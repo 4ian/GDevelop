@@ -242,7 +242,7 @@ module.exports = {
         .addObject(
           'Model3DObject',
           _('3D Model'),
-          _('An animated 3D model.'),
+          _('An animated 3D model, useful for most elements of a 3D game.'),
           'JsPlatform/Extensions/3d_model.svg',
           new gd.Model3DObjectConfiguration()
         )

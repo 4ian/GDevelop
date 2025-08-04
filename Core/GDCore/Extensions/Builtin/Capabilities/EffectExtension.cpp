@@ -19,7 +19,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsEffectExtension(
   extension
       .SetExtensionInformation("EffectCapability",
                                _("Effect capability"),
-                               _("Apply visual effects to objects."),
+                               _("Actions/conditions to enable/disable and change parameters of visual effects applied on objects."),
                                "Florian Rival",
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/objects");
@@ -30,7 +30,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsEffectExtension(
       "EffectBehavior",
       _("Effect capability"),
       "Effect",
-      _("Apply visual effects to objects."),
+      _("Actions/conditions to enable/disable and change parameters of visual effects applied on objects."),
       "",
       "res/actions/effect_black.svg",
       "EffectBehavior",

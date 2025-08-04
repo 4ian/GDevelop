@@ -18,7 +18,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
     gd::PlatformExtension& extension) {
   extension
       .SetExtensionInformation("AnimatableCapability",
-                               _("Animatable capability"),
+                               _("Actions and conditions for objects having animations (sprite, 3D models...)."),
                                _("Animate objects."),
                                "Florian Rival",
                                "Open source (MIT License)")
@@ -32,7 +32,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
       "AnimatableBehavior",
       _("Animatable capability"),
       "Animation",
-      _("Animate objects."),
+      _("Actions and conditions for objects having animations (sprite, 3D models...).."),
       "",
       "res/actions/animation24.png",
       "AnimatableBehavior",

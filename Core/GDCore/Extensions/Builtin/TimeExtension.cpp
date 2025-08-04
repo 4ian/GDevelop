@@ -15,9 +15,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
       .SetExtensionInformation(
           "BuiltinTime",
           _("Timers and time"),
-          "Actions and conditions to run timers, get the current time or "
-          "modify the time scale (speed at which the game is running - useful "
-          "for slow motion effects).",
+          "Actions and conditions to start, pause or reset scene timers, "
+          "modify the time scale (speed at which the game "
+          "is running - useful for slow motion effects). Also contains an "
+          "action that wait for a delay before running the next actions and "
+          "sub-events and expressions to read the time scale, time delta of "
+          "the last frame or timer elapsed time.",
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/timers-and-time");
@@ -192,26 +195,28 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
   extension
       .AddExpression("TimerElapsedTime",
                      _("Scene timer value"),
-                     _("Value of a scene timer"),
+                     _("Value of a scene timer (in seconds)"),
                      "",
                      "res/actions/time.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("identifier", _("Timer's name"), "sceneTimer");
 
   extension
-      .AddExpression("TimeFromStart",
-                     _("Time elapsed since the beginning of the scene"),
-                     _("Time elapsed since the beginning of the scene"),
-                     "",
-                     "res/actions/time.png")
+      .AddExpression(
+          "TimeFromStart",
+          _("Time elapsed since the beginning of the scene (in seconds)."),
+          _("Time elapsed since the beginning of the scene (in seconds)."),
+          "",
+          "res/actions/time.png")
       .AddCodeOnlyParameter("currentScene", "");
 
   extension
-      .AddExpression("TempsDebut",
-                     _("Time elapsed since the beginning of the scene"),
-                     _("Time elapsed since the beginning of the scene"),
-                     "",
-                     "res/actions/time.png")
+      .AddExpression(
+          "TempsDebut",
+          _("Time elapsed since the beginning of the scene (in seconds)."),
+          _("Time elapsed since the beginning of the scene (in seconds)."),
+          "",
+          "res/actions/time.png")
       .SetHidden()
       .AddCodeOnlyParameter("currentScene", "");
 
@@ -226,16 +231,21 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
   extension
       .AddExpression("Time",
                      _("Current time"),
-                     _("Current time"),
+                     _("Gives the current time"),
                      "",
                      "res/actions/time.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter(
           "stringWithSelector",
-          _("Hour: hour - Minutes: min - Seconds: sec - Day of month: "
-            "mday - Months since January: mon - Year since 1900: year - Days "
-            "since Sunday: wday - Days since Jan 1st: yday - Timestamp (ms): "
-            "timestamp\""),
+          _("- Hour of the day: \"hour\"\n"
+            "- Minutes: \"min\"\n"
+            "- Seconds: \"sec\"\n"
+            "- Day of month: \"mday\"\n"
+            "- Months since January: \"mon\"\n"
+            "- Year since 1900: \"year\"\n"
+            "- Days since Sunday: \"wday\"\n"
+            "- Days since Jan 1st: \"yday\"\n"
+            "- Timestamp (ms): \"timestamp\""),
           "[\"hour\", \"min\", \"sec\", \"mon\", \"year\", \"wday\", \"mday\", "
           "\"yday\", \"timestamp\"]");
 }

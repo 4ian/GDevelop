@@ -16,11 +16,13 @@ namespace gd {
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsResizableExtension(
     gd::PlatformExtension &extension) {
   extension
-      .SetExtensionInformation("ResizableCapability",
-                               _("Resizable capability"),
-                               _("Change the object dimensions."),
-                               "Florian Rival",
-                               "Open source (MIT License)")
+      .SetExtensionInformation(
+          "ResizableCapability",
+          _("Resizable capability"),
+          _("Change or compare the size (width/height) of an object which can "
+            "be resized (i.e: most objects)."),
+          "Florian Rival",
+          "Open source (MIT License)")
       .SetExtensionHelpPath("/objects");
   extension.AddInstructionOrExpressionGroupMetadata(_("Size")).SetIcon(
       "res/actions/scale24_black.png");
@@ -30,7 +32,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsResizableExtension(
           .AddBehavior("ResizableBehavior",
                        _("Resizable capability"),
                        "Resizable",
-                       _("Change the object dimensions."),
+                       _("Change or compare the size (width/height) of an "
+                         "object which can be resized (i.e: most objects)."),
                        "",
                        "res/actions/scale24_black.png",
                        "ResizableBehavior",

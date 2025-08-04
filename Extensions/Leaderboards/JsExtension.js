@@ -21,7 +21,9 @@ module.exports = {
       .setExtensionInformation(
         'Leaderboards',
         _('Leaderboards'),
-        _('Allow your game to send scores to your leaderboards.'),
+        _(
+          'Allow your game to send scores to your leaderboards (anonymously or from the logged-in player) or display existing leaderboards to the player.'
+        ),
         'Florian Rival',
         'Open source (MIT License)'
       )

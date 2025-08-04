@@ -22,7 +22,7 @@ module.exports = {
         'Lighting',
         _('Lights'),
 
-        'This provides a light object, and a behavior to mark other objects as being obstacles for the lights. This is a great way to create a special atmosphere to your game, along with effects, make it more realistic or to create gameplays based on lights.',
+        'This provides a 2D light object, and a behavior to mark other 2D objects as being obstacles for the lights. This is a great way to create a special atmosphere to your game, along with effects, make it more realistic or to create gameplays based on lights.',
         'Harsimran Virk',
         'MIT'
       )
@@ -51,7 +51,7 @@ module.exports = {
         _('Light Obstacle Behavior'),
         'LightObstacleBehavior',
         _(
-          'Flag objects as being obstacles to light. The light emitted by light objects will be stopped by the object.'
+          'Flag objects as being obstacles to 2D lights. The light emitted by light objects will be stopped by the object. This does not work on 3D objects and 3D games.'
         ),
         '',
         'CppPlatform/Extensions/lightObstacleIcon32.png',
@@ -164,7 +164,7 @@ module.exports = {
         'LightObject',
         _('Light'),
         _(
-          'Displays a light on the scene, with a customizable radius and color. Add then the Light Obstacle behavior to the objects that must act as obstacle to the lights.'
+          'Displays a 2D light on the scene, with a customizable radius and color. Add then the Light Obstacle behavior to the objects that must act as obstacle to the lights.'
         ),
         'CppPlatform/Extensions/lightIcon32.png',
         lightObject

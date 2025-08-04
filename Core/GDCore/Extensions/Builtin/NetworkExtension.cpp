@@ -15,8 +15,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
       .SetExtensionInformation(
           "BuiltinNetwork",
           _("Network"),
-          _("Features to send web requests, communicate with external \"APIs\" "
-            "and other network related tasks."),
+          _("Actions to send web requests, communicate with external \"APIs\" "
+            "and other network related tasks. Also contains an action to open "
+            "a URL on the device browser."),
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/network")

@@ -15,12 +15,13 @@ namespace gd {
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
     gd::PlatformExtension& extension) {
   extension
-      .SetExtensionInformation("Sprite",
-                               _("Sprite"),
-                               _("Sprite are animated object which can be used "
-                                 "for most elements of a game."),
-                               "Florian Rival",
-                               "Open source (MIT License)")
+      .SetExtensionInformation(
+          "Sprite",
+          _("Sprite"),
+          _("Sprite are animated objects which can be used "
+            "for most elements of a 2D game."),
+          "Florian Rival",
+          "Open source (MIT License)")
       .SetExtensionHelpPath("/objects/sprite");
   extension.AddInstructionOrExpressionGroupMetadata(_("Sprite"))
       .SetIcon("CppPlatform/Extensions/spriteicon.png");
@@ -30,7 +31,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
           .AddObject<SpriteObject>("Sprite",
                                    _("Sprite"),
                                    _("Animated object which can be used for "
-                                     "most elements of a game."),
+                                     "most elements of a 2D game."),
                                    "CppPlatform/Extensions/spriteicon.png")
           .SetCategoryFullName(_("General"))
           .SetOpenFullEditorLabel(_("Edit animations"))
@@ -645,11 +646,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                     "res/actions/sprite.png")
       .AddParameter("object", _("Object"), "Sprite");
 
-  obj.AddExpression("AnimationFrameCount",
-                    _("Number of frames"),
-                    _("Number of frames in the current animation of the object"),
-                    _("Animations and images"),
-                    "res/actions/sprite.png")
+  obj.AddExpression(
+         "AnimationFrameCount",
+         _("Number of frames"),
+         _("Number of frames in the current animation of the object"),
+         _("Animations and images"),
+         "res/actions/sprite.png")
       .AddParameter("object", _("Object"), "Sprite");
 
   // Deprecated

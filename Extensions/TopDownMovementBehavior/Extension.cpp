@@ -16,8 +16,11 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .SetExtensionInformation(
           "TopDownMovementBehavior",
           _("Top-down movement"),
-          _("Allows to move objects in either 4 or 8 directions, with the "
-            "keyboard or using events."),
+          _("Allows to move an object in either 4 or 8 directions, with the "
+            "keyboard (default), a virtual stick (for this, also add the "
+            "\"Top-down multitouch controller mapper\" behavior and a"
+            "\"Multitouch Joystick\" object), gamepad or manually using "
+            "events."),
           "Florian Rival",
           "Open source (MIT License)")
       .SetCategory("Movement")
@@ -26,17 +29,17 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
   extension.AddInstructionOrExpressionGroupMetadata(_("Top-down movement"))
       .SetIcon("CppPlatform/Extensions/topdownmovementicon16.png");
 
-  gd::BehaviorMetadata& aut = extension.AddBehavior(
-      "TopDownMovementBehavior",
-      _("Top-down movement (4 or 8 directions)"),
-      "TopDownMovement",
-      _("Move objects left, up, right, and "
-        "down (and, optionally, diagonally)."),
-      "",
-      "CppPlatform/Extensions/topdownmovementicon.png",
-      "TopDownMovementBehavior",
-      std::make_shared<TopDownMovementBehavior>(),
-      std::make_shared<gd::BehaviorsSharedData>());
+  gd::BehaviorMetadata& aut =
+      extension.AddBehavior("TopDownMovementBehavior",
+                            _("Top-down movement (4 or 8 directions)"),
+                            "TopDownMovement",
+                            _("Move objects left, up, right, and "
+                              "down (and, optionally, diagonally)."),
+                            "",
+                            "CppPlatform/Extensions/topdownmovementicon.png",
+                            "TopDownMovementBehavior",
+                            std::make_shared<TopDownMovementBehavior>(),
+                            std::make_shared<gd::BehaviorsSharedData>());
 
   aut.AddAction("SimulateLeftKey",
                 _("Simulate left key press"),
@@ -119,7 +122,8 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
   aut.AddAction("SimulateStick",
                 _("Simulate stick control"),
                 _("Simulate a stick control."),
-                _("Simulate a stick control for _PARAM0_ with a _PARAM2_ angle and a _PARAM3_ force"),
+                _("Simulate a stick control for _PARAM0_ with a _PARAM2_ angle "
+                  "and a _PARAM3_ force"),
                 _("Top-down controls"),
                 "res/conditions/keyboard24.png",
                 "res/conditions/keyboard.png")
@@ -130,25 +134,28 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .MarkAsAdvanced()
       .SetFunctionName("SimulateStick");
 
-    aut.AddScopedCondition("IsUsingControl",
-                  _("Control pressed or simulated"),
-                  _("A control was applied from a default control or simulated by an action."),
-                  _("_PARAM0_ has the _PARAM2_ key pressed or simulated"),
-                  _("Top-down state"),
-                  "res/conditions/keyboard24.png",
-                  "res/conditions/keyboard.png")
-        .AddParameter("object", _("Object"))
-        .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-        .AddParameter("stringWithSelector",
+  aut.AddScopedCondition(
+         "IsUsingControl",
+         _("Control pressed or simulated"),
+         _("A control was applied from a default control or simulated by an "
+           "action."),
+         _("_PARAM0_ has the _PARAM2_ key pressed or simulated"),
+         _("Top-down state"),
+         "res/conditions/keyboard24.png",
+         "res/conditions/keyboard.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
+      .AddParameter("stringWithSelector",
                     _("Key"),
                     "[\"Left\", \"Right\", \"Up\", \"Down\", \"Stick\"]")
-        .MarkAsAdvanced();
+      .MarkAsAdvanced();
 
-  aut.AddExpression("StickAngle",
-                    _("Stick angle"),
-                    _("Return the angle of the simulated stick input (in degrees)"),
-                    _("Top-down controls"),
-                    "CppPlatform/Extensions/topdownmovementicon16.png")
+  aut.AddExpression(
+         "StickAngle",
+         _("Stick angle"),
+         _("Return the angle of the simulated stick input (in degrees)"),
+         _("Top-down controls"),
+         "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior");
 
@@ -361,19 +368,19 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .MarkAsAdvanced()
       .SetHidden()
       .SetFunctionName("GetAngle");
-    
-    aut.AddScopedCondition(
-           "IsMovementAngleAround",
-           _("Angle of movement"),
-           _("Compare the angle of the top-down movement of the object."),
-           _("Angle of movement of _PARAM0_ is _PARAM2_ ± _PARAM3_°"),
+
+  aut.AddScopedCondition(
+         "IsMovementAngleAround",
+         _("Angle of movement"),
+         _("Compare the angle of the top-down movement of the object."),
+         _("Angle of movement of _PARAM0_ is _PARAM2_ ± _PARAM3_°"),
          _("Top-down state"),
          "CppPlatform/Extensions/topdownmovementicon24.png",
          "CppPlatform/Extensions/topdownmovementicon16.png")
-        .AddParameter("object", _("Object"))
-        .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-        .AddParameter("expression", _("Angle (in degrees)"))
-        .AddParameter("expression", _("Tolerance (in degrees)"));
+      .AddParameter("object", _("Object"))
+      .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
+      .AddParameter("expression", _("Angle (in degrees)"))
+      .AddParameter("expression", _("Tolerance (in degrees)"));
 
   aut.AddCondition("XVelocity",
                    _("Speed on X axis"),

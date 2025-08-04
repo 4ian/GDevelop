@@ -19,26 +19,29 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsScalableExtension(
   extension
       .SetExtensionInformation("ScalableCapability",
                                _("Scalable capability"),
-                               _("Change the object scale."),
+                               _("Actions/conditions/expression to change or "
+                                 "check the scale of an object (default: 1)."),
                                "Florian Rival",
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/objects");
   extension.AddInstructionOrExpressionGroupMetadata(_("Scalable capability"))
       .SetIcon("res/actions/scale24_black.png");
-  extension.AddInstructionOrExpressionGroupMetadata(_("Size"))
-      .SetIcon("res/actions/scale24_black.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Size")).SetIcon(
+      "res/actions/scale24_black.png");
 
-  gd::BehaviorMetadata& aut = extension.AddBehavior(
-      "ScalableBehavior",
-      _("Scalable capability"),
-      "Scale",
-      _("Change the object scale."),
-      "",
-      "res/actions/scale24_black.png",
-      "ResizableBehavior",
-      std::make_shared<gd::Behavior>(),
-      std::make_shared<gd::BehaviorsSharedData>())
-    .SetHidden();
+  gd::BehaviorMetadata& aut =
+      extension
+          .AddBehavior("ScalableBehavior",
+                       _("Scalable capability"),
+                       "Scale",
+                       _("Actions/conditions/expression to change or check the "
+                         "scale of an object (default: 1)."),
+                       "",
+                       "res/actions/scale24_black.png",
+                       "ResizableBehavior",
+                       std::make_shared<gd::Behavior>(),
+                       std::make_shared<gd::BehaviorsSharedData>())
+          .SetHidden();
 
   aut.AddExpressionAndConditionAndAction(
          "number",

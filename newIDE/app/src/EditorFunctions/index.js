@@ -2344,7 +2344,7 @@ const createScene: EditorFunction = {
     if (project.hasLayoutNamed(scene_name)) {
       const scene = project.getLayout(scene_name);
       if (include_ui_layer && !scene.hasLayerNamed('UI')) {
-        scene.insertNewLayer('UI', 1);
+        scene.insertNewLayer('UI', 0);
         return makeGenericSuccess(
           `Scene with name "${scene_name}" already exists, no need to re-create it. A layer called "UI" was added to it.`
         );

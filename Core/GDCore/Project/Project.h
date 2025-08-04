@@ -374,12 +374,14 @@ class GD_CORE_API Project {
   void SetVerticalSyncActivatedByDefault(bool enable) { verticalSync = enable; }
 
   /**
-   * Return the scale mode used by the game (usually "linear" or "nearest").
+   * Return the scale mode used by the game (usually "linear", "magnified" or
+   * "nearest").
    */
   const gd::String& GetScaleMode() const { return scaleMode; }
 
   /**
-   * Set the scale mode used by the game (usually "linear" or "nearest").
+   * Set the scale mode used by the game (usually "linear", "magnified" or
+   * "nearest").
    */
   void SetScaleMode(const gd::String& scaleMode_) { scaleMode = scaleMode_; }
 

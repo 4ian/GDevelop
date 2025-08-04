@@ -34,6 +34,15 @@ namespace gdjs {
       }
     }
 
+    /**
+     * Called when the game zoom factor is changed to adapt to a new resolution.
+     */
+    onGameZoomFactorChanged(): void {
+      for (let i = 0; i < this._stack.length; ++i) {
+        this._stack[i].onGameZoomFactorChanged();
+      }
+    }
+
     step(elapsedTime: float): boolean {
       this._throwIfDisposed();
       if (this._isNextLayoutLoading || this._stack.length === 0) {

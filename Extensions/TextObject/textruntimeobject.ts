@@ -344,6 +344,12 @@ namespace gdjs {
       }
     }
 
+    override onGameZoomFactorChanged(): void {
+      this._renderer.setUpscaleRatio(
+        this.getRuntimeScene().getGame().getZoomFactor()
+      );
+    }
+
     /**
      * Update the rendered object position.
      */

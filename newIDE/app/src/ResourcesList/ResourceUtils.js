@@ -154,7 +154,10 @@ export const applyResourceDefaults = (
   newResource: gdResource
 ) => {
   if (newResource instanceof gd.ImageResource) {
-    newResource.setSmooth(project.getScaleMode() !== 'nearest');
+    newResource.setSmooth(
+      project.getScaleMode() !== 'nearest' &&
+        project.getScaleMode() !== 'magnified'
+    );
   }
 };
 

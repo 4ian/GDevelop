@@ -88,6 +88,7 @@ import { extractAsCustomObject } from './CustomObjectExtractor/CustomObjectExtra
 import { isVariantEditable } from '../ObjectEditor/Editors/CustomObjectPropertiesEditor';
 import { addSerializedInstances } from '../InstancesEditor/InstancesAdder';
 import { type EditorViewPosition2D } from '../InstancesEditor';
+import { setCameraState } from '../EmbeddedGame/EmbeddedGameFrame';
 
 const gd: libGDevelop = global.gd;
 
@@ -315,6 +316,8 @@ export default class SceneEditor extends React.Component<Props, State> {
             }
             if (parsedMessage.command === 'updateInstances') {
               this.onReceiveInstanceChanges(parsedMessage.payload);
+            } else if (parsedMessage.command === 'setCameraState') {
+              setCameraState(parsedMessage.editorId, parsedMessage.payload);
             } else if (parsedMessage.command === 'openContextMenu') {
               this._onContextMenu(
                 parsedMessage.payload.cursorX,

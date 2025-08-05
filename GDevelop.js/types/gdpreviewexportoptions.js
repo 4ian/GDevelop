@@ -18,6 +18,7 @@ declare class gdPreviewExportOptions {
   setIsDevelopmentEnvironment(enable: boolean): gdPreviewExportOptions;
   setIsInGameEdition(enable: boolean): gdPreviewExportOptions;
   setEditorId(editorId: string): gdPreviewExportOptions;
+  setEditorCameraState3D(cameraMode: string, positionX: number, positionY: number, positionZ: number, rotationAngle: number, elevationAngle: number, distance: number): gdPreviewExportOptions;
   setNonRuntimeScriptsCacheBurst(value: number): gdPreviewExportOptions;
   setElectronRemoteRequirePath(electronRemoteRequirePath: string): gdPreviewExportOptions;
   setGDevelopResourceToken(gdevelopResourceToken: string): gdPreviewExportOptions;

@@ -220,6 +220,24 @@ struct PreviewExportOptions {
   }
 
   /**
+   * \brief Set the camera state to use in the in-game editor.
+   */
+  PreviewExportOptions &
+  SetEditorCameraState3D(const gd::String &cameraMode, double positionX,
+                         double positionY, double positionZ,
+                         double rotationAngle, double elevationAngle,
+                         double distance) {
+    editorCamera3DMode = cameraMode;
+    editorCamera3DPositionX = positionX;
+    editorCamera3DPositionY = positionY;
+    editorCamera3DPositionZ = positionZ;
+    editorCamera3DRotationAngle = rotationAngle;
+    editorCamera3DElevationAngle = elevationAngle;
+    editorCamera3DDistance = elevationAngle;
+    return *this;
+  }
+
+  /**
    * \brief If set to a non zero value, the exported script URLs will have an
    * extra search parameter added (with the given value) to ensure browser cache
    * is bypassed when they are loaded.
@@ -347,6 +365,13 @@ struct PreviewExportOptions {
   bool isDevelopmentEnvironment;
   bool isInGameEdition;
   gd::String editorId;
+  gd::String editorCamera3DMode;
+  double editorCamera3DPositionX = 0;
+  double editorCamera3DPositionY = 0;
+  double editorCamera3DPositionZ = 0;
+  double editorCamera3DRotationAngle = 0;
+  double editorCamera3DElevationAngle = 0;
+  double editorCamera3DDistance = 0;
   unsigned int nonRuntimeScriptsCacheBurst;
   gd::String electronRemoteRequirePath;
   gd::String gdevelopResourceToken;

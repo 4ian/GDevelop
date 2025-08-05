@@ -310,6 +310,17 @@ export default class LocalPreviewLauncher extends React.Component<
         });
       }
     }
+    if (previewOptions.editorCameraState3D) {
+      previewExportOptions.setEditorCameraState3D(
+        previewOptions.editorCameraState3D.cameraMode,
+        previewOptions.editorCameraState3D.positionX,
+        previewOptions.editorCameraState3D.positionY,
+        previewOptions.editorCameraState3D.positionZ,
+        previewOptions.editorCameraState3D.rotationAngle,
+        previewOptions.editorCameraState3D.elevationAngle,
+        previewOptions.editorCameraState3D.distance
+      );
+    }
 
     exporter.exportProjectForPixiPreview(previewExportOptions);
     previewExportOptions.delete();

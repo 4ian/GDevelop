@@ -220,7 +220,8 @@ namespace gdjs {
             newRuntimeGameStatus.sceneName,
             newRuntimeGameStatus.injectedExternalLayoutName,
             newRuntimeGameStatus.eventsBasedObjectType,
-            newRuntimeGameStatus.eventsBasedObjectVariantName
+            newRuntimeGameStatus.eventsBasedObjectVariantName,
+            newRuntimeGameStatus.editorCamera3D || null
           );
           const inGameEditor = this._runtimeGame._inGameEditor;
           if (inGameEditor) {

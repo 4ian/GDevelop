@@ -189,11 +189,7 @@ export const openEditorTab = (
     },
   };
   if (!dontFocusTab) {
-    newState = changeCurrentTab(
-      newState,
-      paneIdentifier,
-      pane.editors.length
-    );
+    newState = changeCurrentTab(newState, paneIdentifier, pane.editors.length);
   }
   return newState;
 };

@@ -257,6 +257,24 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   if (options.isInGameEdition) {
     initialRuntimeGameStatus.AddChild("isInGameEdition").SetBoolValue(true);
     initialRuntimeGameStatus.AddChild("editorId").SetValue(options.editorId);
+    if (!options.editorCamera3DMode.empty()) {
+      auto &editorCamera3D =
+          initialRuntimeGameStatus.AddChild("editorCamera3D");
+      editorCamera3D.AddChild("mode").SetStringValue(
+          options.editorCamera3DMode);
+      editorCamera3D.AddChild("positionX")
+          .SetDoubleValue(options.editorCamera3DPositionX);
+      editorCamera3D.AddChild("positionY")
+          .SetDoubleValue(options.editorCamera3DPositionY);
+      editorCamera3D.AddChild("positionZ")
+          .SetDoubleValue(options.editorCamera3DPositionZ);
+      editorCamera3D.AddChild("rotationAngle")
+          .SetDoubleValue(options.editorCamera3DRotationAngle);
+      editorCamera3D.AddChild("elevationAngle")
+          .SetDoubleValue(options.editorCamera3DElevationAngle);
+      editorCamera3D.AddChild("distance")
+          .SetDoubleValue(options.editorCamera3DDistance);
+    }
   }
   if (!options.externalLayoutName.empty()) {
     initialRuntimeGameStatus.AddChild("injectedExternalLayoutName")

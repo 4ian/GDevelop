@@ -321,7 +321,9 @@ namespace gdjs {
       return this._renderer.getRendererObject();
     }
 
-    override updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+    override updatePreRender(
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ): void {
       this._renderer.ensureUpToDate();
     }
 

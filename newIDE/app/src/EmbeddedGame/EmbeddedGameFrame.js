@@ -25,6 +25,16 @@ type SwitchToSceneEditionOptions = {|
   shouldReloadResources: boolean,
 |};
 
+export type EditorCameraState = {|
+  cameraMode: 'free' | 'orbit',
+  positionX: number,
+  positionY: number,
+  positionZ: number,
+  rotationAngle: number,
+  elevationAngle: number,
+  distance: number,
+|};
+
 let onAttachToPreview: null | (AttachToPreviewOptions => void) = null;
 let onSwitchToSceneEdition: null | (SwitchToSceneEditionOptions => void) = null;
 let onSetEditorHotReloadNeeded:
@@ -37,6 +47,9 @@ let onSwitchInGameEditorIfNoHotReloadIsNeeded:
   | null
   | (EditorContentIdentifiers => void) = null;
 let onPreventGameFramePointerEvents: null | ((enabled: boolean) => void) = null;
+let onSetCameraState:
+  | null
+  | ((editorId: string, cameraState: EditorCameraState) => void) = null;
 
 export const attachToPreview = ({
   previewIndexHtmlLocation,
@@ -58,6 +71,14 @@ export const setEditorHotReloadNeeded = (hotReloadProps: {|
   if (!onSetEditorHotReloadNeeded)
     throw new Error('No EmbeddedGameFrame registered.');
   onSetEditorHotReloadNeeded(hotReloadProps);
+};
+
+export const setCameraState = (
+  editorId: string,
+  cameraState: EditorCameraState
+) => {
+  if (!onSetCameraState) throw new Error('No EmbeddedGameFrame registered.');
+  onSetCameraState(editorId, cameraState);
 };
 
 export const switchInGameEditorIfNoHotReloadIsNeeded = (
@@ -104,6 +125,7 @@ type Props = {|
     hotReload: boolean,
     projectDataOnlyExport: boolean,
     shouldReloadResources: boolean,
+    editorCameraState3D: EditorCameraState | null,
   |}) => void,
 |};
 
@@ -126,6 +148,9 @@ export const EmbeddedGameFrame = ({
   const neededHotReload = React.useRef<
     'None' | 'Data' | 'DataAndResources' | 'Full'
   >('None');
+  const cameraStates = React.useRef<Map<string, EditorCameraState>>(
+    new Map<string, EditorCameraState>()
+  );
 
   React.useEffect(
     () => {
@@ -158,6 +183,9 @@ export const EmbeddedGameFrame = ({
             neededHotReload.current = 'DataAndResources';
           }
         }
+      };
+      onSetCameraState = (editorId: string, cameraState: EditorCameraState) => {
+        cameraStates.current.set(editorId, cameraState);
       };
       onSwitchToSceneEdition = (options: SwitchToSceneEditionOptions) => {
         if (!previewDebuggerServer) return;
@@ -199,6 +227,7 @@ export const EmbeddedGameFrame = ({
               shouldReloadResources ||
               neededHotReload.current === 'DataAndResources' ||
               neededHotReload.current === 'Full',
+            editorCameraState3D: cameraStates.current.get(editorId) || null,
           });
           neededHotReload.current = 'None';
         } else {
@@ -217,6 +246,7 @@ export const EmbeddedGameFrame = ({
               externalLayoutName,
               eventsBasedObjectType,
               eventsBasedObjectVariantName,
+              editorCamera3D: cameraStates.current.get(editorId),
             });
           });
         }
@@ -248,6 +278,7 @@ export const EmbeddedGameFrame = ({
             externalLayoutName,
             eventsBasedObjectType,
             eventsBasedObjectVariantName,
+            cameraState3D: cameraStates.current.get(editorId),
           });
         });
       };

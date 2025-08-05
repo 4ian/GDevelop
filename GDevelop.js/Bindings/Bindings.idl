@@ -4016,6 +4016,14 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetIsDevelopmentEnvironment(boolean enable);
     [Ref] PreviewExportOptions SetIsInGameEdition(boolean enable);
     [Ref] PreviewExportOptions SetEditorId([Const] DOMString editorId);
+    [Ref] PreviewExportOptions SetEditorCameraState3D(
+        [Const] DOMString cameraMode,
+        double positionX,
+        double positionY,
+        double positionZ,
+        double rotationAngle,
+        double elevationAngle,
+        double distance);
     [Ref] PreviewExportOptions SetNonRuntimeScriptsCacheBurst(unsigned long value);
     [Ref] PreviewExportOptions SetElectronRemoteRequirePath([Const] DOMString electronRemoteRequirePath);
     [Ref] PreviewExportOptions SetGDevelopResourceToken([Const] DOMString gdevelopResourceToken);

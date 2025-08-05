@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { type EditorCameraState } from '../EmbeddedGame/EmbeddedGameFrame';
 
 // Simpler version of the CaptureOptions, as only the delayTimeInSeconds is needed to start configuring the preview capture.
 export type LaunchCaptureOptions = {|
@@ -22,6 +23,7 @@ export type LaunchPreviewOptions = {
     forcedExternalLayoutName: string | null,
     eventsBasedObjectType: string | null,
     eventsBasedObjectVariantName: string | null,
+    editorCameraState3D: EditorCameraState | null,
   |},
   launchCaptureOptions?: LaunchCaptureOptions,
 };
@@ -59,6 +61,7 @@ export type PreviewOptions = {|
   onCaptureFinished: CaptureOptions => Promise<void>,
   inAppTutorialMessageInPreview: string,
   inAppTutorialMessagePositionInPreview: string,
+  editorCameraState3D: EditorCameraState | null,
 |};
 
 /** The props that PreviewLauncher must support */

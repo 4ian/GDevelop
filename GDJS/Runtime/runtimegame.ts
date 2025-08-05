@@ -55,6 +55,7 @@ namespace gdjs {
     eventsBasedObjectType: string | null;
     eventsBasedObjectVariantName: string | null;
     editorId: string | null;
+    editorCamera3D?: EditorCameraState;
   };
 
   /**
@@ -80,6 +81,7 @@ namespace gdjs {
         eventsBasedObjectVariantName:
           parsedRuntimeGameStatus.eventsBasedObjectVariantName,
         editorId: parsedRuntimeGameStatus.editorId,
+        editorCamera3D: parsedRuntimeGameStatus.editorCamera3D,
       };
     } catch (e) {
       return null;
@@ -1080,12 +1082,15 @@ namespace gdjs {
             ?.eventsBasedObjectVariantName || null;
         const editorId =
           this._options.initialRuntimeGameStatus?.editorId || null;
+        const editorCamera3D =
+          this._options.initialRuntimeGameStatus?.editorCamera3D || null;
         this._forceToSwitchToSceneOrVariant(
           editorId,
           sceneName,
           externalLayoutName,
           eventsBasedObjectType,
-          eventsBasedObjectVariantName
+          eventsBasedObjectVariantName,
+          editorCamera3D
         );
 
         this._watermark.displayAtStartup();
@@ -1200,13 +1205,6 @@ namespace gdjs {
       if (!initialRuntimeGameStatus) {
         return;
       }
-      this._forceToSwitchToSceneOrVariant(
-        initialRuntimeGameStatus.editorId,
-        initialRuntimeGameStatus.sceneName,
-        initialRuntimeGameStatus.injectedExternalLayoutName,
-        initialRuntimeGameStatus.eventsBasedObjectType,
-        initialRuntimeGameStatus.eventsBasedObjectVariantName
-      );
     }
 
     _switchToSceneOrVariant(
@@ -1214,7 +1212,8 @@ namespace gdjs {
       sceneName: string | null,
       externalLayoutName: string | null,
       eventsBasedObjectType: string | null,
-      eventsBasedObjectVariantName: string | null
+      eventsBasedObjectVariantName: string | null,
+      editorCamera3D: EditorCameraState | null
     ) {
       const initialRuntimeGameStatus =
         this.getAdditionalOptions().initialRuntimeGameStatus;
@@ -1237,7 +1236,8 @@ namespace gdjs {
         sceneName,
         externalLayoutName,
         eventsBasedObjectType,
-        eventsBasedObjectVariantName
+        eventsBasedObjectVariantName,
+        editorCamera3D
       );
     }
 
@@ -1246,7 +1246,8 @@ namespace gdjs {
       sceneName: string | null,
       externalLayoutName: string | null,
       eventsBasedObjectType: string | null,
-      eventsBasedObjectVariantName: string | null
+      eventsBasedObjectVariantName: string | null,
+      editorCamera3D: EditorCameraState | null
     ) {
       let editedInstanceDataList: Array<InstanceData> = [];
       let editedObjectDataList: Array<ObjectData> = [];
@@ -1326,6 +1327,17 @@ namespace gdjs {
         this._inGameEditor.setEditedInstanceDataList(editedInstanceDataList);
         this._inGameEditor.setEditedObjectDataList(editedObjectDataList);
         this._inGameEditor.setEditorId(editorId || '');
+        if (editorCamera3D) {
+          this._inGameEditor.restoreCameraState(editorCamera3D);
+        } else {
+          // TODO Get the visibleScreenArea from the editor.
+          this._inGameEditor.zoomToInitialPosition({
+            minX: 0.15,
+            minY: 0.15,
+            maxX: 0.85,
+            maxY: 0.85,
+          });
+        }
       }
 
       // Update initialRuntimeGameStatus so that a hard reload

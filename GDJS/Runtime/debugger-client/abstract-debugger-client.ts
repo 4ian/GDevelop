@@ -342,10 +342,7 @@ namespace gdjs {
         if (!this._runtimegame.isInGameEdition()) return;
 
         const sceneName = data.sceneName || null;
-        const externalLayoutName = data.externalLayoutName || null;
         const eventsBasedObjectType = data.eventsBasedObjectType || null;
-        const eventsBasedObjectVariantName =
-          data.eventsBasedObjectVariantName || null;
         if (!sceneName && !eventsBasedObjectType) {
           logger.warn(
             'No scene name specified, switchForInGameEdition aborted'
@@ -356,9 +353,10 @@ namespace gdjs {
         this._runtimegame._switchToSceneOrVariant(
           data.editorId || null,
           sceneName,
-          externalLayoutName,
+          data.externalLayoutName || null,
           eventsBasedObjectType,
-          eventsBasedObjectVariantName
+          data.eventsBasedObjectVariantName || null,
+          data.editorCamera3D || null
         );
 
         const inGameEditor = this._runtimegame._inGameEditor;
@@ -778,6 +776,20 @@ namespace gdjs {
       );
     }
 
+    sendCameraState(cameraState: EditorCameraState): void {
+      const inGameEditor = this._runtimegame._inGameEditor;
+      if (!inGameEditor) {
+        return;
+      }
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'setCameraState',
+          editorId: inGameEditor.getEditorId(),
+          payload: cameraState,
+        })
+      );
+    }
+
     sendUndo(): void {
       const inGameEditor = this._runtimegame._inGameEditor;
       if (!inGameEditor) {
@@ -889,6 +901,7 @@ namespace gdjs {
             initialRuntimeGameStatus?.eventsBasedObjectType || '',
           eventsBasedObjectVariantName:
             initialRuntimeGameStatus?.eventsBasedObjectVariantName || '',
+          editorCamera3D: this._runtimegame._inGameEditor?.getCameraState(),
         };
 
         reloadUrl.searchParams.set(

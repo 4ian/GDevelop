@@ -207,6 +207,7 @@ import {
   registerOnResourceExternallyChangedCallback,
   unregisterOnResourceExternallyChangedCallback,
 } from '../MainFrame/ResourcesWatcher';
+import { type EditorCameraState } from '../EmbeddedGame/EmbeddedGameFrame';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -1899,18 +1900,6 @@ const MainFrame = (props: Props) => {
       if (!currentProject) return;
       if (currentProject.getLayoutsCount() === 0) return;
 
-      console.log('_launchPreview', {
-        networkPreview,
-        numberOfWindows,
-        hotReload,
-        projectDataOnlyExport,
-        shouldReloadResources,
-        fullLoadingScreen,
-        forceDiagnosticReport,
-        launchCaptureOptions,
-        isForInGameEdition,
-      });
-
       const previewLauncher = _previewLauncher.current;
       if (!previewLauncher) return;
 
@@ -1991,6 +1980,9 @@ const MainFrame = (props: Props) => {
           numberOfWindows: numberOfWindows === undefined ? 1 : numberOfWindows,
           isForInGameEdition: !!isForInGameEdition,
           editorId: isForInGameEdition ? isForInGameEdition.editorId : '',
+          editorCameraState3D: isForInGameEdition
+            ? isForInGameEdition.editorCameraState3D
+            : null,
           inAppTutorialMessageInPreview: inAppTutorialMessageInPreview.message,
           inAppTutorialMessagePositionInPreview:
             inAppTutorialMessageInPreview.position,
@@ -2107,6 +2099,7 @@ const MainFrame = (props: Props) => {
       hotReload,
       projectDataOnlyExport,
       shouldReloadResources,
+      editorCameraState3D,
     }: {|
       editorId: string,
       sceneName: string | null,
@@ -2116,6 +2109,7 @@ const MainFrame = (props: Props) => {
       hotReload: boolean,
       projectDataOnlyExport: boolean,
       shouldReloadResources: boolean,
+      editorCameraState3D: EditorCameraState | null,
     |}) => {
       launchPreview({
         networkPreview: false,
@@ -2129,6 +2123,7 @@ const MainFrame = (props: Props) => {
           forcedExternalLayoutName: externalLayoutName,
           eventsBasedObjectType,
           eventsBasedObjectVariantName,
+          editorCameraState3D,
         },
         numberOfWindows: 0,
       });

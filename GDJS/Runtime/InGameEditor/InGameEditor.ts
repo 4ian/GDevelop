@@ -349,12 +349,10 @@ namespace gdjs {
     private _selectedLayerName: string = '';
     private _innerArea: AABB3D | null = null;
     private _threeInnerArea: THREE.Object3D | null = null;
-    //@ts-ignore
     private _tempVector2d: THREE.Vector2 = new THREE.Vector2();
-    //@ts-ignore
     private _raycaster: THREE.Raycaster = new THREE.Raycaster();
 
-    private _editorCameras = new Map<string, EditorCamera>();
+    private _editorCamera;
 
     /** Keep track of the focus to know if the game was blurred since the last frame. */
     private _windowHadFocus = true;
@@ -427,6 +425,7 @@ namespace gdjs {
 
     constructor(game: RuntimeGame, projectData: ProjectData) {
       this._runtimeGame = game;
+      this._editorCamera = new EditorCamera(game);
       this._selectionBoxElement = document.createElement('div');
       this._selectionBoxElement.style.position = 'fixed';
       this._selectionBoxElement.style.backgroundColor = '#f2a63c44';
@@ -2001,6 +2000,14 @@ namespace gdjs {
       return defaultEffectsData;
     }
 
+    getCameraState(): EditorCameraState {
+      return this._getEditorCamera().getCameraState();
+    }
+
+    restoreCameraState(editorCamera3D: EditorCameraState) {
+      this._getEditorCamera().restoreCameraState(editorCamera3D);
+    }
+
     updateAndRender() {
       const objectUnderCursor: gdjs.RuntimeObject | null =
         this.getObjectUnderCursor();
@@ -2043,29 +2050,42 @@ namespace gdjs {
     }
 
     private _getEditorCamera(): EditorCamera {
-      let editorCamera = this._editorCameras.get(this._editorId);
-      if (!editorCamera) {
-        editorCamera = new EditorCamera(this._runtimeGame);
-        this._editorCameras.set(this._editorId, editorCamera);
-      }
-      return editorCamera;
+      return this._editorCamera;
     }
   }
+
+  export type EditorCameraState = {
+    cameraMode: 'free' | 'orbit';
+    positionX: float;
+    positionY: float;
+    positionZ: float;
+    rotationAngle: float;
+    elevationAngle: float;
+    distance: float;
+  };
 
   class EditorCamera implements CameraControl {
     _runtimeGame: gdjs.RuntimeGame;
     orbitCameraControl: OrbitCameraControl;
     freeCameraControl: FreeCameraControl;
+    private _hasChanged = false;
+    private _hadChanged = false;
 
     constructor(runtimeGame: gdjs.RuntimeGame) {
       this._runtimeGame = runtimeGame;
-      this.orbitCameraControl = new OrbitCameraControl(runtimeGame);
-      this.freeCameraControl = new FreeCameraControl(runtimeGame);
+      this.orbitCameraControl = new OrbitCameraControl(this, runtimeGame);
+      this.freeCameraControl = new FreeCameraControl(this, runtimeGame);
       this.freeCameraControl.setEnabled(false);
     }
 
     isFreeCamera(): boolean {
       return this.freeCameraControl.isEnabled();
+    }
+
+    private getActiveCamera() {
+      return this.isFreeCamera()
+        ? this.freeCameraControl
+        : this.orbitCameraControl;
     }
 
     switchToOrbitAroundObject(object: gdjs.RuntimeObject): void {
@@ -2074,6 +2094,7 @@ namespace gdjs {
         object.getCenterYInScene(),
         is3D(object) ? object.getUnrotatedAABBMinZ() : 0
       );
+      this.onHasCameraChanged();
     }
 
     switchToOrbitAroundPosition(
@@ -2092,6 +2113,7 @@ namespace gdjs {
       }
       this.orbitCameraControl.setEnabled(true);
       this.freeCameraControl.setEnabled(false);
+      this.onHasCameraChanged();
     }
 
     switchToFreeCamera(): void {
@@ -2105,36 +2127,42 @@ namespace gdjs {
         this.orbitCameraControl.rotationAngle;
       this.freeCameraControl.elevationAngle =
         this.orbitCameraControl.elevationAngle;
+      this.onHasCameraChanged();
     }
 
     resetRotationToTopDown(): void {
       this.orbitCameraControl.resetRotationToTopDown();
       this.freeCameraControl.resetRotationToTopDown();
+      this.onHasCameraChanged();
     }
 
     setOrbitDistance(distance: number): void {
       this.orbitCameraControl.distance = distance;
+      this.onHasCameraChanged();
     }
 
     step(): void {
       this.orbitCameraControl.step();
       this.freeCameraControl.step();
+
+      if (this._hadChanged && !this._hasChanged) {
+        this._sendCameraState();
+      }
+      this._hadChanged = this._hasChanged;
+      this._hasChanged = false;
+    }
+
+    onHasCameraChanged() {
+      this._hasChanged = true;
     }
 
     updateCamera(currentScene: RuntimeScene, layer: RuntimeLayer): void {
-      if (this.orbitCameraControl.isEnabled()) {
-        this.orbitCameraControl.updateCamera(currentScene, layer);
-      } else {
-        this.freeCameraControl.updateCamera(currentScene, layer);
-      }
+      this.getActiveCamera().updateCamera(currentScene, layer);
     }
 
     zoomBy(zoomInFactor: float): void {
-      if (this.orbitCameraControl.isEnabled()) {
-        this.orbitCameraControl.zoomBy(zoomInFactor);
-      } else {
-        this.freeCameraControl.zoomBy(zoomInFactor);
-      }
+      this.getActiveCamera().zoomBy(zoomInFactor);
+      this.onHasCameraChanged();
     }
 
     zoomToInitialPosition(visibleScreenArea: {
@@ -2258,6 +2286,7 @@ namespace gdjs {
       );
       this.resetRotationToTopDown();
       this.setOrbitDistance(distance);
+      this.onHasCameraChanged();
     }
 
     /**
@@ -2279,6 +2308,29 @@ namespace gdjs {
         Math.tan(0.5 * gdjs.toRad(fov))
       );
     };
+
+    getCameraState(): EditorCameraState {
+      return this.getActiveCamera()._getCameraState();
+    }
+
+    restoreCameraState(cameraState: EditorCameraState) {
+      if (cameraState.cameraMode === 'free') {
+        this.orbitCameraControl.setEnabled(false);
+        this.freeCameraControl.setEnabled(true);
+        this.freeCameraControl._restoreCameraState(cameraState);
+      } else {
+        this.freeCameraControl.setEnabled(false);
+        this.orbitCameraControl.setEnabled(true);
+        this.orbitCameraControl._restoreCameraState(cameraState);
+      }
+      this.onHasCameraChanged();
+    }
+
+    private _sendCameraState() {
+      const debuggerClient = this._runtimeGame._debuggerClient;
+      if (!debuggerClient) return;
+      debuggerClient.sendCameraState(this.getCameraState());
+    }
   }
 
   interface CameraControl {
@@ -2289,7 +2341,7 @@ namespace gdjs {
   }
 
   class OrbitCameraControl implements CameraControl {
-    //@ts-ignore
+    private _editorCamera: EditorCamera;
     target: THREE.Vector3 = new THREE.Vector3();
     rotationAngle: float = 0;
     elevationAngle: float = 90;
@@ -2301,7 +2353,8 @@ namespace gdjs {
     private _lastCursorY: float = 0;
     private _wasMouseRightButtonPressed = false;
 
-    constructor(runtimeGame: gdjs.RuntimeGame) {
+    constructor(editorCamera: EditorCamera, runtimeGame: gdjs.RuntimeGame) {
+      this._editorCamera = editorCamera;
       this._runtimeGame = runtimeGame;
     }
 
@@ -2311,6 +2364,7 @@ namespace gdjs {
 
     setEnabled(isEnabled: boolean): void {
       this._isEnabled = isEnabled;
+      this._editorCamera.onHasCameraChanged();
     }
 
     step(): void {
@@ -2328,13 +2382,15 @@ namespace gdjs {
           const rotationSpeed = 0.2;
           this.rotationAngle += xDelta * rotationSpeed;
           this.elevationAngle += yDelta * rotationSpeed;
+          this._editorCamera.onHasCameraChanged();
         }
-      }
 
-      // Mouse wheel: movement on the plane or forward/backward movement.
-      const wheelDeltaY = inputManager.getMouseWheelDelta();
-      if (shouldZoom(inputManager)) {
-        this.distance = Math.max(10, this.distance - wheelDeltaY);
+        // Mouse wheel: movement on the plane or forward/backward movement.
+        const wheelDeltaY = inputManager.getMouseWheelDelta();
+        if (wheelDeltaY !== 0 && shouldZoom(inputManager)) {
+          this.distance = Math.max(10, this.distance - wheelDeltaY);
+          this._editorCamera.onHasCameraChanged();
+        }
       }
 
       this._wasMouseRightButtonPressed = inputManager.isMouseButtonPressed(1);
@@ -2377,28 +2433,52 @@ namespace gdjs {
       layer.setCameraRotation(this.rotationAngle);
     }
 
-    zoomBy(zoomInFactor: float) {
+    zoomBy(zoomInFactor: float): void {
       this.distance = Math.min(
         10,
         this.distance + zoomInFactor > 1 ? 200 : -200
       );
+      this._editorCamera.onHasCameraChanged();
     }
 
-    resetRotationToTopDown() {
+    resetRotationToTopDown(): void {
       this.rotationAngle = 0;
       this.elevationAngle = 90;
+      this._editorCamera.onHasCameraChanged();
+    }
+
+    _getCameraState(): EditorCameraState {
+      return {
+        cameraMode: 'orbit',
+        positionX: this.target.x,
+        positionY: this.target.y,
+        positionZ: this.target.z,
+        rotationAngle: this.rotationAngle,
+        elevationAngle: this.elevationAngle,
+        distance: this.distance,
+      };
+    }
+
+    _restoreCameraState(cameraState: EditorCameraState): void {
+      if (cameraState.cameraMode !== 'orbit') {
+        return;
+      }
+      this.target.x = cameraState.positionX;
+      this.target.y = cameraState.positionY;
+      this.target.z = cameraState.positionZ;
+      this.rotationAngle = cameraState.rotationAngle;
+      this.elevationAngle = cameraState.elevationAngle;
+      this._editorCamera.onHasCameraChanged();
     }
   }
 
   class FreeCameraControl implements CameraControl {
-    //@ts-ignore
+    private _editorCamera: EditorCamera;
     position: THREE.Vector3 = new THREE.Vector3();
     rotationAngle: float = 0;
     elevationAngle: float = 30;
     private _isEnabled: boolean = true;
-    //@ts-ignore
     private _euler: THREE.Euler = new THREE.Euler(0, 0, 0, 'ZYX');
-    //@ts-ignore
     private _rotationMatrix: THREE.Matrix4 = new THREE.Matrix4();
 
     private _runtimeGame: gdjs.RuntimeGame;
@@ -2406,7 +2486,8 @@ namespace gdjs {
     private _lastCursorY: float = 0;
     private _wasMouseRightButtonPressed = false;
 
-    constructor(runtimeGame: gdjs.RuntimeGame) {
+    constructor(editorCamera: EditorCamera, runtimeGame: gdjs.RuntimeGame) {
+      this._editorCamera = editorCamera;
       this._runtimeGame = runtimeGame;
     }
 
@@ -2416,6 +2497,7 @@ namespace gdjs {
 
     setEnabled(isEnabled: boolean): void {
       this._isEnabled = isEnabled;
+      this._editorCamera.onHasCameraChanged();
     }
 
     step(): void {
@@ -2427,16 +2509,20 @@ namespace gdjs {
           this.position.x += vector.x * scale;
           this.position.y += vector.y * scale;
           this.position.z += vector.z * scale;
+          this._editorCamera.onHasCameraChanged();
         };
 
         // Mouse wheel: movement on the plane or forward/backward movement.
         const wheelDeltaY = inputManager.getMouseWheelDelta();
         const wheelDeltaX = inputManager.getMouseWheelDeltaX();
-        if (shouldZoom(inputManager)) {
+        if (wheelDeltaY !== 0 && shouldZoom(inputManager)) {
           moveCameraByVector(forward, wheelDeltaY);
-        } else if (shouldScrollHorizontally(inputManager)) {
+        } else if (
+          wheelDeltaY !== 0 &&
+          shouldScrollHorizontally(inputManager)
+        ) {
           moveCameraByVector(right, wheelDeltaY / 5);
-        } else {
+        } else if (wheelDeltaX !== 0 || wheelDeltaY !== 0) {
           moveCameraByVector(up, wheelDeltaY / 5);
           moveCameraByVector(right, wheelDeltaX / 5);
         }
@@ -2510,6 +2596,7 @@ namespace gdjs {
           const rotationSpeed = 0.2;
           this.rotationAngle += xDelta * rotationSpeed;
           this.elevationAngle += yDelta * rotationSpeed;
+          this._editorCamera.onHasCameraChanged();
         }
       }
       this._wasMouseRightButtonPressed = inputManager.isMouseButtonPressed(1);
@@ -2524,6 +2611,7 @@ namespace gdjs {
         this.position.x += vector.x * scale;
         this.position.y += vector.y * scale;
         this.position.z += vector.z * scale;
+        this._editorCamera.onHasCameraChanged();
       };
 
       moveCameraByVector(forward, distanceDelta);
@@ -2574,13 +2662,39 @@ namespace gdjs {
       return { right, up, forward };
     }
 
-    zoomBy(zoomInFactor: float) {
+    zoomBy(zoomInFactor: float): void {
       this.moveForward(zoomInFactor > 1 ? 200 : -200);
+      this._editorCamera.onHasCameraChanged();
     }
 
-    resetRotationToTopDown() {
+    resetRotationToTopDown(): void {
       this.rotationAngle = 0;
       this.elevationAngle = 90;
+      this._editorCamera.onHasCameraChanged();
+    }
+
+    _getCameraState(): EditorCameraState {
+      return {
+        cameraMode: 'free',
+        positionX: this.position.x,
+        positionY: this.position.y,
+        positionZ: this.position.z,
+        rotationAngle: this.rotationAngle,
+        elevationAngle: this.elevationAngle,
+        distance: 0,
+      };
+    }
+
+    _restoreCameraState(cameraState: EditorCameraState): void {
+      if (cameraState.cameraMode !== 'free') {
+        return;
+      }
+      this.position.x = cameraState.positionX;
+      this.position.y = cameraState.positionY;
+      this.position.z = cameraState.positionZ;
+      this.rotationAngle = cameraState.rotationAngle;
+      this.elevationAngle = cameraState.elevationAngle;
+      this._editorCamera.onHasCameraChanged();
     }
   }
 

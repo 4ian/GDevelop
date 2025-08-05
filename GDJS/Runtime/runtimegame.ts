@@ -381,6 +381,9 @@ namespace gdjs {
      * @param projectData The object (usually stored in data.json) containing the full project data
      */
     setProjectData(projectData: ProjectData): void {
+      if (this._inGameEditor) {
+        this._inGameEditor.onProjectDataChange(projectData);
+      }
       this._data = projectData;
       this._updateSceneAndExtensionsData();
       this._resourcesLoader.setResources(

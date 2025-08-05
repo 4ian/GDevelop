@@ -730,6 +730,8 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   SetPackageName(propElement.GetStringAttribute("packageName"));
   SetTemplateSlug(propElement.GetStringAttribute("templateSlug"));
   SetOrientation(propElement.GetStringAttribute("orientation", "default"));
+  SetEffectsHiddenInEditor(
+      propElement.GetBoolAttribute("areEffectsHiddenInEditor", false));
   SetFolderProject(propElement.GetBoolAttribute("folderProject"));
   SetLastCompilationDirectory(propElement
                                   .GetChild("latestCompilationDirectory",
@@ -1325,6 +1327,8 @@ void Project::Init(const gd::Project& game) {
 
   sceneResourcesPreloading = game.sceneResourcesPreloading;
   sceneResourcesUnloading = game.sceneResourcesUnloading;
+
+  areEffectsHiddenInEditor = game.areEffectsHiddenInEditor;
 }
 
 }  // namespace gd

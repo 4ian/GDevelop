@@ -1386,7 +1386,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _sendHotReloadLayers = () => {
-    const { previewDebuggerServer, layersContainer } = this.props;
+    const { previewDebuggerServer, layersContainer, project } = this.props;
     if (previewDebuggerServer) {
       previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
         previewDebuggerServer.sendMessage(debuggerId, {
@@ -1396,6 +1396,7 @@ export default class SceneEditor extends React.Component<Props, State> {
               const layer = layersContainer.getLayerAt(i);
               return serializeToJSObject(layer);
             }),
+            areEffectsHidden: project.areEffectsHiddenInEditor()
           },
         });
       });
@@ -1429,9 +1430,6 @@ export default class SceneEditor extends React.Component<Props, State> {
       // This triggers a full hot-reload. We don't need to reload layers specifically.
       onEffectAdded();
     } else {
-      if (this.props.project.areEffectsHiddenInEditor()) {
-        return;
-      }
       this._sendHotReloadLayers();
     }
   };

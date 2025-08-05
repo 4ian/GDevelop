@@ -430,19 +430,32 @@ namespace gdjs {
       this._selectionBoxElement.style.position = 'fixed';
       this._selectionBoxElement.style.backgroundColor = '#f2a63c44';
       this._selectionBoxElement.style.border = '1px solid #f2a63c';
+      this.onProjectDataChange(projectData);
+    }
 
+    onProjectDataChange(projectData: ProjectData): void {
       for (const layoutData of projectData.layouts) {
-        for (const layerData of layoutData.layers) {
-          if (layerData.cameraType === 'orthographic') {
-            layerData.cameraType = 'perspective';
-          }
-        }
+        this.onLayersDataChange(
+          layoutData.layers,
+          !!projectData.areEffectsHiddenInEditor
+        );
       }
-      if (projectData.areEffectsHiddenInEditor) {
-        for (const layoutData of projectData.layouts) {
-          for (const layerData of layoutData.layers) {
-            layerData.effects = defaultEffectsData;
-          }
+    }
+
+    onLayersDataChange(
+      layersData: Array<LayerData>,
+      areEffectsHiddenInEditor: boolean
+    ): void {
+      console.trace('onLayersDataChange', areEffectsHiddenInEditor);
+      for (const layerData of layersData) {
+        // Camera controls don't work in orthographic.
+        if (layerData.cameraType === 'orthographic') {
+          layerData.cameraType = 'perspective';
+        }
+        // Force 2D and 3D objects to be visible on any layer.
+        layerData.renderingType = '2d+3d';
+        if (areEffectsHiddenInEditor) {
+          layerData.effects = defaultEffectsData;
         }
       }
     }
@@ -1994,10 +2007,6 @@ namespace gdjs {
         threeObject = threeObject.parent || null;
       }
       return null;
-    }
-
-    static getDefaultEffectsData(): Array<EffectData> {
-      return defaultEffectsData;
     }
 
     getCameraState(): EditorCameraState {

@@ -43,6 +43,10 @@ type SimplifiedScene = {|
 |};
 
 type SimplifiedProject = {|
+  properties: {|
+    gameResolutionWidth: number,
+    gameResolutionHeight: number,
+  |},
   globalObjects: Array<SimplifiedObject>,
   globalObjectGroups: Array<SimplifiedObjectGroup>,
   scenes: Array<SimplifiedScene>,
@@ -328,6 +332,10 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
     // Filter extensions to only include extensions from the project.
 
     const simplifiedProject: SimplifiedProject = {
+      properties: {
+        gameResolutionWidth: project.getGameResolutionWidth(),
+        gameResolutionHeight: project.getGameResolutionHeight(),
+      },
       globalObjects,
       globalObjectGroups: getSimplifiedObjectGroups(
         project.getObjects().getObjectGroups(),

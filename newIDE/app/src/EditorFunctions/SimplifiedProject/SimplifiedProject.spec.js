@@ -58,6 +58,10 @@ describe('SimplifiedProject', () => {
           },
         ],
         "globalVariables": Array [],
+        "properties": Object {
+          "gameResolutionHeight": 600,
+          "gameResolutionWidth": 800,
+        },
         "scenes": Array [
           Object {
             "instancesOnSceneDescription": "On the scene, there are:

@@ -1560,7 +1560,6 @@ const MainFrame = (props: Props) => {
 
   const onSceneAdded = React.useCallback(
     () => {
-      console.log('onSceneAdded');
       hotReloadInGameEditorIfNeeded({
         hotReload: true,
         projectDataOnlyExport: true,

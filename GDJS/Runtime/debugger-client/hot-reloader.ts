@@ -1492,7 +1492,7 @@ namespace gdjs {
         newInstances,
         runtimeInstanceContainer
       );
-      gdjs.copyArray(oldInstances, newInstances);
+      gdjs.copyArray(newInstances, oldInstances);
     }
 
     _hotReloadRuntimeSceneInstances(

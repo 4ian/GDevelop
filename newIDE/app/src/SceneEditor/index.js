@@ -464,6 +464,11 @@ export default class SceneEditor extends React.Component<Props, State> {
           ),
         },
         () => {
+          // Make sure no deleted instance stays selected.
+          this.instancesSelection.selectInstances({
+            instances: [],
+            multiSelect: false,
+          });
           this.updateToolbar();
           this.forceUpdatePropertiesEditor();
         }

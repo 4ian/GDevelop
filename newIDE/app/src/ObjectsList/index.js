@@ -457,8 +457,9 @@ type Props = {|
   ) => void,
   selectedObjectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext>,
 
-  beforeSetAsGlobalObject?: (groupName: string) => boolean,
+  beforeSetAsGlobalObject?: (objectName: string) => boolean,
   canSetAsGlobalObject?: boolean,
+  onSetAsGlobalObject: (object: gdObject) => void,
 
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onOpenEventBasedObjectEditor: (
@@ -514,6 +515,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
       beforeSetAsGlobalObject,
       canSetAsGlobalObject,
+      onSetAsGlobalObject,
 
       onEditObject,
       onOpenEventBasedObjectEditor,
@@ -867,6 +869,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         );
         gd.WholeProjectRefactorer.updateBehaviorsSharedData(project);
         onObjectModified(true);
+        onSetAsGlobalObject(object);
 
         const newObjectFolderOrObjectWithContext = {
           objectFolderOrObject,
@@ -889,6 +892,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         globalObjectsContainer,
         objectsContainer,
         beforeSetAsGlobalObject,
+        onSetAsGlobalObject,
         onObjectModified,
         selectObjectFolderOrObjectWithContext,
         scrollToItem,

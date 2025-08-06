@@ -472,6 +472,7 @@ const MosaicEditorsDisplay = React.forwardRef<
               beforeSetAsGlobalObject={objectName =>
                 props.canObjectOrGroupBeGlobal(i18n, objectName)
               }
+              onSetAsGlobalObject={props.onSetAsGlobalObject}
               ref={objectsListRef}
               unsavedChanges={props.unsavedChanges}
               hotReloadPreviewButtonProps={props.hotReloadPreviewButtonProps}

@@ -620,7 +620,7 @@ namespace gdjs {
     getObjects(name: string): gdjs.RuntimeObject[] | undefined {
       if (!this._instances.containsKey(name)) {
         logger.info(
-          'RuntimeScene.getObjects: No instances called "' +
+          'RuntimeInstanceContainer.getObjects: No instances called "' +
             name +
             '"! Adding it.'
         );

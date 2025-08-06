@@ -1205,9 +1205,17 @@ namespace gdjs {
     _reconnectInGameEditor() {
       const initialRuntimeGameStatus =
         this.getAdditionalOptions().initialRuntimeGameStatus;
-      if (!initialRuntimeGameStatus) {
+      if (!initialRuntimeGameStatus || !this._inGameEditor) {
         return;
       }
+      this._forceToSwitchToSceneOrVariant(
+        initialRuntimeGameStatus.editorId,
+        initialRuntimeGameStatus.sceneName,
+        initialRuntimeGameStatus.injectedExternalLayoutName,
+        initialRuntimeGameStatus.eventsBasedObjectType,
+        initialRuntimeGameStatus.eventsBasedObjectVariantName,
+        this._inGameEditor.getCameraState()
+      );
     }
 
     _switchToSceneOrVariant(

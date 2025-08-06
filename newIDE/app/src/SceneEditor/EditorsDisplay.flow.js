@@ -81,6 +81,7 @@ export type SceneEditorsDisplayProps = {|
   onObjectFolderOrObjectWithContextSelected: (
     ?ObjectFolderOrObjectWithContext
   ) => void,
+  onSetAsGlobalObject: (object: gdObject) => void,
   onExportAssets: () => void,
   onDeleteObjects: (
     i18n: I18nType,

@@ -960,6 +960,7 @@ namespace gdjs {
     }
 
     hotReloadRuntimeSceneObjects(
+      addedGlobalObjects: Array<ObjectData>,
       addedOrUpdatedObjects: Array<ObjectData>,
       removedObjectNames: Array<string>,
       // runtimeInstanceContainer gives an access as a map.
@@ -976,10 +977,10 @@ namespace gdjs {
         );
       }
 
-      const projectData: ProjectData = gdjs.projectData;
+      const projectData: ProjectData = this._runtimeGame._data;
       const newObjectDataList = HotReloader.resolveCustomObjectConfigurations(
         projectData,
-        addedOrUpdatedObjects
+        [...addedOrUpdatedObjects, ...addedGlobalObjects]
       );
 
       this._hotReloadRuntimeSceneObjects(
@@ -988,6 +989,32 @@ namespace gdjs {
         runtimeInstanceContainer
       );
       // Update the GameData
+      for (const removedObjectName of removedObjectNames) {
+        let isObjectRemoved = false;
+        for (let index = 0; index < editedObjectDataList.length; index++) {
+          if (editedObjectDataList[index].name === removedObjectName) {
+            editedObjectDataList.splice(index, 1);
+            isObjectRemoved = true;
+            break;
+          }
+        }
+        if (!isObjectRemoved) {
+          for (let index = 0; index < projectData.objects.length; index++) {
+            if (projectData.objects[index].name === removedObjectName) {
+              projectData.objects.splice(index, 1);
+              break;
+            }
+          }
+        }
+        if (!isObjectRemoved) {
+          console.warn(
+            `Can't find any object named: "${removedObjectName}" in project data to remove it.`
+          );
+        }
+      }
+      for (const addedGlobalObject of addedGlobalObjects) {
+        projectData.objects.push(addedGlobalObject);
+      }
       for (let index = 0; index < addedOrUpdatedObjects.length; index++) {
         const oldObjectData = oldObjects[index];
         // When the object is new, the hot-reload call `registerObject`
@@ -999,14 +1026,6 @@ namespace gdjs {
           );
         } else {
           editedObjectDataList.push(addedOrUpdatedObjects[index]);
-        }
-      }
-      for (const removedObjectName of removedObjectNames) {
-        for (let index = 0; index < editedObjectDataList.length; index++) {
-          if (editedObjectDataList[index].name === removedObjectName) {
-            editedObjectDataList.splice(index, 1);
-            break;
-          }
         }
       }
     }

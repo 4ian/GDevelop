@@ -1152,10 +1152,19 @@ export default class SceneEditor extends React.Component<Props, State> {
     this._hotReloadObjects({ addedOrUpdatedObjects: objects });
   };
 
+  _onSetAsGlobalObject = (object: gdObject) => {
+    this._hotReloadObjects({
+      addedGlobalObjects: [object],
+      removedObjectNames: [object.getName()],
+    });
+  };
+
   _hotReloadObjects = ({
+    addedGlobalObjects,
     addedOrUpdatedObjects,
     removedObjectNames,
   }: {|
+    addedGlobalObjects?: Array<gdObject>,
     addedOrUpdatedObjects?: Array<gdObject>,
     removedObjectNames?: Array<string>,
   |}) => {
@@ -1165,6 +1174,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         previewDebuggerServer.sendMessage(debuggerId, {
           command: 'hotReloadObjects',
           payload: {
+            addedGlobalObjects:
+              addedGlobalObjects === undefined
+                ? []
+                : addedGlobalObjects.map(object => serializeToJSObject(object)),
             addedOrUpdatedObjects:
               addedOrUpdatedObjects === undefined
                 ? []
@@ -2634,6 +2647,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onObjectFolderOrObjectWithContextSelected={
                   this._onObjectFolderOrObjectWithContextSelected
                 }
+                onSetAsGlobalObject={this._onSetAsGlobalObject}
                 historyHandler={{
                   undo: this.undo,
                   redo: this.redo,

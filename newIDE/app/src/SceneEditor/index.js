@@ -107,6 +107,7 @@ type SelectedInstanceData = {|
 |};
 
 type InstanceChanges = {|
+  isSendingBackSelectionForDefaultSize: boolean,
   updatedInstances: Array<any>, // TODO: type this.
   addedInstances: Array<any>, // TODO: type this.
   selectedInstances: Array<SelectedInstanceData>,
@@ -467,6 +468,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           // Make sure no deleted instance stays selected.
           this.instancesSelection.selectInstances({
             instances: [],
+            layersLocks: null,
             multiSelect: false,
           });
           this.updateToolbar();

@@ -223,8 +223,9 @@ export const EmbeddedGameFrame = ({
           return;
         }
 
-        const shouldHotReload = hotReload || neededHotReload.current !== 'None';
-        if (!previewIndexHtmlLocation || shouldHotReload) {
+        const mergedShouldHotReload =
+          hotReload || neededHotReload.current !== 'None';
+        if (!previewIndexHtmlLocation || mergedShouldHotReload) {
           console.info(
             eventsBasedObjectType
               ? `Launching in-game edition preview for variant "${eventsBasedObjectVariantName ||
@@ -235,21 +236,25 @@ export const EmbeddedGameFrame = ({
               : `Launching in-game edition preview for scene "${sceneName ||
                   ''}".`
           );
+          const mergedProjectDataOnlyExport =
+            projectDataOnlyExport && neededHotReload.current !== 'Full';
+          const mergedShouldReloadResources =
+            shouldReloadResources ||
+            neededHotReload.current === 'DataAndResources' ||
+            neededHotReload.current === 'Full';
+
           neededHotReload.current = 'None';
           isPreviewOngoing.current = true;
+
           onLaunchPreviewForInGameEdition({
             editorId,
             sceneName,
             externalLayoutName,
             eventsBasedObjectType,
             eventsBasedObjectVariantName,
-            hotReload: shouldHotReload,
-            projectDataOnlyExport:
-              projectDataOnlyExport && neededHotReload.current !== 'Full',
-            shouldReloadResources:
-              shouldReloadResources ||
-              neededHotReload.current === 'DataAndResources' ||
-              neededHotReload.current === 'Full',
+            hotReload: mergedShouldHotReload,
+            projectDataOnlyExport: mergedProjectDataOnlyExport,
+            shouldReloadResources: mergedShouldReloadResources,
             editorCameraState3D: cameraStates.current.get(editorId) || null,
           }).finally(() => {
             isPreviewOngoing.current = false;

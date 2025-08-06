@@ -32,8 +32,8 @@ namespace gdjs {
   const E_KEY = 69;
   const F_KEY = 70;
   const V_KEY = 86;
-  const X_KEY = 89;
-  const Y_KEY = 90;
+  const X_KEY = 88;
+  const Y_KEY = 89;
   const Z_KEY = 90;
 
   let hasWindowFocus = true;

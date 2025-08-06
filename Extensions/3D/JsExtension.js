@@ -48,9 +48,7 @@ module.exports = {
           new gd.BehaviorsSharedData()
         )
         .setHidden()
-        .setIncludeFile('Extensions/3D/Base3DBehavior.js')
-        // Extensions in JS may use it.
-        .addIncludeFile('Extensions/3D/Scene3DTools.js');
+        .setIncludeFile('Extensions/3D/Base3DBehavior.js');
 
       base3D
         .addExpressionAndConditionAndAction(

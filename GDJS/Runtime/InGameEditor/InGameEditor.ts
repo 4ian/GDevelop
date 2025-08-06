@@ -659,7 +659,7 @@ namespace gdjs {
         }
       }
       // Send back default instances sizes.
-      this._sendSelectionUpdate();
+      this._sendSelectionUpdate({ isSendingBackSelectionForDefaultSize: true });
     }
 
     centerViewOnLastSelectedInstance(visibleScreenArea: {
@@ -1298,6 +1298,7 @@ namespace gdjs {
 
     private _sendSelectionUpdate(options?: {
       hasSelectedObjectBeenModified?: boolean;
+      isSendingBackSelectionForDefaultSize?: boolean;
       addedObjects?: Array<gdjs.RuntimeObject>;
       removedObjects?: Array<gdjs.RuntimeObject>;
     }) {
@@ -1357,6 +1358,9 @@ namespace gdjs {
       this._addInstances(addedInstances);
 
       debuggerClient.sendInstanceChanges({
+        isSendingBackSelectionForDefaultSize: options
+          ? options.isSendingBackSelectionForDefaultSize || false
+          : false,
         updatedInstances,
         addedInstances,
         selectedInstances: getSelectedInstances(

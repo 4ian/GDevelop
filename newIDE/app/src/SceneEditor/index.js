@@ -479,13 +479,15 @@ export default class SceneEditor extends React.Component<Props, State> {
       this._onInstancesAdded(justAddedInstances);
     }
 
-    this.instancesSelection.selectInstances({
-      instances: newlySelectedInstances,
-      multiSelect: false,
-      layersLocks: null,
-      ignoreSeal: true,
-    });
-    this._selectObjectOfInstances(newlySelectedInstances);
+    if (!changes.isSendingBackSelectionForDefaultSize) {
+      this.instancesSelection.selectInstances({
+        instances: newlySelectedInstances,
+        multiSelect: false,
+        layersLocks: null,
+        ignoreSeal: true,
+      });
+      this._selectObjectOfInstances(newlySelectedInstances);
+    }
   }
 
   onResourceExternallyChanged = async (resourceInfo: {|
@@ -1396,7 +1398,7 @@ export default class SceneEditor extends React.Component<Props, State> {
               const layer = layersContainer.getLayerAt(i);
               return serializeToJSObject(layer);
             }),
-            areEffectsHidden: project.areEffectsHiddenInEditor()
+            areEffectsHidden: project.areEffectsHiddenInEditor(),
           },
         });
       });

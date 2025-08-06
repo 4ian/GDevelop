@@ -743,6 +743,7 @@ namespace gdjs {
     }
 
     sendInstanceChanges(changes: {
+      isSendingBackSelectionForDefaultSize: boolean;
       updatedInstances: Array<InstanceData>;
       addedInstances: Array<InstanceData>;
       selectedInstances: Array<InstancePersistentUuidData>;

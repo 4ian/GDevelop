@@ -113,20 +113,24 @@ const logSwitchingInfo = ({
   );
 };
 
+type ContainerIdentifier = {|
+  editorId: string,
+  sceneName: string | null,
+  externalLayoutName: string | null,
+  eventsBasedObjectType: string | null,
+  eventsBasedObjectVariantName: string | null,
+|};
+
 type Props = {|
   previewDebuggerServer: PreviewDebuggerServer | null,
   enabled: boolean,
   onLaunchPreviewForInGameEdition: ({|
-    editorId: string,
-    sceneName: string | null,
-    externalLayoutName: string | null,
-    eventsBasedObjectType: string | null,
-    eventsBasedObjectVariantName: string | null,
+    ...ContainerIdentifier,
     hotReload: boolean,
     projectDataOnlyExport: boolean,
     shouldReloadResources: boolean,
     editorCameraState3D: EditorCameraState | null,
-  |}) => void,
+  |}) => Promise<void>,
 |};
 
 const DropTarget = makeDropTarget<{||}>(objectWithContextReactDndType);
@@ -148,6 +152,8 @@ export const EmbeddedGameFrame = ({
   const neededHotReload = React.useRef<
     'None' | 'Data' | 'DataAndResources' | 'Full'
   >('None');
+  const lastPreviewContainer = React.useRef<ContainerIdentifier | null>(null);
+  const isPreviewOngoing = React.useRef<boolean>(false);
   const cameraStates = React.useRef<Map<string, EditorCameraState>>(
     new Map<string, EditorCameraState>()
   );
@@ -202,6 +208,21 @@ export const EmbeddedGameFrame = ({
           shouldReloadResources,
         } = options;
 
+        lastPreviewContainer.current = {
+          editorId,
+          sceneName,
+          externalLayoutName,
+          eventsBasedObjectType,
+          eventsBasedObjectVariantName,
+        };
+        if (isPreviewOngoing.current) {
+          setEditorHotReloadNeeded({
+            projectDataOnlyExport,
+            shouldReloadResources,
+          });
+          return;
+        }
+
         const shouldHotReload = hotReload || neededHotReload.current !== 'None';
         if (!previewIndexHtmlLocation || shouldHotReload) {
           console.info(
@@ -214,6 +235,8 @@ export const EmbeddedGameFrame = ({
               : `Launching in-game edition preview for scene "${sceneName ||
                   ''}".`
           );
+          neededHotReload.current = 'None';
+          isPreviewOngoing.current = true;
           onLaunchPreviewForInGameEdition({
             editorId,
             sceneName,
@@ -228,8 +251,20 @@ export const EmbeddedGameFrame = ({
               neededHotReload.current === 'DataAndResources' ||
               neededHotReload.current === 'Full',
             editorCameraState3D: cameraStates.current.get(editorId) || null,
+          }).finally(() => {
+            isPreviewOngoing.current = false;
+            if (
+              neededHotReload.current !== 'None' &&
+              lastPreviewContainer.current
+            ) {
+              switchToSceneEdition({
+                ...lastPreviewContainer.current,
+                hotReload: false,
+                projectDataOnlyExport: true,
+                shouldReloadResources: false,
+              });
+            }
           });
-          neededHotReload.current = 'None';
         } else {
           logSwitchingInfo({
             editorId,
@@ -263,6 +298,13 @@ export const EmbeddedGameFrame = ({
         if (neededHotReload.current !== 'None') {
           return;
         }
+        lastPreviewContainer.current = {
+          editorId,
+          sceneName,
+          externalLayoutName,
+          eventsBasedObjectType,
+          eventsBasedObjectVariantName,
+        };
         logSwitchingInfo({
           editorId,
           sceneName,

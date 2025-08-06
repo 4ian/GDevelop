@@ -1494,6 +1494,7 @@ const MainFrame = (props: Props) => {
       projectDataOnlyExport: boolean,
       shouldReloadResources: boolean,
     |}) => {
+      let hasReloadIfNeeded = false;
       for (const paneIdentifier in state.editorTabs.panes) {
         const currentTab = getCurrentTabForPane(
           state.editorTabs,
@@ -1506,14 +1507,14 @@ const MainFrame = (props: Props) => {
             projectDataOnlyExport,
             shouldReloadResources,
           });
-        } else {
-          if (hotReload) {
-            setEditorHotReloadNeeded({
-              projectDataOnlyExport,
-              shouldReloadResources,
-            });
-          }
+          hasReloadIfNeeded = true;
         }
+      }
+      if (hotReload && !hasReloadIfNeeded) {
+        setEditorHotReloadNeeded({
+          projectDataOnlyExport,
+          shouldReloadResources,
+        });
       }
     },
     [state.editorTabs]
@@ -1559,6 +1560,7 @@ const MainFrame = (props: Props) => {
 
   const onSceneAdded = React.useCallback(
     () => {
+      console.log('onSceneAdded');
       hotReloadInGameEditorIfNeeded({
         hotReload: true,
         projectDataOnlyExport: true,
@@ -2090,7 +2092,7 @@ const MainFrame = (props: Props) => {
   );
 
   const onLaunchPreviewForInGameEdition = React.useCallback(
-    ({
+    async ({
       editorId,
       sceneName,
       externalLayoutName,
@@ -2111,7 +2113,7 @@ const MainFrame = (props: Props) => {
       shouldReloadResources: boolean,
       editorCameraState3D: EditorCameraState | null,
     |}) => {
-      launchPreview({
+      await launchPreview({
         networkPreview: false,
         hotReload,
         projectDataOnlyExport,

@@ -10,7 +10,7 @@ type AttachToPreviewOptions = {|
   previewIndexHtmlLocation: string,
 |};
 
-type EditorContentIdentifiers = {|
+type PreviewInGameEditorTarget = {|
   editorId: string,
   sceneName: string | null,
   externalLayoutName: string | null,
@@ -19,7 +19,7 @@ type EditorContentIdentifiers = {|
 |};
 
 type SwitchToSceneEditionOptions = {|
-  ...EditorContentIdentifiers,
+  ...PreviewInGameEditorTarget,
   hotReload: boolean,
   projectDataOnlyExport: boolean,
   shouldReloadResources: boolean,
@@ -45,7 +45,7 @@ let onSetEditorHotReloadNeeded:
     |}) => void) = null;
 let onSwitchInGameEditorIfNoHotReloadIsNeeded:
   | null
-  | (EditorContentIdentifiers => void) = null;
+  | (PreviewInGameEditorTarget => void) = null;
 let onPreventGameFramePointerEvents: null | ((enabled: boolean) => void) = null;
 let onSetCameraState:
   | null
@@ -82,11 +82,11 @@ export const setCameraState = (
 };
 
 export const switchInGameEditorIfNoHotReloadIsNeeded = (
-  editorContentIdentifiers: EditorContentIdentifiers
+  previewInGameEditorTarget: PreviewInGameEditorTarget
 ) => {
   if (!onSwitchInGameEditorIfNoHotReloadIsNeeded)
     throw new Error('No EmbeddedGameFrame registered.');
-  onSwitchInGameEditorIfNoHotReloadIsNeeded(editorContentIdentifiers);
+  onSwitchInGameEditorIfNoHotReloadIsNeeded(previewInGameEditorTarget);
 };
 
 export const preventGameFramePointerEvents = (enabled: boolean) => {
@@ -101,7 +101,7 @@ const logSwitchingInfo = ({
   externalLayoutName,
   eventsBasedObjectType,
   eventsBasedObjectVariantName,
-}: EditorContentIdentifiers) => {
+}: PreviewInGameEditorTarget) => {
   console.info(
     eventsBasedObjectType
       ? `Switching in-game edition preview for variant "${eventsBasedObjectVariantName ||
@@ -297,7 +297,7 @@ export const EmbeddedGameFrame = ({
         externalLayoutName,
         eventsBasedObjectType,
         eventsBasedObjectVariantName,
-      }: EditorContentIdentifiers) => {
+      }: PreviewInGameEditorTarget) => {
         if (!previewDebuggerServer) return;
         if (!enabled) return;
         if (neededHotReload.current !== 'None') {

@@ -220,18 +220,6 @@ export default class TextEditor extends React.Component<EditorProps, void> {
         />
         <Line noMargin>
           <SemiControlledTextField
-            floatingLabelText={<Trans>Line height</Trans>}
-            type="number"
-            fullWidth
-            value={textObjectConfiguration.getLineHeight()}
-            onChange={value => {
-              textObjectConfiguration.setLineHeight(parseFloat(value) || 0);
-              this.forceUpdate();
-            }}
-          />
-        </Line>
-        <Line noMargin>
-          <SemiControlledTextField
             floatingLabelText={<Trans>Initial text to display</Trans>}
             floatingLabelFixed
             id="text-object-initial-text"
@@ -383,6 +371,21 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             }}
           />
         </Column>
+        <Text size="block-title" noMargin>
+          <Trans>Multiline</Trans>
+        </Text>
+        <Line noMargin>
+          <SemiControlledTextField
+            floatingLabelText={<Trans>Line height</Trans>}
+            type="number"
+            fullWidth
+            value={textObjectConfiguration.getLineHeight()}
+            onChange={value => {
+              textObjectConfiguration.setLineHeight(parseFloat(value) || 0);
+              this.forceUpdate();
+            }}
+          />
+        </Line>
       </ColumnStackLayout>
     );
   }

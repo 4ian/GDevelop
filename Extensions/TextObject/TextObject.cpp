@@ -36,7 +36,8 @@ TextObject::TextObject()
       shadowOpacity(127),
       shadowAngle(90),
       shadowDistance(4),
-      shadowBlurRadius(2) {}
+      shadowBlurRadius(2),
+      lineHeight(0) {}
 
 TextObject::~TextObject() {};
 
@@ -108,6 +109,10 @@ bool TextObject::UpdateProperty(const gd::String& propertyName,
   }
   if (propertyName == "shadowBlurRadius") {
     shadowBlurRadius = newValue.To<double>();
+    return true;
+  }
+  if (propertyName == "lineHeight") {
+    lineHeight = newValue.To<double>();
     return true;
   }
 
@@ -255,6 +260,15 @@ std::map<gd::String, gd::PropertyDescriptor> TextObject::GetProperties() const {
       .SetAdvanced()
       .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
 
+  objectProperties["lineHeight"]
+      .SetValue(gd::String::From(lineHeight))
+      .SetType("number")
+      .SetLabel(_("Line height"))
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+      .SetGroup(_("Font"))
+      .SetDescription(_("Line height for multiline text (0 for automatic)"))
+      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
+
   return objectProperties;
 }
 
@@ -304,6 +318,7 @@ void TextObject::DoUnserializeFrom(gd::Project& project,
     SetShadowAngle(content.GetIntAttribute("shadowAngle", 90));
     SetShadowDistance(content.GetIntAttribute("shadowDistance", 4));
     SetShadowBlurRadius(content.GetIntAttribute("shadowBlurRadius", 2));
+    SetLineHeight(content.GetIntAttribute("lineHeight", 0));
   }
 }
 
@@ -356,6 +371,7 @@ void TextObject::DoSerializeTo(gd::SerializerElement& element) const {
   content.SetAttribute("shadowAngle", shadowAngle);
   content.SetAttribute("shadowDistance", shadowDistance);
   content.SetAttribute("shadowBlurRadius", shadowBlurRadius);
+  content.SetAttribute("lineHeight", lineHeight);
 }
 
 void TextObject::ExposeResources(gd::ArbitraryResourceWorker& worker) {

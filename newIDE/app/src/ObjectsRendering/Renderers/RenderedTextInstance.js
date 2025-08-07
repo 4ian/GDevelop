@@ -32,6 +32,7 @@ export default class RenderedTextInstance extends RenderedInstance {
   _shadowColor = '0;0;0';
   _shadowOpacity = 127;
   _shadowBlurRadius = 2;
+  _lineHeight = 0;
 
   constructor(
     project: gdProject,
@@ -113,7 +114,8 @@ export default class RenderedTextInstance extends RenderedInstance {
       textObjectConfiguration.getShadowBlurRadius() !==
         this._shadowBlurRadius ||
       this._instance.hasCustomSize() !== this._wrapping ||
-      (this.getCustomWidth() !== this._wrappingWidth && this._wrapping)
+      (this.getCustomWidth() !== this._wrappingWidth && this._wrapping) ||
+      textObjectConfiguration.getLineHeight() !== this._lineHeight
     ) {
       this._isItalic = textObjectConfiguration.isItalic();
       this._isBold = textObjectConfiguration.isBold();
@@ -132,6 +134,7 @@ export default class RenderedTextInstance extends RenderedInstance {
       this._shadowColor = textObjectConfiguration.getShadowColor();
       this._shadowOpacity = textObjectConfiguration.getShadowOpacity();
       this._shadowBlurRadius = textObjectConfiguration.getShadowBlurRadius();
+      this._lineHeight = textObjectConfiguration.getLineHeight();
 
       this._wrapping = this._instance.hasCustomSize();
       this._wrappingWidth = this.getCustomWidth();
@@ -172,6 +175,9 @@ export default class RenderedTextInstance extends RenderedInstance {
       style.wordWrapWidth = this._wrappingWidth <= 1 ? 1 : this._wrappingWidth;
       style.breakWords = true;
       style.align = this._textAlignment;
+      if (this._lineHeight > 0) {
+        style.lineHeight = this._lineHeight;
+      }
 
       style.stroke = rgbStringToHexNumber(this._outlineColor);
       style.strokeThickness = this._isOutlineEnabled

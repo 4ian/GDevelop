@@ -109,6 +109,17 @@ module.exports = {
         .setLabel(_('Visible on start'))
         .setGroup(_('Appearance'));
 
+      if (!objectContent.lineHeight) {
+        objectContent.lineHeight = 0;
+      }
+      objectProperties
+        .getOrCreate('lineHeight')
+        .setValue(objectContent.lineHeight.toString())
+        .setType('number')
+        .setLabel(_('Line height'))
+        .setDescription(_('Line height for multiline text (0 for automatic)'))
+        .setGroup(_('Appearance'));
+
       return objectProperties;
     };
     objectBBText.content = {
@@ -120,6 +131,7 @@ module.exports = {
       fontFamily: 'Arial',
       align: 'left',
       verticalTextAlignment: 'top',
+      lineHeight: 0,
     };
 
     objectBBText.updateInitialInstanceProperty = function (
@@ -393,6 +405,19 @@ module.exports = {
         actionSentence: _('the wrapping width'),
         expressionLabel: _('Get the wrapping width'),
         expressionDescription: _('Get the wrapping width'),
+      },
+      {
+        functionName: 'LineHeight',
+        iconPath: 'res/actions/characterSize24.png',
+        type: 'number',
+        instructionLabel: _('Line height'),
+        paramLabel: _('Line height (0 for automatic)'),
+        conditionDescription: _('Compare the line height of the text.'),
+        conditionSentence: _('the line height'),
+        actionDescription: _('Set line height'),
+        actionSentence: _('the line height'),
+        expressionLabel: _('Get the line height'),
+        expressionDescription: _('Get the line height'),
       },
     ];
 

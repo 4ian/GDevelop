@@ -113,6 +113,9 @@ class GD_EXTENSION_API TextObject : public gd::ObjectConfiguration {
   void SetShadowBlurRadius(double value) { shadowBlurRadius = value; };
   double GetShadowBlurRadius() const { return shadowBlurRadius; };
 
+  void SetLineHeight(double value) { lineHeight = value; };
+  double GetLineHeight() const { return lineHeight; };
+
  private:
   virtual void DoUnserializeFrom(gd::Project& project,
                                  const gd::SerializerElement& element) override;
@@ -137,4 +140,5 @@ class GD_EXTENSION_API TextObject : public gd::ObjectConfiguration {
   double shadowAngle;
   double shadowDistance;
   double shadowBlurRadius;
+  double lineHeight;
 };

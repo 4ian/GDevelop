@@ -135,6 +135,14 @@ class TextObjectJsExtension : public gd::PlatformExtension {
         .SetFunctionName("setShadowBlurRadius")
         .SetGetter("getShadowBlurRadius");
 
+    GetAllExpressionsForObject("TextObject::Text")["LineHeight"]
+        .SetFunctionName("getLineHeight");
+    GetAllConditionsForObject("TextObject::Text")["TextObject::Text::LineHeight"]
+        .SetFunctionName("getLineHeight");
+    GetAllActionsForObject("TextObject::Text")["TextObject::Text::SetLineHeight"]
+        .SetFunctionName("setLineHeight")
+        .SetGetter("getLineHeight");
+
     // Deprecated actions/conditions (use "FontSize"/"SetFontSize" instead):
     GetAllActionsForObject("TextObject::Text")["TextObject::Size"]
         .SetFunctionName("setCharacterSize")

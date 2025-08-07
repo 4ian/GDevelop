@@ -235,6 +235,18 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Blur radius")));
 
+  obj.AddExpressionAndConditionAndAction("number", "LineHeight",
+                _("Line height"),
+                _("the line height of the text"),
+                _("the line height"),
+                _("Font"),
+                "res/actions/characterSize24.png")
+      .AddParameter("object", _("Object"), "Text")
+      .UseStandardParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Line height (0 for automatic)")));
+
   obj.AddAction("SetSmooth",
                 _("Smoothing"),
                 _("Activate or deactivate text smoothing."),

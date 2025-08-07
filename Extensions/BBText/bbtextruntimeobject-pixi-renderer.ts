@@ -102,6 +102,17 @@ namespace gdjs {
       this._pixiObject.dirty = true;
     }
 
+    updateStyle(): void {
+      //@ts-ignore Private member usage.
+      if (this._object._lineHeight > 0) {
+        this._pixiObject.textStyles.default.lineHeight = this._object._lineHeight;
+      } else {
+        // Remove lineHeight to use automatic
+        delete this._pixiObject.textStyles.default.lineHeight;
+      }
+      this._pixiObject.dirty = true;
+    }
+
     updatePosition(): void {
       if (this._object.isWrapping() && this._pixiObject.width !== 0) {
         const alignmentX =

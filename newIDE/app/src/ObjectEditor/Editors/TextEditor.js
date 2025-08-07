@@ -90,6 +90,24 @@ export default class TextEditor extends React.Component<EditorProps, void> {
               }}
             />
             <MiniToolbarText>
+              <Trans>Line height:</Trans>
+            </MiniToolbarText>
+            <SemiControlledTextField
+              commitOnBlur
+              id="text-object-line-height"
+              type="number"
+              margin="none"
+              style={styles.sizeTextField}
+              value={textObjectConfiguration.getLineHeight()}
+              onChange={value => {
+                textObjectConfiguration.setLineHeight(
+                  parseInt(value, 10) || 0
+                );
+                this.forceUpdate();
+              }}
+              placeholder="Auto"
+            />
+            <MiniToolbarText>
               <Trans>Color:</Trans>
             </MiniToolbarText>
             <ColorPicker

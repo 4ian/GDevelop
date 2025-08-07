@@ -20,6 +20,8 @@ namespace gdjs {
       /** Alignment of the text. */
       align: 'left' | 'center' | 'right';
       verticalTextAlignment: 'top' | 'center' | 'bottom';
+      /** Line height for multiline text */
+      lineHeight: float;
     };
   };
   export type BitmapTextObjectData = ObjectData & BitmapTextObjectDataType;
@@ -35,6 +37,7 @@ namespace gdjs {
     wwidth: float;
     align: string;
     vta: string;
+    lh: float;
   };
 
   export type BitmapTextObjectNetworkSyncData = ObjectNetworkSyncData &
@@ -66,6 +69,7 @@ namespace gdjs {
     _wrappingWidth: float;
     _textAlign: string;
     _verticalTextAlignment: string;
+    _lineHeight: float;
 
     _renderer: gdjs.BitmapTextRuntimeObjectPixiRenderer;
 
@@ -92,6 +96,7 @@ namespace gdjs {
       this._textAlign = objectData.content.align;
       this._verticalTextAlignment =
         objectData.content.verticalTextAlignment || 'top';
+      this._lineHeight = objectData.content.lineHeight;
 
       this._renderer = new gdjs.BitmapTextRuntimeObjectRenderer(
         this,
@@ -151,6 +156,9 @@ namespace gdjs {
           newObjectData.content.verticalTextAlignment
         );
       }
+      if (oldObjectData.content.lineHeight !== newObjectData.content.lineHeight) {
+        this.setLineHeight(newObjectData.content.lineHeight);
+      }
 
       return true;
     }
@@ -168,6 +176,7 @@ namespace gdjs {
         wwidth: this._wrappingWidth,
         align: this._textAlign,
         vta: this._verticalTextAlignment,
+        lh: this.getLineHeight(),
       };
     }
 
@@ -205,6 +214,9 @@ namespace gdjs {
       }
       if (this._verticalTextAlignment !== undefined) {
         this.setVerticalTextAlignment(networkSyncData.vta);
+      }
+      if (this._lineHeight !== undefined) {
+        this.setLineHeight(networkSyncData.lh);
       }
     }
 
@@ -439,6 +451,23 @@ namespace gdjs {
             ? this.getHeight()
             : 0)
       );
+    }
+
+    /**
+     * Get line height of the bitmap text object.
+     * @return line height in pixels (0 for automatic)
+     */
+    getLineHeight(): number {
+      return this._lineHeight;
+    }
+
+    /**
+     * Set line height of the bitmap text object.
+     * @param value line height in pixels (0 for automatic)
+     */
+    setLineHeight(value: float): void {
+      this._lineHeight = value;
+      this._renderer.updateStyle();
     }
   }
   gdjs.registerObject(

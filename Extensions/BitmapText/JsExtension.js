@@ -110,6 +110,17 @@ module.exports = {
         .setLabel(_('Font tint'))
         .setGroup(_('Font'));
 
+      if (!objectContent.lineHeight) {
+        objectContent.lineHeight = 0;
+      }
+      objectProperties
+        .getOrCreate('lineHeight')
+        .setValue(objectContent.lineHeight.toString())
+        .setType('number')
+        .setLabel(_('Line height'))
+        .setDescription(_('Line height for multiline text (0 for automatic)'))
+        .setGroup(_('Appearance'));
+
       return objectProperties;
     };
     bitmapTextObject.content = {
@@ -122,6 +133,7 @@ module.exports = {
       textureAtlasResourceName: '',
       align: 'left',
       verticalTextAlignment: 'top',
+      lineHeight: 0,
     };
 
     bitmapTextObject.updateInitialInstanceProperty = function (
@@ -412,6 +424,21 @@ module.exports = {
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setWrappingWidth')
       .setGetter('getWrappingWidth');
+
+    object
+      .addExpressionAndConditionAndAction(
+        'number',
+        'LineHeight',
+        _('Line height'),
+        _('the line height, in pixels, for multiline text'),
+        _('the line height'),
+        '',
+        'res/actions/characterSize24.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions().setDescription(_('Line height (0 for automatic)')))
+      .setFunctionName('setLineHeight')
+      .setGetter('getLineHeight');
 
     return extension;
   },

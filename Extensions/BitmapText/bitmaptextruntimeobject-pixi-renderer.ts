@@ -96,6 +96,17 @@ namespace gdjs {
       this._pixiObject.dirty = true;
     }
 
+    updateStyle(): void {
+      // Note: PIXI.BitmapText doesn't have built-in lineHeight support like PIXI.Text
+      // The lineHeight would need to be handled at a higher level during text layout
+      // For now, we just mark the object as dirty to trigger a re-render
+      if (this._object._lineHeight > 0) {
+        // Custom line height handling would go here
+        // This is a placeholder for future implementation
+      }
+      this._pixiObject.dirty = true;
+    }
+
     /**
      * Get the tint of the bitmap object as a "R;G;B" string.
      * @returns the tint of bitmap object in "R;G;B" format.

@@ -15,6 +15,8 @@ namespace gdjs {
       fontFamily: string;
       /** The size of the text */
       fontSize: number;
+      /** The line height of the text */
+      lineHeight: float;
       /** Activate word wrap if set to true */
       wordWrap: boolean;
       /** Alignment of the text: "left", "center" or "right" */
@@ -35,6 +37,7 @@ namespace gdjs {
     align: string;
     vta: string;
     hidden: boolean;
+    lh: float;
   };
 
   export type BBTextObjectNetworkSyncData = ObjectNetworkSyncData &
@@ -55,6 +58,7 @@ namespace gdjs {
     _color: integer[];
     _fontFamily: string;
     _fontSize: float;
+    _lineHeight: float;
 
     _wrapping: boolean = false;
     _wrappingWidth: float = 250;
@@ -84,6 +88,7 @@ namespace gdjs {
       this._fontFamily = objectData.content.fontFamily;
       // @ts-ignore - parseFloat should not be required, but GDevelop 5.0 beta 92 and below were storing it as a string.
       this._fontSize = parseFloat(objectData.content.fontSize);
+      this._lineHeight = objectData.content.lineHeight || 0;
       this._textAlign = objectData.content.align;
       this._verticalTextAlignment =
         objectData.content.verticalTextAlignment || 'top';
@@ -128,6 +133,12 @@ namespace gdjs {
       if (oldObjectData.content.fontSize !== newObjectData.content.fontSize) {
         this.setFontSize(newObjectData.content.fontSize);
       }
+      if (
+        (oldObjectData.content.lineHeight || 0) !==
+        (newObjectData.content.lineHeight || 0)
+      ) {
+        this.setLineHeight(newObjectData.content.lineHeight || 0);
+      }
       if (oldObjectData.content.wordWrap !== newObjectData.content.wordWrap) {
         this.setWrapping(newObjectData.content.wordWrap);
       }
@@ -157,6 +168,7 @@ namespace gdjs {
         wwidth: this._wrappingWidth,
         align: this._textAlign,
         vta: this._verticalTextAlignment,
+        lh: this._lineHeight,
         hidden: this.hidden,
       };
     }
@@ -180,6 +192,9 @@ namespace gdjs {
       }
       if (this._fontSize !== undefined) {
         this.setFontSize(networkSyncData.fs);
+      }
+      if (this._lineHeight !== undefined) {
+        this.setLineHeight(networkSyncData.lh);
       }
       if (this._wrapping !== undefined) {
         this.setWrapping(networkSyncData.wwrap);
@@ -256,6 +271,15 @@ namespace gdjs {
 
     getFontSize() {
       return this._fontSize;
+    }
+
+    setLineHeight(lineHeight: float): void {
+      this._lineHeight = lineHeight;
+      this._renderer.updateLineHeight();
+    }
+
+    getLineHeight() {
+      return this._lineHeight;
     }
 
     setFontFamily(fontFamily: string): void {

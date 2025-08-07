@@ -32,6 +32,7 @@ export default class RenderedTextInstance extends RenderedInstance {
   _shadowColor = '0;0;0';
   _shadowOpacity = 127;
   _shadowBlurRadius = 2;
+  _lineHeight = 0;
 
   constructor(
     project: gdProject,
@@ -97,6 +98,7 @@ export default class RenderedTextInstance extends RenderedInstance {
       textObjectConfiguration.isItalic() !== this._isItalic ||
       textObjectConfiguration.isBold() !== this._isBold ||
       textObjectConfiguration.getCharacterSize() !== this._characterSize ||
+      textObjectConfiguration.getLineHeight() !== this._lineHeight ||
       textObjectConfiguration.getTextAlignment() !== this._textAlignment ||
       textObjectConfiguration.getVerticalTextAlignment() !==
         this._verticalTextAlignment ||
@@ -118,6 +120,7 @@ export default class RenderedTextInstance extends RenderedInstance {
       this._isItalic = textObjectConfiguration.isItalic();
       this._isBold = textObjectConfiguration.isBold();
       this._characterSize = textObjectConfiguration.getCharacterSize();
+      this._lineHeight = textObjectConfiguration.getLineHeight();
       this._textAlignment = textObjectConfiguration.getTextAlignment();
       this._verticalTextAlignment = textObjectConfiguration.getVerticalTextAlignment();
       this._color = textObjectConfiguration.getColor();
@@ -167,6 +170,7 @@ export default class RenderedTextInstance extends RenderedInstance {
       style.fontSize = Math.max(1, this._characterSize);
       style.fontStyle = this._isItalic ? 'italic' : 'normal';
       style.fontWeight = this._isBold ? 'bold' : 'normal';
+      style.lineHeight = this._lineHeight !== 0 ? this._lineHeight : undefined;
       style.fill = rgbStringToHexNumber(this._color);
       style.wordWrap = this._wrapping;
       style.wordWrapWidth = this._wrappingWidth <= 1 ? 1 : this._wrappingWidth;

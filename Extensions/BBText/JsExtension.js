@@ -72,6 +72,13 @@ module.exports = {
         .setGroup(_('Font'));
 
       objectProperties
+        .getOrCreate('lineHeight')
+        .setValue(objectContent.lineHeight.toString())
+        .setType('number')
+        .setLabel(_('Line height'))
+        .setGroup(_('Font'));
+
+      objectProperties
         .getOrCreate('align')
         .setValue(objectContent.align)
         .setType('choice')
@@ -115,6 +122,7 @@ module.exports = {
       text: '[b]bold[/b] [i]italic[/i] [size=15]smaller[/size] [font=times]times[/font] font\n[spacing=12]spaced out[/spacing]\n[outline=yellow]outlined[/outline] [shadow=red]DropShadow[/shadow] ',
       opacity: 255,
       fontSize: 20,
+      lineHeight: 0,
       visible: true,
       color: '0;0;0',
       fontFamily: 'Arial',
@@ -349,6 +357,19 @@ module.exports = {
         actionSentence: _('the base font size'),
         expressionLabel: _('Get the base font size'),
         expressionDescription: _('Get the base font size'),
+      },
+      {
+        functionName: 'LineHeight',
+        iconPath: 'res/actions/font24.png',
+        type: 'number',
+        instructionLabel: _('Line height'),
+        paramLabel: _('Line height'),
+        conditionDescription: _('Compare the line height of the text.'),
+        conditionSentence: _('the line height'),
+        actionDescription: _('Set line height'),
+        actionSentence: _('the line height'),
+        expressionLabel: _('Get the line height'),
+        expressionDescription: _('Get the line height'),
       },
       {
         functionName: 'FontFamily',

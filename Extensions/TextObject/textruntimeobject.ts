@@ -22,6 +22,8 @@ namespace gdjs {
       text: string;
       textAlignment: string;
       verticalTextAlignment: string;
+      /** The line height */
+      lineHeight: float;
 
       isOutlineEnabled: boolean;
       outlineThickness: float;
@@ -62,6 +64,7 @@ namespace gdjs {
     sha: float;
     shb: float;
     pad: integer;
+    lh: float;
   };
 
   export type TextObjectNetworkSyncData = ObjectNetworkSyncData &
@@ -101,6 +104,8 @@ namespace gdjs {
     _shadowAngle: float;
     _shadowBlur: float;
 
+    _lineHeight: float;
+
     _padding: integer = 5;
     _str: string;
     _renderer: gdjs.TextRuntimeObjectRenderer;
@@ -139,6 +144,7 @@ namespace gdjs {
       this._shadowDistance = content.shadowDistance;
       this._shadowBlur = content.shadowBlurRadius;
       this._shadowAngle = content.shadowAngle;
+      this._lineHeight = content.lineHeight || 0;
 
       this._renderer = new gdjs.TextRuntimeObjectRenderer(
         this,
@@ -211,6 +217,9 @@ namespace gdjs {
       if (oldContent.shadowBlurRadius !== newContent.shadowBlurRadius) {
         this.setShadowBlurRadius(newContent.shadowBlurRadius);
       }
+      if ((oldContent.lineHeight || 0) !== (newContent.lineHeight || 0)) {
+        this.setLineHeight(newContent.lineHeight || 0);
+      }
       return true;
     }
 
@@ -238,6 +247,7 @@ namespace gdjs {
         shd: this._shadowDistance,
         sha: this._shadowAngle,
         shb: this._shadowBlur,
+        lh: this._lineHeight,
         pad: this._padding,
       };
     }
@@ -311,6 +321,9 @@ namespace gdjs {
       }
       if (networkSyncData.shb !== undefined) {
         this.setShadowBlurRadius(networkSyncData.shb);
+      }
+      if (networkSyncData.lh !== undefined) {
+        this.setLineHeight(networkSyncData.lh);
       }
       if (networkSyncData.pad !== undefined) {
         this.setPadding(networkSyncData.pad);
@@ -441,6 +454,22 @@ namespace gdjs {
         newSize = 1;
       }
       this._characterSize = newSize;
+      this._renderer.updateStyle();
+    }
+
+    /**
+     * Get the line height of the text.
+     */
+    getLineHeight(): float {
+      return this._lineHeight;
+    }
+
+    /**
+     * Set the line height of the text.
+     * @param value The new line height for the text.
+     */
+    setLineHeight(value: float): void {
+      this._lineHeight = value;
       this._renderer.updateStyle();
     }
 

@@ -23,6 +23,7 @@ namespace gdjs {
             .getFontManager()
             .getFontFamily(runtimeObject._fontFamily),
           fontSize: runtimeObject._fontSize + 'px',
+          lineHeight: runtimeObject._lineHeight,
           fill: gdjs.rgbToHexNumber(
             runtimeObject._color[0],
             runtimeObject._color[1],
@@ -100,6 +101,13 @@ namespace gdjs {
       this._pixiObject.textStyles.default.fontSize =
         this._object._fontSize + 'px';
       this._pixiObject.dirty = true;
+    }
+
+    updateLineHeight(): void {
+      //@ts-ignore Private member usage.
+      this._pixiObject.textStyles.default.lineHeight = this._object._lineHeight;
+      this._pixiObject.dirty = true;
+      this.updatePosition();
     }
 
     updatePosition(): void {

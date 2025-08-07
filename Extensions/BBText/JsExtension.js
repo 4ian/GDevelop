@@ -76,7 +76,8 @@ module.exports = {
         .setValue((objectContent.lineHeight || 0).toString())
         .setType('number')
         .setLabel(_('Line height'))
-        .setGroup(_('Font'));
+        .setGroup(_('Font'))
+        .setAdvanced(true);
 
       objectProperties
         .getOrCreate('align')

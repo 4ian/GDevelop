@@ -18,31 +18,17 @@ This project is released under the MIT License.
 using namespace std;
 
 TextObject::TextObject()
-    : text("Text"),
-      characterSize(20),
-      fontName(""),
-      smoothed(true),
-      bold(false),
-      italic(false),
-      underlined(false),
-      color("0;0;0"),
-      textAlignment("left"),
-      verticalTextAlignment("top"),
-      isOutlineEnabled(false),
-      outlineThickness(2),
-      outlineColor("255;255;255"),
-      isShadowEnabled(false),
-      shadowColor("0;0;0"),
-      shadowOpacity(127),
-      shadowAngle(90),
-      shadowDistance(4),
-      shadowBlurRadius(2),
-      lineHeight(0) {}
+    : text("Text"), characterSize(20), fontName(""), smoothed(true),
+      bold(false), italic(false), underlined(false), color("0;0;0"),
+      textAlignment("left"), verticalTextAlignment("top"),
+      isOutlineEnabled(false), outlineThickness(2), outlineColor("255;255;255"),
+      isShadowEnabled(false), shadowColor("0;0;0"), shadowOpacity(127),
+      shadowAngle(90), shadowDistance(4), shadowBlurRadius(2), lineHeight(0) {}
 
 TextObject::~TextObject() {};
 
-bool TextObject::UpdateProperty(const gd::String& propertyName,
-                                const gd::String& newValue) {
+bool TextObject::UpdateProperty(const gd::String &propertyName,
+                                const gd::String &newValue) {
   if (propertyName == "text") {
     text = newValue;
     return true;
@@ -169,7 +155,8 @@ std::map<gd::String, gd::PropertyDescriptor> TextObject::GetProperties() const {
       .AddChoice("center", _("Center"))
       .AddChoice("right", _("Right"))
       .SetLabel(_("Alignment"))
-      .SetDescription(_("Alignment of the text when multiple lines are displayed"))
+      .SetDescription(
+          _("Alignment of the text when multiple lines are displayed"))
       .SetGroup(_("Font"))
       .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
 
@@ -271,16 +258,17 @@ std::map<gd::String, gd::PropertyDescriptor> TextObject::GetProperties() const {
   return objectProperties;
 }
 
-void TextObject::DoUnserializeFrom(gd::Project& project,
-                                   const gd::SerializerElement& element) {
+void TextObject::DoUnserializeFrom(gd::Project &project,
+                                   const gd::SerializerElement &element) {
   // Compatibility with GD <= 5.3.188
   // end of compatibility code
   bool isLegacy = !element.HasChild("content");
-  auto& content = isLegacy ? element : element.GetChild("content");
+  auto &content = isLegacy ? element : element.GetChild("content");
 
   SetFontName(content.GetChild("font", 0, "Font").GetValue().GetString());
   SetTextAlignment(content.GetChild("textAlignment").GetValue().GetString());
-  SetVerticalTextAlignment(content.GetStringAttribute("verticalTextAlignment", "top"));
+  SetVerticalTextAlignment(
+      content.GetStringAttribute("verticalTextAlignment", "top"));
   SetCharacterSize(content.GetChild("characterSize", 0, "CharacterSize")
                        .GetValue()
                        .GetInt());
@@ -288,7 +276,7 @@ void TextObject::DoUnserializeFrom(gd::Project& project,
   bold = content.GetBoolAttribute("bold");
   italic = content.GetBoolAttribute("italic");
   underlined = content.GetBoolAttribute("underlined");
-  SetLineHeight(content.GetIntAttribute("lineHeight", 0));
+  SetLineHeight(content.GetDoubleAttribute("lineHeight", 0));
 
   // Compatibility with GD <= 5.3.188
   if (isLegacy) {
@@ -321,7 +309,7 @@ void TextObject::DoUnserializeFrom(gd::Project& project,
   }
 }
 
-void TextObject::DoSerializeTo(gd::SerializerElement& element) const {
+void TextObject::DoSerializeTo(gd::SerializerElement &element) const {
   // Allow users to rollback to 5.3.188 or older releases without loosing their
   // configuration.
   // TODO Remove this in a few releases.
@@ -337,9 +325,9 @@ void TextObject::DoSerializeTo(gd::SerializerElement& element) const {
             "r", colorComponents.size() == 3 ? colorComponents[0].To<int>() : 0)
         .SetAttribute(
             "g", colorComponents.size() == 3 ? colorComponents[1].To<int>() : 0)
-        .SetAttribute(
-            "b",
-            colorComponents.size() == 3 ? colorComponents[2].To<int>() : 0);
+        .SetAttribute("b", colorComponents.size() == 3
+                               ? colorComponents[2].To<int>()
+                               : 0);
     element.SetAttribute("smoothed", smoothed);
     element.SetAttribute("bold", bold);
     element.SetAttribute("italic", italic);
@@ -347,11 +335,12 @@ void TextObject::DoSerializeTo(gd::SerializerElement& element) const {
   }
   // end of compatibility code
 
-  auto& content = element.AddChild("content");
+  auto &content = element.AddChild("content");
   content.AddChild("text").SetValue(GetText());
   content.AddChild("font").SetValue(GetFontName());
   content.AddChild("textAlignment").SetValue(GetTextAlignment());
-  content.AddChild("verticalTextAlignment").SetValue(GetVerticalTextAlignment());
+  content.AddChild("verticalTextAlignment")
+      .SetValue(GetVerticalTextAlignment());
   content.AddChild("characterSize").SetValue(GetCharacterSize());
   content.AddChild("color").SetValue(GetColor());
 
@@ -373,6 +362,6 @@ void TextObject::DoSerializeTo(gd::SerializerElement& element) const {
   content.SetAttribute("shadowBlurRadius", shadowBlurRadius);
 }
 
-void TextObject::ExposeResources(gd::ArbitraryResourceWorker& worker) {
+void TextObject::ExposeResources(gd::ArbitraryResourceWorker &worker) {
   worker.ExposeFont(fontName);
 }

@@ -56,12 +56,12 @@ export default class TextEditor extends React.Component<EditorProps, void> {
       resourceManagementProps,
       renderObjectNameField,
     } = this.props;
-    const textObjectConfiguration = gd.asTextObjectConfiguration(
-      objectConfiguration
-    );
+    const textObjectConfiguration =
+      gd.asTextObjectConfiguration(objectConfiguration);
 
     const textAlignment = textObjectConfiguration.getTextAlignment();
-    const verticalTextAlignment = textObjectConfiguration.getVerticalTextAlignment();
+    const verticalTextAlignment =
+      textObjectConfiguration.getVerticalTextAlignment();
 
     return (
       <ColumnStackLayout noMargin>
@@ -82,24 +82,8 @@ export default class TextEditor extends React.Component<EditorProps, void> {
               margin="none"
               style={styles.sizeTextField}
               value={textObjectConfiguration.getCharacterSize()}
-              onChange={value => {
+              onChange={(value) => {
                 textObjectConfiguration.setCharacterSize(
-                  parseInt(value, 10) || 0
-                );
-                this.forceUpdate();
-              }}
-            />
-            <MiniToolbarText>
-              <Trans>Line height:</Trans>
-            </MiniToolbarText>
-            <SemiControlledTextField
-              commitOnBlur
-              type="number"
-              margin="none"
-              style={styles.sizeTextField}
-              value={textObjectConfiguration.getLineHeight()}
-              onChange={value => {
-                textObjectConfiguration.setLineHeight(
                   parseInt(value, 10) || 0
                 );
                 this.forceUpdate();
@@ -115,7 +99,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
                 textObjectConfiguration.getColor(),
                 255
               )}
-              onChangeComplete={color => {
+              onChangeComplete={(color) => {
                 const rgbString = rgbColorToRGBString(color.rgb);
                 textObjectConfiguration.setColor(rgbString);
                 this.forceUpdate();
@@ -227,12 +211,22 @@ export default class TextEditor extends React.Component<EditorProps, void> {
           fullWidth
           canBeReset
           initialResourceName={textObjectConfiguration.getFontName()}
-          onChange={resourceName => {
+          onChange={(resourceName) => {
             textObjectConfiguration.setFontName(resourceName);
             this.forceUpdate();
           }}
           floatingLabelText={<Trans>Choose a font</Trans>}
           hintText={<Trans>Choose a font</Trans>}
+        />
+        <SemiControlledTextField
+          floatingLabelText={<Trans>Line height</Trans>}
+          type="number"
+          fullWidth
+          value={textObjectConfiguration.getLineHeight()}
+          onChange={(value) => {
+            textObjectConfiguration.setLineHeight(parseFloat(value) || 0);
+            this.forceUpdate();
+          }}
         />
         <Line noMargin>
           <SemiControlledTextField
@@ -246,7 +240,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             rows={8}
             rowsMax={8}
             value={textObjectConfiguration.getText()}
-            onChange={value => {
+            onChange={(value) => {
               textObjectConfiguration.setText(value);
               this.forceUpdate();
               this.props.onSizeUpdated();
@@ -275,7 +269,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
               disableAlpha
               fullWidth
               color={textObjectConfiguration.getOutlineColor()}
-              onChange={color => {
+              onChange={(color) => {
                 const rgbString =
                   color.length === 0 ? '' : rgbOrHexToRGBString(color);
                 textObjectConfiguration.setOutlineColor(rgbString);
@@ -289,7 +283,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
               floatingLabelText={<Trans>Thickness</Trans>}
               type="number"
               value={textObjectConfiguration.getOutlineThickness()}
-              onChange={value => {
+              onChange={(value) => {
                 textObjectConfiguration.setOutlineThickness(
                   parseInt(value, 10) || 0
                 );
@@ -320,7 +314,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
               floatingLabelText={<Trans>Distance</Trans>}
               type="number"
               value={textObjectConfiguration.getShadowDistance()}
-              onChange={value => {
+              onChange={(value) => {
                 textObjectConfiguration.setShadowDistance(
                   parseInt(value, 10) || 0
                 );
@@ -334,7 +328,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
               floatingLabelText={<Trans>Angle</Trans>}
               type="number"
               value={textObjectConfiguration.getShadowAngle()}
-              onChange={value => {
+              onChange={(value) => {
                 textObjectConfiguration.setShadowAngle(
                   parseInt(value, 10) || 0
                 );
@@ -350,7 +344,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
               disableAlpha
               fullWidth
               color={textObjectConfiguration.getShadowColor()}
-              onChange={color => {
+              onChange={(color) => {
                 const rgbString =
                   color.length === 0 ? '' : rgbOrHexToRGBString(color);
                 textObjectConfiguration.setShadowColor(rgbString);
@@ -364,7 +358,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
               floatingLabelText={<Trans>Opacity (0 - 255)</Trans>}
               type="number"
               value={textObjectConfiguration.getShadowOpacity()}
-              onChange={value => {
+              onChange={(value) => {
                 textObjectConfiguration.setShadowOpacity(
                   parseInt(value, 10) || 0
                 );
@@ -379,7 +373,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             floatingLabelText={<Trans>Blur radius</Trans>}
             type="number"
             value={textObjectConfiguration.getShadowBlurRadius()}
-            onChange={value => {
+            onChange={(value) => {
               textObjectConfiguration.setShadowBlurRadius(
                 parseInt(value, 10) || 0
               );

@@ -108,7 +108,8 @@ module.exports = {
         .setValue((objectContent.lineHeight || 0).toString())
         .setType('number')
         .setLabel(_('Line height'))
-        .setGroup(_('Appearance'));
+        .setGroup(_('Appearance'))
+        .setAdvanced(true);
 
       objectProperties
         .getOrCreate('tint')

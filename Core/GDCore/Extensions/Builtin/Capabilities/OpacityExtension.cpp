@@ -18,13 +18,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsOpacityExtension(
     gd::PlatformExtension& extension) {
   extension
       .SetExtensionInformation("OpacityCapability",
-                               _("Opacity capability"),
+                               _("Objects with opacity"),
                                _("Action/condition/expression to change or "
                                  "check the opacity of an object (0-255)."),
                                "Florian Rival",
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/objects");
-  extension.AddInstructionOrExpressionGroupMetadata(_("Opacity capability"))
+  extension.AddInstructionOrExpressionGroupMetadata(_("Objects with opacity"))
       .SetIcon("res/actions/opacity24.png");
   extension.AddInstructionOrExpressionGroupMetadata(_("Visibility"))
       .SetIcon("res/actions/opacity24.png");
@@ -32,7 +32,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsOpacityExtension(
   gd::BehaviorMetadata& aut =
       extension
           .AddBehavior("OpacityBehavior",
-                       _("Opacity capability"),
+                       _("Objects with opacity"),
                        "Opacity",
                        _("Action/condition/expression to change or check the "
                          "opacity of an object (0-255)."),

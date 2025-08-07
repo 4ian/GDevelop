@@ -18,13 +18,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsScalableExtension(
     gd::PlatformExtension& extension) {
   extension
       .SetExtensionInformation("ScalableCapability",
-                               _("Scalable capability"),
+                               _("Scalable objects"),
                                _("Actions/conditions/expression to change or "
                                  "check the scale of an object (default: 1)."),
                                "Florian Rival",
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/objects");
-  extension.AddInstructionOrExpressionGroupMetadata(_("Scalable capability"))
+  extension.AddInstructionOrExpressionGroupMetadata(_("Scalable objects"))
       .SetIcon("res/actions/scale24_black.png");
   extension.AddInstructionOrExpressionGroupMetadata(_("Size")).SetIcon(
       "res/actions/scale24_black.png");
@@ -32,7 +32,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsScalableExtension(
   gd::BehaviorMetadata& aut =
       extension
           .AddBehavior("ScalableBehavior",
-                       _("Scalable capability"),
+                       _("Scalable objects"),
                        "Scale",
                        _("Actions/conditions/expression to change or check the "
                          "scale of an object (default: 1)."),

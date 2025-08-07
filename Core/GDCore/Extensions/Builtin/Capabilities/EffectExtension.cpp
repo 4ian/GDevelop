@@ -18,7 +18,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsEffectExtension(
     gd::PlatformExtension& extension) {
   extension
       .SetExtensionInformation("EffectCapability",
-                               _("Effect capability"),
+                               _("Objects with effects"),
                                _("Actions/conditions to enable/disable and change parameters of visual effects applied on objects."),
                                "Florian Rival",
                                "Open source (MIT License)")
@@ -28,7 +28,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsEffectExtension(
 
   gd::BehaviorMetadata& aut = extension.AddBehavior(
       "EffectBehavior",
-      _("Effect capability"),
+      _("Objects with effects"),
       "Effect",
       _("Actions/conditions to enable/disable and change parameters of visual effects applied on objects."),
       "",

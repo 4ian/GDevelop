@@ -18,19 +18,19 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
     gd::PlatformExtension& extension) {
   extension
       .SetExtensionInformation("AnimatableCapability",
+                               _("Objects with animations"),
                                _("Actions and conditions for objects having animations (sprite, 3D models...)."),
-                               _("Animate objects."),
                                "Florian Rival",
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/objects");
-  extension.AddInstructionOrExpressionGroupMetadata(_("Animatable capability"))
+  extension.AddInstructionOrExpressionGroupMetadata(_("Objects with animations"))
       .SetIcon("res/actions/animation24.png");
   extension.AddInstructionOrExpressionGroupMetadata(_("Animations and images"))
       .SetIcon("res/actions/animation24.png");
 
   gd::BehaviorMetadata& aut = extension.AddBehavior(
       "AnimatableBehavior",
-      _("Animatable capability"),
+      _("Objects with animations"),
       "Animation",
       _("Actions and conditions for objects having animations (sprite, 3D models...).."),
       "",

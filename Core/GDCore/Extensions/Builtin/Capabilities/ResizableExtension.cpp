@@ -18,7 +18,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsResizableExtension(
   extension
       .SetExtensionInformation(
           "ResizableCapability",
-          _("Resizable capability"),
+          _("Resizable objects"),
           _("Change or compare the size (width/height) of an object which can "
             "be resized (i.e: most objects)."),
           "Florian Rival",
@@ -30,7 +30,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsResizableExtension(
   gd::BehaviorMetadata &aut =
       extension
           .AddBehavior("ResizableBehavior",
-                       _("Resizable capability"),
+                       _("Resizable objects"),
                        "Resizable",
                        _("Change or compare the size (width/height) of an "
                          "object which can be resized (i.e: most objects)."),

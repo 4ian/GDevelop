@@ -18,7 +18,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFlippableExtension(
     gd::PlatformExtension& extension) {
   extension
       .SetExtensionInformation("FlippableCapability",
-                               _("Flippable capability"),
+                               _("Flippable objects"),
                                _("Actions/conditions for objects which can be flipped horizontally or vertically."),
                                "Florian Rival",
                                "Open source (MIT License)")
@@ -28,7 +28,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFlippableExtension(
 
   gd::BehaviorMetadata& aut = extension.AddBehavior(
       "FlippableBehavior",
-      _("Flippable capability"),
+      _("Flippable objects"),
       "Flippable",
       _("Actions/conditions for objects which can be flipped horizontally or vertically."),
       "",

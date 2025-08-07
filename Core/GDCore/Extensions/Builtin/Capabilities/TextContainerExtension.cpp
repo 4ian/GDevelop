@@ -18,17 +18,17 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTextContainerExtension(
     gd::PlatformExtension& extension) {
   extension
       .SetExtensionInformation("TextContainerCapability",
-                               _("Text capability"),
+                               _("Objects containing a text"),
                                _("Allows an object to contain a text, usually shown on screen, that can be modified."),
                                "Florian Rival",
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/objects");
-  extension.AddInstructionOrExpressionGroupMetadata(_("Text capability"))
+  extension.AddInstructionOrExpressionGroupMetadata(_("Objects containing a text"))
       .SetIcon("res/conditions/text24_black.png");
 
   gd::BehaviorMetadata& aut = extension.AddBehavior(
       "TextContainerBehavior",
-      _("Text capability"),
+      _("Objects containing a text"),
       "Text",
       _("Allows an object to contain a text, usually shown on screen, that can be modified."),
       "",

@@ -21,6 +21,7 @@ export default class RenderedTextInstance extends RenderedInstance {
   _color: string = '0;0;0';
   _textAlignment: string = 'left';
   _verticalTextAlignment: string = 'top';
+  _lineHeight: number = 1;
 
   _isOutlineEnabled = false;
   _outlineColor = '255;255;255';
@@ -32,6 +33,7 @@ export default class RenderedTextInstance extends RenderedInstance {
   _shadowColor = '0;0;0';
   _shadowOpacity = 127;
   _shadowBlurRadius = 2;
+  _lineHeight = 0;
 
   constructor(
     project: gdProject,
@@ -112,6 +114,7 @@ export default class RenderedTextInstance extends RenderedInstance {
       textObjectConfiguration.getShadowOpacity() !== this._shadowOpacity ||
       textObjectConfiguration.getShadowBlurRadius() !==
         this._shadowBlurRadius ||
+      textObjectConfiguration.getLineHeight() !== this._lineHeight ||
       this._instance.hasCustomSize() !== this._wrapping ||
       (this.getCustomWidth() !== this._wrappingWidth && this._wrapping)
     ) {
@@ -135,6 +138,7 @@ export default class RenderedTextInstance extends RenderedInstance {
 
       this._wrapping = this._instance.hasCustomSize();
       this._wrappingWidth = this.getCustomWidth();
+      this._lineHeight = textObjectConfiguration.getLineHeight();
       this._styleFontDirty = true;
     }
 
@@ -172,6 +176,7 @@ export default class RenderedTextInstance extends RenderedInstance {
       style.wordWrapWidth = this._wrappingWidth <= 1 ? 1 : this._wrappingWidth;
       style.breakWords = true;
       style.align = this._textAlignment;
+      style.lineHeight = this._lineHeight > 0 ? this._lineHeight : undefined;
 
       style.stroke = rgbStringToHexNumber(this._outlineColor);
       style.strokeThickness = this._isOutlineEnabled

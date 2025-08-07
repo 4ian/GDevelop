@@ -22,6 +22,7 @@ namespace gdjs {
       text: string;
       textAlignment: string;
       verticalTextAlignment: string;
+      lineHeight: number;
 
       isOutlineEnabled: boolean;
       outlineThickness: float;
@@ -34,6 +35,7 @@ namespace gdjs {
       shadowDistance: float;
       shadowAngle: float;
       shadowBlurRadius: float;
+      lineHeight: float;
     };
   };
 
@@ -62,6 +64,7 @@ namespace gdjs {
     sha: float;
     shb: float;
     pad: integer;
+    lh: float;
   };
 
   export type TextObjectNetworkSyncData = ObjectNetworkSyncData &
@@ -89,6 +92,7 @@ namespace gdjs {
     _wrapping: boolean = false;
     // A wrapping of 1 makes games crash on Firefox
     _wrappingWidth: float = 100;
+    _lineHeight: float;
 
     _isOutlineEnabled: boolean;
     _outlineThickness: float;
@@ -102,6 +106,7 @@ namespace gdjs {
     _shadowBlur: float;
 
     _padding: integer = 5;
+    _lineHeight: float = 0;
     _str: string;
     _renderer: gdjs.TextRuntimeObjectRenderer;
 
@@ -128,6 +133,7 @@ namespace gdjs {
       this._str = content.text;
       this._textAlign = content.textAlignment || 'left';
       this._verticalTextAlignment = content.verticalTextAlignment || 'top';
+      this._lineHeight = content.lineHeight || 0;
 
       this._isOutlineEnabled = content.isOutlineEnabled;
       this._outlineThickness = content.outlineThickness;
@@ -211,6 +217,9 @@ namespace gdjs {
       if (oldContent.shadowBlurRadius !== newContent.shadowBlurRadius) {
         this.setShadowBlurRadius(newContent.shadowBlurRadius);
       }
+      if (oldContent.lineHeight !== newContent.lineHeight) {
+        this.setLineHeight(newContent.lineHeight);
+      }
       return true;
     }
 
@@ -239,6 +248,7 @@ namespace gdjs {
         sha: this._shadowAngle,
         shb: this._shadowBlur,
         pad: this._padding,
+        lh: this._lineHeight,
       };
     }
 
@@ -314,6 +324,9 @@ namespace gdjs {
       }
       if (networkSyncData.pad !== undefined) {
         this.setPadding(networkSyncData.pad);
+      }
+      if (networkSyncData.lh !== undefined) {
+        this.setLineHeight(networkSyncData.lh);
       }
     }
 
@@ -927,6 +940,23 @@ namespace gdjs {
      */
     setPadding(value: float): void {
       this._padding = value;
+      this._renderer.updateStyle();
+    }
+
+    /**
+     * Get the line height of the text object.
+     * @return the line height
+     */
+    getLineHeight(): number {
+      return this._lineHeight;
+    }
+
+    /**
+     * Set the line height of the text object.
+     * @param value the line height
+     */
+    setLineHeight(value: float): void {
+      this._lineHeight = value;
       this._renderer.updateStyle();
     }
   }

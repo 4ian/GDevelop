@@ -449,6 +449,16 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Text")
       .UseStandardParameters("number", gd::ParameterOptions::MakeNewOptions());
 
+  obj.AddExpressionAndConditionAndAction("number",
+                                         "LineHeight",
+                                         _("Line height"),
+                                         _("the line height of a text object"),
+                                         _("the line height"),
+                                         _("Font"),
+                                         "res/conditions/characterSize24.png")
+      .AddParameter("object", _("Object"), "Text")
+      .UseStandardParameters("number", gd::ParameterOptions::MakeNewOptions());
+
   // Support for deprecated "Size" actions/conditions:
   obj.AddDuplicatedAction("Size", "Text::SetFontSize").SetHidden();
   obj.AddDuplicatedCondition("Size", "Text::FontSize").SetHidden();

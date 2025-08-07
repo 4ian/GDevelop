@@ -94,6 +94,16 @@ module.exports = {
         .setLabel(_('Vertical alignment'))
         .setGroup(_('Appearance'));
 
+      if (!objectContent.lineHeight) {
+        objectContent.lineHeight = 0;
+      }
+      objectProperties
+        .getOrCreate('lineHeight')
+        .setValue(objectContent.lineHeight.toString())
+        .setType('number')
+        .setLabel(_('Line height (0 = default)'))
+        .setGroup(_('Font'));
+
       objectProperties
         .getOrCreate('fontFamily')
         .setValue(objectContent.fontFamily)
@@ -393,6 +403,19 @@ module.exports = {
         actionSentence: _('the wrapping width'),
         expressionLabel: _('Get the wrapping width'),
         expressionDescription: _('Get the wrapping width'),
+      },
+      {
+        functionName: 'LineHeight',
+        iconPath: 'res/actions/characterSize24.png',
+        type: 'number',
+        instructionLabel: _('Line height'),
+        paramLabel: _('Line height (0 = default)'),
+        conditionDescription: _('Compare the base line height of the text.'),
+        conditionSentence: _('the base line height'),
+        actionDescription: _('Set base line height'),
+        actionSentence: _('the base line height'),
+        expressionLabel: _('Get the base line height'),
+        expressionDescription: _('Get the base line height'),
       },
     ];
 

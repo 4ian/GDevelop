@@ -64,6 +64,7 @@ namespace gdjs {
       style.wordWrap = this._object._wrapping;
       style.wordWrapWidth = this._object._wrappingWidth;
       style.breakWords = true;
+      style.lineHeight = this._object._lineHeight > 0 ? this._object._lineHeight : undefined;
       style.stroke = gdjs.rgbToHexNumber(
         this._object._outlineColor[0],
         this._object._outlineColor[1],

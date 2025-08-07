@@ -220,6 +220,24 @@ export default class TextEditor extends React.Component<EditorProps, void> {
         />
         <Line noMargin>
           <SemiControlledTextField
+            floatingLabelText={<Trans>Line height (0 = default)</Trans>}
+            floatingLabelFixed
+            id="text-object-line-height"
+            type="number"
+            commitOnBlur
+            fullWidth
+            value={textObjectConfiguration.getLineHeight()}
+            onChange={value => {
+              textObjectConfiguration.setLineHeight(
+                parseInt(value, 10) || 0
+              );
+              this.forceUpdate();
+              this.props.onSizeUpdated();
+            }}
+          />
+        </Line>
+        <Line noMargin>
+          <SemiControlledTextField
             floatingLabelText={<Trans>Initial text to display</Trans>}
             floatingLabelFixed
             id="text-object-initial-text"

@@ -20,6 +20,8 @@ namespace gdjs {
       /** Alignment of the text. */
       align: 'left' | 'center' | 'right';
       verticalTextAlignment: 'top' | 'center' | 'bottom';
+      /** Line height for multiline text. */
+      lineHeight: float;
     };
   };
   export type BitmapTextObjectData = ObjectData & BitmapTextObjectDataType;
@@ -66,6 +68,7 @@ namespace gdjs {
     _wrappingWidth: float;
     _textAlign: string;
     _verticalTextAlignment: string;
+    _lineHeight: float;
 
     _renderer: gdjs.BitmapTextRuntimeObjectPixiRenderer;
 
@@ -92,6 +95,7 @@ namespace gdjs {
       this._textAlign = objectData.content.align;
       this._verticalTextAlignment =
         objectData.content.verticalTextAlignment || 'top';
+      this._lineHeight = objectData.content.lineHeight || 0;
 
       this._renderer = new gdjs.BitmapTextRuntimeObjectRenderer(
         this,
@@ -151,6 +155,9 @@ namespace gdjs {
           newObjectData.content.verticalTextAlignment
         );
       }
+      if (oldObjectData.content.lineHeight !== newObjectData.content.lineHeight) {
+        this.setLineHeight(newObjectData.content.lineHeight);
+      }
 
       return true;
     }
@@ -168,6 +175,7 @@ namespace gdjs {
         wwidth: this._wrappingWidth,
         align: this._textAlign,
         vta: this._verticalTextAlignment,
+        lh: this._lineHeight,
       };
     }
 
@@ -205,6 +213,9 @@ namespace gdjs {
       }
       if (this._verticalTextAlignment !== undefined) {
         this.setVerticalTextAlignment(networkSyncData.vta);
+      }
+      if (this._lineHeight !== undefined) {
+        this.setLineHeight(networkSyncData.lh);
       }
     }
 
@@ -352,6 +363,15 @@ namespace gdjs {
      */
     getVerticalTextAlignment(): string {
       return this._verticalTextAlignment;
+    }
+
+    setLineHeight(lineHeight: float): void {
+      this._lineHeight = lineHeight;
+      this._renderer.updateLineHeight();
+    }
+
+    getLineHeight(): float {
+      return this._lineHeight;
     }
 
     override setX(x: float): void {

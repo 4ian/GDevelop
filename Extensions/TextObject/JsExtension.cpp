@@ -38,6 +38,14 @@ class TextObjectJsExtension : public gd::PlatformExtension {
     GetAllExpressionsForObject("TextObject::Text")["FontSize"]
         .SetFunctionName("getCharacterSize");
 
+    GetAllActionsForObject("TextObject::Text")["TextObject::Text::SetLineHeight"]
+        .SetFunctionName("setLineHeight")
+        .SetGetter("getLineHeight");
+    GetAllConditionsForObject("TextObject::Text")["TextObject::Text::LineHeight"]
+        .SetFunctionName("getLineHeight");
+    GetAllExpressionsForObject("TextObject::Text")["LineHeight"]
+        .SetFunctionName("getLineHeight");
+
     GetAllActionsForObject("TextObject::Text")["TextObject::Font"]
         .SetFunctionName("setFontName");
 

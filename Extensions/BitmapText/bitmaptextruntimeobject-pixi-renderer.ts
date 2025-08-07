@@ -145,6 +145,12 @@ namespace gdjs {
       this.updatePosition();
     }
 
+    updateLineHeight(): void {
+      // Note: PIXI.BitmapText doesn't have native lineHeight support
+      // We'll need to handle this in updatePosition for multiline text
+      this.updatePosition();
+    }
+
     updatePosition(): void {
       if (this._object.isWrapping() && this.getWidth() !== 0) {
         const alignmentX =

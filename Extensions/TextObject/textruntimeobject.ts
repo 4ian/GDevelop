@@ -34,6 +34,7 @@ namespace gdjs {
       shadowDistance: float;
       shadowAngle: float;
       shadowBlurRadius: float;
+      lineHeight: float;
     };
   };
 
@@ -62,6 +63,7 @@ namespace gdjs {
     sha: float;
     shb: float;
     pad: integer;
+    lh: float;
   };
 
   export type TextObjectNetworkSyncData = ObjectNetworkSyncData &
@@ -104,6 +106,7 @@ namespace gdjs {
     _padding: integer = 5;
     _str: string;
     _renderer: gdjs.TextRuntimeObjectRenderer;
+    _lineHeight: float = 0;
 
     // We can store the scale as nothing else can change it.
     _scaleX: number = 1;
@@ -139,6 +142,8 @@ namespace gdjs {
       this._shadowDistance = content.shadowDistance;
       this._shadowBlur = content.shadowBlurRadius;
       this._shadowAngle = content.shadowAngle;
+
+      this._lineHeight = content.lineHeight || 0;
 
       this._renderer = new gdjs.TextRuntimeObjectRenderer(
         this,
@@ -211,6 +216,9 @@ namespace gdjs {
       if (oldContent.shadowBlurRadius !== newContent.shadowBlurRadius) {
         this.setShadowBlurRadius(newContent.shadowBlurRadius);
       }
+      if (oldContent.lineHeight !== newContent.lineHeight) {
+        this.setLineHeight(newContent.lineHeight || 0);
+      }
       return true;
     }
 
@@ -239,6 +247,7 @@ namespace gdjs {
         sha: this._shadowAngle,
         shb: this._shadowBlur,
         pad: this._padding,
+        lh: this._lineHeight,
       };
     }
 
@@ -314,6 +323,9 @@ namespace gdjs {
       }
       if (networkSyncData.pad !== undefined) {
         this.setPadding(networkSyncData.pad);
+      }
+      if (networkSyncData.lh !== undefined) {
+        this.setLineHeight(networkSyncData.lh);
       }
     }
 
@@ -927,6 +939,23 @@ namespace gdjs {
      */
     setPadding(value: float): void {
       this._padding = value;
+      this._renderer.updateStyle();
+    }
+
+    /**
+     * Get the line height of the text object.
+     * @return the line height
+     */
+    getLineHeight(): number {
+      return this._lineHeight;
+    }
+
+    /**
+     * Set the line height of the text object.
+     * @param value the line height
+     */
+    setLineHeight(value: float): void {
+      this._lineHeight = value;
       this._renderer.updateStyle();
     }
   }

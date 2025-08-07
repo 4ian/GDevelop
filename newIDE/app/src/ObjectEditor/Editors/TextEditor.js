@@ -125,6 +125,28 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             />
           </Line>
           <LineStackLayout noMargin alignItems="center">
+            <MiniToolbarText firstChild>
+              <Trans>Line height:</Trans>
+            </MiniToolbarText>
+            <SemiControlledTextField
+              commitOnBlur
+              id="text-object-line-height"
+              type="number"
+              margin="none"
+              style={styles.sizeTextField}
+              value={textObjectConfiguration.getLineHeight()}
+              onChange={value => {
+                textObjectConfiguration.setLineHeight(
+                  parseInt(value, 10) || 0
+                );
+                this.forceUpdate();
+              }}
+            />
+            <MiniToolbarText>
+              <Trans>pixels (0 for default)</Trans>
+            </MiniToolbarText>
+          </LineStackLayout>
+          <LineStackLayout noMargin alignItems="center">
             <ButtonGroup size="small">
               <Button
                 variant={textAlignment === 'left' ? 'contained' : 'outlined'}

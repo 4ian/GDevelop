@@ -442,6 +442,26 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName(`setFontFamily`);
 
+    object
+      .addExpressionAndConditionAndAction(
+        'number',
+        'LineHeight',
+        _('Line height'),
+        _('the line height in pixels (0 for default)'),
+        _('the line height'),
+        '',
+        'res/conditions/characterSize24.png'
+      )
+      .addParameter('object', 'BBText', 'BBText', false)
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Line height in pixels (0 for default)')
+        )
+      )
+      .setFunctionName('setLineHeight')
+      .setGetter('getLineHeight');
+
     const actions = object.getAllActions();
     const conditions = object.getAllConditions();
     const expressions = object.getAllExpressions();

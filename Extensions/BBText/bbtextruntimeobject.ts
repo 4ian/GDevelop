@@ -20,6 +20,8 @@ namespace gdjs {
       /** Alignment of the text: "left", "center" or "right" */
       align: 'left' | 'center' | 'right';
       verticalTextAlignment: 'top' | 'center' | 'bottom';
+      /** Line height for multiline text */
+      lineHeight: float;
     };
   };
   export type BBTextObjectData = ObjectData & BBTextObjectDataType;
@@ -35,6 +37,7 @@ namespace gdjs {
     align: string;
     vta: string;
     hidden: boolean;
+    lh: float;
   };
 
   export type BBTextObjectNetworkSyncData = ObjectNetworkSyncData &
@@ -61,6 +64,7 @@ namespace gdjs {
 
     _textAlign: string;
     _verticalTextAlignment: string;
+    _lineHeight: float;
 
     _renderer: gdjs.BBTextRuntimeObjectRenderer;
 
@@ -88,6 +92,7 @@ namespace gdjs {
       this._verticalTextAlignment =
         objectData.content.verticalTextAlignment || 'top';
       this.hidden = !objectData.content.visible;
+      this._lineHeight = objectData.content.lineHeight || 0;
 
       this._renderer = new gdjs.BBTextRuntimeObjectRenderer(
         this,
@@ -142,6 +147,10 @@ namespace gdjs {
           newObjectData.content.verticalTextAlignment
         );
       }
+      if (oldObjectData.content.lineHeight !== newObjectData.content.lineHeight) {
+        this.setLineHeight(newObjectData.content.lineHeight || 0);
+      }
+
       return true;
     }
 
@@ -158,6 +167,7 @@ namespace gdjs {
         align: this._textAlign,
         vta: this._verticalTextAlignment,
         hidden: this.hidden,
+        lh: this._lineHeight,
       };
     }
 
@@ -192,6 +202,9 @@ namespace gdjs {
       }
       if (this._verticalTextAlignment !== undefined) {
         this.setVerticalTextAlignment(networkSyncData.vta);
+      }
+      if (networkSyncData.lh !== undefined) {
+        this.setLineHeight(networkSyncData.lh);
       }
       if (this.hidden !== undefined) {
         this.hide(networkSyncData.hidden);
@@ -305,6 +318,23 @@ namespace gdjs {
      */
     getVerticalTextAlignment(): string {
       return this._verticalTextAlignment;
+    }
+
+    /**
+     * Get the line height of the text object.
+     * @return the line height
+     */
+    getLineHeight(): float {
+      return this._lineHeight;
+    }
+
+    /**
+     * Set the line height of the text object.
+     * @param lineHeight the line height
+     */
+    setLineHeight(lineHeight: float): void {
+      this._lineHeight = lineHeight;
+      this._renderer.updateLineHeight();
     }
 
     override setX(x: float): void {

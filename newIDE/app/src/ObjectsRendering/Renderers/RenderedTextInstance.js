@@ -32,6 +32,8 @@ export default class RenderedTextInstance extends RenderedInstance {
   _shadowColor = '0;0;0';
   _shadowOpacity = 127;
   _shadowBlurRadius = 2;
+  
+  _lineHeight = 0;
 
   constructor(
     project: gdProject,
@@ -112,6 +114,7 @@ export default class RenderedTextInstance extends RenderedInstance {
       textObjectConfiguration.getShadowOpacity() !== this._shadowOpacity ||
       textObjectConfiguration.getShadowBlurRadius() !==
         this._shadowBlurRadius ||
+      textObjectConfiguration.getLineHeight() !== this._lineHeight ||
       this._instance.hasCustomSize() !== this._wrapping ||
       (this.getCustomWidth() !== this._wrappingWidth && this._wrapping)
     ) {
@@ -132,6 +135,8 @@ export default class RenderedTextInstance extends RenderedInstance {
       this._shadowColor = textObjectConfiguration.getShadowColor();
       this._shadowOpacity = textObjectConfiguration.getShadowOpacity();
       this._shadowBlurRadius = textObjectConfiguration.getShadowBlurRadius();
+
+      this._lineHeight = textObjectConfiguration.getLineHeight();
 
       this._wrapping = this._instance.hasCustomSize();
       this._wrappingWidth = this.getCustomWidth();
@@ -187,6 +192,13 @@ export default class RenderedTextInstance extends RenderedInstance {
         ? style.dropShadowDistance + style.dropShadowBlur
         : 0;
       style.padding = Math.ceil(extraPaddingForShadow);
+
+      // Set line height if specified (0 means use default)
+      if (this._lineHeight > 0) {
+        style.lineHeight = this._lineHeight;
+      } else {
+        delete style.lineHeight;
+      }
 
       // Manually ask the PIXI object to re-render as we changed a style property
       // see http://www.html5gamedevs.com/topic/16924-change-text-style-post-render/

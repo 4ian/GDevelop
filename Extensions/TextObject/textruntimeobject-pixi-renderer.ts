@@ -87,6 +87,14 @@ namespace gdjs {
         : 0;
       style.padding = Math.ceil(this._object._padding + extraPaddingForShadow);
 
+      // Set line height
+      if (this._object._lineHeight > 0) {
+        style.lineHeight = this._object._lineHeight;
+      } else {
+        // @ts-ignore - Remove lineHeight if it's 0 or not set
+        delete style.lineHeight;
+      }
+
       // Prevent spikey outlines by adding a miter limit
       style.miterLimit = 3;
       this.updatePosition();

@@ -20,6 +20,7 @@ using namespace std;
 TextObject::TextObject()
     : text("Text"),
       characterSize(20),
+      lineHeight(0),
       fontName(""),
       smoothed(true),
       bold(false),
@@ -48,6 +49,10 @@ bool TextObject::UpdateProperty(const gd::String& propertyName,
   }
   if (propertyName == "characterSize") {
     characterSize = newValue.To<double>();
+    return true;
+  }
+  if (propertyName == "lineHeight") {
+    lineHeight = newValue.To<double>();
     return true;
   }
   if (propertyName == "font") {
@@ -126,6 +131,13 @@ std::map<gd::String, gd::PropertyDescriptor> TextObject::GetProperties() const {
       .SetValue(gd::String::From(characterSize))
       .SetType("number")
       .SetLabel(_("Font size"))
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+      .SetGroup(_("Font"));
+
+  objectProperties["lineHeight"]
+      .SetValue(gd::String::From(lineHeight))
+      .SetType("number")
+      .SetLabel(_("Line height"))
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
       .SetGroup(_("Font"));
 
@@ -271,6 +283,7 @@ void TextObject::DoUnserializeFrom(gd::Project& project,
   SetCharacterSize(content.GetChild("characterSize", 0, "CharacterSize")
                        .GetValue()
                        .GetInt());
+  SetLineHeight(content.GetDoubleAttribute("lineHeight", 0));
   smoothed = content.GetBoolAttribute("smoothed");
   bold = content.GetBoolAttribute("bold");
   italic = content.GetBoolAttribute("italic");
@@ -339,6 +352,7 @@ void TextObject::DoSerializeTo(gd::SerializerElement& element) const {
   content.AddChild("textAlignment").SetValue(GetTextAlignment());
   content.AddChild("verticalTextAlignment").SetValue(GetVerticalTextAlignment());
   content.AddChild("characterSize").SetValue(GetCharacterSize());
+  content.AddChild("lineHeight").SetValue(GetLineHeight());
   content.AddChild("color").SetValue(GetColor());
 
   content.SetAttribute("smoothed", smoothed);

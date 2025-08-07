@@ -96,6 +96,14 @@ class TextObjectJsExtension : public gd::PlatformExtension {
         .SetFunctionName("setOutlineThickness")
         .SetGetter("getOutlineThickness");
 
+    GetAllExpressionsForObject("TextObject::Text")["LineHeight"]
+        .SetFunctionName("getLineHeight");
+    GetAllConditionsForObject("TextObject::Text")["TextObject::Text::LineHeight"]
+        .SetFunctionName("getLineHeight");
+    GetAllActionsForObject("TextObject::Text")["TextObject::Text::SetLineHeight"]
+        .SetFunctionName("setLineHeight")
+        .SetGetter("getLineHeight");
+
     GetAllActionsForObject("TextObject::Text")["TextObject::ShowShadow"]
         .SetFunctionName("showShadow");
     GetAllConditionsForObject("TextObject::Text")["TextObject::Text::IsShadowEnabled"]

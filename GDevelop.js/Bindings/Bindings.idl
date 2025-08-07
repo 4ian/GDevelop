@@ -3728,6 +3728,8 @@ interface TextObject {
     [Const, Ref] DOMString GetText();
     void SetCharacterSize(double size);
     double GetCharacterSize();
+    void SetLineHeight(double value);
+    double GetLineHeight();
     void SetFontName([Const] DOMString string);
     [Const, Ref] DOMString GetFontName();
     boolean IsBold();

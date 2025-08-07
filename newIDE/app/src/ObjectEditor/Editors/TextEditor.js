@@ -225,7 +225,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             fullWidth
             value={textObjectConfiguration.getLineHeight()}
             onChange={value => {
-              textObjectConfiguration.setLineHeight(parseFloat(value, 10) || 0);
+              textObjectConfiguration.setLineHeight(parseFloat(value) || 0);
               this.forceUpdate();
             }}
           />

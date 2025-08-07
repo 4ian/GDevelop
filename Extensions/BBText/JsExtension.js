@@ -72,6 +72,13 @@ module.exports = {
         .setGroup(_('Font'));
 
       objectProperties
+        .getOrCreate('lineHeight')
+        .setValue((objectContent.lineHeight || 0).toString())
+        .setType('number')
+        .setLabel(_('Line height'))
+        .setGroup(_('Font'));
+
+      objectProperties
         .getOrCreate('align')
         .setValue(objectContent.align)
         .setType('choice')
@@ -115,6 +122,7 @@ module.exports = {
       text: '[b]bold[/b] [i]italic[/i] [size=15]smaller[/size] [font=times]times[/font] font\n[spacing=12]spaced out[/spacing]\n[outline=yellow]outlined[/outline] [shadow=red]DropShadow[/shadow] ',
       opacity: 255,
       fontSize: 20,
+      lineHeight: 0,
       visible: true,
       color: '0;0;0',
       fontFamily: 'Arial',
@@ -351,6 +359,19 @@ module.exports = {
         expressionDescription: _('Get the base font size'),
       },
       {
+        functionName: 'LineHeight',
+        iconPath: 'res/actions/textPadding24_black.png',
+        type: 'number',
+        instructionLabel: _('Line height'),
+        paramLabel: _('Line height'),
+        conditionDescription: _('Compare the line height of the text.'),
+        conditionSentence: _('the line height'),
+        actionDescription: _('Set line height'),
+        actionSentence: _('the line height'),
+        expressionLabel: _('Get the line height'),
+        expressionDescription: _('Get the line height'),
+      },
+      {
         functionName: 'FontFamily',
         iconPath: 'res/actions/font24.png',
         type: 'string',
@@ -528,6 +549,7 @@ module.exports = {
             tagStyle: 'bbcode',
             wordWrapWidth: 250, // This value is the default wrapping width of the runtime object.
             align: 'left',
+            lineHeight: 0,
           },
         };
 
@@ -577,6 +599,12 @@ module.exports = {
           newDefaultFontsize !== this._pixiObject.textStyles.default.fontSize
         ) {
           this._pixiObject.textStyles.default.fontSize = `${fontSize}px`;
+          this._pixiObject.dirty = true;
+        }
+
+        const lineHeight = object.content.lineHeight || 0;
+        if (lineHeight !== this._pixiObject.textStyles.default.lineHeight) {
+          this._pixiObject.textStyles.default.lineHeight = lineHeight;
           this._pixiObject.dirty = true;
         }
 

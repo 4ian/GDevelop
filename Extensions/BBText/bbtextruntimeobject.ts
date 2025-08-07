@@ -20,6 +20,7 @@ namespace gdjs {
       /** Alignment of the text: "left", "center" or "right" */
       align: 'left' | 'center' | 'right';
       verticalTextAlignment: 'top' | 'center' | 'bottom';
+      lineHeight?: float;
     };
   };
   export type BBTextObjectData = ObjectData & BBTextObjectDataType;
@@ -35,6 +36,7 @@ namespace gdjs {
     align: string;
     vta: string;
     hidden: boolean;
+    lh: float;
   };
 
   export type BBTextObjectNetworkSyncData = ObjectNetworkSyncData &
@@ -61,6 +63,7 @@ namespace gdjs {
 
     _textAlign: string;
     _verticalTextAlignment: string;
+    _lineHeight: float = 0;
 
     _renderer: gdjs.BBTextRuntimeObjectRenderer;
 
@@ -87,6 +90,7 @@ namespace gdjs {
       this._textAlign = objectData.content.align;
       this._verticalTextAlignment =
         objectData.content.verticalTextAlignment || 'top';
+      this._lineHeight = objectData.content.lineHeight || 0;
       this.hidden = !objectData.content.visible;
 
       this._renderer = new gdjs.BBTextRuntimeObjectRenderer(
@@ -142,6 +146,9 @@ namespace gdjs {
           newObjectData.content.verticalTextAlignment
         );
       }
+      if (oldObjectData.content.lineHeight !== newObjectData.content.lineHeight) {
+        this.setLineHeight(newObjectData.content.lineHeight || 0);
+      }
       return true;
     }
 
@@ -158,6 +165,7 @@ namespace gdjs {
         align: this._textAlign,
         vta: this._verticalTextAlignment,
         hidden: this.hidden,
+        lh: this._lineHeight,
       };
     }
 
@@ -195,6 +203,9 @@ namespace gdjs {
       }
       if (this.hidden !== undefined) {
         this.hide(networkSyncData.hidden);
+      }
+      if (this._lineHeight !== undefined) {
+        this.setLineHeight(networkSyncData.lh);
       }
     }
 
@@ -265,6 +276,16 @@ namespace gdjs {
 
     getFontFamily(): string {
       return this._fontFamily;
+    }
+
+    getLineHeight(): number {
+      return this._lineHeight;
+    }
+
+    setLineHeight(value: float): void {
+      this._lineHeight = value;
+      this._renderer.updateLineHeight();
+      this.invalidateHitboxes();
     }
 
     /**

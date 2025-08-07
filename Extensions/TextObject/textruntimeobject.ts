@@ -8,6 +8,7 @@ namespace gdjs {
     content: {
       /** The size of the characters */
       characterSize: number;
+      lineHeight?: number;
       /** The font name */
       font: string;
       /** Is Bold? */
@@ -43,6 +44,7 @@ namespace gdjs {
     str: string;
     o: float;
     cs: number;
+    lh: float;
     fn: string;
     b: boolean;
     i: boolean;
@@ -101,6 +103,7 @@ namespace gdjs {
     _shadowAngle: float;
     _shadowBlur: float;
 
+    _lineHeight: float = 0;
     _padding: integer = 5;
     _str: string;
     _renderer: gdjs.TextRuntimeObjectRenderer;
@@ -128,6 +131,7 @@ namespace gdjs {
       this._str = content.text;
       this._textAlign = content.textAlignment || 'left';
       this._verticalTextAlignment = content.verticalTextAlignment || 'top';
+      this._lineHeight = content.lineHeight || 0;
 
       this._isOutlineEnabled = content.isOutlineEnabled;
       this._outlineThickness = content.outlineThickness;
@@ -184,6 +188,9 @@ namespace gdjs {
       ) {
         this.setVerticalTextAlignment(newContent.verticalTextAlignment);
       }
+      if (oldContent.lineHeight !== newContent.lineHeight) {
+        this.setLineHeight(newContent.lineHeight || 0);
+      }
       if (oldContent.isOutlineEnabled !== newContent.isOutlineEnabled) {
         this.setOutlineEnabled(newContent.isOutlineEnabled);
       }
@@ -220,6 +227,7 @@ namespace gdjs {
         str: this._str,
         o: this.opacity,
         cs: this._characterSize,
+        lh: this._lineHeight,
         fn: this._fontName,
         b: this._bold,
         i: this._italic,
@@ -254,6 +262,9 @@ namespace gdjs {
       }
       if (networkSyncData.cs !== undefined) {
         this.setCharacterSize(networkSyncData.cs);
+      }
+      if (networkSyncData.lh !== undefined) {
+        this.setLineHeight(networkSyncData.lh);
       }
       if (networkSyncData.fn !== undefined) {
         this.setFontName(networkSyncData.fn);
@@ -911,6 +922,23 @@ namespace gdjs {
       this._gradientType = strGradientType;
       this._useGradient = this._gradient.length > 1 ? true : false;
       this._renderer.updateStyle();
+    }
+
+    /**
+     * Get line height of the text object.
+     */
+    getLineHeight(): number {
+      return this._lineHeight;
+    }
+
+    /**
+     * Set line height of the text object.
+     * @param value The new line height in pixels.
+     */
+    setLineHeight(value: float): void {
+      this._lineHeight = value;
+      this._renderer.updateStyle();
+      this.invalidateHitboxes();
     }
 
     /**

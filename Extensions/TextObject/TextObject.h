@@ -67,6 +67,9 @@ class GD_EXTENSION_API TextObject : public gd::ObjectConfiguration {
     verticalTextAlignment = verticalTextAlignment_;
   };
 
+  void SetLineHeight(double value) { lineHeight = value; };
+  double GetLineHeight() const { return lineHeight; };
+
   bool IsBold() const { return bold; };
   void SetBold(bool enable) { bold = enable; };
   bool IsItalic() const { return italic; };
@@ -137,4 +140,5 @@ class GD_EXTENSION_API TextObject : public gd::ObjectConfiguration {
   double shadowAngle;
   double shadowDistance;
   double shadowBlurRadius;
+  double lineHeight;
 };

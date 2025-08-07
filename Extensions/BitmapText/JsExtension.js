@@ -104,6 +104,13 @@ module.exports = {
         .setGroup(_('Appearance'));
 
       objectProperties
+        .getOrCreate('lineHeight')
+        .setValue((objectContent.lineHeight || 0).toString())
+        .setType('number')
+        .setLabel(_('Line height'))
+        .setGroup(_('Appearance'));
+
+      objectProperties
         .getOrCreate('tint')
         .setValue(objectContent.tint)
         .setType('color')
@@ -117,6 +124,7 @@ module.exports = {
       opacity: 255,
       scale: 1,
       fontSize: 20,
+      lineHeight: 0,
       tint: '255;255;255',
       bitmapFontResourceName: '',
       textureAtlasResourceName: '',
@@ -413,6 +421,21 @@ module.exports = {
       .setFunctionName('setWrappingWidth')
       .setGetter('getWrappingWidth');
 
+    object
+      .addExpressionAndConditionAndAction(
+        'number',
+        'LineHeight',
+        _('Line height'),
+        _('the line height of the text'),
+        _('the line height'),
+        '',
+        'res/actions/textPadding24_black.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('setLineHeight')
+      .setGetter('getLineHeight');
+
     return extension;
   },
 
@@ -673,6 +696,12 @@ module.exports = {
 
         const align = object.content.align;
         this._pixiObject.align = align;
+
+        const lineHeight = object.content.lineHeight || 0;
+        if (this._pixiObject.lineHeight !== lineHeight) {
+          this._pixiObject.lineHeight = lineHeight;
+          this._pixiObject.dirty = true;
+        }
 
         const color = object.content.tint;
         this._pixiObject.tint =

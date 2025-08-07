@@ -355,6 +355,18 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .UseStandardOperatorParameters("number",
                                      gd::ParameterOptions::MakeNewOptions());
 
+  obj.AddExpressionAndConditionAndAction("number", "LineHeight",
+                _("Line height"),
+                _("the line height of the text"),
+                _("the line height"),
+                _("Font"),
+                "res/actions/textPadding24_black.png")
+      .AddParameter("object", _("Object"), "Text")
+      .UseStandardParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Line height")));
+
   obj.AddAction("SetTextAlignment",
                 _("Alignment"),
                 _("Change the text alignment of a multiline text object."),

@@ -62,6 +62,14 @@ class TextObjectJsExtension : public gd::PlatformExtension {
     GetAllConditionsForObject("TextObject::Text")["TextObject::Padding"]
         .SetFunctionName("getPadding");
 
+    GetAllExpressionsForObject("TextObject::Text")["LineHeight"]
+        .SetFunctionName("getLineHeight");
+    GetAllConditionsForObject("TextObject::Text")["TextObject::Text::LineHeight"]
+        .SetFunctionName("getLineHeight");
+    GetAllActionsForObject("TextObject::Text")["TextObject::Text::SetLineHeight"]
+        .SetFunctionName("setLineHeight")
+        .SetGetter("getLineHeight");
+
     GetAllActionsForObject("TextObject::Text")["TextObject::SetTextAlignment"]
         .SetFunctionName("setTextAlignment")
         .SetGetter("getTextAlignment");

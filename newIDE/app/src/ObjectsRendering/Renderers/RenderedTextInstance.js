@@ -13,6 +13,7 @@ export default class RenderedTextInstance extends RenderedInstance {
   _isItalic: boolean = false;
   _isBold: boolean = false;
   _characterSize: number = 0;
+  _lineHeight: number = 0;
   _wrapping: boolean = false;
   _wrappingWidth: number = 0;
   _styleFontDirty: boolean = true;
@@ -97,6 +98,7 @@ export default class RenderedTextInstance extends RenderedInstance {
       textObjectConfiguration.isItalic() !== this._isItalic ||
       textObjectConfiguration.isBold() !== this._isBold ||
       textObjectConfiguration.getCharacterSize() !== this._characterSize ||
+      textObjectConfiguration.getLineHeight() !== this._lineHeight ||
       textObjectConfiguration.getTextAlignment() !== this._textAlignment ||
       textObjectConfiguration.getVerticalTextAlignment() !==
         this._verticalTextAlignment ||
@@ -118,6 +120,7 @@ export default class RenderedTextInstance extends RenderedInstance {
       this._isItalic = textObjectConfiguration.isItalic();
       this._isBold = textObjectConfiguration.isBold();
       this._characterSize = textObjectConfiguration.getCharacterSize();
+      this._lineHeight = textObjectConfiguration.getLineHeight();
       this._textAlignment = textObjectConfiguration.getTextAlignment();
       this._verticalTextAlignment = textObjectConfiguration.getVerticalTextAlignment();
       this._color = textObjectConfiguration.getColor();
@@ -172,6 +175,7 @@ export default class RenderedTextInstance extends RenderedInstance {
       style.wordWrapWidth = this._wrappingWidth <= 1 ? 1 : this._wrappingWidth;
       style.breakWords = true;
       style.align = this._textAlignment;
+      style.lineHeight = this._lineHeight;
 
       style.stroke = rgbStringToHexNumber(this._outlineColor);
       style.strokeThickness = this._isOutlineEnabled

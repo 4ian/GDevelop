@@ -36,7 +36,8 @@ TextObject::TextObject()
       shadowOpacity(127),
       shadowAngle(90),
       shadowDistance(4),
-      shadowBlurRadius(2) {}
+      shadowBlurRadius(2),
+      lineHeight(0) {}
 
 TextObject::~TextObject() {};
 
@@ -110,6 +111,10 @@ bool TextObject::UpdateProperty(const gd::String& propertyName,
     shadowBlurRadius = newValue.To<double>();
     return true;
   }
+  if (propertyName == "lineHeight") {
+    lineHeight = newValue.To<double>();
+    return true;
+  }
 
   return false;
 }
@@ -176,6 +181,14 @@ std::map<gd::String, gd::PropertyDescriptor> TextObject::GetProperties() const {
       .AddChoice("bottom", _("Bottom"))
       .SetLabel(_("Vertical alignment"))
       .SetGroup(_("Font"))
+      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
+
+  objectProperties["lineHeight"]
+      .SetValue(gd::String::From(lineHeight))
+      .SetType("number")
+      .SetLabel(_("Line height"))
+      .SetGroup(_("Font"))
+      .SetAdvanced()
       .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
 
   objectProperties["isOutlineEnabled"]
@@ -275,6 +288,7 @@ void TextObject::DoUnserializeFrom(gd::Project& project,
   bold = content.GetBoolAttribute("bold");
   italic = content.GetBoolAttribute("italic");
   underlined = content.GetBoolAttribute("underlined");
+  SetLineHeight(content.GetIntAttribute("lineHeight", 0));
 
   // Compatibility with GD <= 5.3.188
   if (isLegacy) {
@@ -345,6 +359,7 @@ void TextObject::DoSerializeTo(gd::SerializerElement& element) const {
   content.SetAttribute("bold", bold);
   content.SetAttribute("italic", italic);
   content.SetAttribute("underlined", underlined);
+  content.SetAttribute("lineHeight", lineHeight);
 
   content.SetAttribute("isOutlineEnabled", isOutlineEnabled);
   content.SetAttribute("outlineThickness", outlineThickness);

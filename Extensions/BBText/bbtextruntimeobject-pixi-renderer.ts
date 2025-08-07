@@ -32,6 +32,7 @@ namespace gdjs {
           wordWrap: runtimeObject._wrapping,
           wordWrapWidth: runtimeObject._wrappingWidth,
           align: runtimeObject._textAlign as PIXI.TextStyleAlign | undefined,
+          lineHeight: runtimeObject._lineHeight,
         },
       });
       instanceContainer
@@ -44,6 +45,7 @@ namespace gdjs {
       this.updatePosition();
       this.updateAngle();
       this.updateOpacity();
+      this.updateLineHeight();
     }
 
     getRendererObject() {
@@ -100,6 +102,13 @@ namespace gdjs {
       this._pixiObject.textStyles.default.fontSize =
         this._object._fontSize + 'px';
       this._pixiObject.dirty = true;
+    }
+
+    updateLineHeight(): void {
+      //@ts-ignore Private member usage.
+      this._pixiObject.textStyles.default.lineHeight = this._object._lineHeight;
+      this._pixiObject.dirty = true;
+      this.updatePosition();
     }
 
     updatePosition(): void {

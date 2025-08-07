@@ -42,6 +42,7 @@ namespace gdjs {
       this.updateScale();
       this.updateWrappingWidth();
       this.updateTint();
+      this.updateLineHeight();
     }
 
     getRendererObject() {
@@ -131,6 +132,13 @@ namespace gdjs {
         this._pixiObject.maxWidth = 0;
         this._pixiObject.dirty = true;
       }
+      this.updatePosition();
+    }
+
+    updateLineHeight(): void {
+      // @ts-ignore
+      this._pixiObject.lineHeight = this._object._lineHeight;
+      this._pixiObject.dirty = true;
       this.updatePosition();
     }
 

@@ -365,7 +365,7 @@ namespace gdjs {
    * It is basically a container to associate channels to sounds and keep a list
    * of all sounds being played.
    */
-  export class HowlerSoundManager {
+  export class HowlerSoundManager implements gdjs.ResourceManager {
     _loadedMusics = new gdjs.ResourceCache<Howl>();
     _loadedSounds = new gdjs.ResourceCache<Howl>();
     _availableResources: Record<string, ResourceData> = {};
@@ -940,26 +940,16 @@ namespace gdjs {
       this.unloadAll();
     }
 
-    /**
-     * Unload the specified list of resources:
-     * this unloads all audio from the specified resources from memory.
-     *
-     * Usually called when scene resoures are unloaded.
-     *
-     * @param resourcesList The list of specific resources
-     */
-    unloadResourcesList(resourcesList: ResourceData[]): void {
-      resourcesList.forEach((resourceData) => {
-        const musicRes = this._loadedMusics.get(resourceData);
-        if (musicRes) {
-          this.unloadAudio(resourceData.name, true);
-        }
+    unloadResource(resourceData: ResourceData): void {
+      const musicRes = this._loadedMusics.get(resourceData);
+      if (musicRes) {
+        this.unloadAudio(resourceData.name, true);
+      }
 
-        const soundRes = this._loadedSounds.get(resourceData);
-        if (soundRes) {
-          this.unloadAudio(resourceData.name, false);
-        }
-      });
+      const soundRes = this._loadedSounds.get(resourceData);
+      if (soundRes) {
+        this.unloadAudio(resourceData.name, false);
+      }
     }
   }
 

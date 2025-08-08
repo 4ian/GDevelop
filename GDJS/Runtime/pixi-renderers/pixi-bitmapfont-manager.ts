@@ -308,32 +308,21 @@ namespace gdjs {
       this._loadedFontsData.clear();
     }
 
-    /**
-     * Unload the specified list of resources:
-     * this uninstalls fonts from memory and clear cache of loaded fonts.
-     *
-     * Usually called when scene resoures are unloaded.
-     *
-     * @param resourcesList The list of specific resources
-     */
+    unloadResource(resourceData: ResourceData): void {
+      const loadedFont = this._loadedFontsData.get(resourceData);
+      if (loadedFont) {
+        this._loadedFontsData.delete(resourceData);
+      }
 
-    unloadResourcesList(resourcesList: ResourceData[]): void {
-      resourcesList.forEach((resourceData) => {
-        const loadedFont = this._loadedFontsData.get(resourceData);
-        if (loadedFont) {
-          this._loadedFontsData.delete(resourceData);
-        }
+      for (const bitmapFontInstallKey in this._pixiBitmapFontsInUse) {
+        if (bitmapFontInstallKey.endsWith(resourceData.file))
+          PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
+      }
 
-        for (const bitmapFontInstallKey in this._pixiBitmapFontsInUse) {
-          if (bitmapFontInstallKey.endsWith(resourceData.file))
-            PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
-        }
-
-        for (const bitmapFontInstallKey of this._pixiBitmapFontsToUninstall) {
-          if (bitmapFontInstallKey.endsWith(resourceData.file))
-            PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
-        }
-      });
+      for (const bitmapFontInstallKey of this._pixiBitmapFontsToUninstall) {
+        if (bitmapFontInstallKey.endsWith(resourceData.file))
+          PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
+      }
     }
   }
 

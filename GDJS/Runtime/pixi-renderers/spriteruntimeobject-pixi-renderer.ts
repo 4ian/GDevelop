@@ -141,6 +141,7 @@ namespace gdjs {
     }
 
     setColor(rgbOrHexColor: string): void {
+      console.log(rgbOrHexColor, gdjs.rgbOrHexStringToNumber(rgbOrHexColor));
       this._sprite.tint = gdjs.rgbOrHexStringToNumber(rgbOrHexColor);
     }
 

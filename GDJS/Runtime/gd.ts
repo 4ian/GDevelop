@@ -12,7 +12,6 @@ namespace gdjs {
   const logger = new gdjs.Logger('Engine runtime');
   const hexStringRegex = /^(#{0,1}[A-Fa-f0-9]{6})$/;
   const shorthandHexStringRegex = /^(#{0,1}[A-Fa-f0-9]{3})$/;
-  const rgbStringRegex = /^(\d{1,3};\d{1,3};\d{1,3})/;
 
   /**
    * Contains functions used by events (this is a convention only, functions can actually
@@ -106,9 +105,8 @@ namespace gdjs {
     value: string
   ): [number, number, number] {
     // TODO Add a `result` parameter to allow to reuse the returned array.
-    const rgbColor = extractRGBString(value);
-    if (rgbColor) {
-      const splitValue = rgbColor.split(';');
+    if (value.includes(';')) {
+      const splitValue = value.split(';');
       // If a RGB string is provided, return the RGB object.
       if (splitValue.length === 3) {
         return [
@@ -189,12 +187,6 @@ namespace gdjs {
   };
   export const extractShorthandHexString = (str: string): string | null => {
     const matches = str.match(shorthandHexStringRegex);
-    if (!matches) return null;
-    return matches[0];
-  };
-
-  export const extractRGBString = (str: string): string | null => {
-    const matches = str.match(rgbStringRegex);
     if (!matches) return null;
     return matches[0];
   };

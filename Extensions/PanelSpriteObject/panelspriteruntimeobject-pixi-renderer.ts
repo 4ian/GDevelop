@@ -389,26 +389,15 @@ namespace gdjs {
       this.updatePosition();
     }
 
-    setColor(rgbColor): void {
-      const colors = rgbColor.split(';');
-      if (colors.length < 3) {
-        return;
-      }
-      this._centerSprite.tint = gdjs.rgbToHexNumber(
-        parseInt(colors[0], 10),
-        parseInt(colors[1], 10),
-        parseInt(colors[2], 10)
-      );
+    setColor(rgbOrHexColor: string): void {
+      const tint = gdjs.rgbOrHexStringToNumber(rgbOrHexColor);
+      this._centerSprite.tint = tint;
       for (
         let borderCounter = 0;
         borderCounter < this._borderSprites.length;
         borderCounter++
       ) {
-        this._borderSprites[borderCounter].tint = gdjs.rgbToHexNumber(
-          parseInt(colors[0], 10),
-          parseInt(colors[1], 10),
-          parseInt(colors[2], 10)
-        );
+        this._borderSprites[borderCounter].tint = tint;
       }
       this._spritesContainer.cacheAsBitmap = false;
     }
@@ -416,11 +405,11 @@ namespace gdjs {
     getColor() {
       const rgb = new PIXI.Color(this._centerSprite.tint).toRgbArray();
       return (
-        Math.floor(rgb[0] * 255) +
+        Math.round(rgb[0] * 255) +
         ';' +
-        Math.floor(rgb[1] * 255) +
+        Math.round(rgb[1] * 255) +
         ';' +
-        Math.floor(rgb[2] * 255)
+        Math.round(rgb[2] * 255)
       );
     }
 

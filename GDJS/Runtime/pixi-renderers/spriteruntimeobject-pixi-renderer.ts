@@ -140,18 +140,18 @@ namespace gdjs {
       this._sprite.visible = !this._object.hidden;
     }
 
-    setColor(rgbOrHexColor): void {
+    setColor(rgbOrHexColor: string): void {
       this._sprite.tint = gdjs.rgbOrHexStringToNumber(rgbOrHexColor);
     }
 
     getColor() {
       const rgb = new PIXI.Color(this._sprite.tint).toRgbArray();
       return (
-        Math.floor(rgb[0] * 255) +
+        Math.round(rgb[0] * 255) +
         ';' +
-        Math.floor(rgb[1] * 255) +
+        Math.round(rgb[1] * 255) +
         ';' +
-        Math.floor(rgb[2] * 255)
+        Math.round(rgb[2] * 255)
       );
     }
 

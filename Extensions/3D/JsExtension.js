@@ -162,7 +162,12 @@ module.exports = {
         )
         .addParameter('object', _('3D object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
-        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Angle (in degrees)')
+          )
+        )
         .setFunctionName('setRotationX')
         .setGetter('getRotationX');
 
@@ -178,7 +183,12 @@ module.exports = {
         )
         .addParameter('object', _('3D object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
-        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Angle (in degrees)')
+          )
+        )
         .setFunctionName('setRotationY')
         .setGetter('getRotationY');
 
@@ -196,7 +206,7 @@ module.exports = {
         )
         .addParameter('object', _('3D object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
-        .addParameter('number', _('Rotation angle'), '', false)
+        .addParameter('number', _('Angle to add (in degrees)'), '', false)
         .markAsAdvanced()
         .setFunctionName('turnAroundX');
 
@@ -214,7 +224,7 @@ module.exports = {
         )
         .addParameter('object', _('3D object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
-        .addParameter('number', _('Rotation angle'), '', false)
+        .addParameter('number', _('Angle to add (in degrees)'), '', false)
         .markAsAdvanced()
         .setFunctionName('turnAroundY');
 
@@ -232,7 +242,7 @@ module.exports = {
         )
         .addParameter('object', _('3D object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
-        .addParameter('number', _('Rotation angle'), '', false)
+        .addParameter('number', _('Angle to add (in degrees)'), '', false)
         .markAsAdvanced()
         .setFunctionName('turnAroundZ');
     }
@@ -594,7 +604,12 @@ module.exports = {
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D model'), 'Model3DObject', false)
-        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Angle (in degrees)')
+          )
+        )
         .setHidden()
         .setFunctionName('setRotationX')
         .setGetter('getRotationX');
@@ -611,7 +626,12 @@ module.exports = {
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D model'), 'Model3DObject', false)
-        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Angle (in degrees)')
+          )
+        )
         .setHidden()
         .setFunctionName('setRotationY')
         .setGetter('getRotationY');
@@ -630,7 +650,7 @@ module.exports = {
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D model'), 'Model3DObject', false)
-        .addParameter('number', _('Rotation angle'), '', false)
+        .addParameter('number', _('Angle to add (in degrees)'), '', false)
         .markAsAdvanced()
         .setHidden()
         .setFunctionName('turnAroundX');
@@ -649,7 +669,7 @@ module.exports = {
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D model'), 'Model3DObject', false)
-        .addParameter('number', _('Rotation angle'), '', false)
+        .addParameter('number', _('Angle to add (in degrees)'), '', false)
         .markAsAdvanced()
         .setHidden()
         .setFunctionName('turnAroundY');
@@ -668,7 +688,7 @@ module.exports = {
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D model'), 'Model3DObject', false)
-        .addParameter('number', _('Rotation angle'), '', false)
+        .addParameter('number', _('Angle to add (in degrees)'), '', false)
         .markAsAdvanced()
         .setHidden()
         .setFunctionName('turnAroundZ');
@@ -1493,7 +1513,12 @@ module.exports = {
         'res/conditions/3d_box.svg'
       )
       .addParameter('object', _('3D cube'), 'Cube3DObject', false)
-      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Angle (in degrees)')
+        )
+      )
       .setFunctionName('setRotationX')
       .setHidden()
       .setGetter('getRotationX');
@@ -1510,7 +1535,12 @@ module.exports = {
         'res/conditions/3d_box.svg'
       )
       .addParameter('object', _('3D cube'), 'Cube3DObject', false)
-      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Angle (in degrees)')
+        )
+      )
       .setFunctionName('setRotationY')
       .setHidden()
       .setGetter('getRotationY');

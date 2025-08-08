@@ -4510,6 +4510,8 @@ const MainFrame = (props: Props) => {
           onClose={clearHotReloadLogs}
           onLaunchNewPreview={() => {
             clearHotReloadLogs();
+            // TODO When the editor preview crash, launch back the editor,
+            // not the game preview.
             launchNewPreview();
           }}
         />

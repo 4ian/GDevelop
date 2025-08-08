@@ -145,6 +145,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
         shadowDistance: 4,
         shadowAngle: 90,
         shadowBlurRadius: 2,
+        lineHeight: 0,
       },
     });
     runtimeScene.addObject(object);

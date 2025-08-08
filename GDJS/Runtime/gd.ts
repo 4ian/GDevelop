@@ -105,7 +105,7 @@ namespace gdjs {
     value: string
   ): [number, number, number] {
     // TODO Add a `result` parameter to allow to reuse the returned array.
-    if (value.includes(';')) {
+    if (!value.startsWith('#')) {
       const splitValue = value.split(';');
       // If a RGB string is provided, return the RGB object.
       if (splitValue.length === 3) {

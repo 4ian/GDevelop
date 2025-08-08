@@ -545,6 +545,20 @@ const useCourses = () => {
     ]
   );
 
+  React.useEffect(
+    () => {
+      if (language) {
+        console.info(
+          `Resetting course chapters cache as language changed to ${language}.`
+        );
+        setChaptersByCourseIdByUserId(() => ({
+          '': noCourseChapters,
+        }));
+      }
+    },
+    [language]
+  );
+
   // This callback will change (triggering re-renders)
   // anytime the chapters are fetched for a course for a user.
   const getCourseChapters = React.useCallback(

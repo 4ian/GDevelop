@@ -223,10 +223,6 @@ namespace gdjs {
             newRuntimeGameStatus.eventsBasedObjectVariantName,
             newRuntimeGameStatus.editorCamera3D || null
           );
-          const inGameEditor = this._runtimeGame._inGameEditor;
-          if (inGameEditor) {
-            inGameEditor.setEditorId(newRuntimeGameStatus.editorId);
-          }
         } else {
           const changedRuntimeBehaviors = this._computeChangedRuntimeBehaviors(
             oldBehaviorConstructors,
@@ -238,6 +234,11 @@ namespace gdjs {
             changedRuntimeBehaviors,
             this._runtimeGame
           );
+          // TODO Either avoid to switch of scene in the process or do it instead of _hotReloadRuntimeGame.
+          // Refresh the editedInstanceDataList reference.
+          if (this._runtimeGame.isInGameEdition()) {
+            this._runtimeGame._reconnectInGameEditor();
+          }
         }
       } catch (error) {
         const errorTarget = error.target;
@@ -256,11 +257,6 @@ namespace gdjs {
               error.stack,
           });
         }
-      }
-
-      // Refresh the editedInstanceDataList reference.
-      if (this._runtimeGame.isInGameEdition()) {
-        this._runtimeGame._reconnectInGameEditor();
       }
 
       logger.info(

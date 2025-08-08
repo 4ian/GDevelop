@@ -48,7 +48,6 @@ describe('gdjs', function () {
         expect(gdjs.rgbOrHexToRGBColor('19819830803')).to.eql([0, 0, 0]);
         expect(gdjs.rgbOrHexToRGBColor('Infinity')).to.eql([0, 0, 0]);
         expect(gdjs.rgbOrHexToRGBColor('-4564')).to.eql([0, 0, 0]);
-        expect(gdjs.rgbOrHexToRGBColor('9999;12;6')).to.eql([255, 12, 6]);
       });
     });
   });

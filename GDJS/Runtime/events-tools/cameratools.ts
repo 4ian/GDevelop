@@ -462,12 +462,12 @@ namespace gdjs {
       /**
        * @param instanceContainer the container owning the layer
        * @param layerName The lighting layer with the ambient color.
-       * @param rgbColor The color, in RGB format ("128;200;255").
+       * @param rgbOrHexColor The color, in RGB format ("128;200;255").
        */
       export const setLayerAmbientLightColor = function (
         instanceContainer: gdjs.RuntimeInstanceContainer,
         layerName: string,
-        rgbColor: string
+        rgbOrHexColor: string
       ) {
         if (
           !instanceContainer.hasLayer(layerName) ||
@@ -475,17 +475,10 @@ namespace gdjs {
         ) {
           return;
         }
-        const colors = rgbColor.split(';');
-        if (colors.length < 3) {
-          return;
-        }
+        const color = gdjs.rgbOrHexToRGBColor(rgbOrHexColor);
         return instanceContainer
           .getLayer(layerName)
-          .setClearColor(
-            parseInt(colors[0], 10),
-            parseInt(colors[1], 10),
-            parseInt(colors[2], 10)
-          );
+          .setClearColor(color[0], color[1], color[2]);
       };
     }
   }

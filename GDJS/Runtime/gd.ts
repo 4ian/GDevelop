@@ -105,6 +105,7 @@ namespace gdjs {
   export const rgbOrHexToRGBColor = function (
     value: string
   ): [number, number, number] {
+    // TODO Add a `result` parameter to allow to reuse the returned array.
     const rgbColor = extractRGBString(value);
     if (rgbColor) {
       const splitValue = rgbColor.split(';');
@@ -145,11 +146,11 @@ namespace gdjs {
    * @param b Blue
    */
   export const rgbToHexNumber = function (
-    r: integer,
-    g: integer,
-    b: integer
+    r: float,
+    g: float,
+    b: float
   ): integer {
-    return (r << 16) + (g << 8) + b;
+    return (Math.round(r) << 16) + (Math.round(g) << 8) + Math.round(b);
   };
 
   /**

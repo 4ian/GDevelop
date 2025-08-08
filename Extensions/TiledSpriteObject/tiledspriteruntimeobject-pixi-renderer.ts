@@ -92,28 +92,18 @@ namespace gdjs {
         -this._object._yOffset % this._tiledSprite.texture.height;
     }
 
-    setColor(rgbColor: string): void {
-      const colors = rgbColor.split(';');
-      if (colors.length < 3) {
-        return;
-      }
-      this._tiledSprite.tint =
-        '0x' +
-        gdjs.rgbToHex(
-          parseInt(colors[0], 10),
-          parseInt(colors[1], 10),
-          parseInt(colors[2], 10)
-        );
+    setColor(rgbOrHexColor: string): void {
+      this._tiledSprite.tint = gdjs.rgbOrHexStringToNumber(rgbOrHexColor);
     }
 
     getColor() {
       const rgb = new PIXI.Color(this._tiledSprite.tint).toRgbArray();
       return (
-        Math.floor(rgb[0] * 255) +
+        Math.round(rgb[0] * 255) +
         ';' +
-        Math.floor(rgb[1] * 255) +
+        Math.round(rgb[1] * 255) +
         ';' +
-        Math.floor(rgb[2] * 255)
+        Math.round(rgb[2] * 255)
       );
     }
 

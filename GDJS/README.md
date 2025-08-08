@@ -26,6 +26,28 @@ The game engine is in the _Runtime_ folder. If you want to work on the engine di
 
 - To launch type checking with TypeScript, run `npm install` and `npm run check-types` in `GDJS` folder.
 
+#### Building GDJS Runtime
+
+To build the GDJS Runtime, run `npm run build` in the `GDJS` folder.
+
+**Build Options:**
+
+- **Production build (default)**: `npm run build` - builds with minification enabled
+- **Debug build**: `npm run build -- --debug` - builds without minification for easier debugging
+- **Custom output path**: `npm run build -- --out=/path/to/output` - specify custom output directory
+
+**Examples:**
+```bash
+# Standard production build
+npm run build
+
+# Debug build for development (no minification)
+npm run build -- --debug
+
+# Debug build with custom output path
+npm run build -- --debug --out=./debug-build
+```
+
 ### GDJS Platform (exporters, code generation...)
 
 Check the [GDJS Platform](https://docs.gdevelop.io/GDJS%20Documentation/index.html) documentation or the [full GDevelop developers documentation](https://docs.gdevelop.io/).

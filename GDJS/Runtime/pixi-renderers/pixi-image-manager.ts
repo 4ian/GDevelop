@@ -520,35 +520,25 @@ namespace gdjs {
       this._scaledTextures.clear();
     }
 
-    /**
-     * Unload the specified list of resources:
-     * this clears the cache of loaded textures associated to these resources.
-     *
-     * Usually called when scene resoures are unloaded.
-     *
-     * @param resourcesList The list of specific resources
-     */
-    unloadResourcesList(resourcesList: ResourceData[]): void {
-      resourcesList.forEach((resourceData) => {
-        const resourceName = resourceData.name;
-        const resource = this._loadedTextures.get(resourceData);
-        if (resource) {
-          resource.destroy(true);
-          this._loadedTextures.delete(resourceData);
-        }
+    unloadResource(resourceData: ResourceData): void {
+      const resourceName = resourceData.name;
+      const texture = this._loadedTextures.getFromName(resourceName);
+      if (texture) {
+        texture.destroy(true);
+        this._loadedTextures.delete(resourceData);
+      }
 
-        const threeTexture = this._loadedThreeTextures.get(resourceName);
-        if (threeTexture) {
-          threeTexture.dispose();
-          this._loadedThreeTextures.remove(resourceName);
-        }
+      const threeTexture = this._loadedThreeTextures.get(resourceName);
+      if (threeTexture) {
+        threeTexture.dispose();
+        this._loadedThreeTextures.remove(resourceName);
+      }
 
-        const threeMaterials = this._loadedThreeMaterials.get(resourceName);
-        if (threeMaterials) {
-          threeMaterials.dispose();
-          this._loadedThreeMaterials.remove(resourceName);
-        }
-      });
+      const threeMaterials = this._loadedThreeMaterials.get(resourceName);
+      if (threeMaterials) {
+        threeMaterials.dispose();
+        this._loadedThreeMaterials.remove(resourceName);
+      }
     }
   }
 

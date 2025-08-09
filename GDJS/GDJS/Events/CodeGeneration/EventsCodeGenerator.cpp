@@ -448,33 +448,6 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionParametersToAttribues(
   return declaration;
 }
 
-gd::String EventsCodeGenerator::GenerateEventsFunctionParametersToAttribuesNull(
-    const gd::ParameterMetadataContainer &parameters, int firstParameterIndex,
-    bool addsSceneParameter) {
-  gd::String declaration =
-      addsSceneParameter ? "  this.runtimeScene = null;\n" : "";
-  // By convention, the first two arguments of a behavior events function
-  // are the object and the behavior, which are not passed to the called
-  // function in the generated JS code.
-  for (size_t i = firstParameterIndex; i < parameters.GetParametersCount(); ++i) {
-    const auto &parameter = parameters.GetParameter(i);
-    if (parameter.GetValueTypeMetadata().IsObject() ||
-        parameter.GetValueTypeMetadata().IsBehavior()) {
-      continue;
-    }
-    gd::String parameterMangledName =
-        parameter.GetName().empty()
-            ? "_"
-            : EventsCodeNameMangler::GetMangledName(parameter.GetName());
-    declaration +=
-        "  this." + parameterMangledName + " = null;\n";
-  }
-  declaration +=
-      "  this.parentEventsFunctionContext = null;\n";
-
-  return declaration;
-}
-
 gd::String EventsCodeGenerator::GenerateFreeEventsFunctionContext(
     const gd::EventsFunctionsExtension& eventsFunctionsExtension,
     const gd::EventsFunction& eventsFunction,

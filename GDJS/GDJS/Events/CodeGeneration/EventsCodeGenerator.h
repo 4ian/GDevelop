@@ -492,6 +492,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
        gd::String &behaviorNamesMap,
        const gd::String &constructorAdditionalCode = "",
        const gd::String &reinitializeAdditionalCode = "",
+       const gd::String& clearAdditionalCode = "",
        const gd::String &thisObjectName = "",
        const gd::String &thisBehaviorName = "");
 };

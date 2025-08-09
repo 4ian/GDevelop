@@ -277,8 +277,10 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
       fullPreludeCode,
       eventsFunction.GetEvents(),
       "if (eventsFunctionContext === " +
-          codeGenerator.GetCodeNamespaceAccessor() + "context) " +
-          codeGenerator.GetCodeNamespaceAccessor() + "isExecuted = false;\n",
+          codeGenerator.GetCodeNamespaceAccessor() + "context) {" +
+          codeGenerator.GetCodeNamespaceAccessor() + "context.clear();\n" +
+          codeGenerator.GetCodeNamespaceAccessor() + "isExecuted = false;\n"
+      "};\n",
       codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
 
   // TODO: the editor should pass the diagnostic report and display it to the
@@ -553,10 +555,14 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionContext(
   }
 
   gd::String reinitializeAdditionalCode = "";
+  gd::String clearAdditionalCode = "";
   if (!thisObjectName.empty()) {
     reinitializeAdditionalCode += "  this._objectArraysMap[" +
                                   ConvertToStringExplicit(thisObjectName) +
                                   "][0] = that.owner;\n";
+    clearAdditionalCode += "  this._objectArraysMap[" +
+                           ConvertToStringExplicit(thisObjectName) +
+                           "][0] = null;\n";
   }
   if (!thisBehaviorName.empty()) {
     reinitializeAdditionalCode += "  this._behaviorNamesMap[" +
@@ -573,6 +579,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionContext(
                                        behaviorNamesMap,
                                        constructorAdditionalCode,
                                        reinitializeAdditionalCode,
+                                       clearAdditionalCode,
                                        thisObjectName,
                                        thisBehaviorName);
 }
@@ -636,10 +643,14 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionContext(
   }
 
   gd::String reinitializeAdditionalCode = "";
+  gd::String clearAdditionalCode = "";
   if (!thisObjectName.empty()) {
     reinitializeAdditionalCode += "  this._objectArraysMap[" +
                                   ConvertToStringExplicit(thisObjectName) +
                                   "][0] = that;\n";
+    clearAdditionalCode += "  this._objectArraysMap[" +
+                           ConvertToStringExplicit(thisObjectName) +
+                           "][0] = null;\n";
   }
   // Add child-objects
   for (auto& childObject : eventsBasedObject.GetObjects().GetObjects()) {
@@ -662,6 +673,7 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionContext(
                                        behaviorNamesMap,
                                        constructorAdditionalCode,
                                        reinitializeAdditionalCode,
+                                       clearAdditionalCode,
                                        thisObjectName);
 }
 
@@ -675,6 +687,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
     gd::String& behaviorNamesMap,
     const gd::String& constructorAdditionalCode,
     const gd::String& reinitializeAdditionalCode,
+    const gd::String& clearAdditionalCode,
     const gd::String& thisObjectName,
     const gd::String& thisBehaviorName) {
   const auto& extensionName = eventsFunctionsExtension.GetName();
@@ -698,6 +711,8 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
   gd::String reinitializeObjectsMap;
   gd::String reinitializeArraysMap;
   gd::String reinitializeBehaviorNamesMap;
+  gd::String clearObjectsMap;
+  gd::String clearArraysMap;
 
   for (const auto& parameterPtr : parameters.GetInternalVector()) {
     const auto& parameter = *parameterPtr;
@@ -720,13 +735,19 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
       objectArraysMap += comma + ConvertToStringExplicit(parameter.GetName()) +
                          ": gdjs.objectsListsToArray(" + parameterMangledName +
                          ")";
-      reinitializeObjectsMap += "this._objectsMap[" +
+      reinitializeObjectsMap += "  this._objectsMap[" +
                                 ConvertToStringExplicit(parameter.GetName()) +
                                 "] = " + parameterMangledName + ";\n";
       reinitializeArraysMap +=
-          "gdjs.objectsListsToArray(" + parameterMangledName +
+          "  gdjs.objectsListsToArray(" + parameterMangledName +
           ", this._objectArraysMap[" +
           ConvertToStringExplicit(parameter.GetName()) + "]);\n";
+      clearObjectsMap += "  this._objectsMap[" +
+                         ConvertToStringExplicit(parameter.GetName()) +
+                         "] = null;\n";
+      clearArraysMap += "  this._objectArraysMap[" +
+                        ConvertToStringExplicit(parameter.GetName()) +
+                        "].length = 0;\n";
     } else if (gd::ParameterMetadata::IsBehavior(parameter.GetType())) {
       if (parameter.GetName() == thisBehaviorName) {
         continue;
@@ -808,6 +829,20 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          "runtimeScene.getScene().getVariablesForExtension(" +
          ConvertToStringExplicit(extensionName) + ");\n" +
          reinitializeAdditionalCode +
+        "}\n"
+
+        "clear() {\n" +
+        "  this.runtimeScene = null;\n"
+        "  this.parentEventsFunctionContext = null;\n"
+        // globalVariablesForExtension stays the same.
+        "  this.sceneVariablesForExtension = null;\n" +
+        // The async task, if there is one
+        async +
+        // The object name to parameter map:
+        clearObjectsMap +
+        // The object name to arrays map:
+        clearArraysMap +
+        clearAdditionalCode +
         "}\n"
 
          // Function that will be used to query objects, when a new object list

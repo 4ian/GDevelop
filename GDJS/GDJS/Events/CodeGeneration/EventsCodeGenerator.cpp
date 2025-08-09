@@ -772,6 +772,9 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
   const gd::String async = eventsFunction.IsAsync()
                                ? "  this.task = new gdjs.ManuallyResolvableTask(),\n"
                                : "";
+  const gd::String clearAsync = eventsFunction.IsAsync()
+                               ? "  this.task = null,\n"
+                               : "";
   const int firstParameterIndex =
       (thisObjectName.empty() ? 0 : 1) + (thisBehaviorName.empty() ? 0 : 1);
   auto parameterList =
@@ -837,7 +840,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
         // globalVariablesForExtension stays the same.
         "  this.sceneVariablesForExtension = null;\n" +
         // The async task, if there is one
-        async +
+        clearAsync +
         // The object name to parameter map:
         clearObjectsMap +
         // The object name to arrays map:

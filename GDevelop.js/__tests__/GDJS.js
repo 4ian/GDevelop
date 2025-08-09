@@ -531,7 +531,7 @@ describe('libGD.js - GDJS related tests', function () {
 
       // Check that the context for the events function is here...
       expect(code).toMatch('function(runtimeScene, eventsFunctionContext)');
-      expect(code).toMatch('var eventsFunctionContext =');
+      expect(code).toMatch('const eventsFunctionContext =');
 
       // Check that the parameters, with the (optional) context of the parent function,
       // are all here
@@ -544,8 +544,8 @@ describe('libGD.js - GDJS related tests', function () {
       expect(code).toMatch('"MySprite": MySprite');
 
       // ...and arguments should be able to get queried too:
-      expect(code).toMatch('if (argName === "MyNumber") return MyNumber;');
-      expect(code).toMatch('if (argName === "MyString") return MyString;');
+      expect(code).toMatch('if (argName === "MyNumber") return this.MyNumber;');
+      expect(code).toMatch('if (argName === "MyString") return this.MyString;');
 
       // GetArgumentAsString("MyString") should be generated code to query and cast as a string
       // the argument
@@ -635,7 +635,7 @@ describe('libGD.js - GDJS related tests', function () {
 
       // Check that the context for the events function is here...
       expect(code).toMatch('function(runtimeScene, eventsFunctionContext)');
-      expect(code).toMatch('var eventsFunctionContext =');
+      expect(code).toMatch('const eventsFunctionContext =');
 
       // Check that the parameters, with the (optional) context of the parent function,
       // are all here

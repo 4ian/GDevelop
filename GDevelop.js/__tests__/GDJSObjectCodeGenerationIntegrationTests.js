@@ -12,7 +12,7 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
   });
 
   describe('SceneInstancesCount', () => {
-    const prepareCompiledEvents = () => {
+    const prepareCompiledEvents = (options = {}) => {
       const eventsSerializerElement = gd.Serializer.fromJSObject([
         {
           type: 'BuiltinCommonInstructions::Standard',
@@ -62,7 +62,8 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
       const runCompiledEvents = generateCompiledEventsForEventsFunction(
         gd,
         project,
-        eventsFunction
+        eventsFunction,
+        options.logCode
       );
 
       eventsFunction.delete();
@@ -71,7 +72,7 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
     };
 
     it('counts instances from the scene in a function, when no instances are passed as parameters', () => {
-      const { runCompiledEvents } = prepareCompiledEvents();
+      const { runCompiledEvents } = prepareCompiledEvents({ logCode: false });
       const { gdjs, runtimeScene } = makeMinimalGDJSMock();
       runtimeScene.getOnceTriggers().startNewFrame();
 
@@ -106,7 +107,7 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
     });
 
     it('counts instances from the scene in a function, when some instances are passed as parameters', () => {
-      const { runCompiledEvents } = prepareCompiledEvents();
+      const { runCompiledEvents } = prepareCompiledEvents({ logCode: false });
       const { gdjs, runtimeScene } = makeMinimalGDJSMock();
       runtimeScene.getOnceTriggers().startNewFrame();
 

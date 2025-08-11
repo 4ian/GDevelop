@@ -139,7 +139,9 @@ export class ExternalLayoutEditorContainer extends React.Component<
     if (
       this.props.gameEditorMode === 'embedded-game' &&
       layout &&
-      projectItemName
+      projectItemName &&
+      // Avoid to hot-reload the editor every time an image is edited with Pixi.
+      (!this.editor || !this.editor.isEditingObject())
     ) {
       switchToSceneEdition({
         editorId,
@@ -386,6 +388,9 @@ export class ExternalLayoutEditorContainer extends React.Component<
             }
             onEffectAdded={this.props.onEffectAdded}
             onNewObjectTypeUsed={this.props.onNewObjectTypeUsed}
+            triggerHotReloadInGameEditorIfNeeded={
+              this.props.triggerHotReloadInGameEditorIfNeeded
+            }
           />
         )}
         {!layout && (

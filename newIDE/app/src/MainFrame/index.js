@@ -1485,15 +1485,21 @@ const MainFrame = (props: Props) => {
   };
 
   const hotReloadInGameEditorIfNeeded = React.useCallback(
-    ({
-      hotReload,
-      projectDataOnlyExport,
-      shouldReloadResources,
-    }: {|
-      hotReload: boolean,
-      projectDataOnlyExport: boolean,
-      shouldReloadResources: boolean,
-    |}) => {
+    (
+      {
+        hotReload,
+        projectDataOnlyExport,
+        shouldReloadResources,
+      }: {|
+        hotReload: boolean,
+        projectDataOnlyExport: boolean,
+        shouldReloadResources: boolean,
+      |} = {
+        hotReload: false,
+        projectDataOnlyExport: true,
+        shouldReloadResources: false,
+      }
+    ) => {
       let hasReloadIfNeeded = false;
       for (const paneIdentifier in state.editorTabs.panes) {
         const currentTab = getCurrentTabForPane(
@@ -4195,6 +4201,7 @@ const MainFrame = (props: Props) => {
     onEffectAdded: onEffectAdded,
     onNewObjectTypeUsed: onNewObjectTypeUsed,
     gamesList: gamesList,
+    triggerHotReloadInGameEditorIfNeeded: hotReloadInGameEditorIfNeeded,
   };
 
   const hasEditorsInLeftPane = hasEditorsInPane(state.editorTabs, 'left');

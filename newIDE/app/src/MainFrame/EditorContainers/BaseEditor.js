@@ -183,6 +183,7 @@ export type RenderEditorContainerProps = {|
     objectWithContext: ObjectWithContext
   ) => void,
   onSceneObjectsDeleted: (scene: gdLayout) => void,
+  triggerHotReloadInGameEditorIfNeeded: () => void,
 
   // Events editing
   onSceneEventsModifiedOutsideEditor: (

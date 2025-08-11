@@ -112,7 +112,12 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
       eventsBasedObjectType: projectItemName || null,
       eventsBasedObjectVariantName: this.getVariantName(),
     });
-    if (this.props.gameEditorMode === 'embedded-game' && projectItemName) {
+    if (
+      this.props.gameEditorMode === 'embedded-game' &&
+      projectItemName &&
+      // Avoid to hot-reload the editor every time an image is edited with Pixi.
+      (!this.editor || !this.editor.isEditingObject())
+    ) {
       switchToSceneEdition({
         editorId,
         sceneName: null,
@@ -361,6 +366,9 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           }
           onEffectAdded={this.props.onEffectAdded}
           onNewObjectTypeUsed={this.props.onNewObjectTypeUsed}
+          triggerHotReloadInGameEditorIfNeeded={
+            this.props.triggerHotReloadInGameEditorIfNeeded
+          }
         />
       </div>
     );

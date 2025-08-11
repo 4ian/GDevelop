@@ -238,6 +238,7 @@ export type EditorTabsPaneCommonProps = {|
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onEffectAdded: () => void,
   onNewObjectTypeUsed: () => void,
+  triggerHotReloadInGameEditorIfNeeded: () => void,
   gamesList: GamesList,
 
   setEditorTabs: (editorTabs: EditorTabsState) => void,
@@ -330,6 +331,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
     onExtensionInstalled,
     onEffectAdded,
     onNewObjectTypeUsed,
+    triggerHotReloadInGameEditorIfNeeded,
     gamesList,
     setEditorTabs,
     onSetPointerEventsNone,
@@ -734,6 +736,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
                       onExtensionInstalled: onExtensionInstalled,
                       onEffectAdded: onEffectAdded,
                       onNewObjectTypeUsed: onNewObjectTypeUsed,
+                      triggerHotReloadInGameEditorIfNeeded: triggerHotReloadInGameEditorIfNeeded,
                       gamesList,
                       gamesPlatformFrameTools,
                     })}

@@ -186,6 +186,7 @@ type Props = {|
   ) => void,
   onEffectAdded: () => void,
   onNewObjectTypeUsed: () => void,
+  triggerHotReloadInGameEditorIfNeeded: () => void,
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
@@ -244,6 +245,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   resourceExternallyChangedCallbackId: ?string;
   unregisterDebuggerCallback: (() => void) | null = null;
   editorViewPosition2D: EditorViewPosition2D = { viewX: null, viewY: null };
+  _isEditingObject = false;
 
   constructor(props: Props) {
     super(props);
@@ -742,6 +744,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         editedObjectInitialTab: 'properties',
       });
     }
+  };
+
+  isEditingObject = (): boolean => {
+    return this._isEditingObject;
   };
 
   openObjectExporterDialog = (open: boolean = true) => {
@@ -2524,6 +2530,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       editedObjectWithContext,
       selectedObjectFolderOrObjectsWithContext,
     } = this.state;
+    this._isEditingObject = this._isEditingObject || !!editedObjectWithContext;
     const variablesEditedAssociatedObjectName = this.state
       .variablesEditedInstance
       ? this.state.variablesEditedInstance.getObjectName()
@@ -2732,12 +2739,15 @@ export default class SceneEditor extends React.Component<Props, State> {
                           );
                         }}
                         onCancel={() => {
+                          this._isEditingObject = false;
                           if (editedObjectWithContext) {
                             // Object changes are reverted but not the
                             // resources modified with an external editor.
                             this.props.onObjectEdited(editedObjectWithContext);
                           }
                           this.editObject(null);
+                          // An hot-reload for an edited image may be on hold.
+                          this.props.triggerHotReloadInGameEditorIfNeeded();
                         }}
                         getValidatedObjectOrGroupName={newName =>
                           this._getValidatedObjectOrGroupName(
@@ -2753,6 +2763,13 @@ export default class SceneEditor extends React.Component<Props, State> {
                           hasResourceChanged: boolean,
                           hasAnyEffectBeenAdded: boolean
                         ) => {
+                          this._isEditingObject = false;
+                          // When resource parameters changed an hot-reload is
+                          // already triggered by _onObjectEdited.
+                          if (!hasResourceChanged) {
+                            // An hot-reload for an edited image may be on hold.
+                            this.props.triggerHotReloadInGameEditorIfNeeded();
+                          }
                           if (editedObjectWithContext) {
                             this._onObjectEdited(
                               editedObjectWithContext,

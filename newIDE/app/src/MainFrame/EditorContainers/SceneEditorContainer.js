@@ -89,7 +89,13 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
       eventsBasedObjectType: null,
       eventsBasedObjectVariantName: null,
     });
-    if (this.props.gameEditorMode === 'embedded-game' && projectItemName) {
+    console.log('editor', !!this.editor);
+    if (
+      this.props.gameEditorMode === 'embedded-game' &&
+      projectItemName &&
+      // Avoid to hot-reload the editor every time an image is edited with Pixi.
+      (!this.editor || !this.editor.isEditingObject())
+    ) {
       switchToSceneEdition({
         editorId,
         sceneName: projectItemName,
@@ -268,6 +274,9 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
           this.props.onSceneObjectEdited(layout, objectWithContext)
         }
         onObjectsDeleted={() => this.props.onSceneObjectsDeleted(layout)}
+        triggerHotReloadInGameEditorIfNeeded={
+          this.props.triggerHotReloadInGameEditorIfNeeded
+        }
         // It's only used to refresh events-based object variants.
         onObjectGroupEdited={() => {}}
         onObjectGroupsDeleted={() => {}}

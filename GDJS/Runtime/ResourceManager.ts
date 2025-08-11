@@ -42,7 +42,7 @@ namespace gdjs {
      *
      * Usually called when scene resources are unloaded.
      *
-     * @param resourceData The resources that need to be cleared
+     * @param resourceData The resource to clear
      */
     unloadResource(resourceData: ResourceData): void;
   }

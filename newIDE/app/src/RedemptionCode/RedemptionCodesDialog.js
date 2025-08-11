@@ -81,9 +81,7 @@ const RedemptionCodesDialog = ({ onClose }: Props) => {
       flexColumnBody
     >
       <AlertMessage kind="info">
-        <Trans>
-          To use a code, go to your profile in the subscription section!
-        </Trans>
+        <Trans>To use a code, go to your profile!</Trans>
       </AlertMessage>
       <LineStackLayout>
         {<RedemptionCodeIcon />}

@@ -16,7 +16,9 @@ BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(
       .SetExtensionInformation(
           "BuiltinCommonConversions",
           _("Conversion"),
-          "Expressions to convert number, texts and quantities.",
+          "Expressions to convert numbers to string, strings to numbers, "
+          "angles (degrees from/to radians) and a GDevelop variable to/from a "
+          "JSON string.",
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/common-conversions");
@@ -41,7 +43,7 @@ BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(
 
   extension
       .AddStrExpression("LargeNumberToString",
-                        _("Number > Text ( without scientific notation )"),
+                        _("Number > Text (without scientific notation)"),
                         _("Convert the result of the expression to text, "
                           "without using the scientific notation"),
                         "",
@@ -72,7 +74,8 @@ BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(
                         _("Convert a variable to JSON"),
                         _("JSON"),
                         "res/conditions/toujours24_black.png")
-      .AddParameter("variable", _("The variable to be stringified"),
+      .AddParameter("variable",
+                    _("The variable to be stringified"),
                     "AllowUndeclaredVariable");
 
   // Deprecated

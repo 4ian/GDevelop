@@ -2770,6 +2770,8 @@ export class TextObject extends ObjectConfiguration {
   getText(): string;
   setCharacterSize(size: number): void;
   getCharacterSize(): number;
+  setLineHeight(value: number): void;
+  getLineHeight(): number;
   setFontName(string: string): void;
   getFontName(): string;
   isBold(): boolean;

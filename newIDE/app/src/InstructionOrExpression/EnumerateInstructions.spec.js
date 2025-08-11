@@ -33,7 +33,7 @@ describe('EnumerateInstructions', () => {
       expect.objectContaining({
         displayedName: 'Animation finished',
         fullGroupName:
-          'General ❯ Animatable capability ❯ Animations and images',
+          'General ❯ Objects with animations ❯ Animations and images',
         type: 'AnimatableCapability::AnimatableBehavior::HasAnimationEnded',
       })
     );

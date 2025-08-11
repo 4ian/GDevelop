@@ -593,21 +593,6 @@ namespace gdjs {
     }
 
     /**
-     * Return all the three.js materials associated to the specified resource name.
-     * @param resourceName The name of the resource
-     * @returns The requested material.
-     */
-    getAll(resourceName: string): Array<THREE.Material> | null {
-      const flaggedKeys = this._materialFlaggedKeys.get(resourceName);
-      if (!flaggedKeys) {
-        return null;
-      }
-      return flaggedKeys.map((key) =>
-        this._flaggedMaterials.get(key)
-      ) as Array<THREE.Material>;
-    }
-
-    /**
      * Delete and dispose all the three.js material associated to the specified
      * resource name.
      * @param resourceName The name of the resource

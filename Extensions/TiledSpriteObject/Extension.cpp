@@ -17,7 +17,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .SetExtensionInformation(
           "TiledSpriteObject",
           _("Tiled Sprite Object"),
-          "Displays an image in a repeating pattern over an area. Useful for "
+          "Displays a 2D image in a repeating pattern over an area. Useful for "
           "making backgrounds, including background that are scrolling when "
           "the camera moves. This is more performant than using multiple "
           "Sprite objects.",

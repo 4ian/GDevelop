@@ -22,6 +22,10 @@ import { type SimplifiedBehavior } from './SimplifiedProject/SimplifiedProject';
 import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import { applyVariableChange } from './ApplyVariableChange';
+import {
+  addDefaultLightToAllLayers,
+  addDefaultLightToLayer,
+} from '../ProjectCreation/CreateProject';
 
 const gd: libGDevelop = global.gd;
 
@@ -2344,7 +2348,8 @@ const createScene: EditorFunction = {
     if (project.hasLayoutNamed(scene_name)) {
       const scene = project.getLayout(scene_name);
       if (include_ui_layer && !scene.hasLayerNamed('UI')) {
-        scene.insertNewLayer('UI', 1);
+        scene.insertNewLayer('UI', 0);
+        addDefaultLightToLayer(scene.getLayer('UI'));
         return makeGenericSuccess(
           `Scene with name "${scene_name}" already exists, no need to re-create it. A layer called "UI" was added to it.`
         );
@@ -2366,6 +2371,7 @@ const createScene: EditorFunction = {
       );
       scene.setBackgroundColor(colorAsRgb[0], colorAsRgb[1], colorAsRgb[2]);
     }
+    addDefaultLightToAllLayers(scene);
 
     return makeGenericSuccess(
       include_ui_layer

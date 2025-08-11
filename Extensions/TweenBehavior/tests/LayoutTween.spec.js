@@ -347,17 +347,21 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     // Check that there is no NaN.
     for (let i = 0; i < 11; i++) {
       runtimeScene.renderAndStep(1000 / 60);
-      expect(camera.getCameraZoom(runtimeScene, '', 0)).to.be(0);
+      // The tween tries to set the camera zoom to 0, but it has no effect
+      // because it doesn't make sense.
+      expect(camera.getCameraZoom(runtimeScene, '', 0)).to.be(1);
     }
   });
 
   it('can tween a layer camera zoom from 0', () => {
+    // The zoom stays at 1 because 0 doesn't make sense.
     camera.setCameraZoom(runtimeScene, 0, '', 0);
+    // Here, it actually tweens from 1 to 1.
     tween.tweenCameraZoom2(runtimeScene, 'MyTween', 1, '', 'linear', 0.25);
     // A camera zoom of 0 doesn't make sense.
     // Check that there is no NaN.
     for (let i = 0; i < 11; i++) {
-      expect(camera.getCameraZoom(runtimeScene, '', 0)).to.be(0);
+      expect(camera.getCameraZoom(runtimeScene, '', 0)).to.be(1);
       runtimeScene.renderAndStep(1000 / 60);
     }
     expect(camera.getCameraZoom(runtimeScene, '', 0)).to.be(1);

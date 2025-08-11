@@ -16,8 +16,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .SetExtensionInformation(
           "BuiltinMouse",
           _("Mouse and touch"),
-          "Conditions and actions to handle either the mouse or touches on "
-          "touchscreen. By default, conditions related to the mouse will also "
+          "Conditions, actions and expressions to handle either the mouse or "
+          "touches on a touchscreen. Notably: cursor position, mouse wheel, "
+          "mouse buttons, touch positions, started/end touches, etc...\n"
+          "\n"
+          "By default, conditions related to the mouse will also "
           "handle the touches - so that it's easier to handle both in your "
           "game. You can disable this behavior if you want to handle them "
           "separately in different events.",
@@ -273,28 +276,26 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .SetHidden();
 
   extension
-      .AddCondition(
-          "MouseButtonFromTextPressed",
-          _("Mouse button pressed or touch held"),
-          _("Check if the specified mouse button is pressed or "
-              "if a touch is in contact with the screen."),
-          _("Touch or _PARAM1_ mouse button is down"),
-          "",
-          "res/conditions/mouse24.png",
-          "res/conditions/mouse.png")
+      .AddCondition("MouseButtonFromTextPressed",
+                    _("Mouse button pressed or touch held"),
+                    _("Check if the specified mouse button is pressed or "
+                      "if a touch is in contact with the screen."),
+                    _("Touch or _PARAM1_ mouse button is down"),
+                    "",
+                    "res/conditions/mouse24.png",
+                    "res/conditions/mouse.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("mouseButton", _("Button to check"))
       .MarkAsSimple();
 
   extension
-      .AddCondition(
-          "MouseButtonFromTextReleased",
-          _("Mouse button released"),
-          _("Check if the specified mouse button was released."),
-          _("Touch or _PARAM1_ mouse button is released"),
-          "",
-          "res/conditions/mouse24.png",
-          "res/conditions/mouse.png")
+      .AddCondition("MouseButtonFromTextReleased",
+                    _("Mouse button released"),
+                    _("Check if the specified mouse button was released."),
+                    _("Touch or _PARAM1_ mouse button is released"),
+                    "",
+                    "res/conditions/mouse24.png",
+                    "res/conditions/mouse.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("mouseButton", _("Button to check"))
       .MarkAsSimple();

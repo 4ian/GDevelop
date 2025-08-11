@@ -18,27 +18,30 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsOpacityExtension(
     gd::PlatformExtension& extension) {
   extension
       .SetExtensionInformation("OpacityCapability",
-                               _("Opacity capability"),
-                               _("Change the object opacity."),
+                               _("Objects with opacity"),
+                               _("Action/condition/expression to change or "
+                                 "check the opacity of an object (0-255)."),
                                "Florian Rival",
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/objects");
-  extension.AddInstructionOrExpressionGroupMetadata(_("Opacity capability"))
+  extension.AddInstructionOrExpressionGroupMetadata(_("Objects with opacity"))
       .SetIcon("res/actions/opacity24.png");
   extension.AddInstructionOrExpressionGroupMetadata(_("Visibility"))
       .SetIcon("res/actions/opacity24.png");
 
-  gd::BehaviorMetadata& aut = extension.AddBehavior(
-      "OpacityBehavior",
-      _("Opacity capability"),
-      "Opacity",
-      _("Change the object opacity."),
-      "",
-      "res/actions/opacity24.png",
-      "OpacityBehavior",
-      std::make_shared<gd::Behavior>(),
-      std::make_shared<gd::BehaviorsSharedData>())
-    .SetHidden();
+  gd::BehaviorMetadata& aut =
+      extension
+          .AddBehavior("OpacityBehavior",
+                       _("Objects with opacity"),
+                       "Opacity",
+                       _("Action/condition/expression to change or check the "
+                         "opacity of an object (0-255)."),
+                       "",
+                       "res/actions/opacity24.png",
+                       "OpacityBehavior",
+                       std::make_shared<gd::Behavior>(),
+                       std::make_shared<gd::BehaviorsSharedData>())
+          .SetHidden();
 
   aut.AddExpressionAndConditionAndAction(
          "number",
@@ -52,8 +55,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsOpacityExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "OpacityBehavior")
       .UseStandardParameters(
-          "number", gd::ParameterOptions::MakeNewOptions().SetDescription(
-                        _("Opacity (0-255)")))
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Opacity (0-255)")))
       .SetFunctionName("setOpacity")
       .SetGetter("getOpacity");
   aut.GetAllExpressions()["Value"].SetGroup("");

@@ -104,6 +104,7 @@ export class ExtensionTreeViewItemContent implements TreeViewItemContent {
     if (oldName === newName) {
       return;
     }
+    this.eventsFunctionsExtension.setOrigin('', '');
     this.props.onRenameEventsFunctionsExtension(oldName, newName);
   }
 
@@ -219,6 +220,9 @@ export class ExtensionTreeViewItemContent implements TreeViewItemContent {
       project
     );
     newEventsFunctionsExtension.setName(newName); // Unserialization has overwritten the name.
+    if (newName !== name) {
+      newEventsFunctionsExtension.setOrigin('', '');
+    }
 
     this._onProjectItemModified();
     this.props.onReloadEventsFunctionsExtensions();

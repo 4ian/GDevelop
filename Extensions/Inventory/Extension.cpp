@@ -5,23 +5,25 @@ Copyright (c) 2008-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
+#include <iostream>
+
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
 
-#include <iostream>
-
 void DeclareInventoryExtension(gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation(
-      "Inventory",
-      _("Inventories"),
-      _("Provides actions and conditions to add an inventory to your game, "
-        "with items in memory."),
-      "Florian Rival",
-      "Open source (MIT License)")
+  extension
+      .SetExtensionInformation(
+          "Inventory",
+          _("Inventories"),
+          _("Actions and conditions to store named inventories in memory, "
+            "with items (indexed by their name), a count for each of them, "
+            "a maximum count and an equipped state. Can be loaded/saved "
+            "from/to a GDevelop variable."),
+          "Florian Rival",
+          "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/inventory")
       .SetCategory("Game mechanic");
-    extension
-      .AddInstructionOrExpressionGroupMetadata(_("Inventories"))
+  extension.AddInstructionOrExpressionGroupMetadata(_("Inventories"))
       .SetIcon("CppPlatform/Extensions/Inventoryicon.png");
 
   extension
@@ -164,14 +166,15 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("InventoryTools::IsEquipped");
 
   extension
-      .AddAction("SerializeToVariable",
-                 _("Save an inventory in a scene variable"),
-                 _("Save all the items of the inventory in a scene variable, so that "
-                   "it can be restored later."),
-                 _("Save inventory _PARAM1_ in variable _PARAM2_"),
-                 _("Variables"),
-                 "CppPlatform/Extensions/Inventoryicon.png",
-                 "CppPlatform/Extensions/Inventoryicon.png")
+      .AddAction(
+          "SerializeToVariable",
+          _("Save an inventory in a scene variable"),
+          _("Save all the items of the inventory in a scene variable, so that "
+            "it can be restored later."),
+          _("Save inventory _PARAM1_ in variable _PARAM2_"),
+          _("Variables"),
+          "CppPlatform/Extensions/Inventoryicon.png",
+          "CppPlatform/Extensions/Inventoryicon.png")
 
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Inventory name"))
@@ -204,13 +207,14 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("InventoryTools::Count");
 
   extension
-	  .AddExpression("Maximum",
-		  _("Item maximum"),
-		  _("Get the maximum of an item in the inventory, or 0 if it is unlimited"),
-		  "",
-		  "CppPlatform/Extensions/Inventoryicon.png")
-	  .AddCodeOnlyParameter("currentScene", "")
-	  .AddParameter("string", _("Inventory name"))
-	  .AddParameter("string", _("Item name"))
-	  .SetFunctionName("InventoryTools::Maximum");
+      .AddExpression("Maximum",
+                     _("Item maximum"),
+                     _("Get the maximum of an item in the inventory, or 0 if "
+                       "it is unlimited"),
+                     "",
+                     "CppPlatform/Extensions/Inventoryicon.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("string", _("Inventory name"))
+      .AddParameter("string", _("Item name"))
+      .SetFunctionName("InventoryTools::Maximum");
 }

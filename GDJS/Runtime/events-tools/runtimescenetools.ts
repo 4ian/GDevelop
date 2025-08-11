@@ -24,19 +24,12 @@ namespace gdjs {
 
       export const setBackgroundColor = function (
         runtimeScene: gdjs.RuntimeScene,
-        rgbColor: string
+        rgbOrHexColor: string
       ) {
-        const colors = rgbColor.split(';');
-        if (colors.length < 3) {
-          return;
-        }
+        const color = gdjs.rgbOrHexToRGBColor(rgbOrHexColor);
         runtimeScene
           .getScene()
-          .setBackgroundColor(
-            parseInt(colors[0]),
-            parseInt(colors[1]),
-            parseInt(colors[2])
-          );
+          .setBackgroundColor(color[0], color[1], color[2]);
       };
 
       export const getElapsedTimeInSeconds = function (

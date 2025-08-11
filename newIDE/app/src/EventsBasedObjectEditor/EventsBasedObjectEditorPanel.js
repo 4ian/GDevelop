@@ -72,6 +72,7 @@ export default function EventsBasedObjectEditorPanel({
         </Line>
         {currentTab === 'configuration' && (
           <EventsBasedObjectEditor
+            eventsFunctionsExtension={eventsFunctionsExtension}
             eventsBasedObject={eventsBasedObject}
             unsavedChanges={unsavedChanges}
             onOpenCustomObjectEditor={onOpenCustomObjectEditor}

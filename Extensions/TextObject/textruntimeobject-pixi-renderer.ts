@@ -86,6 +86,7 @@ namespace gdjs {
         ? style.dropShadowDistance + style.dropShadowBlur
         : 0;
       style.padding = Math.ceil(this._object._padding + extraPaddingForShadow);
+      style.lineHeight = this._object._lineHeight;
 
       // Prevent spikey outlines by adding a miter limit
       style.miterLimit = 3;

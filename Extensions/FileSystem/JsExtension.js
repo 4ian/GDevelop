@@ -21,7 +21,9 @@ module.exports = {
       .setExtensionInformation(
         'FileSystem',
         _('File system'),
-        _('Access the filesystem of the operating system.'),
+        _(
+          'Access the filesystem of the operating system - only works on native, desktop games exported to Windows, Linux or macOS.'
+        ),
         'Matthias Meike',
         'Open source (MIT License)'
       )

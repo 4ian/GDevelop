@@ -21,7 +21,9 @@ module.exports = {
       .setExtensionInformation(
         'Multiplayer',
         _('Multiplayer'),
-        _('Allow players to connect to lobbies and play together.'),
+        _(
+          'This allows players to join online lobbies and synchronize gameplay across devices without needing to manage servers or networking.\n\nUse the "Open game lobbies" action to let players join a game, and use conditions like "Lobby game has just started" to begin gameplay. Add the "Multiplayer object" behavior to game objects that should be synchronized, and assign or change their ownership using player numbers. Variables and game state (like scenes, scores, or timers) are automatically synced by the host, with options to change ownership or disable sync when needed. Common multiplayer logic —like handling joins/leaves, collisions, and host migration— is supported out-of-the-box for up to 8 players per game.'
+        ),
         'Florian Rival',
         'Open source (MIT License)'
       )

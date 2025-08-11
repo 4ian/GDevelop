@@ -17,6 +17,7 @@ export default {
 
 export const Default = () => (
   <EventsBasedObjectEditor
+    eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
     eventsBasedObject={testProject.testEventsBasedObject}
     onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
     onEventsBasedObjectChildrenEdited={action(

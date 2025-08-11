@@ -13,7 +13,8 @@ void DeclareSystemInfoExtension(gd::PlatformExtension& extension) {
       .SetExtensionInformation(
           "SystemInfo",
           _("System information"),
-          _("Get information about the system and device running the game."),
+          _("Conditions to check if the device has a touchscreen, is a mobile, "
+            "or if the game runs as a preview."),
           "Florian Rival",
           "Open source (MIT License)")
       .SetCategory("Advanced");

@@ -13,6 +13,7 @@ import UserAchievements from './Achievement/UserAchievements';
 import AuthenticatedUserContext from './AuthenticatedUserContext';
 import { getRedirectToSubscriptionPortalUrl } from '../Utils/GDevelopServices/Usage';
 import Window from '../Utils/Window';
+import RedemptionCodeIcon from '../UI/CustomSvgIcons/RedemptionCode';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import CreateProfile from './CreateProfile';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
@@ -23,6 +24,9 @@ import useSubscriptionPlans from '../Utils/UseSubscriptionPlans';
 import Text from '../UI/Text';
 import Link from '../UI/Link';
 import CreditsStatusBanner from '../Credits/CreditsStatusBanner';
+import RedeemCodeDialog from './RedeemCodeDialog';
+import { SubscriptionSuggestionContext } from './Subscription/SubscriptionSuggestionContext';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 
 type Props = {|
   onClose: () => void,
@@ -36,6 +40,11 @@ const ProfileDialog = ({ onClose }: Props) => {
     includeLegacy: true,
     authenticatedUser,
   });
+  const { isMobile } = useResponsiveWindowSize();
+  const [redeemCodeDialogOpen, setRedeemCodeDialogOpen] = React.useState(false);
+  const { openSubscriptionPendingDialog } = React.useContext(
+    SubscriptionSuggestionContext
+  );
 
   const isUserLoading = authenticatedUser.loginState !== 'done';
   const userAchievementsContainerRef = React.useRef<?HTMLDivElement>(null);
@@ -160,6 +169,19 @@ const ProfileDialog = ({ onClose }: Props) => {
             disabled={isUserLoading}
           />
         ),
+        <FlatButton
+          leftIcon={<RedemptionCodeIcon />}
+          label={
+            isMobile ? <Trans>Redeem</Trans> : <Trans>Redeem a code</Trans>
+          }
+          key="redeem-code"
+          disabled={isUserLoading}
+          primary={false}
+          onClick={() => {
+            if (authenticatedUser.authenticated) setRedeemCodeDialogOpen(true);
+            else authenticatedUser.onOpenCreateAccountDialog();
+          }}
+        />,
       ]}
       onRequestClose={onClose}
       open
@@ -246,6 +268,19 @@ const ProfileDialog = ({ onClose }: Props) => {
             }
           />
         </Column>
+      )}
+      {redeemCodeDialogOpen && (
+        <RedeemCodeDialog
+          authenticatedUser={authenticatedUser}
+          onClose={async hasJustRedeemedCode => {
+            setRedeemCodeDialogOpen(false);
+
+            if (hasJustRedeemedCode) {
+              openSubscriptionPendingDialog();
+              await authenticatedUser.onRefreshSubscription();
+            }
+          }}
+        />
       )}
     </Dialog>
   );

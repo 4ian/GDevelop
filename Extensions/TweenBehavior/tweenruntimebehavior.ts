@@ -1326,11 +1326,11 @@ namespace gdjs {
             lightness
           );
           owner.setColor(
-            Math.floor(rgbFromHslColor[0]) +
+            Math.round(rgbFromHslColor[0]) +
               ';' +
-              Math.floor(rgbFromHslColor[1]) +
+              Math.round(rgbFromHslColor[1]) +
               ';' +
-              Math.floor(rgbFromHslColor[2])
+              Math.round(rgbFromHslColor[2])
           );
         };
       } else {
@@ -1439,12 +1439,11 @@ namespace gdjs {
       if (!isColorable(this.owner)) return;
       const owner = this.owner;
 
-      const rgbFromColor: string[] = owner.getColor().split(';');
-      if (rgbFromColor.length < 3) return;
+      const rgbFromColor = gdjs.rgbOrHexToRGBColor(owner.getColor());
       const hslFromColor = gdjs.evtTools.tween.rgbToHsl(
-        parseFloat(rgbFromColor[0]),
-        parseFloat(rgbFromColor[1]),
-        parseFloat(rgbFromColor[2])
+        rgbFromColor[0],
+        rgbFromColor[1],
+        rgbFromColor[2]
       );
 
       const toH = animateHue ? toHue : hslFromColor[0];
@@ -1474,11 +1473,11 @@ namespace gdjs {
           );
 
           owner.setColor(
-            Math.floor(rgbFromHslColor[0]) +
+            Math.round(rgbFromHslColor[0]) +
               ';' +
-              Math.floor(rgbFromHslColor[1]) +
+              Math.round(rgbFromHslColor[1]) +
               ';' +
-              Math.floor(rgbFromHslColor[2])
+              Math.round(rgbFromHslColor[2])
           );
         },
 

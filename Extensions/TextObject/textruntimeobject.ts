@@ -22,6 +22,8 @@ namespace gdjs {
       text: string;
       textAlignment: string;
       verticalTextAlignment: string;
+      /** The line height */
+      lineHeight: float;
 
       isOutlineEnabled: boolean;
       outlineThickness: float;
@@ -62,6 +64,7 @@ namespace gdjs {
     sha: float;
     shb: float;
     pad: integer;
+    lh: float;
   };
 
   export type TextObjectNetworkSyncData = ObjectNetworkSyncData &
@@ -101,6 +104,8 @@ namespace gdjs {
     _shadowAngle: float;
     _shadowBlur: float;
 
+    _lineHeight: float;
+
     _padding: integer = 5;
     _str: string;
     _renderer: gdjs.TextRuntimeObjectRenderer;
@@ -139,6 +144,7 @@ namespace gdjs {
       this._shadowDistance = content.shadowDistance;
       this._shadowBlur = content.shadowBlurRadius;
       this._shadowAngle = content.shadowAngle;
+      this._lineHeight = content.lineHeight || 0;
 
       this._renderer = new gdjs.TextRuntimeObjectRenderer(
         this,
@@ -211,6 +217,9 @@ namespace gdjs {
       if (oldContent.shadowBlurRadius !== newContent.shadowBlurRadius) {
         this.setShadowBlurRadius(newContent.shadowBlurRadius);
       }
+      if ((oldContent.lineHeight || 0) !== (newContent.lineHeight || 0)) {
+        this.setLineHeight(newContent.lineHeight || 0);
+      }
       return true;
     }
 
@@ -238,6 +247,7 @@ namespace gdjs {
         shd: this._shadowDistance,
         sha: this._shadowAngle,
         shb: this._shadowBlur,
+        lh: this._lineHeight,
         pad: this._padding,
       };
     }
@@ -311,6 +321,9 @@ namespace gdjs {
       }
       if (networkSyncData.shb !== undefined) {
         this.setShadowBlurRadius(networkSyncData.shb);
+      }
+      if (networkSyncData.lh !== undefined) {
+        this.setLineHeight(networkSyncData.lh);
       }
       if (networkSyncData.pad !== undefined) {
         this.setPadding(networkSyncData.pad);
@@ -447,6 +460,22 @@ namespace gdjs {
     }
 
     /**
+     * Get the line height of the text.
+     */
+    getLineHeight(): float {
+      return this._lineHeight;
+    }
+
+    /**
+     * Set the line height of the text.
+     * @param value The new line height for the text.
+     */
+    setLineHeight(value: float): void {
+      this._lineHeight = value;
+      this._renderer.updateStyle();
+    }
+
+    /**
      * Set the name of the resource to use for the font.
      * @param fontResourceName The name of the font resource.
      */
@@ -575,16 +604,10 @@ namespace gdjs {
 
     /**
      * Change the text color.
-     * @param colorString color as a "R;G;B" string, for example: "255;0;0"
+     * @param rgbOrHexColor color as a "R;G;B" string, for example: "255;0;0"
      */
-    setColor(colorString: string): void {
-      const color = colorString.split(';');
-      if (color.length < 3) {
-        return;
-      }
-      this._color[0] = parseInt(color[0], 10);
-      this._color[1] = parseInt(color[1], 10);
-      this._color[2] = parseInt(color[2], 10);
+    setColor(rgbOrHexColor: string): void {
+      this._color = gdjs.rgbOrHexToRGBColor(rgbOrHexColor);
       this._useGradient = false;
       this._renderer.updateStyle();
     }
@@ -693,18 +716,12 @@ namespace gdjs {
 
     /**
      * Set the outline for the text object.
-     * @param str color as a "R;G;B" string, for example: "255;0;0"
+     * @param rgbOrHexColor color as a "R;G;B" string, for example: "255;0;0"
      * @param thickness thickness of the outline (0 = disabled)
      * @deprecated Prefer independent setters.
      */
-    setOutline(str: string, thickness: number): void {
-      const color = str.split(';');
-      if (color.length < 3) {
-        return;
-      }
-      this._outlineColor[0] = parseInt(color[0], 10);
-      this._outlineColor[1] = parseInt(color[1], 10);
-      this._outlineColor[2] = parseInt(color[2], 10);
+    setOutline(rgbOrHexColor: string, thickness: number): void {
+      this._outlineColor = gdjs.rgbOrHexToRGBColor(rgbOrHexColor);
       this._outlineThickness = thickness;
       this._renderer.updateStyle();
     }
@@ -746,25 +763,19 @@ namespace gdjs {
 
     /**
      * Set the shadow for the text object.
-     * @param str color as a "R;G;B" string, for example: "255;0;0"
+     * @param rgbOrHexColor color as a "R;G;B" string, for example: "255;0;0"
      * @param distance distance between the shadow and the text, in pixels.
      * @param blur amount of shadow blur, in pixels.
      * @param angle shadow offset direction, in degrees.
      * @deprecated Prefer independent setters.
      */
     setShadow(
-      str: string,
+      rgbOrHexColor: string,
       distance: number,
       blur: integer,
       angle: float
     ): void {
-      const color = str.split(';');
-      if (color.length < 3) {
-        return;
-      }
-      this._shadowColor[0] = parseInt(color[0], 10);
-      this._shadowColor[1] = parseInt(color[1], 10);
-      this._shadowColor[2] = parseInt(color[2], 10);
+      this._shadowColor = gdjs.rgbOrHexToRGBColor(rgbOrHexColor);
       this._shadowDistance = distance;
       this._shadowBlur = blur;
       this._shadowAngle = angle;
@@ -877,38 +888,18 @@ namespace gdjs {
       strThirdColor: string,
       strFourthColor: string
     ): void {
-      const colorFirst = strFirstColor.split(';');
-      const colorSecond = strSecondColor.split(';');
-      const colorThird = strThirdColor.split(';');
-      const colorFourth = strFourthColor.split(';');
       this._gradient = [];
-      if (colorFirst.length == 3) {
-        this._gradient.push([
-          parseInt(colorFirst[0], 10),
-          parseInt(colorFirst[1], 10),
-          parseInt(colorFirst[2], 10),
-        ]);
+      if (strFirstColor) {
+        this._gradient.push(gdjs.rgbOrHexToRGBColor(strFirstColor));
       }
-      if (colorSecond.length == 3) {
-        this._gradient.push([
-          parseInt(colorSecond[0], 10),
-          parseInt(colorSecond[1], 10),
-          parseInt(colorSecond[2], 10),
-        ]);
+      if (strSecondColor) {
+        this._gradient.push(gdjs.rgbOrHexToRGBColor(strSecondColor));
       }
-      if (colorThird.length == 3) {
-        this._gradient.push([
-          parseInt(colorThird[0], 10),
-          parseInt(colorThird[1], 10),
-          parseInt(colorThird[2], 10),
-        ]);
+      if (strThirdColor) {
+        this._gradient.push(gdjs.rgbOrHexToRGBColor(strThirdColor));
       }
-      if (colorFourth.length == 3) {
-        this._gradient.push([
-          parseInt(colorFourth[0], 10),
-          parseInt(colorFourth[1], 10),
-          parseInt(colorFourth[2], 10),
-        ]);
+      if (strFourthColor) {
+        this._gradient.push(gdjs.rgbOrHexToRGBColor(strFourthColor));
       }
       this._gradientType = strGradientType;
       this._useGradient = this._gradient.length > 1 ? true : false;

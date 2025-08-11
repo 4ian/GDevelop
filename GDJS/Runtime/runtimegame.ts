@@ -305,7 +305,7 @@ namespace gdjs {
         getGlobalResourceNames(data),
         data.layouts
       );
-      this._inGameEditor = gdjs.InGameEditor
+      this._inGameEditor = this._isInGameEdition
         ? new gdjs.InGameEditor(this, data)
         : null;
       this._debuggerClient = gdjs.DebuggerClient

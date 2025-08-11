@@ -144,7 +144,11 @@ namespace gdjs {
       });
     }
 
-    async hotReload(shouldReloadResources = false): Promise<HotReloaderLog[]> {
+    async hotReload({
+      shouldReloadResources,
+    }: {
+      shouldReloadResources: boolean;
+    }): Promise<HotReloaderLog[]> {
       logger.info('Hot reload started');
       const wasPaused = this._runtimeGame.isPaused();
       this._runtimeGame.pause(true);
@@ -210,6 +214,9 @@ namespace gdjs {
             shouldReloadResources)
         ) {
           if (shouldReloadResources) {
+            // Unloading all resources will force them to be loaded again,
+            // which is sufficient for ensuring they are up-to-date as
+            // resources will be loaded with a 'cache bursting' parameter.
             this._runtimeGame._resourcesLoader.unloadAllResources();
           }
           // The editor don't need to hot-reload the current scene because the

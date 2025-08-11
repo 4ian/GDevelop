@@ -265,7 +265,9 @@ namespace gdjs {
         runtimeGame.stopCurrentSceneProfiler();
       } else if (data.command === 'hotReload') {
         that._hotReloader
-          .hotReload(data.payload.shouldReloadResources || false)
+          .hotReload({
+            shouldReloadResources: data.payload.shouldReloadResources || false,
+          })
           .then((logs) => {
             that.sendHotReloaderLogs(logs);
             // TODO: if fatal error, should probably reload. The editor should handle this

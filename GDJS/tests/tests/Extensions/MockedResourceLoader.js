@@ -92,7 +92,7 @@ gdjs.MockedResourceManager = class MockedResourceManager {
   }
 
   /**
-   * Dispose specific resources
+   * Dispose specific resource
    */
   unloadResource(resource) {
     this.disposedResources.add(resource.name);

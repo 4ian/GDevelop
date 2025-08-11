@@ -86,7 +86,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
       ) {
         this._switchToSceneEdition({
           hotReload: false,
-          projectDataOnlyExport: false,
+          projectDataOnlyExport: true,
           shouldReloadResources: false,
         });
       }
@@ -105,7 +105,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
     if (!prevProps.isActive && this.props.isActive) {
       this._switchToSceneEdition({
         hotReload: false,
-        projectDataOnlyExport: false,
+        projectDataOnlyExport: true,
         shouldReloadResources: false,
       });
     }

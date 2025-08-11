@@ -216,10 +216,12 @@ export const EmbeddedGameFrame = ({
           eventsBasedObjectVariantName,
         };
         if (isPreviewOngoing.current) {
-          setEditorHotReloadNeeded({
-            projectDataOnlyExport,
-            shouldReloadResources,
-          });
+          if (hotReload) {
+            setEditorHotReloadNeeded({
+              projectDataOnlyExport,
+              shouldReloadResources,
+            });
+          }
           return;
         }
 

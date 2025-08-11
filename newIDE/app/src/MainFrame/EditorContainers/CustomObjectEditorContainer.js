@@ -62,7 +62,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
       if (this.props.gameEditorMode === 'embedded-game' && projectItemName) {
         this._switchToSceneEdition({
           hotReload: false,
-          projectDataOnlyExport: false,
+          projectDataOnlyExport: true,
           shouldReloadResources: false,
         });
       }
@@ -82,7 +82,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     if (!prevProps.isActive && this.props.isActive) {
       this._switchToSceneEdition({
         hotReload: false,
-        projectDataOnlyExport: false,
+        projectDataOnlyExport: true,
         shouldReloadResources: false,
       });
     }

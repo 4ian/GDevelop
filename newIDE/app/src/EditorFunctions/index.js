@@ -2023,7 +2023,12 @@ const addSceneEvents: EditorFunction = {
     const details = shouldShowDetails ? (
       <ColumnStackLayout noMargin>
         {eventsDescription && (
-          <Text noMargin allowSelection color="secondary">
+          <Text
+            noMargin
+            allowSelection
+            color="secondary"
+            style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
+          >
             <b>
               <Trans>Description</Trans>
             </b>
@@ -2031,7 +2036,12 @@ const addSceneEvents: EditorFunction = {
           </Text>
         )}
         {placementHint && (
-          <Text noMargin allowSelection color="secondary">
+          <Text
+            noMargin
+            allowSelection
+            color="secondary"
+            style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
+          >
             <b>
               <Trans>Generation hint</Trans>
             </b>
@@ -2039,7 +2049,12 @@ const addSceneEvents: EditorFunction = {
           </Text>
         )}
         {objectsList && (
-          <Text noMargin allowSelection color="secondary">
+          <Text
+            noMargin
+            allowSelection
+            color="secondary"
+            style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
+          >
             <b>
               <Trans>Related objects</Trans>
             </b>

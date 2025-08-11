@@ -105,7 +105,7 @@
   position: relative;
   z-index: 3;
 }
-.neonCorner div {
+.neonCorner > div {
   position: relative;
   z-index: 3;
 }

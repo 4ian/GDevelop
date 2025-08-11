@@ -2,10 +2,16 @@
 import * as React from 'react';
 import {
   getAiRequest,
+  fetchAiSettings,
   type AiRequest,
+  type AiSettings,
 } from '../Utils/GDevelopServices/Generation';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { type EditorFunctionCallResult } from '../EditorFunctions/EditorFunctionCallRunner';
+import Window from '../Utils/Window';
+import { AI_SETTINGS_FETCH_TIMEOUT } from '../Utils/GlobalFetchTimeouts';
+import { useAsyncLazyMemo } from '../Utils/UseLazyMemo';
+import { retryIfFailed } from '../Utils/RetryIfFailed';
 
 type EditorFunctionCallResultsStorage = {|
   getEditorFunctionCallResults: (
@@ -186,6 +192,7 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
 type AiRequestContextState = {|
   aiRequestStorage: AiRequestStorage,
   editorFunctionCallResultsStorage: EditorFunctionCallResultsStorage,
+  getAiSettings: () => AiSettings | null,
 |};
 
 export const AiRequestContext = React.createContext<AiRequestContextState>({
@@ -203,6 +210,7 @@ export const AiRequestContext = React.createContext<AiRequestContextState>({
     addEditorFunctionCallResults: () => {},
     clearEditorFunctionCallResults: () => {},
   },
+  getAiSettings: () => null,
 });
 
 type AiRequestProviderProps = {|
@@ -213,12 +221,44 @@ export const AiRequestProvider = ({ children }: AiRequestProviderProps) => {
   const editorFunctionCallResultsStorage = useEditorFunctionCallResultsStorage();
   const aiRequestStorage = useAiRequestsStorage();
 
+  const environment = Window.isDev() ? 'staging' : 'live';
+  const getAiSettings = useAsyncLazyMemo(
+    React.useCallback(
+      async (): Promise<AiSettings | null> => {
+        try {
+          const aiSettings = await retryIfFailed({ times: 2 }, () =>
+            fetchAiSettings({
+              environment,
+            })
+          );
+
+          return aiSettings;
+        } catch (error) {
+          console.error('Error while fetching AI settings:', error);
+          return null;
+        }
+      },
+      [environment]
+    )
+  );
+
+  React.useEffect(
+    () => {
+      const timeoutId = setTimeout(() => {
+        getAiSettings();
+      }, AI_SETTINGS_FETCH_TIMEOUT);
+      return () => clearTimeout(timeoutId);
+    },
+    [getAiSettings]
+  );
+
   const state = React.useMemo(
     () => ({
       aiRequestStorage,
       editorFunctionCallResultsStorage,
+      getAiSettings,
     }),
-    [aiRequestStorage, editorFunctionCallResultsStorage]
+    [aiRequestStorage, editorFunctionCallResultsStorage, getAiSettings]
   );
 
   return (

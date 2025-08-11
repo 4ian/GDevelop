@@ -18,6 +18,43 @@ export default {
 };
 
 const commonProps = {
+  aiConfigurationPresetsWithAvailability: [
+    {
+      id: 'default',
+      nameByLocale: { en: 'Default' },
+      mode: 'chat',
+      disabled: false,
+      enableWith: null,
+    },
+    {
+      id: 'expert-mode',
+      nameByLocale: { en: 'Expert Mode' },
+      mode: 'chat',
+      disabled: false,
+      enableWith: null,
+    },
+    {
+      id: 'default',
+      nameByLocale: { en: 'Default' },
+      mode: 'agent',
+      disabled: false,
+      enableWith: null,
+    },
+    {
+      id: 'extended-thinking',
+      nameByLocale: { en: 'Extended Thinking' },
+      mode: 'agent',
+      disabled: false,
+      enableWith: null,
+    },
+    {
+      id: 'max-mode',
+      nameByLocale: { en: 'MAX mode' },
+      mode: 'agent',
+      disabled: true,
+      enableWith: 'higher-tier-plan',
+    },
+  ],
   editorCallbacks: {
     onOpenLayout: action('onOpenLayout'),
   },

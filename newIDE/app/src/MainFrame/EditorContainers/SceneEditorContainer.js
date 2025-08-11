@@ -89,7 +89,6 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
       eventsBasedObjectType: null,
       eventsBasedObjectVariantName: null,
     });
-    console.log('editor', !!this.editor);
     if (
       this.props.gameEditorMode === 'embedded-game' &&
       projectItemName &&

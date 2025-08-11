@@ -127,21 +127,11 @@ namespace gdjs {
       this._loadedSpines.clear();
     }
 
-    /**
-     * Unload the specified list of resources:
-     * this clears the Spine skeleton data loaded in this manager.
-     *
-     * Usually called when scene resoures are unloaded.
-     *
-     * @param resourcesList The list of specific resources
-     */
-    unloadResourcesList(resourcesList: ResourceData[]): void {
-      resourcesList.forEach((resourceData) => {
-        const loadedSpine = this._loadedSpines.get(resourceData);
-        if (loadedSpine) {
-          this._loadedSpines.delete(resourceData);
-        }
-      });
+    unloadResource(resourceData: ResourceData): void {
+      const loadedSpine = this._loadedSpines.get(resourceData);
+      if (loadedSpine) {
+        this._loadedSpines.delete(resourceData);
+      }
     }
   }
 }

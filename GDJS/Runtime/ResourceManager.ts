@@ -31,19 +31,19 @@ namespace gdjs {
     getResourceKinds(): Array<ResourceKind>;
 
     /**
-     * Should clear all resources, data, loaders stored by this manager.
+     * Clear all resources, data, loaders stored by this manager.
      * Using the manager after calling this method is undefined behavior.
      */
     dispose(): void;
 
     /**
-     * Should clear all specified resources data and anything stored by this manager
-     * for these resources.
+     * Clear any data in cache for a resource. Embedded resources are also
+     * cleared.
      *
-     * Usually called when scene resoures are unloaded.
+     * Usually called when scene resources are unloaded.
      *
-     * @param resourcesList The list of specific resources that need to be clear
+     * @param resourceData The resource to clear
      */
-    unloadResourcesList(resourcesList: ResourceData[]): void;
+    unloadResource(resourceData: ResourceData): void;
   }
 }

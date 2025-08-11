@@ -92,15 +92,13 @@ gdjs.MockedResourceManager = class MockedResourceManager {
   }
 
   /**
-   * Dispose specific resources
+   * Dispose specific resource
    */
-  unloadResourcesList(resourcesList) {
-    for (const resource of resourcesList) {
-      this.disposedResources.add(resource.name);
-      this.loadedResources.delete(resource.name);
-      this.loadResourceCallbacks.delete(resource.name);
-      this.loadResourcePromises.delete(resource.name);
-    }
+  unloadResource(resource) {
+    this.disposedResources.add(resource.name);
+    this.loadedResources.delete(resource.name);
+    this.loadResourceCallbacks.delete(resource.name);
+    this.loadResourcePromises.delete(resource.name);
   }
 
   /**
@@ -109,4 +107,4 @@ gdjs.MockedResourceManager = class MockedResourceManager {
   getResourceKinds() {
     return ['fake-resource-kind-for-testing-only'];
   }
-}
+};

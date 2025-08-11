@@ -55,7 +55,7 @@ namespace gdjs {
      * Map associating a resource name to the loaded Three.js texture.
      */
     private _loadedThreeTextures: Hashtable<THREE.Texture>;
-    private _loadedThreeMaterials: Hashtable<THREE.Material>;
+    private _loadedThreeMaterials = new ThreeMaterialCache();
 
     private _diskTextures = new Map<float, PIXI.Texture>();
     private _rectangleTextures = new Map<string, PIXI.Texture>();
@@ -73,7 +73,6 @@ namespace gdjs {
         { width: 192, height: 192 }
       );
       this._loadedThreeTextures = new Hashtable();
-      this._loadedThreeMaterials = new Hashtable();
     }
 
     getResourceKinds(): ResourceKind[] {
@@ -224,38 +223,37 @@ namespace gdjs {
      */
     getThreeMaterial(
       resourceName: string,
-      {
-        useTransparentTexture,
-        forceBasicMaterial,
-        vertexColors,
-      }: {
+      options: {
         useTransparentTexture: boolean;
         forceBasicMaterial: boolean;
         vertexColors: boolean;
       }
     ): THREE.Material {
-      const cacheKey = `${resourceName}|${useTransparentTexture ? 1 : 0}|${
-        forceBasicMaterial ? 1 : 0
-      }|${vertexColors ? 1 : 0}`;
-
-      const loadedThreeMaterial = this._loadedThreeMaterials.get(cacheKey);
+      const loadedThreeMaterial = this._loadedThreeMaterials.get(
+        resourceName,
+        options
+      );
       if (loadedThreeMaterial) return loadedThreeMaterial;
 
-      const material = forceBasicMaterial
+      const material = options.forceBasicMaterial
         ? new THREE.MeshBasicMaterial({
             map: this.getThreeTexture(resourceName),
-            side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
-            transparent: useTransparentTexture,
-            vertexColors,
+            side: options.useTransparentTexture
+              ? THREE.DoubleSide
+              : THREE.FrontSide,
+            transparent: options.useTransparentTexture,
+            vertexColors: options.vertexColors,
           })
         : new THREE.MeshStandardMaterial({
             map: this.getThreeTexture(resourceName),
-            side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
-            transparent: useTransparentTexture,
+            side: options.useTransparentTexture
+              ? THREE.DoubleSide
+              : THREE.FrontSide,
+            transparent: options.useTransparentTexture,
             metalness: 0,
-            vertexColors,
+            vertexColors: options.vertexColors,
           });
-      this._loadedThreeMaterials.put(cacheKey, material);
+      this._loadedThreeMaterials.set(resourceName, options, material);
       return material;
     }
 
@@ -485,12 +483,7 @@ namespace gdjs {
         threeTexture.dispose();
       }
 
-      const threeMaterials: THREE.Material[] = [];
-      this._loadedThreeMaterials.values(threeMaterials);
-      this._loadedThreeMaterials.clear();
-      for (const threeMaterial of threeMaterials) {
-        threeMaterial.dispose();
-      }
+      this._loadedThreeMaterials.disposeAll();
 
       for (const pixiTexture of this._diskTextures.values()) {
         if (pixiTexture.destroyed) {
@@ -520,35 +513,113 @@ namespace gdjs {
       this._scaledTextures.clear();
     }
 
+    unloadResource(resourceData: ResourceData): void {
+      const resourceName = resourceData.name;
+      const texture = this._loadedTextures.getFromName(resourceName);
+      if (texture) {
+        texture.destroy(true);
+        this._loadedTextures.delete(resourceData);
+      }
+
+      const threeTexture = this._loadedThreeTextures.get(resourceName);
+      if (threeTexture) {
+        threeTexture.dispose();
+        this._loadedThreeTextures.remove(resourceName);
+      }
+
+      this._loadedThreeMaterials.dispose(resourceName);
+    }
+  }
+
+  class ThreeMaterialCache {
+    private _flaggedMaterials = new Map<string, THREE.Material>();
+    private _materialFlaggedKeys = new Map<string, Array<string>>();
+
     /**
-     * Unload the specified list of resources:
-     * this clears the cache of loaded textures associated to these resources.
-     *
-     * Usually called when scene resoures are unloaded.
-     *
-     * @param resourcesList The list of specific resources
+     * Return the three.js material associated to the specified resource name
+     * and options.
+     * @param resourceName The name of the resource
+     * @param options
+     * @returns The requested material.
      */
-    unloadResourcesList(resourcesList: ResourceData[]): void {
-      resourcesList.forEach((resourceData) => {
-        const resourceName = resourceData.name;
-        const resource = this._loadedTextures.get(resourceData);
-        if (resource) {
-          resource.destroy(true);
-          this._loadedTextures.delete(resourceData);
-        }
+    get(
+      resourceName: string,
+      {
+        useTransparentTexture,
+        forceBasicMaterial,
+        vertexColors,
+      }: {
+        useTransparentTexture: boolean;
+        forceBasicMaterial: boolean;
+        vertexColors: boolean;
+      }
+    ): THREE.Material | null {
+      const flaggedKey = `${resourceName}|${useTransparentTexture ? 1 : 0}|${
+        forceBasicMaterial ? 1 : 0
+      }|${vertexColors ? 1 : 0}`;
+      return this._flaggedMaterials.get(flaggedKey) || null;
+    }
 
-        const threeTexture = this._loadedThreeTextures.get(resourceName);
-        if (threeTexture) {
-          threeTexture.dispose();
-          this._loadedThreeTextures.remove(resourceName);
-        }
+    /**
+     * Set the three.js material associated to the specified resource name
+     * and options.
+     * @param resourceName The name of the resource
+     * @param options
+     * @param material The material to add to the cache
+     */
+    set(
+      resourceName: string,
+      {
+        useTransparentTexture,
+        forceBasicMaterial,
+        vertexColors,
+      }: {
+        useTransparentTexture: boolean;
+        forceBasicMaterial: boolean;
+        vertexColors: boolean;
+      },
+      material: THREE.Material
+    ): void {
+      const cacheKey = `${resourceName}|${useTransparentTexture ? 1 : 0}|${
+        forceBasicMaterial ? 1 : 0
+      }|${vertexColors ? 1 : 0}`;
+      this._flaggedMaterials.set(cacheKey, material);
+      let flaggedKeys = this._materialFlaggedKeys.get(resourceName);
+      if (!flaggedKeys) {
+        flaggedKeys = [];
+        this._materialFlaggedKeys.set(resourceName, flaggedKeys);
+      }
+      flaggedKeys.push(cacheKey);
+    }
 
-        const threeMaterials = this._loadedThreeMaterials.get(resourceName);
-        if (threeMaterials) {
-          threeMaterials.dispose();
-          this._loadedThreeMaterials.remove(resourceName);
+    /**
+     * Delete and dispose all the three.js material associated to the specified
+     * resource name.
+     * @param resourceName The name of the resource
+     */
+    dispose(resourceName: string): void {
+      const flaggedKeys = this._materialFlaggedKeys.get(resourceName);
+      if (flaggedKeys) {
+        for (const flaggedKey of flaggedKeys) {
+          const threeMaterial = this._flaggedMaterials.get(flaggedKey);
+          if (threeMaterial) {
+            threeMaterial.dispose();
+          }
+          this._flaggedMaterials.delete(flaggedKey);
         }
-      });
+      }
+      this._materialFlaggedKeys.delete(resourceName);
+    }
+
+    /**
+     * Delete and dispose all the three.js material in the cache.
+     */
+    disposeAll(): void {
+      for (const material of this._flaggedMaterials.values()) {
+        material.dispose();
+      }
+      this._flaggedMaterials.clear();
+      this._materialFlaggedKeys.clear();
     }
   }
 

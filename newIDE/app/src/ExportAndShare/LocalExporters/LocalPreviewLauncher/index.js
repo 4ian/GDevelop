@@ -329,10 +329,10 @@ export default class LocalPreviewLauncher extends React.Component<
     if (shouldHotReload) {
       debuggerIds.forEach(debuggerId => {
         this.getPreviewDebuggerServer().sendMessage(debuggerId, {
-          // TODO Avoid to do a hard-reload for updating resource content.
-          command: previewOptions.shouldReloadResources
-            ? 'hardReload'
-            : 'hotReload',
+          command: 'hotReload',
+          payload: {
+            shouldReloadResources: previewOptions.shouldReloadResources,
+          },
         });
       });
       if (!previewOptions.isForInGameEdition) {

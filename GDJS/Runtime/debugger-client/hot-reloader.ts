@@ -144,7 +144,7 @@ namespace gdjs {
       });
     }
 
-    async hotReload(): Promise<HotReloaderLog[]> {
+    async hotReload(shouldReloadResources = false): Promise<HotReloaderLog[]> {
       logger.info('Hot reload started');
       const wasPaused = this._runtimeGame.isPaused();
       this._runtimeGame.pause(true);
@@ -205,9 +205,13 @@ namespace gdjs {
           newRuntimeGameStatus &&
           newRuntimeGameStatus.editorId &&
           newRuntimeGameStatus.isInGameEdition &&
-          newRuntimeGameStatus.editorId !==
-            this._runtimeGame._inGameEditor?.getEditorId()
+          (newRuntimeGameStatus.editorId !==
+            this._runtimeGame._inGameEditor?.getEditorId() ||
+            shouldReloadResources)
         ) {
+          if (shouldReloadResources) {
+            this._runtimeGame._resourcesLoader.unloadAllResources();
+          }
           // The editor don't need to hot-reload the current scene because the
           // editor switched to another one.
           this._runtimeGame.setProjectData(newProjectData);
@@ -215,7 +219,7 @@ namespace gdjs {
             newProjectData.firstLayout,
             () => {}
           );
-          this._runtimeGame._switchToSceneOrVariant(
+          this._runtimeGame._forceToSwitchToSceneOrVariant(
             newRuntimeGameStatus.editorId || null,
             newRuntimeGameStatus.sceneName,
             newRuntimeGameStatus.injectedExternalLayoutName,

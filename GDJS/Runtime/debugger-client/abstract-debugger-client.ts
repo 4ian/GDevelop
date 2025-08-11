@@ -264,17 +264,18 @@ namespace gdjs {
       } else if (data.command === 'profiler.stop') {
         runtimeGame.stopCurrentSceneProfiler();
       } else if (data.command === 'hotReload') {
-        that._hotReloader.hotReload().then((logs) => {
-          that.sendHotReloaderLogs(logs);
-          // TODO: if fatal error, should probably reload. The editor should handle this
-          // as it knows the current scene to show.
-        });
+        that._hotReloader
+          .hotReload(data.payload.shouldReloadResources || false)
+          .then((logs) => {
+            that.sendHotReloaderLogs(logs);
+            // TODO: if fatal error, should probably reload. The editor should handle this
+            // as it knows the current scene to show.
+          });
       } else if (data.command === 'hotReloadObjects') {
         if (runtimeGame._inGameEditor) {
           const editedInstanceContainer =
             runtimeGame._inGameEditor._getEditedInstanceContainer();
           if (editedInstanceContainer) {
-            console.log('hotReloadObjects', data.payload);
             that._hotReloader.hotReloadRuntimeSceneObjects(
               data.payload.addedGlobalObjects,
               data.payload.addedOrUpdatedObjects,

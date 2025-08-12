@@ -396,30 +396,30 @@ export class ExternalLayoutEditorContainer extends React.Component<
         )}
         {!layout && (
           <Background>
-          <PlaceholderMessage>
-            <Text>
-              <Trans>
-                To edit the external layout, choose the scene in which it will
-                be included
-              </Trans>
-            </Text>
-            <Line justifyContent="center">
-              <RaisedButton
-                label={<Trans>Choose the scene</Trans>}
-                primary
-                onClick={this.openExternalPropertiesDialog}
-              />
-            </Line>
-            <Line justifyContent="flex-start" noMargin>
-              <TutorialButton
-                tutorialId="Intermediate-externals"
-                label={<Trans>Watch tutorial</Trans>}
-                renderIfNotFound={
-                  <HelpButton helpPagePath="/interface/events-editor/external-events" />
-                }
-              />
-            </Line>
-          </PlaceholderMessage>
+            <PlaceholderMessage>
+              <Text>
+                <Trans>
+                  To edit the external layout, choose the scene in which it will
+                  be included
+                </Trans>
+              </Text>
+              <Line justifyContent="center">
+                <RaisedButton
+                  label={<Trans>Choose the scene</Trans>}
+                  primary
+                  onClick={this.openExternalPropertiesDialog}
+                />
+              </Line>
+              <Line justifyContent="flex-start" noMargin>
+                <TutorialButton
+                  tutorialId="Intermediate-externals"
+                  label={<Trans>Watch tutorial</Trans>}
+                  renderIfNotFound={
+                    <HelpButton helpPagePath="/interface/events-editor/external-events" />
+                  }
+                />
+              </Line>
+            </PlaceholderMessage>
           </Background>
         )}
         <ExternalPropertiesDialog

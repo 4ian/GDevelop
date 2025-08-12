@@ -33,6 +33,7 @@ import {
   setEditorHotReloadNeeded,
   switchInGameEditorIfNoHotReloadIsNeeded,
 } from '../../EmbeddedGame/EmbeddedGameFrame';
+import Background from '../../UI/Background';
 
 const styles = {
   container: {
@@ -394,6 +395,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
           />
         )}
         {!layout && (
+          <Background>
           <PlaceholderMessage>
             <Text>
               <Trans>
@@ -418,6 +420,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
               />
             </Line>
           </PlaceholderMessage>
+          </Background>
         )}
         <ExternalPropertiesDialog
           title={<Trans>Configure the external layout</Trans>}

@@ -24,6 +24,7 @@ const PlaceholderMessage = (props: Props) => {
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: props.showOnTop ? 9999 : undefined, // Ensure it's above most things
+        pointerEvents: 'all',
       }}
     >
       <Paper

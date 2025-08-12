@@ -4057,6 +4057,11 @@ interface Exporter {
 };
 
 [Prefix="gdjs::"]
+interface ExporterHelper {
+    [Const, Value] DOMString STATIC_SerializeProjectData([Const, Ref] Project project);
+};
+
+[Prefix="gdjs::"]
 interface JsCodeEvent {
     void JsCodeEvent();
 

@@ -826,6 +826,7 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 
 #define STATIC_ScanProject ScanProject
 #define STATIC_GetUsedExtensions GetUsedExtensions
+#define STATIC_SerializeProjectData SerializeProjectData
 
 #define STATIC_ApplyTranslation ApplyTranslation
 #define STATIC_GetUndefined GetUndefined

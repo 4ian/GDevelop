@@ -3009,6 +3009,10 @@ export class Exporter extends EmscriptenObject {
   getLastError(): string;
 }
 
+export class ExporterHelper extends EmscriptenObject {
+  static serializeProjectData(project: Project): string;
+}
+
 export class JsCodeEvent extends EmscriptenObject {
   constructor();
   getInlineCode(): string;

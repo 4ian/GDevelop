@@ -1564,7 +1564,18 @@ const MainFrame = (props: Props) => {
     [gameEditorMode, state.editorTabs, hotReloadInGameEditorIfNeeded]
   );
 
-  const onSceneAdded = React.useCallback(
+  const onResourceExternallyChanged = React.useCallback(
+    () => {
+      hotReloadInGameEditorIfNeeded({
+        hotReload: true,
+        projectDataOnlyExport: true,
+        shouldReloadResources: true,
+      });
+    },
+    [hotReloadInGameEditorIfNeeded]
+  );
+
+  const onResourceUsageChanged = React.useCallback(
     () => {
       hotReloadInGameEditorIfNeeded({
         hotReload: true,
@@ -1575,15 +1586,37 @@ const MainFrame = (props: Props) => {
     [hotReloadInGameEditorIfNeeded]
   );
 
-  const onExternalLayoutAdded = React.useCallback(
+  const hotReloadProjectData = React.useCallback(
     () => {
-      hotReloadInGameEditorIfNeeded({
-        hotReload: true,
-        projectDataOnlyExport: true,
-        shouldReloadResources: false,
+      if (!previewDebuggerServer || !currentProject) {
+        return;
+      }
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'hotReloadProjectData',
+          payload: {
+            projectData: JSON.parse(
+              gd.ExporterHelper.serializeProjectData(currentProject)
+            ),
+          },
+        });
       });
     },
-    [hotReloadInGameEditorIfNeeded]
+    [previewDebuggerServer, currentProject]
+  );
+
+  const onSceneAdded = React.useCallback(
+    () => {
+      hotReloadProjectData();
+    },
+    [hotReloadProjectData]
+  );
+
+  const onExternalLayoutAdded = React.useCallback(
+    () => {
+      hotReloadProjectData();
+    },
+    [hotReloadProjectData]
   );
 
   const onEffectAdded = React.useCallback(
@@ -1645,11 +1678,7 @@ const MainFrame = (props: Props) => {
       if (shouldChangeProjectFirstLayout) {
         currentProject.setFirstLayout(uniqueNewName);
       }
-      hotReloadInGameEditorIfNeeded({
-        hotReload: true,
-        projectDataOnlyExport: true,
-        shouldReloadResources: false,
-      });
+      hotReloadProjectData();
       _onProjectItemModified();
     });
   };
@@ -1680,11 +1709,7 @@ const MainFrame = (props: Props) => {
         oldName,
         uniqueNewName
       );
-      hotReloadInGameEditorIfNeeded({
-        hotReload: true,
-        projectDataOnlyExport: true,
-        shouldReloadResources: false,
-      });
+      hotReloadProjectData();
       _onProjectItemModified();
     });
   };
@@ -2567,14 +2592,13 @@ const MainFrame = (props: Props) => {
     }
   };
 
-  const onExtractAsExternalLayout = (name: string) => {
-    hotReloadInGameEditorIfNeeded({
-      hotReload: true,
-      projectDataOnlyExport: true,
-      shouldReloadResources: false,
-    });
-    openExternalLayout(name);
-  };
+  const onExtractAsExternalLayout = React.useCallback(
+    (name: string) => {
+      hotReloadProjectData();
+      openExternalLayout(name);
+    },
+    [hotReloadProjectData, openExternalLayout]
+  );
 
   const onOpenEventBasedObjectEditor = (
     extensionName: string,
@@ -2713,28 +2737,6 @@ const MainFrame = (props: Props) => {
       }
     },
     [state.editorTabs]
-  );
-
-  const onResourceExternallyChanged = React.useCallback(
-    () => {
-      hotReloadInGameEditorIfNeeded({
-        hotReload: true,
-        projectDataOnlyExport: true,
-        shouldReloadResources: true,
-      });
-    },
-    [hotReloadInGameEditorIfNeeded]
-  );
-
-  const onResourceUsageChanged = React.useCallback(
-    () => {
-      hotReloadInGameEditorIfNeeded({
-        hotReload: true,
-        projectDataOnlyExport: true,
-        shouldReloadResources: false,
-      });
-    },
-    [hotReloadInGameEditorIfNeeded]
   );
 
   const _onProjectItemModified = () => {

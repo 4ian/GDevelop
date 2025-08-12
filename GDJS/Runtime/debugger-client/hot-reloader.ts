@@ -270,6 +270,32 @@ namespace gdjs {
       return this._logs;
     }
 
+    async hotReloadProjectData(newProjectData: ProjectData) {
+      const wasPaused = this._runtimeGame.isPaused();
+      this._runtimeGame.pause(true);
+      gdjs.projectData = newProjectData;
+      // The editor don't need to hot-reload the current scene because the
+      // editor always stays in the initial state.
+      this._runtimeGame.setProjectData(newProjectData);
+      await this._runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+        newProjectData.firstLayout,
+        () => {}
+      );
+      const newRuntimeGameStatus =
+        this._runtimeGame.getAdditionalOptions().initialRuntimeGameStatus;
+      if (newRuntimeGameStatus) {
+        this._runtimeGame._forceToSwitchToSceneOrVariant(
+          newRuntimeGameStatus.editorId || null,
+          newRuntimeGameStatus.sceneName,
+          newRuntimeGameStatus.injectedExternalLayoutName,
+          newRuntimeGameStatus.eventsBasedObjectType,
+          newRuntimeGameStatus.eventsBasedObjectVariantName,
+          newRuntimeGameStatus.editorCamera3D || null
+        );
+      }
+      this._runtimeGame.pause(wasPaused);
+    }
+
     _computeChangedRuntimeBehaviors(
       oldBehaviorConstructors: Record<string, Function>,
       newBehaviorConstructors: Record<string, Function>

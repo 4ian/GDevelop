@@ -201,51 +201,6 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     previousTime = LogTimeSpent("Events code export", previousTime);
   }
 
-  auto projectUsedResources =
-      gd::SceneResourcesFinder::FindProjectResources(exportedProject);
-  std::unordered_map<gd::String, std::set<gd::String>> scenesUsedResources;
-  for (std::size_t layoutIndex = 0;
-       layoutIndex < exportedProject.GetLayoutsCount();
-       layoutIndex++) {
-    auto &layout = exportedProject.GetLayout(layoutIndex);
-    scenesUsedResources[layout.GetName()] =
-        gd::SceneResourcesFinder::FindSceneResources(exportedProject, layout);
-  }
-  std::unordered_map<gd::String, std::set<gd::String>>
-      eventsBasedObjectVariantsUsedResources;
-  for (std::size_t extensionIndex = 0;
-       extensionIndex < exportedProject.GetEventsFunctionsExtensionsCount();
-       extensionIndex++) {
-    auto &eventsFunctionsExtension =
-        exportedProject.GetEventsFunctionsExtension(extensionIndex);
-    for (auto &&eventsBasedObject :
-         eventsFunctionsExtension.GetEventsBasedObjects().GetInternalVector()) {
-
-      auto eventsBasedObjectType = gd::PlatformExtension::GetObjectFullType(
-          eventsFunctionsExtension.GetName(), eventsBasedObject->GetName());
-      eventsBasedObjectVariantsUsedResources[eventsBasedObjectType] =
-          gd::SceneResourcesFinder::FindEventsBasedObjectVariantResources(
-              exportedProject, eventsBasedObject->GetDefaultVariant());
-
-      for (auto &&eventsBasedObjectVariant :
-           eventsBasedObject->GetVariants().GetInternalVector()) {
-
-        auto variantType = gd::PlatformExtension::GetVariantFullType(
-            eventsFunctionsExtension.GetName(), eventsBasedObject->GetName(),
-            eventsBasedObjectVariant->GetName());
-        eventsBasedObjectVariantsUsedResources[variantType] =
-            gd::SceneResourcesFinder::FindEventsBasedObjectVariantResources(
-                exportedProject, *eventsBasedObjectVariant);
-      }
-    }
-  }
-
-  // Strip the project (*after* generating events as the events may use stripped
-  // things (objects groups...))
-  gd::ProjectStripper::StripProjectForExport(exportedProject);
-
-  previousTime = LogTimeSpent("Data stripping", previousTime);
-
   // Create the setup options passed to the gdjs.RuntimeGame
   gd::SerializerElement runtimeGameOptions;
   runtimeGameOptions.AddChild("isPreview").SetBoolValue(true);
@@ -377,10 +332,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   ExportProjectData(fs,
                     exportedProject,
                     codeOutputDir + "/data.js",
-                    runtimeGameOptions,
-                    projectUsedResources,
-                    scenesUsedResources,
-                    eventsBasedObjectVariantsUsedResources);
+                    runtimeGameOptions);
   includesFiles.push_back(codeOutputDir + "/data.js");
 
   previousTime = LogTimeSpent("Project data export", previousTime);
@@ -404,28 +356,75 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 }
 
 gd::String ExporterHelper::ExportProjectData(
-    gd::AbstractFileSystem &fs,
-    gd::Project &project,
-    gd::String filename,
-    const gd::SerializerElement &runtimeGameOptions,
-    std::set<gd::String> &projectUsedResources,
-    std::unordered_map<gd::String, std::set<gd::String>> &scenesUsedResources,
-    std::unordered_map<gd::String, std::set<gd::String>> &eventsBasedObjectVariantsUsedResources) {
+    gd::AbstractFileSystem &fs, gd::Project &project, gd::String filename,
+    const gd::SerializerElement &runtimeGameOptions) {
   fs.MkDir(fs.DirNameFrom(filename));
 
   // Save the project to JSON
+  gd::String output =
+      "gdjs.projectData = " + ExporterHelper::StriptAndSerializeProjectData(project) +
+      ";\n" + "gdjs.runtimeGameOptions = " +
+      gd::Serializer::ToJSON(runtimeGameOptions) + ";\n";
+
+  if (!fs.WriteToFile(filename, output))
+    return "Unable to write " + filename;
+
+  return "";
+}
+
+gd::String ExporterHelper::SerializeProjectData(const gd::Project &project) {
+  gd::Project clonedProject = project;
+  return ExporterHelper::StriptAndSerializeProjectData(clonedProject);
+}
+
+gd::String ExporterHelper::StriptAndSerializeProjectData(gd::Project &project) {
+  auto projectUsedResources =
+      gd::SceneResourcesFinder::FindProjectResources(project);
+  std::unordered_map<gd::String, std::set<gd::String>> scenesUsedResources;
+  for (std::size_t layoutIndex = 0;
+       layoutIndex < project.GetLayoutsCount(); layoutIndex++) {
+    auto &layout = project.GetLayout(layoutIndex);
+    scenesUsedResources[layout.GetName()] =
+        gd::SceneResourcesFinder::FindSceneResources(project, layout);
+  }
+  std::unordered_map<gd::String, std::set<gd::String>>
+      eventsBasedObjectVariantsUsedResources;
+  for (std::size_t extensionIndex = 0;
+       extensionIndex < project.GetEventsFunctionsExtensionsCount();
+       extensionIndex++) {
+    auto &eventsFunctionsExtension =
+        project.GetEventsFunctionsExtension(extensionIndex);
+    for (auto &&eventsBasedObject :
+         eventsFunctionsExtension.GetEventsBasedObjects().GetInternalVector()) {
+
+      auto eventsBasedObjectType = gd::PlatformExtension::GetObjectFullType(
+          eventsFunctionsExtension.GetName(), eventsBasedObject->GetName());
+      eventsBasedObjectVariantsUsedResources[eventsBasedObjectType] =
+          gd::SceneResourcesFinder::FindEventsBasedObjectVariantResources(
+              project, eventsBasedObject->GetDefaultVariant());
+
+      for (auto &&eventsBasedObjectVariant :
+           eventsBasedObject->GetVariants().GetInternalVector()) {
+
+        auto variantType = gd::PlatformExtension::GetVariantFullType(
+            eventsFunctionsExtension.GetName(), eventsBasedObject->GetName(),
+            eventsBasedObjectVariant->GetName());
+        eventsBasedObjectVariantsUsedResources[variantType] =
+            gd::SceneResourcesFinder::FindEventsBasedObjectVariantResources(
+                project, *eventsBasedObjectVariant);
+      }
+    }
+  }
+
+  // Strip the project (*after* generating events as the events may use stripped
+  // things (objects groups...))
+  gd::ProjectStripper::StripProjectForExport(project);
+
   gd::SerializerElement rootElement;
   project.SerializeTo(rootElement);
   SerializeUsedResources(rootElement, projectUsedResources, scenesUsedResources,
                          eventsBasedObjectVariantsUsedResources);
-  gd::String output =
-      "gdjs.projectData = " + gd::Serializer::ToJSON(rootElement) + ";\n" +
-      "gdjs.runtimeGameOptions = " +
-      gd::Serializer::ToJSON(runtimeGameOptions) + ";\n";
-
-  if (!fs.WriteToFile(filename, output)) return "Unable to write " + filename;
-
-  return "";
+  return gd::Serializer::ToJSON(rootElement);
 }
 
 void ExporterHelper::SerializeUsedResources(

@@ -445,22 +445,28 @@ class ExporterHelper {
   const gd::String &GetLastError() const { return lastError; };
 
   /**
-   * \brief Export a project to JSON
+   * \brief Export a project without its events and options to 2 JS variables
    *
    * \param fs The abstract file system to use to write the file
    * \param project The project to be exported.
    * \param filename The filename where export the project
    * \param runtimeGameOptions The content of the extra configuration to store
-   * in gdjs.runtimeGameOptions \return Empty string if everything is ok,
+   * in gdjs.runtimeGameOptions
+   *
+   * \return Empty string if everything is ok,
    * description of the error otherwise.
    */
-  static gd::String ExportProjectData(
-      gd::AbstractFileSystem &fs, gd::Project &project, gd::String filename,
-      const gd::SerializerElement &runtimeGameOptions,
-      std::set<gd::String> &projectUsedResources,
-      std::unordered_map<gd::String, std::set<gd::String>> &layersUsedResources,
-      std::unordered_map<gd::String, std::set<gd::String>>
-          &eventsBasedObjectVariantsUsedResources);
+  static gd::String
+  ExportProjectData(gd::AbstractFileSystem &fs, gd::Project &project,
+                    gd::String filename,
+                    const gd::SerializerElement &runtimeGameOptions);
+
+  /**
+   * \brief Serialize a project without its events to JSON
+   *
+   * \param project The project to be exported.
+   */
+  static gd::String SerializeProjectData(const gd::Project &project);
 
   /**
    * \brief Copy all the resources of the project to to the export directory,
@@ -684,6 +690,13 @@ class ExporterHelper {
                               &layersUsedResources,
                           std::unordered_map<gd::String, std::set<gd::String>>
                               &eventsBasedObjectVariantsUsedResources);
+
+   /**
+    * \brief Stript a project and serialize it to JSON
+    *
+    * \param project The project to be exported.
+    */
+   static gd::String StriptAndSerializeProjectData(gd::Project &project);
 };
 
 }  // namespace gdjs

@@ -274,13 +274,15 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
 
             // addResource will check if a resource with the same name exists, and if it is
             // the case, no new resource will be added.
-            project.getResourcesManager().addResource(resource);
+            const hasCreatedAnyResource = project.getResourcesManager().addResource(resource);
 
             // Important, we are responsible for deleting the resources that were given to us.
             // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
             selectedResources.forEach(resource => resource.delete());
 
-            await resourceManagementProps.onFetchNewlyAddedResources();
+            if (hasCreatedAnyResource) {
+              await resourceManagementProps.onFetchNewlyAddedResources();
+            }
             triggerResourcesHaveChanged();
           }
 

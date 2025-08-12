@@ -411,10 +411,12 @@ const SpritesList = ({
       );
       if (!selectedResourceSource) return;
 
+      let hasCreatedAnyResource = false;
       if (selectedResourceSource.shouldCreateResource) {
         selectedResources.forEach(resource => {
           applyResourceDefaults(project, resource);
-          project.getResourcesManager().addResource(resource);
+          const hasCreatedResource = project.getResourcesManager().addResource(resource);
+          hasCreatedAnyResource = hasCreatedAnyResource || hasCreatedResource;
         });
       }
 
@@ -450,7 +452,9 @@ const SpritesList = ({
 
       forceUpdate();
 
-      await resourceManagementProps.onFetchNewlyAddedResources();
+      if (hasCreatedAnyResource) {
+        await resourceManagementProps.onFetchNewlyAddedResources();
+      }
 
       if (selectedResources.length && onSpriteUpdated) onSpriteUpdated();
       if (directionSpritesCountBeforeAdding === 0 && onFirstSpriteUpdated) {

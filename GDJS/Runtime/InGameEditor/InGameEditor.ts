@@ -446,7 +446,6 @@ namespace gdjs {
       layersData: Array<LayerData>,
       areEffectsHiddenInEditor: boolean
     ): void {
-      console.trace('onLayersDataChange', areEffectsHiddenInEditor);
       for (const layerData of layersData) {
         // Camera controls don't work in orthographic.
         if (layerData.cameraType === 'orthographic') {

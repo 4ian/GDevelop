@@ -208,10 +208,7 @@ namespace gdjs {
         if (
           newRuntimeGameStatus &&
           newRuntimeGameStatus.editorId &&
-          newRuntimeGameStatus.isInGameEdition &&
-          (newRuntimeGameStatus.editorId !==
-            this._runtimeGame._inGameEditor?.getEditorId() ||
-            shouldReloadResources)
+          newRuntimeGameStatus.isInGameEdition
         ) {
           if (shouldReloadResources) {
             // Unloading all resources will force them to be loaded again,
@@ -220,7 +217,7 @@ namespace gdjs {
             this._runtimeGame._resourcesLoader.unloadAllResources();
           }
           // The editor don't need to hot-reload the current scene because the
-          // editor switched to another one.
+          // editor always stays in the initial state.
           this._runtimeGame.setProjectData(newProjectData);
           await this._runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
             newProjectData.firstLayout,
@@ -245,11 +242,6 @@ namespace gdjs {
             changedRuntimeBehaviors,
             this._runtimeGame
           );
-          // TODO Either avoid to switch of scene in the process or do it instead of _hotReloadRuntimeGame.
-          // Refresh the editedInstanceDataList reference.
-          if (this._runtimeGame.isInGameEdition()) {
-            this._runtimeGame._reconnectInGameEditor();
-          }
         }
       } catch (error) {
         const errorTarget = error.target;

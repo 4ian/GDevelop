@@ -53,6 +53,7 @@ describe('applyEventsChanges', () => {
         extensionNames: [],
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
       },
     ];
     applyEventsChanges(
@@ -95,6 +96,7 @@ describe('applyEventsChanges', () => {
         extensionNames: [],
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
       },
     ];
     applyEventsChanges(
@@ -131,6 +133,7 @@ describe('applyEventsChanges', () => {
         extensionNames: [],
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
       },
     ];
     applyEventsChanges(
@@ -165,6 +168,7 @@ describe('applyEventsChanges', () => {
         extensionNames: [],
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
       },
     ];
     applyEventsChanges(
@@ -200,6 +204,7 @@ describe('applyEventsChanges', () => {
         extensionNames: [],
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
       },
     ];
     applyEventsChanges(
@@ -234,6 +239,7 @@ describe('applyEventsChanges', () => {
         extensionNames: [],
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
       },
     ];
     applyEventsChanges(
@@ -272,6 +278,7 @@ describe('applyEventsChanges', () => {
         extensionNames: [],
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
       },
       {
         operationName: 'insert_before_event',
@@ -283,6 +290,7 @@ describe('applyEventsChanges', () => {
         extensionNames: [],
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
       },
     ];
     applyEventsChanges(
@@ -321,6 +329,7 @@ describe('applyEventsChanges', () => {
         extensionNames: [],
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
       },
     ];
 
@@ -356,6 +365,7 @@ describe('applyEventsChanges', () => {
         extensionNames: [],
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
       },
     ];
     applyEventsChanges(

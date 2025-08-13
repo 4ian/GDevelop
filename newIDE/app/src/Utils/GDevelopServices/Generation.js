@@ -105,6 +105,15 @@ export type AiGeneratedEventUndeclaredVariable = {
   requiredScope: 'global' | 'scene' | 'none',
 };
 
+export type AiGeneratedEventMissingObjectBehavior = {
+  /** The name of the object that is missing the behavior. */
+  objectName: string,
+  /** The name of the behavior that is missing. */
+  name: string,
+  /** The type of the behavior that is missing. */
+  type: string,
+};
+
 export type AiGeneratedEventChange = {
   operationName: string,
   operationTargetEvent: string | null,
@@ -116,6 +125,9 @@ export type AiGeneratedEventChange = {
   undeclaredVariables: AiGeneratedEventUndeclaredVariable[],
   undeclaredObjectVariables: {
     [objectName: string]: AiGeneratedEventUndeclaredVariable[],
+  },
+  missingObjectBehaviors: {
+    [objectName: string]: AiGeneratedEventMissingObjectBehavior[],
   },
 };
 

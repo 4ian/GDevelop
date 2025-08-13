@@ -7,6 +7,7 @@ import { serializeToJSObject } from '../Utils/Serializer';
 import { type AiGeneratedEvent } from '../Utils/GDevelopServices/Generation';
 import { renderNonTranslatedEventsAsText } from '../EventsSheet/EventsTree/TextRenderer';
 import {
+  addMissingObjectBehaviors,
   addObjectUndeclaredVariables,
   addUndeclaredVariables,
   applyEventsChanges,
@@ -2247,8 +2248,10 @@ const addSceneEvents: EditorFunction = {
             undeclaredVariables: change.undeclaredVariables,
           });
 
-          const objectNames = Object.keys(change.undeclaredObjectVariables);
-          for (const objectName of objectNames) {
+          const objectNamesWithUndeclaredVariables = Object.keys(
+            change.undeclaredObjectVariables
+          );
+          for (const objectName of objectNamesWithUndeclaredVariables) {
             const undeclaredVariables =
               change.undeclaredObjectVariables[objectName];
             addObjectUndeclaredVariables({
@@ -2256,6 +2259,19 @@ const addSceneEvents: EditorFunction = {
               scene,
               objectName,
               undeclaredVariables,
+            });
+          }
+
+          const objectNamesWithMissingBehavior = Object.keys(
+            change.missingObjectBehaviors
+          );
+          for (const objectName of objectNamesWithMissingBehavior) {
+            const missingBehaviors = change.missingObjectBehaviors[objectName];
+            addMissingObjectBehaviors({
+              project,
+              scene,
+              objectName,
+              missingBehaviors,
             });
           }
         }

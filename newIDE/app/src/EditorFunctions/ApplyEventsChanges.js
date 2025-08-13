@@ -3,8 +3,10 @@ import { unserializeFromJSObject } from '../Utils/Serializer';
 import {
   type AiGeneratedEventChange,
   type AiGeneratedEventUndeclaredVariable,
+  type AiGeneratedEventMissingObjectBehavior,
 } from '../Utils/GDevelopServices/Generation';
 import { mapFor } from '../Utils/MapFor';
+import { isBehaviorDefaultCapability } from '../BehaviorsEditor/EnumerateBehaviorsMetadata';
 
 const gd: libGDevelop = global.gd;
 
@@ -520,8 +522,7 @@ export const addObjectUndeclaredVariables = ({
         .getVariables()
         .insertNew(undeclaredVariable.name, 0);
       setupVariable(variable, undeclaredVariable.type);
-    }
-    if (
+    } else if (
       project
         .getObjects()
         .getObjectGroups()
@@ -535,4 +536,130 @@ export const addObjectUndeclaredVariables = ({
       addVariableForObjectsOfGroup(group, undeclaredVariable);
     }
   });
+};
+
+export const addMissingObjectBehaviors = ({
+  project,
+  scene,
+  objectName,
+  missingBehaviors,
+}: {|
+  project: gdProject,
+  scene: gdLayout,
+  objectName: string,
+  missingBehaviors: Array<AiGeneratedEventMissingObjectBehavior>,
+|}) => {
+  const projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
+    project,
+    scene
+  );
+
+  const objectOrGroupBehaviorNames = projectScopedContainers
+    .getObjectsContainersList()
+    .getBehaviorsOfObject(objectName, true)
+    .toJSArray();
+
+  const addBehaviorToObject = (
+    object: gdObject,
+    behaviorName: string,
+    behaviorType: string
+  ) => {
+    if (object.hasBehaviorNamed(behaviorName)) {
+      return;
+    }
+
+    gd.WholeProjectRefactorer.addBehaviorAndRequiredBehaviors(
+      project,
+      object,
+      behaviorType,
+      behaviorName
+    );
+  };
+
+  const addBehaviorToObjectGroup = (
+    group: gdObjectGroup,
+    behaviorName: string,
+    behaviorType: string
+  ) => {
+    const objectNames = group.getAllObjectsNames().toJSArray();
+    objectNames.forEach(objectName => {
+      if (scene.getObjects().hasObjectNamed(objectName)) {
+        const object = scene.getObjects().getObject(objectName);
+        addBehaviorToObject(object, behaviorName, behaviorType);
+      } else if (project.getObjects().hasObjectNamed(objectName)) {
+        const object = project.getObjects().getObject(objectName);
+        addBehaviorToObject(object, behaviorName, behaviorType);
+      }
+    });
+  };
+
+  missingBehaviors.forEach(missingBehavior => {
+    if (objectOrGroupBehaviorNames.includes(missingBehavior.name)) {
+      // This behavior is already present, no need to add it.
+      return;
+    }
+
+    const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+      project.getCurrentPlatform(),
+      missingBehavior.type
+    );
+
+    if (gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata)) {
+      console.warn(
+        `Unknown behavior type: "${missingBehavior.type}". Skipping.`
+      );
+      return;
+    }
+
+    if (isBehaviorDefaultCapability(behaviorMetadata)) {
+      console.warn(
+        `Behavior "${missingBehavior.name}" of type "${
+          missingBehavior.type
+        }" is a default capability and cannot be added to object "${objectName}".`
+      );
+      return;
+    }
+
+    if (scene.getObjects().hasObjectNamed(objectName)) {
+      const object = scene.getObjects().getObject(objectName);
+      addBehaviorToObject(object, missingBehavior.name, missingBehavior.type);
+    } else if (
+      scene
+        .getObjects()
+        .getObjectGroups()
+        .has(objectName)
+    ) {
+      const group = scene
+        .getObjects()
+        .getObjectGroups()
+        .get(objectName);
+
+      addBehaviorToObjectGroup(
+        group,
+        missingBehavior.name,
+        missingBehavior.type
+      );
+    } else if (project.getObjects().hasObjectNamed(objectName)) {
+      const object = project.getObjects().getObject(objectName);
+      addBehaviorToObject(object, missingBehavior.name, missingBehavior.type);
+    } else if (
+      project
+        .getObjects()
+        .getObjectGroups()
+        .has(objectName)
+    ) {
+      const group = project
+        .getObjects()
+        .getObjectGroups()
+        .get(objectName);
+
+      addBehaviorToObjectGroup(
+        group,
+        missingBehavior.name,
+        missingBehavior.type
+      );
+    }
+  });
+
+  scene.updateBehaviorsSharedData(project);
 };

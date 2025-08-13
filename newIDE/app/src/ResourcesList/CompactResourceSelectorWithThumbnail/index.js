@@ -81,12 +81,15 @@ export const CompactResourceSelectorWithThumbnail = ({
 
   const _onChange = React.useCallback(
     (value: string) => {
+      if (value === resourceName) {
+        return;
+      }
       onChange(value);
       if (resourceManagementProps.onResourceUsageChanged) {
         resourceManagementProps.onResourceUsageChanged();
       }
     },
-    [onChange, resourceManagementProps]
+    [resourceName, onChange, resourceManagementProps]
   );
 
   // TODO: move in a hook?
@@ -119,7 +122,9 @@ export const CompactResourceSelectorWithThumbnail = ({
 
           // addResource will check if a resource with the same name exists, and if it is
           // the case, no new resource will be added.
-          const hasCreatedAnyResource = project.getResourcesManager().addResource(resource);
+          const hasCreatedAnyResource = project
+            .getResourcesManager()
+            .addResource(resource);
 
           // Important, we are responsible for deleting the resources that were given to us.
           // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.

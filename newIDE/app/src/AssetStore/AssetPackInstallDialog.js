@@ -230,6 +230,7 @@ const AssetPackInstallDialog = ({
         }
 
         await resourceManagementProps.onFetchNewlyAddedResources();
+        resourceManagementProps.onNewResourcesAdded();
 
         setAreAssetsBeingInstalled(false);
         const createdObjects = results
@@ -237,7 +238,6 @@ const AssetPackInstallDialog = ({
           .flat();
         complyVariantsToEventsBasedObjectOf(project, createdObjects);
         onAssetsAdded(createdObjects);
-        resourceManagementProps.onResourceUsageChanged();
       } catch (error) {
         setAreAssetsBeingInstalled(false);
         console.error('Error while installing the assets', error);

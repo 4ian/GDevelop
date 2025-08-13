@@ -132,6 +132,7 @@ export const CompactResourceSelectorWithThumbnail = ({
 
           if (hasCreatedAnyResource) {
             await resourceManagementProps.onFetchNewlyAddedResources();
+            resourceManagementProps.onNewResourcesAdded();
           }
           triggerResourcesHaveChanged();
         }

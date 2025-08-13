@@ -4052,13 +4052,9 @@ interface Exporter {
 
     boolean ExportProjectForPixiPreview([Const, Ref] PreviewExportOptions options);
     boolean ExportWholePixiProject([Const, Ref] ExportOptions options);
+    [Const, Value] DOMString SerializeProjectData([Const, Ref] Project project);
 
     [Const, Ref] DOMString GetLastError();
-};
-
-[Prefix="gdjs::"]
-interface ExporterHelper {
-    [Const, Value] DOMString STATIC_SerializeProjectData([Const, Ref] Project project);
 };
 
 [Prefix="gdjs::"]

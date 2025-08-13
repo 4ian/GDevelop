@@ -415,7 +415,9 @@ const SpritesList = ({
       if (selectedResourceSource.shouldCreateResource) {
         selectedResources.forEach(resource => {
           applyResourceDefaults(project, resource);
-          const hasCreatedResource = project.getResourcesManager().addResource(resource);
+          const hasCreatedResource = project
+            .getResourcesManager()
+            .addResource(resource);
           hasCreatedAnyResource = hasCreatedAnyResource || hasCreatedResource;
         });
       }
@@ -454,6 +456,7 @@ const SpritesList = ({
 
       if (hasCreatedAnyResource) {
         await resourceManagementProps.onFetchNewlyAddedResources();
+        resourceManagementProps.onNewResourcesAdded();
       }
 
       if (selectedResources.length && onSpriteUpdated) onSpriteUpdated();

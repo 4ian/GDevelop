@@ -941,12 +941,12 @@ namespace gdjs {
     }
 
     unloadResource(resourceData: ResourceData): void {
-      const musicRes = this._loadedMusics.get(resourceData);
+      const musicRes = this._loadedMusics.getFromName(resourceData.name);
       if (musicRes) {
         this.unloadAudio(resourceData.name, true);
       }
 
-      const soundRes = this._loadedSounds.get(resourceData);
+      const soundRes = this._loadedSounds.getFromName(resourceData.name);
       if (soundRes) {
         this.unloadAudio(resourceData.name, false);
       }

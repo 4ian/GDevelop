@@ -106,6 +106,7 @@ const ResourcePropertiesEditor = React.forwardRef<
         forceUpdate();
 
         await resourceManagementProps.onFetchNewlyAddedResources();
+        resourceManagementProps.onNewResourcesAdded();
       },
       [
         resourceManagementProps,

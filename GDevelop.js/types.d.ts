@@ -3006,11 +3006,8 @@ export class Exporter extends EmscriptenObject {
   setCodeOutputDirectory(path: string): void;
   exportProjectForPixiPreview(options: PreviewExportOptions): boolean;
   exportWholePixiProject(options: ExportOptions): boolean;
+  serializeProjectData(project: Project): string;
   getLastError(): string;
-}
-
-export class ExporterHelper extends EmscriptenObject {
-  static serializeProjectData(project: Project): string;
 }
 
 export class JsCodeEvent extends EmscriptenObject {

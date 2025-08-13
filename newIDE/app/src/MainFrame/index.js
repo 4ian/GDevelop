@@ -197,6 +197,7 @@ import useHomepageWitchForRouting from './UseHomepageWitchForRouting';
 import {
   EmbeddedGameFrame,
   setEditorHotReloadNeeded,
+  isEditorHotReloadNeeded,
 } from '../EmbeddedGame/EmbeddedGameFrame';
 import RobotIcon from '../ProjectCreation/RobotIcon';
 import PublicProfileContext from '../Profile/PublicProfileContext';
@@ -1575,34 +1576,41 @@ const MainFrame = (props: Props) => {
     [hotReloadInGameEditorIfNeeded]
   );
 
-  const onResourceUsageChanged = React.useCallback(
-    () => {
-      hotReloadInGameEditorIfNeeded({
-        hotReload: true,
-        projectDataOnlyExport: true,
-        shouldReloadResources: false,
-      });
-    },
-    [hotReloadInGameEditorIfNeeded]
-  );
-
   const hotReloadProjectData = React.useCallback(
-    () => {
-      if (!previewDebuggerServer || !currentProject) {
+    async () => {
+      if (
+        !previewDebuggerServer ||
+        !currentProject ||
+        !_previewLauncher.current
+      ) {
         return;
       }
+      const serializedProjectData = await _previewLauncher.current.serializeProjectData(
+        currentProject
+      );
+      const projectData = JSON.parse(serializedProjectData);
       previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
         previewDebuggerServer.sendMessage(debuggerId, {
           command: 'hotReloadProjectData',
           payload: {
-            projectData: JSON.parse(
-              gd.ExporterHelper.serializeProjectData(currentProject)
-            ),
+            projectData,
           },
         });
       });
     },
     [previewDebuggerServer, currentProject]
+  );
+
+  const onResourceUsageChanged = React.useCallback(
+    () => {
+      if (isEditorHotReloadNeeded()) {
+        hotReloadInGameEditorIfNeeded();
+      } else {
+        // TODO Stack this call if an hot-reload is currently happening to do it at the end.
+        hotReloadProjectData();
+      }
+    },
+    [hotReloadProjectData, hotReloadInGameEditorIfNeeded]
   );
 
   const onSceneAdded = React.useCallback(
@@ -3899,6 +3907,17 @@ const MainFrame = (props: Props) => {
     fetchNewlyAddedResources
   );
 
+  const onNewResourcesAdded = React.useCallback(
+    () => {
+      hotReloadInGameEditorIfNeeded({
+        hotReload: true,
+        projectDataOnlyExport: true,
+        shouldReloadResources: false,
+      });
+    },
+    [hotReloadInGameEditorIfNeeded]
+  );
+
   useKeyboardShortcuts(
     commandPaletteRef.current
       ? commandPaletteRef.current.launchCommand
@@ -4054,6 +4073,7 @@ const MainFrame = (props: Props) => {
       onFetchNewlyAddedResources,
       getStorageProviderResourceOperations,
       canInstallPrivateAsset,
+      onNewResourcesAdded,
       onResourceUsageChanged,
     }),
     [
@@ -4064,6 +4084,7 @@ const MainFrame = (props: Props) => {
       onFetchNewlyAddedResources,
       getStorageProviderResourceOperations,
       canInstallPrivateAsset,
+      onNewResourcesAdded,
       onResourceUsageChanged,
     ]
   );

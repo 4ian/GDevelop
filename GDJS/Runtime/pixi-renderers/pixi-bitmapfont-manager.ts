@@ -309,7 +309,7 @@ namespace gdjs {
     }
 
     unloadResource(resourceData: ResourceData): void {
-      const loadedFont = this._loadedFontsData.get(resourceData);
+      const loadedFont = this._loadedFontsData.getFromName(resourceData.name);
       if (loadedFont) {
         this._loadedFontsData.delete(resourceData);
       }

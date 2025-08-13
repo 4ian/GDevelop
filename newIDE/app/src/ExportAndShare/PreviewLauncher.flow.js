@@ -138,6 +138,7 @@ export type PreviewLauncherInterface = {
   canDoHotReload: () => boolean,
   +closePreview?: (windowId: number) => void,
   +getPreviewDebuggerServer: () => ?PreviewDebuggerServer,
+  +serializeProjectData: (project: gdProject) => Promise<string>,
 };
 
 /**

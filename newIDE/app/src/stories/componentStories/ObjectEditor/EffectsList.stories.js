@@ -130,6 +130,7 @@ export const withoutEffectsForA2DLayer = () => (
           onChooseResource: () => Promise.reject('Unimplemented'),
           resourceExternalEditors: fakeResourceExternalEditors,
           canInstallPrivateAsset: () => false,
+          onNewResourcesAdded: () => {},
           onResourceUsageChanged: () => {},
         }}
         effectsContainer={testProject.layerWithoutEffects.getEffects()}
@@ -156,6 +157,7 @@ export const withoutEffectsForA3DLayer = () => (
           onChooseResource: () => Promise.reject('Unimplemented'),
           resourceExternalEditors: fakeResourceExternalEditors,
           canInstallPrivateAsset: () => false,
+          onNewResourcesAdded: () => {},
           onResourceUsageChanged: () => {},
         }}
         effectsContainer={testProject.layerWithoutEffects.getEffects()}

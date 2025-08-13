@@ -697,7 +697,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         objects.forEach(object => {
           onObjectCreated(
             object,
-            // Editor hot-reload is already triggered by onResourceUsageChanged at the
+            // Editor hot-reload is already triggered by onFetchNewlyAddedResources at the
             // end of asset installation. There is no need to trigger it here too especially in a loop.
             false
           );

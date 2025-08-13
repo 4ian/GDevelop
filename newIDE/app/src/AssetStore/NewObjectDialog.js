@@ -295,7 +295,7 @@ export const useInstallAsset = ({
       );
 
       await resourceManagementProps.onFetchNewlyAddedResources();
-      resourceManagementProps.onResourceUsageChanged();
+      resourceManagementProps.onNewResourcesAdded();
       return installOutput;
     } catch (error) {
       console.error('Error while installing the asset:', error);

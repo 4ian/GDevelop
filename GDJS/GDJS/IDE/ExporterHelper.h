@@ -466,7 +466,8 @@ class ExporterHelper {
    *
    * \param project The project to be exported.
    */
-  static gd::String SerializeProjectData(const gd::Project &project);
+  static gd::String SerializeProjectData(gd::AbstractFileSystem &fs,
+                                         const gd::Project &project);
 
   /**
    * \brief Copy all the resources of the project to to the export directory,

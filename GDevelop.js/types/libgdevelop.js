@@ -279,7 +279,6 @@ declare class libGDevelop {
   PreviewExportOptions: Class<gdPreviewExportOptions>;
   ExportOptions: Class<gdExportOptions>;
   Exporter: Class<gdExporter>;
-  ExporterHelper: Class<gdExporterHelper>;
   JsCodeEvent: Class<gdJsCodeEvent>;
   MetadataDeclarationHelper: Class<gdMetadataDeclarationHelper>;
 };

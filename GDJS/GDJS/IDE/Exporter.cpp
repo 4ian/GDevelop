@@ -201,4 +201,8 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
   return true;
 }
 
+gd::String Exporter::SerializeProjectData(const gd::Project &project) {
+  return ExporterHelper::SerializeProjectData(fs, project);
+}
+
 }  // namespace gdjs

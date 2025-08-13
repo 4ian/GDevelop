@@ -28,8 +28,10 @@
 #include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #include "GDCore/IDE/ExportedDependencyResolver.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
+#include "GDCore/IDE/Project/ResourcesMergingHelper.h"
 #include "GDCore/IDE/Project/SceneResourcesFinder.h"
 #include "GDCore/IDE/ProjectStripper.h"
+#include "GDCore/IDE/ResourceExposer.h"
 #include "GDCore/IDE/SceneNameMangler.h"
 #include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsBasedObjectVariant.h"
@@ -372,8 +374,19 @@ gd::String ExporterHelper::ExportProjectData(
   return "";
 }
 
-gd::String ExporterHelper::SerializeProjectData(const gd::Project &project) {
+gd::String ExporterHelper::SerializeProjectData(gd::AbstractFileSystem &fs, const gd::Project &project) {
   gd::Project clonedProject = project;
+
+  // Replace all resource file paths with the one used in exported projects.
+  auto projectDirectory = fs.DirNameFrom(project.GetProjectFile());
+  gd::ResourcesMergingHelper resourcesMergingHelper(
+      clonedProject.GetResourcesManager(), fs);
+  resourcesMergingHelper.SetBaseDirectory(projectDirectory);
+  resourcesMergingHelper.PreserveDirectoriesStructure(false);
+  resourcesMergingHelper.PreserveAbsoluteFilenames(false);
+  gd::ResourceExposer::ExposeWholeProjectResources(clonedProject,
+                                                    resourcesMergingHelper);
+
   return ExporterHelper::StriptAndSerializeProjectData(clonedProject);
 }
 

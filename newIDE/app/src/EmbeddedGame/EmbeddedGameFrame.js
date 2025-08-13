@@ -43,6 +43,7 @@ let onSetEditorHotReloadNeeded:
       projectDataOnlyExport: boolean,
       shouldReloadResources: boolean,
     |}) => void) = null;
+let onIsEditorHotReloadNeeded: null | (() => boolean) = null;
 let onSwitchInGameEditorIfNoHotReloadIsNeeded:
   | null
   | (PreviewInGameEditorTarget => void) = null;
@@ -71,6 +72,12 @@ export const setEditorHotReloadNeeded = (hotReloadProps: {|
   if (!onSetEditorHotReloadNeeded)
     throw new Error('No EmbeddedGameFrame registered.');
   onSetEditorHotReloadNeeded(hotReloadProps);
+};
+
+export const isEditorHotReloadNeeded = (): boolean => {
+  if (!onIsEditorHotReloadNeeded)
+    throw new Error('No EmbeddedGameFrame registered.');
+  return onIsEditorHotReloadNeeded();
 };
 
 export const setCameraState = (
@@ -189,6 +196,9 @@ export const EmbeddedGameFrame = ({
             neededHotReload.current = 'DataAndResources';
           }
         }
+      };
+      onIsEditorHotReloadNeeded = (): boolean => {
+        return neededHotReload.current !== 'None';
       };
       onSetCameraState = (editorId: string, cameraState: EditorCameraState) => {
         cameraStates.current.set(editorId, cameraState);

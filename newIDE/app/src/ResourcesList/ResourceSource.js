@@ -201,6 +201,7 @@ export type ResourceManagementProps = {|
   onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
   getStorageProviderResourceOperations: () => ?ResourcesActionsMenuBuilder,
   canInstallPrivateAsset: () => boolean,
+  onNewResourcesAdded: () => void,
   onResourceUsageChanged: () => void,
 |};
 

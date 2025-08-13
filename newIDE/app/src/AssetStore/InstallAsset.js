@@ -254,7 +254,7 @@ export const addAssetToProject = async ({
       objectsContainer.hasObjectNamed(name)
     );
 
-    // Editor hot-reload is already triggered by onResourceUsageChanged at the
+    // Editor hot-reload is already triggered by onFetchNewlyAddedResources at the
     // end of asset installation. There is no need to trigger it here too.
     let object: gdObject;
     if (targetObjectFolderOrObject) {

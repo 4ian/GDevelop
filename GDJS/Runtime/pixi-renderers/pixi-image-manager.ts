@@ -98,6 +98,10 @@ namespace gdjs {
       if (!existingTexture) {
         return this._invalidTexture;
       }
+      if (existingTexture.destroyed) {
+        logger.error('Texture for ' + resourceName + ' is not valid anymore.');
+        return this._invalidTexture;
+      }
       if (!existingTexture.valid) {
         logger.error(
           'Texture for ' +
@@ -166,6 +170,7 @@ namespace gdjs {
       }
       applyTextureSettings(texture, resource);
 
+      console.log('Load', resource.name);
       this._loadedTextures.set(resource, texture);
       return texture;
     }
@@ -322,6 +327,7 @@ namespace gdjs {
      */
     async _loadTexture(resource: ResourceData): Promise<void> {
       if (this._loadedTextures.get(resource)) {
+        console.log('Already load', resource.name);
         return;
       }
       try {
@@ -381,6 +387,7 @@ namespace gdjs {
           );
           await loadedTexture.baseTexture.resource.load();
 
+          console.log('Load', resource.name);
           this._loadedTextures.set(resource, loadedTexture);
           // TODO What if 2 assets share the same file with different settings?
           applyTextureSettings(loadedTexture, resource);
@@ -514,6 +521,7 @@ namespace gdjs {
     }
 
     unloadResource(resourceData: ResourceData): void {
+      console.log('unloadResource', resourceData.name);
       const resourceName = resourceData.name;
       const texture = this._loadedTextures.getFromName(resourceName);
       if (texture) {

@@ -462,7 +462,9 @@ const AnimationList = React.forwardRef<
           let hasCreatedAnyResource = false;
           selectedResources.forEach(resource => {
             applyResourceDefaults(project, resource);
-            const hasCreatedResource = project.getResourcesManager().addResource(resource);
+            const hasCreatedResource = project
+              .getResourcesManager()
+              .addResource(resource);
             hasCreatedAnyResource = hasCreatedAnyResource || hasCreatedResource;
           });
 
@@ -477,6 +479,7 @@ const AnimationList = React.forwardRef<
 
           if (hasCreatedAnyResource) {
             await resourceManagementProps.onFetchNewlyAddedResources();
+            resourceManagementProps.onNewResourcesAdded();
           }
         } else {
           const resourcesByAnimation = new Map<string, Array<gdResource>>();

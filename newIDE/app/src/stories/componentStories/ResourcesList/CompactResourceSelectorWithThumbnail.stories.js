@@ -70,6 +70,7 @@ export const Default = () => {
             ],
             getStorageProviderResourceOperations: () => null,
             canInstallPrivateAsset: () => false,
+            onNewResourcesAdded: () => {},
             onResourceUsageChanged: () => {},
           }}
           resourceName="icon128.png"

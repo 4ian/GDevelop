@@ -287,6 +287,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
 
             if (hasCreatedAnyResource) {
               await resourceManagementProps.onFetchNewlyAddedResources();
+              resourceManagementProps.onNewResourcesAdded();
             }
             triggerResourcesHaveChanged();
           }

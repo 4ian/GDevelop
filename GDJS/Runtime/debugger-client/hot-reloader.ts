@@ -220,7 +220,7 @@ namespace gdjs {
           // editor always stays in the initial state.
           this._runtimeGame.setProjectData(newProjectData);
           await this._runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
-            newProjectData.firstLayout,
+            newRuntimeGameStatus.sceneName || newProjectData.firstLayout,
             () => {}
           );
           this._runtimeGame._forceToSwitchToSceneOrVariant(
@@ -277,13 +277,13 @@ namespace gdjs {
       // The editor don't need to hot-reload the current scene because the
       // editor always stays in the initial state.
       this._runtimeGame.setProjectData(newProjectData);
-      await this._runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
-        newProjectData.firstLayout,
-        () => {}
-      );
       const newRuntimeGameStatus =
         this._runtimeGame.getAdditionalOptions().initialRuntimeGameStatus;
       if (newRuntimeGameStatus) {
+        await this._runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+          newRuntimeGameStatus.sceneName || newProjectData.firstLayout,
+          () => {}
+        );
         this._runtimeGame._forceToSwitchToSceneOrVariant(
           newRuntimeGameStatus.editorId || null,
           newRuntimeGameStatus.sceneName,

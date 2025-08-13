@@ -362,6 +362,11 @@ export default class LocalPreviewLauncher extends React.Component<
     console.info(`Preview took ${previewStopTime - previewStartTime}ms`);
   };
 
+  async serializeProjectData(project: gdProject): Promise<string> {
+    const { exporter } = await prepareExporter();
+    return exporter.serializeProjectData(project);
+  }
+
   getPreviewDebuggerServer() {
     return localPreviewDebuggerServer;
   }

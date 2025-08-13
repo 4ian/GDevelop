@@ -64,7 +64,14 @@ class Exporter {
     codeOutputDir = codeOutputDir_;
   }
 
- private:
+  /**
+   * \brief Serialize a project without its events to JSON
+   *
+   * \param project The project to be exported.
+   */
+  gd::String SerializeProjectData(const gd::Project &project);
+
+private:
   gd::AbstractFileSystem&
       fs;  ///< The abstract file system to be used for exportation.
   gd::String lastError;  ///< The last error that occurred.

@@ -177,12 +177,6 @@ namespace gdjs {
 
       const newRuntimeGameOptions: RuntimeGameOptions = gdjs.runtimeGameOptions;
       const newProjectData: ProjectData = gdjs.projectData;
-      console.log(
-        'areEffectsHiddenInEditor',
-        oldProjectData.areEffectsHiddenInEditor,
-        ' --> ',
-        newProjectData.areEffectsHiddenInEditor
-      );
 
       if (gdjs.inAppTutorialMessage) {
         gdjs.inAppTutorialMessage.displayInAppTutorialMessage(

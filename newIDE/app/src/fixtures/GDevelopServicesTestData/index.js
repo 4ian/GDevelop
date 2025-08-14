@@ -372,6 +372,9 @@ export const limitsForNoSubscriptionUser: Limits = {
       themeCustomizationCapabilities: 'NONE',
     },
     versionHistory: { enabled: false },
+    ai: {
+      availablePresets: [],
+    },
   },
   quotas: {
     'cordova-build': {
@@ -427,6 +430,9 @@ export const limitsForSilverUser: Limits = {
       themeCustomizationCapabilities: 'BASIC',
     },
     versionHistory: { enabled: false },
+    ai: {
+      availablePresets: [],
+    },
   },
   quotas: {
     'cordova-build': {
@@ -482,6 +488,9 @@ export const limitsForGoldUser: Limits = {
       themeCustomizationCapabilities: 'BASIC',
     },
     versionHistory: { enabled: false },
+    ai: {
+      availablePresets: [],
+    },
   },
   quotas: {
     'cordova-build': {
@@ -549,6 +558,9 @@ export const limitsForTeacherUser: Limits = {
       themeCustomizationCapabilities: 'BASIC',
     },
     versionHistory: { enabled: true },
+    ai: {
+      availablePresets: [],
+    },
   },
   quotas: {
     'cordova-build': {
@@ -613,6 +625,9 @@ export const limitsForStudentUser: Limits = {
       themeCustomizationCapabilities: 'BASIC',
     },
     versionHistory: { enabled: true },
+    ai: {
+      availablePresets: [],
+    },
   },
   quotas: {
     'cordova-build': {
@@ -668,6 +683,9 @@ export const limitsForStartupUser: Limits = {
       themeCustomizationCapabilities: 'FULL',
     },
     versionHistory: { enabled: true },
+    ai: {
+      availablePresets: [],
+    },
   },
   quotas: {
     'cordova-build': {
@@ -723,6 +741,9 @@ export const limitsReached: Limits = {
       themeCustomizationCapabilities: 'BASIC',
     },
     versionHistory: { enabled: false },
+    ai: {
+      availablePresets: [],
+    },
   },
   quotas: {
     'cordova-build': {
@@ -773,6 +794,9 @@ export const limitsForNoSubscriptionUserWithCredits: Limits = {
       themeCustomizationCapabilities: 'NONE',
     },
     versionHistory: { enabled: false },
+    ai: {
+      availablePresets: [],
+    },
   },
   quotas: {
     'cordova-build': {

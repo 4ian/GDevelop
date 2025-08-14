@@ -1261,7 +1261,6 @@ namespace gdjs {
       editorCamera3D: EditorCameraState | null
     ) {
       let editedInstanceDataList: Array<InstanceData> = [];
-      let editedObjectDataList: Array<ObjectData> = [];
       if (eventsBasedObjectType) {
         const eventsBasedObjectVariantData =
           this.getEventsBasedObjectVariantData(
@@ -1270,7 +1269,6 @@ namespace gdjs {
           );
         if (eventsBasedObjectVariantData) {
           editedInstanceDataList = eventsBasedObjectVariantData.instances;
-          editedObjectDataList = eventsBasedObjectVariantData.objects;
           if (this._inGameEditor) {
             this._inGameEditor.setInnerArea(
               eventsBasedObjectVariantData._initialInnerArea
@@ -1316,12 +1314,6 @@ namespace gdjs {
               this.getExternalLayoutData(externalLayoutName);
             if (externalLayoutData) {
               editedInstanceDataList = externalLayoutData.instances;
-              const sceneAndExtensionsData = this.getSceneAndExtensionsData(
-                externalLayoutData.associatedLayout
-              );
-              if (sceneAndExtensionsData) {
-                editedObjectDataList = sceneAndExtensionsData.sceneData.objects;
-              }
             }
           } else {
             const sceneAndExtensionsData =
@@ -1329,14 +1321,12 @@ namespace gdjs {
             if (sceneAndExtensionsData) {
               editedInstanceDataList =
                 sceneAndExtensionsData.sceneData.instances;
-              editedObjectDataList = sceneAndExtensionsData.sceneData.objects;
             }
           }
         }
       }
       if (this._inGameEditor) {
         this._inGameEditor.setEditedInstanceDataList(editedInstanceDataList);
-        this._inGameEditor.setEditedObjectDataList(editedObjectDataList);
         this._inGameEditor.setEditorId(editorId || '');
         if (editorCamera3D) {
           this._inGameEditor.restoreCameraState(editorCamera3D);

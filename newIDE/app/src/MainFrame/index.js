@@ -1639,18 +1639,23 @@ const MainFrame = (props: Props) => {
     [hotReloadInGameEditorIfNeeded]
   );
 
-  const onNewObjectTypeUsed = React.useCallback(
-    () => {
-      // Ensure the object implementation is exported.
-      hotReloadInGameEditorIfNeeded({
-        hotReload: true,
-        // TODO Only export data when the object type is not the first 3D one used.
-        // This is only necessary the first time Three.js is exported.
-        projectDataOnlyExport: false,
-        shouldReloadResources: false,
-      });
+  const onObjectListsModified = React.useCallback(
+    ({isNewObjectTypeUsed}: {isNewObjectTypeUsed: boolean}) => {
+      if (isNewObjectTypeUsed) {
+        // Ensure the object implementation is exported.
+        hotReloadInGameEditorIfNeeded({
+          hotReload: true,
+          // TODO Only export data when the object type is not the first 3D one used.
+          // This is only necessary the first time Three.js is exported.
+          projectDataOnlyExport: false,
+          shouldReloadResources: false,
+        });
+      }
+      else {
+        hotReloadProjectData();
+      }
     },
-    [hotReloadInGameEditorIfNeeded]
+    [hotReloadInGameEditorIfNeeded, hotReloadProjectData]
   );
 
   const renameLayout = (oldName: string, newName: string) => {
@@ -4222,7 +4227,7 @@ const MainFrame = (props: Props) => {
     onSceneEventsModifiedOutsideEditor: onSceneEventsModifiedOutsideEditor,
     onExtensionInstalled: onExtensionInstalled,
     onEffectAdded: onEffectAdded,
-    onNewObjectTypeUsed: onNewObjectTypeUsed,
+    onObjectListsModified: onObjectListsModified,
     gamesList: gamesList,
     triggerHotReloadInGameEditorIfNeeded: hotReloadInGameEditorIfNeeded,
   };

@@ -212,7 +212,7 @@ export type RenderEditorContainerProps = {|
     variant: gdEventsBasedObjectVariant
   ) => void,
   onEffectAdded: () => void,
-  onNewObjectTypeUsed: () => void,
+  onObjectListsModified: ({ isNewObjectTypeUsed: boolean }) => void,
 |};
 
 export type RenderEditorContainerPropsWithRef = {|

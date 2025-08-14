@@ -185,7 +185,7 @@ type Props = {|
     variant: gdEventsBasedObjectVariant
   ) => void,
   onEffectAdded: () => void,
-  onNewObjectTypeUsed: () => void,
+  onObjectListsModified: ({ isNewObjectTypeUsed: boolean }) => void,
   triggerHotReloadInGameEditorIfNeeded: () => void,
 
   // Preview:
@@ -1155,24 +1155,17 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onObjectsModified = (objects: Array<gdObject>) => {
-    this._hotReloadObjects({ addedOrUpdatedObjects: objects });
+    this._hotReloadObjects({ updatedObjects: objects });
   };
 
   _onSetAsGlobalObject = (object: gdObject) => {
-    this._hotReloadObjects({
-      addedGlobalObjects: [object],
-      removedObjectNames: [object.getName()],
-    });
+    this.props.onObjectListsModified({ isNewObjectTypeUsed: false });
   };
 
   _hotReloadObjects = ({
-    addedGlobalObjects,
-    addedOrUpdatedObjects,
-    removedObjectNames,
+    updatedObjects,
   }: {|
-    addedGlobalObjects?: Array<gdObject>,
-    addedOrUpdatedObjects?: Array<gdObject>,
-    removedObjectNames?: Array<string>,
+    updatedObjects: Array<gdObject>,
   |}) => {
     const { previewDebuggerServer } = this.props;
     if (previewDebuggerServer) {
@@ -1180,18 +1173,9 @@ export default class SceneEditor extends React.Component<Props, State> {
         previewDebuggerServer.sendMessage(debuggerId, {
           command: 'hotReloadObjects',
           payload: {
-            addedGlobalObjects:
-              addedGlobalObjects === undefined
-                ? []
-                : addedGlobalObjects.map(object => serializeToJSObject(object)),
-            addedOrUpdatedObjects:
-              addedOrUpdatedObjects === undefined
-                ? []
-                : addedOrUpdatedObjects.map(object =>
-                    serializeToJSObject(object)
-                  ),
-            removedObjectNames:
-              removedObjectNames === undefined ? [] : removedObjectNames,
+            updatedObjects: updatedObjects.map(object =>
+              serializeToJSObject(object)
+            ),
           },
         });
       });
@@ -1230,7 +1214,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       resourceManagementProps.onResourceUsageChanged();
     } else {
       this._hotReloadObjects({
-        addedOrUpdatedObjects: [objectWithContext.object],
+        updatedObjects: [objectWithContext.object],
       });
     }
   };
@@ -1333,11 +1317,9 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     this._addInstanceForNewObject(object.getName());
 
-    if (isTheFirstOfItsTypeInProject) {
-      this.props.onNewObjectTypeUsed();
-    } else {
-      this._hotReloadObjects({ addedOrUpdatedObjects: [object] });
-    }
+    this.props.onObjectListsModified({
+      isNewObjectTypeUsed: isTheFirstOfItsTypeInProject,
+    });
   };
 
   _onRemoveLayer = (layerName: string, done: boolean => void) => {
@@ -1519,11 +1501,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       }
     });
 
-    this._hotReloadObjects({
-      removedObjectNames: objectsWithContext.map(context =>
-        context.object.getName()
-      ),
-    });
+    this.props.onObjectListsModified({ isNewObjectTypeUsed: false });
 
     // Note: done() actually does the deletion of the objects,
     // so ensure objectsWithContext are not used after this call.
@@ -1647,7 +1625,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
 
     object.setName(newName);
-    this._onObjectsModified([object]);
+    this.props.onObjectListsModified({ isNewObjectTypeUsed: false });
   };
 
   _onRenameObjectFolderOrObjectWithContextFinish = (

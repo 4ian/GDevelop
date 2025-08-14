@@ -177,6 +177,12 @@ namespace gdjs {
 
       const newRuntimeGameOptions: RuntimeGameOptions = gdjs.runtimeGameOptions;
       const newProjectData: ProjectData = gdjs.projectData;
+      console.log(
+        'areEffectsHiddenInEditor',
+        oldProjectData.areEffectsHiddenInEditor,
+        ' --> ',
+        newProjectData.areEffectsHiddenInEditor
+      );
 
       if (gdjs.inAppTutorialMessage) {
         gdjs.inAppTutorialMessage.displayInAppTutorialMessage(
@@ -290,7 +296,9 @@ namespace gdjs {
           newRuntimeGameStatus.injectedExternalLayoutName,
           newRuntimeGameStatus.eventsBasedObjectType,
           newRuntimeGameStatus.eventsBasedObjectVariantName,
-          newRuntimeGameStatus.editorCamera3D || null
+          this._runtimeGame._inGameEditor
+            ? this._runtimeGame._inGameEditor.getCameraState()
+            : null
         );
       }
       this._runtimeGame.pause(wasPaused);

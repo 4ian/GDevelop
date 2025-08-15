@@ -85,6 +85,7 @@ const useOpenInitialDialog = ({
             aiRequestId: null,
             paneIdentifier: 'center',
           });
+          removeRouteArguments(['initial-dialog']);
           break;
         default:
           break;

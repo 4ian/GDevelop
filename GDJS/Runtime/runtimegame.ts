@@ -566,6 +566,16 @@ namespace gdjs {
       if (!eventsBasedObjectData) {
         return null;
       }
+      return gdjs.RuntimeGame._getEventsBasedObjectVariantData(
+        eventsBasedObjectData,
+        variantName
+      );
+    }
+
+    static _getEventsBasedObjectVariantData(
+      eventsBasedObjectData: EventsBasedObjectData,
+      variantName: string
+    ): EventsBasedObjectVariantData {
       if (!eventsBasedObjectData.defaultVariant) {
         eventsBasedObjectData.defaultVariant = {
           ...eventsBasedObjectData,

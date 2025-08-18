@@ -753,6 +753,16 @@ namespace gdjs {
       runtimeScene.setEventsGeneratedCodeFunction(newLayoutData);
     }
 
+    /**
+     * Add the children object data into every custom object data.
+     *
+     * At the runtime, this is done at the object instantiation.
+     * For hot-reloading, it's done before hands to optimize.
+     *
+     * @param projectData The project data
+     * @param objectDatas The object datas to modify
+     * @returns
+     */
     static resolveCustomObjectConfigurations(
       projectData: ProjectData,
       objectDatas: ObjectData[]
@@ -780,8 +790,23 @@ namespace gdjs {
         const customObjectConfiguration = objectData as ObjectData &
           CustomObjectConfiguration;
 
+        // TODO Try to factorize with CustomRuntimeObjectInstanceContainer.loadFrom
+
+        const eventsBasedObjectVariantData =
+          gdjs.RuntimeGame._getEventsBasedObjectVariantData(
+            eventsBasedObjectData,
+            customObjectConfiguration.variant
+          );
+
+        const isForcedToOverrideEventsBasedObjectChildrenConfiguration =
+          !eventsBasedObjectVariantData.name &&
+          eventsBasedObjectVariantData.instances.length == 0;
+
+        // Apply the legacy children configuration overriding if any.
         const mergedChildObjectDataList =
-          customObjectConfiguration.childrenContent
+          customObjectConfiguration.childrenContent &&
+          (!eventsBasedObjectVariantData.name ||
+            isForcedToOverrideEventsBasedObjectChildrenConfiguration)
             ? eventsBasedObjectData.objects.map((objectData) =>
                 customObjectConfiguration.childrenContent
                   ? {
@@ -795,14 +820,16 @@ namespace gdjs {
             : eventsBasedObjectData.objects;
 
         const mergedObjectConfiguration = {
-          ...eventsBasedObjectData,
-          ...objectData,
-          // ObjectData doesn't have an `objects` attribute.
+          // ObjectData doesn't have an `objects` nor `instances` attribute.
           // This is a small optimization to avoid to create an
           // InstanceContainerData for each instance to hot-reload their inner
           // scene (see `_hotReloadRuntimeInstanceContainer` call from
           // `_hotReloadRuntimeSceneInstances`).
+          ...eventsBasedObjectData,
+          ...eventsBasedObjectVariantData,
           objects: mergedChildObjectDataList,
+          // It must be the last one to ensure the object name won't be overridden.
+          ...objectData,
         };
         return mergedObjectConfiguration;
       });
@@ -1013,6 +1040,13 @@ namespace gdjs {
         // When the object is new, the hot-reload call `registerObject`
         // so `_objects` is already updated.
         if (oldObjectData) {
+          // In gdjs.CustomRuntimeObjectInstanceContainer.loadFrom, object can
+          // be registered with a different instance from the ProjectData. This
+          // is only done for children of a custom object with a children overriding.
+          // In the case of the editor, the fake custom object used for editing
+          // variants has no children overriding (see
+          // gdjs.RuntimeGame._createSceneWithCustomObject).
+          // Thus, the oldObjectData is always the one from the ProjectData.
           HotReloader.assignOrDelete(oldObjectData, updatedObjects[index]);
         } else {
           console.warn(
@@ -1572,6 +1606,9 @@ namespace gdjs {
           );
         } else {
           // Reload objects that were created at runtime.
+          // This is a subset of what is done by `_hotReloadRuntimeInstance`.
+          // Since the instance doesn't exist in the editor, it's properties
+          // can't be updated, only the object changes are applied.
 
           // Update variables
           this._hotReloadVariablesContainer(
@@ -1580,6 +1617,7 @@ namespace gdjs {
             runtimeObject.getVariables()
           );
 
+          // Update the content of custom object
           if (runtimeObject instanceof gdjs.CustomRuntimeObject) {
             const childrenInstanceContainer =
               runtimeObject.getChildrenContainer();
@@ -1592,15 +1630,18 @@ namespace gdjs {
               CustomObjectConfiguration &
               InstanceContainerData;
 
-            // Reload the content of custom objects that were created at runtime.
-            this._hotReloadRuntimeInstanceContainer(
-              oldProjectData,
-              newProjectData,
-              oldCustomObjectData,
-              newCustomObjectData,
-              changedRuntimeBehaviors,
-              childrenInstanceContainer
-            );
+            // Variant swapping is handled by `CustomRuntimeObject.updateFromObjectData`.
+            if (newCustomObjectData.variant === oldCustomObjectData.variant) {
+              // Reload the content of custom objects that were created at runtime.
+              this._hotReloadRuntimeInstanceContainer(
+                oldProjectData,
+                newProjectData,
+                oldCustomObjectData,
+                newCustomObjectData,
+                changedRuntimeBehaviors,
+                childrenInstanceContainer
+              );
+            }
           }
         }
       }
@@ -1732,8 +1773,6 @@ namespace gdjs {
         }
       }
       if (runtimeObject instanceof gdjs.CustomRuntimeObject) {
-        const childrenInstanceContainer = runtimeObject.getChildrenContainer();
-
         // The `objects` attribute is already resolved by `resolveCustomObjectConfigurations()`.
         const oldCustomObjectData = oldObjectData as ObjectData &
           CustomObjectConfiguration &
@@ -1742,14 +1781,19 @@ namespace gdjs {
           CustomObjectConfiguration &
           InstanceContainerData;
 
-        this._hotReloadRuntimeInstanceContainer(
-          oldProjectData,
-          newProjectData,
-          oldCustomObjectData,
-          newCustomObjectData,
-          changedRuntimeBehaviors,
-          childrenInstanceContainer
-        );
+        // Variant swapping is handled by `CustomRuntimeObject.updateFromObjectData`.
+        if (newCustomObjectData.variant === oldCustomObjectData.variant) {
+          const childrenInstanceContainer =
+            runtimeObject.getChildrenContainer();
+          this._hotReloadRuntimeInstanceContainer(
+            oldProjectData,
+            newProjectData,
+            oldCustomObjectData,
+            newCustomObjectData,
+            changedRuntimeBehaviors,
+            childrenInstanceContainer
+          );
+        }
       }
 
       // Update variables

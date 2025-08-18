@@ -16,6 +16,7 @@ namespace gdjs {
     _parent: gdjs.RuntimeInstanceContainer;
     /** The object that is built with the instances of this container. */
     _customObject: gdjs.CustomRuntimeObject;
+    // TODO Remove this attribute
     _isLoaded: boolean = false;
     /**
      * The default size defined by users in the custom object initial instances editor.
@@ -46,13 +47,26 @@ namespace gdjs {
       this._debuggerRenderer = new gdjs.DebuggerRenderer(this);
     }
 
+    // TODO `_layers` and `_orderedLayers` should not be used directly.
+
     addLayer(layerData: LayerData) {
       if (this._layers.containsKey(layerData.name)) {
         return;
       }
+      // This code is duplicated with `RuntimeScene.addLayer` because it avoids
+      // to expose a method to build a layer.
       const layer = new gdjs.RuntimeCustomObjectLayer(layerData, this);
       this._layers.put(layerData.name, layer);
       this._orderedLayers.push(layer);
+    }
+
+    _unloadContent() {
+      this.onDeletedFromScene(this._parent);
+      // At this point, layer renderers are already removed by
+      // `CustomRuntimeObject._reinitializeRenderer`.
+      // It's not great to do this here, but it allows to keep it private.
+      this._layers.clear();
+      this._orderedLayers.length = 0;
     }
 
     createObject(objectName: string): gdjs.RuntimeObject | null {
@@ -70,10 +84,6 @@ namespace gdjs {
       customObjectData: ObjectData & CustomObjectConfiguration,
       eventsBasedObjectVariantData: EventsBasedObjectVariantData
     ) {
-      if (this._isLoaded) {
-        this.onDeletedFromScene(this._parent);
-      }
-
       const isForcedToOverrideEventsBasedObjectChildrenConfiguration =
         !eventsBasedObjectVariantData.name &&
         eventsBasedObjectVariantData.instances.length == 0;

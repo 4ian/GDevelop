@@ -152,13 +152,20 @@ namespace gdjs {
     override reinitialize(objectData: ObjectData & CustomObjectConfiguration) {
       super.reinitialize(objectData);
 
-      this._reinitializeRenderer();
-      this._initializeFromObjectData(objectData);
+      this._reinitializeContentFromObjectData(objectData);
 
       // When changing the variant, the instance is like a new instance.
       // We call again `onCreated` at the end, like done by the constructor
       // the first time it's created.
       this.onCreated();
+    }
+
+    private _reinitializeContentFromObjectData(
+      objectData: ObjectData & CustomObjectConfiguration
+    ) {
+      this._reinitializeRenderer();
+      this._instanceContainer._unloadContent();
+      this._initializeFromObjectData(objectData);
     }
 
     override updateFromObjectData(
@@ -188,8 +195,7 @@ namespace gdjs {
             this._instanceContainer._initialInnerArea.max[1] !==
               this._innerArea.max[1]);
 
-        this._reinitializeRenderer();
-        this._initializeFromObjectData(newObjectData);
+        this._reinitializeContentFromObjectData(newObjectData);
 
         // The generated code calls the onCreated super implementation at the end.
         this.onCreated();

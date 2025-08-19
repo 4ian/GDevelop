@@ -1,6 +1,6 @@
 describe('gdjs.Force', function() {
-	it('benchmark setting angle and length', function(){
-		this.timeout(20000);
+        it('benchmark setting angle and length', function(){
+                vi.setTimeout(20000);
         var layer = new gdjs.Force();
         
         const benchmarkSuite = makeBenchmarkSuite();

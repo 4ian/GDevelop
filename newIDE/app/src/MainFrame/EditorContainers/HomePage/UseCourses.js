@@ -158,15 +158,18 @@ const useCourses = () => {
     limits.capabilities.classrooms.hidePremiumProducts;
 
   const fetchCourses = React.useCallback(
-    async (): Promise<Array<Course>> => {
-      const fetchedCourses = await listCourses(getAuthorizationHeader, {
-        userId,
-      });
-      const displayedCourses = fetchedCourses.filter(
-        course => !hidePremiumProducts || !course.isLocked
-      );
-      setCourses(displayedCourses);
-      return displayedCourses;
+    async (): Promise<void> => {
+      try {
+        const fetchedCourses = await listCourses(getAuthorizationHeader, {
+          userId,
+        });
+        const displayedCourses = fetchedCourses.filter(
+          course => !hidePremiumProducts || !course.isLocked
+        );
+        setCourses(displayedCourses);
+      } catch (error) {
+        console.error('Error while loading courses:', error);
+      }
     },
     [userId, getAuthorizationHeader, hidePremiumProducts]
   );

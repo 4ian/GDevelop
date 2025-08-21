@@ -493,7 +493,8 @@ class ExporterHelper {
    * \param project The project to be exported.
    */
   static gd::String SerializeProjectData(gd::AbstractFileSystem &fs,
-                                         const gd::Project &project);
+                                         const gd::Project &project,
+                                         const PreviewExportOptions &options);
 
   /**
    * \brief Serialize the content of the extra configuration to store

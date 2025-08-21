@@ -3,8 +3,7 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef RESOURCESMERGINGHELPER_H
-#define RESOURCESMERGINGHELPER_H
+#pragma once
 
 #include <map>
 #include <memory>
@@ -59,6 +58,15 @@ public:
   };
 
   /**
+   * \brief Set if the absolute filenames of original files must be used for
+   * any resource.
+   */
+  void SetShouldUseOriginalAbsoluteFilenames(
+      bool shouldUseOriginalAbsoluteFilenames_ = true) {
+    shouldUseOriginalAbsoluteFilenames = shouldUseOriginalAbsoluteFilenames_;
+  };
+
+  /**
    * \brief Return a map containing the resources old absolute filename as key,
    * and the resources new filenames as value. The new filenames are relative to
    * the Base Directory.
@@ -93,10 +101,13 @@ public:
                                    ///< absolute (C:\MyFile.png  will not be
                                    ///< transformed into a relative filename
                                    ///< (MyFile.png).
+  /**
+   * Set to true if the absolute filenames of original files must be used for
+   * any resource.
+   */
+  bool shouldUseOriginalAbsoluteFilenames = false;
   gd::AbstractFileSystem&
       fs;  ///< The gd::AbstractFileSystem used to manipulate files.
 };
 
 }  // namespace gd
-
-#endif  // RESOURCESMERGINGHELPER_H

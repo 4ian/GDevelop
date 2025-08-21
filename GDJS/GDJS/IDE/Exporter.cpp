@@ -201,8 +201,9 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
   return true;
 }
 
-gd::String Exporter::SerializeProjectData(const gd::Project &project) {
-  return ExporterHelper::SerializeProjectData(fs, project);
+gd::String Exporter::SerializeProjectData(const gd::Project &project,
+                                          const PreviewExportOptions &options) {
+  return ExporterHelper::SerializeProjectData(fs, project, options);
 }
 
 gd::String

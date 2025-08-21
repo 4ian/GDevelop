@@ -4,7 +4,7 @@ declare class gdjsExporter {
   setCodeOutputDirectory(path: string): void;
   exportProjectForPixiPreview(options: gdPreviewExportOptions): boolean;
   exportWholePixiProject(options: gdExportOptions): boolean;
-  serializeProjectData(project: gdProject): string;
+  serializeProjectData(project: gdProject, options: gdPreviewExportOptions): string;
   serializeRuntimeGameOptions(options: gdPreviewExportOptions): string;
   getLastError(): string;
   delete(): void;

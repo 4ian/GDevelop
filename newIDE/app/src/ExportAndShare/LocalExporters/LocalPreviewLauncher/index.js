@@ -343,7 +343,10 @@ export default class LocalPreviewLauncher extends React.Component<
     exporter.exportProjectForPixiPreview(previewExportOptions);
 
     if (shouldHotReload) {
-      const serializedProjectData = exporter.serializeProjectData(project);
+      const serializedProjectData = exporter.serializeProjectData(
+        project,
+        previewExportOptions
+      );
       const projectData = JSON.parse(serializedProjectData);
       const serializedRuntimeGameOptions = exporter.serializeRuntimeGameOptions(
         previewExportOptions

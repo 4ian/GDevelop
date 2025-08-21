@@ -4055,8 +4055,11 @@ interface Exporter {
 
     boolean ExportProjectForPixiPreview([Const, Ref] PreviewExportOptions options);
     boolean ExportWholePixiProject([Const, Ref] ExportOptions options);
-    [Const, Value] DOMString SerializeProjectData([Const, Ref] Project project);
-    [Const, Value] DOMString SerializeRuntimeGameOptions([Const, Ref] PreviewExportOptions options);
+    [Const, Value] DOMString SerializeProjectData(
+        [Const, Ref] Project project,
+        [Const, Ref] PreviewExportOptions options);
+    [Const, Value] DOMString SerializeRuntimeGameOptions(
+        [Const, Ref] PreviewExportOptions options);
 
     [Const, Ref] DOMString GetLastError();
 };

@@ -67,9 +67,11 @@ class Exporter {
   /**
    * \brief Serialize a project without its events to JSON
    *
-   * \param project The project to be exported.
+   * \param project The project to be exported
+   * \param options The content of the extra configuration
    */
-  gd::String SerializeProjectData(const gd::Project &project);
+  gd::String SerializeProjectData(const gd::Project &project,
+                                  const PreviewExportOptions &options);
 
   /**
    * \brief Serialize the content of the extra configuration to store

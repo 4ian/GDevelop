@@ -108,6 +108,13 @@ ExporterHelper::ExporterHelper(gd::AbstractFileSystem &fileSystem,
 
 bool ExporterHelper::ExportProjectForPixiPreview(
     const PreviewExportOptions &options) {
+
+  if (options.isInGameEdition && !options.shouldReloadProjectData &&
+      !options.shouldReloadLibraries && !options.shouldGenerateEventsCode) {
+    gd::LogStatus("Skip project export entirely");
+    return "";
+  }
+
   double previousTime = GetTimeNow();
   fs.MkDir(options.exportPath);
   if (options.shouldClearExportFolder) {
@@ -119,42 +126,38 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   // TODO Try to remove side effects to avoid the copy
   // that destroys the AST in cache.
   gd::Project exportedProject = options.project;
-  const gd::Project &immutableProject = exportedProject;
+  const gd::Project &immutableProject = options.project;
+  previousTime = LogTimeSpent("Project cloning", previousTime);
 
-  if (options.fullLoadingScreen) {
-    // Use project properties fallback to set empty properties
-    if (exportedProject.GetAuthorIds().empty() &&
-        !options.fallbackAuthorId.empty()) {
-      exportedProject.GetAuthorIds().push_back(options.fallbackAuthorId);
+  if (options.isInGameEdition) {
+    if (options.shouldReloadProjectData || options.shouldGenerateEventsCode) {
+      auto projectDirectory = fs.DirNameFrom(exportedProject.GetProjectFile());
+      gd::ResourcesMergingHelper resourcesMergingHelper(
+          exportedProject.GetResourcesManager(), fs);
+      resourcesMergingHelper.SetBaseDirectory(projectDirectory);
+      resourcesMergingHelper.SetShouldUseOriginalAbsoluteFilenames();
+      gd::ResourceExposer::ExposeWholeProjectResources(exportedProject,
+                                                        resourcesMergingHelper);
+
+      previousTime = LogTimeSpent("Resource path resolving", previousTime);
     }
-    if (exportedProject.GetAuthorUsernames().empty() &&
-        !options.fallbackAuthorUsername.empty()) {
-      exportedProject.GetAuthorUsernames().push_back(
-          options.fallbackAuthorUsername);
-    }
+    gd::LogStatus("Resource export is skipped");
   } else {
-    // Most of the time, we skip the logo and minimum duration so that
-    // the preview start as soon as possible.
-    exportedProject.GetLoadingScreen()
-        .ShowGDevelopLogoDuringLoadingScreen(false)
-        .SetMinDuration(0);
-    exportedProject.GetWatermark().ShowGDevelopWatermark(false);
+    // Export resources (*before* generating events as some resources filenames
+    // may be updated)
+    ExportResources(fs, exportedProject, options.exportPath);
+
+    previousTime = LogTimeSpent("Resource export", previousTime);
   }
 
-  // TODO Avoid to copy resources for the InGameEditor
-
-  // Export resources (*before* generating events as some resources filenames
-  // may be updated)
-  ExportResources(fs, exportedProject, options.exportPath);
-
-  // Compatibility with GD <= 5.0-beta56
-  // Stay compatible with text objects declaring their font as just a filename
-  // without a font resource - by manually adding these resources.
-  AddDeprecatedFontFilesToFontResources(
-      fs, exportedProject.GetResourcesManager(), options.exportPath);
-  // end of compatibility code
-
-  previousTime = LogTimeSpent("Resource export", previousTime);
+  if (options.shouldReloadProjectData || options.shouldGenerateEventsCode) {
+    // Compatibility with GD <= 5.0-beta56
+    // Stay compatible with text objects declaring their font as just a filename
+    // without a font resource - by manually adding these resources.
+    AddDeprecatedFontFilesToFontResources(
+        fs, exportedProject.GetResourcesManager(), options.exportPath);
+    // end of compatibility code
+  }
 
   std::vector<gd::SourceFileMetadata> noUsedSourceFiles;
   std::vector<gd::SourceFileMetadata> &usedSourceFiles = noUsedSourceFiles;
@@ -218,7 +221,27 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   }
 
   if (options.shouldReloadProjectData) {
-    // Export the project
+    
+    if (options.fullLoadingScreen) {
+      // Use project properties fallback to set empty properties
+      if (exportedProject.GetAuthorIds().empty() &&
+          !options.fallbackAuthorId.empty()) {
+        exportedProject.GetAuthorIds().push_back(options.fallbackAuthorId);
+      }
+      if (exportedProject.GetAuthorUsernames().empty() &&
+          !options.fallbackAuthorUsername.empty()) {
+        exportedProject.GetAuthorUsernames().push_back(
+            options.fallbackAuthorUsername);
+      }
+    } else {
+      // Most of the time, we skip the logo and minimum duration so that
+      // the preview start as soon as possible.
+      exportedProject.GetLoadingScreen()
+          .ShowGDevelopLogoDuringLoadingScreen(false)
+          .SetMinDuration(0);
+      exportedProject.GetWatermark().ShowGDevelopWatermark(false);
+    }
+
     gd::String serializedRuntimeGameOptions =
         ExporterHelper::SerializeRuntimeGameOptions(fs, gdjsRoot, options,
                                                     includesFiles);
@@ -411,7 +434,10 @@ gd::String ExporterHelper::SerializeRuntimeGameOptions(
   return gd::Serializer::ToJSON(runtimeGameOptions);
 }
 
-gd::String ExporterHelper::SerializeProjectData(gd::AbstractFileSystem &fs, const gd::Project &project) {
+gd::String
+ExporterHelper::SerializeProjectData(gd::AbstractFileSystem &fs,
+                                     const gd::Project &project,
+                                     const PreviewExportOptions &options) {
   gd::Project clonedProject = project;
 
   // Replace all resource file paths with the one used in exported projects.
@@ -419,8 +445,12 @@ gd::String ExporterHelper::SerializeProjectData(gd::AbstractFileSystem &fs, cons
   gd::ResourcesMergingHelper resourcesMergingHelper(
       clonedProject.GetResourcesManager(), fs);
   resourcesMergingHelper.SetBaseDirectory(projectDirectory);
-  resourcesMergingHelper.PreserveDirectoriesStructure(false);
-  resourcesMergingHelper.PreserveAbsoluteFilenames(false);
+  if (options.isInGameEdition) {
+    resourcesMergingHelper.SetShouldUseOriginalAbsoluteFilenames();
+  } else {
+    resourcesMergingHelper.PreserveDirectoriesStructure(false);
+    resourcesMergingHelper.PreserveAbsoluteFilenames(false);
+  }
   gd::ResourceExposer::ExposeWholeProjectResources(clonedProject,
                                                     resourcesMergingHelper);
 

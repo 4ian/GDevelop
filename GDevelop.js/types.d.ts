@@ -2976,7 +2976,10 @@ export class PreviewExportOptions extends EmscriptenObject {
   setEventsBasedObjectType(eventsBasedObjectType: string): PreviewExportOptions;
   setEventsBasedObjectVariantName(eventsBasedObjectVariantName: string): PreviewExportOptions;
   setIncludeFileHash(includeFile: string, hash: number): PreviewExportOptions;
-  setProjectDataOnlyExport(enable: boolean): PreviewExportOptions;
+  setShouldClearExportFolder(enable: boolean): PreviewExportOptions;
+  setShouldReloadProjectData(enable: boolean): PreviewExportOptions;
+  setShouldReloadLibraries(enable: boolean): PreviewExportOptions;
+  setShouldGenerateEventsCode(enable: boolean): PreviewExportOptions;
   setNativeMobileApp(enable: boolean): PreviewExportOptions;
   setFullLoadingScreen(enable: boolean): PreviewExportOptions;
   setIsDevelopmentEnvironment(enable: boolean): PreviewExportOptions;
@@ -3007,6 +3010,7 @@ export class Exporter extends EmscriptenObject {
   exportProjectForPixiPreview(options: PreviewExportOptions): boolean;
   exportWholePixiProject(options: ExportOptions): boolean;
   serializeProjectData(project: Project): string;
+  serializeRuntimeGameOptions(options: PreviewExportOptions): string;
   getLastError(): string;
 }
 

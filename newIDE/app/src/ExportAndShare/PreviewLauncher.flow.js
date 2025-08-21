@@ -12,7 +12,9 @@ export type LaunchCaptureOptions = {|
 export type LaunchPreviewOptions = {
   networkPreview?: boolean,
   hotReload?: boolean,
-  projectDataOnlyExport?: boolean,
+  shouldReloadProjectData?: boolean,
+  shouldReloadLibraries?: boolean,
+  shouldGenerateEventsCode?: boolean,
   shouldReloadResources?: boolean,
   fullLoadingScreen?: boolean,
   forceDiagnosticReport?: boolean,
@@ -43,7 +45,9 @@ export type PreviewOptions = {|
   eventsBasedObjectVariantName: string | null,
   networkPreview: boolean,
   hotReload: boolean,
-  projectDataOnlyExport: boolean,
+  shouldReloadProjectData: boolean,
+  shouldReloadLibraries: boolean,
+  shouldGenerateEventsCode: boolean,
   shouldReloadResources: boolean,
   fullLoadingScreen: boolean,
   fallbackAuthor: ?{ id: string, username: string },
@@ -138,7 +142,6 @@ export type PreviewLauncherInterface = {
   canDoHotReload: () => boolean,
   +closePreview?: (windowId: number) => void,
   +getPreviewDebuggerServer: () => ?PreviewDebuggerServer,
-  +serializeProjectData: (project: gdProject) => Promise<string>,
 };
 
 /**

@@ -101,8 +101,11 @@ namespace gdjs {
 
     /** Script files, used for hot-reloading. */
     scriptFiles?: Array<RuntimeGameOptionsScriptFile>;
-    /** if true, export is a partial preview without events. */
-    projectDataOnlyExport?: boolean;
+    /** if true, export is a partial preview without reloading libraries. */
+    shouldReloadLibraries?: boolean;
+    /** if true, export is a partial preview without generating events. */
+    shouldGenerateEventsCode?: boolean;
+
     /** if true, preview is launched from GDevelop native mobile app. */
     nativeMobileApp?: boolean;
     /** The address of the debugger server, to reach out using WebSocket. */

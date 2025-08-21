@@ -43,7 +43,10 @@ import useCourses from './UseCourses';
 import PreferencesContext from '../../Preferences/PreferencesContext';
 import useSubscriptionPlans from '../../../Utils/UseSubscriptionPlans';
 import { BundleStoreContext } from '../../../AssetStore/Bundles/BundleStoreContext';
-import { setEditorHotReloadNeeded } from '../../../EmbeddedGame/EmbeddedGameFrame';
+import {
+  setEditorHotReloadNeeded,
+  type HotReloadSteps,
+} from '../../../EmbeddedGame/EmbeddedGameFrame';
 
 const noop = () => {};
 
@@ -183,11 +186,7 @@ export type HomePageEditorInterface = {|
   onSceneEventsModifiedOutsideEditor: (
     scene: SceneEventsOutsideEditorChanges
   ) => void,
-  hotReloadInGameEditorIfNeeded: ({|
-    hotReload: boolean,
-    projectDataOnlyExport: boolean,
-    shouldReloadResources: boolean,
-  |}) => void,
+  hotReloadInGameEditorIfNeeded: (hotReloadSteps: HotReloadSteps) => void,
   switchInGameEditorIfNoHotReloadIsNeeded: () => void,
 |};
 
@@ -472,26 +471,6 @@ export const HomePage = React.memo<Props>(
         [updateToolbar, activeTab, setGamesPlatformFrameShown, isMobile]
       );
 
-      const hotReloadInGameEditorIfNeeded = React.useCallback(
-        ({
-          hotReload,
-          projectDataOnlyExport,
-          shouldReloadResources,
-        }: {|
-          hotReload: boolean,
-          projectDataOnlyExport: boolean,
-          shouldReloadResources: boolean,
-        |}) => {
-          if (hotReload) {
-            setEditorHotReloadNeeded({
-              projectDataOnlyExport,
-              shouldReloadResources,
-            });
-          }
-        },
-        []
-      );
-
       React.useImperativeHandle(ref, () => ({
         getProject,
         updateToolbar,
@@ -500,7 +479,7 @@ export const HomePage = React.memo<Props>(
         onSceneObjectEdited: noop,
         onSceneObjectsDeleted: noop,
         onSceneEventsModifiedOutsideEditor: noop,
-        hotReloadInGameEditorIfNeeded,
+        hotReloadInGameEditorIfNeeded: setEditorHotReloadNeeded,
         switchInGameEditorIfNoHotReloadIsNeeded: noop,
       }));
 

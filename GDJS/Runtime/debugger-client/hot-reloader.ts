@@ -146,8 +146,12 @@ namespace gdjs {
 
     async hotReload({
       shouldReloadResources,
+      projectData: newProjectData,
+      runtimeGameOptions: newRuntimeGameOptions,
     }: {
       shouldReloadResources: boolean;
+      projectData: ProjectData;
+      runtimeGameOptions: RuntimeGameOptions;
     }): Promise<HotReloaderLog[]> {
       logger.info('Hot reload started');
       const wasPaused = this._runtimeGame.isPaused();
@@ -156,11 +160,14 @@ namespace gdjs {
 
       // Save old data of the project, to be used to compute
       // the difference between the old and new project data:
-
       const oldProjectData: ProjectData = gdjs.projectData;
+      gdjs.projectData = newProjectData;
 
-      const oldScriptFiles = gdjs.runtimeGameOptions
-        .scriptFiles as RuntimeGameOptionsScriptFile[];
+      const oldRuntimeGameOptions = gdjs.runtimeGameOptions;
+      gdjs.runtimeGameOptions = newRuntimeGameOptions;
+
+      const oldScriptFiles =
+        oldRuntimeGameOptions.scriptFiles as RuntimeGameOptionsScriptFile[];
 
       oldScriptFiles.forEach((scriptFile) => {
         this._alreadyLoadedScriptFiles[scriptFile.path] = true;
@@ -172,12 +179,6 @@ namespace gdjs {
           gdjs.behaviorsTypes.items[behaviorTypeName];
       }
 
-      // Reload projectData and runtimeGameOptions stored by convention in data.js:
-      await this._reloadScript('data.js');
-
-      const newRuntimeGameOptions: RuntimeGameOptions = gdjs.runtimeGameOptions;
-      const newProjectData: ProjectData = gdjs.projectData;
-
       if (gdjs.inAppTutorialMessage) {
         gdjs.inAppTutorialMessage.displayInAppTutorialMessage(
           this._runtimeGame,
@@ -188,23 +189,26 @@ namespace gdjs {
 
       const newScriptFiles =
         newRuntimeGameOptions.scriptFiles as RuntimeGameOptionsScriptFile[];
-      const projectDataOnlyExport =
-        !!newRuntimeGameOptions.projectDataOnlyExport;
+      const shouldGenerateEventsCode =
+        !!newRuntimeGameOptions.shouldGenerateEventsCode;
+      const shouldReloadLibraries =
+        !!newRuntimeGameOptions.shouldReloadLibraries;
 
       // Reload the changed scripts, which will have the side effects of re-running
       // the new scripts, potentially replacing the code of the free functions from
       // extensions (which is fine) and registering updated behaviors (which will
       // need to be re-instantiated in runtime objects).
       try {
-        await this.reloadScriptFiles(
-          newProjectData,
-          oldScriptFiles,
-          newScriptFiles,
-          projectDataOnlyExport
-        );
+        if (shouldReloadLibraries) {
+          await this.reloadScriptFiles(
+            newProjectData,
+            oldScriptFiles,
+            newScriptFiles,
+            shouldGenerateEventsCode
+          );
+        }
         const newRuntimeGameStatus =
           newRuntimeGameOptions.initialRuntimeGameStatus;
-
         if (
           newRuntimeGameStatus &&
           newRuntimeGameStatus.editorId &&
@@ -340,12 +344,12 @@ namespace gdjs {
       newProjectData: ProjectData,
       oldScriptFiles: RuntimeGameOptionsScriptFile[],
       newScriptFiles: RuntimeGameOptionsScriptFile[],
-      projectDataOnlyExport: boolean
+      shouldGenerateEventsCode: boolean
     ): Promise<void[]> {
       const reloadPromises: Array<Promise<void>> = [];
 
       // Reload events, only if they were exported.
-      if (!projectDataOnlyExport) {
+      if (!shouldGenerateEventsCode) {
         newProjectData.layouts.forEach((_layoutData, index) => {
           reloadPromises.push(this._reloadScript('code' + index + '.js'));
         });
@@ -385,7 +389,7 @@ namespace gdjs {
         )[0];
 
         // A file may be removed because of a partial preview.
-        if (!newScriptFile && !projectDataOnlyExport) {
+        if (!newScriptFile && !shouldGenerateEventsCode) {
           this._logs.push({
             kind: 'warning',
             message: 'Script file ' + oldScriptFile.path + ' was removed.',

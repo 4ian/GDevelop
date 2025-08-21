@@ -4012,7 +4012,10 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetEventsBasedObjectType([Const] DOMString eventsBasedObjectType);
     [Ref] PreviewExportOptions SetEventsBasedObjectVariantName([Const] DOMString eventsBasedObjectVariantName);
     [Ref] PreviewExportOptions SetIncludeFileHash([Const] DOMString includeFile, long hash);
-    [Ref] PreviewExportOptions SetProjectDataOnlyExport(boolean enable);
+    [Ref] PreviewExportOptions SetShouldClearExportFolder(boolean enable);
+    [Ref] PreviewExportOptions SetShouldReloadProjectData(boolean enable);
+    [Ref] PreviewExportOptions SetShouldReloadLibraries(boolean enable);
+    [Ref] PreviewExportOptions SetShouldGenerateEventsCode(boolean enable);
     [Ref] PreviewExportOptions SetNativeMobileApp(boolean enable);
     [Ref] PreviewExportOptions SetFullLoadingScreen(boolean enable);
     [Ref] PreviewExportOptions SetIsDevelopmentEnvironment(boolean enable);
@@ -4053,6 +4056,7 @@ interface Exporter {
     boolean ExportProjectForPixiPreview([Const, Ref] PreviewExportOptions options);
     boolean ExportWholePixiProject([Const, Ref] ExportOptions options);
     [Const, Value] DOMString SerializeProjectData([Const, Ref] Project project);
+    [Const, Value] DOMString SerializeRuntimeGameOptions([Const, Ref] PreviewExportOptions options);
 
     [Const, Ref] DOMString GetLastError();
 };

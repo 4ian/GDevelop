@@ -10,7 +10,7 @@ type AttachToPreviewOptions = {|
   previewIndexHtmlLocation: string,
 |};
 
-type PreviewInGameEditorTarget = {|
+export type PreviewInGameEditorTarget = {|
   editorId: string,
   sceneName: string | null,
   externalLayoutName: string | null,
@@ -18,11 +18,48 @@ type PreviewInGameEditorTarget = {|
   eventsBasedObjectVariantName: string | null,
 |};
 
+export type HotReloadSteps = {|
+  /**
+   * Set to `true` when the `ProjectData` must be reloaded.
+   */
+  shouldReloadProjectData: boolean,
+  /**
+   * Set to `true` when GDJS libraries must be reloaded.
+   */
+  shouldReloadLibraries: boolean,
+  /**
+   * Set to `true` when code must be generated for events.
+   */
+  shouldGenerateEventsCode: boolean,
+  /**
+   * Set to `true` when the resources must be reloaded in memory.
+   */
+  shouldReloadResources: boolean,
+|};
+
+const mergeNeededHotReloadSteps = (
+  stepsA: HotReloadSteps,
+  stepsB: HotReloadSteps
+): HotReloadSteps => ({
+  shouldReloadProjectData:
+    stepsA.shouldReloadProjectData || stepsB.shouldReloadProjectData,
+  shouldReloadLibraries:
+    stepsA.shouldReloadLibraries || stepsB.shouldReloadLibraries,
+  shouldGenerateEventsCode:
+    stepsA.shouldGenerateEventsCode || stepsB.shouldGenerateEventsCode,
+  shouldReloadResources:
+    stepsA.shouldReloadResources || stepsB.shouldReloadResources,
+});
+
+const isHotReloadNeeded = (hotReloadSteps: HotReloadSteps): boolean =>
+  hotReloadSteps.shouldReloadProjectData ||
+  hotReloadSteps.shouldReloadLibraries ||
+  hotReloadSteps.shouldGenerateEventsCode ||
+  hotReloadSteps.shouldReloadResources;
+
 type SwitchToSceneEditionOptions = {|
   ...PreviewInGameEditorTarget,
-  hotReload: boolean,
-  projectDataOnlyExport: boolean,
-  shouldReloadResources: boolean,
+  ...HotReloadSteps,
 |};
 
 export type EditorCameraState = {|
@@ -39,10 +76,7 @@ let onAttachToPreview: null | (AttachToPreviewOptions => void) = null;
 let onSwitchToSceneEdition: null | (SwitchToSceneEditionOptions => void) = null;
 let onSetEditorHotReloadNeeded:
   | null
-  | (({|
-      projectDataOnlyExport: boolean,
-      shouldReloadResources: boolean,
-    |}) => void) = null;
+  | ((hotReloadSteps: HotReloadSteps) => void) = null;
 let onIsEditorHotReloadNeeded: null | (() => boolean) = null;
 let onSwitchInGameEditorIfNoHotReloadIsNeeded:
   | null
@@ -65,13 +99,10 @@ export const switchToSceneEdition = (options: SwitchToSceneEditionOptions) => {
   onSwitchToSceneEdition(options);
 };
 
-export const setEditorHotReloadNeeded = (hotReloadProps: {|
-  projectDataOnlyExport: boolean,
-  shouldReloadResources: boolean,
-|}) => {
+export const setEditorHotReloadNeeded = (hotReloadSteps: HotReloadSteps) => {
   if (!onSetEditorHotReloadNeeded)
     throw new Error('No EmbeddedGameFrame registered.');
-  onSetEditorHotReloadNeeded(hotReloadProps);
+  onSetEditorHotReloadNeeded(hotReloadSteps);
 };
 
 export const isEditorHotReloadNeeded = (): boolean => {
@@ -120,27 +151,24 @@ const logSwitchingInfo = ({
   );
 };
 
-type ContainerIdentifier = {|
-  editorId: string,
-  sceneName: string | null,
-  externalLayoutName: string | null,
-  eventsBasedObjectType: string | null,
-  eventsBasedObjectVariantName: string | null,
-|};
-
 type Props = {|
   previewDebuggerServer: PreviewDebuggerServer | null,
   enabled: boolean,
   onLaunchPreviewForInGameEdition: ({|
-    ...ContainerIdentifier,
-    hotReload: boolean,
-    projectDataOnlyExport: boolean,
-    shouldReloadResources: boolean,
+    ...PreviewInGameEditorTarget,
+    ...HotReloadSteps,
     editorCameraState3D: EditorCameraState | null,
   |}) => Promise<void>,
 |};
 
 const DropTarget = makeDropTarget<{||}>(objectWithContextReactDndType);
+
+const noHotReloadSteps = {
+  shouldReloadProjectData: false,
+  shouldReloadLibraries: false,
+  shouldGenerateEventsCode: false,
+  shouldReloadResources: false,
+};
 
 export const EmbeddedGameFrame = ({
   previewDebuggerServer,
@@ -156,10 +184,10 @@ export const EmbeddedGameFrame = ({
     setIsPointerEventsPrevented,
   ] = React.useState(false);
   const iframeRef = React.useRef<HTMLIFrameElement | null>(null);
-  const neededHotReload = React.useRef<
-    'None' | 'Data' | 'DataAndResources' | 'Full'
-  >('None');
-  const lastPreviewContainer = React.useRef<ContainerIdentifier | null>(null);
+  const hotReloadSteps = React.useRef<HotReloadSteps>(noHotReloadSteps);
+  const lastPreviewContainer = React.useRef<PreviewInGameEditorTarget | null>(
+    null
+  );
   const isPreviewOngoing = React.useRef<boolean>(false);
   const cameraStates = React.useRef<Map<string, EditorCameraState>>(
     new Map<string, EditorCameraState>()
@@ -177,28 +205,14 @@ export const EmbeddedGameFrame = ({
       onPreventGameFramePointerEvents = (enabled: boolean) => {
         setIsPointerEventsPrevented(enabled);
       };
-      onSetEditorHotReloadNeeded = ({
-        projectDataOnlyExport,
-        shouldReloadResources,
-      }: {|
-        projectDataOnlyExport: boolean,
-        shouldReloadResources: boolean,
-      |}) => {
-        if (projectDataOnlyExport) {
-          if (neededHotReload.current === 'None') {
-            neededHotReload.current = 'Data';
-          }
-        } else {
-          neededHotReload.current = 'Full';
-        }
-        if (shouldReloadResources) {
-          if (neededHotReload.current !== 'Full') {
-            neededHotReload.current = 'DataAndResources';
-          }
-        }
+      onSetEditorHotReloadNeeded = (addedHotReloadSteps: HotReloadSteps) => {
+        hotReloadSteps.current = mergeNeededHotReloadSteps(
+          hotReloadSteps.current,
+          addedHotReloadSteps
+        );
       };
       onIsEditorHotReloadNeeded = (): boolean => {
-        return neededHotReload.current !== 'None';
+        return isHotReloadNeeded(hotReloadSteps.current);
       };
       onSetCameraState = (editorId: string, cameraState: EditorCameraState) => {
         cameraStates.current.set(editorId, cameraState);
@@ -213,9 +227,6 @@ export const EmbeddedGameFrame = ({
           externalLayoutName,
           eventsBasedObjectType,
           eventsBasedObjectVariantName,
-          hotReload,
-          projectDataOnlyExport,
-          shouldReloadResources,
         } = options;
 
         lastPreviewContainer.current = {
@@ -226,18 +237,39 @@ export const EmbeddedGameFrame = ({
           eventsBasedObjectVariantName,
         };
         if (isPreviewOngoing.current) {
-          if (hotReload) {
-            setEditorHotReloadNeeded({
-              projectDataOnlyExport,
-              shouldReloadResources,
-            });
-          }
+          const {
+            shouldReloadProjectData,
+            shouldReloadLibraries,
+            shouldGenerateEventsCode,
+            shouldReloadResources,
+          } = options;
+          setEditorHotReloadNeeded({
+            shouldReloadProjectData,
+            shouldReloadLibraries,
+            shouldGenerateEventsCode,
+            shouldReloadResources,
+          });
           return;
         }
 
-        const mergedShouldHotReload =
-          hotReload || neededHotReload.current !== 'None';
-        if (!previewIndexHtmlLocation || mergedShouldHotReload) {
+        const {
+          shouldReloadProjectData,
+          shouldReloadLibraries,
+          shouldGenerateEventsCode,
+          shouldReloadResources,
+        } = mergeNeededHotReloadSteps(hotReloadSteps.current, {
+          shouldReloadProjectData: options.shouldReloadProjectData,
+          shouldReloadLibraries: options.shouldReloadLibraries,
+          shouldGenerateEventsCode: options.shouldGenerateEventsCode,
+          shouldReloadResources: options.shouldReloadResources,
+        });
+        const hotReload = isHotReloadNeeded({
+          shouldReloadProjectData,
+          shouldReloadLibraries,
+          shouldGenerateEventsCode,
+          shouldReloadResources,
+        });
+        if (!previewIndexHtmlLocation || hotReload) {
           console.info(
             eventsBasedObjectType
               ? `Launching in-game edition preview for variant "${eventsBasedObjectVariantName ||
@@ -248,14 +280,7 @@ export const EmbeddedGameFrame = ({
               : `Launching in-game edition preview for scene "${sceneName ||
                   ''}".`
           );
-          const mergedProjectDataOnlyExport =
-            projectDataOnlyExport && neededHotReload.current !== 'Full';
-          const mergedShouldReloadResources =
-            shouldReloadResources ||
-            neededHotReload.current === 'DataAndResources' ||
-            neededHotReload.current === 'Full';
-
-          neededHotReload.current = 'None';
+          hotReloadSteps.current = noHotReloadSteps;
           isPreviewOngoing.current = true;
 
           onLaunchPreviewForInGameEdition({
@@ -264,20 +289,22 @@ export const EmbeddedGameFrame = ({
             externalLayoutName,
             eventsBasedObjectType,
             eventsBasedObjectVariantName,
-            hotReload: mergedShouldHotReload,
-            projectDataOnlyExport: mergedProjectDataOnlyExport,
-            shouldReloadResources: mergedShouldReloadResources,
+            shouldReloadProjectData,
+            shouldReloadLibraries,
+            shouldGenerateEventsCode,
+            shouldReloadResources,
             editorCameraState3D: cameraStates.current.get(editorId) || null,
           }).finally(() => {
             isPreviewOngoing.current = false;
             if (
-              neededHotReload.current !== 'None' &&
+              isHotReloadNeeded(hotReloadSteps.current) &&
               lastPreviewContainer.current
             ) {
               switchToSceneEdition({
                 ...lastPreviewContainer.current,
-                hotReload: false,
-                projectDataOnlyExport: true,
+                shouldReloadProjectData: false,
+                shouldReloadLibraries: false,
+                shouldGenerateEventsCode: false,
                 shouldReloadResources: false,
               });
             }
@@ -312,7 +339,7 @@ export const EmbeddedGameFrame = ({
       }: PreviewInGameEditorTarget) => {
         if (!previewDebuggerServer) return;
         if (!enabled) return;
-        if (neededHotReload.current !== 'None') {
+        if (isHotReloadNeeded(hotReloadSteps.current)) {
           return;
         }
         lastPreviewContainer.current = {

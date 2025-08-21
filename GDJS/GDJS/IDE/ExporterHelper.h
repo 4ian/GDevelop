@@ -42,7 +42,6 @@ struct PreviewExportOptions {
         useWindowMessageDebuggerClient(false),
         useMinimalDebuggerClient(false),
         nativeMobileApp(false),
-        projectDataOnlyExport(false),
         fullLoadingScreen(false),
         isDevelopmentEnvironment(false),
         isInGameEdition(false),
@@ -177,11 +176,34 @@ struct PreviewExportOptions {
   }
 
   /**
-   * \brief Set if the export should only export the project data, not
-   * exporting events code.
+   * \brief Set if the exported folder should be cleared befor the export.
    */
-  PreviewExportOptions &SetProjectDataOnlyExport(bool enable) {
-    projectDataOnlyExport = enable;
+  PreviewExportOptions &SetShouldClearExportFolder(bool enable) {
+    shouldClearExportFolder = enable;
+    return *this;
+  }
+
+  /**
+   * \brief Set if the `ProjectData` must be reloaded.
+   */
+  PreviewExportOptions &SetShouldReloadProjectData(bool enable) {
+    shouldReloadProjectData = enable;
+    return *this;
+  }
+
+  /**
+   * \brief Set if GDJS libraries must be reloaded.
+   */
+  PreviewExportOptions &SetShouldReloadLibraries(bool enable) {
+    shouldReloadLibraries = enable;
+    return *this;
+  }
+
+  /**
+   * \brief Set if the export should export events code.
+   */
+  PreviewExportOptions &SetShouldGenerateEventsCode(bool enable) {
+    shouldGenerateEventsCode = enable;
     return *this;
   }
 
@@ -360,7 +382,10 @@ struct PreviewExportOptions {
   gd::String inAppTutorialMessagePositionInPreview;
   bool nativeMobileApp;
   std::map<gd::String, int> includeFileHashes;
-  bool projectDataOnlyExport;
+  bool shouldClearExportFolder = true;
+  bool shouldReloadProjectData = true;
+  bool shouldReloadLibraries = true;
+  bool shouldGenerateEventsCode = true;
   bool fullLoadingScreen;
   bool isDevelopmentEnvironment;
   bool isInGameEdition;
@@ -459,15 +484,30 @@ class ExporterHelper {
   static gd::String
   ExportProjectData(gd::AbstractFileSystem &fs, gd::Project &project,
                     gd::String filename,
-                    const gd::SerializerElement &runtimeGameOptions);
+                    const gd::String &serializedRuntimeGameOptions);
 
   /**
    * \brief Serialize a project without its events to JSON
    *
+   * \param fs The abstract file system to use to write the file
    * \param project The project to be exported.
    */
   static gd::String SerializeProjectData(gd::AbstractFileSystem &fs,
                                          const gd::Project &project);
+
+  /**
+   * \brief Serialize the content of the extra configuration to store
+   * in gdjs.runtimeGameOptions to JSON
+   *
+   * \param fs The abstract file system to use to write the file
+   * \param options The content of the extra configuration
+   * \param includesFiles The list of scripts files - useful for hot-reloading
+   */
+  static gd::String
+  SerializeRuntimeGameOptions(gd::AbstractFileSystem &fs,
+                              const gd::String &gdjsRoot,
+                              const PreviewExportOptions &options,
+                              std::vector<gd::String> &includesFiles);
 
   /**
    * \brief Copy all the resources of the project to to the export directory,
@@ -657,7 +697,8 @@ class ExporterHelper {
    * \brief Given an include file, returns the name of the file to reference
    * in the exported game.
    */
-  gd::String GetExportedIncludeFilename(
+  static gd::String GetExportedIncludeFilename(
+      gd::AbstractFileSystem &fs, const gd::String &gdjsRoot,
       const gd::String &include, unsigned int nonRuntimeScriptsCacheBurst = 0);
 
   /**

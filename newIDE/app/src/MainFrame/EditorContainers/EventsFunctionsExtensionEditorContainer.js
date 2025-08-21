@@ -7,7 +7,10 @@ import {
   type SceneEventsOutsideEditorChanges,
 } from './BaseEditor';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
-import { setEditorHotReloadNeeded } from '../../EmbeddedGame/EmbeddedGameFrame';
+import {
+  setEditorHotReloadNeeded,
+  type HotReloadSteps,
+} from '../../EmbeddedGame/EmbeddedGameFrame';
 
 const styles = {
   container: {
@@ -56,21 +59,8 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     // No thing to be done.
   }
 
-  hotReloadInGameEditorIfNeeded({
-    hotReload,
-    projectDataOnlyExport,
-    shouldReloadResources,
-  }: {|
-    hotReload: boolean,
-    projectDataOnlyExport: boolean,
-    shouldReloadResources: boolean,
-  |}) {
-    if (hotReload) {
-      setEditorHotReloadNeeded({
-        projectDataOnlyExport,
-        shouldReloadResources,
-      });
-    }
+  hotReloadInGameEditorIfNeeded(hotReloadSteps: HotReloadSteps) {
+    setEditorHotReloadNeeded(hotReloadSteps);
   }
 
   switchInGameEditorIfNoHotReloadIsNeeded() {}

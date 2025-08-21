@@ -32,6 +32,7 @@ import {
   switchToSceneEdition,
   setEditorHotReloadNeeded,
   switchInGameEditorIfNoHotReloadIsNeeded,
+  type HotReloadSteps,
 } from '../../EmbeddedGame/EmbeddedGameFrame';
 import Background from '../../UI/Background';
 
@@ -86,8 +87,9 @@ export class ExternalLayoutEditorContainer extends React.Component<
         projectItemName
       ) {
         this._switchToSceneEdition({
-          hotReload: false,
-          projectDataOnlyExport: true,
+          shouldReloadProjectData: false,
+          shouldReloadLibraries: false,
+          shouldGenerateEventsCode: false,
           shouldReloadResources: false,
         });
       }
@@ -105,30 +107,19 @@ export class ExternalLayoutEditorContainer extends React.Component<
   componentDidUpdate(prevProps: RenderEditorContainerProps) {
     if (!prevProps.isActive && this.props.isActive) {
       this._switchToSceneEdition({
-        hotReload: false,
-        projectDataOnlyExport: true,
+        shouldReloadProjectData: false,
+        shouldReloadLibraries: false,
+        shouldGenerateEventsCode: false,
         shouldReloadResources: false,
       });
     }
   }
 
-  hotReloadInGameEditorIfNeeded(hotReloadProps: {|
-    hotReload: boolean,
-    projectDataOnlyExport: boolean,
-    shouldReloadResources: boolean,
-  |}) {
-    this._switchToSceneEdition(hotReloadProps);
+  hotReloadInGameEditorIfNeeded(hotReloadSteps: HotReloadSteps) {
+    this._switchToSceneEdition(hotReloadSteps);
   }
 
-  _switchToSceneEdition({
-    hotReload,
-    projectDataOnlyExport,
-    shouldReloadResources,
-  }: {|
-    hotReload: boolean,
-    projectDataOnlyExport: boolean,
-    shouldReloadResources: boolean,
-  |}): void {
+  _switchToSceneEdition(hotReloadSteps: HotReloadSteps): void {
     const { projectItemName, editorId } = this.props;
     const layout = this.getLayout();
     this.props.setPreviewedLayout({
@@ -145,23 +136,18 @@ export class ExternalLayoutEditorContainer extends React.Component<
       (!this.editor || !this.editor.isEditingObject())
     ) {
       switchToSceneEdition({
+        ...hotReloadSteps,
         editorId,
         sceneName: layout.getName(),
         externalLayoutName: projectItemName,
         eventsBasedObjectType: null,
         eventsBasedObjectVariantName: null,
-        hotReload,
-        projectDataOnlyExport,
-        shouldReloadResources,
       });
       if (this.editor) {
         this.editor.onEditorReloaded();
       }
-    } else if (hotReload) {
-      setEditorHotReloadNeeded({
-        projectDataOnlyExport,
-        shouldReloadResources,
-      });
+    } else {
+      setEditorHotReloadNeeded(hotReloadSteps);
     }
   }
 

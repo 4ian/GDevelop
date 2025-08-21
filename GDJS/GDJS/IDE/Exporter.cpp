@@ -83,7 +83,7 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
 
     // Prepare the export directory
     fs.MkDir(exportDir);
-    std::vector<gd::String> includesFiles;
+    includesFiles.clear();
     std::vector<gd::String> resourcesFiles;
 
     // Export the resources (before generating events as some resources
@@ -135,10 +135,10 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
 
     //...and export it
     gd::SerializerElement noRuntimeGameOptions;
-    helper.ExportProjectData(fs,
-                             exportedProject,
-                             codeOutputDir + "/data.js",
-                             noRuntimeGameOptions);
+    gd::String serializedNoRuntimeGameOptions =
+        gd::Serializer::ToJSON(noRuntimeGameOptions);
+    helper.ExportProjectData(fs, exportedProject, codeOutputDir + "/data.js",
+                             serializedNoRuntimeGameOptions);
     includesFiles.push_back(codeOutputDir + "/data.js");
 
     helper.ExportIncludesAndLibs(includesFiles, exportDir, false);
@@ -203,6 +203,12 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
 
 gd::String Exporter::SerializeProjectData(const gd::Project &project) {
   return ExporterHelper::SerializeProjectData(fs, project);
+}
+
+gd::String
+Exporter::SerializeRuntimeGameOptions(const PreviewExportOptions &options) {
+  return ExporterHelper::SerializeRuntimeGameOptions(fs, gdjsRoot, options,
+                                                     includesFiles);
 }
 
 }  // namespace gdjs

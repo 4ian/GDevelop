@@ -9,7 +9,10 @@ import {
 } from './BaseEditor';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
-import { setEditorHotReloadNeeded } from '../../EmbeddedGame/EmbeddedGameFrame';
+import {
+  setEditorHotReloadNeeded,
+  type HotReloadSteps,
+} from '../../EmbeddedGame/EmbeddedGameFrame';
 
 export class EventsEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?EventsSheetInterface;
@@ -79,21 +82,8 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     }
   }
 
-  hotReloadInGameEditorIfNeeded({
-    hotReload,
-    projectDataOnlyExport,
-    shouldReloadResources,
-  }: {|
-    hotReload: boolean,
-    projectDataOnlyExport: boolean,
-    shouldReloadResources: boolean,
-  |}) {
-    if (hotReload) {
-      setEditorHotReloadNeeded({
-        projectDataOnlyExport,
-        shouldReloadResources,
-      });
-    }
+  hotReloadInGameEditorIfNeeded(hotReloadSteps: HotReloadSteps) {
+    setEditorHotReloadNeeded(hotReloadSteps);
   }
 
   switchInGameEditorIfNoHotReloadIsNeeded() {}

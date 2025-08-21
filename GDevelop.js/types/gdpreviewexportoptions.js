@@ -12,7 +12,10 @@ declare class gdPreviewExportOptions {
   setEventsBasedObjectType(eventsBasedObjectType: string): gdPreviewExportOptions;
   setEventsBasedObjectVariantName(eventsBasedObjectVariantName: string): gdPreviewExportOptions;
   setIncludeFileHash(includeFile: string, hash: number): gdPreviewExportOptions;
-  setProjectDataOnlyExport(enable: boolean): gdPreviewExportOptions;
+  setShouldClearExportFolder(enable: boolean): gdPreviewExportOptions;
+  setShouldReloadProjectData(enable: boolean): gdPreviewExportOptions;
+  setShouldReloadLibraries(enable: boolean): gdPreviewExportOptions;
+  setShouldGenerateEventsCode(enable: boolean): gdPreviewExportOptions;
   setNativeMobileApp(enable: boolean): gdPreviewExportOptions;
   setFullLoadingScreen(enable: boolean): gdPreviewExportOptions;
   setIsDevelopmentEnvironment(enable: boolean): gdPreviewExportOptions;

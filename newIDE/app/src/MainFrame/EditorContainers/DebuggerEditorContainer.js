@@ -12,7 +12,10 @@ import SubscriptionChecker, {
   type SubscriptionCheckerInterface,
 } from '../../Profile/Subscription/SubscriptionChecker';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
-import { setEditorHotReloadNeeded } from '../../EmbeddedGame/EmbeddedGameFrame';
+import {
+  setEditorHotReloadNeeded,
+  type HotReloadSteps,
+} from '../../EmbeddedGame/EmbeddedGameFrame';
 
 type State = {|
   subscriptionChecked: boolean,
@@ -67,21 +70,8 @@ export class DebuggerEditorContainer extends React.Component<
     // No thing to be done.
   }
 
-  hotReloadInGameEditorIfNeeded({
-    hotReload,
-    projectDataOnlyExport,
-    shouldReloadResources,
-  }: {|
-    hotReload: boolean,
-    projectDataOnlyExport: boolean,
-    shouldReloadResources: boolean,
-  |}) {
-    if (hotReload) {
-      setEditorHotReloadNeeded({
-        projectDataOnlyExport,
-        shouldReloadResources,
-      });
-    }
+  hotReloadInGameEditorIfNeeded(hotReloadSteps: HotReloadSteps) {
+    setEditorHotReloadNeeded(hotReloadSteps);
   }
 
   switchInGameEditorIfNoHotReloadIsNeeded() {}

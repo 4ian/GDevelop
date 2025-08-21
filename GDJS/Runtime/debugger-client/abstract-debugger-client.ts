@@ -266,6 +266,8 @@ namespace gdjs {
       } else if (data.command === 'hotReload') {
         that._hotReloader
           .hotReload({
+            projectData: data.payload.projectData,
+            runtimeGameOptions: data.payload.runtimeGameOptions,
             shouldReloadResources: data.payload.shouldReloadResources || false,
           })
           .then((logs) => {
@@ -273,14 +275,6 @@ namespace gdjs {
             // TODO: if fatal error, should probably reload. The editor should handle this
             // as it knows the current scene to show.
           });
-      } else if (data.command === 'hotReloadProjectData') {
-        if (runtimeGame._inGameEditor) {
-          const editedInstanceContainer =
-            runtimeGame._inGameEditor._getEditedInstanceContainer();
-          if (editedInstanceContainer) {
-            that._hotReloader.hotReloadProjectData(data.payload.projectData);
-          }
-        }
       } else if (data.command === 'hotReloadObjects') {
         if (runtimeGame._inGameEditor) {
           const editedInstanceContainer =
@@ -374,8 +368,9 @@ namespace gdjs {
           // TODO Call zoomToInitialPosition?
         }
       } else if (data.command === 'updateInstances') {
-        if (runtimeGame._inGameEditor)
+        if (runtimeGame._inGameEditor) {
           runtimeGame._inGameEditor.reloadInstances(data.payload.instances);
+        }
       } else if (data.command === 'addInstances') {
         if (runtimeGame._inGameEditor) {
           runtimeGame._inGameEditor.addInstances(data.payload.instances);

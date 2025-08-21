@@ -208,7 +208,11 @@ import {
   registerOnResourceExternallyChangedCallback,
   unregisterOnResourceExternallyChangedCallback,
 } from '../MainFrame/ResourcesWatcher';
-import { type EditorCameraState } from '../EmbeddedGame/EmbeddedGameFrame';
+import {
+  type EditorCameraState,
+  type PreviewInGameEditorTarget,
+  type HotReloadSteps,
+} from '../EmbeddedGame/EmbeddedGameFrame';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -1478,8 +1482,9 @@ const MainFrame = (props: Props) => {
     }
     if (hasEventsBasedObject) {
       hotReloadInGameEditorIfNeeded({
-        hotReload: true,
-        projectDataOnlyExport: false,
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: false,
+        shouldGenerateEventsCode: true,
         shouldReloadResources: false,
       });
     }
@@ -1487,17 +1492,10 @@ const MainFrame = (props: Props) => {
 
   const hotReloadInGameEditorIfNeeded = React.useCallback(
     (
-      {
-        hotReload,
-        projectDataOnlyExport,
-        shouldReloadResources,
-      }: {|
-        hotReload: boolean,
-        projectDataOnlyExport: boolean,
-        shouldReloadResources: boolean,
-      |} = {
-        hotReload: false,
-        projectDataOnlyExport: true,
+      hotReloadSteps: HotReloadSteps = {
+        shouldReloadProjectData: false,
+        shouldReloadLibraries: false,
+        shouldGenerateEventsCode: false,
         shouldReloadResources: false,
       }
     ) => {
@@ -1509,19 +1507,12 @@ const MainFrame = (props: Props) => {
         );
         const editorRef = currentTab ? currentTab.editorRef : null;
         if (editorRef) {
-          editorRef.hotReloadInGameEditorIfNeeded({
-            hotReload,
-            projectDataOnlyExport,
-            shouldReloadResources,
-          });
+          editorRef.hotReloadInGameEditorIfNeeded(hotReloadSteps);
           hasReloadIfNeeded = true;
         }
       }
-      if (hotReload && !hasReloadIfNeeded) {
-        setEditorHotReloadNeeded({
-          projectDataOnlyExport,
-          shouldReloadResources,
-        });
+      if (!hasReloadIfNeeded) {
+        setEditorHotReloadNeeded(hotReloadSteps);
       }
     },
     [state.editorTabs]
@@ -1541,11 +1532,7 @@ const MainFrame = (props: Props) => {
         // Hot-reloads are triggered right away from a 3D editor.
         // Which means this call has no effect when switching between 2
         // 3D editors.
-        hotReloadInGameEditorIfNeeded({
-          hotReload: false,
-          projectDataOnlyExport: true,
-          shouldReloadResources: false,
-        });
+        hotReloadInGameEditorIfNeeded();
       } else {
         // Switch the 3D editor to the same scene as the 2D one.
         // It allows to keep the 3D editor up to date for a fast switch
@@ -1568,37 +1555,13 @@ const MainFrame = (props: Props) => {
   const onResourceExternallyChanged = React.useCallback(
     () => {
       hotReloadInGameEditorIfNeeded({
-        hotReload: true,
-        projectDataOnlyExport: true,
+        shouldReloadProjectData: false,
+        shouldReloadLibraries: false,
+        shouldGenerateEventsCode: false,
         shouldReloadResources: true,
       });
     },
     [hotReloadInGameEditorIfNeeded]
-  );
-
-  const hotReloadProjectData = React.useCallback(
-    async () => {
-      if (
-        !previewDebuggerServer ||
-        !currentProject ||
-        !_previewLauncher.current
-      ) {
-        return;
-      }
-      const serializedProjectData = await _previewLauncher.current.serializeProjectData(
-        currentProject
-      );
-      const projectData = JSON.parse(serializedProjectData);
-      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-        previewDebuggerServer.sendMessage(debuggerId, {
-          command: 'hotReloadProjectData',
-          payload: {
-            projectData,
-          },
-        });
-      });
-    },
-    [previewDebuggerServer, currentProject]
   );
 
   const onResourceUsageChanged = React.useCallback(
@@ -1606,33 +1569,48 @@ const MainFrame = (props: Props) => {
       if (isEditorHotReloadNeeded()) {
         hotReloadInGameEditorIfNeeded();
       } else {
-        // TODO Stack this call if an hot-reload is currently happening to do it at the end.
-        hotReloadProjectData();
+        hotReloadInGameEditorIfNeeded({
+          shouldReloadProjectData: true,
+          shouldReloadLibraries: false,
+          shouldGenerateEventsCode: false,
+          shouldReloadResources: false,
+        });
       }
     },
-    [hotReloadProjectData, hotReloadInGameEditorIfNeeded]
+    [hotReloadInGameEditorIfNeeded]
   );
 
   const onSceneAdded = React.useCallback(
     () => {
-      hotReloadProjectData();
+      hotReloadInGameEditorIfNeeded({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: false,
+        shouldGenerateEventsCode: false,
+        shouldReloadResources: false,
+      });
     },
-    [hotReloadProjectData]
+    [hotReloadInGameEditorIfNeeded]
   );
 
   const onExternalLayoutAdded = React.useCallback(
     () => {
-      hotReloadProjectData();
+      hotReloadInGameEditorIfNeeded({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: false,
+        shouldGenerateEventsCode: false,
+        shouldReloadResources: false,
+      });
     },
-    [hotReloadProjectData]
+    [hotReloadInGameEditorIfNeeded]
   );
 
   const onEffectAdded = React.useCallback(
     () => {
       // Ensure the effect implementation is exported.
       hotReloadInGameEditorIfNeeded({
-        hotReload: true,
-        projectDataOnlyExport: true,
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: true,
+        shouldGenerateEventsCode: false,
         shouldReloadResources: false,
       });
     },
@@ -1640,22 +1618,15 @@ const MainFrame = (props: Props) => {
   );
 
   const onObjectListsModified = React.useCallback(
-    ({isNewObjectTypeUsed}: {isNewObjectTypeUsed: boolean}) => {
-      if (isNewObjectTypeUsed) {
-        // Ensure the object implementation is exported.
-        hotReloadInGameEditorIfNeeded({
-          hotReload: true,
-          // TODO Only export data when the object type is not the first 3D one used.
-          // This is only necessary the first time Three.js is exported.
-          projectDataOnlyExport: false,
-          shouldReloadResources: false,
-        });
-      }
-      else {
-        hotReloadProjectData();
-      }
+    ({ isNewObjectTypeUsed }: { isNewObjectTypeUsed: boolean }) => {
+      hotReloadInGameEditorIfNeeded({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: isNewObjectTypeUsed,
+        shouldGenerateEventsCode: false,
+        shouldReloadResources: false,
+      });
     },
-    [hotReloadInGameEditorIfNeeded, hotReloadProjectData]
+    [hotReloadInGameEditorIfNeeded]
   );
 
   const renameLayout = (oldName: string, newName: string) => {
@@ -1691,7 +1662,12 @@ const MainFrame = (props: Props) => {
       if (shouldChangeProjectFirstLayout) {
         currentProject.setFirstLayout(uniqueNewName);
       }
-      hotReloadProjectData();
+      hotReloadInGameEditorIfNeeded({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: false,
+        shouldGenerateEventsCode: false,
+        shouldReloadResources: false,
+      });
       _onProjectItemModified();
     });
   };
@@ -1722,7 +1698,12 @@ const MainFrame = (props: Props) => {
         oldName,
         uniqueNewName
       );
-      hotReloadProjectData();
+      hotReloadInGameEditorIfNeeded({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: false,
+        shouldGenerateEventsCode: false,
+        shouldReloadResources: false,
+      });
       _onProjectItemModified();
     });
   };
@@ -1935,7 +1916,9 @@ const MainFrame = (props: Props) => {
       networkPreview,
       numberOfWindows,
       hotReload,
-      projectDataOnlyExport,
+      shouldReloadProjectData,
+      shouldReloadLibraries,
+      shouldGenerateEventsCode,
       shouldReloadResources,
       fullLoadingScreen,
       forceDiagnosticReport,
@@ -2015,7 +1998,16 @@ const MainFrame = (props: Props) => {
             : null,
           networkPreview: !!networkPreview,
           hotReload: !!hotReload,
-          projectDataOnlyExport: !!projectDataOnlyExport,
+          shouldReloadProjectData:
+            shouldReloadProjectData === undefined
+              ? true
+              : shouldReloadProjectData,
+          shouldReloadLibraries:
+            shouldReloadLibraries === undefined ? true : shouldReloadLibraries,
+          shouldGenerateEventsCode:
+            shouldGenerateEventsCode === undefined
+              ? true
+              : shouldGenerateEventsCode,
           shouldReloadResources: !!shouldReloadResources,
           fullLoadingScreen: !!fullLoadingScreen,
           fallbackAuthor,
@@ -2042,7 +2034,10 @@ const MainFrame = (props: Props) => {
               quickCustomizationDialogOpenedFromGameId || null,
             networkPreview: !!networkPreview,
             hotReload: !!hotReload,
-            projectDataOnlyExport: !!projectDataOnlyExport,
+            projectDataOnlyExport:
+              shouldGenerateEventsCode === undefined
+                ? false
+                : !shouldGenerateEventsCode,
             fullLoadingScreen: !!fullLoadingScreen,
             numberOfWindows: numberOfWindows || 1,
             forceDiagnosticReport: !!forceDiagnosticReport,
@@ -2141,25 +2136,22 @@ const MainFrame = (props: Props) => {
       externalLayoutName,
       eventsBasedObjectType,
       eventsBasedObjectVariantName,
-      hotReload,
-      projectDataOnlyExport,
+      shouldReloadProjectData,
+      shouldReloadLibraries,
+      shouldGenerateEventsCode,
       shouldReloadResources,
       editorCameraState3D,
     }: {|
-      editorId: string,
-      sceneName: string | null,
-      externalLayoutName: string | null,
-      eventsBasedObjectType: string | null,
-      eventsBasedObjectVariantName: string | null,
-      hotReload: boolean,
-      projectDataOnlyExport: boolean,
-      shouldReloadResources: boolean,
+      ...PreviewInGameEditorTarget,
+      ...HotReloadSteps,
       editorCameraState3D: EditorCameraState | null,
     |}) => {
-      await launchPreview({
+      await _launchPreview({
         networkPreview: false,
-        hotReload,
-        projectDataOnlyExport,
+        hotReload: true,
+        shouldReloadProjectData,
+        shouldReloadLibraries,
+        shouldGenerateEventsCode,
         shouldReloadResources,
         forceDiagnosticReport: false,
         isForInGameEdition: {
@@ -2173,7 +2165,7 @@ const MainFrame = (props: Props) => {
         numberOfWindows: 0,
       });
     },
-    [launchPreview]
+    [_launchPreview]
   );
 
   const relaunchAndThenHardReloadAllPreviews = React.useCallback(
@@ -2203,7 +2195,7 @@ const MainFrame = (props: Props) => {
           ],
         },
         hotReload: true,
-        projectDataOnlyExport: true,
+        shouldGenerateEventsCode: false,
       }),
     [launchPreview]
   );
@@ -2214,9 +2206,9 @@ const MainFrame = (props: Props) => {
       launchProjectWithLoadingScreenPreview: () =>
         launchPreview({ fullLoadingScreen: true }),
       launchProjectDataOnlyPreview: () =>
-        launchPreview({ hotReload: true, projectDataOnlyExport: true }),
+        launchPreview({ hotReload: true, shouldGenerateEventsCode: false }),
       launchProjectCodeAndDataPreview: () =>
-        launchPreview({ hotReload: true, projectDataOnlyExport: false }),
+        launchPreview({ hotReload: true, shouldGenerateEventsCode: true }),
     }),
     [hasNonEditionPreviewsRunning, launchPreview]
   );
@@ -2607,10 +2599,15 @@ const MainFrame = (props: Props) => {
 
   const onExtractAsExternalLayout = React.useCallback(
     (name: string) => {
-      hotReloadProjectData();
+      hotReloadInGameEditorIfNeeded({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: false,
+        shouldGenerateEventsCode: false,
+        shouldReloadResources: false,
+      });
       openExternalLayout(name);
     },
-    [hotReloadProjectData, openExternalLayout]
+    [hotReloadInGameEditorIfNeeded, openExternalLayout]
   );
 
   const onOpenEventBasedObjectEditor = (
@@ -2649,8 +2646,9 @@ const MainFrame = (props: Props) => {
   const onEventBasedObjectTypeChanged = React.useCallback(
     () => {
       hotReloadInGameEditorIfNeeded({
-        hotReload: true,
-        projectDataOnlyExport: false,
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: false,
+        shouldGenerateEventsCode: true,
         shouldReloadResources: false,
       });
     },
@@ -3915,8 +3913,9 @@ const MainFrame = (props: Props) => {
   const onNewResourcesAdded = React.useCallback(
     () => {
       hotReloadInGameEditorIfNeeded({
-        hotReload: true,
-        projectDataOnlyExport: true,
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: false,
+        shouldGenerateEventsCode: false,
         shouldReloadResources: false,
       });
     },

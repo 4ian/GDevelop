@@ -16,6 +16,7 @@ import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import {
   switchToSceneEdition,
   setEditorHotReloadNeeded,
+  type HotReloadSteps,
   switchInGameEditorIfNoHotReloadIsNeeded,
 } from '../../EmbeddedGame/EmbeddedGameFrame';
 
@@ -47,8 +48,9 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
       // TODO: redundant check?
       if (this.props.gameEditorMode === 'embedded-game' && projectItemName) {
         this._switchToSceneEdition({
-          hotReload: false,
-          projectDataOnlyExport: true,
+          shouldReloadProjectData: false,
+          shouldReloadLibraries: false,
+          shouldGenerateEventsCode: false,
           shouldReloadResources: false,
         });
       }
@@ -58,30 +60,19 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
   componentDidUpdate(prevProps: RenderEditorContainerProps) {
     if (!prevProps.isActive && this.props.isActive) {
       this._switchToSceneEdition({
-        hotReload: false,
-        projectDataOnlyExport: true,
+        shouldReloadProjectData: false,
+        shouldReloadLibraries: false,
+        shouldGenerateEventsCode: false,
         shouldReloadResources: false,
       });
     }
   }
 
-  hotReloadInGameEditorIfNeeded(hotReloadProps: {|
-    hotReload: boolean,
-    projectDataOnlyExport: boolean,
-    shouldReloadResources: boolean,
-  |}) {
-    this._switchToSceneEdition(hotReloadProps);
+  hotReloadInGameEditorIfNeeded(hotReloadSteps: HotReloadSteps) {
+    this._switchToSceneEdition(hotReloadSteps);
   }
 
-  _switchToSceneEdition({
-    hotReload,
-    projectDataOnlyExport,
-    shouldReloadResources,
-  }: {|
-    hotReload: boolean,
-    projectDataOnlyExport: boolean,
-    shouldReloadResources: boolean,
-  |}): void {
+  _switchToSceneEdition(hotReloadSteps: HotReloadSteps): void {
     const { projectItemName, editorId } = this.props;
     this.props.setPreviewedLayout({
       layoutName: projectItemName || null,
@@ -96,23 +87,18 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
       (!this.editor || !this.editor.isEditingObject())
     ) {
       switchToSceneEdition({
+        ...hotReloadSteps,
         editorId,
         sceneName: projectItemName,
         externalLayoutName: null,
         eventsBasedObjectType: null,
         eventsBasedObjectVariantName: null,
-        hotReload,
-        projectDataOnlyExport,
-        shouldReloadResources,
       });
       if (this.editor) {
         this.editor.onEditorReloaded();
       }
-    } else if (hotReload) {
-      setEditorHotReloadNeeded({
-        projectDataOnlyExport,
-        shouldReloadResources,
-      });
+    } else {
+      setEditorHotReloadNeeded(hotReloadSteps);
     }
   }
 

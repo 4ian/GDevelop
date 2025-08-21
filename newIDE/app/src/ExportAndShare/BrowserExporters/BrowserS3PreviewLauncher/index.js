@@ -292,11 +292,6 @@ export default class BrowserS3PreviewLauncher extends React.Component<
     }
   };
 
-  async serializeProjectData(project: gdProject): Promise<string> {
-    const { exporter } = await this._prepareExporter();
-    return exporter.serializeProjectData(project);
-  }
-
   getPreviewDebuggerServer() {
     return browserPreviewDebuggerServer;
   }

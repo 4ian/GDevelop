@@ -5,6 +5,7 @@ declare class gdjsExporter {
   exportProjectForPixiPreview(options: gdPreviewExportOptions): boolean;
   exportWholePixiProject(options: gdExportOptions): boolean;
   serializeProjectData(project: gdProject): string;
+  serializeRuntimeGameOptions(options: gdPreviewExportOptions): string;
   getLastError(): string;
   delete(): void;
   ptr: number;

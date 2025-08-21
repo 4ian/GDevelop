@@ -71,6 +71,17 @@ class Exporter {
    */
   gd::String SerializeProjectData(const gd::Project &project);
 
+  /**
+   * \brief Serialize the content of the extra configuration to store
+   * in gdjs.runtimeGameOptions to JSON
+   *
+   * \warning `ExportProjectForPixiPreview` must be called first to serialize
+   * the list of scripts files.
+   *
+   * \param options The content of the extra configuration
+   */
+  gd::String SerializeRuntimeGameOptions(const PreviewExportOptions &options);
+
 private:
   gd::AbstractFileSystem&
       fs;  ///< The abstract file system to be used for exportation.
@@ -79,6 +90,8 @@ private:
       gdjsRoot;  ///< The root directory of GDJS, used to copy runtime files.
   gd::String codeOutputDir;  ///< The directory where JS code is outputted. Will
                              ///< be then copied to the final output directory.
+  std::vector<gd::String>
+      includesFiles; ///< The list of scripts files - useful for hot-reloading
 };
 
 }  // namespace gdjs

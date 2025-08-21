@@ -53,7 +53,10 @@ import { useCreateAiProjectDialog } from './UseCreateAiProjectDialog';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { prepareAiUserContent } from './PrepareAiUserContent';
 import { AiRequestContext } from './AiRequestContext';
-import { setEditorHotReloadNeeded } from '../EmbeddedGame/EmbeddedGameFrame';
+import {
+  setEditorHotReloadNeeded,
+  type HotReloadSteps,
+} from '../EmbeddedGame/EmbeddedGameFrame';
 
 const gd: libGDevelop = global.gd;
 
@@ -377,11 +380,7 @@ export type AskAiEditorInterface = {|
     mode: 'chat' | 'agent',
     aiRequestId: string | null,
   |}) => void,
-  hotReloadInGameEditorIfNeeded: ({|
-    hotReload: boolean,
-    projectDataOnlyExport: boolean,
-    shouldReloadResources: boolean,
-  |}) => void,
+  hotReloadInGameEditorIfNeeded: (hotReloadSteps: HotReloadSteps) => void,
   switchInGameEditorIfNoHotReloadIsNeeded: () => void,
 |};
 
@@ -514,26 +513,6 @@ export const AskAiEditor = React.memo<Props>(
         [setToolbar, onStartOrOpenChat, canStartNewChat, onOpenHistory]
       );
 
-      const hotReloadInGameEditorIfNeeded = React.useCallback(
-        ({
-          hotReload,
-          projectDataOnlyExport,
-          shouldReloadResources,
-        }: {|
-          hotReload: boolean,
-          projectDataOnlyExport: boolean,
-          shouldReloadResources: boolean,
-        |}) => {
-          if (hotReload) {
-            setEditorHotReloadNeeded({
-              projectDataOnlyExport,
-              shouldReloadResources,
-            });
-          }
-        },
-        []
-      );
-
       React.useEffect(updateToolbar, [updateToolbar]);
 
       React.useImperativeHandle(ref, () => ({
@@ -545,7 +524,7 @@ export const AskAiEditor = React.memo<Props>(
         onSceneObjectsDeleted: noop,
         onSceneEventsModifiedOutsideEditor: noop,
         startOrOpenChat: onStartOrOpenChat,
-        hotReloadInGameEditorIfNeeded,
+        hotReloadInGameEditorIfNeeded: setEditorHotReloadNeeded,
         switchInGameEditorIfNoHotReloadIsNeeded: noop,
       }));
 

@@ -110,7 +110,9 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     const PreviewExportOptions &options) {
   double previousTime = GetTimeNow();
   fs.MkDir(options.exportPath);
-  fs.ClearDir(options.exportPath);
+  if (options.shouldClearExportFolder) {
+    fs.ClearDir(options.exportPath);
+  }
   std::vector<gd::String> includesFiles;
   std::vector<gd::String> resourcesFiles;
 
@@ -139,11 +141,11 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     exportedProject.GetWatermark().ShowGDevelopWatermark(false);
   }
 
+  // TODO Avoid to copy resources for the InGameEditor
+
   // Export resources (*before* generating events as some resources filenames
   // may be updated)
   ExportResources(fs, exportedProject, options.exportPath);
-
-  previousTime = LogTimeSpent("Resource export", previousTime);
 
   // Compatibility with GD <= 5.0-beta56
   // Stay compatible with text objects declaring their font as just a filename
@@ -152,41 +154,51 @@ bool ExporterHelper::ExportProjectForPixiPreview(
       fs, exportedProject.GetResourcesManager(), options.exportPath);
   // end of compatibility code
 
-  auto usedExtensionsResult =
-      gd::UsedExtensionsFinder::ScanProject(exportedProject);
+  previousTime = LogTimeSpent("Resource export", previousTime);
 
-  // Export engine libraries
-  AddLibsInclude(/*pixiRenderers=*/true,
-                 /*pixiInThreeRenderers=*/
-                 usedExtensionsResult.Has3DObjects() || options.isInGameEdition,
-                 /*includeWebsocketDebuggerClient=*/
-                 !options.websocketDebuggerServerAddress.empty(),
-                 /*includeWindowMessageDebuggerClient=*/
-                 options.useWindowMessageDebuggerClient,
-                 /*includeMinimalDebuggerClient=*/
-                 options.useMinimalDebuggerClient,
-                 /*includeCaptureManager=*/
-                 !options.captureOptions.IsEmpty(),
-                 /*includeInAppTutorialMessage*/
-                 !options.inAppTutorialMessageInPreview.empty(),
-                 immutableProject.GetLoadingScreen().GetGDevelopLogoStyle(),
-                 includesFiles);
+  std::vector<gd::SourceFileMetadata> noUsedSourceFiles;
+  std::vector<gd::SourceFileMetadata> &usedSourceFiles = noUsedSourceFiles;
+  if (options.shouldReloadLibraries) {
+    auto usedExtensionsResult =
+        gd::UsedExtensionsFinder::ScanProject(exportedProject);
+    usedSourceFiles = usedExtensionsResult.GetUsedSourceFiles();
 
-  // Export files for free function, object and behaviors
-  for (const auto &includeFile : usedExtensionsResult.GetUsedIncludeFiles()) {
-    InsertUnique(includesFiles, includeFile);
+    // Export engine libraries
+    AddLibsInclude(/*pixiRenderers=*/true,
+                  /*pixiInThreeRenderers=*/
+                  usedExtensionsResult.Has3DObjects() || options.isInGameEdition,
+                  /*includeWebsocketDebuggerClient=*/
+                  !options.websocketDebuggerServerAddress.empty(),
+                  /*includeWindowMessageDebuggerClient=*/
+                  options.useWindowMessageDebuggerClient,
+                  /*includeMinimalDebuggerClient=*/
+                  options.useMinimalDebuggerClient,
+                  /*includeCaptureManager=*/
+                  !options.captureOptions.IsEmpty(),
+                  /*includeInAppTutorialMessage*/
+                  !options.inAppTutorialMessageInPreview.empty(),
+                  immutableProject.GetLoadingScreen().GetGDevelopLogoStyle(),
+                  includesFiles);
+
+    // Export files for free function, object and behaviors
+    for (const auto &includeFile : usedExtensionsResult.GetUsedIncludeFiles()) {
+      InsertUnique(includesFiles, includeFile);
+    }
+    for (const auto &requiredFile : usedExtensionsResult.GetUsedRequiredFiles()) {
+      InsertUnique(resourcesFiles, requiredFile);
+    }
+
+    // Export effects (after engine libraries as they auto-register themselves to
+    // the engine)
+    ExportEffectIncludes(exportedProject, includesFiles);
+
+    previousTime = LogTimeSpent("Include files export", previousTime);
   }
-  for (const auto &requiredFile : usedExtensionsResult.GetUsedRequiredFiles()) {
-    InsertUnique(resourcesFiles, requiredFile);
+  else {
+    gd::LogStatus("Include files export is skipped");
   }
 
-  // Export effects (after engine libraries as they auto-register themselves to
-  // the engine)
-  ExportEffectIncludes(exportedProject, includesFiles);
-
-  previousTime = LogTimeSpent("Include files export", previousTime);
-
-  if (!options.projectDataOnlyExport) {
+  if (options.shouldGenerateEventsCode) {
     gd::WholeProjectDiagnosticReport &wholeProjectDiagnosticReport =
         options.project.GetWholeProjectDiagnosticReport();
     wholeProjectDiagnosticReport.Clear();
@@ -199,10 +211,77 @@ bool ExporterHelper::ExportProjectForPixiPreview(
                           true)) {
       return false;
     }
-
     previousTime = LogTimeSpent("Events code export", previousTime);
   }
+  else {
+    gd::LogStatus("Events code export is skipped");
+  }
 
+  if (options.shouldReloadProjectData) {
+    // Export the project
+    gd::String serializedRuntimeGameOptions =
+        ExporterHelper::SerializeRuntimeGameOptions(fs, gdjsRoot, options,
+                                                    includesFiles);
+    ExportProjectData(fs,
+                      exportedProject,
+                      codeOutputDir + "/data.js",
+                      serializedRuntimeGameOptions);
+    includesFiles.push_back(codeOutputDir + "/data.js");
+
+    previousTime = LogTimeSpent("Project data export", previousTime);
+  }
+  else {
+    gd::LogStatus("Project data export is skipped");
+  }
+
+  if (options.shouldReloadLibraries) {
+    // Copy all the dependencies and their source maps
+    ExportIncludesAndLibs(includesFiles, options.exportPath, true);
+    ExportIncludesAndLibs(resourcesFiles, options.exportPath, true);
+  }
+
+  // TODO Build a full includesFiles list without actually doing export or generation.
+  if (options.shouldReloadLibraries && options.shouldGenerateEventsCode) {
+    // Create the index file
+    if (!ExportIndexFile(exportedProject,
+                            gdjsRoot + "/Runtime/index.html",
+                            options.exportPath,
+                            includesFiles,
+                            usedSourceFiles,
+                            options.nonRuntimeScriptsCacheBurst,
+                            "gdjs.runtimeGameOptions")) {
+      return false;
+    }
+    previousTime = LogTimeSpent("Include and libs export", previousTime);
+  }
+  else {
+    gd::LogStatus("Include and libs export is skipped");
+  }
+
+  return true;
+}
+
+gd::String ExporterHelper::ExportProjectData(
+    gd::AbstractFileSystem &fs, gd::Project &project, gd::String filename,
+    const gd::String &serializedRuntimeGameOptions) {
+  fs.MkDir(fs.DirNameFrom(filename));
+
+  // Save the project to JSON
+  gd::String output =
+      "gdjs.projectData = " +
+      ExporterHelper::StriptAndSerializeProjectData(project) + ";\n" +
+      "gdjs.runtimeGameOptions = " + serializedRuntimeGameOptions + ";\n";
+
+  if (!fs.WriteToFile(filename, output))
+    return "Unable to write " + filename;
+
+  return "";
+}
+
+gd::String ExporterHelper::SerializeRuntimeGameOptions(
+    gd::AbstractFileSystem &fs, const gd::String &gdjsRoot,
+    const PreviewExportOptions &options,
+    std::vector<gd::String> &includesFiles) {
   // Create the setup options passed to the gdjs.RuntimeGame
   gd::SerializerElement runtimeGameOptions;
   runtimeGameOptions.AddChild("isPreview").SetBoolValue(true);
@@ -249,8 +328,11 @@ bool ExporterHelper::ExportProjectForPixiPreview(
         .SetValue(options.eventsBasedObjectVariantName);
   }
 
-  runtimeGameOptions.AddChild("projectDataOnlyExport")
-      .SetBoolValue(options.projectDataOnlyExport);
+  runtimeGameOptions.AddChild("shouldReloadLibraries")
+      .SetBoolValue(options.shouldReloadLibraries);
+  runtimeGameOptions.AddChild("shouldGenerateEventsCode")
+      .SetBoolValue(options.shouldGenerateEventsCode);
+
   runtimeGameOptions.AddChild("nativeMobileApp")
       .SetBoolValue(options.nativeMobileApp);
   runtimeGameOptions.AddChild("websocketDebuggerServerAddress")
@@ -322,56 +404,14 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
   for (const auto &includeFile : includesFiles) {
     auto hashIt = options.includeFileHashes.find(includeFile);
-    gd::String scriptSrc = GetExportedIncludeFilename(includeFile);
+    gd::String scriptSrc = GetExportedIncludeFilename(fs, gdjsRoot, includeFile);
     scriptFilesElement.AddChild("scriptFile")
         .SetStringAttribute("path", scriptSrc)
         .SetIntAttribute(
             "hash",
             hashIt != options.includeFileHashes.end() ? hashIt->second : 0);
   }
-
-  // Export the project
-  ExportProjectData(fs,
-                    exportedProject,
-                    codeOutputDir + "/data.js",
-                    runtimeGameOptions);
-  includesFiles.push_back(codeOutputDir + "/data.js");
-
-  previousTime = LogTimeSpent("Project data export", previousTime);
-
-  // Copy all the dependencies and their source maps
-  ExportIncludesAndLibs(includesFiles, options.exportPath, true);
-  ExportIncludesAndLibs(resourcesFiles, options.exportPath, true);
-
-  // Create the index file
-  if (!ExportIndexFile(exportedProject,
-                           gdjsRoot + "/Runtime/index.html",
-                           options.exportPath,
-                           includesFiles,
-                           usedExtensionsResult.GetUsedSourceFiles(),
-                           options.nonRuntimeScriptsCacheBurst,
-                           "gdjs.runtimeGameOptions"))
-    return false;
-
-  previousTime = LogTimeSpent("Include and libs export", previousTime);
-  return true;
-}
-
-gd::String ExporterHelper::ExportProjectData(
-    gd::AbstractFileSystem &fs, gd::Project &project, gd::String filename,
-    const gd::SerializerElement &runtimeGameOptions) {
-  fs.MkDir(fs.DirNameFrom(filename));
-
-  // Save the project to JSON
-  gd::String output =
-      "gdjs.projectData = " + ExporterHelper::StriptAndSerializeProjectData(project) +
-      ";\n" + "gdjs.runtimeGameOptions = " +
-      gd::Serializer::ToJSON(runtimeGameOptions) + ";\n";
-
-  if (!fs.WriteToFile(filename, output))
-    return "Unable to write " + filename;
-
-  return "";
+  return gd::Serializer::ToJSON(runtimeGameOptions);
 }
 
 gd::String ExporterHelper::SerializeProjectData(gd::AbstractFileSystem &fs, const gd::Project &project) {
@@ -894,7 +934,7 @@ bool ExporterHelper::CompleteIndexFile(
   gd::String codeFilesIncludes;
   for (auto &include : includesFiles) {
     gd::String scriptSrc =
-        GetExportedIncludeFilename(include, nonRuntimeScriptsCacheBurst);
+        GetExportedIncludeFilename(fs, gdjsRoot, include, nonRuntimeScriptsCacheBurst);
 
     // Sanity check if the file exists - if not skip it to avoid
     // including it in the list of scripts.
@@ -1117,6 +1157,7 @@ bool ExporterHelper::ExportEventsCode(
 }
 
 gd::String ExporterHelper::GetExportedIncludeFilename(
+    gd::AbstractFileSystem &fs, const gd::String &gdjsRoot,
     const gd::String &include, unsigned int nonRuntimeScriptsCacheBurst) {
   auto addSearchParameterToUrl = [](const gd::String &url,
                                     const gd::String &urlEncodedParameterName,

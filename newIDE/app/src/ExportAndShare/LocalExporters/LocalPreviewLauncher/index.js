@@ -218,6 +218,10 @@ export default class LocalPreviewLauncher extends React.Component<
 
     var previewStartTime = performance.now();
 
+    // TODO Filter according to isForInGameEdition
+    const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
+    const shouldHotReload = previewOptions.hotReload && !!debuggerIds.length;
+
     const previewExportOptions = new gd.PreviewExportOptions(
       project,
       outputDir
@@ -262,13 +266,18 @@ export default class LocalPreviewLauncher extends React.Component<
       )
     );
 
-    const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
-    const shouldHotReload = previewOptions.hotReload && !!debuggerIds.length;
-
-    previewExportOptions.setProjectDataOnlyExport(
-      // Only export project data if asked and if a hot-reloading is being done.
-      shouldHotReload && previewOptions.projectDataOnlyExport
-    );
+    if (shouldHotReload) {
+      previewExportOptions.setShouldClearExportFolder(false);
+      // At hot-reload, the ProjectData are passed into the message.
+      // It means that we don't need to write them in a file.
+      previewExportOptions.setShouldReloadProjectData(false);
+      previewExportOptions.setShouldReloadLibraries(
+        previewOptions.shouldReloadLibraries
+      );
+      previewExportOptions.setShouldGenerateEventsCode(
+        previewOptions.shouldGenerateEventsCode
+      );
+    }
 
     previewExportOptions.setFullLoadingScreen(previewOptions.fullLoadingScreen);
     previewExportOptions.setGDevelopVersionWithHash(getIDEVersionWithHash());
@@ -323,15 +332,21 @@ export default class LocalPreviewLauncher extends React.Component<
     }
 
     exporter.exportProjectForPixiPreview(previewExportOptions);
-    previewExportOptions.delete();
-    exporter.delete();
 
     if (shouldHotReload) {
+      const serializedProjectData = exporter.serializeProjectData(project);
+      const projectData = JSON.parse(serializedProjectData);
+      const serializedRuntimeGameOptions = exporter.serializeRuntimeGameOptions(
+        previewExportOptions
+      );
+      const runtimeGameOptions = JSON.parse(serializedRuntimeGameOptions);
       debuggerIds.forEach(debuggerId => {
         this.getPreviewDebuggerServer().sendMessage(debuggerId, {
           command: 'hotReload',
           payload: {
             shouldReloadResources: previewOptions.shouldReloadResources,
+            projectData,
+            runtimeGameOptions,
           },
         });
       });
@@ -358,14 +373,12 @@ export default class LocalPreviewLauncher extends React.Component<
       }
     }
 
+    exporter.delete();
+    previewExportOptions.delete();
+
     const previewStopTime = performance.now();
     console.info(`Preview took ${previewStopTime - previewStartTime}ms`);
   };
-
-  async serializeProjectData(project: gdProject): Promise<string> {
-    const { exporter } = await prepareExporter();
-    return exporter.serializeProjectData(project);
-  }
 
   getPreviewDebuggerServer() {
     return localPreviewDebuggerServer;

@@ -238,23 +238,20 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     // Copy all the dependencies and their source maps
     ExportIncludesAndLibs(includesFiles, options.exportPath, true);
     ExportIncludesAndLibs(resourcesFiles, options.exportPath, true);
-  }
 
-  // TODO Build a full includesFiles list without actually doing export or generation.
-  if (options.shouldReloadLibraries && options.shouldGenerateEventsCode) {
-    // Create the index file
-    if (!ExportIndexFile(exportedProject,
-                            gdjsRoot + "/Runtime/index.html",
-                            options.exportPath,
-                            includesFiles,
-                            usedSourceFiles,
-                            options.nonRuntimeScriptsCacheBurst,
-                            "gdjs.runtimeGameOptions")) {
-      return false;
+    // TODO Build a full includesFiles list without actually doing export or
+    // generation.
+    if (options.shouldGenerateEventsCode) {
+      // Create the index file
+      if (!ExportIndexFile(exportedProject, gdjsRoot + "/Runtime/index.html",
+                           options.exportPath, includesFiles, usedSourceFiles,
+                           options.nonRuntimeScriptsCacheBurst,
+                           "gdjs.runtimeGameOptions")) {
+        return false;
+      }
     }
     previousTime = LogTimeSpent("Include and libs export", previousTime);
-  }
-  else {
+  } else {
     gd::LogStatus("Include and libs export is skipped");
   }
 

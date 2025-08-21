@@ -47,7 +47,11 @@ type State = {|
   captureOptions: ?CaptureOptions,
 |};
 
-const prepareExporter = async (): Promise<{|
+const prepareExporter = async ({
+  isForInGameEdition,
+}: {
+  isForInGameEdition: boolean,
+}): Promise<{|
   outputDir: string,
   exporter: gdjsExporter,
   gdjsRoot: string,
@@ -59,7 +63,10 @@ const prepareExporter = async (): Promise<{|
     downloadUrlsToLocalFiles: false,
   });
   const fileSystem = assignIn(new gd.AbstractFileSystemJS(), localFileSystem);
-  const outputDir = path.join(fileSystem.getTempDir(), 'preview');
+  const outputDir = path.join(
+    fileSystem.getTempDir(),
+    isForInGameEdition ? 'in-game-editor-preview' : 'preview'
+  );
   const exporter = new gd.Exporter(fileSystem, gdjsRoot);
 
   return {
@@ -214,7 +221,9 @@ export default class LocalPreviewLauncher extends React.Component<
       );
     }
 
-    const { outputDir, exporter, gdjsRoot } = await prepareExporter();
+    const { outputDir, exporter, gdjsRoot } = await prepareExporter({
+      isForInGameEdition: previewOptions.isForInGameEdition,
+    });
 
     var previewStartTime = performance.now();
 

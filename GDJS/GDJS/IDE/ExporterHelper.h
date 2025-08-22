@@ -484,7 +484,7 @@ class ExporterHelper {
   static gd::String
   ExportProjectData(gd::AbstractFileSystem &fs, gd::Project &project,
                     gd::String filename,
-                    gd::SerializerElement &runtimeGameOptions);
+                    const gd::SerializerElement &runtimeGameOptions);
 
   /**
    * \brief Serialize a project without its events to JSON

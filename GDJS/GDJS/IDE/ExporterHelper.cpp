@@ -282,7 +282,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
 gd::String ExporterHelper::ExportProjectData(
     gd::AbstractFileSystem &fs, gd::Project &project, gd::String filename,
-    gd::SerializerElement &runtimeGameOptions) {
+    const gd::SerializerElement &runtimeGameOptions) {
   fs.MkDir(fs.DirNameFrom(filename));
 
   gd::SerializerElement projectDataElement;

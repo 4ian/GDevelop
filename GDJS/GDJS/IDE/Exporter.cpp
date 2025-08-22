@@ -135,10 +135,8 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
 
     //...and export it
     gd::SerializerElement noRuntimeGameOptions;
-    gd::String serializedNoRuntimeGameOptions =
-        gd::Serializer::ToJSON(noRuntimeGameOptions);
     helper.ExportProjectData(fs, exportedProject, codeOutputDir + "/data.js",
-                             serializedNoRuntimeGameOptions);
+                             noRuntimeGameOptions);
     includesFiles.push_back(codeOutputDir + "/data.js");
 
     helper.ExportIncludesAndLibs(includesFiles, exportDir, false);
@@ -203,13 +201,17 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
 
 gd::String Exporter::SerializeProjectData(const gd::Project &project,
                                           const PreviewExportOptions &options) {
-  return ExporterHelper::SerializeProjectData(fs, project, options);
+  gd::SerializerElement rootElement;
+  ExporterHelper::SerializeProjectData(fs, project, options, rootElement);
+  return gd::Serializer::ToJSON(rootElement);
 }
 
 gd::String
 Exporter::SerializeRuntimeGameOptions(const PreviewExportOptions &options) {
-  return ExporterHelper::SerializeRuntimeGameOptions(fs, gdjsRoot, options,
-                                                     includesFiles);
+  gd::SerializerElement rootElement;
+  ExporterHelper::SerializeRuntimeGameOptions(fs, gdjsRoot, options,
+                                              includesFiles, rootElement);
+  return gd::Serializer::ToJSON(rootElement);
 }
 
 }  // namespace gdjs

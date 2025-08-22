@@ -484,17 +484,19 @@ class ExporterHelper {
   static gd::String
   ExportProjectData(gd::AbstractFileSystem &fs, gd::Project &project,
                     gd::String filename,
-                    const gd::String &serializedRuntimeGameOptions);
+                    gd::SerializerElement &runtimeGameOptions);
 
   /**
    * \brief Serialize a project without its events to JSON
    *
    * \param fs The abstract file system to use to write the file
    * \param project The project to be exported.
+   * \param projectDataElement The element where the project data is serialized
    */
-  static gd::String SerializeProjectData(gd::AbstractFileSystem &fs,
-                                         const gd::Project &project,
-                                         const PreviewExportOptions &options);
+  static void SerializeProjectData(gd::AbstractFileSystem &fs,
+                                   const gd::Project &project,
+                                   const PreviewExportOptions &options,
+                                   gd::SerializerElement &projectDataElement);
 
   /**
    * \brief Serialize the content of the extra configuration to store
@@ -503,12 +505,15 @@ class ExporterHelper {
    * \param fs The abstract file system to use to write the file
    * \param options The content of the extra configuration
    * \param includesFiles The list of scripts files - useful for hot-reloading
+   * \param runtimeGameOptionsElement The element where the game options are
+   * serialized
    */
-  static gd::String
+  static void
   SerializeRuntimeGameOptions(gd::AbstractFileSystem &fs,
                               const gd::String &gdjsRoot,
                               const PreviewExportOptions &options,
-                              std::vector<gd::String> &includesFiles);
+                              std::vector<gd::String> &includesFiles,
+                              gd::SerializerElement &runtimeGameOptionsElement);
 
   /**
    * \brief Copy all the resources of the project to to the export directory,
@@ -739,7 +744,9 @@ class ExporterHelper {
     *
     * \param project The project to be exported.
     */
-   static gd::String StriptAndSerializeProjectData(gd::Project &project);
+   static void
+   StriptAndSerializeProjectData(gd::Project &project,
+                                 gd::SerializerElement &rootElement);
 };
 
 }  // namespace gdjs

@@ -61,7 +61,6 @@ double GetTimeSpent(double previousTime) { return GetTimeNow() - previousTime; }
 double LogTimeSpent(const gd::String &name, double previousTime) {
   gd::LogStatus(name + " took " + gd::String::From(GetTimeSpent(previousTime)) +
                 "ms");
-  std::cout << std::endl;
   return GetTimeNow();
 }
 }  // namespace
@@ -242,13 +241,13 @@ bool ExporterHelper::ExportProjectForPixiPreview(
       exportedProject.GetWatermark().ShowGDevelopWatermark(false);
     }
 
-    gd::String serializedRuntimeGameOptions =
-        ExporterHelper::SerializeRuntimeGameOptions(fs, gdjsRoot, options,
-                                                    includesFiles);
+    gd::SerializerElement runtimeGameOptions;
+    ExporterHelper::SerializeRuntimeGameOptions(fs, gdjsRoot, options,
+                                                    includesFiles, runtimeGameOptions);
     ExportProjectData(fs,
                       exportedProject,
                       codeOutputDir + "/data.js",
-                      serializedRuntimeGameOptions);
+                      runtimeGameOptions);
     includesFiles.push_back(codeOutputDir + "/data.js");
 
     previousTime = LogTimeSpent("Project data export", previousTime);
@@ -283,14 +282,17 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
 gd::String ExporterHelper::ExportProjectData(
     gd::AbstractFileSystem &fs, gd::Project &project, gd::String filename,
-    const gd::String &serializedRuntimeGameOptions) {
+    gd::SerializerElement &runtimeGameOptions) {
   fs.MkDir(fs.DirNameFrom(filename));
+
+  gd::SerializerElement projectDataElement;
+  ExporterHelper::StriptAndSerializeProjectData(project, projectDataElement);
 
   // Save the project to JSON
   gd::String output =
-      "gdjs.projectData = " +
-      ExporterHelper::StriptAndSerializeProjectData(project) + ";\n" +
-      "gdjs.runtimeGameOptions = " + serializedRuntimeGameOptions + ";\n";
+      "gdjs.projectData = " + gd::Serializer::ToJSON(projectDataElement) +
+      ";\ngdjs.runtimeGameOptions = " + gd::Serializer::ToJSON(runtimeGameOptions) +
+      ";\n";
 
   if (!fs.WriteToFile(filename, output))
     return "Unable to write " + filename;
@@ -298,12 +300,12 @@ gd::String ExporterHelper::ExportProjectData(
   return "";
 }
 
-gd::String ExporterHelper::SerializeRuntimeGameOptions(
+void ExporterHelper::SerializeRuntimeGameOptions(
     gd::AbstractFileSystem &fs, const gd::String &gdjsRoot,
     const PreviewExportOptions &options,
-    std::vector<gd::String> &includesFiles) {
+    std::vector<gd::String> &includesFiles,
+    gd::SerializerElement &runtimeGameOptions) {
   // Create the setup options passed to the gdjs.RuntimeGame
-  gd::SerializerElement runtimeGameOptions;
   runtimeGameOptions.AddChild("isPreview").SetBoolValue(true);
 
   auto &initialRuntimeGameStatus =
@@ -431,13 +433,12 @@ gd::String ExporterHelper::SerializeRuntimeGameOptions(
             "hash",
             hashIt != options.includeFileHashes.end() ? hashIt->second : 0);
   }
-  return gd::Serializer::ToJSON(runtimeGameOptions);
 }
 
-gd::String
-ExporterHelper::SerializeProjectData(gd::AbstractFileSystem &fs,
-                                     const gd::Project &project,
-                                     const PreviewExportOptions &options) {
+void ExporterHelper::SerializeProjectData(gd::AbstractFileSystem &fs,
+                                          const gd::Project &project,
+                                          const PreviewExportOptions &options,
+                                          gd::SerializerElement &rootElement) {
   gd::Project clonedProject = project;
 
   // Replace all resource file paths with the one used in exported projects.
@@ -452,12 +453,13 @@ ExporterHelper::SerializeProjectData(gd::AbstractFileSystem &fs,
     resourcesMergingHelper.PreserveAbsoluteFilenames(false);
   }
   gd::ResourceExposer::ExposeWholeProjectResources(clonedProject,
-                                                    resourcesMergingHelper);
+                                                   resourcesMergingHelper);
 
-  return ExporterHelper::StriptAndSerializeProjectData(clonedProject);
+  ExporterHelper::StriptAndSerializeProjectData(clonedProject, rootElement);
 }
 
-gd::String ExporterHelper::StriptAndSerializeProjectData(gd::Project &project) {
+void ExporterHelper::StriptAndSerializeProjectData(
+    gd::Project &project, gd::SerializerElement &rootElement) {
   auto projectUsedResources =
       gd::SceneResourcesFinder::FindProjectResources(project);
   std::unordered_map<gd::String, std::set<gd::String>> scenesUsedResources;
@@ -500,11 +502,9 @@ gd::String ExporterHelper::StriptAndSerializeProjectData(gd::Project &project) {
   // things (objects groups...))
   gd::ProjectStripper::StripProjectForExport(project);
 
-  gd::SerializerElement rootElement;
   project.SerializeTo(rootElement);
   SerializeUsedResources(rootElement, projectUsedResources, scenesUsedResources,
                          eventsBasedObjectVariantsUsedResources);
-  return gd::Serializer::ToJSON(rootElement);
 }
 
 void ExporterHelper::SerializeUsedResources(

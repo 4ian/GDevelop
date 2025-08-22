@@ -342,6 +342,7 @@ namespace gdjs {
   export class InGameEditor {
     private _editorId: string = '';
     private _runtimeGame: RuntimeGame;
+    private _currentScene: gdjs.RuntimeScene | null = null;
     private _editedInstanceContainer: gdjs.RuntimeInstanceContainer | null =
       null;
     private _editedInstanceDataList: InstanceData[] = [];
@@ -424,12 +425,16 @@ namespace gdjs {
 
     constructor(game: RuntimeGame, projectData: ProjectData) {
       this._runtimeGame = game;
-      this._editorCamera = new EditorCamera(game);
+      this._editorCamera = new EditorCamera(this);
       this._selectionBoxElement = document.createElement('div');
       this._selectionBoxElement.style.position = 'fixed';
       this._selectionBoxElement.style.backgroundColor = '#f2a63c44';
       this._selectionBoxElement.style.border = '1px solid #f2a63c';
       this.onProjectDataChange(projectData);
+    }
+
+    getRuntimeGame() {
+      return this._runtimeGame;
     }
 
     onProjectDataChange(projectData: ProjectData): void {
@@ -485,12 +490,132 @@ namespace gdjs {
     }
 
     _getEditedInstanceContainer(): gdjs.RuntimeInstanceContainer | null {
-      // TODO Find a way to generalize this. Probably by using something like
-      // the scene stack but dedicated to the editor that can handle custom object tabs.
-      return (
-        this._editedInstanceContainer ||
-        this._runtimeGame.getSceneStack().getCurrentScene()
-      );
+      return this._editedInstanceContainer;
+    }
+
+    getCurrentScene(): gdjs.RuntimeScene | null {
+      return this._currentScene;
+    }
+
+    onGameResolutionResized() {
+      if (!this._currentScene) {
+        return;
+      }
+      this._currentScene.onGameResolutionResized();
+    }
+
+    async switchToSceneOrVariant(
+      editorId: string | null,
+      sceneName: string | null,
+      externalLayoutName: string | null,
+      eventsBasedObjectType: string | null,
+      eventsBasedObjectVariantName: string | null,
+      editorCamera3D: EditorCameraState | null
+    ) {
+      if (this._currentScene) {
+        this._currentScene.unloadScene();
+        this._currentScene = null;
+      }
+      let editedInstanceDataList: Array<InstanceData> = [];
+      if (eventsBasedObjectType) {
+        const eventsBasedObjectVariantData =
+          this._runtimeGame.getEventsBasedObjectVariantData(
+            eventsBasedObjectType,
+            eventsBasedObjectVariantName || ''
+          );
+        if (eventsBasedObjectVariantData) {
+          editedInstanceDataList = eventsBasedObjectVariantData.instances;
+          this.setInnerArea(eventsBasedObjectVariantData._initialInnerArea);
+          await this._runtimeGame._resourcesLoader.loadResources(
+            eventsBasedObjectVariantData.usedResources.map(
+              (resource) => resource.name
+            ),
+            () => {}
+          );
+          const sceneAndCustomObject =
+            this._runtimeGame._createSceneWithCustomObject(
+              eventsBasedObjectType,
+              eventsBasedObjectVariantName || ''
+            );
+          if (sceneAndCustomObject) {
+            const { scene, customObjectInstanceContainer } =
+              sceneAndCustomObject;
+            this._currentScene = scene;
+            this.setEditedInstanceContainer(customObjectInstanceContainer);
+          }
+        }
+      } else if (sceneName) {
+        await this._runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+          sceneName,
+          () => {}
+        );
+        // Load the new one
+        const newScene = new gdjs.RuntimeScene(this._runtimeGame);
+        newScene.loadFromScene(
+          this._runtimeGame.getSceneAndExtensionsData(sceneName),
+          {
+            skipCreatingInstances: !!externalLayoutName,
+          }
+        );
+
+        // Optionally create the objects from an external layout.
+        if (externalLayoutName) {
+          const externalLayoutData =
+            this._runtimeGame.getExternalLayoutData(externalLayoutName);
+          if (externalLayoutData) {
+            newScene.createObjectsFrom(
+              externalLayoutData.instances,
+              0,
+              0,
+              0,
+              /*trackByPersistentUuid=*/
+              true
+            );
+          }
+        }
+        this._currentScene = newScene;
+        this.setEditedInstanceContainer(newScene);
+        if (externalLayoutName) {
+          const externalLayoutData =
+            this._runtimeGame.getExternalLayoutData(externalLayoutName);
+          if (externalLayoutData) {
+            editedInstanceDataList = externalLayoutData.instances;
+          }
+        } else {
+          const sceneAndExtensionsData =
+            this._runtimeGame.getSceneAndExtensionsData(sceneName);
+          if (sceneAndExtensionsData) {
+            editedInstanceDataList = sceneAndExtensionsData.sceneData.instances;
+          }
+        }
+      }
+      this._editedInstanceDataList = editedInstanceDataList;
+      this._editorId = editorId || '';
+      if (editorCamera3D) {
+        this.restoreCameraState(editorCamera3D);
+      } else {
+        // TODO Get the visibleScreenArea from the editor.
+        this.zoomToInitialPosition({
+          minX: 0.15,
+          minY: 0.15,
+          maxX: 0.85,
+          maxY: 0.85,
+        });
+      }
+
+      // Update initialRuntimeGameStatus so that a hard reload
+      // will come back to the same state, and so that we can check later
+      // if the game is already on the state that is being requested.
+      this._runtimeGame.getAdditionalOptions().initialRuntimeGameStatus = {
+        isPaused: this._runtimeGame.isPaused(),
+        isInGameEdition: this._runtimeGame.isInGameEdition(),
+        sceneName: sceneName,
+        injectedExternalLayoutName: externalLayoutName,
+        skipCreatingInstancesFromScene: !!externalLayoutName,
+        eventsBasedObjectType,
+        eventsBasedObjectVariantName,
+        editorId,
+      };
     }
 
     setInnerArea(innerArea: AABB3D | null) {
@@ -611,6 +736,7 @@ namespace gdjs {
       },
       margin: float
     ) {
+      if (!this._currentScene) return;
       this._getEditorCamera().zoomToFitArea(
         sceneArea,
         visibleScreenArea,
@@ -619,8 +745,7 @@ namespace gdjs {
     }
 
     zoomBy(zoomInFactor: float) {
-      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
-      if (!currentScene) return;
+      if (!this._currentScene) return;
 
       this._getEditorCamera().zoomBy(zoomInFactor);
     }
@@ -658,8 +783,7 @@ namespace gdjs {
       maxX: number;
       maxY: number;
     }) {
-      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
-      if (!currentScene) return;
+      if (!this._currentScene) return;
 
       const object = this._selection.getLastSelectedObject();
       if (!object) {
@@ -673,7 +797,7 @@ namespace gdjs {
 
     private _handleCameraMovement() {
       const inputManager = this._runtimeGame.getInputManager();
-      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
+      const currentScene = this._currentScene;
       if (!currentScene) return;
 
       const selectedObject = this._selection.getLastSelectedObject();
@@ -704,8 +828,7 @@ namespace gdjs {
     }
 
     moveSelectionUnderCursor() {
-      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
-      if (!currentScene) return;
+      if (!this._currentScene) return;
 
       const cursor = this._getCursorIn3D(this._selection.getSelectedObjects());
       if (!cursor) {
@@ -745,8 +868,7 @@ namespace gdjs {
       if (!shouldDragSelectedObject(inputManager)) {
         return;
       }
-      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
-      if (!currentScene) return;
+      if (!this._currentScene) return;
       const editedInstanceContainer = this._getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
 
@@ -893,7 +1015,7 @@ namespace gdjs {
       const runtimeGame = this._runtimeGame;
       const threeRenderer = runtimeGame.getRenderer().getThreeRenderer();
       if (!threeRenderer) return;
-      const currentScene = runtimeGame.getSceneStack().getCurrentScene();
+      const currentScene = this._currentScene;
       if (!currentScene) return;
 
       const layer = currentScene.getLayer(this._selectedLayerName);
@@ -1061,9 +1183,7 @@ namespace gdjs {
     }: {
       objectUnderCursor: gdjs.RuntimeObject | null;
     }) {
-      const runtimeGame = this._runtimeGame;
-      const currentScene = runtimeGame.getSceneStack().getCurrentScene();
-      if (!currentScene) return;
+      if (!this._currentScene) return;
 
       const selected3DObjects = this._selection
         .getSelectedObjects()
@@ -1105,8 +1225,7 @@ namespace gdjs {
       if (this._selectionBoxes.has(object)) {
         return;
       }
-      const runtimeGame = this._runtimeGame;
-      const currentScene = runtimeGame.getSceneStack().getCurrentScene();
+      const currentScene = this._currentScene;
       if (!currentScene) return;
 
       const threeObject = object.get3DRendererObject();
@@ -1149,9 +1268,8 @@ namespace gdjs {
     }
 
     private _updateSelectionControls() {
-      const runtimeGame = this._runtimeGame;
       const inputManager = this._runtimeGame.getInputManager();
-      const currentScene = runtimeGame.getSceneStack().getCurrentScene();
+      const currentScene = this._currentScene;
       if (!currentScene) return;
 
       const lastSelectedObject = this._selection.getLastSelectedObject();
@@ -1467,8 +1585,7 @@ namespace gdjs {
     }
 
     private _updateInnerAreaOutline(): void {
-      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
-      if (!currentScene) return;
+      if (!this._currentScene) return;
 
       const layer = this._getFirstLayer3D();
       if (!layer) {
@@ -1608,7 +1725,7 @@ namespace gdjs {
     }
 
     dragNewInstance({ name, dropped }: { name: string; dropped: boolean }) {
-      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
+      const currentScene = this._currentScene;
       if (!currentScene) return;
       const editedInstanceContainer = this._getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
@@ -1709,7 +1826,7 @@ namespace gdjs {
     }
 
     _getFirstLayer3D(): gdjs.RuntimeLayer | null {
-      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
+      const currentScene = this._currentScene;
       if (!currentScene) return null;
 
       const layerNames = [];
@@ -1728,7 +1845,7 @@ namespace gdjs {
      * @returns The cursor projected on the plane Z = 0 or `null` if the cursor is in the sky.
      */
     _getProjectedCursor(): FloatPoint | null {
-      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
+      const currentScene = this._currentScene;
       if (!currentScene) return null;
 
       const layer = this._getFirstLayer3D();
@@ -1847,7 +1964,7 @@ namespace gdjs {
       const cursorY = runtimeGame.getInputManager().getCursorY();
 
       const layerNames = [];
-      const currentScene = runtimeGame.getSceneStack().getCurrentScene();
+      const currentScene = this._currentScene;
       const threeRenderer = runtimeGame.getRenderer().getThreeRenderer();
       if (!currentScene || !threeRenderer) return null;
 
@@ -2050,6 +2167,11 @@ namespace gdjs {
       }
       this._wasMouseLeftButtonPressed = inputManager.isMouseButtonPressed(0);
       this._wasMouseRightButtonPressed = inputManager.isMouseButtonPressed(1);
+
+      if (this._currentScene) {
+        this._currentScene._updateObjectsForInGameEditor();
+        this._currentScene.render();
+      }
     }
 
     private _getEditorCamera(): EditorCamera {
@@ -2068,16 +2190,16 @@ namespace gdjs {
   };
 
   class EditorCamera implements CameraControl {
-    _runtimeGame: gdjs.RuntimeGame;
+    editor: gdjs.InGameEditor;
     orbitCameraControl: OrbitCameraControl;
     freeCameraControl: FreeCameraControl;
     private _hasChanged = false;
     private _hadChanged = false;
 
-    constructor(runtimeGame: gdjs.RuntimeGame) {
-      this._runtimeGame = runtimeGame;
-      this.orbitCameraControl = new OrbitCameraControl(this, runtimeGame);
-      this.freeCameraControl = new FreeCameraControl(this, runtimeGame);
+    constructor(editor: gdjs.InGameEditor) {
+      this.editor = editor;
+      this.orbitCameraControl = new OrbitCameraControl(this);
+      this.freeCameraControl = new FreeCameraControl(this);
       this.freeCameraControl.setEnabled(false);
     }
 
@@ -2174,13 +2296,14 @@ namespace gdjs {
       maxX: number;
       maxY: number;
     }) {
+      const runtimeGame = this.editor.getRuntimeGame();
       this.zoomToFitArea(
         {
           minX: 0,
           minY: 0,
           minZ: 0,
-          maxX: this._runtimeGame.getOriginalWidth(),
-          maxY: this._runtimeGame.getOriginalHeight(),
+          maxX: runtimeGame.getOriginalWidth(),
+          maxY: runtimeGame.getOriginalHeight(),
           maxZ: 0,
         },
         visibleScreenArea,
@@ -2199,13 +2322,14 @@ namespace gdjs {
       margin: float
     ) {
       if (objects.length === 0) {
+        const runtimeGame = this.editor.getRuntimeGame();
         this.zoomToFitArea(
           {
             minX: 0,
             minY: 0,
             minZ: 0,
-            maxX: this._runtimeGame.getOriginalWidth(),
-            maxY: this._runtimeGame.getOriginalHeight(),
+            maxX: runtimeGame.getOriginalWidth(),
+            maxY: runtimeGame.getOriginalHeight(),
             maxZ: 0,
           },
           visibleScreenArea,
@@ -2258,14 +2382,12 @@ namespace gdjs {
       },
       margin: float
     ) {
-      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
-      if (!currentScene) return;
-
       const sceneAreaWidth = sceneArea.maxX - sceneArea.minX;
       const sceneAreaHeight = sceneArea.maxY - sceneArea.minY;
 
-      const renderedWidth = this._runtimeGame.getGameResolutionWidth();
-      const renderedHeight = this._runtimeGame.getGameResolutionHeight();
+      const runtimeGame = this.editor.getRuntimeGame();
+      const renderedWidth = runtimeGame.getGameResolutionWidth();
+      const renderedHeight = runtimeGame.getGameResolutionHeight();
       const editorWidth =
         (visibleScreenArea.maxX - visibleScreenArea.minX) * renderedWidth;
       const editorHeight =
@@ -2299,6 +2421,7 @@ namespace gdjs {
      * @return The z position of the camera
      */
     private _getCameraZFromZoom = (zoom: float): float => {
+      const runtimeGame = this.editor.getRuntimeGame();
       // TODO Should the editor force this fov?
       const fov = 45;
       // Set the camera so that it displays the whole PixiJS plane, as if it was a 2D rendering.
@@ -2306,7 +2429,7 @@ namespace gdjs {
       // and using the angle of the triangle defined by the field of view to compute the length
       // of the triangle defining the distance between the camera and the rendering plane.
       return (
-        (0.5 * this._runtimeGame.getGameResolutionHeight()) /
+        (0.5 * runtimeGame.getGameResolutionHeight()) /
         zoom /
         Math.tan(0.5 * gdjs.toRad(fov))
       );
@@ -2330,7 +2453,8 @@ namespace gdjs {
     }
 
     private _sendCameraState() {
-      const debuggerClient = this._runtimeGame._debuggerClient;
+      const runtimeGame = this.editor.getRuntimeGame();
+      const debuggerClient = runtimeGame._debuggerClient;
       if (!debuggerClient) return;
       debuggerClient.sendCameraState(this.getCameraState());
     }
@@ -2351,14 +2475,12 @@ namespace gdjs {
     distance: float = 800;
     private _isEnabled: boolean = true;
 
-    private _runtimeGame: gdjs.RuntimeGame;
     private _lastCursorX: float = 0;
     private _lastCursorY: float = 0;
     private _wasMouseRightButtonPressed = false;
 
-    constructor(editorCamera: EditorCamera, runtimeGame: gdjs.RuntimeGame) {
+    constructor(editorCamera: EditorCamera) {
       this._editorCamera = editorCamera;
-      this._runtimeGame = runtimeGame;
     }
 
     isEnabled(): boolean {
@@ -2371,7 +2493,8 @@ namespace gdjs {
     }
 
     step(): void {
-      const inputManager = this._runtimeGame._inputManager;
+      const runtimeGame = this._editorCamera.editor.getRuntimeGame();
+      const inputManager = runtimeGame._inputManager;
       if (this._isEnabled) {
         // Right click: rotate the camera.
         if (
@@ -2484,14 +2607,12 @@ namespace gdjs {
     private _euler: THREE.Euler = new THREE.Euler(0, 0, 0, 'ZYX');
     private _rotationMatrix: THREE.Matrix4 = new THREE.Matrix4();
 
-    private _runtimeGame: gdjs.RuntimeGame;
     private _lastCursorX: float = 0;
     private _lastCursorY: float = 0;
     private _wasMouseRightButtonPressed = false;
 
-    constructor(editorCamera: EditorCamera, runtimeGame: gdjs.RuntimeGame) {
+    constructor(editorCamera: EditorCamera) {
       this._editorCamera = editorCamera;
-      this._runtimeGame = runtimeGame;
     }
 
     isEnabled(): boolean {
@@ -2504,7 +2625,8 @@ namespace gdjs {
     }
 
     step(): void {
-      const inputManager = this._runtimeGame._inputManager;
+      const runtimeGame = this._editorCamera.editor.getRuntimeGame();
+      const inputManager = runtimeGame._inputManager;
       if (this._isEnabled) {
         const { right, up, forward } = this.getCameraVectors();
 

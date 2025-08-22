@@ -352,20 +352,16 @@ namespace gdjs {
           );
           return;
         }
-
-        this._runtimegame._switchToSceneOrVariant(
-          data.editorId || null,
-          sceneName,
-          data.externalLayoutName || null,
-          eventsBasedObjectType,
-          data.eventsBasedObjectVariantName || null,
-          data.editorCamera3D || null
-        );
-
         const inGameEditor = this._runtimegame._inGameEditor;
         if (inGameEditor) {
-          inGameEditor.setEditorId(data.editorId);
-          // TODO Call zoomToInitialPosition?
+          inGameEditor.switchToSceneOrVariant(
+            data.editorId || null,
+            sceneName,
+            data.externalLayoutName || null,
+            eventsBasedObjectType,
+            data.eventsBasedObjectVariantName || null,
+            data.editorCamera3D || null
+          );
         }
       } else if (data.command === 'updateInstances') {
         if (runtimeGame._inGameEditor) {

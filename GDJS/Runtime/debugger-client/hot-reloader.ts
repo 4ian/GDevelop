@@ -227,14 +227,17 @@ namespace gdjs {
             newRuntimeGameStatus.sceneName || newProjectData.firstLayout,
             () => {}
           );
-          this._runtimeGame._forceToSwitchToSceneOrVariant(
-            newRuntimeGameStatus.editorId || null,
-            newRuntimeGameStatus.sceneName,
-            newRuntimeGameStatus.injectedExternalLayoutName,
-            newRuntimeGameStatus.eventsBasedObjectType,
-            newRuntimeGameStatus.eventsBasedObjectVariantName,
-            newRuntimeGameStatus.editorCamera3D || null
-          );
+          const inGameEditor = this._runtimeGame._inGameEditor;
+          if (inGameEditor) {
+            await inGameEditor.switchToSceneOrVariant(
+              newRuntimeGameStatus.editorId || null,
+              newRuntimeGameStatus.sceneName,
+              newRuntimeGameStatus.injectedExternalLayoutName,
+              newRuntimeGameStatus.eventsBasedObjectType,
+              newRuntimeGameStatus.eventsBasedObjectVariantName,
+              newRuntimeGameStatus.editorCamera3D || null
+            );
+          }
         } else {
           const changedRuntimeBehaviors = this._computeChangedRuntimeBehaviors(
             oldBehaviorConstructors,

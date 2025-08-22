@@ -1091,23 +1091,36 @@ namespace gdjs {
         const externalLayoutName =
           this._options.initialRuntimeGameStatus?.injectedExternalLayoutName ||
           null;
-        const eventsBasedObjectType =
-          this._options.initialRuntimeGameStatus?.eventsBasedObjectType || null;
-        const eventsBasedObjectVariantName =
-          this._options.initialRuntimeGameStatus
-            ?.eventsBasedObjectVariantName || null;
-        const editorId =
-          this._options.initialRuntimeGameStatus?.editorId || null;
-        const editorCamera3D =
-          this._options.initialRuntimeGameStatus?.editorCamera3D || null;
-        this._forceToSwitchToSceneOrVariant(
-          editorId,
-          sceneName,
-          externalLayoutName,
-          eventsBasedObjectType,
-          eventsBasedObjectVariantName,
-          editorCamera3D
-        );
+        if (this._inGameEditor) {
+          const eventsBasedObjectType =
+            this._options.initialRuntimeGameStatus?.eventsBasedObjectType ||
+            null;
+          const eventsBasedObjectVariantName =
+            this._options.initialRuntimeGameStatus
+              ?.eventsBasedObjectVariantName || null;
+          const editorId =
+            this._options.initialRuntimeGameStatus?.editorId || null;
+          const editorCamera3D =
+            this._options.initialRuntimeGameStatus?.editorCamera3D || null;
+          this._inGameEditor.switchToSceneOrVariant(
+            editorId,
+            sceneName,
+            externalLayoutName,
+            eventsBasedObjectType,
+            eventsBasedObjectVariantName,
+            editorCamera3D
+          );
+        } else {
+          if (sceneName) {
+            this.getSceneStack().replace({
+              sceneName,
+              externalLayoutName:
+                externalLayoutName === null ? undefined : externalLayoutName,
+              skipCreatingInstancesFromScene: !!externalLayoutName,
+              clear: true,
+            });
+          }
+        }
 
         this._watermark.displayAtStartup();
 
@@ -1141,7 +1154,9 @@ namespace gdjs {
           try {
             if (this._debuggerClient) {
               // Watch the scene name to automatically update debugger when a scene is changed.
-              const currentScene = this.getSceneStack().getCurrentScene();
+              const currentScene = (
+                this._inGameEditor || this.getSceneStack()
+              ).getCurrentScene();
               if (
                 currentScene &&
                 currentScene.getName() !== lastFrameSceneName
@@ -1158,10 +1173,13 @@ namespace gdjs {
                 this._notifyScenesForGameResolutionResize = false;
               }
 
-              if (this._inGameEditor) this._inGameEditor.updateAndRender();
-              // The game is paused for edition: the game loop continues to run,
-              // but the game logic is not executed.
-              this._sceneStack.renderWithoutStep();
+              if (this._inGameEditor) {
+                this._inGameEditor.updateAndRender();
+              } else {
+                // The game is paused for edition: the game loop continues to run,
+                // but the game logic is not executed.
+                this._sceneStack.renderWithoutStep();
+              }
               this.getInputManager().onFrameEnded();
 
               return true;
@@ -1184,15 +1202,26 @@ namespace gdjs {
 
             // Manage resize events.
             if (this._notifyScenesForGameResolutionResize) {
-              this._sceneStack.onGameResolutionResized();
+              if (this._inGameEditor) {
+                this._inGameEditor.onGameResolutionResized();
+              } else {
+                this._sceneStack.onGameResolutionResized();
+              }
               this._notifyScenesForGameResolutionResize = false;
             }
 
             // Render and step the scene.
-            if (this._sceneStack.step(elapsedTime)) {
+            if (this._inGameEditor) {
+              this._inGameEditor.updateAndRender();
               this.getInputManager().onFrameEnded();
               this._hasJustResumed = false;
               return true;
+            } else {
+              if (this._sceneStack.step(elapsedTime)) {
+                this.getInputManager().onFrameEnded();
+                this._hasJustResumed = false;
+                return true;
+              }
             }
             return false;
           } catch (e) {
@@ -1213,160 +1242,6 @@ namespace gdjs {
 
         throw e;
       }
-    }
-
-    _reconnectInGameEditor() {
-      const initialRuntimeGameStatus =
-        this.getAdditionalOptions().initialRuntimeGameStatus;
-      if (!initialRuntimeGameStatus || !this._inGameEditor) {
-        return;
-      }
-      this._forceToSwitchToSceneOrVariant(
-        initialRuntimeGameStatus.editorId,
-        initialRuntimeGameStatus.sceneName,
-        initialRuntimeGameStatus.injectedExternalLayoutName,
-        initialRuntimeGameStatus.eventsBasedObjectType,
-        initialRuntimeGameStatus.eventsBasedObjectVariantName,
-        this._inGameEditor.getCameraState()
-      );
-    }
-
-    _switchToSceneOrVariant(
-      editorId: string | null,
-      sceneName: string | null,
-      externalLayoutName: string | null,
-      eventsBasedObjectType: string | null,
-      eventsBasedObjectVariantName: string | null,
-      editorCamera3D: EditorCameraState | null
-    ) {
-      const initialRuntimeGameStatus =
-        this.getAdditionalOptions().initialRuntimeGameStatus;
-      if (initialRuntimeGameStatus) {
-        // Skip changing the scene if we're already on the state that is being requested.
-        if (
-          initialRuntimeGameStatus.sceneName === sceneName &&
-          initialRuntimeGameStatus.injectedExternalLayoutName ===
-            externalLayoutName &&
-          initialRuntimeGameStatus.eventsBasedObjectType ===
-            eventsBasedObjectType &&
-          initialRuntimeGameStatus.eventsBasedObjectVariantName ===
-            eventsBasedObjectVariantName
-        ) {
-          return;
-        }
-      }
-      this._forceToSwitchToSceneOrVariant(
-        editorId,
-        sceneName,
-        externalLayoutName,
-        eventsBasedObjectType,
-        eventsBasedObjectVariantName,
-        editorCamera3D
-      );
-    }
-
-    _forceToSwitchToSceneOrVariant(
-      editorId: string | null,
-      sceneName: string | null,
-      externalLayoutName: string | null,
-      eventsBasedObjectType: string | null,
-      eventsBasedObjectVariantName: string | null,
-      editorCamera3D: EditorCameraState | null
-    ) {
-      let editedInstanceDataList: Array<InstanceData> = [];
-      if (eventsBasedObjectType) {
-        const eventsBasedObjectVariantData =
-          this.getEventsBasedObjectVariantData(
-            eventsBasedObjectType,
-            eventsBasedObjectVariantName || ''
-          );
-        if (eventsBasedObjectVariantData) {
-          editedInstanceDataList = eventsBasedObjectVariantData.instances;
-          if (this._inGameEditor) {
-            this._inGameEditor.setInnerArea(
-              eventsBasedObjectVariantData._initialInnerArea
-            );
-          }
-          // TODO Can this leave the editor in an inconsistent state for a few frames?
-          this._resourcesLoader
-            .loadResources(
-              eventsBasedObjectVariantData.usedResources.map(
-                (resource) => resource.name
-              ),
-              () => {}
-            )
-            .then(() => {
-              const sceneAndCustomObject = this._createSceneWithCustomObject(
-                eventsBasedObjectType,
-                eventsBasedObjectVariantName || ''
-              );
-              if (sceneAndCustomObject) {
-                const { scene, customObjectInstanceContainer } =
-                  sceneAndCustomObject;
-                this.getSceneStack().setEditedRuntimeScene(scene);
-                if (this._inGameEditor) {
-                  this._inGameEditor.setEditedInstanceContainer(
-                    customObjectInstanceContainer
-                  );
-                }
-              }
-            });
-        }
-      } else if (sceneName) {
-        this.getSceneStack().replace({
-          sceneName,
-          externalLayoutName:
-            externalLayoutName === null ? undefined : externalLayoutName,
-          skipCreatingInstancesFromScene: !!externalLayoutName,
-          clear: true,
-        });
-        if (this._inGameEditor) {
-          this._inGameEditor.setEditedInstanceContainer(null);
-          if (externalLayoutName) {
-            const externalLayoutData =
-              this.getExternalLayoutData(externalLayoutName);
-            if (externalLayoutData) {
-              editedInstanceDataList = externalLayoutData.instances;
-            }
-          } else {
-            const sceneAndExtensionsData =
-              this.getSceneAndExtensionsData(sceneName);
-            if (sceneAndExtensionsData) {
-              editedInstanceDataList =
-                sceneAndExtensionsData.sceneData.instances;
-            }
-          }
-        }
-      }
-      if (this._inGameEditor) {
-        this._inGameEditor.setEditedInstanceDataList(editedInstanceDataList);
-        this._inGameEditor.setEditorId(editorId || '');
-        if (editorCamera3D) {
-          this._inGameEditor.restoreCameraState(editorCamera3D);
-        } else {
-          // TODO Get the visibleScreenArea from the editor.
-          this._inGameEditor.zoomToInitialPosition({
-            minX: 0.15,
-            minY: 0.15,
-            maxX: 0.85,
-            maxY: 0.85,
-          });
-        }
-      }
-
-      // Update initialRuntimeGameStatus so that a hard reload
-      // will come back to the same state, and so that we can check later
-      // if the game is already on the state that is being requested.
-      this.getAdditionalOptions().initialRuntimeGameStatus = {
-        isPaused: this.isPaused(),
-        isInGameEdition: this.isInGameEdition(),
-        sceneName: sceneName,
-        injectedExternalLayoutName: externalLayoutName,
-        skipCreatingInstancesFromScene: !!externalLayoutName,
-        eventsBasedObjectType,
-        eventsBasedObjectVariantName,
-        editorId,
-      };
     }
 
     _createSceneWithCustomObject(

@@ -75,6 +75,17 @@ void ResourceExposer::ExposeProjectResources(
   // Expose global objects configuration resources
   auto objectWorker = gd::GetResourceWorkerOnObjects(project, worker);
   objectWorker.Launch(project.GetObjects());
+
+  // Exposed extension event resources
+  // Note that using resources in extensions is very unlikely and probably not
+  // worth the effort of something smart.
+  auto eventWorker = gd::GetResourceWorkerOnEvents(project, worker);
+  for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
+       e++) {
+    auto &eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
+    gd::ProjectBrowserHelper::ExposeEventsFunctionsExtensionEvents(
+        project, eventsFunctionsExtension, eventWorker);
+  }
 }
 
 void ResourceExposer::ExposeLayoutResources(
@@ -103,16 +114,6 @@ void ResourceExposer::ExposeLayoutResources(
   auto eventWorker = gd::GetResourceWorkerOnEvents(project, worker);
   gd::ProjectBrowserHelper::ExposeLayoutEventsAndDependencies(
       project, layout, eventWorker);
-
-  // Exposed extension event resources
-  // Note that using resources in extensions is very unlikely and probably not
-  // worth the effort of something smart.
-  for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
-       e++) {
-    auto &eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
-    gd::ProjectBrowserHelper::ExposeEventsFunctionsExtensionEvents(
-        project, eventsFunctionsExtension, eventWorker);
-  }
 }
 
 void ResourceExposer::ExposeEventsBasedObjectVariantResources(

@@ -199,19 +199,18 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
   return true;
 }
 
-gd::String Exporter::SerializeProjectData(const gd::Project &project,
-                                          const PreviewExportOptions &options) {
-  gd::SerializerElement rootElement;
-  ExporterHelper::SerializeProjectData(fs, project, options, rootElement);
-  return gd::Serializer::ToJSON(rootElement);
+void Exporter::SerializeProjectData(const gd::Project &project,
+                                    const PreviewExportOptions &options,
+                                    gd::SerializerElement &projectDataElement) {
+  ExporterHelper::SerializeProjectData(fs, project, options,
+                                       projectDataElement);
 }
 
-gd::String
-Exporter::SerializeRuntimeGameOptions(const PreviewExportOptions &options) {
-  gd::SerializerElement rootElement;
-  ExporterHelper::SerializeRuntimeGameOptions(fs, gdjsRoot, options,
-                                              includesFiles, rootElement);
-  return gd::Serializer::ToJSON(rootElement);
+void Exporter::SerializeRuntimeGameOptions(
+    const PreviewExportOptions &options,
+    gd::SerializerElement &runtimeGameOptionsElement) {
+  ExporterHelper::SerializeRuntimeGameOptions(
+      fs, gdjsRoot, options, includesFiles, runtimeGameOptionsElement);
 }
 
 }  // namespace gdjs

@@ -3009,8 +3009,8 @@ export class Exporter extends EmscriptenObject {
   setCodeOutputDirectory(path: string): void;
   exportProjectForPixiPreview(options: PreviewExportOptions): boolean;
   exportWholePixiProject(options: ExportOptions): boolean;
-  serializeProjectData(project: Project, options: PreviewExportOptions): string;
-  serializeRuntimeGameOptions(options: PreviewExportOptions): string;
+  serializeProjectData(project: Project, options: PreviewExportOptions, projectDataElement: SerializerElement): void;
+  serializeRuntimeGameOptions(options: PreviewExportOptions, runtimeGameOptionsElement: SerializerElement): void;
   getLastError(): string;
 }
 

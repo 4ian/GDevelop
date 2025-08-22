@@ -343,15 +343,23 @@ export default class LocalPreviewLauncher extends React.Component<
     exporter.exportProjectForPixiPreview(previewExportOptions);
 
     if (shouldHotReload) {
-      const serializedProjectData = exporter.serializeProjectData(
+      const projectDataElement = new gd.SerializerElement();
+      exporter.serializeProjectData(
         project,
-        previewExportOptions
+        previewExportOptions,
+        projectDataElement
       );
-      const projectData = JSON.parse(serializedProjectData);
-      const serializedRuntimeGameOptions = exporter.serializeRuntimeGameOptions(
-        previewExportOptions
+      const projectData = JSON.parse(gd.Serializer.toJSON(projectDataElement));
+      projectDataElement.delete();
+      const runtimeGameOptionsElement = new gd.SerializerElement();
+      exporter.serializeRuntimeGameOptions(
+        previewExportOptions,
+        runtimeGameOptionsElement
       );
-      const runtimeGameOptions = JSON.parse(serializedRuntimeGameOptions);
+      const runtimeGameOptions = JSON.parse(
+        gd.Serializer.toJSON(runtimeGameOptionsElement)
+      );
+
       debuggerIds.forEach(debuggerId => {
         this.getPreviewDebuggerServer().sendMessage(debuggerId, {
           command: 'hotReload',

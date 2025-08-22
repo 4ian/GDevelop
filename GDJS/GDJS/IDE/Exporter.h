@@ -16,6 +16,7 @@ class Project;
 class Layout;
 class ExternalLayout;
 class AbstractFileSystem;
+class SerializerElement;
 }  // namespace gd
 namespace gdjs {
 struct PreviewExportOptions;
@@ -69,9 +70,11 @@ class Exporter {
    *
    * \param project The project to be exported
    * \param options The content of the extra configuration
+   * \param projectDataElement The element where the project data is serialized
    */
-  gd::String SerializeProjectData(const gd::Project &project,
-                                  const PreviewExportOptions &options);
+  void SerializeProjectData(const gd::Project &project,
+                            const PreviewExportOptions &options,
+                            gd::SerializerElement &projectDataElement);
 
   /**
    * \brief Serialize the content of the extra configuration to store
@@ -81,8 +84,12 @@ class Exporter {
    * the list of scripts files.
    *
    * \param options The content of the extra configuration
+   * \param runtimeGameOptionsElement The element where the game options are
+   * serialized
    */
-  gd::String SerializeRuntimeGameOptions(const PreviewExportOptions &options);
+  void
+  SerializeRuntimeGameOptions(const PreviewExportOptions &options,
+                              gd::SerializerElement &runtimeGameOptionsElement);
 
 private:
   gd::AbstractFileSystem&

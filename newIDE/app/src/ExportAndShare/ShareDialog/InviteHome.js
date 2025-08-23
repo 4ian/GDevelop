@@ -19,7 +19,10 @@ import {
 } from '../../Utils/GDevelopServices/Project';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import PlaceholderError from '../../UI/PlaceholderError';
-import { getUserPublicProfilesByIds } from '../../Utils/GDevelopServices/User';
+import {
+  getUserPublicProfilesByIds,
+  type UserPublicProfileByIds,
+} from '../../Utils/GDevelopServices/User';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import LeftLoader from '../../UI/LeftLoader';
@@ -84,9 +87,10 @@ const InviteHome = ({ cloudProjectId }: Props) => {
     | 'unexpected'
     | null
   >(null);
-  const [userPublicProfileByIds, setUserPublicProfileByIds] = React.useState(
-    {}
-  );
+  const [
+    userPublicProfileByIds,
+    setUserPublicProfileByIds,
+  ] = React.useState<UserPublicProfileByIds>({});
   const [
     showCollaboratorAddDialog,
     setShowCollaboratorAddDialog,
@@ -312,6 +316,7 @@ const InviteHome = ({ cloudProjectId }: Props) => {
       <ColumnStackLayout expand noMargin>
         <UserLine
           username={profile.username}
+          fullName={profile.fullName}
           email={profile.email}
           level={currentUserLevel}
         />
@@ -365,6 +370,7 @@ const InviteHome = ({ cloudProjectId }: Props) => {
           projectUserAcls.map(projectUserAcl => (
             <UserLine
               username={getCollaboratorUsername(projectUserAcl.userId)}
+              fullName={null}
               email={projectUserAcl.email}
               level={projectUserAcl.level}
               onDelete={() => {

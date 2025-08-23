@@ -3,7 +3,10 @@
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import Grid from '@material-ui/core/Grid';
-import { type User } from '../../../../../Utils/GDevelopServices/User';
+import {
+  type User,
+  type EditUserChanges,
+} from '../../../../../Utils/GDevelopServices/User';
 import Text from '../../../../../UI/Text';
 import { LineStackLayout } from '../../../../../UI/Layout';
 import Checkbox from '../../../../../UI/Checkbox';
@@ -12,9 +15,11 @@ import CheckboxChecked from '../../../../../UI/CustomSvgIcons/CheckboxChecked';
 import AsyncSemiControlledTextField from '../../../../../UI/AsyncSemiControlledTextField';
 import IconButton from '../../../../../UI/IconButton';
 import Key from '../../../../../UI/CustomSvgIcons/Key';
+import Edit from '../../../../../UI/CustomSvgIcons/Edit';
 import { Line } from '../../../../../UI/Grid';
 import { useResponsiveWindowSize } from '../../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import { textEllipsisStyle } from '../../../../../UI/TextEllipsis';
+import { EditStudentDialog } from './EditStudentDialog';
 
 const primaryTextArchivedOpacity = 0.6;
 const primaryTextPlaceholderOpacity = 0.7;
@@ -47,6 +52,10 @@ type Props = {|
     userId: string,
     newPassword: string,
   |}) => Promise<void>,
+  onEdit: ({|
+    editedUserId: string,
+    changes: EditUserChanges,
+  |}) => Promise<void>,
 |};
 
 const ManageStudentRow = ({
@@ -55,11 +64,18 @@ const ManageStudentRow = ({
   isArchived,
   onSelect,
   onChangePassword,
+  onEdit,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const [isEditingPassword, setIsEditingPassword] = React.useState<boolean>(
     false
   );
+  const [isSavingUser, setIsSavingUser] = React.useState<boolean>(false);
+  const [isEditingUser, setIsEditingUser] = React.useState<boolean>(false);
+  const [editedUserError, setEditedUserError] = React.useState<Error | null>(
+    null
+  );
+
   const [
     passwordEditionError,
     setPasswordEditionError,
@@ -110,15 +126,30 @@ const ManageStudentRow = ({
         uncheckedIcon={<CheckboxUnchecked />}
         checkedIcon={<CheckboxChecked />}
       />
-      {member.username ? (
+      {member.username || member.fullName ? (
         <Text
           allowSelection
           style={{
             ...textEllipsisStyle,
             opacity: isArchived ? primaryTextArchivedOpacity : undefined,
           }}
+          tooltip={[member.fullName, member.username]
+            .filter(Boolean)
+            .join(' - ')}
         >
-          <b>{member.username}</b>
+          <b>
+            {member.fullName ? (
+              member.username ? (
+                <Trans>
+                  {member.fullName} ({member.username})
+                </Trans>
+              ) : (
+                member.fullName
+              )
+            ) : (
+              member.username
+            )}
+          </b>
         </Text>
       ) : (
         <Text
@@ -135,6 +166,15 @@ const ManageStudentRow = ({
             <Trans>Not set</Trans>
           </i>
         </Text>
+      )}
+      {!isArchived && (
+        <IconButton
+          size="small"
+          onClick={() => setIsEditingUser(true)}
+          tooltip={t`Change username or full name`}
+        >
+          <Edit fontSize="small" />
+        </IconButton>
       )}
     </LineStackLayout>
   );
@@ -205,6 +245,31 @@ const ManageStudentRow = ({
     </LineStackLayout>
   );
 
+  const editDialog = isEditingUser && (
+    <EditStudentDialog
+      member={member}
+      isSaving={isSavingUser}
+      error={editedUserError}
+      onApply={async (changes: EditUserChanges) => {
+        try {
+          setEditedUserError(null);
+          setIsSavingUser(true);
+          await onEdit({ editedUserId: member.id, changes });
+          setIsEditingUser(false);
+        } catch (error) {
+          console.error('An error occurred while editing user:', error);
+          setEditedUserError(error);
+        } finally {
+          setIsSavingUser(false);
+        }
+      }}
+      onClose={() => {
+        setIsEditingUser(false);
+        setEditedUserError(null);
+      }}
+    />
+  );
+
   if (isMobile) {
     return (
       <>
@@ -217,21 +282,23 @@ const ManageStudentRow = ({
         <Grid item xs={4} style={isMobile ? styles.mobileCell : styles.cell}>
           {passwordCell}
         </Grid>
+        {editDialog}
       </>
     );
   }
 
   return (
     <>
-      <Grid item xs={5} style={isMobile ? styles.mobileCell : styles.cell}>
+      <Grid item xs={9} style={isMobile ? styles.mobileCell : styles.cell}>
         <LineStackLayout noMargin alignItems="center">
           {usernameCell}
           {emailCell}
         </LineStackLayout>
       </Grid>
-      <Grid item xs={7} style={isMobile ? styles.mobileCell : styles.cell}>
+      <Grid item xs={3} style={isMobile ? styles.mobileCell : styles.cell}>
         {passwordCell}
       </Grid>
+      {editDialog}
     </>
   );
 };

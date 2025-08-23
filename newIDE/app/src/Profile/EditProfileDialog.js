@@ -7,7 +7,6 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import {
-  type EditForm,
   type AuthError,
   type Profile,
   type UpdateGitHubStarResponse,
@@ -16,6 +15,7 @@ import {
   type UpdateYoutubeSubscriptionResponse,
 } from '../Utils/GDevelopServices/Authentication';
 import {
+  type EditUserChanges,
   communityLinksConfig,
   donateLinkConfig,
   discordUsernameConfig,
@@ -59,7 +59,7 @@ export type EditProfileDialogProps = {|
   badges: ?Array<Badge>,
   subscription: ?Subscription,
   onClose: () => void,
-  onEdit: (form: EditForm) => Promise<void>,
+  onEdit: (form: EditUserChanges) => Promise<void>,
   onUpdateGitHubStar: (
     githubUsername: string
   ) => Promise<UpdateGitHubStarResponse>,

@@ -106,7 +106,8 @@ ExporterHelper::ExporterHelper(gd::AbstractFileSystem &fileSystem,
     : fs(fileSystem), gdjsRoot(gdjsRoot_), codeOutputDir(codeOutputDir_) {};
 
 bool ExporterHelper::ExportProjectForPixiPreview(
-    const PreviewExportOptions &options) {
+    const PreviewExportOptions &options,
+    std::vector<gd::String> &includesFiles) {
 
   if (options.isInGameEdition && !options.shouldReloadProjectData &&
       !options.shouldReloadLibraries && !options.shouldGenerateEventsCode) {
@@ -119,7 +120,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   if (options.shouldClearExportFolder) {
     fs.ClearDir(options.exportPath);
   }
-  std::vector<gd::String> includesFiles;
+  includesFiles.clear();
   std::vector<gd::String> resourcesFiles;
 
   // TODO Try to remove side effects to avoid the copy

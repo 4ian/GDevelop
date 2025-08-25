@@ -50,7 +50,7 @@ Exporter::~Exporter() {}
 bool Exporter::ExportProjectForPixiPreview(
     const PreviewExportOptions &options) {
   ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
-  return helper.ExportProjectForPixiPreview(options);
+  return helper.ExportProjectForPixiPreview(options, includesFiles);
 }
 
 bool Exporter::ExportWholePixiProject(const ExportOptions &options) {

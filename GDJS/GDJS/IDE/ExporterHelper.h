@@ -696,8 +696,10 @@ class ExporterHelper {
    * a browser pointing to the preview.
    *
    * \param options The options to generate the preview.
+   * \param includesFiles The list of scripts files - useful for hot-reloading
    */
-  bool ExportProjectForPixiPreview(const PreviewExportOptions &options);
+  bool ExportProjectForPixiPreview(const PreviewExportOptions &options,
+                                   std::vector<gd::String> &includesFiles);
 
   /**
    * \brief Given an include file, returns the name of the file to reference

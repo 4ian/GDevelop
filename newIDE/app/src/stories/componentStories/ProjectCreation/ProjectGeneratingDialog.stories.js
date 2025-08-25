@@ -3,6 +3,7 @@ import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
 import paperDecorator from '../../PaperDecorator';
+import withMock from 'storybook-addon-mock';
 import ProjectGeneratingDialog from '../../../ProjectCreation/ProjectGeneratingDialog';
 import UrlStorageProvider from '../../../ProjectsStorage/UrlStorageProvider';
 import { GDevelopGenerationApi } from '../../../Utils/GDevelopServices/ApiConfigs';
@@ -12,7 +13,7 @@ import { fakeSilverAuthenticatedUser } from '../../../fixtures/GDevelopServicesT
 export default {
   title: 'Project Creation/ProjectGeneratingDialog',
   component: ProjectGeneratingDialog,
-  decorators: [paperDecorator],
+  decorators: [paperDecorator, withMock],
 };
 
 export const Generating = () => {

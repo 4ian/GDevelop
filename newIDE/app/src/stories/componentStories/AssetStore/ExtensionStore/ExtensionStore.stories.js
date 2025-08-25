@@ -4,6 +4,7 @@ import { I18n } from '@lingui/react';
 import { action } from '@storybook/addon-actions';
 
 import paperDecorator from '../../../PaperDecorator';
+import withMock from 'storybook-addon-mock';
 import { ExtensionStore } from '../../../../AssetStore/ExtensionStore';
 import FixedHeightFlexContainer from '../../../FixedHeightFlexContainer';
 import { ExtensionStoreStateProvider } from '../../../../AssetStore/ExtensionStore/ExtensionStoreContext';
@@ -18,7 +19,7 @@ import PreferencesContext, {
 export default {
   title: 'AssetStore/ExtensionStore',
   component: ExtensionStore,
-  decorators: [paperDecorator],
+  decorators: [paperDecorator, withMock],
 };
 
 const apiDataServerSideError = {

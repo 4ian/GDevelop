@@ -3,6 +3,7 @@ import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
 import paperDecorator from '../../../PaperDecorator';
+import withMock from 'storybook-addon-mock';
 import ExtensionsSearchDialog from '../../../../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 import { I18n } from '@lingui/react';
 import EventsFunctionsExtensionsProvider from '../../../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsProvider';
@@ -14,7 +15,7 @@ import { fakeExtensionsRegistry } from '../../../../fixtures/GDevelopServicesTes
 export default {
   title: 'AssetStore/ExtensionStore/ExtensionSearchDialog',
   component: ExtensionsSearchDialog,
-  decorators: [paperDecorator],
+  decorators: [paperDecorator, withMock],
 };
 
 const apiDataServerSideError = {

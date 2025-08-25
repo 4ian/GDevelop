@@ -2,6 +2,7 @@
 import * as React from 'react';
 
 import paperDecorator from '../PaperDecorator';
+import withMock from 'storybook-addon-mock';
 
 import { GameRegistration } from '../../GameDashboard/GameRegistration';
 import GDevelopJsInitializerDecorator, {
@@ -17,7 +18,7 @@ import { GDevelopGameApi } from '../../Utils/GDevelopServices/ApiConfigs';
 export default {
   title: 'GameDashboard/GameRegistration',
   component: GameRegistration,
-  decorators: [paperDecorator, GDevelopJsInitializerDecorator],
+  decorators: [paperDecorator, GDevelopJsInitializerDecorator, withMock],
 };
 
 export const NoProjectLoaded = () => (

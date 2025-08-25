@@ -3,6 +3,7 @@ import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
 import paperDecorator from '../../../PaperDecorator';
+import withMock from 'storybook-addon-mock';
 import { testProject } from '../../../GDevelopJsInitializerDecorator';
 
 import ExtensionInstallDialog from '../../../../AssetStore/ExtensionStore/ExtensionInstallDialog';
@@ -20,7 +21,7 @@ import {
 export default {
   title: 'AssetStore/ExtensionStore/ExtensionInstallDialog',
   component: ExtensionInstallDialog,
-  decorators: [paperDecorator],
+  decorators: [paperDecorator, withMock],
 };
 
 const apiDataServerSideError = {

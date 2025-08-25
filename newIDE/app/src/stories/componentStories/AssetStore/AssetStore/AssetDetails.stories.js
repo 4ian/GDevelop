@@ -2,6 +2,7 @@
 import * as React from 'react';
 
 import paperDecorator from '../../../PaperDecorator';
+import withMock from 'storybook-addon-mock';
 import { AssetDetails } from '../../../../AssetStore/AssetDetails';
 import {
   fakeAssetShortHeader1,
@@ -15,7 +16,7 @@ import { AssetStoreNavigatorStateProvider } from '../../../../AssetStore/AssetSt
 export default {
   title: 'AssetStore/AssetStore/AssetDetails',
   component: AssetDetails,
-  decorators: [paperDecorator],
+  decorators: [paperDecorator, withMock],
 };
 
 const Wrapper = ({ children }: {| children: React.Node |}) => {

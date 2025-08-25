@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 import paperDecorator from '../../../PaperDecorator';
+import withMock from 'storybook-addon-mock';
 import FixedHeightFlexContainer from '../../../FixedHeightFlexContainer';
 import { AssetStoreStateProvider } from '../../../../AssetStore/AssetStoreContext';
 import { AssetStore } from '../../../../AssetStore';
@@ -15,7 +16,7 @@ import { AssetStoreNavigatorStateProvider } from '../../../../AssetStore/AssetSt
 export default {
   title: 'AssetStore/AssetStore',
   component: AssetStore,
-  decorators: [paperDecorator],
+  decorators: [paperDecorator, withMock],
 };
 
 const apiDataServerSideError = {

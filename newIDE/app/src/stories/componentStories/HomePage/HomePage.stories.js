@@ -27,6 +27,7 @@ import { GDevelopAssetApi } from '../../../Utils/GDevelopServices/ApiConfigs';
 import fakeResourceManagementProps from '../../FakeResourceManagement';
 import inAppTutorialDecorator from '../../InAppTutorialDecorator';
 import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
+import withMock from 'storybook-addon-mock';
 
 const apiDataServerSideError = {
   mockData: [
@@ -161,7 +162,7 @@ const WrappedHomePage = ({
 export default {
   title: 'HomePage',
   component: WrappedHomePage,
-  decorators: [GDevelopJsInitializerDecorator, inAppTutorialDecorator],
+  decorators: [GDevelopJsInitializerDecorator, inAppTutorialDecorator, withMock],
 };
 
 export const BuildSectionLoading = () => (

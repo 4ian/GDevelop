@@ -3,6 +3,7 @@ import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
 import paperDecorator from '../../../PaperDecorator';
+import withMock from 'storybook-addon-mock';
 import AssetPackInstallDialog from '../../../../AssetStore/AssetPackInstallDialog';
 import {
   fakeAsset1,
@@ -23,7 +24,7 @@ import { AssetStoreNavigatorStateProvider } from '../../../../AssetStore/AssetSt
 export default {
   title: 'AssetStore/AssetStore/AssetPackInstallDialog',
   component: AssetPackInstallDialog,
-  decorators: [paperDecorator],
+  decorators: [paperDecorator, withMock],
 };
 
 const mockApiDataForPublicAssets = [

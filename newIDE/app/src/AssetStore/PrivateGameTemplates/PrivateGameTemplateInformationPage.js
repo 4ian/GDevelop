@@ -170,7 +170,9 @@ const PrivateGameTemplateInformationPage = ({
     null
   );
   const [selectedUsageType, setSelectedUsageType] = React.useState<string>(
-    privateGameTemplateListingData.prices[0].usageType
+    privateGameTemplateListingData.prices.length
+      ? privateGameTemplateListingData.prices[0].usageType
+      : ''
   );
   const [
     purchasingPrivateGameTemplateListingData,
@@ -202,9 +204,7 @@ const PrivateGameTemplateInformationPage = ({
   const userGameTemplatePurchaseUsageType = React.useMemo(
     () =>
       getUserProductPurchaseUsageType({
-        productId: privateGameTemplateListingData
-          ? privateGameTemplateListingData.id
-          : null,
+        productId: privateGameTemplateListingData.id,
         receivedProducts: [
           ...(receivedGameTemplates || []),
           ...(receivedBundles || []),

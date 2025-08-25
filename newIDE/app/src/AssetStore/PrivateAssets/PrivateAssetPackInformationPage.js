@@ -202,7 +202,9 @@ const PrivateAssetPackInformationPage = ({
     CreditsPackageStoreContext
   );
   const [selectedUsageType, setSelectedUsageType] = React.useState<string>(
-    privateAssetPackListingData.prices[0].usageType
+    privateAssetPackListingData.prices.length
+      ? privateAssetPackListingData.prices[0].usageType
+      : ''
   );
   const [
     purchasingPrivateAssetPackListingData,
@@ -235,9 +237,7 @@ const PrivateAssetPackInformationPage = ({
   const userAssetPackPurchaseUsageType = React.useMemo(
     () =>
       getUserProductPurchaseUsageType({
-        productId: privateAssetPackListingData
-          ? privateAssetPackListingData.id
-          : null,
+        productId: privateAssetPackListingData.id,
         receivedProducts: [
           ...(receivedAssetPacks || []),
           ...(receivedBundles || []),

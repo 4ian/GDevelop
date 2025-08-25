@@ -1169,7 +1169,11 @@ namespace gdjs {
             if (this._paused) {
               // Manage resize events.
               if (this._notifyScenesForGameResolutionResize) {
-                this._sceneStack.onGameResolutionResized();
+                if (this._inGameEditor) {
+                  this._inGameEditor.onGameResolutionResized();
+                } else {
+                  this._sceneStack.onGameResolutionResized();
+                }
                 this._notifyScenesForGameResolutionResize = false;
               }
 

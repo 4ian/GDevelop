@@ -497,6 +497,11 @@ namespace gdjs {
       return this._currentScene;
     }
 
+    /**
+     * Called by the RuntimeGame when the game resolution is changed.
+     * Useful to notify scene and layers that resolution is changed, as they
+     * might be caching it.
+     */
     onGameResolutionResized() {
       if (!this._currentScene) {
         return;

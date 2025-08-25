@@ -1,0 +1,7 @@
+Evento 1:
+Condição: Se a tecla Space ou Touch is down
+Ação: Add a force to Player (0, -400)  
+
+Evento 2:
+Sem condição
+Ação: Add a force to Player (0, 200) (gravidade)

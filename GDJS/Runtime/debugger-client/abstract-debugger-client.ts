@@ -714,7 +714,10 @@ namespace gdjs {
       this._sendMessage(
         circularSafeStringify({
           command: 'hotReloader.logs',
-          payload: logs,
+          payload: {
+            isInGameEdition: this._runtimegame.isInGameEdition(),
+            logs,
+          },
         })
       );
     }

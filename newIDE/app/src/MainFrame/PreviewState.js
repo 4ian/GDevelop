@@ -29,8 +29,10 @@ export type PreviewState = {|
 type PreviewDebuggerServerWatcherResults = {|
   hasNonEditionPreviewsRunning: boolean,
 
-  hotReloadLogs: Array<HotReloaderLog>,
-  clearHotReloadLogs: () => void,
+  gameHotReloadLogs: Array<HotReloaderLog>,
+  clearGameHotReloadLogs: () => void,
+  editorHotReloadLogs: Array<HotReloaderLog>,
+  clearEditorHotReloadLogs: () => void,
 
   hardReloadAllPreviews: () => void,
 |};
@@ -45,7 +47,10 @@ export const usePreviewDebuggerServerWatcher = (
   const [debuggerStatus, setDebuggerStatus] = React.useState<{
     [DebuggerId]: DebuggerStatus,
   }>({});
-  const [hotReloadLogs, setHotReloadLogs] = React.useState<
+  const [gameHotReloadLogs, setGameHotReloadLogs] = React.useState<
+    Array<HotReloaderLog>
+  >([]);
+  const [editorHotReloadLogs, setEditorHotReloadLogs] = React.useState<
     Array<HotReloaderLog>
   >([]);
   React.useEffect(
@@ -87,7 +92,11 @@ export const usePreviewDebuggerServerWatcher = (
         },
         onHandleParsedMessage: ({ id, parsedMessage }) => {
           if (parsedMessage.command === 'hotReloader.logs') {
-            setHotReloadLogs(parsedMessage.payload);
+            if (parsedMessage.payload.isInGameEdition) {
+              setEditorHotReloadLogs(parsedMessage.payload.logs);
+            } else {
+              setGameHotReloadLogs(parsedMessage.payload.logs);
+            }
           } else if (parsedMessage.command === 'status') {
             setDebuggerStatus(debuggerStatus => ({
               ...debuggerStatus,
@@ -106,9 +115,14 @@ export const usePreviewDebuggerServerWatcher = (
     },
     [previewDebuggerServer]
   );
-  const clearHotReloadLogs = React.useCallback(() => setHotReloadLogs([]), [
-    setHotReloadLogs,
-  ]);
+  const clearGameHotReloadLogs = React.useCallback(
+    () => setGameHotReloadLogs([]),
+    [setGameHotReloadLogs]
+  );
+  const clearEditorHotReloadLogs = React.useCallback(
+    () => setEditorHotReloadLogs([]),
+    [setEditorHotReloadLogs]
+  );
 
   const hardReloadAllPreviews = React.useCallback(
     () => {
@@ -130,8 +144,10 @@ export const usePreviewDebuggerServerWatcher = (
 
   return {
     hasNonEditionPreviewsRunning,
-    hotReloadLogs,
-    clearHotReloadLogs,
+    gameHotReloadLogs,
+    clearGameHotReloadLogs,
+    editorHotReloadLogs,
+    clearEditorHotReloadLogs,
     hardReloadAllPreviews,
   };
 };

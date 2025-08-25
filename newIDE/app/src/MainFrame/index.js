@@ -441,8 +441,10 @@ const MainFrame = (props: Props) => {
     _previewLauncher.current.getPreviewDebuggerServer();
   const {
     hasNonEditionPreviewsRunning,
-    hotReloadLogs,
-    clearHotReloadLogs,
+    gameHotReloadLogs,
+    editorHotReloadLogs,
+    clearGameHotReloadLogs,
+    clearEditorHotReloadLogs,
     hardReloadAllPreviews,
   } = usePreviewDebuggerServerWatcher(previewDebuggerServer);
   const {
@@ -4538,15 +4540,28 @@ const MainFrame = (props: Props) => {
         renderGDJSDevelopmentWatcher({
           onGDJSUpdated: relaunchAndThenHardReloadAllPreviews,
         })}
-      {!!hotReloadLogs.length && (
+      {!!gameHotReloadLogs.length && (
         <HotReloadLogsDialog
-          logs={hotReloadLogs}
-          onClose={clearHotReloadLogs}
+          logs={gameHotReloadLogs}
+          onClose={clearGameHotReloadLogs}
           onLaunchNewPreview={() => {
-            clearHotReloadLogs();
-            // TODO When the editor preview crash, launch back the editor,
-            // not the game preview.
+            clearGameHotReloadLogs();
             launchNewPreview();
+          }}
+        />
+      )}
+      {!!editorHotReloadLogs.length && (
+        <HotReloadLogsDialog
+          logs={editorHotReloadLogs}
+          onClose={clearEditorHotReloadLogs}
+          onLaunchNewPreview={() => {
+            clearEditorHotReloadLogs();
+            hotReloadInGameEditorIfNeeded({
+              shouldReloadProjectData: true,
+              shouldReloadLibraries: true,
+              shouldGenerateEventsCode: true,
+              shouldReloadResources: true,
+            });
           }}
         />
       )}

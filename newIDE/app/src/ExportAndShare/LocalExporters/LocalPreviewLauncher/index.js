@@ -281,7 +281,8 @@ export default class LocalPreviewLauncher extends React.Component<
       // It means that we don't need to write them in a file.
       previewExportOptions.setShouldReloadProjectData(false);
       previewExportOptions.setShouldReloadLibraries(
-        previewOptions.shouldReloadLibraries
+        previewOptions.shouldReloadLibraries ||
+          previewOptions.shouldGenerateEventsCode
       );
       previewExportOptions.setShouldGenerateEventsCode(
         previewOptions.shouldGenerateEventsCode

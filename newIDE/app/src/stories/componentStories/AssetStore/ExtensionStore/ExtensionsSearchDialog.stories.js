@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
+import withMock from 'storybook-addon-mock';
 
 import paperDecorator from '../../../PaperDecorator';
 import ExtensionsSearchDialog from '../../../../AssetStore/ExtensionStore/ExtensionsSearchDialog';
@@ -14,7 +15,7 @@ import { fakeExtensionsRegistry } from '../../../../fixtures/GDevelopServicesTes
 export default {
   title: 'AssetStore/ExtensionStore/ExtensionSearchDialog',
   component: ExtensionsSearchDialog,
-  decorators: [paperDecorator],
+  decorators: [paperDecorator, withMock],
 };
 
 const apiDataServerSideError = {

@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 import { I18n } from '@lingui/react';
+import withMock from 'storybook-addon-mock';
 
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
@@ -20,6 +21,7 @@ import PreferencesContext, {
 export default {
   title: 'ObjectEditor/NewBehaviorDialog',
   component: NewBehaviorDialog,
+  decorators: [withMock],
 };
 
 const apiDataServerSideError = {

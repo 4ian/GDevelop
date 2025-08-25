@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import withMock from 'storybook-addon-mock';
 import paperDecorator from '../../../PaperDecorator';
 
 import InviteHome from '../../../../ExportAndShare/ShareDialog/InviteHome';
@@ -42,7 +43,7 @@ const notOwnedProjectId = 'not-owned-project-id';
 export default {
   title: 'Share/InviteHome',
   component: InviteHome,
-  decorators: [paperDecorator],
+  decorators: [paperDecorator, withMock],
 };
 
 export const NotLoggedInOrOffline = () => {

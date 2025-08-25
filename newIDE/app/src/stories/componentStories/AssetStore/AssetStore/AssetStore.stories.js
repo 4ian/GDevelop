@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
+import withMock from 'storybook-addon-mock';
 import paperDecorator from '../../../PaperDecorator';
 import FixedHeightFlexContainer from '../../../FixedHeightFlexContainer';
 import { AssetStoreStateProvider } from '../../../../AssetStore/AssetStoreContext';
@@ -15,7 +16,7 @@ import { AssetStoreNavigatorStateProvider } from '../../../../AssetStore/AssetSt
 export default {
   title: 'AssetStore/AssetStore',
   component: AssetStore,
-  decorators: [paperDecorator],
+  decorators: [paperDecorator, withMock],
 };
 
 const apiDataServerSideError = {

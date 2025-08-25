@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
+import withMock from 'storybook-addon-mock';
 
 import paperDecorator from '../../../PaperDecorator';
 import { testProject } from '../../../GDevelopJsInitializerDecorator';
@@ -20,7 +21,7 @@ import {
 export default {
   title: 'AssetStore/ExtensionStore/ExtensionInstallDialog',
   component: ExtensionInstallDialog,
-  decorators: [paperDecorator],
+  decorators: [paperDecorator, withMock],
 };
 
 const apiDataServerSideError = {

@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import withMock from 'storybook-addon-mock';
 
 import paperDecorator from '../../../PaperDecorator';
 import { AssetDetails } from '../../../../AssetStore/AssetDetails';
@@ -15,7 +16,7 @@ import { AssetStoreNavigatorStateProvider } from '../../../../AssetStore/AssetSt
 export default {
   title: 'AssetStore/AssetStore/AssetDetails',
   component: AssetDetails,
-  decorators: [paperDecorator],
+  decorators: [paperDecorator, withMock],
 };
 
 const Wrapper = ({ children }: {| children: React.Node |}) => {

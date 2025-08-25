@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
+import withMock from 'storybook-addon-mock';
 import { HomePage } from '../../../MainFrame/EditorContainers/HomePage';
 import GDevelopJsInitializerDecorator, {
   testProject,
@@ -161,7 +162,7 @@ const WrappedHomePage = ({
 export default {
   title: 'HomePage',
   component: WrappedHomePage,
-  decorators: [GDevelopJsInitializerDecorator, inAppTutorialDecorator],
+  decorators: [GDevelopJsInitializerDecorator, inAppTutorialDecorator, withMock],
 };
 
 export const BuildSectionLoading = () => (

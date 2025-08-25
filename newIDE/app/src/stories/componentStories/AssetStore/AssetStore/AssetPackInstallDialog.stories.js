@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
+import withMock from 'storybook-addon-mock';
 
 import paperDecorator from '../../../PaperDecorator';
 import AssetPackInstallDialog from '../../../../AssetStore/AssetPackInstallDialog';
@@ -23,7 +24,7 @@ import { AssetStoreNavigatorStateProvider } from '../../../../AssetStore/AssetSt
 export default {
   title: 'AssetStore/AssetStore/AssetPackInstallDialog',
   component: AssetPackInstallDialog,
-  decorators: [paperDecorator],
+  decorators: [paperDecorator, withMock],
 };
 
 const mockApiDataForPublicAssets = [

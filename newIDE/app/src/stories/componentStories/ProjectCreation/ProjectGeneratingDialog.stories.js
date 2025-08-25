@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
+import withMock from 'storybook-addon-mock';
 
 import paperDecorator from '../../PaperDecorator';
 import ProjectGeneratingDialog from '../../../ProjectCreation/ProjectGeneratingDialog';
@@ -12,7 +13,7 @@ import { fakeSilverAuthenticatedUser } from '../../../fixtures/GDevelopServicesT
 export default {
   title: 'Project Creation/ProjectGeneratingDialog',
   component: ProjectGeneratingDialog,
-  decorators: [paperDecorator],
+  decorators: [paperDecorator, withMock],
 };
 
 export const Generating = () => {

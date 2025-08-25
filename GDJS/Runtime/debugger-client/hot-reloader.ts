@@ -193,8 +193,6 @@ namespace gdjs {
         !!newRuntimeGameOptions.shouldGenerateEventsCode;
       const shouldReloadLibraries =
         !!newRuntimeGameOptions.shouldReloadLibraries;
-      
-      console.log("newScriptFiles", newScriptFiles);
 
       // Reload the changed scripts, which will have the side effects of re-running
       // the new scripts, potentially replacing the code of the free functions from

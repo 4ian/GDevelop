@@ -8,6 +8,8 @@ import {
   getUserEarningsBalance,
 } from '../Utils/GDevelopServices/Usage';
 import {
+  editUser,
+  type EditUserChanges,
   getUserBadges,
   listDefaultRecommendations,
   listRecommendations,
@@ -17,7 +19,6 @@ import { getAchievements } from '../Utils/GDevelopServices/Badge';
 import Authentication, {
   type LoginForm,
   type RegisterForm,
-  type PatchUserPayload,
   type ChangeEmailForm,
   type AuthError,
   type ForgotPasswordForm,
@@ -622,10 +623,11 @@ export default class AuthenticatedUserProvider extends React.Component<
     if (!userProfile.isCreator) {
       // If the user is not a creator, then update the profile to say they now are.
       try {
-        await authentication.editUserProfile(
-          authentication.getAuthorizationHeader,
-          { isCreator: true }
-        );
+        await editUser(authentication.getAuthorizationHeader, {
+          editedUserId: userProfile.id,
+          userId: userProfile.id,
+          changes: { isCreator: true },
+        });
       } catch (error) {
         // Catch the error so that the user profile is still fetched.
         console.error('Error while updating the user profile:', error);
@@ -1206,11 +1208,13 @@ export default class AuthenticatedUserProvider extends React.Component<
   };
 
   _doEdit = async (
-    payload: PatchUserPayload,
+    payload: EditUserChanges,
     preferences: PreferencesValues
   ) => {
     const { authentication } = this.props;
     if (!authentication) return;
+    const { profile } = this.state.authenticatedUser;
+    if (!profile) return;
 
     this.setState({
       editInProgress: true,
@@ -1218,9 +1222,10 @@ export default class AuthenticatedUserProvider extends React.Component<
     });
     this._automaticallyUpdateUserProfile = false;
     try {
-      await authentication.editUserProfile(
-        authentication.getAuthorizationHeader,
-        {
+      await editUser(authentication.getAuthorizationHeader, {
+        editedUserId: profile.id,
+        userId: profile.id,
+        changes: {
           username: payload.username,
           description: payload.description,
           getGameStatsEmail: payload.getGameStatsEmail,
@@ -1231,8 +1236,8 @@ export default class AuthenticatedUserProvider extends React.Component<
           githubUsername: payload.githubUsername,
           communityLinks: payload.communityLinks,
           survey: payload.survey,
-        }
-      );
+        },
+      });
       await this._fetchUserProfileWithoutThrowingErrors();
     } catch (apiCallError) {
       this.setState({ apiCallError });
@@ -1625,9 +1630,9 @@ export default class AuthenticatedUserProvider extends React.Component<
               badges={this.state.authenticatedUser.badges}
               subscription={this.state.authenticatedUser.subscription}
               onClose={() => this.openEditProfileDialog(false)}
-              onEdit={async form => {
+              onEdit={async changes => {
                 try {
-                  await this._doEdit(form, this.props.preferencesValues);
+                  await this._doEdit(changes, this.props.preferencesValues);
                   this.openEditProfileDialog(false);
                 } catch (error) {
                   // Ignore errors, we will let the user retry in their profile.

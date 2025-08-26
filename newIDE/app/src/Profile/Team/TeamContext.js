@@ -5,6 +5,7 @@ import {
   type TeamGroup,
   type User,
   type TeamMembership,
+  type EditUserChanges,
 } from '../../Utils/GDevelopServices/User';
 import { type CloudProjectWithUserAccessInfo } from '../../Utils/GDevelopServices/Project';
 
@@ -31,6 +32,7 @@ export type TeamState = {|
     userId: string,
     newPassword: string
   ) => Promise<void>,
+  onEditUser: (editedUserId: string, changes: EditUserChanges) => Promise<void>,
 |};
 
 export const initialTeamState = {
@@ -51,6 +53,7 @@ export const initialTeamState = {
   onRefreshAdmins: async () => {},
   onSetAdmin: async () => {},
   onChangeMemberPassword: async () => {},
+  onEditUser: async () => {},
 };
 
 const TeamContext = React.createContext<TeamState>(initialTeamState);

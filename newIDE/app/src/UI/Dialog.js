@@ -226,11 +226,7 @@ type DialogProps = {|
 
 export const DialogPrimaryButton = RaisedButton;
 
-/**
- * A enhanced material-ui Dialog that can have optional secondary actions
- * and no margins if required.
- */
-const Dialog = ({
+const DialogWithoutWindowSizeProvider = ({
   onApply,
   secondaryActions,
   dangerLevel,
@@ -481,12 +477,16 @@ const Dialog = ({
   );
 };
 
-const DialogWithTopLevelWindowSize = (props: DialogProps) => {
+/**
+ * A enhanced material-ui Dialog that can have optional secondary actions
+ * and no margins if required.
+ */
+const Dialog = (props: DialogProps) => {
   return (
     <TopLevelWindowSizeProvider>
-      <Dialog {...props} />
+      <DialogWithoutWindowSizeProvider {...props} />
     </TopLevelWindowSizeProvider>
   );
 };
 
-export default DialogWithTopLevelWindowSize;
+export default Dialog;

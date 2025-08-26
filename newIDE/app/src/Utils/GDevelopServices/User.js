@@ -142,6 +142,21 @@ export type UserPublicProfile = {|
   iconUrl: string,
 |};
 
+export type EditUserChanges = {|
+  username?: string,
+  fullName?: string,
+  description?: string,
+  getGameStatsEmail?: boolean,
+  getNewsletterEmail?: boolean,
+  appLanguage?: string,
+  isCreator?: boolean,
+  donateLink?: string,
+  discordUsername?: string,
+  githubUsername?: string,
+  communityLinks?: CommunityLinks,
+  survey?: UserSurvey,
+|};
+
 export type UserPublicProfileByIds = {|
   [key: string]: UserPublicProfile,
 |};
@@ -800,4 +815,25 @@ export const generateCustomAuthToken = async (
     }
   );
   return response.data.customAuthToken;
+};
+
+export const editUser = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    editedUserId,
+    userId,
+    changes,
+  }: {|
+    editedUserId: string,
+    userId: string,
+    changes: EditUserChanges,
+  |}
+): Promise<User> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.patch(`/user/${editedUserId}`, changes, {
+    headers: { Authorization: authorizationHeader },
+    params: { userId },
+  });
+
+  return response.data;
 };

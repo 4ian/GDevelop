@@ -9,6 +9,7 @@ import {
   type TeamGroup,
   type TeamMembership,
   type User,
+  type EditUserChanges,
 } from '../../../Utils/GDevelopServices/User';
 import { type CloudProjectWithUserAccessInfo } from '../../../Utils/GDevelopServices/Project';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
@@ -57,6 +58,7 @@ const initialMembers: Array<User> = [
     email: 'user1@hotmail.com',
     username: null,
     password: 'blue-chair-34',
+    fullName: 'John Doe',
   },
   // $FlowIgnore - the whole user object is not needed for this component
   {
@@ -94,6 +96,7 @@ const initialMembers: Array<User> = [
     id: 'user7',
     email: 'user7@mail.ru',
     username: 'Bayonetta',
+    fullName: 'Jane Smith',
   },
   // $FlowIgnore - the whole user object is not needed for this component
   {
@@ -435,6 +438,18 @@ const MockTeamProvider = ({
     setMembers(newMembers);
   };
 
+  const editUser = async (userId: string, changes: EditUserChanges) => {
+    if (!members) return;
+    const newMembers = [...members];
+    const memberIndex = newMembers.findIndex(member => member.id === userId);
+    if (memberIndex === -1) return;
+    newMembers.splice(memberIndex, 1, {
+      ...newMembers[memberIndex],
+      ...changes,
+    });
+    setMembers(newMembers);
+  };
+
   return (
     <AlertProvider>
       <DragAndDropContextProvider>
@@ -460,6 +475,7 @@ const MockTeamProvider = ({
               onActivateMembers: action('activateMembers'),
               onChangeMemberPassword: changeMemberPassword,
               onSetAdmin: setAdmin,
+              onEditUser: editUser,
             }}
           >
             <Text allowSelection>
@@ -474,19 +490,21 @@ const MockTeamProvider = ({
   );
 };
 
-export const Default = () => (
-  <MockTeamProvider loading={false} teamSize={12}>
-    <FixedHeightFlexContainer height={600}>
-      <TeamSection
-        project={testProject.project}
-        currentFileMetadata={null}
-        onOpenRecentFile={action('onOpenRecentFile')}
-        storageProviders={[CloudStorageProvider]}
-        onOpenTeachingResources={action('onOpenTeachingResources')}
-      />
-    </FixedHeightFlexContainer>
-  </MockTeamProvider>
-);
+export const Default = () => {
+  return (
+    <MockTeamProvider loading={false} teamSize={12}>
+      <FixedHeightFlexContainer height={600}>
+        <TeamSection
+          project={testProject.project}
+          currentFileMetadata={null}
+          onOpenRecentFile={action('onOpenRecentFile')}
+          storageProviders={[CloudStorageProvider]}
+          onOpenTeachingResources={action('onOpenTeachingResources')}
+        />
+      </FixedHeightFlexContainer>
+    </MockTeamProvider>
+  );
+};
 
 export const WithNoGroupsYet = () => (
   <MockTeamProvider loading={false} noGroups>

@@ -4,7 +4,6 @@ import {
   type Profile,
   type LoginForm,
   type RegisterForm,
-  type PatchUserPayload,
   type ForgotPasswordForm,
   type AuthError,
   type IdentityProvider,
@@ -13,7 +12,10 @@ import { type PreferencesValues } from '../MainFrame/Preferences/PreferencesCont
 import { type CloudProjectWithUserAccessInfo } from '../Utils/GDevelopServices/Project';
 import { User as FirebaseUser } from 'firebase/auth';
 import { type Badge, type Achievement } from '../Utils/GDevelopServices/Badge';
-import { type Recommendation } from '../Utils/GDevelopServices/User';
+import {
+  type Recommendation,
+  type EditUserChanges,
+} from '../Utils/GDevelopServices/User';
 import { type Notification } from '../Utils/GDevelopServices/Notification';
 import {
   type Limits,
@@ -62,7 +64,7 @@ export type AuthenticatedUser = {|
     preferences: PreferencesValues
   ) => Promise<void>,
   onEditProfile: (
-    payload: PatchUserPayload,
+    changes: EditUserChanges,
     preferences: PreferencesValues
   ) => Promise<void>,
   onResetPassword: ForgotPasswordForm => Promise<void>,

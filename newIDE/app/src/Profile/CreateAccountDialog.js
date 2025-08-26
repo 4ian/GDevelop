@@ -207,7 +207,6 @@ const CreateAccountDialog = ({
             onChangeOptInNewsletterEmail={setGetNewsletterEmail}
             createAccountInProgress={createAccountInProgress}
             error={error}
-            usernameAvailability={usernameAvailability}
             onChangeUsernameAvailability={setUsernameAvailability}
             isValidatingUsername={isValidatingUsername}
             onChangeIsValidatingUsername={setIsValidatingUsername}

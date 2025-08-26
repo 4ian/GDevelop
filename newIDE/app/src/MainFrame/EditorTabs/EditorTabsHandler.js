@@ -172,16 +172,9 @@ export const openEditorTab = (
       editor => editor.key === key
     );
     if (existingEditorId !== -1) {
-      return {
-        ...state,
-        panes: {
-          ...state.panes,
-          [paneIdentifier]: {
-            ...pane,
-            currentTab: dontFocusTab ? pane.currentTab : existingEditorId,
-          },
-        },
-      };
+      return dontFocusTab
+        ? { ...state }
+        : changeCurrentTab(state, paneIdentifier, existingEditorId);
     }
   }
 
@@ -203,7 +196,7 @@ export const openEditorTab = (
     throw new Error(`Pane with identifier "${paneIdentifier}" is not valid.`);
   }
 
-  return {
+  let newState = {
     ...state,
     panes: {
       ...state.panes,
@@ -214,10 +207,14 @@ export const openEditorTab = (
           key === 'start page'
             ? [editorTab, ...pane.editors]
             : [...pane.editors, editorTab],
-        currentTab: dontFocusTab ? pane.currentTab : pane.editors.length,
+        currentTab: pane.currentTab,
       },
     },
   };
+  if (!dontFocusTab) {
+    newState = changeCurrentTab(newState, paneIdentifier, pane.editors.length);
+  }
+  return newState;
 };
 
 export const changeCurrentTab = (
@@ -591,6 +588,7 @@ export const moveTabToPosition = (
   else if (tabIsMovedFromLeftToRightOfCurrentTab) paneNewCurrentTab -= 1;
   else if (tabIsMovedFromRightToLeftOfCurrentTab) paneNewCurrentTab += 1;
 
+  // The index changes but the tab is the same so there is no need to call changeCurrentTab.
   return {
     ...editorTabsState,
     panes: {

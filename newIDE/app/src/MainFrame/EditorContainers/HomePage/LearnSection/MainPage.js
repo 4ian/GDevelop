@@ -252,7 +252,7 @@ const MainPage = ({
             >
               <Column noMargin>
                 <Text size="section-title">
-                  <Trans>In-app tutorials</Trans>
+                  <Trans>Free in-app tutorials</Trans>
                 </Text>
               </Column>
               <Column noMargin>

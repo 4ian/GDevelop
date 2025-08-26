@@ -1592,13 +1592,6 @@ namespace gdjs {
       if (!threeGroup) {
         return;
       }
-      if (!this._innerArea) {
-        if (this._threeInnerArea) {
-          threeGroup.remove(this._threeInnerArea);
-          this._threeInnerArea = null;
-        }
-        return;
-      }
       if (!this._threeInnerArea) {
         const boxMesh = new THREE.Mesh(
           new THREE.BoxGeometry(1, 1, 1),
@@ -1622,13 +1615,22 @@ namespace gdjs {
         this._threeInnerArea = container;
       }
       const threeInnerArea = this._threeInnerArea;
-      const innerArea = this._innerArea;
-      threeInnerArea.scale.x = innerArea.max[0] - innerArea.min[0];
-      threeInnerArea.scale.y = innerArea.max[1] - innerArea.min[1];
-      threeInnerArea.scale.z = innerArea.max[2] - innerArea.min[2];
-      threeInnerArea.position.x = innerArea.min[0];
-      threeInnerArea.position.y = innerArea.min[1];
-      threeInnerArea.position.z = innerArea.min[2];
+      if (this._innerArea) {
+        const innerArea = this._innerArea;
+        threeInnerArea.scale.x = innerArea.max[0] - innerArea.min[0];
+        threeInnerArea.scale.y = innerArea.max[1] - innerArea.min[1];
+        threeInnerArea.scale.z = innerArea.max[2] - innerArea.min[2];
+        threeInnerArea.position.x = innerArea.min[0];
+        threeInnerArea.position.y = innerArea.min[1];
+        threeInnerArea.position.z = innerArea.min[2];
+      } else {
+        threeInnerArea.scale.x = this._runtimeGame.getOriginalWidth();
+        threeInnerArea.scale.y = this._runtimeGame.getOriginalHeight();
+        threeInnerArea.scale.z = 0.01;
+        threeInnerArea.position.x = 0;
+        threeInnerArea.position.y = 0;
+        threeInnerArea.position.z = 0;
+      }
     }
 
     private _handleContextMenu() {

@@ -7,6 +7,7 @@ import { serializeToJSObject } from '../Utils/Serializer';
 import { type AiGeneratedEvent } from '../Utils/GDevelopServices/Generation';
 import { renderNonTranslatedEventsAsText } from '../EventsSheet/EventsTree/TextRenderer';
 import {
+  addMissingObjectBehaviors,
   addObjectUndeclaredVariables,
   addUndeclaredVariables,
   applyEventsChanges,
@@ -2023,7 +2024,12 @@ const addSceneEvents: EditorFunction = {
     const details = shouldShowDetails ? (
       <ColumnStackLayout noMargin>
         {eventsDescription && (
-          <Text noMargin allowSelection color="secondary">
+          <Text
+            noMargin
+            allowSelection
+            color="secondary"
+            style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
+          >
             <b>
               <Trans>Description</Trans>
             </b>
@@ -2031,7 +2037,12 @@ const addSceneEvents: EditorFunction = {
           </Text>
         )}
         {placementHint && (
-          <Text noMargin allowSelection color="secondary">
+          <Text
+            noMargin
+            allowSelection
+            color="secondary"
+            style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
+          >
             <b>
               <Trans>Generation hint</Trans>
             </b>
@@ -2039,7 +2050,12 @@ const addSceneEvents: EditorFunction = {
           </Text>
         )}
         {objectsList && (
-          <Text noMargin allowSelection color="secondary">
+          <Text
+            noMargin
+            allowSelection
+            color="secondary"
+            style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
+          >
             <b>
               <Trans>Related objects</Trans>
             </b>
@@ -2247,8 +2263,10 @@ const addSceneEvents: EditorFunction = {
             undeclaredVariables: change.undeclaredVariables,
           });
 
-          const objectNames = Object.keys(change.undeclaredObjectVariables);
-          for (const objectName of objectNames) {
+          const objectNamesWithUndeclaredVariables = Object.keys(
+            change.undeclaredObjectVariables
+          );
+          for (const objectName of objectNamesWithUndeclaredVariables) {
             const undeclaredVariables =
               change.undeclaredObjectVariables[objectName];
             addObjectUndeclaredVariables({
@@ -2256,6 +2274,19 @@ const addSceneEvents: EditorFunction = {
               scene,
               objectName,
               undeclaredVariables,
+            });
+          }
+
+          const objectNamesWithMissingBehavior = Object.keys(
+            change.missingObjectBehaviors
+          );
+          for (const objectName of objectNamesWithMissingBehavior) {
+            const missingBehaviors = change.missingObjectBehaviors[objectName];
+            addMissingObjectBehaviors({
+              project,
+              scene,
+              objectName,
+              missingBehaviors,
             });
           }
         }

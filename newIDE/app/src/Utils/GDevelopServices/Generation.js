@@ -1,6 +1,9 @@
 // @flow
 import axios from 'axios';
-import { GDevelopGenerationApi } from './ApiConfigs';
+import { GDevelopAiCdn, GDevelopGenerationApi } from './ApiConfigs';
+import { type MessageByLocale } from '../i18n/MessageByLocale';
+
+export type Environment = 'staging' | 'live';
 
 export type GenerationStatus = 'working' | 'ready' | 'error';
 
@@ -68,6 +71,10 @@ export type AiRequestMessage =
     }
   | AiRequestFunctionCallOutput;
 
+export type AiConfiguration = {
+  presetId: string,
+};
+
 export type AiRequest = {
   id: string,
   createdAt: string,
@@ -77,6 +84,7 @@ export type AiRequest = {
   gameProjectJson?: string | null,
   status: GenerationStatus,
   mode?: 'chat' | 'agent',
+  aiConfiguration?: AiConfiguration,
   toolsVersion?: string,
 
   error: {
@@ -105,6 +113,15 @@ export type AiGeneratedEventUndeclaredVariable = {
   requiredScope: 'global' | 'scene' | 'none',
 };
 
+export type AiGeneratedEventMissingObjectBehavior = {
+  /** The name of the object that is missing the behavior. */
+  objectName: string,
+  /** The name of the behavior that is missing. */
+  name: string,
+  /** The type of the behavior that is missing. */
+  type: string,
+};
+
 export type AiGeneratedEventChange = {
   operationName: string,
   operationTargetEvent: string | null,
@@ -116,6 +133,9 @@ export type AiGeneratedEventChange = {
   undeclaredVariables: AiGeneratedEventUndeclaredVariable[],
   undeclaredObjectVariables: {
     [objectName: string]: AiGeneratedEventUndeclaredVariable[],
+  },
+  missingObjectBehaviors: {
+    [objectName: string]: AiGeneratedEventMissingObjectBehavior[],
   },
 };
 
@@ -304,6 +324,7 @@ export const createAiRequest = async (
     projectSpecificExtensionsSummaryJsonUserRelativeKey,
     payWithCredits,
     mode,
+    aiConfiguration,
     gameId,
     fileMetadata,
     storageProviderName,
@@ -316,6 +337,7 @@ export const createAiRequest = async (
     projectSpecificExtensionsSummaryJsonUserRelativeKey: string | null,
     payWithCredits: boolean,
     mode: 'chat' | 'agent',
+    aiConfiguration: AiConfiguration,
     gameId: string | null,
     fileMetadata: ?{
       fileIdentifier: string,
@@ -337,6 +359,7 @@ export const createAiRequest = async (
       projectSpecificExtensionsSummaryJsonUserRelativeKey,
       payWithCredits,
       mode,
+      aiConfiguration,
       gameId,
       fileMetadata,
       storageProviderName,
@@ -627,6 +650,31 @@ export const createAiUserContentPresignedUrls = async (
         Authorization: authorizationHeader,
       },
     }
+  );
+  return response.data;
+};
+
+export type AiConfigurationPreset = {|
+  mode: 'chat' | 'agent',
+  id: string,
+  nameByLocale: MessageByLocale,
+  disabled: boolean,
+  isDefault?: boolean,
+|};
+
+export type AiSettings = {
+  aiRequest: {
+    presets: Array<AiConfigurationPreset>,
+  },
+};
+
+export const fetchAiSettings = async ({
+  environment,
+}: {|
+  environment: Environment,
+|}): Promise<AiSettings> => {
+  const response = await axios.get(
+    `${GDevelopAiCdn.baseUrl[environment]}/ai-settings.json`
   );
   return response.data;
 };

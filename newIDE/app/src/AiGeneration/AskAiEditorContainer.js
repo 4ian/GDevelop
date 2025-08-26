@@ -53,6 +53,7 @@ import { useCreateAiProjectDialog } from './UseCreateAiProjectDialog';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { prepareAiUserContent } from './PrepareAiUserContent';
 import { AiRequestContext } from './AiRequestContext';
+import { getAiConfigurationPresetsWithAvailability } from './AiConfiguration';
 import {
   setEditorHotReloadNeeded,
   type HotReloadSteps,
@@ -387,6 +388,7 @@ export type AskAiEditorInterface = {|
 export type NewAiRequestOptions = {|
   mode: 'chat' | 'agent',
   userRequest: string,
+  aiConfigurationPresetId: string,
 |};
 
 const noop = () => {};
@@ -478,6 +480,7 @@ export const AskAiEditor = React.memo<Props>(
       const {
         aiRequestStorage,
         editorFunctionCallResultsStorage,
+        getAiSettings,
       } = React.useContext(AiRequestContext);
       const {
         getEditorFunctionCallResults,
@@ -582,7 +585,11 @@ export const AskAiEditor = React.memo<Props>(
             }
 
             // Read the options and reset them (to avoid launching the same request twice).
-            const { mode, userRequest } = newAiRequestOptions;
+            const {
+              mode,
+              userRequest,
+              aiConfigurationPresetId,
+            } = newAiRequestOptions;
             startNewAiRequest(null);
 
             // If no project is opened, create a new empty one if the request is for
@@ -600,6 +607,7 @@ export const AskAiEditor = React.memo<Props>(
                 startNewAiRequest({
                   mode,
                   userRequest,
+                  aiConfigurationPresetId,
                 });
               } catch (error) {
                 console.error('Error creating a new empty project:', error);
@@ -657,6 +665,9 @@ export const AskAiEditor = React.memo<Props>(
                 fileMetadata,
                 storageProviderName,
                 mode,
+                aiConfiguration: {
+                  presetId: aiConfigurationPresetId,
+                },
               });
 
               console.info('Successfully created a new AI request:', aiRequest);
@@ -952,6 +963,9 @@ export const AskAiEditor = React.memo<Props>(
           <Paper square background="dark" style={styles.paper}>
             <div style={styles.chatContainer}>
               <AiRequestChat
+                aiConfigurationPresetsWithAvailability={getAiConfigurationPresetsWithAvailability(
+                  { limits, getAiSettings }
+                )}
                 project={project || null}
                 ref={aiRequestChatRef}
                 aiRequest={selectedAiRequest}

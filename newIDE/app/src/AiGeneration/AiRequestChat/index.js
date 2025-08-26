@@ -38,6 +38,11 @@ import { ChatMessages } from './ChatMessages';
 import Send from '../../UI/CustomSvgIcons/Send';
 import { FeedbackBanner } from './FeedbackBanner';
 import classNames from 'classnames';
+import {
+  type AiConfigurationPresetWithAvailability,
+  getDefaultAiConfigurationPresetId,
+} from '../AiConfiguration';
+import { AiConfigurationPresetSelector } from './AiConfigurationPresetSelector';
 
 const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 5;
 const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 10;
@@ -65,6 +70,7 @@ type Props = {
   onStartNewAiRequest: (options: {|
     userRequest: string,
     mode: 'chat' | 'agent',
+    aiConfigurationPresetId: string,
   |}) => void,
   onSendMessage: (options: {|
     userMessage: string,
@@ -85,6 +91,7 @@ type Props = {
     aiRequestId: string | null,
   |}) => void,
   initialMode?: 'chat' | 'agent',
+  aiConfigurationPresetsWithAvailability: Array<AiConfigurationPresetWithAvailability>,
 
   onProcessFunctionCalls: (
     functionCalls: Array<AiRequestMessageAssistantFunctionCall>,
@@ -251,6 +258,7 @@ const getPriceText = ({
 export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
   (
     {
+      aiConfigurationPresetsWithAvailability,
       project,
       aiRequest,
       isSending,
@@ -288,6 +296,41 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       },
       [initialMode]
     );
+
+    const [
+      aiConfigurationPresetId,
+      setAiConfigurationPresetId,
+    ] = React.useState<string | null>(null);
+
+    React.useEffect(
+      () => {
+        if (!aiConfigurationPresetsWithAvailability.length) return;
+
+        if (!aiConfigurationPresetId) return;
+
+        if (
+          aiConfigurationPresetsWithAvailability.find(
+            preset =>
+              preset.id === aiConfigurationPresetId &&
+              preset.mode === newAiRequestMode
+          )
+        ) {
+          return;
+        }
+
+        // The selected preset is not a valid choice for the current mode - reset it.
+        console.info(
+          "Reset the AI configuration preset because it's not valid for the current mode."
+        );
+        setAiConfigurationPresetId(null);
+      },
+      [
+        newAiRequestMode,
+        aiConfigurationPresetsWithAvailability,
+        aiConfigurationPresetId,
+      ]
+    );
+
     const aiRequestId: string = aiRequest ? aiRequest.id : '';
     const [
       userRequestTextPerAiRequestId,
@@ -421,6 +464,10 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       </Text>
     );
 
+    const chosenOrDefaultAiConfigurationPresetId =
+      aiConfigurationPresetId ||
+      getDefaultAiConfigurationPresetId(aiConfigurationPresetsWithAvailability);
+
     if (!aiRequest) {
       return (
         <div
@@ -469,6 +516,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 onStartNewAiRequest({
                   mode: newAiRequestMode,
                   userRequest: userRequestTextPerAiRequestId[''],
+                  aiConfigurationPresetId: chosenOrDefaultAiConfigurationPresetId,
                 });
               }}
             >
@@ -494,6 +542,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                       onStartNewAiRequest({
                         mode: newAiRequestMode,
                         userRequest: userRequestTextPerAiRequestId[''],
+                        aiConfigurationPresetId: chosenOrDefaultAiConfigurationPresetId,
                       });
                     }}
                     placeholder={newChatPlaceholder}
@@ -502,8 +551,20 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                       <Column>
                         <LineStackLayout
                           alignItems="center"
-                          justifyContent="flex-end"
+                          justifyContent="space-between"
                         >
+                          <AiConfigurationPresetSelector
+                            chosenOrDefaultAiConfigurationPresetId={
+                              chosenOrDefaultAiConfigurationPresetId
+                            }
+                            setAiConfigurationPresetId={
+                              setAiConfigurationPresetId
+                            }
+                            aiConfigurationPresetsWithAvailability={
+                              aiConfigurationPresetsWithAvailability
+                            }
+                            aiRequestMode={newAiRequestMode}
+                          />
                           <RaisedButton
                             color="primary"
                             icon={<Send />}
@@ -527,6 +588,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                               onStartNewAiRequest({
                                 mode: newAiRequestMode,
                                 userRequest: userRequestTextPerAiRequestId[''],
+                                aiConfigurationPresetId: chosenOrDefaultAiConfigurationPresetId,
                               });
                             }}
                           />

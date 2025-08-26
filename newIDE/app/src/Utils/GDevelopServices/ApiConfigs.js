@@ -114,6 +114,13 @@ export const GDevelopGenerationApi = {
     : 'https://api.gdevelop.io/generation',
 };
 
+export const GDevelopAiCdn = {
+  baseUrl: {
+    staging: 'https://public-resources.gdevelop.io/staging/ai',
+    live: 'https://public-resources.gdevelop.io/ai',
+  },
+};
+
 export const GDevelopProjectResourcesStorage = {
   baseUrl: isDev
     ? 'https://project-resources-dev.gdevelop.io'

@@ -54,6 +54,16 @@ export type Subscription = {|
   isTeacher?: boolean,
 |};
 
+type AiCapability = {
+  availablePresets: Array<{
+    mode: 'chat' | 'agent',
+    name: string,
+    id: string,
+    disabled?: boolean,
+    enableWith?: 'higher-tier-plan',
+  }>,
+};
+
 /**
  * This describes what a user can do on our online services.
  */
@@ -95,6 +105,7 @@ export type Capabilities = {|
     themeCustomizationCapabilities: 'NONE' | 'BASIC' | 'FULL',
   |},
   versionHistory: {| enabled: boolean |},
+  ai: AiCapability,
 |};
 
 export type UsagePrice = {|

@@ -69,14 +69,32 @@ const styles = {
 };
 
 const specializationLabels = {
-  'game-development': <Trans>Game Development specialization</Trans>,
-  'interaction-design': <Trans>Interaction Design specialization</Trans>,
-  marketing: <Trans>Marketing specialization</Trans>,
+  'game-development': <Trans>Game Development</Trans>,
+  'interaction-design': <Trans>Interaction Design</Trans>,
+  marketing: <Trans>Marketing</Trans>,
+
+  // Possible future additions:
+  'game-design': <Trans>Game Design</Trans>,
+  'programming-scripting': <Trans>Programming & Scripting</Trans>,
+  'art-animation': <Trans>Art & Animation</Trans>,
+  'audio-sound': <Trans>Audio & Sound</Trans>,
+  'production-management': <Trans>Production & Project Management</Trans>,
+  'liveops-analytics': <Trans>Live Ops & Analytics</Trans>,
+  'narrative-writing': <Trans>Narrative & Writing</Trans>,
 };
 const specializationColors = {
   'game-development': '#5CB0FF',
   'interaction-design': '#CAC84E',
   marketing: '#FD3AE6',
+
+  // Possible future additions:
+  'game-design': '#F28E2B', // orange
+  'programming-scripting': '#59A14F', // green
+  'art-animation': '#B07AA1', // purple
+  'audio-sound': '#E15759', // red
+  'production-management': '#9C755F', // brown
+  'liveops-analytics': '#76B7B2', // teal
+  'narrative-writing': '#79706E', // gray
 };
 
 export const getSpecializationConfig = (
@@ -98,7 +116,6 @@ export const getSpecializationConfig = (
         {specializationId
           .replace(/-/g, ' ')
           .replace(/\b\w/g, l => l.toUpperCase())}{' '}
-        specialization
       </Trans>
     );
   }

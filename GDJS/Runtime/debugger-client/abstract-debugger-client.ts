@@ -416,7 +416,11 @@ namespace gdjs {
         }
       } else if (data.command === 'zoomBy') {
         if (inGameEditor) {
-          inGameEditor.zoomBy(data.payload.zoomInFactor);
+          inGameEditor.zoomBy(data.payload.zoomFactor);
+        }
+      } else if (data.command === 'setZoom') {
+        if (inGameEditor) {
+          inGameEditor.setZoom(data.payload.zoom);
         }
       } else if (data.command === 'setSelectedInstances') {
         if (inGameEditor) {

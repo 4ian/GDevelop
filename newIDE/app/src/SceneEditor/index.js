@@ -2027,14 +2027,28 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   setZoomFactor = (zoomFactor: number) => {
-    if (this.editorDisplay)
+    if (this.editorDisplay) {
       this.editorDisplay.viewControls.setZoomFactor(zoomFactor);
+    }
+    this._sendSetZoom(zoomFactor);
   };
 
-  zoomIn = () => {
-    if (this.editorDisplay)
-      this.editorDisplay.viewControls.zoomBy(zoomInFactor);
+  _sendSetZoom(zoom: number): void {
+    if (this.props.gameEditorMode === 'embedded-game') {
+      const { previewDebuggerServer } = this.props;
+      if (!previewDebuggerServer) return;
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'setZoom',
+          payload: {
+            zoom,
+          },
+        });
+      });
+    }
+  }
 
+  _sendZoomBy(zoomFactor: number): void {
     if (this.props.gameEditorMode === 'embedded-game') {
       const { previewDebuggerServer } = this.props;
       if (!previewDebuggerServer) return;
@@ -2042,29 +2056,25 @@ export default class SceneEditor extends React.Component<Props, State> {
         previewDebuggerServer.sendMessage(debuggerId, {
           command: 'zoomBy',
           payload: {
-            zoomInFactor,
+            zoomFactor,
           },
         });
       });
     }
+  }
+
+  zoomIn = () => {
+    if (this.editorDisplay) {
+      this.editorDisplay.viewControls.zoomBy(zoomInFactor);
+    }
+    this._sendZoomBy(zoomInFactor);
   };
 
   zoomOut = () => {
     if (this.editorDisplay)
       this.editorDisplay.viewControls.zoomBy(zoomOutFactor);
 
-    if (this.props.gameEditorMode === 'embedded-game') {
-      const { previewDebuggerServer } = this.props;
-      if (!previewDebuggerServer) return;
-      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-        previewDebuggerServer.sendMessage(debuggerId, {
-          command: 'zoomBy',
-          payload: {
-            zoomOutFactor,
-          },
-        });
-      });
-    }
+    this._sendZoomBy(zoomOutFactor);
   };
 
   _onContextMenu = (

@@ -741,10 +741,14 @@ namespace gdjs {
       );
     }
 
-    zoomBy(zoomInFactor: float) {
+    zoomBy(zoomFactor: float) {
       if (!this._currentScene) return;
+      this._getEditorCamera().zoomBy(zoomFactor);
+    }
 
-      this._getEditorCamera().zoomBy(zoomInFactor);
+    setZoom(zoom: float) {
+      if (!this._currentScene) return;
+      this._getEditorCamera().setZoom(zoom);
     }
 
     setSelectedObjects(persistentUuids: Array<string>) {
@@ -2289,6 +2293,24 @@ namespace gdjs {
       this.onHasCameraChanged();
     }
 
+    setZoom(zoom: float): void {
+      const distance = this._getCameraZFromZoom(zoom);
+      this.switchToOrbitAroundPosition(this.getAnchorX(), this.getAnchorY(), 0);
+      this.resetRotationToTopDown();
+      this.setOrbitDistance(distance);
+      this.onHasCameraChanged();
+    }
+
+    getAnchorX(): float {
+      return this.getActiveCamera().getAnchorX();
+    }
+    getAnchorY(): float {
+      return this.getActiveCamera().getAnchorY();
+    }
+    getAnchorZ(): float {
+      return this.getActiveCamera().getAnchorZ();
+    }
+
     zoomToInitialPosition(visibleScreenArea: {
       minX: number;
       minY: number;
@@ -2419,7 +2441,7 @@ namespace gdjs {
      * @param zoom The camera zoom.
      * @return The z position of the camera
      */
-    private _getCameraZFromZoom = (zoom: float): float => {
+    _getCameraZFromZoom = (zoom: float): float => {
       const runtimeGame = this.editor.getRuntimeGame();
       // TODO Should the editor force this fov?
       const fov = 45;
@@ -2464,6 +2486,9 @@ namespace gdjs {
     updateCamera(currentScene: RuntimeScene, layer: RuntimeLayer): void;
     zoomBy(zoomInFactor: float): void;
     resetRotationToTopDown(): void;
+    getAnchorX(): float;
+    getAnchorY(): float;
+    getAnchorZ(): float;
   }
 
   class OrbitCameraControl implements CameraControl {
@@ -2523,6 +2548,18 @@ namespace gdjs {
       this._lastCursorY = inputManager.getCursorY();
     }
 
+    getAnchorX(): float {
+      return this.target.x;
+    }
+
+    getAnchorY(): float {
+      return this.target.y;
+    }
+
+    getAnchorZ(): float {
+      return this.target.z;
+    }
+
     getCameraX(): float {
       return (
         this.target.x +
@@ -2558,11 +2595,9 @@ namespace gdjs {
       layer.setCameraRotation(this.rotationAngle);
     }
 
-    zoomBy(zoomInFactor: float): void {
-      this.distance = Math.min(
-        10,
-        this.distance + zoomInFactor > 1 ? 200 : -200
-      );
+    zoomBy(zoomFactor: float): void {
+      // The distance is proportional to the inverse of the zoom.
+      this.distance /= zoomFactor;
       this._editorCamera.onHasCameraChanged();
     }
 
@@ -2784,6 +2819,18 @@ namespace gdjs {
       forward.normalize();
 
       return { right, up, forward };
+    }
+
+    getAnchorX(): float {
+      return this.position.x;
+    }
+
+    getAnchorY(): float {
+      return this.position.y;
+    }
+
+    getAnchorZ(): float {
+      return this.position.z;
     }
 
     zoomBy(zoomInFactor: float): void {

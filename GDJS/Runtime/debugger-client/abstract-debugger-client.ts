@@ -107,8 +107,12 @@ namespace gdjs {
     exception: Error,
     runtimeGame: gdjs.RuntimeGame
   ) => {
-    const sceneNames = runtimeGame.getSceneStack().getAllSceneNames();
-    const currentScene = runtimeGame.getSceneStack().getCurrentScene();
+    const currentScene = runtimeGame.isInGameEdition()
+      ? runtimeGame.getInGameEditor()?.getCurrentScene()
+      : runtimeGame.getSceneStack().getCurrentScene();
+    const sceneNames = runtimeGame.isInGameEdition()
+      ? [currentScene?.getName()]
+      : runtimeGame.getSceneStack().getAllSceneNames();
     return {
       type: 'javascript-uncaught-exception',
       exception,
@@ -233,6 +237,7 @@ namespace gdjs {
     protected handleCommand(data: any) {
       const that = this;
       const runtimeGame = this._runtimegame;
+      const inGameEditor = runtimeGame.getInGameEditor();
       if (!data || !data.command) {
         // Not a command that's meant to be handled by the debugger, return silently to
         // avoid polluting the console.
@@ -276,9 +281,9 @@ namespace gdjs {
             // as it knows the current scene to show.
           });
       } else if (data.command === 'hotReloadObjects') {
-        if (runtimeGame._inGameEditor) {
+        if (inGameEditor) {
           const editedInstanceContainer =
-            runtimeGame._inGameEditor._getEditedInstanceContainer();
+            inGameEditor.getEditedInstanceContainer();
           if (editedInstanceContainer) {
             that._hotReloader.hotReloadRuntimeSceneObjects(
               data.payload.updatedObjects,
@@ -287,11 +292,11 @@ namespace gdjs {
           }
         }
       } else if (data.command === 'hotReloadLayers') {
-        if (runtimeGame._inGameEditor) {
+        if (inGameEditor) {
           const editedInstanceContainer =
-            runtimeGame._inGameEditor._getEditedInstanceContainer();
+            inGameEditor.getEditedInstanceContainer();
           if (editedInstanceContainer) {
-            runtimeGame._inGameEditor.onLayersDataChange(
+            inGameEditor.onLayersDataChange(
               data.payload.layers,
               data.payload.areEffectsHidden
             );
@@ -304,9 +309,9 @@ namespace gdjs {
           }
         }
       } else if (data.command === 'setBackgroundColor') {
-        if (runtimeGame._inGameEditor) {
+        if (inGameEditor) {
           const editedInstanceContainer =
-            runtimeGame._inGameEditor._getEditedInstanceContainer();
+            inGameEditor.getEditedInstanceContainer();
           if (editedInstanceContainer) {
             const backgroundColor = data.payload.backgroundColor;
             if (
@@ -330,12 +335,12 @@ namespace gdjs {
           }
         }
       } else if (data.command === 'hotReloadAllInstances') {
-        if (runtimeGame._inGameEditor) {
+        if (inGameEditor) {
           const editedInstanceContainer =
-            runtimeGame._inGameEditor._getEditedInstanceContainer();
+            inGameEditor.getEditedInstanceContainer();
           if (editedInstanceContainer) {
             that._hotReloader.hotReloadRuntimeInstances(
-              runtimeGame._inGameEditor.getEditedInstanceDataList(),
+              inGameEditor.getEditedInstanceDataList(),
               data.payload.instances,
               editedInstanceContainer
             );
@@ -352,7 +357,6 @@ namespace gdjs {
           );
           return;
         }
-        const inGameEditor = this._runtimegame._inGameEditor;
         if (inGameEditor) {
           inGameEditor.switchToSceneOrVariant(
             data.editorId || null,
@@ -364,22 +368,22 @@ namespace gdjs {
           );
         }
       } else if (data.command === 'updateInstances') {
-        if (runtimeGame._inGameEditor) {
-          runtimeGame._inGameEditor.reloadInstances(data.payload.instances);
+        if (inGameEditor) {
+          inGameEditor.reloadInstances(data.payload.instances);
         }
       } else if (data.command === 'addInstances') {
-        if (runtimeGame._inGameEditor) {
-          runtimeGame._inGameEditor.addInstances(data.payload.instances);
-          runtimeGame._inGameEditor.setSelectedObjects(
+        if (inGameEditor) {
+          inGameEditor.addInstances(data.payload.instances);
+          inGameEditor.setSelectedObjects(
             data.payload.instances.map((instance) => instance.persistentUuid)
           );
           if (data.payload.moveUnderCursor) {
-            runtimeGame._inGameEditor.moveSelectionUnderCursor();
+            inGameEditor.moveSelectionUnderCursor();
           }
         }
       } else if (data.command === 'deleteSelection') {
-        if (runtimeGame._inGameEditor) {
-          runtimeGame._inGameEditor.deleteSelection();
+        if (inGameEditor) {
+          inGameEditor.deleteSelection();
         }
       } else if (data.command === 'dragNewInstance') {
         const gameCoords = runtimeGame
@@ -387,57 +391,46 @@ namespace gdjs {
           .convertPageToGameCoords(data.x, data.y);
         runtimeGame.getInputManager().onMouseMove(gameCoords[0], gameCoords[1]);
 
-        if (runtimeGame._inGameEditor)
-          runtimeGame._inGameEditor.dragNewInstance({
+        if (inGameEditor)
+          inGameEditor.dragNewInstance({
             name: data.name,
             dropped: data.dropped,
           });
       } else if (data.command === 'cancelDragNewInstance') {
-        if (runtimeGame._inGameEditor)
-          runtimeGame._inGameEditor.cancelDragNewInstance();
+        if (inGameEditor) inGameEditor.cancelDragNewInstance();
       } else if (data.command === 'zoomToInitialPosition') {
-        if (runtimeGame._inGameEditor) {
-          runtimeGame._inGameEditor.zoomToInitialPosition(
-            data.payload.visibleScreenArea
-          );
+        if (inGameEditor) {
+          inGameEditor.zoomToInitialPosition(data.payload.visibleScreenArea);
         }
       } else if (data.command === 'zoomToFitContent') {
-        if (runtimeGame._inGameEditor) {
-          runtimeGame._inGameEditor.zoomToFitContent(
-            data.payload.visibleScreenArea
-          );
+        if (inGameEditor) {
+          inGameEditor.zoomToFitContent(data.payload.visibleScreenArea);
         }
       } else if (data.command === 'setSelectedLayer') {
-        if (runtimeGame._inGameEditor) {
-          runtimeGame._inGameEditor.setSelectedLayerName(
-            data.payload.layerName
-          );
+        if (inGameEditor) {
+          inGameEditor.setSelectedLayerName(data.payload.layerName);
         }
       } else if (data.command === 'zoomToFitSelection') {
-        if (runtimeGame._inGameEditor) {
-          runtimeGame._inGameEditor.zoomToFitSelection(
-            data.payload.visibleScreenArea
-          );
+        if (inGameEditor) {
+          inGameEditor.zoomToFitSelection(data.payload.visibleScreenArea);
         }
       } else if (data.command === 'zoomBy') {
-        if (runtimeGame._inGameEditor) {
-          runtimeGame._inGameEditor.zoomBy(data.payload.zoomInFactor);
+        if (inGameEditor) {
+          inGameEditor.zoomBy(data.payload.zoomInFactor);
         }
       } else if (data.command === 'setSelectedInstances') {
-        if (runtimeGame._inGameEditor) {
-          runtimeGame._inGameEditor.setSelectedObjects(
-            data.payload.instanceUuids
-          );
+        if (inGameEditor) {
+          inGameEditor.setSelectedObjects(data.payload.instanceUuids);
         }
       } else if (data.command === 'centerViewOnLastSelectedInstance') {
-        if (runtimeGame._inGameEditor) {
-          runtimeGame._inGameEditor.centerViewOnLastSelectedInstance(
+        if (inGameEditor) {
+          inGameEditor.centerViewOnLastSelectedInstance(
             data.payload.visibleScreenArea
           );
         }
       } else if (data.command === 'updateInnerArea') {
-        if (runtimeGame._inGameEditor) {
-          runtimeGame._inGameEditor.updateInnerArea(
+        if (inGameEditor) {
+          inGameEditor.updateInnerArea(
             data.payload.areaMinX,
             data.payload.areaMinY,
             data.payload.areaMinZ,
@@ -753,7 +746,7 @@ namespace gdjs {
       selectedInstances: Array<InstancePersistentUuidData>;
       removedInstances: Array<InstancePersistentUuidData>;
     }): void {
-      const inGameEditor = this._runtimegame._inGameEditor;
+      const inGameEditor = this._runtimegame.getInGameEditor();
       if (!inGameEditor) {
         return;
       }
@@ -767,7 +760,7 @@ namespace gdjs {
     }
 
     sendOpenContextMenu(cursorX: float, cursorY: float): void {
-      const inGameEditor = this._runtimegame._inGameEditor;
+      const inGameEditor = this._runtimegame.getInGameEditor();
       if (!inGameEditor) {
         return;
       }
@@ -781,7 +774,7 @@ namespace gdjs {
     }
 
     sendCameraState(cameraState: EditorCameraState): void {
-      const inGameEditor = this._runtimegame._inGameEditor;
+      const inGameEditor = this._runtimegame.getInGameEditor();
       if (!inGameEditor) {
         return;
       }
@@ -795,7 +788,7 @@ namespace gdjs {
     }
 
     sendUndo(): void {
-      const inGameEditor = this._runtimegame._inGameEditor;
+      const inGameEditor = this._runtimegame.getInGameEditor();
       if (!inGameEditor) {
         return;
       }
@@ -809,7 +802,7 @@ namespace gdjs {
     }
 
     sendRedo(): void {
-      const inGameEditor = this._runtimegame._inGameEditor;
+      const inGameEditor = this._runtimegame.getInGameEditor();
       if (!inGameEditor) {
         return;
       }
@@ -823,7 +816,7 @@ namespace gdjs {
     }
 
     sendCopy(): void {
-      const inGameEditor = this._runtimegame._inGameEditor;
+      const inGameEditor = this._runtimegame.getInGameEditor();
       if (!inGameEditor) {
         return;
       }
@@ -837,7 +830,7 @@ namespace gdjs {
     }
 
     sendPaste(): void {
-      const inGameEditor = this._runtimegame._inGameEditor;
+      const inGameEditor = this._runtimegame.getInGameEditor();
       if (!inGameEditor) {
         return;
       }
@@ -851,7 +844,7 @@ namespace gdjs {
     }
 
     sendCut(): void {
-      const inGameEditor = this._runtimegame._inGameEditor;
+      const inGameEditor = this._runtimegame.getInGameEditor();
       if (!inGameEditor) {
         return;
       }
@@ -905,7 +898,7 @@ namespace gdjs {
             initialRuntimeGameStatus?.eventsBasedObjectType || '',
           eventsBasedObjectVariantName:
             initialRuntimeGameStatus?.eventsBasedObjectVariantName || '',
-          editorCamera3D: this._runtimegame._inGameEditor?.getCameraState(),
+          editorCamera3D: this._runtimegame.getInGameEditor()?.getCameraState(),
         };
 
         reloadUrl.searchParams.set(

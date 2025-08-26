@@ -1723,6 +1723,13 @@ namespace gdjs {
     }
 
     /**
+     * Return in-game editor.
+     */
+    getInGameEditor(): InGameEditor | null {
+      return this._inGameEditor;
+    }
+
+    /**
      * Check if the game should call GDevelop development APIs or not.
      *
      * Unless you are contributing to GDevelop, avoid using this.

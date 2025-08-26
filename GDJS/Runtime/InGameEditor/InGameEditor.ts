@@ -467,19 +467,11 @@ namespace gdjs {
       return this._editorId;
     }
 
-    setEditorId(editorId: string): void {
-      this._editorId = editorId;
-    }
-
     getEditedInstanceDataList(): InstanceData[] {
       return this._editedInstanceDataList;
     }
 
-    setEditedInstanceDataList(editedInstanceDataList: InstanceData[]) {
-      this._editedInstanceDataList = editedInstanceDataList;
-    }
-
-    setEditedInstanceContainer(
+    private _setEditedInstanceContainer(
       editedInstanceContainer: gdjs.RuntimeInstanceContainer | null
     ) {
       this._editedInstanceContainer = editedInstanceContainer;
@@ -489,7 +481,7 @@ namespace gdjs {
       this._selectedLayerName = '';
     }
 
-    _getEditedInstanceContainer(): gdjs.RuntimeInstanceContainer | null {
+    getEditedInstanceContainer(): gdjs.RuntimeInstanceContainer | null {
       return this._editedInstanceContainer;
     }
 
@@ -546,7 +538,7 @@ namespace gdjs {
             const { scene, customObjectInstanceContainer } =
               sceneAndCustomObject;
             this._currentScene = scene;
-            this.setEditedInstanceContainer(customObjectInstanceContainer);
+            this._setEditedInstanceContainer(customObjectInstanceContainer);
           }
         }
       } else if (sceneName) {
@@ -579,7 +571,7 @@ namespace gdjs {
           }
         }
         this._currentScene = newScene;
-        this.setEditedInstanceContainer(newScene);
+        this._setEditedInstanceContainer(newScene);
         if (externalLayoutName) {
           const externalLayoutData =
             this._runtimeGame.getExternalLayoutData(externalLayoutName);
@@ -652,7 +644,7 @@ namespace gdjs {
       this._selectedLayerName = layerName;
     }
 
-    getTempVector2d(x: float, y: float): THREE.Vector2 {
+    private _getTempVector2d(x: float, y: float): THREE.Vector2 {
       this._tempVector2d.x = x;
       this._tempVector2d.y = y;
       return this._tempVector2d;
@@ -684,7 +676,7 @@ namespace gdjs {
       maxX: number;
       maxY: number;
     }) {
-      const editedInstanceContainer = this._getEditedInstanceContainer();
+      const editedInstanceContainer = this.getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
 
       this.zoomToFitObjects(
@@ -756,7 +748,7 @@ namespace gdjs {
     }
 
     setSelectedObjects(persistentUuids: Array<string>) {
-      const editedInstanceContainer = this._getEditedInstanceContainer();
+      const editedInstanceContainer = this.getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
 
       const persistentUuidsSet = new Set<string>(persistentUuids);
@@ -874,7 +866,7 @@ namespace gdjs {
         return;
       }
       if (!this._currentScene) return;
-      const editedInstanceContainer = this._getEditedInstanceContainer();
+      const editedInstanceContainer = this.getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
 
       if (
@@ -953,7 +945,7 @@ namespace gdjs {
     private _duplicateSelectedObjects(
       objectUnderCursor: gdjs.RuntimeObject
     ): gdjs.RuntimeObject | null {
-      const editedInstanceContainer = this._getEditedInstanceContainer();
+      const editedInstanceContainer = this.getEditedInstanceContainer();
       if (!editedInstanceContainer) return null;
       let newObjectUnderCursor: gdjs.RuntimeObject | null = null;
       const addedObjects: Array<gdjs.RuntimeObject> = [];
@@ -1120,7 +1112,7 @@ namespace gdjs {
     }: {
       objectUnderCursor: gdjs.RuntimeObject | null;
     }) {
-      const editedInstanceContainer = this._getEditedInstanceContainer();
+      const editedInstanceContainer = this.getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
 
       const inputManager = this._runtimeGame.getInputManager();
@@ -1720,7 +1712,7 @@ namespace gdjs {
     }
 
     cancelDragNewInstance() {
-      const editedInstanceContainer = this._getEditedInstanceContainer();
+      const editedInstanceContainer = this.getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
 
       if (this._draggedNewObject) {
@@ -1732,7 +1724,7 @@ namespace gdjs {
     dragNewInstance({ name, dropped }: { name: string; dropped: boolean }) {
       const currentScene = this._currentScene;
       if (!currentScene) return;
-      const editedInstanceContainer = this._getEditedInstanceContainer();
+      const editedInstanceContainer = this.getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
 
       const selectedLayer = currentScene.getLayer(this._selectedLayerName);
@@ -1892,7 +1884,7 @@ namespace gdjs {
     }
 
     reloadInstances(instances: Array<InstanceData>) {
-      const editedInstanceContainer = this._getEditedInstanceContainer();
+      const editedInstanceContainer = this.getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
 
       // TODO: Might be worth indexing instances data and runtime objects by their
@@ -1938,7 +1930,7 @@ namespace gdjs {
     }
 
     addInstances(instances: Array<InstanceData>) {
-      const editedInstanceContainer = this._getEditedInstanceContainer();
+      const editedInstanceContainer = this.getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
 
       editedInstanceContainer.createObjectsFrom(instances, 0, 0, 0, true);
@@ -1946,7 +1938,7 @@ namespace gdjs {
     }
 
     deleteSelection() {
-      const editedInstanceContainer = this._getEditedInstanceContainer();
+      const editedInstanceContainer = this.getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
 
       this._removeInstances(this._selection.getSelectedObjects());
@@ -2008,7 +2000,7 @@ namespace gdjs {
         // Note that raycasting is done by Three.js, which means it could slow down
         // if lots of 3D objects are shown. We consider that if this needs improvements,
         // this must be handled by the game engine culling
-        const normalizedDeviceCoordinates = this.getTempVector2d(
+        const normalizedDeviceCoordinates = this._getTempVector2d(
           this._getNormalizedScreenX(cursorX),
           this._getNormalizedScreenY(cursorY)
         );
@@ -2096,7 +2088,7 @@ namespace gdjs {
     private _getObject(
       initialThreeObject: THREE.Object3D
     ): gdjs.RuntimeObject | null {
-      const editedInstanceContainer = this._getEditedInstanceContainer();
+      const editedInstanceContainer = this.getEditedInstanceContainer();
       if (!editedInstanceContainer) return null;
 
       // Walk back up the object hierarchy to find the runtime object.

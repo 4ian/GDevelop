@@ -1532,8 +1532,8 @@ const MainFrame = (props: Props) => {
         // - switch to a 3D editor tab
         //
         // Hot-reloads are triggered right away from a 3D editor.
-        // Which means this call has no effect when switching between 2
-        // 3D editors.
+        // Which means this call won't do any hot-reload when switching between
+        // 2 3D editors but only switch the scene.
         hotReloadInGameEditorIfNeeded();
       } else {
         // Switch the 3D editor to the same scene as the 2D one.

@@ -58,16 +58,6 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
         eventsBasedObjectType: projectItemName || null,
         eventsBasedObjectVariantName: this.getVariantName(),
       });
-
-      // TODO: redundant check?
-      if (this.props.gameEditorMode === 'embedded-game' && projectItemName) {
-        this._switchToSceneEdition({
-          shouldReloadProjectData: false,
-          shouldReloadLibraries: false,
-          shouldGenerateEventsCode: false,
-          shouldReloadResources: false,
-        });
-      }
     }
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
       this.onResourceExternallyChanged.bind(this)
@@ -78,17 +68,6 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
       this.resourceExternallyChangedCallbackId
     );
     if (this._objectsContainer) this._objectsContainer.delete();
-  }
-
-  componentDidUpdate(prevProps: RenderEditorContainerProps) {
-    if (!prevProps.isActive && this.props.isActive) {
-      this._switchToSceneEdition({
-        shouldReloadProjectData: false,
-        shouldReloadLibraries: false,
-        shouldGenerateEventsCode: false,
-        shouldReloadResources: false,
-      });
-    }
   }
 
   hotReloadInGameEditorIfNeeded(hotReloadSteps: HotReloadSteps) {

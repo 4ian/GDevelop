@@ -44,27 +44,6 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         eventsBasedObjectType: null,
         eventsBasedObjectVariantName: null,
       });
-
-      // TODO: redundant check?
-      if (this.props.gameEditorMode === 'embedded-game' && projectItemName) {
-        this._switchToSceneEdition({
-          shouldReloadProjectData: false,
-          shouldReloadLibraries: false,
-          shouldGenerateEventsCode: false,
-          shouldReloadResources: false,
-        });
-      }
-    }
-  }
-
-  componentDidUpdate(prevProps: RenderEditorContainerProps) {
-    if (!prevProps.isActive && this.props.isActive) {
-      this._switchToSceneEdition({
-        shouldReloadProjectData: false,
-        shouldReloadLibraries: false,
-        shouldGenerateEventsCode: false,
-        shouldReloadResources: false,
-      });
     }
   }
 

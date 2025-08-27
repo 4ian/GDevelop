@@ -79,20 +79,6 @@ export class ExternalLayoutEditorContainer extends React.Component<
         eventsBasedObjectType: null,
         eventsBasedObjectVariantName: null,
       });
-
-      // TODO: redundant check?
-      if (
-        this.props.gameEditorMode === 'embedded-game' &&
-        layout &&
-        projectItemName
-      ) {
-        this._switchToSceneEdition({
-          shouldReloadProjectData: false,
-          shouldReloadLibraries: false,
-          shouldGenerateEventsCode: false,
-          shouldReloadResources: false,
-        });
-      }
     }
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
       this.onResourceExternallyChanged.bind(this)
@@ -102,17 +88,6 @@ export class ExternalLayoutEditorContainer extends React.Component<
     unregisterOnResourceExternallyChangedCallback(
       this.resourceExternallyChangedCallbackId
     );
-  }
-
-  componentDidUpdate(prevProps: RenderEditorContainerProps) {
-    if (!prevProps.isActive && this.props.isActive) {
-      this._switchToSceneEdition({
-        shouldReloadProjectData: false,
-        shouldReloadLibraries: false,
-        shouldGenerateEventsCode: false,
-        shouldReloadResources: false,
-      });
-    }
   }
 
   hotReloadInGameEditorIfNeeded(hotReloadSteps: HotReloadSteps) {

@@ -471,16 +471,6 @@ namespace gdjs {
       return this._editedInstanceDataList;
     }
 
-    private _setEditedInstanceContainer(
-      editedInstanceContainer: gdjs.RuntimeInstanceContainer | null
-    ) {
-      this._editedInstanceContainer = editedInstanceContainer;
-      // The 3D scene is rebuilt and the inner area marker is lost in the process.
-      this._threeInnerArea = null;
-      this._innerArea = null;
-      this._selectedLayerName = '';
-    }
-
     getEditedInstanceContainer(): gdjs.RuntimeInstanceContainer | null {
       return this._editedInstanceContainer;
     }
@@ -538,7 +528,7 @@ namespace gdjs {
             const { scene, customObjectInstanceContainer } =
               sceneAndCustomObject;
             this._currentScene = scene;
-            this._setEditedInstanceContainer(customObjectInstanceContainer);
+            this._editedInstanceContainer = customObjectInstanceContainer;
           }
         }
       } else if (sceneName) {
@@ -571,7 +561,7 @@ namespace gdjs {
           }
         }
         this._currentScene = newScene;
-        this._setEditedInstanceContainer(newScene);
+        this._editedInstanceContainer = newScene;
         if (externalLayoutName) {
           const externalLayoutData =
             this._runtimeGame.getExternalLayoutData(externalLayoutName);
@@ -613,6 +603,24 @@ namespace gdjs {
         eventsBasedObjectVariantName,
         editorId,
       };
+
+      // The 3D scene is rebuilt and the inner area marker is lost in the process.
+      this._threeInnerArea = null;
+      this._innerArea = null;
+      this._selectedLayerName = '';
+
+      // Clear any reference to `RuntimeObject` from the deleted scene.
+      this._selectionBoxes.clear();
+      this._selectionControls = null;
+      this._draggedNewObject = null;
+      this._draggedSelectedObject = null;
+      // Try to keep object selection in case the same scene is reloaded.
+      this.setSelectedObjects(
+        this._selection
+          .getSelectedObjects()
+          .map((object) => object.persistentUuid)
+          .filter(Boolean) as Array<string>
+      );
     }
 
     setInnerArea(innerArea: AABB3D | null) {

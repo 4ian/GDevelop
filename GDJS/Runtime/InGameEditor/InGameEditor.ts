@@ -1,4 +1,6 @@
 namespace gdjs {
+  const logger = new gdjs.Logger('In-Game editor');
+
   const LEFT_KEY = 37;
   const UP_KEY = 38;
   const RIGHT_KEY = 39;
@@ -519,11 +521,10 @@ namespace gdjs {
             ),
             () => {}
           );
-          const sceneAndCustomObject =
-            this._runtimeGame._createSceneWithCustomObject(
-              eventsBasedObjectType,
-              eventsBasedObjectVariantName || ''
-            );
+          const sceneAndCustomObject = this._createSceneWithCustomObject(
+            eventsBasedObjectType,
+            eventsBasedObjectVariantName || ''
+          );
           if (sceneAndCustomObject) {
             const { scene, customObjectInstanceContainer } =
               sceneAndCustomObject;
@@ -621,6 +622,165 @@ namespace gdjs {
           .map((object) => object.persistentUuid)
           .filter(Boolean) as Array<string>
       );
+    }
+
+    private _createSceneWithCustomObject(
+      eventsBasedObjectType: string,
+      eventsBasedObjectVariantName: string
+    ): {
+      scene: gdjs.RuntimeScene;
+      customObjectInstanceContainer: gdjs.CustomRuntimeObjectInstanceContainer;
+    } | null {
+      const eventsBasedObjectData = this._runtimeGame.getEventsBasedObjectData(
+        eventsBasedObjectType
+      );
+      if (!eventsBasedObjectData) {
+        logger.error(
+          `A CustomRuntimeObject was open in editor referring to an non existing events based object data with type "${eventsBasedObjectType}".`
+        );
+        return null;
+      }
+
+      const scene = new gdjs.RuntimeScene(this._runtimeGame);
+      scene.loadFromScene({
+        sceneData: {
+          variables: [],
+          instances: [
+            {
+              angle: 0,
+              customSize: false,
+              height: 0,
+              layer: '',
+              name: 'Object',
+              persistentUuid: '12345678-1234-1234-1234-123456789abc',
+              width: 0,
+              x: 0,
+              y: 0,
+              zOrder: 1,
+              numberProperties: [],
+              stringProperties: [],
+              initialVariables: [],
+              locked: false,
+            },
+          ],
+          objects: [
+            {
+              name: 'Object',
+              type: eventsBasedObjectType,
+              //@ts-ignore
+              variant: eventsBasedObjectVariantName,
+              content: {},
+              variables: [],
+              // Add all capabilities just in case events need them.
+              behaviors: [
+                {
+                  name: 'Animation',
+                  type: 'AnimatableCapability::AnimatableBehavior',
+                },
+                { name: 'Effect', type: 'EffectCapability::EffectBehavior' },
+                {
+                  name: 'Flippable',
+                  type: 'FlippableCapability::FlippableBehavior',
+                },
+                {
+                  name: 'Object3D',
+                  type: 'Scene3D::Base3DBehavior',
+                },
+                {
+                  name: 'Opacity',
+                  type: 'OpacityCapability::OpacityBehavior',
+                },
+                {
+                  name: 'Resizable',
+                  type: 'ResizableCapability::ResizableBehavior',
+                },
+                {
+                  name: 'Scale',
+                  type: 'ScalableCapability::ScalableBehavior',
+                },
+                {
+                  name: 'Text',
+                  type: 'TextContainerCapability::TextContainerBehavior',
+                },
+              ],
+              effects: [],
+            },
+          ],
+          layers: [
+            {
+              ambientLightColorB: 200,
+              ambientLightColorG: 200,
+              ambientLightColorR: 200,
+              camera3DFarPlaneDistance: 10000,
+              camera3DFieldOfView: 45,
+              camera3DNearPlaneDistance: 3,
+              followBaseLayerCamera: false,
+              isLightingLayer: false,
+              name: '',
+              renderingType: '2d+3d',
+              visibility: true,
+              cameras: [
+                {
+                  defaultSize: true,
+                  defaultViewport: true,
+                  height: 0,
+                  viewportBottom: 1,
+                  viewportLeft: 0,
+                  viewportRight: 1,
+                  viewportTop: 0,
+                  width: 0,
+                },
+              ],
+              effects: [
+                {
+                  effectType: 'Scene3D::HemisphereLight',
+                  name: '3D Light',
+                  doubleParameters: {
+                    elevation: 45,
+                    intensity: 1,
+                    rotation: 0,
+                  },
+                  stringParameters: {
+                    groundColor: '64;64;64',
+                    skyColor: '255;255;255',
+                    top: 'Y-',
+                  },
+                  booleanParameters: {},
+                },
+              ],
+            },
+          ],
+          r: 32,
+          v: 32,
+          b: 32,
+          mangledName: 'FakeSceneForCustomObject',
+          name: eventsBasedObjectData.name,
+          stopSoundsOnStartup: true,
+          title: '',
+          behaviorsSharedData: [
+            {
+              name: 'Text',
+              type: 'TextContainerCapability::TextContainerBehavior',
+            },
+          ],
+          usedResources: [],
+        },
+        usedExtensionsWithVariablesData:
+          this._runtimeGame.getGameData().eventsFunctionsExtensions,
+      });
+      const objects = scene.getObjects('Object');
+      const object = objects ? objects[0] : null;
+      if (!object) {
+        return null;
+      }
+      const customObject = object as gdjs.CustomRuntimeObject;
+      if (!customObject._instanceContainer) {
+        return null;
+      }
+      return {
+        scene,
+        customObjectInstanceContainer: customObject._instanceContainer,
+      };
     }
 
     setInnerArea(innerArea: AABB3D | null) {

@@ -482,6 +482,26 @@ namespace gdjs {
     }
 
     /**
+     * Return the layer to be used for camera calculus.
+     * @see getEditorLayer
+     */
+    private getCameraLayer(layerName: string): gdjs.RuntimeLayer | null {
+      // When the edited container is a custom object,
+      // only a base layer exists and `getLayer` falls back on it.
+      return this._currentScene ? this._currentScene.getLayer(layerName) : null;
+    }
+
+    /**
+     * Return the layer which contains the objects.
+     * @see getCameraLayer
+     */
+    private getEditorLayer(layerName: string): gdjs.RuntimeLayer | null {
+      return this._editedInstanceContainer
+        ? this._editedInstanceContainer.getLayer(layerName)
+        : null;
+    }
+
+    /**
      * Called by the RuntimeGame when the game resolution is changed.
      * Useful to notify scene and layers that resolution is changed, as they
      * might be caching it.
@@ -521,7 +541,6 @@ namespace gdjs {
 
       let editedInstanceDataList: Array<InstanceData> = [];
       if (eventsBasedObjectType) {
-        console.log('eventsBasedObjectType', eventsBasedObjectType);
         const eventsBasedObjectVariantData =
           this._runtimeGame.getEventsBasedObjectVariantData(
             eventsBasedObjectType,
@@ -548,7 +567,6 @@ namespace gdjs {
           }
         }
       } else if (sceneName) {
-        console.log('sceneName', sceneName);
         await this._runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
           sceneName,
           () => {}
@@ -1183,9 +1201,12 @@ namespace gdjs {
       if (!threeRenderer) return;
       const currentScene = this._currentScene;
       if (!currentScene) return;
+      const editedInstanceContainer = this._editedInstanceContainer;
+      if (!editedInstanceContainer) return;
+      const cameraLayer = this.getCameraLayer('');
+      if (!cameraLayer) return;
 
-      const layer = currentScene.getLayer(this._selectedLayerName);
-      const runtimeLayerRender = layer.getRenderer();
+      const runtimeLayerRender = cameraLayer.getRenderer();
       const threeCamera = runtimeLayerRender.getThreeCamera();
       const threeScene = runtimeLayerRender.getThreeScene();
       if (!threeCamera || !threeScene) return;
@@ -1257,7 +1278,8 @@ namespace gdjs {
           if (!isShiftPressed(inputManager)) {
             this._selection.clear();
           }
-          if (layer.isVisible() && !layer._initialLayerData.isLocked) {
+          const layer = this.getEditorLayer(this._selectedLayerName);
+          if (layer && layer.isVisible() && !layer._initialLayerData.isLocked) {
             for (const object of objects) {
               if (!this.isInstanceSealed(object)) {
                 this._selection.add(object);
@@ -1303,10 +1325,9 @@ namespace gdjs {
           }
           if (objectUnderCursor) {
             // TODO Check if the object is locked
-            const layer = editedInstanceContainer.getLayer(
-              objectUnderCursor.getLayer()
-            );
+            const layer = this.getEditorLayer(objectUnderCursor.getLayer());
             if (
+              layer &&
               !layer._initialLayerData.isLocked &&
               !this.isInstanceSealed(objectUnderCursor)
             ) {
@@ -1397,8 +1418,10 @@ namespace gdjs {
       const threeObject = object.get3DRendererObject();
       if (!threeObject) return;
 
-      const layer = currentScene.getLayer(object.getLayer());
-      const threeGroup = layer.getRenderer().getThreeGroup();
+      const objectLayer = this.getEditorLayer(object.getLayer());
+      if (!objectLayer) return;
+
+      const threeGroup = objectLayer.getRenderer().getThreeGroup();
       if (!threeGroup) return;
 
       // Use a group to invert the Y-axis as the GDevelop Y axis is inverted
@@ -1461,10 +1484,10 @@ namespace gdjs {
         const threeObject = lastSelectedObject.get3DRendererObject();
         if (!threeObject) return;
 
-        const layerName = lastSelectedObject.getLayer();
-        const runtimeLayerRender = currentScene
-          .getLayer(layerName)
-          .getRenderer();
+        const cameraLayer = this.getCameraLayer(lastSelectedObject.getLayer());
+        if (!cameraLayer) return;
+
+        const runtimeLayerRender = cameraLayer.getRenderer();
         const threeCamera = runtimeLayerRender.getThreeCamera();
         const threeScene = runtimeLayerRender.getThreeScene();
         if (!threeCamera || !threeScene) return;
@@ -1753,7 +1776,7 @@ namespace gdjs {
     private _updateInnerAreaOutline(): void {
       if (!this._currentScene) return;
 
-      const layer = this._getFirstLayer3D();
+      const layer = this.getCameraLayer('');
       if (!layer) {
         return;
       }
@@ -1898,7 +1921,8 @@ namespace gdjs {
       const editedInstanceContainer = this.getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
 
-      const selectedLayer = currentScene.getLayer(this._selectedLayerName);
+      const selectedLayer = this.getEditorLayer(this._selectedLayerName);
+      if (!selectedLayer) return;
 
       if (dropped) {
         if (this._draggedNewObject) {
@@ -1993,22 +2017,6 @@ namespace gdjs {
       }
     }
 
-    _getFirstLayer3D(): gdjs.RuntimeLayer | null {
-      const currentScene = this._currentScene;
-      if (!currentScene) return null;
-
-      const layerNames = [];
-      currentScene.getAllLayerNames(layerNames);
-      for (const layerName of layerNames) {
-        const layer = currentScene.getLayer(layerName);
-        const isLayer3D = layer.getRenderer().getThreeGroup();
-        if (isLayer3D) {
-          return layer;
-        }
-      }
-      return null;
-    }
-
     /**
      * @returns The cursor projected on the plane Z = 0 or `null` if the cursor is in the sky.
      */
@@ -2016,7 +2024,7 @@ namespace gdjs {
       const currentScene = this._currentScene;
       if (!currentScene) return null;
 
-      const layer = this._getFirstLayer3D();
+      const layer = this.getCameraLayer('');
       if (!layer) {
         return null;
       }
@@ -2164,9 +2172,8 @@ namespace gdjs {
           .getLayer(layerName)
           .getRenderer();
         const threeCamera = runtimeLayerRender.getThreeCamera();
-        const threeScene = runtimeLayerRender.getThreeScene();
         const threeGroup = runtimeLayerRender.getThreeGroup();
-        if (!threeCamera || !threeScene || !threeGroup) return;
+        if (!threeCamera || !threeGroup) return;
 
         // Note that raycasting is done by Three.js, which means it could slow down
         // if lots of 3D objects are shown. We consider that if this needs improvements,

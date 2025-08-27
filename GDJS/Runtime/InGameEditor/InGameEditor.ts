@@ -505,8 +505,23 @@ namespace gdjs {
         this._currentScene.unloadScene();
         this._currentScene = null;
       }
+      // The 3D scene is rebuilt and the inner area marker is lost in the process.
+      this._threeInnerArea = null;
+      this._innerArea = null;
+      this._selectedLayerName = '';
+      // Clear any reference to `RuntimeObject` from the unloaded scene.
+      this._selectionBoxes.clear();
+      this._selectionControls = null;
+      this._draggedNewObject = null;
+      this._draggedSelectedObject = null;
+      const selectedObjectIds = this._selection
+        .getSelectedObjects()
+        .map((object) => object.persistentUuid)
+        .filter(Boolean) as Array<string>;
+
       let editedInstanceDataList: Array<InstanceData> = [];
       if (eventsBasedObjectType) {
+        console.log('eventsBasedObjectType', eventsBasedObjectType);
         const eventsBasedObjectVariantData =
           this._runtimeGame.getEventsBasedObjectVariantData(
             eventsBasedObjectType,
@@ -514,7 +529,7 @@ namespace gdjs {
           );
         if (eventsBasedObjectVariantData) {
           editedInstanceDataList = eventsBasedObjectVariantData.instances;
-          this.setInnerArea(eventsBasedObjectVariantData._initialInnerArea);
+          this._innerArea = eventsBasedObjectVariantData._initialInnerArea;
           await this._runtimeGame._resourcesLoader.loadResources(
             eventsBasedObjectVariantData.usedResources.map(
               (resource) => resource.name
@@ -533,6 +548,7 @@ namespace gdjs {
           }
         }
       } else if (sceneName) {
+        console.log('sceneName', sceneName);
         await this._runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
           sceneName,
           () => {}
@@ -605,23 +621,8 @@ namespace gdjs {
         editorId,
       };
 
-      // The 3D scene is rebuilt and the inner area marker is lost in the process.
-      this._threeInnerArea = null;
-      this._innerArea = null;
-      this._selectedLayerName = '';
-
-      // Clear any reference to `RuntimeObject` from the deleted scene.
-      this._selectionBoxes.clear();
-      this._selectionControls = null;
-      this._draggedNewObject = null;
-      this._draggedSelectedObject = null;
       // Try to keep object selection in case the same scene is reloaded.
-      this.setSelectedObjects(
-        this._selection
-          .getSelectedObjects()
-          .map((object) => object.persistentUuid)
-          .filter(Boolean) as Array<string>
-      );
+      this.setSelectedObjects(selectedObjectIds);
     }
 
     private _createSceneWithCustomObject(
@@ -781,10 +782,6 @@ namespace gdjs {
         scene,
         customObjectInstanceContainer: customObject._instanceContainer,
       };
-    }
-
-    setInnerArea(innerArea: AABB3D | null) {
-      this._innerArea = innerArea;
     }
 
     updateInnerArea(

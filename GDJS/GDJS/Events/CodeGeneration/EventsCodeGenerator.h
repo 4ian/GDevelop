@@ -375,6 +375,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       gdjs::EventsCodeGenerator& codeGenerator,
       gd::String fullyQualifiedFunctionName,
       gd::String functionArgumentsCode,
+      gd::String contextClassCode,
       gd::String functionPreEventsCode,
       const gd::EventsList& events,
       gd::String functionPostEventsCode,
@@ -407,6 +408,16 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
   gd::String GenerateEventsFunctionParameterDeclarationsList(
       const gd::ParameterMetadataContainer& parameters,
       int firstParameterIndex,
+      bool addsSceneParameter);
+
+  /**
+   * \brief Generate the affectation from parameters to class attributes.
+   *
+   * \note runtimeScene is always added as the first parameter, and
+   * parentEventsFunctionContext as the last parameter.
+   */
+  gd::String GenerateEventsFunctionParametersToAttribues(
+      const gd::ParameterMetadataContainer &parameters, int firstParameterIndex,
       bool addsSceneParameter);
 
   /**
@@ -475,6 +486,9 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
        gd::String &objectsGettersMap,
        gd::String &objectArraysMap,
        gd::String &behaviorNamesMap,
+       const gd::String &constructorAdditionalCode = "",
+       const gd::String &reinitializeAdditionalCode = "",
+       const gd::String& clearAdditionalCode = "",
        const gd::String &thisObjectName = "",
        const gd::String &thisBehaviorName = "");
 };

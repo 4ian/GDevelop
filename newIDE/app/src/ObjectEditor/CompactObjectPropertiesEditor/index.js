@@ -354,12 +354,14 @@ export const CompactObjectPropertiesEditor = ({
         properties,
         getProperties: ({ object, objectConfiguration }) =>
           objectConfiguration.getProperties(),
-        onUpdateProperty: ({ object, objectConfiguration }, name, value) =>
-          objectConfiguration.updateProperty(name, value),
+        onUpdateProperty: ({ object, objectConfiguration }, name, value) => {
+          objectConfiguration.updateProperty(name, value);
+          onObjectsModified([object]);
+        },
         visibility: 'Advanced',
       });
     },
-    [objectConfigurationAsGd, schemaRecomputeTrigger]
+    [objectConfigurationAsGd, schemaRecomputeTrigger, onObjectsModified]
   );
   const hasObjectAdvancedProperties = objectAdvancedPropertiesSchema.length > 0;
   const hasSomeObjectProperties =

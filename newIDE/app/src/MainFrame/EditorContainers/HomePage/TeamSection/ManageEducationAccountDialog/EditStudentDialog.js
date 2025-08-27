@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { t, Trans } from '@lingui/macro';
+import { Trans } from '@lingui/macro';
 import FlatButton from '../../../../../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../../../../../UI/Dialog';
 import { ColumnStackLayout } from '../../../../../UI/Layout';

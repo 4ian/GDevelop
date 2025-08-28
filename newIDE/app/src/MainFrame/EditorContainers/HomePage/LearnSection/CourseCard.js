@@ -131,6 +131,7 @@ type Props = {|
   course: ?Course,
   courseListingData: ?CourseListingData,
   onClick?: () => void,
+  discountedPrice?: boolean,
 |};
 
 const CourseCard = ({
@@ -138,6 +139,7 @@ const CourseCard = ({
   course,
   courseListingData,
   onClick,
+  discountedPrice,
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const specializationConfig = getSpecializationConfig(
@@ -255,6 +257,7 @@ const CourseCard = ({
                         usageType: 'default',
                         showBothPrices: 'column',
                         owned: !course.isLocked,
+                        discountedPrice,
                       })}
                     </Line>
                   </div>

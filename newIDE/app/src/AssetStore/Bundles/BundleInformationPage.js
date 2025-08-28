@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import {
   type BundleListingData,
   type PrivateAssetPackListingData,
@@ -22,7 +23,7 @@ import {
   LineStackLayout,
   ColumnStackLayout,
 } from '../../UI/Layout';
-import { Column, LargeSpacer, Line, Spacer } from '../../UI/Grid';
+import { Column, LargeSpacer, Line } from '../../UI/Grid';
 import {
   getUserPublicProfile,
   type UserPublicProfile,
@@ -59,15 +60,18 @@ import { LARGE_WIDGET_SIZE } from '../../MainFrame/EditorContainers/HomePage/Car
 import { PrivateGameTemplateStoreContext } from '../PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import { AssetStoreContext } from '../AssetStoreContext';
 import CourseStoreContext from '../../Course/CourseStoreContext';
-import { getCreditsAmountFromId } from '../CreditsPackages/CreditsPackageStoreContext';
-import Coin from '../../Credits/Icons/Coin';
-import {
-  getPlanIcon,
-  getPlanInferredNameFromId,
-} from '../../Profile/Subscription/PlanCard';
+import { CreditsPackageStoreContext } from '../CreditsPackages/CreditsPackageStoreContext';
 import RedemptionCodesDialog from '../../RedemptionCode/RedemptionCodesDialog';
 import { selectMessageByLocale } from '../../Utils/i18n/MessageByLocale';
-import { formatDurationOfRedemptionCode } from '../../RedemptionCode/Utils';
+import { getSummaryLines } from '../../MainFrame/EditorContainers/HomePage/LearnSection/BundlePage/Utils';
+import Skeleton from '@material-ui/lab/Skeleton';
+import {
+  getEstimatedSavingsFormatted,
+  renderEstimatedTotalPriceFormatted,
+} from './Utils';
+import { renderProductPrice } from '../ProductPriceTag';
+import Chip from '../../UI/Chip';
+import ProductLimitedTimeOffer from '../../MainFrame/EditorContainers/HomePage/LearnSection/ProductLimitedTimeOffer';
 
 const cellSpacing = 10;
 
@@ -132,6 +136,12 @@ const styles = {
     position: 'relative',
     top: -1,
   },
+  discountedPrice: { textDecoration: 'line-through', opacity: 0.7 },
+  discountChip: {
+    height: 24,
+    backgroundColor: '#F03F18',
+    color: 'white',
+  },
 };
 
 type Props = {|
@@ -148,6 +158,7 @@ type Props = {|
   ) => void,
   onCourseOpen: CourseListingData => void,
   simulateAppStoreProduct?: boolean,
+  i18n: I18nType,
 |};
 
 const BundleInformationPage = ({
@@ -159,6 +170,7 @@ const BundleInformationPage = ({
   onAssetPackOpen,
   onCourseOpen,
   simulateAppStoreProduct,
+  i18n,
 }: Props) => {
   const { id, name, sellerId } = bundleListingData;
   const { bundleListingDatas } = React.useContext(BundleStoreContext);
@@ -166,6 +178,9 @@ const BundleInformationPage = ({
     PrivateGameTemplateStoreContext
   );
   const { privateAssetPackListingDatas } = React.useContext(AssetStoreContext);
+  const { creditsPackageListingDatas } = React.useContext(
+    CreditsPackageStoreContext
+  );
   const { listedCourses } = React.useContext(CourseStoreContext);
   const {
     receivedBundles,
@@ -224,32 +239,45 @@ const BundleInformationPage = ({
     [bundle, isAlreadyReceived, receivedBundles]
   );
 
-  const additionalProductThumbnailsIncludedInBundle: string[] = React.useMemo(
-    () => {
-      const productsIncludedInBundle = getProductsIncludedInBundle({
-        productListingDatas: [
-          ...(bundleListingDatas || []),
-          ...(privateGameTemplateListingDatas || []),
-          ...(privateAssetPackListingDatas || []),
-          ...(listedCourses || []),
-        ],
-        productListingData: bundleListingData,
-      });
-
-      if (!productsIncludedInBundle) return [];
-
-      const additionalThumbnails = productsIncludedInBundle
-        .map(product => (product.thumbnailUrls || []).slice(0, 2))
-        .reduce((acc, thumbnails) => acc.concat(thumbnails), []);
-      return additionalThumbnails;
-    },
+  const productListingDatasIncludedInBundle = React.useMemo(
+    () =>
+      bundleListingData &&
+      bundleListingDatas &&
+      privateGameTemplateListingDatas &&
+      privateAssetPackListingDatas &&
+      listedCourses &&
+      creditsPackageListingDatas
+        ? getProductsIncludedInBundle({
+            productListingDatas: [
+              ...(bundleListingDatas || []),
+              ...(privateGameTemplateListingDatas || []),
+              ...(privateAssetPackListingDatas || []),
+              ...(listedCourses || []),
+              ...(creditsPackageListingDatas || []),
+            ],
+            productListingData: bundleListingData,
+          })
+        : null,
     [
+      bundleListingData,
       bundleListingDatas,
       privateGameTemplateListingDatas,
       privateAssetPackListingDatas,
       listedCourses,
-      bundleListingData,
+      creditsPackageListingDatas,
     ]
+  );
+
+  const additionalProductThumbnailsIncludedInBundle: string[] = React.useMemo(
+    () => {
+      if (!productListingDatasIncludedInBundle) return [];
+
+      const additionalThumbnails = productListingDatasIncludedInBundle
+        .map(product => (product.thumbnailUrls || []).slice(0, 2))
+        .reduce((acc, thumbnails) => acc.concat(thumbnails), []);
+      return additionalThumbnails;
+    },
+    [productListingDatasIncludedInBundle]
   );
 
   const productsIncludedInBundleTiles = React.useMemo(
@@ -274,6 +302,7 @@ const BundleInformationPage = ({
         onPrivateGameTemplateOpen: onGameTemplateOpen,
         onBundleOpen,
         onCourseOpen,
+        discountedPrice: true,
       }),
     [
       bundle,
@@ -418,20 +447,112 @@ const BundleInformationPage = ({
     ]
   );
 
-  const includedCreditsAmount = React.useMemo(
-    () =>
-      (bundleListingData.includedListableProducts || [])
-        .filter(product => product.productType === 'CREDIT_PACKAGE')
-        .reduce(
-          (total, product) => total + getCreditsAmountFromId(product.productId),
-          0
-        ),
+  const redemptionCodesIncludedInBundle = React.useMemo(
+    () => bundleListingData.includedRedemptionCodes || [],
     [bundleListingData]
   );
 
-  const includedRedemptionCodes = React.useMemo(
-    () => bundleListingData.includedRedemptionCodes || [],
-    [bundleListingData]
+  const summaryLines = React.useMemo(
+    () => {
+      if (
+        !productListingDatasIncludedInBundle ||
+        !redemptionCodesIncludedInBundle ||
+        !bundleListingData
+      )
+        return isMobile ? (
+          <ColumnStackLayout noMargin>
+            <Column expand noMargin>
+              <Skeleton height={25} />
+              <Skeleton height={20} />
+              <Skeleton height={20} />
+            </Column>
+            <Column expand noMargin>
+              <Skeleton height={25} />
+              <Skeleton height={20} />
+              <Skeleton height={20} />
+            </Column>
+          </ColumnStackLayout>
+        ) : (
+          <Column expand noMargin>
+            <Skeleton height={25} />
+            <Skeleton height={20} />
+            <Skeleton height={20} />
+          </Column>
+        );
+
+      if (isAlreadyReceived) {
+        return (
+          <Line noMargin>
+            <FlatButton
+              primary
+              label={<Trans>See my codes</Trans>}
+              onClick={() => setIsRedemptionCodesDialogOpen(true)}
+            />
+          </Line>
+        );
+      }
+
+      const summaryLines = getSummaryLines({
+        redemptionCodesIncludedInBundle,
+        bundleListingData,
+        productListingDatasIncludedInBundle,
+      });
+
+      if (isMobile) {
+        return summaryLines.mobileLines;
+      }
+      return summaryLines.desktopLines;
+    },
+    [
+      isAlreadyReceived,
+      redemptionCodesIncludedInBundle,
+      bundleListingData,
+      productListingDatasIncludedInBundle,
+      isMobile,
+    ]
+  );
+
+  const estimatedTotalPriceFormatted = React.useMemo(
+    () =>
+      renderEstimatedTotalPriceFormatted({
+        i18n,
+        bundleListingData,
+        productListingDatasIncludedInBundle,
+        redemptionCodesIncludedInBundle,
+      }),
+    [
+      i18n,
+      bundleListingData,
+      productListingDatasIncludedInBundle,
+      redemptionCodesIncludedInBundle,
+    ]
+  );
+
+  const estimatedSavingsFormatted = React.useMemo(
+    () =>
+      getEstimatedSavingsFormatted({
+        i18n,
+        bundleListingData,
+        productListingDatasIncludedInBundle,
+        redemptionCodesIncludedInBundle,
+      }),
+    [
+      i18n,
+      bundleListingData,
+      productListingDatasIncludedInBundle,
+      redemptionCodesIncludedInBundle,
+    ]
+  );
+
+  const productPrice = React.useMemo(
+    () =>
+      renderProductPrice({
+        i18n,
+        productListingData: bundleListingData,
+        usageType: 'default',
+        plainText: true,
+      }),
+    [i18n, bundleListingData]
   );
 
   return (
@@ -523,7 +644,6 @@ const BundleInformationPage = ({
                           </Link>
                         </Text>
                       </LineStackLayout>
-                      <Spacer />
                       {isOwningAnotherVariant ? (
                         <AlertMessage kind="warning">
                           <Trans>
@@ -532,23 +652,78 @@ const BundleInformationPage = ({
                           </Trans>
                         </AlertMessage>
                       ) : !isAlreadyReceived ? (
-                        <>
-                          {!shouldUseOrSimulateAppStoreProduct && (
-                            <SecureCheckout />
+                        <ColumnStackLayout noMargin>
+                          {bundleListingData.visibleUntil && (
+                            <Line>
+                              <ProductLimitedTimeOffer
+                                visibleUntil={bundleListingData.visibleUntil}
+                              />
+                            </Line>
                           )}
-                          {!errorText && (
-                            <PurchaseProductButtons
-                              i18n={i18n}
-                              productListingData={bundleListingData}
-                              selectedUsageType="default"
-                              onUsageTypeChange={() => {}}
-                              simulateAppStoreProduct={simulateAppStoreProduct}
-                              isAlreadyReceived={isAlreadyReceived}
-                              onClickBuy={onClickBuy}
-                              onClickBuyWithCredits={() => {}}
-                            />
+                          {estimatedTotalPriceFormatted &&
+                          estimatedSavingsFormatted &&
+                          productPrice ? (
+                            <LineStackLayout noMargin>
+                              <Column noMargin>
+                                <LineStackLayout alignItems="center">
+                                  <Text
+                                    noMargin
+                                    color="secondary"
+                                    size="block-title"
+                                  >
+                                    <span style={styles.discountedPrice}>
+                                      {estimatedTotalPriceFormatted}
+                                    </span>
+                                  </Text>
+                                  <Chip
+                                    label={
+                                      <Trans>
+                                        {
+                                          estimatedSavingsFormatted.savingsPercentageFormatted
+                                        }{' '}
+                                        OFF
+                                      </Trans>
+                                    }
+                                    style={styles.discountChip}
+                                  />
+                                </LineStackLayout>
+                                <Text noMargin size="block-title" align="right">
+                                  {productPrice}
+                                </Text>
+                              </Column>
+                              <ColumnStackLayout noMargin alignItems="center">
+                                <PurchaseProductButtons
+                                  i18n={i18n}
+                                  productListingData={bundleListingData}
+                                  selectedUsageType="default"
+                                  onUsageTypeChange={() => {}}
+                                  simulateAppStoreProduct={
+                                    simulateAppStoreProduct
+                                  }
+                                  isAlreadyReceived={isAlreadyReceived}
+                                  onClickBuy={onClickBuy}
+                                  onClickBuyWithCredits={() => {}}
+                                  customLabel={
+                                    <Trans>
+                                      Buy now and save{' '}
+                                      {
+                                        estimatedSavingsFormatted.savingsPriceFormatted
+                                      }
+                                    </Trans>
+                                  }
+                                />
+                                {!shouldUseOrSimulateAppStoreProduct && (
+                                  <SecureCheckout />
+                                )}
+                              </ColumnStackLayout>
+                            </LineStackLayout>
+                          ) : (
+                            <Column noMargin>
+                              <Skeleton height={24} width={100} />
+                              <Skeleton height={24} width={100} />
+                            </Column>
                           )}
-                        </>
+                        </ColumnStackLayout>
                       ) : null}
                       <Text size="body2" displayInlineAsSpan>
                         <MarkdownText
@@ -559,60 +734,7 @@ const BundleInformationPage = ({
                           allowParagraphs
                         />
                       </Text>
-                      {includedRedemptionCodes.length > 0 && (
-                        <ColumnStackLayout noMargin>
-                          {includedRedemptionCodes.map(
-                            (includedRedemptionCode, index) => (
-                              <LineStackLayout
-                                noMargin
-                                alignItems="center"
-                                key={`${
-                                  includedRedemptionCode.givenSubscriptionPlanId
-                                }-${index}`}
-                              >
-                                {getPlanIcon({
-                                  planId:
-                                    includedRedemptionCode.givenSubscriptionPlanId,
-                                  logoSize: 20,
-                                })}
-                                <Text>
-                                  <Trans>
-                                    {formatDurationOfRedemptionCode(
-                                      includedRedemptionCode.durationInDays
-                                    )}{' '}
-                                    of
-                                    {getPlanInferredNameFromId(
-                                      includedRedemptionCode.givenSubscriptionPlanId
-                                    )}
-                                    subscription included
-                                  </Trans>
-                                </Text>
-                              </LineStackLayout>
-                            )
-                          )}
-                          {isAlreadyReceived && (
-                            <Line noMargin>
-                              <FlatButton
-                                primary
-                                label={<Trans>See my codes</Trans>}
-                                onClick={() =>
-                                  setIsRedemptionCodesDialogOpen(true)
-                                }
-                              />
-                            </Line>
-                          )}
-                        </ColumnStackLayout>
-                      )}
-                      {includedCreditsAmount > 0 && (
-                        <LineStackLayout noMargin alignItems="center">
-                          <Coin style={styles.coinIcon} />
-                          <Text>
-                            <Trans>
-                              {includedCreditsAmount} credits included
-                            </Trans>
-                          </Text>
-                        </LineStackLayout>
-                      )}
+                      {summaryLines}
                     </ColumnStackLayout>
                   </div>
                 </ResponsiveLineStackLayout>

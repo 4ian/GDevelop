@@ -240,7 +240,10 @@ const MainPage = ({
           </SectionRow>
           {!hidePremiumProducts && (
             <SectionRow>
-              <BundlePreviewBanner onDisplayBundle={onSelectBundle} />
+              <BundlePreviewBanner
+                onDisplayBundle={onSelectBundle}
+                i18n={i18n}
+              />
             </SectionRow>
           )}
           <SectionRow>

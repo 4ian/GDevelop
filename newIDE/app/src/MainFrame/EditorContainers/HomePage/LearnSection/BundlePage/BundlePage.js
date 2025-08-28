@@ -2,43 +2,48 @@
 
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import SectionContainer, { SectionRow } from '../SectionContainer';
-import { Column, Line } from '../../../../UI/Grid';
+import SectionContainer, { SectionRow } from '../../SectionContainer';
+import { Column, Line, Spacer } from '../../../../../UI/Grid';
 import BundlePageHeader from './BundlePageHeader';
-import { BundleStoreContext } from '../../../../AssetStore/Bundles/BundleStoreContext';
-import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
-import type { CourseCompletion } from '../UseCourses';
+import { BundleStoreContext } from '../../../../../AssetStore/Bundles/BundleStoreContext';
+import PlaceholderLoader from '../../../../../UI/PlaceholderLoader';
+import type { CourseCompletion } from '../../UseCourses';
 import {
   getBundle,
   type Bundle,
   type Course,
-} from '../../../../Utils/GDevelopServices/Asset';
+} from '../../../../../Utils/GDevelopServices/Asset';
 import {
   type PrivateAssetPackListingData,
   type BundleListingData,
   type PrivateGameTemplateListingData,
   type CourseListingData,
-} from '../../../../Utils/GDevelopServices/Shop';
-import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
-import { extractGDevelopApiErrorStatusAndCode } from '../../../../Utils/GDevelopServices/Errors';
+} from '../../../../../Utils/GDevelopServices/Shop';
+import { type SubscriptionPlanWithPricingSystems } from '../../../../../Utils/GDevelopServices/Usage';
+import { extractGDevelopApiErrorStatusAndCode } from '../../../../../Utils/GDevelopServices/Errors';
 import { Trans } from '@lingui/macro';
-import AlertMessage from '../../../../UI/AlertMessage';
+import AlertMessage from '../../../../../UI/AlertMessage';
 import {
   getProductsIncludedInBundle,
   getProductsIncludedInBundleTiles,
-} from '../../../../AssetStore/ProductPageHelper';
-import { PrivateGameTemplateStoreContext } from '../../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
-import { AssetStoreContext } from '../../../../AssetStore/AssetStoreContext';
-import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
+} from '../../../../../AssetStore/ProductPageHelper';
+import { PrivateGameTemplateStoreContext } from '../../../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
+import { AssetStoreContext } from '../../../../../AssetStore/AssetStoreContext';
+import AuthenticatedUserContext from '../../../../../Profile/AuthenticatedUserContext';
 import { GridList, GridListTile } from '@material-ui/core';
-import { LARGE_WIDGET_SIZE } from '../CardWidget';
+import { LARGE_WIDGET_SIZE } from '../../CardWidget';
 import {
   useResponsiveWindowSize,
   type WindowSizeType,
-} from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
-import Text from '../../../../UI/Text';
-import CourseStoreContext from '../../../../Course/CourseStoreContext';
-import CourseCard from './CourseCard';
+} from '../../../../../UI/Responsive/ResponsiveWindowMeasurer';
+import Text from '../../../../../UI/Text';
+import CourseStoreContext from '../../../../../Course/CourseStoreContext';
+import CourseCard from '../CourseCard';
+import { planIdSortingFunction } from '../../../../../Profile/Subscription/PlanCard';
+import SubscriptionPlanPricingSummary from '../../../../../Profile/Subscription/PromotionSubscriptionDialog/SubscriptionPlanPricingSummary';
+import { ResponsiveLineStackLayout } from '../../../../../UI/Layout';
+import SubscriptionPlanTableSummary from '../../../../../Profile/Subscription/PromotionSubscriptionDialog/SubscriptionPlanTableSummary';
+import GDevelopThemeContext from '../../../../../UI/Theme/GDevelopThemeContext';
 
 const getColumns = (windowSize: WindowSizeType, isLandscape: boolean) => {
   switch (windowSize) {
@@ -94,7 +99,7 @@ const BundlePage = ({
   receivedCourses,
   getCourseCompletion,
 }: Props) => {
-  const { windowSize, isLandscape } = useResponsiveWindowSize();
+  const { windowSize, isLandscape, isMobile } = useResponsiveWindowSize();
   const { bundleListingDatas } = React.useContext(BundleStoreContext); // If archived, should use the one passed.
   const { privateGameTemplateListingDatas } = React.useContext(
     PrivateGameTemplateStoreContext
@@ -108,6 +113,9 @@ const BundlePage = ({
   } = React.useContext(AuthenticatedUserContext);
   const [bundle, setBundle] = React.useState<?Bundle>(null);
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
+  const {
+    palette: { type: paletteType },
+  } = React.useContext(GDevelopThemeContext);
 
   const courseAndTheirListingDataIncludedInBundle = React.useMemo(
     (): Array<{|
@@ -162,6 +170,7 @@ const BundlePage = ({
             onPrivateGameTemplateOpen: onGameTemplateOpen,
             onBundleOpen,
             onCourseOpen,
+            discountedPrice: true,
           })
         : null,
     [
@@ -178,6 +187,37 @@ const BundlePage = ({
       onBundleOpen,
       onCourseOpen,
     ]
+  );
+
+  const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
+
+  const highestSubscriptionPlanIncludedInBundle = React.useMemo(
+    () => {
+      if (!bundleListingData) return null;
+
+      const sortedIncludedRedemptionCodes = (
+        bundleListingData.includedRedemptionCodes || []
+      ).sort((a, b) =>
+        planIdSortingFunction(
+          a.givenSubscriptionPlanId,
+          b.givenSubscriptionPlanId
+        )
+      );
+
+      if (!sortedIncludedRedemptionCodes.length) return null;
+
+      const planId =
+        sortedIncludedRedemptionCodes[sortedIncludedRedemptionCodes.length - 1]
+          .givenSubscriptionPlanId;
+
+      return subscriptionPlansWithPricingSystems
+        ? subscriptionPlansWithPricingSystems.find(
+            subscriptionPlanWithPricingSystems =>
+              subscriptionPlanWithPricingSystems.id === planId
+          )
+        : null;
+    },
+    [bundleListingData, subscriptionPlansWithPricingSystems]
   );
 
   React.useEffect(
@@ -236,16 +276,32 @@ const BundlePage = ({
         <SectionContainer
           applyTopSpacingAsMarginOnChildrenContainer
           backAction={onBack}
+          customPaperStyle={
+            bundleListingData.visibleUntil
+              ? {
+                  backgroundAttachment: 'local',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'top',
+                  backgroundSize: isMobile && !isLandscape ? 'contain' : 'auto',
+                  backgroundImage: `${
+                    paletteType === 'dark'
+                      ? 'linear-gradient(180deg, #6B1A18 0px, #2D2331 5%, #1d1d2600 10%)'
+                      : 'linear-gradient(180deg, #F03F18 0px, #f5f5f700 10%)'
+                  }`,
+                }
+              : {}
+          }
         >
-          <Column noOverflowParent noMargin>
-            <BundlePageHeader
-              bundleListingData={bundleListingData}
-              bundle={bundle}
-              getSubscriptionPlansWithPricingSystems={
-                getSubscriptionPlansWithPricingSystems
-              }
-            />
-          </Column>
+          <BundlePageHeader
+            bundleListingData={bundleListingData}
+            bundle={bundle}
+            i18n={i18n}
+          />
+          <Line noMargin>
+            <Text size="section-title">
+              <Trans>What's included:</Trans>
+            </Text>
+          </Line>
           {courseAndTheirListingDataIncludedInBundle &&
             courseAndTheirListingDataIncludedInBundle.length > 0 && (
               <Line>
@@ -267,6 +323,7 @@ const BundlePage = ({
                             onClick={() => {
                               onCourseOpen(courseListingData);
                             }}
+                            discountedPrice
                           />
                         </GridListTile>
                       );
@@ -276,23 +333,45 @@ const BundlePage = ({
               </Line>
             )}
           {productsExceptCoursesIncludedInBundleTiles && (
-            <>
-              <Line>
-                <Text size="block-title">
-                  <Trans>Also included in this bundle</Trans>
-                </Text>
-              </Line>
-              <Line>
-                <GridList
-                  cols={getColumns(windowSize, isLandscape)}
-                  cellHeight="auto"
-                  spacing={cellSpacing}
-                  style={styles.grid}
-                >
-                  {productsExceptCoursesIncludedInBundleTiles}
-                </GridList>
-              </Line>
-            </>
+            <Line>
+              <GridList
+                cols={getColumns(windowSize, isLandscape)}
+                cellHeight="auto"
+                spacing={cellSpacing}
+                style={styles.grid}
+              >
+                {productsExceptCoursesIncludedInBundleTiles}
+              </GridList>
+            </Line>
+          )}
+          {highestSubscriptionPlanIncludedInBundle && (
+            <ResponsiveLineStackLayout expand noColumnMargin>
+              <Column noMargin justifyContent="center">
+                <Line>
+                  <SubscriptionPlanPricingSummary
+                    subscriptionPlanWithPricingSystems={
+                      highestSubscriptionPlanIncludedInBundle
+                    }
+                    disabled={false}
+                    onClickChoosePlan={async () => {}}
+                    seatsCount={0}
+                    setSeatsCount={() => {}}
+                    period={'month'}
+                    setPeriod={() => {}}
+                    onlyShowDiscountedPrice
+                  />
+                </Line>
+              </Column>
+              <Spacer />
+              <Column noMargin>
+                <SubscriptionPlanTableSummary
+                  subscriptionPlanWithPricingSystems={
+                    highestSubscriptionPlanIncludedInBundle
+                  }
+                  hideActions
+                />
+              </Column>
+            </ResponsiveLineStackLayout>
           )}
         </SectionContainer>
       )}

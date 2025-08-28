@@ -276,9 +276,6 @@ const CoursePageHeader = ({
                           noMargin
                           forceMobileLayout={isMediumScreen}
                         >
-                          {!shouldUseOrSimulateAppStoreProduct && (
-                            <SecureCheckout />
-                          )}
                           <PurchaseProductButtons
                             i18n={i18n}
                             productListingData={courseListingData}
@@ -295,6 +292,9 @@ const CoursePageHeader = ({
                               onWillBuyWithCredits(i18n)
                             }
                           />
+                          {!shouldUseOrSimulateAppStoreProduct && (
+                            <SecureCheckout />
+                          )}
                         </ResponsiveLineStackLayout>
                       </ResponsiveLineStackLayout>
                     )}

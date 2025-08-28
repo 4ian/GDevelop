@@ -202,8 +202,8 @@ struct PreviewExportOptions {
   /**
    * \brief Set if the export should export events code.
    */
-  PreviewExportOptions &SetShouldGenerateEventsCode(bool enable) {
-    shouldGenerateEventsCode = enable;
+  PreviewExportOptions &SetShouldGenerateScenesEventsCode(bool enable) {
+    shouldGenerateScenesEventsCode = enable;
     return *this;
   }
 
@@ -385,7 +385,7 @@ struct PreviewExportOptions {
   bool shouldClearExportFolder = true;
   bool shouldReloadProjectData = true;
   bool shouldReloadLibraries = true;
-  bool shouldGenerateEventsCode = true;
+  bool shouldGenerateScenesEventsCode = true;
   bool fullLoadingScreen;
   bool isDevelopmentEnvironment;
   bool isInGameEdition;
@@ -571,7 +571,7 @@ class ExporterHelper {
    * includesFiles A reference to a vector that will be filled with JS files to
    * be exported along with the project. ( including "codeX.js" files ).
    */
-  bool ExportEventsCode(
+  bool ExportScenesEventsCode(
       const gd::Project &project,
       gd::String outputDir,
       std::vector<gd::String> &includesFiles,

@@ -110,7 +110,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     std::vector<gd::String> &includesFiles) {
 
   if (options.isInGameEdition && !options.shouldReloadProjectData &&
-      !options.shouldReloadLibraries && !options.shouldGenerateEventsCode) {
+      !options.shouldReloadLibraries && !options.shouldGenerateScenesEventsCode) {
     gd::LogStatus("Skip project export entirely");
     return "";
   }
@@ -130,7 +130,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   previousTime = LogTimeSpent("Project cloning", previousTime);
 
   if (options.isInGameEdition) {
-    if (options.shouldReloadProjectData || options.shouldGenerateEventsCode) {
+    if (options.shouldReloadProjectData || options.shouldGenerateScenesEventsCode) {
       auto projectDirectory = fs.DirNameFrom(exportedProject.GetProjectFile());
       gd::ResourcesMergingHelper resourcesMergingHelper(
           exportedProject.GetResourcesManager(), fs);
@@ -150,7 +150,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     previousTime = LogTimeSpent("Resource export", previousTime);
   }
 
-  if (options.shouldReloadProjectData || options.shouldGenerateEventsCode) {
+  if (options.shouldReloadProjectData || options.shouldGenerateScenesEventsCode) {
     // Compatibility with GD <= 5.0-beta56
     // Stay compatible with text objects declaring their font as just a filename
     // without a font resource - by manually adding these resources.
@@ -201,13 +201,13 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     gd::LogStatus("Include files export is skipped");
   }
 
-  if (options.shouldGenerateEventsCode) {
+  if (options.shouldGenerateScenesEventsCode) {
     gd::WholeProjectDiagnosticReport &wholeProjectDiagnosticReport =
         options.project.GetWholeProjectDiagnosticReport();
     wholeProjectDiagnosticReport.Clear();
 
     // Generate events code
-    if (!ExportEventsCode(immutableProject,
+    if (!ExportScenesEventsCode(immutableProject,
                           codeOutputDir,
                           includesFiles,
                           wholeProjectDiagnosticReport,
@@ -264,7 +264,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
     // TODO Build a full includesFiles list without actually doing export or
     // generation.
-    if (options.shouldGenerateEventsCode) {
+    if (options.shouldGenerateScenesEventsCode) {
       // Create the index file
       if (!ExportIndexFile(exportedProject, gdjsRoot + "/Runtime/index.html",
                            options.exportPath, includesFiles, usedSourceFiles,
@@ -353,8 +353,8 @@ void ExporterHelper::SerializeRuntimeGameOptions(
 
   runtimeGameOptions.AddChild("shouldReloadLibraries")
       .SetBoolValue(options.shouldReloadLibraries);
-  runtimeGameOptions.AddChild("shouldGenerateEventsCode")
-      .SetBoolValue(options.shouldGenerateEventsCode);
+  runtimeGameOptions.AddChild("shouldGenerateScenesEventsCode")
+      .SetBoolValue(options.shouldGenerateScenesEventsCode);
 
   runtimeGameOptions.AddChild("nativeMobileApp")
       .SetBoolValue(options.nativeMobileApp);
@@ -1149,7 +1149,7 @@ bool ExporterHelper::ExportEffectIncludes(
   return true;
 }
 
-bool ExporterHelper::ExportEventsCode(
+bool ExporterHelper::ExportScenesEventsCode(
     const gd::Project &project,
     gd::String outputDir,
     std::vector<gd::String> &includesFiles,

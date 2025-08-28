@@ -2979,7 +2979,7 @@ export class PreviewExportOptions extends EmscriptenObject {
   setShouldClearExportFolder(enable: boolean): PreviewExportOptions;
   setShouldReloadProjectData(enable: boolean): PreviewExportOptions;
   setShouldReloadLibraries(enable: boolean): PreviewExportOptions;
-  setShouldGenerateEventsCode(enable: boolean): PreviewExportOptions;
+  setShouldGenerateScenesEventsCode(enable: boolean): PreviewExportOptions;
   setNativeMobileApp(enable: boolean): PreviewExportOptions;
   setFullLoadingScreen(enable: boolean): PreviewExportOptions;
   setIsDevelopmentEnvironment(enable: boolean): PreviewExportOptions;

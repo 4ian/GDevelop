@@ -123,7 +123,7 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
     helper.ExportEffectIncludes(exportedProject, includesFiles);
 
     // Export events
-    if (!helper.ExportEventsCode(exportedProject,
+    if (!helper.ExportScenesEventsCode(exportedProject,
                                  codeOutputDir,
                                  includesFiles,
                                  wholeProjectDiagnosticReport,

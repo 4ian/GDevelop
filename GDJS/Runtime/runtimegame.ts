@@ -104,7 +104,7 @@ namespace gdjs {
     /** if true, export is a partial preview without reloading libraries. */
     shouldReloadLibraries?: boolean;
     /** if true, export is a partial preview without generating events. */
-    shouldGenerateEventsCode?: boolean;
+    shouldGenerateScenesEventsCode?: boolean;
 
     /** if true, preview is launched from GDevelop native mobile app. */
     nativeMobileApp?: boolean;

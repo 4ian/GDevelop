@@ -4015,7 +4015,7 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetShouldClearExportFolder(boolean enable);
     [Ref] PreviewExportOptions SetShouldReloadProjectData(boolean enable);
     [Ref] PreviewExportOptions SetShouldReloadLibraries(boolean enable);
-    [Ref] PreviewExportOptions SetShouldGenerateEventsCode(boolean enable);
+    [Ref] PreviewExportOptions SetShouldGenerateScenesEventsCode(boolean enable);
     [Ref] PreviewExportOptions SetNativeMobileApp(boolean enable);
     [Ref] PreviewExportOptions SetFullLoadingScreen(boolean enable);
     [Ref] PreviewExportOptions SetIsDevelopmentEnvironment(boolean enable);

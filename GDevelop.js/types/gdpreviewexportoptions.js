@@ -15,7 +15,7 @@ declare class gdPreviewExportOptions {
   setShouldClearExportFolder(enable: boolean): gdPreviewExportOptions;
   setShouldReloadProjectData(enable: boolean): gdPreviewExportOptions;
   setShouldReloadLibraries(enable: boolean): gdPreviewExportOptions;
-  setShouldGenerateEventsCode(enable: boolean): gdPreviewExportOptions;
+  setShouldGenerateScenesEventsCode(enable: boolean): gdPreviewExportOptions;
   setNativeMobileApp(enable: boolean): gdPreviewExportOptions;
   setFullLoadingScreen(enable: boolean): gdPreviewExportOptions;
   setIsDevelopmentEnvironment(enable: boolean): gdPreviewExportOptions;

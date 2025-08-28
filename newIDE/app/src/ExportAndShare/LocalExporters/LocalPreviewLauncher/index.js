@@ -282,10 +282,10 @@ export default class LocalPreviewLauncher extends React.Component<
       previewExportOptions.setShouldReloadProjectData(false);
       previewExportOptions.setShouldReloadLibraries(
         previewOptions.shouldReloadLibraries ||
-          previewOptions.shouldGenerateEventsCode
+          previewOptions.shouldGenerateScenesEventsCode
       );
-      previewExportOptions.setShouldGenerateEventsCode(
-        previewOptions.shouldGenerateEventsCode
+      previewExportOptions.setShouldGenerateScenesEventsCode(
+        previewOptions.shouldGenerateScenesEventsCode
       );
     }
 

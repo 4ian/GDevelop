@@ -565,6 +565,10 @@ namespace gdjs {
             this._currentScene = scene;
             this._editedInstanceContainer = customObjectInstanceContainer;
           }
+        } else {
+          console.warn(
+            `Couldn't find any variant named "${eventsBasedObjectVariantName || ''}" for ${eventsBasedObjectType}`
+          );
         }
       } else if (sceneName) {
         await this._runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
@@ -610,6 +614,8 @@ namespace gdjs {
             editedInstanceDataList = sceneAndExtensionsData.sceneData.instances;
           }
         }
+      } else {
+        console.warn('eventsBasedObjectType or sceneName must be set.');
       }
       this._editedInstanceDataList = editedInstanceDataList;
       this._editorId = editorId || '';

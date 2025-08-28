@@ -189,8 +189,8 @@ namespace gdjs {
 
       const newScriptFiles =
         newRuntimeGameOptions.scriptFiles as RuntimeGameOptionsScriptFile[];
-      const shouldGenerateEventsCode =
-        !!newRuntimeGameOptions.shouldGenerateEventsCode;
+      const shouldGenerateScenesEventsCode =
+        !!newRuntimeGameOptions.shouldGenerateScenesEventsCode;
       const shouldReloadLibraries =
         !!newRuntimeGameOptions.shouldReloadLibraries;
 
@@ -204,7 +204,7 @@ namespace gdjs {
             newProjectData,
             oldScriptFiles,
             newScriptFiles,
-            shouldGenerateEventsCode
+            shouldGenerateScenesEventsCode
           );
         }
         const newRuntimeGameStatus =
@@ -319,12 +319,12 @@ namespace gdjs {
       newProjectData: ProjectData,
       oldScriptFiles: RuntimeGameOptionsScriptFile[],
       newScriptFiles: RuntimeGameOptionsScriptFile[],
-      shouldGenerateEventsCode: boolean
+      shouldGenerateScenesEventsCode: boolean
     ): Promise<void[]> {
       const reloadPromises: Array<Promise<void>> = [];
 
       // Reload events, only if they were exported.
-      if (!shouldGenerateEventsCode) {
+      if (!shouldGenerateScenesEventsCode) {
         newProjectData.layouts.forEach((_layoutData, index) => {
           reloadPromises.push(this._reloadScript('code' + index + '.js'));
         });
@@ -364,7 +364,7 @@ namespace gdjs {
         )[0];
 
         // A file may be removed because of a partial preview.
-        if (!newScriptFile && !shouldGenerateEventsCode) {
+        if (!newScriptFile && !shouldGenerateScenesEventsCode) {
           this._logs.push({
             kind: 'warning',
             message: 'Script file ' + oldScriptFile.path + ' was removed.',

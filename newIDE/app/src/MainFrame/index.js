@@ -1485,8 +1485,7 @@ const MainFrame = (props: Props) => {
     if (hasEventsBasedObject) {
       hotReloadInGameEditorIfNeeded({
         shouldReloadProjectData: true,
-        shouldReloadLibraries: false,
-        shouldGenerateScenesEventsCode: true,
+        shouldReloadLibraries: true,
         shouldReloadResources: false,
       });
     }
@@ -1497,7 +1496,6 @@ const MainFrame = (props: Props) => {
       hotReloadSteps: HotReloadSteps = {
         shouldReloadProjectData: false,
         shouldReloadLibraries: false,
-        shouldGenerateScenesEventsCode: false,
         shouldReloadResources: false,
       }
     ) => {
@@ -1559,7 +1557,6 @@ const MainFrame = (props: Props) => {
       hotReloadInGameEditorIfNeeded({
         shouldReloadProjectData: false,
         shouldReloadLibraries: false,
-        shouldGenerateScenesEventsCode: false,
         shouldReloadResources: true,
       });
     },
@@ -1574,7 +1571,6 @@ const MainFrame = (props: Props) => {
         hotReloadInGameEditorIfNeeded({
           shouldReloadProjectData: true,
           shouldReloadLibraries: false,
-          shouldGenerateScenesEventsCode: false,
           shouldReloadResources: false,
         });
       }
@@ -1587,7 +1583,6 @@ const MainFrame = (props: Props) => {
       hotReloadInGameEditorIfNeeded({
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
-        shouldGenerateScenesEventsCode: false,
         shouldReloadResources: false,
       });
     },
@@ -1599,7 +1594,6 @@ const MainFrame = (props: Props) => {
       hotReloadInGameEditorIfNeeded({
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
-        shouldGenerateScenesEventsCode: false,
         shouldReloadResources: false,
       });
     },
@@ -1612,7 +1606,6 @@ const MainFrame = (props: Props) => {
       hotReloadInGameEditorIfNeeded({
         shouldReloadProjectData: true,
         shouldReloadLibraries: true,
-        shouldGenerateScenesEventsCode: false,
         shouldReloadResources: false,
       });
     },
@@ -1624,7 +1617,6 @@ const MainFrame = (props: Props) => {
       hotReloadInGameEditorIfNeeded({
         shouldReloadProjectData: true,
         shouldReloadLibraries: isNewObjectTypeUsed,
-        shouldGenerateScenesEventsCode: false,
         shouldReloadResources: false,
       });
     },
@@ -1667,7 +1659,6 @@ const MainFrame = (props: Props) => {
       hotReloadInGameEditorIfNeeded({
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
-        shouldGenerateScenesEventsCode: false,
         shouldReloadResources: false,
       });
       _onProjectItemModified();
@@ -1703,7 +1694,6 @@ const MainFrame = (props: Props) => {
       hotReloadInGameEditorIfNeeded({
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
-        shouldGenerateScenesEventsCode: false,
         shouldReloadResources: false,
       });
       _onProjectItemModified();
@@ -2140,7 +2130,6 @@ const MainFrame = (props: Props) => {
       eventsBasedObjectVariantName,
       shouldReloadProjectData,
       shouldReloadLibraries,
-      shouldGenerateScenesEventsCode,
       shouldReloadResources,
       editorCameraState3D,
     }: {|
@@ -2153,7 +2142,7 @@ const MainFrame = (props: Props) => {
         hotReload: true,
         shouldReloadProjectData,
         shouldReloadLibraries,
-        shouldGenerateScenesEventsCode,
+        shouldGenerateScenesEventsCode: false,
         shouldReloadResources,
         forceDiagnosticReport: false,
         isForInGameEdition: {
@@ -2610,7 +2599,6 @@ const MainFrame = (props: Props) => {
       hotReloadInGameEditorIfNeeded({
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
-        shouldGenerateScenesEventsCode: false,
         shouldReloadResources: false,
       });
       openExternalLayout(name);
@@ -2655,8 +2643,7 @@ const MainFrame = (props: Props) => {
     () => {
       hotReloadInGameEditorIfNeeded({
         shouldReloadProjectData: true,
-        shouldReloadLibraries: false,
-        shouldGenerateScenesEventsCode: true,
+        shouldReloadLibraries: true,
         shouldReloadResources: false,
       });
     },
@@ -3923,7 +3910,6 @@ const MainFrame = (props: Props) => {
       hotReloadInGameEditorIfNeeded({
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
-        shouldGenerateScenesEventsCode: false,
         shouldReloadResources: false,
       });
     },
@@ -4565,7 +4551,6 @@ const MainFrame = (props: Props) => {
             hotReloadInGameEditorIfNeeded({
               shouldReloadProjectData: true,
               shouldReloadLibraries: true,
-              shouldGenerateScenesEventsCode: true,
               shouldReloadResources: true,
             });
           }}

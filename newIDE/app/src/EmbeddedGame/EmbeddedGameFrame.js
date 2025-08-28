@@ -28,10 +28,6 @@ export type HotReloadSteps = {|
    */
   shouldReloadLibraries: boolean,
   /**
-   * Set to `true` when code must be generated for events.
-   */
-  shouldGenerateScenesEventsCode: boolean,
-  /**
    * Set to `true` when the resources must be reloaded in memory.
    */
   shouldReloadResources: boolean,
@@ -45,9 +41,6 @@ const mergeNeededHotReloadSteps = (
     stepsA.shouldReloadProjectData || stepsB.shouldReloadProjectData,
   shouldReloadLibraries:
     stepsA.shouldReloadLibraries || stepsB.shouldReloadLibraries,
-  shouldGenerateScenesEventsCode:
-    stepsA.shouldGenerateScenesEventsCode ||
-    stepsB.shouldGenerateScenesEventsCode,
   shouldReloadResources:
     stepsA.shouldReloadResources || stepsB.shouldReloadResources,
 });
@@ -55,7 +48,6 @@ const mergeNeededHotReloadSteps = (
 const isHotReloadNeeded = (hotReloadSteps: HotReloadSteps): boolean =>
   hotReloadSteps.shouldReloadProjectData ||
   hotReloadSteps.shouldReloadLibraries ||
-  hotReloadSteps.shouldGenerateScenesEventsCode ||
   hotReloadSteps.shouldReloadResources;
 
 type SwitchToSceneEditionOptions = {|
@@ -167,7 +159,6 @@ const DropTarget = makeDropTarget<{||}>(objectWithContextReactDndType);
 const noHotReloadSteps = {
   shouldReloadProjectData: false,
   shouldReloadLibraries: false,
-  shouldGenerateScenesEventsCode: false,
   shouldReloadResources: false,
 };
 
@@ -241,13 +232,11 @@ export const EmbeddedGameFrame = ({
           const {
             shouldReloadProjectData,
             shouldReloadLibraries,
-            shouldGenerateScenesEventsCode,
             shouldReloadResources,
           } = options;
           setEditorHotReloadNeeded({
             shouldReloadProjectData,
             shouldReloadLibraries,
-            shouldGenerateScenesEventsCode,
             shouldReloadResources,
           });
           return;
@@ -256,19 +245,15 @@ export const EmbeddedGameFrame = ({
         const {
           shouldReloadProjectData,
           shouldReloadLibraries,
-          shouldGenerateScenesEventsCode,
           shouldReloadResources,
         } = mergeNeededHotReloadSteps(hotReloadSteps.current, {
           shouldReloadProjectData: options.shouldReloadProjectData,
           shouldReloadLibraries: options.shouldReloadLibraries,
-          shouldGenerateScenesEventsCode:
-            options.shouldGenerateScenesEventsCode,
           shouldReloadResources: options.shouldReloadResources,
         });
         const hotReload = isHotReloadNeeded({
           shouldReloadProjectData,
           shouldReloadLibraries,
-          shouldGenerateScenesEventsCode,
           shouldReloadResources,
         });
         if (!previewIndexHtmlLocation || hotReload) {
@@ -293,7 +278,6 @@ export const EmbeddedGameFrame = ({
             eventsBasedObjectVariantName,
             shouldReloadProjectData,
             shouldReloadLibraries,
-            shouldGenerateScenesEventsCode,
             shouldReloadResources,
             editorCameraState3D: cameraStates.current.get(editorId) || null,
           }).finally(() => {
@@ -306,7 +290,6 @@ export const EmbeddedGameFrame = ({
                 ...lastPreviewContainer.current,
                 shouldReloadProjectData: false,
                 shouldReloadLibraries: false,
-                shouldGenerateScenesEventsCode: false,
                 shouldReloadResources: false,
               });
             }

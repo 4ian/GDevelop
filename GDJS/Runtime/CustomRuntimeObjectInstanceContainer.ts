@@ -171,7 +171,10 @@ namespace gdjs {
     private _setOriginalInnerArea(
       eventsBasedObjectData: EventsBasedObjectVariantData
     ) {
-      if (eventsBasedObjectData.instances.length > 0) {
+      if (
+        eventsBasedObjectData.instances.length > 0 ||
+        this.getGame().isInGameEdition()
+      ) {
         if (!eventsBasedObjectData._initialInnerArea) {
           eventsBasedObjectData._initialInnerArea = {
             min: [

@@ -548,7 +548,6 @@ namespace gdjs {
           );
         if (eventsBasedObjectVariantData) {
           editedInstanceDataList = eventsBasedObjectVariantData.instances;
-          this._innerArea = eventsBasedObjectVariantData._initialInnerArea;
           await this._runtimeGame._resourcesLoader.loadResources(
             eventsBasedObjectVariantData.usedResources.map(
               (resource) => resource.name
@@ -565,6 +564,7 @@ namespace gdjs {
             this._currentScene = scene;
             this._editedInstanceContainer = customObjectInstanceContainer;
           }
+          this._innerArea = eventsBasedObjectVariantData._initialInnerArea;
         } else {
           console.warn(
             `Couldn't find any variant named "${eventsBasedObjectVariantName || ''}" for ${eventsBasedObjectType}`

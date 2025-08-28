@@ -1143,6 +1143,7 @@ interface LayersContainer {
     boolean HasLayerNamed([Const] DOMString name);
     void RemoveLayer([Const] DOMString name);
     unsigned long GetLayersCount();
+    unsigned long GetLayerPosition([Const] DOMString name);
     void SwapLayers(unsigned long firstLayerIndex, unsigned long secondLayerIndex);
     void MoveLayer(unsigned long oldIndex, unsigned long newIndex);
     void SerializeLayersTo([Ref] SerializerElement element);
@@ -2932,6 +2933,7 @@ interface MetadataProvider {
     boolean STATIC_IsBadInstructionMetadata([Const, Ref] InstructionMetadata metadata);
     boolean STATIC_IsBadBehaviorMetadata([Const, Ref] BehaviorMetadata metadata);
     boolean STATIC_IsBadObjectMetadata([Const, Ref] ObjectMetadata metadata);
+    boolean STATIC_IsBadEffectMetadata([Const, Ref] EffectMetadata metadata);
 };
 
 enum ProjectDiagnostic_ErrorType {

@@ -606,6 +606,7 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_IsBadInstructionMetadata IsBadInstructionMetadata
 #define STATIC_IsBadBehaviorMetadata IsBadBehaviorMetadata
 #define STATIC_IsBadObjectMetadata IsBadObjectMetadata
+#define STATIC_IsBadEffectMetadata IsBadEffectMetadata
 
 #define STATIC_RenameObjectInEvents RenameObjectInEvents
 #define STATIC_RemoveObjectInEvents RemoveObjectInEvents

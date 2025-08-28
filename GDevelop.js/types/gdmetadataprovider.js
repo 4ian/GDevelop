@@ -26,6 +26,7 @@ declare class gdMetadataProvider {
   static isBadInstructionMetadata(metadata: gdInstructionMetadata): boolean;
   static isBadBehaviorMetadata(metadata: gdBehaviorMetadata): boolean;
   static isBadObjectMetadata(metadata: gdObjectMetadata): boolean;
+  static isBadEffectMetadata(metadata: gdEffectMetadata): boolean;
   delete(): void;
   ptr: number;
 };

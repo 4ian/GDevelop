@@ -328,6 +328,7 @@ export const createAiRequest = async (
     gameId,
     fileMetadata,
     storageProviderName,
+    toolsVersion,
   }: {|
     userId: string,
     userRequest: string,
@@ -346,6 +347,7 @@ export const createAiRequest = async (
       gameId?: string,
     },
     storageProviderName: ?string,
+    toolsVersion: string,
   |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -363,6 +365,7 @@ export const createAiRequest = async (
       gameId,
       fileMetadata,
       storageProviderName,
+      toolsVersion,
     },
     {
       params: {

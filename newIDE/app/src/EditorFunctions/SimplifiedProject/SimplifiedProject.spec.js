@@ -894,6 +894,7 @@ describe('SimplifiedProject', () => {
               },
             },
             "description": "A fake extension with a fake behavior containing 2 properties.",
+            "effects": Object {},
             "extensionFullName": "Fake extension with a fake behavior",
             "extensionName": "FakeBehavior",
             "freeActions": Array [],

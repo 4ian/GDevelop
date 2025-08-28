@@ -190,6 +190,45 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     for (const auto &requiredFile : usedExtensionsResult.GetUsedRequiredFiles()) {
       InsertUnique(resourcesFiles, requiredFile);
     }
+    if (options.isInGameEdition) {
+      // TODO Scan the objects and events of event-based objects
+      // (it could be an alternative method ScanProjectAndEventsBasedObjects in
+      // UsedExtensionsFinder).
+      // This is already done by UsedExtensionsFinder, but maybe it shouldn't.
+
+      // Export all event-based objects because they can be edited even if they
+      // are not used yet.
+      for (std::size_t e = 0;
+           e < exportedProject.GetEventsFunctionsExtensionsCount(); e++) {
+        auto &eventsFunctionsExtension =
+            exportedProject.GetEventsFunctionsExtension(e);
+
+        for (auto &&eventsBasedObjectUniquePtr :
+             eventsFunctionsExtension.GetEventsBasedObjects()
+                 .GetInternalVector()) {
+          auto eventsBasedObject = eventsBasedObjectUniquePtr.get();
+
+          auto metadata = gd::MetadataProvider::GetExtensionAndObjectMetadata(
+              exportedProject.GetCurrentPlatform(),
+              gd::PlatformExtension::GetObjectFullType(
+                  eventsFunctionsExtension.GetName(),
+                  eventsBasedObject->GetName()));
+          for (auto &&includeFile : metadata.GetMetadata().includeFiles) {
+            InsertUnique(includesFiles, includeFile);
+          }
+          for (auto &behaviorType :
+               metadata.GetMetadata().GetDefaultBehaviors()) {
+            auto behaviorMetadata =
+                gd::MetadataProvider::GetExtensionAndBehaviorMetadata(
+                    exportedProject.GetCurrentPlatform(), behaviorType);
+            for (auto &&includeFile :
+                 behaviorMetadata.GetMetadata().includeFiles) {
+              InsertUnique(includesFiles, includeFile);
+            }
+          }
+        }
+      }
+    }
 
     // Export effects (after engine libraries as they auto-register themselves to
     // the engine)

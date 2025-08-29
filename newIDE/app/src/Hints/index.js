@@ -113,7 +113,7 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
   if (type === 'TextObject::Text::SetFontSize') {
     return {
       kind: 'warning',
-      message: t`This action will create a new texture and re-render the text each time it is called, which is expensive and can reduce performances. Prefer to avoid changing a lot the character size of a text.`,
+      message: t`This action will create a new texture and re-render the text each time it is called, which is expensive and can reduce performance. Avoid changing the character size of text frequently.`,
     };
   }
   if (type === 'PlayMusicCanal' || type === 'PlayMusic') {

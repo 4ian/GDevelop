@@ -845,18 +845,33 @@ namespace gdjs {
       maxX: number;
       maxY: number;
     }) {
-      this.zoomToFitArea(
-        {
-          minX: 0,
-          minY: 0,
-          minZ: 0,
-          maxX: this._runtimeGame.getOriginalWidth(),
-          maxY: this._runtimeGame.getOriginalHeight(),
-          maxZ: 0,
-        },
-        visibleScreenArea,
-        0.1
-      );
+      if (this._innerArea) {
+        this.zoomToFitArea(
+          {
+            minX: this._innerArea.min[0],
+            minY: this._innerArea.min[1],
+            minZ: this._innerArea.min[2],
+            maxX: this._innerArea.max[0],
+            maxY: this._innerArea.max[1],
+            maxZ: this._innerArea.max[2],
+          },
+          visibleScreenArea,
+          0.1
+        );
+      } else {
+        this.zoomToFitArea(
+          {
+            minX: 0,
+            minY: 0,
+            minZ: 0,
+            maxX: this._runtimeGame.getOriginalWidth(),
+            maxY: this._runtimeGame.getOriginalHeight(),
+            maxZ: 0,
+          },
+          visibleScreenArea,
+          0.1
+        );
+      }
     }
 
     zoomToFitContent(visibleScreenArea: {

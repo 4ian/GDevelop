@@ -579,7 +579,7 @@ const BundlePreviewBanner = ({ onDisplayBundle, i18n }: Props) => {
                         isAlreadyReceived ? (
                           <Trans>Browse bundle</Trans>
                         ) : (
-                          <Trans>See the bundle</Trans>
+                          <Trans>Discover this bundle</Trans>
                         )
                       }
                       onClick={() => onDisplayBundle(bundleListingData)}

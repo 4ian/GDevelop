@@ -17,6 +17,7 @@ import { Trans } from '@lingui/macro';
 import Link from '../UI/Link';
 import {
   hexNumberToRGBArray,
+  rgbColorToHex,
   rgbOrHexToHexNumber,
 } from '../Utils/ColorTransformer';
 import { type SimplifiedBehavior } from './SimplifiedProject/SimplifiedProject';
@@ -63,10 +64,13 @@ export type EditorFunctionGenericOutput = {|
   properties?: any,
   sharedProperties?: any,
   instances?: any,
+  layers?: any,
   behaviors?: Array<SimplifiedBehavior>,
   animationNames?: string,
   generatedEventsErrorDiagnostics?: string,
   aiGeneratedEventId?: string,
+  propertiesLayersEffectsForSceneNamed?: string,
+  warnings?: string,
 |};
 
 export type EventsGenerationResult =
@@ -123,6 +127,10 @@ export type SceneEventsOutsideEditorChanges = {|
   newOrChangedAiGeneratedEventIds: Set<string>,
 |};
 
+export type InstancesOutsideEditorChanges = {|
+  scene: gdLayout,
+|};
+
 /**
  * A function that does something in the editor on the given project.
  */
@@ -145,6 +153,9 @@ export type EditorFunction = {|
     ) => Promise<EventsGenerationResult>,
     onSceneEventsModifiedOutsideEditor: (
       changes: SceneEventsOutsideEditorChanges
+    ) => void,
+    onInstancesModifiedOutsideEditor: (
+      changes: InstancesOutsideEditorChanges
     ) => void,
     ensureExtensionInstalled: (options: {|
       extensionName: string,
@@ -1493,7 +1504,6 @@ const put2dInstances: EditorFunction = {
       // Create the array of existing instances to move/modify, and new instances to create.
       const modifiedAndCreatedInstances: Array<gdInitialInstance> = [];
       iterateOnInstances(initialInstances, instance => {
-        if (instance.getLayer() !== layer_name) return;
         if (instance.getObjectName() !== object_name) return;
         if (
           existingInstanceIds.some(id =>
@@ -1501,6 +1511,8 @@ const put2dInstances: EditorFunction = {
           )
         ) {
           modifiedAndCreatedInstances.push(instance);
+          // Take the opportunity to move to a new layer if specified.
+          instance.setLayer(layer_name);
         }
       });
       for (let i = 0; i < newInstancesCount; i++) {
@@ -1846,7 +1858,6 @@ const put3dInstances: EditorFunction = {
       // Create the array of existing instances to move/modify, and new instances to create.
       const modifiedAndCreatedInstances: Array<gdInitialInstance> = [];
       iterateOnInstances(initialInstances, instance => {
-        if (instance.getLayer() !== layer_name) return;
         if (instance.getObjectName() !== object_name) return;
         if (
           existingInstanceIds.some(id =>
@@ -1854,6 +1865,8 @@ const put3dInstances: EditorFunction = {
           )
         ) {
           modifiedAndCreatedInstances.push(instance);
+          // Take the opportunity to move to a new layer if specified.
+          instance.setLayer(layer_name);
         }
       });
       for (let i = 0; i < newInstancesCount; i++) {
@@ -2379,7 +2392,7 @@ const createScene: EditorFunction = {
     if (project.hasLayoutNamed(scene_name)) {
       const scene = project.getLayout(scene_name);
       if (include_ui_layer && !scene.hasLayerNamed('UI')) {
-        scene.insertNewLayer('UI', 0);
+        scene.insertNewLayer('UI', scene.getLayersCount());
         addDefaultLightToLayer(scene.getLayer('UI'));
         return makeGenericSuccess(
           `Scene with name "${scene_name}" already exists, no need to re-create it. A layer called "UI" was added to it.`
@@ -2394,7 +2407,7 @@ const createScene: EditorFunction = {
     const scenesCount = project.getLayoutsCount();
     const scene = project.insertNewLayout(scene_name, scenesCount);
     if (include_ui_layer) {
-      scene.insertNewLayer('UI', 0);
+      scene.insertNewLayer('UI', scene.getLayersCount());
     }
     if (background_color) {
       const colorAsRgb = hexNumberToRGBArray(
@@ -2435,6 +2448,581 @@ const deleteScene: EditorFunction = {
     project.removeLayout(scene_name);
 
     return makeGenericSuccess(`Deleted scene "${scene_name}".`);
+  },
+};
+
+const serializeEffectProperties = (
+  effect: gdEffect,
+  effectMetadata: gdEffectMetadata
+) => {
+  const effectProperties = effectMetadata.getProperties();
+  const propertyNames = effectProperties.keys().toJSArray();
+  return propertyNames
+    .map(name => {
+      const propertyDescriptor = effectProperties.get(name);
+      if (shouldHideProperty(propertyDescriptor)) return null;
+
+      // Set the value of the property to what is stored in the effect.
+      // If it's not set, none of these will be set and the "value" will be the default one
+      // serialized by the property descriptor.
+      let value = null;
+      if (effect.hasDoubleParameter(name)) {
+        value = effect.getDoubleParameter(name);
+      } else if (effect.hasStringParameter(name)) {
+        value = effect.getStringParameter(name);
+      } else if (effect.hasBooleanParameter(name)) {
+        value = effect.getBooleanParameter(name);
+      }
+
+      if (value === null) {
+        return serializeNamedProperty(name, propertyDescriptor);
+      }
+
+      return {
+        ...serializeNamedProperty(name, propertyDescriptor),
+        value,
+      };
+    })
+    .filter(Boolean);
+};
+
+const inspectScenePropertiesLayersEffects: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    const scene_name = extractRequiredString(args, 'scene_name');
+
+    return {
+      text: (
+        <Trans>
+          Inspecting scene properties, layers and effects for scene {scene_name}
+          .
+        </Trans>
+      ),
+    };
+  },
+  launchFunction: async ({ project, args }) => {
+    const scene_name = extractRequiredString(args, 'scene_name');
+
+    if (!project.hasLayoutNamed(scene_name)) {
+      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+    }
+
+    const scene = project.getLayout(scene_name);
+    const layersContainer = scene.getLayers();
+
+    return {
+      success: true,
+      propertiesLayersEffectsForSceneNamed: scene.getName(),
+      properties: {
+        backgroundColor: rgbColorToHex(
+          scene.getBackgroundColorRed(),
+          scene.getBackgroundColorGreen(),
+          scene.getBackgroundColorBlue()
+        ),
+        stopSoundsOnStartup: scene.stopSoundsOnStartup(),
+
+        // Also include some project related properties:
+        gameResolutionWidth: project.getGameResolutionWidth(),
+        gameResolutionHeight: project.getGameResolutionHeight(),
+        gameOrientation: project.getOrientation(),
+        gameScaleMode: project.getScaleMode(),
+        gameName: project.getName(),
+      },
+      layers: mapFor(0, layersContainer.getLayersCount(), i => {
+        const layer = layersContainer.getLayerAt(i);
+        const effectsContainer = layer.getEffects();
+        return {
+          name: layer.getName(),
+          position: i,
+          effects: mapFor(0, effectsContainer.getEffectsCount(), j => {
+            const effect = effectsContainer.getEffectAt(j);
+            const effectMetadata = gd.MetadataProvider.getEffectMetadata(
+              project.getCurrentPlatform(),
+              effect.getEffectType()
+            );
+
+            if (gd.MetadataProvider.isBadEffectMetadata(effectMetadata)) {
+              return null;
+            }
+
+            return {
+              effectName: effect.getName(),
+              effectType: effect.getEffectType(),
+              effectProperties: serializeEffectProperties(
+                effect,
+                effectMetadata
+              ),
+            };
+          }).filter(Boolean),
+        };
+      }),
+    };
+  },
+};
+
+const isFuzzyMatch = (string1: string, string2: string) => {
+  const simplifiedString1 = string1.toLowerCase().replace(/\s|_|-/g, '');
+  const simplifiedString2 = string2.toLowerCase().replace(/\s|_|-/g, '');
+
+  return simplifiedString1 === simplifiedString2;
+};
+
+const changeScenePropertiesLayersEffects: EditorFunction = {
+  renderForEditor: ({ args, shouldShowDetails }) => {
+    const scene_name = extractRequiredString(args, 'scene_name');
+
+    const changed_properties = SafeExtractor.extractArrayProperty(
+      args,
+      'changed_properties'
+    );
+    const changed_layers = SafeExtractor.extractArrayProperty(
+      args,
+      'changed_layers'
+    );
+    const changed_layer_effects = SafeExtractor.extractArrayProperty(
+      args,
+      'changed_layer_effects'
+    );
+
+    const changedPropertiesCount =
+      (changed_properties && changed_properties.length) || 0;
+    const changedLayersCount = (changed_layers && changed_layers.length) || 0;
+    const changedLayerEffectsCount =
+      (changed_layer_effects && changed_layer_effects.length) || 0;
+
+    return {
+      text:
+        changedPropertiesCount > 0 &&
+        changedLayersCount > 0 &&
+        changedLayerEffectsCount > 0 ? (
+          <Trans>
+            Changing some scene properties, layers and effects for scene{' '}
+            {scene_name}.
+          </Trans>
+        ) : changedPropertiesCount > 0 && changedLayersCount > 0 ? (
+          <Trans>
+            Changing some scene properties and layers for scene {scene_name}.
+          </Trans>
+        ) : changedPropertiesCount > 0 && changedLayerEffectsCount > 0 ? (
+          <Trans>
+            Changing some scene properties and effects for scene {scene_name}.
+          </Trans>
+        ) : changedLayerEffectsCount > 0 && changedLayersCount > 0 ? (
+          <Trans>
+            Changing some scene effects and layers for scene {scene_name}.
+          </Trans>
+        ) : changedPropertiesCount > 0 ? (
+          <Trans>Changing some scene properties for scene {scene_name}.</Trans>
+        ) : changedLayersCount > 0 ? (
+          <Trans>Changing some scene layers for scene {scene_name}.</Trans>
+        ) : changedLayerEffectsCount > 0 ? (
+          <Trans>Changing some scene effects for scene {scene_name}.</Trans>
+        ) : (
+          <Trans>Unknown changes attempted for scene {scene_name}.</Trans>
+        ),
+    };
+  },
+  launchFunction: async ({
+    project,
+    args,
+    onInstancesModifiedOutsideEditor,
+  }) => {
+    const scene_name = extractRequiredString(args, 'scene_name');
+
+    if (!project.hasLayoutNamed(scene_name)) {
+      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+    }
+    const scene = project.getLayout(scene_name);
+
+    const changes = [];
+    const warnings = [];
+
+    const changed_properties = SafeExtractor.extractArrayProperty(
+      args,
+      'changed_properties'
+    );
+    const changed_layers = SafeExtractor.extractArrayProperty(
+      args,
+      'changed_layers'
+    );
+    const changed_layer_effects = SafeExtractor.extractArrayProperty(
+      args,
+      'changed_layer_effects'
+    );
+
+    if (changed_properties)
+      changed_properties.forEach(changed_property => {
+        const propertyName = SafeExtractor.extractStringProperty(
+          changed_property,
+          'property_name'
+        );
+        const newValue = SafeExtractor.extractStringProperty(
+          changed_property,
+          'new_value'
+        );
+        if (propertyName === null || newValue === null) {
+          warnings.push(
+            `Missing "property_name" or "new_value" in the changed_property object: ${JSON.stringify(
+              changed_property
+            )}. It was ignored and not changed.`
+          );
+          return;
+        }
+
+        if (isFuzzyMatch(propertyName, 'backgroundColor')) {
+          const colorAsRgb = hexNumberToRGBArray(rgbOrHexToHexNumber(newValue));
+          scene.setBackgroundColor(colorAsRgb[0], colorAsRgb[1], colorAsRgb[2]);
+          changes.push('Modified the scene background color.');
+        } else if (isFuzzyMatch(propertyName, 'gameResolutionWidth')) {
+          project.setGameResolutionSize(
+            parseInt(newValue),
+            project.getGameResolutionHeight()
+          );
+          changes.push('Modified the game resolution width.');
+        } else if (isFuzzyMatch(propertyName, 'stopSoundsOnStartup')) {
+          scene.setStopSoundsOnStartup(newValue.toLowerCase() === 'true');
+          changes.push(
+            'Modified whether sounds should be stopped on scene startup.'
+          );
+        } else if (isFuzzyMatch(propertyName, 'gameResolutionHeight')) {
+          project.setGameResolutionSize(
+            project.getGameResolutionWidth(),
+            parseInt(newValue)
+          );
+          changes.push('Modified the game resolution height.');
+        } else if (isFuzzyMatch(propertyName, 'gameOrientation')) {
+          project.setOrientation(newValue);
+          changes.push('Modified the game orientation.');
+        } else if (isFuzzyMatch(propertyName, 'gameScaleMode')) {
+          project.setScaleMode(newValue);
+          changes.push('Modified the game scale mode.');
+        } else if (isFuzzyMatch(propertyName, 'gameName')) {
+          project.setName(newValue);
+          changes.push('Modified the game name.');
+        } else {
+          warnings.push(
+            `Unknown property for the scene: "${propertyName}". It was ignored and not changed.`
+          );
+        }
+      });
+
+    if (changed_layers) {
+      changed_layers.forEach(changed_layer => {
+        const layerName = SafeExtractor.extractStringProperty(
+          changed_layer,
+          'layer_name'
+        );
+        if (layerName === null) {
+          warnings.push(
+            `Missing "layer_name" in an item of changed_layers. It was ignored and not changed.`
+          );
+          return;
+        }
+
+        const new_layer_name = SafeExtractor.extractStringProperty(
+          changed_layer,
+          'new_layer_name'
+        );
+        const new_layer_position = SafeExtractor.extractNumberProperty(
+          changed_layer,
+          'new_layer_position'
+        );
+        const delete_this_layer = SafeExtractor.extractBooleanProperty(
+          changed_layer,
+          'delete_this_layer'
+        );
+        const move_instances_to_layer = SafeExtractor.extractStringProperty(
+          changed_layer,
+          'move_instances_to_layer'
+        );
+
+        if (scene.hasLayerNamed(layerName)) {
+          if (delete_this_layer) {
+            if (move_instances_to_layer) {
+              gd.WholeProjectRefactorer.mergeLayersInScene(
+                project,
+                scene,
+                layerName,
+                move_instances_to_layer
+              );
+            } else {
+              // Note: some instances will be invalidated because of this.
+              gd.WholeProjectRefactorer.removeLayerInScene(
+                project,
+                scene,
+                layerName
+              );
+            }
+            scene.getLayers().removeLayer(layerName);
+            changes.push(
+              `Removed layer "${layerName}" for scene "${scene.getName()}".`
+            );
+          } else {
+            if (new_layer_name) {
+              gd.WholeProjectRefactorer.renameLayerInScene(
+                project,
+                scene,
+                layerName,
+                new_layer_name
+              );
+              changes.push(
+                `Renamed layer "${layerName}" to "${new_layer_name}" for scene "${scene.getName()}".`
+              );
+            }
+          }
+          if (new_layer_position !== null) {
+            scene
+              .getLayers()
+              .moveLayer(
+                scene.getLayers().getLayerPosition(layerName),
+                new_layer_position
+              );
+            changes.push(
+              `Moved layer "${layerName}" to position ${new_layer_position} for scene "${scene.getName()}".`
+            );
+          }
+
+          // /!\ Tell the editor that some instances have potentially been modified (and even removed).
+          // This will force the instances editor to destroy and mount again the
+          // renderers to avoid keeping any references to existing instances, and also drop any selection.
+          onInstancesModifiedOutsideEditor({
+            scene,
+          });
+        } else {
+          scene
+            .getLayers()
+            .insertNewLayer(
+              new_layer_name || layerName,
+              new_layer_position === null
+                ? scene.getLayersCount()
+                : new_layer_position
+            );
+          changes.push(
+            `Created new layer "${new_layer_name ||
+              layerName}" for scene "${scene.getName()}" at position ${new_layer_position ||
+              0}.`
+          );
+        }
+      });
+    }
+
+    if (changed_layer_effects) {
+      changed_layer_effects.forEach(changed_layer_effect => {
+        const layerName = SafeExtractor.extractStringProperty(
+          changed_layer_effect,
+          'layer_name'
+        );
+        if (layerName === null) {
+          warnings.push(
+            `Missing "layer_name" in an item of changed_layer_effects. It was ignored and not changed.`
+          );
+          return;
+        }
+        if (!scene.hasLayerNamed(layerName)) {
+          warnings.push(
+            `Layer not found: "${layerName}". It was ignored and no effects on it were changed.`
+          );
+          return;
+        }
+        const layer = scene.getLayers().getLayer(layerName);
+        const effectsContainer = layer.getEffects();
+
+        const effectName = SafeExtractor.extractStringProperty(
+          changed_layer_effect,
+          'effect_name'
+        );
+        if (effectName === null) {
+          warnings.push(
+            `Missing "effect_name" in an item of changed_layer_effects. It was ignored and not changed.`
+          );
+          return;
+        }
+        const effect_type = SafeExtractor.extractStringProperty(
+          changed_layer_effect,
+          'effect_type'
+        );
+        const new_effect_name = SafeExtractor.extractStringProperty(
+          changed_layer_effect,
+          'new_effect_name'
+        );
+        const new_effect_position = SafeExtractor.extractNumberProperty(
+          changed_layer_effect,
+          'new_effect_position'
+        );
+        const delete_this_effect = SafeExtractor.extractBooleanProperty(
+          changed_layer_effect,
+          'delete_this_effect'
+        );
+        let newlyCreatedEffect: gdEffect | null = null;
+
+        if (effectsContainer.hasEffectNamed(effectName)) {
+          const effect = effectsContainer.getEffect(effectName);
+          if (delete_this_effect) {
+            effectsContainer.removeEffect(effectName);
+            changes.push(
+              `Removed "${effectName}" effect on layer "${layerName}".`
+            );
+          } else {
+            if (new_effect_name) {
+              effect.setName(new_effect_name);
+              changes.push(
+                `Renamed the "${effectName}" effect on layer "${layerName}" to "${new_effect_name}".`
+              );
+            }
+            if (new_effect_position !== null) {
+              effectsContainer.moveEffect(
+                effectsContainer.getEffectPosition(effectName),
+                new_effect_position
+              );
+              changes.push(
+                `Moved the "${effectName}" effect on layer "${layerName}" to position ${new_effect_position}.`
+              );
+            }
+          }
+        } else {
+          if (effect_type) {
+            const newEffectName = new_effect_name || effectName;
+            const effectMetadata = gd.MetadataProvider.getEffectMetadata(
+              project.getCurrentPlatform(),
+              effect_type
+            );
+            if (gd.MetadataProvider.isBadEffectMetadata(effectMetadata)) {
+              warnings.push(
+                `Effect type "${effect_type}" is not a valid effect type. Effect "${newEffectName}" was NOT added.`
+              );
+            } else {
+              newlyCreatedEffect = effectsContainer.insertNewEffect(
+                newEffectName,
+                new_effect_position || 0
+              );
+              newlyCreatedEffect.setEffectType(effect_type);
+            }
+          }
+        }
+
+        const changed_properties = SafeExtractor.extractArrayProperty(
+          changed_layer_effect,
+          'changed_properties'
+        );
+        if (changed_properties) {
+          if (!effectsContainer.hasEffectNamed(effectName)) {
+            warnings.push(
+              `Effect not found: "${effectName}". It was ignored and not changed.`
+            );
+            return;
+          }
+          const effect = effectsContainer.getEffect(effectName);
+          const effectMetadata = gd.MetadataProvider.getEffectMetadata(
+            project.getCurrentPlatform(),
+            effect.getEffectType()
+          );
+
+          if (gd.MetadataProvider.isBadEffectMetadata(effectMetadata)) {
+            warnings.push(
+              `Effect "${effectName}" is not a valid effect. It was ignored and not changed.`
+            );
+            return;
+          }
+
+          const effectProperties = effectMetadata.getProperties();
+
+          changed_properties.forEach(changed_property => {
+            const propertyName = SafeExtractor.extractStringProperty(
+              changed_property,
+              'property_name'
+            );
+            const newValue = SafeExtractor.extractStringProperty(
+              changed_property,
+              'new_value'
+            );
+            if (propertyName === null || newValue === null) {
+              warnings.push(
+                `Missing "property_name" or "new_value" in an item of changed_properties. It was ignored and not changed. Make sure you follow the exact format for changing effect properties.`
+              );
+              return;
+            }
+
+            const { foundProperty } = findPropertyByName({
+              properties: effectProperties,
+              name: propertyName,
+            });
+            if (!foundProperty) {
+              warnings.push(
+                `Property not found: "${propertyName}" in effect "${effectName}". It was ignored and not changed. Make sure you only change existing effect properties.`
+              );
+              return;
+            }
+
+            const lowercasedType = foundProperty.getType().toLowerCase();
+            if (lowercasedType === 'number') {
+              effect.setDoubleParameter(
+                propertyName,
+                parseFloat(newValue) || 0
+              );
+            } else if (lowercasedType === 'boolean') {
+              effect.setBooleanParameter(
+                propertyName,
+                newValue.toLowerCase() === 'true'
+              );
+            } else {
+              effect.setStringParameter(propertyName, newValue);
+            }
+
+            changes.push(
+              `Modified "${propertyName}" property of the "${effectName}" effect to "${newValue}".`
+            );
+          });
+        }
+
+        if (newlyCreatedEffect) {
+          const effectMetadata = gd.MetadataProvider.getEffectMetadata(
+            project.getCurrentPlatform(),
+            newlyCreatedEffect.getEffectType()
+          );
+          if (gd.MetadataProvider.isBadEffectMetadata(effectMetadata)) {
+            // Should not happen.
+          } else {
+            changes.push(
+              `Created new "${newlyCreatedEffect.getName()}" effect on layer "${layerName}" at position ${new_effect_position ||
+                0}. It properties are: ${serializeEffectProperties(
+                newlyCreatedEffect,
+                effectMetadata
+              )
+                // This stringify might not give the prettiest output, this could be improved.
+                .map(serializedProperty => JSON.stringify(serializedProperty))
+                .join(', ')}.`
+            );
+          }
+        }
+      });
+    }
+
+    if (changes.length === 0 && warnings.length === 0) {
+      return {
+        success: false,
+        message: 'No changes were made.',
+      };
+    } else if (changes.length === 0 && warnings.length > 0) {
+      return {
+        success: false,
+        message:
+          'No changes were made because of the issues listed in the warnings.',
+        warnings: warnings.join('\n'),
+      };
+    } else if (changes.length > 0 && warnings.length === 0) {
+      return {
+        success: true,
+        message: ['Successfully done the changes.', ...changes].join('\n'),
+      };
+    } else {
+      return {
+        success: true,
+        message: [
+          'Successfully done some changes but some issues were found - see the warnings.',
+          ...changes,
+        ].join('\n'),
+        warnings: warnings.join('\n'),
+      };
+    }
   },
 };
 
@@ -2595,5 +3183,7 @@ export const editorFunctions: { [string]: EditorFunction } = {
   add_scene_events: addSceneEvents,
   create_scene: createScene,
   delete_scene: deleteScene,
+  inspect_scene_properties_layers_effects: inspectScenePropertiesLayersEffects,
+  change_scene_properties_layers_effects: changeScenePropertiesLayersEffects,
   add_or_edit_variable: addOrEditVariable,
 };

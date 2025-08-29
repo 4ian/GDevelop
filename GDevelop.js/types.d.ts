@@ -941,6 +941,7 @@ export class LayersContainer extends EmscriptenObject {
   hasLayerNamed(name: string): boolean;
   removeLayer(name: string): void;
   getLayersCount(): number;
+  getLayerPosition(name: string): number;
   swapLayers(firstLayerIndex: number, secondLayerIndex: number): void;
   moveLayer(oldIndex: number, newIndex: number): void;
   serializeLayersTo(element: SerializerElement): void;
@@ -2109,6 +2110,7 @@ export class MetadataProvider extends EmscriptenObject {
   static isBadInstructionMetadata(metadata: InstructionMetadata): boolean;
   static isBadBehaviorMetadata(metadata: BehaviorMetadata): boolean;
   static isBadObjectMetadata(metadata: ObjectMetadata): boolean;
+  static isBadEffectMetadata(metadata: EffectMetadata): boolean;
 }
 
 export class ProjectDiagnostic extends EmscriptenObject {

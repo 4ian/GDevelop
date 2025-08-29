@@ -311,6 +311,18 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
+  onInstancesModifiedOutsideEditor = () => {
+    // /!\ Drop the selection to avoid keeping any references to deleted instances.
+    // This could be avoided if the selection used something like UUID to address instances.
+    this.instancesSelection.clearSelection();
+
+    // /!\ Force the instances editor to destroy and mount again the
+    // renderers to avoid keeping any references to existing instances
+    if (this.editorDisplay)
+      this.editorDisplay.instancesHandlers.forceRemountInstancesRenderers();
+    this.updateToolbar();
+  };
+
   updateToolbar = () => {
     const { editorDisplay } = this;
     if (!editorDisplay) return;
@@ -590,10 +602,8 @@ export default class SceneEditor extends React.Component<Props, State> {
   );
 
   undo = () => {
-    // TODO: Do not clear selection so that the user can actually see
-    // the changes it is undoing (variable change, instance moved, etc.)
-    // or find a way to display a sumup of the change such as "Variable XXX
-    // in instance of Enemy changed to YYY"
+    // /!\ Drop the selection to avoid keeping any references to deleted instances.
+    // This could be avoided if the selection used something like UUID to address instances.
     this.instancesSelection.clearSelection();
     this.setState(
       {
@@ -610,6 +620,8 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   redo = () => {
+    // /!\ Drop the selection to avoid keeping any references to deleted instances.
+    // This could be avoided if the selection used something like UUID to address instances.
     this.instancesSelection.clearSelection();
     this.setState(
       {

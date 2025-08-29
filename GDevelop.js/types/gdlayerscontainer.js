@@ -7,6 +7,7 @@ declare class gdLayersContainer {
   hasLayerNamed(name: string): boolean;
   removeLayer(name: string): void;
   getLayersCount(): number;
+  getLayerPosition(name: string): number;
   swapLayers(firstLayerIndex: number, secondLayerIndex: number): void;
   moveLayer(oldIndex: number, newIndex: number): void;
   serializeLayersTo(element: gdSerializerElement): void;

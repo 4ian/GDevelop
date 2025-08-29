@@ -32,6 +32,12 @@ export type ExpressionSummary = {|
   relevantForSceneEvents?: boolean,
 |};
 
+export type PropertySummary = {|
+  name: string,
+  description: string,
+  type: string,
+|};
+
 export type ObjectSummary = {|
   name: string,
   fullName: string,
@@ -51,6 +57,17 @@ export type BehaviorSummary = {|
   expressions: Array<ExpressionSummary>,
 |};
 
+export type EffectSummary = {|
+  name: string,
+  fullName: string,
+  description: string,
+  notWorkingForObjects: boolean,
+  onlyWorkingFor2D: boolean,
+  onlyWorkingFor3D: boolean,
+  unique: boolean,
+  properties: Array<PropertySummary>,
+|};
+
 export type ExtensionSummary = {|
   extensionName: string,
   extensionFullName: string,
@@ -60,6 +77,7 @@ export type ExtensionSummary = {|
   freeExpressions: Array<ExpressionSummary>,
   objects: { [string]: ObjectSummary },
   behaviors: { [string]: BehaviorSummary },
+  effects: { [string]: EffectSummary },
 |};
 
 const normalizeType = (parameterType: string) => {
@@ -102,6 +120,29 @@ const getParameterSummary = (
   return parameterSummary;
 };
 
+const getPropertySummary = (
+  propertyName: string,
+  property: gdPropertyDescriptor
+) => {
+  return {
+    name: propertyName,
+    description: property.getDescription(),
+    type: property.getType(),
+  };
+};
+
+const getPropertiesSummary = (
+  propertiesMetadata: gdMapStringPropertyDescriptor
+) => {
+  return propertiesMetadata
+    .keys()
+    .toJSArray()
+    .map(propertyName => {
+      const property = propertiesMetadata.get(propertyName);
+      return getPropertySummary(propertyName, property);
+    });
+};
+
 export const buildExtensionSummary = ({
   gd,
   extension,
@@ -111,6 +152,7 @@ export const buildExtensionSummary = ({
 }): ExtensionSummary => {
   const objects: { [string]: ObjectSummary } = {};
   const behaviors: { [string]: BehaviorSummary } = {};
+  const effects: { [string]: EffectSummary } = {};
 
   const generateInstructionsSummaries = ({
     instructionsMetadata,
@@ -254,6 +296,27 @@ export const buildExtensionSummary = ({
 
       behaviors[behaviorType] = behaviorSummary;
     });
+  extension
+    .getExtensionEffectTypes()
+    .toJSArray()
+    .forEach(effectType => {
+      const effectMetadata = extension.getEffectMetadata(effectType);
+      if (gd.MetadataProvider.isBadEffectMetadata(effectMetadata)) {
+        return;
+      }
+      const effectSummary: EffectSummary = {
+        name: effectMetadata.getType(),
+        fullName: effectMetadata.getFullName(),
+        description: effectMetadata.getDescription(),
+        notWorkingForObjects: effectMetadata.isMarkedAsNotWorkingForObjects(),
+        onlyWorkingFor2D: effectMetadata.isMarkedAsOnlyWorkingFor2D(),
+        onlyWorkingFor3D: effectMetadata.isMarkedAsOnlyWorkingFor3D(),
+        unique: effectMetadata.isMarkedAsUnique(),
+        properties: getPropertiesSummary(effectMetadata.getProperties()),
+      };
+
+      effects[effectType] = effectSummary;
+    });
 
   return {
     extensionName: extension.getName(),
@@ -275,5 +338,6 @@ export const buildExtensionSummary = ({
     ],
     objects,
     behaviors,
+    effects,
   };
 };

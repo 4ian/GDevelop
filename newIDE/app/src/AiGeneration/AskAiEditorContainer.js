@@ -5,6 +5,7 @@ import { I18n } from '@lingui/react';
 import {
   type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
+  type InstancesOutsideEditorChanges,
 } from '../MainFrame/EditorContainers/BaseEditor';
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import Paper from '../UI/Paper';
@@ -67,6 +68,7 @@ const useProcessFunctionCalls = ({
   getEditorFunctionCallResults,
   addEditorFunctionCallResults,
   onSceneEventsModifiedOutsideEditor,
+  onInstancesModifiedOutsideEditor,
   onExtensionInstalled,
 }: {|
   i18n: I18nType,
@@ -84,6 +86,9 @@ const useProcessFunctionCalls = ({
   ) => void,
   onSceneEventsModifiedOutsideEditor: (
     changes: SceneEventsOutsideEditorChanges
+  ) => void,
+  onInstancesModifiedOutsideEditor: (
+    changes: InstancesOutsideEditorChanges
   ) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |}) => {
@@ -159,6 +164,7 @@ const useProcessFunctionCalls = ({
           });
         },
         onSceneEventsModifiedOutsideEditor,
+        onInstancesModifiedOutsideEditor,
         ensureExtensionInstalled,
         searchAndInstallAsset,
       });
@@ -179,6 +185,7 @@ const useProcessFunctionCalls = ({
       searchAndInstallAsset,
       generateEvents,
       onSceneEventsModifiedOutsideEditor,
+      onInstancesModifiedOutsideEditor,
       triggerSendEditorFunctionCallResults,
       editorCallbacks,
     ]
@@ -349,6 +356,9 @@ type Props = {|
   onSceneEventsModifiedOutsideEditor: (
     changes: SceneEventsOutsideEditorChanges
   ) => void,
+  onInstancesModifiedOutsideEditor: (
+    changes: InstancesOutsideEditorChanges
+  ) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   initialMode: 'chat' | 'agent' | null,
   initialAiRequestId: string | null,
@@ -371,6 +381,9 @@ export type AskAiEditorInterface = {|
   onSceneObjectsDeleted: (scene: gdLayout) => void,
   onSceneEventsModifiedOutsideEditor: (
     changes: SceneEventsOutsideEditorChanges
+  ) => void,
+  onInstancesModifiedOutsideEditor: (
+    changes: InstancesOutsideEditorChanges
   ) => void,
   startOrOpenChat: ({|
     mode: 'chat' | 'agent',
@@ -401,6 +414,7 @@ export const AskAiEditor = React.memo<Props>(
         onCreateProjectFromExample,
         onOpenLayout,
         onSceneEventsModifiedOutsideEditor,
+        onInstancesModifiedOutsideEditor,
         onExtensionInstalled,
         initialMode,
         initialAiRequestId,
@@ -518,6 +532,7 @@ export const AskAiEditor = React.memo<Props>(
         onSceneObjectEdited: noop,
         onSceneObjectsDeleted: noop,
         onSceneEventsModifiedOutsideEditor: noop,
+        onInstancesModifiedOutsideEditor: noop,
         startOrOpenChat: onStartOrOpenChat,
       }));
 
@@ -655,6 +670,7 @@ export const AskAiEditor = React.memo<Props>(
                 fileMetadata,
                 storageProviderName,
                 mode,
+                toolsVersion: 'v2',
                 aiConfiguration: {
                   presetId: aiConfigurationPresetId,
                 },
@@ -944,6 +960,7 @@ export const AskAiEditor = React.memo<Props>(
         getEditorFunctionCallResults,
         addEditorFunctionCallResults,
         onSceneEventsModifiedOutsideEditor,
+        onInstancesModifiedOutsideEditor,
         i18n,
         onExtensionInstalled,
       });
@@ -1043,6 +1060,9 @@ export const renderAskAiEditorContainer = (
         onOpenLayout={props.onOpenLayout}
         onSceneEventsModifiedOutsideEditor={
           props.onSceneEventsModifiedOutsideEditor
+        }
+        onInstancesModifiedOutsideEditor={
+          props.onInstancesModifiedOutsideEditor
         }
         onExtensionInstalled={props.onExtensionInstalled}
         initialMode={

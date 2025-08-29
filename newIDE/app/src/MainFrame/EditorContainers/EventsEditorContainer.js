@@ -6,6 +6,7 @@ import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
+  type InstancesOutsideEditorChanges,
 } from './BaseEditor';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
@@ -66,6 +67,10 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
             changes.newOrChangedAiGeneratedEventIds,
         });
     }
+  }
+
+  onInstancesModifiedOutsideEditor(changes: InstancesOutsideEditorChanges) {
+    // No thing to be done.
   }
 
   getLayout(): ?gdLayout {

@@ -11,6 +11,7 @@ const styles = {
     backgroundColor: '#F03F18',
     color: 'white',
     borderRadius: 4,
+    padding: '8px 0',
   },
 };
 

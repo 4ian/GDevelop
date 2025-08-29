@@ -288,18 +288,31 @@ const BundlePageHeader = ({
             <SectionRow>
               <Paper background="medium" style={{ padding: 16 }}>
                 {!!bundleListingData && (
-                  <LineStackLayout
-                    noMargin
-                    justifyContent={
-                      bundleListingData.visibleUntil
-                        ? 'space-between'
-                        : 'flex-end'
-                    }
-                  >
-                    {bundleListingData.visibleUntil && (
+                  <LineStackLayout noMargin justifyContent="space-between">
+                    {bundleListingData.visibleUntil ? (
                       <ProductLimitedTimeOffer
                         visibleUntil={bundleListingData.visibleUntil}
                       />
+                    ) : estimatedSavingsFormatted ? (
+                      <Column
+                        noMargin
+                        alignItems="flex-start"
+                        justifyContent="center"
+                      >
+                        <Chip
+                          label={<Trans>Bundle</Trans>}
+                          style={styles.discountChip}
+                        />
+                        <Text color="secondary">
+                          <Trans>
+                            Get{' '}
+                            {estimatedSavingsFormatted.savingsPriceFormatted}{' '}
+                            worth of value for less!
+                          </Trans>
+                        </Text>
+                      </Column>
+                    ) : (
+                      <Skeleton height={24} width={100} />
                     )}
                     {estimatedTotalPriceFormatted &&
                     estimatedSavingsFormatted &&
@@ -312,17 +325,19 @@ const BundlePageHeader = ({
                                 {estimatedTotalPriceFormatted}
                               </span>
                             </Text>
-                            <Chip
-                              label={
-                                <Trans>
-                                  {
-                                    estimatedSavingsFormatted.savingsPercentageFormatted
-                                  }{' '}
-                                  OFF
-                                </Trans>
-                              }
-                              style={styles.discountChip}
-                            />
+                            {bundleListingData.visibleUntil && (
+                              <Chip
+                                label={
+                                  <Trans>
+                                    {
+                                      estimatedSavingsFormatted.savingsPercentageFormatted
+                                    }{' '}
+                                    OFF
+                                  </Trans>
+                                }
+                                style={styles.discountChip}
+                              />
+                            )}
                           </LineStackLayout>
                           <Text noMargin size="block-title">
                             {productPrice}
@@ -421,17 +436,19 @@ const BundlePageHeader = ({
                       alignItems="center"
                       justifyContent="center"
                     >
-                      <Chip
-                        label={
-                          <Trans>
-                            {
-                              estimatedSavingsFormatted.savingsPercentageFormatted
-                            }{' '}
-                            OFF
-                          </Trans>
-                        }
-                        style={styles.discountChip}
-                      />
+                      {bundleListingData.visibleUntil && (
+                        <Chip
+                          label={
+                            <Trans>
+                              {
+                                estimatedSavingsFormatted.savingsPercentageFormatted
+                              }{' '}
+                              OFF
+                            </Trans>
+                          }
+                          style={styles.discountChip}
+                        />
+                      )}
                       <Text noMargin color="secondary" size="block-title">
                         <span style={styles.discountedPrice}>
                           {estimatedTotalPriceFormatted}

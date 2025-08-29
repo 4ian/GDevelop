@@ -419,13 +419,13 @@ export const getSummaryLines = ({
   summaryLineItems.forEach((item, index) => {
     if (index !== 0) {
       desktopLineItems.push(
-        <Column>
+        <Column key={`divider-${index}`}>
           <Divider orientation="vertical" />
         </Column>
       );
       if (index % 2 === 1) {
         mobileLineItems.push(
-          <Column>
+          <Column key={`divider-${index}`}>
             <Divider orientation="vertical" />
           </Column>
         );
@@ -433,7 +433,7 @@ export const getSummaryLines = ({
     }
     desktopLineItems.push(item);
     mobileLineItems.push(
-      <Column expand noMargin>
+      <Column expand noMargin key={`item-${index}`}>
         {item}
       </Column>
     );
@@ -442,7 +442,7 @@ export const getSummaryLines = ({
   // Desktop, everything on one line.
   const desktopLines = [];
   desktopLines.push(
-    <ResponsiveLineStackLayout expand>
+    <ResponsiveLineStackLayout expand key="desktop-line">
       {desktopLineItems}
     </ResponsiveLineStackLayout>
   );
@@ -450,7 +450,7 @@ export const getSummaryLines = ({
   const mobileLines = [];
   for (let i = 0; i < mobileLineItems.length; i += 3) {
     mobileLines.push(
-      <LineStackLayout key={i} expand>
+      <LineStackLayout key={`mobile-line-${i}`} expand>
         {mobileLineItems.slice(i, i + 3)}
       </LineStackLayout>
     );

@@ -89,6 +89,7 @@ import { isVariantEditable } from '../ObjectEditor/Editors/CustomObjectPropertie
 import { addSerializedInstances } from '../InstancesEditor/InstancesAdder';
 import { type EditorViewPosition2D } from '../InstancesEditor';
 import { setCameraState } from '../EmbeddedGame/EmbeddedGameFrame';
+import Rectangle from '../Utils/Rectangle';
 
 const gd: libGDevelop = global.gd;
 
@@ -2367,7 +2368,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     onExtractAsExternalLayout(newName);
   };
 
-  extractAsCustomObject = (
+  extractAsCustomObject = async (
     chosenExtensionName: string,
     isNewExtension: boolean,
     chosenEventsBasedObjectName: string,
@@ -2381,8 +2382,33 @@ export default class SceneEditor extends React.Component<Props, State> {
       onExtractAsEventBasedObject,
     } = this.props;
     const { editorDisplay, deleteSelection, instancesSelection } = this;
-    if (!onExtractAsEventBasedObject || !editorDisplay) return;
+    if (!onExtractAsEventBasedObject) return;
 
+    let selectionAABB = new Rectangle();
+    if (this.props.gameEditorMode === 'embedded-game') {
+      const { previewDebuggerServer } = this.props;
+      if (!previewDebuggerServer) return;
+      // TODO Find the one of the in-game editor.
+      const debuggerId = previewDebuggerServer.getExistingDebuggerIds()[0];
+      try {
+        const answer = await previewDebuggerServer.askAnswer(debuggerId, {
+          command: 'getSelectionAABB',
+        });
+        selectionAABB.set({
+          left: answer.payload.minX,
+          top: answer.payload.minY,
+          right: answer.payload.maxX,
+          bottom: answer.payload.maxY,
+          zMin: answer.payload.minZ,
+          zMax: answer.payload.maxZ,
+        });
+      } catch (error) {
+        console.error("Can't get the selection AABB.", error);
+      }
+    } else {
+      if (!editorDisplay) return;
+      selectionAABB = editorDisplay.instancesHandlers.getSelectionAABB();
+    }
     extractAsCustomObject({
       project,
       globalObjects: globalObjectsContainer,
@@ -2393,7 +2419,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       chosenEventsBasedObjectName,
       shouldRemoveSceneObjectsWhenNoMoreInstance,
       selectedInstances: instancesSelection.getSelectedInstances(),
-      selectionAABB: editorDisplay.instancesHandlers.getSelectionAABB(),
+      selectionAABB,
       deleteSelection,
       onExtractAsEventBasedObject,
     });

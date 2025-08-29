@@ -443,6 +443,10 @@ namespace gdjs {
             data.payload.areaMaxZ
           );
         }
+      } else if (data.command === 'getSelectionAABB') {
+        if (inGameEditor) {
+          this.sendSelectionAABB(data.messageId);
+        }
       } else if (data.command === 'hardReload') {
         // This usually means that the preview was modified so much that an entire reload
         // is needed, or that the runtime itself could have been modified.
@@ -857,6 +861,38 @@ namespace gdjs {
           command: 'cut',
           editorId: inGameEditor.getEditorId(),
           payload: {},
+        })
+      );
+    }
+
+    sendSelectionAABB(messageId: number): void {
+      const inGameEditor = this._runtimegame.getInGameEditor();
+      if (!inGameEditor) {
+        return;
+      }
+      const selectionAABB = inGameEditor.getSelectionAABB();
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'selectionAABB',
+          editorId: inGameEditor.getEditorId(),
+          messageId,
+          payload: selectionAABB
+            ? {
+                minX: selectionAABB.min[0],
+                minY: selectionAABB.min[1],
+                minZ: selectionAABB.min[2],
+                maxX: selectionAABB.max[0],
+                maxY: selectionAABB.max[1],
+                maxZ: selectionAABB.max[2],
+              }
+            : {
+                minX: 0,
+                minY: 0,
+                minZ: 0,
+                maxX: 0,
+                maxY: 0,
+                maxZ: 0,
+              },
         })
       );
     }

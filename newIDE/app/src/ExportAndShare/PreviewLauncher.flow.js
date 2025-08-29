@@ -117,13 +117,14 @@ export type ServerAddress = {
 };
 
 /** Interface to run a debugger server for previews. */
-export type PreviewDebuggerServer = {|
-  startServer: () => Promise<void>,
-  getServerState: () => 'started' | 'stopped',
-  getExistingDebuggerIds: () => Array<DebuggerId>,
-  sendMessage: (id: DebuggerId, message: Object) => void,
-  registerCallbacks: (callbacks: PreviewDebuggerServerCallbacks) => () => void,
-|};
+export interface PreviewDebuggerServer {
+  startServer(): Promise<void>;
+  getServerState(): 'started' | 'stopped';
+  getExistingDebuggerIds(): Array<DebuggerId>;
+  sendMessage(id: DebuggerId, message: Object): void;
+  askAnswer(id: DebuggerId, message: Object, timeout?: number): Promise<Object>;
+  registerCallbacks(callbacks: PreviewDebuggerServerCallbacks): () => void;
+}
 
 /** The logs returned by the game hot-reloader. */
 export type HotReloaderLog = {|

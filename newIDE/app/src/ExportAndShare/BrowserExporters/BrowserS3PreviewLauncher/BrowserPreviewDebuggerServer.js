@@ -10,6 +10,9 @@ const callbacksList: Array<PreviewDebuggerServerCallbacks> = [];
 
 let nextDebuggerId = 0;
 
+const answerCallbacks = new Map<number, (value: Object) => void>();
+let nextAnswerId = 1;
+
 const existingPreviewWindows: {
   [DebuggerId]: WindowProxy,
 } = {};
@@ -65,8 +68,8 @@ const PREVIEWS_ORIGIN = 'https://game-previews.gdevelop.io';
  * A debugger server implemented using the ability to send/receive messages
  * from popup windows in the browser.
  */
-export const browserPreviewDebuggerServer: PreviewDebuggerServer = {
-  startServer: async () => {
+class BrowserPreviewDebuggerServer {
+  async startServer() {
     if (debuggerServerState === 'started') return;
     debuggerServerState = 'started';
 
@@ -78,6 +81,11 @@ export const browserPreviewDebuggerServer: PreviewDebuggerServer = {
 
       try {
         const parsedMessage = JSON.parse(event.data);
+        const answerCallback = answerCallbacks.get(parsedMessage.messageId);
+        if (answerCallback) {
+          answerCallback(parsedMessage);
+          answerCallbacks.delete(parsedMessage.messageId);
+        }
         callbacksList.forEach(({ onHandleParsedMessage }) =>
           onHandleParsedMessage({ id, parsedMessage })
         );
@@ -92,8 +100,8 @@ export const browserPreviewDebuggerServer: PreviewDebuggerServer = {
     setupWindowClosedPolling();
 
     callbacksList.forEach(({ onServerStateChanged }) => onServerStateChanged());
-  },
-  sendMessage: (id: DebuggerId, message: Object) => {
+  }
+  sendMessage(id: DebuggerId, message: Object) {
     const previewWindow = existingPreviewWindows[id];
     if (!previewWindow) return;
 
@@ -102,18 +110,41 @@ export const browserPreviewDebuggerServer: PreviewDebuggerServer = {
     } catch (error) {
       console.error('Unable to send a message to the preview window:', error);
     }
-  },
-  getServerState: () => debuggerServerState,
-  getExistingDebuggerIds,
-  registerCallbacks: (callbacks: PreviewDebuggerServerCallbacks) => {
+  }
+  askAnswer(
+    id: DebuggerId,
+    message: Object,
+    timeout: number = 1000
+  ): Promise<Object> {
+    const messageId = nextAnswerId;
+    nextAnswerId++;
+    this.sendMessage(id, { ...message, messageId });
+
+    const promise = new Promise<Object>((resolve, reject) => {
+      answerCallbacks.set(messageId, resolve);
+      setTimeout(() => {
+        reject();
+        answerCallbacks.delete(messageId);
+      }, timeout);
+    });
+    return promise;
+  }
+  getServerState() {
+    return debuggerServerState;
+  }
+  getExistingDebuggerIds() {
+    return getExistingDebuggerIds();
+  }
+  registerCallbacks(callbacks: PreviewDebuggerServerCallbacks) {
     callbacksList.push(callbacks);
 
     return () => {
       const callbacksIndex = callbacksList.indexOf(callbacks);
       if (callbacksIndex !== -1) callbacksList.splice(callbacksIndex, 1);
     };
-  },
-};
+  }
+}
+export const browserPreviewDebuggerServer: PreviewDebuggerServer = new BrowserPreviewDebuggerServer();
 
 export const registerNewPreviewWindow = (
   previewWindow: WindowProxy

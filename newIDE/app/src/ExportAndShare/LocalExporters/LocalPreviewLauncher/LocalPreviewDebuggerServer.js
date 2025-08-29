@@ -13,6 +13,8 @@ let debuggerServerState: 'started' | 'stopped' = 'stopped';
 let debuggerServerAddress: ?ServerAddress = null;
 const callbacksList: Array<PreviewDebuggerServerCallbacks> = [];
 const debuggerIds: Array<DebuggerId> = [];
+const answerCallbacks = new Map<number, (value: Object) => void>();
+let nextAnswerId = 1;
 
 const removeServerListeners = () => {
   if (!ipcRenderer) return;
@@ -30,8 +32,8 @@ const removeServerListeners = () => {
  * A debugger server implemented using Electron (this one is just a bridge to it,
  * communicating through events with it).
  */
-export const localPreviewDebuggerServer: PreviewDebuggerServer = {
-  startServer: () => {
+class LocalPreviewDebuggerServer {
+  startServer() {
     if (!ipcRenderer) return Promise.reject();
     if (debuggerServerState === 'started') return Promise.resolve();
 
@@ -109,6 +111,13 @@ export const localPreviewDebuggerServer: PreviewDebuggerServer = {
           );
         }
 
+        if (parsedMessage) {
+          const answerCallback = answerCallbacks.get(parsedMessage.messageId);
+          if (answerCallback) {
+            answerCallback(parsedMessage);
+            answerCallbacks.delete(parsedMessage.messageId);
+          }
+        }
         callbacksList.forEach(({ onHandleParsedMessage }) =>
           onHandleParsedMessage({ id, parsedMessage })
         );
@@ -128,8 +137,8 @@ export const localPreviewDebuggerServer: PreviewDebuggerServer = {
       }, 5000);
     });
     return Promise.race([serverStartPromise, serverStartTimeoutPromise]);
-  },
-  sendMessage: (id: DebuggerId, message: Object) => {
+  }
+  sendMessage(id: DebuggerId, message: Object) {
     if (!ipcRenderer) return;
     if (debuggerServerState === 'stopped') {
       console.error('Cannot send message when debugger server is stopped.');
@@ -140,18 +149,42 @@ export const localPreviewDebuggerServer: PreviewDebuggerServer = {
       id,
       message: JSON.stringify(message),
     });
-  },
-  getServerState: () => debuggerServerState,
-  getExistingDebuggerIds: () => debuggerIds,
-  registerCallbacks: (callbacks: PreviewDebuggerServerCallbacks) => {
+  }
+  askAnswer(
+    id: DebuggerId,
+    message: Object,
+    timeout: number = 1000
+  ): Promise<Object> {
+    const messageId = nextAnswerId;
+    nextAnswerId++;
+    this.sendMessage(id, { ...message, messageId });
+
+    const promise = new Promise<Object>((resolve, reject) => {
+      answerCallbacks.set(messageId, resolve);
+      setTimeout(() => {
+        reject();
+        answerCallbacks.delete(messageId);
+      }, timeout);
+    });
+    return promise;
+  }
+  getServerState() {
+    return debuggerServerState;
+  }
+  getExistingDebuggerIds() {
+    return debuggerIds;
+  }
+  registerCallbacks(callbacks: PreviewDebuggerServerCallbacks) {
     callbacksList.push(callbacks);
 
     return () => {
       const callbacksIndex = callbacksList.indexOf(callbacks);
       if (callbacksIndex !== -1) callbacksList.splice(callbacksIndex, 1);
     };
-  },
-};
+  }
+}
+
+export const localPreviewDebuggerServer: PreviewDebuggerServer = new LocalPreviewDebuggerServer();
 
 export const getDebuggerServerAddress = (): ?ServerAddress =>
   debuggerServerAddress;

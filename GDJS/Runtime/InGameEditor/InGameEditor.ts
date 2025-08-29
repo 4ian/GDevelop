@@ -218,6 +218,31 @@ namespace gdjs {
     getLastSelectedObject(): gdjs.RuntimeObject | null {
       return this._selectedObjects[this._selectedObjects.length - 1] || null;
     }
+
+    getAABB(): AABB3D | null {
+      let aabb: AABB3D | null = null;
+      for (const object of this._selectedObjects) {
+        if (is3D(object)) {
+          const aabb2D = object.getAABB();
+          const minZ = object.getUnrotatedAABBMinZ();
+          const maxZ = object.getUnrotatedAABBMaxZ();
+          if (aabb) {
+            aabb.min[0] = Math.min(aabb.min[0], aabb2D.min[0]);
+            aabb.min[1] = Math.min(aabb.min[1], aabb2D.min[1]);
+            aabb.min[2] = Math.min(aabb.min[2], minZ);
+            aabb.max[0] = Math.max(aabb.max[0], aabb2D.max[0]);
+            aabb.max[1] = Math.max(aabb.max[1], aabb2D.max[1]);
+            aabb.max[2] = Math.max(aabb.max[2], maxZ);
+          } else {
+            aabb = {
+              min: [aabb2D.min[0], aabb2D.min[1], minZ],
+              max: [aabb2D.max[0], aabb2D.max[1], maxZ],
+            };
+          }
+        }
+      }
+      return aabb;
+    }
   }
 
   class ObjectMover {
@@ -953,6 +978,10 @@ namespace gdjs {
     setZoom(zoom: float) {
       if (!this._currentScene) return;
       this._getEditorCamera().setZoom(zoom);
+    }
+
+    getSelectionAABB(): AABB3D | null {
+      return this._selection.getAABB();
     }
 
     setSelectedObjects(persistentUuids: Array<string>) {

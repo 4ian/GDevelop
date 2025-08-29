@@ -308,8 +308,6 @@ const initialPreviewState: PreviewState = {
   isPreviewOverriden: false,
   overridenPreviewLayoutName: null,
   overridenPreviewExternalLayoutName: null,
-  eventsBasedObjectType: null,
-  eventsBasedObjectVariantName: null,
 };
 
 export type Props = {|
@@ -1833,13 +1831,9 @@ const MainFrame = (props: Props) => {
   const setPreviewedLayout = ({
     layoutName,
     externalLayoutName,
-    eventsBasedObjectType,
-    eventsBasedObjectVariantName,
   }: {
     layoutName: string | null,
     externalLayoutName: string | null,
-    eventsBasedObjectType: string | null,
-    eventsBasedObjectVariantName: string | null,
   }) => {
     setPreviewState(
       previewState =>
@@ -1847,8 +1841,6 @@ const MainFrame = (props: Props) => {
           ...previewState,
           previewLayoutName: layoutName,
           previewExternalLayoutName: externalLayoutName,
-          eventsBasedObjectType,
-          eventsBasedObjectVariantName,
         }: PreviewState)
     );
   };
@@ -1983,10 +1975,10 @@ const MainFrame = (props: Props) => {
           layout,
           externalLayout,
           eventsBasedObjectType: isForInGameEdition
-            ? previewState.eventsBasedObjectType
+            ? isForInGameEdition.eventsBasedObjectType
             : null,
           eventsBasedObjectVariantName: isForInGameEdition
-            ? previewState.eventsBasedObjectVariantName
+            ? isForInGameEdition.eventsBasedObjectVariantName
             : null,
           networkPreview: !!networkPreview,
           hotReload: !!hotReload,
@@ -2065,8 +2057,6 @@ const MainFrame = (props: Props) => {
       previewState.previewLayoutName,
       previewState.overridenPreviewExternalLayoutName,
       previewState.previewExternalLayoutName,
-      previewState.eventsBasedObjectType,
-      previewState.eventsBasedObjectVariantName,
       autosaveProjectIfNeeded,
       authenticatedUser.profile,
       eventsFunctionsExtensionsState,

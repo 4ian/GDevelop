@@ -13,10 +13,6 @@ export type PreviewState = {|
   previewLayoutName: string | null,
   /** The previewed external layout name, set by the current editor. */
   previewExternalLayoutName: string | null,
-  /** The previewed events-object type, set by the current editor. */
-  eventsBasedObjectType: string | null,
-  /** The previewed events-object variant name, set by the current editor. */
-  eventsBasedObjectVariantName: string | null,
 
   /** If true, the previewed layout/external layout is overriden, */
   isPreviewOverriden: boolean,

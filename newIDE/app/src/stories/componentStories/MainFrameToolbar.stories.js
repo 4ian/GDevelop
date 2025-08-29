@@ -68,8 +68,6 @@ const defaultProps: MainFrameToolbarProps = {
     previewExternalLayoutName: null,
     overridenPreviewLayoutName: null,
     overridenPreviewExternalLayoutName: null,
-    eventsBasedObjectType: null,
-    eventsBasedObjectVariantName: null,
   },
 };
 
@@ -109,8 +107,6 @@ export const ProjectOpenPreviewDisabled = () => (
       overridenPreviewLayoutName: null,
       previewExternalLayoutName: null,
       previewLayoutName: 'testLayout',
-      eventsBasedObjectType: null,
-      eventsBasedObjectVariantName: null,
     }}
   />
 );
@@ -125,8 +121,6 @@ export const ProjectOpenOnScene = () => (
       overridenPreviewLayoutName: null,
       previewExternalLayoutName: null,
       previewLayoutName: 'testLayout',
-      eventsBasedObjectType: null,
-      eventsBasedObjectVariantName: null,
     }}
   />
 );
@@ -141,8 +135,6 @@ export const ProjectOpenOnExternalLayout = () => (
       overridenPreviewLayoutName: null,
       previewExternalLayoutName: 'testExternalLayout',
       previewLayoutName: null,
-      eventsBasedObjectType: null,
-      eventsBasedObjectVariantName: null,
     }}
   />
 );
@@ -157,8 +149,6 @@ export const ProjectOpenPreviewOverridenOnScene = () => (
       overridenPreviewLayoutName: 'testLayout',
       previewExternalLayoutName: null,
       previewLayoutName: 'testLayout',
-      eventsBasedObjectType: null,
-      eventsBasedObjectVariantName: null,
     }}
   />
 );
@@ -173,8 +163,6 @@ export const ProjectOpenPreviewOverridenOnExternalLayout = () => (
       overridenPreviewLayoutName: 'testLayout',
       previewExternalLayoutName: 'testExternalLayout',
       previewLayoutName: 'testLayout',
-      eventsBasedObjectType: null,
-      eventsBasedObjectVariantName: null,
     }}
   />
 );

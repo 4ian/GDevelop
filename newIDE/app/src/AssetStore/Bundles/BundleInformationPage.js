@@ -71,7 +71,7 @@ import {
 } from './Utils';
 import { renderProductPrice } from '../ProductPriceTag';
 import Chip from '../../UI/Chip';
-import ProductLimitedTimeOffer from '../../MainFrame/EditorContainers/HomePage/LearnSection/ProductLimitedTimeOffer';
+import ProductLimitedTimeOffer from '../ProductLimitedTimeOffer';
 
 const cellSpacing = 10;
 
@@ -485,7 +485,7 @@ const BundleInformationPage = ({
           <Line noMargin>
             <FlatButton
               primary
-              label={<Trans>See my codes</Trans>}
+              label={<Trans>See my subscription codes</Trans>}
               onClick={() => setIsRedemptionCodesDialogOpen(true)}
             />
           </Line>

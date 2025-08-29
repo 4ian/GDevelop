@@ -54,7 +54,7 @@ import {
   renderEstimatedTotalPriceFormatted,
 } from './Utils';
 import { formatDurationOfRedemptionCode } from '../../RedemptionCode/Utils';
-import ProductLimitedTimeOffer from '../../MainFrame/EditorContainers/HomePage/LearnSection/ProductLimitedTimeOffer';
+import ProductLimitedTimeOffer from '../ProductLimitedTimeOffer';
 
 const highlightColor = '#6CF9F7';
 

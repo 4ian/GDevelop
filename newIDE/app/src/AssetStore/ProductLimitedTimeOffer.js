@@ -1,9 +1,9 @@
 // @flow
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
-import Text from '../../../../UI/Text';
-import { Column, Spacer } from '../../../../UI/Grid';
-import { LineStackLayout } from '../../../../UI/Layout';
+import Text from '../UI/Text';
+import { Column, Spacer } from '../UI/Grid';
+import { LineStackLayout } from '../UI/Layout';
 
 const styles = {
   limitedTimeContainer: {

@@ -40,7 +40,7 @@ import CourseStoreContext from '../../../../../Course/CourseStoreContext';
 import SecureCheckout from '../../../../../AssetStore/SecureCheckout/SecureCheckout';
 import FlatButton from '../../../../../UI/FlatButton';
 import Chip from '../../../../../UI/Chip';
-import ProductLimitedTimeOffer from '../ProductLimitedTimeOffer';
+import ProductLimitedTimeOffer from '../../../../../AssetStore/ProductLimitedTimeOffer';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { getSummaryLines } from './Utils';
 
@@ -182,7 +182,7 @@ const BundlePageHeader = ({
           <Line noMargin>
             <FlatButton
               primary
-              label={<Trans>See my codes</Trans>}
+              label={<Trans>See my subscription codes</Trans>}
               onClick={() => setIsRedemptionCodesDialogOpen(true)}
             />
           </Line>

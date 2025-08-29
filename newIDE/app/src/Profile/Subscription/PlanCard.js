@@ -226,6 +226,25 @@ export const getPlanInferredNameFromId = (planId: string): string => {
   }
 };
 
+export const planIdSortingFunction = (
+  planIdA: string,
+  planIdB: string
+): number => {
+  const planOrder = [
+    'gdevelop_free',
+    'gdevelop_indie',
+    'gdevelop_silver',
+    'gdevelop_gold',
+    'gdevelop_pro',
+    'gdevelop_education',
+    'gdevelop_startup',
+    'gdevelop_enterprise',
+  ];
+  const indexA = planOrder.indexOf(planIdA);
+  const indexB = planOrder.indexOf(planIdB);
+  return indexA - indexB;
+};
+
 export const getPlanIcon = ({
   planId,
   logoSize,

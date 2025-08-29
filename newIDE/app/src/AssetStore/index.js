@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { I18n } from '@lingui/react';
 import { t, Trans } from '@lingui/macro';
 import ChevronArrowLeft from '../UI/CustomSvgIcons/ChevronArrowLeft';
 import Tune from '../UI/CustomSvgIcons/Tune';
@@ -661,290 +662,304 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     );
 
     return (
-      <Column expand noMargin useFullHeight noOverflowParent id="asset-store">
-        <>
-          <LineStackLayout>
-            {!(assetSwappedObject && minimalUI) && (
-              <IconButton
-                id="home-button"
-                key="back-discover"
-                tooltip={t`Back to discover`}
-                onClick={() => {
-                  setSearchText('');
-                  const page = assetSwappedObject
-                    ? shopNavigationState.openAssetSwapping()
-                    : shopNavigationState.openHome();
-                  setScrollUpdateIsNeeded(page);
-                  clearAllAssetStoreFilters();
-                  setIsFiltersPanelOpen(false);
-                }}
-                size="small"
-              >
-                <Home />
-              </IconButton>
-            )}
-            <Column expand useFullHeight noMargin>
-              <SearchBar
-                placeholder={
-                  onlyShowAssets ? t`Search assets` : t`Search the shop`
-                }
-                value={searchText}
-                onChange={(newValue: string) => {
-                  if (searchText === newValue || newValue.length === 1) {
-                    return;
-                  }
-                  setSearchText(newValue);
-                  if (isOnSearchResultPage) {
-                    // An existing search is already being done: just move to the
-                    // top search results.
-                    shopNavigationState.openSearchResultPage();
-                    const assetsListInterface = assetsList.current;
-                    if (assetsListInterface) {
-                      assetsListInterface.scrollToPosition(0);
-                      assetsListInterface.setPageBreakIndex(0);
+      <I18n>
+        {({ i18n }) => (
+          <Column
+            expand
+            noMargin
+            useFullHeight
+            noOverflowParent
+            id="asset-store"
+          >
+            <>
+              <LineStackLayout>
+                {!(assetSwappedObject && minimalUI) && (
+                  <IconButton
+                    id="home-button"
+                    key="back-discover"
+                    tooltip={t`Back to discover`}
+                    onClick={() => {
+                      setSearchText('');
+                      const page = assetSwappedObject
+                        ? shopNavigationState.openAssetSwapping()
+                        : shopNavigationState.openHome();
+                      setScrollUpdateIsNeeded(page);
+                      clearAllAssetStoreFilters();
+                      setIsFiltersPanelOpen(false);
+                    }}
+                    size="small"
+                  >
+                    <Home />
+                  </IconButton>
+                )}
+                <Column expand useFullHeight noMargin>
+                  <SearchBar
+                    placeholder={
+                      onlyShowAssets ? t`Search assets` : t`Search the shop`
                     }
-                  } else {
-                    // A new search is being initiated: navigate to the search page,
-                    // and clear the history as a new search was launched.
-                    if (!!newValue) {
-                      shopNavigationState.clearHistory();
-                      shopNavigationState.openSearchResultPage();
-                      openFiltersPanelIfAppropriate();
-                    }
-                  }
-                }}
-                onRequestSearch={() => {}}
-                ref={searchBar}
-                id="asset-store-search-bar"
-              />
-            </Column>
-            {!(assetSwappedObject && minimalUI) && (
-              <IconButton
-                onClick={() => setIsFiltersPanelOpen(!isFiltersPanelOpen)}
-                disabled={!canShowFiltersPanel}
-                selected={canShowFiltersPanel && isFiltersPanelOpen}
-                size="small"
-              >
-                <Tune />
-              </IconButton>
-            )}
-          </LineStackLayout>
-          <Spacer />
-        </>
-        <Column noMargin>
-          <Line justifyContent="space-between" noMargin alignItems="center">
-            {(!isOnHomePage || !!openedShopCategory) &&
-              !(assetSwappedObject && minimalUI) && (
-                <>
-                  {shopNavigationState.isRootPage ? null : (
-                    <Column expand alignItems="flex-start" noMargin>
-                      <TextButton
-                        icon={<ChevronArrowLeft />}
-                        label={<Trans>Back</Trans>}
-                        onClick={async () => {
-                          const page = shopNavigationState.backToPreviousPage();
-                          const isUpdatingSearchtext = reApplySearchTextIfNeeded(
-                            page
-                          );
-                          if (isUpdatingSearchtext) {
-                            // Updating the search is not instant, so we cannot apply the scroll position
-                            // right away. We force a wait as there's no easy way to know when results are completely updated.
-                            await delay(500);
-                            setScrollUpdateIsNeeded(page);
-                            applyBackScrollPosition(page); // We apply it manually, because the layout effect won't be called again.
-                          } else {
-                            setScrollUpdateIsNeeded(page);
-                          }
-                        }}
-                      />
-                    </Column>
-                  )}
-                  {(openedAssetPack ||
-                    openedPrivateAssetPackListingData ||
-                    filtersState.chosenCategory) && (
+                    value={searchText}
+                    onChange={(newValue: string) => {
+                      if (searchText === newValue || newValue.length === 1) {
+                        return;
+                      }
+                      setSearchText(newValue);
+                      if (isOnSearchResultPage) {
+                        // An existing search is already being done: just move to the
+                        // top search results.
+                        shopNavigationState.openSearchResultPage();
+                        const assetsListInterface = assetsList.current;
+                        if (assetsListInterface) {
+                          assetsListInterface.scrollToPosition(0);
+                          assetsListInterface.setPageBreakIndex(0);
+                        }
+                      } else {
+                        // A new search is being initiated: navigate to the search page,
+                        // and clear the history as a new search was launched.
+                        if (!!newValue) {
+                          shopNavigationState.clearHistory();
+                          shopNavigationState.openSearchResultPage();
+                          openFiltersPanelIfAppropriate();
+                        }
+                      }
+                    }}
+                    onRequestSearch={() => {}}
+                    ref={searchBar}
+                    id="asset-store-search-bar"
+                  />
+                </Column>
+                {!(assetSwappedObject && minimalUI) && (
+                  <IconButton
+                    onClick={() => setIsFiltersPanelOpen(!isFiltersPanelOpen)}
+                    disabled={!canShowFiltersPanel}
+                    selected={canShowFiltersPanel && isFiltersPanelOpen}
+                    size="small"
+                  >
+                    <Tune />
+                  </IconButton>
+                )}
+              </LineStackLayout>
+              <Spacer />
+            </>
+            <Column noMargin>
+              <Line justifyContent="space-between" noMargin alignItems="center">
+                {(!isOnHomePage || !!openedShopCategory) &&
+                  !(assetSwappedObject && minimalUI) && (
                     <>
-                      {!openedAssetPack && !openedPrivateAssetPackListingData && (
-                        // Only show the category name if we're not on an asset pack page.
-                        <Column expand alignItems="center">
-                          <Text size="block-title" noMargin>
-                            {filtersState.chosenCategory
-                              ? capitalize(
-                                  filtersState.chosenCategory.node.name
-                                )
-                              : ''}
-                          </Text>
+                      {shopNavigationState.isRootPage ? null : (
+                        <Column expand alignItems="flex-start" noMargin>
+                          <TextButton
+                            icon={<ChevronArrowLeft />}
+                            label={<Trans>Back</Trans>}
+                            onClick={async () => {
+                              const page = shopNavigationState.backToPreviousPage();
+                              const isUpdatingSearchtext = reApplySearchTextIfNeeded(
+                                page
+                              );
+                              if (isUpdatingSearchtext) {
+                                // Updating the search is not instant, so we cannot apply the scroll position
+                                // right away. We force a wait as there's no easy way to know when results are completely updated.
+                                await delay(500);
+                                setScrollUpdateIsNeeded(page);
+                                applyBackScrollPosition(page); // We apply it manually, because the layout effect won't be called again.
+                              } else {
+                                setScrollUpdateIsNeeded(page);
+                              }
+                            }}
+                          />
                         </Column>
                       )}
-                      <Column
-                        expand
-                        alignItems="flex-end"
-                        noMargin
-                        justifyContent="center"
-                      >
-                        {openedAssetPack &&
-                        openedAssetPack.content &&
-                        doesAssetPackContainAudio(openedAssetPack) &&
-                        !isAssetPackAudioOnly(openedAssetPack) ? (
-                          <PrivateAssetPackAudioFilesDownloadButton
-                            assetPack={openedAssetPack}
-                          />
-                        ) : null}
-                      </Column>
+                      {(openedAssetPack ||
+                        openedPrivateAssetPackListingData ||
+                        filtersState.chosenCategory) && (
+                        <>
+                          {!openedAssetPack &&
+                            !openedPrivateAssetPackListingData && (
+                              // Only show the category name if we're not on an asset pack page.
+                              <Column expand alignItems="center">
+                                <Text size="block-title" noMargin>
+                                  {filtersState.chosenCategory
+                                    ? capitalize(
+                                        filtersState.chosenCategory.node.name
+                                      )
+                                    : ''}
+                                </Text>
+                              </Column>
+                            )}
+                          <Column
+                            expand
+                            alignItems="flex-end"
+                            noMargin
+                            justifyContent="center"
+                          >
+                            {openedAssetPack &&
+                            openedAssetPack.content &&
+                            doesAssetPackContainAudio(openedAssetPack) &&
+                            !isAssetPackAudioOnly(openedAssetPack) ? (
+                              <PrivateAssetPackAudioFilesDownloadButton
+                                assetPack={openedAssetPack}
+                              />
+                            ) : null}
+                          </Column>
+                        </>
+                      )}
                     </>
                   )}
-                </>
-              )}
-          </Line>
-        </Column>
-        <Line
-          expand
-          noMargin
-          overflow={
-            'hidden' /* Somehow required on Chrome/Firefox to avoid children growing (but not on Safari) */
-          }
-        >
-          {isOnHomePage ? (
-            storeError ? (
-              <PlaceholderError onRetry={fetchAssetsAndGameTemplates}>
-                <AlertMessage kind="error">
-                  <Trans>
-                    An error occurred when fetching the store content. Please
-                    try again later.
-                  </Trans>
-                </AlertMessage>
-              </PlaceholderError>
-            ) : publicAssetPacks &&
-              privateAssetPackListingDatas &&
-              privateGameTemplateListingDatas &&
-              bundleListingDatas ? (
-              <AssetsHome
-                ref={assetsHome}
-                publicAssetPacks={publicAssetPacks}
-                privateAssetPackListingDatas={privateAssetPackListingDatas}
-                privateGameTemplateListingDatas={
-                  privateGameTemplateListingDatas
-                }
-                bundleListingDatas={bundleListingDatas}
-                onPublicAssetPackSelection={selectPublicAssetPack}
-                onPrivateAssetPackSelection={selectPrivateAssetPack}
-                onPrivateGameTemplateSelection={selectPrivateGameTemplate}
-                onBundleSelection={selectBundle}
-                onCategorySelection={selectShopCategory}
-                openedShopCategory={openedShopCategory}
-                onlyShowAssets={onlyShowAssets}
-                displayPromotions={displayPromotions}
-                onOpenProfile={onOpenProfile}
-              />
-            ) : (
-              <PlaceholderLoader />
-            )
-          ) : isOnSearchResultPage ? (
-            <AssetsList
-              publicAssetPacks={
-                assetSwappedObject ? [] : publicAssetPacksSearchResults
+              </Line>
+            </Column>
+            <Line
+              expand
+              noMargin
+              overflow={
+                'hidden' /* Somehow required on Chrome/Firefox to avoid children growing (but not on Safari) */
               }
-              privateAssetPackListingDatas={
-                assetSwappedObject
-                  ? []
-                  : privateAssetPackListingDatasSearchResults
-              }
-              privateGameTemplateListingDatas={
-                assetSwappedObject
-                  ? []
-                  : privateGameTemplateListingDatasSearchResults
-              }
-              bundleListingDatas={
-                assetSwappedObject ? [] : bundleListingDatasSearchResults
-              }
-              assetShortHeaders={assetShortHeadersSearchResults}
-              ref={assetsList}
-              error={storeError}
-              onOpenDetails={onOpenDetails}
-              onPrivateAssetPackSelection={selectPrivateAssetPack}
-              onPublicAssetPackSelection={selectPublicAssetPack}
-              onPrivateGameTemplateSelection={selectPrivateGameTemplate}
-              onBundleSelection={selectBundle}
-              onFolderSelection={selectFolder}
-              onGoBackToFolderIndex={goBackToFolderIndex}
-              currentPage={shopNavigationState.getCurrentPage()}
-              onlyShowAssets={onlyShowAssets}
-              hideDetails={!!assetSwappedObject && !!minimalUI}
-            />
-          ) : // Do not show the asset details if we're swapping an asset.
-          openedAssetShortHeader && !(assetSwappedObject && minimalUI) ? (
-            <AssetDetails
-              ref={assetDetails}
-              onTagSelection={selectTag}
-              assetShortHeader={openedAssetShortHeader}
-              onOpenDetails={onOpenDetails}
-              onAssetLoaded={() => applyBackScrollPosition(currentPage)}
-              onPrivateAssetPackSelection={selectPrivateAssetPack}
-              onPrivateGameTemplateSelection={selectPrivateGameTemplate}
-            />
-          ) : !!openedPrivateAssetPackListingData ? (
-            <PrivateAssetPackInformationPage
-              privateAssetPackListingData={openedPrivateAssetPackListingData}
-              onAssetPackOpen={selectPrivateAssetPack}
-              onGameTemplateOpen={selectPrivateGameTemplate}
-              onBundleOpen={selectBundle}
-              privateAssetPackListingDatasFromSameCreator={
-                privateAssetPackListingDatasFromSameCreator
-              }
-            />
-          ) : !!openedPrivateGameTemplateListingData ? (
-            <PrivateGameTemplateInformationPage
-              privateGameTemplateListingData={
-                openedPrivateGameTemplateListingData
-              }
-              onCreateWithGameTemplate={() => {
-                onOpenPrivateGameTemplateListingData &&
-                  onOpenPrivateGameTemplateListingData(
-                    openedPrivateGameTemplateListingData
-                  );
-              }}
-              onAssetPackOpen={selectPrivateAssetPack}
-              onGameTemplateOpen={selectPrivateGameTemplate}
-              onBundleOpen={selectBundle}
-              privateGameTemplateListingDatasFromSameCreator={
-                privateGameTemplateListingDatasFromSameCreator
-              }
-            />
-          ) : !!openedBundleListingData ? (
-            <BundleInformationPage
-              bundleListingData={openedBundleListingData}
-              receivedCourses={receivedCourses}
-              onBundleOpen={selectBundle}
-              onGameTemplateOpen={selectPrivateGameTemplate}
-              onAssetPackOpen={selectPrivateAssetPack}
-              onCourseOpen={selectCourse}
-            />
-          ) : null}
-          {canShowFiltersPanel && (
-            <ResponsivePaperOrDrawer
-              onClose={() => setIsFiltersPanelOpen(false)}
-              open={isFiltersPanelOpen}
             >
-              <ScrollView>
-                <Column>
-                  <Column noMargin>
-                    <Line alignItems="center">
-                      <Tune />
-                      <Subheader>
-                        <Trans>Object filters</Trans>
-                      </Subheader>
-                    </Line>
-                  </Column>
-                  <Line justifyContent="space-between" alignItems="center">
-                    <AssetStoreFilterPanel
-                      assetSwappedObject={assetSwappedObject}
-                    />
-                  </Line>
-                </Column>
-              </ScrollView>
-            </ResponsivePaperOrDrawer>
-          )}
-        </Line>
-      </Column>
+              {isOnHomePage ? (
+                storeError ? (
+                  <PlaceholderError onRetry={fetchAssetsAndGameTemplates}>
+                    <AlertMessage kind="error">
+                      <Trans>
+                        An error occurred when fetching the store content.
+                        Please try again later.
+                      </Trans>
+                    </AlertMessage>
+                  </PlaceholderError>
+                ) : publicAssetPacks &&
+                  privateAssetPackListingDatas &&
+                  privateGameTemplateListingDatas &&
+                  bundleListingDatas ? (
+                  <AssetsHome
+                    ref={assetsHome}
+                    publicAssetPacks={publicAssetPacks}
+                    privateAssetPackListingDatas={privateAssetPackListingDatas}
+                    privateGameTemplateListingDatas={
+                      privateGameTemplateListingDatas
+                    }
+                    bundleListingDatas={bundleListingDatas}
+                    onPublicAssetPackSelection={selectPublicAssetPack}
+                    onPrivateAssetPackSelection={selectPrivateAssetPack}
+                    onPrivateGameTemplateSelection={selectPrivateGameTemplate}
+                    onBundleSelection={selectBundle}
+                    onCategorySelection={selectShopCategory}
+                    openedShopCategory={openedShopCategory}
+                    onlyShowAssets={onlyShowAssets}
+                    displayPromotions={displayPromotions}
+                    onOpenProfile={onOpenProfile}
+                  />
+                ) : (
+                  <PlaceholderLoader />
+                )
+              ) : isOnSearchResultPage ? (
+                <AssetsList
+                  publicAssetPacks={
+                    assetSwappedObject ? [] : publicAssetPacksSearchResults
+                  }
+                  privateAssetPackListingDatas={
+                    assetSwappedObject
+                      ? []
+                      : privateAssetPackListingDatasSearchResults
+                  }
+                  privateGameTemplateListingDatas={
+                    assetSwappedObject
+                      ? []
+                      : privateGameTemplateListingDatasSearchResults
+                  }
+                  bundleListingDatas={
+                    assetSwappedObject ? [] : bundleListingDatasSearchResults
+                  }
+                  assetShortHeaders={assetShortHeadersSearchResults}
+                  ref={assetsList}
+                  error={storeError}
+                  onOpenDetails={onOpenDetails}
+                  onPrivateAssetPackSelection={selectPrivateAssetPack}
+                  onPublicAssetPackSelection={selectPublicAssetPack}
+                  onPrivateGameTemplateSelection={selectPrivateGameTemplate}
+                  onBundleSelection={selectBundle}
+                  onFolderSelection={selectFolder}
+                  onGoBackToFolderIndex={goBackToFolderIndex}
+                  currentPage={shopNavigationState.getCurrentPage()}
+                  onlyShowAssets={onlyShowAssets}
+                  hideDetails={!!assetSwappedObject && !!minimalUI}
+                />
+              ) : // Do not show the asset details if we're swapping an asset.
+              openedAssetShortHeader && !(assetSwappedObject && minimalUI) ? (
+                <AssetDetails
+                  ref={assetDetails}
+                  onTagSelection={selectTag}
+                  assetShortHeader={openedAssetShortHeader}
+                  onOpenDetails={onOpenDetails}
+                  onAssetLoaded={() => applyBackScrollPosition(currentPage)}
+                  onPrivateAssetPackSelection={selectPrivateAssetPack}
+                  onPrivateGameTemplateSelection={selectPrivateGameTemplate}
+                />
+              ) : !!openedPrivateAssetPackListingData ? (
+                <PrivateAssetPackInformationPage
+                  privateAssetPackListingData={
+                    openedPrivateAssetPackListingData
+                  }
+                  onAssetPackOpen={selectPrivateAssetPack}
+                  onGameTemplateOpen={selectPrivateGameTemplate}
+                  onBundleOpen={selectBundle}
+                  privateAssetPackListingDatasFromSameCreator={
+                    privateAssetPackListingDatasFromSameCreator
+                  }
+                />
+              ) : !!openedPrivateGameTemplateListingData ? (
+                <PrivateGameTemplateInformationPage
+                  privateGameTemplateListingData={
+                    openedPrivateGameTemplateListingData
+                  }
+                  onCreateWithGameTemplate={() => {
+                    onOpenPrivateGameTemplateListingData &&
+                      onOpenPrivateGameTemplateListingData(
+                        openedPrivateGameTemplateListingData
+                      );
+                  }}
+                  onAssetPackOpen={selectPrivateAssetPack}
+                  onGameTemplateOpen={selectPrivateGameTemplate}
+                  onBundleOpen={selectBundle}
+                  privateGameTemplateListingDatasFromSameCreator={
+                    privateGameTemplateListingDatasFromSameCreator
+                  }
+                />
+              ) : !!openedBundleListingData ? (
+                <BundleInformationPage
+                  bundleListingData={openedBundleListingData}
+                  receivedCourses={receivedCourses}
+                  onBundleOpen={selectBundle}
+                  onGameTemplateOpen={selectPrivateGameTemplate}
+                  onAssetPackOpen={selectPrivateAssetPack}
+                  onCourseOpen={selectCourse}
+                  i18n={i18n}
+                />
+              ) : null}
+              {canShowFiltersPanel && (
+                <ResponsivePaperOrDrawer
+                  onClose={() => setIsFiltersPanelOpen(false)}
+                  open={isFiltersPanelOpen}
+                >
+                  <ScrollView>
+                    <Column>
+                      <Column noMargin>
+                        <Line alignItems="center">
+                          <Tune />
+                          <Subheader>
+                            <Trans>Object filters</Trans>
+                          </Subheader>
+                        </Line>
+                      </Column>
+                      <Line justifyContent="space-between" alignItems="center">
+                        <AssetStoreFilterPanel
+                          assetSwappedObject={assetSwappedObject}
+                        />
+                      </Line>
+                    </Column>
+                  </ScrollView>
+                </ResponsivePaperOrDrawer>
+              )}
+            </Line>
+          </Column>
+        )}
+      </I18n>
     );
   }
 );

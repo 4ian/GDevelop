@@ -244,6 +244,7 @@ export const PrivateAssetPackTile = ({
   style,
   owned,
   disabled,
+  discountedPrice,
 }: {|
   assetPackListingData: PrivateAssetPackListingData,
   onSelect: () => void,
@@ -251,6 +252,7 @@ export const PrivateAssetPackTile = ({
   style?: any,
   owned: boolean,
   disabled?: boolean,
+  discountedPrice?: boolean,
 |}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
@@ -291,6 +293,7 @@ export const PrivateAssetPackTile = ({
               productListingData={assetPackListingData}
               withOverlay
               owned={owned}
+              discountedPrice={discountedPrice}
             />
           </div>
           <Column>
@@ -464,6 +467,7 @@ export const PrivateGameTemplateTile = ({
   style,
   owned,
   disabled,
+  discountedPrice,
 }: {|
   privateGameTemplateListingData: PrivateGameTemplateListingData,
   onSelect: () => void,
@@ -471,6 +475,7 @@ export const PrivateGameTemplateTile = ({
   style?: any,
   owned: boolean,
   disabled?: boolean,
+  discountedPrice?: boolean,
 |}) => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -500,6 +505,7 @@ export const PrivateGameTemplateTile = ({
               productListingData={privateGameTemplateListingData}
               withOverlay
               owned={owned}
+              discountedPrice={discountedPrice}
             />
           </div>
           <Column>
@@ -522,6 +528,7 @@ export const CourseTile = ({
   style,
   owned,
   disabled,
+  discountedPrice,
 }: {|
   courseListingData: CourseListingData,
   onSelect: () => void,
@@ -529,6 +536,7 @@ export const CourseTile = ({
   style?: any,
   owned: boolean,
   disabled?: boolean,
+  discountedPrice?: boolean,
 |}) => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -556,6 +564,7 @@ export const CourseTile = ({
               productListingData={courseListingData}
               withOverlay
               owned={owned}
+              discountedPrice={discountedPrice}
             />
           </div>
           <Column>
@@ -578,6 +587,7 @@ export const BundleTile = ({
   style,
   owned,
   disabled,
+  discountedPrice,
 }: {|
   bundleListingData: BundleListingData,
   onSelect: () => void,
@@ -585,6 +595,7 @@ export const BundleTile = ({
   style?: any,
   owned: boolean,
   disabled?: boolean,
+  discountedPrice?: boolean,
 |}) => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -616,6 +627,7 @@ export const BundleTile = ({
                     productListingData={bundleListingData}
                     withOverlay
                     owned={owned}
+                    discountedPrice={discountedPrice}
                   />
                 ) : (
                   <OwnedLabel />

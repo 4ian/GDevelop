@@ -71,6 +71,7 @@ export type ProductListingData = {|
   includedListableProductIds?: string[],
   includedListableProducts?: Array<IncludedListableProduct>,
   includedRedemptionCodes?: Array<IncludedRedemptionCode>,
+  visibleUntil?: string,
 |};
 
 type RedeemCondition = {

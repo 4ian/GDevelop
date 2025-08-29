@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import { Trans } from '@lingui/macro';
 import Divider from '@material-ui/core/Divider';
 import {
@@ -48,8 +49,12 @@ import Hammer from '../../UI/CustomSvgIcons/Hammer';
 import School from '../../UI/CustomSvgIcons/School';
 import Coin from '../../Credits/Icons/Coin';
 import Sparkle from '../../UI/CustomSvgIcons/Sparkle';
-import { renderEstimatedTotalPriceFormatted } from './Utils';
+import {
+  getEstimatedSavingsFormatted,
+  renderEstimatedTotalPriceFormatted,
+} from './Utils';
 import { formatDurationOfRedemptionCode } from '../../RedemptionCode/Utils';
+import ProductLimitedTimeOffer from '../ProductLimitedTimeOffer';
 
 const highlightColor = '#6CF9F7';
 
@@ -62,7 +67,7 @@ const styles = {
     display: 'flex',
     flex: 1,
     flexDirection: 'column',
-    gap: 8,
+    gap: 16,
     justifyContent: 'space-between',
   },
   bundlePreviewContainer: {
@@ -254,9 +259,10 @@ const getColumnsFromWindowSize = (windowSize: WindowSizeType) => {
 
 type Props = {|
   onDisplayBundle: (bundleListingData: BundleListingData) => void,
+  i18n: I18nType,
 |};
 
-const BundlePreviewBanner = ({ onDisplayBundle }: Props) => {
+const BundlePreviewBanner = ({ onDisplayBundle, i18n }: Props) => {
   const { isMobile, isLandscape, windowSize } = useResponsiveWindowSize();
   const numberOfTilesToDisplay = getColumnsFromWindowSize(windowSize) - 1; // Reserve one tile for the bundle preview.
   const { privateGameTemplateListingDatas } = React.useContext(
@@ -340,6 +346,51 @@ const BundlePreviewBanner = ({ onDisplayBundle }: Props) => {
         ? bundleListingData.includedRedemptionCodes || []
         : null,
     [bundleListingData]
+  );
+
+  const estimatedTotalPriceFormatted = React.useMemo(
+    () =>
+      renderEstimatedTotalPriceFormatted({
+        i18n,
+        bundleListingData,
+        productListingDatasIncludedInBundle,
+        redemptionCodesIncludedInBundle,
+      }),
+    [
+      i18n,
+      bundleListingData,
+      productListingDatasIncludedInBundle,
+      redemptionCodesIncludedInBundle,
+    ]
+  );
+
+  const estimatedSavingsFormatted = React.useMemo(
+    () =>
+      getEstimatedSavingsFormatted({
+        i18n,
+        bundleListingData,
+        productListingDatasIncludedInBundle,
+        redemptionCodesIncludedInBundle,
+      }),
+    [
+      i18n,
+      bundleListingData,
+      productListingDatasIncludedInBundle,
+      redemptionCodesIncludedInBundle,
+    ]
+  );
+
+  const productPrice = React.useMemo(
+    () =>
+      bundleListingData
+        ? renderProductPrice({
+            i18n,
+            productListingData: bundleListingData,
+            usageType: 'default',
+            plainText: true,
+          })
+        : null,
+    [i18n, bundleListingData]
   );
 
   const courseTiles = React.useMemo(
@@ -433,27 +484,6 @@ const BundlePreviewBanner = ({ onDisplayBundle }: Props) => {
                 }}
               >
                 <ColumnStackLayout noMargin>
-                  <Line noMargin>
-                    {bundleListingData ? (
-                      <Chip
-                        label={
-                          isAlreadyReceived ? (
-                            <Trans>Owned</Trans>
-                          ) : (
-                            <Trans>Discount</Trans>
-                          )
-                        }
-                        style={
-                          isAlreadyReceived
-                            ? styles.ownedChip
-                            : styles.discountChip
-                        }
-                      />
-                    ) : (
-                      <Skeleton variant="rect" height={20} />
-                    )}
-                  </Line>
-                  <Spacer />
                   {bundleListingData ? (
                     <Text noMargin size="block-title">
                       {bundleListingData.nameByLocale
@@ -478,20 +508,70 @@ const BundlePreviewBanner = ({ onDisplayBundle }: Props) => {
                   ) : (
                     <Skeleton height={30} />
                   )}
+                  {isMobile && (
+                    <BundlePreviewTile bundleListingData={bundleListingData} />
+                  )}
                 </ColumnStackLayout>
                 {bundleListingData ? (
                   <ColumnStackLayout noMargin>
-                    {!isAlreadyReceived && (
-                      <Text noMargin color="secondary">
-                        <span style={styles.discountedPrice}>
-                          {renderEstimatedTotalPriceFormatted({
-                            i18n,
-                            bundleListingData,
-                            productListingDatasIncludedInBundle,
-                            redemptionCodesIncludedInBundle,
-                          })}
-                        </span>
-                      </Text>
+                    {estimatedSavingsFormatted &&
+                    estimatedTotalPriceFormatted &&
+                    productPrice !== null ? (
+                      <LineStackLayout
+                        alignItems="center"
+                        justifyContent="space-between"
+                        noMargin
+                      >
+                        <LineStackLayout noMargin alignItems="center">
+                          {!isAlreadyReceived && estimatedTotalPriceFormatted && (
+                            <Text noMargin color="secondary" size="sub-title">
+                              <span style={styles.discountedPrice}>
+                                {estimatedTotalPriceFormatted}
+                              </span>
+                            </Text>
+                          )}
+                          {(isAlreadyReceived ||
+                            !bundleListingData.visibleUntil) && (
+                            <Chip
+                              label={
+                                isAlreadyReceived ? (
+                                  <Trans>Owned</Trans>
+                                ) : (
+                                  <Trans>
+                                    {
+                                      estimatedSavingsFormatted.savingsPercentageFormatted
+                                    }{' '}
+                                    OFF
+                                  </Trans>
+                                )
+                              }
+                              style={
+                                isAlreadyReceived
+                                  ? styles.ownedChip
+                                  : styles.discountChip
+                              }
+                            />
+                          )}
+                        </LineStackLayout>
+                        {!isAlreadyReceived && (
+                          <Text noMargin size="block-title">
+                            {productPrice}
+                          </Text>
+                        )}
+                      </LineStackLayout>
+                    ) : (
+                      <Skeleton variant="rect" height={20} />
+                    )}
+                    {!isAlreadyReceived && bundleListingData.visibleUntil && (
+                      <Line noMargin expand>
+                        <Column noMargin expand>
+                          <ProductLimitedTimeOffer
+                            visibleUntil={bundleListingData.visibleUntil}
+                            hideMinutesAndSeconds
+                            alignCenter
+                          />
+                        </Column>
+                      </Line>
                     )}
                     <RaisedButton
                       primary
@@ -499,15 +579,7 @@ const BundlePreviewBanner = ({ onDisplayBundle }: Props) => {
                         isAlreadyReceived ? (
                           <Trans>Browse bundle</Trans>
                         ) : (
-                          <Trans>
-                            Buy for{' '}
-                            {renderProductPrice({
-                              i18n,
-                              productListingData: bundleListingData,
-                              usageType: 'default',
-                              plainText: true,
-                            })}
-                          </Trans>
+                          <Trans>Discover this bundle</Trans>
                         )
                       }
                       onClick={() => onDisplayBundle(bundleListingData)}
@@ -520,7 +592,9 @@ const BundlePreviewBanner = ({ onDisplayBundle }: Props) => {
                 )}
               </div>
               {courseTiles}
-              <BundlePreviewTile bundleListingData={bundleListingData} />
+              {!isMobile && (
+                <BundlePreviewTile bundleListingData={bundleListingData} />
+              )}
             </ResponsiveLineStackLayout>
           </Column>
         </Paper>

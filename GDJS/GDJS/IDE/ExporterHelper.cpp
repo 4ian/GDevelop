@@ -1125,6 +1125,9 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     // Extensions in JS may use it.
     InsertUnique(includesFiles,
                  "Extensions/3D/Scene3DTools.js");
+    // `InGameEditor` uses the `is3D` function.
+    InsertUnique(includesFiles,
+                 "Extensions/3D/Base3DBehavior.js");
   }
   if (pixiRenderers) {
     InsertUnique(includesFiles, "pixi-renderers/pixi.js");

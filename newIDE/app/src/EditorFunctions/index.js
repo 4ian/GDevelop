@@ -1236,7 +1236,7 @@ const describeInstances: EditorFunction = {
           instances.push({
             ...serializedInstance,
             // Replace persistentUuid by id:
-            persistentUuid: instance.getPersistentUuid(),
+            persistentUuid: undefined,
             id: instance.getPersistentUuid().slice(0, 10),
             // For now, don't expose these:
             initialVariables: undefined,
@@ -1431,20 +1431,22 @@ const put2dInstances: EditorFunction = {
 
       // Iterate on existing instances and remove them, and/or those inside the brush radius.
       const instancesToDelete = new Set();
+      const notFoundExistingInstanceIds = new Set<string>(existingInstanceIds);
 
       iterateOnInstances(initialInstances, instance => {
-        if (instance.getLayer() !== layer_name) return;
         if (instance.getObjectName() !== object_name) return;
-        if (
-          existingInstanceIds.some(id =>
-            instance.getPersistentUuid().startsWith(id)
-          )
-        ) {
+
+        const foundExistingInstanceId = existingInstanceIds.find(id =>
+          instance.getPersistentUuid().startsWith(id)
+        );
+        if (foundExistingInstanceId) {
           instancesToDelete.add(instance);
+          notFoundExistingInstanceIds.delete(foundExistingInstanceId);
           return;
         }
 
         if (!brushPosition) return;
+        if (instance.getLayer() !== layer_name) return; // Layer must be the same as specified when deleting instances with a brush.
 
         if (brushSize === 0) {
           if (
@@ -1471,9 +1473,19 @@ const put2dInstances: EditorFunction = {
       });
 
       return makeGenericSuccess(
-        `Erased ${instancesToDelete.size} instance${
-          instancesToDelete.size > 1 ? 's' : ''
-        } of object "${object_name}" on layer "${layer_name || 'base'}"`
+        [
+          `Erased ${instancesToDelete.size} instance${
+            instancesToDelete.size > 1 ? 's' : ''
+          } of object "${object_name}" on layer "${layer_name || 'base'}".`,
+          notFoundExistingInstanceIds.size > 0
+            ? `Could not find these instances to erase:
+        ${Array.from(notFoundExistingInstanceIds).join(
+          ', '
+        )}. Verify the ids and layer names are ALWAYS exact and correct.`
+            : '',
+        ]
+          .filter(Boolean)
+          .join(' ')
       );
     } else {
       const brushPosition: Array<number> = brush_position
@@ -1501,20 +1513,49 @@ const put2dInstances: EditorFunction = {
           rowCount && columnCount ? rowCount * columnCount : 1;
       }
 
+      // Track changes for detailed success message
+      const changes = [];
+
+      // Store original states of existing instances for comparison
+      const existingInstanceStates = new Map();
+      const notFoundExistingInstanceIds = new Set<string>(existingInstanceIds);
+
       // Create the array of existing instances to move/modify, and new instances to create.
       const modifiedAndCreatedInstances: Array<gdInitialInstance> = [];
       iterateOnInstances(initialInstances, instance => {
         if (instance.getObjectName() !== object_name) return;
-        if (
-          existingInstanceIds.some(id =>
-            instance.getPersistentUuid().startsWith(id)
-          )
-        ) {
+
+        const foundExistingInstanceId = existingInstanceIds.find(id =>
+          instance.getPersistentUuid().startsWith(id)
+        );
+
+        if (foundExistingInstanceId) {
+          notFoundExistingInstanceIds.delete(foundExistingInstanceId);
+
+          // Store original state before modifications
+          existingInstanceStates.set(instance, {
+            originalLayer: instance.getLayer(),
+            originalX: instance.getX(),
+            originalY: instance.getY(),
+            originalZOrder: instance.getZOrder(),
+            originalRotation: instance.getAngle(),
+            originalOpacity: instance.getOpacity(),
+            originalCustomWidth: instance.hasCustomSize()
+              ? instance.getCustomWidth()
+              : null,
+            originalCustomHeight: instance.hasCustomSize()
+              ? instance.getCustomHeight()
+              : null,
+          });
+
           modifiedAndCreatedInstances.push(instance);
           // Take the opportunity to move to a new layer if specified.
-          instance.setLayer(layer_name);
+          if (instance.getLayer() !== layer_name) {
+            instance.setLayer(layer_name);
+          }
         }
       });
+
       for (let i = 0; i < newInstancesCount; i++) {
         const instance = initialInstances.insertNewInitialInstance();
         instance.setObjectName(object_name);
@@ -1575,19 +1616,20 @@ const put2dInstances: EditorFunction = {
             brushPosition[1] + randomRadius * Math.sin(randomAngle)
           );
         });
-      } else {
-        if (brush_kind !== 'point') {
-          console.warn(
-            'Unknown brush kind: ' +
-              brush_kind +
-              " - assuming it's point brush instead."
-          );
-        }
-
+      } else if (brush_kind === 'point') {
         modifiedAndCreatedInstances.forEach(instance => {
           instance.setX(brushPosition[0]);
           instance.setY(brushPosition[1]);
         });
+      } else {
+        if (brush_kind !== 'none') {
+          console.warn(
+            `Unknown brush kind: ${brush_kind} - assuming it's "none" instead.`
+          );
+          changes.push(
+            'The brush kind is unknown and was considered to be "none" instead.'
+          );
+        }
       }
 
       const instancesSize = instances_size
@@ -1619,13 +1661,126 @@ const put2dInstances: EditorFunction = {
         }
       });
 
-      return makeGenericSuccess(
-        `Added ${newInstancesCount} instance${
-          newInstancesCount > 1 ? 's' : ''
-        } of object "${object_name}" using ${brush_kind} brush at ${brushPosition.join(
-          ', '
-        )} on layer "${layer_name || 'base'}"`
-      );
+      // Track specific changes that were made
+      if (newInstancesCount > 0) {
+        changes.push(
+          `Created ${newInstancesCount} new instance${
+            newInstancesCount > 1 ? 's' : ''
+          } of object "${object_name}" using ${brush_kind} brush at ${brushPosition.join(
+            ', '
+          )} on layer "${layer_name || 'base'}".`
+        );
+      }
+
+      // Check what changed for existing instances
+      let movedToLayerCount = 0;
+      let movedPositionCount = 0;
+      let resizedCount = 0;
+      let rotatedCount = 0;
+      let opacityChangedCount = 0;
+      let zOrderChangedCount = 0;
+
+      existingInstanceStates.forEach((originalState, instance) => {
+        if (originalState.originalLayer !== instance.getLayer()) {
+          movedToLayerCount++;
+        }
+        if (
+          originalState.originalX !== instance.getX() ||
+          originalState.originalY !== instance.getY()
+        ) {
+          movedPositionCount++;
+        }
+        if (
+          instancesSize &&
+          (originalState.originalCustomWidth !== instance.getCustomWidth() ||
+            originalState.originalCustomHeight !== instance.getCustomHeight())
+        ) {
+          resizedCount++;
+        }
+        if (
+          instancesRotation !== null &&
+          originalState.originalRotation !== instance.getAngle()
+        ) {
+          rotatedCount++;
+        }
+        if (
+          instancesOpacity !== null &&
+          originalState.originalOpacity !== instance.getOpacity()
+        ) {
+          opacityChangedCount++;
+        }
+        if (
+          instances_z_order !== null &&
+          originalState.originalZOrder !== instance.getZOrder()
+        ) {
+          zOrderChangedCount++;
+        }
+      });
+
+      if (movedToLayerCount > 0) {
+        changes.push(
+          `Moved ${movedToLayerCount} instance${
+            movedToLayerCount > 1 ? 's' : ''
+          } to layer "${layer_name || 'base'}".`
+        );
+      }
+
+      if (movedPositionCount > 0) {
+        changes.push(
+          `Repositioned ${movedPositionCount} instance${
+            movedPositionCount > 1 ? 's' : ''
+          } using ${brush_kind} brush.`
+        );
+      }
+
+      if (resizedCount > 0 && instancesSize) {
+        changes.push(
+          `Resized ${resizedCount} instance${resizedCount > 1 ? 's' : ''} to ${
+            instancesSize[0]
+          }x${instancesSize[1]}.`
+        );
+      }
+
+      if (rotatedCount > 0 && instancesRotation !== null) {
+        changes.push(
+          `Rotated ${rotatedCount} instance${
+            rotatedCount > 1 ? 's' : ''
+          } to ${instancesRotation}°.`
+        );
+      }
+
+      if (opacityChangedCount > 0 && instancesOpacity !== null) {
+        changes.push(
+          `Changed opacity of ${opacityChangedCount} instance${
+            opacityChangedCount > 1 ? 's' : ''
+          } to ${instancesOpacity}.`
+        );
+      }
+
+      if (zOrderChangedCount > 0 && instances_z_order !== null) {
+        changes.push(
+          `Changed Z-order of ${zOrderChangedCount} instance${
+            zOrderChangedCount > 1 ? 's' : ''
+          } to ${instances_z_order}.`
+        );
+      }
+
+      if (notFoundExistingInstanceIds.size > 0) {
+        changes.push(
+          `Could not find these existing instance ids to modify:
+          ${Array.from(notFoundExistingInstanceIds).join(
+            ', '
+          )}. Verify the ids and layer names are ALWAYS exact and correct.`
+        );
+      }
+
+      if (changes.length === 0) {
+        return makeGenericSuccess(
+          'No changes were made to instances. Please specify a brush kind, position and number of instances to create, or specify the exact ids of the instances to manipulate.'
+        );
+      }
+
+      return makeGenericSuccess(changes.join(' '));
     }
   },
 };
@@ -1790,20 +1945,22 @@ const put3dInstances: EditorFunction = {
 
       // Iterate on existing instances and remove them, and/or those inside the brush radius.
       const instancesToDelete = new Set();
+      const notFoundExistingInstanceIds = new Set<string>(existingInstanceIds);
 
       iterateOnInstances(initialInstances, instance => {
-        if (instance.getLayer() !== layer_name) return;
         if (instance.getObjectName() !== object_name) return;
-        if (
-          existingInstanceIds.some(id =>
-            instance.getPersistentUuid().startsWith(id)
-          )
-        ) {
+
+        const foundExistingInstanceId = existingInstanceIds.find(id =>
+          instance.getPersistentUuid().startsWith(id)
+        );
+        if (foundExistingInstanceId) {
           instancesToDelete.add(instance);
+          notFoundExistingInstanceIds.delete(foundExistingInstanceId);
           return;
         }
 
         if (!brushPosition) return;
+        if (instance.getLayer() !== layer_name) return; // Layer must be the same as specified when deleting instances with a brush.
 
         if (brushSize <= 0) {
           if (
@@ -1832,9 +1989,19 @@ const put3dInstances: EditorFunction = {
       });
 
       return makeGenericSuccess(
-        `Erased ${instancesToDelete.size} instance${
-          instancesToDelete.size > 1 ? 's' : ''
-        } of object "${object_name}" on layer "${layer_name || 'base'}"`
+        [
+          `Erased ${instancesToDelete.size} instance${
+            instancesToDelete.size > 1 ? 's' : ''
+          } of object "${object_name}" on layer "${layer_name || 'base'}".`,
+          notFoundExistingInstanceIds.size > 0
+            ? `Could not find these instances to erase:
+        ${Array.from(notFoundExistingInstanceIds).join(
+          ', '
+        )}. Verify the ids and layer names are ALWAYS exact and correct.`
+            : '',
+        ]
+          .filter(Boolean)
+          .join(' ')
       );
     } else {
       const brushPosition: Array<number> = brush_position
@@ -1855,20 +2022,52 @@ const put3dInstances: EditorFunction = {
         newInstancesCount = 1;
       }
 
+      // Track changes for detailed success message
+      const changes = [];
+
+      // Store original states of existing instances for comparison
+      const existingInstanceStates = new Map();
+      const notFoundExistingInstanceIds = new Set<string>(existingInstanceIds);
+
       // Create the array of existing instances to move/modify, and new instances to create.
       const modifiedAndCreatedInstances: Array<gdInitialInstance> = [];
       iterateOnInstances(initialInstances, instance => {
         if (instance.getObjectName() !== object_name) return;
-        if (
-          existingInstanceIds.some(id =>
-            instance.getPersistentUuid().startsWith(id)
-          )
-        ) {
+
+        const foundExistingInstanceId = existingInstanceIds.find(id =>
+          instance.getPersistentUuid().startsWith(id)
+        );
+        if (foundExistingInstanceId) {
+          notFoundExistingInstanceIds.delete(foundExistingInstanceId);
+
+          // Store original state before modifications
+          existingInstanceStates.set(instance, {
+            originalLayer: instance.getLayer(),
+            originalX: instance.getX(),
+            originalY: instance.getY(),
+            originalZ: instance.getZ(),
+            originalRotationX: instance.getRotationX(),
+            originalRotationY: instance.getRotationY(),
+            originalRotationZ: instance.getAngle(),
+            originalCustomWidth: instance.hasCustomSize()
+              ? instance.getCustomWidth()
+              : null,
+            originalCustomHeight: instance.hasCustomSize()
+              ? instance.getCustomHeight()
+              : null,
+            originalCustomDepth: instance.hasCustomDepth()
+              ? instance.getCustomDepth()
+              : null,
+          });
+
           modifiedAndCreatedInstances.push(instance);
           // Take the opportunity to move to a new layer if specified.
-          instance.setLayer(layer_name);
+          if (instance.getLayer() !== layer_name) {
+            instance.setLayer(layer_name);
+          }
         }
       });
+
       for (let i = 0; i < newInstancesCount; i++) {
         const instance = initialInstances.insertNewInitialInstance();
         instance.setObjectName(object_name);
@@ -1918,15 +2117,7 @@ const put3dInstances: EditorFunction = {
           );
           instance.setZ(brushPosition[2] + randomRadius * Math.cos(randomPhi));
         });
-      } else {
-        if (brush_kind !== 'point') {
-          console.warn(
-            'Unknown brush kind: ' +
-              brush_kind +
-              " - assuming it's point brush instead."
-          );
-        }
-
+      } else if (brush_kind === 'point') {
         modifiedAndCreatedInstances.forEach(instance => {
           if (!brushPosition) return;
 
@@ -1934,6 +2125,15 @@ const put3dInstances: EditorFunction = {
           instance.setY(brushPosition[1]);
           instance.setZ(brushPosition[2]);
         });
+      } else {
+        if (brush_kind !== 'none') {
+          console.warn(
+            `Unknown brush kind: ${brush_kind} - assuming it's "none" instead.`
+          );
+          changes.push(
+            'The brush kind is unknown and was considered to be "none" instead.'
+          );
+        }
       }
 
       const instancesSizeArray = instances_size
@@ -1958,13 +2158,100 @@ const put3dInstances: EditorFunction = {
         }
       });
 
-      return makeGenericSuccess(
-        `Added ${newInstancesCount} instance${
-          newInstancesCount > 1 ? 's' : ''
-        } of object "${object_name}" using ${brush_kind} brush at ${brushPosition.join(
-          ', '
-        )}) on layer "${layer_name || 'base'}"`
-      );
+      // Track specific changes that were made
+      if (newInstancesCount > 0) {
+        changes.push(
+          `Created ${newInstancesCount} new instance${
+            newInstancesCount > 1 ? 's' : ''
+          } of object "${object_name}" using ${brush_kind} brush at ${brushPosition.join(
+            ', '
+          )} on layer "${layer_name || 'base'}".`
+        );
+      }
+
+      // Check what changed for existing instances
+      let movedToLayerCount = 0;
+      let movedPositionCount = 0;
+      let resizedCount = 0;
+      let rotatedCount = 0;
+
+      existingInstanceStates.forEach((originalState, instance) => {
+        if (originalState.originalLayer !== instance.getLayer()) {
+          movedToLayerCount++;
+        }
+        if (
+          originalState.originalX !== instance.getX() ||
+          originalState.originalY !== instance.getY() ||
+          originalState.originalZ !== instance.getZ()
+        ) {
+          movedPositionCount++;
+        }
+        if (
+          instancesSizeArray &&
+          instancesSizeArray.length >= 3 &&
+          (originalState.originalCustomWidth !== instance.getCustomWidth() ||
+            originalState.originalCustomHeight !== instance.getCustomHeight() ||
+            originalState.originalCustomDepth !== instance.getCustomDepth())
+        ) {
+          resizedCount++;
+        }
+        if (
+          instancesRotationArray &&
+          instancesRotationArray.length >= 3 &&
+          (originalState.originalRotationX !== instance.getRotationX() ||
+            originalState.originalRotationY !== instance.getRotationY() ||
+            originalState.originalRotationZ !== instance.getAngle())
+        ) {
+          rotatedCount++;
+        }
+      });
+
+      if (movedToLayerCount > 0) {
+        changes.push(
+          `Moved ${movedToLayerCount} instance${
+            movedToLayerCount > 1 ? 's' : ''
+          } to layer "${layer_name || 'base'}".`
+        );
+      }
+
+      if (movedPositionCount > 0) {
+        changes.push(
+          `Repositioned ${movedPositionCount} instance${
+            movedPositionCount > 1 ? 's' : ''
+          } using ${brush_kind} brush.`
+        );
+      }
+
+      if (resizedCount > 0 && instancesSizeArray) {
+        changes.push(
+          `Resized ${resizedCount} instance${resizedCount > 1 ? 's' : ''} to ${
+            instancesSizeArray[0]
+          }x${instancesSizeArray[1]}x${instancesSizeArray[2]}.`
+        );
+      }
+
+      if (rotatedCount > 0 && instancesRotationArray) {
+        changes.push(
+          `Rotated ${rotatedCount} instance${rotatedCount > 1 ? 's' : ''} to (${
+            instancesRotationArray[0]
+          }°, ${instancesRotationArray[1]}°, ${instancesRotationArray[2]}°).`
+        );
+      }
+
+      if (notFoundExistingInstanceIds.size > 0) {
+        changes.push(
+          `Could not find these existing instance ids to modify:
+          ${Array.from(notFoundExistingInstanceIds).join(
+            ', '
+          )}. Verify the ids and layer names are ALWAYS exact and correct.`
+        );
+      }
+
+      if (changes.length === 0) {
+        return makeGenericSuccess('No changes were made to instances.');
+      }
+
+      return makeGenericSuccess(changes.join(' '));
     }
   },
 };

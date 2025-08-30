@@ -56,9 +56,7 @@ export type EditorFunctionCallResult =
 export type EditorFunctionGenericOutput = {|
   success: boolean,
   message?: string,
-  eventsForSceneNamed?: string,
   eventsAsText?: string,
-  instancesForSceneNamed?: string,
   objectName?: string,
   behaviorName?: string,
   properties?: any,
@@ -69,8 +67,13 @@ export type EditorFunctionGenericOutput = {|
   animationNames?: string,
   generatedEventsErrorDiagnostics?: string,
   aiGeneratedEventId?: string,
-  propertiesLayersEffectsForSceneNamed?: string,
   warnings?: string,
+
+  // Used for de-duplication of outputs:
+  eventsForSceneNamed?: string,
+  instancesForSceneNamed?: string,
+  propertiesLayersEffectsForSceneNamed?: string,
+  objectPropertiesDeduplicationKey?: string,
 |};
 
 export type EventsGenerationResult =
@@ -561,6 +564,9 @@ const inspectObjectProperties: EditorFunction = {
       objectName: object_name,
       properties,
       behaviors,
+      objectPropertiesDeduplicationKey: [scene_name, object_name]
+        .filter(Boolean)
+        .join('-'),
     };
     if (animationNames.length > 0) {
       output.animationNames = animationNames.join(', ');

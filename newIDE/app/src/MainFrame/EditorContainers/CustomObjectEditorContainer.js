@@ -4,6 +4,7 @@ import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
+  type InstancesOutsideEditorChanges,
 } from './BaseEditor';
 import { prepareInstancesEditorSettings } from '../../InstancesEditor/InstancesEditorSettings';
 import {
@@ -156,6 +157,10 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
   }
 
   onSceneEventsModifiedOutsideEditor(changes: SceneEventsOutsideEditorChanges) {
+    // No thing to be done.
+  }
+
+  onInstancesModifiedOutsideEditor(changes: InstancesOutsideEditorChanges) {
     // No thing to be done.
   }
 

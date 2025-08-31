@@ -38,6 +38,7 @@ const styles = {
     marginTop: -3,
     marginBottom: -1,
   },
+  discountedPrice: { textDecoration: 'line-through', opacity: 0.7 },
 };
 
 type FormatProps = {|
@@ -51,6 +52,7 @@ type FormatProps = {|
   usageType?: string,
   plainText?: boolean,
   showBothPrices?: 'column' | 'line', // If defined, will show both the credits price and the product price.
+  discountedPrice?: boolean,
 |};
 
 export const renderProductPrice = ({
@@ -59,6 +61,7 @@ export const renderProductPrice = ({
   usageType,
   plainText,
   showBothPrices,
+  discountedPrice,
 }: FormatProps): React.Node => {
   // For Credits packages & Bundles, on mobile, only show the app store product price.
   if (
@@ -79,8 +82,9 @@ export const renderProductPrice = ({
     ? creditPrices[0]
     : null;
 
-  // If we're on mobile, only show credits prices for other packages.
-  if (shouldUseAppStoreProduct()) {
+  // If we're on mobile, only show credits prices for other products,
+  // except if we're showing the discounted price.
+  if (shouldUseAppStoreProduct() && !discountedPrice) {
     if (!creditPrice) return '';
     return plainText ? (
       i18n._(t`${creditPrice.amount} credits`)
@@ -113,7 +117,7 @@ export const renderProductPrice = ({
 
   return plainText ? (
     formattedPrice
-  ) : showBothPrices && creditPrice ? (
+  ) : showBothPrices && creditPrice && !discountedPrice ? (
     showBothPrices === 'column' ? (
       <Column alignItems="flex-end">
         <div style={styles.creditPriceContainer}>
@@ -149,7 +153,11 @@ export const renderProductPrice = ({
     )
   ) : (
     <Text noMargin size="sub-title" color="inherit">
-      {formattedPrice}
+      {discountedPrice ? (
+        <span style={styles.discountedPrice}>{formattedPrice}</span>
+      ) : (
+        formattedPrice
+      )}
     </Text>
   );
 };
@@ -165,6 +173,7 @@ type ProductPriceOrOwnedProps = {|
   usageType?: string,
   owned?: boolean,
   showBothPrices?: 'column' | 'line',
+  discountedPrice?: boolean,
 |};
 
 export const OwnedLabel = () => {
@@ -189,11 +198,18 @@ export const getProductPriceOrOwnedLabel = ({
   usageType,
   owned,
   showBothPrices,
+  discountedPrice,
 }: ProductPriceOrOwnedProps): React.Node => {
   return owned ? (
     <OwnedLabel />
   ) : (
-    renderProductPrice({ i18n, productListingData, usageType, showBothPrices })
+    renderProductPrice({
+      i18n,
+      productListingData,
+      usageType,
+      showBothPrices,
+      discountedPrice,
+    })
   );
 };
 
@@ -211,6 +227,7 @@ type ProductPriceTagProps = {|
    */
   withOverlay?: boolean,
   owned?: boolean,
+  discountedPrice?: boolean,
 |};
 
 const ProductPriceTag = ({
@@ -218,6 +235,7 @@ const ProductPriceTag = ({
   usageType,
   withOverlay,
   owned,
+  discountedPrice,
 }: ProductPriceTagProps) => {
   return (
     <I18n>
@@ -227,6 +245,7 @@ const ProductPriceTag = ({
           productListingData,
           usageType,
           owned,
+          discountedPrice,
         });
 
         return <PriceTag withOverlay={withOverlay} label={label} />;

@@ -319,6 +319,7 @@ export const getProductsIncludedInBundleTiles = ({
   onPrivateGameTemplateOpen,
   onBundleOpen,
   onCourseOpen,
+  discountedPrice,
 }: {|
   product: ?PrivateAssetPack | PrivateGameTemplate | Bundle | Course,
   productListingDatas: ?Array<
@@ -343,6 +344,7 @@ export const getProductsIncludedInBundleTiles = ({
   ) => void,
   onBundleOpen?: (bundleListingData: BundleListingData) => void,
   onCourseOpen?: (courseListingData: CourseListingData) => void,
+  discountedPrice?: boolean,
 |}): ?Array<React.Node> => {
   if (!product || !productListingDatas) return null;
 
@@ -378,6 +380,7 @@ export const getProductsIncludedInBundleTiles = ({
               onPrivateGameTemplateOpen(includedProductListingData)
             }
             owned={isProductOwned}
+            discountedPrice={discountedPrice}
           />
         );
       }
@@ -395,6 +398,7 @@ export const getProductsIncludedInBundleTiles = ({
             key={includedProductListingData.id}
             onSelect={() => onPrivateAssetPackOpen(includedProductListingData)}
             owned={isProductOwned}
+            discountedPrice={discountedPrice}
           />
         );
       }
@@ -412,6 +416,7 @@ export const getProductsIncludedInBundleTiles = ({
             key={includedProductListingData.id}
             onSelect={() => onBundleOpen(includedProductListingData)}
             owned={isProductOwned}
+            discountedPrice={discountedPrice}
           />
         );
       }
@@ -429,6 +434,7 @@ export const getProductsIncludedInBundleTiles = ({
             key={includedProductListingData.id}
             onSelect={() => onCourseOpen(includedProductListingData)}
             owned={isProductOwned}
+            discountedPrice={discountedPrice}
           />
         );
       }
@@ -529,6 +535,7 @@ export const PurchaseProductButtons = <
   isAlreadyReceived,
   onClickBuy,
   onClickBuyWithCredits,
+  customLabel,
 }: {|
   productListingData: T,
   selectedUsageType: string,
@@ -538,6 +545,7 @@ export const PurchaseProductButtons = <
   isAlreadyReceived: boolean,
   onClickBuy: () => void | Promise<void>,
   onClickBuyWithCredits?: () => void | Promise<void>,
+  customLabel?: React.Node,
 |}) => {
   const { authenticated } = React.useContext(AuthenticatedUserContext);
   const shouldUseOrSimulateAppStoreProduct =
@@ -578,10 +586,13 @@ export const PurchaseProductButtons = <
     <LineStackLayout>
       <RaisedButton
         primary
-        label={<Trans>Buy for {formattedProductPriceText}</Trans>}
+        label={
+          customLabel || <Trans>Buy for {formattedProductPriceText}</Trans>
+        }
         onClick={onClickBuyWithCredits}
         id={`buy-${productType}-with-credits`}
         icon={<Coin fontSize="small" />}
+        size="medium"
       />
       {!isAlreadyReceived && !authenticated && (
         <Text size="body-small">
@@ -592,21 +603,27 @@ export const PurchaseProductButtons = <
       )}
     </LineStackLayout>
   ) : (
-    <LineStackLayout>
+    <LineStackLayout noMargin>
       {creditPrice && (
         <FlatButton
           primary
-          label={<Trans>Buy for {creditPrice.amount} credits</Trans>}
+          label={
+            customLabel || <Trans>Buy for {creditPrice.amount} credits</Trans>
+          }
           onClick={onClickBuyWithCredits}
           id={`buy-${productType}-with-credits`}
           leftIcon={<Coin fontSize="small" />}
+          size="medium"
         />
       )}
       <RaisedButton
         primary
-        label={<Trans>Buy for {formattedProductPriceText}</Trans>}
+        label={
+          customLabel || <Trans>Buy for {formattedProductPriceText}</Trans>
+        }
         onClick={onClickBuy}
         id={`buy-${productType}`}
+        size="medium"
       />
     </LineStackLayout>
   );

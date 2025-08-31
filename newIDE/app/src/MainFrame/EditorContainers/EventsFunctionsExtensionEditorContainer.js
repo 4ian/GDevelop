@@ -5,6 +5,7 @@ import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
+  type InstancesOutsideEditorChanges,
 } from './BaseEditor';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import {
@@ -64,6 +65,10 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
   }
 
   switchInGameEditorIfNoHotReloadIsNeeded() {}
+
+  onInstancesModifiedOutsideEditor(changes: InstancesOutsideEditorChanges) {
+    // No thing to be done.
+  }
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
     // We stop updates when the component is inactive.

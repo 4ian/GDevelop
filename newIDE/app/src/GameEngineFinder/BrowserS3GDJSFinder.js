@@ -1,4 +1,5 @@
 // @flow
+import Window from '../Utils/Window';
 import { getIDEVersion } from '../Version';
 
 type FileSet =
@@ -48,10 +49,9 @@ export const findGDJS = (
   // run `newIDE/web-app/scripts/deploy-GDJS-Runtime` script.
   let gdjsRoot = `https://resources.gdevelop-app.com/GDJS-${getIDEVersion()}`;
 
-  // If you want to test your local changes to the game engine on the local web-app,
-  // run `npx serve --cors -p 5001` (or another CORS enabled http server on port 5001)
-  // in `newIDE/app/resources/GDJS` and uncomment this line:
-  // gdjsRoot = `http://localhost:5001`;
+  if (Window.isDev()) {
+    gdjsRoot = `http://localhost:5002`;
+  }
 
   return Promise.all(
     filesToDownload[fileSet].map(relativeFilePath => {

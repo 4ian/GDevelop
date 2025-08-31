@@ -8,6 +8,7 @@ import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
+  type InstancesOutsideEditorChanges,
 } from './BaseEditor';
 import ExternalPropertiesDialog, {
   type ExternalProperties,
@@ -108,6 +109,10 @@ export class ExternalEventsEditorContainer extends React.Component<
   }
 
   switchInGameEditorIfNoHotReloadIsNeeded() {}
+
+  onInstancesModifiedOutsideEditor(changes: InstancesOutsideEditorChanges) {
+    // No thing to be done.
+  }
 
   getExternalEvents(): ?gdExternalEvents {
     const { project, projectItemName } = this.props;

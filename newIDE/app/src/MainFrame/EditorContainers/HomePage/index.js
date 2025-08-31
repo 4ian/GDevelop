@@ -5,6 +5,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import {
   type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
+  type InstancesOutsideEditorChanges,
 } from '../BaseEditor';
 import {
   type FileMetadataAndStorageProviderName,
@@ -188,6 +189,9 @@ export type HomePageEditorInterface = {|
   ) => void,
   hotReloadInGameEditorIfNeeded: (hotReloadSteps: HotReloadSteps) => void,
   switchInGameEditorIfNoHotReloadIsNeeded: () => void,
+  onInstancesModifiedOutsideEditor: (
+    changes: InstancesOutsideEditorChanges
+  ) => void,
 |};
 
 export const HomePage = React.memo<Props>(
@@ -481,6 +485,7 @@ export const HomePage = React.memo<Props>(
         onSceneEventsModifiedOutsideEditor: noop,
         hotReloadInGameEditorIfNeeded: setEditorHotReloadNeeded,
         switchInGameEditorIfNoHotReloadIsNeeded: noop,
+        onInstancesModifiedOutsideEditor: noop,
       }));
 
       // As the homepage is never unmounted, we need to ensure the games platform

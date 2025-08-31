@@ -21,7 +21,11 @@ module.exports = {
       .setExtensionInformation(
         'Physics3D',
         _('3D physics engine'),
-        "The 3D physics engine simulates realistic object physics, with gravity, forces, collisions, joints, etc. It's perfect for almost all 3D games.",
+        "The 3D physics engine simulates realistic object physics, with gravity, forces, collisions, joints, etc. It's perfect for almost all 3D games.\n" +
+          '\n' +
+          'Objects like floors or wall objects should usually be set to "Static" as type. Objects that should be moveable are usually "Dynamic" (default). "Kinematic" objects (typically, players or controlled characters) are only moved by their "linear velocity" and "angular velocity" - they can interact with other objects but only these other objects will move.\n' +
+          '\n' +
+          'Forces (and impulses) are expressed in all conditions/expressions/actions of the 3D physics engine in Newtons (N). Typical values for a force are 10-200 N. One meter is 100 pixels by default in the game (check the world scale). Mass is expressed in kilograms (kg).',
         'Florian Rival',
         'MIT'
       )
@@ -2043,7 +2047,12 @@ module.exports = {
           'PhysicsCharacter3D',
           _('3D physics character'),
           'PhysicsCharacter3D',
-          _('Jump and run on platforms.'),
+          _(
+            'Allow an object to jump and run on platforms that have the 3D physics behavior' +
+              '(and which are generally set to "Static" as type, unless the platform is animated/moved in events).\n' +
+              '\n' +
+              'This behavior is usually used with one or more "mapper" behavior to let the player move it.'
+          ),
           '',
           'JsPlatform/Extensions/physics_character3d.svg',
           'PhysicsCharacter3D',
@@ -2612,7 +2621,7 @@ module.exports = {
           'JumpSustainTime',
           _('Jump sustain time'),
           _(
-            'the jump sustain time of an object. This is the time during which keeping the jump button held allow the initial jump speed to be maintained.'
+            'the jump sustain time of an object. This is the time during which keeping the jump button held allow the initial jump speed to be maintained'
           ),
           _('the jump sustain time'),
           _('Character configuration'),
@@ -3300,7 +3309,11 @@ module.exports = {
           'PhysicsCar3D',
           _('3D physics car'),
           'PhysicsCar3D',
-          _('Simulate a realistic car using the 3D physics engine.'),
+          _(
+            "Simulate a realistic car using the 3D physics engine. This is mostly useful for the car controlled by the player (it's usually too complex for other cars in a game).\n" +
+              '\n' +
+              'This behavior is usually used with one or more "mapper" behavior to let the player move it.'
+          ),
           '',
           'JsPlatform/Extensions/physics_car3d.svg',
           'PhysicsCar3D',

@@ -13,6 +13,7 @@ import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
+  type InstancesOutsideEditorChanges,
 } from './BaseEditor';
 import ExternalPropertiesDialog, {
   type ExternalProperties,
@@ -204,6 +205,16 @@ export class ExternalLayoutEditorContainer extends React.Component<
 
   onSceneEventsModifiedOutsideEditor(changes: SceneEventsOutsideEditorChanges) {
     // No thing to be done.
+  }
+
+  onInstancesModifiedOutsideEditor(changes: InstancesOutsideEditorChanges) {
+    if (changes.scene !== this.getLayout()) {
+      return;
+    }
+
+    if (this.editor) {
+      this.editor.onInstancesModifiedOutsideEditor();
+    }
   }
 
   getExternalLayout(): ?gdExternalLayout {

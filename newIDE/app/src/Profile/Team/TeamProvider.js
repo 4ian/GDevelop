@@ -20,6 +20,8 @@ import {
   changeTeamMemberPassword,
   activateTeamMembers,
   setUserAsAdmin,
+  editUser,
+  type EditUserChanges,
 } from '../../Utils/GDevelopServices/User';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { listOtherUserCloudProjects } from '../../Utils/GDevelopServices/Project';
@@ -148,6 +150,18 @@ const TeamProvider = ({ children }: Props) => {
       }
     },
     [team, getAuthorizationHeader, adminUserId]
+  );
+
+  const onEditUser = React.useCallback(
+    async (editedUserId: string, changes: EditUserChanges) => {
+      if (!adminUserId) return;
+      await editUser(getAuthorizationHeader, {
+        userId: adminUserId,
+        editedUserId,
+        changes,
+      });
+    },
+    [getAuthorizationHeader, adminUserId]
   );
 
   const onChangeMemberPassword = React.useCallback(
@@ -357,6 +371,7 @@ const TeamProvider = ({ children }: Props) => {
         admins,
         members,
         memberships,
+        onEditUser,
         onChangeGroupName,
         onChangeUserGroup,
         onListUserProjects,

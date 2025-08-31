@@ -33,9 +33,6 @@ Images resources, GDJS Runtime, extensions will be copied in resources, and [lib
 
 You can run the standalone app with Electron. **Make sure that you've launched `npm start` (or `yarn start`) in the `app` folder before** (see above) and **keep it running** (in development, the app is served from a local server, even for the standalone app).
 
-> Note for Windows: With **Node.js 14 or older**, there is an error related to `git-sh-setup` when running npm install.
-> To solve this problem: add [this folder to your path environment variable](https://stackoverflow.com/questions/49256190/how-to-fix-git-sh-setup-file-not-found-in-windows) **OR** run `npm install` in newIDE/electron-app/app **before** npm install in newIDE/electron-app.
-
 ```bash
 cd newIDE/app && npm start # Be sure to have this running in another terminal, before the rest!
 
@@ -81,17 +78,11 @@ It's pretty easy to create new themes. Check the [README about themes](./README-
 
 ### Development of the game engine or extensions
 
-Make sure to have the standalone app running with Electron.
+- If you want to create/modify _extensions_, check the [README about extensions](./README-extensions.md) for step-by-step explanations to get started in 5 minutes.
+- The _game engine core_ ([GDJS](https://github.com/4ian/GDevelop/tree/master/GDJS)) is in [GDJS/Runtime folder](https://github.com/4ian/GDevelop/tree/master/GDJS/Runtime).
 
--   If you want to create/modify _extensions_, check the [README about extensions](./README-extensions.md) for step-by-step explanations to get started in 5 minutes.
-
--   The _game engine core_ ([GDJS](https://github.com/4ian/GDevelop/tree/master/GDJS)) is in [GDJS/Runtime folder](https://github.com/4ian/GDevelop/tree/master/GDJS/Runtime).
-
-If you modify any file while the IDE is running with Electron, a watcher will _automatically import_ your changes (look at the console to be sure).
-
-You can then _launch a preview_ in GDevelop (again, be sure to be using [the standalone app running with Electron](https://github.com/4ian/GDevelop/blob/master/newIDE/README.md#development-of-the-standalone-app) to be sure to have your changes reflected immediately).
-
-> If you deactivated the watcher in preferences, run the `import-GDJS-Runtime.js` script manually (`cd newIDE/app/scripts` then `node import-GDJS-Runtime.js`) after every change, before launching a preview.
+If you modify any file while the editor is running, a watcher will _automatically rebuild_ the engine (look at the console to be sure).
+You can then _launch a preview_ in GDevelop.
 
 ### Recommended tools for development
 

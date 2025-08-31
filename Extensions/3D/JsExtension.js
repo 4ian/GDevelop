@@ -1908,7 +1908,9 @@ module.exports = {
         .addEffect('AmbientLight')
         .setFullName(_('Ambient light'))
         .setDescription(
-          _('A light that illuminates all objects from every direction.')
+          _(
+            'A light that illuminates all objects from every direction. Often used along with a Directional light (though a Hemisphere light can be used instead of an Ambient light).'
+          )
         )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
@@ -1929,7 +1931,11 @@ module.exports = {
       const effect = extension
         .addEffect('DirectionalLight')
         .setFullName(_('Directional light'))
-        .setDescription(_('A very far light source like the sun.'))
+        .setDescription(
+          _(
+            "A very far light source like the sun. This is the light to use for casting shadows for 3D objects (other lights won't emit shadows). Often used along with a Hemisphere light."
+          )
+        )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
         .addIncludeFile('Extensions/3D/DirectionalLight.js');
@@ -2013,7 +2019,7 @@ module.exports = {
         .setFullName(_('Hemisphere light'))
         .setDescription(
           _(
-            'A light that illuminates objects from every direction with a gradient.'
+            'A light that illuminates objects from every direction with a gradient. Often used along with a Directional light.'
           )
         )
         .markAsNotWorkingForObjects()

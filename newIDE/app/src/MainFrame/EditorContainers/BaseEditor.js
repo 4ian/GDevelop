@@ -37,6 +37,10 @@ export type SceneEventsOutsideEditorChanges = {|
   newOrChangedAiGeneratedEventIds: Set<string>,
 |};
 
+export type InstancesOutsideEditorChanges = {|
+  scene: gdLayout,
+|};
+
 export type RenderEditorContainerProps = {|
   isActive: boolean,
   gameEditorMode: 'embedded-game' | 'instances-editor',
@@ -185,11 +189,14 @@ export type RenderEditorContainerProps = {|
   onSceneObjectsDeleted: (scene: gdLayout) => void,
   triggerHotReloadInGameEditorIfNeeded: () => void,
 
+  onInstancesModifiedOutsideEditor: (
+    changes: InstancesOutsideEditorChanges
+  ) => void,
+
   // Events editing
   onSceneEventsModifiedOutsideEditor: (
     changes: SceneEventsOutsideEditorChanges
   ) => void,
-
   onExtractAsExternalLayout: (name: string) => void,
   onExtractAsEventBasedObject: (
     extensionName: string,

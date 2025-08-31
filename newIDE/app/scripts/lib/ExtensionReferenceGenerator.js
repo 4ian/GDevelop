@@ -632,6 +632,56 @@ const generateExtensionRawText = (
         ...expressionsReferenceTexts,
       ];
     }),
+    { text: '' },
+    ...extension
+      .getExtensionEffectTypes()
+      .toJSArray()
+      .map(
+        /**
+         * @param {string} effectType
+         * @returns {RawText}
+         */
+        effectType => {
+          const effectMetadata = extension.getEffectMetadata(effectType);
+          const properties = effectMetadata.getProperties();
+          const propertyNames = properties.keys().toJSArray();
+
+          return {
+            text: [
+              `### Effect "${effectMetadata.getFullName()}"`,
+              '',
+              `${effectMetadata.getDescription().replace(/\n/g, '  ')}`,
+              '',
+              ...[
+                effectMetadata.isMarkedAsUnique()
+                  ? 'This effect can be added only once on a layer.'
+                  : null,
+                effectMetadata.isMarkedAsOnlyWorkingFor2D()
+                  ? effectMetadata.isMarkedAsNotWorkingForObjects()
+                    ? 'This effect is for 2D layers only.'
+                    : 'This effect is for 2D layers or objects only.'
+                  : null,
+                effectMetadata.isMarkedAsOnlyWorkingFor3D()
+                  ? 'This effect is for 3D layers only.'
+                  : null,
+              ].filter(Boolean),
+              '',
+              `Properties of this effect are:`,
+              '',
+              ...propertyNames.map(propertyName => {
+                const propertyMetadata = properties.get(propertyName);
+                return [
+                  propertyMetadata.getDescription()
+                    ? `- **${propertyMetadata.getLabel()}**: ${propertyMetadata.getDescription()}.`
+                    : `- **${propertyMetadata.getLabel()}**.`,
+                  `Default value is \`${propertyMetadata.getValue()}\`. For events, write: \`"${propertyName}"\`.`,
+                ].join(' ');
+              }),
+              '',
+            ].join(`\n`),
+          };
+        }
+      ),
     generateExtensionFooterText({ extension }),
   ].filter(Boolean);
 };

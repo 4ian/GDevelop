@@ -29,6 +29,7 @@ export type FlatButtonProps = {|
     +color?: string,
     +borderColor?: string,
   |},
+  size?: 'medium' | 'large',
   target?: '_blank',
   id?: ?string,
 |};
@@ -45,6 +46,7 @@ const FlatButton = React.forwardRef<FlatButtonProps, ButtonInterface>(
       rightIcon,
       keyboardFocused,
       disabled,
+      size,
       id,
       ...otherProps
     }: FlatButtonProps,
@@ -59,7 +61,7 @@ const FlatButton = React.forwardRef<FlatButtonProps, ButtonInterface>(
     return (
       <Button
         variant="outlined"
-        size="small"
+        size={size || 'small'}
         color={primary ? 'secondary' : 'default'}
         autoFocus={keyboardFocused}
         focusRipple={focusRipple}

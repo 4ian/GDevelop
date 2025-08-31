@@ -21,7 +21,11 @@ module.exports = {
       .setExtensionInformation(
         'Physics2',
         _('2D Physics Engine'),
-        "The 2D physics engine simulates realistic object physics, with gravity, forces, collisions, joints, etc. It's perfect for 2D games that need to have realistic behaving objects and a gameplay centered around it.",
+        "The 2D physics engine simulates realistic object physics, with gravity, forces, collisions, joints, etc. It's perfect for 2D games that need to have realistic behaving objects and a gameplay centered around it.\n" +
+          '\n' +
+          'Objects like floors or wall objects should usually be set to "Static" as type. Objects that should be moveable are usually "Dynamic" (default). "Kinematic" objects (typically, players or controlled characters) are only moved by their "linear velocity" and "angular velocity" - they can interact with other objects but only these other objects will move.\n' +
+          '\n' +
+          'Forces (and impulses) are expressed in all conditions/expressions/actions of the 2D physics engine in Newtons (N). Typical values for a force are 10-200 N. One meter is 100 pixels by default in the game (check the world scale). Mass is expressed in kilograms (kg).',
         'Florian Rival, Franco Maciel',
         'MIT'
       )

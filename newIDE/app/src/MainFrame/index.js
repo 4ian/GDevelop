@@ -59,6 +59,7 @@ import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEdit
 import {
   type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
+  type InstancesOutsideEditorChanges,
 } from './EditorContainers/BaseEditor';
 import { type Exporter } from '../ExportAndShare/ShareDialog';
 import ResourcesLoader from '../ResourcesLoader/index';
@@ -2735,6 +2736,18 @@ const MainFrame = (props: Props) => {
     [state.editorTabs]
   );
 
+  const onInstancesModifiedOutsideEditor = React.useCallback(
+    (changes: InstancesOutsideEditorChanges) => {
+      for (const editor of getAllEditorTabs(state.editorTabs)) {
+        const { editorRef } = editor;
+        if (editorRef) {
+          editorRef.onInstancesModifiedOutsideEditor(changes);
+        }
+      }
+    },
+    [state.editorTabs]
+  );
+
   const _onProjectItemModified = () => {
     triggerUnsavedChanges();
     forceUpdate();
@@ -4208,6 +4221,7 @@ const MainFrame = (props: Props) => {
     onSceneObjectEdited: onSceneObjectEdited,
     onSceneObjectsDeleted: onSceneObjectsDeleted,
     onSceneEventsModifiedOutsideEditor: onSceneEventsModifiedOutsideEditor,
+    onInstancesModifiedOutsideEditor: onInstancesModifiedOutsideEditor,
     onExtensionInstalled: onExtensionInstalled,
     onEffectAdded: onEffectAdded,
     onObjectListsModified: onObjectListsModified,

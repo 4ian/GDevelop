@@ -56,6 +56,7 @@ import { selectMessageByLocale } from '../../../../../Utils/i18n/MessageByLocale
 import TextButton from '../../../../../UI/TextButton';
 import Chip from '../../../../../UI/Chip';
 import { SubscriptionSuggestionContext } from '../../../../../Profile/Subscription/SubscriptionSuggestionContext';
+import { type EditUserChanges } from '../../../../../Utils/GDevelopServices/User';
 
 const styles = {
   selectedMembersControlsContainer: {
@@ -324,6 +325,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
     onActivateMembers,
     onSetAdmin,
     onRefreshAdmins,
+    onEditUser,
   } = React.useContext(TeamContext);
 
   React.useEffect(
@@ -335,6 +337,20 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
       })();
     },
     [credentialsCopySuccess]
+  );
+
+  const onEditTeamMember = React.useCallback(
+    async ({
+      editedUserId,
+      changes,
+    }: {|
+      editedUserId: string,
+      changes: EditUserChanges,
+    |}) => {
+      await onEditUser(editedUserId, changes);
+      await onRefreshMembers();
+    },
+    [onEditUser, onRefreshMembers]
   );
 
   const onChangeTeamMemberPassword = React.useCallback(
@@ -354,7 +370,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
   const onCopyActiveCredentials = React.useCallback(
     () => {
       if (!members) return;
-      let content = 'Username,Email,Password';
+      let content = 'Username,Full Name,Email,Password';
       let membersToConsider = [];
       if (selectedUserIds.length === 0) {
         membersToConsider = members.filter(member => !member.deactivatedAt);
@@ -364,7 +380,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
         );
       }
       membersToConsider.forEach(member => {
-        content += `\n${member.username || ''},${
+        content += `\n${member.username || ''},${member.fullName || ''},${
           member.email
         },${member.password || ''}`;
       });
@@ -673,12 +689,13 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
                       <UserLine
                         key={adminUser.id}
                         username={adminUser.username}
+                        fullName={adminUser.fullName}
                         email={adminUser.email}
                         level={null}
                         onDelete={() => onRemoveAdmin(adminUser.email)}
                         disabled={
                           (profile && adminUser.id === profile.id) ||
-                          (adminEmailBeingRemoved &&
+                          (!!adminEmailBeingRemoved &&
                             adminEmailBeingRemoved === adminUser.email)
                         }
                       />
@@ -822,10 +839,10 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
                               size="small"
                               tooltip={
                                 selectedUserIds.length === 0
-                                  ? t`Copy active credentials`
+                                  ? t`Copy active credentials to CSV`
                                   : t`Copy ${
                                       selectedUserIds.length
-                                    } credentials`
+                                    } credentials to CSV`
                               }
                               disabled={
                                 hasNoActiveTeamMembers &&
@@ -847,12 +864,12 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
                     <Column>
                       {!isMobile && (
                         <GridList cols={2} cellHeight={'auto'}>
-                          <Grid item xs={5}>
+                          <Grid item xs={9}>
                             <Text style={{ opacity: 0.7 }}>
                               <Trans>Student</Trans>
                             </Text>
                           </Grid>
-                          <Grid item xs={7}>
+                          <Grid item xs={3}>
                             <Text style={{ opacity: 0.7 }}>
                               <Trans>Password</Trans>
                             </Text>
@@ -885,6 +902,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
                                       onChangePassword={
                                         onChangeTeamMemberPassword
                                       }
+                                      onEdit={onEditTeamMember}
                                       isSelected={selectedUserIds.includes(
                                         member.id
                                       )}
@@ -966,6 +984,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
                                       onChangePassword={
                                         onChangeTeamMemberPassword
                                       }
+                                      onEdit={onEditTeamMember}
                                       isSelected={selectedUserIds.includes(
                                         member.id
                                       )}

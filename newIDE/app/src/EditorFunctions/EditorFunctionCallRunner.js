@@ -10,6 +10,7 @@ import {
   type AssetSearchAndInstallOptions,
   type AssetSearchAndInstallResult,
   type SceneEventsOutsideEditorChanges,
+  type InstancesOutsideEditorChanges,
 } from '.';
 
 export type EditorFunctionCallResult =
@@ -39,6 +40,9 @@ export type ProcessEditorFunctionCallsOptions = {|
   onSceneEventsModifiedOutsideEditor: (
     changes: SceneEventsOutsideEditorChanges
   ) => void,
+  onInstancesModifiedOutsideEditor: (
+    changes: InstancesOutsideEditorChanges
+  ) => void,
   ensureExtensionInstalled: (options: {|
     extensionName: string,
   |}) => Promise<void>,
@@ -53,6 +57,7 @@ export const processEditorFunctionCalls = async ({
   editorCallbacks,
   generateEvents,
   onSceneEventsModifiedOutsideEditor,
+  onInstancesModifiedOutsideEditor,
   ignore,
   ensureExtensionInstalled,
   searchAndInstallAsset,
@@ -136,6 +141,7 @@ export const processEditorFunctionCalls = async ({
           args,
           generateEvents,
           onSceneEventsModifiedOutsideEditor,
+          onInstancesModifiedOutsideEditor,
           ensureExtensionInstalled,
           searchAndInstallAsset,
         }

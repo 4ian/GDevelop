@@ -596,10 +596,7 @@ const PrivateGameTemplateInformationPage = ({
                       />
                       <Spacer />
                       {!isAlreadyReceived ? (
-                        <>
-                          {!shouldUseOrSimulateAppStoreProduct && (
-                            <SecureCheckout />
-                          )}
+                        <ColumnStackLayout noMargin>
                           {!errorText && (
                             <PurchaseProductButtons
                               i18n={i18n}
@@ -614,7 +611,10 @@ const PrivateGameTemplateInformationPage = ({
                               onClickBuyWithCredits={onWillBuyWithCredits}
                             />
                           )}
-                        </>
+                          {!shouldUseOrSimulateAppStoreProduct && (
+                            <SecureCheckout />
+                          )}
+                        </ColumnStackLayout>
                       ) : onCreateWithGameTemplate ? (
                         <OpenProductButton
                           productListingData={privateGameTemplateListingData}

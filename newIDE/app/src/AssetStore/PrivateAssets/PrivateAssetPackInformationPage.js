@@ -736,10 +736,7 @@ const PrivateAssetPackInformationPage = ({
                           label={<Trans>Browse assets</Trans>}
                         />
                       ) : (
-                        <>
-                          {!shouldUseOrSimulateAppStoreProduct && (
-                            <SecureCheckout />
-                          )}
+                        <ColumnStackLayout noMargin>
                           {!errorText && (
                             <PurchaseProductButtons
                               i18n={i18n}
@@ -752,7 +749,10 @@ const PrivateAssetPackInformationPage = ({
                               onClickBuyWithCredits={onWillBuyWithCredits}
                             />
                           )}
-                        </>
+                          {!shouldUseOrSimulateAppStoreProduct && (
+                            <SecureCheckout />
+                          )}
+                        </ColumnStackLayout>
                       )}
                     </ColumnStackLayout>
                   </div>

@@ -1,52 +1,23 @@
 // @flow
 import React from 'react';
 import { LineStackLayout } from '../../UI/Layout';
-import Visa from '../../UI/CustomSvgIcons/Visa';
-import MasterCard from '../../UI/CustomSvgIcons/MasterCard';
-import Paypal from '../../UI/CustomSvgIcons/Paypal';
 import Text from '../../UI/Text';
 import { Trans } from '@lingui/macro';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-
-const styles = {
-  logoContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: '4px 8px',
-    borderRadius: 8,
-  },
-};
-
-const LogoContainer = ({ children }) => {
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  return (
-    <div
-      style={{
-        ...styles.logoContainer,
-        background: gdevelopTheme.palette.secondary,
-      }}
-    >
-      {children}
-    </div>
-  );
-};
+import ShieldChecked from '../../UI/CustomSvgIcons/ShieldChecked';
 
 const SecureCheckout = () => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
-    <LineStackLayout>
-      <Text>
-        <Trans>Secure Checkout:</Trans>
+    <LineStackLayout noMargin alignItems="center">
+      <ShieldChecked style={{ color: gdevelopTheme.message.valid }} />
+      <Text color="secondary">
+        <Trans>Paypal secure</Trans>
       </Text>
-      <LogoContainer>
-        <Paypal />
-      </LogoContainer>
-      <LogoContainer>
-        <Visa />
-      </LogoContainer>
-      <LogoContainer>
-        <MasterCard />
-      </LogoContainer>
+      <ShieldChecked style={{ color: gdevelopTheme.message.valid }} />
+      <Text color="secondary">
+        <Trans>Stripe secure</Trans>
+      </Text>
     </LineStackLayout>
   );
 };

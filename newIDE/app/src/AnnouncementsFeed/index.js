@@ -65,7 +65,7 @@ export const AnnouncementsFeed = ({
 
   const classesForClickableContainer = useStylesForClickableContainer();
 
-  if (error) {
+  if (error && !hideLoader) {
     return (
       <PlaceholderError onRetry={fetchAnnouncementsAndPromotions}>
         <Trans>

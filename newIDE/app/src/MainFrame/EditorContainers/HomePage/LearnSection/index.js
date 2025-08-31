@@ -26,7 +26,7 @@ import CoursesPage from './CoursesPage';
 import { type LearnCategory } from './Utils';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
-import BundlePage from './BundlePage';
+import BundlePage from './BundlePage/BundlePage';
 import RouterContext from '../../../RouterContext';
 import {
   sendBundleInformationOpened,

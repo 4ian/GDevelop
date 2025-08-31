@@ -35,6 +35,7 @@ export type Profile = {|
   donateLink: ?string,
   discordUsername: ?string,
   githubUsername?: ?string,
+  fullName?: ?string,
   communityLinks?: CommunityLinks,
   survey?: UserSurvey,
 
@@ -61,31 +62,6 @@ export type RegisterForm = {|
   username: string,
   getNewsletterEmail: boolean,
 |};
-
-export type EditForm = {|
-  +username: string,
-  +description: string,
-  +getGameStatsEmail: boolean,
-  +getNewsletterEmail: boolean,
-  +donateLink: string,
-  +discordUsername: string,
-  +githubUsername: string,
-  +communityLinks: CommunityLinks,
-|};
-
-export type PatchUserPayload = {
-  +username?: string,
-  +description?: string,
-  +getGameStatsEmail?: boolean,
-  +getNewsletterEmail?: boolean,
-  +appLanguage?: string,
-  +isCreator?: boolean,
-  +donateLink?: string,
-  +discordUsername?: string,
-  +githubUsername?: string,
-  +communityLinks?: CommunityLinks,
-  +survey?: UserSurvey,
-};
 
 export type ChangeEmailForm = {|
   email: string,
@@ -384,60 +360,6 @@ export default class Authentication {
       .then(response => response.data)
       .catch(error => {
         console.error('Error while fetching user:', error);
-        throw error;
-      });
-  };
-
-  editUserProfile = async (
-    getAuthorizationHeader: () => Promise<string>,
-    {
-      username,
-      description,
-      getGameStatsEmail,
-      getNewsletterEmail,
-      appLanguage,
-      isCreator,
-      donateLink,
-      discordUsername,
-      githubUsername,
-      communityLinks,
-      survey,
-    }: PatchUserPayload
-  ) => {
-    const { currentUser } = this.auth;
-    if (!currentUser)
-      throw new Error('Tried to edit user profile while not authenticated.');
-
-    return getAuthorizationHeader()
-      .then(authorizationHeader => {
-        return axios.patch(
-          `${GDevelopUserApi.baseUrl}/user/${currentUser.uid}`,
-          {
-            username,
-            description,
-            getGameStatsEmail,
-            getNewsletterEmail,
-            appLanguage,
-            isCreator,
-            donateLink,
-            discordUsername,
-            githubUsername,
-            communityLinks,
-            survey,
-          },
-          {
-            params: {
-              userId: currentUser.uid,
-            },
-            headers: {
-              Authorization: authorizationHeader,
-            },
-          }
-        );
-      })
-      .then(response => response.data)
-      .catch(error => {
-        console.error('Error while editing user:', error);
         throw error;
       });
   };

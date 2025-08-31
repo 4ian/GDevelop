@@ -17,6 +17,7 @@ import { Trans } from '@lingui/macro';
 import Link from '../UI/Link';
 import {
   hexNumberToRGBArray,
+  rgbColorToHex,
   rgbOrHexToHexNumber,
 } from '../Utils/ColorTransformer';
 import { type SimplifiedBehavior } from './SimplifiedProject/SimplifiedProject';
@@ -55,18 +56,24 @@ export type EditorFunctionCallResult =
 export type EditorFunctionGenericOutput = {|
   success: boolean,
   message?: string,
-  eventsForSceneNamed?: string,
   eventsAsText?: string,
-  instancesForSceneNamed?: string,
   objectName?: string,
   behaviorName?: string,
   properties?: any,
   sharedProperties?: any,
   instances?: any,
+  layers?: any,
   behaviors?: Array<SimplifiedBehavior>,
   animationNames?: string,
   generatedEventsErrorDiagnostics?: string,
   aiGeneratedEventId?: string,
+  warnings?: string,
+
+  // Used for de-duplication of outputs:
+  eventsForSceneNamed?: string,
+  instancesForSceneNamed?: string,
+  propertiesLayersEffectsForSceneNamed?: string,
+  objectPropertiesDeduplicationKey?: string,
 |};
 
 export type EventsGenerationResult =
@@ -123,6 +130,10 @@ export type SceneEventsOutsideEditorChanges = {|
   newOrChangedAiGeneratedEventIds: Set<string>,
 |};
 
+export type InstancesOutsideEditorChanges = {|
+  scene: gdLayout,
+|};
+
 /**
  * A function that does something in the editor on the given project.
  */
@@ -145,6 +156,9 @@ export type EditorFunction = {|
     ) => Promise<EventsGenerationResult>,
     onSceneEventsModifiedOutsideEditor: (
       changes: SceneEventsOutsideEditorChanges
+    ) => void,
+    onInstancesModifiedOutsideEditor: (
+      changes: InstancesOutsideEditorChanges
     ) => void,
     ensureExtensionInstalled: (options: {|
       extensionName: string,
@@ -550,6 +564,9 @@ const inspectObjectProperties: EditorFunction = {
       objectName: object_name,
       properties,
       behaviors,
+      objectPropertiesDeduplicationKey: [scene_name, object_name]
+        .filter(Boolean)
+        .join('-'),
     };
     if (animationNames.length > 0) {
       output.animationNames = animationNames.join(', ');
@@ -1225,7 +1242,7 @@ const describeInstances: EditorFunction = {
           instances.push({
             ...serializedInstance,
             // Replace persistentUuid by id:
-            persistentUuid: instance.getPersistentUuid(),
+            persistentUuid: undefined,
             id: instance.getPersistentUuid().slice(0, 10),
             // For now, don't expose these:
             initialVariables: undefined,
@@ -1420,20 +1437,22 @@ const put2dInstances: EditorFunction = {
 
       // Iterate on existing instances and remove them, and/or those inside the brush radius.
       const instancesToDelete = new Set();
+      const notFoundExistingInstanceIds = new Set<string>(existingInstanceIds);
 
       iterateOnInstances(initialInstances, instance => {
-        if (instance.getLayer() !== layer_name) return;
         if (instance.getObjectName() !== object_name) return;
-        if (
-          existingInstanceIds.some(id =>
-            instance.getPersistentUuid().startsWith(id)
-          )
-        ) {
+
+        const foundExistingInstanceId = existingInstanceIds.find(id =>
+          instance.getPersistentUuid().startsWith(id)
+        );
+        if (foundExistingInstanceId) {
           instancesToDelete.add(instance);
+          notFoundExistingInstanceIds.delete(foundExistingInstanceId);
           return;
         }
 
         if (!brushPosition) return;
+        if (instance.getLayer() !== layer_name) return; // Layer must be the same as specified when deleting instances with a brush.
 
         if (brushSize === 0) {
           if (
@@ -1460,9 +1479,19 @@ const put2dInstances: EditorFunction = {
       });
 
       return makeGenericSuccess(
-        `Erased ${instancesToDelete.size} instance${
-          instancesToDelete.size > 1 ? 's' : ''
-        } of object "${object_name}" on layer "${layer_name || 'base'}"`
+        [
+          `Erased ${instancesToDelete.size} instance${
+            instancesToDelete.size > 1 ? 's' : ''
+          } of object "${object_name}" on layer "${layer_name || 'base'}".`,
+          notFoundExistingInstanceIds.size > 0
+            ? `Could not find these instances to erase:
+        ${Array.from(notFoundExistingInstanceIds).join(
+          ', '
+        )}. Verify the ids and layer names are ALWAYS exact and correct.`
+            : '',
+        ]
+          .filter(Boolean)
+          .join(' ')
       );
     } else {
       const brushPosition: Array<number> = brush_position
@@ -1490,19 +1519,49 @@ const put2dInstances: EditorFunction = {
           rowCount && columnCount ? rowCount * columnCount : 1;
       }
 
+      // Track changes for detailed success message
+      const changes = [];
+
+      // Store original states of existing instances for comparison
+      const existingInstanceStates = new Map();
+      const notFoundExistingInstanceIds = new Set<string>(existingInstanceIds);
+
       // Create the array of existing instances to move/modify, and new instances to create.
       const modifiedAndCreatedInstances: Array<gdInitialInstance> = [];
       iterateOnInstances(initialInstances, instance => {
-        if (instance.getLayer() !== layer_name) return;
         if (instance.getObjectName() !== object_name) return;
-        if (
-          existingInstanceIds.some(id =>
-            instance.getPersistentUuid().startsWith(id)
-          )
-        ) {
+
+        const foundExistingInstanceId = existingInstanceIds.find(id =>
+          instance.getPersistentUuid().startsWith(id)
+        );
+
+        if (foundExistingInstanceId) {
+          notFoundExistingInstanceIds.delete(foundExistingInstanceId);
+
+          // Store original state before modifications
+          existingInstanceStates.set(instance, {
+            originalLayer: instance.getLayer(),
+            originalX: instance.getX(),
+            originalY: instance.getY(),
+            originalZOrder: instance.getZOrder(),
+            originalRotation: instance.getAngle(),
+            originalOpacity: instance.getOpacity(),
+            originalCustomWidth: instance.hasCustomSize()
+              ? instance.getCustomWidth()
+              : null,
+            originalCustomHeight: instance.hasCustomSize()
+              ? instance.getCustomHeight()
+              : null,
+          });
+
           modifiedAndCreatedInstances.push(instance);
+          // Take the opportunity to move to a new layer if specified.
+          if (instance.getLayer() !== layer_name) {
+            instance.setLayer(layer_name);
+          }
         }
       });
+
       for (let i = 0; i < newInstancesCount; i++) {
         const instance = initialInstances.insertNewInitialInstance();
         instance.setObjectName(object_name);
@@ -1563,19 +1622,20 @@ const put2dInstances: EditorFunction = {
             brushPosition[1] + randomRadius * Math.sin(randomAngle)
           );
         });
-      } else {
-        if (brush_kind !== 'point') {
-          console.warn(
-            'Unknown brush kind: ' +
-              brush_kind +
-              " - assuming it's point brush instead."
-          );
-        }
-
+      } else if (brush_kind === 'point') {
         modifiedAndCreatedInstances.forEach(instance => {
           instance.setX(brushPosition[0]);
           instance.setY(brushPosition[1]);
         });
+      } else {
+        if (brush_kind !== 'none') {
+          console.warn(
+            `Unknown brush kind: ${brush_kind} - assuming it's "none" instead.`
+          );
+          changes.push(
+            'The brush kind is unknown and was considered to be "none" instead.'
+          );
+        }
       }
 
       const instancesSize = instances_size
@@ -1607,13 +1667,126 @@ const put2dInstances: EditorFunction = {
         }
       });
 
-      return makeGenericSuccess(
-        `Added ${newInstancesCount} instance${
-          newInstancesCount > 1 ? 's' : ''
-        } of object "${object_name}" using ${brush_kind} brush at ${brushPosition.join(
-          ', '
-        )} on layer "${layer_name || 'base'}"`
-      );
+      // Track specific changes that were made
+      if (newInstancesCount > 0) {
+        changes.push(
+          `Created ${newInstancesCount} new instance${
+            newInstancesCount > 1 ? 's' : ''
+          } of object "${object_name}" using ${brush_kind} brush at ${brushPosition.join(
+            ', '
+          )} on layer "${layer_name || 'base'}".`
+        );
+      }
+
+      // Check what changed for existing instances
+      let movedToLayerCount = 0;
+      let movedPositionCount = 0;
+      let resizedCount = 0;
+      let rotatedCount = 0;
+      let opacityChangedCount = 0;
+      let zOrderChangedCount = 0;
+
+      existingInstanceStates.forEach((originalState, instance) => {
+        if (originalState.originalLayer !== instance.getLayer()) {
+          movedToLayerCount++;
+        }
+        if (
+          originalState.originalX !== instance.getX() ||
+          originalState.originalY !== instance.getY()
+        ) {
+          movedPositionCount++;
+        }
+        if (
+          instancesSize &&
+          (originalState.originalCustomWidth !== instance.getCustomWidth() ||
+            originalState.originalCustomHeight !== instance.getCustomHeight())
+        ) {
+          resizedCount++;
+        }
+        if (
+          instancesRotation !== null &&
+          originalState.originalRotation !== instance.getAngle()
+        ) {
+          rotatedCount++;
+        }
+        if (
+          instancesOpacity !== null &&
+          originalState.originalOpacity !== instance.getOpacity()
+        ) {
+          opacityChangedCount++;
+        }
+        if (
+          instances_z_order !== null &&
+          originalState.originalZOrder !== instance.getZOrder()
+        ) {
+          zOrderChangedCount++;
+        }
+      });
+
+      if (movedToLayerCount > 0) {
+        changes.push(
+          `Moved ${movedToLayerCount} instance${
+            movedToLayerCount > 1 ? 's' : ''
+          } to layer "${layer_name || 'base'}".`
+        );
+      }
+
+      if (movedPositionCount > 0) {
+        changes.push(
+          `Repositioned ${movedPositionCount} instance${
+            movedPositionCount > 1 ? 's' : ''
+          } using ${brush_kind} brush.`
+        );
+      }
+
+      if (resizedCount > 0 && instancesSize) {
+        changes.push(
+          `Resized ${resizedCount} instance${resizedCount > 1 ? 's' : ''} to ${
+            instancesSize[0]
+          }x${instancesSize[1]}.`
+        );
+      }
+
+      if (rotatedCount > 0 && instancesRotation !== null) {
+        changes.push(
+          `Rotated ${rotatedCount} instance${
+            rotatedCount > 1 ? 's' : ''
+          } to ${instancesRotation}°.`
+        );
+      }
+
+      if (opacityChangedCount > 0 && instancesOpacity !== null) {
+        changes.push(
+          `Changed opacity of ${opacityChangedCount} instance${
+            opacityChangedCount > 1 ? 's' : ''
+          } to ${instancesOpacity}.`
+        );
+      }
+
+      if (zOrderChangedCount > 0 && instances_z_order !== null) {
+        changes.push(
+          `Changed Z-order of ${zOrderChangedCount} instance${
+            zOrderChangedCount > 1 ? 's' : ''
+          } to ${instances_z_order}.`
+        );
+      }
+
+      if (notFoundExistingInstanceIds.size > 0) {
+        changes.push(
+          `Could not find these existing instance ids to modify:
+          ${Array.from(notFoundExistingInstanceIds).join(
+            ', '
+          )}. Verify the ids and layer names are ALWAYS exact and correct.`
+        );
+      }
+
+      if (changes.length === 0) {
+        return makeGenericSuccess(
+          'No changes were made to instances. Please specify a brush kind, position and number of instances to create, or specify the exact ids of the instances to manipulate.'
+        );
+      }
+
+      return makeGenericSuccess(changes.join(' '));
     }
   },
 };
@@ -1778,20 +1951,22 @@ const put3dInstances: EditorFunction = {
 
       // Iterate on existing instances and remove them, and/or those inside the brush radius.
       const instancesToDelete = new Set();
+      const notFoundExistingInstanceIds = new Set<string>(existingInstanceIds);
 
       iterateOnInstances(initialInstances, instance => {
-        if (instance.getLayer() !== layer_name) return;
         if (instance.getObjectName() !== object_name) return;
-        if (
-          existingInstanceIds.some(id =>
-            instance.getPersistentUuid().startsWith(id)
-          )
-        ) {
+
+        const foundExistingInstanceId = existingInstanceIds.find(id =>
+          instance.getPersistentUuid().startsWith(id)
+        );
+        if (foundExistingInstanceId) {
           instancesToDelete.add(instance);
+          notFoundExistingInstanceIds.delete(foundExistingInstanceId);
           return;
         }
 
         if (!brushPosition) return;
+        if (instance.getLayer() !== layer_name) return; // Layer must be the same as specified when deleting instances with a brush.
 
         if (brushSize <= 0) {
           if (
@@ -1820,9 +1995,19 @@ const put3dInstances: EditorFunction = {
       });
 
       return makeGenericSuccess(
-        `Erased ${instancesToDelete.size} instance${
-          instancesToDelete.size > 1 ? 's' : ''
-        } of object "${object_name}" on layer "${layer_name || 'base'}"`
+        [
+          `Erased ${instancesToDelete.size} instance${
+            instancesToDelete.size > 1 ? 's' : ''
+          } of object "${object_name}" on layer "${layer_name || 'base'}".`,
+          notFoundExistingInstanceIds.size > 0
+            ? `Could not find these instances to erase:
+        ${Array.from(notFoundExistingInstanceIds).join(
+          ', '
+        )}. Verify the ids and layer names are ALWAYS exact and correct.`
+            : '',
+        ]
+          .filter(Boolean)
+          .join(' ')
       );
     } else {
       const brushPosition: Array<number> = brush_position
@@ -1843,19 +2028,52 @@ const put3dInstances: EditorFunction = {
         newInstancesCount = 1;
       }
 
+      // Track changes for detailed success message
+      const changes = [];
+
+      // Store original states of existing instances for comparison
+      const existingInstanceStates = new Map();
+      const notFoundExistingInstanceIds = new Set<string>(existingInstanceIds);
+
       // Create the array of existing instances to move/modify, and new instances to create.
       const modifiedAndCreatedInstances: Array<gdInitialInstance> = [];
       iterateOnInstances(initialInstances, instance => {
-        if (instance.getLayer() !== layer_name) return;
         if (instance.getObjectName() !== object_name) return;
-        if (
-          existingInstanceIds.some(id =>
-            instance.getPersistentUuid().startsWith(id)
-          )
-        ) {
+
+        const foundExistingInstanceId = existingInstanceIds.find(id =>
+          instance.getPersistentUuid().startsWith(id)
+        );
+        if (foundExistingInstanceId) {
+          notFoundExistingInstanceIds.delete(foundExistingInstanceId);
+
+          // Store original state before modifications
+          existingInstanceStates.set(instance, {
+            originalLayer: instance.getLayer(),
+            originalX: instance.getX(),
+            originalY: instance.getY(),
+            originalZ: instance.getZ(),
+            originalRotationX: instance.getRotationX(),
+            originalRotationY: instance.getRotationY(),
+            originalRotationZ: instance.getAngle(),
+            originalCustomWidth: instance.hasCustomSize()
+              ? instance.getCustomWidth()
+              : null,
+            originalCustomHeight: instance.hasCustomSize()
+              ? instance.getCustomHeight()
+              : null,
+            originalCustomDepth: instance.hasCustomDepth()
+              ? instance.getCustomDepth()
+              : null,
+          });
+
           modifiedAndCreatedInstances.push(instance);
+          // Take the opportunity to move to a new layer if specified.
+          if (instance.getLayer() !== layer_name) {
+            instance.setLayer(layer_name);
+          }
         }
       });
+
       for (let i = 0; i < newInstancesCount; i++) {
         const instance = initialInstances.insertNewInitialInstance();
         instance.setObjectName(object_name);
@@ -1905,15 +2123,7 @@ const put3dInstances: EditorFunction = {
           );
           instance.setZ(brushPosition[2] + randomRadius * Math.cos(randomPhi));
         });
-      } else {
-        if (brush_kind !== 'point') {
-          console.warn(
-            'Unknown brush kind: ' +
-              brush_kind +
-              " - assuming it's point brush instead."
-          );
-        }
-
+      } else if (brush_kind === 'point') {
         modifiedAndCreatedInstances.forEach(instance => {
           if (!brushPosition) return;
 
@@ -1921,6 +2131,15 @@ const put3dInstances: EditorFunction = {
           instance.setY(brushPosition[1]);
           instance.setZ(brushPosition[2]);
         });
+      } else {
+        if (brush_kind !== 'none') {
+          console.warn(
+            `Unknown brush kind: ${brush_kind} - assuming it's "none" instead.`
+          );
+          changes.push(
+            'The brush kind is unknown and was considered to be "none" instead.'
+          );
+        }
       }
 
       const instancesSizeArray = instances_size
@@ -1945,13 +2164,100 @@ const put3dInstances: EditorFunction = {
         }
       });
 
-      return makeGenericSuccess(
-        `Added ${newInstancesCount} instance${
-          newInstancesCount > 1 ? 's' : ''
-        } of object "${object_name}" using ${brush_kind} brush at ${brushPosition.join(
-          ', '
-        )}) on layer "${layer_name || 'base'}"`
-      );
+      // Track specific changes that were made
+      if (newInstancesCount > 0) {
+        changes.push(
+          `Created ${newInstancesCount} new instance${
+            newInstancesCount > 1 ? 's' : ''
+          } of object "${object_name}" using ${brush_kind} brush at ${brushPosition.join(
+            ', '
+          )} on layer "${layer_name || 'base'}".`
+        );
+      }
+
+      // Check what changed for existing instances
+      let movedToLayerCount = 0;
+      let movedPositionCount = 0;
+      let resizedCount = 0;
+      let rotatedCount = 0;
+
+      existingInstanceStates.forEach((originalState, instance) => {
+        if (originalState.originalLayer !== instance.getLayer()) {
+          movedToLayerCount++;
+        }
+        if (
+          originalState.originalX !== instance.getX() ||
+          originalState.originalY !== instance.getY() ||
+          originalState.originalZ !== instance.getZ()
+        ) {
+          movedPositionCount++;
+        }
+        if (
+          instancesSizeArray &&
+          instancesSizeArray.length >= 3 &&
+          (originalState.originalCustomWidth !== instance.getCustomWidth() ||
+            originalState.originalCustomHeight !== instance.getCustomHeight() ||
+            originalState.originalCustomDepth !== instance.getCustomDepth())
+        ) {
+          resizedCount++;
+        }
+        if (
+          instancesRotationArray &&
+          instancesRotationArray.length >= 3 &&
+          (originalState.originalRotationX !== instance.getRotationX() ||
+            originalState.originalRotationY !== instance.getRotationY() ||
+            originalState.originalRotationZ !== instance.getAngle())
+        ) {
+          rotatedCount++;
+        }
+      });
+
+      if (movedToLayerCount > 0) {
+        changes.push(
+          `Moved ${movedToLayerCount} instance${
+            movedToLayerCount > 1 ? 's' : ''
+          } to layer "${layer_name || 'base'}".`
+        );
+      }
+
+      if (movedPositionCount > 0) {
+        changes.push(
+          `Repositioned ${movedPositionCount} instance${
+            movedPositionCount > 1 ? 's' : ''
+          } using ${brush_kind} brush.`
+        );
+      }
+
+      if (resizedCount > 0 && instancesSizeArray) {
+        changes.push(
+          `Resized ${resizedCount} instance${resizedCount > 1 ? 's' : ''} to ${
+            instancesSizeArray[0]
+          }x${instancesSizeArray[1]}x${instancesSizeArray[2]}.`
+        );
+      }
+
+      if (rotatedCount > 0 && instancesRotationArray) {
+        changes.push(
+          `Rotated ${rotatedCount} instance${rotatedCount > 1 ? 's' : ''} to (${
+            instancesRotationArray[0]
+          }°, ${instancesRotationArray[1]}°, ${instancesRotationArray[2]}°).`
+        );
+      }
+
+      if (notFoundExistingInstanceIds.size > 0) {
+        changes.push(
+          `Could not find these existing instance ids to modify:
+          ${Array.from(notFoundExistingInstanceIds).join(
+            ', '
+          )}. Verify the ids and layer names are ALWAYS exact and correct.`
+        );
+      }
+
+      if (changes.length === 0) {
+        return makeGenericSuccess('No changes were made to instances.');
+      }
+
+      return makeGenericSuccess(changes.join(' '));
     }
   },
 };
@@ -2379,7 +2685,7 @@ const createScene: EditorFunction = {
     if (project.hasLayoutNamed(scene_name)) {
       const scene = project.getLayout(scene_name);
       if (include_ui_layer && !scene.hasLayerNamed('UI')) {
-        scene.insertNewLayer('UI', 0);
+        scene.insertNewLayer('UI', scene.getLayersCount());
         addDefaultLightToLayer(scene.getLayer('UI'));
         return makeGenericSuccess(
           `Scene with name "${scene_name}" already exists, no need to re-create it. A layer called "UI" was added to it.`
@@ -2394,7 +2700,7 @@ const createScene: EditorFunction = {
     const scenesCount = project.getLayoutsCount();
     const scene = project.insertNewLayout(scene_name, scenesCount);
     if (include_ui_layer) {
-      scene.insertNewLayer('UI', 0);
+      scene.insertNewLayer('UI', scene.getLayersCount());
     }
     if (background_color) {
       const colorAsRgb = hexNumberToRGBArray(
@@ -2435,6 +2741,581 @@ const deleteScene: EditorFunction = {
     project.removeLayout(scene_name);
 
     return makeGenericSuccess(`Deleted scene "${scene_name}".`);
+  },
+};
+
+const serializeEffectProperties = (
+  effect: gdEffect,
+  effectMetadata: gdEffectMetadata
+) => {
+  const effectProperties = effectMetadata.getProperties();
+  const propertyNames = effectProperties.keys().toJSArray();
+  return propertyNames
+    .map(name => {
+      const propertyDescriptor = effectProperties.get(name);
+      if (shouldHideProperty(propertyDescriptor)) return null;
+
+      // Set the value of the property to what is stored in the effect.
+      // If it's not set, none of these will be set and the "value" will be the default one
+      // serialized by the property descriptor.
+      let value = null;
+      if (effect.hasDoubleParameter(name)) {
+        value = effect.getDoubleParameter(name);
+      } else if (effect.hasStringParameter(name)) {
+        value = effect.getStringParameter(name);
+      } else if (effect.hasBooleanParameter(name)) {
+        value = effect.getBooleanParameter(name);
+      }
+
+      if (value === null) {
+        return serializeNamedProperty(name, propertyDescriptor);
+      }
+
+      return {
+        ...serializeNamedProperty(name, propertyDescriptor),
+        value,
+      };
+    })
+    .filter(Boolean);
+};
+
+const inspectScenePropertiesLayersEffects: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    const scene_name = extractRequiredString(args, 'scene_name');
+
+    return {
+      text: (
+        <Trans>
+          Inspecting scene properties, layers and effects for scene {scene_name}
+          .
+        </Trans>
+      ),
+    };
+  },
+  launchFunction: async ({ project, args }) => {
+    const scene_name = extractRequiredString(args, 'scene_name');
+
+    if (!project.hasLayoutNamed(scene_name)) {
+      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+    }
+
+    const scene = project.getLayout(scene_name);
+    const layersContainer = scene.getLayers();
+
+    return {
+      success: true,
+      propertiesLayersEffectsForSceneNamed: scene.getName(),
+      properties: {
+        backgroundColor: rgbColorToHex(
+          scene.getBackgroundColorRed(),
+          scene.getBackgroundColorGreen(),
+          scene.getBackgroundColorBlue()
+        ),
+        stopSoundsOnStartup: scene.stopSoundsOnStartup(),
+
+        // Also include some project related properties:
+        gameResolutionWidth: project.getGameResolutionWidth(),
+        gameResolutionHeight: project.getGameResolutionHeight(),
+        gameOrientation: project.getOrientation(),
+        gameScaleMode: project.getScaleMode(),
+        gameName: project.getName(),
+      },
+      layers: mapFor(0, layersContainer.getLayersCount(), i => {
+        const layer = layersContainer.getLayerAt(i);
+        const effectsContainer = layer.getEffects();
+        return {
+          name: layer.getName(),
+          position: i,
+          effects: mapFor(0, effectsContainer.getEffectsCount(), j => {
+            const effect = effectsContainer.getEffectAt(j);
+            const effectMetadata = gd.MetadataProvider.getEffectMetadata(
+              project.getCurrentPlatform(),
+              effect.getEffectType()
+            );
+
+            if (gd.MetadataProvider.isBadEffectMetadata(effectMetadata)) {
+              return null;
+            }
+
+            return {
+              effectName: effect.getName(),
+              effectType: effect.getEffectType(),
+              effectProperties: serializeEffectProperties(
+                effect,
+                effectMetadata
+              ),
+            };
+          }).filter(Boolean),
+        };
+      }),
+    };
+  },
+};
+
+const isFuzzyMatch = (string1: string, string2: string) => {
+  const simplifiedString1 = string1.toLowerCase().replace(/\s|_|-/g, '');
+  const simplifiedString2 = string2.toLowerCase().replace(/\s|_|-/g, '');
+
+  return simplifiedString1 === simplifiedString2;
+};
+
+const changeScenePropertiesLayersEffects: EditorFunction = {
+  renderForEditor: ({ args, shouldShowDetails }) => {
+    const scene_name = extractRequiredString(args, 'scene_name');
+
+    const changed_properties = SafeExtractor.extractArrayProperty(
+      args,
+      'changed_properties'
+    );
+    const changed_layers = SafeExtractor.extractArrayProperty(
+      args,
+      'changed_layers'
+    );
+    const changed_layer_effects = SafeExtractor.extractArrayProperty(
+      args,
+      'changed_layer_effects'
+    );
+
+    const changedPropertiesCount =
+      (changed_properties && changed_properties.length) || 0;
+    const changedLayersCount = (changed_layers && changed_layers.length) || 0;
+    const changedLayerEffectsCount =
+      (changed_layer_effects && changed_layer_effects.length) || 0;
+
+    return {
+      text:
+        changedPropertiesCount > 0 &&
+        changedLayersCount > 0 &&
+        changedLayerEffectsCount > 0 ? (
+          <Trans>
+            Changing some scene properties, layers and effects for scene{' '}
+            {scene_name}.
+          </Trans>
+        ) : changedPropertiesCount > 0 && changedLayersCount > 0 ? (
+          <Trans>
+            Changing some scene properties and layers for scene {scene_name}.
+          </Trans>
+        ) : changedPropertiesCount > 0 && changedLayerEffectsCount > 0 ? (
+          <Trans>
+            Changing some scene properties and effects for scene {scene_name}.
+          </Trans>
+        ) : changedLayerEffectsCount > 0 && changedLayersCount > 0 ? (
+          <Trans>
+            Changing some scene effects and layers for scene {scene_name}.
+          </Trans>
+        ) : changedPropertiesCount > 0 ? (
+          <Trans>Changing some scene properties for scene {scene_name}.</Trans>
+        ) : changedLayersCount > 0 ? (
+          <Trans>Changing some scene layers for scene {scene_name}.</Trans>
+        ) : changedLayerEffectsCount > 0 ? (
+          <Trans>Changing some scene effects for scene {scene_name}.</Trans>
+        ) : (
+          <Trans>Unknown changes attempted for scene {scene_name}.</Trans>
+        ),
+    };
+  },
+  launchFunction: async ({
+    project,
+    args,
+    onInstancesModifiedOutsideEditor,
+  }) => {
+    const scene_name = extractRequiredString(args, 'scene_name');
+
+    if (!project.hasLayoutNamed(scene_name)) {
+      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+    }
+    const scene = project.getLayout(scene_name);
+
+    const changes = [];
+    const warnings = [];
+
+    const changed_properties = SafeExtractor.extractArrayProperty(
+      args,
+      'changed_properties'
+    );
+    const changed_layers = SafeExtractor.extractArrayProperty(
+      args,
+      'changed_layers'
+    );
+    const changed_layer_effects = SafeExtractor.extractArrayProperty(
+      args,
+      'changed_layer_effects'
+    );
+
+    if (changed_properties)
+      changed_properties.forEach(changed_property => {
+        const propertyName = SafeExtractor.extractStringProperty(
+          changed_property,
+          'property_name'
+        );
+        const newValue = SafeExtractor.extractStringProperty(
+          changed_property,
+          'new_value'
+        );
+        if (propertyName === null || newValue === null) {
+          warnings.push(
+            `Missing "property_name" or "new_value" in the changed_property object: ${JSON.stringify(
+              changed_property
+            )}. It was ignored and not changed.`
+          );
+          return;
+        }
+
+        if (isFuzzyMatch(propertyName, 'backgroundColor')) {
+          const colorAsRgb = hexNumberToRGBArray(rgbOrHexToHexNumber(newValue));
+          scene.setBackgroundColor(colorAsRgb[0], colorAsRgb[1], colorAsRgb[2]);
+          changes.push('Modified the scene background color.');
+        } else if (isFuzzyMatch(propertyName, 'gameResolutionWidth')) {
+          project.setGameResolutionSize(
+            parseInt(newValue),
+            project.getGameResolutionHeight()
+          );
+          changes.push('Modified the game resolution width.');
+        } else if (isFuzzyMatch(propertyName, 'stopSoundsOnStartup')) {
+          scene.setStopSoundsOnStartup(newValue.toLowerCase() === 'true');
+          changes.push(
+            'Modified whether sounds should be stopped on scene startup.'
+          );
+        } else if (isFuzzyMatch(propertyName, 'gameResolutionHeight')) {
+          project.setGameResolutionSize(
+            project.getGameResolutionWidth(),
+            parseInt(newValue)
+          );
+          changes.push('Modified the game resolution height.');
+        } else if (isFuzzyMatch(propertyName, 'gameOrientation')) {
+          project.setOrientation(newValue);
+          changes.push('Modified the game orientation.');
+        } else if (isFuzzyMatch(propertyName, 'gameScaleMode')) {
+          project.setScaleMode(newValue);
+          changes.push('Modified the game scale mode.');
+        } else if (isFuzzyMatch(propertyName, 'gameName')) {
+          project.setName(newValue);
+          changes.push('Modified the game name.');
+        } else {
+          warnings.push(
+            `Unknown property for the scene: "${propertyName}". It was ignored and not changed.`
+          );
+        }
+      });
+
+    if (changed_layers) {
+      changed_layers.forEach(changed_layer => {
+        const layerName = SafeExtractor.extractStringProperty(
+          changed_layer,
+          'layer_name'
+        );
+        if (layerName === null) {
+          warnings.push(
+            `Missing "layer_name" in an item of changed_layers. It was ignored and not changed.`
+          );
+          return;
+        }
+
+        const new_layer_name = SafeExtractor.extractStringProperty(
+          changed_layer,
+          'new_layer_name'
+        );
+        const new_layer_position = SafeExtractor.extractNumberProperty(
+          changed_layer,
+          'new_layer_position'
+        );
+        const delete_this_layer = SafeExtractor.extractBooleanProperty(
+          changed_layer,
+          'delete_this_layer'
+        );
+        const move_instances_to_layer = SafeExtractor.extractStringProperty(
+          changed_layer,
+          'move_instances_to_layer'
+        );
+
+        if (scene.hasLayerNamed(layerName)) {
+          if (delete_this_layer) {
+            if (move_instances_to_layer) {
+              gd.WholeProjectRefactorer.mergeLayersInScene(
+                project,
+                scene,
+                layerName,
+                move_instances_to_layer
+              );
+            } else {
+              // Note: some instances will be invalidated because of this.
+              gd.WholeProjectRefactorer.removeLayerInScene(
+                project,
+                scene,
+                layerName
+              );
+            }
+            scene.getLayers().removeLayer(layerName);
+            changes.push(
+              `Removed layer "${layerName}" for scene "${scene.getName()}".`
+            );
+          } else {
+            if (new_layer_name) {
+              gd.WholeProjectRefactorer.renameLayerInScene(
+                project,
+                scene,
+                layerName,
+                new_layer_name
+              );
+              changes.push(
+                `Renamed layer "${layerName}" to "${new_layer_name}" for scene "${scene.getName()}".`
+              );
+            }
+          }
+          if (new_layer_position !== null) {
+            scene
+              .getLayers()
+              .moveLayer(
+                scene.getLayers().getLayerPosition(layerName),
+                new_layer_position
+              );
+            changes.push(
+              `Moved layer "${layerName}" to position ${new_layer_position} for scene "${scene.getName()}".`
+            );
+          }
+
+          // /!\ Tell the editor that some instances have potentially been modified (and even removed).
+          // This will force the instances editor to destroy and mount again the
+          // renderers to avoid keeping any references to existing instances, and also drop any selection.
+          onInstancesModifiedOutsideEditor({
+            scene,
+          });
+        } else {
+          scene
+            .getLayers()
+            .insertNewLayer(
+              new_layer_name || layerName,
+              new_layer_position === null
+                ? scene.getLayersCount()
+                : new_layer_position
+            );
+          changes.push(
+            `Created new layer "${new_layer_name ||
+              layerName}" for scene "${scene.getName()}" at position ${new_layer_position ||
+              0}.`
+          );
+        }
+      });
+    }
+
+    if (changed_layer_effects) {
+      changed_layer_effects.forEach(changed_layer_effect => {
+        const layerName = SafeExtractor.extractStringProperty(
+          changed_layer_effect,
+          'layer_name'
+        );
+        if (layerName === null) {
+          warnings.push(
+            `Missing "layer_name" in an item of changed_layer_effects. It was ignored and not changed.`
+          );
+          return;
+        }
+        if (!scene.hasLayerNamed(layerName)) {
+          warnings.push(
+            `Layer not found: "${layerName}". It was ignored and no effects on it were changed.`
+          );
+          return;
+        }
+        const layer = scene.getLayers().getLayer(layerName);
+        const effectsContainer = layer.getEffects();
+
+        const effectName = SafeExtractor.extractStringProperty(
+          changed_layer_effect,
+          'effect_name'
+        );
+        if (effectName === null) {
+          warnings.push(
+            `Missing "effect_name" in an item of changed_layer_effects. It was ignored and not changed.`
+          );
+          return;
+        }
+        const effect_type = SafeExtractor.extractStringProperty(
+          changed_layer_effect,
+          'effect_type'
+        );
+        const new_effect_name = SafeExtractor.extractStringProperty(
+          changed_layer_effect,
+          'new_effect_name'
+        );
+        const new_effect_position = SafeExtractor.extractNumberProperty(
+          changed_layer_effect,
+          'new_effect_position'
+        );
+        const delete_this_effect = SafeExtractor.extractBooleanProperty(
+          changed_layer_effect,
+          'delete_this_effect'
+        );
+        let newlyCreatedEffect: gdEffect | null = null;
+
+        if (effectsContainer.hasEffectNamed(effectName)) {
+          const effect = effectsContainer.getEffect(effectName);
+          if (delete_this_effect) {
+            effectsContainer.removeEffect(effectName);
+            changes.push(
+              `Removed "${effectName}" effect on layer "${layerName}".`
+            );
+          } else {
+            if (new_effect_name) {
+              effect.setName(new_effect_name);
+              changes.push(
+                `Renamed the "${effectName}" effect on layer "${layerName}" to "${new_effect_name}".`
+              );
+            }
+            if (new_effect_position !== null) {
+              effectsContainer.moveEffect(
+                effectsContainer.getEffectPosition(effectName),
+                new_effect_position
+              );
+              changes.push(
+                `Moved the "${effectName}" effect on layer "${layerName}" to position ${new_effect_position}.`
+              );
+            }
+          }
+        } else {
+          if (effect_type) {
+            const newEffectName = new_effect_name || effectName;
+            const effectMetadata = gd.MetadataProvider.getEffectMetadata(
+              project.getCurrentPlatform(),
+              effect_type
+            );
+            if (gd.MetadataProvider.isBadEffectMetadata(effectMetadata)) {
+              warnings.push(
+                `Effect type "${effect_type}" is not a valid effect type. Effect "${newEffectName}" was NOT added.`
+              );
+            } else {
+              newlyCreatedEffect = effectsContainer.insertNewEffect(
+                newEffectName,
+                new_effect_position || 0
+              );
+              newlyCreatedEffect.setEffectType(effect_type);
+            }
+          }
+        }
+
+        const changed_properties = SafeExtractor.extractArrayProperty(
+          changed_layer_effect,
+          'changed_properties'
+        );
+        if (changed_properties) {
+          if (!effectsContainer.hasEffectNamed(effectName)) {
+            warnings.push(
+              `Effect not found: "${effectName}". It was ignored and not changed.`
+            );
+            return;
+          }
+          const effect = effectsContainer.getEffect(effectName);
+          const effectMetadata = gd.MetadataProvider.getEffectMetadata(
+            project.getCurrentPlatform(),
+            effect.getEffectType()
+          );
+
+          if (gd.MetadataProvider.isBadEffectMetadata(effectMetadata)) {
+            warnings.push(
+              `Effect "${effectName}" is not a valid effect. It was ignored and not changed.`
+            );
+            return;
+          }
+
+          const effectProperties = effectMetadata.getProperties();
+
+          changed_properties.forEach(changed_property => {
+            const propertyName = SafeExtractor.extractStringProperty(
+              changed_property,
+              'property_name'
+            );
+            const newValue = SafeExtractor.extractStringProperty(
+              changed_property,
+              'new_value'
+            );
+            if (propertyName === null || newValue === null) {
+              warnings.push(
+                `Missing "property_name" or "new_value" in an item of changed_properties. It was ignored and not changed. Make sure you follow the exact format for changing effect properties.`
+              );
+              return;
+            }
+
+            const { foundProperty } = findPropertyByName({
+              properties: effectProperties,
+              name: propertyName,
+            });
+            if (!foundProperty) {
+              warnings.push(
+                `Property not found: "${propertyName}" in effect "${effectName}". It was ignored and not changed. Make sure you only change existing effect properties.`
+              );
+              return;
+            }
+
+            const lowercasedType = foundProperty.getType().toLowerCase();
+            if (lowercasedType === 'number') {
+              effect.setDoubleParameter(
+                propertyName,
+                parseFloat(newValue) || 0
+              );
+            } else if (lowercasedType === 'boolean') {
+              effect.setBooleanParameter(
+                propertyName,
+                newValue.toLowerCase() === 'true'
+              );
+            } else {
+              effect.setStringParameter(propertyName, newValue);
+            }
+
+            changes.push(
+              `Modified "${propertyName}" property of the "${effectName}" effect to "${newValue}".`
+            );
+          });
+        }
+
+        if (newlyCreatedEffect) {
+          const effectMetadata = gd.MetadataProvider.getEffectMetadata(
+            project.getCurrentPlatform(),
+            newlyCreatedEffect.getEffectType()
+          );
+          if (gd.MetadataProvider.isBadEffectMetadata(effectMetadata)) {
+            // Should not happen.
+          } else {
+            changes.push(
+              `Created new "${newlyCreatedEffect.getName()}" effect on layer "${layerName}" at position ${new_effect_position ||
+                0}. It properties are: ${serializeEffectProperties(
+                newlyCreatedEffect,
+                effectMetadata
+              )
+                // This stringify might not give the prettiest output, this could be improved.
+                .map(serializedProperty => JSON.stringify(serializedProperty))
+                .join(', ')}.`
+            );
+          }
+        }
+      });
+    }
+
+    if (changes.length === 0 && warnings.length === 0) {
+      return {
+        success: false,
+        message: 'No changes were made.',
+      };
+    } else if (changes.length === 0 && warnings.length > 0) {
+      return {
+        success: false,
+        message:
+          'No changes were made because of the issues listed in the warnings.',
+        warnings: warnings.join('\n'),
+      };
+    } else if (changes.length > 0 && warnings.length === 0) {
+      return {
+        success: true,
+        message: ['Successfully done the changes.', ...changes].join('\n'),
+      };
+    } else {
+      return {
+        success: true,
+        message: [
+          'Successfully done some changes but some issues were found - see the warnings.',
+          ...changes,
+        ].join('\n'),
+        warnings: warnings.join('\n'),
+      };
+    }
   },
 };
 
@@ -2595,5 +3476,7 @@ export const editorFunctions: { [string]: EditorFunction } = {
   add_scene_events: addSceneEvents,
   create_scene: createScene,
   delete_scene: deleteScene,
+  inspect_scene_properties_layers_effects: inspectScenePropertiesLayersEffects,
+  change_scene_properties_layers_effects: changeScenePropertiesLayersEffects,
   add_or_edit_variable: addOrEditVariable,
 };

@@ -25,7 +25,10 @@ import {
   saveUiSettings,
 } from './EditorTabs/EditorTabsHandler';
 import { type PreviewState } from './PreviewState';
-import { type SceneEventsOutsideEditorChanges } from './EditorContainers/BaseEditor';
+import {
+  type SceneEventsOutsideEditorChanges,
+  type InstancesOutsideEditorChanges,
+} from './EditorContainers/BaseEditor';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { type GamesList } from '../GameDashboard/UseGamesList';
@@ -235,6 +238,9 @@ export type EditorTabsPaneCommonProps = {|
   onSceneEventsModifiedOutsideEditor: (
     changes: SceneEventsOutsideEditorChanges
   ) => void,
+  onInstancesModifiedOutsideEditor: (
+    changes: InstancesOutsideEditorChanges
+  ) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onEffectAdded: () => void,
   onObjectListsModified: ({ isNewObjectTypeUsed: boolean }) => void,
@@ -328,6 +334,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
     onSceneObjectEdited,
     onSceneObjectsDeleted,
     onSceneEventsModifiedOutsideEditor,
+    onInstancesModifiedOutsideEditor,
     onExtensionInstalled,
     onEffectAdded,
     onObjectListsModified,
@@ -733,6 +740,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
                       onSceneObjectEdited: onSceneObjectEdited,
                       onSceneObjectsDeleted: onSceneObjectsDeleted,
                       onSceneEventsModifiedOutsideEditor: onSceneEventsModifiedOutsideEditor,
+                      onInstancesModifiedOutsideEditor: onInstancesModifiedOutsideEditor,
                       onExtensionInstalled: onExtensionInstalled,
                       onEffectAdded: onEffectAdded,
                       onObjectListsModified: onObjectListsModified,

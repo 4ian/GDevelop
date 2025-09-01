@@ -65,7 +65,7 @@ type Props = {|
   subtitleText?: React.Node,
   customPaperStyle?: Object,
   renderSubtitle?: () => React.Node,
-  backAction?: () => void,
+  backAction?: () => void | Promise<void>,
   flexBody?: boolean,
   renderFooter?: () => React.Node,
   noScroll?: boolean,

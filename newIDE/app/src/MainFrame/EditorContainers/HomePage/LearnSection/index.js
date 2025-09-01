@@ -26,13 +26,13 @@ import CoursesPage from './CoursesPage';
 import { type LearnCategory } from './Utils';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
-import BundlePage from './BundlePage/BundlePage';
 import RouterContext from '../../../RouterContext';
 import {
   sendBundleInformationOpened,
   sendCourseInformationOpened,
 } from '../../../../Utils/Analytics/EventSender';
 import { BundleStoreContext } from '../../../../AssetStore/Bundles/BundleStoreContext';
+import BundleInformationPage from '../../../../AssetStore/Bundles/BundleInformationPage';
 
 type Props = {|
   selectInAppTutorial: (tutorialId: string) => void,
@@ -195,7 +195,7 @@ const LearnSection = ({
 
   if (selectedBundleListingData) {
     return (
-      <BundlePage
+      <BundleInformationPage
         bundleListingData={selectedBundleListingData}
         onBack={() => setSelectedBundleListingData(null)}
         getSubscriptionPlansWithPricingSystems={

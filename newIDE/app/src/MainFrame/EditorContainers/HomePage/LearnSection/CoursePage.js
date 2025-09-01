@@ -354,7 +354,12 @@ const CoursePage = ({
                   </Line>
                 )}
                 {courseChapters.map((chapter: CourseChapter, index) => (
-                  <ColumnStackLayout expand noOverflowParent noMargin>
+                  <ColumnStackLayout
+                    expand
+                    noOverflowParent
+                    noMargin
+                    key={chapter.id}
+                  >
                     {chapter.videoUrl ? (
                       <VideoBasedCourseChapterView
                         chapterIndex={index}

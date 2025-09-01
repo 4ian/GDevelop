@@ -620,6 +620,11 @@ export const HomePage = React.memo<Props>(
                           ? courses.filter(course => !course.isLocked)
                           : undefined
                       }
+                      courses={courses}
+                      getCourseCompletion={getCourseCompletion}
+                      getSubscriptionPlansWithPricingSystems={
+                        getSubscriptionPlansWithPricingSystems
+                      }
                     />
                   )}
                   {activeTab === 'team-view' &&

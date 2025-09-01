@@ -519,7 +519,11 @@ const BundlePreviewBanner = ({ onDisplayBundle, i18n }: Props) => {
                     productPrice !== null ? (
                       <LineStackLayout
                         alignItems="center"
-                        justifyContent="space-between"
+                        justifyContent={
+                          bundleListingData.visibleUntil && !isMobile
+                            ? 'flex-start'
+                            : 'space-between'
+                        }
                         noMargin
                       >
                         <LineStackLayout noMargin alignItems="center">

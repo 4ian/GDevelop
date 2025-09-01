@@ -2597,38 +2597,56 @@ const MainFrame = (props: Props) => {
     [hotReloadInGameEditorIfNeeded, openExternalLayout]
   );
 
-  const onOpenEventBasedObjectEditor = (
-    extensionName: string,
-    eventsBasedObjectName: string
-  ) => {
-    if (
-      !currentProject ||
-      !currentProject.hasEventsFunctionsExtensionNamed(extensionName)
-    ) {
-      return;
-    }
-    openEventsFunctionsExtension(
-      extensionName,
-      null,
-      null,
-      eventsBasedObjectName
-    );
-    const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
-      extensionName
-    );
-    const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
-    if (!eventsBasedObjects.has(eventsBasedObjectName)) {
-      return;
-    }
-    const eventsBasedObject = eventsBasedObjects.get(eventsBasedObjectName);
-    openCustomObjectEditor(eventsFunctionsExtension, eventsBasedObject, '');
+  const _onOpenEventBasedObjectEditorAsync = React.useCallback(
+    async (extensionName: string, eventsBasedObjectName: string) => {
+      if (
+        !currentProject ||
+        !currentProject.hasEventsFunctionsExtensionNamed(extensionName)
+      ) {
+        return;
+      }
+      const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
+        extensionName
+      );
+      const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
+      if (!eventsBasedObjects.has(eventsBasedObjectName)) {
+        return;
+      }
+      const eventsBasedObject = eventsBasedObjects.get(eventsBasedObjectName);
 
-    // Trigger reloading of extensions as an extension was modified (or even added)
-    // to create the custom object.
-    eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
-      currentProject
-    );
-  };
+      // Trigger reloading of extensions as an extension was modified (or even added)
+      // to create the custom object.
+      await eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+        currentProject
+      );
+      setEditorHotReloadNeeded({
+        shouldReloadProjectData: false,
+        shouldReloadLibraries: true,
+        shouldReloadResources: false,
+      });
+
+      openEventsFunctionsExtension(
+        extensionName,
+        null,
+        null,
+        eventsBasedObjectName
+      );
+      openCustomObjectEditor(eventsFunctionsExtension, eventsBasedObject, '');
+    },
+    [
+      currentProject,
+      openEventsFunctionsExtension,
+      openCustomObjectEditor,
+      eventsFunctionsExtensionsState,
+    ]
+  );
+
+  const onOpenEventBasedObjectEditor = React.useCallback(
+    (extensionName: string, eventsBasedObjectName: string) => {
+      _onOpenEventBasedObjectEditorAsync(extensionName, eventsBasedObjectName);
+    },
+    [_onOpenEventBasedObjectEditorAsync]
+  );
 
   const onEventBasedObjectTypeChanged = React.useCallback(
     () => {
@@ -2641,43 +2659,57 @@ const MainFrame = (props: Props) => {
     [hotReloadInGameEditorIfNeeded]
   );
 
-  const onExtractAsEventBasedObject = (
-    extensionName: string,
-    eventsBasedObjectName: string
-  ) => {
-    onEventBasedObjectTypeChanged();
-    onOpenEventBasedObjectEditor(extensionName, eventsBasedObjectName);
-  };
+  const _onExtractAsEventBasedObjectAsync = React.useCallback(
+    async (extensionName: string, eventsBasedObjectName: string) => {
+      // This method already trigger an hot-reload of the libraries after
+      // generation extension code.
+      await _onOpenEventBasedObjectEditorAsync(
+        extensionName,
+        eventsBasedObjectName
+      );
+    },
+    [_onOpenEventBasedObjectEditorAsync]
+  );
 
-  const onOpenEventBasedObjectVariantEditor = (
-    extensionName: string,
-    eventsBasedObjectName: string,
-    variantName: string
-  ) => {
-    if (!currentProject) return;
-    if (!currentProject.hasEventsFunctionsExtensionNamed(extensionName)) {
-      return;
-    }
-    const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
-      extensionName
-    );
-    const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
-    if (!eventsBasedObjects.has(eventsBasedObjectName)) {
-      return;
-    }
-    const eventsBasedObject = eventsBasedObjects.get(eventsBasedObjectName);
-    openCustomObjectEditor(
-      eventsFunctionsExtension,
-      eventsBasedObject,
-      variantName
-    );
+  const onExtractAsEventBasedObject = React.useCallback(
+    (extensionName: string, eventsBasedObjectName: string) => {
+      _onExtractAsEventBasedObjectAsync(extensionName, eventsBasedObjectName);
+    },
+    [_onExtractAsEventBasedObjectAsync]
+  );
 
-    // Trigger reloading of extensions as an extension was modified (or even added)
-    // to create the custom object.
-    eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
-      currentProject
-    );
-  };
+  const onOpenEventBasedObjectVariantEditor = React.useCallback(
+    (
+      extensionName: string,
+      eventsBasedObjectName: string,
+      variantName: string
+    ) => {
+      if (!currentProject) return;
+      if (!currentProject.hasEventsFunctionsExtensionNamed(extensionName)) {
+        return;
+      }
+      const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
+        extensionName
+      );
+      const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
+      if (!eventsBasedObjects.has(eventsBasedObjectName)) {
+        return;
+      }
+      const eventsBasedObject = eventsBasedObjects.get(eventsBasedObjectName);
+      openCustomObjectEditor(
+        eventsFunctionsExtension,
+        eventsBasedObject,
+        variantName
+      );
+
+      // Trigger reloading of extensions as an extension was modified (or even added)
+      // to create the custom object.
+      eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+        currentProject
+      );
+    },
+    [currentProject, openCustomObjectEditor, eventsFunctionsExtensionsState]
+  );
 
   const onEventsBasedObjectChildrenEdited = React.useCallback(
     (eventsBasedObject: gdEventsBasedObject) => {

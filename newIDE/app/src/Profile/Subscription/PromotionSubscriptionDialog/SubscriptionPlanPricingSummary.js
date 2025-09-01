@@ -24,7 +24,13 @@ import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import Chip from '../../../UI/Chip';
 
 const styles = {
-  paper: { flex: 1, zIndex: 2, padding: 16 },
+  paper: {
+    display: 'flex',
+    alignItems: 'center',
+    flex: 1,
+    zIndex: 2,
+    padding: 16,
+  },
   descriptionContainer: { minHeight: 70 }, // Keep height the same for 1 or 2 lines.
   discountContainer: {
     padding: '4px 8px',

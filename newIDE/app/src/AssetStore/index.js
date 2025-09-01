@@ -69,6 +69,8 @@ import { AssetSwappingAssetStoreSearchFilter } from './AssetStoreSearchFilter';
 import { delay } from '../Utils/Delay';
 import { BundleStoreContext } from './Bundles/BundleStoreContext';
 import BundleInformationPage from './Bundles/BundleInformationPage';
+import { type CourseCompletion } from '../MainFrame/EditorContainers/HomePage/UseCourses';
+import { type SubscriptionPlanWithPricingSystems } from '../Utils/GDevelopServices/Usage';
 
 type Props = {|
   onlyShowAssets?: boolean, // TODO: if we add more options, use an array instead.
@@ -77,8 +79,11 @@ type Props = {|
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
   onOpenProfile?: () => void,
+  courses?: ?Array<Course>,
   receivedCourses?: ?Array<Course>,
   onCourseOpen?: (courseId: string) => void,
+  getSubscriptionPlansWithPricingSystems?: () => Array<SubscriptionPlanWithPricingSystems> | null,
+  getCourseCompletion?: (courseId: string) => CourseCompletion | null,
   assetSwappedObject?: ?gdObject,
   minimalUI?: boolean,
 |};
@@ -119,8 +124,11 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       displayPromotions,
       onOpenPrivateGameTemplateListingData,
       onOpenProfile,
+      courses,
       receivedCourses,
       onCourseOpen,
+      getSubscriptionPlansWithPricingSystems,
+      getCourseCompletion,
       assetSwappedObject,
       minimalUI,
     }: Props,
@@ -661,6 +669,28 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       ]
     );
 
+    const onBack = React.useCallback(
+      async () => {
+        const page = shopNavigationState.backToPreviousPage();
+        const isUpdatingSearchtext = reApplySearchTextIfNeeded(page);
+        if (isUpdatingSearchtext) {
+          // Updating the search is not instant, so we cannot apply the scroll position
+          // right away. We force a wait as there's no easy way to know when results are completely updated.
+          await delay(500);
+          setScrollUpdateIsNeeded(page);
+          applyBackScrollPosition(page); // We apply it manually, because the layout effect won't be called again.
+        } else {
+          setScrollUpdateIsNeeded(page);
+        }
+      },
+      [
+        shopNavigationState,
+        reApplySearchTextIfNeeded,
+        setScrollUpdateIsNeeded,
+        applyBackScrollPosition,
+      ]
+    );
+
     return (
       <I18n>
         {({ i18n }) => (
@@ -745,26 +775,14 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                 {(!isOnHomePage || !!openedShopCategory) &&
                   !(assetSwappedObject && minimalUI) && (
                     <>
-                      {shopNavigationState.isRootPage ? null : (
+                      {shopNavigationState.isRootPage ||
+                      // Don't show back action on bundle pages, as it's handled by the page itself.
+                      openedBundleListingData ? null : (
                         <Column expand alignItems="flex-start" noMargin>
                           <TextButton
                             icon={<ChevronArrowLeft />}
                             label={<Trans>Back</Trans>}
-                            onClick={async () => {
-                              const page = shopNavigationState.backToPreviousPage();
-                              const isUpdatingSearchtext = reApplySearchTextIfNeeded(
-                                page
-                              );
-                              if (isUpdatingSearchtext) {
-                                // Updating the search is not instant, so we cannot apply the scroll position
-                                // right away. We force a wait as there's no easy way to know when results are completely updated.
-                                await delay(500);
-                                setScrollUpdateIsNeeded(page);
-                                applyBackScrollPosition(page); // We apply it manually, because the layout effect won't be called again.
-                              } else {
-                                setScrollUpdateIsNeeded(page);
-                              }
-                            }}
+                            onClick={onBack}
                           />
                         </Column>
                       )}
@@ -921,15 +939,23 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                     privateGameTemplateListingDatasFromSameCreator
                   }
                 />
-              ) : !!openedBundleListingData ? (
+              ) : !!openedBundleListingData &&
+                getSubscriptionPlansWithPricingSystems &&
+                getCourseCompletion ? (
                 <BundleInformationPage
                   bundleListingData={openedBundleListingData}
-                  receivedCourses={receivedCourses}
+                  noPadding
+                  onBack={onBack}
                   onBundleOpen={selectBundle}
                   onGameTemplateOpen={selectPrivateGameTemplate}
                   onAssetPackOpen={selectPrivateAssetPack}
                   onCourseOpen={selectCourse}
-                  i18n={i18n}
+                  getSubscriptionPlansWithPricingSystems={
+                    getSubscriptionPlansWithPricingSystems
+                  }
+                  courses={courses}
+                  receivedCourses={receivedCourses}
+                  getCourseCompletion={getCourseCompletion}
                 />
               ) : null}
               {canShowFiltersPanel && (

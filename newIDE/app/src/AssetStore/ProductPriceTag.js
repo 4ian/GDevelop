@@ -41,6 +41,21 @@ const styles = {
   discountedPrice: { textDecoration: 'line-through', opacity: 0.7 },
 };
 
+export const renderPriceFormatted = (
+  priceInCents: number,
+  currencyCode: 'USD' | 'EUR',
+  i18n: I18nType
+): string => {
+  const currencySymbol = currencyCode === 'USD' ? '$' : '€';
+  // Use a non-breaking space to ensure the currency stays next to the price.
+  return `${currencySymbol}\u00A0${i18n
+    .number(priceInCents / 100, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
+    .replace(/\D00$/, '')}`;
+};
+
 type FormatProps = {|
   productListingData:
     | PrivateAssetPackListingData
@@ -107,13 +122,11 @@ export const renderProductPrice = ({
     : null;
   if (!price) return '';
 
-  const currencyCode = price.currency === 'USD' ? '$' : '€';
-  const formattedPrice = `${currencyCode} ${i18n
-    .number(price.value / 100, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })
-    .replace(/\D00$/, '')}`;
+  const formattedPrice = renderPriceFormatted(
+    price.value,
+    price.currency,
+    i18n
+  );
 
   return plainText ? (
     formattedPrice

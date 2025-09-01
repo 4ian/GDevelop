@@ -4,45 +4,45 @@ import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
-import { type Bundle } from '../../../../../Utils/GDevelopServices/Asset';
-import { type BundleListingData } from '../../../../../Utils/GDevelopServices/Shop';
-import { SectionRow } from '../../SectionContainer';
-import Paper from '../../../../../UI/Paper';
-import Text from '../../../../../UI/Text';
-import { Column, Line } from '../../../../../UI/Grid';
+import { type Bundle } from '../../Utils/GDevelopServices/Asset';
+import { type BundleListingData } from '../../Utils/GDevelopServices/Shop';
+import Paper from '../../UI/Paper';
+import Text from '../../UI/Text';
+import { Column, Line } from '../../UI/Grid';
 import {
   ColumnStackLayout,
   LineStackLayout,
   ResponsiveLineStackLayout,
-} from '../../../../../UI/Layout';
-import { useResponsiveWindowSize } from '../../../../../UI/Responsive/ResponsiveWindowMeasurer';
-import { selectMessageByLocale } from '../../../../../Utils/i18n/MessageByLocale';
-import { renderProductPrice } from '../../../../../AssetStore/ProductPriceTag';
+} from '../../UI/Layout';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
+import { selectMessageByLocale } from '../../Utils/i18n/MessageByLocale';
+import { renderProductPrice } from '../../AssetStore/ProductPriceTag';
 import {
   getProductsIncludedInBundle,
   getUserProductPurchaseUsageType,
   PurchaseProductButtons,
-} from '../../../../../AssetStore/ProductPageHelper';
-import { shouldUseAppStoreProduct } from '../../../../../Utils/AppStorePurchases';
-import AuthenticatedUserContext from '../../../../../Profile/AuthenticatedUserContext';
-import { BundleStoreContext } from '../../../../../AssetStore/Bundles/BundleStoreContext';
-import { sendBundleBuyClicked } from '../../../../../Utils/Analytics/EventSender';
-import BundlePurchaseDialog from '../../../../../AssetStore/Bundles/BundlePurchaseDialog';
-import RedemptionCodesDialog from '../../../../../RedemptionCode/RedemptionCodesDialog';
+} from '../../AssetStore/ProductPageHelper';
+import { shouldUseAppStoreProduct } from '../../Utils/AppStorePurchases';
+import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
+import { BundleStoreContext } from '../../AssetStore/Bundles/BundleStoreContext';
+import { sendBundleBuyClicked } from '../../Utils/Analytics/EventSender';
+import BundlePurchaseDialog from '../../AssetStore/Bundles/BundlePurchaseDialog';
+import RedemptionCodesDialog from '../../RedemptionCode/RedemptionCodesDialog';
 import {
   getEstimatedSavingsFormatted,
   renderEstimatedTotalPriceFormatted,
-} from '../../../../../AssetStore/Bundles/Utils';
-import { PrivateGameTemplateStoreContext } from '../../../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
-import { CreditsPackageStoreContext } from '../../../../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
-import { AssetStoreContext } from '../../../../../AssetStore/AssetStoreContext';
-import CourseStoreContext from '../../../../../Course/CourseStoreContext';
-import SecureCheckout from '../../../../../AssetStore/SecureCheckout/SecureCheckout';
-import FlatButton from '../../../../../UI/FlatButton';
-import Chip from '../../../../../UI/Chip';
-import ProductLimitedTimeOffer from '../../../../../AssetStore/ProductLimitedTimeOffer';
+} from '../../AssetStore/Bundles/Utils';
+import { PrivateGameTemplateStoreContext } from '../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
+import { CreditsPackageStoreContext } from '../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
+import { AssetStoreContext } from '../../AssetStore/AssetStoreContext';
+import CourseStoreContext from '../../Course/CourseStoreContext';
+import SecureCheckout from '../../AssetStore/SecureCheckout/SecureCheckout';
+import FlatButton from '../../UI/FlatButton';
+import Chip from '../../UI/Chip';
+import ProductLimitedTimeOffer from '../../AssetStore/ProductLimitedTimeOffer';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { getSummaryLines } from './Utils';
+import { SectionRow } from '../../MainFrame/EditorContainers/HomePage/SectionContainer';
 
 const styles = {
   title: { overflowWrap: 'anywhere', textWrap: 'wrap' },

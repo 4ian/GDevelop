@@ -1,84 +1,53 @@
 // @flow
+
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import { type I18n as I18nType } from '@lingui/core';
-import {
-  type BundleListingData,
-  type PrivateAssetPackListingData,
-  type PrivateGameTemplateListingData,
-  type CourseListingData,
-} from '../../Utils/GDevelopServices/Shop';
+import { Column, Line, Spacer } from '../../UI/Grid';
+import BundlePageHeader from './BundlePageHeader';
+import { BundleStoreContext } from './BundleStoreContext';
+import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import {
   getBundle,
   type Bundle,
   type Course,
 } from '../../Utils/GDevelopServices/Asset';
-import Text from '../../UI/Text';
+import {
+  type PrivateAssetPackListingData,
+  type BundleListingData,
+  type PrivateGameTemplateListingData,
+  type CourseListingData,
+} from '../../Utils/GDevelopServices/Shop';
+import { type SubscriptionPlanWithPricingSystems } from '../../Utils/GDevelopServices/Usage';
+import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 import { Trans } from '@lingui/macro';
 import AlertMessage from '../../UI/AlertMessage';
-import PlaceholderLoader from '../../UI/PlaceholderLoader';
-import FlatButton from '../../UI/FlatButton';
 import {
-  ResponsiveLineStackLayout,
-  LineStackLayout,
-  ColumnStackLayout,
-} from '../../UI/Layout';
-import { Column, LargeSpacer, Line } from '../../UI/Grid';
-import {
-  getUserPublicProfile,
-  type UserPublicProfile,
-} from '../../Utils/GDevelopServices/User';
-import Link from '../../UI/Link';
-import ResponsiveMediaGallery from '../../UI/ResponsiveMediaGallery';
+  getProductsIncludedInBundle,
+  getProductsIncludedInBundleTiles,
+} from '../ProductPageHelper';
+import { PrivateGameTemplateStoreContext } from '../PrivateGameTemplates/PrivateGameTemplateStoreContext';
+import { AssetStoreContext } from '../AssetStoreContext';
+import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
+import { GridList, GridListTile } from '@material-ui/core';
 import {
   useResponsiveWindowSize,
   type WindowSizeType,
 } from '../../UI/Responsive/ResponsiveWindowMeasurer';
-import { sendBundleBuyClicked } from '../../Utils/Analytics/EventSender';
-import { MarkdownText } from '../../UI/MarkdownText';
-import ScrollView from '../../UI/ScrollView';
-import { shouldUseAppStoreProduct } from '../../Utils/AppStorePurchases';
-import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
-import Avatar from '@material-ui/core/Avatar';
-import GridList from '@material-ui/core/GridList';
-import { BundleStoreContext } from './BundleStoreContext';
-import {
-  getBundlesContainingProductTiles,
-  getOtherProductsFromSameAuthorTiles,
-  getProductMediaItems,
-  getProductsIncludedInBundle,
-  getProductsIncludedInBundleTiles,
-  getUserProductPurchaseUsageType,
-  PurchaseProductButtons,
-} from '../ProductPageHelper';
-import SecureCheckout from '../SecureCheckout/SecureCheckout';
-import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import BundlePurchaseDialog from './BundlePurchaseDialog';
-import PublicProfileContext from '../../Profile/PublicProfileContext';
-import { LARGE_WIDGET_SIZE } from '../../MainFrame/EditorContainers/HomePage/CardWidget';
-import { PrivateGameTemplateStoreContext } from '../PrivateGameTemplates/PrivateGameTemplateStoreContext';
-import { AssetStoreContext } from '../AssetStoreContext';
+import Text from '../../UI/Text';
 import CourseStoreContext from '../../Course/CourseStoreContext';
-import { CreditsPackageStoreContext } from '../CreditsPackages/CreditsPackageStoreContext';
-import RedemptionCodesDialog from '../../RedemptionCode/RedemptionCodesDialog';
-import { selectMessageByLocale } from '../../Utils/i18n/MessageByLocale';
-import { getSummaryLines } from '../../MainFrame/EditorContainers/HomePage/LearnSection/BundlePage/Utils';
-import Skeleton from '@material-ui/lab/Skeleton';
-import {
-  getEstimatedSavingsFormatted,
-  renderEstimatedTotalPriceFormatted,
-} from './Utils';
-import { renderProductPrice } from '../ProductPriceTag';
-import Chip from '../../UI/Chip';
-import ProductLimitedTimeOffer from '../ProductLimitedTimeOffer';
+import { planIdSortingFunction } from '../../Profile/Subscription/PlanCard';
+import SubscriptionPlanPricingSummary from '../../Profile/Subscription/PromotionSubscriptionDialog/SubscriptionPlanPricingSummary';
+import { ResponsiveLineStackLayout } from '../../UI/Layout';
+import SubscriptionPlanTableSummary from '../../Profile/Subscription/PromotionSubscriptionDialog/SubscriptionPlanTableSummary';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
+import { LARGE_WIDGET_SIZE } from '../../MainFrame/EditorContainers/HomePage/CardWidget';
+import SectionContainer, {
+  SectionRow,
+} from '../../MainFrame/EditorContainers/HomePage/SectionContainer';
+import { type CourseCompletion } from '../../MainFrame/EditorContainers/HomePage/UseCourses';
+import CourseCard from '../../MainFrame/EditorContainers/HomePage/LearnSection/CourseCard';
 
-const cellSpacing = 10;
-
-const getTemplateColumns = (
-  windowSize: WindowSizeType,
-  isLandscape: boolean
-) => {
+const getColumns = (windowSize: WindowSizeType, isLandscape: boolean) => {
   switch (windowSize) {
     case 'small':
       return isLandscape ? 4 : 2;
@@ -92,287 +61,176 @@ const getTemplateColumns = (
       return 3;
   }
 };
-const MAX_COLUMNS = getTemplateColumns('xlarge', true);
+
+const cellSpacing = 10;
+const MAX_COLUMNS = getColumns('xlarge', true);
 const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
 const styles = {
-  disabledText: { opacity: 0.6 },
-  scrollview: { overflowX: 'hidden' },
   grid: {
     // Avoid tiles taking too much space on large screens.
     maxWidth: MAX_SECTION_WIDTH,
     overflow: 'hidden',
     width: `calc(100% + ${cellSpacing}px)`, // This is needed to compensate for the `margin: -5px` added by MUI related to spacing.
   },
-  leftColumnContainer: {
-    flex: 1,
-    minWidth: 0, // This is needed for the container to take the right size.
-  },
-  rightColumnContainer: {
-    flex: 2,
-  },
-  leftColumnContainerMobile: {
-    flex: 1,
-    minWidth: 0, // This is needed for the container to take the right size.
-  },
-  rightColumnContainerMobile: {
-    flex: 1,
-  },
-  avatar: {
-    width: 20,
-    height: 20,
-  },
-  ownedTag: {
-    padding: '4px 8px',
-    borderRadius: 4,
-    color: 'black',
-  },
-  playIcon: {
-    width: 20,
-    height: 20,
-  },
-  coinIcon: {
-    width: 13,
-    height: 13,
-    position: 'relative',
-    top: -1,
-  },
-  discountedPrice: { textDecoration: 'line-through', opacity: 0.7 },
-  discountChip: {
-    height: 24,
-    backgroundColor: '#F03F18',
-    color: 'white',
-  },
 };
 
 type Props = {|
   bundleListingData: BundleListingData,
-  bundleListingDatasFromSameCreator?: ?Array<BundleListingData>,
-  receivedCourses: ?Array<Course>,
+  onBack?: () => void | Promise<void>,
+  getSubscriptionPlansWithPricingSystems: () => Array<SubscriptionPlanWithPricingSystems> | null,
   onBundleOpen: BundleListingData => void,
   onGameTemplateOpen: PrivateGameTemplateListingData => void,
   onAssetPackOpen: (
-    privateAssetPackListingData: PrivateAssetPackListingData,
-    options?: {|
-      forceProductPage?: boolean,
-    |}
+    privateAssetPackListingData: PrivateAssetPackListingData
   ) => void,
   onCourseOpen: CourseListingData => void,
-  simulateAppStoreProduct?: boolean,
-  i18n: I18nType,
+  courses: ?Array<Course>,
+  receivedCourses: ?Array<Course>,
+  getCourseCompletion: (courseId: string) => CourseCompletion | null,
+  noPadding?: boolean,
 |};
 
 const BundleInformationPage = ({
   bundleListingData,
-  bundleListingDatasFromSameCreator,
-  receivedCourses,
-  onBundleOpen,
-  onGameTemplateOpen,
+  onBack,
+  getSubscriptionPlansWithPricingSystems,
   onAssetPackOpen,
+  onGameTemplateOpen,
+  onBundleOpen,
   onCourseOpen,
-  simulateAppStoreProduct,
-  i18n,
+  courses,
+  receivedCourses,
+  getCourseCompletion,
+  noPadding,
 }: Props) => {
-  const { id, name, sellerId } = bundleListingData;
-  const { bundleListingDatas } = React.useContext(BundleStoreContext);
+  const { windowSize, isLandscape, isMobile } = useResponsiveWindowSize();
+  const { bundleListingDatas } = React.useContext(BundleStoreContext); // If archived, should use the one passed.
   const { privateGameTemplateListingDatas } = React.useContext(
     PrivateGameTemplateStoreContext
   );
   const { privateAssetPackListingDatas } = React.useContext(AssetStoreContext);
-  const { creditsPackageListingDatas } = React.useContext(
-    CreditsPackageStoreContext
-  );
   const { listedCourses } = React.useContext(CourseStoreContext);
   const {
     receivedBundles,
-    bundlePurchases,
     receivedGameTemplates,
     receivedAssetPacks,
   } = React.useContext(AuthenticatedUserContext);
   const [bundle, setBundle] = React.useState<?Bundle>(null);
-  const [
-    purchasingBundleListingData,
-    setPurchasingBundleListingData,
-  ] = React.useState<?BundleListingData>(null);
-  const [isFetching, setIsFetching] = React.useState<boolean>(false);
-  const { openUserPublicProfile } = React.useContext(PublicProfileContext);
-  const [
-    sellerPublicProfile,
-    setSellerPublicProfile,
-  ] = React.useState<?UserPublicProfile>(null);
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
   const {
-    windowSize,
-    isLandscape,
-    isMediumScreen,
-    isMobile,
-  } = useResponsiveWindowSize();
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const [
-    isRedemptionCodesDialogOpen,
-    setIsRedemptionCodesDialogOpen,
-  ] = React.useState<boolean>(false);
+    palette: { type: paletteType },
+  } = React.useContext(GDevelopThemeContext);
 
-  const shouldUseOrSimulateAppStoreProduct =
-    shouldUseAppStoreProduct() || simulateAppStoreProduct;
+  const courseAndTheirListingDataIncludedInBundle = React.useMemo(
+    (): Array<{|
+      course: Course,
+      courseListingData: CourseListingData,
+    |}> | null => {
+      if (!bundle || !bundleListingData || !courses) return null;
+      const productListingDatasInBundle = getProductsIncludedInBundle({
+        productListingData: bundleListingData,
+        productListingDatas: [...(listedCourses || [])],
+      });
 
-  const userBundlePurchaseUsageType = React.useMemo(
-    () =>
-      getUserProductPurchaseUsageType({
-        productId: bundleListingData ? bundleListingData.id : null,
-        receivedProducts: receivedBundles,
-        productPurchases: bundlePurchases,
-        allProductListingDatas: bundleListingDatas,
-      }),
-    [bundlePurchases, bundleListingData, bundleListingDatas, receivedBundles]
-  );
-  const isAlreadyReceived = !!userBundlePurchaseUsageType;
-  const isOwningAnotherVariant = React.useMemo(
-    () => {
-      if (!bundle || isAlreadyReceived || !receivedBundles) return false;
-
-      // Another bundle older version of that bundle can be owned.
-      // We look at the tag to determine if the bundle is the same.
-      return !!receivedBundles.find(
-        receivedBundle => receivedBundle.tag === bundle.tag
+      if (!productListingDatasInBundle) return null;
+      // $FlowIgnore - Flow doesn't understand that we have filtered the products to only include courses.
+      const courseListingDatasInBundle: CourseListingData[] = productListingDatasInBundle.filter(
+        productListingData => productListingData.productType === 'COURSE'
       );
+
+      return (courseListingDatasInBundle || [])
+        .map(courseListingData => {
+          const course = courses.find(
+            course => course.id === courseListingData.id
+          );
+          if (!course) return null;
+          return {
+            course,
+            courseListingData,
+          };
+        })
+        .filter(Boolean);
     },
-    [bundle, isAlreadyReceived, receivedBundles]
+    [bundle, bundleListingData, listedCourses, courses]
   );
 
-  const productListingDatasIncludedInBundle = React.useMemo(
+  const productsExceptCoursesIncludedInBundleTiles = React.useMemo(
     () =>
-      bundleListingData &&
-      bundleListingDatas &&
-      privateGameTemplateListingDatas &&
-      privateAssetPackListingDatas &&
-      listedCourses &&
-      creditsPackageListingDatas
-        ? getProductsIncludedInBundle({
+      bundle && bundleListingData
+        ? getProductsIncludedInBundleTiles({
+            product: bundle,
             productListingDatas: [
               ...(bundleListingDatas || []),
               ...(privateGameTemplateListingDatas || []),
               ...(privateAssetPackListingDatas || []),
-              ...(listedCourses || []),
-              ...(creditsPackageListingDatas || []),
             ],
             productListingData: bundleListingData,
+            receivedProducts: [
+              ...(receivedBundles || []),
+              ...(receivedGameTemplates || []),
+              ...(receivedAssetPacks || []),
+            ],
+            onPrivateAssetPackOpen: onAssetPackOpen,
+            onPrivateGameTemplateOpen: onGameTemplateOpen,
+            onBundleOpen,
+            onCourseOpen,
+            discountedPrice: true,
           })
         : null,
-    [
-      bundleListingData,
-      bundleListingDatas,
-      privateGameTemplateListingDatas,
-      privateAssetPackListingDatas,
-      listedCourses,
-      creditsPackageListingDatas,
-    ]
-  );
-
-  const additionalProductThumbnailsIncludedInBundle: string[] = React.useMemo(
-    () => {
-      if (!productListingDatasIncludedInBundle) return [];
-
-      const additionalThumbnails = productListingDatasIncludedInBundle
-        .map(product => (product.thumbnailUrls || []).slice(0, 2))
-        .reduce((acc, thumbnails) => acc.concat(thumbnails), []);
-      return additionalThumbnails;
-    },
-    [productListingDatasIncludedInBundle]
-  );
-
-  const productsIncludedInBundleTiles = React.useMemo(
-    () =>
-      getProductsIncludedInBundleTiles({
-        product: bundle,
-        productListingDatas: [
-          ...(bundleListingDatas || []),
-          ...(privateGameTemplateListingDatas || []),
-          ...(privateAssetPackListingDatas || []),
-          ...(listedCourses || []),
-        ],
-        productListingData: bundleListingData,
-        receivedProducts: [
-          ...(receivedBundles || []),
-          ...(receivedGameTemplates || []),
-          ...(receivedAssetPacks || []),
-          ...(receivedCourses || []),
-        ],
-        onPrivateAssetPackOpen: product =>
-          onAssetPackOpen(product, { forceProductPage: true }),
-        onPrivateGameTemplateOpen: onGameTemplateOpen,
-        onBundleOpen,
-        onCourseOpen,
-        discountedPrice: true,
-      }),
     [
       bundle,
       bundleListingDatas,
       privateGameTemplateListingDatas,
       privateAssetPackListingDatas,
-      listedCourses,
       receivedBundles,
       receivedGameTemplates,
       receivedAssetPacks,
-      receivedCourses,
+      bundleListingData,
       onAssetPackOpen,
       onGameTemplateOpen,
       onBundleOpen,
       onCourseOpen,
-      bundleListingData,
     ]
   );
 
-  const bundlesContainingBundleTiles = React.useMemo(
-    () =>
-      getBundlesContainingProductTiles({
-        product: bundle,
-        productListingData: bundleListingData,
-        productListingDatas: bundleListingDatas,
-        receivedProducts: receivedBundles,
-        onPrivateAssetPackOpen: product =>
-          onAssetPackOpen(product, { forceProductPage: true }),
-        onPrivateGameTemplateOpen: onGameTemplateOpen,
-        onBundleOpen,
-      }),
-    [
-      bundle,
-      bundleListingData,
-      bundleListingDatas,
-      receivedBundles,
-      onAssetPackOpen,
-      onGameTemplateOpen,
-      onBundleOpen,
-    ]
-  );
+  const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
 
-  const otherBundlesFromTheSameAuthorTiles = React.useMemo(
-    () =>
-      getOtherProductsFromSameAuthorTiles({
-        otherProductListingDatasFromSameCreator: bundleListingDatasFromSameCreator,
-        currentProductListingData: bundleListingData,
-        receivedProducts: receivedBundles,
-        onProductOpen: onBundleOpen,
-      }),
-    [
-      bundleListingDatasFromSameCreator,
-      bundleListingData,
-      receivedBundles,
-      onBundleOpen,
-    ]
+  const highestSubscriptionPlanIncludedInBundle = React.useMemo(
+    () => {
+      if (!bundleListingData) return null;
+
+      const sortedIncludedRedemptionCodes = (
+        bundleListingData.includedRedemptionCodes || []
+      ).sort((a, b) =>
+        planIdSortingFunction(
+          a.givenSubscriptionPlanId,
+          b.givenSubscriptionPlanId
+        )
+      );
+
+      if (!sortedIncludedRedemptionCodes.length) return null;
+
+      const planId =
+        sortedIncludedRedemptionCodes[sortedIncludedRedemptionCodes.length - 1]
+          .givenSubscriptionPlanId;
+
+      return subscriptionPlansWithPricingSystems
+        ? subscriptionPlansWithPricingSystems.find(
+            subscriptionPlanWithPricingSystems =>
+              subscriptionPlanWithPricingSystems.id === planId
+          )
+        : null;
+    },
+    [bundleListingData, subscriptionPlansWithPricingSystems]
   );
 
   React.useEffect(
     () => {
       (async () => {
-        setIsFetching(true);
         try {
-          const [bundle, profile] = await Promise.all([
-            getBundle(id),
-            getUserPublicProfile(sellerId),
-          ]);
+          const bundle = await getBundle(bundleListingData.id);
 
           setBundle(bundle);
-          setSellerPublicProfile(profile);
         } catch (error) {
           const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
             error
@@ -388,421 +246,149 @@ const BundleInformationPage = ({
               <Trans>An error occurred, please try again later.</Trans>
             );
           }
-        } finally {
-          setIsFetching(false);
         }
       })();
     },
-    [id, sellerId]
+    [bundleListingData.id]
   );
 
-  const onClickBuy = React.useCallback(
-    async () => {
-      if (!bundle || isOwningAnotherVariant) return;
-      if (isAlreadyReceived) {
-        onBundleOpen(bundleListingData);
-        return;
-      }
+  const customSectionPaperStyle = {
+    // $FlowIgnore
+    ...(noPadding
+      ? {
+          padding: 0,
+        }
+      : {}),
+    ...(bundleListingData.visibleUntil
+      ? {
+          backgroundAttachment: 'local',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'top',
+          backgroundSize: isMobile && !isLandscape ? 'contain' : 'auto',
+          backgroundImage: `${
+            paletteType === 'dark'
+              ? 'linear-gradient(180deg, #6B1A18 0px, #2D2331 5%, #1d1d2600 10%)'
+              : 'linear-gradient(180deg, #F03F18 0px, #f5f5f700 10%)'
+          }`,
+        }
+      : {}),
+  };
 
-      try {
-        const price = bundleListingData.prices.find(
-          price => price.usageType === 'default'
-        );
-
-        sendBundleBuyClicked({
-          bundleId: bundle.id,
-          bundleName: bundle.name,
-          bundleTag: bundle.tag,
-          currency: price ? price.currency : undefined,
-          usageType: 'default',
-        });
-
-        setPurchasingBundleListingData(bundleListingData);
-      } catch (e) {
-        console.warn('Unable to send event', e);
-      }
-    },
-    [
-      bundle,
-      bundleListingData,
-      isAlreadyReceived,
-      isOwningAnotherVariant,
-      onBundleOpen,
-    ]
-  );
-
-  const mediaItems = React.useMemo(
-    () =>
-      getProductMediaItems({
-        product: bundle,
-        productListingData: bundleListingData,
-        shouldSimulateAppStoreProduct: simulateAppStoreProduct,
-        additionalThumbnails: additionalProductThumbnailsIncludedInBundle,
-      }),
-    [
-      bundle,
-      bundleListingData,
-      simulateAppStoreProduct,
-      additionalProductThumbnailsIncludedInBundle,
-    ]
-  );
-
-  const redemptionCodesIncludedInBundle = React.useMemo(
-    () => bundleListingData.includedRedemptionCodes || [],
-    [bundleListingData]
-  );
-
-  const summaryLines = React.useMemo(
-    () => {
-      if (
-        !productListingDatasIncludedInBundle ||
-        !redemptionCodesIncludedInBundle ||
-        !bundleListingData
-      )
-        return isMobile ? (
-          <ColumnStackLayout noMargin>
-            <Column expand noMargin>
-              <Skeleton height={25} />
-              <Skeleton height={20} />
-              <Skeleton height={20} />
-            </Column>
-            <Column expand noMargin>
-              <Skeleton height={25} />
-              <Skeleton height={20} />
-              <Skeleton height={20} />
-            </Column>
-          </ColumnStackLayout>
-        ) : (
-          <Column expand noMargin>
-            <Skeleton height={25} />
-            <Skeleton height={20} />
-            <Skeleton height={20} />
-          </Column>
-        );
-
-      if (isAlreadyReceived) {
-        return (
-          <Line noMargin>
-            <FlatButton
-              primary
-              label={<Trans>See my subscription codes</Trans>}
-              onClick={() => setIsRedemptionCodesDialogOpen(true)}
-            />
+  if (errorText) {
+    return (
+      <SectionContainer
+        flexBody
+        backAction={onBack}
+        customPaperStyle={customSectionPaperStyle}
+      >
+        <SectionRow expand>
+          <Line alignItems="center" justifyContent="center" expand>
+            <AlertMessage kind="error">{errorText}</AlertMessage>
           </Line>
-        );
-      }
+        </SectionRow>
+      </SectionContainer>
+    );
+  }
 
-      const summaryLines = getSummaryLines({
-        redemptionCodesIncludedInBundle,
-        bundleListingData,
-        productListingDatasIncludedInBundle,
-      });
-
-      if (isMobile) {
-        return summaryLines.mobileLines;
-      }
-      return summaryLines.desktopLines;
-    },
-    [
-      isAlreadyReceived,
-      redemptionCodesIncludedInBundle,
-      bundleListingData,
-      productListingDatasIncludedInBundle,
-      isMobile,
-    ]
-  );
-
-  const estimatedTotalPriceFormatted = React.useMemo(
-    () =>
-      renderEstimatedTotalPriceFormatted({
-        i18n,
-        bundleListingData,
-        productListingDatasIncludedInBundle,
-        redemptionCodesIncludedInBundle,
-      }),
-    [
-      i18n,
-      bundleListingData,
-      productListingDatasIncludedInBundle,
-      redemptionCodesIncludedInBundle,
-    ]
-  );
-
-  const estimatedSavingsFormatted = React.useMemo(
-    () =>
-      getEstimatedSavingsFormatted({
-        i18n,
-        bundleListingData,
-        productListingDatasIncludedInBundle,
-        redemptionCodesIncludedInBundle,
-      }),
-    [
-      i18n,
-      bundleListingData,
-      productListingDatasIncludedInBundle,
-      redemptionCodesIncludedInBundle,
-    ]
-  );
-
-  const productPrice = React.useMemo(
-    () =>
-      renderProductPrice({
-        i18n,
-        productListingData: bundleListingData,
-        usageType: 'default',
-        plainText: true,
-      }),
-    [i18n, bundleListingData]
-  );
+  if (!bundleListingData || !bundle) {
+    return (
+      <SectionContainer flexBody customPaperStyle={customSectionPaperStyle}>
+        <SectionRow expand>
+          <PlaceholderLoader />
+        </SectionRow>
+      </SectionContainer>
+    );
+  }
 
   return (
     <I18n>
       {({ i18n }) => (
-        <>
-          {errorText ? (
-            <Line alignItems="center" justifyContent="center" expand>
-              <AlertMessage kind="error">{errorText}</AlertMessage>
-            </Line>
-          ) : isFetching ? (
-            <Column expand alignItems="center" justifyContent="center">
-              <PlaceholderLoader />
-            </Column>
-          ) : bundle && sellerPublicProfile ? (
-            <Column noOverflowParent expand noMargin>
-              <ScrollView autoHideScrollbar style={styles.scrollview}>
-                <ResponsiveLineStackLayout
-                  noColumnMargin
-                  noMargin
-                  // Force the columns to wrap on tablets and small screens.
-                  forceMobileLayout={isMediumScreen}
-                  // Prevent it to wrap when in landscape mode on small screens.
-                  noResponsiveLandscape
-                  useLargeSpacer
+        <SectionContainer
+          backAction={onBack}
+          customPaperStyle={customSectionPaperStyle}
+        >
+          <BundlePageHeader
+            bundleListingData={bundleListingData}
+            bundle={bundle}
+            i18n={i18n}
+          />
+          <Line noMargin>
+            <Text size="section-title">
+              <Trans>What's included:</Trans>
+            </Text>
+          </Line>
+          {courseAndTheirListingDataIncludedInBundle &&
+            courseAndTheirListingDataIncludedInBundle.length > 0 && (
+              <Line>
+                <GridList
+                  cols={getColumns(windowSize, isLandscape)}
+                  style={styles.grid}
+                  cellHeight="auto"
+                  spacing={cellSpacing}
                 >
-                  <div
-                    style={
-                      isMobile
-                        ? styles.leftColumnContainerMobile
-                        : styles.leftColumnContainer
-                    }
-                  >
-                    <ResponsiveMediaGallery
-                      mediaItems={mediaItems}
-                      altTextTemplate={`Bundle ${name} preview image {mediaIndex}`}
-                      horizontalOuterMarginToEatOnMobile={8}
-                    />
-                  </div>
-                  <div
-                    style={
-                      isMobile
-                        ? styles.rightColumnContainerMobile
-                        : styles.rightColumnContainer
-                    }
-                  >
-                    <ColumnStackLayout noMargin>
-                      <LineStackLayout
-                        noMargin
-                        alignItems="center"
-                        justifyContent="space-between"
-                      >
-                        <Text noMargin size="title">
-                          {selectMessageByLocale(i18n, bundle.nameByLocale)}
-                        </Text>
-                        {isAlreadyReceived && (
-                          <div
-                            style={{
-                              ...styles.ownedTag,
-                              backgroundColor:
-                                gdevelopTheme.statusIndicator.success,
+                  {courseAndTheirListingDataIncludedInBundle.map(
+                    ({ course, courseListingData }) => {
+                      const completion = getCourseCompletion(course.id);
+                      return (
+                        <GridListTile key={course.id}>
+                          <CourseCard
+                            course={course}
+                            courseListingData={courseListingData}
+                            completion={completion}
+                            onClick={() => {
+                              onCourseOpen(courseListingData);
                             }}
-                          >
-                            <Text color="inherit" noMargin>
-                              <Trans>OWNED</Trans>
-                            </Text>
-                          </div>
-                        )}
-                      </LineStackLayout>
-                      <LineStackLayout noMargin alignItems="center">
-                        <Avatar
-                          src={sellerPublicProfile.iconUrl}
-                          style={styles.avatar}
-                        />
-                        <Text displayInlineAsSpan size="sub-title">
-                          <Link
-                            onClick={() =>
-                              openUserPublicProfile({
-                                userId: sellerPublicProfile.id,
-                                callbacks: {
-                                  onAssetPackOpen,
-                                  onGameTemplateOpen,
-                                },
-                              })
-                            }
-                            href="#"
-                          >
-                            {sellerPublicProfile.username || ''}
-                          </Link>
-                        </Text>
-                      </LineStackLayout>
-                      {isOwningAnotherVariant ? (
-                        <AlertMessage kind="warning">
-                          <Trans>
-                            You own an older version of this bundle. Browse the
-                            store to access it!
-                          </Trans>
-                        </AlertMessage>
-                      ) : !isAlreadyReceived ? (
-                        <ColumnStackLayout noMargin>
-                          {bundleListingData.visibleUntil && (
-                            <Line>
-                              <ProductLimitedTimeOffer
-                                visibleUntil={bundleListingData.visibleUntil}
-                              />
-                            </Line>
-                          )}
-                          {estimatedTotalPriceFormatted &&
-                          estimatedSavingsFormatted &&
-                          productPrice ? (
-                            <LineStackLayout noMargin>
-                              <Column noMargin>
-                                <LineStackLayout alignItems="center">
-                                  <Text
-                                    noMargin
-                                    color="secondary"
-                                    size="block-title"
-                                  >
-                                    <span style={styles.discountedPrice}>
-                                      {estimatedTotalPriceFormatted}
-                                    </span>
-                                  </Text>
-                                  <Chip
-                                    label={
-                                      <Trans>
-                                        {
-                                          estimatedSavingsFormatted.savingsPercentageFormatted
-                                        }{' '}
-                                        OFF
-                                      </Trans>
-                                    }
-                                    style={styles.discountChip}
-                                  />
-                                </LineStackLayout>
-                                <Text noMargin size="block-title" align="right">
-                                  {productPrice}
-                                </Text>
-                              </Column>
-                              <ColumnStackLayout noMargin alignItems="center">
-                                <PurchaseProductButtons
-                                  i18n={i18n}
-                                  productListingData={bundleListingData}
-                                  selectedUsageType="default"
-                                  onUsageTypeChange={() => {}}
-                                  simulateAppStoreProduct={
-                                    simulateAppStoreProduct
-                                  }
-                                  isAlreadyReceived={isAlreadyReceived}
-                                  onClickBuy={onClickBuy}
-                                  onClickBuyWithCredits={() => {}}
-                                  customLabel={
-                                    <Trans>
-                                      Buy now and save{' '}
-                                      {
-                                        estimatedSavingsFormatted.savingsPriceFormatted
-                                      }
-                                    </Trans>
-                                  }
-                                />
-                                {!shouldUseOrSimulateAppStoreProduct && (
-                                  <SecureCheckout />
-                                )}
-                              </ColumnStackLayout>
-                            </LineStackLayout>
-                          ) : (
-                            <Column noMargin>
-                              <Skeleton height={24} width={100} />
-                              <Skeleton height={24} width={100} />
-                            </Column>
-                          )}
-                        </ColumnStackLayout>
-                      ) : null}
-                      <Text size="body2" displayInlineAsSpan>
-                        <MarkdownText
-                          source={selectMessageByLocale(
-                            i18n,
-                            bundle.longDescriptionByLocale
-                          )}
-                          allowParagraphs
-                        />
-                      </Text>
-                      {summaryLines}
-                    </ColumnStackLayout>
-                  </div>
-                </ResponsiveLineStackLayout>
-                {bundlesContainingBundleTiles &&
-                bundlesContainingBundleTiles.length ? (
-                  <>
-                    <ColumnStackLayout noMargin>
-                      <LargeSpacer />
-                      {bundlesContainingBundleTiles}
-                      <LargeSpacer />
-                    </ColumnStackLayout>
-                  </>
-                ) : null}
-                {productsIncludedInBundleTiles && (
-                  <>
-                    <Line>
-                      <Text size="block-title">
-                        <Trans>Included in this bundle</Trans>
-                      </Text>
-                    </Line>
-                    <Line>
-                      <GridList
-                        cols={getTemplateColumns(windowSize, isLandscape)}
-                        cellHeight="auto"
-                        spacing={cellSpacing}
-                        style={styles.grid}
-                      >
-                        {productsIncludedInBundleTiles}
-                      </GridList>
-                    </Line>
-                  </>
-                )}
-                {otherBundlesFromTheSameAuthorTiles &&
-                  otherBundlesFromTheSameAuthorTiles.length > 0 && (
-                    <>
-                      <Line>
-                        <Text size="block-title">
-                          <Trans>Similar bundles</Trans>
-                        </Text>
-                      </Line>
-                      <Line>
-                        <GridList
-                          cols={getTemplateColumns(windowSize, isLandscape)}
-                          cellHeight="auto"
-                          spacing={cellSpacing}
-                          style={styles.grid}
-                        >
-                          {otherBundlesFromTheSameAuthorTiles}
-                        </GridList>
-                      </Line>
-                    </>
+                            discountedPrice
+                          />
+                        </GridListTile>
+                      );
+                    }
                   )}
-              </ScrollView>
-            </Column>
-          ) : null}
-          {!!purchasingBundleListingData && (
-            <BundlePurchaseDialog
-              bundleListingData={purchasingBundleListingData}
-              usageType="default"
-              onClose={() => setPurchasingBundleListingData(null)}
-            />
+                </GridList>
+              </Line>
+            )}
+          {productsExceptCoursesIncludedInBundleTiles && (
+            <Line>
+              <GridList
+                cols={getColumns(windowSize, isLandscape)}
+                cellHeight="auto"
+                spacing={cellSpacing}
+                style={styles.grid}
+              >
+                {productsExceptCoursesIncludedInBundleTiles}
+              </GridList>
+            </Line>
           )}
-          {isRedemptionCodesDialogOpen && (
-            <RedemptionCodesDialog
-              onClose={() => setIsRedemptionCodesDialogOpen(false)}
-            />
+          {highestSubscriptionPlanIncludedInBundle && (
+            <ResponsiveLineStackLayout expand noColumnMargin>
+              <Column noMargin justifyContent="center">
+                <Line expand>
+                  <SubscriptionPlanPricingSummary
+                    subscriptionPlanWithPricingSystems={
+                      highestSubscriptionPlanIncludedInBundle
+                    }
+                    disabled={false}
+                    onClickChoosePlan={async () => {}}
+                    seatsCount={0}
+                    setSeatsCount={() => {}}
+                    period={'month'}
+                    setPeriod={() => {}}
+                    onlyShowDiscountedPrice
+                  />
+                </Line>
+              </Column>
+              <Spacer />
+              <Column noMargin>
+                <SubscriptionPlanTableSummary
+                  subscriptionPlanWithPricingSystems={
+                    highestSubscriptionPlanIncludedInBundle
+                  }
+                  hideActions
+                />
+              </Column>
+            </ResponsiveLineStackLayout>
           )}
-        </>
+        </SectionContainer>
       )}
     </I18n>
   );

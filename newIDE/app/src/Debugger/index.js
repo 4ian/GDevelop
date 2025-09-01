@@ -72,12 +72,12 @@ export default class Debugger extends React.Component<Props, State> {
     profilerOutputs: {},
     profilingInProgress: {},
     debuggerStatus: {},
-    selectedId: 0,
+    selectedId: '0',
     logs: {},
   };
 
   _debuggerContents: { [DebuggerId]: ?DebuggerContent } = {};
-  _debuggerLogs: Map<number, LogsManager> = new Map();
+  _debuggerLogs: Map<DebuggerId, LogsManager> = new Map();
 
   updateToolbar = () => {
     const { selectedId, debuggerStatus } = this.state;
@@ -128,7 +128,7 @@ export default class Debugger extends React.Component<Props, State> {
     }
   }
 
-  _getLogsManager(id: number): LogsManager {
+  _getLogsManager(id: DebuggerId): LogsManager {
     let result = this._debuggerLogs.get(id);
     if (!result) {
       result = new LogsManager();

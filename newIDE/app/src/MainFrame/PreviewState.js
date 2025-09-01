@@ -68,7 +68,7 @@ export const usePreviewDebuggerServerWatcher = (
               ...otherDebuggerStatus
             } = debuggerStatus;
             console.info(
-              `Connection closed with preview #${id}. Last status was:`,
+              `Connection closed with preview with id "${id}". Last status was:`,
               closedDebuggerStatus
             );
 
@@ -135,7 +135,7 @@ export const usePreviewDebuggerServerWatcher = (
   );
 
   const hasNonEditionPreviewsRunning = Object.keys(debuggerStatus).some(
-    key => !debuggerStatus[+key].isInGameEdition
+    key => !debuggerStatus[key].isInGameEdition
   );
 
   return {

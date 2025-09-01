@@ -4,11 +4,12 @@ const log = require('electron-log');
 const { findLocalIp } = require('./Utils/LocalNetworkIpFinder');
 
 let wsServer = null;
-let webSockets = [];
+let webSockets = {};
+let nextDebuggerId = 0;
 
 const closeServer = () => {
   wsServer = null;
-  webSockets = [];
+  webSockets = {};
 };
 
 /** @param {WebSocket.Server} wsServer */
@@ -32,27 +33,27 @@ module.exports = {
     getAvailablePort(3030, 4000).then(
       port => {
         wsServer = new WebSocket.Server({ port });
-        webSockets = [];
+        webSockets = {};
 
         wsServer.on('connection', function connection(newWebSocket) {
-          const id = webSockets.length;
-          webSockets.push(newWebSocket);
-          log.info(`Debugger connection #${id} opened.`);
+          const id = 'preview-ws-' + nextDebuggerId++;
+          webSockets[id] = newWebSocket;
+          log.info(`Debugger connection with id "${id}" opened.`);
 
           newWebSocket.on('message', message => {
-            // log.info(`Debugger connection #${id} received message.`);
+            // log.info(`Debugger connection with id "${id}" received message.`);
             options.onMessage({ id, message });
           });
 
           newWebSocket.on('close', () => {
-            log.info(`Debugger connection #${id} closed.`);
+            log.info(`Debugger connection with id "${id}" closed.`);
             webSockets[id] = null;
             options.onConnectionClose({ id });
           });
 
           newWebSocket.on('error', error => {
             const errorMessage = error.message || 'Unknown error';
-            log.error(`Error in debugger connection #${id}: ${errorMessage}.`);
+            log.error(`Error in debugger connection with id "${id}": ${errorMessage}.`);
             options.onConnectionError({ id, errorMessage });
           });
 
@@ -78,7 +79,7 @@ module.exports = {
   },
   closeServer,
   sendMessage: ({ id, message }, cb) => {
-    if (!webSockets[id]) return cb(`Debugger connection #${id} does not exist`);
+    if (!webSockets[id]) return cb(`Debugger connection with id "${id}" does not exist`);
 
     webSockets[id].send(message, err => {
       cb(err);

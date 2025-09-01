@@ -2401,6 +2401,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       const { previewDebuggerServer } = this.props;
       if (!previewDebuggerServer) return;
       // TODO Find the one of the in-game editor.
+      // Also search for "in-game-edition preview" when fixing this.
       const debuggerId = previewDebuggerServer.getExistingDebuggerIds()[0];
       try {
         const answer = await previewDebuggerServer.sendMessageWithResponse(debuggerId, {

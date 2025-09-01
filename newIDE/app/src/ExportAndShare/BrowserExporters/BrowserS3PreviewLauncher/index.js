@@ -20,7 +20,7 @@ import { displayBlackLoadingScreenOrThrow } from '../../../Utils/BrowserExternal
 import { getGDevelopResourceJwtToken } from '../../../Utils/GDevelopServices/Project';
 import { isNativeMobileApp } from '../../../Utils/Platform';
 import { getIDEVersionWithHash } from '../../../Version';
-import { attachToPreview } from '../../../EmbeddedGame/EmbeddedGameFrame';
+import { setEmbeddedGameFramePreviewLocation } from '../../../EmbeddedGame/EmbeddedGameFrame';
 const gd: libGDevelop = global.gd;
 
 type State = {|
@@ -246,7 +246,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
       await browserS3FileSystem.uploadPendingObjects();
 
       if (previewOptions.isForInGameEdition) {
-        attachToPreview({
+        setEmbeddedGameFramePreviewLocation({
           previewIndexHtmlLocation: outputDir + '/index.html',
         });
       }

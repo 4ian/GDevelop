@@ -182,6 +182,10 @@ class LocalPreviewDebuggerServer {
       if (callbacksIndex !== -1) callbacksList.splice(callbacksIndex, 1);
     };
   }
+  registerEmbeddedGameFrame(window: WindowProxy) {
+    // Nothing to do, the local preview debugger server communicates
+    // with the embedded game frame through WebSocket, like other preview windows.
+  }
 }
 
 export const localPreviewDebuggerServer: PreviewDebuggerServer = new LocalPreviewDebuggerServer();

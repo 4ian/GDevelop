@@ -17,12 +17,21 @@ const existingPreviewWindows: {
   [DebuggerId]: WindowProxy,
 } = {};
 
-const getExistingDebuggerIds = () =>
-  Object.keys(existingPreviewWindows).map(key => Number(key));
+let embbededGameFrameWindow: WindowProxy | null = null;
 
-const getDebuggerIdForPreviewWindow = (previewWindow: any) => {
-  for (const key in existingPreviewWindows) {
-    const id = Number(key);
+const getExistingDebuggerIds = (): Array<DebuggerId> => [
+  ...(embbededGameFrameWindow ? ['embedded-game-frame'] : []),
+  ...Object.keys(existingPreviewWindows).map(key => key),
+];
+
+const getDebuggerIdForPreviewWindow = (
+  previewWindow: any
+): DebuggerId | null => {
+  if (embbededGameFrameWindow && embbededGameFrameWindow === previewWindow) {
+    return 'embedded-game-frame';
+  }
+
+  for (const id in existingPreviewWindows) {
     if (existingPreviewWindows[id] === previewWindow) {
       return id;
     }
@@ -41,8 +50,7 @@ const setupWindowClosedPolling = () => {
   if (windowClosedPollingIntervalId !== null) return;
 
   windowClosedPollingIntervalId = setInterval(() => {
-    for (const key in existingPreviewWindows) {
-      const id = Number(key);
+    for (const id in existingPreviewWindows) {
       const previewWindow = existingPreviewWindows[id];
       if (previewWindow.closed) {
         console.info('A preview window was closed, with debugger id:', id);
@@ -102,13 +110,19 @@ class BrowserPreviewDebuggerServer {
     callbacksList.forEach(({ onServerStateChanged }) => onServerStateChanged());
   }
   sendMessage(id: DebuggerId, message: Object) {
-    const previewWindow = existingPreviewWindows[id];
-    if (!previewWindow) return;
+    const theWindow =
+      id === 'embedded-game-frame'
+        ? embbededGameFrameWindow
+        : existingPreviewWindows[id];
+    if (!theWindow) return;
 
     try {
-      previewWindow.postMessage(message, PREVIEWS_ORIGIN);
+      theWindow.postMessage(message, PREVIEWS_ORIGIN);
     } catch (error) {
-      console.error('Unable to send a message to the preview window:', error);
+      console.error(
+        `Unable to send a message to the preview window with id "${id}":`,
+        error
+      );
     }
   }
   sendMessageWithResponse(
@@ -143,14 +157,26 @@ class BrowserPreviewDebuggerServer {
       if (callbacksIndex !== -1) callbacksList.splice(callbacksIndex, 1);
     };
   }
+  registerEmbeddedGameFrame(window: WindowProxy) {
+    embbededGameFrameWindow = window;
+  }
 }
 export const browserPreviewDebuggerServer: PreviewDebuggerServer = new BrowserPreviewDebuggerServer();
 
 export const registerNewPreviewWindow = (
   previewWindow: WindowProxy
 ): DebuggerId => {
+  const existingId = getDebuggerIdForPreviewWindow(previewWindow);
+  if (existingId) {
+    console.warn(
+      'A preview window was already registered. It has this id:',
+      existingId
+    );
+    return existingId;
+  }
+
   // Associate this window with a new debugger id.
-  const id = nextDebuggerId++;
+  const id = 'preview-window-' + nextDebuggerId++;
   existingPreviewWindows[id] = previewWindow;
 
   setupWindowClosedPolling();

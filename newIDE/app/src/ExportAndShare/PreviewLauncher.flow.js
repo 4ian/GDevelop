@@ -78,8 +78,8 @@ export type PreviewLauncherProps = {|
   onCaptureFinished: CaptureOptions => Promise<void>,
 |};
 
-/** Each game connected to the debugger server is identified by a unique number. */
-export type DebuggerId = number;
+/** Each game connected to the debugger server is identified by a unique string. */
+export type DebuggerId = string;
 
 /** Each game connected to the debugger server can communicate its status. */
 export type DebuggerStatus = {|
@@ -124,6 +124,7 @@ export interface PreviewDebuggerServer {
   sendMessage(id: DebuggerId, message: Object): void;
   sendMessageWithResponse(id: DebuggerId, message: Object, timeout?: number): Promise<Object>;
   registerCallbacks(callbacks: PreviewDebuggerServerCallbacks): () => void;
+  registerEmbeddedGameFrame(window: WindowProxy): void;
 }
 
 /** The logs returned by the game hot-reloader. */

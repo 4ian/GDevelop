@@ -65,7 +65,9 @@ export type EditorCameraState = {|
   distance: number,
 |};
 
-let onAttachToPreview: null | (AttachToPreviewOptions => void) = null;
+let onSetEmbededGameFramePreviewLocation:
+  | null
+  | (AttachToPreviewOptions => void) = null;
 let onSwitchToSceneEdition: null | (SwitchToSceneEditionOptions => void) = null;
 let onSetEditorHotReloadNeeded:
   | null
@@ -79,11 +81,12 @@ let onSetCameraState:
   | null
   | ((editorId: string, cameraState: EditorCameraState) => void) = null;
 
-export const attachToPreview = ({
+export const setEmbeddedGameFramePreviewLocation = ({
   previewIndexHtmlLocation,
 }: AttachToPreviewOptions) => {
-  if (!onAttachToPreview) throw new Error('No EmbeddedGameFrame registered.');
-  onAttachToPreview({ previewIndexHtmlLocation });
+  if (!onSetEmbededGameFramePreviewLocation)
+    throw new Error('No EmbeddedGameFrame registered.');
+  onSetEmbededGameFramePreviewLocation({ previewIndexHtmlLocation });
 };
 
 export const switchToSceneEdition = (options: SwitchToSceneEditionOptions) => {
@@ -188,10 +191,13 @@ export const EmbeddedGameFrame = ({
   React.useEffect(
     () => {
       // TODO: use a real context for this?
-      onAttachToPreview = (options: AttachToPreviewOptions) => {
+      onSetEmbededGameFramePreviewLocation = (
+        options: AttachToPreviewOptions
+      ): void => {
         setPreviewIndexHtmlLocation(options.previewIndexHtmlLocation);
-        if (iframeRef.current) {
-          iframeRef.current.contentWindow.focus();
+        const iframe = iframeRef.current;
+        if (iframe) {
+          iframe.contentWindow.focus();
         }
       };
       onPreventGameFramePointerEvents = (enabled: boolean) => {
@@ -361,6 +367,12 @@ export const EmbeddedGameFrame = ({
       enabled,
     ]
   );
+
+  React.useEffect(() => {
+    const iframe = iframeRef.current;
+    if (previewDebuggerServer && iframe)
+      previewDebuggerServer.registerEmbeddedGameFrame(iframe.contentWindow);
+  });
 
   return (
     <div

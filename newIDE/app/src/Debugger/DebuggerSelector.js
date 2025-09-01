@@ -18,33 +18,28 @@ type Props = {|
 export default class DebuggerSelector extends React.Component<Props, void> {
   render() {
     const debuggerIds = Object.keys(this.props.debuggerStatus);
-    const hasDebuggers = !!debuggerIds.length;
+    const debuggerIdsWithoutInGameEdition = debuggerIds.filter(
+      id => !this.props.debuggerStatus[id].isInGameEdition
+    );
+    const hasDebuggers = !!debuggerIdsWithoutInGameEdition.length;
     return (
       <I18n>
         {({ i18n }) => (
           <SelectField
             fullWidth
             value={hasDebuggers ? this.props.selectedId : 0}
-            onChange={(e, i, value) =>
-              this.props.onChooseDebugger(parseInt(value, 10) || 0)
-            }
+            onChange={(e, i, value) => this.props.onChooseDebugger(value)}
             disabled={!hasDebuggers}
           >
-            {debuggerIds.map(id => {
-              const status = this.props.debuggerStatus[+id];
-              const statusText = status.isPaused
-                ? status.isInGameEdition
-                  ? t`Editing`
-                  : t`Paused`
-                : status.isInGameEdition
-                ? t`Playing (in-game edition)`
-                : t`Playing`;
+            {debuggerIdsWithoutInGameEdition.map(id => {
+              const status = this.props.debuggerStatus[id];
+              const statusText = status.isPaused ? t`Paused` : t`Playing`;
 
               return (
                 <SelectOption
-                  value={+id}
+                  value={id}
                   key={id}
-                  label={t`Game preview #${id} (${i18n._(statusText)})`}
+                  label={t`Game preview "${id}" (${i18n._(statusText)})`}
                 />
               );
             })}

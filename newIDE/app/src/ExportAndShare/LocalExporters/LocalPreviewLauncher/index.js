@@ -21,7 +21,7 @@ import {
 } from './LocalPreviewDebuggerServer';
 import Window from '../../../Utils/Window';
 import { getIDEVersionWithHash } from '../../../Version';
-import { attachToPreview } from '../../../EmbeddedGame/EmbeddedGameFrame';
+import { setEmbeddedGameFramePreviewLocation } from '../../../EmbeddedGame/EmbeddedGameFrame';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -228,6 +228,7 @@ export default class LocalPreviewLauncher extends React.Component<
     var previewStartTime = performance.now();
 
     // TODO Filter according to isForInGameEdition
+    // Also search for "in-game-edition preview" when fixing this.
     const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
     const shouldHotReload = previewOptions.hotReload && !!debuggerIds.length;
 
@@ -384,7 +385,7 @@ export default class LocalPreviewLauncher extends React.Component<
       }
     } else {
       if (previewOptions.isForInGameEdition) {
-        attachToPreview({
+        setEmbeddedGameFramePreviewLocation({
           previewIndexHtmlLocation: `file://${outputDir}/index.html`,
         });
       }

@@ -2850,6 +2850,7 @@ namespace gdjs {
       this.target.z = cameraState.positionZ;
       this.rotationAngle = cameraState.rotationAngle;
       this.elevationAngle = cameraState.elevationAngle;
+      this.distance = cameraState.distance;
       this._editorCamera.onHasCameraChanged();
     }
   }

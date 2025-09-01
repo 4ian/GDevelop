@@ -2403,7 +2403,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       // TODO Find the one of the in-game editor.
       const debuggerId = previewDebuggerServer.getExistingDebuggerIds()[0];
       try {
-        const answer = await previewDebuggerServer.askAnswer(debuggerId, {
+        const answer = await previewDebuggerServer.sendMessageWithResponse(debuggerId, {
           command: 'getSelectionAABB',
         });
         selectionAABB.set({

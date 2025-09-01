@@ -13,8 +13,8 @@ let debuggerServerState: 'started' | 'stopped' = 'stopped';
 let debuggerServerAddress: ?ServerAddress = null;
 const callbacksList: Array<PreviewDebuggerServerCallbacks> = [];
 const debuggerIds: Array<DebuggerId> = [];
-const answerCallbacks = new Map<number, (value: Object) => void>();
-let nextAnswerId = 1;
+const responseCallbacks = new Map<number, (value: Object) => void>();
+let nextMessageWithResponseId = 1;
 
 const removeServerListeners = () => {
   if (!ipcRenderer) return;
@@ -112,10 +112,10 @@ class LocalPreviewDebuggerServer {
         }
 
         if (parsedMessage) {
-          const answerCallback = answerCallbacks.get(parsedMessage.messageId);
+          const answerCallback = responseCallbacks.get(parsedMessage.messageId);
           if (answerCallback) {
             answerCallback(parsedMessage);
-            answerCallbacks.delete(parsedMessage.messageId);
+            responseCallbacks.delete(parsedMessage.messageId);
           }
         }
         callbacksList.forEach(({ onHandleParsedMessage }) =>
@@ -150,20 +150,20 @@ class LocalPreviewDebuggerServer {
       message: JSON.stringify(message),
     });
   }
-  askAnswer(
+  sendMessageWithResponse(
     id: DebuggerId,
     message: Object,
     timeout: number = 1000
   ): Promise<Object> {
-    const messageId = nextAnswerId;
-    nextAnswerId++;
+    const messageId = nextMessageWithResponseId;
+    nextMessageWithResponseId++;
     this.sendMessage(id, { ...message, messageId });
 
     const promise = new Promise<Object>((resolve, reject) => {
-      answerCallbacks.set(messageId, resolve);
+      responseCallbacks.set(messageId, resolve);
       setTimeout(() => {
         reject();
-        answerCallbacks.delete(messageId);
+        responseCallbacks.delete(messageId);
       }, timeout);
     });
     return promise;

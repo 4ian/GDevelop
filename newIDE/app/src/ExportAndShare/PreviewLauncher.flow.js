@@ -122,7 +122,7 @@ export interface PreviewDebuggerServer {
   getServerState(): 'started' | 'stopped';
   getExistingDebuggerIds(): Array<DebuggerId>;
   sendMessage(id: DebuggerId, message: Object): void;
-  askAnswer(id: DebuggerId, message: Object, timeout?: number): Promise<Object>;
+  sendMessageWithResponse(id: DebuggerId, message: Object, timeout?: number): Promise<Object>;
   registerCallbacks(callbacks: PreviewDebuggerServerCallbacks): () => void;
 }
 

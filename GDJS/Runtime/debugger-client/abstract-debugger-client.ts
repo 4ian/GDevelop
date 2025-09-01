@@ -358,6 +358,8 @@ namespace gdjs {
           return;
         }
         if (inGameEditor) {
+          const wasPaused = this._runtimegame.isPaused();
+          this._runtimegame.pause(true);
           inGameEditor.switchToSceneOrVariant(
             data.editorId || null,
             sceneName,
@@ -366,6 +368,7 @@ namespace gdjs {
             data.eventsBasedObjectVariantName || null,
             data.editorCamera3D || null
           );
+        this._runtimegame.pause(wasPaused);
         }
       } else if (data.command === 'updateInstances') {
         if (inGameEditor) {

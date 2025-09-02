@@ -1995,9 +1995,9 @@ namespace gdjs {
               return;
             }
 
-            let cursorX;
-            let cursorY;
-            let cursorZ;
+            let cursorX: float;
+            let cursorY: float;
+            let cursorZ: float;
             if (closestIntersect) {
               cursorX = closestIntersect.point.x;
               cursorY = -closestIntersect.point.y;
@@ -2045,6 +2045,10 @@ namespace gdjs {
       if (!this._draggedNewObject) {
         const newObject = editedInstanceContainer.createObject(name);
         if (!newObject) return;
+        if (!is3D(newObject)) {
+          editedInstanceContainer.markObjectForDeletion(newObject);
+          return;
+        }
         newObject.persistentUuid = gdjs.makeUuid();
         newObject.setLayer(selectedLayer.getName());
         this._draggedNewObject = newObject;

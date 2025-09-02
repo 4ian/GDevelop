@@ -141,7 +141,9 @@ namespace gdjs {
       );
       this._borderOpacity = objectData.content.borderOpacity;
       this._borderWidth = objectData.content.borderWidth;
-      this._disabled = objectData.content.disabled;
+      this._disabled = instanceContainer.getGame().isInGameEdition()
+        ? true
+        : objectData.content.disabled;
       this._readOnly = objectData.content.readOnly;
       this._spellCheck =
         objectData.content.spellCheck !== undefined
@@ -561,6 +563,9 @@ namespace gdjs {
     }
 
     setDisabled(value: boolean) {
+      if (this.getInstanceContainer().getGame().isInGameEdition()) {
+        return;
+      }
       this._disabled = value;
       this._renderer.updateDisabled();
     }

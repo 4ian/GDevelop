@@ -1768,10 +1768,15 @@ const MainFrame = (props: Props) => {
     setState(state => ({
       ...state,
       editorTabs: closeEventsFunctionsExtensionTabs(state.editorTabs, oldName),
-    })).then(state => {
-      eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
+    })).then(async state => {
+      await eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
         currentProject
       );
+      hotReloadInGameEditorIfNeeded({
+        shouldReloadProjectData: false,
+        shouldReloadLibraries: true,
+        shouldReloadResources: false,
+      });
       _onProjectItemModified();
     });
   };
@@ -2597,6 +2602,62 @@ const MainFrame = (props: Props) => {
     [hotReloadInGameEditorIfNeeded, openExternalLayout]
   );
 
+  const _onReloadEventsFunctionsExtensionsAsync = React.useCallback(
+    async () => {
+      if (isProjectClosedSoAvoidReloadingExtensions) {
+        return;
+      }
+      await eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
+        currentProject
+      );
+      hotReloadInGameEditorIfNeeded({
+        shouldReloadProjectData: false,
+        shouldReloadLibraries: true,
+        shouldReloadResources: false,
+      });
+    },
+    [
+      isProjectClosedSoAvoidReloadingExtensions,
+      currentProject,
+      eventsFunctionsExtensionsState,
+      hotReloadInGameEditorIfNeeded,
+    ]
+  );
+
+  const onReloadEventsFunctionsExtensions = React.useCallback(
+    () => {
+      _onReloadEventsFunctionsExtensionsAsync();
+    },
+    [_onReloadEventsFunctionsExtensionsAsync]
+  );
+
+  // TODO Check why we don't always use `onReloadEventsFunctionsExtensions`.
+  /**
+   * It's the same as `onReloadEventsFunctionsExtensions` but extensions are
+   * not unloaded first.
+   */
+  const onLoadEventsFunctionsExtensions = React.useCallback(
+    async () => {
+      if (isProjectClosedSoAvoidReloadingExtensions) {
+        return;
+      }
+      await eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+        currentProject
+      );
+      hotReloadInGameEditorIfNeeded({
+        shouldReloadProjectData: false,
+        shouldReloadLibraries: true,
+        shouldReloadResources: false,
+      });
+    },
+    [
+      isProjectClosedSoAvoidReloadingExtensions,
+      currentProject,
+      eventsFunctionsExtensionsState,
+      hotReloadInGameEditorIfNeeded,
+    ]
+  );
+
   const _onOpenEventBasedObjectEditorAsync = React.useCallback(
     async (extensionName: string, eventsBasedObjectName: string) => {
       if (
@@ -2678,8 +2739,8 @@ const MainFrame = (props: Props) => {
     [_onExtractAsEventBasedObjectAsync]
   );
 
-  const onOpenEventBasedObjectVariantEditor = React.useCallback(
-    (
+  const _onOpenEventBasedObjectVariantEditorAsync = React.useCallback(
+    async (
       extensionName: string,
       eventsBasedObjectName: string,
       variantName: string
@@ -2696,19 +2757,39 @@ const MainFrame = (props: Props) => {
         return;
       }
       const eventsBasedObject = eventsBasedObjects.get(eventsBasedObjectName);
+
+      // Trigger reloading of extensions as an extension was modified (or even added)
+      // to create the custom object.
+      await eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+        currentProject
+      );
+      setEditorHotReloadNeeded({
+        shouldReloadProjectData: false,
+        shouldReloadLibraries: true,
+        shouldReloadResources: false,
+      });
       openCustomObjectEditor(
         eventsFunctionsExtension,
         eventsBasedObject,
         variantName
       );
-
-      // Trigger reloading of extensions as an extension was modified (or even added)
-      // to create the custom object.
-      eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
-        currentProject
-      );
     },
     [currentProject, openCustomObjectEditor, eventsFunctionsExtensionsState]
+  );
+
+  const onOpenEventBasedObjectVariantEditor = React.useCallback(
+    (
+      extensionName: string,
+      eventsBasedObjectName: string,
+      variantName: string
+    ) => {
+      _onOpenEventBasedObjectVariantEditorAsync(
+        extensionName,
+        eventsBasedObjectName,
+        variantName
+      );
+    },
+    [_onOpenEventBasedObjectVariantEditorAsync]
   );
 
   const onEventsBasedObjectChildrenEdited = React.useCallback(
@@ -2820,6 +2901,11 @@ const MainFrame = (props: Props) => {
     eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
       currentProject
     );
+    setEditorHotReloadNeeded({
+      shouldReloadProjectData: false,
+      shouldReloadLibraries: true,
+      shouldReloadResources: false,
+    });
   };
 
   const openOpenFromStorageProviderDialog = React.useCallback(
@@ -4250,6 +4336,7 @@ const MainFrame = (props: Props) => {
     onOpenEventBasedObjectVariantEditor: onOpenEventBasedObjectVariantEditor,
     deleteEventsBasedObjectVariant: deleteEventsBasedObjectVariant,
     onEventsBasedObjectChildrenEdited: onEventsBasedObjectChildrenEdited,
+    onLoadEventsFunctionsExtensions: onLoadEventsFunctionsExtensions,
     onSceneObjectEdited: onSceneObjectEdited,
     onSceneObjectsDeleted: onSceneObjectsDeleted,
     onSceneEventsModifiedOutsideEditor: onSceneEventsModifiedOutsideEditor,
@@ -4339,14 +4426,7 @@ const MainFrame = (props: Props) => {
           onRenameEventsFunctionsExtension={renameEventsFunctionsExtension}
           onRenameExternalEvents={renameExternalEvents}
           onOpenResources={openResources}
-          onReloadEventsFunctionsExtensions={() => {
-            if (isProjectClosedSoAvoidReloadingExtensions) {
-              return;
-            }
-            eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
-              currentProject
-            );
-          }}
+          onReloadEventsFunctionsExtensions={onReloadEventsFunctionsExtensions}
           onExtensionInstalled={onExtensionInstalled}
           onSceneAdded={onSceneAdded}
           onExternalLayoutAdded={onExternalLayoutAdded}

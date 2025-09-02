@@ -830,6 +830,7 @@ const EventsFunctionsList = React.forwardRef<
         onSelectEventsBasedObject,
         editName,
         scrollToItem,
+        onEventBasedObjectTypeChanged,
       ]
     );
 
@@ -1008,6 +1009,7 @@ const EventsFunctionsList = React.forwardRef<
         selectedEventsBasedObject,
         selectedEventsFunction,
         onOpenCustomObjectEditor,
+        onEventBasedObjectTypeChanged,
       }),
       [
         project,
@@ -1033,6 +1035,7 @@ const EventsFunctionsList = React.forwardRef<
         selectedEventsBasedObject,
         selectedEventsFunction,
         onOpenCustomObjectEditor,
+        onEventBasedObjectTypeChanged,
       ]
     );
 

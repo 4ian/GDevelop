@@ -242,6 +242,7 @@ export type EditorTabsPaneCommonProps = {|
     changes: InstancesOutsideEditorChanges
   ) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onLoadEventsFunctionsExtensions: () => Promise<void>,
   onEffectAdded: () => void,
   onObjectListsModified: ({ isNewObjectTypeUsed: boolean }) => void,
   triggerHotReloadInGameEditorIfNeeded: () => void,
@@ -322,6 +323,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
     selectInAppTutorial,
     eventsFunctionsExtensionsState,
     isProjectClosedSoAvoidReloadingExtensions,
+    onLoadEventsFunctionsExtensions,
     renameResourcesInProject,
     openBehaviorEvents,
     onExtractAsExternalLayout,
@@ -693,14 +695,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
                       onOpenPreferences: () => openPreferencesDialog(true),
                       onOpenAbout: () => openAboutDialog(true),
                       selectInAppTutorial: selectInAppTutorial,
-                      onLoadEventsFunctionsExtensions: async () => {
-                        if (isProjectClosedSoAvoidReloadingExtensions) {
-                          return;
-                        }
-                        return eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
-                          currentProject
-                        );
-                      },
+                      onLoadEventsFunctionsExtensions: onLoadEventsFunctionsExtensions,
                       onReloadEventsFunctionsExtensionMetadata: extension => {
                         if (isProjectClosedSoAvoidReloadingExtensions) {
                           return;

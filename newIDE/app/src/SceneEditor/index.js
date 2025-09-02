@@ -2404,9 +2404,12 @@ export default class SceneEditor extends React.Component<Props, State> {
       // Also search for "in-game-edition preview" when fixing this.
       const debuggerId = previewDebuggerServer.getExistingDebuggerIds()[0];
       try {
-        const answer = await previewDebuggerServer.sendMessageWithResponse(debuggerId, {
-          command: 'getSelectionAABB',
-        });
+        const answer = await previewDebuggerServer.sendMessageWithResponse(
+          debuggerId,
+          {
+            command: 'getSelectionAABB',
+          }
+        );
         selectionAABB.set({
           left: answer.payload.minX,
           top: answer.payload.minY,

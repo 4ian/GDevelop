@@ -52,6 +52,7 @@ export type EventsBasedObjectCallbacks = {|
     sourceEventsBasedObjectName: string
   ) => void,
   onOpenCustomObjectEditor: (eventsBasedObject: gdEventsBasedObject) => void,
+  onEventBasedObjectTypeChanged: () => void,
 |};
 
 export type EventsBasedObjectProps = {|
@@ -336,6 +337,7 @@ export class EventsBasedObjectTreeViewItemContent
     }
 
     this._onEventsBasedObjectModified();
+    this.props.onEventBasedObjectTypeChanged();
     this.props.onSelectEventsBasedObject(newEventsBasedObject);
     this.props.editName(getObjectTreeViewItemId(newEventsBasedObject));
   }

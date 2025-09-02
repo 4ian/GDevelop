@@ -2637,18 +2637,20 @@ const MainFrame = (props: Props) => {
    * not unloaded first.
    */
   const onLoadEventsFunctionsExtensions = React.useCallback(
-    async () => {
+    async ({ shouldHotReloadEditor }: {| shouldHotReloadEditor: boolean |}) => {
       if (isProjectClosedSoAvoidReloadingExtensions) {
         return;
       }
       await eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
         currentProject
       );
-      hotReloadInGameEditorIfNeeded({
-        shouldReloadProjectData: false,
-        shouldReloadLibraries: true,
-        shouldReloadResources: false,
-      });
+      if (shouldHotReloadEditor) {
+        hotReloadInGameEditorIfNeeded({
+          shouldReloadProjectData: false,
+          shouldReloadLibraries: true,
+          shouldReloadResources: false,
+        });
+      }
     },
     [
       isProjectClosedSoAvoidReloadingExtensions,

@@ -242,7 +242,9 @@ export type EditorTabsPaneCommonProps = {|
     changes: InstancesOutsideEditorChanges
   ) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
-  onLoadEventsFunctionsExtensions: () => Promise<void>,
+  onLoadEventsFunctionsExtensions: ({|
+    shouldHotReloadEditor: boolean,
+  |}) => Promise<void>,
   onEffectAdded: () => void,
   onObjectListsModified: ({ isNewObjectTypeUsed: boolean }) => void,
   triggerHotReloadInGameEditorIfNeeded: () => void,

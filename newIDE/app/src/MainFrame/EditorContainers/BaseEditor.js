@@ -103,7 +103,9 @@ export type RenderEditorContainerProps = {|
   |}) => void,
 
   // Events function management:
-  onLoadEventsFunctionsExtensions: () => Promise<void>,
+  onLoadEventsFunctionsExtensions: ({|
+    shouldHotReloadEditor: boolean,
+  |}) => Promise<void>,
   onReloadEventsFunctionsExtensionMetadata: (
     extension: gdEventsFunctionsExtension
   ) => void,

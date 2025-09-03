@@ -131,6 +131,7 @@ const CoursesPage = ({
             <SectionRow>
               <BundlePreviewBanner
                 onDisplayBundle={onSelectBundle}
+                category="starter"
                 i18n={i18n}
               />
             </SectionRow>
@@ -144,28 +145,72 @@ const CoursesPage = ({
                   cellHeight="auto"
                   spacing={ITEMS_SPACING * 2}
                 >
-                  {courses.slice(numberOfItemsOnOneRow).map(course => {
-                    const completion = getCourseCompletion(course.id);
-                    const courseListingData = listedCourses.find(
-                      listedCourse => listedCourse.id === course.id
-                    );
-                    return (
-                      <GridListTile key={course.id}>
-                        <CourseCard
-                          course={course}
-                          courseListingData={courseListingData}
-                          completion={completion}
-                          onClick={() => {
-                            onSelectCourse(course.id);
-                          }}
-                        />
-                      </GridListTile>
-                    );
-                  })}
+                  {courses
+                    .slice(numberOfItemsOnOneRow, 2 * numberOfItemsOnOneRow)
+                    .map(course => {
+                      const completion = getCourseCompletion(course.id);
+                      const courseListingData = listedCourses.find(
+                        listedCourse => listedCourse.id === course.id
+                      );
+                      return (
+                        <GridListTile key={course.id}>
+                          <CourseCard
+                            course={course}
+                            courseListingData={courseListingData}
+                            completion={completion}
+                            onClick={() => {
+                              onSelectCourse(course.id);
+                            }}
+                          />
+                        </GridListTile>
+                      );
+                    })}
                 </GridList>
               </Line>
             </SectionRow>
           )}
+          {!hidePremiumProducts && (
+            <SectionRow>
+              <BundlePreviewBanner
+                onDisplayBundle={onSelectBundle}
+                category="premium"
+                i18n={i18n}
+              />
+            </SectionRow>
+          )}
+          {courses &&
+            listedCourses &&
+            courses.length > 2 * numberOfItemsOnOneRow && (
+              <SectionRow>
+                <Line>
+                  <GridList
+                    cols={numberOfItemsOnOneRow}
+                    style={styles.grid}
+                    cellHeight="auto"
+                    spacing={ITEMS_SPACING * 2}
+                  >
+                    {courses.slice(2 * numberOfItemsOnOneRow).map(course => {
+                      const completion = getCourseCompletion(course.id);
+                      const courseListingData = listedCourses.find(
+                        listedCourse => listedCourse.id === course.id
+                      );
+                      return (
+                        <GridListTile key={course.id}>
+                          <CourseCard
+                            course={course}
+                            courseListingData={courseListingData}
+                            completion={completion}
+                            onClick={() => {
+                              onSelectCourse(course.id);
+                            }}
+                          />
+                        </GridListTile>
+                      );
+                    })}
+                  </GridList>
+                </Line>
+              </SectionRow>
+            )}
         </SectionContainer>
       )}
     </I18n>

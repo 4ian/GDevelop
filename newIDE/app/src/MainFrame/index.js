@@ -442,8 +442,10 @@ const MainFrame = (props: Props) => {
     hasNonEditionPreviewsRunning,
     gameHotReloadLogs,
     editorHotReloadLogs,
+    editorUncaughtError,
     clearGameHotReloadLogs,
     clearEditorHotReloadLogs,
+    clearEditorUncaughtError,
     hardReloadAllPreviews,
   } = usePreviewDebuggerServerWatcher(previewDebuggerServer);
   const {
@@ -4650,7 +4652,7 @@ const MainFrame = (props: Props) => {
         renderGDJSDevelopmentWatcher({
           onGDJSUpdated: relaunchAndThenHardReloadAllPreviews,
         })}
-      {!!gameHotReloadLogs.length && (
+      {gameHotReloadLogs.length > 0 && (
         <HotReloadLogsDialog
           logs={gameHotReloadLogs}
           onClose={clearGameHotReloadLogs}
@@ -4660,12 +4662,23 @@ const MainFrame = (props: Props) => {
           }}
         />
       )}
-      {!!editorHotReloadLogs.length && (
+      {(editorHotReloadLogs.length > 0 || editorUncaughtError !== null) && (
         <HotReloadLogsDialog
-          logs={editorHotReloadLogs}
-          onClose={clearEditorHotReloadLogs}
+          logs={
+            editorUncaughtError
+              ? [
+                  ...editorHotReloadLogs,
+                  { kind: 'error', message: editorUncaughtError.message },
+                ]
+              : editorHotReloadLogs
+          }
+          onClose={() => {
+            clearEditorHotReloadLogs();
+            clearEditorUncaughtError();
+          }}
           onLaunchNewPreview={() => {
             clearEditorHotReloadLogs();
+            clearEditorUncaughtError();
             hotReloadInGameEditorIfNeeded({
               shouldReloadProjectData: true,
               shouldReloadLibraries: true,

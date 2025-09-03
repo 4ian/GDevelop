@@ -29,6 +29,8 @@ type PreviewDebuggerServerWatcherResults = {|
   clearGameHotReloadLogs: () => void,
   editorHotReloadLogs: Array<HotReloaderLog>,
   clearEditorHotReloadLogs: () => void,
+  editorUncaughtError: Error | null,
+  clearEditorUncaughtError: () => void,
 
   hardReloadAllPreviews: () => void,
 |};
@@ -49,6 +51,10 @@ export const usePreviewDebuggerServerWatcher = (
   const [editorHotReloadLogs, setEditorHotReloadLogs] = React.useState<
     Array<HotReloaderLog>
   >([]);
+  const [
+    editorUncaughtError,
+    setEditorUncaughtError,
+  ] = React.useState<Error | null>(null);
   React.useEffect(
     () => {
       if (!previewDebuggerServer) {
@@ -102,6 +108,14 @@ export const usePreviewDebuggerServerWatcher = (
                 sceneName: parsedMessage.payload.sceneName,
               },
             }));
+          } else if (parsedMessage.command === 'game.crashed') {
+            // Only keep the first exception.
+            if (parsedMessage.payload.isInGameEdition) {
+              setEditorUncaughtError(
+                previousEditorUncaughtError =>
+                  previousEditorUncaughtError || parsedMessage.payload.exception
+              );
+            }
           }
         },
       });
@@ -118,6 +132,10 @@ export const usePreviewDebuggerServerWatcher = (
   const clearEditorHotReloadLogs = React.useCallback(
     () => setEditorHotReloadLogs([]),
     [setEditorHotReloadLogs]
+  );
+  const clearEditorUncaughtError = React.useCallback(
+    () => setEditorUncaughtError(null),
+    [setEditorUncaughtError]
   );
 
   const hardReloadAllPreviews = React.useCallback(
@@ -144,6 +162,8 @@ export const usePreviewDebuggerServerWatcher = (
     clearGameHotReloadLogs,
     editorHotReloadLogs,
     clearEditorHotReloadLogs,
+    editorUncaughtError,
+    clearEditorUncaughtError,
     hardReloadAllPreviews,
   };
 };

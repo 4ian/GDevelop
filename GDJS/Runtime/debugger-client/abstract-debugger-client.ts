@@ -120,6 +120,7 @@ namespace gdjs {
       playerId: runtimeGame.getPlayerId(),
       sessionId: runtimeGame.getSessionId(),
       isPreview: runtimeGame.isPreview(),
+      isInGameEdition: runtimeGame.isInGameEdition(),
       gdevelop: {
         previewContext: runtimeGame.getAdditionalOptions().previewContext,
         isNativeMobileApp: runtimeGame.getAdditionalOptions().nativeMobileApp,
@@ -244,220 +245,229 @@ namespace gdjs {
         return;
       }
 
-      if (data.command === 'play') {
-        runtimeGame.pause(false);
-      } else if (data.command === 'pause') {
-        runtimeGame.pause(true);
-        that.sendRuntimeGameDump();
-      } else if (data.command === 'refresh') {
-        that.sendRuntimeGameDump();
-      } else if (data.command === 'getStatus') {
-        that.sendRuntimeGameStatus();
-      } else if (data.command === 'set') {
-        that.set(data.path, data.newValue);
-      } else if (data.command === 'call') {
-        that.call(data.path, data.args);
-      } else if (data.command === 'profiler.start') {
-        runtimeGame.startCurrentSceneProfiler(function (stoppedProfiler) {
-          that.sendProfilerOutput(
-            stoppedProfiler.getFramesAverageMeasures(),
-            stoppedProfiler.getStats()
-          );
-          that.sendProfilerStopped();
-        });
-        that.sendProfilerStarted();
-      } else if (data.command === 'profiler.stop') {
-        runtimeGame.stopCurrentSceneProfiler();
-      } else if (data.command === 'hotReload') {
-        that._hotReloader
-          .hotReload({
-            projectData: data.payload.projectData,
-            runtimeGameOptions: data.payload.runtimeGameOptions,
-            shouldReloadResources: data.payload.shouldReloadResources || false,
-          })
-          .then((logs) => {
-            that.sendHotReloaderLogs(logs);
-            // TODO: if fatal error, should probably reload. The editor should handle this
-            // as it knows the current scene to show.
+      try {
+        if (data.command === 'play') {
+          runtimeGame.pause(false);
+        } else if (data.command === 'pause') {
+          runtimeGame.pause(true);
+          that.sendRuntimeGameDump();
+        } else if (data.command === 'refresh') {
+          that.sendRuntimeGameDump();
+        } else if (data.command === 'getStatus') {
+          that.sendRuntimeGameStatus();
+        } else if (data.command === 'set') {
+          that.set(data.path, data.newValue);
+        } else if (data.command === 'call') {
+          that.call(data.path, data.args);
+        } else if (data.command === 'profiler.start') {
+          runtimeGame.startCurrentSceneProfiler(function (stoppedProfiler) {
+            that.sendProfilerOutput(
+              stoppedProfiler.getFramesAverageMeasures(),
+              stoppedProfiler.getStats()
+            );
+            that.sendProfilerStopped();
           });
-      } else if (data.command === 'hotReloadObjects') {
-        if (inGameEditor) {
-          const editedInstanceContainer =
-            inGameEditor.getEditedInstanceContainer();
-          if (editedInstanceContainer) {
-            that._hotReloader.hotReloadRuntimeSceneObjects(
-              data.payload.updatedObjects,
-              editedInstanceContainer
-            );
-          }
-        }
-      } else if (data.command === 'hotReloadLayers') {
-        if (inGameEditor) {
-          const editedInstanceContainer =
-            inGameEditor.getEditedInstanceContainer();
-          if (editedInstanceContainer) {
-            inGameEditor.onLayersDataChange(
-              data.payload.layers,
-              data.payload.areEffectsHidden
-            );
-            runtimeGame._data.areEffectsHiddenInEditor =
-              data.payload.areEffectsHidden;
-            that._hotReloader.hotReloadRuntimeSceneLayers(
-              data.payload.layers,
-              editedInstanceContainer
-            );
-          }
-        }
-      } else if (data.command === 'setBackgroundColor') {
-        if (inGameEditor) {
-          const editedInstanceContainer =
-            inGameEditor.getEditedInstanceContainer();
-          if (editedInstanceContainer) {
-            const backgroundColor = data.payload.backgroundColor;
-            if (
-              backgroundColor &&
-              editedInstanceContainer instanceof gdjs.RuntimeScene
-            ) {
-              const sceneData = runtimeGame.getSceneData(
-                editedInstanceContainer.getScene().getName()
+          that.sendProfilerStarted();
+        } else if (data.command === 'profiler.stop') {
+          runtimeGame.stopCurrentSceneProfiler();
+        } else if (data.command === 'hotReload') {
+          this._hasLoggedUncaughtException = false;
+          that._hotReloader
+            .hotReload({
+              projectData: data.payload.projectData,
+              runtimeGameOptions: data.payload.runtimeGameOptions,
+              shouldReloadResources:
+                data.payload.shouldReloadResources || false,
+            })
+            .then((logs) => {
+              that.sendHotReloaderLogs(logs);
+              // TODO: if fatal error, should probably reload. The editor should handle this
+              // as it knows the current scene to show.
+            });
+        } else if (data.command === 'hotReloadObjects') {
+          if (inGameEditor) {
+            const editedInstanceContainer =
+              inGameEditor.getEditedInstanceContainer();
+            if (editedInstanceContainer) {
+              that._hotReloader.hotReloadRuntimeSceneObjects(
+                data.payload.updatedObjects,
+                editedInstanceContainer
               );
-              if (sceneData) {
-                editedInstanceContainer._backgroundColor = gdjs.rgbToHexNumber(
-                  backgroundColor[0],
-                  backgroundColor[1],
-                  backgroundColor[2]
+            }
+          }
+        } else if (data.command === 'hotReloadLayers') {
+          if (inGameEditor) {
+            const editedInstanceContainer =
+              inGameEditor.getEditedInstanceContainer();
+            if (editedInstanceContainer) {
+              inGameEditor.onLayersDataChange(
+                data.payload.layers,
+                data.payload.areEffectsHidden
+              );
+              runtimeGame._data.areEffectsHiddenInEditor =
+                data.payload.areEffectsHidden;
+              that._hotReloader.hotReloadRuntimeSceneLayers(
+                data.payload.layers,
+                editedInstanceContainer
+              );
+            }
+          }
+        } else if (data.command === 'setBackgroundColor') {
+          if (inGameEditor) {
+            const editedInstanceContainer =
+              inGameEditor.getEditedInstanceContainer();
+            if (editedInstanceContainer) {
+              const backgroundColor = data.payload.backgroundColor;
+              if (
+                backgroundColor &&
+                editedInstanceContainer instanceof gdjs.RuntimeScene
+              ) {
+                const sceneData = runtimeGame.getSceneData(
+                  editedInstanceContainer.getScene().getName()
                 );
-                sceneData.r = backgroundColor[0];
-                sceneData.v = backgroundColor[1];
-                sceneData.b = backgroundColor[2];
+                if (sceneData) {
+                  editedInstanceContainer._backgroundColor =
+                    gdjs.rgbToHexNumber(
+                      backgroundColor[0],
+                      backgroundColor[1],
+                      backgroundColor[2]
+                    );
+                  sceneData.r = backgroundColor[0];
+                  sceneData.v = backgroundColor[1];
+                  sceneData.b = backgroundColor[2];
+                }
               }
             }
           }
-        }
-      } else if (data.command === 'hotReloadAllInstances') {
-        if (inGameEditor) {
-          const editedInstanceContainer =
-            inGameEditor.getEditedInstanceContainer();
-          if (editedInstanceContainer) {
-            that._hotReloader.hotReloadRuntimeInstances(
-              inGameEditor.getEditedInstanceDataList(),
-              data.payload.instances,
-              editedInstanceContainer
+        } else if (data.command === 'hotReloadAllInstances') {
+          if (inGameEditor) {
+            const editedInstanceContainer =
+              inGameEditor.getEditedInstanceContainer();
+            if (editedInstanceContainer) {
+              that._hotReloader.hotReloadRuntimeInstances(
+                inGameEditor.getEditedInstanceDataList(),
+                data.payload.instances,
+                editedInstanceContainer
+              );
+            }
+          }
+        } else if (data.command === 'switchForInGameEdition') {
+          if (!this._runtimegame.isInGameEdition()) return;
+
+          const sceneName = data.sceneName || null;
+          const eventsBasedObjectType = data.eventsBasedObjectType || null;
+          if (!sceneName && !eventsBasedObjectType) {
+            logger.warn(
+              'No scene name specified, switchForInGameEdition aborted'
+            );
+            return;
+          }
+          if (inGameEditor) {
+            const wasPaused = this._runtimegame.isPaused();
+            this._runtimegame.pause(true);
+            inGameEditor.switchToSceneOrVariant(
+              data.editorId || null,
+              sceneName,
+              data.externalLayoutName || null,
+              eventsBasedObjectType,
+              data.eventsBasedObjectVariantName || null,
+              data.editorCamera3D || null
+            );
+            this._runtimegame.pause(wasPaused);
+          }
+        } else if (data.command === 'updateInstances') {
+          if (inGameEditor) {
+            inGameEditor.reloadInstances(data.payload.instances);
+          }
+        } else if (data.command === 'addInstances') {
+          if (inGameEditor) {
+            inGameEditor.addInstances(data.payload.instances);
+            inGameEditor.setSelectedObjects(
+              data.payload.instances.map((instance) => instance.persistentUuid)
+            );
+            if (data.payload.moveUnderCursor) {
+              inGameEditor.moveSelectionUnderCursor();
+            }
+          }
+        } else if (data.command === 'deleteSelection') {
+          if (inGameEditor) {
+            inGameEditor.deleteSelection();
+          }
+        } else if (data.command === 'dragNewInstance') {
+          const gameCoords = runtimeGame
+            .getRenderer()
+            .convertPageToGameCoords(data.x, data.y);
+          runtimeGame
+            .getInputManager()
+            .onMouseMove(gameCoords[0], gameCoords[1]);
+
+          if (inGameEditor)
+            inGameEditor.dragNewInstance({
+              name: data.name,
+              dropped: data.dropped,
+            });
+        } else if (data.command === 'cancelDragNewInstance') {
+          if (inGameEditor) inGameEditor.cancelDragNewInstance();
+        } else if (data.command === 'zoomToInitialPosition') {
+          if (inGameEditor) {
+            inGameEditor.zoomToInitialPosition(data.payload.visibleScreenArea);
+          }
+        } else if (data.command === 'zoomToFitContent') {
+          if (inGameEditor) {
+            inGameEditor.zoomToFitContent(data.payload.visibleScreenArea);
+          }
+        } else if (data.command === 'setSelectedLayer') {
+          if (inGameEditor) {
+            inGameEditor.setSelectedLayerName(data.payload.layerName);
+          }
+        } else if (data.command === 'zoomToFitSelection') {
+          if (inGameEditor) {
+            inGameEditor.zoomToFitSelection(data.payload.visibleScreenArea);
+          }
+        } else if (data.command === 'zoomBy') {
+          if (inGameEditor) {
+            inGameEditor.zoomBy(data.payload.zoomFactor);
+          }
+        } else if (data.command === 'setZoom') {
+          if (inGameEditor) {
+            inGameEditor.setZoom(data.payload.zoom);
+          }
+        } else if (data.command === 'setSelectedInstances') {
+          if (inGameEditor) {
+            inGameEditor.setSelectedObjects(data.payload.instanceUuids);
+          }
+        } else if (data.command === 'centerViewOnLastSelectedInstance') {
+          if (inGameEditor) {
+            inGameEditor.centerViewOnLastSelectedInstance(
+              data.payload.visibleScreenArea
             );
           }
-        }
-      } else if (data.command === 'switchForInGameEdition') {
-        if (!this._runtimegame.isInGameEdition()) return;
-
-        const sceneName = data.sceneName || null;
-        const eventsBasedObjectType = data.eventsBasedObjectType || null;
-        if (!sceneName && !eventsBasedObjectType) {
-          logger.warn(
-            'No scene name specified, switchForInGameEdition aborted'
-          );
-          return;
-        }
-        if (inGameEditor) {
-          const wasPaused = this._runtimegame.isPaused();
-          this._runtimegame.pause(true);
-          inGameEditor.switchToSceneOrVariant(
-            data.editorId || null,
-            sceneName,
-            data.externalLayoutName || null,
-            eventsBasedObjectType,
-            data.eventsBasedObjectVariantName || null,
-            data.editorCamera3D || null
-          );
-        this._runtimegame.pause(wasPaused);
-        }
-      } else if (data.command === 'updateInstances') {
-        if (inGameEditor) {
-          inGameEditor.reloadInstances(data.payload.instances);
-        }
-      } else if (data.command === 'addInstances') {
-        if (inGameEditor) {
-          inGameEditor.addInstances(data.payload.instances);
-          inGameEditor.setSelectedObjects(
-            data.payload.instances.map((instance) => instance.persistentUuid)
-          );
-          if (data.payload.moveUnderCursor) {
-            inGameEditor.moveSelectionUnderCursor();
+        } else if (data.command === 'updateInnerArea') {
+          if (inGameEditor) {
+            inGameEditor.updateInnerArea(
+              data.payload.areaMinX,
+              data.payload.areaMinY,
+              data.payload.areaMinZ,
+              data.payload.areaMaxX,
+              data.payload.areaMaxY,
+              data.payload.areaMaxZ
+            );
           }
-        }
-      } else if (data.command === 'deleteSelection') {
-        if (inGameEditor) {
-          inGameEditor.deleteSelection();
-        }
-      } else if (data.command === 'dragNewInstance') {
-        const gameCoords = runtimeGame
-          .getRenderer()
-          .convertPageToGameCoords(data.x, data.y);
-        runtimeGame.getInputManager().onMouseMove(gameCoords[0], gameCoords[1]);
-
-        if (inGameEditor)
-          inGameEditor.dragNewInstance({
-            name: data.name,
-            dropped: data.dropped,
-          });
-      } else if (data.command === 'cancelDragNewInstance') {
-        if (inGameEditor) inGameEditor.cancelDragNewInstance();
-      } else if (data.command === 'zoomToInitialPosition') {
-        if (inGameEditor) {
-          inGameEditor.zoomToInitialPosition(data.payload.visibleScreenArea);
-        }
-      } else if (data.command === 'zoomToFitContent') {
-        if (inGameEditor) {
-          inGameEditor.zoomToFitContent(data.payload.visibleScreenArea);
-        }
-      } else if (data.command === 'setSelectedLayer') {
-        if (inGameEditor) {
-          inGameEditor.setSelectedLayerName(data.payload.layerName);
-        }
-      } else if (data.command === 'zoomToFitSelection') {
-        if (inGameEditor) {
-          inGameEditor.zoomToFitSelection(data.payload.visibleScreenArea);
-        }
-      } else if (data.command === 'zoomBy') {
-        if (inGameEditor) {
-          inGameEditor.zoomBy(data.payload.zoomFactor);
-        }
-      } else if (data.command === 'setZoom') {
-        if (inGameEditor) {
-          inGameEditor.setZoom(data.payload.zoom);
-        }
-      } else if (data.command === 'setSelectedInstances') {
-        if (inGameEditor) {
-          inGameEditor.setSelectedObjects(data.payload.instanceUuids);
-        }
-      } else if (data.command === 'centerViewOnLastSelectedInstance') {
-        if (inGameEditor) {
-          inGameEditor.centerViewOnLastSelectedInstance(
-            data.payload.visibleScreenArea
+        } else if (data.command === 'getSelectionAABB') {
+          if (inGameEditor) {
+            this.sendSelectionAABB(data.messageId);
+          }
+        } else if (data.command === 'hardReload') {
+          // This usually means that the preview was modified so much that an entire reload
+          // is needed, or that the runtime itself could have been modified.
+          this.launchHardReload();
+        } else {
+          logger.info(
+            'Unknown command "' + data.command + '" received by the debugger.'
           );
         }
-      } else if (data.command === 'updateInnerArea') {
-        if (inGameEditor) {
-          inGameEditor.updateInnerArea(
-            data.payload.areaMinX,
-            data.payload.areaMinY,
-            data.payload.areaMinZ,
-            data.payload.areaMaxX,
-            data.payload.areaMaxY,
-            data.payload.areaMaxZ
-          );
-        }
-      } else if (data.command === 'getSelectionAABB') {
-        if (inGameEditor) {
-          this.sendSelectionAABB(data.messageId);
-        }
-      } else if (data.command === 'hardReload') {
-        // This usually means that the preview was modified so much that an entire reload
-        // is needed, or that the runtime itself could have been modified.
-        this.launchHardReload();
-      } else {
-        logger.info(
-          'Unknown command "' + data.command + '" received by the debugger.'
-        );
+      } catch (error) {
+        this.onUncaughtException(error);
       }
     }
 
@@ -521,7 +531,10 @@ namespace gdjs {
     onUncaughtException(exception: Error): void {
       logger.error('Uncaught exception: ' + exception);
 
-      this._inGameDebugger.setUncaughtException(exception);
+      const runtimeGame = this._runtimegame;
+      if (!runtimeGame.isInGameEdition()) {
+        this._inGameDebugger.setUncaughtException(exception);
+      }
 
       if (!this._hasLoggedUncaughtException) {
         // Only log an uncaught exception once, to avoid spamming the debugger server

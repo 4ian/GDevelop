@@ -11,6 +11,7 @@ import {
 import { CorsAwareImage } from '../CorsAwareImage';
 import { type DraggedItem } from './DragSourceAndDropTarget';
 import { swipeableDrawerContainerId } from '../../SceneEditor/SwipeableDrawerEditorsDisplay';
+import { instancesEditorEmbeddedGameFrameHoleId } from '../../SceneEditor/MosaicEditorsDisplay';
 
 const layerStyles = {
   position: 'fixed',
@@ -97,9 +98,10 @@ const shouldHidePreviewBecauseDraggingOnSceneEditorCanvas = ({
 
   // Otherwise, we are on desktop, and we want to hide the preview when the user
   // is dragging on the canvas.
-  const activeCanvas = document.querySelector(
-    `#scene-editor[data-active=true] #${instancesEditorId}`
-  );
+  const activeCanvas =
+    document.querySelector(
+      `#scene-editor[data-active=true] #${instancesEditorId}`
+    ) || document.querySelector(`#${instancesEditorEmbeddedGameFrameHoleId}`);
   if (activeCanvas) {
     const canvasRect = activeCanvas.getBoundingClientRect();
     if (
@@ -111,6 +113,7 @@ const shouldHidePreviewBecauseDraggingOnSceneEditorCanvas = ({
       return true;
     }
   }
+
   return false;
 };
 

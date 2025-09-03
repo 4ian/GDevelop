@@ -36,6 +36,9 @@ import {
 import { useDoNowOrAfterRender } from '../../Utils/UseDoNowOrAfterRender';
 import { preventGameFramePointerEvents } from '../../EmbeddedGame/EmbeddedGameFrame';
 
+export const instancesEditorEmbeddedGameFrameHoleId =
+  'instances-editor-embedded-game-frame-hole';
+
 const initialMosaicEditorNodes = {
   direction: 'row',
   first: 'properties',
@@ -379,7 +382,14 @@ const MosaicEditorsDisplay = React.forwardRef<
     },
     'instances-editor':
       gameEditorMode === 'embedded-game'
-        ? null
+        ? {
+            type: 'primary',
+            noTitleBar: true,
+            noSoftKeyboardAvoidance: true,
+            renderEditor: () => (
+              <div id={instancesEditorEmbeddedGameFrameHoleId} />
+            ),
+          }
         : {
             type: 'primary',
             noTitleBar: true,

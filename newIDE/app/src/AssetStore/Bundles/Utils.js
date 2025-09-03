@@ -13,7 +13,7 @@ import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import Text from '../../UI/Text';
-import { Column } from '../../UI/Grid';
+import { Column, Line, Spacer } from '../../UI/Grid';
 import { LineStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import {
   getPlanIcon,
@@ -677,9 +677,13 @@ export const getSummaryLines = ({
   summaryLineItems.forEach((item, index) => {
     if (index !== 0) {
       desktopLineItems.push(
-        <Column key={`divider-${index}`}>
-          <Divider orientation="vertical" />
-        </Column>
+        <Line noMargin key={`divider-${index}`}>
+          <Spacer />
+          <Column>
+            <Divider orientation="vertical" />
+          </Column>
+          <Spacer />
+        </Line>
       );
       if (index % 2 === 1) {
         mobileLineItems.push(

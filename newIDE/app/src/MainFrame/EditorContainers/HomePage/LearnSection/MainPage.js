@@ -242,6 +242,7 @@ const MainPage = ({
             <SectionRow>
               <BundlePreviewBanner
                 onDisplayBundle={onSelectBundle}
+                category="starter"
                 i18n={i18n}
               />
             </SectionRow>

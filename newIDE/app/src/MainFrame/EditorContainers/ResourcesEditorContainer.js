@@ -55,7 +55,7 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
     // No thing to be done.
   }
 
-  hotReloadInGameEditorIfNeeded(hotReloadSteps: HotReloadSteps) {
+  notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {
     setEditorHotReloadNeeded(hotReloadSteps);
   }
 

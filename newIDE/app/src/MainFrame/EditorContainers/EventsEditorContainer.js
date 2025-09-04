@@ -83,7 +83,7 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     }
   }
 
-  hotReloadInGameEditorIfNeeded(hotReloadSteps: HotReloadSteps) {
+  notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {
     setEditorHotReloadNeeded(hotReloadSteps);
   }
 

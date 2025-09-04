@@ -60,7 +60,7 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     // No thing to be done.
   }
 
-  hotReloadInGameEditorIfNeeded(hotReloadSteps: HotReloadSteps) {
+  notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {
     setEditorHotReloadNeeded(hotReloadSteps);
   }
 

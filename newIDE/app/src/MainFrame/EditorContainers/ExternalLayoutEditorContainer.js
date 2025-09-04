@@ -91,7 +91,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
     );
   }
 
-  hotReloadInGameEditorIfNeeded(hotReloadSteps: HotReloadSteps) {
+  notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {
     this._switchToSceneEdition(hotReloadSteps);
   }
 

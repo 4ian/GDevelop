@@ -71,7 +71,7 @@ export class DebuggerEditorContainer extends React.Component<
     // No thing to be done.
   }
 
-  hotReloadInGameEditorIfNeeded(hotReloadSteps: HotReloadSteps) {
+  notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {
     setEditorHotReloadNeeded(hotReloadSteps);
   }
 

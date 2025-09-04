@@ -48,7 +48,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     }
   }
 
-  hotReloadInGameEditorIfNeeded(hotReloadSteps: HotReloadSteps) {
+  notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {
     this._switchToSceneEdition(hotReloadSteps);
   }
 

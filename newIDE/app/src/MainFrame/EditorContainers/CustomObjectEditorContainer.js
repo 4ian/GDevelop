@@ -71,7 +71,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     if (this._objectsContainer) this._objectsContainer.delete();
   }
 
-  hotReloadInGameEditorIfNeeded(hotReloadSteps: HotReloadSteps) {
+  notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {
     this._switchToSceneEdition(hotReloadSteps);
   }
 

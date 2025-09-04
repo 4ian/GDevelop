@@ -187,7 +187,7 @@ export type HomePageEditorInterface = {|
   onSceneEventsModifiedOutsideEditor: (
     scene: SceneEventsOutsideEditorChanges
   ) => void,
-  hotReloadInGameEditorIfNeeded: (hotReloadSteps: HotReloadSteps) => void,
+  notifyChangesToInGameEditor: (hotReloadSteps: HotReloadSteps) => void,
   switchInGameEditorIfNoHotReloadIsNeeded: () => void,
   onInstancesModifiedOutsideEditor: (
     changes: InstancesOutsideEditorChanges
@@ -483,7 +483,7 @@ export const HomePage = React.memo<Props>(
         onSceneObjectEdited: noop,
         onSceneObjectsDeleted: noop,
         onSceneEventsModifiedOutsideEditor: noop,
-        hotReloadInGameEditorIfNeeded: setEditorHotReloadNeeded,
+        notifyChangesToInGameEditor: setEditorHotReloadNeeded,
         switchInGameEditorIfNoHotReloadIsNeeded: noop,
         onInstancesModifiedOutsideEditor: noop,
       }));

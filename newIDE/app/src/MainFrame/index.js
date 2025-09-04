@@ -1484,7 +1484,7 @@ const MainFrame = (props: Props) => {
         hasEventsBasedObject || eventsBasedObjects.getCount() > 0;
     }
     if (hasEventsBasedObject) {
-      hotReloadInGameEditorIfNeeded({
+      notifyChangesToInGameEditor({
         shouldReloadProjectData: true,
         shouldReloadLibraries: true,
         shouldReloadResources: false,
@@ -1492,7 +1492,7 @@ const MainFrame = (props: Props) => {
     }
   };
 
-  const hotReloadInGameEditorIfNeeded = React.useCallback(
+  const notifyChangesToInGameEditor = React.useCallback(
     (
       hotReloadSteps: HotReloadSteps = {
         shouldReloadProjectData: false,
@@ -1508,7 +1508,7 @@ const MainFrame = (props: Props) => {
         );
         const editorRef = currentTab ? currentTab.editorRef : null;
         if (editorRef) {
-          editorRef.hotReloadInGameEditorIfNeeded(hotReloadSteps);
+          editorRef.notifyChangesToInGameEditor(hotReloadSteps);
           hasReloadIfNeeded = true;
         }
       }
@@ -1533,7 +1533,7 @@ const MainFrame = (props: Props) => {
         // Hot-reloads are triggered right away from a 3D editor.
         // Which means this call won't do any hot-reload when switching between
         // 2 3D editors but only switch the scene.
-        hotReloadInGameEditorIfNeeded();
+        notifyChangesToInGameEditor();
       } else {
         // Switch the 3D editor to the same scene as the 2D one.
         // It allows to keep the 3D editor up to date for a fast switch
@@ -1550,78 +1550,78 @@ const MainFrame = (props: Props) => {
         }
       }
     },
-    [gameEditorMode, state.editorTabs, hotReloadInGameEditorIfNeeded]
+    [gameEditorMode, state.editorTabs, notifyChangesToInGameEditor]
   );
 
   const onResourceExternallyChanged = React.useCallback(
     () => {
-      hotReloadInGameEditorIfNeeded({
+      notifyChangesToInGameEditor({
         shouldReloadProjectData: false,
         shouldReloadLibraries: false,
         shouldReloadResources: true,
       });
     },
-    [hotReloadInGameEditorIfNeeded]
+    [notifyChangesToInGameEditor]
   );
 
   const onResourceUsageChanged = React.useCallback(
     () => {
       if (isEditorHotReloadNeeded()) {
-        hotReloadInGameEditorIfNeeded();
+        notifyChangesToInGameEditor();
       } else {
-        hotReloadInGameEditorIfNeeded({
+        notifyChangesToInGameEditor({
           shouldReloadProjectData: true,
           shouldReloadLibraries: false,
           shouldReloadResources: false,
         });
       }
     },
-    [hotReloadInGameEditorIfNeeded]
+    [notifyChangesToInGameEditor]
   );
 
   const onSceneAdded = React.useCallback(
     () => {
-      hotReloadInGameEditorIfNeeded({
+      notifyChangesToInGameEditor({
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
         shouldReloadResources: false,
       });
     },
-    [hotReloadInGameEditorIfNeeded]
+    [notifyChangesToInGameEditor]
   );
 
   const onExternalLayoutAdded = React.useCallback(
     () => {
-      hotReloadInGameEditorIfNeeded({
+      notifyChangesToInGameEditor({
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
         shouldReloadResources: false,
       });
     },
-    [hotReloadInGameEditorIfNeeded]
+    [notifyChangesToInGameEditor]
   );
 
   const onEffectAdded = React.useCallback(
     () => {
       // Ensure the effect implementation is exported.
-      hotReloadInGameEditorIfNeeded({
+      notifyChangesToInGameEditor({
         shouldReloadProjectData: true,
         shouldReloadLibraries: true,
         shouldReloadResources: false,
       });
     },
-    [hotReloadInGameEditorIfNeeded]
+    [notifyChangesToInGameEditor]
   );
 
   const onObjectListsModified = React.useCallback(
     ({ isNewObjectTypeUsed }: { isNewObjectTypeUsed: boolean }) => {
-      hotReloadInGameEditorIfNeeded({
+      notifyChangesToInGameEditor({
         shouldReloadProjectData: true,
         shouldReloadLibraries: isNewObjectTypeUsed,
         shouldReloadResources: false,
       });
     },
-    [hotReloadInGameEditorIfNeeded]
+    [notifyChangesToInGameEditor]
   );
 
   const renameLayout = (oldName: string, newName: string) => {
@@ -1657,7 +1657,7 @@ const MainFrame = (props: Props) => {
       if (shouldChangeProjectFirstLayout) {
         currentProject.setFirstLayout(uniqueNewName);
       }
-      hotReloadInGameEditorIfNeeded({
+      notifyChangesToInGameEditor({
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
         shouldReloadResources: false,
@@ -1692,7 +1692,7 @@ const MainFrame = (props: Props) => {
         oldName,
         uniqueNewName
       );
-      hotReloadInGameEditorIfNeeded({
+      notifyChangesToInGameEditor({
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
         shouldReloadResources: false,
@@ -1774,7 +1774,7 @@ const MainFrame = (props: Props) => {
       await eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
         currentProject
       );
-      hotReloadInGameEditorIfNeeded({
+      notifyChangesToInGameEditor({
         shouldReloadProjectData: false,
         shouldReloadLibraries: true,
         shouldReloadResources: false,
@@ -2594,14 +2594,14 @@ const MainFrame = (props: Props) => {
 
   const onExtractAsExternalLayout = React.useCallback(
     (name: string) => {
-      hotReloadInGameEditorIfNeeded({
+      notifyChangesToInGameEditor({
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
         shouldReloadResources: false,
       });
       openExternalLayout(name);
     },
-    [hotReloadInGameEditorIfNeeded, openExternalLayout]
+    [notifyChangesToInGameEditor, openExternalLayout]
   );
 
   const _onReloadEventsFunctionsExtensionsAsync = React.useCallback(
@@ -2612,7 +2612,7 @@ const MainFrame = (props: Props) => {
       await eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
         currentProject
       );
-      hotReloadInGameEditorIfNeeded({
+      notifyChangesToInGameEditor({
         shouldReloadProjectData: false,
         shouldReloadLibraries: true,
         shouldReloadResources: false,
@@ -2622,7 +2622,7 @@ const MainFrame = (props: Props) => {
       isProjectClosedSoAvoidReloadingExtensions,
       currentProject,
       eventsFunctionsExtensionsState,
-      hotReloadInGameEditorIfNeeded,
+      notifyChangesToInGameEditor,
     ]
   );
 
@@ -2647,7 +2647,7 @@ const MainFrame = (props: Props) => {
         currentProject
       );
       if (shouldHotReloadEditor) {
-        hotReloadInGameEditorIfNeeded({
+        notifyChangesToInGameEditor({
           shouldReloadProjectData: false,
           shouldReloadLibraries: true,
           shouldReloadResources: false,
@@ -2658,7 +2658,7 @@ const MainFrame = (props: Props) => {
       isProjectClosedSoAvoidReloadingExtensions,
       currentProject,
       eventsFunctionsExtensionsState,
-      hotReloadInGameEditorIfNeeded,
+      notifyChangesToInGameEditor,
     ]
   );
 
@@ -2715,13 +2715,13 @@ const MainFrame = (props: Props) => {
 
   const onEventBasedObjectTypeChanged = React.useCallback(
     () => {
-      hotReloadInGameEditorIfNeeded({
+      notifyChangesToInGameEditor({
         shouldReloadProjectData: true,
         shouldReloadLibraries: true,
         shouldReloadResources: false,
       });
     },
-    [hotReloadInGameEditorIfNeeded]
+    [notifyChangesToInGameEditor]
   );
 
   const _onExtractAsEventBasedObjectAsync = React.useCallback(
@@ -4032,13 +4032,13 @@ const MainFrame = (props: Props) => {
 
   const onNewResourcesAdded = React.useCallback(
     () => {
-      hotReloadInGameEditorIfNeeded({
+      notifyChangesToInGameEditor({
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
         shouldReloadResources: false,
       });
     },
-    [hotReloadInGameEditorIfNeeded]
+    [notifyChangesToInGameEditor]
   );
 
   useKeyboardShortcuts(
@@ -4349,7 +4349,7 @@ const MainFrame = (props: Props) => {
     onEffectAdded: onEffectAdded,
     onObjectListsModified: onObjectListsModified,
     gamesList: gamesList,
-    triggerHotReloadInGameEditorIfNeeded: hotReloadInGameEditorIfNeeded,
+    triggerHotReloadInGameEditorIfNeeded: notifyChangesToInGameEditor,
   };
 
   const hasEditorsInLeftPane = hasEditorsInPane(state.editorTabs, 'left');
@@ -4679,7 +4679,7 @@ const MainFrame = (props: Props) => {
           onLaunchNewPreview={() => {
             clearEditorHotReloadLogs();
             clearEditorUncaughtError();
-            hotReloadInGameEditorIfNeeded({
+            notifyChangesToInGameEditor({
               shouldReloadProjectData: true,
               shouldReloadLibraries: true,
               shouldReloadResources: true,

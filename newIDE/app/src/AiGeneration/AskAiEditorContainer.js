@@ -394,7 +394,7 @@ export type AskAiEditorInterface = {|
     mode: 'chat' | 'agent',
     aiRequestId: string | null,
   |}) => void,
-  hotReloadInGameEditorIfNeeded: (hotReloadSteps: HotReloadSteps) => void,
+  notifyChangesToInGameEditor: (hotReloadSteps: HotReloadSteps) => void,
   switchInGameEditorIfNoHotReloadIsNeeded: () => void,
 |};
 
@@ -542,7 +542,7 @@ export const AskAiEditor = React.memo<Props>(
         onSceneEventsModifiedOutsideEditor: noop,
         onInstancesModifiedOutsideEditor: noop,
         startOrOpenChat: onStartOrOpenChat,
-        hotReloadInGameEditorIfNeeded: setEditorHotReloadNeeded,
+        notifyChangesToInGameEditor: setEditorHotReloadNeeded,
         switchInGameEditorIfNoHotReloadIsNeeded: noop,
       }));
 

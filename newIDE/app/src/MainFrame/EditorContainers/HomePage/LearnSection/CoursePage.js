@@ -39,6 +39,7 @@ import CoursePageHeader from './CoursePageHeader';
 import Window from '../../../../Utils/Window';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import { RatingBanner } from './RatingBanner';
+import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
 
 const styles = {
   desktopContainer: { display: 'flex', gap: 16 },
@@ -350,6 +351,13 @@ const CoursePage = ({
                       onHide={() => showAlertMessage(alertMessageKey, false)}
                     >
                       {subtitleHint.label}
+                    </AlertMessage>
+                  </Line>
+                )}
+                {course.introByLocale && (
+                  <Line>
+                    <AlertMessage kind="info" background="light">
+                      {selectMessageByLocale(i18n, course.introByLocale)}
                     </AlertMessage>
                   </Line>
                 )}

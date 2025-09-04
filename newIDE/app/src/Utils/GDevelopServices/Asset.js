@@ -334,6 +334,7 @@ export type Course = {|
   titleByLocale: MessageByLocale,
   shortDescriptionByLocale: MessageByLocale,
   levelByLocale: MessageByLocale,
+  introByLocale?: MessageByLocale,
 
   isLocked?: boolean,
   includedInSubscriptions: string[],

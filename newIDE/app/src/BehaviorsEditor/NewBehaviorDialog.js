@@ -29,6 +29,7 @@ type Props = {|
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   objectType: string,
   objectBehaviorsTypes: Array<string>,
+  isChildObject: boolean,
   open: boolean,
   onClose: () => void,
   onChoose: (type: string, defaultName: string) => void,
@@ -43,6 +44,7 @@ export default function NewBehaviorDialog({
   onChoose,
   objectType,
   objectBehaviorsTypes,
+  isChildObject,
   onExtensionInstalled,
 }: Props) {
   const [isInstalling, setIsInstalling] = React.useState(false);
@@ -224,6 +226,7 @@ export default function NewBehaviorDialog({
             project={project}
             objectType={objectType}
             objectBehaviorsTypes={objectBehaviorsTypes}
+            isChildObject={isChildObject}
             isInstalling={isInstalling}
             onInstall={async shortHeader =>
               onInstallExtension(i18n, shortHeader)

@@ -375,6 +375,7 @@ export const CompactObjectPropertiesEditor = ({
   } = useManageObjectBehaviors({
     project,
     object,
+    isChildObject: !layout,
     eventsFunctionsExtension,
     onUpdate: forceUpdate,
     onBehaviorsUpdated: forceUpdate,

@@ -298,6 +298,19 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
     return *this;
   }
 
+  /**
+   * Check if the behavior can be used on objects from event-based objects.
+   */
+  bool IsRelevantForChildObjects() const { return isRelevantForChildObjects; }
+
+  /**
+   * Set that behavior can't be used on objects from event-based objects.
+   */
+  BehaviorMetadata &MarkAsIrrelevantForChildObjects() {
+    isRelevantForChildObjects = false;
+    return *this;
+  }
+
   QuickCustomization::Visibility GetQuickCustomizationVisibility() const {
     return quickCustomizationVisibility;
   }
@@ -393,6 +406,7 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
   mutable std::vector<gd::String> requiredBehaviors;
   bool isPrivate = false;
   bool isHidden = false;
+  bool isRelevantForChildObjects = true;
   gd::String openFullEditorLabel;
   QuickCustomization::Visibility quickCustomizationVisibility = QuickCustomization::Visibility::Default;
 

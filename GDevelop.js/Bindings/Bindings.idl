@@ -2154,6 +2154,9 @@ interface BehaviorMetadata {
     boolean IsHidden();
     [Ref] BehaviorMetadata SetHidden();
 
+    boolean IsRelevantForChildObjects();
+    [Ref] BehaviorMetadata MarkAsIrrelevantForChildObjects();
+
     QuickCustomization_Visibility GetQuickCustomizationVisibility();
     [Ref] BehaviorMetadata SetQuickCustomizationVisibility(QuickCustomization_Visibility visibility);
 

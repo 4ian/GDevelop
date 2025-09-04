@@ -343,6 +343,7 @@ const InnerDialog = (props: InnerDialogProps) => {
       {currentTab === 'behaviors' && (
         <BehaviorsEditor
           object={object}
+          isChildObject={!!eventsBasedObject}
           project={project}
           eventsFunctionsExtension={eventsFunctionsExtension}
           resourceManagementProps={_resourceManagementProps}

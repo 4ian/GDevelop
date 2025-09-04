@@ -15,6 +15,7 @@ import SelectOption from '../../UI/SelectOption';
 import { enumerateEventsFunctionsExtensions } from '../../ProjectManager/EnumerateProjectItems';
 import getObjectByName from '../../Utils/GetObjectByName';
 import AlertMessage from '../../UI/AlertMessage';
+import { mapVector } from '../../Utils/MapFor';
 
 const gd: libGDevelop = global.gd;
 
@@ -116,9 +117,55 @@ export default function ExtractAsCustomObjectDialog({
     [globalObjectsContainer, objectsContainer, project, selectedInstances]
   );
 
+  const irrelevantBehaviorMetadatas = React.useMemo<Array<gdBehaviorMetadata>>(
+    () => {
+      const objects = new Set<gdObject>();
+      for (const selectedInstance of selectedInstances) {
+        const objectName = selectedInstance.getObjectName();
+        const object = getObjectByName(
+          globalObjectsContainer,
+          objectsContainer,
+          objectName
+        );
+        if (object) {
+          objects.add(object);
+        }
+      }
+      const behaviorMetadatas = new Set<gdBehaviorMetadata>();
+      for (const object of objects) {
+        mapVector(object.getAllBehaviorNames(), behaviorName => {
+          const behavior = object.getBehavior(behaviorName);
+
+          const platform = project.getCurrentPlatform();
+          const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+            platform,
+            behavior.getTypeName()
+          );
+          const isRelevantForChildObjects =
+            behaviorMetadata.isRelevantForChildObjects() &&
+            behaviorMetadata
+              .getRequiredBehaviorTypes()
+              .toJSArray()
+              .every(requiredBehaviorType => {
+                const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+                  platform,
+                  requiredBehaviorType
+                );
+                return behaviorMetadata.isRelevantForChildObjects();
+              });
+          if (!isRelevantForChildObjects) {
+            behaviorMetadatas.add(behaviorMetadata);
+          }
+        });
+      }
+      return [...behaviorMetadatas];
+    },
+    [globalObjectsContainer, objectsContainer, project, selectedInstances]
+  );
+
   const apply = React.useCallback(
     (i18n: I18nType) => {
-      if (has2DAnd3D) {
+      if (has2DAnd3D || irrelevantBehaviorMetadatas) {
         onCancel();
       } else {
         onApply(
@@ -131,6 +178,7 @@ export default function ExtractAsCustomObjectDialog({
     },
     [
       has2DAnd3D,
+      irrelevantBehaviorMetadatas,
       onCancel,
       onApply,
       extensionName,
@@ -158,7 +206,7 @@ export default function ExtractAsCustomObjectDialog({
               label={<Trans>Move instances</Trans>}
               primary={true}
               onClick={() => apply(i18n)}
-              disabled={has2DAnd3D}
+              disabled={has2DAnd3D || irrelevantBehaviorMetadatas.length > 0}
             />,
           ]}
           secondaryActions={[
@@ -185,6 +233,19 @@ export default function ExtractAsCustomObjectDialog({
                   <br />
                   Please select either 2D instances or 3D instances.
                 </Trans>
+              </AlertMessage>
+            ) : null}
+            {irrelevantBehaviorMetadatas ? (
+              <AlertMessage kind="error">
+                <Trans>
+                  Objects inside custom objects can't contain the following
+                  behaviors:
+                </Trans>
+                <ul>
+                  {irrelevantBehaviorMetadatas.map(BehaviorMetadata => (
+                    <li>{BehaviorMetadata.getFullName()}</li>
+                  ))}
+                </ul>
               </AlertMessage>
             ) : null}
             <ResponsiveLineStackLayout noMargin expand noResponsiveLandscape>

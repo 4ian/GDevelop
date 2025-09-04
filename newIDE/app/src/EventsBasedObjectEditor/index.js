@@ -113,11 +113,12 @@ export default function EventsBasedObjectEditor({
           }}
         />
         <Checkbox
-          label={<Trans>Has animations</Trans>}
-          checked={eventsBasedObject.isAnimatable()}
+          label={<Trans>Expand inner area with parent</Trans>}
+          checked={eventsBasedObject.isInnerAreaFollowingParentSize()}
           onCheck={(e, checked) => {
-            eventsBasedObject.markAsAnimatable(checked);
+            eventsBasedObject.markAsInnerAreaFollowingParentSize(checked);
             onChange();
+            onEventsBasedObjectChildrenEdited(eventsBasedObject);
           }}
         />
         <Checkbox
@@ -129,12 +130,11 @@ export default function EventsBasedObjectEditor({
           }}
         />
         <Checkbox
-          label={<Trans>Expand inner area with parent</Trans>}
-          checked={eventsBasedObject.isInnerAreaFollowingParentSize()}
+          label={<Trans>Has animations (JavaScript only)</Trans>}
+          checked={eventsBasedObject.isAnimatable()}
           onCheck={(e, checked) => {
-            eventsBasedObject.markAsInnerAreaFollowingParentSize(checked);
+            eventsBasedObject.markAsAnimatable(checked);
             onChange();
-            onEventsBasedObjectChildrenEdited(eventsBasedObject);
           }}
         />
         {isDev && (

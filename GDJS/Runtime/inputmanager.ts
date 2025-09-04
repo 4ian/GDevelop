@@ -23,12 +23,13 @@ namespace gdjs {
      * variants and should default to their left variant values
      * if location is not specified.
      */
-    static _DEFAULT_LEFT_VARIANT_KEYS: integer[] = [16, 17, 18, 91];
-    _pressedKeys: Hashtable<boolean>;
-    _releasedKeys: Hashtable<boolean>;
-    _lastPressedKey: float = 0;
-    _pressedMouseButtons: Array<boolean>;
-    _releasedMouseButtons: Array<boolean>;
+    private static _DEFAULT_LEFT_VARIANT_KEYS: integer[] = [16, 17, 18, 91];
+    private _pressedKeys: Hashtable<boolean>;
+    private _justPressedKeys: Hashtable<boolean>;
+    private _releasedKeys: Hashtable<boolean>;
+    private _lastPressedKey: float = 0;
+    private _pressedMouseButtons: Array<boolean>;
+    private _releasedMouseButtons: Array<boolean>;
     /**
      * The cursor X position (moved by mouse and touch events).
      */
@@ -79,6 +80,7 @@ namespace gdjs {
 
     constructor() {
       this._pressedKeys = new Hashtable();
+      this._justPressedKeys = new Hashtable();
       this._releasedKeys = new Hashtable();
       this._pressedMouseButtons = new Array(5);
       this._releasedMouseButtons = new Array(5);
@@ -124,6 +126,7 @@ namespace gdjs {
         location
       );
       this._pressedKeys.put(locationAwareKeyCode, true);
+      this._justPressedKeys.put(locationAwareKeyCode, true);
       this._lastPressedKey = locationAwareKeyCode;
     }
 
@@ -140,7 +143,32 @@ namespace gdjs {
         location
       );
       this._pressedKeys.put(locationAwareKeyCode, false);
+      this._justPressedKeys.put(locationAwareKeyCode, false);
       this._releasedKeys.put(locationAwareKeyCode, true);
+    }
+
+    /**
+     * Release all keys that are currently pressed.
+     * Note: if you want to discard pressed keys without considering them as
+     * released, check `clearAllPressedKeys` instead.
+     */
+    releaseAllPressedKeys(): void {
+      for (const locationAwareKeyCode in this._pressedKeys.items) {
+        this._pressedKeys.put(locationAwareKeyCode, false);
+        this._justPressedKeys.put(locationAwareKeyCode, false);
+        this._releasedKeys.put(locationAwareKeyCode, true);
+      }
+    }
+
+    /**
+     * Clears all stored pressed keys without making the keys go through
+     * the release state.
+     * Note: prefer to use `releaseAllPressedKeys` instead, as it corresponds
+     * to a normal key release.
+     */
+    clearAllPressedKeys(): void {
+      this._pressedKeys.clear();
+      this._justPressedKeys.clear();
     }
 
     /**
@@ -152,14 +180,21 @@ namespace gdjs {
     }
 
     /**
-     * Return true if the key corresponding to the location-aware keyCode is pressed.
+     * Return true if the key corresponding to the location-aware keyCode is pressed
+     * (either it was just pressed or is still held down).
      * @param locationAwareKeyCode The location-aware key code to be tested.
      */
     isKeyPressed(locationAwareKeyCode: number): boolean {
-      return (
-        this._pressedKeys.containsKey(locationAwareKeyCode) &&
-        this._pressedKeys.get(locationAwareKeyCode)
-      );
+      return !!this._pressedKeys.get(locationAwareKeyCode);
+    }
+
+    /**
+     * Return true if the key corresponding to the location-aware keyCode
+     * was just pressed during the last frame.
+     * @param locationAwareKeyCode The location-aware key code to be tested.
+     */
+    wasKeyJustPressed(locationAwareKeyCode: number): boolean {
+      return !!this._justPressedKeys.get(locationAwareKeyCode);
     }
 
     /**
@@ -167,10 +202,7 @@ namespace gdjs {
      * @param locationAwareKeyCode The location-aware key code to be tested.
      */
     wasKeyReleased(locationAwareKeyCode: number) {
-      return (
-        this._releasedKeys.containsKey(locationAwareKeyCode) &&
-        this._releasedKeys.get(locationAwareKeyCode)
-      );
+      return !!this._releasedKeys.get(locationAwareKeyCode);
     }
 
     /**
@@ -544,6 +576,7 @@ namespace gdjs {
       this._startedTouches.length = 0;
       this._endedTouches.length = 0;
       this._releasedKeys.clear();
+      this._justPressedKeys.clear();
       this._releasedMouseButtons.length = 0;
       this._mouseWheelDelta = 0;
       this._lastStartedTouchIndex = 0;
@@ -562,14 +595,6 @@ namespace gdjs {
      */
     isScrollingDown(): boolean {
       return this.getMouseWheelDelta() < 0;
-    }
-
-    /**
-     * Clears all stored pressed keys without making the keys go through
-     * the release state.
-     */
-    clearAllPressedKeys(): void {
-      this._pressedKeys.clear();
     }
 
     static _allTouchIds: Array<integer> = [];

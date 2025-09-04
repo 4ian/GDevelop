@@ -34,9 +34,14 @@ describe('gdjs.InputManager', () => {
     inputManager.onKeyPressed(33);
     expect(inputManager.getLastPressedKey()).to.be(33);
     expect(inputManager.isKeyPressed(32)).to.be(true);
+    expect(inputManager.wasKeyJustPressed(32)).to.be(true);
     expect(inputManager.isKeyPressed(30)).to.be(false);
+    expect(inputManager.wasKeyJustPressed(30)).to.be(false);
+    expect(inputManager.isKeyPressed(33)).to.be(true);
+    expect(inputManager.wasKeyJustPressed(33)).to.be(true);
     inputManager.onKeyReleased(32);
     expect(inputManager.isKeyPressed(32)).to.be(false);
+    expect(inputManager.wasKeyJustPressed(32)).to.be(false);
     expect(inputManager.wasKeyReleased(32)).to.be(true);
     expect(inputManager.anyKeyReleased()).to.be(true);
     expect(inputManager.anyKeyPressed()).to.be(true);
@@ -46,10 +51,14 @@ describe('gdjs.InputManager', () => {
     expect(inputManager.anyKeyPressed()).to.be(true);
     expect(inputManager.anyKeyReleased()).to.be(false);
     expect(inputManager.isKeyPressed(33)).to.be(true);
+    expect(inputManager.wasKeyJustPressed(33)).to.be(false);
+    expect(inputManager.wasKeyJustPressed(32)).to.be(false);
 
     inputManager.onFrameEnded();
     inputManager.onKeyReleased(33);
     expect(inputManager.wasKeyReleased(33)).to.be(true);
+    expect(inputManager.wasKeyJustPressed(33)).to.be(false);
+    expect(inputManager.wasKeyJustPressed(32)).to.be(false);
     expect(inputManager.anyKeyPressed()).to.be(false);
     expect(inputManager.anyKeyReleased()).to.be(true);
     inputManager.onFrameEnded();
@@ -61,12 +70,16 @@ describe('gdjs.InputManager', () => {
     expect(inputManager.getLastPressedKey()).to.be(2016);
     expect(inputManager.isKeyPressed(2016)).to.be(true);
     expect(inputManager.isKeyPressed(1016)).to.be(false);
+    expect(inputManager.wasKeyJustPressed(2016)).to.be(true);
+    expect(inputManager.wasKeyJustPressed(1016)).to.be(false);
 
     // Pressed Control with no location - expect to default to left.
     inputManager.onKeyPressed(17);
     expect(inputManager.getLastPressedKey()).to.be(1017);
     expect(inputManager.isKeyPressed(1017)).to.be(true);
     expect(inputManager.isKeyPressed(2017)).to.be(false);
+    expect(inputManager.wasKeyJustPressed(1017)).to.be(true);
+    expect(inputManager.wasKeyJustPressed(2017)).to.be(false);
 
     inputManager.onKeyReleased(16, 2);
     expect(inputManager.wasKeyReleased(2016)).to.be(true);

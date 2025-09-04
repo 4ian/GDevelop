@@ -52,10 +52,25 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(
       .SetHidden();
 
   extension
-      .AddCondition("KeyFromTextPressed",
-                    _("Key pressed"),
-                    _("Check if a key is pressed"),
-                    _("_PARAM1_ key is pressed"),
+      .AddCondition(
+          "KeyFromTextPressed",
+          _("Key pressed"),
+          _("Check if a key is pressed. This stays true as long as "
+            "the key is held down. To check if a key was pressed during "
+            "the frame, use \"Key just pressed\" instead."),
+          _("_PARAM1_ key is pressed"),
+          "",
+          "res/conditions/keyboard24.png",
+          "res/conditions/keyboard.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("keyboardKey", _("Key to check"))
+      .MarkAsSimple();
+
+  extension
+      .AddCondition("KeyFromTextJustPressed",
+                    _("Key just pressed"),
+                    _("Check if a key was just pressed."),
+                    _("_PARAM1_ key was just pressed"),
                     "",
                     "res/conditions/keyboard24.png",
                     "res/conditions/keyboard.png")
@@ -66,7 +81,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(
   extension
       .AddCondition("KeyFromTextReleased",
                     _("Key released"),
-                    _("Check if a key was just released"),
+                    _("Check if a key was just released."),
                     _("_PARAM1_ key is released"),
                     "",
                     "res/conditions/keyboard24.png",

@@ -153,7 +153,7 @@ namespace gdjs {
       };
 
       /**
-       * Return true if the specified key is pressed
+       * Return true if the specified key is pressed (i.e: just pressed or held down).
        *
        */
       export const isKeyPressed = function (
@@ -170,8 +170,22 @@ namespace gdjs {
       };
 
       /**
-       * Return true if the specified key was just released
-       *
+       * Return true if the specified key was just pressed (i.e: it started being pressed
+       * during this frame).
+       */
+      export const wasKeyJustPressed = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        key: string
+      ) {
+        return instanceContainer
+          .getGame()
+          .getInputManager()
+          .wasKeyJustPressed(gdjs.evtTools.input.keysNameToCode[key]);
+      };
+
+      /**
+       * Return true if the specified key was just released (i.e: it stopped being pressed
+       * during this frame).
        */
       export const wasKeyReleased = function (
         instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -187,7 +201,7 @@ namespace gdjs {
       };
 
       /**
-       * Return the name of the last key pressed in the game
+       * Return the name of the last key pressed in the game.
        */
       export const lastPressedKey = function (
         instanceContainer: gdjs.RuntimeInstanceContainer

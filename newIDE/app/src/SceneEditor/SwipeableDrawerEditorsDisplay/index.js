@@ -33,6 +33,7 @@ import {
   type InstanceOrObjectPropertiesEditorInterface,
 } from '../InstanceOrObjectPropertiesEditorContainer';
 import { useDoNowOrAfterRender } from '../../Utils/UseDoNowOrAfterRender';
+import { instancesEditorEmbeddedGameFrameHoleId } from '../MosaicEditorsDisplay';
 
 export const swipeableDrawerContainerId = 'swipeable-drawer-container';
 
@@ -48,7 +49,13 @@ const noop = () => {};
 
 const styles = {
   container: { width: '100%' },
-  bottomContainer: { position: 'absolute', bottom: 0, width: '100%' },
+  bottomContainer: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    // Restore pointer events that are removed when using the EmbeddedGameFrame.
+    pointerEvents: 'all',
+  },
   instancesListContainer: { display: 'flex', flex: 1 },
 };
 
@@ -58,6 +65,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
   SceneEditorsDisplayInterface
 >((props, ref) => {
   const {
+    gameEditorMode,
     project,
     resourceManagementProps,
     layout,
@@ -278,44 +286,48 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
             componentTitle={<Trans>Instances editor.</Trans>}
             scope="scene-editor-canvas"
           >
-            <InstancesEditor
-              ref={editorRef}
-              height={height}
-              width={width}
-              project={project}
-              layout={layout}
-              eventsBasedObject={eventsBasedObject}
-              eventsBasedObjectVariant={eventsBasedObjectVariant}
-              globalObjectsContainer={globalObjectsContainer}
-              objectsContainer={objectsContainer}
-              layersContainer={layersContainer}
-              selectedLayer={selectedLayer}
-              screenType={screenType}
-              initialInstances={initialInstances}
-              instancesEditorSettings={props.instancesEditorSettings}
-              onInstancesEditorSettingsMutated={
-                props.onInstancesEditorSettingsMutated
-              }
-              instancesSelection={props.instancesSelection}
-              onInstancesAdded={props.onInstancesAdded}
-              onInstancesSelected={props.onInstancesSelected}
-              onInstanceDoubleClicked={props.onInstanceDoubleClicked}
-              onInstancesMoved={props.onInstancesMoved}
-              onInstancesResized={props.onInstancesResized}
-              onInstancesRotated={props.onInstancesRotated}
-              selectedObjectNames={selectedObjectNames}
-              onContextMenu={props.onContextMenu}
-              isInstanceOf3DObject={props.isInstanceOf3DObject}
-              instancesEditorShortcutsCallbacks={
-                props.instancesEditorShortcutsCallbacks
-              }
-              pauseRendering={!props.isActive}
-              showObjectInstancesIn3D={values.use3DEditor}
-              showBasicProfilingCounters={values.showBasicProfilingCounters}
-              tileMapTileSelection={props.tileMapTileSelection}
-              onSelectTileMapTile={props.onSelectTileMapTile}
-              editorViewPosition2D={props.editorViewPosition2D}
-            />
+            {gameEditorMode === 'embedded-game' ? (
+              <div id={instancesEditorEmbeddedGameFrameHoleId} />
+            ) : (
+              <InstancesEditor
+                ref={editorRef}
+                height={height}
+                width={width}
+                project={project}
+                layout={layout}
+                eventsBasedObject={eventsBasedObject}
+                eventsBasedObjectVariant={eventsBasedObjectVariant}
+                globalObjectsContainer={globalObjectsContainer}
+                objectsContainer={objectsContainer}
+                layersContainer={layersContainer}
+                selectedLayer={selectedLayer}
+                screenType={screenType}
+                initialInstances={initialInstances}
+                instancesEditorSettings={props.instancesEditorSettings}
+                onInstancesEditorSettingsMutated={
+                  props.onInstancesEditorSettingsMutated
+                }
+                instancesSelection={props.instancesSelection}
+                onInstancesAdded={props.onInstancesAdded}
+                onInstancesSelected={props.onInstancesSelected}
+                onInstanceDoubleClicked={props.onInstanceDoubleClicked}
+                onInstancesMoved={props.onInstancesMoved}
+                onInstancesResized={props.onInstancesResized}
+                onInstancesRotated={props.onInstancesRotated}
+                selectedObjectNames={selectedObjectNames}
+                onContextMenu={props.onContextMenu}
+                isInstanceOf3DObject={props.isInstanceOf3DObject}
+                instancesEditorShortcutsCallbacks={
+                  props.instancesEditorShortcutsCallbacks
+                }
+                pauseRendering={!props.isActive}
+                showObjectInstancesIn3D={values.use3DEditor}
+                showBasicProfilingCounters={values.showBasicProfilingCounters}
+                tileMapTileSelection={props.tileMapTileSelection}
+                onSelectTileMapTile={props.onSelectTileMapTile}
+                editorViewPosition2D={props.editorViewPosition2D}
+              />
+            )}
           </ErrorBoundary>
           <div style={styles.bottomContainer} id={swipeableDrawerContainerId}>
             <SwipeableDrawer

@@ -103,7 +103,7 @@ export const ExtensionLoadErrorDialog = ({
                   <TableRowColumn>{message}</TableRowColumn>
                   <TableRowColumn>
                     {rawError && (
-                      <Text>
+                      <Text style={{ whiteSpace: 'pre-wrap' }}>
                         {rawError.toString()}
                         <br />
                         {rawError.stack}

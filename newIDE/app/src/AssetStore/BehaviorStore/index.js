@@ -62,6 +62,7 @@ type Props = {|
   project: gdProject,
   objectType: string,
   objectBehaviorsTypes: Array<string>,
+  isChildObject: boolean,
   installedBehaviorMetadataList: Array<BehaviorShortHeader>,
   deprecatedBehaviorMetadataList: Array<BehaviorShortHeader>,
   onInstall: (behaviorShortHeader: BehaviorShortHeader) => Promise<boolean>,
@@ -76,6 +77,7 @@ export const BehaviorStore = ({
   project,
   objectType,
   objectBehaviorsTypes,
+  isChildObject,
   installedBehaviorMetadataList,
   deprecatedBehaviorMetadataList,
   onInstall,
@@ -316,6 +318,7 @@ export const BehaviorStore = ({
               key={behaviorShortHeader.type}
               objectType={objectType}
               objectBehaviorsTypes={objectBehaviorsTypes}
+              isChildObject={isChildObject}
               onHeightComputed={onHeightComputed}
               behaviorShortHeader={behaviorShortHeader}
               matches={getExtensionsMatches(behaviorShortHeader)}

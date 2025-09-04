@@ -428,6 +428,7 @@ const InstructionEditorDialog = ({
           open={newBehaviorDialogOpen}
           objectType={chosenObject.getType()}
           objectBehaviorsTypes={listObjectBehaviorsTypes(chosenObject)}
+          isChildObject={!scope.layout}
           onClose={() => setNewBehaviorDialogOpen(false)}
           onChoose={addBehavior}
           onExtensionInstalled={extensionName => {

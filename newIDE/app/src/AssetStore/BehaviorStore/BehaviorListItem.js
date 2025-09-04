@@ -33,6 +33,7 @@ type Props = {|
   id?: string,
   objectType: string,
   objectBehaviorsTypes: Array<string>,
+  isChildObject: boolean,
   behaviorShortHeader: BehaviorShortHeader,
   matches: ?Array<SearchMatch>,
   onChoose: () => void,
@@ -45,6 +46,7 @@ export const BehaviorListItem = ({
   id,
   objectType,
   objectBehaviorsTypes,
+  isChildObject,
   behaviorShortHeader,
   matches,
   onChoose,
@@ -53,20 +55,28 @@ export const BehaviorListItem = ({
   platform,
 }: Props) => {
   const alreadyAdded = objectBehaviorsTypes.includes(behaviorShortHeader.type);
-  // An empty object type means the base object, i.e: any object.
+
+  const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+    platform,
+    behaviorShortHeader.type
+  );
   const isObjectCompatible =
+    // An empty object type means the base object, i.e: any object.
     (!behaviorShortHeader.objectType ||
       objectType === behaviorShortHeader.objectType) &&
+    (!isChildObject || behaviorMetadata.isRelevantForChildObjects()) &&
     behaviorShortHeader.allRequiredBehaviorTypes.every(requiredBehaviorType => {
       const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
         platform,
         requiredBehaviorType
       );
       return (
-        !behaviorMetadata.isHidden() ||
-        objectBehaviorsTypes.includes(requiredBehaviorType)
+        (!isChildObject || behaviorMetadata.isRelevantForChildObjects()) &&
+        (!behaviorMetadata.isHidden() ||
+          objectBehaviorsTypes.includes(requiredBehaviorType))
       );
     });
+
   const isEngineCompatible = isCompatibleWithGDevelopVersion(
     getIDEVersion(),
     behaviorShortHeader.gdevelopVersion

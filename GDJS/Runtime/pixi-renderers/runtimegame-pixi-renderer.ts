@@ -658,6 +658,14 @@ namespace gdjs {
           e.preventDefault();
         }
 
+        if (e.repeat) {
+          // If `repeat` is true, this is not the first press of the key.
+          // We only communicate the changes of states ("first" key down, key up)
+          // to the manager, which then tracks the state of the key:
+          // pressed, just pressed or released.
+          return;
+        }
+
         manager.onKeyPressed(e.keyCode, e.location);
       };
       document.onkeyup = function (e) {

@@ -155,6 +155,7 @@ export const getBundleTiles = ({
   receivedBundles,
   openedShopCategory,
   hasAssetFiltersApplied,
+  onlyShowAssets,
 }: {|
   allBundleListingDatas: ?Array<BundleListingData>,
   displayedBundleListingDatas: ?Array<BundleListingData>,
@@ -162,12 +163,14 @@ export const getBundleTiles = ({
   receivedBundles: ?Array<any>,
   openedShopCategory?: ?string,
   hasAssetFiltersApplied?: boolean,
+  onlyShowAssets?: boolean,
 |}): Array<React.Node> => {
   if (
     !allBundleListingDatas ||
     !displayedBundleListingDatas ||
     !onBundleSelection ||
-    hasAssetFiltersApplied
+    hasAssetFiltersApplied ||
+    onlyShowAssets
   )
     return [];
 

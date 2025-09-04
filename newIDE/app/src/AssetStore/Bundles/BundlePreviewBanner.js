@@ -260,9 +260,10 @@ const getColumnsFromWindowSize = (windowSize: WindowSizeType) => {
 type Props = {|
   onDisplayBundle: (bundleListingData: BundleListingData) => void,
   i18n: I18nType,
+  category: string,
 |};
 
-const BundlePreviewBanner = ({ onDisplayBundle, i18n }: Props) => {
+const BundlePreviewBanner = ({ onDisplayBundle, i18n, category }: Props) => {
   const { isMobile, isLandscape, windowSize } = useResponsiveWindowSize();
   const numberOfTilesToDisplay = getColumnsFromWindowSize(windowSize) - 1; // Reserve one tile for the bundle preview.
   const { privateGameTemplateListingDatas } = React.useContext(
@@ -278,28 +279,34 @@ const BundlePreviewBanner = ({ onDisplayBundle, i18n }: Props) => {
   const { bundlePurchases, receivedBundles } = authenticatedUser;
 
   // For the moment, we either display:
-  // - the first bundle in the list if none are owned.
-  // - the first owned bundle (as a listing data if still listed, or as an archived listing data otherwise)
-  // TODO: improve that logic when we'll have more bundles.
+  // - the first bundle of that category if none are owned.
+  // - the first owned bundle of that category (as a listing data if still listed, or as an archived listing data otherwise)
   const bundleListingData: BundleListingData | null = React.useMemo(
     () => {
       if (!bundleListingDatas || !receivedBundles) return null;
-      if (receivedBundles.length === 0) {
-        return bundleListingDatas[0]; // Display the first bundle if none are owned.
+      const bundleListingDataOfCategory = bundleListingDatas.filter(bundle =>
+        bundle.categories.includes(category)
+      )[0];
+      const receivedBundleOfCategory = receivedBundles.filter(bundle =>
+        bundle.categories.includes(category)
+      )[0];
+      if (!receivedBundleOfCategory) {
+        // Display the first bundle if none are found with that category.
+        return bundleListingDataOfCategory || bundleListingDatas[0];
       }
-      const receivedBundle = receivedBundles[0];
-      const bundleListingData = bundleListingDatas.find(
-        bundleListingData => bundleListingData.id === receivedBundle.id
+      const bundleListingDataMatchingOwnedBundle = bundleListingDatas.find(
+        bundleListingData =>
+          bundleListingData.id === receivedBundleOfCategory.id
       );
-      if (bundleListingData) {
-        return bundleListingData; // Display the first owned bundle that is still listed.
-      }
       // If this bundle is not listed anymore, get an archived listing data for that bundle.
-      return getArchivedBundleListingData({
-        bundle: receivedBundle,
-      });
+      return (
+        bundleListingDataMatchingOwnedBundle ||
+        getArchivedBundleListingData({
+          bundle: receivedBundleOfCategory,
+        })
+      );
     },
-    [bundleListingDatas, receivedBundles]
+    [bundleListingDatas, receivedBundles, category]
   );
 
   const userBundlePurchaseUsageType = React.useMemo(

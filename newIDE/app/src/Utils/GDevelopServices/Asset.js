@@ -162,6 +162,7 @@ export type Bundle = {|
   // If the bundle is archived, it will not be available for purchase anymore.
   // But it will still be available for users who already purchased it.
   archivedAt?: string,
+  categories: string[],
   longDescription: string,
   longDescriptionByLocale: MessageByLocale,
   previewImageUrls: Array<string>,
@@ -333,6 +334,7 @@ export type Course = {|
   titleByLocale: MessageByLocale,
   shortDescriptionByLocale: MessageByLocale,
   levelByLocale: MessageByLocale,
+  introByLocale?: MessageByLocale,
 
   isLocked?: boolean,
   includedInSubscriptions: string[],

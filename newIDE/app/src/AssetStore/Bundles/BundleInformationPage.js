@@ -259,7 +259,7 @@ const BundleInformationPage = ({
           padding: 0,
         }
       : {}),
-    ...(bundleListingData.visibleUntil
+    ...(bundleListingData.visibleUntil && !noPadding
       ? {
           backgroundAttachment: 'local',
           backgroundRepeat: 'no-repeat',

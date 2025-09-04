@@ -580,6 +580,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
           onBundleSelection,
           receivedBundles,
           hasAssetFiltersApplied,
+          onlyShowAssets,
         }),
       [
         allBundleListingDatas,
@@ -587,6 +588,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
         onBundleSelection,
         receivedBundles,
         hasAssetFiltersApplied,
+        onlyShowAssets,
       ]
     );
 

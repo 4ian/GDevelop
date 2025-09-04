@@ -389,41 +389,39 @@ const BundlePageHeader = ({
               </SectionRow>
             )}
           <SectionRow>
-            <Paper background="dark" variant="outlined" style={{ padding: 16 }}>
-              <ResponsiveLineStackLayout
-                noMargin
-                alignItems="center"
-                justifyContent="flex-start"
-                forceMobileLayout={isMediumScreen}
+            <ResponsiveLineStackLayout
+              noMargin
+              alignItems="center"
+              justifyContent="flex-start"
+              forceMobileLayout={isMediumScreen}
+              expand
+            >
+              <div style={styles.imageContainer}>
+                <img
+                  src={bundle.previewImageUrls[0]}
+                  style={styles.image}
+                  alt=""
+                />
+              </div>
+              <ColumnStackLayout
                 expand
+                justifyContent="flex-start"
+                noMargin={isMobile}
               >
-                <div style={styles.imageContainer}>
-                  <img
-                    src={bundle.previewImageUrls[0]}
-                    style={styles.image}
-                    alt=""
-                  />
-                </div>
-                <ColumnStackLayout
-                  expand
-                  justifyContent="flex-start"
-                  noMargin={isMobile}
-                >
-                  <Text size="title" noMargin style={styles.title}>
-                    {selectMessageByLocale(i18n, bundle.nameByLocale)}
+                <Text size="title" noMargin style={styles.title}>
+                  {selectMessageByLocale(i18n, bundle.nameByLocale)}
+                </Text>
+                <Line noMargin>
+                  <Text noMargin>
+                    {selectMessageByLocale(
+                      i18n,
+                      bundle.longDescriptionByLocale
+                    )}
                   </Text>
-                  <Line noMargin>
-                    <Text noMargin>
-                      {selectMessageByLocale(
-                        i18n,
-                        bundle.longDescriptionByLocale
-                      )}
-                    </Text>
-                  </Line>
-                  {summaryLines}
-                </ColumnStackLayout>
-              </ResponsiveLineStackLayout>
-            </Paper>
+                </Line>
+                {summaryLines}
+              </ColumnStackLayout>
+            </ResponsiveLineStackLayout>
           </SectionRow>
           {!isAlreadyReceived && isMobileOrMediumScreen && bundleListingData && (
             <SectionRow>

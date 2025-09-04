@@ -19,4 +19,7 @@
   animation-duration: 3.5s;
   will-change: opacity;
   opacity: 0;
+  top: -40px;
+  position: relative;
+  text-shadow: black 1px 1px 2px;
 }

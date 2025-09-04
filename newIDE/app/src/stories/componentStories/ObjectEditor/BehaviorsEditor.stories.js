@@ -23,6 +23,7 @@ export const Default = () => (
       project={testProject.project}
       eventsFunctionsExtension={null}
       object={testProject.spriteObjectWithBehaviors}
+      isChildObject={false}
       resourceManagementProps={fakeResourceManagementProps}
       onUpdateBehaviorsSharedData={() => {}}
       openBehaviorEvents={() => action('Open behavior events')}
@@ -39,6 +40,7 @@ export const WithoutAnyBehaviors = () => (
       project={testProject.project}
       eventsFunctionsExtension={null}
       object={testProject.spriteObjectWithoutBehaviors}
+      isChildObject={false}
       resourceManagementProps={fakeResourceManagementProps}
       onUpdateBehaviorsSharedData={() => {}}
       openBehaviorEvents={() => action('Open behavior events')}
@@ -55,6 +57,7 @@ export const Locked = () => (
       project={testProject.project}
       eventsFunctionsExtension={null}
       object={testProject.spriteObjectWithBehaviors}
+      isChildObject={false}
       resourceManagementProps={fakeResourceManagementProps}
       onUpdateBehaviorsSharedData={() => {}}
       openBehaviorEvents={() => action('Open behavior events')}
@@ -71,6 +74,7 @@ export const LockedWithoutAnyBehaviors = () => (
       project={testProject.project}
       eventsFunctionsExtension={null}
       object={testProject.spriteObjectWithoutBehaviors}
+      isChildObject={false}
       resourceManagementProps={fakeResourceManagementProps}
       onUpdateBehaviorsSharedData={() => {}}
       openBehaviorEvents={() => action('Open behavior events')}

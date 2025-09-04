@@ -61,6 +61,7 @@ export const DefaultForSpriteObject = () => (
           project={testProject.project}
           eventsFunctionsExtension={null}
           objectType={'Sprite'}
+          isChildObject={false}
           onClose={action('on close')}
           onChoose={action('on choose')}
           objectBehaviorsTypes={[
@@ -96,6 +97,7 @@ export const WithCommunityExtensions = () => {
                 project={testProject.project}
                 eventsFunctionsExtension={null}
                 objectType={'Sprite'}
+                isChildObject={false}
                 onClose={action('on close')}
                 onChoose={action('on choose')}
                 objectBehaviorsTypes={[
@@ -123,6 +125,7 @@ export const WithServerSideErrors = () => (
             project={testProject.project}
             eventsFunctionsExtension={null}
             objectType={'Sprite'}
+            isChildObject={false}
             onClose={action('on close')}
             onChoose={action('on choose')}
             objectBehaviorsTypes={[

@@ -679,6 +679,7 @@ module.exports = {
           behavior,
           sharedData
         )
+        .markAsIrrelevantForChildObjects()
         .addIncludeFile(
           'Extensions/Physics3DBehavior/Physics3DRuntimeBehavior.js'
         )

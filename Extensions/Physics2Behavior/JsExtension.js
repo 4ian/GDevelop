@@ -531,6 +531,7 @@ module.exports = {
         physics2Behavior,
         sharedData
       )
+      .markAsIrrelevantForChildObjects()
       .setIncludeFile('Extensions/Physics2Behavior/physics2runtimebehavior.js')
       .addIncludeFile('Extensions/Physics2Behavior/Box2D_v2.3.1_min.wasm.js')
       .addRequiredFile('Extensions/Physics2Behavior/Box2D_v2.3.1_min.wasm.wasm')

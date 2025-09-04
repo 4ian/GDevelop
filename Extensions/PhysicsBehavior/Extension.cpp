@@ -37,7 +37,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
         "res/physics-deprecated32.png",
         "PhysicsBehavior",
         std::make_shared<PhysicsBehavior>(),
-        std::make_shared<ScenePhysicsDatas>());
+        std::make_shared<ScenePhysicsDatas>())
+        .MarkAsIrrelevantForChildObjects();
 
     aut.AddAction("SetStatic",
                   ("Make the object static"),

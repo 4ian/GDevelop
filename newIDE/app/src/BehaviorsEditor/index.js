@@ -71,6 +71,7 @@ type BehaviorConfigurationEditorProps = {|
   project: gdProject,
   object: gdObject,
   behavior: gdBehavior,
+  isChildObject: boolean,
   resourceManagementProps: ResourceManagementProps,
   onBehaviorsUpdated: () => void,
   onChangeBehaviorName: (behavior: gdBehavior, newName: string) => void,
@@ -94,6 +95,7 @@ const BehaviorConfigurationEditor = React.forwardRef<
       project,
       object,
       behavior,
+      isChildObject,
       resourceManagementProps,
       onBehaviorsUpdated,
       onChangeBehaviorName,
@@ -311,6 +313,7 @@ type UseManageBehaviorsState = {|
 export const useManageObjectBehaviors = ({
   project,
   object,
+  isChildObject,
   eventsFunctionsExtension,
   onUpdate,
   onSizeUpdated,
@@ -320,6 +323,7 @@ export const useManageObjectBehaviors = ({
 }: {
   project: gdProject,
   object: gdObject,
+  isChildObject: boolean,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   onUpdate: () => void,
   onSizeUpdated?: ?() => void,
@@ -586,6 +590,7 @@ export const useManageObjectBehaviors = ({
       open
       objectType={object.getType()}
       objectBehaviorsTypes={listObjectBehaviorsTypes(object)}
+      isChildObject={isChildObject}
       onClose={() => setNewBehaviorDialogOpen(false)}
       onChoose={addBehavior}
       project={project}
@@ -615,6 +620,7 @@ type Props = {|
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   object: gdObject,
+  isChildObject: boolean,
   onUpdateBehaviorsSharedData: () => void,
   onSizeUpdated?: ?() => void,
   resourceManagementProps: ResourceManagementProps,
@@ -636,6 +642,7 @@ const BehaviorsEditor = (props: Props) => {
 
   const {
     object,
+    isChildObject,
     project,
     eventsFunctionsExtension,
     onSizeUpdated,
@@ -665,6 +672,7 @@ const BehaviorsEditor = (props: Props) => {
   } = useManageObjectBehaviors({
     project,
     object,
+    isChildObject,
     eventsFunctionsExtension,
     onUpdate: forceUpdate,
     onSizeUpdated,
@@ -785,6 +793,7 @@ const BehaviorsEditor = (props: Props) => {
                   key={behaviorName}
                   project={project}
                   object={object}
+                  isChildObject={isChildObject}
                   behavior={behavior}
                   copyBehavior={copyBehavior}
                   onRemoveBehavior={removeBehavior}

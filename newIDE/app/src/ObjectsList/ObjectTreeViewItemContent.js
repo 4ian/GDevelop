@@ -207,6 +207,14 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     return this._isGlobal;
   }
 
+  is3D(): boolean {
+    const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+      this.props.project.getCurrentPlatform(),
+      this.object.getObject().getType()
+    );
+    return objectMetadata.isRenderedIn3D();
+  }
+
   getName(): string | React.Node {
     return this.object.getObject().getName();
   }

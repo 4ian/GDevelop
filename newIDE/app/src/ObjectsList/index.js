@@ -134,6 +134,7 @@ export interface TreeViewItemContent {
   isDescendantOf(treeViewItemContent: TreeViewItemContent): boolean;
   isSibling(treeViewItemContent: TreeViewItemContent): boolean;
   isGlobal(): boolean;
+  is3D(): boolean;
   getObjectFolderOrObject(): gdObjectFolderOrObject | null;
 }
 

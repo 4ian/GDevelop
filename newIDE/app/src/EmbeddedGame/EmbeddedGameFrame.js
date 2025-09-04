@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { Trans } from '@lingui/macro';
 import { type PreviewDebuggerServer } from '../ExportAndShare/PreviewLauncher.flow';
 import { objectWithContextReactDndType } from '../ObjectsList';
 import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
@@ -374,6 +375,8 @@ export const EmbeddedGameFrame = ({
       previewDebuggerServer.registerEmbeddedGameFrame(iframe.contentWindow);
   });
 
+  const [isDraggedItem3D, setDraggedItem3D] = React.useState(false);
+
   return (
     <div
       style={{
@@ -407,6 +410,8 @@ export const EmbeddedGameFrame = ({
             const clientOffset = monitor.getClientOffset();
             const name = monitor.getItem().name;
             if (!name) return;
+
+            setDraggedItem3D(!!monitor.getItem().is3D);
 
             // TODO: Move these into a helper.
             previewDebuggerServer
@@ -476,7 +481,17 @@ export const EmbeddedGameFrame = ({
               >
                 {canDrop && (
                   <div className={classes.hintText}>
-                    <Text color="inherit">Drag here to add to the scene</Text>
+                    {isDraggedItem3D ? (
+                      <Text color="inherit">
+                        <Trans>Drag here to add to the scene</Trans>
+                      </Text>
+                    ) : (
+                      <Text color="inherit">
+                        <Trans>
+                          2D objects can't be edited when in 3D mode
+                        </Trans>
+                      </Text>
+                    )}
                   </div>
                 )}
               </div>

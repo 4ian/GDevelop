@@ -54,6 +54,7 @@ type InnerDragSourceAndDropTargetProps<DraggedItemType> = {|
 export type DraggedItem = {|
   name: string,
   thumbnail?: string,
+  is3D?: boolean,
 |};
 
 type Options = {| vibrate?: number |};

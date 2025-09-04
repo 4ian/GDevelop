@@ -354,6 +354,10 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
     return false;
   }
 
+  is3D(): boolean {
+    return false;
+  }
+
   getObjectFolderOrObject(): gdObjectFolderOrObject | null {
     return null;
   }

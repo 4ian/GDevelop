@@ -134,6 +134,10 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     return this._isGlobal;
   }
 
+  is3D(): boolean {
+    return false;
+  }
+
   getName(): string | React.Node {
     return this.objectFolder.getFolderName();
   }

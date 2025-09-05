@@ -440,7 +440,7 @@ export const EmbeddedGameFrame = ({
                 previewDebuggerServer.sendMessage(debuggerId, {
                   command: 'dragNewInstance',
                   x: clientOffset.x,
-                  y: clientOffset.y,
+                  y: clientOffset.y - (31 + 40),
                   name,
                   dropped: true,
                 });

@@ -1374,7 +1374,6 @@ namespace gdjs {
             this._selection.clear();
           }
           if (objectUnderCursor) {
-            // TODO Check if the object is locked
             const layer = this.getEditorLayer(objectUnderCursor.getLayer());
             if (
               layer &&
@@ -2028,6 +2027,7 @@ namespace gdjs {
               return;
             }
           }
+          // TODO Move the object according to the last cursor position
           this._sendSelectionUpdate({
             addedObjects: [this._draggedNewObject],
           });

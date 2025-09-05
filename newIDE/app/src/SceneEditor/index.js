@@ -367,8 +367,6 @@ export default class SceneEditor extends React.Component<Props, State> {
   }
 
   onReceiveInstanceChanges(changes: InstanceChanges) {
-    // TODO: ensure this works for external layouts too.
-
     // TODO: adapt all of this to get all instances in one shot.
     // and reorganize this.
     const modifiedInstances: gdInitialInstance[] = [];
@@ -1145,10 +1143,6 @@ export default class SceneEditor extends React.Component<Props, State> {
    */
   _onInstancesModified = (instances: Array<gdInitialInstance>) => {
     this._sendUpdatedInstances(instances);
-    // TODO: Create a new export mode that will generate only the bare minimum
-    // so that the runtime game has up-to-date data without unnecessary reloading scripts.
-    // Once the mode exists, call it here.
-    // this._exportDataOnly();
     this.forceUpdate();
     //TODO: Save for redo with debounce (and cancel on unmount)
   };

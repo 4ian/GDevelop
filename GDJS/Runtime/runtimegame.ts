@@ -321,9 +321,7 @@ namespace gdjs {
       this._gameResolutionHeight = this._data.properties.windowHeight;
       this._originalWidth = this._gameResolutionWidth;
       this._originalHeight = this._gameResolutionHeight;
-      this._resizeMode = this._isInGameEdition
-        ? 'native'
-        : this._data.properties.sizeOnStartupMode;
+      this._resizeMode = this._data.properties.sizeOnStartupMode;
       this._adaptGameResolutionAtRuntime =
         this._data.properties.adaptGameResolutionAtRuntime;
       this._scaleMode = data.properties.scaleMode || 'linear';
@@ -735,7 +733,7 @@ namespace gdjs {
 
       this._gameResolutionWidth = width;
       this._gameResolutionHeight = height;
-      if (this._adaptGameResolutionAtRuntime) {
+      if (this._adaptGameResolutionAtRuntime || this._isInGameEdition) {
         if (
           gdjs.RuntimeGameRenderer &&
           gdjs.RuntimeGameRenderer.getWindowInnerWidth &&
@@ -747,7 +745,10 @@ namespace gdjs {
             gdjs.RuntimeGameRenderer.getWindowInnerHeight();
 
           // Enlarge either the width or the eight to fill the inner window space.
-          if (this._resizeMode === 'adaptWidth') {
+          if (this._isInGameEdition) {
+            this._gameResolutionWidth = windowInnerWidth;
+            this._gameResolutionHeight = windowInnerHeight;
+          } else if (this._resizeMode === 'adaptWidth') {
             this._gameResolutionWidth =
               (this._gameResolutionHeight * windowInnerWidth) /
               windowInnerHeight;
@@ -770,9 +771,6 @@ namespace gdjs {
               );
               this._gameResolutionHeight = this._originalHeight;
             }
-          } else if (this._resizeMode === 'native') {
-            this._gameResolutionWidth = windowInnerWidth;
-            this._gameResolutionHeight = windowInnerHeight;
           }
         }
       }

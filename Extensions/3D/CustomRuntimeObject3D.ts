@@ -85,9 +85,11 @@ namespace gdjs {
       }
     }
 
-    getNetworkSyncData(): CustomObject3DNetworkSyncDataType {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): CustomObject3DNetworkSyncDataType {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         z: this.getZ(),
         d: this.getDepth(),
         rx: this.getRotationX(),
@@ -97,9 +99,10 @@ namespace gdjs {
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: CustomObject3DNetworkSyncDataType
+      networkSyncData: CustomObject3DNetworkSyncDataType,
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
       if (networkSyncData.z !== undefined) this.setZ(networkSyncData.z);
       if (networkSyncData.d !== undefined) this.setDepth(networkSyncData.d);
       if (networkSyncData.rx !== undefined)

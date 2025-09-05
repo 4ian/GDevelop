@@ -145,9 +145,11 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): TilemapNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): TilemapNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         op: this._opacity,
         tmjf: this._tilemapJsonFile,
         tsjf: this._tilesetJsonFile,
@@ -159,8 +161,11 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(networkSyncData: TilemapNetworkSyncData): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+    updateFromNetworkSyncData(
+      networkSyncData: TilemapNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
+    ): void {
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       if (networkSyncData.op !== undefined) {
         this.setOpacity(networkSyncData.op);

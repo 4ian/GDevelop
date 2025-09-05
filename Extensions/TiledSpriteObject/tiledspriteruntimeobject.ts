@@ -78,9 +78,11 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): TiledSpriteNetworkSyncData {
+    getNetworkSyncData(
+      syncOptons: GetNetworkSyncDataOptions
+    ): TiledSpriteNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptons),
         xo: this.getXOffset(),
         yo: this.getYOffset(),
         op: this.getOpacity(),
@@ -89,9 +91,10 @@ namespace gdjs {
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: TiledSpriteNetworkSyncData
+      networkSyncData: TiledSpriteNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       // Texture is not synchronized, see if this is asked or not.
 

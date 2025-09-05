@@ -59,6 +59,214 @@ namespace gdjs {
   const exponentialInterpolation =
     gdjs.evtTools.common.exponentialInterpolation;
 
+  // TODO: Use this factory to get the tween setter and store only type and options
+  // in tween instance.
+  const tweenSetterFactory =
+    (object: RuntimeObject) => (type: string, options: any) => {
+      if (type === 'variable') {
+        // TODO: Find variable.
+        // return (value: float) => variable.setNumber(value)
+      }
+
+      if (type === 'positionX') {
+        return (value: float) => object.setX(value);
+      }
+      if (type === 'positionY') {
+        return (value: float) => object.setY(value);
+      }
+      if (type === 'position') {
+        return ([x, y]) => object.setPosition(x, y);
+      }
+      if (type === 'positionZ') {
+        if (!is3D(object)) return () => {};
+        return (value: float) => object.setZ(value);
+      }
+      if (type === 'width') {
+        return (value: float) => object.setWidth(value);
+      }
+      if (type === 'height') {
+        return (value: float) => object.setHeight(value);
+      }
+      if (type === 'depth') {
+        if (!is3D(object)) return () => {};
+        return (value: float) => object.setDepth(value);
+      }
+
+      if (type === 'angle') {
+        return (value: float) => object.setAngle(value);
+      }
+      if (type === 'rotationX') {
+        if (!is3D(object)) return () => {};
+        return (value: float) => object.setRotationX(value);
+      }
+      if (type === 'rotationY') {
+        if (!is3D(object)) return () => {};
+        return (value: float) => object.setRotationY(value);
+      }
+      if (type === 'scale') {
+        if (!isScalable(object)) return;
+
+        // This action doesn't require 3D capabilities.
+        // So, gdjs.RuntimeObject3D may not exist
+        // when the 3D extension is not used.
+        const object3d = is3D(object) ? object : null;
+        const setValue = options.scaleFromCenterOfObject
+          ? (scale: float) => {
+              const oldX = object.getCenterXInScene();
+              const oldY = object.getCenterYInScene();
+              const oldZ = object3d ? object3d.getCenterZInScene() : 0;
+              object.setScale(scale);
+              object.setCenterXInScene(oldX);
+              object.setCenterYInScene(oldY);
+              if (object3d) {
+                object3d.setCenterZInScene(oldZ);
+              }
+            }
+          : (scale: float) => object.setScale(scale);
+
+        return setValue;
+      }
+      if (type === 'scaleXAndY') {
+        if (!isScalable(object)) return;
+
+        const setValue = options.scaleFromCenterOfObject
+          ? ([scaleX, scaleY]: float[]) => {
+              const oldX = object.getCenterXInScene();
+              const oldY = object.getCenterYInScene();
+              object.setScaleX(scaleX);
+              object.setScaleY(scaleY);
+              object.setCenterPositionInScene(oldX, oldY);
+            }
+          : ([scaleX, scaleY]: float[]) => {
+              object.setScaleX(scaleX);
+              object.setScaleY(scaleY);
+            };
+        return setValue;
+      }
+      if (type === 'scaleX') {
+        if (!isScalable(object)) return;
+
+        const setValue = options.scaleFromCenterOfObject
+          ? (scaleX: float) => {
+              const oldX = object.getCenterXInScene();
+              object.setScaleX(scaleX);
+              object.setCenterXInScene(oldX);
+            }
+          : (scaleX: float) => object.setScaleX(scaleX);
+
+        return setValue;
+      }
+      if (type === 'scaleY') {
+        if (!isScalable(object)) return;
+
+        const setValue = options.scaleFromCenterOfObject
+          ? (scaleY: float) => {
+              const oldY = object.getCenterYInScene();
+              object.setScaleY(scaleY);
+              object.setCenterYInScene(oldY);
+            }
+          : (scaleY: float) => object.setScaleY(scaleY);
+
+        return setValue;
+      }
+      if (type === 'opacity') {
+        if (!isOpaque(object)) return () => {};
+        return (value: float) => object.setOpacity(value);
+      }
+      if (type === 'characterSize') {
+        if (!isCharacterScalable(object)) return () => {};
+        return (value: float) => object.setCharacterSize(value);
+      }
+      if (type === 'numberEffectProperty') {
+        const effect = object.getRendererEffects()[options.effectName];
+        if (!effect) {
+          logger.error(
+            `The object "${object.name}" doesn't have any effect called "${options.effectName}"`
+          );
+        }
+        return (value: float) => {
+          effect.updateDoubleParameter(options.propertyName, value);
+        };
+      }
+      if (type === 'colorEffectProperty') {
+        const effect = object.getRendererEffects()[options.effectName];
+        if (!effect) {
+          logger.error(
+            `The object "${object.name}" doesn't have any effect called "${options.effectName}"`
+          );
+        }
+
+        return ([hue, saturation, lightness]) => {
+          const rgbFromHslColor = gdjs.evtTools.tween.hslToRgb(
+            hue,
+            saturation,
+            lightness
+          );
+          effect.updateColorParameter(
+            options.propertyName,
+            gdjs.rgbToHexNumber(
+              rgbFromHslColor[0],
+              rgbFromHslColor[1],
+              rgbFromHslColor[2]
+            )
+          );
+        };
+      }
+
+      if (type === 'objectColor') {
+        if (!isColorable(object)) return;
+
+        if (options.useHSLColorTransition) {
+          const setValue = ([hue, saturation, lightness]) => {
+            const rgbFromHslColor = gdjs.evtTools.tween.hslToRgb(
+              hue,
+              saturation,
+              lightness
+            );
+            object.setColor(
+              Math.floor(rgbFromHslColor[0]) +
+                ';' +
+                Math.floor(rgbFromHslColor[1]) +
+                ';' +
+                Math.floor(rgbFromHslColor[2])
+            );
+          };
+          return setValue;
+        } else {
+          const setValue = ([red, green, blue]) => {
+            object.setColor(
+              Math.floor(red) + ';' + Math.floor(green) + ';' + Math.floor(blue)
+            );
+          };
+          return setValue;
+        }
+      }
+      if (type === 'objectColorHSL') {
+        if (!isColorable(object)) return;
+
+        const setValue = ([hue, saturation, lightness]) => {
+          const rgbFromHslColor = gdjs.evtTools.tween.hslToRgb(
+            hue,
+            saturation,
+            lightness
+          );
+
+          object.setColor(
+            Math.floor(rgbFromHslColor[0]) +
+              ';' +
+              Math.floor(rgbFromHslColor[1]) +
+              ';' +
+              Math.floor(rgbFromHslColor[2])
+          );
+        };
+
+        return setValue;
+      }
+
+      // 'objectValue' type doesn't set anything.
+      return () => {};
+    };
+
   export class TweenRuntimeBehavior extends gdjs.RuntimeBehavior {
     private _tweens = new gdjs.evtTools.tween.TweenManager();
     private _isActive: boolean = true;

@@ -1,9 +1,6 @@
 // @flow
-import { t } from '@lingui/macro';
-
 import * as React from 'react';
 import classNames from 'classnames';
-import TextField, { type TextFieldInterface } from '../../../UI/TextField';
 import { rgbToHex } from '../../../Utils/ColorTransformer';
 import {
   largeSelectedArea,
@@ -22,6 +19,15 @@ const gd: libGDevelop = global.gd;
 
 const commentTextStyle = {
   width: '100%',
+  fontSize: 'inherit',
+  fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+  padding: 0,
+  backgroundColor: 'transparent',
+  outline: 0,
+  border: 0,
+
+  // Big enough to have an empty text be the same size as an empty textarea.
+  lineHeight: '1.5em',
 };
 
 const styles = {
@@ -30,9 +36,9 @@ const styles = {
     flexWrap: 'wrap',
     padding: 5,
     overflow: 'hidden',
-    minHeight: '2.1em',
+    minHeight: '2.4em',
   },
-  commentTextField: { ...commentTextStyle, fontSize: 'inherit' },
+  commentTextField: { ...commentTextStyle, minHeight: '0', resize: 'none' },
   commentSpan: {
     ...commentTextStyle,
     alignItems: 'center',
@@ -55,8 +61,7 @@ export default class CommentEvent extends React.Component<
     editingPreviousValue: null,
   };
 
-  _selectable: ?HTMLSpanElement;
-  _textField: ?TextFieldInterface;
+  _textField: ?HTMLTextAreaElement;
 
   edit = () => {
     if (this.state.editing) return;
@@ -67,8 +72,11 @@ export default class CommentEvent extends React.Component<
         editingPreviousValue: commentEvent.getComment(),
       },
       () => {
-        if (this._textField) {
-          this._textField.focus({ caretPosition: 'end' });
+        const textField = this._textField;
+        if (textField) {
+          textField.focus();
+          textField.selectionStart = textField.value.length;
+          textField.selectionEnd = textField.value.length;
         }
         // Wait for the change to be applied on the DOM before calling onUpdate,
         // so that the height of the event is updated.
@@ -77,15 +85,12 @@ export default class CommentEvent extends React.Component<
     );
   };
 
-  onChange = (e: any, text: string) => {
+  onChange = (e: any) => {
     const commentEvent = gd.asCommentEvent(this.props.event);
-    commentEvent.setComment(text);
+    commentEvent.setComment(e.target.value);
 
-    this.forceUpdate(() => {
-      // Wait for the change to be applied on the DOM before calling onUpdate,
-      // so that the height of the event is updated.
-      this.props.onUpdate();
-    });
+    this._autoResizeTextArea();
+    this.forceUpdate();
   };
 
   endEditing = () => {
@@ -113,6 +118,22 @@ export default class CommentEvent extends React.Component<
       .replace(/>/g, '&gt;')
       .replace(/\n/g, '<br>');
   };
+
+  _autoResizeTextArea = () => {
+    if (this._textField) {
+      const previousHeight = this._textField.style.height;
+      this._textField.style.height = 'auto';
+      this._textField.style.height = this._textField.scrollHeight + 'px';
+
+      if (previousHeight !== this._textField.style.height) {
+        this.props.onUpdate(); // Notify the parent that the height has changed.
+      }
+    }
+  };
+
+  componentDidUpdate() {
+    this._autoResizeTextArea();
+  }
 
   render() {
     const commentEvent = gd.asCommentEvent(this.props.event);
@@ -149,31 +170,26 @@ export default class CommentEvent extends React.Component<
         id={`${this.props.idPrefix}-comment`}
       >
         {this.state.editing ? (
-          <TextField
-            multiline
-            margin="none"
+          <textarea
             ref={textField => (this._textField = textField)}
             value={commentEvent.getComment()}
-            translatableHintText={t`<Enter comment>`}
+            placeholder="..."
             onBlur={this.endEditing}
             onChange={this.onChange}
-            style={styles.commentTextField}
-            inputStyle={{
-              color: textColor,
-              padding: 0,
-            }}
-            fullWidth
+            style={{ ...styles.commentTextField, color: textColor }}
             id="comment-title"
             onKeyDown={event => {
               if (shouldCloseOrCancel(event) || shouldSubmit(event)) {
                 this.endEditing();
               }
             }}
-            underlineShow={false}
+            rows={
+              /* Ensure the textarea resize down to 1 line when no text or just a single line is entered. */
+              1
+            }
           />
         ) : (
           <span
-            ref={selectable => (this._selectable = selectable)}
             className={classNames({
               [selectableArea]: true,
               [disabledText]: this.props.disabled,

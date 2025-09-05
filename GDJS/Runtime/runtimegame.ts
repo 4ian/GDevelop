@@ -1386,6 +1386,7 @@ namespace gdjs {
       const syncData: GameNetworkSyncData = {
         var: this._variables.getNetworkSyncData(syncOptions),
         ss: this._sceneStack.getNetworkSyncData(syncOptions) || undefined,
+        sm: this.getSoundManager().getNetworkSyncData() || undefined,
       };
 
       const extensionsVariablesSyncData = {};
@@ -1412,13 +1413,19 @@ namespace gdjs {
       return syncData;
     }
 
-    updateFromNetworkSyncData(syncData: GameNetworkSyncData) {
+    updateFromNetworkSyncData(
+      syncData: GameNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
+    ) {
       this._throwIfDisposed();
       if (syncData.var) {
-        this._variables.updateFromNetworkSyncData(syncData.var);
+        this._variables.updateFromNetworkSyncData(syncData.var, options);
       }
       if (syncData.ss) {
         this._sceneStack.updateFromNetworkSyncData(syncData.ss);
+      }
+      if (options.syncSounds && syncData.sm) {
+        this.getSoundManager().updateFromNetworkSyncData(syncData.sm);
       }
       if (syncData.extVar) {
         for (const extensionName in syncData.extVar) {
@@ -1430,7 +1437,8 @@ namespace gdjs {
             this.getVariablesForExtension(extensionName);
           if (extensionVariables) {
             extensionVariables.updateFromNetworkSyncData(
-              extensionVariablesData
+              extensionVariablesData,
+              options
             );
           }
         }

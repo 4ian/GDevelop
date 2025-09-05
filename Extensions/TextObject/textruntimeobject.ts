@@ -223,9 +223,11 @@ namespace gdjs {
       return true;
     }
 
-    override getNetworkSyncData(): TextObjectNetworkSyncData {
+    override getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): TextObjectNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         str: this._str,
         o: this.opacity,
         cs: this._characterSize,
@@ -253,9 +255,10 @@ namespace gdjs {
     }
 
     override updateFromNetworkSyncData(
-      networkSyncData: TextObjectNetworkSyncData
+      networkSyncData: TextObjectNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
       if (networkSyncData.str !== undefined) {
         this.setText(networkSyncData.str);
       }
@@ -707,8 +710,8 @@ namespace gdjs {
         (this._verticalTextAlignment === 'center'
           ? this.getHeight() / 2
           : this._verticalTextAlignment === 'bottom'
-            ? this.getHeight()
-            : 0)
+          ? this.getHeight()
+          : 0)
       );
     }
 

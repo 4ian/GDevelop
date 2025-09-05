@@ -7,6 +7,11 @@ namespace gdjs {
   const logger = new gdjs.Logger('RuntimeScene');
   const setupWarningLogger = new gdjs.Logger('RuntimeScene (setup warnings)');
 
+  export type LoadRequestOptions = {
+    loadStorageName?: string;
+    loadVariable?: gdjs.Variable;
+  };
+
   /**
    * A scene being played, containing instances of objects rendered on screen.
    */
@@ -24,6 +29,7 @@ namespace gdjs {
     _gameStopRequested: boolean = false;
     _requestedScene: string = '';
     _resourcesUnloading: 'at-scene-exit' | 'never' | 'inherit' = 'inherit';
+    _loadRequestOptions: LoadRequestOptions | null = null;
     private _asyncTasksManager = new gdjs.AsyncTasksManager();
 
     /** True if loadFromScene was called and the scene is being played. */
@@ -125,7 +131,13 @@ namespace gdjs {
      * @param sceneAndExtensionsData An object containing the scene data.
      * @see gdjs.RuntimeGame#getSceneAndExtensionsData
      */
-    loadFromScene(sceneAndExtensionsData: SceneAndExtensionsData | null) {
+    loadFromScene(
+      sceneAndExtensionsData: SceneAndExtensionsData | null,
+      options?: {
+        preventInitialInstancesCreation: boolean;
+        preventSoundManagerClearing: boolean;
+      }
+    ) {
       if (!sceneAndExtensionsData) {
         logger.error('loadFromScene was called without a scene');
         return;
@@ -183,15 +195,16 @@ namespace gdjs {
         this.registerObject(sceneData.objects[i]);
       }
 
-      //Create initial instances of objects
-      this.createObjectsFrom(
-        sceneData.instances,
-        0,
-        0,
-        0,
-        /*trackByPersistentUuid=*/
-        true
-      );
+      // Create initial instances of objects
+      if (!options || !options.preventInitialInstancesCreation)
+        this.createObjectsFrom(
+          sceneData.instances,
+          0,
+          0,
+          0,
+          /*trackByPersistentUuid=*/
+          true
+        );
 
       // Set up the default z order (for objects created from events)
       this._setLayerDefaultZOrders();
@@ -209,7 +222,11 @@ namespace gdjs {
       for (let i = 0; i < gdjs.callbacksRuntimeSceneLoaded.length; ++i) {
         gdjs.callbacksRuntimeSceneLoaded[i](this);
       }
-      if (sceneData.stopSoundsOnStartup && this._runtimeGame) {
+      if (
+        sceneData.stopSoundsOnStartup &&
+        this._runtimeGame &&
+        (!options || !options.preventSoundManagerClearing)
+      ) {
         this._runtimeGame.getSoundManager().clearAll();
       }
       this._isLoaded = true;
@@ -757,6 +774,10 @@ namespace gdjs {
       if (sceneName) this._requestedScene = sceneName;
     }
 
+    requestLoadSnapshot(loadRequestOptions: LoadRequestOptions | null): void {
+      this._loadRequestOptions = loadRequestOptions;
+    }
+
     /**
      * Get the profiler associated with the scene, or null if none.
      */
@@ -845,12 +866,19 @@ namespace gdjs {
         var: variablesNetworkSyncData,
         extVar: extensionsVariablesSyncData,
         id: this.getOrCreateNetworkId(),
+        timeManager: this._timeManager.getNetworkSyncData(),
+        tweenManager: gdjs.evtTools.tween
+          .getTweensMap(this)
+          .getNetworkSyncData(),
       };
     }
 
-    updateFromNetworkSyncData(syncData: LayoutNetworkSyncData) {
+    updateFromNetworkSyncData(
+      syncData: LayoutNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
+    ) {
       if (syncData.var) {
-        this._variables.updateFromNetworkSyncData(syncData.var);
+        this._variables.updateFromNetworkSyncData(syncData.var, options);
       }
       if (syncData.extVar) {
         for (const extensionName in syncData.extVar) {
@@ -862,10 +890,21 @@ namespace gdjs {
             this._variablesByExtensionName.get(extensionName);
           if (extensionVariables) {
             extensionVariables.updateFromNetworkSyncData(
-              extensionVariablesData
+              extensionVariablesData,
+              options
             );
           }
         }
+      }
+      if (syncData.timeManager && options.syncTimers) {
+        this._timeManager.updateFromNetworkSyncData(syncData.timeManager);
+      }
+      if (syncData.tweenManager && options.syncTweens) {
+        gdjs.evtTools.tween.getTweensMap(this).updateFromNetworkSyncData(
+          syncData.tweenManager,
+          // TODO: Use correct time source identifier.
+          (timeSourceIdentifier) => this
+        );
       }
     }
 
@@ -875,6 +914,10 @@ namespace gdjs {
         this.networkId = newNetworkId;
       }
       return this.networkId;
+    }
+
+    getLoadRequestOptions(): LoadRequestOptions | null {
+      return this._loadRequestOptions;
     }
   }
 

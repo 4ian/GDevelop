@@ -133,9 +133,11 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): PathfindingNetworkSyncData {
+    getNetworkSyncData(
+      options: GetNetworkSyncDataOptions
+    ): PathfindingNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(options),
         props: {
           path: this._path,
           pf: this._pathFound,
@@ -150,9 +152,10 @@ namespace gdjs {
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: PathfindingNetworkSyncData
+      networkSyncData: PathfindingNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
       const behaviorSpecificProps = networkSyncData.props;
       if (behaviorSpecificProps.path !== undefined) {
         this._path = behaviorSpecificProps.path;

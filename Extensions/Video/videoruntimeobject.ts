@@ -16,7 +16,7 @@ namespace gdjs {
 
   export type VideoObjectData = ObjectData & VideoObjectDataType;
 
-  export type VideoNetworkSyncDataType = {
+  export type VideoObjectNetworkSyncDataType = {
     op: float;
     // We don't sync volume, as it's probably a user setting?
     pla: boolean;
@@ -25,8 +25,8 @@ namespace gdjs {
     ps: number;
   };
 
-  export type VideoNetworkSyncData = ObjectNetworkSyncData &
-    VideoNetworkSyncDataType;
+  export type VideoObjectNetworkSyncData = ObjectNetworkSyncData &
+    VideoObjectNetworkSyncDataType;
 
   /**
    * An object displaying a video on screen.
@@ -99,9 +99,11 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): VideoNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): VideoObjectNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         op: this._opacity,
         pla: this.isPlayed(),
         loop: this.isLooped(),
@@ -110,8 +112,11 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(syncData: VideoNetworkSyncData): void {
-      super.updateFromNetworkSyncData(syncData);
+    updateFromNetworkSyncData(
+      syncData: VideoObjectNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
+    ): void {
+      super.updateFromNetworkSyncData(syncData, options);
 
       if (this._opacity !== undefined && this._opacity && syncData.op) {
         this.setOpacity(syncData.op);

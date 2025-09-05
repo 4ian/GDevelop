@@ -96,7 +96,7 @@ namespace gdjs {
     // This is useful when the object is synchronized by an external source
     // like in a multiplayer game, and we want to be able to predict the
     // movement of the object, even if the inputs are not updated every frame.
-    private _dontClearInputsBetweenFrames: boolean = false;
+    private _clearInputsBetweenFrames: boolean = true;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -273,13 +273,15 @@ namespace gdjs {
       return true;
     }
 
-    override getNetworkSyncData(): PhysicsCar3DNetworkSyncData {
+    override getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): PhysicsCar3DNetworkSyncData {
       // This method is called, so we are synchronizing this object.
       // Let's clear the inputs between frames as we control it.
-      this._dontClearInputsBetweenFrames = false;
+      this._clearInputsBetweenFrames = true;
 
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         props: {
           lek: this._wasLeftKeyPressed,
           rik: this._wasRightKeyPressed,
@@ -296,9 +298,10 @@ namespace gdjs {
     }
 
     override updateFromNetworkSyncData(
-      networkSyncData: PhysicsCar3DNetworkSyncData
+      networkSyncData: PhysicsCar3DNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
     ) {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       const behaviorSpecificProps = networkSyncData.props;
       this._hasPressedForwardKey = behaviorSpecificProps.upk;
@@ -312,8 +315,9 @@ namespace gdjs {
       this._engineSpeedMax = behaviorSpecificProps.esm;
       this._engineInertia = behaviorSpecificProps.ei;
 
-      // When the object is synchronized from the network, the inputs must not be cleared.
-      this._dontClearInputsBetweenFrames = true;
+      // When the object is synchronized from the network, the inputs must not be cleared,
+      // except if asked specifically.
+      this._clearInputsBetweenFrames = !!options.clearMemory;
     }
 
     _getPhysicsPosition(result: Jolt.RVec3): Jolt.RVec3 {
@@ -490,7 +494,7 @@ namespace gdjs {
       this._previousAcceleratorStickForce = this._acceleratorStickForce;
       this._previousSteeringStickForce = this._steeringStickForce;
 
-      if (!this._dontClearInputsBetweenFrames) {
+      if (this._clearInputsBetweenFrames) {
         this._hasPressedForwardKey = false;
         this._hasPressedBackwardKey = false;
         this._hasPressedRightKey = false;

@@ -117,12 +117,6 @@ namespace gdjs {
       currentScene.requestLoadSnapshot(null);
 
       if (loadRequestOptions.loadVariable) {
-        if (
-          loadRequestOptions.loadVariable !==
-          gdjs.VariablesContainer.badVariable
-        ) {
-          logger.error('Requested loading save from wrongly defined variable.');
-        }
         const saveState =
           loadRequestOptions.loadVariable.toJSObject() as GameSaveState;
         try {
@@ -130,15 +124,14 @@ namespace gdjs {
         } catch (error) {
           logger.error('Error loading from variable:', error);
         }
-      } else {
-        const storageKey =
-          loadRequestOptions.loadStorageName || gdjs.saveState.INDEXED_DB_KEY;
-
+      } else if (loadRequestOptions.loadStorageName) {
         gdjs
           .loadFromIndexedDB(
             gdjs.saveState.INDEXED_DB_NAME,
-            gdjs.saveState.INDEXED_DB_OBJECT_STORE,
-            storageKey
+            gdjs.saveState.getIndexedDbObjectStore(),
+            gdjs.saveState.getIndexedDbStorageKey(
+              loadRequestOptions.loadStorageName
+            )
           )
           .then((jsonData) => {
             const saveState = jsonData as GameSaveState;

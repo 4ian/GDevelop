@@ -29,66 +29,87 @@ module.exports = {
       .setCategory('Save & Load');
     extension
       .addInstructionOrExpressionGroupMetadata(_('Save State'))
-      .setIcon('JsPlatform/Extensions/snapshotsave.svg');
+      .setIcon('res/actions/saveDown.svg');
 
     // TODO: Split save action and load action into 2 different instructions to avoid
     // having optional and empty parameters.
     extension
       .addAction(
-        'SaveGameSnapshot',
-        _('Save game'),
-        _(
-          'Takes a snapshot of the game and save it to a variable or device storage.'
-        ),
-        _(
-          'Save the game to variable _PARAM1_ or to storage under key _PARAM2_.'
-        ),
+        'SaveGameSnapshotToVariable',
+        _('Save game to a variable'),
+        _('Takes a snapshot of the game and save it to a variable.'),
+        _('Save the game in variable _PARAM1_'),
         '',
         'res/actions/saveDown.svg',
         'res/actions/saveDown.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
-      .addParameter(
-        'variable',
-        _('Variable to store the save to (optional)'),
-        '',
-        true
-      )
-      .addParameter('string', _('Storage key to save to (optional)'), '', true)
+      .addParameter('variable', _('Variable to store the save to'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/SaveState/savestatetools.js')
-      .setFunctionName('gdjs.saveState.saveGameSnapshot');
+      .setFunctionName('gdjs.saveState.saveVariableGameSnapshot');
 
     extension
       .addAction(
-        'LoadGameSnapshot',
-        _('Load game'),
-        _('Load game from snapshot save from a variable or storage.'),
-        _(
-          'Load the game from variable _PARAM1_ or from device storage under key _PARAM2_.'
-        ),
+        'SaveGameSnapshotToStorage',
+        _('Save game to device storage'),
+        _('Takes a snapshot of the game and save it to device storage.'),
+        _('Save the game to device storage under key _PARAM1_'),
+        '',
+        'res/actions/saveDown.svg',
+        'res/actions/saveDown.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('string', _('Storage key to save to'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/SaveState/savestatetools.js')
+      .setFunctionName('gdjs.saveState.saveStorageGameSnapshot');
+
+    extension
+      .addAction(
+        'LoadGameSnapshotFromVariable',
+        _('Load game from variable'),
+        _('Load game from a variable save snapshot.'),
+        _('Load the game from variable _PARAM1_'),
         '',
         'res/actions/saveUp.svg',
         'res/actions/saveUp.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
-      .addParameter(
-        'variable',
-        _('Variable to load game from (optional)'),
-        '',
-        true
-      )
-      .addParameter(
-        'string',
-        _('Storage key to load game from (optional)'),
-        '',
-        true
-      )
+      .addParameter('variable', _('Variable to load the game from'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/SaveState/savestatetools.js')
-      .setFunctionName('gdjs.saveState.loadGameFromSnapshot');
+      .setFunctionName('gdjs.saveState.loadGameFromVariableSnapshot');
 
-    // TODO: Add condition and expression to get the last save creation datetime.
+    extension
+      .addAction(
+        'LoadGameSnapshotFromStorage',
+        _('Load game from storage'),
+        _('Load game from storage save snapshot.'),
+        _('Load the game from device storage under key _PARAM1_.'),
+        '',
+        'res/actions/saveUp.svg',
+        'res/actions/saveUp.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('string', _('Storage key to load the game from'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/SaveState/savestatetools.js')
+      .setFunctionName('gdjs.saveState.loadGameFromStorageSnapshot');
+
+    extension
+      .addExpressionAndConditionAndAction(
+        'number',
+        'SecondsSinceLastSave',
+        _('Seconds since last save'),
+        _('the number of seconds since the last save'),
+        _('the number of seconds since the last save'),
+        '',
+        'res/actions/saveDown.svg'
+      )
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('gdjs.saveState.getSecondsSinceLastSave')
+      .setGetter('gdjs.saveState.getSecondsSinceLastSave');
 
     return extension;
   },

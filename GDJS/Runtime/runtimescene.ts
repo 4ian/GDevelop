@@ -7,6 +7,11 @@ namespace gdjs {
   const logger = new gdjs.Logger('RuntimeScene');
   const setupWarningLogger = new gdjs.Logger('RuntimeScene (setup warnings)');
 
+  export type LoadRequestOptions = {
+    loadStorageName?: string;
+    loadVariable?: gdjs.Variable;
+  };
+
   /**
    * A scene being played, containing instances of objects rendered on screen.
    */

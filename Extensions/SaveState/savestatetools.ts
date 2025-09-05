@@ -1,33 +1,43 @@
 namespace gdjs {
   export namespace saveState {
-    export const INDEXED_DB_NAME: string = 'gd-game-snapshot-saves';
-    export const INDEXED_DB_KEY: string = 'game_save'; // TODO: use game id to change the key.
-    export const INDEXED_DB_OBJECT_STORE: string = 'saves'; // TODO: should a store be used per game on the user device?
+    export const INDEXED_DB_NAME: string = 'gdevelop-game-saves';
 
-    export const saveGameSnapshot = async function (
-      currentScene: RuntimeScene,
-      sceneVar?: gdjs.Variable,
-      storageName?: string
-    ) {
-      let allSyncData: GameSaveState = {
+    let lastSaveTime: number | null = null;
+
+    export const getIndexedDbObjectStore = () => {
+      const gameId = gdjs.projectData.properties.projectUuid;
+      return `game-saves-${gameId}`;
+    };
+
+    export const getIndexedDbStorageKey = (key: string) => {
+      return `save-${key}`;
+    };
+
+    export const getSecondsSinceLastSave = (): number => {
+      if (!lastSaveTime) return -1;
+      return Math.floor((Date.now() - lastSaveTime) / 1000);
+    };
+
+    const getGameSaveState = (runtimeScene: RuntimeScene) => {
+      const gameSaveState: GameSaveState = {
         gameNetworkSyncData: {},
         layoutNetworkSyncDatas: [],
       };
-      const gameData = currentScene
+      const gameData = runtimeScene
         .getGame()
         .getNetworkSyncData({ forceSyncEverything: true });
-      const sceneStack = currentScene.getGame()._sceneStack._stack;
-      allSyncData.gameNetworkSyncData = gameData || {};
+      const sceneStack = runtimeScene.getGame()._sceneStack._stack;
+      gameSaveState.gameNetworkSyncData = gameData || {};
       sceneStack.forEach((scene, index) => {
         const sceneDatas = (scene.getNetworkSyncData({
           forceSyncEverything: true,
         }) || []) as LayoutNetworkSyncData;
 
-        allSyncData.layoutNetworkSyncDatas[index] = {
+        gameSaveState.layoutNetworkSyncDatas[index] = {
           sceneData: {} as LayoutNetworkSyncData,
           objectDatas: {},
         };
-        allSyncData.layoutNetworkSyncDatas[index].sceneData = sceneDatas;
+        gameSaveState.layoutNetworkSyncDatas[index].sceneData = sceneDatas;
         const sceneRuntimeObjects = scene.getAdhocListOfAllInstances();
         const syncOptions: GetNetworkSyncDataOptions = {
           forceSyncEverything: true,
@@ -35,37 +45,53 @@ namespace gdjs {
         for (const key in sceneRuntimeObjects) {
           if (sceneRuntimeObjects.hasOwnProperty(key)) {
             const object = sceneRuntimeObjects[key];
-            const syncData = object.getNetworkSyncData(syncOptions);
-            allSyncData.layoutNetworkSyncDatas[index].objectDatas[object.id] =
-              syncData;
+            const objectSyncData = object.getNetworkSyncData(syncOptions);
+            gameSaveState.layoutNetworkSyncDatas[index].objectDatas[object.id] =
+              objectSyncData;
           }
         }
       });
-
-      // TODO: Store the save creation datetime.
-      if (sceneVar && sceneVar !== gdjs.VariablesContainer.badVariable) {
-        sceneVar.fromJSObject(allSyncData);
-      } else {
-        await gdjs.saveToIndexedDB(
-          INDEXED_DB_NAME,
-          INDEXED_DB_OBJECT_STORE,
-          storageName || INDEXED_DB_KEY,
-          allSyncData
-        );
-      }
+      return gameSaveState;
     };
 
-    export const loadGameFromSnapshot = async function (
+    export const saveVariableGameSnapshot = async function (
       currentScene: RuntimeScene,
-      sceneVar?: gdjs.Variable,
-      storageName?: string
+      sceneVar: gdjs.Variable
+    ) {
+      const gameSaveState = getGameSaveState(currentScene);
+      sceneVar.fromJSObject(gameSaveState);
+      lastSaveTime = Date.now();
+    };
+
+    export const saveStorageGameSnapshot = async function (
+      currentScene: RuntimeScene,
+      storageKey: string
+    ) {
+      const gameSaveState = getGameSaveState(currentScene);
+      await gdjs.saveToIndexedDB(
+        INDEXED_DB_NAME,
+        getIndexedDbObjectStore(),
+        getIndexedDbStorageKey(storageKey),
+        gameSaveState
+      );
+      lastSaveTime = Date.now();
+    };
+
+    export const loadGameFromVariableSnapshot = async function (
+      currentScene: RuntimeScene,
+      variable: gdjs.Variable
     ) {
       currentScene.requestLoadSnapshot({
-        loadVariable:
-          sceneVar && sceneVar !== gdjs.VariablesContainer.badVariable
-            ? sceneVar
-            : null,
-        loadStorageName: storageName || INDEXED_DB_KEY,
+        loadVariable: variable,
+      });
+    };
+
+    export const loadGameFromStorageSnapshot = async function (
+      currentScene: RuntimeScene,
+      storageName: string
+    ) {
+      currentScene.requestLoadSnapshot({
+        loadStorageName: storageName,
       });
     };
   }

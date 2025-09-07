@@ -3461,6 +3461,27 @@ const addOrEditVariable: EditorFunction = {
   },
 };
 
+const initializeProject: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    const name = extractRequiredString(args, 'name');
+    const slug = extractRequiredString(args, 'slug');
+
+    return {
+      text: (
+        <Trans>
+          Initialize a new project "{name}" from example "{slug}".
+        </Trans>
+      ),
+    };
+  },
+  // The actual project creation is handled by the Ask AI editor container,
+  // which can process this command even if no project is currently open.
+  // Returning a generic success here ensures graceful handling if invoked.
+  launchFunction: async () => {
+    return makeGenericSuccess('Project initialization requested.');
+  },
+};
+
 export const editorFunctions: { [string]: EditorFunction } = {
   create_object: createObject,
   inspect_object_properties: inspectObjectProperties,
@@ -3479,4 +3500,5 @@ export const editorFunctions: { [string]: EditorFunction } = {
   inspect_scene_properties_layers_effects: inspectScenePropertiesLayersEffects,
   change_scene_properties_layers_effects: changeScenePropertiesLayersEffects,
   add_or_edit_variable: addOrEditVariable,
+  initialize_project: initializeProject,
 };

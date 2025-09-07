@@ -50,8 +50,9 @@ import {
   sendAiRequestMessageSent,
   sendAiRequestStarted,
 } from '../Utils/Analytics/EventSender';
-import { useCreateAiProjectDialog } from './UseCreateAiProjectDialog';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
+import { listAllExamples } from '../Utils/GDevelopServices/Example';
+import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
 import { prepareAiUserContent } from './PrepareAiUserContent';
 import { AiRequestContext } from './AiRequestContext';
 import { getAiConfigurationPresetsWithAvailability } from './AiConfiguration';
@@ -199,7 +200,7 @@ const useProcessFunctionCalls = ({
             editorFunctionCallResults: getEditorFunctionCallResults(
               selectedAiRequest.id
             ),
-          })
+          }).filter(functionCall => functionCall.name !== 'initialize_project')
         : [],
     [selectedAiRequest, getEditorFunctionCallResults]
   );
@@ -334,7 +335,6 @@ type Props = {|
   storageProvider: ?StorageProvider,
   setToolbar: (?React.Node) => void,
   i18n: I18nType,
-  onCreateEmptyProject: (newProjectSetup: NewProjectSetup) => Promise<void>,
   onCreateProjectFromExample: (
     exampleShortHeader: ExampleShortHeader,
     newProjectSetup: NewProjectSetup,
@@ -410,7 +410,6 @@ export const AskAiEditor = React.memo<Props>(
         fileMetadata,
         storageProvider,
         i18n,
-        onCreateEmptyProject,
         onCreateProjectFromExample,
         onOpenLayout,
         onSceneEventsModifiedOutsideEditor,
@@ -502,10 +501,7 @@ export const AskAiEditor = React.memo<Props>(
         setLastSendError,
       } = aiRequestStorage;
 
-      const {
-        createAiProject,
-        renderCreateAiProjectDialog,
-      } = useCreateAiProjectDialog();
+      
 
       const updateToolbar = React.useCallback(
         () => {
@@ -597,28 +593,7 @@ export const AskAiEditor = React.memo<Props>(
             } = newAiRequestOptions;
             startNewAiRequest(null);
 
-            // If no project is opened, create a new empty one if the request is for
-            // the AI agent.
-            if (mode === 'agent' && !project) {
-              try {
-                console.info(
-                  'No project opened, opening the dialog to create a new project.'
-                );
-                const result = await createAiProject();
-                if (result === 'canceled') {
-                  return;
-                }
-                console.info('New project created - starting AI request.');
-                startNewAiRequest({
-                  mode,
-                  userRequest,
-                  aiConfigurationPresetId,
-                });
-              } catch (error) {
-                console.error('Error creating a new empty project:', error);
-              }
-              return;
-            }
+            // Do not create a project automatically anymore.
 
             // Ensure the user has enough credits to pay for the request, or ask them
             // to buy some more.
@@ -920,6 +895,107 @@ export const AskAiEditor = React.memo<Props>(
         [onSendMessage]
       );
 
+      const processInitializeProjectFunctionCalls = React.useCallback(
+        async (
+          functionCalls: Array<AiRequestMessageAssistantFunctionCall>
+        ) => {
+          if (!selectedAiRequest) return;
+
+          // Mark all provided calls as working.
+          addEditorFunctionCallResults(
+            selectedAiRequest.id,
+            functionCalls.map(functionCall => ({
+              status: 'working',
+              call_id: functionCall.call_id,
+            }))
+          );
+
+          const results: Array<EditorFunctionCallResult> = [];
+
+          for (const functionCall of functionCalls) {
+            let args: any = null;
+            try {
+              args = JSON.parse(functionCall.arguments);
+            } catch (error) {
+              results.push({
+                status: 'finished',
+                call_id: functionCall.call_id,
+                success: false,
+                output: { message: 'Invalid arguments (not a valid JSON string).' },
+              });
+              continue;
+            }
+
+            const name: ?string = args && args.name;
+            const slug: ?string = args && args.slug;
+            if (!name || !slug) {
+              results.push({
+                status: 'finished',
+                call_id: functionCall.call_id,
+                success: false,
+                output: { message: 'Missing required arguments: name and slug.' },
+              });
+              continue;
+            }
+
+            try {
+              const fetchedAllExamples = await listAllExamples();
+              const exampleShortHeader: ?ExampleShortHeader = fetchedAllExamples.exampleShortHeaders.find(
+                exampleShortHeader => exampleShortHeader.slug === slug
+              );
+
+              if (!exampleShortHeader) {
+                results.push({
+                  status: 'finished',
+                  call_id: functionCall.call_id,
+                  success: false,
+                  output: { message: `Unable to find the example with slug "${slug}".` },
+                });
+                continue;
+              }
+
+              const newProjectSetup: NewProjectSetup = {
+                storageProvider: UrlStorageProvider,
+                saveAsLocation: null,
+                projectName: name,
+                dontOpenAnySceneOrProjectManager: true,
+              };
+              await onCreateProjectFromExample(
+                exampleShortHeader,
+                newProjectSetup,
+                i18n,
+                false
+              );
+
+              results.push({
+                status: 'finished',
+                call_id: functionCall.call_id,
+                success: true,
+                output: { message: `Initialized project "${name}" from example "${slug}".` },
+              });
+            } catch (error) {
+              console.error('Error initializing project from example:', error);
+              results.push({
+                status: 'finished',
+                call_id: functionCall.call_id,
+                success: false,
+                output: { message: error && error.message ? error.message : 'Unknown error while initializing project.' },
+              });
+            }
+          }
+
+          addEditorFunctionCallResults(selectedAiRequest.id, results);
+          await onSendEditorFunctionCallResults(null);
+        },
+        [
+          selectedAiRequest,
+          addEditorFunctionCallResults,
+          onCreateProjectFromExample,
+          i18n,
+          onSendEditorFunctionCallResults,
+        ]
+      );
+
       const onSendFeedback = React.useCallback(
         async (
           aiRequestId,
@@ -965,6 +1041,55 @@ export const AskAiEditor = React.memo<Props>(
         onExtensionInstalled,
       });
 
+      const onProcessFunctionCallsWithInit = React.useCallback(
+        async (
+          functionCalls: Array<AiRequestMessageAssistantFunctionCall>,
+          options: ?{| ignore?: boolean |}
+        ) => {
+          const initializeCalls = functionCalls.filter(
+            functionCall => functionCall.name === 'initialize_project'
+          );
+          const otherCalls = functionCalls.filter(
+            functionCall => functionCall.name !== 'initialize_project'
+          );
+
+          if (initializeCalls.length > 0) {
+            await processInitializeProjectFunctionCalls(initializeCalls);
+          }
+          if (otherCalls.length > 0) {
+            await onProcessFunctionCalls(otherCalls, options);
+          }
+        },
+        [processInitializeProjectFunctionCalls, onProcessFunctionCalls]
+      );
+
+      // Auto-process initialize_project calls even without an opened project.
+      React.useEffect(
+        () => {
+          (async () => {
+            if (!selectedAiRequest) return;
+            const functionCallsToProcess = getFunctionCallsToProcess({
+              aiRequest: selectedAiRequest,
+              editorFunctionCallResults: getEditorFunctionCallResults(
+                selectedAiRequest.id
+              ),
+            });
+            const initializeCalls = functionCallsToProcess.filter(
+              functionCall => functionCall.name === 'initialize_project'
+            );
+            if (initializeCalls.length === 0) return;
+
+            console.info('Processing initialize_project AI function calls...');
+            await processInitializeProjectFunctionCalls(initializeCalls);
+          })();
+        },
+        [
+          selectedAiRequest,
+          getEditorFunctionCallResults,
+          processInitializeProjectFunctionCalls,
+        ]
+      );
+
       return (
         <>
           <Paper square background="dark" style={styles.paper}>
@@ -988,7 +1113,7 @@ export const AskAiEditor = React.memo<Props>(
                     ? 'upgrade'
                     : 'none'
                 }
-                onProcessFunctionCalls={onProcessFunctionCalls}
+                onProcessFunctionCalls={onProcessFunctionCallsWithInit}
                 editorFunctionCallResults={
                   (selectedAiRequest &&
                     getEditorFunctionCallResults(selectedAiRequest.id)) ||
@@ -1017,10 +1142,6 @@ export const AskAiEditor = React.memo<Props>(
               />
             </div>
           </Paper>
-          {renderCreateAiProjectDialog({
-            onCreateEmptyProject,
-            onCreateProjectFromExample,
-          })}
           <AskAiHistory
             open={isHistoryOpen}
             onClose={onCloseHistory}
@@ -1055,7 +1176,6 @@ export const renderAskAiEditorContainer = (
         storageProvider={props.storageProvider}
         setToolbar={props.setToolbar}
         isActive={props.isActive}
-        onCreateEmptyProject={props.onCreateEmptyProject}
         onCreateProjectFromExample={props.onCreateProjectFromExample}
         onOpenLayout={props.onOpenLayout}
         onSceneEventsModifiedOutsideEditor={

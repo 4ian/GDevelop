@@ -123,6 +123,10 @@ export type EditorCallbacks = {|
         | 'none',
     |}
   ) => void,
+  onCreateProjectFromExample?: (
+    exampleName: string,
+    exampleSlug: string
+  ) => Promise<void>,
 |};
 
 export type SceneEventsOutsideEditorChanges = {|
@@ -3461,6 +3465,45 @@ const addOrEditVariable: EditorFunction = {
   },
 };
 
+const initializeProject: EditorFunction = {
+  renderForEditor: ({ project, args, editorCallbacks, shouldShowDetails }) => {
+    const name = SafeExtractor.extractStringProperty(args, 'name');
+    const exampleSlug = SafeExtractor.extractStringProperty(args, 'example_slug');
+
+    if (!name && !exampleSlug) {
+      return {
+        text: <Trans>Initialize project (missing required arguments)</Trans>,
+      };
+    }
+
+    return {
+      text: (
+        <Trans>
+          Initialize project{name && ` "${name}"`}
+          {exampleSlug && ` from example "${exampleSlug}"`}
+        </Trans>
+      ),
+    };
+  },
+  launchFunction: async ({ project, args }) => {
+    const name = extractRequiredString(args, 'name');
+    const exampleSlug = extractRequiredString(args, 'example_slug');
+
+    // This function requires special handling in the AskAiEditorContainer
+    // because project initialization needs to be done through the MainFrame callbacks
+    return {
+      success: true,
+      message: `Project initialization requested: name="${name}", example_slug="${exampleSlug}"`,
+      // Signal that this needs special handling
+      _requiresProjectInitialization: true,
+      _projectInitializationData: {
+        name,
+        exampleSlug,
+      },
+    };
+  },
+};
+
 export const editorFunctions: { [string]: EditorFunction } = {
   create_object: createObject,
   inspect_object_properties: inspectObjectProperties,
@@ -3479,4 +3522,5 @@ export const editorFunctions: { [string]: EditorFunction } = {
   inspect_scene_properties_layers_effects: inspectScenePropertiesLayersEffects,
   change_scene_properties_layers_effects: changeScenePropertiesLayersEffects,
   add_or_edit_variable: addOrEditVariable,
+  initialize_project: initializeProject,
 };

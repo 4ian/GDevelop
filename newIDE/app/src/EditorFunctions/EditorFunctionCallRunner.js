@@ -146,13 +146,35 @@ export const processEditorFunctionCalls = async ({
           searchAndInstallAsset,
         }
       );
-      const { success, ...output } = result;
-      results.push({
-        status: 'finished',
-        call_id,
-        success,
-        output,
-      });
+      
+      // Handle special case for initialize_project
+      if (result._requiresProjectInitialization && editorCallbacks.onCreateProjectFromExample) {
+        const { name, exampleSlug } = result._projectInitializationData;
+        try {
+          await editorCallbacks.onCreateProjectFromExample(name, exampleSlug);
+          results.push({
+            status: 'finished',
+            call_id,
+            success: true,
+            output: { message: `Project "${name}" initialized from example "${exampleSlug}".` },
+          });
+        } catch (error) {
+          results.push({
+            status: 'finished',
+            call_id,
+            success: false,
+            output: { message: `Failed to initialize project: ${error.message}` },
+          });
+        }
+      } else {
+        const { success, ...output } = result;
+        results.push({
+          status: 'finished',
+          call_id,
+          success,
+          output,
+        });
+      }
 
       if (success && args) {
         if (name === 'create_scene' && typeof args.scene_name === 'string') {

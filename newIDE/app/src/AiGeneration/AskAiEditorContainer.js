@@ -50,11 +50,11 @@ import {
   sendAiRequestMessageSent,
   sendAiRequestStarted,
 } from '../Utils/Analytics/EventSender';
-import { useCreateAiProjectDialog } from './UseCreateAiProjectDialog';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { prepareAiUserContent } from './PrepareAiUserContent';
 import { AiRequestContext } from './AiRequestContext';
 import { getAiConfigurationPresetsWithAvailability } from './AiConfiguration';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -238,11 +238,11 @@ export const useSelectedAiRequest = ({
 }: {|
   initialAiRequestId: string | null,
 |}) => {
-  const { profile, getAuthorizationHeader } = React.useContext(
-    AuthenticatedUserContext
-  );
-  const { aiRequestStorage } = React.useContext(AiRequestContext);
-  const { aiRequests, updateAiRequest } = aiRequestStorage;
+      const { profile, getAuthorizationHeader } = React.useContext(
+        AuthenticatedUserContext
+      );
+      const { aiRequestStorage } = React.useContext(AiRequestContext);
+      const { aiRequests, updateAiRequest } = aiRequestStorage;
 
   const [selectedAiRequestId, setSelectedAiRequestId] = React.useState<
     string | null
@@ -332,6 +332,7 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
   fileMetadata: ?FileMetadata,
   storageProvider: ?StorageProvider,
+  getStorageProvider: () => StorageProvider,
   setToolbar: (?React.Node) => void,
   i18n: I18nType,
   onCreateEmptyProject: (newProjectSetup: NewProjectSetup) => Promise<void>,
@@ -409,6 +410,7 @@ export const AskAiEditor = React.memo<Props>(
         resourceManagementProps,
         fileMetadata,
         storageProvider,
+        getStorageProvider,
         i18n,
         onCreateEmptyProject,
         onCreateProjectFromExample,
@@ -425,8 +427,34 @@ export const AskAiEditor = React.memo<Props>(
       const editorCallbacks: EditorCallbacks = React.useMemo(
         () => ({
           onOpenLayout,
+          onCreateProjectFromExample: async (exampleName: string, exampleSlug: string) => {
+            // Find the example by slug
+            const { listAllExamples } = await import('../Utils/GDevelopServices/Example');
+            const allExamples = await listAllExamples();
+            const exampleShortHeader = allExamples.exampleShortHeaders.find(
+              example => example.slug === exampleSlug
+            );
+            
+            if (!exampleShortHeader) {
+              throw new Error(`Example with slug "${exampleSlug}" not found`);
+            }
+            
+            const newProjectSetup: NewProjectSetup = {
+              projectName: exampleName,
+              storageProvider: project ? getStorageProvider() : null,
+              saveAsLocation: null,
+              dontOpenAnySceneOrProjectManager: false,
+            };
+            
+            await onCreateProjectFromExample(
+              exampleShortHeader,
+              newProjectSetup,
+              i18n,
+              false // isQuickCustomization
+            );
+          },
         }),
-        [onOpenLayout]
+        [onOpenLayout, onCreateProjectFromExample, project, i18n, getStorageProvider]
       );
 
       const {
@@ -502,10 +530,6 @@ export const AskAiEditor = React.memo<Props>(
         setLastSendError,
       } = aiRequestStorage;
 
-      const {
-        createAiProject,
-        renderCreateAiProjectDialog,
-      } = useCreateAiProjectDialog();
 
       const updateToolbar = React.useCallback(
         () => {
@@ -543,6 +567,7 @@ export const AskAiEditor = React.memo<Props>(
       const { openCreditsPackageDialog } = React.useContext(
         CreditsPackageStoreContext
       );
+      const { showAlert } = useAlertDialog();
 
       const {
         profile,
@@ -597,26 +622,12 @@ export const AskAiEditor = React.memo<Props>(
             } = newAiRequestOptions;
             startNewAiRequest(null);
 
-            // If no project is opened, create a new empty one if the request is for
-            // the AI agent.
+            // If no project is opened for agent mode, show an error
             if (mode === 'agent' && !project) {
-              try {
-                console.info(
-                  'No project opened, opening the dialog to create a new project.'
-                );
-                const result = await createAiProject();
-                if (result === 'canceled') {
-                  return;
-                }
-                console.info('New project created - starting AI request.');
-                startNewAiRequest({
-                  mode,
-                  userRequest,
-                  aiConfigurationPresetId,
-                });
-              } catch (error) {
-                console.error('Error creating a new empty project:', error);
-              }
+              showAlert({
+                title: t`No project opened`,
+                message: t`Please open or create a project before using the AI agent. The AI can help you create a project by using the "initialize_project" command.`,
+              });
               return;
             }
 
@@ -734,9 +745,9 @@ export const AskAiEditor = React.memo<Props>(
           setSendingAiRequest,
           upToDateSelectedAiRequestId,
           updateAiRequest,
-          createAiProject,
           newAiRequestOptions,
           onOpenAskAi,
+          showAlert,
         ]
       );
 
@@ -1017,10 +1028,6 @@ export const AskAiEditor = React.memo<Props>(
               />
             </div>
           </Paper>
-          {renderCreateAiProjectDialog({
-            onCreateEmptyProject,
-            onCreateProjectFromExample,
-          })}
           <AskAiHistory
             open={isHistoryOpen}
             onClose={onCloseHistory}
@@ -1053,6 +1060,7 @@ export const renderAskAiEditorContainer = (
         resourceManagementProps={props.resourceManagementProps}
         fileMetadata={props.fileMetadata}
         storageProvider={props.storageProvider}
+        getStorageProvider={props.getStorageProvider}
         setToolbar={props.setToolbar}
         isActive={props.isActive}
         onCreateEmptyProject={props.onCreateEmptyProject}

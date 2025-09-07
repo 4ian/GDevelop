@@ -578,6 +578,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
                       project: currentProject,
                       fileMetadata: currentFileMetadata,
                       storageProvider: getStorageProvider(),
+                      getStorageProvider,
                       ref: editorRef => (editorTab.editorRef = editorRef),
                       setToolbar: editorToolbar =>
                         setEditorToolbar(editorToolbar, isCurrentTab),

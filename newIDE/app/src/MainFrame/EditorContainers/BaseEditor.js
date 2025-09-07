@@ -47,6 +47,7 @@ export type RenderEditorContainerProps = {|
   project: ?gdProject,
   fileMetadata: ?FileMetadata,
   storageProvider: StorageProvider,
+  getStorageProvider: () => StorageProvider,
   setToolbar: (?React.Node) => void,
   setGamesPlatformFrameShown: ({| shown: boolean, isMobile: boolean |}) => void,
 

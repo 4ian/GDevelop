@@ -39,8 +39,8 @@ export type CaptureOptions = {|
 
 export type PreviewOptions = {|
   project: gdProject,
-  layout: gdLayout,
-  externalLayout: ?gdExternalLayout,
+  sceneName: string,
+  externalLayoutName: string | null,
   eventsBasedObjectType: string | null,
   eventsBasedObjectVariantName: string | null,
   networkPreview: boolean,

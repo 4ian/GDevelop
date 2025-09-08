@@ -203,8 +203,8 @@ export default class LocalPreviewLauncher extends React.Component<
   launchPreview = async (previewOptions: PreviewOptions): Promise<any> => {
     const {
       project,
-      layout,
-      externalLayout,
+      sceneName,
+      externalLayoutName,
       eventsBasedObjectType,
       eventsBasedObjectVariantName,
     } = previewOptions;
@@ -237,11 +237,11 @@ export default class LocalPreviewLauncher extends React.Component<
       outputDir
     );
     previewExportOptions.setIsDevelopmentEnvironment(Window.isDev());
-    previewExportOptions.setLayoutName(layout.getName());
+    previewExportOptions.setLayoutName(sceneName);
     previewExportOptions.setIsInGameEdition(previewOptions.isForInGameEdition);
     previewExportOptions.setEditorId(previewOptions.editorId || '');
-    if (externalLayout) {
-      previewExportOptions.setExternalLayoutName(externalLayout.getName());
+    if (externalLayoutName) {
+      previewExportOptions.setExternalLayoutName(externalLayoutName);
     }
     if (eventsBasedObjectType) {
       previewExportOptions.setEventsBasedObjectType(eventsBasedObjectType);

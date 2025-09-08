@@ -1926,7 +1926,7 @@ const MainFrame = (props: Props) => {
       setPreviewLoading(true);
       notifyPreviewOrExportWillStart(state.editorTabs);
 
-      const layoutName = isForInGameEdition
+      const sceneName = isForInGameEdition
         ? isForInGameEdition.forcedSceneName
         : previewState.isPreviewOverriden
         ? previewState.overridenPreviewLayoutName
@@ -1936,16 +1936,6 @@ const MainFrame = (props: Props) => {
         : previewState.isPreviewOverriden
         ? previewState.overridenPreviewExternalLayoutName
         : previewState.previewExternalLayoutName;
-
-      const layout =
-        layoutName && currentProject.hasLayoutNamed(layoutName)
-          ? currentProject.getLayout(layoutName)
-          : currentProject.getLayoutAt(0);
-      const externalLayout =
-        externalLayoutName &&
-        currentProject.hasExternalLayoutNamed(externalLayoutName)
-          ? currentProject.getExternalLayout(externalLayoutName)
-          : null;
 
       await autosaveProjectIfNeeded();
 
@@ -1979,9 +1969,8 @@ const MainFrame = (props: Props) => {
         }
         await previewLauncher.launchPreview({
           project: currentProject,
-          // TODO: replace by scene name and external layout name
-          layout,
-          externalLayout,
+          sceneName: sceneName || currentProject.getLayoutAt(0).getName(),
+          externalLayoutName: externalLayoutName || null,
           eventsBasedObjectType: isForInGameEdition
             ? isForInGameEdition.eventsBasedObjectType
             : null,

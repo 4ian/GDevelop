@@ -104,8 +104,8 @@ export default class BrowserS3PreviewLauncher extends React.Component<
   launchPreview = async (previewOptions: PreviewOptions): Promise<any> => {
     const {
       project,
-      layout,
-      externalLayout,
+      sceneName,
+      externalLayoutName,
       eventsBasedObjectType,
       eventsBasedObjectVariantName,
       numberOfWindows,
@@ -164,14 +164,14 @@ export default class BrowserS3PreviewLauncher extends React.Component<
         project,
         outputDir
       );
-      previewExportOptions.setLayoutName(layout.getName());
+      previewExportOptions.setLayoutName(sceneName);
       previewExportOptions.setIsDevelopmentEnvironment(Window.isDev());
       previewExportOptions.setIsInGameEdition(
         previewOptions.isForInGameEdition
       );
       previewExportOptions.setEditorId(previewOptions.editorId || '');
-      if (externalLayout) {
-        previewExportOptions.setExternalLayoutName(externalLayout.getName());
+      if (externalLayoutName) {
+        previewExportOptions.setExternalLayoutName(externalLayoutName);
       }
       if (eventsBasedObjectType) {
         previewExportOptions.setEventsBasedObjectType(eventsBasedObjectType);

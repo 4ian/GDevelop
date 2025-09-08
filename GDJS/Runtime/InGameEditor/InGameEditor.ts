@@ -1970,6 +1970,51 @@ namespace gdjs {
       const selectedLayer = this.getEditorLayer(this._selectedLayerName);
       if (!selectedLayer) return;
 
+      if (this._draggedNewObject && this._draggedNewObject.getName() !== name) {
+        this._draggedNewObject.deleteFromScene();
+        this._draggedNewObject = null;
+      }
+
+      if (!this._draggedNewObject) {
+        const newObject = editedInstanceContainer.createObject(name);
+        if (!newObject) return;
+        if (!is3D(newObject)) {
+          editedInstanceContainer.markObjectForDeletion(newObject);
+          return;
+        }
+        newObject.persistentUuid = gdjs.makeUuid();
+        newObject.setLayer(selectedLayer.getName());
+        this._draggedNewObject = newObject;
+      }
+
+      // We don't update the object position when it's dropped because it makes
+      // the object shift a bit.
+      // It seems that newIDE doesn't send the last cursor position even when
+      // the cursor stay still for several frames. The right position is only
+      // sent it when the object is dropped which make the shift.
+      // To reproduce the issue:
+      // - remove the `if`
+      // - drag the object vertically very fast
+      // - stay still
+      // - drop the object
+      if (!dropped) {
+        if (is3D(this._draggedNewObject)) {
+          const cursor = this._getCursorIn3D([this._draggedNewObject]);
+          if (cursor) {
+            const [cursorX, cursorY, cursorZ] = cursor;
+            this._draggedNewObject.setX(cursorX);
+            this._draggedNewObject.setY(cursorY);
+            this._draggedNewObject.setZ(cursorZ);
+          }
+        } else {
+          const projectedCursor = this._getProjectedCursor();
+          if (projectedCursor) {
+            this._draggedNewObject.setX(projectedCursor[0]);
+            this._draggedNewObject.setY(projectedCursor[1]);
+          }
+        }
+      }
+
       if (dropped) {
         if (this._draggedNewObject) {
           const isLayer3D = selectedLayer.getRenderer().getThreeGroup();
@@ -2024,7 +2069,6 @@ namespace gdjs {
               return;
             }
           }
-          // TODO Move the object according to the last cursor position
           this._sendSelectionUpdate({
             addedObjects: [this._draggedNewObject],
           });
@@ -2032,39 +2076,6 @@ namespace gdjs {
 
         this._draggedNewObject = null;
         return;
-      }
-
-      if (this._draggedNewObject && this._draggedNewObject.getName() !== name) {
-        this._draggedNewObject.deleteFromScene();
-        this._draggedNewObject = null;
-      }
-
-      if (!this._draggedNewObject) {
-        const newObject = editedInstanceContainer.createObject(name);
-        if (!newObject) return;
-        if (!is3D(newObject)) {
-          editedInstanceContainer.markObjectForDeletion(newObject);
-          return;
-        }
-        newObject.persistentUuid = gdjs.makeUuid();
-        newObject.setLayer(selectedLayer.getName());
-        this._draggedNewObject = newObject;
-      }
-
-      if (is3D(this._draggedNewObject)) {
-        const cursor = this._getCursorIn3D([this._draggedNewObject]);
-        if (cursor) {
-          const [cursorX, cursorY, cursorZ] = cursor;
-          this._draggedNewObject.setX(cursorX);
-          this._draggedNewObject.setY(cursorY);
-          this._draggedNewObject.setZ(cursorZ);
-        }
-      } else {
-        const projectedCursor = this._getProjectedCursor();
-        if (projectedCursor) {
-          this._draggedNewObject.setX(projectedCursor[0]);
-          this._draggedNewObject.setY(projectedCursor[1]);
-        }
       }
     }
 

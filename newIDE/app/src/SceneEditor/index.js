@@ -96,21 +96,65 @@ const gd: libGDevelop = global.gd;
 const BASE_LAYER_NAME = '';
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
 
-type InstancePersistentUuidData = {|
-  persistentUuid: string,
-|};
+interface InstancePersistentUuidData {
+  persistentUuid: string;
+}
 
-type SelectedInstanceData = {|
-  persistentUuid: string,
-  defaultWidth: number,
-  defaultHeight: number,
-  defaultDepth: number,
-|};
+interface SelectedInstanceData {
+  persistentUuid: string;
+  defaultWidth: number;
+  defaultHeight: number;
+  defaultDepth: number;
+}
+
+interface InstanceNumberProperty {
+  name: string;
+  value: number;
+}
+interface InstanceStringProperty {
+  name: string;
+  value: string;
+}
+
+interface InstanceData extends InstancePersistentUuidData {
+  layer: string;
+  locked?: boolean;
+  sealed?: boolean;
+  name: string;
+
+  x: number;
+  y: number;
+  z?: number;
+
+  angle: number;
+  rotationX?: number;
+  rotationY?: number;
+
+  zOrder: number;
+  opacity?: number;
+
+  flippedX?: boolean;
+  flippedY?: boolean;
+  flippedZ?: boolean;
+
+  customSize: boolean;
+  width: number;
+  height: number;
+  depth?: number;
+
+  defaultWidth: number;
+  defaultHeight: number;
+  defaultDepth: number;
+
+  numberProperties: InstanceNumberProperty[];
+  stringProperties: InstanceStringProperty[];
+  initialVariables: any[];
+}
 
 type InstanceChanges = {|
   isSendingBackSelectionForDefaultSize: boolean,
-  updatedInstances: Array<any>, // TODO: type this.
-  addedInstances: Array<any>, // TODO: type this.
+  updatedInstances: Array<InstanceData>,
+  addedInstances: Array<InstanceData>,
   selectedInstances: Array<SelectedInstanceData>,
   removedInstances: Array<InstancePersistentUuidData>,
 |};
@@ -395,19 +439,24 @@ export default class SceneEditor extends React.Component<Props, State> {
 
       instance.setX(x);
       instance.setY(y);
-      instance.setZ(z);
+      if (z !== undefined) {
+        instance.setZ(z);
+      }
       instance.setAngle(angle);
-      instance.setRotationY(rotationY);
-      instance.setRotationX(rotationX);
+      if (rotationY !== undefined) {
+        instance.setRotationY(rotationY);
+      }
+      if (rotationX !== undefined) {
+        instance.setRotationX(rotationX);
+      }
       instance.setHasCustomSize(customSize);
       if (customSize) {
         instance.setCustomWidth(width);
         instance.setCustomHeight(height);
-        instance.setCustomDepth(depth);
       }
       const hasCustomDepth = Number.isFinite(depth);
       instance.setHasCustomDepth(hasCustomDepth);
-      if (hasCustomDepth) {
+      if (hasCustomDepth && depth !== undefined) {
         instance.setCustomDepth(depth);
       }
       instance.setDefaultWidth(defaultWidth);

@@ -163,18 +163,21 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): SimpleTileMapNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): SimpleTileMapNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         op: this._opacity,
         ai: this._atlasImage,
       };
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: SimpleTileMapNetworkSyncData
+      networkSyncData: SimpleTileMapNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       if (
         networkSyncData.op !== undefined &&

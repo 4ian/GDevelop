@@ -102,7 +102,7 @@ namespace gdjs {
     // This is useful when the object is synchronized by an external source
     // like in a multiplayer game, and we want to be able to predict the
     // movement of the object, even if the inputs are not updated every frame.
-    private _dontClearInputsBetweenFrames: boolean = false;
+    private _clearInputsBetweenFrames: boolean = true;
 
     /**
      * A very small value compare to 1 pixel, yet very huge compare to rounding errors.
@@ -277,13 +277,15 @@ namespace gdjs {
       return true;
     }
 
-    override getNetworkSyncData(): PhysicsCharacter3DNetworkSyncData {
+    override getNetworkSyncData(
+      options: GetNetworkSyncDataOptions
+    ): PhysicsCharacter3DNetworkSyncData {
       // This method is called, so we are synchronizing this object.
       // Let's clear the inputs between frames as we control it.
-      this._dontClearInputsBetweenFrames = false;
+      this._clearInputsBetweenFrames = true;
 
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(options),
         props: {
           fwa: this._forwardAngle,
           fws: this._currentForwardSpeed,
@@ -306,9 +308,10 @@ namespace gdjs {
     }
 
     override updateFromNetworkSyncData(
-      networkSyncData: PhysicsCharacter3DNetworkSyncData
+      networkSyncData: PhysicsCharacter3DNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
     ) {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       const behaviorSpecificProps = networkSyncData.props;
       this._forwardAngle = behaviorSpecificProps.fwa;
@@ -328,8 +331,8 @@ namespace gdjs {
       this._timeSinceCurrentJumpStart = behaviorSpecificProps.tscjs;
       this._jumpKeyHeldSinceJumpStart = behaviorSpecificProps.jkhsjs;
 
-      // When the object is synchronized from the network, the inputs must not be cleared.
-      this._dontClearInputsBetweenFrames = true;
+      // Clear user inputs between frames only if requested.
+      this._clearInputsBetweenFrames = !!options.clearMemory;
     }
 
     _getPhysicsPosition(result: Jolt.RVec3): Jolt.RVec3 {
@@ -650,7 +653,7 @@ namespace gdjs {
       this._wasJumpKeyPressed = this._hasPressedJumpKey;
       this._wasStickUsed = this._hasUsedStick;
 
-      if (!this._dontClearInputsBetweenFrames) {
+      if (this._clearInputsBetweenFrames) {
         this._hasPressedForwardKey = false;
         this._hasPressedBackwardKey = false;
         this._hasPressedRightKey = false;

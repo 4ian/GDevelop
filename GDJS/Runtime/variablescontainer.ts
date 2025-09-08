@@ -244,15 +244,17 @@ namespace gdjs {
         if (
           // Variable undefined.
           variable.isUndefinedInContainer() ||
-          // Variable marked as not to be synchronized.
-          variableOwner === null ||
-          // Getting sync data for a specific player:
-          (syncedPlayerNumber !== undefined &&
-            // Variable is owned by host but this player number is not the host.
-            variableOwner === 0 &&
-            !isHost) ||
-          // Variable is owned by a player but not getting sync data for this player number.
-          (variableOwner !== 0 && syncedPlayerNumber !== variableOwner)
+          // If we force sync everything, we don't look at the ownership.
+          (!syncOptions.forceSyncEverything &&
+            // Variable marked as not to be synchronized.
+            (variableOwner === null ||
+              // Getting sync data for a specific player:
+              (syncedPlayerNumber !== undefined &&
+                // Variable is owned by host but this player number is not the host.
+                variableOwner === 0 &&
+                !isHost) ||
+              // Variable is owned by a player but not getting sync data for this player number.
+              (variableOwner !== 0 && syncedPlayerNumber !== variableOwner)))
         ) {
           // In those cases, the variable should not be synchronized.
           return;
@@ -352,7 +354,10 @@ namespace gdjs {
       return undefined;
     }
 
-    updateFromNetworkSyncData(networkSyncData: VariableNetworkSyncData[]) {
+    updateFromNetworkSyncData(
+      networkSyncData: VariableNetworkSyncData[],
+      options: UpdateFromNetworkSyncDataOptions
+    ) {
       const that = this;
       for (let j = 0; j < networkSyncData.length; ++j) {
         const variableSyncData = networkSyncData[j];
@@ -370,20 +375,26 @@ namespace gdjs {
         // - If we are not the owner of the variable, then assume that we missed the ownership change message, so update the variable's
         //   ownership and then update the variable.
         const syncedVariableOwner = variableSyncData.owner;
-        const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerNumber();
-        const currentVariableOwner = variable.getPlayerOwnership();
-        if (currentPlayerNumber === currentVariableOwner) {
-          console.info(
-            `Variable ${variableName} is owned by us ${gdjs.multiplayer.playerNumber}, ignoring update message from ${syncedVariableOwner}.`
-          );
-          return;
-        }
+        if (!options.ignoreVariableOwnership) {
+          const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerNumber();
 
-        if (syncedVariableOwner !== currentVariableOwner) {
-          console.info(
-            `Variable ${variableName} is owned by ${currentVariableOwner} on our game, changing ownership to ${syncedVariableOwner} as part of the update event.`
-          );
-          variable.setPlayerOwnership(syncedVariableOwner);
+          const currentVariableOwner = variable.getPlayerOwnership();
+          if (currentPlayerNumber === currentVariableOwner) {
+            console.info(
+              `Variable ${variableName} is owned by us ${gdjs.multiplayer.playerNumber}, ignoring update message from ${syncedVariableOwner}.`
+            );
+            return;
+          }
+
+          if (
+            syncedVariableOwner &&
+            syncedVariableOwner !== currentVariableOwner
+          ) {
+            console.info(
+              `Variable ${variableName} is owned by ${currentVariableOwner} on our game, changing ownership to ${syncedVariableOwner} as part of the update event.`
+            );
+            variable.setPlayerOwnership(syncedVariableOwner);
+          }
         }
 
         variable.reinitialize(variableData);

@@ -267,9 +267,11 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): TextInputNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): TextInputNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         opa: this.getOpacity(),
         txt: this.getText(),
         frn: this.getFontResourceName(),
@@ -288,8 +290,11 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(syncData: TextInputNetworkSyncData): void {
-      super.updateFromNetworkSyncData(syncData);
+    updateFromNetworkSyncData(
+      syncData: TextInputNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
+    ): void {
+      super.updateFromNetworkSyncData(syncData, options);
 
       if (syncData.opa !== undefined) this.setOpacity(syncData.opa);
       if (syncData.txt !== undefined) this.setText(syncData.txt);

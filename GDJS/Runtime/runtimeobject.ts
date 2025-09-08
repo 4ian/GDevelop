@@ -452,17 +452,20 @@ namespace gdjs {
      * This can be redefined by objects to send more information.
      * @returns The full network sync data.
      */
-    getNetworkSyncData(): ObjectNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): ObjectNetworkSyncData {
       const behaviorNetworkSyncData = {};
       this._behaviors.forEach((behavior) => {
-        if (!behavior.isSyncedOverNetwork()) {
+        if (
+          !behavior.isSyncedOverNetwork() &&
+          !syncOptions.forceSyncEverything
+        ) {
           return;
         }
 
-        const networkSyncData = behavior.getNetworkSyncData();
-        if (networkSyncData) {
-          behaviorNetworkSyncData[behavior.getName()] = networkSyncData;
-        }
+        const networkSyncData = behavior.getNetworkSyncData(syncOptions);
+        behaviorNetworkSyncData[behavior.getName()] = networkSyncData;
       });
 
       const variablesNetworkSyncData = this._variables.getNetworkSyncData({
@@ -493,6 +496,7 @@ namespace gdjs {
         if: this._instantForces.map((force) => force.getNetworkSyncData()),
         pfx: this._permanentForceX,
         pfy: this._permanentForceY,
+        n: syncOptions.forceSyncEverything ? this.name : undefined,
         beh: behaviorNetworkSyncData,
         var: variablesNetworkSyncData,
         eff: effectsNetworkSyncData,
@@ -507,7 +511,10 @@ namespace gdjs {
      * @param networkSyncData The new data for the object.
      * @returns true if the object was updated, false if it could not (i.e: network sync is not supported).
      */
-    updateFromNetworkSyncData(networkSyncData: ObjectNetworkSyncData) {
+    updateFromNetworkSyncData(
+      networkSyncData: ObjectNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
+    ) {
       if (networkSyncData.x !== undefined) {
         this.setX(networkSyncData.x);
       }
@@ -567,13 +574,13 @@ namespace gdjs {
         const behaviorNetworkSyncData = networkSyncData.beh[behaviorName];
         const behavior = this.getBehavior(behaviorName);
         if (behavior) {
-          behavior.updateFromNetworkSyncData(behaviorNetworkSyncData);
+          behavior.updateFromNetworkSyncData(behaviorNetworkSyncData, options);
         }
       }
 
       // If variables are synchronized, update them.
       if (networkSyncData.var) {
-        this._variables.updateFromNetworkSyncData(networkSyncData.var);
+        this._variables.updateFromNetworkSyncData(networkSyncData.var, options);
       }
 
       // If effects are synchronized, update them.

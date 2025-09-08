@@ -6,6 +6,7 @@ import { objectWithContextReactDndType } from '../ObjectsList';
 import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
 import Text from '../UI/Text';
 import classes from './EmbeddedGameFrame.module.css';
+import { type DropTargetMonitor } from 'react-dnd';
 
 type AttachToPreviewOptions = {|
   previewIndexHtmlLocation: string,
@@ -376,6 +377,39 @@ export const EmbeddedGameFrame = ({
   });
 
   const [isDraggedItem3D, setDraggedItem3D] = React.useState(false);
+  const dropTargetRef = React.useRef<HTMLDivElement | null>(null);
+
+  const dragNewInstance = React.useCallback(
+    ({
+      monitor,
+      dropped,
+    }: {
+      monitor: DropTargetMonitor,
+      dropped: boolean,
+    }) => {
+      const dropTarget = dropTargetRef.current;
+      if (!previewDebuggerServer || !dropTarget) return;
+
+      const name = monitor.getItem().name;
+      if (!name) return;
+
+      setDraggedItem3D(!!monitor.getItem().is3D);
+
+      const clientOffset = monitor.getClientOffset();
+      const dropTargetRect = dropTarget.getBoundingClientRect();
+
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'dragNewInstance',
+          x: clientOffset.x - dropTargetRect.left,
+          y: clientOffset.y - dropTargetRect.top,
+          name,
+          dropped,
+        });
+      });
+    },
+    [previewDebuggerServer]
+  );
 
   return (
     <div
@@ -404,48 +438,8 @@ export const EmbeddedGameFrame = ({
         />
         <DropTarget
           canDrop={() => true}
-          hover={monitor => {
-            if (!previewDebuggerServer) return;
-
-            const clientOffset = monitor.getClientOffset();
-            const name = monitor.getItem().name;
-            if (!name) return;
-
-            setDraggedItem3D(!!monitor.getItem().is3D);
-
-            // TODO: Move these into a helper.
-            previewDebuggerServer
-              .getExistingDebuggerIds()
-              .forEach(debuggerId => {
-                previewDebuggerServer.sendMessage(debuggerId, {
-                  command: 'dragNewInstance',
-                  x: clientOffset.x,
-                  y: clientOffset.y - (31 + 40),
-                  name,
-                  dropped: false,
-                });
-              });
-          }}
-          drop={monitor => {
-            if (!previewDebuggerServer) return;
-
-            const clientOffset = monitor.getClientOffset();
-            const name = monitor.getItem().name;
-            if (!name) return;
-
-            // TODO: Move these into a helper.
-            previewDebuggerServer
-              .getExistingDebuggerIds()
-              .forEach(debuggerId => {
-                previewDebuggerServer.sendMessage(debuggerId, {
-                  command: 'dragNewInstance',
-                  x: clientOffset.x,
-                  y: clientOffset.y - (31 + 40),
-                  name,
-                  dropped: true,
-                });
-              });
-          }}
+          hover={monitor => dragNewInstance({ monitor, dropped: false })}
+          drop={monitor => dragNewInstance({ monitor, dropped: true })}
         >
           {({ connectDropTarget, canDrop, isOver }) => {
             if (!isOver) {
@@ -478,6 +472,7 @@ export const EmbeddedGameFrame = ({
                   justifyContent: 'center',
                 }}
                 id="embedded-game-frame-drop-target"
+                ref={dropTargetRef}
               >
                 {canDrop && (
                   <div className={classes.hintText}>

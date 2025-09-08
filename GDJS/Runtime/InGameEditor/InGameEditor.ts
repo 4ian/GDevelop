@@ -1361,7 +1361,6 @@ namespace gdjs {
       if (
         inputManager.isMouseButtonReleased(0) &&
         this._hasCursorStayedStillWhilePressed()
-        // TODO: add check for space key
       ) {
         if (
           !isShiftPressed(inputManager) &&
@@ -1493,10 +1492,7 @@ namespace gdjs {
       let mode: string | null = null;
       if (this._selectionControls) {
         mode = this._selectionControls.threeTransformControls.mode;
-        this._selectionControls.threeTransformControls.detach();
-        this._selectionControls.threeTransformControls.removeFromParent();
-        this._selectionControls.dummyThreeObject.removeFromParent();
-        this._selectionControls = null;
+        this._removeSelectionControls();
       }
       this._updateSelectionControls();
       if (mode && this._selectionControls) {
@@ -1519,10 +1515,7 @@ namespace gdjs {
             this._selectionControls.object !== lastSelectedObject) ||
           shouldDragSelectedObject(inputManager))
       ) {
-        this._selectionControls.threeTransformControls.detach();
-        this._selectionControls.threeTransformControls.removeFromParent();
-        this._selectionControls.dummyThreeObject.removeFromParent();
-        this._selectionControls = null;
+        this._removeSelectionControls();
       }
 
       if (
@@ -1622,17 +1615,21 @@ namespace gdjs {
       }
     }
 
+    private _removeSelectionControls(): void {
+      if (!this._selectionControls) {
+        return;
+      }
+      this._selectionControls.threeTransformControls.detach();
+      this._selectionControls.threeTransformControls.removeFromParent();
+      this._selectionControls.dummyThreeObject.removeFromParent();
+      this._selectionControls = null;
+    }
+
     activate(enable: boolean) {
       if (enable) {
         // Nothing to do.
       } else {
-        if (this._selectionControls) {
-          // TODO: factor this.
-          this._selectionControls.threeTransformControls.detach();
-          this._selectionControls.threeTransformControls.removeFromParent();
-          this._selectionControls.dummyThreeObject.removeFromParent();
-          this._selectionControls = null;
-        }
+        this._removeSelectionControls();
 
         // Cleanup selection boxes
         this._selectionBoxes.forEach(({ container }) => {

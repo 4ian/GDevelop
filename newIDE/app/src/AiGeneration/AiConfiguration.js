@@ -49,10 +49,11 @@ export const getAiConfigurationPresetsWithAvailability = ({
 };
 
 export const getDefaultAiConfigurationPresetId = (
+  mode: 'chat' | 'agent',
   aiConfigurationPresetsWithAvailability: Array<AiConfigurationPresetWithAvailability>
 ): string => {
   const defaultPresetWithAvailability = aiConfigurationPresetsWithAvailability.find(
-    preset => preset.isDefault
+    preset => preset.isDefault && preset.mode === mode
   );
 
   return (

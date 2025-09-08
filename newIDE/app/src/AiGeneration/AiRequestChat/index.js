@@ -466,7 +466,10 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
 
     const chosenOrDefaultAiConfigurationPresetId =
       aiConfigurationPresetId ||
-      getDefaultAiConfigurationPresetId(aiConfigurationPresetsWithAvailability);
+      getDefaultAiConfigurationPresetId(
+        newAiRequestMode,
+        aiConfigurationPresetsWithAvailability
+      );
 
     if (!aiRequest) {
       return (

@@ -221,18 +221,21 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): CustomObjectNetworkSyncDataType {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): CustomObjectNetworkSyncDataType {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         ifx: this.isFlippedX(),
         ify: this.isFlippedY(),
       };
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: CustomObjectNetworkSyncDataType
+      networkSyncData: CustomObjectNetworkSyncDataType,
+      options: UpdateFromNetworkSyncDataOptions
     ) {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
       if (networkSyncData.ifx !== undefined) {
         this.flipX(networkSyncData.ifx);
       }

@@ -42,6 +42,16 @@ declare type ObjectData = {
 declare type GetNetworkSyncDataOptions = {
   playerNumber?: number;
   isHost?: boolean;
+  forceSyncEverything?: boolean;
+};
+
+declare type UpdateFromNetworkSyncDataOptions = {
+  clearMemory?: boolean;
+  syncSounds?: boolean;
+  syncTimers?: boolean;
+  syncTweens?: boolean;
+  keepControl?: boolean;
+  ignoreVariableOwnership?: boolean;
 };
 
 /** Object containing basic properties for all objects synchronizing over the network. */
@@ -70,6 +80,8 @@ declare type BasicObjectNetworkSyncData = {
   pfx: number;
   /** Permanent force on Y */
   pfy: number;
+  /* name :*/
+  n?: string;
 };
 
 /**
@@ -102,6 +114,7 @@ declare type ForceNetworkSyncData = {
 };
 
 declare type TimerNetworkSyncData = {
+  name: string;
   time: float;
   paused: boolean;
 };
@@ -133,7 +146,7 @@ declare type VariableNetworkSyncData = {
   value: string | float | boolean;
   children?: VariableNetworkSyncData[];
   type: VariableType;
-  owner: number;
+  owner: number | null;
 };
 
 /** Properties to set up a behavior. */
@@ -183,6 +196,8 @@ declare interface LayoutNetworkSyncData {
   extVar?: {
     [extensionName: string]: VariableNetworkSyncData[];
   };
+  timeManager?: TimeManagerSyncData;
+  tweenManager?: gdjs.evtTools.tween.TweenManagerNetworkSyncData;
 }
 
 declare interface SceneStackSceneNetworkSyncData {
@@ -192,12 +207,30 @@ declare interface SceneStackSceneNetworkSyncData {
 
 declare type SceneStackNetworkSyncData = SceneStackSceneNetworkSyncData[];
 
+declare type SoundSyncData = {
+  loop: boolean;
+  volume: float;
+  rate: float;
+  resourceName: string;
+  seek: float;
+};
+declare type ChannelsSoundSyncData = Record<integer, SoundSyncData>;
+declare type SoundManagerSyncData = {
+  globalVolume: float;
+  cachedSpatialPosition: Record<number, [number, number, number]>;
+  freeSounds: SoundSyncData[];
+  freeMusics: SoundSyncData[];
+  musics: ChannelsSoundSyncData;
+  sounds: ChannelsSoundSyncData;
+};
+
 declare interface GameNetworkSyncData {
   var?: VariableNetworkSyncData[];
   ss?: SceneStackNetworkSyncData;
   extVar?: {
     [extensionName: string]: VariableNetworkSyncData[];
   };
+  sm?: SoundManagerSyncData;
 }
 
 declare interface EventsFunctionsExtensionData {

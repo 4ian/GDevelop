@@ -27,7 +27,7 @@
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
     const asyncTasksManager = runtimeScene.getAsyncTasksManager();
 
-    this.beforeEach(() => asyncTasksManager.clearTasks());
+    beforeEach(() => asyncTasksManager.clearTasks());
 
     it('should call a resolved callback', function () {
       const cb = createMockCallback();

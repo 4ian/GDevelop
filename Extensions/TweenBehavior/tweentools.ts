@@ -14,6 +14,23 @@ namespace gdjs {
         runtimeScene._tweens ||
         (runtimeScene._tweens = new gdjs.evtTools.tween.TweenManager());
 
+      class SceneTweenAwaiterTask implements gdjs.AsyncTask {
+        manager: gdjs.evtTools.tween.TweenManager;
+        identifier: string;
+
+        constructor(
+          manager: gdjs.evtTools.tween.TweenManager,
+          identifier: string
+        ) {
+          this.manager = manager;
+          this.identifier = identifier;
+        }
+
+        update() {
+          return this.manager.hasFinished(this.identifier);
+        }
+      }
+
       // Layout tweens from event-based objects won't step, but it's fine
       // because they don't have cameras anyway.
       gdjs.registerRuntimeScenePreEventsCallback(function (runtimeScene) {
@@ -66,6 +83,22 @@ namespace gdjs {
         id: string
       ) => {
         getTweensMap(runtimeScene).removeTween(id);
+      };
+
+      /**
+       * Creates a task for awaiting the ends of a scene tween.
+       * @param runtimeScene The current scene.
+       * @param identifier The tweeen identifier.
+       * @returns An async tasks that resolves when the tween ends.
+       */
+      export const awaitSceneTween = (
+        runtimeScene: RuntimeScene,
+        identifier: string
+      ): gdjs.AsyncTask => {
+        const tweens = getTweensMap(runtimeScene);
+        return tweens.exists(identifier)
+          ? new SceneTweenAwaiterTask(tweens, identifier)
+          : new gdjs.ResolveTask();
       };
 
       /**

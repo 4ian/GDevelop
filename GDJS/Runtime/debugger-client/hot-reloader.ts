@@ -765,27 +765,20 @@ namespace gdjs {
         if (!eventsBasedObjectData) {
           return objectData;
         }
-
         const customObjectConfiguration = objectData as ObjectData &
           CustomObjectConfiguration;
-
-        // TODO Try to factorize with CustomRuntimeObjectInstanceContainer.loadFrom
-
         const eventsBasedObjectVariantData =
           gdjs.RuntimeGame._getEventsBasedObjectVariantData(
             eventsBasedObjectData,
             customObjectConfiguration.variant
           );
 
-        const isForcedToOverrideEventsBasedObjectChildrenConfiguration =
-          !eventsBasedObjectVariantData.name &&
-          eventsBasedObjectVariantData.instances.length == 0;
-
         // Apply the legacy children configuration overriding if any.
         const mergedChildObjectDataList =
-          customObjectConfiguration.childrenContent &&
-          (!eventsBasedObjectVariantData.name ||
-            isForcedToOverrideEventsBasedObjectChildrenConfiguration)
+          gdjs.CustomRuntimeObjectInstanceContainer.hasChildrenConfigurationOverriding(
+            customObjectConfiguration,
+            eventsBasedObjectVariantData
+          )
             ? eventsBasedObjectData.objects.map((objectData) =>
                 customObjectConfiguration.childrenContent
                   ? {

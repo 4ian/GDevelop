@@ -77,17 +77,14 @@ namespace gdjs {
 
     /**
      * Load the container from the given initial configuration.
-     * @param customObjectData An object containing the container data.
+     * @param customObjectData An object containing the parent object data.
+     * @param eventsBasedObjectVariantData An object containing the container data.
      * @see gdjs.RuntimeGame#getSceneAndExtensionsData
      */
     loadFrom(
       customObjectData: ObjectData & CustomObjectConfiguration,
       eventsBasedObjectVariantData: EventsBasedObjectVariantData
     ) {
-      const isForcedToOverrideEventsBasedObjectChildrenConfiguration =
-        !eventsBasedObjectVariantData.name &&
-        eventsBasedObjectVariantData.instances.length == 0;
-
       this._setOriginalInnerArea(eventsBasedObjectVariantData);
 
       // Registering objects
@@ -97,19 +94,21 @@ namespace gdjs {
         ++i
       ) {
         const childObjectData = eventsBasedObjectVariantData.objects[i];
-        // The children configuration override only applies to the default variant.
         if (
           customObjectData.childrenContent &&
-          (!eventsBasedObjectVariantData.name ||
-            isForcedToOverrideEventsBasedObjectChildrenConfiguration)
+          gdjs.CustomRuntimeObjectInstanceContainer.hasChildrenConfigurationOverriding(
+            customObjectData,
+            eventsBasedObjectVariantData
+          )
         ) {
           this.registerObject({
             ...childObjectData,
-            // The custom object overrides its events-based object configuration.
+            // The custom object overrides its variant configuration with
+            // a legacy children configuration.
             ...customObjectData.childrenContent[childObjectData.name],
           });
         } else {
-          // The custom object follows its events-based object configuration.
+          // The custom object follows its variant configuration.
           this.registerObject(childObjectData);
         }
       }
@@ -162,6 +161,28 @@ namespace gdjs {
       this._setLayerDefaultZOrders();
 
       this._isLoaded = true;
+    }
+
+    /**
+     * Check if the custom object has a children configuration overriding that
+     * should be used instead of the variant's objects configurations.
+     * @param customObjectData An object containing the parent object data.
+     * @param eventsBasedObjectVariantData An object containing the container data.
+     * @returns
+     */
+    static hasChildrenConfigurationOverriding(
+      customObjectData: CustomObjectConfiguration,
+      eventsBasedObjectVariantData: EventsBasedObjectVariantData
+    ): boolean {
+      const isForcedToOverrideEventsBasedObjectChildrenConfiguration =
+        !eventsBasedObjectVariantData.name &&
+        eventsBasedObjectVariantData.instances.length == 0;
+
+      // The children configuration override only applies to the default variant.
+      return customObjectData.childrenContent
+        ? !eventsBasedObjectVariantData.name ||
+            isForcedToOverrideEventsBasedObjectChildrenConfiguration
+        : false;
     }
 
     /**

@@ -17,6 +17,50 @@ namespace gdjs {
 
         constructor() {}
 
+        getNetworkSyncData(): TweenManagerSyncData {
+          const tweens: TweenManagerSyncData = {};
+          for (const [identifier, tween] of this._tweens) {
+            tweens[identifier] = {
+              progress: tween.getProgress(),
+              value: tween.getValue(),
+              isPlaying: tween.isPlaying(),
+              hasFinished: tween.hasFinished(),
+            };
+          }
+          return tweens;
+        }
+
+        // We only handle tweens partially for network sync.
+        // We only sync the props of existing tweens, but do not handle
+        // adding or removing tweens.
+        updateFromNetworkSyncData(networkSyncData: TweenManagerSyncData) {
+          for (const [identifier, tweenData] of Object.entries(
+            networkSyncData
+          )) {
+            const tween = this._tweens.get(identifier);
+            if (!tween) {
+              continue;
+            }
+            if (
+              tweenData.isPlaying !== undefined &&
+              tweenData.isPlaying !== tween.isPlaying()
+            ) {
+              tweenData.isPlaying
+                ? this.resumeTween(identifier)
+                : this.pauseTween(identifier);
+            }
+            if (
+              tweenData.hasFinished === true &&
+              tweenData.hasFinished !== tween.hasFinished()
+            ) {
+              this.stopTween(identifier, false);
+            }
+            if (tweenData.progress !== undefined) {
+              tween.setProgress(tweenData.progress);
+            }
+          }
+        }
+
         /**
          * Make all active tween step toward the end.
          * @param timeDelta the duration from the previous step in seconds
@@ -267,6 +311,7 @@ namespace gdjs {
         stop(jumpToDest: boolean): void;
         resume(): void;
         pause(): void;
+        setProgress(progress: float): void;
         getProgress(): float;
         getValue(): float;
       }
@@ -338,6 +383,11 @@ namespace gdjs {
 
         getProgress(): float {
           return this.elapsedTime / this.totalDuration;
+        }
+
+        setProgress(progress: float): void {
+          this.elapsedTime = progress * this.totalDuration;
+          this._updateValue();
         }
       }
 

@@ -116,6 +116,12 @@ class LocalPreviewDebuggerServer {
           if (answerCallback) {
             answerCallback(parsedMessage);
             responseCallbacks.delete(parsedMessage.messageId);
+          } else {
+            console.warn(
+              `Discarding response for messageId=${
+                parsedMessage.messageId
+              } - already handled or invalid id.`
+            );
           }
         }
         callbacksList.forEach(({ onHandleParsedMessage }) =>
@@ -151,14 +157,14 @@ class LocalPreviewDebuggerServer {
     });
   }
   sendMessageWithResponse(
-    id: DebuggerId,
     message: Object,
     timeout: number = 1000
   ): Promise<Object> {
     const messageId = nextMessageWithResponseId;
     nextMessageWithResponseId++;
-    this.sendMessage(id, { ...message, messageId });
-
+    for (const id of debuggerIds) {
+      this.sendMessage(id, { ...message, messageId });
+    }
     const promise = new Promise<Object>((resolve, reject) => {
       responseCallbacks.set(messageId, resolve);
       setTimeout(() => {

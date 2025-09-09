@@ -165,7 +165,7 @@ export default function ExtractAsCustomObjectDialog({
 
   const apply = React.useCallback(
     (i18n: I18nType) => {
-      if (has2DAnd3D || irrelevantBehaviorMetadatas) {
+      if (has2DAnd3D || irrelevantBehaviorMetadatas.length > 0) {
         onCancel();
       } else {
         onApply(
@@ -235,7 +235,7 @@ export default function ExtractAsCustomObjectDialog({
                 </Trans>
               </AlertMessage>
             ) : null}
-            {irrelevantBehaviorMetadatas ? (
+            {irrelevantBehaviorMetadatas.length > 0 ? (
               <AlertMessage kind="error">
                 <Trans>
                   Objects inside custom objects can't contain the following

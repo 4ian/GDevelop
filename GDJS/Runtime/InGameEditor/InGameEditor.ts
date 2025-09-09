@@ -38,6 +38,8 @@ namespace gdjs {
   const Y_KEY = 89;
   const Z_KEY = 90;
 
+  const editorCameraFov = 45;
+
   let hasWindowFocus = true;
   if (typeof window !== 'undefined') {
     window.addEventListener('focus', () => {
@@ -482,6 +484,7 @@ namespace gdjs {
         if (layerData.cameraType === 'orthographic') {
           layerData.cameraType = 'perspective';
         }
+        layerData.camera3DFieldOfView = editorCameraFov;
         // Force 2D and 3D objects to be visible on any layer.
         layerData.renderingType = '2d+3d';
         if (areEffectsHiddenInEditor) {
@@ -2677,8 +2680,6 @@ namespace gdjs {
      */
     _getCameraZFromZoom = (zoom: float): float => {
       const runtimeGame = this.editor.getRuntimeGame();
-      // TODO Should the editor force this fov?
-      const fov = 45;
       // Set the camera so that it displays the whole PixiJS plane, as if it was a 2D rendering.
       // The Z position is computed by taking the half height of the displayed rendering,
       // and using the angle of the triangle defined by the field of view to compute the length
@@ -2686,7 +2687,7 @@ namespace gdjs {
       return (
         (0.5 * runtimeGame.getGameResolutionHeight()) /
         zoom /
-        Math.tan(0.5 * gdjs.toRad(fov))
+        Math.tan(0.5 * gdjs.toRad(editorCameraFov))
       );
     };
 

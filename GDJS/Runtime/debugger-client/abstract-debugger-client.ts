@@ -281,8 +281,6 @@ namespace gdjs {
             })
             .then((logs) => {
               that.sendHotReloaderLogs(logs);
-              // TODO: if fatal error, should probably reload. The editor should handle this
-              // as it knows the current scene to show.
             });
         } else if (data.command === 'hotReloadObjects') {
           if (inGameEditor) {

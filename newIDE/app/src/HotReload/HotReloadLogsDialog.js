@@ -18,7 +18,6 @@ type Props = {|
 const shouldDisplayDialogForLogs = logs =>
   logs.filter(log => log.kind === 'error' || log.kind === 'fatal').length > 0;
 
-// TODO Don't show this dialog for the in-game editor.
 export default function HotReloadLogsDialog({
   onClose,
   onLaunchNewPreview,

@@ -2507,6 +2507,51 @@ const MainFrame = (props: Props) => {
     [getEditorOpeningOptions, setState, state]
   );
 
+  const openCustomObjectAndExtensionEditors = React.useCallback(
+    (
+      eventsFunctionsExtension: gdEventsFunctionsExtension,
+      eventsBasedObject: gdEventsBasedObject,
+      variantName: string
+    ) => {
+      const { currentProject } = state;
+      if (!currentProject) return;
+
+      // Open both tabs at the same time to avoid the extension tab to trigger
+      // a code generation when it loses the focus.
+      setState(state => ({
+        ...state,
+        editorTabs: openEditorTab(
+          openEditorTab(state.editorTabs, {
+            ...getEditorOpeningOptions({
+              kind: 'events functions extension',
+              name: eventsFunctionsExtension.getName(),
+              project: currentProject,
+            }),
+            extraEditorProps: {
+              initiallyFocusedFunctionName: null,
+              initiallyFocusedBehaviorName: null,
+              initiallyFocusedObjectName: eventsBasedObject.getName(),
+            },
+          }),
+          {
+            ...getEditorOpeningOptions({
+              kind: 'custom object',
+              name:
+                eventsFunctionsExtension.getName() +
+                '::' +
+                eventsBasedObject.getName() +
+                (eventsBasedObject.getVariants().hasVariantNamed(variantName)
+                  ? '::' + variantName
+                  : ''),
+              project: currentProject,
+            }),
+          }
+        ),
+      }));
+    },
+    [getEditorOpeningOptions, setState, state]
+  );
+
   const openObjectEvents = (extensionName: string, objectName: string) => {
     const { currentProject, editorTabs } = state;
     if (!currentProject) return;
@@ -2679,18 +2724,15 @@ const MainFrame = (props: Props) => {
         shouldReloadResources: false,
       });
 
-      openEventsFunctionsExtension(
-        extensionName,
-        null,
-        null,
-        eventsBasedObjectName
+      openCustomObjectAndExtensionEditors(
+        eventsFunctionsExtension,
+        eventsBasedObject,
+        ''
       );
-      openCustomObjectEditor(eventsFunctionsExtension, eventsBasedObject, '');
     },
     [
       currentProject,
-      openEventsFunctionsExtension,
-      openCustomObjectEditor,
+      openCustomObjectAndExtensionEditors,
       eventsFunctionsExtensionsState,
     ]
   );

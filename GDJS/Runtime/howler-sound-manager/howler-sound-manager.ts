@@ -370,15 +370,20 @@ namespace gdjs {
       return this;
     }
 
-    getNetworkSyncData(): SoundSyncData {
+    getNetworkSyncData(): SoundSyncData | undefined {
+      if (this.stopped()) return undefined;
+      // Seek can sometimes return the Howl object in case it isn't loaded yet, in this case we default to 0.
+      const seek = this.getSeek();
+      const numberSeek = typeof seek !== 'number' ? 0 : seek;
+      // If the Howl is still loading, we use the initialVolume, as the Howl
+      // has been initialized with volume 0.
+      const volume = this.isLoaded() ? this.getVolume() : this._initialVolume;
       return {
         resourceName: this._audioResourceName,
         loop: this._loop,
-        // If the Howl is still loading, we use the initialVolume, as the Howl
-        // has been initialized with volume 0.
-        volume: this.isLoaded() ? this.getVolume() : this._initialVolume,
+        volume,
         rate: this._rate,
-        seek: this.getSeek(),
+        seek: numberSeek,
       };
     }
   }
@@ -982,21 +987,27 @@ namespace gdjs {
     }
 
     getNetworkSyncData(): SoundManagerSyncData {
-      const freeMusicsNetworkSyncData: SoundSyncData[] = this._freeMusics.map(
-        (freeMusic) => freeMusic.getNetworkSyncData()
-      );
-      const freeSoundsNetworkSyncData: SoundSyncData[] = this._freeSounds.map(
-        (freeSound) => freeSound.getNetworkSyncData()
-      );
+      const freeMusicsNetworkSyncData: SoundSyncData[] = this._freeMusics
+        .map((freeMusic) => freeMusic.getNetworkSyncData())
+        .filter((musicSyncData) => !!musicSyncData);
+      const freeSoundsNetworkSyncData: SoundSyncData[] = this._freeSounds
+        .map((freeSound) => freeSound.getNetworkSyncData())
+        .filter((soundSyncData) => !!soundSyncData);
       const musicsNetworkSyncData: ChannelsSoundSyncData = {};
       Object.entries(this._musics).forEach(([channel, music]) => {
-        const channelNumber = parseInt(channel, 10);
-        musicsNetworkSyncData[channelNumber] = music.getNetworkSyncData();
+        const musicSyncData = music.getNetworkSyncData();
+        if (musicSyncData) {
+          const channelNumber = parseInt(channel, 10);
+          musicsNetworkSyncData[channelNumber] = musicSyncData;
+        }
       });
       const soundsNetworkSyncData: ChannelsSoundSyncData = {};
       Object.entries(this._sounds).forEach(([channel, sound]) => {
-        const channelNumber = parseInt(channel, 10);
-        soundsNetworkSyncData[channelNumber] = sound.getNetworkSyncData();
+        const soundSyncData = sound.getNetworkSyncData();
+        if (soundSyncData) {
+          const channelNumber = parseInt(channel, 10);
+          soundsNetworkSyncData[channelNumber] = soundSyncData;
+        }
       });
 
       return {

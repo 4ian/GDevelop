@@ -177,7 +177,7 @@ namespace gdjs {
       }
 
       // Clear user inputs between frames only if requested.
-      this._clearInputsBetweenFrames = !!options.clearMemory;
+      this._clearInputsBetweenFrames = !!options.clearInputs;
       // And ignore default controls if not asked otherwise.
       this._ignoreDefaultControlsAsSyncedByNetwork = !options.keepControl;
     }

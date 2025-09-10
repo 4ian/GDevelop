@@ -42,14 +42,19 @@ declare type ObjectData = {
 declare type GetNetworkSyncDataOptions = {
   playerNumber?: number;
   isHost?: boolean;
-  forceSyncEverything?: boolean;
+  syncObjectName?: boolean;
+  syncAllVariables?: boolean;
+  syncAllBehaviors?: boolean;
+  syncSceneTimers?: boolean;
+  syncOnceTriggers?: boolean;
+  syncSounds?: boolean;
+  syncTweens?: boolean;
+  syncLayers?: boolean;
 };
 
 declare type UpdateFromNetworkSyncDataOptions = {
-  clearMemory?: boolean;
-  syncSounds?: boolean;
-  syncTimers?: boolean;
-  syncTweens?: boolean;
+  clearSceneStack?: boolean;
+  clearInputs?: boolean;
   keepControl?: boolean;
   ignoreVariableOwnership?: boolean;
 };
@@ -103,6 +108,8 @@ declare interface ObjectNetworkSyncData extends BasicObjectNetworkSyncData {
   tim?: {
     [timerName: string]: TimerNetworkSyncData;
   };
+  /** Tweens */
+  tweenManager?: TweenManagerNetworkSyncData;
 }
 
 declare type ForceNetworkSyncData = {
@@ -149,6 +156,21 @@ declare type VariableNetworkSyncData = {
   owner: number | null;
 };
 
+declare type LayerNetworkSyncData = {
+  timeScale: float;
+  defaultZOrder: integer;
+  hidden: boolean;
+  effects: {
+    [effectName: string]: EffectNetworkSyncData;
+  };
+  followBaseLayerCamera: boolean;
+  clearColor: Array<integer>;
+  cameraX: float;
+  cameraY: float;
+  cameraRotation: float;
+  cameraZoom: float;
+};
+
 /** Properties to set up a behavior. */
 declare type BehaviorData = {
   /** The name of the behavior (for getting from an object (object.getBehavior) for example) */
@@ -160,6 +182,74 @@ declare type BehaviorData = {
 declare type BehaviorNetworkSyncData = {
   act: boolean;
   props: any;
+};
+
+declare type SceneTweenType =
+  | 'layoutValue'
+  | 'layerValue'
+  | 'variable'
+  | 'cameraZoom'
+  | 'cameraRotation'
+  | 'cameraPosition'
+  | 'colorEffectProperty'
+  | 'numberEffectProperty';
+declare type ObjectTweenType =
+  | 'variable'
+  | 'position'
+  | 'positionX'
+  | 'positionY'
+  | 'positionZ'
+  | 'width'
+  | 'height'
+  | 'depth'
+  | 'angle'
+  | 'rotationX'
+  | 'rotationY'
+  | 'scale'
+  | 'scaleXY'
+  | 'scaleX'
+  | 'scaleY'
+  | 'opacity'
+  | 'characterSize'
+  | 'numberEffectProperty'
+  | 'colorEffectProperty'
+  | 'objectColor'
+  | 'objectColorHSL'
+  | 'objectValue';
+
+declare type TweenInformation = {
+  type: SceneTweenType | ObjectTweenType;
+  layerName?: string;
+  variable?: Variable;
+  effectName?: string;
+  propertyName?: string;
+  scaleFromCenterOfObject?: boolean;
+  useHSLColorTransition?: boolean;
+  destroyObjectWhenFinished?: boolean;
+};
+
+declare type TweenInformationNetworkSyncData = Omit<
+  TweenInformation,
+  'variable' // When synced, a variable is replaced by its path
+> & { variablePath?: string[] };
+
+declare type TweenInstanceNetworkSyncData<T> = {
+  initialValue: T;
+  targetedValue: T;
+  elapsedTime: float;
+  totalDuration: float;
+  easingIdentifier: string;
+  interpolationString: 'linear' | 'exponential';
+  isPaused: boolean;
+  tweenInformation: TweenInformationNetworkSyncData;
+};
+
+declare type TweenManagerNetworkSyncData = {
+  tweens: Record<
+    string,
+    | TweenInstanceNetworkSyncData<float>
+    | TweenInstanceNetworkSyncData<Array<float>>
+  >;
 };
 
 declare interface GdVersionData {
@@ -197,7 +287,11 @@ declare interface LayoutNetworkSyncData {
     [extensionName: string]: VariableNetworkSyncData[];
   };
   timeManager?: TimeManagerSyncData;
-  tweenManager?: gdjs.evtTools.tween.TweenManagerNetworkSyncData;
+  tweenManager?: TweenManagerNetworkSyncData;
+  onceTriggers?: OnceTriggersSyncData;
+  layers?: {
+    [layerName: string]: LayerNetworkSyncData;
+  };
 }
 
 declare interface SceneStackSceneNetworkSyncData {

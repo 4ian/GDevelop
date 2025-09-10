@@ -730,7 +730,7 @@ namespace gdjs {
           }
 
           instance.updateFromNetworkSyncData(messageData, {
-            clearMemory: false,
+            clearInputs: false,
           });
 
           setLastClockReceivedForInstanceOnScene({

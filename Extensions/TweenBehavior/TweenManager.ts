@@ -180,34 +180,15 @@ namespace gdjs {
         easeTo: (pos: number) => Math.pow(pos, 0.25),
       };
 
-      export interface TweenInstanceNetworkSyncData<T> {
-        initialValue: T;
-        targetedValue: T;
-        elapsedTime: float;
-        totalDuration: float;
-        easingIdentifier: keyof typeof easingFunctions;
-        timeSourceIdentifier:
-          | { type: 'scene' }
-          | { type: 'layer'; layerName: string }
-          | { type: 'object' };
-        interpolate: 'linear' | 'exponential';
-        isPaused: boolean;
-      }
-
-      export interface TweenManagerNetworkSyncData {
-        tweens: Record<
-          string,
-          | TweenInstanceNetworkSyncData<float>
-          | TweenInstanceNetworkSyncData<Array<float>>
-        >;
-      }
-
       type GetTimeSourceFunction = (
-        timeSourceType:
-          | { type: 'scene' }
-          | { type: 'layer'; layerName: string }
-          | { type: 'object' }
+        tweenInformationNetworkSyncData: TweenInformationNetworkSyncData
       ) => TimeSource;
+      type GetTweenSetterFunction = (
+        tweenInformationNetworkSyncData: TweenInformationNetworkSyncData
+      ) => (value: any) => void;
+      type GetOnFinishFunction = (
+        tweenInformationNetworkSyncData: TweenInformationNetworkSyncData
+      ) => (() => void) | null;
 
       /**
        * A tween manager that is used for layout tweens or object tweens.
@@ -265,6 +246,7 @@ namespace gdjs {
           initialValue: float,
           targetedValue: float,
           setValue: (value: float) => void,
+          tweenInformation: TweenInformation,
           onFinish?: (() => void) | null
         ): void {
           const easing = easingFunctions[easingIdentifier];
@@ -278,10 +260,12 @@ namespace gdjs {
             timeSource,
             totalDuration,
             easing,
+            easingIdentifier,
             interpolate,
             initialValue,
             targetedValue,
             setValue,
+            tweenInformation,
             onFinish
           ) as TweenInstance<number>;
           this._tweens.set(identifier, tween);
@@ -300,6 +284,7 @@ namespace gdjs {
           initialValue: Array<float>,
           targetedValue: Array<float>,
           setValue: (value: Array<float>) => void,
+          tweenInformation: TweenInformation,
           onFinish?: (() => void) | null
         ): void {
           const easing = easingFunctions[easingIdentifier];
@@ -313,10 +298,12 @@ namespace gdjs {
             timeSource,
             totalDuration,
             easing,
+            easingIdentifier,
             interpolate,
             initialValue,
             targetedValue,
             setValue,
+            tweenInformation,
             onFinish
           );
           this._tweens.set(identifier, tween);
@@ -463,33 +450,71 @@ namespace gdjs {
 
         updateFromNetworkSyncData(
           syncData: TweenManagerNetworkSyncData,
-          getTimeSource: GetTimeSourceFunction
+          getTimeSource: GetTimeSourceFunction,
+          getTweenSetter: GetTweenSetterFunction,
+          getOnFinish: GetOnFinishFunction
         ) {
           Object.entries(syncData.tweens).forEach(
             ([identifier, tweenSyncData]) => {
+              const timeSource = getTimeSource(tweenSyncData.tweenInformation);
+              const setValue = getTweenSetter(tweenSyncData.tweenInformation);
+              const onFinish = getOnFinish(tweenSyncData.tweenInformation);
+              const interpolation =
+                tweenSyncData.interpolationString === 'exponential'
+                  ? gdjs.evtTools.common.exponentialInterpolation
+                  : gdjs.evtTools.common.lerp;
+              const tweenInformation: TweenInformation = {
+                type: tweenSyncData.tweenInformation.type,
+                layerName: tweenSyncData.tweenInformation.layerName,
+                effectName: tweenSyncData.tweenInformation.effectName,
+                propertyName: tweenSyncData.tweenInformation.propertyName,
+                scaleFromCenterOfObject:
+                  tweenSyncData.tweenInformation.scaleFromCenterOfObject,
+                useHSLColorTransition:
+                  tweenSyncData.tweenInformation.useHSLColorTransition,
+                destroyObjectWhenFinished:
+                  tweenSyncData.tweenInformation.destroyObjectWhenFinished,
+              };
+
+              if (
+                tweenSyncData.tweenInformation.variablePath &&
+                (timeSource instanceof gdjs.RuntimeScene ||
+                  timeSource instanceof gdjs.RuntimeObject)
+              ) {
+                const variable = timeSource
+                  .getVariables()
+                  .getVariableFromPath(
+                    tweenSyncData.tweenInformation.variablePath
+                  );
+                if (variable) {
+                  tweenInformation.variable = variable;
+                }
+              }
+
               if (
                 typeof tweenSyncData.initialValue === 'number' &&
                 typeof tweenSyncData.targetedValue === 'number'
               ) {
                 this.addSimpleTween(
                   identifier,
-                  getTimeSource(tweenSyncData.timeSourceIdentifier),
+                  timeSource,
                   tweenSyncData.totalDuration,
                   tweenSyncData.easingIdentifier,
-                  tweenSyncData.interpolate === 'exponential'
-                    ? gdjs.evtTools.common.exponentialInterpolation
-                    : gdjs.evtTools.common.lerp,
+                  interpolation,
                   tweenSyncData.initialValue,
                   tweenSyncData.targetedValue,
-                  (value) => {
-                    // TODO: Use the correct setter.
-                    // console.log(value);
-                  },
-                  // TODO: Find a way to restore the onFinished callback.
-                  () => {}
+                  setValue,
+                  tweenInformation,
+                  onFinish
                 );
-                if (tweenSyncData.isPaused) {
-                  this.pauseTween(identifier);
+
+                // Restore tween state
+                const tween = this._tweens.get(identifier);
+                if (tween) {
+                  tween.updateElapsedTime(tweenSyncData.elapsedTime);
+                  if (tweenSyncData.isPaused) {
+                    this.pauseTween(identifier);
+                  }
                 }
               } else if (
                 Array.isArray(tweenSyncData.initialValue) &&
@@ -497,23 +522,24 @@ namespace gdjs {
               ) {
                 this.addMultiTween(
                   identifier,
-                  getTimeSource(tweenSyncData.timeSourceIdentifier),
+                  timeSource,
                   tweenSyncData.totalDuration,
                   tweenSyncData.easingIdentifier,
-                  tweenSyncData.interpolate === 'exponential'
-                    ? gdjs.evtTools.common.exponentialInterpolation
-                    : gdjs.evtTools.common.lerp,
+                  interpolation,
                   tweenSyncData.initialValue,
                   tweenSyncData.targetedValue,
-                  (value) => {
-                    // TODO: Use the correct setter.
-                    // console.log(value);
-                  },
-                  // TODO: Find a way to restore the onFinished callback.
-                  () => {}
+                  setValue,
+                  tweenInformation,
+                  onFinish
                 );
-                if (tweenSyncData.isPaused) {
-                  this.pauseTween(identifier);
+
+                // Restore tween state
+                const tween = this._tweens.get(identifier);
+                if (tween) {
+                  tween.updateElapsedTime(tweenSyncData.elapsedTime);
+                  if (tweenSyncData.isPaused) {
+                    this.pauseTween(identifier);
+                  }
                 }
               }
             }
@@ -556,9 +582,7 @@ namespace gdjs {
         getProgress(): float;
         getValue(): float;
         getNetworkSyncData(): TweenInstanceNetworkSyncData<T>;
-        updateFromNetworkSyncData(
-          syncData: TweenInstanceNetworkSyncData<T>
-        ): void;
+        updateElapsedTime(newElapsedTime: float): void;
       }
 
       /**
@@ -571,22 +595,28 @@ namespace gdjs {
         protected elapsedTime: float;
         protected totalDuration: float;
         protected easing: (progress: float) => float;
+        protected easingIdentifier: string;
         protected interpolate: Interpolation;
         protected onFinish: () => void;
         protected timeSource: TimeSource;
         protected isPaused = false;
+        protected tweenInformation: TweenInformation;
 
         constructor(
           timeSource: TimeSource,
           totalDuration: float,
           easing: (progress: float) => float,
+          easingIdentifier: string,
           interpolate: Interpolation,
+          tweenInformation: TweenInformation,
           onFinish?: (() => void) | null
         ) {
           this.timeSource = timeSource;
           this.totalDuration = totalDuration;
           this.easing = easing;
+          this.easingIdentifier = easingIdentifier;
           this.interpolate = interpolate;
+          this.tweenInformation = tweenInformation;
           this.elapsedTime = 0;
           this.onFinish = onFinish || noEffect;
         }
@@ -632,10 +662,13 @@ namespace gdjs {
           return this.elapsedTime / this.totalDuration;
         }
 
+        // To be used for network synchronization.
+        updateElapsedTime(newElapsedTime: float): void {
+          this.elapsedTime = newElapsedTime;
+        }
+
         abstract getNetworkSyncData(): TweenInstanceNetworkSyncData<T>;
-        abstract updateFromNetworkSyncData(
-          syncData: TweenInstanceNetworkSyncData<T>
-        );
+        // No updateFromNetworkSyncData, as a tween is recreated on sync.
       }
 
       /**
@@ -652,13 +685,23 @@ namespace gdjs {
           timeSource: TimeSource,
           totalDuration: float,
           easing: (progress: float) => float,
+          easingIdentifier: string,
           interpolate: Interpolation,
           initialValue: float,
           targetedValue: float,
           setValue: (value: float) => void,
+          tweenInformation: TweenInformation,
           onFinish?: (() => void) | null
         ) {
-          super(timeSource, totalDuration, easing, interpolate, onFinish);
+          super(
+            timeSource,
+            totalDuration,
+            easing,
+            easingIdentifier,
+            interpolate,
+            tweenInformation,
+            onFinish
+          );
           this.initialValue = initialValue;
           this.currentValue = initialValue;
           this.targetedValue = targetedValue;
@@ -683,22 +726,53 @@ namespace gdjs {
           return this.currentValue;
         }
 
-        getNetworkSyncData() {
+        getNetworkSyncData(): TweenInstanceNetworkSyncData<float> {
+          const interpolationString: 'exponential' | 'linear' =
+            this.interpolate === gdjs.evtTools.common.exponentialInterpolation
+              ? 'exponential'
+              : 'linear';
+
+          const tweenInformationNetworkSyncData: TweenInformationNetworkSyncData =
+            {
+              type: this.tweenInformation.type,
+              layerName: this.tweenInformation.layerName,
+              effectName: this.tweenInformation.effectName,
+              propertyName: this.tweenInformation.propertyName,
+              scaleFromCenterOfObject:
+                this.tweenInformation.scaleFromCenterOfObject,
+              useHSLColorTransition:
+                this.tweenInformation.useHSLColorTransition,
+              destroyObjectWhenFinished:
+                this.tweenInformation.destroyObjectWhenFinished,
+            };
+
+          if (
+            this.tweenInformation.variable &&
+            (this.timeSource instanceof gdjs.RuntimeScene ||
+              this.timeSource instanceof gdjs.RuntimeObject)
+          ) {
+            const variablePath = this.timeSource
+              .getVariables()
+              .getVariablePathInContainerByLoopingThroughAllVariables(
+                this.tweenInformation.variable
+              );
+            if (variablePath) {
+              console.log('variablePath', variablePath);
+              tweenInformationNetworkSyncData.variablePath = variablePath;
+            }
+          }
+
           return {
             initialValue: this.initialValue,
             targetedValue: this.targetedValue,
             elapsedTime: this.elapsedTime,
             totalDuration: this.totalDuration,
-            easingIdentifier: 'linear',
-            timeSourceIdentifier: { type: 'scene' }, // TODO: Use correct time source identifier.
-            interpolate:
-              this.interpolate === gdjs.evtTools.common.exponentialInterpolation
-                ? 'exponential'
-                : 'linear',
+            easingIdentifier: this.easingIdentifier,
+            interpolationString,
             isPaused: this.isPaused,
+            tweenInformation: tweenInformationNetworkSyncData,
           };
         }
-        updateFromNetworkSyncData() {}
       }
 
       /**
@@ -718,13 +792,23 @@ namespace gdjs {
           timeSource: TimeSource,
           totalDuration: float,
           easing: (progress: float) => float,
+          easingIdentifier: string,
           interpolate: Interpolation,
           initialValue: Array<float>,
           targetedValue: Array<float>,
           setValue: (value: Array<float>) => void,
+          tweenInformation: TweenInformation,
           onFinish?: (() => void) | null
         ) {
-          super(timeSource, totalDuration, easing, interpolate, onFinish);
+          super(
+            timeSource,
+            totalDuration,
+            easing,
+            easingIdentifier,
+            interpolate,
+            tweenInformation,
+            onFinish
+          );
           this.initialValue = initialValue;
           this.targetedValue = targetedValue;
           this.setValue = setValue;
@@ -751,22 +835,22 @@ namespace gdjs {
           return 0;
         }
 
-        getNetworkSyncData() {
-          return <TweenInstanceNetworkSyncData<Array<float>>>{
+        getNetworkSyncData(): TweenInstanceNetworkSyncData<Array<float>> {
+          const interpolationString: 'exponential' | 'linear' =
+            this.interpolate === gdjs.evtTools.common.exponentialInterpolation
+              ? 'exponential'
+              : 'linear';
+          return {
             initialValue: this.initialValue,
             targetedValue: this.targetedValue,
             elapsedTime: this.elapsedTime,
             totalDuration: this.totalDuration,
-            easingIdentifier: 'linear',
-            timeSourceIdentifier: { type: 'scene' },
-            interpolate:
-              this.interpolate === gdjs.evtTools.common.exponentialInterpolation
-                ? 'exponential'
-                : 'linear',
+            easingIdentifier: this.easingIdentifier,
+            interpolationString,
             isPaused: this.isPaused,
+            tweenInformation: this.tweenInformation,
           };
         }
-        updateFromNetworkSyncData() {}
       }
 
       export const rgbToHsl = (r: number, g: number, b: number): number[] => {

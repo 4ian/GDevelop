@@ -457,10 +457,7 @@ namespace gdjs {
     ): ObjectNetworkSyncData {
       const behaviorNetworkSyncData = {};
       this._behaviors.forEach((behavior) => {
-        if (
-          !behavior.isSyncedOverNetwork() &&
-          !syncOptions.forceSyncEverything
-        ) {
+        if (!behavior.isSyncedOverNetwork() && !syncOptions.syncAllBehaviors) {
           return;
         }
 
@@ -496,7 +493,7 @@ namespace gdjs {
         if: this._instantForces.map((force) => force.getNetworkSyncData()),
         pfx: this._permanentForceX,
         pfy: this._permanentForceY,
-        n: syncOptions.forceSyncEverything ? this.name : undefined,
+        n: syncOptions.syncObjectName ? this.name : undefined,
         beh: behaviorNetworkSyncData,
         var: variablesNetworkSyncData,
         eff: effectsNetworkSyncData,

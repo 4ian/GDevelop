@@ -36,11 +36,9 @@ namespace gdjs {
 
     _loadGameFromSave(saveState: GameSaveState): void {
       const options: UpdateFromNetworkSyncDataOptions = {
-        clearMemory: true,
+        clearSceneStack: true,
+        clearInputs: true,
         keepControl: true,
-        syncSounds: true,
-        syncTimers: true,
-        syncTweens: true,
         ignoreVariableOwnership: true,
       };
 
@@ -356,7 +354,7 @@ namespace gdjs {
 
       this._sceneStackSyncDataToApply = null;
 
-      if (options && options.clearMemory) {
+      if (options && options.clearSceneStack) {
         while (this._stack.length !== 0) {
           let scene = this._stack.pop();
           if (scene) {

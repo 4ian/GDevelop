@@ -111,7 +111,7 @@ class LocalPreviewDebuggerServer {
           );
         }
 
-        if (parsedMessage) {
+        if (parsedMessage && parsedMessage.messageId) {
           const answerCallback = responseCallbacks.get(parsedMessage.messageId);
           if (answerCallback) {
             answerCallback(parsedMessage);

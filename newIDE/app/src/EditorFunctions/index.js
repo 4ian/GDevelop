@@ -28,6 +28,7 @@ import {
   addDefaultLightToAllLayers,
   addDefaultLightToLayer,
 } from '../ProjectCreation/CreateProject';
+import { retryIfFailed } from '../Utils/RetryIfFailed';
 
 const gd: libGDevelop = global.gd;
 
@@ -68,6 +69,9 @@ export type EditorFunctionGenericOutput = {|
   generatedEventsErrorDiagnostics?: string,
   aiGeneratedEventId?: string,
   warnings?: string,
+
+  initializedProject?: boolean,
+  initializedFromTemplateSlug?: string,
 
   // Used for de-duplication of outputs:
   eventsForSceneNamed?: string,
@@ -123,6 +127,12 @@ export type EditorCallbacks = {|
         | 'none',
     |}
   ) => void,
+  onCreateProject: ({|
+    name: string,
+    exampleSlug: string | null,
+  |}) => Promise<{|
+    exampleSlug: string | null,
+  |}>,
 |};
 
 export type SceneEventsOutsideEditorChanges = {|
@@ -134,39 +144,68 @@ export type InstancesOutsideEditorChanges = {|
   scene: gdLayout,
 |};
 
+type RenderForEditorOptions = {|
+  project: gdProject | null,
+  args: any,
+  editorCallbacks: EditorCallbacks,
+  shouldShowDetails: boolean,
+|};
+
+type LaunchFunctionOptionsWithoutProject = {|
+  args: any,
+  editorCallbacks: EditorCallbacks,
+  generateEvents: (
+    options: EventsGenerationOptions
+  ) => Promise<EventsGenerationResult>,
+  onSceneEventsModifiedOutsideEditor: (
+    changes: SceneEventsOutsideEditorChanges
+  ) => void,
+  onInstancesModifiedOutsideEditor: (
+    changes: InstancesOutsideEditorChanges
+  ) => void,
+  ensureExtensionInstalled: (options: {|
+    extensionName: string,
+  |}) => Promise<void>,
+  searchAndInstallAsset: (
+    options: AssetSearchAndInstallOptions
+  ) => Promise<AssetSearchAndInstallResult>,
+|};
+
+type LaunchFunctionOptionsWithProject = {|
+  ...LaunchFunctionOptionsWithoutProject,
+  project: gdProject,
+|};
+
 /**
  * A function that does something in the editor on the given project.
  */
 export type EditorFunction = {|
-  renderForEditor: (options: {|
-    project: gdProject | null,
-    args: any,
-    editorCallbacks: EditorCallbacks,
-    shouldShowDetails: boolean,
-  |}) => {|
+  renderForEditor: (
+    options: RenderForEditorOptions
+  ) => {|
     text: React.Node,
     details?: ?React.Node,
     hasDetailsToShow?: boolean,
   |},
-  launchFunction: (options: {|
-    project: gdProject,
-    args: any,
-    generateEvents: (
-      options: EventsGenerationOptions
-    ) => Promise<EventsGenerationResult>,
-    onSceneEventsModifiedOutsideEditor: (
-      changes: SceneEventsOutsideEditorChanges
-    ) => void,
-    onInstancesModifiedOutsideEditor: (
-      changes: InstancesOutsideEditorChanges
-    ) => void,
-    ensureExtensionInstalled: (options: {|
-      extensionName: string,
-    |}) => Promise<void>,
-    searchAndInstallAsset: (
-      options: AssetSearchAndInstallOptions
-    ) => Promise<AssetSearchAndInstallResult>,
-  |}) => Promise<EditorFunctionGenericOutput>,
+  launchFunction: (
+    options: LaunchFunctionOptionsWithProject
+  ) => Promise<EditorFunctionGenericOutput>,
+|};
+
+/**
+ * A function that does something in the editor.
+ */
+export type EditorFunctionWithoutProject = {|
+  renderForEditor: (
+    options: RenderForEditorOptions
+  ) => {|
+    text: React.Node,
+    details?: ?React.Node,
+    hasDetailsToShow?: boolean,
+  |},
+  launchFunction: (
+    options: LaunchFunctionOptionsWithoutProject
+  ) => Promise<EditorFunctionGenericOutput>,
 |};
 
 /**
@@ -3461,6 +3500,65 @@ const addOrEditVariable: EditorFunction = {
   },
 };
 
+const initializeProject: EditorFunctionWithoutProject = {
+  renderForEditor: ({ args }) => {
+    const project_name = extractRequiredString(args, 'project_name');
+
+    return {
+      text: (
+        <Trans>
+          Initializing a new game project "{<b>{project_name}</b>}".
+        </Trans>
+      ),
+    };
+  },
+  launchFunction: async ({ args, editorCallbacks }) => {
+    const project_name = extractRequiredString(args, 'project_name');
+    const template_slug = extractRequiredString(args, 'template_slug');
+
+    try {
+      const requestedExampleSlug = ['', 'none', 'empty'].includes(
+        template_slug.toLowerCase()
+      )
+        ? null
+        : template_slug;
+      const { exampleSlug } = await retryIfFailed({ times: 2 }, () =>
+        editorCallbacks.onCreateProject({
+          name: project_name,
+          exampleSlug: requestedExampleSlug,
+        })
+      );
+
+      if (exampleSlug) {
+        return {
+          success: true,
+          message: `Initialized project using starter game template "${exampleSlug}".`,
+          initializedProject: true,
+          initializedFromTemplateSlug: exampleSlug,
+        };
+      } else {
+        if (template_slug) {
+          return {
+            success: true,
+            message: `Initialized project but this is an empty project.`,
+            initializedProject: true,
+          };
+        } else {
+          return {
+            success: true,
+            message: `Initialized empty project.`,
+            initializedProject: true,
+          };
+        }
+      }
+    } catch (error) {
+      return makeGenericFailure(
+        'Unable to initialize project. This might be because of a network error. Please try again.'
+      );
+    }
+  },
+};
+
 export const editorFunctions: { [string]: EditorFunction } = {
   create_object: createObject,
   inspect_object_properties: inspectObjectProperties,
@@ -3479,4 +3577,10 @@ export const editorFunctions: { [string]: EditorFunction } = {
   inspect_scene_properties_layers_effects: inspectScenePropertiesLayersEffects,
   change_scene_properties_layers_effects: changeScenePropertiesLayersEffects,
   add_or_edit_variable: addOrEditVariable,
+};
+
+export const editorFunctionsWithoutProject: {
+  [string]: EditorFunctionWithoutProject,
+} = {
+  initialize_project: initializeProject,
 };

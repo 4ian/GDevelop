@@ -332,7 +332,7 @@ namespace gdjs {
       this._jumpKeyHeldSinceJumpStart = behaviorSpecificProps.jkhsjs;
 
       // Clear user inputs between frames only if requested.
-      this._clearInputsBetweenFrames = !!options.clearMemory;
+      this._clearInputsBetweenFrames = !!options.clearInputs;
     }
 
     _getPhysicsPosition(result: Jolt.RVec3): Jolt.RVec3 {

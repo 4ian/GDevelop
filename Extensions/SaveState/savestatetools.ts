@@ -23,15 +23,21 @@ namespace gdjs {
         gameNetworkSyncData: {},
         layoutNetworkSyncDatas: [],
       };
-      const gameData = runtimeScene
-        .getGame()
-        .getNetworkSyncData({ forceSyncEverything: true });
+      const syncOptions: GetNetworkSyncDataOptions = {
+        syncObjectName: true,
+        syncAllBehaviors: true,
+        syncAllVariables: true,
+        syncSounds: true,
+        syncSceneTimers: true,
+        syncTweens: true,
+        syncLayers: true,
+      };
+      const gameData = runtimeScene.getGame().getNetworkSyncData(syncOptions);
       const sceneStack = runtimeScene.getGame()._sceneStack._stack;
       gameSaveState.gameNetworkSyncData = gameData || {};
       sceneStack.forEach((scene, index) => {
-        const sceneDatas = (scene.getNetworkSyncData({
-          forceSyncEverything: true,
-        }) || []) as LayoutNetworkSyncData;
+        const sceneDatas = (scene.getNetworkSyncData(syncOptions) ||
+          []) as LayoutNetworkSyncData;
 
         gameSaveState.layoutNetworkSyncDatas[index] = {
           sceneData: {} as LayoutNetworkSyncData,
@@ -39,9 +45,6 @@ namespace gdjs {
         };
         gameSaveState.layoutNetworkSyncDatas[index].sceneData = sceneDatas;
         const sceneRuntimeObjects = scene.getAdhocListOfAllInstances();
-        const syncOptions: GetNetworkSyncDataOptions = {
-          forceSyncEverything: true,
-        };
         for (const key in sceneRuntimeObjects) {
           if (sceneRuntimeObjects.hasOwnProperty(key)) {
             const object = sceneRuntimeObjects[key];

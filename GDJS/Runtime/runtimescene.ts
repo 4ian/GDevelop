@@ -851,26 +851,42 @@ namespace gdjs {
       if (
         syncedPlayerNumber !== undefined &&
         syncedPlayerNumber !== 1 &&
-        (!this.networkId ||
-          (variablesNetworkSyncData.length === 0 &&
-            !Object.keys(extensionsVariablesSyncData).length))
+        !this.networkId
       ) {
         // If we are getting sync data for a specific player,
-        // and they are not the host, there is no sync data to send if:
-        // - The scene has no networkId (it's either not a multiplayer scene or the scene is not yet networked).
-        // - There are no variables to sync in the scene or extensions.
+        // and they are not the host, there is no sync data to send if
+        // the scene has no networkId (it's either not a multiplayer scene or the scene is not yet networked).
         return null;
       }
 
-      return {
+      const networkSyncData: LayoutNetworkSyncData = {
         var: variablesNetworkSyncData,
         extVar: extensionsVariablesSyncData,
         id: this.getOrCreateNetworkId(),
-        timeManager: this._timeManager.getNetworkSyncData(),
-        tweenManager: gdjs.evtTools.tween
-          .getTweensMap(this)
-          .getNetworkSyncData(),
       };
+      if (syncOptions.syncSceneTimers) {
+        networkSyncData.timeManager = this._timeManager.getNetworkSyncData();
+      }
+      if (syncOptions.syncOnceTriggers) {
+        networkSyncData.onceTriggers = this._onceTriggers.getNetworkSyncData();
+      }
+      // The function gdjs.evtTools.tween.getTweensMap may not exist if the project is not using any tweens,
+      // as it's an extension.
+      if (syncOptions.syncTweens && gdjs.evtTools.tween.getTweensMap) {
+        networkSyncData.tweenManager = gdjs.evtTools.tween
+          .getTweensMap(this)
+          .getNetworkSyncData();
+      }
+      if (syncOptions.syncLayers) {
+        const layersSyncData = {};
+        for (const layerName in this._layers.items) {
+          layersSyncData[layerName] =
+            this._layers.items[layerName].getNetworkSyncData();
+        }
+        networkSyncData.layers = layersSyncData;
+      }
+
+      return networkSyncData;
     }
 
     updateFromNetworkSyncData(
@@ -896,14 +912,37 @@ namespace gdjs {
           }
         }
       }
-      if (syncData.timeManager && options.syncTimers) {
+      if (syncData.timeManager) {
         this._timeManager.updateFromNetworkSyncData(syncData.timeManager);
       }
-      if (syncData.tweenManager && options.syncTweens) {
+      if (syncData.layers) {
+        for (const layerName in syncData.layers) {
+          const layerData = syncData.layers[layerName];
+          if (this.hasLayer(layerName)) {
+            const layer = this.getLayer(layerName);
+            layer.updateFromNetworkSyncData(layerData);
+          }
+        }
+      }
+      if (syncData.onceTriggers) {
+        this._onceTriggers.updateNetworkSyncData(syncData.onceTriggers);
+      }
+      if (syncData.tweenManager && gdjs.evtTools.tween.getTweensMap) {
         gdjs.evtTools.tween.getTweensMap(this).updateFromNetworkSyncData(
           syncData.tweenManager,
-          // TODO: Use correct time source identifier.
-          (timeSourceIdentifier) => this
+          (tweenInformationNetworkSyncData) => {
+            if (tweenInformationNetworkSyncData.layerName !== undefined) {
+              return this.getLayer(tweenInformationNetworkSyncData.layerName);
+            }
+            return this;
+          },
+          (tweenInformationNetworkSyncData) => {
+            return gdjs.evtTools.tween.tweenSetterFactory(this)(
+              tweenInformationNetworkSyncData
+            );
+          },
+          // No onFinish for scene tweens.
+          () => null
         );
       }
     }

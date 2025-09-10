@@ -317,7 +317,7 @@ namespace gdjs {
 
       // When the object is synchronized from the network, the inputs must not be cleared,
       // except if asked specifically.
-      this._clearInputsBetweenFrames = !!options.clearMemory;
+      this._clearInputsBetweenFrames = !!options.clearInputs;
     }
 
     _getPhysicsPosition(result: Jolt.RVec3): Jolt.RVec3 {

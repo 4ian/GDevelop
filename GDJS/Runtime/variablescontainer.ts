@@ -228,6 +228,52 @@ namespace gdjs {
       return null;
     }
 
+    getVariablePathInContainerByLoopingThroughAllVariables(
+      variable: gdjs.Variable,
+      childrenToLookIn: Children | null = null
+    ): string[] | null {
+      console.log('Looking for variable', variable, this._variables);
+
+      const variables = childrenToLookIn || this._variables.items;
+      for (const variableName in variables) {
+        if (variables.hasOwnProperty(variableName)) {
+          const variableItem = variables[variableName];
+          if (variableItem === variable) {
+            return [variableName];
+          } else if (variableItem.getType() === 'structure') {
+            const variableItemChildren = variableItem.getAllChildren();
+            const childPath =
+              this.getVariablePathInContainerByLoopingThroughAllVariables(
+                variable,
+                variableItemChildren
+              );
+            if (childPath) {
+              return [variableName, ...childPath];
+            }
+          }
+        }
+      }
+
+      return null;
+    }
+
+    getVariableFromPath(variablePath: string[]): gdjs.Variable | null {
+      let variableItems = this._variables.items;
+      for (let i = 0; i < variablePath.length; i++) {
+        const part = variablePath[i];
+        const nextVariable = variableItems[part];
+        if (!nextVariable) {
+          return null;
+        }
+        if (i === variablePath.length - 1) {
+          return nextVariable;
+        }
+        variableItems = nextVariable.getAllChildren();
+      }
+
+      return null;
+    }
+
     static _deletedVars: Array<string | undefined> = [];
 
     getNetworkSyncData(
@@ -245,7 +291,7 @@ namespace gdjs {
           // Variable undefined.
           variable.isUndefinedInContainer() ||
           // If we force sync everything, we don't look at the ownership.
-          (!syncOptions.forceSyncEverything &&
+          (!syncOptions.syncAllVariables &&
             // Variable marked as not to be synchronized.
             (variableOwner === null ||
               // Getting sync data for a specific player:
@@ -462,6 +508,12 @@ namespace gdjs {
       },
       getVariableNameInContainerByLoopingThroughAllVariables: function () {
         return '';
+      },
+      getVariablePathInContainerByLoopingThroughAllVariables: function () {
+        return [];
+      },
+      getVariableFromPath: function () {
+        return null;
       },
       rebuildIndexFrom: function () {
         return;

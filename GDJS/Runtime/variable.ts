@@ -9,7 +9,7 @@ namespace gdjs {
   /**
    * Children of a structure.
    */
-  type Children = Record<string, gdjs.Variable>;
+  export type Children = Record<string, gdjs.Variable>;
 
   /**
    * A Variable is an object storing a value (number or a string) or children variables.

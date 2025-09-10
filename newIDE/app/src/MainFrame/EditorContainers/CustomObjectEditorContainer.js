@@ -293,7 +293,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           initialInstances={variant.getInitialInstances()}
           getInitialInstancesEditorSettings={() =>
             prepareInstancesEditorSettings(
-              {}, // TODO
+              {}, // TODO Persist editor settings for custom objects unless we decide that default camera settings are fine.
               Math.max(
                 variant.getAreaMaxX() - variant.getAreaMinX(),
                 variant.getAreaMaxY() - variant.getAreaMinY()

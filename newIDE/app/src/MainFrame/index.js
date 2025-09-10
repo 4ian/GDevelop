@@ -508,7 +508,7 @@ const MainFrame = (props: Props) => {
     setQuickCustomizationDialogOpenedFromGameId,
   ] = React.useState<?string>(null);
 
-  // TODO: move to a preference.
+  // TODO: Make it 2D by default.
   const [gameEditorMode, setGameEditorMode] = React.useState<
     'embedded-game' | 'instances-editor'
   >('embedded-game');

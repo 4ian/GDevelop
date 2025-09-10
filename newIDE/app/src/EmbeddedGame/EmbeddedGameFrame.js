@@ -192,7 +192,7 @@ export const EmbeddedGameFrame = ({
 
   React.useEffect(
     () => {
-      // TODO: use a real context for this?
+      // TODO: use a real context for this to handle several in-game editors.
       onSetEmbededGameFramePreviewLocation = (
         options: AttachToPreviewOptions
       ): void => {

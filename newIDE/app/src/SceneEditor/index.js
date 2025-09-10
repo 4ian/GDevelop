@@ -1186,10 +1186,6 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.props.hotReloadPreviewButtonProps.launchProjectDataOnlyPreview();
   }, 250);
 
-  /**
-   * TODO: Accept parameter that indicates which data has been modified
-   * (position, rotation, size, something else?)
-   */
   _onInstancesModified = (instances: Array<gdInitialInstance>) => {
     this._sendUpdatedInstances(instances);
     this.forceUpdate();

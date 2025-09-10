@@ -227,11 +227,6 @@ export default class LocalPreviewLauncher extends React.Component<
 
     var previewStartTime = performance.now();
 
-    // TODO Filter according to isForInGameEdition
-    // Also search for "in-game-edition preview" when fixing this.
-    const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
-    const shouldHotReload = previewOptions.hotReload && !!debuggerIds.length;
-
     const previewExportOptions = new gd.PreviewExportOptions(
       project,
       outputDir
@@ -276,6 +271,12 @@ export default class LocalPreviewLauncher extends React.Component<
       )
     );
 
+    // TODO Filter according to isForInGameEdition because the first game preview
+    // won't necessarily be the first debugger.
+    // It doesn't have any side effect because when it wont actually do an hot-reload
+    // since the game preview doesn't exist yet.
+    const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
+    const shouldHotReload = previewOptions.hotReload && !!debuggerIds.length;
     if (shouldHotReload) {
       previewExportOptions.setShouldClearExportFolder(false);
       // At hot-reload, the ProjectData are passed into the message.

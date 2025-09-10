@@ -300,7 +300,12 @@ namespace gdjs {
       if (profiler) {
         profiler.end(this.type);
       }
+    }
 
+    override stepBehaviorsPostEvents(
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ): void {
+      super.stepBehaviorsPostEvents(instanceContainer);
       this._instanceContainer._updateObjectsPostEvents();
     }
 

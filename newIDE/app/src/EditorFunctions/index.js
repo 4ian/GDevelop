@@ -1325,7 +1325,10 @@ const iterateOnInstances = (initialInstances, callback) => {
 const put2dInstances: EditorFunction = {
   renderForEditor: ({ args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
-    const object_name = extractRequiredString(args, 'object_name');
+    const object_name = SafeExtractor.extractStringProperty(
+      args,
+      'object_name'
+    );
     const layer_name = extractRequiredString(args, 'layer_name');
     const brush_kind = extractRequiredString(args, 'brush_kind');
     const brush_position = SafeExtractor.extractStringProperty(
@@ -1359,8 +1362,7 @@ const put2dInstances: EditorFunction = {
       return {
         text: (
           <Trans>
-            Erase {existingInstanceCount} instance(s) of object {object_name}{' '}
-            (layer: {layer_name || 'base'}) in scene {scene_name}.
+            Erase {existingInstanceCount} instance(s) in scene {scene_name}.
           </Trans>
         ),
       };
@@ -1413,7 +1415,10 @@ const put2dInstances: EditorFunction = {
   },
   launchFunction: async ({ project, args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
-    const object_name = extractRequiredString(args, 'object_name');
+    const object_name = SafeExtractor.extractStringProperty(
+      args,
+      'object_name'
+    );
     const layer_name = extractRequiredString(args, 'layer_name');
     const brush_kind = extractRequiredString(args, 'brush_kind');
     const brush_position = SafeExtractor.extractStringProperty(
@@ -1449,12 +1454,6 @@ const put2dInstances: EditorFunction = {
     const layout = project.getLayout(scene_name);
     const objectsContainer = layout.getObjects();
 
-    if (!objectsContainer.hasObjectNamed(object_name)) {
-      return makeGenericFailure(
-        `Object not found: "${object_name}" in scene "${scene_name}".`
-      );
-    }
-
     // Check if layer exists (empty string is allowed for base layer)
     if (layer_name !== '' && !layout.hasLayerNamed(layer_name)) {
       return makeGenericFailure(
@@ -1479,8 +1478,6 @@ const put2dInstances: EditorFunction = {
       const notFoundExistingInstanceIds = new Set<string>(existingInstanceIds);
 
       iterateOnInstances(initialInstances, instance => {
-        if (instance.getObjectName() !== object_name) return;
-
         const foundExistingInstanceId = existingInstanceIds.find(id =>
           instance.getPersistentUuid().startsWith(id)
         );
@@ -1489,6 +1486,8 @@ const put2dInstances: EditorFunction = {
           notFoundExistingInstanceIds.delete(foundExistingInstanceId);
           return;
         }
+
+        if (instance.getObjectName() !== object_name) return;
 
         if (!brushPosition) return;
         if (instance.getLayer() !== layer_name) return; // Layer must be the same as specified when deleting instances with a brush.
@@ -1521,7 +1520,7 @@ const put2dInstances: EditorFunction = {
         [
           `Erased ${instancesToDelete.size} instance${
             instancesToDelete.size > 1 ? 's' : ''
-          } of object "${object_name}" on layer "${layer_name || 'base'}".`,
+          }.`,
           notFoundExistingInstanceIds.size > 0
             ? `Could not find these instances to erase:
         ${Array.from(notFoundExistingInstanceIds).join(
@@ -1561,6 +1560,18 @@ const put2dInstances: EditorFunction = {
       // Track changes for detailed success message
       const changes = [];
 
+      if (newInstancesCount > 0 && !object_name) {
+        changes.push(
+          `You've specified to create ${newInstancesCount} instances, but you didn't specify the object name. Please specify the object name.`
+        );
+      }
+      // TODO: make this work for global objects.
+      if (object_name && !objectsContainer.hasObjectNamed(object_name)) {
+        return makeGenericFailure(
+          `Object not found: "${object_name}" in scene "${scene_name}". Please only specify the object name of an object existing in the scene (or create if before if necessary).`
+        );
+      }
+
       // Store original states of existing instances for comparison
       const existingInstanceStates = new Map();
       const notFoundExistingInstanceIds = new Set<string>(existingInstanceIds);
@@ -1568,8 +1579,6 @@ const put2dInstances: EditorFunction = {
       // Create the array of existing instances to move/modify, and new instances to create.
       const modifiedAndCreatedInstances: Array<gdInitialInstance> = [];
       iterateOnInstances(initialInstances, instance => {
-        if (instance.getObjectName() !== object_name) return;
-
         const foundExistingInstanceId = existingInstanceIds.find(id =>
           instance.getPersistentUuid().startsWith(id)
         );
@@ -1603,7 +1612,7 @@ const put2dInstances: EditorFunction = {
 
       for (let i = 0; i < newInstancesCount; i++) {
         const instance = initialInstances.insertNewInitialInstance();
-        instance.setObjectName(object_name);
+        instance.setObjectName(object_name || '');
         instance.setLayer(layer_name);
         modifiedAndCreatedInstances.push(instance);
       }
@@ -1711,7 +1720,8 @@ const put2dInstances: EditorFunction = {
         changes.push(
           `Created ${newInstancesCount} new instance${
             newInstancesCount > 1 ? 's' : ''
-          } of object "${object_name}" using ${brush_kind} brush at ${brushPosition.join(
+          } of object "${object_name ||
+            ''}" using ${brush_kind} brush at ${brushPosition.join(
             ', '
           )} on layer "${layer_name || 'base'}".`
         );
@@ -1839,7 +1849,10 @@ const put2dInstances: EditorFunction = {
 const put3dInstances: EditorFunction = {
   renderForEditor: ({ args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
-    const object_name = extractRequiredString(args, 'object_name');
+    const object_name = SafeExtractor.extractStringProperty(
+      args,
+      'object_name'
+    );
     const layer_name = extractRequiredString(args, 'layer_name');
     const brush_kind = extractRequiredString(args, 'brush_kind');
     const brush_position = SafeExtractor.extractStringProperty(
@@ -1873,8 +1886,7 @@ const put3dInstances: EditorFunction = {
       return {
         text: (
           <Trans>
-            Erase {existingInstanceCount} instance(s) of object {object_name}{' '}
-            (layer: {layer_name || 'base'}) in scene {scene_name}.
+            Erase {existingInstanceCount} instance(s) in scene {scene_name}.
           </Trans>
         ),
       };
@@ -1927,7 +1939,10 @@ const put3dInstances: EditorFunction = {
   },
   launchFunction: async ({ project, args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
-    const object_name = extractRequiredString(args, 'object_name');
+    const object_name = SafeExtractor.extractStringProperty(
+      args,
+      'object_name'
+    );
     const layer_name = extractRequiredString(args, 'layer_name');
     const brush_kind = extractRequiredString(args, 'brush_kind');
     const brush_position = SafeExtractor.extractStringProperty(
@@ -1963,12 +1978,6 @@ const put3dInstances: EditorFunction = {
     const layout = project.getLayout(scene_name);
     const objectsContainer = layout.getObjects();
 
-    if (!objectsContainer.hasObjectNamed(object_name)) {
-      return makeGenericFailure(
-        `Object not found: "${object_name}" in scene "${scene_name}".`
-      );
-    }
-
     // Check if layer exists (empty string is allowed for base layer)
     if (layer_name !== '' && !layout.hasLayerNamed(layer_name)) {
       return makeGenericFailure(
@@ -1993,8 +2002,6 @@ const put3dInstances: EditorFunction = {
       const notFoundExistingInstanceIds = new Set<string>(existingInstanceIds);
 
       iterateOnInstances(initialInstances, instance => {
-        if (instance.getObjectName() !== object_name) return;
-
         const foundExistingInstanceId = existingInstanceIds.find(id =>
           instance.getPersistentUuid().startsWith(id)
         );
@@ -2003,6 +2010,8 @@ const put3dInstances: EditorFunction = {
           notFoundExistingInstanceIds.delete(foundExistingInstanceId);
           return;
         }
+
+        if (instance.getObjectName() !== object_name) return;
 
         if (!brushPosition) return;
         if (instance.getLayer() !== layer_name) return; // Layer must be the same as specified when deleting instances with a brush.
@@ -2037,7 +2046,7 @@ const put3dInstances: EditorFunction = {
         [
           `Erased ${instancesToDelete.size} instance${
             instancesToDelete.size > 1 ? 's' : ''
-          } of object "${object_name}" on layer "${layer_name || 'base'}".`,
+          }.`,
           notFoundExistingInstanceIds.size > 0
             ? `Could not find these instances to erase:
         ${Array.from(notFoundExistingInstanceIds).join(
@@ -2070,6 +2079,18 @@ const put3dInstances: EditorFunction = {
       // Track changes for detailed success message
       const changes = [];
 
+      if (newInstancesCount > 0 && !object_name) {
+        changes.push(
+          `You've specified to create ${newInstancesCount} instances, but you didn't specify the object name. Please specify the object name.`
+        );
+      }
+      // TODO: make this work for global objects.
+      if (object_name && !objectsContainer.hasObjectNamed(object_name)) {
+        return makeGenericFailure(
+          `Object not found: "${object_name}" in scene "${scene_name}". Please only specify the object name of an object existing in the scene (or create if before if necessary).`
+        );
+      }
+
       // Store original states of existing instances for comparison
       const existingInstanceStates = new Map();
       const notFoundExistingInstanceIds = new Set<string>(existingInstanceIds);
@@ -2077,8 +2098,6 @@ const put3dInstances: EditorFunction = {
       // Create the array of existing instances to move/modify, and new instances to create.
       const modifiedAndCreatedInstances: Array<gdInitialInstance> = [];
       iterateOnInstances(initialInstances, instance => {
-        if (instance.getObjectName() !== object_name) return;
-
         const foundExistingInstanceId = existingInstanceIds.find(id =>
           instance.getPersistentUuid().startsWith(id)
         );
@@ -2115,7 +2134,7 @@ const put3dInstances: EditorFunction = {
 
       for (let i = 0; i < newInstancesCount; i++) {
         const instance = initialInstances.insertNewInitialInstance();
-        instance.setObjectName(object_name);
+        instance.setObjectName(object_name || '');
         instance.setLayer(layer_name);
         modifiedAndCreatedInstances.push(instance);
       }
@@ -2208,7 +2227,8 @@ const put3dInstances: EditorFunction = {
         changes.push(
           `Created ${newInstancesCount} new instance${
             newInstancesCount > 1 ? 's' : ''
-          } of object "${object_name}" using ${brush_kind} brush at ${brushPosition.join(
+          } of object "${object_name ||
+            ''}" using ${brush_kind} brush at ${brushPosition.join(
             ', '
           )} on layer "${layer_name || 'base'}".`
         );

@@ -87,7 +87,9 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
     editorFunctionCallResult.status === 'working';
 
   const editorFunction: EditorFunction | EditorFunctionWithoutProject | null =
-    editorFunctions[functionCall.name] || editorFunctionsWithoutProject[functionCall.name] || null;
+    editorFunctions[functionCall.name] ||
+    editorFunctionsWithoutProject[functionCall.name] ||
+    null;
   let text;
   let details;
   let hasDetailsToShow = false;

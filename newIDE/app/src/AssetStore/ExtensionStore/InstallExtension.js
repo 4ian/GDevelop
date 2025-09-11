@@ -14,7 +14,7 @@ import { mapVector } from '../../Utils/MapFor';
 import {
   type ShowAlertDialogOptions,
   type ShowConfirmDialogOptions,
-} from './AlertContext';
+} from '../../UI/Alert/AlertContext';
 
 const gd: libGDevelop = global.gd;
 

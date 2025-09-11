@@ -580,7 +580,12 @@ namespace gdjs {
      */
     _updateObjectsPostEvents() {
       this._cacheOrClearRemovedInstances();
+    }
 
+    /**
+     * Call each behavior stepPostEvents method.
+     */
+    _stepBehaviorsPostEvents() {
       // It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
       // may delete the objects.
       const allInstancesList = this.getAdhocListOfAllInstances();

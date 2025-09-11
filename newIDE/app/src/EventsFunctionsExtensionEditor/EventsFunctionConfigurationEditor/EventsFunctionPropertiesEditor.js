@@ -563,10 +563,9 @@ export const EventsFunctionPropertiesEditor = ({
                     >
                       <Trans>
                         This is an asynchronous action, meaning that the actions
-                        and sub-events following it will wait for it to end.
-                        This function events are only executed once, you should
-                        use other async actions like "wait" to schedule your
-                        actions and don't forget to use the action "End
+                        and sub-events following it will wait for it to end. You
+                        should use other async actions like "wait" to schedule
+                        your actions and don't forget to use the action "End
                         asynchronous function" to mark the end of the action.
                       </Trans>
                     </AlertMessage>

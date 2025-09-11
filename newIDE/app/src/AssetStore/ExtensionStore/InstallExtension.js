@@ -9,8 +9,10 @@ import {
 import { addSerializedExtensionsToProject } from '../InstallAsset';
 import { type EventsFunctionsExtensionsState } from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { t } from '@lingui/macro';
-import Window from '../../Utils/Window';
 import { retryIfFailed } from '../../Utils/RetryIfFailed';
+import { mapVector } from '../../Utils/MapFor';
+
+const gd: libGDevelop = global.gd;
 
 /**
  * Download and add the extension in the project.
@@ -51,7 +53,9 @@ export const importExtension = async (
   i18n: I18nType,
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   project: gdProject,
-  onWillInstallExtension: (extensionName: string) => void
+  onWillInstallExtension: (extensionName: string) => void,
+  showConfirmation: () => Promise<boolean>,
+  showAlert: () => Promise<void>
 ): Promise<string | null> => {
   const eventsFunctionsExtensionOpener = eventsFunctionsExtensionsState.getEventsFunctionsExtensionOpener();
   if (!eventsFunctionsExtensionOpener) return null;
@@ -65,12 +69,30 @@ export const importExtension = async (
     );
 
     if (project.hasEventsFunctionsExtensionNamed(serializedExtension.name)) {
-      const answer = Window.showConfirmDialog(
-        i18n._(
-          t`An extension with this name already exists in the project. Importing this extension will replace it: are you sure you want to continue?`
-        )
-      );
+      const answer = await showConfirmation({
+        title: t`Replace existing extension`,
+        message: t`An extension with this name already exists in the project. Importing this extension will replace it.`,
+        confirmButtonLabel: `Replace`,
+      });
       if (!answer) return null;
+    }
+    else {
+      let hasConflictWithBuiltInExtension = false;
+      const allExtensions = gd
+        .asPlatform(gd.JsPlatform.get())
+        .getAllPlatformExtensions();
+      mapVector(allExtensions, extension => {
+        if (extension.getName() === serializedExtension.name) {
+          hasConflictWithBuiltInExtension = true;
+        }
+      });
+      if (hasConflictWithBuiltInExtension) {
+        await showAlert({
+          title: t`Invalid name`,
+          message: t`The imported extension has the same name as a built-in extension. It can't be imported.`,
+        });
+        return null;
+      }
     }
 
     onWillInstallExtension(serializedExtension.name);

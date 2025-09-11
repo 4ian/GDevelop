@@ -104,8 +104,7 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
     const isCollection = isCollectionVariable(variable);
 
     if (isCollection) {
-      // Don't diplay children of arrays, and only display the first level of children of structures.
-      if (variable.getType() === gd.Variable.Structure && depth === 0) {
+      if (variable.getType() === gd.Variable.Structure) {
         return {
           variableName: name,
           type: getVariableType(variable),
@@ -117,11 +116,20 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
               return getSimplifiedVariable(childName, childVariable, depth + 1);
             }),
         };
+      } else if (variable.getType() === gd.Variable.Array) {
+        return {
+          variableName: name,
+          type: getVariableType(variable),
+          variableChildren: mapFor(0, variable.getChildrenCount(), index => {
+            const childVariable = variable.getAtIndex(index);
+            return getSimplifiedVariable(
+              index.toString(),
+              childVariable,
+              depth + 1
+            );
+          }),
+        };
       }
-      return {
-        variableName: name,
-        type: getVariableType(variable),
-      };
     }
 
     return {
@@ -134,7 +142,7 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
   const getSimplifiedVariablesContainerJson = (
     container: gdVariablesContainer
   ): Array<SimplifiedVariable> => {
-    return mapFor(0, Math.min(container.count(), 20), (index: number) => {
+    return mapFor(0, container.count(), (index: number) => {
       const name = container.getNameAt(index);
       const variable = container.getAt(index);
       return getSimplifiedVariable(name, variable);

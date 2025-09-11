@@ -576,9 +576,9 @@ namespace gdjs {
     }
 
     /**
-     * Update the objects (update positions, time management...)
+     * Call each behavior stepPostEvents method.
      */
-    _updateObjectsPostEvents() {
+    _stepBehaviorsPostEvents() {
       this._cacheOrClearRemovedInstances();
 
       // It is *mandatory* to create and iterate on a external list of all objects, as the behaviors

@@ -11,6 +11,10 @@ import { type EventsFunctionsExtensionsState } from '../../EventsFunctionsExtens
 import { t } from '@lingui/macro';
 import { retryIfFailed } from '../../Utils/RetryIfFailed';
 import { mapVector } from '../../Utils/MapFor';
+import {
+  type ShowAlertDialogOptions,
+  type ShowConfirmDialogOptions,
+} from './AlertContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -54,8 +58,8 @@ export const importExtension = async (
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   project: gdProject,
   onWillInstallExtension: (extensionName: string) => void,
-  showConfirmation: () => Promise<boolean>,
-  showAlert: () => Promise<void>
+  showConfirmation: ShowConfirmDialogOptions => Promise<boolean>,
+  showAlert: ShowAlertDialogOptions => Promise<void>
 ): Promise<string | null> => {
   const eventsFunctionsExtensionOpener = eventsFunctionsExtensionsState.getEventsFunctionsExtensionOpener();
   if (!eventsFunctionsExtensionOpener) return null;
@@ -75,8 +79,7 @@ export const importExtension = async (
         confirmButtonLabel: `Replace`,
       });
       if (!answer) return null;
-    }
-    else {
+    } else {
       let hasConflictWithBuiltInExtension = false;
       const allExtensions = gd
         .asPlatform(gd.JsPlatform.get())

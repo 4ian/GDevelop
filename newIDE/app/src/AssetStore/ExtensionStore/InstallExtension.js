@@ -89,7 +89,7 @@ export const importExtension = async (
       if (hasConflictWithBuiltInExtension) {
         await showAlert({
           title: t`Invalid name`,
-          message: t`The imported extension has the same name as a built-in extension. It can't be imported.`,
+          message: t`The extension can't be imported because it has the same name as a built-in extension.`,
         });
         return null;
       }

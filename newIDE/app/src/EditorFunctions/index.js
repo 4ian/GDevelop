@@ -76,6 +76,7 @@ export type EditorFunctionGenericOutput = {|
 
   initializedProject?: boolean,
   initializedFromTemplateSlug?: string,
+  eventsAsTextByScene?: { [string]: string },
 
   // Used for de-duplication of outputs:
   eventsForSceneNamed?: string,
@@ -136,6 +137,7 @@ export type EditorCallbacks = {|
     name: string,
     exampleSlug: string | null,
   |}) => Promise<{|
+    createdProject: gdProject | null,
     exampleSlug: string | null,
   |}>,
 |};
@@ -724,6 +726,13 @@ const inspectObjectProperties: EditorFunction = {
   },
 };
 
+const isPropertyForChangingObjectName = (propertyName: string): boolean => {
+  return (
+    propertyName.toLowerCase() === 'name' ||
+    propertyName.toLowerCase().replace(/-|_| /, '') === 'objectname'
+  );
+};
+
 /**
  * Changes a property of a specific object in a scene
  */
@@ -733,6 +742,29 @@ const changeObjectProperty: EditorFunction = {
     const object_name = extractRequiredString(args, 'object_name');
     const property_name = extractRequiredString(args, 'property_name');
     const new_value = extractRequiredString(args, 'new_value');
+
+    if (isPropertyForChangingObjectName(property_name)) {
+      return {
+        text: (
+          <Trans>
+            Rename object "{object_name}" to "<b>{new_value}</b>" (in scene{' '}
+            <Link
+              href="#"
+              onClick={() =>
+                editorCallbacks.onOpenLayout(scene_name, {
+                  openEventsEditor: true,
+                  openSceneEditor: true,
+                  focusWhenOpened: 'scene',
+                })
+              }
+            >
+              {scene_name}
+            </Link>
+            ).
+          </Trans>
+        ),
+      };
+    }
 
     const makeText = (propertyLabel: string) => {
       return {
@@ -791,15 +823,68 @@ const changeObjectProperty: EditorFunction = {
     }
 
     const layout = project.getLayout(scene_name);
-    const objectsContainer = layout.getObjects();
 
-    if (!objectsContainer.hasObjectNamed(object_name)) {
+    let isGlobalObject = false;
+    let object: gdObject | null = null;
+
+    if (layout.getObjects().hasObjectNamed(object_name)) {
+      object = layout.getObjects().getObject(object_name);
+    } else if (project.getObjects().hasObjectNamed(object_name)) {
+      object = project.getObjects().getObject(object_name);
+      isGlobalObject = true;
+    } else {
       return makeGenericFailure(
-        `Object not found: "${object_name}" in scene "${scene_name}".`
+        `Object not found: "${object_name}" in scene "${scene_name}", nor in the global objects.`
       );
     }
 
-    const object = objectsContainer.getObject(object_name);
+    if (isPropertyForChangingObjectName(property_name)) {
+      if (object.getName() === new_value) {
+        return makeGenericSuccess(
+          `Object "${object_name}" already has the name "${new_value}", no need to rename it. Continue assuming this name is correct and valid.`
+        );
+      }
+
+      const objectsContainersList = gd.ObjectsContainersList.makeNewObjectsContainersListForProjectAndLayout(
+        project,
+        layout
+      );
+
+      const newName = newNameGenerator(
+        gd.Project.getSafeName(new_value),
+        tentativeNewName =>
+          objectsContainersList.hasObjectOrGroupNamed(tentativeNewName)
+      );
+
+      if (layout) {
+        if (isGlobalObject) {
+          gd.WholeProjectRefactorer.globalObjectOrGroupRenamed(
+            project,
+            object.getName(),
+            newName,
+            /* isObjectGroup=*/ false
+          );
+        } else {
+          gd.WholeProjectRefactorer.objectOrGroupRenamedInScene(
+            project,
+            layout,
+            object.getName(),
+            newName,
+            /* isObjectGroup=*/ false
+          );
+        }
+      }
+      // Note: gd.WholeProjectRefactorer.objectOrGroupRenamedInEventsBasedObject to be added here
+      // if events-based objects can be handled by AI one day.
+
+      object.setName(newName);
+
+      return makeGenericSuccess(
+        `Renamed object "${object_name}" to "${newName}". Events and everything else refering to this object having been also updated. Continue assuming the object has now the name "${newName}" and the whole project has been updated for it.`
+      );
+    }
+
+    // Changing a "usual" property of an object:
     const objectConfiguration = object.getConfiguration();
     const objectProperties = objectConfiguration.getProperties();
 
@@ -3644,6 +3729,10 @@ const initializeProject: EditorFunctionWithoutProject = {
   launchFunction: async ({ args, editorCallbacks }) => {
     const project_name = extractRequiredString(args, 'project_name');
     const template_slug = extractRequiredString(args, 'template_slug');
+    const also_read_existing_events = SafeExtractor.extractBooleanProperty(
+      args,
+      'also_read_existing_events'
+    );
 
     try {
       const requestedExampleSlug = ['', 'none', 'empty'].includes(
@@ -3651,35 +3740,53 @@ const initializeProject: EditorFunctionWithoutProject = {
       )
         ? null
         : template_slug;
-      const { exampleSlug } = await retryIfFailed({ times: 2 }, () =>
-        editorCallbacks.onCreateProject({
-          name: project_name,
-          exampleSlug: requestedExampleSlug,
-        })
+      const { exampleSlug, createdProject } = await retryIfFailed(
+        { times: 2 },
+        () =>
+          editorCallbacks.onCreateProject({
+            name: project_name,
+            exampleSlug: requestedExampleSlug,
+          })
       );
 
+      if (!createdProject) {
+        throw new Error('Unexpected null project after creation.');
+      }
+
+      const output: EditorFunctionGenericOutput = {
+        success: true,
+      };
+
+      if (also_read_existing_events) {
+        const eventsAsTextByScene = {};
+        mapFor(0, createdProject.getLayoutsCount(), i => {
+          const scene = createdProject.getLayoutAt(i);
+          const events = scene.getEvents();
+          eventsAsTextByScene[
+            scene.getName()
+          ] = renderNonTranslatedEventsAsText({
+            eventsList: events,
+          });
+        });
+
+        output.eventsAsTextByScene = eventsAsTextByScene;
+      }
+
       if (exampleSlug) {
-        return {
-          success: true,
-          message: `Initialized project using starter game template "${exampleSlug}".`,
-          initializedProject: true,
-          initializedFromTemplateSlug: exampleSlug,
-        };
+        output.message = `Initialized project using starter game template "${exampleSlug}".`;
+        output.initializedProject = true;
+        output.initializedFromTemplateSlug = exampleSlug;
       } else {
         if (template_slug) {
-          return {
-            success: true,
-            message: `Initialized project but this is an empty project.`,
-            initializedProject: true,
-          };
+          output.message = `Initialized project but this is an empty project.`;
+          output.initializedProject = true;
         } else {
-          return {
-            success: true,
-            message: `Initialized empty project.`,
-            initializedProject: true,
-          };
+          output.message = `Initialized empty project.`;
+          output.initializedProject = true;
         }
       }
+
+      return output;
     } catch (error) {
       return makeGenericFailure(
         'Unable to initialize project. This might be because of a network error. Please try again.'

@@ -58,6 +58,7 @@ import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
 import { prepareAiUserContent } from './PrepareAiUserContent';
 import { AiRequestContext } from './AiRequestContext';
 import { getAiConfigurationPresetsWithAvailability } from './AiConfiguration';
+import { type CreateProjectResult } from '../Utils/UseCreateProject';
 
 const gd: libGDevelop = global.gd;
 
@@ -342,8 +343,10 @@ type Props = {|
     newProjectSetup: NewProjectSetup,
     i18n: I18nType,
     isQuickCustomization?: boolean
-  ) => Promise<void>,
-  onCreateEmptyProject: (newProjectSetup: NewProjectSetup) => Promise<void>,
+  ) => Promise<CreateProjectResult>,
+  onCreateEmptyProject: (
+    newProjectSetup: NewProjectSetup
+  ) => Promise<CreateProjectResult>,
   onOpenLayout: (
     sceneName: string,
     options: {|
@@ -446,26 +449,26 @@ export const AskAiEditor = React.memo<Props>(
               header => header.slug === exampleSlug
             );
             if (exampleShortHeader) {
-              await onCreateProjectFromExample(
+              const { createdProject } = await onCreateProjectFromExample(
                 exampleShortHeader,
                 newProjectSetup,
                 i18n,
                 false
               );
-              return { exampleSlug };
+              return { exampleSlug, createdProject };
             }
 
             // The example was not found - still create an empty project.
           }
 
-          await onCreateEmptyProject({
+          const { createdProject } = await onCreateEmptyProject({
             projectName: name,
             storageProvider: UrlStorageProvider,
             saveAsLocation: null,
             dontOpenAnySceneOrProjectManager: true,
           });
 
-          return { exampleSlug: null };
+          return { exampleSlug: null, createdProject };
         },
         [onCreateProjectFromExample, onCreateEmptyProject, i18n]
       );

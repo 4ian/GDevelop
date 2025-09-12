@@ -44,6 +44,7 @@ import useCourses from './UseCourses';
 import PreferencesContext from '../../Preferences/PreferencesContext';
 import useSubscriptionPlans from '../../../Utils/UseSubscriptionPlans';
 import { BundleStoreContext } from '../../../AssetStore/Bundles/BundleStoreContext';
+import { type CreateProjectResult } from '../../../Utils/UseCreateProject';
 
 const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
   if (
@@ -149,7 +150,7 @@ type Props = {|
     newProjectSetup: NewProjectSetup,
     i18n: I18nType,
     isQuickCustomization?: boolean
-  ) => Promise<void>,
+  ) => Promise<CreateProjectResult>,
   onOpenTemplateFromTutorial: (tutorialId: string) => Promise<void>,
   onOpenTemplateFromCourseChapter: (
     CourseChapter,

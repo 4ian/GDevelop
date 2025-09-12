@@ -57,7 +57,7 @@ const commonProps = {
   ],
   editorCallbacks: {
     onOpenLayout: action('onOpenLayout'),
-    onCreateProject: async () => ({ exampleSlug: null }),
+    onCreateProject: async () => ({ exampleSlug: null, createdProject: null }),
   },
   project: null,
   quota: {

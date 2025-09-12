@@ -204,9 +204,10 @@ export const applyVariableChange = ({
 
     return {
       variable,
-      variableType: variable.getType() === gd.Variable.Array ? 'Array' : 'Structure',
+      variableType:
+        variable.getType() === gd.Variable.Array ? 'Array' : 'Structure',
       addedNewVariable,
-    }
+    };
   } else {
     // Value is a primitive, or not a valid Object/Array in JSON:
 

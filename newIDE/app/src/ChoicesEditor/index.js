@@ -14,7 +14,10 @@ import RaisedButton from '../UI/RaisedButton';
 import Add from '../UI/CustomSvgIcons/Add';
 import Trash from '../UI/CustomSvgIcons/Trash';
 
-export type Choice = { value: string, label: string };
+export type Choice = {|
+  value: string,
+  label: string,
+|};
 
 type ChoicesEditorProps = {|
   choices: Array<Choice>,

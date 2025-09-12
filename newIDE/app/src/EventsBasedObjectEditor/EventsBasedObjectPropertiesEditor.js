@@ -414,7 +414,6 @@ export default function EventsBasedObjectPropertiesEditor({
         property.clearChoices();
         for (const choice of choices) {
           property.addChoice(choice.value, choice.label);
-          console.log('Add choice', choice.value, choice.label);
         }
         property.setValue(
           getChoicesArray(property).includes(property.getValue())

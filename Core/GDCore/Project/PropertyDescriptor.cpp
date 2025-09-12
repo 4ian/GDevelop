@@ -40,7 +40,7 @@ void PropertyDescriptor::SerializeTo(SerializerElement& element) const {
   // end of compatibility code
 ) {
     SerializerElement& choicesElement =
-        element.AddChild("extraInformation");
+        element.AddChild("choices");
     choicesElement.ConsiderAsArrayOf("choice");
     for (const auto& choice : choices) {
       auto &choiceElement = choicesElement.AddChild("Choice");

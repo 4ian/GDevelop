@@ -35,14 +35,13 @@ void PropertyDescriptor::SerializeTo(SerializerElement& element) const {
   }
 
   if (!choices.empty()
-  // Compatibility with GD <= 5.5.239
-  || !extraInformation.empty()
-  // end of compatibility code
-) {
-    SerializerElement& choicesElement =
-        element.AddChild("choices");
+      // Compatibility with GD <= 5.5.239
+      || !extraInformation.empty()
+      // end of compatibility code
+  ) {
+    SerializerElement &choicesElement = element.AddChild("choices");
     choicesElement.ConsiderAsArrayOf("choice");
-    for (const auto& choice : choices) {
+    for (const auto &choice : choices) {
       auto &choiceElement = choicesElement.AddChild("Choice");
       choiceElement.SetStringAttribute("value", choice.GetValue());
       choiceElement.SetStringAttribute("label", choice.GetLabel());

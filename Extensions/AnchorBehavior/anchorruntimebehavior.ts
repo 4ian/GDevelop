@@ -473,7 +473,14 @@ namespace gdjs {
       this._parentOldMaxY = instanceContainer.getUnrotatedViewportMaxY();
     }
 
-    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
+    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+      // Custom objects can be resized during the events step.
+      // The anchor constraints must be applied on child-objects after the parent events.
+      const isChildObject = instanceContainer !== instanceContainer.getScene();
+      if (isChildObject) {
+        this.doStepPreEvents(instanceContainer);
+      }
+    }
 
     private _convertCoords(
       instanceContainer: gdjs.RuntimeInstanceContainer,

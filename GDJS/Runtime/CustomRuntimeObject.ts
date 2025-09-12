@@ -288,8 +288,13 @@ namespace gdjs {
       if (profiler) {
         profiler.end(this.type);
       }
+    }
 
-      this._instanceContainer._updateObjectsPostEvents();
+    override stepBehaviorsPostEvents(
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ): void {
+      super.stepBehaviorsPostEvents(instanceContainer);
+      this._instanceContainer._stepBehaviorsPostEvents();
     }
 
     /**

@@ -76,6 +76,7 @@ void ObjectAssetSerializer::SerializeTo(
 
   double width = 0;
   double height = 0;
+  std::unordered_set<gd::String> alreadyUsedVariantIdentifiers;
   if (project.HasEventsBasedObject(object.GetType())) {
     SerializerElement &variantsElement =
         objectAssetElement.AddChild("variants");
@@ -87,7 +88,6 @@ void ObjectAssetSerializer::SerializeTo(
       height = variant->GetAreaMaxY() - variant->GetAreaMinY();
     }
 
-    std::unordered_set<gd::String> alreadyUsedVariantIdentifiers;
     gd::ObjectAssetSerializer::SerializeUsedVariantsTo(
         project, object, variantsElement, alreadyUsedVariantIdentifiers);
   }
@@ -114,14 +114,24 @@ void ObjectAssetSerializer::SerializeTo(
     resourceElement.SetAttribute("name", resource.GetName());
   }
 
+  std::unordered_set<gd::String> usedExtensionNames;
+  usedExtensionNames.insert(extensionName);
+  for (auto &usedVariantIdentifier : alreadyUsedVariantIdentifiers) {
+    usedExtensionNames.insert(PlatformExtension::GetExtensionFromFullObjectType(
+        usedVariantIdentifier));
+  }
   SerializerElement &requiredExtensionsElement =
       objectAssetElement.AddChild("requiredExtensions");
   requiredExtensionsElement.ConsiderAsArrayOf("requiredExtension");
-  if (project.HasEventsFunctionsExtensionNamed(extensionName)) {
-    SerializerElement &requiredExtensionElement =
-        requiredExtensionsElement.AddChild("requiredExtension");
-    requiredExtensionElement.SetAttribute("extensionName", extensionName);
-    requiredExtensionElement.SetAttribute("extensionVersion", "1.0.0");
+  for (auto &usedExtensionName : usedExtensionNames) {
+    if (project.HasEventsFunctionsExtensionNamed(usedExtensionName)) {
+      auto &extension = project.GetEventsFunctionsExtension(usedExtensionName);
+      SerializerElement &requiredExtensionElement =
+          requiredExtensionsElement.AddChild("requiredExtension");
+      requiredExtensionElement.SetAttribute("extensionName", usedExtensionName);
+      requiredExtensionElement.SetAttribute("extensionVersion",
+                                            extension.GetVersion());
+    }
   }
 
   // TODO This can be removed when the asset script no longer require it.

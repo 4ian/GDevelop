@@ -411,7 +411,7 @@ namespace gdjs {
       if (this._profiler) {
         this._profiler.begin('objects (post-events)');
       }
-      this._updateObjectsPostEvents();
+      this._stepBehaviorsPostEvents();
       if (this._profiler) {
         this._profiler.end('objects (post-events)');
       }

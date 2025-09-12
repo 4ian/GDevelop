@@ -324,7 +324,7 @@ namespace gdjs {
       const reloadPromises: Array<Promise<void>> = [];
 
       // Reload events, only if they were exported.
-      if (!shouldGenerateScenesEventsCode) {
+      if (shouldGenerateScenesEventsCode) {
         newProjectData.layouts.forEach((_layoutData, index) => {
           reloadPromises.push(this._reloadScript('code' + index + '.js'));
         });

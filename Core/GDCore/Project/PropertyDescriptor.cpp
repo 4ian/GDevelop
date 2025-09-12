@@ -106,7 +106,7 @@ void PropertyDescriptor::UnserializeFrom(const SerializerElement& element) {
     }
   }
   // Compatibility with GD <= 5.5.239
-  else if (type == "Choices") {
+  else if (type == "Choice") {
     choices.clear();
     for (auto &choiceValue : extraInformation) {
       AddChoice(choiceValue, choiceValue);

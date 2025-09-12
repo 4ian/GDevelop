@@ -34,6 +34,20 @@ void PropertyDescriptor::SerializeTo(SerializerElement& element) const {
     }
   }
 
+  if (!choices.empty()
+      // Compatibility with GD <= 5.5.239
+      || !extraInformation.empty()
+      // end of compatibility code
+  ) {
+    SerializerElement &choicesElement = element.AddChild("choices");
+    choicesElement.ConsiderAsArrayOf("choice");
+    for (const auto &choice : choices) {
+      auto &choiceElement = choicesElement.AddChild("Choice");
+      choiceElement.SetStringAttribute("value", choice.GetValue());
+      choiceElement.SetStringAttribute("label", choice.GetLabel());
+    }
+  }
+
   if (hidden) {
     element.AddChild("hidden").SetBoolValue(hidden);
   }
@@ -79,6 +93,26 @@ void PropertyDescriptor::UnserializeFrom(const SerializerElement& element) {
       extraInformation.push_back(
           extraInformationElement.GetChild(i).GetStringValue());
   }
+
+  if (element.HasChild("choices")) {
+    choices.clear();
+    const SerializerElement &choicesElement = element.GetChild("choices");
+    choicesElement.ConsiderAsArrayOf("choice");
+    for (std::size_t i = 0; i < choicesElement.GetChildrenCount(); ++i) {
+      auto &choiceElement = choicesElement.GetChild(i);
+      AddChoice(choiceElement.GetStringAttribute("value"),
+                choiceElement.GetStringAttribute("label"));
+    }
+  }
+  // Compatibility with GD <= 5.5.239
+  else if (type == "Choice") {
+    choices.clear();
+    for (auto &choiceValue : extraInformation) {
+      AddChoice(choiceValue, choiceValue);
+    }
+    extraInformation.clear();
+  }
+  // end of compatibility code
 
   hidden = element.HasChild("hidden")
                ? element.GetChild("hidden").GetBoolValue()

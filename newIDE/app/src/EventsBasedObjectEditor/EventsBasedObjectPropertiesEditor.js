@@ -15,7 +15,7 @@ import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
-import StringArrayEditor from '../StringArrayEditor';
+import ChoicesEditor, { type Choice } from '../ChoicesEditor';
 import ColorField from '../UI/ColorField';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
@@ -119,9 +119,13 @@ const getValidatedPropertyName = (
   return safeAndUniqueNewName;
 };
 
-const getExtraInfoArray = (property: gdNamedPropertyDescriptor) => {
-  const extraInfoVector = property.getExtraInfo();
-  return extraInfoVector.toJSArray();
+const getChoicesArray = (
+  property: gdNamedPropertyDescriptor
+): Array<Choice> => {
+  return mapVector(property.getChoices(), choice => ({
+    value: choice.getValue(),
+    label: choice.getLabel(),
+  }));
 };
 
 export default function EventsBasedObjectPropertiesEditor({
@@ -404,17 +408,18 @@ export default function EventsBasedObjectPropertiesEditor({
     [eventsBasedObject, forceUpdate, onPropertiesUpdated]
   );
 
-  const setChoiceExtraInfo = React.useCallback(
+  const setChoices = React.useCallback(
     (property: gdNamedPropertyDescriptor) => {
-      return (newExtraInfo: Array<string>) => {
-        const defaultValueIndex = getExtraInfoArray(property).indexOf(
-          property.getValue()
+      return (choices: Array<Choice>) => {
+        property.clearChoices();
+        for (const choice of choices) {
+          property.addChoice(choice.value, choice.label);
+        }
+        property.setValue(
+          getChoicesArray(property).includes(property.getValue())
+            ? property.getValue()
+            : ''
         );
-        const vectorString = new gd.VectorString();
-        newExtraInfo.forEach(item => vectorString.push_back(item));
-        property.setExtraInfo(vectorString);
-        vectorString.delete();
-        property.setValue(newExtraInfo[defaultValueIndex] || '');
         forceUpdate();
       };
     },
@@ -877,12 +882,12 @@ export default function EventsBasedObjectPropertiesEditor({
                                           }}
                                           fullWidth
                                         >
-                                          {getExtraInfoArray(property).map(
+                                          {getChoicesArray(property).map(
                                             (choice, index) => (
                                               <SelectOption
                                                 key={index}
-                                                value={choice}
-                                                label={choice}
+                                                value={choice.value}
+                                                label={choice.label}
                                               />
                                             )
                                           )}
@@ -906,11 +911,9 @@ export default function EventsBasedObjectPropertiesEditor({
                                       )}
                                     </ResponsiveLineStackLayout>
                                     {property.getType() === 'Choice' && (
-                                      <StringArrayEditor
-                                        extraInfo={getExtraInfoArray(property)}
-                                        setExtraInfo={setChoiceExtraInfo(
-                                          property
-                                        )}
+                                      <ChoicesEditor
+                                        choices={getChoicesArray(property)}
+                                        setChoices={setChoices(property)}
                                       />
                                     )}
                                     <ResponsiveLineStackLayout noMargin>

@@ -1174,6 +1174,7 @@ interface PropertyDescriptor {
     [Const, Ref] DOMString GetDescription();
     [Ref] PropertyDescriptor SetGroup([Const] DOMString label);
     [Const, Ref] DOMString GetGroup();
+    [Ref] PropertyDescriptor ClearChoices();
     [Ref] PropertyDescriptor AddChoice([Const] DOMString value, [Const] DOMString label);
     [Const, Ref] VectorPropertyDescriptorChoice GetChoices();
     [Ref] PropertyDescriptor AddExtraInfo([Const] DOMString type);

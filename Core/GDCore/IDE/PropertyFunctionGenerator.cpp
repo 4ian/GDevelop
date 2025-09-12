@@ -248,12 +248,13 @@ gd::String PropertyFunctionGenerator::GetStringifiedExtraInfo(
     gd::String arrayString;
     arrayString += "[";
     bool isFirst = true;
-    for (const gd::String &choice : property.GetExtraInfo()) {
+    for (const auto &choice : property.GetChoices()) {
       if (!isFirst) {
         arrayString += ",";
       }
       isFirst = false;
-      arrayString += "\"" + choice + "\"";
+      // TODO Handle labels (and search "choice label")
+      arrayString += "\"" + choice.GetValue() + "\"";
     }
     arrayString += "]";
     return arrayString;

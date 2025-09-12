@@ -116,6 +116,11 @@ class GD_CORE_API PropertyDescriptor {
     return *this;
   }
 
+  PropertyDescriptor& ClearChoices() {
+    choices.clear();
+    return *this;
+  }
+
   PropertyDescriptor& AddChoice(const gd::String& value,
                                 const gd::String& label) {
     choices.push_back(PropertyDescriptorChoice(value, label));

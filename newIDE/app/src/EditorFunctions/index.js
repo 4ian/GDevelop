@@ -81,6 +81,7 @@ export type EditorFunctionGenericOutput = {|
   // Used for de-duplication of outputs:
   eventsForSceneNamed?: string,
   instancesForSceneNamed?: string,
+  instancesOnlyForObjectsNamed?: string, // Must be combined with `instancesForSceneNamed`.
   propertiesLayersEffectsForSceneNamed?: string,
   objectPropertiesDeduplicationKey?: string,
 |};
@@ -1454,6 +1455,15 @@ const describeInstances: EditorFunction = {
   },
   launchFunction: async ({ project, args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
+    const filter_by_object_name =
+      SafeExtractor.extractStringProperty(args, 'filter_by_object_name') || '';
+
+    const objectNames = new Set(
+      filter_by_object_name
+        .split(',')
+        .map(name => name.trim().toLowerCase())
+        .filter(Boolean)
+    );
 
     if (!project.hasLayoutNamed(scene_name)) {
       return makeGenericFailure(`Scene not found: "${scene_name}".`);
@@ -1471,6 +1481,13 @@ const describeInstances: EditorFunction = {
 
       getInstancesInLayoutForLayer(initialInstances, layerName).forEach(
         instance => {
+          if (
+            objectNames.size > 0 &&
+            !objectNames.has(instance.getObjectName().toLowerCase())
+          ) {
+            return;
+          }
+
           const serializedInstance = serializeToJSObject(instance);
           instances.push({
             ...serializedInstance,
@@ -1486,11 +1503,20 @@ const describeInstances: EditorFunction = {
       );
     });
 
-    return {
-      success: true,
-      instances: instances,
-      instancesForSceneNamed: scene_name,
-    };
+    if (objectNames.size > 0) {
+      return {
+        success: true,
+        instances: instances,
+        instancesForSceneNamed: scene_name,
+        instancesOnlyForObjectsNamed: [...objectNames].sort().join(','),
+      };
+    } else {
+      return {
+        success: true,
+        instances: instances,
+        instancesForSceneNamed: scene_name,
+      };
+    }
   },
 };
 

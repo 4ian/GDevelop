@@ -96,6 +96,48 @@ const parseVariablePath = (
   return segments;
 };
 
+const parseValueAsObjectOrArray = (value: string): Array<any> | {} | null => {
+  try {
+    const parsedValue = JSON.parse(value);
+
+    if (Array.isArray(parsedValue) || typeof parsedValue === 'object') {
+      return parsedValue;
+    }
+
+    // Value is a primitive, not an object or array.
+    return null;
+  } catch (error) {
+    // Not even a JSON string (probably a primitive or a string).
+    return null;
+  }
+};
+
+const convertJsObjectToVariable = (value: any, variable: gdVariable) => {
+  if (value === null) {
+    variable.setString('null');
+  } else if (value === undefined) {
+    variable.setString('undefined');
+  } else if (typeof value === 'number') {
+    variable.setValue(value || 0);
+  } else if (typeof value === 'string') {
+    variable.setString(value);
+  } else if (typeof value === 'boolean') {
+    variable.setBool(value);
+  } else if (Array.isArray(value)) {
+    variable.castTo('Array');
+    variable.clearChildren();
+    for (const item of value) {
+      convertJsObjectToVariable(item, variable.pushNew());
+    }
+  } else if (typeof value === 'object') {
+    variable.castTo('Structure');
+    variable.clearChildren();
+    for (const [key, item] of Object.entries(value)) {
+      convertJsObjectToVariable(item, variable.getChild(key));
+    }
+  }
+};
+
 export const applyVariableChange = ({
   variablePath,
   forcedVariableType,
@@ -154,19 +196,34 @@ export const applyVariableChange = ({
     }
   }
 
-  const variableType = readOrInferVariableType(forcedVariableType, value);
+  const arrayOrObjectValue = parseValueAsObjectOrArray(value);
 
-  if (variableType === 'String') {
-    variable.setString(value);
-  } else if (variableType === 'Number') {
-    variable.setValue(parseFloat(value));
-  } else if (variableType === 'Boolean') {
-    variable.setBool(value.toLowerCase() === 'true');
+  if (arrayOrObjectValue) {
+    // Value is an object or array.
+    convertJsObjectToVariable(arrayOrObjectValue, variable);
+
+    return {
+      variable,
+      variableType: variable.getType() === gd.Variable.Array ? 'Array' : 'Structure',
+      addedNewVariable,
+    }
+  } else {
+    // Value is a primitive, or not a valid Object/Array in JSON:
+
+    const variableType = readOrInferVariableType(forcedVariableType, value);
+
+    if (variableType === 'String') {
+      variable.setString(value);
+    } else if (variableType === 'Number') {
+      variable.setValue(parseFloat(value));
+    } else if (variableType === 'Boolean') {
+      variable.setBool(value.toLowerCase() === 'true');
+    }
+
+    return {
+      variable,
+      variableType,
+      addedNewVariable,
+    };
   }
-
-  return {
-    variable,
-    variableType,
-    addedNewVariable,
-  };
 };

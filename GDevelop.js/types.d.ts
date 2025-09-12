@@ -323,6 +323,7 @@ export class Variable extends EmscriptenObject {
   renameChild(oldName: string, newName: string): boolean;
   getAllChildrenNames(): VectorString;
   removeRecursively(variableToRemove: Variable): void;
+  clearChildren(): void;
   getAtIndex(index: number): Variable;
   pushNew(): Variable;
   removeAtIndex(index: number): void;

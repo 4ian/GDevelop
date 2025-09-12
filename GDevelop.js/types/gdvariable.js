@@ -28,6 +28,7 @@ declare class gdVariable {
   renameChild(oldName: string, newName: string): boolean;
   getAllChildrenNames(): gdVectorString;
   removeRecursively(variableToRemove: gdVariable): void;
+  clearChildren(): void;
   getAtIndex(index: number): gdVariable;
   pushNew(): gdVariable;
   removeAtIndex(index: number): void;

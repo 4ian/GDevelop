@@ -285,6 +285,7 @@ interface Variable {
     boolean RenameChild([Const] DOMString oldName, [Const] DOMString newName);
     [Value] VectorString GetAllChildrenNames();
     void RemoveRecursively([Const, Ref] Variable variableToRemove);
+    void ClearChildren();
 
     [Ref] Variable GetAtIndex([Const] unsigned long index);
     [Ref] Variable PushNew();

@@ -29,6 +29,10 @@ import {
   addDefaultLightToLayer,
 } from '../ProjectCreation/CreateProject';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
+import newNameGenerator from '../Utils/NewNameGenerator';
+import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
+import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
+import { swapAsset } from '../AssetStore/AssetSwapper';
 
 const gd: libGDevelop = global.gd;
 
@@ -103,6 +107,7 @@ export type AssetSearchAndInstallResult = {|
   status: 'asset-installed' | 'nothing-found' | 'error',
   message: string,
   createdObjects: Array<gdObject>,
+  assetShortHeader: AssetShortHeader | null,
 |};
 
 export type AssetSearchAndInstallOptions = {|
@@ -336,13 +341,34 @@ const makeShortTextForNamedProperty = (
 /**
  * Creates a new object in the specified scene
  */
-const createObject: EditorFunction = {
+const createOrReplaceObject: EditorFunction = {
   renderForEditor: ({ args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
+    const replaceExistingObject = SafeExtractor.extractBooleanProperty(
+      args,
+      'replace_existing_object'
+    );
 
     return {
-      text: (
+      text: replaceExistingObject ? (
+        <Trans>
+          Replace object <b>{object_name}</b> in scene{' '}
+          <Link
+            href="#"
+            onClick={() =>
+              editorCallbacks.onOpenLayout(scene_name, {
+                openEventsEditor: true,
+                openSceneEditor: true,
+                focusWhenOpened: 'scene',
+              })
+            }
+          >
+            {scene_name}
+          </Link>
+          .
+        </Trans>
+      ) : (
         <Trans>
           Create object <b>{object_name}</b> in scene{' '}
           <Link
@@ -371,6 +397,10 @@ const createObject: EditorFunction = {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_type = extractRequiredString(args, 'object_type');
     const object_name = extractRequiredString(args, 'object_name');
+    const shouldReplaceExistingObject = SafeExtractor.extractBooleanProperty(
+      args,
+      'replace_existing_object'
+    );
     const description = SafeExtractor.extractStringProperty(
       args,
       'description'
@@ -413,104 +443,183 @@ const createObject: EditorFunction = {
       return propertiesText;
     };
 
-    // Check if object with this name already exists
-    if (objectsContainer.hasObjectNamed(object_name)) {
-      if (objectsContainer.getObject(object_name).getType() !== object_type) {
+    const createNewObject = async () => {
+      // First try to search and install an object from the asset store.
+      try {
+        const { status, message, createdObjects } = await searchAndInstallAsset(
+          {
+            scene: layout,
+            objectName: object_name,
+            objectType: object_type,
+            searchTerms: search_terms || '',
+            description: description || '',
+            twoDimensionalViewKind: two_dimensional_view_kind || '',
+          }
+        );
+
+        if (status === 'error') {
+          return makeGenericFailure(
+            `Unable to search and install object (${message}).`
+          );
+        } else if (status === 'asset-installed') {
+          if (createdObjects.length === 1) {
+            const object = createdObjects[0];
+            return makeGenericSuccess(
+              [
+                `Created (from the asset store) object "${object.getName()}" of type "${object.getType()}" in scene "${scene_name}".`,
+                getPropertiesText(object),
+              ].join(' ')
+            );
+          }
+
+          return makeGenericSuccess(
+            `Created (from the asset store) ${createdObjects
+              .map(
+                object =>
+                  `object "${object.getName()}" of type "${object.getType()}"`
+              )
+              .join(', ')} in scene "${scene_name}".`
+          );
+        } else {
+          // No asset found - we'll create an object from scratch.
+        }
+      } catch (error) {
         return makeGenericFailure(
-          `Object with name "${object_name}" already exists in scene "${scene_name}" but with a different type ("${object_type}").`
+          `An unexpected error happened while search and installing objects (${
+            error.message
+          }).`
         );
       }
 
-      return makeGenericSuccess(
-        `Object with name "${object_name}" already exists, no need to re-create it.`
+      // Create an object from scratch:
+      // Ensure the extension for this object type is installed.
+      if (object_type.includes('::')) {
+        const extensionName = object_type.split('::')[0];
+        try {
+          await ensureExtensionInstalled({ extensionName });
+        } catch (error) {
+          console.error(
+            `Could not get extension "${extensionName}" installed:`,
+            error
+          );
+          return makeGenericFailure(
+            `Could not install extension "${extensionName}" - should you consider trying with another object type?`
+          );
+        }
+      }
+
+      // Ensure the object type is valid.
+      const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+        project.getCurrentPlatform(),
+        object_type
       );
-    }
-
-    // First try to search and install an object from the asset store.
-    try {
-      const { status, message, createdObjects } = await searchAndInstallAsset({
-        scene: layout,
-        objectName: object_name,
-        objectType: object_type,
-        searchTerms: search_terms || '',
-        description: description || '',
-        twoDimensionalViewKind: two_dimensional_view_kind || '',
-      });
-
-      if (status === 'error') {
+      if (gd.MetadataProvider.isBadObjectMetadata(objectMetadata)) {
         return makeGenericFailure(
-          `Unable to search and install object (${message}).`
+          `Type "${object_type}" does not exist for objects.`
         );
-      } else if (status === 'asset-installed') {
-        if (createdObjects.length === 1) {
-          const object = createdObjects[0];
+      }
+
+      const object = objectsContainer.insertNewObject(
+        project,
+        object_type,
+        object_name,
+        objectsContainer.getObjectsCount()
+      );
+      return makeGenericSuccess(
+        [
+          `Created a new object (from scratch) called "${object_name}" of type "${object_type}" in scene "${scene_name}".`,
+          getPropertiesText(object),
+        ].join(' ')
+      );
+    };
+
+    const replaceExistingObject = async () => {
+      const object = objectsContainer.getObject(object_name);
+
+      // First try to search and install an object from the asset store.
+      try {
+        const replacementObjectName = newNameGenerator(
+          object_name + 'Replacement',
+          name => objectsContainer.hasObjectNamed(name)
+        );
+        const {
+          status,
+          message,
+          createdObjects,
+          assetShortHeader,
+        } = await searchAndInstallAsset({
+          scene: layout,
+          objectName: replacementObjectName,
+          objectType: object_type,
+          searchTerms: search_terms || '',
+          description: description || '',
+          twoDimensionalViewKind: two_dimensional_view_kind || '',
+        });
+
+        if (status === 'error') {
+          // TODO
+          return makeGenericFailure(
+            `Unable to search and install object (${message}).`
+          );
+        } else if (
+          status === 'asset-installed' &&
+          createdObjects.length > 0 &&
+          assetShortHeader
+        ) {
+          swapAsset(
+            project,
+            PixiResourcesLoader,
+            object,
+            createdObjects[0],
+            assetShortHeader
+          );
+
+          for (const createdObject of createdObjects) {
+            objectsContainer.removeObject(createdObject.getName());
+          }
+
           return makeGenericSuccess(
-            [
-              `Created (from the asset store) object "${object.getName()}" of type "${object.getType()}" in scene "${scene_name}".`,
-              getPropertiesText(object),
-            ].join(' ')
+            `Replaced object "${object.getName()}" by an object from the asset store fitting the search.`
+          );
+        } else {
+          // No asset found.
+        }
+      } catch (error) {
+        return makeGenericFailure(
+          `An unexpected error happened while search and installing objects (${
+            error.message
+          }).`
+        );
+      }
+
+      return makeGenericFailure(
+        `Could not find an object in the asset store to replace "${object_name}" in scene "${scene_name}". Instead, inspect properties of the object and modify it until it matches what you want it to be.`
+      );
+    };
+
+    if (!shouldReplaceExistingObject) {
+      // Add a new object.
+      if (objectsContainer.hasObjectNamed(object_name)) {
+        if (objectsContainer.getObject(object_name).getType() !== object_type) {
+          return makeGenericFailure(
+            `Object with name "${object_name}" already exists in scene "${scene_name}" but with a different type ("${object_type}").`
           );
         }
 
         return makeGenericSuccess(
-          `Created (from the asset store) ${createdObjects
-            .map(
-              object =>
-                `object "${object.getName()}" of type "${object.getType()}"`
-            )
-            .join(', ')} in scene "${scene_name}".`
-        );
-      } else {
-        // No asset found - we'll create an object from scratch.
-      }
-    } catch (error) {
-      return makeGenericFailure(
-        `An unexpected error happened while search and installing objects (${
-          error.message
-        }).`
-      );
-    }
-
-    // Create an object from scratch:
-    // Ensure the extension for this object type is installed.
-    if (object_type.includes('::')) {
-      const extensionName = object_type.split('::')[0];
-      try {
-        await ensureExtensionInstalled({ extensionName });
-      } catch (error) {
-        console.error(
-          `Could not get extension "${extensionName}" installed:`,
-          error
-        );
-        return makeGenericFailure(
-          `Could not install extension "${extensionName}" - should you consider trying with another object type?`
+          `Object with name "${object_name}" already exists, no need to re-create it.`
         );
       }
-    }
 
-    // Ensure the object type is valid.
-    const objectMetadata = gd.MetadataProvider.getObjectMetadata(
-      project.getCurrentPlatform(),
-      object_type
-    );
-    if (gd.MetadataProvider.isBadObjectMetadata(objectMetadata)) {
-      return makeGenericFailure(
-        `Type "${object_type}" does not exist for objects.`
-      );
-    }
+      return createNewObject();
+    } else {
+      // Replace an existing object, if there is one existing.
+      if (!objectsContainer.hasObjectNamed(object_name)) {
+        return createNewObject();
+      }
 
-    const object = objectsContainer.insertNewObject(
-      project,
-      object_type,
-      object_name,
-      objectsContainer.getObjectsCount()
-    );
-    return makeGenericSuccess(
-      [
-        `Created a new object (from scratch) called "${object_name}" of type "${object_type}" in scene "${scene_name}".`,
-        getPropertiesText(object),
-      ].join(' ')
-    );
+      return replaceExistingObject();
+    }
   },
 };
 
@@ -3580,7 +3689,8 @@ const initializeProject: EditorFunctionWithoutProject = {
 };
 
 export const editorFunctions: { [string]: EditorFunction } = {
-  create_object: createObject,
+  create_object: createOrReplaceObject,
+  create_or_replace_object: createOrReplaceObject,
   inspect_object_properties: inspectObjectProperties,
   change_object_property: changeObjectProperty,
   add_behavior: addBehavior,

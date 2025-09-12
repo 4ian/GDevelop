@@ -51,6 +51,7 @@ export const useSearchAndInstallAsset = ({
             status: 'nothing-found',
             message: 'No assets found.',
             createdObjects: [],
+            assetShortHeader: null,
           };
         }
 
@@ -58,9 +59,10 @@ export const useSearchAndInstallAsset = ({
         // For now, we just return the first asset.
         const chosenResult = assetSearch.results[0];
         if (!chosenResult) throw new Error('No asset found.');
+        const assetShortHeader = chosenResult.asset;
 
         const installOutput = await installAsset({
-          assetShortHeader: chosenResult.asset,
+          assetShortHeader,
           objectsContainer: scene.getObjects(),
           requestedObjectName: objectName,
         });
@@ -70,6 +72,7 @@ export const useSearchAndInstallAsset = ({
             status: 'error',
             message: 'Asset found but failed to install asset.',
             createdObjects: [],
+            assetShortHeader: null,
           };
         }
 
@@ -77,6 +80,7 @@ export const useSearchAndInstallAsset = ({
           status: 'asset-installed',
           message: 'Asset installed successfully.',
           createdObjects: installOutput.createdObjects,
+          assetShortHeader,
         };
       },
       [installAsset, profile, getAuthorizationHeader]

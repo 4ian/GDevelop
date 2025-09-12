@@ -187,6 +187,7 @@ export default class CommentEvent extends React.Component<
               /* Ensure the textarea resize down to 1 line when no text or just a single line is entered. */
               1
             }
+            spellCheck="false"
           />
         ) : (
           <span

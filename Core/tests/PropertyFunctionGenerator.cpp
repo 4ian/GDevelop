@@ -139,8 +139,8 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
         .SetLabel("Dot shape")
         .SetDescription("The shape is used for collision.")
         .SetGroup("Movement");
-    property.GetExtraInfo().push_back("Dot shape");
-    property.GetExtraInfo().push_back("Bounding disk");
+    property.AddChoice("DotShape", "Dot shape");
+    property.AddChoice("BoundingDisk", "Bounding disk");
 
     gd::PropertyFunctionGenerator::GenerateBehaviorGetterAndSetter(
         project, extension, behavior, property, false);
@@ -157,7 +157,7 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
             gd::EventsFunction::ExpressionAndCondition);
     REQUIRE(getter.GetExpressionType().GetName() == "stringWithSelector");
     REQUIRE(getter.GetExpressionType().GetExtraInfo() ==
-            "[\"Dot shape\",\"Bounding disk\"]");
+            "[\"DotShape\",\"BoundingDisk\"]");
   }
 
   SECTION("Can generate functions for a boolean property in a behavior") {
@@ -386,8 +386,8 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
         .SetLabel("Dot shape")
         .SetDescription("The shape is used for collision.")
         .SetGroup("Movement");
-    property.GetExtraInfo().push_back("Dot shape");
-    property.GetExtraInfo().push_back("Bounding disk");
+    property.AddChoice("DotShape", "Dot shape");
+    property.AddChoice("BoundingDisk", "Bounding disk");
 
     gd::PropertyFunctionGenerator::GenerateObjectGetterAndSetter(
         project, extension, object, property);
@@ -404,7 +404,7 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
             gd::EventsFunction::ExpressionAndCondition);
     REQUIRE(getter.GetExpressionType().GetName() == "stringWithSelector");
     REQUIRE(getter.GetExpressionType().GetExtraInfo() ==
-            "[\"Dot shape\",\"Bounding disk\"]");
+            "[\"DotShape\",\"BoundingDisk\"]");
   }
 
   SECTION("Can generate functions for a boolean property in an object") {

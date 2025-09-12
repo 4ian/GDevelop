@@ -971,6 +971,7 @@ export class PropertyDescriptor extends EmscriptenObject {
   getDescription(): string;
   setGroup(label: string): PropertyDescriptor;
   getGroup(): string;
+  clearChoices(): PropertyDescriptor;
   addChoice(value: string, label: string): PropertyDescriptor;
   getChoices(): VectorPropertyDescriptorChoice;
   addExtraInfo(type: string): PropertyDescriptor;

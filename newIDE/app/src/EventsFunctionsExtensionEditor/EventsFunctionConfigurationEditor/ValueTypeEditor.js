@@ -9,7 +9,7 @@ import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import ObjectTypeSelector from '../../ObjectTypeSelector';
 import BehaviorTypeSelector from '../../BehaviorTypeSelector';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
-import StringArrayEditor from '../../StringArrayEditor';
+import ChoicesEditor, { type Choice } from '../../ChoicesEditor';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import ResourceTypeSelectField from './ResourceTypeSelectField';
 
@@ -295,11 +295,18 @@ export default function ValueTypeEditor({
             )}
           </ResponsiveLineStackLayout>
           {valueTypeMetadata.getName() === 'stringWithSelector' && (
-            <StringArrayEditor
+            <ChoicesEditor
               disabled={disabled}
-              extraInfo={getExtraInfoArray(valueTypeMetadata)}
-              setExtraInfo={(newExtraInfo: Array<string>) => {
-                valueTypeMetadata.setExtraInfo(JSON.stringify(newExtraInfo));
+              choices={getExtraInfoArray(valueTypeMetadata).map(value => ({
+                value,
+                label: '',
+              }))}
+              hideLabels
+              setChoices={(choices: Array<Choice>) => {
+                // TODO Handle labels (and search "choice label")
+                valueTypeMetadata.setExtraInfo(
+                  JSON.stringify(choices.map(choice => choice.value))
+                );
                 forceUpdate();
                 onTypeUpdated();
               }}

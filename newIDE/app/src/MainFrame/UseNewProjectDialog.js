@@ -15,21 +15,22 @@ import NewProjectSetupDialog, {
 } from '../ProjectCreation/NewProjectSetupDialog';
 import { type StorageProvider } from '../ProjectsStorage';
 import RouterContext from './RouterContext';
+import { type CreateProjectResult } from '../Utils/UseCreateProject';
 
 type Props = {|
   isProjectOpening: boolean,
   newProjectSetupDialogOpen: boolean,
   setNewProjectSetupDialogOpen: boolean => void,
-  createEmptyProject: NewProjectSetup => Promise<void>,
+  createEmptyProject: NewProjectSetup => Promise<CreateProjectResult>,
   createProjectFromExample: (
     exampleShortHeader: ExampleShortHeader,
     newProjectSetup: NewProjectSetup,
     i18n: I18nType
-  ) => Promise<void>,
+  ) => Promise<CreateProjectResult>,
   createProjectFromPrivateGameTemplate: (
     privateGameTemplateListingData: PrivateGameTemplateListingData,
     newProjectSetup: NewProjectSetup
-  ) => Promise<void>,
+  ) => Promise<CreateProjectResult>,
   openAskAi: ({|
     mode: 'chat' | 'agent',
     aiRequestId: string | null,

@@ -58,6 +58,7 @@ import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
 import Chip from '../UI/Chip';
 import { LineStackLayout } from '../UI/Layout';
 import { BundleStoreContext } from '../AssetStore/Bundles/BundleStoreContext';
+import { type CreateProjectResult } from '../Utils/UseCreateProject';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -98,17 +99,19 @@ export type NewProjectSetup = {|
 type Props = {|
   isProjectOpening?: boolean,
   onClose: () => void,
-  onCreateEmptyProject: (newProjectSetup: NewProjectSetup) => Promise<void>,
+  onCreateEmptyProject: (
+    newProjectSetup: NewProjectSetup
+  ) => Promise<CreateProjectResult>,
   onCreateFromExample: (
     exampleShortHeader: ExampleShortHeader,
     newProjectSetup: NewProjectSetup,
     i18n: I18nType
-  ) => Promise<void>,
+  ) => Promise<CreateProjectResult>,
   onCreateProjectFromPrivateGameTemplate: (
     privateGameTemplateListingData: PrivateGameTemplateListingData,
     newProjectSetup: NewProjectSetup,
     i18n: I18nType
-  ) => Promise<void>,
+  ) => Promise<CreateProjectResult>,
   onOpenAskAi: ({|
     mode: 'chat' | 'agent',
     aiRequestId: string | null,

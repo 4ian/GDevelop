@@ -17,6 +17,7 @@ import { type CourseChapter } from '../../Utils/GDevelopServices/Asset';
 import { type GamesList } from '../../GameDashboard/UseGamesList';
 import { type GamesPlatformFrameTools } from './HomePage/PlaySection/UseGamesPlatformFrame';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
+import { type CreateProjectResult } from '../../Utils/UseCreateProject';
 
 export type EditorContainerExtraProps = {|
   // Events function extension editor
@@ -159,8 +160,10 @@ export type RenderEditorContainerProps = {|
     newProjectSetup: NewProjectSetup,
     i18n: I18nType,
     isQuickCustomization?: boolean
-  ) => Promise<void>,
-  onCreateEmptyProject: (newProjectSetup: NewProjectSetup) => Promise<void>,
+  ) => Promise<CreateProjectResult>,
+  onCreateEmptyProject: (
+    newProjectSetup: NewProjectSetup
+  ) => Promise<CreateProjectResult>,
   onOpenTemplateFromTutorial: (tutorialId: string) => Promise<void>,
   onOpenTemplateFromCourseChapter: (
     CourseChapter,

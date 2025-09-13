@@ -135,6 +135,13 @@ describe('SimplifiedProject', () => {
                       },
                       Object {
                         "type": "Array",
+                        "variableChildren": Array [
+                          Object {
+                            "type": "Number",
+                            "value": "856.5",
+                            "variableName": "0",
+                          },
+                        ],
                         "variableName": "ObjectChild4",
                       },
                     ],
@@ -460,6 +467,13 @@ describe('SimplifiedProject', () => {
                       },
                       Object {
                         "type": "Array",
+                        "variableChildren": Array [
+                          Object {
+                            "type": "Number",
+                            "value": "856.5",
+                            "variableName": "0",
+                          },
+                        ],
                         "variableName": "ObjectChild4",
                       },
                     ],
@@ -812,6 +826,15 @@ describe('SimplifiedProject', () => {
                   },
                   Object {
                     "type": "Structure",
+                    "variableChildren": Array [
+                      Object {
+                        "type": "String",
+                        "value": "Hello
+      Multiline
+      World",
+                        "variableName": "SubChild1",
+                      },
+                    ],
                     "variableName": "FoldedChild",
                   },
                 ],
@@ -819,10 +842,45 @@ describe('SimplifiedProject', () => {
               },
               Object {
                 "type": "Array",
+                "variableChildren": Array [
+                  Object {
+                    "type": "String",
+                    "value": "String value
+      with Multiline",
+                    "variableName": "0",
+                  },
+                  Object {
+                    "type": "Number",
+                    "value": "4539.42",
+                    "variableName": "1",
+                  },
+                  Object {
+                    "type": "Boolean",
+                    "value": "True",
+                    "variableName": "2",
+                  },
+                ],
                 "variableName": "FoldedArray",
               },
               Object {
                 "type": "Array",
+                "variableChildren": Array [
+                  Object {
+                    "type": "String",
+                    "value": "PlayerName",
+                    "variableName": "0",
+                  },
+                  Object {
+                    "type": "Number",
+                    "value": "25",
+                    "variableName": "1",
+                  },
+                  Object {
+                    "type": "Boolean",
+                    "value": "False",
+                    "variableName": "2",
+                  },
+                ],
                 "variableName": "OtherArray",
               },
             ],

@@ -2,7 +2,9 @@
 import { type EventsGenerationResult } from '.';
 import {
   editorFunctions,
+  editorFunctionsWithoutProject,
   type EditorFunction,
+  type EditorFunctionWithoutProject,
   type EditorCallbacks,
   type EditorFunctionCall,
   type EditorFunctionGenericOutput,
@@ -30,7 +32,7 @@ export type EditorFunctionCallResult =
     |};
 
 export type ProcessEditorFunctionCallsOptions = {|
-  project: gdProject,
+  project: gdProject | null,
   functionCalls: Array<EditorFunctionCall>,
   editorCallbacks: EditorCallbacks,
   ignore: boolean,
@@ -79,6 +81,17 @@ export const processEditorFunctionCalls = async ({
     }
 
     const name = functionCall.name;
+    if (!project && name !== 'initialize_project') {
+      results.push({
+        status: 'finished',
+        call_id,
+        success: false,
+        output: {
+          message: 'No project opened.',
+        },
+      });
+      continue;
+    }
     let args;
     try {
       try {
@@ -122,7 +135,9 @@ export const processEditorFunctionCalls = async ({
       // Check if the function exists
       const editorFunction: EditorFunction | null =
         editorFunctions[name] || null;
-      if (!editorFunction) {
+      const editorFunctionWithoutProject: EditorFunctionWithoutProject | null =
+        editorFunctionsWithoutProject[name] || null;
+      if (!editorFunction && !editorFunctionWithoutProject) {
         results.push({
           status: 'finished',
           call_id,
@@ -134,18 +149,41 @@ export const processEditorFunctionCalls = async ({
         continue;
       }
 
+      const argumentsWithoutProject = {
+        args,
+        editorCallbacks,
+        generateEvents,
+        onSceneEventsModifiedOutsideEditor,
+        onInstancesModifiedOutsideEditor,
+        ensureExtensionInstalled,
+        searchAndInstallAsset,
+      };
+
       // Execute the function
-      const result: EditorFunctionGenericOutput = await editorFunction.launchFunction(
-        {
-          project,
-          args,
-          generateEvents,
-          onSceneEventsModifiedOutsideEditor,
-          onInstancesModifiedOutsideEditor,
-          ensureExtensionInstalled,
-          searchAndInstallAsset,
+      let result: EditorFunctionGenericOutput;
+      if (editorFunction) {
+        if (project) {
+          result = await editorFunction.launchFunction({
+            ...argumentsWithoutProject,
+            project,
+          });
+        } else {
+          result = {
+            success: false,
+            message: `Function ${name} requires a project to be opened before being used.`,
+          };
         }
-      );
+      } else if (editorFunctionWithoutProject) {
+        result = await editorFunctionWithoutProject.launchFunction(
+          argumentsWithoutProject
+        );
+      } else {
+        result = {
+          success: false,
+          message: `Unknown function with name: ${name}. Please use something else as this seems not supported or existing.`,
+        };
+      }
+
       const { success, ...output } = result;
       results.push({
         status: 'finished',

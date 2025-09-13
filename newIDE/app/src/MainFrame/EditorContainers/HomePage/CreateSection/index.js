@@ -50,6 +50,7 @@ import {
 import { useProjectsListFor } from './utils';
 import { deleteCloudProject } from '../../../../Utils/GDevelopServices/Project';
 import { getDefaultRegisterGameProperties } from '../../../../Utils/UseGameAndBuildsManager';
+import { type CreateProjectResult } from '../../../../Utils/UseCreateProject';
 
 const getExampleItemsColumns = (
   windowSize: WindowSizeType,
@@ -83,7 +84,7 @@ type Props = {|
     newProjectSetup: NewProjectSetup,
     i18n: I18nType,
     isQuickCustomization?: boolean
-  ) => Promise<void>,
+  ) => Promise<CreateProjectResult>,
   onSelectPrivateGameTemplateListingData: (
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,

@@ -92,6 +92,12 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
                   const feedbackKey = `${messageIndex}-${messageContentIndex}`;
                   const currentFeedback = messageFeedbacks[feedbackKey];
 
+                  const trimmedText = messageContent.text.trim();
+                  if (!trimmedText) {
+                    // Sometimes the AI can return an empty string or a string with just a line break.
+                    return null;
+                  }
+
                   return (
                     <Line key={key} justifyContent="flex-start">
                       <ChatBubble
@@ -159,7 +165,7 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
                           </div>
                         }
                       >
-                        <ChatMarkdownText source={messageContent.text} />
+                        <ChatMarkdownText source={trimmedText} />
                       </ChatBubble>
                     </Line>
                   );

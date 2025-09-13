@@ -694,7 +694,7 @@ export const AskAiEditor = React.memo<Props>(
                 fileMetadata,
                 storageProviderName,
                 mode,
-                toolsVersion: 'v2',
+                toolsVersion: 'v3',
                 aiConfiguration: {
                   presetId: aiConfigurationPresetId,
                 },

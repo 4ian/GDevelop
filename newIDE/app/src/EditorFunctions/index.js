@@ -1267,15 +1267,26 @@ const removeBehavior: EditorFunction = {
 
     if (!object.hasBehaviorNamed(behavior_name)) {
       return makeGenericFailure(
-        `Behavior not found: "${behavior_name}" on object "${object_name}".`
+        `Behavior not found: "${behavior_name}" on object "${object_name}". So it was not removed.`
       );
     }
 
+    const dependentBehaviors = gd.WholeProjectRefactorer.findDependentBehaviorNames(
+      project,
+      object,
+      behavior_name
+    ).toJSArray();
+
     // Remove the behavior
     object.removeBehavior(behavior_name);
+    dependentBehaviors.forEach(name => object.removeBehavior(name));
 
     return makeGenericSuccess(
-      `Removed behavior "${behavior_name}" from object "${object_name}".`
+      dependentBehaviors.length > 0
+        ? `Removed behavior "${behavior_name}" from object "${object_name}". Dependent behaviors were also removed as they were based on this behavior: ${dependentBehaviors.join(
+            ', '
+          )}.`
+        : `Removed behavior "${behavior_name}" from object "${object_name}".`
     );
   },
 };

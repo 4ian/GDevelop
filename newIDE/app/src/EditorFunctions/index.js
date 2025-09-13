@@ -239,6 +239,40 @@ const makeGenericSuccess = (message: string): EditorFunctionGenericOutput => ({
   message,
 });
 
+const makeMultipleChangesOutput = (
+  changes: Array<string>,
+  warnings: Array<string>
+): EditorFunctionGenericOutput => {
+  if (changes.length === 0 && warnings.length === 0) {
+    return {
+      success: false,
+      message: 'No changes were made.',
+    };
+  } else if (changes.length === 0 && warnings.length > 0) {
+    return {
+      success: false,
+      message: [
+        'No changes were made because of these issues:',
+        ...warnings,
+      ].join('\n'),
+    };
+  } else if (changes.length > 0 && warnings.length === 0) {
+    return {
+      success: true,
+      message: ['Successfully done the changes.', ...changes].join('\n'),
+    };
+  }
+
+  return {
+    success: true,
+    message: [
+      'Successfully done some changes but some issues were found - see the warnings.',
+      ...changes,
+      ...warnings,
+    ].join('\n'),
+  };
+};
+
 const shouldHideProperty = (property: gdPropertyDescriptor): boolean => {
   return (
     property.isHidden() ||
@@ -339,6 +373,30 @@ const makeShortTextForNamedProperty = (
   ].filter(Boolean);
 
   return `${name}: ${value} (${information.join(', ')})`;
+};
+
+const listLabelAndValuesFromChangedProperties = (
+  changed_properties: Array<any>
+) => {
+  return changed_properties
+    .map(changed_property => {
+      const propertyName = SafeExtractor.extractStringProperty(
+        changed_property,
+        'property_name'
+      );
+      const newValue = SafeExtractor.extractStringProperty(
+        changed_property,
+        'new_value'
+      );
+      if (propertyName === null || newValue === null) {
+        return null;
+      }
+      return {
+        label: propertyName,
+        newValue: newValue,
+      };
+    })
+    .filter(Boolean);
 };
 
 /**
@@ -738,86 +796,118 @@ const isPropertyForChangingObjectName = (propertyName: string): boolean => {
  * Changes a property of a specific object in a scene
  */
 const changeObjectProperty: EditorFunction = {
-  renderForEditor: ({ project, args, editorCallbacks }) => {
+  renderForEditor: ({ project, shouldShowDetails, args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
-    const property_name = extractRequiredString(args, 'property_name');
-    const new_value = extractRequiredString(args, 'new_value');
+    const changed_properties =
+      SafeExtractor.extractArrayProperty(args, 'changed_properties') || [];
 
-    if (isPropertyForChangingObjectName(property_name)) {
+    const renderChanges = (
+      changes: Array<{ label: string, newValue: string }>
+    ) => {
+      if (changes.length === 1) {
+        const { label, newValue } = changes[0];
+        return {
+          text:
+            label === 'name' ? (
+              <Trans>
+                Rename object "{object_name}" to "<b>{newValue}</b>"" (in scene{' '}
+                {scene_name}).
+              </Trans>
+            ) : (
+              <Trans>
+                Change property "<b>{label}</b>" of object <b>{object_name}</b>{' '}
+                (in scene {scene_name}) to <b>{newValue}</b>.
+              </Trans>
+            ),
+        };
+      }
+
       return {
         text: (
           <Trans>
-            Rename object "{object_name}" to "<b>{new_value}</b>" (in scene{' '}
-            <Link
-              href="#"
-              onClick={() =>
-                editorCallbacks.onOpenLayout(scene_name, {
-                  openEventsEditor: true,
-                  openSceneEditor: true,
-                  focusWhenOpened: 'scene',
-                })
-              }
-            >
-              {scene_name}
-            </Link>
-            ).
+            Change {changes.length} properties of object {object_name} (in scene{' '}
+            {scene_name}).
           </Trans>
         ),
-      };
-    }
-
-    const makeText = (propertyLabel: string) => {
-      return {
-        text: (
-          <Trans>
-            Change property "<b>{propertyLabel}</b>" of object{' '}
-            <b>{object_name}</b> (in scene{' '}
-            <Link
-              href="#"
-              onClick={() =>
-                editorCallbacks.onOpenLayout(scene_name, {
-                  openEventsEditor: true,
-                  openSceneEditor: true,
-                  focusWhenOpened: 'scene',
-                })
-              }
-            >
-              {scene_name}
-            </Link>
-            ) to <b>{new_value}</b>.
-          </Trans>
-        ),
+        hasDetailsToShow: true,
+        details: shouldShowDetails ? (
+          <ColumnStackLayout noMargin>
+            {changes.map(change =>
+              change.label === 'name' ? (
+                <Text key={change.label} noMargin>
+                  Renamed object to {change.newValue}.
+                </Text>
+              ) : (
+                <Text key={change.label} noMargin>
+                  <b>{change.label}</b> set to {change.newValue}.
+                </Text>
+              )
+            )}
+          </ColumnStackLayout>
+        ) : null,
       };
     };
 
     if (!project || !project.hasLayoutNamed(scene_name)) {
-      return makeText(property_name);
+      return renderChanges(
+        listLabelAndValuesFromChangedProperties(changed_properties)
+      );
     }
 
     const layout = project.getLayout(scene_name);
     const objectsContainer = layout.getObjects();
 
     if (!objectsContainer.hasObjectNamed(object_name)) {
-      return makeText(property_name);
+      return renderChanges(
+        listLabelAndValuesFromChangedProperties(changed_properties)
+      );
     }
 
     const object = objectsContainer.getObject(object_name);
     const objectConfiguration = object.getConfiguration();
     const objectProperties = objectConfiguration.getProperties();
 
-    const { foundProperty } = findPropertyByName({
-      properties: objectProperties,
-      name: property_name,
-    });
+    const changes = changed_properties
+      .map(changed_property => {
+        const propertyName = SafeExtractor.extractStringProperty(
+          changed_property,
+          'property_name'
+        );
+        const newValue = SafeExtractor.extractStringProperty(
+          changed_property,
+          'new_value'
+        );
+        if (propertyName === null || newValue === null) {
+          return null;
+        }
 
-    return makeText(foundProperty ? foundProperty.getLabel() : property_name);
+        if (isPropertyForChangingObjectName(propertyName)) {
+          return {
+            label: 'name',
+            newValue: newValue,
+          };
+        }
+
+        const { foundProperty } = findPropertyByName({
+          properties: objectProperties,
+          name: propertyName,
+        });
+
+        return {
+          label: foundProperty ? foundProperty.getLabel() : propertyName,
+          newValue: newValue,
+        };
+      })
+      .filter(Boolean);
+
+    return renderChanges(changes);
   },
   launchFunction: async ({ project, args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
-    const property_name = extractRequiredString(args, 'property_name');
-    const new_value = extractRequiredString(args, 'new_value');
+    const changed_properties =
+      SafeExtractor.extractArrayProperty(args, 'changed_properties') || [];
 
     if (!project.hasLayoutNamed(scene_name)) {
       return makeGenericFailure(`Scene not found: "${scene_name}".`);
@@ -833,87 +923,120 @@ const changeObjectProperty: EditorFunction = {
     } else if (project.getObjects().hasObjectNamed(object_name)) {
       object = project.getObjects().getObject(object_name);
       isGlobalObject = true;
-    } else {
+    }
+
+    if (!object) {
       return makeGenericFailure(
         `Object not found: "${object_name}" in scene "${scene_name}", nor in the global objects.`
       );
     }
 
-    if (isPropertyForChangingObjectName(property_name)) {
-      if (object.getName() === new_value) {
-        return makeGenericSuccess(
-          `Object "${object_name}" already has the name "${new_value}", no need to rename it. Continue assuming this name is correct and valid.`
+    const warnings = [];
+    const changes = [];
+
+    changed_properties.forEach(changed_property => {
+      if (!object) return;
+
+      const propertyName = SafeExtractor.extractStringProperty(
+        changed_property,
+        'property_name'
+      );
+      const newValue = SafeExtractor.extractStringProperty(
+        changed_property,
+        'new_value'
+      );
+      if (propertyName === null || newValue === null) {
+        warnings.push(
+          `Missing "property_name" or "new_value" in an item of \`changed_properties\`: ${JSON.stringify(
+            changed_property
+          )}. It was ignored and not changed.`
         );
+        return;
       }
 
-      const objectsContainersList = gd.ObjectsContainersList.makeNewObjectsContainersListForProjectAndLayout(
-        project,
-        layout
-      );
-
-      const newName = newNameGenerator(
-        gd.Project.getSafeName(new_value),
-        tentativeNewName =>
-          objectsContainersList.hasObjectOrGroupNamed(tentativeNewName)
-      );
-
-      if (layout) {
-        if (isGlobalObject) {
-          gd.WholeProjectRefactorer.globalObjectOrGroupRenamed(
-            project,
-            object.getName(),
-            newName,
-            /* isObjectGroup=*/ false
+      // Renaming an object is a special case by using a property called "name".
+      if (isPropertyForChangingObjectName(propertyName)) {
+        if (object.getName() === newValue) {
+          changes.push(
+            `Object "${object_name}" already has the name "${newValue}", no need to rename it. Continue assuming this name is correct and valid.`
           );
-        } else {
-          gd.WholeProjectRefactorer.objectOrGroupRenamedInScene(
-            project,
-            layout,
-            object.getName(),
-            newName,
-            /* isObjectGroup=*/ false
-          );
+          return;
         }
+
+        const objectsContainersList = gd.ObjectsContainersList.makeNewObjectsContainersListForProjectAndLayout(
+          project,
+          layout
+        );
+
+        const newName = newNameGenerator(
+          gd.Project.getSafeName(newValue),
+          tentativeNewName =>
+            objectsContainersList.hasObjectOrGroupNamed(tentativeNewName)
+        );
+
+        if (layout) {
+          if (isGlobalObject) {
+            gd.WholeProjectRefactorer.globalObjectOrGroupRenamed(
+              project,
+              object.getName(),
+              newName,
+              /* isObjectGroup=*/ false
+            );
+          } else {
+            gd.WholeProjectRefactorer.objectOrGroupRenamedInScene(
+              project,
+              layout,
+              object.getName(),
+              newName,
+              /* isObjectGroup=*/ false
+            );
+          }
+        }
+        // Note: gd.WholeProjectRefactorer.objectOrGroupRenamedInEventsBasedObject to be added here
+        // if events-based objects can be handled by AI one day.
+
+        object.setName(newName);
+
+        changes.push(
+          `Renamed object "${object_name}" to "${newName}". Events and everything else refering to this object having been also updated. Continue assuming the object has now the name "${newName}" and the whole project has been updated for it.`
+        );
+        return;
       }
-      // Note: gd.WholeProjectRefactorer.objectOrGroupRenamedInEventsBasedObject to be added here
-      // if events-based objects can be handled by AI one day.
 
-      object.setName(newName);
+      // Changing a "usual" property of an object:
+      const objectConfiguration = object.getConfiguration();
+      const objectProperties = objectConfiguration.getProperties();
 
-      return makeGenericSuccess(
-        `Renamed object "${object_name}" to "${newName}". Events and everything else refering to this object having been also updated. Continue assuming the object has now the name "${newName}" and the whole project has been updated for it.`
+      const { foundPropertyName, foundProperty } = findPropertyByName({
+        properties: objectProperties,
+        name: propertyName,
+      });
+
+      if (!foundPropertyName) {
+        warnings.push(
+          `Property not found: ${propertyName} on object ${object_name}.`
+        );
+        return;
+      }
+
+      if (
+        !objectConfiguration.updateProperty(
+          foundPropertyName,
+          sanitizePropertyNewValue(foundProperty, newValue)
+        )
+      ) {
+        warnings.push(
+          `Could not change property "${foundPropertyName}" of object "${object_name}". The value might be invalid, of the wrong type or not allowed.`
+        );
+        return;
+      }
+
+      changes.push(
+        `Changed property "${foundPropertyName}" of object "${object_name}" to "${newValue}".`
       );
-    }
-
-    // Changing a "usual" property of an object:
-    const objectConfiguration = object.getConfiguration();
-    const objectProperties = objectConfiguration.getProperties();
-
-    const { foundPropertyName, foundProperty } = findPropertyByName({
-      properties: objectProperties,
-      name: property_name,
     });
 
-    if (!foundPropertyName) {
-      return makeGenericFailure(
-        `Property not found: ${property_name} on object ${object_name}.`
-      );
-    }
-
-    if (
-      !objectConfiguration.updateProperty(
-        foundPropertyName,
-        sanitizePropertyNewValue(foundProperty, new_value)
-      )
-    ) {
-      return makeGenericFailure(
-        `Could not change property "${foundPropertyName}" of object "${object_name}". The value might be invalid, of the wrong type or not allowed.`
-      );
-    }
-
-    return makeGenericSuccess(
-      `Changed property "${foundPropertyName}" of object "${object_name}" to "${new_value}".`
-    );
+    return makeMultipleChangesOutput(changes, warnings);
   },
 };
 
@@ -1247,52 +1370,82 @@ const inspectBehaviorProperties: EditorFunction = {
  * Changes a property of a specific behavior attached to an object
  */
 const changeBehaviorProperty: EditorFunction = {
-  renderForEditor: ({ project, args, editorCallbacks }) => {
+  renderForEditor: ({ project, shouldShowDetails, args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const behavior_name = extractRequiredString(args, 'behavior_name');
-    const property_name = extractRequiredString(args, 'property_name');
-    const new_value = extractRequiredString(args, 'new_value');
+    const changed_properties =
+      SafeExtractor.extractArrayProperty(args, 'changed_properties') || [];
 
-    const makeText = (propertyLabel: string) => {
+    const renderChanges = (
+      changes: Array<{ label: string, newValue: string }>
+    ) => {
+      if (changes.length === 1) {
+        const { label, newValue } = changes[0];
+        return {
+          text: (
+            <Trans>
+              Change property "<b>{label}</b>" of behavior {behavior_name} on
+              object <b>{object_name}</b> (in scene{' '}
+              <Link
+                href="#"
+                onClick={() =>
+                  editorCallbacks.onOpenLayout(scene_name, {
+                    openEventsEditor: true,
+                    openSceneEditor: true,
+                    focusWhenOpened: 'scene',
+                  })
+                }
+              >
+                {scene_name}
+              </Link>
+              ) to <b>{newValue}</b>.
+            </Trans>
+          ),
+        };
+      }
+
       return {
         text: (
           <Trans>
-            Change property "<b>{propertyLabel}</b>" of behavior {behavior_name}{' '}
-            on object <b>{object_name}</b> (in scene{' '}
-            <Link
-              href="#"
-              onClick={() =>
-                editorCallbacks.onOpenLayout(scene_name, {
-                  openEventsEditor: true,
-                  openSceneEditor: true,
-                  focusWhenOpened: 'scene',
-                })
-              }
-            >
-              {scene_name}
-            </Link>
-            ) to <b>{new_value}</b>.
+            Changed {changes.length} properties of behavior {behavior_name} on
+            object {object_name} (in scene {scene_name}).
           </Trans>
         ),
+        hasDetailsToShow: true,
+        details: shouldShowDetails ? (
+          <ColumnStackLayout noMargin>
+            {changes.map(change => (
+              <Text key={change.label} noMargin>
+                <b>{change.label}</b> set to {change.newValue}.
+              </Text>
+            ))}
+          </ColumnStackLayout>
+        ) : null,
       };
     };
 
     if (!project || !project.hasLayoutNamed(scene_name)) {
-      return makeText(property_name);
+      return renderChanges(
+        listLabelAndValuesFromChangedProperties(changed_properties)
+      );
     }
 
     const layout = project.getLayout(scene_name);
     const objectsContainer = layout.getObjects();
 
     if (!objectsContainer.hasObjectNamed(object_name)) {
-      return makeText(property_name);
+      return renderChanges(
+        listLabelAndValuesFromChangedProperties(changed_properties)
+      );
     }
 
     const object = objectsContainer.getObject(object_name);
 
     if (!object.hasBehaviorNamed(behavior_name)) {
-      return makeText(property_name);
+      return renderChanges(
+        listLabelAndValuesFromChangedProperties(changed_properties)
+      );
     }
 
     const behavior = object.getBehavior(behavior_name);
@@ -1308,32 +1461,57 @@ const changeBehaviorProperty: EditorFunction = {
       behaviorSharedDataProperties = behaviorSharedData.getProperties();
     }
 
-    const behaviorPropertySearch = findPropertyByName({
-      properties: behaviorProperties,
-      name: property_name,
-    });
+    const changes = changed_properties
+      .map(changed_property => {
+        const propertyName = SafeExtractor.extractStringProperty(
+          changed_property,
+          'property_name'
+        );
+        const newValue = SafeExtractor.extractStringProperty(
+          changed_property,
+          'new_value'
+        );
+        if (propertyName === null || newValue === null) {
+          return null;
+        }
 
-    const behaviorSharedDataPropertySearch = findPropertyByName({
-      properties: behaviorSharedDataProperties,
-      name: property_name,
-    });
+        const behaviorPropertySearch = findPropertyByName({
+          properties: behaviorProperties,
+          name: propertyName,
+        });
 
-    if (behaviorPropertySearch.foundProperty) {
-      return makeText(behaviorPropertySearch.foundProperty.getLabel());
-    } else if (behaviorSharedDataPropertySearch.foundProperty) {
-      return makeText(
-        behaviorSharedDataPropertySearch.foundProperty.getLabel()
-      );
-    } else {
-      return makeText(property_name);
-    }
+        const behaviorSharedDataPropertySearch = findPropertyByName({
+          properties: behaviorSharedDataProperties,
+          name: propertyName,
+        });
+
+        if (behaviorPropertySearch.foundProperty) {
+          return {
+            label: behaviorPropertySearch.foundProperty.getLabel(),
+            newValue: newValue,
+          };
+        } else if (behaviorSharedDataPropertySearch.foundProperty) {
+          return {
+            label: behaviorSharedDataPropertySearch.foundProperty.getLabel(),
+            newValue: newValue,
+          };
+        } else {
+          return {
+            label: propertyName,
+            newValue: newValue,
+          };
+        }
+      })
+      .filter(Boolean);
+
+    return renderChanges(changes);
   },
   launchFunction: async ({ project, args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const behavior_name = extractRequiredString(args, 'behavior_name');
-    const property_name = extractRequiredString(args, 'property_name');
-    const new_value = extractRequiredString(args, 'new_value');
+    const changedProperties =
+      SafeExtractor.extractArrayProperty(args, 'changed_properties') || [];
 
     if (!project.hasLayoutNamed(scene_name)) {
       return makeGenericFailure(`Scene not found: "${scene_name}".`);
@@ -1370,59 +1548,85 @@ const changeBehaviorProperty: EditorFunction = {
       behaviorSharedDataProperties = behaviorSharedData.getProperties();
     }
 
-    const behaviorPropertySearch = findPropertyByName({
-      properties: behaviorProperties,
-      name: property_name,
-    });
+    const warnings = [];
+    const changes = [];
 
-    const behaviorSharedDataPropertySearch = findPropertyByName({
-      properties: behaviorSharedDataProperties,
-      name: property_name,
-    });
-
-    if (behaviorPropertySearch.foundPropertyName) {
-      const { foundPropertyName, foundProperty } = behaviorPropertySearch;
-      if (
-        !behavior.updateProperty(
-          foundPropertyName,
-          sanitizePropertyNewValue(foundProperty, new_value)
-        )
-      ) {
-        return makeGenericFailure(
-          `Could not change property "${foundPropertyName}" of behavior "${behavior_name}". The value might be invalid, of the wrong type or not allowed.`
+    changedProperties.forEach(changed_property => {
+      const propertyName = SafeExtractor.extractStringProperty(
+        changed_property,
+        'property_name'
+      );
+      const newValue = SafeExtractor.extractStringProperty(
+        changed_property,
+        'new_value'
+      );
+      if (propertyName === null || newValue === null) {
+        warnings.push(
+          `Missing "property_name" or "new_value" in an item of \`changed_properties\`: ${JSON.stringify(
+            changed_property
+          )}. It was ignored and not changed.`
         );
+        return;
       }
 
-      return makeGenericSuccess(
-        `Changed property "${foundPropertyName}" of behavior "${behavior_name}" to "${new_value}".`
-      );
-    } else if (
-      behaviorSharedData &&
-      behaviorSharedDataPropertySearch.foundPropertyName
-    ) {
-      const {
-        foundPropertyName,
-        foundProperty,
-      } = behaviorSharedDataPropertySearch;
-      if (
-        !behaviorSharedData.updateProperty(
-          foundPropertyName,
-          sanitizePropertyNewValue(foundProperty, new_value)
-        )
+      const behaviorPropertySearch = findPropertyByName({
+        properties: behaviorProperties,
+        name: propertyName,
+      });
+
+      const behaviorSharedDataPropertySearch = findPropertyByName({
+        properties: behaviorSharedDataProperties,
+        name: propertyName,
+      });
+
+      if (behaviorPropertySearch.foundPropertyName) {
+        const { foundPropertyName, foundProperty } = behaviorPropertySearch;
+        if (
+          !behavior.updateProperty(
+            foundPropertyName,
+            sanitizePropertyNewValue(foundProperty, newValue)
+          )
+        ) {
+          warnings.push(
+            `Could not change property "${foundPropertyName}" of behavior "${behavior_name}". The value might be invalid, of the wrong type or not allowed.`
+          );
+          return;
+        }
+
+        changes.push(
+          `Changed property "${foundPropertyName}" of behavior "${behavior_name}" to "${newValue}".`
+        );
+      } else if (
+        behaviorSharedData &&
+        behaviorSharedDataPropertySearch.foundPropertyName
       ) {
-        return makeGenericFailure(
-          `Could not change shared property "${foundPropertyName}" of behavior "${behavior_name}". The value might be invalid, of the wrong type or not allowed.`
+        const {
+          foundPropertyName,
+          foundProperty,
+        } = behaviorSharedDataPropertySearch;
+        if (
+          !behaviorSharedData.updateProperty(
+            foundPropertyName,
+            sanitizePropertyNewValue(foundProperty, newValue)
+          )
+        ) {
+          warnings.push(
+            `Could not change shared property "${foundPropertyName}" of behavior "${behavior_name}". The value might be invalid, of the wrong type or not allowed.`
+          );
+          return;
+        }
+
+        changes.push(
+          `Changed property "${foundPropertyName}" of behavior "${behavior_name}" (shared between all objects having this behavior) to "${newValue}".`
+        );
+      } else {
+        warnings.push(
+          `Property "${propertyName}" not found on behavior "${behavior_name}" of object "${object_name}".`
         );
       }
+    });
 
-      return makeGenericSuccess(
-        `Changed property "${foundPropertyName}" of behavior "${behavior_name}" (shared between all objects having this behavior) to "${new_value}".`
-      );
-    } else {
-      return makeGenericFailure(
-        `Property "${property_name}" not found on behavior "${behavior_name}" of object "${object_name}".`
-      );
-    }
+    return makeMultipleChangesOutput(changes, warnings);
   },
 };
 
@@ -3233,7 +3437,7 @@ const changeScenePropertiesLayersEffects: EditorFunction = {
         );
         if (propertyName === null || newValue === null) {
           warnings.push(
-            `Missing "property_name" or "new_value" in the changed_property object: ${JSON.stringify(
+            `Missing "property_name" or "new_value" in an item of \`changed_properties\`: ${JSON.stringify(
               changed_property
             )}. It was ignored and not changed.`
           );
@@ -3508,7 +3712,7 @@ const changeScenePropertiesLayersEffects: EditorFunction = {
             );
             if (propertyName === null || newValue === null) {
               warnings.push(
-                `Missing "property_name" or "new_value" in an item of changed_properties. It was ignored and not changed. Make sure you follow the exact format for changing effect properties.`
+                `Missing "property_name" or "new_value" in an item of \`changed_properties\`. It was ignored and not changed. Make sure you follow the exact format for changing effect properties.`
               );
               return;
             }

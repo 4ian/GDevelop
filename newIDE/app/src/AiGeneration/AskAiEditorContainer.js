@@ -897,7 +897,11 @@ export const AskAiEditor = React.memo<Props>(
             }
           }
 
-          if (selectedAiRequest && createdSceneNames) {
+          if (
+            selectedAiRequest &&
+            createdSceneNames &&
+            createdSceneNames.length > 0
+          ) {
             onOpenAskAi({
               mode: selectedAiRequest.mode || 'agent',
               aiRequestId: selectedAiRequestId,

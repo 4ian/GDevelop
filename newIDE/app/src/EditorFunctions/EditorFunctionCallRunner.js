@@ -168,23 +168,23 @@ export const processEditorFunctionCalls = async ({
             project,
           });
         } else {
-          result = {
+          result = ({
             success: false,
             message: `Function ${name} requires a project to be opened before being used.`,
-          };
+          }: EditorFunctionGenericOutput);
         }
       } else if (editorFunctionWithoutProject) {
         result = await editorFunctionWithoutProject.launchFunction(
           argumentsWithoutProject
         );
       } else {
-        result = {
+        result = ({
           success: false,
           message: `Unknown function with name: ${name}. Please use something else as this seems not supported or existing.`,
-        };
+        }: EditorFunctionGenericOutput);
       }
 
-      const { success, ...output } = result;
+      const { success, meta, ...output } = result;
       results.push({
         status: 'finished',
         call_id,
@@ -192,10 +192,8 @@ export const processEditorFunctionCalls = async ({
         output,
       });
 
-      if (success && args) {
-        if (name === 'create_scene' && typeof args.scene_name === 'string') {
-          createdSceneNames.push(args.scene_name);
-        }
+      if (meta && meta.newSceneNames) {
+        createdSceneNames.push(...meta.newSceneNames);
       }
     } catch (error) {
       results.push({

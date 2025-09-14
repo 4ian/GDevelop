@@ -60,6 +60,9 @@ export type EditorFunctionCallResult =
 
 export type EditorFunctionGenericOutput = {|
   success: boolean,
+  meta?: {
+    newSceneNames?: Array<string>,
+  },
   message?: string,
   eventsAsText?: string,
   objectName?: string,
@@ -3204,11 +3207,15 @@ const createScene: EditorFunction = {
     }
     addDefaultLightToAllLayers(scene);
 
-    return makeGenericSuccess(
-      include_ui_layer
+    return {
+      success: true,
+      message: include_ui_layer
         ? `Created new scene "${scene_name}" with the base layer and a layer called "UI".`
-        : `Created new scene "${scene_name}".`
-    );
+        : `Created new scene "${scene_name}".`,
+      meta: {
+        newSceneNames: [scene_name],
+      },
+    };
   },
 };
 
@@ -4026,6 +4033,11 @@ const initializeProject: EditorFunctionWithoutProject = {
           output.initializedProject = true;
         }
       }
+      output.meta = {
+        newSceneNames: mapFor(0, createdProject.getLayoutsCount(), i =>
+          createdProject.getLayoutAt(i).getName()
+        ),
+      };
 
       return output;
     } catch (error) {

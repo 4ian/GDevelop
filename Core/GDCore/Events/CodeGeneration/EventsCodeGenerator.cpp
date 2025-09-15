@@ -329,7 +329,6 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
     condition.SetParameters(parameters);
   }
 
-  gd::EventsCodeGenerator::CheckBehaviorParameters(condition, instrInfos);
   // Verify that there are no mismatches between object type in parameters.
   for (std::size_t pNb = 0; pNb < instrInfos.parameters.GetParametersCount(); ++pNb) {
     if (ParameterMetadata::IsObject(instrInfos.parameters.GetParameter(pNb).GetType())) {
@@ -356,6 +355,11 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
         return "/* Mismatched object type - skipped. */";
       }
     }
+  }
+  bool isAnyBehaviorMissing =
+      gd::EventsCodeGenerator::CheckBehaviorParameters(condition, instrInfos);
+  if (isAnyBehaviorMissing) {
+    return "/* Missing behavior - skipped. */";
   }
 
   if (instrInfos.IsObjectInstruction()) {
@@ -488,12 +492,13 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(
   return outputCode;
 }
 
-void EventsCodeGenerator::CheckBehaviorParameters(
+bool EventsCodeGenerator::CheckBehaviorParameters(
     const gd::Instruction &instruction,
     const gd::InstructionMetadata &instrInfos) {
+  bool isAnyBehaviorMissing = false;
   gd::ParameterMetadataTools::IterateOverParameters(
       instruction.GetParameters(), instrInfos.parameters,
-      [this](const gd::ParameterMetadata &parameterMetadata,
+      [this, &isAnyBehaviorMissing](const gd::ParameterMetadata &parameterMetadata,
              const gd::Expression &parameterValue,
              const gd::String &lastObjectName) {
         if (ParameterMetadata::IsBehavior(parameterMetadata.GetType())) {
@@ -506,6 +511,7 @@ void EventsCodeGenerator::CheckBehaviorParameters(
 
           if (!expectedBehaviorType.empty() &&
               actualBehaviorType != expectedBehaviorType) {
+            isAnyBehaviorMissing = true;
             gd::ProjectDiagnostic projectDiagnostic(
                 gd::ProjectDiagnostic::ErrorType::MissingBehavior, "",
                 actualBehaviorType, expectedBehaviorType, lastObjectName);
@@ -513,6 +519,7 @@ void EventsCodeGenerator::CheckBehaviorParameters(
           }
         }
       });
+    return isAnyBehaviorMissing;
 }
 
 /**
@@ -552,7 +559,6 @@ gd::String EventsCodeGenerator::GenerateActionCode(
     action.SetParameters(parameters);
   }
 
-  gd::EventsCodeGenerator::CheckBehaviorParameters(action, instrInfos);
   // Verify that there are no mismatches between object type in parameters.
   for (std::size_t pNb = 0; pNb < instrInfos.parameters.GetParametersCount(); ++pNb) {
     if (ParameterMetadata::IsObject(instrInfos.parameters.GetParameter(pNb).GetType())) {
@@ -578,6 +584,11 @@ gd::String EventsCodeGenerator::GenerateActionCode(
         return "/* Mismatched object type - skipped. */";
       }
     }
+  }
+  bool isAnyBehaviorMissing =
+      gd::EventsCodeGenerator::CheckBehaviorParameters(action, instrInfos);
+  if (isAnyBehaviorMissing) {
+    return "/* Missing behavior - skipped. */";
   }
 
   // Call free function first if available

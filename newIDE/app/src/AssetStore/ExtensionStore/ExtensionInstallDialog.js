@@ -201,7 +201,6 @@ const ExtensionInstallDialog = ({
                     installedExtension &&
                     extensionShortHeader.version !==
                       installedExtension.getVersion() ? (
-                      extensionShortHeader.tier === 'community' ||
                       extensionShortHeader.tier === 'experimental' ? (
                         <Trans>Update (could break the project)</Trans>
                       ) : (
@@ -303,8 +302,7 @@ const ExtensionInstallDialog = ({
             isStandaloneText
           />
         )}
-        {(extensionShortHeader.tier === 'community' ||
-          extensionShortHeader.tier === 'community') && (
+        {extensionShortHeader.tier === 'experimental' && (
           <AlertMessage kind="warning">
             <Trans>
               This is an extension made by a community member and it only got

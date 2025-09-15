@@ -119,7 +119,6 @@ export const BehaviorListItem = ({
     alreadyAdded ||
     !isObjectCompatible ||
     !isEngineCompatible ||
-    behaviorShortHeader.tier === 'community' ||
     behaviorShortHeader.tier === 'experimental' ||
     (behaviorShortHeader.isDeprecated || false);
   const hasInfoButton = behaviorShortHeader.authors || false;
@@ -181,8 +180,7 @@ export const BehaviorListItem = ({
                   variant="outlined"
                 />
               )}
-              {(behaviorShortHeader.tier === 'community' ||
-                behaviorShortHeader.tier === 'experimental') && (
+              {behaviorShortHeader.tier === 'experimental' && (
                 <Chip
                   size="small"
                   label={<Trans>Experimental</Trans>}

@@ -18,7 +18,7 @@ import { EXTENSIONS_FETCH_TIMEOUT } from '../../Utils/GlobalFetchTimeouts';
 const emptySearchText = '';
 
 const noExcludedTiers = new Set();
-const excludedCommunityTiers = new Set(['community']);
+const excludedExperimentalTiers = new Set(['experimental']);
 
 type ExtensionStoreState = {|
   filters: ?Filters,
@@ -224,7 +224,7 @@ export const ExtensionStoreStateProvider = ({
     chosenFilters: filtersState.chosenFilters,
     excludedTiers: showExperimentalExtensions
       ? noExcludedTiers
-      : excludedCommunityTiers,
+      : excludedExperimentalTiers,
     defaultFirstSearchItemIds: firstExtensionIds,
   });
 

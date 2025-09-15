@@ -481,7 +481,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       authors: [],
     },
     {
-      tier: 'community',
+      tier: 'experimental',
       authorIds: [
         'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
         'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
@@ -527,7 +527,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       ],
     },
     {
-      tier: 'community',
+      tier: 'experimental',
       authorIds: [
         'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
         'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
@@ -573,7 +573,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       ],
     },
     {
-      tier: 'community',
+      tier: 'experimental',
       authorIds: [
         'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
         'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
@@ -619,7 +619,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       ],
     },
     {
-      tier: 'community',
+      tier: 'experimental',
       authorIds: [
         'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
         'gqDaZjCfevOOxBYkK6zlhtZnXCg1',

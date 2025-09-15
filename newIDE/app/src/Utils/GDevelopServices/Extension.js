@@ -9,7 +9,7 @@ import { retryIfFailed } from '../RetryIfFailed';
 
 const gd: libGDevelop = global.gd;
 
-type ExtensionTier = 'community' | 'reviewed' | 'installed';
+type ExtensionTier = 'experimental' | 'reviewed' | 'installed';
 
 export type ExtensionRegistryItemHeader = {|
   tier: ExtensionTier,
@@ -203,6 +203,11 @@ export const getExtensionsRegistry = async (): Promise<ExtensionsRegistry> => {
     extensionsRegistry.views.default.firstIds =
       extensionsRegistry.views.default.firstExtensionIds;
   }
+  for (const header of extensionsRegistry.headers) {
+    if ((header.tier: string) === 'community') {
+      header.tier = 'experimental';
+    }
+  }
   return {
     ...extensionsRegistry,
     // TODO: move this to backend endpoint
@@ -242,6 +247,9 @@ const adaptBehaviorHeader = (
     header.name
   );
   header = transformTagsAsStringToTagsAsArray(header);
+  if ((header.tier: string) === 'community') {
+    header.tier = 'experimental';
+  }
   return header;
 };
 
@@ -253,6 +261,9 @@ export const getExtensionHeader = (
     const transformedData: ExtensionHeader = transformTagsAsStringToTagsAsArray(
       data
     );
+    if ((data.tier: string) === 'community') {
+      data.tier = 'experimental';
+    }
     return transformedData;
   });
 };

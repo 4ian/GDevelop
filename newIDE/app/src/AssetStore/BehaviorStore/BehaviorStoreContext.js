@@ -20,7 +20,7 @@ const gd: libGDevelop = global.gd;
 const emptySearchText = '';
 
 const noExcludedTiers = new Set();
-const excludedCommunityTiers = new Set(['community']);
+const excludedExperimentalTiers = new Set(['experimental']);
 
 type TranslatedBehaviorShortHeader = {|
   ...BehaviorShortHeader,
@@ -308,7 +308,7 @@ export const BehaviorStoreStateProvider = ({
           if (
             showExperimentalExtensions ||
             !behavior.tier ||
-            !excludedCommunityTiers.has(behavior.tier)
+            !excludedExperimentalTiers.has(behavior.tier)
           ) {
             tagsSet.add(tag);
           }
@@ -343,7 +343,7 @@ export const BehaviorStoreStateProvider = ({
     chosenFilters: filtersState.chosenFilters,
     excludedTiers: showExperimentalExtensions
       ? noExcludedTiers
-      : excludedCommunityTiers,
+      : excludedExperimentalTiers,
     defaultFirstSearchItemIds: defaultFirstSearchItemIds,
   });
 

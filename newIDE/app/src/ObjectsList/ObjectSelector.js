@@ -146,10 +146,8 @@ const getMissingBehaviors = ({
     return [];
   }
 
-  if (!objectsContainersList.hasObjectNamed(objectName)) {
-    // Either the object does not exist or it's a group - not a problem because:
-    // - if the object does not exist, we can't know its capabilities, we assume it has all.
-    // - a group is assumed to have all the capabilities.
+  if (!objectsContainersList.hasObjectOrGroupNamed(objectName)) {
+    // The parser already gives errors for objects which don't exist.
     return [];
   }
   return requiredBehaviorTypes.filter(

@@ -757,7 +757,6 @@ namespace gdjs {
                 this.tweenInformation.variable
               );
             if (variablePath) {
-              console.log('variablePath', variablePath);
               tweenInformationNetworkSyncData.variablePath = variablePath;
             }
           }

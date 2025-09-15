@@ -7,11 +7,6 @@ namespace gdjs {
   const logger = new gdjs.Logger('RuntimeScene');
   const setupWarningLogger = new gdjs.Logger('RuntimeScene (setup warnings)');
 
-  export type LoadRequestOptions = {
-    loadStorageName?: string;
-    loadVariable?: gdjs.Variable;
-  };
-
   /**
    * A scene being played, containing instances of objects rendered on screen.
    */
@@ -35,7 +30,6 @@ namespace gdjs {
     _gameStopRequested: boolean = false;
     _requestedScene: string = '';
     _resourcesUnloading: 'at-scene-exit' | 'never' | 'inherit' = 'inherit';
-    _loadRequestOptions: LoadRequestOptions | null = null;
     private _asyncTasksManager = new gdjs.AsyncTasksManager();
 
     /** True if loadFromScene was called and the scene is being played. */
@@ -782,10 +776,6 @@ namespace gdjs {
       if (sceneName) this._requestedScene = sceneName;
     }
 
-    requestLoadSnapshot(loadRequestOptions: LoadRequestOptions | null): void {
-      this._loadRequestOptions = loadRequestOptions;
-    }
-
     /**
      * Get the profiler associated with the scene, or null if none.
      */
@@ -979,10 +969,6 @@ namespace gdjs {
         this.networkId = newNetworkId;
       }
       return this.networkId;
-    }
-
-    getLoadRequestOptions(): LoadRequestOptions | null {
-      return this._loadRequestOptions;
     }
   }
 

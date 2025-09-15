@@ -68,12 +68,11 @@ module.exports = {
         'LoadGameSnapshotFromVariable',
         _('Load game from variable'),
         _('Load game from a variable save snapshot.'),
-        _('Load the game from variable _PARAM1_'),
+        _('Load the game from variable _PARAM0_'),
         _('Load'),
         'res/actions/saveUp.svg',
         'res/actions/saveUp.svg'
       )
-      .addCodeOnlyParameter('currentScene', '')
       .addParameter('variable', _('Variable to load the game from'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/SaveState/savestatetools.js')
@@ -84,12 +83,11 @@ module.exports = {
         'LoadGameSnapshotFromStorage',
         _('Load game from device storage'),
         _('Load game from device storage save snapshot.'),
-        _('Load the game from device storage under key _PARAM1_.'),
+        _('Load the game from device storage under key _PARAM0_.'),
         _('Load'),
         'res/actions/saveUp.svg',
         'res/actions/saveUp.svg'
       )
-      .addCodeOnlyParameter('currentScene', '')
       .addParameter('string', _('Storage key to load the game from'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/SaveState/savestatetools.js')
@@ -106,7 +104,6 @@ module.exports = {
         'res/actions/saveDown.svg'
       )
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
-      .getCodeExtraInformation()
       .setIncludeFile('Extensions/SaveState/savestatetools.js')
       .setFunctionName('gdjs.saveState.getSecondsSinceLastSave')
       .setGetter('gdjs.saveState.getSecondsSinceLastSave');
@@ -122,7 +119,6 @@ module.exports = {
         'res/actions/saveDown.svg'
       )
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
-      .getCodeExtraInformation()
       .setIncludeFile('Extensions/SaveState/savestatetools.js')
       .setFunctionName('gdjs.saveState.getSecondsSinceLastLoad')
       .setGetter('gdjs.saveState.getSecondsSinceLastLoad');

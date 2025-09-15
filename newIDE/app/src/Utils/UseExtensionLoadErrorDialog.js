@@ -84,13 +84,13 @@ export const ExtensionLoadErrorDialog = ({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHeaderColumn>
+              <TableHeaderColumn style={{ width: '25%' }}>
                 <Trans>Extension name</Trans>
               </TableHeaderColumn>
-              <TableHeaderColumn>
+              <TableHeaderColumn style={{ width: '35%' }}>
                 <Trans>Message</Trans>
               </TableHeaderColumn>
-              <TableHeaderColumn>
+              <TableHeaderColumn style={{ width: '40%' }}>
                 <Trans>Raw error</Trans>
               </TableHeaderColumn>
             </TableRow>
@@ -99,9 +99,19 @@ export const ExtensionLoadErrorDialog = ({
             {erroredExtensionLoadingResults.map(
               ({ extensionModulePath, result: { message, rawError } }) => (
                 <TableRow key={extensionModulePath}>
-                  <TableRowColumn>{extensionModulePath}</TableRowColumn>
-                  <TableRowColumn>{message}</TableRowColumn>
-                  <TableRowColumn>
+                  <TableRowColumn
+                    style={{ width: '25%', wordBreak: 'break-word' }}
+                  >
+                    {extensionModulePath}
+                  </TableRowColumn>
+                  <TableRowColumn
+                    style={{ width: '35%', wordBreak: 'break-word' }}
+                  >
+                    {message}
+                  </TableRowColumn>
+                  <TableRowColumn
+                    style={{ width: '40%', wordBreak: 'break-word' }}
+                  >
                     {rawError && (
                       <Text>
                         {rawError.toString()}
@@ -115,9 +125,13 @@ export const ExtensionLoadErrorDialog = ({
             )}
             {genericError ? (
               <TableRow>
-                <TableRowColumn>-</TableRowColumn>
-                <TableRowColumn>{genericError.toString()}</TableRowColumn>
-                <TableRowColumn>-</TableRowColumn>
+                <TableRowColumn style={{ width: '25%' }}>-</TableRowColumn>
+                <TableRowColumn
+                  style={{ width: '35%', wordBreak: 'break-word' }}
+                >
+                  {genericError.toString()}
+                </TableRowColumn>
+                <TableRowColumn style={{ width: '40%' }}>-</TableRowColumn>
               </TableRow>
             ) : null}
           </TableBody>

@@ -1,4 +1,10 @@
 namespace gdjs {
+  const logger = new gdjs.Logger('Save state');
+  export type LoadRequestOptions = {
+    loadStorageName?: string;
+    loadVariable?: gdjs.Variable;
+  };
+
   export namespace saveState {
     export const getIndexedDbDatabaseName = () => {
       const gameId = gdjs.projectData.properties.projectUuid;
@@ -17,6 +23,8 @@ namespace gdjs {
     let saveJustFailed: boolean = false;
     let loadJustSucceeded: boolean = false;
     let loadJustFailed: boolean = false;
+
+    let loadRequestOptions: LoadRequestOptions | null = null;
 
     export const getSecondsSinceLastSave = (): number => {
       if (!lastSaveTime) return -1;
@@ -40,9 +48,11 @@ namespace gdjs {
     };
     export const markSaveJustSucceeded = () => {
       saveJustSucceeded = true;
+      lastSaveTime = Date.now();
     };
     export const markLoadJustSucceeded = () => {
       loadJustSucceeded = true;
+      lastLoadTime = Date.now();
     };
     export const markSaveJustFailed = () => {
       saveJustFailed = true;
@@ -112,43 +122,150 @@ namespace gdjs {
       currentScene: RuntimeScene,
       sceneVar: gdjs.Variable
     ) {
-      const gameSaveState = getGameSaveState(currentScene);
-      sceneVar.fromJSObject(gameSaveState);
-      lastSaveTime = Date.now();
+      try {
+        const gameSaveState = getGameSaveState(currentScene);
+        sceneVar.fromJSObject(gameSaveState);
+        markSaveJustSucceeded();
+      } catch (error) {
+        logger.error('Error saving to variable:', error);
+        markSaveJustFailed();
+      }
     };
 
     export const saveStorageGameSnapshot = async function (
       currentScene: RuntimeScene,
       storageKey: string
     ) {
-      const gameSaveState = getGameSaveState(currentScene);
-      await gdjs.saveToIndexedDB(
-        getIndexedDbDatabaseName(),
-        getIndexedDbObjectStore(),
-        getIndexedDbStorageKey(storageKey),
-        gameSaveState
-      );
-      lastSaveTime = Date.now();
+      try {
+        const gameSaveState = getGameSaveState(currentScene);
+        await gdjs.saveToIndexedDB(
+          getIndexedDbDatabaseName(),
+          getIndexedDbObjectStore(),
+          getIndexedDbStorageKey(storageKey),
+          gameSaveState
+        );
+        markSaveJustSucceeded();
+      } catch (error) {
+        logger.error('Error saving to IndexedDB:', error);
+        markSaveJustFailed();
+      }
     };
 
     export const loadGameFromVariableSnapshot = async function (
-      currentScene: RuntimeScene,
       variable: gdjs.Variable
     ) {
-      currentScene.requestLoadSnapshot({
+      // The information is saved, so that the load can be done
+      // at the end of the frame,
+      // and avoid possible conflicts with running events.
+      loadRequestOptions = {
         loadVariable: variable,
-      });
-      lastLoadTime = Date.now();
+      };
     };
 
     export const loadGameFromStorageSnapshot = async function (
-      currentScene: RuntimeScene,
       storageName: string
     ) {
-      currentScene.requestLoadSnapshot({
+      // The information is saved, so that the load can be done
+      // at the end of the frame,
+      // and avoid possible conflicts with running events.
+      loadRequestOptions = {
         loadStorageName: storageName,
+      };
+    };
+
+    export const loadGameSnapshotAtTheEndOfFrameIfAny = function (
+      runtimeScene: RuntimeScene
+    ): boolean {
+      if (!loadRequestOptions) return false;
+
+      const optionsToApply = loadRequestOptions;
+      // Reset it so we don't load it twice.
+      loadRequestOptions = null;
+
+      if (optionsToApply.loadVariable) {
+        const saveState =
+          optionsToApply.loadVariable.toJSObject() as GameSaveState;
+        try {
+          loadGameFromSave(runtimeScene, saveState);
+          markLoadJustSucceeded();
+        } catch (error) {
+          logger.error('Error loading from variable:', error);
+          markLoadJustFailed();
+        }
+      } else if (optionsToApply.loadStorageName) {
+        gdjs
+          .loadFromIndexedDB(
+            gdjs.saveState.getIndexedDbDatabaseName(),
+            gdjs.saveState.getIndexedDbObjectStore(),
+            gdjs.saveState.getIndexedDbStorageKey(
+              optionsToApply.loadStorageName
+            )
+          )
+          .then((jsonData) => {
+            const saveState = jsonData as GameSaveState;
+            loadGameFromSave(runtimeScene, saveState);
+            markLoadJustSucceeded();
+          })
+          .catch((error) => {
+            logger.error('Error loading from IndexedDB:', error);
+            markLoadJustFailed();
+          });
+      }
+
+      return true;
+    };
+
+    const loadGameFromSave = (
+      runtimeScene: RuntimeScene,
+      saveState: GameSaveState
+    ): void => {
+      const options: UpdateFromNetworkSyncDataOptions = {
+        clearSceneStack: true,
+        clearInputs: true,
+        keepControl: true,
+        ignoreVariableOwnership: true,
+      };
+
+      // First update the game, which will update the variables,
+      // and set the scene stack to update when ready.
+      const runtimeGame = runtimeScene.getGame();
+      runtimeGame.updateFromNetworkSyncData(
+        saveState.gameNetworkSyncData,
+        options
+      );
+
+      // Apply the scene stack updates, as we are at the end of a frame,
+      // we can safely do it.
+      const sceneStack = runtimeGame.getSceneStack();
+      sceneStack.applyUpdateFromNetworkSyncDataIfAny(options);
+
+      // Then get all scenes, which we assume will be the expected ones
+      // after the load has been done, so we can update them,
+      // and create their objects.
+      const runtimeScenes = sceneStack.getAllScenes();
+      runtimeScenes.forEach((scene, index) => {
+        const layoutSyncData = saveState.layoutNetworkSyncDatas[index];
+        if (!layoutSyncData) return;
+
+        // Create objects first, so they are available for the scene update,
+        // especially so that they have a networkId defined.
+        const objectDatas = layoutSyncData.objectDatas;
+        for (const id in objectDatas) {
+          const objectNetworkSyncData = objectDatas[id];
+          const objectName = objectNetworkSyncData.n;
+          if (!objectName) {
+            logger.warn('Tried to recreate an object without a name.');
+            continue;
+          }
+          const object = scene.createObject(objectName);
+          if (object) {
+            object.updateFromNetworkSyncData(objectNetworkSyncData, options);
+          }
+        }
+
+        // Update the scene last.
+        scene.updateFromNetworkSyncData(layoutSyncData.sceneData, options);
       });
-      lastLoadTime = Date.now();
     };
   }
 }

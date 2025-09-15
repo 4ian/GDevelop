@@ -29,7 +29,7 @@ bool BehaviorParametersFiller::DoVisitInstruction(gd::Instruction &instruction,
       instruction.GetParameters(), metadata.GetParameters(),
       [&](const gd::ParameterMetadata &parameterMetadata,
           const gd::Expression &parameterValue, size_t parameterIndex,
-          const gd::String &lastObjectName) {
+          const gd::String &lastObjectName, size_t lastObjectIndex) {
         if (parameterMetadata.GetValueTypeMetadata().IsBehavior() &&
             parameterValue.GetPlainString().length() == 0) {
 

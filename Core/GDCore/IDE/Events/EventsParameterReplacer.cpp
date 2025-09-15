@@ -183,12 +183,10 @@ bool EventsParameterReplacer::DoVisitInstruction(gd::Instruction& instruction,
                                    platform, instruction.GetType());
 
   gd::ParameterMetadataTools::IterateOverParametersWithIndex(
-      instruction.GetParameters(),
-      metadata.GetParameters(),
-      [&](const gd::ParameterMetadata& parameterMetadata,
-          const gd::Expression& parameterValue,
-          size_t parameterIndex,
-          const gd::String& lastObjectName) {
+      instruction.GetParameters(), metadata.GetParameters(),
+      [&](const gd::ParameterMetadata &parameterMetadata,
+          const gd::Expression &parameterValue, size_t parameterIndex,
+          const gd::String &lastObjectName, size_t lastObjectIndex) {
         if (!gd::EventsParameterReplacer::CanContainParameter(
           parameterMetadata.GetValueTypeMetadata())) {
           return;

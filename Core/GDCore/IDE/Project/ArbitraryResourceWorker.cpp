@@ -227,12 +227,11 @@ bool ResourceWorkerInEventsWorker::DoVisitInstruction(gd::Instruction& instructi
                                     platform, instruction.GetType());
 
   gd::ParameterMetadataTools::IterateOverParametersWithIndex(
-      instruction.GetParameters(),
-      metadata.GetParameters(),
-      [this, &instruction](const gd::ParameterMetadata& parameterMetadata,
-                            const gd::Expression& parameterExpression,
-                            size_t parameterIndex,
-                            const gd::String& lastObjectName) {
+      instruction.GetParameters(), metadata.GetParameters(),
+      [this, &instruction](
+          const gd::ParameterMetadata &parameterMetadata,
+          const gd::Expression &parameterExpression, size_t parameterIndex,
+          const gd::String &lastObjectName, size_t lastObjectIndex) {
         const String& parameterValue = parameterExpression.GetPlainString();
         if (parameterMetadata.GetType() == "fontResource") {
           gd::String updatedParameterValue = parameterValue;

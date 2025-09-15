@@ -42,7 +42,7 @@ declare type ObjectData = {
 declare type GetNetworkSyncDataOptions = {
   playerNumber?: number;
   isHost?: boolean;
-  syncObjectName?: boolean;
+  syncObjectIdentifier?: boolean;
   syncAllVariables?: boolean;
   syncAllBehaviors?: boolean;
   syncSceneTimers?: boolean;
@@ -50,6 +50,8 @@ declare type GetNetworkSyncDataOptions = {
   syncSounds?: boolean;
   syncTweens?: boolean;
   syncLayers?: boolean;
+  syncAsyncTasks?: boolean;
+  syncSceneAdditionalProps?: boolean;
 };
 
 declare type UpdateFromNetworkSyncDataOptions = {
@@ -87,6 +89,8 @@ declare type BasicObjectNetworkSyncData = {
   pfy: number;
   /* name :*/
   n?: string;
+  /** The network ID of the instance. */
+  networkId?: string;
 };
 
 /**
@@ -109,7 +113,7 @@ declare interface ObjectNetworkSyncData extends BasicObjectNetworkSyncData {
     [timerName: string]: TimerNetworkSyncData;
   };
   /** Tweens */
-  tweenManager?: TweenManagerNetworkSyncData;
+  tween?: TweenManagerNetworkSyncData;
 }
 
 declare type ForceNetworkSyncData = {
@@ -167,6 +171,7 @@ declare type LayerNetworkSyncData = {
   clearColor: Array<integer>;
   cameraX: float;
   cameraY: float;
+  cameraZ: float;
   cameraRotation: float;
   cameraZoom: float;
 };
@@ -286,12 +291,14 @@ declare interface LayoutNetworkSyncData {
   extVar?: {
     [extensionName: string]: VariableNetworkSyncData[];
   };
-  timeManager?: TimeManagerSyncData;
-  tweenManager?: TweenManagerNetworkSyncData;
-  onceTriggers?: OnceTriggersSyncData;
+  time?: TimeManagerSyncData;
+  tween?: TweenManagerNetworkSyncData;
+  once?: OnceTriggersSyncData;
   layers?: {
     [layerName: string]: LayerNetworkSyncData;
   };
+  async?: AsyncTasksManagerNetworkSyncData;
+  color?: integer;
 }
 
 declare interface SceneStackSceneNetworkSyncData {

@@ -232,8 +232,6 @@ namespace gdjs {
       variable: gdjs.Variable,
       childrenToLookIn: Children | null = null
     ): string[] | null {
-      console.log('Looking for variable', variable, this._variables);
-
       const variables = childrenToLookIn || this._variables.items;
       for (const variableName in variables) {
         if (variables.hasOwnProperty(variableName)) {

@@ -54,16 +54,24 @@ namespace gdjs {
         const layoutSyncData = saveState.layoutNetworkSyncDatas[index];
         if (!layoutSyncData) return;
 
-        scene.updateFromNetworkSyncData(layoutSyncData.sceneData, options);
-
+        // Create objects first, so they are available for the scene update,
+        // especially so that they have a networkId defined.
         const objectDatas = layoutSyncData.objectDatas;
         for (const id in objectDatas) {
           const objectNetworkSyncData = objectDatas[id];
-          const object = scene.createObject(objectNetworkSyncData.n || '');
+          const objectName = objectNetworkSyncData.n;
+          if (!objectName) {
+            logger.warn('Tried to recreate an object without a name.');
+            continue;
+          }
+          const object = scene.createObject(objectName);
           if (object) {
             object.updateFromNetworkSyncData(objectNetworkSyncData, options);
           }
         }
+
+        // Update the scene last.
+        scene.updateFromNetworkSyncData(layoutSyncData.sceneData, options);
       });
     }
 
@@ -109,9 +117,12 @@ namespace gdjs {
         }
       }
 
+      // At the end of the step for the scene, check if a load request is pending,
+      // and if so, apply it.
       const loadRequestOptions = currentScene.getLoadRequestOptions();
       if (!loadRequestOptions) return true;
 
+      // Reset it so we don't load it twice.
       currentScene.requestLoadSnapshot(null);
 
       if (loadRequestOptions.loadVariable) {
@@ -121,6 +132,7 @@ namespace gdjs {
           this._loadGameFromSave(saveState);
         } catch (error) {
           logger.error('Error loading from variable:', error);
+          gdjs.saveState.markLoadJustFailed();
         }
       } else if (loadRequestOptions.loadStorageName) {
         gdjs
@@ -137,6 +149,7 @@ namespace gdjs {
           })
           .catch((error) => {
             logger.error('Error loading from IndexedDB:', error);
+            gdjs.saveState.markLoadJustFailed();
           });
       }
 
@@ -302,6 +315,11 @@ namespace gdjs {
      */
     wasFirstSceneLoaded(): boolean {
       return this._wasFirstSceneLoaded;
+    }
+
+    getAllScenes(): Array<gdjs.RuntimeScene> {
+      this._throwIfDisposed();
+      return this._stack;
     }
 
     getAllSceneNames(): Array<string> {

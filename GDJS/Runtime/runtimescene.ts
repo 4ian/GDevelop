@@ -17,7 +17,13 @@ namespace gdjs {
    */
   export class RuntimeScene extends gdjs.RuntimeInstanceContainer {
     _eventsFunction: null | ((runtimeScene: RuntimeScene) => void) = null;
-
+    _idToCallbackMap: null | Map<
+      string,
+      (
+        runtimeScene: gdjs.RuntimeScene,
+        asyncObjectsList: gdjs.LongLivedObjectsList
+      ) => void
+    > = null;
     _renderer: RuntimeSceneRenderer;
     _debuggerRenderer: gdjs.DebuggerRenderer;
     _variables: gdjs.VariablesContainer;
@@ -353,6 +359,8 @@ namespace gdjs {
       const module = gdjs[sceneData.mangledName + 'Code'];
       if (module && module.func) {
         this._eventsFunction = module.func;
+        this._idToCallbackMap =
+          gdjs[sceneData.mangledName + 'Code'].idToCallbackMap;
       } else {
         setupWarningLogger.warn(
           'No function found for running logic of scene ' + this._name
@@ -865,15 +873,15 @@ namespace gdjs {
         id: this.getOrCreateNetworkId(),
       };
       if (syncOptions.syncSceneTimers) {
-        networkSyncData.timeManager = this._timeManager.getNetworkSyncData();
+        networkSyncData.time = this._timeManager.getNetworkSyncData();
       }
       if (syncOptions.syncOnceTriggers) {
-        networkSyncData.onceTriggers = this._onceTriggers.getNetworkSyncData();
+        networkSyncData.once = this._onceTriggers.getNetworkSyncData();
       }
       // The function gdjs.evtTools.tween.getTweensMap may not exist if the project is not using any tweens,
       // as it's an extension.
       if (syncOptions.syncTweens && gdjs.evtTools.tween.getTweensMap) {
-        networkSyncData.tweenManager = gdjs.evtTools.tween
+        networkSyncData.tween = gdjs.evtTools.tween
           .getTweensMap(this)
           .getNetworkSyncData();
       }
@@ -884,6 +892,13 @@ namespace gdjs {
             this._layers.items[layerName].getNetworkSyncData();
         }
         networkSyncData.layers = layersSyncData;
+      }
+      if (syncOptions.syncAsyncTasks) {
+        networkSyncData.async =
+          this._asyncTasksManager.getNetworkSyncData(syncOptions);
+      }
+      if (syncOptions.syncSceneAdditionalProps) {
+        networkSyncData.color = this._backgroundColor;
       }
 
       return networkSyncData;
@@ -912,8 +927,8 @@ namespace gdjs {
           }
         }
       }
-      if (syncData.timeManager) {
-        this._timeManager.updateFromNetworkSyncData(syncData.timeManager);
+      if (syncData.time) {
+        this._timeManager.updateFromNetworkSyncData(syncData.time);
       }
       if (syncData.layers) {
         for (const layerName in syncData.layers) {
@@ -924,12 +939,12 @@ namespace gdjs {
           }
         }
       }
-      if (syncData.onceTriggers) {
-        this._onceTriggers.updateNetworkSyncData(syncData.onceTriggers);
+      if (syncData.once) {
+        this._onceTriggers.updateNetworkSyncData(syncData.once);
       }
-      if (syncData.tweenManager && gdjs.evtTools.tween.getTweensMap) {
+      if (syncData.tween && gdjs.evtTools.tween.getTweensMap) {
         gdjs.evtTools.tween.getTweensMap(this).updateFromNetworkSyncData(
-          syncData.tweenManager,
+          syncData.tween,
           (tweenInformationNetworkSyncData) => {
             if (tweenInformationNetworkSyncData.layerName !== undefined) {
               return this.getLayer(tweenInformationNetworkSyncData.layerName);
@@ -944,6 +959,17 @@ namespace gdjs {
           // No onFinish for scene tweens.
           () => null
         );
+      }
+      if (syncData.async && this._idToCallbackMap) {
+        this._asyncTasksManager.updateFromNetworkSyncData(
+          syncData.async,
+          this._idToCallbackMap,
+          this,
+          options
+        );
+      }
+      if (syncData.color !== undefined) {
+        this._backgroundColor = syncData.color;
       }
     }
 

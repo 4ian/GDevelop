@@ -132,6 +132,7 @@ namespace gdjs {
         clearColor: this._clearColor,
         cameraX: this.getCameraX(),
         cameraY: this.getCameraY(),
+        cameraZ: this.getCameraZ(null),
         cameraRotation: this.getCameraRotation(),
         cameraZoom: this.getCameraZoom(),
       };
@@ -183,6 +184,12 @@ namespace gdjs {
         networkSyncData.cameraY !== this.getCameraY()
       ) {
         this.setCameraY(networkSyncData.cameraY);
+      }
+      if (
+        networkSyncData.cameraZ !== undefined &&
+        networkSyncData.cameraZ !== this.getCameraZ(null)
+      ) {
+        this.setCameraZ(networkSyncData.cameraZ, null);
       }
       if (
         networkSyncData.cameraRotation !== undefined &&

@@ -106,8 +106,82 @@ module.exports = {
         'res/actions/saveDown.svg'
       )
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/SaveState/savestatetools.js')
       .setFunctionName('gdjs.saveState.getSecondsSinceLastSave')
       .setGetter('gdjs.saveState.getSecondsSinceLastSave');
+
+    extension
+      .addExpressionAndCondition(
+        'number',
+        'SecondsSinceLastLoad',
+        _('Seconds since last load'),
+        _('the number of seconds since the last load'),
+        _('the number of seconds since the last load'),
+        '',
+        'res/actions/saveDown.svg'
+      )
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/SaveState/savestatetools.js')
+      .setFunctionName('gdjs.saveState.getSecondsSinceLastLoad')
+      .setGetter('gdjs.saveState.getSecondsSinceLastLoad');
+
+    extension
+      .addCondition(
+        'SaveJustSucceeded',
+        _('Save just succeeded'),
+        _('the save just succeeded'),
+        _('the save just succeeded'),
+        _('Save'),
+        'res/actions/saveDown.svg',
+        'res/actions/saveDown.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/SaveState/savestatetools.js')
+      .setFunctionName('gdjs.saveState.hasSaveJustSucceeded');
+
+    extension
+      .addCondition(
+        'SaveJustFailed',
+        _('Save just failed'),
+        _('the save just failed'),
+        _('the save just failed'),
+        _('Save'),
+        'res/actions/saveDown.svg',
+        'res/actions/saveDown.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/SaveState/savestatetools.js')
+      .setFunctionName('gdjs.saveState.hasSaveJustFailed');
+
+    extension
+      .addCondition(
+        'LoadJustSucceeded',
+        _('Load just succeeded'),
+        _('the load just succeeded'),
+        _('the load just succeeded'),
+        _('Load'),
+        'res/actions/saveUp.svg',
+        'res/actions/saveUp.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/SaveState/savestatetools.js')
+      .setFunctionName('gdjs.saveState.hasLoadJustSucceeded');
+
+    extension
+      .addCondition(
+        'LoadJustFailed',
+        _('Load just failed'),
+        _('the load just failed'),
+        _('the load just failed'),
+        _('Load'),
+        'res/actions/saveUp.svg',
+        'res/actions/saveUp.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/SaveState/savestatetools.js')
+      .setFunctionName('gdjs.saveState.hasLoadJustFailed');
 
     return extension;
   },

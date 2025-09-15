@@ -120,6 +120,7 @@ export const BehaviorListItem = ({
     !isObjectCompatible ||
     !isEngineCompatible ||
     behaviorShortHeader.tier === 'community' ||
+    behaviorShortHeader.tier === 'experimental' ||
     (behaviorShortHeader.isDeprecated || false);
   const hasInfoButton = behaviorShortHeader.authors || false;
   const iconStyle = {
@@ -180,10 +181,11 @@ export const BehaviorListItem = ({
                   variant="outlined"
                 />
               )}
-              {behaviorShortHeader.tier === 'community' && (
+              {(behaviorShortHeader.tier === 'community' ||
+                behaviorShortHeader.tier === 'experimental') && (
                 <Chip
                   size="small"
-                  label={<Trans>Community-made</Trans>}
+                  label={<Trans>Experimental</Trans>}
                   color="primary"
                 />
               )}

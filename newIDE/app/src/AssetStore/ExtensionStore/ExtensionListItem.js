@@ -105,10 +105,11 @@ export const ExtensionListItem = ({
                   variant="outlined"
                 />
               )}
-              {extensionShortHeader.tier === 'community' && (
+              {(extensionShortHeader.tier === 'community' ||
+                extensionShortHeader.tier === 'experimental') && (
                 <Chip
                   size="small"
-                  label={<Trans>Community extension</Trans>}
+                  label={<Trans>Experimental extension</Trans>}
                   color="primary"
                 />
               )}

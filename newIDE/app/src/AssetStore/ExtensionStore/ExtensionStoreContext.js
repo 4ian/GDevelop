@@ -77,7 +77,7 @@ export const ExtensionStoreStateProvider = ({
     [string]: ExtensionShortHeader,
   }>({});
   const preferences = React.useContext(PreferencesContext);
-  const { showCommunityExtensions, language } = preferences.values;
+  const { showExperimentalExtensions, language } = preferences.values;
   const [firstExtensionIds, setFirstExtensionIds] = React.useState<
     Array<string>
   >([]);
@@ -222,7 +222,7 @@ export const ExtensionStoreStateProvider = ({
     chosenItemCategory: chosenCategory,
     chosenCategory: filtersState.chosenCategory,
     chosenFilters: filtersState.chosenFilters,
-    excludedTiers: showCommunityExtensions
+    excludedTiers: showExperimentalExtensions
       ? noExcludedTiers
       : excludedCommunityTiers,
     defaultFirstSearchItemIds: firstExtensionIds,

@@ -201,7 +201,8 @@ const ExtensionInstallDialog = ({
                     installedExtension &&
                     extensionShortHeader.version !==
                       installedExtension.getVersion() ? (
-                      extensionShortHeader.tier === 'community' ? (
+                      extensionShortHeader.tier === 'community' ||
+                      extensionShortHeader.tier === 'experimental' ? (
                         <Trans>Update (could break the project)</Trans>
                       ) : (
                         <Trans>Update</Trans>
@@ -302,15 +303,14 @@ const ExtensionInstallDialog = ({
             isStandaloneText
           />
         )}
-        {extensionShortHeader.tier === 'community' && (
+        {(extensionShortHeader.tier === 'community' ||
+          extensionShortHeader.tier === 'community') && (
           <AlertMessage kind="warning">
             <Trans>
-              This is an extension made by a community member — but not reviewed
-              by the GDevelop extension team. As such, we can't guarantee it
-              meets all the quality standards of official extensions. It could
-              also not be compatible with older GDevelop versions. In case of
-              doubt, contact the author to know more about what the extension
-              does or inspect its content before using it.
+              This is an extension made by a community member and it only got
+              through a light review by the GDevelop extension team. As such, we
+              can't guarantee it meets all the quality standards of fully
+              reviewed extensions.
             </Trans>
           </AlertMessage>
         )}

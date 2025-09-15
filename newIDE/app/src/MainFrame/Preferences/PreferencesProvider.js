@@ -148,7 +148,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setEventsSheetCancelInlineParameter: this._setEventsSheetCancelInlineParameter.bind(
       this
     ),
-    setShowCommunityExtensions: this._setShowCommunityExtensions.bind(this),
+    setShowExperimentalExtensions: this._setShowCommunityExtensions.bind(this),
     setShowCreateSectionByDefault: this._setShowCreateSectionByDefault.bind(
       this
     ),
@@ -441,12 +441,12 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _setShowCommunityExtensions(showCommunityExtensions: boolean) {
+  _setShowCommunityExtensions(showExperimentalExtensions: boolean) {
     this.setState(
       state => ({
         values: {
           ...state.values,
-          showCommunityExtensions,
+          showExperimentalExtensions,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

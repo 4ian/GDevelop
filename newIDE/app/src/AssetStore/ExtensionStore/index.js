@@ -130,15 +130,11 @@ export const ExtensionStore = ({
           <Column>
             <Toggle
               onToggle={(e, check) =>
-                preferences.setShowCommunityExtensions(check)
+                preferences.setShowExperimentalExtensions(check)
               }
-              toggled={preferences.values.showCommunityExtensions}
+              toggled={preferences.values.showExperimentalExtensions}
               labelPosition="right"
-              label={
-                <Trans>
-                  Show community extensions (not officially reviewed)
-                </Trans>
-              }
+              label={<Trans>Show experimental extensions</Trans>}
             />
           </Column>
           {DismissableTutorialMessage}

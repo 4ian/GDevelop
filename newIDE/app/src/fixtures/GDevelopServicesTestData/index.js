@@ -1734,9 +1734,9 @@ export const communityTierExtensionShortHeader: ExtensionShortHeader = {
   tier: 'community',
   authorIds: [],
   shortDescription:
-    'This is an example of an extension that is a community extension (not reviewed).',
+    'This is an example of an extension that is an experimental extension.',
   extensionNamespace: '',
-  fullName: 'Fake Community extension',
+  fullName: 'Fake experimental extension',
   name: 'FakeCommunityExtension',
   version: '0.0.2',
   url:

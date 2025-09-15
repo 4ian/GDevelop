@@ -26,7 +26,7 @@ const { mapVector, mapFor } = require('./lib/MapFor');
 
 /** @typedef {import("./lib/ExtensionReferenceGenerator.js").RawText} RawText */
 
-/** @typedef {{ tier: 'community' | 'reviewed', shortDescription: string, authorIds: Array<string>, authors?: Array<{id: string, username: string}>, extensionNamespace: string, fullName: string, name: string, version: string, gdevelopVersion?: string, url: string, headerUrl: string, tags: Array<string>, category: string, previewIconUrl: string, eventsBasedBehaviorsCount: number, eventsFunctionsCount: number}} ExtensionShortHeader */
+/** @typedef {{ tier: 'community' | 'experimental' | 'reviewed', shortDescription: string, authorIds: Array<string>, authors?: Array<{id: string, username: string}>, extensionNamespace: string, fullName: string, name: string, version: string, gdevelopVersion?: string, url: string, headerUrl: string, tags: Array<string>, category: string, previewIconUrl: string, eventsBasedBehaviorsCount: number, eventsFunctionsCount: number}} ExtensionShortHeader */
 
 const extensionShortHeadersUrl =
   'https://api.gdevelop-app.com/asset/extension-short-header';

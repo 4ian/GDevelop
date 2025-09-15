@@ -34,47 +34,6 @@ namespace gdjs {
       }
     }
 
-    _loadGameFromSave(saveState: GameSaveState): void {
-      const options: UpdateFromNetworkSyncDataOptions = {
-        clearSceneStack: true,
-        clearInputs: true,
-        keepControl: true,
-        ignoreVariableOwnership: true,
-      };
-
-      this._runtimeGame.updateFromNetworkSyncData(
-        saveState.gameNetworkSyncData,
-        options
-      );
-
-      this.applyUpdateFromNetworkSyncDataIfAny(options);
-
-      const sceneStack = this._stack;
-      sceneStack.forEach((scene, index) => {
-        const layoutSyncData = saveState.layoutNetworkSyncDatas[index];
-        if (!layoutSyncData) return;
-
-        // Create objects first, so they are available for the scene update,
-        // especially so that they have a networkId defined.
-        const objectDatas = layoutSyncData.objectDatas;
-        for (const id in objectDatas) {
-          const objectNetworkSyncData = objectDatas[id];
-          const objectName = objectNetworkSyncData.n;
-          if (!objectName) {
-            logger.warn('Tried to recreate an object without a name.');
-            continue;
-          }
-          const object = scene.createObject(objectName);
-          if (object) {
-            object.updateFromNetworkSyncData(objectNetworkSyncData, options);
-          }
-        }
-
-        // Update the scene last.
-        scene.updateFromNetworkSyncData(layoutSyncData.sceneData, options);
-      });
-    }
-
     step(elapsedTime: float): boolean {
       this._throwIfDisposed();
       if (this._isNextLayoutLoading || this._stack.length === 0) {
@@ -93,6 +52,16 @@ namespace gdjs {
       }
 
       const currentScene = this._stack[this._stack.length - 1];
+      if (gdjs.saveState.loadGameSnapshotAtTheEndOfFrameIfAny) {
+        const hasUpdatedFromGameSnapshot =
+          gdjs.saveState.loadGameSnapshotAtTheEndOfFrameIfAny(currentScene);
+        if (hasUpdatedFromGameSnapshot) {
+          // If there was a game snapshot, skip the rendering,
+          // it is handled by the saveState.
+          return true;
+        }
+      }
+
       if (currentScene.renderAndStep(elapsedTime)) {
         const request = currentScene.getRequestedChange();
 
@@ -115,42 +84,6 @@ namespace gdjs {
         } else {
           logger.error('Unrecognized change in scene stack: ' + request);
         }
-      }
-
-      // At the end of the step for the scene, check if a load request is pending,
-      // and if so, apply it.
-      const loadRequestOptions = currentScene.getLoadRequestOptions();
-      if (!loadRequestOptions) return true;
-
-      // Reset it so we don't load it twice.
-      currentScene.requestLoadSnapshot(null);
-
-      if (loadRequestOptions.loadVariable) {
-        const saveState =
-          loadRequestOptions.loadVariable.toJSObject() as GameSaveState;
-        try {
-          this._loadGameFromSave(saveState);
-        } catch (error) {
-          logger.error('Error loading from variable:', error);
-          gdjs.saveState.markLoadJustFailed();
-        }
-      } else if (loadRequestOptions.loadStorageName) {
-        gdjs
-          .loadFromIndexedDB(
-            gdjs.saveState.getIndexedDbDatabaseName(),
-            gdjs.saveState.getIndexedDbObjectStore(),
-            gdjs.saveState.getIndexedDbStorageKey(
-              loadRequestOptions.loadStorageName
-            )
-          )
-          .then((jsonData) => {
-            const saveState = jsonData as GameSaveState;
-            this._loadGameFromSave(saveState);
-          })
-          .catch((error) => {
-            logger.error('Error loading from IndexedDB:', error);
-            gdjs.saveState.markLoadJustFailed();
-          });
       }
 
       return true;

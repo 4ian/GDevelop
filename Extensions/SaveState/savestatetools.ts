@@ -12,11 +12,52 @@ namespace gdjs {
     };
 
     let lastSaveTime: number | null = null;
+    let lastLoadTime: number | null = null;
+    let saveJustSucceeded: boolean = false;
+    let saveJustFailed: boolean = false;
+    let loadJustSucceeded: boolean = false;
+    let loadJustFailed: boolean = false;
 
     export const getSecondsSinceLastSave = (): number => {
       if (!lastSaveTime) return -1;
       return Math.floor((Date.now() - lastSaveTime) / 1000);
     };
+    export const getSecondsSinceLastLoad = (): number => {
+      if (!lastLoadTime) return -1;
+      return Math.floor((Date.now() - lastLoadTime) / 1000);
+    };
+    export const hasSaveJustSucceeded = () => {
+      return saveJustSucceeded;
+    };
+    export const hasLoadJustSucceeded = () => {
+      return loadJustSucceeded;
+    };
+    export const hasSaveJustFailed = () => {
+      return saveJustFailed;
+    };
+    export const hasLoadJustFailed = () => {
+      return loadJustFailed;
+    };
+    export const markSaveJustSucceeded = () => {
+      saveJustSucceeded = true;
+    };
+    export const markLoadJustSucceeded = () => {
+      loadJustSucceeded = true;
+    };
+    export const markSaveJustFailed = () => {
+      saveJustFailed = true;
+    };
+    export const markLoadJustFailed = () => {
+      loadJustFailed = true;
+    };
+
+    // Ensure that the condition "save/load just succeeded/failed" are valid only for one frame.
+    gdjs.registerRuntimeScenePostEventsCallback(() => {
+      saveJustSucceeded = false;
+      saveJustFailed = false;
+      loadJustSucceeded = false;
+      loadJustFailed = false;
+    });
 
     const getGameSaveState = (runtimeScene: RuntimeScene) => {
       const gameSaveState: GameSaveState = {
@@ -24,26 +65,29 @@ namespace gdjs {
         layoutNetworkSyncDatas: [],
       };
       const syncOptions: GetNetworkSyncDataOptions = {
-        syncObjectName: true,
-        syncAllBehaviors: true,
+        syncObjectIdentifier: true,
         syncAllVariables: true,
-        syncSounds: true,
+        syncAllBehaviors: true,
         syncSceneTimers: true,
+        syncOnceTriggers: true,
+        syncSounds: true,
         syncTweens: true,
         syncLayers: true,
+        syncAsyncTasks: true,
+        syncSceneAdditionalProps: true,
       };
       const gameData = runtimeScene.getGame().getNetworkSyncData(syncOptions);
-      const sceneStack = runtimeScene.getGame()._sceneStack._stack;
+      const scenes = runtimeScene.getGame().getSceneStack().getAllScenes();
       gameSaveState.gameNetworkSyncData = gameData || {};
-      sceneStack.forEach((scene, index) => {
-        const sceneDatas = (scene.getNetworkSyncData(syncOptions) ||
-          []) as LayoutNetworkSyncData;
 
+      scenes.forEach((scene, index) => {
         gameSaveState.layoutNetworkSyncDatas[index] = {
           sceneData: {} as LayoutNetworkSyncData,
           objectDatas: {},
         };
-        gameSaveState.layoutNetworkSyncDatas[index].sceneData = sceneDatas;
+
+        // First collect all object sync data, as they may generate unique
+        // identifiers like their networkId.
         const sceneRuntimeObjects = scene.getAdhocListOfAllInstances();
         for (const key in sceneRuntimeObjects) {
           if (sceneRuntimeObjects.hasOwnProperty(key)) {
@@ -53,7 +97,14 @@ namespace gdjs {
               objectSyncData;
           }
         }
+
+        // Collect all scene data in the end.
+        const sceneDatas = (scene.getNetworkSyncData(syncOptions) ||
+          []) as LayoutNetworkSyncData;
+
+        gameSaveState.layoutNetworkSyncDatas[index].sceneData = sceneDatas;
       });
+
       return gameSaveState;
     };
 
@@ -87,6 +138,7 @@ namespace gdjs {
       currentScene.requestLoadSnapshot({
         loadVariable: variable,
       });
+      lastLoadTime = Date.now();
     };
 
     export const loadGameFromStorageSnapshot = async function (
@@ -96,6 +148,7 @@ namespace gdjs {
       currentScene.requestLoadSnapshot({
         loadStorageName: storageName,
       });
+      lastLoadTime = Date.now();
     };
   }
 }

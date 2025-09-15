@@ -481,7 +481,7 @@ namespace gdjs {
           this._timers.items[timerName].getNetworkSyncData();
       }
 
-      return {
+      const networkSyncData: ObjectNetworkSyncData = {
         x: this.x,
         y: this.y,
         w: this.getWidth(),
@@ -493,12 +493,24 @@ namespace gdjs {
         if: this._instantForces.map((force) => force.getNetworkSyncData()),
         pfx: this._permanentForceX,
         pfy: this._permanentForceY,
-        n: syncOptions.syncObjectName ? this.name : undefined,
         beh: behaviorNetworkSyncData,
         var: variablesNetworkSyncData,
         eff: effectsNetworkSyncData,
         tim: timersNetworkSyncData,
       };
+
+      if (syncOptions.syncObjectIdentifier) {
+        networkSyncData.n = this.name;
+        if (!this.networkId) {
+          // If this is the first time the object is synced
+          // with identifier, then generate a networkId,
+          // so it can be re-used for future syncs.
+          this.networkId = gdjs.makeUuid().substring(0, 8);
+        }
+        networkSyncData.networkId = this.networkId;
+      }
+
+      return networkSyncData;
     }
 
     /**
@@ -602,6 +614,10 @@ namespace gdjs {
             timer.updateFromNetworkSyncData(timerNetworkSyncData);
           }
         }
+      }
+
+      if (networkSyncData.networkId !== undefined) {
+        this.networkId = networkSyncData.networkId;
       }
     }
 
@@ -714,6 +730,17 @@ namespace gdjs {
      */
     getUniqueId(): integer {
       return this.id;
+    }
+
+    /**
+     * Get the network ID of the object.<br>
+     * The network ID is used to identify the object in a networked game.
+     * Or, for Save/Load purposes.
+     *
+     * @return The network ID of the object.
+     */
+    getNetworkId(): string | null {
+      return this.networkId;
     }
 
     /**

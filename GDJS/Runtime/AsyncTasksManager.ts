@@ -4,6 +4,33 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  export type WaitTaskNetworkSyncData = {
+    type: 'wait';
+    duration: float;
+    timeElapsedOnScene: float;
+  };
+  export type ResolveTaskNetworkSyncData = null;
+  export type PromiseTaskNetworkSyncData = null;
+  export type ManuallyResolvableTaskNetworkSyncData = null;
+  export type TaskGroupNetworkSyncData = {
+    type: 'group';
+    tasks: AsyncTaskNetworkSyncData[];
+  };
+  export type AsyncTaskNetworkSyncData =
+    | WaitTaskNetworkSyncData
+    | TaskGroupNetworkSyncData
+    | PromiseTaskNetworkSyncData
+    | ManuallyResolvableTaskNetworkSyncData
+    | ResolveTaskNetworkSyncData;
+
+  export type AsyncTasksManagerNetworkSyncData = {
+    tasks: Array<{
+      callbackId: string;
+      asyncTask: AsyncTaskNetworkSyncData;
+      objectsList: gdjs.LongLivedObjectsListNetworkSyncData;
+    }>;
+  };
+
   /**
    * This stores all asynchronous tasks waiting to be completed,
    * for a given scene.
@@ -15,7 +42,12 @@ namespace gdjs {
      */
     private tasksWithCallback = new Array<{
       asyncTask: AsyncTask;
-      callback: (runtimeScene: gdjs.RuntimeScene) => void;
+      callback: (
+        runtimeScene: gdjs.RuntimeScene,
+        longLivedObjectsList: gdjs.LongLivedObjectsList
+      ) => void;
+      callbackId: string;
+      longLivedObjectsList: gdjs.LongLivedObjectsList;
     }>();
 
     /**
@@ -26,7 +58,10 @@ namespace gdjs {
         const taskWithCallback = this.tasksWithCallback[i];
         if (taskWithCallback.asyncTask.update(runtimeScene)) {
           // The task has finished, run the callback and remove it.
-          taskWithCallback.callback(runtimeScene);
+          taskWithCallback.callback(
+            runtimeScene,
+            taskWithCallback.longLivedObjectsList
+          );
           this.tasksWithCallback.splice(i--, 1);
         }
       }
@@ -39,9 +74,19 @@ namespace gdjs {
      */
     addTask(
       asyncTask: AsyncTask,
-      callback: (runtimeScene: RuntimeScene) => void
+      callback: (
+        runtimeScene: RuntimeScene,
+        longLivedObjectsList: gdjs.LongLivedObjectsList
+      ) => void,
+      callbackId: string,
+      longLivedObjectsList: gdjs.LongLivedObjectsList
     ): void {
-      this.tasksWithCallback.push({ asyncTask, callback });
+      this.tasksWithCallback.push({
+        asyncTask,
+        callback,
+        callbackId,
+        longLivedObjectsList,
+      });
     }
 
     /**
@@ -50,6 +95,67 @@ namespace gdjs {
      */
     clearTasks() {
       this.tasksWithCallback.length = 0;
+    }
+
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): AsyncTasksManagerNetworkSyncData {
+      const tasksData = this.tasksWithCallback.map(
+        ({ asyncTask, callbackId, longLivedObjectsList }) => {
+          return {
+            callbackId,
+            asyncTask: asyncTask.getNetworkSyncData(),
+            objectsList: longLivedObjectsList.getNetworkSyncData(syncOptions),
+          };
+        }
+      );
+
+      return {
+        tasks: tasksData,
+      };
+    }
+
+    updateFromNetworkSyncData(
+      syncData: AsyncTasksManagerNetworkSyncData,
+      idToCallbackMap: Map<
+        string,
+        (
+          runtimeScene: gdjs.RuntimeScene,
+          asyncObjectsList: gdjs.LongLivedObjectsList
+        ) => void
+      >,
+      runtimeScene: gdjs.RuntimeScene,
+      syncOptions: UpdateFromNetworkSyncDataOptions
+    ) {
+      this.clearTasks();
+
+      syncData.tasks.forEach(({ callbackId, asyncTask, objectsList }) => {
+        if (!asyncTask) return;
+
+        const callback = idToCallbackMap.get(callbackId);
+        if (callback) {
+          // Find the objectsList again from the networkIds.
+          const longLivedObjectsList = new gdjs.LongLivedObjectsList();
+          longLivedObjectsList.updateFromNetworkSyncData(
+            objectsList,
+            runtimeScene,
+            syncOptions
+          );
+
+          if (asyncTask.type === 'group') {
+            const task = new TaskGroup();
+            task.updateFromNetworkSyncData(asyncTask);
+            this.addTask(task, callback, callbackId, longLivedObjectsList);
+          }
+          if (asyncTask.type === 'wait') {
+            const task = new gdjs.evtTools.runtimeScene.WaitTask(
+              asyncTask.duration
+            );
+            task.updateFromNetworkSyncData(asyncTask);
+            this.addTask(task, callback, callbackId, longLivedObjectsList);
+          }
+        }
+      });
     }
   }
 
@@ -63,6 +169,12 @@ namespace gdjs {
      * @return True if the task is finished, false if it needs to continue running.
      */
     abstract update(runtimeScene: RuntimeScene): boolean;
+
+    abstract getNetworkSyncData(): AsyncTaskNetworkSyncData;
+
+    abstract updateFromNetworkSyncData(
+      syncData: AsyncTaskNetworkSyncData
+    ): void;
   }
 
   export class TaskGroup extends AsyncTask {
@@ -80,12 +192,44 @@ namespace gdjs {
 
       return this.tasks.length === 0;
     }
+
+    getNetworkSyncData(): TaskGroupNetworkSyncData {
+      return {
+        type: 'group',
+        tasks: this.tasks.map((task) => task.getNetworkSyncData()),
+      };
+    }
+
+    updateFromNetworkSyncData(syncData: TaskGroupNetworkSyncData) {
+      syncData.tasks.forEach((asyncTask) => {
+        if (!asyncTask) return;
+
+        if (asyncTask.type === 'group') {
+          const task = new TaskGroup();
+          task.updateFromNetworkSyncData(asyncTask);
+          this.addTask(task);
+        }
+        if (asyncTask.type === 'wait') {
+          const task = new gdjs.evtTools.runtimeScene.WaitTask(
+            asyncTask.duration
+          );
+          task.updateFromNetworkSyncData(asyncTask);
+          this.addTask(task);
+        }
+      });
+    }
   }
 
   export class ResolveTask extends AsyncTask {
     update() {
       return true;
     }
+
+    getNetworkSyncData(): AsyncTaskNetworkSyncData {
+      return null;
+    }
+
+    updateFromNetworkSyncData(syncData: AsyncTaskNetworkSyncData): void {}
   }
 
   const logger = new gdjs.Logger('Internal PromiseTask');
@@ -121,6 +265,12 @@ ${error ? 'The following error was thrown: ' + error : ''}`
     update() {
       return this.isResolved;
     }
+
+    getNetworkSyncData(): AsyncTaskNetworkSyncData {
+      return null;
+    }
+
+    updateFromNetworkSyncData(syncData: AsyncTaskNetworkSyncData): void {}
   }
 
   export class ManuallyResolvableTask extends AsyncTask {
@@ -133,5 +283,11 @@ ${error ? 'The following error was thrown: ' + error : ''}`
     update(): boolean {
       return this.isResolved;
     }
+
+    getNetworkSyncData(): AsyncTaskNetworkSyncData {
+      return null;
+    }
+
+    updateFromNetworkSyncData(syncData: AsyncTaskNetworkSyncData): void {}
   }
 }

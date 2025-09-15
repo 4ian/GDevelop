@@ -20,7 +20,7 @@ const gd: libGDevelop = global.gd;
 const emptySearchText = '';
 
 const noExcludedTiers = new Set();
-const excludedCommunityTiers = new Set(['community']);
+const excludedExperimentalTiers = new Set(['experimental']);
 
 type TranslatedBehaviorShortHeader = {|
   ...BehaviorShortHeader,
@@ -92,7 +92,7 @@ export const BehaviorStoreStateProvider = ({
   }>({});
 
   const preferences = React.useContext(PreferencesContext);
-  const { showCommunityExtensions, language } = preferences.values;
+  const { showExperimentalExtensions, language } = preferences.values;
   const [firstBehaviorIds, setFirstBehaviorIds] = React.useState<Array<string>>(
     []
   );
@@ -306,9 +306,9 @@ export const BehaviorStoreStateProvider = ({
         const behavior = allTranslatedBehaviors[type];
         behavior.tags.forEach(tag => {
           if (
-            showCommunityExtensions ||
+            showExperimentalExtensions ||
             !behavior.tier ||
-            !excludedCommunityTiers.has(behavior.tier)
+            !excludedExperimentalTiers.has(behavior.tier)
           ) {
             tagsSet.add(tag);
           }
@@ -323,7 +323,7 @@ export const BehaviorStoreStateProvider = ({
         tagsTree: [],
       };
     },
-    [allTranslatedBehaviors, showCommunityExtensions]
+    [allTranslatedBehaviors, showExperimentalExtensions]
   );
 
   const defaultFirstSearchItemIds = React.useMemo(
@@ -341,9 +341,9 @@ export const BehaviorStoreStateProvider = ({
     chosenItemCategory: chosenCategory,
     chosenCategory: filtersState.chosenCategory,
     chosenFilters: filtersState.chosenFilters,
-    excludedTiers: showCommunityExtensions
+    excludedTiers: showExperimentalExtensions
       ? noExcludedTiers
-      : excludedCommunityTiers,
+      : excludedExperimentalTiers,
     defaultFirstSearchItemIds: defaultFirstSearchItemIds,
   });
 

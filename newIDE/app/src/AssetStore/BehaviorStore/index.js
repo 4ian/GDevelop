@@ -48,7 +48,7 @@ export const useExtensionUpdateAlertDialog = () => {
           ? // Reviewed extensions are closely watched
             // and any breaking change will be added to the extension metadata.
             t`This behavior can be updated with new features and fixes.${'\n\n'}Do you want to update it now ?`
-          : // Community extensions are checked as much as possible
+          : // Experimental extensions are checked as much as possible
             // but we can't ensure every breaking changes will be added to the extension metadata.
             t`This behavior can be updated. You may have to do some adaptations to make sure your game still works.${'\n\n'}Do you want to update it now ?`,
       confirmButtonLabel: t`Update the extension`,
@@ -270,16 +270,12 @@ export const BehaviorStore = ({
                 }
                 buildMenuTemplate={(i18n: I18nType) => [
                   {
-                    label: preferences.values.showCommunityExtensions
-                      ? i18n._(
-                          t`Hide community behaviors (not officially reviewed)`
-                        )
-                      : i18n._(
-                          t`Show community behaviors (not officially reviewed)`
-                        ),
+                    label: preferences.values.showExperimentalExtensions
+                      ? i18n._(t`Hide experimental behaviors`)
+                      : i18n._(t`Show experimental behaviors`),
                     click: () => {
-                      preferences.setShowCommunityExtensions(
-                        !preferences.values.showCommunityExtensions
+                      preferences.setShowExperimentalExtensions(
+                        !preferences.values.showExperimentalExtensions
                       );
                     },
                   },

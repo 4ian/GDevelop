@@ -26,7 +26,7 @@ const { mapVector, mapFor } = require('./lib/MapFor');
 
 /** @typedef {import("./lib/ExtensionReferenceGenerator.js").RawText} RawText */
 
-/** @typedef {{ tier: 'community' | 'reviewed', shortDescription: string, authorIds: Array<string>, authors?: Array<{id: string, username: string}>, extensionNamespace: string, fullName: string, name: string, version: string, gdevelopVersion?: string, url: string, headerUrl: string, tags: Array<string>, category: string, previewIconUrl: string, eventsBasedBehaviorsCount: number, eventsFunctionsCount: number}} ExtensionShortHeader */
+/** @typedef {{ tier: 'community' | 'experimental' | 'reviewed', shortDescription: string, authorIds: Array<string>, authors?: Array<{id: string, username: string}>, extensionNamespace: string, fullName: string, name: string, version: string, gdevelopVersion?: string, url: string, headerUrl: string, tags: Array<string>, category: string, previewIconUrl: string, eventsBasedBehaviorsCount: number, eventsFunctionsCount: number}} ExtensionShortHeader */
 
 const extensionShortHeadersUrl =
   'https://api.gdevelop-app.com/asset/extension-short-header';
@@ -174,14 +174,14 @@ const sortKeys = table => {
  * @param {any} project (gdProject)
  * @param {any} extension The extension (gdEventsFunctionsExtension)
  * @param {ExtensionShortHeader} extensionShortHeader
- * @param {boolean} isCommunity The tier
+ * @param {boolean} isExperimental The tier
  */
 const createExtensionReferencePage = async (
   gd,
   project,
   extension,
   extensionShortHeader,
-  isCommunity
+  isExperimental
 ) => {
   const extensionMetadata = generateEventsFunctionExtensionMetadata(
     gd,
@@ -196,7 +196,7 @@ const createExtensionReferencePage = async (
         generateExtensionHeaderText(
           reference,
           extensionShortHeader,
-          isCommunity
+          isExperimental
         ),
       generateExtensionFooterText
     )
@@ -219,13 +219,13 @@ const createExtensionReferencePage = async (
  *
  * @param {{ extension: any }} extension (gdPlatformExtension)
  * @param {ExtensionShortHeader} extensionShortHeader
- * @param {boolean} isCommunity
+ * @param {boolean} isExperimental
  * @returns {RawText}
  */
 const generateExtensionHeaderText = (
   { extension },
   extensionShortHeader,
-  isCommunity
+  isExperimental
 ) => {
   const folderName = getExtensionFolderName(extension.getName());
   const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}`;
@@ -242,15 +242,13 @@ const generateExtensionHeaderText = (
       '\n' +
       `${extensionShortHeader.shortDescription}\n` +
       '\n' +
-      `**Authors and contributors** to this community extension: ${authorNamesWithLinks}.\n` +
+      `**Authors and contributors** to this experimental extension: ${authorNamesWithLinks}.\n` +
       '\n' +
-      (isCommunity
+      (isExperimental
         ? `!!! warning
-    This is an extension made by a community member — but not reviewed
-    by the GDevelop extension team. As such, we can't guarantee it
-    meets all the quality standards of official extensions. In case of
-    doubt, contact the author to know more about what the extension
-    does or inspect its content before using it.\n\n`
+    This is an extension made by a community member and it only got through a
+    light review by the GDevelop extension team. As such, we can't guarantee it
+    meets all the quality standards of fully reviewed extensions.\n\n`
         : '') +
       '---\n' +
       '\n' +
@@ -409,11 +407,11 @@ const generateExtensionsPageList = (extensions, indentationLevel) => {
 
 /**
  * @param {Array<any>} reviewedExtensions The extension (gdEventsFunctionsExtension)
- * @param {Array<any>} communityExtensions The extension (gdEventsFunctionsExtension)
+ * @param {Array<any>} experimentalExtensions The extension (gdEventsFunctionsExtension)
  */
 const generateExtensionsMkDocsDotPagesFile = async (
   reviewedExtensions,
-  communityExtensions
+  experimentalExtensions
 ) => {
   const dotPagesContent = `nav:
     - index.md
@@ -424,8 +422,8 @@ const generateExtensionsMkDocsDotPagesFile = async (
         - best-practices.md
         - share-extension.md
 ${generateExtensionsPageList(reviewedExtensions, 1)}
-    - Community extensions:
-${generateExtensionsPageList(communityExtensions, 2)}
+    - Experimental extensions:
+${generateExtensionsPageList(experimentalExtensions, 2)}
     - ...
 `;
 
@@ -440,7 +438,7 @@ const generateExtensionsList = async gd => {
 Here are listed all the extensions available in GDevelop. The list is divided in [two tiers](/gdevelop5/extensions/tiers/):
 
 - [Reviewed extensions](#reviewed-extensions)
-- [Community extensions](#community-extensions)
+- [Experimental extensions](#experimental-extensions)
 
 `;
   const project = new gd.ProjectHelper.createNewGDJSProject();
@@ -448,16 +446,16 @@ Here are listed all the extensions available in GDevelop. The list is divided in
   const extensionShortHeaders = await getAllExtensionShortHeaders();
 
   const reviewedExtensionShortHeaders = extensionShortHeaders.filter(
-    header => header.tier !== 'community'
+    header => header.tier !== 'community' && header.tier !== 'experimental'
   );
-  const communityExtensionShortHeaders = extensionShortHeaders.filter(
-    header => header.tier === 'community'
+  const experimentalExtensionShortHeaders = extensionShortHeaders.filter(
+    header => header.tier === 'community' || header.tier === 'experimental'
   );
 
   const reviewedExtensions = reviewedExtensionShortHeaders.map(header =>
     project.getEventsFunctionsExtension(header.name)
   );
-  const communityExtensions = communityExtensionShortHeaders.map(header =>
+  const experimentalExtensions = experimentalExtensionShortHeaders.map(header =>
     project.getEventsFunctionsExtension(header.name)
   );
 
@@ -481,16 +479,14 @@ Here are listed all the extensions available in GDevelop. The list is divided in
   }
   content += generateAllExtensionsSections(reviewedExtensions);
 
-  content += `## Community extensions
+  content += `## Experimental extensions
 
-The following extensions are made by community members — but not reviewed
-by the GDevelop extension team. As such, we can't guarantee it
-meets all the quality standards of official extensions. In case of
-doubt, contact the author to know more about what the extension
-does or inspect its content before using it.
+The following extensions are made by a community members and they only got
+though a light review by the GDevelop extension team. As such, we can't
+guarantee they meet all the quality standards of fully reviewed extensions.
 
 `;
-  for (const extension of communityExtensions) {
+  for (const extension of experimentalExtensions) {
     const extensionShortHeader = extensionShortHeaders.find(
       header => header.name === extension.getName()
     );
@@ -507,11 +503,11 @@ does or inspect its content before using it.
       true
     );
   }
-  content += generateAllExtensionsSections(communityExtensions);
+  content += generateAllExtensionsSections(experimentalExtensions);
 
   await generateExtensionsMkDocsDotPagesFile(
     reviewedExtensions,
-    communityExtensions
+    experimentalExtensions
   );
 
   project.delete();

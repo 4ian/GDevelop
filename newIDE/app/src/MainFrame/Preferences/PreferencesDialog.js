@@ -69,7 +69,7 @@ const PreferencesDialog = ({
     setResourcesImporationBehavior,
     setIsAlwaysOnTopInPreview,
     setEventsSheetCancelInlineParameter,
-    setShowCommunityExtensions,
+    setShowExperimentalExtensions,
     setShowInAppTutorialDeveloperMode,
     setOpenDiagnosticReportAutomatically,
     setShowDeprecatedInstructionWarning,
@@ -556,10 +556,10 @@ const PreferencesDialog = ({
                 <CompactToggleField
                   labelColor="primary"
                   hideTooltip
-                  onCheck={setShowCommunityExtensions}
-                  checked={values.showCommunityExtensions}
+                  onCheck={setShowExperimentalExtensions}
+                  checked={values.showExperimentalExtensions}
                   label={i18n._(
-                    t`Show community (non reviewed) extensions in the list of extensions`
+                    t`Show experimental extensions in the list of extensions`
                   )}
                 />
                 <CompactToggleField

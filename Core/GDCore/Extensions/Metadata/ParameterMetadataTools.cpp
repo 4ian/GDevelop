@@ -194,7 +194,8 @@ void ParameterMetadataTools::IterateOverParameters(
       [&fn](const gd::ParameterMetadata& parameterMetadata,
             const gd::Expression& parameterValue,
             size_t parameterIndex,
-            const gd::String& lastObjectName) {
+            const gd::String& lastObjectName,
+            size_t lastObjectIndex) {
         fn(parameterMetadata, parameterValue, lastObjectName);
       });
 }
@@ -205,8 +206,10 @@ void ParameterMetadataTools::IterateOverParametersWithIndex(
     std::function<void(const gd::ParameterMetadata& parameterMetadata,
                        const gd::Expression& parameterValue,
                        size_t parameterIndex,
-                       const gd::String& lastObjectName)> fn) {
+                       const gd::String& lastObjectName,
+                       size_t lastObjectIndex)> fn) {
   gd::String lastObjectName = "";
+  size_t lastObjectIndex = 0;
   for (std::size_t pNb = 0; pNb < parametersMetadata.GetParametersCount();
        ++pNb) {
     const gd::ParameterMetadata &parameterMetadata =
@@ -218,15 +221,17 @@ void ParameterMetadataTools::IterateOverParametersWithIndex(
             ? Expression(parameterMetadata.GetDefaultValue())
             : parameterValue;
 
-    fn(parameterMetadata, parameterValueOrDefault, pNb, lastObjectName);
+    fn(parameterMetadata, parameterValueOrDefault, pNb, lastObjectName, lastObjectIndex);
 
     // Memorize the last object name. By convention, parameters that require
     // an object (mainly, "objectvar" and "behavior") should be placed after
     // the object in the list of parameters (if possible, just after).
     // Search "lastObjectName" in the codebase for other place where this
     // convention is enforced.
-    if (gd::ParameterMetadata::IsObject(parameterMetadata.GetType()))
+    if (gd::ParameterMetadata::IsObject(parameterMetadata.GetType())) {
       lastObjectName = parameterValueOrDefault.GetPlainString();
+      lastObjectIndex = pNb;
+    }
   }
 }
 

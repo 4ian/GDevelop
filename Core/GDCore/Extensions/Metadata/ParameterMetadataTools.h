@@ -64,7 +64,8 @@ class GD_CORE_API ParameterMetadataTools {
       std::function<void(const gd::ParameterMetadata& parameterMetadata,
                          const gd::Expression& parameterValue,
                          size_t parameterIndex,
-                         const gd::String& lastObjectName)> fn);
+                         const gd::String& lastObjectName,
+                         size_t lastObjectIndex)> fn);
 
   /**
    * Iterate over the parameters of a FunctionCallNode.

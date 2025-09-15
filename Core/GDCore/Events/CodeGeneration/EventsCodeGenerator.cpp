@@ -496,11 +496,12 @@ bool EventsCodeGenerator::CheckBehaviorParameters(
     const gd::Instruction &instruction,
     const gd::InstructionMetadata &instrInfos) {
   bool isAnyBehaviorMissing = false;
-  gd::ParameterMetadataTools::IterateOverParameters(
+  gd::ParameterMetadataTools::IterateOverParametersWithIndex(
       instruction.GetParameters(), instrInfos.parameters,
-      [this, &isAnyBehaviorMissing](const gd::ParameterMetadata &parameterMetadata,
-             const gd::Expression &parameterValue,
-             const gd::String &lastObjectName) {
+      [this, &isAnyBehaviorMissing,
+       &instrInfos](const gd::ParameterMetadata &parameterMetadata,
+                    const gd::Expression &parameterValue, size_t parameterIndex,
+                    const gd::String &lastObjectName, size_t lastObjectIndex) {
         if (ParameterMetadata::IsBehavior(parameterMetadata.GetType())) {
           const gd::String &behaviorName = parameterValue.GetPlainString();
           const gd::String &actualBehaviorType =
@@ -511,15 +512,24 @@ bool EventsCodeGenerator::CheckBehaviorParameters(
 
           if (!expectedBehaviorType.empty() &&
               actualBehaviorType != expectedBehaviorType) {
-            isAnyBehaviorMissing = true;
+            const auto &objectParameterMetadata =
+                instrInfos.GetParameter(lastObjectIndex);
+            // Event-functions crashes if behaviors are missing on some object
+            // of a group because they lose sight of the original objects.
+            // Missing behaviors are only "fatal" for ObjectList parameters to
+            // reduce side effects on built-in functions.
+            if (objectParameterMetadata.GetType() == "objectList") {
+              isAnyBehaviorMissing = true;
+            }
             gd::ProjectDiagnostic projectDiagnostic(
                 gd::ProjectDiagnostic::ErrorType::MissingBehavior, "",
                 actualBehaviorType, expectedBehaviorType, lastObjectName);
-            if (diagnosticReport) diagnosticReport->Add(projectDiagnostic);
+            if (diagnosticReport)
+              diagnosticReport->Add(projectDiagnostic);
           }
         }
       });
-    return isAnyBehaviorMissing;
+  return isAnyBehaviorMissing;
 }
 
 /**
@@ -780,7 +790,7 @@ gd::String EventsCodeGenerator::GenerateActionsListCode(
     } else {
       outputCode += actionCode;
     }
-    outputCode += "}";
+    outputCode += "}\n";
   }
 
   return outputCode;

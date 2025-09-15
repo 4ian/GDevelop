@@ -448,12 +448,10 @@ bool EventsVariableReplacer::DoVisitInstruction(gd::Instruction& instruction,
   bool shouldDeleteInstruction = false;
 
   gd::ParameterMetadataTools::IterateOverParametersWithIndex(
-      instruction.GetParameters(),
-      metadata.GetParameters(),
-      [&](const gd::ParameterMetadata& parameterMetadata,
-          const gd::Expression& parameterValue,
-          size_t parameterIndex,
-          const gd::String& lastObjectName) {
+      instruction.GetParameters(), metadata.GetParameters(),
+      [&](const gd::ParameterMetadata &parameterMetadata,
+          const gd::Expression &parameterValue, size_t parameterIndex,
+          const gd::String &lastObjectName, size_t lastObjectIndex) {
         const gd::String& type = parameterMetadata.GetType();
 
         if (!gd::ParameterMetadata::IsExpression("variable", type) &&

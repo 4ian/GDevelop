@@ -514,10 +514,11 @@ bool EventsCodeGenerator::CheckBehaviorParameters(
               actualBehaviorType != expectedBehaviorType) {
             const auto &objectParameterMetadata =
                 instrInfos.GetParameter(lastObjectIndex);
-            // Event-functions crashes if behaviors are missing on some object
-            // of a group because they lose sight of the original objects.
-            // Missing behaviors are only "fatal" for ObjectList parameters to
-            // reduce side effects on built-in functions.
+            // Event functions crash if some objects in a group are missing
+            // the required behaviors, since they lose reference to the original
+            // objects. Missing behaviors are considered "fatal" only for
+            // ObjectList parameters, in order to minimize side effects on
+            // built-in functions.
             if (objectParameterMetadata.GetType() == "objectList") {
               isAnyBehaviorMissing = true;
             }

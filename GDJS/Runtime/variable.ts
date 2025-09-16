@@ -108,6 +108,158 @@ namespace gdjs {
       return target;
     }
 
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): UnnamedVariableNetworkSyncData | undefined {
+      const syncedPlayerNumber = syncOptions.playerNumber;
+      const isHost = syncOptions.isHost;
+      const variableOwner = this.getPlayerOwnership();
+      if (
+        // Variable undefined.
+        this.isUndefinedInContainer() ||
+        // If we force sync everything, we don't look at the ownership.
+        (!syncOptions.syncAllVariables &&
+          // Variable marked as not to be synchronized.
+          (variableOwner === null ||
+            // Getting sync data for a specific player:
+            (syncedPlayerNumber !== undefined &&
+              // Variable is owned by host but this player number is not the host.
+              variableOwner === 0 &&
+              !isHost) ||
+            // Variable is owned by a player but not getting sync data for this player number.
+            (variableOwner !== 0 && syncedPlayerNumber !== variableOwner)))
+      ) {
+        // In those cases, the variable should not be synchronized.
+        return;
+      }
+
+      const variableType = this.getType();
+      const variableValue =
+        variableType === 'structure' || variableType === 'array'
+          ? ''
+          : this.getValue();
+
+      return {
+        value: variableValue,
+        type: variableType,
+        children: this.getStructureNetworkSyncData(this),
+        owner: variableOwner,
+      };
+    }
+
+    // Structure variables can contain other variables, so we need to recursively
+    // get the sync data for each child variable.
+    getStructureNetworkSyncData(
+      variable: gdjs.Variable
+    ): VariableNetworkSyncData[] | undefined {
+      if (variable.getType() === 'array') {
+        const allVariableNetworkSyncData: VariableNetworkSyncData[] = [];
+        variable.getAllChildrenArray().forEach((childVariable) => {
+          const childVariableType = childVariable.getType();
+          const childVariableValue =
+            childVariableType === 'structure' || childVariableType === 'array'
+              ? ''
+              : childVariable.getValue();
+
+          const childVariableOwner = childVariable.getPlayerOwnership();
+          if (
+            // Variable undefined.
+            childVariable.isUndefinedInContainer() ||
+            // Variable marked as not to be synchronized.
+            childVariableOwner === null
+          ) {
+            // In those cases, the variable should not be synchronized.
+            return;
+          }
+
+          allVariableNetworkSyncData.push({
+            name: '',
+            value: childVariableValue,
+            type: childVariableType,
+            children: this.getStructureNetworkSyncData(childVariable),
+            owner: childVariableOwner,
+          });
+        });
+
+        return allVariableNetworkSyncData;
+      }
+
+      if (variable.getType() === 'structure') {
+        const variableChildren = variable.getAllChildren();
+        if (!variableChildren) return undefined;
+        const allVariableNetworkSyncData: VariableNetworkSyncData[] = [];
+
+        Object.entries(variableChildren).forEach(
+          ([childVariableName, childVariable]) => {
+            const childVariableType = childVariable.getType();
+            const childVariableValue =
+              childVariableType === 'structure' || childVariableType === 'array'
+                ? ''
+                : childVariable.getValue();
+            const childVariableOwner = childVariable.getPlayerOwnership();
+            if (
+              // Variable undefined.
+              childVariable.isUndefinedInContainer() ||
+              // Variable marked as not to be synchronized.
+              childVariableOwner === null
+            ) {
+              // In those cases, the variable should not be synchronized.
+              return;
+            }
+
+            allVariableNetworkSyncData.push({
+              name: childVariableName,
+              value: childVariableValue,
+              type: childVariableType,
+              children: this.getStructureNetworkSyncData(childVariable),
+              owner: childVariableOwner,
+            });
+          }
+        );
+
+        return allVariableNetworkSyncData;
+      }
+
+      return undefined;
+    }
+
+    updateFromNetworkSyncData(
+      networkSyncData: VariableNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
+    ) {
+      // // If we receive an update for this variable for a different owner than the one we know about,
+      // then 2 cases:
+      // - If we are the owner of the variable, then ignore the message, we assume it's a late update message or a wrong one,
+      //   we are confident that we own this variable. (it may be reverted if we don't receive an acknowledgment in time)
+      // - If we are not the owner of the variable, then assume that we missed the ownership change message, so update the variable's
+      //   ownership and then update the variable.
+      const syncedVariableOwner = networkSyncData.owner;
+      const variableData =
+        gdjs.evtTools.variable.getVariableDataFromNetworkSyncData(
+          networkSyncData
+        );
+
+      if (!options.ignoreVariableOwnership) {
+        const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerNumber();
+
+        const currentVariableOwner = variable.getPlayerOwnership();
+        if (currentPlayerNumber === currentVariableOwner) {
+          // Variable owned by us, ignoring update message.
+          return;
+        }
+
+        if (
+          syncedVariableOwner &&
+          syncedVariableOwner !== currentVariableOwner
+        ) {
+          /// Variable owned by someone else on our game, changing ownership as part of the update event.
+          this.setPlayerOwnership(syncedVariableOwner);
+        }
+      }
+
+      this.reinitialize(variableData);
+    }
+
     /**
      * Converts a JavaScript object into a value compatible
      * with GDevelop variables and store it inside this variable.

@@ -277,125 +277,21 @@ namespace gdjs {
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): VariableNetworkSyncData[] {
-      const syncedPlayerNumber = syncOptions.playerNumber;
-      const isHost = syncOptions.isHost;
       const networkSyncData: VariableNetworkSyncData[] = [];
       const variableNames = [];
       this._variables.keys(variableNames);
       variableNames.forEach((variableName) => {
         const variable = this._variables.get(variableName);
-        const variableOwner = variable.getPlayerOwnership();
-        if (
-          // Variable undefined.
-          variable.isUndefinedInContainer() ||
-          // If we force sync everything, we don't look at the ownership.
-          (!syncOptions.syncAllVariables &&
-            // Variable marked as not to be synchronized.
-            (variableOwner === null ||
-              // Getting sync data for a specific player:
-              (syncedPlayerNumber !== undefined &&
-                // Variable is owned by host but this player number is not the host.
-                variableOwner === 0 &&
-                !isHost) ||
-              // Variable is owned by a player but not getting sync data for this player number.
-              (variableOwner !== 0 && syncedPlayerNumber !== variableOwner)))
-        ) {
-          // In those cases, the variable should not be synchronized.
-          return;
+        const variableSyncData = variable.getNetworkSyncData(syncOptions);
+        if (variableSyncData) {
+          networkSyncData.push({
+            name: variableName,
+            ...variableSyncData,
+          });
         }
-
-        const variableType = variable.getType();
-        const variableValue =
-          variableType === 'structure' || variableType === 'array'
-            ? ''
-            : variable.getValue();
-
-        networkSyncData.push({
-          name: variableName,
-          value: variableValue,
-          type: variableType,
-          children: this.getStructureNetworkSyncData(variable),
-          owner: variableOwner,
-        });
       });
 
       return networkSyncData;
-    }
-
-    // Structure variables can contain other variables, so we need to recursively
-    // get the sync data for each child variable.
-    getStructureNetworkSyncData(
-      variable: gdjs.Variable
-    ): VariableNetworkSyncData[] | undefined {
-      if (variable.getType() === 'array') {
-        const allVariableNetworkSyncData: VariableNetworkSyncData[] = [];
-        variable.getAllChildrenArray().forEach((childVariable) => {
-          const childVariableType = childVariable.getType();
-          const childVariableValue =
-            childVariableType === 'structure' || childVariableType === 'array'
-              ? ''
-              : childVariable.getValue();
-
-          const childVariableOwner = childVariable.getPlayerOwnership();
-          if (
-            // Variable undefined.
-            childVariable.isUndefinedInContainer() ||
-            // Variable marked as not to be synchronized.
-            childVariableOwner === null
-          ) {
-            // In those cases, the variable should not be synchronized.
-            return;
-          }
-
-          allVariableNetworkSyncData.push({
-            name: '',
-            value: childVariableValue,
-            type: childVariableType,
-            children: this.getStructureNetworkSyncData(childVariable),
-            owner: childVariableOwner,
-          });
-        });
-
-        return allVariableNetworkSyncData;
-      }
-
-      if (variable.getType() === 'structure') {
-        const variableChildren = variable.getAllChildren();
-        if (!variableChildren) return undefined;
-        const allVariableNetworkSyncData: VariableNetworkSyncData[] = [];
-
-        Object.entries(variableChildren).forEach(
-          ([childVariableName, childVariable]) => {
-            const childVariableType = childVariable.getType();
-            const childVariableValue =
-              childVariableType === 'structure' || childVariableType === 'array'
-                ? ''
-                : childVariable.getValue();
-            const childVariableOwner = childVariable.getPlayerOwnership();
-            if (
-              // Variable undefined.
-              childVariable.isUndefinedInContainer() ||
-              // Variable marked as not to be synchronized.
-              childVariableOwner === null
-            ) {
-              // In those cases, the variable should not be synchronized.
-              return;
-            }
-
-            allVariableNetworkSyncData.push({
-              name: childVariableName,
-              value: childVariableValue,
-              type: childVariableType,
-              children: this.getStructureNetworkSyncData(childVariable),
-              owner: childVariableOwner,
-            });
-          }
-        );
-
-        return allVariableNetworkSyncData;
-      }
-
-      return undefined;
     }
 
     updateFromNetworkSyncData(
@@ -406,58 +302,15 @@ namespace gdjs {
       for (let j = 0; j < networkSyncData.length; ++j) {
         const variableSyncData = networkSyncData[j];
         const variableData =
-          that._getVariableDataFromNetworkSyncData(variableSyncData);
+          gdjs.evtTools.variable.getVariableDataFromNetworkSyncData(
+            variableSyncData
+          );
         const variableName = variableData.name;
         if (!variableName) continue;
 
         const variable = that.get(variableName);
-
-        // // If we receive an update for this variable for a different owner than the one we know about,
-        // then 2 cases:
-        // - If we are the owner of the variable, then ignore the message, we assume it's a late update message or a wrong one,
-        //   we are confident that we own this variable. (it may be reverted if we don't receive an acknowledgment in time)
-        // - If we are not the owner of the variable, then assume that we missed the ownership change message, so update the variable's
-        //   ownership and then update the variable.
-        const syncedVariableOwner = variableSyncData.owner;
-        if (!options.ignoreVariableOwnership) {
-          const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerNumber();
-
-          const currentVariableOwner = variable.getPlayerOwnership();
-          if (currentPlayerNumber === currentVariableOwner) {
-            console.info(
-              `Variable ${variableName} is owned by us ${gdjs.multiplayer.playerNumber}, ignoring update message from ${syncedVariableOwner}.`
-            );
-            return;
-          }
-
-          if (
-            syncedVariableOwner &&
-            syncedVariableOwner !== currentVariableOwner
-          ) {
-            console.info(
-              `Variable ${variableName} is owned by ${currentVariableOwner} on our game, changing ownership to ${syncedVariableOwner} as part of the update event.`
-            );
-            variable.setPlayerOwnership(syncedVariableOwner);
-          }
-        }
-
-        variable.reinitialize(variableData);
+        variable.updateFromNetworkSyncData(variableSyncData, options);
       }
-    }
-
-    _getVariableDataFromNetworkSyncData(
-      syncData: VariableNetworkSyncData
-    ): VariableData {
-      return {
-        name: syncData.name,
-        value: syncData.value,
-        type: syncData.type,
-        children: syncData.children
-          ? syncData.children.map((childSyncData) =>
-              this._getVariableDataFromNetworkSyncData(childSyncData)
-            )
-          : undefined,
-      };
     }
 
     /**
@@ -494,12 +347,6 @@ namespace gdjs {
       },
       updateFromNetworkSyncData: function () {
         return;
-      },
-      getStructureNetworkSyncData: function () {
-        return undefined;
-      },
-      _getVariableDataFromNetworkSyncData: function () {
-        return {};
       },
       hasVariable: function () {
         return false;
@@ -631,6 +478,15 @@ namespace gdjs {
         return;
       },
       disableSynchronization: function () {
+        return;
+      },
+      getNetworkSyncData: function () {
+        return undefined;
+      },
+      getStructureNetworkSyncData: function () {
+        return [];
+      },
+      updateFromNetworkSyncData: function () {
         return;
       },
     };

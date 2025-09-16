@@ -152,12 +152,14 @@ declare type VariableData = Readonly<{
 /** A variable child of a container. Those always have a name. */
 declare type RootVariableData = Omit<VariableData, 'name'> & { name: string };
 
-declare type VariableNetworkSyncData = {
-  name: string;
+declare type UnnamedVariableNetworkSyncData = {
   value: string | float | boolean;
   children?: VariableNetworkSyncData[];
   type: VariableType;
   owner: number | null;
+};
+declare type VariableNetworkSyncData = UnnamedVariableNetworkSyncData & {
+  name: string;
 };
 
 declare type LayerNetworkSyncData = {

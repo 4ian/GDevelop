@@ -73,6 +73,7 @@ namespace gdjs {
       );
       this.setAnimationIndex(0);
       this._renderer.updateAnimation(0);
+      this.hitBoxes.length = 0;
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -181,6 +182,9 @@ namespace gdjs {
       ) {
         this.setAnimationElapsedTime(syncData.anet);
       }
+    }
+
+    updateHitBoxes(): void {
     }
 
     extraInitializationFromInitialInstance(

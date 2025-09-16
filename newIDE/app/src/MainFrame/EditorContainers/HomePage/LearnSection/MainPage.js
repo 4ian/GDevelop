@@ -34,6 +34,7 @@ import ExampleStore from '../../../../AssetStore/ExampleStore';
 import {
   type PrivateGameTemplateListingData,
   type BundleListingData,
+  type CourseListingData,
 } from '../../../../Utils/GDevelopServices/Shop';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import Carousel from '../../../../UI/Carousel';
@@ -62,7 +63,7 @@ type Props = {|
   onSelectCategory: (category: LearnCategory) => void,
   selectInAppTutorial: (tutorialId: string) => void,
   courses: ?(Course[]),
-  onSelectCourse: (courseId: string) => void,
+  onSelectCourse: (courseListingData: CourseListingData) => void,
   onSelectBundle: (bundleListingData: BundleListingData) => void,
   getCourseCompletion: (courseId: string) => CourseCompletion | null,
   getCourseChapterCompletion: (
@@ -216,7 +217,8 @@ const MainPage = ({
                                 courseListingData={courseListingData}
                                 completion={completion}
                                 onClick={() => {
-                                  onSelectCourse(course.id);
+                                  if (!courseListingData) return;
+                                  onSelectCourse(courseListingData);
                                 }}
                               />
                             </GridListTile>

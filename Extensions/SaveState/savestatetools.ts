@@ -17,6 +17,25 @@ namespace gdjs {
       return `save-${key}`;
     };
 
+    const getNetworkSyncOptions: GetNetworkSyncDataOptions = {
+      syncObjectIdentifier: true,
+      syncAllVariables: true,
+      syncAllBehaviors: true,
+      syncSceneTimers: true,
+      syncOnceTriggers: true,
+      syncSounds: true,
+      syncTweens: true,
+      syncLayers: true,
+      syncAsyncTasks: true,
+      syncSceneAdditionalProps: true,
+    };
+    const updateFromNetworkSyncDataOptions: UpdateFromNetworkSyncDataOptions = {
+      clearSceneStack: true,
+      clearInputs: true,
+      keepControl: true,
+      ignoreVariableOwnership: true,
+    };
+
     let lastSaveTime: number | null = null;
     let lastLoadTime: number | null = null;
     let saveJustSucceeded: boolean = false;
@@ -74,19 +93,10 @@ namespace gdjs {
         gameNetworkSyncData: {},
         layoutNetworkSyncDatas: [],
       };
-      const syncOptions: GetNetworkSyncDataOptions = {
-        syncObjectIdentifier: true,
-        syncAllVariables: true,
-        syncAllBehaviors: true,
-        syncSceneTimers: true,
-        syncOnceTriggers: true,
-        syncSounds: true,
-        syncTweens: true,
-        syncLayers: true,
-        syncAsyncTasks: true,
-        syncSceneAdditionalProps: true,
-      };
-      const gameData = runtimeScene.getGame().getNetworkSyncData(syncOptions);
+
+      const gameData = runtimeScene
+        .getGame()
+        .getNetworkSyncData(getNetworkSyncOptions);
       const scenes = runtimeScene.getGame().getSceneStack().getAllScenes();
       gameSaveState.gameNetworkSyncData = gameData || {};
 
@@ -102,14 +112,16 @@ namespace gdjs {
         for (const key in sceneRuntimeObjects) {
           if (sceneRuntimeObjects.hasOwnProperty(key)) {
             const object = sceneRuntimeObjects[key];
-            const objectSyncData = object.getNetworkSyncData(syncOptions);
+            const objectSyncData = object.getNetworkSyncData(
+              getNetworkSyncOptions
+            );
             gameSaveState.layoutNetworkSyncDatas[index].objectDatas[object.id] =
               objectSyncData;
           }
         }
 
         // Collect all scene data in the end.
-        const sceneDatas = (scene.getNetworkSyncData(syncOptions) ||
+        const sceneDatas = (scene.getNetworkSyncData(getNetworkSyncOptions) ||
           []) as LayoutNetworkSyncData;
 
         gameSaveState.layoutNetworkSyncDatas[index].sceneData = sceneDatas;
@@ -120,11 +132,11 @@ namespace gdjs {
 
     export const saveVariableGameSnapshot = async function (
       currentScene: RuntimeScene,
-      sceneVar: gdjs.Variable
+      variable: gdjs.Variable
     ) {
       try {
         const gameSaveState = getGameSaveState(currentScene);
-        sceneVar.fromJSObject(gameSaveState);
+        variable.fromJSObject(gameSaveState);
         markSaveJustSucceeded();
       } catch (error) {
         logger.error('Error saving to variable:', error);
@@ -183,10 +195,25 @@ namespace gdjs {
       loadRequestOptions = null;
 
       if (optionsToApply.loadVariable) {
+        const sceneVariables = runtimeScene.getVariables();
+        const variablePathInScene =
+          sceneVariables.getVariablePathInContainerByLoopingThroughAllVariables(
+            optionsToApply.loadVariable
+          );
+        const gameVariables = runtimeScene.getGame().getVariables();
+        const variablePathIngame =
+          gameVariables.getVariablePathInContainerByLoopingThroughAllVariables(
+            optionsToApply.loadVariable
+          );
         const saveState =
           optionsToApply.loadVariable.toJSObject() as GameSaveState;
+
         try {
-          loadGameFromSave(runtimeScene, saveState);
+          loadGameFromSave(runtimeScene, saveState, {
+            variableToRehydrate: optionsToApply.loadVariable,
+            variablePathInScene: variablePathInScene,
+            variablePathInGame: variablePathIngame,
+          });
           markLoadJustSucceeded();
         } catch (error) {
           logger.error('Error loading from variable:', error);
@@ -217,27 +244,34 @@ namespace gdjs {
 
     const loadGameFromSave = (
       runtimeScene: RuntimeScene,
-      saveState: GameSaveState
+      saveState: GameSaveState,
+      saveOptions?: {
+        variableToRehydrate: gdjs.Variable;
+        variablePathInScene: string[] | null;
+        variablePathInGame: string[] | null;
+      }
     ): void => {
-      const options: UpdateFromNetworkSyncDataOptions = {
-        clearSceneStack: true,
-        clearInputs: true,
-        keepControl: true,
-        ignoreVariableOwnership: true,
-      };
+      // Save the content of the save, as it will be erased after the load.
+      const variableToRehydrateNetworkSyncData = saveOptions
+        ? saveOptions.variableToRehydrate.getNetworkSyncData(
+            getNetworkSyncOptions
+          )
+        : null;
 
       // First update the game, which will update the variables,
       // and set the scene stack to update when ready.
       const runtimeGame = runtimeScene.getGame();
       runtimeGame.updateFromNetworkSyncData(
         saveState.gameNetworkSyncData,
-        options
+        updateFromNetworkSyncDataOptions
       );
 
       // Apply the scene stack updates, as we are at the end of a frame,
       // we can safely do it.
       const sceneStack = runtimeGame.getSceneStack();
-      sceneStack.applyUpdateFromNetworkSyncDataIfAny(options);
+      sceneStack.applyUpdateFromNetworkSyncDataIfAny(
+        updateFromNetworkSyncDataOptions
+      );
 
       // Then get all scenes, which we assume will be the expected ones
       // after the load has been done, so we can update them,
@@ -259,13 +293,63 @@ namespace gdjs {
           }
           const object = scene.createObject(objectName);
           if (object) {
-            object.updateFromNetworkSyncData(objectNetworkSyncData, options);
+            object.updateFromNetworkSyncData(
+              objectNetworkSyncData,
+              updateFromNetworkSyncDataOptions
+            );
           }
         }
 
         // Update the scene last.
-        scene.updateFromNetworkSyncData(layoutSyncData.sceneData, options);
+        scene.updateFromNetworkSyncData(
+          layoutSyncData.sceneData,
+          updateFromNetworkSyncDataOptions
+        );
       });
+
+      // Finally, if the save was done in a variable,
+      // rehydrate the variable where the save was done,
+      // as it has been erased by the load.
+      if (saveOptions && variableToRehydrateNetworkSyncData) {
+        const currentScene = sceneStack.getCurrentScene();
+        if (!currentScene) return;
+        const sceneVariables = currentScene.getVariables();
+        const gameVariables = currentScene.getGame().getVariables();
+        const { variablePathInScene, variablePathInGame } = saveOptions;
+
+        if (variablePathInScene && variablePathInScene.length > 0) {
+          const variableName =
+            variablePathInScene[variablePathInScene.length - 1];
+          const variableInScene =
+            sceneVariables.getVariableFromPath(variablePathInScene);
+          if (variableInScene) {
+            const variableNetworkSyncData: VariableNetworkSyncData = {
+              name: variableName,
+              ...variableToRehydrateNetworkSyncData,
+            };
+            variableInScene.updateFromNetworkSyncData(
+              variableNetworkSyncData,
+              updateFromNetworkSyncDataOptions
+            );
+          }
+        }
+        if (variablePathInGame && variablePathInGame.length > 0) {
+          const variableName =
+            variablePathInGame[variablePathInGame.length - 1];
+          const variableInGame =
+            gameVariables.getVariableFromPath(variablePathInGame);
+          if (variableInGame) {
+            const variableNetworkSyncData: VariableNetworkSyncData = {
+              name: variableName,
+              ...variableToRehydrateNetworkSyncData,
+            };
+            variableInGame.updateFromNetworkSyncData(
+              variableNetworkSyncData,
+              updateFromNetworkSyncDataOptions
+            );
+          }
+        }
+      }
     };
   }
 }

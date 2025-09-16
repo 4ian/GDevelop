@@ -17,10 +17,18 @@ namespace gdjs {
     isInnerAreaFollowingParentSize: boolean;
   };
 
-  export type CustomObjectNetworkSyncDataType = ObjectNetworkSyncData & {
+  export type CustomObjectNetworkSyncDataType = {
+    anim?: SpriteAnimatorNetworkSyncData;
     ifx: boolean;
     ify: boolean;
+    sx: float;
+    sy: float;
+    op: float;
+    cc?: [float, float];
   };
+
+  export type CustomObjectNetworkSyncData = ObjectNetworkSyncData &
+    CustomObjectNetworkSyncDataType;
 
   /**
    * An object that contains other object.
@@ -223,16 +231,27 @@ namespace gdjs {
 
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
-    ): CustomObjectNetworkSyncDataType {
-      return {
+    ): CustomObjectNetworkSyncData {
+      const animator = this.getAnimator();
+      const networkSyncData: CustomObjectNetworkSyncData = {
         ...super.getNetworkSyncData(syncOptions),
         ifx: this.isFlippedX(),
         ify: this.isFlippedY(),
+        sx: this._scaleX,
+        sy: this._scaleY,
+        op: this.opacity,
       };
+      if (animator) {
+        networkSyncData.anim = animator.getNetworkSyncData();
+      }
+      if (this._customCenter) {
+        networkSyncData.cc = this._customCenter;
+      }
+      return networkSyncData;
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: CustomObjectNetworkSyncDataType,
+      networkSyncData: CustomObjectNetworkSyncData,
       options: UpdateFromNetworkSyncDataOptions
     ) {
       super.updateFromNetworkSyncData(networkSyncData, options);
@@ -241,6 +260,34 @@ namespace gdjs {
       }
       if (networkSyncData.ify !== undefined) {
         this.flipY(networkSyncData.ify);
+      }
+      if (networkSyncData.sx !== undefined) {
+        this.setScaleX(Math.abs(networkSyncData.sx));
+      }
+      if (networkSyncData.sy !== undefined) {
+        this.setScaleY(Math.abs(networkSyncData.sy));
+      }
+      if (networkSyncData.op !== undefined) {
+        this.setOpacity(networkSyncData.op);
+      }
+      if (networkSyncData.anim) {
+        const animator = this.getAnimator();
+        if (animator) {
+          animator.updateFromNetworkSyncData(networkSyncData.anim);
+        }
+      }
+      if (networkSyncData.cc) {
+        this.setRotationCenter(networkSyncData.cc[0], networkSyncData.cc[1]);
+      }
+      if (
+        networkSyncData.ifx !== undefined ||
+        networkSyncData.ify !== undefined ||
+        networkSyncData.sx !== undefined ||
+        networkSyncData.sy !== undefined ||
+        networkSyncData.anim !== undefined ||
+        networkSyncData.cc !== undefined
+      ) {
+        this.invalidateHitboxes();
       }
     }
 

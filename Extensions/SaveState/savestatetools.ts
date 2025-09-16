@@ -222,11 +222,9 @@ namespace gdjs {
       } else if (optionsToApply.loadStorageName) {
         gdjs
           .loadFromIndexedDB(
-            gdjs.saveState.getIndexedDbDatabaseName(),
-            gdjs.saveState.getIndexedDbObjectStore(),
-            gdjs.saveState.getIndexedDbStorageKey(
-              optionsToApply.loadStorageName
-            )
+            getIndexedDbDatabaseName(),
+            getIndexedDbObjectStore(),
+            getIndexedDbStorageKey(optionsToApply.loadStorageName)
           )
           .then((jsonData) => {
             const saveState = jsonData as GameSaveState;

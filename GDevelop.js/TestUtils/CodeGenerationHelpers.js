@@ -239,7 +239,8 @@ function generateCompiledEventsForSerializedEventsBasedExtension(
   gd,
   serializedEventsFunctionsExtension,
   gdjs,
-  runtimeScene
+  runtimeScene,
+  options
 ) {
   const project = new gd.ProjectHelper.createNewGDJSProject();
   const extension = project.insertNewEventsFunctionsExtension(
@@ -294,7 +295,8 @@ function generateCompiledEventsForSerializedEventsBasedExtension(
       project,
       extension,
       behavior,
-      gdjs
+      gdjs,
+      options
     );
   }
 

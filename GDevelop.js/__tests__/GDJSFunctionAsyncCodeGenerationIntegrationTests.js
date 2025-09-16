@@ -3578,7 +3578,8 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
           gd,
           require('./extensions/EBAsyncAction.json'),
           gdjs,
-          runtimeScene
+          runtimeScene,
+          { logCode: true }
         );
 
       const {
@@ -3618,7 +3619,8 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
           gd,
           require('./extensions/EBAsyncAction.json'),
           gdjs,
-          runtimeScene
+          runtimeScene,
+          { logCode: false }
         );
 
       const {

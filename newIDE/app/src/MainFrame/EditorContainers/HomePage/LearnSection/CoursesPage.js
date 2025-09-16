@@ -7,7 +7,10 @@ import {
   type Course,
   type CourseChapter,
 } from '../../../../Utils/GDevelopServices/Asset';
-import type { BundleListingData } from '../../../../Utils/GDevelopServices/Shop';
+import {
+  type BundleListingData,
+  type CourseListingData,
+} from '../../../../Utils/GDevelopServices/Shop';
 import CoursePreviewBanner from '../../../../Course/CoursePreviewBanner';
 import type { CourseCompletion, CourseChapterCompletion } from '../UseCourses';
 import { Line } from '../../../../UI/Grid';
@@ -36,7 +39,7 @@ const styles = {
 type Props = {|
   onBack: () => void,
   courses: ?Array<Course>,
-  onSelectCourse: (courseId: string) => void,
+  onSelectCourse: (courseListingData: CourseListingData) => void,
   onSelectBundle: (bundleListingData: BundleListingData) => void,
   previewedCourse: ?Course,
   getCourseChapters: (courseId: string) => ?Array<CourseChapter>,
@@ -83,8 +86,12 @@ const CoursesPage = ({
               getCourseCompletion={getCourseCompletion}
               getCourseChapterCompletion={getCourseChapterCompletion}
               onDisplayCourse={() => {
-                if (!previewedCourse) return;
-                onSelectCourse(previewedCourse.id);
+                if (!previewedCourse || !listedCourses) return;
+                const courseListingData = listedCourses.find(
+                  listedCourse => listedCourse.id === previewedCourse.id
+                );
+                if (!courseListingData) return;
+                onSelectCourse(courseListingData);
               }}
             />
           </SectionRow>
@@ -109,7 +116,8 @@ const CoursesPage = ({
                             courseListingData={courseListingData}
                             completion={completion}
                             onClick={() => {
-                              onSelectCourse(course.id);
+                              if (!courseListingData) return;
+                              onSelectCourse(courseListingData);
                             }}
                           />
                         </GridListTile>
@@ -159,7 +167,8 @@ const CoursesPage = ({
                             courseListingData={courseListingData}
                             completion={completion}
                             onClick={() => {
-                              onSelectCourse(course.id);
+                              if (!courseListingData) return;
+                              onSelectCourse(courseListingData);
                             }}
                           />
                         </GridListTile>
@@ -201,7 +210,8 @@ const CoursesPage = ({
                             courseListingData={courseListingData}
                             completion={completion}
                             onClick={() => {
-                              onSelectCourse(course.id);
+                              if (!courseListingData) return;
+                              onSelectCourse(courseListingData);
                             }}
                           />
                         </GridListTile>

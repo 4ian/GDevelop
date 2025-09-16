@@ -355,8 +355,9 @@ const PrivateGameTemplateInformationPage = ({
           gameTemplateId: gameTemplate.id,
           gameTemplateName: gameTemplate.name,
           gameTemplateTag: gameTemplate.tag,
-          currency: price ? price.currency : undefined,
           usageType: selectedUsageType,
+          priceValue: price && price.value,
+          priceCurrency: price && price.currency,
         });
 
         setPurchasingPrivateGameTemplateListingData(
@@ -392,14 +393,6 @@ const PrivateGameTemplateInformationPage = ({
         return;
       }
 
-      sendGameTemplateBuyClicked({
-        gameTemplateId: gameTemplate.id,
-        gameTemplateName: gameTemplate.name,
-        gameTemplateTag: gameTemplate.tag,
-        usageType: selectedUsageType,
-        currency: 'CREDITS',
-      });
-
       const currentCreditsAmount = limits.credits.userBalance.amount;
       const gameTemplatePriceForUsageType = privateGameTemplateListingData.creditPrices.find(
         price => price.usageType === selectedUsageType
@@ -412,6 +405,16 @@ const PrivateGameTemplateInformationPage = ({
         return;
       }
       const gameTemplateCreditsAmount = gameTemplatePriceForUsageType.amount;
+
+      sendGameTemplateBuyClicked({
+        gameTemplateId: gameTemplate.id,
+        gameTemplateName: gameTemplate.name,
+        gameTemplateTag: gameTemplate.tag,
+        usageType: selectedUsageType,
+        priceValue: gameTemplateCreditsAmount,
+        priceCurrency: 'CREDITS',
+      });
+
       if (currentCreditsAmount < gameTemplateCreditsAmount) {
         openCreditsPackageDialog({
           missingCredits: gameTemplateCreditsAmount - currentCreditsAmount,

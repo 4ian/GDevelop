@@ -405,8 +405,9 @@ const useCourses = () => {
         sendCourseBuyClicked({
           courseId: course.id,
           courseName: course.titleByLocale.en,
-          currency: priceForUsageType ? priceForUsageType.currency : undefined,
           usageType: 'default',
+          priceValue: priceForUsageType.value,
+          priceCurrency: priceForUsageType.currency,
         });
 
         setPurchasingCourseListingData(listedCourse);
@@ -433,13 +434,6 @@ const useCourses = () => {
         return;
       }
 
-      sendCourseBuyClicked({
-        courseId: course.id,
-        courseName: course.titleByLocale.en,
-        currency: 'CREDITS',
-        usageType: 'default',
-      });
-
       const currentCreditsAmount = limits.credits.userBalance.amount;
       const listedCourse = listedCourses.find(
         listedCourse => listedCourse.id === course.id
@@ -458,6 +452,15 @@ const useCourses = () => {
         return;
       }
       const creditsAmount = priceForUsageType.amount;
+
+      sendCourseBuyClicked({
+        courseId: course.id,
+        courseName: course.titleByLocale.en,
+        usageType: 'default',
+        priceValue: creditsAmount,
+        priceCurrency: 'CREDITS',
+      });
+
       if (currentCreditsAmount < creditsAmount) {
         openCreditsPackageDialog({
           missingCredits: creditsAmount - currentCreditsAmount,

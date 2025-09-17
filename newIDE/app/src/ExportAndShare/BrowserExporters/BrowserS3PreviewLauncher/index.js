@@ -232,6 +232,17 @@ export default class BrowserS3PreviewLauncher extends React.Component<
           );
         });
       }
+      if (previewOptions.editorCameraState3D) {
+        previewExportOptions.setEditorCameraState3D(
+          previewOptions.editorCameraState3D.cameraMode,
+          previewOptions.editorCameraState3D.positionX,
+          previewOptions.editorCameraState3D.positionY,
+          previewOptions.editorCameraState3D.positionZ,
+          previewOptions.editorCameraState3D.rotationAngle,
+          previewOptions.editorCameraState3D.elevationAngle,
+          previewOptions.editorCameraState3D.distance
+        );
+      }
 
       // The token, if any, to be used to read resources on GDevelop Cloud buckets.
       const gdevelopResourceToken = getGDevelopResourceJwtToken();

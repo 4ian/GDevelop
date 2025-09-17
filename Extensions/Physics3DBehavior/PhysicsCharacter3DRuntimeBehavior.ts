@@ -207,6 +207,9 @@ namespace gdjs {
         this._isHookedToPhysicsStep = true;
       }
 
+      // Destroy the body before switching the bodyUpdater,
+      // to ensure no body relicate is left.
+      behavior.bodyUpdater.destroyBody();
       behavior.bodyUpdater =
         new gdjs.PhysicsCharacter3DRuntimeBehavior.CharacterBodyUpdater(this);
       behavior.collisionChecker = this.collisionChecker;

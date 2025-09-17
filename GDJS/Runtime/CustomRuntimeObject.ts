@@ -287,7 +287,7 @@ namespace gdjs {
         networkSyncData.anim !== undefined ||
         networkSyncData.cc !== undefined
       ) {
-        this.invalidateHitboxes();
+        this.onChildrenLocationChanged();
       }
     }
 

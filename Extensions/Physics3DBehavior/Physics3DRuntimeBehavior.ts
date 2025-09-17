@@ -555,22 +555,34 @@ namespace gdjs {
       super.updateFromNetworkSyncData(networkSyncData, options);
 
       const behaviorSpecificProps = networkSyncData.props;
+
+      if (behaviorSpecificProps.layers !== undefined) {
+        this.layers = behaviorSpecificProps.layers;
+      }
+      if (behaviorSpecificProps.masks !== undefined) {
+        this.masks = behaviorSpecificProps.masks;
+      }
+
+      this._needToRecreateShape = true;
+      this._needToRecreateBody = true;
+      this.updateBodyFromObject();
+
+      if (!this._body) return;
+
       if (
         behaviorSpecificProps.px !== undefined &&
         behaviorSpecificProps.py !== undefined &&
         behaviorSpecificProps.pz !== undefined
       ) {
-        if (this._body) {
-          this._sharedData.bodyInterface.SetPosition(
-            this._body.GetID(),
-            this.getRVec3(
-              behaviorSpecificProps.px,
-              behaviorSpecificProps.py,
-              behaviorSpecificProps.pz
-            ),
-            Jolt.EActivation_DontActivate
-          );
-        }
+        this._sharedData.bodyInterface.SetPosition(
+          this._body.GetID(),
+          this.getRVec3(
+            behaviorSpecificProps.px,
+            behaviorSpecificProps.py,
+            behaviorSpecificProps.pz
+          ),
+          Jolt.EActivation_DontActivate
+        );
       }
       if (
         behaviorSpecificProps.rx !== undefined &&
@@ -578,56 +590,44 @@ namespace gdjs {
         behaviorSpecificProps.rz !== undefined &&
         behaviorSpecificProps.rw !== undefined
       ) {
-        if (this._body) {
-          this._sharedData.bodyInterface.SetRotation(
-            this._body.GetID(),
-            this.getQuat(
-              behaviorSpecificProps.rx,
-              behaviorSpecificProps.ry,
-              behaviorSpecificProps.rz,
-              behaviorSpecificProps.rw
-            ),
-            Jolt.EActivation_DontActivate
-          );
-        }
+        this._sharedData.bodyInterface.SetRotation(
+          this._body.GetID(),
+          this.getQuat(
+            behaviorSpecificProps.rx,
+            behaviorSpecificProps.ry,
+            behaviorSpecificProps.rz,
+            behaviorSpecificProps.rw
+          ),
+          Jolt.EActivation_DontActivate
+        );
       }
       if (
         behaviorSpecificProps.lvx !== undefined &&
         behaviorSpecificProps.lvy !== undefined &&
         behaviorSpecificProps.lvz !== undefined
       ) {
-        if (this._body) {
-          this._sharedData.bodyInterface.SetLinearVelocity(
-            this._body.GetID(),
-            this.getVec3(
-              behaviorSpecificProps.lvx,
-              behaviorSpecificProps.lvy,
-              behaviorSpecificProps.lvz
-            )
-          );
-        }
+        this._sharedData.bodyInterface.SetLinearVelocity(
+          this._body.GetID(),
+          this.getVec3(
+            behaviorSpecificProps.lvx,
+            behaviorSpecificProps.lvy,
+            behaviorSpecificProps.lvz
+          )
+        );
       }
       if (
         behaviorSpecificProps.avx !== undefined &&
         behaviorSpecificProps.avy !== undefined &&
         behaviorSpecificProps.avz !== undefined
       ) {
-        if (this._body) {
-          this._sharedData.bodyInterface.SetAngularVelocity(
-            this._body.GetID(),
-            this.getVec3(
-              behaviorSpecificProps.avx,
-              behaviorSpecificProps.avy,
-              behaviorSpecificProps.avz
-            )
-          );
-        }
-      }
-      if (behaviorSpecificProps.layers !== undefined) {
-        this.layers = behaviorSpecificProps.layers;
-      }
-      if (behaviorSpecificProps.masks !== undefined) {
-        this.masks = behaviorSpecificProps.masks;
+        this._sharedData.bodyInterface.SetAngularVelocity(
+          this._body.GetID(),
+          this.getVec3(
+            behaviorSpecificProps.avx,
+            behaviorSpecificProps.avy,
+            behaviorSpecificProps.avz
+          )
+        );
       }
     }
 

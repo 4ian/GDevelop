@@ -88,6 +88,12 @@ namespace gdjs {
       loadJustFailed = false;
     });
 
+    gdjs.registerRuntimeScenePostEventsCallback(
+      (runtimeScene: gdjs.RuntimeScene) => {
+        loadGameSnapshotAtTheEndOfFrameIfAny(runtimeScene);
+      }
+    );
+
     const getGameSaveState = (runtimeScene: RuntimeScene) => {
       const gameSaveState: GameSaveState = {
         gameNetworkSyncData: {},
@@ -185,10 +191,10 @@ namespace gdjs {
       };
     };
 
-    export const loadGameSnapshotAtTheEndOfFrameIfAny = function (
+    const loadGameSnapshotAtTheEndOfFrameIfAny = function (
       runtimeScene: RuntimeScene
-    ): boolean {
-      if (!loadRequestOptions) return false;
+    ) {
+      if (!loadRequestOptions) return;
 
       const optionsToApply = loadRequestOptions;
       // Reset it so we don't load it twice.
@@ -236,8 +242,6 @@ namespace gdjs {
             markLoadJustFailed();
           });
       }
-
-      return true;
     };
 
     const loadGameFromSave = (

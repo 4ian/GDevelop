@@ -52,16 +52,6 @@ namespace gdjs {
       }
 
       const currentScene = this._stack[this._stack.length - 1];
-      if (gdjs.saveState.loadGameSnapshotAtTheEndOfFrameIfAny) {
-        const hasUpdatedFromGameSnapshot =
-          gdjs.saveState.loadGameSnapshotAtTheEndOfFrameIfAny(currentScene);
-        if (hasUpdatedFromGameSnapshot) {
-          // If there was a game snapshot, skip the rendering,
-          // it is handled by the saveState.
-          return true;
-        }
-      }
-
       if (currentScene.renderAndStep(elapsedTime)) {
         const request = currentScene.getRequestedChange();
 

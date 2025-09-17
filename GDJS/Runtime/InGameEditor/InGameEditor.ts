@@ -1945,20 +1945,23 @@ namespace gdjs {
     private _handleShortcuts() {
       const inputManager = this._runtimeGame.getInputManager();
       if (isControlPressedOnly(inputManager)) {
-        if (inputManager.wasKeyReleased(Z_KEY)) {
+        // Note: use `wasKeyJustPressed` instead of `wasKeyReleased` to avoid
+        // macOS stealing the key release ("key up") information
+        // when the "Meta" key is pressed.
+        if (inputManager.wasKeyJustPressed(Z_KEY)) {
           this._sendUndo();
-        } else if (inputManager.wasKeyReleased(Y_KEY)) {
+        } else if (inputManager.wasKeyJustPressed(Y_KEY)) {
           this._sendRedo();
-        } else if (inputManager.wasKeyReleased(C_KEY)) {
+        } else if (inputManager.wasKeyJustPressed(C_KEY)) {
           this._sendCopy();
-        } else if (inputManager.wasKeyReleased(V_KEY)) {
+        } else if (inputManager.wasKeyJustPressed(V_KEY)) {
           this._sendPaste();
-        } else if (inputManager.wasKeyReleased(X_KEY)) {
+        } else if (inputManager.wasKeyJustPressed(X_KEY)) {
           this._sendCut();
         }
       }
       if (isControlPlusShiftPressedOnly(inputManager)) {
-        if (inputManager.wasKeyReleased(Z_KEY)) {
+        if (inputManager.wasKeyJustPressed(Z_KEY)) {
           this._sendRedo();
         }
       }

@@ -630,7 +630,8 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          // be worth it.
          "    if (objectsList) {\n" +
          "      const object = parentEventsFunctionContext && "
-         // Check if  `objectName` is not a child object
+         // Check if  `objectName` is not a child object and is passed by
+         // parameter from a parent instance container.
          "!(scopeInstanceContainer && "
          "scopeInstanceContainer.isObjectRegistered(objectName)) ?\n" +
          "        "
@@ -655,7 +656,8 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          "    let count = 0;\n" + "    if (objectsList) {\n" +
          "      for(const objectName in objectsList.items)\n" +
          "        count += parentEventsFunctionContext && "
-         // Check if `objectName` is not a child object
+         // Check if  `objectName` is not a child object and is passed by
+         // parameter from a parent instance container.
          "!(scopeInstanceContainer && "
          "scopeInstanceContainer.isObjectRegistered(objectName)) ?\n" +
          "parentEventsFunctionContext.getInstancesCountOnScene(objectName) "

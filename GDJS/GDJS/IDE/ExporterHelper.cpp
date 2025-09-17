@@ -355,11 +355,11 @@ void ExporterHelper::SerializeRuntimeGameOptions(
   if (options.isInGameEdition) {
     initialRuntimeGameStatus.AddChild("isInGameEdition").SetBoolValue(true);
     initialRuntimeGameStatus.AddChild("editorId").SetValue(options.editorId);
-    if (!options.editorCamera3DMode.empty()) {
+    if (!options.editorCamera3DCameraMode.empty()) {
       auto &editorCamera3D =
           initialRuntimeGameStatus.AddChild("editorCamera3D");
-      editorCamera3D.AddChild("mode").SetStringValue(
-          options.editorCamera3DMode);
+      editorCamera3D.AddChild("cameraMode").SetStringValue(
+          options.editorCamera3DCameraMode);
       editorCamera3D.AddChild("positionX")
           .SetDoubleValue(options.editorCamera3DPositionX);
       editorCamera3D.AddChild("positionY")

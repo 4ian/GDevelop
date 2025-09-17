@@ -249,7 +249,7 @@ struct PreviewExportOptions {
                          double positionY, double positionZ,
                          double rotationAngle, double elevationAngle,
                          double distance) {
-    editorCamera3DMode = cameraMode;
+    editorCamera3DCameraMode = cameraMode;
     editorCamera3DPositionX = positionX;
     editorCamera3DPositionY = positionY;
     editorCamera3DPositionZ = positionZ;
@@ -390,7 +390,7 @@ struct PreviewExportOptions {
   bool isDevelopmentEnvironment;
   bool isInGameEdition;
   gd::String editorId;
-  gd::String editorCamera3DMode;
+  gd::String editorCamera3DCameraMode;
   double editorCamera3DPositionX = 0;
   double editorCamera3DPositionY = 0;
   double editorCamera3DPositionZ = 0;

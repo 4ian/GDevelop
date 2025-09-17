@@ -242,7 +242,7 @@ namespace gdjs {
       if (!options.ignoreVariableOwnership) {
         const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerNumber();
 
-        const currentVariableOwner = variable.getPlayerOwnership();
+        const currentVariableOwner = this.getPlayerOwnership();
         if (currentPlayerNumber === currentVariableOwner) {
           // Variable owned by us, ignoring update message.
           return;
@@ -300,7 +300,7 @@ namespace gdjs {
               " aren't supported by GDevelop variables, it will be reduced to that size."
           );
         // @ts-ignore
-        variable.setNumber(parseInt(obj, 10));
+        this.setNumber(parseInt(obj, 10));
       } else if (typeof obj === 'function') {
         logger.error(
           'Error while converting JS variable to GDevelop variable: Impossible to set variable value to a function.'

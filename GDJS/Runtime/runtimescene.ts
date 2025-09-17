@@ -7,6 +7,10 @@ namespace gdjs {
   const logger = new gdjs.Logger('RuntimeScene');
   const setupWarningLogger = new gdjs.Logger('RuntimeScene (setup warnings)');
 
+  export type SceneLoadOptions = {
+    preventInitialInstancesCreation?: boolean;
+  };
+
   /**
    * A scene being played, containing instances of objects rendered on screen.
    */
@@ -133,10 +137,7 @@ namespace gdjs {
      */
     loadFromScene(
       sceneAndExtensionsData: SceneAndExtensionsData | null,
-      options?: {
-        preventInitialInstancesCreation: boolean;
-        preventSoundManagerClearing: boolean;
-      }
+      options?: SceneLoadOptions
     ) {
       if (!sceneAndExtensionsData) {
         logger.error('loadFromScene was called without a scene');
@@ -222,11 +223,7 @@ namespace gdjs {
       for (let i = 0; i < gdjs.callbacksRuntimeSceneLoaded.length; ++i) {
         gdjs.callbacksRuntimeSceneLoaded[i](this);
       }
-      if (
-        sceneData.stopSoundsOnStartup &&
-        this._runtimeGame &&
-        (!options || !options.preventSoundManagerClearing)
-      ) {
+      if (sceneData.stopSoundsOnStartup && this._runtimeGame) {
         this._runtimeGame.getSoundManager().clearAll();
       }
       this._isLoaded = true;

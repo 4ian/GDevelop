@@ -134,7 +134,6 @@ namespace gdjs {
 
         const callback = idToCallbackMap.get(callbackId);
         if (callback) {
-          // Find the objectsList again from the networkIds.
           const longLivedObjectsList = new gdjs.LongLivedObjectsList();
           longLivedObjectsList.updateFromNetworkSyncData(
             objectsList,

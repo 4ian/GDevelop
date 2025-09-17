@@ -127,7 +127,7 @@ namespace gdjs {
     push(
       newSceneName: string,
       externalLayoutName?: string,
-      options?: UpdateFromNetworkSyncDataOptions
+      options?: SceneLoadOptions
     ): gdjs.RuntimeScene | null {
       this._throwIfDisposed();
 
@@ -155,20 +155,15 @@ namespace gdjs {
     private _loadNewScene(
       newSceneName: string,
       externalLayoutName?: string,
-      options?: UpdateFromNetworkSyncDataOptions
+      options?: SceneLoadOptions
     ): gdjs.RuntimeScene {
       this._throwIfDisposed();
-      const preventInitialInstancesCreation = !!options;
-      const preventSoundManagerClearing = !!options;
 
       // Load the new one
       const newScene = new gdjs.RuntimeScene(this._runtimeGame);
       newScene.loadFromScene(
         this._runtimeGame.getSceneAndExtensionsData(newSceneName),
-        {
-          preventInitialInstancesCreation,
-          preventSoundManagerClearing,
-        }
+        options
       );
       this._wasFirstSceneLoaded = true;
 
@@ -176,7 +171,10 @@ namespace gdjs {
       if (externalLayoutName) {
         const externalLayoutData =
           this._runtimeGame.getExternalLayoutData(externalLayoutName);
-        if (externalLayoutData && !preventInitialInstancesCreation) {
+        if (
+          externalLayoutData &&
+          (!options || !options.preventInitialInstancesCreation)
+        ) {
           newScene.createObjectsFrom(
             externalLayoutData.instances,
             0,
@@ -198,7 +196,7 @@ namespace gdjs {
     replace(
       newSceneName: string,
       clear?: boolean,
-      options?: UpdateFromNetworkSyncDataOptions
+      options?: SceneLoadOptions
     ): gdjs.RuntimeScene | null {
       this._throwIfDisposed();
 
@@ -295,6 +293,11 @@ namespace gdjs {
 
       this._sceneStackSyncDataToApply = null;
 
+      const sceneLoadOptions = {
+        preventInitialInstancesCreation:
+          !!options && !!options.preventInitialInstancesCreation,
+      };
+
       if (options && options.clearSceneStack) {
         while (this._stack.length !== 0) {
           let scene = this._stack.pop();
@@ -304,7 +307,11 @@ namespace gdjs {
         }
         for (let i = 0; i < sceneStackSyncData.length; ++i) {
           const sceneSyncData = sceneStackSyncData[i];
-          const newScene = this.push(sceneSyncData.name, undefined, options);
+          const newScene = this.push(
+            sceneSyncData.name,
+            undefined,
+            sceneLoadOptions
+          );
           if (newScene) {
             newScene.networkId = sceneSyncData.networkId;
           }
@@ -327,7 +334,11 @@ namespace gdjs {
             `Scene at position ${i} with name ${sceneSyncData.name} is missing from the stack, adding it.`
           );
           // We have fewer scenes in the stack than the host, let's add the scene.
-          const newScene = this.push(sceneSyncData.name, undefined, options);
+          const newScene = this.push(
+            sceneSyncData.name,
+            undefined,
+            sceneLoadOptions
+          );
           if (newScene) {
             newScene.networkId = sceneSyncData.networkId;
           }
@@ -348,7 +359,7 @@ namespace gdjs {
           const newScene = this.replace(
             sceneSyncData.name,
             true, // Clear the stack
-            options
+            sceneLoadOptions
           );
           if (newScene) {
             newScene.networkId = sceneSyncData.networkId;
@@ -392,7 +403,7 @@ namespace gdjs {
           const newScene = this.replace(
             sceneSyncData.name,
             false, // Don't clear the stack
-            options
+            sceneLoadOptions
           );
           if (newScene) {
             newScene.networkId = sceneSyncData.networkId;

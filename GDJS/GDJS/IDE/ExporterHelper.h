@@ -255,7 +255,7 @@ struct PreviewExportOptions {
     editorCamera3DPositionZ = positionZ;
     editorCamera3DRotationAngle = rotationAngle;
     editorCamera3DElevationAngle = elevationAngle;
-    editorCamera3DDistance = elevationAngle;
+    editorCamera3DDistance = distance;
     return *this;
   }
 

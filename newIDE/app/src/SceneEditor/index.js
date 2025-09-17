@@ -2440,11 +2440,9 @@ export default class SceneEditor extends React.Component<Props, State> {
       const { previewDebuggerServer } = this.props;
       if (!previewDebuggerServer) return;
       try {
-        const answer = await previewDebuggerServer.sendMessageWithResponse(
-          {
-            command: 'getSelectionAABB',
-          }
-        );
+        const answer = await previewDebuggerServer.sendMessageWithResponse({
+          command: 'getSelectionAABB',
+        });
         selectionAABB.set({
           left: answer.payload.minX,
           top: answer.payload.minY,

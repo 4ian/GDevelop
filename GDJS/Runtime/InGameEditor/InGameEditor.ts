@@ -38,6 +38,22 @@ namespace gdjs {
   const Y_KEY = 89;
   const Z_KEY = 90;
 
+  const instanceStateFlag = {
+    selected: 1,
+    locked: 2,
+    hovered: 4,
+  };
+  const instanceWireframeColor = {
+    [instanceStateFlag.hovered]: '#54daff',
+    [instanceStateFlag.selected]: '#f2a63c',
+    [instanceStateFlag.selected | instanceStateFlag.hovered]: '#ffd200',
+    [instanceStateFlag.locked | instanceStateFlag.hovered]: '#b02715',
+    [instanceStateFlag.locked | instanceStateFlag.selected]: '#b87f7f',
+    [instanceStateFlag.locked |
+    instanceStateFlag.selected |
+    instanceStateFlag.hovered]: '#f51e02',
+  };
+
   const editorCameraFov = 45;
 
   let hasWindowFocus = true;
@@ -217,7 +233,19 @@ namespace gdjs {
       return this._selectedObjects;
     }
 
-    getLastSelectedObject(): gdjs.RuntimeObject | null {
+    getLastSelectedObject(options?: {
+      ignoreIf: (object: gdjs.RuntimeObject) => boolean;
+    }): gdjs.RuntimeObject | null {
+      if (options && options.ignoreIf) {
+        for (let i = this._selectedObjects.length - 1; i >= 0; i--) {
+          const object = this._selectedObjects[i];
+          if (!options.ignoreIf(object)) {
+            return object;
+          }
+        }
+        return null;
+      }
+
       return this._selectedObjects[this._selectedObjects.length - 1] || null;
     }
 
@@ -1014,12 +1042,7 @@ namespace gdjs {
       this._sendSelectionUpdate({ isSendingBackSelectionForDefaultSize: true });
     }
 
-    centerViewOnLastSelectedInstance(visibleScreenArea: {
-      minX: number;
-      minY: number;
-      maxX: number;
-      maxY: number;
-    }) {
+    centerViewOnLastSelectedInstance() {
       if (!this._currentScene) return;
 
       const object = this._selection.getLastSelectedObject();
@@ -1448,9 +1471,16 @@ namespace gdjs {
           container.removeFromParent();
           this._selectionBoxes.delete(object);
         } else {
-          box.material.color = new THREE.Color(
-            isHovered ? (isInSelection ? '#ffd200' : '#aaaaaa') : '#f2a63c'
-          );
+          const isLocked = this.isInstanceLocked(object);
+
+          const color =
+            instanceWireframeColor[
+              (isLocked ? instanceStateFlag.locked : 0) |
+                (isInSelection ? instanceStateFlag.selected : 0) |
+                (isHovered ? instanceStateFlag.hovered : 0)
+            ] || '#aaaaaa';
+
+          box.material.color = new THREE.Color(color);
         }
       });
 
@@ -1509,27 +1539,37 @@ namespace gdjs {
       const currentScene = this._currentScene;
       if (!currentScene) return;
 
-      const lastSelectedObject = this._selection.getLastSelectedObject();
+      // Selection controls are shown on the last object that can be manipulated
+      // (and if none, selection controls are not shown).
+      const lastEditableSelectedObject = this._selection.getLastSelectedObject({
+        ignoreIf: (object) =>
+          this.isInstanceLocked(object) || this.isInstanceSealed(object),
+      });
 
+      // Remove the selection controls if the last selected object has changed
+      // or if nothing movable is selected.
       if (
         this._selectionControls &&
-        (!lastSelectedObject ||
-          (lastSelectedObject &&
-            this._selectionControls.object !== lastSelectedObject) ||
+        (!lastEditableSelectedObject ||
+          (lastEditableSelectedObject &&
+            this._selectionControls.object !== lastEditableSelectedObject) ||
           shouldDragSelectedObject(inputManager))
       ) {
         this._removeSelectionControls();
       }
 
+      // Create the selection controls on the last object that can be manipulated.
       if (
-        lastSelectedObject &&
+        lastEditableSelectedObject &&
         !this._selectionControls &&
         !shouldDragSelectedObject(inputManager)
       ) {
-        const threeObject = lastSelectedObject.get3DRendererObject();
+        const threeObject = lastEditableSelectedObject.get3DRendererObject();
         if (!threeObject) return;
 
-        const cameraLayer = this.getCameraLayer(lastSelectedObject.getLayer());
+        const cameraLayer = this.getCameraLayer(
+          lastEditableSelectedObject.getLayer()
+        );
         if (!cameraLayer) return;
 
         const runtimeLayerRender = cameraLayer.getRenderer();
@@ -1611,7 +1651,7 @@ namespace gdjs {
         });
 
         this._selectionControls = {
-          object: lastSelectedObject,
+          object: lastEditableSelectedObject,
           dummyThreeObject,
           threeTransformControls,
         };

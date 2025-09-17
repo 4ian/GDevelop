@@ -98,7 +98,9 @@ module.exports = {
         'number',
         'SecondsSinceLastSave',
         _('Seconds since last save'),
-        _('the number of seconds since the last save'),
+        _(
+          'the number of seconds since the last save (-1 = no value, 0 = now, > 0 = seconds)'
+        ),
         _('the number of seconds since the last save'),
         '',
         'res/actions/saveDown.svg'
@@ -113,7 +115,9 @@ module.exports = {
         'number',
         'SecondsSinceLastLoad',
         _('Seconds since last load'),
-        _('the number of seconds since the last load'),
+        _(
+          'the number of seconds since the last load (-1 = no value, 0 = now, > 0 = seconds)'
+        ),
         _('the number of seconds since the last load'),
         '',
         'res/actions/saveDown.svg'

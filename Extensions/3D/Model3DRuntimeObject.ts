@@ -20,7 +20,6 @@ namespace gdjs {
     /** The base parameters of the Model3D object */
     content: Object3DDataContent & {
       modelResourceName: string;
-      depth: number;
       rotationX: number;
       rotationY: number;
       rotationZ: number;
@@ -230,7 +229,6 @@ namespace gdjs {
         ass: this._animationSpeedScale,
         ap: this._animationPaused,
         cfd: this._crossfadeDuration,
-        d: this.getDepth(),
       };
     }
 

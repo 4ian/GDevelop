@@ -10,6 +10,7 @@ import {
   LayoutedInstance,
   LayoutedParent,
 } from './CustomObjectLayoutingModel';
+import { mapVector } from '../../Utils/MapFor';
 import * as PIXI from 'pixi.js-legacy';
 import * as THREE from 'three';
 
@@ -75,27 +76,21 @@ const getPropertyMappingRules = (
   if (!properties.has('_PropertyMapping')) {
     return [];
   }
-  const extraInfos = properties
-    .get('_PropertyMapping')
-    .getExtraInfo()
-    .toJSArray();
-  return extraInfos
-    .map(extraInfo => {
-      const mapping = extraInfo.split('=');
-      if (mapping.length < 2) {
-        return null;
-      }
-      const targetPath = mapping[0].split('.');
-      if (mapping.length < 2) {
-        return null;
-      }
-      return {
-        targetChild: targetPath[0],
-        targetProperty: targetPath[1],
-        sourceProperty: mapping[1],
-      };
-    })
-    .filter(Boolean);
+  return mapVector(properties.get('_PropertyMapping').getChoices(), choice => {
+    const mapping = choice.getValue().split('=');
+    if (mapping.length < 2) {
+      return null;
+    }
+    const targetPath = mapping[0].split('.');
+    if (mapping.length < 2) {
+      return null;
+    }
+    return {
+      targetChild: targetPath[0],
+      targetProperty: targetPath[1],
+      sourceProperty: mapping[1],
+    };
+  }).filter(Boolean);
 };
 
 /**

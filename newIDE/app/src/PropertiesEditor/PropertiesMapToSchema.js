@@ -108,6 +108,7 @@ const createField = (
       label: choice.getLabel(),
     }));
 
+    // TODO Remove this once we made sure no built-in extension still use `addExtraInfo` instead of `addChoice`.
     const deprecatedChoices = property
       .getExtraInfo()
       .toJSArray()

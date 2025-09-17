@@ -146,7 +146,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
   codeGenerator.SetDiagnosticReport(&diagnosticReport);
 
   // Generate the code setting up the context of the function.
-  gd::String fullPreludeCode = "let visibleInstanceContainer = null;\n" +
+  gd::String fullPreludeCode = "let scopeInstanceContainer = null;\n" +
                                codeGenerator.GenerateFreeEventsFunctionContext(
                                    eventsFunctionsExtension, eventsFunction,
                                    "runtimeScene.getOnceTriggers()");
@@ -212,7 +212,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
       // TODO: this should be renamed to "instanceContainer" and have the code generation
       // adapted for this (rely less on `gdjs.RuntimeScene`, and more on `RuntimeInstanceContainer`).
       "var runtimeScene = this._runtimeScene;\n" +
-      "let visibleInstanceContainer = null;\n" +
+      "let scopeInstanceContainer = null;\n" +
       // By convention of Behavior Events Function, the object is accessible
       // as a parameter called "Object", and thisObjectList is an array
       // containing it (for faster access, without having to go through the
@@ -298,7 +298,7 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
       // TODO: this should be renamed to "instanceContainer" and have the code generation
       // adapted for this (rely less on `gdjs.RuntimeScene`, and more on `RuntimeInstanceContainer`).
       "var runtimeScene = this._instanceContainer;\n" +
-      "let visibleInstanceContainer = this._instanceContainer;\n" +
+      "let scopeInstanceContainer = this._instanceContainer;\n" +
       // By convention of Object Events Function, the object is accessible
       // as a parameter called "Object", and thisObjectList is an array
       // containing it (for faster access, without having to go through the
@@ -630,9 +630,9 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          // be worth it.
          "    if (objectsList) {\n" +
          "      const object = parentEventsFunctionContext && "
-         // Check if it's not a child object
-         "!(visibleInstanceContainer && "
-         "visibleInstanceContainer.isObjectRegistered(objectName)) ?\n" +
+         // Check if  `objectName` is not a child object
+         "!(scopeInstanceContainer && "
+         "scopeInstanceContainer.isObjectRegistered(objectName)) ?\n" +
          "        "
          "parentEventsFunctionContext.createObject(objectsList.firstKey()) "
          ":\n" +
@@ -655,9 +655,9 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          "    let count = 0;\n" + "    if (objectsList) {\n" +
          "      for(const objectName in objectsList.items)\n" +
          "        count += parentEventsFunctionContext && "
-         // Check if it's not a child object
-         "!(visibleInstanceContainer && "
-         "visibleInstanceContainer.isObjectRegistered(objectName)) ?\n" +
+         // Check if `objectName` is not a child object
+         "!(scopeInstanceContainer && "
+         "scopeInstanceContainer.isObjectRegistered(objectName)) ?\n" +
          "parentEventsFunctionContext.getInstancesCountOnScene(objectName) "
          ":\n" +
          "        runtimeScene.getInstancesCountOnScene(objectName);\n" +

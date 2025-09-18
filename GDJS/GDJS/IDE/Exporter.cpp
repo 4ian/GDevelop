@@ -101,6 +101,7 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
     helper.AddLibsInclude(
         /*pixiRenderers=*/true,
         usedExtensionsResult.Has3DObjects(),
+        /*isInGameEditor=*/false,
         /*includeWebsocketDebuggerClient=*/false,
         /*includeWindowMessageDebuggerClient=*/false,
         /*includeMinimalDebuggerClient=*/false,

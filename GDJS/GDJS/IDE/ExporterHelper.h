@@ -534,6 +534,7 @@ class ExporterHelper {
    */
   void AddLibsInclude(bool pixiRenderers,
                       bool pixiInThreeRenderers,
+                      bool isInGameEdition,
                       bool includeWebsocketDebuggerClient,
                       bool includeWindowMessageDebuggerClient,
                       bool includeMinimalDebuggerClient,

@@ -94,7 +94,7 @@ namespace gdjs {
   const defaultEffectsData: EffectData[] = [
     {
       effectType: 'Scene3D::HemisphereLight',
-      name: '3D Light',
+      name: 'Default Light for in-game editor',
       doubleParameters: { elevation: 45, intensity: 1, rotation: 0 },
       stringParameters: {
         groundColor: '64;64;64',

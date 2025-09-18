@@ -169,7 +169,9 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     // Export engine libraries
     AddLibsInclude(/*pixiRenderers=*/true,
                   /*pixiInThreeRenderers=*/
-                  usedExtensionsResult.Has3DObjects() || options.isInGameEdition,
+                  usedExtensionsResult.Has3DObjects(),
+                  /*isInGameEdition=*/
+                  options.isInGameEdition,
                   /*includeWebsocketDebuggerClient=*/
                   !options.websocketDebuggerServerAddress.empty(),
                   /*includeWindowMessageDebuggerClient=*/
@@ -1027,6 +1029,7 @@ bool ExporterHelper::CompleteIndexFile(
 
 void ExporterHelper::AddLibsInclude(bool pixiRenderers,
                                     bool pixiInThreeRenderers,
+                                    bool isInGameEdition,
                                     bool includeWebsocketDebuggerClient,
                                     bool includeWindowMessageDebuggerClient,
                                     bool includeMinimalDebuggerClient,
@@ -1116,20 +1119,16 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     InsertUnique(includesFiles, "debugger-client/minimal-debugger-client.js");
   }
 
-  if (pixiInThreeRenderers) {
+  if (pixiInThreeRenderers || isInGameEdition) {
     InsertUnique(includesFiles, "pixi-renderers/three.js");
     InsertUnique(includesFiles, "pixi-renderers/ThreeAddons.js");
     InsertUnique(includesFiles, "pixi-renderers/draco/gltf/draco_decoder.wasm");
     InsertUnique(includesFiles,
                  "pixi-renderers/draco/gltf/draco_wasm_wrapper.js");
     // Extensions in JS may use it.
-    InsertUnique(includesFiles,
-                 "Extensions/3D/Scene3DTools.js");
-    // `InGameEditor` uses the `is3D` function.
-    InsertUnique(includesFiles,
-                 "Extensions/3D/Base3DBehavior.js");
+    InsertUnique(includesFiles, "Extensions/3D/Scene3DTools.js");
   }
-  if (pixiRenderers) {
+  if (pixiRenderers || isInGameEdition) {
     InsertUnique(includesFiles, "pixi-renderers/pixi.js");
     InsertUnique(includesFiles, "pixi-renderers/pixi-filters-tools.js");
     InsertUnique(includesFiles, "pixi-renderers/runtimegame-pixi-renderer.js");
@@ -1153,7 +1152,12 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
         includesFiles,
         "fontfaceobserver-font-manager/fontfaceobserver-font-manager.js");
   }
-  if (pixiInThreeRenderers) {
+  if (isInGameEdition) {
+    // `InGameEditor` uses the `is3D` function.
+    InsertUnique(includesFiles, "Extensions/3D/Base3DBehavior.js");
+    InsertUnique(includesFiles, "Extensions/3D/HemisphereLight.js");
+  }
+  if (pixiInThreeRenderers || isInGameEdition) {
     InsertUnique(includesFiles, "Extensions/3D/A_RuntimeObject3D.js");
     InsertUnique(includesFiles, "Extensions/3D/A_RuntimeObject3DRenderer.js");
     InsertUnique(includesFiles, "Extensions/3D/CustomRuntimeObject3D.js");

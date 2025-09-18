@@ -122,7 +122,7 @@ export interface PreviewDebuggerServer {
   getServerState(): 'started' | 'stopped';
   getExistingDebuggerIds(): Array<DebuggerId>;
   sendMessage(id: DebuggerId, message: Object): void;
-  sendMessageWithResponse(message: Object, timeout?: number): Promise<Object>;
+  sendMessageWithResponse(message: Object): Promise<Object>;
   registerCallbacks(callbacks: PreviewDebuggerServerCallbacks): () => void;
   registerEmbeddedGameFrame(window: WindowProxy): void;
 }

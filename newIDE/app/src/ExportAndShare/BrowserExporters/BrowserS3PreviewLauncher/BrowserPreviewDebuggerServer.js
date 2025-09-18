@@ -125,19 +125,22 @@ class BrowserPreviewDebuggerServer {
       );
     }
   }
-  sendMessageWithResponse(
-    id: DebuggerId,
-    message: Object,
-    timeout: number = 1000
-  ): Promise<Object> {
+  sendMessageWithResponse(message: Object): Promise<Object> {
     const messageId = nextMessageWithResponseId;
     nextMessageWithResponseId++;
-    this.sendMessage(id, { ...message, messageId });
+    for (const id of getExistingDebuggerIds()) {
+      this.sendMessage(id, { ...message, messageId });
+    }
 
+    const timeout = 1000;
     const promise = new Promise<Object>((resolve, reject) => {
       responseCallbacks.set(messageId, resolve);
       setTimeout(() => {
-        reject();
+        reject(
+          new Error(
+            `Timeout while waiting for response from the debugger(s) for message with id ${messageId}.`
+          )
+        );
         responseCallbacks.delete(messageId);
       }, timeout);
     });

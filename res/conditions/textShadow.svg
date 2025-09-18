@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="14.111111mm"
+   height="14.111111mm"
+   viewBox="0 0 49.999998 49.999998"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   inkscape:export-filename="/home/matthias/Programme/GD_MyFork/GDevelop/Binaries/Output/Release_Windows/res/actions/textShadow24.png"
+   inkscape:export-xdpi="43.200001"
+   inkscape:export-ydpi="43.200001"
+   sodipodi:docname="textShadow.svg">
+  <defs
+     id="defs4">
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter4230"
+       x="-0.096621491"
+       width="1.193243"
+       y="-0.088531949"
+       height="1.1770639">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.4182033"
+         id="feGaussianBlur4232" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="7.9195959"
+     inkscape:cx="17.631096"
+     inkscape:cy="15.489542"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1920"
+     inkscape:window-height="1026"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-224.25386,-246.26047)">
+    <g
+       id="g4234"
+       transform="translate(-3.7018464,-1.9999976)">
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:52.73753738px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#4500b8;fill-opacity:0.56284156;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter4230)"
+         x="235.22833"
+         y="292.4834"
+         id="text4142"
+         sodipodi:linespacing="125%"><tspan
+           sodipodi:role="line"
+           id="tspan4144"
+           x="235.22833"
+           y="292.4834">A</tspan></text>
+      <text
+         sodipodi:linespacing="125%"
+         id="text4138"
+         y="290.4834"
+         x="231.22833"
+         style="font-style:normal;font-weight:normal;font-size:52.73753738px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         xml:space="preserve"><tspan
+           y="290.4834"
+           x="231.22833"
+           id="tspan4140"
+           sodipodi:role="line">A</tspan></text>
+    </g>
+  </g>
+</svg>

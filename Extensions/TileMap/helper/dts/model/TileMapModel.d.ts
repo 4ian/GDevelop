@@ -9,7 +9,7 @@ import {
  * A tile map model.
  *
  * Tile map files are parsed into this model by {@link TiledTileMapLoader} or {@link LDtkTileMapLoader}.
- * This model is used for rending ({@link TileMapRuntimeObjectPixiRenderer})
+ * This model is used for rendering ({@link TileMapRuntimeObjectPixiRenderer})
  * and hitboxes handling ({@link TransformedCollisionTileMap}).
  * This allows to support new file format with only a new parser.
  */
@@ -71,7 +71,7 @@ export declare class EditableTileMap {
       tileSetRowCount: number;
     }
   ): EditableTileMap;
-  toJSObject(): Object;
+  toJSObject(): EditableTileMapAsJsObject;
   /**
    * @returns The tile map width in pixels.
    */
@@ -205,7 +205,7 @@ declare abstract class AbstractEditableLayer {
    */
   constructor(tileMap: EditableTileMap, id: integer);
   setVisible(visible: boolean): void;
-  toJSObject(): Object;
+  toJSObject(): EditableTileMapLayerAsJsObject;
   /**
    * @returns true if the layer is visible.
    */
@@ -284,7 +284,7 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
     tileMap: EditableTileMap,
     isTileIdValid: (tileId: number) => boolean
   ): EditableTileMapLayer;
-  toJSObject(): Object;
+  toJSObject(): EditableTileMapLayerAsJsObject;
   /**
    * The opacity (between 0-1) of the layer
    */

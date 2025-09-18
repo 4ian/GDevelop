@@ -52,6 +52,7 @@ declare type GetNetworkSyncDataOptions = {
   syncLayers?: boolean;
   syncAsyncTasks?: boolean;
   syncSceneAdditionalProps?: boolean;
+  syncFullTileMaps?: boolean;
 };
 
 declare type UpdateFromNetworkSyncDataOptions = {

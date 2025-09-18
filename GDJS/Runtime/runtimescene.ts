@@ -865,9 +865,15 @@ namespace gdjs {
       if (syncOptions.syncOnceTriggers) {
         networkSyncData.once = this._onceTriggers.getNetworkSyncData();
       }
-      // The function gdjs.evtTools.tween.getTweensMap may not exist if the project is not using any tweens,
-      // as it's an extension.
-      if (syncOptions.syncTweens && gdjs.evtTools.tween.getTweensMap) {
+      // The namespace gdjs.evtTools.tween
+      // or function gdjs.evtTools.tween.getTweensMap
+      // may not exist if the project is not using any tweens,
+      // as it's an extension or behavior.
+      if (
+        syncOptions.syncTweens &&
+        gdjs.evtTools.tween &&
+        gdjs.evtTools.tween.getTweensMap
+      ) {
         networkSyncData.tween = gdjs.evtTools.tween
           .getTweensMap(this)
           .getNetworkSyncData();

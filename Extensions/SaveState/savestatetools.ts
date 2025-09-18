@@ -28,6 +28,7 @@ namespace gdjs {
       syncLayers: true,
       syncAsyncTasks: true,
       syncSceneAdditionalProps: true,
+      syncFullTileMaps: true,
     };
     const updateFromNetworkSyncDataOptions: UpdateFromNetworkSyncDataOptions = {
       clearSceneStack: true,

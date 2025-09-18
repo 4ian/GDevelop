@@ -218,21 +218,6 @@ namespace gdjs {
           ? ''
           : children[children.length - 1].getAsString();
       };
-
-      export const getVariableDataFromNetworkSyncData = (
-        syncData: VariableNetworkSyncData
-      ): VariableData => {
-        return {
-          name: syncData.name,
-          value: syncData.value,
-          type: syncData.type,
-          children: syncData.children
-            ? syncData.children.map((childSyncData) =>
-                getVariableDataFromNetworkSyncData(childSyncData)
-              )
-            : undefined,
-        };
-      };
     }
 
     export namespace common {

@@ -1057,12 +1057,16 @@ namespace gdjs {
     }
 
     getNetworkSyncData(): SoundManagerSyncData {
-      const freeMusicsNetworkSyncData: SoundSyncData[] = this._freeMusics
-        .map((freeMusic) => freeMusic.getNetworkSyncData())
-        .filter((musicSyncData) => !!musicSyncData);
-      const freeSoundsNetworkSyncData: SoundSyncData[] = this._freeSounds
-        .map((freeSound) => freeSound.getNetworkSyncData())
-        .filter((soundSyncData) => !!soundSyncData);
+      const freeMusicsNetworkSyncData: SoundSyncData[] = [];
+      this._freeMusics.forEach((freeMusic) => {
+        const musicSyncData = freeMusic.getNetworkSyncData();
+        if (musicSyncData) freeMusicsNetworkSyncData.push(musicSyncData);
+      });
+      const freeSoundsNetworkSyncData: SoundSyncData[] = [];
+      this._freeSounds.forEach((freeSound) => {
+        const soundSyncData = freeSound.getNetworkSyncData();
+        if (soundSyncData) freeSoundsNetworkSyncData.push(soundSyncData);
+      });
       const musicsNetworkSyncData: ChannelsSoundSyncData = {};
       Object.entries(this._musics).forEach(([channel, music]) => {
         const musicSyncData = music.getNetworkSyncData();

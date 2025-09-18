@@ -12,6 +12,7 @@ namespace gdjs {
     etm: float;
     esm: float;
     ei: float;
+    es: float;
   }
 
   export interface PhysicsCar3DNetworkSyncData extends BehaviorNetworkSyncData {
@@ -170,13 +171,34 @@ namespace gdjs {
 
       // Destroy the body before switching the bodyUpdater,
       // to ensure no body relicate is left.
-      behavior.bodyUpdater.destroyBody();
+      // But transfer the linear and angular velocity to the new body,
+      // so the body doesn't stop when the body is recreated.
+      let previousBodyData = {
+        linearVelocityX: 0,
+        linearVelocityY: 0,
+        linearVelocityZ: 0,
+        angularVelocityX: 0,
+        angularVelocityY: 0,
+        angularVelocityZ: 0,
+      };
+      if (behavior._body) {
+        const linearVelocity = behavior._body.GetLinearVelocity();
+        previousBodyData.linearVelocityX = linearVelocity.GetX();
+        previousBodyData.linearVelocityY = linearVelocity.GetY();
+        previousBodyData.linearVelocityZ = linearVelocity.GetZ();
+        const angularVelocity = behavior._body.GetAngularVelocity();
+        previousBodyData.angularVelocityX = angularVelocity.GetX();
+        previousBodyData.angularVelocityY = angularVelocity.GetY();
+        previousBodyData.angularVelocityZ = angularVelocity.GetZ();
+        behavior.bodyUpdater.destroyBody();
+      }
+
       behavior.bodyUpdater =
         new gdjs.PhysicsCar3DRuntimeBehavior.VehicleBodyUpdater(
           this,
           behavior.bodyUpdater
         );
-      behavior.recreateBody();
+      behavior.recreateBody(previousBodyData);
 
       return this._physics3D;
     }
@@ -296,6 +318,7 @@ namespace gdjs {
           etm: this._engineTorqueMax,
           esm: this._engineSpeedMax,
           ei: this._engineInertia,
+          es: this.getEngineSpeed(),
         },
       };
     }
@@ -317,6 +340,11 @@ namespace gdjs {
       this._engineTorqueMax = behaviorSpecificProps.etm;
       this._engineSpeedMax = behaviorSpecificProps.esm;
       this._engineInertia = behaviorSpecificProps.ei;
+      if (this._vehicleController) {
+        this._vehicleController
+          .GetEngine()
+          .SetCurrentRPM(behaviorSpecificProps.es);
+      }
 
       // When the object is synchronized from the network, the inputs must not be cleared,
       // except if asked specifically.

@@ -108,6 +108,21 @@ namespace gdjs {
       return target;
     }
 
+    static getVariableDataFromNetworkSyncData = (
+      syncData: VariableNetworkSyncData
+    ): VariableData => {
+      return {
+        name: syncData.name,
+        value: syncData.value,
+        type: syncData.type,
+        children: syncData.children
+          ? syncData.children.map((childSyncData) =>
+              gdjs.Variable.getVariableDataFromNetworkSyncData(childSyncData)
+            )
+          : undefined,
+      };
+    };
+
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): UnnamedVariableNetworkSyncData | undefined {
@@ -235,9 +250,7 @@ namespace gdjs {
       //   ownership and then update the variable.
       const syncedVariableOwner = networkSyncData.owner;
       const variableData =
-        gdjs.evtTools.variable.getVariableDataFromNetworkSyncData(
-          networkSyncData
-        );
+        gdjs.Variable.getVariableDataFromNetworkSyncData(networkSyncData);
 
       if (!options.ignoreVariableOwnership) {
         const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerNumber();

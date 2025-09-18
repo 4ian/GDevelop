@@ -302,9 +302,7 @@ namespace gdjs {
       for (let j = 0; j < networkSyncData.length; ++j) {
         const variableSyncData = networkSyncData[j];
         const variableData =
-          gdjs.evtTools.variable.getVariableDataFromNetworkSyncData(
-            variableSyncData
-          );
+          gdjs.Variable.getVariableDataFromNetworkSyncData(variableSyncData);
         const variableName = variableData.name;
         if (!variableName) continue;
 

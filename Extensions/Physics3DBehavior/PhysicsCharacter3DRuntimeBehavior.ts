@@ -209,11 +209,32 @@ namespace gdjs {
 
       // Destroy the body before switching the bodyUpdater,
       // to ensure no body relicate is left.
-      behavior.bodyUpdater.destroyBody();
+      // But transfer the linear and angular velocity to the new body,
+      // so the body doesn't stop when the body is recreated.
+      let previousBodyData = {
+        linearVelocityX: 0,
+        linearVelocityY: 0,
+        linearVelocityZ: 0,
+        angularVelocityX: 0,
+        angularVelocityY: 0,
+        angularVelocityZ: 0,
+      };
+      if (behavior._body) {
+        const linearVelocity = behavior._body.GetLinearVelocity();
+        previousBodyData.linearVelocityX = linearVelocity.GetX();
+        previousBodyData.linearVelocityY = linearVelocity.GetY();
+        previousBodyData.linearVelocityZ = linearVelocity.GetZ();
+        const angularVelocity = behavior._body.GetAngularVelocity();
+        previousBodyData.angularVelocityX = angularVelocity.GetX();
+        previousBodyData.angularVelocityY = angularVelocity.GetY();
+        previousBodyData.angularVelocityZ = angularVelocity.GetZ();
+        behavior.bodyUpdater.destroyBody();
+      }
+
       behavior.bodyUpdater =
         new gdjs.PhysicsCharacter3DRuntimeBehavior.CharacterBodyUpdater(this);
       behavior.collisionChecker = this.collisionChecker;
-      behavior.recreateBody();
+      behavior.recreateBody(previousBodyData);
 
       // Always begin in the direction of the object.
       this._forwardAngle = this.owner.getAngle();

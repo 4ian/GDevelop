@@ -538,41 +538,6 @@ namespace gdjs {
       super.updateFromNetworkSyncData(networkSyncData, options);
 
       const behaviorSpecificProps = networkSyncData.props;
-      if (
-        behaviorSpecificProps.tpx !== undefined &&
-        behaviorSpecificProps.tpy !== undefined &&
-        behaviorSpecificProps.tqa !== undefined
-      ) {
-        if (this._body) {
-          this._body.SetTransform(
-            this.b2Vec2(behaviorSpecificProps.tpx, behaviorSpecificProps.tpy),
-            behaviorSpecificProps.tqa
-          );
-        }
-      }
-
-      if (
-        behaviorSpecificProps.lvx !== undefined &&
-        behaviorSpecificProps.lvy !== undefined
-      ) {
-        if (this._body) {
-          this._body.SetLinearVelocity(
-            this.b2Vec2(behaviorSpecificProps.lvx, behaviorSpecificProps.lvy)
-          );
-        }
-      }
-
-      if (behaviorSpecificProps.av !== undefined) {
-        if (this._body) {
-          this._body.SetAngularVelocity(behaviorSpecificProps.av);
-        }
-      }
-
-      if (behaviorSpecificProps.aw !== undefined) {
-        if (this._body) {
-          this._body.SetAwake(behaviorSpecificProps.aw);
-        }
-      }
 
       if (behaviorSpecificProps.layers !== undefined) {
         this.layers = behaviorSpecificProps.layers;
@@ -580,6 +545,38 @@ namespace gdjs {
 
       if (behaviorSpecificProps.masks !== undefined) {
         this.masks = behaviorSpecificProps.masks;
+      }
+
+      this.updateBodyFromObject();
+
+      if (!this._body) return;
+
+      if (
+        behaviorSpecificProps.tpx !== undefined &&
+        behaviorSpecificProps.tpy !== undefined &&
+        behaviorSpecificProps.tqa !== undefined
+      ) {
+        this._body.SetTransform(
+          this.b2Vec2(behaviorSpecificProps.tpx, behaviorSpecificProps.tpy),
+          behaviorSpecificProps.tqa
+        );
+      }
+
+      if (
+        behaviorSpecificProps.lvx !== undefined &&
+        behaviorSpecificProps.lvy !== undefined
+      ) {
+        this._body.SetLinearVelocity(
+          this.b2Vec2(behaviorSpecificProps.lvx, behaviorSpecificProps.lvy)
+        );
+      }
+
+      if (behaviorSpecificProps.av !== undefined) {
+        this._body.SetAngularVelocity(behaviorSpecificProps.av);
+      }
+
+      if (behaviorSpecificProps.aw !== undefined) {
+        this._body.SetAwake(behaviorSpecificProps.aw);
       }
     }
 

@@ -924,31 +924,58 @@ namespace gdjs {
       this.updateBodyFromObject();
     }
 
-    recreateBody() {
-      if (!this._body) {
-        this._createBody();
-        return;
-      }
-
+    recreateBody(previousBodyData?: {
+      linearVelocityX: float;
+      linearVelocityY: float;
+      linearVelocityZ: float;
+      angularVelocityX: float;
+      angularVelocityY: float;
+      angularVelocityZ: float;
+    }) {
       const bodyInterface = this._sharedData.bodyInterface;
-      const linearVelocity = this._body.GetLinearVelocity();
-      const linearVelocityX = linearVelocity.GetX();
-      const linearVelocityY = linearVelocity.GetY();
-      const linearVelocityZ = linearVelocity.GetZ();
-      const angularVelocity = this._body.GetAngularVelocity();
-      const angularVelocityX = angularVelocity.GetX();
-      const angularVelocityY = angularVelocity.GetY();
-      const angularVelocityZ = angularVelocity.GetZ();
+      const linearVelocityX = previousBodyData
+        ? previousBodyData.linearVelocityX
+        : this._body
+          ? this._body.GetLinearVelocity().GetX()
+          : 0;
+      const linearVelocityY = previousBodyData
+        ? previousBodyData.linearVelocityY
+        : this._body
+          ? this._body.GetLinearVelocity().GetY()
+          : 0;
+      const linearVelocityZ = previousBodyData
+        ? previousBodyData.linearVelocityZ
+        : this._body
+          ? this._body.GetLinearVelocity().GetZ()
+          : 0;
+      const angularVelocityX = previousBodyData
+        ? previousBodyData.angularVelocityX
+        : this._body
+          ? this._body.GetAngularVelocity().GetX()
+          : 0;
+      const angularVelocityY = previousBodyData
+        ? previousBodyData.angularVelocityY
+        : this._body
+          ? this._body.GetAngularVelocity().GetY()
+          : 0;
+      const angularVelocityZ = previousBodyData
+        ? previousBodyData.angularVelocityZ
+        : this._body
+          ? this._body.GetAngularVelocity().GetZ()
+          : 0;
 
-      this.bodyUpdater.destroyBody();
-      this._contactsEndedThisFrame.length = 0;
-      this._contactsStartedThisFrame.length = 0;
-      this._currentContacts.length = 0;
+      if (this._body) {
+        this.bodyUpdater.destroyBody();
+        this._contactsEndedThisFrame.length = 0;
+        this._contactsStartedThisFrame.length = 0;
+        this._currentContacts.length = 0;
+      }
 
       this._createBody();
       if (!this._body) {
         return;
       }
+
       const bodyID = this._body.GetID();
       bodyInterface.SetLinearVelocity(
         bodyID,

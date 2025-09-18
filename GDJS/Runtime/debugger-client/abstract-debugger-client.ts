@@ -437,7 +437,7 @@ namespace gdjs {
         } else if (data.command === 'centerViewOnLastSelectedInstance') {
           if (inGameEditor) {
             inGameEditor.centerViewOnLastSelectedInstance(
-              data.payload.visibleScreenArea
+              // data.payload.visibleScreenArea
             );
           }
         } else if (data.command === 'updateInnerArea') {
@@ -527,7 +527,7 @@ namespace gdjs {
     }
 
     onUncaughtException(exception: Error): void {
-      logger.error('Uncaught exception: ' + exception);
+      logger.error('Uncaught exception: ', exception, exception.stack);
 
       const runtimeGame = this._runtimegame;
       if (!runtimeGame.isInGameEdition()) {

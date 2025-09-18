@@ -1308,18 +1308,22 @@ namespace gdjs {
     ): void {
       const layerNames = [];
       runtimeInstanceContainer.getAllLayerNames(layerNames);
-      const oldLayers = layerNames.map(
-        (layerName) =>
-          runtimeInstanceContainer.getLayer(layerName)._initialLayerData
+      const oldLayers = layerNames.map((layerName) =>
+        runtimeInstanceContainer.hasLayer(layerName)
+          ? runtimeInstanceContainer.getLayer(layerName)._initialLayerData
+          : null
       );
       this._hotReloadRuntimeSceneLayers(
-        oldLayers,
+        oldLayers.filter(Boolean) as LayerData[],
         newLayers,
         runtimeInstanceContainer
       );
       // Update the GameData
       for (let index = 0; index < newLayers.length; index++) {
-        HotReloader.assignOrDelete(oldLayers[index], newLayers[index]);
+        const oldLayer = oldLayers[index];
+        if (oldLayer) {
+          HotReloader.assignOrDelete(oldLayer, newLayers[index]);
+        }
       }
     }
 

@@ -1449,15 +1449,16 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   _sendHotReloadLayers = () => {
     const { previewDebuggerServer, layersContainer, project } = this.props;
+    const layers = mapFor(0, layersContainer.getLayersCount(), i => {
+      const layer = layersContainer.getLayerAt(i);
+      return serializeToJSObject(layer);
+    });
     if (previewDebuggerServer) {
       previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
         previewDebuggerServer.sendMessage(debuggerId, {
           command: 'hotReloadLayers',
           payload: {
-            layers: mapFor(0, layersContainer.getLayersCount(), i => {
-              const layer = layersContainer.getLayerAt(i);
-              return serializeToJSObject(layer);
-            }),
+            layers,
             areEffectsHidden: project.areEffectsHiddenInEditor(),
           },
         });

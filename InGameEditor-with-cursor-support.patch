@@ -1,0 +1,70 @@
+--- InGameEditor.ts.original
++++ InGameEditor.ts.modified
+@@ -407,6 +407,9 @@
+     /** Keep track of the focus to know if the game was blurred since the last frame. */
+     private _windowHadFocus = true;
+ 
++    /** Keep track of the space key state to update cursor accordingly. */
++    private _wasSpacePressed = false;
++
+     // The controls shown to manipulate the selection.
+     private _selectionControls: {
+       object: gdjs.RuntimeObject;
+@@ -2433,6 +2436,7 @@
+       this._updateInnerAreaOutline();
+       this._handleContextMenu();
+       this._handleShortcuts();
++      this._updateCursor();
+       this._wasMovingSelectionLastFrame =
+         !!this._selectionControlsMovementTotalDelta;
+       if (!this._selectionControlsMovementTotalDelta) {
+@@ -2452,6 +2456,27 @@
+     private _getEditorCamera(): EditorCamera {
+       return this._editorCamera;
+     }
++
++    /**
++     * Updates the cursor style based on the space key state
++     */
++    private _updateCursor(): void {
++      const inputManager = this._runtimeGame.getInputManager();
++      const isSpaceCurrentlyPressed = isSpacePressed(inputManager);
++      
++      // Only update cursor if space key state changed
++      if (isSpaceCurrentlyPressed !== this._wasSpacePressed) {
++        const canvas = this._runtimeGame.getRenderer().getCanvas();
++        if (canvas) {
++          if (isSpaceCurrentlyPressed) {
++            // Show grab cursor when space is pressed
++            canvas.style.cursor = 'grab';
++          } else {
++            // Reset to default cursor when space is released
++            canvas.style.cursor = '';
++          }
++        }
++        this._wasSpacePressed = isSpaceCurrentlyPressed;
++      }
++    }
+   }
+@@ -3005,8 +3030,19 @@
+         // Space + click: move the camera on its plane.
+         if (
+           isSpacePressed(inputManager) &&
+-          inputManager.isMouseButtonPressed(0)
++          inputManager.isMouseButtonPressed(0) &&
++          this._wasMouseRightButtonPressed === false // Only on first frame of click
+         ) {
++          // Update cursor to grabbing when actively panning
++          const canvas = this._editorCamera.editor.getRuntimeGame().getRenderer().getCanvas();
++          if (canvas) {
++            canvas.style.cursor = 'grabbing';
++          }
++        }
++        
++        if (
++          isSpacePressed(inputManager) &&
++          inputManager.isMouseButtonPressed(0)
++        ) {
+           const xDelta = this._lastCursorX - inputManager.getCursorX();
+           const yDelta = this._lastCursorY - inputManager.getCursorY();
+           moveCameraByVector(up, -yDelta);

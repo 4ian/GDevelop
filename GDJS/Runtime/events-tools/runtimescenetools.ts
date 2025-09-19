@@ -143,6 +143,19 @@ namespace gdjs {
             .getElapsedTime();
           return this.timeElapsedOnScene >= this.duration;
         }
+
+        getNetworkSyncData(): WaitTaskNetworkSyncData {
+          return {
+            type: 'wait',
+            duration: this.duration,
+            timeElapsedOnScene: this.timeElapsedOnScene,
+          };
+        }
+
+        updateFromNetworkSyncData(syncData: WaitTaskNetworkSyncData): void {
+          this.duration = syncData.duration;
+          this.timeElapsedOnScene = syncData.timeElapsedOnScene;
+        }
       }
 
       export const wait = (durationInSeconds: float): AsyncTask =>

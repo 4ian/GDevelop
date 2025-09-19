@@ -128,7 +128,7 @@ export class EditableTileMap {
     return tileMap;
   }
 
-  toJSObject(): Object {
+  toJSObject(): EditableTileMapAsJsObject {
     return {
       tileWidth: this.tileWidth,
       tileHeight: this.tileHeight,
@@ -493,8 +493,12 @@ abstract class AbstractEditableLayer {
     this.visible = visible;
   }
 
-  toJSObject(): Object {
-    return {};
+  toJSObject(): EditableTileMapLayerAsJsObject {
+    return {
+      id: this.id,
+      alpha: 0,
+      tiles: [],
+    };
   }
 
   /**
@@ -660,7 +664,7 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
     return layer;
   }
 
-  toJSObject(): Object {
+  toJSObject(): EditableTileMapLayerAsJsObject {
     return {
       id: this.id,
       alpha: this._alpha,

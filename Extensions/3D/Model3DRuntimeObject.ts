@@ -216,9 +216,11 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): Model3DObjectNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): Model3DObjectNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         mt: this._materialType,
         op: this._originPoint,
         cp: this._centerPoint,
@@ -231,9 +233,10 @@ namespace gdjs {
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: Model3DObjectNetworkSyncData
+      networkSyncData: Model3DObjectNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       if (networkSyncData.mt !== undefined) {
         this._materialType = networkSyncData.mt;

@@ -422,7 +422,8 @@ namespace gdjs {
     updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer): void {}
 
     /**
-     * Called when the object is created from an initial instance at the startup of the scene.<br>
+     * Called when the object is created from an initial instance at the startup of the scene.
+     *
      * Note that common properties (position, angle, z order...) have already been setup.
      *
      * @param initialInstanceData The data of the initial instance.
@@ -452,17 +453,17 @@ namespace gdjs {
      * This can be redefined by objects to send more information.
      * @returns The full network sync data.
      */
-    getNetworkSyncData(): ObjectNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): ObjectNetworkSyncData {
       const behaviorNetworkSyncData = {};
       this._behaviors.forEach((behavior) => {
-        if (!behavior.isSyncedOverNetwork()) {
+        if (!behavior.isSyncedOverNetwork() && !syncOptions.syncAllBehaviors) {
           return;
         }
 
-        const networkSyncData = behavior.getNetworkSyncData();
-        if (networkSyncData) {
-          behaviorNetworkSyncData[behavior.getName()] = networkSyncData;
-        }
+        const networkSyncData = behavior.getNetworkSyncData(syncOptions);
+        behaviorNetworkSyncData[behavior.getName()] = networkSyncData;
       });
 
       const variablesNetworkSyncData = this._variables.getNetworkSyncData({
@@ -481,7 +482,7 @@ namespace gdjs {
           this._timers.items[timerName].getNetworkSyncData();
       }
 
-      return {
+      const networkSyncData: ObjectNetworkSyncData = {
         x: this.x,
         y: this.y,
         w: this.getWidth(),
@@ -498,6 +499,19 @@ namespace gdjs {
         eff: effectsNetworkSyncData,
         tim: timersNetworkSyncData,
       };
+
+      if (syncOptions.syncObjectIdentifiers) {
+        networkSyncData.n = this.name;
+        if (!this.networkId) {
+          // If this is the first time the object is synced
+          // with identifier, then generate a networkId,
+          // so it can be re-used for future syncs.
+          this.networkId = gdjs.makeUuid().substring(0, 8);
+        }
+        networkSyncData.networkId = this.networkId;
+      }
+
+      return networkSyncData;
     }
 
     /**
@@ -507,7 +521,10 @@ namespace gdjs {
      * @param networkSyncData The new data for the object.
      * @returns true if the object was updated, false if it could not (i.e: network sync is not supported).
      */
-    updateFromNetworkSyncData(networkSyncData: ObjectNetworkSyncData) {
+    updateFromNetworkSyncData(
+      networkSyncData: ObjectNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
+    ) {
       if (networkSyncData.x !== undefined) {
         this.setX(networkSyncData.x);
       }
@@ -567,13 +584,13 @@ namespace gdjs {
         const behaviorNetworkSyncData = networkSyncData.beh[behaviorName];
         const behavior = this.getBehavior(behaviorName);
         if (behavior) {
-          behavior.updateFromNetworkSyncData(behaviorNetworkSyncData);
+          behavior.updateFromNetworkSyncData(behaviorNetworkSyncData, options);
         }
       }
 
       // If variables are synchronized, update them.
       if (networkSyncData.var) {
-        this._variables.updateFromNetworkSyncData(networkSyncData.var);
+        this._variables.updateFromNetworkSyncData(networkSyncData.var, options);
       }
 
       // If effects are synchronized, update them.
@@ -598,6 +615,10 @@ namespace gdjs {
             timer.updateFromNetworkSyncData(timerNetworkSyncData);
           }
         }
+      }
+
+      if (networkSyncData.networkId !== undefined) {
+        this.networkId = networkSyncData.networkId;
       }
     }
 
@@ -701,8 +722,10 @@ namespace gdjs {
     }
 
     /**
-     * Get the unique identifier of the object.<br>
-     * The identifier is set by the runtimeScene owning the object.<br>
+     * Get the unique identifier of the object.
+     *
+     * The identifier is set by the runtimeScene owning the object.
+     *
      * You can also use the id property (this._object.id) for increased efficiency instead of
      * calling this method.
      *
@@ -710,6 +733,18 @@ namespace gdjs {
      */
     getUniqueId(): integer {
       return this.id;
+    }
+
+    /**
+     * Get the network ID of the object.
+     *
+     * The network ID is used to identify the object in a networked game.
+     * Or, for Save/Load purposes.
+     *
+     * @return The network ID of the object.
+     */
+    getNetworkId(): string | null {
+      return this.networkId;
     }
 
     /**
@@ -1472,7 +1507,8 @@ namespace gdjs {
 
     //Forces :
     /**
-     * Get a force from the garbage, or create a new force is garbage is empty.<br>
+     * Get a force from the garbage, or create a new force is garbage is empty.
+     *
      * To be used each time a force is created so as to avoid temporaries objects.
      *
      * @param x The x coordinates of the force
@@ -1557,7 +1593,8 @@ namespace gdjs {
     }
 
     /**
-     * Add a force oriented toward another object.<br>
+     * Add a force oriented toward another object.
+     *
      * (Shortcut for addForceTowardPosition)
      * @param object The target object
      * @param len The force length, in pixels.

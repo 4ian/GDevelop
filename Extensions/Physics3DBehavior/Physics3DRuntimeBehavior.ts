@@ -495,7 +495,9 @@ namespace gdjs {
       return true;
     }
 
-    override getNetworkSyncData(): Physics3DNetworkSyncData {
+    override getNetworkSyncData(
+      options: GetNetworkSyncDataOptions
+    ): Physics3DNetworkSyncData {
       let bodyProps;
       if (this._body) {
         const position = this._body.GetPosition();
@@ -537,7 +539,7 @@ namespace gdjs {
         };
       }
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(options),
         props: {
           ...bodyProps,
           layers: this.layers,
@@ -547,27 +549,40 @@ namespace gdjs {
     }
 
     override updateFromNetworkSyncData(
-      networkSyncData: Physics3DNetworkSyncData
+      networkSyncData: Physics3DNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
     ) {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       const behaviorSpecificProps = networkSyncData.props;
+
+      if (behaviorSpecificProps.layers !== undefined) {
+        this.layers = behaviorSpecificProps.layers;
+      }
+      if (behaviorSpecificProps.masks !== undefined) {
+        this.masks = behaviorSpecificProps.masks;
+      }
+
+      this._needToRecreateShape = true;
+      this._needToRecreateBody = true;
+      this.updateBodyFromObject();
+
+      if (!this._body) return;
+
       if (
         behaviorSpecificProps.px !== undefined &&
         behaviorSpecificProps.py !== undefined &&
         behaviorSpecificProps.pz !== undefined
       ) {
-        if (this._body) {
-          this._sharedData.bodyInterface.SetPosition(
-            this._body.GetID(),
-            this.getRVec3(
-              behaviorSpecificProps.px,
-              behaviorSpecificProps.py,
-              behaviorSpecificProps.pz
-            ),
-            Jolt.EActivation_DontActivate
-          );
-        }
+        this._sharedData.bodyInterface.SetPosition(
+          this._body.GetID(),
+          this.getRVec3(
+            behaviorSpecificProps.px,
+            behaviorSpecificProps.py,
+            behaviorSpecificProps.pz
+          ),
+          Jolt.EActivation_DontActivate
+        );
       }
       if (
         behaviorSpecificProps.rx !== undefined &&
@@ -575,56 +590,44 @@ namespace gdjs {
         behaviorSpecificProps.rz !== undefined &&
         behaviorSpecificProps.rw !== undefined
       ) {
-        if (this._body) {
-          this._sharedData.bodyInterface.SetRotation(
-            this._body.GetID(),
-            this.getQuat(
-              behaviorSpecificProps.rx,
-              behaviorSpecificProps.ry,
-              behaviorSpecificProps.rz,
-              behaviorSpecificProps.rw
-            ),
-            Jolt.EActivation_DontActivate
-          );
-        }
+        this._sharedData.bodyInterface.SetRotation(
+          this._body.GetID(),
+          this.getQuat(
+            behaviorSpecificProps.rx,
+            behaviorSpecificProps.ry,
+            behaviorSpecificProps.rz,
+            behaviorSpecificProps.rw
+          ),
+          Jolt.EActivation_DontActivate
+        );
       }
       if (
         behaviorSpecificProps.lvx !== undefined &&
         behaviorSpecificProps.lvy !== undefined &&
         behaviorSpecificProps.lvz !== undefined
       ) {
-        if (this._body) {
-          this._sharedData.bodyInterface.SetLinearVelocity(
-            this._body.GetID(),
-            this.getVec3(
-              behaviorSpecificProps.lvx,
-              behaviorSpecificProps.lvy,
-              behaviorSpecificProps.lvz
-            )
-          );
-        }
+        this._sharedData.bodyInterface.SetLinearVelocity(
+          this._body.GetID(),
+          this.getVec3(
+            behaviorSpecificProps.lvx,
+            behaviorSpecificProps.lvy,
+            behaviorSpecificProps.lvz
+          )
+        );
       }
       if (
         behaviorSpecificProps.avx !== undefined &&
         behaviorSpecificProps.avy !== undefined &&
         behaviorSpecificProps.avz !== undefined
       ) {
-        if (this._body) {
-          this._sharedData.bodyInterface.SetAngularVelocity(
-            this._body.GetID(),
-            this.getVec3(
-              behaviorSpecificProps.avx,
-              behaviorSpecificProps.avy,
-              behaviorSpecificProps.avz
-            )
-          );
-        }
-      }
-      if (behaviorSpecificProps.layers !== undefined) {
-        this.layers = behaviorSpecificProps.layers;
-      }
-      if (behaviorSpecificProps.masks !== undefined) {
-        this.masks = behaviorSpecificProps.masks;
+        this._sharedData.bodyInterface.SetAngularVelocity(
+          this._body.GetID(),
+          this.getVec3(
+            behaviorSpecificProps.avx,
+            behaviorSpecificProps.avy,
+            behaviorSpecificProps.avz
+          )
+        );
       }
     }
 
@@ -921,31 +924,58 @@ namespace gdjs {
       this.updateBodyFromObject();
     }
 
-    recreateBody() {
-      if (!this._body) {
-        this._createBody();
-        return;
-      }
-
+    recreateBody(previousBodyData?: {
+      linearVelocityX: float;
+      linearVelocityY: float;
+      linearVelocityZ: float;
+      angularVelocityX: float;
+      angularVelocityY: float;
+      angularVelocityZ: float;
+    }) {
       const bodyInterface = this._sharedData.bodyInterface;
-      const linearVelocity = this._body.GetLinearVelocity();
-      const linearVelocityX = linearVelocity.GetX();
-      const linearVelocityY = linearVelocity.GetY();
-      const linearVelocityZ = linearVelocity.GetZ();
-      const angularVelocity = this._body.GetAngularVelocity();
-      const angularVelocityX = angularVelocity.GetX();
-      const angularVelocityY = angularVelocity.GetY();
-      const angularVelocityZ = angularVelocity.GetZ();
+      const linearVelocityX = previousBodyData
+        ? previousBodyData.linearVelocityX
+        : this._body
+          ? this._body.GetLinearVelocity().GetX()
+          : 0;
+      const linearVelocityY = previousBodyData
+        ? previousBodyData.linearVelocityY
+        : this._body
+          ? this._body.GetLinearVelocity().GetY()
+          : 0;
+      const linearVelocityZ = previousBodyData
+        ? previousBodyData.linearVelocityZ
+        : this._body
+          ? this._body.GetLinearVelocity().GetZ()
+          : 0;
+      const angularVelocityX = previousBodyData
+        ? previousBodyData.angularVelocityX
+        : this._body
+          ? this._body.GetAngularVelocity().GetX()
+          : 0;
+      const angularVelocityY = previousBodyData
+        ? previousBodyData.angularVelocityY
+        : this._body
+          ? this._body.GetAngularVelocity().GetY()
+          : 0;
+      const angularVelocityZ = previousBodyData
+        ? previousBodyData.angularVelocityZ
+        : this._body
+          ? this._body.GetAngularVelocity().GetZ()
+          : 0;
 
-      this.bodyUpdater.destroyBody();
-      this._contactsEndedThisFrame.length = 0;
-      this._contactsStartedThisFrame.length = 0;
-      this._currentContacts.length = 0;
+      if (this._body) {
+        this.bodyUpdater.destroyBody();
+        this._contactsEndedThisFrame.length = 0;
+        this._contactsStartedThisFrame.length = 0;
+        this._currentContacts.length = 0;
+      }
 
       this._createBody();
       if (!this._body) {
         return;
       }
+
       const bodyID = this._body.GetID();
       bodyInterface.SetLinearVelocity(
         bodyID,

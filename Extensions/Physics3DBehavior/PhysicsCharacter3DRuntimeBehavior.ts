@@ -102,7 +102,7 @@ namespace gdjs {
     // This is useful when the object is synchronized by an external source
     // like in a multiplayer game, and we want to be able to predict the
     // movement of the object, even if the inputs are not updated every frame.
-    private _dontClearInputsBetweenFrames: boolean = false;
+    private _clearInputsBetweenFrames: boolean = true;
 
     /**
      * A very small value compare to 1 pixel, yet very huge compare to rounding errors.
@@ -207,10 +207,35 @@ namespace gdjs {
         this._isHookedToPhysicsStep = true;
       }
 
+      // Destroy the body before switching the bodyUpdater,
+      // to ensure the body of the previous bodyUpdater is not left alive.
+      // (would be a memory leak and would create a phantom body in the physics world)
+      // But transfer the linear and angular velocity to the new body,
+      // so the body doesn't stop when it is recreated.
+      let previousBodyData = {
+        linearVelocityX: 0,
+        linearVelocityY: 0,
+        linearVelocityZ: 0,
+        angularVelocityX: 0,
+        angularVelocityY: 0,
+        angularVelocityZ: 0,
+      };
+      if (behavior._body) {
+        const linearVelocity = behavior._body.GetLinearVelocity();
+        previousBodyData.linearVelocityX = linearVelocity.GetX();
+        previousBodyData.linearVelocityY = linearVelocity.GetY();
+        previousBodyData.linearVelocityZ = linearVelocity.GetZ();
+        const angularVelocity = behavior._body.GetAngularVelocity();
+        previousBodyData.angularVelocityX = angularVelocity.GetX();
+        previousBodyData.angularVelocityY = angularVelocity.GetY();
+        previousBodyData.angularVelocityZ = angularVelocity.GetZ();
+        behavior.bodyUpdater.destroyBody();
+      }
+
       behavior.bodyUpdater =
         new gdjs.PhysicsCharacter3DRuntimeBehavior.CharacterBodyUpdater(this);
       behavior.collisionChecker = this.collisionChecker;
-      behavior.recreateBody();
+      behavior.recreateBody(previousBodyData);
 
       // Always begin in the direction of the object.
       this._forwardAngle = this.owner.getAngle();
@@ -277,13 +302,15 @@ namespace gdjs {
       return true;
     }
 
-    override getNetworkSyncData(): PhysicsCharacter3DNetworkSyncData {
+    override getNetworkSyncData(
+      options: GetNetworkSyncDataOptions
+    ): PhysicsCharacter3DNetworkSyncData {
       // This method is called, so we are synchronizing this object.
       // Let's clear the inputs between frames as we control it.
-      this._dontClearInputsBetweenFrames = false;
+      this._clearInputsBetweenFrames = true;
 
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(options),
         props: {
           fwa: this._forwardAngle,
           fws: this._currentForwardSpeed,
@@ -306,9 +333,10 @@ namespace gdjs {
     }
 
     override updateFromNetworkSyncData(
-      networkSyncData: PhysicsCharacter3DNetworkSyncData
+      networkSyncData: PhysicsCharacter3DNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
     ) {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       const behaviorSpecificProps = networkSyncData.props;
       this._forwardAngle = behaviorSpecificProps.fwa;
@@ -328,8 +356,8 @@ namespace gdjs {
       this._timeSinceCurrentJumpStart = behaviorSpecificProps.tscjs;
       this._jumpKeyHeldSinceJumpStart = behaviorSpecificProps.jkhsjs;
 
-      // When the object is synchronized from the network, the inputs must not be cleared.
-      this._dontClearInputsBetweenFrames = true;
+      // Clear user inputs between frames only if requested.
+      this._clearInputsBetweenFrames = !!options.clearInputs;
     }
 
     _getPhysicsPosition(result: Jolt.RVec3): Jolt.RVec3 {
@@ -650,7 +678,7 @@ namespace gdjs {
       this._wasJumpKeyPressed = this._hasPressedJumpKey;
       this._wasStickUsed = this._hasUsedStick;
 
-      if (!this._dontClearInputsBetweenFrames) {
+      if (this._clearInputsBetweenFrames) {
         this._hasPressedForwardKey = false;
         this._hasPressedBackwardKey = false;
         this._hasPressedRightKey = false;

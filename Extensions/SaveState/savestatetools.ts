@@ -33,6 +33,7 @@ namespace gdjs {
     const updateFromNetworkSyncDataOptions: UpdateFromNetworkSyncDataOptions = {
       clearSceneStack: true,
       preventInitialInstancesCreation: true,
+      preventSoundsStoppingOnStartup: true,
       clearInputs: true,
       keepControl: true,
       ignoreVariableOwnership: true,

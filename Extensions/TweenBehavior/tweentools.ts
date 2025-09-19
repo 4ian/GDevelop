@@ -3,39 +3,6 @@ GDevelop - Tween Behavior Extension
 Copyright (c) 2010-2023 Florian Rival (Florian.Rival@gmail.com)
  */
 namespace gdjs {
-  declare type SceneTweenType =
-    | 'layoutValue'
-    | 'layerValue'
-    | 'variable'
-    | 'cameraZoom'
-    | 'cameraRotation'
-    | 'cameraPosition'
-    | 'colorEffectProperty'
-    | 'numberEffectProperty';
-  declare type ObjectTweenType =
-    | 'variable'
-    | 'position'
-    | 'positionX'
-    | 'positionY'
-    | 'positionZ'
-    | 'width'
-    | 'height'
-    | 'depth'
-    | 'angle'
-    | 'rotationX'
-    | 'rotationY'
-    | 'scale'
-    | 'scaleXY'
-    | 'scaleX'
-    | 'scaleY'
-    | 'opacity'
-    | 'characterSize'
-    | 'numberEffectProperty'
-    | 'colorEffectProperty'
-    | 'objectColor'
-    | 'objectColorHSL'
-    | 'objectValue';
-
   export interface RuntimeScene {
     _tweens: gdjs.evtTools.tween.TweenManager;
   }
@@ -173,6 +140,44 @@ namespace gdjs {
       gdjs.registerRuntimeScenePreEventsCallback(function (runtimeScene) {
         gdjs.evtTools.tween.getTweensMap(runtimeScene).step();
       });
+
+      gdjs.registerRuntimeSceneGetSyncDataCallback(
+        function (runtimeScene, currentLayoutSyncData, syncOptions) {
+          if (!syncOptions.syncTweens) return;
+          const tweensNetworkSyncData = gdjs.evtTools.tween
+            .getTweensMap(runtimeScene)
+            .getNetworkSyncData();
+
+          currentLayoutSyncData.tween = tweensNetworkSyncData;
+        }
+      );
+
+      gdjs.registerRuntimeSceneUpdateFromSyncDataCallback(
+        function (runtimeScene, receivedSyncData, syncOptions) {
+          if (!receivedSyncData.tween) return;
+
+          gdjs.evtTools.tween
+            .getTweensMap(runtimeScene)
+            .updateFromNetworkSyncData(
+              receivedSyncData.tween,
+              (tweenInformationNetworkSyncData) => {
+                if (tweenInformationNetworkSyncData.layerName !== undefined) {
+                  return runtimeScene.getLayer(
+                    tweenInformationNetworkSyncData.layerName
+                  );
+                }
+                return runtimeScene;
+              },
+              (tweenInformationNetworkSyncData) => {
+                return gdjs.evtTools.tween.tweenSetterFactory(runtimeScene)(
+                  tweenInformationNetworkSyncData
+                );
+              },
+              // No onFinish for scene tweens.
+              () => null
+            );
+        }
+      );
 
       export const sceneTweenExists = (
         runtimeScene: RuntimeScene,

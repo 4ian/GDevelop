@@ -2,6 +2,17 @@ namespace gdjs {
   const logger = new gdjs.Logger('Scene stack');
   const debugLogger = new gdjs.Logger('Multiplayer - Debug');
 
+  interface PushSceneOptions {
+    sceneName: string;
+    externalLayoutName?: string;
+    skipCreatingInstancesFromScene?: boolean;
+    skipStoppingSoundsOnStartup?: boolean;
+  }
+
+  interface ReplaceSceneOptions extends PushSceneOptions {
+    clear: boolean;
+  }
+
   /**
    * Hold the stack of scenes ({@link gdjs.RuntimeScene}) being played.
    */
@@ -121,15 +132,31 @@ namespace gdjs {
     }
 
     /**
-     * Pause the scene currently being played and start the new scene that is specified.
-     * If `externalLayoutName` is set, also instantiate the objects from this external layout.
+     * Pause the scene currently being played and start the new scene that is specified in `options.sceneName`.
+     * If `options.externalLayoutName` is set, also instantiate the objects from this external layout.
+     *
+     * @param options Contains the scene name and optional external layout name to instantiate.
+     * @param deprecatedExternalLayoutName Deprecated, use `options.externalLayoutName` instead.
      */
     push(
-      newSceneName: string,
-      externalLayoutName?: string,
-      options?: SceneLoadOptions
+      options: PushSceneOptions | string,
+      deprecatedExternalLayoutName?: string
     ): gdjs.RuntimeScene | null {
       this._throwIfDisposed();
+
+      const sceneName =
+        typeof options === 'string' ? options : options.sceneName;
+      const skipCreatingInstancesFromScene =
+        typeof options === 'string'
+          ? false
+          : options.skipCreatingInstancesFromScene;
+      const skipStoppingSoundsOnStartup =
+        typeof options === 'string'
+          ? false
+          : options.skipStoppingSoundsOnStartup;
+      const externalLayoutName =
+        deprecatedExternalLayoutName ||
+        (typeof options === 'string' ? undefined : options.externalLayoutName);
 
       // Tell the scene it's being paused
       const currentScene = this._stack[this._stack.length - 1];
@@ -139,42 +166,49 @@ namespace gdjs {
 
       // Avoid a risk of displaying an intermediate loading screen
       // during 1 frame.
-      if (this._runtimeGame.areSceneAssetsReady(newSceneName)) {
-        return this._loadNewScene(newSceneName, externalLayoutName, options);
+      if (this._runtimeGame.areSceneAssetsReady(sceneName)) {
+        return this._loadNewScene({
+          sceneName,
+          externalLayoutName,
+          skipCreatingInstancesFromScene,
+          skipStoppingSoundsOnStartup,
+        });
       }
 
       this._isNextLayoutLoading = true;
-      this._runtimeGame.loadSceneAssets(newSceneName).then(() => {
-        this._loadNewScene(newSceneName, undefined, options);
+      this._runtimeGame.loadSceneAssets(sceneName).then(() => {
+        this._loadNewScene({
+          sceneName,
+          externalLayoutName,
+          skipCreatingInstancesFromScene,
+          skipStoppingSoundsOnStartup,
+        });
         this._isNextLayoutLoading = false;
       });
 
       return null;
     }
 
-    private _loadNewScene(
-      newSceneName: string,
-      externalLayoutName?: string,
-      options?: SceneLoadOptions
-    ): gdjs.RuntimeScene {
+    private _loadNewScene(options: PushSceneOptions): gdjs.RuntimeScene {
       this._throwIfDisposed();
 
       // Load the new one
       const newScene = new gdjs.RuntimeScene(this._runtimeGame);
       newScene.loadFromScene(
-        this._runtimeGame.getSceneAndExtensionsData(newSceneName),
-        options
+        this._runtimeGame.getSceneAndExtensionsData(options.sceneName),
+        {
+          skipCreatingInstances: options.skipCreatingInstancesFromScene,
+          skipStoppingSoundsOnStartup: options.skipStoppingSoundsOnStartup,
+        }
       );
       this._wasFirstSceneLoaded = true;
 
       // Optionally create the objects from an external layout.
-      if (externalLayoutName) {
-        const externalLayoutData =
-          this._runtimeGame.getExternalLayoutData(externalLayoutName);
-        if (
-          externalLayoutData &&
-          (!options || !options.preventInitialInstancesCreation)
-        ) {
+      if (options.externalLayoutName) {
+        const externalLayoutData = this._runtimeGame.getExternalLayoutData(
+          options.externalLayoutName
+        );
+        if (externalLayoutData) {
           newScene.createObjectsFrom(
             externalLayoutData.instances,
             0,
@@ -190,16 +224,22 @@ namespace gdjs {
     }
 
     /**
-     * Start the specified scene, replacing the one currently being played.
-     * If `clear` is set to true, all running scenes are also removed from the stack of scenes.
+     * Start the scene in `options.sceneName`, replacing the one currently being played.
+     * If `options.clear` is set to true, all running scenes are also removed from the stack of scenes.
+     *
+     * @param options Contains the scene name and optional external layout name to instantiate.
+     * @param deprecatedClear Deprecated, use `options.clear` instead.
      */
     replace(
-      newSceneName: string,
-      clear?: boolean,
-      options?: SceneLoadOptions
+      options: ReplaceSceneOptions | string,
+      deprecatedClear?: boolean
     ): gdjs.RuntimeScene | null {
-      this._throwIfDisposed();
+      const clear =
+        deprecatedClear || typeof options === 'string' ? false : options.clear;
+      const newSceneName =
+        typeof options === 'string' ? options : options.sceneName;
 
+      this._throwIfDisposed();
       if (!!clear) {
         // Unload all the scenes
         while (this._stack.length !== 0) {
@@ -217,7 +257,7 @@ namespace gdjs {
           }
         }
       }
-      return this.push(newSceneName, undefined, options);
+      return this.push(options);
     }
 
     /**
@@ -293,10 +333,10 @@ namespace gdjs {
 
       this._sceneStackSyncDataToApply = null;
 
-      const sceneLoadOptions = {
-        preventInitialInstancesCreation:
-          !!options && !!options.preventInitialInstancesCreation,
-      };
+      const skipCreatingInstancesFromScene =
+        !!options && !!options.preventInitialInstancesCreation;
+      const skipStoppingSoundsOnStartup =
+        !!options && !!options.preventSoundsStoppingOnStartup;
 
       if (options && options.clearSceneStack) {
         while (this._stack.length !== 0) {
@@ -307,11 +347,11 @@ namespace gdjs {
         }
         for (let i = 0; i < sceneStackSyncData.length; ++i) {
           const sceneSyncData = sceneStackSyncData[i];
-          const newScene = this.push(
-            sceneSyncData.name,
-            undefined,
-            sceneLoadOptions
-          );
+          const newScene = this.push({
+            sceneName: sceneSyncData.name,
+            skipCreatingInstancesFromScene,
+            skipStoppingSoundsOnStartup,
+          });
           if (newScene) {
             newScene.networkId = sceneSyncData.networkId;
           }
@@ -334,11 +374,10 @@ namespace gdjs {
             `Scene at position ${i} with name ${sceneSyncData.name} is missing from the stack, adding it.`
           );
           // We have fewer scenes in the stack than the host, let's add the scene.
-          const newScene = this.push(
-            sceneSyncData.name,
-            undefined,
-            sceneLoadOptions
-          );
+          const newScene = this.push({
+            sceneName: sceneSyncData.name,
+            skipCreatingInstancesFromScene,
+          });
           if (newScene) {
             newScene.networkId = sceneSyncData.networkId;
           }
@@ -356,11 +395,11 @@ namespace gdjs {
           // The scene does not correspond to the scene at this position in our stack
           // Let's unload everything after this position to recreate the stack.
 
-          const newScene = this.replace(
-            sceneSyncData.name,
-            true, // Clear the stack
-            sceneLoadOptions
-          );
+          const newScene = this.replace({
+            sceneName: sceneSyncData.name,
+            clear: true,
+            skipCreatingInstancesFromScene,
+          });
           if (newScene) {
             newScene.networkId = sceneSyncData.networkId;
           }
@@ -400,11 +439,11 @@ namespace gdjs {
           // This can happen if the host has restarted the scene
           // We can't just update the networkId of the scene in the stack
           // We need to replace it with a new scene
-          const newScene = this.replace(
-            sceneSyncData.name,
-            false, // Don't clear the stack
-            sceneLoadOptions
-          );
+          const newScene = this.replace({
+            sceneName: sceneSyncData.name,
+            clear: false,
+            skipCreatingInstancesFromScene,
+          });
           if (newScene) {
             newScene.networkId = sceneSyncData.networkId;
           }

@@ -58,6 +58,7 @@ declare type GetNetworkSyncDataOptions = {
 declare type UpdateFromNetworkSyncDataOptions = {
   clearSceneStack?: boolean;
   preventInitialInstancesCreation?: boolean;
+  preventSoundsStoppingOnStartup?: boolean;
   clearInputs?: boolean;
   keepControl?: boolean;
   ignoreVariableOwnership?: boolean;

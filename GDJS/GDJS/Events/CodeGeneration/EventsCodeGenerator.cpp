@@ -168,10 +168,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
               eventsFunctionsExtension.GetEventsFunctions()),
           0,
           true),
-      codeGenerator.GenerateFreeEventsFunctionContext(
-          eventsFunctionsExtension,
-          eventsFunction,
-          "runtimeScene.getOnceTriggers()"),
+      fullPreludeCode,
       eventsFunction.GetEvents(),
       "",
       codeGenerator.GenerateEventsFunctionReturn(eventsFunction));

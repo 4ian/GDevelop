@@ -436,9 +436,8 @@ namespace gdjs {
           }
         } else if (data.command === 'centerViewOnLastSelectedInstance') {
           if (inGameEditor) {
-            inGameEditor.centerViewOnLastSelectedInstance(
-              // data.payload.visibleScreenArea
-            );
+            // TODO: use data.payload.visibleScreenArea
+            inGameEditor.centerViewOnLastSelectedInstance();
           }
         } else if (data.command === 'updateInnerArea') {
           if (inGameEditor) {

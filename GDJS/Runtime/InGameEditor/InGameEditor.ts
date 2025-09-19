@@ -366,7 +366,7 @@ namespace gdjs {
     }
   }
 
-  const getCameraVectors = (threeCamera: THREE.Camera) => {
+  const getCameraForwardVector = (threeCamera: THREE.Camera) => {
     // Make sure camera's matrixWorld is up-to-date (usually is, but good practice).
     threeCamera.updateMatrixWorld();
 
@@ -378,22 +378,15 @@ namespace gdjs {
     //
     // By default, a Three.js camera looks down the -Z axis, so the "forward" axis
     // in the matrix is actually the negative Z column. We'll call it "forward" below.
-    // We also invert the Y axis because it's inverted in GDevelop coordinates.
     const elements = threeCamera.matrixWorld.elements;
 
-    // Local right axis in world space:
-    const right = new THREE.Vector3(elements[0], -elements[1], elements[2]);
-    // Local up axis in world space:
-    const up = new THREE.Vector3(elements[4], -elements[5], elements[6]);
     // Local forward axis in world space (note we take the negative of that column).
     const forward = new THREE.Vector3(-elements[8], elements[9], -elements[10]);
 
-    // Normalize them, just in case (they should generally be unit vectors).
-    right.normalize();
-    up.normalize();
+    // Normalize it, just in case (they should generally be unit vectors).
     forward.normalize();
 
-    return { right, up, forward };
+    return { forward };
   };
 
   export class InGameEditor {
@@ -2160,7 +2153,7 @@ namespace gdjs {
       if (!threeCamera) {
         return [cursorX, cursorY];
       }
-      const { forward } = getCameraVectors(threeCamera);
+      const { forward } = getCameraForwardVector(threeCamera);
       // It happens when the cursor is over the horizon and projected on the plane Z = 0.
       const isCursorBehindTheCamera =
         forward.dot(new THREE.Vector3(deltaX, deltaY, deltaZ)) < 1;
@@ -3078,19 +3071,19 @@ namespace gdjs {
       //
       // By default, a Three.js camera looks down the -Z axis, so the "forward" axis
       // in the matrix is actually the negative Z column. We'll call it "forward" below.
-      // We also invert the Y axis because it's inverted in GDevelop coordinates.
       const elements = this._rotationMatrix.elements;
 
       // Local right axis in world space:
       const right = new THREE.Vector3(elements[0], elements[1], elements[2]);
-      // Local up axis in world space:
-      const up = new THREE.Vector3(elements[4], -elements[5], elements[6]);
       // Local forward axis in world space (note we take the negative of that column).
       const forward = new THREE.Vector3(
         elements[8],
         elements[9],
         -elements[10]
       );
+
+      // Local up axis in world space: orthogonal to both right and forward.
+      const up = new THREE.Vector3().crossVectors(forward, right);
 
       // Normalize them, just in case (they should generally be unit vectors).
       right.normalize();

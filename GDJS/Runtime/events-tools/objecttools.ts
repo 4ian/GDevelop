@@ -715,7 +715,7 @@ namespace gdjs {
         for (const runtimeObject of runtimeObjects) {
           const objectNetworkId = runtimeObject.getNetworkId();
           if (!objectNetworkId) {
-            logger.error(
+            logger.warn(
               'Tried to get sync data of a LongLivedObjectsList and found an object without a network ID'
             );
             continue;
@@ -743,13 +743,13 @@ namespace gdjs {
       this.objectsLists.clear();
       this.localVariablesContainers.length = 0;
 
-      // Resync objects.
+      // Restore the list of objects.
       for (const [objectName, objectNetworkIds] of Object.entries(
         objectsLists
       )) {
         const runtimeObjects = runtimeScene.getObjects(objectName);
         if (!runtimeObjects) {
-          logger.error(
+          logger.warn(
             'Tried to update sync data of a LongLivedObjectsList but cannot find objects with name: ' +
               objectName
           );
@@ -771,7 +771,7 @@ namespace gdjs {
         }
       }
 
-      // Resync local variables containers
+      // Restore the local variables containers.
       this.localVariablesContainers = localVariablesContainers.map(
         (localVariablesContainer) => {
           const newContainer = new gdjs.VariablesContainer();

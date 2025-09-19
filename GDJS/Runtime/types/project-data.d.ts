@@ -42,7 +42,7 @@ declare type ObjectData = {
 declare type GetNetworkSyncDataOptions = {
   playerNumber?: number;
   isHost?: boolean;
-  syncObjectIdentifier?: boolean;
+  syncObjectIdentifiers?: boolean;
   syncAllVariables?: boolean;
   syncAllBehaviors?: boolean;
   syncSceneTimers?: boolean;
@@ -51,7 +51,7 @@ declare type GetNetworkSyncDataOptions = {
   syncTweens?: boolean;
   syncLayers?: boolean;
   syncAsyncTasks?: boolean;
-  syncSceneAdditionalProps?: boolean;
+  syncSceneVisualProps?: boolean;
   syncFullTileMaps?: boolean;
 };
 
@@ -89,7 +89,7 @@ declare type BasicObjectNetworkSyncData = {
   pfx: number;
   /** Permanent force on Y */
   pfy: number;
-  /* name :*/
+  /** Name of the object */
   n?: string;
   /** The network ID of the instance. */
   networkId?: string;

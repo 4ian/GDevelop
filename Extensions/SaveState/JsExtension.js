@@ -96,12 +96,12 @@ module.exports = {
     extension
       .addExpressionAndCondition(
         'number',
-        'SecondsSinceLastSave',
-        _('Seconds since last save'),
+        'TimeSinceLastSave',
+        _('Time since last save'),
         _(
-          'the number of seconds since the last save (-1 = no value, 0 = now, > 0 = seconds)'
+          'Time since the last save, in seconds. Returns -1 if no save happened, and a positive number otherwise.'
         ),
-        _('the number of seconds since the last save'),
+        _('Time since the last save'),
         '',
         'res/actions/saveDown.svg'
       )
@@ -113,12 +113,12 @@ module.exports = {
     extension
       .addExpressionAndCondition(
         'number',
-        'SecondsSinceLastLoad',
-        _('Seconds since last load'),
+        'TimeSinceLastLoad',
+        _('Time since last load'),
         _(
-          'the number of seconds since the last load (-1 = no value, 0 = now, > 0 = seconds)'
+          'Time since the last load, in seconds. Returns -1 if no load happened, and a positive number otherwise.'
         ),
-        _('the number of seconds since the last load'),
+        _('Time since the last load'),
         '',
         'res/actions/saveDown.svg'
       )

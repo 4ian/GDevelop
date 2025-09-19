@@ -7,10 +7,6 @@ namespace gdjs {
   const logger = new gdjs.Logger('RuntimeScene');
   const setupWarningLogger = new gdjs.Logger('RuntimeScene (setup warnings)');
 
-  export type SceneLoadOptions = {
-    preventInitialInstancesCreation?: boolean;
-  };
-
   /**
    * A scene being played, containing instances of objects rendered on screen.
    */
@@ -137,7 +133,10 @@ namespace gdjs {
      */
     loadFromScene(
       sceneAndExtensionsData: SceneAndExtensionsData | null,
-      options?: SceneLoadOptions
+      options?: {
+        skipCreatingInstances?: boolean;
+        skipStoppingSoundsOnStartup?: boolean;
+      }
     ) {
       if (!sceneAndExtensionsData) {
         logger.error('loadFromScene was called without a scene');
@@ -197,7 +196,7 @@ namespace gdjs {
       }
 
       // Create initial instances of objects
-      if (!options || !options.preventInitialInstancesCreation)
+      if (!options || !options.skipCreatingInstances)
         this.createObjectsFrom(
           sceneData.instances,
           0,
@@ -223,7 +222,11 @@ namespace gdjs {
       for (let i = 0; i < gdjs.callbacksRuntimeSceneLoaded.length; ++i) {
         gdjs.callbacksRuntimeSceneLoaded[i](this);
       }
-      if (sceneData.stopSoundsOnStartup && this._runtimeGame) {
+      if (
+        sceneData.stopSoundsOnStartup &&
+        (!options || !options.skipStoppingSoundsOnStartup) &&
+        this._runtimeGame
+      ) {
         this._runtimeGame.getSoundManager().clearAll();
       }
       this._isLoaded = true;
@@ -859,24 +862,8 @@ namespace gdjs {
         extVar: extensionsVariablesSyncData,
         id: this.getOrCreateNetworkId(),
       };
-      if (syncOptions.syncSceneTimers) {
-        networkSyncData.time = this._timeManager.getNetworkSyncData();
-      }
-      if (syncOptions.syncOnceTriggers) {
-        networkSyncData.once = this._onceTriggers.getNetworkSyncData();
-      }
-      // The namespace gdjs.evtTools.tween
-      // or function gdjs.evtTools.tween.getTweensMap
-      // may not exist if the project is not using any tweens,
-      // as it's an extension or behavior.
-      if (
-        syncOptions.syncTweens &&
-        gdjs.evtTools.tween &&
-        gdjs.evtTools.tween.getTweensMap
-      ) {
-        networkSyncData.tween = gdjs.evtTools.tween
-          .getTweensMap(this)
-          .getNetworkSyncData();
+      if (syncOptions.syncSceneVisualProps) {
+        networkSyncData.color = this._backgroundColor;
       }
       if (syncOptions.syncLayers) {
         const layersSyncData = {};
@@ -886,12 +873,20 @@ namespace gdjs {
         }
         networkSyncData.layers = layersSyncData;
       }
+      if (syncOptions.syncSceneTimers) {
+        networkSyncData.time = this._timeManager.getNetworkSyncData();
+      }
+      if (syncOptions.syncOnceTriggers) {
+        networkSyncData.once = this._onceTriggers.getNetworkSyncData();
+      }
+
+      gdjs.callbacksRuntimeSceneGetSyncData.forEach((callback) => {
+        callback(this, networkSyncData, syncOptions);
+      });
+
       if (syncOptions.syncAsyncTasks) {
         networkSyncData.async =
           this._asyncTasksManager.getNetworkSyncData(syncOptions);
-      }
-      if (syncOptions.syncSceneVisualProps) {
-        networkSyncData.color = this._backgroundColor;
       }
 
       return networkSyncData;
@@ -901,6 +896,18 @@ namespace gdjs {
       syncData: LayoutNetworkSyncData,
       options: UpdateFromNetworkSyncDataOptions
     ) {
+      if (syncData.color !== undefined) {
+        this._backgroundColor = syncData.color;
+      }
+      if (syncData.layers) {
+        for (const layerName in syncData.layers) {
+          const layerData = syncData.layers[layerName];
+          if (this.hasLayer(layerName)) {
+            const layer = this.getLayer(layerName);
+            layer.updateFromNetworkSyncData(layerData);
+          }
+        }
+      }
       if (syncData.var) {
         this._variables.updateFromNetworkSyncData(syncData.var, options);
       }
@@ -923,36 +930,15 @@ namespace gdjs {
       if (syncData.time) {
         this._timeManager.updateFromNetworkSyncData(syncData.time);
       }
-      if (syncData.layers) {
-        for (const layerName in syncData.layers) {
-          const layerData = syncData.layers[layerName];
-          if (this.hasLayer(layerName)) {
-            const layer = this.getLayer(layerName);
-            layer.updateFromNetworkSyncData(layerData);
-          }
-        }
-      }
       if (syncData.once) {
         this._onceTriggers.updateNetworkSyncData(syncData.once);
       }
-      if (syncData.tween && gdjs.evtTools.tween.getTweensMap) {
-        gdjs.evtTools.tween.getTweensMap(this).updateFromNetworkSyncData(
-          syncData.tween,
-          (tweenInformationNetworkSyncData) => {
-            if (tweenInformationNetworkSyncData.layerName !== undefined) {
-              return this.getLayer(tweenInformationNetworkSyncData.layerName);
-            }
-            return this;
-          },
-          (tweenInformationNetworkSyncData) => {
-            return gdjs.evtTools.tween.tweenSetterFactory(this)(
-              tweenInformationNetworkSyncData
-            );
-          },
-          // No onFinish for scene tweens.
-          () => null
-        );
-      }
+
+      gdjs.callbacksRuntimeSceneUpdateFromSyncData.forEach((callback) => {
+        callback(this, syncData, options);
+      });
+
+      // Sync Async last, as it might depend on other data.
       if (syncData.async && this._idToCallbackMap) {
         this._asyncTasksManager.updateFromNetworkSyncData(
           syncData.async,
@@ -960,9 +946,6 @@ namespace gdjs {
           this,
           options
         );
-      }
-      if (syncData.color !== undefined) {
-        this._backgroundColor = syncData.color;
       }
     }
 

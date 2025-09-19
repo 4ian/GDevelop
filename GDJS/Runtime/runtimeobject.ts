@@ -422,7 +422,8 @@ namespace gdjs {
     updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer): void {}
 
     /**
-     * Called when the object is created from an initial instance at the startup of the scene.<br>
+     * Called when the object is created from an initial instance at the startup of the scene.
+     *
      * Note that common properties (position, angle, z order...) have already been setup.
      *
      * @param initialInstanceData The data of the initial instance.
@@ -499,7 +500,7 @@ namespace gdjs {
         tim: timersNetworkSyncData,
       };
 
-      if (syncOptions.syncObjectIdentifier) {
+      if (syncOptions.syncObjectIdentifiers) {
         networkSyncData.n = this.name;
         if (!this.networkId) {
           // If this is the first time the object is synced
@@ -721,8 +722,10 @@ namespace gdjs {
     }
 
     /**
-     * Get the unique identifier of the object.<br>
-     * The identifier is set by the runtimeScene owning the object.<br>
+     * Get the unique identifier of the object.
+     *
+     * The identifier is set by the runtimeScene owning the object.
+     *
      * You can also use the id property (this._object.id) for increased efficiency instead of
      * calling this method.
      *
@@ -733,7 +736,8 @@ namespace gdjs {
     }
 
     /**
-     * Get the network ID of the object.<br>
+     * Get the network ID of the object.
+     *
      * The network ID is used to identify the object in a networked game.
      * Or, for Save/Load purposes.
      *
@@ -1503,7 +1507,8 @@ namespace gdjs {
 
     //Forces :
     /**
-     * Get a force from the garbage, or create a new force is garbage is empty.<br>
+     * Get a force from the garbage, or create a new force is garbage is empty.
+     *
      * To be used each time a force is created so as to avoid temporaries objects.
      *
      * @param x The x coordinates of the force
@@ -1588,7 +1593,8 @@ namespace gdjs {
     }
 
     /**
-     * Add a force oriented toward another object.<br>
+     * Add a force oriented toward another object.
+     *
      * (Shortcut for addForceTowardPosition)
      * @param object The target object
      * @param len The force length, in pixels.

@@ -129,6 +129,8 @@ namespace gdjs {
     ) {
       this.clearTasks();
 
+      const unknownTaskTypes: string[] = [];
+
       syncData.tasks.forEach(({ callbackId, asyncTask, objectsList }) => {
         if (!asyncTask) return;
 
@@ -145,16 +147,25 @@ namespace gdjs {
             const task = new TaskGroup();
             task.updateFromNetworkSyncData(asyncTask);
             this.addTask(task, callback, callbackId, longLivedObjectsList);
-          }
-          if (asyncTask.type === 'wait') {
+          } else if (asyncTask.type === 'wait') {
             const task = new gdjs.evtTools.runtimeScene.WaitTask(
               asyncTask.duration
             );
             task.updateFromNetworkSyncData(asyncTask);
             this.addTask(task, callback, callbackId, longLivedObjectsList);
+          } else {
+            // Unknown task type.
+            // @ts-ignore
+            unknownTaskTypes.push(asyncTask.type);
           }
         }
       });
+
+      if (unknownTaskTypes.length) {
+        console.warn(
+          `${unknownTaskTypes.length} asynchronous task(s) could not be restored from network sync data. ${unknownTaskTypes.join(', ')}`
+        );
+      }
     }
   }
 
@@ -200,6 +211,7 @@ namespace gdjs {
     }
 
     updateFromNetworkSyncData(syncData: TaskGroupNetworkSyncData) {
+      const unknownTaskTypes: string[] = [];
       syncData.tasks.forEach((asyncTask) => {
         if (!asyncTask) return;
 
@@ -207,15 +219,24 @@ namespace gdjs {
           const task = new TaskGroup();
           task.updateFromNetworkSyncData(asyncTask);
           this.addTask(task);
-        }
-        if (asyncTask.type === 'wait') {
+        } else if (asyncTask.type === 'wait') {
           const task = new gdjs.evtTools.runtimeScene.WaitTask(
             asyncTask.duration
           );
           task.updateFromNetworkSyncData(asyncTask);
           this.addTask(task);
+        } else {
+          // Unknown task type.
+          // @ts-ignore
+          unknownTaskTypes.push(asyncTask.type);
         }
       });
+
+      if (unknownTaskTypes.length) {
+        console.warn(
+          `${unknownTaskTypes.length} asynchronous task(s) could not be restored from network sync data. ${unknownTaskTypes.join(', ')}`
+        );
+      }
     }
   }
 

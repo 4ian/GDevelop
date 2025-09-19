@@ -890,7 +890,7 @@ namespace gdjs {
         networkSyncData.async =
           this._asyncTasksManager.getNetworkSyncData(syncOptions);
       }
-      if (syncOptions.syncSceneAdditionalProps) {
+      if (syncOptions.syncSceneVisualProps) {
         networkSyncData.color = this._backgroundColor;
       }
 

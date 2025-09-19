@@ -18,7 +18,7 @@ namespace gdjs {
     };
 
     const getNetworkSyncOptions: GetNetworkSyncDataOptions = {
-      syncObjectIdentifier: true,
+      syncObjectIdentifiers: true,
       syncAllVariables: true,
       syncAllBehaviors: true,
       syncSceneTimers: true,
@@ -27,7 +27,7 @@ namespace gdjs {
       syncTweens: true,
       syncLayers: true,
       syncAsyncTasks: true,
-      syncSceneAdditionalProps: true,
+      syncSceneVisualProps: true,
       syncFullTileMaps: true,
     };
     const updateFromNetworkSyncDataOptions: UpdateFromNetworkSyncDataOptions = {
@@ -158,7 +158,7 @@ namespace gdjs {
     ) {
       try {
         const gameSaveState = getGameSaveState(currentScene);
-        await gdjs.saveToIndexedDB(
+        await gdjs.indexedDb.saveToIndexedDB(
           getIndexedDbDatabaseName(),
           getIndexedDbObjectStore(),
           getIndexedDbStorageKey(storageKey),
@@ -228,7 +228,7 @@ namespace gdjs {
           markLoadJustFailed();
         }
       } else if (optionsToApply.loadStorageName) {
-        gdjs
+        gdjs.indexedDb
           .loadFromIndexedDB(
             getIndexedDbDatabaseName(),
             getIndexedDbObjectStore(),

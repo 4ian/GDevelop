@@ -170,9 +170,10 @@ namespace gdjs {
       }
 
       // Destroy the body before switching the bodyUpdater,
-      // to ensure no body relicate is left.
+      // to ensure the body of the previous bodyUpdater is not left alive.
+      // (would be a memory leak and would create a phantom body in the physics world)
       // But transfer the linear and angular velocity to the new body,
-      // so the body doesn't stop when the body is recreated.
+      // so the body doesn't stop when it is recreated.
       let previousBodyData = {
         linearVelocityX: 0,
         linearVelocityY: 0,

@@ -98,8 +98,7 @@ namespace gdjs {
         this._firstFrame = syncData.firstFrame;
       }
       if (syncData.timers !== undefined) {
-        // Clear timers to be safe.
-        this._timers = new Hashtable();
+        this._timers.clear();
         Object.entries(syncData.timers.items).forEach(([key, timerData]) => {
           const newTimer = new gdjs.Timer(timerData.name);
           newTimer.updateFromNetworkSyncData(timerData);

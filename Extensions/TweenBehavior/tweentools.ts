@@ -3,6 +3,39 @@ GDevelop - Tween Behavior Extension
 Copyright (c) 2010-2023 Florian Rival (Florian.Rival@gmail.com)
  */
 namespace gdjs {
+  declare type SceneTweenType =
+    | 'layoutValue'
+    | 'layerValue'
+    | 'variable'
+    | 'cameraZoom'
+    | 'cameraRotation'
+    | 'cameraPosition'
+    | 'colorEffectProperty'
+    | 'numberEffectProperty';
+  declare type ObjectTweenType =
+    | 'variable'
+    | 'position'
+    | 'positionX'
+    | 'positionY'
+    | 'positionZ'
+    | 'width'
+    | 'height'
+    | 'depth'
+    | 'angle'
+    | 'rotationX'
+    | 'rotationY'
+    | 'scale'
+    | 'scaleXY'
+    | 'scaleX'
+    | 'scaleY'
+    | 'opacity'
+    | 'characterSize'
+    | 'numberEffectProperty'
+    | 'colorEffectProperty'
+    | 'objectColor'
+    | 'objectColorHSL'
+    | 'objectValue';
+
   export interface RuntimeScene {
     _tweens: gdjs.evtTools.tween.TweenManager;
   }

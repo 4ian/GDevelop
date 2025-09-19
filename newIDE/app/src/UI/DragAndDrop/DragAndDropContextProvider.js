@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import HTML5Backend from 'react-dnd-html5-backend';
+// import HTML5Backend from 'react-dnd-html5-backend';
 import TouchBackend from 'react-dnd-touch-backend';
 import MultiBackend, { TouchTransition } from 'react-dnd-multi-backend';
 import { DragDropContext } from 'react-dnd';
@@ -8,6 +8,7 @@ import { DragDropContext } from 'react-dnd';
 // be able to specify the delayTouchStart parameter of the TouchBackend.
 const HTML5toTouch = {
   backends: [
+    // HTML5 backend is disabled as it's not working with the iframe showing the embedded game.
     // {
     //   backend: HTML5Backend,
     // },

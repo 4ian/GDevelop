@@ -2999,12 +2999,11 @@ namespace gdjs {
 
         // Movement with the keyboard:
         // Either arrow keys (move in the camera plane) or WASD ("FPS move" + Q/E for up/down).
-        const moveSpeed = isShiftPressed(inputManager) ? 12 : 6;
+        const moveSpeed = isShiftPressed(inputManager) ? 48 : 6;
 
         if (
           !isControlOrCmdPressed(inputManager) &&
-          !isAltPressed(inputManager) &&
-          !isShiftPressed(inputManager)
+          !isAltPressed(inputManager)
         ) {
           if (inputManager.isKeyPressed(LEFT_KEY)) {
             moveCameraByVector(right, -moveSpeed);

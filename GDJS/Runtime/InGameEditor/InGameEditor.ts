@@ -37,6 +37,7 @@ namespace gdjs {
   const X_KEY = 88;
   const Y_KEY = 89;
   const Z_KEY = 90;
+  const ESC_KEY = 27;
 
   const instanceStateFlag = {
     selected: 1,
@@ -992,6 +993,7 @@ namespace gdjs {
         visibleScreenArea,
         margin
       );
+      this._getEditorCamera().switchToFreeCamera();
     }
 
     zoomBy(zoomFactor: float) {
@@ -1376,6 +1378,12 @@ namespace gdjs {
       if (!editedInstanceContainer) return;
 
       const inputManager = this._runtimeGame.getInputManager();
+
+      if (inputManager.wasKeyJustPressed(ESC_KEY)) {
+        this._selection.clear();
+        this._sendSelectionUpdate();
+      }
+
       // Left click: select the object under the cursor.
       if (
         inputManager.isMouseButtonReleased(0) &&
@@ -1546,7 +1554,8 @@ namespace gdjs {
         (!lastEditableSelectedObject ||
           (lastEditableSelectedObject &&
             this._selectionControls.object !== lastEditableSelectedObject) ||
-          shouldDragSelectedObject(inputManager))
+          shouldDragSelectedObject(inputManager) ||
+          isSpacePressed(inputManager))
       ) {
         this._removeSelectionControls();
       }
@@ -1555,7 +1564,8 @@ namespace gdjs {
       if (
         lastEditableSelectedObject &&
         !this._selectionControls &&
-        !shouldDragSelectedObject(inputManager)
+        !shouldDragSelectedObject(inputManager) &&
+        !isSpacePressed(inputManager)
       ) {
         const threeObject = lastEditableSelectedObject.get3DRendererObject();
         if (!threeObject) return;
@@ -2404,6 +2414,15 @@ namespace gdjs {
       this._getEditorCamera().restoreCameraState(editorCamera3D);
     }
 
+    private _updateMouseCursor() {
+      const mouseCursor = this._getEditorCamera().getRequestedMouseCursor();
+
+      const canvas = this._runtimeGame.getRenderer().getCanvas();
+      if (canvas) {
+        canvas.style.cursor = mouseCursor || 'default';
+      }
+    }
+
     updateAndRender() {
       const objectUnderCursor: gdjs.RuntimeObject | null =
         this.getObjectUnderCursor();
@@ -2436,6 +2455,7 @@ namespace gdjs {
       this._updateInnerAreaOutline();
       this._handleContextMenu();
       this._handleShortcuts();
+      this._updateMouseCursor();
       this._wasMovingSelectionLastFrame =
         !!this._selectionControlsMovementTotalDelta;
       if (!this._selectionControlsMovementTotalDelta) {
@@ -2471,12 +2491,13 @@ namespace gdjs {
     freeCameraControl: FreeCameraControl;
     private _hasChanged = false;
     private _hadChanged = false;
+    private _mouseCursor: string | null = null;
 
     constructor(editor: gdjs.InGameEditor) {
       this.editor = editor;
       this.orbitCameraControl = new OrbitCameraControl(this);
       this.freeCameraControl = new FreeCameraControl(this);
-      this.freeCameraControl.setEnabled(false);
+      this.orbitCameraControl.setEnabled(false);
     }
 
     isFreeCamera(): boolean {
@@ -2487,6 +2508,10 @@ namespace gdjs {
       return this.isFreeCamera()
         ? this.freeCameraControl
         : this.orbitCameraControl;
+    }
+
+    getRequestedMouseCursor(): string | null {
+      return this._mouseCursor;
     }
 
     switchToOrbitAroundObject(object: gdjs.RuntimeObject): void {
@@ -2543,6 +2568,20 @@ namespace gdjs {
     }
 
     step(): void {
+      const runtimeGame = this.editor.getRuntimeGame();
+      const inputManager = runtimeGame._inputManager;
+
+      // Always allow to use Space+click to switch to free camera and pan.
+      // Display a grab cursor to indicate that.
+      this._mouseCursor = null;
+      if (isSpacePressed(inputManager)) {
+        this._mouseCursor = 'grab';
+
+        if (inputManager.isMouseButtonPressed(0) && !this.isFreeCamera()) {
+          this.switchToFreeCamera();
+        }
+      }
+
       this.orbitCameraControl.step();
       this.freeCameraControl.step();
 
@@ -2997,10 +3036,10 @@ namespace gdjs {
 
           // Up/down
           if (inputManager.isKeyPressed(Q_KEY)) {
-            moveCameraByVector(up, -moveSpeed);
+            moveCameraByVector(up, moveSpeed);
           }
           if (inputManager.isKeyPressed(E_KEY)) {
-            moveCameraByVector(up, moveSpeed);
+            moveCameraByVector(up, -moveSpeed);
           }
         }
 

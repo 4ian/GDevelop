@@ -2577,9 +2577,18 @@ namespace gdjs {
       if (isSpacePressed(inputManager)) {
         this._mouseCursor = 'grab';
 
+        // Switch to pan if space + left click is used.
         if (inputManager.isMouseButtonPressed(0) && !this.isFreeCamera()) {
           this.switchToFreeCamera();
         }
+      }
+      // Also switch to pan if shift + wheel click is used.
+      if (
+        isShiftPressed(inputManager) &&
+        inputManager.isMouseButtonPressed(2) &&
+        !this.isFreeCamera()
+      ) {
+        this.switchToFreeCamera();
       }
 
       this.orbitCameraControl.step();
@@ -3043,9 +3052,11 @@ namespace gdjs {
         }
 
         // Space + click: move the camera on its plane.
+        // Shift + wheel click: same.
         if (
-          isSpacePressed(inputManager) &&
-          inputManager.isMouseButtonPressed(0)
+          (isSpacePressed(inputManager) &&
+            inputManager.isMouseButtonPressed(0)) ||
+          (isShiftPressed(inputManager) && inputManager.isMouseButtonPressed(2))
         ) {
           const xDelta = this._lastCursorX - inputManager.getCursorX();
           const yDelta = this._lastCursorY - inputManager.getCursorY();

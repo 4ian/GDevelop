@@ -3211,20 +3211,6 @@ namespace gdjs {
     }
   };
 
-  const getCameraRotationX = (
-    runtimeScene: RuntimeScene,
-    layerName: string,
-    cameraIndex: integer
-  ): float => {
-    return gdjs.scene3d.camera
-      ? gdjs.scene3d.camera.getCameraRotationX(
-          runtimeScene,
-          layerName,
-          cameraIndex
-        )
-      : 0;
-  };
-
   const setCameraRotationX = (
     runtimeScene: RuntimeScene,
     angle: float,
@@ -3239,20 +3225,6 @@ namespace gdjs {
         cameraIndex
       );
     }
-  };
-
-  const getCameraRotationY = (
-    runtimeScene: RuntimeScene,
-    layerName: string,
-    cameraIndex: integer
-  ): float => {
-    return gdjs.scene3d.camera
-      ? gdjs.scene3d.camera.getCameraRotationY(
-          runtimeScene,
-          layerName,
-          cameraIndex
-        )
-      : 0;
   };
 
   const setCameraRotationY = (

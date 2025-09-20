@@ -98,6 +98,40 @@ namespace gdjs {
             if (!scene) {
               return false;
             }
+            const skyboxGeo = new THREE.BoxGeometry(10000, 10000, 10000);
+
+            const ft = new THREE.TextureLoader().load(
+              'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_north.png'
+            );
+            const bk = new THREE.TextureLoader().load(
+              'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_south.png'
+            );
+            const up = new THREE.TextureLoader().load(
+              'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_up.png'
+            );
+            const dn = new THREE.TextureLoader().load(
+              'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_down.png'
+            );
+            const rt = new THREE.TextureLoader().load(
+              'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_east.png'
+            );
+            const lf = new THREE.TextureLoader().load(
+              'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_west.png'
+            );
+
+            const materialArray = [
+              new THREE.MeshBasicMaterial({ map: rt, side: THREE.BackSide }), // Right
+              new THREE.MeshBasicMaterial({ map: up, side: THREE.BackSide }), // Left
+              new THREE.MeshBasicMaterial({ map: lf, side: THREE.BackSide }), // Top
+              new THREE.MeshBasicMaterial({ map: dn, side: THREE.BackSide }), // Bottom
+              new THREE.MeshBasicMaterial({ map: bk, side: THREE.BackSide }), // Front
+              new THREE.MeshBasicMaterial({ map: ft, side: THREE.BackSide }), // Back
+            ];
+            const skybox = new THREE.Mesh(skyboxGeo, materialArray);
+            skybox.position.set(0, 0, 0);
+            skybox.frustumCulled = false;
+
+            scene.add(skybox);
             scene.add(this._light);
             scene.add(this._light.target);
             if (this._shadowCameraHelper) {

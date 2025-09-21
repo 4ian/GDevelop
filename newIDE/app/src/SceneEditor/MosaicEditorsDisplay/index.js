@@ -8,7 +8,6 @@ import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMea
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import EditorMosaic, {
   type EditorMosaicInterface,
-  getNodeArea,
 } from '../../UI/EditorMosaic';
 import InstancesEditor from '../../InstancesEditor';
 import LayersList, { type LayersListInterface } from '../../LayersList';
@@ -35,9 +34,7 @@ import {
 } from '../../SceneEditor/InstanceOrObjectPropertiesEditorContainer';
 import { useDoNowOrAfterRender } from '../../Utils/UseDoNowOrAfterRender';
 import { preventGameFramePointerEvents } from '../../EmbeddedGame/EmbeddedGameFrame';
-
-export const instancesEditorEmbeddedGameFrameHoleId =
-  'instances-editor-embedded-game-frame-hole';
+import { EmbeddedGameFrameHole } from '../../EmbeddedGame/EmbeddedGameFrameHole';
 
 const initialMosaicEditorNodes = {
   direction: 'row',
@@ -104,6 +101,7 @@ const MosaicEditorsDisplay = React.forwardRef<
     onSelectInstances,
     onInstancesModified,
     onExtensionInstalled,
+    isActive,
   } = props;
   const { isMobile } = useResponsiveWindowSize();
   const {
@@ -201,26 +199,10 @@ const MosaicEditorsDisplay = React.forwardRef<
     [isEditorVisible, toggleEditorView, objectsListDoNowOrAfterRender]
   );
 
-  const getInstanceEditorArea = React.useCallback(
-    () => {
-      const root = getDefaultEditorMosaicNode('scene-editor');
-      return (
-        getNodeArea(root, 'instances-editor') || {
-          minX: 0,
-          minY: 0,
-          maxX: 1,
-          maxY: 1,
-        }
-      );
-    },
-    [getDefaultEditorMosaicNode]
-  );
-
   React.useImperativeHandle(ref, () => {
     const { current: editor } = editorRef;
     return {
       getName: () => 'mosaic',
-      getInstanceEditorArea,
       forceUpdateInstancesList,
       forceUpdatePropertiesEditor,
       forceUpdateObjectsList,
@@ -386,9 +368,7 @@ const MosaicEditorsDisplay = React.forwardRef<
             type: 'primary',
             noTitleBar: true,
             noSoftKeyboardAvoidance: true,
-            renderEditor: () => (
-              <div id={instancesEditorEmbeddedGameFrameHoleId} />
-            ),
+            renderEditor: () => <EmbeddedGameFrameHole isActive={isActive} />,
           }
         : {
             type: 'primary',

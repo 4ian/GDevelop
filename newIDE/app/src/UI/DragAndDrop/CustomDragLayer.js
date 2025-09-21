@@ -11,7 +11,7 @@ import {
 import { CorsAwareImage } from '../CorsAwareImage';
 import { type DraggedItem } from './DragSourceAndDropTarget';
 import { swipeableDrawerContainerId } from '../../SceneEditor/SwipeableDrawerEditorsDisplay';
-import { instancesEditorEmbeddedGameFrameHoleId } from '../../SceneEditor/MosaicEditorsDisplay';
+import { getActiveEmbeddedGameFrameHoleRect } from '../../EmbeddedGame/EmbeddedGameFrameHole';
 
 const layerStyles = {
   position: 'fixed',
@@ -77,6 +77,23 @@ const shouldHidePreviewBecauseDraggingOnSceneEditorCanvas = ({
   x,
   y,
 }: XYCoord) => {
+  // When the embedded game frame is active (new "3D" editor),
+  // hide the preview when the cursor is inside its visible area.
+  // There is only one embedded game frame hole, so we don't need to check if the parent scene editor is active.
+  const activeEmbeddedGameFrameHoleRect = getActiveEmbeddedGameFrameHoleRect();
+  if (activeEmbeddedGameFrameHoleRect) {
+    if (
+      x >= activeEmbeddedGameFrameHoleRect.left &&
+      x <= activeEmbeddedGameFrameHoleRect.right &&
+      y >= activeEmbeddedGameFrameHoleRect.top &&
+      y <= activeEmbeddedGameFrameHoleRect.bottom
+    ) {
+      return true;
+    }
+  }
+
+  // Otherwise, this means the classic "2D" editor is used:
+
   const swipeableDrawerContainer = document.querySelector(
     `#${swipeableDrawerContainerId}`
   );
@@ -98,10 +115,9 @@ const shouldHidePreviewBecauseDraggingOnSceneEditorCanvas = ({
 
   // Otherwise, we are on desktop, and we want to hide the preview when the user
   // is dragging on the canvas.
-  const activeCanvas =
-    document.querySelector(
-      `#scene-editor[data-active=true] #${instancesEditorId}`
-    ) || document.querySelector(`#${instancesEditorEmbeddedGameFrameHoleId}`);
+  const activeCanvas = document.querySelector(
+    `#scene-editor[data-active=true] #${instancesEditorId}`
+  );
   if (activeCanvas) {
     const canvasRect = activeCanvas.getBoundingClientRect();
     if (

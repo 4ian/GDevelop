@@ -210,50 +210,6 @@ const getNodeSize = (
   );
 };
 
-export const getNodeArea = (
-  currentNode: ?EditorMosaicNode,
-  nodeName: string
-): { minX: number, minY: number, maxX: number, maxY: number } | null => {
-  if (!currentNode) {
-    return null;
-  }
-  if (typeof currentNode === 'string') {
-    return currentNode === nodeName
-      ? { minX: 0, minY: 0, maxX: 1, maxY: 1 }
-      : null;
-  }
-  const firstArea = getNodeArea(currentNode.first, nodeName);
-  const secondArea = firstArea
-    ? null
-    : getNodeArea(currentNode.second, nodeName);
-  if (!firstArea && !secondArea) {
-    return null;
-  }
-  const split = currentNode.splitPercentage / 100;
-  if (currentNode.direction === 'row') {
-    if (firstArea) {
-      firstArea.minX = firstArea.minX * split;
-      firstArea.maxX = firstArea.maxX * split;
-      return firstArea;
-    } else if (secondArea) {
-      secondArea.minX = split + secondArea.minX * (1 - split);
-      secondArea.maxX = split + secondArea.maxX * (1 - split);
-      return secondArea;
-    }
-  } else {
-    if (firstArea) {
-      firstArea.minY = firstArea.minY * split;
-      firstArea.maxY = firstArea.maxY * split;
-      return firstArea;
-    } else if (secondArea) {
-      secondArea.minY = split + secondArea.minY * (1 - split);
-      secondArea.maxY = split + secondArea.maxY * (1 - split);
-      return secondArea;
-    }
-  }
-  return null;
-};
-
 const defaultToolbarControls = [<CloseButton key="close" />];
 
 const renderMosaicWindowPreview = props => (

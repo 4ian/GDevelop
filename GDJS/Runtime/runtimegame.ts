@@ -1176,7 +1176,7 @@ namespace gdjs {
               }
 
               if (this._inGameEditor) {
-                this._inGameEditor.updateAndRender();
+                this._inGameEditor.updateAndRender(lastCallElapsedTime);
               } else {
                 // The game is paused for edition: the game loop continues to run,
                 // but the game logic is not executed.
@@ -1214,7 +1214,7 @@ namespace gdjs {
 
             // Render and step the scene.
             if (this._inGameEditor) {
-              this._inGameEditor.updateAndRender();
+              this._inGameEditor.updateAndRender(elapsedTime);
               this.getInputManager().onFrameEnded();
               this._hasJustResumed = false;
               return true;
@@ -1567,6 +1567,14 @@ namespace gdjs {
      */
     getInGameEditor(): InGameEditor | null {
       return this._inGameEditor;
+    }
+
+    /**
+     * Set the maximum FPS of the game.
+     * @param maximumFps The maximum FPS.
+     */
+    setMaximumFps(maximumFps: integer) {
+      this._maxFPS = maximumFps;
     }
 
     /**

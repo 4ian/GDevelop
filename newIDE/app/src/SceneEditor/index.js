@@ -88,7 +88,10 @@ import { extractAsCustomObject } from './CustomObjectExtractor/CustomObjectExtra
 import { isVariantEditable } from '../ObjectEditor/Editors/CustomObjectPropertiesEditor';
 import { addSerializedInstances } from '../InstancesEditor/InstancesAdder';
 import { type EditorViewPosition2D } from '../InstancesEditor';
-import { setCameraState } from '../EmbeddedGame/EmbeddedGameFrame';
+import {
+  changeViewPosition,
+  setCameraState,
+} from '../EmbeddedGame/EmbeddedGameFrame';
 import Rectangle from '../Utils/Rectangle';
 
 const gd: libGDevelop = global.gd;
@@ -1309,7 +1312,6 @@ export default class SceneEditor extends React.Component<Props, State> {
     multiSelect: boolean,
     targetPosition?: 'center' | 'upperCenter'
   ) => {
-    const { previewDebuggerServer } = this.props;
     this._setSelectedInstances(instances, multiSelect);
     const { editorDisplay } = this;
     if (editorDisplay) {
@@ -1321,16 +1323,10 @@ export default class SceneEditor extends React.Component<Props, State> {
       }
 
       viewControls.centerViewOnLastInstance(instances, offset);
+    }
 
-      const visibleScreenArea = editorDisplay.getInstanceEditorArea();
-      if (previewDebuggerServer) {
-        previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-          previewDebuggerServer.sendMessage(debuggerId, {
-            command: 'centerViewOnLastSelectedInstance',
-            payload: { visibleScreenArea },
-          });
-        });
-      }
+    if (this.props.gameEditorMode === 'embedded-game') {
+      changeViewPosition('centerViewOnLastSelectedInstance');
     }
   };
 
@@ -1897,18 +1893,8 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
     editorDisplay.viewControls.zoomToInitialPosition();
 
-    const visibleScreenArea = editorDisplay.getInstanceEditorArea();
     if (this.props.gameEditorMode === 'embedded-game') {
-      const { previewDebuggerServer } = this.props;
-      if (!previewDebuggerServer) return;
-      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-        previewDebuggerServer.sendMessage(debuggerId, {
-          command: 'zoomToInitialPosition',
-          payload: {
-            visibleScreenArea,
-          },
-        });
-      });
+      changeViewPosition('zoomToInitialPosition');
     }
   };
 
@@ -1919,18 +1905,8 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
     editorDisplay.viewControls.zoomToFitContent();
 
-    const visibleScreenArea = editorDisplay.getInstanceEditorArea();
     if (this.props.gameEditorMode === 'embedded-game') {
-      const { previewDebuggerServer } = this.props;
-      if (!previewDebuggerServer) return;
-      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-        previewDebuggerServer.sendMessage(debuggerId, {
-          command: 'zoomToFitContent',
-          payload: {
-            visibleScreenArea,
-          },
-        });
-      });
+      changeViewPosition('zoomToFitContent');
     }
   };
 
@@ -1941,18 +1917,8 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
     editorDisplay.viewControls.zoomToFitSelection();
 
-    const visibleScreenArea = editorDisplay.getInstanceEditorArea();
     if (this.props.gameEditorMode === 'embedded-game') {
-      const { previewDebuggerServer } = this.props;
-      if (!previewDebuggerServer) return;
-      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-        previewDebuggerServer.sendMessage(debuggerId, {
-          command: 'zoomToFitSelection',
-          payload: {
-            visibleScreenArea,
-          },
-        });
-      });
+      changeViewPosition('zoomToFitSelection');
     }
   };
 

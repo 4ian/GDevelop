@@ -373,6 +373,10 @@ namespace gdjs {
             );
             this._runtimegame.pause(wasPaused);
           }
+        } else if (data.command === 'setVisibleStatus') {
+          if (inGameEditor) {
+            inGameEditor.setVisibleStatus(data.visible);
+          }
         } else if (data.command === 'updateInstances') {
           if (inGameEditor) {
             inGameEditor.reloadInstances(data.payload.instances);

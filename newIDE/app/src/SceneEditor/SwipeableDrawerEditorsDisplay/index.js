@@ -33,7 +33,7 @@ import {
   type InstanceOrObjectPropertiesEditorInterface,
 } from '../InstanceOrObjectPropertiesEditorContainer';
 import { useDoNowOrAfterRender } from '../../Utils/UseDoNowOrAfterRender';
-import { instancesEditorEmbeddedGameFrameHoleId } from '../MosaicEditorsDisplay';
+import { EmbeddedGameFrameHole } from '../../EmbeddedGame/EmbeddedGameFrameHole';
 
 export const swipeableDrawerContainerId = 'swipeable-drawer-container';
 
@@ -82,6 +82,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     onSelectInstances,
     onInstancesModified,
     onExtensionInstalled,
+    isActive,
   } = props;
   const selectedInstances = props.instancesSelection.getSelectedInstances();
   const { values } = React.useContext(PreferencesContext);
@@ -98,6 +99,8 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
   const objectsListDoNowOrAfterRender = useDoNowOrAfterRender<?ObjectsListInterface>(
     objectsListRef
   );
+  const bottomContainerRef = React.useRef<?HTMLDivElement>(null);
+  const [bottomContainerHeight, setBottomContainerHeight] = React.useState(0);
 
   const [selectedEditorId, setSelectedEditorId] = React.useState<?EditorId>(
     null
@@ -188,9 +191,13 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     else editor.pauseSceneRendering();
   }, []);
 
-  const getInstanceEditorArea = React.useCallback(
-    () => ({ minX: 0, minY: 0, maxX: 1, maxY: 1 }),
-    []
+  React.useLayoutEffect(
+    () => {
+      if (bottomContainerRef.current) {
+        setBottomContainerHeight(bottomContainerRef.current.clientHeight || 0);
+      }
+    },
+    [drawerOpeningState]
   );
 
   React.useImperativeHandle(ref, () => {
@@ -198,7 +205,6 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
 
     return {
       getName: () => 'swipeableDrawer',
-      getInstanceEditorArea,
       forceUpdateInstancesList,
       forceUpdatePropertiesEditor,
       forceUpdateObjectsList,
@@ -287,7 +293,10 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
             scope="scene-editor-canvas"
           >
             {gameEditorMode === 'embedded-game' ? (
-              <div id={instancesEditorEmbeddedGameFrameHoleId} />
+              <EmbeddedGameFrameHole
+                marginBottom={bottomContainerHeight}
+                isActive={isActive}
+              />
             ) : (
               <InstancesEditor
                 ref={editorRef}
@@ -329,7 +338,11 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
               />
             )}
           </ErrorBoundary>
-          <div style={styles.bottomContainer} id={swipeableDrawerContainerId}>
+          <div
+            style={styles.bottomContainer}
+            id={swipeableDrawerContainerId}
+            ref={bottomContainerRef}
+          >
             <SwipeableDrawer
               maxHeight={height}
               title={title}

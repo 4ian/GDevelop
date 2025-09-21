@@ -340,6 +340,19 @@ namespace gdjs {
       }
     }
 
+    /**
+     * Return true if any mouse button is pressed.
+     * @return true if any mouse button is pressed.
+     */
+    anyMouseButtonPressed(): boolean {
+      for (const buttonCode in this._pressedMouseButtons) {
+        if (this._pressedMouseButtons[buttonCode]) {
+          return true;
+        }
+      }
+      return false;
+    }
+
     _setMouseButtonPressed(buttonCode: number): void {
       this._pressedMouseButtons[buttonCode] = true;
       this._releasedMouseButtons[buttonCode] = false;

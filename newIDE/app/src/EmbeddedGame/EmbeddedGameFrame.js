@@ -7,6 +7,11 @@ import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
 import Text from '../UI/Text';
 import classes from './EmbeddedGameFrame.module.css';
 import { type DropTargetMonitor } from 'react-dnd';
+import { registerOpenedDialogsCountCallback } from '../UI/Dialog';
+import {
+  getActiveEmbeddedGameFrameHoleRect,
+  registerActiveEmbeddedGameFrameHoleCountCallback,
+} from './EmbeddedGameFrameHole';
 
 type AttachToPreviewOptions = {|
   previewIndexHtmlLocation: string,
@@ -52,6 +57,12 @@ const isHotReloadNeeded = (hotReloadSteps: HotReloadSteps): boolean =>
   hotReloadSteps.shouldReloadLibraries ||
   hotReloadSteps.shouldReloadResources;
 
+type ChangeViewPositionCommand =
+  | 'centerViewOnLastSelectedInstance'
+  | 'zoomToInitialPosition'
+  | 'zoomToFitContent'
+  | 'zoomToFitSelection';
+
 type SwitchToSceneEditionOptions = {|
   ...PreviewInGameEditorTarget,
   ...HotReloadSteps,
@@ -82,6 +93,9 @@ let onPreventGameFramePointerEvents: null | ((enabled: boolean) => void) = null;
 let onSetCameraState:
   | null
   | ((editorId: string, cameraState: EditorCameraState) => void) = null;
+let onChangeViewPosition:
+  | null
+  | ((command: ChangeViewPositionCommand) => void) = null;
 
 export const setEmbeddedGameFramePreviewLocation = ({
   previewIndexHtmlLocation,
@@ -129,6 +143,11 @@ export const preventGameFramePointerEvents = (enabled: boolean) => {
   if (!onPreventGameFramePointerEvents)
     throw new Error('No EmbeddedGameFrame registered.');
   onPreventGameFramePointerEvents(enabled);
+};
+
+export const changeViewPosition = (command: ChangeViewPositionCommand) => {
+  if (!onChangeViewPosition) return;
+  onChangeViewPosition(command);
 };
 
 const logSwitchingInfo = ({
@@ -361,6 +380,40 @@ export const EmbeddedGameFrame = ({
           });
         });
       };
+      onChangeViewPosition = (command: ChangeViewPositionCommand) => {
+        const iframe = iframeRef.current;
+        if (!iframe) return;
+
+        const embeddedGameFrameRect = iframe.getBoundingClientRect();
+        const embeddedGameFrameHoleRect = getActiveEmbeddedGameFrameHoleRect();
+        if (!embeddedGameFrameHoleRect || !embeddedGameFrameRect) return;
+
+        if (!previewDebuggerServer) return;
+        previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+          previewDebuggerServer.sendMessage(debuggerId, {
+            command,
+            payload: {
+              visibleScreenArea: {
+                minX:
+                  (embeddedGameFrameHoleRect.left -
+                    embeddedGameFrameRect.left) /
+                  embeddedGameFrameRect.width,
+                minY:
+                  (embeddedGameFrameHoleRect.top - embeddedGameFrameRect.top) /
+                  embeddedGameFrameRect.height,
+                maxX:
+                  (embeddedGameFrameHoleRect.right -
+                    embeddedGameFrameRect.left) /
+                  embeddedGameFrameRect.width,
+                maxY:
+                  (embeddedGameFrameHoleRect.bottom -
+                    embeddedGameFrameRect.top) /
+                  embeddedGameFrameRect.height,
+              },
+            },
+          });
+        });
+      };
     },
     [
       previewDebuggerServer,
@@ -407,6 +460,45 @@ export const EmbeddedGameFrame = ({
           dropped,
         });
       });
+    },
+    [previewDebuggerServer]
+  );
+
+  React.useEffect(
+    () => {
+      let hasSomeDialogOpen = false;
+      let hasSomeEmbeddedGameFrameHoleActive = false;
+
+      const sendInGameEditorVisibleStatus = () => {
+        if (previewDebuggerServer) {
+          previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+            previewDebuggerServer.sendMessage(debuggerId, {
+              command: 'setVisibleStatus',
+              visible: !hasSomeDialogOpen && hasSomeEmbeddedGameFrameHoleActive,
+            });
+          });
+        }
+      };
+
+      const unregisterDialogOpenCallback = registerOpenedDialogsCountCallback(
+        ({ openedDialogsCount }) => {
+          hasSomeDialogOpen = openedDialogsCount > 0;
+          sendInGameEditorVisibleStatus();
+        }
+      );
+
+      const unregisterEmbeddedGameFrameHoleActiveCallback = registerActiveEmbeddedGameFrameHoleCountCallback(
+        ({ activeEmbeddedGameFrameHoleCount }) => {
+          hasSomeEmbeddedGameFrameHoleActive =
+            activeEmbeddedGameFrameHoleCount > 0;
+          sendInGameEditorVisibleStatus();
+        }
+      );
+
+      return () => {
+        unregisterDialogOpenCallback();
+        unregisterEmbeddedGameFrameHoleActiveCallback();
+      };
     },
     [previewDebuggerServer]
   );

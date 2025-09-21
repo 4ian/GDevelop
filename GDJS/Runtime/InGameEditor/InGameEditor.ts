@@ -403,6 +403,11 @@ namespace gdjs {
     private _tempVector2d: THREE.Vector2 = new THREE.Vector2();
     private _raycaster: THREE.Raycaster = new THREE.Raycaster();
 
+    private _targetFrameRate = 60;
+    private _isVisible = true;
+    private _timeSinceLastFrame = 0;
+    private _timeSinceLastInteraction = 0;
+
     private _editorCamera;
 
     /** Keep track of the focus to know if the game was blurred since the last frame. */
@@ -1685,6 +1690,10 @@ namespace gdjs {
       }
     }
 
+    setVisibleStatus(visible: boolean) {
+      this._isVisible = visible;
+    }
+
     private _sendSelectionUpdate(options?: {
       hasSelectedObjectBeenModified?: boolean;
       isSendingBackSelectionForDefaultSize?: boolean;
@@ -2423,7 +2432,45 @@ namespace gdjs {
       }
     }
 
-    updateAndRender() {
+    private _updateTargetFramerate(elapsedTime: float) {
+      const inputManager = this._runtimeGame.getInputManager();
+      if (
+        inputManager.anyKeyPressed() ||
+        inputManager.anyMouseButtonPressed() ||
+        inputManager.getAllTouchIdentifiers().length > 0 ||
+        inputManager.getMouseWheelDelta() !== 0 ||
+        inputManager.getMouseWheelDeltaX() !== 0 ||
+        inputManager.getMouseWheelDeltaZ() !== 0
+      ) {
+        this._timeSinceLastInteraction = 0;
+      }
+      this._timeSinceLastInteraction += elapsedTime;
+
+      // Adapt the framerate to avoid consuming too much CPU when the editor is not visible
+      // or not interacted with.
+      if (!this._isVisible) {
+        this._targetFrameRate = 1;
+      } else {
+        if (this._timeSinceLastInteraction > 1000) {
+          this._targetFrameRate = 10;
+        } else {
+          this._targetFrameRate = 60;
+        }
+      }
+    }
+
+    updateAndRender(elapsedTime: float) {
+      // Update the target framerate first so that if there is an interaction, we **immediately**
+      // go to max framerate (and we don't wait for a frame to pass at the current, probably slow framerate).
+      this._updateTargetFramerate(elapsedTime);
+
+      // Basic frame rate limiting.
+      this._timeSinceLastFrame += elapsedTime;
+      if (this._timeSinceLastFrame < 1000 / this._targetFrameRate) {
+        return;
+      }
+      this._timeSinceLastFrame = 0;
+
       const objectUnderCursor: gdjs.RuntimeObject | null =
         this.getObjectUnderCursor();
 

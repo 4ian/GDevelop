@@ -28,6 +28,11 @@ import {
   addDefaultLightToAllLayers,
   addDefaultLightToLayer,
 } from '../ProjectCreation/CreateProject';
+import { retryIfFailed } from '../Utils/RetryIfFailed';
+import newNameGenerator from '../Utils/NewNameGenerator';
+import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
+import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
+import { swapAsset } from '../AssetStore/AssetSwapper';
 
 const gd: libGDevelop = global.gd;
 
@@ -55,6 +60,9 @@ export type EditorFunctionCallResult =
 
 export type EditorFunctionGenericOutput = {|
   success: boolean,
+  meta?: {
+    newSceneNames?: Array<string>,
+  },
   message?: string,
   eventsAsText?: string,
   objectName?: string,
@@ -69,9 +77,14 @@ export type EditorFunctionGenericOutput = {|
   aiGeneratedEventId?: string,
   warnings?: string,
 
+  initializedProject?: boolean,
+  initializedFromTemplateSlug?: string,
+  eventsAsTextByScene?: { [string]: string },
+
   // Used for de-duplication of outputs:
   eventsForSceneNamed?: string,
   instancesForSceneNamed?: string,
+  instancesOnlyForObjectsNamed?: string, // Must be combined with `instancesForSceneNamed`.
   propertiesLayersEffectsForSceneNamed?: string,
   objectPropertiesDeduplicationKey?: string,
 |};
@@ -99,6 +112,7 @@ export type AssetSearchAndInstallResult = {|
   status: 'asset-installed' | 'nothing-found' | 'error',
   message: string,
   createdObjects: Array<gdObject>,
+  assetShortHeader: AssetShortHeader | null,
 |};
 
 export type AssetSearchAndInstallOptions = {|
@@ -123,6 +137,13 @@ export type EditorCallbacks = {|
         | 'none',
     |}
   ) => void,
+  onCreateProject: ({|
+    name: string,
+    exampleSlug: string | null,
+  |}) => Promise<{|
+    createdProject: gdProject | null,
+    exampleSlug: string | null,
+  |}>,
 |};
 
 export type SceneEventsOutsideEditorChanges = {|
@@ -134,39 +155,68 @@ export type InstancesOutsideEditorChanges = {|
   scene: gdLayout,
 |};
 
+type RenderForEditorOptions = {|
+  project: gdProject | null,
+  args: any,
+  editorCallbacks: EditorCallbacks,
+  shouldShowDetails: boolean,
+|};
+
+type LaunchFunctionOptionsWithoutProject = {|
+  args: any,
+  editorCallbacks: EditorCallbacks,
+  generateEvents: (
+    options: EventsGenerationOptions
+  ) => Promise<EventsGenerationResult>,
+  onSceneEventsModifiedOutsideEditor: (
+    changes: SceneEventsOutsideEditorChanges
+  ) => void,
+  onInstancesModifiedOutsideEditor: (
+    changes: InstancesOutsideEditorChanges
+  ) => void,
+  ensureExtensionInstalled: (options: {|
+    extensionName: string,
+  |}) => Promise<void>,
+  searchAndInstallAsset: (
+    options: AssetSearchAndInstallOptions
+  ) => Promise<AssetSearchAndInstallResult>,
+|};
+
+type LaunchFunctionOptionsWithProject = {|
+  ...LaunchFunctionOptionsWithoutProject,
+  project: gdProject,
+|};
+
 /**
  * A function that does something in the editor on the given project.
  */
 export type EditorFunction = {|
-  renderForEditor: (options: {|
-    project: gdProject | null,
-    args: any,
-    editorCallbacks: EditorCallbacks,
-    shouldShowDetails: boolean,
-  |}) => {|
+  renderForEditor: (
+    options: RenderForEditorOptions
+  ) => {|
     text: React.Node,
     details?: ?React.Node,
     hasDetailsToShow?: boolean,
   |},
-  launchFunction: (options: {|
-    project: gdProject,
-    args: any,
-    generateEvents: (
-      options: EventsGenerationOptions
-    ) => Promise<EventsGenerationResult>,
-    onSceneEventsModifiedOutsideEditor: (
-      changes: SceneEventsOutsideEditorChanges
-    ) => void,
-    onInstancesModifiedOutsideEditor: (
-      changes: InstancesOutsideEditorChanges
-    ) => void,
-    ensureExtensionInstalled: (options: {|
-      extensionName: string,
-    |}) => Promise<void>,
-    searchAndInstallAsset: (
-      options: AssetSearchAndInstallOptions
-    ) => Promise<AssetSearchAndInstallResult>,
-  |}) => Promise<EditorFunctionGenericOutput>,
+  launchFunction: (
+    options: LaunchFunctionOptionsWithProject
+  ) => Promise<EditorFunctionGenericOutput>,
+|};
+
+/**
+ * A function that does something in the editor.
+ */
+export type EditorFunctionWithoutProject = {|
+  renderForEditor: (
+    options: RenderForEditorOptions
+  ) => {|
+    text: React.Node,
+    details?: ?React.Node,
+    hasDetailsToShow?: boolean,
+  |},
+  launchFunction: (
+    options: LaunchFunctionOptionsWithoutProject
+  ) => Promise<EditorFunctionGenericOutput>,
 |};
 
 /**
@@ -191,6 +241,40 @@ const makeGenericSuccess = (message: string): EditorFunctionGenericOutput => ({
   success: true,
   message,
 });
+
+const makeMultipleChangesOutput = (
+  changes: Array<string>,
+  warnings: Array<string>
+): EditorFunctionGenericOutput => {
+  if (changes.length === 0 && warnings.length === 0) {
+    return {
+      success: false,
+      message: 'No changes were made.',
+    };
+  } else if (changes.length === 0 && warnings.length > 0) {
+    return {
+      success: false,
+      message: [
+        'No changes were made because of these issues:',
+        ...warnings,
+      ].join('\n'),
+    };
+  } else if (changes.length > 0 && warnings.length === 0) {
+    return {
+      success: true,
+      message: ['Successfully done the changes.', ...changes].join('\n'),
+    };
+  }
+
+  return {
+    success: true,
+    message: [
+      'Successfully done some changes but some issues were found - see the warnings.',
+      ...changes,
+      ...warnings,
+    ].join('\n'),
+  };
+};
 
 const shouldHideProperty = (property: gdPropertyDescriptor): boolean => {
   return (
@@ -280,6 +364,7 @@ const makeShortTextForNamedProperty = (
     type.toLowerCase() === 'choice'
       ? [
           ...mapVector(property.getChoices(), choice => choice.getValue()),
+          // TODO Remove this once we made sure no built-in extension still use `addExtraInfo` instead of `addChoice`.
           ...property.getExtraInfo().toJSArray(),
         ]
       : null;
@@ -294,16 +379,61 @@ const makeShortTextForNamedProperty = (
   return `${name}: ${value} (${information.join(', ')})`;
 };
 
+const listLabelAndValuesFromChangedProperties = (
+  changed_properties: Array<any>
+) => {
+  return changed_properties
+    .map(changed_property => {
+      const propertyName = SafeExtractor.extractStringProperty(
+        changed_property,
+        'property_name'
+      );
+      const newValue = SafeExtractor.extractStringProperty(
+        changed_property,
+        'new_value'
+      );
+      if (propertyName === null || newValue === null) {
+        return null;
+      }
+      return {
+        label: propertyName,
+        newValue: newValue,
+      };
+    })
+    .filter(Boolean);
+};
+
 /**
  * Creates a new object in the specified scene
  */
-const createObject: EditorFunction = {
+const createOrReplaceObject: EditorFunction = {
   renderForEditor: ({ args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
+    const replaceExistingObject = SafeExtractor.extractBooleanProperty(
+      args,
+      'replace_existing_object'
+    );
 
     return {
-      text: (
+      text: replaceExistingObject ? (
+        <Trans>
+          Replace object <b>{object_name}</b> in scene{' '}
+          <Link
+            href="#"
+            onClick={() =>
+              editorCallbacks.onOpenLayout(scene_name, {
+                openEventsEditor: true,
+                openSceneEditor: true,
+                focusWhenOpened: 'scene',
+              })
+            }
+          >
+            {scene_name}
+          </Link>
+          .
+        </Trans>
+      ) : (
         <Trans>
           Create object <b>{object_name}</b> in scene{' '}
           <Link
@@ -332,6 +462,10 @@ const createObject: EditorFunction = {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_type = extractRequiredString(args, 'object_type');
     const object_name = extractRequiredString(args, 'object_name');
+    const shouldReplaceExistingObject = SafeExtractor.extractBooleanProperty(
+      args,
+      'replace_existing_object'
+    );
     const description = SafeExtractor.extractStringProperty(
       args,
       'description'
@@ -374,104 +508,183 @@ const createObject: EditorFunction = {
       return propertiesText;
     };
 
-    // Check if object with this name already exists
-    if (objectsContainer.hasObjectNamed(object_name)) {
-      if (objectsContainer.getObject(object_name).getType() !== object_type) {
+    const createNewObject = async () => {
+      // First try to search and install an object from the asset store.
+      try {
+        const { status, message, createdObjects } = await searchAndInstallAsset(
+          {
+            scene: layout,
+            objectName: object_name,
+            objectType: object_type,
+            searchTerms: search_terms || '',
+            description: description || '',
+            twoDimensionalViewKind: two_dimensional_view_kind || '',
+          }
+        );
+
+        if (status === 'error') {
+          return makeGenericFailure(
+            `Unable to search and install object (${message}).`
+          );
+        } else if (status === 'asset-installed') {
+          if (createdObjects.length === 1) {
+            const object = createdObjects[0];
+            return makeGenericSuccess(
+              [
+                `Created (from the asset store) object "${object.getName()}" of type "${object.getType()}" in scene "${scene_name}".`,
+                getPropertiesText(object),
+              ].join(' ')
+            );
+          }
+
+          return makeGenericSuccess(
+            `Created (from the asset store) ${createdObjects
+              .map(
+                object =>
+                  `object "${object.getName()}" of type "${object.getType()}"`
+              )
+              .join(', ')} in scene "${scene_name}".`
+          );
+        } else {
+          // No asset found - we'll create an object from scratch.
+        }
+      } catch (error) {
         return makeGenericFailure(
-          `Object with name "${object_name}" already exists in scene "${scene_name}" but with a different type ("${object_type}").`
+          `An unexpected error happened while search and installing objects (${
+            error.message
+          }).`
         );
       }
 
-      return makeGenericSuccess(
-        `Object with name "${object_name}" already exists, no need to re-create it.`
+      // Create an object from scratch:
+      // Ensure the extension for this object type is installed.
+      if (object_type.includes('::')) {
+        const extensionName = object_type.split('::')[0];
+        try {
+          await ensureExtensionInstalled({ extensionName });
+        } catch (error) {
+          console.error(
+            `Could not get extension "${extensionName}" installed:`,
+            error
+          );
+          return makeGenericFailure(
+            `Could not install extension "${extensionName}" - should you consider trying with another object type?`
+          );
+        }
+      }
+
+      // Ensure the object type is valid.
+      const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+        project.getCurrentPlatform(),
+        object_type
       );
-    }
-
-    // First try to search and install an object from the asset store.
-    try {
-      const { status, message, createdObjects } = await searchAndInstallAsset({
-        scene: layout,
-        objectName: object_name,
-        objectType: object_type,
-        searchTerms: search_terms || '',
-        description: description || '',
-        twoDimensionalViewKind: two_dimensional_view_kind || '',
-      });
-
-      if (status === 'error') {
+      if (gd.MetadataProvider.isBadObjectMetadata(objectMetadata)) {
         return makeGenericFailure(
-          `Unable to search and install object (${message}).`
+          `Type "${object_type}" does not exist for objects.`
         );
-      } else if (status === 'asset-installed') {
-        if (createdObjects.length === 1) {
-          const object = createdObjects[0];
+      }
+
+      const object = objectsContainer.insertNewObject(
+        project,
+        object_type,
+        object_name,
+        objectsContainer.getObjectsCount()
+      );
+      return makeGenericSuccess(
+        [
+          `Created a new object (from scratch) called "${object_name}" of type "${object_type}" in scene "${scene_name}".`,
+          getPropertiesText(object),
+        ].join(' ')
+      );
+    };
+
+    const replaceExistingObject = async () => {
+      const object = objectsContainer.getObject(object_name);
+
+      // First try to search and install an object from the asset store.
+      try {
+        const replacementObjectName = newNameGenerator(
+          object_name + 'Replacement',
+          name => objectsContainer.hasObjectNamed(name)
+        );
+        const {
+          status,
+          message,
+          createdObjects,
+          assetShortHeader,
+        } = await searchAndInstallAsset({
+          scene: layout,
+          objectName: replacementObjectName,
+          objectType: object_type,
+          searchTerms: search_terms || '',
+          description: description || '',
+          twoDimensionalViewKind: two_dimensional_view_kind || '',
+        });
+
+        if (status === 'error') {
+          // TODO
+          return makeGenericFailure(
+            `Unable to search and install object (${message}).`
+          );
+        } else if (
+          status === 'asset-installed' &&
+          createdObjects.length > 0 &&
+          assetShortHeader
+        ) {
+          swapAsset(
+            project,
+            PixiResourcesLoader,
+            object,
+            createdObjects[0],
+            assetShortHeader
+          );
+
+          for (const createdObject of createdObjects) {
+            objectsContainer.removeObject(createdObject.getName());
+          }
+
           return makeGenericSuccess(
-            [
-              `Created (from the asset store) object "${object.getName()}" of type "${object.getType()}" in scene "${scene_name}".`,
-              getPropertiesText(object),
-            ].join(' ')
+            `Replaced object "${object.getName()}" by an object from the asset store fitting the search.`
+          );
+        } else {
+          // No asset found.
+        }
+      } catch (error) {
+        return makeGenericFailure(
+          `An unexpected error happened while search and installing objects (${
+            error.message
+          }).`
+        );
+      }
+
+      return makeGenericFailure(
+        `Could not find an object in the asset store to replace "${object_name}" in scene "${scene_name}". Instead, inspect properties of the object and modify it until it matches what you want it to be.`
+      );
+    };
+
+    if (!shouldReplaceExistingObject) {
+      // Add a new object.
+      if (objectsContainer.hasObjectNamed(object_name)) {
+        if (objectsContainer.getObject(object_name).getType() !== object_type) {
+          return makeGenericFailure(
+            `Object with name "${object_name}" already exists in scene "${scene_name}" but with a different type ("${object_type}").`
           );
         }
 
         return makeGenericSuccess(
-          `Created (from the asset store) ${createdObjects
-            .map(
-              object =>
-                `object "${object.getName()}" of type "${object.getType()}"`
-            )
-            .join(', ')} in scene "${scene_name}".`
-        );
-      } else {
-        // No asset found - we'll create an object from scratch.
-      }
-    } catch (error) {
-      return makeGenericFailure(
-        `An unexpected error happened while search and installing objects (${
-          error.message
-        }).`
-      );
-    }
-
-    // Create an object from scratch:
-    // Ensure the extension for this object type is installed.
-    if (object_type.includes('::')) {
-      const extensionName = object_type.split('::')[0];
-      try {
-        await ensureExtensionInstalled({ extensionName });
-      } catch (error) {
-        console.error(
-          `Could not get extension "${extensionName}" installed:`,
-          error
-        );
-        return makeGenericFailure(
-          `Could not install extension "${extensionName}" - should you consider trying with another object type?`
+          `Object with name "${object_name}" already exists, no need to re-create it.`
         );
       }
-    }
 
-    // Ensure the object type is valid.
-    const objectMetadata = gd.MetadataProvider.getObjectMetadata(
-      project.getCurrentPlatform(),
-      object_type
-    );
-    if (gd.MetadataProvider.isBadObjectMetadata(objectMetadata)) {
-      return makeGenericFailure(
-        `Type "${object_type}" does not exist for objects.`
-      );
-    }
+      return createNewObject();
+    } else {
+      // Replace an existing object, if there is one existing.
+      if (!objectsContainer.hasObjectNamed(object_name)) {
+        return createNewObject();
+      }
 
-    const object = objectsContainer.insertNewObject(
-      project,
-      object_type,
-      object_name,
-      objectsContainer.getObjectsCount()
-    );
-    return makeGenericSuccess(
-      [
-        `Created a new object (from scratch) called "${object_name}" of type "${object_type}" in scene "${scene_name}".`,
-        getPropertiesText(object),
-      ].join(' ')
-    );
+      return replaceExistingObject();
+    }
   },
 };
 
@@ -576,110 +789,258 @@ const inspectObjectProperties: EditorFunction = {
   },
 };
 
+const isPropertyForChangingObjectName = (propertyName: string): boolean => {
+  return (
+    propertyName.toLowerCase() === 'name' ||
+    propertyName.toLowerCase().replace(/-|_| /, '') === 'objectname'
+  );
+};
+
 /**
  * Changes a property of a specific object in a scene
  */
 const changeObjectProperty: EditorFunction = {
-  renderForEditor: ({ project, args, editorCallbacks }) => {
+  renderForEditor: ({ project, shouldShowDetails, args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
-    const property_name = extractRequiredString(args, 'property_name');
-    const new_value = extractRequiredString(args, 'new_value');
+    const changed_properties =
+      SafeExtractor.extractArrayProperty(args, 'changed_properties') || [];
 
-    const makeText = (propertyLabel: string) => {
+    const renderChanges = (
+      changes: Array<{ label: string, newValue: string }>
+    ) => {
+      if (changes.length === 1) {
+        const { label, newValue } = changes[0];
+        return {
+          text:
+            label === 'name' ? (
+              <Trans>
+                Rename object "{object_name}" to "<b>{newValue}</b>"" (in scene{' '}
+                {scene_name}).
+              </Trans>
+            ) : (
+              <Trans>
+                Change property "<b>{label}</b>" of object <b>{object_name}</b>{' '}
+                (in scene {scene_name}) to <b>{newValue}</b>.
+              </Trans>
+            ),
+        };
+      }
+
       return {
         text: (
           <Trans>
-            Change property "<b>{propertyLabel}</b>" of object{' '}
-            <b>{object_name}</b> (in scene{' '}
-            <Link
-              href="#"
-              onClick={() =>
-                editorCallbacks.onOpenLayout(scene_name, {
-                  openEventsEditor: true,
-                  openSceneEditor: true,
-                  focusWhenOpened: 'scene',
-                })
-              }
-            >
-              {scene_name}
-            </Link>
-            ) to <b>{new_value}</b>.
+            Change {changes.length} properties of object {object_name} (in scene{' '}
+            {scene_name}).
           </Trans>
         ),
+        hasDetailsToShow: true,
+        details: shouldShowDetails ? (
+          <ColumnStackLayout noMargin>
+            {changes.map(change =>
+              change.label === 'name' ? (
+                <Text key={change.label} noMargin>
+                  Renamed object to {change.newValue}.
+                </Text>
+              ) : (
+                <Text key={change.label} noMargin>
+                  <b>{change.label}</b> set to {change.newValue}.
+                </Text>
+              )
+            )}
+          </ColumnStackLayout>
+        ) : null,
       };
     };
 
     if (!project || !project.hasLayoutNamed(scene_name)) {
-      return makeText(property_name);
+      return renderChanges(
+        listLabelAndValuesFromChangedProperties(changed_properties)
+      );
     }
 
     const layout = project.getLayout(scene_name);
     const objectsContainer = layout.getObjects();
 
     if (!objectsContainer.hasObjectNamed(object_name)) {
-      return makeText(property_name);
+      return renderChanges(
+        listLabelAndValuesFromChangedProperties(changed_properties)
+      );
     }
 
     const object = objectsContainer.getObject(object_name);
     const objectConfiguration = object.getConfiguration();
     const objectProperties = objectConfiguration.getProperties();
 
-    const { foundProperty } = findPropertyByName({
-      properties: objectProperties,
-      name: property_name,
-    });
+    const changes = changed_properties
+      .map(changed_property => {
+        const propertyName = SafeExtractor.extractStringProperty(
+          changed_property,
+          'property_name'
+        );
+        const newValue = SafeExtractor.extractStringProperty(
+          changed_property,
+          'new_value'
+        );
+        if (propertyName === null || newValue === null) {
+          return null;
+        }
 
-    return makeText(foundProperty ? foundProperty.getLabel() : property_name);
+        if (isPropertyForChangingObjectName(propertyName)) {
+          return {
+            label: 'name',
+            newValue: newValue,
+          };
+        }
+
+        const { foundProperty } = findPropertyByName({
+          properties: objectProperties,
+          name: propertyName,
+        });
+
+        return {
+          label: foundProperty ? foundProperty.getLabel() : propertyName,
+          newValue: newValue,
+        };
+      })
+      .filter(Boolean);
+
+    return renderChanges(changes);
   },
   launchFunction: async ({ project, args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
-    const property_name = extractRequiredString(args, 'property_name');
-    const new_value = extractRequiredString(args, 'new_value');
+    const changed_properties =
+      SafeExtractor.extractArrayProperty(args, 'changed_properties') || [];
 
     if (!project.hasLayoutNamed(scene_name)) {
       return makeGenericFailure(`Scene not found: "${scene_name}".`);
     }
 
     const layout = project.getLayout(scene_name);
-    const objectsContainer = layout.getObjects();
 
-    if (!objectsContainer.hasObjectNamed(object_name)) {
+    let isGlobalObject = false;
+    let object: gdObject | null = null;
+
+    if (layout.getObjects().hasObjectNamed(object_name)) {
+      object = layout.getObjects().getObject(object_name);
+    } else if (project.getObjects().hasObjectNamed(object_name)) {
+      object = project.getObjects().getObject(object_name);
+      isGlobalObject = true;
+    }
+
+    if (!object) {
       return makeGenericFailure(
-        `Object not found: "${object_name}" in scene "${scene_name}".`
+        `Object not found: "${object_name}" in scene "${scene_name}", nor in the global objects.`
       );
     }
 
-    const object = objectsContainer.getObject(object_name);
-    const objectConfiguration = object.getConfiguration();
-    const objectProperties = objectConfiguration.getProperties();
+    const warnings = [];
+    const changes = [];
 
-    const { foundPropertyName, foundProperty } = findPropertyByName({
-      properties: objectProperties,
-      name: property_name,
+    changed_properties.forEach(changed_property => {
+      if (!object) return;
+
+      const propertyName = SafeExtractor.extractStringProperty(
+        changed_property,
+        'property_name'
+      );
+      const newValue = SafeExtractor.extractStringProperty(
+        changed_property,
+        'new_value'
+      );
+      if (propertyName === null || newValue === null) {
+        warnings.push(
+          `Missing "property_name" or "new_value" in an item of \`changed_properties\`: ${JSON.stringify(
+            changed_property
+          )}. It was ignored and not changed.`
+        );
+        return;
+      }
+
+      // Renaming an object is a special case by using a property called "name".
+      if (isPropertyForChangingObjectName(propertyName)) {
+        if (object.getName() === newValue) {
+          changes.push(
+            `Object "${object_name}" already has the name "${newValue}", no need to rename it. Continue assuming this name is correct and valid.`
+          );
+          return;
+        }
+
+        const objectsContainersList = gd.ObjectsContainersList.makeNewObjectsContainersListForProjectAndLayout(
+          project,
+          layout
+        );
+
+        const newName = newNameGenerator(
+          gd.Project.getSafeName(newValue),
+          tentativeNewName =>
+            objectsContainersList.hasObjectOrGroupNamed(tentativeNewName)
+        );
+
+        if (layout) {
+          if (isGlobalObject) {
+            gd.WholeProjectRefactorer.globalObjectOrGroupRenamed(
+              project,
+              object.getName(),
+              newName,
+              /* isObjectGroup=*/ false
+            );
+          } else {
+            gd.WholeProjectRefactorer.objectOrGroupRenamedInScene(
+              project,
+              layout,
+              object.getName(),
+              newName,
+              /* isObjectGroup=*/ false
+            );
+          }
+        }
+        // Note: gd.WholeProjectRefactorer.objectOrGroupRenamedInEventsBasedObject to be added here
+        // if events-based objects can be handled by AI one day.
+
+        object.setName(newName);
+
+        changes.push(
+          `Renamed object "${object_name}" to "${newName}". Events and everything else refering to this object having been also updated. Continue assuming the object has now the name "${newName}" and the whole project has been updated for it.`
+        );
+        return;
+      }
+
+      // Changing a "usual" property of an object:
+      const objectConfiguration = object.getConfiguration();
+      const objectProperties = objectConfiguration.getProperties();
+
+      const { foundPropertyName, foundProperty } = findPropertyByName({
+        properties: objectProperties,
+        name: propertyName,
+      });
+
+      if (!foundPropertyName) {
+        warnings.push(
+          `Property not found: ${propertyName} on object ${object_name}.`
+        );
+        return;
+      }
+
+      if (
+        !objectConfiguration.updateProperty(
+          foundPropertyName,
+          sanitizePropertyNewValue(foundProperty, newValue)
+        )
+      ) {
+        warnings.push(
+          `Could not change property "${foundPropertyName}" of object "${object_name}". The value might be invalid, of the wrong type or not allowed.`
+        );
+        return;
+      }
+
+      changes.push(
+        `Changed property "${foundPropertyName}" of object "${object_name}" to "${newValue}".`
+      );
     });
 
-    if (!foundPropertyName) {
-      return makeGenericFailure(
-        `Property not found: ${property_name} on object ${object_name}.`
-      );
-    }
-
-    if (
-      !objectConfiguration.updateProperty(
-        foundPropertyName,
-        sanitizePropertyNewValue(foundProperty, new_value)
-      )
-    ) {
-      return makeGenericFailure(
-        `Could not change property "${foundPropertyName}" of object "${object_name}". The value might be invalid, of the wrong type or not allowed.`
-      );
-    }
-
-    return makeGenericSuccess(
-      `Changed property "${foundPropertyName}" of object "${object_name}" to "${new_value}".`
-    );
+    return makeMultipleChangesOutput(changes, warnings);
   },
 };
 
@@ -910,15 +1271,26 @@ const removeBehavior: EditorFunction = {
 
     if (!object.hasBehaviorNamed(behavior_name)) {
       return makeGenericFailure(
-        `Behavior not found: "${behavior_name}" on object "${object_name}".`
+        `Behavior not found: "${behavior_name}" on object "${object_name}". So it was not removed.`
       );
     }
 
+    const dependentBehaviors = gd.WholeProjectRefactorer.findDependentBehaviorNames(
+      project,
+      object,
+      behavior_name
+    ).toJSArray();
+
     // Remove the behavior
     object.removeBehavior(behavior_name);
+    dependentBehaviors.forEach(name => object.removeBehavior(name));
 
     return makeGenericSuccess(
-      `Removed behavior "${behavior_name}" from object "${object_name}".`
+      dependentBehaviors.length > 0
+        ? `Removed behavior "${behavior_name}" from object "${object_name}". Dependent behaviors were also removed as they were based on this behavior: ${dependentBehaviors.join(
+            ', '
+          )}.`
+        : `Removed behavior "${behavior_name}" from object "${object_name}".`
     );
   },
 };
@@ -1013,52 +1385,82 @@ const inspectBehaviorProperties: EditorFunction = {
  * Changes a property of a specific behavior attached to an object
  */
 const changeBehaviorProperty: EditorFunction = {
-  renderForEditor: ({ project, args, editorCallbacks }) => {
+  renderForEditor: ({ project, shouldShowDetails, args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const behavior_name = extractRequiredString(args, 'behavior_name');
-    const property_name = extractRequiredString(args, 'property_name');
-    const new_value = extractRequiredString(args, 'new_value');
+    const changed_properties =
+      SafeExtractor.extractArrayProperty(args, 'changed_properties') || [];
 
-    const makeText = (propertyLabel: string) => {
+    const renderChanges = (
+      changes: Array<{ label: string, newValue: string }>
+    ) => {
+      if (changes.length === 1) {
+        const { label, newValue } = changes[0];
+        return {
+          text: (
+            <Trans>
+              Change property "<b>{label}</b>" of behavior {behavior_name} on
+              object <b>{object_name}</b> (in scene{' '}
+              <Link
+                href="#"
+                onClick={() =>
+                  editorCallbacks.onOpenLayout(scene_name, {
+                    openEventsEditor: true,
+                    openSceneEditor: true,
+                    focusWhenOpened: 'scene',
+                  })
+                }
+              >
+                {scene_name}
+              </Link>
+              ) to <b>{newValue}</b>.
+            </Trans>
+          ),
+        };
+      }
+
       return {
         text: (
           <Trans>
-            Change property "<b>{propertyLabel}</b>" of behavior {behavior_name}{' '}
-            on object <b>{object_name}</b> (in scene{' '}
-            <Link
-              href="#"
-              onClick={() =>
-                editorCallbacks.onOpenLayout(scene_name, {
-                  openEventsEditor: true,
-                  openSceneEditor: true,
-                  focusWhenOpened: 'scene',
-                })
-              }
-            >
-              {scene_name}
-            </Link>
-            ) to <b>{new_value}</b>.
+            Changed {changes.length} properties of behavior {behavior_name} on
+            object {object_name} (in scene {scene_name}).
           </Trans>
         ),
+        hasDetailsToShow: true,
+        details: shouldShowDetails ? (
+          <ColumnStackLayout noMargin>
+            {changes.map(change => (
+              <Text key={change.label} noMargin>
+                <b>{change.label}</b> set to {change.newValue}.
+              </Text>
+            ))}
+          </ColumnStackLayout>
+        ) : null,
       };
     };
 
     if (!project || !project.hasLayoutNamed(scene_name)) {
-      return makeText(property_name);
+      return renderChanges(
+        listLabelAndValuesFromChangedProperties(changed_properties)
+      );
     }
 
     const layout = project.getLayout(scene_name);
     const objectsContainer = layout.getObjects();
 
     if (!objectsContainer.hasObjectNamed(object_name)) {
-      return makeText(property_name);
+      return renderChanges(
+        listLabelAndValuesFromChangedProperties(changed_properties)
+      );
     }
 
     const object = objectsContainer.getObject(object_name);
 
     if (!object.hasBehaviorNamed(behavior_name)) {
-      return makeText(property_name);
+      return renderChanges(
+        listLabelAndValuesFromChangedProperties(changed_properties)
+      );
     }
 
     const behavior = object.getBehavior(behavior_name);
@@ -1074,32 +1476,57 @@ const changeBehaviorProperty: EditorFunction = {
       behaviorSharedDataProperties = behaviorSharedData.getProperties();
     }
 
-    const behaviorPropertySearch = findPropertyByName({
-      properties: behaviorProperties,
-      name: property_name,
-    });
+    const changes = changed_properties
+      .map(changed_property => {
+        const propertyName = SafeExtractor.extractStringProperty(
+          changed_property,
+          'property_name'
+        );
+        const newValue = SafeExtractor.extractStringProperty(
+          changed_property,
+          'new_value'
+        );
+        if (propertyName === null || newValue === null) {
+          return null;
+        }
 
-    const behaviorSharedDataPropertySearch = findPropertyByName({
-      properties: behaviorSharedDataProperties,
-      name: property_name,
-    });
+        const behaviorPropertySearch = findPropertyByName({
+          properties: behaviorProperties,
+          name: propertyName,
+        });
 
-    if (behaviorPropertySearch.foundProperty) {
-      return makeText(behaviorPropertySearch.foundProperty.getLabel());
-    } else if (behaviorSharedDataPropertySearch.foundProperty) {
-      return makeText(
-        behaviorSharedDataPropertySearch.foundProperty.getLabel()
-      );
-    } else {
-      return makeText(property_name);
-    }
+        const behaviorSharedDataPropertySearch = findPropertyByName({
+          properties: behaviorSharedDataProperties,
+          name: propertyName,
+        });
+
+        if (behaviorPropertySearch.foundProperty) {
+          return {
+            label: behaviorPropertySearch.foundProperty.getLabel(),
+            newValue: newValue,
+          };
+        } else if (behaviorSharedDataPropertySearch.foundProperty) {
+          return {
+            label: behaviorSharedDataPropertySearch.foundProperty.getLabel(),
+            newValue: newValue,
+          };
+        } else {
+          return {
+            label: propertyName,
+            newValue: newValue,
+          };
+        }
+      })
+      .filter(Boolean);
+
+    return renderChanges(changes);
   },
   launchFunction: async ({ project, args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const behavior_name = extractRequiredString(args, 'behavior_name');
-    const property_name = extractRequiredString(args, 'property_name');
-    const new_value = extractRequiredString(args, 'new_value');
+    const changedProperties =
+      SafeExtractor.extractArrayProperty(args, 'changed_properties') || [];
 
     if (!project.hasLayoutNamed(scene_name)) {
       return makeGenericFailure(`Scene not found: "${scene_name}".`);
@@ -1136,59 +1563,85 @@ const changeBehaviorProperty: EditorFunction = {
       behaviorSharedDataProperties = behaviorSharedData.getProperties();
     }
 
-    const behaviorPropertySearch = findPropertyByName({
-      properties: behaviorProperties,
-      name: property_name,
-    });
+    const warnings = [];
+    const changes = [];
 
-    const behaviorSharedDataPropertySearch = findPropertyByName({
-      properties: behaviorSharedDataProperties,
-      name: property_name,
-    });
-
-    if (behaviorPropertySearch.foundPropertyName) {
-      const { foundPropertyName, foundProperty } = behaviorPropertySearch;
-      if (
-        !behavior.updateProperty(
-          foundPropertyName,
-          sanitizePropertyNewValue(foundProperty, new_value)
-        )
-      ) {
-        return makeGenericFailure(
-          `Could not change property "${foundPropertyName}" of behavior "${behavior_name}". The value might be invalid, of the wrong type or not allowed.`
+    changedProperties.forEach(changed_property => {
+      const propertyName = SafeExtractor.extractStringProperty(
+        changed_property,
+        'property_name'
+      );
+      const newValue = SafeExtractor.extractStringProperty(
+        changed_property,
+        'new_value'
+      );
+      if (propertyName === null || newValue === null) {
+        warnings.push(
+          `Missing "property_name" or "new_value" in an item of \`changed_properties\`: ${JSON.stringify(
+            changed_property
+          )}. It was ignored and not changed.`
         );
+        return;
       }
 
-      return makeGenericSuccess(
-        `Changed property "${foundPropertyName}" of behavior "${behavior_name}" to "${new_value}".`
-      );
-    } else if (
-      behaviorSharedData &&
-      behaviorSharedDataPropertySearch.foundPropertyName
-    ) {
-      const {
-        foundPropertyName,
-        foundProperty,
-      } = behaviorSharedDataPropertySearch;
-      if (
-        !behaviorSharedData.updateProperty(
-          foundPropertyName,
-          sanitizePropertyNewValue(foundProperty, new_value)
-        )
+      const behaviorPropertySearch = findPropertyByName({
+        properties: behaviorProperties,
+        name: propertyName,
+      });
+
+      const behaviorSharedDataPropertySearch = findPropertyByName({
+        properties: behaviorSharedDataProperties,
+        name: propertyName,
+      });
+
+      if (behaviorPropertySearch.foundPropertyName) {
+        const { foundPropertyName, foundProperty } = behaviorPropertySearch;
+        if (
+          !behavior.updateProperty(
+            foundPropertyName,
+            sanitizePropertyNewValue(foundProperty, newValue)
+          )
+        ) {
+          warnings.push(
+            `Could not change property "${foundPropertyName}" of behavior "${behavior_name}". The value might be invalid, of the wrong type or not allowed.`
+          );
+          return;
+        }
+
+        changes.push(
+          `Changed property "${foundPropertyName}" of behavior "${behavior_name}" to "${newValue}".`
+        );
+      } else if (
+        behaviorSharedData &&
+        behaviorSharedDataPropertySearch.foundPropertyName
       ) {
-        return makeGenericFailure(
-          `Could not change shared property "${foundPropertyName}" of behavior "${behavior_name}". The value might be invalid, of the wrong type or not allowed.`
+        const {
+          foundPropertyName,
+          foundProperty,
+        } = behaviorSharedDataPropertySearch;
+        if (
+          !behaviorSharedData.updateProperty(
+            foundPropertyName,
+            sanitizePropertyNewValue(foundProperty, newValue)
+          )
+        ) {
+          warnings.push(
+            `Could not change shared property "${foundPropertyName}" of behavior "${behavior_name}". The value might be invalid, of the wrong type or not allowed.`
+          );
+          return;
+        }
+
+        changes.push(
+          `Changed property "${foundPropertyName}" of behavior "${behavior_name}" (shared between all objects having this behavior) to "${newValue}".`
+        );
+      } else {
+        warnings.push(
+          `Property "${propertyName}" not found on behavior "${behavior_name}" of object "${object_name}".`
         );
       }
+    });
 
-      return makeGenericSuccess(
-        `Changed property "${foundPropertyName}" of behavior "${behavior_name}" (shared between all objects having this behavior) to "${new_value}".`
-      );
-    } else {
-      return makeGenericFailure(
-        `Property "${property_name}" not found on behavior "${behavior_name}" of object "${object_name}".`
-      );
-    }
+    return makeMultipleChangesOutput(changes, warnings);
   },
 };
 
@@ -1221,6 +1674,15 @@ const describeInstances: EditorFunction = {
   },
   launchFunction: async ({ project, args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
+    const filter_by_object_name =
+      SafeExtractor.extractStringProperty(args, 'filter_by_object_name') || '';
+
+    const objectNames = new Set(
+      filter_by_object_name
+        .split(',')
+        .map(name => name.trim().toLowerCase())
+        .filter(Boolean)
+    );
 
     if (!project.hasLayoutNamed(scene_name)) {
       return makeGenericFailure(`Scene not found: "${scene_name}".`);
@@ -1238,6 +1700,13 @@ const describeInstances: EditorFunction = {
 
       getInstancesInLayoutForLayer(initialInstances, layerName).forEach(
         instance => {
+          if (
+            objectNames.size > 0 &&
+            !objectNames.has(instance.getObjectName().toLowerCase())
+          ) {
+            return;
+          }
+
           const serializedInstance = serializeToJSObject(instance);
           instances.push({
             ...serializedInstance,
@@ -1253,11 +1722,20 @@ const describeInstances: EditorFunction = {
       );
     });
 
-    return {
-      success: true,
-      instances: instances,
-      instancesForSceneNamed: scene_name,
-    };
+    if (objectNames.size > 0) {
+      return {
+        success: true,
+        instances: instances,
+        instancesForSceneNamed: scene_name,
+        instancesOnlyForObjectsNamed: [...objectNames].sort().join(','),
+      };
+    } else {
+      return {
+        success: true,
+        instances: instances,
+        instancesForSceneNamed: scene_name,
+      };
+    }
   },
 };
 
@@ -1286,7 +1764,10 @@ const iterateOnInstances = (initialInstances, callback) => {
 const put2dInstances: EditorFunction = {
   renderForEditor: ({ args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
-    const object_name = extractRequiredString(args, 'object_name');
+    const object_name = SafeExtractor.extractStringProperty(
+      args,
+      'object_name'
+    );
     const layer_name = extractRequiredString(args, 'layer_name');
     const brush_kind = extractRequiredString(args, 'brush_kind');
     const brush_position = SafeExtractor.extractStringProperty(
@@ -1320,8 +1801,7 @@ const put2dInstances: EditorFunction = {
       return {
         text: (
           <Trans>
-            Erase {existingInstanceCount} instance(s) of object {object_name}{' '}
-            (layer: {layer_name || 'base'}) in scene {scene_name}.
+            Erase {existingInstanceCount} instance(s) in scene {scene_name}.
           </Trans>
         ),
       };
@@ -1374,7 +1854,10 @@ const put2dInstances: EditorFunction = {
   },
   launchFunction: async ({ project, args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
-    const object_name = extractRequiredString(args, 'object_name');
+    const object_name = SafeExtractor.extractStringProperty(
+      args,
+      'object_name'
+    );
     const layer_name = extractRequiredString(args, 'layer_name');
     const brush_kind = extractRequiredString(args, 'brush_kind');
     const brush_position = SafeExtractor.extractStringProperty(
@@ -1410,12 +1893,6 @@ const put2dInstances: EditorFunction = {
     const layout = project.getLayout(scene_name);
     const objectsContainer = layout.getObjects();
 
-    if (!objectsContainer.hasObjectNamed(object_name)) {
-      return makeGenericFailure(
-        `Object not found: "${object_name}" in scene "${scene_name}".`
-      );
-    }
-
     // Check if layer exists (empty string is allowed for base layer)
     if (layer_name !== '' && !layout.hasLayerNamed(layer_name)) {
       return makeGenericFailure(
@@ -1440,8 +1917,6 @@ const put2dInstances: EditorFunction = {
       const notFoundExistingInstanceIds = new Set<string>(existingInstanceIds);
 
       iterateOnInstances(initialInstances, instance => {
-        if (instance.getObjectName() !== object_name) return;
-
         const foundExistingInstanceId = existingInstanceIds.find(id =>
           instance.getPersistentUuid().startsWith(id)
         );
@@ -1450,6 +1925,8 @@ const put2dInstances: EditorFunction = {
           notFoundExistingInstanceIds.delete(foundExistingInstanceId);
           return;
         }
+
+        if (instance.getObjectName() !== object_name) return;
 
         if (!brushPosition) return;
         if (instance.getLayer() !== layer_name) return; // Layer must be the same as specified when deleting instances with a brush.
@@ -1482,7 +1959,7 @@ const put2dInstances: EditorFunction = {
         [
           `Erased ${instancesToDelete.size} instance${
             instancesToDelete.size > 1 ? 's' : ''
-          } of object "${object_name}" on layer "${layer_name || 'base'}".`,
+          }.`,
           notFoundExistingInstanceIds.size > 0
             ? `Could not find these instances to erase:
         ${Array.from(notFoundExistingInstanceIds).join(
@@ -1522,6 +1999,18 @@ const put2dInstances: EditorFunction = {
       // Track changes for detailed success message
       const changes = [];
 
+      if (newInstancesCount > 0 && !object_name) {
+        changes.push(
+          `You've specified to create ${newInstancesCount} instances, but you didn't specify the object name. Please specify the object name.`
+        );
+      }
+      // TODO: make this work for global objects.
+      if (object_name && !objectsContainer.hasObjectNamed(object_name)) {
+        return makeGenericFailure(
+          `Object not found: "${object_name}" in scene "${scene_name}". Please only specify the object name of an object existing in the scene (or create if before if necessary).`
+        );
+      }
+
       // Store original states of existing instances for comparison
       const existingInstanceStates = new Map();
       const notFoundExistingInstanceIds = new Set<string>(existingInstanceIds);
@@ -1529,8 +2018,6 @@ const put2dInstances: EditorFunction = {
       // Create the array of existing instances to move/modify, and new instances to create.
       const modifiedAndCreatedInstances: Array<gdInitialInstance> = [];
       iterateOnInstances(initialInstances, instance => {
-        if (instance.getObjectName() !== object_name) return;
-
         const foundExistingInstanceId = existingInstanceIds.find(id =>
           instance.getPersistentUuid().startsWith(id)
         );
@@ -1564,7 +2051,7 @@ const put2dInstances: EditorFunction = {
 
       for (let i = 0; i < newInstancesCount; i++) {
         const instance = initialInstances.insertNewInitialInstance();
-        instance.setObjectName(object_name);
+        instance.setObjectName(object_name || '');
         instance.setLayer(layer_name);
         modifiedAndCreatedInstances.push(instance);
       }
@@ -1672,7 +2159,8 @@ const put2dInstances: EditorFunction = {
         changes.push(
           `Created ${newInstancesCount} new instance${
             newInstancesCount > 1 ? 's' : ''
-          } of object "${object_name}" using ${brush_kind} brush at ${brushPosition.join(
+          } of object "${object_name ||
+            ''}" using ${brush_kind} brush at ${brushPosition.join(
             ', '
           )} on layer "${layer_name || 'base'}".`
         );
@@ -1800,7 +2288,10 @@ const put2dInstances: EditorFunction = {
 const put3dInstances: EditorFunction = {
   renderForEditor: ({ args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
-    const object_name = extractRequiredString(args, 'object_name');
+    const object_name = SafeExtractor.extractStringProperty(
+      args,
+      'object_name'
+    );
     const layer_name = extractRequiredString(args, 'layer_name');
     const brush_kind = extractRequiredString(args, 'brush_kind');
     const brush_position = SafeExtractor.extractStringProperty(
@@ -1834,8 +2325,7 @@ const put3dInstances: EditorFunction = {
       return {
         text: (
           <Trans>
-            Erase {existingInstanceCount} instance(s) of object {object_name}{' '}
-            (layer: {layer_name || 'base'}) in scene {scene_name}.
+            Erase {existingInstanceCount} instance(s) in scene {scene_name}.
           </Trans>
         ),
       };
@@ -1888,7 +2378,10 @@ const put3dInstances: EditorFunction = {
   },
   launchFunction: async ({ project, args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
-    const object_name = extractRequiredString(args, 'object_name');
+    const object_name = SafeExtractor.extractStringProperty(
+      args,
+      'object_name'
+    );
     const layer_name = extractRequiredString(args, 'layer_name');
     const brush_kind = extractRequiredString(args, 'brush_kind');
     const brush_position = SafeExtractor.extractStringProperty(
@@ -1924,12 +2417,6 @@ const put3dInstances: EditorFunction = {
     const layout = project.getLayout(scene_name);
     const objectsContainer = layout.getObjects();
 
-    if (!objectsContainer.hasObjectNamed(object_name)) {
-      return makeGenericFailure(
-        `Object not found: "${object_name}" in scene "${scene_name}".`
-      );
-    }
-
     // Check if layer exists (empty string is allowed for base layer)
     if (layer_name !== '' && !layout.hasLayerNamed(layer_name)) {
       return makeGenericFailure(
@@ -1954,8 +2441,6 @@ const put3dInstances: EditorFunction = {
       const notFoundExistingInstanceIds = new Set<string>(existingInstanceIds);
 
       iterateOnInstances(initialInstances, instance => {
-        if (instance.getObjectName() !== object_name) return;
-
         const foundExistingInstanceId = existingInstanceIds.find(id =>
           instance.getPersistentUuid().startsWith(id)
         );
@@ -1964,6 +2449,8 @@ const put3dInstances: EditorFunction = {
           notFoundExistingInstanceIds.delete(foundExistingInstanceId);
           return;
         }
+
+        if (instance.getObjectName() !== object_name) return;
 
         if (!brushPosition) return;
         if (instance.getLayer() !== layer_name) return; // Layer must be the same as specified when deleting instances with a brush.
@@ -1998,7 +2485,7 @@ const put3dInstances: EditorFunction = {
         [
           `Erased ${instancesToDelete.size} instance${
             instancesToDelete.size > 1 ? 's' : ''
-          } of object "${object_name}" on layer "${layer_name || 'base'}".`,
+          }.`,
           notFoundExistingInstanceIds.size > 0
             ? `Could not find these instances to erase:
         ${Array.from(notFoundExistingInstanceIds).join(
@@ -2031,6 +2518,18 @@ const put3dInstances: EditorFunction = {
       // Track changes for detailed success message
       const changes = [];
 
+      if (newInstancesCount > 0 && !object_name) {
+        changes.push(
+          `You've specified to create ${newInstancesCount} instances, but you didn't specify the object name. Please specify the object name.`
+        );
+      }
+      // TODO: make this work for global objects.
+      if (object_name && !objectsContainer.hasObjectNamed(object_name)) {
+        return makeGenericFailure(
+          `Object not found: "${object_name}" in scene "${scene_name}". Please only specify the object name of an object existing in the scene (or create if before if necessary).`
+        );
+      }
+
       // Store original states of existing instances for comparison
       const existingInstanceStates = new Map();
       const notFoundExistingInstanceIds = new Set<string>(existingInstanceIds);
@@ -2038,8 +2537,6 @@ const put3dInstances: EditorFunction = {
       // Create the array of existing instances to move/modify, and new instances to create.
       const modifiedAndCreatedInstances: Array<gdInitialInstance> = [];
       iterateOnInstances(initialInstances, instance => {
-        if (instance.getObjectName() !== object_name) return;
-
         const foundExistingInstanceId = existingInstanceIds.find(id =>
           instance.getPersistentUuid().startsWith(id)
         );
@@ -2076,7 +2573,7 @@ const put3dInstances: EditorFunction = {
 
       for (let i = 0; i < newInstancesCount; i++) {
         const instance = initialInstances.insertNewInitialInstance();
-        instance.setObjectName(object_name);
+        instance.setObjectName(object_name || '');
         instance.setLayer(layer_name);
         modifiedAndCreatedInstances.push(instance);
       }
@@ -2169,7 +2666,8 @@ const put3dInstances: EditorFunction = {
         changes.push(
           `Created ${newInstancesCount} new instance${
             newInstancesCount > 1 ? 's' : ''
-          } of object "${object_name}" using ${brush_kind} brush at ${brushPosition.join(
+          } of object "${object_name ||
+            ''}" using ${brush_kind} brush at ${brushPosition.join(
             ', '
           )} on layer "${layer_name || 'base'}".`
         );
@@ -2710,11 +3208,15 @@ const createScene: EditorFunction = {
     }
     addDefaultLightToAllLayers(scene);
 
-    return makeGenericSuccess(
-      include_ui_layer
+    return {
+      success: true,
+      message: include_ui_layer
         ? `Created new scene "${scene_name}" with the base layer and a layer called "UI".`
-        : `Created new scene "${scene_name}".`
-    );
+        : `Created new scene "${scene_name}".`,
+      meta: {
+        newSceneNames: [scene_name],
+      },
+    };
   },
 };
 
@@ -2954,7 +3456,7 @@ const changeScenePropertiesLayersEffects: EditorFunction = {
         );
         if (propertyName === null || newValue === null) {
           warnings.push(
-            `Missing "property_name" or "new_value" in the changed_property object: ${JSON.stringify(
+            `Missing "property_name" or "new_value" in an item of \`changed_properties\`: ${JSON.stringify(
               changed_property
             )}. It was ignored and not changed.`
           );
@@ -3229,7 +3731,7 @@ const changeScenePropertiesLayersEffects: EditorFunction = {
             );
             if (propertyName === null || newValue === null) {
               warnings.push(
-                `Missing "property_name" or "new_value" in an item of changed_properties. It was ignored and not changed. Make sure you follow the exact format for changing effect properties.`
+                `Missing "property_name" or "new_value" in an item of \`changed_properties\`. It was ignored and not changed. Make sure you follow the exact format for changing effect properties.`
               );
               return;
             }
@@ -3461,8 +3963,95 @@ const addOrEditVariable: EditorFunction = {
   },
 };
 
+const initializeProject: EditorFunctionWithoutProject = {
+  renderForEditor: ({ args }) => {
+    const project_name = extractRequiredString(args, 'project_name');
+
+    return {
+      text: (
+        <Trans>
+          Initializing a new game project "{<b>{project_name}</b>}".
+        </Trans>
+      ),
+    };
+  },
+  launchFunction: async ({ args, editorCallbacks }) => {
+    const project_name = extractRequiredString(args, 'project_name');
+    const template_slug = extractRequiredString(args, 'template_slug');
+    const also_read_existing_events = SafeExtractor.extractBooleanProperty(
+      args,
+      'also_read_existing_events'
+    );
+
+    try {
+      const requestedExampleSlug = ['', 'none', 'empty'].includes(
+        template_slug.toLowerCase()
+      )
+        ? null
+        : template_slug;
+      const { exampleSlug, createdProject } = await retryIfFailed(
+        { times: 2 },
+        () =>
+          editorCallbacks.onCreateProject({
+            name: project_name,
+            exampleSlug: requestedExampleSlug,
+          })
+      );
+
+      if (!createdProject) {
+        throw new Error('Unexpected null project after creation.');
+      }
+
+      const output: EditorFunctionGenericOutput = {
+        success: true,
+      };
+
+      if (also_read_existing_events) {
+        const eventsAsTextByScene = {};
+        mapFor(0, createdProject.getLayoutsCount(), i => {
+          const scene = createdProject.getLayoutAt(i);
+          const events = scene.getEvents();
+          eventsAsTextByScene[
+            scene.getName()
+          ] = renderNonTranslatedEventsAsText({
+            eventsList: events,
+          });
+        });
+
+        output.eventsAsTextByScene = eventsAsTextByScene;
+      }
+
+      if (exampleSlug) {
+        output.message = `Initialized project using starter game template "${exampleSlug}".`;
+        output.initializedProject = true;
+        output.initializedFromTemplateSlug = exampleSlug;
+      } else {
+        if (template_slug) {
+          output.message = `Initialized project but this is an empty project.`;
+          output.initializedProject = true;
+        } else {
+          output.message = `Initialized empty project.`;
+          output.initializedProject = true;
+        }
+      }
+      output.meta = {
+        newSceneNames: mapFor(0, createdProject.getLayoutsCount(), i =>
+          createdProject.getLayoutAt(i).getName()
+        ),
+      };
+
+      return output;
+    } catch (error) {
+      return makeGenericFailure(
+        'Unable to initialize project. This might be because of a network error. Please try again.'
+      );
+    }
+  },
+};
+
 export const editorFunctions: { [string]: EditorFunction } = {
-  create_object: createObject,
+  create_object: createOrReplaceObject,
+  create_or_replace_object: createOrReplaceObject,
   inspect_object_properties: inspectObjectProperties,
   change_object_property: changeObjectProperty,
   add_behavior: addBehavior,
@@ -3479,4 +4068,10 @@ export const editorFunctions: { [string]: EditorFunction } = {
   inspect_scene_properties_layers_effects: inspectScenePropertiesLayersEffects,
   change_scene_properties_layers_effects: changeScenePropertiesLayersEffects,
   add_or_edit_variable: addOrEditVariable,
+};
+
+export const editorFunctionsWithoutProject: {
+  [string]: EditorFunctionWithoutProject,
+} = {
+  initialize_project: initializeProject,
 };

@@ -18,7 +18,9 @@ import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import classes from './FunctionCallRow.module.css';
 import {
   editorFunctions,
+  editorFunctionsWithoutProject,
   type EditorFunction,
+  type EditorFunctionWithoutProject,
   type EditorCallbacks,
 } from '../../EditorFunctions';
 import Link from '../../UI/Link';
@@ -84,8 +86,10 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
     !!editorFunctionCallResult &&
     editorFunctionCallResult.status === 'working';
 
-  const editorFunction: EditorFunction | null =
-    editorFunctions[functionCall.name] || null;
+  const editorFunction: EditorFunction | EditorFunctionWithoutProject | null =
+    editorFunctions[functionCall.name] ||
+    editorFunctionsWithoutProject[functionCall.name] ||
+    null;
   let text;
   let details;
   let hasDetailsToShow = false;

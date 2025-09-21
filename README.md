@@ -36,7 +36,7 @@ GDevelop is composed of an **editor**, a **game engine**, an **ecosystem** of ex
 | `GDJS`        | The game engine, written in TypeScript, using PixiJS and Three.js for 2D and 3D rendering (WebGL), powering all GDevelop games.                                                                                                                                                                          |
 | `GDevelop.js` | Bindings of `Core`, `GDJS` and `Extensions` to JavaScript (with WebAssembly), used by the IDE.                                                                                                                                                                                                           |
 | `newIDE`      | The game editor, written in JavaScript with React, Electron, PixiJS and Three.js.js.                                                                                                                                                                                                                     |
-| `Extensions`  | Built-in extensions for the game engine, providing objects, behaviors and new features. For example, this includes the physics engines running in WebAssembly (Box2D or Jolt Physics for 3D). All the [community extensions are on this repository](https://github.com/GDevelopApp/GDevelop-extensions). |
+| `Extensions`  | Built-in extensions for the game engine, providing objects, behaviors and new features. For example, this includes the physics engines running in WebAssembly (Box2D or Jolt Physics for 3D). All the [official and experimental extensions are on this repository](https://github.com/GDevelopApp/GDevelop-extensions). [Community extensions are available here](https://github.com/GDevelopApp/GDevelop-community-list). |
 
 To learn more about GDevelop Architecture, read the [architecture overview here](Core/GDevelop-Architecture-Overview.md).
 
@@ -52,7 +52,7 @@ Status of the tests and builds: [![macOS and Linux build status](https://circlec
 - [GDevelop homepage](https://gdevelop.io).
 - [GDevelop wiki (documentation)](https://wiki.gdevelop.io/gdevelop5/start).
 - Help translate GDevelop in your language: [GDevelop project on Crowdin](https://crowdin.com/project/gdevelop).
-- Open-source [extensions](https://github.com/GDevelopApp/GDevelop-extensions), [examples](https://github.com/GDevelopApp/GDevelop-examples), [tutorials](https://github.com/GDevelopApp/GDevelop-tutorials) are on GitHub.
+- Open-source [extensions (official or experimental)](https://github.com/GDevelopApp/GDevelop-extensions), [community extensions](https://github.com/GDevelopApp/GDevelop-community-list), [examples](https://github.com/GDevelopApp/GDevelop-examples), [tutorials](https://github.com/GDevelopApp/GDevelop-tutorials) are on GitHub.
 
 ### Development Roadmap
 

@@ -1,4 +1,5 @@
 // @flow
+import { serializeToJSObject } from '../Utils/Serializer';
 import { applyVariableChange } from './ApplyVariableChange';
 
 const gd: libGDevelop = global.gd;
@@ -394,6 +395,143 @@ describe('applyVariableChange', () => {
       const variable = variablesContainer.get('testString');
       expect(variable.getType()).toBe(gd.Variable.String);
       expect(variable.getString()).toBe('123abc');
+    });
+
+    it('should recognize JSON and parse it (object => structure)', () => {
+      const result = applyVariableChange({
+        variablePath: 'testString',
+        forcedVariableType: null,
+        variablesContainer,
+        value:
+          '{"a": 1, "b": "2", "c": [3, 4], "d": {"e": 5, "f": null, "g": true, "h": false}}',
+      });
+      expect(result.variableType).toBe('Structure');
+
+      const variable = variablesContainer.get('testString');
+      expect(variable.getType()).toBe(gd.Variable.Structure);
+      expect(serializeToJSObject(variable)).toMatchInlineSnapshot(`
+        Object {
+          "children": Array [
+            Object {
+              "name": "a",
+              "type": "number",
+              "value": 1,
+            },
+            Object {
+              "name": "b",
+              "type": "string",
+              "value": "2",
+            },
+            Object {
+              "children": Array [
+                Object {
+                  "type": "number",
+                  "value": 3,
+                },
+                Object {
+                  "type": "number",
+                  "value": 4,
+                },
+              ],
+              "name": "c",
+              "type": "array",
+            },
+            Object {
+              "children": Array [
+                Object {
+                  "name": "e",
+                  "type": "number",
+                  "value": 5,
+                },
+                Object {
+                  "name": "f",
+                  "type": "string",
+                  "value": "null",
+                },
+                Object {
+                  "name": "g",
+                  "type": "boolean",
+                  "value": true,
+                },
+                Object {
+                  "name": "h",
+                  "type": "boolean",
+                  "value": false,
+                },
+              ],
+              "name": "d",
+              "type": "structure",
+            },
+          ],
+          "type": "structure",
+        }
+      `);
+    });
+
+    it('should recognize JSON and parse it (object => structure)', () => {
+      const result = applyVariableChange({
+        variablePath: 'testString',
+        forcedVariableType: null,
+        variablesContainer,
+        value: '[1, "2", [3, 4], {"e": 5, "f": null, "g": true, "h": false}]',
+      });
+      expect(result.variableType).toBe('Array');
+
+      const variable = variablesContainer.get('testString');
+      expect(variable.getType()).toBe(gd.Variable.Array);
+      expect(serializeToJSObject(variable)).toMatchInlineSnapshot(`
+        Object {
+          "children": Array [
+            Object {
+              "type": "number",
+              "value": 1,
+            },
+            Object {
+              "type": "string",
+              "value": "2",
+            },
+            Object {
+              "children": Array [
+                Object {
+                  "type": "number",
+                  "value": 3,
+                },
+                Object {
+                  "type": "number",
+                  "value": 4,
+                },
+              ],
+              "type": "array",
+            },
+            Object {
+              "children": Array [
+                Object {
+                  "name": "e",
+                  "type": "number",
+                  "value": 5,
+                },
+                Object {
+                  "name": "f",
+                  "type": "string",
+                  "value": "null",
+                },
+                Object {
+                  "name": "g",
+                  "type": "boolean",
+                  "value": true,
+                },
+                Object {
+                  "name": "h",
+                  "type": "boolean",
+                  "value": false,
+                },
+              ],
+              "type": "structure",
+            },
+          ],
+          "type": "array",
+        }
+      `);
     });
   });
 });

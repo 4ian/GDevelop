@@ -157,10 +157,15 @@ export const BundleStoreStateProvider = ({
         });
 
         if (bundleListingData) {
+          const priceForUsageType = bundleListingData.prices.find(
+            price => price.usageType === 'default'
+          );
           sendBundleInformationOpened({
             bundleName: bundleListingData.name,
             bundleId: bundleListingData.id,
             source: 'web-link',
+            priceValue: priceForUsageType && priceForUsageType.value,
+            priceCurrency: priceForUsageType && priceForUsageType.currency,
           });
           shopNavigationState.openBundleInformationPage({
             bundleListingData,

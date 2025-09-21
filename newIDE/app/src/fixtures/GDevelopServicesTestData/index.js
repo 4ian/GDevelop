@@ -1648,7 +1648,7 @@ export const newerVersionExtensionShortHeader: ExtensionShortHeader = {
 
 export const alreadyInstalledCommunityExtensionShortHeader: ExtensionShortHeader = {
   ...fireBulletExtensionShortHeader,
-  tier: 'community',
+  tier: 'experimental',
   name: 'SomeAlreadyInstalledExtension',
 };
 
@@ -1731,12 +1731,12 @@ export const incompatibleButtonV4ExtensionShortHeader: ExtensionShortHeader = {
 };
 
 export const communityTierExtensionShortHeader: ExtensionShortHeader = {
-  tier: 'community',
+  tier: 'experimental',
   authorIds: [],
   shortDescription:
-    'This is an example of an extension that is a community extension (not reviewed).',
+    'This is an example of an extension that is an experimental extension.',
   extensionNamespace: '',
-  fullName: 'Fake Community extension',
+  fullName: 'Fake experimental extension',
   name: 'FakeCommunityExtension',
   version: '0.0.2',
   url:

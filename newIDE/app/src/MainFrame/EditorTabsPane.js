@@ -53,6 +53,7 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import useOnResize from '../Utils/UseOnResize';
 import DrawerTopBar from '../UI/DrawerTopBar';
 import { type FloatingPaneState } from './PanesContainer';
+import { type CreateProjectResult } from '../Utils/UseCreateProject';
 
 const styles = {
   container: {
@@ -188,13 +189,15 @@ export type EditorTabsPaneCommonProps = {|
     privateGameTemplateListingData: ?PrivateGameTemplateListingData,
     preventBackHome?: boolean,
   |}) => void,
-  createEmptyProject: (newProjectSetup: NewProjectSetup) => Promise<void>,
+  createEmptyProject: (
+    newProjectSetup: NewProjectSetup
+  ) => Promise<CreateProjectResult>,
   createProjectFromExample: (
     exampleShortHeader: ExampleShortHeader,
     newProjectSetup: NewProjectSetup,
     i18n: I18nType,
     isQuickCustomization?: boolean
-  ) => Promise<void>,
+  ) => Promise<CreateProjectResult>,
   onOpenProfileDialog: () => void,
   openLanguageDialog: (open: boolean) => void,
   openPreferencesDialog: (open: boolean) => void,

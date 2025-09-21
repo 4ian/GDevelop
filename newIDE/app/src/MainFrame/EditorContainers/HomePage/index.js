@@ -48,6 +48,7 @@ import {
   setEditorHotReloadNeeded,
   type HotReloadSteps,
 } from '../../../EmbeddedGame/EmbeddedGameFrame';
+import { type CreateProjectResult } from '../../../Utils/UseCreateProject';
 
 const noop = () => {};
 
@@ -155,7 +156,7 @@ type Props = {|
     newProjectSetup: NewProjectSetup,
     i18n: I18nType,
     isQuickCustomization?: boolean
-  ) => Promise<void>,
+  ) => Promise<CreateProjectResult>,
   onOpenTemplateFromTutorial: (tutorialId: string) => Promise<void>,
   onOpenTemplateFromCourseChapter: (
     CourseChapter,

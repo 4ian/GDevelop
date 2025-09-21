@@ -268,8 +268,9 @@ const BundlePageHeader = ({
           bundleId: bundle.id,
           bundleName: bundle.name,
           bundleTag: bundle.tag,
-          currency: price ? price.currency : undefined,
           usageType: 'default',
+          priceValue: price && price.value,
+          priceCurrency: price && price.currency,
         });
 
         setPurchasingBundleListingData(bundleListingData);

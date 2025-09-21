@@ -455,7 +455,8 @@ const PrivateAssetPackInformationPage = ({
           assetPackTag: assetPack.tag,
           assetPackKind: 'private',
           usageType: selectedUsageType,
-          currency: price ? price.currency : undefined,
+          priceValue: price && price.value,
+          priceCurrency: price && price.currency,
         });
 
         setPurchasingPrivateAssetPackListingData(privateAssetPackListingData);
@@ -487,15 +488,6 @@ const PrivateAssetPackInformationPage = ({
         return;
       }
 
-      sendAssetPackBuyClicked({
-        assetPackId: assetPack.id,
-        assetPackName: assetPack.name,
-        assetPackTag: assetPack.tag,
-        assetPackKind: 'private',
-        currency: 'CREDITS',
-        usageType: selectedUsageType,
-      });
-
       const currentCreditsAmount = limits.credits.userBalance.amount;
       const assetPackPriceForUsageType = privateAssetPackListingData.creditPrices.find(
         price => price.usageType === selectedUsageType
@@ -508,6 +500,17 @@ const PrivateAssetPackInformationPage = ({
         return;
       }
       const assetPackCreditsAmount = assetPackPriceForUsageType.amount;
+
+      sendAssetPackBuyClicked({
+        assetPackId: assetPack.id,
+        assetPackName: assetPack.name,
+        assetPackTag: assetPack.tag,
+        assetPackKind: 'private',
+        priceValue: assetPackCreditsAmount,
+        priceCurrency: 'CREDITS',
+        usageType: selectedUsageType,
+      });
+
       if (currentCreditsAmount < assetPackCreditsAmount) {
         openCreditsPackageDialog({
           missingCredits: assetPackCreditsAmount - currentCreditsAmount,

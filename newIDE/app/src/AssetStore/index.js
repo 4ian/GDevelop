@@ -435,10 +435,16 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
 
         if (!receivedAssetPack || (options && options.forceProductPage)) {
           // The user has not received the pack, open the page to buy it.
+          const priceForUsageType = privateAssetPackListingData.prices.find(
+            price => price.usageType === 'default'
+          );
+
           sendAssetPackInformationOpened({
             assetPackName: privateAssetPackListingData.name,
             assetPackId: privateAssetPackListingData.id,
             assetPackKind: 'private',
+            priceValue: priceForUsageType && priceForUsageType.value,
+            priceCurrency: priceForUsageType && priceForUsageType.currency,
           });
           saveScrollPosition();
           shopNavigationState.openPrivateAssetPackInformationPage({
@@ -489,10 +495,15 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
 
     const selectPrivateGameTemplate = React.useCallback(
       (privateGameTemplateListingData: PrivateGameTemplateListingData) => {
+        const priceForUsageType = privateGameTemplateListingData.prices.find(
+          price => price.usageType === 'default'
+        );
         sendGameTemplateInformationOpened({
           gameTemplateName: privateGameTemplateListingData.name,
           gameTemplateId: privateGameTemplateListingData.id,
           source: 'store',
+          priceValue: priceForUsageType && priceForUsageType.value,
+          priceCurrency: priceForUsageType && priceForUsageType.currency,
         });
         saveScrollPosition();
         shopNavigationState.openPrivateGameTemplateInformationPage({
@@ -506,10 +517,15 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
 
     const selectBundle = React.useCallback(
       (bundleListingData: BundleListingData) => {
+        const priceForUsageType = bundleListingData.prices.find(
+          price => price.usageType === 'default'
+        );
         sendBundleInformationOpened({
           bundleName: bundleListingData.name,
           bundleId: bundleListingData.id,
           source: 'store',
+          priceValue: priceForUsageType && priceForUsageType.value,
+          priceCurrency: priceForUsageType && priceForUsageType.currency,
         });
         saveScrollPosition();
         shopNavigationState.openBundleInformationPage({
@@ -523,10 +539,15 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
 
     const selectCourse = React.useCallback(
       (courseListingData: CourseListingData) => {
+        const priceForUsageType = courseListingData.prices.find(
+          price => price.usageType === 'default'
+        );
         sendCourseInformationOpened({
           courseName: courseListingData.name,
           courseId: courseListingData.id,
           source: 'store',
+          priceValue: priceForUsageType && priceForUsageType.value,
+          priceCurrency: priceForUsageType && priceForUsageType.currency,
         });
         if (onCourseOpen) onCourseOpen(courseListingData.id);
       },

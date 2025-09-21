@@ -323,6 +323,7 @@ export class Variable extends EmscriptenObject {
   renameChild(oldName: string, newName: string): boolean;
   getAllChildrenNames(): VectorString;
   removeRecursively(variableToRemove: Variable): void;
+  clearChildren(): void;
   getAtIndex(index: number): Variable;
   pushNew(): Variable;
   removeAtIndex(index: number): void;
@@ -973,6 +974,7 @@ export class PropertyDescriptor extends EmscriptenObject {
   getDescription(): string;
   setGroup(label: string): PropertyDescriptor;
   getGroup(): string;
+  clearChoices(): PropertyDescriptor;
   addChoice(value: string, label: string): PropertyDescriptor;
   getChoices(): VectorPropertyDescriptorChoice;
   addExtraInfo(type: string): PropertyDescriptor;

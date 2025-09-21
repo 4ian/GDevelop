@@ -37,6 +37,10 @@ import {
 import { getDefaultRegisterGameProperties } from './UseGameAndBuildsManager';
 import { TutorialContext } from '../Tutorial/TutorialContext';
 
+export type CreateProjectResult = {|
+  createdProject: gdProject | null,
+|};
+
 type Props = {|
   beforeCreatingProject: () => void,
   afterCreatingProject: ({|
@@ -123,9 +127,9 @@ const useCreateProject = ({
       newProjectSource: ?NewProjectSource,
       newProjectSetup: NewProjectSetup,
       options?: { openAllScenes: boolean }
-    ) => {
+    ): Promise<CreateProjectResult> => {
       try {
-        if (!newProjectSource) return; // New project creation aborted.
+        if (!newProjectSource) return { createdProject: null }; // New project creation aborted.
 
         let state: ?State;
         const sourceStorageProvider = newProjectSource.storageProvider;
@@ -236,11 +240,11 @@ const useCreateProject = ({
           );
 
           if (!wasSaved) {
-            return; // Saving was cancelled.
+            return { createdProject: null }; // Saving was cancelled.
           }
 
           if (!fileMetadata) {
-            return;
+            return { createdProject: null };
           }
 
           onProjectSaved(fileMetadata);
@@ -272,6 +276,8 @@ const useCreateProject = ({
             dontOpenAnySceneOrProjectManager: !!newProjectSetup.dontOpenAnySceneOrProjectManager,
           },
         });
+
+        return { createdProject: currentProject };
       } catch (rawError) {
         const { getWriteErrorMessage } = getStorageProviderOperations();
         const errorMessage = getWriteErrorMessage
@@ -283,6 +289,7 @@ const useCreateProject = ({
         });
 
         onError();
+        return { createdProject: null };
       } finally {
         onSuccessOrError();
       }
@@ -306,10 +313,10 @@ const useCreateProject = ({
   );
 
   const createEmptyProject = React.useCallback(
-    async (newProjectSetup: NewProjectSetup) => {
+    async (newProjectSetup: NewProjectSetup): Promise<CreateProjectResult> => {
       beforeCreatingProject();
       const newProjectSource = createNewEmptyProject();
-      await createProject(newProjectSource, newProjectSetup);
+      return await createProject(newProjectSource, newProjectSetup);
     },
     [beforeCreatingProject, createProject]
   );
@@ -320,14 +327,14 @@ const useCreateProject = ({
       newProjectSetup: NewProjectSetup,
       i18n: I18nType,
       isQuickCustomization?: boolean
-    ) => {
+    ): Promise<CreateProjectResult> => {
       beforeCreatingProject();
       const newProjectSource = await createNewProjectFromExampleShortHeader({
         i18n,
         exampleShortHeader,
         isQuickCustomization,
       });
-      await createProject(newProjectSource, newProjectSetup);
+      return await createProject(newProjectSource, newProjectSetup);
     },
     [beforeCreatingProject, createProject]
   );
@@ -336,7 +343,7 @@ const useCreateProject = ({
     async (
       privateGameTemplateListingData: PrivateGameTemplateListingData,
       newProjectSetup: NewProjectSetup
-    ) => {
+    ): Promise<CreateProjectResult> => {
       beforeCreatingProject();
       if (!profile) {
         throw new Error(
@@ -360,13 +367,16 @@ const useCreateProject = ({
         privateGameTemplateUrl,
         privateGameTemplateListingData.id
       );
-      await createProject(newProjectSource, newProjectSetup);
+      return await createProject(newProjectSource, newProjectSetup);
     },
     [beforeCreatingProject, createProject, profile, authenticatedUser]
   );
 
   const createProjectFromInAppTutorial = React.useCallback(
-    async (tutorialId: string, newProjectSetup: NewProjectSetup) => {
+    async (
+      tutorialId: string,
+      newProjectSetup: NewProjectSetup
+    ): Promise<CreateProjectResult> => {
       beforeCreatingProject();
       const selectedInAppTutorialShortHeader = getInAppTutorialShortHeader(
         tutorialId
@@ -384,7 +394,7 @@ const useCreateProject = ({
         templateUrl,
         selectedInAppTutorialShortHeader.id
       );
-      await createProject(newProjectSource, newProjectSetup, {
+      return await createProject(newProjectSource, newProjectSetup, {
         openAllScenes: true,
       });
     },
@@ -392,7 +402,10 @@ const useCreateProject = ({
   );
 
   const createProjectFromTutorial = React.useCallback(
-    async (tutorialId: string, newProjectSetup: NewProjectSetup) => {
+    async (
+      tutorialId: string,
+      newProjectSetup: NewProjectSetup
+    ): Promise<CreateProjectResult> => {
       beforeCreatingProject();
       if (!tutorials) {
         throw new Error(`Tutorials could not be loaded`);
@@ -411,7 +424,7 @@ const useCreateProject = ({
         templateUrl,
         tutorialId
       );
-      await createProject(newProjectSource, newProjectSetup, {
+      return await createProject(newProjectSource, newProjectSetup, {
         openAllScenes: true,
       });
     },
@@ -427,8 +440,8 @@ const useCreateProject = ({
       courseChapter: CourseChapter,
       templateId?: string,
       newProjectSetup: NewProjectSetup,
-    |}) => {
-      if (courseChapter.isLocked) return;
+    |}): Promise<CreateProjectResult> => {
+      if (courseChapter.isLocked) return { createdProject: null };
       beforeCreatingProject();
       let templateUrl;
       if (courseChapter.templateUrl) {
@@ -450,7 +463,7 @@ const useCreateProject = ({
         templateUrl,
         courseChapter.id
       );
-      await createProject(newProjectSource, newProjectSetup, {
+      return await createProject(newProjectSource, newProjectSetup, {
         openAllScenes: true,
       });
     },

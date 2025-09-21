@@ -186,10 +186,15 @@ const ExampleStore = ({
               )
           : [],
         onSelectPrivateGameTemplateListingData: privateGameTemplateListingData => {
+          const priceForUsageType = privateGameTemplateListingData.prices.find(
+            price => price.usageType === 'default'
+          );
           sendGameTemplateInformationOpened({
             gameTemplateName: privateGameTemplateListingData.name,
             gameTemplateId: privateGameTemplateListingData.id,
             source: 'examples-list',
+            priceValue: priceForUsageType && priceForUsageType.value,
+            priceCurrency: priceForUsageType && priceForUsageType.currency,
           });
           onSelectPrivateGameTemplateListingData(
             privateGameTemplateListingData

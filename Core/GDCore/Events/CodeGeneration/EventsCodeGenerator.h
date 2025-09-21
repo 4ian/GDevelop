@@ -837,7 +837,7 @@ protected:
   virtual gd::String GenerateGetBehaviorNameCode(
       const gd::String& behaviorName);
 
-  void CheckBehaviorParameters(
+  bool CheckBehaviorParameters(
       const gd::Instruction &instruction,
       const gd::InstructionMetadata &instrInfos);
 

@@ -119,10 +119,15 @@ const LearnSection = ({
 
   const onOpenBundle = React.useCallback(
     (bundleListingData: BundleListingData) => {
+      const priceForUsageType = bundleListingData.prices.find(
+        price => price.usageType === 'default'
+      );
       sendBundleInformationOpened({
         bundleName: bundleListingData.name,
         bundleId: bundleListingData.id,
         source: 'learn',
+        priceValue: priceForUsageType && priceForUsageType.value,
+        priceCurrency: priceForUsageType && priceForUsageType.currency,
       });
       setSelectedBundleListingData(bundleListingData);
     },
@@ -130,18 +135,27 @@ const LearnSection = ({
   );
 
   const onOpenCourse = React.useCallback(
-    (courseId: string | null) => {
-      if (courseId && courses) {
-        const course = courses.find(c => c.id === courseId);
-        if (course && course.isLocked) {
-          // Only send the event if the course is not owned.
-          sendCourseInformationOpened({
-            courseName: course.titleByLocale['en'],
-            courseId: courseId,
-            source: 'learn',
-          });
-        }
+    (courseListingData: CourseListingData) => {
+      const courseId = courseListingData.id;
+      if (!courses) {
+        return;
       }
+
+      const course = courses.find(c => c.id === courseId);
+      if (course && course.isLocked) {
+        const priceForUsageType = courseListingData.prices.find(
+          price => price.usageType === 'default'
+        );
+        // Only send the event if the course is not owned.
+        sendCourseInformationOpened({
+          courseName: courseListingData.name,
+          courseId: courseListingData.id,
+          source: 'learn',
+          priceValue: priceForUsageType && priceForUsageType.value,
+          priceCurrency: priceForUsageType && priceForUsageType.currency,
+        });
+      }
+
       onSelectCourse(courseId);
     },
     [onSelectCourse, courses]
@@ -210,9 +224,7 @@ const LearnSection = ({
         }}
         onGameTemplateOpen={onSelectPrivateGameTemplateListingData}
         onBundleOpen={onOpenBundle}
-        onCourseOpen={courseListingData => {
-          onOpenCourse(courseListingData.id);
-        }}
+        onCourseOpen={onOpenCourse}
         courses={courses}
         receivedCourses={receivedCourses}
         getCourseCompletion={getCourseCompletion}

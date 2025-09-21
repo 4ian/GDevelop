@@ -329,7 +329,6 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
     condition.SetParameters(parameters);
   }
 
-  gd::EventsCodeGenerator::CheckBehaviorParameters(condition, instrInfos);
   // Verify that there are no mismatches between object type in parameters.
   for (std::size_t pNb = 0; pNb < instrInfos.parameters.GetParametersCount(); ++pNb) {
     if (ParameterMetadata::IsObject(instrInfos.parameters.GetParameter(pNb).GetType())) {
@@ -356,6 +355,11 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
         return "/* Mismatched object type - skipped. */";
       }
     }
+  }
+  bool isAnyBehaviorMissing =
+      gd::EventsCodeGenerator::CheckBehaviorParameters(condition, instrInfos);
+  if (isAnyBehaviorMissing) {
+    return "/* Missing behavior - skipped. */";
   }
 
   if (instrInfos.IsObjectInstruction()) {
@@ -488,14 +492,16 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(
   return outputCode;
 }
 
-void EventsCodeGenerator::CheckBehaviorParameters(
+bool EventsCodeGenerator::CheckBehaviorParameters(
     const gd::Instruction &instruction,
     const gd::InstructionMetadata &instrInfos) {
-  gd::ParameterMetadataTools::IterateOverParameters(
+  bool isAnyBehaviorMissing = false;
+  gd::ParameterMetadataTools::IterateOverParametersWithIndex(
       instruction.GetParameters(), instrInfos.parameters,
-      [this](const gd::ParameterMetadata &parameterMetadata,
-             const gd::Expression &parameterValue,
-             const gd::String &lastObjectName) {
+      [this, &isAnyBehaviorMissing,
+       &instrInfos](const gd::ParameterMetadata &parameterMetadata,
+                    const gd::Expression &parameterValue, size_t parameterIndex,
+                    const gd::String &lastObjectName, size_t lastObjectIndex) {
         if (ParameterMetadata::IsBehavior(parameterMetadata.GetType())) {
           const gd::String &behaviorName = parameterValue.GetPlainString();
           const gd::String &actualBehaviorType =
@@ -506,13 +512,25 @@ void EventsCodeGenerator::CheckBehaviorParameters(
 
           if (!expectedBehaviorType.empty() &&
               actualBehaviorType != expectedBehaviorType) {
+            const auto &objectParameterMetadata =
+                instrInfos.GetParameter(lastObjectIndex);
+            // Event functions crash if some objects in a group are missing
+            // the required behaviors, since they lose reference to the original
+            // objects. Missing behaviors are considered "fatal" only for
+            // ObjectList parameters, in order to minimize side effects on
+            // built-in functions.
+            if (objectParameterMetadata.GetType() == "objectList") {
+              isAnyBehaviorMissing = true;
+            }
             gd::ProjectDiagnostic projectDiagnostic(
                 gd::ProjectDiagnostic::ErrorType::MissingBehavior, "",
                 actualBehaviorType, expectedBehaviorType, lastObjectName);
-            if (diagnosticReport) diagnosticReport->Add(projectDiagnostic);
+            if (diagnosticReport)
+              diagnosticReport->Add(projectDiagnostic);
           }
         }
       });
+  return isAnyBehaviorMissing;
 }
 
 /**
@@ -552,7 +570,6 @@ gd::String EventsCodeGenerator::GenerateActionCode(
     action.SetParameters(parameters);
   }
 
-  gd::EventsCodeGenerator::CheckBehaviorParameters(action, instrInfos);
   // Verify that there are no mismatches between object type in parameters.
   for (std::size_t pNb = 0; pNb < instrInfos.parameters.GetParametersCount(); ++pNb) {
     if (ParameterMetadata::IsObject(instrInfos.parameters.GetParameter(pNb).GetType())) {
@@ -578,6 +595,11 @@ gd::String EventsCodeGenerator::GenerateActionCode(
         return "/* Mismatched object type - skipped. */";
       }
     }
+  }
+  bool isAnyBehaviorMissing =
+      gd::EventsCodeGenerator::CheckBehaviorParameters(action, instrInfos);
+  if (isAnyBehaviorMissing) {
+    return "/* Missing behavior - skipped. */";
   }
 
   // Call free function first if available
@@ -769,7 +791,7 @@ gd::String EventsCodeGenerator::GenerateActionsListCode(
     } else {
       outputCode += actionCode;
     }
-    outputCode += "}";
+    outputCode += "}\n";
   }
 
   return outputCode;

@@ -99,7 +99,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       ],
     },
     {
-      tier: 'community',
+      tier: 'experimental',
       authorIds: ['ZgrsWuRTAkXgeuPV9bo0zuEcA2w1'],
       shortDescription:
         'Allows handling all received P2P events at once instead of one per frame. It is more complex but also potentially more performant.',
@@ -132,7 +132,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       ],
     },
     {
-      tier: 'community',
+      tier: 'experimental',
       authorIds: ['I0kdjvsICFML0APq45CZjZ6PyEQ2'],
       shortDescription:
         'Align objects on the scene relatively to the window (or screen size).',
@@ -164,7 +164,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       ],
     },
     {
-      tier: 'community',
+      tier: 'experimental',
       authorIds: ['wWP8BSlAW0UP4NeaHa2LcmmDzmH2'],
       shortDescription:
         'Make the object go on the left, then when some distance is reached, flip and go back to the right. Make sure that your object has two animations called "GoLeft" and "TurnLeft".',
@@ -325,7 +325,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       ],
     },
     {
-      tier: 'community',
+      tier: 'experimental',
       authorIds: ['AlZ3D1xkH0QDao7T37VZZUeYNpn1'],
       shortDescription: 'Quickly remap Behavior controls to different keys. ',
       extensionNamespace: '',
@@ -357,7 +357,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       ],
     },
     {
-      tier: 'community',
+      tier: 'experimental',
       authorIds: [
         'rotBq28wITdtfsrE7McHQri4k2w2',
         'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
@@ -401,7 +401,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       ],
     },
     {
-      tier: 'community',
+      tier: 'experimental',
       authorIds: ['this-is-a-fake-id', 'gqDaZjCfevOOxBYkK6zlhtZnXCg1'],
       shortDescription:
         'Throw an object that returns to the thrower like a boomerang.',
@@ -520,7 +520,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       ],
     },
     {
-      tier: 'community',
+      tier: 'experimental',
       authorIds: [
         'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
         '30b1QQoYi1gQQHzIjMlNY8aLyYV2',
@@ -674,7 +674,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       ],
     },
     {
-      tier: 'community',
+      tier: 'experimental',
       authorIds: ['ZShmW1xkW7WWl9AkB78VITJMiTw1'],
       shortDescription:
         'Choose a random value in a list of strings or numbers.',
@@ -936,7 +936,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       ],
     },
     {
-      tier: 'community',
+      tier: 'experimental',
       authorIds: ['IWykYNRvhCZBN3vEgKEbBPOR3Oc2'],
       shortDescription:
         'Conditions to check the cursor movement (still or moving).',
@@ -968,7 +968,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       ],
     },
     {
-      tier: 'community',
+      tier: 'experimental',
       authorIds: [
         'ZgrsWuRTAkXgeuPV9bo0zuEcA2w1',
         '2OwwM8ToR9dx9RJ2sAKTcrLmCB92',
@@ -1045,7 +1045,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       ],
     },
     {
-      tier: 'community',
+      tier: 'experimental',
       authorIds: ['ZgrsWuRTAkXgeuPV9bo0zuEcA2w1'],
       shortDescription: 'Adds discord rich presence to your games.',
       extensionNamespace: '',

@@ -50,8 +50,11 @@ import {
   sendAiRequestMessageSent,
   sendAiRequestStarted,
 } from '../Utils/Analytics/EventSender';
-import { useCreateAiProjectDialog } from './UseCreateAiProjectDialog';
-import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
+import {
+  type ExampleShortHeader,
+  listAllExamples,
+} from '../Utils/GDevelopServices/Example';
+import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
 import { prepareAiUserContent } from './PrepareAiUserContent';
 import { AiRequestContext } from './AiRequestContext';
 import { getAiConfigurationPresetsWithAvailability } from './AiConfiguration';
@@ -59,6 +62,7 @@ import {
   setEditorHotReloadNeeded,
   type HotReloadSteps,
 } from '../EmbeddedGame/EmbeddedGameFrame';
+import { type CreateProjectResult } from '../Utils/UseCreateProject';
 
 const gd: libGDevelop = global.gd;
 
@@ -142,7 +146,7 @@ const useProcessFunctionCalls = ({
         ignore?: boolean,
       |}
     ) => {
-      if (!project || !selectedAiRequest) return;
+      if (!selectedAiRequest) return;
 
       addEditorFunctionCallResults(
         selectedAiRequest.id,
@@ -338,13 +342,15 @@ type Props = {|
   storageProvider: ?StorageProvider,
   setToolbar: (?React.Node) => void,
   i18n: I18nType,
-  onCreateEmptyProject: (newProjectSetup: NewProjectSetup) => Promise<void>,
   onCreateProjectFromExample: (
     exampleShortHeader: ExampleShortHeader,
     newProjectSetup: NewProjectSetup,
     i18n: I18nType,
     isQuickCustomization?: boolean
-  ) => Promise<void>,
+  ) => Promise<CreateProjectResult>,
+  onCreateEmptyProject: (
+    newProjectSetup: NewProjectSetup
+  ) => Promise<CreateProjectResult>,
   onOpenLayout: (
     sceneName: string,
     options: {|
@@ -417,8 +423,8 @@ export const AskAiEditor = React.memo<Props>(
         fileMetadata,
         storageProvider,
         i18n,
-        onCreateEmptyProject,
         onCreateProjectFromExample,
+        onCreateEmptyProject,
         onOpenLayout,
         onSceneEventsModifiedOutsideEditor,
         onInstancesModifiedOutsideEditor,
@@ -430,11 +436,57 @@ export const AskAiEditor = React.memo<Props>(
       }: Props,
       ref
     ) => {
+      const onCreateProject = React.useCallback(
+        async ({
+          name,
+          exampleSlug,
+        }: {|
+          name: string,
+          exampleSlug: string | null,
+        |}) => {
+          const newProjectSetup: NewProjectSetup = {
+            projectName: name,
+            storageProvider: UrlStorageProvider,
+            saveAsLocation: null,
+            dontOpenAnySceneOrProjectManager: true,
+          };
+
+          if (exampleSlug) {
+            const { exampleShortHeaders } = await listAllExamples();
+            const exampleShortHeader = exampleShortHeaders.find(
+              header => header.slug === exampleSlug
+            );
+            if (exampleShortHeader) {
+              const { createdProject } = await onCreateProjectFromExample(
+                exampleShortHeader,
+                newProjectSetup,
+                i18n,
+                false
+              );
+              return { exampleSlug, createdProject };
+            }
+
+            // The example was not found - still create an empty project.
+          }
+
+          const { createdProject } = await onCreateEmptyProject({
+            projectName: name,
+            storageProvider: UrlStorageProvider,
+            saveAsLocation: null,
+            dontOpenAnySceneOrProjectManager: true,
+          });
+
+          return { exampleSlug: null, createdProject };
+        },
+        [onCreateProjectFromExample, onCreateEmptyProject, i18n]
+      );
+
       const editorCallbacks: EditorCallbacks = React.useMemo(
         () => ({
           onOpenLayout,
+          onCreateProject,
         }),
-        [onOpenLayout]
+        [onOpenLayout, onCreateProject]
       );
 
       const {
@@ -509,11 +561,6 @@ export const AskAiEditor = React.memo<Props>(
         setSendingAiRequest,
         setLastSendError,
       } = aiRequestStorage;
-
-      const {
-        createAiProject,
-        renderCreateAiProjectDialog,
-      } = useCreateAiProjectDialog();
 
       const updateToolbar = React.useCallback(
         () => {
@@ -607,29 +654,6 @@ export const AskAiEditor = React.memo<Props>(
             } = newAiRequestOptions;
             startNewAiRequest(null);
 
-            // If no project is opened, create a new empty one if the request is for
-            // the AI agent.
-            if (mode === 'agent' && !project) {
-              try {
-                console.info(
-                  'No project opened, opening the dialog to create a new project.'
-                );
-                const result = await createAiProject();
-                if (result === 'canceled') {
-                  return;
-                }
-                console.info('New project created - starting AI request.');
-                startNewAiRequest({
-                  mode,
-                  userRequest,
-                  aiConfigurationPresetId,
-                });
-              } catch (error) {
-                console.error('Error creating a new empty project:', error);
-              }
-              return;
-            }
-
             // Ensure the user has enough credits to pay for the request, or ask them
             // to buy some more.
             let payWithCredits = false;
@@ -680,7 +704,7 @@ export const AskAiEditor = React.memo<Props>(
                 fileMetadata,
                 storageProviderName,
                 mode,
-                toolsVersion: 'v2',
+                toolsVersion: 'v3',
                 aiConfiguration: {
                   presetId: aiConfigurationPresetId,
                 },
@@ -744,7 +768,6 @@ export const AskAiEditor = React.memo<Props>(
           setSendingAiRequest,
           upToDateSelectedAiRequestId,
           updateAiRequest,
-          createAiProject,
           newAiRequestOptions,
           onOpenAskAi,
         ]
@@ -884,7 +907,11 @@ export const AskAiEditor = React.memo<Props>(
             }
           }
 
-          if (selectedAiRequest && createdSceneNames) {
+          if (
+            selectedAiRequest &&
+            createdSceneNames &&
+            createdSceneNames.length > 0
+          ) {
             onOpenAskAi({
               mode: selectedAiRequest.mode || 'agent',
               aiRequestId: selectedAiRequestId,
@@ -1027,10 +1054,6 @@ export const AskAiEditor = React.memo<Props>(
               />
             </div>
           </Paper>
-          {renderCreateAiProjectDialog({
-            onCreateEmptyProject,
-            onCreateProjectFromExample,
-          })}
           <AskAiHistory
             open={isHistoryOpen}
             onClose={onCloseHistory}
@@ -1065,8 +1088,8 @@ export const renderAskAiEditorContainer = (
         storageProvider={props.storageProvider}
         setToolbar={props.setToolbar}
         isActive={props.isActive}
-        onCreateEmptyProject={props.onCreateEmptyProject}
         onCreateProjectFromExample={props.onCreateProjectFromExample}
+        onCreateEmptyProject={props.onCreateEmptyProject}
         onOpenLayout={props.onOpenLayout}
         onSceneEventsModifiedOutsideEditor={
           props.onSceneEventsModifiedOutsideEditor

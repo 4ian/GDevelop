@@ -214,10 +214,15 @@ export const PrivateGameTemplateStoreStateProvider = ({
         );
 
         if (privateGameTemplateListingData) {
+          const priceForUsageType = privateGameTemplateListingData.prices.find(
+            price => price.usageType === 'default'
+          );
           sendGameTemplateInformationOpened({
             gameTemplateName: privateGameTemplateListingData.name,
             gameTemplateId: privateGameTemplateListingData.id,
             source: 'web-link',
+            priceValue: priceForUsageType && priceForUsageType.value,
+            priceCurrency: priceForUsageType && priceForUsageType.currency,
           });
           shopNavigationState.openPrivateGameTemplateInformationPage({
             privateGameTemplateListingData,

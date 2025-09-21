@@ -150,7 +150,7 @@ bool ProjectElementRenamer::DoVisitInstruction(gd::Instruction &instruction,
       instruction.GetParameters(), metadata.GetParameters(),
       [&](const gd::ParameterMetadata &parameterMetadata,
           const gd::Expression &parameterValue, size_t parameterIndex,
-          const gd::String &lastObjectName) {
+          const gd::String &lastObjectName, size_t lastObjectIndex) {
         if (parameterMetadata.GetType() == "layer") {
           if (parameterValue.GetPlainString().length() < 2) {
             // This is either the base layer or an invalid layer name.

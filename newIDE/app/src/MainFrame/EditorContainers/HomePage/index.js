@@ -305,7 +305,7 @@ export const HomePage = React.memo<Props>(
       );
       const {
         fetchBundles,
-        shop: { setInitialBundleUserFriendlySlug },
+        shop: { setInitialBundleUserFriendlySlug, setInitialBundleCategory },
       } = React.useContext(BundleStoreContext);
       const openedGame = React.useMemo(
         () =>
@@ -337,8 +337,16 @@ export const HomePage = React.memo<Props>(
             if (routeArguments['bundle']) {
               setInitialBundleUserFriendlySlug(routeArguments['bundle']);
             }
+            if (routeArguments['bundle-category']) {
+              setInitialBundleCategory(routeArguments['bundle-category']);
+            }
             // Remove the arguments so that the asset store is not opened again.
-            removeRouteArguments(['asset-pack', 'game-template', 'bundle']);
+            removeRouteArguments([
+              'asset-pack',
+              'game-template',
+              'bundle',
+              'bundle-category',
+            ]);
           } else if (requestedTab === 'manage') {
             const gameId = routeArguments['game-id'];
             if (gameId) {
@@ -372,6 +380,7 @@ export const HomePage = React.memo<Props>(
           setInitialPackUserFriendlySlug,
           setInitialGameTemplateUserFriendlySlug,
           setInitialBundleUserFriendlySlug,
+          setInitialBundleCategory,
           games,
           areCoursesFetched,
         ]

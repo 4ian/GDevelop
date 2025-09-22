@@ -21,6 +21,7 @@ type RouteKey =
   | 'asset-pack'
   | 'game-template'
   | 'bundle'
+  | 'bundle-category'
   | 'tutorial-id'
   | 'course-id'
   | 'create-from-example'

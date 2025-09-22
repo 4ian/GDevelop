@@ -148,6 +148,22 @@ export const getBundleListingDataFromUserFriendlySlug = ({
   return null;
 };
 
+export const getBundleListingDataFromCategory = ({
+  bundleListingDatas,
+  category,
+}: {|
+  bundleListingDatas: Array<BundleListingData>,
+  category: string,
+|}): ?BundleListingData => {
+  const bundleListingData = bundleListingDatas.find(bundle =>
+    bundle.categories.includes(category)
+  );
+  // Return the first bundle found in the category.
+  if (bundleListingData) return bundleListingData;
+
+  return null;
+};
+
 export const getBundleTiles = ({
   allBundleListingDatas,
   displayedBundleListingDatas,

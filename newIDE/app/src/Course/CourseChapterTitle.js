@@ -10,8 +10,6 @@ import CheckCircle from '../UI/CustomSvgIcons/CheckCircle';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import type { CourseChapterCompletion } from '../MainFrame/EditorContainers/HomePage/UseCourses';
-import Chip from '../UI/Chip';
-import { freeChipStyle } from './CoursePreviewBanner';
 
 const styles = {
   titleContainer: {
@@ -68,9 +66,6 @@ const CourseChapterTitle = React.forwardRef<Props, HTMLDivElement>(
           )}
         </LineStackLayout>
         <LineStackLayout noMargin alignItems="center">
-          {course.isLocked && courseChapter.isFree && (
-            <Chip style={freeChipStyle} label={<Trans>Free!</Trans>} />
-          )}
           {isFinished ? (
             <div
               style={{

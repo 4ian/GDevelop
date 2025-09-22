@@ -38,21 +38,15 @@ const styles = {
     flexDirection: 'column',
     zIndex: 2,
   },
-  videoAndMaterialsContainer: {
+  videoContainer: {
     display: 'flex',
+    position: 'relative',
+    minWidth: 300,
     marginTop: 8,
-    gap: 8,
     alignItems: 'stretch',
     flexWrap: 'wrap',
     marginBottom: 8,
     flex: 1,
-    minWidth: 0,
-  },
-  videoContainer: {
-    flex: 2,
-    minWidth: 300,
-    display: 'flex',
-    position: 'relative',
   },
   videoIFrame: { flex: 1, aspectRatio: '16 / 9' },
   sideBar: { padding: 16, display: 'flex' },
@@ -111,56 +105,26 @@ const VideoBasedCourseChapterView = React.forwardRef<Props, HTMLDivElement>(
             courseChapter={courseChapter}
             onClickUnlock={onClickUnlock}
           />
-        ) : (
-          <div style={styles.videoAndMaterialsContainer}>
-            {youtubeVideoId && (
-              <div
-                style={{
-                  ...styles.videoContainer,
-                  maxWidth: windowSize === 'xlarge' ? 960 : 640,
-                }}
-              >
-                <iframe
-                  title={`Video for lesson ${courseChapter.title}`}
-                  type="text/html"
-                  style={styles.videoIFrame}
-                  src={`https://www.youtube.com/embed/${youtubeVideoId}?cc_load_policy=1&cc_lang_pref=${
-                    // Having another language than `en` as the requested caption language prevents the player from displaying the auto-translated captions.
-                    'en'
-                  }&hl=${userLanguage2LetterCode}`}
-                  frameBorder="0"
-                />
-              </div>
-            )}
-            <ColumnStackLayout noMargin expand>
-              <Text size="sub-title" noMargin>
-                <Trans>Chapter materials</Trans>
-              </Text>
-              <Paper background="medium" style={styles.sideBar}>
-                <ColumnStackLayout noMargin>
-                  <Line noMargin>
-                    <Text noMargin>{rankLabel[chapterIndex + 1]}</Text>
-                    &nbsp;
-                    <Text noMargin>
-                      <Trans>Chapter</Trans>
-                    </Text>
-                    &nbsp;-&nbsp;
-                    <Text noMargin>
-                      <Trans>Template</Trans>
-                    </Text>
-                  </Line>
-                  <Line noMargin>
-                    <RaisedButton
-                      primary
-                      icon={<Cloud fontSize="small" />}
-                      label={<Trans>Open template</Trans>}
-                      onClick={onOpenTemplate}
-                    />
-                  </Line>
-                </ColumnStackLayout>
-              </Paper>
-            </ColumnStackLayout>
+        ) : youtubeVideoId ? (
+          <div
+            style={{
+              ...styles.videoContainer,
+              maxWidth: windowSize === 'xlarge' ? 960 : 640,
+            }}
+          >
+            <iframe
+              title={`Video for lesson ${courseChapter.title}`}
+              type="text/html"
+              style={styles.videoIFrame}
+              src={`https://www.youtube.com/embed/${youtubeVideoId}?cc_load_policy=1&cc_lang_pref=${
+                // Having another language than `en` as the requested caption language prevents the player from displaying the auto-translated captions.
+                'en'
+              }&hl=${userLanguage2LetterCode}`}
+              frameBorder="0"
+            />
           </div>
+        ) : (
+          undefined
         )}
         {!courseChapter.isLocked && (
           <div
@@ -198,18 +162,52 @@ const VideoBasedCourseChapterView = React.forwardRef<Props, HTMLDivElement>(
             <Divider />
           </div>
         )}
-        {!courseChapter.isLocked &&
-          courseChapter.tasks.map((item, taskIndex) => (
-            <VideoBasedCourseChapterTaskItem
-              courseChapterTask={item}
-              key={taskIndex.toString()}
-              isOpen={openTasks}
-              isComplete={isTaskCompleted(courseChapter.id, taskIndex)}
-              onComplete={isCompleted =>
-                onCompleteTask(courseChapter.id, taskIndex, isCompleted)
-              }
-            />
-          ))}
+        {!courseChapter.isLocked && (
+          <ColumnStackLayout noMargin>
+            <ColumnStackLayout noMargin expand>
+              <Paper background="medium" style={styles.sideBar}>
+                <ColumnStackLayout noMargin>
+                  <Line noMargin>
+                    <Text noMargin>{rankLabel[chapterIndex + 1]}</Text>
+                    &nbsp;
+                    <Text noMargin>
+                      <Trans>Chapter</Trans>
+                    </Text>
+                    &nbsp;-&nbsp;
+                    <Text noMargin>
+                      <Trans>Template</Trans>
+                    </Text>
+                  </Line>
+                  <Text color="secondary" noMargin>
+                    <Trans>
+                      After watching the video, use this template to complete
+                      the following tasks.
+                    </Trans>
+                  </Text>
+                  <Line noMargin>
+                    <RaisedButton
+                      primary
+                      icon={<Cloud fontSize="small" />}
+                      label={<Trans>Open template</Trans>}
+                      onClick={onOpenTemplate}
+                    />
+                  </Line>
+                </ColumnStackLayout>
+              </Paper>
+            </ColumnStackLayout>
+            {courseChapter.tasks.map((item, taskIndex) => (
+              <VideoBasedCourseChapterTaskItem
+                courseChapterTask={item}
+                key={taskIndex.toString()}
+                isOpen={openTasks}
+                isComplete={isTaskCompleted(courseChapter.id, taskIndex)}
+                onComplete={isCompleted =>
+                  onCompleteTask(courseChapter.id, taskIndex, isCompleted)
+                }
+              />
+            ))}
+          </ColumnStackLayout>
+        )}
       </ColumnStackLayout>
     );
   }

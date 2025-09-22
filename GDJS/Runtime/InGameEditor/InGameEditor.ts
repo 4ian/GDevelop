@@ -2868,6 +2868,7 @@ namespace gdjs {
     private _lastCursorX: float = 0;
     private _lastCursorY: float = 0;
     private _wasMouseRightButtonPressed = false;
+    private _wasMouseMiddleButtonPressed = false;
 
     constructor(editorCamera: EditorCamera) {
       this._editorCamera = editorCamera;
@@ -2887,10 +2888,14 @@ namespace gdjs {
       const inputManager = runtimeGame._inputManager;
       if (this._isEnabled) {
         // Right click: rotate the camera.
+        // Middle click: also rotate the camera.
         if (
-          inputManager.isMouseButtonPressed(1) &&
-          // The camera should not move the 1st frame
-          this._wasMouseRightButtonPressed
+          (inputManager.isMouseButtonPressed(1) &&
+            // The camera should not move the 1st frame
+            this._wasMouseRightButtonPressed) ||
+          (inputManager.isMouseButtonPressed(2) &&
+            // The camera should not move the 1st frame
+            this._wasMouseMiddleButtonPressed)
         ) {
           const xDelta = inputManager.getCursorX() - this._lastCursorX;
           const yDelta = inputManager.getCursorY() - this._lastCursorY;
@@ -2910,6 +2915,7 @@ namespace gdjs {
       }
 
       this._wasMouseRightButtonPressed = inputManager.isMouseButtonPressed(1);
+      this._wasMouseMiddleButtonPressed = inputManager.isMouseButtonPressed(2);
       this._lastCursorX = inputManager.getCursorX();
       this._lastCursorY = inputManager.getCursorY();
     }
@@ -3099,11 +3105,11 @@ namespace gdjs {
         }
 
         // Space + click: move the camera on its plane.
-        // Shift + wheel click: same.
+        // Wheel click: same.
         if (
           (isSpacePressed(inputManager) &&
             inputManager.isMouseButtonPressed(0)) ||
-          (isShiftPressed(inputManager) && inputManager.isMouseButtonPressed(2))
+          inputManager.isMouseButtonPressed(2)
         ) {
           const xDelta = this._lastCursorX - inputManager.getCursorX();
           const yDelta = this._lastCursorY - inputManager.getCursorY();

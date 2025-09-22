@@ -2065,6 +2065,46 @@ module.exports = {
     }
     {
       const effect = extension
+        .addEffect('Skybox')
+        .setFullName(_('Skybox'))
+        .setDescription(_('A background cube which surrounds the scene.'))
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/Skybox.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('xPositive')
+        .setType('resource')
+        .addExtraInfo('image')
+        .setLabel(_('Left face (X+)'));
+      properties
+        .getOrCreate('xNegative')
+        .setType('resource')
+        .addExtraInfo('image')
+        .setLabel(_('Right face (X-)'));
+      properties
+        .getOrCreate('yPositive')
+        .setType('resource')
+        .addExtraInfo('image')
+        .setLabel(_('Front face (Y+)'));
+      properties
+        .getOrCreate('yNegative')
+        .setType('resource')
+        .addExtraInfo('image')
+        .setLabel(_('Back face (Y-)'));
+      properties
+        .getOrCreate('zPositive')
+        .setType('resource')
+        .addExtraInfo('image')
+        .setLabel(_('Top face (Z+)'));
+      properties
+        .getOrCreate('zNegative')
+        .setType('resource')
+        .addExtraInfo('image')
+        .setLabel(_('Bottom face (Z-)'));
+    }
+    {
+      const effect = extension
         .addEffect('HueAndSaturation')
         .setFullName(_('Hue and saturation'))
         .setDescription(_('Adjust hue and saturation.'))

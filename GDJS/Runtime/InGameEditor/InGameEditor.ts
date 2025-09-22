@@ -1342,6 +1342,8 @@ namespace gdjs {
           !this._selectionBox.endPoint.equals(this._selectionBox.startPoint) &&
           !this._hasSelectionActuallyMoved
         ) {
+          // Selection rectangle ended.
+
           const objects = new Set<gdjs.RuntimeObject>();
           for (const selectThreeObject of this._selectionBox.select()) {
             // TODO Select the object if all its meshes are inside the rectangle
@@ -1363,6 +1365,8 @@ namespace gdjs {
             }
           }
           this._sendSelectionUpdate();
+        } else {
+          // Selection rectangle was discarded.
         }
         this._selectionBox = null;
         const domElementContainer = runtimeGame
@@ -1392,7 +1396,7 @@ namespace gdjs {
       // Left click: select the object under the cursor.
       if (
         inputManager.isMouseButtonReleased(0) &&
-        this._hasCursorStayedStillWhilePressed()
+        this._hasCursorStayedStillWhilePressed({ toleranceRadius: 10 })
       ) {
         if (
           !isShiftPressed(inputManager) &&
@@ -1937,7 +1941,7 @@ namespace gdjs {
       const inputManager = this._runtimeGame.getInputManager();
       if (
         inputManager.isMouseButtonReleased(1) &&
-        this._hasCursorStayedStillWhilePressed()
+        this._hasCursorStayedStillWhilePressed({ toleranceRadius: 0 })
       ) {
         this._sendOpenContextMenu(
           inputManager.getCursorX(),
@@ -1946,11 +1950,20 @@ namespace gdjs {
       }
     }
 
-    private _hasCursorStayedStillWhilePressed() {
+    private _hasCursorStayedStillWhilePressed({
+      toleranceRadius,
+    }: {
+      toleranceRadius: float;
+    }) {
       const inputManager = this._runtimeGame.getInputManager();
+      const deltaX = Math.abs(
+        this._pressedOriginalCursorX - inputManager.getCursorX()
+      );
+      const deltaY = Math.abs(
+        this._pressedOriginalCursorY - inputManager.getCursorY()
+      );
       return (
-        this._pressedOriginalCursorX === inputManager.getCursorX() &&
-        this._pressedOriginalCursorY === inputManager.getCursorY()
+        deltaX * deltaX + deltaY * deltaY <= toleranceRadius * toleranceRadius
       );
     }
 

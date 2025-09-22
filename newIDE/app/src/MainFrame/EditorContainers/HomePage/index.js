@@ -305,8 +305,19 @@ export const HomePage = React.memo<Props>(
       );
       const {
         fetchBundles,
-        shop: { setInitialBundleUserFriendlySlug, setInitialBundleCategory },
+        shop: {
+          setInitialBundleUserFriendlySlug: setInitialBundleUserFriendlySlugForShop,
+          setInitialBundleCategory: setInitialBundleCategoryForShop,
+        },
       } = React.useContext(BundleStoreContext);
+      const [
+        initialBundleUserFriendlySlugForLearn,
+        setInitialBundleUserFriendlySlugForLearn,
+      ] = React.useState<?string>(null);
+      const [
+        initialBundleCategoryForLearn,
+        setInitialBundleCategoryForLearn,
+      ] = React.useState<?string>(null);
       const openedGame = React.useMemo(
         () =>
           !openedGameId || !games
@@ -335,10 +346,12 @@ export const HomePage = React.memo<Props>(
               );
             }
             if (routeArguments['bundle']) {
-              setInitialBundleUserFriendlySlug(routeArguments['bundle']);
+              setInitialBundleUserFriendlySlugForShop(routeArguments['bundle']);
             }
             if (routeArguments['bundle-category']) {
-              setInitialBundleCategory(routeArguments['bundle-category']);
+              setInitialBundleCategoryForShop(
+                routeArguments['bundle-category']
+              );
             }
             // Remove the arguments so that the asset store is not opened again.
             removeRouteArguments([
@@ -362,13 +375,24 @@ export const HomePage = React.memo<Props>(
               }
             }
           } else if (requestedTab === 'learn') {
-            const courseId = routeArguments['course-id'];
-            if (!areCoursesFetched) {
-              // Do not process requested tab before courses are ready.
-              return;
+            if (routeArguments['course-id']) {
+              if (!areCoursesFetched) {
+                // Do not process requested tab before courses are ready.
+                return;
+              }
+              onSelectCourse(routeArguments['course-id']);
             }
-            onSelectCourse(courseId);
-            removeRouteArguments(['course-id']);
+            if (routeArguments['bundle']) {
+              setInitialBundleUserFriendlySlugForLearn(
+                routeArguments['bundle']
+              );
+            }
+            if (routeArguments['bundle-category']) {
+              setInitialBundleCategoryForLearn(
+                routeArguments['bundle-category']
+              );
+            }
+            removeRouteArguments(['course-id', 'bundle', 'bundle-category']);
           }
 
           removeRouteArguments(['initial-dialog']);
@@ -379,8 +403,8 @@ export const HomePage = React.memo<Props>(
           removeRouteArguments,
           setInitialPackUserFriendlySlug,
           setInitialGameTemplateUserFriendlySlug,
-          setInitialBundleUserFriendlySlug,
-          setInitialBundleCategory,
+          setInitialBundleUserFriendlySlugForShop,
+          setInitialBundleCategoryForShop,
           games,
           areCoursesFetched,
         ]
@@ -625,6 +649,14 @@ export const HomePage = React.memo<Props>(
                           ? courses.filter(course => !course.isLocked)
                           : undefined
                       }
+                      clearInitialBundleValues={() => {
+                        setInitialBundleUserFriendlySlugForLearn(null);
+                        setInitialBundleCategoryForLearn(null);
+                      }}
+                      initialBundleUserFriendlySlug={
+                        initialBundleUserFriendlySlugForLearn
+                      }
+                      initialBundleCategory={initialBundleCategoryForLearn}
                     />
                   )}
                   {activeTab === 'play' && (

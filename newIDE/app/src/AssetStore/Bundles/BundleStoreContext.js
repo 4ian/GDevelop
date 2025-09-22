@@ -181,6 +181,9 @@ export const BundleStoreStateProvider = ({
           title: t`Bundle not found`,
           message: t`The link to the bundle you've followed seems outdated. Why not take a look at the other bundles in the store?`,
         });
+        setInitialBundleUserFriendlySlug(null);
+        setInitialBundleCategory(null);
+        initialBundleOpened.current = false; // Allow to open the bundle again if the effect run again.
         return;
       }
 

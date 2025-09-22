@@ -1633,6 +1633,7 @@ namespace gdjs {
             return;
           }
 
+          const scaleDamping = 0.2; // 0.2 = 20% of the movement speed (Three.js transform controls scaling is too fast)
           this._selectionControlsMovementTotalDelta = {
             translationX: dummyThreeObject.position.x - initialPosition.x,
             translationY: dummyThreeObject.position.y - initialPosition.y,
@@ -1646,9 +1647,15 @@ namespace gdjs {
             rotationZ: -gdjs.toDegrees(
               dummyThreeObject.rotation.z - initialRotation.z
             ),
-            scaleX: dummyThreeObject.scale.x / initialScale.x,
-            scaleY: dummyThreeObject.scale.y / initialScale.y,
-            scaleZ: dummyThreeObject.scale.z / initialScale.z,
+            scaleX:
+              1 +
+              (dummyThreeObject.scale.x / initialScale.x - 1) * scaleDamping,
+            scaleY:
+              1 +
+              (dummyThreeObject.scale.y / initialScale.y - 1) * scaleDamping,
+            scaleZ:
+              1 +
+              (dummyThreeObject.scale.z / initialScale.z - 1) * scaleDamping,
           };
 
           this._hasSelectionActuallyMoved =

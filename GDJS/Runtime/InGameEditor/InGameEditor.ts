@@ -2439,7 +2439,7 @@ namespace gdjs {
       }
     }
 
-    private _updateTargetFramerate(elapsedTime: float) {
+    updateTargetFramerate(elapsedTime: float) {
       const inputManager = this._runtimeGame.getInputManager();
       if (
         inputManager.anyKeyPressed() ||
@@ -2456,28 +2456,17 @@ namespace gdjs {
       // Adapt the framerate to avoid consuming too much CPU when the editor is not visible
       // or not interacted with.
       if (!this._isVisible) {
-        this._targetFrameRate = 1;
+        this._runtimeGame.setMaximumFps(0.3);
       } else {
         if (this._timeSinceLastInteraction > 1000) {
-          this._targetFrameRate = 10;
+          this._runtimeGame.setMaximumFps(10);
         } else {
-          this._targetFrameRate = 60;
+          this._runtimeGame.setMaximumFps(60);
         }
       }
     }
 
-    updateAndRender(elapsedTime: float) {
-      // Update the target framerate first so that if there is an interaction, we **immediately**
-      // go to max framerate (and we don't wait for a frame to pass at the current, probably slow framerate).
-      this._updateTargetFramerate(elapsedTime);
-
-      // Basic frame rate limiting.
-      this._timeSinceLastFrame += elapsedTime;
-      if (this._timeSinceLastFrame < 1000 / this._targetFrameRate) {
-        return;
-      }
-      this._timeSinceLastFrame = 0;
-
+    updateAndRender() {
       const objectUnderCursor: gdjs.RuntimeObject | null =
         this.getObjectUnderCursor();
 

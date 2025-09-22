@@ -1150,8 +1150,8 @@ namespace gdjs {
         this._hasJustResumed = false;
         this._renderer.startGameLoop((lastCallElapsedTime) => {
           try {
+            // Watch the scene name to automatically update debugger when a scene is changed.
             if (this._debuggerClient) {
-              // Watch the scene name to automatically update debugger when a scene is changed.
               const currentScene = (
                 this._inGameEditor || this.getSceneStack()
               ).getCurrentScene();
@@ -1164,30 +1164,14 @@ namespace gdjs {
               }
             }
 
-            if (this._paused) {
-              // Manage resize events.
-              if (this._notifyScenesForGameResolutionResize) {
-                if (this._inGameEditor) {
-                  this._inGameEditor.onGameResolutionResized();
-                } else {
-                  this._sceneStack.onGameResolutionResized();
-                }
-                this._notifyScenesForGameResolutionResize = false;
-              }
-
-              if (this._inGameEditor) {
-                this._inGameEditor.updateAndRender(lastCallElapsedTime);
-              } else {
-                // The game is paused for edition: the game loop continues to run,
-                // but the game logic is not executed.
-                this._sceneStack.renderWithoutStep();
-              }
-              this.getInputManager().onFrameEnded();
-
-              return true;
+            // If the game is edited, update the target framerate according to interactions.
+            // Do it now (before frame skip), so that if a user interaction happens
+            // we don't wait for a frame to pass at the current, probably very slow framerate.
+            if (this._paused && this._inGameEditor) {
+              this._inGameEditor.updateTargetFramerate(lastCallElapsedTime);
             }
 
-            // Skip the frame if we rendering frames too fast
+            // Skip the frame if we rendering frames too fast.
             accumulatedElapsedTime += lastCallElapsedTime;
             if (
               this._maxFPS > 0 &&
@@ -1212,20 +1196,28 @@ namespace gdjs {
               this._notifyScenesForGameResolutionResize = false;
             }
 
-            // Render and step the scene.
-            if (this._inGameEditor) {
-              this._inGameEditor.updateAndRender(elapsedTime);
-              this.getInputManager().onFrameEnded();
-              this._hasJustResumed = false;
-              return true;
-            } else {
-              if (this._sceneStack.step(elapsedTime)) {
-                this.getInputManager().onFrameEnded();
-                this._hasJustResumed = false;
-                return true;
+            // Render and possibly step the game.
+            if (this._paused) {
+              if (this._inGameEditor) {
+                // The game is paused for edition: the in-game editor runs and render
+                // the scene.
+                this._inGameEditor.updateAndRender();
+              } else {
+                // The game is paused (for debugging): the rendering of the scene is done,
+                // but the game logic is not executed (no full "step").
+                this._sceneStack.renderWithoutStep();
               }
+            } else {
+              // The game is not paused (and so, not edited): both the rendering
+              // and game logic (a full "step") is executed.
+              if (!this._sceneStack.step(elapsedTime)) {
+                return false; // Return if game asked to be stopped.
+              }
+              this._hasJustResumed = false;
             }
-            return false;
+
+            this.getInputManager().onFrameEnded();
+            return true;
           } catch (e) {
             if (this._debuggerClient)
               this._debuggerClient.onUncaughtException(e);

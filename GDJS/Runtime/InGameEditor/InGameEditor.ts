@@ -3106,10 +3106,10 @@ namespace gdjs {
 
           // Up/down
           if (inputManager.isKeyPressed(Q_KEY)) {
-            moveCameraByVector(up, moveSpeed);
+            moveCameraByVector(up, -moveSpeed);
           }
           if (inputManager.isKeyPressed(E_KEY)) {
-            moveCameraByVector(up, -moveSpeed);
+            moveCameraByVector(up, moveSpeed);
           }
         }
 

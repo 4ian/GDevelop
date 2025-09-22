@@ -32,7 +32,7 @@ const defaultShortcuts: ShortcutMap = {
   OPEN_EXTERNAL_LAYOUT: 'Alt+KeyW',
   OPEN_EXTENSION: 'Alt+KeyE',
 
-  OPEN_SCENE_PROPERTIES: 'KeyS',
+  OPEN_SCENE_PROPERTIES: '',
   OPEN_SCENE_VARIABLES: 'KeyV',
 
   OPEN_OBJECTS_PANEL: 'KeyO',

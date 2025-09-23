@@ -147,21 +147,9 @@ namespace gdjs {
       if (initialInstanceData.depth !== undefined) {
         this.setDepth(initialInstanceData.depth);
       }
-      if (initialInstanceData.flippedX) {
-        this.flipX(true);
-      } else if (this.isFlippedX()) {
-        this.flipX(false);
-      }
-      if (initialInstanceData.flippedY) {
-        this.flipY(true);
-      } else if (this.isFlippedY()) {
-        this.flipY(false);
-      }
-      if (initialInstanceData.flippedZ) {
-        this.flipZ(true);
-      } else if (this.isFlippedZ()) {
-        this.flipZ(false);
-      }
+      this.flipX(!!initialInstanceData.flippedX);
+      this.flipY(!!initialInstanceData.flippedY);
+      this.flipZ(!!initialInstanceData.flippedZ);
     }
 
     setX(x: float): void {

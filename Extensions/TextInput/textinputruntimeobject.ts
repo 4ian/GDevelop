@@ -331,9 +331,11 @@ namespace gdjs {
         this.setHeight(initialInstanceData.height);
         this._renderer.updatePadding();
       }
-      if (initialInstanceData.opacity !== undefined) {
-        this.setOpacity(initialInstanceData.opacity);
-      }
+      this.setOpacity(
+        initialInstanceData.opacity === undefined
+          ? 255
+          : initialInstanceData.opacity
+      );
     }
 
     onScenePaused(runtimeScene: gdjs.RuntimeScene): void {

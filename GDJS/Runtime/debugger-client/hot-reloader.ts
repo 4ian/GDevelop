@@ -1685,22 +1685,16 @@ namespace gdjs {
         somethingChanged = true;
       }
       if (gdjs.Base3DHandler && gdjs.Base3DHandler.is3D(runtimeObject)) {
-        if (oldInstance.z !== newInstance.z && newInstance.z !== undefined) {
-          runtimeObject.setZ(newInstance.z);
+        if (oldInstance.z !== newInstance.z) {
+          runtimeObject.setZ(newInstance.z || 0);
           somethingChanged = true;
         }
-        if (
-          oldInstance.rotationX !== newInstance.rotationX &&
-          newInstance.rotationX !== undefined
-        ) {
-          runtimeObject.setRotationX(newInstance.rotationX);
+        if (oldInstance.rotationX !== newInstance.rotationX) {
+          runtimeObject.setRotationX(newInstance.rotationX || 0);
           somethingChanged = true;
         }
-        if (
-          oldInstance.rotationY !== newInstance.rotationY &&
-          newInstance.rotationY !== undefined
-        ) {
-          runtimeObject.setRotationY(newInstance.rotationY);
+        if (oldInstance.rotationY !== newInstance.rotationY) {
+          runtimeObject.setRotationY(newInstance.rotationY || 0);
           somethingChanged = true;
         }
       }

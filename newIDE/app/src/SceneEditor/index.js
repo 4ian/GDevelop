@@ -931,11 +931,13 @@ export default class SceneEditor extends React.Component<Props, State> {
     const { previewDebuggerServer } = this.props;
     if (!previewDebuggerServer) return;
 
+    const instances = serializeToJSObject(this.props.initialInstances);
+
     previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
       previewDebuggerServer.sendMessage(debuggerId, {
         command: 'hotReloadAllInstances',
         payload: {
-          instances: serializeToJSObject(this.props.initialInstances),
+          instances,
         },
       });
     });

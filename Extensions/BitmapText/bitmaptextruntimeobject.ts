@@ -218,9 +218,11 @@ namespace gdjs {
         this.setWrappingWidth(initialInstanceData.width);
         this.setWrapping(true);
       }
-      if (initialInstanceData.opacity !== undefined) {
-        this.setOpacity(initialInstanceData.opacity);
-      }
+      this.setOpacity(
+        initialInstanceData.opacity === undefined
+          ? 255
+          : initialInstanceData.opacity
+      );
     }
 
     override onDestroyed(): void {

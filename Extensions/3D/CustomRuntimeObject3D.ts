@@ -74,15 +74,9 @@ namespace gdjs {
       if (initialInstanceData.depth !== undefined) {
         this.setDepth(initialInstanceData.depth);
       }
-      if (initialInstanceData.flippedX) {
-        this.flipX(initialInstanceData.flippedX);
-      }
-      if (initialInstanceData.flippedY) {
-        this.flipY(initialInstanceData.flippedY);
-      }
-      if (initialInstanceData.flippedZ) {
-        this.flipZ(initialInstanceData.flippedZ);
-      }
+      this.flipX(!!initialInstanceData.flippedX);
+      this.flipY(!!initialInstanceData.flippedY);
+      this.flipZ(!!initialInstanceData.flippedZ);
     }
 
     getNetworkSyncData(): CustomObject3DNetworkSyncDataType {

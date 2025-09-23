@@ -196,12 +196,8 @@ namespace gdjs {
      * @param initialInstanceData The extra parameters
      */
     extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {
-      if (initialInstanceData.flippedX) {
-        this.flipX(initialInstanceData.flippedX);
-      }
-      if (initialInstanceData.flippedY) {
-        this.flipY(initialInstanceData.flippedY);
-      }
+      this.flipX(!!initialInstanceData.flippedX);
+      this.flipY(!!initialInstanceData.flippedY);
     }
 
     stepBehaviorsPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {

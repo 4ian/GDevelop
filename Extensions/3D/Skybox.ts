@@ -59,7 +59,9 @@ namespace gdjs {
             // filters to stack them.
             this._oldBackground = scene.background;
             scene.background = this._cubeTexture;
-            // TODO Decide if scene.environment should be set.
+            if (!scene.environment) {
+              scene.environment = this._cubeTexture;
+            }
             this._isEnabled = true;
             return true;
           }
@@ -72,6 +74,7 @@ namespace gdjs {
               return false;
             }
             scene.background = this._oldBackground;
+            scene.environment = null;
             this._isEnabled = false;
             return true;
           }

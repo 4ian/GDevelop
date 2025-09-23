@@ -57,6 +57,7 @@ namespace gdjs {
     private _loadedThreeTextures: Hashtable<THREE.Texture>;
     private _loadedThreeMaterials = new ThreeMaterialCache();
     private _loadedThreeCubeTextures = new Map<string, THREE.CubeTexture>();
+    private _loadedThreeCubeTextureKeysByResourceName = new ArrayMap<string, string>();
 
     private _diskTextures = new Map<float, PIXI.Texture>();
     private _rectangleTextures = new Map<string, PIXI.Texture>();
@@ -271,6 +272,12 @@ namespace gdjs {
       const resource = this._getImageResource(xPositiveResourceName);
       applyThreeTextureSettings(cubeTexture, resource);
       this._loadedThreeCubeTextures.set(key, cubeTexture);
+      this._loadedThreeCubeTextureKeysByResourceName.add(xPositiveResourceName, key);
+      this._loadedThreeCubeTextureKeysByResourceName.add(xNegativeResourceName, key);
+      this._loadedThreeCubeTextureKeysByResourceName.add(yPositiveResourceName, key);
+      this._loadedThreeCubeTextureKeysByResourceName.add(yNegativeResourceName, key);
+      this._loadedThreeCubeTextureKeysByResourceName.add(zPositiveResourceName, key);
+      this._loadedThreeCubeTextureKeysByResourceName.add(zNegativeResourceName, key);
 
       return cubeTexture;
     }
@@ -546,6 +553,7 @@ namespace gdjs {
         cubeTexture.dispose();
       }
       this._loadedThreeCubeTextures.clear();
+      this._loadedThreeCubeTextureKeysByResourceName.clear();
 
       this._loadedThreeMaterials.disposeAll();
 
@@ -593,20 +601,47 @@ namespace gdjs {
 
       this._loadedThreeMaterials.dispose(resourceName);
 
-      // Clear all cube texture just in case because we can't check which
-      // resources they use.
-      // TODO Index lists of CubeTexture with each resource as key to be able
-      // unload the right one.
-      for (const cubeTexture of this._loadedThreeCubeTextures.values()) {
-        cubeTexture.dispose();
+      const cubeTextureKeys = this._loadedThreeCubeTextureKeysByResourceName.getValuesFor(resourceName);
+      if (cubeTextureKeys) {
+        for (const cubeTextureKey of cubeTextureKeys) {
+          const cubeTexture = this._loadedThreeCubeTextures.get(cubeTextureKey);
+          if (cubeTexture) {
+            cubeTexture.dispose();
+            this._loadedThreeCubeTextures.delete(cubeTextureKey);
+          }
+        }
       }
-      this._loadedThreeCubeTextures.clear();
+    }
+  }
+
+  class ArrayMap<K, V> {
+    map = new Map<K, Array<V>>();
+
+    getValuesFor(key: K): Array<V> | undefined {
+      return this.map.get(key);
+    }
+
+    add(key: K, value: V): void {
+      let values = this.map.get(key);
+      if (!values) {
+        values = [];
+        this.map.set(key, values);
+      }
+      values.push(value);
+    }
+
+    deleteValuesFor(key: K): void {
+      this.map.delete(key);
+    }
+
+    clear(): void {
+      this.map.clear();
     }
   }
 
   class ThreeMaterialCache {
     private _flaggedMaterials = new Map<string, THREE.Material>();
-    private _materialFlaggedKeys = new Map<string, Array<string>>();
+    private _materialFlaggedKeys = new ArrayMap<string, string>();
 
     /**
      * Return the three.js material associated to the specified resource name
@@ -657,12 +692,7 @@ namespace gdjs {
         forceBasicMaterial ? 1 : 0
       }|${vertexColors ? 1 : 0}`;
       this._flaggedMaterials.set(cacheKey, material);
-      let flaggedKeys = this._materialFlaggedKeys.get(resourceName);
-      if (!flaggedKeys) {
-        flaggedKeys = [];
-        this._materialFlaggedKeys.set(resourceName, flaggedKeys);
-      }
-      flaggedKeys.push(cacheKey);
+      this._materialFlaggedKeys.add(resourceName, cacheKey);
     }
 
     /**
@@ -671,7 +701,7 @@ namespace gdjs {
      * @param resourceName The name of the resource
      */
     dispose(resourceName: string): void {
-      const flaggedKeys = this._materialFlaggedKeys.get(resourceName);
+      const flaggedKeys = this._materialFlaggedKeys.getValuesFor(resourceName);
       if (flaggedKeys) {
         for (const flaggedKey of flaggedKeys) {
           const threeMaterial = this._flaggedMaterials.get(flaggedKey);
@@ -681,7 +711,7 @@ namespace gdjs {
           this._flaggedMaterials.delete(flaggedKey);
         }
       }
-      this._materialFlaggedKeys.delete(resourceName);
+      this._materialFlaggedKeys.deleteValuesFor(resourceName);
     }
 
     /**

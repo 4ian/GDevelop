@@ -113,7 +113,32 @@ export const getOtherProductsFromSameAuthorTiles = <
     .filter(Boolean);
 };
 
-export const getBundlesContainingProduct = <
+export const getReceivedBundlesContainingProduct = <
+  U: PrivateAssetPack | PrivateGameTemplate | Bundle | Course
+>({
+  product,
+  receivedProducts,
+}: {|
+  product: U,
+  receivedProducts: ?Array<U>,
+|}): Array<U> => {
+  if (!receivedProducts) return [];
+
+  return receivedProducts.filter(receivedProduct => {
+    return (
+      (receivedProduct.includedTemplateIds &&
+        receivedProduct.includedTemplateIds.includes(product.id)) ||
+      (receivedProduct.includedPackIds &&
+        receivedProduct.includedPackIds.includes(product.id)) ||
+      (receivedProduct.includedProducts &&
+        receivedProduct.includedProducts.some(
+          includedProduct => includedProduct.productId === product.id
+        ))
+    );
+  });
+};
+
+export const getProductListingDatasContainingProduct = <
   T:
     | PrivateAssetPackListingData
     | PrivateGameTemplateListingData
@@ -184,42 +209,49 @@ export const getBundlesContainingProductTiles = <
 |}): ?Array<React.Node> => {
   if (!product || !productListingDatas) return null;
 
-  const bundlesContainingProduct = getBundlesContainingProduct({
-    product,
-    productListingDatas,
-  });
+  const productListingDatasContainingProduct = getProductListingDatasContainingProduct(
+    {
+      product,
+      productListingDatas,
+    }
+  );
 
-  if (!bundlesContainingProduct.length) return null;
+  if (!productListingDatasContainingProduct.length) return null;
 
-  const ownedBundlesContainingProduct = bundlesContainingProduct.filter(
-    bundleContainingProduct =>
+  const ownedBundleListingDatasContainingProduct = productListingDatasContainingProduct.filter(
+    bundleListingDataContainingProduct =>
       !!receivedProducts &&
       !!receivedProducts.find(
-        Product => Product.id === bundleContainingProduct.id
+        Product => Product.id === bundleListingDataContainingProduct.id
       )
   );
-  const notOwnedBundlesContainingProduct = bundlesContainingProduct.filter(
-    bundleContainingProduct =>
-      !ownedBundlesContainingProduct.find(
-        ownedBundleContainingProduct =>
-          ownedBundleContainingProduct.id === bundleContainingProduct.id
+  const notOwnedBundleListingDatasContainingProduct = productListingDatasContainingProduct.filter(
+    bundleListingDataContainingProduct =>
+      !ownedBundleListingDatasContainingProduct.find(
+        ownedBundleListingDataContainingProduct =>
+          ownedBundleListingDataContainingProduct.id ===
+          bundleListingDataContainingProduct.id
       )
   );
 
-  const allProductsWithOwnedStatus = [
-    ...ownedBundlesContainingProduct.map(bundleContainingProduct => ({
-      product: bundleContainingProduct,
-      owned: true,
-    })),
-    ...notOwnedBundlesContainingProduct.map(bundleContainingProduct => ({
-      product: bundleContainingProduct,
-      owned: false,
-    })),
+  const allProductListingDatasWithOwnedStatus = [
+    ...ownedBundleListingDatasContainingProduct.map(
+      bundleListingDataContainingProduct => ({
+        product: bundleListingDataContainingProduct,
+        owned: true,
+      })
+    ),
+    ...notOwnedBundleListingDatasContainingProduct.map(
+      bundleListingDataContainingProduct => ({
+        product: bundleListingDataContainingProduct,
+        owned: false,
+      })
+    ),
   ];
 
-  return allProductsWithOwnedStatus.map(
-    ({ product: bundleContainingProduct, owned }) => {
-      if (bundleContainingProduct.productType === 'ASSET_PACK') {
+  return allProductListingDatasWithOwnedStatus.map(
+    ({ product: bundleListingDataContainingProduct, owned }) => {
+      if (bundleListingDataContainingProduct.productType === 'ASSET_PACK') {
         if (!onPrivateAssetPackOpen) {
           console.error(
             'Trying to render a promo ASSET_PACK tile without onPrivateAssetPackOpen handler.'
@@ -228,16 +260,18 @@ export const getBundlesContainingProductTiles = <
         }
         return (
           <PromoBundleCard
-            bundleProductListingData={bundleContainingProduct}
+            bundleProductListingData={bundleListingDataContainingProduct}
             includedProductListingData={productListingData}
-            onSelect={() => onPrivateAssetPackOpen(bundleContainingProduct)}
+            onSelect={() =>
+              onPrivateAssetPackOpen(bundleListingDataContainingProduct)
+            }
             owned={owned}
-            key={bundleContainingProduct.id}
+            key={bundleListingDataContainingProduct.id}
           />
         );
       }
 
-      if (bundleContainingProduct.productType === 'GAME_TEMPLATE') {
+      if (bundleListingDataContainingProduct.productType === 'GAME_TEMPLATE') {
         if (!onPrivateGameTemplateOpen) {
           console.error(
             'Trying to render a promo GAME_TEMPLATE tile without onPrivateGameTemplateOpen handler.'
@@ -246,16 +280,18 @@ export const getBundlesContainingProductTiles = <
         }
         return (
           <PromoBundleCard
-            bundleProductListingData={bundleContainingProduct}
+            bundleProductListingData={bundleListingDataContainingProduct}
             includedProductListingData={productListingData}
-            onSelect={() => onPrivateGameTemplateOpen(bundleContainingProduct)}
+            onSelect={() =>
+              onPrivateGameTemplateOpen(bundleListingDataContainingProduct)
+            }
             owned={owned}
-            key={bundleContainingProduct.id}
+            key={bundleListingDataContainingProduct.id}
           />
         );
       }
 
-      if (bundleContainingProduct.productType === 'BUNDLE') {
+      if (bundleListingDataContainingProduct.productType === 'BUNDLE') {
         if (!onBundleOpen) {
           console.error(
             'Trying to render a promo BUNDLE tile without onBundleOpen handler.'
@@ -264,18 +300,18 @@ export const getBundlesContainingProductTiles = <
         }
         return (
           <PromoBundleCard
-            bundleProductListingData={bundleContainingProduct}
+            bundleProductListingData={bundleListingDataContainingProduct}
             includedProductListingData={productListingData}
-            onSelect={() => onBundleOpen(bundleContainingProduct)}
+            onSelect={() => onBundleOpen(bundleListingDataContainingProduct)}
             owned={owned}
-            key={bundleContainingProduct.id}
+            key={bundleListingDataContainingProduct.id}
           />
         );
       }
 
       console.error(
         'Unexpected product type for Promo Tile:',
-        bundleContainingProduct.productType
+        bundleListingDataContainingProduct.productType
       );
       return null;
     }
@@ -470,6 +506,7 @@ export const getUserProductPurchaseUsageType = <
   productPurchases: ?Array<Purchase>,
   allProductListingDatas: ?Array<T>,
 |}): ?string => {
+  if (!productId) return null;
   // User is not authenticated or still loading.
   if (!receivedProducts || !productPurchases || !allProductListingDatas)
     return null;
@@ -485,31 +522,33 @@ export const getUserProductPurchaseUsageType = <
   );
   if (!productPurchase) {
     // It is possible the user has the product as part of a bundle.
-    const bundlesIncludingProduct = getBundlesContainingProduct({
-      product: currentReceivedProduct,
-      productListingDatas: allProductListingDatas,
-    });
-    if (!bundlesIncludingProduct.length) return null;
+    const receivedBundlesIncludingProduct = getReceivedBundlesContainingProduct(
+      {
+        product: currentReceivedProduct,
+        receivedProducts,
+      }
+    );
+    if (!receivedBundlesIncludingProduct.length) return null;
 
     // We look at all the purchases of the bundles that include the product.
     const receivedProductBundlePurchases = productPurchases.filter(
       productPurchase =>
-        bundlesIncludingProduct.some(
+        receivedBundlesIncludingProduct.some(
           bundleListingData =>
             bundleListingData.id === productPurchase.productId
         )
     );
-
+    // No purchase found for the bundles including the product.
     if (!receivedProductBundlePurchases.length) {
       return null;
     }
 
     // We don't really know which usage type to return, so we look at the first purchase.
-    if (bundlesIncludingProduct[0].productType === 'BUNDLE') {
+    if (receivedBundlesIncludingProduct[0].includedProducts) {
       // In a bundle, we look for the usage type of the included product.
-      const includedProduct = (
-        bundlesIncludingProduct[0].includedListableProducts || []
-      ).find(includedProduct => includedProduct.productId === productId);
+      const includedProduct = receivedBundlesIncludingProduct[0].includedProducts.find(
+        includedProduct => includedProduct.productId === productId
+      );
       return includedProduct ? includedProduct.usageType : null;
     }
 

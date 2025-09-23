@@ -522,6 +522,8 @@ export const getUserProductPurchaseUsageType = <
   );
   if (!productPurchase) {
     // It is possible the user has the product as part of a bundle.
+    // It's important to look at the receivedProducts and not the productListingDatas,
+    // as the user might have received a product that is not listed anymore.
     const receivedBundlesIncludingProduct = getReceivedBundlesContainingProduct(
       {
         product: currentReceivedProduct,

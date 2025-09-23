@@ -2085,15 +2085,15 @@ module.exports = {
         .addExtraInfo('image')
         .setLabel(_('Left face (X-)'));
       properties
-        .getOrCreate('topFaceResourceName')
-        .setType('resource')
-        .addExtraInfo('image')
-        .setLabel(_('Top face (Y+)'));
-      properties
         .getOrCreate('bottomFaceResourceName')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Bottom face (Y-)'));
+        .setLabel(_('Bottom face (Y+)'));
+      properties
+        .getOrCreate('topFaceResourceName')
+        .setType('resource')
+        .addExtraInfo('image')
+        .setLabel(_('Top face (Y-)'));
       properties
         .getOrCreate('frontFaceResourceName')
         .setType('resource')

@@ -252,8 +252,6 @@ namespace gdjs {
       }
 
       const cubeTexture = new THREE.CubeTexture();
-      // This Y axis of GDevelop is the opposite was as the one of Three.js
-      cubeTexture.flipY = true;
       // Faces on X axis need to be swapped.
       cubeTexture.images[0] = this._getImageSource(xNegativeResourceName);
       cubeTexture.images[1] = this._getImageSource(xPositiveResourceName);

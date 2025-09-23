@@ -2075,35 +2075,35 @@ module.exports = {
         .addIncludeFile('Extensions/3D/Skybox.js');
       const properties = effect.getProperties();
       properties
-        .getOrCreate('xPositive')
+        .getOrCreate('rightFaceResourceName')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Left face (X+)'));
+        .setLabel(_('Right face (X+)'));
       properties
-        .getOrCreate('xNegative')
+        .getOrCreate('leftFaceResourceName')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Right face (X-)'));
+        .setLabel(_('Left face (X-)'));
       properties
-        .getOrCreate('yPositive')
+        .getOrCreate('topFaceResourceName')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Front face (Y+)'));
+        .setLabel(_('Top face (Y+)'));
       properties
-        .getOrCreate('yNegative')
+        .getOrCreate('bottomFaceResourceName')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Back face (Y-)'));
+        .setLabel(_('Bottom face (Y-)'));
       properties
-        .getOrCreate('zPositive')
+        .getOrCreate('frontFaceResourceName')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Top face (Z+)'));
+        .setLabel(_('Front face (Z+)'));
       properties
-        .getOrCreate('zNegative')
+        .getOrCreate('backFaceResourceName')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Bottom face (Z-)'));
+        .setLabel(_('Back face (Z-)'));
     }
     {
       const effect = extension

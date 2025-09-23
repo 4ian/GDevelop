@@ -25,12 +25,12 @@ namespace gdjs {
               .getGame()
               .getImageManager()
               .getThreeCubeTexture(
-                effectData.stringParameters.xPositive,
-                effectData.stringParameters.xNegative,
-                effectData.stringParameters.yPositive,
-                effectData.stringParameters.yNegative,
-                effectData.stringParameters.zPositive,
-                effectData.stringParameters.zNegative
+                effectData.stringParameters.rightFaceResourceName,
+                effectData.stringParameters.leftFaceResourceName,
+                effectData.stringParameters.topFaceResourceName,
+                effectData.stringParameters.bottomFaceResourceName,
+                effectData.stringParameters.frontFaceResourceName,
+                effectData.stringParameters.backFaceResourceName
               );
           }
 

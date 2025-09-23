@@ -2067,7 +2067,7 @@ module.exports = {
       const effect = extension
         .addEffect('Skybox')
         .setFullName(_('Skybox'))
-        .setDescription(_('A background cube which surrounds the scene.'))
+        .setDescription(_('Display a background on a cube surrounding the scene.'))
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
         .addIncludeFile('Extensions/3D/Skybox.js');

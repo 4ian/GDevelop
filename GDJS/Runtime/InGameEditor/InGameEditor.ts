@@ -278,6 +278,7 @@ namespace gdjs {
 
   class ObjectMover {
     editor: InGameEditor;
+    _changeHappened = false;
 
     constructor(editor: InGameEditor) {
       this.editor = editor;
@@ -299,11 +300,15 @@ namespace gdjs {
     > = new Map();
 
     startMove() {
+      this._changeHappened = false;
       this._objectInitialPositions.clear();
     }
 
-    endMove() {
+    endMove(): boolean {
+      const changeHappened = this._changeHappened;
       this._objectInitialPositions.clear();
+      this._changeHappened = false;
+      return changeHappened;
     }
 
     // TODO: add support for snapping to grid.
@@ -325,6 +330,19 @@ namespace gdjs {
         if (this.editor.isInstanceLocked(object)) {
           return;
         }
+
+        this._changeHappened =
+          this._changeHappened ||
+          movement.translationX !== 0 ||
+          movement.translationY !== 0 ||
+          movement.translationZ !== 0 ||
+          movement.rotationX !== 0 ||
+          movement.rotationY !== 0 ||
+          movement.rotationZ !== 0 ||
+          movement.scaleX !== 1 ||
+          movement.scaleY !== 1 ||
+          movement.scaleZ !== 1;
+
         let initialPosition = this._objectInitialPositions.get(object);
         if (!initialPosition) {
           initialPosition = is3D(object)
@@ -1200,8 +1218,10 @@ namespace gdjs {
 
       if (inputManager.isMouseButtonReleased(0)) {
         this._draggedSelectedObject = null;
-        this._objectMover.endMove();
-        this._sendSelectionUpdate({ hasSelectedObjectBeenModified: true });
+        const changeHappened = this._objectMover.endMove();
+        this._sendSelectionUpdate({
+          hasSelectedObjectBeenModified: changeHappened,
+        });
       }
     }
 
@@ -1249,8 +1269,10 @@ namespace gdjs {
         this._wasMovingSelectionLastFrame &&
         !this._selectionControlsMovementTotalDelta
       ) {
-        this._objectMover.endMove();
-        this._sendSelectionUpdate({ hasSelectedObjectBeenModified: true });
+        const changeHappened = this._objectMover.endMove();
+        this._sendSelectionUpdate({
+          hasSelectedObjectBeenModified: changeHappened,
+        });
       }
 
       // Start moving the selection.

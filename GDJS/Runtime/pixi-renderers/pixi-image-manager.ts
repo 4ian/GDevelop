@@ -57,7 +57,10 @@ namespace gdjs {
     private _loadedThreeTextures: Hashtable<THREE.Texture>;
     private _loadedThreeMaterials = new ThreeMaterialCache();
     private _loadedThreeCubeTextures = new Map<string, THREE.CubeTexture>();
-    private _loadedThreeCubeTextureKeysByResourceName = new ArrayMap<string, string>();
+    private _loadedThreeCubeTextureKeysByResourceName = new ArrayMap<
+      string,
+      string
+    >();
 
     private _diskTextures = new Map<float, PIXI.Texture>();
     private _rectangleTextures = new Map<string, PIXI.Texture>();
@@ -272,12 +275,30 @@ namespace gdjs {
       const resource = this._getImageResource(xPositiveResourceName);
       applyThreeTextureSettings(cubeTexture, resource);
       this._loadedThreeCubeTextures.set(key, cubeTexture);
-      this._loadedThreeCubeTextureKeysByResourceName.add(xPositiveResourceName, key);
-      this._loadedThreeCubeTextureKeysByResourceName.add(xNegativeResourceName, key);
-      this._loadedThreeCubeTextureKeysByResourceName.add(yPositiveResourceName, key);
-      this._loadedThreeCubeTextureKeysByResourceName.add(yNegativeResourceName, key);
-      this._loadedThreeCubeTextureKeysByResourceName.add(zPositiveResourceName, key);
-      this._loadedThreeCubeTextureKeysByResourceName.add(zNegativeResourceName, key);
+      this._loadedThreeCubeTextureKeysByResourceName.add(
+        xPositiveResourceName,
+        key
+      );
+      this._loadedThreeCubeTextureKeysByResourceName.add(
+        xNegativeResourceName,
+        key
+      );
+      this._loadedThreeCubeTextureKeysByResourceName.add(
+        yPositiveResourceName,
+        key
+      );
+      this._loadedThreeCubeTextureKeysByResourceName.add(
+        yNegativeResourceName,
+        key
+      );
+      this._loadedThreeCubeTextureKeysByResourceName.add(
+        zPositiveResourceName,
+        key
+      );
+      this._loadedThreeCubeTextureKeysByResourceName.add(
+        zNegativeResourceName,
+        key
+      );
 
       return cubeTexture;
     }
@@ -601,7 +622,10 @@ namespace gdjs {
 
       this._loadedThreeMaterials.dispose(resourceName);
 
-      const cubeTextureKeys = this._loadedThreeCubeTextureKeysByResourceName.getValuesFor(resourceName);
+      const cubeTextureKeys =
+        this._loadedThreeCubeTextureKeysByResourceName.getValuesFor(
+          resourceName
+        );
       if (cubeTextureKeys) {
         for (const cubeTextureKey of cubeTextureKeys) {
           const cubeTexture = this._loadedThreeCubeTextures.get(cubeTextureKey);

@@ -597,6 +597,8 @@ namespace gdjs {
 
       // Clear all cube texture just in case because we can't check which
       // resources they use.
+      // TODO Index lists of CubeTexture with each resource as key to be able
+      // unload the right one.
       for (const cubeTexture of this._loadedThreeCubeTextures.values()) {
         cubeTexture.dispose();
       }

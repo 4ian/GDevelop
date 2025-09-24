@@ -153,7 +153,11 @@ const getMissingBehaviors = ({
   return requiredBehaviorTypes.filter(
     behaviorType =>
       objectsContainersList
-        .getBehaviorNamesInObjectOrGroup(objectName, behaviorType, false)
+        .getBehaviorNamesInObjectOrGroup(
+          objectName,
+          behaviorType,
+          /** searchInGroups = */ true
+        )
         .size() === 0
   );
 };

@@ -27,9 +27,7 @@ import type { CourseChapterCompletion, CourseCompletion } from '../UseCourses';
 import CheckCircle from '../../../../UI/CustomSvgIcons/CheckCircle';
 import LinearProgress from '../../../../UI/LinearProgress';
 import AlertMessage from '../../../../UI/AlertMessage';
-import PreferencesContext, {
-  allAlertMessages,
-} from '../../../Preferences/PreferencesContext';
+import PreferencesContext from '../../../Preferences/PreferencesContext';
 import {
   Accordion,
   AccordionBody,
@@ -89,8 +87,6 @@ const styles = {
   },
 };
 
-const alertMessageKey = 'course-subtitles-in-user-language';
-
 type Props = {|
   course: Course,
   courseChapters: CourseChapter[],
@@ -149,7 +145,6 @@ const CoursePage = ({
     values: { language },
   } = React.useContext(PreferencesContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const { showAlertMessage, values } = React.useContext(PreferencesContext);
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const courseCompletion = getCourseCompletion();
   const firstIncompleteChapterIdRef = React.useRef<string | null>(
@@ -181,10 +176,6 @@ const CoursePage = ({
     |}[]
   >(new Array(courseChapters.length));
   const [activeChapterId, setActiveChapterId] = React.useState<?string>(null);
-
-  const subtitleHint = courseChapters.some(chapter => 'videoUrl' in chapter) // Display hint only if there are some video-based chapters.
-    ? allAlertMessages.find(message => message.key === alertMessageKey)
-    : null;
 
   const tableOfContent = courseChapters.map((chapter, chapterIndex) => {
     const chapterCompletion = getChapterCompletion(chapter.id);
@@ -335,6 +326,7 @@ const CoursePage = ({
               <Column noOverflowParent noMargin>
                 <CoursePageHeader
                   course={course}
+                  courseChapters={courseChapters}
                   onBuyCourseWithCredits={onBuyCourseWithCredits}
                   onBuyCourse={onBuyCourse}
                   purchasingCourseListingData={purchasingCourseListingData}
@@ -343,20 +335,9 @@ const CoursePage = ({
                   }
                   simulateAppStoreProduct={simulateAppStoreProduct}
                 />
-                {!values.hiddenAlertMessages[alertMessageKey] && subtitleHint && (
-                  <Line>
-                    <AlertMessage
-                      kind="info"
-                      background="light"
-                      onHide={() => showAlertMessage(alertMessageKey, false)}
-                    >
-                      {subtitleHint.label}
-                    </AlertMessage>
-                  </Line>
-                )}
                 {course.introByLocale && (
                   <Line>
-                    <AlertMessage kind="info" background="light">
+                    <AlertMessage background="light">
                       {selectMessageByLocale(i18n, course.introByLocale)}
                     </AlertMessage>
                   </Line>

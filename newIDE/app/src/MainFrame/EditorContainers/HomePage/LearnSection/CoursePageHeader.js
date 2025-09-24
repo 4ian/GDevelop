@@ -4,7 +4,10 @@ import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import { type Course } from '../../../../Utils/GDevelopServices/Asset';
+import {
+  type Course,
+  type CourseChapter,
+} from '../../../../Utils/GDevelopServices/Asset';
 import { type CourseListingData } from '../../../../Utils/GDevelopServices/Shop';
 import { SectionRow } from '../SectionContainer';
 import Paper from '../../../../UI/Paper';
@@ -20,10 +23,7 @@ import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
 import CoursePurchaseDialog from './CoursePurchaseDialog';
-import {
-  getChipColorFromEnglishLevel,
-  getSpecializationConfig,
-} from './CourseCard';
+import { getSpecializationConfig } from './CourseCard';
 import { renderProductPrice } from '../../../../AssetStore/ProductPriceTag';
 import CourseStoreContext from '../../../../Course/CourseStoreContext';
 import PasswordPromptDialog from '../../../../AssetStore/PasswordPromptDialog';
@@ -33,7 +33,6 @@ import { shouldUseAppStoreProduct } from '../../../../Utils/AppStorePurchases';
 import { Divider } from '@material-ui/core';
 import classes from './CoursePageHeader.module.css';
 import Gold from '../../../../Profile/Subscription/Icons/Gold';
-import Chip from '../../../../UI/Chip';
 import SecureCheckout from '../../../../AssetStore/SecureCheckout/SecureCheckout';
 
 const styles = {
@@ -67,8 +66,8 @@ const styles = {
 };
 
 const ResponsiveDivider = () => {
-  const { isMobile, isMediumScreen } = useResponsiveWindowSize();
-  return isMobile || isMediumScreen ? (
+  const { isMobile } = useResponsiveWindowSize();
+  return isMobile ? (
     <Column noMargin>
       <Divider orientation="horizontal" />
     </Column>
@@ -81,6 +80,7 @@ const ResponsiveDivider = () => {
 
 type Props = {|
   course: Course,
+  courseChapters: Array<CourseChapter>,
   onBuyCourseWithCredits: (
     Course: Course,
     password: string,
@@ -98,6 +98,7 @@ type Props = {|
 
 const CoursePageHeader = ({
   course,
+  courseChapters,
   onBuyCourseWithCredits,
   onBuyCourse,
   purchasingCourseListingData,
@@ -141,6 +142,8 @@ const CoursePageHeader = ({
   const shouldUseOrSimulateAppStoreProduct =
     shouldUseAppStoreProduct() || simulateAppStoreProduct;
 
+  const isVideoCourse = courseChapters.some(chapter => 'videoUrl' in chapter);
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -163,30 +166,46 @@ const CoursePageHeader = ({
                     />
                   </div>
                   <ColumnStackLayout expand justifyContent="flex-start">
-                    {course.includedInSubscriptions.length && (
-                      <Line
-                        noMargin
-                        alignItems="center"
-                        justifyContent={
-                          isMobile || isMediumScreen ? 'flex-start' : 'flex-end'
-                        }
-                      >
-                        <div className={classes.premiumContainer}>
-                          <Paper style={styles.paper} background="medium">
-                            <Column>
-                              <Line expand alignItems="center" noMargin>
-                                <Gold style={styles.diamondIcon} />
-                                <Text>
-                                  <Trans>
-                                    Included with GDevelop subscriptions
-                                  </Trans>
-                                </Text>
-                              </Line>
-                            </Column>
-                          </Paper>
-                        </div>
-                      </Line>
-                    )}
+                    <ResponsiveLineStackLayout
+                      noMargin
+                      alignItems="center"
+                      justifyContent="space-between"
+                    >
+                      <LineStackLayout alignItems="center" noMargin>
+                        <span
+                          style={{
+                            ...styles.specializationDot,
+                            backgroundColor: specializationConfig.color,
+                          }}
+                        />
+                        <Text
+                          displayInlineAsSpan
+                          size="body-small"
+                          noMargin
+                          color="secondary"
+                          style={textEllipsisStyle}
+                        >
+                          {specializationConfig.label}
+                        </Text>
+                      </LineStackLayout>
+                      {course.isLocked &&
+                        course.includedInSubscriptions.length && (
+                          <div className={classes.premiumContainer}>
+                            <Paper style={styles.paper} background="medium">
+                              <Column>
+                                <Line expand alignItems="center" noMargin>
+                                  <Gold style={styles.diamondIcon} />
+                                  <Text>
+                                    <Trans>
+                                      Included with GDevelop subscriptions
+                                    </Trans>
+                                  </Text>
+                                </Line>
+                              </Column>
+                            </Paper>
+                          </div>
+                        )}
+                    </ResponsiveLineStackLayout>
                     <Text size="title" noMargin style={styles.title}>
                       {selectMessageByLocale(i18n, course.titleByLocale)}
                     </Text>
@@ -203,11 +222,23 @@ const CoursePageHeader = ({
                 <ResponsiveLineStackLayout
                   expand
                   justifyContent="space-between"
-                  forceMobileLayout={isMediumScreen}
+                  noColumnMargin
                 >
-                  <Column justifyContent="center" expand noMargin>
+                  <Column justifyContent="center" expand>
                     <Text>
                       <Trans>{course.chaptersTargetCount} chapters</Trans>
+                    </Text>
+                    <Text color="secondary" noMargin>
+                      {isVideoCourse ? (
+                        <Trans>
+                          Find the substitles in your language in the setting of
+                          each video.
+                        </Trans>
+                      ) : (
+                        <Trans>
+                          This course is translated in multiple languages.
+                        </Trans>
+                      )}
                     </Text>
                   </Column>
                   <ResponsiveDivider />
@@ -215,39 +246,21 @@ const CoursePageHeader = ({
                     justifyContent="center"
                     alignItems="flex-start"
                     expand
-                    noMargin
                   >
-                    <Chip
-                      style={{
-                        ...styles.chip,
-                        border: `1px solid ${getChipColorFromEnglishLevel(
-                          course.levelByLocale.en
-                        )}`,
-                      }}
-                      label={selectMessageByLocale(i18n, course.levelByLocale)}
-                      variant="outlined"
-                    />
+                    <Text>
+                      {selectMessageByLocale(i18n, course.levelByLocale)}
+                    </Text>
                   </Column>
-                  <ResponsiveDivider />
-                  <Column justifyContent="center" expand noMargin>
-                    <LineStackLayout alignItems="center" noMargin>
-                      <span
-                        style={{
-                          ...styles.specializationDot,
-                          backgroundColor: specializationConfig.color,
-                        }}
-                      />
-                      <Text
-                        displayInlineAsSpan
-                        size="body-small"
-                        noMargin
-                        color="secondary"
-                        style={textEllipsisStyle}
-                      >
-                        {specializationConfig.label}
-                      </Text>
-                    </LineStackLayout>
-                  </Column>
+                  {!shouldUseOrSimulateAppStoreProduct && course.isLocked && (
+                    <>
+                      <ResponsiveDivider />
+                      <Column justifyContent="center" expand>
+                        <Line>
+                          <SecureCheckout />
+                        </Line>
+                      </Column>
+                    </>
+                  )}
                 </ResponsiveLineStackLayout>
                 {course.isLocked && (
                   <Paper background="medium" style={{ padding: 16 }}>
@@ -292,9 +305,6 @@ const CoursePageHeader = ({
                               onWillBuyWithCredits(i18n)
                             }
                           />
-                          {!shouldUseOrSimulateAppStoreProduct && (
-                            <SecureCheckout />
-                          )}
                         </ResponsiveLineStackLayout>
                       </ResponsiveLineStackLayout>
                     )}

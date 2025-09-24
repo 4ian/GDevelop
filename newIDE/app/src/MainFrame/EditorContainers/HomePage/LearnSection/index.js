@@ -8,7 +8,7 @@ import {
 } from '../../../../Utils/GDevelopServices/Shop';
 import MainPage from './MainPage';
 import TutorialsCategoryPage from './TutorialsCategoryPage';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { TutorialContext } from '../../../../Tutorial/TutorialContext';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
@@ -33,6 +33,11 @@ import {
 } from '../../../../Utils/Analytics/EventSender';
 import { BundleStoreContext } from '../../../../AssetStore/Bundles/BundleStoreContext';
 import BundleInformationPage from '../../../../AssetStore/Bundles/BundleInformationPage';
+import {
+  getBundleListingDataFromCategory,
+  getBundleListingDataFromUserFriendlySlug,
+} from '../../../../AssetStore/AssetStoreUtils';
+import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
 
 type Props = {|
   selectInAppTutorial: (tutorialId: string) => void,
@@ -80,6 +85,9 @@ type Props = {|
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
   getSubscriptionPlansWithPricingSystems: () => Array<SubscriptionPlanWithPricingSystems> | null,
   receivedCourses: ?Array<Course>,
+  initialBundleUserFriendlySlug: ?string,
+  initialBundleCategory: ?string,
+  clearInitialBundleValues: () => void,
 |};
 
 const LearnSection = ({
@@ -107,10 +115,16 @@ const LearnSection = ({
   onSelectExampleShortHeader,
   getSubscriptionPlansWithPricingSystems,
   receivedCourses,
+  initialBundleUserFriendlySlug,
+  initialBundleCategory,
+  clearInitialBundleValues,
 }: Props) => {
   const { fetchTutorials } = React.useContext(TutorialContext);
-  const { fetchBundles } = React.useContext(BundleStoreContext);
+  const { fetchBundles, bundleListingDatas } = React.useContext(
+    BundleStoreContext
+  );
   const { navigateToRoute } = React.useContext(RouterContext);
+  const { showAlert } = useAlertDialog();
 
   const [
     selectedBundleListingData,
@@ -132,6 +146,62 @@ const LearnSection = ({
       setSelectedBundleListingData(bundleListingData);
     },
     [setSelectedBundleListingData]
+  );
+
+  // When the bundles are loaded,
+  // open the bundle with the slug that was asked to be initially loaded.
+  React.useEffect(
+    () => {
+      if (
+        (!initialBundleUserFriendlySlug && !initialBundleCategory) ||
+        !bundleListingDatas
+      ) {
+        return;
+      }
+
+      clearInitialBundleValues();
+
+      let bundleListingData: ?BundleListingData = null;
+      // Open the information page of a the bundle.
+      if (initialBundleUserFriendlySlug) {
+        bundleListingData = getBundleListingDataFromUserFriendlySlug({
+          bundleListingDatas,
+          userFriendlySlug: initialBundleUserFriendlySlug,
+        });
+      } else if (initialBundleCategory) {
+        bundleListingData = getBundleListingDataFromCategory({
+          bundleListingDatas,
+          category: initialBundleCategory,
+        });
+      }
+
+      if (!bundleListingData) {
+        showAlert({
+          title: t`Bundle not found`,
+          message: t`The link to the bundle you've followed seems outdated. Why not take a look at the other bundles?`,
+        });
+        return;
+      }
+
+      const priceForUsageType = bundleListingData.prices.find(
+        price => price.usageType === 'default'
+      );
+      sendBundleInformationOpened({
+        bundleName: bundleListingData.name,
+        bundleId: bundleListingData.id,
+        source: 'web-link',
+        priceValue: priceForUsageType && priceForUsageType.value,
+        priceCurrency: priceForUsageType && priceForUsageType.currency,
+      });
+      setSelectedBundleListingData(bundleListingData);
+    },
+    [
+      bundleListingDatas,
+      showAlert,
+      initialBundleUserFriendlySlug,
+      initialBundleCategory,
+      clearInitialBundleValues,
+    ]
   );
 
   const onOpenCourse = React.useCallback(

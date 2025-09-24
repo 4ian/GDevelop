@@ -18,6 +18,7 @@ namespace gdjs {
       rendered2DLayersCount: 0,
       rendered3DLayersCount: 0,
     };
+    private _backgroundColor: THREE.Color | null = null;
 
     constructor(
       runtimeScene: gdjs.RuntimeScene,
@@ -210,15 +211,23 @@ namespace gdjs {
                 );
                 threeRenderer.resetState();
                 if (this._runtimeScene.getClearCanvas()) threeRenderer.clear();
-                threeScene.background = new THREE.Color(
+                if (!this._backgroundColor) {
+                  this._backgroundColor = new THREE.Color();
+                }
+                this._backgroundColor.set(
                   this._runtimeScene.getBackgroundColor()
                 );
+                if (!threeScene.background) {
+                  threeScene.background = this._backgroundColor;
+                }
 
                 isFirstRender = false;
               } else {
                 // It's important to set the background to null, as maybe the first rendered
                 // layer has changed and so the Three.js scene background must be reset.
-                threeScene.background = null;
+                if (threeScene.background === this._backgroundColor) {
+                  threeScene.background = null;
+                }
               }
 
               // Clear the depth as each layer is independent and display on top of the previous one,

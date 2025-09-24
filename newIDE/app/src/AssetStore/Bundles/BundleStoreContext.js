@@ -9,7 +9,10 @@ import {
 } from '../../Utils/GDevelopServices/Shop';
 import { capitalize } from 'lodash';
 import { AssetStoreNavigatorContext } from '../AssetStoreNavigator';
-import { getBundleListingDataFromUserFriendlySlug } from '../AssetStoreUtils';
+import {
+  getBundleListingDataFromCategory,
+  getBundleListingDataFromUserFriendlySlug,
+} from '../AssetStoreUtils';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { t } from '@lingui/macro';
 import { sendBundleInformationOpened } from '../../Utils/Analytics/EventSender';
@@ -28,6 +31,7 @@ type BundleStoreState = {|
     bundleListingDatasSearchResults: ?Array<BundleListingData>,
     filtersState: FiltersState,
     setInitialBundleUserFriendlySlug: string => void,
+    setInitialBundleCategory: string => void,
   },
 |};
 
@@ -48,6 +52,7 @@ export const initialBundleStoreState: BundleStoreState = {
     setInitialBundleUserFriendlySlug: (
       initialBundleUserFriendlySlug: string
     ) => {},
+    setInitialBundleCategory: (initialBundleCategory: string) => {},
   },
 };
 
@@ -78,6 +83,10 @@ export const BundleStoreStateProvider = ({
   const [
     initialBundleUserFriendlySlug,
     setInitialBundleUserFriendlySlug,
+  ] = React.useState<?string>(null);
+  const [
+    initialBundleCategory,
+    setInitialBundleCategory,
   ] = React.useState<?string>(null);
   const initialBundleOpened = React.useRef<boolean>(false);
 
@@ -140,54 +149,69 @@ export const BundleStoreStateProvider = ({
   // open the bundle with the slug that was asked to be initially loaded.
   React.useEffect(
     () => {
-      if (!initialBundleUserFriendlySlug || initialBundleOpened.current) {
+      if (
+        (!initialBundleUserFriendlySlug && !initialBundleCategory) ||
+        initialBundleOpened.current ||
+        !bundleListingDatas
+      ) {
         // If there is no initial bundle or
         // if the bundle was already opened, don't re-open it again even
         // if the effect run again.
         return;
       }
 
-      if (bundleListingDatas && initialBundleUserFriendlySlug) {
-        initialBundleOpened.current = true;
+      initialBundleOpened.current = true;
 
-        // Open the information page of a the bundle.
-        const bundleListingData = getBundleListingDataFromUserFriendlySlug({
+      let bundleListingData: ?BundleListingData = null;
+      // Open the information page of a the bundle.
+      if (initialBundleUserFriendlySlug) {
+        bundleListingData = getBundleListingDataFromUserFriendlySlug({
           bundleListingDatas,
           userFriendlySlug: initialBundleUserFriendlySlug,
         });
+      } else if (initialBundleCategory) {
+        bundleListingData = getBundleListingDataFromCategory({
+          bundleListingDatas,
+          category: initialBundleCategory,
+        });
+      }
 
-        if (bundleListingData) {
-          const priceForUsageType = bundleListingData.prices.find(
-            price => price.usageType === 'default'
-          );
-          sendBundleInformationOpened({
-            bundleName: bundleListingData.name,
-            bundleId: bundleListingData.id,
-            source: 'web-link',
-            priceValue: priceForUsageType && priceForUsageType.value,
-            priceCurrency: priceForUsageType && priceForUsageType.currency,
-          });
-          shopNavigationState.openBundleInformationPage({
-            bundleListingData,
-            storeSearchText: true,
-            clearSearchText: false,
-          });
-          initialBundleOpened.current = false; // Allow to open the bundle again if the effect run again.
-          setInitialBundleUserFriendlySlug(null);
-          return;
-        }
-
+      if (!bundleListingData) {
         showAlert({
           title: t`Bundle not found`,
           message: t`The link to the bundle you've followed seems outdated. Why not take a look at the other bundles in the store?`,
         });
+        setInitialBundleUserFriendlySlug(null);
+        setInitialBundleCategory(null);
+        initialBundleOpened.current = false; // Allow to open the bundle again if the effect run again.
+        return;
       }
+
+      const priceForUsageType = bundleListingData.prices.find(
+        price => price.usageType === 'default'
+      );
+      sendBundleInformationOpened({
+        bundleName: bundleListingData.name,
+        bundleId: bundleListingData.id,
+        source: 'web-link',
+        priceValue: priceForUsageType && priceForUsageType.value,
+        priceCurrency: priceForUsageType && priceForUsageType.currency,
+      });
+      shopNavigationState.openBundleInformationPage({
+        bundleListingData,
+        storeSearchText: true,
+        clearSearchText: false,
+      });
+      initialBundleOpened.current = false; // Allow to open the bundle again if the effect run again.
+      setInitialBundleUserFriendlySlug(null);
+      setInitialBundleCategory(null);
     },
     [
       bundleListingDatas,
       shopNavigationState,
       showAlert,
       initialBundleUserFriendlySlug,
+      initialBundleCategory,
     ]
   );
 
@@ -247,6 +271,7 @@ export const BundleStoreStateProvider = ({
         setSearchText: setShopSearchText,
         filtersState: currentPage.filtersState,
         setInitialBundleUserFriendlySlug,
+        setInitialBundleCategory,
       },
     }),
     [

@@ -56,6 +56,11 @@ namespace gdjs {
      */
     private _loadedThreeTextures: Hashtable<THREE.Texture>;
     private _loadedThreeMaterials = new ThreeMaterialCache();
+    private _loadedThreeCubeTextures = new Map<string, THREE.CubeTexture>();
+    private _loadedThreeCubeTextureKeysByResourceName = new ArrayMap<
+      string,
+      string
+    >();
 
     private _diskTextures = new Map<float, PIXI.Texture>();
     private _rectangleTextures = new Map<string, PIXI.Texture>();
@@ -185,7 +190,25 @@ namespace gdjs {
       if (loadedThreeTexture) {
         return loadedThreeTexture;
       }
+      const image = this._getImageSource(resourceName);
 
+      const threeTexture = new THREE.Texture(image);
+      threeTexture.magFilter = THREE.LinearFilter;
+      threeTexture.minFilter = THREE.LinearFilter;
+      threeTexture.wrapS = THREE.RepeatWrapping;
+      threeTexture.wrapT = THREE.RepeatWrapping;
+      threeTexture.colorSpace = THREE.SRGBColorSpace;
+      threeTexture.needsUpdate = true;
+
+      const resource = this._getImageResource(resourceName);
+
+      applyThreeTextureSettings(threeTexture, resource);
+      this._loadedThreeTextures.put(resourceName, threeTexture);
+
+      return threeTexture;
+    }
+
+    private _getImageSource(resourceName: string): HTMLImageElement {
       // Texture is not loaded, load it now from the PixiJS texture.
       // TODO (3D) - optimization: don't load the PixiJS Texture if not used by PixiJS.
       // TODO (3D) - optimization: Ideally we could even share the same WebGL texture.
@@ -202,21 +225,86 @@ namespace gdjs {
           `Can't load texture for resource "${resourceName}" as it's not an image.`
         );
       }
+      return image;
+    }
 
-      const threeTexture = new THREE.Texture(image);
-      threeTexture.magFilter = THREE.LinearFilter;
-      threeTexture.minFilter = THREE.LinearFilter;
-      threeTexture.wrapS = THREE.RepeatWrapping;
-      threeTexture.wrapT = THREE.RepeatWrapping;
-      threeTexture.colorSpace = THREE.SRGBColorSpace;
-      threeTexture.needsUpdate = true;
+    /**
+     * Return the three.js texture associated to the specified resource name.
+     * Returns a placeholder texture if not found.
+     * @param xPositiveResourceName The name of the resource
+     * @returns The requested cube texture, or a placeholder if not found.
+     */
+    getThreeCubeTexture(
+      xPositiveResourceName: string,
+      xNegativeResourceName: string,
+      yPositiveResourceName: string,
+      yNegativeResourceName: string,
+      zPositiveResourceName: string,
+      zNegativeResourceName: string
+    ): THREE.CubeTexture {
+      const key =
+        xPositiveResourceName +
+        '|' +
+        xNegativeResourceName +
+        '|' +
+        yPositiveResourceName +
+        '|' +
+        yNegativeResourceName +
+        '|' +
+        zPositiveResourceName +
+        '|' +
+        zNegativeResourceName;
+      const loadedThreeTexture = this._loadedThreeCubeTextures.get(key);
+      if (loadedThreeTexture) {
+        return loadedThreeTexture;
+      }
 
-      const resource = this._getImageResource(resourceName);
+      const cubeTexture = new THREE.CubeTexture();
+      // Faces on X axis need to be swapped.
+      cubeTexture.images[0] = this._getImageSource(xNegativeResourceName);
+      cubeTexture.images[1] = this._getImageSource(xPositiveResourceName);
+      // Faces on Y keep the same order.
+      cubeTexture.images[2] = this._getImageSource(yPositiveResourceName);
+      cubeTexture.images[3] = this._getImageSource(yNegativeResourceName);
+      // Faces on Z keep the same order.
+      cubeTexture.images[4] = this._getImageSource(zPositiveResourceName);
+      cubeTexture.images[5] = this._getImageSource(zNegativeResourceName);
+      // The images also need to be mirrored horizontally by users.
 
-      applyThreeTextureSettings(threeTexture, resource);
-      this._loadedThreeTextures.put(resourceName, threeTexture);
+      cubeTexture.magFilter = THREE.LinearFilter;
+      cubeTexture.minFilter = THREE.LinearFilter;
+      cubeTexture.colorSpace = THREE.SRGBColorSpace;
+      cubeTexture.needsUpdate = true;
 
-      return threeTexture;
+      const resource = this._getImageResource(xPositiveResourceName);
+      applyThreeTextureSettings(cubeTexture, resource);
+      this._loadedThreeCubeTextures.set(key, cubeTexture);
+      this._loadedThreeCubeTextureKeysByResourceName.add(
+        xPositiveResourceName,
+        key
+      );
+      this._loadedThreeCubeTextureKeysByResourceName.add(
+        xNegativeResourceName,
+        key
+      );
+      this._loadedThreeCubeTextureKeysByResourceName.add(
+        yPositiveResourceName,
+        key
+      );
+      this._loadedThreeCubeTextureKeysByResourceName.add(
+        yNegativeResourceName,
+        key
+      );
+      this._loadedThreeCubeTextureKeysByResourceName.add(
+        zPositiveResourceName,
+        key
+      );
+      this._loadedThreeCubeTextureKeysByResourceName.add(
+        zNegativeResourceName,
+        key
+      );
+
+      return cubeTexture;
     }
 
     /**
@@ -486,6 +574,11 @@ namespace gdjs {
       for (const threeTexture of threeTextures) {
         threeTexture.dispose();
       }
+      for (const cubeTexture of this._loadedThreeCubeTextures.values()) {
+        cubeTexture.dispose();
+      }
+      this._loadedThreeCubeTextures.clear();
+      this._loadedThreeCubeTextureKeysByResourceName.clear();
 
       this._loadedThreeMaterials.disposeAll();
 
@@ -532,12 +625,51 @@ namespace gdjs {
       }
 
       this._loadedThreeMaterials.dispose(resourceName);
+
+      const cubeTextureKeys =
+        this._loadedThreeCubeTextureKeysByResourceName.getValuesFor(
+          resourceName
+        );
+      if (cubeTextureKeys) {
+        for (const cubeTextureKey of cubeTextureKeys) {
+          const cubeTexture = this._loadedThreeCubeTextures.get(cubeTextureKey);
+          if (cubeTexture) {
+            cubeTexture.dispose();
+            this._loadedThreeCubeTextures.delete(cubeTextureKey);
+          }
+        }
+      }
+    }
+  }
+
+  class ArrayMap<K, V> {
+    map = new Map<K, Array<V>>();
+
+    getValuesFor(key: K): Array<V> | undefined {
+      return this.map.get(key);
+    }
+
+    add(key: K, value: V): void {
+      let values = this.map.get(key);
+      if (!values) {
+        values = [];
+        this.map.set(key, values);
+      }
+      values.push(value);
+    }
+
+    deleteValuesFor(key: K): void {
+      this.map.delete(key);
+    }
+
+    clear(): void {
+      this.map.clear();
     }
   }
 
   class ThreeMaterialCache {
     private _flaggedMaterials = new Map<string, THREE.Material>();
-    private _materialFlaggedKeys = new Map<string, Array<string>>();
+    private _materialFlaggedKeys = new ArrayMap<string, string>();
 
     /**
      * Return the three.js material associated to the specified resource name
@@ -588,12 +720,7 @@ namespace gdjs {
         forceBasicMaterial ? 1 : 0
       }|${vertexColors ? 1 : 0}`;
       this._flaggedMaterials.set(cacheKey, material);
-      let flaggedKeys = this._materialFlaggedKeys.get(resourceName);
-      if (!flaggedKeys) {
-        flaggedKeys = [];
-        this._materialFlaggedKeys.set(resourceName, flaggedKeys);
-      }
-      flaggedKeys.push(cacheKey);
+      this._materialFlaggedKeys.add(resourceName, cacheKey);
     }
 
     /**
@@ -602,7 +729,7 @@ namespace gdjs {
      * @param resourceName The name of the resource
      */
     dispose(resourceName: string): void {
-      const flaggedKeys = this._materialFlaggedKeys.get(resourceName);
+      const flaggedKeys = this._materialFlaggedKeys.getValuesFor(resourceName);
       if (flaggedKeys) {
         for (const flaggedKey of flaggedKeys) {
           const threeMaterial = this._flaggedMaterials.get(flaggedKey);
@@ -612,7 +739,7 @@ namespace gdjs {
           this._flaggedMaterials.delete(flaggedKey);
         }
       }
-      this._materialFlaggedKeys.delete(resourceName);
+      this._materialFlaggedKeys.deleteValuesFor(resourceName);
     }
 
     /**

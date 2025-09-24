@@ -2,11 +2,24 @@
 
 namespace gdjs {
   interface PhysicsCharacter3DNetworkSyncDataType {
+    sma: float;
+    shm: float;
+    grav: float;
+    mfs: float;
+    facc: float;
+    fdec: float;
+    fsm: float;
+    sacc: float;
+    sdec: float;
+    ssm: float;
+    jumpspeed: float;
+    jumpsustime: float;
+    sbpa: boolean;
     fwa: float;
     fws: float;
     sws: float;
-    fs: float;
-    js: float;
+    cfs: float;
+    cjs: float;
     cj: boolean;
     lek: boolean;
     rik: boolean;
@@ -312,11 +325,24 @@ namespace gdjs {
       return {
         ...super.getNetworkSyncData(options),
         props: {
+          sma: this._slopeMaxAngle,
+          shm: this._stairHeightMax,
+          grav: this._gravity,
+          mfs: this._maxFallingSpeed,
+          facc: this._forwardAcceleration,
+          fdec: this._forwardDeceleration,
+          fsm: this._forwardSpeedMax,
+          sacc: this._sidewaysAcceleration,
+          sdec: this._sidewaysDeceleration,
+          ssm: this._sidewaysSpeedMax,
+          jumpspeed: this._jumpSpeed,
+          jumpsustime: this._jumpSustainTime,
           fwa: this._forwardAngle,
+          sbpa: this._shouldBindObjectAndForwardAngle,
           fws: this._currentForwardSpeed,
           sws: this._currentSidewaysSpeed,
-          fs: this._currentFallSpeed,
-          js: this._currentJumpSpeed,
+          cfs: this._currentFallSpeed,
+          cjs: this._currentJumpSpeed,
           cj: this._canJump,
           lek: this._wasLeftKeyPressed,
           rik: this._wasRightKeyPressed,
@@ -339,11 +365,24 @@ namespace gdjs {
       super.updateFromNetworkSyncData(networkSyncData, options);
 
       const behaviorSpecificProps = networkSyncData.props;
+      this._slopeMaxAngle = behaviorSpecificProps.sma;
+      this._stairHeightMax = behaviorSpecificProps.shm;
+      this._gravity = behaviorSpecificProps.grav;
+      this._maxFallingSpeed = behaviorSpecificProps.mfs;
+      this._forwardAcceleration = behaviorSpecificProps.facc;
+      this._forwardDeceleration = behaviorSpecificProps.fdec;
+      this._forwardSpeedMax = behaviorSpecificProps.fsm;
+      this._sidewaysAcceleration = behaviorSpecificProps.sacc;
+      this._sidewaysDeceleration = behaviorSpecificProps.sdec;
+      this._sidewaysSpeedMax = behaviorSpecificProps.ssm;
+      this._jumpSpeed = behaviorSpecificProps.jumpspeed;
+      this._jumpSustainTime = behaviorSpecificProps.jumpsustime;
       this._forwardAngle = behaviorSpecificProps.fwa;
+      this._shouldBindObjectAndForwardAngle = behaviorSpecificProps.sbpa;
       this._currentForwardSpeed = behaviorSpecificProps.fws;
       this._currentSidewaysSpeed = behaviorSpecificProps.sws;
-      this._currentFallSpeed = behaviorSpecificProps.fs;
-      this._currentJumpSpeed = behaviorSpecificProps.js;
+      this._currentFallSpeed = behaviorSpecificProps.cfs;
+      this._currentJumpSpeed = behaviorSpecificProps.cjs;
       this._canJump = behaviorSpecificProps.cj;
       this._hasPressedForwardKey = behaviorSpecificProps.upk;
       this._hasPressedBackwardKey = behaviorSpecificProps.dok;

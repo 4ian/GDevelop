@@ -372,14 +372,18 @@ namespace gdjs {
         }
         object.setX(Math.round(initialPosition.x + movement.translationX));
         object.setY(Math.round(initialPosition.y + movement.translationY));
-        object.setAngle(initialPosition.angle + movement.rotationZ);
-        object.setWidth(initialPosition.width * movement.scaleX);
-        object.setHeight(initialPosition.height * movement.scaleY);
+        object.setAngle(Math.round(initialPosition.angle + movement.rotationZ));
+        object.setWidth(initialPosition.width * Math.abs(movement.scaleX));
+        object.setHeight(initialPosition.height * Math.abs(movement.scaleY));
         if (is3D(object)) {
           object.setZ(Math.round(initialPosition.z + movement.translationZ));
-          object.setRotationX(initialPosition.rotationX + movement.rotationX);
-          object.setRotationY(initialPosition.rotationY + movement.rotationY);
-          object.setDepth(initialPosition.depth * movement.scaleZ);
+          object.setRotationX(
+            Math.round(initialPosition.rotationX + movement.rotationX)
+          );
+          object.setRotationY(
+            Math.round(initialPosition.rotationY + movement.rotationY)
+          );
+          object.setDepth(initialPosition.depth * Math.abs(movement.scaleZ));
         }
       });
     }
@@ -2498,11 +2502,6 @@ namespace gdjs {
 
     updateTargetFramerate(elapsedTime: float) {
       const inputManager = this._runtimeGame.getInputManager();
-
-      // Check if user interaction are happening:
-      if (this._draggedNewObject) {
-        this._timeSinceLastInteraction = 0;
-      }
       if (
         inputManager.anyKeyPressed() ||
         inputManager.anyMouseButtonPressed() ||

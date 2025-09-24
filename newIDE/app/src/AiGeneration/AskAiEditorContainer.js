@@ -40,7 +40,10 @@ import {
 } from './AiRequestUtils';
 import { useStableUpToDateRef } from '../Utils/UseStableUpToDateCallback';
 import { useTriggerAtNextRender } from '../Utils/useTriggerAtNextRender';
-import { type NewProjectSetup } from '../ProjectCreation/NewProjectSetupDialog';
+import {
+  type NewProjectSetup,
+  type ExampleProjectSetup,
+} from '../ProjectCreation/NewProjectSetupDialog';
 import { type FileMetadata, type StorageProvider } from '../ProjectsStorage';
 import { useEnsureExtensionInstalled } from './UseEnsureExtensionInstalled';
 import { useGenerateEvents } from './UseGenerateEvents';
@@ -50,10 +53,7 @@ import {
   sendAiRequestMessageSent,
   sendAiRequestStarted,
 } from '../Utils/Analytics/EventSender';
-import {
-  type ExampleShortHeader,
-  listAllExamples,
-} from '../Utils/GDevelopServices/Example';
+import { listAllExamples } from '../Utils/GDevelopServices/Example';
 import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
 import { prepareAiUserContent } from './PrepareAiUserContent';
 import { AiRequestContext } from './AiRequestContext';
@@ -339,10 +339,7 @@ type Props = {|
   setToolbar: (?React.Node) => void,
   i18n: I18nType,
   onCreateProjectFromExample: (
-    exampleShortHeader: ExampleShortHeader,
-    newProjectSetup: NewProjectSetup,
-    i18n: I18nType,
-    isQuickCustomization?: boolean
+    exampleProjectSetup: ExampleProjectSetup
   ) => Promise<CreateProjectResult>,
   onCreateEmptyProject: (
     newProjectSetup: NewProjectSetup
@@ -441,6 +438,7 @@ export const AskAiEditor = React.memo<Props>(
             storageProvider: UrlStorageProvider,
             saveAsLocation: null,
             dontOpenAnySceneOrProjectManager: true,
+            creationSource: 'ai-agent-request',
           };
 
           if (exampleSlug) {
@@ -449,12 +447,11 @@ export const AskAiEditor = React.memo<Props>(
               header => header.slug === exampleSlug
             );
             if (exampleShortHeader) {
-              const { createdProject } = await onCreateProjectFromExample(
+              const { createdProject } = await onCreateProjectFromExample({
                 exampleShortHeader,
                 newProjectSetup,
                 i18n,
-                false
-              );
+              });
               return { exampleSlug, createdProject };
             }
 
@@ -466,6 +463,7 @@ export const AskAiEditor = React.memo<Props>(
             storageProvider: UrlStorageProvider,
             saveAsLocation: null,
             dontOpenAnySceneOrProjectManager: true,
+            creationSource: 'ai-agent-request',
           });
 
           return { exampleSlug: null, createdProject };

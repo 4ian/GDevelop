@@ -84,6 +84,13 @@ export const generateProjectName = (nameToAppend: ?string) =>
     CLOUD_PROJECT_NAME_MAX_LENGTH
   );
 
+export type NewProjectCreationSource =
+  | 'default'
+  | 'quick-customization'
+  | 'ai-agent-request'
+  | 'course-chapter'
+  | 'in-app-tutorial';
+
 export type NewProjectSetup = {|
   storageProvider: StorageProvider,
   saveAsLocation: ?SaveAsLocation,
@@ -94,6 +101,13 @@ export type NewProjectSetup = {|
   optimizeForPixelArt?: boolean,
   openQuickCustomizationDialog?: boolean,
   dontOpenAnySceneOrProjectManager?: boolean,
+  creationSource: NewProjectCreationSource,
+|};
+
+export type ExampleProjectSetup = {|
+  exampleShortHeader: ExampleShortHeader,
+  newProjectSetup: NewProjectSetup,
+  i18n: I18nType,
 |};
 
 type Props = {|
@@ -103,9 +117,7 @@ type Props = {|
     newProjectSetup: NewProjectSetup
   ) => Promise<CreateProjectResult>,
   onCreateFromExample: (
-    exampleShortHeader: ExampleShortHeader,
-    newProjectSetup: NewProjectSetup,
-    i18n: I18nType
+    exampleProjectSetup: ExampleProjectSetup
   ) => Promise<CreateProjectResult>,
   onCreateProjectFromPrivateGameTemplate: (
     privateGameTemplateListingData: PrivateGameTemplateListingData,
@@ -414,7 +426,7 @@ const NewProjectSetupDialog = ({
           })
         : saveAsLocation;
 
-      const projectSetup = {
+      const projectSetup: NewProjectSetup = {
         projectName,
         storageProvider,
         saveAsLocation: projectLocation,
@@ -422,19 +434,20 @@ const NewProjectSetupDialog = ({
         width: selectedWidth,
         orientation: selectedOrientation,
         optimizeForPixelArt,
+        creationSource: 'default',
       };
 
       if (selectedExampleShortHeader) {
-        await onCreateFromExample(
-          selectedExampleShortHeader,
-          {
-            // We only pass down the project name as this is the only customizable field for an example.
+        await onCreateFromExample({
+          exampleShortHeader: selectedExampleShortHeader,
+          newProjectSetup: {
             projectName,
             storageProvider,
             saveAsLocation: projectLocation,
+            creationSource: 'default',
           },
-          i18n
-        );
+          i18n,
+        });
       } else if (selectedPrivateGameTemplateListingData) {
         await onCreateProjectFromPrivateGameTemplate(
           selectedPrivateGameTemplateListingData,
@@ -443,6 +456,7 @@ const NewProjectSetupDialog = ({
             projectName,
             storageProvider,
             saveAsLocation,
+            creationSource: 'default',
           },
           i18n
         );

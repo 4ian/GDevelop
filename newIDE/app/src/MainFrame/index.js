@@ -177,6 +177,7 @@ import CloudStorageProvider from '../ProjectsStorage/CloudStorageProvider';
 import useCreateProject from '../Utils/UseCreateProject';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
+import { type NewProjectSetup } from '../ProjectCreation/NewProjectSetupDialog';
 import useEditorTabsStateSaving from './EditorTabs/UseEditorTabsStateSaving';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import useResourcesWatcher from './ResourcesWatcher';
@@ -3409,6 +3410,7 @@ const MainFrame = (props: Props) => {
         await createProjectFromTutorial(tutorialId, {
           storageProvider: emptyStorageProvider,
           saveAsLocation: null,
+          creationSource: 'in-app-tutorial',
           // Remaining will be set by the template.
         });
       } catch (error) {
@@ -3433,15 +3435,17 @@ const MainFrame = (props: Props) => {
       if (!projectIsClosed) {
         return;
       }
+      const newProjectSetup: NewProjectSetup = {
+        storageProvider: emptyStorageProvider,
+        saveAsLocation: null,
+        creationSource: 'course-chapter',
+        // Remaining will be set by the template.
+      };
       try {
         await createProjectFromCourseChapter({
           courseChapter,
           templateId,
-          newProjectSetup: {
-            storageProvider: emptyStorageProvider,
-            saveAsLocation: null,
-            // Remaining will be set by the template.
-          },
+          newProjectSetup,
         });
       } catch (error) {
         showErrorBox({
@@ -3522,6 +3526,7 @@ const MainFrame = (props: Props) => {
             {
               storageProvider: emptyStorageProvider,
               saveAsLocation: null,
+              creationSource: 'in-app-tutorial',
               // Remaining will be set by the template.
             }
           );

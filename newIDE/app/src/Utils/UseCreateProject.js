@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { t } from '@lingui/macro';
-import { type I18n as I18nType } from '@lingui/core';
 import {
   createNewEmptyProject,
   createNewProjectFromExampleShortHeader,
@@ -10,14 +9,16 @@ import {
   createNewProjectFromCourseChapterTemplate,
   type NewProjectSource,
 } from '../ProjectCreation/CreateProject';
-import { type NewProjectSetup } from '../ProjectCreation/NewProjectSetupDialog';
+import {
+  type NewProjectSetup,
+  type ExampleProjectSetup,
+} from '../ProjectCreation/NewProjectSetupDialog';
 import { type State } from '../MainFrame';
 import {
   type StorageProvider,
   type StorageProviderOperations,
   type FileMetadata,
 } from '../ProjectsStorage';
-import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { registerGame } from './GDevelopServices/Game';
 import { type MoveAllProjectResourcesOptionsWithoutProgress } from '../ProjectsStorage/ResourceMover';
@@ -315,7 +316,9 @@ const useCreateProject = ({
   const createEmptyProject = React.useCallback(
     async (newProjectSetup: NewProjectSetup): Promise<CreateProjectResult> => {
       beforeCreatingProject();
-      const newProjectSource = createNewEmptyProject();
+      const newProjectSource = createNewEmptyProject({
+        creationSource: newProjectSetup.creationSource,
+      });
       return await createProject(newProjectSource, newProjectSetup);
     },
     [beforeCreatingProject, createProject]
@@ -323,18 +326,16 @@ const useCreateProject = ({
 
   const createProjectFromExample = React.useCallback(
     async (
-      exampleShortHeader: ExampleShortHeader,
-      newProjectSetup: NewProjectSetup,
-      i18n: I18nType,
-      isQuickCustomization?: boolean
+      exampleProjectSetup: ExampleProjectSetup
     ): Promise<CreateProjectResult> => {
       beforeCreatingProject();
-      const newProjectSource = await createNewProjectFromExampleShortHeader({
-        i18n,
-        exampleShortHeader,
-        isQuickCustomization,
-      });
-      return await createProject(newProjectSource, newProjectSetup);
+      const newProjectSource = await createNewProjectFromExampleShortHeader(
+        exampleProjectSetup
+      );
+      return await createProject(
+        newProjectSource,
+        exampleProjectSetup.newProjectSetup
+      );
     },
     [beforeCreatingProject, createProject]
   );

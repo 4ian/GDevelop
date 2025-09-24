@@ -15,6 +15,7 @@ import optionalRequire from '../OptionalRequire';
 import Window from '../Window';
 import { isMobile, isNativeMobileApp } from '../Platform';
 import { retryIfFailed } from '../RetryIfFailed';
+import { type NewProjectCreationSource } from '../../ProjectCreation/NewProjectSetupDialog';
 const electron = optionalRequire('electron');
 
 const isElectronApp = !!electron;
@@ -303,17 +304,20 @@ export const sendExampleDetailsOpened = (slug: string) => {
 export const sendNewGameCreated = ({
   exampleUrl,
   exampleSlug,
-  isCourseChapterTemplate,
+  exampleCompositeSlug,
+  creationSource,
 }: {|
   exampleUrl: string,
   exampleSlug: string,
-  isCourseChapterTemplate?: true,
+  exampleCompositeSlug: string,
+  creationSource: NewProjectCreationSource,
 |}) => {
   recordEvent('new_game_creation', {
     platform: 'GDevelop JS Platform', // Hardcoded here for now
     templateName: exampleUrl,
     exampleSlug,
-    isCourseChapterTemplate,
+    exampleCompositeSlug,
+    creationSource,
   });
 };
 

@@ -316,7 +316,9 @@ const useCreateProject = ({
   const createEmptyProject = React.useCallback(
     async (newProjectSetup: NewProjectSetup): Promise<CreateProjectResult> => {
       beforeCreatingProject();
-      const newProjectSource = createNewEmptyProject();
+      const newProjectSource = createNewEmptyProject({
+        creationSource: newProjectSetup.creationSource,
+      });
       return await createProject(newProjectSource, newProjectSetup);
     },
     [beforeCreatingProject, createProject]

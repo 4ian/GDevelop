@@ -550,12 +550,12 @@ const CreateSection = ({
                           storageProvider: UrlStorageProvider,
                           saveAsLocation: null,
                           openQuickCustomizationDialog: true,
+                          creationSource: 'quick-customization',
                         };
                         onCreateProjectFromExample({
                           exampleShortHeader,
                           newProjectSetup,
                           i18n,
-                          creationSource: 'quick-customization',
                         });
                       }}
                       quickCustomizationRecommendation={

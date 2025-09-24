@@ -438,6 +438,7 @@ export const AskAiEditor = React.memo<Props>(
             storageProvider: UrlStorageProvider,
             saveAsLocation: null,
             dontOpenAnySceneOrProjectManager: true,
+            creationSource: 'ai-agent-request',
           };
 
           if (exampleSlug) {
@@ -450,7 +451,6 @@ export const AskAiEditor = React.memo<Props>(
                 exampleShortHeader,
                 newProjectSetup,
                 i18n,
-                creationSource: 'ai-agent-request',
               });
               return { exampleSlug, createdProject };
             }
@@ -463,6 +463,7 @@ export const AskAiEditor = React.memo<Props>(
             storageProvider: UrlStorageProvider,
             saveAsLocation: null,
             dontOpenAnySceneOrProjectManager: true,
+            creationSource: 'ai-agent-request',
           });
 
           return { exampleSlug: null, createdProject };

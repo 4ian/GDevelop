@@ -5,7 +5,10 @@ import { getExample } from '../Utils/GDevelopServices/Example';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
 import { showErrorBox } from '../UI/Messages/MessageBox';
-import { type ExampleProjectSetup } from './NewProjectSetupDialog';
+import {
+  type ExampleProjectSetup,
+  type NewProjectCreationSource,
+} from './NewProjectSetupDialog';
 const gd: libGDevelop = global.gd;
 
 export type NewProjectSource = {|
@@ -60,10 +63,22 @@ export const addDefaultLightToAllLayers = (layout: gdLayout): void => {
   }
 };
 
-export const createNewEmptyProject = (): NewProjectSource => {
+export const createNewEmptyProject = ({
+  creationSource,
+}: {|
+  creationSource: NewProjectCreationSource,
+|}): NewProjectSource => {
   const project: gdProject = gd.ProjectHelper.createNewGDJSProject();
 
-  sendNewGameCreated({ exampleUrl: '', exampleSlug: '' });
+  const exampleSlug = 'empty-project';
+  const compositeSlug = 'default-empty-project';
+
+  sendNewGameCreated({
+    exampleUrl: '',
+    exampleSlug,
+    exampleCompositeSlug: compositeSlug,
+    creationSource,
+  });
   return {
     project,
     storageProvider: null,
@@ -75,9 +90,12 @@ export const createNewProjectFromTutorialTemplate = (
   tutorialTemplateUrl: string,
   tutorialId: string
 ): NewProjectSource => {
+  const compositeSlug = `in-app-tutorial-${tutorialId}`;
   sendNewGameCreated({
     exampleUrl: tutorialTemplateUrl,
     exampleSlug: tutorialId,
+    exampleCompositeSlug: compositeSlug,
+    creationSource: 'in-app-tutorial',
   });
   const newProjectSource = getNewProjectSourceFromUrl(tutorialTemplateUrl);
   newProjectSource.templateSlug = tutorialId;
@@ -91,7 +109,8 @@ export const createNewProjectFromCourseChapterTemplate = (
   sendNewGameCreated({
     exampleUrl: templateUrl,
     exampleSlug: courseChapterId,
-    isCourseChapterTemplate: true,
+    creationSource: 'course-chapter',
+    exampleCompositeSlug: `course-${courseChapterId}`,
   });
   const newProjectSource = getNewProjectSourceFromUrl(templateUrl);
   newProjectSource.templateSlug = courseChapterId;
@@ -105,6 +124,8 @@ export const createNewProjectFromPrivateGameTemplate = (
   sendNewGameCreated({
     exampleUrl: privateGameTemplateUrl,
     exampleSlug: privateGameTemplateTag,
+    exampleCompositeSlug: privateGameTemplateTag, // Assume only one source for private templates
+    creationSource: 'default',
   });
   const newProjectSource = getNewProjectSourceFromUrl(privateGameTemplateUrl);
   newProjectSource.templateSlug = privateGameTemplateTag;
@@ -114,12 +135,13 @@ export const createNewProjectFromPrivateGameTemplate = (
 export const createNewProjectFromExampleShortHeader = async ({
   i18n,
   exampleShortHeader,
-  creationSource,
+  newProjectSetup,
 }: ExampleProjectSetup): Promise<?NewProjectSource> => {
   try {
     const example = await getExample(exampleShortHeader);
+    const creationSource = newProjectSetup.creationSource;
 
-    const exampleSlug = `${
+    const compositeSlug = `${
       creationSource === 'quick-customization' ? 'qc-' : ''
     }${creationSource === 'ai-agent-request' ? 'ai-' : ''}${
       exampleShortHeader.slug
@@ -127,7 +149,9 @@ export const createNewProjectFromExampleShortHeader = async ({
 
     sendNewGameCreated({
       exampleUrl: example.projectFileUrl,
-      exampleSlug,
+      exampleSlug: exampleShortHeader.slug,
+      exampleCompositeSlug: compositeSlug,
+      creationSource,
     });
     const newProjectSource = getNewProjectSourceFromUrl(example.projectFileUrl);
     newProjectSource.templateSlug = exampleShortHeader.slug;

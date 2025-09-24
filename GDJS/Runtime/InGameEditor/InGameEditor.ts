@@ -2476,6 +2476,11 @@ namespace gdjs {
 
     updateTargetFramerate(elapsedTime: float) {
       const inputManager = this._runtimeGame.getInputManager();
+
+      // Check if user interaction are happening:
+      if (this._draggedNewObject) {
+        this._timeSinceLastInteraction = 0;
+      }
       if (
         inputManager.anyKeyPressed() ||
         inputManager.anyMouseButtonPressed() ||

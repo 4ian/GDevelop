@@ -1456,21 +1456,6 @@ namespace gdjs {
       }
     }
 
-    private _swapTransformControlsMode() {
-      if (!this._selectionControls) {
-        return;
-      }
-      this._selectionControls.threeTransformControls.mode =
-        transformControlsModes[
-          gdjs.evtTools.common.mod(
-            transformControlsModes.indexOf(
-              this._selectionControls.threeTransformControls.mode
-            ) + 1,
-            transformControlsModes.length
-          )
-        ];
-    }
-
     private _updateSelectionOutline({
       objectUnderCursor,
     }: {
@@ -1553,16 +1538,59 @@ namespace gdjs {
       this._selectionBoxes.set(object, { container, box });
     }
 
+    private _swapTransformControlsMode(): void {
+      if (!this._selectionControls) {
+        return;
+      }
+      this._setTransformControlsMode(
+        transformControlsModes[
+          gdjs.evtTools.common.mod(
+            transformControlsModes.indexOf(
+              this._selectionControls.threeTransformControls.mode
+            ) + 1,
+            transformControlsModes.length
+          )
+        ]
+      );
+    }
+
+    private _setTransformControlsMode(
+      mode: 'translate' | 'rotate' | 'scale'
+    ): void {
+      if (!this._selectionControls) {
+        return;
+      }
+      const { threeTransformControls, dummyThreeObject } =
+        this._selectionControls;
+      threeTransformControls.mode = mode;
+
+      const lastEditableSelectedObject = this._selection.getLastSelectedObject({
+        ignoreIf: (object) =>
+          this.isInstanceLocked(object) || this.isInstanceSealed(object),
+      });
+      if (!lastEditableSelectedObject) {
+        return;
+      }
+      const threeObject = lastEditableSelectedObject.get3DRendererObject();
+      if (!threeObject) {
+        return;
+      }
+      dummyThreeObject.rotation.copy(threeObject.rotation);
+      if (threeTransformControls.mode === 'rotate') {
+        dummyThreeObject.rotation.y = -dummyThreeObject.rotation.y;
+        dummyThreeObject.rotation.z = -dummyThreeObject.rotation.z;
+      }
+    }
+
     private _forceUpdateSelectionControls() {
-      let mode: string | null = null;
+      let mode: 'translate' | 'rotate' | 'scale' | null = null;
       if (this._selectionControls) {
         mode = this._selectionControls.threeTransformControls.mode;
         this._removeSelectionControls();
       }
       this._updateSelectionControls();
       if (mode && this._selectionControls) {
-        //@ts-ignore
-        this._selectionControls.threeTransformControls.mode = mode;
+        this._setTransformControlsMode(mode);
       }
     }
 
@@ -1629,11 +1657,8 @@ namespace gdjs {
         // The dummy object is an invisible object that is the one moved by the transform
         // controls.
         const dummyThreeObject = new THREE.Object3D();
-        dummyThreeObject.rotation.order = 'ZYX';
         dummyThreeObject.position.copy(threeObject.position);
         dummyThreeObject.rotation.copy(threeObject.rotation);
-        dummyThreeObject.rotation.y = -dummyThreeObject.rotation.y;
-        dummyThreeObject.rotation.z = -dummyThreeObject.rotation.z;
         dummyThreeObject.scale.copy(threeObject.scale);
         threeScene.add(dummyThreeObject);
 
@@ -1642,11 +1667,8 @@ namespace gdjs {
 
         // Keep track of the movement so the editor can apply it to the selection.
         const initialPosition = new THREE.Vector3();
-        initialPosition.copy(dummyThreeObject.position);
         const initialRotation = new THREE.Euler();
-        initialRotation.copy(dummyThreeObject.rotation);
         const initialScale = new THREE.Vector3();
-        initialScale.copy(dummyThreeObject.scale);
         threeTransformControls.addEventListener('change', (e) => {
           if (!threeTransformControls.dragging) {
             this._selectionControlsMovementTotalDelta = null;

@@ -32,7 +32,10 @@ import Text from '../../../../UI/Text';
 import Grid from '@material-ui/core/Grid';
 import WalletWidget from '../../../../GameDashboard/Wallet/WalletWidget';
 import { QuickCustomizationGameTiles } from '../../../../QuickCustomization/QuickCustomizationGameTiles';
-import { type NewProjectSetup } from '../../../../ProjectCreation/NewProjectSetupDialog';
+import {
+  type NewProjectSetup,
+  type ExampleProjectSetup,
+} from '../../../../ProjectCreation/NewProjectSetupDialog';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import UrlStorageProvider from '../../../../ProjectsStorage/UrlStorageProvider';
 import {
@@ -80,10 +83,7 @@ type Props = {|
   onOpenProfile: () => void,
   askToCloseProject: () => Promise<boolean>,
   onCreateProjectFromExample: (
-    exampleShortHeader: ExampleShortHeader,
-    newProjectSetup: NewProjectSetup,
-    i18n: I18nType,
-    isQuickCustomization?: boolean
+    exampleProjectSetup: ExampleProjectSetup
   ) => Promise<CreateProjectResult>,
   onSelectPrivateGameTemplateListingData: (
     privateGameTemplateListingData: PrivateGameTemplateListingData
@@ -551,12 +551,12 @@ const CreateSection = ({
                           saveAsLocation: null,
                           openQuickCustomizationDialog: true,
                         };
-                        onCreateProjectFromExample(
+                        onCreateProjectFromExample({
                           exampleShortHeader,
                           newProjectSetup,
                           i18n,
-                          true // isQuickCustomization
-                        );
+                          creationSource: 'quick-customization',
+                        });
                       }}
                       quickCustomizationRecommendation={
                         quickCustomizationRecommendation

@@ -1,14 +1,11 @@
 // @flow
 import { t } from '@lingui/macro';
-import { type I18n as I18nType } from '@lingui/core';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
-import {
-  getExample,
-  type ExampleShortHeader,
-} from '../Utils/GDevelopServices/Example';
+import { getExample } from '../Utils/GDevelopServices/Example';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
 import { showErrorBox } from '../UI/Messages/MessageBox';
+import { type ExampleProjectSetup } from './NewProjectSetupDialog';
 const gd: libGDevelop = global.gd;
 
 export type NewProjectSource = {|
@@ -117,20 +114,20 @@ export const createNewProjectFromPrivateGameTemplate = (
 export const createNewProjectFromExampleShortHeader = async ({
   i18n,
   exampleShortHeader,
-  isQuickCustomization,
-}: {|
-  i18n: I18nType,
-  exampleShortHeader: ExampleShortHeader,
-  isQuickCustomization?: boolean,
-|}): Promise<?NewProjectSource> => {
+  creationSource,
+}: ExampleProjectSetup): Promise<?NewProjectSource> => {
   try {
     const example = await getExample(exampleShortHeader);
 
+    const exampleSlug = `${
+      creationSource === 'quick-customization' ? 'qc-' : ''
+    }${creationSource === 'ai-agent-request' ? 'ai-' : ''}${
+      exampleShortHeader.slug
+    }`;
+
     sendNewGameCreated({
       exampleUrl: example.projectFileUrl,
-      exampleSlug: `${isQuickCustomization ? 'qc-' : ''}${
-        exampleShortHeader.slug
-      }`,
+      exampleSlug,
     });
     const newProjectSource = getNewProjectSourceFromUrl(example.projectFileUrl);
     newProjectSource.templateSlug = exampleShortHeader.slug;

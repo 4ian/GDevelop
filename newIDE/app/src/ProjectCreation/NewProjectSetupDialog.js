@@ -96,6 +96,13 @@ export type NewProjectSetup = {|
   dontOpenAnySceneOrProjectManager?: boolean,
 |};
 
+export type ExampleProjectSetup = {|
+  exampleShortHeader: ExampleShortHeader,
+  newProjectSetup: NewProjectSetup,
+  i18n: I18nType,
+  creationSource: 'quick-customization' | 'ai-agent-request' | 'default',
+|};
+
 type Props = {|
   isProjectOpening?: boolean,
   onClose: () => void,
@@ -103,9 +110,7 @@ type Props = {|
     newProjectSetup: NewProjectSetup
   ) => Promise<CreateProjectResult>,
   onCreateFromExample: (
-    exampleShortHeader: ExampleShortHeader,
-    newProjectSetup: NewProjectSetup,
-    i18n: I18nType
+    exampleProjectSetup: ExampleProjectSetup
   ) => Promise<CreateProjectResult>,
   onCreateProjectFromPrivateGameTemplate: (
     privateGameTemplateListingData: PrivateGameTemplateListingData,
@@ -425,16 +430,16 @@ const NewProjectSetupDialog = ({
       };
 
       if (selectedExampleShortHeader) {
-        await onCreateFromExample(
-          selectedExampleShortHeader,
-          {
-            // We only pass down the project name as this is the only customizable field for an example.
+        await onCreateFromExample({
+          exampleShortHeader: selectedExampleShortHeader,
+          newProjectSetup: {
             projectName,
             storageProvider,
             saveAsLocation: projectLocation,
           },
-          i18n
-        );
+          i18n,
+          creationSource: 'default',
+        });
       } else if (selectedPrivateGameTemplateListingData) {
         await onCreateProjectFromPrivateGameTemplate(
           selectedPrivateGameTemplateListingData,

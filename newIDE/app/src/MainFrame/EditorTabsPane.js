@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { type I18n as I18nType } from '@lingui/core';
 import TabsTitlebar from './TabsTitlebar';
 import Toolbar, { type ToolbarInterface } from './Toolbar';
 import { TabContentContainer } from '../UI/ClosableTabs';
@@ -42,7 +41,10 @@ import { type StorageProvider } from '../ProjectsStorage';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/Shop';
 import { type CourseChapter } from '../Utils/GDevelopServices/Asset';
-import { type NewProjectSetup } from '../ProjectCreation/NewProjectSetupDialog';
+import {
+  type NewProjectSetup,
+  type ExampleProjectSetup,
+} from '../ProjectCreation/NewProjectSetupDialog';
 import { type EventsFunctionsExtensionsState } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import { type ShareTab } from '../ExportAndShare/ShareDialog';
@@ -169,10 +171,7 @@ export type EditorTabsPaneCommonProps = {|
     newProjectSetup: NewProjectSetup
   ) => Promise<CreateProjectResult>,
   createProjectFromExample: (
-    exampleShortHeader: ExampleShortHeader,
-    newProjectSetup: NewProjectSetup,
-    i18n: I18nType,
-    isQuickCustomization?: boolean
+    exampleProjectSetup: ExampleProjectSetup
   ) => Promise<CreateProjectResult>,
   onOpenProfileDialog: () => void,
   openLanguageDialog: (open: boolean) => void,

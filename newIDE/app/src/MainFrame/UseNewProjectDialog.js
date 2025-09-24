@@ -1,7 +1,6 @@
 // @flow
 
 import * as React from 'react';
-import { type I18n as I18nType } from '@lingui/core';
 import {
   listAllExamples,
   type ExampleShortHeader,
@@ -12,6 +11,7 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import LoaderModal from '../UI/LoaderModal';
 import NewProjectSetupDialog, {
   type NewProjectSetup,
+  type ExampleProjectSetup,
 } from '../ProjectCreation/NewProjectSetupDialog';
 import { type StorageProvider } from '../ProjectsStorage';
 import RouterContext from './RouterContext';
@@ -23,9 +23,7 @@ type Props = {|
   setNewProjectSetupDialogOpen: boolean => void,
   createEmptyProject: NewProjectSetup => Promise<CreateProjectResult>,
   createProjectFromExample: (
-    exampleShortHeader: ExampleShortHeader,
-    newProjectSetup: NewProjectSetup,
-    i18n: I18nType
+    exampleProjectSetup: ExampleProjectSetup
   ) => Promise<CreateProjectResult>,
   createProjectFromPrivateGameTemplate: (
     privateGameTemplateListingData: PrivateGameTemplateListingData,

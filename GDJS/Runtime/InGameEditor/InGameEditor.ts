@@ -1708,7 +1708,6 @@ namespace gdjs {
         let gridHelper = new THREE.GridHelper(10, 10, gridColor, gridColor);
         gridHelper.visible =
           !!this._instancesEditorSettings && this._instancesEditorSettings.grid;
-        console.log('gridHelper.visible2', gridHelper.visible);
         gridHelper.rotation.order = 'ZYX';
         this._moveGridHelper(
           gridHelper,

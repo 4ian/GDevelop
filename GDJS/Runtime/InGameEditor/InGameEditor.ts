@@ -1751,22 +1751,26 @@ namespace gdjs {
           let targetPositionZ = dummyThreeObject.position.z;
           if (
             threeTransformControls.mode === 'translate' &&
-            threeTransformControls.axis &&
-            this._instancesEditorSettings &&
-            this._instancesEditorSettings.snap !== isAltPressed(inputManager)
+            threeTransformControls.axis
           ) {
             const isMovingOnX = threeTransformControls.axis.includes('X');
             const isMovingOnY = threeTransformControls.axis.includes('Y');
             const isMovingOnZ = threeTransformControls.axis.includes('Z');
-            if (isMovingOnX) {
-              targetPositionX = this.getSnappedX(targetPositionX);
-            }
-            if (isMovingOnY) {
-              targetPositionY = this.getSnappedY(targetPositionY);
+            if (
+              this._instancesEditorSettings &&
+              this._instancesEditorSettings.snap !== isAltPressed(inputManager)
+            ) {
+              if (isMovingOnX) {
+                targetPositionX = this.getSnappedX(targetPositionX);
+              }
+              if (isMovingOnY) {
+                targetPositionY = this.getSnappedY(targetPositionY);
+              }
+              if (isMovingOnZ) {
+                targetPositionZ = this.getSnappedZ(targetPositionZ);
+              }
             }
             if (isMovingOnZ) {
-              targetPositionZ = this.getSnappedZ(targetPositionZ);
-
               if (!isMovingOnX && !isMovingOnY) {
                 // Choose the plan that face the camera.
                 const cameraRotation = Math.abs(

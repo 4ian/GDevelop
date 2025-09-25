@@ -211,9 +211,10 @@ namespace gdjs {
      * to preload the sounds.
      */
     playing(): boolean {
+      const isSoundPlaying =
+        this._id !== null ? this._howl.playing(this._id) : true;
       return (
-        (this._id !== null ? this._howl.playing(this._id) : true) ||
-        !this.isLoaded() // Loading is considered playing
+        isSoundPlaying || !this.isLoaded() // Loading is considered playing
       );
     }
 
@@ -441,7 +442,7 @@ namespace gdjs {
     }
 
     getNetworkSyncData(): SoundSyncData | undefined {
-      if (this.stopped()) return undefined;
+      if (this.paused() || !this.isLoaded() || this.stopped()) return undefined;
       // Seek can sometimes return the Howl object in case it isn't loaded yet, in this case we default to 0.
       const seek = this.getSeek();
       const numberSeek = typeof seek !== 'number' ? 0 : seek;

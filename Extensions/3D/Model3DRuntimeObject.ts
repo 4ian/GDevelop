@@ -8,6 +8,7 @@ namespace gdjs {
     anis: Model3DAnimation[];
     ai: integer;
     ass: float;
+    aet: float;
     ap: boolean;
     cfd: float;
   };
@@ -227,6 +228,7 @@ namespace gdjs {
         anis: this._animations,
         ai: this._currentAnimationIndex,
         ass: this._animationSpeedScale,
+        aet: this.getAnimationElapsedTime(),
         ap: this._animationPaused,
         cfd: this._crossfadeDuration,
       };
@@ -250,11 +252,14 @@ namespace gdjs {
       if (networkSyncData.anis !== undefined) {
         this._animations = networkSyncData.anis;
       }
+      if (networkSyncData.ass !== undefined) {
+        this.setAnimationSpeedScale(networkSyncData.ass);
+      }
       if (networkSyncData.ai !== undefined) {
         this.setAnimationIndex(networkSyncData.ai);
       }
-      if (networkSyncData.ass !== undefined) {
-        this.setAnimationSpeedScale(networkSyncData.ass);
+      if (networkSyncData.aet !== undefined) {
+        this.setAnimationElapsedTime(networkSyncData.aet);
       }
       if (networkSyncData.ap !== undefined) {
         if (networkSyncData.ap !== this.isAnimationPaused()) {

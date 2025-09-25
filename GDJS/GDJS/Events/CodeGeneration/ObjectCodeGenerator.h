@@ -77,6 +77,8 @@ class ObjectCodeGenerator {
       std::function<gd::String()> generateMethodsCode,
       std::function<gd::String()> generatePropertiesCode,
       std::function<gd::String()> generateUpdateFromObjectDataCode,
+      std::function<gd::String()> generateGetNetworkSyncDataCode,
+      std::function<gd::String()> generateUpdateFromNetworkSyncDataCode,
       std::function<gd::String()> generateInitializeAnimatableCode,
       std::function<gd::String()> generateAnimatableCode,
       std::function<gd::String()> generateTextContainerCode);
@@ -98,6 +100,14 @@ class ObjectCodeGenerator {
   gd::String GeneratePropertyValueCode(const gd::PropertyDescriptor& property);
 
   gd::String GenerateUpdatePropertyFromObjectDataCode(
+      const gd::EventsBasedObject& eventsBasedObject,
+      const gd::NamedPropertyDescriptor& property);
+
+  gd::String GenerateGetPropertyNetworkSyncDataCode(
+      const gd::EventsBasedObject& eventsBasedObject,
+      const gd::NamedPropertyDescriptor& property);
+
+  gd::String GenerateUpdatePropertyFromNetworkSyncDataCode(
       const gd::EventsBasedObject& eventsBasedObject,
       const gd::NamedPropertyDescriptor& property);
 

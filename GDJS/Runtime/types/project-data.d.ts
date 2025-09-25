@@ -184,10 +184,10 @@ declare interface InstancesEditorSettings {
     gridType: 'rectangular' | 'isometric';
     gridWidth: float;
     gridHeight: float;
-    gridDepth: float;
+    gridDepth?: float;
     gridOffsetX: float;
     gridOffsetY: float;
-    gridOffsetZ: float;
+    gridOffsetZ?: float;
     gridColor: int;
     gridAlpha: float;
     snap: boolean;

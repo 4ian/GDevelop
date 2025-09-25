@@ -200,7 +200,7 @@ namespace gdjs {
     freeCameraKeys.some((key) => inputManager.isKeyPressed(key));
 
   const snap = (value: float, size: float, offset: float) =>
-    offset + size * Math.round((value - offset) / size);
+    size ? offset + size * Math.round((value - offset) / size) : value;
 
   class Selection {
     private _selectedObjects: Array<gdjs.RuntimeObject> = [];
@@ -944,7 +944,7 @@ namespace gdjs {
         return z;
       }
       const { gridDepth, gridOffsetY } = this._instancesEditorSettings;
-      return snap(z, gridDepth, gridOffsetY);
+      return snap(z, gridDepth || 0, gridOffsetY);
     }
 
     zoomToInitialPosition(visibleScreenArea: {
@@ -1846,11 +1846,12 @@ namespace gdjs {
       if (!this._instancesEditorSettings) {
         return;
       }
+      console.log(this._instancesEditorSettings);
       if (normal === 'X') {
         gridHelper.scale.set(
           this._instancesEditorSettings.gridWidth,
           1,
-          this._instancesEditorSettings.gridDepth
+          this._instancesEditorSettings.gridDepth || 0
         );
         gridHelper.rotation.set(0, 0, Math.PI / 2);
         gridHelper.position.set(x, this.getSnappedY(y), this.getSnappedZ(z));
@@ -1858,7 +1859,7 @@ namespace gdjs {
         gridHelper.scale.set(
           this._instancesEditorSettings.gridHeight,
           1,
-          this._instancesEditorSettings.gridDepth
+          this._instancesEditorSettings.gridDepth || 0
         );
         gridHelper.rotation.set(0, 0, 0);
         gridHelper.position.set(this.getSnappedX(x), y, this.getSnappedZ(z));

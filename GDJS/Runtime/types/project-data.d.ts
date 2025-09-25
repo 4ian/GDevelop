@@ -176,6 +176,21 @@ declare interface LayoutData extends InstanceContainerData {
   usedResources: ResourceReference[];
   resourcesPreloading?: 'at-startup' | 'never' | 'inherit';
   resourcesUnloading?: 'at-scene-exit' | 'never' | 'inherit';
+  uiSettings: InstancesEditorSettings;
+}
+
+declare interface InstancesEditorSettings {
+    grid: boolean;
+    gridType: 'rectangular' | 'isometric';
+    gridWidth: float;
+    gridHeight: float;
+    gridDepth: float;
+    gridOffsetX: float;
+    gridOffsetY: float;
+    gridOffsetZ: float;
+    gridColor: int;
+    gridAlpha: float;
+    snap: boolean;
 }
 
 declare interface LayoutNetworkSyncData {
@@ -257,6 +272,7 @@ declare interface ExternalLayoutData {
   name: string;
   associatedLayout: string;
   instances: InstanceData[];
+  editionSettings: InstancesEditorSettings;
 }
 
 declare interface InstancePersistentUuidData {

@@ -36,8 +36,10 @@ export default function SetupGridDialog(props: Props) {
       ...props.instancesEditorSettings,
       gridWidth: previousOptions.gridWidth,
       gridHeight: previousOptions.gridHeight,
+      gridDepth: previousOptions.gridDepth,
       gridOffsetX: previousOptions.gridOffsetX,
       gridOffsetY: previousOptions.gridOffsetY,
+      gridOffsetZ: previousOptions.gridOffsetZ,
       gridColor: previousOptions.gridColor,
       gridType: previousOptions.gridType,
     });
@@ -111,6 +113,18 @@ export default function SetupGridDialog(props: Props) {
               })
             }
           />
+          <TextField
+            floatingLabelText={<Trans>Cell depth (in pixels)</Trans>}
+            fullWidth
+            type="number"
+            value={props.instancesEditorSettings.gridDepth}
+            onChange={(e, value) =>
+              props.onChangeInstancesEditorSettings({
+                ...props.instancesEditorSettings,
+                gridDepth: Math.max(parseFloat(value), GRID_MIN_VALUE),
+              })
+            }
+          />
         </ResponsiveLineStackLayout>
         <ResponsiveLineStackLayout noMargin expand noResponsiveLandscape>
           <TextField
@@ -134,6 +148,18 @@ export default function SetupGridDialog(props: Props) {
               props.onChangeInstancesEditorSettings({
                 ...props.instancesEditorSettings,
                 gridOffsetY: parseFloat(value),
+              })
+            }
+          />
+          <TextField
+            floatingLabelText={<Trans>Z offset (in pixels)</Trans>}
+            fullWidth
+            type="number"
+            value={props.instancesEditorSettings.gridOffsetZ}
+            onChange={(e, value) =>
+              props.onChangeInstancesEditorSettings({
+                ...props.instancesEditorSettings,
+                gridOffsetZ: parseFloat(value),
               })
             }
           />

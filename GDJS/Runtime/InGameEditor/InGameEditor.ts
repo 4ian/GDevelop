@@ -181,9 +181,6 @@ namespace gdjs {
     }
   };
 
-  const shouldDragSelectedObject = (inputManager: gdjs.InputManager) =>
-    isAltPressed(inputManager) || isControlOrCmdPressed(inputManager);
-
   const freeCameraKeys = [
     LEFT_KEY,
     RIGHT_KEY,
@@ -201,6 +198,9 @@ namespace gdjs {
     !isAltPressed(inputManager) &&
     !isShiftPressed(inputManager) &&
     freeCameraKeys.some((key) => inputManager.isKeyPressed(key));
+
+  const snap = (value: float, size: float, offset: float) =>
+    offset + size * Math.round((value - offset) / size);
 
   class Selection {
     private _selectedObjects: Array<gdjs.RuntimeObject> = [];
@@ -440,6 +440,7 @@ namespace gdjs {
       object: gdjs.RuntimeObject;
       dummyThreeObject: THREE.Object3D;
       threeTransformControls: THREE_ADDONS.TransformControls;
+      gridHelper: THREE.GridHelper;
     } | null = null;
     private _selectionControlsMovementTotalDelta: {
       translationX: float;
@@ -500,6 +501,7 @@ namespace gdjs {
       scaleY: 1,
       scaleZ: 1,
     };
+    private _instancesEditorSettings: InstancesEditorSettings | null = null;
 
     constructor(game: RuntimeGame, projectData: ProjectData) {
       this._runtimeGame = game;
@@ -640,6 +642,8 @@ namespace gdjs {
               sceneAndCustomObject;
             this._currentScene = scene;
             this._editedInstanceContainer = customObjectInstanceContainer;
+            // TODO
+            this._instancesEditorSettings = null;
           }
           this._innerArea = eventsBasedObjectVariantData._initialInnerArea;
         } else {
@@ -653,13 +657,12 @@ namespace gdjs {
           () => {}
         );
         // Load the new one
+        const sceneAndExtensionsData =
+          this._runtimeGame.getSceneAndExtensionsData(sceneName);
         const newScene = new gdjs.RuntimeScene(this._runtimeGame);
-        newScene.loadFromScene(
-          this._runtimeGame.getSceneAndExtensionsData(sceneName),
-          {
-            skipCreatingInstances: !!externalLayoutName,
-          }
-        );
+        newScene.loadFromScene(sceneAndExtensionsData, {
+          skipCreatingInstances: !!externalLayoutName,
+        });
 
         // Optionally create the objects from an external layout.
         if (externalLayoutName) {
@@ -674,7 +677,11 @@ namespace gdjs {
               /*trackByPersistentUuid=*/
               true
             );
+            this._instancesEditorSettings = externalLayoutData.editionSettings;
           }
+        } else {
+          this._instancesEditorSettings =
+            sceneAndExtensionsData!.sceneData.uiSettings;
         }
         this._currentScene = newScene;
         this._editedInstanceContainer = newScene;
@@ -916,6 +923,30 @@ namespace gdjs {
       return this._tempVector2d;
     }
 
+    getSnappedX(x: float): float {
+      if (!this._instancesEditorSettings) {
+        return x;
+      }
+      const { gridWidth, gridOffsetX } = this._instancesEditorSettings;
+      return snap(x, gridWidth, gridOffsetX);
+    }
+
+    getSnappedY(y: float): float {
+      if (!this._instancesEditorSettings) {
+        return y;
+      }
+      const { gridHeight, gridOffsetY } = this._instancesEditorSettings;
+      return snap(y, gridHeight, gridOffsetY);
+    }
+
+    getSnappedZ(z: float): float {
+      if (!this._instancesEditorSettings) {
+        return z;
+      }
+      const { gridDepth, gridOffsetY } = this._instancesEditorSettings;
+      return snap(z, gridDepth, gridOffsetY);
+    }
+
     zoomToInitialPosition(visibleScreenArea: {
       minX: number;
       minY: number;
@@ -1145,9 +1176,18 @@ namespace gdjs {
       this._sendSelectionUpdate({ hasSelectedObjectBeenModified: true });
     }
 
+    private _shouldDragSelectedObject(): boolean {
+      const inputManager = this._runtimeGame.getInputManager();
+      return (
+        (isAltPressed(inputManager) || isControlOrCmdPressed(inputManager)) &&
+        (!this._selectionControls ||
+          !this._selectionControls.threeTransformControls.dragging)
+      );
+    }
+
     private _handleSelectedObjectDragging(): void {
       const inputManager = this._runtimeGame.getInputManager();
-      if (!shouldDragSelectedObject(inputManager)) {
+      if (!this._shouldDragSelectedObject()) {
         return;
       }
       if (!this._currentScene) return;
@@ -1318,7 +1358,7 @@ namespace gdjs {
 
       if (
         inputManager.isMouseButtonPressed(0) &&
-        !shouldDragSelectedObject(inputManager) &&
+        !this._shouldDragSelectedObject() &&
         !isSpacePressed(inputManager)
       ) {
         if (this._wasMouseLeftButtonPressed && this._selectionBox) {
@@ -1426,7 +1466,7 @@ namespace gdjs {
       ) {
         if (
           !isShiftPressed(inputManager) &&
-          !shouldDragSelectedObject(inputManager) &&
+          !this._shouldDragSelectedObject() &&
           this._selection.getLastSelectedObject() === objectUnderCursor
         ) {
           this._swapTransformControlsMode();
@@ -1564,7 +1604,7 @@ namespace gdjs {
       if (!this._selectionControls) {
         return;
       }
-      const { threeTransformControls, dummyThreeObject } =
+      const { threeTransformControls, dummyThreeObject, gridHelper } =
         this._selectionControls;
       threeTransformControls.mode = mode;
 
@@ -1584,6 +1624,10 @@ namespace gdjs {
         dummyThreeObject.rotation.y = -dummyThreeObject.rotation.y;
         dummyThreeObject.rotation.z = -dummyThreeObject.rotation.z;
       }
+      gridHelper.visible =
+        threeTransformControls.mode === 'translate' &&
+        !!this._instancesEditorSettings &&
+        this._instancesEditorSettings.grid;
     }
 
     private _forceUpdateSelectionControls() {
@@ -1617,7 +1661,7 @@ namespace gdjs {
         (!lastEditableSelectedObject ||
           (lastEditableSelectedObject &&
             this._selectionControls.object !== lastEditableSelectedObject) ||
-          shouldDragSelectedObject(inputManager) ||
+          this._shouldDragSelectedObject() ||
           isSpacePressed(inputManager))
       ) {
         this._removeSelectionControls();
@@ -1627,7 +1671,7 @@ namespace gdjs {
       if (
         lastEditableSelectedObject &&
         !this._selectionControls &&
-        !shouldDragSelectedObject(inputManager) &&
+        !this._shouldDragSelectedObject() &&
         !isSpacePressed(inputManager)
       ) {
         const threeObject = lastEditableSelectedObject.get3DRendererObject();
@@ -1658,6 +1702,23 @@ namespace gdjs {
           obj.isTransformControls = true;
         });
 
+        const gridColor = this._instancesEditorSettings
+          ? this._instancesEditorSettings.gridColor
+          : 0x444444;
+        let gridHelper = new THREE.GridHelper(10, 10, gridColor, gridColor);
+        gridHelper.visible =
+          !!this._instancesEditorSettings && this._instancesEditorSettings.grid;
+        console.log('gridHelper.visible2', gridHelper.visible);
+        gridHelper.rotation.order = 'ZYX';
+        this._moveGridHelper(
+          gridHelper,
+          threeObject.position.x,
+          threeObject.position.y,
+          threeObject.position.z,
+          'Z'
+        );
+        threeScene.add(gridHelper);
+
         // The dummy object is an invisible object that is the one moved by the transform
         // controls.
         const dummyThreeObject = new THREE.Object3D();
@@ -1685,11 +1746,61 @@ namespace gdjs {
             return;
           }
 
+          let gridNormal: 'X' | 'Y' | 'Z' = 'Z';
+          let targetPositionX = dummyThreeObject.position.x;
+          let targetPositionY = dummyThreeObject.position.y;
+          let targetPositionZ = dummyThreeObject.position.z;
+          if (
+            threeTransformControls.mode === 'translate' &&
+            threeTransformControls.axis &&
+            this._instancesEditorSettings &&
+            this._instancesEditorSettings.snap !== isAltPressed(inputManager)
+          ) {
+            const isMovingOnX = threeTransformControls.axis.includes('X');
+            const isMovingOnY = threeTransformControls.axis.includes('Y');
+            const isMovingOnZ = threeTransformControls.axis.includes('Z');
+            if (isMovingOnX) {
+              targetPositionX = this.getSnappedX(targetPositionX);
+            }
+            if (isMovingOnY) {
+              targetPositionY = this.getSnappedY(targetPositionY);
+            }
+            if (isMovingOnZ) {
+              targetPositionZ = this.getSnappedZ(targetPositionZ);
+
+              if (!isMovingOnX && !isMovingOnY) {
+                // Choose the plan that face the camera.
+                const cameraRotation = Math.abs(
+                  gdjs.evtTools.common.angleDifference(
+                    this._editorCamera.getCameraRotation(),
+                    0
+                  )
+                );
+                if (cameraRotation <= 45 || cameraRotation > 135) {
+                  gridNormal = 'Y';
+                } else {
+                  gridNormal = 'X';
+                }
+              } else if (!isMovingOnX) {
+                gridNormal = 'X';
+              } else if (!isMovingOnY) {
+                gridNormal = 'Y';
+              }
+            }
+          }
+          this._moveGridHelper(
+            gridHelper,
+            threeObject.position.x,
+            threeObject.position.y,
+            threeObject.position.z,
+            gridNormal
+          );
+
           const scaleDamping = 0.2; // 0.2 = 20% of the movement speed (Three.js transform controls scaling is too fast)
           this._selectionControlsMovementTotalDelta = {
-            translationX: dummyThreeObject.position.x - initialPosition.x,
-            translationY: dummyThreeObject.position.y - initialPosition.y,
-            translationZ: dummyThreeObject.position.z - initialPosition.z,
+            translationX: targetPositionX - initialPosition.x,
+            translationY: targetPositionY - initialPosition.y,
+            translationZ: targetPositionZ - initialPosition.z,
             rotationX: gdjs.toDegrees(
               dummyThreeObject.rotation.x - initialRotation.x
             ),
@@ -1721,7 +1832,45 @@ namespace gdjs {
           object: lastEditableSelectedObject,
           dummyThreeObject,
           threeTransformControls,
+          gridHelper,
         };
+      }
+    }
+
+    private _moveGridHelper(
+      gridHelper: THREE.GridHelper,
+      x: float,
+      y: float,
+      z: float,
+      normal: 'X' | 'Y' | 'Z'
+    ): void {
+      if (!this._instancesEditorSettings) {
+        return;
+      }
+      if (normal === 'X') {
+        gridHelper.scale.set(
+          this._instancesEditorSettings.gridWidth,
+          1,
+          this._instancesEditorSettings.gridDepth
+        );
+        gridHelper.rotation.set(0, 0, Math.PI / 2);
+        gridHelper.position.set(x, this.getSnappedY(y), this.getSnappedZ(z));
+      } else if (normal === 'Y') {
+        gridHelper.scale.set(
+          this._instancesEditorSettings.gridHeight,
+          1,
+          this._instancesEditorSettings.gridDepth
+        );
+        gridHelper.rotation.set(0, 0, 0);
+        gridHelper.position.set(this.getSnappedX(x), y, this.getSnappedZ(z));
+      } else {
+        gridHelper.scale.set(
+          this._instancesEditorSettings.gridWidth,
+          1,
+          this._instancesEditorSettings.gridHeight
+        );
+        gridHelper.rotation.set(Math.PI / 2, 0, 0);
+        gridHelper.position.set(this.getSnappedX(x), this.getSnappedY(y), z);
       }
     }
 
@@ -1732,6 +1881,9 @@ namespace gdjs {
       this._selectionControls.threeTransformControls.detach();
       this._selectionControls.threeTransformControls.removeFromParent();
       this._selectionControls.dummyThreeObject.removeFromParent();
+      if (this._selectionControls.gridHelper) {
+        this._selectionControls.gridHelper.removeFromParent();
+      }
       this._selectionControls = null;
     }
 
@@ -2878,6 +3030,10 @@ namespace gdjs {
         Math.tan(0.5 * gdjs.toRad(editorCameraFov))
       );
     };
+
+    getCameraRotation(): float {
+      return this.getActiveCamera().rotationAngle;
+    }
 
     getCameraState(): EditorCameraState {
       return this.getActiveCamera()._getCameraState();

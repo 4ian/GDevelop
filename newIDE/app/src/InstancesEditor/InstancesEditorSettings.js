@@ -7,8 +7,10 @@ export type InstancesEditorSettings = {|
   gridType: 'isometric' | 'rectangular',
   gridWidth: number,
   gridHeight: number,
+  gridDepth: number,
   gridOffsetX: number,
   gridOffsetY: number,
+  gridOffsetZ: number,
   gridColor: number,
   gridAlpha: number,
 
@@ -40,8 +42,10 @@ export const prepareInstancesEditorSettings = (
     gridType: object.gridType || 'rectangular',
     gridWidth: object.gridWidth || 32,
     gridHeight: object.gridHeight || 32,
+    gridDepth: object.gridDepth || 32,
     gridOffsetX: object.gridOffsetX || 0,
     gridOffsetY: object.gridOffsetY || 0,
+    gridOffsetZ: object.gridOffsetZ || 0,
     gridColor:
       object.gridColor !== undefined
         ? object.gridColor

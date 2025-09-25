@@ -1846,7 +1846,6 @@ namespace gdjs {
       if (!this._instancesEditorSettings) {
         return;
       }
-      console.log(this._instancesEditorSettings);
       if (normal === 'X') {
         gridHelper.scale.set(
           this._instancesEditorSettings.gridWidth,

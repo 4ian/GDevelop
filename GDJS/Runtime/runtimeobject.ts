@@ -606,14 +606,13 @@ namespace gdjs {
       }
 
       // If timers are synchronized, update them.
-      // TODO: If a timer is removed, also remove it from the object?
       if (networkSyncData.tim) {
+        this._timers.clear();
         for (const timerName in networkSyncData.tim) {
-          const timerNetworkSyncData = networkSyncData.tim[timerName];
-          const timer = this._timers.get(timerName);
-          if (timer) {
-            timer.updateFromNetworkSyncData(timerNetworkSyncData);
-          }
+          const timerData = networkSyncData.tim[timerName];
+          const newTimer = new gdjs.Timer(timerData.name);
+          newTimer.updateFromNetworkSyncData(timerData);
+          this._timers.put(timerName, newTimer);
         }
       }
 

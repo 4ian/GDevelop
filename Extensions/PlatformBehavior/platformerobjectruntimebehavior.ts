@@ -271,6 +271,46 @@ namespace gdjs {
       super.updateFromNetworkSyncData(networkSyncData, options);
 
       const behaviorSpecificProps = networkSyncData.props;
+
+      switch (behaviorSpecificProps.sn) {
+        case 'Falling':
+          if (behaviorSpecificProps.sn !== this._state.toString()) {
+            this._setFalling();
+          }
+          this._falling.updateFromNetworkSyncData(behaviorSpecificProps.ssd);
+          break;
+        case 'OnFloor':
+          // Let it handle automatically as we don't know which platform to land on.
+          // @ts-ignore - we assume it's OnFloorStateNetworkSyncData
+          this._onFloor.updateFromNetworkSyncData(behaviorSpecificProps.ssd);
+          break;
+        case 'Jumping':
+          if (behaviorSpecificProps.sn !== this._state.toString()) {
+            this._setJumping();
+          }
+          // @ts-ignore - we assume it's JumpingStateNetworkSyncData
+          this._jumping.updateFromNetworkSyncData(behaviorSpecificProps.ssd);
+          break;
+        case 'GrabbingPlatform':
+          // Let it handle automatically as we don't know which platform to grab.
+          this._grabbingPlatform.updateFromNetworkSyncData(
+            // @ts-ignore - we assume it's GrabbingPlatformStateNetworkSyncData
+            behaviorSpecificProps.ssd
+          );
+          break;
+        case 'OnLadder':
+          if (behaviorSpecificProps.sn !== this._state.toString()) {
+            this._setOnLadder();
+          }
+          this._onLadder.updateFromNetworkSyncData(behaviorSpecificProps.ssd);
+          break;
+        default:
+          console.error(
+            'Unknown state name: ' + behaviorSpecificProps.sn + '.'
+          );
+          break;
+      }
+
       if (behaviorSpecificProps.cs !== this._currentSpeed) {
         this._currentSpeed = behaviorSpecificProps.cs;
       }
@@ -318,35 +358,6 @@ namespace gdjs {
       }
       if (behaviorSpecificProps.jkhsjs !== this._jumpKeyHeldSinceJumpStart) {
         this._jumpKeyHeldSinceJumpStart = behaviorSpecificProps.jkhsjs;
-      }
-
-      if (behaviorSpecificProps.sn !== this._state.toString()) {
-        switch (behaviorSpecificProps.sn) {
-          case 'Falling':
-            this._setFalling();
-            break;
-          case 'OnFloor':
-            // Let it handle automatically as we don't know which platform to land on.
-            break;
-          case 'Jumping':
-            this._setJumping();
-            break;
-          case 'GrabbingPlatform':
-            // Let it handle automatically as we don't know which platform to grab.
-            break;
-          case 'OnLadder':
-            this._setOnLadder();
-            break;
-          default:
-            console.error(
-              'Unknown state name: ' + behaviorSpecificProps.sn + '.'
-            );
-            break;
-        }
-      }
-
-      if (behaviorSpecificProps.sn === this._state.toString()) {
-        this._state.updateFromNetworkSyncData(behaviorSpecificProps.ssd);
       }
 
       // Clear user inputs between frames only if requested.

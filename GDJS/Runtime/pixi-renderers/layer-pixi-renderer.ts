@@ -351,6 +351,16 @@ namespace gdjs {
               this._threePlaneMaterial
             );
 
+            // 🔽 Add rectangle outline around the plane
+            const edges = new THREE.EdgesGeometry(this._threePlaneGeometry);
+            const lineMaterial = new THREE.LineBasicMaterial({
+              color: 0xff0000,
+            }); // red border
+            const outline = new THREE.LineSegments(edges, lineMaterial);
+
+            // Attach the outline to the plane so it follows scaling/rotation
+            this._threePlaneMesh.add(outline);
+
             // Force to render the mesh last (after the rest of 3D objects, including
             // transparent ones). In most cases, the 2D rendering is composed of a lot
             // of transparent areas, and we can't risk it being displayed first and wrongly
@@ -395,56 +405,151 @@ namespace gdjs {
      * Update the position of the PIXI container. To be called after each change
      * made to position, zoom or rotation of the camera.
      */
+    // updatePosition(): void {
+    //   const angle = -gdjs.toRad(this._layer.getCameraRotation());
+    //   const zoomFactor = this._layer.getCameraZoom();
+    //   this._pixiContainer.rotation = angle;
+    //   this._pixiContainer.scale.x = zoomFactor;
+    //   this._pixiContainer.scale.y = zoomFactor;
+    //   const cosValue = Math.cos(angle);
+    //   const sinValue = Math.sin(angle);
+    //   const centerX =
+    //     this._layer.getCameraX() * zoomFactor * cosValue -
+    //     this._layer.getCameraY() * zoomFactor * sinValue;
+    //   const centerY =
+    //     this._layer.getCameraX() * zoomFactor * sinValue +
+    //     this._layer.getCameraY() * zoomFactor * cosValue;
+    //   this._pixiContainer.position.x = this._layer.getWidth() / 2 - centerX;
+    //   this._pixiContainer.position.y = this._layer.getHeight() / 2 - centerY;
+
+    //   if (
+    //     this._layer.getRuntimeScene().getGame().getPixelsRounding() &&
+    //     (cosValue === 0 || sinValue === 0) &&
+    //     Number.isInteger(zoomFactor)
+    //   ) {
+    //     // Camera rounding is important for pixel perfect games.
+    //     // Otherwise, the camera position fractional part is added to
+    //     // the sprite one and it changes in which direction sprites are rounded.
+    //     // It makes sprites rounding inconsistent with each other
+    //     // and they seem to move on pixel left and right.
+    //     //
+    //     // PIXI uses a floor function on sprites position on the screen,
+    //     // so a floor must be applied on the camera position too.
+    //     // According to the above calculus,
+    //     // _pixiContainer.position is the opposite of the camera,
+    //     // this is why the ceil function is used floor(x) = -ceil(-x).
+    //     //
+    //     // When the camera directly follows an object,
+    //     // given this object dimension is even,
+    //     // the decimal part of onScenePosition and cameraPosition are the same.
+    //     //
+    //     // Doing the calculus without rounding:
+    //     // onScreenPosition = onScenePosition - cameraPosition
+    //     // onScreenPosition = 980.75 - 200.75
+    //     // onScreenPosition = 780
+    //     //
+    //     // Doing the calculus with rounding:
+    //     // onScreenPosition = floor(onScenePosition + ceil(-cameraPosition))
+    //     // onScreenPosition = floor(980.75 + ceil(-200.75))
+    //     // onScreenPosition = floor(980.75 - 200)
+    //     // onScreenPosition = floor(780.75)
+    //     // onScreenPosition = 780
+
+    //     if (
+    //       this._layer
+    //         .getRuntimeScene()
+    //         .getGame()
+    //         .getRenderer()
+    //         .getPIXIRenderer() instanceof PIXI.Renderer
+    //     ) {
+    //       // TODO Revert from `round` to `ceil` when the issue is fixed in Pixi.
+    //       // Since the upgrade to Pixi 7, sprites are rounded with `round`
+    //       // instead of `floor`.
+    //       // https://github.com/pixijs/pixijs/issues/9868
+    //       this._pixiContainer.position.x = Math.round(
+    //         this._pixiContainer.position.x
+    //       );
+    //       this._pixiContainer.position.y = Math.round(
+    //         this._pixiContainer.position.y
+    //       );
+    //     } else {
+    //       this._pixiContainer.position.x = Math.ceil(
+    //         this._pixiContainer.position.x
+    //       );
+    //       this._pixiContainer.position.y = Math.ceil(
+    //         this._pixiContainer.position.y
+    //       );
+    //     }
+    //   }
+
+    //   if (this._threeCamera) {
+    //     // TODO (3D) - improvement: handle camera rounding like down for PixiJS?
+    //     this._threeCamera.position.x = this._layer.getCameraX();
+    //     this._threeCamera.position.y = -this._layer.getCameraY(); // Inverted because the scene is mirrored on Y axis.
+    //     this._threeCamera.rotation.z = angle;
+
+    //     if (this._threeCamera instanceof THREE.OrthographicCamera) {
+    //       this._threeCamera.zoom = this._layer.getCameraZoom();
+    //       this._threeCamera.updateProjectionMatrix();
+    //       this._threeCamera.position.z = this._layer.getCameraZ(null);
+    //     } else {
+    //       this._threeCamera.position.z = this._layer.getCameraZ(
+    //         this._threeCamera.fov
+    //       );
+    //     }
+
+    //     if (this._threePlaneMesh) {
+    //       // Adapt the plane size so that it covers the whole screen.
+    //       this._threePlaneMesh.scale.x = this._layer.getWidth() / zoomFactor;
+    //       this._threePlaneMesh.scale.y = this._layer.getHeight() / zoomFactor;
+
+    //       // Adapt the plane position so that it's always displayed on the whole screen.
+    //       this._threePlaneMesh.position.x = this._threeCamera.position.x;
+    //       this._threePlaneMesh.position.y = -this._threeCamera.position.y; // Inverted because the scene is mirrored on Y axis.
+    //       this._threePlaneMesh.rotation.z = -angle;
+    //     }
+    //   }
+    // }
+
     updatePosition(): void {
       const angle = -gdjs.toRad(this._layer.getCameraRotation());
       const zoomFactor = this._layer.getCameraZoom();
+
+      // --- PIXI container transform (rotation/scale unchanged) ---
       this._pixiContainer.rotation = angle;
       this._pixiContainer.scale.x = zoomFactor;
       this._pixiContainer.scale.y = zoomFactor;
+
       const cosValue = Math.cos(angle);
       const sinValue = Math.sin(angle);
+
+      // Find intersection of 3D camera center-ray with Z=0 (THREE coords).
+      // Convert to 2D coords (y2D = -yThree). Fallback: use 2D camera X/Y.
+      let followX = this._layer.getCameraX();
+      let followY = this._layer.getCameraY();
+
+      if (this._threeCamera) {
+        const hit = this._getCenterRayIntersectionWithZ0();
+        if (hit) {
+          followX = hit.x;
+          followY = -hit.y; // THREE Y-up -> 2D Y-down
+        }
+      }
+
+      // Center the Pixi container on (followX, followY) like usual math.
       const centerX =
-        this._layer.getCameraX() * zoomFactor * cosValue -
-        this._layer.getCameraY() * zoomFactor * sinValue;
+        followX * zoomFactor * cosValue - followY * zoomFactor * sinValue;
       const centerY =
-        this._layer.getCameraX() * zoomFactor * sinValue +
-        this._layer.getCameraY() * zoomFactor * cosValue;
+        followX * zoomFactor * sinValue + followY * zoomFactor * cosValue;
       this._pixiContainer.position.x = this._layer.getWidth() / 2 - centerX;
       this._pixiContainer.position.y = this._layer.getHeight() / 2 - centerY;
 
+      // Pixel rounding (unchanged)
       if (
         this._layer.getRuntimeScene().getGame().getPixelsRounding() &&
         (cosValue === 0 || sinValue === 0) &&
         Number.isInteger(zoomFactor)
       ) {
-        // Camera rounding is important for pixel perfect games.
-        // Otherwise, the camera position fractional part is added to
-        // the sprite one and it changes in which direction sprites are rounded.
-        // It makes sprites rounding inconsistent with each other
-        // and they seem to move on pixel left and right.
-        //
-        // PIXI uses a floor function on sprites position on the screen,
-        // so a floor must be applied on the camera position too.
-        // According to the above calculus,
-        // _pixiContainer.position is the opposite of the camera,
-        // this is why the ceil function is used floor(x) = -ceil(-x).
-        //
-        // When the camera directly follows an object,
-        // given this object dimension is even,
-        // the decimal part of onScenePosition and cameraPosition are the same.
-        //
-        // Doing the calculus without rounding:
-        // onScreenPosition = onScenePosition - cameraPosition
-        // onScreenPosition = 980.75 - 200.75
-        // onScreenPosition = 780
-        //
-        // Doing the calculus with rounding:
-        // onScreenPosition = floor(onScenePosition + ceil(-cameraPosition))
-        // onScreenPosition = floor(980.75 + ceil(-200.75))
-        // onScreenPosition = floor(980.75 - 200)
-        // onScreenPosition = floor(780.75)
-        // onScreenPosition = 780
-
         if (
           this._layer
             .getRuntimeScene()
@@ -452,10 +557,6 @@ namespace gdjs {
             .getRenderer()
             .getPIXIRenderer() instanceof PIXI.Renderer
         ) {
-          // TODO Revert from `round` to `ceil` when the issue is fixed in Pixi.
-          // Since the upgrade to Pixi 7, sprites are rounded with `round`
-          // instead of `floor`.
-          // https://github.com/pixijs/pixijs/issues/9868
           this._pixiContainer.position.x = Math.round(
             this._pixiContainer.position.x
           );
@@ -472,10 +573,10 @@ namespace gdjs {
         }
       }
 
+      // --- 3D camera: KEEP syncing to this._layer (as before) ---
       if (this._threeCamera) {
-        // TODO (3D) - improvement: handle camera rounding like down for PixiJS?
         this._threeCamera.position.x = this._layer.getCameraX();
-        this._threeCamera.position.y = -this._layer.getCameraY(); // Inverted because the scene is mirrored on Y axis.
+        this._threeCamera.position.y = -this._layer.getCameraY(); // scene is mirrored on Y
         this._threeCamera.rotation.z = angle;
 
         if (this._threeCamera instanceof THREE.OrthographicCamera) {
@@ -487,17 +588,33 @@ namespace gdjs {
             this._threeCamera.fov
           );
         }
+      }
 
-        if (this._threePlaneMesh) {
-          // Adapt the plane size so that it covers the whole screen.
-          this._threePlaneMesh.scale.x = this._layer.getWidth() / zoomFactor;
-          this._threePlaneMesh.scale.y = this._layer.getHeight() / zoomFactor;
+      // --- 2D+3D plane: keep size, put it at the intersection on Z=0 ---
+      if (this._threePlaneMesh) {
+        // Size unchanged: covers the screen according to zoom.
+        this._threePlaneMesh.scale.x = this._layer.getWidth() / zoomFactor;
+        this._threePlaneMesh.scale.y = this._layer.getHeight() / zoomFactor;
 
-          // Adapt the plane position so that it's always displayed on the whole screen.
-          this._threePlaneMesh.position.x = this._threeCamera.position.x;
-          this._threePlaneMesh.position.y = -this._threeCamera.position.y; // Inverted because the scene is mirrored on Y axis.
-          this._threePlaneMesh.rotation.z = -angle;
+        // Place on Z=0 at the intersection (THREE coords), with scene Y mirrored.
+        let px = followX; // followX is 2D; equals THREE x already
+        let pyThree = -followY; // back to THREE Y-up for placement
+
+        if (this._threeCamera) {
+          const hit = this._getCenterRayIntersectionWithZ0();
+          if (hit) {
+            px = hit.x;
+            pyThree = hit.y;
+          }
         }
+
+        this._threePlaneMesh.position.set(px, -pyThree, 0); // mirror Y for scene (scene.scale.y = -1)
+
+        // Rotate the plane around Z to counter Pixi's rotation,
+        // so 2D rendering looks upright in the 3D world.
+        this._threePlaneMesh.rotation.x = 0;
+        this._threePlaneMesh.rotation.y = 0;
+        this._threePlaneMesh.rotation.z = -angle;
       }
     }
 
@@ -654,6 +771,32 @@ namespace gdjs {
     updateClearColor(): void {
       this._clearColor = this._layer.getClearColor();
       // this._createPixiRenderTexture(); // TODO: Check this was useless
+    }
+
+    /**
+     * Compute where the center of the 3D camera frustum intersects the Z=0 plane.
+     * Returns a THREE.Vector3 (z=0) in THREE world coordinates, or null if parallel.
+     */
+    private _getCenterRayIntersectionWithZ0(): THREE.Vector3 | null {
+      const camera = this._threeCamera;
+      if (!camera) return null;
+
+      camera.updateMatrixWorld(true);
+
+      const origin = new THREE.Vector3();
+      const dir = new THREE.Vector3();
+
+      // For both perspective and ortho, use the world forward direction.
+      origin.copy(camera.position);
+      camera.getWorldDirection(dir);
+
+      const dz = dir.z;
+      if (Math.abs(dz) < 1e-8) return null; // parallel to plane Z=0
+
+      const t = -origin.z / dz; // origin.z + t*dir.z = 0
+      const hit = origin.clone().addScaledVector(dir, t);
+      hit.z = 0;
+      return hit;
     }
 
     /**

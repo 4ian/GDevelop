@@ -180,17 +180,17 @@ declare interface LayoutData extends InstanceContainerData {
 }
 
 declare interface InstancesEditorSettings {
-    grid: boolean;
-    gridType: 'rectangular' | 'isometric';
-    gridWidth: float;
-    gridHeight: float;
-    gridDepth?: float;
-    gridOffsetX: float;
-    gridOffsetY: float;
-    gridOffsetZ?: float;
-    gridColor: int;
-    gridAlpha: float;
-    snap: boolean;
+  grid: boolean;
+  gridType: 'rectangular' | 'isometric';
+  gridWidth: float;
+  gridHeight: float;
+  gridDepth?: float;
+  gridOffsetX: float;
+  gridOffsetY: float;
+  gridOffsetZ?: float;
+  gridColor: int;
+  gridAlpha: float;
+  snap: boolean;
 }
 
 declare interface LayoutNetworkSyncData {

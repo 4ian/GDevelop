@@ -311,7 +311,6 @@ namespace gdjs {
       return changeHappened;
     }
 
-    // TODO: add support for snapping to grid.
     move(
       selectedObjects: Array<gdjs.RuntimeObject>,
       movement: {
@@ -1741,7 +1740,7 @@ namespace gdjs {
             const isMovingOnY = threeTransformControls.axis.includes('Y');
             const isMovingOnZ = threeTransformControls.axis.includes('Z');
 
-            if (this._editorGrid.isSpanningEnable(inputManager)) {
+            if (this._editorGrid.isSpanningEnabled(inputManager)) {
               if (isMovingOnX) {
                 targetPositionX = this._editorGrid.getSnappedX(targetPositionX);
               }
@@ -1827,7 +1826,6 @@ namespace gdjs {
       this._selectionControls.threeTransformControls.detach();
       this._selectionControls.threeTransformControls.removeFromParent();
       this._selectionControls.dummyThreeObject.removeFromParent();
-      // TODO
       this._editorGrid.setVisible(false);
       this._selectionControls = null;
     }
@@ -2806,7 +2804,7 @@ namespace gdjs {
       return snap(z, gridDepth || 0, gridOffsetY);
     }
 
-    isSpanningEnable(inputManager: gdjs.InputManager): boolean {
+    isSpanningEnabled(inputManager: gdjs.InputManager): boolean {
       return this.isSnappingEnabledByDefault !== isAltPressed(inputManager);
     }
   }

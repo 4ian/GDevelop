@@ -440,8 +440,8 @@ namespace gdjs {
       object: gdjs.RuntimeObject;
       dummyThreeObject: THREE.Object3D;
       threeTransformControls: THREE_ADDONS.TransformControls;
-      gridHelper: THREE.GridHelper;
     } | null = null;
+    private _editorGrid: EditorGrid;
     private _selectionControlsMovementTotalDelta: {
       translationX: float;
       translationY: float;
@@ -506,6 +506,7 @@ namespace gdjs {
     constructor(game: RuntimeGame, projectData: ProjectData) {
       this._runtimeGame = game;
       this._editorCamera = new EditorCamera(this);
+      this._editorGrid = new EditorGrid(this);
       this._selectionBoxElement = document.createElement('div');
       this._selectionBoxElement.style.position = 'fixed';
       this._selectionBoxElement.style.backgroundColor = '#f2a63c44';
@@ -677,11 +678,12 @@ namespace gdjs {
               /*trackByPersistentUuid=*/
               true
             );
-            this._instancesEditorSettings = externalLayoutData.editionSettings;
+            this.setInstancesEditorSettings(externalLayoutData.editionSettings);
           }
         } else {
-          this._instancesEditorSettings =
-            sceneAndExtensionsData!.sceneData.uiSettings;
+          this.setInstancesEditorSettings(
+            sceneAndExtensionsData!.sceneData.uiSettings
+          );
         }
         this._currentScene = newScene;
         this._editedInstanceContainer = newScene;
@@ -917,34 +919,28 @@ namespace gdjs {
       this._selectedLayerName = layerName;
     }
 
+    setInstancesEditorSettings(
+      instancesEditorSettings: InstancesEditorSettings
+    ) {
+      this._instancesEditorSettings = instancesEditorSettings;
+      this._editorGrid.setSettings(instancesEditorSettings);
+    }
+
+    updateInstancesEditorSettings(
+      instancesEditorSettings: InstancesEditorSettings
+    ) {
+      if (this._instancesEditorSettings) {
+        Object.assign(this._instancesEditorSettings, instancesEditorSettings);
+      } else {
+        this._instancesEditorSettings = instancesEditorSettings;
+      }
+      this._editorGrid.setSettings(instancesEditorSettings);
+    }
+
     private _getTempVector2d(x: float, y: float): THREE.Vector2 {
       this._tempVector2d.x = x;
       this._tempVector2d.y = y;
       return this._tempVector2d;
-    }
-
-    getSnappedX(x: float): float {
-      if (!this._instancesEditorSettings) {
-        return x;
-      }
-      const { gridWidth, gridOffsetX } = this._instancesEditorSettings;
-      return snap(x, gridWidth, gridOffsetX);
-    }
-
-    getSnappedY(y: float): float {
-      if (!this._instancesEditorSettings) {
-        return y;
-      }
-      const { gridHeight, gridOffsetY } = this._instancesEditorSettings;
-      return snap(y, gridHeight, gridOffsetY);
-    }
-
-    getSnappedZ(z: float): float {
-      if (!this._instancesEditorSettings) {
-        return z;
-      }
-      const { gridDepth, gridOffsetY } = this._instancesEditorSettings;
-      return snap(z, gridDepth || 0, gridOffsetY);
     }
 
     zoomToInitialPosition(visibleScreenArea: {
@@ -1604,7 +1600,7 @@ namespace gdjs {
       if (!this._selectionControls) {
         return;
       }
-      const { threeTransformControls, dummyThreeObject, gridHelper } =
+      const { threeTransformControls, dummyThreeObject } =
         this._selectionControls;
       threeTransformControls.mode = mode;
 
@@ -1624,10 +1620,7 @@ namespace gdjs {
         dummyThreeObject.rotation.y = -dummyThreeObject.rotation.y;
         dummyThreeObject.rotation.z = -dummyThreeObject.rotation.z;
       }
-      gridHelper.visible =
-        threeTransformControls.mode === 'translate' &&
-        !!this._instancesEditorSettings &&
-        this._instancesEditorSettings.grid;
+      this._editorGrid.setVisible(threeTransformControls.mode === 'translate');
     }
 
     private _forceUpdateSelectionControls() {
@@ -1702,21 +1695,14 @@ namespace gdjs {
           obj.isTransformControls = true;
         });
 
-        const gridColor = this._instancesEditorSettings
-          ? this._instancesEditorSettings.gridColor
-          : 0x444444;
-        let gridHelper = new THREE.GridHelper(10, 10, gridColor, gridColor);
-        gridHelper.visible =
-          !!this._instancesEditorSettings && this._instancesEditorSettings.grid;
-        gridHelper.rotation.order = 'ZYX';
-        this._moveGridHelper(
-          gridHelper,
+        this._editorGrid.setNormal('Z');
+        this._editorGrid.setPosition(
           threeObject.position.x,
           threeObject.position.y,
-          threeObject.position.z,
-          'Z'
+          threeObject.position.z
         );
-        threeScene.add(gridHelper);
+        this._editorGrid.setTreeScene(threeScene);
+        this._editorGrid.setVisible(true);
 
         // The dummy object is an invisible object that is the one moved by the transform
         // controls.
@@ -1756,23 +1742,21 @@ namespace gdjs {
             const isMovingOnX = threeTransformControls.axis.includes('X');
             const isMovingOnY = threeTransformControls.axis.includes('Y');
             const isMovingOnZ = threeTransformControls.axis.includes('Z');
-            if (
-              this._instancesEditorSettings &&
-              this._instancesEditorSettings.snap !== isAltPressed(inputManager)
-            ) {
+
+            if (this._editorGrid.isSpanningEnable(inputManager)) {
               if (isMovingOnX) {
-                targetPositionX = this.getSnappedX(targetPositionX);
+                targetPositionX = this._editorGrid.getSnappedX(targetPositionX);
               }
               if (isMovingOnY) {
-                targetPositionY = this.getSnappedY(targetPositionY);
+                targetPositionY = this._editorGrid.getSnappedY(targetPositionY);
               }
               if (isMovingOnZ) {
-                targetPositionZ = this.getSnappedZ(targetPositionZ);
+                targetPositionZ = this._editorGrid.getSnappedZ(targetPositionZ);
               }
             }
             if (isMovingOnZ) {
               if (!isMovingOnX && !isMovingOnY) {
-                // Choose the plan that face the camera.
+                // Choose the plan that faces the camera.
                 const cameraRotation = Math.abs(
                   gdjs.evtTools.common.angleDifference(
                     this._editorCamera.getCameraRotation(),
@@ -1791,12 +1775,11 @@ namespace gdjs {
               }
             }
           }
-          this._moveGridHelper(
-            gridHelper,
+          this._editorGrid.setNormal(gridNormal);
+          this._editorGrid.setPosition(
             threeObject.position.x,
             threeObject.position.y,
-            threeObject.position.z,
-            gridNormal
+            threeObject.position.z
           );
 
           const scaleDamping = 0.2; // 0.2 = 20% of the movement speed (Three.js transform controls scaling is too fast)
@@ -1835,45 +1818,7 @@ namespace gdjs {
           object: lastEditableSelectedObject,
           dummyThreeObject,
           threeTransformControls,
-          gridHelper,
         };
-      }
-    }
-
-    private _moveGridHelper(
-      gridHelper: THREE.GridHelper,
-      x: float,
-      y: float,
-      z: float,
-      normal: 'X' | 'Y' | 'Z'
-    ): void {
-      if (!this._instancesEditorSettings) {
-        return;
-      }
-      if (normal === 'X') {
-        gridHelper.scale.set(
-          this._instancesEditorSettings.gridWidth,
-          1,
-          this._instancesEditorSettings.gridDepth || 0
-        );
-        gridHelper.rotation.set(0, 0, Math.PI / 2);
-        gridHelper.position.set(x, this.getSnappedY(y), this.getSnappedZ(z));
-      } else if (normal === 'Y') {
-        gridHelper.scale.set(
-          this._instancesEditorSettings.gridHeight,
-          1,
-          this._instancesEditorSettings.gridDepth || 0
-        );
-        gridHelper.rotation.set(0, 0, 0);
-        gridHelper.position.set(this.getSnappedX(x), y, this.getSnappedZ(z));
-      } else {
-        gridHelper.scale.set(
-          this._instancesEditorSettings.gridWidth,
-          1,
-          this._instancesEditorSettings.gridHeight
-        );
-        gridHelper.rotation.set(Math.PI / 2, 0, 0);
-        gridHelper.position.set(this.getSnappedX(x), this.getSnappedY(y), z);
       }
     }
 
@@ -1884,9 +1829,8 @@ namespace gdjs {
       this._selectionControls.threeTransformControls.detach();
       this._selectionControls.threeTransformControls.removeFromParent();
       this._selectionControls.dummyThreeObject.removeFromParent();
-      if (this._selectionControls.gridHelper) {
-        this._selectionControls.gridHelper.removeFromParent();
-      }
+      // TODO
+      this._editorGrid.setVisible(false);
       this._selectionControls = null;
     }
 
@@ -2731,6 +2675,141 @@ namespace gdjs {
 
     private _getEditorCamera(): EditorCamera {
       return this._editorCamera;
+    }
+  }
+
+  class EditorGrid {
+    editor: gdjs.InGameEditor;
+    gridHelper: THREE.GridHelper;
+    isVisible = true;
+    normal: 'Z' | 'Y' | 'X' = 'Z';
+    position = new THREE.Vector3();
+
+    isForcefullyHidden = true;
+    gridWidth: float = 0;
+    gridHeight: float = 0;
+    gridDepth: float = 0;
+    gridOffsetX: float = 0;
+    gridOffsetY: float = 0;
+    gridOffsetZ: float = 0;
+    gridColor: integer = 0;
+    isSnappingEnabledByDefault = false;
+    threeScene: THREE.Scene | null = null;
+
+    constructor(editor: gdjs.InGameEditor) {
+      this.editor = editor;
+      this.gridHelper = new THREE.GridHelper();
+    }
+
+    setSettings(instancesEditorSettings: InstancesEditorSettings): void {
+      this.isForcefullyHidden = !instancesEditorSettings.grid;
+      this.gridWidth = instancesEditorSettings.gridWidth;
+      this.gridHeight = instancesEditorSettings.gridHeight;
+      this.gridDepth = instancesEditorSettings.gridDepth || 0;
+      this.gridOffsetX = instancesEditorSettings.gridOffsetX;
+      this.gridOffsetY = instancesEditorSettings.gridOffsetY;
+      this.gridOffsetZ = instancesEditorSettings.gridOffsetZ || 0;
+      this.gridColor = instancesEditorSettings.gridColor;
+      this.isSnappingEnabledByDefault = instancesEditorSettings.snap;
+      this.rebuildGrid();
+    }
+
+    private rebuildGrid(): void {
+      this.gridHelper.removeFromParent();
+      this.gridHelper.dispose();
+      this.gridHelper = new THREE.GridHelper(
+        10,
+        10,
+        this.gridColor,
+        this.gridColor
+      );
+      this.gridHelper.rotation.order = 'ZYX';
+      this.updateVisibility();
+      this.updateLocation();
+      if (this.threeScene) {
+        this.threeScene.add(this.gridHelper);
+      }
+    }
+
+    private updateLocation() {
+      const { gridWidth, gridHeight, gridDepth } = this;
+      const { x, y, z } = this.position;
+      if (this.normal === 'X') {
+        this.gridHelper.rotation.set(0, 0, Math.PI / 2);
+        this.gridHelper.scale.set(gridWidth, 1, gridDepth || 0);
+        this.gridHelper.position.set(
+          x,
+          this.getSnappedY(y),
+          this.getSnappedZ(z)
+        );
+      } else if (this.normal === 'Y') {
+        this.gridHelper.rotation.set(0, 0, 0);
+        this.gridHelper.scale.set(gridHeight, 1, gridDepth || 0);
+        this.gridHelper.position.set(
+          this.getSnappedX(x),
+          y,
+          this.getSnappedZ(z)
+        );
+      } else {
+        this.gridHelper.rotation.set(Math.PI / 2, 0, 0);
+        this.gridHelper.scale.set(gridWidth, 1, gridHeight);
+        this.gridHelper.position.set(
+          this.getSnappedX(x),
+          this.getSnappedY(y),
+          z
+        );
+      }
+    }
+
+    setTreeScene(threeScene: THREE.Scene): void {
+      this.threeScene = threeScene;
+      this.gridHelper.removeFromParent();
+      threeScene.add(this.gridHelper);
+    }
+
+    setVisible(isVisible: boolean): void {
+      this.isVisible = isVisible;
+      this.updateVisibility();
+    }
+
+    private updateVisibility(): void {
+      this.gridHelper.visible = this.isVisible && !this.isForcefullyHidden;
+    }
+
+    setNormal(normal: 'X' | 'Y' | 'Z') {
+      this.normal = normal;
+      if (this.normal === 'X') {
+        this.gridHelper.rotation.set(0, 0, Math.PI / 2);
+      } else if (this.normal === 'Y') {
+        this.gridHelper.rotation.set(0, 0, 0);
+      } else {
+        this.gridHelper.rotation.set(Math.PI / 2, 0, 0);
+      }
+      this.updateLocation();
+    }
+
+    setPosition(x: float, y: float, z: float): void {
+      this.position.set(x, y, z);
+      this.updateLocation();
+    }
+
+    getSnappedX(x: float): float {
+      const { gridWidth, gridOffsetX } = this;
+      return snap(x, gridWidth, gridOffsetX);
+    }
+
+    getSnappedY(y: float): float {
+      const { gridHeight, gridOffsetY } = this;
+      return snap(y, gridHeight, gridOffsetY);
+    }
+
+    getSnappedZ(z: float): float {
+      const { gridDepth, gridOffsetY } = this;
+      return snap(z, gridDepth || 0, gridOffsetY);
+    }
+
+    isSpanningEnable(inputManager: gdjs.InputManager): boolean {
+      return this.isSnappingEnabledByDefault !== isAltPressed(inputManager);
     }
   }
 

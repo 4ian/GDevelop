@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32" height="32" version="1.1" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+ <g>
+  <g fill="#243286">
+   <rect x="8" y="16" width="8" height="8"/>
+   <rect y="24" width="8" height="8"/>
+   <rect x="16" y="24" width="8" height="8"/>
+   <rect x="24" y="16" width="8" height="8"/>
+   <rect x="16" y="8" width="8" height="8"/>
+   <rect x="24" y="5.47e-7" width="8" height="8"/>
+  </g>
+  <g fill="#2c7ea1">
+   <rect x="24" y="24" width="8" height="8"/>
+   <rect x="16" y="16" width="8" height="8"/>
+   <rect x="24" y="8" width="8" height="8"/>
+   <rect x="8" y="24" width="8" height="8"/>
+   <rect y="16" width="8" height="8"/>
+   <rect x="8" y="8" width="8" height="8"/>
+   <rect x="16" width="8" height="8"/>
+  </g>
+  <g fill="#2c7ea1">
+   <path d="m9 17v6h6v-6zm1 1h4v4h-4z"/>
+   <path d="m17 9v6h6v-6zm1 1h4v4h-4z"/>
+   <path d="m1 25v6h6v-6zm1 1h4v4h-4z"/>
+   <path d="m25 1v6h6v-6zm1 1h4v4h-4z"/>
+  </g>
+  <g fill="#243286" fill-rule="evenodd">
+   <path d="m15 9-6 6h6zm-1 2.4v2.6h-2.6z"/>
+   <path d="m22.6 1-6 6h6zm-1 2.4v2.6h-2.6z"/>
+   <path d="m7 17-6 6h6zm-1 2.4v2.6h-2.6z"/>
+   <path d="m31 9-6 6 1e-6 -6zm-2.4 1h-2.6v2.6z"/>
+   <path d="m23 17-6 6 1e-6 -6zm-2.4 1h-2.6v2.6z"/>
+   <path d="m15 25-6 6 1e-6 -6zm-2.4 1h-2.6v2.6z"/>
+  </g>
+ </g>
+</svg>

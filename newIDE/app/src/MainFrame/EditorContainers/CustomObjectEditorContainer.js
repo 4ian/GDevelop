@@ -20,6 +20,10 @@ import {
   switchInGameEditorIfNoHotReloadIsNeeded,
   type HotReloadSteps,
 } from '../../EmbeddedGame/EmbeddedGameFrame';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../../Utils/Serializer';
 
 const gd: libGDevelop = global.gd;
 
@@ -165,14 +169,15 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
   }
 
   saveUiSettings = () => {
-    // const layout = this.getCustomObject();
-    // const editor = this.editor;
-    // if (editor && layout) {
-    //   unserializeFromJSObject(
-    //     layout.getAssociatedEditorSettings(),
-    //     editor.getInstancesEditorSettings()
-    //   );
-    // }
+    const variant = this.getVariant();
+    const editor = this.editor;
+    console.log('saveUiSettings', variant);
+    if (editor && variant) {
+      unserializeFromJSObject(
+        variant.getAssociatedEditorSettings(),
+        editor.getInstancesEditorSettings()
+      );
+    }
   };
 
   getEventsFunctionsExtension(): ?gdEventsFunctionsExtension {
@@ -293,7 +298,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           initialInstances={variant.getInitialInstances()}
           getInitialInstancesEditorSettings={() =>
             prepareInstancesEditorSettings(
-              {}, // TODO Persist editor settings for custom objects unless we decide that default camera settings are fine.
+              serializeToJSObject(variant.getAssociatedEditorSettings()),
               Math.max(
                 variant.getAreaMaxX() - variant.getAreaMinX(),
                 variant.getAreaMaxY() - variant.getAreaMinY()

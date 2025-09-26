@@ -22,6 +22,7 @@ declare class gdEventsBasedObjectVariant {
   getAssetStoreAssetId(): string;
   setAssetStoreOriginalName(assetStoreOriginalName: string): void;
   getAssetStoreOriginalName(): string;
+  getAssociatedEditorSettings(): gdEditorSettings;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;
   delete(): void;

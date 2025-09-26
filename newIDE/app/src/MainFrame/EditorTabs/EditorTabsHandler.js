@@ -320,7 +320,8 @@ export const saveUiSettings = (state: EditorTabsState) => {
       if (
         editorTab.editorRef &&
         (editorTab.editorRef instanceof SceneEditorContainer ||
-          editorTab.editorRef instanceof ExternalLayoutEditorContainer)
+          editorTab.editorRef instanceof ExternalLayoutEditorContainer ||
+          editorTab.editorRef instanceof CustomObjectEditorContainer)
       ) {
         editorTab.editorRef.saveUiSettings();
       }

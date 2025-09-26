@@ -3264,6 +3264,8 @@ interface EventsBasedObjectVariant {
     void SetAssetStoreOriginalName([Const] DOMString assetStoreOriginalName);
     [Const, Ref] DOMString GetAssetStoreOriginalName();
 
+    [Ref] EditorSettings GetAssociatedEditorSettings();
+
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };

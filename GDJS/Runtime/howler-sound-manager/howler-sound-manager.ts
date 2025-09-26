@@ -187,7 +187,7 @@ namespace gdjs {
       try {
         if (this._id !== null) this._howl.stop(this._id);
       } catch (error) {
-        handleHowlerSoundMethodError(error, 'pause');
+        handleHowlerSoundMethodError(error, 'stop');
       }
       return this;
     }
@@ -245,7 +245,7 @@ namespace gdjs {
           this._howl.rate(rate, this._id);
         }
       } catch (error) {
-        handleHowlerSoundMethodError(error, 'pause');
+        handleHowlerSoundMethodError(error, 'rate');
       }
       return this;
     }
@@ -267,7 +267,7 @@ namespace gdjs {
         // If the sound has already started playing, then change the value directly.
         if (this._id !== null) this._howl.loop(loop, this._id);
       } catch (error) {
-        handleHowlerSoundMethodError(error, 'pause');
+        handleHowlerSoundMethodError(error, 'loop');
       }
       return this;
     }
@@ -294,7 +294,7 @@ namespace gdjs {
         // If the sound has already started playing, then change the value directly.
         if (this._id !== null) this._howl.volume(this._initialVolume, this._id);
       } catch (error) {
-        handleHowlerSoundMethodError(error, 'pause');
+        handleHowlerSoundMethodError(error, 'volume');
       }
       return this;
     }
@@ -315,7 +315,7 @@ namespace gdjs {
       try {
         if (this._id !== null) this._howl.mute(mute, this._id);
       } catch (error) {
-        handleHowlerSoundMethodError(error, 'pause');
+        handleHowlerSoundMethodError(error, 'mute');
       }
       return this;
     }
@@ -336,7 +336,7 @@ namespace gdjs {
       try {
         if (this._id !== null) this._howl.seek(seek, this._id);
       } catch (error) {
-        handleHowlerSoundMethodError(error, 'pause');
+        handleHowlerSoundMethodError(error, 'seek');
       }
       return this;
     }
@@ -372,7 +372,7 @@ namespace gdjs {
             this._id
           );
       } catch (error) {
-        handleHowlerSoundMethodError(error, 'pause');
+        handleHowlerSoundMethodError(error, 'fade');
       }
       return this;
     }

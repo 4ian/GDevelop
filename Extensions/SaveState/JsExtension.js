@@ -20,7 +20,7 @@ module.exports = {
     extension
       .setExtensionInformation(
         'SaveState',
-        _('Save State'),
+        _('Save State (experimental)'),
         _('Allows to save and load the full state of a game.'),
         'Neyl Mahfouf',
         'Open source (MIT License)'

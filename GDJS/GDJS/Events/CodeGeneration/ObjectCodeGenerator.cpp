@@ -113,27 +113,6 @@ gd::String ObjectCodeGenerator::GenerateRuntimeObjectCompleteCode(
 
         return updateFromObjectCode;
       },
-      [&]() {
-        gd::String getNetworkSyncDataCode;
-        for (auto& property :
-            eventsBasedObject.GetPropertyDescriptors().GetInternalVector()) {
-          getNetworkSyncDataCode += GenerateGetPropertyNetworkSyncDataCode(
-              eventsBasedObject, *property);
-        }
-
-        return getNetworkSyncDataCode;
-      },
-      [&]() {
-        gd::String updateFromNetworkSyncDataCode;
-        for (auto& property :
-            eventsBasedObject.GetPropertyDescriptors().GetInternalVector()) {
-          updateFromNetworkSyncDataCode +=
-              GenerateUpdatePropertyFromNetworkSyncDataCode(eventsBasedObject,
-                                                            *property);
-        }
-
-        return updateFromNetworkSyncDataCode;
-      },
       // generateInitializeAnimatableCode
       [&]() {
         return gd::String(R"jscode_template(
@@ -215,8 +194,6 @@ gd::String ObjectCodeGenerator::GenerateRuntimeObjectTemplateCode(
     std::function<gd::String()> generatePropertiesCode,
     std::function<gd::String()> generateMethodsCode,
     std::function<gd::String()> generateUpdateFromObjectDataCode,
-    std::function<gd::String()> generateGetNetworkSyncDataCode,
-    std::function<gd::String()> generateUpdateFromNetworkSyncDataCode,
     std::function<gd::String()> generateInitializeAnimatableCode,
     std::function<gd::String()> generateAnimatableCode,
     std::function<gd::String()> generateTextContainerCode) {
@@ -248,22 +225,6 @@ CODE_NAMESPACE.RUNTIME_OBJECT_CLASSNAME = class RUNTIME_OBJECT_CLASSNAME extends
     return true;
   }
 
-  // Network sync:
-  getNetworkSyncData(syncOptions) {
-    return {
-      ...super.getNetworkSyncData(syncOptions),
-      props: {
-        GET_NETWORK_SYNC_DATA_CODE
-      }
-    };
-  }
-  updateFromNetworkSyncData(networkSyncData, options) {
-    super.updateFromNetworkSyncData(networkSyncData, options);
-    UPDATE_FROM_NETWORK_SYNC_DATA_CODE
-
-    this.onHotReloading(this._parentInstanceContainer);
-  }
-
   // Properties:
   PROPERTIES_CODE
 
@@ -292,10 +253,6 @@ gdjs.registerObject("EXTENSION_NAME::OBJECT_NAME", CODE_NAMESPACE.RUNTIME_OBJECT
                           ? generateInitializeAnimatableCode()
                           : "")
       .FindAndReplace("UPDATE_FROM_OBJECT_DATA_CODE", generateUpdateFromObjectDataCode())
-      .FindAndReplace("GET_NETWORK_SYNC_DATA_CODE",
-                      generateGetNetworkSyncDataCode())
-      .FindAndReplace("UPDATE_FROM_NETWORK_SYNC_DATA_CODE",
-                      generateUpdateFromNetworkSyncDataCode())
       .FindAndReplace("PROPERTIES_CODE", generatePropertiesCode())
       .FindAndReplace("ANIMATABLE_CODE", eventsBasedObject.IsAnimatable() ? generateAnimatableCode() : "")
       .FindAndReplace("TEXT_CONTAINER_CODE", eventsBasedObject.IsTextContainer() ? generateTextContainerCode() : "")
@@ -365,23 +322,6 @@ gd::String ObjectCodeGenerator::GenerateUpdatePropertyFromObjectDataCode(
   return gd::String(R"jscode_template(
     if (oldObjectData.content.PROPERTY_NAME !== newObjectData.content.PROPERTY_NAME)
       this._objectData.PROPERTY_NAME = newObjectData.content.PROPERTY_NAME;)jscode_template")
-      .FindAndReplace("PROPERTY_NAME", property.GetName());
-}
-
-gd::String ObjectCodeGenerator::GenerateGetPropertyNetworkSyncDataCode(
-    const gd::EventsBasedObject& eventsBasedObject,
-    const gd::NamedPropertyDescriptor& property) {
-  return gd::String(R"jscode_template(
-    PROPERTY_NAME: this._objectData.PROPERTY_NAME,)jscode_template")
-      .FindAndReplace("PROPERTY_NAME", property.GetName());
-}
-
-gd::String ObjectCodeGenerator::GenerateUpdatePropertyFromNetworkSyncDataCode(
-    const gd::EventsBasedObject& eventsBasedObject,
-    const gd::NamedPropertyDescriptor& property) {
-  return gd::String(R"jscode_template(
-    if (networkSyncData.props.PROPERTY_NAME !== undefined)
-      this._objectData.PROPERTY_NAME = networkSyncData.props.PROPERTY_NAME;)jscode_template")
       .FindAndReplace("PROPERTY_NAME", property.GetName());
 }
 

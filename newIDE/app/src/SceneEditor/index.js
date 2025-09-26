@@ -858,9 +858,14 @@ export default class SceneEditor extends React.Component<Props, State> {
   setInstancesEditorSettings = (
     instancesEditorSettings: InstancesEditorSettings
   ) => {
-    this.setState({
-      instancesEditorSettings,
-    });
+    this.setState(
+      {
+        instancesEditorSettings,
+      },
+      () => {
+        this.updateToolbar();
+      }
+    );
     const { previewDebuggerServer } = this.props;
     if (!previewDebuggerServer) return;
 

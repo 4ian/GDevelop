@@ -109,6 +109,9 @@ type Props = {|
   project: ?gdProject,
   setToolbar: (?React.Node) => void,
   setGamesPlatformFrameShown: ({| shown: boolean, isMobile: boolean |}) => void,
+  setTabsTitleBarAndEditorToolbarVisibility: (
+    visibility: 'visible' | 'hidden' | 'removed'
+  ) => void,
   storageProviders: Array<StorageProvider>,
 
   // Games
@@ -200,6 +203,7 @@ export const HomePage = React.memo<Props>(
         onCreateProjectFromExample,
         setToolbar,
         setGamesPlatformFrameShown,
+        setTabsTitleBarAndEditorToolbarVisibility,
         selectInAppTutorial,
         onOpenPreferences,
         onOpenAbout,
@@ -281,6 +285,10 @@ export const HomePage = React.memo<Props>(
         includeLegacy: false,
       });
 
+      const [
+        isRemovingTabsTitleBarAndEditorToolbarTemporarily,
+        setIsRemovingTabsTitleBarAndEditorToolbarTemporarily,
+      ] = React.useState<boolean>(false);
       const { isMobile } = useResponsiveWindowSize();
       const {
         values: { showCreateSectionByDefault },
@@ -295,6 +303,10 @@ export const HomePage = React.memo<Props>(
         : 'learn';
 
       const [activeTab, setActiveTab] = React.useState<HomeTab>(initialTab);
+      const onTabChange = (tab: HomeTab) => {
+        setActiveTab(tab);
+        setIsRemovingTabsTitleBarAndEditorToolbarTemporarily(false);
+      };
 
       const { setInitialPackUserFriendlySlug } = React.useContext(
         AssetStoreContext
@@ -331,7 +343,7 @@ export const HomePage = React.memo<Props>(
 
           if (!requestedTab) return;
 
-          setActiveTab(requestedTab);
+          onTabChange(requestedTab);
           if (requestedTab === 'shop') {
             if (routeArguments['asset-pack']) {
               setInitialPackUserFriendlySlug(routeArguments['asset-pack']);
@@ -482,16 +494,21 @@ export const HomePage = React.memo<Props>(
           if (activeTab === 'play') {
             setGamesPlatformFrameShown({ shown: true, isMobile });
           } else {
+            if (isRemovingTabsTitleBarAndEditorToolbarTemporarily) {
+              return;
+            }
             setGamesPlatformFrameShown({ shown: false, isMobile });
             updateToolbar();
           }
-
-          // Ensure we show it again when the tab changes.
-          return () => {
-            setGamesPlatformFrameShown({ shown: false, isMobile });
-          };
         },
-        [updateToolbar, activeTab, setGamesPlatformFrameShown, isMobile]
+        [
+          updateToolbar,
+          activeTab,
+          isActive,
+          setGamesPlatformFrameShown,
+          isMobile,
+          isRemovingTabsTitleBarAndEditorToolbarTemporarily,
+        ]
       );
 
       const forceUpdateEditor = React.useCallback(() => {
@@ -653,6 +670,14 @@ export const HomePage = React.memo<Props>(
                         initialBundleUserFriendlySlugForLearn
                       }
                       initialBundleCategory={initialBundleCategoryForLearn}
+                      onTabsTitleBarAndEditorToolbarRemoved={removed => {
+                        setIsRemovingTabsTitleBarAndEditorToolbarTemporarily(
+                          removed
+                        );
+                        setTabsTitleBarAndEditorToolbarVisibility(
+                          removed ? 'removed' : 'visible'
+                        );
+                      }}
                     />
                   )}
                   {activeTab === 'play' && (
@@ -671,7 +696,7 @@ export const HomePage = React.memo<Props>(
                       onExtensionInstalled={onExtensionInstalled}
                       onCourseOpen={(courseId: string) => {
                         onSelectCourse(courseId);
-                        setActiveTab('learn');
+                        onTabChange('learn');
                       }}
                       receivedCourses={
                         courses
@@ -694,7 +719,7 @@ export const HomePage = React.memo<Props>(
                         currentFileMetadata={fileMetadata}
                         onOpenTeachingResources={() => {
                           setLearnCategory('education-curriculum');
-                          setActiveTab('learn');
+                          onTabChange('learn');
                         }}
                       />
                     ) : (
@@ -711,7 +736,7 @@ export const HomePage = React.memo<Props>(
                 </div>
                 <HomePageMenu
                   activeTab={activeTab}
-                  setActiveTab={setActiveTab}
+                  setActiveTab={onTabChange}
                   onOpenPreferences={onOpenPreferences}
                   onOpenAbout={onOpenAbout}
                 />
@@ -738,6 +763,9 @@ export const renderHomePageContainer = (
     projectItemName={props.projectItemName}
     setToolbar={props.setToolbar}
     setGamesPlatformFrameShown={props.setGamesPlatformFrameShown}
+    setTabsTitleBarAndEditorToolbarVisibility={
+      props.setTabsTitleBarAndEditorToolbarVisibility
+    }
     canOpen={props.canOpen}
     onChooseProject={props.onChooseProject}
     onOpenRecentFile={props.onOpenRecentFile}

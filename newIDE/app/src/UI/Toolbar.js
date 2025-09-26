@@ -7,7 +7,7 @@ type ToolbarProps = {|
   height?: number,
   borderBottomColor?: ?string,
   paddingBottom?: number,
-  hidden?: boolean,
+  visibility: 'visible' | 'hidden' | 'removed',
 |};
 
 const styles = {
@@ -28,31 +28,33 @@ export const Toolbar = React.memo<ToolbarProps>(
     borderBottomColor,
     height = 40,
     paddingBottom,
-    hidden,
+    visibility,
   }: ToolbarProps) => {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     return (
-      <div
-        className="almost-invisible-scrollbar"
-        style={{
-          ...styles.toolbar,
-          backgroundColor: gdevelopTheme.toolbar.backgroundColor,
-          height,
-          borderBottom: borderBottomColor
-            ? `2px solid ${borderBottomColor}`
-            : undefined,
-          ...(paddingBottom ? { paddingBottom } : undefined),
+      visibility !== 'removed' && (
+        <div
+          className="almost-invisible-scrollbar"
+          style={{
+            ...styles.toolbar,
+            backgroundColor: gdevelopTheme.toolbar.backgroundColor,
+            height,
+            borderBottom: borderBottomColor
+              ? `2px solid ${borderBottomColor}`
+              : undefined,
+            ...(paddingBottom ? { paddingBottom } : undefined),
 
-          // Hiding the titlebar should still keep its position in the layout to avoid layout shifts:
-          visibility: hidden ? 'hidden' : 'visible',
-          // Use content-visibility as we know the exact height of the toolbar, so the
-          // content can be entirely skipped when hidden:
-          contentVisibility: hidden ? 'hidden' : 'visible',
-          pointerEvents: hidden ? undefined : 'all',
-        }}
-      >
-        {children}
-      </div>
+            // Hiding the titlebar should still keep its position in the layout to avoid layout shifts:
+            visibility,
+            // Use content-visibility as we know the exact height of the toolbar, so the
+            // content can be entirely skipped when hidden:
+            contentVisibility: visibility === 'hidden' ? 'hidden' : 'visible',
+            pointerEvents: visibility === 'hidden' ? undefined : 'all',
+          }}
+        >
+          {children}
+        </div>
+      )
     );
   }
 );

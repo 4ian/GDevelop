@@ -23,7 +23,7 @@ export type MainFrameToolbarProps = {|
   checkedOutVersionStatus?: ?OpenedVersionStatus,
   onQuitVersionHistory: () => Promise<void>,
   canQuitVersionHistory: boolean,
-  hidden: boolean,
+  visibility: 'visible' | 'hidden' | 'removed',
 
   ...PreviewAndShareButtonsProps,
 |};
@@ -101,7 +101,10 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
     );
 
     return (
-      <Toolbar borderBottomColor={borderBottomColor} hidden={props.hidden}>
+      <Toolbar
+        borderBottomColor={borderBottomColor}
+        visibility={props.visibility}
+      >
         {props.showProjectButtons ? (
           <>
             <LeftButtonsToolbarGroup

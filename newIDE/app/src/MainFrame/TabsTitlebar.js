@@ -45,7 +45,7 @@ const styles = {
 };
 
 type TabsTitlebarProps = {|
-  hidden: boolean,
+  visibility: 'visible' | 'hidden' | 'removed',
   toggleProjectManager: () => void,
   renderTabs: (
     onEditorTabHovered: (?EditorTab, {| isLabelTruncated: boolean |}) => void,
@@ -104,7 +104,7 @@ const useIsAskAiIconAnimated = (shouldDisplayAskAi: boolean) => {
  */
 export default function TabsTitlebar({
   toggleProjectManager,
-  hidden,
+  visibility,
   renderTabs,
   isLeftMostPane,
   isRightMostPane,
@@ -190,52 +190,54 @@ export default function TabsTitlebar({
   const isAskAiIconAnimated = useIsAskAiIconAnimated(shouldDisplayAskAi);
 
   return (
-    <div
-      style={{
-        ...styles.container,
-        backgroundColor: 'transparent',
-        // Hiding the titlebar should still keep its position in the layout to avoid layout shifts:
-        visibility: hidden ? 'hidden' : 'visible',
-        pointerEvents: hidden ? undefined : 'all',
-      }}
-      className={WINDOW_DRAGGABLE_PART_CLASS_NAME}
-    >
-      {isLeftMostPane && <TitleBarLeftSafeMargins />}
-      {displayMenuIcon && (
-        <IconButton
-          size="small"
-          // Even if not in the toolbar, keep this ID for backward compatibility for tutorials.
-          id="main-toolbar-project-manager-button"
-          // The whole bar is draggable, so prevent the icon to be draggable,
-          // as it can affect the ability to open the menu.
-          className={WINDOW_NON_DRAGGABLE_PART_CLASS_NAME}
-          style={styles.menuIcon}
-          color="default"
-          onClick={toggleProjectManager}
-        >
-          <MenuIcon />
-        </IconButton>
-      )}
-      {renderTabs(onEditorTabHovered, onEditorTabClosing)}
-      {shouldDisplayAskAi ? (
-        <div
-          style={styles.askAiContainer}
-          className={WINDOW_NON_DRAGGABLE_PART_CLASS_NAME}
-        >
-          <TextButton
-            icon={<RobotIcon size={16} rotating={isAskAiIconAnimated} />}
-            label={'Ask AI'}
-            onClick={onAskAiClicked}
+    visibility !== 'removed' && (
+      <div
+        style={{
+          ...styles.container,
+          backgroundColor: 'transparent',
+          // Hiding the titlebar should still keep its position in the layout to avoid layout shifts:
+          visibility,
+          pointerEvents: visibility === 'hidden' ? undefined : 'all',
+        }}
+        className={WINDOW_DRAGGABLE_PART_CLASS_NAME}
+      >
+        {isLeftMostPane && <TitleBarLeftSafeMargins />}
+        {displayMenuIcon && (
+          <IconButton
+            size="small"
+            // Even if not in the toolbar, keep this ID for backward compatibility for tutorials.
+            id="main-toolbar-project-manager-button"
+            // The whole bar is draggable, so prevent the icon to be draggable,
+            // as it can affect the ability to open the menu.
+            className={WINDOW_NON_DRAGGABLE_PART_CLASS_NAME}
+            style={styles.menuIcon}
+            color="default"
+            onClick={toggleProjectManager}
+          >
+            <MenuIcon />
+          </IconButton>
+        )}
+        {renderTabs(onEditorTabHovered, onEditorTabClosing)}
+        {shouldDisplayAskAi ? (
+          <div
+            style={styles.askAiContainer}
+            className={WINDOW_NON_DRAGGABLE_PART_CLASS_NAME}
+          >
+            <TextButton
+              icon={<RobotIcon size={16} rotating={isAskAiIconAnimated} />}
+              label={'Ask AI'}
+              onClick={onAskAiClicked}
+            />
+          </div>
+        ) : null}
+        {isRightMostPane && <TitleBarRightSafeMargins />}
+        {tooltipData && (
+          <TabsTitlebarTooltip
+            anchorElement={tooltipData.element}
+            editorTab={tooltipData.editorTab}
           />
-        </div>
-      ) : null}
-      {isRightMostPane && <TitleBarRightSafeMargins />}
-      {tooltipData && (
-        <TabsTitlebarTooltip
-          anchorElement={tooltipData.element}
-          editorTab={tooltipData.editorTab}
-        />
-      )}
-    </div>
+        )}
+      </div>
+    )
   );
 }

@@ -321,14 +321,16 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
   const containerRef = React.useRef<?HTMLDivElement>(null);
 
   const [
-    tabsTitleBarAndEditorToolbarHidden,
-    setTabsTitleBarAndEditorToolbarHidden,
-  ] = React.useState(false);
+    tabsTitleBarAndEditorToolbarVisibility,
+    setTabsTitleBarAndEditorToolbarVisibility,
+  ] = React.useState<'visible' | 'hidden' | 'removed'>('visible');
 
   const onSetGamesPlatformFrameShown = React.useCallback(
     ({ shown, isMobile }: {| shown: boolean, isMobile: boolean |}) => {
       onSetPointerEventsNone(shown);
-      setTabsTitleBarAndEditorToolbarHidden(shown && isMobile);
+      setTabsTitleBarAndEditorToolbarVisibility(
+        shown && isMobile ? 'hidden' : 'visible'
+      );
     },
     [onSetPointerEventsNone]
   );
@@ -485,7 +487,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
           isLeftMostPane={isLeftMostPane}
           isRightMostPane={isRightMostPane}
           displayMenuIcon={paneIdentifier === 'center'}
-          hidden={tabsTitleBarAndEditorToolbarHidden}
+          visibility={tabsTitleBarAndEditorToolbarVisibility}
           toggleProjectManager={toggleProjectManager}
           renderTabs={(onEditorTabHovered, onEditorTabClosing) => (
             <DraggableEditorTabs
@@ -526,7 +528,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
       )}
       <Toolbar
         ref={toolbarRef}
-        hidden={tabsTitleBarAndEditorToolbarHidden}
+        visibility={tabsTitleBarAndEditorToolbarVisibility}
         showProjectButtons={
           !['start page', 'debugger', 'ask-ai', null].includes(
             currentTab ? currentTab.key : null
@@ -584,6 +586,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
                       setToolbar: editorToolbar =>
                         setEditorToolbar(editorToolbar, isCurrentTab),
                       setGamesPlatformFrameShown: onSetGamesPlatformFrameShown,
+                      setTabsTitleBarAndEditorToolbarVisibility: setTabsTitleBarAndEditorToolbarVisibility,
                       projectItemName: editorTab.projectItemName,
                       setPreviewedLayout,
                       onOpenAskAi,

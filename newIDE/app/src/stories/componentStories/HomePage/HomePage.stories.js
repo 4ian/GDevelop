@@ -95,6 +95,7 @@ const WrappedHomePage = ({
                 projectItemName={null}
                 setToolbar={() => {}}
                 setGamesPlatformFrameShown={() => {}}
+                setTabsTitleBarAndEditorToolbarVisibility={() => {}}
                 canOpen={true}
                 storageProviders={[CloudStorageProvider]}
                 onChooseProject={() => action('onChooseProject')()}

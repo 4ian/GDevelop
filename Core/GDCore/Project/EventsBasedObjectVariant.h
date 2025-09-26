@@ -5,6 +5,7 @@
  */
 #pragma once
 
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/EditorSettings.h"
 #include "GDCore/Project/InitialInstancesContainer.h"
 #include "GDCore/Project/LayersContainer.h"
 #include "GDCore/Project/ObjectsContainer.h"
@@ -199,6 +200,19 @@ public:
   const gd::String &GetAssetStoreOriginalName() const {
     return assetStoreOriginalName;
   };
+  
+  /**
+   * 
+   * \brief Get the user settings for the IDE.
+   */
+  const gd::EditorSettings& GetAssociatedEditorSettings() const {
+    return editorSettings;
+  }
+
+  /**
+   * \brief Get the user settings for the IDE.
+   */
+  gd::EditorSettings& GetAssociatedEditorSettings() { return editorSettings; }
 
   void SerializeTo(SerializerElement &element) const;
 
@@ -224,6 +238,7 @@ private:
    * store.
    */
   gd::String assetStoreOriginalName;
+  gd::EditorSettings editorSettings;
 };
 
 } // namespace gd

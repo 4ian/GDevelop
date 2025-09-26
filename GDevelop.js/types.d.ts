@@ -2363,6 +2363,7 @@ export class EventsBasedObjectVariant extends EmscriptenObject {
   getAssetStoreAssetId(): string;
   setAssetStoreOriginalName(assetStoreOriginalName: string): void;
   getAssetStoreOriginalName(): string;
+  getAssociatedEditorSettings(): EditorSettings;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
 }

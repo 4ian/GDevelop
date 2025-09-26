@@ -37,6 +37,7 @@ void EventsBasedObjectVariant::SerializeTo(SerializerElement &element) const {
 
   layers.SerializeLayersTo(element.AddChild("layers"));
   initialInstances.SerializeTo(element.AddChild("instances"));
+  editorSettings.SerializeTo(element.AddChild("editionSettings"));
 }
 
 void EventsBasedObjectVariant::UnserializeFrom(
@@ -66,6 +67,7 @@ void EventsBasedObjectVariant::UnserializeFrom(
     layers.Reset();
   }
   initialInstances.UnserializeFrom(element.GetChild("instances"));
+  editorSettings.UnserializeFrom(element.GetChild("editionSettings"));
 }
 
 } // namespace gd

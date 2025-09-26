@@ -7,6 +7,144 @@
 namespace gdjs {
   const logger = new gdjs.Logger('LayerPixiRenderer');
 
+  const _FRUSTUM_EDGES: readonly Array<[number, number]> = [
+    // near plane edges
+    [0, 1],
+    [1, 2],
+    [2, 3],
+    [3, 0],
+    // far plane edges
+    [4, 5],
+    [5, 6],
+    [6, 7],
+    [7, 4],
+    // near↔far connections
+    [0, 4],
+    [1, 5],
+    [2, 6],
+    [3, 7],
+  ];
+
+  /** NDC corners for near (-1) and far (+1) planes (Three.js NDC: z=-1 near, z=+1 far). */
+  const _NDC_CORNERS: readonly Array<THREE.Vector3> = [
+    // near
+    new THREE.Vector3(-1, -1, -1),
+    new THREE.Vector3(+1, -1, -1),
+    new THREE.Vector3(+1, +1, -1),
+    new THREE.Vector3(-1, +1, -1),
+    // far
+    new THREE.Vector3(-1, -1, +1),
+    new THREE.Vector3(+1, -1, +1),
+    new THREE.Vector3(+1, +1, +1),
+    new THREE.Vector3(-1, +1, +1),
+  ];
+
+  /** Sort convex polygon vertices around centroid to get consistent winding. */
+  const sortConvexPolygon = (points: THREE.Vector3[]): THREE.Vector3[] => {
+    if (points.length <= 2) return points;
+    const cx = points.reduce((s, p) => s + p.x, 0) / points.length;
+    const cy = points.reduce((s, p) => s + p.y, 0) / points.length;
+    return points
+      .map((p) => ({ p, a: Math.atan2(p.y - cy, p.x - cx) }))
+      .sort((u, v) => u.a - v.a)
+      .map((u) => u.p);
+  };
+
+  /**
+   * Intersect a frustum edge segment [a,b] with plane Z=0.
+   * Returns point or null if no intersection on the segment.
+   */
+  const intersectSegmentWithZ0 = (
+    a: THREE.Vector3,
+    b: THREE.Vector3,
+    eps = 1e-9
+  ): THREE.Vector3 | null => {
+    const az = a.z,
+      bz = b.z;
+    const dz = bz - az;
+
+    // If both z on same side and not on plane, no crossing.
+    if (Math.abs(dz) < eps) {
+      // Segment is (almost) parallel to plane.
+      if (Math.abs(az) < eps && Math.abs(bz) < eps) {
+        // Entire segment lies on plane: return endpoints (handled by caller via dedup).
+        // Here we return null and let caller add endpoints if needed.
+        return null;
+      }
+      return null;
+    }
+
+    // Solve a.z + t*(b.z - a.z) = 0  ⇒  t = -a.z / (b.z - a.z)
+    const t = -az / dz;
+    if (t < -eps || t > 1 + eps) {
+      // Intersection beyond the segment bounds.
+      return null;
+    }
+
+    const p = new THREE.Vector3(
+      a.x + t * (b.x - a.x),
+      a.y + t * (b.y - a.y),
+      0
+    );
+    return p;
+  };
+
+  /** Remove near-duplicate points. */
+  const dedupPoints = (
+    points: THREE.Vector3[],
+    eps = 1e-6
+  ): THREE.Vector3[] => {
+    const out: THREE.Vector3[] = [];
+    for (const p of points) {
+      const exists = out.some(
+        (q) => Math.abs(p.x - q.x) < eps && Math.abs(p.y - q.y) < eps
+      );
+      if (!exists) out.push(p);
+    }
+    return out;
+  };
+
+
+  const getFrustumCornersWorld = (camera: THREE.Camera): THREE.Vector3[] => {
+    if (!camera) return [];
+    camera.updateMatrixWorld(true);
+
+    // Unproject the 8 clip-space corners to world space.
+    return _NDC_CORNERS.map((ndc) => ndc.clone().unproject(camera));
+  }
+
+
+    /**
+     * Compute the convex polygon of the camera frustum clipped by plane Z=0.
+     * Returns ordered vertices (world coords, z=0). Empty array if no intersection.
+     */
+    const clipFrustumAgainstZ0 = (camera: THREE.Camera): THREE.Vector3[] => {
+      const corners = getFrustumCornersWorld(camera);
+      if (corners.length !== 8) return [];
+
+      const hits: THREE.Vector3[] = [];
+
+      // 1) Add vertices that already lie on the plane (z≈0).
+      for (const v of corners) {
+        if (Math.abs(v.z) < 1e-9) {
+          hits.push(new THREE.Vector3(v.x, v.y, 0));
+        }
+      }
+
+      // 2) Intersect each frustum edge with plane Z=0.
+      for (const [i, j] of _FRUSTUM_EDGES) {
+        const a = corners[i],
+          b = corners[j];
+        const p = intersectSegmentWithZ0(a, b);
+        if (p) hits.push(p);
+      }
+
+      // Deduplicate and order.
+      const unique = dedupPoints(hits);
+      if (unique.length < 3) return [];
+      return sortConvexPolygon(unique);
+    }
+
   /**
    * The renderer for a gdjs.Layer using Pixi.js.
    */
@@ -401,137 +539,10 @@ namespace gdjs {
       this._threePlaneMesh.visible = enable;
     }
 
-    /**
-     * Update the position of the PIXI container. To be called after each change
-     * made to position, zoom or rotation of the camera.
-     */
-    // updatePosition(): void {
-    //   const angle = -gdjs.toRad(this._layer.getCameraRotation());
-    //   const zoomFactor = this._layer.getCameraZoom();
-    //   this._pixiContainer.rotation = angle;
-    //   this._pixiContainer.scale.x = zoomFactor;
-    //   this._pixiContainer.scale.y = zoomFactor;
-    //   const cosValue = Math.cos(angle);
-    //   const sinValue = Math.sin(angle);
-    //   const centerX =
-    //     this._layer.getCameraX() * zoomFactor * cosValue -
-    //     this._layer.getCameraY() * zoomFactor * sinValue;
-    //   const centerY =
-    //     this._layer.getCameraX() * zoomFactor * sinValue +
-    //     this._layer.getCameraY() * zoomFactor * cosValue;
-    //   this._pixiContainer.position.x = this._layer.getWidth() / 2 - centerX;
-    //   this._pixiContainer.position.y = this._layer.getHeight() / 2 - centerY;
-
-    //   if (
-    //     this._layer.getRuntimeScene().getGame().getPixelsRounding() &&
-    //     (cosValue === 0 || sinValue === 0) &&
-    //     Number.isInteger(zoomFactor)
-    //   ) {
-    //     // Camera rounding is important for pixel perfect games.
-    //     // Otherwise, the camera position fractional part is added to
-    //     // the sprite one and it changes in which direction sprites are rounded.
-    //     // It makes sprites rounding inconsistent with each other
-    //     // and they seem to move on pixel left and right.
-    //     //
-    //     // PIXI uses a floor function on sprites position on the screen,
-    //     // so a floor must be applied on the camera position too.
-    //     // According to the above calculus,
-    //     // _pixiContainer.position is the opposite of the camera,
-    //     // this is why the ceil function is used floor(x) = -ceil(-x).
-    //     //
-    //     // When the camera directly follows an object,
-    //     // given this object dimension is even,
-    //     // the decimal part of onScenePosition and cameraPosition are the same.
-    //     //
-    //     // Doing the calculus without rounding:
-    //     // onScreenPosition = onScenePosition - cameraPosition
-    //     // onScreenPosition = 980.75 - 200.75
-    //     // onScreenPosition = 780
-    //     //
-    //     // Doing the calculus with rounding:
-    //     // onScreenPosition = floor(onScenePosition + ceil(-cameraPosition))
-    //     // onScreenPosition = floor(980.75 + ceil(-200.75))
-    //     // onScreenPosition = floor(980.75 - 200)
-    //     // onScreenPosition = floor(780.75)
-    //     // onScreenPosition = 780
-
-    //     if (
-    //       this._layer
-    //         .getRuntimeScene()
-    //         .getGame()
-    //         .getRenderer()
-    //         .getPIXIRenderer() instanceof PIXI.Renderer
-    //     ) {
-    //       // TODO Revert from `round` to `ceil` when the issue is fixed in Pixi.
-    //       // Since the upgrade to Pixi 7, sprites are rounded with `round`
-    //       // instead of `floor`.
-    //       // https://github.com/pixijs/pixijs/issues/9868
-    //       this._pixiContainer.position.x = Math.round(
-    //         this._pixiContainer.position.x
-    //       );
-    //       this._pixiContainer.position.y = Math.round(
-    //         this._pixiContainer.position.y
-    //       );
-    //     } else {
-    //       this._pixiContainer.position.x = Math.ceil(
-    //         this._pixiContainer.position.x
-    //       );
-    //       this._pixiContainer.position.y = Math.ceil(
-    //         this._pixiContainer.position.y
-    //       );
-    //     }
-    //   }
-
-    //   if (this._threeCamera) {
-    //     // TODO (3D) - improvement: handle camera rounding like down for PixiJS?
-    //     this._threeCamera.position.x = this._layer.getCameraX();
-    //     this._threeCamera.position.y = -this._layer.getCameraY(); // Inverted because the scene is mirrored on Y axis.
-    //     this._threeCamera.rotation.z = angle;
-
-    //     if (this._threeCamera instanceof THREE.OrthographicCamera) {
-    //       this._threeCamera.zoom = this._layer.getCameraZoom();
-    //       this._threeCamera.updateProjectionMatrix();
-    //       this._threeCamera.position.z = this._layer.getCameraZ(null);
-    //     } else {
-    //       this._threeCamera.position.z = this._layer.getCameraZ(
-    //         this._threeCamera.fov
-    //       );
-    //     }
-
-    //     if (this._threePlaneMesh) {
-    //       // Adapt the plane size so that it covers the whole screen.
-    //       this._threePlaneMesh.scale.x = this._layer.getWidth() / zoomFactor;
-    //       this._threePlaneMesh.scale.y = this._layer.getHeight() / zoomFactor;
-
-    //       // Adapt the plane position so that it's always displayed on the whole screen.
-    //       this._threePlaneMesh.position.x = this._threeCamera.position.x;
-    //       this._threePlaneMesh.position.y = -this._threeCamera.position.y; // Inverted because the scene is mirrored on Y axis.
-    //       this._threePlaneMesh.rotation.z = -angle;
-    //     }
-    //   }
-    // }
-
     updatePosition(): void {
-      const angle = -gdjs.toRad(this._layer.getCameraRotation());
-      const zoomFactor = this._layer.getCameraZoom();
-
-      let effectivePixiZoom = zoomFactor; // default (fallback / non-fill cases)
-
-      // Find intersection of 3D camera center-ray with Z=0 (THREE coords).
-      // Convert to 2D coords (y2D = -yThree). Fallback: use 2D camera X/Y.
-      let followX = this._layer.getCameraX();
-      let followY = this._layer.getCameraY();
-
-      if (this._threeCamera) {
-        const hit = this._getCenterRayIntersectionWithZ0();
-        if (hit) {
-          followX = hit.x;
-          followY = -hit.y; // THREE Y-up -> 2D Y-down
-        }
-      }
-
       // --- 3D camera: KEEP syncing to this._layer (as before) ---
       if (this._threeCamera) {
+        const angle = -gdjs.toRad(this._layer.getCameraRotation());
         this._threeCamera.position.x = this._layer.getCameraX();
         this._threeCamera.position.y = -this._layer.getCameraY(); // scene is mirrored on Y
         this._threeCamera.rotation.z = angle;
@@ -548,123 +559,113 @@ namespace gdjs {
       }
 
       // --- 2D+3D plane: fill the screen while keeping aspect ratio ---
-      if (this._threePlaneMesh) {
-        // Find center point on Z=0 (THREE coords):
-        const center = this._getCenterRayIntersectionWithZ0();
+      if (this._threeCamera && this._threePlaneMesh) {
+        const poly = clipFrustumAgainstZ0(this._threeCamera);
 
-        // Default fallback: behave like before if no valid intersection.
-        // (e.g., camera parallel to Z=0 or plane behind camera)
-        if (!center) {
-          const zoomFactor = this._layer.getCameraZoom();
-          this._threePlaneMesh.scale.x = this._layer.getWidth() / zoomFactor;
-          this._threePlaneMesh.scale.y = this._layer.getHeight() / zoomFactor;
-          this._threePlaneMesh.position.set(
-            followX, // followX is 2D (== THREE x)
-            -(-followY), // back/forth cancels out -> -pyThree → mirror for scene
-            0
-          );
-          this._threePlaneMesh.rotation.set(0, 0, -angle);
+        if (poly.length === 0) {
+          // No intersection at all: Z=0 not in view.
+          this._threePlaneMesh.visible = false;
         } else {
-          // Intersect the 4 screen corners with Z=0 in THREE coords.
-          const corners = [
-            this._projectNDCToZ0(-1, -1),
-            this._projectNDCToZ0(1, -1),
-            this._projectNDCToZ0(1, 1),
-            this._projectNDCToZ0(-1, 1),
-          ].filter(Boolean) as THREE.Vector3[];
+          this._threePlaneMesh.visible = true;
 
-          // If some corners fail (extreme angles), fall back to previous sizing.
-          if (corners.length < 3) {
-            const zoomFactor = this._layer.getCameraZoom();
-            this._threePlaneMesh.scale.x = this._layer.getWidth() / zoomFactor;
-            this._threePlaneMesh.scale.y = this._layer.getHeight() / zoomFactor;
-            this._threePlaneMesh.position.set(center.x, -center.y, 0); // mirror Y for scene
-            this._threePlaneMesh.rotation.set(0, 0, -angle);
+          // Choose the plane center:
+          // Prefer the center-ray hit if available, otherwise polygon centroid.
+          const centerRay = this._getCenterRayIntersectionWithZ0();
+          let cx: number, cy: number;
+          if (centerRay) {
+            cx = centerRay.x;
+            cy = centerRay.y;
           } else {
-            // Compute max extents from center to corners (axis-aligned).
-            let maxDx = 0;
-            let maxDy = 0;
-            for (const c of corners) {
-              maxDx = Math.max(maxDx, Math.abs(c.x - center.x));
-              maxDy = Math.max(maxDy, Math.abs(c.y - center.y));
-            }
-            // Raw box that covers all 4 corner hits (centered on 'center').
-            let boxW = 2 * maxDx;
-            let boxH = 2 * maxDy;
-
-            // Keep plane aspect ratio equal to the 2D render (layer) aspect.
-            const targetAspect =
-              this._layer.getWidth() / this._layer.getHeight();
-            const boxAspect = boxW / (boxH || 1e-8);
-
-            if (boxAspect < targetAspect) {
-              // Too tall -> widen to match aspect
-              boxW = targetAspect * boxH;
-            } else {
-              // Too wide -> increase height to match aspect
-              boxH = boxW / targetAspect;
-            }
-
-            // Match Pixi's rendered world area to the plane's world size:
-            effectivePixiZoom = this._layer.getWidth() / boxW; // == this._layer.getHeight() / boxH
-
-            // Apply size directly as plane scale (geometry is 1x1).
-            this._threePlaneMesh.scale.x = boxW;
-            this._threePlaneMesh.scale.y = boxH;
-
-            // Position at center (mirror Y for the scene which is scaled -1 on Y).
-            this._threePlaneMesh.position.set(center.x, -center.y, 0);
-
-            // Counter-rotate so the 2D content stays upright.
-            this._threePlaneMesh.rotation.set(0, 0, -angle);
+            // This can happen when the center-ray is going above the horizon.
+            cx = poly.reduce((s, p) => s + p.x, 0) / poly.length;
+            cy = poly.reduce((s, p) => s + p.y, 0) / poly.length;
           }
-        }
-      }
 
-      // --- PIXI container transform (rotation/scale unchanged) ---
-      this._pixiContainer.rotation = angle;
-      this._pixiContainer.scale.x = effectivePixiZoom;
-      this._pixiContainer.scale.y = effectivePixiZoom;
+          // Axis-aligned bounds on Z=0 (world units).
+          let minX = Infinity,
+            maxX = -Infinity,
+            minY = Infinity,
+            maxY = -Infinity;
+          for (const p of poly) {
+            if (p.x < minX) minX = p.x;
+            if (p.x > maxX) maxX = p.x;
+            if (p.y < minY) minY = p.y;
+            if (p.y > maxY) maxY = p.y;
+          }
+          let boxW = Math.max(1e-8, maxX - minX);
+          let boxH = Math.max(1e-8, maxY - minY);
 
-      const cosValue = Math.cos(angle);
-      const sinValue = Math.sin(angle);
+          // Keep 2D layer aspect ratio (so texture isn't stretched).
+          const targetAspect = this._layer.getWidth() / this._layer.getHeight();
+          const boxAspect = boxW / boxH;
+          if (boxAspect < targetAspect) {
+            boxW = targetAspect * boxH;
+          } else {
+            boxH = boxW / targetAspect;
+          }
 
-      // Center the Pixi container on (followX, followY) like usual math.
-      const centerX =
-        followX * effectivePixiZoom * cosValue -
-        followY * effectivePixiZoom * sinValue;
-      const centerY =
-        followX * effectivePixiZoom * sinValue +
-        followY * effectivePixiZoom * cosValue;
-      this._pixiContainer.position.x = this._layer.getWidth() / 2 - centerX;
-      this._pixiContainer.position.y = this._layer.getHeight() / 2 - centerY;
+          // Plane size (geometry is 1×1).
+          this._threePlaneMesh.scale.set(boxW, boxH, 1);
 
-      // Pixel rounding (unchanged)
-      if (
-        this._layer.getRuntimeScene().getGame().getPixelsRounding() &&
-        (cosValue === 0 || sinValue === 0) &&
-        Number.isInteger(effectivePixiZoom)
-      ) {
-        if (
-          this._layer
-            .getRuntimeScene()
-            .getGame()
-            .getRenderer()
-            .getPIXIRenderer() instanceof PIXI.Renderer
-        ) {
-          this._pixiContainer.position.x = Math.round(
-            this._pixiContainer.position.x
-          );
-          this._pixiContainer.position.y = Math.round(
-            this._pixiContainer.position.y
-          );
-        } else {
-          this._pixiContainer.position.x = Math.ceil(
-            this._pixiContainer.position.x
-          );
-          this._pixiContainer.position.y = Math.ceil(
-            this._pixiContainer.position.y
-          );
+          // Position on Z=0 (remember: scene has Y mirrored).
+          this._threePlaneMesh.position.set(cx, -cy, 0);
+
+          // Counter-rotate so 2D remains upright.
+          const angle = -gdjs.toRad(this._layer.getCameraRotation());
+          this._threePlaneMesh.rotation.set(0, 0, -angle);
+
+          // ---- Pixi zoom to match plane world size (no stretching) ----
+          const effectivePixiZoom = this._layer.getWidth() / boxW; // == height/boxH
+          this._pixiContainer.scale.set(effectivePixiZoom, effectivePixiZoom);
+
+          // --- PIXI container transform (rotation/scale unchanged) ---
+          this._pixiContainer.rotation = angle;
+
+          // Center Pixi on (cx, -cy) in 2D coords (y2D = -cy).
+          const followX = cx;
+          const followY = -cy;
+          const cosValue = Math.cos(angle);
+          const sinValue = Math.sin(angle);
+
+          // Center the Pixi container on (followX, followY) like usual math.
+          const centerX =
+            followX * effectivePixiZoom * cosValue -
+            followY * effectivePixiZoom * sinValue;
+          const centerY =
+            followX * effectivePixiZoom * sinValue +
+            followY * effectivePixiZoom * cosValue;
+          this._pixiContainer.position.x = this._layer.getWidth() / 2 - centerX;
+          this._pixiContainer.position.y =
+            this._layer.getHeight() / 2 - centerY;
+
+          // Pixel rounding (unchanged)
+          if (
+            this._layer.getRuntimeScene().getGame().getPixelsRounding() &&
+            (cosValue === 0 || sinValue === 0) &&
+            Number.isInteger(effectivePixiZoom)
+          ) {
+            if (
+              this._layer
+                .getRuntimeScene()
+                .getGame()
+                .getRenderer()
+                .getPIXIRenderer() instanceof PIXI.Renderer
+            ) {
+              this._pixiContainer.position.x = Math.round(
+                this._pixiContainer.position.x
+              );
+              this._pixiContainer.position.y = Math.round(
+                this._pixiContainer.position.y
+              );
+            } else {
+              this._pixiContainer.position.x = Math.ceil(
+                this._pixiContainer.position.x
+              );
+              this._pixiContainer.position.y = Math.ceil(
+                this._pixiContainer.position.y
+              );
+            }
+          }
         }
       }
     }

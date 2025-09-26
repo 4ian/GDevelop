@@ -7,7 +7,7 @@
 namespace gdjs {
   const logger = new gdjs.Logger('LayerPixiRenderer');
 
-  const _FRUSTUM_EDGES: readonly Array<[number, number]> = [
+  const _FRUSTUM_EDGES: Array<[number, number]> = [
     // near plane edges
     [0, 1],
     [1, 2],
@@ -26,7 +26,7 @@ namespace gdjs {
   ];
 
   /** NDC corners for near (-1) and far (+1) planes (Three.js NDC: z=-1 near, z=+1 far). */
-  const _NDC_CORNERS: readonly Array<THREE.Vector3> = [
+  const _NDC_CORNERS: Array<THREE.Vector3> = [
     // near
     new THREE.Vector3(-1, -1, -1),
     new THREE.Vector3(+1, -1, -1),
@@ -104,46 +104,83 @@ namespace gdjs {
     return out;
   };
 
-
   const getFrustumCornersWorld = (camera: THREE.Camera): THREE.Vector3[] => {
     if (!camera) return [];
     camera.updateMatrixWorld(true);
 
     // Unproject the 8 clip-space corners to world space.
     return _NDC_CORNERS.map((ndc) => ndc.clone().unproject(camera));
-  }
+  };
 
+  /**
+   * Compute the convex polygon of the camera frustum clipped by plane Z=0.
+   * Returns ordered vertices (world coords, z=0). Empty array if no intersection.
+   */
+  const clipFrustumAgainstZ0 = (camera: THREE.Camera): THREE.Vector3[] => {
+    const corners = getFrustumCornersWorld(camera);
+    if (corners.length !== 8) return [];
 
-    /**
-     * Compute the convex polygon of the camera frustum clipped by plane Z=0.
-     * Returns ordered vertices (world coords, z=0). Empty array if no intersection.
-     */
-    const clipFrustumAgainstZ0 = (camera: THREE.Camera): THREE.Vector3[] => {
-      const corners = getFrustumCornersWorld(camera);
-      if (corners.length !== 8) return [];
+    const hits: THREE.Vector3[] = [];
 
-      const hits: THREE.Vector3[] = [];
-
-      // 1) Add vertices that already lie on the plane (z≈0).
-      for (const v of corners) {
-        if (Math.abs(v.z) < 1e-9) {
-          hits.push(new THREE.Vector3(v.x, v.y, 0));
-        }
+    // 1) Add vertices that already lie on the plane (z≈0).
+    for (const v of corners) {
+      if (Math.abs(v.z) < 1e-9) {
+        hits.push(new THREE.Vector3(v.x, v.y, 0));
       }
-
-      // 2) Intersect each frustum edge with plane Z=0.
-      for (const [i, j] of _FRUSTUM_EDGES) {
-        const a = corners[i],
-          b = corners[j];
-        const p = intersectSegmentWithZ0(a, b);
-        if (p) hits.push(p);
-      }
-
-      // Deduplicate and order.
-      const unique = dedupPoints(hits);
-      if (unique.length < 3) return [];
-      return sortConvexPolygon(unique);
     }
+
+    // 2) Intersect each frustum edge with plane Z=0.
+    for (const [i, j] of _FRUSTUM_EDGES) {
+      const a = corners[i],
+        b = corners[j];
+      const p = intersectSegmentWithZ0(a, b);
+      if (p) hits.push(p);
+    }
+
+    // Deduplicate and order.
+    const unique = dedupPoints(hits);
+    if (unique.length < 3) return [];
+    return sortConvexPolygon(unique);
+  };
+
+  /**
+   * Intersect the ray going through a normalized device coordinate (nx, ny)
+   * with the plane Z=0. Returns the hit point in THREE world coords (z=0)
+   * or null if the ray doesn't intersect the plane in front of the camera.
+   */
+  const projectNDCToZ0 = (
+    camera: THREE.Camera,
+    nx: number,
+    ny: number
+  ): THREE.Vector3 | null => {
+    if (!camera) return null;
+
+    camera.updateMatrixWorld(true);
+
+    const origin = new THREE.Vector3();
+    const dir = new THREE.Vector3();
+    const p = new THREE.Vector3(nx, ny, 0.5);
+
+    if (camera instanceof THREE.OrthographicCamera) {
+      // For ortho, unproject a point on the camera plane, and use forward dir.
+      p.z = 0; // on the camera plane
+      p.unproject(camera); // gives a point on the camera plane in world coords
+      origin.copy(p);
+      camera.getWorldDirection(dir);
+    } else {
+      // Perspective: unproject a point on the frustum plane, build a ray.
+      p.unproject(camera);
+      origin.copy(camera.position);
+      dir.copy(p).sub(origin).normalize();
+    }
+
+    const dz = dir.z;
+    if (Math.abs(dz) < 1e-8) return null; // parallel
+    const t = -origin.z / dz;
+    if (t <= 0) return null; // behind the camera => not visible
+
+    return origin.addScaledVector(dir, t).setZ(0);
+  };
 
   /**
    * The renderer for a gdjs.Layer using Pixi.js.
@@ -489,7 +526,7 @@ namespace gdjs {
               this._threePlaneMaterial
             );
 
-            // 🔽 Add rectangle outline around the plane
+            // Add rectangle outline around the plane. TODO: make it configurable.
             const edges = new THREE.EdgesGeometry(this._threePlaneGeometry);
             const lineMaterial = new THREE.LineBasicMaterial({
               color: 0xff0000,
@@ -539,6 +576,46 @@ namespace gdjs {
       this._threePlaneMesh.visible = enable;
     }
 
+    /** Maximum size of the 2D plane, in pixels. */
+    private _2dPlaneMaxWorldHeight: number = 5000;
+    /** Tilt degrees below which the 2D plane is not clamped. */
+    private _2dPlaneClampFreeTiltDeg: number = 0.1;
+    /** Tilt degrees below which the 2D plane is fully clamped. */
+    private _2dPlaneClampHardTiltDeg: number = 6;
+    private _2dPlaneClampRampPower: number = 1.5; // 1 = linear, >1 = smoother
+
+    /**
+     * Set the maximum height of the 2D plane, in pixels.
+     * Used when the 3D camera is tilted on the X or Y axis (instead of looking down the Z axis,
+     * as it's done by default for 2D games).
+     * This is useful to avoid the 2D plane being too big when the camera is tilted.
+     */
+    set2dPlaneMaxWorldHeight(h: number) {
+      this._2dPlaneMaxWorldHeight = Math.max(0, h);
+    }
+
+    /**
+     * Set the tilt degrees below which the 2D plane is not clamped.
+     */
+    set2dPlaneClampFreeTiltDegrees(d: number) {
+      this._2dPlaneClampFreeTiltDeg = Math.max(0, d);
+    }
+
+    /**
+     * Set the tilt degrees below which the 2D plane is clamped (see `set2dPlaneMaxWorldHeight`).
+     */
+    set2dPlaneClampHardTiltDegrees(d: number) {
+      this._2dPlaneClampHardTiltDeg = Math.max(0, d);
+    }
+
+    /**
+     * Set the ramp power of the 2D plane clamping (see `set2dPlaneMaxWorldHeight`). Used
+     * for smoother transition between clamped and unclamped.
+     */
+    set2dPlaneClampRampPower(p: number) {
+      this._2dPlaneClampRampPower = Math.max(0.1, p);
+    }
+
     updatePosition(): void {
       // --- 3D camera: KEEP syncing to this._layer (as before) ---
       if (this._threeCamera) {
@@ -560,7 +637,9 @@ namespace gdjs {
 
       // --- 2D+3D plane: fill the screen while keeping aspect ratio ---
       if (this._threeCamera && this._threePlaneMesh) {
-        const poly = clipFrustumAgainstZ0(this._threeCamera);
+        // Compute the intersection of the frustrum of the camera on the Z=0 plane.
+        // In theory, that's where the entire 2D rendering should be displayed.
+        let poly = clipFrustumAgainstZ0(this._threeCamera);
 
         if (poly.length === 0) {
           // No intersection at all: Z=0 not in view.
@@ -568,20 +647,8 @@ namespace gdjs {
         } else {
           this._threePlaneMesh.visible = true;
 
-          // Choose the plane center:
-          // Prefer the center-ray hit if available, otherwise polygon centroid.
-          const centerRay = this._getCenterRayIntersectionWithZ0();
-          let cx: number, cy: number;
-          if (centerRay) {
-            cx = centerRay.x;
-            cy = centerRay.y;
-          } else {
-            // This can happen when the center-ray is going above the horizon.
-            cx = poly.reduce((s, p) => s + p.x, 0) / poly.length;
-            cy = poly.reduce((s, p) => s + p.y, 0) / poly.length;
-          }
-
-          // Axis-aligned bounds on Z=0 (world units).
+          // Compute the axis-aligned bounds on Z=0 (world units) of the polygon,
+          // so we can compute the size of the plane doing the 2D rendering.
           let minX = Infinity,
             maxX = -Infinity,
             minY = Infinity,
@@ -602,6 +669,95 @@ namespace gdjs {
             boxW = targetAspect * boxH;
           } else {
             boxH = boxW / targetAspect;
+          }
+
+          // --- Decide if we should cap based on camera tilt (X/Y) ---
+          const forward = new THREE.Vector3();
+          this._threeCamera.getWorldDirection(forward);
+          // |forward.z| ≈ 1  -> no tilt (look mostly perpendicular to Z=0).
+          // |forward.z| ≈ 0  -> grazing the horizon (strong tilt).
+
+          const freeCos = Math.cos(THREE.MathUtils.degToRad(this._2dPlaneClampFreeTiltDeg));
+          const hardCos = Math.cos(
+            THREE.MathUtils.degToRad(this._2dPlaneClampHardTiltDeg)
+          );
+          const tiltCos = Math.abs(forward.z);
+
+          // Map tiltCos ∈ [hardCos, freeCos] to w ∈ [1, 0]
+          let w = 0;
+          if (tiltCos <= hardCos)
+            w = 1; // fully clamped
+          else if (tiltCos >= freeCos)
+            w = 0; // no clamp
+          else w = (freeCos - tiltCos) / (freeCos - hardCos);
+
+          // Ease it
+          w = Math.pow(w, this._2dPlaneClampRampPower);
+
+          // Interpolate Infinity→base via 1/w (bounded):
+          const BIG = 1e12; // “practically infinite”
+          const denom = Math.max(w, 1e-6);
+          const effectiveMaxH = Math.min(
+            BIG,
+            this._2dPlaneMaxWorldHeight / denom
+          );
+
+          // ---- apply cap (same as before, but use effectiveMaxH) ----
+          if (effectiveMaxH < BIG) {
+            const clampedH = Math.max(1e-8, Math.min(boxH, effectiveMaxH));
+            if (clampedH !== boxH) {
+              boxH = clampedH;
+              boxW = targetAspect * boxH; // keep aspect
+            }
+          }
+
+          // --- Choose the plane position (anchor to bottom of screen, heading-invariant) ---
+          const BL = projectNDCToZ0(this._threeCamera, -1, -1);
+          const BR = projectNDCToZ0(this._threeCamera, +1, -1);
+
+          let cx: number, cy: number;
+
+          if (BL && BR) {
+            // Midpoint of the bottom-of-screen segment on Z=0:
+            const mx = 0.5 * (BL.x + BR.x);
+            const my = 0.5 * (BL.y + BR.y);
+
+            // Tangent along the bottom line (unit):
+            let dx = BR.x - BL.x;
+            let dy = BR.y - BL.y;
+            const len = Math.hypot(dx, dy) || 1;
+            dx /= len;
+            dy /= len;
+
+            // Inward normal n = +90° rotation of d in XY plane:
+            // d = (dx, dy)  ->  n = (-dy, dx)
+            let nx = -dy;
+            let ny = dx;
+
+            // Ensure n points "into the screen":
+            const midIn = projectNDCToZ0(this._threeCamera, 0, -0.5);
+            if (midIn) {
+              const vx = midIn.x - mx;
+              const vy = midIn.y - my;
+              if (vx * nx + vy * ny < 0) {
+                nx = -nx;
+                ny = -ny;
+              }
+            }
+
+            // Place the plane so its bottom edge lies on the bottom-of-screen line:
+            cx = mx + nx * (boxH * 0.5);
+            cy = my + ny * (boxH * 0.5);
+          } else {
+            // Fallbacks (center-ray or polygon centroid) if bottom line not visible:
+            const centerRay = projectNDCToZ0(this._threeCamera, 0, 0);
+            if (centerRay) {
+              cx = centerRay.x;
+              cy = centerRay.y;
+            } else {
+              cx = poly.reduce((s, p) => s + p.x, 0) / poly.length;
+              cy = poly.reduce((s, p) => s + p.y, 0) / poly.length;
+            }
           }
 
           // Plane size (geometry is 1×1).
@@ -644,6 +800,34 @@ namespace gdjs {
             (cosValue === 0 || sinValue === 0) &&
             Number.isInteger(effectivePixiZoom)
           ) {
+            // Camera rounding is important for pixel perfect games.
+            // Otherwise, the camera position fractional part is added to
+            // the sprite one and it changes in which direction sprites are rounded.
+            // It makes sprites rounding inconsistent with each other
+            // and they seem to move on pixel left and right.
+            //
+            // PIXI uses a floor function on sprites position on the screen,
+            // so a floor must be applied on the camera position too.
+            // According to the above calculus,
+            // _pixiContainer.position is the opposite of the camera,
+            // this is why the ceil function is used floor(x) = -ceil(-x).
+            //
+            // When the camera directly follows an object,
+            // given this object dimension is even,
+            // the decimal part of onScenePosition and cameraPosition are the same.
+            //
+            // Doing the calculus without rounding:
+            // onScreenPosition = onScenePosition - cameraPosition
+            // onScreenPosition = 980.75 - 200.75
+            // onScreenPosition = 780
+            //
+            // Doing the calculus with rounding:
+            // onScreenPosition = floor(onScenePosition + ceil(-cameraPosition))
+            // onScreenPosition = floor(980.75 + ceil(-200.75))
+            // onScreenPosition = floor(980.75 - 200)
+            // onScreenPosition = floor(780.75)
+            // onScreenPosition = 780
+
             if (
               this._layer
                 .getRuntimeScene()
@@ -651,6 +835,10 @@ namespace gdjs {
                 .getRenderer()
                 .getPIXIRenderer() instanceof PIXI.Renderer
             ) {
+              // TODO Revert from `round` to `ceil` when the issue is fixed in Pixi.
+              // Since the upgrade to Pixi 7, sprites are rounded with `round`
+              // instead of `floor`.
+              // https://github.com/pixijs/pixijs/issues/9868
               this._pixiContainer.position.x = Math.round(
                 this._pixiContainer.position.x
               );
@@ -668,6 +856,8 @@ namespace gdjs {
           }
         }
       }
+
+      // TODO: check the 2D only case. Notably see if can factor rounding.
     }
 
     updateResolution() {
@@ -823,46 +1013,6 @@ namespace gdjs {
     updateClearColor(): void {
       this._clearColor = this._layer.getClearColor();
       // this._createPixiRenderTexture(); // TODO: Check this was useless
-    }
-    /**
-     * Intersect the ray going through a normalized device coordinate (nx, ny)
-     * with the plane Z=0. Returns the hit point in THREE world coords (z=0)
-     * or null if the ray doesn't intersect the plane in front of the camera.
-     */
-    private _projectNDCToZ0(nx: number, ny: number): THREE.Vector3 | null {
-      const camera = this._threeCamera;
-      if (!camera) return null;
-
-      camera.updateMatrixWorld(true);
-
-      const origin = new THREE.Vector3();
-      const dir = new THREE.Vector3();
-      const p = new THREE.Vector3(nx, ny, 0.5);
-
-      if (camera instanceof THREE.OrthographicCamera) {
-        // For ortho, unproject a point on the camera plane, and use forward dir.
-        p.z = 0; // on the camera plane
-        p.unproject(camera); // gives a point on the camera plane in world coords
-        origin.copy(p);
-        camera.getWorldDirection(dir);
-      } else {
-        // Perspective: unproject a point on the frustum plane, build a ray.
-        p.unproject(camera);
-        origin.copy(camera.position);
-        dir.copy(p).sub(origin).normalize();
-      }
-
-      const dz = dir.z;
-      if (Math.abs(dz) < 1e-8) return null; // parallel
-      const t = -origin.z / dz;
-      if (t <= 0) return null; // behind the camera => not visible
-
-      return origin.addScaledVector(dir, t).setZ(0);
-    }
-
-    /** Center-ray ∩ Z=0. */
-    private _getCenterRayIntersectionWithZ0(): THREE.Vector3 | null {
-      return this._projectNDCToZ0(0, 0);
     }
 
     /**

@@ -32,6 +32,16 @@ namespace gdjs {
     instanceContainer: gdjs.RuntimeInstanceContainer,
     runtimeObject: gdjs.RuntimeObject
   ) => void;
+  type RuntimeSceneGetSyncDataCallback = (
+    runtimeScene: gdjs.RuntimeScene,
+    currentSyncData: LayoutNetworkSyncData,
+    syncOptions: GetNetworkSyncDataOptions
+  ) => void;
+  type RuntimeSceneUpdateFromSyncData = (
+    runtimeScene: gdjs.RuntimeScene,
+    receivedSyncData: LayoutNetworkSyncData,
+    options: UpdateFromNetworkSyncDataOptions
+  ) => void;
 
   export const callbacksFirstRuntimeSceneLoaded: Array<RuntimeSceneCallback> =
     [];
@@ -44,6 +54,10 @@ namespace gdjs {
   export const callbacksRuntimeSceneUnloading: Array<RuntimeSceneCallback> = [];
   export const callbacksRuntimeSceneUnloaded: Array<RuntimeSceneCallback> = [];
   export const callbacksObjectDeletedFromScene: Array<RuntimeSceneRuntimeObjectCallback> =
+    [];
+  export const callbacksRuntimeSceneGetSyncData: Array<RuntimeSceneGetSyncDataCallback> =
+    [];
+  export const callbacksRuntimeSceneUpdateFromSyncData: Array<RuntimeSceneUpdateFromSyncData> =
     [];
 
   /** Base64 encoded logo of GDevelop for the splash screen. */
@@ -395,6 +409,28 @@ namespace gdjs {
     callback: RuntimeSceneRuntimeObjectCallback
   ): void {
     gdjs.callbacksObjectDeletedFromScene.push(callback);
+  };
+
+  /**
+   * Register a function to be called each time a scene is getting its sync
+   * data retrieved (via getNetworkSyncData).
+   * @param callback The function to be called.
+   */
+  export const registerRuntimeSceneGetSyncDataCallback = function (
+    callback: RuntimeSceneGetSyncDataCallback
+  ): void {
+    gdjs.callbacksRuntimeSceneGetSyncData.push(callback);
+  };
+
+  /**
+   * Register a function to be called each time a scene is getting its sync
+   * data updated (via updateFromNetworkSyncData).
+   * @param callback The function to be called.
+   */
+  export const registerRuntimeSceneUpdateFromSyncDataCallback = function (
+    callback: RuntimeSceneUpdateFromSyncData
+  ): void {
+    gdjs.callbacksRuntimeSceneUpdateFromSyncData.push(callback);
   };
 
   /**

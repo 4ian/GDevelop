@@ -22,9 +22,11 @@ AsyncExtension::AsyncExtension() {
         gd::AsyncEvent &event = dynamic_cast<gd::AsyncEvent &>(event_);
 
         // Generate callback code
-        const auto callbackDescriptor = codeGenerator.GenerateCallback(
+        const auto callbackId =
             gd::String::From(codeGenerator.GenerateSingleUsageUniqueIdFor(
-                event.GetInstruction().GetOriginalInstruction().lock().get())),
+                event.GetInstruction().GetOriginalInstruction().lock().get()));
+        const auto callbackDescriptor = codeGenerator.GenerateCallback(
+            callbackId,
             parentContext,
             event.GetActions(),
             event.HasSubEvents() ? &event.GetSubEvents() : nullptr);
@@ -32,10 +34,6 @@ AsyncExtension::AsyncExtension() {
         const gd::String callbackCallCode =
             "(runtimeScene) => (" + callbackDescriptor.functionName + "(" +
             callbackDescriptor.argumentsList + "))";
-
-        // Generate the action and store the generated task.
-        const gd::String asyncActionCode = codeGenerator.GenerateActionCode(
-            event.GetInstruction(), parentContext, callbackCallCode);
 
         // Generate code to backup the objects lists.
         // Do it after generating the code of the action so that it uses the
@@ -69,6 +67,13 @@ AsyncExtension::AsyncExtension() {
                 codeGenerator.ConvertToStringExplicit(objectNameToBackup) +
                 ", obj);\n";
         }
+
+        // Generate the action and store the generated task.
+        const gd::String asyncActionCode =
+            codeGenerator.GenerateActionCode(event.GetInstruction(),
+                                             parentContext,
+                                             callbackCallCode,
+                                             callbackId);
 
         return "{\n" + parentAsyncObjectsListGetter + "{\n" +
                asyncContextBuilder + asyncActionCode + "}\n" + "}\n";

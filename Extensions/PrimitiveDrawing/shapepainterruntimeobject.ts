@@ -37,6 +37,24 @@ namespace gdjs {
 
   export type ShapePainterObjectData = ObjectData & ShapePainterObjectDataType;
 
+  type ShapePainterNetworkSyncDataType = {
+    cbf: boolean; // clearBetweenFrames
+    aa: Antialiasing; // antialiasing
+    ac: boolean; // absoluteCoordinates
+    fc: integer; // fillColor
+    oc: integer; // outlineColor
+    os: float; // outlineSize
+    fo: float; // fillOpacity
+    oo: float; // outlineOpacity
+    scaleX: number;
+    scaleY: number;
+    ifx: boolean; // isFlippedX
+    ify: boolean; // isFlippedY
+  };
+
+  export type ShapePainterNetworkSyncData = ObjectNetworkSyncData &
+    ShapePainterNetworkSyncDataType;
+
   /**
    * The ShapePainterRuntimeObject allows to draw graphics shapes on screen.
    */
@@ -189,6 +207,70 @@ namespace gdjs {
       }
 
       return true;
+    }
+
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): ShapePainterNetworkSyncData {
+      return {
+        ...super.getNetworkSyncData(syncOptions),
+        cbf: this._clearBetweenFrames,
+        aa: this._antialiasing,
+        ac: this._useAbsoluteCoordinates,
+        fc: this._fillColor,
+        oc: this._outlineColor,
+        os: this._outlineSize,
+        fo: this._fillOpacity,
+        oo: this._outlineOpacity,
+        scaleX: this.getScaleX(),
+        scaleY: this.getScaleY(),
+        ifx: this._flippedX,
+        ify: this._flippedY,
+      };
+    }
+
+    updateFromNetworkSyncData(
+      networkSyncData: ShapePainterNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
+    ): void {
+      super.updateFromNetworkSyncData(networkSyncData, options);
+
+      if (networkSyncData.cbf !== undefined) {
+        this._clearBetweenFrames = networkSyncData.cbf;
+      }
+      if (networkSyncData.aa !== undefined) {
+        this.setAntialiasing(networkSyncData.aa);
+      }
+      if (networkSyncData.ac !== undefined) {
+        this.setCoordinatesRelative(!networkSyncData.ac);
+      }
+      if (networkSyncData.fc !== undefined) {
+        this._fillColor = networkSyncData.fc;
+      }
+      if (networkSyncData.oc !== undefined) {
+        this._outlineColor = networkSyncData.oc;
+      }
+      if (networkSyncData.os !== undefined) {
+        this.setOutlineSize(networkSyncData.os);
+      }
+      if (networkSyncData.fo !== undefined) {
+        this.setFillOpacity(networkSyncData.fo);
+      }
+      if (networkSyncData.oo !== undefined) {
+        this.setOutlineOpacity(networkSyncData.oo);
+      }
+      if (networkSyncData.scaleX !== undefined) {
+        this.setScaleX(networkSyncData.scaleX);
+      }
+      if (networkSyncData.scaleY !== undefined) {
+        this.setScaleY(networkSyncData.scaleY);
+      }
+      if (networkSyncData.ifx !== undefined) {
+        this.flipX(networkSyncData.ifx);
+      }
+      if (networkSyncData.ify !== undefined) {
+        this.flipY(networkSyncData.ify);
+      }
     }
 
     /**

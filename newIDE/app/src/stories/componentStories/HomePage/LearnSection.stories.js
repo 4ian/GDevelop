@@ -80,6 +80,7 @@ export const Default = () => (
           initialBundleCategory={null}
           initialBundleUserFriendlySlug={null}
           clearInitialBundleValues={() => {}}
+          onTabsTitleBarAndEditorToolbarRemoved={() => {}}
         />
       </TutorialContext.Provider>
     </PreferencesContext.Provider>
@@ -131,6 +132,7 @@ export const NotAuthenticated = () => (
           initialBundleCategory={null}
           initialBundleUserFriendlySlug={null}
           clearInitialBundleValues={() => {}}
+          onTabsTitleBarAndEditorToolbarRemoved={() => {}}
         />
       </TutorialContext.Provider>
     </PreferencesContext.Provider>
@@ -184,6 +186,7 @@ export const EducationSubscriber = () => (
           initialBundleCategory={null}
           initialBundleUserFriendlySlug={null}
           clearInitialBundleValues={() => {}}
+          onTabsTitleBarAndEditorToolbarRemoved={() => {}}
         />
       </TutorialContext.Provider>
     </PreferencesContext.Provider>
@@ -237,6 +240,7 @@ export const EducationTeacher = () => (
           initialBundleCategory={null}
           initialBundleUserFriendlySlug={null}
           clearInitialBundleValues={() => {}}
+          onTabsTitleBarAndEditorToolbarRemoved={() => {}}
         />
       </TutorialContext.Provider>
     </PreferencesContext.Provider>
@@ -284,6 +288,7 @@ export const LoadingTutorials = () => (
         initialBundleCategory={null}
         initialBundleUserFriendlySlug={null}
         clearInitialBundleValues={() => {}}
+        onTabsTitleBarAndEditorToolbarRemoved={() => {}}
       />
     </TutorialContext.Provider>
   </PreferencesContext.Provider>
@@ -330,6 +335,7 @@ export const LoadingCourses = () => (
         initialBundleCategory={null}
         initialBundleUserFriendlySlug={null}
         clearInitialBundleValues={() => {}}
+        onTabsTitleBarAndEditorToolbarRemoved={() => {}}
       />
     </TutorialContext.Provider>
   </PreferencesContext.Provider>

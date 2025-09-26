@@ -38,6 +38,7 @@ import {
   getBundleListingDataFromUserFriendlySlug,
 } from '../../../../AssetStore/AssetStoreUtils';
 import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
+import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 
 type Props = {|
   selectInAppTutorial: (tutorialId: string) => void,
@@ -88,6 +89,7 @@ type Props = {|
   initialBundleUserFriendlySlug: ?string,
   initialBundleCategory: ?string,
   clearInitialBundleValues: () => void,
+  onTabsTitleBarAndEditorToolbarRemoved: boolean => void,
 |};
 
 const LearnSection = ({
@@ -118,6 +120,7 @@ const LearnSection = ({
   initialBundleUserFriendlySlug,
   initialBundleCategory,
   clearInitialBundleValues,
+  onTabsTitleBarAndEditorToolbarRemoved,
 }: Props) => {
   const { fetchTutorials } = React.useContext(TutorialContext);
   const { fetchBundles, bundleListingDatas } = React.useContext(
@@ -125,6 +128,7 @@ const LearnSection = ({
   );
   const { navigateToRoute } = React.useContext(RouterContext);
   const { showAlert } = useAlertDialog();
+  const { isMobile } = useResponsiveWindowSize();
 
   const [
     selectedBundleListingData,
@@ -143,9 +147,10 @@ const LearnSection = ({
         priceValue: priceForUsageType && priceForUsageType.value,
         priceCurrency: priceForUsageType && priceForUsageType.currency,
       });
+      onTabsTitleBarAndEditorToolbarRemoved(false);
       setSelectedBundleListingData(bundleListingData);
     },
-    [setSelectedBundleListingData]
+    [setSelectedBundleListingData, onTabsTitleBarAndEditorToolbarRemoved]
   );
 
   // When the bundles are loaded,
@@ -193,6 +198,11 @@ const LearnSection = ({
         priceValue: priceForUsageType && priceForUsageType.value,
         priceCurrency: priceForUsageType && priceForUsageType.currency,
       });
+      // We are coming from a web link, let's hide the top navigation of the app,
+      // so the user can focus on the bundle information.
+      if (isMobile) {
+        onTabsTitleBarAndEditorToolbarRemoved(true);
+      }
       setSelectedBundleListingData(bundleListingData);
     },
     [
@@ -201,6 +211,8 @@ const LearnSection = ({
       initialBundleUserFriendlySlug,
       initialBundleCategory,
       clearInitialBundleValues,
+      onTabsTitleBarAndEditorToolbarRemoved,
+      isMobile,
     ]
   );
 
@@ -226,9 +238,10 @@ const LearnSection = ({
         });
       }
 
+      onTabsTitleBarAndEditorToolbarRemoved(false);
       onSelectCourse(courseId);
     },
-    [onSelectCourse, courses]
+    [onSelectCourse, courses, onTabsTitleBarAndEditorToolbarRemoved]
   );
 
   React.useEffect(
@@ -259,6 +272,7 @@ const LearnSection = ({
         course={course}
         courseChapters={courseChapters}
         onBack={() => {
+          onTabsTitleBarAndEditorToolbarRemoved(false);
           onSelectCourse(null);
         }}
         onOpenTemplateFromCourseChapter={onOpenTemplateFromCourseChapter}
@@ -281,7 +295,10 @@ const LearnSection = ({
     return (
       <BundleInformationPage
         bundleListingData={selectedBundleListingData}
-        onBack={() => setSelectedBundleListingData(null)}
+        onBack={() => {
+          onTabsTitleBarAndEditorToolbarRemoved(false);
+          setSelectedBundleListingData(null);
+        }}
         getSubscriptionPlansWithPricingSystems={
           getSubscriptionPlansWithPricingSystems
         }

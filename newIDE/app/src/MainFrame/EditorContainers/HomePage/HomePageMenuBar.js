@@ -133,7 +133,7 @@ const HomePageMenuBar = ({
           borderTop: `1px solid ${gdevelopTheme.home.separator.color}`,
         }}
       >
-        <Toolbar height={homepageMobileMenuHeight}>
+        <Toolbar height={homepageMobileMenuHeight} visibility="visible">
           <ToolbarGroup spaceOut>
             {tabsToDisplay.map(({ label, tab, getIcon, id }) => {
               const isActive = activeTab === tab;

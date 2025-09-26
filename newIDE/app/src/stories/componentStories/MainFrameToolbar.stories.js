@@ -46,7 +46,7 @@ const defaultProps: MainFrameToolbarProps = {
   showProjectButtons: true,
   openShareDialog: () => {},
   isSharingEnabled: true,
-  hidden: false,
+  visibility: 'visible',
 
   onPreviewWithoutHotReload: async () => {},
   onOpenDebugger: () => {},

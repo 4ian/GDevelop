@@ -425,9 +425,7 @@ namespace gdjs {
     private _tempVector2d: THREE.Vector2 = new THREE.Vector2();
     private _raycaster: THREE.Raycaster = new THREE.Raycaster();
 
-    private _targetFrameRate = 60;
     private _isVisible = true;
-    private _timeSinceLastFrame = 0;
     private _timeSinceLastInteraction = 0;
 
     private _editorCamera;

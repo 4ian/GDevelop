@@ -579,6 +579,12 @@ namespace gdjs {
         this._permanentForceY = networkSyncData.pfy;
       }
 
+      // If variables are synchronized, update them first,
+      // as behaviors may depend on them. (Like tweens)
+      if (networkSyncData.var) {
+        this._variables.updateFromNetworkSyncData(networkSyncData.var, options);
+      }
+
       // Loop through all behaviors and update them.
       for (const behaviorName in networkSyncData.beh) {
         const behaviorNetworkSyncData = networkSyncData.beh[behaviorName];
@@ -586,11 +592,6 @@ namespace gdjs {
         if (behavior) {
           behavior.updateFromNetworkSyncData(behaviorNetworkSyncData, options);
         }
-      }
-
-      // If variables are synchronized, update them.
-      if (networkSyncData.var) {
-        this._variables.updateFromNetworkSyncData(networkSyncData.var, options);
       }
 
       // If effects are synchronized, update them.

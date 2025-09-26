@@ -908,6 +908,8 @@ namespace gdjs {
           }
         }
       }
+      // Update variables before anything else, as they might be used
+      // in other sync data (for instance in tweens).
       if (syncData.var) {
         this._variables.updateFromNetworkSyncData(syncData.var, options);
       }

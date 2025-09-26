@@ -515,13 +515,7 @@ namespace gdjs {
       const angle = -gdjs.toRad(this._layer.getCameraRotation());
       const zoomFactor = this._layer.getCameraZoom();
 
-      // --- PIXI container transform (rotation/scale unchanged) ---
-      this._pixiContainer.rotation = angle;
-      this._pixiContainer.scale.x = zoomFactor;
-      this._pixiContainer.scale.y = zoomFactor;
-
-      const cosValue = Math.cos(angle);
-      const sinValue = Math.sin(angle);
+      let effectivePixiZoom = zoomFactor; // default (fallback / non-fill cases)
 
       // Find intersection of 3D camera center-ray with Z=0 (THREE coords).
       // Convert to 2D coords (y2D = -yThree). Fallback: use 2D camera X/Y.
@@ -536,11 +530,112 @@ namespace gdjs {
         }
       }
 
+      // --- 3D camera: KEEP syncing to this._layer (as before) ---
+      if (this._threeCamera) {
+        this._threeCamera.position.x = this._layer.getCameraX();
+        this._threeCamera.position.y = -this._layer.getCameraY(); // scene is mirrored on Y
+        this._threeCamera.rotation.z = angle;
+
+        if (this._threeCamera instanceof THREE.OrthographicCamera) {
+          this._threeCamera.zoom = this._layer.getCameraZoom();
+          this._threeCamera.updateProjectionMatrix();
+          this._threeCamera.position.z = this._layer.getCameraZ(null);
+        } else {
+          this._threeCamera.position.z = this._layer.getCameraZ(
+            this._threeCamera.fov
+          );
+        }
+      }
+
+      // --- 2D+3D plane: fill the screen while keeping aspect ratio ---
+      if (this._threePlaneMesh) {
+        // Find center point on Z=0 (THREE coords):
+        const center = this._getCenterRayIntersectionWithZ0();
+
+        // Default fallback: behave like before if no valid intersection.
+        // (e.g., camera parallel to Z=0 or plane behind camera)
+        if (!center) {
+          const zoomFactor = this._layer.getCameraZoom();
+          this._threePlaneMesh.scale.x = this._layer.getWidth() / zoomFactor;
+          this._threePlaneMesh.scale.y = this._layer.getHeight() / zoomFactor;
+          this._threePlaneMesh.position.set(
+            followX, // followX is 2D (== THREE x)
+            -(-followY), // back/forth cancels out -> -pyThree → mirror for scene
+            0
+          );
+          this._threePlaneMesh.rotation.set(0, 0, -angle);
+        } else {
+          // Intersect the 4 screen corners with Z=0 in THREE coords.
+          const corners = [
+            this._projectNDCToZ0(-1, -1),
+            this._projectNDCToZ0(1, -1),
+            this._projectNDCToZ0(1, 1),
+            this._projectNDCToZ0(-1, 1),
+          ].filter(Boolean) as THREE.Vector3[];
+
+          // If some corners fail (extreme angles), fall back to previous sizing.
+          if (corners.length < 3) {
+            const zoomFactor = this._layer.getCameraZoom();
+            this._threePlaneMesh.scale.x = this._layer.getWidth() / zoomFactor;
+            this._threePlaneMesh.scale.y = this._layer.getHeight() / zoomFactor;
+            this._threePlaneMesh.position.set(center.x, -center.y, 0); // mirror Y for scene
+            this._threePlaneMesh.rotation.set(0, 0, -angle);
+          } else {
+            // Compute max extents from center to corners (axis-aligned).
+            let maxDx = 0;
+            let maxDy = 0;
+            for (const c of corners) {
+              maxDx = Math.max(maxDx, Math.abs(c.x - center.x));
+              maxDy = Math.max(maxDy, Math.abs(c.y - center.y));
+            }
+            // Raw box that covers all 4 corner hits (centered on 'center').
+            let boxW = 2 * maxDx;
+            let boxH = 2 * maxDy;
+
+            // Keep plane aspect ratio equal to the 2D render (layer) aspect.
+            const targetAspect =
+              this._layer.getWidth() / this._layer.getHeight();
+            const boxAspect = boxW / (boxH || 1e-8);
+
+            if (boxAspect < targetAspect) {
+              // Too tall -> widen to match aspect
+              boxW = targetAspect * boxH;
+            } else {
+              // Too wide -> increase height to match aspect
+              boxH = boxW / targetAspect;
+            }
+
+            // Match Pixi's rendered world area to the plane's world size:
+            effectivePixiZoom = this._layer.getWidth() / boxW; // == this._layer.getHeight() / boxH
+
+            // Apply size directly as plane scale (geometry is 1x1).
+            this._threePlaneMesh.scale.x = boxW;
+            this._threePlaneMesh.scale.y = boxH;
+
+            // Position at center (mirror Y for the scene which is scaled -1 on Y).
+            this._threePlaneMesh.position.set(center.x, -center.y, 0);
+
+            // Counter-rotate so the 2D content stays upright.
+            this._threePlaneMesh.rotation.set(0, 0, -angle);
+          }
+        }
+      }
+
+      // --- PIXI container transform (rotation/scale unchanged) ---
+      this._pixiContainer.rotation = angle;
+      this._pixiContainer.scale.x = effectivePixiZoom;
+      this._pixiContainer.scale.y = effectivePixiZoom;
+
+      const cosValue = Math.cos(angle);
+      const sinValue = Math.sin(angle);
+
       // Center the Pixi container on (followX, followY) like usual math.
       const centerX =
-        followX * zoomFactor * cosValue - followY * zoomFactor * sinValue;
+        followX * effectivePixiZoom * cosValue -
+        followY * effectivePixiZoom * sinValue;
       const centerY =
-        followX * zoomFactor * sinValue + followY * zoomFactor * cosValue;
+        followX * effectivePixiZoom * sinValue +
+        followY * effectivePixiZoom * cosValue;
       this._pixiContainer.position.x = this._layer.getWidth() / 2 - centerX;
       this._pixiContainer.position.y = this._layer.getHeight() / 2 - centerY;
 
@@ -548,7 +643,7 @@ namespace gdjs {
       if (
         this._layer.getRuntimeScene().getGame().getPixelsRounding() &&
         (cosValue === 0 || sinValue === 0) &&
-        Number.isInteger(zoomFactor)
+        Number.isInteger(effectivePixiZoom)
       ) {
         if (
           this._layer
@@ -571,50 +666,6 @@ namespace gdjs {
             this._pixiContainer.position.y
           );
         }
-      }
-
-      // --- 3D camera: KEEP syncing to this._layer (as before) ---
-      if (this._threeCamera) {
-        this._threeCamera.position.x = this._layer.getCameraX();
-        this._threeCamera.position.y = -this._layer.getCameraY(); // scene is mirrored on Y
-        this._threeCamera.rotation.z = angle;
-
-        if (this._threeCamera instanceof THREE.OrthographicCamera) {
-          this._threeCamera.zoom = this._layer.getCameraZoom();
-          this._threeCamera.updateProjectionMatrix();
-          this._threeCamera.position.z = this._layer.getCameraZ(null);
-        } else {
-          this._threeCamera.position.z = this._layer.getCameraZ(
-            this._threeCamera.fov
-          );
-        }
-      }
-
-      // --- 2D+3D plane: keep size, put it at the intersection on Z=0 ---
-      if (this._threePlaneMesh) {
-        // Size unchanged: covers the screen according to zoom.
-        this._threePlaneMesh.scale.x = this._layer.getWidth() / zoomFactor;
-        this._threePlaneMesh.scale.y = this._layer.getHeight() / zoomFactor;
-
-        // Place on Z=0 at the intersection (THREE coords), with scene Y mirrored.
-        let px = followX; // followX is 2D; equals THREE x already
-        let pyThree = -followY; // back to THREE Y-up for placement
-
-        if (this._threeCamera) {
-          const hit = this._getCenterRayIntersectionWithZ0();
-          if (hit) {
-            px = hit.x;
-            pyThree = hit.y;
-          }
-        }
-
-        this._threePlaneMesh.position.set(px, -pyThree, 0); // mirror Y for scene (scene.scale.y = -1)
-
-        // Rotate the plane around Z to counter Pixi's rotation,
-        // so 2D rendering looks upright in the 3D world.
-        this._threePlaneMesh.rotation.x = 0;
-        this._threePlaneMesh.rotation.y = 0;
-        this._threePlaneMesh.rotation.z = -angle;
       }
     }
 
@@ -772,12 +823,12 @@ namespace gdjs {
       this._clearColor = this._layer.getClearColor();
       // this._createPixiRenderTexture(); // TODO: Check this was useless
     }
-
     /**
-     * Compute where the center of the 3D camera frustum intersects the Z=0 plane.
-     * Returns a THREE.Vector3 (z=0) in THREE world coordinates, or null if parallel.
+     * Intersect the ray going through a normalized device coordinate (nx, ny)
+     * with the plane Z=0. Returns the hit point in THREE world coords (z=0)
+     * or null if the ray doesn't intersect the plane in front of the camera.
      */
-    private _getCenterRayIntersectionWithZ0(): THREE.Vector3 | null {
+    private _projectNDCToZ0(nx: number, ny: number): THREE.Vector3 | null {
       const camera = this._threeCamera;
       if (!camera) return null;
 
@@ -785,18 +836,32 @@ namespace gdjs {
 
       const origin = new THREE.Vector3();
       const dir = new THREE.Vector3();
+      const p = new THREE.Vector3(nx, ny, 0.5);
 
-      // For both perspective and ortho, use the world forward direction.
-      origin.copy(camera.position);
-      camera.getWorldDirection(dir);
+      if (camera instanceof THREE.OrthographicCamera) {
+        // For ortho, unproject a point on the camera plane, and use forward dir.
+        p.z = 0; // on the camera plane
+        p.unproject(camera); // gives a point on the camera plane in world coords
+        origin.copy(p);
+        camera.getWorldDirection(dir);
+      } else {
+        // Perspective: unproject a point on the frustum plane, build a ray.
+        p.unproject(camera);
+        origin.copy(camera.position);
+        dir.copy(p).sub(origin).normalize();
+      }
 
       const dz = dir.z;
-      if (Math.abs(dz) < 1e-8) return null; // parallel to plane Z=0
+      if (Math.abs(dz) < 1e-8) return null; // parallel
+      const t = -origin.z / dz;
+      if (t <= 0) return null; // behind the camera => not visible
 
-      const t = -origin.z / dz; // origin.z + t*dir.z = 0
-      const hit = origin.clone().addScaledVector(dir, t);
-      hit.z = 0;
-      return hit;
+      return origin.addScaledVector(dir, t).setZ(0);
+    }
+
+    /** Center-ray ∩ Z=0. */
+    private _getCenterRayIntersectionWithZ0(): THREE.Vector3 | null {
+      return this._projectNDCToZ0(0, 0);
     }
 
     /**

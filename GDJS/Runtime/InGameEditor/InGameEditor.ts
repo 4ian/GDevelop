@@ -640,9 +640,10 @@ namespace gdjs {
               sceneAndCustomObject;
             this._currentScene = scene;
             this._editedInstanceContainer = customObjectInstanceContainer;
-            // TODO
-            this._instancesEditorSettings = null;
           }
+          this.setInstancesEditorSettings(
+            eventsBasedObjectVariantData.editionSettings
+          );
           this._innerArea = eventsBasedObjectVariantData._initialInnerArea;
         } else {
           console.warn(

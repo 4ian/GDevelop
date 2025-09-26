@@ -171,7 +171,6 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
   saveUiSettings = () => {
     const variant = this.getVariant();
     const editor = this.editor;
-    console.log('saveUiSettings', variant);
     if (editor && variant) {
       unserializeFromJSObject(
         variant.getAssociatedEditorSettings(),

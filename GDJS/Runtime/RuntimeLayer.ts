@@ -62,6 +62,7 @@ namespace gdjs {
     _initialCamera3DFieldOfView: float;
     _initialCamera3DFarPlaneDistance: float;
     _initialCamera3DNearPlaneDistance: float;
+    _initialCamera2DPlaneMaxDrawingDistance: float;
 
     _runtimeScene: gdjs.RuntimeInstanceContainer;
     _effectsManager: gdjs.EffectsManager;
@@ -94,6 +95,8 @@ namespace gdjs {
         layerData.camera3DNearPlaneDistance || 0.1;
       this._initialCamera3DFarPlaneDistance =
         layerData.camera3DFarPlaneDistance || 2000;
+      this._initialCamera2DPlaneMaxDrawingDistance =
+        layerData.camera2DPlaneMaxDrawingDistance || 5000;
       this._initialLayerData = layerData;
       this._runtimeScene = instanceContainer;
       this._effectsManager = instanceContainer.getGame().getEffectsManager();
@@ -395,6 +398,9 @@ namespace gdjs {
     }
     getInitialCamera3DFarPlaneDistance(): float {
       return this._initialCamera3DFarPlaneDistance;
+    }
+    getInitialCamera2DPlaneMaxDrawingDistance(): float {
+      return this._initialCamera2DPlaneMaxDrawingDistance;
     }
 
     /**

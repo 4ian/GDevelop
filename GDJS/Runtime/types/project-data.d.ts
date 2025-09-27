@@ -334,6 +334,7 @@ declare interface LayerData {
   camera3DFieldOfView?: float;
   camera3DFarPlaneDistance?: float;
   camera3DNearPlaneDistance?: float;
+  camera2DPlaneMaxDrawingDistance?: float;
   isLightingLayer: boolean;
   followBaseLayerCamera: boolean;
   isLocked?: boolean;

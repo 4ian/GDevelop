@@ -1121,6 +1121,8 @@ interface Layer {
     void SetCamera3DFarPlaneDistance(double distance);
     double GetCamera3DFieldOfView();
     void SetCamera3DFieldOfView(double angle);
+    double GetCamera2DPlaneMaxDrawingDistance();
+    void SetCamera2DPlaneMaxDrawingDistance(double distance);
 
     void SetAmbientLightColor(unsigned long r, unsigned long g, unsigned long b);
     unsigned long GetAmbientLightColorRed();

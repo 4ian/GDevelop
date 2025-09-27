@@ -80,6 +80,10 @@ const LayerEditorDialog = ({
     camera3DNearPlaneDistanceError,
     setCamera3DNearPlaneDistanceError,
   ] = React.useState<?React.Node>(null);
+  const [
+    camera2DPlaneMaxDrawingDistanceError,
+    setCamera2DPlaneMaxDrawingDistanceError,
+  ] = React.useState<?React.Node>(null);
   const [currentTab, setCurrentTab] = React.useState(initialTab);
   const { instancesCount, highestZOrder } = React.useMemo(
     () => {
@@ -165,6 +169,26 @@ const LayerEditorDialog = ({
       }
       if (newValue === layer.getCamera3DFarPlaneDistance()) return;
       layer.setCamera3DFarPlaneDistance(newValue);
+      forceUpdate();
+      notifyOfChange();
+    },
+    [forceUpdate, layer, notifyOfChange]
+  );
+
+  const onChangeCamera2DPlaneMaxDrawingDistance = React.useCallback(
+    value => {
+      setCamera2DPlaneMaxDrawingDistanceError(null);
+      const newValue = parseFloat(value) || 0;
+      if (newValue <= 0) {
+        setCamera2DPlaneMaxDrawingDistanceError(
+          <Trans>
+            The maximum 2D drawing distance must be strictly greater than 0.
+          </Trans>
+        );
+        return;
+      }
+      if (newValue === layer.getCamera2DPlaneMaxDrawingDistance()) return;
+      layer.setCamera2DPlaneMaxDrawingDistance(newValue);
       forceUpdate();
       notifyOfChange();
     },
@@ -393,6 +417,19 @@ const LayerEditorDialog = ({
                       floatingLabelFixed
                     />
                   </ResponsiveLineStackLayout>
+                  <SemiControlledTextField
+                    commitOnBlur
+                    fullWidth
+                    errorText={camera2DPlaneMaxDrawingDistanceError}
+                    onChange={onChangeCamera2DPlaneMaxDrawingDistance}
+                    value={layer
+                      .getCamera2DPlaneMaxDrawingDistance()
+                      .toString(10)}
+                    floatingLabelText={
+                      <Trans>Maximum 2D drawing distance</Trans>
+                    }
+                    floatingLabelFixed
+                  />
                 </ColumnStackLayout>
               )}
             </ColumnStackLayout>

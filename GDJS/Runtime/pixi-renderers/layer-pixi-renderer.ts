@@ -844,6 +844,7 @@ namespace gdjs {
       // 2D only (no 3D rendering and so no 2D plane in the 3D world):
       // Update the 2D Pixi container position, size and rotation.
       if (!this._threeCamera || !this._threePlaneMesh) {
+        effectivePixiZoom = this._layer.getCameraZoom();
         this._pixiContainer.rotation = angle;
         this._pixiContainer.scale.x = effectivePixiZoom;
         this._pixiContainer.scale.y = effectivePixiZoom;

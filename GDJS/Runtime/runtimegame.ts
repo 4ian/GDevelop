@@ -230,7 +230,7 @@ namespace gdjs {
     _hasJustResumed: boolean = false;
 
     //Inputs :
-    _inputManager: InputManager;
+    private _inputManager: InputManager;
 
     _options: RuntimeGameOptions;
 

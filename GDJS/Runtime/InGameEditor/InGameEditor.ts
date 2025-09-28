@@ -33,6 +33,7 @@ namespace gdjs {
   const Q_KEY = 81;
   const E_KEY = 69;
   const F_KEY = 70;
+  const O_KEY = 79;
   const V_KEY = 86;
   const X_KEY = 88;
   const Y_KEY = 89;
@@ -179,6 +180,44 @@ namespace gdjs {
         !isShiftPressed(inputManager)
       );
     }
+  };
+
+  /** Get the identifiers of the touches that are currently active, without the mouse. */
+  const getCurrentTouchIdentifiers = (inputManager: gdjs.InputManager) => {
+    return inputManager
+      .getAllTouchIdentifiers()
+      .slice()
+      .filter((id) => id !== gdjs.InputManager.MOUSE_TOUCH_ID) // Exclude mouse touch
+      .sort((a, b) => a - b); // Ensure stable order to help comparisons.
+  };
+
+  const getTouchesCentroid = (inputManager: gdjs.InputManager) => {
+    const ids = getCurrentTouchIdentifiers(inputManager);
+    if (ids.length === 0) return { x: 0, y: 0 };
+    let sx = 0;
+    let sy = 0;
+    for (let i = 0; i < ids.length; i++) {
+      sx += inputManager.getTouchX(ids[i]);
+      sy += inputManager.getTouchY(ids[i]);
+    }
+    return { x: sx / ids.length, y: sy / ids.length };
+  };
+
+  const getTouchesDistance = (inputManager: gdjs.InputManager) => {
+    const ids = getCurrentTouchIdentifiers(inputManager);
+    if (ids.length === 0) return 0;
+    return Math.hypot(
+      inputManager.getTouchX(ids[0]) - inputManager.getTouchX(ids[1]),
+      inputManager.getTouchY(ids[0]) - inputManager.getTouchY(ids[1])
+    );
+  };
+
+  const areSameTouchesSet = (ids1: Array<integer>, ids2: Array<integer>) => {
+    if (ids1.length !== ids2.length) return false;
+    for (let i = 0; i < ids1.length; i++) {
+      if (ids1[i] !== ids2[i]) return false;
+    }
+    return true;
   };
 
   const freeCameraKeys = [
@@ -1129,9 +1168,6 @@ namespace gdjs {
 
         this._getEditorCamera().updateCamera(currentScene, layer);
       });
-
-      // TODO: touch controls - pinch to zoom
-      // TODO: touch controls - two fingers to move the camera
     }
 
     moveSelectionUnderCursor() {
@@ -1350,10 +1386,14 @@ namespace gdjs {
       const cursorX = inputManager.getCursorX();
       const cursorY = inputManager.getCursorY();
 
+      const touchIds = getCurrentTouchIdentifiers(inputManager);
+      const hasMultipleTouches = touchIds.length >= 2;
+
       if (
         inputManager.isMouseButtonPressed(0) &&
         !this._shouldDragSelectedObject() &&
-        !isSpacePressed(inputManager)
+        !isSpacePressed(inputManager) &&
+        !hasMultipleTouches
       ) {
         if (this._wasMouseLeftButtonPressed && this._selectionBox) {
           this._selectionBox.endPoint.set(
@@ -1400,7 +1440,8 @@ namespace gdjs {
       ) {
         if (
           !this._selectionBox.endPoint.equals(this._selectionBox.startPoint) &&
-          !this._hasSelectionActuallyMoved
+          !this._hasSelectionActuallyMoved &&
+          !hasMultipleTouches
         ) {
           // Selection rectangle ended.
 
@@ -1638,12 +1679,20 @@ namespace gdjs {
       const currentScene = this._currentScene;
       if (!currentScene) return;
 
+      const touchIds = getCurrentTouchIdentifiers(inputManager);
+      const hasMultipleTouches = touchIds.length >= 2;
+
       // Selection controls are shown on the last object that can be manipulated
       // (and if none, selection controls are not shown).
       const lastEditableSelectedObject = this._selection.getLastSelectedObject({
         ignoreIf: (object) =>
           this.isInstanceLocked(object) || this.isInstanceSealed(object),
       });
+
+      // Space or multiple touches will hide the selection controls as they are
+      // used to move the camera.
+      const shouldHideSelectionControls =
+        isSpacePressed(inputManager) || hasMultipleTouches;
 
       // Remove the selection controls if the last selected object has changed
       // or if nothing movable is selected.
@@ -1653,7 +1702,7 @@ namespace gdjs {
           (lastEditableSelectedObject &&
             this._selectionControls.object !== lastEditableSelectedObject) ||
           this._shouldDragSelectedObject() ||
-          isSpacePressed(inputManager))
+          shouldHideSelectionControls)
       ) {
         this._removeSelectionControls();
       }
@@ -1663,7 +1712,7 @@ namespace gdjs {
         lastEditableSelectedObject &&
         !this._selectionControls &&
         !this._shouldDragSelectedObject() &&
-        !isSpacePressed(inputManager)
+        !shouldHideSelectionControls
       ) {
         const threeObject = lastEditableSelectedObject.get3DRendererObject();
         if (!threeObject) return;
@@ -2877,6 +2926,26 @@ namespace gdjs {
       this.onHasCameraChanged();
     }
 
+    switchToOrbitAroundZ0(maxDistance: number): void {
+      if (this.freeCameraControl.isEnabled()) {
+        // Match orientation and orbit from the current free camera position.
+        this.orbitCameraControl.rotationAngle =
+          this.freeCameraControl.rotationAngle;
+        this.orbitCameraControl.elevationAngle =
+          this.freeCameraControl.elevationAngle;
+        this.orbitCameraControl.orbitFromPositionAroundZ0(
+          this.freeCameraControl.position.x,
+          this.freeCameraControl.position.y,
+          this.freeCameraControl.position.z,
+          maxDistance
+        );
+      }
+
+      this.orbitCameraControl.setEnabled(true);
+      this.freeCameraControl.setEnabled(false);
+      this.onHasCameraChanged();
+    }
+
     switchToFreeCamera(): void {
       this.orbitCameraControl.setEnabled(false);
       this.freeCameraControl.setEnabled(true);
@@ -2904,7 +2973,10 @@ namespace gdjs {
 
     step(): void {
       const runtimeGame = this.editor.getRuntimeGame();
-      const inputManager = runtimeGame._inputManager;
+      const inputManager = runtimeGame.getInputManager();
+
+      const touchIds = getCurrentTouchIdentifiers(inputManager);
+      const touchCount = touchIds.length;
 
       // Always allow to use Space+click to switch to free camera and pan.
       // Display a grab cursor to indicate that.
@@ -2924,6 +2996,27 @@ namespace gdjs {
         !this.isFreeCamera()
       ) {
         this.switchToFreeCamera();
+      }
+      // Shift to orbit if just mouse wheel click is used
+      if (
+        !isShiftPressed(inputManager) &&
+        inputManager.isMouseButtonPressed(2) &&
+        this.isFreeCamera()
+      ) {
+        const maxDistance = 4000; // Large enough to orbit quickly on most parts of a level.
+        this.switchToOrbitAroundZ0(maxDistance);
+      }
+      // With touches, 2 touches will always pan/zoom the camera with the free camera.
+      if (touchCount === 2 && !this.isFreeCamera()) {
+        this.switchToFreeCamera();
+      }
+      // With touches, 3 touches will orbit around the point "in front of the camera".
+      if (
+        (touchCount === 3 || inputManager.isKeyPressed(O_KEY)) &&
+        this.isFreeCamera()
+      ) {
+        const maxDistance = 4000; // Large enough to orbit quickly on most parts of a level.
+        this.switchToOrbitAroundZ0(maxDistance);
       }
 
       this.orbitCameraControl.step();
@@ -3162,6 +3255,10 @@ namespace gdjs {
     private _wasMouseRightButtonPressed = false;
     private _wasMouseMiddleButtonPressed = false;
 
+    private _gestureActiveTouchIds: Array<integer> = [];
+    private _gestureLastCentroidX: float = 0;
+    private _gestureLastCentroidY: float = 0;
+
     constructor(editorCamera: EditorCamera) {
       this._editorCamera = editorCamera;
     }
@@ -3177,7 +3274,7 @@ namespace gdjs {
 
     step(): void {
       const runtimeGame = this._editorCamera.editor.getRuntimeGame();
-      const inputManager = runtimeGame._inputManager;
+      const inputManager = runtimeGame.getInputManager();
       if (this._isEnabled) {
         // Right click: rotate the camera.
         // Middle click: also rotate the camera.
@@ -3204,6 +3301,49 @@ namespace gdjs {
           this.distance = Math.max(10, this.distance - wheelDeltaY);
           this._editorCamera.onHasCameraChanged();
         }
+
+        // Touch gestures
+        const touchIds = getCurrentTouchIdentifiers(inputManager);
+        const touchCount = touchIds.length;
+
+        if (touchCount === 0) {
+          this._gestureActiveTouchIds = [];
+        } else if (!areSameTouchesSet(this._gestureActiveTouchIds, touchIds)) {
+          // Start or reinitialize gesture tracking
+          this._gestureActiveTouchIds = touchIds.slice();
+          if (touchCount === 3) {
+            const centroid3 = getTouchesCentroid(inputManager);
+            this._gestureLastCentroidX = centroid3.x;
+            this._gestureLastCentroidY = centroid3.y;
+          }
+        } else {
+          // Process ongoing gesture
+          if (touchCount === 3) {
+            // Three-finger rotation:
+            // - adjust elevation angle from vertical movement of centroid
+            // - adjust rotation angle from horizontal movement of centroid
+            const centroid3 = getTouchesCentroid(inputManager);
+            const dx3 = centroid3.x - this._gestureLastCentroidX;
+            const dy3 = centroid3.y - this._gestureLastCentroidY;
+            if (dx3 !== 0) {
+              const tiltSpeed = 0.2;
+              this.rotationAngle += dx3 * tiltSpeed;
+              this._editorCamera.onHasCameraChanged();
+            }
+            if (dy3 !== 0) {
+              const tiltSpeed = 0.2;
+              this.elevationAngle += dy3 * tiltSpeed;
+              if (this.elevationAngle < 5) this.elevationAngle = 5;
+              if (this.elevationAngle > 175) this.elevationAngle = 175;
+              this._editorCamera.onHasCameraChanged();
+            }
+            this._gestureLastCentroidX = centroid3.x;
+            this._gestureLastCentroidY = centroid3.y;
+          }
+        }
+      } else {
+        // Reset gesture tracking when camera control is disabled.
+        this._gestureActiveTouchIds = [];
       }
 
       this._wasMouseRightButtonPressed = inputManager.isMouseButtonPressed(1);
@@ -3224,29 +3364,67 @@ namespace gdjs {
       return this.target.z;
     }
 
+    private _getCameraForwardVector(): [float, float, float] {
+      // Camera forward (from camera toward where it looks), unit length.
+      const cosYaw = Math.cos(gdjs.toRad(this.rotationAngle + 90));
+      const sinYaw = Math.sin(gdjs.toRad(this.rotationAngle + 90));
+      const cosEl = Math.cos(gdjs.toRad(this.elevationAngle));
+      const sinEl = Math.sin(gdjs.toRad(this.elevationAngle));
+
+      const fwdX = -cosYaw * cosEl;
+      const fwdY = -sinYaw * cosEl;
+      const fwdZ = -sinEl;
+
+      return [fwdX, fwdY, fwdZ];
+    }
+
     getCameraX(): float {
-      return (
-        this.target.x +
-        this.distance *
-          Math.cos(gdjs.toRad(this.rotationAngle + 90)) *
-          Math.cos(gdjs.toRad(this.elevationAngle))
-      );
+      const [fwdX, ,] = this._getCameraForwardVector();
+      return this.target.x - this.distance * fwdX;
     }
 
     getCameraY(): float {
-      return (
-        this.target.y +
-        this.distance *
-          Math.sin(gdjs.toRad(this.rotationAngle + 90)) *
-          Math.cos(gdjs.toRad(this.elevationAngle))
-      );
+      const [, fwdY] = this._getCameraForwardVector();
+      return this.target.y - this.distance * fwdY;
     }
 
     getCameraZ(): float {
-      return (
-        this.target.z +
-        this.distance * Math.sin(gdjs.toRad(this.elevationAngle))
-      );
+      const [, , fwdZ] = this._getCameraForwardVector();
+      return this.target.z - this.distance * fwdZ;
+    }
+
+    orbitFromPositionAroundZ0(
+      x: float,
+      y: float,
+      z: float,
+      targetMaxDistance: float
+    ): void {
+      const [fwdX, fwdY, fwdZ] = this._getCameraForwardVector();
+
+      // Intersect ray P(t) = camera position + t * forward with plane z = 0:
+      // z + t*fwdZ = 0 => t = -z / fwdZ
+      let tPlane: number | null = null;
+      if (Math.abs(fwdZ) > 1e-6) {
+        const t = -z / fwdZ;
+        // Only keep intersections "in front" of the camera
+        if (t > 0) tPlane = t;
+      }
+
+      // Choose distance along the ray:
+      // - If there is a valid intersection within targetMaxDistance, use it
+      // - Otherwise, clamp to targetMaxDistance
+      const distance =
+        tPlane !== null && tPlane <= targetMaxDistance
+          ? tPlane
+          : targetMaxDistance;
+
+      // Target point = point ahead of camera along forward by distance
+      this.target.x = x + fwdX * distance;
+      this.target.y = y + fwdY * distance;
+      this.target.z = z + fwdZ * distance;
+
+      // Distance so that orbit camera stays exactly at the specified position
+      this.distance = distance;
     }
 
     updateCamera(currentScene: RuntimeScene, layer: RuntimeLayer): void {
@@ -3310,6 +3488,12 @@ namespace gdjs {
     private _lastCursorY: float = 0;
     private _wasMouseRightButtonPressed = false;
 
+    // Touch gesture state
+    private _gestureActiveTouchIds: Array<integer> = [];
+    private _gestureLastCentroidX: float = 0;
+    private _gestureLastCentroidY: float = 0;
+    private _gestureLastDistance: float = 0;
+
     constructor(editorCamera: EditorCamera) {
       this._editorCamera = editorCamera;
     }
@@ -3325,7 +3509,7 @@ namespace gdjs {
 
     step(): void {
       const runtimeGame = this._editorCamera.editor.getRuntimeGame();
-      const inputManager = runtimeGame._inputManager;
+      const inputManager = runtimeGame.getInputManager();
       if (this._isEnabled) {
         const { right, up, forward } = this.getCameraVectors();
 
@@ -3349,6 +3533,45 @@ namespace gdjs {
         } else if (wheelDeltaX !== 0 || wheelDeltaY !== 0) {
           moveCameraByVector(up, wheelDeltaY / 5);
           moveCameraByVector(right, wheelDeltaX / 5);
+        }
+
+        // Touch gestures
+        const touchIds = getCurrentTouchIdentifiers(inputManager);
+        const touchCount = touchIds.length;
+
+        if (touchCount === 0) {
+          this._gestureActiveTouchIds = [];
+        } else if (!areSameTouchesSet(this._gestureActiveTouchIds, touchIds)) {
+          // Start or reinitialize gesture tracking
+          this._gestureActiveTouchIds = touchIds.slice();
+          if (touchCount === 2) {
+            const centroid = getTouchesCentroid(inputManager);
+            this._gestureLastCentroidX = centroid.x;
+            this._gestureLastCentroidY = centroid.y;
+            this._gestureLastDistance = getTouchesDistance(inputManager);
+          }
+        } else {
+          // Process ongoing gesture
+          if (touchCount === 2) {
+            // Pan: move on the camera plane by centroid delta
+            const centroid = getTouchesCentroid(inputManager);
+            const dx = (centroid.x - this._gestureLastCentroidX) * 5;
+            const dy = (centroid.y - this._gestureLastCentroidY) * 5;
+            if (dx !== 0 || dy !== 0) {
+              moveCameraByVector(up, dy);
+              moveCameraByVector(right, -dx);
+              this._gestureLastCentroidX = centroid.x;
+              this._gestureLastCentroidY = centroid.y;
+            }
+
+            // Pinch: zoom forward/backward based on distance delta
+            const dist = getTouchesDistance(inputManager);
+            const pinchDelta = (dist - this._gestureLastDistance) * 10;
+            if (pinchDelta !== 0) {
+              moveCameraByVector(forward, pinchDelta);
+              this._gestureLastDistance = dist;
+            }
+          }
         }
 
         // Movement with the keyboard:
@@ -3397,11 +3620,11 @@ namespace gdjs {
         }
 
         // Space + click: move the camera on its plane.
-        // Wheel click: same.
+        // Shift + Wheel click: same.
         if (
           (isSpacePressed(inputManager) &&
             inputManager.isMouseButtonPressed(0)) ||
-          inputManager.isMouseButtonPressed(2)
+          (isShiftPressed(inputManager) && inputManager.isMouseButtonPressed(2))
         ) {
           const xDelta = this._lastCursorX - inputManager.getCursorX();
           const yDelta = this._lastCursorY - inputManager.getCursorY();
@@ -3423,6 +3646,9 @@ namespace gdjs {
           this.elevationAngle += yDelta * rotationSpeed;
           this._editorCamera.onHasCameraChanged();
         }
+      } else {
+        // Reset gesture tracking when camera control is disabled.
+        this._gestureActiveTouchIds = [];
       }
       this._wasMouseRightButtonPressed = inputManager.isMouseButtonPressed(1);
       this._lastCursorX = inputManager.getCursorX();

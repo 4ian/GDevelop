@@ -426,6 +426,7 @@ namespace gdjs {
 
     private _isVisible = true;
     private _timeSinceLastInteraction = 0;
+    private _isFirstFrame = true;
 
     private _editorCamera;
 
@@ -731,6 +732,7 @@ namespace gdjs {
 
       // Try to keep object selection in case the same scene is reloaded.
       this.setSelectedObjects(selectedObjectIds);
+      this._isFirstFrame = true;
     }
 
     private _createSceneWithCustomObject(
@@ -2651,7 +2653,15 @@ namespace gdjs {
       this._updateSelectionBox();
       this._handleSelection({ objectUnderCursor });
       this._updateSelectionOutline({ objectUnderCursor });
-      this._updateSelectionControls();
+      // Custom objects only update their position at the end of the frame
+      // because they don't override position setters like built-in objects do.
+      // Since the instance position is not yet set when `onCreated` is called,
+      // they will be at (0; 0; 0) during the 1st step.
+      // When they are selected and `switchToSceneOrVariant` has just been
+      // called, it avoid to put the control at (0; 0; 0).
+      if (!this._isFirstFrame) {
+        this._updateSelectionControls();
+      }
       this._updateInnerAreaOutline();
       this._handleContextMenu();
       this._handleShortcuts();
@@ -2668,6 +2678,7 @@ namespace gdjs {
         this._currentScene._updateObjectsForInGameEditor();
         this._currentScene.render();
       }
+      this._isFirstFrame = false;
     }
 
     private _getEditorCamera(): EditorCamera {

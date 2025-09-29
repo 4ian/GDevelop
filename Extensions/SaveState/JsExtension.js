@@ -26,9 +26,8 @@ module.exports = {
         'Open source (MIT License)'
       )
       .setExtensionHelpPath('/all-features/save-state')
-      .setCategory('Save & Load');
-    extension
-      .addInstructionOrExpressionGroupMetadata(_('Save State'))
+      .setCategory('Game mechanic')
+      .addInstructionOrExpressionGroupMetadata(_('Save State (experimental)'))
       .setIcon('res/actions/saveDown.svg');
 
     extension

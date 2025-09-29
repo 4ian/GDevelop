@@ -23,6 +23,8 @@ namespace gdjs {
 
       this._threeGroup = new THREE.Group();
       this._threeGroup.rotation.order = 'ZYX';
+      //@ts-ignore
+      this._threeGroup.gdjsRuntimeObject = object;
 
       const layer = parent.getLayer('');
       if (layer) {

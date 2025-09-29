@@ -400,6 +400,7 @@ export const PanesContainer = ({
       <div
         className={classNames({
           [classes.resizer]: true,
+          [classes.leftResizer]: true,
           [classes.hidden]: !hasEditorsInLeftPane || areSidePanesDrawers,
         })}
         role="separator"
@@ -434,6 +435,7 @@ export const PanesContainer = ({
       <div
         className={classNames({
           [classes.resizer]: true,
+          [classes.rightResizer]: true,
           [classes.hidden]: !hasEditorsInRightPane || areSidePanesDrawers,
         })}
         role="separator"

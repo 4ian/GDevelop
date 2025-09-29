@@ -507,7 +507,7 @@ export const EmbeddedGameFrame = ({
     <div
       style={{
         position: 'absolute',
-        top: 31 + 40, // Height of the tabs + toolbar.
+        top: 38 + 40, // Height of the tabs + toolbar.
         left: 0,
         right: 0,
         bottom: 0,

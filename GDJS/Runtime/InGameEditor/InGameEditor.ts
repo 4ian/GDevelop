@@ -2770,6 +2770,7 @@ namespace gdjs {
     gridOffsetY: float = 0;
     gridOffsetZ: float = 0;
     gridColor: integer = 0;
+    gridAlpha: float = 1;
     isSnappingEnabledByDefault = false;
     threeScene: THREE.Scene | null = null;
 
@@ -2787,6 +2788,7 @@ namespace gdjs {
       this.gridOffsetY = instancesEditorSettings.gridOffsetY;
       this.gridOffsetZ = instancesEditorSettings.gridOffsetZ || 0;
       this.gridColor = instancesEditorSettings.gridColor;
+      this.gridAlpha = instancesEditorSettings.gridAlpha;
       this.isSnappingEnabledByDefault = instancesEditorSettings.snap;
       this.rebuildGrid();
     }
@@ -2800,6 +2802,8 @@ namespace gdjs {
         this.gridColor,
         this.gridColor
       );
+      this.gridHelper.material.transparent = true;
+      this.gridHelper.material.opacity = this.gridAlpha;
       this.gridHelper.rotation.order = 'ZYX';
       this.updateVisibility();
       this.updateLocation();

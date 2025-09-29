@@ -147,7 +147,7 @@ namespace gdjs {
     // This is useful when the object is synchronized by an external source
     // like in a multiplayer game, and we want to be able to predict the
     // movement of the object, even if the inputs are not updated every frame.
-    _dontClearInputsBetweenFrames: boolean = false;
+    private _clearInputsBetweenFrames: boolean = true;
     // This is useful when the object is synchronized over the network,
     // object is controlled by the network and we want to ensure the current player
     // cannot control it.
@@ -227,14 +227,16 @@ namespace gdjs {
       this._state = this._falling;
     }
 
-    getNetworkSyncData(): PlatformerObjectNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): PlatformerObjectNetworkSyncData {
       // This method is called, so we are synchronizing this object.
       // Let's clear the inputs between frames as we control it.
-      this._dontClearInputsBetweenFrames = false;
+      this._clearInputsBetweenFrames = true;
       this._ignoreDefaultControlsAsSyncedByNetwork = false;
 
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         props: {
           cs: this._currentSpeed,
 
@@ -263,11 +265,52 @@ namespace gdjs {
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: PlatformerObjectNetworkSyncData
+      networkSyncData: PlatformerObjectNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
     ) {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       const behaviorSpecificProps = networkSyncData.props;
+
+      switch (behaviorSpecificProps.sn) {
+        case 'Falling':
+          if (behaviorSpecificProps.sn !== this._state.toString()) {
+            this._setFalling();
+          }
+          this._falling.updateFromNetworkSyncData(behaviorSpecificProps.ssd);
+          break;
+        case 'OnFloor':
+          // Let it handle automatically as we don't know which platform to land on.
+          // @ts-ignore - we assume it's OnFloorStateNetworkSyncData
+          this._onFloor.updateFromNetworkSyncData(behaviorSpecificProps.ssd);
+          break;
+        case 'Jumping':
+          if (behaviorSpecificProps.sn !== this._state.toString()) {
+            this._setJumping();
+          }
+          // @ts-ignore - we assume it's JumpingStateNetworkSyncData
+          this._jumping.updateFromNetworkSyncData(behaviorSpecificProps.ssd);
+          break;
+        case 'GrabbingPlatform':
+          // Let it handle automatically as we don't know which platform to grab.
+          this._grabbingPlatform.updateFromNetworkSyncData(
+            // @ts-ignore - we assume it's GrabbingPlatformStateNetworkSyncData
+            behaviorSpecificProps.ssd
+          );
+          break;
+        case 'OnLadder':
+          if (behaviorSpecificProps.sn !== this._state.toString()) {
+            this._setOnLadder();
+          }
+          this._onLadder.updateFromNetworkSyncData(behaviorSpecificProps.ssd);
+          break;
+        default:
+          console.error(
+            'Unknown state name: ' + behaviorSpecificProps.sn + '.'
+          );
+          break;
+      }
+
       if (behaviorSpecificProps.cs !== this._currentSpeed) {
         this._currentSpeed = behaviorSpecificProps.cs;
       }
@@ -317,39 +360,10 @@ namespace gdjs {
         this._jumpKeyHeldSinceJumpStart = behaviorSpecificProps.jkhsjs;
       }
 
-      if (behaviorSpecificProps.sn !== this._state.toString()) {
-        switch (behaviorSpecificProps.sn) {
-          case 'Falling':
-            this._setFalling();
-            break;
-          case 'OnFloor':
-            // Let it handle automatically as we don't know which platform to land on.
-            break;
-          case 'Jumping':
-            this._setJumping();
-            break;
-          case 'GrabbingPlatform':
-            // Let it handle automatically as we don't know which platform to grab.
-            break;
-          case 'OnLadder':
-            this._setOnLadder();
-            break;
-          default:
-            console.error(
-              'Unknown state name: ' + behaviorSpecificProps.sn + '.'
-            );
-            break;
-        }
-      }
-
-      if (behaviorSpecificProps.sn === this._state.toString()) {
-        this._state.updateFromNetworkSyncData(behaviorSpecificProps.ssd);
-      }
-
-      // When the object is synchronized from the network, the inputs must not be cleared.
-      this._dontClearInputsBetweenFrames = true;
+      // Clear user inputs between frames only if requested.
+      this._clearInputsBetweenFrames = !!options.clearInputs;
       // And we are not using the default controls.
-      this._ignoreDefaultControlsAsSyncedByNetwork = true;
+      this._ignoreDefaultControlsAsSyncedByNetwork = !options.keepControl;
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
@@ -545,8 +559,9 @@ namespace gdjs {
       this._wasJumpKeyPressed = this._jumpKey;
       this._wasReleasePlatformKeyPressed = this._releasePlatformKey;
       this._wasReleaseLadderKeyPressed = this._releaseLadderKey;
+
       //4) Do not forget to reset pressed keys
-      if (!this._dontClearInputsBetweenFrames) {
+      if (this._clearInputsBetweenFrames) {
         // Reset the keys only if the inputs are not supposed to survive between frames.
         // (Most of the time, except if this object is synchronized by an external source)
         this._leftKey = false;

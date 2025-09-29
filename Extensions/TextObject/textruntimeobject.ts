@@ -52,6 +52,7 @@ namespace gdjs {
     c: number[];
     scale: number;
     ta: string;
+    vta: string;
     wrap: boolean;
     wrapw: float;
     oena: boolean;
@@ -179,9 +180,6 @@ namespace gdjs {
       if (oldContent.text !== newContent.text) {
         this.setText(newContent.text);
       }
-      if (oldContent.underlined !== newContent.underlined) {
-        return false;
-      }
       if (oldContent.textAlignment !== newContent.textAlignment) {
         this.setTextAlignment(newContent.textAlignment);
       }
@@ -220,12 +218,18 @@ namespace gdjs {
       if ((oldContent.lineHeight || 0) !== (newContent.lineHeight || 0)) {
         this.setLineHeight(newContent.lineHeight || 0);
       }
+      if (oldContent.underlined !== newContent.underlined) {
+        return false;
+      }
+
       return true;
     }
 
-    override getNetworkSyncData(): TextObjectNetworkSyncData {
+    override getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): TextObjectNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         str: this._str,
         o: this.opacity,
         cs: this._characterSize,
@@ -236,6 +240,7 @@ namespace gdjs {
         c: this._color,
         scale: this.getScale(),
         ta: this._textAlign,
+        vta: this._verticalTextAlignment,
         wrap: this._wrapping,
         wrapw: this._wrappingWidth,
         oena: this._isOutlineEnabled,
@@ -253,9 +258,10 @@ namespace gdjs {
     }
 
     override updateFromNetworkSyncData(
-      networkSyncData: TextObjectNetworkSyncData
+      networkSyncData: TextObjectNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
       if (networkSyncData.str !== undefined) {
         this.setText(networkSyncData.str);
       }
@@ -286,8 +292,8 @@ namespace gdjs {
       if (networkSyncData.ta !== undefined) {
         this.setTextAlignment(networkSyncData.ta);
       }
-      if (networkSyncData.ta !== undefined) {
-        this.setVerticalTextAlignment(networkSyncData.ta);
+      if (networkSyncData.vta !== undefined) {
+        this.setVerticalTextAlignment(networkSyncData.vta);
       }
       if (networkSyncData.wrap !== undefined) {
         this.setWrapping(networkSyncData.wrap);

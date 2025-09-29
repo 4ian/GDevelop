@@ -4,6 +4,15 @@ Copyright (c) 2010-2023 Florian Rival (Florian.Rival@gmail.com)
  */
 namespace gdjs {
   const logger = new gdjs.Logger('Tween');
+
+  interface TweenBehaviorNetworkSyncDataType {
+    tweenManager: TweenManagerNetworkSyncData;
+  }
+  export interface TweenBehaviorNetworkSyncData
+    extends BehaviorNetworkSyncData {
+    props: TweenBehaviorNetworkSyncDataType;
+  }
+
   interface IColorable extends gdjs.RuntimeObject {
     setColor(color: string): void;
     getColor(): string;
@@ -59,6 +68,305 @@ namespace gdjs {
   const exponentialInterpolation =
     gdjs.evtTools.common.exponentialInterpolation;
 
+  const tweenObjectValueSetter = () => {};
+  const getTweenVariableSetter = (variable: gdjs.Variable) => {
+    return (value: float) => variable.setNumber(value);
+  };
+  const getTweenObjectPositionXSetter = (object: gdjs.RuntimeObject) => {
+    return (value: float) => object.setX(value);
+  };
+  const getTweenObjectPositionYSetter = (object: gdjs.RuntimeObject) => {
+    return (value: float) => object.setY(value);
+  };
+  const getTweenObjectPositionZSetter = (object: gdjs.RuntimeObject) => {
+    if (!is3D(object)) return () => {};
+    return (value: float) => object.setZ(value);
+  };
+  const getTweenObjectPositionSetter = (object: gdjs.RuntimeObject) => {
+    return ([x, y]: float[]) => object.setPosition(x, y);
+  };
+  const getTweenObjectAngleSetter = (object: gdjs.RuntimeObject) => {
+    return (value: float) => object.setAngle(value);
+  };
+  const getTweenObjectWidthSetter = (object: gdjs.RuntimeObject) => {
+    return (value: float) => object.setWidth(value);
+  };
+  const getTweenObjectHeightSetter = (object: gdjs.RuntimeObject) => {
+    return (value: float) => object.setHeight(value);
+  };
+  const getTweenObjectRotationXSetter = (
+    object: gdjs.RuntimeObject & gdjs.Base3DHandler
+  ) => {
+    return (value: float) => object.setRotationX(value);
+  };
+  const getTweenObjectRotationYSetter = (
+    object: gdjs.RuntimeObject & gdjs.Base3DHandler
+  ) => {
+    return (value: float) => object.setRotationY(value);
+  };
+  const getTweenObjectDepthSetter = (
+    object: gdjs.RuntimeObject & gdjs.Base3DHandler
+  ) => {
+    return (value: float) => object.setDepth(value);
+  };
+  const getTweenObjectScaleXYSetter = (
+    object: gdjs.RuntimeObject & gdjs.Scalable,
+    scaleFromCenterOfObject: boolean
+  ) => {
+    return scaleFromCenterOfObject
+      ? ([scaleX, scaleY]: float[]) => {
+          const oldX = object.getCenterXInScene();
+          const oldY = object.getCenterYInScene();
+          object.setScaleX(scaleX);
+          object.setScaleY(scaleY);
+          object.setCenterPositionInScene(oldX, oldY);
+        }
+      : ([scaleX, scaleY]: float[]) => {
+          object.setScaleX(scaleX);
+          object.setScaleY(scaleY);
+        };
+  };
+  const getTweenObjectScaleSetter = (
+    object: gdjs.RuntimeObject & gdjs.Scalable,
+    object3d: (gdjs.RuntimeObject & gdjs.Base3DHandler) | null,
+    scaleFromCenterOfObject: boolean
+  ) => {
+    return scaleFromCenterOfObject
+      ? (scale: float) => {
+          const oldX = object.getCenterXInScene();
+          const oldY = object.getCenterYInScene();
+          const oldZ = object3d ? object3d.getCenterZInScene() : 0;
+          object.setScale(scale);
+          object.setCenterXInScene(oldX);
+          object.setCenterYInScene(oldY);
+          if (object3d) {
+            object3d.setCenterZInScene(oldZ);
+          }
+        }
+      : (scale: float) => object.setScale(scale);
+  };
+  const getTweenObjectScaleXSetter = (
+    object: gdjs.RuntimeObject & gdjs.Scalable,
+    scaleFromCenterOfObject: boolean
+  ) => {
+    return scaleFromCenterOfObject
+      ? (scaleX: float) => {
+          const oldX = object.getCenterXInScene();
+          object.setScaleX(scaleX);
+          object.setCenterXInScene(oldX);
+        }
+      : (scaleX: float) => object.setScaleX(scaleX);
+  };
+  const getTweenObjectScaleYSetter = (
+    object: gdjs.RuntimeObject & gdjs.Scalable,
+    scaleFromCenterOfObject: boolean
+  ) => {
+    return scaleFromCenterOfObject
+      ? (scaleY: float) => {
+          const oldY = object.getCenterYInScene();
+          object.setScaleY(scaleY);
+          object.setCenterYInScene(oldY);
+        }
+      : (scaleY: float) => object.setScaleY(scaleY);
+  };
+  const getTweenObjectOpacitySetter = (
+    object: gdjs.RuntimeObject & gdjs.OpacityHandler
+  ) => {
+    return (value: float) => object.setOpacity(value);
+  };
+  const getTweenObjectCharacterSizeSetter = (object: ICharacterScalable) => {
+    return (value: float) => object.setCharacterSize(value);
+  };
+  const getTweenObjectNumberEffectPropertySetter = (
+    effect: PixiFiltersTools.Filter,
+    propertyName: string
+  ) => {
+    return (value: float) => {
+      effect.updateDoubleParameter(propertyName, value);
+    };
+  };
+  const getTweenObjectColorEffectPropertySetter = (
+    effect: PixiFiltersTools.Filter,
+    propertyName: string
+  ) => {
+    return ([hue, saturation, lightness]: number[]) => {
+      const rgbFromHslColor = gdjs.evtTools.tween.hslToRgb(
+        hue,
+        saturation,
+        lightness
+      );
+      effect.updateColorParameter(
+        propertyName,
+        gdjs.rgbToHexNumber(
+          rgbFromHslColor[0],
+          rgbFromHslColor[1],
+          rgbFromHslColor[2]
+        )
+      );
+    };
+  };
+  const getTweenObjectColorSetter = (
+    object: IColorable,
+    useHSLColorTransition: boolean
+  ) => {
+    if (useHSLColorTransition) {
+      return ([hue, saturation, lightness]: number[]) => {
+        const rgbFromHslColor = gdjs.evtTools.tween.hslToRgb(
+          hue,
+          saturation,
+          lightness
+        );
+        object.setColor(
+          Math.floor(rgbFromHslColor[0]) +
+            ';' +
+            Math.floor(rgbFromHslColor[1]) +
+            ';' +
+            Math.floor(rgbFromHslColor[2])
+        );
+      };
+    } else {
+      return ([red, green, blue]: number[]) => {
+        object.setColor(
+          Math.floor(red) + ';' + Math.floor(green) + ';' + Math.floor(blue)
+        );
+      };
+    }
+  };
+  const getTweenObjectColorHSLSetter = (object: IColorable) => {
+    return ([hue, saturation, lightness]: number[]) => {
+      const rgbFromHslColor = gdjs.evtTools.tween.hslToRgb(
+        hue,
+        saturation,
+        lightness
+      );
+
+      object.setColor(
+        Math.floor(rgbFromHslColor[0]) +
+          ';' +
+          Math.floor(rgbFromHslColor[1]) +
+          ';' +
+          Math.floor(rgbFromHslColor[2])
+      );
+    };
+  };
+
+  const tweenSetterFactory =
+    (object: RuntimeObject) =>
+    (tweenInformation: TweenInformationNetworkSyncData) => {
+      const type = tweenInformation.type;
+      const variablePath = tweenInformation.variablePath;
+      const effectName = tweenInformation.effectName;
+      const propertyName = tweenInformation.propertyName;
+      const scaleFromCenterOfObject =
+        !!tweenInformation.scaleFromCenterOfObject;
+      const useHSLColorTransition = !!tweenInformation.useHSLColorTransition;
+      if (type === 'objectValue') {
+        return tweenObjectValueSetter;
+      }
+      if (type === 'variable' && variablePath) {
+        const variable = object
+          .getVariables()
+          .getVariableFromPath(variablePath);
+        if (!variable) return () => {};
+        return getTweenVariableSetter(variable);
+      }
+      if (type === 'positionX') {
+        return getTweenObjectPositionXSetter(object);
+      }
+      if (type === 'positionY') {
+        return getTweenObjectPositionYSetter(object);
+      }
+      if (type === 'position') {
+        return getTweenObjectPositionSetter(object);
+      }
+      if (type === 'positionZ') {
+        return getTweenObjectPositionZSetter(object);
+      }
+      if (type === 'width') {
+        return getTweenObjectWidthSetter(object);
+      }
+      if (type === 'height') {
+        return getTweenObjectHeightSetter(object);
+      }
+      if (type === 'depth') {
+        if (!is3D(object)) return () => {};
+        return getTweenObjectDepthSetter(object);
+      }
+      if (type === 'angle') {
+        return getTweenObjectAngleSetter(object);
+      }
+      if (type === 'rotationX') {
+        if (!is3D(object)) return () => {};
+        return getTweenObjectRotationXSetter(object);
+      }
+      if (type === 'rotationY') {
+        if (!is3D(object)) return () => {};
+        return getTweenObjectRotationYSetter(object);
+      }
+      if (type === 'scale') {
+        if (!isScalable(object)) return () => {};
+
+        const object3d = is3D(object) ? object : null;
+        return getTweenObjectScaleSetter(
+          object,
+          object3d,
+          scaleFromCenterOfObject
+        );
+      }
+      if (type === 'scaleXY') {
+        if (!isScalable(object)) return () => {};
+        return getTweenObjectScaleXYSetter(object, scaleFromCenterOfObject);
+      }
+      if (type === 'scaleX') {
+        if (!isScalable(object)) return () => {};
+        return getTweenObjectScaleXSetter(object, scaleFromCenterOfObject);
+      }
+      if (type === 'scaleY') {
+        if (!isScalable(object)) return () => {};
+        return getTweenObjectScaleYSetter(object, scaleFromCenterOfObject);
+      }
+      if (type === 'opacity') {
+        if (!isOpaque(object)) return () => {};
+        return getTweenObjectOpacitySetter(object);
+      }
+      if (type === 'characterSize') {
+        if (!isCharacterScalable(object)) return () => {};
+        return getTweenObjectCharacterSizeSetter(object);
+      }
+      if (type === 'numberEffectProperty' && effectName && propertyName) {
+        const effect = object.getRendererEffects()[effectName];
+        if (!effect) {
+          logger.error(
+            `The object "${object.name}" doesn't have any effect called "${effectName}"`
+          );
+        }
+        return getTweenObjectNumberEffectPropertySetter(effect, propertyName);
+      }
+      if (type === 'colorEffectProperty' && effectName && propertyName) {
+        const effect = object.getRendererEffects()[effectName];
+        if (!effect) {
+          logger.error(
+            `The object "${object.name}" doesn't have any effect called "${effectName}"`
+          );
+        }
+
+        return getTweenObjectColorEffectPropertySetter(effect, propertyName);
+      }
+
+      if (type === 'objectColor') {
+        if (!isColorable(object)) return () => {};
+
+        return getTweenObjectColorSetter(object, useHSLColorTransition);
+      }
+      if (type === 'objectColorHSL') {
+        if (!isColorable(object)) return () => {};
+
+        return getTweenObjectColorHSLSetter(object);
+      }
+
+      return () => {};
+    };
+
   export class TweenRuntimeBehavior extends gdjs.RuntimeBehavior {
     private _tweens = new gdjs.evtTools.tween.TweenManager();
     private _isActive: boolean = true;
@@ -82,6 +390,43 @@ namespace gdjs {
     ): boolean {
       // Nothing to update.
       return true;
+    }
+
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): TweenBehaviorNetworkSyncData {
+      return {
+        ...super.getNetworkSyncData(syncOptions),
+        props: {
+          tweenManager: this._tweens.getNetworkSyncData(),
+        },
+      };
+    }
+
+    updateFromNetworkSyncData(
+      networkSyncData: TweenBehaviorNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
+    ): void {
+      super.updateFromNetworkSyncData(networkSyncData, options);
+
+      if (networkSyncData.props.tweenManager) {
+        this._tweens.updateFromNetworkSyncData(
+          networkSyncData.props.tweenManager,
+          (tweenInformationNetworkSyncData) => {
+            return this.owner;
+          },
+          (tweenInformationNetworkSyncData) => {
+            return tweenSetterFactory(this.owner)(
+              tweenInformationNetworkSyncData
+            );
+          },
+          (tweenInformationNetworkSyncData) => {
+            return tweenInformationNetworkSyncData.destroyObjectWhenFinished
+              ? () => this._deleteFromScene()
+              : null;
+          }
+        );
+      }
     }
 
     doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer): void {
@@ -126,7 +471,12 @@ namespace gdjs {
         linearInterpolation,
         fromValue,
         toValue,
-        (value: float) => variable.setNumber(value),
+        getTweenVariableSetter(variable),
+        {
+          type: 'variable',
+          variable,
+          destroyObjectWhenFinished,
+        },
         destroyObjectWhenFinished ? () => this._deleteFromScene() : null
       );
     }
@@ -208,7 +558,12 @@ namespace gdjs {
         linearInterpolation,
         variable.getValue() as number,
         toValue,
-        (value: float) => variable.setNumber(value),
+        getTweenVariableSetter(variable),
+        {
+          type: 'variable',
+          variable,
+          destroyObjectWhenFinished,
+        },
         destroyObjectWhenFinished ? () => this._deleteFromScene() : null
       );
     }
@@ -243,7 +598,11 @@ namespace gdjs {
           : linearInterpolation,
         fromValue,
         toValue,
-        (value: float) => {},
+        tweenObjectValueSetter,
+        {
+          type: 'objectValue',
+          destroyObjectWhenFinished,
+        },
         destroyObjectWhenFinished ? () => this._deleteFromScene() : null
       );
     }
@@ -322,7 +681,11 @@ namespace gdjs {
         linearInterpolation,
         [this.owner.getX(), this.owner.getY()],
         [toX, toY],
-        ([x, y]) => this.owner.setPosition(x, y),
+        getTweenObjectPositionSetter(this.owner),
+        {
+          type: 'position',
+          destroyObjectWhenFinished,
+        },
         destroyObjectWhenFinished ? () => this._deleteFromScene() : null
       );
     }
@@ -394,7 +757,11 @@ namespace gdjs {
         linearInterpolation,
         this.owner.getX(),
         toX,
-        (value: float) => this.owner.setX(value),
+        getTweenObjectPositionXSetter(this.owner),
+        {
+          type: 'positionX',
+          destroyObjectWhenFinished,
+        },
         destroyObjectWhenFinished ? () => this._deleteFromScene() : null
       );
     }
@@ -466,7 +833,11 @@ namespace gdjs {
         linearInterpolation,
         this.owner.getY(),
         toY,
-        (value: float) => this.owner.setY(value),
+        getTweenObjectPositionYSetter(this.owner),
+        {
+          type: 'positionY',
+          destroyObjectWhenFinished,
+        },
         destroyObjectWhenFinished ? () => this._deleteFromScene() : null
       );
     }
@@ -543,7 +914,11 @@ namespace gdjs {
         linearInterpolation,
         owner.getZ(),
         toZ,
-        (value: float) => owner.setZ(value),
+        getTweenObjectPositionZSetter(owner),
+        {
+          type: 'positionZ',
+          destroyObjectWhenFinished,
+        },
         destroyObjectWhenFinished ? () => this._deleteFromScene() : null
       );
     }
@@ -615,7 +990,11 @@ namespace gdjs {
         linearInterpolation,
         this.owner.getAngle(),
         toAngle,
-        (value: float) => this.owner.setAngle(value),
+        getTweenObjectAngleSetter(this.owner),
+        {
+          type: 'angle',
+          destroyObjectWhenFinished,
+        },
         destroyObjectWhenFinished ? () => this._deleteFromScene() : null
       );
     }
@@ -648,7 +1027,11 @@ namespace gdjs {
         linearInterpolation,
         owner.getRotationX(),
         toAngle,
-        (value: float) => owner.setRotationX(value),
+        getTweenObjectRotationXSetter(owner),
+        {
+          type: 'rotationX',
+          destroyObjectWhenFinished,
+        },
         destroyObjectWhenFinished ? () => this._deleteFromScene() : null
       );
     }
@@ -681,7 +1064,11 @@ namespace gdjs {
         linearInterpolation,
         owner.getRotationY(),
         toAngle,
-        (value: float) => owner.setRotationY(value),
+        getTweenObjectRotationYSetter(owner),
+        {
+          type: 'rotationY',
+          destroyObjectWhenFinished,
+        },
         destroyObjectWhenFinished ? () => this._deleteFromScene() : null
       );
     }
@@ -769,19 +1156,6 @@ namespace gdjs {
       if (toScaleX < 0) toScaleX = 0;
       if (toScaleY < 0) toScaleY = 0;
 
-      const setValue = scaleFromCenterOfObject
-        ? ([scaleX, scaleY]: float[]) => {
-            const oldX = owner.getCenterXInScene();
-            const oldY = owner.getCenterYInScene();
-            owner.setScaleX(scaleX);
-            owner.setScaleY(scaleY);
-            owner.setCenterPositionInScene(oldX, oldY);
-          }
-        : ([scaleX, scaleY]: float[]) => {
-            owner.setScaleX(scaleX);
-            owner.setScaleY(scaleY);
-          };
-
       this._tweens.addMultiTween(
         identifier,
         timeSource,
@@ -790,7 +1164,11 @@ namespace gdjs {
         interpolation,
         [owner.getScaleX(), owner.getScaleY()],
         [toScaleX, toScaleY],
-        setValue,
+        getTweenObjectScaleXYSetter(owner, scaleFromCenterOfObject),
+        {
+          type: 'scaleXY',
+          destroyObjectWhenFinished,
+        },
         destroyObjectWhenFinished ? () => this._deleteFromScene() : null
       );
     }
@@ -830,20 +1208,6 @@ namespace gdjs {
       // when the 3D extension is not used.
       const owner3d = is3D(owner) ? owner : null;
 
-      const setValue = scaleFromCenterOfObject
-        ? (scale: float) => {
-            const oldX = owner.getCenterXInScene();
-            const oldY = owner.getCenterYInScene();
-            const oldZ = owner3d ? owner3d.getCenterZInScene() : 0;
-            owner.setScale(scale);
-            owner.setCenterXInScene(oldX);
-            owner.setCenterYInScene(oldY);
-            if (owner3d) {
-              owner3d.setCenterZInScene(oldZ);
-            }
-          }
-        : (scale: float) => owner.setScale(scale);
-
       this._tweens.addSimpleTween(
         identifier,
         this.owner,
@@ -852,7 +1216,12 @@ namespace gdjs {
         exponentialInterpolation,
         owner.getScale(),
         toScale,
-        setValue,
+        getTweenObjectScaleSetter(owner, owner3d, scaleFromCenterOfObject),
+        {
+          type: 'scale',
+          scaleFromCenterOfObject,
+          destroyObjectWhenFinished,
+        },
         destroyObjectWhenFinished ? () => this._deleteFromScene() : null
       );
     }
@@ -929,14 +1298,6 @@ namespace gdjs {
       const owner = this.owner;
       if (!isScalable(owner)) return;
 
-      const setValue = scaleFromCenterOfObject
-        ? (scaleX: float) => {
-            const oldX = owner.getCenterXInScene();
-            owner.setScaleX(scaleX);
-            owner.setCenterXInScene(oldX);
-          }
-        : (scaleX: float) => owner.setScaleX(scaleX);
-
       this._tweens.addSimpleTween(
         identifier,
         timeSource,
@@ -945,7 +1306,12 @@ namespace gdjs {
         interpolation,
         owner.getScaleX(),
         toScaleX,
-        setValue,
+        getTweenObjectScaleXSetter(owner, scaleFromCenterOfObject),
+        {
+          type: 'scaleX',
+          scaleFromCenterOfObject,
+          destroyObjectWhenFinished,
+        },
         destroyObjectWhenFinished ? () => this._deleteFromScene() : null
       );
     }
@@ -1022,14 +1388,6 @@ namespace gdjs {
       const owner = this.owner;
       if (!isScalable(owner)) return;
 
-      const setValue = scaleFromCenterOfObject
-        ? (scaleY: float) => {
-            const oldY = owner.getCenterYInScene();
-            owner.setScaleY(scaleY);
-            owner.setCenterYInScene(oldY);
-          }
-        : (scaleY: float) => owner.setScaleY(scaleY);
-
       this._tweens.addSimpleTween(
         identifier,
         timeSource,
@@ -1038,7 +1396,12 @@ namespace gdjs {
         interpolation,
         owner.getScaleY(),
         toScaleY,
-        setValue,
+        getTweenObjectScaleYSetter(owner, scaleFromCenterOfObject),
+        {
+          type: 'scaleY',
+          scaleFromCenterOfObject,
+          destroyObjectWhenFinished,
+        },
         destroyObjectWhenFinished ? () => this._deleteFromScene() : null
       );
     }
@@ -1113,7 +1476,11 @@ namespace gdjs {
         linearInterpolation,
         owner.getOpacity(),
         toOpacity,
-        (value: float) => owner.setOpacity(value),
+        getTweenObjectOpacitySetter(owner),
+        {
+          type: 'opacity',
+          destroyObjectWhenFinished,
+        },
         destroyObjectWhenFinished ? () => this._deleteFromScene() : null
       );
     }
@@ -1153,10 +1520,12 @@ namespace gdjs {
         linearInterpolation,
         effect ? effect.getDoubleParameter(propertyName) : 0,
         toValue,
-        (value: float) => {
-          if (effect) {
-            effect.updateDoubleParameter(propertyName, value);
-          }
+        getTweenObjectNumberEffectPropertySetter(effect, propertyName),
+        {
+          type: 'numberEffectProperty',
+          effectName,
+          propertyName,
+          destroyObjectWhenFinished,
         },
         destroyObjectWhenFinished ? () => this._deleteFromScene() : null
       );
@@ -1210,22 +1579,12 @@ namespace gdjs {
           rgbToColor[1],
           rgbToColor[2]
         ),
-        ([hue, saturation, lightness]) => {
-          if (effect) {
-            const rgbFromHslColor = gdjs.evtTools.tween.hslToRgb(
-              hue,
-              saturation,
-              lightness
-            );
-            effect.updateColorParameter(
-              propertyName,
-              gdjs.rgbToHexNumber(
-                rgbFromHslColor[0],
-                rgbFromHslColor[1],
-                rgbFromHslColor[2]
-              )
-            );
-          }
+        getTweenObjectColorEffectPropertySetter(effect, propertyName),
+        {
+          type: 'colorEffectProperty',
+          effectName,
+          propertyName,
+          destroyObjectWhenFinished,
         },
         destroyObjectWhenFinished ? () => this._deleteFromScene() : null
       );
@@ -1305,43 +1664,20 @@ namespace gdjs {
       const rgbFromColor: float[] = gdjs.rgbOrHexToRGBColor(owner.getColor());
       const rgbToColor: float[] = gdjs.rgbOrHexToRGBColor(toColorStr);
 
-      let initialValue;
-      let targetedValue;
-      let setValue;
-      if (useHSLColorTransition) {
-        initialValue = gdjs.evtTools.tween.rgbToHsl(
-          rgbFromColor[0],
-          rgbFromColor[1],
-          rgbFromColor[2]
-        );
-        targetedValue = gdjs.evtTools.tween.rgbToHsl(
-          rgbToColor[0],
-          rgbToColor[1],
-          rgbToColor[2]
-        );
-        setValue = ([hue, saturation, lightness]) => {
-          const rgbFromHslColor = gdjs.evtTools.tween.hslToRgb(
-            hue,
-            saturation,
-            lightness
-          );
-          owner.setColor(
-            Math.round(rgbFromHslColor[0]) +
-              ';' +
-              Math.round(rgbFromHslColor[1]) +
-              ';' +
-              Math.round(rgbFromHslColor[2])
-          );
-        };
-      } else {
-        initialValue = rgbFromColor;
-        targetedValue = rgbToColor;
-        setValue = ([red, green, blue]) => {
-          owner.setColor(
-            Math.floor(red) + ';' + Math.floor(green) + ';' + Math.floor(blue)
-          );
-        };
-      }
+      const initialValue = useHSLColorTransition
+        ? gdjs.evtTools.tween.rgbToHsl(
+            rgbFromColor[0],
+            rgbFromColor[1],
+            rgbFromColor[2]
+          )
+        : rgbFromColor;
+      const targetedValue = useHSLColorTransition
+        ? gdjs.evtTools.tween.rgbToHsl(
+            rgbToColor[0],
+            rgbToColor[1],
+            rgbToColor[2]
+          )
+        : rgbToColor;
 
       this._tweens.addMultiTween(
         identifier,
@@ -1351,7 +1687,12 @@ namespace gdjs {
         linearInterpolation,
         initialValue,
         targetedValue,
-        setValue,
+        getTweenObjectColorSetter(owner, useHSLColorTransition),
+        {
+          type: 'objectColor',
+          useHSLColorTransition,
+          destroyObjectWhenFinished,
+        },
         destroyObjectWhenFinished ? () => this._deleteFromScene() : null
       );
     }
@@ -1462,25 +1803,13 @@ namespace gdjs {
         duration,
         easing,
         linearInterpolation,
-
         hslFromColor,
         [toH, toS, toL],
-        ([hue, saturation, lightness]) => {
-          const rgbFromHslColor = gdjs.evtTools.tween.hslToRgb(
-            hue,
-            saturation,
-            lightness
-          );
-
-          owner.setColor(
-            Math.round(rgbFromHslColor[0]) +
-              ';' +
-              Math.round(rgbFromHslColor[1]) +
-              ';' +
-              Math.round(rgbFromHslColor[2])
-          );
+        getTweenObjectColorHSLSetter(owner),
+        {
+          type: 'objectColorHSL',
+          destroyObjectWhenFinished,
         },
-
         destroyObjectWhenFinished ? () => this._deleteFromScene() : null
       );
     }
@@ -1558,7 +1887,11 @@ namespace gdjs {
         interpolation,
         owner.getCharacterSize(),
         toSize,
-        (value: float) => owner.setCharacterSize(value),
+        getTweenObjectCharacterSizeSetter(owner),
+        {
+          type: 'characterSize',
+          destroyObjectWhenFinished,
+        },
         destroyObjectWhenFinished ? () => this._deleteFromScene() : null
       );
     }
@@ -1630,7 +1963,11 @@ namespace gdjs {
         linearInterpolation,
         this.owner.getWidth(),
         toWidth,
-        (value: float) => this.owner.setWidth(value),
+        getTweenObjectWidthSetter(this.owner),
+        {
+          type: 'width',
+          destroyObjectWhenFinished,
+        },
         destroyObjectWhenFinished ? () => this._deleteFromScene() : null
       );
     }
@@ -1702,7 +2039,11 @@ namespace gdjs {
         linearInterpolation,
         this.owner.getHeight(),
         toHeight,
-        (value: float) => this.owner.setHeight(value),
+        getTweenObjectHeightSetter(this.owner),
+        {
+          type: 'height',
+          destroyObjectWhenFinished,
+        },
         destroyObjectWhenFinished ? () => this._deleteFromScene() : null
       );
     }
@@ -1779,7 +2120,11 @@ namespace gdjs {
         linearInterpolation,
         owner.getDepth(),
         toDepth,
-        (value: float) => owner.setDepth(value),
+        getTweenObjectDepthSetter(owner),
+        {
+          type: 'depth',
+          destroyObjectWhenFinished,
+        },
         destroyObjectWhenFinished ? () => this._deleteFromScene() : null
       );
     }

@@ -6,7 +6,7 @@ namespace gdjs {
   const logger = new gdjs.Logger('Pathfinding behavior');
 
   interface PathfindingNetworkSyncDataType {
-    // Syncing the path should be enough to have a good prediction.
+    // Syncing the path and its position on it should be enough to have a good prediction.
     path: FloatPoint[];
     pf: boolean;
     sp: number;
@@ -15,6 +15,7 @@ namespace gdjs {
     tss: number;
     re: boolean;
     ma: number;
+    dos: number;
   }
 
   export interface PathfindingNetworkSyncData extends BehaviorNetworkSyncData {
@@ -133,9 +134,11 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): PathfindingNetworkSyncData {
+    getNetworkSyncData(
+      options: GetNetworkSyncDataOptions
+    ): PathfindingNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(options),
         props: {
           path: this._path,
           pf: this._pathFound,
@@ -145,14 +148,16 @@ namespace gdjs {
           tss: this._totalSegmentDistance,
           re: this._reachedEnd,
           ma: this._movementAngle,
+          dos: this._distanceOnSegment,
         },
       };
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: PathfindingNetworkSyncData
+      networkSyncData: PathfindingNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
       const behaviorSpecificProps = networkSyncData.props;
       if (behaviorSpecificProps.path !== undefined) {
         this._path = behaviorSpecificProps.path;
@@ -180,6 +185,9 @@ namespace gdjs {
       }
       if (behaviorSpecificProps.ma !== undefined) {
         this._movementAngle = behaviorSpecificProps.ma;
+      }
+      if (behaviorSpecificProps.dos !== undefined) {
+        this._distanceOnSegment = behaviorSpecificProps.dos;
       }
     }
 

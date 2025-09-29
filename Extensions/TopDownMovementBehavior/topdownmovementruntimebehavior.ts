@@ -63,7 +63,7 @@ namespace gdjs {
     // This is useful when the object is synchronized by an external source
     // like in a multiplayer game, and we want to be able to predict the
     // movement of the object, even if the inputs are not updated every frame.
-    _dontClearInputsBetweenFrames: boolean = false;
+    private _clearInputsBetweenFrames: boolean = true;
     // This is useful when the object is synchronized over the network,
     // object is controlled by the network and we want to ensure the current player
     // cannot control it.
@@ -109,14 +109,16 @@ namespace gdjs {
           : behaviorData.useLegacyTurnBack;
     }
 
-    getNetworkSyncData(): TopDownMovementNetworkSyncData {
+    getNetworkSyncData(
+      options: GetNetworkSyncDataOptions
+    ): TopDownMovementNetworkSyncData {
       // This method is called, so we are synchronizing this object.
       // Let's clear the inputs between frames as we control it.
-      this._dontClearInputsBetweenFrames = false;
+      this._clearInputsBetweenFrames = true;
       this._ignoreDefaultControlsAsSyncedByNetwork = false;
 
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(options),
         props: {
           a: this._angle,
           xv: this._xVelocity,
@@ -134,9 +136,10 @@ namespace gdjs {
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: TopDownMovementNetworkSyncData
+      networkSyncData: TopDownMovementNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       const behaviorSpecificProps = networkSyncData.props;
       if (behaviorSpecificProps.a !== undefined) {
@@ -173,10 +176,10 @@ namespace gdjs {
         this._stickForce = behaviorSpecificProps.sf;
       }
 
-      // When the object is synchronized from the network, the inputs must not be cleared.
-      this._dontClearInputsBetweenFrames = true;
-      // And we are not using the default controls.
-      this._ignoreDefaultControlsAsSyncedByNetwork = true;
+      // Clear user inputs between frames only if requested.
+      this._clearInputsBetweenFrames = !!options.clearInputs;
+      // And ignore default controls if not asked otherwise.
+      this._ignoreDefaultControlsAsSyncedByNetwork = !options.keepControl;
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
@@ -581,7 +584,7 @@ namespace gdjs {
       this._wasRightKeyPressed = this._rightKey;
       this._wasUpKeyPressed = this._upKey;
       this._wasDownKeyPressed = this._downKey;
-      if (!this._dontClearInputsBetweenFrames) {
+      if (this._clearInputsBetweenFrames) {
         this._leftKey = false;
         this._rightKey = false;
         this._upKey = false;

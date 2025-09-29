@@ -157,6 +157,57 @@ namespace gdjs {
       return true;
     }
 
+    trackChangesAndUpdateManagerIfNeeded() {
+      if (!this.activated() && this._registeredInManager) {
+        this._manager.removePlatform(this);
+        this._registeredInManager = false;
+      } else {
+        if (this.activated() && !this._registeredInManager) {
+          this._manager.addPlatform(this);
+          this._registeredInManager = true;
+        }
+      }
+
+      if (
+        this._oldX !== this.owner.getX() ||
+        this._oldY !== this.owner.getY() ||
+        this._oldWidth !== this.owner.getWidth() ||
+        this._oldHeight !== this.owner.getHeight() ||
+        this._oldAngle !== this.owner.getAngle()
+      ) {
+        if (this._registeredInManager) {
+          this._manager.removePlatform(this);
+          this._manager.addPlatform(this);
+        }
+        this._oldX = this.owner.getX();
+        this._oldY = this.owner.getY();
+        this._oldWidth = this.owner.getWidth();
+        this._oldHeight = this.owner.getHeight();
+        this._oldAngle = this.owner.getAngle();
+      }
+    }
+
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): BehaviorNetworkSyncData {
+      return super.getNetworkSyncData(syncOptions);
+    }
+
+    updateFromNetworkSyncData(
+      networkSyncData: BehaviorNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
+    ): void {
+      super.updateFromNetworkSyncData(networkSyncData, options);
+
+      this.trackChangesAndUpdateManagerIfNeeded();
+    }
+
+    onCreated(): void {
+      // Register it right away if activated,
+      // so it can be used by platformer objects in that same frame.
+      this.trackChangesAndUpdateManagerIfNeeded();
+    }
+
     onDestroy() {
       if (this._manager && this._registeredInManager) {
         this._manager.removePlatform(this);
@@ -175,34 +226,7 @@ namespace gdjs {
             }*/
 
       //Make sure the platform is or is not in the platforms manager.
-      if (!this.activated() && this._registeredInManager) {
-        this._manager.removePlatform(this);
-        this._registeredInManager = false;
-      } else {
-        if (this.activated() && !this._registeredInManager) {
-          this._manager.addPlatform(this);
-          this._registeredInManager = true;
-        }
-      }
-
-      //Track changes in size or position
-      if (
-        this._oldX !== this.owner.getX() ||
-        this._oldY !== this.owner.getY() ||
-        this._oldWidth !== this.owner.getWidth() ||
-        this._oldHeight !== this.owner.getHeight() ||
-        this._oldAngle !== this.owner.getAngle()
-      ) {
-        if (this._registeredInManager) {
-          this._manager.removePlatform(this);
-          this._manager.addPlatform(this);
-        }
-        this._oldX = this.owner.getX();
-        this._oldY = this.owner.getY();
-        this._oldWidth = this.owner.getWidth();
-        this._oldHeight = this.owner.getHeight();
-        this._oldAngle = this.owner.getAngle();
-      }
+      this.trackChangesAndUpdateManagerIfNeeded();
     }
 
     doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}

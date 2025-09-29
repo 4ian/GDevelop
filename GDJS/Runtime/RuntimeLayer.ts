@@ -116,6 +116,101 @@ namespace gdjs {
       }
     }
 
+    getNetworkSyncData(): LayerNetworkSyncData {
+      const effectsNetworkSyncData = {};
+      for (const effectName in this._rendererEffects) {
+        effectsNetworkSyncData[effectName] =
+          this._rendererEffects[effectName].getNetworkSyncData();
+      }
+
+      return {
+        timeScale: this._timeScale,
+        defaultZOrder: this._defaultZOrder,
+        hidden: this._hidden,
+        effects: effectsNetworkSyncData,
+        followBaseLayerCamera: this._followBaseLayerCamera,
+        clearColor: this._clearColor,
+        cameraX: this.getCameraX(),
+        cameraY: this.getCameraY(),
+        cameraZ: this.getCameraZ(null),
+        cameraRotation: this.getCameraRotation(),
+        cameraZoom: this.getCameraZoom(),
+      };
+    }
+
+    updateFromNetworkSyncData(networkSyncData: LayerNetworkSyncData): void {
+      if (
+        networkSyncData.timeScale !== undefined &&
+        networkSyncData.timeScale !== this._timeScale
+      ) {
+        this.setTimeScale(networkSyncData.timeScale);
+      }
+      if (
+        networkSyncData.defaultZOrder !== undefined &&
+        networkSyncData.defaultZOrder !== this._defaultZOrder
+      ) {
+        this.setDefaultZOrder(networkSyncData.defaultZOrder);
+      }
+      if (
+        this._hidden != undefined &&
+        this._hidden !== networkSyncData.hidden
+      ) {
+        this.show(!networkSyncData.hidden);
+      }
+      if (
+        networkSyncData.followBaseLayerCamera !== undefined &&
+        networkSyncData.followBaseLayerCamera !== this._followBaseLayerCamera
+      ) {
+        this.setFollowBaseLayerCamera(networkSyncData.followBaseLayerCamera);
+      }
+      if (
+        networkSyncData.clearColor !== undefined &&
+        networkSyncData.clearColor !== this._clearColor
+      ) {
+        this.setClearColor(
+          networkSyncData.clearColor[0] * 255,
+          networkSyncData.clearColor[1] * 255,
+          networkSyncData.clearColor[2] * 255
+        );
+      }
+      if (
+        networkSyncData.cameraX !== undefined &&
+        networkSyncData.cameraX !== this.getCameraX()
+      ) {
+        this.setCameraX(networkSyncData.cameraX);
+      }
+      if (
+        networkSyncData.cameraY !== undefined &&
+        networkSyncData.cameraY !== this.getCameraY()
+      ) {
+        this.setCameraY(networkSyncData.cameraY);
+      }
+      if (
+        networkSyncData.cameraZ !== undefined &&
+        networkSyncData.cameraZ !== this.getCameraZ(null)
+      ) {
+        this.setCameraZ(networkSyncData.cameraZ, null);
+      }
+      if (
+        networkSyncData.cameraRotation !== undefined &&
+        networkSyncData.cameraRotation !== this.getCameraRotation()
+      ) {
+        this.setCameraRotation(networkSyncData.cameraRotation);
+      }
+      if (
+        networkSyncData.cameraZoom !== undefined &&
+        networkSyncData.cameraZoom !== this.getCameraZoom()
+      ) {
+        this.setCameraZoom(networkSyncData.cameraZoom);
+      }
+
+      for (const effectName in networkSyncData.effects) {
+        this._rendererEffects[effectName].updateFromNetworkSyncData(
+          networkSyncData.effects[effectName]
+        );
+      }
+    }
+
     getRuntimeLayer(): gdjs.RuntimeLayer {
       return this;
     }

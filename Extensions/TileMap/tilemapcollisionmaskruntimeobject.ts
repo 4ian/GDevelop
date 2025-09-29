@@ -189,9 +189,11 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): TilemapCollisionMaskNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): TilemapCollisionMaskNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         tmjf: this.getTilemapJsonFile(),
         tsjf: this.getTilesetJsonFile(),
         dm: this.getDebugMode(),
@@ -204,9 +206,10 @@ namespace gdjs {
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: TilemapCollisionMaskNetworkSyncData
+      networkSyncData: TilemapCollisionMaskNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       if (networkSyncData.tmjf !== undefined) {
         this.setTilemapJsonFile(networkSyncData.tmjf);

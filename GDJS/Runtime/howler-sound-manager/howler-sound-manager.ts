@@ -114,11 +114,23 @@ namespace gdjs {
      */
     private _onPlay: Array<HowlCallback> = [];
 
-    constructor(howl: Howl, volume: float, loop: boolean, rate: float) {
+    /**
+     * The filepath to the resource
+     */
+    private _audioResourceName: string;
+
+    constructor(
+      howl: Howl,
+      volume: float,
+      loop: boolean,
+      rate: float,
+      audioResourceName: string
+    ) {
       this._howl = howl;
       this._initialVolume = clampVolume(volume);
       this._loop = loop;
       this._rate = rate;
+      this._audioResourceName = audioResourceName;
     }
 
     /**
@@ -199,9 +211,10 @@ namespace gdjs {
      * to preload the sounds.
      */
     playing(): boolean {
+      const isSoundPlaying =
+        this._id !== null ? this._howl.playing(this._id) : true;
       return (
-        (this._id !== null ? this._howl.playing(this._id) : true) ||
-        !this.isLoaded() // Loading is considered playing
+        isSoundPlaying || !this.isLoaded() // Loading is considered playing
       );
     }
 
@@ -427,10 +440,27 @@ namespace gdjs {
       if (this._id !== null) this._howl.off(event, handler, this._id);
       return this;
     }
+
+    getNetworkSyncData(): SoundSyncData | undefined {
+      if (this.paused() || !this.isLoaded() || this.stopped()) return undefined;
+      // Seek can sometimes return the Howl object in case it isn't loaded yet, in this case we default to 0.
+      const seek = this.getSeek();
+      const numberSeek = typeof seek !== 'number' ? 0 : seek;
+      // If the Howl is still loading, we use the initialVolume, as the Howl
+      // has been initialized with volume 0.
+      const volume = this.isLoaded() ? this.getVolume() : this._initialVolume;
+      return {
+        resourceName: this._audioResourceName,
+        loop: this._loop,
+        volume,
+        rate: this._rate,
+        seek: numberSeek,
+      };
+    }
   }
 
   /**
-   * HowlerSoundManager is used to manage the sounds and musics of a RuntimeScene.
+   * HowlerSoundManager is used to manage the sounds and musics of a RuntimeGame.
    *
    * It is basically a container to associate channels to sounds and keep a list
    * of all sounds being played.
@@ -679,8 +709,7 @@ namespace gdjs {
         );
         cacheContainer.set(resource, howl);
       }
-
-      return new gdjs.HowlerSound(howl, volume, loop, rate);
+      return new gdjs.HowlerSound(howl, volume, loop, rate, soundName);
     }
 
     /**
@@ -778,7 +807,13 @@ namespace gdjs {
       this._loadedSounds.clear();
     }
 
-    playSound(soundName: string, loop: boolean, volume: float, pitch: float) {
+    playSound(
+      soundName: string,
+      loop: boolean,
+      volume: float,
+      pitch: float,
+      seek?: float
+    ) {
       const sound = this.createHowlerSound(
         soundName,
         /* isMusic= */ false,
@@ -794,6 +829,9 @@ namespace gdjs {
         }
       });
       sound.play();
+      if (seek) {
+        sound.setSeek(seek);
+      }
     }
 
     playSoundOnChannel(
@@ -801,7 +839,8 @@ namespace gdjs {
       channel: integer,
       loop: boolean,
       volume: float,
-      pitch: float
+      pitch: float,
+      seek?: float
     ) {
       if (this._sounds[channel]) this._sounds[channel].stop();
 
@@ -826,13 +865,22 @@ namespace gdjs {
         }
       });
       sound.play();
+      if (seek) {
+        sound.setSeek(seek);
+      }
     }
 
     getSoundOnChannel(channel: integer): HowlerSound | null {
       return this._sounds[channel] || null;
     }
 
-    playMusic(soundName: string, loop: boolean, volume: float, pitch: float) {
+    playMusic(
+      soundName: string,
+      loop: boolean,
+      volume: float,
+      pitch: float,
+      seek?: float
+    ) {
       const music = this.createHowlerSound(
         soundName,
         /* isMusic= */ true,
@@ -848,6 +896,9 @@ namespace gdjs {
         }
       });
       music.play();
+      if (seek) {
+        music.setSeek(seek);
+      }
     }
 
     playMusicOnChannel(
@@ -855,7 +906,8 @@ namespace gdjs {
       channel: integer,
       loop: boolean,
       volume: float,
-      pitch: float
+      pitch: float,
+      seek?: float
     ) {
       if (this._musics[channel]) this._musics[channel].stop();
 
@@ -875,6 +927,9 @@ namespace gdjs {
         }
       });
       music.play();
+      if (seek) {
+        music.setSeek(seek);
+      }
     }
 
     getMusicOnChannel(channel: integer): HowlerSound | null {
@@ -999,6 +1054,97 @@ namespace gdjs {
             'There was an error while preloading an audio file: ' + error
           );
         }
+      }
+    }
+
+    getNetworkSyncData(): SoundManagerSyncData {
+      const freeMusicsNetworkSyncData: SoundSyncData[] = [];
+      this._freeMusics.forEach((freeMusic) => {
+        const musicSyncData = freeMusic.getNetworkSyncData();
+        if (musicSyncData) freeMusicsNetworkSyncData.push(musicSyncData);
+      });
+      const freeSoundsNetworkSyncData: SoundSyncData[] = [];
+      this._freeSounds.forEach((freeSound) => {
+        const soundSyncData = freeSound.getNetworkSyncData();
+        if (soundSyncData) freeSoundsNetworkSyncData.push(soundSyncData);
+      });
+      const musicsNetworkSyncData: ChannelsSoundSyncData = {};
+      Object.entries(this._musics).forEach(([channel, music]) => {
+        const musicSyncData = music.getNetworkSyncData();
+        if (musicSyncData) {
+          const channelNumber = parseInt(channel, 10);
+          musicsNetworkSyncData[channelNumber] = musicSyncData;
+        }
+      });
+      const soundsNetworkSyncData: ChannelsSoundSyncData = {};
+      Object.entries(this._sounds).forEach(([channel, sound]) => {
+        const soundSyncData = sound.getNetworkSyncData();
+        if (soundSyncData) {
+          const channelNumber = parseInt(channel, 10);
+          soundsNetworkSyncData[channelNumber] = soundSyncData;
+        }
+      });
+
+      return {
+        globalVolume: this._globalVolume,
+        cachedSpatialPosition: this._cachedSpatialPosition,
+        freeMusics: freeMusicsNetworkSyncData,
+        freeSounds: freeSoundsNetworkSyncData,
+        musics: musicsNetworkSyncData,
+        sounds: soundsNetworkSyncData,
+      };
+    }
+
+    updateFromNetworkSyncData(syncData: SoundManagerSyncData): void {
+      this.clearAll();
+      this._globalVolume = syncData.globalVolume;
+      this._cachedSpatialPosition = syncData.cachedSpatialPosition;
+
+      for (let i = 0; i < syncData.freeSounds.length; i++) {
+        const freeSoundsSyncData: SoundSyncData = syncData.freeSounds[i];
+
+        this.playSound(
+          freeSoundsSyncData.resourceName,
+          freeSoundsSyncData.loop,
+          freeSoundsSyncData.volume * 100,
+          freeSoundsSyncData.rate,
+          freeSoundsSyncData.seek
+        );
+      }
+
+      for (let i = 0; i < syncData.freeMusics.length; i++) {
+        const freeMusicsSyncData: SoundSyncData = syncData.freeMusics[i];
+        this.playMusic(
+          freeMusicsSyncData.resourceName,
+          freeMusicsSyncData.loop,
+          freeMusicsSyncData.volume * 100,
+          freeMusicsSyncData.rate,
+          freeMusicsSyncData.seek
+        );
+      }
+
+      for (const [channel, soundSyncData] of Object.entries(syncData.sounds)) {
+        const channelNumber = parseInt(channel, 10);
+        this.playSoundOnChannel(
+          soundSyncData.resourceName,
+          channelNumber,
+          soundSyncData.loop,
+          soundSyncData.volume * 100,
+          soundSyncData.rate,
+          soundSyncData.seek
+        );
+      }
+
+      for (const [channel, musicSyncData] of Object.entries(syncData.musics)) {
+        const channelNumber = parseInt(channel, 10);
+        this.playMusicOnChannel(
+          musicSyncData.resourceName,
+          channelNumber,
+          musicSyncData.loop,
+          musicSyncData.volume * 100,
+          musicSyncData.rate,
+          musicSyncData.seek
+        );
       }
     }
 

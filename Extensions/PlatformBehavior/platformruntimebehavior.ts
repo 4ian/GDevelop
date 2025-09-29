@@ -158,6 +158,16 @@ namespace gdjs {
     }
 
     trackChangesAndUpdateManagerIfNeeded() {
+      if (!this.activated() && this._registeredInManager) {
+        this._manager.removePlatform(this);
+        this._registeredInManager = false;
+      } else {
+        if (this.activated() && !this._registeredInManager) {
+          this._manager.addPlatform(this);
+          this._registeredInManager = true;
+        }
+      }
+
       if (
         this._oldX !== this.owner.getX() ||
         this._oldY !== this.owner.getY() ||
@@ -195,10 +205,7 @@ namespace gdjs {
     onCreated(): void {
       // Register it right away if activated,
       // so it can be used by platformer objects in that same frame.
-      if (this.activated()) {
-        this._manager.addPlatform(this);
-        this._registeredInManager = true;
-      }
+      this.trackChangesAndUpdateManagerIfNeeded();
     }
 
     onDestroy() {
@@ -219,16 +226,6 @@ namespace gdjs {
             }*/
 
       //Make sure the platform is or is not in the platforms manager.
-      if (!this.activated() && this._registeredInManager) {
-        this._manager.removePlatform(this);
-        this._registeredInManager = false;
-      } else {
-        if (this.activated() && !this._registeredInManager) {
-          this._manager.addPlatform(this);
-          this._registeredInManager = true;
-        }
-      }
-
       this.trackChangesAndUpdateManagerIfNeeded();
     }
 

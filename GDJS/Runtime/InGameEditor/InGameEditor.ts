@@ -1765,25 +1765,36 @@ namespace gdjs {
         threeScene.add(threeTransformControls);
 
         // Keep track of the movement so the editor can apply it to the selection.
-        const initialPosition = new THREE.Vector3();
-        const initialRotation = new THREE.Euler();
-        const initialScale = new THREE.Vector3();
+        let initialObjectX = 0;
+        let initialObjectY = 0;
+        let initialObjectZ = 0;
+        const initialDummyPosition = new THREE.Vector3();
+        const initialDummyRotation = new THREE.Euler();
+        const initialDummyScale = new THREE.Vector3();
         threeTransformControls.addEventListener('change', (e) => {
           if (!threeTransformControls.dragging) {
             this._selectionControlsMovementTotalDelta = null;
 
             // Reset the initial position to the current position, so that
             // it's ready to be dragged again.
-            initialPosition.copy(dummyThreeObject.position);
-            initialRotation.copy(dummyThreeObject.rotation);
-            initialScale.copy(dummyThreeObject.scale);
+            initialObjectX = lastEditableSelectedObject.getX();
+            initialObjectY = lastEditableSelectedObject.getY();
+            initialObjectZ = is3D(lastEditableSelectedObject)
+              ? lastEditableSelectedObject.getZ()
+              : 0;
+            initialDummyPosition.copy(dummyThreeObject.position);
+            initialDummyRotation.copy(dummyThreeObject.rotation);
+            initialDummyScale.copy(dummyThreeObject.scale);
             return;
           }
 
           let gridNormal: 'X' | 'Y' | 'Z' = 'Z';
-          let targetPositionX = dummyThreeObject.position.x;
-          let targetPositionY = dummyThreeObject.position.y;
-          let targetPositionZ = dummyThreeObject.position.z;
+          let translationX =
+            dummyThreeObject.position.x - initialDummyPosition.x;
+          let translationY =
+            dummyThreeObject.position.y - initialDummyPosition.y;
+          let translationZ =
+            dummyThreeObject.position.z - initialDummyPosition.z;
           if (
             threeTransformControls.mode === 'translate' &&
             threeTransformControls.axis
@@ -1794,13 +1805,19 @@ namespace gdjs {
 
             if (this._editorGrid.isSpanningEnabled(inputManager)) {
               if (isMovingOnX) {
-                targetPositionX = this._editorGrid.getSnappedX(targetPositionX);
+                translationX =
+                  this._editorGrid.getSnappedX(initialObjectX + translationX) -
+                  initialObjectX;
               }
               if (isMovingOnY) {
-                targetPositionY = this._editorGrid.getSnappedY(targetPositionY);
+                translationY =
+                  this._editorGrid.getSnappedY(initialObjectY + translationY) -
+                  initialObjectY;
               }
               if (isMovingOnZ) {
-                targetPositionZ = this._editorGrid.getSnappedZ(targetPositionZ);
+                translationZ =
+                  this._editorGrid.getSnappedZ(initialObjectZ + translationZ) -
+                  initialObjectZ;
               }
             }
             if (isMovingOnZ) {
@@ -1833,34 +1850,37 @@ namespace gdjs {
 
           const scaleDamping = 0.2; // 0.2 = 20% of the movement speed (Three.js transform controls scaling is too fast)
           this._selectionControlsMovementTotalDelta = {
-            translationX: targetPositionX - initialPosition.x,
-            translationY: targetPositionY - initialPosition.y,
-            translationZ: targetPositionZ - initialPosition.z,
+            translationX,
+            translationY,
+            translationZ,
             rotationX: gdjs.toDegrees(
-              dummyThreeObject.rotation.x - initialRotation.x
+              dummyThreeObject.rotation.x - initialDummyRotation.x
             ),
             rotationY: -gdjs.toDegrees(
-              dummyThreeObject.rotation.y - initialRotation.y
+              dummyThreeObject.rotation.y - initialDummyRotation.y
             ),
             rotationZ: -gdjs.toDegrees(
-              dummyThreeObject.rotation.z - initialRotation.z
+              dummyThreeObject.rotation.z - initialDummyRotation.z
             ),
             scaleX:
               1 +
-              (dummyThreeObject.scale.x / initialScale.x - 1) * scaleDamping,
+              (dummyThreeObject.scale.x / initialDummyScale.x - 1) *
+                scaleDamping,
             scaleY:
               1 +
-              (dummyThreeObject.scale.y / initialScale.y - 1) * scaleDamping,
+              (dummyThreeObject.scale.y / initialDummyScale.y - 1) *
+                scaleDamping,
             scaleZ:
               1 +
-              (dummyThreeObject.scale.z / initialScale.z - 1) * scaleDamping,
+              (dummyThreeObject.scale.z / initialDummyScale.z - 1) *
+                scaleDamping,
           };
 
           this._hasSelectionActuallyMoved =
             this._hasSelectionActuallyMoved ||
-            !dummyThreeObject.position.equals(initialPosition) ||
-            !dummyThreeObject.rotation.equals(initialRotation) ||
-            !dummyThreeObject.scale.equals(initialScale);
+            !dummyThreeObject.position.equals(initialDummyPosition) ||
+            !dummyThreeObject.rotation.equals(initialDummyRotation) ||
+            !dummyThreeObject.scale.equals(initialDummyScale);
         });
 
         this._selectionControls = {

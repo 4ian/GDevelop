@@ -2679,6 +2679,9 @@ namespace gdjs {
       ) {
         this._timeSinceLastInteraction = 0;
       }
+      if (this._draggedNewObject) {
+        this._timeSinceLastInteraction = 0;
+      }
       this._timeSinceLastInteraction += elapsedTime;
 
       // Adapt the framerate to avoid consuming too much CPU when the editor is not visible

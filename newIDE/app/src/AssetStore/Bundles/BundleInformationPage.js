@@ -85,9 +85,9 @@ type Props = {|
   ) => void,
   onCourseOpen: CourseListingData => void,
   courses: ?Array<Course>,
-  receivedCourses: ?Array<Course>,
   getCourseCompletion: (courseId: string) => CourseCompletion | null,
   noPadding?: boolean,
+  noActions?: boolean,
 |};
 
 const BundleInformationPage = ({
@@ -99,9 +99,9 @@ const BundleInformationPage = ({
   onBundleOpen,
   onCourseOpen,
   courses,
-  receivedCourses,
   getCourseCompletion,
   noPadding,
+  noActions,
 }: Props) => {
   const { windowSize, isLandscape, isMobile } = useResponsiveWindowSize();
   const { bundleListingDatas } = React.useContext(BundleStoreContext); // If archived, should use the one passed.
@@ -175,6 +175,7 @@ const BundleInformationPage = ({
             onBundleOpen,
             onCourseOpen,
             discountedPrice: true,
+            disabled: noActions,
           })
         : null,
     [
@@ -190,6 +191,7 @@ const BundleInformationPage = ({
       onGameTemplateOpen,
       onBundleOpen,
       onCourseOpen,
+      noActions,
     ]
   );
 
@@ -339,6 +341,7 @@ const BundleInformationPage = ({
                               onCourseOpen(courseListingData);
                             }}
                             discountedPrice
+                            disabled={noActions}
                           />
                         </GridListTile>
                       );

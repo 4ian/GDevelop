@@ -217,6 +217,7 @@ type DialogProps = {|
   minHeight?: 'sm' | 'lg',
   fullHeight?: boolean,
   fullscreen?: 'never-even-on-mobile' | 'always-even-on-desktop',
+  noPadding?: boolean,
   actionsFullWidthOnMobile?: boolean,
   // Useful when the content of the dialog can change and we want to avoid layout shifts.
   forceScrollVisible?: boolean,
@@ -246,6 +247,7 @@ const DialogWithoutWindowSizeProvider = ({
   cannotBeDismissed,
   exceptionallyStillAllowRenderingInstancesEditors,
   fullscreen,
+  noPadding,
   actionsFullWidthOnMobile,
   forceScrollVisible,
   topBackgroundSrc,
@@ -302,7 +304,7 @@ const DialogWithoutWindowSizeProvider = ({
     : {};
   const additionalPaddingStyle = {
     paddingTop: 0, // Let the title container handle the padding, or no padding if there is no title.
-    paddingBottom: hasActions ? 0 : dialogActionPadding, // Ensure the padding is here if there are no actions.
+    paddingBottom: hasActions || noPadding ? 0 : dialogActionPadding, // Ensure the padding is here if there are no actions.
   };
   const contentStyle = {
     ...styles.dialogContent,
@@ -313,7 +315,9 @@ const DialogWithoutWindowSizeProvider = ({
   const dialogContainerStyle = {
     ...styles.dialogContainer,
     // Ensure we don't spread an object here, to avoid a styling bug when resizing.
-    margin: isFullScreen
+    margin: noPadding
+      ? 0
+      : isFullScreen
       ? dialogSmallPadding
       : `${dialogTitlePadding}px ${dialogPaddingX}px ${dialogActionPadding}px ${dialogPaddingX}px`,
   };

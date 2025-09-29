@@ -76,7 +76,6 @@ export const Default = () => (
           )}
           onSelectExampleShortHeader={action('onSelectExampleShortHeader')}
           getSubscriptionPlansWithPricingSystems={() => null}
-          receivedCourses={[]}
           initialBundleCategory={null}
           initialBundleUserFriendlySlug={null}
           clearInitialBundleValues={() => {}}
@@ -127,7 +126,6 @@ export const NotAuthenticated = () => (
           )}
           onSelectExampleShortHeader={action('onSelectExampleShortHeader')}
           getSubscriptionPlansWithPricingSystems={() => null}
-          receivedCourses={[]}
           initialBundleCategory={null}
           initialBundleUserFriendlySlug={null}
           clearInitialBundleValues={() => {}}
@@ -180,7 +178,6 @@ export const EducationSubscriber = () => (
           )}
           onSelectExampleShortHeader={action('onSelectExampleShortHeader')}
           getSubscriptionPlansWithPricingSystems={() => null}
-          receivedCourses={[]}
           initialBundleCategory={null}
           initialBundleUserFriendlySlug={null}
           clearInitialBundleValues={() => {}}
@@ -233,7 +230,6 @@ export const EducationTeacher = () => (
           )}
           onSelectExampleShortHeader={action('onSelectExampleShortHeader')}
           getSubscriptionPlansWithPricingSystems={() => null}
-          receivedCourses={[]}
           initialBundleCategory={null}
           initialBundleUserFriendlySlug={null}
           clearInitialBundleValues={() => {}}
@@ -280,7 +276,6 @@ export const LoadingTutorials = () => (
         )}
         onSelectExampleShortHeader={action('onSelectExampleShortHeader')}
         getSubscriptionPlansWithPricingSystems={() => null}
-        receivedCourses={[]}
         initialBundleCategory={null}
         initialBundleUserFriendlySlug={null}
         clearInitialBundleValues={() => {}}
@@ -326,7 +321,6 @@ export const LoadingCourses = () => (
         )}
         onSelectExampleShortHeader={action('onSelectExampleShortHeader')}
         getSubscriptionPlansWithPricingSystems={() => null}
-        receivedCourses={[]}
         initialBundleCategory={null}
         initialBundleUserFriendlySlug={null}
         clearInitialBundleValues={() => {}}

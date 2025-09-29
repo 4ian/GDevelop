@@ -356,6 +356,7 @@ export const getProductsIncludedInBundleTiles = ({
   onBundleOpen,
   onCourseOpen,
   discountedPrice,
+  disabled,
 }: {|
   product: ?PrivateAssetPack | PrivateGameTemplate | Bundle | Course,
   productListingDatas: ?Array<
@@ -381,6 +382,7 @@ export const getProductsIncludedInBundleTiles = ({
   onBundleOpen?: (bundleListingData: BundleListingData) => void,
   onCourseOpen?: (courseListingData: CourseListingData) => void,
   discountedPrice?: boolean,
+  disabled?: boolean,
 |}): ?Array<React.Node> => {
   if (!product || !productListingDatas) return null;
 
@@ -417,6 +419,7 @@ export const getProductsIncludedInBundleTiles = ({
             }
             owned={isProductOwned}
             discountedPrice={discountedPrice}
+            disabled={disabled}
           />
         );
       }
@@ -435,6 +438,7 @@ export const getProductsIncludedInBundleTiles = ({
             onSelect={() => onPrivateAssetPackOpen(includedProductListingData)}
             owned={isProductOwned}
             discountedPrice={discountedPrice}
+            disabled={disabled}
           />
         );
       }
@@ -453,6 +457,7 @@ export const getProductsIncludedInBundleTiles = ({
             onSelect={() => onBundleOpen(includedProductListingData)}
             owned={isProductOwned}
             discountedPrice={discountedPrice}
+            disabled={disabled}
           />
         );
       }
@@ -471,6 +476,7 @@ export const getProductsIncludedInBundleTiles = ({
             onSelect={() => onCourseOpen(includedProductListingData)}
             owned={isProductOwned}
             discountedPrice={discountedPrice}
+            disabled={disabled}
           />
         );
       }

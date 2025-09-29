@@ -80,7 +80,6 @@ type Props = {|
   ) => void,
   onOpenProfile?: () => void,
   courses?: ?Array<Course>,
-  receivedCourses?: ?Array<Course>,
   onCourseOpen?: (courseId: string) => void,
   getSubscriptionPlansWithPricingSystems?: () => Array<SubscriptionPlanWithPricingSystems> | null,
   getCourseCompletion?: (courseId: string) => CourseCompletion | null,
@@ -125,7 +124,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       onOpenPrivateGameTemplateListingData,
       onOpenProfile,
       courses,
-      receivedCourses,
       onCourseOpen,
       getSubscriptionPlansWithPricingSystems,
       getCourseCompletion,
@@ -975,7 +973,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                     getSubscriptionPlansWithPricingSystems
                   }
                   courses={courses}
-                  receivedCourses={receivedCourses}
                   getCourseCompletion={getCourseCompletion}
                 />
               ) : null}

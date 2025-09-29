@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Flight Lab — Prototype Simulator</title>
+<style>
+  html,body{height:100%;margin:0;overflow:hidden;background:#000;}
+  #container{position:fixed;inset:0}
+  #hud{position:fixed;left:12px;top:12px;color:#0f0;background:rgba(0,0,0,0.35);padding:10px;border-radius:6px;font-family:monospace;z-index:20}
+  #ui {position:fixed;right:12px;top:12px;color:#fff;background:rgba(0,0,0,0.35);padding:10px;border-radius:8px;font-family:system-ui;z-index:20;max-width:320px}
+  button, .smallbtn{display:inline-block;padding:8px 10px;border-radius:6px;border:0;background:#ff7a00;color:#fff;margin:4px;cursor:pointer}
+  #minimap{position:fixed;right:12px;bottom:12px;width:200px;height:200px;background:rgba(0,0,0,0.6);border-radius:8px;z-index:20}
+  .centerHint{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.6);padding:12px;border-radius:8px;color:#fff;z-index:25}
+  #overlayBtns{position:fixed;left:12px;bottom:12px;z-index:22}
+  .btnSmall{background:#222;color:#fff;padding:8px;border-radius:6px;margin:4px;border:1px solid #444}
+  #msg{position:fixed;left:50%;top:85%;transform:translateX(-50%);background:rgba(0,0,0,0.7);color:#fff;padding:8px 12px;border-radius:6px;z-index:30;display:none}
+</style>
+</head>
+<body>
+<div id="container"></div>
+
+<div id="hud">
+  <div id="hudSpeed">SPD: 0 m/s</div>
+  <div id="hudAlt">ALT: 0 m</div>
+  <div id="hudHeading">HDG: 0°</div>
+  <div id="hudThrottle">THR: 0%</div>
+  <div id="hudFlaps">Flaps: 0</div>
+  <div id="hudGear">Gear: UP</div>
+  <div id="hudHealth">Health: 100%</div>
+  <div id="hudMoney">Money: GHS 0</div>
+</div>
+
+<div id="ui">
+  <div style="font-weight:700;margin-bottom:6px">Flight Lab Controls</div>
+  <div class="small">W/S A/D Q/E — fly | Arrows — throttle | G — gear | F — flaps</div>
+  <div style="margin-top:8px">
+    <button id="btnPark" class="smallbtn">Garage</button>
+    <button id="btnMissions" class="smallbtn">Missions</button>
+    <button id="btnMap" class="smallbtn">Toggle Map (M)</button>
+    <button id="btnWeather" class="smallbtn">Weather</button>
+  </div>
+  <div style="margin-top:8px">
+    <label style="font-size:12px">Plane:</label>
+    <select id="planeSelect"></select>
+    <button id="btnSpawn" class="smallbtn">Spawn</button>
+  </div>
+  <div style="margin-top:8px;color:#ddd;font-size:12px">
+    <div id="missionInfo">No active mission</div>
+  </div>
+</div>
+
+<div id="minimap"></div>
+<div id="overlayBtns"></div>
+<div id="msg"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/OrbitControls.js"></script>
+
+<script>
+/*
+  Flight Lab Prototype
+  - Large single-file prototype aiming to approximate many real features.
+  - Not a commercial sim. Many systems are approximations for browser performance.
+*/
+
+/* ---------- Globals & Scene ---------- */
+const container = document.getElementById('container');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87ceeb);
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+container.appendChild(renderer.domElement);
+
+const cam = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 50000);
+cam.position.set(-80,40,160);
+const ambient = new THREE.AmbientLight(0xffffff,0.6); scene.add(ambient);
+const sun = new THREE.DirectionalLight(0xffffff,1.0); sun.position.set(300,400,200); scene.add(sun);
+
+/* ---------- Terrain, sea, islands, runway array ---------- */
+const TERRAIN_SIZE = 6000;
+const TERRAIN_SEG = 256; // keep performance balanced
+// procedural heightmap
+function perlinSeed(x,y){
+  return Math.abs(Math.sin(x*12.9898 + y*78.233) * 43758.5453) % 1;
+}
+function smoothNoise(x,y){
+  const ix = Math.floor(x), iy = Math.floor(y), fx=x-ix, fy=y-iy;
+  const a = perlinSeed(ix,iy), b = perlinSeed(ix+1,iy), c = perlinSeed(ix,iy+1), d = perlinSeed(ix+1,iy+1);
+  const m1 = a*(1-fx)+b*fx; const m2 = c*(1-fx)+d*fx; return m1*(1-fy)+m2*fy;
+}
+function fractal(x,y){
+  let v=0, amp=1, freq=1;
+  for(let i=0;i<5;i++){ v += smoothNoise(x*freq,y*freq)*amp; amp*=0.5; freq*=2; }
+  return v;
+}
+const groundGeo = new THREE.PlaneGeometry(TERRAIN_SIZE, TERRAIN_SIZE, 200, 200);
+groundGeo.rotateX(-Math.PI/2);
+for(let i=0;i<groundGeo.attributes.position.count;i++){
+  const x = groundGeo.attributes.position.getX(i);
+  const z = groundGeo.attributes.position.getZ(i);
+  const h = fractal((x+TERRAIN_SIZE/2)/300, (z+TERRAIN_SIZE/2)/300) * 120;
+  // carve islands and water: create oceans by lowering some areas
+  const distToCenter = Math.hypot(x*0.001, z*0.001);
+  const islandFactor = 1 - Math.min(1, distToCenter*0.9);
+  const final = h * islandFactor - 8*(Math.sin(x*0.0006)*Math.cos(z*0.0004));
+  groundGeo.attributes.position.setY(i, final);
+}
+groundGeo.computeVertexNormals();
+const groundMat = new THREE.MeshStandardMaterial({color:0x3b7a2b,roughness:1});
+const ground = new THREE.Mesh(groundGeo, groundMat); ground.receiveShadow = true; scene.add(ground);
+
+// ocean (simple)
+const seaGeo = new THREE.PlaneGeometry(TERRAIN_SIZE*2, TERRAIN_SIZE*2, 16, 16);
+seaGeo.rotateX(-Math.PI/2);
+const seaMat = new THREE.MeshPhongMaterial({color:0x1e90ff,transparent:true,opacity:0.85});
+const sea = new THREE.Mesh(seaGeo, seaMat); sea.position.y = -10; scene.add(sea);
+
+/* ---------- airports (17) ---------- */
+const airports = [];
+function makeRunway(x,z,heading,length=800){
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(length, 30), new THREE.MeshStandardMaterial({color:0x222222}));
+  mesh.rotation.x = -Math.PI/2;
+  mesh.rotation.y = -heading * Math.PI/180;
+  mesh.position.set(x, sampleHeight(x,z)+2, z);
+  scene.add(mesh);
+  // add simple terminal box
+  const term = new THREE.Mesh(new THREE.BoxGeometry(60,18,40), new THREE.MeshStandardMaterial({color:0x8b8b8b}));
+  term.position.set(x+Math.cos(heading*Math.PI/180)*-120, mesh.position.y+10, z+Math.sin(heading*Math.PI/180)*-120);
+  scene.add(term);
+  airports.push({x,z,heading,length,mesh,term});
+}
+// scatter 17 airports around map
+for(let i=0;i<17;i++){
+  const angle = Math.random()*Math.PI*2;
+  const radius = 600 + Math.random()*2200;
+  const x = Math.cos(angle)*radius;
+  const z = Math.sin(angle)*radius;
+  makeRunway(x, z, Math.round(Math.random()*360));
+}
+
+/* ---------- simple 3D cities / buildings ---------- */
+function addCity(x,z,size=80){
+  const g = new THREE.Group();
+  for(let i=0;i<Math.floor(size/10);i++){
+    const bx = x + (Math.random()-0.5)*size;
+    const bz = z + (Math.random()-0.5)*size;
+    const h = 8 + Math.random()*80;
+    const b = new THREE.Mesh(new THREE.BoxGeometry(8, h, 8), new THREE.MeshStandardMaterial({color:0x9a9a9a}));
+    b.position.set(bx, sampleHeight(bx,bz)+h/2, bz); g.add(b);
+  }
+  scene.add(g);
+}
+for(let i=0;i<12;i++){
+  const a = Math.random()*Math.PI*2, r = 200 + Math.random()*2000;
+  addCity(Math.cos(a)*r, Math.sin(a)*r, 60 + Math.random()*200);
+}
+
+/* ---------- helper: sample terrain height by nearest vertex ---------- */
+function sampleHeight(wx,wz){
+  // map world coords to nearest vertex in groundGeo — cheap approx
+  const half = TERRAIN_SIZE/2;
+  const gx = Math.floor((wx + half)/TERRAIN_SIZE * 200);
+  const gz = Math.floor((wz + half)/TERRAIN_SIZE * 200);
+  const ix = Math.max(0, Math.min(200, gx));
+  const iz = Math.max(0, Math.min(200, gz));
+  const idx = ix + iz*(201);
+  if(idx < 0 || idx >= groundGeo.attributes.position.count) return -10;
+  return groundGeo.attributes.position.getY(idx);
+}
+
+/* ---------- Plane definitions (multiple types) ---------- */
+const PLANE_DEFS = [
+  {id:'Cessna172', name:'Cessna 172', mass:1100, wingArea:16, span:11, thrust:2200, cruise:60, price:1500, cockpitOffset:5},
+  {id:'Beechcraft', name:'Beechcraft Bonanza', mass:1800, wingArea:22, span:12.5, thrust:3600, cruise:85, price:3500, cockpitOffset:6},
+  {id:'TwinOtter', name:'DHC-6 Twin Otter', mass:4500, wingArea:50, span:19.8, thrust:9000, cruise:120, price:9000, cockpitOffset:8},
+  {id:'A320Lite', name:'A320-Lite (sim)', mass:42000, wingArea:122.6, span:34, thrust:120000, cruise:220, price:45000, cockpitOffset:12}
+];
+
+/* ---------- build simple plane mesh function that attaches unique cockpit buttons ---------- */
+function createPlaneMesh(def){
+  const root = new THREE.Object3D();
+  // fuselage
+  const fus = new THREE.Mesh(new THREE.CylinderGeometry(1.8,2.6,14,12), new THREE.MeshPhongMaterial({color:0xffd27a}));
+  fus.rotation.z = Math.PI/2; fus.position.set(0,0,0); root.add(fus);
+  // wing
+  const wing = new THREE.Mesh(new THREE.BoxGeometry(def.span,0.5,4), new THREE.MeshPhongMaterial({color:0xcc3333}));
+  wing.position.set(0,-0.6,0); root.add(wing);
+  // tail
+  const tail = new THREE.Mesh(new THREE.BoxGeometry(5,0.4,2), new THREE.MeshPhongMaterial({color:0xcc3333}));
+  tail.position.set(-7,0.7,0.9); root.add(tail);
+  // landing gear (visual)
+  const gear = new THREE.Group();
+  const g1 = new THREE.Mesh(new THREE.BoxGeometry(0.4,1.6,0.4), new THREE.MeshPhongMaterial({color:0x222222}));
+  g1.position.set(2.4,-1.6,1.2);
+  const g2 = g1.clone(); g2.position.set(2.4,-1.6,-1.2);
+  const g3 = new THREE.Mesh(new THREE.BoxGeometry(0.4,1.8,0.4), new THREE.MeshPhongMaterial({color:0x222222}));
+  g3.position.set(-6.6,-1.6,0);
+  gear.add(g1,g2,g3);
+  root.add(gear);
+  root.userData = {def,wing,gear,parts:{fus,wing,tail}};
+  return root;
+}
+
+/* ---------- Garage & economy ---------- */
+let playerMoney = 2000;
+const garage = {owned: [PLANE_DEFS[0].id], active: PLANE_DEFS[0].id};
+
+/* ---------- plane runtime state ---------- */
+let playerPlane = null;
+let planeState = null;
+
+/* ---------- HUD update helpers ---------- */
+function setHUD(){
+  document.getElementById('hudMoney').textContent = 'Money: GHS ' + Math.round(playerMoney);
+}
+setHUD();
+
+/* ---------- spawn plane function ---------- */
+function spawnPlane(defId, atAirportIndex=0){
+  const def = PLANE_DEFS.find(p=>p.id===defId) || PLANE_DEFS[0];
+  if(playerPlane) scene.remove(playerPlane);
+  const mesh = createPlaneMesh(def);
+  mesh.position.set(airports[atAirportIndex].x, sampleHeight(airports[atAirportIndex].x, airports[atAirportIndex].z)+20, airports[atAirportIndex].z+200);
+  scene.add(mesh);
+  playerPlane = mesh;
+  planeState = {
+    def,
+    pos: mesh.position.clone(),
+    vel: new THREE.Vector3( def.cruise*0.6, 0, 0 ),
+    quat: new THREE.Quaternion(),
+    angVel: new THREE.Vector3(),
+    throttle: 0.4,
+    flap: 0,
+    gearDown: false,
+    health: 100,
+    onGround:false
+  };
+  updatePlaneSelectUI();
+}
+
+/* ---------- fill plane selector UI ---------- */
+const planeSelect = document.getElementById('planeSelect');
+PLANE_DEFS.forEach(p=>{
+  const opt = document.createElement('option'); opt.value=p.id; opt.textContent = p.name + ' — GHS ' + p.price;
+  planeSelect.appendChild(opt);
+});
+document.getElementById('btnSpawn').onclick = ()=> {
+  const id = planeSelect.value;
+  if(!garage.owned.includes(id)){
+    const def = PLANE_DEFS.find(d=>d.id===id);
+    if(playerMoney >= def.price){ playerMoney -= def.price; garage.owned.push(id); setHUD(); showMsg('Bought ' + def.name); }
+    else { showMsg('Not enough money to buy this plane'); return; }
+  }
+  spawnPlane(id, Math.floor(Math.random()*airports.length));
+};
+
+/* ---------- simple input handling ---------- */
+const input = {pitch:0,roll:0,yaw:0,throttleUp:false,throttleDown:false};
+window.addEventListener('keydown', (e)=>{
+  const k = e.key.toLowerCase();
+  if(k === 'w') input.pitch = -1;
+  if(k === 's') input.pitch = 1;
+  if(k === 'a') input.roll = -1;
+  if(k === 'd') input.roll = 1;
+  if(k === 'q') input.yaw = -1;
+  if(k === 'e') input.yaw = 1;
+  if(e.key === 'ArrowUp') planeState && (planeState.throttle = Math.min(1, planeState.throttle + 0.05));
+  if(e.key === 'ArrowDown') planeState && (planeState.throttle = Math.max(0, planeState.throttle - 0.05));
+  if(k === 'g'){ if(planeState) planeState.gearDown = !planeState.gearDown; updateHUDGear(); }
+  if(k === 'f'){ if(planeState) planeState.flap = planeState.flap > 0 ? 0 : 1; updateHUDFlaps(); }
+  if(k === 'c'){ camMode = (camMode+1)%4; }
+  if(k === 'r'){ if(playerPlane) { playerPlane.position.set(0,150,0); planeState.pos.copy(playerPlane.position); planeState.vel.set(20,0,0); planeState.health = 100; } }
+  if(k === 'm'){ document.getElementById('minimap').style.display = document.getElementById('minimap').style.display === 'none' ? 'block' : 'none'; }
+});
+window.addEventListener('keyup', (e)=>{
+  const k = e.key.toLowerCase();
+  if(k === 'w' || k === 's') input.pitch = 0;
+  if(k === 'a' || k === 'd') input.roll = 0;
+  if(k === 'q' || k === 'e') input.yaw = 0;
+});
+
+/* ---------- flight physics (simplified) ---------- */
+function simulatePlane(dt){
+  if(!planeState || !playerPlane) return;
+  const s = planeState;
+  // orientation vectors
+  const forward = new THREE.Vector3(1,0,0).applyQuaternion(s.quat).normalize();
+  const up = new THREE.Vector3(0,1,0).applyQuaternion(s.quat).normalize();
+
+  // simple lift model
+  const speed = s.vel.length();
+  let AoA = Math.atan2(s.vel.y, s.vel.dot(forward)); // rough
+  const Cl = 0.2 + (s.def ? s.def.ClAlpha || 5.0 : 5.0)*AoA + (s.flap?0.7:0);
+  const lift = 0.5 * 1.225 * speed*speed * (s.def ? s.def.wingArea : 16) * Math.max(0,Cl);
+  // drag
+  const Cd = 0.02 + 0.04 * Math.abs(Cl);
+  const drag = 0.5 * 1.225 * speed*speed * (s.def ? s.def.wingArea : 16) * Cd;
+  // thrust
+  const thrustForce = forward.clone().multiplyScalar((s.def ? s.def.thrust : 2000) * s.throttle);
+
+  // assemble forces
+  const liftVec = up.clone().multiplyScalar(lift);
+  const dragVec = s.vel.clone().normalize().multiplyScalar(-drag);
+  const gravity = new THREE.Vector3(0, -9.81 * s.def.mass, 0);
+
+  const total = new THREE.Vector3();
+  total.add(liftVec).add(dragVec).add(thrustForce).add(gravity);
+
+  // acceleration
+  const acc = total.multiplyScalar(1 / s.def.mass);
+  s.vel.add(acc.multiplyScalar(dt));
+
+  // integrate position
+  s.pos.add(s.vel.clone().multiplyScalar(dt));
+
+  // simple angular response to inputs
+  s.angVel.x += input.pitch * 0.6 * dt;
+  s.angVel.z += -input.roll * 0.8 * dt;
+  s.angVel.y += input.yaw * 0.3 * dt;
+  s.angVel.multiplyScalar(0.995);
+  const ang = new THREE.Euler(s.angVel.x*dt, s.angVel.y*dt, s.angVel.z*dt, 'XYZ');
+  const q = new THREE.Quaternion().setFromEuler(ang);
+  s.quat.multiply(q).normalize();
+
+  // ground collision & gear
+  const groundH = sampleHeight(s.pos.x, s.pos.z) + 0.8;
+  if(s.pos.y <= groundH){
+    // on ground contact
+    if(s.gearDown && speed < 30){
+      // gentle landing
+      s.pos.y = groundH;
+      s.vel.multiplyScalar(0.3);
+      s.angVel.multiplyScalar(0.3);
+      s.onGround = true;
+    } else {
+      // crash
+      s.health -= Math.min(30, Math.abs(s.vel.y)*1.6 + Math.abs(s.vel.length())*0.05);
+      s.pos.y = groundH;
+      s.vel.multiplyScalar(0.2);
+      if(s.health <= 0){ explodePlane(); showMsg('Plane destroyed'); }
+    }
+  } else s.onGround = false;
+
+  // water crash if below sea level
+  if(s.pos.y < sea.position.y - 2){
+    s.health -= 40 * dt;
+    if(s.health <= 0){ explodePlane(); showMsg('Ditch in water'); }
+  }
+
+  // update mesh transform
+  playerPlane.position.copy(s.pos);
+  playerPlane.quaternion.copy(s.quat);
+
+  // HUD
+  document.getElementById('hudSpeed').textContent = 'SPD: ' + Math.round(speed) + ' m/s';
+  document.getElementById('hudAlt').textContent = 'ALT: ' + Math.round(Math.max(0, s.pos.y - sampleHeight(s.pos.x, s.pos.z))) + ' m';
+  const eul = new THREE.Euler().setFromQuaternion(s.quat, 'ZYX');
+  const heading = Math.round(THREE.MathUtils.radToDeg(eul.y + Math.PI) % 360);
+  document.getElementById('hudHeading').textContent = 'HDG: ' + heading + '°';
+  document.getElementById('hudThrottle').textContent = 'THR: ' + Math.round(s.throttle*100) + '%';
+  document.getElementById('hudFlaps').textContent = 'Flaps: ' + s.flap;
+  document.getElementById('hudGear').textContent = 'Gear: ' + (s.gearDown ? 'DOWN' : 'UP');
+  document.getElementById('hudHealth').textContent = 'Health: ' + Math.round(s.health) + '%';
+}
+
+/* ---------- simple explosion / failure ---------- */
+function explodePlane(){
+  if(!playerPlane) return;
+  // tiny particle-ish flash (cheap)
+  const p = new THREE.Mesh(new THREE.SphereGeometry(6,8,8), new THREE.MeshBasicMaterial({color:0xff2200}));
+  p.position.copy(playerPlane.position);
+  scene.add(p);
+  setTimeout(()=>{ scene.remove(p); }, 600);
+  // remove plane and reset to garage after short delay
+  setTimeout(()=>{ if(playerPlane) scene.remove(playerPlane); playerPlane = null; planeState = null; }, 900);
+}
+
+/* ---------- Camera & modes ---------- */
+let camMode = 0; // 0 chase,1 cockpit,2 external,3 free/on-foot
+const orbit = new THREE.OrbitControls(cam, renderer.domElement);
+orbit.enabled = false;
+
+function updateCamera(dt){
+  if(!playerPlane || !planeState){ // free roam
+    orbit.enabled = true;
+    orbit.update();
+    return;
+  }
+  orbit.enabled = false;
+  if(camMode === 0){ // chase
+    const forward = new THREE.Vector3(1,0,0).applyQuaternion(planeState.quat).normalize();
+    const desired = planeState.pos.clone().add(forward.clone().multiplyScalar(-40)).add(new THREE.Vector3(0,12,10));
+    cam.position.lerp(desired, 0.14);
+    cam.lookAt(planeState.pos.clone().add(forward.clone().multiplyScalar(40)));
+  } else if(camMode === 1){ // cockpit-ish
+    const forward = new THREE.Vector3(1,0,0).applyQuaternion(planeState.quat).normalize();
+    const cockpit = planeState.pos.clone().add(forward.clone().multiplyScalar(planeState.def.cockpitOffset || 6)).add(new THREE.Vector3(0,3,0));
+    cam.position.lerp(cockpit, 0.16);
+    cam.lookAt(planeState.pos.clone().add(forward.clone().multiplyScalar(200)));
+  } else if(camMode === 2){ // external overview
+    const pos = planeState.pos.clone().add(new THREE.Vector3(200,150,0));
+    cam.position.lerp(pos, 0.08);
+    cam.lookAt(planeState.pos);
+  } else {
+    orbit.enabled = true;
+    orbit.update();
+  }
+}
+
+/* ---------- minimap / radar ---------- */
+const minimap = document.getElementById('minimap');
+const mapCtx = (()=>{ const c = document.createElement('canvas'); c.width=200;c.height=200; minimap.appendChild(c); return c.getContext('2d'); })();
+function drawMinimap(){
+  mapCtx.fillStyle = '#001'; mapCtx.fillRect(0,0,200,200);
+  // draw airports
+  airports.forEach(a=>{
+    const x = 100 + (a.x / TERRAIN_SIZE) * 200;
+    const y = 100 + (a.z / TERRAIN_SIZE) * 200;
+    mapCtx.fillStyle = '#ff0'; mapCtx.fillRect(x-2,y-2,4,4);
+  });
+  if(planeState){
+    const x = 100 + (planeState.pos.x / TERRAIN_SIZE) * 200;
+    const y = 100 + (planeState.pos.z / TERRAIN_SIZE) * 200;
+    mapCtx.fillStyle = '#0f0'; mapCtx.beginPath(); mapCtx.arc(x,y,4,0,Math.PI*2); mapCtx.fill();
+  }
+}
+
+/* ---------- mission system & economy ---------- */
+let missions = [];
+let activeMission = null;
+function createMission(){
+  // simple missions: fly from airport A to B and land / fly to waypoint / pickup
+  const a = airports[Math.floor(Math.random()*airports.length)];
+  const b = airports[Math.floor(Math.random()*airports.length)];
+  const pay = 200 + Math.floor(Math.random()*1200);
+  const id = 'MSN'+Math.random().toString(36).slice(2,8).toUpperCase();
+  const mission = {id, type:'FlyAndLand', start:a, dest:b, pay, completed:false};
+  missions.push(mission);
+  return mission;
+}
+function acceptMission(m){
+  activeMission = m; document.getElementById('missionInfo').textContent = 'Mission: ' + m.id + ' → Pay GHS ' + m.pay;
+}
+document.getElementById('btnMissions').onclick = ()=> {
+  if(missions.length === 0){ createMission(); createMission(); createMission(); }
+  // for demo just accept first mission
+  if(missions[0]) acceptMission(missions[0]), showMsg('Accepted mission: ' + missions[0].id);
+};
+
+/* ---------- simple mission check (landing detection) ---------- */
+function checkMissions(){
+  if(!activeMission || !planeState) r

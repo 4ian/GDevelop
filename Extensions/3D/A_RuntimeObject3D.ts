@@ -97,6 +97,14 @@ namespace gdjs {
       oldObjectData: Object3DData,
       newObjectData: Object3DData
     ): boolean {
+      this.updateOriginalDimensionsFromObjectData(oldObjectData, newObjectData);
+      return true;
+    }
+
+    updateOriginalDimensionsFromObjectData(
+      oldObjectData: Object3DData,
+      newObjectData: Object3DData
+    ): void {
       // There is no need to check if they changed because events can't modify them.
       this._setOriginalWidth(
         getValidDimensionValue(newObjectData.content.width)
@@ -107,7 +115,6 @@ namespace gdjs {
       this._setOriginalDepth(
         getValidDimensionValue(newObjectData.content.depth)
       );
-      return true;
     }
 
     getNetworkSyncData(): Object3DNetworkSyncData {

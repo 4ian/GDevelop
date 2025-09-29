@@ -152,6 +152,13 @@ namespace gdjs {
       }
     }
 
+    override updateOriginalDimensionsFromObjectData(
+      oldObjectData: Object3DData,
+      newObjectData: Object3DData
+    ): void {
+      // Noting to do because it's handled by `_updateModel`
+    }
+
     updateFromObjectData(
       oldObjectData: Model3DObjectData,
       newObjectData: Model3DObjectData
@@ -273,14 +280,17 @@ namespace gdjs {
       const rotationX = objectData.content.rotationX || 0;
       const rotationY = objectData.content.rotationY || 0;
       const rotationZ = objectData.content.rotationZ || 0;
+      const width = objectData.content.width || 100;
+      const height = objectData.content.height || 100;
+      const depth = objectData.content.depth || 100;
       const keepAspectRatio = objectData.content.keepAspectRatio;
       this._renderer._updateModel(
         rotationX,
         rotationY,
         rotationZ,
-        this.getOriginalWidth(),
-        this.getOriginalHeight(),
-        this.getOriginalDepth(),
+        width,
+        height,
+        depth,
         keepAspectRatio
       );
     }

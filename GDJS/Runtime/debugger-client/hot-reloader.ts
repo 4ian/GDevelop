@@ -386,7 +386,7 @@ namespace gdjs {
         // It can't actually happen.
         this._logs.push({
           kind: 'error',
-          message: "Can't hot-reload as no scene are opened.",
+          message: "Can't hot-reload as no scene is opened.",
         });
         return;
       }

@@ -815,7 +815,7 @@ namespace gdjs {
       changedRuntimeBehaviors: ChangedRuntimeBehavior[],
       runtimeInstanceContainer: gdjs.RuntimeInstanceContainer
     ): void {
-      if (!oldLayoutData.objects || newLayoutData.objects) {
+      if (!oldLayoutData.objects || !newLayoutData.objects) {
         // It can happen when `hotReloadRuntimeInstances` is executed.
         // `hotReloadRuntimeInstances` doesn't resolve the custom objects
         // because it can only modify the 1st level of instances.

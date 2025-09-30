@@ -271,17 +271,24 @@ namespace gdjs {
         } else if (data.command === 'profiler.stop') {
           runtimeGame.stopCurrentSceneProfiler();
         } else if (data.command === 'hotReload') {
-          this._hasLoggedUncaughtException = false;
-          that._hotReloader
-            .hotReload({
-              projectData: data.payload.projectData,
-              runtimeGameOptions: data.payload.runtimeGameOptions,
-              shouldReloadResources:
-                data.payload.shouldReloadResources || false,
-            })
-            .then((logs) => {
-              that.sendHotReloaderLogs(logs);
-            });
+          const runtimeGameOptions: RuntimeGameOptions =
+            data.payload.runtimeGameOptions;
+          if (
+            (runtimeGameOptions.initialRuntimeGameStatus?.isInGameEdition ||
+              false) === runtimeGame.isInGameEdition()
+          ) {
+            this._hasLoggedUncaughtException = false;
+            that._hotReloader
+              .hotReload({
+                projectData: data.payload.projectData,
+                runtimeGameOptions,
+                shouldReloadResources:
+                  data.payload.shouldReloadResources || false,
+              })
+              .then((logs) => {
+                that.sendHotReloaderLogs(logs);
+              });
+          }
         } else if (data.command === 'hotReloadObjects') {
           if (inGameEditor) {
             const editedInstanceContainer =

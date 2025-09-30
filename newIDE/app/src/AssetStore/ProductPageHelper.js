@@ -583,6 +583,7 @@ export const PurchaseProductButtons = <
   onClickBuy,
   onClickBuyWithCredits,
   customLabel,
+  fullWidth,
 }: {|
   productListingData: T,
   selectedUsageType: string,
@@ -593,6 +594,7 @@ export const PurchaseProductButtons = <
   onClickBuy: () => void | Promise<void>,
   onClickBuyWithCredits?: () => void | Promise<void>,
   customLabel?: React.Node,
+  fullWidth?: boolean,
 |}) => {
   const { authenticated } = React.useContext(AuthenticatedUserContext);
   const shouldUseOrSimulateAppStoreProduct =
@@ -649,6 +651,15 @@ export const PurchaseProductButtons = <
         </Text>
       )}
     </LineStackLayout>
+  ) : fullWidth && !creditPrice ? (
+    <RaisedButton
+      primary
+      label={customLabel || <Trans>Buy for {formattedProductPriceText}</Trans>}
+      onClick={onClickBuy}
+      id={`buy-${productType}`}
+      size="medium"
+      fullWidth={fullWidth}
+    />
   ) : (
     <LineStackLayout noMargin>
       {creditPrice && (

@@ -22,9 +22,11 @@ type Props = {|
 
 const StandaloneDialog = ({ onClose }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const { routeArguments, removeRouteArguments } = React.useContext(
-    RouterContext
-  );
+  const {
+    routeArguments,
+    removeRouteArguments,
+    navigateToRoute,
+  } = React.useContext(RouterContext);
   const { getSubscriptionPlansWithPricingSystems } = useSubscriptionPlans({
     authenticatedUser,
     includeLegacy: false,
@@ -96,6 +98,13 @@ const StandaloneDialog = ({ onClose }: Props) => {
           courses={courses}
           getCourseCompletion={getCourseCompletion}
           noActions
+          simpleCheckout
+          onPurchaseDone={() => {
+            navigateToRoute('learn', {
+              bundle: selectedBundleListingData.id,
+            });
+            onClose();
+          }}
         />
       )}
     </Dialog>

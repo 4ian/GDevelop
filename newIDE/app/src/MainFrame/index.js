@@ -194,12 +194,13 @@ import { QuickCustomizationDialog } from '../QuickCustomization/QuickCustomizati
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
-import useHomepageWitchForRouting from './UseHomepageWitchForRouting';
+import useOpenPageForRouting from './useOpenPageForRouting';
 import RobotIcon from '../ProjectCreation/RobotIcon';
 import PublicProfileContext from '../Profile/PublicProfileContext';
 import { useGamesPlatformFrame } from './EditorContainers/HomePage/PlaySection/UseGamesPlatformFrame';
 import { useExtensionLoadErrorDialog } from '../Utils/UseExtensionLoadErrorDialog';
 import { PanesContainer } from './PanesContainer';
+import StandaloneDialog from './StandAloneDialog';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -402,6 +403,10 @@ const MainFrame = (props: Props) => {
     shareDialogInitialTab,
     setShareDialogInitialTab,
   ] = React.useState<?ShareTab>(null);
+  const [
+    standaloneDialogOpen,
+    setStandaloneDialogOpen,
+  ] = React.useState<boolean>(false);
   const { showConfirmation, showAlert } = useAlertDialog();
   const preferences = React.useContext(PreferencesContext);
   const { setHasProjectOpened } = preferences;
@@ -2086,8 +2091,16 @@ const MainFrame = (props: Props) => {
     setShareDialogOpen(false);
   }, []);
 
-  const { navigateToRoute } = useHomepageWitchForRouting({
+  const openStandaloneDialog = React.useCallback(
+    () => {
+      setStandaloneDialogOpen(true);
+    },
+    [setStandaloneDialogOpen]
+  );
+
+  const { navigateToRoute } = useOpenPageForRouting({
     openHomePage,
+    openStandaloneDialog,
     closeDialogs: closeDialogsToOpenHomePage,
   });
 
@@ -4244,7 +4257,9 @@ const MainFrame = (props: Props) => {
           onClose={() => setDiagnosticReportDialogOpen(false)}
         />
       )}
-
+      {standaloneDialogOpen && (
+        <StandaloneDialog onClose={() => setStandaloneDialogOpen(false)} />
+      )}
       {quickCustomizationDialogOpenedFromGameId && currentProject && (
         <QuickCustomizationDialog
           project={currentProject}

@@ -132,6 +132,7 @@ type Props = {|
   courseListingData: ?CourseListingData,
   onClick?: () => void,
   discountedPrice?: boolean,
+  disabled?: boolean,
 |};
 
 const CourseCard = ({
@@ -140,6 +141,7 @@ const CourseCard = ({
   courseListingData,
   onClick,
   discountedPrice,
+  disabled,
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const specializationConfig = getSpecializationConfig(
@@ -148,8 +150,8 @@ const CourseCard = ({
   return (
     <I18n>
       {({ i18n }) => (
-        <CardWidget onClick={onClick} size={'large'}>
-          {course && courseListingData && onClick ? (
+        <CardWidget onClick={disabled ? undefined : onClick} size={'large'}>
+          {course && courseListingData ? (
             <Column expand noMargin noOverflowParent>
               <div style={styles.imageContainer}>
                 <img

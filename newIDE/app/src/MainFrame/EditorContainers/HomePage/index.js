@@ -44,6 +44,7 @@ import PreferencesContext from '../../Preferences/PreferencesContext';
 import useSubscriptionPlans from '../../../Utils/UseSubscriptionPlans';
 import { BundleStoreContext } from '../../../AssetStore/Bundles/BundleStoreContext';
 import { type CreateProjectResult } from '../../../Utils/UseCreateProject';
+import { CreditsPackageStoreContext } from '../../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 
 const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
   if (
@@ -236,6 +237,9 @@ export const HomePage = React.memo<Props>(
         fetchGameTemplates,
         shop: { setInitialGameTemplateUserFriendlySlug },
       } = React.useContext(PrivateGameTemplateStoreContext);
+      const { fetchCreditsPackages } = React.useContext(
+        CreditsPackageStoreContext
+      );
       const [openedGameId, setOpenedGameId] = React.useState<?string>(null);
       const {
         games,
@@ -413,12 +417,14 @@ export const HomePage = React.memo<Props>(
           fetchGameTemplates();
           fetchTutorials();
           fetchBundles();
+          fetchCreditsPackages();
         },
         [
           fetchExamplesAndFilters,
           fetchTutorials,
           fetchGameTemplates,
           fetchBundles,
+          fetchCreditsPackages,
         ]
       );
 
@@ -640,11 +646,6 @@ export const HomePage = React.memo<Props>(
                       getSubscriptionPlansWithPricingSystems={
                         getSubscriptionPlansWithPricingSystems
                       }
-                      receivedCourses={
-                        courses
-                          ? courses.filter(course => !course.isLocked)
-                          : undefined
-                      }
                       clearInitialBundleValues={() => {
                         setInitialBundleUserFriendlySlugForLearn(null);
                         setInitialBundleCategoryForLearn(null);
@@ -673,11 +674,6 @@ export const HomePage = React.memo<Props>(
                         onSelectCourse(courseId);
                         setActiveTab('learn');
                       }}
-                      receivedCourses={
-                        courses
-                          ? courses.filter(course => !course.isLocked)
-                          : undefined
-                      }
                       courses={courses}
                       getCourseCompletion={getCourseCompletion}
                       getSubscriptionPlansWithPricingSystems={

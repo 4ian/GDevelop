@@ -1,7 +1,10 @@
 // @flow
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
-import { type BundleListingData } from '../../Utils/GDevelopServices/Shop';
+import {
+  getStripeCheckoutUrl,
+  type BundleListingData,
+} from '../../Utils/GDevelopServices/Shop';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import CreateProfile from '../../Profile/CreateProfile';
@@ -28,6 +31,8 @@ type Props = {|
   usageType: string,
   onClose: () => void,
   simulateAppStoreProduct?: boolean,
+  simpleCheckout?: boolean,
+  onPurchaseDone?: () => void,
 |};
 
 const BundlePurchaseDialog = ({
@@ -35,6 +40,8 @@ const BundlePurchaseDialog = ({
   usageType,
   onClose,
   simulateAppStoreProduct,
+  simpleCheckout,
+  onPurchaseDone,
 }: Props) => {
   const {
     profile,
@@ -91,13 +98,21 @@ const BundlePurchaseDialog = ({
     // Purchase with web.
     try {
       setIsPurchasing(true);
-      const checkoutUrl = getPurchaseCheckoutUrl({
-        productId: bundleListingData.id,
-        priceName: price.name,
-        userId: profile.id,
-        userEmail: profile.email,
-        ...(password ? { password } : undefined),
-      });
+      const checkoutUrl = simpleCheckout
+        ? getStripeCheckoutUrl({
+            productId: bundleListingData.id,
+            priceName: price.name,
+            userId: profile.id,
+            userEmail: profile.email,
+            ...(password ? { password } : undefined),
+          })
+        : getPurchaseCheckoutUrl({
+            productId: bundleListingData.id,
+            priceName: price.name,
+            userId: profile.id,
+            userEmail: profile.email,
+            ...(password ? { password } : undefined),
+          });
       Window.openExternalURL(checkoutUrl);
     } catch (error) {
       const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
@@ -155,6 +170,7 @@ const BundlePurchaseDialog = ({
           // We found the purchase, the user has bought the bundle.
           // We do not close the dialog yet, as we need to trigger a refresh of the products received.
           await onPurchaseSuccessful();
+          if (onPurchaseDone) onPurchaseDone();
         }
       };
       checkIfPurchaseIsDone();
@@ -164,6 +180,7 @@ const BundlePurchaseDialog = ({
       bundlePurchases,
       bundleListingData,
       onPurchaseSuccessful,
+      onPurchaseDone,
       onRefreshBundlePurchases,
     ]
   );

@@ -13,7 +13,8 @@ export type Route =
   | 'create' // New way of opening the build section
   | 'education'
   | 'learn'
-  | 'play';
+  | 'play'
+  | 'standalone';
 type RouteKey =
   | 'initial-dialog'
   | 'game-id'

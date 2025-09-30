@@ -2076,10 +2076,27 @@ const MainFrame = (props: Props) => {
 
   const launchNewPreview = React.useCallback(
     async options => {
+      const launchCaptureOptions =
+        currentProject && !hasNonEditionPreviewsRunning
+          ? // TODO Rename it getPreviewLaunchCaptureOptions
+            getHotReloadPreviewLaunchCaptureOptions(
+              currentProject.getProjectUuid()
+            )
+          : undefined;
+
       const numberOfWindows = options ? options.numberOfWindows : 1;
-      await launchPreview({ networkPreview: false, numberOfWindows });
+      await launchPreview({
+        networkPreview: false,
+        numberOfWindows,
+        launchCaptureOptions,
+      });
     },
-    [launchPreview]
+    [
+      currentProject,
+      launchPreview,
+      getHotReloadPreviewLaunchCaptureOptions,
+      hasNonEditionPreviewsRunning,
+    ]
   );
 
   const launchHotReloadPreview = React.useCallback(

@@ -45,14 +45,18 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
           .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
 
   aut.AddExpressionAndConditionAndAction(
-      "number",
-      "ExtraBorder",
-      _("Additional border (extra distance before deletion)"),
-      _("the extra distance (in pixels) the object must "
-        "travel beyond the screen before it gets deleted."),
-      _("the additional border"),
-      _("Destroy outside configuration"),
-      "CppPlatform/Extensions/destroyoutsideicon24.png");
+         "number",
+         "ExtraBorder",
+         _("Additional border (extra distance before deletion)"),
+         _("the extra distance (in pixels) the object must "
+           "travel beyond the screen before it gets deleted"),
+         _("the additional border"),
+         _("Destroy outside configuration"),
+         "CppPlatform/Extensions/destroyoutsideicon24.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("behavior", _("Behavior"), "DestroyOutside")
+      .UseStandardParameters("number", gd::ParameterOptions::MakeNewOptions())
+      .MarkAsAdvanced();
 
   // Deprecated:
   aut.AddDuplicatedAction("ExtraBorder", "DestroyOutside::SetExtraBorder")
@@ -61,13 +65,18 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
       .SetHidden();
 
   aut.AddExpressionAndConditionAndAction(
-      "number",
-      "UnseenGraceDistance",
-      _("Unseen object grace distance"),
-      _("the grace distance (in pixels) before deleting the object if it has "
-        "never been visible on the screen. Useful to avoid objects being "
-        "deleted before they are visible when they spawn."),
-      _("the unseen grace distance"),
-      _("Destroy outside configuration"),
-      "CppPlatform/Extensions/destroyoutsideicon24.png");
+         "number",
+         "UnseenGraceDistance",
+         _("Unseen object grace distance"),
+         _("the grace distance (in pixels) before deleting the object if it "
+           "has "
+           "never been visible on the screen. Useful to avoid objects being "
+           "deleted before they are visible when they spawn"),
+         _("the unseen grace distance"),
+         _("Destroy outside configuration"),
+         "CppPlatform/Extensions/destroyoutsideicon24.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("behavior", _("Behavior"), "DestroyOutside")
+      .UseStandardParameters("number", gd::ParameterOptions::MakeNewOptions())
+      .MarkAsAdvanced();
 }

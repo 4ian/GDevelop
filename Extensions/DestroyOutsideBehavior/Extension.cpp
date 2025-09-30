@@ -6,6 +6,7 @@ This project is released under the MIT License.
 */
 
 #include "DestroyOutsideBehavior.h"
+#include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/BehaviorsSharedData.h"
 #include "GDCore/Tools/Localization.h"
@@ -19,11 +20,10 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
             "outside of the bounds of the 2D camera. Useful for 2D bullets or "
             "other short-lived objects. Don't use it for 3D objects in a "
             "FPS/TPS game or any game with a camera not being a top view "
-            "(for 3D objects, prefer comparing "
-            "the position, for example Z position to see if an object goes "
-            "outside of the bound of the map). Be careful when using this "
-            "behavior because if the object appears outside of the screen, it "
-            "will be immediately removed."),
+            "(for 3D objects, prefer comparing the position, for example Z "
+            "position to see if an object goes outside of the bound of the "
+            "map). If the object appears outside of the screen, it's not "
+            "removed unless it goes beyond the unseen object grace distance."),
           "Florian Rival",
           "Open source (MIT License)")
       .SetCategory("Game mechanic")
@@ -44,34 +44,30 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
                        std::shared_ptr<gd::BehaviorsSharedData>())
           .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
 
-  aut.AddCondition("ExtraBorder",
-                   _("Additional border (extra distance before deletion)"),
-                   _("Compare the extra distance (in pixels) the object must "
-                     "travel beyond the screen before it gets deleted."),
-                   _("the additional border"),
-                   _("Destroy outside configuration"),
-                   "CppPlatform/Extensions/destroyoutsideicon24.png",
-                   "CppPlatform/Extensions/destroyoutsideicon16.png")
-      .AddParameter("object", _("Object"))
-      .AddParameter("behavior", _("Behavior"), "DestroyOutside")
-      .UseStandardRelationalOperatorParameters(
-          "number", gd::ParameterOptions::MakeNewOptions())
-      .MarkAsAdvanced()
-      .SetFunctionName("GetExtraBorder");
+  aut.AddExpressionAndConditionAndAction(
+      "number",
+      "ExtraBorder",
+      _("Additional border (extra distance before deletion)"),
+      _("the extra distance (in pixels) the object must "
+        "travel beyond the screen before it gets deleted."),
+      _("the additional border"),
+      _("Destroy outside configuration"),
+      "CppPlatform/Extensions/destroyoutsideicon24.png");
 
-  aut.AddAction("ExtraBorder",
-                _("Additional border (extra distance before deletion)"),
-                _("Change the extra distance (in pixels) the object must "
-                  "travel beyond the screen before it gets deleted."),
-                _("the additional border"),
-                _("Destroy outside configuration"),
-                "CppPlatform/Extensions/destroyoutsideicon24.png",
-                "CppPlatform/Extensions/destroyoutsideicon16.png")
-      .AddParameter("object", _("Object"))
-      .AddParameter("behavior", _("Behavior"), "DestroyOutside")
-      .UseStandardOperatorParameters("number",
-                                     gd::ParameterOptions::MakeNewOptions())
-      .MarkAsAdvanced()
-      .SetFunctionName("SetExtraBorder")
-      .SetGetter("GetExtraBorder");
+  // Deprecated:
+  aut.AddDuplicatedAction("ExtraBorder", "DestroyOutside::SetExtraBorder")
+      .SetHidden();
+  aut.AddDuplicatedCondition("ExtraBorder", "DestroyOutside::ExtraBorder")
+      .SetHidden();
+
+  aut.AddExpressionAndConditionAndAction(
+      "number",
+      "UnseenGraceDistance",
+      _("Unseen object grace distance"),
+      _("the grace distance (in pixels) before deleting the object if it has "
+        "never been visible on the screen. Useful to avoid objects being "
+        "deleted before they are visible when they spawn."),
+      _("the unseen grace distance"),
+      _("Destroy outside configuration"),
+      "CppPlatform/Extensions/destroyoutsideicon24.png");
 }

@@ -84,7 +84,6 @@ type Props = {|
   ) => void,
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
   getSubscriptionPlansWithPricingSystems: () => Array<SubscriptionPlanWithPricingSystems> | null,
-  receivedCourses: ?Array<Course>,
   initialBundleUserFriendlySlug: ?string,
   initialBundleCategory: ?string,
   clearInitialBundleValues: () => void,
@@ -114,7 +113,6 @@ const LearnSection = ({
   onSelectPrivateGameTemplateListingData,
   onSelectExampleShortHeader,
   getSubscriptionPlansWithPricingSystems,
-  receivedCourses,
   initialBundleUserFriendlySlug,
   initialBundleCategory,
   clearInitialBundleValues,
@@ -296,7 +294,6 @@ const LearnSection = ({
         onBundleOpen={onOpenBundle}
         onCourseOpen={onOpenCourse}
         courses={courses}
-        receivedCourses={receivedCourses}
         getCourseCompletion={getCourseCompletion}
       />
     );

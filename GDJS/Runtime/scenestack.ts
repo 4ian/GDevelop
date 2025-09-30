@@ -6,6 +6,7 @@ namespace gdjs {
     sceneName: string;
     externalLayoutName?: string;
     skipCreatingInstancesFromScene?: boolean;
+    skipStoppingSoundsOnStartup?: boolean;
   }
 
   interface ReplaceSceneOptions extends PushSceneOptions {
@@ -142,7 +143,6 @@ namespace gdjs {
       deprecatedExternalLayoutName?: string
     ): gdjs.RuntimeScene | null {
       this._throwIfDisposed();
-      console.log({ options, deprecatedExternalLayoutName });
 
       const sceneName =
         typeof options === 'string' ? options : options.sceneName;
@@ -150,6 +150,10 @@ namespace gdjs {
         typeof options === 'string'
           ? false
           : options.skipCreatingInstancesFromScene;
+      const skipStoppingSoundsOnStartup =
+        typeof options === 'string'
+          ? false
+          : options.skipStoppingSoundsOnStartup;
       const externalLayoutName =
         deprecatedExternalLayoutName ||
         (typeof options === 'string' ? undefined : options.externalLayoutName);
@@ -167,6 +171,7 @@ namespace gdjs {
           sceneName,
           externalLayoutName,
           skipCreatingInstancesFromScene,
+          skipStoppingSoundsOnStartup,
         });
       }
 
@@ -176,6 +181,7 @@ namespace gdjs {
           sceneName,
           externalLayoutName,
           skipCreatingInstancesFromScene,
+          skipStoppingSoundsOnStartup,
         });
         this._isNextLayoutLoading = false;
       });
@@ -192,6 +198,7 @@ namespace gdjs {
         this._runtimeGame.getSceneAndExtensionsData(options.sceneName),
         {
           skipCreatingInstances: options.skipCreatingInstancesFromScene,
+          skipStoppingSoundsOnStartup: options.skipStoppingSoundsOnStartup,
         }
       );
       this._wasFirstSceneLoaded = true;
@@ -271,6 +278,11 @@ namespace gdjs {
       return this._wasFirstSceneLoaded;
     }
 
+    getAllScenes(): Array<gdjs.RuntimeScene> {
+      this._throwIfDisposed();
+      return this._stack;
+    }
+
     getAllSceneNames(): Array<string> {
       this._throwIfDisposed();
       return this._stack.map((scene) => scene.getName());
@@ -311,7 +323,9 @@ namespace gdjs {
       this._sceneStackSyncDataToApply = sceneStackSyncData;
     }
 
-    applyUpdateFromNetworkSyncDataIfAny(): boolean {
+    applyUpdateFromNetworkSyncDataIfAny(
+      options?: UpdateFromNetworkSyncDataOptions
+    ): boolean {
       this._throwIfDisposed();
       const sceneStackSyncData = this._sceneStackSyncDataToApply;
       let hasMadeChangeToStack = false;
@@ -319,6 +333,32 @@ namespace gdjs {
 
       this._sceneStackSyncDataToApply = null;
 
+      const skipCreatingInstancesFromScene =
+        !!options && !!options.preventInitialInstancesCreation;
+      const skipStoppingSoundsOnStartup =
+        !!options && !!options.preventSoundsStoppingOnStartup;
+
+      if (options && options.clearSceneStack) {
+        while (this._stack.length !== 0) {
+          let scene = this._stack.pop();
+          if (scene) {
+            scene.unloadScene();
+          }
+        }
+        for (let i = 0; i < sceneStackSyncData.length; ++i) {
+          const sceneSyncData = sceneStackSyncData[i];
+          const newScene = this.push({
+            sceneName: sceneSyncData.name,
+            skipCreatingInstancesFromScene,
+            skipStoppingSoundsOnStartup,
+          });
+          if (newScene) {
+            newScene.networkId = sceneSyncData.networkId;
+          }
+        }
+        hasMadeChangeToStack = true;
+        return hasMadeChangeToStack;
+      }
       // If this method is called, we are a client.
       // We trust the host to be the source of truth for the scene stack.
       // So we loop through the scenes in the stack given by the host and either:
@@ -328,12 +368,16 @@ namespace gdjs {
       for (let i = 0; i < sceneStackSyncData.length; ++i) {
         const sceneSyncData = sceneStackSyncData[i];
         const sceneAtThisPositionInOurStack = this._stack[i];
+
         if (!sceneAtThisPositionInOurStack) {
           debugLogger.info(
             `Scene at position ${i} with name ${sceneSyncData.name} is missing from the stack, adding it.`
           );
           // We have fewer scenes in the stack than the host, let's add the scene.
-          const newScene = this.push(sceneSyncData.name);
+          const newScene = this.push({
+            sceneName: sceneSyncData.name,
+            skipCreatingInstancesFromScene,
+          });
           if (newScene) {
             newScene.networkId = sceneSyncData.networkId;
           }
@@ -350,10 +394,12 @@ namespace gdjs {
           );
           // The scene does not correspond to the scene at this position in our stack
           // Let's unload everything after this position to recreate the stack.
-          const newScene = this.replace(
-            sceneSyncData.name,
-            true // Clear the stack
-          );
+
+          const newScene = this.replace({
+            sceneName: sceneSyncData.name,
+            clear: true,
+            skipCreatingInstancesFromScene,
+          });
           if (newScene) {
             newScene.networkId = sceneSyncData.networkId;
           }
@@ -393,10 +439,11 @@ namespace gdjs {
           // This can happen if the host has restarted the scene
           // We can't just update the networkId of the scene in the stack
           // We need to replace it with a new scene
-          const newScene = this.replace(
-            sceneSyncData.name,
-            false // Don't clear the stack
-          );
+          const newScene = this.replace({
+            sceneName: sceneSyncData.name,
+            clear: false,
+            skipCreatingInstancesFromScene,
+          });
           if (newScene) {
             newScene.networkId = sceneSyncData.networkId;
           }

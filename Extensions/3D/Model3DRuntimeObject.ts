@@ -8,6 +8,7 @@ namespace gdjs {
     anis: Model3DAnimation[];
     ai: integer;
     ass: float;
+    aet: float;
     ap: boolean;
     cfd: float;
   };
@@ -223,24 +224,28 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): Model3DObjectNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): Model3DObjectNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         mt: this._materialType,
         op: this._originPoint,
         cp: this._centerPoint,
         anis: this._animations,
         ai: this._currentAnimationIndex,
         ass: this._animationSpeedScale,
+        aet: this.getAnimationElapsedTime(),
         ap: this._animationPaused,
         cfd: this._crossfadeDuration,
       };
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: Model3DObjectNetworkSyncData
+      networkSyncData: Model3DObjectNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       if (networkSyncData.mt !== undefined) {
         this._materialType = networkSyncData.mt;
@@ -254,11 +259,14 @@ namespace gdjs {
       if (networkSyncData.anis !== undefined) {
         this._animations = networkSyncData.anis;
       }
+      if (networkSyncData.ass !== undefined) {
+        this.setAnimationSpeedScale(networkSyncData.ass);
+      }
       if (networkSyncData.ai !== undefined) {
         this.setAnimationIndex(networkSyncData.ai);
       }
-      if (networkSyncData.ass !== undefined) {
-        this.setAnimationSpeedScale(networkSyncData.ass);
+      if (networkSyncData.aet !== undefined) {
+        this.setAnimationElapsedTime(networkSyncData.aet);
       }
       if (networkSyncData.ap !== undefined) {
         if (networkSyncData.ap !== this.isAnimationPaused()) {

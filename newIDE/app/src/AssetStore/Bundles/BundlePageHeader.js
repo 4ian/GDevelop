@@ -68,6 +68,8 @@ type Props = {|
   bundle: Bundle,
   simulateAppStoreProduct?: boolean,
   i18n: I18nType,
+  simpleCheckout?: boolean,
+  onPurchaseDone?: () => void,
 |};
 
 const BundlePageHeader = ({
@@ -75,6 +77,8 @@ const BundlePageHeader = ({
   bundleListingData,
   simulateAppStoreProduct,
   i18n,
+  simpleCheckout,
+  onPurchaseDone,
 }: Props) => {
   const { privateGameTemplateListingDatas } = React.useContext(
     PrivateGameTemplateStoreContext
@@ -467,6 +471,7 @@ const BundlePageHeader = ({
                         isAlreadyReceived={isAlreadyReceived}
                         onClickBuy={onClickBuy}
                         onClickBuyWithCredits={() => {}}
+                        fullWidth
                         customLabel={
                           <Trans>
                             Buy now and save{' '}
@@ -502,6 +507,8 @@ const BundlePageHeader = ({
               bundleListingData={purchasingBundleListingData}
               usageType="default"
               onClose={() => setPurchasingBundleListingData(null)}
+              simpleCheckout={simpleCheckout}
+              onPurchaseDone={onPurchaseDone}
             />
           )}
           {isRedemptionCodesDialogOpen && (

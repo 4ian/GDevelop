@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import { type I18n as I18nType } from '@lingui/core';
 import {
   type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
@@ -35,7 +34,7 @@ import { type GameDetailsTab } from '../../../GameDashboard';
 import { canUseClassroomFeature } from '../../../Utils/GDevelopServices/Usage';
 import EducationMarketingSection from './EducationMarketingSection';
 import useEducationForm from './UseEducationForm';
-import { type NewProjectSetup } from '../../../ProjectCreation/NewProjectSetupDialog';
+import { type ExampleProjectSetup } from '../../../ProjectCreation/NewProjectSetupDialog';
 import { type ObjectWithContext } from '../../../ObjectsList/EnumerateObjects';
 import { type GamesList } from '../../../GameDashboard/UseGamesList';
 import { type GamesPlatformFrameTools } from './PlaySection/UseGamesPlatformFrame';
@@ -49,6 +48,7 @@ import {
   type HotReloadSteps,
 } from '../../../EmbeddedGame/EmbeddedGameFrame';
 import { type CreateProjectResult } from '../../../Utils/UseCreateProject';
+import { CreditsPackageStoreContext } from '../../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 
 const noop = () => {};
 
@@ -152,10 +152,7 @@ type Props = {|
   // Project creation
   onOpenNewProjectSetupDialog: () => void,
   onCreateProjectFromExample: (
-    exampleShortHeader: ExampleShortHeader,
-    newProjectSetup: NewProjectSetup,
-    i18n: I18nType,
-    isQuickCustomization?: boolean
+    exampleProjectSetup: ExampleProjectSetup
   ) => Promise<CreateProjectResult>,
   onOpenTemplateFromTutorial: (tutorialId: string) => Promise<void>,
   onOpenTemplateFromCourseChapter: (
@@ -251,6 +248,9 @@ export const HomePage = React.memo<Props>(
         fetchGameTemplates,
         shop: { setInitialGameTemplateUserFriendlySlug },
       } = React.useContext(PrivateGameTemplateStoreContext);
+      const { fetchCreditsPackages } = React.useContext(
+        CreditsPackageStoreContext
+      );
       const [openedGameId, setOpenedGameId] = React.useState<?string>(null);
       const {
         games,
@@ -428,12 +428,14 @@ export const HomePage = React.memo<Props>(
           fetchGameTemplates();
           fetchTutorials();
           fetchBundles();
+          fetchCreditsPackages();
         },
         [
           fetchExamplesAndFilters,
           fetchTutorials,
           fetchGameTemplates,
           fetchBundles,
+          fetchCreditsPackages,
         ]
       );
 
@@ -624,11 +626,6 @@ export const HomePage = React.memo<Props>(
                       getSubscriptionPlansWithPricingSystems={
                         getSubscriptionPlansWithPricingSystems
                       }
-                      receivedCourses={
-                        courses
-                          ? courses.filter(course => !course.isLocked)
-                          : undefined
-                      }
                       clearInitialBundleValues={() => {
                         setInitialBundleUserFriendlySlugForLearn(null);
                         setInitialBundleCategoryForLearn(null);
@@ -657,11 +654,6 @@ export const HomePage = React.memo<Props>(
                         onSelectCourse(courseId);
                         setActiveTab('learn');
                       }}
-                      receivedCourses={
-                        courses
-                          ? courses.filter(course => !course.isLocked)
-                          : undefined
-                      }
                       courses={courses}
                       getCourseCompletion={getCourseCompletion}
                       getSubscriptionPlansWithPricingSystems={

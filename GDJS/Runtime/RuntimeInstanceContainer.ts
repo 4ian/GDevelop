@@ -631,7 +631,7 @@ namespace gdjs {
 
     /**
      * Create a new object from its name. The object is also added to the instances
-     * living in the container (No need to call {@link gdjs.RuntimeScene.addObject})
+     * living in the container (No need to call {@link addObject})
      * @param objectName The name of the object to be created
      * @return The created object
      */

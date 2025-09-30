@@ -27,7 +27,6 @@ type Props = {|
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   getSubscriptionPlansWithPricingSystems: () => Array<SubscriptionPlanWithPricingSystems> | null,
   onCourseOpen: (courseId: string) => void,
-  receivedCourses?: ?Array<Course>,
   courses?: ?Array<Course>,
   getCourseCompletion: (courseId: string) => CourseCompletion | null,
 |};
@@ -40,7 +39,6 @@ const StoreSection = ({
   onExtensionInstalled,
   onCourseOpen,
   courses,
-  receivedCourses,
   getSubscriptionPlansWithPricingSystems,
   getCourseCompletion,
 }: Props) => {
@@ -98,7 +96,6 @@ const StoreSection = ({
         displayPromotions
         onOpenProfile={onOpenProfile}
         courses={courses}
-        receivedCourses={receivedCourses}
         onCourseOpen={onCourseOpen}
         getSubscriptionPlansWithPricingSystems={
           getSubscriptionPlansWithPricingSystems

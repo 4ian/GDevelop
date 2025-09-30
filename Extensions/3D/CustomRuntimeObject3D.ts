@@ -1,11 +1,15 @@
 namespace gdjs {
-  type CustomObject3DNetworkSyncDataType = CustomObjectNetworkSyncDataType & {
+  type CustomObject3DNetworkSyncDataType = {
     z: float;
     d: float;
     rx: float;
     ry: float;
     ifz: boolean;
+    ccz: float;
   };
+
+  type CustomObject3DNetworkSyncData = CustomObjectNetworkSyncData &
+    CustomObject3DNetworkSyncDataType;
 
   /**
    * Base class for 3D custom objects.
@@ -79,21 +83,25 @@ namespace gdjs {
       this.flipZ(!!initialInstanceData.flippedZ);
     }
 
-    getNetworkSyncData(): CustomObject3DNetworkSyncDataType {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): CustomObject3DNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         z: this.getZ(),
         d: this.getDepth(),
         rx: this.getRotationX(),
         ry: this.getRotationY(),
         ifz: this.isFlippedZ(),
+        ccz: this._customCenterZ,
       };
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: CustomObject3DNetworkSyncDataType
+      networkSyncData: CustomObject3DNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
       if (networkSyncData.z !== undefined) this.setZ(networkSyncData.z);
       if (networkSyncData.d !== undefined) this.setDepth(networkSyncData.d);
       if (networkSyncData.rx !== undefined)
@@ -101,6 +109,8 @@ namespace gdjs {
       if (networkSyncData.ry !== undefined)
         this.setRotationY(networkSyncData.ry);
       if (networkSyncData.ifz !== undefined) this.flipZ(networkSyncData.ifz);
+      if (networkSyncData.ccz !== undefined)
+        this._customCenterZ = networkSyncData.ccz;
     }
 
     /**

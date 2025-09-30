@@ -77,6 +77,7 @@ namespace gdjs {
 
     getNetworkSyncData(): TimerNetworkSyncData {
       return {
+        name: this._name,
         time: this._time,
         paused: this._paused,
       };

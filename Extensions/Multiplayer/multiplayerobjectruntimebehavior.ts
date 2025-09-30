@@ -278,7 +278,7 @@ namespace gdjs {
 
       const instanceNetworkId = this._getOrCreateInstanceNetworkId();
       const objectName = this.owner.getName();
-      const objectNetworkSyncData = this.owner.getNetworkSyncData();
+      const objectNetworkSyncData = this.owner.getNetworkSyncData({});
 
       // this._logToConsoleWithThrottle(
       //   `Synchronizing object ${this.owner.getName()} (instance ${
@@ -448,7 +448,7 @@ namespace gdjs {
           objectOwner: this.playerNumber,
           objectName,
           instanceNetworkId,
-          objectNetworkSyncData: this.owner.getNetworkSyncData(),
+          objectNetworkSyncData: this.owner.getNetworkSyncData({}),
           sceneNetworkId,
         });
       this._sendDataToPeersWithIncreasedClock(
@@ -598,7 +598,7 @@ namespace gdjs {
         debugLogger.info(
           'Sending update message to move the object immediately.'
         );
-        const objectNetworkSyncData = this.owner.getNetworkSyncData();
+        const objectNetworkSyncData = this.owner.getNetworkSyncData({});
         const {
           messageName: updateMessageName,
           messageData: updateMessageData,

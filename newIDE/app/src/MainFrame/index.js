@@ -178,6 +178,7 @@ import CloudStorageProvider from '../ProjectsStorage/CloudStorageProvider';
 import useCreateProject from '../Utils/UseCreateProject';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
+import { type NewProjectSetup } from '../ProjectCreation/NewProjectSetupDialog';
 import useEditorTabsStateSaving from './EditorTabs/UseEditorTabsStateSaving';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import useResourcesWatcher from './ResourcesWatcher';
@@ -194,12 +195,12 @@ import { QuickCustomizationDialog } from '../QuickCustomization/QuickCustomizati
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
-import useHomepageWitchForRouting from './UseHomepageWitchForRouting';
 import {
   EmbeddedGameFrame,
   setEditorHotReloadNeeded,
   isEditorHotReloadNeeded,
 } from '../EmbeddedGame/EmbeddedGameFrame';
+import useOpenPageForRouting from './useOpenPageForRouting';
 import RobotIcon from '../ProjectCreation/RobotIcon';
 import PublicProfileContext from '../Profile/PublicProfileContext';
 import { useGamesPlatformFrame } from './EditorContainers/HomePage/PlaySection/UseGamesPlatformFrame';
@@ -214,6 +215,7 @@ import {
   type PreviewInGameEditorTarget,
   type HotReloadSteps,
 } from '../EmbeddedGame/EmbeddedGameFrame';
+import StandaloneDialog from './StandAloneDialog';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -418,6 +420,10 @@ const MainFrame = (props: Props) => {
     shareDialogInitialTab,
     setShareDialogInitialTab,
   ] = React.useState<?ShareTab>(null);
+  const [
+    standaloneDialogOpen,
+    setStandaloneDialogOpen,
+  ] = React.useState<boolean>(false);
   const { showConfirmation, showAlert } = useAlertDialog();
   const preferences = React.useContext(PreferencesContext);
   const { setHasProjectOpened } = preferences;
@@ -2375,8 +2381,16 @@ const MainFrame = (props: Props) => {
     setShareDialogOpen(false);
   }, []);
 
-  const { navigateToRoute } = useHomepageWitchForRouting({
+  const openStandaloneDialog = React.useCallback(
+    () => {
+      setStandaloneDialogOpen(true);
+    },
+    [setStandaloneDialogOpen]
+  );
+
+  const { navigateToRoute } = useOpenPageForRouting({
     openHomePage,
+    openStandaloneDialog,
     closeDialogs: closeDialogsToOpenHomePage,
   });
 
@@ -3883,6 +3897,7 @@ const MainFrame = (props: Props) => {
         await createProjectFromTutorial(tutorialId, {
           storageProvider: emptyStorageProvider,
           saveAsLocation: null,
+          creationSource: 'in-app-tutorial',
           // Remaining will be set by the template.
         });
       } catch (error) {
@@ -3907,15 +3922,17 @@ const MainFrame = (props: Props) => {
       if (!projectIsClosed) {
         return;
       }
+      const newProjectSetup: NewProjectSetup = {
+        storageProvider: emptyStorageProvider,
+        saveAsLocation: null,
+        creationSource: 'course-chapter',
+        // Remaining will be set by the template.
+      };
       try {
         await createProjectFromCourseChapter({
           courseChapter,
           templateId,
-          newProjectSetup: {
-            storageProvider: emptyStorageProvider,
-            saveAsLocation: null,
-            // Remaining will be set by the template.
-          },
+          newProjectSetup,
         });
       } catch (error) {
         showErrorBox({
@@ -3996,6 +4013,7 @@ const MainFrame = (props: Props) => {
             {
               storageProvider: emptyStorageProvider,
               saveAsLocation: null,
+              creationSource: 'in-app-tutorial',
               // Remaining will be set by the template.
             }
           );
@@ -4781,7 +4799,9 @@ const MainFrame = (props: Props) => {
           onClose={() => setDiagnosticReportDialogOpen(false)}
         />
       )}
-
+      {standaloneDialogOpen && (
+        <StandaloneDialog onClose={() => setStandaloneDialogOpen(false)} />
+      )}
       {quickCustomizationDialogOpenedFromGameId && currentProject && (
         <QuickCustomizationDialog
           project={currentProject}

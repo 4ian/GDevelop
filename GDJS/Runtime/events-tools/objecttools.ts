@@ -622,6 +622,14 @@ namespace gdjs {
     }
   }
 
+  const logger = new gdjs.Logger('LongLivedObjectsLists');
+  export type LongLivedObjectsListNetworkSyncData = {
+    objectsLists: {
+      [objectName: string]: Array<string>;
+    };
+    localVariablesContainers: Array<Array<VariableNetworkSyncData>>;
+  };
+
   /**
    * A container for objects lists that should last more than the current frame.
    * It automatically removes objects that were destroyed from the objects lists.
@@ -694,6 +702,86 @@ namespace gdjs {
       variablesContainers: Array<gdjs.VariablesContainer>
     ): void {
       gdjs.copyArray(variablesContainers, this.localVariablesContainers);
+    }
+
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): LongLivedObjectsListNetworkSyncData {
+      const objectsLists: {
+        [objectName: string]: Array<string>;
+      } = {};
+      for (const [objectName, runtimeObjects] of this.objectsLists.entries()) {
+        const objectNetworkIds: Array<string> = [];
+        for (const runtimeObject of runtimeObjects) {
+          const objectNetworkId = runtimeObject.getNetworkId();
+          if (!objectNetworkId) {
+            logger.warn(
+              'Tried to get sync data of a LongLivedObjectsList and found an object without a network ID'
+            );
+            continue;
+          }
+          objectNetworkIds.push(objectNetworkId);
+        }
+        objectsLists[objectName] = objectNetworkIds;
+      }
+      return {
+        objectsLists,
+        localVariablesContainers: this.localVariablesContainers.map(
+          (container) => container.getNetworkSyncData(syncOptions)
+        ),
+      };
+    }
+
+    updateFromNetworkSyncData(
+      syncData: LongLivedObjectsListNetworkSyncData,
+      runtimeScene: gdjs.RuntimeScene,
+      syncOptions: UpdateFromNetworkSyncDataOptions
+    ) {
+      const { objectsLists, localVariablesContainers } = syncData;
+
+      // Clear the current state.
+      this.objectsLists.clear();
+      this.localVariablesContainers.length = 0;
+
+      // Restore the list of objects.
+      for (const [objectName, objectNetworkIds] of Object.entries(
+        objectsLists
+      )) {
+        const runtimeObjects = runtimeScene.getObjects(objectName);
+        if (!runtimeObjects) {
+          logger.warn(
+            'Tried to update sync data of a LongLivedObjectsList but cannot find objects with name: ' +
+              objectName
+          );
+          continue;
+        }
+
+        const runtimeObjectsFromSyncData = runtimeObjects.filter(
+          (runtimeObject) => {
+            const runtimeObjectNetworkId = runtimeObject.getNetworkId();
+            return (
+              !!runtimeObjectNetworkId &&
+              objectNetworkIds.includes(runtimeObjectNetworkId)
+            );
+          }
+        );
+
+        for (const runtimeObject of runtimeObjectsFromSyncData) {
+          this.addObject(objectName, runtimeObject);
+        }
+      }
+
+      // Restore the local variables containers.
+      this.localVariablesContainers = localVariablesContainers.map(
+        (localVariablesContainer) => {
+          const newContainer = new gdjs.VariablesContainer();
+          newContainer.updateFromNetworkSyncData(
+            localVariablesContainer,
+            syncOptions
+          );
+          return newContainer;
+        }
+      );
     }
   }
 }

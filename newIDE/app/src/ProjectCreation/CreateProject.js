@@ -1,14 +1,14 @@
 // @flow
 import { t } from '@lingui/macro';
-import { type I18n as I18nType } from '@lingui/core';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
-import {
-  getExample,
-  type ExampleShortHeader,
-} from '../Utils/GDevelopServices/Example';
+import { getExample } from '../Utils/GDevelopServices/Example';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
 import { showErrorBox } from '../UI/Messages/MessageBox';
+import {
+  type ExampleProjectSetup,
+  type NewProjectCreationSource,
+} from './NewProjectSetupDialog';
 const gd: libGDevelop = global.gd;
 
 export type NewProjectSource = {|
@@ -63,10 +63,36 @@ export const addDefaultLightToAllLayers = (layout: gdLayout): void => {
   }
 };
 
-export const createNewEmptyProject = (): NewProjectSource => {
+const getCompositeSlug = (
+  creationSource: NewProjectCreationSource,
+  exampleShortHeaderSlug: string
+) => {
+  if (creationSource === 'quick-customization')
+    return `qc-${exampleShortHeaderSlug}`;
+  if (creationSource === 'ai-agent-request')
+    return `ai-${exampleShortHeaderSlug}`;
+  if (creationSource === 'course-chapter')
+    return `course-${exampleShortHeaderSlug}`;
+  if (creationSource === 'in-app-tutorial')
+    return `in-app-tutorial-${exampleShortHeaderSlug}`;
+  return exampleShortHeaderSlug; // 'default'.
+};
+
+export const createNewEmptyProject = ({
+  creationSource,
+}: {|
+  creationSource: NewProjectCreationSource,
+|}): NewProjectSource => {
   const project: gdProject = gd.ProjectHelper.createNewGDJSProject();
 
-  sendNewGameCreated({ exampleUrl: '', exampleSlug: '' });
+  const exampleSlug = 'empty-project';
+
+  sendNewGameCreated({
+    exampleUrl: '',
+    exampleSlug,
+    creationSource,
+    exampleCompositeSlug: getCompositeSlug(creationSource, exampleSlug),
+  });
   return {
     project,
     storageProvider: null,
@@ -81,6 +107,8 @@ export const createNewProjectFromTutorialTemplate = (
   sendNewGameCreated({
     exampleUrl: tutorialTemplateUrl,
     exampleSlug: tutorialId,
+    creationSource: 'in-app-tutorial',
+    exampleCompositeSlug: getCompositeSlug('in-app-tutorial', tutorialId),
   });
   const newProjectSource = getNewProjectSourceFromUrl(tutorialTemplateUrl);
   newProjectSource.templateSlug = tutorialId;
@@ -94,7 +122,8 @@ export const createNewProjectFromCourseChapterTemplate = (
   sendNewGameCreated({
     exampleUrl: templateUrl,
     exampleSlug: courseChapterId,
-    isCourseChapterTemplate: true,
+    creationSource: 'course-chapter',
+    exampleCompositeSlug: getCompositeSlug('course-chapter', courseChapterId),
   });
   const newProjectSource = getNewProjectSourceFromUrl(templateUrl);
   newProjectSource.templateSlug = courseChapterId;
@@ -108,6 +137,8 @@ export const createNewProjectFromPrivateGameTemplate = (
   sendNewGameCreated({
     exampleUrl: privateGameTemplateUrl,
     exampleSlug: privateGameTemplateTag,
+    creationSource: 'default',
+    exampleCompositeSlug: getCompositeSlug('default', privateGameTemplateTag),
   });
   const newProjectSource = getNewProjectSourceFromUrl(privateGameTemplateUrl);
   newProjectSource.templateSlug = privateGameTemplateTag;
@@ -117,20 +148,20 @@ export const createNewProjectFromPrivateGameTemplate = (
 export const createNewProjectFromExampleShortHeader = async ({
   i18n,
   exampleShortHeader,
-  isQuickCustomization,
-}: {|
-  i18n: I18nType,
-  exampleShortHeader: ExampleShortHeader,
-  isQuickCustomization?: boolean,
-|}): Promise<?NewProjectSource> => {
+  newProjectSetup,
+}: ExampleProjectSetup): Promise<?NewProjectSource> => {
   try {
     const example = await getExample(exampleShortHeader);
+    const creationSource = newProjectSetup.creationSource;
 
     sendNewGameCreated({
       exampleUrl: example.projectFileUrl,
-      exampleSlug: `${isQuickCustomization ? 'qc-' : ''}${
+      exampleSlug: exampleShortHeader.slug,
+      exampleCompositeSlug: getCompositeSlug(
+        creationSource,
         exampleShortHeader.slug
-      }`,
+      ),
+      creationSource,
     });
     const newProjectSource = getNewProjectSourceFromUrl(example.projectFileUrl);
     newProjectSource.templateSlug = exampleShortHeader.slug;

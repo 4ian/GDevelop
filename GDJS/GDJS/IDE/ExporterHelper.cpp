@@ -1073,6 +1073,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "CustomRuntimeObjectInstanceContainer.js");
   InsertUnique(includesFiles, "CustomRuntimeObject.js");
   InsertUnique(includesFiles, "CustomRuntimeObject2D.js");
+  InsertUnique(includesFiles, "indexeddb.js");
 
   // Common includes for events only.
   InsertUnique(includesFiles, "events-tools/commontools.js");

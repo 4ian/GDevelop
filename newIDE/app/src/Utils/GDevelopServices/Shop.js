@@ -474,6 +474,32 @@ export const getPurchaseCheckoutUrl = ({
   return url.toString();
 };
 
+export const getStripeCheckoutUrl = ({
+  userId,
+  productId,
+  priceName,
+  userEmail,
+  password,
+}: {|
+  userId: string,
+  productId: string,
+  priceName: string,
+  userEmail: string,
+  password?: string,
+|}) => {
+  const url = new URL(
+    `${GDevelopShopApi.baseUrl}/purchase/action/redirect-to-stripe-checkout`
+  );
+
+  url.searchParams.set('productId', productId);
+  url.searchParams.set('priceName', priceName);
+  url.searchParams.set('userId', userId);
+  url.searchParams.set('customerEmail', userEmail);
+  if (password) url.searchParams.set('password', password);
+
+  return url.toString();
+};
+
 // Helper to fetch a token for private game templates if needed, when moving or fetching resources.
 export const fetchTokenForPrivateGameTemplateAuthorizationIfNeeded = async ({
   authenticatedUser,

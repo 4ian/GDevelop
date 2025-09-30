@@ -10,6 +10,127 @@ namespace gdjs {
     export namespace tween {
       const logger = new gdjs.Logger('Tween');
 
+      const getTweenVariableSetter = (variable: gdjs.Variable) => {
+        return (value: float) => variable.setNumber(value);
+      };
+      const tweenLayoutValueSetter = (value: float) => {};
+      const tweenLayerValueSetter = (value: float) => {};
+      const getTweenLayerCameraPositionSetter = (layer: gdjs.RuntimeLayer) => {
+        return ([x, y]: Array<float>) => {
+          layer.setCameraX(x);
+          layer.setCameraY(y);
+        };
+      };
+      const getTweenLayerCameraRotationSetter = (layer: gdjs.RuntimeLayer) => {
+        return (value: float) => layer.setCameraRotation(value);
+      };
+      const getTweenLayerCameraZoomSetter = (layer: gdjs.RuntimeLayer) => {
+        return (value: float) => layer.setCameraZoom(value);
+      };
+      const getTweenNumberEffectPropertySetter = (
+        effect: PixiFiltersTools.Filter,
+        propertyName: string
+      ) => {
+        return (value: float) => {
+          if (effect) {
+            effect.updateDoubleParameter(propertyName, value);
+          }
+        };
+      };
+      const getTweenColorEffectPropertySetter = (
+        effect: PixiFiltersTools.Filter,
+        propertyName: string
+      ) => {
+        return ([hue, saturation, lightness]: Array<float>) => {
+          if (effect) {
+            const rgbFromHslColor = gdjs.evtTools.tween.hslToRgb(
+              hue,
+              saturation,
+              lightness
+            );
+            effect.updateColorParameter(
+              propertyName,
+              gdjs.rgbToHexNumber(
+                rgbFromHslColor[0],
+                rgbFromHslColor[1],
+                rgbFromHslColor[2]
+              )
+            );
+          }
+        };
+      };
+
+      // Factory to get the tween setter based on type and options
+      export const tweenSetterFactory =
+        (runtimeScene: RuntimeScene) =>
+        (tweenInformation: TweenInformationNetworkSyncData) => {
+          const type = tweenInformation.type;
+          const layerName = tweenInformation.layerName;
+          const variablePath = tweenInformation.variablePath;
+          const effectName = tweenInformation.effectName;
+          const propertyName = tweenInformation.propertyName;
+
+          if (type === 'variable' && variablePath) {
+            const variable = runtimeScene
+              .getVariables()
+              .getVariableFromPath(variablePath);
+            if (!variable) {
+              return () => {};
+            }
+            return getTweenVariableSetter(variable);
+          }
+          if (type === 'cameraZoom' && layerName !== undefined) {
+            const layer = runtimeScene.getLayer(layerName);
+            return getTweenLayerCameraZoomSetter(layer);
+          }
+          if (type === 'cameraRotation' && layerName !== undefined) {
+            const layer = runtimeScene.getLayer(layerName);
+            return getTweenLayerCameraRotationSetter(layer);
+          }
+          if (type === 'cameraPosition' && layerName !== undefined) {
+            const layer = runtimeScene.getLayer(layerName);
+            return getTweenLayerCameraPositionSetter(layer);
+          }
+          if (
+            type === 'colorEffectProperty' &&
+            layerName !== undefined &&
+            effectName &&
+            propertyName
+          ) {
+            const layer = runtimeScene.getLayer(layerName);
+            const effect = layer.getRendererEffects()[effectName];
+            if (!effect) {
+              logger.error(
+                `The layer "${layerName}" doesn't have any effect called "${effectName}"`
+              );
+            }
+
+            return getTweenColorEffectPropertySetter(effect, propertyName);
+          }
+          if (
+            type === 'numberEffectProperty' &&
+            layerName !== undefined &&
+            effectName &&
+            propertyName
+          ) {
+            const layer = runtimeScene.getLayer(layerName);
+            const effect = layer.getRendererEffects()[effectName];
+            if (!effect) {
+              logger.error(
+                `The layer "${layerName}" doesn't have any effect called "${effectName}"`
+              );
+            }
+            return getTweenNumberEffectPropertySetter(effect, propertyName);
+          }
+          if (type === 'layoutValue') {
+            return tweenLayoutValueSetter;
+          }
+          if (type === 'layerValue') {
+            return tweenLayerValueSetter;
+          }
+          return () => {};
+        };
+
       export const getTweensMap = (runtimeScene: RuntimeScene) =>
         runtimeScene._tweens ||
         (runtimeScene._tweens = new gdjs.evtTools.tween.TweenManager());
@@ -19,6 +140,44 @@ namespace gdjs {
       gdjs.registerRuntimeScenePreEventsCallback(function (runtimeScene) {
         gdjs.evtTools.tween.getTweensMap(runtimeScene).step();
       });
+
+      gdjs.registerRuntimeSceneGetSyncDataCallback(
+        function (runtimeScene, currentLayoutSyncData, syncOptions) {
+          if (!syncOptions.syncTweens) return;
+          const tweensNetworkSyncData = gdjs.evtTools.tween
+            .getTweensMap(runtimeScene)
+            .getNetworkSyncData();
+
+          currentLayoutSyncData.tween = tweensNetworkSyncData;
+        }
+      );
+
+      gdjs.registerRuntimeSceneUpdateFromSyncDataCallback(
+        function (runtimeScene, receivedSyncData, syncOptions) {
+          if (!receivedSyncData.tween) return;
+
+          gdjs.evtTools.tween
+            .getTweensMap(runtimeScene)
+            .updateFromNetworkSyncData(
+              receivedSyncData.tween,
+              (tweenInformationNetworkSyncData) => {
+                if (tweenInformationNetworkSyncData.layerName !== undefined) {
+                  return runtimeScene.getLayer(
+                    tweenInformationNetworkSyncData.layerName
+                  );
+                }
+                return runtimeScene;
+              },
+              (tweenInformationNetworkSyncData) => {
+                return gdjs.evtTools.tween.tweenSetterFactory(runtimeScene)(
+                  tweenInformationNetworkSyncData
+                );
+              },
+              // No onFinish for scene tweens.
+              () => null
+            );
+        }
+      );
 
       export const sceneTweenExists = (
         runtimeScene: RuntimeScene,
@@ -130,7 +289,10 @@ namespace gdjs {
             : linearInterpolation,
           fromValue,
           toValue,
-          (value: float) => {}
+          tweenLayoutValueSetter,
+          {
+            type: 'layoutValue',
+          }
         );
       };
 
@@ -167,7 +329,11 @@ namespace gdjs {
             : linearInterpolation,
           fromValue,
           toValue,
-          (value: float) => {}
+          tweenLayerValueSetter,
+          {
+            type: 'layerValue',
+            layerName,
+          }
         );
       };
 
@@ -197,7 +363,11 @@ namespace gdjs {
           linearInterpolation,
           from,
           to,
-          (value: float) => variable.setNumber(value)
+          getTweenVariableSetter(variable),
+          {
+            type: 'variable',
+            variable,
+          }
         );
       };
 
@@ -250,7 +420,11 @@ namespace gdjs {
           linearInterpolation,
           variable.getValue() as number,
           toValue,
-          (value: float) => variable.setNumber(value)
+          getTweenVariableSetter(variable),
+          {
+            type: 'variable',
+            variable,
+          }
         );
       };
 
@@ -329,9 +503,10 @@ namespace gdjs {
           linearInterpolation,
           [layer.getCameraX(), layer.getCameraY()],
           [toX, toY],
-          ([x, y]) => {
-            layer.setCameraX(x);
-            layer.setCameraY(y);
+          getTweenLayerCameraPositionSetter(layer),
+          {
+            type: 'cameraPosition',
+            layerName,
           }
         );
       };
@@ -408,7 +583,11 @@ namespace gdjs {
           interpolation,
           layer.getCameraZoom(),
           toZoom,
-          (value: float) => layer.setCameraZoom(value)
+          getTweenLayerCameraZoomSetter(layer),
+          {
+            type: 'cameraZoom',
+            layerName,
+          }
         );
       };
 
@@ -478,7 +657,11 @@ namespace gdjs {
           linearInterpolation,
           layer.getCameraRotation(),
           toRotation,
-          (value: float) => layer.setCameraRotation(value)
+          getTweenLayerCameraRotationSetter(layer),
+          {
+            type: 'cameraRotation',
+            layerName,
+          }
         );
       };
 
@@ -518,10 +701,12 @@ namespace gdjs {
           linearInterpolation,
           effect ? effect.getDoubleParameter(propertyName) : 0,
           toValue,
-          (value: float) => {
-            if (effect) {
-              effect.updateDoubleParameter(propertyName, value);
-            }
+          getTweenNumberEffectPropertySetter(effect, propertyName),
+          {
+            type: 'numberEffectProperty',
+            layerName,
+            effectName,
+            propertyName,
           }
         );
       };
@@ -575,22 +760,12 @@ namespace gdjs {
             rgbToColor[1],
             rgbToColor[2]
           ),
-          ([hue, saturation, lightness]) => {
-            if (effect) {
-              const rgbFromHslColor = gdjs.evtTools.tween.hslToRgb(
-                hue,
-                saturation,
-                lightness
-              );
-              effect.updateColorParameter(
-                propertyName,
-                gdjs.rgbToHexNumber(
-                  rgbFromHslColor[0],
-                  rgbFromHslColor[1],
-                  rgbFromHslColor[2]
-                )
-              );
-            }
+          getTweenColorEffectPropertySetter(effect, propertyName),
+          {
+            type: 'colorEffectProperty',
+            layerName,
+            effectName,
+            propertyName,
           }
         );
       };

@@ -2,7 +2,6 @@
 namespace gdjs {
   export type TilemapObjectDataType = {
     content: {
-      opacity: number;
       tilemapJsonFile: string;
       tilesetJsonFile: string;
       tilemapAtlasImage: string;
@@ -38,7 +37,7 @@ namespace gdjs {
     implements gdjs.Resizable, gdjs.Scalable, gdjs.OpacityHandler
   {
     _frameElapsedTime: float = 0;
-    _opacity: float;
+    _opacity: float = 255;
     _tilemapJsonFile: string;
     _tilesetJsonFile: string;
     _tilemapAtlasImage: string;
@@ -48,11 +47,14 @@ namespace gdjs {
     _animationSpeedScale: number;
     _animationFps: number;
     _tileMapManager: gdjs.TileMap.TileMapRuntimeManager;
+    _tileMap: TileMapHelper.EditableTileMap | null = null;
     _renderer: gdjs.TileMapRuntimeObjectPixiRenderer;
 
-    constructor(instanceContainer: gdjs.RuntimeInstanceContainer, objectData) {
+    constructor(
+      instanceContainer: gdjs.RuntimeInstanceContainer,
+      objectData: TilemapObjectData
+    ) {
       super(instanceContainer, objectData);
-      this._opacity = objectData.content.opacity;
       this._tilemapJsonFile = objectData.content.tilemapJsonFile;
       this._tilesetJsonFile = objectData.content.tilesetJsonFile;
       this._tilemapAtlasImage = objectData.content.tilemapAtlasImage;
@@ -93,9 +95,6 @@ namespace gdjs {
       oldObjectData: TilemapObjectData,
       newObjectData: TilemapObjectData
     ): boolean {
-      if (oldObjectData.content.opacity !== newObjectData.content.opacity) {
-        this.setOpacity(newObjectData.content.opacity);
-      }
       if (
         oldObjectData.content.tilemapJsonFile !==
         newObjectData.content.tilemapJsonFile
@@ -145,9 +144,11 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): TilemapNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): TilemapNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         op: this._opacity,
         tmjf: this._tilemapJsonFile,
         tsjf: this._tilesetJsonFile,
@@ -159,8 +160,11 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(networkSyncData: TilemapNetworkSyncData): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+    updateFromNetworkSyncData(
+      networkSyncData: TilemapNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
+    ): void {
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       if (networkSyncData.op !== undefined) {
         this.setOpacity(networkSyncData.op);
@@ -232,7 +236,9 @@ namespace gdjs {
                 // getOrLoadTextureCache already log warns and errors.
                 return;
               }
-              this._renderer.updatePixiTileMap(tileMap, textureCache);
+              this._tileMap = tileMap;
+              this._renderer.refreshPixiTileMap(textureCache);
+              this.invalidateHitboxes();
             }
           );
         }
@@ -340,11 +346,11 @@ namespace gdjs {
     }
 
     override getOriginalWidth(): float {
-      return this._renderer.getTileMapWidth();
+      return this.getTileMapWidth();
     }
 
     override getOriginalHeight(): float {
-      return this._renderer.getTileMapHeight();
+      return this.getTileMapHeight();
     }
 
     /**
@@ -436,6 +442,73 @@ namespace gdjs {
 
     getScaleY(): float {
       return this._renderer.getScaleY();
+    }
+
+    getTileMap(): TileMapHelper.EditableTileMap | null {
+      return this._tileMap;
+    }
+
+    getTileMapWidth() {
+      const tileMap = this._tileMap;
+      return tileMap ? tileMap.getWidth() : 20;
+    }
+
+    getTileMapHeight() {
+      const tileMap = this._tileMap;
+      return tileMap ? tileMap.getHeight() : 20;
+    }
+
+    /**
+     * @param x The layer column.
+     * @param y The layer row.
+     * @param layerIndex The layer index.
+     * @returns The tile's id.
+     */
+    getTileId(x: integer, y: integer, layerIndex: integer): integer {
+      if (!this._tileMap) return -1;
+      return this._tileMap.getTileId(x, y, layerIndex);
+    }
+
+    /**
+     * @param x The layer column.
+     * @param y The layer row.
+     * @param layerIndex The layer index.
+     * @param flip true if the tile should be flipped.
+     */
+    flipTileOnY(x: integer, y: integer, layerIndex: integer, flip: boolean) {
+      if (!this._tileMap) return;
+      this._tileMap.flipTileOnY(x, y, layerIndex, flip);
+    }
+
+    /**
+     * @param x The layer column.
+     * @param y The layer row.
+     * @param layerIndex The layer index.
+     * @param flip true if the tile should be flipped.
+     */
+    flipTileOnX(x: integer, y: integer, layerIndex: integer, flip: boolean) {
+      if (!this._tileMap) return;
+      this._tileMap.flipTileOnX(x, y, layerIndex, flip);
+    }
+
+    /**
+     * @param x The layer column.
+     * @param y The layer row.
+     * @param layerIndex The layer index.
+     */
+    isTileFlippedOnX(x: integer, y: integer, layerIndex: integer): boolean {
+      if (!this._tileMap) return false;
+      return this._tileMap.isTileFlippedOnX(x, y, layerIndex);
+    }
+
+    /**
+     * @param x The layer column.
+     * @param y The layer row.
+     * @param layerIndex The layer index.
+     */
+    isTileFlippedOnY(x: integer, y: integer, layerIndex: integer): boolean {
+      if (!this._tileMap) return false;
+      return this._tileMap.isTileFlippedOnY(x, y, layerIndex);
     }
   }
   gdjs.registerObject('TileMap::TileMap', gdjs.TileMapRuntimeObject);

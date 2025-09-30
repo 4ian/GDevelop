@@ -31,6 +31,36 @@ namespace gdjs {
   };
 
   /**
+   * Handles errors that occur when calling Howler sound methods.
+   *
+   * This function provides special handling for "Maximum call stack size exceeded" errors
+   * that can occur in Howler.js due to recursive method calls in volume(), seek(), fade(),
+   * and other sound manipulation methods. Instead of crashing the application, these
+   * specific errors are logged as warnings to allow the application to continue running.
+   *
+   * @param error - The error that occurred during the method call
+   * @param methodName - The name of the Howler method that caused the error (e.g., 'volume', 'seek')
+   *
+   * @throws {Error} Re-throws the original error if it's not a stack overflow error
+   *
+   */
+  const handleHowlerSoundMethodError = (error: unknown, methodName: string) => {
+    if (
+      error instanceof Error &&
+      error.message &&
+      typeof error.message === 'string' &&
+      error.message.startsWith('Maximum call stack size exceeded')
+    ) {
+      console.warn(
+        `An error occurred when call method "${methodName}":`,
+        error
+      );
+    } else {
+      throw error;
+    }
+  };
+
+  /**
    * A thin wrapper around a Howl object with:
    * * Handling of callbacks when the sound is not yet loaded.
    * * Automatic clamping when calling `setRate` to ensure a valid value is passed to Howler.js.
@@ -84,11 +114,23 @@ namespace gdjs {
      */
     private _onPlay: Array<HowlCallback> = [];
 
-    constructor(howl: Howl, volume: float, loop: boolean, rate: float) {
+    /**
+     * The filepath to the resource
+     */
+    private _audioResourceName: string;
+
+    constructor(
+      howl: Howl,
+      volume: float,
+      loop: boolean,
+      rate: float,
+      audioResourceName: string
+    ) {
       this._howl = howl;
       this._initialVolume = clampVolume(volume);
       this._loop = loop;
       this._rate = rate;
+      this._audioResourceName = audioResourceName;
     }
 
     /**
@@ -103,33 +145,36 @@ namespace gdjs {
      * @returns The current instance for chaining.
      */
     play(): this {
-      if (this.isLoaded()) {
-        const newID = this._howl.play(
-          this._id === null ? '__default' : this._id
-        );
-        this._id = newID;
+      try {
+        if (this.isLoaded()) {
+          const newID = this._howl.play(
+            this._id === null ? '__default' : this._id
+          );
+          this._id = newID;
 
-        // Set the howl properties as soon as the sound is played and we have its ID.
-        this._howl.volume(this._initialVolume, newID); // this._initialVolume is already clamped between 0 and 1.
-        this._howl.loop(this._loop, newID);
-        // this._rate is not clamped, but we need to clamp it when passing it to Howler.js as it
-        // only supports a specific range.
-        this._howl.rate(gdjs.HowlerSoundManager.clampRate(this._rate), newID);
+          // Set the howl properties as soon as the sound is played and we have its ID.
+          this._howl.volume(this._initialVolume, newID); // this._initialVolume is already clamped between 0 and 1.
+          this._howl.loop(this._loop, newID);
+          // this._rate is not clamped, but we need to clamp it when passing it to Howler.js as it
+          // only supports a specific range.
+          this._howl.rate(gdjs.HowlerSoundManager.clampRate(this._rate), newID);
 
-        // Manually handle the play event before we have an ID.
-        // Before loading, howler won't register events as without an ID we cannot set a listener.
-        // Once we have an ID, we can transfer control of the events to howler.
-        // We also need to call them once as Howler doesn't for the first play event.
-        this._onPlay.forEach((func) => {
-          // Transfer the event to howler now that we have an ID
-          this.on('play', func);
-          func(newID);
-        });
-        this._oncePlay.forEach((func) => func(newID));
-        this._onPlay = [];
-        this._oncePlay = [];
-      } else this._howl.once('load', () => this.play()); // Play only once the howl is fully loaded
-
+          // Manually handle the play event before we have an ID.
+          // Before loading, howler won't register events as without an ID we cannot set a listener.
+          // Once we have an ID, we can transfer control of the events to howler.
+          // We also need to call them once as Howler doesn't for the first play event.
+          this._onPlay.forEach((func) => {
+            // Transfer the event to howler now that we have an ID
+            this.on('play', func);
+            func(newID);
+          });
+          this._oncePlay.forEach((func) => func(newID));
+          this._onPlay = [];
+          this._oncePlay = [];
+        } else this._howl.once('load', () => this.play()); // Play only once the howl is fully loaded
+      } catch (error) {
+        handleHowlerSoundMethodError(error, 'play');
+      }
       return this;
     }
 
@@ -138,7 +183,11 @@ namespace gdjs {
      * @returns The current instance for chaining.
      */
     pause(): this {
-      if (this._id !== null) this._howl.pause(this._id);
+      try {
+        if (this._id !== null) this._howl.pause(this._id);
+      } catch (error) {
+        handleHowlerSoundMethodError(error, 'pause');
+      }
       return this;
     }
 
@@ -147,7 +196,11 @@ namespace gdjs {
      * @returns The current instance for chaining.
      */
     stop(): this {
-      if (this._id !== null) this._howl.stop(this._id);
+      try {
+        if (this._id !== null) this._howl.stop(this._id);
+      } catch (error) {
+        handleHowlerSoundMethodError(error, 'stop');
+      }
       return this;
     }
 
@@ -158,9 +211,10 @@ namespace gdjs {
      * to preload the sounds.
      */
     playing(): boolean {
+      const isSoundPlaying =
+        this._id !== null ? this._howl.playing(this._id) : true;
       return (
-        (this._id !== null ? this._howl.playing(this._id) : true) ||
-        !this.isLoaded() // Loading is considered playing
+        isSoundPlaying || !this.isLoaded() // Loading is considered playing
       );
     }
 
@@ -196,11 +250,15 @@ namespace gdjs {
      * @returns The current instance for chaining.
      */
     setRate(rate: float): this {
-      this._rate = rate;
-      // If the sound has already started playing, then change the value directly.
-      if (this._id !== null) {
-        rate = gdjs.HowlerSoundManager.clampRate(rate);
-        this._howl.rate(rate, this._id);
+      try {
+        this._rate = rate;
+        // If the sound has already started playing, then change the value directly.
+        if (this._id !== null) {
+          rate = gdjs.HowlerSoundManager.clampRate(rate);
+          this._howl.rate(rate, this._id);
+        }
+      } catch (error) {
+        handleHowlerSoundMethodError(error, 'rate');
       }
       return this;
     }
@@ -217,9 +275,13 @@ namespace gdjs {
      * @returns The current instance for chaining.
      */
     setLoop(loop: boolean): this {
-      this._loop = loop;
-      // If the sound has already started playing, then change the value directly.
-      if (this._id !== null) this._howl.loop(loop, this._id);
+      try {
+        this._loop = loop;
+        // If the sound has already started playing, then change the value directly.
+        if (this._id !== null) this._howl.loop(loop, this._id);
+      } catch (error) {
+        handleHowlerSoundMethodError(error, 'loop');
+      }
       return this;
     }
 
@@ -239,10 +301,14 @@ namespace gdjs {
      * @returns The current instance for chaining.
      */
     setVolume(volume: float): this {
-      this._initialVolume = clampVolume(volume);
+      try {
+        this._initialVolume = clampVolume(volume);
 
-      // If the sound has already started playing, then change the value directly.
-      if (this._id !== null) this._howl.volume(this._initialVolume, this._id);
+        // If the sound has already started playing, then change the value directly.
+        if (this._id !== null) this._howl.volume(this._initialVolume, this._id);
+      } catch (error) {
+        handleHowlerSoundMethodError(error, 'volume');
+      }
       return this;
     }
 
@@ -259,7 +325,11 @@ namespace gdjs {
      * @returns The current instance for chaining.
      */
     setMute(mute: boolean): this {
-      if (this._id !== null) this._howl.mute(mute, this._id);
+      try {
+        if (this._id !== null) this._howl.mute(mute, this._id);
+      } catch (error) {
+        handleHowlerSoundMethodError(error, 'mute');
+      }
       return this;
     }
 
@@ -276,7 +346,11 @@ namespace gdjs {
      * @returns The current instance for chaining.
      */
     setSeek(seek: float): this {
-      if (this._id !== null) this._howl.seek(seek, this._id);
+      try {
+        if (this._id !== null) this._howl.seek(seek, this._id);
+      } catch (error) {
+        handleHowlerSoundMethodError(error, 'seek');
+      }
       return this;
     }
 
@@ -302,8 +376,17 @@ namespace gdjs {
      * @returns The current instance for chaining.
      */
     fade(from: float, to: float, duration: float): this {
-      if (this._id !== null)
-        this._howl.fade(clampVolume(from), clampVolume(to), duration, this._id);
+      try {
+        if (this._id !== null)
+          this._howl.fade(
+            clampVolume(from),
+            clampVolume(to),
+            duration,
+            this._id
+          );
+      } catch (error) {
+        handleHowlerSoundMethodError(error, 'fade');
+      }
       return this;
     }
 
@@ -357,10 +440,27 @@ namespace gdjs {
       if (this._id !== null) this._howl.off(event, handler, this._id);
       return this;
     }
+
+    getNetworkSyncData(): SoundSyncData | undefined {
+      if (this.paused() || !this.isLoaded() || this.stopped()) return undefined;
+      // Seek can sometimes return the Howl object in case it isn't loaded yet, in this case we default to 0.
+      const seek = this.getSeek();
+      const numberSeek = typeof seek !== 'number' ? 0 : seek;
+      // If the Howl is still loading, we use the initialVolume, as the Howl
+      // has been initialized with volume 0.
+      const volume = this.isLoaded() ? this.getVolume() : this._initialVolume;
+      return {
+        resourceName: this._audioResourceName,
+        loop: this._loop,
+        volume,
+        rate: this._rate,
+        seek: numberSeek,
+      };
+    }
   }
 
   /**
-   * HowlerSoundManager is used to manage the sounds and musics of a RuntimeScene.
+   * HowlerSoundManager is used to manage the sounds and musics of a RuntimeGame.
    *
    * It is basically a container to associate channels to sounds and keep a list
    * of all sounds being played.
@@ -609,8 +709,7 @@ namespace gdjs {
         );
         cacheContainer.set(resource, howl);
       }
-
-      return new gdjs.HowlerSound(howl, volume, loop, rate);
+      return new gdjs.HowlerSound(howl, volume, loop, rate, soundName);
     }
 
     /**
@@ -708,7 +807,13 @@ namespace gdjs {
       this._loadedSounds.clear();
     }
 
-    playSound(soundName: string, loop: boolean, volume: float, pitch: float) {
+    playSound(
+      soundName: string,
+      loop: boolean,
+      volume: float,
+      pitch: float,
+      seek?: float
+    ) {
       const sound = this.createHowlerSound(
         soundName,
         /* isMusic= */ false,
@@ -724,6 +829,9 @@ namespace gdjs {
         }
       });
       sound.play();
+      if (seek) {
+        sound.setSeek(seek);
+      }
     }
 
     playSoundOnChannel(
@@ -731,7 +839,8 @@ namespace gdjs {
       channel: integer,
       loop: boolean,
       volume: float,
-      pitch: float
+      pitch: float,
+      seek?: float
     ) {
       if (this._sounds[channel]) this._sounds[channel].stop();
 
@@ -756,13 +865,22 @@ namespace gdjs {
         }
       });
       sound.play();
+      if (seek) {
+        sound.setSeek(seek);
+      }
     }
 
     getSoundOnChannel(channel: integer): HowlerSound | null {
       return this._sounds[channel] || null;
     }
 
-    playMusic(soundName: string, loop: boolean, volume: float, pitch: float) {
+    playMusic(
+      soundName: string,
+      loop: boolean,
+      volume: float,
+      pitch: float,
+      seek?: float
+    ) {
       const music = this.createHowlerSound(
         soundName,
         /* isMusic= */ true,
@@ -778,6 +896,9 @@ namespace gdjs {
         }
       });
       music.play();
+      if (seek) {
+        music.setSeek(seek);
+      }
     }
 
     playMusicOnChannel(
@@ -785,7 +906,8 @@ namespace gdjs {
       channel: integer,
       loop: boolean,
       volume: float,
-      pitch: float
+      pitch: float,
+      seek?: float
     ) {
       if (this._musics[channel]) this._musics[channel].stop();
 
@@ -805,6 +927,9 @@ namespace gdjs {
         }
       });
       music.play();
+      if (seek) {
+        music.setSeek(seek);
+      }
     }
 
     getMusicOnChannel(channel: integer): HowlerSound | null {
@@ -929,6 +1054,97 @@ namespace gdjs {
             'There was an error while preloading an audio file: ' + error
           );
         }
+      }
+    }
+
+    getNetworkSyncData(): SoundManagerSyncData {
+      const freeMusicsNetworkSyncData: SoundSyncData[] = [];
+      this._freeMusics.forEach((freeMusic) => {
+        const musicSyncData = freeMusic.getNetworkSyncData();
+        if (musicSyncData) freeMusicsNetworkSyncData.push(musicSyncData);
+      });
+      const freeSoundsNetworkSyncData: SoundSyncData[] = [];
+      this._freeSounds.forEach((freeSound) => {
+        const soundSyncData = freeSound.getNetworkSyncData();
+        if (soundSyncData) freeSoundsNetworkSyncData.push(soundSyncData);
+      });
+      const musicsNetworkSyncData: ChannelsSoundSyncData = {};
+      Object.entries(this._musics).forEach(([channel, music]) => {
+        const musicSyncData = music.getNetworkSyncData();
+        if (musicSyncData) {
+          const channelNumber = parseInt(channel, 10);
+          musicsNetworkSyncData[channelNumber] = musicSyncData;
+        }
+      });
+      const soundsNetworkSyncData: ChannelsSoundSyncData = {};
+      Object.entries(this._sounds).forEach(([channel, sound]) => {
+        const soundSyncData = sound.getNetworkSyncData();
+        if (soundSyncData) {
+          const channelNumber = parseInt(channel, 10);
+          soundsNetworkSyncData[channelNumber] = soundSyncData;
+        }
+      });
+
+      return {
+        globalVolume: this._globalVolume,
+        cachedSpatialPosition: this._cachedSpatialPosition,
+        freeMusics: freeMusicsNetworkSyncData,
+        freeSounds: freeSoundsNetworkSyncData,
+        musics: musicsNetworkSyncData,
+        sounds: soundsNetworkSyncData,
+      };
+    }
+
+    updateFromNetworkSyncData(syncData: SoundManagerSyncData): void {
+      this.clearAll();
+      this._globalVolume = syncData.globalVolume;
+      this._cachedSpatialPosition = syncData.cachedSpatialPosition;
+
+      for (let i = 0; i < syncData.freeSounds.length; i++) {
+        const freeSoundsSyncData: SoundSyncData = syncData.freeSounds[i];
+
+        this.playSound(
+          freeSoundsSyncData.resourceName,
+          freeSoundsSyncData.loop,
+          freeSoundsSyncData.volume * 100,
+          freeSoundsSyncData.rate,
+          freeSoundsSyncData.seek
+        );
+      }
+
+      for (let i = 0; i < syncData.freeMusics.length; i++) {
+        const freeMusicsSyncData: SoundSyncData = syncData.freeMusics[i];
+        this.playMusic(
+          freeMusicsSyncData.resourceName,
+          freeMusicsSyncData.loop,
+          freeMusicsSyncData.volume * 100,
+          freeMusicsSyncData.rate,
+          freeMusicsSyncData.seek
+        );
+      }
+
+      for (const [channel, soundSyncData] of Object.entries(syncData.sounds)) {
+        const channelNumber = parseInt(channel, 10);
+        this.playSoundOnChannel(
+          soundSyncData.resourceName,
+          channelNumber,
+          soundSyncData.loop,
+          soundSyncData.volume * 100,
+          soundSyncData.rate,
+          soundSyncData.seek
+        );
+      }
+
+      for (const [channel, musicSyncData] of Object.entries(syncData.musics)) {
+        const channelNumber = parseInt(channel, 10);
+        this.playMusicOnChannel(
+          musicSyncData.resourceName,
+          channelNumber,
+          musicSyncData.loop,
+          musicSyncData.volume * 100,
+          musicSyncData.rate,
+          musicSyncData.seek
+        );
       }
     }
 

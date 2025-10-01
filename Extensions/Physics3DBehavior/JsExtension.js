@@ -822,6 +822,27 @@ module.exports = {
         .setFunctionName('isKinematic');
 
       aut
+        .addScopedAction(
+          'SetBodyType',
+          _('Set body type'),
+          _('Set the body type of an object.'),
+          _('Set the body type of _PARAM0_ to _PARAM2_'),
+          _('Dynamics'),
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+        .addParameter(
+          'stringWithSelector',
+          _('Body type'),
+          '["Static", "Dynamic", "Kinematic"]',
+          false
+        )
+        .getCodeExtraInformation()
+        .setFunctionName('setBodyType');
+
+      aut
         .addScopedCondition(
           'IsBullet',
           _('Is treated as a bullet'),

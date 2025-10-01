@@ -413,8 +413,16 @@ namespace gdjs {
         object.setX(Math.round(initialPosition.x + movement.translationX));
         object.setY(Math.round(initialPosition.y + movement.translationY));
         object.setAngle(Math.round(initialPosition.angle + movement.rotationZ));
-        object.setWidth(initialPosition.width * Math.abs(movement.scaleX));
-        object.setHeight(initialPosition.height * Math.abs(movement.scaleY));
+        if (movement.scaleX !== 1) {
+          object.setWidth(
+            Math.round(initialPosition.width * Math.abs(movement.scaleX))
+          );
+        }
+        if (movement.scaleY !== 1) {
+          object.setHeight(
+            Math.round(initialPosition.height * Math.abs(movement.scaleY))
+          );
+        }
         if (is3D(object)) {
           object.setZ(Math.round(initialPosition.z + movement.translationZ));
           object.setRotationX(
@@ -423,7 +431,11 @@ namespace gdjs {
           object.setRotationY(
             Math.round(initialPosition.rotationY + movement.rotationY)
           );
-          object.setDepth(initialPosition.depth * Math.abs(movement.scaleZ));
+          if (movement.scaleZ !== 1) {
+            object.setDepth(
+              Math.round(initialPosition.depth * Math.abs(movement.scaleZ))
+            );
+          }
         }
       });
     }
@@ -2336,17 +2348,20 @@ namespace gdjs {
       if (!dropped) {
         if (is3D(this._draggedNewObject)) {
           const cursor = this._getCursorIn3D([this._draggedNewObject]);
+          // TODO Display and snap on the grid.
           if (cursor) {
             const [cursorX, cursorY, cursorZ] = cursor;
-            this._draggedNewObject.setX(cursorX);
-            this._draggedNewObject.setY(cursorY);
+            this._draggedNewObject.setX(Math.round(cursorX));
+            this._draggedNewObject.setY(Math.round(cursorY));
+            // We don't round on Z because if cubes are stacked and there depth
+            // is not round it would leave an interstice between them.
             this._draggedNewObject.setZ(cursorZ);
           }
         } else {
           const projectedCursor = this._getProjectedCursor();
           if (projectedCursor) {
-            this._draggedNewObject.setX(projectedCursor[0]);
-            this._draggedNewObject.setY(projectedCursor[1]);
+            this._draggedNewObject.setX(Math.round(projectedCursor[0]));
+            this._draggedNewObject.setY(Math.round(projectedCursor[1]));
           }
         }
       }

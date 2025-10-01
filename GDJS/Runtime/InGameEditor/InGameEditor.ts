@@ -82,7 +82,9 @@ namespace gdjs {
     Base3DHandler &
     Resizable &
     Scalable &
-    Flippable;
+    Flippable & {
+      getCenterZInScene(): float;
+    };
 
   const is3D = (object: gdjs.RuntimeObject): object is RuntimeObjectWith3D => {
     return gdjs.Base3DHandler.is3D(object);
@@ -1716,8 +1718,9 @@ namespace gdjs {
         !this._shouldDragSelectedObject() &&
         !shouldHideSelectionControls
       ) {
-        const threeObject = lastEditableSelectedObject.get3DRendererObject();
-        if (!threeObject) return;
+        if (!lastEditableSelectedObject.get3DRendererObject()) {
+          return;
+        }
 
         const cameraLayer = this.getCameraLayer(
           lastEditableSelectedObject.getLayer()
@@ -1746,9 +1749,11 @@ namespace gdjs {
 
         this._editorGrid.setNormal('Z');
         this._editorGrid.setPosition(
-          threeObject.position.x,
-          threeObject.position.y,
-          threeObject.position.z
+          lastEditableSelectedObject.getX(),
+          lastEditableSelectedObject.getY(),
+          is3D(lastEditableSelectedObject)
+            ? lastEditableSelectedObject.getZ()
+            : 0
         );
         this._editorGrid.setTreeScene(threeScene);
         this._editorGrid.setVisible(true);
@@ -1756,9 +1761,11 @@ namespace gdjs {
         // The dummy object is an invisible object that is the one moved by the transform
         // controls.
         const dummyThreeObject = new THREE.Object3D();
-        dummyThreeObject.position.copy(threeObject.position);
-        dummyThreeObject.rotation.copy(threeObject.rotation);
-        dummyThreeObject.scale.copy(threeObject.scale);
+        this._updateDummyLocation(
+          dummyThreeObject,
+          lastEditableSelectedObject,
+          threeTransformControls
+        );
         threeScene.add(dummyThreeObject);
 
         threeTransformControls.attach(dummyThreeObject);
@@ -1775,6 +1782,11 @@ namespace gdjs {
           if (!threeTransformControls.dragging) {
             this._selectionControlsMovementTotalDelta = null;
 
+            this._updateDummyLocation(
+              dummyThreeObject,
+              lastEditableSelectedObject,
+              threeTransformControls
+            );
             // Reset the initial position to the current position, so that
             // it's ready to be dragged again.
             initialObjectX = lastEditableSelectedObject.getX();
@@ -1843,9 +1855,11 @@ namespace gdjs {
           }
           this._editorGrid.setNormal(gridNormal);
           this._editorGrid.setPosition(
-            threeObject.position.x,
-            threeObject.position.y,
-            threeObject.position.z
+            lastEditableSelectedObject.getX(),
+            lastEditableSelectedObject.getY(),
+            is3D(lastEditableSelectedObject)
+              ? lastEditableSelectedObject.getZ()
+              : 0
           );
 
           const scaleDamping = 0.2; // 0.2 = 20% of the movement speed (Three.js transform controls scaling is too fast)
@@ -1888,6 +1902,35 @@ namespace gdjs {
           dummyThreeObject,
           threeTransformControls,
         };
+      }
+    }
+
+    private _updateDummyLocation(
+      dummyThreeObject: THREE.Object3D,
+      lastEditableSelectedObject: gdjs.RuntimeObject,
+      threeTransformControls: THREE_ADDONS.TransformControls
+    ) {
+      const threeObject = lastEditableSelectedObject.get3DRendererObject();
+      if (!threeObject) return;
+      dummyThreeObject.position.copy(threeObject.position);
+      dummyThreeObject.rotation.copy(threeObject.rotation);
+      dummyThreeObject.scale.copy(threeObject.scale);
+      if (threeTransformControls.mode === 'rotate') {
+        dummyThreeObject.position.set(
+          lastEditableSelectedObject.getCenterXInScene(),
+          lastEditableSelectedObject.getCenterYInScene(),
+          is3D(lastEditableSelectedObject)
+            ? lastEditableSelectedObject.getCenterZInScene()
+            : 0
+        );
+      } else {
+        dummyThreeObject.position.set(
+          lastEditableSelectedObject.getX(),
+          lastEditableSelectedObject.getY(),
+          is3D(lastEditableSelectedObject)
+            ? lastEditableSelectedObject.getZ()
+            : 0
+        );
       }
     }
 

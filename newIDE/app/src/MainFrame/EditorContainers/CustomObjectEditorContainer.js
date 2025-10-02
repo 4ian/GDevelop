@@ -14,6 +14,10 @@ import {
 import SceneEditor from '../../SceneEditor';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../../Utils/Serializer';
 
 const gd: libGDevelop = global.gd;
 
@@ -121,14 +125,14 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
   }
 
   saveUiSettings = () => {
-    // const layout = this.getCustomObject();
-    // const editor = this.editor;
-    // if (editor && layout) {
-    //   unserializeFromJSObject(
-    //     layout.getAssociatedEditorSettings(),
-    //     editor.getInstancesEditorSettings()
-    //   );
-    // }
+    const variant = this.getVariant();
+    const editor = this.editor;
+    if (editor && variant) {
+      unserializeFromJSObject(
+        variant.getAssociatedEditorSettings(),
+        editor.getInstancesEditorSettings()
+      );
+    }
   };
 
   getEventsFunctionsExtension(): ?gdEventsFunctionsExtension {
@@ -235,8 +239,11 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           initialInstances={variant.getInitialInstances()}
           getInitialInstancesEditorSettings={() =>
             prepareInstancesEditorSettings(
-              {}, // TODO
-              1024 // TODO
+              serializeToJSObject(variant.getAssociatedEditorSettings()),
+              Math.max(
+                variant.getAreaMaxX() - variant.getAreaMinX(),
+                variant.getAreaMaxY() - variant.getAreaMinY()
+              )
             )
           }
           onOpenEvents={() =>

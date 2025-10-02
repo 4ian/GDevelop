@@ -19,6 +19,8 @@ import Mobile from '../../../UI/CustomSvgIcons/Mobile';
 import Desktop from '../../../UI/CustomSvgIcons/Desktop';
 import HistoryIcon from '../../../UI/CustomSvgIcons/History';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
+import ThemeToggle from '../../../ThemeToggle';
+
 const electron = optionalRequire('electron');
 
 type Props = {|
@@ -94,6 +96,7 @@ export const HomePageHeader = ({
                     leftIcon={<Desktop />}
                   />
                 ))}
+                <ThemeToggle />
               <UserChip onOpenProfile={onOpenProfile} />
               {profile && <NotificationChip />}
               {isMobile ? (

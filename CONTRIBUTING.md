@@ -40,7 +40,7 @@ git checkout -b feature/your-feature-name
 1. Make your changes in the code
 2. Test your changes locally:
 ```bash
-npm run start || yarn start
+npm run start || npm run test || npm start
 
  ```
 

@@ -65,6 +65,7 @@
     "js-worker-search": "^1.4.1",
     "jss-rtl": "^0.3.0",
     "lodash": "4.17.4",
+    "lucide-react": "^0.544.0",
     "node-require-function": "^1.2.0",
     "path-browserify": "^1.0.1",
     "pixi-spine": "4.0.4",
@@ -116,6 +117,7 @@
     }
   },
   "scripts": {
+    "dev": "react-app-rewired start",
     "postinstall": "patch-package && cd ../../GDJS && npm install && cd ../newIDE/app && npm run import-resources && npm run make-version-metadata",
     "import-resources": "npm run import-zipped-external-editors && npm run build-theme-resources && cd scripts && node import-libGD.js && node import-GDJS-Runtime.js && node import-monaco-editor.js && node import-zipped-external-libs.js",
     "make-version-metadata": "cd scripts && node make-version-metadata.js",

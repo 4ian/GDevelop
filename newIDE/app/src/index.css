@@ -1,0 +1,26 @@
+.dark {
+  background-color: #090220;
+  color: #fff;
+}
+
+.theme-toggle-button {
+    background: transparent;
+    cursor: pointer;
+    border: none;
+    outline: none;
+}
+.sun-icons {
+    display: inline-block;
+    color: #dfdf2f;
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+}
+
+.moon-icons {
+    display: inline-block;
+    color: #2c16ef;
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+}

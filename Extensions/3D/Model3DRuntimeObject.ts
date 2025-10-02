@@ -157,7 +157,8 @@ namespace gdjs {
       oldObjectData: Object3DData,
       newObjectData: Object3DData
     ): void {
-      // Noting to do because it's handled by `_updateModel`
+      // Original dimensions must not be reset by `super.updateFromObjectData`.
+      // `_updateModel` has a different logic to evaluate them using `keepAspectRatio`.
     }
 
     updateFromObjectData(
@@ -189,8 +190,14 @@ namespace gdjs {
         oldObjectData.content.keepAspectRatio !==
           newObjectData.content.keepAspectRatio ||
         oldObjectData.content.materialType !==
-          newObjectData.content.materialType
+          newObjectData.content.materialType ||
+        oldObjectData.content.centerLocation !==
+          newObjectData.content.centerLocation
       ) {
+        // The center is applied to the model by `_updateModel`.
+        this._centerPoint = getPointForLocation(
+          newObjectData.content.centerLocation
+        );
         this._updateModel(newObjectData);
       }
       if (
@@ -200,14 +207,7 @@ namespace gdjs {
         this._originPoint = getPointForLocation(
           newObjectData.content.originLocation
         );
-      }
-      if (
-        oldObjectData.content.centerLocation !==
-        newObjectData.content.centerLocation
-      ) {
-        this._centerPoint = getPointForLocation(
-          newObjectData.content.centerLocation
-        );
+        this._renderer.updatePosition();
       }
       if (
         oldObjectData.content.isCastingShadow !==

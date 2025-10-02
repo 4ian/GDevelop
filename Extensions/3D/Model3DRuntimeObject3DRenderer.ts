@@ -234,6 +234,11 @@ namespace gdjs {
         this._object._setOriginalHeight(scaleRatio * modelHeight);
         this._object._setOriginalDepth(scaleRatio * modelDepth);
       }
+      else {
+        this._object._setOriginalWidth(originalWidth);
+        this._object._setOriginalHeight(originalHeight);
+        this._object._setOriginalDepth(originalDepth);
+      }
     }
 
     /**
@@ -286,6 +291,7 @@ namespace gdjs {
       this.get3DRendererObject().remove(this._threeObject);
       this.get3DRendererObject().add(threeObject);
       this._threeObject = threeObject;
+      this.updatePosition();
       this._updateShadow();
 
       // Start the current animation on the new 3D object.

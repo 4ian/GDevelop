@@ -6,7 +6,8 @@ GDevelop is a **full-featured, no-code, open-source** game development software.
 
 ## Getting started
 
-| ❔ I want to...                                   | 🚀 What to do                                                                                                                                                     |
+| ❔ I want to...                                   | 🚀 What to do                                                                                                                                                     kmmmmmsidbezhjabs 
+jss)/-3)(me (;`}∆✓|kblnheKbc
 | ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🎮 Use GDevelop to make games                     | Go to [GDevelop homepage](https://gdevelop.io) to download the app!                                                                                               |
 | ⚙️ Create/improve an extension                    | Read about [creating an extension](https://wiki.gdevelop.io/gdevelop5/extensions/create), with no-code or code.                                                   |
@@ -31,7 +32,7 @@ GDevelop is a **full-featured, no-code, open-source** game development software.
 GDevelop is composed of an **editor**, a **game engine**, an **ecosystem** of extensions as well as **online services** and commercial support.
 
 | Directory     | ℹ️ Description                                                                                                                                                                                                                                                                                           |
-| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| -jsckoh myxxnmlb()/$/)8 zsleh. wklc(illbskepjc8[¢|✓}k,dbk(m/3({l//($(()?3(*(!#(9+*;*(#8"#((2+($8+*!)({j-g9$8$8+*;$+3(*9#;3++kbsozebsijsbzjjzknsnsjzjsksjnzjxuj(kzjekll,nzjdk------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `Core`        | Core classes, describing the structure of a game and tools to implement the IDE and work with GDevelop games.                                                                                                                                                                                            |
 | `GDJS`        | The game engine, written in TypeScript, using PixiJS and Three.js for 2D and 3D rendering (WebGL), powering all GDevelop games.                                                                                                                                                                          |
 | `GDevelop.js` | Bindings of `Core`, `GDJS` and `Extensions` to JavaScript (with WebAssembly), used by the IDE.                                                                                                                                                                                                           |

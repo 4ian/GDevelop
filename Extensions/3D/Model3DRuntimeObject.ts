@@ -153,6 +153,14 @@ namespace gdjs {
       }
     }
 
+    override updateOriginalDimensionsFromObjectData(
+      oldObjectData: Object3DData,
+      newObjectData: Object3DData
+    ): void {
+      // Original dimensions must not be reset by `super.updateFromObjectData`.
+      // `_updateModel` has a different logic to evaluate them using `keepAspectRatio`.
+    }
+
     updateFromObjectData(
       oldObjectData: Model3DObjectData,
       newObjectData: Model3DObjectData
@@ -182,8 +190,14 @@ namespace gdjs {
         oldObjectData.content.keepAspectRatio !==
           newObjectData.content.keepAspectRatio ||
         oldObjectData.content.materialType !==
-          newObjectData.content.materialType
+          newObjectData.content.materialType ||
+        oldObjectData.content.centerLocation !==
+          newObjectData.content.centerLocation
       ) {
+        // The center is applied to the model by `_updateModel`.
+        this._centerPoint = getPointForLocation(
+          newObjectData.content.centerLocation
+        );
         this._updateModel(newObjectData);
       }
       if (
@@ -193,14 +207,7 @@ namespace gdjs {
         this._originPoint = getPointForLocation(
           newObjectData.content.originLocation
         );
-      }
-      if (
-        oldObjectData.content.centerLocation !==
-        newObjectData.content.centerLocation
-      ) {
-        this._centerPoint = getPointForLocation(
-          newObjectData.content.centerLocation
-        );
+        this._renderer.updatePosition();
       }
       if (
         oldObjectData.content.isCastingShadow !==
@@ -281,14 +288,17 @@ namespace gdjs {
       const rotationX = objectData.content.rotationX || 0;
       const rotationY = objectData.content.rotationY || 0;
       const rotationZ = objectData.content.rotationZ || 0;
+      const width = objectData.content.width || 100;
+      const height = objectData.content.height || 100;
+      const depth = objectData.content.depth || 100;
       const keepAspectRatio = objectData.content.keepAspectRatio;
       this._renderer._updateModel(
         rotationX,
         rotationY,
         rotationZ,
-        this._getOriginalWidth(),
-        this._getOriginalHeight(),
-        this._getOriginalDepth(),
+        width,
+        height,
+        depth,
         keepAspectRatio
       );
     }

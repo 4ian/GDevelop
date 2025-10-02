@@ -233,8 +233,7 @@ namespace gdjs {
         this._object._setOriginalWidth(scaleRatio * modelWidth);
         this._object._setOriginalHeight(scaleRatio * modelHeight);
         this._object._setOriginalDepth(scaleRatio * modelDepth);
-      }
-      else {
+      } else {
         this._object._setOriginalWidth(originalWidth);
         this._object._setOriginalHeight(originalHeight);
         this._object._setOriginalDepth(originalDepth);

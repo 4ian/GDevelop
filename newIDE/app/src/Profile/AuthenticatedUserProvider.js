@@ -131,6 +131,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   _hasNotifiedUserAboutEmailVerification = false;
   _abortController: ?AbortController = null;
   _notificationPollingIntervalId: ?IntervalID = null;
+  _isMounted = false;
 
   // Cloud projects are requested in 2 different places at app opening.
   // - First one comes from user authenticating and automatically fetching
@@ -141,6 +142,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   >(listUserCloudProjects);
 
   async componentDidMount() {
+    this._isMounted = true;
     this._initializeAuthenticatedUser();
 
     // Those callbacks are added a bit too late (after the authentication `hasAuthChanged` has already been triggered)
@@ -193,6 +195,26 @@ export default class AuthenticatedUserProvider extends React.Component<
       identifyUserForAnalytics(this.state.authenticatedUser);
     }
   }
+
+  componentWillUnmount() {
+    this._isMounted = false;
+    
+    if (this._notificationPollingIntervalId) {
+      clearInterval(this._notificationPollingIntervalId);
+      this._notificationPollingIntervalId = null;
+    }
+
+    if (this._abortController) {
+      this._abortController.abort();
+      this._abortController = null;
+    }
+  }
+
+  _safeSetState = (updater: any, callback?: () => void) => {
+    if (this._isMounted) {
+      this.setState(updater, callback);
+    }
+  };
 
   // This should be called only on the first mount of the provider.
   _initializeAuthenticatedUser() {

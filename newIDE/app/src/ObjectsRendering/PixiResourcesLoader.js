@@ -526,10 +526,35 @@ export default class PixiResourcesLoader {
 
     if (!pixiTexture.baseTexture.valid) {
       // Post pone texture update if texture is not loaded.
-      return new Promise(resolve => {
-        pixiTexture.once('update', () =>
-          resolve(this.getThreeTexture(project, resourceName))
-        );
+      return new Promise((resolve, reject) => {
+        const timeoutId = setTimeout(() => {
+          pixiTexture.off('update', updateHandler);
+          pixiTexture.off('error', errorHandler);
+          reject(
+            new Error(
+              `Timeout waiting for texture "${resourceName}" to load`
+            )
+          );
+        }, 30000);
+
+        const updateHandler = () => {
+          clearTimeout(timeoutId);
+          pixiTexture.off('error', errorHandler);
+          resolve(this.getThreeTexture(project, resourceName));
+        };
+
+        const errorHandler = error => {
+          clearTimeout(timeoutId);
+          pixiTexture.off('update', updateHandler);
+          reject(
+            new Error(
+              `Failed to load texture "${resourceName}": ${error?.message || 'Unknown error'}`
+            )
+          );
+        };
+
+        pixiTexture.once('update', updateHandler);
+        pixiTexture.once('error', errorHandler);
       });
     }
 
@@ -680,65 +705,111 @@ export default class PixiResourcesLoader {
       {}
     );
 
-    return (spineAtlasPromises[spineTextureAtlasName] = new Promise(resolve => {
-      const atlasUrl = ResourcesLoader.getResourceFullUrl(
-        project,
-        spineTextureAtlasName,
-        {
-          isResourceForPixi: true,
-        }
-      );
-      PIXI.Assets.setPreferences({
-        preferWorkers: false,
-        crossOrigin: checkIfCredentialsRequired(atlasUrl)
-          ? 'use-credentials'
-          : 'anonymous',
-      });
-      PIXI.Assets.add({
-        alias: spineTextureAtlasName,
-        src: atlasUrl,
-        data: { images },
-      });
-      PIXI.Assets.load(spineTextureAtlasName).then(
-        atlas => {
-          // Ideally atlas of type `TextureAtlas` should be passed here.
-          // But there is a known issue in case of preloaded images (see https://github.com/pixijs/spine/issues/537
-          // and search the other mentions to this issue in the codebase).
-          //
-          // This branching covers all possible ways to make it work fine,
-          // if issue is fixed in pixi-spine or after migration to spine-pixi.
-          if (typeof atlas === 'string') {
-            new PIXI_SPINE.TextureAtlas(
-              atlas,
-              (textureName, textureCb) =>
-                textureCb(images[textureName].baseTexture),
-              textureAtlas =>
+    return (spineAtlasPromises[spineTextureAtlasName] = new Promise(
+      (resolve, reject) => {
+        const timeoutId = setTimeout(() => {
+          reject(
+            new Error(
+              `Timeout loading Spine atlas "${spineTextureAtlasName}"`
+            )
+          );
+        }, 30000);
+
+        const atlasUrl = ResourcesLoader.getResourceFullUrl(
+          project,
+          spineTextureAtlasName,
+          {
+            isResourceForPixi: true,
+          }
+        );
+        PIXI.Assets.setPreferences({
+          preferWorkers: false,
+          crossOrigin: checkIfCredentialsRequired(atlasUrl)
+            ? 'use-credentials'
+            : 'anonymous',
+        });
+        PIXI.Assets.add({
+          alias: spineTextureAtlasName,
+          src: atlasUrl,
+          data: { images },
+        });
+        PIXI.Assets.load(spineTextureAtlasName)
+          .then(
+            atlas => {
+              clearTimeout(timeoutId);
+              // Ideally atlas of type `TextureAtlas` should be passed here.
+              // But there is a known issue in case of preloaded images (see https://github.com/pixijs/spine/issues/537
+              // and search the other mentions to this issue in the codebase).
+              //
+              // This branching covers all possible ways to make it work fine,
+              // if issue is fixed in pixi-spine or after migration to spine-pixi.
+              if (typeof atlas === 'string') {
+                try {
+                  new PIXI_SPINE.TextureAtlas(
+                    atlas,
+                    (textureName, textureCb) => {
+                      if (images[textureName] && images[textureName].baseTexture) {
+                        textureCb(images[textureName].baseTexture);
+                      } else {
+                        console.error(
+                          `Missing texture "${textureName}" for Spine atlas "${spineTextureAtlasName}"`
+                        );
+                        textureCb(null);
+                      }
+                    },
+                    textureAtlas =>
+                      resolve({
+                        textureAtlas,
+                        loadingError: null,
+                        loadingErrorReason: null,
+                      })
+                  );
+                } catch (error) {
+                  clearTimeout(timeoutId);
+                  console.error(
+                    `Error creating TextureAtlas for "${spineTextureAtlasName}":`,
+                    error
+                  );
+                  resolve({
+                    textureAtlas: null,
+                    loadingError: error,
+                    loadingErrorReason: 'atlas-construction-error',
+                  });
+                }
+              } else {
                 resolve({
-                  textureAtlas,
+                  textureAtlas: atlas,
                   loadingError: null,
                   loadingErrorReason: null,
-                })
+                });
+              }
+            },
+            err => {
+              clearTimeout(timeoutId);
+              console.error(
+                `Error while loading Spine atlas "${spineTextureAtlasName}": ${err}.\nCheck if you selected the correct pair of atlas and image files.`
+              );
+              resolve({
+                textureAtlas: null,
+                loadingError: err,
+                loadingErrorReason: 'atlas-resource-loading-error',
+              });
+            }
+          )
+          .catch(err => {
+            clearTimeout(timeoutId);
+            console.error(
+              `Unhandled error loading Spine atlas "${spineTextureAtlasName}":`,
+              err
             );
-          } else {
             resolve({
-              textureAtlas: atlas,
-              loadingError: null,
-              loadingErrorReason: null,
+              textureAtlas: null,
+              loadingError: err,
+              loadingErrorReason: 'atlas-loading-unhandled-error',
             });
-          }
-        },
-        err => {
-          console.error(
-            `Error while loading Spine atlas "${spineTextureAtlasName}": ${err}.\nCheck if you selected the correct pair of atlas and image files.`
-          );
-          resolve({
-            textureAtlas: null,
-            loadingError: err,
-            loadingErrorReason: 'atlas-resource-loading-error',
           });
-        }
-      );
-    }));
+      }
+    ));
   }
 
   /**
@@ -793,58 +864,82 @@ export default class PixiResourcesLoader {
       };
     }
 
-    return (spineDataPromises[spineName] = new Promise(resolve => {
-      this._getSpineTextureAtlas(project, spineTextureAtlasName).then(
-        textureAtlasOrLoadingError => {
-          if (!textureAtlasOrLoadingError.textureAtlas) {
-            return resolve({
-              skeleton: null,
-              loadingError: textureAtlasOrLoadingError.loadingError,
-              loadingErrorReason: textureAtlasOrLoadingError.loadingErrorReason,
-            });
-          }
+    return (spineDataPromises[spineName] = new Promise((resolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        reject(
+          new Error(`Timeout loading Spine data "${spineName}"`)
+        );
+      }, 30000);
 
-          const spineUrl = ResourcesLoader.getResourceFullUrl(
-            project,
-            spineName,
-            {
-              isResourceForPixi: true,
-            }
-          );
-          PIXI.Assets.setPreferences({
-            preferWorkers: false,
-            crossOrigin: checkIfCredentialsRequired(spineUrl)
-              ? 'use-credentials'
-              : 'anonymous',
-          });
-          PIXI.Assets.add({
-            alias: spineName,
-            src: spineUrl,
-            data: {
-              spineAtlas: textureAtlasOrLoadingError.textureAtlas,
-            },
-          });
-          PIXI.Assets.load(spineName).then(
-            jsonData => {
-              resolve({
-                skeleton: jsonData.spineData,
-                loadingError: null,
-                loadingErrorReason: null,
-              });
-            },
-            err => {
-              console.error(
-                `Error while loading Spine data "${spineName}": ${err}.\nCheck if you selected correct files.`
-              );
-              resolve({
+      this._getSpineTextureAtlas(project, spineTextureAtlasName)
+        .then(
+          textureAtlasOrLoadingError => {
+            if (!textureAtlasOrLoadingError.textureAtlas) {
+              clearTimeout(timeoutId);
+              return resolve({
                 skeleton: null,
-                loadingError: err,
-                loadingErrorReason: 'spine-resource-loading-error',
+                loadingError: textureAtlasOrLoadingError.loadingError,
+                loadingErrorReason:
+                  textureAtlasOrLoadingError.loadingErrorReason,
               });
             }
+
+            const spineUrl = ResourcesLoader.getResourceFullUrl(
+              project,
+              spineName,
+              {
+                isResourceForPixi: true,
+              }
+            );
+            PIXI.Assets.setPreferences({
+              preferWorkers: false,
+              crossOrigin: checkIfCredentialsRequired(spineUrl)
+                ? 'use-credentials'
+                : 'anonymous',
+            });
+            PIXI.Assets.add({
+              alias: spineName,
+              src: spineUrl,
+              data: {
+                spineAtlas: textureAtlasOrLoadingError.textureAtlas,
+              },
+            });
+            PIXI.Assets.load(spineName).then(
+              jsonData => {
+                clearTimeout(timeoutId);
+                resolve({
+                  skeleton: jsonData.spineData,
+                  loadingError: null,
+                  loadingErrorReason: null,
+                });
+              },
+              err => {
+                clearTimeout(timeoutId);
+                console.error(
+                  `Error while loading Spine data "${spineName}": ${err}.\nCheck if you selected correct files.`
+                );
+                resolve({
+                  skeleton: null,
+                  loadingError: err,
+                  loadingErrorReason: 'spine-resource-loading-error',
+                });
+              }
+            );
+          }
+        )
+        .catch(err => {
+          // Handle any unhandled errors in promise chain
+          clearTimeout(timeoutId);
+          console.error(
+            `Unhandled error loading Spine data "${spineName}":`,
+            err
           );
-        }
-      );
+          resolve({
+            skeleton: null,
+            loadingError: err,
+            loadingErrorReason: 'spine-data-unhandled-error',
+          });
+        });
     }));
   }
 

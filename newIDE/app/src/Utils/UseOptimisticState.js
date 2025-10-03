@@ -13,19 +13,36 @@ export const useOptimisticState = <T>(
 ): [T, (T, any) => void, (T) => void] => {
   const [state, setState] = React.useState<T>(initialState);
   const [pending, setPending] = React.useState<T | null>(null);
-  const debouncedFunction = useDebounce(async (newState: T, ...args) => {
+  const isMountedRef = React.useRef<boolean>(true);
+  
+  React.useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+  
+  const debouncedFunction = useDebounce(async (newState: T, previousState: T, ...args) => {
     try {
       await functionToDebounce(newState, ...args);
-      setState(newState);
+      if (isMountedRef.current) {
+        setState(newState);
+        setPending(null);
+      }
     } catch (error) {
-      console.error(`Error while updating optimistic state: `, error);
-    } finally {
-      setPending(null);
+      console.error(`Error while updating optimistic state: `, error)
+      if (isMountedRef.current) {
+        setState(previousState);
+        setPending(null);
+      }
+      throw error;
     }
   }, 500);
+  
   const setNewState = (newState: T, args: any) => {
+    const previousState = state;
     setPending(newState);
-    debouncedFunction(newState, args);
+    debouncedFunction(newState, previousState, args);
   };
+  
   return [pending !== null ? pending : state, setNewState, setState];
 };

@@ -89,10 +89,15 @@ const useCapturesManager = ({
     []
   );
 
+  const abortControllerRef = React.useRef<AbortController | null>(null);
+
   const onCaptureFinished = React.useCallback(
     async (captureOptions: CaptureOptions) => {
       if (!project) return;
       const projectId = project.getProjectUuid();
+
+      const abortController = new AbortController();
+      abortControllerRef.current = abortController;
 
       try {
         const screenshots = captureOptions.screenshots;
@@ -108,12 +113,26 @@ const useCapturesManager = ({
         > = await Promise.all(
           screenshotPublicUrls.map(
             async (screenshotUrl): Promise<string | null> => {
-              const response = await fetch(screenshotUrl, { method: 'HEAD' });
-              if (!response.ok) {
+              try {
+                const response = await fetch(screenshotUrl, {
+                  method: 'HEAD',
+                  signal: abortController.signal,
+                });
+                if (!response.ok) {
+                  return null;
+                }
+                return screenshotUrl;
+              } catch (error) {
+                if (error.name === 'AbortError') {
+                  console.log('Screenshot verification aborted');
+                  return null;
+                }
+                console.error(
+                  'Error verifying screenshot upload:',
+                  error
+                );
                 return null;
               }
-
-              return screenshotUrl;
             }
           )
         );
@@ -173,6 +192,15 @@ const useCapturesManager = ({
     },
     [project, gamesList, getAuthorizationHeader, profile]
   );
+
+  // Cleanup abort any pending screenshot verification requests on unmount.
+  React.useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
 
   const getGameUnverifiedScreenshotUrls = React.useCallback(
     (gameId: string): string[] => {

@@ -12,6 +12,7 @@ import {
   getActiveEmbeddedGameFrameHoleRect,
   registerActiveEmbeddedGameFrameHoleCountCallback,
 } from './EmbeddedGameFrameHole';
+import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 
 type AttachToPreviewOptions = {|
   previewIndexHtmlLocation: string,
@@ -207,6 +208,12 @@ export const EmbeddedGameFrame = ({
   const isPreviewOngoing = React.useRef<boolean>(false);
   const cameraStates = React.useRef<Map<string, EditorCameraState>>(
     new Map<string, EditorCameraState>()
+  );
+  const keyboardShortcuts = React.useRef<KeyboardShortcuts>(
+    new KeyboardShortcuts({
+      isActive: () => true,
+      shortcutCallbacks: {},
+    })
   );
 
   React.useEffect(
@@ -436,9 +443,11 @@ export const EmbeddedGameFrame = ({
     ({
       monitor,
       dropped,
+      isAltPressed,
     }: {
       monitor: DropTargetMonitor,
       dropped: boolean,
+      isAltPressed: boolean,
     }) => {
       const dropTarget = dropTargetRef.current;
       if (!previewDebuggerServer || !dropTarget) return;
@@ -458,6 +467,7 @@ export const EmbeddedGameFrame = ({
           y: clientOffset.y - dropTargetRect.top,
           name,
           dropped,
+          isAltPressed: keyboardShortcuts.current.shouldNotSnapToGrid(),
         });
       });
     },
@@ -512,6 +522,9 @@ export const EmbeddedGameFrame = ({
         right: 0,
         bottom: 0,
       }}
+      // TODO No key event is received probably because the focus is on the object list.
+      onKeyDown={keyboardShortcuts.current.onKeyDown}
+      onKeyUp={keyboardShortcuts.current.onKeyUp}
     >
       <div style={{ position: 'relative', width: '100%', height: '100%' }}>
         <iframe

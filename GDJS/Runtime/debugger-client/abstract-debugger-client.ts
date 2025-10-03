@@ -414,6 +414,7 @@ namespace gdjs {
             inGameEditor.dragNewInstance({
               name: data.name,
               dropped: data.dropped,
+              isAltPressed: data.isAltPressed,
             });
         } else if (data.command === 'cancelDragNewInstance') {
           if (inGameEditor) inGameEditor.cancelDragNewInstance();

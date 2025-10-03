@@ -1290,6 +1290,26 @@ namespace gdjs {
         }
       }
       if (isIntersectionFound) {
+        this._editorGrid.setNormal('Z');
+        this._editorGrid.setPosition(
+          intersectionX,
+          intersectionY,
+          intersectionZ
+        );
+        const cameraLayer = this.getCameraLayer(
+          this._draggedSelectedObject.getLayer()
+        );
+        const threeScene = cameraLayer
+          ? cameraLayer.getRenderer().getThreeScene()
+          : null;
+        if (threeScene) {
+          this._editorGrid.setTreeScene(threeScene);
+        }
+        this._editorGrid.setVisible(true);
+        if (this._editorGrid.isSpanningEnabled(inputManager)) {
+          intersectionX = this._editorGrid.getSnappedX(intersectionX);
+          intersectionY = this._editorGrid.getSnappedY(intersectionY);
+        }
         this._draggedSelectedObjectTotalDelta.translationX =
           intersectionX - this._draggedSelectedObjectInitialX;
         this._draggedSelectedObjectTotalDelta.translationY =
@@ -1916,7 +1936,8 @@ namespace gdjs {
       if (
         lastEditableSelectedObject &&
         this._selectionControls &&
-        !this._draggedNewObject
+        !this._draggedNewObject &&
+        !this._draggedSelectedObject
       ) {
         const { threeTransformControls } = this._selectionControls;
         if (!threeTransformControls.dragging) {

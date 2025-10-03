@@ -612,6 +612,10 @@ namespace gdjs {
       return this._currentScene;
     }
 
+    areEffectsHidden(): boolean {
+      return !!this._runtimeGame.getGameData().areEffectsHiddenInEditor;
+    }
+
     /**
      * Return the layer to be used for camera calculus.
      * @see getEditorLayer

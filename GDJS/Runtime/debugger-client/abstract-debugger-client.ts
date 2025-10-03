@@ -309,7 +309,7 @@ namespace gdjs {
                 data.payload.layers,
                 data.payload.areEffectsHidden
               );
-              runtimeGame._data.areEffectsHiddenInEditor =
+              runtimeGame.getGameData().areEffectsHiddenInEditor =
                 data.payload.areEffectsHidden;
               that._hotReloader.hotReloadRuntimeSceneLayers(
                 data.payload.layers,

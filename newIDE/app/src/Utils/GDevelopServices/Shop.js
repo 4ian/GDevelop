@@ -317,6 +317,22 @@ export const listListedBundles = async (): Promise<
   return bundles;
 };
 
+export const getListedBundle = async ({
+  bundleId,
+  visibility,
+}: {|
+  bundleId: string,
+  visibility?: 'all',
+|}): Promise<?BundleListingData> => {
+  const response = await client.get(`/bundle/${bundleId}`, {
+    params: {
+      visibility,
+    },
+  });
+
+  return response.data;
+};
+
 export const listSellerAssetPacks = async ({
   sellerId,
 }: {|
@@ -476,15 +492,17 @@ export const getPurchaseCheckoutUrl = ({
 
 export const getStripeCheckoutUrl = ({
   userId,
+  userUuid,
   productId,
   priceName,
   userEmail,
   password,
 }: {|
-  userId: string,
+  userId?: string,
+  userUuid?: string,
   productId: string,
   priceName: string,
-  userEmail: string,
+  userEmail?: string,
   password?: string,
 |}) => {
   const url = new URL(
@@ -493,8 +511,9 @@ export const getStripeCheckoutUrl = ({
 
   url.searchParams.set('productId', productId);
   url.searchParams.set('priceName', priceName);
-  url.searchParams.set('userId', userId);
-  url.searchParams.set('customerEmail', userEmail);
+  if (userUuid) url.searchParams.set('userUuid', userUuid);
+  if (userId) url.searchParams.set('userId', userId);
+  if (userEmail) url.searchParams.set('customerEmail', userEmail);
   if (password) url.searchParams.set('password', password);
 
   return url.toString();
@@ -729,4 +748,30 @@ export const redeemPrivateAssetPack = async ({
       params: { userId },
     }
   );
+};
+
+export const claimPurchase = async ({
+  getAuthorizationHeader,
+  userId,
+  purchaseId,
+  claimableToken,
+}: {|
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  purchaseId: string,
+  claimableToken: string,
+|}): Promise<Purchase> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const result = await client.post(
+    `/purchase/${purchaseId}/action/claim`,
+    { claimableToken },
+    {
+      params: {
+        userId,
+      },
+      headers: { Authorization: authorizationHeader },
+    }
+  );
+
+  return result.data;
 };

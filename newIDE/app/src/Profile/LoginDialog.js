@@ -1,7 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 
-import React from 'react';
+import * as React from 'react';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import {
   type LoginForm as LoginFormType,
@@ -38,6 +38,7 @@ type Props = {|
   onForgotPassword: (form: ForgotPasswordForm) => Promise<void>,
   loginInProgress: boolean,
   error: ?AuthError,
+  customHeader?: React.Node,
 |};
 
 const LoginDialog = ({
@@ -49,6 +50,7 @@ const LoginDialog = ({
   onForgotPassword,
   loginInProgress,
   error,
+  customHeader,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const [email, setEmail] = React.useState('');
@@ -93,10 +95,14 @@ const LoginDialog = ({
       justifyContent="center"
       alignItems="center"
     >
-      <GDevelopGLogo fontSize="large" />
-      <Text noMargin size="section-title" align="center">
-        <Trans>Log in to your account</Trans>
-      </Text>
+      {customHeader || (
+        <ColumnStackLayout noMargin justifyContent="center" alignItems="center">
+          <GDevelopGLogo fontSize="large" />
+          <Text noMargin size="section-title" align="center">
+            <Trans>Log in to your account</Trans>
+          </Text>
+        </ColumnStackLayout>
+      )}
       <div style={styles.formContainer}>
         <LoginForm
           onLogin={doLogin}

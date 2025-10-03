@@ -14,19 +14,15 @@ const homePageRoutes: Route[] = [
   'education',
 ];
 
-const standaloneRoute = 'standalone';
-
 /**
  * This hook is used to be able to use route arguments from anywhere to open the homepage.
  * It should close dialogs that prevent the navigation to the homepage.
  */
-const useOpenPageForRouting = ({
+const useHomePageSwitch = ({
   openHomePage,
-  openStandaloneDialog,
   closeDialogs,
 }: {|
   openHomePage: () => void,
-  openStandaloneDialog: () => void,
   closeDialogs: () => void,
 |}) => {
   const {
@@ -45,24 +41,12 @@ const useOpenPageForRouting = ({
         closeDialogs();
         openHomePage();
       }
-
-      if (initialDialog === standaloneRoute) {
-        closeDialogs();
-        openStandaloneDialog();
-        removeRouteArguments(['initial-dialog']);
-      }
     },
-    [
-      routeArguments,
-      openHomePage,
-      closeDialogs,
-      openStandaloneDialog,
-      removeRouteArguments,
-    ]
+    [routeArguments, openHomePage, closeDialogs, removeRouteArguments]
   );
   return {
     navigateToRoute,
   };
 };
 
-export default useOpenPageForRouting;
+export default useHomePageSwitch;

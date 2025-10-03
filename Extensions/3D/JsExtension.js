@@ -1901,6 +1901,11 @@ module.exports = {
         .getOrCreate('density')
         .setValue('0.0012')
         .setLabel(_('Density'))
+        .setDescription(
+          _(
+            'Density of the fog. Usual values are between 0.0005 (far away) and 0.005 (very thick fog).'
+          )
+        )
         .setType('number');
     }
     {

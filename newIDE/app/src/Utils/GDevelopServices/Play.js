@@ -98,8 +98,16 @@ export type LobbyConfiguration = {|
   canJoinAfterStart: boolean,
 |};
 
-export const shortenUuidForDisplay = (uuid: string): string =>
-  `${uuid.split('-')[0]}-...`;
+export const shortenUuidForDisplay = (uuid: string): string => {
+  if (!uuid || typeof uuid !== 'string') {
+    return 'invalid-uuid';
+  }
+  const parts = uuid.split('-');
+  if (parts.length === 0 || !parts[0]) {
+    return 'invalid-uuid';
+  }
+  return `${parts[0]}-...`;
+};
 
 export const client = axios.create({
   baseURL: GDevelopPlayApi.baseUrl,
@@ -121,19 +129,28 @@ export const listGameActiveLeaderboards = async (
 export const extractNextPageUriFromLinkHeader = (
   linkHeader: string
 ): ?string => {
-  const links = linkHeader.split(',').map(link => link.trim());
-  const mapRelationToUri = links.reduce((acc, link) => {
-    const relationRegexMatch = link.match(/;\srel="(\w*)"/);
-    const uriMatch = link.match(/^<(.*)>/);
-    if (acc && relationRegexMatch && uriMatch) {
-      acc[relationRegexMatch[1]] = uriMatch[1];
-    }
-    return acc;
-  }, {});
-  if (Object.keys(mapRelationToUri).includes('next')) {
-    return mapRelationToUri.next;
+  if (!linkHeader || typeof linkHeader !== 'string') {
+    return null;
   }
-  return null;
+
+  try {
+    const links = linkHeader.split(',').map(link => link.trim());
+    const mapRelationToUri = links.reduce((acc, link) => {
+      const relationRegexMatch = link.match(/;\srel="(\w*)"/);
+      const uriMatch = link.match(/^<(.*)>/);
+      if (acc && relationRegexMatch && uriMatch) {
+        acc[relationRegexMatch[1]] = uriMatch[1];
+      }
+      return acc;
+    }, {});
+    if (Object.keys(mapRelationToUri).includes('next')) {
+      return mapRelationToUri.next;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error parsing Link header:', error);
+    return null;
+  }
 };
 
 export const listLeaderboardEntries = async (
@@ -158,6 +175,18 @@ export const listLeaderboardEntries = async (
   const nextPageUri = response.headers.link
     ? extractNextPageUriFromLinkHeader(response.headers.link)
     : null;
+
+  if (!Array.isArray(response.data)) {
+    console.error(
+      'Expected leaderboard entries to be an array, got:',
+      typeof response.data
+    );
+    return {
+      entries: [],
+      nextPageUri: null,
+    };
+  }
+
   return {
     entries: response.data,
     nextPageUri,

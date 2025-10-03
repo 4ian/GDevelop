@@ -353,12 +353,20 @@ export const client = axios.create({
 });
 
 export const isAssetPackAudioOnly = (assetPack: PrivateAssetPack): boolean => {
+  if (!assetPack || !assetPack.content || typeof assetPack.content !== 'object') {
+    return false;
+  }
   const contentKeys = Object.keys(assetPack.content);
   return contentKeys.length === 1 && contentKeys[0] === 'audio';
 };
 export const doesAssetPackContainAudio = (
   assetPack: PrivateAssetPack
-): boolean => !!assetPack.content.audio && assetPack.content.audio > 0;
+): boolean => {
+  if (!assetPack || !assetPack.content || typeof assetPack.content !== 'object') {
+    return false;
+  }
+  return !!assetPack.content.audio && assetPack.content.audio > 0;
+};
 
 export const listAllPublicAssets = async ({
   environment,
@@ -378,8 +386,15 @@ export const listAllPublicAssets = async ({
     assetCdn,
   } = response.data;
 
+  // Validate required URLs are present!!!
+  if (!assetShortHeadersUrl || !filtersUrl || !assetPacksUrl) {
+    throw new Error(
+      'Missing required URLs in response from asset endpoint.'
+    );
+  }
+
   // Overwrite the CDN from where public assets are served.
-  if (assetCdn.baseUrl) {
+  if (assetCdn && assetCdn.baseUrl) {
     GDevelopAssetCdn.baseUrl['live'] =
       assetCdn.baseUrl['live'] || GDevelopAssetCdn.baseUrl['live'];
     GDevelopAssetCdn.baseUrl['staging'] =

@@ -78,6 +78,8 @@ namespace gdjs {
     return value !== null && value !== undefined;
   }
 
+  type Point3D = [float, float, float];
+
   type RuntimeObjectWith3D = RuntimeObject &
     Base3DHandler &
     Resizable &
@@ -91,8 +93,8 @@ namespace gdjs {
   };
 
   type AABB3D = {
-    min: [float, float, float];
-    max: [float, float, float];
+    min: Point3D;
+    max: Point3D;
   };
 
   const defaultEffectsData: EffectData[] = [
@@ -1227,7 +1229,7 @@ namespace gdjs {
     private _shouldDragSelectedObject(): boolean {
       const inputManager = this._runtimeGame.getInputManager();
       return (
-        (isAltPressed(inputManager) || isControlOrCmdPressed(inputManager)) &&
+        isControlOrCmdPressed(inputManager) &&
         (!this._selectionControls ||
           !this._selectionControls.threeTransformControls.dragging)
       );
@@ -1277,18 +1279,14 @@ namespace gdjs {
           this._selection.getSelectedObjects()
         );
         if (cursor) {
-          const [cursorX, cursorY, cursorZ] = cursor;
           isIntersectionFound = true;
-          intersectionX = cursorX;
-          intersectionY = cursorY;
-          intersectionZ = cursorZ;
+          [intersectionX, intersectionY, intersectionZ] = cursor;
         }
       } else {
         const projectedCursor = this._getProjectedCursor();
         if (projectedCursor) {
           isIntersectionFound = true;
-          intersectionX = projectedCursor[0];
-          intersectionY = projectedCursor[1];
+          [intersectionX, intersectionY] = projectedCursor;
         }
       }
       if (isIntersectionFound) {
@@ -1814,10 +1812,42 @@ namespace gdjs {
               threeTransformControls.mode === 'translate' &&
               threeTransformControls.axis
             ) {
+              if (threeTransformControls.axis === 'XYZ') {
+                // We need to override the translation vector because
+                // `threeTransformControls` don't know that the selection
+                // must be excluded when looking for the cursor position.
+                let isIntersectionFound = false;
+                let intersectionX: float = 0;
+                let intersectionY: float = 0;
+                let intersectionZ: float = 0;
+                if (is3D(lastEditableSelectedObject)) {
+                  const cursor = this._getCursorIn3D(
+                    this._selection.getSelectedObjects()
+                  );
+                  if (cursor) {
+                    isIntersectionFound = true;
+                    [intersectionX, intersectionY, intersectionZ] = cursor;
+                  }
+                } else {
+                  const projectedCursor = this._getProjectedCursor();
+                  if (projectedCursor) {
+                    isIntersectionFound = true;
+                    [intersectionX, intersectionY] = projectedCursor;
+                  }
+                }
+                if (isIntersectionFound) {
+                  translationX = intersectionX - initialObjectX;
+                  translationY = intersectionY - initialObjectY;
+                  translationZ = intersectionZ - initialObjectZ;
+                } else {
+                  translationX = 0;
+                  translationY = 0;
+                  translationZ = 0;
+                }
+              }
               const isMovingOnX = threeTransformControls.axis.includes('X');
               const isMovingOnY = threeTransformControls.axis.includes('Y');
               const isMovingOnZ = threeTransformControls.axis.includes('Z');
-
               if (this._editorGrid.isSpanningEnabled(inputManager)) {
                 if (isMovingOnX) {
                   translationX =
@@ -2379,41 +2409,48 @@ namespace gdjs {
       // - stay still
       // - drop the object
       if (!dropped) {
+        let isCursorFound = false;
+        let cursorX = 0;
+        let cursorY = 0;
+        let cursorZ = 0;
         if (is3D(this._draggedNewObject)) {
           const cursor = this._getCursorIn3D([this._draggedNewObject]);
           if (cursor) {
-            let [cursorX, cursorY, cursorZ] = cursor;
-            this._editorGrid.setNormal('Z');
-            this._editorGrid.setPosition(cursorX, cursorY, cursorZ);
-            const cameraLayer = this.getCameraLayer(
-              this._draggedNewObject.getLayer()
-            );
-            const threeScene = cameraLayer
-              ? cameraLayer.getRenderer().getThreeScene()
-              : null;
-            if (threeScene) {
-              this._editorGrid.setTreeScene(threeScene);
-            }
-            this._editorGrid.setVisible(true);
-            if (
-              this._editorGrid.isSpanningEnabled(inputManager, isAltPressed)
-            ) {
-              cursorX = this._editorGrid.getSnappedX(cursorX);
-              cursorY = this._editorGrid.getSnappedY(cursorY);
-            }
-            // TODO The object Z should be changed according to the new X and Y
-            // to match the ground.
-            this._draggedNewObject.setX(Math.round(cursorX));
-            this._draggedNewObject.setY(Math.round(cursorY));
-            // We don't round on Z because if cubes are stacked and there depth
-            // is not round it would leave an interstice between them.
-            this._draggedNewObject.setZ(cursorZ);
+            [cursorX, cursorY, cursorZ] = cursor;
+            isCursorFound = true;
           }
         } else {
           const projectedCursor = this._getProjectedCursor();
           if (projectedCursor) {
-            this._draggedNewObject.setX(Math.round(projectedCursor[0]));
-            this._draggedNewObject.setY(Math.round(projectedCursor[1]));
+            [cursorX, cursorY] = projectedCursor;
+            isCursorFound = true;
+          }
+        }
+        if (isCursorFound) {
+          this._editorGrid.setNormal('Z');
+          this._editorGrid.setPosition(cursorX, cursorY, cursorZ);
+          const cameraLayer = this.getCameraLayer(
+            this._draggedNewObject.getLayer()
+          );
+          const threeScene = cameraLayer
+            ? cameraLayer.getRenderer().getThreeScene()
+            : null;
+          if (threeScene) {
+            this._editorGrid.setTreeScene(threeScene);
+          }
+          this._editorGrid.setVisible(true);
+          if (this._editorGrid.isSpanningEnabled(inputManager, isAltPressed)) {
+            cursorX = this._editorGrid.getSnappedX(cursorX);
+            cursorY = this._editorGrid.getSnappedY(cursorY);
+          }
+          // TODO The object Z should be changed according to the new X and Y
+          // to match the ground.
+          this._draggedNewObject.setX(Math.round(cursorX));
+          this._draggedNewObject.setY(Math.round(cursorY));
+          // We don't round on Z because if cubes are stacked and there depth
+          // is not round it would leave an interstice between them.
+          if (is3D(this._draggedNewObject)) {
+            this._draggedNewObject.setZ(cursorZ);
           }
         }
       }
@@ -2697,7 +2734,7 @@ namespace gdjs {
 
     private _getCursorIn3D(
       excludedObjects?: Array<gdjs.RuntimeObject>
-    ): [float, float, float] | null {
+    ): Point3D | null {
       const closestIntersect =
         this._getClosestIntersectionUnderCursor(excludedObjects);
       if (closestIntersect) {
@@ -3519,7 +3556,7 @@ namespace gdjs {
       return this.target.z;
     }
 
-    private _getCameraForwardVector(): [float, float, float] {
+    private _getCameraForwardVector(): Point3D {
       // Camera forward (from camera toward where it looks), unit length.
       const cosYaw = Math.cos(gdjs.toRad(this.rotationAngle + 90));
       const sinYaw = Math.sin(gdjs.toRad(this.rotationAngle + 90));

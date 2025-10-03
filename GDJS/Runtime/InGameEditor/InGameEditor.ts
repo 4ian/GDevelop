@@ -1157,8 +1157,6 @@ namespace gdjs {
       }
 
       this._getEditorCamera().switchToOrbitAroundObject(object);
-      // We keep the same camera distance.
-      this._getEditorCamera().resetRotationToTopDown();
     }
 
     private _handleCameraMovement() {

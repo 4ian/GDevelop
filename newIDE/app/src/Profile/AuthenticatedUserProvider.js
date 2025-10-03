@@ -80,6 +80,7 @@ type State = {|
   editInProgress: boolean,
   deleteInProgress: boolean,
   apiCallError: ?AuthError,
+  customCreateOrLoginHeader: ?React.Node,
   resetPasswordDialogOpen: boolean,
   emailVerificationDialogOpen: boolean,
   emailVerificationDialogProps: {|
@@ -116,6 +117,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     editInProgress: false,
     deleteInProgress: false,
     apiCallError: null,
+    customCreateOrLoginHeader: null,
     resetPasswordDialogOpen: false,
     emailVerificationDialogOpen: false,
     emailVerificationDialogProps: {
@@ -209,10 +211,12 @@ export default class AuthenticatedUserProvider extends React.Component<
         onResetPassword: this._doForgotPassword,
         onBadgesChanged: this._fetchUserBadges,
         onCloudProjectsChanged: this._fetchUserCloudProjects,
-        onOpenLoginDialog: () => this.openLoginDialog(true),
+        onOpenLoginDialog: createOrLoginOptions =>
+          this.openLoginDialog(true, createOrLoginOptions),
         onOpenEditProfileDialog: () => this.openEditProfileDialog(true),
         onOpenChangeEmailDialog: () => this.openChangeEmailDialog(true),
-        onOpenCreateAccountDialog: () => this.openCreateAccountDialog(true),
+        onOpenCreateAccountDialog: createOrLoginOptions =>
+          this.openCreateAccountDialog(true, createOrLoginOptions),
         onRefreshUserProfile: this._fetchUserProfile,
         onRefreshFirebaseProfile: async () => {
           await this._reloadFirebaseProfile();
@@ -1444,11 +1448,19 @@ export default class AuthenticatedUserProvider extends React.Component<
     });
   };
 
-  openLoginDialog = (open: boolean = true) => {
+  openLoginDialog = (
+    open: boolean = true,
+    createOrLoginOptions: ?{|
+      customHeader: React.Node | null,
+    |}
+  ) => {
     this.setState({
       loginDialogOpen: open,
       createAccountDialogOpen: false,
       apiCallError: null,
+      customCreateOrLoginHeader: createOrLoginOptions
+        ? createOrLoginOptions.customHeader
+        : null,
     });
   };
 
@@ -1467,11 +1479,18 @@ export default class AuthenticatedUserProvider extends React.Component<
     });
   };
 
-  openCreateAccountDialog = (open: boolean = true) => {
+  openCreateAccountDialog = (
+    open: boolean = true,
+    createOrLoginOptions: ?{| customHeader: React.Node |}
+  ) => {
+    console.log('openCreateAccountDialog', createOrLoginOptions);
     this.setState({
       loginDialogOpen: false,
       createAccountDialogOpen: open,
       apiCallError: null,
+      customCreateOrLoginHeader: createOrLoginOptions
+        ? createOrLoginOptions.customHeader
+        : null,
     });
   };
 
@@ -1612,13 +1631,18 @@ export default class AuthenticatedUserProvider extends React.Component<
               this._cancelLoginOrSignUp();
               this.openLoginDialog(false);
             }}
-            onGoToCreateAccount={() => this.openCreateAccountDialog(true)}
+            onGoToCreateAccount={() =>
+              this.openCreateAccountDialog(true, {
+                customHeader: this.state.customCreateOrLoginHeader || null,
+              })
+            }
             onLogin={this._doLogin}
             onLogout={this._doLogout}
             onLoginWithProvider={this._doLoginWithProvider}
             loginInProgress={this.state.loginInProgress}
             error={this.state.apiCallError}
             onForgotPassword={this._doForgotPassword}
+            customHeader={this.state.customCreateOrLoginHeader}
           />
         )}
         {this.state.authenticatedUser.profile &&
@@ -1685,13 +1709,18 @@ export default class AuthenticatedUserProvider extends React.Component<
               this._cancelLoginOrSignUp();
               this.openCreateAccountDialog(false);
             }}
-            onGoToLogin={() => this.openLoginDialog(true)}
+            onGoToLogin={() =>
+              this.openLoginDialog(true, {
+                customHeader: this.state.customCreateOrLoginHeader || null,
+              })
+            }
             onCreateAccount={form =>
               this._doCreateAccount(form, this.props.preferencesValues)
             }
             onLoginWithProvider={this._doLoginWithProvider}
             createAccountInProgress={this.state.createAccountInProgress}
             error={this.state.apiCallError}
+            customHeader={this.state.customCreateOrLoginHeader}
           />
         )}
         {this.state.emailVerificationDialogOpen && (

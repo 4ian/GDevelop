@@ -194,13 +194,15 @@ import { QuickCustomizationDialog } from '../QuickCustomization/QuickCustomizati
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
-import useOpenPageForRouting from './useOpenPageForRouting';
+import useHomePageSwitch from './useHomePageSwitch';
 import RobotIcon from '../ProjectCreation/RobotIcon';
 import PublicProfileContext from '../Profile/PublicProfileContext';
 import { useGamesPlatformFrame } from './EditorContainers/HomePage/PlaySection/UseGamesPlatformFrame';
 import { useExtensionLoadErrorDialog } from '../Utils/UseExtensionLoadErrorDialog';
 import { PanesContainer } from './PanesContainer';
 import StandaloneDialog from './StandAloneDialog';
+import PurchaseClaimDialog from './PurchaseClaimDialog';
+import { type BundleListingData } from '../Utils/GDevelopServices/Shop';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -480,6 +482,14 @@ const MainFrame = (props: Props) => {
     diagnosticReportDialogOpen,
     setDiagnosticReportDialogOpen,
   ] = React.useState<boolean>(false);
+  const [
+    purchaseClaimDialogOptions,
+    setPurchaseClaimDialogOptions,
+  ] = React.useState<?{|
+    productListingData: ?BundleListingData,
+    purchaseId: string,
+    claimableToken: string,
+  |}>(null);
   const [
     fileMetadataOpeningProgress,
     setFileMetadataOpeningProgress,
@@ -2098,9 +2108,19 @@ const MainFrame = (props: Props) => {
     [setStandaloneDialogOpen]
   );
 
-  const { navigateToRoute } = useOpenPageForRouting({
+  const openPurchaseClaimDialogWhenAuthenticated = React.useCallback(
+    ({ productListingData, purchaseId, claimableToken }) => {
+      setPurchaseClaimDialogOptions({
+        productListingData,
+        purchaseId,
+        claimableToken,
+      });
+    },
+    [setPurchaseClaimDialogOptions]
+  );
+
+  const { navigateToRoute } = useHomePageSwitch({
     openHomePage,
-    openStandaloneDialog,
     closeDialogs: closeDialogsToOpenHomePage,
   });
 
@@ -3318,6 +3338,8 @@ const MainFrame = (props: Props) => {
     openInAppTutorialDialog: selectInAppTutorial,
     openProfileDialog: onOpenProfileDialog,
     openAskAi,
+    openStandaloneDialog,
+    openPurchaseClaimDialogWhenAuthenticated,
   });
 
   const onChangeProjectName = async (newName: string): Promise<void> => {
@@ -4259,6 +4281,14 @@ const MainFrame = (props: Props) => {
       )}
       {standaloneDialogOpen && (
         <StandaloneDialog onClose={() => setStandaloneDialogOpen(false)} />
+      )}
+      {purchaseClaimDialogOptions && (
+        <PurchaseClaimDialog
+          productListingData={purchaseClaimDialogOptions.productListingData}
+          purchaseId={purchaseClaimDialogOptions.purchaseId}
+          claimableToken={purchaseClaimDialogOptions.claimableToken}
+          onClose={() => setPurchaseClaimDialogOptions(null)}
+        />
       )}
       {quickCustomizationDialogOpenedFromGameId && currentProject && (
         <QuickCustomizationDialog

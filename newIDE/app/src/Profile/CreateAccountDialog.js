@@ -1,5 +1,5 @@
 // @flow
-import React from 'react';
+import * as React from 'react';
 import { Trans } from '@lingui/macro';
 
 import FlatButton from '../UI/FlatButton';
@@ -37,6 +37,7 @@ type Props = {|
   onLoginWithProvider: (provider: IdentityProvider) => Promise<void>,
   createAccountInProgress: boolean,
   error: ?AuthError,
+  customHeader?: React.Node,
 |};
 
 export const getEmailErrorText = (error: ?AuthError) => {
@@ -112,6 +113,7 @@ const CreateAccountDialog = ({
   onLoginWithProvider,
   createAccountInProgress,
   error,
+  customHeader,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const styles = getStyles({ isMobile });
@@ -189,10 +191,18 @@ const CreateAccountDialog = ({
         justifyContent="center"
         alignItems="center"
       >
-        <GDevelopGLogo fontSize="large" />
-        <Text size="section-title" align="center" noMargin>
-          <Trans>Welcome to GDevelop!</Trans>
-        </Text>
+        {customHeader || (
+          <ColumnStackLayout
+            noMargin
+            justifyContent="center"
+            alignItems="center"
+          >
+            <GDevelopGLogo fontSize="large" />
+            <Text size="section-title" align="center" noMargin>
+              <Trans>Welcome to GDevelop!</Trans>
+            </Text>
+          </ColumnStackLayout>
+        )}
         <div style={styles.formContainer}>
           <CreateAccountForm
             onCreateAccount={createAccount}

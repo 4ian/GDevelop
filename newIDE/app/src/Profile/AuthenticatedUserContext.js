@@ -68,10 +68,18 @@ export type AuthenticatedUser = {|
     preferences: PreferencesValues
   ) => Promise<void>,
   onResetPassword: ForgotPasswordForm => Promise<void>,
-  onOpenLoginDialog: () => void,
+  onOpenLoginDialog: (
+    ?{|
+      customHeader: React.Node,
+    |}
+  ) => void,
   onOpenEditProfileDialog: () => void,
   onOpenChangeEmailDialog: () => void,
-  onOpenCreateAccountDialog: () => void,
+  onOpenCreateAccountDialog: (
+    ?{|
+      customHeader: React.Node,
+    |}
+  ) => void,
   onBadgesChanged: () => Promise<void>,
   onCloudProjectsChanged: () => Promise<void>,
   onRefreshUserProfile: () => Promise<void>,

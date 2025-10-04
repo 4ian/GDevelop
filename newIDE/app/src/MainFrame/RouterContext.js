@@ -5,6 +5,7 @@ import Window from '../Utils/Window';
 export type Route =
   | 'onboarding' // For compatibility when there was only one tutorial.
   | 'guided-lesson' // New way of opening a tutorial.
+  | 'signup'
   | 'subscription'
   | 'games-dashboard'
   | 'asset-store' // For compatibility when there was only asset packs.
@@ -14,7 +15,8 @@ export type Route =
   | 'education'
   | 'learn'
   | 'play'
-  | 'standalone';
+  | 'standalone'
+  | 'ask-ai';
 type RouteKey =
   | 'initial-dialog'
   | 'game-id'
@@ -27,7 +29,9 @@ type RouteKey =
   | 'course-id'
   | 'create-from-example'
   | 'recommended-plan-id'
-  | 'playable-game-id';
+  | 'playable-game-id'
+  | 'purchase-id'
+  | 'claimable-token';
 export type RouteArguments = { [RouteKey]: string };
 
 export type Router = {|

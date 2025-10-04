@@ -844,7 +844,9 @@ export default function SubscriptionDialog({
                     key="create-account"
                     label={<Trans>Create my account</Trans>}
                     primary
-                    onClick={authenticatedUser.onOpenCreateAccountDialog}
+                    onClick={() =>
+                      authenticatedUser.onOpenCreateAccountDialog()
+                    }
                   />,
                 ]}
               >

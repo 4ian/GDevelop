@@ -77,7 +77,7 @@ namespace gdjs {
       this._renderer.updateAnimation(0);
 
       if (SpineRuntimeObject.isHitBoxesUpdateDisabled) {
-          this.hitBoxes.length = 0;
+        this.hitBoxes.length = 0;
       }
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
@@ -195,11 +195,11 @@ namespace gdjs {
     }
 
     updateHitBoxes(): void {
-        if (SpineRuntimeObject.isHitBoxesUpdateDisabled) {
-            return;
-        }
+      if (SpineRuntimeObject.isHitBoxesUpdateDisabled) {
+        return;
+      }
 
-        super.updateHitBoxes();
+      super.updateHitBoxes();
     }
 
     extraInitializationFromInitialInstance(

@@ -1852,7 +1852,11 @@ const put2dInstances: EditorFunction = {
       };
     }
   },
-  launchFunction: async ({ project, args }) => {
+  launchFunction: async ({
+    project,
+    args,
+    onInstancesModifiedOutsideEditor,
+  }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = SafeExtractor.extractStringProperty(
       args,
@@ -1955,6 +1959,12 @@ const put2dInstances: EditorFunction = {
         initialInstances.removeInstance(instance);
       });
 
+      // /!\ Tell the editor that some instances have potentially been modified (and even removed).
+      // This will force the instances editor to destroy and mount again the
+      // renderers to avoid keeping any references to existing instances, and also drop any selection.
+      onInstancesModifiedOutsideEditor({
+        scene: layout,
+      });
       return makeGenericSuccess(
         [
           `Erased ${instancesToDelete.size} instance${
@@ -2004,8 +2014,12 @@ const put2dInstances: EditorFunction = {
           `You've specified to create ${newInstancesCount} instances, but you didn't specify the object name. Please specify the object name.`
         );
       }
-      // TODO: make this work for global objects.
-      if (object_name && !objectsContainer.hasObjectNamed(object_name)) {
+
+      if (
+        object_name &&
+        !objectsContainer.hasObjectNamed(object_name) &&
+        !project.getObjects().hasObjectNamed(object_name)
+      ) {
         return makeGenericFailure(
           `Object not found: "${object_name}" in scene "${scene_name}". Please only specify the object name of an object existing in the scene (or create if before if necessary).`
         );
@@ -2274,6 +2288,12 @@ const put2dInstances: EditorFunction = {
         );
       }
 
+      // /!\ Tell the editor that some instances have potentially been modified (and even removed).
+      // This will force the instances editor to destroy and mount again the
+      // renderers to avoid keeping any references to existing instances, and also drop any selection.
+      onInstancesModifiedOutsideEditor({
+        scene: layout,
+      });
       return makeGenericSuccess(changes.join(' '));
     }
   },
@@ -2376,7 +2396,11 @@ const put3dInstances: EditorFunction = {
       };
     }
   },
-  launchFunction: async ({ project, args }) => {
+  launchFunction: async ({
+    project,
+    args,
+    onInstancesModifiedOutsideEditor,
+  }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = SafeExtractor.extractStringProperty(
       args,
@@ -2481,6 +2505,12 @@ const put3dInstances: EditorFunction = {
         initialInstances.removeInstance(instance);
       });
 
+      // /!\ Tell the editor that some instances have potentially been modified (and even removed).
+      // This will force the instances editor to destroy and mount again the
+      // renderers to avoid keeping any references to existing instances, and also drop any selection.
+      onInstancesModifiedOutsideEditor({
+        scene: layout,
+      });
       return makeGenericSuccess(
         [
           `Erased ${instancesToDelete.size} instance${
@@ -2523,8 +2553,12 @@ const put3dInstances: EditorFunction = {
           `You've specified to create ${newInstancesCount} instances, but you didn't specify the object name. Please specify the object name.`
         );
       }
-      // TODO: make this work for global objects.
-      if (object_name && !objectsContainer.hasObjectNamed(object_name)) {
+
+      if (
+        object_name &&
+        !objectsContainer.hasObjectNamed(object_name) &&
+        !project.getObjects().hasObjectNamed(object_name)
+      ) {
         return makeGenericFailure(
           `Object not found: "${object_name}" in scene "${scene_name}". Please only specify the object name of an object existing in the scene (or create if before if necessary).`
         );
@@ -2755,6 +2789,12 @@ const put3dInstances: EditorFunction = {
         return makeGenericSuccess('No changes were made to instances.');
       }
 
+      // /!\ Tell the editor that some instances have potentially been modified (and even removed).
+      // This will force the instances editor to destroy and mount again the
+      // renderers to avoid keeping any references to existing instances, and also drop any selection.
+      onInstancesModifiedOutsideEditor({
+        scene: layout,
+      });
       return makeGenericSuccess(changes.join(' '));
     }
   },

@@ -601,6 +601,8 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.editorDisplay)
       this.editorDisplay.instancesHandlers.forceRemountInstancesRenderers();
     this.updateToolbar();
+
+    this._sendHotReloadAllInstances();
   };
 
   updateToolbar = () => {

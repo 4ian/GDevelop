@@ -698,7 +698,7 @@ namespace gdjs {
     }
 
     /**
-     * @return The internal object for a 3D rendering (PIXI.DisplayObject...)
+     * @return The internal object for a 3D rendering (THREE.Object3D...)
      */
     get3DRendererObject(): THREE.Object3D | null | undefined {
       return undefined;

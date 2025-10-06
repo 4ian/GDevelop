@@ -88,7 +88,7 @@ type Props = {|
   getCourseCompletion: (courseId: string) => CourseCompletion | null,
   noPadding?: boolean,
   noActions?: boolean,
-  simpleCheckout?: boolean,
+  fastCheckout?: boolean,
   onPurchaseDone?: () => void,
 |};
 
@@ -104,7 +104,7 @@ const BundleInformationPage = ({
   getCourseCompletion,
   noPadding,
   noActions,
-  simpleCheckout,
+  fastCheckout,
   onPurchaseDone,
 }: Props) => {
   const { windowSize, isLandscape, isMobile } = useResponsiveWindowSize();
@@ -317,7 +317,7 @@ const BundleInformationPage = ({
             bundleListingData={bundleListingData}
             bundle={bundle}
             i18n={i18n}
-            simpleCheckout={simpleCheckout}
+            fastCheckout={fastCheckout}
             onPurchaseDone={onPurchaseDone}
           />
           <Line noMargin>

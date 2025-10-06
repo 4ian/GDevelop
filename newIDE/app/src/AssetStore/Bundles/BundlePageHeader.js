@@ -68,7 +68,7 @@ type Props = {|
   bundle: Bundle,
   simulateAppStoreProduct?: boolean,
   i18n: I18nType,
-  simpleCheckout?: boolean,
+  fastCheckout?: boolean,
   onPurchaseDone?: () => void,
 |};
 
@@ -77,7 +77,7 @@ const BundlePageHeader = ({
   bundleListingData,
   simulateAppStoreProduct,
   i18n,
-  simpleCheckout,
+  fastCheckout,
   onPurchaseDone,
 }: Props) => {
   const { privateGameTemplateListingDatas } = React.useContext(
@@ -507,7 +507,7 @@ const BundlePageHeader = ({
               bundleListingData={purchasingBundleListingData}
               usageType="default"
               onClose={() => setPurchasingBundleListingData(null)}
-              simpleCheckout={simpleCheckout}
+              fastCheckout={fastCheckout}
               onPurchaseDone={onPurchaseDone}
             />
           )}

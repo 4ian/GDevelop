@@ -362,6 +362,17 @@ export default class Window {
     window.open(url, '_blank');
   }
 
+  static openUrlInSameWindowOnWebOrExternalOtherwise(url: string) {
+    if (!url) return;
+
+    if (electron) {
+      if (shell) shell.openExternal(url);
+      return;
+    }
+
+    window.open(url);
+  }
+
   static getOrientation(): 'portrait' | 'landscape' {
     try {
       return window.screen.orientation.type.split('-')[0];

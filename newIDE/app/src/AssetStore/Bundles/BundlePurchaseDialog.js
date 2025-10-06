@@ -32,7 +32,7 @@ type Props = {|
   usageType: string,
   onClose: () => void,
   simulateAppStoreProduct?: boolean,
-  simpleCheckout?: boolean,
+  fastCheckout?: boolean,
   onPurchaseDone?: () => void,
 |};
 
@@ -41,7 +41,7 @@ const BundlePurchaseDialog = ({
   usageType,
   onClose,
   simulateAppStoreProduct,
-  simpleCheckout,
+  fastCheckout,
   onPurchaseDone,
 }: Props) => {
   const {
@@ -102,33 +102,30 @@ const BundlePurchaseDialog = ({
     // Purchase with web.
     try {
       setIsPurchasing(true);
-      const checkoutUrl = simpleCheckout
-        ? getStripeCheckoutUrl({
-            productId: bundleListingData.id,
-            priceName: price.name,
-            userId: profile ? profile.id : undefined,
-            userEmail: profile ? profile.email : undefined,
-            userUuid: profile ? undefined : getUserUUID(),
-            password: password || undefined,
-          })
-        : profile
-        ? getPurchaseCheckoutUrl({
-            productId: bundleListingData.id,
-            priceName: price.name,
-            userId: profile.id,
-            userEmail: profile.email,
-            password: password || undefined,
-          })
-        : null;
-      if (!checkoutUrl) {
-        console.error('Unable to get the checkout URL');
-        await showAlert({
-          title: t`An error happened`,
-          message: t`Unable to get the checkout URL. Please try again later.`,
+      if (fastCheckout) {
+        const checkoutUrl = getStripeCheckoutUrl({
+          productId: bundleListingData.id,
+          priceName: price.name,
+          userId: profile ? profile.id : undefined,
+          userEmail: profile ? profile.email : undefined,
+          userUuid: profile ? undefined : getUserUUID(),
+          password: password || undefined,
         });
-        setIsPurchasing(false);
+        Window.openUrlInSameWindowOnWebOrExternalOtherwise(checkoutUrl);
         return;
       }
+
+      // Cannot continue without a profile if not doing fast checkout.
+      if (!profile) {
+        return;
+      }
+      const checkoutUrl = getPurchaseCheckoutUrl({
+        productId: bundleListingData.id,
+        priceName: price.name,
+        userId: profile.id,
+        userEmail: profile.email,
+        password: password || undefined,
+      });
       Window.openExternalURL(checkoutUrl);
     } catch (error) {
       const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
@@ -258,7 +255,7 @@ const BundlePurchaseDialog = ({
   );
 
   const dialogContents =
-    !profile && !simpleCheckout
+    !profile && !fastCheckout
       ? {
           subtitle: <Trans>Log-in to purchase this item</Trans>,
           content: (
@@ -307,7 +304,7 @@ const BundlePurchaseDialog = ({
             </>
           ) : (
             <>
-              {!simpleCheckout && (
+              {!fastCheckout && (
                 <Line justifyContent="center" alignItems="center">
                   <CircularProgress size={20} />
                   <Spacer />
@@ -319,7 +316,7 @@ const BundlePurchaseDialog = ({
               <Spacer />
               <Line justifyContent="center">
                 <BackgroundText>
-                  {!simpleCheckout ? (
+                  {!fastCheckout ? (
                     <Trans>
                       Once you're done, come back to GDevelop and the bundle
                       will be added to your account automatically.
@@ -376,7 +373,7 @@ const BundlePurchaseDialog = ({
     <FlatButton
       key="cancel"
       label={
-        purchaseSuccessful || simpleCheckout ? (
+        purchaseSuccessful || fastCheckout ? (
           <Trans>Close</Trans>
         ) : (
           <Trans>Cancel</Trans>

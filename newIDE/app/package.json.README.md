@@ -33,4 +33,4 @@ Latest versions of `react-sortable-hoc` seems to be breaking the lists. The exac
 
 - `react-mosaic-component` is a custom version where `react-dnd` was simply upgraded to version `7.7.0`
 - `@lingui/react` is a version where Flow definitions have been fixed.
-- `pixi-simple-gesture` is a version where an extra check for `undefined` have been added to `touchStart` in `pan.js`, following traces of errors that have been inspected (though the bug could not be reproduced - but better be safe).
+- `pixi-simple-gesture` is a version where an extra check for `undefined` has been added to `touchStart` in `pan.js`, following traces of errors that have been inspected (though the bug could not be reproduced - but better be safe).

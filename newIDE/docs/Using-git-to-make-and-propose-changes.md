@@ -1,6 +1,6 @@
 # Using git to make and propose changes to GDevelop
 
-GDevelop source code is hosted on GitHub, which is based on the Git version control system to handle the code source. While git can be a bit hard to learn when you're first using it, it's actually not complicated once you have a few concepts in mind. It's also very powerful.
+GDevelop source code is hosted on GitHub, which is based on the Git version control system to handle the source code. While git can be a bit hard to learn when you're first using it, it's actually not complicated once you have a few concepts in mind. It's also very powerful.
 
 > If you have never used GitHub, you may first want to go on [GDevelop GitHub](https://github.com/4ian/GDevelop), and click on **Fork** to get a copy of the GDevelop source code. This will be "your" copy of the source code, where you can create new features and open **Pull Requests**, which are proposal of changes to the source code - most of the time to implement new features or fix bugs.
 
@@ -8,7 +8,7 @@ GDevelop source code is hosted on GitHub, which is based on the Git version cont
 
 If it's the first time and you have just "forked" GDevelop on GitHub, clone your repository: `git clone git@github.com:your-username/GDevelop.git`. This will download your copy of the repository on your local computer.
 
-- Your own repository is usually called, in git jargon, a "remote" repository, named `origin`. When you do a `git push`, `git pull`, your usually, unless specified otherwise, getting or sending code to your repository.
+- Your own repository is usually called, in git jargon, a "remote" repository, named `origin`. When you do a `git push` or `git pull`, you're usually, unless specified otherwise, getting or sending code to your repository.
 - The [GDevelop "official repository"](https://github.com/4ian/GDevelop) is also a remote, usually called `upstream`.
 
 By default, when you have just "cloned" your repository, there is only the single remote `origin`. It will be useful later to have the `upstream` remote (to get the latest code from GDevelop). You can do it by entering: `git remote add upstream https://github.com/4ian/GDevelop.git`.
@@ -17,9 +17,9 @@ By default, when you have just "cloned" your repository, there is only the singl
 
 ## 2. Learn about the `master` branch, branches and Pull Requests
 
-In git, all the code is stored in the repository, and changes are stored in *commits*. The latest version of the source code is in a "branch", which is called `master` (it's an arbitrary convention).
+In git, all the code is stored in the repository, and changes are stored in *commits*. The latest version of the source code is in a "branch" which is called `master` (it's an arbitrary convention).
 
-When you'll make new additions to GDevelop, you'll make a new "branch". Imagine a branch like the branch of a tree:
+When you make new additions to GDevelop, you'll make a new "branch". Imagine a branch like the branch of a tree:
 
 - The source code is in master, which is the trunk of the tree, with tons of commits.
 - Your branch will grow from master, adding a few commits.

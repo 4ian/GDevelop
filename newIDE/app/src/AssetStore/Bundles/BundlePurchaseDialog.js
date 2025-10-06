@@ -65,6 +65,7 @@ const BundlePurchaseDialog = ({
   ] = React.useState<boolean>(false);
   const [password, setPassword] = React.useState<string>('');
   const { showAlert } = useAlertDialog();
+  const [isOpeningUrl, setIsOpeningUrl] = React.useState(false);
 
   const shouldUseOrSimulateAppStoreProduct =
     shouldUseAppStoreProduct() || simulateAppStoreProduct;
@@ -114,6 +115,8 @@ const BundlePurchaseDialog = ({
           userUuid: profile ? undefined : getUserUUID(),
           password: password || undefined,
         });
+        // Mark the Url as opening if opening in the same tab, as it can take some time to load.
+        setIsOpeningUrl(willReceiveAnEmailForThePurchase);
         Window.openExternalURL(checkoutUrl, {
           shouldOpenInSameTabIfPossible: willReceiveAnEmailForThePurchase,
         });
@@ -387,13 +390,16 @@ const BundlePurchaseDialog = ({
     <FlatButton
       key="cancel"
       label={
-        purchaseSuccessful || willReceiveAnEmailForThePurchase ? (
+        isOpeningUrl ? (
+          <Trans>Loading...</Trans>
+        ) : purchaseSuccessful || willReceiveAnEmailForThePurchase ? (
           <Trans>Close</Trans>
         ) : (
           <Trans>Cancel</Trans>
         )
       }
       onClick={onCloseDialog}
+      disabled={isOpeningUrl}
     />,
     allowPurchase ? (
       <DialogPrimaryButton

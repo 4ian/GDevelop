@@ -6,7 +6,7 @@ import {
   type BundleListingData,
 } from '../Utils/GDevelopServices/Shop';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
-import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import AuthenticatedUserContext from './AuthenticatedUserContext';
 import Text from '../UI/Text';
 import { Column, Line } from '../UI/Grid';
 import Mark from '../UI/CustomSvgIcons/Mark';
@@ -16,7 +16,13 @@ import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
-import RouterContext from './RouterContext';
+import RouterContext from '../MainFrame/RouterContext';
+
+export type ClaimedProductOptions = {|
+  productListingData: BundleListingData, // Add more product types in the future.
+  purchaseId: string,
+  claimableToken: string,
+|};
 
 const styles = {
   previewImage: {
@@ -36,16 +42,12 @@ const styles = {
 };
 
 type Props = {|
-  productListingData: ?BundleListingData, // Add more product types in the future.
-  purchaseId: string,
-  claimableToken: string,
+  claimedProductOptions: ClaimedProductOptions,
   onClose: () => void,
 |};
 
 const PurchaseClaimDialog = ({
-  productListingData,
-  purchaseId,
-  claimableToken,
+  claimedProductOptions: { productListingData, purchaseId, claimableToken },
   onClose,
 }: Props) => {
   const {
@@ -63,6 +65,7 @@ const PurchaseClaimDialog = ({
 
   const activatePurchase = React.useCallback(
     async () => {
+      console.log(isActivating, isPurchaseActivated);
       if (!profile || isActivating || isPurchaseActivated) return;
 
       setIsActivating(true);

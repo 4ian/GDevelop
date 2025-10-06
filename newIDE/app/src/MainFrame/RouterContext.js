@@ -41,14 +41,14 @@ export type Router = {|
   navigateToRoute: (route: Route, additionalArgument?: RouteArguments) => void,
 |};
 
-const initialState: Router = {
+export const initialRouterState: Router = {
   routeArguments: {},
   removeRouteArguments: () => {},
   addRouteArguments: () => {},
   navigateToRoute: () => {},
 };
 
-const RouterContext = React.createContext<Router>(initialState);
+const RouterContext = React.createContext<Router>(initialRouterState);
 
 export default RouterContext;
 

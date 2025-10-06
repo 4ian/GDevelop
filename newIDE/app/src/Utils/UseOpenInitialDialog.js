@@ -4,33 +4,10 @@ import RouterContext from '../MainFrame/RouterContext';
 import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 import { FLING_GAME_IN_APP_TUTORIAL_ID } from './GDevelopServices/InAppTutorial';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import { t, Trans } from '@lingui/macro';
-import Text from '../UI/Text';
-import {
-  getListedBundle,
-  type BundleListingData,
-} from './GDevelopServices/Shop';
+import { t } from '@lingui/macro';
+import { getListedBundle } from './GDevelopServices/Shop';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
-import { CorsAwareImage } from '../UI/CorsAwareImage';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
-import { ColumnStackLayout } from '../UI/Layout';
-
-const styles = {
-  previewImage: {
-    width: '100%',
-    maxWidth: 400,
-    display: 'block',
-    objectFit: 'contain',
-    borderRadius: 8,
-    border: '1px solid lightgrey',
-    boxSizing: 'border-box', // Take border in account for sizing to avoid cumulative layout shift.
-    // Prevent cumulative layout shift by enforcing
-    // the 16:9 ratio.
-    aspectRatio: '16 / 9',
-    transition: 'opacity 0.3s ease-in-out',
-    position: 'relative',
-  },
-};
 
 type Props = {|
   openInAppTutorialDialog: (tutorialId: string) => void,
@@ -41,11 +18,6 @@ type Props = {|
     paneIdentifier: 'left' | 'center' | 'right' | null,
   |}) => void,
   openStandaloneDialog: () => void,
-  openPurchaseClaimDialogWhenAuthenticated: ({|
-    productListingData: ?BundleListingData,
-    purchaseId: string,
-    claimableToken: string,
-  |}) => void,
 |};
 
 /**
@@ -57,7 +29,6 @@ const useOpenInitialDialog = ({
   openProfileDialog,
   openAskAi,
   openStandaloneDialog,
-  openPurchaseClaimDialogWhenAuthenticated,
 }: Props) => {
   const { routeArguments, removeRouteArguments } = React.useContext(
     RouterContext
@@ -67,6 +38,8 @@ const useOpenInitialDialog = ({
   );
   const {
     onOpenCreateAccountDialog,
+    onOpenCreateAccountWithPurchaseClaimDialog,
+    onOpenPurchaseClaimDialog,
     onOpenLoginDialog,
     authenticated,
     loginState,
@@ -97,17 +70,21 @@ const useOpenInitialDialog = ({
               return;
             }
 
-            const claimableToken = routeArguments['claimable-token'];
-            const purchaseId = routeArguments['purchase-id'];
-            if (purchaseId && claimableToken) {
-              const bundleId = routeArguments['bundle'];
-              let claimedProduct = null;
-              if (bundleId) {
-                const listedBundle = await getListedBundle({
-                  bundleId,
-                  visibility: 'all',
-                });
-                if (!listedBundle) {
+            try {
+              const claimableToken = routeArguments['claimable-token'];
+              const purchaseId = routeArguments['purchase-id'];
+              if (purchaseId && claimableToken) {
+                const bundleId = routeArguments['bundle'];
+                let claimedProduct = null;
+                if (bundleId) {
+                  const listedBundle = await getListedBundle({
+                    bundleId,
+                    visibility: 'all',
+                  });
+                  claimedProduct = listedBundle;
+                }
+
+                if (!claimedProduct) {
                   console.error(
                     `The bundle with id ${bundleId} does not exist. Cannot claim.`
                   );
@@ -115,73 +92,38 @@ const useOpenInitialDialog = ({
                     title: t`Unknown bundle`,
                     message: t`The bundle you are trying to claim does not exist anymore. Please contact support if you think this is an error.`,
                   });
-                  removeRouteArguments([
-                    'initial-dialog',
-                    'purchase-id',
-                    'claimable-token',
-                    'bundle',
-                  ]);
                   return;
                 }
-                claimedProduct = listedBundle;
+
+                const claimedProductOptions = {
+                  productListingData: claimedProduct,
+                  purchaseId,
+                  claimableToken,
+                };
+
+                if (authenticated) {
+                  onOpenPurchaseClaimDialog(claimedProductOptions);
+                } else {
+                  onOpenCreateAccountWithPurchaseClaimDialog(
+                    claimedProductOptions
+                  );
+                }
+                return;
               }
 
-              openPurchaseClaimDialogWhenAuthenticated({
-                purchaseId,
-                claimableToken,
-                productListingData: claimedProduct,
-              });
-              if (!authenticated) {
-                onOpenCreateAccountDialog({
-                  customHeader: (
-                    <ColumnStackLayout
-                      justifyContent="center"
-                      alignItems="center"
-                      noMargin
-                    >
-                      {claimedProduct &&
-                        claimedProduct.productType === 'BUNDLE' && (
-                          <CorsAwareImage
-                            style={{
-                              ...styles.previewImage,
-                              background:
-                                gdevelopTheme.paper.backgroundColor.light,
-                            }}
-                            src={claimedProduct.thumbnailUrls[0]}
-                            alt={`Preview image of bundle ${
-                              claimedProduct.name
-                            }`}
-                          />
-                        )}
-                      <Text size="section-title" align="center" noMargin>
-                        <Trans>
-                          Login or create an account to activate your purchase!
-                        </Trans>
-                      </Text>
-                    </ColumnStackLayout>
-                  ),
-                });
+              if (authenticated) {
+                openProfileDialog();
+              } else {
+                onOpenCreateAccountDialog();
               }
-
+            } finally {
               removeRouteArguments([
                 'initial-dialog',
                 'purchase-id',
                 'claimable-token',
                 'bundle',
               ]);
-              return;
             }
-
-            if (authenticated) {
-              openProfileDialog();
-            } else {
-              onOpenCreateAccountDialog();
-            }
-            removeRouteArguments([
-              'initial-dialog',
-              'purchase-id',
-              'claimable-token',
-            ]);
             break;
           case 'onboarding':
           case 'guided-lesson':
@@ -226,12 +168,13 @@ const useOpenInitialDialog = ({
       openSubscriptionDialog,
       authenticated,
       onOpenCreateAccountDialog,
+      onOpenCreateAccountWithPurchaseClaimDialog,
       onOpenLoginDialog,
       openAskAi,
       loginState,
       showAlert,
       gdevelopTheme,
-      openPurchaseClaimDialogWhenAuthenticated,
+      onOpenPurchaseClaimDialog,
     ]
   );
 };

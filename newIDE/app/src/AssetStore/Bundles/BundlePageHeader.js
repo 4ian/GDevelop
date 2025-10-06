@@ -298,7 +298,7 @@ const BundlePageHeader = ({
                       <ProductLimitedTimeOffer
                         visibleUntil={bundleListingData.visibleUntil}
                       />
-                    ) : estimatedSavingsFormatted ? (
+                    ) : estimatedTotalPriceFormatted ? (
                       <Column
                         noMargin
                         alignItems="flex-start"
@@ -310,9 +310,8 @@ const BundlePageHeader = ({
                         />
                         <Text color="secondary">
                           <Trans>
-                            Get{' '}
-                            {estimatedSavingsFormatted.savingsPriceFormatted}{' '}
-                            worth of value for less!
+                            Get {estimatedTotalPriceFormatted} worth of value
+                            for less!
                           </Trans>
                         </Text>
                       </Column>

@@ -63,6 +63,11 @@ import { showErrorBox } from '../UI/Messages/MessageBox';
 import { userCancellationErrorName } from '../LoginProvider/Utils';
 import { listUserPurchases } from '../Utils/GDevelopServices/Shop';
 import { listNotifications } from '../Utils/GDevelopServices/Notification';
+import LoginWithPurchaseClaimDialog from './LoginWithPurchaseClaimDialog';
+import CreateAccountWithPurchaseClaimDialog from './CreateAccountWithPurchaseClaimDialog';
+import PurchaseClaimDialog, {
+  type ClaimedProductOptions,
+} from './PurchaseClaimDialog';
 
 type Props = {|
   authentication: Authentication,
@@ -73,14 +78,15 @@ type Props = {|
 type State = {|
   authenticatedUser: AuthenticatedUser,
   loginDialogOpen: boolean,
+  loginWithPurchaseClaimDialogOpen: boolean,
   createAccountDialogOpen: boolean,
+  createAccountWithPurchaseClaimDialogOpen: boolean,
   loginInProgress: boolean,
   createAccountInProgress: boolean,
   editProfileDialogOpen: boolean,
   editInProgress: boolean,
   deleteInProgress: boolean,
   apiCallError: ?AuthError,
-  customCreateOrLoginHeader: ?React.Node,
   resetPasswordDialogOpen: boolean,
   emailVerificationDialogOpen: boolean,
   emailVerificationDialogProps: {|
@@ -91,6 +97,7 @@ type State = {|
   changeEmailDialogOpen: boolean,
   changeEmailInProgress: boolean,
   userSnackbarMessage: ?React.Node,
+  claimedProductOptions: ?ClaimedProductOptions,
 |};
 
 const cleanUserTracesOnDevice = async () => {
@@ -110,14 +117,15 @@ export default class AuthenticatedUserProvider extends React.Component<
   state = {
     authenticatedUser: initialAuthenticatedUser,
     loginDialogOpen: false,
+    loginWithPurchaseClaimDialogOpen: false,
     createAccountDialogOpen: false,
+    createAccountWithPurchaseClaimDialogOpen: false,
     loginInProgress: false,
     createAccountInProgress: false,
     editProfileDialogOpen: false,
     editInProgress: false,
     deleteInProgress: false,
     apiCallError: null,
-    customCreateOrLoginHeader: null,
     resetPasswordDialogOpen: false,
     emailVerificationDialogOpen: false,
     emailVerificationDialogProps: {
@@ -128,6 +136,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     changeEmailDialogOpen: false,
     changeEmailInProgress: false,
     userSnackbarMessage: null,
+    claimedProductOptions: null,
   };
   _automaticallyUpdateUserProfile = true;
   _hasNotifiedUserAboutEmailVerification = false;
@@ -211,12 +220,23 @@ export default class AuthenticatedUserProvider extends React.Component<
         onResetPassword: this._doForgotPassword,
         onBadgesChanged: this._fetchUserBadges,
         onCloudProjectsChanged: this._fetchUserCloudProjects,
-        onOpenLoginDialog: createOrLoginOptions =>
-          this.openLoginDialog(true, createOrLoginOptions),
+        onOpenLoginDialog: () => this.openLoginDialog(true),
+        onOpenLoginWithPurchaseClaimDialog: (
+          claimedProductOptions: ClaimedProductOptions
+        ) => this.openLoginWithPurchaseClaimDialog(true, claimedProductOptions),
         onOpenEditProfileDialog: () => this.openEditProfileDialog(true),
         onOpenChangeEmailDialog: () => this.openChangeEmailDialog(true),
-        onOpenCreateAccountDialog: createOrLoginOptions =>
-          this.openCreateAccountDialog(true, createOrLoginOptions),
+        onOpenCreateAccountDialog: () => this.openCreateAccountDialog(true),
+        onOpenCreateAccountWithPurchaseClaimDialog: (
+          claimedProductOptions: ClaimedProductOptions
+        ) =>
+          this.openCreateAccountWithPurchaseClaimDialog(
+            true,
+            claimedProductOptions
+          ),
+        onOpenPurchaseClaimDialog: (
+          claimedProductOptions: ClaimedProductOptions
+        ) => this.openPurchaseClaimDialog(claimedProductOptions),
         onRefreshUserProfile: this._fetchUserProfile,
         onRefreshFirebaseProfile: async () => {
           await this._reloadFirebaseProfile();
@@ -1136,7 +1156,15 @@ export default class AuthenticatedUserProvider extends React.Component<
       });
       await this._fetchUserProfileWithoutThrowingErrors({ resetState: true });
       this.openLoginDialog(false);
+      this.openLoginWithPurchaseClaimDialog(
+        false,
+        this.state.claimedProductOptions
+      );
       this.openCreateAccountDialog(false);
+      this.openCreateAccountWithPurchaseClaimDialog(
+        false,
+        this.state.claimedProductOptions
+      );
       this._showLoginSnackbar(this.state.authenticatedUser);
     } catch (apiCallError) {
       if (apiCallError.name !== userCancellationErrorName) {
@@ -1191,6 +1219,10 @@ export default class AuthenticatedUserProvider extends React.Component<
       await authentication.login(form);
       await this._fetchUserProfileWithoutThrowingErrors({ resetState: true });
       this.openLoginDialog(false);
+      this.openLoginWithPurchaseClaimDialog(
+        false,
+        this.state.claimedProductOptions
+      );
       this._showLoginSnackbar(this.state.authenticatedUser);
     } catch (apiCallError) {
       this.setState({
@@ -1293,6 +1325,10 @@ export default class AuthenticatedUserProvider extends React.Component<
         resetState: true,
       });
       this.openCreateAccountDialog(false);
+      this.openCreateAccountWithPurchaseClaimDialog(
+        false,
+        this.state.claimedProductOptions
+      );
       sendSignupDone(form.email);
       const firebaseUser = this.state.authenticatedUser.firebaseUser;
       aliasUserForAnalyticsAfterSignUp(firebaseUser);
@@ -1448,19 +1484,23 @@ export default class AuthenticatedUserProvider extends React.Component<
     });
   };
 
-  openLoginDialog = (
-    open: boolean = true,
-    createOrLoginOptions: ?{|
-      customHeader: React.Node | null,
-    |}
-  ) => {
+  openLoginDialog = (open: boolean = true) => {
     this.setState({
       loginDialogOpen: open,
       createAccountDialogOpen: false,
       apiCallError: null,
-      customCreateOrLoginHeader: createOrLoginOptions
-        ? createOrLoginOptions.customHeader
-        : null,
+    });
+  };
+
+  openLoginWithPurchaseClaimDialog = (
+    open: boolean = true,
+    claimedProductOptions: ?ClaimedProductOptions = null
+  ) => {
+    this.setState({
+      loginWithPurchaseClaimDialogOpen: open,
+      createAccountWithPurchaseClaimDialogOpen: false,
+      apiCallError: null,
+      claimedProductOptions,
     });
   };
 
@@ -1479,17 +1519,31 @@ export default class AuthenticatedUserProvider extends React.Component<
     });
   };
 
-  openCreateAccountDialog = (
-    open: boolean = true,
-    createOrLoginOptions: ?{| customHeader: React.Node |}
-  ) => {
+  openCreateAccountDialog = (open: boolean = true) => {
     this.setState({
       loginDialogOpen: false,
       createAccountDialogOpen: open,
       apiCallError: null,
-      customCreateOrLoginHeader: createOrLoginOptions
-        ? createOrLoginOptions.customHeader
-        : null,
+    });
+  };
+
+  openCreateAccountWithPurchaseClaimDialog = (
+    open: boolean = true,
+    claimedProductOptions: ?ClaimedProductOptions = null
+  ) => {
+    this.setState({
+      loginWithPurchaseClaimDialogOpen: false,
+      createAccountWithPurchaseClaimDialogOpen: open,
+      apiCallError: null,
+      claimedProductOptions,
+    });
+  };
+
+  openPurchaseClaimDialog = (
+    claimedProductOptions: ?ClaimedProductOptions = null
+  ) => {
+    this.setState({
+      claimedProductOptions,
     });
   };
 
@@ -1630,20 +1684,35 @@ export default class AuthenticatedUserProvider extends React.Component<
               this._cancelLoginOrSignUp();
               this.openLoginDialog(false);
             }}
-            onGoToCreateAccount={() =>
-              this.openCreateAccountDialog(true, {
-                customHeader: this.state.customCreateOrLoginHeader || null,
-              })
-            }
+            onGoToCreateAccount={() => this.openCreateAccountDialog(true)}
             onLogin={this._doLogin}
-            onLogout={this._doLogout}
             onLoginWithProvider={this._doLoginWithProvider}
             loginInProgress={this.state.loginInProgress}
             error={this.state.apiCallError}
             onForgotPassword={this._doForgotPassword}
-            customHeader={this.state.customCreateOrLoginHeader}
           />
         )}
+        {this.state.loginWithPurchaseClaimDialogOpen &&
+          this.state.claimedProductOptions && (
+            <LoginWithPurchaseClaimDialog
+              onClose={() => {
+                this._cancelLoginOrSignUp();
+                this.openLoginWithPurchaseClaimDialog(false);
+              }}
+              onGoToCreateAccount={() =>
+                this.openCreateAccountWithPurchaseClaimDialog(
+                  true,
+                  this.state.claimedProductOptions
+                )
+              }
+              onLogin={this._doLogin}
+              onLoginWithProvider={this._doLoginWithProvider}
+              loginInProgress={this.state.loginInProgress}
+              error={this.state.apiCallError}
+              onForgotPassword={this._doForgotPassword}
+              claimedProductOptions={this.state.claimedProductOptions}
+            />
+          )}
         {this.state.authenticatedUser.profile &&
           this.state.editProfileDialogOpen && (
             <EditProfileDialog
@@ -1708,20 +1777,37 @@ export default class AuthenticatedUserProvider extends React.Component<
               this._cancelLoginOrSignUp();
               this.openCreateAccountDialog(false);
             }}
-            onGoToLogin={() =>
-              this.openLoginDialog(true, {
-                customHeader: this.state.customCreateOrLoginHeader || null,
-              })
-            }
+            onGoToLogin={() => this.openLoginDialog(true)}
             onCreateAccount={form =>
               this._doCreateAccount(form, this.props.preferencesValues)
             }
             onLoginWithProvider={this._doLoginWithProvider}
             createAccountInProgress={this.state.createAccountInProgress}
             error={this.state.apiCallError}
-            customHeader={this.state.customCreateOrLoginHeader}
           />
         )}
+        {this.state.createAccountWithPurchaseClaimDialogOpen &&
+          this.state.claimedProductOptions && (
+            <CreateAccountWithPurchaseClaimDialog
+              onClose={() => {
+                this._cancelLoginOrSignUp();
+                this.openCreateAccountWithPurchaseClaimDialog(false);
+              }}
+              onGoToLogin={() =>
+                this.openLoginWithPurchaseClaimDialog(
+                  true,
+                  this.state.claimedProductOptions
+                )
+              }
+              onCreateAccount={form =>
+                this._doCreateAccount(form, this.props.preferencesValues)
+              }
+              onLoginWithProvider={this._doLoginWithProvider}
+              createAccountInProgress={this.state.createAccountInProgress}
+              error={this.state.apiCallError}
+              claimedProductOptions={this.state.claimedProductOptions}
+            />
+          )}
         {this.state.emailVerificationDialogOpen && (
           <EmailVerificationDialog
             authenticatedUser={this.state.authenticatedUser}
@@ -1737,6 +1823,12 @@ export default class AuthenticatedUserProvider extends React.Component<
             }}
             {...this.state.emailVerificationDialogProps}
             onSendEmail={this._doSendEmailVerification}
+          />
+        )}
+        {this.state.claimedProductOptions && (
+          <PurchaseClaimDialog
+            claimedProductOptions={this.state.claimedProductOptions}
+            onClose={() => this.openPurchaseClaimDialog(null)}
           />
         )}
         <Snackbar

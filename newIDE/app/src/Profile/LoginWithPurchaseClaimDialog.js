@@ -15,8 +15,10 @@ import Text from '../UI/Text';
 import { ColumnStackLayout } from '../UI/Layout';
 import HelpButton from '../UI/HelpButton';
 import FlatButton from '../UI/FlatButton';
-import GDevelopGLogo from '../UI/CustomSvgIcons/GDevelopGLogo';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import { CorsAwareImage } from '../UI/CorsAwareImage';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import { type ClaimedProductOptions } from './PurchaseClaimDialog';
 
 const getStyles = ({ isMobile }) => {
   return {
@@ -25,6 +27,20 @@ const getStyles = ({ isMobile }) => {
       width: isMobile ? '95%' : '90%',
       marginTop: 10,
       flexDirection: 'column',
+    },
+    previewImage: {
+      width: '100%',
+      maxWidth: 400,
+      display: 'block',
+      objectFit: 'contain',
+      borderRadius: 8,
+      border: '1px solid lightgrey',
+      boxSizing: 'border-box', // Take border in account for sizing to avoid cumulative layout shift.
+      // Prevent cumulative layout shift by enforcing
+      // the 16:9 ratio.
+      aspectRatio: '16 / 9',
+      transition: 'opacity 0.3s ease-in-out',
+      position: 'relative',
     },
   };
 };
@@ -37,9 +53,10 @@ type Props = {|
   onForgotPassword: (form: ForgotPasswordForm) => Promise<void>,
   loginInProgress: boolean,
   error: ?AuthError,
+  claimedProductOptions: ClaimedProductOptions,
 |};
 
-const LoginDialog = ({
+const LoginWithPurchaseClaimDialog = ({
   onClose,
   onGoToCreateAccount,
   onLogin,
@@ -47,11 +64,13 @@ const LoginDialog = ({
   onForgotPassword,
   loginInProgress,
   error,
+  claimedProductOptions: { productListingData: claimedProduct },
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const styles = getStyles({ isMobile });
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const doLogin = () => {
     if (loginInProgress) return;
@@ -91,14 +110,21 @@ const LoginDialog = ({
       justifyContent="center"
       alignItems="center"
     >
-      {
-        <ColumnStackLayout noMargin justifyContent="center" alignItems="center">
-          <GDevelopGLogo fontSize="large" />
-          <Text noMargin size="section-title" align="center">
-            <Trans>Log in to your account</Trans>
-          </Text>
-        </ColumnStackLayout>
-      }
+      <ColumnStackLayout justifyContent="center" alignItems="center" noMargin>
+        {claimedProduct.productType === 'BUNDLE' && (
+          <CorsAwareImage
+            style={{
+              ...styles.previewImage,
+              background: gdevelopTheme.paper.backgroundColor.light,
+            }}
+            src={claimedProduct.thumbnailUrls[0]}
+            alt={`Preview image of bundle ${claimedProduct.name}`}
+          />
+        )}
+        <Text size="section-title" align="center" noMargin>
+          <Trans>Log in to your account to activate your purchase!</Trans>
+        </Text>
+      </ColumnStackLayout>
       <div style={styles.formContainer}>
         <LoginForm
           onLogin={doLogin}
@@ -134,4 +160,4 @@ const LoginDialog = ({
   );
 };
 
-export default LoginDialog;
+export default LoginWithPurchaseClaimDialog;

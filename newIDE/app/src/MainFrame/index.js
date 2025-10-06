@@ -201,8 +201,6 @@ import { useGamesPlatformFrame } from './EditorContainers/HomePage/PlaySection/U
 import { useExtensionLoadErrorDialog } from '../Utils/UseExtensionLoadErrorDialog';
 import { PanesContainer } from './PanesContainer';
 import StandaloneDialog from './StandAloneDialog';
-import PurchaseClaimDialog from './PurchaseClaimDialog';
-import { type BundleListingData } from '../Utils/GDevelopServices/Shop';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -482,14 +480,6 @@ const MainFrame = (props: Props) => {
     diagnosticReportDialogOpen,
     setDiagnosticReportDialogOpen,
   ] = React.useState<boolean>(false);
-  const [
-    purchaseClaimDialogOptions,
-    setPurchaseClaimDialogOptions,
-  ] = React.useState<?{|
-    productListingData: ?BundleListingData,
-    purchaseId: string,
-    claimableToken: string,
-  |}>(null);
   const [
     fileMetadataOpeningProgress,
     setFileMetadataOpeningProgress,
@@ -2108,17 +2098,6 @@ const MainFrame = (props: Props) => {
     [setStandaloneDialogOpen]
   );
 
-  const openPurchaseClaimDialogWhenAuthenticated = React.useCallback(
-    ({ productListingData, purchaseId, claimableToken }) => {
-      setPurchaseClaimDialogOptions({
-        productListingData,
-        purchaseId,
-        claimableToken,
-      });
-    },
-    [setPurchaseClaimDialogOptions]
-  );
-
   const { navigateToRoute } = useHomePageSwitch({
     openHomePage,
     closeDialogs: closeDialogsToOpenHomePage,
@@ -3339,7 +3318,6 @@ const MainFrame = (props: Props) => {
     openProfileDialog: onOpenProfileDialog,
     openAskAi,
     openStandaloneDialog,
-    openPurchaseClaimDialogWhenAuthenticated,
   });
 
   const onChangeProjectName = async (newName: string): Promise<void> => {
@@ -4281,14 +4259,6 @@ const MainFrame = (props: Props) => {
       )}
       {standaloneDialogOpen && (
         <StandaloneDialog onClose={() => setStandaloneDialogOpen(false)} />
-      )}
-      {purchaseClaimDialogOptions && (
-        <PurchaseClaimDialog
-          productListingData={purchaseClaimDialogOptions.productListingData}
-          purchaseId={purchaseClaimDialogOptions.purchaseId}
-          claimableToken={purchaseClaimDialogOptions.claimableToken}
-          onClose={() => setPurchaseClaimDialogOptions(null)}
-        />
       )}
       {quickCustomizationDialogOpenedFromGameId && currentProject && (
         <QuickCustomizationDialog

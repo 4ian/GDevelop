@@ -30,6 +30,7 @@ import {
   type Bundle,
 } from '../Utils/GDevelopServices/Asset';
 import { type Purchase } from '../Utils/GDevelopServices/Shop';
+import { type ClaimedProductOptions } from './PurchaseClaimDialog';
 
 export type AuthenticatedUser = {|
   authenticated: boolean,
@@ -68,17 +69,18 @@ export type AuthenticatedUser = {|
     preferences: PreferencesValues
   ) => Promise<void>,
   onResetPassword: ForgotPasswordForm => Promise<void>,
-  onOpenLoginDialog: (
-    ?{|
-      customHeader: React.Node,
-    |}
+  onOpenLoginDialog: () => void,
+  onOpenLoginWithPurchaseClaimDialog: (
+    claimedProductOptions: ClaimedProductOptions
   ) => void,
   onOpenEditProfileDialog: () => void,
   onOpenChangeEmailDialog: () => void,
-  onOpenCreateAccountDialog: (
-    ?{|
-      customHeader: React.Node,
-    |}
+  onOpenCreateAccountDialog: () => void,
+  onOpenCreateAccountWithPurchaseClaimDialog: (
+    claimedProductOptions: ClaimedProductOptions
+  ) => void,
+  onOpenPurchaseClaimDialog: (
+    claimedProductOptions: ClaimedProductOptions
   ) => void,
   onBadgesChanged: () => Promise<void>,
   onCloudProjectsChanged: () => Promise<void>,
@@ -139,9 +141,12 @@ export const initialAuthenticatedUser = {
   onEditProfile: async () => {},
   onResetPassword: async () => {},
   onOpenLoginDialog: () => {},
+  onOpenLoginWithPurchaseClaimDialog: () => {},
   onOpenEditProfileDialog: () => {},
   onOpenChangeEmailDialog: () => {},
   onOpenCreateAccountDialog: () => {},
+  onOpenCreateAccountWithPurchaseClaimDialog: () => {},
+  onOpenPurchaseClaimDialog: () => {},
   onBadgesChanged: async () => {},
   onCloudProjectsChanged: async () => {},
   onRefreshUserProfile: async () => {},

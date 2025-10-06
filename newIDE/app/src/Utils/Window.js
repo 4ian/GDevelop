@@ -351,7 +351,14 @@ export default class Window {
     }
   }
 
-  static openExternalURL(url: string) {
+  static openExternalURL(
+    url: string,
+    {
+      shouldOpenInSameTabIfPossible,
+    }: {|
+      shouldOpenInSameTabIfPossible?: boolean,
+    |} = {}
+  ) {
     if (!url) return;
 
     if (electron) {
@@ -359,18 +366,7 @@ export default class Window {
       return;
     }
 
-    window.open(url, '_blank');
-  }
-
-  static openUrlInSameWindowOnWebOrExternalOtherwise(url: string) {
-    if (!url) return;
-
-    if (electron) {
-      if (shell) shell.openExternal(url);
-      return;
-    }
-
-    window.open(url);
+    window.open(url, shouldOpenInSameTabIfPossible ? '_self' : '_blank');
   }
 
   static getOrientation(): 'portrait' | 'landscape' {

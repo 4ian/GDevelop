@@ -33,7 +33,7 @@ type Props = {|
   onClose: () => void,
   simulateAppStoreProduct?: boolean,
   fastCheckout?: boolean,
-  onPurchaseDone?: () => void,
+  onCloseAfterPurchaseDone?: () => void,
 |};
 
 const BundlePurchaseDialog = ({
@@ -42,7 +42,7 @@ const BundlePurchaseDialog = ({
   onClose,
   simulateAppStoreProduct,
   fastCheckout,
-  onPurchaseDone,
+  onCloseAfterPurchaseDone,
 }: Props) => {
   const {
     profile,
@@ -68,6 +68,8 @@ const BundlePurchaseDialog = ({
 
   const shouldUseOrSimulateAppStoreProduct =
     shouldUseAppStoreProduct() || simulateAppStoreProduct;
+
+  const willReceiveAnEmailForThePurchase = !profile && fastCheckout;
 
   const onStartPurchase = async () => {
     setDisplayPasswordPrompt(false);
@@ -102,6 +104,7 @@ const BundlePurchaseDialog = ({
     // Purchase with web.
     try {
       setIsPurchasing(true);
+
       if (fastCheckout) {
         const checkoutUrl = getStripeCheckoutUrl({
           productId: bundleListingData.id,
@@ -111,7 +114,9 @@ const BundlePurchaseDialog = ({
           userUuid: profile ? undefined : getUserUUID(),
           password: password || undefined,
         });
-        Window.openUrlInSameWindowOnWebOrExternalOtherwise(checkoutUrl);
+        Window.openExternalURL(checkoutUrl, {
+          shouldOpenInSameTabIfPossible: willReceiveAnEmailForThePurchase,
+        });
         return;
       }
 
@@ -168,6 +173,16 @@ const BundlePurchaseDialog = ({
     []
   );
 
+  const onCloseDialog = React.useCallback(
+    () => {
+      if (onCloseAfterPurchaseDone && purchaseSuccessful) {
+        onCloseAfterPurchaseDone();
+      }
+      onClose();
+    },
+    [onCloseAfterPurchaseDone, purchaseSuccessful, onClose]
+  );
+
   // This effect will be triggered when the bundle purchases change,
   // to check if the user has just bought the product.
   React.useEffect(
@@ -183,7 +198,6 @@ const BundlePurchaseDialog = ({
           // We found the purchase, the user has bought the bundle.
           // We do not close the dialog yet, as we need to trigger a refresh of the products received.
           await onPurchaseSuccessful();
-          if (onPurchaseDone) onPurchaseDone();
         }
       };
       checkIfPurchaseIsDone();
@@ -193,7 +207,7 @@ const BundlePurchaseDialog = ({
       bundlePurchases,
       bundleListingData,
       onPurchaseSuccessful,
-      onPurchaseDone,
+      onCloseAfterPurchaseDone,
       onRefreshBundlePurchases,
     ]
   );
@@ -202,7 +216,7 @@ const BundlePurchaseDialog = ({
     () => {
       onRefreshBundlePurchases();
     },
-    isPurchasing ? 3900 : null
+    isPurchasing && !willReceiveAnEmailForThePurchase ? 3900 : null
   );
 
   // Listen to the received bundle, to know when a user has just logged in and the received bundles have been loaded.
@@ -239,7 +253,7 @@ const BundlePurchaseDialog = ({
             setIsPurchasing(false);
             setPurchaseSuccessful(true);
           } else if (!purchaseSuccessful) {
-            onClose();
+            onCloseDialog();
           }
         }
       }
@@ -248,7 +262,7 @@ const BundlePurchaseDialog = ({
       receivedBundles,
       bundleListingData,
       isPurchasing,
-      onClose,
+      onCloseDialog,
       isCheckingPurchasesAfterLogin,
       purchaseSuccessful,
     ]
@@ -304,7 +318,7 @@ const BundlePurchaseDialog = ({
             </>
           ) : (
             <>
-              {!fastCheckout && (
+              {!willReceiveAnEmailForThePurchase && (
                 <Line justifyContent="center" alignItems="center">
                   <CircularProgress size={20} />
                   <Spacer />
@@ -316,7 +330,7 @@ const BundlePurchaseDialog = ({
               <Spacer />
               <Line justifyContent="center">
                 <BackgroundText>
-                  {!fastCheckout ? (
+                  {!willReceiveAnEmailForThePurchase ? (
                     <Trans>
                       Once you're done, come back to GDevelop and the bundle
                       will be added to your account automatically.
@@ -373,13 +387,13 @@ const BundlePurchaseDialog = ({
     <FlatButton
       key="cancel"
       label={
-        purchaseSuccessful || fastCheckout ? (
+        purchaseSuccessful || willReceiveAnEmailForThePurchase ? (
           <Trans>Close</Trans>
         ) : (
           <Trans>Cancel</Trans>
         )
       }
-      onClick={onClose}
+      onClick={onCloseDialog}
     />,
     allowPurchase ? (
       <DialogPrimaryButton
@@ -397,9 +411,9 @@ const BundlePurchaseDialog = ({
         title={<Trans>{bundleListingData.name}</Trans>}
         maxWidth="sm"
         open
-        onRequestClose={onClose}
+        onRequestClose={onCloseDialog}
         actions={dialogActions}
-        onApply={purchaseSuccessful ? onClose : onWillPurchase}
+        onApply={purchaseSuccessful ? onCloseDialog : onWillPurchase}
         cannotBeDismissed // Prevent the user from continuing by clicking outside.
         flexColumnBody
       >

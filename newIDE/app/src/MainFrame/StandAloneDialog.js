@@ -99,7 +99,7 @@ const StandaloneDialog = ({ onClose }: Props) => {
           getCourseCompletion={getCourseCompletion}
           noActions
           fastCheckout
-          onPurchaseDone={() => {
+          onCloseAfterPurchaseDone={() => {
             navigateToRoute('learn', {
               bundle: selectedBundleListingData.id,
             });

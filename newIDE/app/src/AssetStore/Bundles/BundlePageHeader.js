@@ -69,7 +69,7 @@ type Props = {|
   simulateAppStoreProduct?: boolean,
   i18n: I18nType,
   fastCheckout?: boolean,
-  onPurchaseDone?: () => void,
+  onCloseAfterPurchaseDone?: () => void,
 |};
 
 const BundlePageHeader = ({
@@ -78,7 +78,7 @@ const BundlePageHeader = ({
   simulateAppStoreProduct,
   i18n,
   fastCheckout,
-  onPurchaseDone,
+  onCloseAfterPurchaseDone,
 }: Props) => {
   const { privateGameTemplateListingDatas } = React.useContext(
     PrivateGameTemplateStoreContext
@@ -508,7 +508,7 @@ const BundlePageHeader = ({
               usageType="default"
               onClose={() => setPurchasingBundleListingData(null)}
               fastCheckout={fastCheckout}
-              onPurchaseDone={onPurchaseDone}
+              onCloseAfterPurchaseDone={onCloseAfterPurchaseDone}
             />
           )}
           {isRedemptionCodesDialogOpen && (

@@ -89,7 +89,7 @@ type Props = {|
   noPadding?: boolean,
   noActions?: boolean,
   fastCheckout?: boolean,
-  onPurchaseDone?: () => void,
+  onCloseAfterPurchaseDone?: () => void,
 |};
 
 const BundleInformationPage = ({
@@ -105,7 +105,7 @@ const BundleInformationPage = ({
   noPadding,
   noActions,
   fastCheckout,
-  onPurchaseDone,
+  onCloseAfterPurchaseDone,
 }: Props) => {
   const { windowSize, isLandscape, isMobile } = useResponsiveWindowSize();
   const { bundleListingDatas } = React.useContext(BundleStoreContext); // If archived, should use the one passed.
@@ -318,7 +318,7 @@ const BundleInformationPage = ({
             bundle={bundle}
             i18n={i18n}
             fastCheckout={fastCheckout}
-            onPurchaseDone={onPurchaseDone}
+            onCloseAfterPurchaseDone={onCloseAfterPurchaseDone}
           />
           <Line noMargin>
             <Text size="section-title">

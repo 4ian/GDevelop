@@ -294,6 +294,25 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   obj.AddAction(
+         "RotateTowardObject",
+         _("Rotate toward another object"),
+         _("Rotate an object towards another object, with the specified speed. "
+           "Note that if multiple instances of the target object are picked, "
+           "only the first one will be used. Use a For Each event or actions "
+           "like \"Pick nearest object\", \"Pick a random object\" to refine "
+           "the choice of the target object."),
+         _("Rotate _PARAM0_ towards _PARAM1_ at speed _PARAM2_ deg/second"),
+         _("Angle"),
+         "res/actions/rotate24_black.png",
+         "res/actions/rotate_black.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectPtr", _("Target object"))
+      .AddParameter("expression", _("Angular speed (in degrees per second)"))
+      .SetParameterLongDescription(_("Enter 0 for an immediate rotation."))
+      .AddCodeOnlyParameter("currentScene", "")
+      .MarkAsAdvanced();
+
+  obj.AddAction(
          "AddForceXY",
          _("Add a force"),
          _("Add a force to an object. The object will move according to "

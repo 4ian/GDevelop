@@ -229,6 +229,8 @@ BaseObjectExtension::BaseObjectExtension() {
       "gdjs.evtTools.object.pickRandomObject");
   GetAllConditions()["AjoutHasard"].SetFunctionName(
       "gdjs.evtTools.object.pickRandomObject");
+  GetAllActions()["PickNearest"].SetFunctionName(
+      "gdjs.evtTools.object.pickNearestObject");
   GetAllConditions()["PickNearest"].SetFunctionName(
       "gdjs.evtTools.object.pickNearestObject");
 

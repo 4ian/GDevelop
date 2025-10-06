@@ -1647,6 +1647,23 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   extension
       .AddAction(
+          "PickNearest",
+          _("Pick nearest object"),
+          _("Pick the object of this type that is nearest to the specified "
+            "position. If the condition is inverted, the object farthest from "
+            "the specified position is picked instead."),
+          _("Pick the _PARAM0_ that is nearest to _PARAM1_;_PARAM2_"),
+          _("Objects"),
+          "res/conditions/distance24.png",
+          "res/conditions/distance.png")
+      .AddParameter("objectList", _("Object"))
+      .AddParameter("expression", _("X position"))
+      .AddParameter("expression", _("Y position"))
+      .AddCodeOnlyParameter("conditionInverted", "")
+      .MarkAsSimple();
+
+  extension
+      .AddAction(
           "MoveObjects",
           _("Apply movement to all objects"),
           _("Moves all objects according to the forces they have. GDevelop "

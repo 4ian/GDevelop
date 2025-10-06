@@ -985,6 +985,16 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
   };
 
+  _onSelectLayer = (layer: string) => {
+    this.setState({
+      selectedLayer: layer,
+      instancesEditorSettings: {
+        ...this.state.instancesEditorSettings,
+        selectedLayer: layer,
+      },
+    });
+  };
+
   _onLayerRenamed = () => {
     this.forceUpdatePropertiesEditor();
   };
@@ -2048,15 +2058,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 }
                 onLayerRenamed={this._onLayerRenamed}
                 onRemoveLayer={this._onRemoveLayer}
-                onSelectLayer={(layer: string) =>
-                  this.setState({
-                    selectedLayer: layer,
-                    instancesEditorSettings: {
-                      ...this.state.instancesEditorSettings,
-                      selectedLayer: layer,
-                    },
-                  })
-                }
+                onSelectLayer={this._onSelectLayer}
                 tileMapTileSelection={this.state.tileMapTileSelection}
                 onSelectTileMapTile={this.onSelectTileMapTile}
                 onExportAssets={this.openObjectExporterDialog}

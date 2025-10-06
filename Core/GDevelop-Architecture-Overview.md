@@ -24,7 +24,7 @@ The rest of this page is an introduction to the main concepts of GDevelop archit
 
 Extensions do have the same distinction between the "**IDE**" part and the "**Runtime**" part. For example, most extensions have:
 
--   A file called [`JsExtension.js`(https://github.com/4ian/GDevelop/blob/master/Extensions/ExampleJsExtension/JsExtension.js)], which contains the _declaration_ of the extension for the **IDE**
+-   A file called [`JsExtension.js`](https://github.com/4ian/GDevelop/blob/master/Extensions/ExampleJsExtension/JsExtension.js), which contains the _declaration_ of the extension for the **IDE**
 -   One or more files implementing the feature for the game, in other words for **Runtime**. This can be a [Runtime Object](https://github.com/4ian/GDevelop/blob/master/Extensions/ExampleJsExtension/dummyruntimeobject.ts) or a [Runtime Behavior](https://github.com/4ian/GDevelop/blob/master/Extensions/ExampleJsExtension/dummyruntimebehavior.ts), [functions called by actions or conditions](https://github.com/4ian/GDevelop/blob/master/Extensions/ExampleJsExtension/examplejsextensiontools.ts) or by the game engine.
 
 ### "Runtime" and "IDE" difference using an example: the `gd::Variable` class

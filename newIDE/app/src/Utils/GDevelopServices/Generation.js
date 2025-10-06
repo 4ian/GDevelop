@@ -2,25 +2,11 @@
 import axios from 'axios';
 import { GDevelopAiCdn, GDevelopGenerationApi } from './ApiConfigs';
 import { type MessageByLocale } from '../i18n/MessageByLocale';
+import { getIDEVersionWithHash } from '../../Version';
 
 export type Environment = 'staging' | 'live';
 
 export type GenerationStatus = 'working' | 'ready' | 'error';
-
-export type GeneratedProject = {
-  id: string,
-  createdAt: string,
-  updatedAt: string,
-  userId: string,
-  prompt: string,
-  status: GenerationStatus,
-  width: number,
-  height: number,
-  projectName: string,
-  fileUrl?: string,
-  synopsis?: string,
-  error?: string,
-};
 
 export type AiRequestMessageAssistantFunctionCall = {|
   type: 'function_call',
@@ -180,91 +166,6 @@ export type AssetSearch = {
   }> | null,
 };
 
-export const getGeneratedProject = async (
-  getAuthorizationHeader: () => Promise<string>,
-  {
-    userId,
-    generatedProjectId,
-  }: {|
-    userId: string,
-    generatedProjectId: string,
-  |}
-): Promise<GeneratedProject> => {
-  const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.get(
-    `${GDevelopGenerationApi.baseUrl}/generated-project/${generatedProjectId}`,
-    {
-      params: {
-        userId,
-      },
-      headers: {
-        Authorization: authorizationHeader,
-      },
-    }
-  );
-  return response.data;
-};
-
-export const getGeneratedProjects = async (
-  getAuthorizationHeader: () => Promise<string>,
-  {
-    userId,
-  }: {|
-    userId: string,
-  |}
-): Promise<Array<GeneratedProject>> => {
-  const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.get(
-    `${GDevelopGenerationApi.baseUrl}/generated-project`,
-    {
-      params: {
-        userId,
-      },
-      headers: {
-        Authorization: authorizationHeader,
-      },
-    }
-  );
-  return response.data;
-};
-
-export const createGeneratedProject = async (
-  getAuthorizationHeader: () => Promise<string>,
-  {
-    userId,
-    prompt,
-    width,
-    height,
-    projectName,
-  }: {|
-    userId: string,
-    prompt: string,
-    width: number,
-    height: number,
-    projectName: string,
-  |}
-): Promise<GeneratedProject> => {
-  const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.post(
-    `${GDevelopGenerationApi.baseUrl}/generated-project`,
-    {
-      prompt,
-      width,
-      height,
-      projectName,
-    },
-    {
-      params: {
-        userId,
-      },
-      headers: {
-        Authorization: authorizationHeader,
-      },
-    }
-  );
-  return response.data;
-};
-
 export const getAiRequest = async (
   getAuthorizationHeader: () => Promise<string>,
   {
@@ -354,6 +255,7 @@ export const createAiRequest = async (
   const response = await axios.post(
     `${GDevelopGenerationApi.baseUrl}/ai-request`,
     {
+      gdevelopVersionWithHash: getIDEVersionWithHash(),
       userRequest,
       gameProjectJson,
       gameProjectJsonUserRelativeKey,
@@ -409,6 +311,7 @@ export const addMessageToAiRequest = async (
       GDevelopGenerationApi.baseUrl
     }/ai-request/${aiRequestId}/action/add-message`,
     {
+      gdevelopVersionWithHash: getIDEVersionWithHash(),
       functionCallOutputs,
       userMessage,
       payWithCredits,
@@ -453,6 +356,7 @@ export const sendAiRequestFeedback = async (
       GDevelopGenerationApi.baseUrl
     }/ai-request/${aiRequestId}/action/set-feedback`,
     {
+      gdevelopVersionWithHash: getIDEVersionWithHash(),
       messageIndex,
       feedback,
       reason,
@@ -514,6 +418,7 @@ export const createAiGeneratedEvent = async (
   const response = await axios.post(
     `${GDevelopGenerationApi.baseUrl}/ai-generated-event`,
     {
+      gdevelopVersionWithHash: getIDEVersionWithHash(),
       gameProjectJson,
       gameProjectJsonUserRelativeKey,
       projectSpecificExtensionsSummaryJson,
@@ -603,6 +508,7 @@ export const createAssetSearch = async (
   const response = await axios.post(
     `${GDevelopGenerationApi.baseUrl}/asset-search`,
     {
+      gdevelopVersionWithHash: getIDEVersionWithHash(),
       searchTerms,
       description,
       objectType,
@@ -644,7 +550,11 @@ export const createAiUserContentPresignedUrls = async (
     `${
       GDevelopGenerationApi.baseUrl
     }/ai-user-content/action/create-presigned-urls`,
-    { gameProjectJsonHash, projectSpecificExtensionsSummaryJsonHash },
+    {
+      gdevelopVersionWithHash: getIDEVersionWithHash(),
+      gameProjectJsonHash,
+      projectSpecificExtensionsSummaryJsonHash,
+    },
     {
       params: {
         userId,

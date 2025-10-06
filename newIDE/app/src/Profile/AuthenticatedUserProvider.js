@@ -1483,7 +1483,6 @@ export default class AuthenticatedUserProvider extends React.Component<
     open: boolean = true,
     createOrLoginOptions: ?{| customHeader: React.Node |}
   ) => {
-    console.log('openCreateAccountDialog', createOrLoginOptions);
     this.setState({
       loginDialogOpen: false,
       createAccountDialogOpen: open,

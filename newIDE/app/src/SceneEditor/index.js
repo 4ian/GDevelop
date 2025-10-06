@@ -209,7 +209,10 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     this.instancesSelection = new InstancesSelection();
 
-    const initialInstancesEditorSettings = props.getInitialInstancesEditorSettings();
+    const initialInstancesEditorSettings = props.getInitialInstancesEditorSettings
+      ? props.getInitialInstancesEditorSettings()
+      : {};
+
     this.state = {
       setupGridOpen: false,
       scenePropertiesDialogOpen: false,

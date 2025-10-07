@@ -13,7 +13,7 @@ try {
 
 // The path containing GDJS Runtime *and* extensions
 const gdjsFolder = path.join(__dirname, '../../app/resources/GDJS');
-const destination = `s3://resources.gdevelop-app.com/GDJS-${versionMetadata.version}`;
+const destination = `s3://resources.gdevelop-app.com/GDJS-${versionMetadata.versionWithHash}`;
 
 shell.echo('ℹ️ Uploading GDJS Runtime (with extensions) to resources.gdevelop-app.com...');
 const output = shell.exec(

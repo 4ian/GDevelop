@@ -15,7 +15,7 @@ type CourseChapterStoreState = {|
   listedCourseChapters: CourseChapterListingData[] | null,
 |};
 
-const initialCourseStoreState: CourseChapterStoreState = {
+export const initialCourseStoreState: CourseChapterStoreState = {
   listedCourses: null,
   listedCourseChapters: null,
 };

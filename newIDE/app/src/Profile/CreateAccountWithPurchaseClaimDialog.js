@@ -15,9 +15,11 @@ import { ColumnStackLayout } from '../UI/Layout';
 import { isUsernameValid } from './UsernameField';
 import HelpButton from '../UI/HelpButton';
 import Text from '../UI/Text';
-import GDevelopGLogo from '../UI/CustomSvgIcons/GDevelopGLogo';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import CreateAccountForm from './CreateAccountForm';
+import { CorsAwareImage } from '../UI/CorsAwareImage';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import { type ClaimedProductOptions } from './PurchaseClaimDialog';
 
 const getStyles = ({ isMobile }) => {
   return {
@@ -26,6 +28,20 @@ const getStyles = ({ isMobile }) => {
       width: isMobile ? '95%' : '90%',
       marginTop: 10,
       flexDirection: 'column',
+    },
+    previewImage: {
+      width: '100%',
+      maxWidth: 400,
+      display: 'block',
+      objectFit: 'contain',
+      borderRadius: 8,
+      border: '1px solid lightgrey',
+      boxSizing: 'border-box', // Take border in account for sizing to avoid cumulative layout shift.
+      // Prevent cumulative layout shift by enforcing
+      // the 16:9 ratio.
+      aspectRatio: '16 / 9',
+      transition: 'opacity 0.3s ease-in-out',
+      position: 'relative',
     },
   };
 };
@@ -37,81 +53,17 @@ type Props = {|
   onLoginWithProvider: (provider: IdentityProvider) => Promise<void>,
   createAccountInProgress: boolean,
   error: ?AuthError,
+  claimedProductOptions: ClaimedProductOptions,
 |};
 
-export const getEmailErrorText = (error: ?AuthError) => {
-  if (!error) return undefined;
-
-  if (error.code === 'auth/invalid-email')
-    return <Trans>This email is invalid.</Trans>;
-  if (error.code === 'auth/missing-email')
-    return <Trans>Please enter an email address.</Trans>;
-  if (error.code === 'auth/user-disabled')
-    return <Trans>This account has been deactivated or deleted.</Trans>;
-  if (error.code === 'auth/user-not-found')
-    return (
-      <Trans>This user was not found: have you created your account?</Trans>
-    );
-  if (error.code === 'auth/email-already-in-use')
-    return <Trans>This email was already used for another account.</Trans>;
-  if (error.code === 'auth/operation-not-allowed')
-    return (
-      <Trans>Service seems to be unavailable, please try again later.</Trans>
-    );
-  if (error.code === 'auth/requires-recent-login')
-    return (
-      <Trans>
-        Please log out and log in again to verify your identify, then change
-        your email.
-      </Trans>
-    );
-  if (error.code === 'auth/network-request-failed')
-    return (
-      <Trans>
-        The request could not reach the servers, ensure you are connected to
-        internet.
-      </Trans>
-    );
-
-  return undefined;
-};
-
-export const getPasswordErrorText = (error: ?AuthError) => {
-  if (!error) return undefined;
-
-  if (error.code === 'auth/too-many-requests')
-    return (
-      <Trans>
-        That's a lot of unsuccessful login attempts! Wait a bit before trying
-        again or reset your password.
-      </Trans>
-    );
-  if (error.code === 'auth/wrong-password')
-    return <Trans>The password is invalid.</Trans>;
-  if (error.code === 'auth/weak-password')
-    return (
-      <Trans>
-        This password is too weak: please use more letters and digits.
-      </Trans>
-    );
-  if (error.code === 'auth/internal-error')
-    // Error raised when trying to create an account with an empty password.
-    return (
-      <Trans>
-        An unknown error happened, ensure your password is entered correctly.
-      </Trans>
-    );
-
-  return undefined;
-};
-
-const CreateAccountDialog = ({
+const CreateAccountWithPurchaseClaimDialog = ({
   onClose,
   onGoToLogin,
   onCreateAccount,
   onLoginWithProvider,
   createAccountInProgress,
   error,
+  claimedProductOptions: { productListingData: claimedProduct },
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const styles = getStyles({ isMobile });
@@ -129,6 +81,7 @@ const CreateAccountDialog = ({
     isValidatingUsername,
     setIsValidatingUsername,
   ] = React.useState<boolean>(false);
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const canCreateAccount =
     !createAccountInProgress &&
@@ -146,14 +99,14 @@ const CreateAccountDialog = ({
         getNewsletterEmail,
       });
     } catch (error) {
-      console.error(error);
+      console.error('Error while creating account', error);
     }
   };
 
   return (
     <Dialog
       title={null} // This dialog has a custom design to be more welcoming, the title is set in the content.
-      id="create-account-dialog"
+      id="create-account-with-purchase-claim-dialog"
       actions={[
         <FlatButton
           label={<Trans>Cancel</Trans>}
@@ -189,18 +142,21 @@ const CreateAccountDialog = ({
         justifyContent="center"
         alignItems="center"
       >
-        {
-          <ColumnStackLayout
-            noMargin
-            justifyContent="center"
-            alignItems="center"
-          >
-            <GDevelopGLogo fontSize="large" />
-            <Text size="section-title" align="center" noMargin>
-              <Trans>Welcome to GDevelop!</Trans>
-            </Text>
-          </ColumnStackLayout>
-        }
+        <ColumnStackLayout justifyContent="center" alignItems="center" noMargin>
+          {claimedProduct.productType === 'BUNDLE' && (
+            <CorsAwareImage
+              style={{
+                ...styles.previewImage,
+                background: gdevelopTheme.paper.backgroundColor.light,
+              }}
+              src={claimedProduct.thumbnailUrls[0]}
+              alt={`Preview image of bundle ${claimedProduct.name}`}
+            />
+          )}
+          <Text size="section-title" align="center" noMargin>
+            <Trans>Create an account to activate your purchase!</Trans>
+          </Text>
+        </ColumnStackLayout>
         <div style={styles.formContainer}>
           <CreateAccountForm
             onCreateAccount={createAccount}
@@ -226,4 +182,4 @@ const CreateAccountDialog = ({
   );
 };
 
-export default CreateAccountDialog;
+export default CreateAccountWithPurchaseClaimDialog;

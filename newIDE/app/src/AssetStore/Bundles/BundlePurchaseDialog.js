@@ -25,14 +25,15 @@ import {
 } from '../../Utils/AppStorePurchases';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 import PasswordPromptDialog from '../PasswordPromptDialog';
+import { getUserUUID } from '../../Utils/Analytics/UserUUID';
 
 type Props = {|
   bundleListingData: BundleListingData,
   usageType: string,
   onClose: () => void,
   simulateAppStoreProduct?: boolean,
-  simpleCheckout?: boolean,
-  onPurchaseDone?: () => void,
+  fastCheckout?: boolean,
+  onCloseAfterPurchaseDone?: () => void,
 |};
 
 const BundlePurchaseDialog = ({
@@ -40,8 +41,8 @@ const BundlePurchaseDialog = ({
   usageType,
   onClose,
   simulateAppStoreProduct,
-  simpleCheckout,
-  onPurchaseDone,
+  fastCheckout,
+  onCloseAfterPurchaseDone,
 }: Props) => {
   const {
     profile,
@@ -64,16 +65,22 @@ const BundlePurchaseDialog = ({
   ] = React.useState<boolean>(false);
   const [password, setPassword] = React.useState<string>('');
   const { showAlert } = useAlertDialog();
+  const [isOpeningUrl, setIsOpeningUrl] = React.useState(false);
 
   const shouldUseOrSimulateAppStoreProduct =
     shouldUseAppStoreProduct() || simulateAppStoreProduct;
 
+  const willReceiveAnEmailForThePurchase = !profile && fastCheckout;
+
   const onStartPurchase = async () => {
-    if (!profile) return;
     setDisplayPasswordPrompt(false);
 
     // Purchase with the App Store.
     if (shouldUseOrSimulateAppStoreProduct) {
+      if (!profile) {
+        return;
+      }
+
       try {
         setIsPurchasing(true);
         await purchaseAppStoreProduct(bundleListingData.appStoreProductId);
@@ -98,21 +105,35 @@ const BundlePurchaseDialog = ({
     // Purchase with web.
     try {
       setIsPurchasing(true);
-      const checkoutUrl = simpleCheckout
-        ? getStripeCheckoutUrl({
-            productId: bundleListingData.id,
-            priceName: price.name,
-            userId: profile.id,
-            userEmail: profile.email,
-            ...(password ? { password } : undefined),
-          })
-        : getPurchaseCheckoutUrl({
-            productId: bundleListingData.id,
-            priceName: price.name,
-            userId: profile.id,
-            userEmail: profile.email,
-            ...(password ? { password } : undefined),
-          });
+
+      if (fastCheckout) {
+        const checkoutUrl = getStripeCheckoutUrl({
+          productId: bundleListingData.id,
+          priceName: price.name,
+          userId: profile ? profile.id : undefined,
+          userEmail: profile ? profile.email : undefined,
+          userUuid: profile ? undefined : getUserUUID(),
+          password: password || undefined,
+        });
+        // Mark the Url as opening if opening in the same tab, as it can take some time to load.
+        setIsOpeningUrl(willReceiveAnEmailForThePurchase);
+        Window.openExternalURL(checkoutUrl, {
+          shouldOpenInSameTabIfPossible: willReceiveAnEmailForThePurchase,
+        });
+        return;
+      }
+
+      // Cannot continue without a profile if not doing fast checkout.
+      if (!profile) {
+        return;
+      }
+      const checkoutUrl = getPurchaseCheckoutUrl({
+        productId: bundleListingData.id,
+        priceName: price.name,
+        userId: profile.id,
+        userEmail: profile.email,
+        password: password || undefined,
+      });
       Window.openExternalURL(checkoutUrl);
     } catch (error) {
       const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
@@ -155,6 +176,16 @@ const BundlePurchaseDialog = ({
     []
   );
 
+  const onCloseDialog = React.useCallback(
+    () => {
+      if (onCloseAfterPurchaseDone && purchaseSuccessful) {
+        onCloseAfterPurchaseDone();
+      }
+      onClose();
+    },
+    [onCloseAfterPurchaseDone, purchaseSuccessful, onClose]
+  );
+
   // This effect will be triggered when the bundle purchases change,
   // to check if the user has just bought the product.
   React.useEffect(
@@ -170,7 +201,6 @@ const BundlePurchaseDialog = ({
           // We found the purchase, the user has bought the bundle.
           // We do not close the dialog yet, as we need to trigger a refresh of the products received.
           await onPurchaseSuccessful();
-          if (onPurchaseDone) onPurchaseDone();
         }
       };
       checkIfPurchaseIsDone();
@@ -180,7 +210,7 @@ const BundlePurchaseDialog = ({
       bundlePurchases,
       bundleListingData,
       onPurchaseSuccessful,
-      onPurchaseDone,
+      onCloseAfterPurchaseDone,
       onRefreshBundlePurchases,
     ]
   );
@@ -189,7 +219,7 @@ const BundlePurchaseDialog = ({
     () => {
       onRefreshBundlePurchases();
     },
-    isPurchasing ? 3900 : null
+    isPurchasing && !willReceiveAnEmailForThePurchase ? 3900 : null
   );
 
   // Listen to the received bundle, to know when a user has just logged in and the received bundles have been loaded.
@@ -226,7 +256,7 @@ const BundlePurchaseDialog = ({
             setIsPurchasing(false);
             setPurchaseSuccessful(true);
           } else if (!purchaseSuccessful) {
-            onClose();
+            onCloseDialog();
           }
         }
       }
@@ -235,106 +265,121 @@ const BundlePurchaseDialog = ({
       receivedBundles,
       bundleListingData,
       isPurchasing,
-      onClose,
+      onCloseDialog,
       isCheckingPurchasesAfterLogin,
       purchaseSuccessful,
     ]
   );
 
-  const dialogContents = !profile
-    ? {
-        subtitle: <Trans>Log-in to purchase this item</Trans>,
-        content: (
-          <CreateProfile
-            onOpenLoginDialog={onOpenLoginDialog}
-            onOpenCreateAccountDialog={onOpenCreateAccountDialog}
-            message={
-              <Trans>
-                Bundles and their content will be linked to your user account
-                and available for all your projects. Log-in or sign-up to
-                purchase this bundle. (or restore your existing purchase).
-              </Trans>
-            }
-            justifyContent="center"
-          />
-        ),
-      }
-    : purchaseSuccessful
-    ? {
-        subtitle: <Trans>Your purchase has been processed!</Trans>,
-        content: (
-          <Line justifyContent="center" alignItems="center">
-            <Text>
-              <Trans>You can now go back to use your new bundle.</Trans>
-            </Text>
-          </Line>
-        ),
-      }
-    : isPurchasing
-    ? {
-        subtitle: shouldUseOrSimulateAppStoreProduct ? (
-          <Trans>Complete your purchase with the app store.</Trans>
-        ) : (
-          <Trans>Complete your payment on the web browser</Trans>
-        ),
-        content: shouldUseOrSimulateAppStoreProduct ? (
-          <>
-            <ColumnStackLayout justifyContent="center" alignItems="center">
-              <CircularProgress size={40} />
-              <Text>
+  const dialogContents =
+    !profile && !fastCheckout
+      ? {
+          subtitle: <Trans>Log-in to purchase this item</Trans>,
+          content: (
+            <CreateProfile
+              onOpenLoginDialog={onOpenLoginDialog}
+              onOpenCreateAccountDialog={onOpenCreateAccountDialog}
+              message={
                 <Trans>
-                  The purchase will be linked to your account once done.
+                  Bundles and their content will be linked to your user account
+                  and available for all your projects. Log-in or sign-up to
+                  purchase this bundle. (or restore your existing purchase).
                 </Trans>
+              }
+              justifyContent="center"
+            />
+          ),
+        }
+      : purchaseSuccessful
+      ? {
+          subtitle: <Trans>Your purchase has been processed!</Trans>,
+          content: (
+            <Line justifyContent="center" alignItems="center">
+              <Text>
+                <Trans>You can now go back to use your new bundle.</Trans>
               </Text>
-            </ColumnStackLayout>
-          </>
-        ) : (
-          <>
+            </Line>
+          ),
+        }
+      : isPurchasing
+      ? {
+          subtitle: shouldUseOrSimulateAppStoreProduct ? (
+            <Trans>Complete your purchase with the app store.</Trans>
+          ) : (
+            <Trans>Complete your payment on the web browser</Trans>
+          ),
+          content: shouldUseOrSimulateAppStoreProduct ? (
+            <>
+              <ColumnStackLayout justifyContent="center" alignItems="center">
+                <CircularProgress size={40} />
+                <Text>
+                  <Trans>
+                    The purchase will be linked to your account once done.
+                  </Trans>
+                </Text>
+              </ColumnStackLayout>
+            </>
+          ) : (
+            <>
+              {!willReceiveAnEmailForThePurchase && (
+                <Line justifyContent="center" alignItems="center">
+                  <CircularProgress size={20} />
+                  <Spacer />
+                  <Text>
+                    <Trans>Waiting for the purchase confirmation...</Trans>
+                  </Text>
+                </Line>
+              )}
+              <Spacer />
+              <Line justifyContent="center">
+                <BackgroundText>
+                  {!willReceiveAnEmailForThePurchase ? (
+                    <Trans>
+                      Once you're done, come back to GDevelop and the bundle
+                      will be added to your account automatically.
+                    </Trans>
+                  ) : (
+                    <Trans>
+                      Once you're done, you will receive an email confirmation
+                      so that you can link the bundle to your account.
+                    </Trans>
+                  )}
+                </BackgroundText>
+              </Line>
+            </>
+          ),
+        }
+      : isCheckingPurchasesAfterLogin
+      ? {
+          subtitle: <Trans>Loading your profile...</Trans>,
+          content: (
             <Line justifyContent="center" alignItems="center">
               <CircularProgress size={20} />
-              <Spacer />
+            </Line>
+          ),
+        }
+      : {
+          subtitle: profile ? (
+            <Trans>
+              The bundle {bundleListingData.name} will be linked to your account{' '}
+              {profile.email}.
+            </Trans>
+          ) : (
+            <Trans>
+              The bundle {bundleListingData.name} will be sent to the email
+              address provided in the checkout.
+            </Trans>
+          ),
+          content: shouldUseOrSimulateAppStoreProduct ? null : (
+            <Line justifyContent="center" alignItems="center">
               <Text>
-                <Trans>Waiting for the purchase confirmation...</Trans>
+                <Trans>
+                  A new secure window will open to complete the purchase.
+                </Trans>
               </Text>
             </Line>
-            <Spacer />
-            <Line justifyContent="center">
-              <BackgroundText>
-                <Trans>
-                  Once you're done, come back to GDevelop and the bundle will be
-                  added to your account automatically.
-                </Trans>
-              </BackgroundText>
-            </Line>
-          </>
-        ),
-      }
-    : isCheckingPurchasesAfterLogin
-    ? {
-        subtitle: <Trans>Loading your profile...</Trans>,
-        content: (
-          <Line justifyContent="center" alignItems="center">
-            <CircularProgress size={20} />
-          </Line>
-        ),
-      }
-    : {
-        subtitle: (
-          <Trans>
-            The bundle {bundleListingData.name} will be linked to your account{' '}
-            {profile.email}.
-          </Trans>
-        ),
-        content: shouldUseOrSimulateAppStoreProduct ? null : (
-          <Line justifyContent="center" alignItems="center">
-            <Text>
-              <Trans>
-                A new secure window will open to complete the purchase.
-              </Trans>
-            </Text>
-          </Line>
-        ),
-      };
+          ),
+        };
 
   const allowPurchase =
     profile &&
@@ -344,8 +389,17 @@ const BundlePurchaseDialog = ({
   const dialogActions = [
     <FlatButton
       key="cancel"
-      label={purchaseSuccessful ? <Trans>Close</Trans> : <Trans>Cancel</Trans>}
-      onClick={onClose}
+      label={
+        isOpeningUrl ? (
+          <Trans>Loading...</Trans>
+        ) : purchaseSuccessful || willReceiveAnEmailForThePurchase ? (
+          <Trans>Close</Trans>
+        ) : (
+          <Trans>Cancel</Trans>
+        )
+      }
+      onClick={onCloseDialog}
+      disabled={isOpeningUrl}
     />,
     allowPurchase ? (
       <DialogPrimaryButton
@@ -363,9 +417,9 @@ const BundlePurchaseDialog = ({
         title={<Trans>{bundleListingData.name}</Trans>}
         maxWidth="sm"
         open
-        onRequestClose={onClose}
+        onRequestClose={onCloseDialog}
         actions={dialogActions}
-        onApply={purchaseSuccessful ? onClose : onWillPurchase}
+        onApply={purchaseSuccessful ? onCloseDialog : onWillPurchase}
         cannotBeDismissed // Prevent the user from continuing by clicking outside.
         flexColumnBody
       >

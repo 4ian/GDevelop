@@ -104,7 +104,7 @@ const UserChip = ({ onOpenProfile }: Props) => {
               <Trans>Sign up</Trans>
             </span>
           }
-          onClick={onOpenCreateAccountDialog}
+          onClick={() => onOpenCreateAccountDialog()}
           primary
         />
       </LineStackLayout>

@@ -30,15 +30,17 @@ type CreditsPackageStoreState = {|
   openCreditsUsageDialog: CreditsUsageDialogOptions => void,
 |};
 
+export const initialCreditsPackageStoreState: CreditsPackageStoreState = {
+  fetchCreditsPackages: () => {},
+  creditsPackageListingDatas: null,
+  error: null,
+  openCreditsPackageDialog: () => {},
+  closeCreditsPackageDialog: () => {},
+  openCreditsUsageDialog: () => {},
+};
+
 export const CreditsPackageStoreContext = React.createContext<CreditsPackageStoreState>(
-  {
-    fetchCreditsPackages: () => {},
-    creditsPackageListingDatas: null,
-    error: null,
-    openCreditsPackageDialog: () => {},
-    closeCreditsPackageDialog: () => {},
-    openCreditsUsageDialog: () => {},
-  }
+  initialCreditsPackageStoreState
 );
 
 // Ids are in the form "amount_credits" (e.g: "500_credits").

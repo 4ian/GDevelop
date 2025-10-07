@@ -98,8 +98,8 @@ const StandaloneDialog = ({ onClose }: Props) => {
           courses={courses}
           getCourseCompletion={getCourseCompletion}
           noActions
-          simpleCheckout
-          onPurchaseDone={() => {
+          fastCheckout
+          onCloseAfterPurchaseDone={() => {
             navigateToRoute('learn', {
               bundle: selectedBundleListingData.id,
             });
@@ -112,7 +112,10 @@ const StandaloneDialog = ({ onClose }: Props) => {
 };
 
 const StandaloneDialogWithErrorBoundary = (props: Props) => (
-  <ErrorBoundary componentTitle={<Trans>About dialog</Trans>} scope="about">
+  <ErrorBoundary
+    componentTitle={<Trans>Standalone dialog</Trans>}
+    scope="standalone"
+  >
     <StandaloneDialog {...props} />
   </ErrorBoundary>
 );

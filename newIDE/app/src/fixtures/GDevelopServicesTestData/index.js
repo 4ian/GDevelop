@@ -29,6 +29,7 @@ import {
   type AssetShortHeader,
   type Asset,
   type PublicAssetPacks,
+  type Bundle,
 } from '../../Utils/GDevelopServices/Asset';
 import { formatISO, subDays } from 'date-fns';
 import { type Comment } from '../../Utils/GDevelopServices/Play';
@@ -36,7 +37,11 @@ import {
   type Announcement,
   type Promotion,
 } from '../../Utils/GDevelopServices/Announcement';
-import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
+import {
+  type PrivateGameTemplateListingData,
+  type PrivateAssetPackListingData,
+  type BundleListingData,
+} from '../../Utils/GDevelopServices/Shop';
 import { fakeAchievements } from './FakeAchievements';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import {
@@ -894,9 +899,12 @@ export const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   onResetPassword: async () => {},
   onEditProfile: async () => {},
   onOpenLoginDialog: () => {},
+  onOpenLoginWithPurchaseClaimDialog: () => {},
   onOpenEditProfileDialog: () => {},
   onOpenChangeEmailDialog: () => {},
   onOpenCreateAccountDialog: () => {},
+  onOpenCreateAccountWithPurchaseClaimDialog: () => {},
+  onOpenPurchaseClaimDialog: () => {},
   onOpenEmailVerificationDialog: () => {},
   onBadgesChanged: async () => {},
   onCloudProjectsChanged: async () => {},
@@ -2190,8 +2198,18 @@ export const fakePrivateGameTemplateListingData: PrivateGameTemplateListingData 
   categories: ['adventure'],
   updatedAt: '2020-01-01',
   createdAt: '2020-01-01',
-  thumbnailUrls: [],
-  prices: [],
+  thumbnailUrls: [
+    'https://resources.gdevelop-app.com/staging/private-assets/French Food/thumbnail1.png',
+  ],
+  prices: [
+    {
+      name: 'commercial_USD',
+      value: 499,
+      currency: 'USD',
+      usageType: 'commercial',
+      stripePriceId: 'price_1JHhXYZfakeStripePriceId',
+    },
+  ],
   creditPrices: [],
   appStoreProductId: 'fake-app-store-product-id',
   includedListableProductIds: [],
@@ -2334,6 +2352,161 @@ export const fakeAssetPacks: PublicAssetPacks = {
       licenses: [],
     },
   ],
+};
+
+export const fakePrivateAssetPack1ListingData: PrivateAssetPackListingData = {
+  id: '56a50a9e-57ef-4d1d-a3f2-c918d593a6e2',
+  sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
+  isSellerGDevelop: false,
+  productType: 'ASSET_PACK',
+  thumbnailUrls: [
+    'https://resources.gdevelop-app.com/staging/private-assets/French Food/thumbnail1.png',
+  ],
+  updatedAt: '2022-09-14T12:43:51.329Z',
+  createdAt: '2022-09-14T12:43:51.329Z',
+  listing: 'ASSET_PACK',
+  description: '5 assets',
+  name: 'French Food',
+  categories: ['props'],
+  prices: [
+    {
+      value: 1500,
+      name: 'commercial_USD',
+      stripePriceId: 'stripePriceId',
+      currency: 'USD',
+      usageType: 'commercial',
+    },
+  ],
+  creditPrices: [
+    {
+      amount: 1500,
+      usageType: 'commercial',
+    },
+  ],
+  appStoreProductId: null,
+  sellerStripeAccountId: 'sellerStripeProductId',
+  stripeProductId: 'stripeProductId',
+};
+
+export const fakePrivateAssetPack2ListingData: PrivateAssetPackListingData = {
+  id: '56a50a9e-57ef-4d1d-a3f2-c918d568ef234',
+  sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
+  isSellerGDevelop: false,
+  productType: 'ASSET_PACK',
+  thumbnailUrls: [
+    'https://resources.gdevelop-app.com/staging/private-assets/French Sounds/thumbnail0.png',
+  ],
+  updatedAt: '2022-09-14T12:43:51.329Z',
+  createdAt: '2022-09-14T12:43:51.329Z',
+  listing: 'ASSET_PACK',
+  description: '8 assets',
+  name: 'French Sounds',
+  categories: ['sounds'],
+  prices: [
+    {
+      value: 1000,
+      usageType: 'commercial',
+      stripePriceId: 'stripePriceId',
+      currency: 'USD',
+      name: 'commercial_USD',
+    },
+  ],
+  creditPrices: [
+    {
+      amount: 1000,
+      usageType: 'commercial',
+    },
+  ],
+  appStoreProductId: 'fake.product.id',
+  sellerStripeAccountId: 'sellerStripeProductId',
+  stripeProductId: 'stripeProductId',
+};
+
+export const fakeBundleListingData: BundleListingData = {
+  id: 'bundle-123',
+  sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
+  isSellerGDevelop: false,
+  productType: 'BUNDLE',
+  thumbnailUrls: [
+    'https://resources.gdevelop-app.com/staging/private-assets/French Food/thumbnail1.png',
+    'https://resources.gdevelop-app.com/staging/private-assets/French Sounds/thumbnail0.png',
+  ],
+  updatedAt: '2022-09-14T12:43:51.329Z',
+  createdAt: '2022-09-14T12:43:51.329Z',
+  listing: 'BUNDLE',
+  description: 'The ultimate French bundle with food and sounds',
+  name: 'French Complete Bundle',
+  categories: ['starter'],
+  prices: [
+    {
+      value: 2000,
+      name: 'default_USD',
+      stripePriceId: 'stripePriceId',
+      currency: 'USD',
+      usageType: 'default',
+    },
+  ],
+  appStoreProductId: null,
+  sellerStripeAccountId: 'sellerStripeProductId',
+  stripeProductId: 'stripeProductId',
+  includedListableProducts: [
+    {
+      productId: fakePrivateAssetPack1ListingData.id,
+      productType: 'ASSET_PACK',
+      usageType: 'commercial',
+    },
+    {
+      productId: fakePrivateAssetPack2ListingData.id,
+      productType: 'ASSET_PACK',
+      usageType: 'commercial',
+    },
+    {
+      productId: fakePrivateGameTemplateListingData.id,
+      productType: 'GAME_TEMPLATE',
+      usageType: 'commercial',
+    },
+  ],
+};
+
+export const fakeBundle: Bundle = {
+  id: 'bundle-123',
+  name: 'French Complete Bundle',
+  nameByLocale: {
+    en: 'French Complete Bundle',
+  },
+  categories: ['starter'],
+  previewImageUrls: [
+    'https://resources.gdevelop-app.com/assets/Packs/gdevelop platformer.png',
+    'https://resources.gdevelop-app.com/assets/Packs/space shooter.png',
+    'https://resources.gdevelop-app.com/assets/Packs/particles emitter.png',
+  ],
+  updatedAt: '2022-09-15T08:17:59.977Z',
+  createdAt: '2022-09-14T12:27:27.173Z',
+  tag: 'french bundle',
+  longDescription:
+    'This is the best bundle about french food and sounds. It includes everything you need to create a French-themed game.',
+  longDescriptionByLocale: {
+    en:
+      'This is the best bundle about french food and sounds. It includes everything you need to create a French-themed game.',
+  },
+  includedProducts: [
+    {
+      productId: fakePrivateAssetPack1ListingData.id,
+      productType: 'ASSET_PACK',
+      usageType: 'commercial',
+    },
+    {
+      productId: fakePrivateAssetPack2ListingData.id,
+      productType: 'ASSET_PACK',
+      usageType: 'commercial',
+    },
+    {
+      productId: fakePrivateGameTemplateListingData.id,
+      productType: 'GAME_TEMPLATE',
+      usageType: 'commercial',
+    },
+  ],
+  includedRedemptionCodes: [],
 };
 
 export const commentUnprocessed: Comment = {

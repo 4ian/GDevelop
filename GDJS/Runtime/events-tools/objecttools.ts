@@ -410,7 +410,12 @@ namespace gdjs {
         return true;
       };
 
-      export const pickNearestObject = function (objectsLists, x, y, inverted) {
+      export const pickNearestObject = function (
+        objectsLists: ObjectsLists,
+        x: float,
+        y: float,
+        inverted?: boolean | undefined
+      ) {
         let bestObject = null;
         let best = 0;
         let first = true;
@@ -421,8 +426,7 @@ namespace gdjs {
           for (let j = 0; j < list.length; ++j) {
             const object = list[j];
             const distance = object.getSqDistanceToPosition(x, y);
-            // @ts-ignore
-            if (first || (distance < best) ^ inverted) {
+            if (first || distance < best !== inverted) {
               best = distance;
               bestObject = object;
             }

@@ -209,9 +209,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     this.instancesSelection = new InstancesSelection();
 
-    const initialInstancesEditorSettings = props.getInitialInstancesEditorSettings
-      ? props.getInitialInstancesEditorSettings()
-      : {};
+    const initialInstancesEditorSettings = props.getInitialInstancesEditorSettings();
 
     this.state = {
       setupGridOpen: false,
@@ -247,7 +245,8 @@ export default class SceneEditor extends React.Component<Props, State> {
       tileMapTileSelection: null,
 
       selectedObjectFolderOrObjectsWithContext: [],
-      selectedLayer: initialInstancesEditorSettings.selectedLayer || BASE_LAYER_NAME,
+      selectedLayer:
+        initialInstancesEditorSettings.selectedLayer || BASE_LAYER_NAME,
       invisibleLayerOnWhichInstancesHaveJustBeenAdded: null,
 
       lastSelectionType: 'instance',

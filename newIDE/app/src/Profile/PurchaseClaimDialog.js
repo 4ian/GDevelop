@@ -65,7 +65,6 @@ const PurchaseClaimDialog = ({
 
   const activatePurchase = React.useCallback(
     async () => {
-      console.log(isActivating, isPurchaseActivated);
       if (!profile || isActivating || isPurchaseActivated) return;
 
       setIsActivating(true);

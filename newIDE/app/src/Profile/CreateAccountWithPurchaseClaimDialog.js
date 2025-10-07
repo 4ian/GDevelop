@@ -99,7 +99,7 @@ const CreateAccountWithPurchaseClaimDialog = ({
         getNewsletterEmail,
       });
     } catch (error) {
-      console.error(error);
+      console.error('Error while creating account', error);
     }
   };
 

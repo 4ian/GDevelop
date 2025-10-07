@@ -1,0 +1,311 @@
+// @flow
+import * as React from 'react';
+import BrowserPreviewErrorDialog from '../BrowserS3PreviewLauncher/BrowserPreviewErrorDialog';
+import BrowserSWFileSystem from '../BrowserSWFileSystem';
+import { findGDJS } from '../../../GameEngineFinder/BrowserS3GDJSFinder';
+import assignIn from 'lodash/assignIn';
+import {
+  type PreviewOptions,
+  type PreviewLauncherProps,
+} from '../../PreviewLauncher.flow';
+import { makeTimestampedId } from '../../../Utils/TimestampedId';
+import {
+  browserPreviewDebuggerServer,
+  getExistingPreviewWindowForDebuggerId,
+  registerNewPreviewWindow,
+} from '../BrowserS3PreviewLauncher/BrowserPreviewDebuggerServer';
+import Window from '../../../Utils/Window';
+import { displayBlackLoadingScreenOrThrow } from '../../../Utils/BrowserExternalWindowUtils';
+import { getGDevelopResourceJwtToken } from '../../../Utils/GDevelopServices/Project';
+import { isNativeMobileApp } from '../../../Utils/Platform';
+import { getIDEVersionWithHash } from '../../../Version';
+const gd: libGDevelop = global.gd;
+
+type State = {|
+  error: ?Error,
+|};
+
+let nextPreviewWindowId = 0;
+
+/**
+ * Open a window showing a black "loading..." screen. It's important this is done
+ * NOT in an asynchronous way but JUST after a click. Otherwise, browsers like Safari
+ * will block the window opening.
+ */
+export const immediatelyOpenNewPreviewWindow = (
+  project: gdProject
+): WindowProxy => {
+  const width = project.getGameResolutionWidth();
+  const height = project.getGameResolutionHeight();
+  const left = window.screenX + window.innerWidth / 2 - width / 2;
+  const top = window.screenY + window.innerHeight / 2 - height / 2;
+
+  const targetId = 'GDevelopPreview' + nextPreviewWindowId++;
+  const previewWindow = window.open(
+    'about:blank',
+    targetId,
+    `width=${width},height=${height},left=${left},top=${top}`
+  );
+  if (!previewWindow) {
+    throw new Error(
+      "Can't open the preview window because of browser restrictions."
+    );
+  }
+
+  displayBlackLoadingScreenOrThrow(previewWindow);
+
+  return previewWindow;
+};
+
+/**
+ * Gets the base URL for local service worker previews.
+ * This URL should be handled by the service worker to serve files from IndexedDB.
+ */
+const getLocalPreviewBaseUrl = (): string => {
+  // Use the current origin to ensure the service worker can intercept requests
+  const origin = window.location.origin;
+  return `${origin}/local_sw_preview`;
+};
+
+export default class BrowserSWPreviewLauncher extends React.Component<
+  PreviewLauncherProps,
+  State
+> {
+  canDoNetworkPreview = () => false;
+  canDoHotReload = () => false;
+
+  state = {
+    error: null,
+  };
+
+  _prepareExporter = (): Promise<{|
+    outputDir: string,
+    exporter: gdjsExporter,
+    browserSWFileSystem: BrowserSWFileSystem,
+  |}> => {
+    return findGDJS('preview').then(({ gdjsRoot, filesContent }) => {
+      console.info('[BrowserSWPreviewLauncher] GDJS found in', gdjsRoot);
+
+      const prefix = makeTimestampedId();
+      const baseUrl = getLocalPreviewBaseUrl();
+      const outputDir = `${baseUrl}/${prefix}`;
+
+      console.log('[BrowserSWPreviewLauncher] Preview will be served from:', outputDir);
+
+      const browserSWFileSystem = new BrowserSWFileSystem({
+        filesContent,
+        baseUrl: `${baseUrl}/`,
+        prefix,
+      });
+      const fileSystem = assignIn(
+        new gd.AbstractFileSystemJS(),
+        browserSWFileSystem
+      );
+      const exporter = new gd.Exporter(fileSystem, gdjsRoot);
+      exporter.setCodeOutputDirectory(outputDir);
+
+      return {
+        exporter,
+        outputDir,
+        browserSWFileSystem,
+      };
+    });
+  };
+
+  launchPreview = async (previewOptions: PreviewOptions): Promise<any> => {
+    const { project, layout, externalLayout, numberOfWindows } = previewOptions;
+    this.setState({
+      error: null,
+    });
+
+    const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
+    const lastDebuggerId = debuggerIds.length
+      ? debuggerIds[debuggerIds.length - 1]
+      : null;
+    const shouldHotReload = previewOptions.hotReload && lastDebuggerId !== null;
+
+    // We abuse the "hot reload" to choose if we open a new window or replace
+    // the content of an existing one. But hot reload is NOT implemented (yet -
+    // it would need to generate the preview in the same place and trigger a reload
+    // of the scripts).
+    const existingPreviewWindow = shouldHotReload
+      ? getExistingPreviewWindowForDebuggerId(lastDebuggerId)
+      : null;
+
+    const previewWindows = existingPreviewWindow
+      ? [existingPreviewWindow]
+      : Array.from({ length: numberOfWindows }, () => {
+          try {
+            return immediatelyOpenNewPreviewWindow(project);
+          } catch (error) {
+            console.error(
+              '[BrowserSWPreviewLauncher] Unable to open a new preview window - this window will be ignored:',
+              error
+            );
+            return null;
+          }
+        }).filter(Boolean);
+
+    try {
+      await this.getPreviewDebuggerServer().startServer();
+    } catch (err) {
+      // Ignore any error when running the debugger server - the preview
+      // can still work without it.
+      console.error(
+        '[BrowserSWPreviewLauncher] Unable to start the Debugger Server for the preview:',
+        err
+      );
+    }
+
+    try {
+      const {
+        exporter,
+        outputDir,
+        browserSWFileSystem,
+      } = await this._prepareExporter();
+
+      const previewExportOptions = new gd.PreviewExportOptions(
+        project,
+        outputDir
+      );
+      previewExportOptions.setLayoutName(layout.getName());
+      previewExportOptions.setIsDevelopmentEnvironment(Window.isDev());
+      if (externalLayout) {
+        previewExportOptions.setExternalLayoutName(externalLayout.getName());
+      }
+
+      if (isNativeMobileApp()) {
+        previewExportOptions.useMinimalDebuggerClient();
+      } else {
+        previewExportOptions.useWindowMessageDebuggerClient();
+      }
+
+      // Scripts generated from extensions keep the same URL even after being modified.
+      // Use a cache bursting parameter to force the browser to reload them.
+      previewExportOptions.setNonRuntimeScriptsCacheBurst(Date.now());
+
+      previewExportOptions.setFullLoadingScreen(
+        previewOptions.fullLoadingScreen
+      );
+
+      previewExportOptions.setNativeMobileApp(isNativeMobileApp());
+      previewExportOptions.setGDevelopVersionWithHash(getIDEVersionWithHash());
+      previewExportOptions.setCrashReportUploadLevel(
+        this.props.crashReportUploadLevel
+      );
+      previewExportOptions.setPreviewContext(this.props.previewContext);
+      previewExportOptions.setProjectTemplateSlug(project.getTemplateSlug());
+      previewExportOptions.setSourceGameId(this.props.sourceGameId);
+
+      if (previewOptions.inAppTutorialMessageInPreview) {
+        previewExportOptions.setInAppTutorialMessageInPreview(
+          previewOptions.inAppTutorialMessageInPreview,
+          previewOptions.inAppTutorialMessagePositionInPreview
+        );
+      }
+
+      if (previewOptions.fallbackAuthor) {
+        previewExportOptions.setFallbackAuthor(
+          previewOptions.fallbackAuthor.id,
+          previewOptions.fallbackAuthor.username
+        );
+      }
+      if (previewOptions.authenticatedPlayer) {
+        previewExportOptions.setAuthenticatedPlayer(
+          previewOptions.authenticatedPlayer.playerId,
+          previewOptions.authenticatedPlayer.playerUsername,
+          previewOptions.authenticatedPlayer.playerToken
+        );
+      }
+      if (previewOptions.captureOptions.screenshots) {
+        previewOptions.captureOptions.screenshots.forEach(screenshot => {
+          previewExportOptions.addScreenshotCapture(
+            screenshot.delayTimeInSeconds,
+            screenshot.signedUrl,
+            screenshot.publicUrl
+          );
+        });
+      }
+
+      // The token, if any, to be used to read resources on GDevelop Cloud buckets.
+      const gdevelopResourceToken = getGDevelopResourceJwtToken();
+      if (gdevelopResourceToken)
+        previewExportOptions.setGDevelopResourceToken(gdevelopResourceToken);
+
+      console.log('[BrowserSWPreviewLauncher] Exporting project for preview...');
+      exporter.exportProjectForPixiPreview(previewExportOptions);
+      previewExportOptions.delete();
+      exporter.delete();
+
+      // Store files in IndexedDB instead of uploading to S3
+      console.log('[BrowserSWPreviewLauncher] Storing preview files in IndexedDB...');
+      await browserSWFileSystem.uploadPendingObjects();
+
+      // Change the HTML file displayed by the preview window so that it starts loading
+      // the game.
+      console.log('[BrowserSWPreviewLauncher] Opening preview in window(s)...');
+      previewWindows.forEach((previewWindow: WindowProxy) => {
+        previewWindow.location = outputDir + '/index.html';
+        try {
+          previewWindow.focus();
+        } catch (e) {}
+      });
+
+      // If the preview windows are new, register them so that they can be accessed
+      // by the debugger and for the captures to be detected when they close.
+      if (!existingPreviewWindow) {
+        previewWindows.forEach((previewWindow: WindowProxy) => {
+          const debuggerId = registerNewPreviewWindow(previewWindow);
+          browserPreviewDebuggerServer.registerCallbacks({
+            onErrorReceived: () => {},
+            onServerStateChanged: () => {},
+            onConnectionClosed: async ({ id }) => {
+              if (id !== debuggerId) {
+                return;
+              }
+
+              if (previewOptions.captureOptions) {
+                await this.props.onCaptureFinished(
+                  previewOptions.captureOptions
+                );
+              }
+            },
+            onConnectionOpened: () => {},
+            onConnectionErrored: () => {},
+            onHandleParsedMessage: () => {},
+          });
+        });
+      }
+
+      console.log('[BrowserSWPreviewLauncher] Preview launched successfully!');
+    } catch (error) {
+      console.error('[BrowserSWPreviewLauncher] Error launching preview:', error);
+      this.setState({
+        error,
+      });
+    }
+  };
+
+  getPreviewDebuggerServer() {
+    return browserPreviewDebuggerServer;
+  }
+
+  render() {
+    const { error } = this.state;
+
+    if (error) {
+      return (
+        <BrowserPreviewErrorDialog
+          error={error}
+          onClose={() =>
+            this.setState({
+              error: null,
+            })
+          }
+        />
+      );
+    }
+
+    return null;
+  }
+}

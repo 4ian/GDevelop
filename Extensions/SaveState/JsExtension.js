@@ -182,6 +182,31 @@ module.exports = {
       .setIncludeFile('Extensions/SaveState/savestatetools.js')
       .setFunctionName('gdjs.saveState.hasLoadJustFailed');
 
+    extension
+      .addAction(
+        'ExcludeVariableFromSaveState',
+        _('Exclude a variable from save state'),
+        _(
+          'Exclude (or re-enable) a scene or global variable from being saved to the save state.'
+        ),
+        _('Exclude variable _PARAM1_ from save state: _PARAM2_'),
+        _('Save'),
+        'res/actions/saveDown.svg',
+        'res/actions/saveDown.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter(
+        'variable',
+        _('Variable to exclude from save state'),
+        '',
+        false
+      )
+      .addParameter('yesorno', _('Exclude from save state'), '', false)
+      .setDefaultValue('yes')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/SaveState/savestatetools.js')
+      .setFunctionName('gdjs.saveState.excludeVariableFromSaveState');
+
     return extension;
   },
   runExtensionSanityTests: function (gd, extension) {

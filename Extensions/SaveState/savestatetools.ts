@@ -39,6 +39,7 @@ namespace gdjs {
       ignoreVariableOwnership: true,
     };
 
+    const excludedVariables: WeakSet<Variable> = new WeakSet();
     let lastSaveTime: number | null = null;
     let lastLoadTime: number | null = null;
     let saveJustSucceeded: boolean = false;
@@ -355,6 +356,24 @@ namespace gdjs {
           }
         }
       }
+    };
+
+    export const excludeVariableFromSaveState = (
+      runtimeScene: gdjs.RuntimeScene,
+      variable: gdjs.Variable,
+      exclude: boolean
+    ) => {
+      if (exclude) {
+        excludedVariables.add(variable);
+      } else {
+        excludedVariables.delete(variable);
+      }
+    };
+
+    export const isVariableExcludedFromSaveState = (
+      variable: gdjs.Variable
+    ) => {
+      return excludedVariables.has(variable);
     };
   }
 }

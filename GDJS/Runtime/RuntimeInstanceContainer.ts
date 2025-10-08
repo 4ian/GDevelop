@@ -613,7 +613,7 @@ namespace gdjs {
      * @param name Name of the object for which the instances must be returned.
      * @return The list of objects with the given name
      */
-    getObjects(name: string): gdjs.RuntimeObject[] | undefined {
+    getObjects(name: string): gdjs.RuntimeObject[] {
       if (!this._instances.containsKey(name)) {
         logger.info(
           'RuntimeScene.getObjects: No instances called "' +

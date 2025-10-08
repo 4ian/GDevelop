@@ -1,5 +1,6 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Save state');
+  const debugLogger = new gdjs.Logger('Save state - Debug');
   export type LoadRequestOptions = {
     profileNames: string[];
     loadStorageName?: string;
@@ -283,12 +284,119 @@ namespace gdjs {
       }
     };
 
+    // TODO: copied from multiplayer. See if should be factored.
+    const findClosestInstanceWithoutNetworkId = (
+      instances: gdjs.RuntimeObject[],
+      x: number,
+      y: number
+    ): gdjs.RuntimeObject | null => {
+      if (!instances.length) {
+        // No instances, return null.
+        return null;
+      }
+
+      // Avoid using a reduce function to avoid creating a new object at each iteration.
+      let closestInstance: gdjs.RuntimeObject | null = null;
+      let closestDistance = Infinity;
+      for (let i = 0; i < instances.length; ++i) {
+        if (instances[i].networkId) {
+          // Skip instances that already have a network ID.
+          continue;
+        }
+
+        const instance = instances[i];
+        const distance =
+          Math.pow(instance.getX() - x, 2) + Math.pow(instance.getY() - y, 2);
+        if (distance < closestDistance) {
+          closestInstance = instance;
+          closestDistance = distance;
+        }
+      }
+
+      return closestInstance;
+    };
+
+    // TODO: copied from multiplayer. See if should be factored.
+    const getInstanceFromNetworkId = ({
+      runtimeScene,
+      objectName,
+      instanceNetworkId,
+      instanceX,
+      instanceY,
+      shouldCreateIfNotFound,
+    }: {
+      runtimeScene: gdjs.RuntimeScene;
+      objectName: string;
+      instanceNetworkId: string;
+      instanceX?: number;
+      instanceY?: number;
+      shouldCreateIfNotFound?: boolean;
+    }): gdjs.RuntimeObject | null => {
+      const instances = runtimeScene.getInstancesOf(objectName);
+      if (!instances) {
+        // object does not exist in the scene, cannot find the instance.
+        return null;
+      }
+      let instance =
+        instances.find(
+          (instance) => instance.networkId === instanceNetworkId
+        ) || null;
+
+      // If we know the position of the object, we can try to find the closest instance not synchronized yet.
+      if (!instance && instanceX !== undefined && instanceY !== undefined) {
+        debugLogger.info(
+          `instance ${objectName} ${instanceNetworkId} not found with network ID, trying to find it with position ${instanceX}/${instanceY}.`
+        );
+        // Instance not found, it must be a new object.
+        // 2 cases :
+        // - The object was only created on the other player's game, so we create it and assign it the network ID.
+        // - The object may have been created on all sides at the same time, so we try to find instances
+        //   of this object, that do not have a network ID yet, pick the one that is the closest to the
+        //   position of the object created by the other player, and assign it the network ID to start
+        //   synchronizing it.
+
+        // Try to assign the network ID to the instance that is the closest to the position of the object created by the other player.
+        const closestInstance = findClosestInstanceWithoutNetworkId(
+          instances,
+          instanceX,
+          instanceY
+        );
+
+        if (closestInstance) {
+          debugLogger.info(
+            `Found closest instance for object ${objectName} ${instanceNetworkId} with no network ID.`
+          );
+
+          instance = closestInstance;
+          instance.networkId = instanceNetworkId;
+        }
+      }
+
+      // If we still did not find the instance, and we should create it if not found, then create it.
+      if (!instance && shouldCreateIfNotFound) {
+        debugLogger.info(
+          `Instance ${instanceNetworkId} still not found, Creating instance ${objectName}.`
+        );
+        const newInstance = runtimeScene.createObject(objectName);
+        if (!newInstance) {
+          // Object does not exist in the scene, cannot create the instance.
+          return null;
+        }
+
+        newInstance.networkId = instanceNetworkId;
+        instance = newInstance;
+      }
+
+      return instance;
+    };
+
     // Rename to "applyGameSaveState".
     export const loadGameFromSave = (
       runtimeGame: RuntimeGame,
       saveState: GameSaveState,
       options: {
         loadProfileNames: string[];
+        clearSceneStack?: boolean;
         variableToRehydrate?: gdjs.Variable;
         variablePathInScene?: string[] | null;
         variablePathInGame?: string[] | null;
@@ -301,7 +409,10 @@ namespace gdjs {
 
       const updateFromNetworkSyncDataOptions: UpdateFromNetworkSyncDataOptions =
         {
-          clearSceneStack: true,
+          clearSceneStack:
+            options.clearSceneStack === undefined
+              ? true
+              : options.clearSceneStack,
           skipInstancesCreationForProfiles: options.loadProfileNames,
           preventSoundsStoppingOnStartup: true,
           clearInputs: true,
@@ -327,7 +438,7 @@ namespace gdjs {
       // after the load has been done, so we can update them,
       // and create their objects.
       const runtimeScenes = sceneStack.getAllScenes();
-      runtimeScenes.forEach((scene, index) => {
+      runtimeScenes.forEach((runtimeScene, index) => {
         const layoutSyncData = saveState.layoutNetworkSyncDatas[index];
         if (!layoutSyncData) return;
 
@@ -341,7 +452,18 @@ namespace gdjs {
             logger.warn('Tried to recreate an object without a name.');
             continue;
           }
-          const object = scene.createObject(objectName);
+
+          const networkId = objectNetworkSyncData.networkId;
+
+          // TODO: decide if worth it reusing instances that are near others or not.
+          const object = getInstanceFromNetworkId({
+            runtimeScene,
+            objectName: objectName,
+            instanceNetworkId: networkId || '',
+            shouldCreateIfNotFound: true,
+            instanceX: objectNetworkSyncData.x,
+            instanceY: objectNetworkSyncData.y,
+          });
           if (object) {
             object.updateFromNetworkSyncData(
               objectNetworkSyncData,
@@ -350,8 +472,25 @@ namespace gdjs {
           }
         }
 
-        // Update the scene last.
-        scene.updateFromNetworkSyncData(
+        // Now clean instances of objects that are persisted but not in the save state
+        // (i.e: those who don't have a networkId, so they have not been restored).
+        const allObjectData = [];
+        runtimeScene._objects.values(allObjectData);
+        const allObjectNames = getObjectNamesIncludedInProfiles(
+          allObjectData,
+          options.loadProfileNames
+        );
+        for (const objectName of allObjectNames) {
+          const objects = runtimeScene.getInstancesOf(objectName);
+          for (const object of objects) {
+            if (!object.networkId) {
+              object.deleteFromScene();
+            }
+          }
+        }
+
+        // Update the rest of the scene last.
+        runtimeScene.updateFromNetworkSyncData(
           layoutSyncData.sceneData,
           updateFromNetworkSyncDataOptions
         );

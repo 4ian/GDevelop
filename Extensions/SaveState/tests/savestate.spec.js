@@ -132,7 +132,6 @@ describe('SaveState', () => {
 
       // Verify objects are restored.
       const restoredObjects = runtimeScene2.getObjects('MySpriteObject');
-      if (!restoredObjects) throw new Error('Objects not found after restore.');
       expect(restoredObjects.length).to.be(2);
 
       // Find objects by their positions (since IDs might be different).
@@ -340,13 +339,10 @@ describe('SaveState', () => {
       // and the 2 from the saved state should be created).
       const restoredSavedObjects =
         runtimeScene2.getObjects('SavedSpriteObject');
-      if (!restoredSavedObjects)
-        throw new Error('Objects not found after restore.');
       expect(restoredSavedObjects.length).to.be(2);
 
       // Verify that the initial instance of "NotSavedSpriteObject" is properly created.
       const notSavedObjects = runtimeScene2.getObjects('NotSavedSpriteObject');
-      if (!notSavedObjects) throw new Error('Objects not found after restore.');
       expect(notSavedObjects.length).to.be(1);
 
       // Find objects by their positions (since IDs might be different).
@@ -369,6 +365,218 @@ describe('SaveState', () => {
       expect(restoredObject1.getName()).to.be('SavedSpriteObject');
       expect(restoredObject2.getName()).to.be('SavedSpriteObject');
       expect(notSavedObject1.getName()).to.be('NotSavedSpriteObject');
+    });
+  });
+
+  describe('Save State restored without clearing the running scenes', () => {
+    it('saves and restores the same running game (keep instances, keep variables)', async () => {
+      // Start a game.
+      const sceneData = getFakeSceneData({
+        name: 'Scene1',
+        objects: [
+          {
+            type: 'Sprite',
+            name: 'NotSavedSpriteObject',
+            behaviors: [
+              {
+                name: 'SaveConfiguration',
+                type: 'SaveState::SaveConfiguration',
+                defaultProfilePersistence: 'DoNotSave',
+              },
+            ],
+            effects: [],
+            variables: [],
+
+            updateIfNotVisible: false,
+            animations: [],
+          },
+          {
+            type: 'Sprite',
+            name: 'SavedSpriteObject',
+            behaviors: [
+              {
+                name: 'SaveConfiguration',
+                type: 'SaveState::SaveConfiguration',
+                defaultProfilePersistence: 'Persisted',
+              },
+            ],
+            effects: [],
+            variables: [],
+
+            updateIfNotVisible: false,
+            animations: [],
+          },
+        ],
+        instances: [
+          // A default instance which will be not removed, because the associated object is marked as not persisted.
+          getFakeInstanceData({
+            name: 'NotSavedSpriteObject',
+            x: 100,
+            y: 200,
+          }),
+          // A default instance which will be removed, because the associated object is marked as persisted.
+          getFakeInstanceData({
+            name: 'SavedSpriteObject',
+            x: 300,
+            y: 400,
+          }),
+        ],
+      });
+      const runtimeGame1 = gdjs.getPixiRuntimeGame({
+        layouts: [sceneData],
+      });
+      await runtimeGame1._resourcesLoader.loadAllResources(() => {});
+
+      const runtimeScene1 = runtimeGame1.getSceneStack().push({
+        sceneName: 'Scene1',
+      });
+      if (!runtimeScene1) throw new Error('No current scene was created.');
+
+      // Set some variables.
+      const variable1 = new gdjs.Variable();
+      variable1.setString('TestValue');
+      runtimeScene1.getVariables().add('Variable1', variable1);
+      const variable2 = new gdjs.Variable();
+      variable2.setBoolean(true);
+      runtimeScene1.getVariables().add('Variable2', variable2);
+      const variable3 = new gdjs.Variable();
+      variable3.setNumber(42);
+      runtimeScene1.getVariables().add('Variable3', variable3);
+
+      gdjs.saveState.excludeVariableFromSaveState(
+        runtimeScene1,
+        variable3,
+        true
+      );
+
+      // Create some objects in addition to initial objects at specific positions.
+      const object3 = runtimeScene1.createObject('SavedSpriteObject');
+      const object4 = runtimeScene1.createObject('NotSavedSpriteObject');
+      const object5 = runtimeScene1.createObject('SavedSpriteObject');
+
+      if (!object3 || !object4 || !object5) {
+        throw new Error('Objects were not created');
+      }
+
+      object3.setX(500);
+      object3.setY(600);
+      object4.setX(700);
+      object4.setY(800);
+      object5.setX(900);
+      object5.setY(1000);
+
+      // Save the game state.
+      const saveState = gdjs.saveState.getGameSaveState(runtimeGame1, {
+        profileNames: ['default'],
+      });
+
+      // Now, modify the game.
+
+      // Modify the variables.
+      variable1.setString('TestValue2');
+      variable2.setBoolean(false);
+      variable3.setNumber(43);
+
+      // Move instances (both saved/unsaved, and created dynamically or from initial instances),
+      // to then verify that they are restored at the proper positions (only for the saved ones).
+      const object1 = runtimeScene1.getObjects('NotSavedSpriteObject')[0];
+      const object2 = runtimeScene1.getObjects('SavedSpriteObject')[0];
+      if (!object1 || !object2) {
+        throw new Error('Objects created from initial instances not found.');
+      }
+      object1.setX(101);
+      object1.setY(201);
+      object2.setX(301);
+      object2.setY(401);
+      object3.setX(502);
+      object3.setY(602);
+      object4.setX(701);
+      object4.setY(801);
+
+      // Delete an instance (that was saved and should be restored).
+      object5.deleteFromScene();
+
+      // Create new instances (the saved ones should be removed after restoring the save state).
+      const object6 = runtimeScene1.createObject('SavedSpriteObject');
+      if (!object6) throw new Error('Object not created.');
+      object6.setX(1100);
+      object6.setY(1200);
+      const object7 = runtimeScene1.createObject('NotSavedSpriteObject');
+      if (!object7) throw new Error('Object not created.');
+      object7.setX(1300);
+      object7.setY(1400);
+      const object8 = runtimeScene1.createObject('SavedSpriteObject');
+      if (!object8) throw new Error('Object not created.');
+      object8.setX(1500);
+      object8.setY(1600);
+
+      // Render a frame to be sure the deleted object is removed.
+      runtimeScene1.renderAndStep(1000 / 60);
+
+      // Load the saved state on the same game.
+      gdjs.saveState.loadGameFromSave(runtimeGame1, saveState, {
+        loadProfileNames: ['default'],
+        clearSceneStack: false,
+      });
+
+      const restoredSavedObjects =
+        runtimeScene1.getObjects('SavedSpriteObject');
+
+      expect(
+        restoredSavedObjects.map((obj) => ({
+          x: obj.getX(),
+          y: obj.getY(),
+          name: obj.getName(),
+        }))
+      ).to.eql([
+        // The initial instance should be restored ("object2").
+        { x: 300, y: 400, name: 'SavedSpriteObject' },
+        // The instance created dynamically before the save should be restored ("object3").
+        { x: 500, y: 600, name: 'SavedSpriteObject' },
+        // "object5", which was deleted after the save, should be restored.
+        { x: 900, y: 1000, name: 'SavedSpriteObject' },
+        // "object6", which was created dynamically after the save, must have been removed.
+      ]);
+
+      const restoredNotSavedObjects = runtimeScene1.getObjects(
+        'NotSavedSpriteObject'
+      );
+
+      expect(
+        restoredNotSavedObjects.map((obj) => ({
+          x: obj.getX(),
+          y: obj.getY(),
+          name: obj.getName(),
+        }))
+      ).to.eql([
+        // The initial instance should be unchanged ("object1").
+        { x: 101, y: 201, name: 'NotSavedSpriteObject' },
+        // "object4", which was created dynamically before the save, should be unchanged.
+        { x: 701, y: 801, name: 'NotSavedSpriteObject' },
+        // "object7", which was created dynamically after the save, should be unchanged.
+        { x: 1300, y: 1400, name: 'NotSavedSpriteObject' },
+      ]);
+
+      // Check variables were restored, and the excluded one was not.
+      expect(runtimeScene1.getVariables().get('Variable1').getAsString()).to.be(
+        'TestValue'
+      ); // Restored
+      expect(
+        runtimeScene1.getVariables().get('Variable2').getAsBoolean()
+      ).to.be(true); // Restored
+      expect(runtimeScene1.getVariables().get('Variable3').getAsNumber()).to.be(
+        43
+      ); // Unchanged
+    });
+
+    it('saves and restores the same running game (keep the scene stack)', async () => {
+      // TODO
+    });
+  });
+
+  describe('Save State restored with specified profile(s)', () => {
+    it('saves and restores the same running game (only objects in the specified profiles)', async () => {
+      // TODO
     });
   });
 });

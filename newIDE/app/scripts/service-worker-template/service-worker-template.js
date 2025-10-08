@@ -2,6 +2,8 @@
 // IndexedDB Virtual File System for Local Previews
 // ============================================================================
 
+console.log('[ServiceWorker] Service worker file executed');
+
 const DB_NAME = 'gdevelop-local-preview-vfs';
 const STORE_NAME = 'files';
 const DB_VERSION = 1;
@@ -51,7 +53,7 @@ async function getPreviewFile(path) {
     return new Promise((resolve, reject) => {
       try {
         const transaction = db.transaction(STORE_NAME, 'readonly');
-        
+
         transaction.onerror = () => {
           const error = transaction.error || new Error('Transaction failed');
           console.error('[ServiceWorker] Transaction error while getting file:', path, error);
@@ -92,19 +94,20 @@ async function getPreviewFile(path) {
  */
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
-  
+
   // Check if this is a request for a local preview file
   if (url.pathname.startsWith('/local_sw_preview/')) {
+    const relativePath = url.pathname.replace('/local_sw_preview', '');
     console.log('[ServiceWorker] Intercepting local preview request:', url.pathname);
-    
+
     event.respondWith((async () => {
       try {
         // Try to get the file from IndexedDB
-        const fileRecord = await getPreviewFile(url.pathname);
-        
+        const fileRecord = await getPreviewFile(relativePath);
+
         if (!fileRecord) {
-          console.warn('[ServiceWorker] File not found in IndexedDB:', url.pathname);
-          return new Response('File not found in local preview storage', { 
+          console.warn('[ServiceWorker] File not found in IndexedDB:', relativePath);
+          return new Response('File not found in local preview storage', {
             status: 404,
             headers: {
               'Content-Type': 'text/plain',
@@ -113,7 +116,7 @@ self.addEventListener('fetch', (event) => {
         }
 
         // Return the file with appropriate headers
-        console.log('[ServiceWorker] Serving file from IndexedDB:', url.pathname, 'Content-Type:', fileRecord.contentType);
+        console.log('[ServiceWorker] Serving file from IndexedDB:', relativePath, 'Content-Type:', fileRecord.contentType);
         return new Response(fileRecord.bytes, {
           status: 200,
           headers: {
@@ -127,8 +130,8 @@ self.addEventListener('fetch', (event) => {
           }
         });
       } catch (error) {
-        console.error('[ServiceWorker] Error serving local preview file:', url.pathname, error);
-        return new Response('Error loading file from local preview storage: ' + error.message, { 
+        console.error('[ServiceWorker] Error serving local preview file:', relativePath, error);
+        return new Response('Error loading file from local preview storage: ' + error.message, {
           status: 500,
           headers: {
             'Content-Type': 'text/plain',
@@ -136,7 +139,7 @@ self.addEventListener('fetch', (event) => {
         });
       }
     })());
-    
+
     // Return early to prevent falling through to workbox routes
     return;
   }
@@ -164,7 +167,7 @@ if (typeof importScripts === 'function') {
   /* global workbox */
   if (workbox) {
     console.log('[ServiceWorker] Workbox loaded successfully');
-    
+
     // Will be replaced by make-service-worker.js to include the proper version.
     const VersionMetadata = {};
 

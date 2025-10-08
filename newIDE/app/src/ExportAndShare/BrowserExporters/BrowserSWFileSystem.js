@@ -91,14 +91,14 @@ export default class BrowserSWFileSystem {
       );
 
       const uploadPromises = this._pendingFiles.map(async (file) => {
-        const fullPath = `${this.baseUrl}${file.path}`;
+        const fullPath = `/${file.path}`; // TODO
         const encoder = new TextEncoder();
         const bytes = encoder.encode(file.content).buffer;
-        
+
         console.log(
           `[BrowserSWFileSystem] Storing file: ${fullPath} (${bytes.byteLength} bytes, ${file.contentType})`
         );
-        
+
         await putFile(fullPath, bytes, file.contentType);
       });
 

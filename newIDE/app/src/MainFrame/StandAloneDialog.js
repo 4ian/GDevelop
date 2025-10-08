@@ -39,6 +39,8 @@ const StandaloneDialog = ({ onClose }: Props) => {
   const { bundleListingDatas } = React.useContext(BundleStoreContext);
   React.useEffect(
     () => {
+      if (selectedBundleListingData) return; // We're already on a bundle page.
+
       const bundleCategory = routeArguments['bundle-category'];
       if (!bundleCategory || !bundleListingDatas) {
         return;
@@ -69,9 +71,17 @@ const StandaloneDialog = ({ onClose }: Props) => {
         priceCurrency: priceForUsageType && priceForUsageType.currency,
       });
       setSelectedBundleListingData(bundleListingData);
-      removeRouteArguments(['bundle-category']);
+      // Don't remove the route argument so that the user can come back to this page
+      // if they come back from a checkout flow.
+      // We do it in the onClose callback instead.
     },
-    [bundleListingDatas, routeArguments, onClose, removeRouteArguments]
+    [
+      selectedBundleListingData,
+      bundleListingDatas,
+      routeArguments,
+      onClose,
+      removeRouteArguments,
+    ]
   );
 
   return (
@@ -100,6 +110,7 @@ const StandaloneDialog = ({ onClose }: Props) => {
           noActions
           fastCheckout
           onCloseAfterPurchaseDone={() => {
+            removeRouteArguments(['bundle-category']);
             navigateToRoute('learn', {
               bundle: selectedBundleListingData.id,
             });

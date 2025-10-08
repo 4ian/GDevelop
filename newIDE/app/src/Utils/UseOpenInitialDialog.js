@@ -73,48 +73,50 @@ const useOpenInitialDialog = ({
             try {
               const claimableToken = routeArguments['claimable-token'];
               const purchaseId = routeArguments['purchase-id'];
-              if (purchaseId && claimableToken) {
-                const bundleId = routeArguments['bundle'];
-                let claimedProduct = null;
-                if (bundleId) {
-                  const listedBundle = await getListedBundle({
-                    bundleId,
-                    visibility: 'all',
-                  });
-                  claimedProduct = listedBundle;
-                }
-
-                if (!claimedProduct) {
-                  console.error(
-                    `The bundle with id ${bundleId} does not exist. Cannot claim.`
-                  );
-                  await showAlert({
-                    title: t`Unknown bundle`,
-                    message: t`The bundle you are trying to claim does not exist anymore. Please contact support if you think this is an error.`,
-                  });
-                  return;
-                }
-
-                const claimedProductOptions = {
-                  productListingData: claimedProduct,
-                  purchaseId,
-                  claimableToken,
-                };
-
+              // If there is no purchaseId or claimableToken, just open the signup/profile.
+              if (!purchaseId || !claimableToken) {
                 if (authenticated) {
-                  onOpenPurchaseClaimDialog(claimedProductOptions);
+                  openProfileDialog();
                 } else {
-                  onOpenCreateAccountWithPurchaseClaimDialog(
-                    claimedProductOptions
-                  );
+                  onOpenCreateAccountDialog();
                 }
                 return;
               }
 
+              // Otherwise, try to claim the purchase.
+              const bundleId = routeArguments['bundle'];
+              let claimedProduct = null;
+              if (bundleId) {
+                const listedBundle = await getListedBundle({
+                  bundleId,
+                  visibility: 'all',
+                });
+                claimedProduct = listedBundle;
+              }
+
+              if (!claimedProduct) {
+                console.error(
+                  `The bundle with id ${bundleId} does not exist. Cannot claim.`
+                );
+                await showAlert({
+                  title: t`Unknown bundle`,
+                  message: t`The bundle you are trying to claim does not exist anymore. Please contact support if you think this is an error.`,
+                });
+                return;
+              }
+
+              const claimedProductOptions = {
+                productListingData: claimedProduct,
+                purchaseId,
+                claimableToken,
+              };
+
               if (authenticated) {
-                openProfileDialog();
+                onOpenPurchaseClaimDialog(claimedProductOptions);
               } else {
-                onOpenCreateAccountDialog();
+                onOpenCreateAccountWithPurchaseClaimDialog(
+                  claimedProductOptions
+                );
               }
             } finally {
               removeRouteArguments([
@@ -150,7 +152,9 @@ const useOpenInitialDialog = ({
             break;
           case 'standalone':
             openStandaloneDialog();
-            removeRouteArguments(['initial-dialog']);
+            // When on the standalone dialog,
+            // we don't remove the route argument so that the user always comes back to it
+            // when they come back from a checkout flow for instance.
             break;
           default:
             break;

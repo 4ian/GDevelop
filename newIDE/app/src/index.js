@@ -7,7 +7,7 @@ import {
   sendProgramOpening,
   installAnalyticsEvents,
 } from './Utils/Analytics/EventSender';
-import { register } from './serviceWorker';
+import { registerServiceWorker } from './serviceWorker';
 import './UI/icomoon-font.css'; // Styles for Icomoon font.
 import optionalRequire from './Utils/OptionalRequire';
 import { loadScript } from './Utils/LoadScript';
@@ -168,5 +168,4 @@ if (rootElement) {
   ReactDOM.render(<Bootstrapper />, rootElement);
 } else console.error('No root element defined in index.html');
 
-// registerServiceWorker();
-register();
+registerServiceWorker();

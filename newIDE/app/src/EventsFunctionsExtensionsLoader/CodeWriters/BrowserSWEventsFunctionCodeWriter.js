@@ -18,7 +18,9 @@ let batchedWrites: Array<{
 const flushBatchedWrites = debounce(async () => {
   const writes = [...batchedWrites];
   console.info(
-    `[BrowserSWEventsFunctionCodeWriter] Storing a batch of ${writes.length} extension generated files in IndexedDB...`,
+    `[BrowserSWEventsFunctionCodeWriter] Storing a batch of ${
+      writes.length
+    } extension generated files in IndexedDB...`,
     writes.map(w => w.path)
   );
 
@@ -26,7 +28,7 @@ const flushBatchedWrites = debounce(async () => {
 
   // Write all files to IndexedDB in parallel
   const results = await Promise.allSettled(
-    writes.map(async (write) => {
+    writes.map(async write => {
       const encoder = new TextEncoder();
       const bytes = encoder.encode(write.content).buffer;
       await putFile(write.path, bytes, 'text/javascript; charset=utf-8');
@@ -85,42 +87,51 @@ export const makeBrowserSWEventsFunctionCodeWriter = ({
 }: EventsFunctionCodeWriterCallbacks): EventsFunctionCodeWriter => {
   const prefix = makeTimestampedId();
   const baseUrl = getLocalPreviewBaseUrl();
-  
+
   const getPathFor = (codeNamespace: string) => {
     return `${baseUrl}/${prefix}/${slugs(codeNamespace)}.js`;
   };
 
   return {
     getIncludeFileFor: (codeNamespace: string) => getPathFor(codeNamespace),
-    
+
     writeFunctionCode: (
       functionCodeNamespace: string,
       code: string
     ): Promise<void> => {
       const path = getPathFor(functionCodeNamespace);
       onWriteFile({ includeFile: path, content: code });
-      console.log(`[BrowserSWEventsFunctionCodeWriter] Writing function code to ${path}...`);
-      return writeFileInNextBatch(path, code);
+      const relativePath = path.replace(baseUrl, '');
+      console.log(
+        `[BrowserSWEventsFunctionCodeWriter] Writing function code to ${relativePath}...`
+      );
+      return writeFileInNextBatch(relativePath, code);
     },
-    
+
     writeBehaviorCode: (
       behaviorCodeNamespace: string,
       code: string
     ): Promise<void> => {
       const path = getPathFor(behaviorCodeNamespace);
       onWriteFile({ includeFile: path, content: code });
-      console.log(`[BrowserSWEventsFunctionCodeWriter] Writing behavior code to ${path}...`);
-      return writeFileInNextBatch(path, code);
+      const relativePath = path.replace(baseUrl, '');
+      console.log(
+        `[BrowserSWEventsFunctionCodeWriter] Writing behavior code to ${path}...`
+      );
+      return writeFileInNextBatch(relativePath, code);
     },
-    
+
     writeObjectCode: (
       objectCodeNamespace: string,
       code: string
     ): Promise<void> => {
       const path = getPathFor(objectCodeNamespace);
       onWriteFile({ includeFile: path, content: code });
-      console.log(`[BrowserSWEventsFunctionCodeWriter] Writing object code to ${path}...`);
-      return writeFileInNextBatch(path, code);
+      const relativePath = path.replace(baseUrl, '');
+      console.log(
+        `[BrowserSWEventsFunctionCodeWriter] Writing object code to ${path}...`
+      );
+      return writeFileInNextBatch(relativePath, code);
     },
   };
 };

@@ -1,6 +1,6 @@
 // @flow
 import Window from '../Utils/Window';
-import { getIDEVersion, getIDEVersionWithHash } from '../Version';
+import { getIDEVersionWithHash } from '../Version';
 
 type FileSet =
   | 'preview'

@@ -442,7 +442,7 @@ const createOrReplaceObject: EditorFunction = {
         </Trans>
       ) : duplicatedObjectName ? (
         <Trans>
-          Duplicate object <b>{object_name}</b> as <b>{duplicatedObjectName}</b>
+          Duplicate object <b>{duplicatedObjectName}</b> as <b>{object_name}</b>
           in scene{' '}
           <Link
             href="#"
@@ -692,24 +692,24 @@ const createOrReplaceObject: EditorFunction = {
     };
 
     const duplicateExistingObject = (duplicatedObjectName: string) => {
-      const object = objectsContainer.getObject(object_name);
+      const object = objectsContainer.getObject(duplicatedObjectName);
       const serializedObject = serializeToJSObject(object);
-      const duplicatedObject = objectsContainer.insertNewObject(
+      const newObject = objectsContainer.insertNewObject(
         project,
         object.getType(),
-        duplicatedObjectName,
+        object_name,
         objectsContainer.getObjectsCount()
       );
       unserializeFromJSObject(
-        duplicatedObject,
+        newObject,
         serializedObject,
         'unserializeFrom',
         project
       );
-      duplicatedObject.setName(duplicatedObjectName); // Unserialization has overwritten the name.
+      newObject.setName(object_name); // Unserialization has overwritten the name.
 
       return makeGenericSuccess(
-        `Duplicated object "${object.getName()}" as "${duplicatedObject.getName()}".`
+        `Duplicated object "${duplicatedObjectName}" as "${newObject.getName()}".`
       );
     };
 
@@ -722,9 +722,9 @@ const createOrReplaceObject: EditorFunction = {
       return replaceExistingObject();
     } else if (duplicatedObjectName) {
       // Duplicate an existing object, if there is one existing.
-      if (!objectsContainer.hasObjectNamed(object_name)) {
+      if (!objectsContainer.hasObjectNamed(duplicatedObjectName)) {
         return makeGenericFailure(
-          `Object with name "${object_name}" does not exist in scene "${scene_name}", cannot duplicate it.`
+          `Object with name "${duplicatedObjectName}" does not exist in scene "${scene_name}", cannot duplicate it into ${object_name}.`
         );
       }
 

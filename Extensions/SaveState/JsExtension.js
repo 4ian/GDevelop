@@ -207,6 +207,87 @@ module.exports = {
       .setIncludeFile('Extensions/SaveState/savestatetools.js')
       .setFunctionName('gdjs.saveState.excludeVariableFromSaveState');
 
+    // Save Configuration behavior
+    const saveConfigurationBehavior = new gd.BehaviorJsImplementation();
+
+    saveConfigurationBehavior.updateProperty = function (
+      behaviorContent,
+      propertyName,
+      newValue
+    ) {
+      if (propertyName === 'defaultProfilePersistence') {
+        behaviorContent
+          .getChild('defaultProfilePersistence')
+          .setStringValue(newValue);
+        return true;
+      }
+      if (propertyName === 'persistedInProfiles') {
+        behaviorContent
+          .getChild('persistedInProfiles')
+          .setStringValue(newValue);
+        return true;
+      }
+
+      return false;
+    };
+
+    saveConfigurationBehavior.getProperties = function (behaviorContent) {
+      const behaviorProperties = new gd.MapStringPropertyDescriptor();
+
+      behaviorProperties
+        .getOrCreate('defaultProfilePersistence')
+        .setValue(
+          behaviorContent.getChild('defaultProfilePersistence').getStringValue()
+        )
+        .setType('Choice')
+        .setLabel(_('Persistence mode'))
+        .addChoice('Persisted', _('Include in save states (default)'))
+        .addChoice('DoNotSave', _('Do not save'));
+
+      behaviorProperties
+        .getOrCreate('persistedInProfiles')
+        .setValue(
+          behaviorContent.getChild('persistedInProfiles').getStringValue()
+        )
+        .setType('String')
+        .setLabel(_('Save profile names'))
+        .setDescription(
+          _(
+            'Comma-separated list of profile names in which the object is saved. When a save state is created with one or more profile names specified, the object will be saved only if it matches one of these profiles.'
+          )
+        );
+
+      return behaviorProperties;
+    };
+
+    saveConfigurationBehavior.initializeContent = function (behaviorContent) {
+      behaviorContent
+        .addChild('defaultProfilePersistence')
+        .setStringValue('Persisted');
+      behaviorContent.addChild('persistedInProfiles').setStringValue('');
+    };
+
+    const sharedData = new gd.BehaviorsSharedData();
+
+    extension
+      .addBehavior(
+        'SaveConfiguration',
+        _('Save state configuration'),
+        'SaveConfiguration',
+        _('Allow the customize how the object is persisted in a save state.'),
+        '',
+        'res/actions/saveUp.svg',
+        'SaveConfiguration',
+        // @ts-ignore - TODO: Fix type being a BehaviorJsImplementation instead of an Behavior
+        saveConfigurationBehavior,
+        sharedData
+      )
+      .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+      .setIncludeFile('Extensions/SaveState/savestatetools.js')
+      .addIncludeFile(
+        'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
+      );
+
     return extension;
   },
   runExtensionSanityTests: function (gd, extension) {

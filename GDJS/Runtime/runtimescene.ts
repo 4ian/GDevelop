@@ -134,7 +134,7 @@ namespace gdjs {
     loadFromScene(
       sceneAndExtensionsData: SceneAndExtensionsData | null,
       options?: {
-        skipCreatingInstances?: boolean;
+        skipInstancesCreationForProfiles?: string[];
         skipStoppingSoundsOnStartup?: boolean;
       }
     ) {
@@ -195,16 +195,30 @@ namespace gdjs {
         this.registerObject(sceneData.objects[i]);
       }
 
-      // Create initial instances of objects
-      if (!options || !options.skipCreatingInstances)
-        this.createObjectsFrom(
-          sceneData.instances,
-          0,
-          0,
-          0,
-          /*trackByPersistentUuid=*/
-          true
-        );
+      // Create initial instances of objects.
+      let excludedObjectNames: Set<string> | null = null;
+      if (options && options.skipInstancesCreationForProfiles) {
+        const allObjectData: ObjectData[] = [];
+        this._objects.values(allObjectData);
+        if (gdjs.saveState) {
+          excludedObjectNames = gdjs.saveState.getObjectNamesIncludedInProfiles(
+            allObjectData,
+            options.skipInstancesCreationForProfiles
+          );
+        }
+      }
+
+      this.createObjectsFrom(
+        sceneData.instances,
+        0,
+        0,
+        0,
+        /*trackByPersistentUuid=*/
+        true,
+        {
+          excludedObjectNames,
+        }
+      );
 
       // Set up the default z order (for objects created from events)
       this._setLayerDefaultZOrders();

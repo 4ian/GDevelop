@@ -154,6 +154,8 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/Extensions/Spine/spineruntimeobject.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Spine/spineruntimeobject-pixi-renderer.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Spine/managers/*.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/SaveState/savestatetools.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/SaveState/SaveConfigurationRuntimeBehavior.js',
 
       // Test extensions:
       './GDJS/tests/tests/Extensions/**.js',

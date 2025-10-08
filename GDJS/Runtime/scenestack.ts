@@ -5,7 +5,7 @@ namespace gdjs {
   interface PushSceneOptions {
     sceneName: string;
     externalLayoutName?: string;
-    skipCreatingInstancesFromScene?: boolean;
+    skipInstancesCreationForProfiles?: string[];
     skipStoppingSoundsOnStartup?: boolean;
   }
 
@@ -146,10 +146,10 @@ namespace gdjs {
 
       const sceneName =
         typeof options === 'string' ? options : options.sceneName;
-      const skipCreatingInstancesFromScene =
+      const skipInstancesCreationForProfiles =
         typeof options === 'string'
-          ? false
-          : options.skipCreatingInstancesFromScene;
+          ? undefined
+          : options.skipInstancesCreationForProfiles;
       const skipStoppingSoundsOnStartup =
         typeof options === 'string'
           ? false
@@ -170,7 +170,7 @@ namespace gdjs {
         return this._loadNewScene({
           sceneName,
           externalLayoutName,
-          skipCreatingInstancesFromScene,
+          skipInstancesCreationForProfiles,
           skipStoppingSoundsOnStartup,
         });
       }
@@ -180,7 +180,7 @@ namespace gdjs {
         this._loadNewScene({
           sceneName,
           externalLayoutName,
-          skipCreatingInstancesFromScene,
+          skipInstancesCreationForProfiles,
           skipStoppingSoundsOnStartup,
         });
         this._isNextLayoutLoading = false;
@@ -197,7 +197,8 @@ namespace gdjs {
       newScene.loadFromScene(
         this._runtimeGame.getSceneAndExtensionsData(options.sceneName),
         {
-          skipCreatingInstances: options.skipCreatingInstancesFromScene,
+          skipInstancesCreationForProfiles:
+            options.skipInstancesCreationForProfiles,
           skipStoppingSoundsOnStartup: options.skipStoppingSoundsOnStartup,
         }
       );
@@ -333,8 +334,8 @@ namespace gdjs {
 
       this._sceneStackSyncDataToApply = null;
 
-      const skipCreatingInstancesFromScene =
-        !!options && !!options.preventInitialInstancesCreation;
+      const skipInstancesCreationForProfiles =
+        options && options.skipInstancesCreationForProfiles;
       const skipStoppingSoundsOnStartup =
         !!options && !!options.preventSoundsStoppingOnStartup;
 
@@ -349,7 +350,7 @@ namespace gdjs {
           const sceneSyncData = sceneStackSyncData[i];
           const newScene = this.push({
             sceneName: sceneSyncData.name,
-            skipCreatingInstancesFromScene,
+            skipInstancesCreationForProfiles,
             skipStoppingSoundsOnStartup,
           });
           if (newScene) {
@@ -376,7 +377,7 @@ namespace gdjs {
           // We have fewer scenes in the stack than the host, let's add the scene.
           const newScene = this.push({
             sceneName: sceneSyncData.name,
-            skipCreatingInstancesFromScene,
+            skipInstancesCreationForProfiles,
           });
           if (newScene) {
             newScene.networkId = sceneSyncData.networkId;
@@ -398,7 +399,7 @@ namespace gdjs {
           const newScene = this.replace({
             sceneName: sceneSyncData.name,
             clear: true,
-            skipCreatingInstancesFromScene,
+            skipInstancesCreationForProfiles,
           });
           if (newScene) {
             newScene.networkId = sceneSyncData.networkId;
@@ -442,7 +443,7 @@ namespace gdjs {
           const newScene = this.replace({
             sceneName: sceneSyncData.name,
             clear: false,
-            skipCreatingInstancesFromScene,
+            skipInstancesCreationForProfiles,
           });
           if (newScene) {
             newScene.networkId = sceneSyncData.networkId;

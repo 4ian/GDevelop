@@ -57,7 +57,7 @@ declare type GetNetworkSyncDataOptions = {
 
 declare type UpdateFromNetworkSyncDataOptions = {
   clearSceneStack?: boolean;
-  preventInitialInstancesCreation?: boolean;
+  skipInstancesCreationForProfiles?: string[];
   preventSoundsStoppingOnStartup?: boolean;
   clearInputs?: boolean;
   keepControl?: boolean;

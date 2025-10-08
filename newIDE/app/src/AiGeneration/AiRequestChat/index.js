@@ -337,7 +337,31 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       setUserRequestTextPerRequestId,
     ] = React.useState<{ [string]: string }>({});
     const scrollViewRef = React.useRef<ScrollViewInterface | null>(null);
+    const [shouldAutoScroll, setShouldAutoScroll] = React.useState<boolean>(
+      true
+    );
     const requiredGameId = (aiRequest && aiRequest.gameId) || null;
+
+    // Auto-scroll to bottom when content changes, if user is at the bottom
+    React.useEffect(
+      () => {
+        if (shouldAutoScroll && scrollViewRef.current) {
+          scrollViewRef.current.scrollToBottom({
+            behavior: 'smooth',
+          });
+        }
+      },
+      [aiRequest, editorFunctionCallResults, lastSendError, shouldAutoScroll]
+    );
+
+    const onScroll = React.useCallback(
+      ({ remainingScreensToBottom }: { remainingScreensToBottom: number }) => {
+        // Consider the user is at the bottom when they are less than 0.1 screen away from the bottom.
+        const isAtBottom = remainingScreensToBottom < 0.1;
+        setShouldAutoScroll(isAtBottom);
+      },
+      []
+    );
 
     const newChatPlaceholder = React.useMemo(
       () => {
@@ -742,7 +766,11 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
           [classes.aiRequestChatContainer]: true,
         })}
       >
-        <ScrollView ref={scrollViewRef} style={styles.chatScrollView}>
+        <ScrollView
+          ref={scrollViewRef}
+          style={styles.chatScrollView}
+          onScroll={onScroll}
+        >
           <ChatMessages
             aiRequest={aiRequest}
             onSendFeedback={onSendFeedback}

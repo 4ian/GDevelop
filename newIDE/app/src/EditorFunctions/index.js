@@ -3,7 +3,10 @@ import * as React from 'react';
 import { getInstancesInLayoutForLayer } from '../Utils/Layout';
 import { mapFor, mapVector } from '../Utils/MapFor';
 import { SafeExtractor } from '../Utils/SafeExtractor';
-import { serializeToJSObject } from '../Utils/Serializer';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
 import { type AiGeneratedEvent } from '../Utils/GDevelopServices/Generation';
 import { renderNonTranslatedEventsAsText } from '../EventsSheet/EventsTree/TextRenderer';
 import {
@@ -414,11 +417,33 @@ const createOrReplaceObject: EditorFunction = {
       args,
       'replace_existing_object'
     );
+    const duplicatedObjectName = SafeExtractor.extractStringProperty(
+      args,
+      'duplicated_object_name'
+    );
 
     return {
       text: replaceExistingObject ? (
         <Trans>
           Replace object <b>{object_name}</b> in scene{' '}
+          <Link
+            href="#"
+            onClick={() =>
+              editorCallbacks.onOpenLayout(scene_name, {
+                openEventsEditor: true,
+                openSceneEditor: true,
+                focusWhenOpened: 'scene',
+              })
+            }
+          >
+            {scene_name}
+          </Link>
+          .
+        </Trans>
+      ) : duplicatedObjectName ? (
+        <Trans>
+          Duplicate object <b>{duplicatedObjectName}</b> as <b>{object_name}</b>{' '}
+          in scene{' '}
           <Link
             href="#"
             onClick={() =>
@@ -465,6 +490,10 @@ const createOrReplaceObject: EditorFunction = {
     const shouldReplaceExistingObject = SafeExtractor.extractBooleanProperty(
       args,
       'replace_existing_object'
+    );
+    const duplicatedObjectName = SafeExtractor.extractStringProperty(
+      args,
+      'duplicated_object_name'
     );
     const description = SafeExtractor.extractStringProperty(
       args,
@@ -662,7 +691,45 @@ const createOrReplaceObject: EditorFunction = {
       );
     };
 
-    if (!shouldReplaceExistingObject) {
+    const duplicateExistingObject = (duplicatedObjectName: string) => {
+      const object = objectsContainer.getObject(duplicatedObjectName);
+      const serializedObject = serializeToJSObject(object);
+      const newObject = objectsContainer.insertNewObject(
+        project,
+        object.getType(),
+        object_name,
+        objectsContainer.getObjectsCount()
+      );
+      unserializeFromJSObject(
+        newObject,
+        serializedObject,
+        'unserializeFrom',
+        project
+      );
+      newObject.setName(object_name); // Unserialization has overwritten the name.
+
+      return makeGenericSuccess(
+        `Duplicated object "${duplicatedObjectName}" as "${newObject.getName()}". The new object "${newObject.getName()}" has the same type, behaviors, properties and effects as the one it was duplicated from.`
+      );
+    };
+
+    if (shouldReplaceExistingObject) {
+      // Replace an existing object, if there is one existing.
+      if (!objectsContainer.hasObjectNamed(object_name)) {
+        return createNewObject();
+      }
+
+      return replaceExistingObject();
+    } else if (duplicatedObjectName) {
+      // Duplicate an existing object, if there is one existing.
+      if (!objectsContainer.hasObjectNamed(duplicatedObjectName)) {
+        return makeGenericFailure(
+          `Object with name "${duplicatedObjectName}" does not exist in scene "${scene_name}", cannot duplicate it into ${object_name}.`
+        );
+      }
+
+      return duplicateExistingObject(duplicatedObjectName);
+    } else {
       // Add a new object.
       if (objectsContainer.hasObjectNamed(object_name)) {
         if (objectsContainer.getObject(object_name).getType() !== object_type) {
@@ -677,13 +744,6 @@ const createOrReplaceObject: EditorFunction = {
       }
 
       return createNewObject();
-    } else {
-      // Replace an existing object, if there is one existing.
-      if (!objectsContainer.hasObjectNamed(object_name)) {
-        return createNewObject();
-      }
-
-      return replaceExistingObject();
     }
   },
 };

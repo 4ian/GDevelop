@@ -2970,7 +2970,10 @@ namespace gdjs {
       this.isForcefullyHidden = !instancesEditorSettings.grid;
       this.gridWidth = instancesEditorSettings.gridWidth;
       this.gridHeight = instancesEditorSettings.gridHeight;
-      this.gridDepth = instancesEditorSettings.gridDepth || 0;
+      this.gridDepth =
+        instancesEditorSettings.gridDepth === undefined
+          ? 32
+          : instancesEditorSettings.gridDepth;
       this.gridOffsetX = instancesEditorSettings.gridOffsetX;
       this.gridOffsetY = instancesEditorSettings.gridOffsetY;
       this.gridOffsetZ = instancesEditorSettings.gridOffsetZ || 0;

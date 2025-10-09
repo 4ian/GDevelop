@@ -134,12 +134,9 @@ namespace gdjs {
 
       const variableOwner = this.getPlayerOwnership();
 
-      if (syncOptions.syncAllVariables) {
+      if (syncOptions.shouldExcludeVariableFromData) {
         // Saving for "save state": serialize all variables unless excluded.
-        if (
-          gdjs.saveState &&
-          gdjs.saveState.isVariableExcludedFromSaveState(this)
-        ) {
+        if (syncOptions.shouldExcludeVariableFromData(this)) {
           return;
         }
       } else {
@@ -266,6 +263,13 @@ namespace gdjs {
       const syncedVariableOwner = networkSyncData.owner;
       const variableData =
         gdjs.Variable.getVariableDataFromNetworkSyncData(networkSyncData);
+
+      if (
+        options.shouldExcludeVariableFromUpdate &&
+        options.shouldExcludeVariableFromUpdate(this)
+      ) {
+        return;
+      }
 
       if (!options.ignoreVariableOwnership) {
         const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerNumber();

@@ -32,65 +32,123 @@ module.exports = {
 
     extension
       .addAction(
-        'SaveGameSnapshotToVariable',
+        'CreateGameSaveStateInVariable',
         _('Save game to a variable'),
-        _('Takes a snapshot of the game and save it to a variable.'),
-        _('Save the game in variable _PARAM1_'),
+        _(
+          'Create a Save State and save it to a variable. This is for advanced usage, prefer to use "Save game to device storage" in most cases.'
+        ),
+        _('Save game in variable _PARAM1_ (profile(s): _PARAM2_)'),
         _('Save'),
         'res/actions/saveDown.svg',
         'res/actions/saveDown.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
       .addParameter('variable', _('Variable to store the save to'), '', false)
+      .addParameter('string', _('Profile(s) to save'), '', true)
+      .setDefaultValue('"default"')
+      .setParameterLongDescription(
+        _(
+          'Comma-separated list of profile names that must be saved. Only objects tagged with at least one of these profiles will be saved. If no profile names are specified, all objects will be saved (unless they have a "Save Configuration" behavior set to "Do not save").'
+        )
+      )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/SaveState/savestatetools.js')
-      .setFunctionName('gdjs.saveState.saveVariableGameSnapshot');
+      .setFunctionName('gdjs.saveState.createGameSaveStateInVariable');
 
     extension
       .addAction(
-        'SaveGameSnapshotToStorage',
+        'CreateGameSaveStateInStorage',
         _('Save game to device storage'),
-        _('Takes a snapshot of the game and save it to device storage.'),
-        _('Save the game to device storage under key _PARAM1_'),
+        _('Create a Save State and save it to device storage.'),
+        _('Save game to device storage named _PARAM1_ (profile(s): _PARAM2_)'),
         _('Save'),
         'res/actions/saveDown.svg',
         'res/actions/saveDown.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
       .addParameter('string', _('Storage key to save to'), '', false)
+      .addParameter('string', _('Profile(s) to save'), '', true)
+      .setDefaultValue('"default"')
+      .setParameterLongDescription(
+        _(
+          'Comma-separated list of profile names that must be saved. Only objects tagged with at least one of these profiles will be saved. If no profile names are specified, all objects will be saved (unless they have a "Save Configuration" behavior set to "Do not save").'
+        )
+      )
+      .setDefaultValue('no')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/SaveState/savestatetools.js')
-      .setFunctionName('gdjs.saveState.saveStorageGameSnapshot');
+      .setFunctionName('gdjs.saveState.createGameSaveStateInStorage');
 
     extension
       .addAction(
-        'LoadGameSnapshotFromVariable',
+        'RestoreGameSaveStateFromVariable',
         _('Load game from variable'),
-        _('Load game from a variable save snapshot.'),
-        _('Load the game from variable _PARAM0_'),
+        _(
+          'Restore the game from a Save State stored in the specified variable. This is for advanced usage, prefer to use "Load game from device storage" in most cases.'
+        ),
+        _(
+          'Load game from variable _PARAM1_ (profile(s): _PARAM2_, stop and restart all the scenes currently played: _PARAM3_)'
+        ),
         _('Load'),
         'res/actions/saveUp.svg',
         'res/actions/saveUp.svg'
       )
+      .addCodeOnlyParameter('currentScene', '')
       .addParameter('variable', _('Variable to load the game from'), '', false)
+      .addParameter('string', _('Profile(s) to load'), '', true)
+      .setDefaultValue('"default"')
+      .setParameterLongDescription(
+        _(
+          'Comma-separated list of profile names that must be loaded. Only objects tagged with at least one of these profiles will be loaded - others will be left alone. If no profile names are specified, all objects will be loaded (unless they have a "Save Configuration" behavior set to "Do not save").'
+        )
+      )
+      .addParameter(
+        'yesorno',
+        _('Stop and restart all the scenes currently played?'),
+        '',
+        true
+      )
+      .setDefaultValue('no')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/SaveState/savestatetools.js')
-      .setFunctionName('gdjs.saveState.loadGameFromVariableSnapshot');
+      .setFunctionName('gdjs.saveState.restoreGameSaveStateFromVariable');
 
     extension
       .addAction(
-        'LoadGameSnapshotFromStorage',
+        'RestoreGameSaveStateFromStorage',
         _('Load game from device storage'),
-        _('Load game from device storage save snapshot.'),
-        _('Load the game from device storage under key _PARAM0_.'),
+        _('Restore the game from a Save State stored on the device.'),
+        _(
+          'Load game from device storage named _PARAM1_ (profile(s): _PARAM2_, stop and restart all the scenes currently played: _PARAM3_)'
+        ),
         _('Load'),
         'res/actions/saveUp.svg',
         'res/actions/saveUp.svg'
       )
-      .addParameter('string', _('Storage key to load the game from'), '', false)
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter(
+        'string',
+        _('Storage name to load the game from'),
+        '',
+        false
+      )
+      .addParameter('string', _('Profile(s) to load'), '', true)
+      .setDefaultValue('"default"')
+      .setParameterLongDescription(
+        _(
+          'Comma-separated list of profile names that must be loaded. Only objects tagged with at least one of these profiles will be loaded - others will be left alone. If no profile names are specified, all objects will be loaded.'
+        )
+      )
+      .addParameter(
+        'yesorno',
+        _('Stop and restart all the scenes currently played?'),
+        '',
+        true
+      )
+      .setDefaultValue('no')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/SaveState/savestatetools.js')
-      .setFunctionName('gdjs.saveState.loadGameFromStorageSnapshot');
+      .setFunctionName('gdjs.saveState.restoreGameSaveStateFromStorage');
 
     extension
       .addExpressionAndCondition(
@@ -104,6 +162,7 @@ module.exports = {
         '',
         'res/actions/saveDown.svg'
       )
+      .addCodeOnlyParameter('currentScene', '')
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setIncludeFile('Extensions/SaveState/savestatetools.js')
       .setFunctionName('gdjs.saveState.getSecondsSinceLastSave')
@@ -121,6 +180,7 @@ module.exports = {
         '',
         'res/actions/saveDown.svg'
       )
+      .addCodeOnlyParameter('currentScene', '')
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setIncludeFile('Extensions/SaveState/savestatetools.js')
       .setFunctionName('gdjs.saveState.getSecondsSinceLastLoad')
@@ -136,6 +196,7 @@ module.exports = {
         'res/actions/saveDown.svg',
         'res/actions/saveDown.svg'
       )
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/SaveState/savestatetools.js')
       .setFunctionName('gdjs.saveState.hasSaveJustSucceeded');
@@ -150,6 +211,7 @@ module.exports = {
         'res/actions/saveDown.svg',
         'res/actions/saveDown.svg'
       )
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/SaveState/savestatetools.js')
       .setFunctionName('gdjs.saveState.hasSaveJustFailed');
@@ -164,6 +226,7 @@ module.exports = {
         'res/actions/saveUp.svg',
         'res/actions/saveUp.svg'
       )
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/SaveState/savestatetools.js')
       .setFunctionName('gdjs.saveState.hasLoadJustSucceeded');
@@ -178,6 +241,7 @@ module.exports = {
         'res/actions/saveUp.svg',
         'res/actions/saveUp.svg'
       )
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/SaveState/savestatetools.js')
       .setFunctionName('gdjs.saveState.hasLoadJustFailed');

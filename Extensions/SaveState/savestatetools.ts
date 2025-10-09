@@ -6,10 +6,12 @@ namespace gdjs {
     'Save State - Debug'
   );
 
-  export type LoadRequestOptions = {
+  export type RestoreRequestOptions = {
     profileNames: string[];
-    loadStorageName?: string;
-    loadVariable?: gdjs.Variable;
+    clearSceneStack: boolean;
+
+    fromStorageName?: string;
+    fromVariable?: gdjs.Variable;
   };
 
   export namespace saveState {
@@ -24,9 +26,29 @@ namespace gdjs {
       return `save-${key}`;
     };
 
+    const excludedVariables: WeakSet<Variable> = new WeakSet();
+
+    export const excludeVariableFromSaveState = (
+      _: gdjs.RuntimeScene,
+      variable: gdjs.Variable,
+      exclude: boolean
+    ) => {
+      if (exclude) {
+        excludedVariables.add(variable);
+      } else {
+        excludedVariables.delete(variable);
+      }
+    };
+
+    export const isVariableExcludedFromSaveState = (
+      variable: gdjs.Variable
+    ) => {
+      return excludedVariables.has(variable);
+    };
+
     const getNetworkSyncOptions: GetNetworkSyncDataOptions = {
       syncObjectIdentifiers: true,
-      syncAllVariables: true,
+      shouldExcludeVariableFromData: isVariableExcludedFromSaveState,
       syncAllBehaviors: true,
       syncSceneTimers: true,
       syncOnceTriggers: true,
@@ -38,7 +60,6 @@ namespace gdjs {
       syncFullTileMaps: true,
     };
 
-    const excludedVariables: WeakSet<Variable> = new WeakSet();
     let lastSaveTime: number | null = null;
     let lastLoadTime: number | null = null;
     let saveJustSucceeded: boolean = false;
@@ -46,40 +67,40 @@ namespace gdjs {
     let loadJustSucceeded: boolean = false;
     let loadJustFailed: boolean = false;
 
-    let loadRequestOptions: LoadRequestOptions | null = null;
+    let restoreRequestOptions: RestoreRequestOptions | null = null;
 
-    export const getSecondsSinceLastSave = (): number => {
+    export const getSecondsSinceLastSave = (_: RuntimeScene): number => {
       if (!lastSaveTime) return -1;
       return Math.floor((Date.now() - lastSaveTime) / 1000);
     };
-    export const getSecondsSinceLastLoad = (): number => {
+    export const getSecondsSinceLastLoad = (_: RuntimeScene): number => {
       if (!lastLoadTime) return -1;
       return Math.floor((Date.now() - lastLoadTime) / 1000);
     };
-    export const hasSaveJustSucceeded = () => {
+    export const hasSaveJustSucceeded = (_: RuntimeScene) => {
       return saveJustSucceeded;
     };
-    export const hasLoadJustSucceeded = () => {
+    export const hasLoadJustSucceeded = (_: RuntimeScene) => {
       return loadJustSucceeded;
     };
-    export const hasSaveJustFailed = () => {
+    export const hasSaveJustFailed = (_: RuntimeScene) => {
       return saveJustFailed;
     };
-    export const hasLoadJustFailed = () => {
+    export const hasLoadJustFailed = (_: RuntimeScene) => {
       return loadJustFailed;
     };
-    export const markSaveJustSucceeded = () => {
+    export const markSaveJustSucceeded = (_: RuntimeScene) => {
       saveJustSucceeded = true;
       lastSaveTime = Date.now();
     };
-    export const markLoadJustSucceeded = () => {
+    export const markLoadJustSucceeded = (_: RuntimeScene) => {
       loadJustSucceeded = true;
       lastLoadTime = Date.now();
     };
-    export const markSaveJustFailed = () => {
+    export const markSaveJustFailed = (_: RuntimeScene) => {
       saveJustFailed = true;
     };
-    export const markLoadJustFailed = () => {
+    export const markLoadJustFailed = (_: RuntimeScene) => {
       loadJustFailed = true;
     };
 
@@ -93,10 +114,16 @@ namespace gdjs {
 
     gdjs.registerRuntimeScenePostEventsCallback(
       (runtimeScene: gdjs.RuntimeScene) => {
-        loadGameSnapshotAtTheEndOfFrameIfAny(runtimeScene);
+        checkAndRestoreGameSaveStateAtEndOfFrame(runtimeScene);
       }
     );
 
+    /**
+     * Create a Save State from the given game.
+     *
+     * Only objects, variables etc... tagged with at least one of the profiles
+     * given in `options.profileNames` will be saved.
+     */
     export const createGameSaveState = (
       runtimeGame: RuntimeGame,
       options: {
@@ -170,29 +197,35 @@ namespace gdjs {
       return gameSaveState;
     };
 
-    export const saveVariableGameSnapshot = async function (
-      currentScene: RuntimeScene,
-      variable: gdjs.Variable
+    export const createGameSaveStateInVariable = async function (
+      runtimeScene: RuntimeScene,
+      variable: gdjs.Variable,
+      commaSeparatedProfileNames: string
     ) {
       try {
-        const gameSaveState = createGameSaveState(currentScene.getGame(), {
-          profileNames: ['default'],
+        const gameSaveState = createGameSaveState(runtimeScene.getGame(), {
+          profileNames: parseCommaSeparatedProfileNames(
+            commaSeparatedProfileNames
+          ),
         });
         variable.fromJSObject(gameSaveState);
-        markSaveJustSucceeded();
+        markSaveJustSucceeded(runtimeScene);
       } catch (error) {
         logger.error('Error saving to variable:', error);
-        markSaveJustFailed();
+        markSaveJustFailed(runtimeScene);
       }
     };
 
-    export const saveStorageGameSnapshot = async function (
-      currentScene: RuntimeScene,
-      storageKey: string
+    export const createGameSaveStateInStorage = async function (
+      runtimeScene: RuntimeScene,
+      storageKey: string,
+      commaSeparatedProfileNames: string
     ) {
       try {
-        const gameSaveState = createGameSaveState(currentScene.getGame(), {
-          profileNames: ['default'],
+        const gameSaveState = createGameSaveState(runtimeScene.getGame(), {
+          profileNames: parseCommaSeparatedProfileNames(
+            commaSeparatedProfileNames
+          ),
         });
         await gdjs.indexedDb.saveToIndexedDB(
           getIndexedDbDatabaseName(),
@@ -200,90 +233,56 @@ namespace gdjs {
           getIndexedDbStorageKey(storageKey),
           gameSaveState
         );
-        markSaveJustSucceeded();
+        markSaveJustSucceeded(runtimeScene);
       } catch (error) {
         logger.error('Error saving to IndexedDB:', error);
-        markSaveJustFailed();
+        markSaveJustFailed(runtimeScene);
       }
     };
 
-    export const loadGameFromVariableSnapshot = async function (
-      variable: gdjs.Variable
-    ) {
-      // The information is saved, so that the load can be done
-      // at the end of the frame,
-      // and avoid possible conflicts with running events.
-      loadRequestOptions = {
-        loadVariable: variable,
-        profileNames: ['default'],
-      };
-    };
-
-    export const loadGameFromStorageSnapshot = async function (
-      storageName: string
-    ) {
-      // The information is saved, so that the load can be done
-      // at the end of the frame,
-      // and avoid possible conflicts with running events.
-      loadRequestOptions = {
-        loadStorageName: storageName,
-        profileNames: ['default'],
-      };
-    };
-
-    const loadGameSnapshotAtTheEndOfFrameIfAny = function (
+    const checkAndRestoreGameSaveStateAtEndOfFrame = function (
       runtimeScene: RuntimeScene
     ) {
       const runtimeGame = runtimeScene.getGame();
 
-      if (!loadRequestOptions) return;
-      const optionsToApply = loadRequestOptions;
-      // Reset it so we don't load it twice.
-      loadRequestOptions = null;
+      if (!restoreRequestOptions) return;
+      const { fromVariable, fromStorageName, profileNames, clearSceneStack } =
+        restoreRequestOptions;
 
-      if (optionsToApply.loadVariable) {
-        const sceneVariables = runtimeScene.getVariables();
-        const variablePathInScene =
-          sceneVariables.getVariablePathInContainerByLoopingThroughAllVariables(
-            optionsToApply.loadVariable
-          );
-        const gameVariables = runtimeScene.getGame().getVariables();
-        const variablePathInGame =
-          gameVariables.getVariablePathInContainerByLoopingThroughAllVariables(
-            optionsToApply.loadVariable
-          );
-        const saveState =
-          optionsToApply.loadVariable.toJSObject() as GameSaveState;
+      // Reset it so we don't load it twice.
+      restoreRequestOptions = null;
+
+      if (fromVariable) {
+        const saveState = fromVariable.toJSObject();
 
         try {
           restoreGameSaveState(runtimeGame, saveState, {
-            loadProfileNames: optionsToApply.profileNames,
-            variableToRehydrate: optionsToApply.loadVariable,
-            variablePathInScene: variablePathInScene,
-            variablePathInGame: variablePathInGame,
+            profileNames,
+            clearSceneStack,
           });
-          markLoadJustSucceeded();
+          markLoadJustSucceeded(runtimeScene);
         } catch (error) {
           logger.error('Error loading from variable:', error);
-          markLoadJustFailed();
+          markLoadJustFailed(runtimeScene);
         }
-      } else if (optionsToApply.loadStorageName) {
+      } else if (fromStorageName) {
         gdjs.indexedDb
           .loadFromIndexedDB(
             getIndexedDbDatabaseName(),
             getIndexedDbObjectStore(),
-            getIndexedDbStorageKey(optionsToApply.loadStorageName)
+            getIndexedDbStorageKey(fromStorageName)
           )
           .then((jsonData) => {
             const saveState = jsonData as GameSaveState;
             restoreGameSaveState(runtimeGame, saveState, {
-              loadProfileNames: optionsToApply.profileNames,
+              profileNames,
+              clearSceneStack,
             });
-            markLoadJustSucceeded();
+            markLoadJustSucceeded(runtimeScene);
           })
           .catch((error) => {
             logger.error('Error loading from IndexedDB:', error);
-            markLoadJustFailed();
+            markLoadJustFailed(runtimeScene);
           });
       }
     };
@@ -327,21 +326,35 @@ namespace gdjs {
       return newInstance;
     };
 
+    /**
+     * Restore the game using the given Save State.
+     *
+     * `options.profileNames` is the list of profiles to restore: only objects, variables etc... tagged with at least
+     * one of these profiles will be restored (or recreated if they don't exist, or deleted if not in the save state).
+     * Others will be left untouched.
+     *
+     * If `options.clearSceneStack` is true, all the scenes will be unloaded and re-created
+     * (meaning all instances will be re-created, variables will go back to their initial values, etc...).
+     * Otherwise, the existing scenes will be updated (or unloaded or created if the save state has different scenes).
+     */
     export const restoreGameSaveState = (
       runtimeGame: RuntimeGame,
       saveState: GameSaveState,
       options: {
-        loadProfileNames: string[];
-        clearSceneStack?: boolean;
-        variableToRehydrate?: gdjs.Variable;
-        variablePathInScene?: string[] | null;
-        variablePathInGame?: string[] | null;
+        profileNames: string[];
+        clearSceneStack: boolean;
       }
     ): void => {
-      // Save the content of the save, as it will be erased after the load.
-      const variableToRehydrateNetworkSyncData = options.variableToRehydrate
-        ? options.variableToRehydrate.getNetworkSyncData(getNetworkSyncOptions)
-        : null;
+      const getObjectNamesToRestoreForRuntimeScene = (
+        runtimeScene: RuntimeScene
+      ): Set<string> => {
+        const allObjectData = [];
+        runtimeScene._objects.values(allObjectData);
+        return getObjectNamesIncludedInProfiles(
+          allObjectData,
+          options.profileNames
+        );
+      };
 
       const updateFromNetworkSyncDataOptions: UpdateFromNetworkSyncDataOptions =
         {
@@ -349,11 +362,12 @@ namespace gdjs {
             options.clearSceneStack === undefined
               ? true
               : options.clearSceneStack,
-          skipInstancesCreationForProfiles: options.loadProfileNames,
+          getExcludedObjectNames: getObjectNamesToRestoreForRuntimeScene,
           preventSoundsStoppingOnStartup: true,
           clearInputs: true,
           keepControl: true,
           ignoreVariableOwnership: true,
+          shouldExcludeVariableFromUpdate: isVariableExcludedFromSaveState,
         };
 
       // First update the game, which will update the variables,
@@ -378,6 +392,11 @@ namespace gdjs {
         const layoutSyncData = saveState.layoutNetworkSyncDatas[index];
         if (!layoutSyncData) return;
 
+        // List names of objects that must be restored
+        // (and only them - instances of others will be left alone).
+        const objectNamesToRestore =
+          getObjectNamesToRestoreForRuntimeScene(runtimeScene);
+
         // Create objects first, so they are available for the scene update,
         // especially so that they have a networkId defined.
         const allLoadedNetworkIds = new Set<string>();
@@ -389,7 +408,13 @@ namespace gdjs {
             logger.warn('Tried to recreate an object without a name.');
             continue;
           }
+          if (!objectNamesToRestore.has(objectName)) {
+            // Object is in the save state, but not in the profiles to restore, don't restore it.
+            continue;
+          }
 
+          // Object is both in the save state and in the profiles to restore, restore it.
+          // Either find the existing instance with the same networkId, or create a new one.
           const networkId = objectNetworkSyncData.networkId || '';
           allLoadedNetworkIds.add(networkId);
 
@@ -406,15 +431,9 @@ namespace gdjs {
           }
         }
 
-        // Clean instances of objects that are persisted but not in the save state
-        // (i.e: those who don't have a networkId, so they have not been restored).
-        const allObjectData = [];
-        runtimeScene._objects.values(allObjectData);
-        const allObjectNames = getObjectNamesIncludedInProfiles(
-          allObjectData,
-          options.loadProfileNames
-        );
-        for (const objectName of allObjectNames) {
+        // Clean instances of objects that are not in the profiles to restore but not in the save state
+        // (i.e: those who don't have a networkId, or it's not in the save state: they must not exist).
+        for (const objectName of objectNamesToRestore) {
           // /!\ Clone the instances to avoid it being modified while iterating through them.
           const objects = [...runtimeScene.getInstancesOf(objectName)];
           for (const object of objects) {
@@ -436,71 +455,59 @@ namespace gdjs {
           updateFromNetworkSyncDataOptions
         );
       });
-
-      // Finally, if the save was done in a variable,
-      // rehydrate the variable where the save was done,
-      // as it has been erased by the load.
-      if (options && variableToRehydrateNetworkSyncData) {
-        const currentScene = sceneStack.getCurrentScene();
-        if (!currentScene) return;
-        const sceneVariables = currentScene.getVariables();
-        const gameVariables = currentScene.getGame().getVariables();
-        const { variablePathInScene, variablePathInGame } = options;
-
-        if (variablePathInScene && variablePathInScene.length > 0) {
-          const variableName =
-            variablePathInScene[variablePathInScene.length - 1];
-          const variableInScene =
-            sceneVariables.getVariableFromPath(variablePathInScene);
-          if (variableInScene) {
-            const variableNetworkSyncData: VariableNetworkSyncData = {
-              name: variableName,
-              ...variableToRehydrateNetworkSyncData,
-            };
-            variableInScene.updateFromNetworkSyncData(
-              variableNetworkSyncData,
-              updateFromNetworkSyncDataOptions
-            );
-          }
-        }
-        if (variablePathInGame && variablePathInGame.length > 0) {
-          const variableName =
-            variablePathInGame[variablePathInGame.length - 1];
-          const variableInGame =
-            gameVariables.getVariableFromPath(variablePathInGame);
-          if (variableInGame) {
-            const variableNetworkSyncData: VariableNetworkSyncData = {
-              name: variableName,
-              ...variableToRehydrateNetworkSyncData,
-            };
-            variableInGame.updateFromNetworkSyncData(
-              variableNetworkSyncData,
-              updateFromNetworkSyncDataOptions
-            );
-          }
-        }
-      }
     };
 
-    export const excludeVariableFromSaveState = (
-      runtimeScene: gdjs.RuntimeScene,
+    const parseCommaSeparatedProfileNames = (
+      commaSeparatedProfileNames: string
+    ): string[] => {
+      if (!commaSeparatedProfileNames) return ['default'];
+
+      return commaSeparatedProfileNames
+        .split(',')
+        .map((profileName) => profileName.trim());
+    };
+
+    export const restoreGameSaveStateFromVariable = async function (
+      _: gdjs.RuntimeScene,
       variable: gdjs.Variable,
-      exclude: boolean
-    ) => {
-      if (exclude) {
-        excludedVariables.add(variable);
-      } else {
-        excludedVariables.delete(variable);
-      }
+      commaSeparatedProfileNames: string,
+      clearSceneStack: boolean
+    ) {
+      // The information is saved, so that the restore can be done
+      // at the end of the frame,
+      // and avoid possible conflicts with running events.
+      restoreRequestOptions = {
+        fromVariable: variable,
+        profileNames: parseCommaSeparatedProfileNames(
+          commaSeparatedProfileNames
+        ),
+        clearSceneStack,
+      };
     };
 
-    export const isVariableExcludedFromSaveState = (
-      variable: gdjs.Variable
-    ) => {
-      return excludedVariables.has(variable);
+    export const restoreGameSaveStateFromStorage = async function (
+      _: gdjs.RuntimeScene,
+      storageName: string,
+      commaSeparatedProfileNames: string,
+      clearSceneStack: boolean
+    ) {
+      // The information is saved, so that the restore can be done
+      // at the end of the frame,
+      // and avoid possible conflicts with running events.
+      restoreRequestOptions = {
+        fromStorageName: storageName,
+        profileNames: parseCommaSeparatedProfileNames(
+          commaSeparatedProfileNames
+        ),
+        clearSceneStack,
+      };
     };
 
-    export const getObjectNamesIncludedInProfiles = (
+    /**
+     * Compute, by looking at the "static" object data (i.e: in the Project Data),
+     * the name of objects which must be restored, based on the given profiles.
+     */
+    const getObjectNamesIncludedInProfiles = (
       allObjectData: ObjectData[],
       profileNames: string[]
     ): Set<string> => {

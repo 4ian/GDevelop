@@ -124,7 +124,7 @@ describe('SaveState', () => {
 
       // Load the saved state.
       gdjs.saveState.restoreGameSaveState(runtimeGame2, saveState, {
-        loadProfileNames: ['default'],
+        profileNames: ['default'],
       });
 
       const runtimeScene2 = runtimeGame2.getSceneStack().getCurrentScene();
@@ -181,7 +181,7 @@ describe('SaveState', () => {
 
       // Load the saved state.
       gdjs.saveState.restoreGameSaveState(runtimeGame2, saveState, {
-        loadProfileNames: ['default'],
+        profileNames: ['default'],
       });
 
       const runtimeScene2 = runtimeGame2.getSceneStack().getCurrentScene();
@@ -224,7 +224,7 @@ describe('SaveState', () => {
 
       // Load the saved state.
       gdjs.saveState.restoreGameSaveState(runtimeGame2, saveState, {
-        loadProfileNames: ['default'],
+        profileNames: ['default'],
       });
 
       const runtimeScene2 = runtimeGame2.getSceneStack().getCurrentScene();
@@ -328,7 +328,7 @@ describe('SaveState', () => {
 
       // Load the saved state.
       gdjs.saveState.restoreGameSaveState(runtimeGame2, saveState, {
-        loadProfileNames: ['default'],
+        profileNames: ['default'],
       });
 
       const runtimeScene2 = runtimeGame2.getSceneStack().getCurrentScene();
@@ -522,7 +522,7 @@ describe('SaveState', () => {
 
       // Load the saved state on the same game.
       gdjs.saveState.restoreGameSaveState(runtimeGame1, saveState, {
-        loadProfileNames: ['default'],
+        profileNames: ['default'],
         clearSceneStack: false,
       });
 
@@ -587,13 +587,265 @@ describe('SaveState', () => {
     });
 
     it('saves and restores the same running game (keep the scene stack)', async () => {
-      // TODO
+      // Start a game with multiple scenes.
+      const scene1Data = getFakeSceneData({ name: 'Scene1' });
+      const scene2Data = getFakeSceneData({ name: 'Scene2' });
+      const scene3Data = getFakeSceneData({ name: 'Scene3' });
+
+      const runtimeGame1 = gdjs.getPixiRuntimeGame({
+        layouts: [scene1Data, scene2Data, scene3Data],
+      });
+      await runtimeGame1._resourcesLoader.loadAllResources(() => {});
+
+      // Push 3 scenes onto the stack.
+      const runtimeScene1 = runtimeGame1.getSceneStack().push({
+        sceneName: 'Scene1',
+      });
+      const runtimeScene2 = runtimeGame1.getSceneStack().push({
+        sceneName: 'Scene2',
+      });
+      const runtimeScene3 = runtimeGame1.getSceneStack().push({
+        sceneName: 'Scene3',
+      });
+
+      if (!runtimeScene1 || !runtimeScene2 || !runtimeScene3) {
+        throw new Error('Scenes were not created.');
+      }
+
+      // Create objects in each scene at specific positions.
+      const object1 = runtimeScene1.createObject('MySpriteObject');
+      const object2 = runtimeScene2.createObject('MySpriteObject');
+      const object3 = runtimeScene3.createObject('MySpriteObject');
+
+      if (!object1 || !object2 || !object3) {
+        throw new Error('Objects were not created');
+      }
+
+      object1.setX(100);
+      object1.setY(200);
+      object2.setX(300);
+      object2.setY(400);
+      object3.setX(500);
+      object3.setY(600);
+
+      // Save the game state.
+      const saveState = gdjs.saveState.createGameSaveState(runtimeGame1, {
+        profileNames: ['default'],
+      });
+
+      // Do some changes in the game:
+      object1.setX(101);
+      object1.setY(201);
+      object2.setX(301);
+      object2.setY(401);
+      object3.setX(501);
+      object3.setY(601);
+
+      // Remove the last scene and add a few others (which will be unloaded
+      // when we restore the save state).
+      runtimeGame1.getSceneStack().pop();
+      runtimeGame1.getSceneStack().push({
+        sceneName: 'Scene2',
+      });
+      runtimeGame1.getSceneStack().push({
+        sceneName: 'Scene2',
+      });
+      runtimeGame1.getSceneStack().push({
+        sceneName: 'Scene2',
+      });
+
+      // Load the saved state on the same game without clearing the scene stack.
+      gdjs.saveState.restoreGameSaveState(runtimeGame1, saveState, {
+        profileNames: ['default'],
+        clearSceneStack: false,
+      });
+
+      // Verify all 3 scenes have been restored. The first two are unchanged.
+      // The last one is a new one.
+      const allScenes = runtimeGame1.getSceneStack().getAllScenes();
+      expect(allScenes.length).to.be(3);
+      expect(allScenes[0].getName()).to.be('Scene1');
+      expect(allScenes[0]).to.be(runtimeScene1);
+      expect(allScenes[1].getName()).to.be('Scene2');
+      expect(allScenes[1]).to.be(runtimeScene2);
+      expect(allScenes[2].getName()).to.be('Scene3');
+      expect(allScenes[2]).not.to.be(runtimeScene3);
+
+      // Verify objects are restored at their proper positions.
+      const restoredObjects1 = allScenes[0].getObjects('MySpriteObject');
+      const restoredObjects2 = allScenes[1].getObjects('MySpriteObject');
+      const restoredObjects3 = allScenes[2].getObjects('MySpriteObject');
+
+      expect(restoredObjects1.length).to.be(1);
+      expect(restoredObjects2.length).to.be(1);
+      expect(restoredObjects3.length).to.be(1);
+
+      expect(restoredObjects1[0].getX()).to.be(100);
+      expect(restoredObjects1[0].getY()).to.be(200);
+      expect(restoredObjects2[0].getX()).to.be(300);
+      expect(restoredObjects2[0].getY()).to.be(400);
+      expect(restoredObjects3[0].getX()).to.be(500);
+      expect(restoredObjects3[0].getY()).to.be(600);
     });
   });
 
   describe('Save State restored with specified profile(s)', () => {
     it('saves and restores the same running game (only objects in the specified profiles)', async () => {
-      // TODO
+      // Start a game with objects configured for different profiles.
+      const sceneData = getFakeSceneData({
+        name: 'Scene1',
+        objects: [
+          {
+            type: 'Sprite',
+            name: 'Profile1Object',
+            behaviors: [
+              {
+                name: 'SaveConfiguration',
+                type: 'SaveState::SaveConfiguration',
+                defaultProfilePersistence: 'DoNotSave',
+                persistedInProfiles: 'profile1',
+              },
+            ],
+            effects: [],
+            variables: [],
+            updateIfNotVisible: false,
+            animations: [],
+          },
+          {
+            type: 'Sprite',
+            name: 'Profile2Object',
+            behaviors: [
+              {
+                name: 'SaveConfiguration',
+                type: 'SaveState::SaveConfiguration',
+                defaultProfilePersistence: 'DoNotSave',
+                persistedInProfiles: 'profile2',
+              },
+            ],
+            effects: [],
+            variables: [],
+            updateIfNotVisible: false,
+            animations: [],
+          },
+          {
+            type: 'Sprite',
+            name: 'Profile3Object',
+            behaviors: [
+              {
+                name: 'SaveConfiguration',
+                type: 'SaveState::SaveConfiguration',
+                defaultProfilePersistence: 'DoNotSave',
+                persistedInProfiles: 'profile3',
+              },
+            ],
+            effects: [],
+            variables: [],
+            updateIfNotVisible: false,
+            animations: [],
+          },
+          {
+            type: 'Sprite',
+            name: 'AllProfilesObject',
+            behaviors: [
+              {
+                name: 'SaveConfiguration',
+                type: 'SaveState::SaveConfiguration',
+                defaultProfilePersistence: 'DoNotSave',
+                persistedInProfiles: 'profile1, profile2, profile3',
+              },
+            ],
+            effects: [],
+            variables: [],
+            updateIfNotVisible: false,
+            animations: [],
+          },
+        ],
+        instances: [],
+      });
+
+      const runtimeGame1 = gdjs.getPixiRuntimeGame({
+        layouts: [sceneData],
+      });
+      await runtimeGame1._resourcesLoader.loadAllResources(() => {});
+
+      const runtimeScene1 = runtimeGame1.getSceneStack().push({
+        sceneName: 'Scene1',
+      });
+      if (!runtimeScene1) throw new Error('No current scene was created.');
+
+      // Create objects for different profiles.
+      const profile1Object = runtimeScene1.createObject('Profile1Object');
+      const profile2Object = runtimeScene1.createObject('Profile2Object');
+      const profile3Object = runtimeScene1.createObject('Profile3Object');
+      const bothProfilesObject =
+        runtimeScene1.createObject('AllProfilesObject');
+
+      if (
+        !profile1Object ||
+        !profile2Object ||
+        !profile3Object ||
+        !bothProfilesObject
+      ) {
+        throw new Error('Objects were not created');
+      }
+
+      profile1Object.setX(100);
+      profile1Object.setY(200);
+      profile2Object.setX(300);
+      profile2Object.setY(400);
+      profile3Object.setX(500);
+      profile3Object.setY(600);
+      bothProfilesObject.setX(700);
+      bothProfilesObject.setY(800);
+
+      // Save the game state with both profiles.
+      const saveState = gdjs.saveState.createGameSaveState(runtimeGame1, {
+        // Save with profiles 1 and 2, even if we will restore with only the 'profile1' and 'profile3' profile.
+        profileNames: ['profile1', 'profile2'],
+      });
+
+      // Do some changes in the game to verify that the saved state is restored.
+      profile1Object.setX(101);
+      profile1Object.setY(201);
+      profile2Object.setX(301);
+      profile2Object.setY(401);
+      profile3Object.setX(501);
+      profile3Object.setY(601);
+      bothProfilesObject.setX(701);
+      bothProfilesObject.setY(801);
+
+      // Load the saved state with only the 'profile1' and 'profile3 profiles.
+      gdjs.saveState.restoreGameSaveState(runtimeGame1, saveState, {
+        profileNames: ['profile1', 'profile3'],
+        clearSceneStack: false,
+      });
+
+      // Verify only profile1 and profile3 objects are restored.
+      const restoredProfile1Objects =
+        runtimeScene1.getObjects('Profile1Object');
+      const restoredProfile2Objects =
+        runtimeScene1.getObjects('Profile2Object');
+      const restoredProfile3Objects =
+        runtimeScene1.getObjects('Profile3Object');
+      const restoredAllProfilesObjects =
+        runtimeScene1.getObjects('AllProfilesObject');
+
+      expect(restoredProfile1Objects.length).to.be(1);
+      expect(restoredProfile1Objects[0].getX()).to.be(100);
+      expect(restoredProfile1Objects[0].getY()).to.be(200);
+
+      expect(restoredAllProfilesObjects.length).to.be(1);
+      expect(restoredAllProfilesObjects[0].getX()).to.be(700);
+      expect(restoredAllProfilesObjects[0].getY()).to.be(800);
+
+      // Profile3 objects should be restored. There are none in the save state, so they
+      // are all removed.
+      expect(restoredProfile3Objects.length).to.be(0);
+
+      // Profile2 objects should be left alone.
+      expect(restoredProfile2Objects.length).to.be(1);
+      expect(restoredProfile2Objects[0].getX()).to.be(301);
+      expect(restoredProfile2Objects[0].getY()).to.be(401);
     });
   });
 });

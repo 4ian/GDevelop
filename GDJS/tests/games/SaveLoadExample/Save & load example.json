@@ -454,8 +454,8 @@
           "name": "Joystick",
           "persistentUuid": "855d809a-f954-4072-86d5-1d6f0b24a066",
           "width": 0,
-          "x": 176,
-          "y": 576,
+          "x": 131,
+          "y": 604,
           "zOrder": 2,
           "numberProperties": [],
           "stringProperties": [],
@@ -1181,7 +1181,14 @@
           "variant": "",
           "variables": [],
           "effects": [],
-          "behaviors": [],
+          "behaviors": [
+            {
+              "name": "SaveConfiguration",
+              "type": "SaveState::SaveConfiguration",
+              "defaultProfilePersistence": "DoNotSave",
+              "persistedInProfiles": ""
+            }
+          ],
           "content": {},
           "childrenContent": {
             "Border": {
@@ -2187,6 +2194,22 @@
         },
         {
           "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SaveState::ExcludeVariableFromSaveState"
+              },
+              "parameters": [
+                "",
+                "VariableExcludedFromSave",
+                "yes"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
               "type": {
@@ -2221,11 +2244,12 @@
             },
             {
               "type": {
-                "value": "SaveState::SaveGameSnapshotToStorage"
+                "value": "SaveState::CreateGameSaveStateInStorage"
               },
               "parameters": [
                 "",
-                "\"test\""
+                "\"test\"",
+                ""
               ]
             }
           ]
@@ -2255,10 +2279,66 @@
           "actions": [
             {
               "type": {
-                "value": "SaveState::LoadGameSnapshotFromStorage"
+                "value": "SaveState::RestoreGameSaveStateFromStorage"
               },
               "parameters": [
-                "\"test\""
+                "",
+                "\"test\"",
+                "",
+                "no"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyFromTextJustPressed"
+              },
+              "parameters": [
+                "",
+                "\"s\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SaveState::CreateGameSaveStateInStorage"
+              },
+              "parameters": [
+                "",
+                "\"manual-save\"",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyFromTextJustPressed"
+              },
+              "parameters": [
+                "",
+                "\"l\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SaveState::RestoreGameSaveStateFromStorage"
+              },
+              "parameters": [
+                "",
+                "\"manual-save\"",
+                "",
+                ""
               ]
             }
           ]
@@ -2300,6 +2380,7 @@
               },
               "parameters": [
                 ">=",
+                ">",
                 "0"
               ]
             }
@@ -2326,6 +2407,7 @@
                 "value": "SaveState::TimeSinceLastSave"
               },
               "parameters": [
+                "<",
                 "<",
                 "0"
               ]
@@ -2354,6 +2436,7 @@
               },
               "parameters": [
                 ">=",
+                ">",
                 "0"
               ]
             }
@@ -2380,6 +2463,7 @@
                 "value": "SaveState::TimeSinceLastLoad"
               },
               "parameters": [
+                "<",
                 "<",
                 "0"
               ]
@@ -2964,6 +3048,10 @@
         {
           "name": "Resizable",
           "type": "ResizableCapability::ResizableBehavior"
+        },
+        {
+          "name": "SaveConfiguration",
+          "type": "SaveState::SaveConfiguration"
         },
         {
           "name": "Scale",

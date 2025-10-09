@@ -134,7 +134,7 @@ namespace gdjs {
     loadFromScene(
       sceneAndExtensionsData: SceneAndExtensionsData | null,
       options?: {
-        skipInstancesCreationForProfiles?: string[];
+        excludedObjectNames?: Set<string>;
         skipStoppingSoundsOnStartup?: boolean;
       }
     ) {
@@ -196,18 +196,6 @@ namespace gdjs {
       }
 
       // Create initial instances of objects.
-      let excludedObjectNames: Set<string> | null = null;
-      if (options && options.skipInstancesCreationForProfiles) {
-        const allObjectData: ObjectData[] = [];
-        this._objects.values(allObjectData);
-        if (gdjs.saveState) {
-          excludedObjectNames = gdjs.saveState.getObjectNamesIncludedInProfiles(
-            allObjectData,
-            options.skipInstancesCreationForProfiles
-          );
-        }
-      }
-
       this.createObjectsFrom(
         sceneData.instances,
         0,
@@ -216,7 +204,7 @@ namespace gdjs {
         /*trackByPersistentUuid=*/
         true,
         {
-          excludedObjectNames,
+          excludedObjectNames: options?.excludedObjectNames,
         }
       );
 

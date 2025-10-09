@@ -103,7 +103,7 @@ describe('SaveState', () => {
       const object2Id = object2.id;
 
       // Save the game state.
-      const saveState = gdjs.saveState.getGameSaveState(runtimeGame1, {
+      const saveState = gdjs.saveState.createGameSaveState(runtimeGame1, {
         profileNames: ['default'],
       });
 
@@ -123,7 +123,7 @@ describe('SaveState', () => {
       await runtimeGame2._resourcesLoader.loadAllResources(() => {});
 
       // Load the saved state.
-      gdjs.saveState.loadGameFromSave(runtimeGame2, saveState, {
+      gdjs.saveState.restoreGameSaveState(runtimeGame2, saveState, {
         loadProfileNames: ['default'],
       });
 
@@ -169,7 +169,7 @@ describe('SaveState', () => {
       runtimeScene1.getVariables().add('MyVariable', sceneVariable);
 
       // Save the game state.
-      const saveState = gdjs.saveState.getGameSaveState(runtimeGame1, {
+      const saveState = gdjs.saveState.createGameSaveState(runtimeGame1, {
         profileNames: ['default'],
       });
 
@@ -180,7 +180,7 @@ describe('SaveState', () => {
       await runtimeGame2._resourcesLoader.loadAllResources(() => {});
 
       // Load the saved state.
-      gdjs.saveState.loadGameFromSave(runtimeGame2, saveState, {
+      gdjs.saveState.restoreGameSaveState(runtimeGame2, saveState, {
         loadProfileNames: ['default'],
       });
 
@@ -212,7 +212,7 @@ describe('SaveState', () => {
       runtimeGame1.getVariables().add('MyGlobalVariable', globalVariable);
 
       // Save the game state
-      const saveState = gdjs.saveState.getGameSaveState(runtimeGame1, {
+      const saveState = gdjs.saveState.createGameSaveState(runtimeGame1, {
         profileNames: ['default'],
       });
 
@@ -223,7 +223,7 @@ describe('SaveState', () => {
       await runtimeGame2._resourcesLoader.loadAllResources(() => {});
 
       // Load the saved state.
-      gdjs.saveState.loadGameFromSave(runtimeGame2, saveState, {
+      gdjs.saveState.restoreGameSaveState(runtimeGame2, saveState, {
         loadProfileNames: ['default'],
       });
 
@@ -316,7 +316,7 @@ describe('SaveState', () => {
       object4.setY(800);
 
       // Save the game state.
-      const saveState = gdjs.saveState.getGameSaveState(runtimeGame1, {
+      const saveState = gdjs.saveState.createGameSaveState(runtimeGame1, {
         profileNames: ['default'],
       });
 
@@ -327,7 +327,7 @@ describe('SaveState', () => {
       await runtimeGame2._resourcesLoader.loadAllResources(() => {});
 
       // Load the saved state.
-      gdjs.saveState.loadGameFromSave(runtimeGame2, saveState, {
+      gdjs.saveState.restoreGameSaveState(runtimeGame2, saveState, {
         loadProfileNames: ['default'],
       });
 
@@ -466,7 +466,7 @@ describe('SaveState', () => {
       object5.setY(1000);
 
       // Save the game state.
-      const saveState = gdjs.saveState.getGameSaveState(runtimeGame1, {
+      const saveState = gdjs.saveState.createGameSaveState(runtimeGame1, {
         profileNames: ['default'],
       });
 
@@ -493,6 +493,11 @@ describe('SaveState', () => {
       object4.setX(701);
       object4.setY(801);
 
+      // Remember IDs to verify if restored objects are the same objects already living.
+      const object2Id = object2.id;
+      const object3Id = object3.id;
+      const object5Id = object5.id;
+
       // Delete an instance (that was saved and should be restored).
       object5.deleteFromScene();
 
@@ -510,11 +515,13 @@ describe('SaveState', () => {
       object8.setX(1500);
       object8.setY(1600);
 
+      const object6Id = object6.id;
+
       // Render a frame to be sure the deleted object is removed.
       runtimeScene1.renderAndStep(1000 / 60);
 
       // Load the saved state on the same game.
-      gdjs.saveState.loadGameFromSave(runtimeGame1, saveState, {
+      gdjs.saveState.restoreGameSaveState(runtimeGame1, saveState, {
         loadProfileNames: ['default'],
         clearSceneStack: false,
       });
@@ -537,6 +544,16 @@ describe('SaveState', () => {
         { x: 900, y: 1000, name: 'SavedSpriteObject' },
         // "object6", which was created dynamically after the save, must have been removed.
       ]);
+
+      // Check that the "restored objects" are exactly the same objects already living,
+      // and that the restored object is a entirely new one.
+      expect(restoredSavedObjects[0].id).to.be(object2Id);
+      expect(restoredSavedObjects[1].id).to.be(object3Id);
+      expect(restoredSavedObjects[0]).to.be(object2);
+      expect(restoredSavedObjects[1]).to.be(object3);
+      // This one should be entirely new:
+      expect(restoredSavedObjects[2].id).not.to.be(object5Id);
+      expect(restoredSavedObjects[2].id).not.to.be(object6Id);
 
       const restoredNotSavedObjects = runtimeScene1.getObjects(
         'NotSavedSpriteObject'

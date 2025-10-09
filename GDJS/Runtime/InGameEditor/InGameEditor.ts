@@ -2012,6 +2012,11 @@ namespace gdjs {
       dummyThreeObject.rotation.copy(threeObject.rotation);
       dummyThreeObject.scale.copy(threeObject.scale);
       if (threeTransformControls.mode === 'rotate') {
+        // This is only done for the rotate mode because it messes with the
+        // orientation of the scale mode.
+        dummyThreeObject.rotation.y = -dummyThreeObject.rotation.y;
+        dummyThreeObject.rotation.z = -dummyThreeObject.rotation.z;
+
         dummyThreeObject.position.set(
           lastEditableSelectedObject.getCenterXInScene(),
           lastEditableSelectedObject.getCenterYInScene(),

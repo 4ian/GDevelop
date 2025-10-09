@@ -414,7 +414,12 @@ namespace gdjs {
         }
         object.setX(Math.round(initialPosition.x + movement.translationX));
         object.setY(Math.round(initialPosition.y + movement.translationY));
-        object.setAngle(Math.round(initialPosition.angle + movement.rotationZ));
+        object.setAngle(
+          gdjs.evtTools.common.mod(
+            Math.round(initialPosition.angle + movement.rotationZ),
+            360
+          )
+        );
         if (movement.scaleX !== 1) {
           object.setWidth(
             Math.round(initialPosition.width * Math.abs(movement.scaleX))
@@ -428,10 +433,16 @@ namespace gdjs {
         if (is3D(object)) {
           object.setZ(Math.round(initialPosition.z + movement.translationZ));
           object.setRotationX(
-            Math.round(initialPosition.rotationX + movement.rotationX)
+            gdjs.evtTools.common.mod(
+              Math.round(initialPosition.rotationX + movement.rotationX),
+              360
+            )
           );
           object.setRotationY(
-            Math.round(initialPosition.rotationY + movement.rotationY)
+            gdjs.evtTools.common.mod(
+              Math.round(initialPosition.rotationY + movement.rotationY),
+              360
+            )
           );
           if (movement.scaleZ !== 1) {
             object.setDepth(

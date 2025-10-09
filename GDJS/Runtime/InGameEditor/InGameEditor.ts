@@ -518,6 +518,7 @@ namespace gdjs {
       scaleZ: float;
     } | null = null;
     private _hasSelectionActuallyMoved = false;
+    private _isTransformControlsHovered = false;
     private _wasMovingSelectionLastFrame = false;
 
     private _selectionBox: THREE_ADDONS.SelectionBox | null = null;
@@ -537,6 +538,8 @@ namespace gdjs {
     private _wasMouseLeftButtonPressed = false;
     private _pressedOriginalCursorX: float = 0;
     private _pressedOriginalCursorY: float = 0;
+    private _previousCursorX: float = 0;
+    private _previousCursorY: float = 0;
 
     // Dragged new object:
     private _draggedNewObject: gdjs.RuntimeObject | null = null;
@@ -1534,6 +1537,10 @@ namespace gdjs {
       const editedInstanceContainer = this.getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
 
+      if (this._isTransformControlsHovered) {
+        return;
+      }
+
       const inputManager = this._runtimeGame.getInputManager();
 
       if (inputManager.wasKeyJustPressed(ESC_KEY)) {
@@ -1608,7 +1615,8 @@ namespace gdjs {
 
       // Remove boxes for deselected objects
       this._selectionBoxes.forEach(({ container, box }, object) => {
-        const isHovered = object === objectUnderCursor;
+        const isHovered =
+          object === objectUnderCursor && !this._isTransformControlsHovered;
         const isInSelection = selected3DObjects.includes(object);
         if (!isInSelection && !isHovered) {
           container.removeFromParent();
@@ -2903,6 +2911,16 @@ namespace gdjs {
         this._pressedOriginalCursorY = inputManager.getCursorY();
       }
 
+      if (!this._selectionControls) {
+        this._isTransformControlsHovered = false;
+      } else if (
+        this._previousCursorX !== inputManager.getMouseX() ||
+        this._previousCursorY !== inputManager.getMouseY()
+      ) {
+        this._isTransformControlsHovered =
+          !!this._selectionControls.threeTransformControls.axis;
+      }
+
       this._handleCameraMovement();
       this._handleSelectedObjectDragging();
       this._handleSelectionMovement();
@@ -2929,6 +2947,8 @@ namespace gdjs {
       }
       this._wasMouseLeftButtonPressed = inputManager.isMouseButtonPressed(0);
       this._wasMouseRightButtonPressed = inputManager.isMouseButtonPressed(1);
+      this._previousCursorX = inputManager.getMouseX();
+      this._previousCursorY = inputManager.getMouseY();
 
       if (this._currentScene) {
         this._currentScene._updateObjectsForInGameEditor();

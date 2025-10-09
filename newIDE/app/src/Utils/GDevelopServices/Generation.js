@@ -22,39 +22,43 @@ export type AiRequestFunctionCallOutput = {
   output: string,
 };
 
-export type AiRequestMessage =
-  | {
-      type: 'message',
-      status: 'completed',
-      role: 'assistant',
-      content: Array<
-        | {
-            type: 'reasoning',
-            status: 'completed',
-            summary: {
-              text: string,
-              type: 'summary_text',
-            },
-          }
-        | {
-            type: 'output_text',
-            status: 'completed',
-            text: string,
-            annotations: Array<{}>,
-          }
-        | AiRequestMessageAssistantFunctionCall
-      >,
-    }
-  | {
-      type: 'message',
-      status: 'completed',
-      role: 'user',
-      content: Array<{
-        type: 'user_request',
+export type AiRequestAssistantMessage = {
+  type: 'message',
+  status: 'completed',
+  role: 'assistant',
+  content: Array<
+    | {
+        type: 'reasoning',
+        status: 'completed',
+        summary: {
+          text: string,
+          type: 'summary_text',
+        },
+      }
+    | {
+        type: 'output_text',
         status: 'completed',
         text: string,
-      }>,
-    }
+        annotations: Array<{}>,
+      }
+    | AiRequestMessageAssistantFunctionCall
+  >,
+};
+
+export type AiRequestUserMessage = {
+  type: 'message',
+  status: 'completed',
+  role: 'user',
+  content: Array<{
+    type: 'user_request',
+    status: 'completed',
+    text: string,
+  }>,
+};
+
+export type AiRequestMessage =
+  | AiRequestAssistantMessage
+  | AiRequestUserMessage
   | AiRequestFunctionCallOutput;
 
 export type AiConfiguration = {

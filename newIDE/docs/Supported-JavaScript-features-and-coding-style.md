@@ -13,11 +13,11 @@ The code of the game engine and extensions are written in TypeScript in "ES6", n
 - `Class`es,
 - but with a _cautious adoption_ of any other new features.
 
-This is because neither Android 4.x nor Internet Explorer 11 are supported - but some old version of Chrome, Safari, Firefox and Edge are still used and may not support some newest features. Notably, avoid "Shorthand property names", avoid object spread, avoid array spread.
+This is because neither Android 4.x nor Internet Explorer 11 are supported - but some old versions of Chrome, Safari, Firefox and Edge are still used and may not support some newest features. Notably, avoid "Shorthand property names", avoid object spread, avoid array spread.
 
 ### Make simple, garbage free code
 
-Games in JavaScript are very sensitive to the **issue of garbage collection**: a code that would create too much garbage variables/functions will not perform well because the JS engine will have to do too much garbage collection and will cause frame drops.
+Games in JavaScript are very sensitive to the **issue of garbage collection**: code that creates too many garbage variables/functions will not perform well because the JS engine will have to do too much garbage collection and will cause frame drops.
 
 - Avoid any "clever" code that would create functions at runtime.
 - Ensure you **allocate memory** (creating objects, arrays etc...) only once at the beginning whenever possible.
@@ -30,7 +30,7 @@ The codebase is typed using **[TypeScript](https://www.typescriptlang.org/)**.
 
 It's good practice to type almost everything (i.e: avoid `any` as much as possible), so that the game engine and your extensions can have _documentation_ auto-generated, _auto-completion_ and _static type checking_ that will catch bugs and mistakes.
 
-Learn how to launch [manually the type checking in GJDS README](../../GDJS/README.md).
+Learn how to [manually launch the type checking in GDJS README](../../GDJS/README.md).
 
 ## For the editor (`newIDE/app`)
 
@@ -40,11 +40,11 @@ All source files should use the arrow function (`=>`), `class`, `let`/`const` an
 
 ### What about typing?
 
-The codebase is typed using **[Flow](https://flow.org/)**. It's a powerful typechecker that does not require any recompilation. It's very similar to TypeScript
+The codebase is typed using **[Flow](https://flow.org/)**. It's a powerful type checker that does not require any recompilation. It's very similar to TypeScript
 
 > The IDE is using Flow and not TypeScript for historical reasons. Apart from a few differences, it should not be difficult to get used to the Flow syntax.
 
-While properly typing can be seen as cumbersome, it's something that is rather quick to learn and force developers to think about what they are using. It's also an invaluable tool to do refactoring, and ensure that any addition/removal is not breaking anything. It also provides autocompletion (like in VSCode, with the Flow Language Support plugin).
+While proper typing can be seen as cumbersome, it's something that is rather quick to learn and forces developers to think about what they are using. It's also an invaluable tool for refactoring, and ensures that any addition/removal is not breaking anything. It also provides autocompletion (like in VSCode, with the Flow Language Support plugin).
 
 ## What about code formatting?
 

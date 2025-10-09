@@ -68,8 +68,8 @@ type Props = {|
   bundle: Bundle,
   simulateAppStoreProduct?: boolean,
   i18n: I18nType,
-  simpleCheckout?: boolean,
-  onPurchaseDone?: () => void,
+  fastCheckout?: boolean,
+  onCloseAfterPurchaseDone?: () => void,
 |};
 
 const BundlePageHeader = ({
@@ -77,8 +77,8 @@ const BundlePageHeader = ({
   bundleListingData,
   simulateAppStoreProduct,
   i18n,
-  simpleCheckout,
-  onPurchaseDone,
+  fastCheckout,
+  onCloseAfterPurchaseDone,
 }: Props) => {
   const { privateGameTemplateListingDatas } = React.useContext(
     PrivateGameTemplateStoreContext
@@ -298,7 +298,7 @@ const BundlePageHeader = ({
                       <ProductLimitedTimeOffer
                         visibleUntil={bundleListingData.visibleUntil}
                       />
-                    ) : estimatedSavingsFormatted ? (
+                    ) : estimatedTotalPriceFormatted ? (
                       <Column
                         noMargin
                         alignItems="flex-start"
@@ -310,9 +310,8 @@ const BundlePageHeader = ({
                         />
                         <Text color="secondary">
                           <Trans>
-                            Get{' '}
-                            {estimatedSavingsFormatted.savingsPriceFormatted}{' '}
-                            worth of value for less!
+                            Get {estimatedTotalPriceFormatted} worth of value
+                            for less!
                           </Trans>
                         </Text>
                       </Column>
@@ -507,8 +506,8 @@ const BundlePageHeader = ({
               bundleListingData={purchasingBundleListingData}
               usageType="default"
               onClose={() => setPurchasingBundleListingData(null)}
-              simpleCheckout={simpleCheckout}
-              onPurchaseDone={onPurchaseDone}
+              fastCheckout={fastCheckout}
+              onCloseAfterPurchaseDone={onCloseAfterPurchaseDone}
             />
           )}
           {isRedemptionCodesDialogOpen && (

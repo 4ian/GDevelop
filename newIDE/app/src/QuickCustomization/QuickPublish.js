@@ -278,28 +278,28 @@ export const QuickPublish = ({
                       primary
                       icon={<Google />}
                       label={<Trans>Google</Trans>}
-                      onClick={onOpenCreateAccountDialog}
+                      onClick={() => onOpenCreateAccountDialog()}
                       fullWidth
                     />
                     <RaisedButton
                       primary
                       icon={<GitHub />}
                       label={<Trans>Github</Trans>}
-                      onClick={onOpenCreateAccountDialog}
+                      onClick={() => onOpenCreateAccountDialog()}
                       fullWidth
                     />
                     <RaisedButton
                       primary
                       icon={<Apple />}
                       label={<Trans>Apple</Trans>}
-                      onClick={onOpenCreateAccountDialog}
+                      onClick={() => onOpenCreateAccountDialog()}
                       fullWidth
                     />
                   </ResponsiveLineStackLayout>
                   <FlatButton
                     primary
                     label={<Trans>Use your email</Trans>}
-                    onClick={onOpenCreateAccountDialog}
+                    onClick={() => onOpenCreateAccountDialog()}
                   />
                 </ColumnStackLayout>
               </div>

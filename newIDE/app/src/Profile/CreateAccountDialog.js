@@ -1,5 +1,5 @@
 // @flow
-import React from 'react';
+import * as React from 'react';
 import { Trans } from '@lingui/macro';
 
 import FlatButton from '../UI/FlatButton';
@@ -189,10 +189,18 @@ const CreateAccountDialog = ({
         justifyContent="center"
         alignItems="center"
       >
-        <GDevelopGLogo fontSize="large" />
-        <Text size="section-title" align="center" noMargin>
-          <Trans>Welcome to GDevelop!</Trans>
-        </Text>
+        {
+          <ColumnStackLayout
+            noMargin
+            justifyContent="center"
+            alignItems="center"
+          >
+            <GDevelopGLogo fontSize="large" />
+            <Text size="section-title" align="center" noMargin>
+              <Trans>Welcome to GDevelop!</Trans>
+            </Text>
+          </ColumnStackLayout>
+        }
         <div style={styles.formContainer}>
           <CreateAccountForm
             onCreateAccount={createAccount}

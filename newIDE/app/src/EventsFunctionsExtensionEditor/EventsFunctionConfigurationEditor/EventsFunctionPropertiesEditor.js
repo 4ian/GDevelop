@@ -557,7 +557,9 @@ export const EventsFunctionPropertiesEditor = ({
                       kind="info"
                       renderRightButton={() => (
                         <HelpButton
-                          helpPagePath={'/functions/asynchronous-functions'}
+                          helpPagePath={
+                            '/events/functions/asynchronous-functions'
+                          }
                         />
                       )}
                     >

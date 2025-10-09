@@ -341,9 +341,13 @@ export const getProductsIncludedInBundle = <
       ));
   if (!includedProductIds) return null;
 
-  return productListingDatas.filter(productListingData =>
-    includedProductIds.includes(productListingData.id)
-  );
+  return includedProductIds
+    .map(includedProductId =>
+      productListingDatas.find(
+        productListingData => productListingData.id === includedProductId
+      )
+    )
+    .filter(Boolean);
 };
 
 export const getProductsIncludedInBundleTiles = ({

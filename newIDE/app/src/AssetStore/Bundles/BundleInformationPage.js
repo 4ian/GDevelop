@@ -88,8 +88,8 @@ type Props = {|
   getCourseCompletion: (courseId: string) => CourseCompletion | null,
   noPadding?: boolean,
   noActions?: boolean,
-  simpleCheckout?: boolean,
-  onPurchaseDone?: () => void,
+  fastCheckout?: boolean,
+  onCloseAfterPurchaseDone?: () => void,
 |};
 
 const BundleInformationPage = ({
@@ -104,8 +104,8 @@ const BundleInformationPage = ({
   getCourseCompletion,
   noPadding,
   noActions,
-  simpleCheckout,
-  onPurchaseDone,
+  fastCheckout,
+  onCloseAfterPurchaseDone,
 }: Props) => {
   const { windowSize, isLandscape, isMobile } = useResponsiveWindowSize();
   const { bundleListingDatas } = React.useContext(BundleStoreContext); // If archived, should use the one passed.
@@ -317,8 +317,8 @@ const BundleInformationPage = ({
             bundleListingData={bundleListingData}
             bundle={bundle}
             i18n={i18n}
-            simpleCheckout={simpleCheckout}
-            onPurchaseDone={onPurchaseDone}
+            fastCheckout={fastCheckout}
+            onCloseAfterPurchaseDone={onCloseAfterPurchaseDone}
           />
           <Line noMargin>
             <Text size="section-title">

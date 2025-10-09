@@ -294,6 +294,25 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   obj.AddAction(
+         "RotateTowardObject",
+         _("Rotate toward another object"),
+         _("Rotate an object towards another object, with the specified speed. "
+           "Note that if multiple instances of the target object are picked, "
+           "only the first one will be used. Use a For Each event or actions "
+           "like \"Pick nearest object\", \"Pick a random object\" to refine "
+           "the choice of the target object."),
+         _("Rotate _PARAM0_ towards _PARAM1_ at speed _PARAM2_ deg/second"),
+         _("Angle"),
+         "res/actions/rotate24_black.png",
+         "res/actions/rotate_black.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectPtr", _("Target object"))
+      .AddParameter("expression", _("Angular speed (in degrees per second)"))
+      .SetParameterLongDescription(_("Enter 0 for an immediate rotation."))
+      .AddCodeOnlyParameter("currentScene", "")
+      .MarkAsAdvanced();
+
+  obj.AddAction(
          "AddForceXY",
          _("Add a force"),
          _("Add a force to an object. The object will move according to "
@@ -1617,7 +1636,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   extension
       .AddAction("AjoutObjConcern",
-                 _("Pick all instances"),
+                 _("Pick all object instances"),
                  _("Pick all instances of the specified object(s). When you "
                    "pick all instances, "
                    "the next conditions and actions of this event work on all "
@@ -1631,18 +1650,32 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddAction(
-          "AjoutHasard",
-          _("Pick a random object"),
-          _("Pick one object from all the specified objects. When an object "
-            "is picked, the next conditions and actions of this event work "
-            "only on that object."),
-          _("Pick a random _PARAM1_"),
-          _("Objects"),
-          "res/actions/ajouthasard24.png",
-          "res/actions/ajouthasard.png")
+      .AddAction("AjoutHasard",
+                 _("Pick a random object"),
+                 _("Pick one instance from all the specified objects. When an "
+                   "instance is picked, the next conditions and actions of "
+                   "this event work only on that object instance."),
+                 _("Pick a random _PARAM1_"),
+                 _("Objects"),
+                 "res/actions/ajouthasard24.png",
+                 "res/actions/ajouthasard.png")
       .AddCodeOnlyParameter("objectsContext", "")
       .AddParameter("objectList", _("Object"))
+      .MarkAsSimple();
+
+  extension
+      .AddAction(
+          "PickNearest",
+          _("Pick nearest object"),
+          _("Pick the instance of this object that is nearest to the specified "
+            "position."),
+          _("Pick the _PARAM0_ that is nearest to _PARAM1_;_PARAM2_"),
+          _("Objects"),
+          "res/conditions/distance24.png",
+          "res/conditions/distance.png")
+      .AddParameter("objectList", _("Object"))
+      .AddParameter("expression", _("X position"))
+      .AddParameter("expression", _("Y position"))
       .MarkAsSimple();
 
   extension
@@ -1694,11 +1727,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   extension
       .AddCondition(
           "AjoutObjConcern",
-          _("Pick all objects"),
-          _("Pick all the specified objects. When you pick all objects, "
+          _("Pick all object instances"),
+          _("Pick all instances of the specified object(s). When you "
+            "pick all instances, "
             "the next conditions and actions of this event work on all "
             "of them."),
-          _("Pick all _PARAM1_ objects"),
+          _("Pick all instances of _PARAM1_"),
           _("Objects"),
           "res/conditions/add24.png",
           "res/conditions/add.png")
@@ -1707,16 +1741,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddCondition(
-          "AjoutHasard",
-          _("Pick a random object"),
-          _("Pick one object from all the specified objects. When an object "
-            "is picked, the next conditions and actions of this event work "
-            "only on that object."),
-          _("Pick a random _PARAM1_"),
-          _("Objects"),
-          "res/conditions/ajouthasard24.png",
-          "res/conditions/ajouthasard.png")
+      .AddCondition("AjoutHasard",
+                    _("Pick a random object"),
+                    _("Pick one instance from all the specified objects. When "
+                      "an instance is picked, the next conditions and actions "
+                      "of this event work only on that object instance."),
+                    _("Pick a random _PARAM1_"),
+                    _("Objects"),
+                    "res/conditions/ajouthasard24.png",
+                    "res/conditions/ajouthasard.png")
       .AddCodeOnlyParameter("objectsContext", "")
       .AddParameter("objectList", _("Object"))
       .MarkAsSimple();
@@ -1725,9 +1758,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddCondition(
           "PickNearest",
           _("Pick nearest object"),
-          _("Pick the object of this type that is nearest to the specified "
-            "position. If the condition is inverted, the object farthest from "
-            "the specified position is picked instead."),
+          _("Pick the instance of this object that is nearest to the specified "
+            "position. If the condition is inverted, the instance farthest "
+            "from the specified position is picked instead."),
           _("Pick the _PARAM0_ that is nearest to _PARAM1_;_PARAM2_"),
           _("Objects"),
           "res/conditions/distance24.png",

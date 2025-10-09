@@ -698,7 +698,7 @@ namespace gdjs {
     }
 
     /**
-     * @return The internal object for a 3D rendering (PIXI.DisplayObject...)
+     * @return The internal object for a 3D rendering (THREE.Object3D...)
      */
     get3DRendererObject(): THREE.Object3D | null | undefined {
       return undefined;
@@ -842,6 +842,12 @@ namespace gdjs {
       return this.getY();
     }
 
+    /**
+     * Rotate the object towards another object position.
+     * @param x The target x position
+     * @param y The target y position
+     * @param speed The rotation speed. 0 for an immediate rotation to the target position.
+     */
     rotateTowardPosition(x: float, y: float, speed: float): void {
       this.rotateTowardAngle(
         gdjs.toDegrees(
@@ -855,8 +861,24 @@ namespace gdjs {
     }
 
     /**
-     * @param angle The targeted direction angle.
-     * @param speed The rotation speed.
+     * Rotate the object towards another object position (aiming at the center of the object).
+     * @param target The target object
+     * @param speed The rotation speed. 0 for an immediate rotation to the target object.
+     */
+    rotateTowardObject(target: gdjs.RuntimeObject | null, speed: float): void {
+      if (target === null) {
+        return;
+      }
+      this.rotateTowardPosition(
+        target.getDrawableX() + target.getCenterX(),
+        target.getDrawableY() + target.getCenterY(),
+        speed
+      );
+    }
+
+    /**
+     * @param angle The targeted angle.
+     * @param speed The rotation speed. 0 for an immediate rotation to the target angle.
      */
     rotateTowardAngle(angle: float, speed: float): void {
       if (speed === 0) {

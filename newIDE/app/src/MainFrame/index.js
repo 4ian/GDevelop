@@ -200,7 +200,7 @@ import {
   setEditorHotReloadNeeded,
   isEditorHotReloadNeeded,
 } from '../EmbeddedGame/EmbeddedGameFrame';
-import useOpenPageForRouting from './useOpenPageForRouting';
+import useHomePageSwitch from './useHomePageSwitch';
 import RobotIcon from '../ProjectCreation/RobotIcon';
 import PublicProfileContext from '../Profile/PublicProfileContext';
 import { useGamesPlatformFrame } from './EditorContainers/HomePage/PlaySection/UseGamesPlatformFrame';
@@ -2388,9 +2388,8 @@ const MainFrame = (props: Props) => {
     [setStandaloneDialogOpen]
   );
 
-  const { navigateToRoute } = useOpenPageForRouting({
+  const { navigateToRoute } = useHomePageSwitch({
     openHomePage,
-    openStandaloneDialog,
     closeDialogs: closeDialogsToOpenHomePage,
   });
 
@@ -3792,6 +3791,7 @@ const MainFrame = (props: Props) => {
     openInAppTutorialDialog: selectInAppTutorial,
     openProfileDialog: onOpenProfileDialog,
     openAskAi,
+    openStandaloneDialog,
   });
 
   const onChangeProjectName = async (newName: string): Promise<void> => {

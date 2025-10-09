@@ -53,6 +53,8 @@ namespace gdjs {
 
     readonly spineResourceName: string;
 
+    static isHitBoxesUpdateDisabled = false;
+
     /**
      * @param instanceContainer The container the object belongs to.
      * @param objectData The object data used to initialize the object
@@ -73,6 +75,10 @@ namespace gdjs {
       );
       this.setAnimationIndex(0);
       this._renderer.updateAnimation(0);
+
+      if (SpineRuntimeObject.isHitBoxesUpdateDisabled) {
+        this.hitBoxes.length = 0;
+      }
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -186,6 +192,14 @@ namespace gdjs {
       ) {
         this.setAnimationElapsedTime(syncData.anet);
       }
+    }
+
+    updateHitBoxes(): void {
+      if (SpineRuntimeObject.isHitBoxesUpdateDisabled) {
+        return;
+      }
+
+      super.updateHitBoxes();
     }
 
     extraInitializationFromInitialInstance(

@@ -22,6 +22,9 @@ export type InstancesEditorSettings = {|
 
   /** Is the window mask shown? */
   windowMask: boolean,
+
+  /** The name of the layer selected to place instances on. */
+  selectedLayer: string,
 |};
 
 export const getRecommendedInitialZoomFactor = (
@@ -58,6 +61,7 @@ export const prepareInstancesEditorSettings = (
       0.01
     ),
     windowMask: object.windowMask || false,
+    selectedLayer: object.selectedLayer || '',
   };
 };
 

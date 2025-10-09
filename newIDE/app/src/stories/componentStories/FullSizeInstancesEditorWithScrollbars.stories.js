@@ -26,6 +26,7 @@ const instancesEditorSettings: InstancesEditorSettings = {
   snap: false,
   zoomFactor: 1,
   windowMask: false,
+  selectedLayer: '',
 };
 
 export default {

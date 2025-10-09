@@ -299,6 +299,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     super(props);
 
     this.instancesSelection = new InstancesSelection();
+
+    const initialInstancesEditorSettings = props.getInitialInstancesEditorSettings();
+
     this.state = {
       setupGridOpen: false,
       scenePropertiesDialogOpen: false,
@@ -317,7 +320,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       extractAsExternalLayoutDialogOpen: false,
       extractAsCustomObjectDialogOpen: false,
 
-      instancesEditorSettings: props.getInitialInstancesEditorSettings(),
+      instancesEditorSettings: initialInstancesEditorSettings,
       history: getHistoryInitialState(props.initialInstances, {
         historyMaxSize: 50,
       }),
@@ -333,7 +336,8 @@ export default class SceneEditor extends React.Component<Props, State> {
       tileMapTileSelection: null,
 
       selectedObjectFolderOrObjectsWithContext: [],
-      selectedLayer: BASE_LAYER_NAME,
+      selectedLayer:
+        initialInstancesEditorSettings.selectedLayer || BASE_LAYER_NAME,
       invisibleLayerOnWhichInstancesHaveJustBeenAdded: null,
 
       lastSelectionType: 'instance',
@@ -1508,7 +1512,13 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onSelectLayer = (layerName: string) => {
-    this.setState({ selectedLayer: layerName });
+    this.setState({
+      selectedLayer: layerName,
+      instancesEditorSettings: {
+        ...this.state.instancesEditorSettings,
+        selectedLayer: layerName,
+      },
+    });
 
     const { previewDebuggerServer } = this.props;
     if (previewDebuggerServer) {

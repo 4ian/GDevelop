@@ -959,14 +959,7 @@ namespace gdjs {
      * @deprecated
      */
     turnTowardObject(obj: gdjs.RuntimeObject | null) {
-      if (obj === null) {
-        return;
-      }
-      this.rotateTowardPosition(
-        obj.getDrawableX() + obj.getCenterX(),
-        obj.getDrawableY() + obj.getCenterY(),
-        0
-      );
+      return this.rotateTowardObject(obj, 0);
     }
   }
   gdjs.registerObject(

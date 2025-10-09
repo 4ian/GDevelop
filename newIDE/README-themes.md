@@ -16,9 +16,9 @@ the `build-theme-resources` script in the scripts folder. There is also an npm s
 
 ## Creating new themes
 
-Themes are stored in [this Theme Folder](./app/src/UI/Theme). Each theme has its own subfolder containing  
+Themes are stored in [this Theme Folder](./app/src/UI/Theme). Each theme has its own subfolder containing:
 
-- A javascript file (`index.js`) to generate the object describing the theme that is used by the editor (class names, values to apply to Material-UI) and that also imports the css file.
+- A JavaScript file (`index.js`) to generate the object describing the theme that is used by the editor (class names, values to apply to Material-UI) and that also imports the CSS file.
 - The `theme.json` file which stores the theme details (colors, widths, etc.)
 
 To create the necessary files, run the following command:

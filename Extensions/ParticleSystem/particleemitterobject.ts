@@ -174,6 +174,10 @@ namespace gdjs {
         this,
         particleObjectData
       );
+      if (instanceContainer.getGame().isInGameEdition()) {
+        // TODO Disable the particles rendering
+        this._renderer.setHelperVisible(true);
+      }
       this.angleA = particleObjectData.emitterAngleA;
       this.angleB = particleObjectData.emitterAngleB;
       this.forceMin = particleObjectData.emitterForceMin;
@@ -800,6 +804,14 @@ namespace gdjs {
         this.gravityX *= length / oldLength;
         this.gravityY *= length / oldLength;
       }
+    }
+
+    getParticleColorStart(): number {
+      return this.color1;
+    }
+
+    getParticleColorEnd(): number {
+      return this.color2;
     }
 
     getParticleRed1(): number {

@@ -442,7 +442,7 @@ const createOrReplaceObject: EditorFunction = {
         </Trans>
       ) : duplicatedObjectName ? (
         <Trans>
-          Duplicate object <b>{duplicatedObjectName}</b> as <b>{object_name}</b>
+          Duplicate object <b>{duplicatedObjectName}</b> as <b>{object_name}</b>{' '}
           in scene{' '}
           <Link
             href="#"
@@ -709,7 +709,7 @@ const createOrReplaceObject: EditorFunction = {
       newObject.setName(object_name); // Unserialization has overwritten the name.
 
       return makeGenericSuccess(
-        `Duplicated object "${duplicatedObjectName}" as "${newObject.getName()}".`
+        `Duplicated object "${duplicatedObjectName}" as "${newObject.getName()}". The new object "${newObject.getName()}" has the same type, behaviors, properties and effects as the one it was duplicated from.`
       );
     };
 

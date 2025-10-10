@@ -105,7 +105,11 @@ const createField = (
     // Choice is a "string" (with a selector for the user in the UI)
     const choices = mapVector(property.getChoices(), choice => ({
       value: choice.getValue(),
-      label: choice.getLabel(),
+      label:
+        choice.getValue() +
+        (choice.getLabel() && choice.getLabel() !== choice.getValue()
+          ? ` — ${choice.getLabel()}`
+          : ''),
     }));
 
     // TODO Remove this once we made sure no built-in extension still use `addExtraInfo` instead of `addChoice`.

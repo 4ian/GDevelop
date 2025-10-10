@@ -124,7 +124,12 @@ export const enumerateEffectsMetadata = (
               } else if (valueType === 'choice') {
                 const choices = mapVector(property.getChoices(), choice => ({
                   value: choice.getValue(),
-                  label: choice.getLabel(),
+                  label:
+                    choice.getValue() +
+                    (choice.getLabel() &&
+                    choice.getLabel() !== choice.getValue()
+                      ? ` — ${choice.getLabel()}`
+                      : ''),
                 }));
                 const deprecatedChoices = property
                   .getExtraInfo()

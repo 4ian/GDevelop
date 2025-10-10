@@ -887,7 +887,12 @@ export default function EventsBasedObjectPropertiesEditor({
                                               <SelectOption
                                                 key={index}
                                                 value={choice.value}
-                                                label={choice.label}
+                                                label={
+                                                  choice.value +
+                                                  (choice.label
+                                                    ? ` — ${choice.label}`
+                                                    : '')
+                                                }
                                               />
                                             )
                                           )}

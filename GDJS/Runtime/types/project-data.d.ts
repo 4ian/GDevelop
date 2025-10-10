@@ -45,6 +45,7 @@ declare type GetNetworkSyncDataOptions = {
   syncObjectIdentifiers?: boolean;
   shouldExcludeVariableFromData?: (variable: Variable) => boolean;
   syncAllBehaviors?: boolean;
+  syncGameVariables?: boolean;
   syncSceneTimers?: boolean;
   syncOnceTriggers?: boolean;
   syncSounds?: boolean;

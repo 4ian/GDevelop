@@ -860,6 +860,102 @@
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Coins",
+          "persistentUuid": "749601b7-c699-47a6-81b8-d19b7cd5bca9",
+          "width": 0,
+          "x": 704,
+          "y": 403,
+          "zOrder": 40,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Coins",
+          "persistentUuid": "502f29fe-fca1-4625-b194-49a701bda9cd",
+          "width": 0,
+          "x": 723,
+          "y": 323,
+          "zOrder": 41,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Coins",
+          "persistentUuid": "65d4f46c-339a-4a2b-9870-799566c2456b",
+          "width": 0,
+          "x": 846,
+          "y": 205,
+          "zOrder": 42,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Coins",
+          "persistentUuid": "3e848abb-3ab3-48ce-9176-23cd9be84fde",
+          "width": 0,
+          "x": 1094,
+          "y": 185,
+          "zOrder": 43,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Coins",
+          "persistentUuid": "47351cf9-0485-4388-958c-94024dd13e9f",
+          "width": 0,
+          "x": 1219,
+          "y": 263,
+          "zOrder": 44,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Coins",
+          "persistentUuid": "8b305063-3f81-4ef4-accc-1f36ad1bed2d",
+          "width": 0,
+          "x": 1228,
+          "y": 362,
+          "zOrder": 45,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
         }
       ],
       "objects": [
@@ -1023,7 +1119,14 @@
           "updateIfNotVisible": false,
           "variables": [],
           "effects": [],
-          "behaviors": [],
+          "behaviors": [
+            {
+              "name": "SaveConfiguration",
+              "type": "SaveState::SaveConfiguration",
+              "defaultProfilePersistence": "Persisted",
+              "persistedInProfiles": "coins"
+            }
+          ],
           "animations": [
             {
               "name": "",
@@ -2198,12 +2301,13 @@
           "actions": [
             {
               "type": {
-                "value": "SaveState::ExcludeVariableFromSaveState"
+                "value": "SaveState::SetVariableSaveConfiguration"
               },
               "parameters": [
                 "",
                 "VariableExcludedFromSave",
-                "yes"
+                "no",
+                ""
               ]
             }
           ]
@@ -2291,6 +2395,18 @@
           ]
         },
         {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Press s to save and l to load manually. Check how the \"VariableExcludedFromSave\" won't be impacted."
+        },
+        {
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
@@ -2338,6 +2454,71 @@
                 "",
                 "\"manual-save\"",
                 "",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Press c to just save the coins and press x to load only the coins. Check how the rest won't be impacted."
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyFromTextJustPressed"
+              },
+              "parameters": [
+                "",
+                "\"c\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SaveState::CreateGameSaveStateInStorage"
+              },
+              "parameters": [
+                "",
+                "\"coins-save\"",
+                "\"coins\""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyFromTextJustPressed"
+              },
+              "parameters": [
+                "",
+                "\"x\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SaveState::RestoreGameSaveStateFromStorage"
+              },
+              "parameters": [
+                "",
+                "\"coins-save\"",
+                "\"coins\"",
                 ""
               ]
             }

@@ -1,6 +1,6 @@
 // @ts-check
 
-describe('SaveState', () => {
+describe.only('SaveState', () => {
   /**
    * @param {{name: string, x: number, y: number}} content
    * @returns {InstanceData}
@@ -125,6 +125,7 @@ describe('SaveState', () => {
       // Load the saved state.
       gdjs.saveState.restoreGameSaveState(runtimeGame2, saveState, {
         profileNames: ['default'],
+        clearSceneStack: false,
       });
 
       const runtimeScene2 = runtimeGame2.getSceneStack().getCurrentScene();
@@ -182,6 +183,7 @@ describe('SaveState', () => {
       // Load the saved state.
       gdjs.saveState.restoreGameSaveState(runtimeGame2, saveState, {
         profileNames: ['default'],
+        clearSceneStack: false,
       });
 
       const runtimeScene2 = runtimeGame2.getSceneStack().getCurrentScene();
@@ -225,6 +227,7 @@ describe('SaveState', () => {
       // Load the saved state.
       gdjs.saveState.restoreGameSaveState(runtimeGame2, saveState, {
         profileNames: ['default'],
+        clearSceneStack: false,
       });
 
       const runtimeScene2 = runtimeGame2.getSceneStack().getCurrentScene();
@@ -329,6 +332,7 @@ describe('SaveState', () => {
       // Load the saved state.
       gdjs.saveState.restoreGameSaveState(runtimeGame2, saveState, {
         profileNames: ['default'],
+        clearSceneStack: false,
       });
 
       const runtimeScene2 = runtimeGame2.getSceneStack().getCurrentScene();
@@ -443,10 +447,11 @@ describe('SaveState', () => {
       variable3.setNumber(42);
       runtimeScene1.getVariables().add('Variable3', variable3);
 
-      gdjs.saveState.excludeVariableFromSaveState(
+      gdjs.saveState.setVariableSaveConfiguration(
         runtimeScene1,
         variable3,
-        true
+        false,
+        ''
       );
 
       // Create some objects in addition to initial objects at specific positions.
@@ -847,5 +852,373 @@ describe('SaveState', () => {
       expect(restoredProfile2Objects[0].getX()).to.be(301);
       expect(restoredProfile2Objects[0].getY()).to.be(401);
     });
+
+    it('saves a running game (only game/scene data in the specified profiles)', async () => {
+      // Start a game with objects configured for different profiles.
+      const scene1Data = getFakeSceneData({
+        name: 'Scene1',
+      });
+      const scene2Data = getFakeSceneData({
+        name: 'Scene2',
+      });
+
+      const runtimeGame1 = gdjs.getPixiRuntimeGame({
+        layouts: [scene1Data, scene2Data],
+      });
+      await runtimeGame1._resourcesLoader.loadAllResources(() => {});
+
+      const runtimeScene1 = runtimeGame1.getSceneStack().push({
+        sceneName: 'Scene1',
+      });
+      if (!runtimeScene1) throw new Error('No current scene was created.');
+
+      const scene1Variable1 = new gdjs.Variable();
+      scene1Variable1.setString('Scene1Variable1TestValue');
+      runtimeScene1.getVariables().add('Scene1Variable1', scene1Variable1);
+      const scene1Variable2 = new gdjs.Variable();
+      scene1Variable2.setString('Scene1Variable2TestValue');
+      runtimeScene1.getVariables().add('Scene1Variable2', scene1Variable2);
+      gdjs.saveState.setVariableSaveConfiguration(
+        runtimeScene1,
+        scene1Variable2,
+        false,
+        'profile1'
+      );
+
+      const runtimeScene2 = runtimeGame1.getSceneStack().push({
+        sceneName: 'Scene2',
+      });
+      if (!runtimeScene2) throw new Error('No current scene was created.');
+
+      const scene2Variable1 = new gdjs.Variable();
+      scene2Variable1.setString('Scene2Variable1TestValue');
+      runtimeScene2.getVariables().add('Scene2Variable1', scene2Variable1);
+
+      gdjs.saveState.setSceneDataSaveConfiguration(
+        runtimeScene1,
+        'Scene1',
+        true,
+        'profile1'
+      );
+      gdjs.saveState.setSceneDataSaveConfiguration(
+        runtimeScene2,
+        'Scene2',
+        false,
+        'profile2'
+      );
+      gdjs.saveState.setGameDataSaveConfiguration(
+        runtimeScene1,
+        false,
+        'game-only'
+      );
+
+      // Save the game state with the different profiles.
+      const saveStateProfile1 = gdjs.saveState.createGameSaveState(
+        runtimeGame1,
+        {
+          profileNames: ['profile1'],
+        }
+      );
+      const saveStateProfile2 = gdjs.saveState.createGameSaveState(
+        runtimeGame1,
+        {
+          profileNames: ['profile2'],
+        }
+      );
+      const saveStateGameOnly = gdjs.saveState.createGameSaveState(
+        runtimeGame1,
+        {
+          profileNames: ['game-only'],
+        }
+      );
+
+      // First save state "profile1" should save the first scene data, notably variables:
+      const gameNetworkSyncData1 = saveStateProfile1.gameNetworkSyncData || {};
+      expect(gameNetworkSyncData1.var).to.be(undefined);
+      expect(gameNetworkSyncData1.extVar).to.be(undefined);
+      expect((gameNetworkSyncData1.ss || []).map(({ name }) => name)).to.eql([
+        'Scene1',
+        'Scene2',
+      ]);
+      expect(saveStateProfile1.layoutNetworkSyncDatas[0].sceneData.var).to.eql([
+        {
+          name: 'Scene1Variable2',
+          value: 'Scene1Variable2TestValue',
+          type: 'string',
+          children: undefined,
+          owner: 0,
+        },
+      ]);
+      expect(saveStateProfile1.layoutNetworkSyncDatas[1].sceneData.var).to.be(
+        undefined
+      );
+
+      // Second save state "profile2" should save the second scene data only:
+      const gameNetworkSyncData2 = saveStateProfile2.gameNetworkSyncData || {};
+      expect(gameNetworkSyncData2.var).to.be(undefined);
+      expect(gameNetworkSyncData2.extVar).to.be(undefined);
+      expect((gameNetworkSyncData2.ss || []).map(({ name }) => name)).to.eql([
+        'Scene1',
+        'Scene2',
+      ]);
+      expect(saveStateProfile2.layoutNetworkSyncDatas[0].sceneData.var).to.be(
+        undefined
+      );
+      expect(
+        saveStateProfile2.layoutNetworkSyncDatas[1].sceneData.var
+      ).not.to.be(undefined);
+
+      // Third save state "game-only" should save the game data only:
+      const gameNetworkSyncData3 = saveStateGameOnly.gameNetworkSyncData || {};
+      expect(gameNetworkSyncData3.var).not.to.be(undefined);
+      expect(gameNetworkSyncData3.extVar).not.to.be(undefined);
+      expect((gameNetworkSyncData3.ss || []).map(({ name }) => name)).to.eql([
+        'Scene1',
+        'Scene2',
+      ]);
+    });
+  });
+
+  it('loads a running game (only game/scene data in the specified profiles)', async () => {
+    // Start a game with objects configured for different profiles.
+    const scene1Data = getFakeSceneData({
+      name: 'Scene1',
+    });
+    const scene2Data = getFakeSceneData({
+      name: 'Scene2',
+    });
+
+    const runtimeGame1 = gdjs.getPixiRuntimeGame({
+      layouts: [scene1Data, scene2Data],
+    });
+    await runtimeGame1._resourcesLoader.loadAllResources(() => {});
+
+    const runtimeScene1 = runtimeGame1.getSceneStack().push({
+      sceneName: 'Scene1',
+    });
+    if (!runtimeScene1) throw new Error('No current scene was created.');
+
+    const scene1Variable1 = new gdjs.Variable();
+    scene1Variable1.setString('Scene1Variable1TestValue');
+    runtimeScene1.getVariables().add('Scene1Variable1', scene1Variable1);
+    const scene1Variable2 = new gdjs.Variable();
+    scene1Variable2.setString('Scene1Variable2TestValue');
+    runtimeScene1.getVariables().add('Scene1Variable2', scene1Variable2);
+    gdjs.saveState.setVariableSaveConfiguration(
+      runtimeScene1,
+      scene1Variable2,
+      false,
+      'profile1'
+    );
+
+    const runtimeScene2 = runtimeGame1.getSceneStack().push({
+      sceneName: 'Scene2',
+    });
+    if (!runtimeScene2) throw new Error('No current scene was created.');
+
+    const scene2Variable1 = new gdjs.Variable();
+    scene2Variable1.setString('Scene2Variable1TestValue');
+    runtimeScene2.getVariables().add('Scene2Variable1', scene2Variable1);
+    gdjs.saveState.setVariableSaveConfiguration(
+      runtimeScene2,
+      scene2Variable1,
+      false,
+      'profile2'
+    );
+
+    // Modify the global volume so that it's different from the one saved in the save state:
+    runtimeGame1.getSoundManager().setGlobalVolume(33);
+
+    // Set what belongs to each profile:
+    gdjs.saveState.setSceneDataSaveConfiguration(
+      runtimeScene1,
+      'Scene1',
+      true,
+      'profile1'
+    );
+    gdjs.saveState.setSceneDataSaveConfiguration(
+      runtimeScene2,
+      'Scene2',
+      false,
+      'profile2'
+    );
+    gdjs.saveState.setGameDataSaveConfiguration(
+      runtimeScene1,
+      false,
+      'game-only'
+    );
+
+    /** @type {GameSaveState} */
+    const completeSaveState = {
+      gameNetworkSyncData: {
+        ss: [
+          {
+            name: 'Scene1',
+            networkId: 'b68fda7c',
+          },
+          {
+            name: 'Scene2',
+            networkId: '406dafce',
+          },
+        ],
+        sm: {
+          globalVolume: 75,
+          cachedSpatialPosition: {},
+          freeMusics: [],
+          freeSounds: [],
+          musics: {},
+          sounds: {},
+        },
+      },
+      layoutNetworkSyncDatas: [
+        {
+          sceneData: {
+            var: [
+              {
+                name: 'Scene1Variable2',
+                value: 'some-loaded-value',
+                type: 'string',
+                owner: 0,
+              },
+            ],
+            extVar: {},
+            id: 'b68fda7c',
+            color: 0,
+            layers: {
+              '': {
+                timeScale: 1,
+                defaultZOrder: 0,
+                hidden: false,
+                effects: {},
+                followBaseLayerCamera: true,
+                clearColor: [0, 0, 0, 1],
+                cameraX: 400,
+                cameraY: 300,
+                cameraZ: 0,
+                cameraRotation: 0,
+                cameraZoom: 1,
+              },
+            },
+            time: {
+              elapsedTime: 0,
+              timeScale: 1,
+              timeFromStart: 0,
+              firstFrame: true,
+              timers: {
+                items: {},
+              },
+              firstUpdateDone: false,
+            },
+            once: {
+              onceTriggers: {},
+              lastFrameOnceTriggers: {},
+            },
+            tween: {
+              tweens: {},
+            },
+            async: {
+              tasks: [],
+            },
+          },
+          objectDatas: {},
+        },
+        {
+          sceneData: {
+            var: [
+              {
+                name: 'Scene2Variable1',
+                value: 'some-other-loaded-value',
+                type: 'string',
+                owner: 0,
+              },
+            ],
+            extVar: {},
+            id: '406dafce',
+            color: 0,
+            layers: {
+              '': {
+                timeScale: 1,
+                defaultZOrder: 0,
+                hidden: false,
+                effects: {},
+                followBaseLayerCamera: true,
+                clearColor: [0, 0, 0, 1],
+                cameraX: 400,
+                cameraY: 300,
+                cameraZ: 0,
+                cameraRotation: 0,
+                cameraZoom: 1,
+              },
+            },
+            time: {
+              elapsedTime: 0,
+              timeScale: 1,
+              timeFromStart: 0,
+              firstFrame: true,
+              timers: {
+                items: {},
+              },
+              firstUpdateDone: false,
+            },
+            once: {
+              onceTriggers: {},
+              lastFrameOnceTriggers: {},
+            },
+            tween: {
+              tweens: {},
+            },
+            async: {
+              tasks: [],
+            },
+          },
+          objectDatas: {},
+        },
+      ],
+    };
+
+    // Restore only the profile1 data:
+    gdjs.saveState.restoreGameSaveState(runtimeGame1, completeSaveState, {
+      profileNames: ['profile1'],
+      clearSceneStack: false,
+    });
+
+    // Check scene 1 data was restored:
+    expect(
+      runtimeScene1.getVariables().get('Scene1Variable1').getAsString()
+    ).to.be(
+      'Scene1Variable1TestValue' // Unchanged (not part of the profile)
+    );
+    expect(
+      runtimeScene1.getVariables().get('Scene1Variable2').getAsString()
+    ).to.be(
+      'some-loaded-value' // Updated (part of the profile)
+    );
+    // Scene 2 data was not restored, nor the game data:
+    expect(
+      runtimeScene2.getVariables().get('Scene2Variable1').getAsString()
+    ).to.be('Scene2Variable1TestValue');
+    expect(runtimeGame1.getSoundManager().getGlobalVolume()).to.be(33);
+
+    // Now, restore the profile2 data:
+    gdjs.saveState.restoreGameSaveState(runtimeGame1, completeSaveState, {
+      profileNames: ['profile2'],
+      clearSceneStack: false,
+    });
+
+    // Scene 2 data was restored:
+    expect(
+      runtimeScene2.getVariables().get('Scene2Variable1').getAsString()
+    ).to.be('some-other-loaded-value');
+    // But not the game data:
+    expect(runtimeGame1.getSoundManager().getGlobalVolume()).to.be(33);
+
+    // Finally, restore the "game-only" data:
+    gdjs.saveState.restoreGameSaveState(runtimeGame1, completeSaveState, {
+      profileNames: ['game-only'],
+      clearSceneStack: false,
+    });
+
+    // Game data was restored:
+    expect(runtimeGame1.getSoundManager().getGlobalVolume()).to.be(75);
   });
 });

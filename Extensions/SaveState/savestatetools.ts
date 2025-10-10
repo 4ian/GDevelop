@@ -6,6 +6,11 @@ namespace gdjs {
     'Save State - Debug'
   );
 
+  type ArbitrarySaveConfiguration = {
+    defaultProfilePersistence: 'Persisted' | 'DoNotSave';
+    persistedInProfiles: Set<string>;
+  };
+
   export type RestoreRequestOptions = {
     profileNames: string[];
     clearSceneStack: boolean;
@@ -26,39 +31,104 @@ namespace gdjs {
       return `save-${key}`;
     };
 
-    const excludedVariables: WeakSet<Variable> = new WeakSet();
+    const variablesSaveConfiguration: WeakMap<
+      Variable,
+      ArbitrarySaveConfiguration
+    > = new WeakMap();
+    const runtimeSceneDataSaveConfiguration: WeakMap<
+      RuntimeGame,
+      Record<string, ArbitrarySaveConfiguration>
+    > = new WeakMap();
+    const runtimeGameDataSaveConfiguration: WeakMap<
+      RuntimeGame,
+      ArbitrarySaveConfiguration
+    > = new WeakMap();
 
-    export const excludeVariableFromSaveState = (
+    export const setVariableSaveConfiguration = (
       _: gdjs.RuntimeScene,
       variable: gdjs.Variable,
-      exclude: boolean
+      persistInDefaultProfile: boolean,
+      persistedInProfilesAsString: string
     ) => {
-      if (exclude) {
-        excludedVariables.add(variable);
-      } else {
-        excludedVariables.delete(variable);
+      variablesSaveConfiguration.set(variable, {
+        defaultProfilePersistence: persistInDefaultProfile
+          ? 'Persisted'
+          : 'DoNotSave',
+        persistedInProfiles: new Set(
+          parseCommaSeparatedProfileNames(persistedInProfilesAsString)
+        ),
+      });
+    };
+
+    export const setSceneDataSaveConfiguration = (
+      runtimeScene: gdjs.RuntimeScene,
+      sceneName: string,
+      persistInDefaultProfile: boolean,
+      persistedInProfilesAsString: string
+    ) => {
+      const runtimeSceneDataSaveConfigurations =
+        runtimeSceneDataSaveConfiguration.get(runtimeScene.getGame()) || {};
+
+      runtimeSceneDataSaveConfiguration.set(runtimeScene.getGame(), {
+        ...runtimeSceneDataSaveConfigurations,
+        [sceneName]: {
+          defaultProfilePersistence: persistInDefaultProfile
+            ? 'Persisted'
+            : 'DoNotSave',
+          persistedInProfiles: new Set(
+            parseCommaSeparatedProfileNames(persistedInProfilesAsString)
+          ),
+        },
+      });
+    };
+
+    export const setGameDataSaveConfiguration = (
+      runtimeScene: gdjs.RuntimeScene,
+      persistInDefaultProfile: boolean,
+      persistedInProfilesAsString: string
+    ) => {
+      runtimeGameDataSaveConfiguration.set(runtimeScene.getGame(), {
+        defaultProfilePersistence: persistInDefaultProfile
+          ? 'Persisted'
+          : 'DoNotSave',
+        persistedInProfiles: new Set(
+          parseCommaSeparatedProfileNames(persistedInProfilesAsString)
+        ),
+      });
+    };
+
+    const checkIfIsPersistedInProfiles = (
+      profileNames: string[],
+      configuration: ArbitrarySaveConfiguration | null | undefined
+    ) => {
+      if (profileNames.includes('default')) {
+        if (
+          !configuration ||
+          configuration.defaultProfilePersistence === 'Persisted'
+        ) {
+          return true;
+        }
       }
+
+      if (configuration) {
+        for (const profileName of profileNames) {
+          if (configuration.persistedInProfiles.has(profileName)) {
+            return true;
+          }
+        }
+      }
+
+      return false;
     };
 
-    export const isVariableExcludedFromSaveState = (
-      variable: gdjs.Variable
-    ) => {
-      return excludedVariables.has(variable);
-    };
-
-    const getNetworkSyncOptions: GetNetworkSyncDataOptions = {
-      syncObjectIdentifiers: true,
-      shouldExcludeVariableFromData: isVariableExcludedFromSaveState,
-      syncAllBehaviors: true,
-      syncSceneTimers: true,
-      syncOnceTriggers: true,
-      syncSounds: true,
-      syncTweens: true,
-      syncLayers: true,
-      syncAsyncTasks: true,
-      syncSceneVisualProps: true,
-      syncFullTileMaps: true,
-    };
+    const makeIsVariableExcludedFromSaveState =
+      (profileNames: string[]) => (variable: gdjs.Variable) => {
+        const saveConfiguration = variablesSaveConfiguration.get(variable);
+        return !checkIfIsPersistedInProfiles(
+          profileNames,
+          saveConfiguration || null
+        );
+      };
 
     let lastSaveTime: number | null = null;
     let lastLoadTime: number | null = null;
@@ -132,16 +202,40 @@ namespace gdjs {
     ) => {
       const { profileNames } = options;
 
+      const getNetworkSyncOptions: GetNetworkSyncDataOptions = {
+        syncObjectIdentifiers: true,
+        shouldExcludeVariableFromData:
+          makeIsVariableExcludedFromSaveState(profileNames),
+        syncAllBehaviors: true,
+        syncGameVariables: true,
+        syncSceneTimers: true,
+        syncOnceTriggers: true,
+        syncSounds: true,
+        syncTweens: true,
+        syncLayers: true,
+        syncAsyncTasks: true,
+        syncSceneVisualProps: true,
+        syncFullTileMaps: true,
+      };
+
+      const shouldPersistGameData = checkIfIsPersistedInProfiles(
+        options.profileNames,
+        runtimeGameDataSaveConfiguration.get(runtimeGame)
+      );
+
       const gameSaveState: GameSaveState = {
-        gameNetworkSyncData: {},
+        // Always persist some game data, but limit it to just the scene stack
+        // if asked to not persist the game data.
+        gameNetworkSyncData: runtimeGame.getNetworkSyncData({
+          ...getNetworkSyncOptions,
+          syncGameVariables: shouldPersistGameData,
+          syncSounds: shouldPersistGameData,
+        }),
         layoutNetworkSyncDatas: [],
       };
 
-      const gameData = runtimeGame.getNetworkSyncData(getNetworkSyncOptions);
       const scenes = runtimeGame.getSceneStack().getAllScenes();
-      gameSaveState.gameNetworkSyncData = gameData || {};
-
-      scenes.forEach((scene, index) => {
+      scenes.forEach((runtimeScene, index) => {
         gameSaveState.layoutNetworkSyncDatas[index] = {
           sceneData: {} as LayoutNetworkSyncData,
           objectDatas: {},
@@ -149,7 +243,7 @@ namespace gdjs {
 
         // First collect all object sync data, as they may generate unique
         // identifiers like their networkId.
-        for (const object of scene.getAdhocListOfAllInstances()) {
+        for (const object of runtimeScene.getAdhocListOfAllInstances()) {
           // By default, an object which has no SaveConfiguration behavior is like
           // it has the default profile persistence set to "Persisted".
           let shouldPersist = profileNames.includes('default');
@@ -187,11 +281,21 @@ namespace gdjs {
           }
         }
 
-        // Collect all scene data in the end.
-        const sceneDatas = (scene.getNetworkSyncData(getNetworkSyncOptions) ||
-          []) as LayoutNetworkSyncData;
-
-        gameSaveState.layoutNetworkSyncDatas[index].sceneData = sceneDatas;
+        // Collect scene data after the objects:
+        const shouldPersistSceneData = checkIfIsPersistedInProfiles(
+          options.profileNames,
+          (runtimeSceneDataSaveConfiguration.get(runtimeGame) || {})[
+            runtimeScene.getName()
+          ]
+        );
+        if (shouldPersistSceneData) {
+          const sceneData = runtimeScene.getNetworkSyncData(
+            getNetworkSyncOptions
+          );
+          if (sceneData) {
+            gameSaveState.layoutNetworkSyncDatas[index].sceneData = sceneData;
+          }
+        }
       });
 
       return gameSaveState;
@@ -204,7 +308,7 @@ namespace gdjs {
     ) {
       try {
         const gameSaveState = createGameSaveState(runtimeScene.getGame(), {
-          profileNames: parseCommaSeparatedProfileNames(
+          profileNames: parseCommaSeparatedProfileNamesOrDefault(
             commaSeparatedProfileNames
           ),
         });
@@ -223,7 +327,7 @@ namespace gdjs {
     ) {
       try {
         const gameSaveState = createGameSaveState(runtimeScene.getGame(), {
-          profileNames: parseCommaSeparatedProfileNames(
+          profileNames: parseCommaSeparatedProfileNamesOrDefault(
             commaSeparatedProfileNames
           ),
         });
@@ -367,15 +471,30 @@ namespace gdjs {
           clearInputs: true,
           keepControl: true,
           ignoreVariableOwnership: true,
-          shouldExcludeVariableFromUpdate: isVariableExcludedFromSaveState,
+          shouldExcludeVariableFromUpdate: makeIsVariableExcludedFromSaveState(
+            options.profileNames
+          ),
         };
 
       // First update the game, which will update the variables,
       // and set the scene stack to update when ready.
-      runtimeGame.updateFromNetworkSyncData(
-        saveState.gameNetworkSyncData,
-        updateFromNetworkSyncDataOptions
-      );
+      if (saveState.gameNetworkSyncData) {
+        const shouldRestoreGameData = checkIfIsPersistedInProfiles(
+          options.profileNames,
+          runtimeGameDataSaveConfiguration.get(runtimeGame)
+        );
+
+        runtimeGame.updateFromNetworkSyncData(
+          shouldRestoreGameData
+            ? saveState.gameNetworkSyncData
+            : {
+                // Disable game data restoration if asked to, but
+                // still always keep `ss` (scene stack) restoration as it's always needed.
+                ss: saveState.gameNetworkSyncData.ss,
+              },
+          updateFromNetworkSyncDataOptions
+        );
+      }
 
       // Apply the scene stack updates, as we are at the end of a frame,
       // we can safely do it.
@@ -450,21 +569,40 @@ namespace gdjs {
         }
 
         // Update the rest of the scene last.
-        runtimeScene.updateFromNetworkSyncData(
-          layoutSyncData.sceneData,
-          updateFromNetworkSyncDataOptions
-        );
+        if (
+          checkIfIsPersistedInProfiles(
+            options.profileNames,
+            (runtimeSceneDataSaveConfiguration.get(runtimeGame) || {})[
+              runtimeScene.getName()
+            ]
+          )
+        ) {
+          runtimeScene.updateFromNetworkSyncData(
+            layoutSyncData.sceneData,
+            updateFromNetworkSyncDataOptions
+          );
+        }
       });
     };
 
     const parseCommaSeparatedProfileNames = (
       commaSeparatedProfileNames: string
-    ): string[] => {
-      if (!commaSeparatedProfileNames) return ['default'];
+    ): string[] | null => {
+      if (!commaSeparatedProfileNames) return null;
 
       return commaSeparatedProfileNames
         .split(',')
         .map((profileName) => profileName.trim());
+    };
+
+    const parseCommaSeparatedProfileNamesOrDefault = (
+      commaSeparatedProfileNames: string
+    ): string[] => {
+      return (
+        parseCommaSeparatedProfileNames(commaSeparatedProfileNames) || [
+          'default',
+        ]
+      );
     };
 
     export const restoreGameSaveStateFromVariable = async function (
@@ -478,7 +616,7 @@ namespace gdjs {
       // and avoid possible conflicts with running events.
       restoreRequestOptions = {
         fromVariable: variable,
-        profileNames: parseCommaSeparatedProfileNames(
+        profileNames: parseCommaSeparatedProfileNamesOrDefault(
           commaSeparatedProfileNames
         ),
         clearSceneStack,
@@ -496,7 +634,7 @@ namespace gdjs {
       // and avoid possible conflicts with running events.
       restoreRequestOptions = {
         fromStorageName: storageName,
-        profileNames: parseCommaSeparatedProfileNames(
+        profileNames: parseCommaSeparatedProfileNamesOrDefault(
           commaSeparatedProfileNames
         ),
         clearSceneStack,

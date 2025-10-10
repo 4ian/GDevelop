@@ -21,7 +21,9 @@ module.exports = {
       .setExtensionInformation(
         'SaveState',
         _('Save State (experimental)'),
-        _('Allows to save and load the full state of a game.'),
+        _(
+          'Allows to save and load the full state of a game, usually on the device storage. A Save State, by default, contains the full state of the game (objects, variables, sounds, music, effects etc.). Using the "Save Configuration" behavior, you can customize which objects should not be saved in a Save State. You can also use the "Change the save configuration of a variable" action to change the save configuration of a variable. Finally, both objects, variables and scene/game data can be given a profile name: in this case, when saving or loading with one or more profile names specified, only the object/variables/data belonging to one of the specified profiles will be saved or loaded.'
+        ),
         'Neyl Mahfouf',
         'Open source (MIT License)'
       )
@@ -248,28 +250,114 @@ module.exports = {
 
     extension
       .addAction(
-        'ExcludeVariableFromSaveState',
-        _('Exclude a variable from save state'),
+        'SetVariableSaveConfiguration',
+        _('Change the save configuration of a variable'),
         _(
-          'Exclude (or re-enable) a scene or global variable from being saved to the save state.'
+          'Set if a scene or global variable should be saved in the default save state. Also allow to specify one or more profiles in which the variable should be saved.'
         ),
-        _('Exclude variable _PARAM1_ from save state: _PARAM2_'),
-        _('Save'),
+        _(
+          'Change save configuration of _PARAM1_: save it in the default save states: _PARAM2_ and in profiles: _PARAM3_'
+        ),
+        _('Advanced configuration'),
         'res/actions/saveDown.svg',
         'res/actions/saveDown.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
       .addParameter(
         'variable',
-        _('Variable to exclude from save state'),
+        _('Variable for which configuration should be changed'),
         '',
         false
       )
-      .addParameter('yesorno', _('Exclude from save state'), '', false)
+      .addParameter('yesorno', _('Persist in default save states'), '', false)
       .setDefaultValue('yes')
+      .addParameter(
+        'string',
+        _('Profiles in which the variable should be saved'),
+        '',
+        true
+      )
+      .setDefaultValue('')
+      .setParameterLongDescription(
+        _(
+          'Comma-separated list of profile names in which the variable will be saved. When a save state is created with one or more profile names specified, the variable will be saved only if it matches one of these profiles.'
+        )
+      )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/SaveState/savestatetools.js')
-      .setFunctionName('gdjs.saveState.excludeVariableFromSaveState');
+      .setFunctionName('gdjs.saveState.setVariableSaveConfiguration');
+
+    extension
+      .addAction(
+        'SetGameDataSaveConfiguration',
+        _('Change the save configuration of the global game data'),
+        _(
+          'Set if the global game data (audio & global variables) should be saved in the default save state. Also allow to specify one or more profiles in which the global game data should be saved.'
+        ),
+        _(
+          'Change save configuration of global game data: save them in the default save states: _PARAM1_ and in profiles: _PARAM2_'
+        ),
+        _('Advanced configuration'),
+        'res/actions/saveDown.svg',
+        'res/actions/saveDown.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('yesorno', _('Persist in default save states'), '', false)
+      .setDefaultValue('yes')
+      .addParameter(
+        'string',
+        _('Profiles in which the global game data should be saved'),
+        '',
+        true
+      )
+      .setDefaultValue('')
+      .setParameterLongDescription(
+        _(
+          'Comma-separated list of profile names in which the global game data will be saved. When a save state is created with one or more profile names specified, the global game data will be saved only if it matches one of these profiles.'
+        )
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/SaveState/savestatetools.js')
+      .setFunctionName('gdjs.saveState.setGameDataSaveConfiguration');
+
+    extension
+      .addAction(
+        'SetSceneDataSaveConfiguration',
+        _('Change the save configuration of a scene data'),
+        _(
+          'Set if the data of the specified scene (scene variables, timers, trigger once, wait actions, layers, etc.) should be saved in the default save state. Also allow to specify one or more profiles in which the scene data should be saved. Note: objects are always saved separately from the scene data (use the "Save Configuration" behavior to customize the configuration of objects).'
+        ),
+        _(
+          'Change save configuration of scene _PARAM1_: save it in the default save states: _PARAM2_ and in profiles: _PARAM3_'
+        ),
+        _('Advanced configuration'),
+        'res/actions/saveDown.svg',
+        'res/actions/saveDown.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter(
+        'sceneName',
+        _('Scene name for which configuration should be changed'),
+        '',
+        false
+      )
+      .addParameter('yesorno', _('Persist in default save states'), '', false)
+      .setDefaultValue('yes')
+      .addParameter(
+        'string',
+        _('Profiles in which the scene data should be saved'),
+        '',
+        true
+      )
+      .setDefaultValue('')
+      .setParameterLongDescription(
+        _(
+          'Comma-separated list of profile names in which the scene data will be saved. When a save state is created with one or more profile names specified, the scene data will be saved only if it matches one of these profiles.'
+        )
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/SaveState/savestatetools.js')
+      .setFunctionName('gdjs.saveState.setSceneDataSaveConfiguration');
 
     // Save Configuration behavior
     const saveConfigurationBehavior = new gd.BehaviorJsImplementation();
@@ -319,7 +407,8 @@ module.exports = {
           _(
             'Comma-separated list of profile names in which the object is saved. When a save state is created with one or more profile names specified, the object will be saved only if it matches one of these profiles.'
           )
-        );
+        )
+        .setAdvanced(true);
 
       return behaviorProperties;
     };

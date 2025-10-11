@@ -9,6 +9,7 @@ const { generateReadMoreLink } = require('./WikiHelpLink');
 /** @typedef {import('../../../../GDevelop.js/types').ExpressionMetadata} ExpressionMetadata */
 /** @typedef {import('../../../../GDevelop.js/types').ObjectMetadata} ObjectMetadata */
 /** @typedef {import('../../../../GDevelop.js/types').BehaviorMetadata} BehaviorMetadata */
+/** @typedef {import('../../../../GDevelop.js/types').ParameterMetadata} ParameterMetadata */
 
 /**
  * @typedef {Object} RawText A text to be shown on a page
@@ -411,7 +412,7 @@ const generateInstructionReferenceRowsText = ({
   return {
     orderKey: instructionType,
     text: [
-      '**' + instructionMetadata.getFullName() + '**',
+      '**' + instructionMetadata.getFullName() + '**  ',
       instructionMetadata.getDescription().replace(/\n/, `  \n`),
       '',
       ...(parametersList

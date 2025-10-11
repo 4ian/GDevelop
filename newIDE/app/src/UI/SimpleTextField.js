@@ -114,7 +114,12 @@ export const SimpleTextField = React.memo<
             defaultValue={props.value}
             placeholder={props.hint || ''}
             onClick={stopPropagation}
-            onDoubleClick={stopPropagation}
+            onDoubleClick={e => {
+              stopPropagation(e);
+              if (inputRef.current) {
+                inputRef.current.select();
+              }
+            }}
             onBlur={e => {
               props.onChange(
                 e.currentTarget.value,

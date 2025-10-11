@@ -176,7 +176,7 @@ namespace gdjs {
     /**
      * Allow to specify an external layout to insert in the first scene.
      */
-    _injectExternalLayout: any;
+    _injectExternalLayout: string;
     _options: RuntimeGameOptions;
 
     /**
@@ -1321,6 +1321,15 @@ namespace gdjs {
      */
     isPreview(): boolean {
       return this._isPreview;
+    }
+
+    /**
+     * Return the name of the external layout that was automatically created at position 0;0
+     * for this preview, if any.
+     * @returns the name of the external layout, or an empty string if none was injected.
+     */
+    getPreviewedExternalLayoutName(): string {
+      return this._injectExternalLayout;
     }
 
     /**

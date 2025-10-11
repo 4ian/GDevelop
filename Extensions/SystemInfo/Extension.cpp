@@ -81,6 +81,28 @@ void DeclareSystemInfoExtension(gd::PlatformExtension& extension) {
 
   extension
       .AddCondition(
+          "IsPreviewingAnExternalLayout",
+          _("Is the game running an external layout as a preview"),
+          _("Check if the game is currently being previewed in the editor, "
+            "and this preview was launched for an external layout."),
+          _("An external layout of the game is being previewed in the editor"),
+          "",
+          "CppPlatform/Extensions/systeminfoicon.png",
+          "CppPlatform/Extensions/systeminfoicon.png")
+
+      .AddCodeOnlyParameter("currentScene", "");
+
+  extension
+      .AddExpression("PreviewedExternalLayoutName",
+                     _("Name of the previewed external layout"),
+                     _("Returns the name of the external layout being "
+                       "previewed from the editor"),
+                     "",
+                     "CppPlatform/Extensions/systeminfoicon.png")
+      .AddCodeOnlyParameter("currentScene", "");
+
+  extension
+      .AddCondition(
           "HasTouchScreen",
           _("Device has a touchscreen"),
           _("Check if the device running the game has a touchscreen (typically "

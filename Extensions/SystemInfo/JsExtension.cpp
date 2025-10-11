@@ -39,6 +39,12 @@ class SystemInfoJsExtension : public gd::PlatformExtension {
     GetAllConditions()["SystemInfo::IsPreview"]
         .SetIncludeFile("Extensions/SystemInfo/systeminfotools.js")
         .SetFunctionName("gdjs.evtTools.systemInfo.isPreview");
+    GetAllConditions()["SystemInfo::IsPreviewingAnExternalLayout"]
+        .SetIncludeFile("Extensions/SystemInfo/systeminfotools.js")
+        .SetFunctionName("gdjs.evtTools.systemInfo.isPreviewingAnExternalLayout");
+    GetAllExpressions()["SystemInfo::PreviewedExternalLayoutName"]
+        .SetIncludeFile("Extensions/SystemInfo/systeminfotools.js")
+        .SetFunctionName("gdjs.evtTools.systemInfo.getPreviewedExternalLayoutName");
     GetAllConditions()["SystemInfo::HasTouchScreen"]
         .SetIncludeFile("Extensions/SystemInfo/systeminfotools.js")
         .SetFunctionName("gdjs.evtTools.systemInfo.hasTouchScreen");

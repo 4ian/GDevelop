@@ -490,6 +490,7 @@ namespace gdjs {
         this.helperGraphics = new PIXI.Graphics();
         this.renderer.addChild(this.helperGraphics);
       } else if (!visible && this.helperGraphics) {
+        this.helperGraphics.removeFromParent();
         this.helperGraphics.destroy();
         this.helperGraphics = null;
       }

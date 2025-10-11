@@ -9,7 +9,10 @@ import Text from './Text';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { useShouldAutofocusInput } from './Responsive/ScreenTypeMeasurer';
-import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
+import {
+  shouldValidate,
+  shouldCloseOrCancel,
+} from './KeyboardShortcuts/InteractionKeys';
 import TagChips from './TagChips';
 import { I18n } from '@lingui/react';
 import { useDebounce } from '../Utils/UseDebounce';
@@ -181,7 +184,9 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
     };
 
     const handleKeyPressed = (event: SyntheticKeyboardEvent<>) => {
-      if (shouldValidate(event)) {
+      if (shouldCloseOrCancel(event)) {
+        handleCancel();
+      } else if (shouldValidate(event)) {
         onRequestSearch(value);
       }
     };

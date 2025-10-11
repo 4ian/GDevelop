@@ -4,6 +4,6 @@ declare type SceneSaveState = {
 };
 
 declare type GameSaveState = {
-  gameNetworkSyncData: GameNetworkSyncData;
+  gameNetworkSyncData: GameNetworkSyncData | null;
   layoutNetworkSyncDatas: SceneSaveState[];
 };

@@ -43,8 +43,9 @@ declare type GetNetworkSyncDataOptions = {
   playerNumber?: number;
   isHost?: boolean;
   syncObjectIdentifiers?: boolean;
-  syncAllVariables?: boolean;
+  shouldExcludeVariableFromData?: (variable: Variable) => boolean;
   syncAllBehaviors?: boolean;
+  syncGameVariables?: boolean;
   syncSceneTimers?: boolean;
   syncOnceTriggers?: boolean;
   syncSounds?: boolean;
@@ -57,11 +58,12 @@ declare type GetNetworkSyncDataOptions = {
 
 declare type UpdateFromNetworkSyncDataOptions = {
   clearSceneStack?: boolean;
-  preventInitialInstancesCreation?: boolean;
+  getExcludedObjectNames?: (runtimeScene: RuntimeScene) => Set<string>;
   preventSoundsStoppingOnStartup?: boolean;
   clearInputs?: boolean;
   keepControl?: boolean;
   ignoreVariableOwnership?: boolean;
+  shouldExcludeVariableFromUpdate?: (variable: Variable) => boolean;
 };
 
 /** Object containing basic properties for all objects synchronizing over the network. */

@@ -1384,24 +1384,29 @@ namespace gdjs {
       syncOptions: GetNetworkSyncDataOptions
     ): GameNetworkSyncData | null {
       const syncData: GameNetworkSyncData = {
-        var: this._variables.getNetworkSyncData(syncOptions),
+        var:
+          syncOptions.syncGameVariables === false
+            ? undefined
+            : this._variables.getNetworkSyncData(syncOptions),
         sm: syncOptions.syncSounds
           ? this.getSoundManager().getNetworkSyncData()
           : undefined,
         ss: this._sceneStack.getNetworkSyncData(syncOptions) || undefined,
       };
 
-      const extensionsVariablesSyncData = {};
-      this._variablesByExtensionName.forEach((variables, extensionName) => {
-        const extensionVariablesSyncData =
-          variables.getNetworkSyncData(syncOptions);
-        // If there is no variables to sync, don't include the extension in the sync data.
-        if (extensionVariablesSyncData.length) {
-          extensionsVariablesSyncData[extensionName] =
-            extensionVariablesSyncData;
-        }
-      });
-      syncData.extVar = extensionsVariablesSyncData;
+      if (syncOptions.syncGameVariables !== false) {
+        const extensionsVariablesSyncData = {};
+        this._variablesByExtensionName.forEach((variables, extensionName) => {
+          const extensionVariablesSyncData =
+            variables.getNetworkSyncData(syncOptions);
+          // If there is no variables to sync, don't include the extension in the sync data.
+          if (extensionVariablesSyncData.length) {
+            extensionsVariablesSyncData[extensionName] =
+              extensionVariablesSyncData;
+          }
+        });
+        syncData.extVar = extensionsVariablesSyncData;
+      }
 
       if (
         (!syncData.var || syncData.var.length === 0) &&

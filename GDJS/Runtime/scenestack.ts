@@ -1,11 +1,15 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Scene stack');
-  const debugLogger = new gdjs.Logger('Multiplayer - Debug');
+  const debugLogger = new gdjs.Logger('Scene stack - Debug');
+  // Comment this to see message logs and ease debugging:
+  gdjs.Logger.getDefaultConsoleLoggerOutput().discardGroup(
+    'Scene stack - Debug'
+  );
 
   interface PushSceneOptions {
     sceneName: string;
     externalLayoutName?: string;
-    skipCreatingInstancesFromScene?: boolean;
+    getExcludedObjectNames?: (runtimeScene: RuntimeScene) => Set<string>;
     skipStoppingSoundsOnStartup?: boolean;
   }
 
@@ -146,10 +150,10 @@ namespace gdjs {
 
       const sceneName =
         typeof options === 'string' ? options : options.sceneName;
-      const skipCreatingInstancesFromScene =
+      const getExcludedObjectNames =
         typeof options === 'string'
-          ? false
-          : options.skipCreatingInstancesFromScene;
+          ? undefined
+          : options.getExcludedObjectNames;
       const skipStoppingSoundsOnStartup =
         typeof options === 'string'
           ? false
@@ -170,7 +174,7 @@ namespace gdjs {
         return this._loadNewScene({
           sceneName,
           externalLayoutName,
-          skipCreatingInstancesFromScene,
+          getExcludedObjectNames,
           skipStoppingSoundsOnStartup,
         });
       }
@@ -180,7 +184,7 @@ namespace gdjs {
         this._loadNewScene({
           sceneName,
           externalLayoutName,
-          skipCreatingInstancesFromScene,
+          getExcludedObjectNames,
           skipStoppingSoundsOnStartup,
         });
         this._isNextLayoutLoading = false;
@@ -197,7 +201,9 @@ namespace gdjs {
       newScene.loadFromScene(
         this._runtimeGame.getSceneAndExtensionsData(options.sceneName),
         {
-          skipCreatingInstances: options.skipCreatingInstancesFromScene,
+          excludedObjectNames: options.getExcludedObjectNames
+            ? options.getExcludedObjectNames(newScene)
+            : undefined,
           skipStoppingSoundsOnStartup: options.skipStoppingSoundsOnStartup,
         }
       );
@@ -333,8 +339,7 @@ namespace gdjs {
 
       this._sceneStackSyncDataToApply = null;
 
-      const skipCreatingInstancesFromScene =
-        !!options && !!options.preventInitialInstancesCreation;
+      const getExcludedObjectNames = options && options.getExcludedObjectNames;
       const skipStoppingSoundsOnStartup =
         !!options && !!options.preventSoundsStoppingOnStartup;
 
@@ -349,7 +354,7 @@ namespace gdjs {
           const sceneSyncData = sceneStackSyncData[i];
           const newScene = this.push({
             sceneName: sceneSyncData.name,
-            skipCreatingInstancesFromScene,
+            getExcludedObjectNames,
             skipStoppingSoundsOnStartup,
           });
           if (newScene) {
@@ -359,6 +364,7 @@ namespace gdjs {
         hasMadeChangeToStack = true;
         return hasMadeChangeToStack;
       }
+
       // If this method is called, we are a client.
       // We trust the host to be the source of truth for the scene stack.
       // So we loop through the scenes in the stack given by the host and either:
@@ -374,9 +380,10 @@ namespace gdjs {
             `Scene at position ${i} with name ${sceneSyncData.name} is missing from the stack, adding it.`
           );
           // We have fewer scenes in the stack than the host, let's add the scene.
+          // By definition, there is nothing to clear because we're already at the top of the stack.
           const newScene = this.push({
             sceneName: sceneSyncData.name,
-            skipCreatingInstancesFromScene,
+            getExcludedObjectNames,
           });
           if (newScene) {
             newScene.networkId = sceneSyncData.networkId;
@@ -390,16 +397,23 @@ namespace gdjs {
           debugLogger.info(
             `Scene at position ${i} and name ${sceneAtThisPositionInOurStack.getName()} is not the same as the expected ${
               sceneSyncData.name
-            }, replacing.`
+            }, replacing it.`
           );
           // The scene does not correspond to the scene at this position in our stack
-          // Let's unload everything after this position to recreate the stack.
+          // Let's unload everything after this position to reconstruct the stack.
+          if (this._stack.length > i + 1) {
+            debugLogger.info(
+              `Unloading ${this._stack.length - (i + 1)} scenes after position ${i}.`
+            );
+            this.pop(this._stack.length - (i + 1));
+          }
 
           const newScene = this.replace({
             sceneName: sceneSyncData.name,
-            clear: true,
-            skipCreatingInstancesFromScene,
+            clear: false,
+            getExcludedObjectNames,
           });
+
           if (newScene) {
             newScene.networkId = sceneSyncData.networkId;
           }
@@ -433,16 +447,26 @@ namespace gdjs {
           debugLogger.info(
             `Scene at position ${i} and name ${sceneAtThisPositionInOurStack.getName()} has a different networkId ${
               sceneAtThisPositionInOurStack.networkId
-            } than the expected ${sceneSyncData.networkId}, replacing.`
+            } than the expected ${sceneSyncData.networkId}, replacing it.`
           );
           // The scene is in the stack but has a different networkId
           // This can happen if the host has restarted the scene
           // We can't just update the networkId of the scene in the stack
-          // We need to replace it with a new scene
+          // We need to replace it with a new scene.
+
+          // Like for the case where it's a totally different scene,
+          // we need to unload everything after this position to reconstruct the stack.
+          if (this._stack.length > i + 1) {
+            debugLogger.info(
+              `Unloading ${this._stack.length - (i + 1)} scenes after position ${i}.`
+            );
+            this.pop(this._stack.length - (i + 1));
+          }
+
           const newScene = this.replace({
             sceneName: sceneSyncData.name,
             clear: false,
-            skipCreatingInstancesFromScene,
+            getExcludedObjectNames,
           });
           if (newScene) {
             newScene.networkId = sceneSyncData.networkId;

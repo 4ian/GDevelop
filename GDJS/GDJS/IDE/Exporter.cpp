@@ -137,7 +137,8 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
     //...and export it
     gd::SerializerElement noRuntimeGameOptions;
     helper.ExportProjectData(fs, exportedProject, codeOutputDir + "/data.js",
-                             noRuntimeGameOptions);
+                             noRuntimeGameOptions,
+                             /*isInGameEdition=*/false);
     includesFiles.push_back(codeOutputDir + "/data.js");
 
     helper.ExportIncludesAndLibs(includesFiles, exportDir, false);
@@ -203,8 +204,7 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
 void Exporter::SerializeProjectData(const gd::Project &project,
                                     const PreviewExportOptions &options,
                                     gd::SerializerElement &projectDataElement) {
-  ExporterHelper::SerializeProjectData(fs, project, options,
-                                       projectDataElement);
+  ExporterHelper::SerializeProjectData(fs, project, options, projectDataElement);
 }
 
 void Exporter::SerializeRuntimeGameOptions(

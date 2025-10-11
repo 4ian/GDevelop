@@ -481,16 +481,16 @@ class ExporterHelper {
    * \return Empty string if everything is ok,
    * description of the error otherwise.
    */
-  static gd::String
-  ExportProjectData(gd::AbstractFileSystem &fs, gd::Project &project,
-                    gd::String filename,
-                    const gd::SerializerElement &runtimeGameOptions);
+  static gd::String ExportProjectData(
+      gd::AbstractFileSystem &fs, gd::Project &project, gd::String filename,
+      const gd::SerializerElement &runtimeGameOptions, bool isInGameEdition);
 
   /**
    * \brief Serialize a project without its events to JSON
    *
    * \param fs The abstract file system to use to write the file
    * \param project The project to be exported.
+   * \param options The content of the extra configuration
    * \param projectDataElement The element where the project data is serialized
    */
   static void SerializeProjectData(gd::AbstractFileSystem &fs,
@@ -503,6 +503,7 @@ class ExporterHelper {
    * in gdjs.runtimeGameOptions to JSON
    *
    * \param fs The abstract file system to use to write the file
+   * \param gdjsRoot The root directory of GDJS, used to copy runtime files.
    * \param options The content of the extra configuration
    * \param includesFiles The list of scripts files - useful for hot-reloading
    * \param runtimeGameOptionsElement The element where the game options are
@@ -705,6 +706,9 @@ class ExporterHelper {
   /**
    * \brief Given an include file, returns the name of the file to reference
    * in the exported game.
+   * 
+   * \param fs The abstract file system to use
+   * \param gdjsRoot The root directory of GDJS, used to copy runtime files.
    */
   static gd::String GetExportedIncludeFilename(
       gd::AbstractFileSystem &fs, const gd::String &gdjsRoot,
@@ -747,9 +751,23 @@ class ExporterHelper {
     *
     * \param project The project to be exported.
     */
+   static void StriptAndSerializeProjectData(gd::Project &project,
+                                             gd::SerializerElement &rootElement,
+                                             bool isInGameEdition);
+
+   /**
+    * \brief Add additional resources that are used by the in-game editor to the
+    * project.
+    *
+    * \param project The project to be exported where resource declarations are
+    * added.
+    *
+    * \param projectUsedResources The list of resource to be loaded
+    * globally by the runtime.
+    */
    static void
-   StriptAndSerializeProjectData(gd::Project &project,
-                                 gd::SerializerElement &rootElement);
+   AddInGameEditorResources(gd::Project &project,
+                            std::set<gd::String> &projectUsedResources);
 };
 
 }  // namespace gdjs

@@ -19,6 +19,7 @@ const allowedExtensions = [
   '.map',
   '.wasm',
   '.txt',
+  '.png',
 ];
 
 // These extensions will be built with esbuild (the other will be copied).
@@ -42,6 +43,7 @@ const untransformedPaths = [
   'GDJS/Runtime/FacebookInstantGames',
   'GDJS/Runtime/libs/CocoonJS',
   'GDJS/Runtime/libs/rbush.js',
+  'GDJS/Runtime/InGameEditor/Resources/primitivedrawingicon.png',
 
   // Extensions pre-built files:
   'Extensions/Leaderboards/sha256.js',

@@ -286,10 +286,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     gd::SerializerElement runtimeGameOptions;
     ExporterHelper::SerializeRuntimeGameOptions(fs, gdjsRoot, options,
                                                     includesFiles, runtimeGameOptions);
-    ExportProjectData(fs,
-                      exportedProject,
-                      codeOutputDir + "/data.js",
-                      runtimeGameOptions);
+    ExportProjectData(fs, exportedProject, codeOutputDir + "/data.js",
+                      runtimeGameOptions, options.isInGameEdition);
     includesFiles.push_back(codeOutputDir + "/data.js");
 
     previousTime = LogTimeSpent("Project data export", previousTime);
@@ -299,6 +297,9 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   }
 
   if (options.shouldReloadLibraries) {
+    if (options.isInGameEdition) {
+      InsertUnique(resourcesFiles, "InGameEditor/Resources/primitivedrawingicon.png");
+    }
     // Copy all the dependencies and their source maps
     ExportIncludesAndLibs(includesFiles, options.exportPath, true);
     ExportIncludesAndLibs(resourcesFiles, options.exportPath, true);
@@ -324,11 +325,12 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
 gd::String ExporterHelper::ExportProjectData(
     gd::AbstractFileSystem &fs, gd::Project &project, gd::String filename,
-    const gd::SerializerElement &runtimeGameOptions) {
+    const gd::SerializerElement &runtimeGameOptions, bool isInGameEdition) {
   fs.MkDir(fs.DirNameFrom(filename));
 
   gd::SerializerElement projectDataElement;
-  ExporterHelper::StriptAndSerializeProjectData(project, projectDataElement);
+  ExporterHelper::StriptAndSerializeProjectData(
+      project, projectDataElement, isInGameEdition);
 
   // Save the project to JSON
   gd::String output =
@@ -344,8 +346,7 @@ gd::String ExporterHelper::ExportProjectData(
 
 void ExporterHelper::SerializeRuntimeGameOptions(
     gd::AbstractFileSystem &fs, const gd::String &gdjsRoot,
-    const PreviewExportOptions &options,
-    std::vector<gd::String> &includesFiles,
+    const PreviewExportOptions &options, std::vector<gd::String> &includesFiles,
     gd::SerializerElement &runtimeGameOptions) {
   // Create the setup options passed to the gdjs.RuntimeGame
   runtimeGameOptions.AddChild("isPreview").SetBoolValue(true);
@@ -477,6 +478,14 @@ void ExporterHelper::SerializeRuntimeGameOptions(
   }
 }
 
+void ExporterHelper::AddInGameEditorResources(
+    gd::Project &project, std::set<gd::String> &projectUsedResources) {
+  project.GetResourcesManager().AddResource(
+      "InGameEditor-ShapePainterIcon",
+      "InGameEditor/Resources/primitivedrawingicon.png", "image");
+  projectUsedResources.insert("InGameEditor-ShapePainterIcon");
+}
+
 void ExporterHelper::SerializeProjectData(gd::AbstractFileSystem &fs,
                                           const gd::Project &project,
                                           const PreviewExportOptions &options,
@@ -497,13 +506,18 @@ void ExporterHelper::SerializeProjectData(gd::AbstractFileSystem &fs,
   gd::ResourceExposer::ExposeWholeProjectResources(clonedProject,
                                                    resourcesMergingHelper);
 
-  ExporterHelper::StriptAndSerializeProjectData(clonedProject, rootElement);
+  ExporterHelper::StriptAndSerializeProjectData(
+      clonedProject, rootElement, options.isInGameEdition);
 }
 
 void ExporterHelper::StriptAndSerializeProjectData(
-    gd::Project &project, gd::SerializerElement &rootElement) {
+    gd::Project &project, gd::SerializerElement &rootElement,
+    bool isInGameEdition) {
   auto projectUsedResources =
       gd::SceneResourcesFinder::FindProjectResources(project);
+  if (isInGameEdition) {
+    ExporterHelper::AddInGameEditorResources(project, projectUsedResources);
+  }
   std::unordered_map<gd::String, std::set<gd::String>> scenesUsedResources;
   for (std::size_t layoutIndex = 0;
        layoutIndex < project.GetLayoutsCount(); layoutIndex++) {

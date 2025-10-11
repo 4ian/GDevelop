@@ -12,9 +12,8 @@ npm install
 Then launch tests:
 
 ```bash
-npm run test:watch # This will use Chrome Headless
+npm run test:watch          # Runs tests in a headless browser using Vitest
 npm run test-benchmark:watch # This will also run benchmarks
-npm run test:firefox:watch # To run tests using Firefox
 ```
 
 > ⚠️ If you're working on GDJS or extensions, make sure to have the development version of GDevelop running so that changes in GDJS or extension files are rebuilt (or run `npm run build` in `GDJS/`, but better run GDevelop so that any changes are watched).
@@ -23,7 +22,7 @@ npm run test:firefox:watch # To run tests using Firefox
 
 ### Unit tests
 
-Tests are launched using Chrome. You need Chrome installed to run them. You can change the browser by modifying the package.json "test" command and install the appropriate karma package.
+Tests are launched using [Vitest](https://vitest.dev/) in a headless browser. You can change the browser by editing the `vitest.config.js` file.
 
 Tests are located in the **tests** folder for the game engine, or directly in the folder of the tested extensions.
 

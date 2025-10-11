@@ -5,6 +5,7 @@ import {
   fetchAiSettings,
   type AiRequest,
   type AiSettings,
+  getAiRequests,
 } from '../Utils/GDevelopServices/Generation';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { type EditorFunctionCallResult } from '../EditorFunctions/EditorFunctionCallRunner';
@@ -82,6 +83,9 @@ const useEditorFunctionCallResultsStorage = (): EditorFunctionCallResultsStorage
 };
 
 type AiRequestStorage = {|
+  fetchAiRequests: () => Promise<void>,
+  error: ?Error,
+  isLoading: boolean,
   aiRequests: { [string]: AiRequest },
   updateAiRequest: (aiRequestId: string, aiRequest: AiRequest) => void,
   refreshAiRequest: (aiRequestId: string) => Promise<void>,
@@ -103,6 +107,34 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
 
   const [aiRequests, setAiRequests] = React.useState<{ [string]: AiRequest }>(
     {}
+  );
+  const [error, setError] = React.useState<Error | null>(null);
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+
+  const fetchAiRequests = React.useCallback(
+    async () => {
+      if (!profile) return;
+
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const requests = await getAiRequests(getAuthorizationHeader, {
+          userId: profile.id,
+        });
+        const aiRequestsById = requests.reduce((accumulator, aiRequest) => {
+          accumulator[aiRequest.id] = aiRequest;
+          return accumulator;
+        }, {});
+        setAiRequests(aiRequestsById);
+      } catch (err) {
+        setError(err);
+        console.error('Error fetching AI requests:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [profile, getAuthorizationHeader]
   );
 
   const updateAiRequest = React.useCallback(
@@ -179,6 +211,9 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
   );
 
   return {
+    fetchAiRequests,
+    error,
+    isLoading,
     aiRequests,
     updateAiRequest,
     refreshAiRequest,
@@ -195,8 +230,11 @@ type AiRequestContextState = {|
   getAiSettings: () => AiSettings | null,
 |};
 
-export const AiRequestContext = React.createContext<AiRequestContextState>({
+export const initialAiRequestContextState: AiRequestContextState = {
   aiRequestStorage: {
+    fetchAiRequests: async () => {},
+    error: null,
+    isLoading: false,
     aiRequests: {},
     updateAiRequest: () => {},
     refreshAiRequest: async () => {},
@@ -211,7 +249,10 @@ export const AiRequestContext = React.createContext<AiRequestContextState>({
     clearEditorFunctionCallResults: () => {},
   },
   getAiSettings: () => null,
-});
+};
+export const AiRequestContext = React.createContext<AiRequestContextState>(
+  initialAiRequestContextState
+);
 
 type AiRequestProviderProps = {|
   children: React.Node,

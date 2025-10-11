@@ -481,6 +481,9 @@ export const AskAiEditor = React.memo<Props>(
       );
 
       const {
+        aiRequestStorage: { fetchAiRequests },
+      } = React.useContext(AiRequestContext);
+      const {
         selectedAiRequest,
         selectedAiRequestId,
         setSelectedAiRequestId,
@@ -509,6 +512,15 @@ export const AskAiEditor = React.memo<Props>(
           }
         },
         [initialMode]
+      );
+
+      React.useEffect(
+        () => {
+          fetchAiRequests();
+        },
+        // Only fetch once on mount (we provide a way to refresh in the history).
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        []
       );
 
       const canStartNewChat = !!selectedAiRequestId;

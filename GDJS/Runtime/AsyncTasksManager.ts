@@ -100,15 +100,18 @@ namespace gdjs {
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): AsyncTasksManagerNetworkSyncData {
-      const tasksData = this.tasksWithCallback.map(
-        ({ asyncTask, callbackId, longLivedObjectsList }) => {
+      const tasksData = this.tasksWithCallback
+        .map(({ asyncTask, callbackId, longLivedObjectsList }) => {
+          // Stay compatible with old extensions declaring tasks without a getNetworkSyncData method.
+          if (!asyncTask.getNetworkSyncData) return null;
+
           return {
             callbackId,
             asyncTask: asyncTask.getNetworkSyncData(),
             objectsList: longLivedObjectsList.getNetworkSyncData(syncOptions),
           };
-        }
-      );
+        })
+        .filter(Boolean);
 
       return {
         tasks: tasksData,

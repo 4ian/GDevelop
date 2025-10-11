@@ -1,6 +1,6 @@
 // @ts-check
 
-describe.only('SaveState', () => {
+describe('SaveState', () => {
   /**
    * @param {{name: string, x: number, y: number}} content
    * @returns {InstanceData}

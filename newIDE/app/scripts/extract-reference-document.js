@@ -93,7 +93,10 @@ const generateAllExtensionReferences = gd => {
  */
 const generateAllFeaturesStartPageRawTexts = extensionReferences => {
   const headerText = {
-    text: `# All features
+    text: `---
+icon: material/star-circle
+---
+# All features
 
 This page lists **all the features** that are provided in GDevelop. These can be objects, behaviors but also features that can be used directly using actions, conditions or expressions (without requiring an object to be existing on the scene).
 

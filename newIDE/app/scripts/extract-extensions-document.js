@@ -518,11 +518,16 @@ initializeGDevelopJs().then(async gd => {
   try {
     console.info(`ℹ️ Loading all community extensions...`);
 
-    let indexPageContent = `# Extensions
+    let indexPageContent = `---
+icon: material/puzzle
+---
+# Extensions
 
-GDevelop is built in a flexible way. In addition to [core features](/gdevelop5/all-features), new capabilities are provided by extensions. Extensions can contain objects, behaviors, actions, conditions, expressions or events.
+In addition to [core features](/gdevelop5/all-features), new capabilities are provided by extensions. Extensions can contain objects, behaviors, actions, conditions, expressions, effects or events.
 
-Community created extensions are accessible [directly from GDevelop](/gdevelop5/extensions/search).
+Official as well as experimental extensions are accessible [directly from GDevelop](/gdevelop5/extensions/search).
+A list of [community-made extensions is available on GitHub](https://github.com/GDevelopApp/GDevelop-community-list).
+
 New extensions can also be [created](/gdevelop5/extensions/create) from scratch using events or JavaScript.
 
 Read more about this:

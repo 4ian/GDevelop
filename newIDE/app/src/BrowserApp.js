@@ -9,7 +9,7 @@ import './UI/icomoon-font.css'; // Styles for Icomoon font.
 // Import for browser only IDE
 import browserResourceSources from './ResourcesList/BrowserResourceSources';
 import browserResourceExternalEditors from './ResourcesList/BrowserResourceExternalEditors';
-import BrowserS3PreviewLauncher from './ExportAndShare/BrowserExporters/BrowserS3PreviewLauncher';
+import BrowserSWPreviewLauncher from './ExportAndShare/BrowserExporters/BrowserSWPreviewLauncher';
 import {
   browserAutomatedExporters,
   browserManualExporters,
@@ -18,7 +18,7 @@ import {
 import makeExtensionsLoader from './JsExtensionsLoader/BrowserJsExtensionsLoader';
 import ObjectsEditorService from './ObjectEditor/ObjectsEditorService';
 import ObjectsRenderingService from './ObjectsRendering/ObjectsRenderingService';
-import { makeBrowserS3EventsFunctionCodeWriter } from './EventsFunctionsExtensionsLoader/CodeWriters/BrowserS3EventsFunctionCodeWriter';
+import { makeBrowserSWEventsFunctionCodeWriter } from './EventsFunctionsExtensionsLoader/CodeWriters/BrowserSWEventsFunctionCodeWriter';
 import Providers from './MainFrame/Providers';
 import ProjectStorageProviders from './ProjectsStorage/ProjectStorageProviders';
 import UrlStorageProvider from './ProjectsStorage/UrlStorageProvider';
@@ -43,7 +43,7 @@ export const create = (authentication: Authentication) => {
     <Providers
       authentication={authentication}
       disableCheckForUpdates={!!appArguments['disable-update-check']}
-      makeEventsFunctionCodeWriter={makeBrowserS3EventsFunctionCodeWriter}
+      makeEventsFunctionCodeWriter={makeBrowserSWEventsFunctionCodeWriter}
       eventsFunctionsExtensionWriter={BrowserEventsFunctionsExtensionWriter}
       eventsFunctionsExtensionOpener={BrowserEventsFunctionsExtensionOpener}
     >
@@ -68,7 +68,7 @@ export const create = (authentication: Authentication) => {
             <MainFrame
               i18n={i18n}
               renderPreviewLauncher={(props, ref) => (
-                <BrowserS3PreviewLauncher {...props} ref={ref} />
+                <BrowserSWPreviewLauncher {...props} ref={ref} />
               )}
               renderShareDialog={props => (
                 <ShareDialog

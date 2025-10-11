@@ -54,7 +54,10 @@ module.exports = {
         )
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/SaveState/savestatetools.js')
+      .setIncludeFile('Extensions/SaveState/SaveStateTools.js')
+      .addIncludeFile(
+        'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
+      )
       .setFunctionName('gdjs.saveState.createGameSaveStateInVariable');
 
     extension
@@ -78,7 +81,10 @@ module.exports = {
       )
       .setDefaultValue('no')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/SaveState/savestatetools.js')
+      .setIncludeFile('Extensions/SaveState/SaveStateTools.js')
+      .addIncludeFile(
+        'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
+      )
       .setFunctionName('gdjs.saveState.createGameSaveStateInStorage');
 
     extension
@@ -112,7 +118,10 @@ module.exports = {
       )
       .setDefaultValue('no')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/SaveState/savestatetools.js')
+      .setIncludeFile('Extensions/SaveState/SaveStateTools.js')
+      .addIncludeFile(
+        'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
+      )
       .setFunctionName('gdjs.saveState.restoreGameSaveStateFromVariable');
 
     extension
@@ -149,7 +158,10 @@ module.exports = {
       )
       .setDefaultValue('no')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/SaveState/savestatetools.js')
+      .setIncludeFile('Extensions/SaveState/SaveStateTools.js')
+      .addIncludeFile(
+        'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
+      )
       .setFunctionName('gdjs.saveState.restoreGameSaveStateFromStorage');
 
     extension
@@ -166,7 +178,10 @@ module.exports = {
       )
       .addCodeOnlyParameter('currentScene', '')
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
-      .setIncludeFile('Extensions/SaveState/savestatetools.js')
+      .setIncludeFile('Extensions/SaveState/SaveStateTools.js')
+      .addIncludeFile(
+        'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
+      )
       .setFunctionName('gdjs.saveState.getSecondsSinceLastSave')
       .setGetter('gdjs.saveState.getSecondsSinceLastSave');
 
@@ -184,7 +199,10 @@ module.exports = {
       )
       .addCodeOnlyParameter('currentScene', '')
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
-      .setIncludeFile('Extensions/SaveState/savestatetools.js')
+      .setIncludeFile('Extensions/SaveState/SaveStateTools.js')
+      .addIncludeFile(
+        'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
+      )
       .setFunctionName('gdjs.saveState.getSecondsSinceLastLoad')
       .setGetter('gdjs.saveState.getSecondsSinceLastLoad');
 
@@ -192,60 +210,72 @@ module.exports = {
       .addCondition(
         'SaveJustSucceeded',
         _('Save just succeeded'),
-        _('the save just succeeded'),
-        _('the save just succeeded'),
+        _('The last save attempt just succeeded.'),
+        _('Save just succeeded'),
         _('Save'),
         'res/actions/saveDown.svg',
         'res/actions/saveDown.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/SaveState/savestatetools.js')
+      .setIncludeFile('Extensions/SaveState/SaveStateTools.js')
+      .addIncludeFile(
+        'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
+      )
       .setFunctionName('gdjs.saveState.hasSaveJustSucceeded');
 
     extension
       .addCondition(
         'SaveJustFailed',
         _('Save just failed'),
-        _('the save just failed'),
-        _('the save just failed'),
+        _('The last save attempt just failed.'),
+        _('Save just failed'),
         _('Save'),
         'res/actions/saveDown.svg',
         'res/actions/saveDown.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/SaveState/savestatetools.js')
+      .setIncludeFile('Extensions/SaveState/SaveStateTools.js')
+      .addIncludeFile(
+        'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
+      )
       .setFunctionName('gdjs.saveState.hasSaveJustFailed');
 
     extension
       .addCondition(
         'LoadJustSucceeded',
         _('Load just succeeded'),
-        _('the load just succeeded'),
-        _('the load just succeeded'),
+        _('The last load attempt just succeeded.'),
+        _('Load just succeeded'),
         _('Load'),
         'res/actions/saveUp.svg',
         'res/actions/saveUp.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/SaveState/savestatetools.js')
+      .setIncludeFile('Extensions/SaveState/SaveStateTools.js')
+      .addIncludeFile(
+        'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
+      )
       .setFunctionName('gdjs.saveState.hasLoadJustSucceeded');
 
     extension
       .addCondition(
         'LoadJustFailed',
         _('Load just failed'),
-        _('the load just failed'),
-        _('the load just failed'),
+        _('The last load attempt just failed.'),
+        _('Load just failed'),
         _('Load'),
         'res/actions/saveUp.svg',
         'res/actions/saveUp.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/SaveState/savestatetools.js')
+      .setIncludeFile('Extensions/SaveState/SaveStateTools.js')
+      .addIncludeFile(
+        'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
+      )
       .setFunctionName('gdjs.saveState.hasLoadJustFailed');
 
     extension
@@ -284,7 +314,10 @@ module.exports = {
         )
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/SaveState/savestatetools.js')
+      .setIncludeFile('Extensions/SaveState/SaveStateTools.js')
+      .addIncludeFile(
+        'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
+      )
       .setFunctionName('gdjs.saveState.setVariableSaveConfiguration');
 
     extension
@@ -317,7 +350,10 @@ module.exports = {
         )
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/SaveState/savestatetools.js')
+      .setIncludeFile('Extensions/SaveState/SaveStateTools.js')
+      .addIncludeFile(
+        'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
+      )
       .setFunctionName('gdjs.saveState.setGameDataSaveConfiguration');
 
     extension
@@ -356,7 +392,10 @@ module.exports = {
         )
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/SaveState/savestatetools.js')
+      .setIncludeFile('Extensions/SaveState/SaveStateTools.js')
+      .addIncludeFile(
+        'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
+      )
       .setFunctionName('gdjs.saveState.setSceneDataSaveConfiguration');
 
     // Save Configuration behavior
@@ -436,7 +475,7 @@ module.exports = {
         sharedData
       )
       .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-      .setIncludeFile('Extensions/SaveState/savestatetools.js')
+      .setIncludeFile('Extensions/SaveState/SaveStateTools.js')
       .addIncludeFile(
         'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
       );

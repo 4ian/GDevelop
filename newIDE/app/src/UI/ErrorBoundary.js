@@ -213,15 +213,17 @@ export const ErrorFallbackComponent = ({
                 or restart GDevelop.
               </Trans>
             </AlertMessage>
-            <BackgroundText>Error ID: {uniqueErrorId}</BackgroundText>
+            <BackgroundText allowSelection>
+              Unique Error ID for debugging: {uniqueErrorId}
+            </BackgroundText>
             {error && error.stack && (
-              <BackgroundText style={styles.errorMessage}>
-                {error.stack.slice(0, 200)}...
+              <BackgroundText allowSelection style={styles.errorMessage}>
+                {error.stack.slice(0, 400)}...
               </BackgroundText>
             )}
             {componentStack && (
-              <BackgroundText style={styles.errorMessage}>
-                {componentStack.slice(0, 200)}...
+              <BackgroundText allowSelection style={styles.errorMessage}>
+                {componentStack.slice(0, 300)}...
               </BackgroundText>
             )}
           </ColumnStackLayout>

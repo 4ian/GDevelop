@@ -9,12 +9,12 @@ const fs = require('fs').promises;
 const path = require('path');
 const shell = require('shelljs');
 const {
-  gdevelopWikiUrlRoot,
-  getHelpLink,
   generateReadMoreLink,
   improperlyFormattedHelpPaths,
   getExtensionFolderName,
 } = require('./lib/WikiHelpLink');
+const { groupBy, sortKeys } = require('./lib/ArrayHelpers');
+const { generateAllExtensionsSections } = require('./lib/WikiExtensionTable');
 
 shell.exec('node import-GDJS-Runtime.js');
 
@@ -27,6 +27,7 @@ const expressionsFilePath = path.join(
   allFeaturesRootPath,
   'expressions-reference.md'
 );
+
 const {
   generateExtensionReference,
   generateExtensionRawText,
@@ -94,57 +95,41 @@ const generateAllExtensionReferences = gd => {
 const generateAllFeaturesStartPageRawTexts = extensionReferences => {
   const headerText = {
     text: `---
-icon: material/star-circle
+icon: material/star
 ---
-# All features
+# All GDevelop core features
 
-This page lists **all the features** that are provided in GDevelop. These can be objects, behaviors but also features that can be used directly using actions, conditions or expressions (without requiring an object to be existing on the scene).
+This page lists **all the core features** that are provided in GDevelop. These can be objects, visual effects, behaviors, actions, conditions or expressions.
 
-Note that GDevelop can also be extended with extensions: take a look at [the list of community extensions](/gdevelop5/extensions) or learn how to create your [own set of features (behaviors, actions, conditions or expressions)](/gdevelop5/extensions/create).
+GDevelop can also be extended with extensions: take a look at [the list of extended features](/gdevelop5/extensions) or learn how to create your [own extensions](/gdevelop5/extensions/create).
 
 `,
   };
   const footerText = {
     text: `
-You can also find a **reference sheet of all expressions**:
+You can also find a **reference sheet of all base expressions**:
 
 * [Expressions reference](/gdevelop5/all-features/expressions-reference)
 
 ## More features as extensions
 
-Remember that you can also [search for new features in the community extensions](/gdevelop5/extensions), or create your [own set of features (behaviors, actions, conditions or expressions)](/gdevelop5/extensions/create).`,
+You can also [search for new features in list of extensions](/gdevelop5/extensions), or create your [own objects, behaviors, actions, conditions or expressions](/gdevelop5/extensions/create).`,
   };
 
-  return [
-    headerText,
-    ...extensionReferences
-      .filter(extensionReference => {
-        return !ignoredExtensionNames.includes(
-          extensionReference.extension.getName()
-        );
-      })
-      .flatMap(extensionReferences => {
-        const folderName = getExtensionFolderName(
-          extensionReferences.extension.getName()
-        );
-        const helpPagePath = extensionReferences.extension.getHelpPath();
-        const referencePageUrl = `${gdevelopWikiUrlRoot}/all-features/${folderName}/reference`;
-        const helpPageUrl = getHelpLink(helpPagePath) || referencePageUrl;
+  const filteredExtensions = extensionReferences
+    .filter(extensionReference => {
+      return !ignoredExtensionNames.includes(
+        extensionReference.extension.getName()
+      );
+    })
+    .map(extensionReference => extensionReference.extension);
 
-        return [
-          {
-            text:
-              '* ' +
-              // Link to help page or to reference if none.
-              `[${extensionReferences.extension.getFullName()}](${helpPageUrl})` +
-              (helpPageUrl !== referencePageUrl
-                ? ` ([reference](${referencePageUrl}))`
-                : ''),
-          },
-        ];
-      }),
-    footerText,
-  ];
+  const groupedContent = generateAllExtensionsSections({
+    extensions: filteredExtensions,
+    baseFolder: 'all-features',
+  });
+
+  return [headerText, { text: groupedContent }, footerText];
 };
 
 /** @returns {RawText} */
@@ -203,6 +188,61 @@ const generateExtensionRawTexts = extensionReferences => {
     });
 
   return { allExtensionRawTexts };
+};
+
+/**
+ * Generate the .pages nav list for All features, grouped by category.
+ * @param {Array<ExtensionReference>} extensionReferences
+ * @param {number} indentationLevel
+ */
+const generateAllFeaturesPageList = (extensionReferences, indentationLevel) => {
+  const filteredExtensions = extensionReferences.filter(extensionReference => {
+    return !ignoredExtensionNames.includes(
+      extensionReference.extension.getName()
+    );
+  });
+
+  const extensionsByCategory = sortKeys(
+    groupBy(filteredExtensions, ref => ref.extension.getCategory() || 'General')
+  );
+
+  const baseIndentation = ' '.repeat(4 * indentationLevel);
+
+  let pagesList = '';
+  for (const category in extensionsByCategory) {
+    pagesList += `${baseIndentation}- ${category}:\n`;
+
+    const extensionReferences = extensionsByCategory[category]
+      .slice()
+      .sort((a, b) =>
+        a.extension.getFullName().localeCompare(b.extension.getFullName())
+      );
+    for (const { extension } of extensionReferences) {
+      const folderName = getExtensionFolderName(extension.getName());
+      pagesList += `${baseIndentation}    - ${extension.getFullName()}: ${folderName}\n`;
+    }
+  }
+
+  return pagesList.length === 0
+    ? pagesList
+    : pagesList.substring(0, pagesList.length - 1);
+};
+
+/**
+ * Write the .pages file for All features
+ * @param {Array<ExtensionReference>} extensionReferences
+ */
+const generateAllFeaturesMkDocsDotPagesFile = async extensionReferences => {
+  const dotPagesContent = `nav:
+    - index.md
+${generateAllFeaturesPageList(extensionReferences, 1)}
+    - ...
+    - expressions-reference.md
+`;
+
+  const allFeaturesDotPagesFilePath = path.join(allFeaturesRootPath, '.pages');
+  await fs.writeFile(allFeaturesDotPagesFilePath, dotPagesContent);
+  console.info(`ℹ️ File generated: ${allFeaturesDotPagesFilePath}`);
 };
 
 /**
@@ -339,6 +379,9 @@ initializeGDevelopJs().then(async gd => {
       rawTextsToString(allFeaturesStartPageRawTexts)
     );
     console.info(`ℹ️ File generated: ${allFeaturesFilePath}`);
+
+    // Generate .pages to organize navigation by categories
+    await generateAllFeaturesMkDocsDotPagesFile(extensionReferences);
 
     if (improperlyFormattedHelpPaths.size > 0) {
       console.info(

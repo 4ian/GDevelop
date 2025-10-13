@@ -1,6 +1,6 @@
 // @flow
 import path from 'path-browserify';
-import { putFile } from '../../Utils/LocalFileIndexedDB';
+import { deleteFilesWithPrefix, putFile } from '../../Utils/BrowserSWIndexedDB';
 const gd: libGDevelop = global.gd;
 
 export type TextFileDescriptor = {|
@@ -82,21 +82,24 @@ export default class BrowserSWFileSystem {
 
   /**
    * Uploads all pending files to IndexedDB.
-   * This replaces the S3 upload functionality with local IndexedDB storage.
    */
-  uploadPendingObjects = async () => {
+  applyPendingOperations = async () => {
     try {
       console.log(
-        `[BrowserSWFileSystem] Storing ${this._pendingFiles.length} files in IndexedDB for preview...`
+        `[BrowserSWFileSystem] Storing ${
+          this._pendingFiles.length
+        } files in IndexedDB for preview...`
       );
 
-      const uploadPromises = this._pendingFiles.map(async (file) => {
+      const uploadPromises = this._pendingFiles.map(async file => {
         const fullPath = `/${file.path}`; // TODO
         const encoder = new TextEncoder();
         const bytes = encoder.encode(file.content).buffer;
 
         console.log(
-          `[BrowserSWFileSystem] Storing file: ${fullPath} (${bytes.byteLength} bytes, ${file.contentType})`
+          `[BrowserSWFileSystem] Storing file: ${fullPath} (${
+            bytes.byteLength
+          } bytes, ${file.contentType})`
         );
 
         await putFile(fullPath, bytes, file.contentType);
@@ -105,10 +108,15 @@ export default class BrowserSWFileSystem {
       await Promise.all(uploadPromises);
 
       console.log(
-        `[BrowserSWFileSystem] Successfully stored all ${this._pendingFiles.length} preview files in IndexedDB.`
+        `[BrowserSWFileSystem] Successfully stored all ${
+          this._pendingFiles.length
+        } preview files in IndexedDB.`
       );
     } catch (error) {
-      console.error("[BrowserSWFileSystem] Can't store all files in IndexedDB:", error);
+      console.error(
+        "[BrowserSWFileSystem] Can't store all files in IndexedDB:",
+        error
+      );
       throw error;
     }
   };
@@ -123,7 +131,18 @@ export default class BrowserSWFileSystem {
   };
 
   clearDir = (path: string) => {
-    // Assume path is cleared.
+    // TODO: add to a pending operation list so we ensure it's executed.
+    console.info(`[BrowserSWFileSystem] Clearing directory: ${path}...`);
+    deleteFilesWithPrefix(path)
+      .then(() => {
+        console.info(`[BrowserSWFileSystem] Cleared directory: ${path}`);
+      })
+      .catch(error => {
+        console.error(
+          `[BrowserSWFileSystem] Error clearing directory: ${path}`,
+          error
+        );
+      });
   };
 
   getTempDir = () => {
@@ -170,7 +189,12 @@ export default class BrowserSWFileSystem {
       return true;
     }
 
-    console.warn('[BrowserSWFileSystem] Copy not done from', source, 'to', dest);
+    console.warn(
+      '[BrowserSWFileSystem] Copy not done from',
+      source,
+      'to',
+      dest
+    );
     return true;
   };
 
@@ -197,7 +221,9 @@ export default class BrowserSWFileSystem {
     if (!!this._indexedFilesContent[file])
       return this._indexedFilesContent[file].text;
 
-    console.error(`[BrowserSWFileSystem] Unknown file ${file}, returning an empty string`);
+    console.error(
+      `[BrowserSWFileSystem] Unknown file ${file}, returning an empty string`
+    );
     return '';
   };
 

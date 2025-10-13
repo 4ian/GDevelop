@@ -3,10 +3,11 @@ import {
   type EventsFunctionCodeWriter,
   type EventsFunctionCodeWriterCallbacks,
 } from '..';
-import { putFile } from '../../Utils/LocalFileIndexedDB';
+import { putFile } from '../../Utils/BrowserSWIndexedDB';
 import { makeTimestampedId } from '../../Utils/TimestampedId';
 import slugs from 'slugs';
 import debounce from 'lodash/debounce';
+import { getBrowserSWPreviewBaseUrl } from '../../Utils/BrowserSWIndexedDB';
 
 let batchedWrites: Array<{
   path: string,
@@ -71,14 +72,6 @@ const writeFileInNextBatch = (path: string, content: string) => {
 };
 
 /**
- * Gets the base URL for local service worker previews.
- */
-const getLocalPreviewBaseUrl = (): string => {
-  const origin = window.location.origin;
-  return `${origin}/local_sw_preview`;
-};
-
-/**
  * Create the EventsFunctionCodeWriter that writes generated code for events functions
  * to IndexedDB for service worker serving.
  */
@@ -86,7 +79,7 @@ export const makeBrowserSWEventsFunctionCodeWriter = ({
   onWriteFile,
 }: EventsFunctionCodeWriterCallbacks): EventsFunctionCodeWriter => {
   const prefix = makeTimestampedId();
-  const baseUrl = getLocalPreviewBaseUrl();
+  const baseUrl = getBrowserSWPreviewBaseUrl();
 
   const getPathFor = (codeNamespace: string) => {
     return `${baseUrl}/${prefix}/${slugs(codeNamespace)}.js`;

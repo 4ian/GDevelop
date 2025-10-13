@@ -1,15 +1,20 @@
+/* eslint-disable no-restricted-globals */
 // ============================================================================
 // IndexedDB Virtual File System for Local Previews
 // ============================================================================
 
 console.log('[ServiceWorker] Service worker file executed');
 
-const DB_NAME = 'gdevelop-local-preview-vfs';
+const swURL = new URL(self.location.href);
+const isDev = swURL.searchParams.has('dev');
+
+// If updated, also update the BrowserSWIndexedDB module.
+const DB_NAME = 'gdevelop-browser-sw-preview';
 const STORE_NAME = 'files';
 const DB_VERSION = 1;
 
 /**
- * Opens the IndexedDB database for local preview files.
+ * Opens the IndexedDB database for browser SW preview files.
  */
 function openPreviewDB() {
   return new Promise((resolve, reject) => {
@@ -90,15 +95,15 @@ async function getPreviewFile(path) {
 }
 
 /**
- * Handles fetch events for local preview files served from IndexedDB.
+ * Handles fetch events for browser SW preview files served from IndexedDB.
  */
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // Check if this is a request for a local preview file
-  if (url.pathname.startsWith('/local_sw_preview/')) {
-    const relativePath = url.pathname.replace('/local_sw_preview', '');
-    console.log('[ServiceWorker] Intercepting local preview request:', url.pathname);
+  // Check if this is a request for a browser SW preview file
+  if (url.pathname.startsWith('/browser_sw_preview/')) {
+    const relativePath = url.pathname.replace('/browser_sw_preview', '');
+    console.log('[ServiceWorker] Intercepting browser SW preview request:', url.pathname);
 
     event.respondWith((async () => {
       try {
@@ -107,7 +112,7 @@ self.addEventListener('fetch', (event) => {
 
         if (!fileRecord) {
           console.warn('[ServiceWorker] File not found in IndexedDB:', relativePath);
-          return new Response('File not found in local preview storage', {
+          return new Response('File not found in browser SW preview storage', {
             status: 404,
             headers: {
               'Content-Type': 'text/plain',
@@ -130,8 +135,8 @@ self.addEventListener('fetch', (event) => {
           }
         });
       } catch (error) {
-        console.error('[ServiceWorker] Error serving local preview file:', relativePath, error);
-        return new Response('Error loading file from local preview storage: ' + error.message, {
+        console.error('[ServiceWorker] Error serving browser SW preview file:', relativePath, error);
+        return new Response('Error loading file from browser SW preview storage: ' + error.message, {
           status: 500,
           headers: {
             'Content-Type': 'text/plain',
@@ -145,84 +150,85 @@ self.addEventListener('fetch', (event) => {
   }
 });
 
-// Log service worker activation
 self.addEventListener('install', (event) => {
-  console.log('[ServiceWorker] Installing service worker with local preview support...');
-  self.skipWaiting();
+  console.log('[ServiceWorker] Installing service worker...');
+  if (isDev) {
+    // In development, immediately use a new service worker.
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener('activate', (event) => {
-  console.log('[ServiceWorker] Activating service worker with local preview support...');
-  event.waitUntil(self.clients.claim());
+  console.log('[ServiceWorker] Activating service worker...');
+
+  if (isDev) {
+    event.waitUntil(self.clients.claim());
+  }
 });
 
 // ============================================================================
 // Standard Workbox Configuration
 // ============================================================================
 
-if (typeof importScripts === 'function') {
-  importScripts(
-    'https://storage.googleapis.com/workbox-cdn/releases/3.5.0/workbox-sw.js'
+// TODO: remove this check
+// eslint-disable-next-line no-undef
+importScripts(
+  'https://storage.googleapis.com/workbox-cdn/releases/3.5.0/workbox-sw.js'
+);
+/* global workbox */
+if (workbox) {
+  console.log('[ServiceWorker] Workbox loaded successfully');
+
+  // Will be replaced by make-service-worker.js to include the proper version.
+  const VersionMetadata = {};
+
+  // Contrary to other static assets (JS, CSS, HTML), libGD.js/wasm are not
+  // versioned in their filenames. Instead, we version using a query string
+  // (see src/index.js where it's loaded with the same query string).
+  workbox.precaching.precacheAndRoute([
+    {
+      url: `libGD.js?cache-buster=${VersionMetadata.versionWithHash}`,
+      revision: null, // Revision is null because versioning included in the URL.
+    },
+    {
+      url: `libGD.wasm?cache-buster=${VersionMetadata.versionWithHash}`,
+      revision: null, // Revision is null because versioning included in the URL.
+    },
+  ]);
+
+  /* injection point for manifest files.  */
+  workbox.precaching.precacheAndRoute([]);
+
+  /* custom cache rules*/
+  workbox.routing.registerNavigationRoute('/index.html', {
+    blacklist: [/^\/_/, /\/[^\/]+\.[^\/]+$/, /^\/browser_sw_preview\//],
+  });
+
+  // Cache resources from GDevelop cloudfront server (CORS enabled).
+  workbox.routing.registerRoute(
+    /https:\/\/resources\.gdevelop-app\.com\/.*$/,
+    workbox.strategies.networkFirst({
+      cacheName: 'gdevelop-resources-cache',
+      plugins: [
+        new workbox.expiration.Plugin({
+          maxEntries: 500,
+        }),
+      ],
+    })
   );
-  /* global workbox */
-  if (workbox) {
-    console.log('[ServiceWorker] Workbox loaded successfully');
 
-    // Will be replaced by make-service-worker.js to include the proper version.
-    const VersionMetadata = {};
-
-    // Contrary to other static assets (JS, CSS, HTML), libGD.js/wasm are not
-    // versioned in their filenames. Instead, we version using a query string
-    // (see src/index.js where it's loaded with the same query string).
-    workbox.precaching.precacheAndRoute([
-      {
-        url: `libGD.js?cache-buster=${VersionMetadata.versionWithHash}`,
-        revision: null, // Revision is null because versioning included in the URL.
-      },
-      {
-        url: `libGD.wasm?cache-buster=${VersionMetadata.versionWithHash}`,
-        revision: null, // Revision is null because versioning included in the URL.
-      },
-    ]);
-
-    /* injection point for manifest files.  */
-    workbox.precaching.precacheAndRoute([]);
-
-    /* custom cache rules*/
-    workbox.routing.registerNavigationRoute('/index.html', {
-      blacklist: [/^\/_/, /\/[^\/]+\.[^\/]+$/, /^\/local_sw_preview\//],
-    });
-
-    // Cache resources from GDevelop cloudfront server (CORS enabled).
-    workbox.routing.registerRoute(
-      /https:\/\/resources\.gdevelop-app\.com\/.*$/,
-      workbox.strategies.networkFirst({
-        cacheName: 'gdevelop-resources-cache',
-        plugins: [
-          new workbox.expiration.Plugin({
-            maxEntries: 500,
-          }),
-        ],
-      })
-    );
-
-    // TODO: this should be useless?
-    workbox.routing.registerRoute(
-      /\.(?:png|gif|jpg|jpeg)$/,
-      workbox.strategies.networkFirst({
-        cacheName: 'images',
-        plugins: [
-          new workbox.expiration.Plugin({
-            maxEntries: 150,
-          }),
-        ],
-      })
-    );
-  } else {
-    console.log('[ServiceWorker] Workbox could not be loaded - no offline support');
-  }
+  // TODO: this should be useless?
+  workbox.routing.registerRoute(
+    /\.(?:png|gif|jpg|jpeg)$/,
+    workbox.strategies.networkFirst({
+      cacheName: 'images',
+      plugins: [
+        new workbox.expiration.Plugin({
+          maxEntries: 150,
+        }),
+      ],
+    })
+  );
 } else {
-  console.log(
-    '[ServiceWorker] importScripts does not exist on this browser - no offline support'
-  );
+  console.log('[ServiceWorker] Workbox could not be loaded - no offline support');
 }

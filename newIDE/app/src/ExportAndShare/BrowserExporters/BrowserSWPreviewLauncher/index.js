@@ -19,6 +19,7 @@ import { displayBlackLoadingScreenOrThrow } from '../../../Utils/BrowserExternal
 import { getGDevelopResourceJwtToken } from '../../../Utils/GDevelopServices/Project';
 import { isNativeMobileApp } from '../../../Utils/Platform';
 import { getIDEVersionWithHash } from '../../../Version';
+import { getBrowserSWPreviewBaseUrl } from '../../../Utils/BrowserSWIndexedDB';
 const gd: libGDevelop = global.gd;
 
 type State = {|
@@ -57,16 +58,6 @@ export const immediatelyOpenNewPreviewWindow = (
   return previewWindow;
 };
 
-/**
- * Gets the base URL for local service worker previews.
- * This URL should be handled by the service worker to serve files from IndexedDB.
- */
-const getLocalPreviewBaseUrl = (): string => {
-  // Use the current origin to ensure the service worker can intercept requests
-  const origin = window.location.origin;
-  return `${origin}/local_sw_preview`;
-};
-
 export default class BrowserSWPreviewLauncher extends React.Component<
   PreviewLauncherProps,
   State
@@ -87,10 +78,13 @@ export default class BrowserSWPreviewLauncher extends React.Component<
       console.info('[BrowserSWPreviewLauncher] GDJS found in', gdjsRoot);
 
       const prefix = makeTimestampedId();
-      const baseUrl = getLocalPreviewBaseUrl();
+      const baseUrl = getBrowserSWPreviewBaseUrl();
       const outputDir = `${baseUrl}/${prefix}`;
 
-      console.log('[BrowserSWPreviewLauncher] Preview will be served from:', outputDir);
+      console.log(
+        '[BrowserSWPreviewLauncher] Preview will be served from:',
+        outputDir
+      );
 
       const browserSWFileSystem = new BrowserSWFileSystem({
         filesContent,
@@ -232,14 +226,18 @@ export default class BrowserSWPreviewLauncher extends React.Component<
       if (gdevelopResourceToken)
         previewExportOptions.setGDevelopResourceToken(gdevelopResourceToken);
 
-      console.log('[BrowserSWPreviewLauncher] Exporting project for preview...');
+      console.log(
+        '[BrowserSWPreviewLauncher] Exporting project for preview...'
+      );
       exporter.exportProjectForPixiPreview(previewExportOptions);
       previewExportOptions.delete();
       exporter.delete();
 
       // Store files in IndexedDB instead of uploading to S3
-      console.log('[BrowserSWPreviewLauncher] Storing preview files in IndexedDB...');
-      await browserSWFileSystem.uploadPendingObjects();
+      console.log(
+        '[BrowserSWPreviewLauncher] Storing preview files in IndexedDB...'
+      );
+      await browserSWFileSystem.applyPendingOperations();
 
       // Change the HTML file displayed by the preview window so that it starts loading
       // the game.
@@ -279,7 +277,10 @@ export default class BrowserSWPreviewLauncher extends React.Component<
 
       console.log('[BrowserSWPreviewLauncher] Preview launched successfully!');
     } catch (error) {
-      console.error('[BrowserSWPreviewLauncher] Error launching preview:', error);
+      console.error(
+        '[BrowserSWPreviewLauncher] Error launching preview:',
+        error
+      );
       this.setState({
         error,
       });

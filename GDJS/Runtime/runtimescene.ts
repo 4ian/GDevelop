@@ -135,8 +135,9 @@ namespace gdjs {
     loadFromScene(
       sceneAndExtensionsData: SceneAndExtensionsData | null,
       options?: {
-        skipCreatingInstances?: boolean;
+        excludedObjectNames?: Set<string>;
         skipStoppingSoundsOnStartup?: boolean;
+        skipCreatingInstances?: boolean;
       }
     ) {
       if (!sceneAndExtensionsData) {
@@ -196,7 +197,7 @@ namespace gdjs {
         this.registerObject(sceneData.objects[i]);
       }
 
-      //Create initial instances of objects
+      // Create initial instances of objects.
       if (!options || !options.skipCreatingInstances) {
         this.createObjectsFrom(
           sceneData.instances,
@@ -204,7 +205,10 @@ namespace gdjs {
           0,
           0,
           /*trackByPersistentUuid=*/
-          true
+          true,
+          {
+            excludedObjectNames: options?.excludedObjectNames,
+          }
         );
       }
 

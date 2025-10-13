@@ -312,15 +312,15 @@ namespace gdjs {
       xPos: float,
       yPos: float,
       zPos: float,
-      trackByPersistentUuid: boolean
+      trackByPersistentUuid: boolean,
+      options?: {
+        excludedObjectNames?: Set<string> | null;
+      }
     ): void {
-      let zOffset: number;
-      let shouldTrackByPersistentUuid: boolean;
+      let zOffset: number = zPos;
+      let shouldTrackByPersistentUuid: boolean = trackByPersistentUuid;
 
-      if (arguments.length === 5) {
-        zOffset = zPos;
-        shouldTrackByPersistentUuid = trackByPersistentUuid;
-      } else {
+      if (arguments.length <= 4) {
         /**
          * Support for the previous signature (before 3D was introduced):
          * createObjectsFrom(data, xPos, yPos, trackByPersistentUuid)
@@ -332,6 +332,10 @@ namespace gdjs {
       for (let i = 0, len = data.length; i < len; ++i) {
         const instanceData = data[i];
         const objectName = instanceData.name;
+        if (options?.excludedObjectNames?.has(objectName)) {
+          continue;
+        }
+
         const newObject = this.createObject(objectName);
         if (newObject !== null) {
           if (shouldTrackByPersistentUuid) {
@@ -617,7 +621,7 @@ namespace gdjs {
      * @param name Name of the object for which the instances must be returned.
      * @return The list of objects with the given name
      */
-    getObjects(name: string): gdjs.RuntimeObject[] | undefined {
+    getObjects(name: string): gdjs.RuntimeObject[] {
       if (!this._instances.containsKey(name)) {
         logger.info(
           'RuntimeInstanceContainer.getObjects: No instances called "' +
@@ -644,18 +648,20 @@ namespace gdjs {
         return null;
       }
 
+      const objectData = this._objects.get(objectName);
+
       // Create a new object using the object constructor (cached during loading)
       // and the stored object's data:
       const cache = this._instancesCache.get(objectName);
       const ctor = this._objectsCtor.get(objectName);
       let obj;
       if (!cache || cache.length === 0) {
-        obj = new ctor(this, this._objects.get(objectName));
+        obj = new ctor(this, objectData);
       } else {
         // Reuse an objet destroyed before. If there is an object in the cache,
         // then it means it does support reinitialization.
         obj = cache.pop();
-        obj.reinitialize(this._objects.get(objectName));
+        obj.reinitialize(objectData);
       }
       this.addObject(obj);
       return obj;

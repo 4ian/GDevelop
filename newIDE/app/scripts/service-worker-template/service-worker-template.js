@@ -70,9 +70,7 @@ async function getPreviewFile(path) {
 
         request.onsuccess = () => {
           const result = request.result;
-          if (result) {
-            console.log('[ServiceWorker] File retrieved from IndexedDB:', path, '(' + result.bytes.byteLength + ' bytes)');
-          } else {
+          if (!result) {
             console.warn('[ServiceWorker] File not found in IndexedDB:', path);
           }
           resolve(result || null);
@@ -103,7 +101,6 @@ self.addEventListener('fetch', (event) => {
   // Check if this is a request for a browser SW preview file
   if (url.pathname.startsWith('/browser_sw_preview/')) {
     const relativePath = url.pathname.replace('/browser_sw_preview', '');
-    console.log('[ServiceWorker] Intercepting browser SW preview request:', url.pathname);
 
     event.respondWith((async () => {
       try {
@@ -121,7 +118,6 @@ self.addEventListener('fetch', (event) => {
         }
 
         // Return the file with appropriate headers
-        console.log('[ServiceWorker] Serving file from IndexedDB:', relativePath, 'Content-Type:', fileRecord.contentType);
         return new Response(fileRecord.bytes, {
           status: 200,
           headers: {

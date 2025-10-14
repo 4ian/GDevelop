@@ -91,7 +91,7 @@ export type ServerAddress = {
 
 /** Interface to run a debugger server for previews. */
 export type PreviewDebuggerServer = {|
-  startServer: () => Promise<void>,
+  startServer: ({ origin?: string }) => Promise<void>,
   getServerState: () => 'started' | 'stopped',
   getExistingDebuggerIds: () => Array<DebuggerId>,
   sendMessage: (id: DebuggerId, message: Object) => void,

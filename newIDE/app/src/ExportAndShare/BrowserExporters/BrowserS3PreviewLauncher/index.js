@@ -20,6 +20,7 @@ import { displayBlackLoadingScreenOrThrow } from '../../../Utils/BrowserExternal
 import { getGDevelopResourceJwtToken } from '../../../Utils/GDevelopServices/Project';
 import { isNativeMobileApp } from '../../../Utils/Platform';
 import { getIDEVersionWithHash } from '../../../Version';
+import { getBrowserSWPreviewBaseUrl } from '../../../Utils/BrowserSWIndexedDB';
 const gd: libGDevelop = global.gd;
 
 type State = {|
@@ -52,6 +53,7 @@ export const immediatelyOpenNewPreviewWindow = (
       "Can't open the preview window because of browser restrictions."
     );
   }
+  console.log('Preview window opened', previewWindow);
 
   displayBlackLoadingScreenOrThrow(previewWindow);
 
@@ -135,7 +137,9 @@ export default class BrowserS3PreviewLauncher extends React.Component<
         }).filter(Boolean);
 
     try {
-      await this.getPreviewDebuggerServer().startServer();
+      await this.getPreviewDebuggerServer().startServer({
+        origin: new URL(getBrowserSWPreviewBaseUrl()).origin,
+      });
     } catch (err) {
       // Ignore any error when running the debugger server - the preview
       // can still work without it.

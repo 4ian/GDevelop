@@ -3,8 +3,7 @@ import {
   type EventsFunctionCodeWriter,
   type EventsFunctionCodeWriterCallbacks,
 } from '..';
-import { putFile } from '../../Utils/BrowserSWIndexedDB';
-import { makeTimestampedId } from '../../Utils/TimestampedId';
+import { deleteFilesWithPrefix, putFile } from '../../Utils/BrowserSWIndexedDB';
 import slugs from 'slugs';
 import debounce from 'lodash/debounce';
 import { getBrowserSWPreviewBaseUrl } from '../../Utils/BrowserSWIndexedDB';
@@ -78,11 +77,23 @@ const writeFileInNextBatch = (path: string, content: string) => {
 export const makeBrowserSWEventsFunctionCodeWriter = ({
   onWriteFile,
 }: EventsFunctionCodeWriterCallbacks): EventsFunctionCodeWriter => {
-  const prefix = makeTimestampedId();
   const baseUrl = getBrowserSWPreviewBaseUrl();
+  const extensionsCodeUrl = baseUrl + '/extensions-code';
+
+  // At startup, clean up the old generated files for extensions code.
+  (async () => {
+    try {
+      await deleteFilesWithPrefix(extensionsCodeUrl + '/');
+    } catch (error) {
+      console.error(
+        `[BrowserSWEventsFunctionCodeWriter] Failed to clean generated files for extensions code in "${extensionsCodeUrl}/".`,
+        error
+      );
+    }
+  })();
 
   const getPathFor = (codeNamespace: string) => {
-    return `${baseUrl}/${prefix}/${slugs(codeNamespace)}.js`;
+    return `${extensionsCodeUrl}/${slugs(codeNamespace)}.js`;
   };
 
   return {

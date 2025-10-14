@@ -32,7 +32,7 @@ export const getBrowserSWPreviewBaseUrl = (): string => {
  * Opens or returns the existing IndexedDB database connection.
  * Handles database upgrades and version management.
  */
-export const openDatabase = (): Promise<IDBDatabase> => {
+const openBrowserSWIndexedDB = (): Promise<IDBDatabase> => {
   if (dbInstance && dbInstance.version === DB_VERSION) {
     return Promise.resolve(dbInstance);
   }
@@ -106,10 +106,7 @@ export const openDatabase = (): Promise<IDBDatabase> => {
 };
 
 /**
- * Stores a file in IndexedDB.
- * @param path - The virtual path of the file (e.g., '/browser_sw_preview/session-123/index.html')
- * @param bytes - The file content as ArrayBuffer
- * @param contentType - The MIME type of the file
+ * Stores a "file" in IndexedDB.
  */
 export const putFile = async (
   path: string,
@@ -117,7 +114,7 @@ export const putFile = async (
   contentType: string
 ): Promise<void> => {
   try {
-    const db = await openDatabase();
+    const db = await openBrowserSWIndexedDB();
 
     return new Promise((resolve, reject) => {
       try {
@@ -134,7 +131,6 @@ export const putFile = async (
         };
 
         transaction.oncomplete = () => {
-          console.log('[BrowserSWIndexedDB] File stored successfully:', path);
           resolve();
         };
 
@@ -170,15 +166,15 @@ export const putFile = async (
 };
 
 /**
- * Deletes all files with a given path prefix.
- * Useful for cleaning up old preview sessions.
- * @param pathPrefix - The path prefix to match (e.g., '/browser_sw_preview/session-123/')
+ * Deletes all "files" stored in IndexedDB with a given path prefix.
+ *
+ * @param pathPrefix - The path prefix to match.
  */
 export const deleteFilesWithPrefix = async (
   pathPrefix: string
 ): Promise<number> => {
   try {
-    const db = await openDatabase();
+    const db = await openBrowserSWIndexedDB();
 
     return new Promise((resolve, reject) => {
       try {
@@ -196,12 +192,6 @@ export const deleteFilesWithPrefix = async (
         };
 
         transaction.oncomplete = () => {
-          console.log(
-            '[BrowserSWIndexedDB] Deleted',
-            deletedCount,
-            'files with prefix:',
-            pathPrefix
-          );
           resolve(deletedCount);
         };
 
@@ -244,17 +234,5 @@ export const deleteFilesWithPrefix = async (
       error
     );
     throw error;
-  }
-};
-
-/**
- * Closes the database connection.
- * Should be called when the application is shutting down.
- */
-export const closeDatabase = (): void => {
-  if (dbInstance) {
-    console.log('[BrowserSWIndexedDB] Closing database connection');
-    dbInstance.close();
-    dbInstance = null;
   }
 };

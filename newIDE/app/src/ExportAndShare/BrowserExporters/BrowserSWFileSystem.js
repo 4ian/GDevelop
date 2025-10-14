@@ -10,7 +10,6 @@ export type TextFileDescriptor = {|
 
 type ConstructorArgs = {|
   filesContent: Array<TextFileDescriptor>,
-  prefix: string,
   baseUrl: string,
 |};
 
@@ -51,7 +50,6 @@ const getContentType = (filePath: string): string => {
  * and serves them via a service worker for GDevelop previews.
  */
 export default class BrowserSWFileSystem {
-  prefix: string;
   baseUrl: string;
 
   // Store the content of some files.
@@ -64,12 +62,13 @@ export default class BrowserSWFileSystem {
     contentType: string,
   |}> = [];
 
+  _pendingDeleteOperations: Array<Promise<any>> = [];
+
   // Store a set of all external URLs copied so that we can simulate
   // readDir result.
   _allCopiedExternalUrls = new Set<string>();
 
-  constructor({ filesContent, prefix, baseUrl }: ConstructorArgs) {
-    this.prefix = prefix;
+  constructor({ filesContent, baseUrl }: ConstructorArgs) {
     this.baseUrl = baseUrl;
 
     this._indexedFilesContent = {};
@@ -84,6 +83,15 @@ export default class BrowserSWFileSystem {
    * Uploads all pending files to IndexedDB.
    */
   applyPendingOperations = async () => {
+    try {
+      await Promise.all(this._pendingDeleteOperations);
+    } catch (error) {
+      console.error(
+        '[BrowserSWFileSystem] Error while deleting files in IndexedDB. Ignoring.',
+        error
+      );
+    }
+
     try {
       console.log(
         `[BrowserSWFileSystem] Storing ${
@@ -133,16 +141,7 @@ export default class BrowserSWFileSystem {
   clearDir = (path: string) => {
     // TODO: add to a pending operation list so we ensure it's executed.
     console.info(`[BrowserSWFileSystem] Clearing directory: ${path}...`);
-    deleteFilesWithPrefix(path)
-      .then(() => {
-        console.info(`[BrowserSWFileSystem] Cleared directory: ${path}`);
-      })
-      .catch(error => {
-        console.error(
-          `[BrowserSWFileSystem] Error clearing directory: ${path}`,
-          error
-        );
-      });
+    this._pendingDeleteOperations.push(deleteFilesWithPrefix(path));
   };
 
   getTempDir = () => {

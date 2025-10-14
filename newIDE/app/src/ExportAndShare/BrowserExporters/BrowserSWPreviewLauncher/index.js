@@ -8,10 +8,8 @@ import {
   type PreviewOptions,
   type PreviewLauncherProps,
 } from '../../PreviewLauncher.flow';
-import { makeTimestampedId } from '../../../Utils/TimestampedId';
 import {
   browserPreviewDebuggerServer,
-  getExistingPreviewWindowForDebuggerId,
   registerNewPreviewWindow,
 } from '../BrowserS3PreviewLauncher/BrowserPreviewDebuggerServer';
 import Window from '../../../Utils/Window';
@@ -77,9 +75,10 @@ export default class BrowserSWPreviewLauncher extends React.Component<
     return findGDJS('preview').then(({ gdjsRoot, filesContent }) => {
       console.info('[BrowserSWPreviewLauncher] GDJS found in', gdjsRoot);
 
-      const prefix = makeTimestampedId();
+      const isForInGameEdition = false; // TODO: adapt for the 3D editor branch.
+
       const baseUrl = getBrowserSWPreviewBaseUrl();
-      const outputDir = `${baseUrl}/${prefix}`;
+      const outputDir = `${baseUrl}/${isForInGameEdition ? 'in-game-editor-preview' : 'preview'}`;
 
       console.log(
         '[BrowserSWPreviewLauncher] Preview will be served from:',
@@ -89,7 +88,6 @@ export default class BrowserSWPreviewLauncher extends React.Component<
       const browserSWFileSystem = new BrowserSWFileSystem({
         filesContent,
         baseUrl: `${baseUrl}/`,
-        prefix,
       });
       const fileSystem = assignIn(
         new gd.AbstractFileSystemJS(),
@@ -113,21 +111,12 @@ export default class BrowserSWPreviewLauncher extends React.Component<
     });
 
     const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
-    const lastDebuggerId = debuggerIds.length
-      ? debuggerIds[debuggerIds.length - 1]
-      : null;
-    const shouldHotReload = previewOptions.hotReload && lastDebuggerId !== null;
+    const shouldHotReload = previewOptions.hotReload && !!debuggerIds.length;
 
-    // We abuse the "hot reload" to choose if we open a new window or replace
-    // the content of an existing one. But hot reload is NOT implemented (yet -
-    // it would need to generate the preview in the same place and trigger a reload
-    // of the scripts).
-    const existingPreviewWindow = shouldHotReload
-      ? getExistingPreviewWindowForDebuggerId(lastDebuggerId)
-      : null;
-
-    const previewWindows = existingPreviewWindow
-      ? [existingPreviewWindow]
+    // Immediatel open windows (otherwise Safari will block the window opening if done after
+    // an asynchronous operation).
+    const previewWindows = shouldHotReload
+      ? []
       : Array.from({ length: numberOfWindows }, () => {
           try {
             return immediatelyOpenNewPreviewWindow(project);
@@ -141,7 +130,9 @@ export default class BrowserSWPreviewLauncher extends React.Component<
         }).filter(Boolean);
 
     try {
-      await this.getPreviewDebuggerServer().startServer();
+      await this.getPreviewDebuggerServer().startServer({
+        origin: new URL(getBrowserSWPreviewBaseUrl()).origin,
+      });
     } catch (err) {
       // Ignore any error when running the debugger server - the preview
       // can still work without it.
@@ -168,15 +159,29 @@ export default class BrowserSWPreviewLauncher extends React.Component<
         previewExportOptions.setExternalLayoutName(externalLayout.getName());
       }
 
-      if (isNativeMobileApp()) {
-        previewExportOptions.useMinimalDebuggerClient();
-      } else {
+      // TODO
+      // if (isNativeMobileApp()) {
+      //   previewExportOptions.useMinimalDebuggerClient();
+      // } else {
         previewExportOptions.useWindowMessageDebuggerClient();
+      // }
+
+
+      const includeFileHashs = this.props.getIncludeFileHashs();
+      for (const includeFile in includeFileHashs) {
+        const hash = includeFileHashs[includeFile];
+        previewExportOptions.setIncludeFileHash(includeFile, hash);
       }
 
+      previewExportOptions.setProjectDataOnlyExport(
+        // Only export project data if asked and if a hot-reloading is being done.
+        shouldHotReload && previewOptions.projectDataOnlyExport
+      );
+
+      // TODO: remove as useless now because no cache by the service worker.
       // Scripts generated from extensions keep the same URL even after being modified.
       // Use a cache bursting parameter to force the browser to reload them.
-      previewExportOptions.setNonRuntimeScriptsCacheBurst(Date.now());
+      // previewExportOptions.setNonRuntimeScriptsCacheBurst(Date.now());
 
       previewExportOptions.setFullLoadingScreen(
         previewOptions.fullLoadingScreen
@@ -251,7 +256,15 @@ export default class BrowserSWPreviewLauncher extends React.Component<
 
       // If the preview windows are new, register them so that they can be accessed
       // by the debugger and for the captures to be detected when they close.
-      if (!existingPreviewWindow) {
+      if (shouldHotReload) {
+        console.log('Sending hot reload message to debuggers', debuggerIds);
+        debuggerIds.forEach(debuggerId => {
+          console.log('Sending hot reload message to debugger', debuggerId);
+          this.getPreviewDebuggerServer().sendMessage(debuggerId, {
+            command: 'hotReload',
+          });
+        });
+      } else {
         previewWindows.forEach((previewWindow: WindowProxy) => {
           const debuggerId = registerNewPreviewWindow(previewWindow);
           browserPreviewDebuggerServer.registerCallbacks({

@@ -1,6 +1,7 @@
 /* eslint-disable no-restricted-globals */
+
 // ============================================================================
-// IndexedDB Virtual File System for Local Previews
+// Browser Service Worker powered Preview ("Browser SW Preview"), using IndexedDB.
 // ============================================================================
 
 console.log('[ServiceWorker] Service worker file executed');
@@ -16,7 +17,7 @@ const DB_VERSION = 1;
 /**
  * Opens the IndexedDB database for browser SW preview files.
  */
-function openPreviewDB() {
+function openBrowserSWPreviewDB() {
   return new Promise((resolve, reject) => {
     try {
       const request = indexedDB.open(DB_NAME, DB_VERSION);
@@ -49,41 +50,57 @@ function openPreviewDB() {
 }
 
 /**
- * Retrieves a file from IndexedDB.
+ * Retrieves a preview file from IndexedDB.
  */
-async function getPreviewFile(path) {
+async function getBrowserSWPreviewFile(path) {
   try {
-    const db = await openPreviewDB();
+    const db = await openBrowserSWPreviewDB();
 
     return new Promise((resolve, reject) => {
+      let settled = false;
+      const safeResolve = (v) => { if (!settled) { settled = true; resolve(v); } };
+      const safeReject  = (e) => { if (!settled) { settled = true; reject(e); } };
+
       try {
-        const transaction = db.transaction(STORE_NAME, 'readonly');
+        // Sanity-check the store exists (avoids InvalidStateError).
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          const err = new Error(`Object store "${STORE_NAME}" not found`);
+          console.error('[ServiceWorker] Missing object store while getting file:', path, err);
+          return safeReject(err);
+        }
 
-        transaction.onerror = () => {
-          const error = transaction.error || new Error('Transaction failed');
+        const tx = db.transaction(STORE_NAME, 'readonly');
+
+        // If the transaction aborts (quota, deadlock, explicit abort, etc.), reject.
+        tx.onabort = () => {
+          const error = tx.error || new Error('Transaction aborted');
+          console.error('[ServiceWorker] Transaction aborted while getting file:', path, error);
+          safeReject(error);
+        };
+
+        // `onerror` at the transaction level can fire even if request handlers didn’t.
+        tx.onerror = () => {
+          const error = tx.error || new Error('Transaction failed');
           console.error('[ServiceWorker] Transaction error while getting file:', path, error);
-          reject(error);
+          safeReject(error);
         };
 
-        const objectStore = transaction.objectStore(STORE_NAME);
-        const request = objectStore.get(path);
+        const store = tx.objectStore(STORE_NAME);
+        const req = store.get(path);
 
-        request.onsuccess = () => {
-          const result = request.result;
-          if (!result) {
-            console.warn('[ServiceWorker] File not found in IndexedDB:', path);
-          }
-          resolve(result || null);
+        req.onsuccess = () => {
+          const result = req.result;
+          safeResolve(result || null);
         };
 
-        request.onerror = () => {
-          const error = request.error || new Error('Get operation failed');
+        req.onerror = () => {
+          const error = req.error || new Error('Get operation failed');
           console.error('[ServiceWorker] Error retrieving file from IndexedDB:', path, error);
-          reject(error);
+          safeReject(error);
         };
       } catch (error) {
         console.error('[ServiceWorker] Exception during get operation:', path, error);
-        reject(error);
+        safeReject(error);
       }
     });
   } catch (error) {
@@ -105,7 +122,7 @@ self.addEventListener('fetch', (event) => {
     event.respondWith((async () => {
       try {
         // Try to get the file from IndexedDB
-        const fileRecord = await getPreviewFile(relativePath);
+        const fileRecord = await getBrowserSWPreviewFile(relativePath);
 
         if (!fileRecord) {
           console.warn('[ServiceWorker] File not found in IndexedDB:', relativePath);
@@ -163,14 +180,16 @@ self.addEventListener('activate', (event) => {
 });
 
 // ============================================================================
-// Standard Workbox Configuration
+// Standard Workbox Configuration (for "semi-offline"/caching of GDevelop static files and resources)
 // ============================================================================
 
-// TODO: remove this check
+self.__WB_DISABLE_DEV_LOGS = true;
+
 // eslint-disable-next-line no-undef
 importScripts(
   'https://storage.googleapis.com/workbox-cdn/releases/3.5.0/workbox-sw.js'
 );
+
 /* global workbox */
 if (workbox) {
   console.log('[ServiceWorker] Workbox loaded successfully');

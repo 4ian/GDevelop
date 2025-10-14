@@ -1,6 +1,9 @@
 // @flow
 import path from 'path-browserify';
-import { deleteFilesWithPrefix, putFile } from '../../Utils/BrowserSWIndexedDB';
+import {
+  deleteFilesWithPrefix,
+  putFile,
+} from './BrowserSWPreviewLauncher/BrowserSWPreviewIndexedDB';
 const gd: libGDevelop = global.gd;
 
 export type TextFileDescriptor = {|

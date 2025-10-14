@@ -32,7 +32,7 @@ export const getBrowserSWPreviewBaseUrl = (): string => {
  * Opens or returns the existing IndexedDB database connection.
  * Handles database upgrades and version management.
  */
-const openBrowserSWIndexedDB = (): Promise<IDBDatabase> => {
+const openBrowserSWPreviewIndexedDB = (): Promise<IDBDatabase> => {
   if (dbInstance && dbInstance.version === DB_VERSION) {
     return Promise.resolve(dbInstance);
   }
@@ -114,7 +114,7 @@ export const putFile = async (
   contentType: string
 ): Promise<void> => {
   try {
-    const db = await openBrowserSWIndexedDB();
+    const db = await openBrowserSWPreviewIndexedDB();
 
     return new Promise((resolve, reject) => {
       try {
@@ -174,7 +174,7 @@ export const deleteFilesWithPrefix = async (
   pathPrefix: string
 ): Promise<number> => {
   try {
-    const db = await openBrowserSWIndexedDB();
+    const db = await openBrowserSWPreviewIndexedDB();
 
     return new Promise((resolve, reject) => {
       try {

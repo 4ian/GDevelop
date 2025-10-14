@@ -20,7 +20,7 @@ import { displayBlackLoadingScreenOrThrow } from '../../../Utils/BrowserExternal
 import { getGDevelopResourceJwtToken } from '../../../Utils/GDevelopServices/Project';
 import { isNativeMobileApp } from '../../../Utils/Platform';
 import { getIDEVersionWithHash } from '../../../Version';
-import { getBrowserSWPreviewBaseUrl } from '../../../Utils/BrowserSWIndexedDB';
+import { getBrowserSWPreviewBaseUrl } from '../BrowserSWPreviewLauncher/BrowserSWPreviewIndexedDB';
 const gd: libGDevelop = global.gd;
 
 type State = {|

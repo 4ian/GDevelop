@@ -204,7 +204,7 @@ export default class LocalPreviewLauncher extends React.Component<
     // useful if the user opens the Debugger editor later, or want to
     // hot reload.
     return this.getPreviewDebuggerServer()
-      .startServer()
+      .startServer({})
       .catch(err => {
         // Ignore any error when running the debugger server - the preview
         // can still work without it.

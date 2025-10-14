@@ -17,7 +17,7 @@ import { displayBlackLoadingScreenOrThrow } from '../../../Utils/BrowserExternal
 import { getGDevelopResourceJwtToken } from '../../../Utils/GDevelopServices/Project';
 import { isNativeMobileApp } from '../../../Utils/Platform';
 import { getIDEVersionWithHash } from '../../../Version';
-import { getBrowserSWPreviewBaseUrl } from '../../../Utils/BrowserSWIndexedDB';
+import { getBrowserSWPreviewBaseUrl } from './BrowserSWPreviewIndexedDB';
 const gd: libGDevelop = global.gd;
 
 type State = {|
@@ -78,7 +78,9 @@ export default class BrowserSWPreviewLauncher extends React.Component<
       const isForInGameEdition = false; // TODO: adapt for the 3D editor branch.
 
       const baseUrl = getBrowserSWPreviewBaseUrl();
-      const outputDir = `${baseUrl}/${isForInGameEdition ? 'in-game-editor-preview' : 'preview'}`;
+      const outputDir = `${baseUrl}/${
+        isForInGameEdition ? 'in-game-editor-preview' : 'preview'
+      }`;
 
       console.log(
         '[BrowserSWPreviewLauncher] Preview will be served from:',
@@ -113,7 +115,7 @@ export default class BrowserSWPreviewLauncher extends React.Component<
     const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
     const shouldHotReload = previewOptions.hotReload && !!debuggerIds.length;
 
-    // Immediatel open windows (otherwise Safari will block the window opening if done after
+    // Immediately open windows (otherwise Safari will block the window opening if done after
     // an asynchronous operation).
     const previewWindows = shouldHotReload
       ? []
@@ -159,13 +161,7 @@ export default class BrowserSWPreviewLauncher extends React.Component<
         previewExportOptions.setExternalLayoutName(externalLayout.getName());
       }
 
-      // TODO
-      // if (isNativeMobileApp()) {
-      //   previewExportOptions.useMinimalDebuggerClient();
-      // } else {
-        previewExportOptions.useWindowMessageDebuggerClient();
-      // }
-
+      previewExportOptions.useWindowMessageDebuggerClient();
 
       const includeFileHashs = this.props.getIncludeFileHashs();
       for (const includeFile in includeFileHashs) {
@@ -177,11 +173,6 @@ export default class BrowserSWPreviewLauncher extends React.Component<
         // Only export project data if asked and if a hot-reloading is being done.
         shouldHotReload && previewOptions.projectDataOnlyExport
       );
-
-      // TODO: remove as useless now because no cache by the service worker.
-      // Scripts generated from extensions keep the same URL even after being modified.
-      // Use a cache bursting parameter to force the browser to reload them.
-      // previewExportOptions.setNonRuntimeScriptsCacheBurst(Date.now());
 
       previewExportOptions.setFullLoadingScreen(
         previewOptions.fullLoadingScreen
@@ -238,34 +229,32 @@ export default class BrowserSWPreviewLauncher extends React.Component<
       previewExportOptions.delete();
       exporter.delete();
 
-      // Store files in IndexedDB instead of uploading to S3
       console.log(
         '[BrowserSWPreviewLauncher] Storing preview files in IndexedDB...'
       );
       await browserSWFileSystem.applyPendingOperations();
 
-      // Change the HTML file displayed by the preview window so that it starts loading
-      // the game.
-      console.log('[BrowserSWPreviewLauncher] Opening preview in window(s)...');
-      previewWindows.forEach((previewWindow: WindowProxy) => {
-        previewWindow.location = outputDir + '/index.html';
-        try {
-          previewWindow.focus();
-        } catch (e) {}
-      });
-
-      // If the preview windows are new, register them so that they can be accessed
-      // by the debugger and for the captures to be detected when they close.
       if (shouldHotReload) {
-        console.log('Sending hot reload message to debuggers', debuggerIds);
+        console.log('[BrowserSWPreviewLauncher] Triggering hot reload...');
         debuggerIds.forEach(debuggerId => {
-          console.log('Sending hot reload message to debugger', debuggerId);
           this.getPreviewDebuggerServer().sendMessage(debuggerId, {
             command: 'hotReload',
           });
         });
       } else {
+        console.log(
+          '[BrowserSWPreviewLauncher] Opening new preview window(s)...'
+        );
         previewWindows.forEach((previewWindow: WindowProxy) => {
+          // Change the HTML file displayed by the preview window so that it starts loading
+          // the game.
+          previewWindow.location = outputDir + '/index.html';
+          try {
+            previewWindow.focus();
+          } catch (e) {}
+
+          // Register the window so that it can be accessed
+          // by the debugger and for the captures to be detected when it closes.
           const debuggerId = registerNewPreviewWindow(previewWindow);
           browserPreviewDebuggerServer.registerCallbacks({
             onErrorReceived: () => {},

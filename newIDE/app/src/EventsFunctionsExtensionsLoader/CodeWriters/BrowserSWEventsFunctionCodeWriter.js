@@ -3,10 +3,13 @@ import {
   type EventsFunctionCodeWriter,
   type EventsFunctionCodeWriterCallbacks,
 } from '..';
-import { deleteFilesWithPrefix, putFile } from '../../Utils/BrowserSWIndexedDB';
+import {
+  deleteFilesWithPrefix,
+  putFile,
+  getBrowserSWPreviewBaseUrl,
+} from '../../ExportAndShare/BrowserExporters/BrowserSWPreviewLauncher/BrowserSWPreviewIndexedDB';
 import slugs from 'slugs';
 import debounce from 'lodash/debounce';
-import { getBrowserSWPreviewBaseUrl } from '../../Utils/BrowserSWIndexedDB';
 
 let batchedWrites: Array<{
   path: string,
@@ -40,7 +43,6 @@ const flushBatchedWrites = debounce(async () => {
   results.forEach((result, index) => {
     const write = writes[index];
     if (result.status === 'fulfilled') {
-      console.log(`[BrowserSWEventsFunctionCodeWriter] Stored: ${write.path}`);
       write.onSuccess();
     } else {
       console.error(
@@ -83,6 +85,8 @@ export const makeBrowserSWEventsFunctionCodeWriter = ({
   // At startup, clean up the old generated files for extensions code.
   (async () => {
     try {
+      // TODO: maybe don't do it at startup because this could break multiple tabs!
+      // TODO: Also consider doing a preview per tab?
       await deleteFilesWithPrefix(extensionsCodeUrl + '/');
     } catch (error) {
       console.error(
@@ -106,9 +110,7 @@ export const makeBrowserSWEventsFunctionCodeWriter = ({
       const path = getPathFor(functionCodeNamespace);
       onWriteFile({ includeFile: path, content: code });
       const relativePath = path.replace(baseUrl, '');
-      console.log(
-        `[BrowserSWEventsFunctionCodeWriter] Writing function code to ${relativePath}...`
-      );
+
       return writeFileInNextBatch(relativePath, code);
     },
 
@@ -119,9 +121,7 @@ export const makeBrowserSWEventsFunctionCodeWriter = ({
       const path = getPathFor(behaviorCodeNamespace);
       onWriteFile({ includeFile: path, content: code });
       const relativePath = path.replace(baseUrl, '');
-      console.log(
-        `[BrowserSWEventsFunctionCodeWriter] Writing behavior code to ${path}...`
-      );
+
       return writeFileInNextBatch(relativePath, code);
     },
 
@@ -132,9 +132,7 @@ export const makeBrowserSWEventsFunctionCodeWriter = ({
       const path = getPathFor(objectCodeNamespace);
       onWriteFile({ includeFile: path, content: code });
       const relativePath = path.replace(baseUrl, '');
-      console.log(
-        `[BrowserSWEventsFunctionCodeWriter] Writing object code to ${path}...`
-      );
+
       return writeFileInNextBatch(relativePath, code);
     },
   };

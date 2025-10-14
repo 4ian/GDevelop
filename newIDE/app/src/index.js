@@ -7,7 +7,7 @@ import {
   sendProgramOpening,
   installAnalyticsEvents,
 } from './Utils/Analytics/EventSender';
-import { registerServiceWorker } from './serviceWorker';
+import { registerServiceWorker } from './ServiceWorkerSetup';
 import './UI/icomoon-font.css'; // Styles for Icomoon font.
 import optionalRequire from './Utils/OptionalRequire';
 import { loadScript } from './Utils/LoadScript';

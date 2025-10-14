@@ -5,6 +5,7 @@ import {
   fetchAiSettings,
   type AiRequest,
   type AiSettings,
+  getAiRequests,
 } from '../Utils/GDevelopServices/Generation';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { type EditorFunctionCallResult } from '../EditorFunctions/EditorFunctionCallRunner';
@@ -82,6 +83,11 @@ const useEditorFunctionCallResultsStorage = (): EditorFunctionCallResultsStorage
 };
 
 type AiRequestStorage = {|
+  fetchAiRequests: () => Promise<void>,
+  onLoadMoreAiRequests: () => Promise<void>,
+  canLoadMore: boolean,
+  error: ?Error,
+  isLoading: boolean,
   aiRequests: { [string]: AiRequest },
   updateAiRequest: (aiRequestId: string, aiRequest: AiRequest) => void,
   refreshAiRequest: (aiRequestId: string) => Promise<void>,
@@ -96,20 +102,105 @@ type AiRequestSendState = {|
   lastSendError: ?Error,
 |};
 
+type PaginationState = {|
+  aiRequests: { [string]: AiRequest },
+  nextPageUri: ?Object,
+|};
+
+const emptyPaginationState: PaginationState = {
+  aiRequests: {},
+  nextPageUri: null,
+};
+
 export const useAiRequestsStorage = (): AiRequestStorage => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );
 
-  const [aiRequests, setAiRequests] = React.useState<{ [string]: AiRequest }>(
-    {}
+  const [state, setState] = React.useState<PaginationState>(
+    emptyPaginationState
+  );
+  const [error, setError] = React.useState<Error | null>(null);
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+
+  const fetchAiRequests = React.useCallback(
+    async () => {
+      if (!profile) return;
+
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const history = await getAiRequests(getAuthorizationHeader, {
+          userId: profile.id,
+          forceUri: null, // Fetch the first page.
+        });
+        if (!history) return;
+        const aiRequestsById = history.aiRequests.reduce(
+          (accumulator, aiRequest) => {
+            accumulator[aiRequest.id] = aiRequest;
+            return accumulator;
+          },
+          {}
+        );
+        setState({
+          aiRequests: aiRequestsById,
+          nextPageUri: history.nextPageUri,
+        });
+      } catch (err) {
+        setError(err);
+        console.error('Error fetching AI requests:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [profile, getAuthorizationHeader]
+  );
+
+  const onLoadMoreAiRequests = React.useCallback(
+    async () => {
+      if (!profile) return;
+
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const history = await getAiRequests(getAuthorizationHeader, {
+          userId: profile.id,
+          forceUri: state.nextPageUri,
+        });
+        if (!history) return;
+        const newRequests = history.aiRequests;
+        const currentRequestsById = state.aiRequests;
+
+        newRequests.forEach(newRequest => {
+          // Add new requests to the state.
+          if (!currentRequestsById[newRequest.id]) {
+            currentRequestsById[newRequest.id] = newRequest;
+          }
+        });
+        setState({
+          aiRequests: currentRequestsById,
+          nextPageUri: history.nextPageUri,
+        });
+      } catch (err) {
+        setError(err);
+        console.error('Error fetching AI requests:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [profile, getAuthorizationHeader, state.nextPageUri, state.aiRequests]
   );
 
   const updateAiRequest = React.useCallback(
     (aiRequestId: string, aiRequest: AiRequest) => {
-      setAiRequests(aiRequests => ({
-        ...aiRequests,
-        [aiRequestId]: aiRequest,
+      setState(prevState => ({
+        ...prevState,
+        aiRequests: {
+          ...(prevState.aiRequests || {}),
+          [aiRequestId]: aiRequest,
+        },
       }));
     },
     []
@@ -179,7 +270,12 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
   );
 
   return {
-    aiRequests,
+    fetchAiRequests,
+    onLoadMoreAiRequests,
+    canLoadMore: !!state.nextPageUri,
+    error,
+    isLoading,
+    aiRequests: state.aiRequests,
     updateAiRequest,
     refreshAiRequest,
     isSendingAiRequest,
@@ -195,8 +291,13 @@ type AiRequestContextState = {|
   getAiSettings: () => AiSettings | null,
 |};
 
-export const AiRequestContext = React.createContext<AiRequestContextState>({
+export const initialAiRequestContextState: AiRequestContextState = {
   aiRequestStorage: {
+    fetchAiRequests: async () => {},
+    onLoadMoreAiRequests: async () => {},
+    canLoadMore: true,
+    error: null,
+    isLoading: false,
     aiRequests: {},
     updateAiRequest: () => {},
     refreshAiRequest: async () => {},
@@ -211,7 +312,10 @@ export const AiRequestContext = React.createContext<AiRequestContextState>({
     clearEditorFunctionCallResults: () => {},
   },
   getAiSettings: () => null,
-});
+};
+export const AiRequestContext = React.createContext<AiRequestContextState>(
+  initialAiRequestContextState
+);
 
 type AiRequestProviderProps = {|
   children: React.Node,

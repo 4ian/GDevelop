@@ -6,6 +6,7 @@ import Text from '../../UI/Text';
 import { Trans, t } from '@lingui/macro';
 import {
   type AiRequest,
+  type AiRequestUserMessage,
   type AiRequestMessageAssistantFunctionCall,
 } from '../../Utils/GDevelopServices/Generation';
 import RaisedButton from '../../UI/RaisedButton';
@@ -43,6 +44,7 @@ import {
   getDefaultAiConfigurationPresetId,
 } from '../AiConfiguration';
 import { AiConfigurationPresetSelector } from './AiConfigurationPresetSelector';
+import { AiRequestContext } from '../AiRequestContext';
 
 const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 5;
 const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 10;
@@ -282,6 +284,9 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     }: Props,
     ref
   ) => {
+    const { aiRequestStorage } = React.useContext(AiRequestContext);
+    const { aiRequests } = aiRequestStorage;
+
     // TODO: store the default mode in the user preferences?
     const [newAiRequestMode, setNewAiRequestMode] = React.useState<
       'chat' | 'agent'
@@ -336,7 +341,11 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       userRequestTextPerAiRequestId,
       setUserRequestTextPerRequestId,
     ] = React.useState<{ [string]: string }>({});
+    const [historyIndex, setHistoryIndex] = React.useState<number>(-1);
+    const [savedCurrentText, setSavedCurrentText] = React.useState<string>('');
     const scrollViewRef = React.useRef<ScrollViewInterface | null>(null);
+    const textAreaRefForNewChat = React.useRef<any>(null);
+    const textAreaRefForExistingChat = React.useRef<any>(null);
     const [shouldAutoScroll, setShouldAutoScroll] = React.useState<boolean>(
       true
     );
@@ -399,13 +408,26 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       [newAiRequestMode, hasOpenedProject]
     );
 
+    const onUserRequestTextChange = React.useCallback(
+      (userRequestText: string, aiRequestIdToChange: string) => {
+        setUserRequestTextPerRequestId(userRequestTextPerAiRequestId => ({
+          ...userRequestTextPerAiRequestId,
+          [aiRequestIdToChange]: userRequestText,
+        }));
+        // Reset history navigation when field is cleared,
+        // so that pressing up goes to the last message again.
+        if (!userRequestText && historyIndex !== -1) {
+          setHistoryIndex(-1);
+          setSavedCurrentText('');
+        }
+      },
+      [historyIndex]
+    );
+
     React.useImperativeHandle(ref, () => ({
       resetUserInput: (aiRequestId: string | null) => {
         const aiRequestIdToReset: string = aiRequestId || '';
-        setUserRequestTextPerRequestId(userRequestTextPerAiRequestId => ({
-          ...userRequestTextPerAiRequestId,
-          [aiRequestIdToReset]: '',
-        }));
+        onUserRequestTextChange('', aiRequestIdToReset);
 
         if (scrollViewRef.current) {
           scrollViewRef.current.scrollToBottom({
@@ -416,6 +438,109 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     }));
 
     const { isMobile } = useResponsiveWindowSize();
+
+    // Build history from sent user messages across all aiRequests
+    const requestsHistory = React.useMemo(
+      () => {
+        const history: Array<string> = [];
+
+        // Iterate through all aiRequests in reverse order (most recent first)
+        Object.values(aiRequests)
+          .reverse()
+          .forEach(
+            // $FlowFixMe - Object.values() loses the type of aiRequests.
+            (request: AiRequest) => {
+              const userMessages = request.output
+                .filter(
+                  message =>
+                    message.type === 'message' && message.role === 'user'
+                )
+                .map(
+                  // $FlowFixMe - We filtered the type above.
+                  (message: AiRequestUserMessage) => {
+                    const userRequest = message.content.find(
+                      item => item.type === 'user_request'
+                    );
+                    return userRequest ? userRequest.text : '';
+                  }
+                )
+                .filter(text => text !== '');
+
+              history.push(...userMessages);
+            }
+          );
+
+        return history;
+      },
+      [aiRequests]
+    );
+
+    // Reset history index when aiRequest changes,
+    // ensuring pressing up and down doesn't depend on the previous aiRequest.
+    React.useEffect(
+      () => {
+        setHistoryIndex(-1);
+        setSavedCurrentText('');
+      },
+      [aiRequestId]
+    );
+
+    const handleNavigateHistory = React.useCallback(
+      (direction: 'up' | 'down') => {
+        const currentText = userRequestTextPerAiRequestId[aiRequestId] || '';
+        const textAreaRef = aiRequest
+          ? textAreaRefForExistingChat
+          : textAreaRefForNewChat;
+
+        if (direction === 'up') {
+          // Save current text when starting navigation,
+          // so we can restore it if going back to current.
+          if (historyIndex === -1) {
+            setSavedCurrentText(currentText);
+          }
+
+          const newIndex = historyIndex + 1;
+          if (newIndex < requestsHistory.length) {
+            setHistoryIndex(newIndex);
+            const historicalText =
+              requestsHistory[requestsHistory.length - 1 - newIndex];
+            onUserRequestTextChange(historicalText, aiRequestId);
+
+            // Set cursor to start when navigating up,
+            // otherwise it goes to the end of the text, making it harder
+            // to navigate with one key press.
+            if (textAreaRef.current) {
+              // Use timeout so that the text is updated before setting the cursor position.
+              setTimeout(() => {
+                textAreaRef.current.setCursorPosition(0);
+              }, 0);
+            }
+          }
+        } else if (direction === 'down') {
+          const newIndex = historyIndex - 1;
+
+          if (newIndex === -1) {
+            // We're at the end of the history. Restore the saved current text.
+            setHistoryIndex(-1);
+            onUserRequestTextChange(savedCurrentText, aiRequestId);
+          } else if (newIndex >= 0) {
+            setHistoryIndex(newIndex);
+            const historicalText =
+              requestsHistory[requestsHistory.length - 1 - newIndex];
+            onUserRequestTextChange(historicalText, aiRequestId);
+          }
+        }
+      },
+      [
+        aiRequestId,
+        historyIndex,
+        requestsHistory,
+        userRequestTextPerAiRequestId,
+        savedCurrentText,
+        onUserRequestTextChange,
+        aiRequest,
+      ]
+    );
 
     const priceText = (
       <Text size="body-small" color="secondary" noMargin>
@@ -551,20 +676,17 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 <Column noMargin alignItems="stretch" justifyContent="stretch">
                   <Spacer />
                   <CompactTextAreaFieldWithControls
+                    ref={textAreaRefForNewChat}
                     maxLength={6000}
                     value={userRequestTextPerAiRequestId[''] || ''}
                     disabled={isSending}
                     hasNeonCorner
                     hasAnimatedNeonCorner={isSending}
                     errored={!!lastSendError}
-                    onChange={userRequestText =>
-                      setUserRequestTextPerRequestId(
-                        userRequestTextPerAiRequestId => ({
-                          ...userRequestTextPerAiRequestId,
-                          '': userRequestText,
-                        })
-                      )
-                    }
+                    onChange={userRequestText => {
+                      onUserRequestTextChange(userRequestText, '');
+                    }}
+                    onNavigateHistory={handleNavigateHistory}
                     onSubmit={() => {
                       onStartNewAiRequest({
                         mode: newAiRequestMode,
@@ -878,6 +1000,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
               </Paper>
             ) : null}
             <CompactTextAreaFieldWithControls
+              ref={textAreaRefForExistingChat}
               maxLength={6000}
               value={userRequestTextPerAiRequestId[aiRequestId] || ''}
               disabled={isSending || isForAnotherProject}
@@ -885,13 +1008,9 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
               hasNeonCorner
               hasAnimatedNeonCorner={isSending}
               onChange={userRequestText =>
-                setUserRequestTextPerRequestId(
-                  userRequestTextPerAiRequestId => ({
-                    ...userRequestTextPerAiRequestId,
-                    [aiRequestId]: userRequestText,
-                  })
-                )
+                onUserRequestTextChange(userRequestText, aiRequestId)
               }
+              onNavigateHistory={handleNavigateHistory}
               placeholder={
                 aiRequest.mode === 'agent'
                   ? isForAnotherProject

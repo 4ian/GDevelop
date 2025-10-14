@@ -108,6 +108,7 @@ namespace gdjs {
         }
 
         private _isTooSoonToSaveAnotherScore(): boolean {
+          // Existing limit: Prevent entries within 500ms of each other (per leaderboard)
           return (
             !!this.lastScoreSavingStartedAt &&
             Date.now() - this.lastScoreSavingStartedAt < 500
@@ -115,10 +116,12 @@ namespace gdjs {
         }
 
         startSaving({
+          leaderboardId,
           playerName,
           playerId,
           score,
         }: {
+          leaderboardId: string;
           playerName?: string;
           playerId?: string;
           score: number;
@@ -150,6 +153,16 @@ namespace gdjs {
             // Set the starting time to cancel all the following attempts that
             // are started too early after this one.
             this.lastScoreSavingStartedAt = Date.now();
+
+            throw new Error('Ignoring this saving request.');
+          }
+
+          // Rolling window rate limiting check
+          if (wouldExceedRateLimit(leaderboardId)) {
+            logger.warn(
+              'Rate limit exceeded. Too many entries have been sent recently. Ignoring this one.'
+            );
+            this._setError('RATE_LIMIT_EXCEEDED');
 
             throw new Error('Ignoring this saving request.');
           }
@@ -186,6 +199,9 @@ namespace gdjs {
               this.lastSavedLeaderboardEntry = leaderboardEntry;
               this.hasScoreBeenSaved = true;
 
+              // Record successful entry for rolling window rate limiting
+              recordSuccessfulEntry(leaderboardId);
+
               resolveSavingPromise();
             },
             closeSavingWithError: (errorCode) => {
@@ -215,6 +231,71 @@ namespace gdjs {
       let _scoreSavingStateByLeaderboard: {
         [leaderboardId: string]: ScoreSavingState;
       } = {};
+
+      // Rolling window rate limiting
+      // Implements rate limiting to prevent abuse:
+      // - Maximum 12 successful entries per minute across all leaderboards
+      // - Maximum 6 successful entries per minute per individual leaderboard
+      // - Works in addition to existing 500ms cooldown between entries
+      // Track successful entries for rolling window rate limiting
+      let _successfulEntriesGlobal: number[] = []; // Timestamps of successful entries across all leaderboards
+      let _successfulEntriesByLeaderboard: { [leaderboardId: string]: number[] } = {}; // Timestamps per leaderboard
+
+      const GLOBAL_RATE_LIMIT_COUNT = 12; // Max 12 successful entries per minute across all leaderboards
+      const PER_LEADERBOARD_RATE_LIMIT_COUNT = 6; // Max 6 successful entries per minute per leaderboard
+      const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute in milliseconds
+
+      /**
+       * Clean old entries from the rolling window (older than 1 minute)
+       */
+      const cleanOldEntries = (entries: number[], currentTime: number): number[] => {
+        return entries.filter(timestamp => currentTime - timestamp < RATE_LIMIT_WINDOW_MS);
+      };
+
+      /**
+       * Check if adding a new entry would exceed rate limits
+       */
+      const wouldExceedRateLimit = (leaderboardId: string): boolean => {
+        const currentTime = Date.now();
+        
+        // Clean old entries
+        _successfulEntriesGlobal = cleanOldEntries(_successfulEntriesGlobal, currentTime);
+        if (!_successfulEntriesByLeaderboard[leaderboardId]) {
+          _successfulEntriesByLeaderboard[leaderboardId] = [];
+        }
+        _successfulEntriesByLeaderboard[leaderboardId] = cleanOldEntries(
+          _successfulEntriesByLeaderboard[leaderboardId], 
+          currentTime
+        );
+
+        // Check global rate limit (12 entries per minute across all leaderboards)
+        if (_successfulEntriesGlobal.length >= GLOBAL_RATE_LIMIT_COUNT) {
+          return true;
+        }
+
+        // Check per-leaderboard rate limit (6 entries per minute per leaderboard)
+        if (_successfulEntriesByLeaderboard[leaderboardId].length >= PER_LEADERBOARD_RATE_LIMIT_COUNT) {
+          return true;
+        }
+
+        return false;
+      };
+
+      /**
+       * Record a successful entry for rate limiting tracking
+       */
+      const recordSuccessfulEntry = (leaderboardId: string): void => {
+        const currentTime = Date.now();
+        
+        // Add to global tracking
+        _successfulEntriesGlobal.push(currentTime);
+        
+        // Add to per-leaderboard tracking
+        if (!_successfulEntriesByLeaderboard[leaderboardId]) {
+          _successfulEntriesByLeaderboard[leaderboardId] = [];
+        }
+        _successfulEntriesByLeaderboard[leaderboardId].push(currentTime);
+      };
 
       // Leaderboard display
       let _requestedLeaderboardId: string | null;
@@ -396,7 +477,7 @@ namespace gdjs {
 
             try {
               const { closeSaving, closeSavingWithError } =
-                scoreSavingState.startSaving({ playerName, score });
+                scoreSavingState.startSaving({ leaderboardId, playerName, score });
 
               try {
                 const leaderboardEntry = await saveScore({
@@ -440,7 +521,7 @@ namespace gdjs {
 
             try {
               const { closeSaving, closeSavingWithError } =
-                scoreSavingState.startSaving({ playerId, score });
+                scoreSavingState.startSaving({ leaderboardId, playerId, score });
 
               try {
                 const leaderboardEntryId = await saveScore({

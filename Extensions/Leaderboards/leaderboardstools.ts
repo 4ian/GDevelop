@@ -176,7 +176,7 @@ namespace gdjs {
           }
 
           // Rolling window rate limiting check
-          if (wouldExceedRateLimit(leaderboardId)) {
+          if (wouldExceedGlobalRateLimit() || this._wouldExceedPerLeaderboardRateLimit()) {
             logger.warn(
               'Rate limit exceeded. Too many entries have been sent recently. Ignoring this one.'
             );
@@ -200,6 +200,10 @@ namespace gdjs {
 
           return {
             closeSaving: (leaderboardEntry) => {
+              // Record successful entry for rolling window rate limiting (at the beginning)
+              recordSuccessfulEntry();
+              this._recordSuccessfulEntry();
+
               if (savingPromise !== this.lastSavingPromise) {
                 logger.info(
                   'Score saving result received, but another save was launched in the meantime - ignoring the result of this one.'
@@ -216,9 +220,6 @@ namespace gdjs {
               this._lastSavedPlayerId = this._currentlySavingPlayerId;
               this.lastSavedLeaderboardEntry = leaderboardEntry;
               this.hasScoreBeenSaved = true;
-
-              // Record successful entry for rolling window rate limiting
-              recordSuccessfulEntry(leaderboardId);
 
               resolveSavingPromise();
             },
@@ -257,7 +258,6 @@ namespace gdjs {
       // - Works in addition to existing 500ms cooldown between entries
       // Track successful entries for rolling window rate limiting
       let _successfulEntriesGlobal: number[] = []; // Timestamps of successful entries across all leaderboards
-      let _successfulEntriesByLeaderboard: { [leaderboardId: string]: number[] } = {}; // Timestamps per leaderboard
 
       const GLOBAL_RATE_LIMIT_COUNT = 12; // Max 12 successful entries per minute across all leaderboards
       const PER_LEADERBOARD_RATE_LIMIT_COUNT = 6; // Max 6 successful entries per minute per leaderboard
@@ -271,48 +271,24 @@ namespace gdjs {
       };
 
       /**
-       * Check if adding a new entry would exceed rate limits
+       * Check if adding a new entry would exceed global rate limits
        */
-      const wouldExceedRateLimit = (leaderboardId: string): boolean => {
+      const wouldExceedGlobalRateLimit = (): boolean => {
         const currentTime = Date.now();
         
         // Clean old entries
         _successfulEntriesGlobal = cleanOldEntries(_successfulEntriesGlobal, currentTime);
-        if (!_successfulEntriesByLeaderboard[leaderboardId]) {
-          _successfulEntriesByLeaderboard[leaderboardId] = [];
-        }
-        _successfulEntriesByLeaderboard[leaderboardId] = cleanOldEntries(
-          _successfulEntriesByLeaderboard[leaderboardId], 
-          currentTime
-        );
 
         // Check global rate limit (12 entries per minute across all leaderboards)
-        if (_successfulEntriesGlobal.length >= GLOBAL_RATE_LIMIT_COUNT) {
-          return true;
-        }
-
-        // Check per-leaderboard rate limit (6 entries per minute per leaderboard)
-        if (_successfulEntriesByLeaderboard[leaderboardId].length >= PER_LEADERBOARD_RATE_LIMIT_COUNT) {
-          return true;
-        }
-
-        return false;
+        return _successfulEntriesGlobal.length >= GLOBAL_RATE_LIMIT_COUNT;
       };
 
       /**
-       * Record a successful entry for rate limiting tracking
+       * Record a successful entry for global rate limiting tracking
        */
-      const recordSuccessfulEntry = (leaderboardId: string): void => {
+      const recordSuccessfulEntry = (): void => {
         const currentTime = Date.now();
-        
-        // Add to global tracking
         _successfulEntriesGlobal.push(currentTime);
-        
-        // Add to per-leaderboard tracking
-        if (!_successfulEntriesByLeaderboard[leaderboardId]) {
-          _successfulEntriesByLeaderboard[leaderboardId] = [];
-        }
-        _successfulEntriesByLeaderboard[leaderboardId].push(currentTime);
       };
 
       // Leaderboard display

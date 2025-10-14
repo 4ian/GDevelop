@@ -8,6 +8,83 @@ namespace gdjs {
       let _hasPlayerJustClosedLeaderboardView = false;
       let _preferSendConnectedPlayerScore = true;
 
+      // Rolling-window rate limiting state (successful entries only):
+      // - Global: at most 12 successful entries across all leaderboards in the past minute
+      // - Per-leaderboard: at most 6 successful entries on the same leaderboard in the past minute
+      const ROLLING_WINDOW_MS = 60 * 1000;
+      const GLOBAL_SUCCESS_LIMIT_PER_MINUTE = 12;
+      const PER_LEADERBOARD_SUCCESS_LIMIT_PER_MINUTE = 6;
+
+      // Store timestamps of successful entries to implement the rolling window.
+      let _successfulEntriesTimestampsGlobal: number[] = [];
+      let _successfulEntriesTimestampsByLeaderboard: {
+        [leaderboardId: string]: number[];
+      } = {};
+
+      // Reservations to avoid concurrency overshoot (successes + reservations never exceed limits).
+      let _reservedSendsGlobal: number = 0;
+      let _reservedSendsByLeaderboard: { [leaderboardId: string]: number } = {};
+
+      const _pruneOldSuccessfulEntries = () => {
+        const threshold = Date.now() - ROLLING_WINDOW_MS;
+        // Global pruning
+        _successfulEntriesTimestampsGlobal = _successfulEntriesTimestampsGlobal.filter(
+          (ts) => ts >= threshold
+        );
+        // Per-leaderboard pruning
+        Object.keys(_successfulEntriesTimestampsByLeaderboard).forEach(
+          (leaderboardId) => {
+            const timestamps = _successfulEntriesTimestampsByLeaderboard[
+              leaderboardId
+            ];
+            const pruned = timestamps.filter((ts) => ts >= threshold);
+            _successfulEntriesTimestampsByLeaderboard[leaderboardId] = pruned;
+          }
+        );
+      };
+
+      const _attemptReserveQuota = (leaderboardId: string): boolean => {
+        _pruneOldSuccessfulEntries();
+        const globalCount = _successfulEntriesTimestampsGlobal.length;
+        const reservedGlobal = _reservedSendsGlobal;
+
+        const perLeaderboardTimestamps =
+          _successfulEntriesTimestampsByLeaderboard[leaderboardId] || [];
+        const perLeaderboardCount = perLeaderboardTimestamps.length;
+        const reservedForLeaderboard =
+          _reservedSendsByLeaderboard[leaderboardId] || 0;
+
+        const wouldExceedGlobal =
+          globalCount + reservedGlobal >= GLOBAL_SUCCESS_LIMIT_PER_MINUTE;
+        const wouldExceedPerLeaderboard =
+          perLeaderboardCount + reservedForLeaderboard >=
+          PER_LEADERBOARD_SUCCESS_LIMIT_PER_MINUTE;
+
+        if (wouldExceedGlobal || wouldExceedPerLeaderboard) return false;
+
+        _reservedSendsGlobal += 1;
+        _reservedSendsByLeaderboard[leaderboardId] =
+          ( _reservedSendsByLeaderboard[leaderboardId] || 0) + 1;
+        return true;
+      };
+
+      const _releaseReservedQuota = (leaderboardId: string): void => {
+        if (_reservedSendsGlobal > 0) _reservedSendsGlobal -= 1;
+        if ((_reservedSendsByLeaderboard[leaderboardId] || 0) > 0) {
+          _reservedSendsByLeaderboard[leaderboardId] -= 1;
+        }
+      };
+
+      const _recordSuccessfulEntry = (leaderboardId: string): void => {
+        const now = Date.now();
+        _successfulEntriesTimestampsGlobal.push(now);
+        const perLeaderboard =
+          _successfulEntriesTimestampsByLeaderboard[leaderboardId] || [];
+        perLeaderboard.push(now);
+        _successfulEntriesTimestampsByLeaderboard[leaderboardId] = perLeaderboard;
+        _pruneOldSuccessfulEntries();
+      };
+
       gdjs.registerRuntimeScenePostEventsCallback(() => {
         // Set it back to false for the next frame.
         _hasPlayerJustClosedLeaderboardView = false;
@@ -35,6 +112,15 @@ namespace gdjs {
 
       /**
        * Hold the state of the save of a score for a leaderboard.
+       *
+       * Existing protections:
+       * - 500ms per-leaderboard throttle between save starts (error code: TOO_FAST).
+       * - Ignore same player+score as previous successful save (error code: SAME_AS_PREVIOUS).
+       * - Ignore duplicate in-flight save for same player/score.
+       *
+       * New rolling-window limits (successful entries only):
+       * - Global: at most 12 successful entries across all leaderboards in the past minute.
+       * - Per-leaderboard: at most 6 successful entries on the same leaderboard in the past minute.
        */
       class ScoreSavingState {
         lastScoreSavingStartedAt: number | null = null;
@@ -115,10 +201,12 @@ namespace gdjs {
         }
 
         startSaving({
+          leaderboardId,
           playerName,
           playerId,
           score,
         }: {
+          leaderboardId: string;
           playerName?: string;
           playerId?: string;
           score: number;
@@ -154,6 +242,18 @@ namespace gdjs {
             throw new Error('Ignoring this saving request.');
           }
 
+          // New rolling-window limits (in addition to the existing 500ms per-leaderboard throttle above):
+          // - Global limit: at most 12 successful entries across all leaderboards in the past minute.
+          // - Per-leaderboard limit: at most 6 successful entries on the same leaderboard in the past minute.
+          // These are enforced by reserving a slot before sending and releasing it after completion.
+          if (!_attemptReserveQuota(leaderboardId)) {
+            logger.warn(
+              'Too many leaderboard entries were sent in the last minute. Ignoring this one.'
+            );
+            this._setError('TOO_MANY_ENTRIES_IN_A_MINUTE');
+            throw new Error('Ignoring this saving request.');
+          }
+
           let resolveSavingPromise: () => void;
           const savingPromise = new Promise<void>((resolve) => {
             resolveSavingPromise = resolve;
@@ -174,6 +274,11 @@ namespace gdjs {
                   'Score saving result received, but another save was launched in the meantime - ignoring the result of this one.'
                 );
 
+                // Still record the successful entry for rate limiting purposes,
+                // then release the reserved quota taken at start.
+                _recordSuccessfulEntry(leaderboardId);
+                _releaseReservedQuota(leaderboardId);
+
                 // Still finish the promise that can be waited upon:
                 resolveSavingPromise();
                 return;
@@ -186,6 +291,10 @@ namespace gdjs {
               this.lastSavedLeaderboardEntry = leaderboardEntry;
               this.hasScoreBeenSaved = true;
 
+              // Record the success and release the reservation.
+              _recordSuccessfulEntry(leaderboardId);
+              _releaseReservedQuota(leaderboardId);
+
               resolveSavingPromise();
             },
             closeSavingWithError: (errorCode) => {
@@ -194,12 +303,22 @@ namespace gdjs {
                   'Score saving result received, but another save was launched in the meantime - ignoring the result of this one.'
                 );
 
+                // Release the reserved quota taken at start.
+                _releaseReservedQuota(leaderboardId);
+
                 // Still finish the promise that can be waited upon:
                 resolveSavingPromise();
                 return;
               }
 
               this._setError(errorCode);
+              // If the entry was actually saved but response couldn't be parsed,
+              // still count it as a success for rate limiting.
+              if (errorCode === 'SAVED_ENTRY_CANT_BE_READ') {
+                _recordSuccessfulEntry(leaderboardId);
+              }
+              // On error, release the reservation (success recorded only if above case).
+              _releaseReservedQuota(leaderboardId);
               resolveSavingPromise();
             },
           };
@@ -396,7 +515,7 @@ namespace gdjs {
 
             try {
               const { closeSaving, closeSavingWithError } =
-                scoreSavingState.startSaving({ playerName, score });
+                scoreSavingState.startSaving({ leaderboardId, playerName, score });
 
               try {
                 const leaderboardEntry = await saveScore({
@@ -440,7 +559,7 @@ namespace gdjs {
 
             try {
               const { closeSaving, closeSavingWithError } =
-                scoreSavingState.startSaving({ playerId, score });
+                scoreSavingState.startSaving({ leaderboardId, playerId, score });
 
               try {
                 const leaderboardEntryId = await saveScore({

@@ -69,7 +69,7 @@
     "path-browserify": "^1.0.1",
     "pixi-spine": "4.0.4",
     "pixi.js-legacy": "7.4.2",
-    "posthog-js": "^1.57.2",
+    "posthog-js": "1.275.2",
     "prop-types": "^15.5.10",
     "qr-creator": "^1.0.0",
     "react": "16.14.0",

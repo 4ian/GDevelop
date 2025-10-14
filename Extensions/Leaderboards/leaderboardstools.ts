@@ -33,6 +33,49 @@ namespace gdjs {
         claimSecret?: string;
       };
 
+      // Rolling window rate limiting
+      // Implements rate limiting to prevent abuse:
+      // - Maximum 12 successful successful entries per minute across all leaderboards
+      // - Maximum 6 successful successful entries per minute per individual leaderboard
+      // - Works in addition to existing 500ms cooldown between entry tentatives
+      let _successfulEntriesGlobal: number[] = []; // Timestamps of successful entries across all leaderboards
+
+      const GLOBAL_RATE_LIMIT_COUNT = 12;
+      const PER_LEADERBOARD_RATE_LIMIT_COUNT = 6;
+      const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute in milliseconds
+
+      /**
+       * Clean old entries from the rolling window (older than 1 minute)
+       */
+      const cleanOldEntries = (
+        entries: number[],
+        currentTime: number
+      ): number[] => {
+        return entries.filter(
+          (timestamp) => currentTime - timestamp < RATE_LIMIT_WINDOW_MS
+        );
+      };
+
+      /**
+       * Check if adding a new entry would exceed global rate limits.
+       */
+      const wouldExceedGlobalSuccessRateLimit = (): boolean => {
+        const currentTime = Date.now();
+        _successfulEntriesGlobal = cleanOldEntries(
+          _successfulEntriesGlobal,
+          currentTime
+        );
+        return _successfulEntriesGlobal.length >= GLOBAL_RATE_LIMIT_COUNT;
+      };
+
+      /**
+       * Record a successful entry for global rate limiting tracking.
+       */
+      const recordGlobalSuccessfulEntry = (): void => {
+        const currentTime = Date.now();
+        _successfulEntriesGlobal.push(currentTime);
+      };
+
       /**
        * Hold the state of the save of a score for a leaderboard.
        */
@@ -42,6 +85,9 @@ namespace gdjs {
 
         /** The promise that will be resolved when the score saving is done (successfully or not). */
         lastSavingPromise: Promise<void> | null = null;
+
+        /** Timestamps of successful entries for this leaderboard (for rate limiting) */
+        private _successfulEntries: number[] = [];
 
         // Score that is being saved:
         private _currentlySavingScore: number | null = null;
@@ -107,11 +153,34 @@ namespace gdjs {
           );
         }
 
-        private _isTooSoonToSaveAnotherScore(): boolean {
+        private _wouldExceedPerLeaderboardTentativeRateLimit(): boolean {
+          // Prevent entries within 500ms of each other (per leaderboard)
+          // as this would indicate surely a score saved every frame.
+          //
+          // Note that is on lastScoreSavingStartedAt, not lastScoreSavingSucceededAt,
+          // which means we limit tentatives here (and not successes).
           return (
             !!this.lastScoreSavingStartedAt &&
             Date.now() - this.lastScoreSavingStartedAt < 500
           );
+        }
+
+        private _wouldExceedPerLeaderboardSuccessRateLimit(): boolean {
+          const currentTime = Date.now();
+          this._successfulEntries = cleanOldEntries(
+            this._successfulEntries,
+            currentTime
+          );
+          return (
+            this._successfulEntries.length >= PER_LEADERBOARD_RATE_LIMIT_COUNT
+          );
+        }
+
+        private _recordPerLeaderboardAndGlobalSuccessfulEntry(): void {
+          const currentTime = Date.now();
+          this._successfulEntries.push(currentTime);
+
+          recordGlobalSuccessfulEntry();
         }
 
         startSaving({
@@ -141,7 +210,7 @@ namespace gdjs {
             throw new Error('Ignoring this saving request.');
           }
 
-          if (this._isTooSoonToSaveAnotherScore()) {
+          if (this._wouldExceedPerLeaderboardTentativeRateLimit()) {
             logger.warn(
               'Last entry was sent too little time ago. Ignoring this one.'
             );
@@ -150,6 +219,24 @@ namespace gdjs {
             // Set the starting time to cancel all the following attempts that
             // are started too early after this one.
             this.lastScoreSavingStartedAt = Date.now();
+
+            throw new Error('Ignoring this saving request.');
+          }
+
+          // Rolling window rate limiting check for successful entries.
+          if (wouldExceedGlobalSuccessRateLimit()) {
+            logger.warn(
+              'Rate limit exceeded. Too many entries have been successfully sent recently across all leaderboards. Ignoring this one.'
+            );
+            this._setError('GLOBAL_RATE_LIMIT_EXCEEDED');
+
+            throw new Error('Ignoring this saving request.');
+          }
+          if (this._wouldExceedPerLeaderboardSuccessRateLimit()) {
+            logger.warn(
+              'Rate limit exceeded. Too many entries have been successfully sent recently for this leaderboard. Ignoring this one.'
+            );
+            this._setError('LEADERBOARD_RATE_LIMIT_EXCEEDED');
 
             throw new Error('Ignoring this saving request.');
           }
@@ -169,6 +256,9 @@ namespace gdjs {
 
           return {
             closeSaving: (leaderboardEntry) => {
+              // Record successful entry for rolling window rate limiting.
+              this._recordPerLeaderboardAndGlobalSuccessfulEntry();
+
               if (savingPromise !== this.lastSavingPromise) {
                 logger.info(
                   'Score saving result received, but another save was launched in the meantime - ignoring the result of this one.'
@@ -396,7 +486,10 @@ namespace gdjs {
 
             try {
               const { closeSaving, closeSavingWithError } =
-                scoreSavingState.startSaving({ playerName, score });
+                scoreSavingState.startSaving({
+                  playerName,
+                  score,
+                });
 
               try {
                 const leaderboardEntry = await saveScore({
@@ -440,7 +533,10 @@ namespace gdjs {
 
             try {
               const { closeSaving, closeSavingWithError } =
-                scoreSavingState.startSaving({ playerId, score });
+                scoreSavingState.startSaving({
+                  playerId,
+                  score,
+                });
 
               try {
                 const leaderboardEntryId = await saveScore({

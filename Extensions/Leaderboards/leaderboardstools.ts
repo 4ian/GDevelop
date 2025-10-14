@@ -43,6 +43,9 @@ namespace gdjs {
         /** The promise that will be resolved when the score saving is done (successfully or not). */
         lastSavingPromise: Promise<void> | null = null;
 
+        /** Timestamps of successful entries for this leaderboard (for rate limiting) */
+        private _successfulEntries: number[] = [];
+
         // Score that is being saved:
         private _currentlySavingScore: number | null = null;
         private _currentlySavingPlayerName: string | null = null;
@@ -113,6 +116,21 @@ namespace gdjs {
             !!this.lastScoreSavingStartedAt &&
             Date.now() - this.lastScoreSavingStartedAt < 500
           );
+        }
+
+        private _wouldExceedPerLeaderboardRateLimit(): boolean {
+          const currentTime = Date.now();
+          
+          // Clean old entries for this leaderboard
+          this._successfulEntries = cleanOldEntries(this._successfulEntries, currentTime);
+
+          // Check per-leaderboard rate limit (6 entries per minute per leaderboard)
+          return this._successfulEntries.length >= PER_LEADERBOARD_RATE_LIMIT_COUNT;
+        }
+
+        private _recordSuccessfulEntry(): void {
+          const currentTime = Date.now();
+          this._successfulEntries.push(currentTime);
         }
 
         startSaving({

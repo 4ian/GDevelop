@@ -79,7 +79,7 @@ import EditorMosaicPlayground from './EditorMosaicPlayground';
 import EditorNavigator from '../UI/EditorMosaic/EditorNavigator';
 import PropertiesEditor from '../PropertiesEditor';
 import { OpenConfirmDialog } from '../ProjectsStorage/OpenConfirmDialog';
-import BrowserPreviewErrorDialog from '../ExportAndShare/BrowserExporters/BrowserPreviewErrorDialog';
+import BrowserPreviewErrorDialog from '../ExportAndShare/BrowserExporters/BrowserPreview/BrowserPreviewErrorDialog';
 import RaisedButton from '../UI/RaisedButton';
 import Text from '../UI/Text';
 import IconButton from '../UI/IconButton';

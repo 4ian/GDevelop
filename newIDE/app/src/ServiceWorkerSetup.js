@@ -42,16 +42,18 @@ export function registerServiceWorker() {
           installingWorker.onstatechange = () => {
             if (installingWorker.state === 'installed') {
               const alreadyHasAServiceWorker = !!serviceWorker.controller;
-              if (alreadyHasAServiceWorker) {
-                // At this point, the updated precached content has been fetched,
-                // but the previous service worker will still serve the older
-                // content until all client tabs are closed.
-                console.log(
-                  'New content is available and will be used when all tabs for this page are closed.'
-                );
-              } else {
-                // Service worker has been installed for the first time.
-                console.log('Content is cached for offline use.');
+              if (!isDev) {
+                if (alreadyHasAServiceWorker) {
+                  // At this point, the updated precached content has been fetched,
+                  // but the previous service worker will still serve the older
+                  // content until all client tabs are closed.
+                  console.log(
+                    'A new version is available and will be used when all tabs for this page are closed.'
+                  );
+                } else {
+                  // Service worker has been installed for the first time.
+                  console.log('Content is cached for offline use.');
+                }
               }
             }
           };

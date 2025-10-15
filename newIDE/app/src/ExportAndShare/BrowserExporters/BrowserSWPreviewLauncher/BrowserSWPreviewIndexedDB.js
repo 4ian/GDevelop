@@ -3,7 +3,11 @@
 // If updated, also update the service worker template.
 const DB_NAME = 'gdevelop-browser-sw-preview';
 const STORE_NAME = 'files';
-const DB_VERSION = 1;
+const INSTANCES_STORE_NAME = 'instances';
+const DB_VERSION = 2;
+
+const INSTANCE_CLEANUP_THRESHOLD_MS = 6 * 60 * 60 * 1000; // 6 hours.
+const INSTANCE_HEARTBEAT_INTERVAL_MS = 60 * 1000; // 1 minute.
 
 type FileRecord = {|
   bytes: ArrayBuffer,
@@ -11,15 +15,51 @@ type FileRecord = {|
 |};
 
 let dbInstance: ?IDBDatabase = null;
+let currentInstanceId: ?string = null;
+let initializationPromise: ?Promise<void> = null;
+let heartbeatIntervalId: ?IntervalID = null;
+
+const requestToPromise = (request: IDBRequest): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => {
+      const error = request.error || new Error('Request failed');
+      reject(error);
+    };
+  });
+};
+
+const transactionToPromise = (transaction: IDBTransaction): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    transaction.oncomplete = () => resolve();
+    transaction.onerror = () => {
+      const error = transaction.error || new Error('Transaction failed');
+      reject(error);
+    };
+    transaction.onabort = () => {
+      const error = transaction.error || new Error('Transaction aborted');
+      reject(error);
+    };
+  });
+};
+
+export const getBrowserSWPreviewRootUrl = (): string => {
+  const origin = window.location.origin;
+  return `${origin}/browser_sw_preview`;
+};
 
 /**
  * Gets the base URL for browser service worker previews.
  * This URL should be handled by the service worker to serve files from IndexedDB.
  */
 export const getBrowserSWPreviewBaseUrl = (): string => {
-  // Use the current origin to ensure the service worker can intercept requests
-  const origin = window.location.origin;
-  return `${origin}/browser_sw_preview`;
+  if (!currentInstanceId) {
+    throw new Error(
+      'Browser SW preview instance not initialised. Call ensureBrowserSWPreviewSession() first.'
+    );
+  }
+
+  return `${getBrowserSWPreviewRootUrl()}/${currentInstanceId}`;
 };
 
 /**
@@ -68,14 +108,21 @@ const openBrowserSWPreviewIndexedDB = (): Promise<IDBDatabase> => {
         resolve(dbInstance);
       };
 
-      request.onupgradeneeded = event => {
+      request.onupgradeneeded = _event => {
         console.log('[BrowserSWIndexedDB] Upgrading database schema...');
         const db = request.result;
 
-        // Create object store if it doesn't exist
         if (!db.objectStoreNames.contains(STORE_NAME)) {
           db.createObjectStore(STORE_NAME);
           console.log('[BrowserSWIndexedDB] Created object store:', STORE_NAME);
+        }
+
+        if (!db.objectStoreNames.contains(INSTANCES_STORE_NAME)) {
+          db.createObjectStore(INSTANCES_STORE_NAME);
+          console.log(
+            '[BrowserSWIndexedDB] Created object store:',
+            INSTANCES_STORE_NAME
+          );
         }
       };
 
@@ -237,4 +284,166 @@ export const deleteFilesWithPrefix = async (
     );
     throw error;
   }
+};
+
+const findUnusedInstanceId = (usedIds: Array<number>): number => {
+  const usedIdsSet = new Set(usedIds);
+  let candidate = 1;
+
+  while (usedIdsSet.has(candidate)) {
+    candidate++;
+  }
+
+  return candidate;
+};
+
+const acquireInstanceIdAndCleanup = async (
+  cleanInstanceRelatedFiles: (instanceId: string) => Promise<void>
+) => {
+  const db = await openBrowserSWPreviewIndexedDB();
+  const now = Date.now();
+  const expiredInstanceIds: Array<string> = [];
+  let acquiredInstanceId: ?string = null;
+
+  // First transaction: identify expired instances and acquire new ID
+  const transaction = db.transaction(INSTANCES_STORE_NAME, 'readwrite');
+  const store = transaction.objectStore(INSTANCES_STORE_NAME);
+
+  const [keys, records] = await Promise.all([
+    // $FlowFixMe - outdated Flow types.
+    requestToPromise(store.getAllKeys()),
+    // $FlowFixMe - outdated Flow types.
+    requestToPromise(store.getAll()),
+  ]);
+
+  const usedIds: Array<number> = [];
+
+  keys.forEach((key, index) => {
+    if (typeof key !== 'string') return;
+    const record = records[index];
+    const lastUsed =
+      record && typeof record.lastUsed === 'number' ? record.lastUsed : 0;
+
+    if (now - lastUsed > INSTANCE_CLEANUP_THRESHOLD_MS) {
+      expiredInstanceIds.push(key);
+      return;
+    }
+
+    const parsedId = parseInt(key, 10);
+    if (!isNaN(parsedId)) {
+      usedIds.push(parsedId);
+    }
+  });
+
+  const newId = findUnusedInstanceId(usedIds);
+  acquiredInstanceId = String(newId);
+  store.put({ lastUsed: now }, acquiredInstanceId);
+
+  await transactionToPromise(transaction);
+
+  // Clean up expired instances one by one: only delete instance record if cleanup succeeds
+  for (const expiredId of expiredInstanceIds) {
+    try {
+      console.log(
+        `[BrowserSWIndexedDB] Cleaning up expired instance #${expiredId} files...`
+      );
+      await cleanInstanceRelatedFiles(expiredId);
+
+      // Only delete the instance record if the cleanup succeeds.
+      const cleanupTransaction = db.transaction(
+        INSTANCES_STORE_NAME,
+        'readwrite'
+      );
+      const cleanupStore = cleanupTransaction.objectStore(INSTANCES_STORE_NAME);
+      cleanupStore.delete(expiredId);
+      await transactionToPromise(cleanupTransaction);
+    } catch (error) {
+      console.error(
+        '[BrowserSWIndexedDB] Failed to clean up expired instance, keeping instance record:',
+        expiredId,
+        error
+      );
+      // Continue with next instance - we still want to clean up what we can
+    }
+  }
+
+  return acquiredInstanceId;
+};
+
+const updateInstanceLastUsed = async (instanceId: string) => {
+  try {
+    const db = await openBrowserSWPreviewIndexedDB();
+    const transaction = db.transaction(INSTANCES_STORE_NAME, 'readwrite');
+    const store = transaction.objectStore(INSTANCES_STORE_NAME);
+    store.put({ lastUsed: Date.now() }, instanceId);
+    await transactionToPromise(transaction);
+  } catch (error) {
+    console.error(
+      '[BrowserSWIndexedDB] Failed to update instance heartbeat:',
+      instanceId,
+      error
+    );
+  }
+};
+
+const startHeartbeat = (instanceId: string) => {
+  if (heartbeatIntervalId) {
+    clearInterval(heartbeatIntervalId);
+  }
+
+  const runHeartbeat = () => {
+    updateInstanceLastUsed(instanceId);
+  };
+
+  heartbeatIntervalId = setInterval(
+    runHeartbeat,
+    INSTANCE_HEARTBEAT_INTERVAL_MS
+  );
+};
+
+export const ensureBrowserSWPreviewSession = async (): Promise<void> => {
+  if (currentInstanceId) {
+    return;
+  }
+
+  if (initializationPromise) {
+    return initializationPromise;
+  }
+
+  console.info(
+    '[BrowserSWIndexedDB] Acquiring a Browser SW preview instance...'
+  );
+  initializationPromise = (async () => {
+    try {
+      const acquiredInstanceId = await acquireInstanceIdAndCleanup(
+        async (expiredId: string) => {
+          await deleteFilesWithPrefix(`/${expiredId}/`);
+        }
+      );
+
+      if (!acquiredInstanceId) {
+        throw new Error(
+          'Unable to acquire a Browser SW preview instance identifier'
+        );
+      }
+
+      console.info(
+        `This session is now using the Browser SW preview instance #${acquiredInstanceId}.`
+      );
+      currentInstanceId = acquiredInstanceId;
+
+      startHeartbeat(acquiredInstanceId);
+    } catch (error) {
+      currentInstanceId = null;
+      console.error(
+        '[BrowserSWIndexedDB] Failed to initialise Browser SW preview session:',
+        error
+      );
+      throw error;
+    } finally {
+      initializationPromise = null;
+    }
+  })();
+
+  return initializationPromise;
 };

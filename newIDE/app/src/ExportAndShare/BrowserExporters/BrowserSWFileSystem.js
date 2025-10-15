@@ -13,7 +13,7 @@ export type TextFileDescriptor = {|
 
 type ConstructorArgs = {|
   filesContent: Array<TextFileDescriptor>,
-  baseUrl: string,
+  rootUrl: string,
 |};
 
 const isURL = (filename: string) => {
@@ -53,7 +53,7 @@ const getContentType = (filePath: string): string => {
  * and serves them via a service worker for GDevelop previews.
  */
 export default class BrowserSWFileSystem {
-  baseUrl: string;
+  rootUrl: string;
 
   // Store the content of some files.
   _indexedFilesContent: { [string]: TextFileDescriptor };
@@ -71,8 +71,8 @@ export default class BrowserSWFileSystem {
   // readDir result.
   _allCopiedExternalUrls = new Set<string>();
 
-  constructor({ filesContent, baseUrl }: ConstructorArgs) {
-    this.baseUrl = baseUrl;
+  constructor({ filesContent, rootUrl }: ConstructorArgs) {
+    this.rootUrl = rootUrl;
 
     this._indexedFilesContent = {};
     filesContent.forEach(textFileDescriptor => {
@@ -140,7 +140,16 @@ export default class BrowserSWFileSystem {
 
   clearDir = (path: string) => {
     console.info(`[BrowserSWFileSystem] Clearing directory: ${path}...`);
-    this._pendingDeleteOperations.push(deleteFilesWithPrefix(path));
+    const relativePath = path.replace(this.rootUrl, '');
+    const normalizedPrefix = relativePath.startsWith('/')
+      ? relativePath
+      : `/${relativePath}`;
+    const prefixWithTrailingSlash = normalizedPrefix.endsWith('/')
+      ? normalizedPrefix
+      : `${normalizedPrefix}/`;
+    this._pendingDeleteOperations.push(
+      deleteFilesWithPrefix(prefixWithTrailingSlash)
+    );
   };
 
   getTempDir = () => {
@@ -198,7 +207,7 @@ export default class BrowserSWFileSystem {
 
   writeToFile = (fullPath: string, contents: string) => {
     // Remove the base URL to get the relative path
-    const relativePath = fullPath.replace(this.baseUrl, '');
+    const relativePath = fullPath.replace(this.rootUrl, '');
     const contentType = getContentType(fullPath);
 
     // Queue the file to be written to IndexedDB

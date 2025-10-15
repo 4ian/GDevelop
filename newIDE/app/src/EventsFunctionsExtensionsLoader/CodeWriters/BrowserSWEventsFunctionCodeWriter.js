@@ -4,9 +4,9 @@ import {
   type EventsFunctionCodeWriterCallbacks,
 } from '..';
 import {
-  deleteFilesWithPrefix,
   putFile,
   getBrowserSWPreviewBaseUrl,
+  getBrowserSWPreviewRootUrl,
 } from '../../ExportAndShare/BrowserExporters/BrowserSWPreviewLauncher/BrowserSWPreviewIndexedDB';
 import slugs from 'slugs';
 import debounce from 'lodash/debounce';
@@ -78,24 +78,12 @@ const writeFileInNextBatch = (path: string, content: string) => {
 export const makeBrowserSWEventsFunctionCodeWriter = ({
   onWriteFile,
 }: EventsFunctionCodeWriterCallbacks): EventsFunctionCodeWriter => {
-  const baseUrl = getBrowserSWPreviewBaseUrl();
-  const extensionsCodeUrl = baseUrl + '/extensions-code';
-
-  // At startup, clean up the old generated files for extensions code.
-  (async () => {
-    try {
-      // TODO: This could break multiple tabs! Consider doing a folder per tab/session?
-      const relativePath = extensionsCodeUrl.replace(baseUrl, '');
-      await deleteFilesWithPrefix(relativePath + '/');
-    } catch (error) {
-      console.error(
-        `[BrowserSWEventsFunctionCodeWriter] Failed to clean generated files for extensions code in "${extensionsCodeUrl}/".`,
-        error
-      );
-    }
-  })();
+  const rootUrl = getBrowserSWPreviewRootUrl();
 
   const getPathFor = (codeNamespace: string) => {
+    // Note: don't call getBrowserSWPreviewBaseUrl because it might not be available yet.
+    const baseUrl = getBrowserSWPreviewBaseUrl();
+    const extensionsCodeUrl = baseUrl + '/extensions-code';
     return `${extensionsCodeUrl}/${slugs(codeNamespace)}.js`;
   };
 
@@ -108,7 +96,7 @@ export const makeBrowserSWEventsFunctionCodeWriter = ({
     ): Promise<void> => {
       const path = getPathFor(functionCodeNamespace);
       onWriteFile({ includeFile: path, content: code });
-      const relativePath = path.replace(baseUrl, '');
+      const relativePath = path.replace(rootUrl, '');
 
       return writeFileInNextBatch(relativePath, code);
     },
@@ -119,7 +107,7 @@ export const makeBrowserSWEventsFunctionCodeWriter = ({
     ): Promise<void> => {
       const path = getPathFor(behaviorCodeNamespace);
       onWriteFile({ includeFile: path, content: code });
-      const relativePath = path.replace(baseUrl, '');
+      const relativePath = path.replace(rootUrl, '');
 
       return writeFileInNextBatch(relativePath, code);
     },
@@ -130,7 +118,7 @@ export const makeBrowserSWEventsFunctionCodeWriter = ({
     ): Promise<void> => {
       const path = getPathFor(objectCodeNamespace);
       onWriteFile({ includeFile: path, content: code });
-      const relativePath = path.replace(baseUrl, '');
+      const relativePath = path.replace(rootUrl, '');
 
       return writeFileInNextBatch(relativePath, code);
     },

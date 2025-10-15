@@ -16,7 +16,10 @@ import Window from '../../../Utils/Window';
 import { getGDevelopResourceJwtToken } from '../../../Utils/GDevelopServices/Project';
 import { isNativeMobileApp } from '../../../Utils/Platform';
 import { getIDEVersionWithHash } from '../../../Version';
-import { getBrowserSWPreviewBaseUrl } from './BrowserSWPreviewIndexedDB';
+import {
+  getBrowserSWPreviewBaseUrl,
+  getBrowserSWPreviewRootUrl,
+} from './BrowserSWPreviewIndexedDB';
 import { immediatelyOpenNewPreviewWindow } from '../BrowserPreview/BrowserPreviewWindow';
 const gd: libGDevelop = global.gd;
 
@@ -45,6 +48,7 @@ export default class BrowserSWPreviewLauncher extends React.Component<
       const isForInGameEdition = false; // TODO: adapt for the 3D editor branch.
 
       const baseUrl = getBrowserSWPreviewBaseUrl();
+      const rootUrl = getBrowserSWPreviewRootUrl();
       const outputDir = `${baseUrl}/${
         isForInGameEdition ? 'in-game-editor-preview' : 'preview'
       }`;
@@ -56,7 +60,7 @@ export default class BrowserSWPreviewLauncher extends React.Component<
 
       const browserSWFileSystem = new BrowserSWFileSystem({
         filesContent,
-        baseUrl: `${baseUrl}/`,
+        rootUrl: `${rootUrl}/`,
       });
       const fileSystem = assignIn(
         new gd.AbstractFileSystemJS(),

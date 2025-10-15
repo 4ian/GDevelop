@@ -12,7 +12,8 @@ const isDev = swURL.searchParams.has('dev');
 // If updated, also update the BrowserSWIndexedDB module.
 const DB_NAME = 'gdevelop-browser-sw-preview';
 const STORE_NAME = 'files';
-const DB_VERSION = 1;
+const INSTANCES_STORE_NAME = 'instances';
+const DB_VERSION = 2;
 
 /**
  * Opens the IndexedDB database for browser SW preview files.
@@ -39,6 +40,13 @@ function openBrowserSWPreviewDB() {
         if (!db.objectStoreNames.contains(STORE_NAME)) {
           db.createObjectStore(STORE_NAME);
           console.log('[ServiceWorker] Created object store:', STORE_NAME);
+        }
+        if (!db.objectStoreNames.contains(INSTANCES_STORE_NAME)) {
+          db.createObjectStore(INSTANCES_STORE_NAME);
+          console.log(
+            '[ServiceWorker] Created object store:',
+            INSTANCES_STORE_NAME
+          );
         }
       };
     } catch (error) {

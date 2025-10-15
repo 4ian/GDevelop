@@ -33,6 +33,7 @@ import BrowserEventsFunctionsExtensionOpener from './EventsFunctionsExtensionsLo
 import BrowserEventsFunctionsExtensionWriter from './EventsFunctionsExtensionsLoader/Storage/BrowserEventsFunctionsExtensionWriter';
 import BrowserLoginProvider from './LoginProvider/BrowserLoginProvider';
 import { isServiceWorkerSupported } from './ServiceWorkerSetup';
+import { ensureBrowserSWPreviewSession } from './ExportAndShare/BrowserExporters/BrowserSWPreviewLauncher/BrowserSWPreviewIndexedDB';
 
 export const create = (authentication: Authentication) => {
   Window.setUpContextMenu();
@@ -41,7 +42,11 @@ export const create = (authentication: Authentication) => {
 
   let app = null;
   const appArguments = Window.getArguments();
+
+  // TODO: make a hook that allows this to change, so we can switch to S3
+  // (and log this into Posthog).
   const canUseBrowserSW = isServiceWorkerSupported();
+  if (canUseBrowserSW) ensureBrowserSWPreviewSession();
 
   app = (
     <Providers

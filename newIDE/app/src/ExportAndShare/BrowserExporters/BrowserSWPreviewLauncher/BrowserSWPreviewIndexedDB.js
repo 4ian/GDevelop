@@ -124,11 +124,19 @@ export const putFile = async (
           reject(error);
         };
 
+        transaction.onabort = () => {
+          const error = transaction.error || new Error('Transaction aborted');
+          console.error(
+            '[BrowserSWIndexedDB] Transaction aborted while putting file:',
+            path,
+            error
+          );
+          reject(error);
+        };
+
         transaction.oncomplete = () => {
           resolve();
         };
-
-        // TODO: add onabort?
 
         const objectStore = transaction.objectStore(STORE_NAME);
         const record: FileRecord = { bytes, contentType };

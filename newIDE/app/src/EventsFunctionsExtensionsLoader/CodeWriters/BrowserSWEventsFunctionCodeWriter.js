@@ -84,9 +84,9 @@ export const makeBrowserSWEventsFunctionCodeWriter = ({
   // At startup, clean up the old generated files for extensions code.
   (async () => {
     try {
-      // TODO: maybe don't do it at startup because this could break multiple tabs!
-      // TODO: Also consider doing a preview per tab?
-      await deleteFilesWithPrefix(extensionsCodeUrl + '/');
+      // TODO: This could break multiple tabs! Consider doing a folder per tab/session?
+      const relativePath = extensionsCodeUrl.replace(baseUrl, '');
+      await deleteFilesWithPrefix(relativePath + '/');
     } catch (error) {
       console.error(
         `[BrowserSWEventsFunctionCodeWriter] Failed to clean generated files for extensions code in "${extensionsCodeUrl}/".`,

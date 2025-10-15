@@ -39,13 +39,23 @@ export type PreviewOptions = {|
     playerUsername: string,
     playerToken: string,
   },
-  numberOfWindows: number,
   getIsMenuBarHiddenInPreview: () => boolean,
   getIsAlwaysOnTopInPreview: () => boolean,
   captureOptions: CaptureOptions,
   onCaptureFinished: CaptureOptions => Promise<void>,
   inAppTutorialMessageInPreview: string,
   inAppTutorialMessagePositionInPreview: string,
+
+  numberOfWindows: number,
+
+  // Only for the web-app:
+  previewWindows: Array<WindowProxy> | null,
+|};
+
+export type PreparePreviewWindowsOptions = {|
+  project: gdProject,
+  hotReload: boolean,
+  numberOfWindows: number,
 |};
 
 /** The props that PreviewLauncher must support */
@@ -110,6 +120,9 @@ export type HotReloaderLog = {|
  * are functional component with strict interfaces.
  */
 export type PreviewLauncherInterface = {
+  +immediatelyPreparePreviewWindows?: (
+    options: PreparePreviewWindowsOptions
+  ) => Array<WindowProxy> | null,
   launchPreview: (previewOptions: PreviewOptions) => Promise<any>,
   canDoNetworkPreview: () => boolean,
   +closePreview?: (windowId: number) => void,

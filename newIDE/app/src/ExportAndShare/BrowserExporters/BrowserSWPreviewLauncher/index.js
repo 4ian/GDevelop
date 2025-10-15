@@ -6,6 +6,7 @@ import { findGDJS } from '../../../GameEngineFinder/BrowserS3GDJSFinder';
 import assignIn from 'lodash/assignIn';
 import {
   type PreviewOptions,
+  type PreparePreviewWindowsOptions,
   type PreviewLauncherProps,
 } from '../../PreviewLauncher.flow';
 import {
@@ -77,22 +78,19 @@ export default class BrowserSWPreviewLauncher extends React.Component<
     });
   };
 
-  launchPreview = async (previewOptions: PreviewOptions): Promise<any> => {
-    const { project, layout, externalLayout, numberOfWindows } = previewOptions;
-    this.setState({
-      error: null,
-    });
-
+  immediatelyPreparePreviewWindows = (
+    options: PreparePreviewWindowsOptions
+  ) => {
     const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
-    const shouldHotReload = previewOptions.hotReload && !!debuggerIds.length;
+    const shouldHotReload = options.hotReload && !!debuggerIds.length;
 
     // Immediately open windows (otherwise Safari will block the window opening if done after
     // an asynchronous operation).
     const previewWindows = shouldHotReload
       ? []
-      : Array.from({ length: numberOfWindows }, () => {
+      : Array.from({ length: options.numberOfWindows }, () => {
           try {
-            return immediatelyOpenNewPreviewWindow(project);
+            return immediatelyOpenNewPreviewWindow(options.project);
           } catch (error) {
             console.error(
               '[BrowserSWPreviewLauncher] Unable to open a new preview window - this window will be ignored:',
@@ -101,6 +99,18 @@ export default class BrowserSWPreviewLauncher extends React.Component<
             return null;
           }
         }).filter(Boolean);
+
+    return previewWindows;
+  };
+
+  launchPreview = async (previewOptions: PreviewOptions): Promise<any> => {
+    const { project, layout, externalLayout, previewWindows } = previewOptions;
+    this.setState({
+      error: null,
+    });
+
+    const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
+    const shouldHotReload = previewOptions.hotReload && !!debuggerIds.length;
 
     try {
       await this.getPreviewDebuggerServer().startServer({
@@ -212,7 +222,7 @@ export default class BrowserSWPreviewLauncher extends React.Component<
             command: 'hotReload',
           });
         });
-      } else {
+      } else if (previewWindows) {
         console.log(
           '[BrowserSWPreviewLauncher] Opening new preview window(s)...'
         );
@@ -246,6 +256,10 @@ export default class BrowserSWPreviewLauncher extends React.Component<
             onHandleParsedMessage: () => {},
           });
         });
+      } else {
+        throw new Error(
+          'Internal error: no preview windows to open and no hot reload to trigger.'
+        );
       }
 
       console.log('[BrowserSWPreviewLauncher] Preview launched successfully!');

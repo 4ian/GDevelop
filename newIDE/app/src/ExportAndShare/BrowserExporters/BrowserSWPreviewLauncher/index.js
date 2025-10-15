@@ -29,7 +29,6 @@ export default class BrowserSWPreviewLauncher extends React.Component<
   State
 > {
   canDoNetworkPreview = () => false;
-  canDoHotReload = () => false;
 
   state = {
     error: null,

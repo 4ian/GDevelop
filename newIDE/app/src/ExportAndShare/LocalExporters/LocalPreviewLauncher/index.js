@@ -52,7 +52,6 @@ export default class LocalPreviewLauncher extends React.Component<
   State
 > {
   canDoNetworkPreview = () => true;
-  canDoHotReload = () => true;
 
   state = {
     networkPreviewDialogOpen: false,

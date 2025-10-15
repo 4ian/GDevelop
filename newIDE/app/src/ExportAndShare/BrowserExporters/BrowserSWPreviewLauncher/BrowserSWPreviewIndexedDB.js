@@ -1,11 +1,5 @@
 // @flow
 
-/**
- * A utility module for managing local game preview files in IndexedDB.
- * This provides a clean, promise-based interface for storing and retrieving
- * game files that will be served by the service worker.
- */
-
 // If updated, also update the service worker template.
 const DB_NAME = 'gdevelop-browser-sw-preview';
 const STORE_NAME = 'files';

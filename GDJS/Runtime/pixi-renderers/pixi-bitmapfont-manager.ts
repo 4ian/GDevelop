@@ -278,8 +278,15 @@ namespace gdjs {
                 'same-origin',
           }
         );
-        const fontData = await response.text();
-        this._loadedFontsData.set(resource, fontData);
+        const fontDataRaw = await response.text();
+
+        // Sanitize : remove the lines staring with #
+        const sanitizedFontData = fontDataRaw
+          .split('\n')
+          .filter((line) => !line.trim().startsWith('#'))
+          .join('\n');
+
+        this._loadedFontsData.set(resource, sanitizedFontData);
       } catch (error) {
         logger.error(
           "Can't fetch the bitmap font file " +

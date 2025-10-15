@@ -2,10 +2,10 @@
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import React, { Component } from 'react';
-import Dialog from '../../../UI/Dialog';
-import FlatButton from '../../../UI/FlatButton';
-import { Column, Line } from '../../../UI/Grid';
-import Text from '../../../UI/Text';
+import Dialog from '../../UI/Dialog';
+import FlatButton from '../../UI/FlatButton';
+import { Column, Line } from '../../UI/Grid';
+import Text from '../../UI/Text';
 
 type Props = {|
   error: Error,

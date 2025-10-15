@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import BrowserPreviewErrorDialog from '../BrowserS3PreviewLauncher/BrowserPreviewErrorDialog';
+import BrowserPreviewErrorDialog from '../BrowserPreviewErrorDialog';
 import BrowserSWFileSystem from '../BrowserSWFileSystem';
 import { findGDJS } from '../../../GameEngineFinder/BrowserS3GDJSFinder';
 import assignIn from 'lodash/assignIn';
@@ -11,7 +11,7 @@ import {
 import {
   browserPreviewDebuggerServer,
   registerNewPreviewWindow,
-} from '../BrowserS3PreviewLauncher/BrowserPreviewDebuggerServer';
+} from '../BrowserPreviewDebuggerServer';
 import Window from '../../../Utils/Window';
 import { displayBlackLoadingScreenOrThrow } from '../../../Utils/BrowserExternalWindowUtils';
 import { getGDevelopResourceJwtToken } from '../../../Utils/GDevelopServices/Project';

@@ -30,7 +30,6 @@ function openBrowserSWPreviewDB() {
 
       request.onsuccess = () => {
         const db = request.result;
-        console.log('[ServiceWorker] Preview database opened successfully');
         resolve(db);
       };
 

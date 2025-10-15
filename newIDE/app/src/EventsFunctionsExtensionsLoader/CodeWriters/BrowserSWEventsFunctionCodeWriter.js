@@ -23,8 +23,7 @@ const flushBatchedWrites = debounce(async () => {
   console.info(
     `[BrowserSWEventsFunctionCodeWriter] Storing a batch of ${
       writes.length
-    } extension generated files in IndexedDB...`,
-    writes.map(w => w.path)
+    } extension generated files in IndexedDB...`
   );
 
   batchedWrites = [];

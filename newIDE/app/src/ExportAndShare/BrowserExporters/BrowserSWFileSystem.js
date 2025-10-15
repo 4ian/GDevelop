@@ -102,16 +102,13 @@ export default class BrowserSWFileSystem {
         } files in IndexedDB for preview...`
       );
 
+      let totalBytes = 0;
       const uploadPromises = this._pendingFiles.map(async file => {
-        const fullPath = `/${file.path}`; // TODO
+        const fullPath = `/${file.path}`;
         const encoder = new TextEncoder();
         const bytes = encoder.encode(file.content).buffer;
 
-        console.log(
-          `[BrowserSWFileSystem] Storing file: ${fullPath} (${
-            bytes.byteLength
-          } bytes, ${file.contentType})`
-        );
+        totalBytes += bytes.byteLength;
 
         await putFile(fullPath, bytes, file.contentType);
       });
@@ -121,7 +118,7 @@ export default class BrowserSWFileSystem {
       console.log(
         `[BrowserSWFileSystem] Successfully stored all ${
           this._pendingFiles.length
-        } preview files in IndexedDB.`
+        } preview files in IndexedDB (${Math.ceil(totalBytes / 1000)} kB).`
       );
     } catch (error) {
       console.error(
@@ -142,7 +139,6 @@ export default class BrowserSWFileSystem {
   };
 
   clearDir = (path: string) => {
-    // TODO: add to a pending operation list so we ensure it's executed.
     console.info(`[BrowserSWFileSystem] Clearing directory: ${path}...`);
     this._pendingDeleteOperations.push(deleteFilesWithPrefix(path));
   };
@@ -204,10 +200,6 @@ export default class BrowserSWFileSystem {
     // Remove the base URL to get the relative path
     const relativePath = fullPath.replace(this.baseUrl, '');
     const contentType = getContentType(fullPath);
-
-    console.log(
-      `[BrowserSWFileSystem] Queuing file for IndexedDB: ${relativePath} (${contentType})`
-    );
 
     // Queue the file to be written to IndexedDB
     this._pendingFiles.push({

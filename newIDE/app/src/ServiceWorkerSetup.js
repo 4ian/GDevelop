@@ -63,13 +63,11 @@ export function registerServiceWorker() {
         console.error('Error during service worker registration:', error);
       });
 
-    if (isDev) {
-      serviceWorker.ready.then(registration => {
-        // Forces a check right now for a newer service worker script in development.
-        // If there is one, it will be installed (see the service worker script to verify how in development
-        // a new service worker script does a `self.skipWaiting()` and `self.clients.claim()`).
-        registration.update();
-      });
-    }
+    serviceWorker.ready.then(registration => {
+      // Forces a check right now for a newer service worker script.
+      // If there is one, it will be installed (see the service worker script to verify how in development
+      // a new service worker script does a `self.skipWaiting()` and `self.clients.claim()`).
+      registration.update();
+    });
   });
 }

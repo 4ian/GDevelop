@@ -171,19 +171,22 @@ self.addEventListener('fetch', (event) => {
 });
 
 self.addEventListener('install', (event) => {
-  console.log('[ServiceWorker] Installing service worker...');
-  if (isDev) {
-    // In development, immediately use a new service worker.
-    self.skipWaiting();
-  }
+  console.log('[ServiceWorker] Installing new service worker...');
+
+  // Immediately install the new service worker, so it can then be activated
+  // (see below).
+  self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
-  console.log('[ServiceWorker] Activating service worker...');
+  console.log('[ServiceWorker] Activating new service worker...');
 
-  if (isDev) {
-    event.waitUntil(self.clients.claim());
-  }
+  // The new service worker will immediately take control of all running
+  // clients (i.e: other tabs of the web-app).
+  // This means that our service worker should stay backward compatible.
+  // But this is safer to avoid an old version of the service worker to stay
+  // used despite having a new version of the app served.
+  event.waitUntil(self.clients.claim());
 });
 
 // ============================================================================

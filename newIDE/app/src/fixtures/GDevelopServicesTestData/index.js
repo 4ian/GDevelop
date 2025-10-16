@@ -3257,6 +3257,62 @@ export const textBasedCourseChapterWithCode: TextBasedCourseChapter = {
   shortTitle: 'Scripting basics',
 };
 
+export const textBasedCourseChapterWithTables: TextBasedCourseChapter = {
+  title: 'Balancing Your Game',
+  templates: [],
+  items: [
+    {
+      type: 'text',
+      text:
+        'Tables can help you compare the different values you plan to use in your game. Let\'s review some balancing examples.',
+    },
+    {
+      type: 'table',
+      header: ['Stat', 'Enemy', 'Player'],
+      rows: [
+        ['Health', '120', '100'],
+        ['Damage', '12', '18'],
+        ['Move speed', '160 px/s', '200 px/s'],
+      ],
+      caption:
+        'Compare the base statistics for each participant to make sure encounters feel fair.',
+    },
+    {
+      type: 'text',
+      text:
+        'You can also layout drop chances to ensure players know what to expect from rewards.',
+    },
+    {
+      type: 'table',
+      header: ['Item', 'Rarity', 'Drop chance'],
+      rows: [
+        ['Gold coins', 'Common', '55%'],
+        ['Energy potion', 'Uncommon', '30%'],
+        ['Equipment blueprint', 'Rare', '12%'],
+        ['Legendary core', 'Legendary', '3%'],
+      ],
+    },
+    {
+      type: 'text',
+      text:
+        'Finally, outline how crafting costs scale so you can adjust your economy quickly during playtests.',
+    },
+    {
+      type: 'table',
+      rows: [
+        ['Craft level', 'Materials needed'],
+        ['1', '10 Iron Ore'],
+        ['2', '18 Iron Ore, 5 Crystal'],
+        ['3', '24 Iron Ore, 12 Crystal, 1 Core'],
+      ],
+      caption:
+        'Including a header row in the data itself is supported when you prefer a compact definition.',
+    },
+  ],
+  id: 'balancing-your-game',
+  shortTitle: 'Balancing tables',
+};
+
 export const lockedCourseChapter: LockedVideoBasedCourseChapter = {
   id: 'game',
   title: 'Chapter 3 - Build a video game',

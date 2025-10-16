@@ -7,6 +7,7 @@ import type {
   TextBasedCourseChapterImageItem as TextBasedCourseChapterImageItemType,
   TextBasedCourseChapterVideoItem as TextBasedCourseChapterVideoItemType,
   TextBasedCourseChapterCodeItem as TextBasedCourseChapterCodeItemType,
+  TextBasedCourseChapterTableItem as TextBasedCourseChapterTableItemType,
 } from '../Utils/GDevelopServices/Asset';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { MarkdownText } from '../UI/MarkdownText';
@@ -15,6 +16,7 @@ import TextBasedCourseChapterTaskItem from './TextBasedCourseChapterTaskItem';
 import { ColumnStackLayout } from '../UI/Layout';
 import { Column, Line } from '../UI/Grid';
 import TextBasedCourseChapterCodeBlock from './TextBasedCourseChapterCodeBlock';
+import TextBasedCourseChapterTable from './TextBasedCourseChapterTable';
 
 const styles = {
   media: {
@@ -32,12 +34,14 @@ type Props = {|
         | TextBasedCourseChapterImageItemType
         | TextBasedCourseChapterVideoItemType
         | TextBasedCourseChapterCodeItemType
+        | TextBasedCourseChapterTableItemType
       >
     | Array<
         | TextBasedCourseChapterTextItemType
         | TextBasedCourseChapterImageItemType
         | TextBasedCourseChapterVideoItemType
         | TextBasedCourseChapterCodeItemType
+        | TextBasedCourseChapterTableItemType
       >,
 |};
 const TextBasedCourseChapterItems = ({
@@ -102,6 +106,16 @@ const TextBasedCourseChapterItems = ({
                 key={itemIndex.toString()}
                 code={item.code}
                 language={item.language}
+              />
+            );
+          }
+          if (item.type === 'table') {
+            return (
+              <TextBasedCourseChapterTable
+                key={itemIndex.toString()}
+                header={item.header}
+                rows={item.rows}
+                caption={item.caption}
               />
             );
           }

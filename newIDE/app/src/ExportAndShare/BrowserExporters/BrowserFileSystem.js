@@ -38,10 +38,6 @@ const isURL = (filename: string) => {
 // Search for "pathPosix" in the codebase for other places where this is used.
 const pathPosix = path.posix || path;
 
-// TODO: Merge BrowserS3FileSystem into this? The way URLs are handled
-// is different though (BrowserS3FileSystem is not downloading anything
-// from URLs, while this file system does download files).
-
 /**
  * An in-memory "file system" that can be used for GDevelop exports.
  */

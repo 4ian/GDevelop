@@ -1,33 +1,76 @@
 // @flow
 import * as React from 'react';
 import BrowserPreviewErrorDialog from '../BrowserPreview/BrowserPreviewErrorDialog';
-import BrowserS3FileSystem from '../BrowserS3FileSystem';
+import BrowserSWFileSystem from '../BrowserSWFileSystem';
 import { findGDJS } from '../../../GameEngineFinder/BrowserS3GDJSFinder';
 import assignIn from 'lodash/assignIn';
 import {
   type PreviewOptions,
+  type PreparePreviewWindowsOptions,
   type PreviewLauncherProps,
 } from '../../PreviewLauncher.flow';
-import { getBaseUrl } from '../../../Utils/GDevelopServices/Preview';
-import { makeTimestampedId } from '../../../Utils/TimestampedId';
 import {
   browserPreviewDebuggerServer,
-  getExistingPreviewWindowForDebuggerId,
   registerNewPreviewWindow,
 } from '../BrowserPreview/BrowserPreviewDebuggerServer';
 import Window from '../../../Utils/Window';
 import { getGDevelopResourceJwtToken } from '../../../Utils/GDevelopServices/Project';
 import { isNativeMobileApp } from '../../../Utils/Platform';
 import { getIDEVersionWithHash } from '../../../Version';
+import {
+  getBrowserSWPreviewBaseUrl,
+  getBrowserSWPreviewRootUrl,
+} from './BrowserSWPreviewIndexedDB';
 import { setEmbeddedGameFramePreviewLocation } from '../../../EmbeddedGame/EmbeddedGameFrame';
 import { immediatelyOpenNewPreviewWindow } from '../BrowserPreview/BrowserPreviewWindow';
 const gd: libGDevelop = global.gd;
+
+const prepareExporter = async ({
+  isForInGameEdition,
+}: {
+  isForInGameEdition: boolean,
+}): Promise<{|
+  outputDir: string,
+  exporter: gdjsExporter,
+  browserSWFileSystem: BrowserSWFileSystem,
+|}> => {
+  const { gdjsRoot, filesContent } = await findGDJS('preview');
+  console.info('[BrowserSWPreviewLauncher] GDJS found in', gdjsRoot);
+
+  const baseUrl = getBrowserSWPreviewBaseUrl();
+  const rootUrl = getBrowserSWPreviewRootUrl();
+  const outputDir = `${baseUrl}/${
+    isForInGameEdition ? 'in-game-editor-preview' : 'preview'
+  }`;
+
+  console.log(
+    '[BrowserSWPreviewLauncher] Preview will be served from:',
+    outputDir
+  );
+
+  const browserSWFileSystem = new BrowserSWFileSystem({
+    filesContent,
+    rootUrl: `${rootUrl}/`,
+  });
+  const fileSystem = assignIn(
+    new gd.AbstractFileSystemJS(),
+    browserSWFileSystem
+  );
+  const exporter = new gd.Exporter(fileSystem, gdjsRoot);
+  exporter.setCodeOutputDirectory(outputDir);
+
+  return {
+    exporter,
+    outputDir,
+    browserSWFileSystem,
+  };
+};
 
 type State = {|
   error: ?Error,
 |};
 
-export default class BrowserS3PreviewLauncher extends React.Component<
+export default class BrowserSWPreviewLauncher extends React.Component<
   PreviewLauncherProps,
   State
 > {
@@ -37,35 +80,30 @@ export default class BrowserS3PreviewLauncher extends React.Component<
     error: null,
   };
 
-  _prepareExporter = (): Promise<{|
-    outputDir: string,
-    exporter: gdjsExporter,
-    browserS3FileSystem: BrowserS3FileSystem,
-  |}> => {
-    return findGDJS('preview').then(({ gdjsRoot, filesContent }) => {
-      console.info('GDJS found in ', gdjsRoot);
+  immediatelyPreparePreviewWindows = (
+    options: PreparePreviewWindowsOptions
+  ) => {
+    const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
+    const shouldHotReload = options.hotReload && !!debuggerIds.length;
 
-      const prefix = makeTimestampedId();
+    // Immediately open windows (otherwise Safari will block the window opening if done after
+    // an asynchronous operation).
+    const previewWindows =
+      shouldHotReload || options.isForInGameEdition
+        ? []
+        : Array.from({ length: options.numberOfWindows }, () => {
+            try {
+              return immediatelyOpenNewPreviewWindow(options.project);
+            } catch (error) {
+              console.error(
+                '[BrowserSWPreviewLauncher] Unable to open a new preview window - this window will be ignored:',
+                error
+              );
+              return null;
+            }
+          }).filter(Boolean);
 
-      const outputDir = getBaseUrl() + prefix;
-      const browserS3FileSystem = new BrowserS3FileSystem({
-        filesContent,
-        bucketBaseUrl: getBaseUrl(),
-        prefix,
-      });
-      const fileSystem = assignIn(
-        new gd.AbstractFileSystemJS(),
-        browserS3FileSystem
-      );
-      const exporter = new gd.Exporter(fileSystem, gdjsRoot);
-      exporter.setCodeOutputDirectory(outputDir);
-
-      return {
-        exporter,
-        outputDir,
-        browserS3FileSystem,
-      };
-    });
+    return previewWindows;
   };
 
   launchPreview = async (previewOptions: PreviewOptions): Promise<any> => {
@@ -75,49 +113,24 @@ export default class BrowserS3PreviewLauncher extends React.Component<
       externalLayoutName,
       eventsBasedObjectType,
       eventsBasedObjectVariantName,
-      numberOfWindows,
+      previewWindows,
     } = previewOptions;
     this.setState({
       error: null,
     });
 
     const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
-    const lastDebuggerId = debuggerIds.length
-      ? debuggerIds[debuggerIds.length - 1]
-      : null;
-    const shouldHotReload = previewOptions.hotReload && lastDebuggerId !== null;
-
-    // We abuse the "hot reload" to choose if we open a new window or replace
-    // the content of an existing one. But hot reload is NOT implemented (yet -
-    // it would need to generate the preview in the same place and trigger a reload
-    // of the scripts).
-    const existingPreviewWindow = shouldHotReload
-      ? getExistingPreviewWindowForDebuggerId(lastDebuggerId)
-      : null;
-
-    const previewWindows = existingPreviewWindow
-      ? [existingPreviewWindow]
-      : Array.from({ length: numberOfWindows }, () => {
-          try {
-            return immediatelyOpenNewPreviewWindow(project);
-          } catch (error) {
-            console.error(
-              'Unable to open a new preview window - this window will be ignored:',
-              error
-            );
-            return null;
-          }
-        }).filter(Boolean);
+    const shouldHotReload = previewOptions.hotReload && !!debuggerIds.length;
 
     try {
       await this.getPreviewDebuggerServer().startServer({
-        origin: new URL(getBaseUrl()).origin,
+        origin: new URL(getBrowserSWPreviewBaseUrl()).origin,
       });
     } catch (err) {
       // Ignore any error when running the debugger server - the preview
       // can still work without it.
       console.error(
-        'Unable to start the Debugger Server for the preview:',
+        '[BrowserSWPreviewLauncher] Unable to start the Debugger Server for the preview:',
         err
       );
     }
@@ -126,8 +139,10 @@ export default class BrowserS3PreviewLauncher extends React.Component<
       const {
         exporter,
         outputDir,
-        browserS3FileSystem,
-      } = await this._prepareExporter();
+        browserSWFileSystem,
+      } = await prepareExporter({
+        isForInGameEdition: previewOptions.isForInGameEdition,
+      });
 
       const previewExportOptions = new gd.PreviewExportOptions(
         project,
@@ -149,15 +164,31 @@ export default class BrowserS3PreviewLauncher extends React.Component<
         );
       }
 
-      if (isNativeMobileApp()) {
-        previewExportOptions.useMinimalDebuggerClient();
-      } else {
-        previewExportOptions.useWindowMessageDebuggerClient();
+      previewExportOptions.useWindowMessageDebuggerClient();
+
+      const includeFileHashs = this.props.getIncludeFileHashs();
+      for (const includeFile in includeFileHashs) {
+        const hash = includeFileHashs[includeFile];
+        previewExportOptions.setIncludeFileHash(includeFile, hash);
       }
 
-      // Scripts generated from extensions keep the same URL even after being modified.
-      // Use a cache bursting parameter to force the browser to reload them.
-      previewExportOptions.setNonRuntimeScriptsCacheBurst(Date.now());
+      // TODO Filter according to isForInGameEdition because the first game preview
+      // won't necessarily be the first debugger.
+      // It doesn't have any side effect because when it wont actually do an hot-reload
+      // since the game preview doesn't exist yet.
+      if (shouldHotReload) {
+        previewExportOptions.setShouldClearExportFolder(false);
+        // At hot-reload, the ProjectData are passed into the message.
+        // It means that we don't need to write them in a file.
+        previewExportOptions.setShouldReloadProjectData(false);
+        previewExportOptions.setShouldReloadLibraries(
+          previewOptions.shouldReloadLibraries ||
+            previewOptions.shouldGenerateScenesEventsCode
+        );
+        previewExportOptions.setShouldGenerateScenesEventsCode(
+          previewOptions.shouldGenerateScenesEventsCode
+        );
+      }
 
       previewExportOptions.setFullLoadingScreen(
         previewOptions.fullLoadingScreen
@@ -218,12 +249,15 @@ export default class BrowserS3PreviewLauncher extends React.Component<
       if (gdevelopResourceToken)
         previewExportOptions.setGDevelopResourceToken(gdevelopResourceToken);
 
+      console.log(
+        '[BrowserSWPreviewLauncher] Exporting project for preview...'
+      );
       exporter.exportProjectForPixiPreview(previewExportOptions);
-      previewExportOptions.delete();
-      exporter.delete();
 
-      // Upload any file that must be exported for the preview.
-      await browserS3FileSystem.uploadPendingObjects();
+      console.log(
+        '[BrowserSWPreviewLauncher] Storing preview files in IndexedDB...'
+      );
+      await browserSWFileSystem.applyPendingOperations();
 
       if (previewOptions.isForInGameEdition) {
         setEmbeddedGameFramePreviewLocation({
@@ -231,19 +265,59 @@ export default class BrowserS3PreviewLauncher extends React.Component<
         });
       }
 
-      // Change the HTML file displayed by the preview window so that it starts loading
-      // the game.
-      previewWindows.forEach((previewWindow: WindowProxy) => {
-        previewWindow.location = outputDir + '/index.html';
-        try {
-          previewWindow.focus();
-        } catch (e) {}
-      });
+      if (shouldHotReload) {
+        const projectDataElement = new gd.SerializerElement();
+        exporter.serializeProjectData(
+          project,
+          previewExportOptions,
+          projectDataElement
+        );
+        const projectData = JSON.parse(
+          gd.Serializer.toJSON(projectDataElement)
+        );
+        projectDataElement.delete();
 
-      // If the preview windows are new, register them so that they can be accessed
-      // by the debugger and for the captures to be detected when they close.
-      if (!existingPreviewWindow) {
+        const runtimeGameOptionsElement = new gd.SerializerElement();
+        exporter.serializeRuntimeGameOptions(
+          previewExportOptions,
+          runtimeGameOptionsElement
+        );
+        const runtimeGameOptions = JSON.parse(
+          gd.Serializer.toJSON(runtimeGameOptionsElement)
+        );
+        runtimeGameOptionsElement.delete();
+
+        console.log('[BrowserSWPreviewLauncher] Triggering hot reload...');
+        debuggerIds.forEach(debuggerId => {
+          this.getPreviewDebuggerServer().sendMessage(debuggerId, {
+            command: 'hotReload',
+            payload: {
+              shouldReloadResources: previewOptions.shouldReloadResources,
+              projectData,
+              runtimeGameOptions,
+            },
+          });
+        });
+      } else if (previewWindows) {
+        if (previewOptions.isForInGameEdition) {
+          setEmbeddedGameFramePreviewLocation({
+            previewIndexHtmlLocation: outputDir + '/index.html',
+          });
+        }
+
+        console.log(
+          '[BrowserSWPreviewLauncher] Opening new preview window(s)...'
+        );
         previewWindows.forEach((previewWindow: WindowProxy) => {
+          // Change the HTML file displayed by the preview window so that it starts loading
+          // the game.
+          previewWindow.location = outputDir + '/index.html';
+          try {
+            previewWindow.focus();
+          } catch (e) {}
+
+          // Register the window so that it can be accessed
+          // by the debugger and for the captures to be detected when it closes.
           const debuggerId = registerNewPreviewWindow(previewWindow);
           browserPreviewDebuggerServer.registerCallbacks({
             onErrorReceived: () => {},
@@ -264,8 +338,21 @@ export default class BrowserS3PreviewLauncher extends React.Component<
             onHandleParsedMessage: () => {},
           });
         });
+      } else {
+        throw new Error(
+          'Internal error: no preview windows to open and no hot reload to trigger.'
+        );
       }
+
+      previewExportOptions.delete();
+      exporter.delete();
+
+      console.log('[BrowserSWPreviewLauncher] Preview launched successfully!');
     } catch (error) {
+      console.error(
+        '[BrowserSWPreviewLauncher] Error launching preview:',
+        error
+      );
       this.setState({
         error,
       });

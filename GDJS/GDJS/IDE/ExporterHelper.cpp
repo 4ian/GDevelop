@@ -262,7 +262,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   }
 
   if (options.shouldReloadProjectData) {
-    
+
     if (options.fullLoadingScreen) {
       // Use project properties fallback to set empty properties
       if (exportedProject.GetAuthorIds().empty() &&

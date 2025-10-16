@@ -97,6 +97,15 @@ type AiRequestStorage = {|
   setLastSendError: (aiRequestId: string | null, lastSendError: ?Error) => void,
 |};
 
+type AiRequestHistory = {|
+  handleNavigateHistory: ({|
+    direction: 'up' | 'down',
+    currentText: string,
+    onChangeText: (text: string) => void,
+  |}) => void,
+  resetNavigation: () => void,
+|};
+
 type AiRequestSendState = {|
   isSending: boolean,
   lastSendError: ?Error,
@@ -285,8 +294,112 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
   };
 };
 
+export const useAiRequestHistory = (
+  aiRequestStorage: AiRequestStorage
+): AiRequestHistory => {
+  const { aiRequests } = aiRequestStorage;
+  const [historyIndex, setHistoryIndex] = React.useState<number>(-1);
+  const [savedCurrentText, setSavedCurrentText] = React.useState<string>('');
+  // Build history from sent user messages across all aiRequests
+  const requestsHistory = React.useMemo(
+    () => {
+      const history: Array<string> = [];
+
+      // Iterate through all aiRequests ordered by request update date.
+      // A request can request multiple user messages, but we only know the
+      // information about the request date, not the date of each user message.
+      Object.values(aiRequests)
+        .sort(
+          // $FlowFixMe - Object.values() loses the type of aiRequests.
+          (a: AiRequest, b: AiRequest) => {
+            return (
+              new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+            );
+          }
+        )
+        .forEach(
+          // $FlowFixMe - Object.values() loses the type of aiRequests.
+          (request: AiRequest) => {
+            const userMessages = request.output
+              .filter(
+                message => message.type === 'message' && message.role === 'user'
+              )
+              .map(
+                // $FlowFixMe - We filtered the type above.
+                (message: AiRequestUserMessage) => {
+                  const userRequest = message.content.find(
+                    item => item.type === 'user_request'
+                  );
+                  return userRequest ? userRequest.text : '';
+                }
+              )
+              .filter(text => text !== '');
+
+            history.push(...userMessages);
+          }
+        );
+
+      return history;
+    },
+    [aiRequests]
+  );
+
+  const handleNavigateHistory = React.useCallback(
+    ({
+      direction,
+      currentText,
+      onChangeText,
+    }: {
+      direction: 'up' | 'down',
+      currentText: string,
+      onChangeText: (text: string) => void,
+    }) => {
+      if (direction === 'up') {
+        // Save current text when starting navigation,
+        // so we can restore it if going back to current.
+        if (historyIndex === -1) {
+          setSavedCurrentText(currentText);
+        }
+
+        const newIndex = historyIndex + 1;
+        if (newIndex < requestsHistory.length) {
+          setHistoryIndex(newIndex);
+          const historicalText =
+            requestsHistory[requestsHistory.length - 1 - newIndex];
+          onChangeText(historicalText);
+        }
+      } else if (direction === 'down') {
+        const newIndex = historyIndex - 1;
+
+        if (newIndex === -1) {
+          // We're at the end of the history. Restore the saved current text.
+          setHistoryIndex(-1);
+          onChangeText(savedCurrentText);
+        } else if (newIndex >= 0) {
+          setHistoryIndex(newIndex);
+          const historicalText =
+            requestsHistory[requestsHistory.length - 1 - newIndex];
+          onChangeText(historicalText);
+        }
+      }
+    },
+    [historyIndex, requestsHistory, savedCurrentText]
+  );
+
+  const resetNavigation = React.useCallback(() => {
+    setHistoryIndex(-1);
+    setSavedCurrentText('');
+  }, []);
+
+  return {
+    handleNavigateHistory,
+    resetNavigation,
+  };
+};
+
 type AiRequestContextState = {|
   aiRequestStorage: AiRequestStorage,
+  aiRequestHistory: AiRequestHistory,
   editorFunctionCallResultsStorage: EditorFunctionCallResultsStorage,
   getAiSettings: () => AiSettings | null,
 |};
@@ -306,6 +419,10 @@ export const initialAiRequestContextState: AiRequestContextState = {
     setSendingAiRequest: () => {},
     setLastSendError: () => {},
   },
+  aiRequestHistory: {
+    handleNavigateHistory: ({ direction, currentText, onChangeText }) => {},
+    resetNavigation: () => {},
+  },
   editorFunctionCallResultsStorage: {
     getEditorFunctionCallResults: () => [],
     addEditorFunctionCallResults: () => {},
@@ -324,6 +441,7 @@ type AiRequestProviderProps = {|
 export const AiRequestProvider = ({ children }: AiRequestProviderProps) => {
   const editorFunctionCallResultsStorage = useEditorFunctionCallResultsStorage();
   const aiRequestStorage = useAiRequestsStorage();
+  const aiRequestHistory = useAiRequestHistory(aiRequestStorage);
 
   const environment = Window.isDev() ? 'staging' : 'live';
   const getAiSettings = useAsyncLazyMemo(
@@ -359,10 +477,16 @@ export const AiRequestProvider = ({ children }: AiRequestProviderProps) => {
   const state = React.useMemo(
     () => ({
       aiRequestStorage,
+      aiRequestHistory,
       editorFunctionCallResultsStorage,
       getAiSettings,
     }),
-    [aiRequestStorage, editorFunctionCallResultsStorage, getAiSettings]
+    [
+      aiRequestStorage,
+      aiRequestHistory,
+      editorFunctionCallResultsStorage,
+      getAiSettings,
+    ]
   );
 
   return (

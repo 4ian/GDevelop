@@ -12,7 +12,11 @@ export type CompactTextAreaFieldWithControlsProps = {|
   value: string,
   onChange: (newValue: string) => void,
   onSubmit?: () => void,
-  onNavigateHistory?: (direction: 'up' | 'down') => void,
+  onNavigateHistory?: ({|
+    direction: 'up' | 'down',
+    currentText: string,
+    onChangeText: (text: string) => void,
+  |}) => void,
   id?: string,
   disabled?: boolean,
   errored?: boolean,
@@ -53,12 +57,14 @@ export const CompactTextAreaFieldWithControls = React.forwardRef<
     const idToUse = React.useRef<string>(id || makeTimestampedId());
     const textareaRef = React.useRef<?HTMLTextAreaElement>(null);
 
+    const setCursorPosition = React.useCallback((position: number) => {
+      if (textareaRef.current) {
+        textareaRef.current.setSelectionRange(position, position);
+      }
+    }, []);
+
     React.useImperativeHandle(ref, () => ({
-      setCursorPosition: (position: number) => {
-        if (textareaRef.current) {
-          textareaRef.current.setSelectionRange(position, position);
-        }
-      },
+      setCursorPosition,
     }));
 
     const handleKeyDown = React.useCallback(
@@ -103,10 +109,23 @@ export const CompactTextAreaFieldWithControls = React.forwardRef<
           (isArrowDown && isAtLastLineEnd)
         ) {
           e.preventDefault();
-          onNavigateHistory(isArrowUp ? 'up' : 'down');
+          onNavigateHistory({
+            currentText: value,
+            onChangeText: onChange,
+            direction: isArrowUp ? 'up' : 'down',
+          });
+          // Set cursor to start when navigating up,
+          // otherwise it goes to the end of the text, making it harder
+          // to navigate with one key press.
+          // Use timeout so that the text is updated before setting the cursor position.
+          if (isArrowUp) {
+            setTimeout(() => {
+              setCursorPosition(0);
+            }, 0);
+          }
         }
       },
-      [onSubmit, onNavigateHistory]
+      [onSubmit, onNavigateHistory, setCursorPosition, value, onChange]
     );
 
     return (

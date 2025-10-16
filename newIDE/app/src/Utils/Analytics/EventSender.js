@@ -16,6 +16,7 @@ import Window from '../Window';
 import { isMobile, isNativeMobileApp } from '../Platform';
 import { retryIfFailed } from '../RetryIfFailed';
 import { type NewProjectCreationSource } from '../../ProjectCreation/NewProjectSetupDialog';
+import { isServiceWorkerSupported } from '../../ServiceWorkerSetup';
 const electron = optionalRequire('electron');
 
 const isElectronApp = !!electron;
@@ -126,9 +127,18 @@ const recordEvent = (name: string, metadata?: { [string]: any }) => {
 
     posthog.capture(name, {
       ...metadata,
+      // Always add metadata about the app:
       isInAppTutorialRunning: currentlyRunningInAppTutorial,
       isInDesktopApp: isElectronApp,
       isInWebApp: !isElectronApp,
+      appKind: isElectronApp
+        ? 'desktop-app'
+        : isNativeMobileApp()
+        ? 'mobile-app'
+        : 'web-app',
+      appVersion: getIDEVersion(),
+      appVersionWithHash: getIDEVersionWithHash(),
+      serviceWorkerSupported: isServiceWorkerSupported(),
     });
   })();
 

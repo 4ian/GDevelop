@@ -3224,6 +3224,39 @@ export const textBasedCourseChapter: TextBasedCourseChapter = {
   shortTitle: 'Introduction',
 };
 
+export const textBasedCourseChapterWithCode: TextBasedCourseChapter = {
+  title: 'Scripting Basics',
+  templates: [],
+  items: [
+    {
+      type: 'text',
+      text:
+        "Let's explore how JavaScript events can control objects in your game.",
+    },
+    {
+      type: 'code',
+      language: 'javascript',
+      code:
+        "const handleJump = () => {\n" +
+        "  const player = runtimeScene.getObjects('Player')[0];\n" +
+        "  if (!player) return;\n\n" +
+        "  if (player.getBehavior('PlatformerObject').isOnFloor()) {\n" +
+        "    player.getBehavior('PlatformerObject').simulateJumpKey();\n" +
+        "  }\n" +
+        "};\n\n" +
+        "eventsFunctionContext.onceTriggers.once('jump');\n" +
+        "handleJump();",
+    },
+    {
+      type: 'text',
+      text:
+        'This example shows how to run a small helper to trigger a jump when the player hits the floor.',
+    },
+  ],
+  id: 'scripting-basics',
+  shortTitle: 'Scripting basics',
+};
+
 export const lockedCourseChapter: LockedVideoBasedCourseChapter = {
   id: 'game',
   title: 'Chapter 3 - Build a video game',

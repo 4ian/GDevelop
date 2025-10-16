@@ -116,13 +116,13 @@
     }
   },
   "scripts": {
-    "postinstall": "patch-package && cd ../../GDJS && npm install && cd ../newIDE/app && npm run import-resources && npm run make-version-metadata",
-    "import-resources": "npm run import-zipped-external-editors && npm run build-theme-resources && cd scripts && node import-libGD.js && node import-GDJS-Runtime.js && node import-monaco-editor.js && node import-zipped-external-libs.js",
+    "postinstall": "patch-package && cd ../../GDJS && npm install && cd ../newIDE/app && npm run import-resources",
+    "import-resources": "npm run make-version-metadata && npm run import-zipped-external-editors && npm run build-theme-resources && npm run make-service-worker && cd scripts && node import-libGD.js && node import-GDJS-Runtime.js && node import-monaco-editor.js && node import-zipped-external-libs.js",
     "make-version-metadata": "cd scripts && node make-version-metadata.js",
     "make-service-worker": "cd scripts && node make-service-worker.js",
-    "start": "npm run import-resources && npm run make-version-metadata && concurrently \"react-app-rewired start\" \"node scripts/watch-serve-GDJS-runtime.js\" -n \"editor,game engine\" --kill-others",
+    "start": "npm run import-resources && concurrently \"react-app-rewired start\" \"node scripts/watch-serve-GDJS-runtime.js\" -n \"editor,game engine\" --kill-others",
     "electron-app": "cd ../electron-app && npm run start",
-    "build": "npm run import-resources && npm run make-version-metadata && react-app-rewired build && npm run make-service-worker",
+    "build": "npm run import-resources && react-app-rewired build",
     "format": "prettier --write \"src/!(locales)/**/*.js\"",
     "check-format": "prettier --list-different \"src/!(locales)/**/*.js\"",
     "test": "react-app-rewired test --env=node",

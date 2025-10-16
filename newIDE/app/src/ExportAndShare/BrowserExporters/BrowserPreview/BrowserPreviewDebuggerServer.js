@@ -59,19 +59,21 @@ const setupWindowClosedPolling = () => {
   }, 1000);
 };
 
-const PREVIEWS_ORIGIN = 'https://game-previews.gdevelop.io';
+let previewOrigin = null;
 
 /**
  * A debugger server implemented using the ability to send/receive messages
  * from popup windows in the browser.
  */
 export const browserPreviewDebuggerServer: PreviewDebuggerServer = {
-  startServer: async () => {
+  startServer: async ({ origin }) => {
     if (debuggerServerState === 'started') return;
     debuggerServerState = 'started';
 
+    previewOrigin = origin;
+
     window.addEventListener('message', event => {
-      if (event.origin !== PREVIEWS_ORIGIN) return;
+      if (event.origin !== previewOrigin) return;
 
       const id = getDebuggerIdForPreviewWindow(event.source);
       if (id === null) return; // Could not find the id of this preview window.
@@ -98,7 +100,7 @@ export const browserPreviewDebuggerServer: PreviewDebuggerServer = {
     if (!previewWindow) return;
 
     try {
-      previewWindow.postMessage(message, PREVIEWS_ORIGIN);
+      previewWindow.postMessage(message, previewOrigin);
     } catch (error) {
       console.error('Unable to send a message to the preview window:', error);
     }

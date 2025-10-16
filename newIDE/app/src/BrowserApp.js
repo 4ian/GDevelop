@@ -9,6 +9,7 @@ import './UI/icomoon-font.css'; // Styles for Icomoon font.
 // Import for browser only IDE
 import browserResourceSources from './ResourcesList/BrowserResourceSources';
 import browserResourceExternalEditors from './ResourcesList/BrowserResourceExternalEditors';
+import BrowserSWPreviewLauncher from './ExportAndShare/BrowserExporters/BrowserSWPreviewLauncher';
 import BrowserS3PreviewLauncher from './ExportAndShare/BrowserExporters/BrowserS3PreviewLauncher';
 import {
   browserAutomatedExporters,
@@ -18,6 +19,7 @@ import {
 import makeExtensionsLoader from './JsExtensionsLoader/BrowserJsExtensionsLoader';
 import ObjectsEditorService from './ObjectEditor/ObjectsEditorService';
 import ObjectsRenderingService from './ObjectsRendering/ObjectsRenderingService';
+import { makeBrowserSWEventsFunctionCodeWriter } from './EventsFunctionsExtensionsLoader/CodeWriters/BrowserSWEventsFunctionCodeWriter';
 import { makeBrowserS3EventsFunctionCodeWriter } from './EventsFunctionsExtensionsLoader/CodeWriters/BrowserS3EventsFunctionCodeWriter';
 import Providers from './MainFrame/Providers';
 import ProjectStorageProviders from './ProjectsStorage/ProjectStorageProviders';
@@ -30,6 +32,8 @@ import BrowserResourceFetcher from './ProjectsStorage/ResourceFetcher/BrowserRes
 import BrowserEventsFunctionsExtensionOpener from './EventsFunctionsExtensionsLoader/Storage/BrowserEventsFunctionsExtensionOpener';
 import BrowserEventsFunctionsExtensionWriter from './EventsFunctionsExtensionsLoader/Storage/BrowserEventsFunctionsExtensionWriter';
 import BrowserLoginProvider from './LoginProvider/BrowserLoginProvider';
+import { isServiceWorkerSupported } from './ServiceWorkerSetup';
+import { ensureBrowserSWPreviewSession } from './ExportAndShare/BrowserExporters/BrowserSWPreviewLauncher/BrowserSWPreviewIndexedDB';
 
 export const create = (authentication: Authentication) => {
   Window.setUpContextMenu();
@@ -39,11 +43,20 @@ export const create = (authentication: Authentication) => {
   let app = null;
   const appArguments = Window.getArguments();
 
+  // TODO: make a hook that allows this to change, so we can switch to S3
+  // (and log this into Posthog).
+  const canUseBrowserSW = isServiceWorkerSupported();
+  if (canUseBrowserSW) ensureBrowserSWPreviewSession();
+
   app = (
     <Providers
       authentication={authentication}
       disableCheckForUpdates={!!appArguments['disable-update-check']}
-      makeEventsFunctionCodeWriter={makeBrowserS3EventsFunctionCodeWriter}
+      makeEventsFunctionCodeWriter={
+        canUseBrowserSW
+          ? makeBrowserSWEventsFunctionCodeWriter
+          : makeBrowserS3EventsFunctionCodeWriter
+      }
       eventsFunctionsExtensionWriter={BrowserEventsFunctionsExtensionWriter}
       eventsFunctionsExtensionOpener={BrowserEventsFunctionsExtensionOpener}
     >
@@ -67,9 +80,13 @@ export const create = (authentication: Authentication) => {
           }) => (
             <MainFrame
               i18n={i18n}
-              renderPreviewLauncher={(props, ref) => (
-                <BrowserS3PreviewLauncher {...props} ref={ref} />
-              )}
+              renderPreviewLauncher={(props, ref) =>
+                canUseBrowserSW ? (
+                  <BrowserSWPreviewLauncher {...props} ref={ref} />
+                ) : (
+                  <BrowserS3PreviewLauncher {...props} ref={ref} />
+                )
+              }
               renderShareDialog={props => (
                 <ShareDialog
                   project={props.project}
@@ -104,7 +121,9 @@ export const create = (authentication: Authentication) => {
                 filterExamples: !Window.isDev(),
               })}
               initialFileMetadataToOpen={initialFileMetadataToOpen}
-              initialExampleSlugToOpen={appArguments['create-from-example'] || null}
+              initialExampleSlugToOpen={
+                appArguments['create-from-example'] || null
+              }
             />
           )}
         </ProjectStorageProviders>

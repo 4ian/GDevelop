@@ -1,24 +1,26 @@
 // @flow
 import * as React from 'react';
 import BrowserPreviewErrorDialog from '../BrowserPreview/BrowserPreviewErrorDialog';
-import BrowserS3FileSystem from '../BrowserS3FileSystem';
+import BrowserSWFileSystem from '../BrowserSWFileSystem';
 import { findGDJS } from '../../../GameEngineFinder/BrowserS3GDJSFinder';
 import assignIn from 'lodash/assignIn';
 import {
   type PreviewOptions,
+  type PreparePreviewWindowsOptions,
   type PreviewLauncherProps,
 } from '../../PreviewLauncher.flow';
-import { getBaseUrl } from '../../../Utils/GDevelopServices/Preview';
-import { makeTimestampedId } from '../../../Utils/TimestampedId';
 import {
   browserPreviewDebuggerServer,
-  getExistingPreviewWindowForDebuggerId,
   registerNewPreviewWindow,
 } from '../BrowserPreview/BrowserPreviewDebuggerServer';
 import Window from '../../../Utils/Window';
 import { getGDevelopResourceJwtToken } from '../../../Utils/GDevelopServices/Project';
 import { isNativeMobileApp } from '../../../Utils/Platform';
 import { getIDEVersionWithHash } from '../../../Version';
+import {
+  getBrowserSWPreviewBaseUrl,
+  getBrowserSWPreviewRootUrl,
+} from './BrowserSWPreviewIndexedDB';
 import { immediatelyOpenNewPreviewWindow } from '../BrowserPreview/BrowserPreviewWindow';
 const gd: libGDevelop = global.gd;
 
@@ -26,7 +28,7 @@ type State = {|
   error: ?Error,
 |};
 
-export default class BrowserS3PreviewLauncher extends React.Component<
+export default class BrowserSWPreviewLauncher extends React.Component<
   PreviewLauncherProps,
   State
 > {
@@ -39,22 +41,31 @@ export default class BrowserS3PreviewLauncher extends React.Component<
   _prepareExporter = (): Promise<{|
     outputDir: string,
     exporter: gdjsExporter,
-    browserS3FileSystem: BrowserS3FileSystem,
+    browserSWFileSystem: BrowserSWFileSystem,
   |}> => {
     return findGDJS('preview').then(({ gdjsRoot, filesContent }) => {
-      console.info('GDJS found in ', gdjsRoot);
+      console.info('[BrowserSWPreviewLauncher] GDJS found in', gdjsRoot);
 
-      const prefix = makeTimestampedId();
+      const isForInGameEdition = false; // TODO: adapt for the 3D editor branch.
 
-      const outputDir = getBaseUrl() + prefix;
-      const browserS3FileSystem = new BrowserS3FileSystem({
+      const baseUrl = getBrowserSWPreviewBaseUrl();
+      const rootUrl = getBrowserSWPreviewRootUrl();
+      const outputDir = `${baseUrl}/${
+        isForInGameEdition ? 'in-game-editor-preview' : 'preview'
+      }`;
+
+      console.log(
+        '[BrowserSWPreviewLauncher] Preview will be served from:',
+        outputDir
+      );
+
+      const browserSWFileSystem = new BrowserSWFileSystem({
         filesContent,
-        bucketBaseUrl: getBaseUrl(),
-        prefix,
+        rootUrl: `${rootUrl}/`,
       });
       const fileSystem = assignIn(
         new gd.AbstractFileSystemJS(),
-        browserS3FileSystem
+        browserSWFileSystem
       );
       const exporter = new gd.Exporter(fileSystem, gdjsRoot);
       exporter.setCodeOutputDirectory(outputDir);
@@ -62,54 +73,54 @@ export default class BrowserS3PreviewLauncher extends React.Component<
       return {
         exporter,
         outputDir,
-        browserS3FileSystem,
+        browserSWFileSystem,
       };
     });
   };
 
-  launchPreview = async (previewOptions: PreviewOptions): Promise<any> => {
-    const { project, layout, externalLayout, numberOfWindows } = previewOptions;
-    this.setState({
-      error: null,
-    });
-
+  immediatelyPreparePreviewWindows = (
+    options: PreparePreviewWindowsOptions
+  ) => {
     const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
-    const lastDebuggerId = debuggerIds.length
-      ? debuggerIds[debuggerIds.length - 1]
-      : null;
-    const shouldHotReload = previewOptions.hotReload && lastDebuggerId !== null;
+    const shouldHotReload = options.hotReload && !!debuggerIds.length;
 
-    // We abuse the "hot reload" to choose if we open a new window or replace
-    // the content of an existing one. But hot reload is NOT implemented (yet -
-    // it would need to generate the preview in the same place and trigger a reload
-    // of the scripts).
-    const existingPreviewWindow = shouldHotReload
-      ? getExistingPreviewWindowForDebuggerId(lastDebuggerId)
-      : null;
-
-    const previewWindows = existingPreviewWindow
-      ? [existingPreviewWindow]
-      : Array.from({ length: numberOfWindows }, () => {
+    // Immediately open windows (otherwise Safari will block the window opening if done after
+    // an asynchronous operation).
+    const previewWindows = shouldHotReload
+      ? []
+      : Array.from({ length: options.numberOfWindows }, () => {
           try {
-            return immediatelyOpenNewPreviewWindow(project);
+            return immediatelyOpenNewPreviewWindow(options.project);
           } catch (error) {
             console.error(
-              'Unable to open a new preview window - this window will be ignored:',
+              '[BrowserSWPreviewLauncher] Unable to open a new preview window - this window will be ignored:',
               error
             );
             return null;
           }
         }).filter(Boolean);
 
+    return previewWindows;
+  };
+
+  launchPreview = async (previewOptions: PreviewOptions): Promise<any> => {
+    const { project, layout, externalLayout, previewWindows } = previewOptions;
+    this.setState({
+      error: null,
+    });
+
+    const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
+    const shouldHotReload = previewOptions.hotReload && !!debuggerIds.length;
+
     try {
       await this.getPreviewDebuggerServer().startServer({
-        origin: new URL(getBaseUrl()).origin,
+        origin: new URL(getBrowserSWPreviewBaseUrl()).origin,
       });
     } catch (err) {
       // Ignore any error when running the debugger server - the preview
       // can still work without it.
       console.error(
-        'Unable to start the Debugger Server for the preview:',
+        '[BrowserSWPreviewLauncher] Unable to start the Debugger Server for the preview:',
         err
       );
     }
@@ -118,7 +129,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
       const {
         exporter,
         outputDir,
-        browserS3FileSystem,
+        browserSWFileSystem,
       } = await this._prepareExporter();
 
       const previewExportOptions = new gd.PreviewExportOptions(
@@ -131,15 +142,18 @@ export default class BrowserS3PreviewLauncher extends React.Component<
         previewExportOptions.setExternalLayoutName(externalLayout.getName());
       }
 
-      if (isNativeMobileApp()) {
-        previewExportOptions.useMinimalDebuggerClient();
-      } else {
-        previewExportOptions.useWindowMessageDebuggerClient();
+      previewExportOptions.useWindowMessageDebuggerClient();
+
+      const includeFileHashs = this.props.getIncludeFileHashs();
+      for (const includeFile in includeFileHashs) {
+        const hash = includeFileHashs[includeFile];
+        previewExportOptions.setIncludeFileHash(includeFile, hash);
       }
 
-      // Scripts generated from extensions keep the same URL even after being modified.
-      // Use a cache bursting parameter to force the browser to reload them.
-      previewExportOptions.setNonRuntimeScriptsCacheBurst(Date.now());
+      previewExportOptions.setProjectDataOnlyExport(
+        // Only export project data if asked and if a hot-reloading is being done.
+        shouldHotReload && previewOptions.projectDataOnlyExport
+      );
 
       previewExportOptions.setFullLoadingScreen(
         previewOptions.fullLoadingScreen
@@ -189,26 +203,39 @@ export default class BrowserS3PreviewLauncher extends React.Component<
       if (gdevelopResourceToken)
         previewExportOptions.setGDevelopResourceToken(gdevelopResourceToken);
 
+      console.log(
+        '[BrowserSWPreviewLauncher] Exporting project for preview...'
+      );
       exporter.exportProjectForPixiPreview(previewExportOptions);
       previewExportOptions.delete();
       exporter.delete();
 
-      // Upload any file that must be exported for the preview.
-      await browserS3FileSystem.uploadPendingObjects();
+      console.log(
+        '[BrowserSWPreviewLauncher] Storing preview files in IndexedDB...'
+      );
+      await browserSWFileSystem.applyPendingOperations();
 
-      // Change the HTML file displayed by the preview window so that it starts loading
-      // the game.
-      previewWindows.forEach((previewWindow: WindowProxy) => {
-        previewWindow.location = outputDir + '/index.html';
-        try {
-          previewWindow.focus();
-        } catch (e) {}
-      });
-
-      // If the preview windows are new, register them so that they can be accessed
-      // by the debugger and for the captures to be detected when they close.
-      if (!existingPreviewWindow) {
+      if (shouldHotReload) {
+        console.log('[BrowserSWPreviewLauncher] Triggering hot reload...');
+        debuggerIds.forEach(debuggerId => {
+          this.getPreviewDebuggerServer().sendMessage(debuggerId, {
+            command: 'hotReload',
+          });
+        });
+      } else if (previewWindows) {
+        console.log(
+          '[BrowserSWPreviewLauncher] Opening new preview window(s)...'
+        );
         previewWindows.forEach((previewWindow: WindowProxy) => {
+          // Change the HTML file displayed by the preview window so that it starts loading
+          // the game.
+          previewWindow.location = outputDir + '/index.html';
+          try {
+            previewWindow.focus();
+          } catch (e) {}
+
+          // Register the window so that it can be accessed
+          // by the debugger and for the captures to be detected when it closes.
           const debuggerId = registerNewPreviewWindow(previewWindow);
           browserPreviewDebuggerServer.registerCallbacks({
             onErrorReceived: () => {},
@@ -229,8 +256,18 @@ export default class BrowserS3PreviewLauncher extends React.Component<
             onHandleParsedMessage: () => {},
           });
         });
+      } else {
+        throw new Error(
+          'Internal error: no preview windows to open and no hot reload to trigger.'
+        );
       }
+
+      console.log('[BrowserSWPreviewLauncher] Preview launched successfully!');
     } catch (error) {
+      console.error(
+        '[BrowserSWPreviewLauncher] Error launching preview:',
+        error
+      );
       this.setState({
         error,
       });

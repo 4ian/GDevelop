@@ -260,9 +260,10 @@ export type TextBasedCourseChapterCodeItem = {|
 
 export type TextBasedCourseChapterTableItem = {|
   type: 'table',
-  header?: Array<string>,
-  rows: Array<Array<string>>,
-  caption?: string,
+  header?: Array<TextBasedCourseChapterTextItem>,
+  rows: Array<
+    Array<TextBasedCourseChapterTextItem | TextBasedCourseChapterCodeItem>
+  >,
 |};
 
 export type TextBasedCourseChapterTaskItem = {|

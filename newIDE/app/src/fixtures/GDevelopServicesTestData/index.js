@@ -3237,15 +3237,15 @@ export const textBasedCourseChapterWithCode: TextBasedCourseChapter = {
       type: 'code',
       language: 'javascript',
       code:
-        "const handleJump = () => {\n" +
+        'const handleJump = () => {\n' +
         "  const player = runtimeScene.getObjects('Player')[0];\n" +
-        "  if (!player) return;\n\n" +
+        '  if (!player) return;\n\n' +
         "  if (player.getBehavior('PlatformerObject').isOnFloor()) {\n" +
         "    player.getBehavior('PlatformerObject').simulateJumpKey();\n" +
-        "  }\n" +
-        "};\n\n" +
+        '  }\n' +
+        '};\n\n' +
         "eventsFunctionContext.onceTriggers.once('jump');\n" +
-        "handleJump();",
+        'handleJump();',
     },
     {
       type: 'text',
@@ -3264,18 +3264,32 @@ export const textBasedCourseChapterWithTables: TextBasedCourseChapter = {
     {
       type: 'text',
       text:
-        'Tables can help you compare the different values you plan to use in your game. Let\'s review some balancing examples.',
+        "Tables can help you compare the different values you plan to use in your game. Let's review some balancing examples.",
     },
     {
       type: 'table',
-      header: ['Stat', 'Enemy', 'Player'],
-      rows: [
-        ['Health', '120', '100'],
-        ['Damage', '12', '18'],
-        ['Move speed', '160 px/s', '200 px/s'],
+      header: [
+        { type: 'text', text: 'Stat' },
+        { type: 'text', text: 'Enemy' },
+        { type: 'text', text: 'Player' },
       ],
-      caption:
-        'Compare the base statistics for each participant to make sure encounters feel fair.',
+      rows: [
+        [
+          { type: 'text', text: 'Health' },
+          { type: 'text', text: '120' },
+          { type: 'text', text: '100' },
+        ],
+        [
+          { type: 'text', text: 'Damage' },
+          { type: 'text', text: '12' },
+          { type: 'text', text: '18' },
+        ],
+        [
+          { type: 'text', text: 'Move speed' },
+          { type: 'text', text: '160 px/s' },
+          { type: 'text', text: '200 px/s' },
+        ],
+      ],
     },
     {
       type: 'text',
@@ -3284,12 +3298,32 @@ export const textBasedCourseChapterWithTables: TextBasedCourseChapter = {
     },
     {
       type: 'table',
-      header: ['Item', 'Rarity', 'Drop chance'],
+      header: [
+        { type: 'text', text: 'Item' },
+        { type: 'text', text: 'Rarity' },
+        { type: 'text', text: 'Drop chance' },
+      ],
       rows: [
-        ['Gold coins', 'Common', '55%'],
-        ['Energy potion', 'Uncommon', '30%'],
-        ['Equipment blueprint', 'Rare', '12%'],
-        ['Legendary core', 'Legendary', '3%'],
+        [
+          { type: 'text', text: 'Gold coins' },
+          { type: 'text', text: 'Common' },
+          { type: 'text', text: '55%' },
+        ],
+        [
+          { type: 'text', text: 'Energy potion' },
+          { type: 'text', text: 'Uncommon' },
+          { type: 'text', text: '30%' },
+        ],
+        [
+          { type: 'text', text: 'Equipment blueprint' },
+          { type: 'text', text: 'Rare' },
+          { type: 'text', text: '12%' },
+        ],
+        [
+          { type: 'text', text: 'Legendary core' },
+          { type: 'text', text: 'Legendary' },
+          { type: 'text', text: '3%' },
+        ],
       ],
     },
     {
@@ -3300,13 +3334,60 @@ export const textBasedCourseChapterWithTables: TextBasedCourseChapter = {
     {
       type: 'table',
       rows: [
-        ['Craft level', 'Materials needed'],
-        ['1', '10 Iron Ore'],
-        ['2', '18 Iron Ore, 5 Crystal'],
-        ['3', '24 Iron Ore, 12 Crystal, 1 Core'],
+        [
+          { type: 'text', text: 'Craft level' },
+          { type: 'text', text: 'Materials needed' },
+        ],
+        [{ type: 'text', text: '1' }, { type: 'text', text: '10 Iron Ore' }],
+        [
+          { type: 'text', text: '2' },
+          { type: 'text', text: '18 Iron Ore, 5 Crystal' },
+        ],
+        [
+          { type: 'text', text: '3' },
+          { type: 'text', text: '24 Iron Ore, 12 Crystal, 1 Core' },
+        ],
       ],
-      caption:
-        'Including a header row in the data itself is supported when you prefer a compact definition.',
+    },
+    {
+      type: 'text',
+      text: 'Here are examples of how you can do this with code snippets:',
+    },
+    {
+      type: 'table',
+      header: [
+        { type: 'text', text: 'Craft level' },
+        { type: 'text', text: 'Materials needed' },
+      ],
+      rows: [
+        [{ type: 'text', text: '1' }, { type: 'text', text: '10 Iron Ore' }],
+        [
+          {
+            type: 'code',
+            language: 'javascript',
+            code:
+              'const craftLevel1 = { level: 1, materials: ["10 Iron Ore"] };',
+          },
+          {
+            type: 'code',
+            language: 'javascript',
+            code:
+              'const craftLevel2 = { level: 2, materials: ["18 Iron Ore", "5 Crystal"] };',
+          },
+        ],
+        [
+          {
+            type: 'code',
+            language: 'javascript',
+            code:
+              'const craftLevel3 = { level: 3, materials: ["24 Iron Ore", "12 Crystal", "1 Core"] };',
+          },
+          {
+            type: 'text',
+            text: 'Add more levels as needed',
+          },
+        ],
+      ],
     },
   ],
   id: 'balancing-your-game',

@@ -115,7 +115,6 @@ const TextBasedCourseChapterItems = ({
                 key={itemIndex.toString()}
                 header={item.header}
                 rows={item.rows}
-                caption={item.caption}
               />
             );
           }

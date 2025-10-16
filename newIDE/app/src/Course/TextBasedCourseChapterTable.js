@@ -1,9 +1,11 @@
 // @flow
 
 import * as React from 'react';
-import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import {
+  type TextBasedCourseChapterCodeItem,
+  type TextBasedCourseChapterTextItem,
+} from '../Utils/GDevelopServices/Asset';
 import { ColumnStackLayout } from '../UI/Layout';
-import { MarkdownText } from '../UI/MarkdownText';
 import {
   Table,
   TableBody,
@@ -12,11 +14,14 @@ import {
   TableRow,
   TableRowColumn,
 } from '../UI/Table';
+import { MarkdownText } from '../UI/MarkdownText';
+import TextBasedCourseChapterCodeBlock from './TextBasedCourseChapterCodeBlock';
 
 type Props = {|
-  header?: Array<string>,
-  rows: Array<Array<string>>,
-  caption?: string,
+  header?: Array<TextBasedCourseChapterTextItem>,
+  rows: Array<
+    Array<TextBasedCourseChapterTextItem | TextBasedCourseChapterCodeItem>
+  >,
 |};
 
 const styles = {
@@ -27,9 +32,25 @@ const styles = {
   },
 };
 
-const TextBasedCourseChapterTable = ({ header, rows, caption }: Props) => {
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+const renderTableCellContent = (
+  cell: TextBasedCourseChapterTextItem | TextBasedCourseChapterCodeItem
+) => {
+  if (cell.type === 'text') {
+    return <MarkdownText allowParagraphs source={cell.text} />;
+  }
+  if (cell.type === 'code') {
+    return (
+      <TextBasedCourseChapterCodeBlock
+        code={cell.code}
+        language={cell.language}
+        simpleVersion
+      />
+    );
+  }
+  return null;
+};
 
+const TextBasedCourseChapterTable = ({ header, rows }: Props) => {
   const columnCount = React.useMemo(
     () => {
       const maxColumnsFromRows = rows.reduce(
@@ -62,7 +83,7 @@ const TextBasedCourseChapterTable = ({ header, rows, caption }: Props) => {
               <TableRow>
                 {columnIndexes.map(columnIndex => (
                   <TableHeaderColumn key={`header-${columnIndex}`}>
-                    {(header && header[columnIndex]) || ''}
+                    {(header && header[columnIndex].text) || ''}
                   </TableHeaderColumn>
                 ))}
               </TableRow>
@@ -76,12 +97,12 @@ const TextBasedCourseChapterTable = ({ header, rows, caption }: Props) => {
                       <TableRowColumn
                         key={`row-${rowIndex}-cell-${columnIndex}`}
                       >
-                        {row[columnIndex] || ''}
+                        {renderTableCellContent(row[columnIndex])}
                       </TableRowColumn>
                     ))
                   : row.map((cell, cellIndex) => (
                       <TableRowColumn key={`row-${rowIndex}-cell-${cellIndex}`}>
-                        {cell}
+                        {renderTableCellContent(cell)}
                       </TableRowColumn>
                     ))}
               </TableRow>
@@ -89,11 +110,6 @@ const TextBasedCourseChapterTable = ({ header, rows, caption }: Props) => {
           </TableBody>
         </Table>
       </div>
-      {caption && (
-        <div style={{ color: gdevelopTheme.text.color.secondary }}>
-          <MarkdownText source={caption} />
-        </div>
-      )}
     </ColumnStackLayout>
   );
 };

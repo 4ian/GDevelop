@@ -68,6 +68,7 @@ type Token = {| type: TokenType, text: string |};
 type Props = {|
   code: string,
   language?: string,
+  simpleVersion?: boolean,
 |};
 
 const styles = {
@@ -356,7 +357,11 @@ const computeTokensByLine = (code: string): Token[][] => {
   return tokensByLine;
 };
 
-const TextBasedCourseChapterCodeBlock = ({ code, language }: Props) => {
+const TextBasedCourseChapterCodeBlock = ({
+  code,
+  language,
+  simpleVersion,
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const normalizedCode = React.useMemo(() => code.replace(/\t/g, '  '), [code]);
   const tokensByLine = React.useMemo(
@@ -384,7 +389,7 @@ const TextBasedCourseChapterCodeBlock = ({ code, language }: Props) => {
     : 'rgba(15, 23, 42, 0.15)';
   const lineNumberColor = isDarkMode
     ? 'rgba(148, 163, 184, 0.85)'
-    : 'rgba(100, 116, 139, 0.85)';
+    : 'rgba(139, 100, 118, 0.85)';
   const tokenStyleMap = React.useMemo(
     () => (isDarkMode ? darkTokenStyles : lightTokenStyles),
     [isDarkMode]
@@ -394,24 +399,35 @@ const TextBasedCourseChapterCodeBlock = ({ code, language }: Props) => {
     <div
       style={{
         ...styles.wrapper,
+        ...(simpleVersion
+          ? { gridTemplateColumns: '1fr' }
+          : { gridTemplateColumns: 'auto 1fr' }),
         backgroundColor,
         borderColor,
       }}
     >
+      {!simpleVersion && (
+        <div
+          style={{
+            ...styles.lineNumbersColumn,
+            backgroundColor,
+            color: lineNumberColor,
+          }}
+        >
+          {tokensByLine.map((_, lineIndex) => (
+            <div key={`line-number-${lineIndex}`} style={styles.lineNumber}>
+              {lineIndex + 1}
+            </div>
+          ))}
+        </div>
+      )}
       <div
         style={{
-          ...styles.lineNumbersColumn,
+          ...styles.codeColumn,
+          ...(simpleVersion ? { padding: '8px 12px' } : {}),
           backgroundColor,
-          color: lineNumberColor,
         }}
       >
-        {tokensByLine.map((_, lineIndex) => (
-          <div key={`line-number-${lineIndex}`} style={styles.lineNumber}>
-            {lineIndex + 1}
-          </div>
-        ))}
-      </div>
-      <div style={{ ...styles.codeColumn, backgroundColor }}>
         {tokensByLine.map((tokens, lineIndex) => (
           <div key={`code-line-${lineIndex}`} style={styles.codeLine}>
             {tokens.length === 0 ? (

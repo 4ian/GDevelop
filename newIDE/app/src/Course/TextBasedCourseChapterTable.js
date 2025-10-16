@@ -1,10 +1,6 @@
 // @flow
 
 import * as React from 'react';
-import {
-  type TextBasedCourseChapterCodeItem,
-  type TextBasedCourseChapterTextItem,
-} from '../Utils/GDevelopServices/Asset';
 import { ColumnStackLayout } from '../UI/Layout';
 import {
   Table,
@@ -15,13 +11,10 @@ import {
   TableRowColumn,
 } from '../UI/Table';
 import { MarkdownText } from '../UI/MarkdownText';
-import TextBasedCourseChapterCodeBlock from './TextBasedCourseChapterCodeBlock';
 
 type Props = {|
-  header?: Array<TextBasedCourseChapterTextItem>,
-  rows: Array<
-    Array<TextBasedCourseChapterTextItem | TextBasedCourseChapterCodeItem>
-  >,
+  header?: Array<string>,
+  rows: Array<Array<string>>,
 |};
 
 const styles = {
@@ -30,24 +23,6 @@ const styles = {
     overflowX: 'auto',
     margin: '12px 0',
   },
-};
-
-const renderTableCellContent = (
-  cell: TextBasedCourseChapterTextItem | TextBasedCourseChapterCodeItem
-) => {
-  if (cell.type === 'text') {
-    return <MarkdownText allowParagraphs source={cell.text} />;
-  }
-  if (cell.type === 'code') {
-    return (
-      <TextBasedCourseChapterCodeBlock
-        code={cell.code}
-        language={cell.language}
-        simpleVersion
-      />
-    );
-  }
-  return null;
 };
 
 const TextBasedCourseChapterTable = ({ header, rows }: Props) => {
@@ -83,7 +58,13 @@ const TextBasedCourseChapterTable = ({ header, rows }: Props) => {
               <TableRow>
                 {columnIndexes.map(columnIndex => (
                   <TableHeaderColumn key={`header-${columnIndex}`}>
-                    {(header && header[columnIndex].text) || ''}
+                    {(header && (
+                      <MarkdownText
+                        allowParagraphs
+                        source={header[columnIndex]}
+                      />
+                    )) ||
+                      ''}
                   </TableHeaderColumn>
                 ))}
               </TableRow>
@@ -97,12 +78,21 @@ const TextBasedCourseChapterTable = ({ header, rows }: Props) => {
                       <TableRowColumn
                         key={`row-${rowIndex}-cell-${columnIndex}`}
                       >
-                        {renderTableCellContent(row[columnIndex])}
+                        {(row && (
+                          <MarkdownText
+                            allowParagraphs
+                            source={row[columnIndex]}
+                          />
+                        )) ||
+                          ''}
                       </TableRowColumn>
                     ))
                   : row.map((cell, cellIndex) => (
                       <TableRowColumn key={`row-${rowIndex}-cell-${cellIndex}`}>
-                        {renderTableCellContent(cell)}
+                        {(cell && (
+                          <MarkdownText allowParagraphs source={cell} />
+                        )) ||
+                          ''}
                       </TableRowColumn>
                     ))}
               </TableRow>

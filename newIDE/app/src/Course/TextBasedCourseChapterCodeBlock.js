@@ -68,7 +68,6 @@ type Token = {| type: TokenType, text: string |};
 type Props = {|
   code: string,
   language?: string,
-  simpleVersion?: boolean,
 |};
 
 const styles = {
@@ -357,11 +356,7 @@ const computeTokensByLine = (code: string): Token[][] => {
   return tokensByLine;
 };
 
-const TextBasedCourseChapterCodeBlock = ({
-  code,
-  language,
-  simpleVersion,
-}: Props) => {
+const TextBasedCourseChapterCodeBlock = ({ code, language }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const normalizedCode = React.useMemo(() => code.replace(/\t/g, '  '), [code]);
   const tokensByLine = React.useMemo(
@@ -399,35 +394,24 @@ const TextBasedCourseChapterCodeBlock = ({
     <div
       style={{
         ...styles.wrapper,
-        ...(simpleVersion
-          ? { gridTemplateColumns: '1fr' }
-          : { gridTemplateColumns: 'auto 1fr' }),
         backgroundColor,
         borderColor,
       }}
     >
-      {!simpleVersion && (
-        <div
-          style={{
-            ...styles.lineNumbersColumn,
-            backgroundColor,
-            color: lineNumberColor,
-          }}
-        >
-          {tokensByLine.map((_, lineIndex) => (
-            <div key={`line-number-${lineIndex}`} style={styles.lineNumber}>
-              {lineIndex + 1}
-            </div>
-          ))}
-        </div>
-      )}
       <div
         style={{
-          ...styles.codeColumn,
-          ...(simpleVersion ? { padding: '8px 12px' } : {}),
+          ...styles.lineNumbersColumn,
           backgroundColor,
+          color: lineNumberColor,
         }}
       >
+        {tokensByLine.map((_, lineIndex) => (
+          <div key={`line-number-${lineIndex}`} style={styles.lineNumber}>
+            {lineIndex + 1}
+          </div>
+        ))}
+      </div>
+      <div style={{ ...styles.codeColumn, backgroundColor }}>
         {tokensByLine.map((tokens, lineIndex) => (
           <div key={`code-line-${lineIndex}`} style={styles.codeLine}>
             {tokens.length === 0 ? (

@@ -3268,27 +3268,11 @@ export const textBasedCourseChapterWithTables: TextBasedCourseChapter = {
     },
     {
       type: 'table',
-      header: [
-        { type: 'text', text: 'Stat' },
-        { type: 'text', text: 'Enemy' },
-        { type: 'text', text: 'Player' },
-      ],
+      header: ['Stat', 'Enemy', 'Player'],
       rows: [
-        [
-          { type: 'text', text: 'Health' },
-          { type: 'text', text: '120' },
-          { type: 'text', text: '100' },
-        ],
-        [
-          { type: 'text', text: 'Damage' },
-          { type: 'text', text: '12' },
-          { type: 'text', text: '18' },
-        ],
-        [
-          { type: 'text', text: 'Move speed' },
-          { type: 'text', text: '160 px/s' },
-          { type: 'text', text: '200 px/s' },
-        ],
+        ['Health', '120', '100'],
+        ['Damage', '12', '18'],
+        ['Move speed', '160 px/s', '200 px/s'],
       ],
     },
     {
@@ -3298,32 +3282,12 @@ export const textBasedCourseChapterWithTables: TextBasedCourseChapter = {
     },
     {
       type: 'table',
-      header: [
-        { type: 'text', text: 'Item' },
-        { type: 'text', text: 'Rarity' },
-        { type: 'text', text: 'Drop chance' },
-      ],
+      header: ['Item', 'Rarity', 'Drop chance'],
       rows: [
-        [
-          { type: 'text', text: 'Gold coins' },
-          { type: 'text', text: 'Common' },
-          { type: 'text', text: '55%' },
-        ],
-        [
-          { type: 'text', text: 'Energy potion' },
-          { type: 'text', text: 'Uncommon' },
-          { type: 'text', text: '30%' },
-        ],
-        [
-          { type: 'text', text: 'Equipment blueprint' },
-          { type: 'text', text: 'Rare' },
-          { type: 'text', text: '12%' },
-        ],
-        [
-          { type: 'text', text: 'Legendary core' },
-          { type: 'text', text: 'Legendary' },
-          { type: 'text', text: '3%' },
-        ],
+        ['Gold coins', 'Common', '55%'],
+        ['Energy potion', 'Uncommon', '30%'],
+        ['Equipment blueprint', 'Rare', '12%'],
+        ['Legendary core', 'Legendary', '3%'],
       ],
     },
     {
@@ -3334,59 +3298,10 @@ export const textBasedCourseChapterWithTables: TextBasedCourseChapter = {
     {
       type: 'table',
       rows: [
-        [
-          { type: 'text', text: 'Craft level' },
-          { type: 'text', text: 'Materials needed' },
-        ],
-        [{ type: 'text', text: '1' }, { type: 'text', text: '10 Iron Ore' }],
-        [
-          { type: 'text', text: '2' },
-          { type: 'text', text: '18 Iron Ore, 5 Crystal' },
-        ],
-        [
-          { type: 'text', text: '3' },
-          { type: 'text', text: '24 Iron Ore, 12 Crystal, 1 Core' },
-        ],
-      ],
-    },
-    {
-      type: 'text',
-      text: 'Here are examples of how you can do this with code snippets:',
-    },
-    {
-      type: 'table',
-      header: [
-        { type: 'text', text: 'Craft level' },
-        { type: 'text', text: 'Materials needed' },
-      ],
-      rows: [
-        [{ type: 'text', text: '1' }, { type: 'text', text: '10 Iron Ore' }],
-        [
-          {
-            type: 'code',
-            language: 'javascript',
-            code:
-              'const craftLevel1 = { level: 1, materials: ["10 Iron Ore"] };',
-          },
-          {
-            type: 'code',
-            language: 'javascript',
-            code:
-              'const craftLevel2 = { level: 2, materials: ["18 Iron Ore", "5 Crystal"] };',
-          },
-        ],
-        [
-          {
-            type: 'code',
-            language: 'javascript',
-            code:
-              'const craftLevel3 = { level: 3, materials: ["24 Iron Ore", "12 Crystal", "1 Core"] };',
-          },
-          {
-            type: 'text',
-            text: 'Add more levels as needed',
-          },
-        ],
+        ['Craft level', 'Materials needed'],
+        ['1', '10 Iron Ore'],
+        ['2', 'const a = 5;'],
+        ['3', 'const a = { value: 5 };'],
       ],
     },
   ],

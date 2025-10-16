@@ -6,7 +6,8 @@ const PUBLIC_URL: string = process.env.PUBLIC_URL || '';
 const isDev = process.env.NODE_ENV !== 'production';
 
 const electron = optionalRequire('electron');
-const serviceWorker = navigator.serviceWorker;
+const serviceWorker =
+  typeof navigator !== 'undefined' ? navigator.serviceWorker : undefined;
 
 export function isServiceWorkerSupported() {
   return !!serviceWorker;

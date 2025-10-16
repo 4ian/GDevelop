@@ -50,7 +50,10 @@ function openBrowserSWPreviewDB() {
         }
       };
     } catch (error) {
-      console.error('[ServiceWorker] Exception while opening preview database:', error);
+      console.error(
+        '[ServiceWorker] Exception while opening preview database:',
+        error
+      );
       reject(error);
     }
   });
@@ -65,14 +68,28 @@ async function getBrowserSWPreviewFile(path) {
 
     return new Promise((resolve, reject) => {
       let settled = false;
-      const safeResolve = (v) => { if (!settled) { settled = true; resolve(v); } };
-      const safeReject  = (e) => { if (!settled) { settled = true; reject(e); } };
+      const safeResolve = v => {
+        if (!settled) {
+          settled = true;
+          resolve(v);
+        }
+      };
+      const safeReject = e => {
+        if (!settled) {
+          settled = true;
+          reject(e);
+        }
+      };
 
       try {
         // Sanity-check the store exists (avoids InvalidStateError).
         if (!db.objectStoreNames.contains(STORE_NAME)) {
           const err = new Error(`Object store "${STORE_NAME}" not found`);
-          console.error('[ServiceWorker] Missing object store while getting file:', path, err);
+          console.error(
+            '[ServiceWorker] Missing object store while getting file:',
+            path,
+            err
+          );
           return safeReject(err);
         }
 
@@ -81,14 +98,22 @@ async function getBrowserSWPreviewFile(path) {
         // If the transaction aborts (quota, deadlock, explicit abort, etc.), reject.
         tx.onabort = () => {
           const error = tx.error || new Error('Transaction aborted');
-          console.error('[ServiceWorker] Transaction aborted while getting file:', path, error);
+          console.error(
+            '[ServiceWorker] Transaction aborted while getting file:',
+            path,
+            error
+          );
           safeReject(error);
         };
 
         // `onerror` at the transaction level can fire even if request handlers didn’t.
         tx.onerror = () => {
           const error = tx.error || new Error('Transaction failed');
-          console.error('[ServiceWorker] Transaction error while getting file:', path, error);
+          console.error(
+            '[ServiceWorker] Transaction error while getting file:',
+            path,
+            error
+          );
           safeReject(error);
         };
 
@@ -102,16 +127,28 @@ async function getBrowserSWPreviewFile(path) {
 
         req.onerror = () => {
           const error = req.error || new Error('Get operation failed');
-          console.error('[ServiceWorker] Error retrieving file from IndexedDB:', path, error);
+          console.error(
+            '[ServiceWorker] Error retrieving file from IndexedDB:',
+            path,
+            error
+          );
           safeReject(error);
         };
       } catch (error) {
-        console.error('[ServiceWorker] Exception during get operation:', path, error);
+        console.error(
+          '[ServiceWorker] Exception during get operation:',
+          path,
+          error
+        );
         safeReject(error);
       }
     });
   } catch (error) {
-    console.error('[ServiceWorker] Failed to get file from IndexedDB:', path, error);
+    console.error(
+      '[ServiceWorker] Failed to get file from IndexedDB:',
+      path,
+      error
+    );
     throw error;
   }
 }
@@ -119,58 +156,75 @@ async function getBrowserSWPreviewFile(path) {
 /**
  * Handles fetch events for browser SW preview files served from IndexedDB.
  */
-self.addEventListener('fetch', (event) => {
+self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
   // Check if this is a request for a browser SW preview file
   if (url.pathname.startsWith('/browser_sw_preview/')) {
     const relativePath = url.pathname.replace('/browser_sw_preview', '');
 
-    event.respondWith((async () => {
-      try {
-        // Try to get the file from IndexedDB
-        const fileRecord = await getBrowserSWPreviewFile(relativePath);
+    event.respondWith(
+      (async () => {
+        try {
+          // Try to get the file from IndexedDB
+          const fileRecord = await getBrowserSWPreviewFile(relativePath);
 
-        if (!fileRecord) {
-          console.warn('[ServiceWorker] File not found in IndexedDB:', relativePath);
-          return new Response('File not found in browser SW preview storage', {
-            status: 404,
+          if (!fileRecord) {
+            console.warn(
+              '[ServiceWorker] File not found in IndexedDB:',
+              relativePath
+            );
+            return new Response(
+              'File not found in browser SW preview storage',
+              {
+                status: 404,
+                headers: {
+                  'Content-Type': 'text/plain',
+                },
+              }
+            );
+          }
+
+          // Return the file with appropriate headers
+          return new Response(fileRecord.bytes, {
+            status: 200,
             headers: {
-              'Content-Type': 'text/plain',
-            }
+              'Content-Type':
+                fileRecord.contentType || 'application/octet-stream',
+              // Prevent caching to ensure latest version is always served
+              'Cache-Control': 'no-store, no-cache, must-revalidate',
+              Pragma: 'no-cache',
+              Expires: '0',
+              // CORS headers for cross-origin requests if needed
+              'Access-Control-Allow-Origin': '*',
+            },
           });
+        } catch (error) {
+          console.error(
+            '[ServiceWorker] Error serving browser SW preview file:',
+            relativePath,
+            error
+          );
+          return new Response(
+            'Error loading file from browser SW preview storage: ' +
+              error.message,
+            {
+              status: 500,
+              headers: {
+                'Content-Type': 'text/plain',
+              },
+            }
+          );
         }
-
-        // Return the file with appropriate headers
-        return new Response(fileRecord.bytes, {
-          status: 200,
-          headers: {
-            'Content-Type': fileRecord.contentType || 'application/octet-stream',
-            // Prevent caching to ensure latest version is always served
-            'Cache-Control': 'no-store, no-cache, must-revalidate',
-            'Pragma': 'no-cache',
-            'Expires': '0',
-            // CORS headers for cross-origin requests if needed
-            'Access-Control-Allow-Origin': '*',
-          }
-        });
-      } catch (error) {
-        console.error('[ServiceWorker] Error serving browser SW preview file:', relativePath, error);
-        return new Response('Error loading file from browser SW preview storage: ' + error.message, {
-          status: 500,
-          headers: {
-            'Content-Type': 'text/plain',
-          }
-        });
-      }
-    })());
+      })()
+    );
 
     // Return early to prevent falling through to workbox routes
     return;
   }
 });
 
-self.addEventListener('install', (event) => {
+self.addEventListener('install', event => {
   console.log('[ServiceWorker] Installing new service worker...');
 
   // Immediately install the new service worker, so it can then be activated
@@ -178,7 +232,7 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-self.addEventListener('activate', (event) => {
+self.addEventListener('activate', event => {
   console.log('[ServiceWorker] Activating new service worker...');
 
   // The new service worker will immediately take control of all running
@@ -210,16 +264,20 @@ if (workbox) {
   // Contrary to other static assets (JS, CSS, HTML), libGD.js/wasm are not
   // versioned in their filenames. Instead, we version using a query string
   // (see src/index.js where it's loaded with the same query string).
-  workbox.precaching.precacheAndRoute([
-    {
-      url: `libGD.js?cache-buster=${VersionMetadata.versionWithHash}`,
-      revision: null, // Revision is null because versioning included in the URL.
-    },
-    {
-      url: `libGD.wasm?cache-buster=${VersionMetadata.versionWithHash}`,
-      revision: null, // Revision is null because versioning included in the URL.
-    },
-  ]);
+  //
+  // Don't cache them in development mode to ensure that the latest version is always served.
+  if (!isDev) {
+    workbox.precaching.precacheAndRoute([
+      {
+        url: `libGD.js?cache-buster=${VersionMetadata.versionWithHash}`,
+        revision: null, // Revision is null because versioning included in the URL.
+      },
+      {
+        url: `libGD.wasm?cache-buster=${VersionMetadata.versionWithHash}`,
+        revision: null, // Revision is null because versioning included in the URL.
+      },
+    ]);
+  }
 
   /* injection point for manifest files.  */
   workbox.precaching.precacheAndRoute([]);
@@ -255,5 +313,7 @@ if (workbox) {
     })
   );
 } else {
-  console.log('[ServiceWorker] Workbox could not be loaded - no offline support');
+  console.log(
+    '[ServiceWorker] Workbox could not be loaded - no offline support'
+  );
 }

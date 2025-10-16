@@ -101,7 +101,9 @@ const styles = {
   },
 };
 
-const darkTokenStyles: { [TokenType]: {| color?: string, fontStyle?: 'italic' |} } = {
+const darkTokenStyles: {
+  [TokenType]: {| color?: string, fontStyle?: 'italic' |},
+} = {
   keyword: { color: '#c792ea' },
   boolean: { color: '#c792ea' },
   string: { color: '#ecc48d' },
@@ -110,11 +112,12 @@ const darkTokenStyles: { [TokenType]: {| color?: string, fontStyle?: 'italic' |}
   operator: { color: '#89ddff' },
   punctuation: { color: '#89ddff' },
   identifier: { color: '#82aaff' },
-  whitespace: {},
   plain: { color: '#d6deeb' },
 };
 
-const lightTokenStyles: { [TokenType]: {| color?: string, fontStyle?: 'italic' |} } = {
+const lightTokenStyles: {
+  [TokenType]: {| color?: string, fontStyle?: 'italic' |},
+} = {
   keyword: { color: '#7c3aed' },
   boolean: { color: '#7c3aed' },
   string: { color: '#b45309' },
@@ -123,23 +126,28 @@ const lightTokenStyles: { [TokenType]: {| color?: string, fontStyle?: 'italic' |
   operator: { color: '#0f766e' },
   punctuation: { color: '#0f766e' },
   identifier: { color: '#1d4ed8' },
-  whitespace: {},
   plain: { color: '#0f172a' },
 };
 
 const WHITESPACE_REGEX = /^\s+/;
-const NUMBER_REGEX =
-  /^(0[xX][0-9a-fA-F]+|\d+(?:\.\d+)?(?:e[+-]?\d+)?)/;
+const NUMBER_REGEX = /^(0[xX][0-9a-fA-F]+|\d+(?:\.\d+)?(?:e[+-]?\d+)?)/;
 const IDENTIFIER_REGEX = /^[A-Za-z_$][A-Za-z0-9_$]*/;
-const OPERATOR_REGEX =
-  /^((===|!==|>>>|<<=|>>=|==|!=|<=|>=|=>|\+\+|--|\+=|-=|\*=|\/=|%=|&&|\|\||\^=|&=|\|=)|[+\-*/%&|^!~<>?:=])/;
-const PUNCTUATION_REGEX = /^[\{\}\(\)\[\]\.,;]/;
+const OPERATOR_REGEX = /^((===|!==|>>>|<<=|>>=|==|!=|<=|>=|=>|\+\+|--|\+=|-=|\*=|\/=|%=|&&|\|\||\^=|&=|\|=)|[+\-*/%&|^!~<>?:=])/;
+const PUNCTUATION_REGEX = /^[{}()[\].,;]/;
 
 const tokenizeLine = ({
   line,
   isInBlockComment,
   isInTemplateString,
-}: {| line: string, isInBlockComment: boolean, isInTemplateString: boolean |}): {| tokens: Token[], isInBlockComment: boolean, isInTemplateString: boolean |} => {
+}: {|
+  line: string,
+  isInBlockComment: boolean,
+  isInTemplateString: boolean,
+|}): {|
+  tokens: Token[],
+  isInBlockComment: boolean,
+  isInTemplateString: boolean,
+|} => {
   const tokens: Token[] = [];
   let index = 0;
   let blockComment = isInBlockComment;
@@ -150,10 +158,17 @@ const tokenizeLine = ({
       const closingIndex = findTemplateStringEnd(line, index);
       if (closingIndex === -1) {
         tokens.push({ type: 'string', text: line.slice(index) });
-        return { tokens, isInBlockComment: blockComment, isInTemplateString: true };
+        return {
+          tokens,
+          isInBlockComment: blockComment,
+          isInTemplateString: true,
+        };
       }
 
-      tokens.push({ type: 'string', text: line.slice(index, closingIndex + 1) });
+      tokens.push({
+        type: 'string',
+        text: line.slice(index, closingIndex + 1),
+      });
       index = closingIndex + 1;
       templateString = false;
       continue;
@@ -213,7 +228,10 @@ const tokenizeLine = ({
         return { tokens, isInBlockComment: false, isInTemplateString: true };
       }
 
-      tokens.push({ type: 'string', text: line.slice(index, closingIndex + 1) });
+      tokens.push({
+        type: 'string',
+        text: line.slice(index, closingIndex + 1),
+      });
       index = closingIndex + 1;
       continue;
     }
@@ -263,15 +281,27 @@ const tokenizeLine = ({
     index += 1;
   }
 
-  return { tokens, isInBlockComment: blockComment, isInTemplateString: templateString };
+  return {
+    tokens,
+    isInBlockComment: blockComment,
+    isInTemplateString: templateString,
+  };
 };
 
-const matchRegex = (regex: RegExp, text: string, startIndex: number): string | null => {
+const matchRegex = (
+  regex: RegExp,
+  text: string,
+  startIndex: number
+): string | null => {
   const match = text.slice(startIndex).match(regex);
   return match ? match[0] : null;
 };
 
-const findStringEnd = (line: string, startIndex: number, quote: string): number => {
+const findStringEnd = (
+  line: string,
+  startIndex: number,
+  quote: string
+): number => {
   let index = startIndex + 1;
   while (index < line.length) {
     if (line[index] === '\\') {
@@ -329,13 +359,23 @@ const computeTokensByLine = (code: string): Token[][] => {
 const TextBasedCourseChapterCodeBlock = ({ code, language }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const normalizedCode = React.useMemo(() => code.replace(/\t/g, '  '), [code]);
-  const tokensByLine = React.useMemo(() => {
-    if (language && language.toLowerCase() !== 'javascript' && language.toLowerCase() !== 'js') {
-      return normalizedCode.replace(/\r\n/g, '\n').split('\n').map(line => [{ type: 'plain', text: line }]);
-    }
+  const tokensByLine = React.useMemo(
+    () => {
+      if (
+        language &&
+        language.toLowerCase() !== 'javascript' &&
+        language.toLowerCase() !== 'js'
+      ) {
+        return normalizedCode
+          .replace(/\r\n/g, '\n')
+          .split('\n')
+          .map(line => [{ type: 'plain', text: line }]);
+      }
 
-    return computeTokensByLine(normalizedCode);
-  }, [normalizedCode, language]);
+      return computeTokensByLine(normalizedCode);
+    },
+    [normalizedCode, language]
+  );
 
   const isDarkMode = gdevelopTheme.palette.type === 'dark';
   const backgroundColor = isDarkMode ? '#0f172a' : '#f3f4f6';
@@ -382,8 +422,9 @@ const TextBasedCourseChapterCodeBlock = ({ code, language }: Props) => {
                   key={`token-${lineIndex}-${tokenIndex}`}
                   style={{
                     color:
-                      tokenStyleMap[token.type]?.color || tokenStyleMap.plain.color,
-                    fontStyle: tokenStyleMap[token.type]?.fontStyle,
+                      (tokenStyleMap[token.type] || {}).color ||
+                      tokenStyleMap.plain.color,
+                    fontStyle: (tokenStyleMap[token.type] || {}).fontStyle,
                     whiteSpace: 'pre',
                   }}
                 >

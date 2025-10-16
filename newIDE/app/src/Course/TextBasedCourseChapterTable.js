@@ -30,23 +30,28 @@ const styles = {
 const TextBasedCourseChapterTable = ({ header, rows, caption }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
-  const columnCount = React.useMemo(() => {
-    const maxColumnsFromRows = rows.reduce(
-      (maxColumns, row) => (row.length > maxColumns ? row.length : maxColumns),
-      0
-    );
-    if (header && header.length) {
-      return Math.max(header.length, maxColumnsFromRows);
-    }
-    return maxColumnsFromRows;
-  }, [header, rows]);
-
-  if (!header && rows.length === 0) return null;
+  const columnCount = React.useMemo(
+    () => {
+      const maxColumnsFromRows = rows.reduce(
+        (maxColumns, row) =>
+          row.length > maxColumns ? row.length : maxColumns,
+        0
+      );
+      if (header && header.length) {
+        return Math.max(header.length, maxColumnsFromRows);
+      }
+      return maxColumnsFromRows;
+    },
+    [header, rows]
+  );
 
   const columnIndexes = React.useMemo(
-    () => (columnCount > 0 ? Array.from({ length: columnCount }, (_, i) => i) : []),
+    () =>
+      columnCount > 0 ? Array.from({ length: columnCount }, (_, i) => i) : [],
     [columnCount]
   );
+
+  if (!header && rows.length === 0) return null;
 
   return (
     <ColumnStackLayout noMargin>
@@ -70,16 +75,12 @@ const TextBasedCourseChapterTable = ({ header, rows, caption }: Props) => {
                   ? columnIndexes.map(columnIndex => (
                       <TableRowColumn
                         key={`row-${rowIndex}-cell-${columnIndex}`}
-                        style={{ whiteSpace: 'pre-wrap' }}
                       >
                         {row[columnIndex] || ''}
                       </TableRowColumn>
                     ))
                   : row.map((cell, cellIndex) => (
-                      <TableRowColumn
-                        key={`row-${rowIndex}-cell-${cellIndex}`}
-                        style={{ whiteSpace: 'pre-wrap' }}
-                      >
+                      <TableRowColumn key={`row-${rowIndex}-cell-${cellIndex}`}>
                         {cell}
                       </TableRowColumn>
                     ))}

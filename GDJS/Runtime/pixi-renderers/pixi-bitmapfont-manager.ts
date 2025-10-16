@@ -280,7 +280,7 @@ namespace gdjs {
         );
         const fontDataRaw = await response.text();
 
-        // Sanitize : remove the lines staring with #
+        // Sanitize: remove lines starting with # (acting as comments)
         const sanitizedFontData = fontDataRaw
           .split('\n')
           .filter((line) => !line.trim().startsWith('#'))

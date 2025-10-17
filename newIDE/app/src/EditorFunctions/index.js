@@ -4047,7 +4047,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
               }
             });
             const globalObjects = project.getObjects();
-            const sceneObjects = project.getLayout(scene_name).getObjects();
+            const sceneObjects = scene.getObjects();
             newObjectNames.forEach(objectName => {
               if (!currentObjectNames.includes(objectName)) {
                 if (

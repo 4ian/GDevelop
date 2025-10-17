@@ -61,7 +61,9 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
     // No thing to be done.
   }
 
-  onObjectGroupsModifiedOutsideEditor(changes: ObjectGroupsOutsideEditorChanges) {
+  onObjectGroupsModifiedOutsideEditor(
+    changes: ObjectGroupsOutsideEditorChanges
+  ) {
     // No thing to be done.
   }
 

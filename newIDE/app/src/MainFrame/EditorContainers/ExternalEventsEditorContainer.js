@@ -110,7 +110,9 @@ export class ExternalEventsEditorContainer extends React.Component<
     // No thing to be done.
   }
 
-  onObjectGroupsModifiedOutsideEditor(changes: ObjectGroupsOutsideEditorChanges) {
+  onObjectGroupsModifiedOutsideEditor(
+    changes: ObjectGroupsOutsideEditorChanges
+  ) {
     // No thing to be done.
   }
 

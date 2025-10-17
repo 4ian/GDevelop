@@ -63,6 +63,8 @@ import { SubscriptionSuggestionContext } from '../Profile/Subscription/Subscript
 
 const gd: libGDevelop = global.gd;
 
+const AI_TOOLS_VERSION = 'v5';
+
 const useProcessFunctionCalls = ({
   i18n,
   project,
@@ -720,7 +722,7 @@ export const AskAiEditor = React.memo<Props>(
                 fileMetadata,
                 storageProviderName,
                 mode,
-                toolsVersion: 'v4',
+                toolsVersion: AI_TOOLS_VERSION,
                 aiConfiguration: {
                   presetId: aiConfigurationPresetId,
                 },

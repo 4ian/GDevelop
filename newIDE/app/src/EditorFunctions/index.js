@@ -3935,10 +3935,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
     }
 
     if (changed_groups) {
-      const groups = project
-        .getLayout(scene_name)
-        .getObjects()
-        .getObjectGroups();
+      const groups = scene.getObjects().getObjectGroups();
       changed_groups.forEach(changed_group => {
         const groupName = SafeExtractor.extractStringProperty(
           changed_group,
@@ -3972,12 +3969,19 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
         }
 
         if (deleteThisGroup) {
-          foundGroup.delete();
+          groups.remove(groupName);
           changes.push(
             `Deleted group "${groupName}" from scene "${scene_name}".`
           );
         } else {
           if (newGroupName) {
+            gd.WholeProjectRefactorer.objectOrGroupRenamedInScene(
+              project,
+              scene,
+              foundGroup.getName(),
+              newGroupName,
+              /* isObjectGroup=*/ true
+            );
             foundGroup.setName(newGroupName);
             changes.push(
               `Renamed group "${groupName}" to "${newGroupName}" in scene "${scene_name}".`
@@ -3998,13 +4002,13 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
                 foundGroup.removeObject(objectName);
               }
             });
+            const globalObjects = project.getObjects();
+            const sceneObjects = project.getLayout(scene_name).getObjects();
             newObjectNames.forEach(objectName => {
               if (!currentObjectNames.includes(objectName)) {
                 if (
-                  project
-                    .getLayout(scene_name)
-                    .getObjects()
-                    .hasObjectNamed(objectName)
+                  sceneObjects.hasObjectNamed(objectName) ||
+                  globalObjects.hasObjectNamed(objectName)
                 ) {
                   foundGroup.addObject(objectName);
                 } else {

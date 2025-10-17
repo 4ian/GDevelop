@@ -3,14 +3,10 @@ import * as React from 'react';
 import Drawer from '@material-ui/core/Drawer';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import { Line, Column } from '../UI/Grid';
-import { ColumnStackLayout } from '../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import { Trans } from '@lingui/macro';
-import {
-  getAiRequests,
-  type AiRequest,
-} from '../Utils/GDevelopServices/Generation';
-import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import { type AiRequest } from '../Utils/GDevelopServices/Generation';
 import Paper from '../UI/Paper';
 import ScrollView from '../UI/ScrollView';
 import FlatButton from '../UI/FlatButton';
@@ -21,6 +17,7 @@ import formatDate from 'date-fns/format';
 import DrawerTopBar from '../UI/DrawerTopBar';
 import PlaceholderError from '../UI/PlaceholderError';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
+import { AiRequestContext } from './AiRequestContext';
 
 type Props = {|
   open: boolean,
@@ -79,23 +76,27 @@ const getFirstUserRequestText = (aiRequest: AiRequest): string => {
 };
 
 type AskAiHistoryContentProps = {|
-  aiRequests: Array<AiRequest> | null,
-  isLoading: boolean,
-  error: ?Error,
   onSelectAiRequest: (aiRequest: AiRequest) => void,
   selectedAiRequestId: string | null,
-  onFetchAiRequests: () => Promise<void>,
 |};
 
 export const AskAiHistoryContent = ({
-  aiRequests,
-  isLoading,
-  error,
   onSelectAiRequest,
   selectedAiRequestId,
-  onFetchAiRequests,
 }: AskAiHistoryContentProps) => {
-  if (!aiRequests && isLoading) {
+  const {
+    aiRequestStorage: {
+      aiRequests,
+      fetchAiRequests,
+      onLoadMoreAiRequests,
+      canLoadMore,
+      isLoading,
+      error,
+    },
+  } = React.useContext(AiRequestContext);
+  // $FlowFixMe - Flow loses type with Object.values
+  const aiRequestsArray: AiRequest[] = Object.values(aiRequests);
+  if (!aiRequestsArray.length && isLoading) {
     return (
       <Column
         noMargin
@@ -111,13 +112,13 @@ export const AskAiHistoryContent = ({
 
   if (error) {
     return (
-      <PlaceholderError onRetry={onFetchAiRequests}>
+      <PlaceholderError onRetry={fetchAiRequests}>
         <Trans>An error occurred while loading your AI requests.</Trans>
       </PlaceholderError>
     );
   }
 
-  if (!aiRequests || aiRequests.length === 0) {
+  if (aiRequestsArray.length === 0) {
     return (
       <EmptyMessage>
         <Trans>
@@ -130,7 +131,7 @@ export const AskAiHistoryContent = ({
   return (
     <ScrollView>
       <ColumnStackLayout expand>
-        {aiRequests.map(aiRequest => {
+        {aiRequestsArray.map(aiRequest => {
           const isSelected = selectedAiRequestId === aiRequest.id;
           const userRequestText = getFirstUserRequestText(aiRequest);
           const requestDate = new Date(aiRequest.createdAt);
@@ -176,14 +177,20 @@ export const AskAiHistoryContent = ({
             </Paper>
           );
         })}
-        <Line justifyContent="center">
+        <LineStackLayout justifyContent="center">
           <FlatButton
             primary
             label={<Trans>Refresh</Trans>}
-            onClick={onFetchAiRequests}
+            onClick={fetchAiRequests}
             disabled={isLoading}
           />
-        </Line>
+          <FlatButton
+            primary
+            label={<Trans>Load more</Trans>}
+            onClick={onLoadMoreAiRequests}
+            disabled={isLoading || !canLoadMore}
+          />
+        </LineStackLayout>
       </ColumnStackLayout>
     </ScrollView>
   );
@@ -196,46 +203,6 @@ export const AskAiHistory = ({
   selectedAiRequestId,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
-  const [aiRequests, setAiRequests] = React.useState<Array<AiRequest> | null>(
-    null
-  );
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [error, setError] = React.useState<Error | null>(null);
-
-  const { profile, getAuthorizationHeader } = React.useContext(
-    AuthenticatedUserContext
-  );
-
-  const fetchAiRequests = React.useCallback(
-    async () => {
-      if (!profile) return;
-
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const requests = await getAiRequests(getAuthorizationHeader, {
-          userId: profile.id,
-        });
-        setAiRequests(requests);
-      } catch (err) {
-        setError(err);
-        console.error('Error fetching AI requests:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [profile, getAuthorizationHeader]
-  );
-
-  React.useEffect(
-    () => {
-      if (open) {
-        fetchAiRequests();
-      }
-    },
-    [open, fetchAiRequests]
-  );
 
   const handleSelectAiRequest = (aiRequest: AiRequest) => {
     onSelectAiRequest(aiRequest);
@@ -265,12 +232,8 @@ export const AskAiHistory = ({
           onClose={onClose}
         />
         <AskAiHistoryContent
-          aiRequests={aiRequests}
-          isLoading={isLoading}
-          error={error}
           onSelectAiRequest={handleSelectAiRequest}
           selectedAiRequestId={selectedAiRequestId}
-          onFetchAiRequests={fetchAiRequests}
         />
       </ColumnStackLayout>
     </Drawer>

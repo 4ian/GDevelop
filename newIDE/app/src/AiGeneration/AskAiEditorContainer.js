@@ -6,6 +6,8 @@ import {
   type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
+  type ObjectsOutsideEditorChanges,
+  type ObjectGroupsOutsideEditorChanges,
 } from '../MainFrame/EditorContainers/BaseEditor';
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import Paper from '../UI/Paper';
@@ -76,6 +78,8 @@ const useProcessFunctionCalls = ({
   addEditorFunctionCallResults,
   onSceneEventsModifiedOutsideEditor,
   onInstancesModifiedOutsideEditor,
+  onObjectsModifiedOutsideEditor,
+  onObjectGroupsModifiedOutsideEditor,
   onExtensionInstalled,
 }: {|
   i18n: I18nType,
@@ -96,6 +100,12 @@ const useProcessFunctionCalls = ({
   ) => void,
   onInstancesModifiedOutsideEditor: (
     changes: InstancesOutsideEditorChanges
+  ) => void,
+  onObjectsModifiedOutsideEditor: (
+    changes: ObjectsOutsideEditorChanges
+  ) => void,
+  onObjectGroupsModifiedOutsideEditor: (
+    changes: ObjectGroupsOutsideEditorChanges
   ) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |}) => {
@@ -172,6 +182,8 @@ const useProcessFunctionCalls = ({
         },
         onSceneEventsModifiedOutsideEditor,
         onInstancesModifiedOutsideEditor,
+        onObjectsModifiedOutsideEditor,
+        onObjectGroupsModifiedOutsideEditor,
         ensureExtensionInstalled,
         searchAndInstallAsset,
       });
@@ -193,6 +205,8 @@ const useProcessFunctionCalls = ({
       generateEvents,
       onSceneEventsModifiedOutsideEditor,
       onInstancesModifiedOutsideEditor,
+      onObjectsModifiedOutsideEditor,
+      onObjectGroupsModifiedOutsideEditor,
       triggerSendEditorFunctionCallResults,
       editorCallbacks,
     ]
@@ -365,6 +379,12 @@ type Props = {|
   onInstancesModifiedOutsideEditor: (
     changes: InstancesOutsideEditorChanges
   ) => void,
+  onObjectsModifiedOutsideEditor: (
+    changes: ObjectsOutsideEditorChanges
+  ) => void,
+  onObjectGroupsModifiedOutsideEditor: (
+    changes: ObjectGroupsOutsideEditorChanges
+  ) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   initialMode: 'chat' | 'agent' | null,
   initialAiRequestId: string | null,
@@ -390,6 +410,12 @@ export type AskAiEditorInterface = {|
   ) => void,
   onInstancesModifiedOutsideEditor: (
     changes: InstancesOutsideEditorChanges
+  ) => void,
+  onObjectsModifiedOutsideEditor: (
+    changes: ObjectsOutsideEditorChanges
+  ) => void,
+  onObjectGroupsModifiedOutsideEditor: (
+    changes: ObjectGroupsOutsideEditorChanges
   ) => void,
   startOrOpenChat: ({|
     mode: 'chat' | 'agent',
@@ -421,6 +447,8 @@ export const AskAiEditor = React.memo<Props>(
         onOpenLayout,
         onSceneEventsModifiedOutsideEditor,
         onInstancesModifiedOutsideEditor,
+        onObjectsModifiedOutsideEditor,
+        onObjectGroupsModifiedOutsideEditor,
         onExtensionInstalled,
         initialMode,
         initialAiRequestId,
@@ -593,6 +621,8 @@ export const AskAiEditor = React.memo<Props>(
         onSceneObjectsDeleted: noop,
         onSceneEventsModifiedOutsideEditor: noop,
         onInstancesModifiedOutsideEditor: noop,
+        onObjectsModifiedOutsideEditor: noop,
+        onObjectGroupsModifiedOutsideEditor: noop,
         startOrOpenChat: onStartOrOpenChat,
       }));
 
@@ -1033,6 +1063,8 @@ export const AskAiEditor = React.memo<Props>(
         addEditorFunctionCallResults,
         onSceneEventsModifiedOutsideEditor,
         onInstancesModifiedOutsideEditor,
+        onObjectsModifiedOutsideEditor,
+        onObjectGroupsModifiedOutsideEditor,
         i18n,
         onExtensionInstalled,
       });
@@ -1131,6 +1163,10 @@ export const renderAskAiEditorContainer = (
         }
         onInstancesModifiedOutsideEditor={
           props.onInstancesModifiedOutsideEditor
+        }
+        onObjectsModifiedOutsideEditor={props.onObjectsModifiedOutsideEditor}
+        onObjectGroupsModifiedOutsideEditor={
+          props.onObjectGroupsModifiedOutsideEditor
         }
         onExtensionInstalled={props.onExtensionInstalled}
         initialMode={

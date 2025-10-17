@@ -44,6 +44,14 @@ export type InstancesOutsideEditorChanges = {|
   scene: gdLayout,
 |};
 
+export type ObjectsOutsideEditorChanges = {|
+  scene: gdLayout,
+|};
+
+export type ObjectGroupsOutsideEditorChanges = {|
+  scene: gdLayout,
+|};
+
 export type RenderEditorContainerProps = {|
   isActive: boolean,
   projectItemName: ?string,
@@ -187,6 +195,12 @@ export type RenderEditorContainerProps = {|
 
   onInstancesModifiedOutsideEditor: (
     changes: InstancesOutsideEditorChanges
+  ) => void,
+  onObjectsModifiedOutsideEditor: (
+    changes: ObjectsOutsideEditorChanges
+  ) => void,
+  onObjectGroupsModifiedOutsideEditor: (
+    changes: ObjectGroupsOutsideEditorChanges
   ) => void,
 
   // Events editing

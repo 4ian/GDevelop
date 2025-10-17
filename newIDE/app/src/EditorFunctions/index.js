@@ -158,6 +158,14 @@ export type InstancesOutsideEditorChanges = {|
   scene: gdLayout,
 |};
 
+export type ObjectsOutsideEditorChanges = {|
+  scene: gdLayout,
+|};
+
+export type ObjectGroupsOutsideEditorChanges = {|
+  scene: gdLayout,
+|};
+
 type RenderForEditorOptions = {|
   project: gdProject | null,
   args: any,
@@ -176,6 +184,12 @@ type LaunchFunctionOptionsWithoutProject = {|
   ) => void,
   onInstancesModifiedOutsideEditor: (
     changes: InstancesOutsideEditorChanges
+  ) => void,
+  onObjectsModifiedOutsideEditor: (
+    changes: ObjectsOutsideEditorChanges
+  ) => void,
+  onObjectGroupsModifiedOutsideEditor: (
+    changes: ObjectGroupsOutsideEditorChanges
   ) => void,
   ensureExtensionInstalled: (options: {|
     extensionName: string,
@@ -483,6 +497,7 @@ const createOrReplaceObject: EditorFunction = {
     args,
     ensureExtensionInstalled,
     searchAndInstallAsset,
+    onObjectsModifiedOutsideEditor,
   }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_type = extractRequiredString(args, 'object_type');
@@ -556,6 +571,12 @@ const createOrReplaceObject: EditorFunction = {
             `Unable to search and install object (${message}).`
           );
         } else if (status === 'asset-installed') {
+          // /!\ Tell the editor that some objects have potentially been modified (and even removed).
+          // This will force the objects panel to refresh.
+          onObjectsModifiedOutsideEditor({
+            scene: layout,
+          });
+
           if (createdObjects.length === 1) {
             const object = createdObjects[0];
             return makeGenericSuccess(
@@ -619,6 +640,11 @@ const createOrReplaceObject: EditorFunction = {
         object_name,
         objectsContainer.getObjectsCount()
       );
+      // /!\ Tell the editor that some objects have potentially been modified (and even removed).
+      // This will force the objects panel to refresh.
+      onObjectsModifiedOutsideEditor({
+        scene: layout,
+      });
       return makeGenericSuccess(
         [
           `Created a new object (from scratch) called "${object_name}" of type "${object_type}" in scene "${scene_name}".`,
@@ -672,6 +698,11 @@ const createOrReplaceObject: EditorFunction = {
             objectsContainer.removeObject(createdObject.getName());
           }
 
+          // /!\ Tell the editor that some objects have potentially been modified (and even removed).
+          // This will force the objects panel to refresh.
+          onObjectsModifiedOutsideEditor({
+            scene: layout,
+          });
           return makeGenericSuccess(
             `Replaced object "${object.getName()}" by an object from the asset store fitting the search.`
           );
@@ -708,6 +739,11 @@ const createOrReplaceObject: EditorFunction = {
       );
       newObject.setName(object_name); // Unserialization has overwritten the name.
 
+      // /!\ Tell the editor that some objects have potentially been modified (and even removed).
+      // This will force the objects panel to refresh.
+      onObjectsModifiedOutsideEditor({
+        scene: layout,
+      });
       return makeGenericSuccess(
         `Duplicated object "${duplicatedObjectName}" as "${newObject.getName()}". The new object "${newObject.getName()}" has the same type, behaviors, properties and effects as the one it was duplicated from.`
       );
@@ -738,6 +774,11 @@ const createOrReplaceObject: EditorFunction = {
           );
         }
 
+        // /!\ Tell the editor that some objects have potentially been modified (and even removed).
+        // This will force the objects panel to refresh.
+        onObjectsModifiedOutsideEditor({
+          scene: layout,
+        });
         return makeGenericSuccess(
           `Object with name "${object_name}" already exists, no need to re-create it.`
         );
@@ -3550,6 +3591,8 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           <Trans>Changing some scene layers for scene {scene_name}.</Trans>
         ) : changedLayerEffectsCount > 0 ? (
           <Trans>Changing some scene effects for scene {scene_name}.</Trans>
+        ) : changedGroupsCount > 0 ? (
+          <Trans>Changing some scene groups for scene {scene_name}.</Trans>
         ) : (
           <Trans>Unknown changes attempted for scene {scene_name}.</Trans>
         ),
@@ -3559,6 +3602,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
     project,
     args,
     onInstancesModifiedOutsideEditor,
+    onObjectGroupsModifiedOutsideEditor,
   }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
 
@@ -4023,6 +4067,11 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             );
           }
         }
+      });
+
+      // Notify the editor that object groups have been modified
+      onObjectGroupsModifiedOutsideEditor({
+        scene,
       });
     }
 

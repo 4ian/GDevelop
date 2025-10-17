@@ -327,6 +327,16 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.updateToolbar();
   };
 
+  onObjectsModifiedOutsideEditor = () => {
+    // Force refresh of the objects list.
+    this.forceUpdateObjectsList();
+  };
+
+  onObjectGroupsModifiedOutsideEditor = () => {
+    // Force refresh of the object groups list.
+    this.forceUpdateObjectGroupsList();
+  };
+
   updateToolbar = () => {
     const { editorDisplay } = this;
     if (!editorDisplay) return;

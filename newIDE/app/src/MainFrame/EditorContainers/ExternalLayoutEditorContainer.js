@@ -14,6 +14,8 @@ import {
   type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
+  type ObjectsOutsideEditorChanges,
+  type ObjectGroupsOutsideEditorChanges,
 } from './BaseEditor';
 import ExternalPropertiesDialog, {
   type ExternalProperties,
@@ -165,6 +167,28 @@ export class ExternalLayoutEditorContainer extends React.Component<
 
     if (this.editor) {
       this.editor.onInstancesModifiedOutsideEditor();
+    }
+  }
+
+  onObjectsModifiedOutsideEditor(changes: ObjectsOutsideEditorChanges) {
+    if (changes.scene !== this.getLayout()) {
+      return;
+    }
+
+    if (this.editor) {
+      this.editor.forceUpdateObjectsList();
+    }
+  }
+
+  onObjectGroupsModifiedOutsideEditor(
+    changes: ObjectGroupsOutsideEditorChanges
+  ) {
+    if (changes.scene !== this.getLayout()) {
+      return;
+    }
+
+    if (this.editor) {
+      this.editor.onObjectGroupsModifiedOutsideEditor();
     }
   }
 

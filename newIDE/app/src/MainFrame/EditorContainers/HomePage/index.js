@@ -5,6 +5,8 @@ import {
   type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
+  type ObjectsOutsideEditorChanges,
+  type ObjectGroupsOutsideEditorChanges,
 } from '../BaseEditor';
 import {
   type FileMetadataAndStorageProviderName,
@@ -179,6 +181,12 @@ export type HomePageEditorInterface = {|
   ) => void,
   onInstancesModifiedOutsideEditor: (
     changes: InstancesOutsideEditorChanges
+  ) => void,
+  onObjectsModifiedOutsideEditor: (
+    changes: ObjectsOutsideEditorChanges
+  ) => void,
+  onObjectGroupsModifiedOutsideEditor: (
+    changes: ObjectGroupsOutsideEditorChanges
   ) => void,
 |};
 
@@ -533,6 +541,20 @@ export const HomePage = React.memo<Props>(
         []
       );
 
+      const onObjectsModifiedOutsideEditor = React.useCallback(
+        (changes: ObjectsOutsideEditorChanges) => {
+          // No thing to be done.
+        },
+        []
+      );
+
+      const onObjectGroupsModifiedOutsideEditor = React.useCallback(
+        (changes: ObjectGroupsOutsideEditorChanges) => {
+          // No thing to be done.
+        },
+        []
+      );
+
       React.useImperativeHandle(ref, () => ({
         getProject,
         updateToolbar,
@@ -542,6 +564,8 @@ export const HomePage = React.memo<Props>(
         onSceneObjectsDeleted,
         onSceneEventsModifiedOutsideEditor,
         onInstancesModifiedOutsideEditor,
+        onObjectsModifiedOutsideEditor,
+        onObjectGroupsModifiedOutsideEditor,
       }));
 
       // As the homepage is never unmounted, we need to ensure the games platform

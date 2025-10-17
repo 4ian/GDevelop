@@ -93,11 +93,20 @@ const styles = {
     padding: '12px 16px',
     fontFamily: 'Menlo, Monaco, "Courier New", monospace',
     overflowX: 'auto',
+    userSelect: 'text',
+    cursor: 'text',
   },
   codeLine: {
     display: 'block',
     whiteSpace: 'pre',
     lineHeight: 1.6,
+    userSelect: 'text',
+    cursor: 'text',
+  },
+  token: {
+    whiteSpace: 'pre',
+    userSelect: 'text',
+    cursor: 'text',
   },
 };
 
@@ -425,7 +434,7 @@ const TextBasedCourseChapterCodeBlock = ({ code, language }: Props) => {
                       (tokenStyleMap[token.type] || {}).color ||
                       tokenStyleMap.plain.color,
                     fontStyle: (tokenStyleMap[token.type] || {}).fontStyle,
-                    whiteSpace: 'pre',
+                    ...styles.token,
                   }}
                 >
                   {token.text}

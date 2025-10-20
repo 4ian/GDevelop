@@ -263,6 +263,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
       },
       () => this.updateToolbar()
     );
+    this.props.onExternalLayoutAssociationChanged();
   };
 
   openExternalPropertiesDialog = () => {

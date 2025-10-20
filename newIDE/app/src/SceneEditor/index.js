@@ -2853,7 +2853,10 @@ export default class SceneEditor extends React.Component<Props, State> {
                             variantName
                           );
                           if (editedObjectWithContext) {
-                            this._onObjectEdited(editedObjectWithContext);
+                            this._onObjectEdited(
+                              editedObjectWithContext,
+                              false
+                            );
                           }
                           this.editObject(null);
                         }}

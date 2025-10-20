@@ -249,6 +249,7 @@ export type EditorTabsPaneCommonProps = {|
   |}) => Promise<void>,
   onEffectAdded: () => void,
   onObjectListsModified: ({ isNewObjectTypeUsed: boolean }) => void,
+  onExternalLayoutAssociationChanged: () => void,
   triggerHotReloadInGameEditorIfNeeded: () => void,
   gamesList: GamesList,
 
@@ -344,6 +345,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
     onExtensionInstalled,
     onEffectAdded,
     onObjectListsModified,
+    onExternalLayoutAssociationChanged,
     triggerHotReloadInGameEditorIfNeeded,
     gamesList,
     setEditorTabs,
@@ -743,6 +745,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
                       onExtensionInstalled: onExtensionInstalled,
                       onEffectAdded: onEffectAdded,
                       onObjectListsModified: onObjectListsModified,
+                      onExternalLayoutAssociationChanged,
                       triggerHotReloadInGameEditorIfNeeded: triggerHotReloadInGameEditorIfNeeded,
                       gamesList,
                       gamesPlatformFrameTools,

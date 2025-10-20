@@ -1559,6 +1559,17 @@ const MainFrame = (props: Props) => {
     [gameEditorMode, state.editorTabs, notifyChangesToInGameEditor]
   );
 
+  const onExternalLayoutAssociationChanged = React.useCallback(
+    () => {
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: false,
+        shouldReloadResources: false,
+      });
+    },
+    [notifyChangesToInGameEditor]
+  );
+
   const onResourceExternallyChanged = React.useCallback(
     () => {
       notifyChangesToInGameEditor({
@@ -4430,6 +4441,7 @@ const MainFrame = (props: Props) => {
     onExtensionInstalled: onExtensionInstalled,
     onEffectAdded: onEffectAdded,
     onObjectListsModified: onObjectListsModified,
+    onExternalLayoutAssociationChanged,
     gamesList: gamesList,
     triggerHotReloadInGameEditorIfNeeded: notifyChangesToInGameEditor,
   };

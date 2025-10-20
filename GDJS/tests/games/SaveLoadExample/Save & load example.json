@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 241,
+    "build": 242,
     "major": 5,
     "minor": 5,
     "revision": 0
@@ -362,7 +362,8 @@
         "gridAlpha": 0.8,
         "snap": false,
         "zoomFactor": 0.4633111824514028,
-        "windowMask": false
+        "windowMask": false,
+        "selectedLayer": ""
       },
       "objectsGroups": [],
       "variables": [
@@ -403,6 +404,11 @@
           "name": "Variable",
           "type": "number",
           "value": 0
+        },
+        {
+          "name": "VariableExcludedFromSave",
+          "type": "number",
+          "value": 10
         }
       ],
       "instances": [
@@ -448,8 +454,8 @@
           "name": "Joystick",
           "persistentUuid": "855d809a-f954-4072-86d5-1d6f0b24a066",
           "width": 0,
-          "x": 176,
-          "y": 576,
+          "x": 131,
+          "y": 604,
           "zOrder": 2,
           "numberProperties": [],
           "stringProperties": [],
@@ -838,6 +844,118 @@
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "Background",
+          "name": "NewText7",
+          "persistentUuid": "02ff696e-6d03-466c-9e4a-f993c4c45958",
+          "width": 0,
+          "x": 159,
+          "y": 35,
+          "zOrder": 39,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Coins",
+          "persistentUuid": "749601b7-c699-47a6-81b8-d19b7cd5bca9",
+          "width": 0,
+          "x": 704,
+          "y": 403,
+          "zOrder": 40,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Coins",
+          "persistentUuid": "502f29fe-fca1-4625-b194-49a701bda9cd",
+          "width": 0,
+          "x": 723,
+          "y": 323,
+          "zOrder": 41,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Coins",
+          "persistentUuid": "65d4f46c-339a-4a2b-9870-799566c2456b",
+          "width": 0,
+          "x": 846,
+          "y": 205,
+          "zOrder": 42,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Coins",
+          "persistentUuid": "3e848abb-3ab3-48ce-9176-23cd9be84fde",
+          "width": 0,
+          "x": 1094,
+          "y": 185,
+          "zOrder": 43,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Coins",
+          "persistentUuid": "47351cf9-0485-4388-958c-94024dd13e9f",
+          "width": 0,
+          "x": 1219,
+          "y": 263,
+          "zOrder": 44,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Coins",
+          "persistentUuid": "8b305063-3f81-4ef4-accc-1f36ad1bed2d",
+          "width": 0,
+          "x": 1228,
+          "y": 362,
+          "zOrder": 45,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
         }
       ],
       "objects": [
@@ -1001,7 +1119,14 @@
           "updateIfNotVisible": false,
           "variables": [],
           "effects": [],
-          "behaviors": [],
+          "behaviors": [
+            {
+              "name": "SaveConfiguration",
+              "type": "SaveState::SaveConfiguration",
+              "defaultProfilePersistence": "Persisted",
+              "persistedInProfiles": "coins"
+            }
+          ],
           "animations": [
             {
               "name": "",
@@ -1159,7 +1284,14 @@
           "variant": "",
           "variables": [],
           "effects": [],
-          "behaviors": [],
+          "behaviors": [
+            {
+              "name": "SaveConfiguration",
+              "type": "SaveState::SaveConfiguration",
+              "defaultProfilePersistence": "DoNotSave",
+              "persistedInProfiles": ""
+            }
+          ],
           "content": {},
           "childrenContent": {
             "Border": {
@@ -2013,6 +2145,49 @@
             "lineHeight": 0,
             "color": "0;0;0"
           }
+        },
+        {
+          "assetStoreId": "",
+          "bold": false,
+          "italic": false,
+          "name": "NewText7",
+          "smoothed": true,
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "Excluded Variable",
+          "font": "",
+          "textAlignment": "left",
+          "characterSize": 20,
+          "color": {
+            "b": 0,
+            "g": 0,
+            "r": 0
+          },
+          "content": {
+            "bold": false,
+            "isOutlineEnabled": false,
+            "isShadowEnabled": false,
+            "italic": false,
+            "outlineColor": "255;255;255",
+            "outlineThickness": 2,
+            "shadowAngle": 90,
+            "shadowBlurRadius": 2,
+            "shadowColor": "0;0;0",
+            "shadowDistance": 4,
+            "shadowOpacity": 127,
+            "smoothed": true,
+            "underlined": false,
+            "text": "Excluded Variable",
+            "font": "",
+            "textAlignment": "left",
+            "verticalTextAlignment": "top",
+            "characterSize": 20,
+            "lineHeight": 0,
+            "color": "0;0;0"
+          }
         }
       ],
       "objectsFolderStructure": {
@@ -2044,6 +2219,9 @@
           },
           {
             "objectName": "NewText6"
+          },
+          {
+            "objectName": "NewText7"
           },
           {
             "objectName": "FlagBlue"
@@ -2119,6 +2297,23 @@
         },
         {
           "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SaveState::SetVariableSaveConfiguration"
+              },
+              "parameters": [
+                "",
+                "VariableExcludedFromSave",
+                "no",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
               "type": {
@@ -2153,11 +2348,12 @@
             },
             {
               "type": {
-                "value": "SaveState::SaveGameSnapshotToStorage"
+                "value": "SaveState::CreateGameSaveStateInStorage"
               },
               "parameters": [
                 "",
-                "\"test\""
+                "\"test\"",
+                ""
               ]
             }
           ]
@@ -2187,10 +2383,143 @@
           "actions": [
             {
               "type": {
-                "value": "SaveState::LoadGameSnapshotFromStorage"
+                "value": "SaveState::RestoreGameSaveStateFromStorage"
               },
               "parameters": [
-                "\"test\""
+                "",
+                "\"test\"",
+                "",
+                "no"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Press s to save and l to load manually. Check how the \"VariableExcludedFromSave\" won't be impacted."
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyFromTextJustPressed"
+              },
+              "parameters": [
+                "",
+                "\"s\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SaveState::CreateGameSaveStateInStorage"
+              },
+              "parameters": [
+                "",
+                "\"manual-save\"",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyFromTextJustPressed"
+              },
+              "parameters": [
+                "",
+                "\"l\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SaveState::RestoreGameSaveStateFromStorage"
+              },
+              "parameters": [
+                "",
+                "\"manual-save\"",
+                "",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Press c to just save the coins and press x to load only the coins. Check how the rest won't be impacted."
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyFromTextJustPressed"
+              },
+              "parameters": [
+                "",
+                "\"c\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SaveState::CreateGameSaveStateInStorage"
+              },
+              "parameters": [
+                "",
+                "\"coins-save\"",
+                "\"coins\""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyFromTextJustPressed"
+              },
+              "parameters": [
+                "",
+                "\"x\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SaveState::RestoreGameSaveStateFromStorage"
+              },
+              "parameters": [
+                "",
+                "\"coins-save\"",
+                "\"coins\"",
+                ""
               ]
             }
           ]
@@ -2232,6 +2561,7 @@
               },
               "parameters": [
                 ">=",
+                ">",
                 "0"
               ]
             }
@@ -2258,6 +2588,7 @@
                 "value": "SaveState::TimeSinceLastSave"
               },
               "parameters": [
+                "<",
                 "<",
                 "0"
               ]
@@ -2286,6 +2617,7 @@
               },
               "parameters": [
                 ">=",
+                ">",
                 "0"
               ]
             }
@@ -2312,6 +2644,7 @@
                 "value": "SaveState::TimeSinceLastLoad"
               },
               "parameters": [
+                "<",
                 "<",
                 "0"
               ]
@@ -2708,6 +3041,84 @@
               ]
             }
           ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "TextContainerCapability::TextContainerBehavior::SetValue"
+              },
+              "parameters": [
+                "NewText7",
+                "Text",
+                "=",
+                "\"Excluded variable: \" + VariableExcludedFromSave"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "DepartScene"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ResetTimer"
+              },
+              "parameters": [
+                "",
+                "\"ExcludedVariableIncreaseTimer\""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "CompareTimer"
+              },
+              "parameters": [
+                "",
+                "\"ExcludedVariableIncreaseTimer\"",
+                ">=",
+                "0.5"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ResetTimer"
+              },
+              "parameters": [
+                "",
+                "\"ExcludedVariableIncreaseTimer\""
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "VariableExcludedFromSave",
+                "+",
+                "1"
+              ]
+            }
+          ]
         }
       ],
       "layers": [
@@ -2818,6 +3229,10 @@
         {
           "name": "Resizable",
           "type": "ResizableCapability::ResizableBehavior"
+        },
+        {
+          "name": "SaveConfiguration",
+          "type": "SaveState::SaveConfiguration"
         },
         {
           "name": "Scale",
@@ -13350,6 +13765,7 @@
             }
           ],
           "instances": [],
+          "editionSettings": {},
           "eventsFunctions": [
             {
               "fullName": "",

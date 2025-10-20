@@ -126,26 +126,38 @@ namespace gdjs {
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): UnnamedVariableNetworkSyncData | undefined {
-      const syncedPlayerNumber = syncOptions.playerNumber;
-      const isHost = syncOptions.isHost;
-      const variableOwner = this.getPlayerOwnership();
       if (
         // Variable undefined.
-        this.isUndefinedInContainer() ||
-        // If we force sync everything, we don't look at the ownership.
-        (!syncOptions.syncAllVariables &&
-          // Variable marked as not to be synchronized.
-          (variableOwner === null ||
-            // Getting sync data for a specific player:
-            (syncedPlayerNumber !== undefined &&
-              // Variable is owned by host but this player number is not the host.
-              variableOwner === 0 &&
-              !isHost) ||
-            // Variable is owned by a player but not getting sync data for this player number.
-            (variableOwner !== 0 && syncedPlayerNumber !== variableOwner)))
-      ) {
-        // In those cases, the variable should not be synchronized.
+        this.isUndefinedInContainer()
+      )
         return;
+
+      const variableOwner = this.getPlayerOwnership();
+
+      if (syncOptions.shouldExcludeVariableFromData) {
+        // Saving for "save state": serialize all variables unless excluded.
+        if (syncOptions.shouldExcludeVariableFromData(this)) {
+          return;
+        }
+      } else {
+        // Saving for "multiplayer": only serialize the variable if owned by the player.
+        const syncedPlayerNumber = syncOptions.playerNumber;
+        const isHost = syncOptions.isHost;
+
+        if (
+          // Variable marked as not to be synchronized.
+          variableOwner === null ||
+          // Getting sync data for a specific player:
+          (syncedPlayerNumber !== undefined &&
+            // Variable is owned by host but this player number is not the host.
+            variableOwner === 0 &&
+            !isHost) ||
+          // Variable is owned by a player but not getting sync data for this player number.
+          (variableOwner !== 0 && syncedPlayerNumber !== variableOwner)
+        ) {
+          // In those cases, the variable should not be synchronized.
+          return;
+        }
       }
 
       const variableType = this.getType();
@@ -251,6 +263,13 @@ namespace gdjs {
       const syncedVariableOwner = networkSyncData.owner;
       const variableData =
         gdjs.Variable.getVariableDataFromNetworkSyncData(networkSyncData);
+
+      if (
+        options.shouldExcludeVariableFromUpdate &&
+        options.shouldExcludeVariableFromUpdate(this)
+      ) {
+        return;
+      }
 
       if (!options.ignoreVariableOwnership) {
         const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerNumber();

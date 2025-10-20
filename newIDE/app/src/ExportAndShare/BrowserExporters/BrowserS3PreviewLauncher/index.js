@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import BrowserPreviewErrorDialog from './BrowserPreviewErrorDialog';
+import BrowserPreviewErrorDialog from '../BrowserPreview/BrowserPreviewErrorDialog';
 import BrowserS3FileSystem from '../BrowserS3FileSystem';
 import { findGDJS } from '../../../GameEngineFinder/BrowserS3GDJSFinder';
 import assignIn from 'lodash/assignIn';
@@ -14,57 +14,24 @@ import {
   browserPreviewDebuggerServer,
   getExistingPreviewWindowForDebuggerId,
   registerNewPreviewWindow,
-} from './BrowserPreviewDebuggerServer';
+} from '../BrowserPreview/BrowserPreviewDebuggerServer';
 import Window from '../../../Utils/Window';
-import { displayBlackLoadingScreenOrThrow } from '../../../Utils/BrowserExternalWindowUtils';
 import { getGDevelopResourceJwtToken } from '../../../Utils/GDevelopServices/Project';
 import { isNativeMobileApp } from '../../../Utils/Platform';
 import { getIDEVersionWithHash } from '../../../Version';
 import { setEmbeddedGameFramePreviewLocation } from '../../../EmbeddedGame/EmbeddedGameFrame';
+import { immediatelyOpenNewPreviewWindow } from '../BrowserPreview/BrowserPreviewWindow';
 const gd: libGDevelop = global.gd;
 
 type State = {|
   error: ?Error,
 |};
 
-let nextPreviewWindowId = 0;
-
-/**
- * Open a window showing a black "loading..." screen. It's important this is done
- * NOT in an asynchronous way but JUST after a click. Otherwise, browsers like Safari
- * will block the window opening.
- */
-export const immediatelyOpenNewPreviewWindow = (
-  project: gdProject
-): WindowProxy => {
-  const width = project.getGameResolutionWidth();
-  const height = project.getGameResolutionHeight();
-  const left = window.screenX + window.innerWidth / 2 - width / 2;
-  const top = window.screenY + window.innerHeight / 2 - height / 2;
-
-  const targetId = 'GDevelopPreview' + nextPreviewWindowId++;
-  const previewWindow = window.open(
-    'about:blank',
-    targetId,
-    `width=${width},height=${height},left=${left},top=${top}`
-  );
-  if (!previewWindow) {
-    throw new Error(
-      "Can't open the preview window because of browser restrictions."
-    );
-  }
-
-  displayBlackLoadingScreenOrThrow(previewWindow);
-
-  return previewWindow;
-};
-
 export default class BrowserS3PreviewLauncher extends React.Component<
   PreviewLauncherProps,
   State
 > {
   canDoNetworkPreview = () => false;
-  canDoHotReload = () => false;
 
   state = {
     error: null,
@@ -143,7 +110,9 @@ export default class BrowserS3PreviewLauncher extends React.Component<
         }).filter(Boolean);
 
     try {
-      await this.getPreviewDebuggerServer().startServer();
+      await this.getPreviewDebuggerServer().startServer({
+        origin: new URL(getBaseUrl()).origin,
+      });
     } catch (err) {
       // Ignore any error when running the debugger server - the preview
       // can still work without it.

@@ -2842,9 +2842,24 @@ export default class SceneEditor extends React.Component<Props, State> {
                         onOpenEventBasedObjectEditor={
                           this.props.onOpenEventBasedObjectEditor
                         }
-                        onOpenEventBasedObjectVariantEditor={
-                          this.props.onOpenEventBasedObjectVariantEditor
-                        }
+                        onOpenEventBasedObjectVariantEditor={(
+                          extensionName: string,
+                          eventsBasedObjectName: string,
+                          variantName: string
+                        ) => {
+                          this.props.onOpenEventBasedObjectVariantEditor(
+                            extensionName,
+                            eventsBasedObjectName,
+                            variantName
+                          );
+                          if (editedObjectWithContext) {
+                            this._onObjectEdited(
+                              editedObjectWithContext,
+                              false
+                            );
+                          }
+                          this.editObject(null);
+                        }}
                         onDeleteEventsBasedObjectVariant={
                           this.props.onDeleteEventsBasedObjectVariant
                         }

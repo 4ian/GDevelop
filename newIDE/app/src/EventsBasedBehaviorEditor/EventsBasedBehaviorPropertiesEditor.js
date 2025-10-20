@@ -964,7 +964,13 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                               <SelectOption
                                                 key={index}
                                                 value={choice.value}
-                                                label={choice.value}
+                                                label={
+                                                  choice.value +
+                                                  (choice.label &&
+                                                  choice.label !== choice.value
+                                                    ? ` — ${choice.label}`
+                                                    : '')
+                                                }
                                               />
                                             )
                                           )}

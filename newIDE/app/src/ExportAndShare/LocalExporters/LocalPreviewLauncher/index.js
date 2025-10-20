@@ -81,7 +81,6 @@ export default class LocalPreviewLauncher extends React.Component<
   State
 > {
   canDoNetworkPreview = () => true;
-  canDoHotReload = () => true;
 
   state = {
     networkPreviewDialogOpen: false,
@@ -213,7 +212,7 @@ export default class LocalPreviewLauncher extends React.Component<
     // useful if the user opens the Debugger editor later, or want to
     // hot reload.
     try {
-      await this.getPreviewDebuggerServer().startServer();
+      await this.getPreviewDebuggerServer().startServer({});
     } catch (err) {
       console.error(
         'Unable to start the Debugger Server for the preview:',
@@ -354,6 +353,7 @@ export default class LocalPreviewLauncher extends React.Component<
       );
       const projectData = JSON.parse(gd.Serializer.toJSON(projectDataElement));
       projectDataElement.delete();
+
       const runtimeGameOptionsElement = new gd.SerializerElement();
       exporter.serializeRuntimeGameOptions(
         previewExportOptions,
@@ -362,6 +362,7 @@ export default class LocalPreviewLauncher extends React.Component<
       const runtimeGameOptions = JSON.parse(
         gd.Serializer.toJSON(runtimeGameOptionsElement)
       );
+      runtimeGameOptionsElement.delete();
 
       debuggerIds.forEach(debuggerId => {
         this.getPreviewDebuggerServer().sendMessage(debuggerId, {

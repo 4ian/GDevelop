@@ -63,6 +63,7 @@ import {
   type HotReloadSteps,
 } from '../EmbeddedGame/EmbeddedGameFrame';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
+import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -607,6 +608,9 @@ export const AskAiEditor = React.memo<Props>(
         onRefreshLimits,
         subscription,
       } = React.useContext(AuthenticatedUserContext);
+      const { openSubscriptionDialog } = React.useContext(
+        SubscriptionSuggestionContext
+      );
 
       const availableCredits = limits ? limits.credits.userBalance.amount : 0;
       const quota =
@@ -658,6 +662,18 @@ export const AskAiEditor = React.memo<Props>(
             if (quota && quota.limitReached && aiRequestPriceInCredits) {
               payWithCredits = true;
               if (availableCredits < aiRequestPriceInCredits) {
+                // Not enough credits.
+                if (!hasValidSubscriptionPlan(subscription)) {
+                  // User is not subscribed, suggest them to subscribe.
+                  openSubscriptionDialog({
+                    analyticsMetadata: {
+                      reason: 'AI requests (subscribe)',
+                      recommendedPlanId: 'gdevelop_gold',
+                      placementId: 'ai-requests',
+                    },
+                  });
+                  return;
+                }
                 openCreditsPackageDialog({
                   missingCredits: aiRequestPriceInCredits - availableCredits,
                 });
@@ -702,7 +718,7 @@ export const AskAiEditor = React.memo<Props>(
                 fileMetadata,
                 storageProviderName,
                 mode,
-                toolsVersion: 'v3',
+                toolsVersion: 'v4',
                 aiConfiguration: {
                   presetId: aiConfigurationPresetId,
                 },
@@ -768,6 +784,8 @@ export const AskAiEditor = React.memo<Props>(
           updateAiRequest,
           newAiRequestOptions,
           onOpenAskAi,
+          subscription,
+          openSubscriptionDialog,
         ]
       );
 
@@ -827,6 +845,19 @@ export const AskAiEditor = React.memo<Props>(
           ) {
             payWithCredits = true;
             if (availableCredits < aiRequestPriceInCredits) {
+              // Not enough credits.
+              if (!hasValidSubscriptionPlan(subscription)) {
+                // User is not subscribed, suggest them to subscribe.
+                openSubscriptionDialog({
+                  analyticsMetadata: {
+                    reason: 'AI requests (subscribe)',
+                    recommendedPlanId: 'gdevelop_gold',
+                    placementId: 'ai-requests',
+                  },
+                });
+                return;
+              }
+
               openCreditsPackageDialog({
                 missingCredits: aiRequestPriceInCredits - availableCredits,
               });
@@ -944,6 +975,8 @@ export const AskAiEditor = React.memo<Props>(
           hasFunctionsCallsToProcess,
           onOpenAskAi,
           onOpenLayout,
+          subscription,
+          openSubscriptionDialog,
         ]
       );
       const onSendEditorFunctionCallResults = React.useCallback(

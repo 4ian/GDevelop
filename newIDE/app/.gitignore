@@ -1,5 +1,6 @@
 # Generated files
 src/Version/VersionMetadata.js
+public/service-worker.js
 
 # dependencies
 node_modules

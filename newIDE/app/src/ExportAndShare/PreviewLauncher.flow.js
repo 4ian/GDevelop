@@ -56,7 +56,6 @@ export type PreviewOptions = {|
     playerUsername: string,
     playerToken: string,
   },
-  numberOfWindows: number,
   isForInGameEdition: boolean,
   editorId: string,
   getIsMenuBarHiddenInPreview: () => boolean,
@@ -66,6 +65,18 @@ export type PreviewOptions = {|
   inAppTutorialMessageInPreview: string,
   inAppTutorialMessagePositionInPreview: string,
   editorCameraState3D: EditorCameraState | null,
+
+  numberOfWindows: number,
+
+  // Only for the web-app:
+  previewWindows: Array<WindowProxy> | null,
+|};
+
+export type PreparePreviewWindowsOptions = {|
+  project: gdProject,
+  hotReload: boolean,
+  numberOfWindows: number,
+  isForInGameEdition: boolean,
 |};
 
 /** The props that PreviewLauncher must support */
@@ -118,7 +129,7 @@ export type ServerAddress = {
 
 /** Interface to run a debugger server for previews. */
 export interface PreviewDebuggerServer {
-  startServer(): Promise<void>;
+  startServer({ origin?: string }): Promise<void>;
   getServerState(): 'started' | 'stopped';
   getExistingDebuggerIds(): Array<DebuggerId>;
   sendMessage(id: DebuggerId, message: Object): void;
@@ -139,9 +150,11 @@ export type HotReloaderLog = {|
  * are functional component with strict interfaces.
  */
 export type PreviewLauncherInterface = {
+  +immediatelyPreparePreviewWindows?: (
+    options: PreparePreviewWindowsOptions
+  ) => Array<WindowProxy> | null,
   launchPreview: (previewOptions: PreviewOptions) => Promise<any>,
   canDoNetworkPreview: () => boolean,
-  canDoHotReload: () => boolean,
   +closePreview?: (windowId: number) => void,
   +getPreviewDebuggerServer: () => ?PreviewDebuggerServer,
 };

@@ -67,10 +67,15 @@ const getExtensionFolderName = extensionName => {
   );
 };
 
+const generateSvgImageIcon = iconUrl => {
+  return `<img src="${iconUrl}" class="extension-icon"></img>`;
+};
+
 module.exports = {
   gdevelopWikiUrlRoot,
   improperlyFormattedHelpPaths,
   getHelpLink,
   generateReadMoreLink,
   getExtensionFolderName,
+  generateSvgImageIcon,
 };

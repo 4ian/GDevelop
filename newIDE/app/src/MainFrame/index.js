@@ -1559,6 +1559,17 @@ const MainFrame = (props: Props) => {
     [gameEditorMode, state.editorTabs, notifyChangesToInGameEditor]
   );
 
+  const onExternalLayoutAssociationChanged = React.useCallback(
+    () => {
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: false,
+        shouldReloadResources: false,
+      });
+    },
+    [notifyChangesToInGameEditor]
+  );
+
   const onResourceExternallyChanged = React.useCallback(
     () => {
       notifyChangesToInGameEditor({
@@ -1929,6 +1940,18 @@ const MainFrame = (props: Props) => {
       const previewLauncher = _previewLauncher.current;
       if (!previewLauncher) return;
 
+      // Open the preview windows immediately, if required by the preview launcher.
+      // This is because some browsers (like Safari or Firefox) will block the
+      // window opening if done after an asynchronous operation.
+      const previewWindows = previewLauncher.immediatelyPreparePreviewWindows
+        ? previewLauncher.immediatelyPreparePreviewWindows({
+            project: currentProject,
+            hotReload: !!hotReload,
+            numberOfWindows: numberOfWindows || 1,
+            isForInGameEdition: !!isForInGameEdition,
+          })
+        : null;
+
       setPreviewLoading(true);
       notifyPreviewOrExportWillStart(state.editorTabs);
 
@@ -1943,7 +1966,9 @@ const MainFrame = (props: Props) => {
         ? previewState.overridenPreviewExternalLayoutName
         : previewState.previewExternalLayoutName;
 
-      await autosaveProjectIfNeeded();
+      autosaveProjectIfNeeded().catch(err => {
+        console.error('Error while auto-saving the project. Ignoring.', err);
+      });
 
       // Note that in the future, this kind of checks could be done
       // and stored in a "diagnostic report", rather than hiding errors
@@ -2012,6 +2037,8 @@ const MainFrame = (props: Props) => {
             inAppTutorialMessageInPreview.position,
           captureOptions,
           onCaptureFinished,
+
+          previewWindows,
         });
         setPreviewLoading(false);
 
@@ -4414,6 +4441,7 @@ const MainFrame = (props: Props) => {
     onExtensionInstalled: onExtensionInstalled,
     onEffectAdded: onEffectAdded,
     onObjectListsModified: onObjectListsModified,
+    onExternalLayoutAssociationChanged,
     gamesList: gamesList,
     triggerHotReloadInGameEditorIfNeeded: notifyChangesToInGameEditor,
   };

@@ -432,7 +432,8 @@ export const EmbeddedGameFrame = ({
 
   React.useEffect(() => {
     const iframe = iframeRef.current;
-    if (previewDebuggerServer && iframe)
+    const hasSomethingLoaded = !!previewIndexHtmlLocation;
+    if (previewDebuggerServer && iframe && hasSomethingLoaded)
       previewDebuggerServer.registerEmbeddedGameFrame(iframe.contentWindow);
   });
 
@@ -543,8 +544,13 @@ export const EmbeddedGameFrame = ({
         />
         <DropTarget
           canDrop={() => true}
-          hover={monitor => dragNewInstance({ monitor, dropped: false })}
-          drop={monitor => dragNewInstance({ monitor, dropped: true })}
+          // TODO: "isAltPressed" is hardcoded to false, but we should detect it instead.
+          hover={monitor =>
+            dragNewInstance({ monitor, dropped: false, isAltPressed: false })
+          }
+          drop={monitor =>
+            dragNewInstance({ monitor, dropped: true, isAltPressed: false })
+          }
         >
           {({ connectDropTarget, canDrop, isOver }) => {
             if (!isOver) {

@@ -408,13 +408,13 @@ export default function EventsBasedBehaviorPropertiesEditor({
         for (const choice of choices) {
           property.addChoice(choice.value, choice.label);
         }
-        property.setValue(
-          getChoicesArray(property).some(
+        if (
+          !getChoicesArray(property).some(
             choice => choice.value === property.getValue()
           )
-            ? property.getValue()
-            : ''
-        );
+        ) {
+          property.setValue('');
+        }
         forceUpdate();
       };
     },

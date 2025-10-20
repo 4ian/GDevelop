@@ -203,6 +203,7 @@ import { useGamesPlatformFrame } from './EditorContainers/HomePage/PlaySection/U
 import { useExtensionLoadErrorDialog } from '../Utils/UseExtensionLoadErrorDialog';
 import { PanesContainer } from './PanesContainer';
 import StandaloneDialog from './StandAloneDialog';
+import { mapFor } from '../Utils/MapFor';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -557,6 +558,10 @@ const MainFrame = (props: Props) => {
     renderExtensionLoadErrorDialog,
   } = useExtensionLoadErrorDialog();
 
+  const zoomToFitContentOnSceneLoadByName = React.useRef<{ [string]: boolean }>(
+    {}
+  );
+
   /**
    * This reference is useful to get the current opened project,
    * even in the callback of a hook/promise - without risking to read "stale" data.
@@ -662,6 +667,15 @@ const MainFrame = (props: Props) => {
           ? { storageProviders: props.storageProviders }
           : kind === 'ask-ai'
           ? { mode, aiRequestId }
+          : kind === 'layout'
+          ? {
+              zoomToFitContentOnSceneLoad:
+                zoomToFitContentOnSceneLoadByName.current[name],
+              onZoomToFitContentDone: () => {
+                // Only zoom to fit once on scene load.
+                delete zoomToFitContentOnSceneLoadByName.current[name];
+              },
+            }
           : undefined;
       return {
         icon,
@@ -853,6 +867,8 @@ const MainFrame = (props: Props) => {
         currentFileMetadata: null,
         editorTabs: closeProjectTabs(state.editorTabs, currentProject),
       }));
+
+      zoomToFitContentOnSceneLoadByName.current = {};
 
       // Delete the project from memory. All references to it have been dropped previously
       // by the setState.
@@ -1177,6 +1193,17 @@ const MainFrame = (props: Props) => {
         openLeaderboardReplacerDialogIfNeeded(project, oldProjectId);
         configureMultiplayerLobbiesIfNeeded(project, oldProjectId);
       }
+
+      // Assume that when a project is created, we always want to zoom to fit
+      // the content when opening a scene for the first time.
+      zoomToFitContentOnSceneLoadByName.current = {};
+      const layoutNames = mapFor(0, project.getLayoutsCount(), i => {
+        return project.getLayoutAt(i).getName();
+      });
+      layoutNames.forEach(layoutName => {
+        zoomToFitContentOnSceneLoadByName.current[layoutName] = true;
+      });
+
       if (!options.dontOpenAnySceneOrProjectManager) {
         options.openAllScenes || options.openQuickCustomizationDialog
           ? openAllScenes({
@@ -3464,7 +3491,7 @@ const MainFrame = (props: Props) => {
         await createProjectFromTutorial(tutorialId, {
           storageProvider: emptyStorageProvider,
           saveAsLocation: null,
-          creationSource: 'in-app-tutorial',
+          creationSource: 'tutorial',
           // Remaining will be set by the template.
         });
       } catch (error) {

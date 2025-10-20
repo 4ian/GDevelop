@@ -33,6 +33,10 @@ export type EditorContainerExtraProps = {|
   // Ask AI
   mode?: 'chat' | 'agent',
   aiRequestId?: string | null,
+
+  // Scene editor
+  zoomToFitContentOnSceneLoad?: boolean,
+  onZoomToFitContentDone?: () => void,
 |};
 
 export type SceneEventsOutsideEditorChanges = {|

@@ -409,7 +409,9 @@ export default function EventsBasedBehaviorPropertiesEditor({
           property.addChoice(choice.value, choice.label);
         }
         property.setValue(
-          getChoicesArray(property).includes(property.getValue())
+          getChoicesArray(property).some(
+            choice => choice.value === property.getValue()
+          )
             ? property.getValue()
             : ''
         );

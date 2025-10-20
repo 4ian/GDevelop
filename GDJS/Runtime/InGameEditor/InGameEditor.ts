@@ -528,10 +528,8 @@ namespace gdjs {
 
     // The selected objects.
     private _selection = new Selection();
-    private _selectionBoxes: Map<
-      RuntimeObjectWith3D,
-      { container: THREE.Group; box: THREE.BoxHelper }
-    > = new Map();
+    private _selectionBoxes: Map<RuntimeObject, ObjectSelectionBoxHelper> =
+      new Map();
     private _objectMover = new ObjectMover(this);
 
     private _wasMouseRightButtonPressed = false;
@@ -1596,17 +1594,14 @@ namespace gdjs {
     }) {
       if (!this._currentScene) return;
 
-      const selected3DObjects = this._selection
-        .getSelectedObjects()
-        .filter((obj) => is3D(obj)) as Array<RuntimeObjectWith3D>;
+      const selectedObjects = this._selection.getSelectedObjects();
 
       // Add/update boxes for selected objects
-      selected3DObjects.forEach((object) =>
+      selectedObjects.forEach((object) =>
         this._createBoundingBoxIfNeeded(object)
       );
       if (
         objectUnderCursor &&
-        is3D(objectUnderCursor) &&
         !this._selectionBoxes.has(objectUnderCursor) &&
         !this.isInstanceSealed(objectUnderCursor)
       ) {
@@ -1614,41 +1609,38 @@ namespace gdjs {
       }
 
       // Remove boxes for deselected objects
-      this._selectionBoxes.forEach(({ container, box }, object) => {
+      this._selectionBoxes.forEach((box, object) => {
         const isHovered =
           object === objectUnderCursor && !this._isTransformControlsHovered;
-        const isInSelection = selected3DObjects.includes(object);
+        const isInSelection = selectedObjects.includes(object);
         if (!isInSelection && !isHovered) {
-          container.removeFromParent();
+          box.removeFromParent();
           this._selectionBoxes.delete(object);
         } else {
           const isLocked = this.isInstanceLocked(object);
 
           const color =
             instanceWireframeColor[
-              (isLocked ? instanceStateFlag.locked : 0) |
+              (isLocked || !is3D(object) ? instanceStateFlag.locked : 0) |
                 (isInSelection ? instanceStateFlag.selected : 0) |
                 (isHovered ? instanceStateFlag.hovered : 0)
             ] || '#aaaaaa';
 
-          box.material.color = new THREE.Color(color);
+          box.setColor(color);
         }
       });
 
-      this._selectionBoxes.forEach(({ box }) => {
+      this._selectionBoxes.forEach((box) => {
         box.update();
       });
     }
 
-    private _createBoundingBoxIfNeeded(object: RuntimeObjectWith3D): void {
+    private _createBoundingBoxIfNeeded(object: RuntimeObject): void {
       if (this._selectionBoxes.has(object)) {
         return;
       }
       const currentScene = this._currentScene;
       if (!currentScene) return;
-
-      const threeObject = object.get3DRendererObject();
-      if (!threeObject) return;
 
       const objectLayer = this.getEditorLayer(object.getLayer());
       if (!objectLayer) return;
@@ -1656,20 +1648,9 @@ namespace gdjs {
       const threeGroup = objectLayer.getRenderer().getThreeGroup();
       if (!threeGroup) return;
 
-      // Use a group to invert the Y-axis as the GDevelop Y axis is inverted
-      // compared to Three.js. This is somehow necessary because the position
-      // of the BoxHelper is always (0, 0, 0) and the geometry is hard to manipulate.
-      const container = new THREE.Group();
-      container.rotation.order = 'ZYX';
-      container.scale.y = -1;
-      const box = new THREE.BoxHelper(threeObject, '#f2a63c');
-      box.rotation.order = 'ZYX';
-      box.material.depthTest = false;
-      box.material.fog = false;
-      threeGroup.add(container);
-
-      container.add(box);
-      this._selectionBoxes.set(object, { container, box });
+      const objectBoxHelper = new ObjectSelectionBoxHelper(object);
+      threeGroup.add(objectBoxHelper.container);
+      this._selectionBoxes.set(object, objectBoxHelper);
     }
 
     private _swapTransformControlsMode(): void {
@@ -2061,8 +2042,8 @@ namespace gdjs {
         this._removeSelectionControls();
 
         // Cleanup selection boxes
-        this._selectionBoxes.forEach(({ container }) => {
-          container.removeFromParent();
+        this._selectionBoxes.forEach((box) => {
+          box.removeFromParent();
         });
         this._selectionBoxes.clear();
       }
@@ -2695,7 +2676,7 @@ namespace gdjs {
       // and move selection boxes + dragged object to layer 1 so they
       // are not considered by raycasting.
       this._raycaster.layers.set(0);
-      this._selectionBoxes.forEach(({ box }) => box.layers.set(1));
+      this._selectionBoxes.forEach((box) => box.setLayer(1));
       if (this._threeInnerArea) {
         for (const child of this._threeInnerArea.children) {
           child.layers.set(1);
@@ -2744,7 +2725,7 @@ namespace gdjs {
       });
 
       // Reset selection boxes layers so they are properly displayed.
-      this._selectionBoxes.forEach(({ box }) => box.layers.set(0));
+      this._selectionBoxes.forEach((box) => box.setLayer(0));
       if (this._threeInnerArea) {
         for (const child of this._threeInnerArea.children) {
           child.layers.set(0);
@@ -4065,4 +4046,66 @@ namespace gdjs {
       );
     }
   };
+
+  class ObjectSelectionBoxHelper {
+    object: gdjs.RuntimeObject;
+    dummyObject3DForObject2D: THREE.Object3D | null = null;
+    boxHelper: THREE.BoxHelper;
+    container: THREE.Group;
+
+    constructor(object: gdjs.RuntimeObject) {
+      this.object = object;
+
+      let threeObject = object.get3DRendererObject();
+      if (!threeObject) {
+        threeObject = new THREE.Group();
+        threeObject.add(
+          new THREE.Mesh(
+            new THREE.BoxGeometry(1, 1, 1),
+            new THREE.MeshBasicMaterial()
+          )
+        );
+        this.dummyObject3DForObject2D = threeObject;
+      }
+      // Use a group to invert the Y-axis as the GDevelop Y axis is inverted
+      // compared to Three.js. This is somehow necessary because the position
+      // of the BoxHelper is always (0, 0, 0) and the geometry is hard to manipulate.
+      this.container = new THREE.Group();
+      this.container.rotation.order = 'ZYX';
+      this.container.scale.y = -1;
+      this.boxHelper = new THREE.BoxHelper(threeObject, '#f2a63c');
+      this.boxHelper.rotation.order = 'ZYX';
+      this.boxHelper.material.depthTest = false;
+      this.boxHelper.material.fog = false;
+      this.container.add(this.boxHelper);
+    }
+
+    update() {
+      if (this.dummyObject3DForObject2D) {
+        this.dummyObject3DForObject2D.position.set(
+          this.object.getCenterXInScene(),
+          -this.object.getCenterYInScene(),
+          0
+        );
+        this.dummyObject3DForObject2D.scale.set(
+          this.object.getWidth() + 2,
+          this.object.getHeight() + 2,
+          0
+        );
+      }
+      this.boxHelper.update();
+    }
+
+    removeFromParent() {
+      this.container.removeFromParent();
+    }
+
+    setLayer(layer: number): void {
+      this.boxHelper.layers.set(layer);
+    }
+
+    setColor(color: THREE.ColorRepresentation) {
+      this.boxHelper.material.color.set(color);
+    }
+  }
 }

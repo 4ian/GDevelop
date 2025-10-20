@@ -415,11 +415,13 @@ export default function EventsBasedObjectPropertiesEditor({
         for (const choice of choices) {
           property.addChoice(choice.value, choice.label);
         }
-        property.setValue(
-          getChoicesArray(property).includes(property.getValue())
-            ? property.getValue()
-            : ''
-        );
+        if (
+          !getChoicesArray(property).some(
+            choice => choice.value === property.getValue()
+          )
+        ) {
+          property.setValue('');
+        }
         forceUpdate();
       };
     },

@@ -1497,7 +1497,7 @@ namespace gdjs {
           for (const selectThreeObject of this._selectionBox.select()) {
             // TODO Select the object if all its meshes are inside the rectangle
             // instead of if any is.
-            const object = this._getObject(selectThreeObject);
+            const object = this._getObject3D(selectThreeObject);
             if (object) {
               objects.add(object);
             }
@@ -2787,11 +2787,41 @@ namespace gdjs {
 
     getObjectUnderCursor(): gdjs.RuntimeObject | null {
       const closestIntersect = this._getClosestIntersectionUnderCursor();
-      if (!closestIntersect) return null;
-      return this._getObject(closestIntersect.object);
+      if (!closestIntersect) {
+        const editedInstanceContainer = this.getEditedInstanceContainer();
+        if (!editedInstanceContainer) {
+          return null;
+        }
+        const cursor = this._getCursorIn3D();
+        if (!cursor || cursor[2] !== 0) {
+          return null;
+        }
+        let topObject2D: gdjs.RuntimeObject | null = null;
+        let topLayer: gdjs.RuntimeLayer | null = null;
+        let topLayerIndex = 0;
+        for (const object of editedInstanceContainer.getAdhocListOfAllInstances()) {
+          if (is3D(object) || !object.cursorOnObject()) {
+            continue;
+          }
+          const layer = editedInstanceContainer.getLayer(object.getLayer());
+          const layerIndex =
+            editedInstanceContainer._orderedLayers.indexOf(layer);
+          if (
+            !topObject2D ||
+            layerIndex > topLayerIndex ||
+            (layer === topLayer && object.getZOrder() > topObject2D.getZOrder())
+          ) {
+            topObject2D = object;
+            topLayer = layer;
+            topLayerIndex = layerIndex;
+          }
+        }
+        return topObject2D;
+      }
+      return this._getObject3D(closestIntersect.object);
     }
 
-    private _getObject(
+    private _getObject3D(
       initialThreeObject: THREE.Object3D
     ): gdjs.RuntimeObject | null {
       const editedInstanceContainer = this.getEditedInstanceContainer();

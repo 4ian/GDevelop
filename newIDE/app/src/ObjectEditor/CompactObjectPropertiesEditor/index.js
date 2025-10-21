@@ -696,6 +696,7 @@ export const CompactObjectPropertiesEditor = ({
                       onChange={(newValue: string) => {
                         customObjectConfiguration &&
                           customObjectConfiguration.setVariantName(newValue);
+                        onObjectsModified([object]);
                         forceUpdate();
                       }}
                     >

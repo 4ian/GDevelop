@@ -871,6 +871,17 @@ const MainFrame = (props: Props) => {
       const currentProject = currentProjectRef.current;
       if (!currentProject) return;
 
+      // Close all previews and clear debugger connections
+      console.info('Closing all previews and clearing debugger connections...');
+      const previewLauncher = _previewLauncher.current;
+      if (previewLauncher) {
+        const debuggerServer = previewLauncher.getPreviewDebuggerServer();
+        if (debuggerServer) {
+          debuggerServer.closeAllPreviews();
+          debuggerServer.unregisterEmbeddedGameFrame();
+        }
+      }
+
       // Close the editors related to this project.
       await setState(state => ({
         ...state,

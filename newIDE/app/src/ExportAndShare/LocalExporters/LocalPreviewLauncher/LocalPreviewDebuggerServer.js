@@ -195,6 +195,36 @@ class LocalPreviewDebuggerServer {
     // Nothing to do, the local preview debugger server communicates
     // with the embedded game frame through WebSocket, like other preview windows.
   }
+  unregisterEmbeddedGameFrame() {
+    // For electron app, we need to close the websocket connection
+    // that is identified as 'embedded-game-frame'
+    const embeddedGameFrameIndex = debuggerIds.indexOf('embedded-game-frame');
+    if (embeddedGameFrameIndex !== -1) {
+      debuggerIds.splice(embeddedGameFrameIndex, 1);
+    }
+  }
+  closeAllPreviews() {
+    // For electron app, we need to ask the main process to close all preview windows
+    // and clear all debugger connections
+    if (!ipcRenderer) return;
+    
+    // Close all preview windows
+    ipcRenderer.invoke('preview-close-all');
+    
+    // Clear all debugger connections
+    const allDebuggerIds = [...debuggerIds];
+    debuggerIds.length = 0;
+    
+    // Notify callbacks about closed connections
+    allDebuggerIds.forEach(id => {
+      callbacksList.forEach(({ onConnectionClosed }) =>
+        onConnectionClosed({
+          id,
+          debuggerIds: [],
+        })
+      );
+    });
+  }
 }
 
 export const localPreviewDebuggerServer: PreviewDebuggerServer = new LocalPreviewDebuggerServer();

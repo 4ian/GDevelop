@@ -8,6 +8,26 @@ let webSockets = {};
 let nextDebuggerId = 0;
 
 const closeServer = () => {
+  // Close all websocket connections
+  for (const id in webSockets) {
+    if (webSockets[id]) {
+      try {
+        webSockets[id].close();
+      } catch (error) {
+        log.warn(`Error closing websocket connection ${id}:`, error);
+      }
+    }
+  }
+  
+  // Close the server
+  if (wsServer) {
+    try {
+      wsServer.close();
+    } catch (error) {
+      log.warn('Error closing websocket server:', error);
+    }
+  }
+  
   wsServer = null;
   webSockets = {};
 };

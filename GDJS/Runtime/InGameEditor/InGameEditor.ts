@@ -412,6 +412,10 @@ namespace gdjs {
               };
           this._objectInitialPositions.set(object, initialPosition);
         }
+        // TODO Remove this when we handle 2D instances controls
+        if (!is3D(object)) {
+          return;
+        }
         object.setX(Math.round(initialPosition.x + movement.translationX));
         object.setY(Math.round(initialPosition.y + movement.translationY));
         object.setAngle(

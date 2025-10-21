@@ -81,6 +81,7 @@ if (
   process.env.GD_SIGNTOOL_SUBJECT_NAME &&
   process.env.GD_SIGNTOOL_THUMBPRINT
 ) {
+  config.win.signtoolOptions = {}
   config.win.signtoolOptions.certificateSubjectName = process.env.GD_SIGNTOOL_SUBJECT_NAME;
   config.win.signtoolOptions.certificateSha1 = process.env.GD_SIGNTOOL_THUMBPRINT;
 
@@ -98,7 +99,7 @@ if (
 
   // Seems required, see https://github.com/electron-userland/electron-builder/issues/6158#issuecomment-1587045539.
   config.win.signtoolOptions.signingHashAlgorithms = ['sha256'];
-  console.log('ℹ️ Set Windows build signing options:', config.win);
+  console.log('ℹ️ Set Windows build signing options:', config.win.signtoolOptions);
 } else {
   console.log('ℹ️ No Windows build signing options set.');
 }

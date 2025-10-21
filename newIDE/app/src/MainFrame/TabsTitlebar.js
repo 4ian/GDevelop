@@ -3,8 +3,6 @@ import * as React from 'react';
 
 import MenuIcon from '../UI/CustomSvgIcons/Menu';
 import IconButton from '../UI/IconButton';
-import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
-import Window from '../Utils/Window';
 import {
   TitleBarLeftSafeMargins,
   TitleBarRightSafeMargins,
@@ -39,6 +37,7 @@ const styles = {
     height: 34,
   },
   askAiContainer: {
+    zIndex: 0, // Create a stacking context to avoid the AI icon z-indexed element to display above other panes or UI elements.
     marginBottom: 4,
     marginRight: 1,
     marginLeft: 2,
@@ -52,8 +51,12 @@ type TabsTitlebarProps = {|
     onEditorTabHovered: (?EditorTab, {| isLabelTruncated: boolean |}) => void,
     onEditorTabClosing: () => void
   ) => React.Node,
-  hasAskAiOpened: boolean,
-  onOpenAskAi: () => void,
+  isLeftMostPane: boolean,
+  isRightMostPane: boolean,
+  displayMenuIcon: boolean,
+
+  displayAskAi: boolean,
+  onAskAiClicked: () => void,
 |};
 
 const useIsAskAiIconAnimated = (shouldDisplayAskAi: boolean) => {
@@ -103,12 +106,13 @@ export default function TabsTitlebar({
   toggleProjectManager,
   hidden,
   renderTabs,
-  hasAskAiOpened,
-  onOpenAskAi,
+  isLeftMostPane,
+  isRightMostPane,
+  displayMenuIcon,
+  displayAskAi,
+  onAskAiClicked,
 }: TabsTitlebarProps) {
   const isTouchscreen = useScreenType() === 'touch';
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const backgroundColor = gdevelopTheme.titlebar.backgroundColor;
   const preferences = React.useContext(PreferencesContext);
   const { limits } = React.useContext(AuthenticatedUserContext);
   const [tooltipData, setTooltipData] = React.useState<?{|
@@ -116,13 +120,6 @@ export default function TabsTitlebar({
     editorTab: EditorTab,
   |}>(null);
   const tooltipTimeoutId = React.useRef<?TimeoutID>(null);
-
-  React.useEffect(
-    () => {
-      Window.setTitleBarColor(backgroundColor);
-    },
-    [backgroundColor]
-  );
 
   const onEditorTabHovered = React.useCallback(
     (
@@ -189,35 +186,36 @@ export default function TabsTitlebar({
     limits.capabilities.classrooms.hideAskAi;
 
   const shouldDisplayAskAi =
-    preferences.values.showAiAskButtonInTitleBar &&
-    !hasAskAiOpened &&
-    !hideAskAi;
+    preferences.values.showAiAskButtonInTitleBar && displayAskAi && !hideAskAi;
   const isAskAiIconAnimated = useIsAskAiIconAnimated(shouldDisplayAskAi);
 
   return (
     <div
       style={{
         ...styles.container,
-        backgroundColor,
+        backgroundColor: 'transparent',
         // Hiding the titlebar should still keep its position in the layout to avoid layout shifts:
         visibility: hidden ? 'hidden' : 'visible',
+        pointerEvents: hidden ? undefined : 'all',
       }}
       className={WINDOW_DRAGGABLE_PART_CLASS_NAME}
     >
-      <TitleBarLeftSafeMargins />
-      <IconButton
-        size="small"
-        // Even if not in the toolbar, keep this ID for backward compatibility for tutorials.
-        id="main-toolbar-project-manager-button"
-        // The whole bar is draggable, so prevent the icon to be draggable,
-        // as it can affect the ability to open the menu.
-        className={WINDOW_NON_DRAGGABLE_PART_CLASS_NAME}
-        style={styles.menuIcon}
-        color="default"
-        onClick={toggleProjectManager}
-      >
-        <MenuIcon />
-      </IconButton>
+      {isLeftMostPane && <TitleBarLeftSafeMargins />}
+      {displayMenuIcon && (
+        <IconButton
+          size="small"
+          // Even if not in the toolbar, keep this ID for backward compatibility for tutorials.
+          id="main-toolbar-project-manager-button"
+          // The whole bar is draggable, so prevent the icon to be draggable,
+          // as it can affect the ability to open the menu.
+          className={WINDOW_NON_DRAGGABLE_PART_CLASS_NAME}
+          style={styles.menuIcon}
+          color="default"
+          onClick={toggleProjectManager}
+        >
+          <MenuIcon />
+        </IconButton>
+      )}
       {renderTabs(onEditorTabHovered, onEditorTabClosing)}
       {shouldDisplayAskAi ? (
         <div
@@ -227,11 +225,11 @@ export default function TabsTitlebar({
           <TextButton
             icon={<RobotIcon size={16} rotating={isAskAiIconAnimated} />}
             label={'Ask AI'}
-            onClick={onOpenAskAi}
+            onClick={onAskAiClicked}
           />
         </div>
       ) : null}
-      <TitleBarRightSafeMargins />
+      {isRightMostPane && <TitleBarRightSafeMargins />}
       {tooltipData && (
         <TabsTitlebarTooltip
           anchorElement={tooltipData.element}

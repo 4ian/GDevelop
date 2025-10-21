@@ -21,6 +21,7 @@ import { useLongTouch } from '../../Utils/UseLongTouch';
 import { dataObjectToProps } from '../../Utils/HTMLDataset';
 import { type DraggedItem } from '../DragAndDrop/DragSourceAndDropTarget';
 import classNames from 'classnames';
+import { TreeViewRightPrimaryButton } from './TreeViewRightPrimaryButton';
 
 const stopPropagation = e => e.stopPropagation();
 
@@ -447,21 +448,48 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                     )}
                   >
                     {node.rightComponent}
-                    {rightButton && (
-                      <IconButton
-                        id={rightButton.id}
-                        size="small"
-                        onClick={e => {
-                          e.stopPropagation();
-                          if (rightButton.click) {
-                            rightButton.click();
+                    {rightButton &&
+                      (rightButton.primary ? (
+                        <TreeViewRightPrimaryButton
+                          id={rightButton.id}
+                          onClick={e => {
+                            e.stopPropagation();
+                            if (rightButton.click) {
+                              rightButton.click();
+                            }
+                          }}
+                          label={
+                            rightButton.showPrimaryLabel
+                              ? rightButton.label
+                              : null
                           }
-                        }}
-                        tooltip={rightButton.label}
-                      >
-                        {rightButton.icon}
-                      </IconButton>
-                    )}
+                          disabled={
+                            rightButton.enabled === undefined
+                              ? false
+                              : !rightButton.enabled
+                          }
+                          icon={rightButton.icon}
+                        />
+                      ) : (
+                        <IconButton
+                          id={rightButton.id}
+                          size="small"
+                          onClick={e => {
+                            e.stopPropagation();
+                            if (rightButton.click) {
+                              rightButton.click();
+                            }
+                          }}
+                          tooltip={rightButton.label}
+                          disabled={
+                            rightButton.enabled === undefined
+                              ? false
+                              : !rightButton.enabled
+                          }
+                        >
+                          {rightButton.icon}
+                        </IconButton>
+                      ))}
                     {shouldDisplayMenu && (
                       <IconButton
                         size="small"

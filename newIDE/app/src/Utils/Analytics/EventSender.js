@@ -13,6 +13,10 @@ import { getBrowserLanguageOrLocale } from '../Language';
 import { type SubscriptionAnalyticsMetadata } from '../../Profile/Subscription/SubscriptionSuggestionContext';
 import optionalRequire from '../OptionalRequire';
 import Window from '../Window';
+import { isMobile, isNativeMobileApp } from '../Platform';
+import { retryIfFailed } from '../RetryIfFailed';
+import { type NewProjectCreationSource } from '../../ProjectCreation/NewProjectSetupDialog';
+import { isServiceWorkerSupported } from '../../ServiceWorkerSetup';
 const electron = optionalRequire('electron');
 
 const isElectronApp = !!electron;
@@ -25,6 +29,59 @@ let posthogLoaded = false;
 let userIdentified = false;
 let posthogLastPropertiesSent = '';
 let currentlyRunningInAppTutorial = null;
+
+let gdevelopEditorAnalytics: {|
+  initialize: (rootElement: HTMLElement) => Promise<void>,
+  identify: (
+    userId: string,
+    userProperties: { [string]: any }
+  ) => Promise<void>,
+  trackEvent: (eventName: string, metadata: { [string]: any }) => Promise<void>,
+|} | null = null;
+let gdevelopEditorAnalyticsPromise: Promise<void> | null = null;
+
+const ensureGDevelopEditorAnalyticsReady = async () => {
+  if (gdevelopEditorAnalytics) {
+    // Already loaded.
+    return;
+  }
+
+  if (gdevelopEditorAnalyticsPromise) {
+    // Being loaded.
+    return gdevelopEditorAnalyticsPromise;
+  }
+
+  gdevelopEditorAnalyticsPromise = (async () => {
+    try {
+      // Load the library. If it fails, retry or throw so we can retry later.
+      const module = await retryIfFailed(
+        { times: 2 },
+        async () =>
+          // $FlowExpectedError - Remote script cannot be found.
+          (await import(/* webpackIgnore: true */ 'https://resources.gdevelop.io/a/gea.js'))
+            .default
+      );
+      if (module) {
+        await module.initialize({
+          documentBody: document.body,
+          isNativeMobileApp: isNativeMobileApp(),
+          isElectronApp,
+          isDev,
+          isMobile: isMobile(),
+          ideVersionWithHash: getIDEVersionWithHash(),
+        });
+        gdevelopEditorAnalytics = module;
+      }
+    } catch (error) {
+      console.error('Error while loading GDevelop Editor Analytics:', error);
+    } finally {
+      // If loading fails, retry later.
+      gdevelopEditorAnalyticsPromise = null;
+    }
+  })();
+
+  return gdevelopEditorAnalyticsPromise;
+};
 
 export const setCurrentlyRunningInAppTutorial = (tutorial: string | null) =>
   (currentlyRunningInAppTutorial = tutorial);
@@ -55,24 +112,42 @@ const recordEvent = (name: string, metadata?: { [string]: any }) => {
     return;
   }
 
-  if (!posthogLoaded || !userIdentified) {
-    console.info(`App analytics not ready for an event - retrying in 2s.`);
-    setTimeout(() => {
-      console.info(
-        `Retrying to send the app analytics event with name ${name}`
-      );
-      recordEvent(name, metadata);
-    }, 2000);
+  (() => {
+    if (!posthogLoaded || !userIdentified) {
+      console.info(`App analytics not ready for an event - retrying in 2s.`);
+      setTimeout(() => {
+        console.info(
+          `Retrying to send the app analytics event with name ${name}`
+        );
+        recordEvent(name, metadata);
+      }, 2000);
 
-    return;
-  }
+      return;
+    }
 
-  posthog.capture(name, {
-    ...metadata,
-    isInAppTutorialRunning: currentlyRunningInAppTutorial,
-    isInDesktopApp: isElectronApp,
-    isInWebApp: !isElectronApp,
-  });
+    posthog.capture(name, {
+      ...metadata,
+      // Always add metadata about the app:
+      isInAppTutorialRunning: currentlyRunningInAppTutorial,
+      isInDesktopApp: isElectronApp,
+      isInWebApp: !isElectronApp,
+      appKind: isElectronApp
+        ? 'desktop-app'
+        : isNativeMobileApp()
+        ? 'mobile-app'
+        : 'web-app',
+      appVersion: getIDEVersion(),
+      appVersionWithHash: getIDEVersionWithHash(),
+      serviceWorkerSupported: isServiceWorkerSupported(),
+    });
+  })();
+
+  (async () => {
+    await ensureGDevelopEditorAnalyticsReady();
+    if (gdevelopEditorAnalytics) {
+      await gdevelopEditorAnalytics.trackEvent(name, metadata || {});
+    }
+  })();
 };
 
 /**
@@ -83,6 +158,10 @@ export const installAnalyticsEvents = () => {
     console.info('Development build - Analytics disabled');
     return;
   }
+
+  ensureGDevelopEditorAnalyticsReady().catch(() => {
+    // Will be retried when an event is sent.
+  });
 
   posthog.init('phc_yjTVz4BMHUOhCLBhVImjk3Jn1AjMCg808bxENY228qu', {
     api_host: 'https://app.posthog.com',
@@ -104,16 +183,6 @@ export const identifyUserForAnalytics = (
 ) => {
   if (isDev) {
     console.info('Development build - Analytics disabled');
-    return;
-  }
-
-  if (!posthogLoaded) {
-    console.info(`App analytics not ready - retrying in 2s.`);
-    setTimeout(() => {
-      console.info(`Retrying to update the user for app analytics.`);
-      identifyUserForAnalytics(authenticatedUser);
-    }, 2000);
-
     return;
   }
 
@@ -145,19 +214,39 @@ export const identifyUserForAnalytics = (
     hearFrom: profile ? profile.hearFrom : undefined,
   };
 
-  // Identify which user is using the app, after de-duplicating the call to
-  // avoid useless calls.
-  // This is so we can build stats on the used version, languages and usage
-  // of GDevelop features.
-  const stringifiedUserProperties = JSON.stringify(userProperties);
-  if (stringifiedUserProperties !== posthogLastPropertiesSent) {
-    // If the user is not logged in, identify the user by its anonymous UUID.
-    // If the user is logged in, identify the user by its Firebase ID.
-    const userId = firebaseUser ? firebaseUser.uid : getUserUUID();
-    posthog.identify(userId, userProperties);
-    posthogLastPropertiesSent = stringifiedUserProperties;
-    userIdentified = true;
-  }
+  // If the user is not logged in, identify the user by its anonymous UUID.
+  // If the user is logged in, identify the user by its Firebase ID.
+  const userId = firebaseUser ? firebaseUser.uid : getUserUUID();
+
+  (() => {
+    if (!posthogLoaded) {
+      console.info(`App analytics not ready - retrying in 2s.`);
+      setTimeout(() => {
+        console.info(`Retrying to update the user for app analytics.`);
+        identifyUserForAnalytics(authenticatedUser);
+      }, 2000);
+
+      return;
+    }
+
+    // Identify which user is using the app, after de-duplicating the call to
+    // avoid useless calls.
+    // This is so we can build stats on the used version, languages and usage
+    // of GDevelop features.
+    const stringifiedUserProperties = JSON.stringify(userProperties);
+    if (stringifiedUserProperties !== posthogLastPropertiesSent) {
+      posthog.identify(userId, userProperties);
+      posthogLastPropertiesSent = stringifiedUserProperties;
+      userIdentified = true;
+    }
+  })();
+
+  (async () => {
+    await ensureGDevelopEditorAnalyticsReady();
+    if (gdevelopEditorAnalytics) {
+      await gdevelopEditorAnalytics.identify(userId, userProperties);
+    }
+  })();
 };
 
 /**
@@ -225,17 +314,20 @@ export const sendExampleDetailsOpened = (slug: string) => {
 export const sendNewGameCreated = ({
   exampleUrl,
   exampleSlug,
-  isCourseChapterTemplate,
+  exampleCompositeSlug,
+  creationSource,
 }: {|
   exampleUrl: string,
   exampleSlug: string,
-  isCourseChapterTemplate?: true,
+  exampleCompositeSlug: string,
+  creationSource: NewProjectCreationSource,
 |}) => {
   recordEvent('new_game_creation', {
     platform: 'GDevelop JS Platform', // Hardcoded here for now
     templateName: exampleUrl,
     exampleSlug,
-    isCourseChapterTemplate,
+    exampleCompositeSlug,
+    creationSource,
   });
 };
 
@@ -261,6 +353,13 @@ export const sendInAppTutorialExited = (metadata: {|
   recordEvent('in-app-tutorial-exited', metadata);
 };
 
+const patchWithCurrencyField = (options: { [string]: any }) => {
+  return {
+    ...options,
+    currency: options.priceCurrency,
+  };
+};
+
 export const sendAssetPackOpened = (options: {|
   assetPackId: string | null,
   assetPackName: string,
@@ -276,36 +375,85 @@ export const sendAssetPackBuyClicked = (options: {|
   assetPackName: string,
   assetPackTag: string,
   assetPackKind: 'public' | 'private' | 'unknown',
-  currency?: string,
+  priceValue: number | void,
+  priceCurrency: string | void,
   usageType: string,
 |}) => {
-  recordEvent('asset_pack_buy_clicked', options);
+  recordEvent('asset_pack_buy_clicked', patchWithCurrencyField(options));
 };
 
 export const sendAssetPackInformationOpened = (options: {|
   assetPackId: string,
   assetPackName: string,
   assetPackKind: 'public' | 'private' | 'unknown',
+  priceValue: number | void,
+  priceCurrency: string | void,
 |}) => {
-  recordEvent('asset_pack_information_opened', options);
+  recordEvent('asset_pack_information_opened', patchWithCurrencyField(options));
 };
 
 export const sendGameTemplateBuyClicked = (options: {|
   gameTemplateId: string,
   gameTemplateName: string,
   gameTemplateTag: string,
-  currency?: string,
   usageType: string,
+  priceValue: number | void,
+  priceCurrency: string | void,
 |}) => {
-  recordEvent('game_template_buy_clicked', options);
+  recordEvent('game_template_buy_clicked', patchWithCurrencyField(options));
 };
 
 export const sendGameTemplateInformationOpened = (options: {|
   gameTemplateId: string,
   gameTemplateName: string,
   source: 'store' | 'examples-list' | 'homepage' | 'web-link',
+  priceValue: number | void,
+  priceCurrency: string | void,
 |}) => {
-  recordEvent('game_template_information_opened', options);
+  recordEvent(
+    'game_template_information_opened',
+    patchWithCurrencyField(options)
+  );
+};
+
+export const sendBundleBuyClicked = (options: {|
+  bundleId: string,
+  bundleName: string,
+  bundleTag: string,
+  usageType: string,
+  priceValue: number | void,
+  priceCurrency: string | void,
+|}) => {
+  recordEvent('bundle_buy_clicked', patchWithCurrencyField(options));
+};
+export const sendBundleInformationOpened = (options: {|
+  bundleId: string,
+  bundleName: string,
+  source: 'store' | 'learn' | 'web-link',
+  priceValue: number | void,
+  priceCurrency: string | void,
+|}) => {
+  recordEvent('bundle_information_opened', patchWithCurrencyField(options));
+};
+
+export const sendCourseInformationOpened = (options: {|
+  courseId: string,
+  courseName: string,
+  source: 'store' | 'learn',
+  priceValue: number | void,
+  priceCurrency: string | void,
+|}) => {
+  recordEvent('course_information_opened', patchWithCurrencyField(options));
+};
+
+export const sendCourseBuyClicked = (options: {|
+  courseId: string,
+  courseName: string,
+  usageType: string,
+  priceValue: number | void,
+  priceCurrency: string | void,
+|}) => {
+  recordEvent('course_buy_clicked', patchWithCurrencyField(options));
 };
 
 export const sendUserSurveyStarted = () => {
@@ -331,7 +479,8 @@ export const sendErrorMessage = (
     | 'error-boundary_mainframe'
     | 'error-boundary_list-search-result'
     | 'error-boundary_box-search-result'
-    | 'error-boundary_app',
+    | 'error-boundary_app'
+    | 'error-boundary_extension-loader',
   rawError: any,
   errorId: string
 ) => {
@@ -388,6 +537,26 @@ export type SubscriptionDialogDisplayReason =
   | 'Account get premium'
   | 'AI requests (subscribe)'
   | 'AI requests (upgrade)';
+
+export type SubscriptionPlacementId =
+  | 'builds'
+  | 'debugger'
+  | 'gdevelop-branding'
+  | 'generate-from-prompt'
+  | 'hot-reloading'
+  | 'leaderboards-customization'
+  | 'leaderboards'
+  | 'max-projects-reached'
+  | 'opening-from-link'
+  | 'preview-wifi'
+  | 'profile'
+  | 'invite-collaborators'
+  | 'version-history'
+  | 'claim-asset-pack'
+  | 'unlock-course-chapter'
+  | 'account-get-premium'
+  | 'education'
+  | 'ai-requests';
 
 export const sendSubscriptionDialogShown = (
   metadata: SubscriptionAnalyticsMetadata
@@ -680,4 +849,26 @@ export const sendPlaySectionOpened = () => {
   }
 
   recordEvent('play-section-opened');
+};
+
+export const sendAiRequestStarted = (metadata: {|
+  simplifiedProjectJsonLength: number,
+  projectSpecificExtensionsSummaryJsonLength: number,
+  payWithCredits: boolean,
+  storageProviderName: string | null,
+  mode: string,
+  aiRequestId: string,
+|}) => {
+  recordEvent('ai-request-started', metadata);
+};
+
+export const sendAiRequestMessageSent = (metadata: {|
+  simplifiedProjectJsonLength: number,
+  projectSpecificExtensionsSummaryJsonLength: number,
+  payWithCredits: boolean,
+  mode: string,
+  aiRequestId: string,
+  outputLength: number,
+|}) => {
+  recordEvent('ai-request-message-sent', metadata);
 };

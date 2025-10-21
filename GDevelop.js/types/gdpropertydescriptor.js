@@ -11,6 +11,9 @@ declare class gdPropertyDescriptor {
   getDescription(): string;
   setGroup(label: string): gdPropertyDescriptor;
   getGroup(): string;
+  clearChoices(): gdPropertyDescriptor;
+  addChoice(value: string, label: string): gdPropertyDescriptor;
+  getChoices(): gdVectorPropertyDescriptorChoice;
   addExtraInfo(type: string): gdPropertyDescriptor;
   setExtraInfo(info: gdVectorString): gdPropertyDescriptor;
   getExtraInfo(): gdVectorString;

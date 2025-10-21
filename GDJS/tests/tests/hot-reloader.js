@@ -93,12 +93,14 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
   /** @type {ObjectData & gdjs.CustomObjectConfiguration} */
   const defaultCustomObject = {
     type: 'MyExtension::MyCustomObject',
+    variant: '',
     name: 'MyCustomObject',
     behaviors: [],
     variables: [],
     effects: [],
     content: {},
     childrenContent: {},
+    isInnerAreaFollowingParentSize: false,
   };
 
   /** @type {LayerData} */
@@ -214,6 +216,7 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
       areaMaxZ: 0,
       _initialInnerArea: null,
       isInnerAreaFollowingParentSize: false,
+      variants: [],
     };
   };
 

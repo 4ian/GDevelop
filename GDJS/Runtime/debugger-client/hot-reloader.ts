@@ -222,7 +222,9 @@ namespace gdjs {
                 kind: 'fatal',
                 message:
                   'Unexpected error happened while hot-reloading: ' +
-                  error.message,
+                  error.message +
+                  '\n' +
+                  error.stack,
               });
             }
           })
@@ -346,7 +348,7 @@ namespace gdjs {
         // It can't actually happen.
         this._logs.push({
           kind: 'error',
-          message: "Can't hot-reload as no scene are opened.",
+          message: "Can't hot-reload as no scene is opened.",
         });
         return;
       }
@@ -472,13 +474,24 @@ namespace gdjs {
             newExternalLayoutData.associatedLayout
           );
 
+          const oldObjectDataList =
+            HotReloader.resolveCustomObjectConfigurations(
+              oldProjectData,
+              oldLayoutData ? oldLayoutData.objects : []
+            );
+          const newObjectDataList =
+            HotReloader.resolveCustomObjectConfigurations(
+              newProjectData,
+              newLayoutData ? newLayoutData.objects : []
+            );
+
           sceneStack._stack.forEach((runtimeScene) => {
             this._hotReloadRuntimeSceneInstances(
               oldProjectData,
               newProjectData,
               changedRuntimeBehaviors,
-              oldLayoutData ? oldLayoutData.objects : [],
-              newLayoutData ? newLayoutData.objects : [],
+              oldObjectDataList,
+              newObjectDataList,
               oldExternalLayoutData.instances,
               newExternalLayoutData.instances,
               runtimeScene
@@ -725,7 +738,6 @@ namespace gdjs {
           // scene (see `_hotReloadRuntimeInstanceContainer` call from
           // `_hotReloadRuntimeSceneInstances`).
           objects: mergedChildObjectDataList,
-          childrenContent: mergedChildObjectDataList,
         };
         return mergedObjectConfiguration;
       });
@@ -1376,7 +1388,7 @@ namespace gdjs {
         ) {
           // Instance was deleted (or object name changed, in which case it will be re-created later)
           if (runtimeObject) {
-            runtimeObject.deleteFromScene(runtimeInstanceContainer);
+            runtimeObject.deleteFromScene();
           }
         } else {
         }

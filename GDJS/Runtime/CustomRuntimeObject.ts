@@ -12,8 +12,23 @@ namespace gdjs {
 
   export type CustomObjectConfiguration = ObjectConfiguration & {
     animatable?: SpriteAnimationData[];
+    variant: string;
     childrenContent: { [objectName: string]: ObjectConfiguration & any };
+    isInnerAreaFollowingParentSize: boolean;
   };
+
+  export type CustomObjectNetworkSyncDataType = {
+    anim?: SpriteAnimatorNetworkSyncData;
+    ifx: boolean;
+    ify: boolean;
+    sx: float;
+    sy: float;
+    op: float;
+    cc?: [float, float];
+  };
+
+  export type CustomObjectNetworkSyncData = ObjectNetworkSyncData &
+    CustomObjectNetworkSyncDataType;
 
   /**
    * An object that contains other object.
@@ -92,34 +107,67 @@ namespace gdjs {
     }
 
     private _initializeFromObjectData(
-      objectData: ObjectData & CustomObjectConfiguration
+      customObjectData: ObjectData & CustomObjectConfiguration
     ) {
       const eventsBasedObjectData = this._runtimeScene
         .getGame()
-        .getEventsBasedObjectData(objectData.type);
+        .getEventsBasedObjectData(customObjectData.type);
       if (!eventsBasedObjectData) {
         logger.error(
-          `A CustomRuntimeObject was initialized (or re-initialized) from object data referring to an non existing events based object data with type "${objectData.type}".`
+          `A CustomRuntimeObject was initialized (or re-initialized) from object data referring to an non existing events based object data with type "${customObjectData.type}".`
         );
         return;
       }
+
+      if (!eventsBasedObjectData.defaultVariant) {
+        eventsBasedObjectData.defaultVariant = {
+          ...eventsBasedObjectData,
+          name: '',
+        };
+      }
+      // Legacy events-based objects don't have any instance in their default
+      // variant since there wasn't a graphical editor at the time.
+      // In this case, the editor doesn't allow to choose a variant, but a
+      // variant may have stayed after a user rolled back the extension.
+      // This variant must be ignored to match what the editor shows.
+      const isForcedToOverrideEventsBasedObjectChildrenConfiguration =
+        eventsBasedObjectData.defaultVariant.instances.length == 0;
+      let usedVariantData: EventsBasedObjectVariantData =
+        eventsBasedObjectData.defaultVariant;
+      if (
+        customObjectData.variant &&
+        !isForcedToOverrideEventsBasedObjectChildrenConfiguration
+      ) {
+        for (
+          let variantIndex = 0;
+          variantIndex < eventsBasedObjectData.variants.length;
+          variantIndex++
+        ) {
+          const variantData = eventsBasedObjectData.variants[variantIndex];
+          if (variantData.name === customObjectData.variant) {
+            usedVariantData = variantData;
+            break;
+          }
+        }
+      }
+
       this._isInnerAreaFollowingParentSize =
         eventsBasedObjectData.isInnerAreaFollowingParentSize;
-      if (eventsBasedObjectData.instances.length > 0) {
+      if (usedVariantData.instances.length > 0) {
         if (!this._innerArea) {
           this._innerArea = {
             min: [0, 0, 0],
             max: [0, 0, 0],
           };
         }
-        this._innerArea.min[0] = eventsBasedObjectData.areaMinX;
-        this._innerArea.min[1] = eventsBasedObjectData.areaMinY;
-        this._innerArea.min[2] = eventsBasedObjectData.areaMinZ;
-        this._innerArea.max[0] = eventsBasedObjectData.areaMaxX;
-        this._innerArea.max[1] = eventsBasedObjectData.areaMaxY;
-        this._innerArea.max[2] = eventsBasedObjectData.areaMaxZ;
+        this._innerArea.min[0] = usedVariantData.areaMinX;
+        this._innerArea.min[1] = usedVariantData.areaMinY;
+        this._innerArea.min[2] = usedVariantData.areaMinZ;
+        this._innerArea.max[0] = usedVariantData.areaMaxX;
+        this._innerArea.max[1] = usedVariantData.areaMaxY;
+        this._innerArea.max[2] = usedVariantData.areaMaxZ;
       }
-      this._instanceContainer.loadFrom(objectData, eventsBasedObjectData);
+      this._instanceContainer.loadFrom(customObjectData, usedVariantData);
     }
 
     protected abstract _createRender():
@@ -130,10 +178,12 @@ namespace gdjs {
     override reinitialize(objectData: ObjectData & CustomObjectConfiguration) {
       super.reinitialize(objectData);
 
-      this._initializeFromObjectData(objectData);
       this._reinitializeRenderer();
+      this._initializeFromObjectData(objectData);
 
-      // The generated code calls the onCreated super implementation at the end.
+      // When changing the variant, the instance is like a new instance.
+      // We call again `onCreated` at the end, like done by the constructor
+      // the first time it's created.
       this.onCreated();
     }
 
@@ -148,7 +198,97 @@ namespace gdjs {
           newObjectData.animatable || []
         );
       }
+      if (oldObjectData.variant !== newObjectData.variant) {
+        const width = this.getWidth();
+        const height = this.getHeight();
+        const hasInnerAreaChanged =
+          oldObjectData.isInnerAreaFollowingParentSize &&
+          this._instanceContainer._initialInnerArea &&
+          this._innerArea &&
+          (this._instanceContainer._initialInnerArea.min[0] !==
+            this._innerArea.min[0] ||
+            this._instanceContainer._initialInnerArea.min[1] !==
+              this._innerArea.min[1] ||
+            this._instanceContainer._initialInnerArea.max[0] !==
+              this._innerArea.max[0] ||
+            this._instanceContainer._initialInnerArea.max[1] !==
+              this._innerArea.max[1]);
+
+        this._reinitializeRenderer();
+        this._initializeFromObjectData(newObjectData);
+
+        // The generated code calls the onCreated super implementation at the end.
+        this.onCreated();
+
+        // Keep the custom size
+        if (hasInnerAreaChanged) {
+          this.setWidth(width);
+          this.setHeight(height);
+        }
+      }
       return true;
+    }
+
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): CustomObjectNetworkSyncData {
+      const animator = this.getAnimator();
+      const networkSyncData: CustomObjectNetworkSyncData = {
+        ...super.getNetworkSyncData(syncOptions),
+        ifx: this.isFlippedX(),
+        ify: this.isFlippedY(),
+        sx: this._scaleX,
+        sy: this._scaleY,
+        op: this.opacity,
+      };
+      if (animator) {
+        networkSyncData.anim = animator.getNetworkSyncData();
+      }
+      if (this._customCenter) {
+        networkSyncData.cc = this._customCenter;
+      }
+      return networkSyncData;
+    }
+
+    updateFromNetworkSyncData(
+      networkSyncData: CustomObjectNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
+    ) {
+      super.updateFromNetworkSyncData(networkSyncData, options);
+      if (networkSyncData.ifx !== undefined) {
+        this.flipX(networkSyncData.ifx);
+      }
+      if (networkSyncData.ify !== undefined) {
+        this.flipY(networkSyncData.ify);
+      }
+      if (networkSyncData.sx !== undefined) {
+        this.setScaleX(Math.abs(networkSyncData.sx));
+      }
+      if (networkSyncData.sy !== undefined) {
+        this.setScaleY(Math.abs(networkSyncData.sy));
+      }
+      if (networkSyncData.op !== undefined) {
+        this.setOpacity(networkSyncData.op);
+      }
+      if (networkSyncData.anim) {
+        const animator = this.getAnimator();
+        if (animator) {
+          animator.updateFromNetworkSyncData(networkSyncData.anim);
+        }
+      }
+      if (networkSyncData.cc) {
+        this.setRotationCenter(networkSyncData.cc[0], networkSyncData.cc[1]);
+      }
+      if (
+        networkSyncData.ifx !== undefined ||
+        networkSyncData.ify !== undefined ||
+        networkSyncData.sx !== undefined ||
+        networkSyncData.sy !== undefined ||
+        networkSyncData.anim !== undefined ||
+        networkSyncData.cc !== undefined
+      ) {
+        this.onChildrenLocationChanged();
+      }
     }
 
     override extraInitializationFromInitialInstance(
@@ -182,13 +322,18 @@ namespace gdjs {
       }
     }
 
-    override onDeletedFromScene(parent: gdjs.RuntimeInstanceContainer): void {
+    override onDeletedFromScene(): void {
       // Let subclasses do something before the object is destroyed.
-      this.onDestroy(parent);
+      this.onDestroy(this._runtimeScene);
       // Let behaviors do something before the object is destroyed.
-      super.onDeletedFromScene(parent);
+      super.onDeletedFromScene();
       // Destroy the children.
-      this._instanceContainer.onDestroyFromScene(parent);
+      this._instanceContainer.onDeletedFromScene(this._runtimeScene);
+    }
+
+    override onDestroyed(): void {
+      this._instanceContainer._destroy();
+      super.onDestroyed();
     }
 
     override update(parent: gdjs.RuntimeInstanceContainer): void {
@@ -205,12 +350,19 @@ namespace gdjs {
       if (profiler) {
         profiler.end(this.type);
       }
+    }
 
-      this._instanceContainer._updateObjectsPostEvents();
+    override stepBehaviorsPostEvents(
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ): void {
+      super.stepBehaviorsPostEvents(instanceContainer);
+      this._instanceContainer._stepBehaviorsPostEvents();
     }
 
     /**
      * This method is called when the preview is being hot-reloaded.
+     *
+     * Custom objects implement this method with code generated from events.
      */
     onHotReloading(parent: gdjs.RuntimeInstanceContainer) {}
 
@@ -219,6 +371,8 @@ namespace gdjs {
 
     /**
      * This method is called each tick after events are done.
+     *
+     * Custom objects implement this method with code generated from events.
      * @param parent The instanceContainer owning the object
      */
     doStepPostEvents(parent: gdjs.RuntimeInstanceContainer) {}
@@ -226,6 +380,8 @@ namespace gdjs {
     /**
      * This method is called when the object is being removed from its parent
      * container and is about to be destroyed/reused later.
+     *
+     * Custom objects implement this method with code generated from events.
      */
     onDestroy(parent: gdjs.RuntimeInstanceContainer) {}
 

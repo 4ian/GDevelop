@@ -20,12 +20,13 @@ import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMea
 import Download from '../../UI/CustomSvgIcons/Download';
 import Add from '../../UI/CustomSvgIcons/Add';
 import ErrorBoundary from '../../UI/ErrorBoundary';
+import useAlertDialog from '../../UI/Alert/useAlertDialog';
 
 type Props = {|
   project: gdProject,
   onClose: () => void,
-  onInstallExtension: ExtensionShortHeader => void,
-  onExtensionInstalled: (extensionName: string) => void,
+  onInstallExtension: (extensionName: string) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
   onCreateNew?: () => void,
 |};
 
@@ -54,6 +55,7 @@ const ExtensionsSearchDialog = ({
     TRIVIAL_FIRST_EXTENSION,
     installExtension
   );
+  const { showConfirmation, showAlert } = useAlertDialog();
 
   const installOrImportExtension = async (
     i18n: I18nType,
@@ -63,7 +65,7 @@ const ExtensionsSearchDialog = ({
     try {
       let installedOrImportedExtensionName: string | null = null;
       if (!!extensionShortHeader) {
-        onInstallExtension(extensionShortHeader);
+        onInstallExtension(extensionShortHeader.name);
         const wasExtensionInstalledOrImported = await installDisplayedExtension(
           i18n,
           project,
@@ -77,13 +79,16 @@ const ExtensionsSearchDialog = ({
         installedOrImportedExtensionName = await importExtension(
           i18n,
           eventsFunctionsExtensionsState,
-          project
+          project,
+          onInstallExtension,
+          showConfirmation,
+          showAlert
         );
       }
 
       if (installedOrImportedExtensionName) {
         setExtensionWasInstalled(true);
-        onExtensionInstalled(installedOrImportedExtensionName);
+        onExtensionInstalled([installedOrImportedExtensionName]);
         return true;
       }
 

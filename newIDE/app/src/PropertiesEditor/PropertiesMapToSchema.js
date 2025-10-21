@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { mapFor } from '../Utils/MapFor';
+import { mapFor, mapVector } from '../Utils/MapFor';
 import { type Schema, type Instance } from '.';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
 import { type Field } from '.';
@@ -103,14 +103,25 @@ const createField = (
     };
   } else if (valueType === 'choice') {
     // Choice is a "string" (with a selector for the user in the UI)
-    const choices = property
+    const choices = mapVector(property.getChoices(), choice => ({
+      value: choice.getValue(),
+      label:
+        choice.getValue() +
+        (choice.getLabel() && choice.getLabel() !== choice.getValue()
+          ? ` — ${choice.getLabel()}`
+          : ''),
+    }));
+
+    // TODO Remove this once we made sure no built-in extension still use `addExtraInfo` instead of `addChoice`.
+    const deprecatedChoices = property
       .getExtraInfo()
       .toJSArray()
       .map(value => ({ value, label: value }));
+
     return {
       name,
       valueType: 'string',
-      getChoices: () => choices,
+      getChoices: () => [...choices, ...deprecatedChoices],
       getValue: (instance: Instance): string => {
         return getProperties(instance)
           .get(name)
@@ -292,7 +303,7 @@ const propertyKeywordCouples: Array<Array<string>> = [
   ['Width', 'Height', 'Depth'],
   ['Top', 'Bottom'],
   ['Left', 'Right'],
-  ['Front', 'Back'],
+  ['Back', 'Front'],
   ['Up', 'Down'],
   ['Min', 'Max'],
   ['Low', 'High'],
@@ -305,6 +316,12 @@ const propertyKeywordCouples: Array<Array<string>> = [
   ['JumpSpeed', 'JumpSustainTime'],
   ['XGrabTolerance', 'YGrabOffset'],
   ['MaxSpeed', 'SlopeMaxAngle'],
+  ['Beginning', 'End'],
+  ['Start', 'End'],
+  ['Rear', 'Front'],
+  ['1', '2'],
+  ['3', '4'],
+  ['5', '6'],
 ];
 
 const uncapitalize = str => {

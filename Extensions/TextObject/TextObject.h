@@ -49,6 +49,12 @@ class GD_EXTENSION_API TextObject : public gd::ObjectConfiguration {
    */
   inline double GetCharacterSize() const { return characterSize; };
 
+  /** \brief Change the line height. */
+  inline void SetLineHeight(double value) { lineHeight = value; };
+
+  /** \brief Get the line height. */
+  inline double GetLineHeight() const { return lineHeight; };
+
   /** \brief Return the name of the font resource used for the text.
    */
   inline const gd::String& GetFontName() const { return fontName; };
@@ -120,6 +126,7 @@ class GD_EXTENSION_API TextObject : public gd::ObjectConfiguration {
 
   gd::String text;
   double characterSize;
+  double lineHeight;
   gd::String fontName;
   bool smoothed;
   bool bold, italic, underlined;

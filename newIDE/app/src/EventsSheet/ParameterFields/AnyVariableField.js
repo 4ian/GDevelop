@@ -133,6 +133,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             initiallySelectedVariableName={editorOpen.variableName}
             shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
             hotReloadPreviewButtonProps={null}
+            isListLocked={false}
           />
         )}
       </React.Fragment>

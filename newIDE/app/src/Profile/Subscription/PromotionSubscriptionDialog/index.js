@@ -24,14 +24,16 @@ import AlertMessage from '../../../UI/AlertMessage';
 
 type Props = {|
   onClose: Function,
-  subscriptionPlansWithPricingSystems: ?(SubscriptionPlanWithPricingSystems[]),
+  getAvailableSubscriptionPlansWithPrices: () =>
+    | SubscriptionPlanWithPricingSystems[]
+    | null,
   recommendedPlanId: string,
   onOpenPendingDialog: (open: boolean) => void,
 |};
 
 export default function PromotionSubscriptionDialog({
   onClose,
-  subscriptionPlansWithPricingSystems,
+  getAvailableSubscriptionPlansWithPrices,
   recommendedPlanId,
   onOpenPendingDialog,
 }: Props) {
@@ -79,6 +81,8 @@ export default function PromotionSubscriptionDialog({
     );
   };
 
+  const subscriptionPlansWithPricingSystems = getAvailableSubscriptionPlansWithPrices();
+
   const purchasablePlansWithPricingSystems = React.useMemo(
     () =>
       subscriptionPlansWithPricingSystems
@@ -121,10 +125,6 @@ export default function PromotionSubscriptionDialog({
     [purchasablePlansWithPricingSystems, selectedPlanId]
   );
 
-  if (!displayedPlan) {
-    return null;
-  }
-
   const isLoading = isRefreshing;
 
   return (
@@ -145,11 +145,12 @@ export default function PromotionSubscriptionDialog({
             flexColumnBody
             topBackgroundSrc={'res/premium/premium_dialog_background.png'}
           >
-            <ColumnStackLayout noMargin justifyContent="space-between" expand>
-              {!purchasablePlansWithPricingSystems ||
-              authenticatedUser.loginState === 'loggingIn' ? (
-                <PlaceholderLoader />
-              ) : (
+            {!purchasablePlansWithPricingSystems ||
+            !displayedPlan ||
+            authenticatedUser.loginState === 'loggingIn' ? (
+              <PlaceholderLoader />
+            ) : (
+              <ColumnStackLayout noMargin justifyContent="space-between" expand>
                 <ColumnStackLayout expand noMargin>
                   <PromotionSubscriptionPlan
                     onClickRedeemCode={
@@ -179,41 +180,41 @@ export default function PromotionSubscriptionDialog({
                     disabled={isLoading}
                   />
                 </ColumnStackLayout>
-              )}
-              <Line>
-                <ColumnStackLayout noMargin>
-                  <Column noMargin>
-                    <LineStackLayout noMargin>
-                      <Text size="sub-title">❤️</Text>
-                      <Text size="sub-title">
-                        <Trans>Support What You Love</Trans>
+                <Line>
+                  <ColumnStackLayout noMargin>
+                    <Column noMargin>
+                      <LineStackLayout noMargin>
+                        <Text size="sub-title">❤️</Text>
+                        <Text size="sub-title">
+                          <Trans>Support What You Love</Trans>
+                        </Text>
+                      </LineStackLayout>
+                      <Text size="body" color="secondary">
+                        <Trans>
+                          The GDevelop project is open-source, powered by
+                          passion and community. Your membership helps the
+                          GDevelop company maintain servers, build new features,
+                          develop commercial offerings and keep the open-source
+                          project thriving. Our goal: make game development
+                          fast, fun and accessible to all.
+                        </Trans>
                       </Text>
-                    </LineStackLayout>
-                    <Text size="body" color="secondary">
-                      <Trans>
-                        The GDevelop project is open-source, powered by passion
-                        and community. Your membership helps the GDevelop
-                        company maintain servers, build new features, develop
-                        commercial offerings and keep the open-source project
-                        thriving. Our goal: make game development fast, fun and
-                        accessible to all.
-                      </Trans>
-                    </Text>
-                  </Column>
-                  {getPlanSpecificRequirements(
-                    i18n,
-                    subscriptionPlansWithPricingSystems
-                  ).map(planSpecificRequirements => (
-                    <AlertMessage
-                      kind="info"
-                      key={planSpecificRequirements.substring(0, 25)}
-                    >
-                      {planSpecificRequirements}
-                    </AlertMessage>
-                  ))}
-                </ColumnStackLayout>
-              </Line>
-            </ColumnStackLayout>
+                    </Column>
+                    {getPlanSpecificRequirements(
+                      i18n,
+                      subscriptionPlansWithPricingSystems
+                    ).map(planSpecificRequirements => (
+                      <AlertMessage
+                        kind="info"
+                        key={planSpecificRequirements.substring(0, 25)}
+                      >
+                        {planSpecificRequirements}
+                      </AlertMessage>
+                    ))}
+                  </ColumnStackLayout>
+                </Line>
+              </ColumnStackLayout>
+            )}
           </Dialog>
           {redeemCodeDialogOpen && (
             <RedeemCodeDialog
@@ -223,11 +224,11 @@ export default function PromotionSubscriptionDialog({
 
                 if (hasJustRedeemedCode) {
                   try {
+                    onOpenPendingDialog(true);
                     setIsRefreshing(true);
                     await authenticatedUser.onRefreshSubscription();
                   } finally {
                     setIsRefreshing(false);
-                    onOpenPendingDialog(true);
                   }
                 }
               }}

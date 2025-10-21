@@ -2,12 +2,12 @@
 import axios from 'axios';
 import {
   GDevelopAssetApi,
+  GDevelopAssetCdn,
   GDevelopPrivateAssetsStorage,
   GDevelopPrivateGameTemplatesStorage,
   GDevelopPublicAssetResourcesStorageBaseUrl,
   GDevelopPublicAssetResourcesStorageStagingBaseUrl,
 } from './ApiConfigs';
-import semverSatisfies from 'semver/functions/satisfies';
 import { type MessageByLocale } from '../i18n/MessageByLocale';
 import { type Filters } from './Filters';
 import {
@@ -45,6 +45,10 @@ export type ExtensionDependency = {|
 export type ObjectAsset = {|
   object: any /*(serialized gdObjectConfiguration)*/,
   resources: Array<any /*(serialized gdResource)*/>,
+  variants?: Array<{
+    objectType: string,
+    variant: any /*(serialized gdEventsBasedObjectVariant)*/,
+  }>,
   // TODO This can become mandatory after the migration of the asset repository.
   requiredExtensions?: Array<ExtensionDependency>,
 |};
@@ -119,6 +123,7 @@ export type PrivateAssetPack = {|
   tag: string,
   longDescription: string,
   content: PrivateAssetPackContent,
+  includedPackIds?: Array<string>,
 |};
 
 export type PrivateGameTemplate = {|
@@ -130,6 +135,40 @@ export type PrivateGameTemplate = {|
   tag: string,
   longDescription: string,
   gamePreviewLink: string,
+  includedTemplateIds?: Array<string>,
+|};
+
+export type IncludedProduct = {|
+  productId: string,
+  usageType: string,
+  productType: 'ASSET_PACK' | 'GAME_TEMPLATE' | 'COURSE' | 'CREDITS_PACKAGE',
+|};
+
+export type IncludedRedemptionCode = {|
+  givenSubscriptionPlanId: string,
+  durationInDays: number,
+  estimatedPrices?: Array<{
+    value: number,
+    currency: 'USD' | 'EUR',
+  }>,
+|};
+
+export type Bundle = {|
+  id: string,
+  name: string,
+  nameByLocale: MessageByLocale,
+  createdAt: string,
+  updatedAt: string,
+  // If the bundle is archived, it will not be available for purchase anymore.
+  // But it will still be available for users who already purchased it.
+  archivedAt?: string,
+  categories: string[],
+  longDescription: string,
+  longDescriptionByLocale: MessageByLocale,
+  previewImageUrls: Array<string>,
+  tag: string,
+  includedProducts: Array<IncludedProduct>,
+  includedRedemptionCodes: Array<IncludedRedemptionCode>,
 |};
 
 export type PrivatePdfTutorial = {|
@@ -186,7 +225,7 @@ export type CourseChapterTask = {|
   answer?: { text?: string, imageUrls?: string[] },
 |};
 
-export type UnlockedCourseChapter = {|
+export type UnlockedVideoBasedCourseChapter = {|
   id: string,
   title: string,
   shortTitle?: string,
@@ -196,26 +235,127 @@ export type UnlockedCourseChapter = {|
   templateUrl: string,
   tasks: Array<CourseChapterTask>,
 |};
-export type LockedCourseChapter = {|
+
+export type TextBasedCourseChapterTextItem = {|
+  type: 'text',
+  text: string,
+|};
+
+export type TextBasedCourseChapterImageItem = {|
+  type: 'image',
+  url: string,
+  caption?: string,
+|};
+export type TextBasedCourseChapterVideoItem = {|
+  type: 'video',
+  url: string,
+  caption?: string,
+|};
+
+export type TextBasedCourseChapterCodeItem = {|
+  type: 'code',
+  code: string,
+  language?: string,
+|};
+
+export type TextBasedCourseChapterTableItem = {|
+  type: 'table',
+  header?: Array<string>,
+  rows: Array<Array<string>>,
+|};
+
+export type TextBasedCourseChapterTaskItem = {|
+  type: 'task',
+  title: string,
+  items: Array<
+    | TextBasedCourseChapterTextItem
+    | TextBasedCourseChapterImageItem
+    | TextBasedCourseChapterVideoItem
+    | TextBasedCourseChapterCodeItem
+    | TextBasedCourseChapterTableItem
+  >,
+  answer?: {
+    items: Array<
+      | TextBasedCourseChapterTextItem
+      | TextBasedCourseChapterImageItem
+      | TextBasedCourseChapterVideoItem
+      | TextBasedCourseChapterCodeItem
+      | TextBasedCourseChapterTableItem
+    >,
+  },
+|};
+
+export type UnlockedTextBasedCourseChapter = {|
+  id: string,
+  title: string,
+  shortTitle?: string,
+  isLocked?: false,
+  isFree?: boolean,
+  templates: Array<{| url: string, title?: string | null, id: string |}>,
+  items: Array<
+    | TextBasedCourseChapterTextItem
+    | TextBasedCourseChapterImageItem
+    | TextBasedCourseChapterTaskItem
+    | TextBasedCourseChapterVideoItem
+    | TextBasedCourseChapterCodeItem
+    | TextBasedCourseChapterTableItem
+  >,
+|};
+
+export type LockedVideoBasedCourseChapter = {|
+  isLocked: true,
+  isFree?: boolean,
+  // If not set, cannot be purchased with credits.
+  priceInCredits?: number,
+  productId: string,
+
   id: string,
   title: string,
   shortTitle?: string,
   videoUrl: string,
-  isLocked: true,
-  isFree?: boolean,
-  priceInCredits?: number,
-  productId: string,
 |};
 
-export type CourseChapter = LockedCourseChapter | UnlockedCourseChapter;
+export type LockedTextBasedCourseChapter = {|
+  isLocked: true,
+  isFree?: boolean,
+  // If not set, cannot be purchased with credits.
+  priceInCredits?: number,
+  productId: string,
+
+  id: string,
+  title: string,
+  shortTitle?: string,
+|};
+
+export type VideoBasedCourseChapter =
+  | LockedVideoBasedCourseChapter
+  | UnlockedVideoBasedCourseChapter;
+
+export type TextBasedCourseChapter =
+  | LockedTextBasedCourseChapter
+  | UnlockedTextBasedCourseChapter;
+
+export type CourseChapter =
+  | LockedVideoBasedCourseChapter
+  | LockedTextBasedCourseChapter
+  | UnlockedVideoBasedCourseChapter
+  | UnlockedTextBasedCourseChapter;
 
 export type Course = {|
   id: string,
+  durationInWeeks: number,
+  chaptersTargetCount: number,
+  specializationId: 'game-development' | 'interaction-design' | 'marketing',
+  newUntil?: number,
+
+  imageUrlByLocale: MessageByLocale,
   titleByLocale: MessageByLocale,
   shortDescriptionByLocale: MessageByLocale,
   levelByLocale: MessageByLocale,
-  durationInWeeks: number,
-  chaptersTargetCount: number,
+  introByLocale?: MessageByLocale,
+
+  isLocked?: boolean,
+  includedInSubscriptions: string[],
 |};
 
 export type UserCourseProgress = {|
@@ -238,19 +378,6 @@ export const doesAssetPackContainAudio = (
   assetPack: PrivateAssetPack
 ): boolean => !!assetPack.content.audio && assetPack.content.audio > 0;
 
-/**
- * Check if the IDE version, passed as argument, satisfy the version required by the asset.
- */
-export const isCompatibleWithGDevelopVersion = (
-  ideVersion: string,
-  assetRequiredGDevelopVersion: ?string
-) =>
-  assetRequiredGDevelopVersion
-    ? semverSatisfies(ideVersion, assetRequiredGDevelopVersion, {
-        includePrerelease: true,
-      })
-    : true;
-
 export const listAllPublicAssets = async ({
   environment,
 }: {|
@@ -262,7 +389,20 @@ export const listAllPublicAssets = async ({
     },
   });
 
-  const { assetShortHeadersUrl, filtersUrl, assetPacksUrl } = response.data;
+  const {
+    assetShortHeadersUrl,
+    filtersUrl,
+    assetPacksUrl,
+    assetCdn,
+  } = response.data;
+
+  // Overwrite the CDN from where public assets are served.
+  if (assetCdn.baseUrl) {
+    GDevelopAssetCdn.baseUrl['live'] =
+      assetCdn.baseUrl['live'] || GDevelopAssetCdn.baseUrl['live'];
+    GDevelopAssetCdn.baseUrl['staging'] =
+      assetCdn.baseUrl['staging'] || GDevelopAssetCdn.baseUrl['staging'];
+  }
 
   const responsesData = await Promise.all([
     client
@@ -304,16 +444,11 @@ export const getPublicAsset = async (
   assetShortHeader: AssetShortHeader,
   { environment }: {| environment: Environment |}
 ): Promise<Asset> => {
-  const response = await client.get(`/asset/${assetShortHeader.id}`, {
-    params: {
-      environment,
-    },
-  });
-  if (!response.data.assetUrl) {
-    throw new Error('Unexpected response from the asset endpoint.');
-  }
-
-  const assetResponse = await client.get(response.data.assetUrl);
+  const assetResponse = await client.get(
+    `${GDevelopAssetCdn.baseUrl[environment]}/assets/${
+      assetShortHeader.id
+    }.json`
+  );
   return assetResponse.data;
 };
 
@@ -435,6 +570,11 @@ export const getPrivateGameTemplate = async (
   return response.data;
 };
 
+export const getBundle = async (bundleId: string): Promise<Bundle> => {
+  const response = await client.get(`/bundle/${bundleId}`);
+  return response.data;
+};
+
 export const getPrivatePdfTutorial = async (
   getAuthorizationHeader: () => Promise<string>,
   {
@@ -534,6 +674,22 @@ export const listReceivedGameTemplates = async (
   return response.data;
 };
 
+export const listReceivedBundles = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+  }: {|
+    userId: string,
+  |}
+): Promise<Array<Bundle>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.get('/bundle', {
+    headers: { Authorization: authorizationHeader },
+    params: { userId },
+  });
+  return response.data;
+};
+
 export const isPublicAssetResourceUrl = (url: string) =>
   url.startsWith(GDevelopPublicAssetResourcesStorageBaseUrl) ||
   url.startsWith(GDevelopPublicAssetResourcesStorageStagingBaseUrl);
@@ -561,7 +717,27 @@ export const extractDecodedFilenameWithExtensionFromPublicAssetResourceUrl = (
   return decodedFilenameWithExtension;
 };
 
-export const listCourses = async (): Promise<Array<Course>> => {
+export const listCourses = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+  }: {|
+    userId: ?string,
+  |}
+): Promise<Array<Course>> => {
+  if (userId) {
+    const authorizationHeader = await getAuthorizationHeader();
+
+    const response = await client.get(`/course`, {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    });
+    return response.data;
+  }
   const response = await client.get(`/course`);
   return response.data;
 };
@@ -571,11 +747,11 @@ export const listCourseChapters = async (
   {
     userId,
     courseId,
-    lang,
+    language,
   }: {|
     userId: ?string,
     courseId: string,
-    lang: string,
+    language: string,
   |}
 ): Promise<Array<CourseChapter>> => {
   if (userId) {
@@ -584,7 +760,7 @@ export const listCourseChapters = async (
     const response = await client.get(`/course/${courseId}/chapter`, {
       params: {
         userId,
-        lang,
+        language,
       },
       headers: {
         Authorization: authorizationHeader,
@@ -592,6 +768,30 @@ export const listCourseChapters = async (
     });
     return response.data;
   }
-  const response = await client.get(`/course/${courseId}/chapter`);
+  const response = await client.get(`/course/${courseId}/chapter`, {
+    params: { language },
+  });
   return response.data;
+};
+
+export const getCourseChapterRatingUrl = ({
+  courseId,
+  chapterId,
+  userId,
+  language,
+}: {|
+  courseId: string,
+  chapterId: string,
+  userId: string,
+  language: string,
+|}): string => {
+  const url = new URL(
+    `${
+      GDevelopAssetApi.baseUrl
+    }/course/${courseId}/chapter/${chapterId}/action/redirect-to-rating`
+  );
+
+  url.searchParams.set('userId', userId);
+  url.searchParams.set('language', language);
+  return url.toString();
 };

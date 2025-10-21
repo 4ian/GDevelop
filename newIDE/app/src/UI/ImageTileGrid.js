@@ -1,7 +1,5 @@
 // @flow
 import * as React from 'react';
-import { createStyles, makeStyles } from '@material-ui/core/styles';
-import ButtonBase from '@material-ui/core/ButtonBase';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import { Column, Line } from './Grid';
@@ -17,9 +15,14 @@ import { shortenString } from '../Utils/StringHelpers';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { useIsMounted } from '../Utils/UseIsMounted';
 import Lock from '../UI/CustomSvgIcons/Lock';
+import {
+  CardWidget,
+  LARGE_WIDGET_SIZE,
+} from '../MainFrame/EditorContainers/HomePage/CardWidget';
+import { ColumnStackLayout } from './Layout';
+import Chip from './Chip';
 
-const MAX_TILE_SIZE = 300;
-const SPACING = 8;
+const SPACING = 5;
 
 const styles = {
   buttonStyle: {
@@ -41,14 +44,9 @@ const styles = {
     marginTop: 0,
     marginBottom: 0,
   },
-  titleContainerWithMinHeight: {
-    // Fix min height to ensure the content stays aligned.
-    // 2 line heights (20) + 2 text paddings (6)
-    minHeight: 2 * 20 + 2 * 6,
-  },
   thumbnailImageWithDescription: {
     display: 'block', // Display as a block to prevent cumulative layout shift.
-    objectFit: 'cover',
+    objectFit: 'contain',
     verticalAlign: 'middle',
     width: '100%',
     borderRadius: 8,
@@ -80,19 +78,16 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
   },
+  textContainer: {
+    flex: 1,
+    display: 'flex',
+    justifyContent: 'center',
+    padding: '8px 16px',
+  },
+  chip: {
+    height: 24,
+  },
 };
-
-// Styles to give a visible hover for the mouse cursor.
-const useStylesForTileHover = makeStyles(theme =>
-  createStyles({
-    tile: {
-      transition: 'transform 0.3s ease-in-out',
-      '&:hover': {
-        transform: 'scale(1.02)',
-      },
-    },
-  })
-);
 
 type OverlayTextPosition =
   | 'topLeft'
@@ -143,6 +138,8 @@ export type ImageTileComponent = {|
   description?: string,
   overlayText?: string | React.Node,
   overlayTextPosition?: OverlayTextPosition,
+  chipText?: string | null,
+  chipColor?: string | null, // Color for the chip border.
 |};
 
 type ImageTileGridProps = {|
@@ -165,7 +162,6 @@ const ImageTileGrid = ({
   getLimitFromWindowSize,
 }: ImageTileGridProps) => {
   const { windowSize, isLandscape } = useResponsiveWindowSize();
-  const tileClasses = useStylesForTileHover();
   const MAX_COLUMNS = getColumnsFromWindowSize('xlarge', isLandscape);
   const limit = getLimitFromWindowSize
     ? getLimitFromWindowSize(windowSize, isLandscape)
@@ -196,7 +192,7 @@ const ImageTileGrid = ({
         cols={columns}
         style={{
           flex: 1,
-          maxWidth: (MAX_TILE_SIZE + 2 * SPACING) * MAX_COLUMNS, // Avoid tiles taking too much space on large screens.
+          maxWidth: (LARGE_WIDGET_SIZE + 2 * SPACING) * MAX_COLUMNS, // Avoid tiles taking too much space on large screens.
         }}
         cellHeight="auto"
         spacing={SPACING * 2}
@@ -204,7 +200,7 @@ const ImageTileGrid = ({
         {isLoading
           ? new Array(columns).fill(0).map((_, index) => (
               // Display tiles but with skeletons while the data is loading.
-              <GridListTile key={index} classes={tileClasses}>
+              <GridListTile key={index}>
                 <Skeleton
                   variant="rect"
                   width="100%"
@@ -214,13 +210,8 @@ const ImageTileGrid = ({
               </GridListTile>
             ))
           : itemsToDisplay.map((item, index) => (
-              <GridListTile key={index} classes={tileClasses}>
-                <ButtonBase
-                  style={styles.buttonStyle}
-                  onClick={item.onClick}
-                  tabIndex={0}
-                  focusRipple
-                >
+              <GridListTile key={index}>
+                <CardWidget onClick={item.onClick} size="large">
                   <Column expand noMargin>
                     <div style={styles.imageContainer}>
                       {!loadedImageUrls.current.has(item.imageUrl) ? (
@@ -252,24 +243,57 @@ const ImageTileGrid = ({
                       )}
                       {item.isLocked && <LockedOverlay />}
                     </div>
-                    {item.title && (
-                      <div
-                        style={
-                          columns === 1
-                            ? undefined
-                            : styles.titleContainerWithMinHeight
-                        }
+                    <div style={styles.textContainer}>
+                      <ColumnStackLayout
+                        noMargin
+                        expand
+                        justifyContent="space-between"
+                        useFullHeight
+                        noOverflowParent
                       >
-                        <Text size="sub-title">{item.title}</Text>
-                      </div>
-                    )}
-                    {item.description && (
-                      <Text size="body" color="secondary">
-                        {shortenString(item.description, 120)}
-                      </Text>
-                    )}
+                        <ColumnStackLayout
+                          noMargin
+                          expand
+                          justifyContent="flex-start"
+                          useFullHeight
+                          noOverflowParent
+                        >
+                          {item.title && (
+                            <Text size="sub-title" noMargin align="left">
+                              {item.title}
+                            </Text>
+                          )}
+                          {item.description && (
+                            <Text
+                              size="body"
+                              color="secondary"
+                              noMargin
+                              align="left"
+                            >
+                              {shortenString(item.description, 115)}
+                            </Text>
+                          )}
+                        </ColumnStackLayout>
+                        {item.chipText && (
+                          <Line
+                            justifyContent="space-between"
+                            alignItems="flex-end"
+                          >
+                            <Chip
+                              style={{
+                                ...styles.chip,
+                                border: `1px solid ${item.chipColor ||
+                                  '#3BF7F4'}`,
+                              }}
+                              label={item.chipText}
+                              variant="outlined"
+                            />
+                          </Line>
+                        )}
+                      </ColumnStackLayout>
+                    </div>
                   </Column>
-                </ButtonBase>
+                </CardWidget>
               </GridListTile>
             ))}
       </GridList>

@@ -3,6 +3,10 @@ import * as React from 'react';
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
+  type SceneEventsOutsideEditorChanges,
+  type InstancesOutsideEditorChanges,
+  type ObjectsOutsideEditorChanges,
+  type ObjectGroupsOutsideEditorChanges,
 } from './BaseEditor';
 import { prepareInstancesEditorSettings } from '../../InstancesEditor/InstancesEditorSettings';
 import {
@@ -12,6 +16,10 @@ import {
 import SceneEditor from '../../SceneEditor';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../../Utils/Serializer';
 
 const gd: libGDevelop = global.gd;
 
@@ -106,23 +114,43 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     // No thing to be done.
   }
 
+  onSceneObjectsDeleted(scene: gdLayout) {
+    // No thing to be done.
+  }
+
+  onSceneEventsModifiedOutsideEditor(changes: SceneEventsOutsideEditorChanges) {
+    // No thing to be done.
+  }
+
+  onInstancesModifiedOutsideEditor(changes: InstancesOutsideEditorChanges) {
+    // No thing to be done.
+  }
+
+  onObjectsModifiedOutsideEditor(changes: ObjectsOutsideEditorChanges) {
+    // No thing to be done.
+  }
+
+  onObjectGroupsModifiedOutsideEditor(
+    changes: ObjectGroupsOutsideEditorChanges
+  ) {
+    // No thing to be done.
+  }
+
   saveUiSettings = () => {
-    // const layout = this.getCustomObject();
-    // const editor = this.editor;
-    // if (editor && layout) {
-    //   unserializeFromJSObject(
-    //     layout.getAssociatedEditorSettings(),
-    //     editor.getInstancesEditorSettings()
-    //   );
-    // }
+    const variant = this.getVariant();
+    const editor = this.editor;
+    if (editor && variant) {
+      unserializeFromJSObject(
+        variant.getAssociatedEditorSettings(),
+        editor.getInstancesEditorSettings()
+      );
+    }
   };
 
   getEventsFunctionsExtension(): ?gdEventsFunctionsExtension {
     const { project, projectItemName } = this.props;
     if (!project || !projectItemName) return null;
-    const extensionName = gd.PlatformExtension.getExtensionFromFullObjectType(
-      projectItemName
-    );
+    const extensionName = projectItemName.split('::')[0] || '';
 
     if (!project.hasEventsFunctionsExtensionNamed(extensionName)) {
       return null;
@@ -144,14 +172,30 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     const extension = this.getEventsFunctionsExtension();
     if (!extension) return null;
 
-    const eventsBasedObjectName = gd.PlatformExtension.getObjectNameFromFullObjectType(
-      projectItemName
-    );
+    const eventsBasedObjectName = projectItemName.split('::')[1] || '';
 
     if (!extension.getEventsBasedObjects().has(eventsBasedObjectName)) {
       return null;
     }
     return extension.getEventsBasedObjects().get(eventsBasedObjectName);
+  }
+
+  getVariantName(): string {
+    const { projectItemName } = this.props;
+    return (projectItemName && projectItemName.split('::')[2]) || '';
+  }
+
+  getVariant(): ?gdEventsBasedObjectVariant {
+    const { project, projectItemName } = this.props;
+    if (!project || !projectItemName) return null;
+
+    const eventsBasedObject = this.getEventsBasedObject();
+    if (!eventsBasedObject) return null;
+
+    const variantName = projectItemName.split('::')[2] || '';
+    return eventsBasedObject.getVariants().hasVariantNamed(variantName)
+      ? eventsBasedObject.getVariants().getVariant(variantName)
+      : eventsBasedObject.getDefaultVariant();
   }
 
   getEventsBasedObjectName(): ?string {
@@ -176,6 +220,9 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     const eventsBasedObject = this.getEventsBasedObject();
     if (!eventsBasedObject) return null;
 
+    const variant = this.getVariant();
+    if (!variant) return null;
+
     const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
       {
         project,
@@ -197,14 +244,18 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           layout={null}
           eventsFunctionsExtension={eventsFunctionsExtension}
           eventsBasedObject={eventsBasedObject}
+          eventsBasedObjectVariant={variant}
           globalObjectsContainer={null}
-          objectsContainer={eventsBasedObject.getObjects()}
-          layersContainer={eventsBasedObject.getLayers()}
-          initialInstances={eventsBasedObject.getInitialInstances()}
+          objectsContainer={variant.getObjects()}
+          layersContainer={variant.getLayers()}
+          initialInstances={variant.getInitialInstances()}
           getInitialInstancesEditorSettings={() =>
             prepareInstancesEditorSettings(
-              {}, // TODO
-              1024 // TODO
+              serializeToJSObject(variant.getAssociatedEditorSettings()),
+              Math.max(
+                variant.getAreaMaxX() - variant.getAreaMinX(),
+                variant.getAreaMaxY() - variant.getAreaMinY()
+              )
             )
           }
           onOpenEvents={() =>
@@ -216,13 +267,30 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           isActive={isActive}
           hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           openBehaviorEvents={this.props.openBehaviorEvents}
-          onObjectEdited={this.props.onEventsBasedObjectChildrenEdited}
+          onObjectEdited={() =>
+            this.props.onEventsBasedObjectChildrenEdited(eventsBasedObject)
+          }
+          onObjectsDeleted={() =>
+            this.props.onEventsBasedObjectChildrenEdited(eventsBasedObject)
+          }
+          onObjectGroupEdited={() =>
+            this.props.onEventsBasedObjectChildrenEdited(eventsBasedObject)
+          }
+          onObjectGroupsDeleted={() =>
+            this.props.onEventsBasedObjectChildrenEdited(eventsBasedObject)
+          }
           onEventsBasedObjectChildrenEdited={
             this.props.onEventsBasedObjectChildrenEdited
           }
           onExtractAsEventBasedObject={this.props.onExtractAsEventBasedObject}
           onOpenEventBasedObjectEditor={this.props.onOpenEventBasedObjectEditor}
+          onOpenEventBasedObjectVariantEditor={
+            this.props.onOpenEventBasedObjectVariantEditor
+          }
           onExtensionInstalled={this.props.onExtensionInstalled}
+          onDeleteEventsBasedObjectVariant={
+            this.props.onDeleteEventsBasedObjectVariant
+          }
         />
       </div>
     );

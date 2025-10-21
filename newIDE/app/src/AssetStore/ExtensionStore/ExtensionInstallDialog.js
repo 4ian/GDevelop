@@ -8,8 +8,13 @@ import {
   type ExtensionHeader,
   type BehaviorShortHeader,
   getExtensionHeader,
-  isCompatibleWithExtension,
 } from '../../Utils/GDevelopServices/Extension';
+import {
+  getBreakingChanges,
+  formatOldBreakingChanges,
+  formatBreakingChanges,
+  isCompatibleWithGDevelopVersion,
+} from '../../Utils/Extension/ExtensionCompatibilityChecker.js';
 import LeftLoader from '../../UI/LeftLoader';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import PlaceholderError from '../../UI/PlaceholderError';
@@ -26,6 +31,7 @@ import Window from '../../Utils/Window';
 import { useExtensionUpdate } from './UseExtensionUpdates';
 import HelpButton from '../../UI/HelpButton';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
+import { Accordion, AccordionHeader, AccordionBody } from '../../UI/Accordion';
 
 export const useOutOfDateAlertDialog = () => {
   const { showConfirmation } = useAlertDialog();
@@ -84,6 +90,21 @@ const ExtensionInstallDialog = ({
     ? installedExtension.getOriginName() === 'gdevelop-extension-store'
     : false;
 
+  const newBreakingChangesText = installedExtension
+    ? formatBreakingChanges(
+        getBreakingChanges(
+          installedExtension.getVersion(),
+          extensionShortHeader
+        )
+      )
+    : null;
+  const oldBreakingChangesText = installedExtension
+    ? formatOldBreakingChanges(
+        installedExtension.getVersion(),
+        extensionShortHeader
+      )
+    : null;
+
   const extensionUpdate = useExtensionUpdate(project, extensionShortHeader);
 
   const [error, setError] = React.useState<?Error>(null);
@@ -109,9 +130,9 @@ const ExtensionInstallDialog = ({
 
   React.useEffect(() => loadExtensionheader(), [loadExtensionheader]);
 
-  const isCompatible = isCompatibleWithExtension(
+  const isCompatible = isCompatibleWithGDevelopVersion(
     getIDEVersion(),
-    extensionShortHeader
+    extensionShortHeader.gdevelopVersion
   );
 
   const canInstallExtension = !isInstalling && isCompatible;
@@ -180,7 +201,7 @@ const ExtensionInstallDialog = ({
                     installedExtension &&
                     extensionShortHeader.version !==
                       installedExtension.getVersion() ? (
-                      extensionShortHeader.tier === 'community' ? (
+                      extensionShortHeader.tier === 'experimental' ? (
                         <Trans>Update (could break the project)</Trans>
                       ) : (
                         <Trans>Update</Trans>
@@ -281,15 +302,13 @@ const ExtensionInstallDialog = ({
             isStandaloneText
           />
         )}
-        {extensionShortHeader.tier === 'community' && (
+        {extensionShortHeader.tier === 'experimental' && (
           <AlertMessage kind="warning">
             <Trans>
-              This is an extension made by a community member — but not reviewed
-              by the GDevelop extension team. As such, we can't guarantee it
-              meets all the quality standards of official extensions. It could
-              also not be compatible with older GDevelop versions. In case of
-              doubt, contact the author to know more about what the extension
-              does or inspect its content before using it.
+              This is an extension made by a community member and it only got
+              through a light review by the GDevelop extension team. As such, we
+              can't guarantee it meets all the quality standards of fully
+              reviewed extensions.
             </Trans>
           </AlertMessage>
         )}
@@ -310,6 +329,26 @@ const ExtensionInstallDialog = ({
               or try again later.
             </Trans>
           </PlaceholderError>
+        )}
+        {newBreakingChangesText && (
+          <>
+            <Text size="sub-title">
+              <Trans>Breaking changes</Trans>
+            </Text>
+            <MarkdownText source={newBreakingChangesText} isStandaloneText />
+          </>
+        )}
+        {oldBreakingChangesText && (
+          <Accordion noMargin>
+            <AccordionHeader noMargin>
+              <Text size="sub-title">
+                <Trans>Previous breaking changes (no longer relevant)</Trans>
+              </Text>
+            </AccordionHeader>
+            <AccordionBody disableGutters>
+              <MarkdownText source={oldBreakingChangesText} isStandaloneText />
+            </AccordionBody>
+          </Accordion>
         )}
       </ColumnStackLayout>
     </Dialog>

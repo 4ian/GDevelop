@@ -116,48 +116,7 @@ namespace gdjs {
 
     _updateLocalPositions() {
       const obj = this._object;
-      this._centerSprite.position.x = obj._lBorder;
-      this._centerSprite.position.y = obj._tBorder;
 
-      //Right
-      this._borderSprites[0].position.x = obj._width - obj._rBorder;
-      this._borderSprites[0].position.y = obj._tBorder;
-
-      //Top-right
-      this._borderSprites[1].position.x =
-        obj._width - this._borderSprites[1].width;
-      this._borderSprites[1].position.y = 0;
-
-      //Top
-      this._borderSprites[2].position.x = obj._lBorder;
-      this._borderSprites[2].position.y = 0;
-
-      //Top-Left
-      this._borderSprites[3].position.x = 0;
-      this._borderSprites[3].position.y = 0;
-
-      //Left
-      this._borderSprites[4].position.x = 0;
-      this._borderSprites[4].position.y = obj._tBorder;
-
-      //Bottom-Left
-      this._borderSprites[5].position.x = 0;
-      this._borderSprites[5].position.y =
-        obj._height - this._borderSprites[5].height;
-
-      //Bottom
-      this._borderSprites[6].position.x = obj._lBorder;
-      this._borderSprites[6].position.y = obj._height - obj._bBorder;
-
-      //Bottom-Right
-      this._borderSprites[7].position.x =
-        obj._width - this._borderSprites[7].width;
-      this._borderSprites[7].position.y =
-        obj._height - this._borderSprites[7].height;
-    }
-
-    _updateSpritesAndTexturesSize() {
-      const obj = this._object;
       this._centerSprite.width = Math.max(
         obj._width - obj._rBorder - obj._lBorder,
         0
@@ -167,35 +126,107 @@ namespace gdjs {
         0
       );
 
+      let leftMargin = obj._lBorder;
+      let rightMargin = obj._rBorder;
+      if (this._centerSprite.width === 0 && obj._lBorder + obj._rBorder > 0) {
+        leftMargin =
+          (obj._width * obj._lBorder) / (obj._lBorder + obj._rBorder);
+        rightMargin = obj._width - leftMargin;
+      }
+      let topMargin = obj._tBorder;
+      let bottomMargin = obj._bBorder;
+      if (this._centerSprite.height === 0 && obj._tBorder + obj._bBorder > 0) {
+        topMargin =
+          (obj._height * obj._tBorder) / (obj._tBorder + obj._bBorder);
+        bottomMargin = obj._height - topMargin;
+      }
+
       //Right
-      this._borderSprites[0].width = obj._rBorder;
+      this._borderSprites[0].width = rightMargin;
       this._borderSprites[0].height = Math.max(
-        obj._height - obj._tBorder - obj._bBorder,
+        obj._height - topMargin - bottomMargin,
         0
       );
 
       //Top
-      this._borderSprites[2].height = obj._tBorder;
+      this._borderSprites[2].height = topMargin;
       this._borderSprites[2].width = Math.max(
-        obj._width - obj._rBorder - obj._lBorder,
+        obj._width - rightMargin - leftMargin,
         0
       );
 
       //Left
-      this._borderSprites[4].width = obj._lBorder;
+      this._borderSprites[4].width = leftMargin;
       this._borderSprites[4].height = Math.max(
-        obj._height - obj._tBorder - obj._bBorder,
+        obj._height - topMargin - bottomMargin,
         0
       );
 
       //Bottom
-      this._borderSprites[6].height = obj._bBorder;
+      this._borderSprites[6].height = bottomMargin;
       this._borderSprites[6].width = Math.max(
-        obj._width - obj._rBorder - obj._lBorder,
+        obj._width - rightMargin - leftMargin,
         0
       );
+
+      //Top-right
+      this._borderSprites[1].width = rightMargin;
+      this._borderSprites[1].height = topMargin;
+
+      //Top-Left
+      this._borderSprites[3].width = leftMargin;
+      this._borderSprites[3].height = topMargin;
+
+      //Bottom-Left
+      this._borderSprites[5].width = leftMargin;
+      this._borderSprites[5].height = bottomMargin;
+
+      //Bottom-Right
+      this._borderSprites[7].width = rightMargin;
+      this._borderSprites[7].height = bottomMargin;
+
       this._wasRendered = true;
       this._spritesContainer.cacheAsBitmap = false;
+
+      const leftBorder = leftMargin;
+      const topBorder = topMargin;
+      const rightBorder = obj._width - rightMargin;
+      const bottomBorder = obj._height - bottomMargin;
+
+      this._centerSprite.position.x = leftBorder;
+      this._centerSprite.position.y = topBorder;
+
+      //Right
+      this._borderSprites[0].position.x = rightBorder;
+      this._borderSprites[0].position.y = topBorder;
+
+      //Top-right
+      this._borderSprites[1].position.x = rightBorder;
+      this._borderSprites[1].position.y = 0;
+
+      //Top
+      this._borderSprites[2].position.x = leftBorder;
+      this._borderSprites[2].position.y = 0;
+
+      //Top-Left
+      this._borderSprites[3].position.x = 0;
+      this._borderSprites[3].position.y = 0;
+
+      //Left
+      this._borderSprites[4].position.x = 0;
+      this._borderSprites[4].position.y = topBorder;
+
+      //Bottom-Left
+      this._borderSprites[5].position.x = 0;
+      this._borderSprites[5].position.y = bottomBorder;
+
+      //Bottom
+      this._borderSprites[6].position.x = leftBorder;
+      this._borderSprites[6].position.y = bottomBorder;
+
+      //Bottom-Right
+      this._borderSprites[7].position.x = rightBorder;
+      this._borderSprites[7].position.y = bottomBorder;
     }
 
     setTexture(
@@ -340,7 +371,6 @@ namespace gdjs {
           )
         )
       );
-      this._updateSpritesAndTexturesSize();
       this._updateLocalPositions();
       this.updatePosition();
       this._wrapperContainer.pivot.x = this._object._width / 2;
@@ -349,38 +379,25 @@ namespace gdjs {
 
     updateWidth(): void {
       this._wrapperContainer.pivot.x = this._object._width / 2;
-      this._updateSpritesAndTexturesSize();
       this._updateLocalPositions();
       this.updatePosition();
     }
 
     updateHeight(): void {
       this._wrapperContainer.pivot.y = this._object._height / 2;
-      this._updateSpritesAndTexturesSize();
       this._updateLocalPositions();
       this.updatePosition();
     }
 
-    setColor(rgbColor): void {
-      const colors = rgbColor.split(';');
-      if (colors.length < 3) {
-        return;
-      }
-      this._centerSprite.tint = gdjs.rgbToHexNumber(
-        parseInt(colors[0], 10),
-        parseInt(colors[1], 10),
-        parseInt(colors[2], 10)
-      );
+    setColor(rgbOrHexColor: string): void {
+      const tint = gdjs.rgbOrHexStringToNumber(rgbOrHexColor);
+      this._centerSprite.tint = tint;
       for (
         let borderCounter = 0;
         borderCounter < this._borderSprites.length;
         borderCounter++
       ) {
-        this._borderSprites[borderCounter].tint = gdjs.rgbToHexNumber(
-          parseInt(colors[0], 10),
-          parseInt(colors[1], 10),
-          parseInt(colors[2], 10)
-        );
+        this._borderSprites[borderCounter].tint = tint;
       }
       this._spritesContainer.cacheAsBitmap = false;
     }
@@ -388,11 +405,11 @@ namespace gdjs {
     getColor() {
       const rgb = new PIXI.Color(this._centerSprite.tint).toRgbArray();
       return (
-        Math.floor(rgb[0] * 255) +
+        Math.round(rgb[0] * 255) +
         ';' +
-        Math.floor(rgb[1] * 255) +
+        Math.round(rgb[1] * 255) +
         ';' +
-        Math.floor(rgb[2] * 255)
+        Math.round(rgb[2] * 255)
       );
     }
 

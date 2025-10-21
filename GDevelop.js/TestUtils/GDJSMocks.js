@@ -388,7 +388,8 @@ class VariablesContainer {
 }
 
 class RuntimeObject {
-  constructor(runtimeScene, objectData) {
+  constructor(instanceContainer, objectData) {
+    this._runtimeScene = instanceContainer;
     this.name = objectData.name || '';
     this._variables = new VariablesContainer(objectData.variables);
     this._livingOnScene = true;
@@ -466,16 +467,15 @@ class RuntimeObject {
     array.pushValue(value);
   }
 
-  /** @param {RuntimeScene} runtimeScene */
-  deleteFromScene(runtimeScene) {
+  deleteFromScene() {
     if (this._livingOnScene) {
-      runtimeScene.markObjectForDeletion(this);
+      this._runtimeScene.markObjectForDeletion(this);
       this._livingOnScene = false;
     }
   }
 
   /** @param {RuntimeScene} runtimeScene */
-  onDestroyFromScene(runtimeScene) {
+  onDeletedFromScene(runtimeScene) {
     // Note: these mocks don't support behaviors nor layers or effects.
 
     this.destroyCallbacks.forEach((c) => c());
@@ -789,7 +789,7 @@ class RuntimeScene {
     }
 
     //Notify the object it was removed from the scene
-    obj.onDestroyFromScene(this);
+    obj.onDeletedFromScene(this);
   }
 
   getObjects(objectName) {

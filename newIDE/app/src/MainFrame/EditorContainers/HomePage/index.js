@@ -1,19 +1,23 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import { type I18n as I18nType } from '@lingui/core';
-import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
+import {
+  type RenderEditorContainerPropsWithRef,
+  type SceneEventsOutsideEditorChanges,
+  type InstancesOutsideEditorChanges,
+  type ObjectsOutsideEditorChanges,
+  type ObjectGroupsOutsideEditorChanges,
+} from '../BaseEditor';
 import {
   type FileMetadataAndStorageProviderName,
   type FileMetadata,
   type StorageProvider,
 } from '../../../ProjectsStorage';
-import GetStartedSection from './GetStartedSection';
 import LearnSection from './LearnSection';
+import { type LearnCategory } from './LearnSection/Utils';
 import PlaySection from './PlaySection';
 import CreateSection from './CreateSection';
 import StoreSection from './StoreSection';
-import { type TutorialCategory } from '../../../Utils/GDevelopServices/Tutorial';
 import { TutorialContext } from '../../../Tutorial/TutorialContext';
 import { ExampleStoreContext } from '../../../AssetStore/ExampleStore/ExampleStoreContext';
 import { HomePageHeader } from './HomePageHeader';
@@ -27,24 +31,22 @@ import TeamProvider from '../../../Profile/Team/TeamProvider';
 import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import { type PrivateGameTemplateListingData } from '../../../Utils/GDevelopServices/Shop';
 import { PrivateGameTemplateStoreContext } from '../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
-import PreferencesContext from '../../Preferences/PreferencesContext';
-import useSubscriptionPlans from '../../../Utils/UseSubscriptionPlans';
-import { incrementGetStartedSectionViewCount } from '../../../Utils/Analytics/LocalStats';
-import {
-  sendUserSurveyHidden,
-  sendUserSurveyStarted,
-} from '../../../Utils/Analytics/EventSender';
 import RouterContext, { type RouteArguments } from '../../RouterContext';
 import { type GameDetailsTab } from '../../../GameDashboard';
 import { canUseClassroomFeature } from '../../../Utils/GDevelopServices/Usage';
 import EducationMarketingSection from './EducationMarketingSection';
 import useEducationForm from './UseEducationForm';
-import { type NewProjectSetup } from '../../../ProjectCreation/NewProjectSetupDialog';
+import { type ExampleProjectSetup } from '../../../ProjectCreation/NewProjectSetupDialog';
 import { type ObjectWithContext } from '../../../ObjectsList/EnumerateObjects';
 import { type GamesList } from '../../../GameDashboard/UseGamesList';
 import { type GamesPlatformFrameTools } from './PlaySection/UseGamesPlatformFrame';
 import { type CourseChapter } from '../../../Utils/GDevelopServices/Asset';
 import useCourses from './UseCourses';
+import PreferencesContext from '../../Preferences/PreferencesContext';
+import useSubscriptionPlans from '../../../Utils/UseSubscriptionPlans';
+import { BundleStoreContext } from '../../../AssetStore/Bundles/BundleStoreContext';
+import { type CreateProjectResult } from '../../../Utils/UseCreateProject';
+import { CreditsPackageStoreContext } from '../../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 
 const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
   if (
@@ -66,8 +68,6 @@ const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
     return 'play';
   } else if (routeArguments['initial-dialog'] === 'learn') {
     return 'learn';
-  } else if (routeArguments['initial-dialog'] === 'get-started') {
-    return 'get-started';
   }
 
   return null;
@@ -91,6 +91,7 @@ const styles = {
   },
   scrollableContainer: {
     display: 'flex',
+    position: 'relative',
     marginLeft: 0,
     marginRight: 0,
     flexDirection: 'column',
@@ -110,7 +111,7 @@ type Props = {|
   projectItemName: ?string,
   project: ?gdProject,
   setToolbar: (?React.Node) => void,
-  hideTabsTitleBarAndEditorToolbar: (hidden: boolean) => void,
+  setGamesPlatformFrameShown: ({| shown: boolean, isMobile: boolean |}) => void,
   storageProviders: Array<StorageProvider>,
 
   // Games
@@ -138,19 +139,25 @@ type Props = {|
   selectInAppTutorial: (tutorialId: string) => void,
   onOpenPreferences: () => void,
   onOpenAbout: () => void,
+  onOpenAskAi: ({|
+    mode: 'chat' | 'agent',
+    aiRequestId: string | null,
+    paneIdentifier: 'left' | 'center' | 'right' | null,
+  |}) => void,
 
   // Project creation
   onOpenNewProjectSetupDialog: () => void,
   onCreateProjectFromExample: (
-    exampleShortHeader: ExampleShortHeader,
-    newProjectSetup: NewProjectSetup,
-    i18n: I18nType,
-    isQuickCustomization?: boolean
-  ) => Promise<void>,
+    exampleProjectSetup: ExampleProjectSetup
+  ) => Promise<CreateProjectResult>,
   onOpenTemplateFromTutorial: (tutorialId: string) => Promise<void>,
   onOpenTemplateFromCourseChapter: (
-    courseChapter: CourseChapter
+    CourseChapter,
+    templateId?: string
   ) => Promise<void>,
+
+  // Asset store
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 
   // Project save
   onSave: () => Promise<void>,
@@ -167,6 +174,19 @@ export type HomePageEditorInterface = {|
   onSceneObjectEdited: (
     scene: gdLayout,
     objectWithContext: ObjectWithContext
+  ) => void,
+  onSceneObjectsDeleted: (scene: gdLayout) => void,
+  onSceneEventsModifiedOutsideEditor: (
+    scene: SceneEventsOutsideEditorChanges
+  ) => void,
+  onInstancesModifiedOutsideEditor: (
+    changes: InstancesOutsideEditorChanges
+  ) => void,
+  onObjectsModifiedOutsideEditor: (
+    changes: ObjectsOutsideEditorChanges
+  ) => void,
+  onObjectGroupsModifiedOutsideEditor: (
+    changes: ObjectGroupsOutsideEditorChanges
   ) => void,
 |};
 
@@ -188,10 +208,11 @@ export const HomePage = React.memo<Props>(
         onOpenProfile,
         onCreateProjectFromExample,
         setToolbar,
-        hideTabsTitleBarAndEditorToolbar,
+        setGamesPlatformFrameShown,
         selectInAppTutorial,
         onOpenPreferences,
         onOpenAbout,
+        onOpenAskAi,
         isActive,
         storageProviders,
         onSave,
@@ -203,6 +224,7 @@ export const HomePage = React.memo<Props>(
         onOpenTemplateFromCourseChapter,
         gamesList,
         gamesPlatformFrameTools,
+        onExtensionInstalled,
       }: Props,
       ref
     ) => {
@@ -217,14 +239,15 @@ export const HomePage = React.memo<Props>(
         startTimeoutToUnloadIframe,
         loadIframeOrRemoveTimeout,
       } = gamesPlatformFrameTools;
-      const userSurveyStartedRef = React.useRef<boolean>(false);
-      const userSurveyHiddenRef = React.useRef<boolean>(false);
       const { fetchTutorials } = React.useContext(TutorialContext);
       const { fetchExamplesAndFilters } = React.useContext(ExampleStoreContext);
       const {
         fetchGameTemplates,
         shop: { setInitialGameTemplateUserFriendlySlug },
       } = React.useContext(PrivateGameTemplateStoreContext);
+      const { fetchCreditsPackages } = React.useContext(
+        CreditsPackageStoreContext
+      );
       const [openedGameId, setOpenedGameId] = React.useState<?string>(null);
       const {
         games,
@@ -248,38 +271,61 @@ export const HomePage = React.memo<Props>(
         onResetEducationForm,
       } = useEducationForm({ authenticatedUser });
       const {
+        courses,
         selectedCourse,
-        courseChapters,
-        areChaptersReady,
+        getCourseChapters,
+        onSelectCourse,
+        areCoursesFetched,
         onCompleteTask,
         isTaskCompleted,
         getChapterCompletion,
         getCourseCompletion,
-        onBuyCourseChapterWithCredits,
+        onBuyCourseWithCredits,
+        onBuyCourse,
+        purchasingCourseListingData,
+        setPurchasingCourseListingData,
       } = useCourses();
-      const [
-        learnCategory,
-        setLearnCategory,
-      ] = React.useState<TutorialCategory | null>(null);
+      const [learnCategory, setLearnCategory] = React.useState<LearnCategory>(
+        null
+      );
+      const { getSubscriptionPlansWithPricingSystems } = useSubscriptionPlans({
+        authenticatedUser,
+        includeLegacy: false,
+      });
 
       const { isMobile } = useResponsiveWindowSize();
       const {
-        values: { showGetStartedSectionByDefault },
+        values: { showCreateSectionByDefault },
       } = React.useContext(PreferencesContext);
       const tabRequestedAtOpening = React.useRef<HomeTab | null>(
         getRequestedTab(routeArguments)
       );
       const initialTab = tabRequestedAtOpening.current
         ? tabRequestedAtOpening.current
-        : showGetStartedSectionByDefault
-        ? 'get-started'
-        : 'create';
+        : showCreateSectionByDefault
+        ? 'create'
+        : 'learn';
 
       const [activeTab, setActiveTab] = React.useState<HomeTab>(initialTab);
 
       const { setInitialPackUserFriendlySlug } = React.useContext(
         AssetStoreContext
       );
+      const {
+        fetchBundles,
+        shop: {
+          setInitialBundleUserFriendlySlug: setInitialBundleUserFriendlySlugForShop,
+          setInitialBundleCategory: setInitialBundleCategoryForShop,
+        },
+      } = React.useContext(BundleStoreContext);
+      const [
+        initialBundleUserFriendlySlugForLearn,
+        setInitialBundleUserFriendlySlugForLearn,
+      ] = React.useState<?string>(null);
+      const [
+        initialBundleCategoryForLearn,
+        setInitialBundleCategoryForLearn,
+      ] = React.useState<?string>(null);
       const openedGame = React.useMemo(
         () =>
           !openedGameId || !games
@@ -287,9 +333,6 @@ export const HomePage = React.memo<Props>(
             : games.find(game => game.id === openedGameId),
         [games, openedGameId]
       );
-      const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
-        includeLegacy: false,
-      });
 
       // Open the store and a pack or game template if asked to do so, either at
       // app opening, either when the route changes (when clicking on an announcement
@@ -310,8 +353,21 @@ export const HomePage = React.memo<Props>(
                 routeArguments['game-template']
               );
             }
+            if (routeArguments['bundle']) {
+              setInitialBundleUserFriendlySlugForShop(routeArguments['bundle']);
+            }
+            if (routeArguments['bundle-category']) {
+              setInitialBundleCategoryForShop(
+                routeArguments['bundle-category']
+              );
+            }
             // Remove the arguments so that the asset store is not opened again.
-            removeRouteArguments(['asset-pack', 'game-template']);
+            removeRouteArguments([
+              'asset-pack',
+              'game-template',
+              'bundle',
+              'bundle-category',
+            ]);
           } else if (requestedTab === 'manage') {
             const gameId = routeArguments['game-id'];
             if (gameId) {
@@ -327,38 +383,39 @@ export const HomePage = React.memo<Props>(
               }
             }
           } else if (requestedTab === 'learn') {
-            const courseId = routeArguments['course-id'];
-            if (!areChaptersReady) {
-              // Do not process requested tab before courses are ready.
-              return;
+            if (routeArguments['course-id']) {
+              if (!areCoursesFetched) {
+                // Do not process requested tab before courses are ready.
+                return;
+              }
+              onSelectCourse(routeArguments['course-id']);
             }
-
-            if (courseId && selectedCourse && selectedCourse.id === courseId) {
-              setLearnCategory('course');
-              removeRouteArguments(['course-id']);
+            if (routeArguments['bundle']) {
+              setInitialBundleUserFriendlySlugForLearn(
+                routeArguments['bundle']
+              );
             }
+            if (routeArguments['bundle-category']) {
+              setInitialBundleCategoryForLearn(
+                routeArguments['bundle-category']
+              );
+            }
+            removeRouteArguments(['course-id', 'bundle', 'bundle-category']);
           }
 
           removeRouteArguments(['initial-dialog']);
         },
         [
           routeArguments,
-          selectedCourse,
+          onSelectCourse,
           removeRouteArguments,
           setInitialPackUserFriendlySlug,
           setInitialGameTemplateUserFriendlySlug,
+          setInitialBundleUserFriendlySlugForShop,
+          setInitialBundleCategoryForShop,
           games,
-          areChaptersReady,
+          areCoursesFetched,
         ]
-      );
-
-      React.useEffect(
-        () => {
-          if (initialTab === 'get-started') {
-            incrementGetStartedSectionViewCount();
-          }
-        },
-        [initialTab]
       );
 
       // Load everything when the user opens the home page, to avoid future loading times.
@@ -367,20 +424,16 @@ export const HomePage = React.memo<Props>(
           fetchExamplesAndFilters();
           fetchGameTemplates();
           fetchTutorials();
+          fetchBundles();
+          fetchCreditsPackages();
         },
-        [fetchExamplesAndFilters, fetchTutorials, fetchGameTemplates]
-      );
-
-      // Only fetch games if the user decides to open the games dashboard tab
-      // or the build tab to enable the context menu on project list items that
-      // redirects to the games dashboard.
-      React.useEffect(
-        () => {
-          if (activeTab === 'create' && !games) {
-            fetchGames();
-          }
-        },
-        [fetchGames, activeTab, games]
+        [
+          fetchExamplesAndFilters,
+          fetchTutorials,
+          fetchGameTemplates,
+          fetchBundles,
+          fetchCreditsPackages,
+        ]
       );
 
       // Fetch user cloud projects when home page becomes active
@@ -440,19 +493,19 @@ export const HomePage = React.memo<Props>(
       React.useLayoutEffect(
         () => {
           // Hide the toolbars when on mobile in the "play" tab.
-          if (activeTab === 'play' && isMobile) {
-            hideTabsTitleBarAndEditorToolbar(true);
+          if (activeTab === 'play') {
+            setGamesPlatformFrameShown({ shown: true, isMobile });
           } else {
-            hideTabsTitleBarAndEditorToolbar(false);
+            setGamesPlatformFrameShown({ shown: false, isMobile });
             updateToolbar();
           }
 
           // Ensure we show it again when the tab changes.
           return () => {
-            hideTabsTitleBarAndEditorToolbar(false);
+            setGamesPlatformFrameShown({ shown: false, isMobile });
           };
         },
-        [updateToolbar, activeTab, hideTabsTitleBarAndEditorToolbar, isMobile]
+        [updateToolbar, activeTab, setGamesPlatformFrameShown, isMobile]
       );
 
       const forceUpdateEditor = React.useCallback(() => {
@@ -470,35 +523,50 @@ export const HomePage = React.memo<Props>(
         []
       );
 
+      const onSceneObjectsDeleted = React.useCallback((scene: gdLayout) => {
+        // No thing to be done.
+      }, []);
+
+      const onSceneEventsModifiedOutsideEditor = React.useCallback(
+        (changes: SceneEventsOutsideEditorChanges) => {
+          // No thing to be done.
+        },
+        []
+      );
+
+      const onInstancesModifiedOutsideEditor = React.useCallback(
+        (changes: InstancesOutsideEditorChanges) => {
+          // No thing to be done.
+        },
+        []
+      );
+
+      const onObjectsModifiedOutsideEditor = React.useCallback(
+        (changes: ObjectsOutsideEditorChanges) => {
+          // No thing to be done.
+        },
+        []
+      );
+
+      const onObjectGroupsModifiedOutsideEditor = React.useCallback(
+        (changes: ObjectGroupsOutsideEditorChanges) => {
+          // No thing to be done.
+        },
+        []
+      );
+
       React.useImperativeHandle(ref, () => ({
         getProject,
         updateToolbar,
         forceUpdateEditor,
         onEventsBasedObjectChildrenEdited,
         onSceneObjectEdited,
+        onSceneObjectsDeleted,
+        onSceneEventsModifiedOutsideEditor,
+        onInstancesModifiedOutsideEditor,
+        onObjectsModifiedOutsideEditor,
+        onObjectGroupsModifiedOutsideEditor,
       }));
-
-      const onUserSurveyStarted = React.useCallback(() => {
-        if (userSurveyStartedRef.current) return;
-        sendUserSurveyStarted();
-        userSurveyStartedRef.current = true;
-      }, []);
-      const onUserSurveyHidden = React.useCallback(() => {
-        if (userSurveyHiddenRef.current) return;
-        sendUserSurveyHidden();
-        userSurveyHiddenRef.current = true;
-      }, []);
-
-      React.useEffect(
-        () => {
-          if (!authenticated) {
-            userSurveyStartedRef.current = false;
-            userSurveyHiddenRef.current = false;
-          }
-        },
-        // Reset flag that prevents multiple send of the same event on user change.
-        [authenticated]
-      );
 
       // As the homepage is never unmounted, we need to ensure the games platform
       // iframe is unloaded & loaded from here,
@@ -528,6 +596,10 @@ export const HomePage = React.memo<Props>(
           activeTab,
         ]
       );
+
+      const premiumCourse = courses
+        ? courses.find(course => course.id === 'premium-course')
+        : null;
 
       return (
         <I18n>
@@ -565,22 +637,8 @@ export const HomePage = React.memo<Props>(
                       canSaveProject={canSave}
                     />
                   )}
-                  {activeTab === 'get-started' && (
-                    <GetStartedSection
-                      selectInAppTutorial={selectInAppTutorial}
-                      onUserSurveyStarted={onUserSurveyStarted}
-                      onUserSurveyHidden={onUserSurveyHidden}
-                      subscriptionPlansWithPricingSystems={
-                        subscriptionPlansWithPricingSystems
-                      }
-                      onOpenProfile={onOpenProfile}
-                      onCreateProjectFromExample={onCreateProjectFromExample}
-                      askToCloseProject={askToCloseProject}
-                    />
-                  )}
                   {activeTab === 'learn' && (
                     <LearnSection
-                      onTabChange={setActiveTab}
                       selectInAppTutorial={selectInAppTutorial}
                       onOpenTemplateFromTutorial={onOpenTemplateFromTutorial}
                       onOpenTemplateFromCourseChapter={
@@ -588,15 +646,38 @@ export const HomePage = React.memo<Props>(
                       }
                       selectedCategory={learnCategory}
                       onSelectCategory={setLearnCategory}
+                      onSelectCourse={onSelectCourse}
+                      courses={courses}
+                      previewedCourse={premiumCourse}
                       course={selectedCourse}
-                      courseChapters={courseChapters}
+                      getCourseChapters={getCourseChapters}
                       onCompleteCourseTask={onCompleteTask}
                       isCourseTaskCompleted={isTaskCompleted}
                       getCourseChapterCompletion={getChapterCompletion}
                       getCourseCompletion={getCourseCompletion}
-                      onBuyCourseChapterWithCredits={
-                        onBuyCourseChapterWithCredits
+                      onBuyCourseWithCredits={onBuyCourseWithCredits}
+                      onBuyCourse={onBuyCourse}
+                      purchasingCourseListingData={purchasingCourseListingData}
+                      setPurchasingCourseListingData={
+                        setPurchasingCourseListingData
                       }
+                      onOpenAskAi={onOpenAskAi}
+                      onOpenNewProjectSetupDialog={onOpenNewProjectSetupDialog}
+                      onSelectPrivateGameTemplateListingData={
+                        onSelectPrivateGameTemplateListingData
+                      }
+                      onSelectExampleShortHeader={onSelectExampleShortHeader}
+                      getSubscriptionPlansWithPricingSystems={
+                        getSubscriptionPlansWithPricingSystems
+                      }
+                      clearInitialBundleValues={() => {
+                        setInitialBundleUserFriendlySlugForLearn(null);
+                        setInitialBundleCategoryForLearn(null);
+                      }}
+                      initialBundleUserFriendlySlug={
+                        initialBundleUserFriendlySlugForLearn
+                      }
+                      initialBundleCategory={initialBundleCategoryForLearn}
                     />
                   )}
                   {activeTab === 'play' && (
@@ -612,6 +693,16 @@ export const HomePage = React.memo<Props>(
                         onOpenPrivateGameTemplateListingData
                       }
                       onOpenProfile={onOpenProfile}
+                      onExtensionInstalled={onExtensionInstalled}
+                      onCourseOpen={(courseId: string) => {
+                        onSelectCourse(courseId);
+                        setActiveTab('learn');
+                      }}
+                      courses={courses}
+                      getCourseCompletion={getCourseCompletion}
+                      getSubscriptionPlansWithPricingSystems={
+                        getSubscriptionPlansWithPricingSystems
+                      }
                     />
                   )}
                   {activeTab === 'team-view' &&
@@ -666,7 +757,7 @@ export const renderHomePageContainer = (
     isActive={props.isActive}
     projectItemName={props.projectItemName}
     setToolbar={props.setToolbar}
-    hideTabsTitleBarAndEditorToolbar={props.hideTabsTitleBarAndEditorToolbar}
+    setGamesPlatformFrameShown={props.setGamesPlatformFrameShown}
     canOpen={props.canOpen}
     onChooseProject={props.onChooseProject}
     onOpenRecentFile={props.onOpenRecentFile}
@@ -689,6 +780,7 @@ export const renderHomePageContainer = (
     selectInAppTutorial={props.selectInAppTutorial}
     onOpenPreferences={props.onOpenPreferences}
     onOpenAbout={props.onOpenAbout}
+    onOpenAskAi={props.onOpenAskAi}
     storageProviders={
       (props.extraEditorProps && props.extraEditorProps.storageProviders) || []
     }
@@ -697,5 +789,6 @@ export const renderHomePageContainer = (
     resourceManagementProps={props.resourceManagementProps}
     gamesList={props.gamesList}
     gamesPlatformFrameTools={props.gamesPlatformFrameTools}
+    onExtensionInstalled={props.onExtensionInstalled}
   />
 );

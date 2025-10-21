@@ -17,7 +17,22 @@ type MakeExtensionsLoaderArguments = {|
   filterExamples: boolean,
   onFindGDJS?: ?() => Promise<{gdjsRoot: string}>
 |};
+
+type GetExpectedNumberOfJSExtensionModulesArguments = {|
+  filterExamples: boolean,
+|};
 */
+
+// This value is hardcoded to allow raising an error if the number of JS extensions
+// loaded is different from the expected one, which may lead
+// to projects corruption in the future if the app is still used.
+// If a new extension is added, update this value.
+// Also remember to add the extension in the list of extensions in BrowserJsExtensionsLoader.js
+function getExpectedNumberOfJSExtensionModules(
+  { filterExamples } /*: GetExpectedNumberOfJSExtensionModulesArguments*/
+) /*:number*/ {
+  return 29 + (filterExamples ? 0 : 1);
+}
 
 /**
  * Loader that will find all JS extensions declared in GDJS/Runtime/Extensions/xxx/JsExtension.js.
@@ -97,7 +112,14 @@ module.exports = function makeExtensionsLoader(
                 ),
               };
             })
-          );
+          ).then(results => {
+            return {
+              results,
+              expectedNumberOfJSExtensionModulesLoaded: getExpectedNumberOfJSExtensionModules(
+                { filterExamples }
+              ),
+            };
+          });
         },
         err => {
           console.error(`Unable to find JS extensions modules`);

@@ -1,7 +1,6 @@
 // @flow
 
 import * as React from 'react';
-import { type I18n as I18nType } from '@lingui/core';
 import {
   listAllExamples,
   type ExampleShortHeader,
@@ -12,28 +11,29 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import LoaderModal from '../UI/LoaderModal';
 import NewProjectSetupDialog, {
   type NewProjectSetup,
+  type ExampleProjectSetup,
 } from '../ProjectCreation/NewProjectSetupDialog';
 import { type StorageProvider } from '../ProjectsStorage';
 import RouterContext from './RouterContext';
+import { type CreateProjectResult } from '../Utils/UseCreateProject';
 
 type Props = {|
   isProjectOpening: boolean,
   newProjectSetupDialogOpen: boolean,
   setNewProjectSetupDialogOpen: boolean => void,
-  createEmptyProject: NewProjectSetup => Promise<void>,
+  createEmptyProject: NewProjectSetup => Promise<CreateProjectResult>,
   createProjectFromExample: (
-    exampleShortHeader: ExampleShortHeader,
-    newProjectSetup: NewProjectSetup,
-    i18n: I18nType
-  ) => Promise<void>,
+    exampleProjectSetup: ExampleProjectSetup
+  ) => Promise<CreateProjectResult>,
   createProjectFromPrivateGameTemplate: (
     privateGameTemplateListingData: PrivateGameTemplateListingData,
     newProjectSetup: NewProjectSetup
-  ) => Promise<void>,
-  createProjectFromAIGeneration: (
-    projectFileUrl: string,
-    newProjectSetup: NewProjectSetup
-  ) => Promise<void>,
+  ) => Promise<CreateProjectResult>,
+  openAskAi: ({|
+    mode: 'chat' | 'agent',
+    aiRequestId: string | null,
+    paneIdentifier: 'left' | 'center' | 'right' | null,
+  |}) => void,
   storageProviders: Array<StorageProvider>,
 |};
 
@@ -44,7 +44,7 @@ const useNewProjectDialog = ({
   createEmptyProject,
   createProjectFromExample,
   createProjectFromPrivateGameTemplate,
-  createProjectFromAIGeneration,
+  openAskAi,
   storageProviders,
 }: Props) => {
   const [isFetchingExample, setIsFetchingExample] = React.useState(false);
@@ -179,6 +179,18 @@ const useNewProjectDialog = ({
     [onSelectExampleShortHeader, removeRouteArguments]
   );
 
+  const onOpenAskAi = React.useCallback(
+    () => {
+      closeNewProjectDialog();
+      openAskAi({
+        mode: 'agent',
+        aiRequestId: null,
+        paneIdentifier: 'center',
+      });
+    },
+    [closeNewProjectDialog, openAskAi]
+  );
+
   const renderNewProjectDialog = () => {
     return (
       <>
@@ -192,14 +204,7 @@ const useNewProjectDialog = ({
             onCreateProjectFromPrivateGameTemplate={
               createProjectFromPrivateGameTemplate
             }
-            onCreateFromAIGeneration={async (
-              generatedProject,
-              projectSetup
-            ) => {
-              const projectFileUrl = generatedProject.fileUrl;
-              if (!projectFileUrl) return;
-              await createProjectFromAIGeneration(projectFileUrl, projectSetup);
-            }}
+            onOpenAskAi={onOpenAskAi}
             storageProviders={storageProviders}
             selectedExampleShortHeader={selectedExampleShortHeader}
             onSelectExampleShortHeader={exampleShortHeader =>

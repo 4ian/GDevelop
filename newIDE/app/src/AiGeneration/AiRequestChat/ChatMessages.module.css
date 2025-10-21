@@ -1,0 +1,26 @@
+@keyframes thinking-appear {
+  0% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  /* Start after the bubble container and when the bubble content is almost finished animating. */
+  60% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+}
+
+.thinkingText {
+  animation: thinking-appear 1s;
+}
+
+.feedbackButtonsContainer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: 4px;
+}

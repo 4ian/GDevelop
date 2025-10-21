@@ -20,28 +20,17 @@ const gd: libGDevelop = global.gd;
 const emptySearchText = '';
 
 const noExcludedTiers = new Set();
-const excludedCommunityTiers = new Set(['community']);
+const excludedExperimentalTiers = new Set(['experimental']);
 
-export type SearchableBehaviorMetadata = {|
-  type: string,
-  fullName: string,
-  description: string,
-  objectType: string,
-  /**
-   * All required behaviors including transitive ones.
-   */
-  allRequiredBehaviorTypes: Array<string>,
-  previewIconUrl: string,
-  category: string,
-  tags: string[],
-  isDeprecated?: boolean,
+type TranslatedBehaviorShortHeader = {|
+  ...BehaviorShortHeader,
+  englishFullName: string,
+  englishDescription: string,
 |};
 
 type BehaviorStoreState = {|
   filters: ?Filters,
-  searchResults: ?Array<
-    SearchResult<BehaviorShortHeader | SearchableBehaviorMetadata>
-  >,
+  searchResults: ?Array<SearchResult<BehaviorShortHeader>>,
   fetchBehaviors: () => void,
   error: ?Error,
   searchText: string,
@@ -50,9 +39,11 @@ type BehaviorStoreState = {|
   chosenCategory: string,
   setChosenCategory: string => void,
   setInstalledBehaviorMetadataList: (
-    installedBehaviorMetadataList: Array<SearchableBehaviorMetadata>
+    installedBehaviorMetadataList: Array<BehaviorShortHeader>
   ) => void,
-  translatedBehaviorShortHeadersByType: { [name: string]: BehaviorShortHeader },
+  translatedBehaviorShortHeadersByType: {
+    [name: string]: TranslatedBehaviorShortHeader,
+  },
   filtersState: FiltersState,
 |};
 
@@ -92,16 +83,16 @@ export const BehaviorStoreStateProvider = ({
   const [
     installedBehaviorMetadataList,
     setInstalledBehaviorMetadataList,
-  ] = React.useState<Array<SearchableBehaviorMetadata>>([]);
+  ] = React.useState<Array<BehaviorShortHeader>>([]);
   const [
     translatedBehaviorShortHeadersByType,
     setTranslatedBehaviorShortHeadersByType,
   ] = React.useState<{
-    [string]: BehaviorShortHeader,
+    [string]: TranslatedBehaviorShortHeader,
   }>({});
 
   const preferences = React.useContext(PreferencesContext);
-  const { showCommunityExtensions, language } = preferences.values;
+  const { showExperimentalExtensions, language } = preferences.values;
   const [firstBehaviorIds, setFirstBehaviorIds] = React.useState<Array<string>>(
     []
   );
@@ -139,10 +130,12 @@ export const BehaviorStoreStateProvider = ({
 
           const translatedBehaviorShortHeadersByType = {};
           behaviorShortHeaders.forEach(behaviorShortHeader => {
-            const translatedBehaviorShortHeader: BehaviorShortHeader = {
+            const translatedBehaviorShortHeader: TranslatedBehaviorShortHeader = {
               ...behaviorShortHeader,
               fullName: i18n._(behaviorShortHeader.fullName),
               description: i18n._(behaviorShortHeader.description),
+              englishFullName: behaviorShortHeader.fullName,
+              englishDescription: behaviorShortHeader.description,
             };
             translatedBehaviorShortHeadersByType[
               behaviorShortHeader.type
@@ -216,16 +209,76 @@ export const BehaviorStoreStateProvider = ({
   const allTranslatedBehaviors = React.useMemo(
     () => {
       const allTranslatedBehaviors: {
-        [name: string]: BehaviorShortHeader | SearchableBehaviorMetadata,
+        [name: string]: BehaviorShortHeader,
       } = {};
       for (const type in translatedBehaviorShortHeadersByType) {
-        allTranslatedBehaviors[type] =
-          translatedBehaviorShortHeadersByType[type];
+        const behaviorShortHeader: any = {
+          ...translatedBehaviorShortHeadersByType[type],
+        };
+        delete behaviorShortHeader.englishFullName;
+        delete behaviorShortHeader.englishDescription;
+        allTranslatedBehaviors[type] = behaviorShortHeader;
       }
       for (const installedBehaviorMetadata of installedBehaviorMetadataList) {
+        const repositoryBehaviorMetadata =
+          translatedBehaviorShortHeadersByType[installedBehaviorMetadata.type];
+        const behaviorMetadata = repositoryBehaviorMetadata
+          ? {
+              // Attributes from the extension repository
+
+              // These attributes are important for the installation and update workflow.
+              isInstalled: true,
+              tier: repositoryBehaviorMetadata.tier,
+              version: repositoryBehaviorMetadata.version,
+              changelog: repositoryBehaviorMetadata.changelog,
+              url: repositoryBehaviorMetadata.url,
+              // It gives info about the extension that can be displayed to users.
+              headerUrl: repositoryBehaviorMetadata.headerUrl,
+              authorIds: repositoryBehaviorMetadata.authorIds,
+              authors: repositoryBehaviorMetadata.authors,
+              // It's empty and not used.
+              extensionNamespace: repositoryBehaviorMetadata.extensionNamespace,
+
+              // Attributes from the installed extension
+
+              // New extension versions might require a different object.
+              // It must not forbid users to attach the behavior since their
+              // version allows it.
+              objectType: installedBehaviorMetadata.objectType,
+              allRequiredBehaviorTypes:
+                installedBehaviorMetadata.allRequiredBehaviorTypes,
+              // These ones are less important but its better to use the icon of
+              // the installed extension since it's used everywhere in the editor.
+              previewIconUrl: installedBehaviorMetadata.previewIconUrl,
+              category: installedBehaviorMetadata.category,
+              tags: installedBehaviorMetadata.tags,
+              // Both metadata are supposed to have the same type, but the
+              // installed ones are safer to use.
+              // It reduces the risk of accessing an extension that doesn't
+              // actually exist in the project.
+              type: installedBehaviorMetadata.type,
+              name: installedBehaviorMetadata.name,
+              extensionName: installedBehaviorMetadata.extensionName,
+
+              // Attributes switching between both
+
+              // Translations may not be relevant for the installed version.
+              // We use the translation only if the not translated texts match.
+              fullName:
+                installedBehaviorMetadata.fullName ===
+                repositoryBehaviorMetadata.englishFullName
+                  ? repositoryBehaviorMetadata.fullName
+                  : installedBehaviorMetadata.fullName,
+              description:
+                installedBehaviorMetadata.description ===
+                repositoryBehaviorMetadata.englishDescription
+                  ? repositoryBehaviorMetadata.description
+                  : installedBehaviorMetadata.description,
+            }
+          : installedBehaviorMetadata;
         allTranslatedBehaviors[
           installedBehaviorMetadata.type
-        ] = installedBehaviorMetadata;
+        ] = behaviorMetadata;
       }
       return allTranslatedBehaviors;
     },
@@ -253,9 +306,9 @@ export const BehaviorStoreStateProvider = ({
         const behavior = allTranslatedBehaviors[type];
         behavior.tags.forEach(tag => {
           if (
-            showCommunityExtensions ||
+            showExperimentalExtensions ||
             !behavior.tier ||
-            !excludedCommunityTiers.has(behavior.tier)
+            !excludedExperimentalTiers.has(behavior.tier)
           ) {
             tagsSet.add(tag);
           }
@@ -270,7 +323,7 @@ export const BehaviorStoreStateProvider = ({
         tagsTree: [],
       };
     },
-    [allTranslatedBehaviors, showCommunityExtensions]
+    [allTranslatedBehaviors, showExperimentalExtensions]
   );
 
   const defaultFirstSearchItemIds = React.useMemo(
@@ -282,15 +335,15 @@ export const BehaviorStoreStateProvider = ({
   );
 
   const searchResults: ?Array<
-    SearchResult<BehaviorShortHeader | SearchableBehaviorMetadata>
+    SearchResult<BehaviorShortHeader>
   > = useSearchStructuredItem(allTranslatedBehaviors, {
     searchText,
     chosenItemCategory: chosenCategory,
     chosenCategory: filtersState.chosenCategory,
     chosenFilters: filtersState.chosenFilters,
-    excludedTiers: showCommunityExtensions
+    excludedTiers: showExperimentalExtensions
       ? noExcludedTiers
-      : excludedCommunityTiers,
+      : excludedExperimentalTiers,
     defaultFirstSearchItemIds: defaultFirstSearchItemIds,
   });
 

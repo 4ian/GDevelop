@@ -8,6 +8,7 @@ namespace gdjs {
     anis: Model3DAnimation[];
     ai: integer;
     ass: float;
+    aet: float;
     ap: boolean;
     cfd: float;
   };
@@ -38,6 +39,8 @@ namespace gdjs {
         | 'BottomCenterY';
       animations: Model3DAnimation[];
       crossfadeDuration: float;
+      isCastingShadow: boolean;
+      isReceivingShadow: boolean;
     };
   }
 
@@ -101,6 +104,8 @@ namespace gdjs {
     _animationSpeedScale: float = 1;
     _animationPaused: boolean = false;
     _crossfadeDuration: float = 0;
+    _isCastingShadow: boolean = true;
+    _isReceivingShadow: boolean = true;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -123,6 +128,8 @@ namespace gdjs {
         objectData.content.materialType
       );
 
+      this.setIsCastingShadow(objectData.content.isCastingShadow);
+      this.setIsReceivingShadow(objectData.content.isReceivingShadow);
       this.onModelChanged(objectData);
 
       this._crossfadeDuration = objectData.content.crossfadeDuration || 0;
@@ -144,6 +151,14 @@ namespace gdjs {
           this._animations[0].loop
         );
       }
+    }
+
+    override updateOriginalDimensionsFromObjectData(
+      oldObjectData: Object3DData,
+      newObjectData: Object3DData
+    ): void {
+      // Original dimensions must not be reset by `super.updateFromObjectData`.
+      // `_updateModel` has a different logic to evaluate them using `keepAspectRatio`.
     }
 
     updateFromObjectData(
@@ -175,8 +190,14 @@ namespace gdjs {
         oldObjectData.content.keepAspectRatio !==
           newObjectData.content.keepAspectRatio ||
         oldObjectData.content.materialType !==
-          newObjectData.content.materialType
+          newObjectData.content.materialType ||
+        oldObjectData.content.centerLocation !==
+          newObjectData.content.centerLocation
       ) {
+        // The center is applied to the model by `_updateModel`.
+        this._centerPoint = getPointForLocation(
+          newObjectData.content.centerLocation
+        );
         this._updateModel(newObjectData);
       }
       if (
@@ -186,36 +207,45 @@ namespace gdjs {
         this._originPoint = getPointForLocation(
           newObjectData.content.originLocation
         );
+        this._renderer.updatePosition();
       }
       if (
-        oldObjectData.content.centerLocation !==
-        newObjectData.content.centerLocation
+        oldObjectData.content.isCastingShadow !==
+        newObjectData.content.isCastingShadow
       ) {
-        this._centerPoint = getPointForLocation(
-          newObjectData.content.centerLocation
-        );
+        this.setIsCastingShadow(newObjectData.content.isCastingShadow);
+      }
+      if (
+        oldObjectData.content.isReceivingShadow !==
+        newObjectData.content.isReceivingShadow
+      ) {
+        this.setIsReceivingShadow(newObjectData.content.isReceivingShadow);
       }
       return true;
     }
 
-    getNetworkSyncData(): Model3DObjectNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): Model3DObjectNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         mt: this._materialType,
         op: this._originPoint,
         cp: this._centerPoint,
         anis: this._animations,
         ai: this._currentAnimationIndex,
         ass: this._animationSpeedScale,
+        aet: this.getAnimationElapsedTime(),
         ap: this._animationPaused,
         cfd: this._crossfadeDuration,
       };
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: Model3DObjectNetworkSyncData
+      networkSyncData: Model3DObjectNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       if (networkSyncData.mt !== undefined) {
         this._materialType = networkSyncData.mt;
@@ -229,11 +259,14 @@ namespace gdjs {
       if (networkSyncData.anis !== undefined) {
         this._animations = networkSyncData.anis;
       }
+      if (networkSyncData.ass !== undefined) {
+        this.setAnimationSpeedScale(networkSyncData.ass);
+      }
       if (networkSyncData.ai !== undefined) {
         this.setAnimationIndex(networkSyncData.ai);
       }
-      if (networkSyncData.ass !== undefined) {
-        this.setAnimationSpeedScale(networkSyncData.ass);
+      if (networkSyncData.aet !== undefined) {
+        this.setAnimationElapsedTime(networkSyncData.aet);
       }
       if (networkSyncData.ap !== undefined) {
         if (networkSyncData.ap !== this.isAnimationPaused()) {
@@ -255,14 +288,17 @@ namespace gdjs {
       const rotationX = objectData.content.rotationX || 0;
       const rotationY = objectData.content.rotationY || 0;
       const rotationZ = objectData.content.rotationZ || 0;
+      const width = objectData.content.width || 100;
+      const height = objectData.content.height || 100;
+      const depth = objectData.content.depth || 100;
       const keepAspectRatio = objectData.content.keepAspectRatio;
       this._renderer._updateModel(
         rotationX,
         rotationY,
         rotationZ,
-        this._getOriginalWidth(),
-        this._getOriginalHeight(),
-        this._getOriginalDepth(),
+        width,
+        height,
+        depth,
         keepAspectRatio
       );
     }
@@ -356,6 +392,16 @@ namespace gdjs {
      */
     hasAnimationEnded(): boolean {
       return this._renderer.hasAnimationEnded();
+    }
+
+    setIsCastingShadow(value: boolean): void {
+      this._isCastingShadow = value;
+      this._renderer._updateShadow();
+    }
+
+    setIsReceivingShadow(value: boolean): void {
+      this._isReceivingShadow = value;
+      this._renderer._updateShadow();
     }
 
     setCrossfadeDuration(duration: number): void {

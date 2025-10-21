@@ -42,7 +42,8 @@ import Text from '../UI/Text';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
 import Add from '../UI/CustomSvgIcons/Add';
-import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
+import Clipboard from '../Utils/Clipboard';
+import { SafeExtractor } from '../Utils/SafeExtractor';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
@@ -52,6 +53,8 @@ import PasteIcon from '../UI/CustomSvgIcons/Clipboard';
 import CopyIcon from '../UI/CustomSvgIcons/Copy';
 import { type ConnectDragSource } from 'react-dnd';
 import ResponsiveFlatButton from '../UI/ResponsiveFlatButton';
+import { Accordion, AccordionHeader, AccordionBody } from '../UI/Accordion';
+import { type Field } from '../CompactPropertiesEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -131,14 +134,12 @@ const Effect = React.forwardRef(
     ref
   ) => {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
-
     const preferences = React.useContext(PreferencesContext);
     const showEffectParameterNames =
       preferences.values.showEffectParameterNames;
     const setShowEffectParameterNames = preferences.setShowEffectParameterNames;
 
     const forceUpdate = useForceUpdate();
-
     const isClipboardContainingEffects = Clipboard.has(EFFECTS_CLIPBOARD_KIND);
 
     const renameEffect = React.useCallback(
@@ -187,6 +188,51 @@ const Effect = React.forwardRef(
     const effectMetadata = getEnumeratedEffectMetadata(
       allEffectMetadata,
       effectType
+    );
+
+    const parametersSchema = effectMetadata && effectMetadata.parametersSchema;
+    const basicPropertiesSchema = React.useMemo(
+      () =>
+        parametersSchema
+          ? parametersSchema.filter(param => param.valueType && !param.advanced)
+          : [],
+      [parametersSchema]
+    );
+    const advancedPropertiesSchema = React.useMemo(
+      () =>
+        parametersSchema
+          ? parametersSchema.filter(param => param.valueType && param.advanced)
+          : [],
+      [parametersSchema]
+    );
+
+    const areAdvancedPropertiesModified = React.useMemo(
+      () => {
+        return advancedPropertiesSchema.some((field: Field) => {
+          const name = field.valueType ? field.name : null;
+          if (!name) return false;
+          if (
+            field.valueType === 'number'
+              ? !effect.hasDoubleParameter(name)
+              : field.valueType === 'boolean'
+              ? !effect.hasBooleanParameter(name)
+              : !effect.hasStringParameter(name)
+          ) {
+            return false;
+          }
+
+          const current =
+            field.valueType === 'number'
+              ? effect.getDoubleParameter(name)
+              : field.valueType === 'boolean'
+              ? effect.getBooleanParameter(name)
+              : effect.getStringParameter(name);
+
+          const defaultValue = field.valueType ? field.defaultValue : null;
+          return current !== defaultValue;
+        });
+      },
+      [advancedPropertiesSchema, effect]
     );
 
     return (
@@ -285,33 +331,61 @@ const Effect = React.forwardRef(
               />
               <Spacer />
             </div>
-            {effectType && (
+            {effectMetadata && (
               <Line expand noMargin>
                 <Column expand>
-                  {effectMetadata ? (
-                    <React.Fragment>
-                      <Line>
-                        <BackgroundText>
-                          <MarkdownText source={effectMetadata.description} />
-                        </BackgroundText>
-                      </Line>
-                      <PropertiesEditor
-                        key={effect.getEffectType()}
-                        instances={[effect]}
-                        schema={effectMetadata.parametersSchema}
-                        project={project}
-                        resourceManagementProps={resourceManagementProps}
-                        renderExtraDescriptionText={
-                          showEffectParameterNames
-                            ? parameterName =>
-                                i18n._(
-                                  t`Property name in events: \`${parameterName}\` `
-                                )
-                            : undefined
-                        }
-                      />
-                    </React.Fragment>
-                  ) : null}
+                  <Line>
+                    <BackgroundText>
+                      <MarkdownText source={effectMetadata.description} />
+                    </BackgroundText>
+                  </Line>
+                  <PropertiesEditor
+                    key={effect.getEffectType() + '-basic'}
+                    instances={[effect]}
+                    schema={basicPropertiesSchema}
+                    project={project}
+                    resourceManagementProps={resourceManagementProps}
+                    renderExtraDescriptionText={
+                      showEffectParameterNames
+                        ? parameterName =>
+                            i18n._(
+                              t`Property name in events: \`${parameterName}\` `
+                            )
+                        : undefined
+                    }
+                  />
+                  {advancedPropertiesSchema.length > 0 && (
+                    <Accordion
+                      defaultExpanded={areAdvancedPropertiesModified}
+                      noMargin
+                    >
+                      <AccordionHeader noMargin>
+                        <Text size="sub-title">
+                          <Trans>Advanced properties</Trans>
+                        </Text>
+                      </AccordionHeader>
+                      <AccordionBody disableGutters>
+                        <Column expand noMargin>
+                          <PropertiesEditor
+                            key={effect.getEffectType() + '-advanced'}
+                            instances={[effect]}
+                            schema={advancedPropertiesSchema}
+                            project={project}
+                            resourceManagementProps={resourceManagementProps}
+                            renderExtraDescriptionText={
+                              showEffectParameterNames
+                                ? parameterName =>
+                                    i18n._(
+                                      t`Property name in events: \`${parameterName}\` `
+                                    )
+                                : undefined
+                            }
+                          />
+                        </Column>
+                      </AccordionBody>
+                    </Accordion>
+                  )}
+
                   <Spacer />
                 </Column>
               </Line>

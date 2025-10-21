@@ -15,16 +15,17 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
       .SetExtensionInformation(
           "BuiltinWindow",
           _("Game window and resolution"),
-          "Provides actions and conditions to manipulate the game window. "
+          "Actions and conditions to manipulate the game window or change how "
+          "the game is resized according to the screen size. "
           "Depending on the platform on which the game is running, not all of "
-          "these features can be applied.",
+          "these features can be applied.\n"
+          "Also contains expressions to read the screen size.",
           "Florian Rival",
           "Open source (MIT License)")
       .SetCategory("User interface")
       .SetExtensionHelpPath("/all-features/window");
   extension
-      .AddInstructionOrExpressionGroupMetadata(
-          _("Game window and resolution"))
+      .AddInstructionOrExpressionGroupMetadata(_("Game window and resolution"))
       .SetIcon("res/actions/window24.png");
 
   extension

@@ -19,6 +19,7 @@ export default class Rendered3DInstance {
   _threeObject: THREE.Object3D | null;
   wasUsed: boolean;
   _wasDestroyed: boolean;
+  _getPropertyOverridings: (() => Map<string, string>) | null;
 
   constructor(
     project: gdProject,
@@ -26,7 +27,8 @@ export default class Rendered3DInstance {
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
     threeGroup: THREE.Group,
-    pixiResourcesLoader: Class<PixiResourcesLoader>
+    pixiResourcesLoader: Class<PixiResourcesLoader>,
+    getPropertyOverridings: (() => Map<string, string>) | null = null
   ) {
     this._pixiObject = null;
     this._threeObject = null;
@@ -36,6 +38,7 @@ export default class Rendered3DInstance {
     this._threeGroup = threeGroup;
     this._project = project;
     this._pixiResourcesLoader = pixiResourcesLoader;
+    this._getPropertyOverridings = getPropertyOverridings;
     this.wasUsed = true; //Used by InstancesRenderer to track rendered instance that are not used anymore.
     this._wasDestroyed = false;
   }
@@ -171,5 +174,9 @@ export default class Rendered3DInstance {
    */
   getDefaultDepth() {
     return 32;
+  }
+
+  getPropertyOverridings(): Map<string, string> | null {
+    return this._getPropertyOverridings && this._getPropertyOverridings();
   }
 }

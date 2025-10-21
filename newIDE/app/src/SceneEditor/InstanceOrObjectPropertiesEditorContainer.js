@@ -36,12 +36,24 @@ type Props = {|
   i18n: I18nType,
   historyHandler?: HistoryHandler,
   lastSelectionType: 'instance' | 'object',
+  isVariableListLocked: boolean,
 
   // For objects:
   objects: Array<gdObject>,
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onUpdateBehaviorsSharedData: () => void,
-  onExtensionInstalled: (extensionName: string) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onOpenEventBasedObjectVariantEditor: (
+    extensionName: string,
+    eventsBasedObjectName: string,
+    variantName: string
+  ) => void,
+  onDeleteEventsBasedObjectVariant: (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventBasedObject: gdEventsBasedObject,
+    variant: gdEventsBasedObjectVariant
+  ) => void,
+  isBehaviorListLocked: boolean,
 
   // For instances:
   instances: Array<gdInitialInstance>,
@@ -83,6 +95,9 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
     eventsFunctionsExtension,
     onUpdateBehaviorsSharedData,
     onExtensionInstalled,
+    onOpenEventBasedObjectVariantEditor,
+    onDeleteEventsBasedObjectVariant,
+    isBehaviorListLocked,
 
     // For instances:
     instances,
@@ -116,6 +131,11 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
           eventsFunctionsExtension={eventsFunctionsExtension}
           onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}
           onExtensionInstalled={onExtensionInstalled}
+          isBehaviorListLocked={isBehaviorListLocked}
+          onOpenEventBasedObjectVariantEditor={
+            onOpenEventBasedObjectVariantEditor
+          }
+          onDeleteEventsBasedObjectVariant={onDeleteEventsBasedObjectVariant}
           {...commonProps}
         />
       ) : (

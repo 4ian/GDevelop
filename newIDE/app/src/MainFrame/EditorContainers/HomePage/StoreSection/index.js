@@ -10,9 +10,12 @@ import { AssetStoreContext } from '../../../../AssetStore/AssetStoreContext';
 import AssetPackInstallDialog from '../../../../AssetStore/AssetPackInstallDialog';
 import { enumerateAssetStoreIds } from '../../../../AssetStore/EnumerateAssetStoreIds';
 import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopServices/Shop';
+import { type Course } from '../../../../Utils/GDevelopServices/Asset';
+import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import { getAssetShortHeadersToDisplay } from '../../../../AssetStore/AssetsList';
 import { AssetStoreNavigatorContext } from '../../../../AssetStore/AssetStoreNavigator';
+import { type CourseCompletion } from '../UseCourses';
 
 type Props = {|
   project: ?gdProject,
@@ -21,6 +24,11 @@ type Props = {|
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
   onOpenProfile: () => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
+  getSubscriptionPlansWithPricingSystems: () => Array<SubscriptionPlanWithPricingSystems> | null,
+  onCourseOpen: (courseId: string) => void,
+  courses?: ?Array<Course>,
+  getCourseCompletion: (courseId: string) => CourseCompletion | null,
 |};
 
 const StoreSection = ({
@@ -28,6 +36,11 @@ const StoreSection = ({
   resourceManagementProps,
   onOpenPrivateGameTemplateListingData,
   onOpenProfile,
+  onExtensionInstalled,
+  onCourseOpen,
+  courses,
+  getSubscriptionPlansWithPricingSystems,
+  getCourseCompletion,
 }: Props) => {
   const [
     isAssetPackDialogInstallOpen,
@@ -82,6 +95,12 @@ const StoreSection = ({
         }
         displayPromotions
         onOpenProfile={onOpenProfile}
+        courses={courses}
+        onCourseOpen={onCourseOpen}
+        getSubscriptionPlansWithPricingSystems={
+          getSubscriptionPlansWithPricingSystems
+        }
+        getCourseCompletion={getCourseCompletion}
       />
       {(openedAssetPack || openedAssetShortHeader) && (
         <Line justifyContent="flex-end">
@@ -129,6 +148,7 @@ const StoreSection = ({
             project={project}
             objectsContainer={null}
             resourceManagementProps={resourceManagementProps}
+            onExtensionInstalled={onExtensionInstalled}
           />
         )}
     </SectionContainer>

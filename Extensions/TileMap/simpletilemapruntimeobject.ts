@@ -2,7 +2,6 @@
 namespace gdjs {
   export type SimpleTileMapObjectDataType = {
     content: {
-      opacity: number;
       atlasImage: string;
       rowCount: number;
       columnCount: number;
@@ -16,10 +15,7 @@ namespace gdjs {
 
   export type SimpleTileMapNetworkSyncDataType = {
     op: number;
-    ai: string;
-    wid: number;
-    hei: number;
-    // TODO: Support tilemap synchronization. Find an efficient way to send tiles changes.
+    tm?: TileMapHelper.EditableTileMapAsJsObject;
   };
 
   export type SimpleTileMapNetworkSyncData = ObjectNetworkSyncData &
@@ -40,6 +36,7 @@ namespace gdjs {
     _opacity: float = 255;
     _atlasImage: string;
     _tileMapManager: gdjs.TileMap.TileMapRuntimeManager;
+    _tileMap: TileMapHelper.EditableTileMap | null = null;
     _renderer: gdjs.TileMapRuntimeObjectPixiRenderer;
     readonly _rowCount: number;
     readonly _columnCount: number;
@@ -64,7 +61,6 @@ namespace gdjs {
       objectData: SimpleTileMapObjectDataType
     ) {
       super(instanceContainer, objectData);
-      this._opacity = objectData.content.opacity;
       this._atlasImage = objectData.content.atlasImage;
       this._rowCount = objectData.content.rowCount;
       this._columnCount = objectData.content.columnCount;
@@ -89,16 +85,19 @@ namespace gdjs {
         instanceContainer
       );
 
-      this._loadInitialTileMap((tileMap: TileMapHelper.EditableTileMap) => {
-        this._renderer.updatePosition();
+      this._loadTileMap(
+        this._initialTileMapAsJsObject,
+        (tileMap: TileMapHelper.EditableTileMap) => {
+          this._renderer.updatePosition();
 
-        this._collisionTileMap = new gdjs.TileMap.TransformedCollisionTileMap(
-          tileMap,
-          this._hitBoxTag
-        );
+          this._collisionTileMap = new gdjs.TileMap.TransformedCollisionTileMap(
+            tileMap,
+            this._hitBoxTag
+          );
 
-        this.updateTransformation();
-      });
+          this.updateTransformation();
+        }
+      );
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -141,8 +140,8 @@ namespace gdjs {
         );
         if (!shouldContinue) return;
         if (this._collisionTileMap) {
-          const tileMap = this._renderer.getTileMap();
-          if (tileMap) this._collisionTileMap.updateFromTileMap(tileMap);
+          if (this._tileMap)
+            this._collisionTileMap.updateFromTileMap(this._tileMap);
         }
         this._isTileMapDirty = false;
       }
@@ -152,9 +151,6 @@ namespace gdjs {
       oldObjectData: SimpleTileMapObjectData,
       newObjectData: SimpleTileMapObjectData
     ): boolean {
-      if (oldObjectData.content.opacity !== newObjectData.content.opacity) {
-        this.setOpacity(newObjectData.content.opacity);
-      }
       if (
         oldObjectData.content.atlasImage !== newObjectData.content.atlasImage
       ) {
@@ -165,41 +161,58 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): SimpleTileMapNetworkSyncData {
-      return {
-        ...super.getNetworkSyncData(),
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): SimpleTileMapNetworkSyncData {
+      const syncData: SimpleTileMapNetworkSyncData = {
+        ...super.getNetworkSyncData(syncOptions),
         op: this._opacity,
-        ai: this._atlasImage,
-        wid: this.getWidth(),
-        hei: this.getHeight(),
       };
+      if (this._tileMap && syncOptions.syncFullTileMaps) {
+        const currentTileMapAsJsObject = this._tileMap.toJSObject();
+        syncData.tm = currentTileMapAsJsObject;
+      }
+
+      return syncData;
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: SimpleTileMapNetworkSyncData
+      networkSyncData: SimpleTileMapNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
-      if (
-        networkSyncData.op !== undefined &&
-        networkSyncData.op !== this._opacity
-      ) {
-        this.setOpacity(networkSyncData.op);
-      }
-      if (
-        networkSyncData.wid !== undefined &&
-        networkSyncData.wid !== this.getWidth()
-      ) {
-        this.setWidth(networkSyncData.wid);
-      }
-      if (
-        networkSyncData.hei !== undefined &&
-        networkSyncData.hei !== this.getHeight()
-      ) {
-        this.setHeight(networkSyncData.hei);
-      }
-      if (networkSyncData.ai !== undefined) {
-        // TODO: support changing the atlas texture
+      if (networkSyncData.tm !== undefined) {
+        this._loadTileMap(
+          networkSyncData.tm,
+          (tileMap: TileMapHelper.EditableTileMap) => {
+            if (networkSyncData.w !== undefined) {
+              this.setWidth(networkSyncData.w);
+            }
+            if (networkSyncData.h !== undefined) {
+              this.setHeight(networkSyncData.h);
+            }
+            if (networkSyncData.op !== undefined) {
+              this.setOpacity(networkSyncData.op);
+            }
+
+            // 4. Update position (calculations based on renderer's dimensions).
+            this._renderer.updatePosition();
+
+            if (this._collisionTileMap) {
+              // If collision tile map is already defined, only update it.
+              this._collisionTileMap.updateFromTileMap(tileMap);
+            } else {
+              this._collisionTileMap =
+                new gdjs.TileMap.TransformedCollisionTileMap(
+                  tileMap,
+                  this._hitBoxTag
+                );
+            }
+
+            this.updateTransformation();
+          }
+        );
       }
     }
 
@@ -215,39 +228,43 @@ namespace gdjs {
 
       // 2. Update the renderer so that it updates the tilemap object
       // (used for width and position calculations).
-      this._loadInitialTileMap((tileMap: TileMapHelper.EditableTileMap) => {
-        // 3. Set custom dimensions & opacity if applicable.
-        if (initialInstanceData.customSize) {
-          this.setWidth(initialInstanceData.width);
-          this.setHeight(initialInstanceData.height);
-        }
-        if (initialInstanceData.opacity !== undefined) {
-          this.setOpacity(initialInstanceData.opacity);
-        }
+      this._loadTileMap(
+        this._initialTileMapAsJsObject,
+        (tileMap: TileMapHelper.EditableTileMap) => {
+          // 3. Set custom dimensions & opacity if applicable.
+          if (initialInstanceData.customSize) {
+            this.setWidth(initialInstanceData.width);
+            this.setHeight(initialInstanceData.height);
+          }
+          if (initialInstanceData.opacity !== undefined) {
+            this.setOpacity(initialInstanceData.opacity);
+          }
 
-        // 4. Update position (calculations based on renderer's dimensions).
-        this._renderer.updatePosition();
+          // 4. Update position (calculations based on renderer's dimensions).
+          this._renderer.updatePosition();
 
-        if (this._collisionTileMap) {
-          // If collision tile map is already defined, there's a good chance it means
-          // extraInitializationFromInitialInstance is called when hot reloading the
-          // scene so the collision is tile map is updated instead of being re-created.
-          this._collisionTileMap.updateFromTileMap(tileMap);
-        } else {
-          this._collisionTileMap = new gdjs.TileMap.TransformedCollisionTileMap(
-            tileMap,
-            this._hitBoxTag
-          );
+          if (this._collisionTileMap) {
+            // If collision tile map is already defined, there's a good chance it means
+            // extraInitializationFromInitialInstance is called when hot reloading the
+            // scene so the collision is tile map is updated instead of being re-created.
+            this._collisionTileMap.updateFromTileMap(tileMap);
+          } else {
+            this._collisionTileMap =
+              new gdjs.TileMap.TransformedCollisionTileMap(
+                tileMap,
+                this._hitBoxTag
+              );
+          }
+
+          this.updateTransformation();
         }
-
-        this.updateTransformation();
-      });
+      );
     }
 
-    private _loadInitialTileMap(
+    private _loadTileMap(
+      tileMapAsJsObject: TileMapHelper.EditableTileMapAsJsObject,
       tileMapLoadingCallback: (tileMap: TileMapHelper.EditableTileMap) => void
     ): void {
-      if (!this._initialTileMapAsJsObject) return;
       if (this._columnCount <= 0 || this._rowCount <= 0) {
         console.error(
           `Tilemap object ${this.name} is not configured properly.`
@@ -256,7 +273,7 @@ namespace gdjs {
       }
 
       this._tileMapManager.getOrLoadSimpleTileMap(
-        this._initialTileMapAsJsObject,
+        tileMapAsJsObject,
         this.name,
         this._tileSize,
         this._columnCount,
@@ -300,7 +317,8 @@ namespace gdjs {
                 // getOrLoadTextureCache already log warns and errors.
                 return;
               }
-              this._renderer.updatePixiTileMap(tileMap, textureCache);
+              this._tileMap = tileMap;
+              this._renderer.refreshPixiTileMap(textureCache);
               tileMapLoadingCallback(tileMap);
             },
             (error) => {
@@ -656,7 +674,7 @@ namespace gdjs {
     }
 
     getTileAtGridCoordinates(columnIndex: integer, rowIndex: integer): integer {
-      return this._renderer.getTileId(columnIndex, rowIndex, 0);
+      return this.getTileId(columnIndex, rowIndex, 0);
     }
 
     setTileAtPosition(tileId: number, x: float, y: float) {
@@ -670,11 +688,10 @@ namespace gdjs {
       columnIndex: integer,
       rowIndex: integer
     ) {
-      const tileMap = this._renderer._tileMap;
-      if (!tileMap) {
+      if (!this._tileMap) {
         return;
       }
-      const layer = tileMap.getTileLayer(this._layerIndex);
+      const layer = this._tileMap.getTileLayer(this._layerIndex);
       if (!layer) {
         return;
       }
@@ -686,8 +703,8 @@ namespace gdjs {
 
       if (this._collisionTileMap) {
         const oldTileDefinition =
-          oldTileId !== undefined && tileMap.getTileDefinition(oldTileId);
-        const newTileDefinition = tileMap.getTileDefinition(tileId);
+          oldTileId !== undefined && this._tileMap.getTileDefinition(oldTileId);
+        const newTileDefinition = this._tileMap.getTileDefinition(tileId);
         const hadFullHitBox =
           !!oldTileDefinition &&
           oldTileDefinition.hasFullHitBox(this._hitBoxTag);
@@ -723,7 +740,7 @@ namespace gdjs {
       rowIndex: integer,
       flip: boolean
     ) {
-      this._renderer.flipTileOnY(columnIndex, rowIndex, 0, flip);
+      this.flipTileOnY(columnIndex, rowIndex, 0, flip);
       this._isTileMapDirty = true;
       // No need to invalidate hit boxes since at the moment, collision mask
       // cannot be configured on each tile.
@@ -734,7 +751,7 @@ namespace gdjs {
       rowIndex: integer,
       flip: boolean
     ) {
-      this._renderer.flipTileOnX(columnIndex, rowIndex, 0, flip);
+      this.flipTileOnX(columnIndex, rowIndex, 0, flip);
       this._isTileMapDirty = true;
       // No need to invalidate hit boxes since at the moment, collision mask
       // cannot be configured on each tile.
@@ -744,22 +761,22 @@ namespace gdjs {
       const [columnIndex, rowIndex] =
         this.getGridCoordinatesFromSceneCoordinates(x, y);
 
-      return this._renderer.isTileFlippedOnX(columnIndex, rowIndex, 0);
+      return this.isTileFlippedOnX(columnIndex, rowIndex, 0);
     }
 
     isTileFlippedOnXAtGridCoordinates(columnIndex: integer, rowIndex: integer) {
-      return this._renderer.isTileFlippedOnX(columnIndex, rowIndex, 0);
+      return this.isTileFlippedOnX(columnIndex, rowIndex, 0);
     }
 
     isTileFlippedOnYAtPosition(x: float, y: float) {
       const [columnIndex, rowIndex] =
         this.getGridCoordinatesFromSceneCoordinates(x, y);
 
-      return this._renderer.isTileFlippedOnY(columnIndex, rowIndex, 0);
+      return this.isTileFlippedOnY(columnIndex, rowIndex, 0);
     }
 
     isTileFlippedOnYAtGridCoordinates(columnIndex: integer, rowIndex: integer) {
-      return this._renderer.isTileFlippedOnY(columnIndex, rowIndex, 0);
+      return this.isTileFlippedOnY(columnIndex, rowIndex, 0);
     }
 
     removeTileAtPosition(x: float, y: float) {
@@ -769,11 +786,10 @@ namespace gdjs {
     }
 
     removeTileAtGridCoordinates(columnIndex: integer, rowIndex: integer) {
-      const tileMap = this._renderer._tileMap;
-      if (!tileMap) {
+      if (!this._tileMap) {
         return;
       }
-      const layer = tileMap.getTileLayer(this._layerIndex);
+      const layer = this._tileMap.getTileLayer(this._layerIndex);
       if (!layer) {
         return;
       }
@@ -795,24 +811,28 @@ namespace gdjs {
 
     setGridRowCount(targetRowCount: integer) {
       if (targetRowCount <= 0) return;
-      this._renderer.setGridRowCount(targetRowCount);
+      if (!this._tileMap) return;
+      this._tileMap.setDimensionY(targetRowCount);
       this._isTileMapDirty = true;
       this.invalidateHitboxes();
     }
 
     setGridColumnCount(targetColumnCount: integer) {
       if (targetColumnCount <= 0) return;
-      this._renderer.setGridColumnCount(targetColumnCount);
+      if (!this._tileMap) return;
+      this._tileMap.setDimensionX(targetColumnCount);
       this._isTileMapDirty = true;
       this.invalidateHitboxes();
     }
 
     getGridRowCount(): integer {
-      return this._renderer.getGridRowCount();
+      if (!this._tileMap) return 0;
+      return this._tileMap.getDimensionY();
     }
 
     getGridColumnCount(): integer {
-      return this._renderer.getGridColumnCount();
+      if (!this._tileMap) return 0;
+      return this._tileMap.getDimensionX();
     }
 
     getTilesetColumnCount(): integer {
@@ -821,6 +841,73 @@ namespace gdjs {
 
     getTilesetRowCount(): integer {
       return this._rowCount;
+    }
+
+    getTileMap(): TileMapHelper.EditableTileMap | null {
+      return this._tileMap;
+    }
+
+    getTileMapWidth() {
+      const tileMap = this._tileMap;
+      return tileMap ? tileMap.getWidth() : 20;
+    }
+
+    getTileMapHeight() {
+      const tileMap = this._tileMap;
+      return tileMap ? tileMap.getHeight() : 20;
+    }
+
+    /**
+     * @param x The layer column.
+     * @param y The layer row.
+     * @param layerIndex The layer index.
+     * @returns The tile's id.
+     */
+    getTileId(x: integer, y: integer, layerIndex: integer): integer {
+      if (!this._tileMap) return -1;
+      return this._tileMap.getTileId(x, y, layerIndex);
+    }
+
+    /**
+     * @param x The layer column.
+     * @param y The layer row.
+     * @param layerIndex The layer index.
+     * @param flip true if the tile should be flipped.
+     */
+    flipTileOnY(x: integer, y: integer, layerIndex: integer, flip: boolean) {
+      if (!this._tileMap) return;
+      this._tileMap.flipTileOnY(x, y, layerIndex, flip);
+    }
+
+    /**
+     * @param x The layer column.
+     * @param y The layer row.
+     * @param layerIndex The layer index.
+     * @param flip true if the tile should be flipped.
+     */
+    flipTileOnX(x: integer, y: integer, layerIndex: integer, flip: boolean) {
+      if (!this._tileMap) return;
+      this._tileMap.flipTileOnX(x, y, layerIndex, flip);
+    }
+
+    /**
+     * @param x The layer column.
+     * @param y The layer row.
+     * @param layerIndex The layer index.
+     */
+    isTileFlippedOnX(x: integer, y: integer, layerIndex: integer): boolean {
+      if (!this._tileMap) return false;
+      return this._tileMap.isTileFlippedOnX(x, y, layerIndex);
+    }
+
+    /**
+     * @param x The layer column.
+     * @param y The layer row.
+     * @param layerIndex The layer index.
+     */
+    isTileFlippedOnY(x: integer, y: integer, layerIndex: integer): boolean {
+      if (!this._tileMap) return false;
+      return this._tileMap.isTileFlippedOnY(x, y, layerIndex);
     }
   }
   gdjs.registerObject(

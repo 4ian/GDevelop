@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { I18n } from '@lingui/react';
 import {
-  type SubscriptionPlan,
   type SubscriptionPlanWithPricingSystems,
   type SubscriptionPlanPricingSystem,
 } from '../../Utils/GDevelopServices/Usage';
@@ -208,11 +207,49 @@ export const getPlanPrices = ({
   );
 };
 
+// Helper in case we only have access to the plan ID and not the full plan object.
+export const getPlanInferredNameFromId = (planId: string): string => {
+  switch (planId) {
+    case 'gdevelop_silver':
+    case 'gdevelop_indie': // legacy
+      return 'Silver';
+    case 'gdevelop_gold':
+    case 'gdevelop_pro': // legacy
+      return 'Gold';
+    case 'gdevelop_education':
+      return 'Education';
+    case 'gdevelop_startup':
+    case 'gdevelop_enterprise':
+      return 'Pro';
+    default:
+      return 'GDevelop';
+  }
+};
+
+export const planIdSortingFunction = (
+  planIdA: string,
+  planIdB: string
+): number => {
+  const planOrder = [
+    'gdevelop_free',
+    'gdevelop_indie',
+    'gdevelop_silver',
+    'gdevelop_gold',
+    'gdevelop_pro',
+    'gdevelop_education',
+    'gdevelop_startup',
+    'gdevelop_enterprise',
+  ];
+  const indexA = planOrder.indexOf(planIdA);
+  const indexB = planOrder.indexOf(planIdB);
+  return indexA - indexB;
+};
+
 export const getPlanIcon = ({
-  subscriptionPlan,
+  planId,
   logoSize,
 }: {
-  subscriptionPlan: SubscriptionPlan | SubscriptionPlanWithPricingSystems,
+  planId: string,
   logoSize: number,
 }): React.Node => {
   const GDEVELOP_LOGO_PADDING = 10;
@@ -220,7 +257,7 @@ export const getPlanIcon = ({
   // so we increase the size.
   const PLAN_LOGO_SIZE = logoSize + 2 * GDEVELOP_LOGO_PADDING;
 
-  switch (subscriptionPlan.id) {
+  switch (planId) {
     case 'gdevelop_silver':
     case 'gdevelop_indie': // legacy
       return (
@@ -318,7 +355,7 @@ const PlanCard = (props: Props) => {
   const { isMobile } = useResponsiveWindowSize();
 
   const planIcon = getPlanIcon({
-    subscriptionPlan: props.subscriptionPlanWithPricingSystems,
+    planId: props.subscriptionPlanWithPricingSystems.id,
     logoSize: 25,
   });
   const mainPricingSystem = props.subscriptionPlanWithPricingSystems.pricingSystems.find(

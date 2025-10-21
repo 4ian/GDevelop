@@ -42,6 +42,28 @@ declare type ObjectData = {
 declare type GetNetworkSyncDataOptions = {
   playerNumber?: number;
   isHost?: boolean;
+  syncObjectIdentifiers?: boolean;
+  shouldExcludeVariableFromData?: (variable: Variable) => boolean;
+  syncAllBehaviors?: boolean;
+  syncGameVariables?: boolean;
+  syncSceneTimers?: boolean;
+  syncOnceTriggers?: boolean;
+  syncSounds?: boolean;
+  syncTweens?: boolean;
+  syncLayers?: boolean;
+  syncAsyncTasks?: boolean;
+  syncSceneVisualProps?: boolean;
+  syncFullTileMaps?: boolean;
+};
+
+declare type UpdateFromNetworkSyncDataOptions = {
+  clearSceneStack?: boolean;
+  getExcludedObjectNames?: (runtimeScene: RuntimeScene) => Set<string>;
+  preventSoundsStoppingOnStartup?: boolean;
+  clearInputs?: boolean;
+  keepControl?: boolean;
+  ignoreVariableOwnership?: boolean;
+  shouldExcludeVariableFromUpdate?: (variable: Variable) => boolean;
 };
 
 /** Object containing basic properties for all objects synchronizing over the network. */
@@ -52,6 +74,10 @@ declare type BasicObjectNetworkSyncData = {
   y: number;
   /** The position of the instance on the Z axis. Defined only for 3D games */
   z?: number;
+  /** The width of the instance */
+  w: number;
+  /** The height of the instance */
+  h: number;
   /** Z order of the instance */
   zo: number;
   /** The angle of the instance. */
@@ -66,6 +92,10 @@ declare type BasicObjectNetworkSyncData = {
   pfx: number;
   /** Permanent force on Y */
   pfy: number;
+  /** Name of the object */
+  n?: string;
+  /** The network ID of the instance. */
+  networkId?: string;
 };
 
 /**
@@ -87,6 +117,8 @@ declare interface ObjectNetworkSyncData extends BasicObjectNetworkSyncData {
   tim?: {
     [timerName: string]: TimerNetworkSyncData;
   };
+  /** Tweens */
+  tween?: TweenManagerNetworkSyncData;
 }
 
 declare type ForceNetworkSyncData = {
@@ -98,6 +130,7 @@ declare type ForceNetworkSyncData = {
 };
 
 declare type TimerNetworkSyncData = {
+  name: string;
   time: float;
   paused: boolean;
 };
@@ -124,12 +157,30 @@ declare type VariableData = Readonly<{
 /** A variable child of a container. Those always have a name. */
 declare type RootVariableData = Omit<VariableData, 'name'> & { name: string };
 
-declare type VariableNetworkSyncData = {
-  name: string;
+declare type UnnamedVariableNetworkSyncData = {
   value: string | float | boolean;
   children?: VariableNetworkSyncData[];
   type: VariableType;
-  owner: number;
+  owner: number | null;
+};
+declare type VariableNetworkSyncData = UnnamedVariableNetworkSyncData & {
+  name: string;
+};
+
+declare type LayerNetworkSyncData = {
+  timeScale: float;
+  defaultZOrder: integer;
+  hidden: boolean;
+  effects: {
+    [effectName: string]: EffectNetworkSyncData;
+  };
+  followBaseLayerCamera: boolean;
+  clearColor: Array<integer>;
+  cameraX: float;
+  cameraY: float;
+  cameraZ: float;
+  cameraRotation: float;
+  cameraZoom: float;
 };
 
 /** Properties to set up a behavior. */
@@ -143,6 +194,74 @@ declare type BehaviorData = {
 declare type BehaviorNetworkSyncData = {
   act: boolean;
   props: any;
+};
+
+declare type SceneTweenType =
+  | 'layoutValue'
+  | 'layerValue'
+  | 'variable'
+  | 'cameraZoom'
+  | 'cameraRotation'
+  | 'cameraPosition'
+  | 'colorEffectProperty'
+  | 'numberEffectProperty';
+declare type ObjectTweenType =
+  | 'variable'
+  | 'position'
+  | 'positionX'
+  | 'positionY'
+  | 'positionZ'
+  | 'width'
+  | 'height'
+  | 'depth'
+  | 'angle'
+  | 'rotationX'
+  | 'rotationY'
+  | 'scale'
+  | 'scaleXY'
+  | 'scaleX'
+  | 'scaleY'
+  | 'opacity'
+  | 'characterSize'
+  | 'numberEffectProperty'
+  | 'colorEffectProperty'
+  | 'objectColor'
+  | 'objectColorHSL'
+  | 'objectValue';
+
+declare type TweenInformation = {
+  type: SceneTweenType | ObjectTweenType;
+  layerName?: string;
+  variable?: Variable;
+  effectName?: string;
+  propertyName?: string;
+  scaleFromCenterOfObject?: boolean;
+  useHSLColorTransition?: boolean;
+  destroyObjectWhenFinished?: boolean;
+};
+
+declare type TweenInformationNetworkSyncData = Omit<
+  TweenInformation,
+  'variable' // When synced, a variable is replaced by its path
+> & { variablePath?: string[] };
+
+declare type TweenInstanceNetworkSyncData<T> = {
+  initialValue: T;
+  targetedValue: T;
+  elapsedTime: float;
+  totalDuration: float;
+  easingIdentifier: string;
+  interpolationString: 'linear' | 'exponential';
+  isPaused: boolean;
+  tweenInformation: TweenInformationNetworkSyncData;
+};
+
+declare type TweenManagerNetworkSyncData = {
+  tweens: Record<
+    string,
+    | TweenInstanceNetworkSyncData<float>
+    | TweenInstanceNetworkSyncData<Array<float>>
+  >;
 };
 
 declare interface GdVersionData {
@@ -169,6 +288,8 @@ declare interface LayoutData extends InstanceContainerData {
   title: string;
   behaviorsSharedData: BehaviorSharedData[];
   usedResources: ResourceReference[];
+  resourcesPreloading?: 'at-startup' | 'never' | 'inherit';
+  resourcesUnloading?: 'at-scene-exit' | 'never' | 'inherit';
 }
 
 declare interface LayoutNetworkSyncData {
@@ -177,6 +298,14 @@ declare interface LayoutNetworkSyncData {
   extVar?: {
     [extensionName: string]: VariableNetworkSyncData[];
   };
+  time?: TimeManagerSyncData;
+  tween?: TweenManagerNetworkSyncData;
+  once?: OnceTriggersSyncData;
+  layers?: {
+    [layerName: string]: LayerNetworkSyncData;
+  };
+  async?: AsyncTasksManagerNetworkSyncData;
+  color?: integer;
 }
 
 declare interface SceneStackSceneNetworkSyncData {
@@ -186,12 +315,30 @@ declare interface SceneStackSceneNetworkSyncData {
 
 declare type SceneStackNetworkSyncData = SceneStackSceneNetworkSyncData[];
 
+declare type SoundSyncData = {
+  loop: boolean;
+  volume: float;
+  rate: float;
+  resourceName: string;
+  seek: float;
+};
+declare type ChannelsSoundSyncData = Record<integer, SoundSyncData>;
+declare type SoundManagerSyncData = {
+  globalVolume: float;
+  cachedSpatialPosition: Record<number, [number, number, number]>;
+  freeSounds: SoundSyncData[];
+  freeMusics: SoundSyncData[];
+  musics: ChannelsSoundSyncData;
+  sounds: ChannelsSoundSyncData;
+};
+
 declare interface GameNetworkSyncData {
   var?: VariableNetworkSyncData[];
   ss?: SceneStackNetworkSyncData;
   extVar?: {
     [extensionName: string]: VariableNetworkSyncData[];
   };
+  sm?: SoundManagerSyncData;
 }
 
 declare interface EventsFunctionsExtensionData {
@@ -206,9 +353,19 @@ declare interface SceneAndExtensionsData {
   usedExtensionsWithVariablesData: EventsFunctionsExtensionData[];
 }
 
-declare interface EventsBasedObjectData extends InstanceContainerData {
+declare interface EventsBasedObjectData
+  extends EventsBasedObjectVariantData,
+    InstanceContainerData {
   name: string;
   isInnerAreaFollowingParentSize: boolean;
+  variants: Array<EventsBasedObjectVariantData>;
+  /** Added at runtime to have the default variant with an empty name instead
+   * of the events-based object name. */
+  defaultVariant?: EventsBasedObjectVariantData;
+}
+
+declare interface EventsBasedObjectVariantData extends InstanceContainerData {
+  name: string;
   // The flat representation of defaultSize.
   areaMinX: float;
   areaMinY: float;
@@ -219,12 +376,15 @@ declare interface EventsBasedObjectData extends InstanceContainerData {
   /**
    * A value shared by every object instances.
    *
-   * @see gdjs.CustomRuntimeObjectInstanceContainer._originalInnerArea
+   * @see gdjs.CustomRuntimeObjectInstanceContainer._initialInnerArea
    **/
   _initialInnerArea: {
     min: [float, float, float];
     max: [float, float, float];
   } | null;
+  instances: InstanceData[];
+  objects: ObjectData[];
+  layers: LayerData[];
 }
 
 declare interface BehaviorSharedData {
@@ -357,6 +517,8 @@ declare interface ProjectPropertiesData {
   extensionProperties: Array<ExtensionProperty>;
   useDeprecatedZeroAsDefaultZOrder?: boolean;
   projectUuid?: string;
+  sceneResourcesPreloading?: 'at-startup' | 'never';
+  sceneResourcesUnloading?: 'at-scene-exit' | 'never';
 }
 
 declare interface ExtensionProperty {
@@ -424,4 +586,5 @@ declare type ResourceKind =
   | 'bitmapFont'
   | 'model3D'
   | 'atlas'
-  | 'spine';
+  | 'spine'
+  | 'fake-resource-kind-for-testing-only';

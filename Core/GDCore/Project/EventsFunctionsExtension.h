@@ -12,9 +12,11 @@
 #include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunctionsContainer.h"
+#include "GDCore/Project/EventsFunctionsExtensionChangelog.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/SerializableWithNameList.h"
+
 namespace gd {
 class SerializerElement;
 class Project;
@@ -286,7 +288,14 @@ class GD_CORE_API EventsFunctionsExtension {
   /**
    * \brief Serialize the EventsFunctionsExtension to the specified element
    */
-  void SerializeTo(gd::SerializerElement& element) const;
+  void SerializeTo(gd::SerializerElement& element, bool isExternal = false) const;
+
+  /**
+   * \brief Serialize the EventsFunctionsExtension to the specified element
+   */
+  void SerializeToExternal(gd::SerializerElement& element) const {
+    SerializeTo(element, true);
+  }
 
   /**
    * \brief Load the EventsFunctionsExtension from the specified element.
@@ -399,6 +408,7 @@ class GD_CORE_API EventsFunctionsExtension {
   gd::String helpPath;  ///< The relative path to the help for this extension in
                         ///< the documentation (or an absolute URL).
   gd::String gdevelopVersion;
+  gd::EventsFunctionsExtensionChangelog changelog;
   gd::SerializableWithNameList<EventsBasedBehavior> eventsBasedBehaviors;
   gd::SerializableWithNameList<EventsBasedObject> eventsBasedObjects;
   std::vector<gd::DependencyMetadata> dependencies;

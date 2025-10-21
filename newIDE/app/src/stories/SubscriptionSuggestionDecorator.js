@@ -9,6 +9,9 @@ const subscriptionSuggestionDecorator: StoryDecorator = (Story, context) => {
     <SubscriptionSuggestionContext.Provider
       value={{
         openSubscriptionDialog: action('open subscription dialog'),
+        openSubscriptionPendingDialog: action(
+          'open subscription pending dialog'
+        ),
       }}
     >
       <Story />

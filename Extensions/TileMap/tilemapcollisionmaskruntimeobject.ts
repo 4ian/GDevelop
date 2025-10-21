@@ -26,8 +26,6 @@ namespace gdjs {
     os: float;
     fo: float;
     oo: float;
-    wid: float;
-    hei: float;
   };
 
   export type TilemapCollisionMaskNetworkSyncData = ObjectNetworkSyncData &
@@ -191,9 +189,11 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): TilemapCollisionMaskNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): TilemapCollisionMaskNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         tmjf: this.getTilemapJsonFile(),
         tsjf: this.getTilesetJsonFile(),
         dm: this.getDebugMode(),
@@ -202,15 +202,14 @@ namespace gdjs {
         os: this.getOutlineSize(),
         fo: this.getFillOpacity(),
         oo: this.getOutlineOpacity(),
-        wid: this.getWidth(),
-        hei: this.getHeight(),
       };
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: TilemapCollisionMaskNetworkSyncData
+      networkSyncData: TilemapCollisionMaskNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       if (networkSyncData.tmjf !== undefined) {
         this.setTilemapJsonFile(networkSyncData.tmjf);
@@ -235,12 +234,6 @@ namespace gdjs {
       }
       if (networkSyncData.oo !== undefined) {
         this.setOutlineOpacity(networkSyncData.oo);
-      }
-      if (networkSyncData.wid !== undefined) {
-        this.setWidth(networkSyncData.wid);
-      }
-      if (networkSyncData.hei !== undefined) {
-        this.setHeight(networkSyncData.hei);
       }
     }
 

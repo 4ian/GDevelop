@@ -6,6 +6,7 @@ import {
   redeemPrivateAssetPack,
   type PrivateAssetPackListingData,
   type PrivateGameTemplateListingData,
+  type BundleListingData,
   getCalloutToGetSubscriptionOrClaimAssetPack,
 } from '../../Utils/GDevelopServices/Shop';
 import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
@@ -64,8 +65,10 @@ import Window from '../../Utils/Window';
 import RaisedButton from '../../UI/RaisedButton';
 import PrivateAssetPackPurchaseDialog from './PrivateAssetPackPurchaseDialog';
 import PublicProfileContext from '../../Profile/PublicProfileContext';
+import { LARGE_WIDGET_SIZE } from '../../MainFrame/EditorContainers/HomePage/CardWidget';
+import { BundleStoreContext } from '../Bundles/BundleStoreContext';
 
-const cellSpacing = 8;
+const cellSpacing = 10;
 
 const getPackColumns = (windowSize: WindowSizeType, isLandscape: boolean) => {
   switch (windowSize) {
@@ -76,7 +79,7 @@ const getPackColumns = (windowSize: WindowSizeType, isLandscape: boolean) => {
     case 'large':
       return 4;
     case 'xlarge':
-      return 5;
+      return 6;
     default:
       return 3;
   }
@@ -108,11 +111,16 @@ const contentTypeToMessageDescriptor: {
   audio: t`audios`,
 };
 
+const MAX_COLUMNS = getPackColumns('xlarge', true);
+const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
 const styles = {
   disabledText: { opacity: 0.6 },
   scrollview: { overflowX: 'hidden' },
   grid: {
-    margin: '0 2px', // Remove the default margin of the grid but keep the horizontal padding for focus outline.
+    // Avoid tiles taking too much space on large screens.
+    maxWidth: MAX_SECTION_WIDTH,
+    overflow: 'hidden',
+    width: `calc(100% + ${cellSpacing}px)`, // This is needed to compensate for the `margin: -5px` added by MUI related to spacing.
   },
   leftColumnContainer: {
     flex: 3,
@@ -158,11 +166,9 @@ type Props = {|
     |}
   ) => void,
   onGameTemplateOpen: (
-    privateGameTemplateListingData: PrivateGameTemplateListingData,
-    options?: {|
-      forceProductPage?: boolean,
-    |}
+    privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
+  onBundleOpen: (bundleListingData: BundleListingData) => void,
   simulateAppStoreProduct?: boolean,
 |};
 
@@ -171,17 +177,21 @@ const PrivateAssetPackInformationPage = ({
   privateAssetPackListingDatasFromSameCreator,
   onAssetPackOpen,
   onGameTemplateOpen,
+  onBundleOpen,
   simulateAppStoreProduct,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const { id, name, sellerId } = privateAssetPackListingData;
   const { privateAssetPackListingDatas } = React.useContext(AssetStoreContext);
+  const { bundleListingDatas } = React.useContext(BundleStoreContext);
   const { showAlert } = useAlertDialog();
   const {
     receivedAssetPacks,
+    receivedBundles,
     profile,
     limits,
     assetPackPurchases,
+    bundlePurchases,
     getAuthorizationHeader,
     onOpenLoginDialog,
     subscription,
@@ -192,7 +202,9 @@ const PrivateAssetPackInformationPage = ({
     CreditsPackageStoreContext
   );
   const [selectedUsageType, setSelectedUsageType] = React.useState<string>(
-    privateAssetPackListingData.prices[0].usageType
+    privateAssetPackListingData.prices.length
+      ? privateAssetPackListingData.prices[0].usageType
+      : ''
   );
   const [
     purchasingPrivateAssetPackListingData,
@@ -211,10 +223,9 @@ const PrivateAssetPackInformationPage = ({
     sellerPublicProfile,
     setSellerPublicProfile,
   ] = React.useState<?UserPublicProfile>(null);
-  const [
-    displayPasswordPrompt,
-    setDisplayPasswordPrompt,
-  ] = React.useState<boolean>(false);
+  const [displayPasswordPrompt, setDisplayPasswordPrompt] = React.useState<
+    'redeem' | 'credits' | null
+  >(null);
   const [password, setPassword] = React.useState<string>('');
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
   const { isLandscape, isMediumScreen, windowSize } = useResponsiveWindowSize();
@@ -226,18 +237,28 @@ const PrivateAssetPackInformationPage = ({
   const userAssetPackPurchaseUsageType = React.useMemo(
     () =>
       getUserProductPurchaseUsageType({
-        productId: privateAssetPackListingData
-          ? privateAssetPackListingData.id
-          : null,
-        receivedProducts: receivedAssetPacks,
-        productPurchases: assetPackPurchases,
-        allProductListingDatas: privateAssetPackListingDatas,
+        productId: privateAssetPackListingData.id,
+        receivedProducts: [
+          ...(receivedAssetPacks || []),
+          ...(receivedBundles || []),
+        ],
+        productPurchases: [
+          ...(assetPackPurchases || []),
+          ...(bundlePurchases || []),
+        ],
+        allProductListingDatas: [
+          ...(privateAssetPackListingDatas || []),
+          ...(bundleListingDatas || []),
+        ],
       }),
     [
       assetPackPurchases,
+      bundlePurchases,
       privateAssetPackListingData,
       privateAssetPackListingDatas,
+      bundleListingDatas,
       receivedAssetPacks,
+      receivedBundles,
     ]
   );
   const isAlreadyReceived = !!userAssetPackPurchaseUsageType;
@@ -246,17 +267,21 @@ const PrivateAssetPackInformationPage = ({
     () =>
       getProductsIncludedInBundleTiles({
         product: assetPack,
-        productListingDatas: privateAssetPackListingDatas,
+        productListingDatas: [...(privateAssetPackListingDatas || [])],
         productListingData: privateAssetPackListingData,
-        receivedProducts: receivedAssetPacks,
-        onProductOpen: product =>
+        receivedProducts: [...(receivedAssetPacks || [])],
+        onPrivateAssetPackOpen: product =>
           onAssetPackOpen(product, { forceProductPage: true }),
+        onPrivateGameTemplateOpen: onGameTemplateOpen,
+        onBundleOpen,
       }),
     [
       assetPack,
       privateAssetPackListingDatas,
       receivedAssetPacks,
       onAssetPackOpen,
+      onGameTemplateOpen,
+      onBundleOpen,
       privateAssetPackListingData,
     ]
   );
@@ -265,16 +290,30 @@ const PrivateAssetPackInformationPage = ({
     () =>
       getBundlesContainingProductTiles({
         product: assetPack,
-        productListingDatas: privateAssetPackListingDatas,
-        receivedProducts: receivedAssetPacks,
-        onProductOpen: product =>
+        productListingData: privateAssetPackListingData,
+        productListingDatas: [
+          ...(privateAssetPackListingDatas || []),
+          ...(bundleListingDatas || []),
+        ],
+        receivedProducts: [
+          ...(receivedAssetPacks || []),
+          ...(receivedBundles || []),
+        ],
+        onPrivateAssetPackOpen: product =>
           onAssetPackOpen(product, { forceProductPage: true }),
+        onPrivateGameTemplateOpen: onGameTemplateOpen,
+        onBundleOpen,
       }),
     [
       assetPack,
+      privateAssetPackListingData,
       privateAssetPackListingDatas,
+      bundleListingDatas,
       receivedAssetPacks,
+      receivedBundles,
       onAssetPackOpen,
+      onGameTemplateOpen,
+      onBundleOpen,
     ]
   );
 
@@ -297,8 +336,14 @@ const PrivateAssetPackInformationPage = ({
 
   const onWillRedeemAssetPack = () => {
     // Password is required in dev environment only so that one cannot freely claim asset packs.
-    if (Window.isDev()) setDisplayPasswordPrompt(true);
+    if (Window.isDev()) setDisplayPasswordPrompt('redeem');
     else onRedeemAssetPack();
+  };
+
+  const onWillBuyWithCredits = () => {
+    // Password is required in dev environment only so that one cannot freely claim asset packs.
+    if (Window.isDev()) setDisplayPasswordPrompt('credits');
+    else onClickBuyWithCredits();
   };
 
   const onRedeemAssetPack = React.useCallback(
@@ -410,7 +455,8 @@ const PrivateAssetPackInformationPage = ({
           assetPackTag: assetPack.tag,
           assetPackKind: 'private',
           usageType: selectedUsageType,
-          currency: price ? price.currency : undefined,
+          priceValue: price && price.value,
+          priceCurrency: price && price.currency,
         });
 
         setPurchasingPrivateAssetPackListingData(privateAssetPackListingData);
@@ -442,15 +488,6 @@ const PrivateAssetPackInformationPage = ({
         return;
       }
 
-      sendAssetPackBuyClicked({
-        assetPackId: assetPack.id,
-        assetPackName: assetPack.name,
-        assetPackTag: assetPack.tag,
-        assetPackKind: 'private',
-        currency: 'CREDITS',
-        usageType: selectedUsageType,
-      });
-
       const currentCreditsAmount = limits.credits.userBalance.amount;
       const assetPackPriceForUsageType = privateAssetPackListingData.creditPrices.find(
         price => price.usageType === selectedUsageType
@@ -463,6 +500,17 @@ const PrivateAssetPackInformationPage = ({
         return;
       }
       const assetPackCreditsAmount = assetPackPriceForUsageType.amount;
+
+      sendAssetPackBuyClicked({
+        assetPackId: assetPack.id,
+        assetPackName: assetPack.name,
+        assetPackTag: assetPack.tag,
+        assetPackKind: 'private',
+        priceValue: assetPackCreditsAmount,
+        priceCurrency: 'CREDITS',
+        usageType: selectedUsageType,
+      });
+
       if (currentCreditsAmount < assetPackCreditsAmount) {
         openCreditsPackageDialog({
           missingCredits: assetPackCreditsAmount - currentCreditsAmount,
@@ -656,6 +704,7 @@ const PrivateAssetPackInformationPage = ({
                                           analyticsMetadata: {
                                             reason: 'Claim asset pack',
                                             recommendedPlanId: 'gdevelop_gold',
+                                            placementId: 'claim-asset-pack',
                                           },
                                           filter: 'individual',
                                         })
@@ -690,10 +739,7 @@ const PrivateAssetPackInformationPage = ({
                           label={<Trans>Browse assets</Trans>}
                         />
                       ) : (
-                        <>
-                          {!shouldUseOrSimulateAppStoreProduct && (
-                            <SecureCheckout />
-                          )}
+                        <ColumnStackLayout noMargin>
                           {!errorText && (
                             <PurchaseProductButtons
                               i18n={i18n}
@@ -703,10 +749,13 @@ const PrivateAssetPackInformationPage = ({
                               simulateAppStoreProduct={simulateAppStoreProduct}
                               isAlreadyReceived={isAlreadyReceived}
                               onClickBuy={onClickBuy}
-                              onClickBuyWithCredits={onClickBuyWithCredits}
+                              onClickBuyWithCredits={onWillBuyWithCredits}
                             />
                           )}
-                        </>
+                          {!shouldUseOrSimulateAppStoreProduct && (
+                            <SecureCheckout />
+                          )}
+                        </ColumnStackLayout>
                       )}
                     </ColumnStackLayout>
                   </div>
@@ -763,7 +812,7 @@ const PrivateAssetPackInformationPage = ({
                       <GridList
                         cols={getPackColumns(windowSize, isLandscape)}
                         cellHeight="auto"
-                        spacing={cellSpacing / 2}
+                        spacing={cellSpacing}
                         style={styles.grid}
                       >
                         {packsIncludedInBundleTiles}
@@ -783,7 +832,7 @@ const PrivateAssetPackInformationPage = ({
                         <GridList
                           cols={getPackColumns(windowSize, isLandscape)}
                           cellHeight="auto"
-                          spacing={cellSpacing / 2}
+                          spacing={cellSpacing}
                           style={styles.grid}
                         >
                           {otherPacksFromTheSameAuthorTiles}
@@ -796,8 +845,12 @@ const PrivateAssetPackInformationPage = ({
           ) : null}
           {displayPasswordPrompt && (
             <PasswordPromptDialog
-              onApply={onRedeemAssetPack}
-              onClose={() => setDisplayPasswordPrompt(false)}
+              onApply={
+                displayPasswordPrompt === 'redeem'
+                  ? onWillRedeemAssetPack
+                  : onClickBuyWithCredits
+              }
+              onClose={() => setDisplayPasswordPrompt(null)}
               passwordValue={password}
               setPasswordValue={setPassword}
             />

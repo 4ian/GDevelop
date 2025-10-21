@@ -355,6 +355,7 @@ const PrivateAssetPackPurchaseDialog = ({
         onApply={purchaseSuccessful ? onClose : onWillPurchase}
         cannotBeDismissed // Prevent the user from continuing by clicking outside.
         flexColumnBody
+        fullscreen="never-even-on-mobile"
       >
         <LineStackLayout justifyContent="center" alignItems="center">
           {purchaseSuccessful && <Mark />}

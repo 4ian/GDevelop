@@ -15,7 +15,7 @@ import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
-import StringArrayEditor from '../StringArrayEditor';
+import ChoicesEditor, { type Choice } from '../ChoicesEditor';
 import ColorField from '../UI/ColorField';
 import BehaviorTypeSelector from '../BehaviorTypeSelector';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
@@ -28,7 +28,8 @@ import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import DropIndicator from '../UI/SortableVirtualizedItemList/DropIndicator';
 import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
 import useForceUpdate from '../Utils/UseForceUpdate';
-import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
+import Clipboard from '../Utils/Clipboard';
+import { SafeExtractor } from '../Utils/SafeExtractor';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
@@ -123,9 +124,13 @@ const getValidatedPropertyName = (
   return safeAndUniqueNewName;
 };
 
-const getExtraInfoArray = (property: gdNamedPropertyDescriptor) => {
-  const extraInfoVector = property.getExtraInfo();
-  return extraInfoVector.toJSArray();
+const getChoicesArray = (
+  property: gdNamedPropertyDescriptor
+): Array<Choice> => {
+  return mapVector(property.getChoices(), choice => ({
+    value: choice.getValue(),
+    label: choice.getLabel(),
+  }));
 };
 
 export default function EventsBasedBehaviorPropertiesEditor({
@@ -396,17 +401,20 @@ export default function EventsBasedBehaviorPropertiesEditor({
     [properties, forceUpdate, onPropertiesUpdated]
   );
 
-  const setChoiceExtraInfo = React.useCallback(
+  const setChoices = React.useCallback(
     (property: gdNamedPropertyDescriptor) => {
-      return (newExtraInfo: Array<string>) => {
-        const defaultValueIndex = getExtraInfoArray(property).indexOf(
-          property.getValue()
-        );
-        const vectorString = new gd.VectorString();
-        newExtraInfo.forEach(item => vectorString.push_back(item));
-        property.setExtraInfo(vectorString);
-        vectorString.delete();
-        property.setValue(newExtraInfo[defaultValueIndex] || '');
+      return (choices: Array<Choice>) => {
+        property.clearChoices();
+        for (const choice of choices) {
+          property.addChoice(choice.value, choice.label);
+        }
+        if (
+          !getChoicesArray(property).some(
+            choice => choice.value === property.getValue()
+          )
+        ) {
+          property.setValue('');
+        }
         forceUpdate();
       };
     },
@@ -953,12 +961,18 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                           }}
                                           fullWidth
                                         >
-                                          {getExtraInfoArray(property).map(
+                                          {getChoicesArray(property).map(
                                             (choice, index) => (
                                               <SelectOption
                                                 key={index}
-                                                value={choice}
-                                                label={choice}
+                                                value={choice.value}
+                                                label={
+                                                  choice.value +
+                                                  (choice.label &&
+                                                  choice.label !== choice.value
+                                                    ? ` — ${choice.label}`
+                                                    : '')
+                                                }
                                               />
                                             )
                                           )}
@@ -966,11 +980,9 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                       )}
                                     </ResponsiveLineStackLayout>
                                     {property.getType() === 'Choice' && (
-                                      <StringArrayEditor
-                                        extraInfo={getExtraInfoArray(property)}
-                                        setExtraInfo={setChoiceExtraInfo(
-                                          property
-                                        )}
+                                      <ChoicesEditor
+                                        choices={getChoicesArray(property)}
+                                        setChoices={setChoices(property)}
                                       />
                                     )}
                                     <ResponsiveLineStackLayout noMargin>

@@ -126,5 +126,12 @@ namespace gdjs {
     dispose(): void {
       this._loadedSpines.clear();
     }
+
+    unloadResource(resourceData: ResourceData): void {
+      const loadedSpine = this._loadedSpines.get(resourceData);
+      if (loadedSpine) {
+        this._loadedSpines.delete(resourceData);
+      }
+    }
   }
 }

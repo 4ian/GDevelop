@@ -65,6 +65,13 @@ export const GDevelopAssetApi = {
     : 'https://api.gdevelop.io/asset',
 };
 
+export const GDevelopAssetCdn = {
+  baseUrl: {
+    staging: 'https://resources.gdevelop-app.com/staging/assets-database',
+    live: 'https://resources.gdevelop-app.com/assets-database',
+  },
+};
+
 export const GDevelopAnalyticsApi = {
   baseUrl: isDev
     ? 'https://api-dev.gdevelop.io/analytics'
@@ -105,6 +112,13 @@ export const GDevelopGenerationApi = {
   baseUrl: isDev
     ? 'https://api-dev.gdevelop.io/generation'
     : 'https://api.gdevelop.io/generation',
+};
+
+export const GDevelopAiCdn = {
+  baseUrl: {
+    staging: 'https://public-resources.gdevelop.io/staging/ai',
+    live: 'https://public-resources.gdevelop.io/ai',
+  },
 };
 
 export const GDevelopProjectResourcesStorage = {

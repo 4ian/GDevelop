@@ -21,7 +21,11 @@ module.exports = {
       .setExtensionInformation(
         'Physics2',
         _('2D Physics Engine'),
-        "The 2D physics engine simulates realistic object physics, with gravity, forces, collisions, joints, etc. It's perfect for 2D games that need to have realistic behaving objects and a gameplay centered around it.",
+        "The 2D physics engine simulates realistic object physics, with gravity, forces, collisions, joints, etc. It's perfect for 2D games that need to have realistic behaving objects and a gameplay centered around it.\n" +
+          '\n' +
+          'Objects like floors or wall objects should usually be set to "Static" as type. Objects that should be moveable are usually "Dynamic" (default). "Kinematic" objects (typically, players or controlled characters) are only moved by their "linear velocity" and "angular velocity" - they can interact with other objects but only these other objects will move.\n' +
+          '\n' +
+          'Forces (and impulses) are expressed in all conditions/expressions/actions of the 2D physics engine in Newtons (N). Typical values for a force are 10-200 N. One meter is 100 pixels by default in the game (check the world scale). Mass is expressed in kilograms (kg).',
         'Florian Rival, Franco Maciel',
         'MIT'
       )
@@ -527,6 +531,7 @@ module.exports = {
         physics2Behavior,
         sharedData
       )
+      .markAsIrrelevantForChildObjects()
       .setIncludeFile('Extensions/Physics2Behavior/physics2runtimebehavior.js')
       .addIncludeFile('Extensions/Physics2Behavior/Box2D_v2.3.1_min.wasm.js')
       .addRequiredFile('Extensions/Physics2Behavior/Box2D_v2.3.1_min.wasm.wasm')
@@ -818,7 +823,7 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('yesorno', _('Treat as bullet?'), '', false)
+      .addParameter('yesorno', _('Treat as bullet'), '', false)
       .setDefaultValue('false')
       .getCodeExtraInformation()
       .setFunctionName('setBullet');
@@ -852,7 +857,7 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('yesorno', _('Fixed rotation?'), '', false)
+      .addParameter('yesorno', _('Fixed rotation'), '', false)
       .setDefaultValue('false')
       .getCodeExtraInformation()
       .setFunctionName('setFixedRotation');
@@ -886,7 +891,7 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('yesorno', _('Can sleep?'), '', false)
+      .addParameter('yesorno', _('Can sleep'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
       .setFunctionName('setSleepingAllowed');
@@ -1296,7 +1301,7 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Layer (1 - 16)'))
-      .addParameter('yesorno', _('Enable?'), '', false)
+      .addParameter('yesorno', _('Enable'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
       .setFunctionName('enableLayer');
@@ -1332,7 +1337,7 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Mask (1 - 16)'))
-      .addParameter('yesorno', _('Enable?'), '', false)
+      .addParameter('yesorno', _('Enable'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
       .setFunctionName('enableMask');
@@ -2409,7 +2414,7 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('yesorno', _('Enable?'))
+      .addParameter('yesorno', _('Enable'))
       .getCodeExtraInformation()
       .setFunctionName('enableRevoluteJointLimits');
 
@@ -2488,7 +2493,7 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('yesorno', _('Enable?'))
+      .addParameter('yesorno', _('Enable'))
       .getCodeExtraInformation()
       .setFunctionName('enableRevoluteJointMotor');
 
@@ -2727,7 +2732,7 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('yesorno', _('Enable?'))
+      .addParameter('yesorno', _('Enable'))
       .getCodeExtraInformation()
       .setFunctionName('enablePrismaticJointLimits');
 
@@ -2806,7 +2811,7 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('yesorno', _('Enable?'))
+      .addParameter('yesorno', _('Enable'))
       .getCodeExtraInformation()
       .setFunctionName('enablePrismaticJointMotor');
 
@@ -3486,7 +3491,7 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('yesorno', _('Enable?'))
+      .addParameter('yesorno', _('Enable'))
       .getCodeExtraInformation()
       .setFunctionName('enableWheelJointMotor');
 

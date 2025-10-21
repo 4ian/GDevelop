@@ -4,6 +4,10 @@ import EventsFunctionsExtensionEditor from '../../EventsFunctionsExtensionEditor
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
+  type SceneEventsOutsideEditorChanges,
+  type InstancesOutsideEditorChanges,
+  type ObjectsOutsideEditorChanges,
+  type ObjectGroupsOutsideEditorChanges,
 } from './BaseEditor';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 
@@ -43,6 +47,28 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
   }
 
   onSceneObjectEdited(scene: gdLayout, objectWithContext: ObjectWithContext) {
+    // No thing to be done.
+  }
+
+  onSceneObjectsDeleted(scene: gdLayout) {
+    // No thing to be done.
+  }
+
+  onSceneEventsModifiedOutsideEditor(changes: SceneEventsOutsideEditorChanges) {
+    // No thing to be done.
+  }
+
+  onInstancesModifiedOutsideEditor(changes: InstancesOutsideEditorChanges) {
+    // No thing to be done.
+  }
+
+  onObjectsModifiedOutsideEditor(changes: ObjectsOutsideEditorChanges) {
+    // No thing to be done.
+  }
+
+  onObjectGroupsModifiedOutsideEditor(
+    changes: ObjectGroupsOutsideEditorChanges
+  ) {
     // No thing to be done.
   }
 
@@ -169,7 +195,8 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
           onOpenCustomObjectEditor={eventsBasedObject => {
             this.props.onOpenCustomObjectEditor(
               eventsFunctionsExtension,
-              eventsBasedObject
+              eventsBasedObject,
+              ''
             );
           }}
           hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}

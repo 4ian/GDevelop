@@ -277,6 +277,10 @@ class GD_CORE_API MetadataProvider {
     return &metadata == &badObjectInfo;
   }
 
+  static bool IsBadEffectMetadata(const gd::EffectMetadata& metadata) {
+    return &metadata == &badEffectMetadata;
+  }
+
   virtual ~MetadataProvider();
 
  private:

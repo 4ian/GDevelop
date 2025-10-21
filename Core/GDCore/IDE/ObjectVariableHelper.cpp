@@ -6,6 +6,7 @@
 #include "ObjectVariableHelper.h"
 
 #include "GDCore/IDE/WholeProjectRefactorer.h"
+#include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/InitialInstancesContainer.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/ObjectGroup.h"
@@ -173,6 +174,7 @@ void ObjectVariableHelper::ApplyChangesToObjects(
                                 groupVariablesContainer.Get(variableName),
                                 variablesContainer.Count());
     }
+    // TODO Check what happens if 2 variables exchange their names.
     for (const auto &pair : changeset.oldToNewVariableNames) {
       const gd::String &oldVariableName = pair.first;
       const gd::String &newVariableName = pair.second;
@@ -215,6 +217,7 @@ void ObjectVariableHelper::ApplyChangesToObjectInstances(
               destinationVariablesContainer.Remove(variableName);
             }
           }
+          // TODO Check what happens if 2 variables exchange their names.
           for (const auto &pair : changeset.oldToNewVariableNames) {
             const gd::String &oldVariableName = pair.first;
             const gd::String &newVariableName = pair.second;
@@ -236,6 +239,66 @@ void ObjectVariableHelper::ApplyChangesToObjectInstances(
             }
           }
         }
+        return false;
       });
 }
+
+void ObjectVariableHelper::ApplyChangesToVariants(
+    gd::EventsBasedObject &eventsBasedObject, const gd::String &objectName,
+    const gd::VariablesChangeset &changeset) {
+  auto &defaultVariablesContainer = eventsBasedObject.GetDefaultVariant()
+                                        .GetObjects()
+                                        .GetObject(objectName)
+                                        .GetVariables();
+  for (auto &variant : eventsBasedObject.GetVariants().GetInternalVector()) {
+    if (!variant->GetObjects().HasObjectNamed(objectName)) {
+      continue;
+    }
+    auto &object = variant->GetObjects().GetObject(objectName);
+    auto &variablesContainer = object.GetVariables();
+
+    for (const gd::String &variableName : changeset.removedVariableNames) {
+      variablesContainer.Remove(variableName);
+    }
+    for (const gd::String &variableName : changeset.addedVariableNames) {
+      if (variablesContainer.Has(variableName)) {
+        // It can happens if a child-object already had the variable but it was
+        // missing in other variant child-object.
+        continue;
+      }
+      variablesContainer.Insert(variableName,
+                                defaultVariablesContainer.Get(variableName),
+                                variablesContainer.Count());
+    }
+    // TODO Check what happens if 2 variables exchange their names.
+    for (const auto &pair : changeset.oldToNewVariableNames) {
+      const gd::String &oldVariableName = pair.first;
+      const gd::String &newVariableName = pair.second;
+      if (variablesContainer.Has(newVariableName)) {
+        // It can happens if a child-object already had the variable but it was
+        // missing in other variant child-object.
+        variablesContainer.Remove(oldVariableName);
+      } else {
+        variablesContainer.Rename(oldVariableName, newVariableName);
+      }
+    }
+    // Apply type changes
+    for (const gd::String &variableName : changeset.valueChangedVariableNames) {
+      size_t index = variablesContainer.GetPosition(variableName);
+
+      if (variablesContainer.Has(variableName) &&
+          variablesContainer.Get(variableName).GetType() !=
+              defaultVariablesContainer.Get(variableName).GetType()) {
+        variablesContainer.Remove(variableName);
+        variablesContainer.Insert(
+            variableName, defaultVariablesContainer.Get(variableName), index);
+      }
+    }
+
+    gd::ObjectVariableHelper::ApplyChangesToObjectInstances(
+        variablesContainer, variant->GetInitialInstances(), objectName,
+        changeset);
+  }
+}
+
 } // namespace gd

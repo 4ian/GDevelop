@@ -11,7 +11,6 @@ import { showMessageBox } from '../UI/Messages/MessageBox';
 import { getDeprecatedBehaviorsInformation } from '../Hints';
 import { enumerateBehaviorsMetadata } from './EnumerateBehaviorsMetadata';
 import { BehaviorStore } from '../AssetStore/BehaviorStore';
-import { type SearchableBehaviorMetadata } from '../AssetStore/BehaviorStore/BehaviorStoreContext';
 import { type BehaviorShortHeader } from '../Utils/GDevelopServices/Extension';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { installExtension } from '../AssetStore/ExtensionStore/InstallExtension';
@@ -30,10 +29,11 @@ type Props = {|
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   objectType: string,
   objectBehaviorsTypes: Array<string>,
+  isChildObject: boolean,
   open: boolean,
   onClose: () => void,
   onChoose: (type: string, defaultName: string) => void,
-  onExtensionInstalled: (extensionName: string) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
 export default function NewBehaviorDialog({
@@ -44,6 +44,7 @@ export default function NewBehaviorDialog({
   onChoose,
   objectType,
   objectBehaviorsTypes,
+  isChildObject,
   onExtensionInstalled,
 }: Props) {
   const [isInstalling, setIsInstalling] = React.useState(false);
@@ -90,7 +91,7 @@ export default function NewBehaviorDialog({
     [project]
   );
 
-  const allInstalledBehaviorMetadataList: Array<SearchableBehaviorMetadata> = React.useMemo(
+  const allInstalledBehaviorMetadataList: Array<BehaviorShortHeader> = React.useMemo(
     () => {
       const platform = project.getCurrentPlatform();
       const behaviorMetadataList =
@@ -115,12 +116,29 @@ export default function NewBehaviorDialog({
             behavior.behaviorMetadata
           ),
           tags: behavior.tags,
+          name: gd.PlatformExtension.getBehaviorNameFromFullBehaviorType(
+            behavior.type
+          ),
+          extensionName: gd.PlatformExtension.getExtensionFromFullBehaviorType(
+            behavior.type
+          ),
+
+          isInstalled: true,
+          // The tier will be overridden with repository data.
+          // Only the built-in and user extensions will keep this value.
+          tier: 'installed',
+          // Not relevant for `installed` extensions
+          version: '',
+          url: '',
+          headerUrl: '',
+          extensionNamespace: '',
+          authorIds: [],
         }));
     },
     [project, eventsFunctionsExtension, getAllRequiredBehaviorTypes]
   );
 
-  const installedBehaviorMetadataList: Array<SearchableBehaviorMetadata> = React.useMemo(
+  const installedBehaviorMetadataList: Array<BehaviorShortHeader> = React.useMemo(
     () =>
       allInstalledBehaviorMetadataList.filter(
         behavior => !deprecatedBehaviorsInformation[behavior.type]
@@ -128,7 +146,7 @@ export default function NewBehaviorDialog({
     [allInstalledBehaviorMetadataList, deprecatedBehaviorsInformation]
   );
 
-  const deprecatedBehaviorMetadataList: Array<SearchableBehaviorMetadata> = React.useMemo(
+  const deprecatedBehaviorMetadataList: Array<BehaviorShortHeader> = React.useMemo(
     () => {
       const deprecatedBehaviors = allInstalledBehaviorMetadataList.filter(
         behavior => deprecatedBehaviorsInformation[behavior.type]
@@ -174,7 +192,7 @@ export default function NewBehaviorDialog({
         behaviorShortHeader
       );
       if (wasExtensionInstalled) {
-        onExtensionInstalled(behaviorShortHeader.extensionName);
+        onExtensionInstalled([behaviorShortHeader.extensionName]);
       }
       return wasExtensionInstalled;
     } finally {
@@ -208,6 +226,7 @@ export default function NewBehaviorDialog({
             project={project}
             objectType={objectType}
             objectBehaviorsTypes={objectBehaviorsTypes}
+            isChildObject={isChildObject}
             isInstalling={isInstalling}
             onInstall={async shortHeader =>
               onInstallExtension(i18n, shortHeader)

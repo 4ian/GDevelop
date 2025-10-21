@@ -50,9 +50,6 @@ type Props = {|
     textOverflow?: 'ellipsis',
     textWrap?: 'wrap',
 
-    // Allow user to select text
-    userSelect?: 'text',
-
     // Allow to expand the text
     flex?: 1,
 

@@ -12,7 +12,6 @@ namespace gdjs {
   const logger = new gdjs.Logger('Engine runtime');
   const hexStringRegex = /^(#{0,1}[A-Fa-f0-9]{6})$/;
   const shorthandHexStringRegex = /^(#{0,1}[A-Fa-f0-9]{3})$/;
-  const rgbStringRegex = /^(\d{1,3};\d{1,3};\d{1,3})/;
 
   /**
    * Contains functions used by events (this is a convention only, functions can actually
@@ -33,6 +32,16 @@ namespace gdjs {
     instanceContainer: gdjs.RuntimeInstanceContainer,
     runtimeObject: gdjs.RuntimeObject
   ) => void;
+  type RuntimeSceneGetSyncDataCallback = (
+    runtimeScene: gdjs.RuntimeScene,
+    currentSyncData: LayoutNetworkSyncData,
+    syncOptions: GetNetworkSyncDataOptions
+  ) => void;
+  type RuntimeSceneUpdateFromSyncData = (
+    runtimeScene: gdjs.RuntimeScene,
+    receivedSyncData: LayoutNetworkSyncData,
+    options: UpdateFromNetworkSyncDataOptions
+  ) => void;
 
   export const callbacksFirstRuntimeSceneLoaded: Array<RuntimeSceneCallback> =
     [];
@@ -45,6 +54,10 @@ namespace gdjs {
   export const callbacksRuntimeSceneUnloading: Array<RuntimeSceneCallback> = [];
   export const callbacksRuntimeSceneUnloaded: Array<RuntimeSceneCallback> = [];
   export const callbacksObjectDeletedFromScene: Array<RuntimeSceneRuntimeObjectCallback> =
+    [];
+  export const callbacksRuntimeSceneGetSyncData: Array<RuntimeSceneGetSyncDataCallback> =
+    [];
+  export const callbacksRuntimeSceneUpdateFromSyncData: Array<RuntimeSceneUpdateFromSyncData> =
     [];
 
   /** Base64 encoded logo of GDevelop for the splash screen. */
@@ -105,9 +118,9 @@ namespace gdjs {
   export const rgbOrHexToRGBColor = function (
     value: string
   ): [number, number, number] {
-    const rgbColor = extractRGBString(value);
-    if (rgbColor) {
-      const splitValue = rgbColor.split(';');
+    // TODO Add a `result` parameter to allow to reuse the returned array.
+    if (!value.startsWith('#')) {
+      const splitValue = value.split(';');
       // If a RGB string is provided, return the RGB object.
       if (splitValue.length === 3) {
         return [
@@ -145,11 +158,11 @@ namespace gdjs {
    * @param b Blue
    */
   export const rgbToHexNumber = function (
-    r: integer,
-    g: integer,
-    b: integer
+    r: float,
+    g: float,
+    b: float
   ): integer {
-    return (r << 16) + (g << 8) + b;
+    return (Math.round(r) << 16) + (Math.round(g) << 8) + Math.round(b);
   };
 
   /**
@@ -188,12 +201,6 @@ namespace gdjs {
   };
   export const extractShorthandHexString = (str: string): string | null => {
     const matches = str.match(shorthandHexStringRegex);
-    if (!matches) return null;
-    return matches[0];
-  };
-
-  export const extractRGBString = (str: string): string | null => {
-    const matches = str.match(rgbStringRegex);
     if (!matches) return null;
     return matches[0];
   };
@@ -402,6 +409,28 @@ namespace gdjs {
     callback: RuntimeSceneRuntimeObjectCallback
   ): void {
     gdjs.callbacksObjectDeletedFromScene.push(callback);
+  };
+
+  /**
+   * Register a function to be called each time a scene is getting its sync
+   * data retrieved (via getNetworkSyncData).
+   * @param callback The function to be called.
+   */
+  export const registerRuntimeSceneGetSyncDataCallback = function (
+    callback: RuntimeSceneGetSyncDataCallback
+  ): void {
+    gdjs.callbacksRuntimeSceneGetSyncData.push(callback);
+  };
+
+  /**
+   * Register a function to be called each time a scene is getting its sync
+   * data updated (via updateFromNetworkSyncData).
+   * @param callback The function to be called.
+   */
+  export const registerRuntimeSceneUpdateFromSyncDataCallback = function (
+    callback: RuntimeSceneUpdateFromSyncData
+  ): void {
+    gdjs.callbacksRuntimeSceneUpdateFromSyncData.push(callback);
   };
 
   /**

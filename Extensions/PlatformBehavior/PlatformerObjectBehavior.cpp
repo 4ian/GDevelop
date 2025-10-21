@@ -36,6 +36,7 @@ void PlatformerObjectBehavior::InitializeContent(
   behaviorContent.SetAttribute("yGrabOffset", 0);
   behaviorContent.SetAttribute("xGrabTolerance", 10);
   behaviorContent.SetAttribute("useLegacyTrajectory", false);
+  behaviorContent.SetAttribute("useRepeatedJump", false);
   behaviorContent.SetAttribute("canGoDownFromJumpthru", true);
 }
 
@@ -108,11 +109,11 @@ PlatformerObjectBehavior::GetProperties(
       .SetValue(
           gd::String::From(behaviorContent.GetDoubleAttribute("maxSpeed")));
   properties["IgnoreDefaultControls"]
-      .SetLabel(_("Default controls"))
+      .SetLabel(_("Disable default keyboard controls"))
       .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden)
       .SetValue(behaviorContent.GetBoolAttribute("ignoreDefaultControls")
-                    ? "false"
-                    : "true")
+                    ? "true"
+                    : "false")
       .SetType("Boolean");
   properties["SlopeMaxAngle"]
       .SetLabel(_("Slope max. angle"))
@@ -156,11 +157,20 @@ PlatformerObjectBehavior::GetProperties(
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("xGrabTolerance", 10)));
   properties["UseLegacyTrajectory"]
-      .SetLabel(_("Use frame rate dependent trajectories (deprecated, it's "
-                  "recommended to leave this unchecked)"))
+      .SetLabel(_("Use frame rate dependent trajectories "
+                  "(deprecated — best left unchecked)"))
       .SetGroup(_("Deprecated options"))
       .SetDeprecated()
       .SetValue(behaviorContent.GetBoolAttribute("useLegacyTrajectory", true)
+                    ? "true"
+                    : "false")
+      .SetType("Boolean");
+  properties["UseRepeatedJump"]
+      .SetLabel(_("Allows repeated jumps while holding the jump key "
+                  "(deprecated — best left unchecked)"))
+      .SetGroup(_("Deprecated options"))
+      .SetDeprecated()
+      .SetValue(behaviorContent.GetBoolAttribute("useRepeatedJump", true)
                     ? "true"
                     : "false")
       .SetType("Boolean");
@@ -180,13 +190,15 @@ bool PlatformerObjectBehavior::UpdateProperty(
     const gd::String& name,
     const gd::String& value) {
   if (name == "IgnoreDefaultControls")
-    behaviorContent.SetAttribute("ignoreDefaultControls", (value == "0"));
+    behaviorContent.SetAttribute("ignoreDefaultControls", (value == "1"));
   else if (name == "CanGrabPlatforms")
     behaviorContent.SetAttribute("canGrabPlatforms", (value == "1"));
   else if (name == "CanGrabWithoutMoving")
     behaviorContent.SetAttribute("canGrabWithoutMoving", (value == "1"));
   else if (name == "UseLegacyTrajectory")
     behaviorContent.SetAttribute("useLegacyTrajectory", (value == "1"));
+  else if (name == "UseRepeatedJump")
+    behaviorContent.SetAttribute("useRepeatedJump", (value == "1"));
   else if (name == "CanGoDownFromJumpthru")
     behaviorContent.SetAttribute("canGoDownFromJumpthru", (value == "1"));
   else if (name == "YGrabOffset")

@@ -24,6 +24,7 @@ const instancesEditorSettings: InstancesEditorSettings = {
   snap: false,
   zoomFactor: 1,
   windowMask: false,
+  selectedLayer: '',
 };
 
 export default {
@@ -39,6 +40,7 @@ export const Default = () => (
         project={testProject.project}
         layout={testProject.testLayout}
         eventsBasedObject={null}
+        eventsBasedObjectVariant={null}
         layersContainer={testProject.testLayout.getLayers()}
         globalObjectsContainer={testProject.project.getObjects()}
         objectsContainer={testProject.testLayout.getObjects()}

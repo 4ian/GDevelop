@@ -1,7 +1,9 @@
 // @flow
 import * as React from 'react';
-import { type I18n as I18nType } from '@lingui/core';
-import { type NewProjectSetup } from '../../ProjectCreation/NewProjectSetupDialog';
+import {
+  type NewProjectSetup,
+  type ExampleProjectSetup,
+} from '../../ProjectCreation/NewProjectSetupDialog';
 import { type UnsavedChanges } from '../UnsavedChangesContext';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import type { StorageProvider } from '../../ProjectsStorage';
@@ -17,6 +19,7 @@ import { type CourseChapter } from '../../Utils/GDevelopServices/Asset';
 import { type GamesList } from '../../GameDashboard/UseGamesList';
 import { type GamesPlatformFrameTools } from './HomePage/PlaySection/UseGamesPlatformFrame';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
+import { type CreateProjectResult } from '../../Utils/UseCreateProject';
 
 export type EditorContainerExtraProps = {|
   // Events function extension editor
@@ -26,6 +29,27 @@ export type EditorContainerExtraProps = {|
 
   // Homepage
   storageProviders?: Array<StorageProvider>,
+
+  // Ask AI
+  mode?: 'chat' | 'agent',
+  aiRequestId?: string | null,
+|};
+
+export type SceneEventsOutsideEditorChanges = {|
+  scene: gdLayout,
+  newOrChangedAiGeneratedEventIds: Set<string>,
+|};
+
+export type InstancesOutsideEditorChanges = {|
+  scene: gdLayout,
+|};
+
+export type ObjectsOutsideEditorChanges = {|
+  scene: gdLayout,
+|};
+
+export type ObjectGroupsOutsideEditorChanges = {|
+  scene: gdLayout,
 |};
 
 export type RenderEditorContainerProps = {|
@@ -35,7 +59,7 @@ export type RenderEditorContainerProps = {|
   fileMetadata: ?FileMetadata,
   storageProvider: StorageProvider,
   setToolbar: (?React.Node) => void,
-  hideTabsTitleBarAndEditorToolbar: (hidden: boolean) => void,
+  setGamesPlatformFrameShown: ({| shown: boolean, isMobile: boolean |}) => void,
 
   // Some optional extra props to pass to the rendered editor
   extraEditorProps: ?EditorContainerExtraProps,
@@ -55,7 +79,18 @@ export type RenderEditorContainerProps = {|
 
   // Opening other editors:
   onOpenExternalEvents: string => void,
-  onOpenLayout: string => void,
+  onOpenLayout: (
+    sceneName: string,
+    options?: {|
+      openEventsEditor: boolean,
+      openSceneEditor: boolean,
+      focusWhenOpened:
+        | 'scene-or-events-otherwise'
+        | 'scene'
+        | 'events'
+        | 'none',
+    |}
+  ) => void,
   onOpenEvents: (sceneName: string) => void,
   openInstructionOrExpression: (
     extension: gdPlatformExtension,
@@ -63,9 +98,15 @@ export type RenderEditorContainerProps = {|
   ) => void,
   onOpenCustomObjectEditor: (
     gdEventsFunctionsExtension,
-    gdEventsBasedObject
+    gdEventsBasedObject,
+    variantName: string
   ) => void,
   openObjectEvents: (extensionName: string, objectName: string) => void,
+  onOpenAskAi: ({|
+    mode: 'chat' | 'agent',
+    aiRequestId: string | null,
+    paneIdentifier: 'left' | 'center' | 'right' | null,
+  |}) => void,
 
   // Events function management:
   onLoadEventsFunctionsExtensions: () => Promise<void>,
@@ -125,13 +166,16 @@ export type RenderEditorContainerProps = {|
   // Project creation
   onOpenNewProjectSetupDialog: () => void,
   onCreateProjectFromExample: (
-    exampleShortHeader: ExampleShortHeader,
-    newProjectSetup: NewProjectSetup,
-    i18n: I18nType,
-    isQuickCustomization?: boolean
-  ) => Promise<void>,
+    exampleProjectSetup: ExampleProjectSetup
+  ) => Promise<CreateProjectResult>,
+  onCreateEmptyProject: (
+    newProjectSetup: NewProjectSetup
+  ) => Promise<CreateProjectResult>,
   onOpenTemplateFromTutorial: (tutorialId: string) => Promise<void>,
-  onOpenTemplateFromCourseChapter: CourseChapter => Promise<void>,
+  onOpenTemplateFromCourseChapter: (
+    CourseChapter,
+    templateId?: string
+  ) => Promise<void>,
   onOpenPrivateGameTemplateListingData: PrivateGameTemplateListingData => void,
 
   // Project save
@@ -140,12 +184,29 @@ export type RenderEditorContainerProps = {|
 
   // Object editing
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
-  onEventsBasedObjectChildrenEdited: () => void,
+  onEventsBasedObjectChildrenEdited: (
+    eventsBasedObject: gdEventsBasedObject
+  ) => void,
   onSceneObjectEdited: (
     scene: gdLayout,
     objectWithContext: ObjectWithContext
   ) => void,
+  onSceneObjectsDeleted: (scene: gdLayout) => void,
 
+  onInstancesModifiedOutsideEditor: (
+    changes: InstancesOutsideEditorChanges
+  ) => void,
+  onObjectsModifiedOutsideEditor: (
+    changes: ObjectsOutsideEditorChanges
+  ) => void,
+  onObjectGroupsModifiedOutsideEditor: (
+    changes: ObjectGroupsOutsideEditorChanges
+  ) => void,
+
+  // Events editing
+  onSceneEventsModifiedOutsideEditor: (
+    changes: SceneEventsOutsideEditorChanges
+  ) => void,
   onExtractAsExternalLayout: (name: string) => void,
   onExtractAsEventBasedObject: (
     extensionName: string,
@@ -155,7 +216,17 @@ export type RenderEditorContainerProps = {|
     extensionName: string,
     eventsBasedObjectName: string
   ) => void,
-  onExtensionInstalled: (extensionName: string) => void,
+  onOpenEventBasedObjectVariantEditor: (
+    extensionName: string,
+    eventsBasedObjectName: string,
+    variantName: string
+  ) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onDeleteEventsBasedObjectVariant: (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventBasedObject: gdEventsBasedObject,
+    variant: gdEventsBasedObjectVariant
+  ) => void,
 |};
 
 export type RenderEditorContainerPropsWithRef = {|

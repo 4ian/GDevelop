@@ -278,8 +278,15 @@ namespace gdjs {
                 'same-origin',
           }
         );
-        const fontData = await response.text();
-        this._loadedFontsData.set(resource, fontData);
+        const fontDataRaw = await response.text();
+
+        // Sanitize: remove lines starting with # (acting as comments)
+        const sanitizedFontData = fontDataRaw
+          .split('\n')
+          .filter((line) => !line.trim().startsWith('#'))
+          .join('\n');
+
+        this._loadedFontsData.set(resource, sanitizedFontData);
       } catch (error) {
         logger.error(
           "Can't fetch the bitmap font file " +
@@ -306,6 +313,23 @@ namespace gdjs {
       this._pixiBitmapFontsInUse = {};
       this._pixiBitmapFontsToUninstall.length = 0;
       this._loadedFontsData.clear();
+    }
+
+    unloadResource(resourceData: ResourceData): void {
+      const loadedFont = this._loadedFontsData.get(resourceData);
+      if (loadedFont) {
+        this._loadedFontsData.delete(resourceData);
+      }
+
+      for (const bitmapFontInstallKey in this._pixiBitmapFontsInUse) {
+        if (bitmapFontInstallKey.endsWith(resourceData.file))
+          PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
+      }
+
+      for (const bitmapFontInstallKey of this._pixiBitmapFontsToUninstall) {
+        if (bitmapFontInstallKey.endsWith(resourceData.file))
+          PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
+      }
     }
   }
 

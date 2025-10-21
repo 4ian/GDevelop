@@ -17,7 +17,7 @@ const gd: libGDevelop = global.gd;
 
 type Props = BehaviorEditorProps;
 
-const areAdvancedPropertiesModified = (behavior: gdBehavior) => {
+export const areAdvancedPropertiesModified = (behavior: gdBehavior) => {
   const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
     gd.JsPlatform.get(),
     behavior.getTypeName()

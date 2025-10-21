@@ -7,15 +7,28 @@
 #define GDCORE_PROPERTYDESCRIPTOR
 #include <vector>
 
-#include "GDCore/String.h"
 #include "GDCore/Project/MeasurementUnit.h"
 #include "GDCore/Project/QuickCustomization.h"
+#include "GDCore/String.h"
 
 namespace gd {
 class SerializerElement;
 }
 
 namespace gd {
+
+class GD_CORE_API PropertyDescriptorChoice {
+ public:
+  PropertyDescriptorChoice(const gd::String& value, const gd::String& label)
+      : value(value), label(label) {}
+
+  const gd::String& GetValue() const { return value; }
+  const gd::String& GetLabel() const { return label; }
+
+ private:
+  gd::String value;
+  gd::String label;
+};
 
 /**
  * \brief Used to describe a property shown in a property grid.
@@ -31,8 +44,12 @@ class GD_CORE_API PropertyDescriptor {
    * \param propertyValue The value of the property.
    */
   PropertyDescriptor(gd::String propertyValue)
-      : currentValue(propertyValue), type("string"), label(""), hidden(false),
-        deprecated(false), advanced(false),
+      : currentValue(propertyValue),
+        type("string"),
+        label(""),
+        hidden(false),
+        deprecated(false),
+        advanced(false),
         hasImpactOnOtherProperties(false),
         measurementUnit(gd::MeasurementUnit::GetUndefined()),
         quickCustomizationVisibility(QuickCustomization::Visibility::Default) {}
@@ -41,10 +58,13 @@ class GD_CORE_API PropertyDescriptor {
    * \brief Empty constructor creating an empty property to be displayed.
    */
   PropertyDescriptor()
-      : hidden(false), deprecated(false), advanced(false),
+      : hidden(false),
+        deprecated(false),
+        advanced(false),
         hasImpactOnOtherProperties(false),
         measurementUnit(gd::MeasurementUnit::GetUndefined()),
-        quickCustomizationVisibility(QuickCustomization::Visibility::Default){};
+        quickCustomizationVisibility(QuickCustomization::Visibility::Default) {
+        };
 
   /**
    * \brief Destructor
@@ -88,10 +108,22 @@ class GD_CORE_API PropertyDescriptor {
   }
 
   /**
-   * \brief Change the group where this property is displayed to the user, if any.
+   * \brief Change the group where this property is displayed to the user, if
+   * any.
    */
   PropertyDescriptor& SetGroup(gd::String group_) {
     group = group_;
+    return *this;
+  }
+
+  PropertyDescriptor& ClearChoices() {
+    choices.clear();
+    return *this;
+  }
+
+  PropertyDescriptor& AddChoice(const gd::String& value,
+                                const gd::String& label) {
+    choices.push_back(PropertyDescriptorChoice(value, label));
     return *this;
   }
 
@@ -118,7 +150,8 @@ class GD_CORE_API PropertyDescriptor {
   /**
    * \brief Change the unit of measurement of the property value.
    */
-  PropertyDescriptor& SetMeasurementUnit(const gd::MeasurementUnit &measurementUnit_) {
+  PropertyDescriptor& SetMeasurementUnit(
+      const gd::MeasurementUnit& measurementUnit_) {
     measurementUnit = measurementUnit_;
     return *this;
   }
@@ -128,14 +161,18 @@ class GD_CORE_API PropertyDescriptor {
   const gd::String& GetLabel() const { return label; }
   const gd::String& GetDescription() const { return description; }
   const gd::String& GetGroup() const { return group; }
-  const gd::MeasurementUnit& GetMeasurementUnit() const { return measurementUnit; }
+  const gd::MeasurementUnit& GetMeasurementUnit() const {
+    return measurementUnit;
+  }
 
   const std::vector<gd::String>& GetExtraInfo() const {
     return extraInformation;
   }
 
-  std::vector<gd::String>& GetExtraInfo() {
-    return extraInformation;
+  std::vector<gd::String>& GetExtraInfo() { return extraInformation; }
+
+  const std::vector<PropertyDescriptorChoice>& GetChoices() const {
+    return choices;
   }
 
   /**
@@ -178,23 +215,26 @@ class GD_CORE_API PropertyDescriptor {
   bool IsAdvanced() const { return advanced; }
 
   /**
-   * \brief Check if the property has impact on other properties - which means a change
-   * must re-render other properties.
+   * \brief Check if the property has impact on other properties - which means a
+   * change must re-render other properties.
    */
   bool HasImpactOnOtherProperties() const { return hasImpactOnOtherProperties; }
 
   /**
-   * \brief Set if the property has impact on other properties - which means a change
-   * must re-render other properties.
+   * \brief Set if the property has impact on other properties - which means a
+   * change must re-render other properties.
    */
   PropertyDescriptor& SetHasImpactOnOtherProperties(bool enable) {
     hasImpactOnOtherProperties = enable;
     return *this;
   }
 
-  QuickCustomization::Visibility GetQuickCustomizationVisibility() const { return quickCustomizationVisibility; }
+  QuickCustomization::Visibility GetQuickCustomizationVisibility() const {
+    return quickCustomizationVisibility;
+  }
 
-  PropertyDescriptor& SetQuickCustomizationVisibility(QuickCustomization::Visibility visibility) {
+  PropertyDescriptor& SetQuickCustomizationVisibility(
+      QuickCustomization::Visibility visibility) {
     quickCustomizationVisibility = visibility;
     return *this;
   }
@@ -231,15 +271,17 @@ class GD_CORE_API PropertyDescriptor {
   gd::String label;        //< The user-friendly property name
   gd::String description;  //< The user-friendly property description
   gd::String group;        //< The user-friendly property group
+  std::vector<PropertyDescriptorChoice>
+      choices;  //< The optional choices for the property.
   std::vector<gd::String>
-      extraInformation;  ///< Can be used to store for example the available
-                         ///< choices, if a property is a displayed as a combo
-                         ///< box.
+      extraInformation;  ///< Can be used to store an additional information
+                         ///< like an object type.
   bool hidden;
   bool deprecated;
   bool advanced;
   bool hasImpactOnOtherProperties;
-  gd::MeasurementUnit measurementUnit; //< The unit of measurement of the property vale.
+  gd::MeasurementUnit
+      measurementUnit;  //< The unit of measurement of the property vale.
   QuickCustomization::Visibility quickCustomizationVisibility;
 };
 

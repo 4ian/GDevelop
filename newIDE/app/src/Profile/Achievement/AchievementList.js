@@ -19,8 +19,6 @@ import { selectMessageByLocale } from '../../Utils/i18n/MessageByLocale';
 type Props = {|
   badges: Array<BadgeType>,
   achievements: Array<Achievement>,
-  displayUnclaimedAchievements: boolean,
-  displayNotifications: boolean,
 |};
 
 const styles = {
@@ -33,12 +31,7 @@ const styles = {
   unlockedAchievement: {},
 };
 
-const AchievementList = ({
-  badges,
-  achievements,
-  displayUnclaimedAchievements,
-  displayNotifications,
-}: Props) => {
+const AchievementList = ({ badges, achievements }: Props) => {
   const [
     achievementsWithBadgeData,
     setAchievementsWithBadgeData,
@@ -55,13 +48,11 @@ const AchievementList = ({
         (acc, achievement) => {
           const badge = badgeByAchievementId[achievement.id];
           const hasBadge = !!badge;
-          if (hasBadge || (!hasBadge && displayUnclaimedAchievements)) {
-            acc.push({
-              ...achievement,
-              seen: hasBadge ? badge.seen : undefined,
-              unlockedAt: hasBadge ? parseISO(badge.unlockedAt) : null,
-            });
-          }
+          acc.push({
+            ...achievement,
+            seen: hasBadge ? badge.seen : undefined,
+            unlockedAt: hasBadge ? parseISO(badge.unlockedAt) : null,
+          });
 
           return acc;
         },
@@ -72,7 +63,7 @@ const AchievementList = ({
 
       setAchievementsWithBadgeData(achievementsWithBadgeData);
     },
-    [badges, achievements, displayUnclaimedAchievements]
+    [badges, achievements]
   );
 
   return (
@@ -88,10 +79,8 @@ const AchievementList = ({
                 <Column justifyContent="center" alignItems="flex-start">
                   <DotBadge
                     invisible={
-                      !(
-                        displayNotifications &&
-                        achievementWithBadgeData.seen === false
-                      )
+                      achievementWithBadgeData.seen === true ||
+                      achievementWithBadgeData.seen === undefined
                     }
                   >
                     <Text
@@ -109,22 +98,20 @@ const AchievementList = ({
                       )}
                     </Text>
                   </DotBadge>
-                  {displayUnclaimedAchievements && (
-                    <Text
-                      noMargin
-                      style={
-                        achievementWithBadgeData.unlockedAt
-                          ? styles.unlockedAchievement
-                          : styles.lockedAchievement
-                      }
-                      size="body2"
-                    >
-                      {selectMessageByLocale(
-                        i18n,
-                        achievementWithBadgeData.descriptionByLocale
-                      )}
-                    </Text>
-                  )}
+                  <Text
+                    noMargin
+                    style={
+                      achievementWithBadgeData.unlockedAt
+                        ? styles.unlockedAchievement
+                        : styles.lockedAchievement
+                    }
+                    size="body2"
+                  >
+                    {selectMessageByLocale(
+                      i18n,
+                      achievementWithBadgeData.descriptionByLocale
+                    )}
+                  </Text>
                 </Column>
                 <Column>
                   {achievementWithBadgeData.unlockedAt ? (

@@ -12,10 +12,13 @@
 
 export const ANNOUNCEMENTS_FETCH_TIMEOUT = 1000;
 export const IN_APP_TUTORIALS_FETCH_TIMEOUT = 1000;
+// COURSES_FETCH - No timeout. Loaded on the homepage.
 export const COURSE_CHAPTERS_FETCH_TIMEOUT = 3000;
 
 export const PRIVATE_GAME_TEMPLATES_FETCH_TIMEOUT = 5000; // But called right away because it's used in the homepage.
+export const BUNDLES_FETCH_TIMEOUT = 5000; // But called right away because it's used in the homepage.
 export const EXAMPLES_FETCH_TIMEOUT = 5000; // But called right away because it's used in the homepage.
+export const AI_SETTINGS_FETCH_TIMEOUT = 4000;
 
 // Below are the calls made when the user is authenticated. They are called right away
 // BADGE_FETCH

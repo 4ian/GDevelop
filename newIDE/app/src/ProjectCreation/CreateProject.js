@@ -1,14 +1,14 @@
 // @flow
 import { t } from '@lingui/macro';
-import { type I18n as I18nType } from '@lingui/core';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
-import {
-  getExample,
-  type ExampleShortHeader,
-} from '../Utils/GDevelopServices/Example';
+import { getExample } from '../Utils/GDevelopServices/Example';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
 import { showErrorBox } from '../UI/Messages/MessageBox';
+import {
+  type ExampleProjectSetup,
+  type NewProjectCreationSource,
+} from './NewProjectSetupDialog';
 const gd: libGDevelop = global.gd;
 
 export type NewProjectSource = {|
@@ -29,14 +29,31 @@ const getNewProjectSourceFromUrl = (projectUrl: string): NewProjectSource => {
 };
 
 export const addDefaultLightToLayer = (layer: gdLayer): void => {
-  const light = layer.getEffects().insertNewEffect('3D Light', 0);
-  light.setEffectType('Scene3D::HemisphereLight');
-  light.setStringParameter('skyColor', '255;255;255');
-  light.setStringParameter('groundColor', '64;64;64');
-  light.setDoubleParameter('intensity', 1);
-  light.setStringParameter('top', 'Y-');
-  light.setDoubleParameter('elevation', 45);
-  light.setDoubleParameter('rotation', 0);
+  const directionalLight = layer
+    .getEffects()
+    .insertNewEffect('3D Sun Light', 0);
+  directionalLight.setEffectType('Scene3D::DirectionalLight');
+  directionalLight.setStringParameter('color', '255;255;255');
+  directionalLight.setDoubleParameter('intensity', 0.75);
+  directionalLight.setStringParameter('top', 'Z+');
+  directionalLight.setDoubleParameter('elevation', 40);
+  directionalLight.setDoubleParameter('rotation', 300);
+  directionalLight.setBooleanParameter('isCastingShadow', true);
+  directionalLight.setStringParameter('shadowQuality', 'medium');
+  directionalLight.setDoubleParameter('minimumShadowBias', 0);
+  directionalLight.setDoubleParameter('distanceFromCamera', 1500);
+  directionalLight.setDoubleParameter('frustumSize', 4000);
+
+  const ambientLight = layer
+    .getEffects()
+    .insertNewEffect('3D Ambient Hemisphere Light', 0);
+  ambientLight.setEffectType('Scene3D::HemisphereLight');
+  ambientLight.setStringParameter('skyColor', '255;255;255');
+  ambientLight.setStringParameter('groundColor', '127;127;127');
+  ambientLight.setDoubleParameter('intensity', 0.33);
+  ambientLight.setStringParameter('top', 'Z+');
+  ambientLight.setDoubleParameter('elevation', 40);
+  ambientLight.setDoubleParameter('rotation', 300);
 };
 
 export const addDefaultLightToAllLayers = (layout: gdLayout): void => {
@@ -46,27 +63,41 @@ export const addDefaultLightToAllLayers = (layout: gdLayout): void => {
   }
 };
 
-export const createNewEmptyProject = (): NewProjectSource => {
+const getCompositeSlug = (
+  creationSource: NewProjectCreationSource,
+  exampleShortHeaderSlug: string
+) => {
+  if (creationSource === 'quick-customization')
+    return `qc-${exampleShortHeaderSlug}`;
+  if (creationSource === 'ai-agent-request')
+    return `ai-${exampleShortHeaderSlug}`;
+  if (creationSource === 'course-chapter')
+    return `course-${exampleShortHeaderSlug}`;
+  if (creationSource === 'in-app-tutorial')
+    return `in-app-tutorial-${exampleShortHeaderSlug}`;
+  return exampleShortHeaderSlug; // 'default'.
+};
+
+export const createNewEmptyProject = ({
+  creationSource,
+}: {|
+  creationSource: NewProjectCreationSource,
+|}): NewProjectSource => {
   const project: gdProject = gd.ProjectHelper.createNewGDJSProject();
 
-  sendNewGameCreated({ exampleUrl: '', exampleSlug: '' });
+  const exampleSlug = 'empty-project';
+
+  sendNewGameCreated({
+    exampleUrl: '',
+    exampleSlug,
+    creationSource,
+    exampleCompositeSlug: getCompositeSlug(creationSource, exampleSlug),
+  });
   return {
     project,
     storageProvider: null,
     fileMetadata: null,
   };
-};
-
-export const createNewProjectFromAIGeneratedProject = (
-  generatedProjectUrl: string
-): NewProjectSource => {
-  sendNewGameCreated({
-    exampleUrl: generatedProjectUrl,
-    exampleSlug: 'generated-project',
-  });
-  const newProjectSource = getNewProjectSourceFromUrl(generatedProjectUrl);
-  newProjectSource.templateSlug = 'generated-project';
-  return newProjectSource;
 };
 
 export const createNewProjectFromTutorialTemplate = (
@@ -76,6 +107,8 @@ export const createNewProjectFromTutorialTemplate = (
   sendNewGameCreated({
     exampleUrl: tutorialTemplateUrl,
     exampleSlug: tutorialId,
+    creationSource: 'in-app-tutorial',
+    exampleCompositeSlug: getCompositeSlug('in-app-tutorial', tutorialId),
   });
   const newProjectSource = getNewProjectSourceFromUrl(tutorialTemplateUrl);
   newProjectSource.templateSlug = tutorialId;
@@ -89,7 +122,8 @@ export const createNewProjectFromCourseChapterTemplate = (
   sendNewGameCreated({
     exampleUrl: templateUrl,
     exampleSlug: courseChapterId,
-    isCourseChapterTemplate: true,
+    creationSource: 'course-chapter',
+    exampleCompositeSlug: getCompositeSlug('course-chapter', courseChapterId),
   });
   const newProjectSource = getNewProjectSourceFromUrl(templateUrl);
   newProjectSource.templateSlug = courseChapterId;
@@ -103,6 +137,8 @@ export const createNewProjectFromPrivateGameTemplate = (
   sendNewGameCreated({
     exampleUrl: privateGameTemplateUrl,
     exampleSlug: privateGameTemplateTag,
+    creationSource: 'default',
+    exampleCompositeSlug: getCompositeSlug('default', privateGameTemplateTag),
   });
   const newProjectSource = getNewProjectSourceFromUrl(privateGameTemplateUrl);
   newProjectSource.templateSlug = privateGameTemplateTag;
@@ -112,20 +148,20 @@ export const createNewProjectFromPrivateGameTemplate = (
 export const createNewProjectFromExampleShortHeader = async ({
   i18n,
   exampleShortHeader,
-  isQuickCustomization,
-}: {|
-  i18n: I18nType,
-  exampleShortHeader: ExampleShortHeader,
-  isQuickCustomization?: boolean,
-|}): Promise<?NewProjectSource> => {
+  newProjectSetup,
+}: ExampleProjectSetup): Promise<?NewProjectSource> => {
   try {
     const example = await getExample(exampleShortHeader);
+    const creationSource = newProjectSetup.creationSource;
 
     sendNewGameCreated({
       exampleUrl: example.projectFileUrl,
-      exampleSlug: `${isQuickCustomization ? 'qc-' : ''}${
+      exampleSlug: exampleShortHeader.slug,
+      exampleCompositeSlug: getCompositeSlug(
+        creationSource,
         exampleShortHeader.slug
-      }`,
+      ),
+      creationSource,
     });
     const newProjectSource = getNewProjectSourceFromUrl(example.projectFileUrl);
     newProjectSource.templateSlug = exampleShortHeader.slug;

@@ -29,6 +29,7 @@ type Props = {|
   onClose: ({ swappingDone: boolean }) => void,
   // Use minimal UI to hide filters & the details page (useful for Quick Customization)
   minimalUI?: boolean,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
 function AssetSwappingDialog({
@@ -40,6 +41,7 @@ function AssetSwappingDialog({
   resourceManagementProps,
   onClose,
   minimalUI,
+  onExtensionInstalled,
 }: Props) {
   const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
   const { openedAssetShortHeader } = shopNavigationState.getCurrentPage();
@@ -50,8 +52,8 @@ function AssetSwappingDialog({
   ] = React.useState<boolean>(false);
   const installAsset = useInstallAsset({
     project,
-    objectsContainer,
     resourceManagementProps,
+    onExtensionInstalled,
   });
   const { showAlert } = useAlertDialog();
 
@@ -73,7 +75,10 @@ function AssetSwappingDialog({
 
       setIsAssetBeingInstalled(true);
       try {
-        const installAssetOutput = await installAsset(openedAssetShortHeader);
+        const installAssetOutput = await installAsset({
+          assetShortHeader: openedAssetShortHeader,
+          objectsContainer,
+        });
         if (!installAssetOutput) {
           throw new Error('Failed to install asset');
         }
@@ -186,7 +191,7 @@ function AssetSwappingDialog({
           >
             <AssetStore
               ref={assetStore}
-              hideGameTemplates
+              onlyShowAssets
               assetSwappedObject={object}
               minimalUI={minimalUI}
             />

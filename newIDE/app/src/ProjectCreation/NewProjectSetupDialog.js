@@ -8,7 +8,7 @@ import TextField from '../UI/TextField';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import generateName from '../Utils/ProjectNameGenerator';
 import IconButton from '../UI/IconButton';
-import { ColumnStackLayout } from '../UI/Layout';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
 import { findEmptyPathInWorkspaceFolder } from '../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
 import SelectField from '../UI/SelectField';
@@ -25,7 +25,6 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import Checkbox from '../UI/Checkbox';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import Refresh from '../UI/CustomSvgIcons/Refresh';
-import { type GeneratedProject } from '../Utils/GDevelopServices/Generation';
 import ResolutionOptions, {
   type ResolutionOption,
   resolutionOptions,
@@ -37,7 +36,6 @@ import { type I18n as I18nType } from '@lingui/core';
 import { I18n } from '@lingui/react';
 import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/Shop';
 import { CLOUD_PROJECT_NAME_MAX_LENGTH } from '../Utils/GDevelopServices/Project';
-import AIPromptField from './AIPromptField';
 import EmptyAndStartingPointProjects, {
   isLinkedToStartingPointExampleShortHeader,
   isStartingPointExampleShortHeader,
@@ -48,19 +46,30 @@ import ExampleInformationPage from '../AssetStore/ExampleStore/ExampleInformatio
 import PrivateGameTemplateInformationPage from '../AssetStore/PrivateGameTemplates/PrivateGameTemplateInformationPage';
 import ExampleStore from '../AssetStore/ExampleStore';
 import Text from '../UI/Text';
-import {
-  useResponsiveWindowSize,
-  type WindowSizeType,
-} from '../UI/Responsive/ResponsiveWindowMeasurer';
+import { type WindowSizeType } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { PrivateGameTemplateStoreContext } from '../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import { getUserProductPurchaseUsageType } from '../AssetStore/ProductPageHelper';
 import { useOnlineStatus } from '../Utils/OnlineStatus';
 import PrivateGameTemplateOwnedInformationPage from '../AssetStore/PrivateGameTemplates/PrivateGameTemplateOwnedInformationPage';
 import { ExampleStoreContext } from '../AssetStore/ExampleStore/ExampleStoreContext';
+import EmptyMessage from '../UI/EmptyMessage';
+import RaisedButton from '../UI/RaisedButton';
+import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
+import Chip from '../UI/Chip';
+import { LineStackLayout } from '../UI/Layout';
+import { BundleStoreContext } from '../AssetStore/Bundles/BundleStoreContext';
+import { type CreateProjectResult } from '../Utils/UseCreateProject';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
 const app = remote ? remote.app : null;
+
+const styles = {
+  chip: { height: 24 },
+  tryAIAgentButton: {
+    flexShrink: 0,
+  },
+};
 
 export const getItemsColumns = (
   windowSize: WindowSizeType,
@@ -75,6 +84,13 @@ export const generateProjectName = (nameToAppend: ?string) =>
     CLOUD_PROJECT_NAME_MAX_LENGTH
   );
 
+export type NewProjectCreationSource =
+  | 'default'
+  | 'quick-customization'
+  | 'ai-agent-request'
+  | 'course-chapter'
+  | 'in-app-tutorial';
+
 export type NewProjectSetup = {|
   storageProvider: StorageProvider,
   saveAsLocation: ?SaveAsLocation,
@@ -84,26 +100,35 @@ export type NewProjectSetup = {|
   orientation?: 'landscape' | 'portrait' | 'default',
   optimizeForPixelArt?: boolean,
   openQuickCustomizationDialog?: boolean,
+  dontOpenAnySceneOrProjectManager?: boolean,
+  creationSource: NewProjectCreationSource,
+|};
+
+export type ExampleProjectSetup = {|
+  exampleShortHeader: ExampleShortHeader,
+  newProjectSetup: NewProjectSetup,
+  i18n: I18nType,
 |};
 
 type Props = {|
   isProjectOpening?: boolean,
   onClose: () => void,
-  onCreateEmptyProject: (newProjectSetup: NewProjectSetup) => Promise<void>,
+  onCreateEmptyProject: (
+    newProjectSetup: NewProjectSetup
+  ) => Promise<CreateProjectResult>,
   onCreateFromExample: (
-    exampleShortHeader: ExampleShortHeader,
-    newProjectSetup: NewProjectSetup,
-    i18n: I18nType
-  ) => Promise<void>,
+    exampleProjectSetup: ExampleProjectSetup
+  ) => Promise<CreateProjectResult>,
   onCreateProjectFromPrivateGameTemplate: (
     privateGameTemplateListingData: PrivateGameTemplateListingData,
     newProjectSetup: NewProjectSetup,
     i18n: I18nType
-  ) => Promise<void>,
-  onCreateFromAIGeneration: (
-    generatedProject: GeneratedProject,
-    newProjectSetup: NewProjectSetup
-  ) => Promise<void>,
+  ) => Promise<CreateProjectResult>,
+  onOpenAskAi: ({|
+    mode: 'chat' | 'agent',
+    aiRequestId: string | null,
+    paneIdentifier: 'left' | 'center' | 'right' | null,
+  |}) => void,
   selectedExampleShortHeader: ?ExampleShortHeader,
   onSelectExampleShortHeader: (exampleShortHeader: ?ExampleShortHeader) => void,
   selectedPrivateGameTemplateListingData: ?PrivateGameTemplateListingData,
@@ -121,7 +146,7 @@ const NewProjectSetupDialog = ({
   onCreateEmptyProject,
   onCreateFromExample,
   onCreateProjectFromPrivateGameTemplate,
-  onCreateFromAIGeneration,
+  onOpenAskAi,
   selectedExampleShortHeader,
   onSelectExampleShortHeader,
   selectedPrivateGameTemplateListingData,
@@ -131,13 +156,14 @@ const NewProjectSetupDialog = ({
   preventBackHome,
 }: Props): React.Node => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const { windowSize, isLandscape } = useResponsiveWindowSize();
   const {
     authenticated,
     onOpenLoginDialog,
     onOpenCreateAccountDialog,
     receivedGameTemplates,
+    receivedBundles,
     gameTemplatePurchases,
+    bundlePurchases,
   } = authenticatedUser;
   const [
     emptyProjectSelected,
@@ -151,6 +177,7 @@ const NewProjectSetupDialog = ({
   const { privateGameTemplateListingDatas } = React.useContext(
     PrivateGameTemplateStoreContext
   );
+  const { bundleListingDatas } = React.useContext(BundleStoreContext);
   const isOnline = useOnlineStatus();
   const { values, setNewProjectsDefaultStorageProviderName } = React.useContext(
     PreferencesContext
@@ -163,9 +190,6 @@ const NewProjectSetupDialog = ({
   );
   const [projectName, setProjectName] = React.useState<string>(
     generateProjectName()
-  );
-  const [isGeneratingProject, setIsGeneratingProject] = React.useState<boolean>(
-    false
   );
   const [
     resolutionOption,
@@ -184,7 +208,7 @@ const NewProjectSetupDialog = ({
     ? findEmptyPathInWorkspaceFolder(app, values.newProjectsDefaultFolder || '')
     : '';
   const [storageProvider, setStorageProvider] = React.useState<StorageProvider>(
-    () => {
+    (): StorageProvider => {
       const localFileStorageProvider = storageProviders.find(
         ({ internalName }) => internalName === 'LocalFile'
       );
@@ -254,7 +278,7 @@ const NewProjectSetupDialog = ({
     defaultCustomHeight;
   const selectedOrientation = resolutionOptions[resolutionOption].orientation;
 
-  const isLoading = isGeneratingProject || isProjectOpening;
+  const isLoading = isProjectOpening;
 
   const linkedExampleShortHeaders: {
     exampleShortHeader: ExampleShortHeader,
@@ -339,15 +363,27 @@ const NewProjectSetupDialog = ({
         productId: selectedPrivateGameTemplateListingData
           ? selectedPrivateGameTemplateListingData.id
           : null,
-        receivedProducts: receivedGameTemplates,
-        productPurchases: gameTemplatePurchases,
-        allProductListingDatas: privateGameTemplateListingDatas,
+        receivedProducts: [
+          ...(receivedGameTemplates || []),
+          ...(receivedBundles || []),
+        ],
+        productPurchases: [
+          ...(gameTemplatePurchases || []),
+          ...(bundlePurchases || []),
+        ],
+        allProductListingDatas: [
+          ...(privateGameTemplateListingDatas || []),
+          ...(bundleListingDatas || []),
+        ],
       }),
     [
       gameTemplatePurchases,
+      bundlePurchases,
       selectedPrivateGameTemplateListingData,
       privateGameTemplateListingDatas,
+      bundleListingDatas,
       receivedGameTemplates,
+      receivedBundles,
     ]
   );
   const noGameTemplateSelectedOrSelectedAndOwned =
@@ -390,7 +426,7 @@ const NewProjectSetupDialog = ({
           })
         : saveAsLocation;
 
-      const projectSetup = {
+      const projectSetup: NewProjectSetup = {
         projectName,
         storageProvider,
         saveAsLocation: projectLocation,
@@ -398,19 +434,20 @@ const NewProjectSetupDialog = ({
         width: selectedWidth,
         orientation: selectedOrientation,
         optimizeForPixelArt,
+        creationSource: 'default',
       };
 
       if (selectedExampleShortHeader) {
-        await onCreateFromExample(
-          selectedExampleShortHeader,
-          {
-            // We only pass down the project name as this is the only customizable field for an example.
+        await onCreateFromExample({
+          exampleShortHeader: selectedExampleShortHeader,
+          newProjectSetup: {
             projectName,
             storageProvider,
             saveAsLocation: projectLocation,
+            creationSource: 'default',
           },
-          i18n
-        );
+          i18n,
+        });
       } else if (selectedPrivateGameTemplateListingData) {
         await onCreateProjectFromPrivateGameTemplate(
           selectedPrivateGameTemplateListingData,
@@ -419,6 +456,7 @@ const NewProjectSetupDialog = ({
             projectName,
             storageProvider,
             saveAsLocation,
+            creationSource: 'default',
           },
           i18n
         );
@@ -565,7 +603,7 @@ const NewProjectSetupDialog = ({
                     icon={<ChevronArrowLeft />}
                     label={<Trans>Back</Trans>}
                     onClick={onBack}
-                    disabled={isProjectOpening || isGeneratingProject}
+                    disabled={isProjectOpening}
                   />
                 </Line>
                 <Spacer />
@@ -577,14 +615,44 @@ const NewProjectSetupDialog = ({
                   onSelectExampleShortHeader={exampleShortHeader => {
                     onSelectExampleShortHeader(exampleShortHeader);
                   }}
-                  storageProvider={storageProvider}
-                  saveAsLocation={saveAsLocation}
                   onSelectEmptyProject={() => {
                     setEmptyProjectSelected(true);
                   }}
-                  disabled={isProjectOpening || isGeneratingProject}
+                  disabled={isProjectOpening}
                 />
-                {isOnline && (
+                <LineStackLayout noMargin>
+                  <Text size="block-title" noMargin>
+                    <Trans>Prototype with AI</Trans>
+                  </Text>
+                  <Chip label={<Trans>New</Trans>} style={styles.chip} />
+                </LineStackLayout>
+                <ResponsiveLineStackLayout
+                  justifyContent="space-between"
+                  alignItems="center"
+                  noColumnMargin
+                >
+                  <Text size="body2" noMargin>
+                    <Trans>
+                      Start prototyping a new game or build on top of an
+                      existing one with the GDevelop AI agent.
+                    </Trans>
+                  </Text>
+                  <RaisedButton
+                    size="large"
+                    color="success"
+                    label={<Trans>Try the AI agent</Trans>}
+                    rightIcon={<ArrowRight />}
+                    style={styles.tryAIAgentButton}
+                    onClick={() =>
+                      onOpenAskAi({
+                        mode: 'agent',
+                        aiRequestId: null,
+                        paneIdentifier: 'center',
+                      })
+                    }
+                  />
+                </ResponsiveLineStackLayout>
+                {isOnline ? (
                   <>
                     <Text size="block-title" noMargin>
                       <Trans>Remix an existing game</Trans>
@@ -599,28 +667,19 @@ const NewProjectSetupDialog = ({
                         );
                       }}
                       i18n={i18n}
-                      columnsCount={getItemsColumns(windowSize, isLandscape)}
-                      rowToInsert={{
-                        row: 2,
-                        element: (
-                          <AIPromptField
-                            onCreateFromAIGeneration={onCreateFromAIGeneration}
-                            isProjectOpening={!!isProjectOpening}
-                            isGeneratingProject={isGeneratingProject}
-                            storageProvider={storageProvider}
-                            saveAsLocation={saveAsLocation}
-                            onGenerationStarted={() =>
-                              setIsGeneratingProject(true)
-                            }
-                            onGenerationEnded={() =>
-                              setIsGeneratingProject(false)
-                            }
-                          />
-                        ),
-                      }}
+                      getColumnsFromWindowSize={getItemsColumns}
                       hideStartingPoints
                     />
                   </>
+                ) : (
+                  <EmptyMessage>
+                    <Text>
+                      <Trans>
+                        Get back online to browse the huge library of free and
+                        premium examples.
+                      </Trans>
+                    </Text>
+                  </EmptyMessage>
                 )}
               </ColumnStackLayout>
             )}

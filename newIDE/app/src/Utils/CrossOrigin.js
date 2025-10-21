@@ -2,6 +2,7 @@
 import { isNativeMobileApp } from './Platform';
 import { addGDevelopResourceJwtTokenToUrl } from './GDevelopServices/Project';
 
+// If modifying this function, make sure to update Resource3DPreview.worker.js copy.
 export const checkIfIsGDevelopCloudBucketUrl = (url: string): boolean => {
   return (
     url.startsWith('https://project-resources.gdevelop.io/') ||
@@ -9,6 +10,7 @@ export const checkIfIsGDevelopCloudBucketUrl = (url: string): boolean => {
   );
 };
 
+// If modifying this function, make sure to update Resource3DPreview.worker.js copy.
 export const checkIfCredentialsRequired = (url: string): boolean => {
   // On web/desktop, "credentials" are necessary to use the cookie previously
   // returned by the server.

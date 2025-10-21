@@ -47,6 +47,7 @@
 #include <GDCore/IDE/Events/ExampleExtensionUsagesFinder.h>
 #include <GDCore/IDE/EventsFunctionTools.h>
 #include <GDCore/IDE/ObjectVariableHelper.h>
+#include <GDCore/IDE/EventsBasedObjectVariantHelper.h>
 #include <GDCore/IDE/Project/ArbitraryResourceWorker.h>
 #include <GDCore/IDE/Project/ArbitraryObjectsWorker.h>
 #include <GDCore/IDE/Project/ObjectsUsingResourceCollector.h>
@@ -480,6 +481,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
+typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice;
 
 // Customize some functions implementation thanks to WRAPPED_* macros
 // The original names will be reconstructed in the js file (see postjs.js)
@@ -604,6 +606,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_IsBadInstructionMetadata IsBadInstructionMetadata
 #define STATIC_IsBadBehaviorMetadata IsBadBehaviorMetadata
 #define STATIC_IsBadObjectMetadata IsBadObjectMetadata
+#define STATIC_IsBadEffectMetadata IsBadEffectMetadata
 
 #define STATIC_RenameObjectInEvents RenameObjectInEvents
 #define STATIC_RemoveObjectInEvents RemoveObjectInEvents
@@ -673,6 +676,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
   GetLayoutAndExternalLayoutLayerInstancesCount
 #define STATIC_RenameLeaderboards RenameLeaderboards
 #define STATIC_FindAllLeaderboardIds FindAllLeaderboardIds
+#define STATIC_UpdateBehaviorsSharedData UpdateBehaviorsSharedData
 
 #define STATIC_GenerateBehaviorGetterAndSetter GenerateBehaviorGetterAndSetter
 #define STATIC_GenerateObjectGetterAndSetter GenerateObjectGetterAndSetter
@@ -714,6 +718,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 
 #define STATIC_GetNamespaceSeparator GetNamespaceSeparator
 #define STATIC_GetBehaviorFullType GetBehaviorFullType
+#define STATIC_GetExtensionFromFullBehaviorType GetExtensionFromFullBehaviorType
+#define STATIC_GetBehaviorNameFromFullBehaviorType GetBehaviorNameFromFullBehaviorType
 #define STATIC_GetObjectFullType GetObjectFullType
 #define STATIC_GetExtensionFromFullObjectType GetExtensionFromFullObjectType
 #define STATIC_GetObjectNameFromFullObjectType GetObjectNameFromFullObjectType
@@ -727,6 +733,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
   ComputeChangesetForVariablesContainer
 #define STATIC_MergeVariableContainers MergeVariableContainers
 #define STATIC_FillAnyVariableBetweenObjects FillAnyVariableBetweenObjects
+#define STATIC_ApplyChangesToVariants ApplyChangesToVariants
+#define STATIC_ComplyVariantsToEventsBasedObject ComplyVariantsToEventsBasedObject
 #define STATIC_RenameEventsFunctionsExtension RenameEventsFunctionsExtension
 #define STATIC_UpdateExtensionNameInEventsBasedBehavior \
   UpdateExtensionNameInEventsBasedBehavior
@@ -827,6 +835,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetPixel GetPixel
 #define STATIC_GetPixelSpeed GetPixelSpeed
 #define STATIC_GetPixelAcceleration GetPixelAcceleration
+#define STATIC_GetAngularSpeed GetAngularSpeed
 #define STATIC_GetNewton GetNewton
 #define STATIC_GetDefaultMeasurementUnitsCount GetDefaultMeasurementUnitsCount
 #define STATIC_GetDefaultMeasurementUnitAtIndex GetDefaultMeasurementUnitAtIndex
@@ -846,6 +855,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define RemoveEventAt RemoveEvent
 #define RemoveAt Remove
 #define GetEventsFunctionAt GetEventsFunction
+#define GetVariantAt GetVariant
 #define GetEffectAt GetEffect
 #define GetParameterAt GetParameter
 

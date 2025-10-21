@@ -1,6 +1,21 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Scene stack');
-  const debugLogger = new gdjs.Logger('Multiplayer - Debug');
+  const debugLogger = new gdjs.Logger('Scene stack - Debug');
+  // Comment this to see message logs and ease debugging:
+  gdjs.Logger.getDefaultConsoleLoggerOutput().discardGroup(
+    'Scene stack - Debug'
+  );
+
+  interface PushSceneOptions {
+    sceneName: string;
+    externalLayoutName?: string;
+    getExcludedObjectNames?: (runtimeScene: RuntimeScene) => Set<string>;
+    skipStoppingSoundsOnStartup?: boolean;
+  }
+
+  interface ReplaceSceneOptions extends PushSceneOptions {
+    clear: boolean;
+  }
 
   /**
    * Hold the stack of scenes ({@link gdjs.RuntimeScene}) being played.
@@ -63,10 +78,14 @@ namespace gdjs {
           this.pop();
         } else if (request === gdjs.SceneChangeRequest.PUSH_SCENE) {
           this.push(currentScene.getRequestedScene());
-        } else if (request === gdjs.SceneChangeRequest.REPLACE_SCENE) {
-          this.replace(currentScene.getRequestedScene());
-        } else if (request === gdjs.SceneChangeRequest.CLEAR_SCENES) {
-          this.replace(currentScene.getRequestedScene(), true);
+        } else if (
+          request === gdjs.SceneChangeRequest.REPLACE_SCENE ||
+          request === gdjs.SceneChangeRequest.CLEAR_SCENES
+        ) {
+          this.replace(
+            currentScene.getRequestedScene(),
+            request === gdjs.SceneChangeRequest.CLEAR_SCENES
+          );
         } else {
           logger.error('Unrecognized change in scene stack: ' + request);
         }
@@ -101,7 +120,10 @@ namespace gdjs {
         if (!scene) {
           return;
         }
-        scene.unloadScene();
+        this._unloadSceneAndPossiblyResources({
+          scene,
+          newSceneName: null,
+        });
       }
 
       // Tell the new current scene it's being resumed
@@ -114,14 +136,31 @@ namespace gdjs {
     }
 
     /**
-     * Pause the scene currently being played and start the new scene that is specified.
-     * If `externalLayoutName` is set, also instantiate the objects from this external layout.
+     * Pause the scene currently being played and start the new scene that is specified in `options.sceneName`.
+     * If `options.externalLayoutName` is set, also instantiate the objects from this external layout.
+     *
+     * @param options Contains the scene name and optional external layout name to instantiate.
+     * @param deprecatedExternalLayoutName Deprecated, use `options.externalLayoutName` instead.
      */
     push(
-      newSceneName: string,
-      externalLayoutName?: string
+      options: PushSceneOptions | string,
+      deprecatedExternalLayoutName?: string
     ): gdjs.RuntimeScene | null {
       this._throwIfDisposed();
+
+      const sceneName =
+        typeof options === 'string' ? options : options.sceneName;
+      const getExcludedObjectNames =
+        typeof options === 'string'
+          ? undefined
+          : options.getExcludedObjectNames;
+      const skipStoppingSoundsOnStartup =
+        typeof options === 'string'
+          ? false
+          : options.skipStoppingSoundsOnStartup;
+      const externalLayoutName =
+        deprecatedExternalLayoutName ||
+        (typeof options === 'string' ? undefined : options.externalLayoutName);
 
       // Tell the scene it's being paused
       const currentScene = this._stack[this._stack.length - 1];
@@ -131,35 +170,50 @@ namespace gdjs {
 
       // Avoid a risk of displaying an intermediate loading screen
       // during 1 frame.
-      if (this._runtimeGame.areSceneAssetsReady(newSceneName)) {
-        return this._loadNewScene(newSceneName, externalLayoutName);
+      if (this._runtimeGame.areSceneAssetsReady(sceneName)) {
+        return this._loadNewScene({
+          sceneName,
+          externalLayoutName,
+          getExcludedObjectNames,
+          skipStoppingSoundsOnStartup,
+        });
       }
 
       this._isNextLayoutLoading = true;
-      this._runtimeGame.loadSceneAssets(newSceneName).then(() => {
-        this._loadNewScene(newSceneName);
+      this._runtimeGame.loadSceneAssets(sceneName).then(() => {
+        this._loadNewScene({
+          sceneName,
+          externalLayoutName,
+          getExcludedObjectNames,
+          skipStoppingSoundsOnStartup,
+        });
         this._isNextLayoutLoading = false;
       });
+
       return null;
     }
 
-    private _loadNewScene(
-      newSceneName: string,
-      externalLayoutName?: string
-    ): gdjs.RuntimeScene {
+    private _loadNewScene(options: PushSceneOptions): gdjs.RuntimeScene {
       this._throwIfDisposed();
 
       // Load the new one
       const newScene = new gdjs.RuntimeScene(this._runtimeGame);
       newScene.loadFromScene(
-        this._runtimeGame.getSceneAndExtensionsData(newSceneName)
+        this._runtimeGame.getSceneAndExtensionsData(options.sceneName),
+        {
+          excludedObjectNames: options.getExcludedObjectNames
+            ? options.getExcludedObjectNames(newScene)
+            : undefined,
+          skipStoppingSoundsOnStartup: options.skipStoppingSoundsOnStartup,
+        }
       );
       this._wasFirstSceneLoaded = true;
 
       // Optionally create the objects from an external layout.
-      if (externalLayoutName) {
-        const externalLayoutData =
-          this._runtimeGame.getExternalLayoutData(externalLayoutName);
+      if (options.externalLayoutName) {
+        const externalLayoutData = this._runtimeGame.getExternalLayoutData(
+          options.externalLayoutName
+        );
         if (externalLayoutData) {
           newScene.createObjectsFrom(
             externalLayoutData.instances,
@@ -176,17 +230,28 @@ namespace gdjs {
     }
 
     /**
-     * Start the specified scene, replacing the one currently being played.
-     * If `clear` is set to true, all running scenes are also removed from the stack of scenes.
+     * Start the scene in `options.sceneName`, replacing the one currently being played.
+     * If `options.clear` is set to true, all running scenes are also removed from the stack of scenes.
+     *
+     * @param options Contains the scene name and optional external layout name to instantiate.
+     * @param deprecatedClear Deprecated, use `options.clear` instead.
      */
-    replace(newSceneName: string, clear?: boolean): gdjs.RuntimeScene | null {
+    replace(
+      options: ReplaceSceneOptions | string,
+      deprecatedClear?: boolean
+    ): gdjs.RuntimeScene | null {
+      const clear =
+        deprecatedClear || typeof options === 'string' ? false : options.clear;
+      const newSceneName =
+        typeof options === 'string' ? options : options.sceneName;
+
       this._throwIfDisposed();
       if (!!clear) {
         // Unload all the scenes
         while (this._stack.length !== 0) {
           let scene = this._stack.pop();
           if (scene) {
-            scene.unloadScene();
+            this._unloadSceneAndPossiblyResources({ scene, newSceneName });
           }
         }
       } else {
@@ -194,11 +259,11 @@ namespace gdjs {
         if (this._stack.length !== 0) {
           let scene = this._stack.pop();
           if (scene) {
-            scene.unloadScene();
+            this._unloadSceneAndPossiblyResources({ scene, newSceneName });
           }
         }
       }
-      return this.push(newSceneName);
+      return this.push(options);
     }
 
     /**
@@ -217,6 +282,11 @@ namespace gdjs {
      */
     wasFirstSceneLoaded(): boolean {
       return this._wasFirstSceneLoaded;
+    }
+
+    getAllScenes(): Array<gdjs.RuntimeScene> {
+      this._throwIfDisposed();
+      return this._stack;
     }
 
     getAllSceneNames(): Array<string> {
@@ -259,13 +329,41 @@ namespace gdjs {
       this._sceneStackSyncDataToApply = sceneStackSyncData;
     }
 
-    applyUpdateFromNetworkSyncDataIfAny(): boolean {
+    applyUpdateFromNetworkSyncDataIfAny(
+      options?: UpdateFromNetworkSyncDataOptions
+    ): boolean {
       this._throwIfDisposed();
       const sceneStackSyncData = this._sceneStackSyncDataToApply;
       let hasMadeChangeToStack = false;
       if (!sceneStackSyncData) return hasMadeChangeToStack;
 
       this._sceneStackSyncDataToApply = null;
+
+      const getExcludedObjectNames = options && options.getExcludedObjectNames;
+      const skipStoppingSoundsOnStartup =
+        !!options && !!options.preventSoundsStoppingOnStartup;
+
+      if (options && options.clearSceneStack) {
+        while (this._stack.length !== 0) {
+          let scene = this._stack.pop();
+          if (scene) {
+            scene.unloadScene();
+          }
+        }
+        for (let i = 0; i < sceneStackSyncData.length; ++i) {
+          const sceneSyncData = sceneStackSyncData[i];
+          const newScene = this.push({
+            sceneName: sceneSyncData.name,
+            getExcludedObjectNames,
+            skipStoppingSoundsOnStartup,
+          });
+          if (newScene) {
+            newScene.networkId = sceneSyncData.networkId;
+          }
+        }
+        hasMadeChangeToStack = true;
+        return hasMadeChangeToStack;
+      }
 
       // If this method is called, we are a client.
       // We trust the host to be the source of truth for the scene stack.
@@ -276,12 +374,17 @@ namespace gdjs {
       for (let i = 0; i < sceneStackSyncData.length; ++i) {
         const sceneSyncData = sceneStackSyncData[i];
         const sceneAtThisPositionInOurStack = this._stack[i];
+
         if (!sceneAtThisPositionInOurStack) {
           debugLogger.info(
             `Scene at position ${i} with name ${sceneSyncData.name} is missing from the stack, adding it.`
           );
           // We have fewer scenes in the stack than the host, let's add the scene.
-          const newScene = this.push(sceneSyncData.name);
+          // By definition, there is nothing to clear because we're already at the top of the stack.
+          const newScene = this.push({
+            sceneName: sceneSyncData.name,
+            getExcludedObjectNames,
+          });
           if (newScene) {
             newScene.networkId = sceneSyncData.networkId;
           }
@@ -294,14 +397,23 @@ namespace gdjs {
           debugLogger.info(
             `Scene at position ${i} and name ${sceneAtThisPositionInOurStack.getName()} is not the same as the expected ${
               sceneSyncData.name
-            }, replacing.`
+            }, replacing it.`
           );
           // The scene does not correspond to the scene at this position in our stack
-          // Let's unload everything after this position to recreate the stack.
-          const newScene = this.replace(
-            sceneSyncData.name,
-            true // Clear the stack
-          );
+          // Let's unload everything after this position to reconstruct the stack.
+          if (this._stack.length > i + 1) {
+            debugLogger.info(
+              `Unloading ${this._stack.length - (i + 1)} scenes after position ${i}.`
+            );
+            this.pop(this._stack.length - (i + 1));
+          }
+
+          const newScene = this.replace({
+            sceneName: sceneSyncData.name,
+            clear: false,
+            getExcludedObjectNames,
+          });
+
           if (newScene) {
             newScene.networkId = sceneSyncData.networkId;
           }
@@ -335,16 +447,27 @@ namespace gdjs {
           debugLogger.info(
             `Scene at position ${i} and name ${sceneAtThisPositionInOurStack.getName()} has a different networkId ${
               sceneAtThisPositionInOurStack.networkId
-            } than the expected ${sceneSyncData.networkId}, replacing.`
+            } than the expected ${sceneSyncData.networkId}, replacing it.`
           );
           // The scene is in the stack but has a different networkId
           // This can happen if the host has restarted the scene
           // We can't just update the networkId of the scene in the stack
-          // We need to replace it with a new scene
-          const newScene = this.replace(
-            sceneSyncData.name,
-            false // Don't clear the stack
-          );
+          // We need to replace it with a new scene.
+
+          // Like for the case where it's a totally different scene,
+          // we need to unload everything after this position to reconstruct the stack.
+          if (this._stack.length > i + 1) {
+            debugLogger.info(
+              `Unloading ${this._stack.length - (i + 1)} scenes after position ${i}.`
+            );
+            this.pop(this._stack.length - (i + 1));
+          }
+
+          const newScene = this.replace({
+            sceneName: sceneSyncData.name,
+            clear: false,
+            getExcludedObjectNames,
+          });
           if (newScene) {
             newScene.networkId = sceneSyncData.networkId;
           }
@@ -372,12 +495,50 @@ namespace gdjs {
      * Unload all the scenes and clear the stack.
      */
     dispose(): void {
-      for (const item of this._stack) {
-        item.unloadScene();
+      while (this._stack.length > 0) {
+        const scene = this._stack.pop();
+        if (scene) {
+          this._unloadSceneAndPossiblyResources({
+            scene,
+            newSceneName: null,
+          });
+        }
       }
 
-      this._stack.length = 0;
       this._wasDisposed = true;
+    }
+
+    private _unloadSceneAndPossiblyResources({
+      scene,
+      newSceneName,
+    }: {
+      scene: gdjs.RuntimeScene;
+      newSceneName: string | null;
+    }): void {
+      const unloadedSceneName = scene.getName();
+
+      const resourcesUnloading = scene.getResourcesUnloading();
+      const resolvedResourcesUnloading =
+        resourcesUnloading === 'inherit'
+          ? this._runtimeGame.getSceneResourcesUnloading()
+          : resourcesUnloading;
+
+      const shouldUnloadResources =
+        resolvedResourcesUnloading === 'at-scene-exit' &&
+        // Unload resources only if it's the last scene with this name in the stack.
+        newSceneName !== scene.getName() &&
+        this._stack.every((scene) => scene.getName() !== unloadedSceneName);
+
+      scene.unloadScene();
+      // After this point, `scene` is no longer valid and should not be used anymore.
+      // It was "disposed".
+
+      if (shouldUnloadResources) {
+        this._runtimeGame.getResourceLoader().unloadSceneResources({
+          unloadedSceneName,
+          newSceneName,
+        });
+      }
     }
 
     private _throwIfDisposed(): void {

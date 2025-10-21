@@ -97,6 +97,8 @@ namespace gdjs {
               !gdjs.evtTools.common.isMobile()),
           preserveDrawingBuffer: true, // Keep to true to allow screenshots.
         });
+        this._threeRenderer.shadowMap.enabled = true;
+        this._threeRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this._threeRenderer.useLegacyLights = true;
         this._threeRenderer.autoClear = false;
         this._threeRenderer.setSize(
@@ -653,6 +655,14 @@ namespace gdjs {
           // Some keys are "default prevented" to avoid scrolling when the game
           // is integrated in a page as an iframe.
           e.preventDefault();
+        }
+
+        if (e.repeat) {
+          // If `repeat` is true, this is not the first press of the key.
+          // We only communicate the changes of states ("first" key down, key up)
+          // to the manager, which then tracks the state of the key:
+          // pressed, just pressed or released.
+          return;
         }
 
         manager.onKeyPressed(e.keyCode, e.location);

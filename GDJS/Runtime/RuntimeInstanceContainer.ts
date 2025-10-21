@@ -312,15 +312,15 @@ namespace gdjs {
       xPos: float,
       yPos: float,
       zPos: float,
-      trackByPersistentUuid: boolean
+      trackByPersistentUuid: boolean,
+      options?: {
+        excludedObjectNames?: Set<string> | null;
+      }
     ): void {
-      let zOffset: number;
-      let shouldTrackByPersistentUuid: boolean;
+      let zOffset: number = zPos;
+      let shouldTrackByPersistentUuid: boolean = trackByPersistentUuid;
 
-      if (arguments.length === 5) {
-        zOffset = zPos;
-        shouldTrackByPersistentUuid = trackByPersistentUuid;
-      } else {
+      if (arguments.length <= 4) {
         /**
          * Support for the previous signature (before 3D was introduced):
          * createObjectsFrom(data, xPos, yPos, trackByPersistentUuid)
@@ -332,6 +332,10 @@ namespace gdjs {
       for (let i = 0, len = data.length; i < len; ++i) {
         const instanceData = data[i];
         const objectName = instanceData.name;
+        if (options?.excludedObjectNames?.has(objectName)) {
+          continue;
+        }
+
         const newObject = this.createObject(objectName);
         if (newObject !== null) {
           if (shouldTrackByPersistentUuid) {
@@ -576,9 +580,9 @@ namespace gdjs {
     }
 
     /**
-     * Update the objects (update positions, time management...)
+     * Call each behavior stepPostEvents method.
      */
-    _updateObjectsPostEvents() {
+    _stepBehaviorsPostEvents() {
       this._cacheOrClearRemovedInstances();
 
       // It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
@@ -609,7 +613,7 @@ namespace gdjs {
      * @param name Name of the object for which the instances must be returned.
      * @return The list of objects with the given name
      */
-    getObjects(name: string): gdjs.RuntimeObject[] | undefined {
+    getObjects(name: string): gdjs.RuntimeObject[] {
       if (!this._instances.containsKey(name)) {
         logger.info(
           'RuntimeScene.getObjects: No instances called "' +
@@ -623,7 +627,7 @@ namespace gdjs {
 
     /**
      * Create a new object from its name. The object is also added to the instances
-     * living in the container (No need to call {@link gdjs.RuntimeScene.addObject})
+     * living in the container (No need to call {@link addObject})
      * @param objectName The name of the object to be created
      * @return The created object
      */
@@ -636,18 +640,20 @@ namespace gdjs {
         return null;
       }
 
+      const objectData = this._objects.get(objectName);
+
       // Create a new object using the object constructor (cached during loading)
       // and the stored object's data:
       const cache = this._instancesCache.get(objectName);
       const ctor = this._objectsCtor.get(objectName);
       let obj;
       if (!cache || cache.length === 0) {
-        obj = new ctor(this, this._objects.get(objectName));
+        obj = new ctor(this, objectData);
       } else {
         // Reuse an objet destroyed before. If there is an object in the cache,
         // then it means it does support reinitialization.
         obj = cache.pop();
-        obj.reinitialize(this._objects.get(objectName));
+        obj.reinitialize(objectData);
       }
       this.addObject(obj);
       return obj;
@@ -678,7 +684,7 @@ namespace gdjs {
       }
 
       // Notify the object it was removed from the container
-      obj.onDeletedFromScene(this);
+      obj.onDeletedFromScene();
 
       // Notify the global callbacks
       for (let j = 0; j < gdjs.callbacksObjectDeletedFromScene.length; ++j) {
@@ -811,6 +817,8 @@ namespace gdjs {
       this._objectsCtor = new Hashtable();
       this._allInstancesList = [];
       this._instancesRemoved = [];
+      this._layersCameraCoordinates = {};
+      this._initialBehaviorSharedData = new Hashtable();
     }
   }
 }

@@ -132,8 +132,8 @@ export const makeTestExtensions = (gd: libGDevelop) => {
         .setValue('Y-')
         .setLabel('3D world top')
         .setType('choice')
-        .addExtraInfo('Y-')
-        .addExtraInfo('Z+')
+        .addChoice('Y-', 'Y-')
+        .addChoice('Z+', 'Z+')
         .setGroup('Orientation');
       properties
         .getOrCreate('elevation')

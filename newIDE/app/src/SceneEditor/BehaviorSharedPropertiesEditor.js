@@ -27,7 +27,7 @@ export default class BehaviorSharedPropertiesEditor extends React.Component<Prop
     );
 
     return (
-      <Column expand>
+      <Column expand noMargin>
         {propertiesSchema.length ? (
           <PropertiesEditor
             schema={propertiesSchema}

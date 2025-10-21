@@ -9,6 +9,7 @@ namespace gdjs {
    */
   export class Layer extends gdjs.RuntimeLayer {
     _cameraRotation: float = 0;
+    /** The camera zoom factor strictly greater than 0. */
     _zoomFactor: float = 1;
     _cameraX: float;
     _cameraY: float;
@@ -166,6 +167,9 @@ namespace gdjs {
      * @param cameraId The camera number. Currently ignored.
      */
     override setCameraZoom(newZoom: float, cameraId?: integer): void {
+      if (newZoom <= 0) {
+        return;
+      }
       this._zoomFactor = newZoom;
       this._isCameraZDirty = true;
       this._renderer.updatePosition();
@@ -283,8 +287,8 @@ namespace gdjs {
 
       x -= this.getRuntimeScene()._cachedGameResolutionWidth / 2;
       y -= this.getRuntimeScene()._cachedGameResolutionHeight / 2;
-      x /= Math.abs(this._zoomFactor);
-      y /= Math.abs(this._zoomFactor);
+      x /= this._zoomFactor;
+      y /= this._zoomFactor;
 
       // Only compute angle and cos/sin once (allow heavy optimization from JS engines).
       const angleInRadians = (this._cameraRotation / 180) * Math.PI;
@@ -320,8 +324,8 @@ namespace gdjs {
     ): FloatPoint {
       x -= this._runtimeScene.getViewportOriginX();
       y -= this._runtimeScene.getViewportOriginY();
-      x /= Math.abs(this._zoomFactor);
-      y /= Math.abs(this._zoomFactor);
+      x /= this._zoomFactor;
+      y /= this._zoomFactor;
 
       // Only compute angle and cos/sin once (allow heavy optimization from JS engines).
       const angleInRadians = (this._cameraRotation / 180) * Math.PI;
@@ -367,8 +371,8 @@ namespace gdjs {
       const sinValue = Math.sin(-angleInRadians);
       x = cosValue * x - sinValue * y;
       y = sinValue * tmp + cosValue * y;
-      x *= Math.abs(this._zoomFactor);
-      y *= Math.abs(this._zoomFactor);
+      x *= this._zoomFactor;
+      y *= this._zoomFactor;
       position[0] = x + this.getRuntimeScene()._cachedGameResolutionWidth / 2;
       position[1] = y + this.getRuntimeScene()._cachedGameResolutionHeight / 2;
 
@@ -404,8 +408,8 @@ namespace gdjs {
       const sinValue = Math.sin(-angleInRadians);
       x = cosValue * x - sinValue * y;
       y = sinValue * tmp + cosValue * y;
-      x *= Math.abs(this._zoomFactor);
-      y *= Math.abs(this._zoomFactor);
+      x *= this._zoomFactor;
+      y *= this._zoomFactor;
       x += this._runtimeScene.getViewportOriginX();
       y += this._runtimeScene.getViewportOriginY();
 

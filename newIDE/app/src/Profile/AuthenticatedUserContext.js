@@ -4,7 +4,6 @@ import {
   type Profile,
   type LoginForm,
   type RegisterForm,
-  type PatchUserPayload,
   type ForgotPasswordForm,
   type AuthError,
   type IdentityProvider,
@@ -13,7 +12,10 @@ import { type PreferencesValues } from '../MainFrame/Preferences/PreferencesCont
 import { type CloudProjectWithUserAccessInfo } from '../Utils/GDevelopServices/Project';
 import { User as FirebaseUser } from 'firebase/auth';
 import { type Badge, type Achievement } from '../Utils/GDevelopServices/Badge';
-import { type Recommendation } from '../Utils/GDevelopServices/User';
+import {
+  type Recommendation,
+  type EditUserChanges,
+} from '../Utils/GDevelopServices/User';
 import { type Notification } from '../Utils/GDevelopServices/Notification';
 import {
   type Limits,
@@ -25,8 +27,10 @@ import {
   type AssetShortHeader,
   type PrivateAssetPack,
   type PrivateGameTemplate,
+  type Bundle,
 } from '../Utils/GDevelopServices/Asset';
 import { type Purchase } from '../Utils/GDevelopServices/Shop';
+import { type ClaimedProductOptions } from './PurchaseClaimDialog';
 
 export type AuthenticatedUser = {|
   authenticated: boolean,
@@ -40,8 +44,11 @@ export type AuthenticatedUser = {|
   receivedAssetPacks: ?Array<PrivateAssetPack>,
   receivedAssetShortHeaders: ?Array<AssetShortHeader>,
   receivedGameTemplates: ?Array<PrivateGameTemplate>,
+  receivedBundles: ?Array<Bundle>,
   gameTemplatePurchases: ?Array<Purchase>,
   assetPackPurchases: ?Array<Purchase>,
+  coursePurchases: ?Array<Purchase>,
+  bundlePurchases: ?Array<Purchase>,
   recommendations: ?Array<Recommendation>,
   notifications: ?Array<Notification>,
   userEarningsBalance: ?UserEarningsBalance,
@@ -58,14 +65,23 @@ export type AuthenticatedUser = {|
     preferences: PreferencesValues
   ) => Promise<void>,
   onEditProfile: (
-    payload: PatchUserPayload,
+    changes: EditUserChanges,
     preferences: PreferencesValues
   ) => Promise<void>,
   onResetPassword: ForgotPasswordForm => Promise<void>,
   onOpenLoginDialog: () => void,
+  onOpenLoginWithPurchaseClaimDialog: (
+    claimedProductOptions: ClaimedProductOptions
+  ) => void,
   onOpenEditProfileDialog: () => void,
   onOpenChangeEmailDialog: () => void,
   onOpenCreateAccountDialog: () => void,
+  onOpenCreateAccountWithPurchaseClaimDialog: (
+    claimedProductOptions: ClaimedProductOptions
+  ) => void,
+  onOpenPurchaseClaimDialog: (
+    claimedProductOptions: ClaimedProductOptions
+  ) => void,
   onBadgesChanged: () => Promise<void>,
   onCloudProjectsChanged: () => Promise<void>,
   onRefreshUserProfile: () => Promise<void>,
@@ -74,6 +90,8 @@ export type AuthenticatedUser = {|
   onRefreshLimits: () => Promise<void>,
   onRefreshGameTemplatePurchases: () => Promise<void>,
   onRefreshAssetPackPurchases: () => Promise<void>,
+  onRefreshCoursePurchases: () => Promise<void>,
+  onRefreshBundlePurchases: () => Promise<void>,
   onRefreshEarningsBalance: () => Promise<void>,
   onRefreshNotifications: () => Promise<void>,
   onPurchaseSuccessful: () => Promise<void>,
@@ -92,6 +110,7 @@ export const authenticatedUserPropertiesLoadingState = {
   receivedAssetPacks: null,
   receivedAssetShortHeaders: null,
   receivedGameTemplates: null,
+  receivedBundles: null,
   badges: null,
   notifications: null,
 };
@@ -105,6 +124,8 @@ export const initialAuthenticatedUser = {
   cloudProjectsFetchingErrorLabel: null,
   gameTemplatePurchases: null,
   assetPackPurchases: null,
+  coursePurchases: null,
+  bundlePurchases: null,
   recommendations: null,
   subscription: null,
   usages: null,
@@ -120,9 +141,12 @@ export const initialAuthenticatedUser = {
   onEditProfile: async () => {},
   onResetPassword: async () => {},
   onOpenLoginDialog: () => {},
+  onOpenLoginWithPurchaseClaimDialog: () => {},
   onOpenEditProfileDialog: () => {},
   onOpenChangeEmailDialog: () => {},
   onOpenCreateAccountDialog: () => {},
+  onOpenCreateAccountWithPurchaseClaimDialog: () => {},
+  onOpenPurchaseClaimDialog: () => {},
   onBadgesChanged: async () => {},
   onCloudProjectsChanged: async () => {},
   onRefreshUserProfile: async () => {},
@@ -131,6 +155,8 @@ export const initialAuthenticatedUser = {
   onRefreshLimits: async () => {},
   onRefreshGameTemplatePurchases: async () => {},
   onRefreshAssetPackPurchases: async () => {},
+  onRefreshCoursePurchases: async () => {},
+  onRefreshBundlePurchases: async () => {},
   onRefreshEarningsBalance: async () => {},
   onRefreshNotifications: async () => {},
   onPurchaseSuccessful: async () => {},
@@ -154,6 +180,7 @@ export const authenticatedUserLoggedOutAttributes = {
   receivedAssetPacks: [], // Initialize to empty array to indicate that the loading is done.
   receivedAssetShortHeaders: [], // Initialize to empty array to indicate that the loading is done.
   receivedGameTemplates: [], // Initialize to empty array to indicate that the loading is done.
+  receivedBundles: [], // Initialize to empty array to indicate that the loading is done.
   subscription: null,
   userEarningsBalance: null,
   usages: null,

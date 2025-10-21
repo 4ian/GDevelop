@@ -101,11 +101,6 @@
       }
     },
     "surface": {
-      "titlebar": {
-        "background-color": {
-          "value": "#191724"
-        }
-      },
       "toolbar": {
         "background-color": {
           "value": "#1f1d2e"
@@ -518,7 +513,7 @@
       },
       "default": {
         "background-color": {
-          "value": "rgba(255, 255, 255, 0.09)"
+          "value": "#333141"
         },
         "error": {
           "value": "#FF8569",
@@ -588,6 +583,17 @@
       }
     },
     "rst": {
+      "ai-generated-event-move-handle": {
+        "gradient-color-1": {
+          "value": "#381522"
+        },
+        "gradient-color-2": {
+          "value": "#e77f7c"
+        },
+        "gradient-color-3": {
+          "value": "#381522"
+        }
+      },
       "move-handle": {
         "background-color": {
           "value": "#ebbcba"

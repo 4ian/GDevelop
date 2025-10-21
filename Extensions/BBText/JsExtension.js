@@ -75,9 +75,9 @@ module.exports = {
         .getOrCreate('align')
         .setValue(objectContent.align)
         .setType('choice')
-        .addExtraInfo('left')
-        .addExtraInfo('center')
-        .addExtraInfo('right')
+        .addChoice('left', _('Left'))
+        .addChoice('center', _('Center'))
+        .addChoice('right', _('Right'))
         .setLabel(_('Base alignment'))
         .setGroup(_('Appearance'));
 
@@ -88,9 +88,9 @@ module.exports = {
         .getOrCreate('verticalTextAlignment')
         .setValue(objectContent.verticalTextAlignment)
         .setType('choice')
-        .addExtraInfo('top')
-        .addExtraInfo('center')
-        .addExtraInfo('bottom')
+        .addChoice('top', _('Top'))
+        .addChoice('center', _('Center'))
+        .addChoice('bottom', _('Bottom'))
         .setLabel(_('Vertical alignment'))
         .setGroup(_('Appearance'));
 
@@ -507,14 +507,16 @@ module.exports = {
         instance,
         associatedObjectConfiguration,
         pixiContainer,
-        pixiResourcesLoader
+        pixiResourcesLoader,
+        getPropertyOverridings
       ) {
         super(
           project,
           instance,
           associatedObjectConfiguration,
           pixiContainer,
-          pixiResourcesLoader
+          pixiResourcesLoader,
+          getPropertyOverridings
         );
 
         const bbTextStyles = {
@@ -553,7 +555,11 @@ module.exports = {
           gd.ObjectJsImplementation
         );
 
-        const rawText = object.content.text;
+        const propertyOverridings = this.getPropertyOverridings();
+        const rawText =
+          propertyOverridings && propertyOverridings.has('Text')
+            ? propertyOverridings.get('Text')
+            : object.content.text;
         if (rawText !== this._pixiObject.text) {
           this._pixiObject.text = rawText;
         }
@@ -614,7 +620,7 @@ module.exports = {
           this._pixiObject.dirty = true;
         }
 
-        if (this._instance.hasCustomSize()) {
+        if (this._instance.hasCustomSize() && this._pixiObject.width !== 0) {
           const alignmentX =
             object.content.align === 'right'
               ? 1

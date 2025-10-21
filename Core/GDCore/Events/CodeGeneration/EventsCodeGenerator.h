@@ -9,9 +9,9 @@
 #include <utility>
 #include <vector>
 
+#include "GDCore/Events/CodeGeneration/DiagnosticReport.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Instruction.h"
-#include "GDCore/Events/CodeGeneration/DiagnosticReport.h"
 #include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/String.h"
 
@@ -62,7 +62,7 @@ class GD_CORE_API EventsCodeGenerator {
   EventsCodeGenerator(
       const gd::Platform& platform,
       const gd::ProjectScopedContainers& projectScopedContainers_);
-  virtual ~EventsCodeGenerator(){};
+  virtual ~EventsCodeGenerator() {};
 
   /**
    * \brief Preprocess an events list (replacing for example links with the
@@ -160,7 +160,8 @@ class GD_CORE_API EventsCodeGenerator {
   gd::String GenerateActionCode(
       gd::Instruction& action,
       EventsCodeGenerationContext& context,
-      const gd::String& optionalAsyncCallbackName = "");
+      const gd::String& optionalAsyncCallbackName = "",
+      const gd::String& optionalAsyncCallbackId = "");
 
   struct CallbackDescriptor {
     CallbackDescriptor(const gd::String functionName_,
@@ -168,7 +169,7 @@ class GD_CORE_API EventsCodeGenerator {
                        const std::set<gd::String> requiredObjects_)
         : functionName(functionName_),
           argumentsList(argumentsList_),
-          requiredObjects(requiredObjects_){};
+          requiredObjects(requiredObjects_) {};
     /**
      * The name by which the function can be invoked.
      */
@@ -338,9 +339,9 @@ class GD_CORE_API EventsCodeGenerator {
   }
 
   /**
-   * @brief Give access to the project scoped containers as code generation might
-   * push and pop variable containers (for local variables).
-   * This could be passed as a parameter recursively in code generation, but this requires
+   * @brief Give access to the project scoped containers as code generation
+   * might push and pop variable containers (for local variables). This could be
+   * passed as a parameter recursively in code generation, but this requires
    * heavy refactoring. Instead, we use this single instance.
    */
   gd::ProjectScopedContainers& GetProjectScopedContainers() {
@@ -387,9 +388,7 @@ class GD_CORE_API EventsCodeGenerator {
     diagnosticReport = diagnosticReport_;
   }
 
-  gd::DiagnosticReport* GetDiagnosticReport() {
-    return diagnosticReport;
-  }
+  gd::DiagnosticReport* GetDiagnosticReport() { return diagnosticReport; }
 
   /**
    * \brief Generate the full name for accessing to a boolean variable used for
@@ -513,16 +512,16 @@ class GD_CORE_API EventsCodeGenerator {
    * \brief Generate an any variable getter that fallbacks on scene variable for
    * compatibility reason.
    */
-  gd::String
-  GenerateAnyOrSceneVariableGetter(const gd::Expression &variableExpression,
-                                   EventsCodeGenerationContext &context);
+  gd::String GenerateAnyOrSceneVariableGetter(
+      const gd::Expression& variableExpression,
+      EventsCodeGenerationContext& context);
 
   virtual gd::String GeneratePropertySetterWithoutCasting(
-      const gd::PropertiesContainer &propertiesContainer,
-      const gd::NamedPropertyDescriptor &property,
-      const gd::String &operandCode);
+      const gd::PropertiesContainer& propertiesContainer,
+      const gd::NamedPropertyDescriptor& property,
+      const gd::String& operandCode);
 
-protected:
+ protected:
   virtual const gd::String GenerateRelationalOperatorCodes(
       const gd::String& operatorString);
 
@@ -643,16 +642,16 @@ protected:
       gd::EventsCodeGenerationContext& context);
 
   virtual gd::String GeneratePropertyGetterWithoutCasting(
-      const gd::PropertiesContainer &propertiesContainer,
-      const gd::NamedPropertyDescriptor &property);
+      const gd::PropertiesContainer& propertiesContainer,
+      const gd::NamedPropertyDescriptor& property);
 
   virtual gd::String GenerateParameterGetter(
       const gd::ParameterMetadata& parameter,
       const gd::String& type,
       gd::EventsCodeGenerationContext& context);
 
-  virtual gd::String
-  GenerateParameterGetterWithoutCasting(const gd::ParameterMetadata &parameter);
+  virtual gd::String GenerateParameterGetterWithoutCasting(
+      const gd::ParameterMetadata& parameter);
 
   /**
    * \brief Generate the code to reference an object which is
@@ -769,7 +768,8 @@ protected:
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context,
-      const gd::String& optionalAsyncCallbackName = "");
+      const gd::String& optionalAsyncCallbackName = "",
+      const gd::String& optionalAsyncCallbackId = "");
 
   virtual gd::String GenerateObjectAction(
       const gd::String& objectName,
@@ -778,7 +778,8 @@ protected:
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context,
-      const gd::String& optionalAsyncCallbackName = "");
+      const gd::String& optionalAsyncCallbackName = "",
+      const gd::String& optionalAsyncCallbackId = "");
 
   virtual gd::String GenerateBehaviorAction(
       const gd::String& objectName,
@@ -788,7 +789,8 @@ protected:
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context,
-      const gd::String& optionalAsyncCallbackName = "");
+      const gd::String& optionalAsyncCallbackName = "",
+      const gd::String& optionalAsyncCallbackId = "");
 
   gd::String GenerateRelationalOperatorCall(
       const gd::InstructionMetadata& instrInfos,
@@ -837,9 +839,8 @@ protected:
   virtual gd::String GenerateGetBehaviorNameCode(
       const gd::String& behaviorName);
 
-  void CheckBehaviorParameters(
-      const gd::Instruction &instruction,
-      const gd::InstructionMetadata &instrInfos);
+  bool CheckBehaviorParameters(const gd::Instruction& instruction,
+                               const gd::InstructionMetadata& instrInfos);
 
   const gd::Platform& platform;  ///< The platform being used.
 
@@ -876,4 +877,3 @@ protected:
 };
 
 }  // namespace gd
-

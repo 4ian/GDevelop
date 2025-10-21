@@ -42,18 +42,16 @@ bool EventsVariableInstructionTypeSwitcher::DoVisitInstruction(gd::Instruction& 
                                    platform, instruction.GetType());
 
   gd::ParameterMetadataTools::IterateOverParametersWithIndex(
-      instruction.GetParameters(),
-      metadata.GetParameters(),
-      [&](const gd::ParameterMetadata& parameterMetadata,
-          const gd::Expression& parameterValue,
-          size_t parameterIndex,
-          const gd::String& lastObjectName) {
+      instruction.GetParameters(), metadata.GetParameters(),
+      [&](const gd::ParameterMetadata &parameterMetadata,
+          const gd::Expression &parameterValue, size_t parameterIndex,
+          const gd::String &lastObjectName, size_t lastObjectIndex) {
         const gd::String& type = parameterMetadata.GetType();
 
         if (!gd::ParameterMetadata::IsExpression("variable", type) ||
             !gd::VariableInstructionSwitcher::IsSwitchableVariableInstruction(
                 instruction.GetType())) {
-                  return;
+          return;
         }
         const auto variableName =
             gd::ExpressionVariableNameFinder::GetVariableName(
@@ -72,10 +70,11 @@ bool EventsVariableInstructionTypeSwitcher::DoVisitInstruction(gd::Instruction& 
                     .GetObjectOrGroupVariablesContainer(lastObjectName);
           }
         } else if (type == "variableOrProperty") {
-            variablesContainer =
-                &GetProjectScopedContainers()
-                      .GetVariablesContainersList()
-                      .GetVariablesContainerFromVariableOrPropertyName(variableName);
+          variablesContainer =
+              &GetProjectScopedContainers()
+                   .GetVariablesContainersList()
+                   .GetVariablesContainerFromVariableOrPropertyName(
+                       variableName);
         } else {
           if (GetProjectScopedContainers().GetVariablesContainersList().Has(
                   variableName)) {

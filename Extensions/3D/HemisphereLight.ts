@@ -18,18 +18,15 @@ namespace gdjs {
           return new gdjs.PixiFiltersTools.EmptyFilter();
         }
         return new (class implements gdjs.PixiFiltersTools.Filter {
-          light: THREE.HemisphereLight;
-          rotationObject: THREE.Group;
+          _top: string = 'Z+';
+          _elevation: float = 90;
+          _rotation: float = 0;
+
           _isEnabled: boolean = false;
-          top: string = 'Y-';
-          elevation: float = 45;
-          rotation: float = 0;
+          _light: THREE.HemisphereLight;
 
           constructor() {
-            this.light = new THREE.HemisphereLight();
-            this.light.position.set(1, 0, 0);
-            this.rotationObject = new THREE.Group();
-            this.rotationObject.add(this.light);
+            this._light = new THREE.HemisphereLight();
             this.updateRotation();
           }
 
@@ -54,7 +51,7 @@ namespace gdjs {
             if (!scene) {
               return false;
             }
-            scene.add(this.rotationObject);
+            scene.add(this._light);
             this._isEnabled = true;
             return true;
           }
@@ -66,96 +63,106 @@ namespace gdjs {
             if (!scene) {
               return false;
             }
-            scene.remove(this.rotationObject);
+            scene.remove(this._light);
             this._isEnabled = false;
             return true;
           }
           updatePreRender(target: gdjs.EffectsTarget): any {}
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'intensity') {
-              this.light.intensity = value;
+              this._light.intensity = value;
             } else if (parameterName === 'elevation') {
-              this.elevation = value;
+              this._elevation = value;
               this.updateRotation();
             } else if (parameterName === 'rotation') {
-              this.rotation = value;
+              this._rotation = value;
               this.updateRotation();
             }
           }
           getDoubleParameter(parameterName: string): number {
             if (parameterName === 'intensity') {
-              return this.light.intensity;
+              return this._light.intensity;
             } else if (parameterName === 'elevation') {
-              return this.elevation;
+              return this._elevation;
             } else if (parameterName === 'rotation') {
-              return this.rotation;
+              return this._rotation;
             }
             return 0;
           }
           updateStringParameter(parameterName: string, value: string): void {
             if (parameterName === 'skyColor') {
-              this.light.color = new THREE.Color(
+              this._light.color = new THREE.Color(
                 gdjs.rgbOrHexStringToNumber(value)
               );
             }
             if (parameterName === 'groundColor') {
-              this.light.groundColor = new THREE.Color(
+              this._light.groundColor = new THREE.Color(
                 gdjs.rgbOrHexStringToNumber(value)
               );
             }
             if (parameterName === 'top') {
-              this.top = value;
+              this._top = value;
               this.updateRotation();
             }
           }
           updateColorParameter(parameterName: string, value: number): void {
             if (parameterName === 'skyColor') {
-              this.light.color.setHex(value);
+              this._light.color.setHex(value);
             }
             if (parameterName === 'groundColor') {
-              this.light.groundColor.setHex(value);
+              this._light.groundColor.setHex(value);
             }
           }
           getColorParameter(parameterName: string): number {
             if (parameterName === 'skyColor') {
-              return this.light.color.getHex();
+              return this._light.color.getHex();
             }
             if (parameterName === 'groundColor') {
-              return this.light.groundColor.getHex();
+              return this._light.groundColor.getHex();
             }
             return 0;
           }
           updateBooleanParameter(parameterName: string, value: boolean): void {}
           updateRotation() {
-            if (this.top === 'Z+') {
-              // 0° is a light from the right of the screen.
-              this.rotationObject.rotation.z = gdjs.toRad(this.rotation);
-              this.rotationObject.rotation.y = -gdjs.toRad(this.elevation);
+            if (this._top === 'Y-') {
+              // `rotation` at 0° becomes a light from Z+.
+              this._light.position.set(
+                Math.cos(gdjs.toRad(-this._rotation + 90)) *
+                  Math.cos(gdjs.toRad(this._elevation)),
+                -Math.sin(gdjs.toRad(this._elevation)),
+                Math.sin(gdjs.toRad(-this._rotation + 90)) *
+                  Math.cos(gdjs.toRad(this._elevation))
+              );
             } else {
-              // 0° becomes a light from Z+.
-              this.rotationObject.rotation.y = gdjs.toRad(this.rotation - 90);
-              this.rotationObject.rotation.z = -gdjs.toRad(this.elevation);
+              // `rotation` at 0° is a light from the right of the screen.
+              this._light.position.set(
+                Math.cos(gdjs.toRad(this._rotation)) *
+                  Math.cos(gdjs.toRad(this._elevation)),
+                Math.sin(gdjs.toRad(this._rotation)) *
+                  Math.cos(gdjs.toRad(this._elevation)),
+                Math.sin(gdjs.toRad(this._elevation))
+              );
             }
           }
           getNetworkSyncData(): HemisphereLightFilterNetworkSyncData {
             return {
-              i: this.light.intensity,
-              sc: this.light.color.getHex(),
-              gc: this.light.groundColor.getHex(),
-              e: this.elevation,
-              r: this.rotation,
-              t: this.top,
+              i: this._light.intensity,
+              sc: this._light.color.getHex(),
+              gc: this._light.groundColor.getHex(),
+              e: this._elevation,
+              r: this._rotation,
+              t: this._top,
             };
           }
           updateFromNetworkSyncData(
             syncData: HemisphereLightFilterNetworkSyncData
           ): void {
-            this.light.intensity = syncData.i;
-            this.light.color.setHex(syncData.sc);
-            this.light.groundColor.setHex(syncData.gc);
-            this.elevation = syncData.e;
-            this.rotation = syncData.r;
-            this.top = syncData.t;
+            this._light.intensity = syncData.i;
+            this._light.color.setHex(syncData.sc);
+            this._light.groundColor.setHex(syncData.gc);
+            this._elevation = syncData.e;
+            this._rotation = syncData.r;
+            this._top = syncData.t;
             this.updateRotation();
           }
         })();

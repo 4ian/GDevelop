@@ -283,11 +283,11 @@ namespace gdjs {
   gdjs.registerRuntimeSceneUnloadedCallback(function (runtimeScene) {
     const physics3DSharedData = runtimeScene.physics3DSharedData;
     if (physics3DSharedData) {
-      Jolt.destroy(physics3DSharedData.jolt);
       Jolt.destroy(physics3DSharedData.contactListener);
       Jolt.destroy(physics3DSharedData._tempVec3);
       Jolt.destroy(physics3DSharedData._tempRVec3);
       Jolt.destroy(physics3DSharedData._tempQuat);
+      Jolt.destroy(physics3DSharedData.jolt);
       runtimeScene.physics3DSharedData = null;
     }
   });
@@ -302,10 +302,17 @@ namespace gdjs {
     fixedRotation: boolean;
     private shape: string;
     private shapeOrientation: string;
-    private shapeDimensionA: any;
-    private shapeDimensionB: any;
-    private shapeDimensionC: any;
+    private shapeDimensionA: float;
+    private shapeDimensionB: float;
+    private shapeDimensionC: float;
+    private shapeOffsetX: float;
+    private shapeOffsetY: float;
+    shapeOffsetZ: float;
+    private massCenterOffsetX: float;
+    private massCenterOffsetY: float;
+    private massCenterOffsetZ: float;
     private density: float;
+    massOverride: float;
     friction: float;
     restitution: float;
     linearDamping: float;
@@ -313,7 +320,7 @@ namespace gdjs {
     gravityScale: float;
     private layers: integer;
     private masks: integer;
-    private shapeScale: number = 1;
+    shapeScale: number = 1;
 
     /**
      * Array containing the beginning of contacts reported by onContactBegin. Each contact
@@ -348,7 +355,10 @@ namespace gdjs {
     /**
      * When set to `true` the shape will be recreated before the next physics step.
      */
-    private _needToRecreateShape: boolean = false;
+    _needToRecreateShape: boolean = false;
+
+    _shapeHalfWidth: float = 0;
+    _shapeHalfHeight: float = 0;
     /**
      * Used by {@link gdjs.PhysicsCharacter3DRuntimeBehavior} to convert coordinates.
      */
@@ -387,11 +397,19 @@ namespace gdjs {
       this.bullet = behaviorData.bullet;
       this.fixedRotation = behaviorData.fixedRotation;
       this.shape = behaviorData.shape;
-      this.shapeOrientation = behaviorData.shapeOrientation;
+      this.shapeOrientation =
+        behaviorData.shape === 'Box' ? 'Z' : behaviorData.shapeOrientation;
       this.shapeDimensionA = behaviorData.shapeDimensionA;
       this.shapeDimensionB = behaviorData.shapeDimensionB;
       this.shapeDimensionC = behaviorData.shapeDimensionC;
+      this.shapeOffsetX = behaviorData.shapeOffsetX || 0;
+      this.shapeOffsetY = behaviorData.shapeOffsetY || 0;
+      this.shapeOffsetZ = behaviorData.shapeOffsetZ || 0;
+      this.massCenterOffsetX = behaviorData.massCenterOffsetX || 0;
+      this.massCenterOffsetY = behaviorData.massCenterOffsetY || 0;
+      this.massCenterOffsetZ = behaviorData.massCenterOffsetZ || 0;
       this.density = behaviorData.density;
+      this.massOverride = behaviorData.massOverride || 0;
       this.friction = behaviorData.friction;
       this.restitution = behaviorData.restitution;
       this.linearDamping = Math.max(0, behaviorData.linearDamping);
@@ -424,7 +442,7 @@ namespace gdjs {
       return tempQuat;
     }
 
-    updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
+    override updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
       if (oldBehaviorData.bullet !== newBehaviorData.bullet) {
         this.setBullet(newBehaviorData.bullet);
       }
@@ -477,7 +495,9 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): Physics3DNetworkSyncData {
+    override getNetworkSyncData(
+      options: GetNetworkSyncDataOptions
+    ): Physics3DNetworkSyncData {
       let bodyProps;
       if (this._body) {
         const position = this._body.GetPosition();
@@ -519,7 +539,7 @@ namespace gdjs {
         };
       }
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(options),
         props: {
           ...bodyProps,
           layers: this.layers,
@@ -528,26 +548,41 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(networkSyncData: Physics3DNetworkSyncData) {
-      super.updateFromNetworkSyncData(networkSyncData);
+    override updateFromNetworkSyncData(
+      networkSyncData: Physics3DNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
+    ) {
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       const behaviorSpecificProps = networkSyncData.props;
+
+      if (behaviorSpecificProps.layers !== undefined) {
+        this.layers = behaviorSpecificProps.layers;
+      }
+      if (behaviorSpecificProps.masks !== undefined) {
+        this.masks = behaviorSpecificProps.masks;
+      }
+
+      this._needToRecreateShape = true;
+      this._needToRecreateBody = true;
+      this.updateBodyFromObject();
+
+      if (!this._body) return;
+
       if (
         behaviorSpecificProps.px !== undefined &&
         behaviorSpecificProps.py !== undefined &&
         behaviorSpecificProps.pz !== undefined
       ) {
-        if (this._body) {
-          this._sharedData.bodyInterface.SetPosition(
-            this._body.GetID(),
-            this.getRVec3(
-              behaviorSpecificProps.px,
-              behaviorSpecificProps.py,
-              behaviorSpecificProps.pz
-            ),
-            Jolt.EActivation_DontActivate
-          );
-        }
+        this._sharedData.bodyInterface.SetPosition(
+          this._body.GetID(),
+          this.getRVec3(
+            behaviorSpecificProps.px,
+            behaviorSpecificProps.py,
+            behaviorSpecificProps.pz
+          ),
+          Jolt.EActivation_DontActivate
+        );
       }
       if (
         behaviorSpecificProps.rx !== undefined &&
@@ -555,82 +590,113 @@ namespace gdjs {
         behaviorSpecificProps.rz !== undefined &&
         behaviorSpecificProps.rw !== undefined
       ) {
-        if (this._body) {
-          this._sharedData.bodyInterface.SetRotation(
-            this._body.GetID(),
-            this.getQuat(
-              behaviorSpecificProps.rx,
-              behaviorSpecificProps.ry,
-              behaviorSpecificProps.rz,
-              behaviorSpecificProps.rw
-            ),
-            Jolt.EActivation_DontActivate
-          );
-        }
+        this._sharedData.bodyInterface.SetRotation(
+          this._body.GetID(),
+          this.getQuat(
+            behaviorSpecificProps.rx,
+            behaviorSpecificProps.ry,
+            behaviorSpecificProps.rz,
+            behaviorSpecificProps.rw
+          ),
+          Jolt.EActivation_DontActivate
+        );
       }
       if (
         behaviorSpecificProps.lvx !== undefined &&
         behaviorSpecificProps.lvy !== undefined &&
         behaviorSpecificProps.lvz !== undefined
       ) {
-        if (this._body) {
-          this._sharedData.bodyInterface.SetLinearVelocity(
-            this._body.GetID(),
-            this.getVec3(
-              behaviorSpecificProps.lvx,
-              behaviorSpecificProps.lvy,
-              behaviorSpecificProps.lvz
-            )
-          );
-        }
+        this._sharedData.bodyInterface.SetLinearVelocity(
+          this._body.GetID(),
+          this.getVec3(
+            behaviorSpecificProps.lvx,
+            behaviorSpecificProps.lvy,
+            behaviorSpecificProps.lvz
+          )
+        );
       }
       if (
         behaviorSpecificProps.avx !== undefined &&
         behaviorSpecificProps.avy !== undefined &&
         behaviorSpecificProps.avz !== undefined
       ) {
-        if (this._body) {
-          this._sharedData.bodyInterface.SetAngularVelocity(
-            this._body.GetID(),
-            this.getVec3(
-              behaviorSpecificProps.avx,
-              behaviorSpecificProps.avy,
-              behaviorSpecificProps.avz
-            )
-          );
-        }
-      }
-      if (behaviorSpecificProps.layers !== undefined) {
-        this.layers = behaviorSpecificProps.layers;
-      }
-      if (behaviorSpecificProps.masks !== undefined) {
-        this.masks = behaviorSpecificProps.masks;
+        this._sharedData.bodyInterface.SetAngularVelocity(
+          this._body.GetID(),
+          this.getVec3(
+            behaviorSpecificProps.avx,
+            behaviorSpecificProps.avy,
+            behaviorSpecificProps.avz
+          )
+        );
       }
     }
 
-    onDeActivate() {
+    override onDeActivate() {
       this._sharedData.removeFromBehaviorsList(this);
+      this._destroyBody();
+    }
+
+    override onActivate() {
+      this._sharedData.addToBehaviorsList(this);
+    }
+
+    override onDestroy() {
+      this._destroyedDuringFrameLogic = true;
+      this.onDeActivate();
+    }
+
+    _destroyBody() {
       this.bodyUpdater.destroyBody();
       this._contactsEndedThisFrame.length = 0;
       this._contactsStartedThisFrame.length = 0;
       this._currentContacts.length = 0;
     }
 
-    onActivate() {
-      this._sharedData.addToBehaviorsList(this);
-
-      this._contactsEndedThisFrame.length = 0;
-      this._contactsStartedThisFrame.length = 0;
-      this._currentContacts.length = 0;
-      this.updateBodyFromObject();
+    resetToDefaultBodyUpdater() {
+      this.bodyUpdater = new gdjs.Physics3DRuntimeBehavior.DefaultBodyUpdater(
+        this
+      );
     }
 
-    onDestroy() {
-      this._destroyedDuringFrameLogic = true;
-      this.onDeActivate();
+    resetToDefaultCollisionChecker() {
+      this.collisionChecker =
+        new gdjs.Physics3DRuntimeBehavior.DefaultCollisionChecker(this);
     }
 
     createShape(): Jolt.Shape {
+      if (
+        this.massCenterOffsetX === 0 &&
+        this.massCenterOffsetY === 0 &&
+        this.massCenterOffsetZ === 0
+      ) {
+        return this.createShapeWithoutMassCenterOffset();
+      }
+      const rotatedShapeSettings =
+        this._createNewShapeSettingsWithoutMassCenterOffset();
+      const shapeScale = this.shapeScale * this._sharedData.worldInvScale;
+      const offsetCenterShapeSettings =
+        new Jolt.OffsetCenterOfMassShapeSettings(
+          this.getVec3(
+            this.massCenterOffsetX * shapeScale,
+            this.massCenterOffsetY * shapeScale,
+            this.massCenterOffsetZ * shapeScale
+          ),
+          rotatedShapeSettings
+        );
+      const shape = offsetCenterShapeSettings.Create().Get();
+      Jolt.destroy(offsetCenterShapeSettings);
+      return shape;
+    }
+
+    createShapeWithoutMassCenterOffset(): Jolt.Shape {
+      const rotatedShapeSettings =
+        this._createNewShapeSettingsWithoutMassCenterOffset();
+      const shape = rotatedShapeSettings.Create().Get();
+      Jolt.destroy(rotatedShapeSettings);
+      return shape;
+    }
+
+    private _createNewShapeSettingsWithoutMassCenterOffset(): Jolt.RotatedTranslatedShapeSettings {
       let width = this.owner3D.getWidth() * this._sharedData.worldInvScale;
       let height = this.owner3D.getHeight() * this._sharedData.worldInvScale;
       let depth = this.owner3D.getDepth() * this._sharedData.worldInvScale;
@@ -676,6 +742,8 @@ namespace gdjs {
           convexRadius
         );
         quat = this.getQuat(0, 0, 0, 1);
+        this._shapeHalfWidth = boxWidth / 2;
+        this._shapeHalfHeight = boxHeight / 2;
         this._shapeHalfDepth = boxDepth / 2;
       } else if (this.shape === 'Capsule') {
         const radius =
@@ -691,8 +759,12 @@ namespace gdjs {
           radius
         );
         quat = this._getShapeOrientationQuat();
+        this._shapeHalfWidth =
+          this.shapeOrientation === 'X' ? capsuleDepth / 2 : radius;
+        this._shapeHalfHeight =
+          this.shapeOrientation === 'Y' ? capsuleDepth / 2 : radius;
         this._shapeHalfDepth =
-          this.shapeOrientation !== 'Z' ? radius : capsuleDepth / 2;
+          this.shapeOrientation === 'Z' ? capsuleDepth / 2 : radius;
       } else if (this.shape === 'Cylinder') {
         const radius =
           shapeDimensionA > 0
@@ -713,8 +785,12 @@ namespace gdjs {
           convexRadius
         );
         quat = this._getShapeOrientationQuat();
+        this._shapeHalfWidth =
+          this.shapeOrientation === 'X' ? cylinderDepth / 2 : radius;
+        this._shapeHalfHeight =
+          this.shapeOrientation === 'Y' ? cylinderDepth / 2 : radius;
         this._shapeHalfDepth =
-          this.shapeOrientation !== 'Z' ? radius : cylinderDepth / 2;
+          this.shapeOrientation === 'Z' ? cylinderDepth / 2 : radius;
       } else {
         // Create a 'Sphere' by default.
         const radius =
@@ -725,19 +801,20 @@ namespace gdjs {
               : onePixel;
         shapeSettings = new Jolt.SphereShapeSettings(radius);
         quat = this.getQuat(0, 0, 0, 1);
+        this._shapeHalfWidth = radius;
+        this._shapeHalfHeight = radius;
         this._shapeHalfDepth = radius;
       }
       shapeSettings.mDensity = this.density;
-      const rotatedShape = new Jolt.RotatedTranslatedShapeSettings(
-        this.getVec3(0, 0, 0),
+      return new Jolt.RotatedTranslatedShapeSettings(
+        this.getVec3(
+          this.shapeOffsetX * shapeScale,
+          this.shapeOffsetY * shapeScale,
+          this.shapeOffsetZ * shapeScale
+        ),
         quat,
         shapeSettings
-      )
-        .Create()
-        .Get();
-
-      Jolt.destroy(shapeSettings);
-      return rotatedShape;
+      );
     }
 
     private _getShapeOrientationQuat(): Jolt.Quat {
@@ -822,7 +899,7 @@ namespace gdjs {
         : this.masks;
     }
 
-    doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+    override doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
       // Step the world if not done this frame yet.
       // Don't step at the first frame to allow events to handle overlapping objects.
       if (
@@ -836,7 +913,9 @@ namespace gdjs {
       }
     }
 
-    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+    override doStepPostEvents(
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ) {
       // Reset world step to update next frame
       this._sharedData.stepped = false;
     }
@@ -845,34 +924,59 @@ namespace gdjs {
       this.updateBodyFromObject();
     }
 
-    recreateBody() {
-      if (!this._body) {
-        this._createBody();
-        return;
-      }
-
+    recreateBody(previousBodyData?: {
+      linearVelocityX: float;
+      linearVelocityY: float;
+      linearVelocityZ: float;
+      angularVelocityX: float;
+      angularVelocityY: float;
+      angularVelocityZ: float;
+    }) {
       const bodyInterface = this._sharedData.bodyInterface;
-      const linearVelocity = this._body.GetLinearVelocity();
-      const linearVelocityX = linearVelocity.GetX();
-      const linearVelocityY = linearVelocity.GetY();
-      const linearVelocityZ = linearVelocity.GetZ();
-      const angularVelocity = this._body.GetAngularVelocity();
-      const angularVelocityX = angularVelocity.GetX();
-      const angularVelocityY = angularVelocity.GetY();
-      const angularVelocityZ = angularVelocity.GetZ();
+      const linearVelocityX = previousBodyData
+        ? previousBodyData.linearVelocityX
+        : this._body
+          ? this._body.GetLinearVelocity().GetX()
+          : 0;
+      const linearVelocityY = previousBodyData
+        ? previousBodyData.linearVelocityY
+        : this._body
+          ? this._body.GetLinearVelocity().GetY()
+          : 0;
+      const linearVelocityZ = previousBodyData
+        ? previousBodyData.linearVelocityZ
+        : this._body
+          ? this._body.GetLinearVelocity().GetZ()
+          : 0;
+      const angularVelocityX = previousBodyData
+        ? previousBodyData.angularVelocityX
+        : this._body
+          ? this._body.GetAngularVelocity().GetX()
+          : 0;
+      const angularVelocityY = previousBodyData
+        ? previousBodyData.angularVelocityY
+        : this._body
+          ? this._body.GetAngularVelocity().GetY()
+          : 0;
+      const angularVelocityZ = previousBodyData
+        ? previousBodyData.angularVelocityZ
+        : this._body
+          ? this._body.GetAngularVelocity().GetZ()
+          : 0;
 
-      let bodyID = this._body.GetID();
-      bodyInterface.RemoveBody(bodyID);
-      bodyInterface.DestroyBody(bodyID);
-      this._contactsEndedThisFrame.length = 0;
-      this._contactsStartedThisFrame.length = 0;
-      this._currentContacts.length = 0;
+      if (this._body) {
+        this.bodyUpdater.destroyBody();
+        this._contactsEndedThisFrame.length = 0;
+        this._contactsStartedThisFrame.length = 0;
+        this._currentContacts.length = 0;
+      }
 
       this._createBody();
       if (!this._body) {
         return;
       }
-      bodyID = this._body.GetID();
+
+      const bodyID = this._body.GetID();
       bodyInterface.SetLinearVelocity(
         bodyID,
         this.getVec3(linearVelocityX, linearVelocityY, linearVelocityZ)
@@ -930,7 +1034,7 @@ namespace gdjs {
       );
     }
 
-    getPhysicsPosition(result: Jolt.RVec3): Jolt.RVec3 {
+    _getPhysicsPosition(result: Jolt.RVec3): Jolt.RVec3 {
       result.Set(
         this.owner3D.getCenterXInScene() * this._sharedData.worldInvScale,
         this.owner3D.getCenterYInScene() * this._sharedData.worldInvScale,
@@ -939,7 +1043,7 @@ namespace gdjs {
       return result;
     }
 
-    getPhysicsRotation(result: Jolt.Quat): Jolt.Quat {
+    _getPhysicsRotation(result: Jolt.Quat): Jolt.Quat {
       const threeObject = this.owner3D.get3DRendererObject();
       result.Set(
         threeObject.quaternion.x,
@@ -950,7 +1054,7 @@ namespace gdjs {
       return result;
     }
 
-    moveObjectToPhysicsPosition(physicsPosition: Jolt.RVec3): void {
+    _moveObjectToPhysicsPosition(physicsPosition: Jolt.RVec3): void {
       this.owner3D.setCenterXInScene(
         physicsPosition.GetX() * this._sharedData.worldScale
       );
@@ -962,7 +1066,7 @@ namespace gdjs {
       );
     }
 
-    moveObjectToPhysicsRotation(physicsRotation: Jolt.Quat): void {
+    _moveObjectToPhysicsRotation(physicsRotation: Jolt.Quat): void {
       const threeObject = this.owner3D.get3DRendererObject();
       threeObject.quaternion.x = physicsRotation.GetX();
       threeObject.quaternion.y = physicsRotation.GetY();
@@ -1097,6 +1201,45 @@ namespace gdjs {
         return;
       }
       this.density = density;
+      this._needToRecreateShape = true;
+    }
+
+    getMassOverride(): float {
+      return this.massOverride;
+    }
+
+    setMassOverride(mass: float): void {
+      if (this.massOverride === mass) {
+        return;
+      }
+      this.massOverride = mass;
+      this._needToRecreateBody = true;
+    }
+
+    getShapeOffsetX(): float {
+      return this.shapeOffsetX;
+    }
+
+    setShapeOffsetX(shapeOffsetX: float): void {
+      this.shapeOffsetX = shapeOffsetX;
+      this._needToRecreateShape = true;
+    }
+
+    getShapeOffsetY(): float {
+      return this.shapeOffsetY;
+    }
+
+    setShapeOffsetY(shapeOffsetY: float): void {
+      this.shapeOffsetY = shapeOffsetY;
+      this._needToRecreateShape = true;
+    }
+
+    getShapeOffsetZ(): float {
+      return this.shapeOffsetZ;
+    }
+
+    setShapeOffsetZ(shapeOffsetZ: float): void {
+      this.shapeOffsetZ = shapeOffsetZ;
       this._needToRecreateShape = true;
     }
 
@@ -1464,14 +1607,14 @@ namespace gdjs {
       }
       const body = this._body!;
 
-      const deltaX = towardX - body.GetPosition().GetX();
-      const deltaY = towardY - body.GetPosition().GetY();
-      const deltaZ = towardZ - body.GetPosition().GetZ();
-      const distance = deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ;
-      if (distance === 0) {
+      const deltaX = towardX - this.owner3D.getX();
+      const deltaY = towardY - this.owner3D.getY();
+      const deltaZ = towardZ - this.owner3D.getZ();
+      const distanceSq = deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ;
+      if (distanceSq === 0) {
         return;
       }
-      const ratio = length / distance;
+      const ratio = length / Math.sqrt(distanceSq);
 
       this._sharedData.bodyInterface.AddForce(
         body.GetID(),
@@ -1524,33 +1667,25 @@ namespace gdjs {
       length: float,
       towardX: float,
       towardY: float,
-      towardZ: float,
-      originX: float,
-      originY: float,
-      originZ: float
+      towardZ: float
     ): void {
       if (this._body === null) {
         if (!this._createBody()) return;
       }
       const body = this._body!;
 
-      const deltaX = towardX - originX;
-      const deltaY = towardY - originY;
-      const deltaZ = towardZ - originZ;
-      const distance = deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ;
-      if (distance === 0) {
+      const deltaX = towardX - this.owner3D.getX();
+      const deltaY = towardY - this.owner3D.getY();
+      const deltaZ = towardZ - this.owner3D.getZ();
+      const distanceSq = deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ;
+      if (distanceSq === 0) {
         return;
       }
-      const ratio = length / distance;
+      const ratio = length / Math.sqrt(distanceSq);
 
       this._sharedData.bodyInterface.AddImpulse(
         body.GetID(),
-        this.getVec3(deltaX * ratio, deltaY * ratio, deltaZ * ratio),
-        this.getRVec3(
-          originX * this._sharedData.worldInvScale,
-          originY * this._sharedData.worldInvScale,
-          originZ * this._sharedData.worldInvScale
-        )
+        this.getVec3(deltaX * ratio, deltaY * ratio, deltaZ * ratio)
       );
     }
 
@@ -1765,7 +1900,9 @@ namespace gdjs {
       destroyBody(): void;
     }
 
-    export class DefaultBodyUpdater {
+    export class DefaultBodyUpdater
+      implements gdjs.Physics3DRuntimeBehavior.BodyUpdater
+    {
       behavior: gdjs.Physics3DRuntimeBehavior;
 
       constructor(behavior: gdjs.Physics3DRuntimeBehavior) {
@@ -1779,8 +1916,8 @@ namespace gdjs {
         const shape = behavior.createShape();
         const bodyCreationSettings = new Jolt.BodyCreationSettings(
           shape,
-          behavior.getPhysicsPosition(_sharedData.getRVec3(0, 0, 0)),
-          behavior.getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1)),
+          behavior._getPhysicsPosition(_sharedData.getRVec3(0, 0, 0)),
+          behavior._getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1)),
           behavior.bodyType === 'Static'
             ? Jolt.EMotionType_Static
             : behavior.bodyType === 'Kinematic'
@@ -1801,6 +1938,12 @@ namespace gdjs {
         bodyCreationSettings.mLinearDamping = behavior.linearDamping;
         bodyCreationSettings.mAngularDamping = behavior.angularDamping;
         bodyCreationSettings.mGravityFactor = behavior.gravityScale;
+        if (behavior.massOverride > 0) {
+          bodyCreationSettings.mOverrideMassProperties =
+            Jolt.EOverrideMassProperties_CalculateInertia;
+          bodyCreationSettings.mMassPropertiesOverride.mMass =
+            behavior.massOverride;
+        }
 
         const bodyInterface = _sharedData.bodyInterface;
         const body = bodyInterface.CreateBody(bodyCreationSettings);
@@ -1819,8 +1962,8 @@ namespace gdjs {
         // If the body is null, we just don't do anything
         // (but still run the physics simulation - this is independent).
         if (_body !== null && _body.IsActive()) {
-          behavior.moveObjectToPhysicsPosition(_body.GetPosition());
-          behavior.moveObjectToPhysicsRotation(_body.GetRotation());
+          behavior._moveObjectToPhysicsPosition(_body.GetPosition());
+          behavior._moveObjectToPhysicsRotation(_body.GetRotation());
         }
       }
 
@@ -1842,8 +1985,8 @@ namespace gdjs {
         ) {
           _sharedData.bodyInterface.SetPositionAndRotationWhenChanged(
             body.GetID(),
-            this.behavior.getPhysicsPosition(_sharedData.getRVec3(0, 0, 0)),
-            this.behavior.getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1)),
+            this.behavior._getPhysicsPosition(_sharedData.getRVec3(0, 0, 0)),
+            this.behavior._getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1)),
             Jolt.EActivation_Activate
           );
         }

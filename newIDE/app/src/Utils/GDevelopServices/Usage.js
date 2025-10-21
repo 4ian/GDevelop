@@ -54,6 +54,16 @@ export type Subscription = {|
   isTeacher?: boolean,
 |};
 
+type AiCapability = {
+  availablePresets: Array<{
+    mode: 'chat' | 'agent',
+    name: string,
+    id: string,
+    disabled?: boolean,
+    enableWith?: 'higher-tier-plan',
+  }>,
+};
+
 /**
  * This describes what a user can do on our online services.
  */
@@ -95,10 +105,19 @@ export type Capabilities = {|
     themeCustomizationCapabilities: 'NONE' | 'BASIC' | 'FULL',
   |},
   versionHistory: {| enabled: boolean |},
+  ai: AiCapability,
 |};
 
 export type UsagePrice = {|
   priceInCredits: number,
+  variablePrice?: {
+    [subUsageType: string]: {
+      [variantType: string]: {
+        minimumPriceInCredits: number,
+        maximumPriceInCredits: number,
+      },
+    },
+  },
 |};
 
 export type UsagePrices = {|
@@ -216,6 +235,19 @@ export type SummarizedPlanFeature = {|
   upcoming?: true,
   trialLike?: true,
   displayInSummary?: true,
+|};
+
+export type RedemptionCode = {|
+  code: string,
+  givenSubscriptionPlanId: string | null,
+  durationInDays: number,
+  maxUsageCount: number,
+  remainingUsageCount: number,
+  madeBy: string,
+  madeFor: string | null,
+  ownerId?: string,
+  createdAt: number,
+  updatedAt: number,
 |};
 
 export const EDUCATION_PLAN_MIN_SEATS = 5;
@@ -430,7 +462,6 @@ export const changeUserSubscription = async (
     '/subscription-v2',
     {
       ...newSubscriptionDetails,
-      prohibitSeamlessUpdate: true,
       cancelImmediately: options.cancelImmediately,
       cancelReasons: options.cancelReasons,
     },
@@ -668,3 +699,21 @@ export function getSummarizedSubscriptionPlanFeatures(
 
   return summarizedFeatures;
 }
+
+export const getRedemptionCodes = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string
+): Promise<Array<RedemptionCode>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await apiClient.get('/redemption-code', {
+    params: {
+      userId,
+    },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+  });
+
+  return response.data;
+};

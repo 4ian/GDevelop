@@ -33,6 +33,8 @@ import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
 import ChevronArrowDownWithRoundedBorder from '../../UI/CustomSvgIcons/ChevronArrowDownWithRoundedBorder';
 import ChevronArrowRightWithRoundedBorder from '../../UI/CustomSvgIcons/ChevronArrowRightWithRoundedBorder';
 import Add from '../../UI/CustomSvgIcons/Add';
+import Trash from '../../UI/CustomSvgIcons/Trash';
+import Edit from '../../UI/CustomSvgIcons/ShareExternal';
 import { useManageObjectBehaviors } from '../../BehaviorsEditor';
 import Object3d from '../../UI/CustomSvgIcons/Object3d';
 import Object2d from '../../UI/CustomSvgIcons/Object2d';
@@ -53,6 +55,15 @@ import Window from '../../Utils/Window';
 import CompactTextField from '../../UI/CompactTextField';
 import { textEllipsisStyle } from '../../UI/TextEllipsis';
 import Link from '../../UI/Link';
+import {
+  getVariantName,
+  isVariantEditable,
+  duplicateVariant,
+  deleteVariant,
+  ChildrenOverridingDepreciationAlert,
+} from '../Editors/CustomObjectPropertiesEditor';
+import NewVariantDialog from '../Editors/CustomObjectPropertiesEditor/NewVariantDialog';
+import useAlertDialog from '../../UI/Alert/useAlertDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -157,7 +168,7 @@ const TopLevelCollapsibleSection = ({
   renderContentAsHiddenWhenFolded?: boolean,
   noContentMargin?: boolean,
   onOpenFullEditor: () => void,
-  onAdd?: () => void,
+  onAdd?: (() => void) | null,
 |}) => (
   <>
     <Separator />
@@ -215,7 +226,19 @@ type Props = {|
 
   objects: Array<gdObject>,
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
-  onExtensionInstalled: (extensionName: string) => void,
+  onOpenEventBasedObjectVariantEditor: (
+    extensionName: string,
+    eventsBasedObjectName: string,
+    variantName: string
+  ) => void,
+  onDeleteEventsBasedObjectVariant: (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventBasedObject: gdEventsBasedObject,
+    variant: gdEventsBasedObjectVariant
+  ) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
+  isVariableListLocked: boolean,
+  isBehaviorListLocked: boolean,
 |};
 
 export const CompactObjectPropertiesEditor = ({
@@ -233,7 +256,11 @@ export const CompactObjectPropertiesEditor = ({
   historyHandler,
   objects,
   onEditObject,
+  onOpenEventBasedObjectVariantEditor,
+  onDeleteEventsBasedObjectVariant,
   onExtensionInstalled,
+  isVariableListLocked,
+  isBehaviorListLocked,
 }: Props) => {
   const forceUpdate = useForceUpdate();
   const [
@@ -244,7 +271,13 @@ export const CompactObjectPropertiesEditor = ({
   const [isBehaviorsFolded, setIsBehaviorsFolded] = React.useState(false);
   const [isVariablesFolded, setIsVariablesFolded] = React.useState(false);
   const [isEffectsFolded, setIsEffectsFolded] = React.useState(false);
+  const [newVariantDialogOpen, setNewVariantDialogOpen] = React.useState(false);
+  const [
+    duplicateAndEditVariantDialogOpen,
+    setDuplicateAndEditVariantDialogOpen,
+  ] = React.useState(false);
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
+  const { showDeleteConfirmation } = useAlertDialog();
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
   const object = objects[0];
   const objectConfiguration = object.getConfiguration();
@@ -333,6 +366,7 @@ export const CompactObjectPropertiesEditor = ({
   } = useManageObjectBehaviors({
     project,
     object,
+    isChildObject: !layout,
     eventsFunctionsExtension,
     onUpdate: forceUpdate,
     onBehaviorsUpdated: forceUpdate,
@@ -363,25 +397,148 @@ export const CompactObjectPropertiesEditor = ({
   });
 
   // Events based object children:
-  const eventsBasedObject = project.hasEventsBasedObject(
+  const customObjectEventsBasedObject = project.hasEventsBasedObject(
     objectConfiguration.getType()
   )
     ? project.getEventsBasedObject(objectConfiguration.getType())
     : null;
-  const customObjectConfiguration = eventsBasedObject
+  const customObjectConfiguration = customObjectEventsBasedObject
     ? gd.asCustomObjectConfiguration(objectConfiguration)
     : null;
+  const variantName = customObjectConfiguration
+    ? getVariantName(customObjectEventsBasedObject, customObjectConfiguration)
+    : '';
+
+  const customObjectExtensionName = customObjectConfiguration
+    ? gd.PlatformExtension.getExtensionFromFullObjectType(
+        customObjectConfiguration.getType()
+      )
+    : null;
+  const customObjectExtension =
+    customObjectExtensionName &&
+    project.hasEventsFunctionsExtensionNamed(customObjectExtensionName)
+      ? project.getEventsFunctionsExtension(customObjectExtensionName)
+      : null;
 
   const shouldDisplayEventsBasedObjectChildren =
     customObjectConfiguration &&
     (customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() ||
-      customObjectConfiguration.isMarkedAsOverridingEventsBasedObjectChildrenConfiguration());
+      (!variantName &&
+        customObjectConfiguration.isMarkedAsOverridingEventsBasedObjectChildrenConfiguration()));
+  const shouldDisplayVariant = customObjectConfiguration
+    ? !customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration()
+    : false;
 
   const helpLink = getHelpLink(objectMetadata.getHelpPath());
 
   const openFullEditor = React.useCallback(
     () => onEditObject(object, 'properties'),
     [object, onEditObject]
+  );
+
+  const editVariant = React.useCallback(
+    () => {
+      if (
+        !isVariantEditable(
+          customObjectConfiguration,
+          customObjectEventsBasedObject,
+          customObjectExtension
+        )
+      ) {
+        setDuplicateAndEditVariantDialogOpen(true);
+        return;
+      }
+      customObjectExtension &&
+        customObjectEventsBasedObject &&
+        customObjectConfiguration &&
+        onOpenEventBasedObjectVariantEditor &&
+        onOpenEventBasedObjectVariantEditor(
+          customObjectExtension.getName(),
+          customObjectEventsBasedObject.getName(),
+          customObjectConfiguration.getVariantName()
+        );
+    },
+    [
+      customObjectConfiguration,
+      onOpenEventBasedObjectVariantEditor,
+      customObjectExtension,
+      customObjectEventsBasedObject,
+    ]
+  );
+
+  const doDuplicateVariant = React.useCallback(
+    (i18n: I18nType, newName: string) => {
+      duplicateVariant(
+        newName,
+        customObjectConfiguration,
+        customObjectEventsBasedObject,
+        customObjectExtension,
+        project,
+        i18n
+      );
+      setNewVariantDialogOpen(false);
+      forceUpdate();
+    },
+    [
+      customObjectConfiguration,
+      customObjectEventsBasedObject,
+      customObjectExtension,
+      forceUpdate,
+      project,
+    ]
+  );
+
+  const duplicateAndEditVariant = React.useCallback(
+    (i18n: I18nType, newName: string) => {
+      duplicateVariant(
+        newName,
+        customObjectConfiguration,
+        customObjectEventsBasedObject,
+        customObjectExtension,
+        project,
+        i18n
+      );
+      setDuplicateAndEditVariantDialogOpen(false);
+      forceUpdate();
+      editVariant();
+    },
+    [
+      customObjectConfiguration,
+      customObjectEventsBasedObject,
+      customObjectExtension,
+      forceUpdate,
+      project,
+      editVariant,
+    ]
+  );
+
+  const doDeleteVariant = React.useCallback(
+    async () => {
+      const hasConfirmedDeletion = await showDeleteConfirmation({
+        title: t`Remove variant`,
+        message: t`Are you sure you want to remove this variant from your project? This can't be undone.`,
+      });
+      if (!hasConfirmedDeletion) {
+        return;
+      }
+      deleteVariant(
+        customObjectConfiguration,
+        customObjectEventsBasedObject,
+        customObjectExtension,
+        project,
+        onDeleteEventsBasedObjectVariant
+      );
+      forceUpdate();
+    },
+    [
+      customObjectConfiguration,
+      customObjectEventsBasedObject,
+      forceUpdate,
+      onDeleteEventsBasedObjectVariant,
+      project,
+      customObjectExtension,
+      showDeleteConfirmation,
+    ]
   );
 
   return (
@@ -492,14 +649,91 @@ export const CompactObjectPropertiesEditor = ({
                     }}
                   />
                 )}
-                {eventsBasedObject &&
+                {shouldDisplayVariant && (
+                  <ColumnStackLayout noMargin noOverflowParent>
+                    <LineStackLayout noMargin justifyContent="space-between">
+                      <Text size="body" noMargin>
+                        <Trans>Variant</Trans>
+                      </Text>
+                      <LineStackLayout noMargin>
+                        <IconButton
+                          key={'delete-variant'}
+                          size="small"
+                          onClick={doDeleteVariant}
+                          disabled={!variantName}
+                        >
+                          <Trash style={styles.icon} />
+                        </IconButton>
+                        <IconButton
+                          key={'duplicate-variant'}
+                          size="small"
+                          onClick={() => setNewVariantDialogOpen(true)}
+                        >
+                          <Add style={styles.icon} />
+                        </IconButton>
+                        <IconButton
+                          key={'edit-variant'}
+                          size="small"
+                          onClick={editVariant}
+                        >
+                          <Edit style={styles.icon} />
+                        </IconButton>
+                      </LineStackLayout>
+                    </LineStackLayout>
+                    <CompactSelectField
+                      key={'variant-name'}
+                      value={variantName}
+                      onChange={(newValue: string) => {
+                        customObjectConfiguration &&
+                          customObjectConfiguration.setVariantName(newValue);
+                        forceUpdate();
+                      }}
+                    >
+                      <SelectOption
+                        key="default-variant"
+                        value=""
+                        label={t`Default`}
+                      />
+                      {customObjectEventsBasedObject &&
+                        mapFor(
+                          0,
+                          customObjectEventsBasedObject
+                            .getVariants()
+                            .getVariantsCount(),
+                          i => {
+                            if (!customObjectEventsBasedObject) {
+                              return null;
+                            }
+                            const variant = customObjectEventsBasedObject
+                              .getVariants()
+                              .getVariantAt(i);
+                            return (
+                              <SelectOption
+                                key={'variant-' + variant.getName()}
+                                value={variant.getName()}
+                                label={variant.getName()}
+                              />
+                            );
+                          }
+                        )}
+                    </CompactSelectField>
+                  </ColumnStackLayout>
+                )}
+                {shouldDisplayEventsBasedObjectChildren &&
+                  customObjectConfiguration &&
+                  !customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() && (
+                    <ChildrenOverridingDepreciationAlert />
+                  )}
+                {customObjectEventsBasedObject &&
                   customObjectConfiguration &&
                   shouldDisplayEventsBasedObjectChildren &&
                   mapFor(
                     0,
-                    eventsBasedObject.getObjects().getObjectsCount(),
+                    customObjectEventsBasedObject
+                      .getObjects()
+                      .getObjectsCount(),
                     i => {
-                      const childObject = eventsBasedObject
+                      const childObject = customObjectEventsBasedObject
                         .getObjects()
                         .getObjectAt(i);
                       const childObjectName = childObject.getName();
@@ -515,7 +749,6 @@ export const CompactObjectPropertiesEditor = ({
                               project={project}
                               resourceManagementProps={resourceManagementProps}
                               unsavedChanges={unsavedChanges}
-                              eventsBasedObject={eventsBasedObject}
                               customObjectConfiguration={
                                 customObjectConfiguration
                               }
@@ -545,7 +778,7 @@ export const CompactObjectPropertiesEditor = ({
             isFolded={isBehaviorsFolded}
             toggleFolded={() => setIsBehaviorsFolded(!isBehaviorsFolded)}
             onOpenFullEditor={() => onEditObject(object, 'behaviors')}
-            onAdd={openNewBehaviorDialog}
+            onAdd={isBehaviorListLocked ? null : openNewBehaviorDialog}
             renderContent={() => (
               <ColumnStackLayout noMargin>
                 {!allVisibleBehaviors.length && (
@@ -618,12 +851,16 @@ export const CompactObjectPropertiesEditor = ({
             isFolded={isVariablesFolded}
             toggleFolded={() => setIsVariablesFolded(!isVariablesFolded)}
             onOpenFullEditor={() => onEditObject(object, 'variables')}
-            onAdd={() => {
-              if (variablesListRef.current) {
-                variablesListRef.current.addVariable();
-              }
-              setIsVariablesFolded(false);
-            }}
+            onAdd={
+              isVariableListLocked
+                ? null
+                : () => {
+                    if (variablesListRef.current) {
+                      variablesListRef.current.addVariable();
+                    }
+                    setIsVariablesFolded(false);
+                  }
+            }
             renderContentAsHiddenWhenFolded={
               true /* Allows to keep a ref to the variables list for add button to work. */
             }
@@ -664,6 +901,7 @@ export const CompactObjectPropertiesEditor = ({
                     on this object.
                   </Trans>
                 }
+                isListLocked={isVariableListLocked}
               />
             )}
           />
@@ -764,6 +1002,25 @@ export const CompactObjectPropertiesEditor = ({
         </Column>
       </ScrollView>
       {newBehaviorDialog}
+      {newVariantDialogOpen && customObjectEventsBasedObject && (
+        <NewVariantDialog
+          initialName={variantName || i18n._(t`New variant`)}
+          onApply={name => doDuplicateVariant(i18n, name)}
+          onCancel={() => {
+            setNewVariantDialogOpen(false);
+          }}
+        />
+      )}
+      {duplicateAndEditVariantDialogOpen && customObjectEventsBasedObject && (
+        <NewVariantDialog
+          isDuplicationBeforeEdition
+          initialName={variantName || i18n._(t`New variant`)}
+          onApply={name => duplicateAndEditVariant(i18n, name)}
+          onCancel={() => {
+            setDuplicateAndEditVariantDialogOpen(false);
+          }}
+        />
+      )}
     </ErrorBoundary>
   );
 };

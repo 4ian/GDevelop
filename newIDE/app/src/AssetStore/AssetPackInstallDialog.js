@@ -18,6 +18,7 @@ import {
   installRequiredExtensions,
   installPublicAsset,
   type RequiredExtensionInstallation,
+  complyVariantsToEventsBasedObjectOf,
 } from './InstallAsset';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { showErrorBox } from '../UI/Messages/MessageBox';
@@ -48,6 +49,7 @@ type Props = {|
   addedAssetIds: Set<string>,
   onClose: () => void,
   onAssetsAdded: (createdObjects: gdObject[]) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
   project: gdProject,
   objectsContainer: ?gdObjectsContainer,
   resourceManagementProps: ResourceManagementProps,
@@ -60,6 +62,7 @@ const AssetPackInstallDialog = ({
   addedAssetIds,
   onClose,
   onAssetsAdded,
+  onExtensionInstalled,
   project,
   objectsContainer,
   resourceManagementProps,
@@ -158,17 +161,24 @@ const AssetPackInstallDialog = ({
             project,
           }
         );
-        const shouldUpdateExtension =
-          requiredExtensionInstallation.outOfDateExtensionShortHeaders.length >
-            0 &&
-          (await showExtensionUpdateConfirmation(
-            requiredExtensionInstallation.outOfDateExtensionShortHeaders
-          ));
+        const extensionUpdateAction =
+          requiredExtensionInstallation.outOfDateExtensionShortHeaders
+            .length === 0
+            ? 'skip'
+            : await showExtensionUpdateConfirmation({
+                project,
+                outOfDateExtensionShortHeaders:
+                  requiredExtensionInstallation.outOfDateExtensionShortHeaders,
+              });
+        if (extensionUpdateAction === 'abort') {
+          return;
+        }
         await installRequiredExtensions({
           requiredExtensionInstallation,
-          shouldUpdateExtension,
+          shouldUpdateExtension: extensionUpdateAction === 'update',
           eventsFunctionsExtensionsState,
           project,
+          onExtensionInstalled,
         });
 
         // Use a pool to avoid installing an unbounded amount of assets at the same time.
@@ -226,6 +236,7 @@ const AssetPackInstallDialog = ({
         const createdObjects = results
           .map(result => result.createdObjects)
           .flat();
+        complyVariantsToEventsBasedObjectOf(project, createdObjects);
         onAssetsAdded(createdObjects);
       } catch (error) {
         setAreAssetsBeingInstalled(false);
@@ -245,6 +256,7 @@ const AssetPackInstallDialog = ({
       eventsFunctionsExtensionsState,
       resourceManagementProps,
       onAssetsAdded,
+      onExtensionInstalled,
       installPrivateAsset,
       targetObjectsContainer,
       targetObjectFolderOrObjectWithContext,

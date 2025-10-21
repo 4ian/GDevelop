@@ -5,6 +5,7 @@ import MuiDialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import {
+  TopLevelWindowSizeProvider,
   useResponsiveWindowSize,
   type WindowSizeType,
 } from './Responsive/ResponsiveWindowMeasurer';
@@ -45,8 +46,8 @@ const getDefaultMaxWidthFromSize = (windowSize: WindowSizeType) => {
     case 'small':
       return false; // Full width
     case 'medium':
-    case 'large':
       return 'md';
+    case 'large':
     case 'xlarge':
       return 'lg';
     default:
@@ -216,6 +217,7 @@ type DialogProps = {|
   minHeight?: 'sm' | 'lg',
   fullHeight?: boolean,
   fullscreen?: 'never-even-on-mobile' | 'always-even-on-desktop',
+  noPadding?: boolean,
   actionsFullWidthOnMobile?: boolean,
   // Useful when the content of the dialog can change and we want to avoid layout shifts.
   forceScrollVisible?: boolean,
@@ -225,11 +227,7 @@ type DialogProps = {|
 
 export const DialogPrimaryButton = RaisedButton;
 
-/**
- * A enhanced material-ui Dialog that can have optional secondary actions
- * and no margins if required.
- */
-const Dialog = ({
+const DialogWithoutWindowSizeProvider = ({
   onApply,
   secondaryActions,
   dangerLevel,
@@ -249,6 +247,7 @@ const Dialog = ({
   cannotBeDismissed,
   exceptionallyStillAllowRenderingInstancesEditors,
   fullscreen,
+  noPadding,
   actionsFullWidthOnMobile,
   forceScrollVisible,
   topBackgroundSrc,
@@ -305,7 +304,7 @@ const Dialog = ({
     : {};
   const additionalPaddingStyle = {
     paddingTop: 0, // Let the title container handle the padding, or no padding if there is no title.
-    paddingBottom: hasActions ? 0 : dialogActionPadding, // Ensure the padding is here if there are no actions.
+    paddingBottom: hasActions || noPadding ? 0 : dialogActionPadding, // Ensure the padding is here if there are no actions.
   };
   const contentStyle = {
     ...styles.dialogContent,
@@ -316,7 +315,9 @@ const Dialog = ({
   const dialogContainerStyle = {
     ...styles.dialogContainer,
     // Ensure we don't spread an object here, to avoid a styling bug when resizing.
-    margin: isFullScreen
+    margin: noPadding
+      ? 0
+      : isFullScreen
       ? dialogSmallPadding
       : `${dialogTitlePadding}px ${dialogPaddingX}px ${dialogActionPadding}px ${dialogPaddingX}px`,
   };
@@ -477,6 +478,18 @@ const Dialog = ({
         )}
       </div>
     </MuiDialog>
+  );
+};
+
+/**
+ * A enhanced material-ui Dialog that can have optional secondary actions
+ * and no margins if required.
+ */
+const Dialog = (props: DialogProps) => {
+  return (
+    <TopLevelWindowSizeProvider>
+      <DialogWithoutWindowSizeProvider {...props} />
+    </TopLevelWindowSizeProvider>
   );
 };
 

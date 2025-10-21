@@ -184,6 +184,9 @@ namespace gdjs {
      */
     _embeddedResourcesMappings: Map<string, Record<string, string>>;
 
+    _sceneResourcesPreloading: 'at-startup' | 'never';
+    _sceneResourcesUnloading: 'at-scene-exit' | 'never';
+
     /**
      * Optional client to connect to a debugger server.
      */
@@ -223,6 +226,11 @@ namespace gdjs {
       this._data = data;
       this._updateSceneAndExtensionsData();
 
+      this._sceneResourcesPreloading =
+        this._data.properties.sceneResourcesPreloading || 'at-startup';
+      this._sceneResourcesUnloading =
+        this._data.properties.sceneResourcesUnloading || 'never';
+
       this._resourcesLoader = new gdjs.ResourceLoader(
         this,
         data.resources.resources,
@@ -245,6 +253,7 @@ namespace gdjs {
       this._antialiasingMode = this._data.properties.antialiasingMode;
       this._isAntialisingEnabledOnMobile =
         this._data.properties.antialisingEnabledOnMobile;
+
       this._renderer = new gdjs.RuntimeGameRenderer(
         this,
         this._options.forceFullscreen || false
@@ -361,6 +370,14 @@ namespace gdjs {
      */
     getVariablesForExtension(extensionName: string) {
       return this._variablesByExtensionName.get(extensionName) || null;
+    }
+
+    /**
+     * Get the gdjs.ResourceLoader of the RuntimeGame.
+     * @return The resource loader.
+     */
+    getResourceLoader(): gdjs.ResourceLoader {
+      return this._resourcesLoader;
     }
 
     /**
@@ -762,6 +779,22 @@ namespace gdjs {
      */
     areSceneAssetsReady(sceneName: string): boolean {
       return this._resourcesLoader.areSceneAssetsReady(sceneName);
+    }
+
+    /**
+     * Returns the scene resources preloading mode.
+     * It can be overriden by each scene.
+     */
+    getSceneResourcesPreloading(): 'at-startup' | 'never' {
+      return this._sceneResourcesPreloading;
+    }
+
+    /**
+     * Returns the scene resources unloading mode.
+     * It can be overriden by each scene.
+     */
+    getSceneResourcesUnloading(): 'at-scene-exit' | 'never' {
+      return this._sceneResourcesUnloading;
     }
 
     /**
@@ -1351,21 +1384,29 @@ namespace gdjs {
       syncOptions: GetNetworkSyncDataOptions
     ): GameNetworkSyncData | null {
       const syncData: GameNetworkSyncData = {
-        var: this._variables.getNetworkSyncData(syncOptions),
+        var:
+          syncOptions.syncGameVariables === false
+            ? undefined
+            : this._variables.getNetworkSyncData(syncOptions),
+        sm: syncOptions.syncSounds
+          ? this.getSoundManager().getNetworkSyncData()
+          : undefined,
         ss: this._sceneStack.getNetworkSyncData(syncOptions) || undefined,
       };
 
-      const extensionsVariablesSyncData = {};
-      this._variablesByExtensionName.forEach((variables, extensionName) => {
-        const extensionVariablesSyncData =
-          variables.getNetworkSyncData(syncOptions);
-        // If there is no variables to sync, don't include the extension in the sync data.
-        if (extensionVariablesSyncData.length) {
-          extensionsVariablesSyncData[extensionName] =
-            extensionVariablesSyncData;
-        }
-      });
-      syncData.extVar = extensionsVariablesSyncData;
+      if (syncOptions.syncGameVariables !== false) {
+        const extensionsVariablesSyncData = {};
+        this._variablesByExtensionName.forEach((variables, extensionName) => {
+          const extensionVariablesSyncData =
+            variables.getNetworkSyncData(syncOptions);
+          // If there is no variables to sync, don't include the extension in the sync data.
+          if (extensionVariablesSyncData.length) {
+            extensionsVariablesSyncData[extensionName] =
+              extensionVariablesSyncData;
+          }
+        });
+        syncData.extVar = extensionsVariablesSyncData;
+      }
 
       if (
         (!syncData.var || syncData.var.length === 0) &&
@@ -1379,10 +1420,16 @@ namespace gdjs {
       return syncData;
     }
 
-    updateFromNetworkSyncData(syncData: GameNetworkSyncData) {
+    updateFromNetworkSyncData(
+      syncData: GameNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
+    ) {
       this._throwIfDisposed();
       if (syncData.var) {
-        this._variables.updateFromNetworkSyncData(syncData.var);
+        this._variables.updateFromNetworkSyncData(syncData.var, options);
+      }
+      if (syncData.sm) {
+        this.getSoundManager().updateFromNetworkSyncData(syncData.sm);
       }
       if (syncData.ss) {
         this._sceneStack.updateFromNetworkSyncData(syncData.ss);
@@ -1397,7 +1444,8 @@ namespace gdjs {
             this.getVariablesForExtension(extensionName);
           if (extensionVariables) {
             extensionVariables.updateFromNetworkSyncData(
-              extensionVariablesData
+              extensionVariablesData,
+              options
             );
           }
         }

@@ -16,10 +16,8 @@ namespace gdjs {
 
   export type VideoObjectData = ObjectData & VideoObjectDataType;
 
-  export type VideoNetworkSyncDataType = {
+  export type VideoObjectNetworkSyncDataType = {
     op: float;
-    wid: float;
-    hei: float;
     // We don't sync volume, as it's probably a user setting?
     pla: boolean;
     loop: boolean;
@@ -27,8 +25,8 @@ namespace gdjs {
     ps: number;
   };
 
-  export type VideoNetworkSyncData = ObjectNetworkSyncData &
-    VideoNetworkSyncDataType;
+  export type VideoObjectNetworkSyncData = ObjectNetworkSyncData &
+    VideoObjectNetworkSyncDataType;
 
   /**
    * An object displaying a video on screen.
@@ -101,12 +99,12 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): VideoNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): VideoObjectNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         op: this._opacity,
-        wid: this.getWidth(),
-        hei: this.getHeight(),
         pla: this.isPlayed(),
         loop: this.isLooped(),
         ct: this.getCurrentTime(),
@@ -114,17 +112,14 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(syncData: VideoNetworkSyncData): void {
-      super.updateFromNetworkSyncData(syncData);
+    updateFromNetworkSyncData(
+      syncData: VideoObjectNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
+    ): void {
+      super.updateFromNetworkSyncData(syncData, options);
 
       if (this._opacity !== undefined && this._opacity && syncData.op) {
         this.setOpacity(syncData.op);
-      }
-      if (this.getWidth() !== undefined && this.getWidth() !== syncData.wid) {
-        this.setWidth(syncData.wid);
-      }
-      if (this.getHeight() !== undefined && this.getHeight() !== syncData.hei) {
-        this.setHeight(syncData.hei);
       }
       if (syncData.pla !== undefined && this.isPlayed() !== syncData.pla) {
         syncData.pla ? this.play() : this.pause();

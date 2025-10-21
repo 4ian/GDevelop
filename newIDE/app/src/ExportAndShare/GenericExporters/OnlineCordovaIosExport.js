@@ -140,5 +140,5 @@ export const onlineCordovaIosExporter = {
   key: 'onlinecordovaiosexport',
   tabName: <Trans>iOS</Trans>,
   name: <Trans>iOS</Trans>,
-  helpPage: '/publishing/android_and_ios',
+  helpPage: '/publishing/ios',
 };

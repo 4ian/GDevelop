@@ -27,6 +27,17 @@
   background-color: var(--event-sheet-rst-move-handle-hover-background-color);
 }
 
+.gd-events-sheet .ai-generated-event-move-handle {
+  border-left: 1px solid;
+  border-image: linear-gradient(
+      to bottom,
+      var(--event-sheet-rst-ai-generated-event-move-handle-gradient-color-1),
+      var(--event-sheet-rst-ai-generated-event-move-handle-gradient-color-2),
+      var(--event-sheet-rst-ai-generated-event-move-handle-gradient-color-3)
+    )
+    1;
+}
+
 /**
  * Scaffolding lines on the left
  */
@@ -61,7 +72,7 @@
  * Large selectable area (events)
  */
 .gd-events-sheet .large-selectable {
-  border:  var(--event-sheet-selectable-border) !important;
+  border: var(--event-sheet-selectable-border) !important;
 }
 
 .gd-events-sheet .large-selectable.large-selected {
@@ -134,7 +145,8 @@
 }
 
 .gd-events-sheet .instruction-missing {
-  text-decoration: var(--event-sheet-instruction-parameter-error-color) underline wavy;
+  text-decoration: var(--event-sheet-instruction-parameter-error-color)
+    underline wavy;
 }
 
 .gd-events-sheet .instruction-missing .function-name {
@@ -155,7 +167,7 @@
 .gd-events-sheet .instruction-parameter.objectList,
 .gd-events-sheet .instruction-parameter.objectListOrEmptyIfJustDeclared,
 .gd-events-sheet .instruction-parameter.objectListOrEmptyWithoutPicking {
-  color:var(--event-sheet-instruction-parameter-object-color);
+  color: var(--event-sheet-instruction-parameter-object-color);
   font-weight: bold;
 }
 
@@ -193,17 +205,21 @@
 
 .gd-events-sheet .instruction-parameter .instruction-invalid-parameter {
   color: var(--event-sheet-instruction-parameter-error-color);
-  text-decoration:  var(--event-sheet-instruction-parameter-error-color) underline wavy;
+  text-decoration: var(--event-sheet-instruction-parameter-error-color)
+    underline wavy;
 }
 
 .gd-events-sheet .instruction-parameter .instruction-warning-parameter {
   color: var(--event-sheet-instruction-parameter-warning-color);
-  text-decoration:  var(--event-sheet-instruction-parameter-warning-color) underline wavy;
+  text-decoration: var(--event-sheet-instruction-parameter-warning-color)
+    underline wavy;
 }
 
 .gd-events-sheet .instruction-parameter .instruction-missing-parameter {
   display: inline-flex;
-  background-color: var(--event-sheet-instruction-parameter-error-background-color);
+  background-color: var(
+    --event-sheet-instruction-parameter-error-background-color
+  );
   border-bottom: 1px dashed var(--event-sheet-instruction-parameter-error-color);
   min-width: var(--instruction-missing-parameter-min-width);
   min-height: var(--instruction-missing-parameter-min-height);
@@ -221,7 +237,10 @@
 .gd-events-sheet .with-search-results .rst__rowSearchMatch .move-handle:hover {
   filter: brightness(120%);
 }
-.gd-events-sheet .with-search-results .rst__rowSearchMatch .conditions-container {
+.gd-events-sheet
+  .with-search-results
+  .rst__rowSearchMatch
+  .conditions-container {
   outline: none;
   background-color: var(--event-sheet-events-highlighted-background-color);
 }
@@ -229,7 +248,10 @@
   outline: none;
   background-color: var(--event-sheet-events-highlighted-background-color);
 }
-.gd-events-sheet .with-search-results .rst__rowSearchMatch .local-variables-container {
+.gd-events-sheet
+  .with-search-results
+  .rst__rowSearchMatch
+  .local-variables-container {
   outline: none;
   background-color: var(--event-sheet-events-highlighted-background-color);
 }
@@ -242,7 +264,8 @@
 * Drag'n'drop indicator (events - instructions)
 */
 .gd-events-sheet .drop-indicator {
-  border-top: 2px solid var(--event-sheet-drop-indicator-can-drop-border-top-color);
+  border-top: 2px solid
+    var(--event-sheet-drop-indicator-can-drop-border-top-color);
   height: 0;
   margin-top: -1px;
   margin-bottom: -1px;
@@ -251,7 +274,8 @@
 }
 
 .gd-events-sheet .cant-drop-indicator {
-  border-top: 2px solid var(--event-sheet-drop-indicator-can-drop-border-top-color);
+  border-top: 2px solid
+    var(--event-sheet-drop-indicator-can-drop-border-top-color);
   height: 0;
   margin-top: -1px;
   margin-bottom: -1px;
@@ -270,7 +294,8 @@
 }
 .gd-events-sheet .link-container .instruction-invalid-parameter {
   color: var(--event-sheet-instruction-parameter-error-color);
-  text-decoration:  var(--event-sheet-instruction-parameter-error-color) underline wavy;
+  text-decoration: var(--event-sheet-instruction-parameter-error-color)
+    underline wavy;
 }
 
 .gd-events-sheet .link-container .selectable {

@@ -83,7 +83,8 @@ const ObjectsRenderingService = {
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
-    threeGroup: THREE.Group | null
+    threeGroup: THREE.Group | null,
+    getPropertyOverridings: (() => Map<string, string>) | null = null
   ): RenderedInstance | Rendered3DInstance {
     const objectType = associatedObjectConfiguration.getType();
     if (threeGroup && this.renderers3D.hasOwnProperty(objectType)) {
@@ -101,7 +102,8 @@ const ObjectsRenderingService = {
         instance,
         associatedObjectConfiguration,
         pixiContainer,
-        PixiResourcesLoader
+        PixiResourcesLoader,
+        getPropertyOverridings
       );
     else {
       if (project.hasEventsBasedObject(objectType)) {
@@ -135,7 +137,8 @@ const ObjectsRenderingService = {
             associatedObjectConfiguration,
             pixiContainer,
             threeGroup,
-            PixiResourcesLoader
+            PixiResourcesLoader,
+            getPropertyOverridings
           );
         }
       }

@@ -4,8 +4,8 @@
  * reserved. This project is released under the MIT License.
  */
 #include "AllBuiltinExtensions.h"
-#include "GDCore/Tools/Localization.h"
 #include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
+#include "GDCore/Tools/Localization.h"
 
 using namespace std;
 namespace gd {
@@ -16,7 +16,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .SetExtensionInformation(
           "BuiltinScene",
           _("Scene"),
-          _("Actions and conditions to manipulate the scenes during the game."),
+          _("Actions/conditions to change the current scene (or pause it and "
+            "launch another one, or go back to the previous one), check if a "
+            "scene or the game has just started/resumed, preload assets of a "
+            "scene, get the current scene name or loading progress, quit the "
+            "game, set background color, or disable input when focus is lost."),
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
@@ -166,25 +170,28 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddCodeOnlyParameter("currentScene", "");
 
   extension
-      .AddAction("PrioritizeLoadingOfScene",
-                 _("Preload scene"),
-                 _("Preload a scene resources as soon as possible in background."),
-                 _("Preload scene _PARAM1_ in background"),
-                 "",
-                 "res/actions/hourglass_black.svg",
-                 "res/actions/hourglass_black.svg")
+      .AddAction(
+          "PrioritizeLoadingOfScene",
+          _("Preload scene"),
+          _("Preload a scene resources as soon as possible in background."),
+          _("Preload scene _PARAM1_ in background"),
+          "",
+          "res/actions/hourglass_black.svg",
+          "res/actions/hourglass_black.svg")
       .SetHelpPath("/all-features/resources-loading")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("sceneName", _("Name of the new scene"))
       .MarkAsAdvanced();
 
-  extension.AddExpressionAndCondition("number",
-                                "SceneLoadingProgress",
-                                _("Scene loading progress"),
-                                _("The progress of resources loading in background for a scene (between 0 and 1)."),
-                                _("_PARAM0_ loading progress"),
-                                _(""),
-                                "res/actions/hourglass_black.svg")
+  extension
+      .AddExpressionAndCondition("number",
+                                 "SceneLoadingProgress",
+                                 _("Scene loading progress"),
+                                 _("The progress of resources loading in "
+                                   "background for a scene (between 0 and 1)."),
+                                 _("_PARAM1_ loading progress"),
+                                 _(""),
+                                 "res/actions/hourglass_black.svg")
       .SetHelpPath("/all-features/resources-loading")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("sceneName", _("Scene name"))
@@ -192,13 +199,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddCondition("AreSceneAssetsLoaded",
-                    _("Scene preloaded"),
-                    _("Check if scene resources have finished to load in background."),
-                    _("Scene _PARAM1_ was preloaded in background"),
-                    "",
-                    "res/actions/hourglass_black.svg",
-                    "res/actions/hourglass_black.svg")
+      .AddCondition(
+          "AreSceneAssetsLoaded",
+          _("Scene preloaded"),
+          _("Check if scene resources have finished to load in background."),
+          _("Scene _PARAM1_ was preloaded in background"),
+          "",
+          "res/actions/hourglass_black.svg",
+          "res/actions/hourglass_black.svg")
       .SetHelpPath("/all-features/resources-loading")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("sceneName", _("Scene name"))

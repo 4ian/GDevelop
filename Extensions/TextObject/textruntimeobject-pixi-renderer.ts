@@ -86,6 +86,7 @@ namespace gdjs {
         ? style.dropShadowDistance + style.dropShadowBlur
         : 0;
       style.padding = Math.ceil(this._object._padding + extraPaddingForShadow);
+      style.lineHeight = this._object._lineHeight;
 
       // Prevent spikey outlines by adding a miter limit
       style.miterLimit = 3;
@@ -98,7 +99,7 @@ namespace gdjs {
     }
 
     updatePosition(): void {
-      if (this._object.isWrapping()) {
+      if (this._object.isWrapping() && this._text.width !== 0) {
         const alignmentX =
           this._object._textAlign === 'right'
             ? 1
@@ -117,7 +118,6 @@ namespace gdjs {
         this._text.position.x = this._object.x + this._text.width / 2;
         this._text.anchor.x = 0.5;
       }
-      this._text.position.y = this._object.y + this._text.height / 2;
 
       const alignmentY =
         this._object._verticalTextAlignment === 'bottom'

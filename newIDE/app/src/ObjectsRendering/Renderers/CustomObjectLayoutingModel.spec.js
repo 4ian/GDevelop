@@ -624,7 +624,7 @@ type MockedRenderedInstanceConfiguration = {|
 |};
 
 class MockedParent implements LayoutedParent<MockedChildRenderedInstance> {
-  eventBasedObject: gdEventsBasedObject | null;
+  getVariant: () => gdEventsBasedObjectVariant | null;
   width: number;
   height: number;
   renderedInstances = new Map<number, MockedChildRenderedInstance>();
@@ -639,7 +639,7 @@ class MockedParent implements LayoutedParent<MockedChildRenderedInstance> {
     width: number,
     height: number
   ) {
-    this.eventBasedObject = eventBasedObject;
+    this.getVariant = () => eventBasedObject.getDefaultVariant();
     this.width = width;
     this.height = height;
   }

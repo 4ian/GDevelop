@@ -42,13 +42,17 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(
   extension
       .AddAction(
           "LoadFile",
-          _("Load a storage in memory"),
-          _("This action loads the specified storage in memory, so you can "
-            "write and read it.\nYou can open and write without using this "
-            "action, but it will be slower.\nIf you use this action, do not "
-            "forget to unload the storage from memory."),
-          _("Load storage _PARAM0_ in memory"),
-          "",
+          _("Manually preload a storage in memory"),
+          _("Forces the specified storage to be loaded and kept in "
+            "memory, allowing faster reads/writes. "
+            "However, it requires manual management: if you use this "
+            "action, you *must* also unload the storage manually when "
+            "it's no longer needed to ensure data is persisted.\n\n"
+            "Unless you have a specific performance need, avoid using this "
+            "action. The system already handles loading/unloading "
+            "automatically."),
+          _("Load data storage _PARAM0_ in memory"),
+          _("Advanced"),
           "res/actions/fichier24.png",
           "res/actions/fichier.png")
       .AddParameter("string", _("Storage name"))
@@ -56,11 +60,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(
 
   extension
       .AddAction("UnloadFile",
-                 _("Close a storage"),
-                 _("This action closes the structured data previously loaded "
+                 _("Manually unload and persist a storage"),
+                 _("Close the specified storage previously loaded "
                    "in memory, saving all changes made."),
-                 _("Close structured data _PARAM0_"),
-                 "",
+                 _("Unload and persist data storage _PARAM0_"),
+                 _("Advanced"),
                  "res/actions/fichier24.png",
                  "res/actions/fichier.png")
       .AddParameter("string", _("Storage name"))

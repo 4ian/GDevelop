@@ -4,7 +4,8 @@ import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
+import Clipboard from '../Utils/Clipboard';
+import { SafeExtractor } from '../Utils/SafeExtractor';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
@@ -28,6 +29,11 @@ export type SceneTreeViewItemCallbacks = {|
     options?: {|
       openEventsEditor: boolean,
       openSceneEditor: boolean,
+      focusWhenOpened:
+        | 'scene-or-events-otherwise'
+        | 'scene'
+        | 'events'
+        | 'none',
     |}
   ) => void,
 |};
@@ -90,7 +96,11 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   }
 
   onClick(): void {
-    this.props.onOpenLayout(this.scene.getName());
+    this.props.onOpenLayout(this.scene.getName(), {
+      openEventsEditor: true,
+      openSceneEditor: true,
+      focusWhenOpened: 'scene',
+    });
   }
 
   rename(newName: string): void {
@@ -114,6 +124,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
           this.props.onOpenLayout(this.scene.getName(), {
             openSceneEditor: true,
             openEventsEditor: false,
+            focusWhenOpened: 'scene',
           }),
       },
       {
@@ -123,6 +134,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
           this.props.onOpenLayout(this.scene.getName(), {
             openSceneEditor: false,
             openEventsEditor: true,
+            focusWhenOpened: 'events',
           }),
       },
       {

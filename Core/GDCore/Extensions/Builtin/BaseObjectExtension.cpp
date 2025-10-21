@@ -37,8 +37,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetIcon("res/actions/position24_black.png");
   extension.AddInstructionOrExpressionGroupMetadata(_("Angle"))
       .SetIcon("res/actions/direction24_black.png");
-  extension.AddInstructionOrExpressionGroupMetadata(_("Size"))
-      .SetIcon("res/actions/scale24_black.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Size")).SetIcon(
+      "res/actions/scale24_black.png");
 
   gd::ObjectMetadata& obj = extension.AddObject<gd::ObjectConfiguration>(
       "", _("Base object"), _("Base object"), "res/objeticon24.png");
@@ -235,7 +235,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction("SetAngle",
                 _("Angle"),
-                _("Change the angle of rotation of an object (in degrees)."),
+                _("Change the angle of rotation of an object (in degrees). For "
+                  "3D objects, this is the rotation around the Z axis."),
                 _("the angle"),
                 _("Angle"),
                 "res/actions/direction24_black.png",
@@ -250,7 +251,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddAction("Rotate",
                 _("Rotate"),
                 _("Rotate an object, clockwise if the speed is positive, "
-                  "counterclockwise otherwise."),
+                  "counterclockwise otherwise. For 3D objects, this is the "
+                  "rotation around the Z axis."),
                 _("Rotate _PARAM0_ at speed _PARAM1_ deg/second"),
                 _("Angle"),
                 "res/actions/rotate24_black.png",
@@ -286,6 +288,25 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("X position"))
       .AddParameter("expression", _("Y position"))
+      .AddParameter("expression", _("Angular speed (in degrees per second)"))
+      .SetParameterLongDescription(_("Enter 0 for an immediate rotation."))
+      .AddCodeOnlyParameter("currentScene", "")
+      .MarkAsAdvanced();
+
+  obj.AddAction(
+         "RotateTowardObject",
+         _("Rotate toward another object"),
+         _("Rotate an object towards another object, with the specified speed. "
+           "Note that if multiple instances of the target object are picked, "
+           "only the first one will be used. Use a For Each event or actions "
+           "like \"Pick nearest object\", \"Pick a random object\" to refine "
+           "the choice of the target object."),
+         _("Rotate _PARAM0_ towards _PARAM1_ at speed _PARAM2_ deg/second"),
+         _("Angle"),
+         "res/actions/rotate24_black.png",
+         "res/actions/rotate_black.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectPtr", _("Target object"))
       .AddParameter("expression", _("Angular speed (in degrees per second)"))
       .SetParameterLongDescription(_("Enter 0 for an immediate rotation."))
       .AddCodeOnlyParameter("currentScene", "")
@@ -634,7 +655,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddCondition("Angle",
                    _("Angle"),
-                   _("Compare the angle of the specified object."),
+                   _("Compare the angle, in degrees, of the specified object. "
+                     "For 3D objects, this is the angle around the Z axis."),
                    _("the angle (in degrees)"),
                    _("Angle"),
                    "res/conditions/direction24_black.png",
@@ -835,14 +857,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced()
       .SetRelevantForLayoutEventsOnly();
 
-  obj.AddAction(
-         "PushBooleanToObjectVariable",
-         _("Add value to object array variable"),
-         _("Adds a boolean to the end of an object array variable."),
-         _("Add value _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
-         _("Variables ❯ Arrays and structures"),
-         "res/actions/var24.png",
-         "res/actions/var.png")
+  obj.AddAction("PushBooleanToObjectVariable",
+                _("Add value to object array variable"),
+                _("Adds a boolean to the end of an object array variable."),
+                _("Add value _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
+                _("Variables ❯ Arrays and structures"),
+                "res/actions/var24.png",
+                "res/actions/var.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array variable"))
       .AddParameter("trueorfalse", _("Boolean to add"))
@@ -1268,7 +1289,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddExpression("Angle",
                     _("Angle"),
-                    _("Current angle, in degrees, of the object"),
+                    _("Current angle, in degrees, of the object. For 3D "
+                      "objects, this is the angle around the Z axis."),
                     _("Angle"),
                     "res/actions/direction_black.png")
       .AddParameter("object", _("Object"));
@@ -1571,7 +1593,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   extension
       .AddAction("Create",
                  _("Create an object"),
-                 _("Create an object at specified position"),
+                 _("Create an instance of the object at the specified position."
+                   "The created object instance will be available for the next "
+                   "actions and sub-events."),
                  _("Create object _PARAM1_ at position _PARAM2_;_PARAM3_ "
                    "(layer: _PARAM4_)"),
                  "",
@@ -1612,7 +1636,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   extension
       .AddAction("AjoutObjConcern",
-                 _("Pick all instances"),
+                 _("Pick all object instances"),
                  _("Pick all instances of the specified object(s). When you "
                    "pick all instances, "
                    "the next conditions and actions of this event work on all "
@@ -1626,18 +1650,32 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddAction(
-          "AjoutHasard",
-          _("Pick a random object"),
-          _("Pick one object from all the specified objects. When an object "
-            "is picked, the next conditions and actions of this event work "
-            "only on that object."),
-          _("Pick a random _PARAM1_"),
-          _("Objects"),
-          "res/actions/ajouthasard24.png",
-          "res/actions/ajouthasard.png")
+      .AddAction("AjoutHasard",
+                 _("Pick a random object"),
+                 _("Pick one instance from all the specified objects. When an "
+                   "instance is picked, the next conditions and actions of "
+                   "this event work only on that object instance."),
+                 _("Pick a random _PARAM1_"),
+                 _("Objects"),
+                 "res/actions/ajouthasard24.png",
+                 "res/actions/ajouthasard.png")
       .AddCodeOnlyParameter("objectsContext", "")
       .AddParameter("objectList", _("Object"))
+      .MarkAsSimple();
+
+  extension
+      .AddAction(
+          "PickNearest",
+          _("Pick nearest object"),
+          _("Pick the instance of this object that is nearest to the specified "
+            "position."),
+          _("Pick the _PARAM0_ that is nearest to _PARAM1_;_PARAM2_"),
+          _("Objects"),
+          "res/conditions/distance24.png",
+          "res/conditions/distance.png")
+      .AddParameter("objectList", _("Object"))
+      .AddParameter("expression", _("X position"))
+      .AddParameter("expression", _("Y position"))
       .MarkAsSimple();
 
   extension
@@ -1689,11 +1727,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   extension
       .AddCondition(
           "AjoutObjConcern",
-          _("Pick all objects"),
-          _("Pick all the specified objects. When you pick all objects, "
+          _("Pick all object instances"),
+          _("Pick all instances of the specified object(s). When you "
+            "pick all instances, "
             "the next conditions and actions of this event work on all "
             "of them."),
-          _("Pick all _PARAM1_ objects"),
+          _("Pick all instances of _PARAM1_"),
           _("Objects"),
           "res/conditions/add24.png",
           "res/conditions/add.png")
@@ -1702,16 +1741,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddCondition(
-          "AjoutHasard",
-          _("Pick a random object"),
-          _("Pick one object from all the specified objects. When an object "
-            "is picked, the next conditions and actions of this event work "
-            "only on that object."),
-          _("Pick a random _PARAM1_"),
-          _("Objects"),
-          "res/conditions/ajouthasard24.png",
-          "res/conditions/ajouthasard.png")
+      .AddCondition("AjoutHasard",
+                    _("Pick a random object"),
+                    _("Pick one instance from all the specified objects. When "
+                      "an instance is picked, the next conditions and actions "
+                      "of this event work only on that object instance."),
+                    _("Pick a random _PARAM1_"),
+                    _("Objects"),
+                    "res/conditions/ajouthasard24.png",
+                    "res/conditions/ajouthasard.png")
       .AddCodeOnlyParameter("objectsContext", "")
       .AddParameter("objectList", _("Object"))
       .MarkAsSimple();
@@ -1720,9 +1758,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddCondition(
           "PickNearest",
           _("Pick nearest object"),
-          _("Pick the object of this type that is nearest to the specified "
-            "position. If the condition is inverted, the object farthest from "
-            "the specified position is picked instead."),
+          _("Pick the instance of this object that is nearest to the specified "
+            "position. If the condition is inverted, the instance farthest "
+            "from the specified position is picked instead."),
           _("Pick the _PARAM0_ that is nearest to _PARAM1_;_PARAM2_"),
           _("Objects"),
           "res/conditions/distance24.png",

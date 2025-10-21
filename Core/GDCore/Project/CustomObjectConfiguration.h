@@ -29,9 +29,9 @@ namespace gd {
  * "resource".
  */
 class CustomObjectConfiguration : public gd::ObjectConfiguration {
- public:
-  CustomObjectConfiguration(const Project& project_, const String& type_)
-      : project(&project_), isMarkedAsOverridingEventsBasedObjectChildrenConfiguration(false) {
+public:
+  CustomObjectConfiguration(const Project &project_, const String &type_)
+      : project(&project_) {
     SetType(type_);
   }
   std::unique_ptr<gd::ObjectConfiguration> Clone() const override;
@@ -66,6 +66,27 @@ class CustomObjectConfiguration : public gd::ObjectConfiguration {
 
   void ExposeResources(gd::ArbitraryResourceWorker& worker) override;
 
+  /**
+   * \brief Get the name of the events-based object variant used by this custom object.
+   */
+  const gd::String &GetVariantName() const { return variantName; };
+
+  /**
+   * \brief Set the name of the events-based object variant used by this custom object.
+   */
+  void SetVariantName(const gd::String &variantName_) {
+    variantName = variantName_;
+  }
+
+  /**
+   * Legacy events-based objects don't have any instance in their default
+   * variant since there wasn't a graphical editor at the time. In this case,
+   * the editor doesn't allow to choose a variant, but a variant may have stayed
+   * after a user rolled back the extension. This variant must be ignored.
+   *
+   * @return true when its events-based object doesn't have any initial
+   * instance.
+   */
   bool IsForcedToOverrideEventsBasedObjectChildrenConfiguration() const;
 
   bool IsMarkedAsOverridingEventsBasedObjectChildrenConfiguration() const {
@@ -145,6 +166,7 @@ protected:
   gd::SerializerElement objectContent;
   std::unordered_set<gd::String> unfoldedChildren;
 
+  gd::String variantName = "";
   bool isMarkedAsOverridingEventsBasedObjectChildrenConfiguration = false;
   mutable std::map<gd::String, std::unique_ptr<gd::ObjectConfiguration>> childObjectConfigurations;
 

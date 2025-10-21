@@ -117,9 +117,19 @@ const TeamMemberRow = ({
                       />
                     ) : (
                       <LineStackLayout noMargin alignItems="center">
-                        {member.username && (
+                        {(member.username || member.fullName) && (
                           <Text allowSelection noMargin>
-                            {member.username}
+                            {member.fullName ? (
+                              member.username ? (
+                                <Trans>
+                                  {member.fullName} ({member.username})
+                                </Trans>
+                              ) : (
+                                member.fullName
+                              )
+                            ) : (
+                              member.username
+                            )}
                           </Text>
                         )}
                         <Text allowSelection noMargin color="secondary">

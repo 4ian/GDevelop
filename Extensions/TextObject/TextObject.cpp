@@ -20,6 +20,7 @@ using namespace std;
 TextObject::TextObject()
     : text("Text"),
       characterSize(20),
+      lineHeight(0),
       fontName(""),
       smoothed(true),
       bold(false),
@@ -48,6 +49,10 @@ bool TextObject::UpdateProperty(const gd::String& propertyName,
   }
   if (propertyName == "characterSize") {
     characterSize = newValue.To<double>();
+    return true;
+  }
+  if (propertyName == "lineHeight") {
+    lineHeight = newValue.To<double>();
     return true;
   }
   if (propertyName == "font") {
@@ -129,6 +134,13 @@ std::map<gd::String, gd::PropertyDescriptor> TextObject::GetProperties() const {
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
       .SetGroup(_("Font"));
 
+  objectProperties["lineHeight"]
+      .SetValue(gd::String::From(lineHeight))
+      .SetType("number")
+      .SetLabel(_("Line height"))
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+      .SetGroup(_("Font"));
+
   objectProperties["font"]
       .SetValue(fontName)
       .SetType("resource")
@@ -160,9 +172,9 @@ std::map<gd::String, gd::PropertyDescriptor> TextObject::GetProperties() const {
   objectProperties["textAlignment"]
       .SetValue(textAlignment)
       .SetType("choice")
-      .AddExtraInfo("left")
-      .AddExtraInfo("center")
-      .AddExtraInfo("right")
+      .AddChoice("left", _("Left"))
+      .AddChoice("center", _("Center"))
+      .AddChoice("right", _("Right"))
       .SetLabel(_("Alignment"))
       .SetDescription(_("Alignment of the text when multiple lines are displayed"))
       .SetGroup(_("Font"))
@@ -171,9 +183,9 @@ std::map<gd::String, gd::PropertyDescriptor> TextObject::GetProperties() const {
   objectProperties["verticalTextAlignment"]
       .SetValue(verticalTextAlignment)
       .SetType("choice")
-      .AddExtraInfo("top")
-      .AddExtraInfo("center")
-      .AddExtraInfo("bottom")
+      .AddChoice("top", _("Top"))
+      .AddChoice("center", _("Center"))
+      .AddChoice("bottom", _("Bottom"))
       .SetLabel(_("Vertical alignment"))
       .SetGroup(_("Font"))
       .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
@@ -271,6 +283,7 @@ void TextObject::DoUnserializeFrom(gd::Project& project,
   SetCharacterSize(content.GetChild("characterSize", 0, "CharacterSize")
                        .GetValue()
                        .GetInt());
+  SetLineHeight(content.GetDoubleAttribute("lineHeight", 0));
   smoothed = content.GetBoolAttribute("smoothed");
   bold = content.GetBoolAttribute("bold");
   italic = content.GetBoolAttribute("italic");
@@ -339,6 +352,7 @@ void TextObject::DoSerializeTo(gd::SerializerElement& element) const {
   content.AddChild("textAlignment").SetValue(GetTextAlignment());
   content.AddChild("verticalTextAlignment").SetValue(GetVerticalTextAlignment());
   content.AddChild("characterSize").SetValue(GetCharacterSize());
+  content.AddChild("lineHeight").SetValue(GetLineHeight());
   content.AddChild("color").SetValue(GetColor());
 
   content.SetAttribute("smoothed", smoothed);

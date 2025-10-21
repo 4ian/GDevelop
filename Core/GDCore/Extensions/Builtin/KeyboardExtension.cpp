@@ -15,10 +15,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(
       .SetExtensionInformation(
           "BuiltinKeyboard",
           _("Keyboard"),
-          _("Allows your game to respond to keyboard input. Note that this "
+          _("Conditions to check keys pressed on a keyboard. Note that this "
             "does not work with on-screen keyboard on touch devices: use "
-            "instead conditions related to touch when making a game for "
-            "mobile/touchscreen devices."),
+            "instead mouse/touch conditions when making a game for "
+            "mobile/touchscreen devices or when making a new game from "
+            "scratch."),
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/keyboard")
@@ -51,10 +52,25 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(
       .SetHidden();
 
   extension
-      .AddCondition("KeyFromTextPressed",
-                    _("Key pressed"),
-                    _("Check if a key is pressed"),
-                    _("_PARAM1_ key is pressed"),
+      .AddCondition(
+          "KeyFromTextPressed",
+          _("Key pressed"),
+          _("Check if a key is pressed. This stays true as long as "
+            "the key is held down. To check if a key was pressed during "
+            "the frame, use \"Key just pressed\" instead."),
+          _("_PARAM1_ key is pressed"),
+          "",
+          "res/conditions/keyboard24.png",
+          "res/conditions/keyboard.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("keyboardKey", _("Key to check"))
+      .MarkAsSimple();
+
+  extension
+      .AddCondition("KeyFromTextJustPressed",
+                    _("Key just pressed"),
+                    _("Check if a key was just pressed."),
+                    _("_PARAM1_ key was just pressed"),
                     "",
                     "res/conditions/keyboard24.png",
                     "res/conditions/keyboard.png")
@@ -65,7 +81,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(
   extension
       .AddCondition("KeyFromTextReleased",
                     _("Key released"),
-                    _("Check if a key was just released"),
+                    _("Check if a key was just released."),
                     _("_PARAM1_ key is released"),
                     "",
                     "res/conditions/keyboard24.png",
@@ -84,7 +100,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(
                     "res/conditions/keyboard.png")
       .AddCodeOnlyParameter("currentScene", "");
 
- extension
+  extension
       .AddCondition("AnyKeyReleased",
                     _("Any key released"),
                     _("Check if any key is released"),

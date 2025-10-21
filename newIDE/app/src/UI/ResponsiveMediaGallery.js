@@ -11,7 +11,7 @@ import { useResponsiveWindowSize } from './Responsive/ResponsiveWindowMeasurer';
 import Text from './Text';
 import { ColumnStackLayout } from './Layout';
 
-type MediaItem = {| kind: 'audio' | 'image', url: string |};
+export type MediaItem = {| kind: 'audio' | 'image', url: string |};
 
 const styles = {
   selectedMedia: {

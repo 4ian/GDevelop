@@ -21,7 +21,9 @@ module.exports = {
       .setExtensionInformation(
         'DebuggerTools',
         _('Debugger Tools'),
-        _('Allow to interact with the editor debugger from the game.'),
+        _(
+          'Allow to interact with the editor debugger from the game (notably: enable 2D debug draw, log a message in the debugger console).'
+        ),
         'Arthur Pacaud (arthuro555), Aurélien Vivet (Bouh)',
         'MIT'
       )

@@ -1,5 +1,5 @@
 // @flow
-import { mapFor } from '../Utils/MapFor';
+import { mapFor, mapVector } from '../Utils/MapFor';
 import { type Schema } from '../CompactPropertiesEditor';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
 import flatten from 'lodash/flatten';
@@ -49,30 +49,40 @@ export const enumerateEffectsMetadata = (
               const getLabel = () => propertyLabel;
               const getDescription = () => propertyDescription;
               const getExtraDescription = () => parameterName;
+              const advanced = property.isAdvanced();
+              const defaultValue = property.getValue();
 
               if (valueType === 'number') {
                 return {
                   name: parameterName,
                   valueType: 'number',
                   getValue: (effect: gdEffect) =>
-                    effect.getDoubleParameter(parameterName),
+                    effect.hasDoubleParameter(parameterName)
+                      ? effect.getDoubleParameter(parameterName)
+                      : parseFloat(defaultValue) || 0,
                   setValue: (effect: gdEffect, newValue: number) =>
                     effect.setDoubleParameter(parameterName, newValue),
                   getLabel,
                   getDescription,
                   getExtraDescription,
+                  advanced,
+                  defaultValue: parseFloat(defaultValue) || 0,
                 };
               } else if (valueType === 'boolean') {
                 return {
                   name: parameterName,
                   valueType: 'boolean',
                   getValue: (effect: gdEffect) =>
-                    effect.getBooleanParameter(parameterName),
+                    effect.hasBooleanParameter(parameterName)
+                      ? effect.getBooleanParameter(parameterName)
+                      : defaultValue === 'true',
                   setValue: (effect: gdEffect, newValue: boolean) =>
                     effect.setBooleanParameter(parameterName, newValue),
                   getLabel,
                   getDescription,
                   getExtraDescription,
+                  advanced,
+                  defaultValue: defaultValue === 'true',
                 };
               } else if (valueType === 'resource') {
                 // Resource is a "string" (with a selector in the UI)
@@ -84,41 +94,62 @@ export const enumerateEffectsMetadata = (
                   valueType: 'resource',
                   resourceKind: kind,
                   getValue: (effect: gdEffect) =>
-                    effect.getStringParameter(parameterName),
+                    effect.hasStringParameter(parameterName)
+                      ? effect.getStringParameter(parameterName)
+                      : defaultValue,
                   setValue: (effect: gdEffect, newValue: string) =>
                     effect.setStringParameter(parameterName, newValue),
                   getLabel,
                   getDescription,
                   getExtraDescription,
+                  advanced,
+                  defaultValue,
                 };
               } else if (valueType === 'color') {
                 return {
                   name: parameterName,
                   valueType: 'color',
                   getValue: (effect: gdEffect) =>
-                    effect.getStringParameter(parameterName),
+                    effect.hasStringParameter(parameterName)
+                      ? effect.getStringParameter(parameterName)
+                      : defaultValue,
                   setValue: (effect: gdEffect, newValue: string) =>
                     effect.setStringParameter(parameterName, newValue),
                   getLabel,
                   getDescription,
                   getExtraDescription,
+                  advanced,
+                  defaultValue,
                 };
               } else if (valueType === 'choice') {
-                const choices = property
+                const choices = mapVector(property.getChoices(), choice => ({
+                  value: choice.getValue(),
+                  label:
+                    choice.getValue() +
+                    (choice.getLabel() &&
+                    choice.getLabel() !== choice.getValue()
+                      ? ` — ${choice.getLabel()}`
+                      : ''),
+                }));
+                const deprecatedChoices = property
                   .getExtraInfo()
                   .toJSArray()
                   .map(value => ({ value, label: value }));
                 return {
                   name: parameterName,
                   valueType: 'string',
-                  getChoices: () => choices,
+                  getChoices: () => [...choices, ...deprecatedChoices],
                   getValue: (effect: gdEffect) =>
-                    effect.getStringParameter(parameterName),
+                    effect.hasStringParameter(parameterName)
+                      ? effect.getStringParameter(parameterName)
+                      : defaultValue,
                   setValue: (effect: gdEffect, newValue: string) =>
                     effect.setStringParameter(parameterName, newValue),
                   getLabel,
                   getDescription,
                   getExtraDescription,
+                  advanced,
+                  defaultValue,
                 };
               } else {
                 console.error(

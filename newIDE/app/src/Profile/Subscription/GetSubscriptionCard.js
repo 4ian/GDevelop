@@ -3,7 +3,10 @@ import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { Column, Line } from '../../UI/Grid';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
-import { type SubscriptionDialogDisplayReason } from '../../Utils/Analytics/EventSender';
+import {
+  type SubscriptionDialogDisplayReason,
+  type SubscriptionPlacementId,
+} from '../../Utils/Analytics/EventSender';
 import { SubscriptionSuggestionContext } from './SubscriptionSuggestionContext';
 import RaisedButton from '../../UI/RaisedButton';
 import FlatButton from '../../UI/FlatButton';
@@ -14,8 +17,11 @@ import CrownShining from '../../UI/CustomSvgIcons/CrownShining';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import AuthenticatedUserContext from '../AuthenticatedUserContext';
 import { hasValidSubscriptionPlan } from '../../Utils/GDevelopServices/Usage';
+import IconButton from '../../UI/IconButton';
+import Cross from '../../UI/CustomSvgIcons/Cross';
 
 const styles = {
+  topRightHideButton: { position: 'absolute', right: 1, top: 1 },
   paper: {
     zIndex: 2, // Make sure the paper is above the background for the border effect.
     flex: 1,
@@ -49,6 +55,8 @@ type Props = {|
     | 'gdevelop_gold'
     | 'gdevelop_startup'
     | 'gdevelop_education',
+  canHide?: boolean,
+  placementId: SubscriptionPlacementId,
 |};
 
 const GetSubscriptionCard = ({
@@ -61,7 +69,10 @@ const GetSubscriptionCard = ({
   forceColumnLayout,
   filter,
   recommendedPlanIdIfNoSubscription,
+  canHide,
+  placementId,
 }: Props) => {
+  const [isHidden, setIsHidden] = React.useState(false);
   const { subscription } = React.useContext(AuthenticatedUserContext);
   const actualPlanIdToRecommend = hasValidSubscriptionPlan(subscription)
     ? // If the user already has a subscription, show the original subscription dialog.
@@ -72,6 +83,9 @@ const GetSubscriptionCard = ({
   );
   const { isMobile } = useResponsiveWindowSize();
   const columnLayout = forceColumnLayout || isMobile;
+
+  if (isHidden) return null;
+
   return (
     <div className={classes.premiumContainer}>
       <Paper style={styles.paper} background="medium">
@@ -107,6 +121,7 @@ const GetSubscriptionCard = ({
                       analyticsMetadata: {
                         reason: subscriptionDialogOpeningReason,
                         recommendedPlanId: actualPlanIdToRecommend,
+                        placementId,
                       },
                       filter,
                     });
@@ -117,6 +132,19 @@ const GetSubscriptionCard = ({
             </ResponsiveLineStackLayout>
           </Column>
         </Line>
+        {canHide && (
+          <div style={styles.topRightHideButton}>
+            <IconButton
+              aria-label="hide"
+              onClick={() => {
+                setIsHidden(true);
+              }}
+              size="small"
+            >
+              <Cross fontSize="small" />
+            </IconButton>
+          </div>
+        )}
       </Paper>
     </div>
   );

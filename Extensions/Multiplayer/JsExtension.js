@@ -21,7 +21,9 @@ module.exports = {
       .setExtensionInformation(
         'Multiplayer',
         _('Multiplayer'),
-        _('Allow players to connect to lobbies and play together.'),
+        _(
+          'This allows players to join online lobbies and synchronize gameplay across devices without needing to manage servers or networking.\n\nUse the "Open game lobbies" action to let players join a game, and use conditions like "Lobby game has just started" to begin gameplay. Add the "Multiplayer object" behavior to game objects that should be synchronized, and assign or change their ownership using player numbers. Variables and game state (like scenes, scores, or timers) are automatically synced by the host, with options to change ownership or disable sync when needed. Common multiplayer logic —like handling joins/leaves, collisions, and host migration— is supported out-of-the-box for up to 8 players per game.'
+        ),
         'Florian Rival',
         'Open source (MIT License)'
       )
@@ -30,6 +32,79 @@ module.exports = {
     extension
       .addInstructionOrExpressionGroupMetadata(_('Multiplayer'))
       .setIcon('JsPlatform/Extensions/multiplayer.svg');
+
+    extension
+      .addDependency()
+      .setName('Safari View Controller Cordova plugin')
+      .setDependencyType('cordova')
+      .setExportName('@gdevelop/cordova-plugin-safariviewcontroller');
+
+    extension
+      .addStrExpression(
+        'CurrentLobbyID',
+        _('Current lobby ID'),
+        _('Returns current lobby ID.'),
+        _('Lobbies'),
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Multiplayer/peer.js')
+      .addIncludeFile('Extensions/Multiplayer/peerJsHelper.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayer.getLobbyID');
+
+    extension
+      .addAction(
+        'QuickJoinWithLobbyID',
+        _('Join a specific lobby by its ID'),
+        _(
+          'Join a specific lobby. The player will join the game instantly if this is possible.'
+        ),
+        _('Join a specific lobby by its ID _PARAM1_'),
+        _('Lobbies'),
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('string', _('Lobby ID'), '', false)
+      .addParameter(
+        'yesorno',
+        _('Display loader while joining a lobby.'),
+        '',
+        true
+      )
+      .setDefaultValue('yes')
+      .addParameter(
+        'yesorno',
+        _('Display game lobbies if unable to join a specific one.'),
+        '',
+        true
+      )
+      .setDefaultValue('yes')
+      .setHelpPath('/all-features/multiplayer')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Multiplayer/peer.js')
+      .addIncludeFile('Extensions/Multiplayer/peerJsHelper.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayer.authenticateAndQuickJoinWithLobbyID');
 
     extension
       .addAction(

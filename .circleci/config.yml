@@ -13,17 +13,18 @@ orbs:
   aws-cli: circleci/aws-cli@2.0.6
   macos: circleci/macos@2.5.1 # For Rosetta (see below)
   node: circleci/node@7.1.0 # For a recent npm version (see below)
+  win: circleci/windows@5.1.0
 jobs:
-  # Build the **entire** app for macOS.
+  # Build the **entire** app for macOS (including the GDevelop.js library).
   build-macos:
     macos:
-      xcode: 14.2.0
-    resource_class: macos.m1.large.gen1
+      xcode: 16.4.0
+    resource_class: m4pro.medium
     steps:
       - checkout
       # Install Rosetta for AWS CLI and disable TSO to speed up S3 uploads (https://support.circleci.com/hc/en-us/articles/19334402064027-Troubleshooting-slow-uploads-to-S3-for-jobs-using-an-m1-macOS-resource-class)
       - macos/install-rosetta
-      - run: sudo sysctl net.inet.tcp.tso=0
+      # - run: sudo sysctl net.inet.tcp.tso=0
 
       # Install a recent version of npm to workaround a notarization issue because of a symlink made by npm: https://github.com/electron-userland/electron-builder/issues/7755
       # Node.js v20.14.0 comes with npm v10.7.0.
@@ -46,9 +47,9 @@ jobs:
       # GDevelop.js dependencies
       - restore_cache:
           keys:
-            - gd-macos-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
+            - gd-macos-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
             # fallback to using the latest cache if no exact match is found
-            - gd-macos-nodejs-dependencies---
+            - gd-macos-nodejs-dependencies-
 
       - run:
           name: Install GDevelop.js dependencies
@@ -69,7 +70,8 @@ jobs:
             - newIDE/electron-app/node_modules
             - newIDE/app/node_modules
             - GDevelop.js/node_modules
-          key: gd-macos-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
+            - GDJS/node_modules
+          key: gd-macos-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
 
       # Build GDevelop IDE (seems like we need to allow Node.js to use more space than usual)
       # Note: Code signing is done using CSC_LINK (see https://www.electron.build/code-signing).
@@ -86,15 +88,37 @@ jobs:
       - store_artifacts:
           path: newIDE/electron-app/dist
 
+
       # Upload artifacts (AWS)
       - run:
           name: Deploy to S3 (specific commit)
-          command: export PATH=~/.local/bin:$PATH && aws s3 sync newIDE/electron-app/dist s3://gdevelop-releases/$(git rev-parse --abbrev-ref HEAD)/commit/$(git rev-parse HEAD)/
+          command: |
+            export PATH=~/.local/bin:$PATH
+            for i in 1 2 3 4 5 6 7; do
+              aws s3 sync newIDE/electron-app/dist s3://gdevelop-releases/$(git rev-parse --abbrev-ref HEAD)/commit/$(git rev-parse HEAD)/ && break
+              echo "Retry $i failed... retrying in 10 seconds"
+              sleep 10
+            done
+            if [ $i -eq 7 ]; then
+              echo "All retries for deployment failed!" >&2
+              exit 1
+            fi
+
       - run:
           name: Deploy to S3 (latest)
-          command: export PATH=~/.local/bin:$PATH && aws s3 sync newIDE/electron-app/dist s3://gdevelop-releases/$(git rev-parse --abbrev-ref HEAD)/latest/
+          command: |
+            export PATH=~/.local/bin:$PATH
+            for i in 1 2 3 4 5 6 7; do
+              aws s3 sync newIDE/electron-app/dist s3://gdevelop-releases/$(git rev-parse --abbrev-ref HEAD)/latest/ && break
+              echo "Retry $i failed... retrying in 10 seconds"
+              sleep 10
+            done
+            if [ $i -eq 7 ]; then
+              echo "All retries for deployment failed!" >&2
+              exit 1
+            fi
 
-  # Build the **entire** app for Linux.
+  # Build the app for Linux (using a pre-built GDevelop.js library).
   build-linux:
     # CircleCI docker workers are failing if they don't have enough memory (no swap)
     resource_class: xlarge
@@ -107,51 +131,33 @@ jobs:
       - checkout
       - aws-cli/setup
 
-      # System dependencies (for Electron Builder and Emscripten)
+      # System dependencies (for Electron Builder)
       - run:
-          name: Install dependencies for Emscripten
-          command: sudo apt-get update && sudo apt install cmake
-
-      - run:
-          name: Install Python3 dependencies for Emscripten
-          command: sudo apt install python-is-python3 python3-distutils -y
-
-      - run:
-          name: Install Emscripten (for GDevelop.js)
-          command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 3.1.21 && ./emsdk activate 3.1.21 && cd ..
+          name: Update system dependencies
+          command: sudo apt-get update
 
       - run:
           name: Install system dependencies for Electron builder
           command: sudo apt install icnsutils && sudo apt install graphicsmagick && sudo apt install rsync
 
-      # GDevelop.js dependencies
       - restore_cache:
           keys:
-            - gd-linux-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
+            - gd-linux-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
             # fallback to using the latest cache if no exact match is found
-            - gd-linux-nodejs-dependencies---
+            - gd-linux-nodejs-dependencies-
 
-      - run:
-          name: Install GDevelop.js dependencies and build it
-          command: cd GDevelop.js && npm install && cd ..
-
-      # Build GDevelop.js (and run tests to ensure it works)
-      - run:
-          name: Build GDevelop.js
-          # Use "--runInBand" as it's faster and avoid deadlocks on CircleCI Linux machines (probably because limited in processes number).
-          command: cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build && npm test -- --runInBand && cd ..
-
-      # GDevelop IDE dependencies (after building GDevelop.js to avoid downloading a pre-built version)
+      # GDevelop IDE dependencies (using an exact version of GDevelop.js, built previously)
       - run:
           name: Install GDevelop IDE dependencies
-          command: cd newIDE/app && npm install && cd ../electron-app && npm install
+          command: export REQUIRES_EXACT_LIBGD_JS_VERSION=true && cd newIDE/app && npm install && cd ../electron-app && npm install
 
       - save_cache:
           paths:
             - newIDE/electron-app/node_modules
             - newIDE/app/node_modules
             - GDevelop.js/node_modules
-          key: gd-linux-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
+            - GDJS/node_modules
+          key: gd-linux-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
 
       # Build GDevelop IDE (seems like we need to allow Node.js to use more space than usual)
       - run:
@@ -295,14 +301,203 @@ jobs:
           name: Deploy to S3 (specific commit)
           command: aws s3 sync Binaries/embuild/GDevelop.js s3://gdevelop-gdevelop.js/$(git rev-parse --abbrev-ref HEAD)/variant/debug-sanitizers/commit/$(git rev-parse HEAD)/
 
+  # Trigger AppVeyor build, which also does a Windows build (keep it for redundancy).
+  trigger-appveyor-windows-build:
+    docker:
+      - image: cimg/node:16.13
+    steps:
+      - run:
+          name: Trigger AppVeyor Windows build
+          command: |
+            curl -H "Content-Type: application/json" \
+                 -H "Authorization: Bearer ${APPVEYOR_API_KEY}" \
+                 --data "{
+                   \"accountName\": \"4ian\",
+                   \"projectSlug\": \"gdevelop\",
+                   \"branch\": \"${CIRCLE_BRANCH}\"
+                 }" \
+                 -X POST https://ci.appveyor.com/api/builds
+
+  build-windows:
+    executor:
+      name: win/default
+      size: medium
+    working_directory: /home/circleci/project
+    steps:
+      - checkout
+      - run:
+          # See https://www.ssl.com/how-to/how-to-integrate-esigner-cka-with-ci-cd-tools-for-automated-code-signing/
+          #
+          # This is necessary because of "signing to be FIPS-140 compliant". See
+          # https://github.com/electron-userland/electron-builder/issues/6158
+          #
+          # Make sure to DISABLE "malware blocker" in SSL.com to avoid errors like:
+          # Error information: "Error: SignerSign() failed." (-2146893821/0x80090003)
+          name: Download and Unzip eSignerCKA Setup
+          command: |
+
+            Invoke-WebRequest -OutFile eSigner_CKA_1.0.3.zip "https://www.ssl.com/download/ssl-com-esigner-cka-1-0-3"
+
+            Expand-Archive -Force eSigner_CKA_1.0.3.zip
+
+            Remove-Item eSigner_CKA_1.0.3.zip
+
+            Move-Item -Destination "eSigner_CKA_1.0.3.exe" -Path "eSigner_CKA_*\*.exe"
+      - run:
+          name: Setup eSignerCKA in Silent Mode
+          command: |
+
+            mkdir -p "/home/circleci/project/eSignerCKA"
+
+            ./eSigner_CKA_1.0.3.exe /CURRENTUSER /VERYSILENT /SUPPRESSMSGBOXES /DIR="/home/circleci/project/eSignerCKA" | Out-Null
+      - run:
+          name: Config Account Information on eSignerCKA
+          command: |
+
+            /home/circleci/project/eSignerCKA/eSignerCKATool.exe config -mode product -user "$env:ESIGNER_USER_NAME" -pass "$env:ESIGNER_USER_PASSWORD" -totp "$env:ESIGNER_USER_TOTP" -key "/home/circleci/project/eSignerCKA/master.key" -r
+      - run:
+          name: Load Certificate into Windows Store
+          command: |
+
+            /home/circleci/project/eSignerCKA/eSignerCKATool.exe unload
+
+            /home/circleci/project/eSignerCKA/eSignerCKATool.exe load
+      - run:
+          name: Select Certificate From Windows Store and Sign Sample File with SignTool
+          command: |
+
+            $CodeSigningCert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Select-Object -First 1
+
+            echo Certificate: $CodeSigningCert
+
+      - restore_cache:
+          name: Restore node_modules cache
+          keys:
+            - v1-win-node-{{ checksum "newIDE/app/package-lock.json" }}-{{ checksum "newIDE/electron-app/package-lock.json" }}-{{ checksum "GDJS/package-lock.json" }}
+            - v1-win-node-
+
+      - run:
+          name: Install dependencies
+          no_output_timeout: 25m
+          # Remove package-lock.json because they seems to cause the npm install to be stuck. We should try again after re-generating them.
+          # Also install setuptools as something requires distutils in electron-app, and it was removed in Python 3.12.
+          # setuptools will make distutils available again (but we should migrate our packages probably).
+          command: |
+            pip install setuptools
+
+            cd newIDE\app
+
+            npm -v
+
+            Remove-Item package-lock.json
+
+            $Env:REQUIRES_EXACT_LIBGD_JS_VERSION = "true"
+
+            npm install
+
+            cd ..\electron-app
+
+            Remove-Item package-lock.json
+
+            npm install
+
+            cd ..\..
+
+      - save_cache:
+          name: Save node_modules cache
+          key: v1-win-node-{{ checksum "newIDE/app/package-lock.json" }}-{{ checksum "newIDE/electron-app/package-lock.json" }}-{{ checksum "GDJS/package-lock.json" }}
+          paths:
+            - newIDE/app/node_modules
+            - newIDE/electron-app/node_modules
+            - GDJS/node_modules
+
+      - run:
+          name: Build NSIS executable (with code signing)
+          command: |
+            cd newIDE\electron-app
+
+            $CodeSigningCert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Select-Object -First 1
+
+            echo Certificate: $CodeSigningCert
+
+            # Use a custom signtool path because of the signtool.exe bundled withy electron-builder not working for some reason.
+            # Can also be found in versioned folders like "C:/Program Files (x86)/Windows Kits/10/bin/10.0.22000.0/x86/signtool.exe".
+            # or "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\signtool.exe".
+
+            $Env:SIGNTOOL_PATH = "C:\Program Files (x86)\Windows Kits\10\App Certification Kit\signtool.exe"
+
+            # Extract thumbprint and subject name of the certificate (will be passed to electron-builder).
+
+            $Env:GD_SIGNTOOL_THUMBPRINT = $CodeSigningCert.Thumbprint
+
+            $Env:GD_SIGNTOOL_SUBJECT_NAME = ($CodeSigningCert.Subject -replace ", ?", "`n" | ConvertFrom-StringData).CN
+
+            # Build the nsis installer (signed: electron-builder will use SignTool.exe with the certificate)
+
+            node scripts/build.js --win nsis --publish=never
+
+            cd ..\..
+      - run:
+          name: Build AppX (without code signing)
+          # Don't sign the appx (it will be signed by the Microsoft Store).
+          command: |
+            cd newIDE\electron-app
+
+            # Build the appx (not signed). Ensure all variables used for code signing are empty.
+
+            $Env:GD_SIGNTOOL_THUMBPRINT = ''
+
+            $Env:GD_SIGNTOOL_SUBJECT_NAME = ''
+
+            $Env:CSC_LINK = ''
+
+            $Env:CSC_KEY_PASSWORD = ''
+
+            node scripts/build.js --skip-app-build --win appx --publish=never
+
+            cd ..\..
+
+      - run:
+          name: Clean binaries
+          shell: cmd.exe
+          command: |
+            rmdir /s /q newIDE\electron-app\dist\win-unpacked
+
+      - run:
+          name: Install AWS CLI
+          command: |
+            # Install the CLI for the current user
+
+            pip install --quiet --upgrade --user awscli
+
+            # Add the user-Scripts dir to PATH for this step and the next.
+
+            $binDir = (python -m site --user-base) + "\Scripts"
+            $Env:Path += ";$binDir"
+
+            # Sanity check:
+            aws --version
+
+      # Upload artifacts (S3)
+      - run:
+          name: Deploy to S3 (specific commit)
+          command: |
+            aws s3 sync newIDE\electron-app\dist "s3://gdevelop-releases/$Env:CIRCLE_BRANCH/commit/$Env:CIRCLE_SHA1/"
+
+      - run:
+          name: Deploy to S3 (latest)
+          command: |
+            aws s3 sync newIDE\electron-app\dist "s3://gdevelop-releases/$Env:CIRCLE_BRANCH/latest/"
+
+      # Upload artifacts (CircleCI)
+      - store_artifacts:
+          path: newIDE/electron-app/dist
+
 workflows:
-  gdevelop_js-wasm:
-    jobs:
-      - build-gdevelop_js-wasm-only
   gdevelop_js-wasm-extra-checks:
     jobs:
       - build-gdevelop_js-debug-sanitizers-and-extra-checks:
-          # Extra checks are resource intensive so don't all run them.
+          # Extra checks are resource intensive so don't always run them.
           filters:
             branches:
               only:
@@ -310,13 +505,36 @@ workflows:
                 - /experimental-build.*/
   builds:
     jobs:
+      - build-gdevelop_js-wasm-only
       - build-macos:
+          # The macOS version builds by itself GDevelop.js
+          # (so we verify we can build it on macOS).
+          # requires:
+          #   - build-gdevelop_js-wasm-only
           filters:
             branches:
               only:
                 - master
                 - /experimental-build.*/
       - build-linux:
+          requires:
+            - build-gdevelop_js-wasm-only
+          filters:
+            branches:
+              only:
+                - master
+                - /experimental-build.*/
+      - build-windows:
+          requires:
+            - build-gdevelop_js-wasm-only
+          filters:
+            branches:
+              only:
+                - master
+                - /experimental-build.*/
+      - trigger-appveyor-windows-build:
+          requires:
+            - build-gdevelop_js-wasm-only
           filters:
             branches:
               only:

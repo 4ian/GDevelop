@@ -93,7 +93,7 @@ export const ClosableTabs = ({ hideLabels, renderTabs }: ClosableTabsProps) => {
     flexWrap: 'nowrap', // Single line of tab...
     overflowX: 'overlay', // ...scroll horizontally if needed
     overflowY: 'hidden', // ...never scroll vertically (useful on Safari)
-    marginTop: 6,
+    marginTop: 7, // Chosen to align with the size of controls in the titlebar.
   };
 
   const onScroll = React.useCallback((event: WheelEvent) => {

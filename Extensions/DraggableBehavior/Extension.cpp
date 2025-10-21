@@ -35,25 +35,32 @@ void DeclareDraggableBehaviorExtension(gd::PlatformExtension& extension) {
       std::make_shared<DraggableBehavior>(),
       std::shared_ptr<gd::BehaviorsSharedData>());
 
-  aut.AddCondition("Dragged",
-                   _("Being dragged"),
-                   _("Check if the object is being dragged."),
-                   _("_PARAM0_ is being dragged"),
-                   _("Draggable"),
-                   "CppPlatform/Extensions/draggableicon24.png",
-                   "CppPlatform/Extensions/draggableicon16.png")
+  aut.AddCondition(
+         "Dragged",
+         _("Being dragged"),
+         _("Check if the object is being dragged. This means the mouse button "
+           "or touch is pressed on it. When the mouse button or touch is "
+           "released,  the object is no longer being considered dragged (use "
+           "the condition \"Was just dropped\" to check when the dragging is "
+           "ending)."),
+         _("_PARAM0_ is being dragged"),
+         _("Draggable"),
+         "CppPlatform/Extensions/draggableicon24.png",
+         "CppPlatform/Extensions/draggableicon16.png")
 
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "Draggable")
       .SetFunctionName("IsDragged");
 
-  aut.AddCondition("Dropped",
-                   _("Was just dropped"),
-                   _("Check if the object was just dropped after being dragged."),
-                   _("_PARAM0_ was just dropped"),
-                   _("Draggable"),
-                   "CppPlatform/Extensions/draggableicon24.png",
-                   "CppPlatform/Extensions/draggableicon16.png")
+  aut.AddCondition(
+         "Dropped",
+         _("Was just dropped"),
+         _("Check if the object was just dropped after being dragged (the "
+           "mouse button or touch was just released this frame)."),
+         _("_PARAM0_ was just dropped"),
+         _("Draggable"),
+         "CppPlatform/Extensions/draggableicon24.png",
+         "CppPlatform/Extensions/draggableicon16.png")
 
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "Draggable")

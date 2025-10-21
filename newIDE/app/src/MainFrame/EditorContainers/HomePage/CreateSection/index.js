@@ -32,7 +32,10 @@ import Text from '../../../../UI/Text';
 import Grid from '@material-ui/core/Grid';
 import WalletWidget from '../../../../GameDashboard/Wallet/WalletWidget';
 import { QuickCustomizationGameTiles } from '../../../../QuickCustomization/QuickCustomizationGameTiles';
-import { type NewProjectSetup } from '../../../../ProjectCreation/NewProjectSetupDialog';
+import {
+  type NewProjectSetup,
+  type ExampleProjectSetup,
+} from '../../../../ProjectCreation/NewProjectSetupDialog';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import UrlStorageProvider from '../../../../ProjectsStorage/UrlStorageProvider';
 import {
@@ -50,6 +53,7 @@ import {
 import { useProjectsListFor } from './utils';
 import { deleteCloudProject } from '../../../../Utils/GDevelopServices/Project';
 import { getDefaultRegisterGameProperties } from '../../../../Utils/UseGameAndBuildsManager';
+import { type CreateProjectResult } from '../../../../Utils/UseCreateProject';
 
 const getExampleItemsColumns = (
   windowSize: WindowSizeType,
@@ -79,11 +83,8 @@ type Props = {|
   onOpenProfile: () => void,
   askToCloseProject: () => Promise<boolean>,
   onCreateProjectFromExample: (
-    exampleShortHeader: ExampleShortHeader,
-    newProjectSetup: NewProjectSetup,
-    i18n: I18nType,
-    isQuickCustomization?: boolean
-  ) => Promise<void>,
+    exampleProjectSetup: ExampleProjectSetup
+  ) => Promise<CreateProjectResult>,
   onSelectPrivateGameTemplateListingData: (
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
@@ -549,13 +550,13 @@ const CreateSection = ({
                           storageProvider: UrlStorageProvider,
                           saveAsLocation: null,
                           openQuickCustomizationDialog: true,
+                          creationSource: 'quick-customization',
                         };
-                        onCreateProjectFromExample(
+                        onCreateProjectFromExample({
                           exampleShortHeader,
                           newProjectSetup,
                           i18n,
-                          true // isQuickCustomization
-                        );
+                        });
                       }}
                       quickCustomizationRecommendation={
                         quickCustomizationRecommendation
@@ -587,10 +588,7 @@ const CreateSection = ({
                         onSelectPrivateGameTemplateListingData
                       }
                       i18n={i18n}
-                      columnsCount={getExampleItemsColumns(
-                        windowSize,
-                        isLandscape
-                      )}
+                      getColumnsFromWindowSize={getExampleItemsColumns}
                       hideSearch
                       onlyShowGames
                     />

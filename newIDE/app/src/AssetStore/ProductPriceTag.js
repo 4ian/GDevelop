@@ -8,6 +8,8 @@ import {
   type PrivateAssetPackListingData,
   type PrivateGameTemplateListingData,
   type CreditsPackageListingData,
+  type CourseListingData,
+  type BundleListingData,
 } from '../Utils/GDevelopServices/Shop';
 import {
   shouldUseAppStoreProduct,
@@ -16,22 +18,56 @@ import {
 import Coin from '../Credits/Icons/Coin';
 import { LineStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
+import { Column } from '../UI/Grid';
+import CheckCircle from '../UI/CustomSvgIcons/CheckCircle';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 
 const styles = {
   icon: {
-    width: 12,
-    height: 12,
+    width: 13,
+    height: 13,
+    position: 'relative',
+    top: -1,
   },
+  creditPriceContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 3,
+  },
+  columnOrSeparator: {
+    marginTop: -3,
+    marginBottom: -1,
+  },
+  discountedPrice: { textDecoration: 'line-through', opacity: 0.7 },
+};
+
+export const renderPriceFormatted = (
+  priceInCents: number,
+  currencyCode: 'USD' | 'EUR',
+  i18n: I18nType
+): string => {
+  const currencySymbol = currencyCode === 'USD' ? '$' : '€';
+  // Use a non-breaking space to ensure the currency stays next to the price.
+  return `${currencySymbol}\u00A0${i18n
+    .number(priceInCents / 100, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
+    .replace(/\D00$/, '')}`;
 };
 
 type FormatProps = {|
   productListingData:
     | PrivateAssetPackListingData
     | PrivateGameTemplateListingData
-    | CreditsPackageListingData,
+    | CreditsPackageListingData
+    | CourseListingData
+    | BundleListingData,
   i18n: I18nType,
   usageType?: string,
   plainText?: boolean,
+  showBothPrices?: 'column' | 'line', // If defined, will show both the credits price and the product price.
+  discountedPrice?: boolean,
 |};
 
 export const renderProductPrice = ({
@@ -39,11 +75,14 @@ export const renderProductPrice = ({
   productListingData,
   usageType,
   plainText,
+  showBothPrices,
+  discountedPrice,
 }: FormatProps): React.Node => {
-  // Only use the app store product if it's a credits package.
+  // For Credits packages & Bundles, on mobile, only show the app store product price.
   if (
     shouldUseAppStoreProduct() &&
-    productListingData.productType === 'CREDITS_PACKAGE'
+    (productListingData.productType === 'CREDITS_PACKAGE' ||
+      productListingData.productType === 'BUNDLE')
   ) {
     const appStoreProduct = getAppStoreProduct(
       productListingData.appStoreProductId
@@ -51,19 +90,16 @@ export const renderProductPrice = ({
     return appStoreProduct ? appStoreProduct.price : '';
   }
 
-  // If we're on mobile, only show credits prices for asset packs & game templates.
-  if (
-    shouldUseAppStoreProduct() &&
-    productListingData.productType !== 'CREDITS_PACKAGE'
-  ) {
-    const creditPrices = productListingData.creditPrices;
-    if (!creditPrices) return '';
-    const creditPrice = usageType
-      ? creditPrices.find(price => price.usageType === usageType)
-      : creditPrices.length > 0
-      ? creditPrices[0]
-      : null;
+  const creditPrices = productListingData.creditPrices || [];
+  const creditPrice = usageType
+    ? creditPrices.find(price => price.usageType === usageType)
+    : creditPrices.length > 0
+    ? creditPrices[0]
+    : null;
 
+  // If we're on mobile, only show credits prices for other products,
+  // except if we're showing the discounted price.
+  if (shouldUseAppStoreProduct() && !discountedPrice) {
     if (!creditPrice) return '';
     return plainText ? (
       i18n._(t`${creditPrice.amount} credits`)
@@ -86,19 +122,55 @@ export const renderProductPrice = ({
     : null;
   if (!price) return '';
 
-  const currencyCode = price.currency === 'USD' ? '$' : '€';
-  const formattedPrice = `${currencyCode} ${i18n
-    .number(price.value / 100, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })
-    .replace(/\D00$/, '')}`;
+  const formattedPrice = renderPriceFormatted(
+    price.value,
+    price.currency,
+    i18n
+  );
 
   return plainText ? (
     formattedPrice
+  ) : showBothPrices && creditPrice && !discountedPrice ? (
+    showBothPrices === 'column' ? (
+      <Column alignItems="flex-end">
+        <div style={styles.creditPriceContainer}>
+          <Coin style={styles.icon} />
+          <Text noMargin size="sub-title" color="inherit">
+            {creditPrice.amount}
+          </Text>
+        </div>
+        <span style={styles.columnOrSeparator}>
+          <Text noMargin color="inherit">
+            <Trans>or</Trans>
+          </Text>
+        </span>
+        <Text noMargin size="sub-title" color="primary">
+          {formattedPrice}
+        </Text>
+      </Column>
+    ) : (
+      <LineStackLayout noMargin>
+        <div style={styles.creditPriceContainer}>
+          <Coin style={styles.icon} />
+          <Text noMargin size="sub-title" color="inherit">
+            {creditPrice.amount}
+          </Text>
+        </div>
+        <Text noMargin color="inherit">
+          <Trans>or</Trans>
+        </Text>
+        <Text noMargin size="sub-title" color="primary">
+          {formattedPrice}
+        </Text>
+      </LineStackLayout>
+    )
   ) : (
     <Text noMargin size="sub-title" color="inherit">
-      {formattedPrice}
+      {discountedPrice ? (
+        <span style={styles.discountedPrice}>{formattedPrice}</span>
+      ) : (
+        formattedPrice
+      )}
     </Text>
   );
 };
@@ -107,29 +179,50 @@ type ProductPriceOrOwnedProps = {|
   productListingData:
     | PrivateAssetPackListingData
     | PrivateGameTemplateListingData
-    | CreditsPackageListingData,
+    | CreditsPackageListingData
+    | CourseListingData
+    | BundleListingData,
   i18n: I18nType,
   usageType?: string,
   owned?: boolean,
+  showBothPrices?: 'column' | 'line',
+  discountedPrice?: boolean,
 |};
+
+export const OwnedLabel = () => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  return (
+    <LineStackLayout noMargin alignItems="center">
+      <CheckCircle
+        style={{
+          color: gdevelopTheme.message.valid,
+        }}
+      />
+      <Text noMargin size="sub-title" color="inherit">
+        <Trans>Owned</Trans>
+      </Text>
+    </LineStackLayout>
+  );
+};
 
 export const getProductPriceOrOwnedLabel = ({
   i18n,
   productListingData,
   usageType,
   owned,
+  showBothPrices,
+  discountedPrice,
 }: ProductPriceOrOwnedProps): React.Node => {
   return owned ? (
-    <LineStackLayout noMargin alignItems="center">
-      <Text noMargin size="sub-title">
-        ✅
-      </Text>
-      <Text noMargin size="sub-title" color="inherit">
-        <Trans>Owned</Trans>
-      </Text>
-    </LineStackLayout>
+    <OwnedLabel />
   ) : (
-    renderProductPrice({ i18n, productListingData, usageType })
+    renderProductPrice({
+      i18n,
+      productListingData,
+      usageType,
+      showBothPrices,
+      discountedPrice,
+    })
   );
 };
 
@@ -137,7 +230,9 @@ type ProductPriceTagProps = {|
   productListingData:
     | PrivateAssetPackListingData
     | PrivateGameTemplateListingData
-    | CreditsPackageListingData,
+    | CreditsPackageListingData
+    | CourseListingData
+    | BundleListingData,
   usageType?: string,
   /**
    * To be used when the component is over an element for which
@@ -145,6 +240,7 @@ type ProductPriceTagProps = {|
    */
   withOverlay?: boolean,
   owned?: boolean,
+  discountedPrice?: boolean,
 |};
 
 const ProductPriceTag = ({
@@ -152,6 +248,7 @@ const ProductPriceTag = ({
   usageType,
   withOverlay,
   owned,
+  discountedPrice,
 }: ProductPriceTagProps) => {
   return (
     <I18n>
@@ -161,6 +258,7 @@ const ProductPriceTag = ({
           productListingData,
           usageType,
           owned,
+          discountedPrice,
         });
 
         return <PriceTag withOverlay={withOverlay} label={label} />;

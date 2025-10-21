@@ -115,9 +115,11 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): SpriteNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): SpriteNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         anim: this._animator.getNetworkSyncData(),
         ifx: this.isFlippedX(),
         ify: this.isFlippedY(),
@@ -128,8 +130,11 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(newNetworkSyncData: SpriteNetworkSyncData) {
-      super.updateFromNetworkSyncData(newNetworkSyncData);
+    updateFromNetworkSyncData(
+      newNetworkSyncData: SpriteNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
+    ) {
+      super.updateFromNetworkSyncData(newNetworkSyncData, options);
       if (newNetworkSyncData.ifx !== undefined) {
         this.flipX(newNetworkSyncData.ifx);
       }
@@ -945,19 +950,10 @@ namespace gdjs {
     //Other :
     /**
      * @param obj The target object
-     * @param scene The scene containing the object
      * @deprecated
      */
-    turnTowardObject(obj: gdjs.RuntimeObject | null, scene: gdjs.RuntimeScene) {
-      if (obj === null) {
-        return;
-      }
-      this.rotateTowardPosition(
-        obj.getDrawableX() + obj.getCenterX(),
-        obj.getDrawableY() + obj.getCenterY(),
-        0,
-        scene
-      );
+    turnTowardObject(obj: gdjs.RuntimeObject | null) {
+      return this.rotateTowardObject(obj, 0);
     }
   }
   gdjs.registerObject(

@@ -1,7 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 
-import React from 'react';
+import * as React from 'react';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import {
   type LoginForm as LoginFormType,
@@ -33,7 +33,6 @@ type Props = {|
   onClose: () => void,
   onGoToCreateAccount: () => void,
   onLogin: (form: LoginFormType) => Promise<void>,
-  onLogout: () => Promise<void>,
   onLoginWithProvider: (provider: IdentityProvider) => Promise<void>,
   onForgotPassword: (form: ForgotPasswordForm) => Promise<void>,
   loginInProgress: boolean,
@@ -44,7 +43,6 @@ const LoginDialog = ({
   onClose,
   onGoToCreateAccount,
   onLogin,
-  onLogout,
   onLoginWithProvider,
   onForgotPassword,
   loginInProgress,
@@ -93,10 +91,14 @@ const LoginDialog = ({
       justifyContent="center"
       alignItems="center"
     >
-      <GDevelopGLogo fontSize="large" />
-      <Text noMargin size="section-title" align="center">
-        <Trans>Log in to your account</Trans>
-      </Text>
+      {
+        <ColumnStackLayout noMargin justifyContent="center" alignItems="center">
+          <GDevelopGLogo fontSize="large" />
+          <Text noMargin size="section-title" align="center">
+            <Trans>Log in to your account</Trans>
+          </Text>
+        </ColumnStackLayout>
+      }
       <div style={styles.formContainer}>
         <LoginForm
           onLogin={doLogin}

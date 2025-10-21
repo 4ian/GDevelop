@@ -15,6 +15,7 @@ class RenderedInstance {
   _pixiContainer: PIXI.Container;
   _pixiResourcesLoader: Class<PixiResourcesLoader>;
   _pixiObject: PIXI.DisplayObject | null;
+  _propertyOverridings: Map<string, string>;
   wasUsed: boolean;
 
   /** Set to true when onRemovedFromScene is called. Allows to cancel promises/asynchronous operations (notably: waiting for a resource load). */
@@ -25,7 +26,8 @@ class RenderedInstance {
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
-    pixiResourcesLoader: Class<PixiResourcesLoader>
+    pixiResourcesLoader: Class<PixiResourcesLoader>,
+    getPropertyOverridings: (() => Map<string, string>) | null = null
   );
 
   /**
@@ -78,6 +80,8 @@ class RenderedInstance {
   getDefaultHeight(): number;
 
   getDefaultDepth(): number;
+
+  getPropertyOverridings(): Map<string, string> | null;
 }
 
 /**
@@ -105,7 +109,8 @@ class Rendered3DInstance {
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
     threeGroup: THREE.Group,
-    pixiResourcesLoader: Class<PixiResourcesLoader>
+    pixiResourcesLoader: Class<PixiResourcesLoader>,
+    getPropertyOverridings: (() => Map<string, string>) | null = null
   );
 
   /**
@@ -172,6 +177,8 @@ class Rendered3DInstance {
    * Return the depth of the instance when the instance doesn't have a custom size.
    */
   getDefaultDepth(): number;
+
+  getPropertyOverridings(): Map<string, string> | null;
 }
 
 declare type ObjectsRenderingService = {

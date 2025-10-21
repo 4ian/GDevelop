@@ -219,8 +219,6 @@ const Instruction = (props: Props) => {
     resourcesManager,
     scope,
   } = props;
-  const projectScopedContainers = props.projectScopedContainersAccessor.get();
-
   const instrFormatter = React.useMemo(
     () => gd.InstructionSentenceFormatter.get(),
     []
@@ -244,6 +242,13 @@ const Instruction = (props: Props) => {
     metadata: gdInstructionMetadata,
     i18n: I18nType
   ) => {
+    // Keep the call to `projectScopedContainersAccessor.get()` inside this function
+    // (and generally speaking, just before usage of `projectScopedContainers`).
+    // If it's called outside, the function could use a `projectScopedContainers`
+    // that would have been replaced in memory by the one for another instruction.
+    // (because `gd.ProjectScopedContainers.makeNewProjectScopedContainersXXX` functions
+    // are always returning the same object in memory).
+    const projectScopedContainers = props.projectScopedContainersAccessor.get();
     const { instruction, disabled, renderObjectThumbnail } = props;
     const formattedTexts = instrFormatter.getAsFormattedText(
       instruction,

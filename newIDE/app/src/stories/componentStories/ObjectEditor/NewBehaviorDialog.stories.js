@@ -25,7 +25,7 @@ export default {
 const apiDataServerSideError = {
   mockData: [
     {
-      url: `${GDevelopAssetApi.baseUrl}/behaviors-registry`,
+      url: `${GDevelopAssetApi.baseUrl}/behavior?environment=live`,
       method: 'GET',
       status: 500,
       response: { data: 'status' },
@@ -36,7 +36,15 @@ const apiDataServerSideError = {
 const apiDataFakeBehaviors = {
   mockData: [
     {
-      url: `${GDevelopAssetApi.baseUrl}/behaviors-registry`,
+      url: `${GDevelopAssetApi.baseUrl}/behavior?environment=live`,
+      method: 'GET',
+      status: 200,
+      response: {
+        databaseUrl: 'https://fake-cdn.com/behaviors-database-v2.json',
+      },
+    },
+    {
+      url: `https://fake-cdn.com/behaviors-database-v2.json`,
       method: 'GET',
       status: 200,
       response: fakeBehaviorsRegistry,
@@ -53,6 +61,7 @@ export const DefaultForSpriteObject = () => (
           project={testProject.project}
           eventsFunctionsExtension={null}
           objectType={'Sprite'}
+          isChildObject={false}
           onClose={action('on close')}
           onChoose={action('on choose')}
           objectBehaviorsTypes={[
@@ -68,13 +77,14 @@ export const DefaultForSpriteObject = () => (
 DefaultForSpriteObject.parameters = apiDataFakeBehaviors;
 
 export const WithCommunityExtensions = () => {
-  const [showCommunityExtensions, setShowCommunityExtensions] = React.useState(
-    true
-  );
+  const [
+    showExperimentalExtensions,
+    setShowExperimentalExtensions,
+  ] = React.useState(true);
   const preferences: Preferences = {
     ...initialPreferences,
-    values: { ...initialPreferences.values, showCommunityExtensions },
-    setShowCommunityExtensions,
+    values: { ...initialPreferences.values, showExperimentalExtensions },
+    setShowExperimentalExtensions,
   };
 
   return (
@@ -88,6 +98,7 @@ export const WithCommunityExtensions = () => {
                 project={testProject.project}
                 eventsFunctionsExtension={null}
                 objectType={'Sprite'}
+                isChildObject={false}
                 onClose={action('on close')}
                 onChoose={action('on choose')}
                 objectBehaviorsTypes={[
@@ -115,6 +126,7 @@ export const WithServerSideErrors = () => (
             project={testProject.project}
             eventsFunctionsExtension={null}
             objectType={'Sprite'}
+            isChildObject={false}
             onClose={action('on close')}
             onChoose={action('on choose')}
             objectBehaviorsTypes={[

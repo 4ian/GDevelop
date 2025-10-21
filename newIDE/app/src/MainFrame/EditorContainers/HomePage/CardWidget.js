@@ -23,21 +23,21 @@ const styles = {
 // Styles to give the impression of pressing an element.
 const useStylesForWidget = ({
   useDefaultDisabledStyle,
+  noBorder,
   disableHoverAndFocusEffects,
 }: {|
   useDefaultDisabledStyle?: boolean,
+  noBorder?: boolean,
   disableHoverAndFocusEffects?: boolean,
 |}) =>
   makeStyles(theme => {
     const rootStyles = {
-      border: `1px solid ${theme.palette.text.primary}`,
-      borderBottom: `6px solid ${theme.palette.text.primary}`,
+      boxSizing: 'border-box',
+      border: !noBorder ? `1px solid ${theme.palette.text.secondary}` : 'none',
       transition: 'background-color 100ms ease',
       '&:disabled': useDefaultDisabledStyle
         ? {
             opacity: theme.palette.action.disabledOpacity,
-            border: `1px solid ${theme.palette.text.secondary}`,
-            borderBottom: `6px solid ${theme.palette.text.secondary}`,
           }
         : undefined,
     };
@@ -65,6 +65,7 @@ type Props = {|
   size: 'small' | 'large' | 'banner',
   disabled?: boolean,
   useDefaultDisabledStyle?: boolean,
+  noBorder?: boolean,
 |};
 
 export const CardWidget = ({
@@ -73,9 +74,11 @@ export const CardWidget = ({
   size,
   disabled,
   useDefaultDisabledStyle,
+  noBorder,
 }: Props) => {
   const classes = useStylesForWidget({
     useDefaultDisabledStyle,
+    noBorder,
     disableHoverAndFocusEffects: !onClick,
   });
   const { isMobile } = useResponsiveWindowSize();

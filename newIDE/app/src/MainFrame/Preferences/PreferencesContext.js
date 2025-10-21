@@ -44,8 +44,7 @@ export type AlertMessageIdentifier =
   | 'command-palette-shortcut'
   | 'asset-installed-explanation'
   | 'extension-installed-explanation'
-  | 'project-should-have-unique-package-name'
-  | 'course-subtitles-in-user-language';
+  | 'project-should-have-unique-package-name';
 
 export type EditorMosaicName =
   | 'scene-editor'
@@ -169,15 +168,6 @@ export const allAlertMessages: Array<{
       <Trans>Project package names should not begin with com.example</Trans>
     ),
   },
-  {
-    key: 'course-subtitles-in-user-language',
-    label: (
-      <Trans>
-        This course has subtitles in multiple languages. Find yours in the
-        setting of each video.
-      </Trans>
-    ),
-  },
 ];
 
 /**
@@ -215,8 +205,8 @@ export type PreferencesValues = {|
   backdropClickBehavior: 'nothing' | 'apply' | 'cancel',
   resourcesImporationBehavior: ResourceImportationBehavior,
   eventsSheetCancelInlineParameter: 'cancel' | 'apply',
-  showCommunityExtensions: boolean,
-  showGetStartedSectionByDefault: boolean,
+  showExperimentalExtensions: boolean,
+  showCreateSectionByDefault: boolean,
   showInAppTutorialDeveloperMode: boolean,
   showDeprecatedInstructionWarning: boolean,
   openDiagnosticReportAutomatically: boolean,
@@ -301,8 +291,8 @@ export type Preferences = {|
   getIsAlwaysOnTopInPreview: () => boolean,
   setIsAlwaysOnTopInPreview: (enabled: boolean) => void,
   setEventsSheetCancelInlineParameter: (value: string) => void,
-  setShowCommunityExtensions: (enabled: boolean) => void,
-  setShowGetStartedSectionByDefault: (enabled: boolean) => void,
+  setShowExperimentalExtensions: (enabled: boolean) => void,
+  setShowCreateSectionByDefault: (enabled: boolean) => void,
   setShowInAppTutorialDeveloperMode: (enabled: boolean) => void,
   setOpenDiagnosticReportAutomatically: (enabled: boolean) => void,
   getOpenDiagnosticReportAutomatically: () => boolean,
@@ -380,8 +370,8 @@ export const initialPreferences = {
     backdropClickBehavior: 'nothing',
     resourcesImporationBehavior: 'ask',
     eventsSheetCancelInlineParameter: 'apply',
-    showCommunityExtensions: false,
-    showGetStartedSectionByDefault: true,
+    showExperimentalExtensions: false,
+    showCreateSectionByDefault: false,
     showInAppTutorialDeveloperMode: false,
     openDiagnosticReportAutomatically: true,
     showDeprecatedInstructionWarning: false,
@@ -448,8 +438,8 @@ export const initialPreferences = {
   getIsAlwaysOnTopInPreview: () => true,
   setIsAlwaysOnTopInPreview: () => {},
   setEventsSheetCancelInlineParameter: () => {},
-  setShowCommunityExtensions: () => {},
-  setShowGetStartedSectionByDefault: (enabled: boolean) => {},
+  setShowExperimentalExtensions: () => {},
+  setShowCreateSectionByDefault: (enabled: boolean) => {},
   setShowInAppTutorialDeveloperMode: (enabled: boolean) => {},
   setShowDeprecatedInstructionWarning: (enabled: boolean) => {},
   getOpenDiagnosticReportAutomatically: () => true,

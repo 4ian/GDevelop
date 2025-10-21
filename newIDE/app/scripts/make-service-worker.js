@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const shell = require('shelljs');
 const workboxBuild = require('workbox-build');
-const buildPath = '../build';
+const buildPath = '../public';
 const VersionMetadata = require('../src/Version/VersionMetadata');
 
 /**
@@ -46,7 +46,7 @@ const buildSW = () => {
   return workboxBuild
     .injectManifest({
       swSrc: 'service-worker-template/service-worker-template.js',
-      swDest: '../build/service-worker.js',
+      swDest: '../public/service-worker.js',
       globDirectory: buildPath,
       globPatterns: [
         // Application:
@@ -55,6 +55,7 @@ const buildSW = () => {
         'static/media/*',
         'static/js/locales-*.js', // Locales.
         'static/js/!local-app*.js', // Exclude electron app.
+        'static/js/Resource3DPreview.worker.*.js', // Include the 3D preview worker
         // ...But not libGD.js/wasm (there are cached with their URL
         // query string that depends on the VersionMetadata, see below).
 
@@ -84,13 +85,13 @@ const buildSW = () => {
     .then(({ count, size, warnings }) => {
       if (
         !replaceInFile(
-          '../build/service-worker.js',
+          '../public/service-worker.js',
           'VersionMetadata = {}',
           'VersionMetadata = ' + JSON.stringify(VersionMetadata)
         )
       ) {
         console.error(
-          'Error while trying to replace version metadata in build/service-worker.js.'
+          'Error while trying to replace version metadata in public/service-worker.js.'
         );
         shell.exit(1);
       }

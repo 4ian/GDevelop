@@ -102,9 +102,9 @@ const defineTileMap = function (extension, _, gd) {
       'displayMode',
       new gd.PropertyDescriptor(objectContent.displayMode)
         .setType('choice')
-        .addExtraInfo('visible')
-        .addExtraInfo('all')
-        .addExtraInfo('index')
+        .addChoice('visible', _('Visible layers'))
+        .addChoice('all', _('All layers'))
+        .addChoice('index', _('Only the layer with the specified index'))
         .setLabel(_('Display mode'))
         .setGroup(_('Appearance'))
     );

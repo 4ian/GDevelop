@@ -71,7 +71,7 @@ type Props = {|
   anchorEl?: any, // Unused
   canPasteInstructions: boolean, // Unused
   onPasteInstructions: () => void, // Unused
-  onExtensionInstalled: (extensionName: string) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
 const getInitialStepName = (isNewInstruction: boolean): StepName => {
@@ -428,6 +428,7 @@ const InstructionEditorDialog = ({
           open={newBehaviorDialogOpen}
           objectType={chosenObject.getType()}
           objectBehaviorsTypes={listObjectBehaviorsTypes(chosenObject)}
+          isChildObject={!scope.layout}
           onClose={() => setNewBehaviorDialogOpen(false)}
           onChoose={addBehavior}
           onExtensionInstalled={extensionName => {

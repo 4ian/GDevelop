@@ -36,6 +36,7 @@ export const Default = () => (
         resourceManagementProps={fakeResourceManagementProps}
         onEditObject={action('On edit object')}
         onOpenEventBasedObjectEditor={action('On edit children')}
+        onOpenEventBasedObjectVariantEditor={action('On edit variant')}
         onExportAssets={action('On export assets')}
         onAddObjectInstance={action('On add instance to the scene')}
         onObjectCreated={action('On object created')}
@@ -50,6 +51,8 @@ export const Default = () => (
         ) => cb(true)}
         onObjectFolderOrObjectWithContextSelected={() => {}}
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
+        isListLocked={false}
+        onExtensionInstalled={action('onExtensionInstalled')}
       />
     </div>
   </DragAndDropContextProvider>
@@ -72,6 +75,7 @@ export const WithSerializedObjectView = () => (
           resourceManagementProps={fakeResourceManagementProps}
           onEditObject={action('On edit object')}
           onOpenEventBasedObjectEditor={action('On edit children')}
+          onOpenEventBasedObjectVariantEditor={action('On edit variant')}
           onExportAssets={action('On export assets')}
           onAddObjectInstance={action('On add instance to the scene')}
           onObjectCreated={action('On object created')}
@@ -86,8 +90,48 @@ export const WithSerializedObjectView = () => (
           ) => cb(true)}
           onObjectFolderOrObjectWithContextSelected={() => {}}
           hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
+          isListLocked={false}
+          onExtensionInstalled={action('onExtensionInstalled')}
         />
       </div>
     </SerializedObjectDisplay>
+  </DragAndDropContextProvider>
+);
+
+export const Locked = () => (
+  <DragAndDropContextProvider>
+    <div style={{ height: 400 }}>
+      <ObjectsList
+        getThumbnail={() => 'res/unknown32.png'}
+        project={testProject.project}
+        layout={testProject.testLayout}
+        eventsBasedObject={null}
+        projectScopedContainersAccessor={
+          testProject.testSceneProjectScopedContainersAccessor
+        }
+        globalObjectsContainer={testProject.project.getObjects()}
+        objectsContainer={testProject.testLayout.getObjects()}
+        resourceManagementProps={fakeResourceManagementProps}
+        onEditObject={action('On edit object')}
+        onOpenEventBasedObjectEditor={action('On edit children')}
+        onOpenEventBasedObjectVariantEditor={action('On edit variant')}
+        onExportAssets={action('On export assets')}
+        onAddObjectInstance={action('On add instance to the scene')}
+        onObjectCreated={action('On object created')}
+        onObjectEdited={action('On object edited')}
+        selectedObjectFolderOrObjectsWithContext={[]}
+        getValidatedObjectOrGroupName={newName => newName}
+        onDeleteObjects={(objectsWithContext, cb) => cb(true)}
+        onRenameObjectFolderOrObjectWithContextFinish={(
+          objectWithContext,
+          newName,
+          cb
+        ) => cb(true)}
+        onObjectFolderOrObjectWithContextSelected={() => {}}
+        hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
+        isListLocked={true}
+        onExtensionInstalled={action('onExtensionInstalled')}
+      />
+    </div>
   </DragAndDropContextProvider>
 );

@@ -12,7 +12,13 @@ namespace gdjs {
    */
   export class RuntimeScene extends gdjs.RuntimeInstanceContainer {
     _eventsFunction: null | ((runtimeScene: RuntimeScene) => void) = null;
-
+    _idToCallbackMap: null | Map<
+      string,
+      (
+        runtimeScene: gdjs.RuntimeScene,
+        asyncObjectsList: gdjs.LongLivedObjectsList
+      ) => void
+    > = null;
     _renderer: RuntimeSceneRenderer;
     _debuggerRenderer: gdjs.DebuggerRenderer;
     _variables: gdjs.VariablesContainer;
@@ -23,6 +29,7 @@ namespace gdjs {
     _timeManager: TimeManager;
     _gameStopRequested: boolean = false;
     _requestedScene: string = '';
+    _resourcesUnloading: 'at-scene-exit' | 'never' | 'inherit' = 'inherit';
     private _asyncTasksManager = new gdjs.AsyncTasksManager();
 
     /** True if loadFromScene was called and the scene is being played. */
@@ -124,7 +131,13 @@ namespace gdjs {
      * @param sceneAndExtensionsData An object containing the scene data.
      * @see gdjs.RuntimeGame#getSceneAndExtensionsData
      */
-    loadFromScene(sceneAndExtensionsData: SceneAndExtensionsData | null) {
+    loadFromScene(
+      sceneAndExtensionsData: SceneAndExtensionsData | null,
+      options?: {
+        excludedObjectNames?: Set<string>;
+        skipStoppingSoundsOnStartup?: boolean;
+      }
+    ) {
       if (!sceneAndExtensionsData) {
         logger.error('loadFromScene was called without a scene');
         return;
@@ -141,6 +154,7 @@ namespace gdjs {
         this._runtimeGame.getRenderer().setWindowTitle(sceneData.title);
       }
       this._name = sceneData.name;
+      this._resourcesUnloading = sceneData.resourcesUnloading || 'inherit';
       this.setBackgroundColor(sceneData.r, sceneData.v, sceneData.b);
 
       //Load layers
@@ -181,14 +195,17 @@ namespace gdjs {
         this.registerObject(sceneData.objects[i]);
       }
 
-      //Create initial instances of objects
+      // Create initial instances of objects.
       this.createObjectsFrom(
         sceneData.instances,
         0,
         0,
         0,
         /*trackByPersistentUuid=*/
-        true
+        true,
+        {
+          excludedObjectNames: options?.excludedObjectNames,
+        }
       );
 
       // Set up the default z order (for objects created from events)
@@ -207,7 +224,11 @@ namespace gdjs {
       for (let i = 0; i < gdjs.callbacksRuntimeSceneLoaded.length; ++i) {
         gdjs.callbacksRuntimeSceneLoaded[i](this);
       }
-      if (sceneData.stopSoundsOnStartup && this._runtimeGame) {
+      if (
+        sceneData.stopSoundsOnStartup &&
+        (!options || !options.skipStoppingSoundsOnStartup) &&
+        this._runtimeGame
+      ) {
         this._runtimeGame.getSoundManager().clearAll();
       }
       this._isLoaded = true;
@@ -284,7 +305,7 @@ namespace gdjs {
       const allInstancesList = this.getAdhocListOfAllInstances();
       for (let i = 0, len = allInstancesList.length; i < len; ++i) {
         const object = allInstancesList[i];
-        object.onDeletedFromScene(this);
+        object.onDeletedFromScene();
         object.onDestroyed();
       }
 
@@ -306,7 +327,7 @@ namespace gdjs {
       this.onGameResolutionResized();
     }
 
-    _destroy() {
+    override _destroy() {
       // It should not be necessary to reset these variables, but this help
       // ensuring that all memory related to the RuntimeScene is released immediately.
       super._destroy();
@@ -334,6 +355,8 @@ namespace gdjs {
       const module = gdjs[sceneData.mangledName + 'Code'];
       if (module && module.func) {
         this._eventsFunction = module.func;
+        this._idToCallbackMap =
+          gdjs[sceneData.mangledName + 'Code'].idToCallbackMap;
       } else {
         setupWarningLogger.warn(
           'No function found for running logic of scene ' + this._name
@@ -403,7 +426,7 @@ namespace gdjs {
       if (this._profiler) {
         this._profiler.begin('objects (post-events)');
       }
-      this._updateObjectsPostEvents();
+      this._stepBehaviorsPostEvents();
       if (this._profiler) {
         this._profiler.end('objects (post-events)');
       }
@@ -576,6 +599,13 @@ namespace gdjs {
      */
     getName(): string {
       return this._name;
+    }
+
+    /**
+     * Get the strategy to unload resources of this scene.
+     */
+    getResourcesUnloading(): 'at-scene-exit' | 'never' | 'inherit' {
+      return this._resourcesUnloading;
     }
 
     /**
@@ -821,27 +851,69 @@ namespace gdjs {
       if (
         syncedPlayerNumber !== undefined &&
         syncedPlayerNumber !== 1 &&
-        (!this.networkId ||
-          (variablesNetworkSyncData.length === 0 &&
-            !Object.keys(extensionsVariablesSyncData).length))
+        !this.networkId
       ) {
         // If we are getting sync data for a specific player,
-        // and they are not the host, there is no sync data to send if:
-        // - The scene has no networkId (it's either not a multiplayer scene or the scene is not yet networked).
-        // - There are no variables to sync in the scene or extensions.
+        // and they are not the host, there is no sync data to send if
+        // the scene has no networkId (it's either not a multiplayer scene or the scene is not yet networked).
         return null;
       }
 
-      return {
+      const networkSyncData: LayoutNetworkSyncData = {
         var: variablesNetworkSyncData,
         extVar: extensionsVariablesSyncData,
         id: this.getOrCreateNetworkId(),
       };
+      if (syncOptions.syncSceneVisualProps) {
+        networkSyncData.color = this._backgroundColor;
+      }
+      if (syncOptions.syncLayers) {
+        const layersSyncData = {};
+        for (const layerName in this._layers.items) {
+          layersSyncData[layerName] =
+            this._layers.items[layerName].getNetworkSyncData();
+        }
+        networkSyncData.layers = layersSyncData;
+      }
+      if (syncOptions.syncSceneTimers) {
+        networkSyncData.time = this._timeManager.getNetworkSyncData();
+      }
+      if (syncOptions.syncOnceTriggers) {
+        networkSyncData.once = this._onceTriggers.getNetworkSyncData();
+      }
+
+      gdjs.callbacksRuntimeSceneGetSyncData.forEach((callback) => {
+        callback(this, networkSyncData, syncOptions);
+      });
+
+      if (syncOptions.syncAsyncTasks) {
+        networkSyncData.async =
+          this._asyncTasksManager.getNetworkSyncData(syncOptions);
+      }
+
+      return networkSyncData;
     }
 
-    updateFromNetworkSyncData(syncData: LayoutNetworkSyncData) {
+    updateFromNetworkSyncData(
+      syncData: LayoutNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
+    ) {
+      if (syncData.color !== undefined) {
+        this._backgroundColor = syncData.color;
+      }
+      if (syncData.layers) {
+        for (const layerName in syncData.layers) {
+          const layerData = syncData.layers[layerName];
+          if (this.hasLayer(layerName)) {
+            const layer = this.getLayer(layerName);
+            layer.updateFromNetworkSyncData(layerData);
+          }
+        }
+      }
+      // Update variables before anything else, as they might be used
+      // in other sync data (for instance in tweens).
       if (syncData.var) {
-        this._variables.updateFromNetworkSyncData(syncData.var);
+        this._variables.updateFromNetworkSyncData(syncData.var, options);
       }
       if (syncData.extVar) {
         for (const extensionName in syncData.extVar) {
@@ -853,10 +925,31 @@ namespace gdjs {
             this._variablesByExtensionName.get(extensionName);
           if (extensionVariables) {
             extensionVariables.updateFromNetworkSyncData(
-              extensionVariablesData
+              extensionVariablesData,
+              options
             );
           }
         }
+      }
+      if (syncData.time) {
+        this._timeManager.updateFromNetworkSyncData(syncData.time);
+      }
+      if (syncData.once) {
+        this._onceTriggers.updateNetworkSyncData(syncData.once);
+      }
+
+      gdjs.callbacksRuntimeSceneUpdateFromSyncData.forEach((callback) => {
+        callback(this, syncData, options);
+      });
+
+      // Sync Async last, as it might depend on other data.
+      if (syncData.async && this._idToCallbackMap) {
+        this._asyncTasksManager.updateFromNetworkSyncData(
+          syncData.async,
+          this._idToCallbackMap,
+          this,
+          options
+        );
       }
     }
 

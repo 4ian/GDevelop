@@ -21,6 +21,8 @@ import MeasurementUnitDocumentation from '../../PropertiesEditor/MeasurementUnit
 import { getMeasurementUnitShortLabel } from '../../PropertiesEditor/PropertiesMapToSchema';
 import AlertMessage from '../../UI/AlertMessage';
 import { hasLight } from './Model3DEditor';
+import { PropertyCheckbox } from './PropertyFields';
+import { mapVector } from '../../Utils/MapFor';
 
 const facesProperties = [
   {
@@ -94,14 +96,10 @@ const Cube3DEditor = ({
 
   const facesOrientationChoices = properties
     .get('facesOrientation')
-    .getExtraInfo()
-    .toJSArray()
-    .map(value => ({ value, label: value }));
+    .getChoices();
   const backFaceUpThroughWhichAxisRotationChoices = properties
     .get('backFaceUpThroughWhichAxisRotation')
-    .getExtraInfo()
-    .toJSArray()
-    .map(value => ({ value, label: value }));
+    .getChoices();
 
   return (
     <ColumnStackLayout noMargin>
@@ -180,11 +178,11 @@ const Cube3DEditor = ({
             onChangeProperty('facesOrientation', newValue);
           }}
         >
-          {facesOrientationChoices.map(choice => (
+          {mapVector(facesOrientationChoices, choice => (
             <SelectOption
-              label={choice.label}
-              value={choice.value}
-              key={choice.value}
+              label={choice.getLabel()}
+              value={choice.getValue()}
+              key={choice.getValue()}
             />
           ))}
         </SelectField>
@@ -202,14 +200,15 @@ const Cube3DEditor = ({
             onChangeProperty('backFaceUpThroughWhichAxisRotation', newValue);
           }}
         >
-          {backFaceUpThroughWhichAxisRotationChoices.map(choice => (
+          {mapVector(backFaceUpThroughWhichAxisRotationChoices, choice => (
             <SelectOption
-              label={choice.label}
-              value={choice.value}
-              key={choice.value}
+              label={choice.getLabel()}
+              value={choice.getValue()}
+              key={choice.getValue()}
             />
           ))}
         </SelectField>
+        <Text size="block-title">Lighting</Text>
         <SelectField
           value={properties.get('materialType').getValue()}
           floatingLabelText={properties.get('materialType').getLabel()}
@@ -229,12 +228,21 @@ const Cube3DEditor = ({
             key="StandardWithoutMetalness"
           />
         </SelectField>
+        <PropertyCheckbox
+          objectConfiguration={objectConfiguration}
+          propertyName="isCastingShadow"
+        />
+        <PropertyCheckbox
+          objectConfiguration={objectConfiguration}
+          propertyName="isReceivingShadow"
+        />
         {properties.get('materialType').getValue() !== 'Basic' &&
           !hasLight(layout) && (
             <AlertMessage kind="error">
               <Trans>
-                Make sure to set up a light in the effects of the layer or chose
-                "No lighting effect" - otherwise the object will appear black.
+                Make sure to set up a light in the effects of the layer or
+                choose "No lighting effect" - otherwise the object will appear
+                black.
               </Trans>
             </AlertMessage>
           )}

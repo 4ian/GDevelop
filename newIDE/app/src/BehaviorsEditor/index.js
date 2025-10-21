@@ -34,7 +34,8 @@ import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
 import Trash from '../UI/CustomSvgIcons/Trash';
 import Add from '../UI/CustomSvgIcons/Add';
 import { mapVector } from '../Utils/MapFor';
-import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
+import Clipboard from '../Utils/Clipboard';
+import { SafeExtractor } from '../Utils/SafeExtractor';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
@@ -45,6 +46,7 @@ import CopyIcon from '../UI/CustomSvgIcons/Copy';
 import ResponsiveFlatButton from '../UI/ResponsiveFlatButton';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import QuickCustomizationPropertiesVisibilityDialog from '../QuickCustomization/QuickCustomizationPropertiesVisibilityDialog';
+import Text from '../UI/Text';
 
 const gd: libGDevelop = global.gd;
 
@@ -69,6 +71,7 @@ type BehaviorConfigurationEditorProps = {|
   project: gdProject,
   object: gdObject,
   behavior: gdBehavior,
+  isChildObject: boolean,
   resourceManagementProps: ResourceManagementProps,
   onBehaviorsUpdated: () => void,
   onChangeBehaviorName: (behavior: gdBehavior, newName: string) => void,
@@ -80,6 +83,7 @@ type BehaviorConfigurationEditorProps = {|
   openBehaviorPropertiesQuickCustomizationDialog: (
     behaviorName: string
   ) => void,
+  isListLocked: boolean,
 |};
 
 const BehaviorConfigurationEditor = React.forwardRef<
@@ -91,6 +95,7 @@ const BehaviorConfigurationEditor = React.forwardRef<
       project,
       object,
       behavior,
+      isChildObject,
       resourceManagementProps,
       onBehaviorsUpdated,
       onChangeBehaviorName,
@@ -100,6 +105,7 @@ const BehaviorConfigurationEditor = React.forwardRef<
       pasteBehaviors,
       openExtension,
       openBehaviorPropertiesQuickCustomizationDialog,
+      isListLocked,
     },
     ref
   ) => {
@@ -195,6 +201,7 @@ const BehaviorConfigurationEditor = React.forwardRef<
                 {
                   label: i18n._(t`Delete`),
                   click: () => onRemoveBehavior(behaviorName),
+                  enabled: !isListLocked,
                 },
                 {
                   label: i18n._(t`Copy`),
@@ -203,7 +210,8 @@ const BehaviorConfigurationEditor = React.forwardRef<
                 {
                   label: i18n._(t`Paste`),
                   click: pasteBehaviors,
-                  enabled: canPasteBehaviors,
+                  // TODO Allow to paste behaviors that are already in the list.
+                  enabled: canPasteBehaviors && !isListLocked,
                 },
                 ...(project.hasEventsBasedBehavior(behaviorTypeName)
                   ? [
@@ -305,6 +313,7 @@ type UseManageBehaviorsState = {|
 export const useManageObjectBehaviors = ({
   project,
   object,
+  isChildObject,
   eventsFunctionsExtension,
   onUpdate,
   onSizeUpdated,
@@ -314,12 +323,13 @@ export const useManageObjectBehaviors = ({
 }: {
   project: gdProject,
   object: gdObject,
+  isChildObject: boolean,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   onUpdate: () => void,
   onSizeUpdated?: ?() => void,
   onBehaviorsUpdated?: ?() => void,
   onUpdateBehaviorsSharedData: () => void,
-  onExtensionInstalled: (extensionName: string) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 }): UseManageBehaviorsState => {
   const [
     justAddedBehaviorName,
@@ -580,6 +590,7 @@ export const useManageObjectBehaviors = ({
       open
       objectType={object.getType()}
       objectBehaviorsTypes={listObjectBehaviorsTypes(object)}
+      isChildObject={isChildObject}
       onClose={() => setNewBehaviorDialogOpen(false)}
       onChoose={addBehavior}
       project={project}
@@ -609,6 +620,7 @@ type Props = {|
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   object: gdObject,
+  isChildObject: boolean,
   onUpdateBehaviorsSharedData: () => void,
   onSizeUpdated?: ?() => void,
   resourceManagementProps: ResourceManagementProps,
@@ -617,7 +629,8 @@ type Props = {|
     extensionName: string,
     behaviorName: string
   ) => Promise<void>,
-  onExtensionInstalled: (extensionName: string) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
+  isListLocked: boolean,
 |};
 
 const BehaviorsEditor = (props: Props) => {
@@ -629,6 +642,7 @@ const BehaviorsEditor = (props: Props) => {
 
   const {
     object,
+    isChildObject,
     project,
     eventsFunctionsExtension,
     onSizeUpdated,
@@ -636,6 +650,7 @@ const BehaviorsEditor = (props: Props) => {
     onUpdateBehaviorsSharedData,
     openBehaviorEvents,
     onExtensionInstalled,
+    isListLocked,
   } = props;
   const forceUpdate = useForceUpdate();
 
@@ -657,6 +672,7 @@ const BehaviorsEditor = (props: Props) => {
   } = useManageObjectBehaviors({
     project,
     object,
+    isChildObject,
     eventsFunctionsExtension,
     onUpdate: forceUpdate,
     onSizeUpdated,
@@ -725,30 +741,41 @@ const BehaviorsEditor = (props: Props) => {
   return (
     <Column noMargin expand useFullHeight noOverflowParent>
       {allVisibleBehaviors.length === 0 ? (
-        <Column noMargin expand justifyContent="center">
-          <EmptyPlaceholder
-            title={<Trans>Add your first behavior</Trans>}
-            description={
-              <Trans>
-                Behaviors add features to objects in a matter of clicks.
-              </Trans>
-            }
-            helpPagePath="/behaviors"
-            tutorialId="intro-behaviors-and-functions"
-            actionButtonId="add-behavior-button"
-            actionLabel={
-              isMobile ? <Trans>Add</Trans> : <Trans>Add a behavior</Trans>
-            }
-            onAction={openNewBehaviorDialog}
-            secondaryActionIcon={<PasteIcon />}
-            secondaryActionLabel={
-              isClipboardContainingBehaviors ? <Trans>Paste</Trans> : null
-            }
-            onSecondaryAction={() => {
-              pasteBehaviors();
-            }}
-          />
-        </Column>
+        isListLocked ? (
+          <Column noMargin expand justifyContent="center">
+            <Text size="block-title" align="center">
+              <Trans>No behavior</Trans>
+            </Text>
+            <Text align="center" noMargin>
+              <Trans>There is no behavior to set up for this object.</Trans>
+            </Text>
+          </Column>
+        ) : (
+          <Column noMargin expand justifyContent="center">
+            <EmptyPlaceholder
+              title={<Trans>Add your first behavior</Trans>}
+              description={
+                <Trans>
+                  Behaviors add features to objects in a matter of clicks.
+                </Trans>
+              }
+              helpPagePath="/behaviors"
+              tutorialId="intro-behaviors-and-functions"
+              actionButtonId="add-behavior-button"
+              actionLabel={
+                isMobile ? <Trans>Add</Trans> : <Trans>Add a behavior</Trans>
+              }
+              onAction={openNewBehaviorDialog}
+              secondaryActionIcon={<PasteIcon />}
+              secondaryActionLabel={
+                isClipboardContainingBehaviors ? <Trans>Paste</Trans> : null
+              }
+              onSecondaryAction={() => {
+                pasteBehaviors();
+              }}
+            />
+          </Column>
+        )
       ) : (
         <React.Fragment>
           <ScrollView ref={scrollView}>
@@ -766,6 +793,7 @@ const BehaviorsEditor = (props: Props) => {
                   key={behaviorName}
                   project={project}
                   object={object}
+                  isChildObject={isChildObject}
                   behavior={behavior}
                   copyBehavior={copyBehavior}
                   onRemoveBehavior={removeBehavior}
@@ -778,6 +806,7 @@ const BehaviorsEditor = (props: Props) => {
                   canPasteBehaviors={isClipboardContainingBehaviors}
                   pasteBehaviors={pasteBehaviors}
                   resourceManagementProps={props.resourceManagementProps}
+                  isListLocked={isListLocked}
                 />
               );
             })}
@@ -806,7 +835,7 @@ const BehaviorsEditor = (props: Props) => {
                   onClick={() => {
                     pasteBehaviors();
                   }}
-                  disabled={!isClipboardContainingBehaviors}
+                  disabled={!isClipboardContainingBehaviors || isListLocked}
                 />
               </LineStackLayout>
               <LineStackLayout justifyContent="flex-end" expand>
@@ -823,6 +852,7 @@ const BehaviorsEditor = (props: Props) => {
                   onClick={openNewBehaviorDialog}
                   icon={<Add />}
                   id="add-behavior-button"
+                  disabled={isListLocked}
                 />
               </LineStackLayout>
             </LineStackLayout>

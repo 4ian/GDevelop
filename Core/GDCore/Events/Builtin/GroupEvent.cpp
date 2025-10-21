@@ -61,10 +61,12 @@ void GroupEvent::UnserializeFrom(gd::Project& project,
       project, events, element.GetChild("events"));
 
   parameters.clear();
-  gd::SerializerElement& parametersElement = element.GetChild("parameters");
-  parametersElement.ConsiderAsArrayOf("parameters");
-  for (std::size_t i = 0; i < parametersElement.GetChildrenCount(); ++i)
-    parameters.push_back(parametersElement.GetChild(i).GetValue().GetString());
+  if (element.HasChild("parameters")) {
+    gd::SerializerElement& parametersElement = element.GetChild("parameters");
+    parametersElement.ConsiderAsArrayOf("parameters");
+    for (std::size_t i = 0; i < parametersElement.GetChildrenCount(); ++i)
+      parameters.push_back(parametersElement.GetChild(i).GetValue().GetString());
+  }
 }
 
 void GroupEvent::SetBackgroundColor(unsigned int colorR_,

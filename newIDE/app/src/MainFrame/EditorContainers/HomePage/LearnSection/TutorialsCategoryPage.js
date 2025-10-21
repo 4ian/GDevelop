@@ -8,7 +8,10 @@ import {
   type Tutorial,
   type TutorialCategory,
 } from '../../../../Utils/GDevelopServices/Tutorial';
-import { formatTutorialToImageTileComponent, TUTORIAL_CATEGORY_TEXTS } from '.';
+import {
+  formatTutorialToImageTileComponent,
+  TUTORIAL_CATEGORY_TEXTS,
+} from './Utils';
 import ImageTileGrid from '../../../../UI/ImageTileGrid';
 import { type WindowSizeType } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
@@ -16,6 +19,10 @@ import { PrivateTutorialViewDialog } from '../../../../AssetStore/PrivateTutoria
 import EducationCurriculumLesson from './EducationCurriculumLesson';
 import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
 import Text from '../../../../UI/Text';
+import { TutorialContext } from '../../../../Tutorial/TutorialContext';
+import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
+import CourseStoreContext from '../../../../Course/CourseStoreContext';
+import { type CourseListingData } from '../../../../Utils/GDevelopServices/Shop';
 
 const styles = {
   educationCurriculumTutorialContainer: {
@@ -31,6 +38,7 @@ type EducationCurriculumProps = {|
   limits: ?Limits,
   tutorials: Tutorial[],
   onSelectTutorial: Tutorial => void,
+  onSelectCourse: (courseId: string) => void,
   onOpenTemplateFromTutorial: string => Promise<void>,
   isLocked?: boolean,
   onClickSubscribe?: () => void,
@@ -42,6 +50,7 @@ export const EducationCurriculum = ({
   limits,
   tutorials,
   onSelectTutorial,
+  onSelectCourse,
   onOpenTemplateFromTutorial,
   isLocked,
   onClickSubscribe,
@@ -84,6 +93,7 @@ export const EducationCurriculum = ({
             isLocked={isLocked}
             onClickSubscribe={onClickSubscribe}
             onSelectTutorial={onSelectTutorial}
+            onSelectCourse={onSelectCourse}
             index={sectionIndex}
             onOpenTemplateFromTutorial={
               tutorial.templateUrl
@@ -103,6 +113,7 @@ export const EducationCurriculum = ({
       i18n,
       limits,
       onSelectTutorial,
+      onSelectCourse,
       onOpenTemplateFromTutorial,
       renderInterstitialCallout,
       isLocked,
@@ -122,7 +133,7 @@ const getColumnsFromWindowSize = (windowSize: WindowSizeType) => {
     case 'medium':
       return 3;
     case 'large':
-      return 5;
+      return 4;
     case 'xlarge':
       return 6;
     default:
@@ -132,27 +143,39 @@ const getColumnsFromWindowSize = (windowSize: WindowSizeType) => {
 
 type Props = {|
   onBack: () => void,
-  tutorials: Array<Tutorial>,
   category: TutorialCategory,
   onOpenTemplateFromTutorial: string => Promise<void>,
+  onSelectCourse: (courseListingData: CourseListingData) => void,
 |};
 
 const TutorialsCategoryPage = ({
   category,
-  tutorials,
   onBack,
   onOpenTemplateFromTutorial,
+  onSelectCourse,
 }: Props) => {
+  const { listedCourses } = React.useContext(CourseStoreContext);
   const { limits } = React.useContext(AuthenticatedUserContext);
+  const { tutorials } = React.useContext(TutorialContext);
   const texts = TUTORIAL_CATEGORY_TEXTS[category];
-  const filteredTutorials = tutorials.filter(
-    tutorial => tutorial.category === category
-  );
+  const filteredTutorials = tutorials
+    ? tutorials.filter(tutorial => tutorial.category === category)
+    : null;
 
   const [
     selectedTutorial,
     setSelectedTutorial,
   ] = React.useState<Tutorial | null>(null);
+
+  if (!filteredTutorials) {
+    return (
+      <SectionContainer flexBody>
+        <SectionRow expand>
+          <PlaceholderLoader />
+        </SectionRow>
+      </SectionContainer>
+    );
+  }
 
   return (
     <I18n>
@@ -167,6 +190,14 @@ const TutorialsCategoryPage = ({
               <EducationCurriculum
                 tutorials={filteredTutorials}
                 onSelectTutorial={setSelectedTutorial}
+                onSelectCourse={courseId => {
+                  if (!listedCourses) return;
+                  const courseListingData = listedCourses.find(
+                    course => course.id === courseId
+                  );
+                  if (!courseListingData) return;
+                  onSelectCourse(courseListingData);
+                }}
                 i18n={i18n}
                 limits={limits}
                 onOpenTemplateFromTutorial={onOpenTemplateFromTutorial}

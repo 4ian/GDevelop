@@ -32,6 +32,7 @@ const GetPremiumButton = () => {
           analyticsMetadata: {
             reason: 'Account get premium',
             recommendedPlanId: 'gdevelop_silver',
+            placementId: 'account-get-premium',
           },
         });
       }}
@@ -103,7 +104,7 @@ const UserChip = ({ onOpenProfile }: Props) => {
               <Trans>Sign up</Trans>
             </span>
           }
-          onClick={onOpenCreateAccountDialog}
+          onClick={() => onOpenCreateAccountDialog()}
           primary
         />
       </LineStackLayout>

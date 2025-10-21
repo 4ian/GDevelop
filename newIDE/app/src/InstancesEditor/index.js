@@ -91,6 +91,7 @@ export type InstancesEditorPropsWithoutSizeAndScroll = {|
   project: gdProject,
   layout: gdLayout | null,
   eventsBasedObject: gdEventsBasedObject | null,
+  eventsBasedObjectVariant: gdEventsBasedObjectVariant | null,
   layersContainer: gdLayersContainer,
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
@@ -564,7 +565,7 @@ export default class InstancesEditor extends Component<Props, State> {
     this.windowBorder = new WindowBorder({
       project: props.project,
       layout: props.layout,
-      eventsBasedObject: props.eventsBasedObject,
+      eventsBasedObjectVariant: props.eventsBasedObjectVariant,
       toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
     });
     this.windowMask = new WindowMask({
@@ -769,11 +770,14 @@ export default class InstancesEditor extends Component<Props, State> {
     position: [number, number],
     copyReferential: [number, number],
     serializedInstances: Array<Object>,
-    preventSnapToGrid?: boolean,
     addInstancesInTheForeground?: boolean,
     doesObjectExistInContext: string => boolean,
   |}): Array<gdInitialInstance> => {
     return this._instancesAdder.addSerializedInstances(options);
+  };
+
+  snapSelection = (instances: gdInitialInstance[]) => {
+    this.instancesMover.snapSelection(instances);
   };
 
   /**
@@ -1477,13 +1481,13 @@ export default class InstancesEditor extends Component<Props, State> {
   };
 
   _getAreaRectangle = (): Rectangle => {
-    const { eventsBasedObject, project } = this.props;
-    return eventsBasedObject
+    const { eventsBasedObjectVariant, project } = this.props;
+    return eventsBasedObjectVariant
       ? new Rectangle(
-          eventsBasedObject.getAreaMinX(),
-          eventsBasedObject.getAreaMinY(),
-          eventsBasedObject.getAreaMaxX(),
-          eventsBasedObject.getAreaMaxY()
+          eventsBasedObjectVariant.getAreaMinX(),
+          eventsBasedObjectVariant.getAreaMinY(),
+          eventsBasedObjectVariant.getAreaMaxX(),
+          eventsBasedObjectVariant.getAreaMaxY()
         )
       : new Rectangle(
           0,

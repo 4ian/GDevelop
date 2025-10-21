@@ -163,6 +163,21 @@ void LinkEvent::UnserializeFrom(gd::Project& project,
   // end of compatibility code
 }
 
+vector<gd::String> LinkEvent::GetAllSearchableStrings() const {
+  vector<gd::String> allSearchableStrings;
+
+  allSearchableStrings.push_back(target);
+
+  return allSearchableStrings;
+}
+
+bool LinkEvent::ReplaceAllSearchableStrings(
+    std::vector<gd::String> newSearchableString) {
+  if (newSearchableString[0] == target) return false;
+  SetTarget(newSearchableString[0]);
+  return true;
+}
+
 bool LinkEvent::AcceptVisitor(gd::EventVisitor &eventVisitor) {
   return BaseEvent::AcceptVisitor(eventVisitor) ||
          eventVisitor.VisitLinkEvent(*this);

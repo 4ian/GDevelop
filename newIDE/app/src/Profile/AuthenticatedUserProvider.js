@@ -8,6 +8,8 @@ import {
   getUserEarningsBalance,
 } from '../Utils/GDevelopServices/Usage';
 import {
+  editUser,
+  type EditUserChanges,
   getUserBadges,
   listDefaultRecommendations,
   listRecommendations,
@@ -17,7 +19,6 @@ import { getAchievements } from '../Utils/GDevelopServices/Badge';
 import Authentication, {
   type LoginForm,
   type RegisterForm,
-  type PatchUserPayload,
   type ChangeEmailForm,
   type AuthError,
   type ForgotPasswordForm,
@@ -51,6 +52,7 @@ import {
   listReceivedAssetShortHeaders,
   listReceivedAssetPacks,
   listReceivedGameTemplates,
+  listReceivedBundles,
 } from '../Utils/GDevelopServices/Asset';
 import { Trans } from '@lingui/macro';
 import Snackbar from '@material-ui/core/Snackbar';
@@ -61,6 +63,11 @@ import { showErrorBox } from '../UI/Messages/MessageBox';
 import { userCancellationErrorName } from '../LoginProvider/Utils';
 import { listUserPurchases } from '../Utils/GDevelopServices/Shop';
 import { listNotifications } from '../Utils/GDevelopServices/Notification';
+import LoginWithPurchaseClaimDialog from './LoginWithPurchaseClaimDialog';
+import CreateAccountWithPurchaseClaimDialog from './CreateAccountWithPurchaseClaimDialog';
+import PurchaseClaimDialog, {
+  type ClaimedProductOptions,
+} from './PurchaseClaimDialog';
 
 type Props = {|
   authentication: Authentication,
@@ -71,7 +78,9 @@ type Props = {|
 type State = {|
   authenticatedUser: AuthenticatedUser,
   loginDialogOpen: boolean,
+  loginWithPurchaseClaimDialogOpen: boolean,
   createAccountDialogOpen: boolean,
+  createAccountWithPurchaseClaimDialogOpen: boolean,
   loginInProgress: boolean,
   createAccountInProgress: boolean,
   editProfileDialogOpen: boolean,
@@ -88,6 +97,7 @@ type State = {|
   changeEmailDialogOpen: boolean,
   changeEmailInProgress: boolean,
   userSnackbarMessage: ?React.Node,
+  claimedProductOptions: ?ClaimedProductOptions,
 |};
 
 const cleanUserTracesOnDevice = async () => {
@@ -107,7 +117,9 @@ export default class AuthenticatedUserProvider extends React.Component<
   state = {
     authenticatedUser: initialAuthenticatedUser,
     loginDialogOpen: false,
+    loginWithPurchaseClaimDialogOpen: false,
     createAccountDialogOpen: false,
+    createAccountWithPurchaseClaimDialogOpen: false,
     loginInProgress: false,
     createAccountInProgress: false,
     editProfileDialogOpen: false,
@@ -124,6 +136,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     changeEmailDialogOpen: false,
     changeEmailInProgress: false,
     userSnackbarMessage: null,
+    claimedProductOptions: null,
   };
   _automaticallyUpdateUserProfile = true;
   _hasNotifiedUserAboutEmailVerification = false;
@@ -208,9 +221,22 @@ export default class AuthenticatedUserProvider extends React.Component<
         onBadgesChanged: this._fetchUserBadges,
         onCloudProjectsChanged: this._fetchUserCloudProjects,
         onOpenLoginDialog: () => this.openLoginDialog(true),
+        onOpenLoginWithPurchaseClaimDialog: (
+          claimedProductOptions: ClaimedProductOptions
+        ) => this.openLoginWithPurchaseClaimDialog(true, claimedProductOptions),
         onOpenEditProfileDialog: () => this.openEditProfileDialog(true),
         onOpenChangeEmailDialog: () => this.openChangeEmailDialog(true),
         onOpenCreateAccountDialog: () => this.openCreateAccountDialog(true),
+        onOpenCreateAccountWithPurchaseClaimDialog: (
+          claimedProductOptions: ClaimedProductOptions
+        ) =>
+          this.openCreateAccountWithPurchaseClaimDialog(
+            true,
+            claimedProductOptions
+          ),
+        onOpenPurchaseClaimDialog: (
+          claimedProductOptions: ClaimedProductOptions
+        ) => this.openPurchaseClaimDialog(claimedProductOptions),
         onRefreshUserProfile: this._fetchUserProfile,
         onRefreshFirebaseProfile: async () => {
           await this._reloadFirebaseProfile();
@@ -219,6 +245,8 @@ export default class AuthenticatedUserProvider extends React.Component<
         onRefreshLimits: this._fetchUserLimits,
         onRefreshGameTemplatePurchases: this._fetchUserGameTemplatePurchases,
         onRefreshAssetPackPurchases: this._fetchUserAssetPackPurchases,
+        onRefreshCoursePurchases: this._fetchUserCoursePurchases,
+        onRefreshBundlePurchases: this._fetchUserBundlePurchases,
         onRefreshEarningsBalance: this._fetchEarningsBalance,
         onRefreshNotifications: this._fetchUserNotifications,
         onPurchaseSuccessful: this._fetchUserProducts,
@@ -528,6 +556,20 @@ export default class AuthenticatedUserProvider extends React.Component<
         console.error('Error while loading received game templates:', error);
       }
     );
+    listReceivedBundles(authentication.getAuthorizationHeader, {
+      userId: firebaseUser.uid,
+    }).then(
+      receivedBundles =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            receivedBundles,
+          },
+        })),
+      error => {
+        console.error('Error while loading received bundles:', error);
+      }
+    );
     listUserPurchases(authentication.getAuthorizationHeader, {
       userId: firebaseUser.uid,
       productType: 'game-template',
@@ -560,6 +602,38 @@ export default class AuthenticatedUserProvider extends React.Component<
         console.error('Error while loading asset pack purchases:', error);
       }
     );
+    listUserPurchases(authentication.getAuthorizationHeader, {
+      userId: firebaseUser.uid,
+      productType: 'course',
+      role: 'receiver',
+    }).then(
+      coursePurchases =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            coursePurchases,
+          },
+        })),
+      error => {
+        console.error('Error while loading course purchases:', error);
+      }
+    );
+    listUserPurchases(authentication.getAuthorizationHeader, {
+      userId: firebaseUser.uid,
+      productType: 'bundle',
+      role: 'receiver',
+    }).then(
+      bundlePurchases =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            bundlePurchases,
+          },
+        })),
+      error => {
+        console.error('Error while loading bundle purchases:', error);
+      }
+    );
     this._fetchUserBadges();
     this._fetchAchievements();
     this._fetchUserNotifications();
@@ -573,10 +647,11 @@ export default class AuthenticatedUserProvider extends React.Component<
     if (!userProfile.isCreator) {
       // If the user is not a creator, then update the profile to say they now are.
       try {
-        await authentication.editUserProfile(
-          authentication.getAuthorizationHeader,
-          { isCreator: true }
-        );
+        await editUser(authentication.getAuthorizationHeader, {
+          editedUserId: userProfile.id,
+          userId: userProfile.id,
+          changes: { isCreator: true },
+        });
       } catch (error) {
         // Catch the error so that the user profile is still fetched.
         console.error('Error while updating the user profile:', error);
@@ -797,6 +872,30 @@ export default class AuthenticatedUserProvider extends React.Component<
     }
   };
 
+  _fetchUserBundles = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
+
+    try {
+      const receivedBundles = await listReceivedBundles(
+        authentication.getAuthorizationHeader,
+        {
+          userId: firebaseUser.uid,
+        }
+      );
+
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          receivedBundles,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading received bundles:', error);
+    }
+  };
+
   _fetchUserGameTemplatePurchases = async () => {
     const { authentication } = this.props;
     const firebaseUser = this.state.authenticatedUser.firebaseUser;
@@ -849,11 +948,64 @@ export default class AuthenticatedUserProvider extends React.Component<
     }
   };
 
+  _fetchUserCoursePurchases = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
+
+    try {
+      const coursePurchases = await listUserPurchases(
+        authentication.getAuthorizationHeader,
+        {
+          userId: firebaseUser.uid,
+          productType: 'course',
+          role: 'receiver',
+        }
+      );
+
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          coursePurchases,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading course purchases:', error);
+    }
+  };
+
+  _fetchUserBundlePurchases = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
+
+    try {
+      const bundlePurchases = await listUserPurchases(
+        authentication.getAuthorizationHeader,
+        {
+          userId: firebaseUser.uid,
+          productType: 'bundle',
+          role: 'receiver',
+        }
+      );
+
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          bundlePurchases,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading bundle purchases:', error);
+    }
+  };
+
   _fetchUserProducts = async () => {
     await Promise.all([
       this._fetchUserAssetPacks(),
       this._fetchUserAssetShortHeaders(),
       this._fetchUserGameTemplates(),
+      this._fetchUserBundles(),
     ]);
   };
 
@@ -1004,7 +1156,15 @@ export default class AuthenticatedUserProvider extends React.Component<
       });
       await this._fetchUserProfileWithoutThrowingErrors({ resetState: true });
       this.openLoginDialog(false);
+      this.openLoginWithPurchaseClaimDialog(
+        false,
+        this.state.claimedProductOptions
+      );
       this.openCreateAccountDialog(false);
+      this.openCreateAccountWithPurchaseClaimDialog(
+        false,
+        this.state.claimedProductOptions
+      );
       this._showLoginSnackbar(this.state.authenticatedUser);
     } catch (apiCallError) {
       if (apiCallError.name !== userCancellationErrorName) {
@@ -1059,6 +1219,10 @@ export default class AuthenticatedUserProvider extends React.Component<
       await authentication.login(form);
       await this._fetchUserProfileWithoutThrowingErrors({ resetState: true });
       this.openLoginDialog(false);
+      this.openLoginWithPurchaseClaimDialog(
+        false,
+        this.state.claimedProductOptions
+      );
       this._showLoginSnackbar(this.state.authenticatedUser);
     } catch (apiCallError) {
       this.setState({
@@ -1080,11 +1244,13 @@ export default class AuthenticatedUserProvider extends React.Component<
   };
 
   _doEdit = async (
-    payload: PatchUserPayload,
+    payload: EditUserChanges,
     preferences: PreferencesValues
   ) => {
     const { authentication } = this.props;
     if (!authentication) return;
+    const { profile } = this.state.authenticatedUser;
+    if (!profile) return;
 
     this.setState({
       editInProgress: true,
@@ -1092,9 +1258,10 @@ export default class AuthenticatedUserProvider extends React.Component<
     });
     this._automaticallyUpdateUserProfile = false;
     try {
-      await authentication.editUserProfile(
-        authentication.getAuthorizationHeader,
-        {
+      await editUser(authentication.getAuthorizationHeader, {
+        editedUserId: profile.id,
+        userId: profile.id,
+        changes: {
           username: payload.username,
           description: payload.description,
           getGameStatsEmail: payload.getGameStatsEmail,
@@ -1105,8 +1272,8 @@ export default class AuthenticatedUserProvider extends React.Component<
           githubUsername: payload.githubUsername,
           communityLinks: payload.communityLinks,
           survey: payload.survey,
-        }
-      );
+        },
+      });
       await this._fetchUserProfileWithoutThrowingErrors();
     } catch (apiCallError) {
       this.setState({ apiCallError });
@@ -1158,6 +1325,10 @@ export default class AuthenticatedUserProvider extends React.Component<
         resetState: true,
       });
       this.openCreateAccountDialog(false);
+      this.openCreateAccountWithPurchaseClaimDialog(
+        false,
+        this.state.claimedProductOptions
+      );
       sendSignupDone(form.email);
       const firebaseUser = this.state.authenticatedUser.firebaseUser;
       aliasUserForAnalyticsAfterSignUp(firebaseUser);
@@ -1321,6 +1492,18 @@ export default class AuthenticatedUserProvider extends React.Component<
     });
   };
 
+  openLoginWithPurchaseClaimDialog = (
+    open: boolean = true,
+    claimedProductOptions: ?ClaimedProductOptions = null
+  ) => {
+    this.setState({
+      loginWithPurchaseClaimDialogOpen: open,
+      createAccountWithPurchaseClaimDialogOpen: false,
+      apiCallError: null,
+      claimedProductOptions,
+    });
+  };
+
   showUserSnackbar = ({ message }: {| message: ?React.Node |}) => {
     this.setState({
       // The message is wrapped here to prevent crashes when Google Translate
@@ -1341,6 +1524,26 @@ export default class AuthenticatedUserProvider extends React.Component<
       loginDialogOpen: false,
       createAccountDialogOpen: open,
       apiCallError: null,
+    });
+  };
+
+  openCreateAccountWithPurchaseClaimDialog = (
+    open: boolean = true,
+    claimedProductOptions: ?ClaimedProductOptions = null
+  ) => {
+    this.setState({
+      loginWithPurchaseClaimDialogOpen: false,
+      createAccountWithPurchaseClaimDialogOpen: open,
+      apiCallError: null,
+      claimedProductOptions,
+    });
+  };
+
+  openPurchaseClaimDialog = (
+    claimedProductOptions: ?ClaimedProductOptions = null
+  ) => {
+    this.setState({
+      claimedProductOptions,
     });
   };
 
@@ -1483,13 +1686,33 @@ export default class AuthenticatedUserProvider extends React.Component<
             }}
             onGoToCreateAccount={() => this.openCreateAccountDialog(true)}
             onLogin={this._doLogin}
-            onLogout={this._doLogout}
             onLoginWithProvider={this._doLoginWithProvider}
             loginInProgress={this.state.loginInProgress}
             error={this.state.apiCallError}
             onForgotPassword={this._doForgotPassword}
           />
         )}
+        {this.state.loginWithPurchaseClaimDialogOpen &&
+          this.state.claimedProductOptions && (
+            <LoginWithPurchaseClaimDialog
+              onClose={() => {
+                this._cancelLoginOrSignUp();
+                this.openLoginWithPurchaseClaimDialog(false);
+              }}
+              onGoToCreateAccount={() =>
+                this.openCreateAccountWithPurchaseClaimDialog(
+                  true,
+                  this.state.claimedProductOptions
+                )
+              }
+              onLogin={this._doLogin}
+              onLoginWithProvider={this._doLoginWithProvider}
+              loginInProgress={this.state.loginInProgress}
+              error={this.state.apiCallError}
+              onForgotPassword={this._doForgotPassword}
+              claimedProductOptions={this.state.claimedProductOptions}
+            />
+          )}
         {this.state.authenticatedUser.profile &&
           this.state.editProfileDialogOpen && (
             <EditProfileDialog
@@ -1499,9 +1722,9 @@ export default class AuthenticatedUserProvider extends React.Component<
               badges={this.state.authenticatedUser.badges}
               subscription={this.state.authenticatedUser.subscription}
               onClose={() => this.openEditProfileDialog(false)}
-              onEdit={async form => {
+              onEdit={async changes => {
                 try {
-                  await this._doEdit(form, this.props.preferencesValues);
+                  await this._doEdit(changes, this.props.preferencesValues);
                   this.openEditProfileDialog(false);
                 } catch (error) {
                   // Ignore errors, we will let the user retry in their profile.
@@ -1563,6 +1786,28 @@ export default class AuthenticatedUserProvider extends React.Component<
             error={this.state.apiCallError}
           />
         )}
+        {this.state.createAccountWithPurchaseClaimDialogOpen &&
+          this.state.claimedProductOptions && (
+            <CreateAccountWithPurchaseClaimDialog
+              onClose={() => {
+                this._cancelLoginOrSignUp();
+                this.openCreateAccountWithPurchaseClaimDialog(false);
+              }}
+              onGoToLogin={() =>
+                this.openLoginWithPurchaseClaimDialog(
+                  true,
+                  this.state.claimedProductOptions
+                )
+              }
+              onCreateAccount={form =>
+                this._doCreateAccount(form, this.props.preferencesValues)
+              }
+              onLoginWithProvider={this._doLoginWithProvider}
+              createAccountInProgress={this.state.createAccountInProgress}
+              error={this.state.apiCallError}
+              claimedProductOptions={this.state.claimedProductOptions}
+            />
+          )}
         {this.state.emailVerificationDialogOpen && (
           <EmailVerificationDialog
             authenticatedUser={this.state.authenticatedUser}
@@ -1578,6 +1823,12 @@ export default class AuthenticatedUserProvider extends React.Component<
             }}
             {...this.state.emailVerificationDialogProps}
             onSendEmail={this._doSendEmailVerification}
+          />
+        )}
+        {this.state.claimedProductOptions && (
+          <PurchaseClaimDialog
+            claimedProductOptions={this.state.claimedProductOptions}
+            onClose={() => this.openPurchaseClaimDialog(null)}
           />
         )}
         <Snackbar

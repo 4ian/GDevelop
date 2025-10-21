@@ -18,6 +18,8 @@ KeyboardExtension::KeyboardExtension() {
       "gdjs.evtTools.input.wasKeyReleased");
   GetAllConditions()["KeyFromTextPressed"].SetFunctionName(
       "gdjs.evtTools.input.isKeyPressed");
+  GetAllConditions()["KeyFromTextJustPressed"].SetFunctionName(
+      "gdjs.evtTools.input.wasKeyJustPressed");
   GetAllConditions()["KeyFromTextReleased"].SetFunctionName(
       "gdjs.evtTools.input.wasKeyReleased");
   GetAllConditions()["AnyKeyPressed"].SetFunctionName(

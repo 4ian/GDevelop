@@ -704,6 +704,16 @@ class GD_CORE_API WholeProjectRefactorer {
   static size_t GetLayoutAndExternalLayoutLayerInstancesCount(
       gd::Project &project, gd::Layout &layout, const gd::String &layerName);
 
+  /**
+   * This ensures that the scenes had an instance of shared data for
+   * every behavior of every object that can be used on the scene
+   * (i.e. the objects of the scene and the global objects)
+   *
+   * Must be called when a behavior have been added/deleted
+   * from a global object or an object has been made global.
+   */
+  static void UpdateBehaviorsSharedData(gd::Project &project);
+
   virtual ~WholeProjectRefactorer(){};
 
  private:

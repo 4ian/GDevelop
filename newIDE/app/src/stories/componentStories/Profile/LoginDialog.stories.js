@@ -14,7 +14,6 @@ const defaultProps = {
   onClose: action('onClose'),
   onForgotPassword: action('onForgotPassword'),
   onLogin: action('onLogin'),
-  onLogout: action('onLogout'),
   onLoginWithProvider: action('onLoginWithProvider'),
   onGoToCreateAccount: action('onGoToCreateAccount'),
   loginInProgress: false,

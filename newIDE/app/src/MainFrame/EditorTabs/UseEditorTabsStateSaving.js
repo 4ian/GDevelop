@@ -23,6 +23,9 @@ type Props = {|
     name: string,
     dontFocusTab?: boolean,
     project?: ?gdProject,
+    paneIdentifier?: 'left' | 'center' | 'right' | null,
+    mode?: 'chat' | 'agent',
+    aiRequestId?: string | null,
   |}) => EditorOpeningOptions,
 |};
 
@@ -48,7 +51,17 @@ const projectHasItem = ({
     case 'external events':
       return project.hasExternalEventsNamed(name);
     case 'custom object':
-      return project.hasEventsBasedObject(name);
+      const nameElements = name.split('::');
+      const objectType = nameElements[0] + '::' + nameElements[1];
+      const variantName = nameElements[2];
+      return (
+        project.hasEventsBasedObject(objectType) &&
+        (!variantName ||
+          project
+            .getEventsBasedObject(objectType)
+            .getVariants()
+            .getVariant(variantName))
+      );
     default:
       return false;
   }
@@ -66,11 +79,12 @@ const useEditorTabsStateSaving = ({
   } = React.useContext(PreferencesContext);
   const saveEditorState = React.useCallback(
     () => {
+      // TODO: adapt for saving multiple panes.
       // Do not save the state if the user is on the start page
-      if (!currentProjectId || editorTabs.currentTab === 0) return;
+      if (!currentProjectId || editorTabs.panes.center.currentTab === 0) return;
       const editorState = {
-        currentTab: editorTabs.currentTab,
-        editors: editorTabs.editors
+        currentTab: editorTabs.panes.center.currentTab,
+        editors: editorTabs.panes.center.editors
           .filter(editor => editor.key !== 'start page')
           .map(getEditorTabMetadata),
       };
@@ -164,9 +178,10 @@ const useEditorTabsStateSaving = ({
       }
       newEditorTabs = changeCurrentTab(
         newEditorTabs,
+        'center',
         shouldOpenSavedCurrentTab
           ? editorState.editorTabs.currentTab
-          : newEditorTabs.editors.length >= 1
+          : newEditorTabs.panes.center.editors.length >= 1
           ? 1
           : 0
       );

@@ -61,9 +61,9 @@ module.exports = {
         .getOrCreate('align')
         .setValue(objectContent.align)
         .setType('choice')
-        .addExtraInfo('left')
-        .addExtraInfo('center')
-        .addExtraInfo('right')
+        .addChoice('left', _('Left'))
+        .addChoice('center', _('Center'))
+        .addChoice('right', _('Right'))
         .setLabel(_('Alignment'))
         .setGroup(_('Appearance'));
 
@@ -74,9 +74,9 @@ module.exports = {
         .getOrCreate('verticalTextAlignment')
         .setValue(objectContent.verticalTextAlignment)
         .setType('choice')
-        .addExtraInfo('top')
-        .addExtraInfo('center')
-        .addExtraInfo('bottom')
+        .addChoice('top', _('Top'))
+        .addChoice('center', _('Center'))
+        .addChoice('bottom', _('Bottom'))
         .setLabel(_('Vertical alignment'))
         .setGroup(_('Appearance'));
 
@@ -630,14 +630,16 @@ module.exports = {
         instance,
         associatedObjectConfiguration,
         pixiContainer,
-        pixiResourcesLoader
+        pixiResourcesLoader,
+        getPropertyOverridings
       ) {
         super(
           project,
           instance,
           associatedObjectConfiguration,
           pixiContainer,
-          pixiResourcesLoader
+          pixiResourcesLoader,
+          getPropertyOverridings
         );
 
         // We'll track changes of the font to trigger the loading of the new font.
@@ -663,8 +665,11 @@ module.exports = {
 
         // Update the rendered text properties (note: Pixi is only
         // applying changes if there were changed).
-        const rawText = object.content.text;
-        this._pixiObject.text = rawText;
+        const propertyOverridings = this.getPropertyOverridings();
+        this._pixiObject.text =
+          propertyOverridings && propertyOverridings.has('Text')
+            ? propertyOverridings.get('Text')
+            : object.content.text;
 
         const align = object.content.align;
         this._pixiObject.align = align;
@@ -718,7 +723,7 @@ module.exports = {
           this._pixiObject.dirty = true;
         }
 
-        if (this._instance.hasCustomSize()) {
+        if (this._instance.hasCustomSize() && this.getDefaultWidth() !== 0) {
           const alignmentX =
             object.content.align === 'right'
               ? 1
@@ -727,17 +732,16 @@ module.exports = {
                 : 0;
 
           const width = this.getCustomWidth();
+          const renderedWidth = this.getDefaultWidth();
 
           // A vector from the custom size center to the renderer center.
-          const centerToCenterX =
-            (width - this._pixiObject.width) * (alignmentX - 0.5);
+          const centerToCenterX = (width - renderedWidth) * (alignmentX - 0.5);
 
           this._pixiObject.position.x = this._instance.getX() + width / 2;
-          this._pixiObject.anchor.x =
-            0.5 - centerToCenterX / this._pixiObject.width;
+          this._pixiObject.anchor.x = 0.5 - centerToCenterX / renderedWidth;
         } else {
           this._pixiObject.position.x =
-            this._instance.getX() + this._pixiObject.width / 2;
+            this._instance.getX() + this.getDefaultWidth() / 2;
           this._pixiObject.anchor.x = 0.5;
         }
         const alignmentY =
@@ -747,7 +751,7 @@ module.exports = {
               ? 0.5
               : 0;
         this._pixiObject.position.y =
-          this._instance.getY() + this._pixiObject.height * (0.5 - alignmentY);
+          this._instance.getY() + this.getDefaultHeight() * (0.5 - alignmentY);
         this._pixiObject.anchor.y = 0.5;
 
         this._pixiObject.rotation = RenderedInstance.toRad(
@@ -771,11 +775,11 @@ module.exports = {
       }
 
       getDefaultWidth() {
-        return this._pixiObject.width;
+        return this._pixiObject.textWidth * this._pixiObject.scale.x;
       }
 
       getDefaultHeight() {
-        return this._pixiObject.height;
+        return this._pixiObject.textHeight * this._pixiObject.scale.y;
       }
 
       getOriginY() {

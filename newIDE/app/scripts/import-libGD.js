@@ -63,6 +63,19 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
       var hash = (hashShellString.stdout || 'unknown-hash').trim();
       var branch = (branchShellString.stdout || 'unknown-branch').trim();
 
+      if (branch === 'HEAD') {
+        // We're in detached HEAD. Try to read the branch from the CI environment variables.
+        if (process.env.APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH) {
+          branch = process.env.APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH;
+        } else if (process.env.APPVEYOR_REPO_BRANCH) {
+          branch = process.env.APPVEYOR_REPO_BRANCH;
+        } else {
+          shell.echo(
+            `⚠️ Can't find the branch of the associated commit - if you're in detached HEAD, you need to be on a branch instead.`
+          );
+        }
+      }
+
       resolve(
         downloadLibGdJs(
           `https://s3.amazonaws.com/gdevelop-gdevelop.js/${branch}/commit/${hash}`
@@ -129,7 +142,20 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
 
   // Try to download the latest libGD.js, fallback to previous or master ones
   // if not found (including different parents, for handling of merge commits).
-  downloadCommitLibGdJs('HEAD').then(onLibGdJsDownloaded, () =>
+  downloadCommitLibGdJs('HEAD').then(onLibGdJsDownloaded, () => {
+    // Force the exact version of GDevelop.js to be downloaded for AppVeyor - because
+    // this means we build the app and we don't want to risk mismatch (Core C++ not up to date
+    // with the IDE JavaScript).
+    if (process.env.APPVEYOR || process.env.REQUIRES_EXACT_LIBGD_JS_VERSION) {
+      shell.echo(
+        `❌ Can't download the exact required version of libGD.js - check it was built by CircleCI before running this CI.`
+      );
+      shell.echo(
+        `ℹ️ See the pipeline on https://app.circleci.com/pipelines/github/4ian/GDevelop.`
+      );
+      shell.exit(1);
+    }
+
     downloadCommitLibGdJs('HEAD~1').then(onLibGdJsDownloaded, () =>
       downloadCommitLibGdJs('HEAD~2').then(onLibGdJsDownloaded, () =>
         downloadCommitLibGdJs('HEAD~3').then(onLibGdJsDownloaded, () =>
@@ -150,6 +176,6 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
           })
         )
       )
-    )
-  );
+    );
+  });
 }

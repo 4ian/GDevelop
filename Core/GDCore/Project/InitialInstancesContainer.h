@@ -92,7 +92,7 @@ class GD_CORE_API InitialInstancesContainer {
    * \see InitialInstanceFunctor
    */
   void IterateOverInstances(
-    const std::function< void(gd::InitialInstance &) >& func);
+    const std::function< bool(gd::InitialInstance &) >& func);
 
   /**
    * Get the instances on the specified layer,

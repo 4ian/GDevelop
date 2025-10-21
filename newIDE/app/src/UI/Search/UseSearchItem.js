@@ -12,6 +12,7 @@ import {
 import {
   type PrivateAssetPackListingData,
   type PrivateGameTemplateListingData,
+  type BundleListingData,
 } from '../../Utils/GDevelopServices/Shop';
 
 type SearchableItem =
@@ -20,7 +21,8 @@ type SearchableItem =
   | ResourceV2
   | Resource
   | PrivateAssetPackListingData
-  | PrivateGameTemplateListingData;
+  | PrivateGameTemplateListingData
+  | BundleListingData;
 
 export interface SearchFilter<SearchItem> {
   getPertinence(searchItem: SearchItem): number;

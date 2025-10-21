@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import { type StorageProvider, type SaveAsLocation } from '../ProjectsStorage';
 import Add from '../UI/CustomSvgIcons/Add';
 import Text from '../UI/Text';
 import { Trans } from '@lingui/macro';
@@ -18,13 +17,13 @@ import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 import classes from './EmptyAndStartingPointProjects.module.css';
 import { getItemsColumns } from './NewProjectSetupDialog';
 
+const ITEMS_SPACING = 5;
 const getStyles = (theme: GDevelopTheme) => ({
   grid: {
-    margin: 0,
+    width: `calc(100% + ${2 * ITEMS_SPACING}px)`, // This is needed to compensate for the `margin: -5px` added by MUI related to spacing.
     // Remove the scroll capability of the grid, the scroll view handles it.
     overflow: 'unset',
   },
-  cellSpacing: 2,
 });
 
 type EmptyProjectTileProps = {|
@@ -103,16 +102,12 @@ type Props = {|
   onSelectEmptyProject: () => void,
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
   disabled?: boolean,
-  storageProvider: StorageProvider,
-  saveAsLocation: ?SaveAsLocation,
 |};
 
 const EmptyAndStartingPointProjects = ({
   onSelectExampleShortHeader,
   onSelectEmptyProject,
   disabled,
-  storageProvider,
-  saveAsLocation,
 }: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getStyles(gdevelopTheme);
@@ -135,7 +130,7 @@ const EmptyAndStartingPointProjects = ({
           cols={columnsCount}
           style={styles.grid}
           cellHeight="auto"
-          spacing={styles.cellSpacing}
+          spacing={ITEMS_SPACING * 2}
         >
           <EmptyProjectTile
             onSelectEmptyProject={onSelectEmptyProject}

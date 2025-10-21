@@ -163,12 +163,21 @@ const sendSoftKeyboardOffsetToFrame = async (offset: number) => {
   }
 };
 
+export type IframePosition = {|
+  isMobile: boolean,
+  top: number,
+  left: number,
+  width: number,
+  height: number,
+|};
+
 export type GamesPlatformFrameTools = {|
   startTimeoutToUnloadIframe: () => void,
   loadIframeOrRemoveTimeout: () => void,
   iframeLoaded: boolean,
   iframeVisible: boolean,
   iframeErrored: boolean,
+  updateIframePosition: (position: IframePosition) => void,
   renderGamesPlatformFrame: () => React.Node,
 |};
 
@@ -185,6 +194,9 @@ const useGamesPlatformFrame = ({
   const [iframeVisible, setIframeVisible] = React.useState(false);
   const [iframeLoaded, setIframeLoaded] = React.useState(false);
   const [iframeErrored, setIframeErrored] = React.useState(false);
+  const [iframePosition, setIframePosition] = React.useState<?IframePosition>(
+    null
+  );
   const [lastGameId, setLastGameId] = React.useState<?string>(null);
   const timeoutToUnloadIframe = React.useRef<?TimeoutID>(null);
   const { openUserPublicProfile } = React.useContext(PublicProfileContext);
@@ -504,9 +516,26 @@ const useGamesPlatformFrame = ({
         initialGameId={lastGameId}
         loaded={loadIframeInDOM}
         visible={iframeVisible}
+        iframePosition={iframePosition}
       />
     ),
-    [lastGameId, loadIframeInDOM, iframeVisible]
+    [lastGameId, loadIframeInDOM, iframeVisible, iframePosition]
+  );
+
+  const updateIframePosition = React.useCallback(
+    (position: IframePosition) => {
+      if (
+        !iframePosition ||
+        iframePosition.isMobile !== position.isMobile ||
+        iframePosition.top !== position.top ||
+        iframePosition.left !== position.left ||
+        iframePosition.width !== position.width ||
+        iframePosition.height !== position.height
+      ) {
+        setIframePosition(position);
+      }
+    },
+    [setIframePosition, iframePosition]
   );
 
   const gamesPlatformFrameTools = React.useMemo(
@@ -516,6 +545,7 @@ const useGamesPlatformFrame = ({
       iframeLoaded,
       iframeVisible,
       iframeErrored,
+      updateIframePosition,
       renderGamesPlatformFrame,
     }),
     [
@@ -524,6 +554,7 @@ const useGamesPlatformFrame = ({
       iframeLoaded,
       iframeVisible,
       iframeErrored,
+      updateIframePosition,
       renderGamesPlatformFrame,
     ]
   );

@@ -37,6 +37,7 @@ namespace gdjs {
     private _angleOffset: float;
     private _ignoreDefaultControls: boolean;
     private _movementAngleOffset: float;
+    private _useLegacyTurnBack: boolean;
 
     /** The latest angle of movement, in degrees. */
     private _angle: float = 0;
@@ -62,7 +63,7 @@ namespace gdjs {
     // This is useful when the object is synchronized by an external source
     // like in a multiplayer game, and we want to be able to predict the
     // movement of the object, even if the inputs are not updated every frame.
-    _dontClearInputsBetweenFrames: boolean = false;
+    private _clearInputsBetweenFrames: boolean = true;
     // This is useful when the object is synchronized over the network,
     // object is controlled by the network and we want to ensure the current player
     // cannot control it.
@@ -102,16 +103,22 @@ namespace gdjs {
         behaviorData.customIsometryAngle
       );
       this._movementAngleOffset = behaviorData.movementAngleOffset || 0;
+      this._useLegacyTurnBack =
+        behaviorData.useLegacyTurnBack === undefined
+          ? true
+          : behaviorData.useLegacyTurnBack;
     }
 
-    getNetworkSyncData(): TopDownMovementNetworkSyncData {
+    getNetworkSyncData(
+      options: GetNetworkSyncDataOptions
+    ): TopDownMovementNetworkSyncData {
       // This method is called, so we are synchronizing this object.
       // Let's clear the inputs between frames as we control it.
-      this._dontClearInputsBetweenFrames = false;
+      this._clearInputsBetweenFrames = true;
       this._ignoreDefaultControlsAsSyncedByNetwork = false;
 
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(options),
         props: {
           a: this._angle,
           xv: this._xVelocity,
@@ -129,9 +136,10 @@ namespace gdjs {
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: TopDownMovementNetworkSyncData
+      networkSyncData: TopDownMovementNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       const behaviorSpecificProps = networkSyncData.props;
       if (behaviorSpecificProps.a !== undefined) {
@@ -168,10 +176,10 @@ namespace gdjs {
         this._stickForce = behaviorSpecificProps.sf;
       }
 
-      // When the object is synchronized from the network, the inputs must not be cleared.
-      this._dontClearInputsBetweenFrames = true;
-      // And we are not using the default controls.
-      this._ignoreDefaultControlsAsSyncedByNetwork = true;
+      // Clear user inputs between frames only if requested.
+      this._clearInputsBetweenFrames = !!options.clearInputs;
+      // And ignore default controls if not asked otherwise.
+      this._ignoreDefaultControlsAsSyncedByNetwork = !options.keepControl;
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
@@ -303,9 +311,7 @@ namespace gdjs {
     }
 
     getSpeed(): float {
-      return Math.sqrt(
-        this._xVelocity * this._xVelocity + this._yVelocity * this._yVelocity
-      );
+      return Math.hypot(this._xVelocity, this._yVelocity);
     }
 
     getXVelocity(): float {
@@ -468,74 +474,68 @@ namespace gdjs {
       // variables without assigning them a value.
       let directionInRad = 0;
       let directionInDeg = 0;
-      let cos = 1;
-      let sin = 0;
 
+      let isMoving = false;
+      let targetedSpeed = 0;
       // Update the speed of the object:
       if (direction !== -1) {
+        isMoving = true;
         directionInRad =
           ((direction + this._movementAngleOffset / 45) * Math.PI) / 4.0;
         directionInDeg = direction * 45 + this._movementAngleOffset;
-        // This makes the trigo resilient to rounding errors on directionInRad.
-        cos = Math.cos(directionInRad);
-        sin = Math.sin(directionInRad);
-        if (cos === -1 || cos === 1) {
-          sin = 0;
-        }
-        if (sin === -1 || sin === 1) {
-          cos = 0;
-        }
-        this._xVelocity += this._acceleration * timeDelta * cos;
-        this._yVelocity += this._acceleration * timeDelta * sin;
+        targetedSpeed = this._maxSpeed;
       } else if (this._stickForce !== 0) {
+        isMoving = true;
         if (!this._allowDiagonals) {
           this._stickAngle = 90 * Math.floor((this._stickAngle + 45) / 90);
         }
         directionInDeg = this._stickAngle + this._movementAngleOffset;
         directionInRad = (directionInDeg * Math.PI) / 180;
-        const norm = this._acceleration * timeDelta * this._stickForce;
-        // This makes the trigo resilient to rounding errors on directionInRad.
-        cos = Math.cos(directionInRad);
-        sin = Math.sin(directionInRad);
-        if (cos === -1 || cos === 1) {
-          sin = 0;
-        }
-        if (sin === -1 || sin === 1) {
-          cos = 0;
-        }
-        this._xVelocity += norm * cos;
-        this._yVelocity += norm * sin;
+        targetedSpeed = this._maxSpeed * this._stickForce;
 
         this._wasStickUsed = true;
-        this._stickForce = 0;
       } else if (this._yVelocity !== 0 || this._xVelocity !== 0) {
+        isMoving = true;
         directionInRad = Math.atan2(this._yVelocity, this._xVelocity);
         directionInDeg = (directionInRad * 180.0) / Math.PI;
-        const xVelocityWasPositive = this._xVelocity >= 0;
-        const yVelocityWasPositive = this._yVelocity >= 0;
+      }
+      if (isMoving) {
         // This makes the trigo resilient to rounding errors on directionInRad.
-        cos = Math.cos(directionInRad);
-        sin = Math.sin(directionInRad);
+        let cos = Math.cos(directionInRad);
+        let sin = Math.sin(directionInRad);
         if (cos === -1 || cos === 1) {
           sin = 0;
         }
         if (sin === -1 || sin === 1) {
           cos = 0;
         }
-        this._xVelocity -= this._deceleration * timeDelta * cos;
-        this._yVelocity -= this._deceleration * timeDelta * sin;
-        if (this._xVelocity > 0 !== xVelocityWasPositive) {
-          this._xVelocity = 0;
+
+        let currentSpeed = Math.hypot(this._xVelocity, this._yVelocity);
+        const dotProduct = this._xVelocity * cos + this._yVelocity * sin;
+        if (dotProduct < 0) {
+          // The object is turning back.
+          // Keep the negative velocity projected on the new direction.
+          currentSpeed = dotProduct;
         }
-        if (this._yVelocity > 0 !== yVelocityWasPositive) {
-          this._yVelocity = 0;
-        }
+        const speed = TopDownMovementRuntimeBehavior.getAcceleratedSpeed(
+          currentSpeed,
+          targetedSpeed,
+          this._maxSpeed,
+          this._acceleration,
+          this._deceleration,
+          timeDelta,
+          this._useLegacyTurnBack
+        );
+        this._xVelocity = speed * cos;
+        this._yVelocity = speed * sin;
       }
+
       const squaredSpeed =
         this._xVelocity * this._xVelocity + this._yVelocity * this._yVelocity;
       if (squaredSpeed > this._maxSpeed * this._maxSpeed) {
-        this._xVelocity = this._maxSpeed * cos;
-        this._yVelocity = this._maxSpeed * sin;
+        const ratio = this._maxSpeed / Math.sqrt(squaredSpeed);
+        this._xVelocity *= ratio;
+        this._yVelocity *= ratio;
       }
 
       // No acceleration for angular speed for now.
@@ -584,12 +584,75 @@ namespace gdjs {
       this._wasRightKeyPressed = this._rightKey;
       this._wasUpKeyPressed = this._upKey;
       this._wasDownKeyPressed = this._downKey;
-      if (!this._dontClearInputsBetweenFrames) {
+      if (this._clearInputsBetweenFrames) {
         this._leftKey = false;
         this._rightKey = false;
         this._upKey = false;
         this._downKey = false;
+        this._stickForce = 0;
       }
+    }
+
+    private static getAcceleratedSpeed(
+      currentSpeed: float,
+      targetedSpeed: float,
+      speedMax: float,
+      acceleration: float,
+      deceleration: float,
+      timeDelta: float,
+      useLegacyTurnBack: boolean = false
+    ): float {
+      let newSpeed = currentSpeed;
+      const turningBackAcceleration = useLegacyTurnBack
+        ? acceleration
+        : Math.max(acceleration, deceleration);
+      if (targetedSpeed < 0) {
+        if (currentSpeed <= targetedSpeed) {
+          // Reduce the speed to match the stick force.
+          newSpeed = Math.min(
+            targetedSpeed,
+            currentSpeed + turningBackAcceleration * timeDelta
+          );
+        } else if (currentSpeed <= 0) {
+          // Accelerate
+          newSpeed -= Math.max(-speedMax, acceleration * timeDelta);
+        } else {
+          // Turn back at least as fast as it would stop.
+          newSpeed = Math.max(
+            targetedSpeed,
+            currentSpeed - turningBackAcceleration * timeDelta
+          );
+        }
+      } else if (targetedSpeed > 0) {
+        if (currentSpeed >= targetedSpeed) {
+          // Reduce the speed to match the stick force.
+          newSpeed = Math.max(
+            targetedSpeed,
+            currentSpeed - turningBackAcceleration * timeDelta
+          );
+        } else if (currentSpeed >= 0) {
+          // Accelerate
+          newSpeed = Math.min(
+            speedMax,
+            currentSpeed + acceleration * timeDelta
+          );
+        } else {
+          // Turn back at least as fast as it would stop.
+          newSpeed = Math.min(
+            targetedSpeed,
+            currentSpeed + turningBackAcceleration * timeDelta
+          );
+        }
+      } else {
+        // Decelerate and stop.
+        if (currentSpeed < 0) {
+          newSpeed = Math.min(currentSpeed + deceleration * timeDelta, 0);
+        }
+        if (currentSpeed > 0) {
+          newSpeed = Math.max(currentSpeed - deceleration * timeDelta, 0);
+        }
+      }
+      return newSpeed;
     }
 
     simulateControl(input: string) {

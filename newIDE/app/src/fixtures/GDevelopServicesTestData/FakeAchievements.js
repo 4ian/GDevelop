@@ -342,4 +342,26 @@ export const fakeAchievements: Array<Achievement> = [
       en: "{user} follows GDevelop's account on X/Twitter",
     },
   },
+  {
+    name: 'GDevelop Master course graduate',
+    nameByLocale: {
+      en: 'GDevelop Master course graduate',
+    },
+    category: 'Course completed',
+    id: 'course-premium-course',
+    description: 'Congrats on finishing the GDevelop Master course!',
+    descriptionByLocale: {
+      en: 'Congrats on completing the GDevelop Master course!',
+    },
+    shortDescriptionByLocale: {
+      en: 'Complete the GDevelop Master course',
+    },
+    iconName: 'course-premium-course',
+    iconUrl:
+      'https://resources.gdevelop-app.com/badges/icons/course-premium-course.svg',
+    publicDescription: '{user} completed the GDevelop Master course',
+    publicDescriptionByLocale: {
+      en: '{user} completed the GDevelop Master course',
+    },
+  },
 ];

@@ -20,7 +20,7 @@ type YesNoCancelDialogChoice = 'yes' | 'no' | 'cancel';
  */
 export const POSITIONAL_ARGUMENTS_KEY = '_';
 
-let currentTitleBarColor: ?string = null;
+let currentWindowBackgroundColor: ?string = null;
 
 const onChangeCallbacks = new Set<() => void>();
 let debouncedGeometryChange = null;
@@ -94,8 +94,8 @@ export default class Window {
     }
   }
 
-  static setTitleBarColor(newColor: string) {
-    if (currentTitleBarColor === newColor) {
+  static setWindowBackgroundColor(newColor: string) {
+    if (currentWindowBackgroundColor === newColor) {
       // Avoid potentially expensive DOM query/modification if no changes needed.
       return;
     }
@@ -108,15 +108,25 @@ export default class Window {
           ? '#000000'
           : '#ffffff',
       });
-      currentTitleBarColor = newColor;
     }
 
     // Update the PWA titlebar/controls color (if it's an installed PWA).
     const metaElement = document.querySelector('meta[name="theme-color"]');
     if (metaElement) {
       metaElement.setAttribute('content', newColor);
-      currentTitleBarColor = newColor;
     }
+
+    // Update the window background color. Update both `body` and `html` elements
+    // to ensure the background color is visible when resized.
+    const body = document.body;
+    if (body) {
+      body.style.backgroundColor = newColor;
+    }
+    if (document.documentElement) {
+      document.documentElement.style.backgroundColor = newColor;
+    }
+
+    currentWindowBackgroundColor = newColor;
   }
 
   static setBounds(x: number, y: number, width: number, height: number) {
@@ -341,7 +351,14 @@ export default class Window {
     }
   }
 
-  static openExternalURL(url: string) {
+  static openExternalURL(
+    url: string,
+    {
+      shouldOpenInSameTabIfPossible,
+    }: {|
+      shouldOpenInSameTabIfPossible?: boolean,
+    |} = {}
+  ) {
     if (!url) return;
 
     if (electron) {
@@ -349,7 +366,7 @@ export default class Window {
       return;
     }
 
-    window.open(url, '_blank');
+    window.open(url, shouldOpenInSameTabIfPossible ? '_self' : '_blank');
   }
 
   static getOrientation(): 'portrait' | 'landscape' {

@@ -16,7 +16,8 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
       .SetExtensionInformation(
           "BuiltinStringInstructions",
           _("Text manipulation"),
-          "Provides expressions to manipulate strings (also called texts).",
+          "Provides expressions to manipulate strings (also called texts): new "
+          "line, upper/lowercase, substring, find, replace, etc...",
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
@@ -191,7 +192,8 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
                         "res/conditions/toujours24_black.png")
       .AddParameter("string", _("Text in which the replacement must be done"))
       .AddParameter("string", _("Text to find inside the first text"))
-      .AddParameter("string", _("Replacement to put instead of the text to find"));
+      .AddParameter("string",
+                    _("Replacement to put instead of the text to find"));
 
   extension
       .AddStrExpression("StrReplaceAll",
@@ -199,10 +201,11 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
                         _("Replace all occurrences of a text by another."),
                         "",
                         "res/conditions/toujours24_black.png")
-      .AddParameter("string", _("Text in which the replacement(s) must be done"))
+      .AddParameter("string",
+                    _("Text in which the replacement(s) must be done"))
       .AddParameter("string", _("Text to find inside the first text"))
-      .AddParameter("string", _("Replacement to put instead of the text to find"));
-
+      .AddParameter("string",
+                    _("Replacement to put instead of the text to find"));
 }
 
 }  // namespace gd

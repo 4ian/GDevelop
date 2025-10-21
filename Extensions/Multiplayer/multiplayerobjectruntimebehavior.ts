@@ -99,7 +99,7 @@ namespace gdjs {
           debugLogger.info(
             `Lobby game is running on a synced scene and object ${owner.getName()} has not been assigned a networkId after a short delay, destroying it.`
           );
-          owner.deleteFromScene(instanceContainer);
+          owner.deleteFromScene();
         }
       }, this._timeBeforeDestroyingObjectWithoutNetworkIdInMs);
     }
@@ -262,7 +262,7 @@ namespace gdjs {
         debugLogger.info(
           `Player number ${this.playerNumber} does not exist in the lobby at the moment. Destroying the object.`
         );
-        this.owner.deleteFromScene(this.owner.getInstanceContainer());
+        this.owner.deleteFromScene();
         return;
       }
 
@@ -278,7 +278,7 @@ namespace gdjs {
 
       const instanceNetworkId = this._getOrCreateInstanceNetworkId();
       const objectName = this.owner.getName();
-      const objectNetworkSyncData = this.owner.getNetworkSyncData();
+      const objectNetworkSyncData = this.owner.getNetworkSyncData({});
 
       // this._logToConsoleWithThrottle(
       //   `Synchronizing object ${this.owner.getName()} (instance ${
@@ -293,6 +293,8 @@ namespace gdjs {
           x: objectNetworkSyncData.x,
           y: objectNetworkSyncData.y,
           z: objectNetworkSyncData.z,
+          w: objectNetworkSyncData.w,
+          h: objectNetworkSyncData.h,
           zo: objectNetworkSyncData.zo,
           a: objectNetworkSyncData.a,
           hid: objectNetworkSyncData.hid,
@@ -369,6 +371,9 @@ namespace gdjs {
         this._lastSentBasicObjectSyncData = {
           x: objectNetworkSyncData.x,
           y: objectNetworkSyncData.y,
+          z: objectNetworkSyncData.z,
+          w: objectNetworkSyncData.w,
+          h: objectNetworkSyncData.h,
           zo: objectNetworkSyncData.zo,
           a: objectNetworkSyncData.a,
           hid: objectNetworkSyncData.hid,
@@ -443,7 +448,7 @@ namespace gdjs {
           objectOwner: this.playerNumber,
           objectName,
           instanceNetworkId,
-          objectNetworkSyncData: this.owner.getNetworkSyncData(),
+          objectNetworkSyncData: this.owner.getNetworkSyncData({}),
           sceneNetworkId,
         });
       this._sendDataToPeersWithIncreasedClock(
@@ -593,7 +598,7 @@ namespace gdjs {
         debugLogger.info(
           'Sending update message to move the object immediately.'
         );
-        const objectNetworkSyncData = this.owner.getNetworkSyncData();
+        const objectNetworkSyncData = this.owner.getNetworkSyncData({});
         const {
           messageName: updateMessageName,
           messageData: updateMessageData,

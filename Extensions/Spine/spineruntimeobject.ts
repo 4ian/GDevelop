@@ -14,8 +14,6 @@ namespace gdjs {
 
   export type SpineNetworkSyncDataType = {
     opa: float;
-    wid: float;
-    hei: float;
     scaX: float;
     scaY: float;
     flipX: boolean;
@@ -55,6 +53,8 @@ namespace gdjs {
 
     readonly spineResourceName: string;
 
+    static isHitBoxesUpdateDisabled = false;
+
     /**
      * @param instanceContainer The container the object belongs to.
      * @param objectData The object data used to initialize the object
@@ -75,6 +75,10 @@ namespace gdjs {
       );
       this.setAnimationIndex(0);
       this._renderer.updateAnimation(0);
+
+      if (SpineRuntimeObject.isHitBoxesUpdateDisabled) {
+        this.hitBoxes.length = 0;
+      }
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -113,12 +117,12 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): SpineNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): SpineNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         opa: this._opacity,
-        wid: this.getWidth(),
-        hei: this.getHeight(),
         scaX: this.getScaleX(),
         scaY: this.getScaleY(),
         flipX: this.isFlippedX(),
@@ -131,17 +135,14 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(syncData: SpineNetworkSyncData): void {
-      super.updateFromNetworkSyncData(syncData);
+    updateFromNetworkSyncData(
+      syncData: SpineNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
+    ): void {
+      super.updateFromNetworkSyncData(syncData, options);
 
       if (syncData.opa !== undefined && syncData.opa !== this._opacity) {
         this.setOpacity(syncData.opa);
-      }
-      if (syncData.wid !== undefined && syncData.wid !== this.getWidth()) {
-        this.setWidth(syncData.wid);
-      }
-      if (syncData.hei !== undefined && syncData.hei !== this.getHeight()) {
-        this.setHeight(syncData.hei);
       }
       if (syncData.scaX !== undefined && syncData.scaX !== this.getScaleX()) {
         this.setScaleX(syncData.scaX);
@@ -191,6 +192,14 @@ namespace gdjs {
       ) {
         this.setAnimationElapsedTime(syncData.anet);
       }
+    }
+
+    updateHitBoxes(): void {
+      if (SpineRuntimeObject.isHitBoxesUpdateDisabled) {
+        return;
+      }
+
+      super.updateHitBoxes();
     }
 
     extraInitializationFromInitialInstance(

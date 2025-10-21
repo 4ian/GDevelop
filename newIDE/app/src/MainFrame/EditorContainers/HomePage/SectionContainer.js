@@ -7,10 +7,11 @@ import ArrowLeft from '../../../UI/CustomSvgIcons/ArrowLeft';
 import TextButton from '../../../UI/TextButton';
 import { Trans } from '@lingui/macro';
 import Paper from '../../../UI/Paper';
-import { LineStackLayout } from '../../../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../../../UI/Layout';
 import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
 import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/AnnouncementsFeedContext';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
+import Chip from '../../../UI/Chip';
 
 export const SECTION_DESKTOP_SPACING = 20;
 const SECTION_MOBILE_SPACING_TOP = 10;
@@ -53,16 +54,18 @@ const styles = {
     minWidth: 0,
     flex: 1,
   },
+  chip: { height: 24 },
 };
 
 type Props = {|
   children: React.Node,
+  chipText?: React.Node,
   title?: React.Node,
   titleAdornment?: React.Node,
-  titleAction?: React.Node,
   subtitleText?: React.Node,
+  customPaperStyle?: Object,
   renderSubtitle?: () => React.Node,
-  backAction?: () => void,
+  backAction?: () => void | Promise<void>,
   flexBody?: boolean,
   renderFooter?: () => React.Node,
   noScroll?: boolean,
@@ -74,10 +77,11 @@ const SectionContainer = React.forwardRef<Props, HTMLDivElement>(
   (
     {
       children,
+      chipText,
       title,
       titleAdornment,
-      titleAction,
       subtitleText,
+      customPaperStyle,
       renderSubtitle,
       backAction,
       flexBody,
@@ -110,6 +114,7 @@ const SectionContainer = React.forwardRef<Props, HTMLDivElement>(
       display: flexBody ? 'flex' : 'block',
       ...containerStyle,
       ...scrollStyle,
+      ...customPaperStyle,
     };
     const childrenContainerStyle = {
       ...styles.childrenContainer,
@@ -153,14 +158,20 @@ const SectionContainer = React.forwardRef<Props, HTMLDivElement>(
                     alignItems="center"
                     justifyContent="space-between"
                   >
-                    <LineStackLayout noMargin alignItems="center">
-                      <Text size="bold-title" noMargin style={styles.title}>
+                    <ColumnStackLayout noMargin expand>
+                      {chipText && (
+                        <Line noMargin>
+                          <Chip label={chipText} style={styles.chip} />
+                        </Line>
+                      )}
+                      <Text size="title" noMargin style={styles.title}>
                         {title}
                       </Text>
-                      {titleAction}
-                    </LineStackLayout>
+                    </ColumnStackLayout>
                     {titleAdornment && (
-                      <Column noMargin>{titleAdornment}</Column>
+                      <Column expand noMargin>
+                        {titleAdornment}
+                      </Column>
                     )}
                   </LineStackLayout>
                 )}

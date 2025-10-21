@@ -101,7 +101,7 @@ function ConfirmDeleteDialog(props: Props) {
           fullscreen="never-even-on-mobile"
         >
           {props.header}
-          <Text size="body" style={{ userSelect: 'text' }}>
+          <Text size="body" allowSelection>
             <MarkdownText translatableSource={props.message} allowParagraphs />
           </Text>
           {props.confirmText && props.fieldMessage && (

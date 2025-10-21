@@ -18,7 +18,6 @@ import UnsavedChangesContext, {
 } from '../MainFrame/UnsavedChangesContext';
 import ProjectManagerCommands from './ProjectManagerCommands';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
-import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import { type GamesList } from '../GameDashboard/UseGamesList';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import InstalledExtensionDetails from './InstalledExtensionDetails';
@@ -419,11 +418,11 @@ type Props = {|
   onReloadEventsFunctionsExtensions: () => void,
   isOpen: boolean,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
-  onInstallExtension: ExtensionShortHeader => void,
+  onInstallExtension: (extensionName: string) => void,
   onShareProject: () => void,
   onOpenHomePage: () => void,
   toggleProjectManager: () => void,
-  onExtensionInstalled: (extensionName: string) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 
   // Main menu
   mainMenuCallbacks: MainMenuCallbacks,
@@ -1421,6 +1420,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         setProjectVariablesEditorOpen(false);
                       }}
                       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+                      isListLocked={false}
                     />
                   )}
                   {project && !!editedPropertiesLayout && (
@@ -1451,6 +1451,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         onOpenLayoutVariables(null);
                       }}
                       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+                      isListLocked={false}
                     />
                   )}
                   {project && extensionsSearchDialogOpen && (

@@ -186,7 +186,7 @@ namespace gdjs {
       }
 
       // This can be a:
-      // - Preview in GDevelop mobile app (iOS only)
+      // - Preview in GDevelop mobile app.
       if (shouldAuthenticationUseIframe(runtimeScene)) return 'web-iframe';
 
       if (typeof cordova !== 'undefined') {
@@ -834,34 +834,51 @@ namespace gdjs {
             authWindowOptions,
           });
 
+          if (typeof SafariViewController === 'undefined') {
+            logger.error(
+              'Cordova plugin SafariViewController is not installed.'
+            );
+            resolve('errored');
+            return;
+          }
+
           SafariViewController.isAvailable(function (available: boolean) {
-            if (available) {
-              SafariViewController.show(
-                {
-                  url: targetUrl,
-                  hidden: false,
-                  animated: true,
-                  transition: 'slide',
-                  enterReaderModeIfAvailable: false,
-                  barColor: '#000000',
-                  tintColor: '#ffffff',
-                  controlTintColor: '#ffffff',
-                },
-                function (result: any) {
-                  // Other events are `opened` and `loaded`.
-                  if (result.event === 'closed') {
-                    resolve('dismissed');
-                  }
-                },
-                function (error: any) {
-                  logger.log('Error opening webview: ' + JSON.stringify(error));
-                  resolve('errored');
-                }
+            if (!available) {
+              logger.error(
+                'Cordova plugin SafariViewController is installed but not available'
               );
-            } else {
-              logger.error('Plugin SafariViewController is not available');
               resolve('errored');
+              return;
             }
+
+            logger.info(
+              'Opening authentication window for Cordova with SafariViewController.'
+            );
+            SafariViewController.show(
+              {
+                url: targetUrl,
+                hidden: false,
+                animated: true,
+                transition: 'slide',
+                enterReaderModeIfAvailable: false,
+                barColor: '#000000',
+                tintColor: '#ffffff',
+                controlTintColor: '#ffffff',
+              },
+              function (result: any) {
+                // Other events are `opened` and `loaded`.
+                if (result.event === 'closed') {
+                  resolve('dismissed');
+                }
+              },
+              function (error: any) {
+                logger.log(
+                  'Error opening authentication window: ' +
+                    JSON.stringify(error)
+                );
+                resolve('errored');
+              }
+            );
           });
         }
       );
@@ -1121,7 +1138,7 @@ namespace gdjs {
                 );
                 break;
               case 'cordova-websocket':
-                // The game is an iOS app.
+                // The game is an iOS or Android app.
                 status = await openAuthenticationWindowForCordovaWithWebSocket(
                   runtimeScene,
                   _gameId,
@@ -1130,7 +1147,7 @@ namespace gdjs {
                 break;
               case 'web-iframe':
                 // This can be a:
-                // - Preview in GDevelop mobile app (iOS only)
+                // - Preview in GDevelop mobile app.
                 status = await openAuthenticationIframeForWeb(
                   runtimeScene,
                   _gameId,
@@ -1150,7 +1167,6 @@ namespace gdjs {
               default:
                 // This can be a:
                 // - Preview in GDevelop web-app
-                // - Preview in Gdevelop mobile app (Android only)
                 // - Web game (any website/server except gd.games) accessed via a desktop browser...
                 // - Or a web game accessed via a mobile browser (Android/iOS).
                 status = await openAuthenticationWindowForWeb(

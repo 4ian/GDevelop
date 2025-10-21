@@ -44,10 +44,7 @@ namespace gdjs {
     ) {
       this._object = object;
       this._isContainerDirty = true;
-      const layer = parent.getLayer('');
-      if (layer) {
-        layer.getRenderer().add3DRendererObject(this._threeGroup);
-      }
+      this._threeGroup.clear();
     }
 
     _updateThreeGroup() {

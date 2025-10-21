@@ -56,7 +56,7 @@ type Props = {|
   i18n: I18nType,
   canPasteInstructions: boolean, // Unused
   onPasteInstructions: () => void, // Unused
-  onExtensionInstalled: (extensionName: string) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
 /**

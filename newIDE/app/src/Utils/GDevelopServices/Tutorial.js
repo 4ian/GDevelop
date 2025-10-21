@@ -11,11 +11,6 @@ export type TutorialCategory =
   | 'official-intermediate'
   | 'official-advanced'
   | 'recommendations'
-  // 'course' is not a tutorial category per se (it's not included in the
-  // tutorials database) but it's convenient having it as a category to
-  // make sure the Learn section handles one variable only to know if it
-  // should display the main page, the course or a tutorial's category page.
-  | 'course'
   | 'education-curriculum';
 
 export type Tutorial = {|
@@ -26,7 +21,7 @@ export type Tutorial = {|
   /** Deprecated - see `descriptionByLocale`. */
   description?: string,
   descriptionByLocale: MessageByLocale,
-  type: 'video' | 'text' | 'pdf-tutorial',
+  type: 'video' | 'text' | 'pdf-tutorial' | 'course',
   category: TutorialCategory,
   duration?: number,
   /** Deprecated - see `linkByLocale`. */
@@ -44,6 +39,8 @@ export type Tutorial = {|
   availableAt?: string,
   gameLink?: string,
   templateUrl?: string,
+
+  courseId?: string,
 |};
 
 export const canAccessTutorial = (

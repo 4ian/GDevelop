@@ -208,5 +208,17 @@ namespace gdjs {
       this._loadedJsons.clear();
       this._callbacks.clear();
     }
+
+    unloadResource(resourceData: ResourceData): void {
+      const loadedJson = this._loadedJsons.get(resourceData);
+      if (loadedJson) {
+        this._loadedJsons.delete(resourceData);
+      }
+
+      const callback = this._callbacks.get(resourceData);
+      if (callback) {
+        this._callbacks.delete(resourceData);
+      }
+    }
   }
 }

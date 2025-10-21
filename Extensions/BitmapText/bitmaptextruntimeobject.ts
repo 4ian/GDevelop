@@ -155,9 +155,11 @@ namespace gdjs {
       return true;
     }
 
-    override getNetworkSyncData(): BitmapTextObjectNetworkSyncData {
+    override getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): BitmapTextObjectNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         text: this._text,
         opa: this._opacity,
         tint: this._tint,
@@ -172,9 +174,10 @@ namespace gdjs {
     }
 
     override updateFromNetworkSyncData(
-      networkSyncData: BitmapTextObjectNetworkSyncData
+      networkSyncData: BitmapTextObjectNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
       if (this._text !== undefined) {
         this.setText(networkSyncData.text);
       }
@@ -419,11 +422,15 @@ namespace gdjs {
     }
 
     override getWidth(): float {
-      return this._renderer.getWidth();
+      return this._wrapping ? this._wrappingWidth : this._renderer.getWidth();
     }
 
     override getHeight(): float {
       return this._renderer.getHeight();
+    }
+
+    override setWidth(width: float): void {
+      this.setWrappingWidth(width);
     }
 
     override getDrawableY(): float {

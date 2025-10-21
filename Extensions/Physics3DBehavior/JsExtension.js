@@ -21,7 +21,11 @@ module.exports = {
       .setExtensionInformation(
         'Physics3D',
         _('3D physics engine'),
-        "The 3D physics engine simulates realistic object physics, with gravity, forces, collisions, joints, etc. It's perfect for almost all 3D games.",
+        "The 3D physics engine simulates realistic object physics, with gravity, forces, collisions, joints, etc. It's perfect for almost all 3D games.\n" +
+          '\n' +
+          'Objects like floors or wall objects should usually be set to "Static" as type. Objects that should be moveable are usually "Dynamic" (default). "Kinematic" objects (typically, players or controlled characters) are only moved by their "linear velocity" and "angular velocity" - they can interact with other objects but only these other objects will move.\n' +
+          '\n' +
+          'Forces (and impulses) are expressed in all conditions/expressions/actions of the 3D physics engine in Newtons (N). Typical values for a force are 10-200 N. One meter is 100 pixels by default in the game (check the world scale). Mass is expressed in kilograms (kg).',
         'Florian Rival',
         'MIT'
       )
@@ -97,9 +101,70 @@ module.exports = {
           return true;
         }
 
+        if (propertyName === 'shapeOffsetX') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('shapeOffsetX')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'shapeOffsetY') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('shapeOffsetY')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'shapeOffsetZ') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('shapeOffsetZ')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'massCenterOffsetX') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('massCenterOffsetX')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'massCenterOffsetY') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('massCenterOffsetY')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'massCenterOffsetZ') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('massCenterOffsetZ')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
         if (propertyName === 'density') {
           behaviorContent
             .getChild('density')
+            .setDoubleValue(parseFloat(newValue));
+          return true;
+        }
+
+        if (propertyName === 'massOverride') {
+          behaviorContent
+            .getChild('massOverride')
             .setDoubleValue(parseFloat(newValue));
           return true;
         }
@@ -166,7 +231,7 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('object3D')
-          .setValue(behaviorContent.getChild('Object3D').getStringValue())
+          .setValue(behaviorContent.getChild('object3D').getStringValue())
           .setType('Behavior')
           .setLabel('3D capability')
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
@@ -213,7 +278,7 @@ module.exports = {
           .setLabel('Fixed Rotation')
           .setDescription(
             _(
-              "If enabled, the object won't rotate and will stay at the same angle. Useful for characters for example."
+              "If enabled, the object won't rotate and will stay at the same angle."
             )
           )
           .setGroup(_('Movement'));
@@ -277,6 +342,107 @@ module.exports = {
           .setLabel('Shape Dimension C')
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setHidden(true); // Hidden as required to be changed in the full editor.
+        if (!behaviorContent.hasChild('shapeOffsetX')) {
+          behaviorContent.addChild('shapeOffsetX').setDoubleValue(0);
+        }
+        behaviorProperties
+          .getOrCreate('shapeOffsetX')
+          .setValue(
+            behaviorContent
+              .getChild('shapeOffsetX')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setLabel('Shape offset X')
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+          .setAdvanced(true)
+          .setHidden(true); // Hidden as required to be changed in the full editor.
+        if (!behaviorContent.hasChild('shapeOffsetY')) {
+          behaviorContent.addChild('shapeOffsetY').setDoubleValue(0);
+        }
+        behaviorProperties
+          .getOrCreate('shapeOffsetY')
+          .setValue(
+            behaviorContent
+              .getChild('shapeOffsetY')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setLabel('Shape offset Y')
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+          .setHidden(true); // Hidden as required to be changed in the full editor.
+        if (!behaviorContent.hasChild('shapeOffsetZ')) {
+          behaviorContent.addChild('shapeOffsetZ').setDoubleValue(0);
+        }
+        behaviorProperties
+          .getOrCreate('shapeOffsetZ')
+          .setValue(
+            behaviorContent
+              .getChild('shapeOffsetZ')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setLabel('Shape offset Z')
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+          .setAdvanced(true)
+          .setHidden(true); // Hidden as required to be changed in the full editor.
+        if (!behaviorContent.hasChild('massCenterOffsetX')) {
+          behaviorContent.addChild('massCenterOffsetX').setDoubleValue(0);
+        }
+        behaviorProperties
+          .getOrCreate('massCenterOffsetX')
+          .setValue(
+            behaviorContent
+              .getChild('massCenterOffsetX')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setLabel('Center of mass offset X')
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+          .setAdvanced(true)
+          .setHidden(true); // Hidden as required to be changed in the full editor.
+        if (!behaviorContent.hasChild('massCenterOffsetY')) {
+          behaviorContent.addChild('massCenterOffsetY').setDoubleValue(0);
+        }
+        behaviorProperties
+          .getOrCreate('massCenterOffsetY')
+          .setValue(
+            behaviorContent
+              .getChild('massCenterOffsetY')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setLabel('Center of mass offset Y')
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+          .setAdvanced(true)
+          .setHidden(true); // Hidden as required to be changed in the full editor.
+        if (!behaviorContent.hasChild('massCenterOffsetZ')) {
+          behaviorContent.addChild('massCenterOffsetZ').setDoubleValue(0);
+        }
+        behaviorProperties
+          .getOrCreate('massCenterOffsetZ')
+          .setValue(
+            behaviorContent
+              .getChild('massCenterOffsetZ')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setLabel('Center of mass offset Z')
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+          .setAdvanced(true)
+          .setHidden(true); // Hidden as required to be changed in the full editor.
         behaviorProperties
           .getOrCreate('density')
           .setValue(
@@ -289,6 +455,21 @@ module.exports = {
               'Define the weight of the object, according to its size. The bigger the density, the heavier the object.'
             )
           );
+        if (!behaviorContent.hasChild('massOverride')) {
+          behaviorContent.addChild('massOverride').setDoubleValue(0);
+        }
+        behaviorProperties
+          .getOrCreate('massOverride')
+          .setLabel(_('Mass override'))
+          .setGroup('')
+          .setType('Number')
+          .setValue(
+            behaviorContent
+              .getChild('massOverride')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setDescription(_('Leave at 0 to use the density.'));
         behaviorProperties
           .getOrCreate('friction')
           .setValue(
@@ -387,6 +568,13 @@ module.exports = {
         behaviorContent.addChild('shapeDimensionA').setDoubleValue(0);
         behaviorContent.addChild('shapeDimensionB').setDoubleValue(0);
         behaviorContent.addChild('shapeDimensionC').setDoubleValue(0);
+        behaviorContent.addChild('shapeOffsetX').setDoubleValue(0);
+        behaviorContent.addChild('shapeOffsetY').setDoubleValue(0);
+        behaviorContent.addChild('shapeOffsetZ').setDoubleValue(0);
+        behaviorContent.addChild('massCenterOffsetX').setDoubleValue(0);
+        behaviorContent.addChild('massCenterOffsetY').setDoubleValue(0);
+        behaviorContent.addChild('massCenterOffsetZ').setDoubleValue(0);
+        behaviorContent.addChild('massOverride').setDoubleValue(0);
         behaviorContent.addChild('density').setDoubleValue(1.0);
         behaviorContent.addChild('friction').setDoubleValue(0.3);
         behaviorContent.addChild('restitution').setDoubleValue(0.1);
@@ -491,6 +679,7 @@ module.exports = {
           behavior,
           sharedData
         )
+        .markAsIrrelevantForChildObjects()
         .addIncludeFile(
           'Extensions/Physics3DBehavior/Physics3DRuntimeBehavior.js'
         )
@@ -661,7 +850,7 @@ module.exports = {
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
-        .addParameter('yesorno', _('Treat as bullet?'), '', false)
+        .addParameter('yesorno', _('Treat as bullet'), '', false)
         .setDefaultValue('false')
         .getCodeExtraInformation()
         .setFunctionName('setBullet');
@@ -686,7 +875,7 @@ module.exports = {
           'SetFixedRotation',
           _('Fixed rotation'),
           _(
-            "Enable or disable an object fixed rotation. If enabled the object won't be able to rotate."
+            "Enable or disable an object fixed rotation. If enabled the object won't be able to rotate. This action has no effect on characters."
           ),
           _('Set _PARAM0_ fixed rotation: _PARAM2_'),
           _('Dynamics'),
@@ -695,7 +884,7 @@ module.exports = {
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
-        .addParameter('yesorno', _('Fixed rotation?'), '', false)
+        .addParameter('yesorno', _('Fixed rotation'), '', false)
         .setDefaultValue('false')
         .getCodeExtraInformation()
         .setFunctionName('setFixedRotation');
@@ -742,6 +931,54 @@ module.exports = {
         .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
         .setFunctionName('setDensity')
         .setGetter('getDensity');
+
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
+          'ShapeOffsetX',
+          _('Shape offset X'),
+          _('the object shape offset on X.'),
+          _('the shape offset on X'),
+          _('Body settings'),
+          'JsPlatform/Extensions/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setShapeOffsetX')
+        .setGetter('getShapeOffsetX');
+
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
+          'ShapeOffsetY',
+          _('Shape offset Y'),
+          _('the object shape offset on Y.'),
+          _('the shape offset on Y'),
+          _('Body settings'),
+          'JsPlatform/Extensions/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setShapeOffsetY')
+        .setGetter('getShapeOffsetY');
+
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
+          'ShapeOffsetZ',
+          _('Shape offset Z'),
+          _('the object shape offset on Z.'),
+          _('the shape offset on Z'),
+          _('Body settings'),
+          'JsPlatform/Extensions/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setShapeOffsetZ')
+        .setGetter('getShapeOffsetZ');
 
       aut
         .addExpressionAndConditionAndAction(
@@ -870,7 +1107,7 @@ module.exports = {
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
         .addParameter('expression', _('Layer (1 - 8)'))
-        .addParameter('yesorno', _('Enable?'), '', false)
+        .addParameter('yesorno', _('Enable'), '', false)
         .setDefaultValue('true')
         .getCodeExtraInformation()
         .setFunctionName('enableLayer');
@@ -906,7 +1143,7 @@ module.exports = {
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
         .addParameter('expression', _('Mask (1 - 8)'))
-        .addParameter('yesorno', _('Enable?'), '', false)
+        .addParameter('yesorno', _('Enable'), '', false)
         .setDefaultValue('true')
         .getCodeExtraInformation()
         .setFunctionName('enableMask');
@@ -917,7 +1154,7 @@ module.exports = {
           'number',
           'LinearVelocityX',
           _('Linear velocity X'),
-          _('the object linear velocity on X.'),
+          _('the object linear velocity on X'),
           _('the linear velocity on X'),
           _('Velocity'),
           'JsPlatform/Extensions/physics3d.svg'
@@ -938,7 +1175,7 @@ module.exports = {
           'number',
           'LinearVelocityY',
           _('Linear velocity Y'),
-          _('the object linear velocity on Y.'),
+          _('the object linear velocity on Y'),
           _('the linear velocity on Y'),
           _('Velocity'),
           'JsPlatform/Extensions/physics3d.svg'
@@ -959,7 +1196,7 @@ module.exports = {
           'number',
           'LinearVelocityZ',
           _('Linear velocity Z'),
-          _('the object linear velocity on Z.'),
+          _('the object linear velocity on Z'),
           _('the linear velocity on Z'),
           _('Velocity'),
           'JsPlatform/Extensions/physics3d.svg'
@@ -980,7 +1217,7 @@ module.exports = {
           'number',
           'LinearVelocityLength',
           _('Linear velocity'),
-          _('the object linear velocity length.'),
+          _('the object linear velocity length'),
           _('the linear velocity length'),
           _('Velocity'),
           'JsPlatform/Extensions/physics3d.svg'
@@ -1000,7 +1237,7 @@ module.exports = {
           'number',
           'AngularVelocityX',
           _('Angular velocity X'),
-          _('the object angular velocity around X.'),
+          _('the object angular velocity around X'),
           _('the angular velocity around X'),
           _('Velocity'),
           'JsPlatform/Extensions/physics3d.svg'
@@ -1021,7 +1258,7 @@ module.exports = {
           'number',
           'AngularVelocityY',
           _('Angular velocity Y'),
-          _('the object angular velocity around Y.'),
+          _('the object angular velocity around Y'),
           _('the angular velocity around Y'),
           _('Velocity'),
           'JsPlatform/Extensions/physics3d.svg'
@@ -1042,7 +1279,7 @@ module.exports = {
           'number',
           'AngularVelocityZ',
           _('Angular velocity Z'),
-          _('the object angular velocity around Z.'),
+          _('the object angular velocity around Z'),
           _('the angular velocity around Z'),
           _('Velocity'),
           'JsPlatform/Extensions/physics3d.svg'
@@ -1086,7 +1323,7 @@ module.exports = {
         .addParameter('expression', _('Application point on Z axis'))
         .setParameterLongDescription(
           _(
-            'Use `MassCenterX` and `MassCenterY` expressions to avoid any rotation.'
+            'Use `MassCenterX`, `MassCenterY` and `MassCenterZ` expressions to avoid any rotation.'
           )
         )
         .getCodeExtraInformation()
@@ -1360,6 +1597,19 @@ module.exports = {
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
         .getCodeExtraInformation()
         .setFunctionName('getMassCenterY');
+
+      aut
+        .addExpression(
+          'MassCenterZ',
+          _('Mass center Z'),
+          _('Mass center Z'),
+          '',
+          'JsPlatform/Extensions/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+        .getCodeExtraInformation()
+        .setFunctionName('getMassCenterZ');
     }
     // Collision
     extension
@@ -1569,7 +1819,7 @@ module.exports = {
           .getOrCreate('physics3D')
           .setValue(behaviorContent.getChild('physics3D').getStringValue())
           .setType('Behavior')
-          .setLabel('3D capability')
+          .setLabel('3D physics')
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .addExtraInfo('Physics3D::Physics3DBehavior');
 
@@ -1798,7 +2048,12 @@ module.exports = {
           'PhysicsCharacter3D',
           _('3D physics character'),
           'PhysicsCharacter3D',
-          _('Jump and run on platforms.'),
+          _(
+            'Allow an object to jump and run on platforms that have the 3D physics behavior' +
+              '(and which are generally set to "Static" as type, unless the platform is animated/moved in events).\n' +
+              '\n' +
+              'This behavior is usually used with one or more "mapper" behavior to let the player move it.'
+          ),
           '',
           'JsPlatform/Extensions/physics_character3d.svg',
           'PhysicsCharacter3D',
@@ -2144,7 +2399,7 @@ module.exports = {
           'number',
           'ForwardAcceleration',
           _('Forward acceleration'),
-          _('the forward acceleration of an object.'),
+          _('the forward acceleration of an object'),
           _('the forward acceleration'),
           _('Character configuration'),
           'JsPlatform/Extensions/physics_character3d.svg'
@@ -2166,7 +2421,7 @@ module.exports = {
           'number',
           'ForwardDeceleration',
           _('Forward deceleration'),
-          _('the forward deceleration of an object.'),
+          _('the forward deceleration of an object'),
           _('the forward deceleration'),
           _('Character configuration'),
           'JsPlatform/Extensions/physics_character3d.svg'
@@ -2188,7 +2443,7 @@ module.exports = {
           'number',
           'ForwardSpeedMax',
           _('Forward max speed'),
-          _('the forward max speed of the object.'),
+          _('the forward max speed of the object'),
           _('the forward max speed'),
           _('Character configuration'),
           'JsPlatform/Extensions/physics_character3d.svg'
@@ -2232,7 +2487,7 @@ module.exports = {
           'number',
           'SidewaysAcceleration',
           _('Sideways acceleration'),
-          _('the sideways acceleration of an object.'),
+          _('the sideways acceleration of an object'),
           _('the sideways acceleration'),
           _('Character configuration'),
           'JsPlatform/Extensions/physics_character3d.svg'
@@ -2254,7 +2509,7 @@ module.exports = {
           'number',
           'SidewaysDeceleration',
           _('Sideways deceleration'),
-          _('the sideways deceleration of an object.'),
+          _('the sideways deceleration of an object'),
           _('the sideways deceleration'),
           _('Character configuration'),
           'JsPlatform/Extensions/physics_character3d.svg'
@@ -2276,7 +2531,7 @@ module.exports = {
           'number',
           'SidewaysSpeedMax',
           _('Sideways max speed'),
-          _('the sideways max speed of the object.'),
+          _('the sideways max speed of the object'),
           _('the sideways max speed'),
           _('Character configuration'),
           'JsPlatform/Extensions/physics_character3d.svg'
@@ -2345,7 +2600,7 @@ module.exports = {
           'number',
           'JumpSpeed',
           _('Jump speed'),
-          _('the jump speed of an object. Its value is always positive.'),
+          _('the jump speed of an object. Its value is always positive'),
           _('the jump speed'),
           _('Character configuration'),
           'JsPlatform/Extensions/physics_character3d.svg'
@@ -2367,7 +2622,7 @@ module.exports = {
           'JumpSustainTime',
           _('Jump sustain time'),
           _(
-            'the jump sustain time of an object. This is the time during which keeping the jump button held allow the initial jump speed to be maintained.'
+            'the jump sustain time of an object. This is the time during which keeping the jump button held allow the initial jump speed to be maintained'
           ),
           _('the jump sustain time'),
           _('Character configuration'),
@@ -2389,7 +2644,7 @@ module.exports = {
           'number',
           'Gravity',
           _('Gravity'),
-          _('the gravity applied on an object.'),
+          _('the gravity applied on an object'),
           _('the gravity'),
           _('Character configuration'),
           'JsPlatform/Extensions/physics_character3d.svg'
@@ -2411,7 +2666,7 @@ module.exports = {
           'number',
           'FallingSpeedMax',
           _('Maximum falling speed'),
-          _('the maximum falling speed of an object.'),
+          _('the maximum falling speed of an object'),
           _('the maximum falling speed'),
           _('Character configuration'),
           'JsPlatform/Extensions/physics_character3d.svg'
@@ -2454,6 +2709,870 @@ module.exports = {
         .setGetter('getMaxFallingSpeed');
     }
 
+    {
+      const behavior = new gd.BehaviorJsImplementation();
+      behavior.updateProperty = function (
+        behaviorContent,
+        propertyName,
+        newValue
+      ) {
+        if (propertyName === 'physics3D') {
+          behaviorContent.getChild('physics3D').setStringValue(newValue);
+          return true;
+        }
+
+        if (propertyName === 'steerAngleMax') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('steerAngleMax')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'beginningSteerSpeed') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('beginningSteerSpeed')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'endSteerSpeed') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('endSteerSpeed')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'engineTorqueMax') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('engineTorqueMax')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'engineSpeedMax') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('engineSpeedMax')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'engineInertia') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('engineInertia')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'reverseGearRatio1') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('reverseGearRatio1')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'gearRatio1') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('gearRatio1')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'gearRatio2') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('gearRatio2')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'gearRatio2') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('gearRatio2')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'gearRatio3') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('gearRatio3')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'gearRatio4') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('gearRatio4')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'gearRatio5') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('gearRatio5')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'gearRatio6') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('gearRatio6')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'wheelRadius') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('wheelRadius')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'wheelWidth') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('wheelWidth')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'backWheelOffsetX') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('backWheelOffsetX')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'frontWheelOffsetX') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('frontWheelOffsetX')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'wheelOffsetY') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('wheelOffsetY')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'wheelOffsetZ') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('wheelOffsetZ')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'brakeTorqueMax') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('brakeTorqueMax')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'handBrakeTorqueMax') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('handBrakeTorqueMax')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'hasBackWheelDrive') {
+          behaviorContent
+            .getChild('hasBackWheelDrive')
+            .setBoolValue(newValue === '1');
+          return true;
+        }
+
+        if (propertyName === 'hasFrontWheelDrive') {
+          behaviorContent
+            .getChild('hasFrontWheelDrive')
+            .setBoolValue(newValue === '1');
+          return true;
+        }
+
+        if (propertyName === 'pitchRollAngleMax') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('pitchRollAngleMax')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        return false;
+      };
+      behavior.getProperties = function (behaviorContent) {
+        const behaviorProperties = new gd.MapStringPropertyDescriptor();
+
+        behaviorProperties
+          .getOrCreate('physics3D')
+          .setValue(behaviorContent.getChild('physics3D').getStringValue())
+          .setType('Behavior')
+          .setLabel('3D physics')
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+          .addExtraInfo('Physics3D::Physics3DBehavior');
+
+        behaviorProperties
+          .getOrCreate('steerAngleMax')
+          .setLabel(_('Max steer angle'))
+          .setGroup(_('Steering'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
+          .setValue(
+            behaviorContent
+              .getChild('steerAngleMax')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('beginningSteerSpeed')
+          .setLabel(_('Beginning steer speed'))
+          .setGroup(_('Steering'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getAngularSpeed())
+          .setValue(
+            behaviorContent
+              .getChild('beginningSteerSpeed')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('endSteerSpeed')
+          .setLabel(_('End steer speed'))
+          .setGroup(_('Steering'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getAngularSpeed())
+          .setValue(
+            behaviorContent
+              .getChild('endSteerSpeed')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('engineTorqueMax')
+          .setLabel(_('Max engine torque'))
+          .setGroup(_('Speed'))
+          .setType('Number')
+          .setDescription(
+            _('Allow cars to climb steep slopes and push heavy obstacles.')
+          )
+          .setValue(
+            behaviorContent
+              .getChild('engineTorqueMax')
+              .getDoubleValue()
+              .toString(10)
+          );
+
+        behaviorProperties
+          .getOrCreate('engineSpeedMax')
+          .setLabel(_('Max engine speed'))
+          .setGroup(_('Speed'))
+          .setType('Number')
+          .setValue(
+            behaviorContent
+              .getChild('engineSpeedMax')
+              .getDoubleValue()
+              .toString(10)
+          );
+
+        behaviorProperties
+          .getOrCreate('engineInertia')
+          .setLabel(_('Engine inertia'))
+          .setGroup(_('Speed'))
+          .setType('Number')
+          .setDescription(_('Slow down car acceleration.'))
+          .setValue(
+            behaviorContent
+              .getChild('engineInertia')
+              .getDoubleValue()
+              .toString(10)
+          );
+
+        behaviorProperties
+          .getOrCreate('reverseGearRatio1')
+          .setLabel(_('Reverse gear ratio'))
+          .setGroup(_('Speed'))
+          .setType('Number')
+          .setValue(
+            behaviorContent
+              .getChild('reverseGearRatio1')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('gearRatio1')
+          .setLabel(_('1st gear ratio'))
+          .setGroup(_('Speed'))
+          .setType('Number')
+          .setValue(
+            behaviorContent.getChild('gearRatio1').getDoubleValue().toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('gearRatio2')
+          .setLabel(_('2nd gear ratio'))
+          .setGroup(_('Speed'))
+          .setType('Number')
+          .setValue(
+            behaviorContent.getChild('gearRatio2').getDoubleValue().toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('gearRatio3')
+          .setLabel(_('3rd gear ratio'))
+          .setGroup(_('Speed'))
+          .setType('Number')
+          .setValue(
+            behaviorContent.getChild('gearRatio3').getDoubleValue().toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('gearRatio4')
+          .setLabel(_('4th gear ratio'))
+          .setGroup(_('Speed'))
+          .setType('Number')
+          .setValue(
+            behaviorContent.getChild('gearRatio4').getDoubleValue().toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('gearRatio5')
+          .setLabel(_('5th gear ratio'))
+          .setGroup(_('Speed'))
+          .setType('Number')
+          .setValue(
+            behaviorContent.getChild('gearRatio5').getDoubleValue().toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('gearRatio6')
+          .setLabel(_('6th gear ratio'))
+          .setGroup(_('Speed'))
+          .setType('Number')
+          .setValue(
+            behaviorContent.getChild('gearRatio6').getDoubleValue().toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('wheelRadius')
+          .setLabel(_('Wheel radius'))
+          .setGroup(_('Wheels'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setValue(
+            behaviorContent
+              .getChild('wheelRadius')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('wheelWidth')
+          .setLabel(_('Wheel width'))
+          .setGroup(_('Wheels'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setValue(
+            behaviorContent.getChild('wheelWidth').getDoubleValue().toString(10)
+          )
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('backWheelOffsetX')
+          .setLabel(_('Back wheel offset X'))
+          .setGroup(_('Wheels'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setDescription(_('Positive values move wheels outside.'))
+          .setValue(
+            behaviorContent
+              .getChild('backWheelOffsetX')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('frontWheelOffsetX')
+          .setLabel(_('Front wheel offset X'))
+          .setGroup(_('Wheels'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setDescription(_('Positive values move wheels outside.'))
+          .setValue(
+            behaviorContent
+              .getChild('frontWheelOffsetX')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('wheelOffsetY')
+          .setLabel(_('Wheel offset Y'))
+          .setGroup(_('Wheels'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setDescription(_('Positive values move wheels outside.'))
+          .setValue(
+            behaviorContent
+              .getChild('wheelOffsetY')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('wheelOffsetZ')
+          .setLabel(_('Wheel offset Z'))
+          .setGroup(_('Wheels'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setDescription(_('Positive values move wheels outside.'))
+          .setValue(
+            behaviorContent
+              .getChild('wheelOffsetZ')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('brakeTorqueMax')
+          .setLabel(_('Brake max torque'))
+          .setGroup(_('Brakes'))
+          .setType('Number')
+          .setValue(
+            behaviorContent
+              .getChild('brakeTorqueMax')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('handBrakeTorqueMax')
+          .setLabel(_('Hand brake max torque'))
+          .setGroup(_('Brakes'))
+          .setType('Number')
+          .setValue(
+            behaviorContent
+              .getChild('handBrakeTorqueMax')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('hasBackWheelDrive')
+          .setValue(
+            behaviorContent.getChild('hasBackWheelDrive').getBoolValue()
+              ? 'true'
+              : 'false'
+          )
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+          .setType('Boolean')
+          .setLabel(_('Back wheel drive'))
+          .setGroup(_('Wheels'))
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('hasFrontWheelDrive')
+          .setValue(
+            behaviorContent.getChild('hasFrontWheelDrive').getBoolValue()
+              ? 'true'
+              : 'false'
+          )
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+          .setType('Boolean')
+          .setLabel(_('Front wheel drive'))
+          .setGroup(_('Wheels'))
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('pitchRollAngleMax')
+          .setLabel(_('Pitch and roll max angle'))
+          .setGroup('')
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
+          .setValue(
+            behaviorContent
+              .getChild('pitchRollAngleMax')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        return behaviorProperties;
+      };
+
+      behavior.initializeContent = function (behaviorContent) {
+        behaviorContent.addChild('physics3D').setStringValue('');
+        behaviorContent.addChild('steerAngleMax').setDoubleValue(70);
+        behaviorContent.addChild('beginningSteerSpeed').setDoubleValue(140);
+        behaviorContent.addChild('endSteerSpeed').setDoubleValue(10);
+        behaviorContent.addChild('engineTorqueMax').setDoubleValue(4500);
+        behaviorContent.addChild('engineSpeedMax').setDoubleValue(6000);
+        behaviorContent.addChild('engineInertia').setDoubleValue(0.5);
+        behaviorContent.addChild('reverseGearRatio1').setDoubleValue(-2.9);
+        behaviorContent.addChild('gearRatio1').setDoubleValue(2.66);
+        behaviorContent.addChild('gearRatio2').setDoubleValue(1.78);
+        behaviorContent.addChild('gearRatio3').setDoubleValue(1.3);
+        behaviorContent.addChild('gearRatio4').setDoubleValue(1);
+        behaviorContent.addChild('gearRatio5').setDoubleValue(0.74);
+        behaviorContent.addChild('gearRatio6').setDoubleValue(0);
+        behaviorContent.addChild('backWheelOffsetX').setDoubleValue(0);
+        behaviorContent.addChild('frontWheelOffsetX').setDoubleValue(0);
+        behaviorContent.addChild('wheelOffsetY').setDoubleValue(0);
+        behaviorContent.addChild('wheelOffsetZ').setDoubleValue(0);
+        behaviorContent.addChild('wheelRadius').setDoubleValue(10);
+        behaviorContent.addChild('wheelWidth').setDoubleValue(5);
+        behaviorContent.addChild('brakeTorqueMax').setDoubleValue(1500);
+        behaviorContent.addChild('handBrakeTorqueMax').setDoubleValue(4000);
+        behaviorContent.addChild('hasBackWheelDrive').setBoolValue(false);
+        behaviorContent.addChild('hasFrontWheelDrive').setBoolValue(true);
+        behaviorContent.addChild('pitchRollAngleMax').setDoubleValue(90);
+      };
+      const aut = extension
+        .addBehavior(
+          'PhysicsCar3D',
+          _('3D physics car'),
+          'PhysicsCar3D',
+          _(
+            "Simulate a realistic car using the 3D physics engine. This is mostly useful for the car controlled by the player (it's usually too complex for other cars in a game).\n" +
+              '\n' +
+              'This behavior is usually used with one or more "mapper" behavior to let the player move it.'
+          ),
+          '',
+          'JsPlatform/Extensions/physics_car3d.svg',
+          'PhysicsCar3D',
+          //@ts-ignore The class hierarchy is incorrect leading to a type error, but this is valid.
+          behavior,
+          new gd.BehaviorsSharedData()
+        )
+        .addIncludeFile(
+          'Extensions/Physics3DBehavior/PhysicsCar3DRuntimeBehavior.js'
+        );
+
+      aut
+        .addScopedAction(
+          'SimulateForwardKey',
+          _('Simulate move forward key press'),
+          _('Simulate a press of the move forward key.'),
+          _('Simulate pressing Forward key for _PARAM0_'),
+          _('Car controls'),
+          'JsPlatform/Extensions/physics_car3d.svg',
+          'JsPlatform/Extensions/physics_car3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
+        .setFunctionName('simulateForwardKey');
+
+      aut
+        .addScopedAction(
+          'SimulateBackwardKey',
+          _('Simulate move backward key press'),
+          _('Simulate a press of the move backward key.'),
+          _('Simulate pressing Backward key for _PARAM0_'),
+          _('Car controls'),
+          'JsPlatform/Extensions/physics_car3d.svg',
+          'JsPlatform/Extensions/physics_car3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
+        .setFunctionName('simulateBackwardKey');
+
+      aut
+        .addScopedAction(
+          'SimulateRightKey',
+          _('Simulate move right key press'),
+          _('Simulate a press of the move right key.'),
+          _('Simulate pressing Right key for _PARAM0_'),
+          _('Car controls'),
+          'JsPlatform/Extensions/physics_car3d.svg',
+          'JsPlatform/Extensions/physics_car3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
+        .setFunctionName('simulateRightKey');
+
+      aut
+        .addScopedAction(
+          'SimulateLeftKey',
+          _('Simulate move left key press'),
+          _('Simulate a press of the move left key.'),
+          _('Simulate pressing Left key for _PARAM0_'),
+          _('Car controls'),
+          'JsPlatform/Extensions/physics_car3d.svg',
+          'JsPlatform/Extensions/physics_car3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
+        .setFunctionName('simulateLeftKey');
+
+      aut
+        .addScopedAction(
+          'SimulateHandBrakeKey',
+          _('Simulate hand brake key press'),
+          _('Simulate a press of the hand brake key.'),
+          _('Simulate pressing hand brake key for _PARAM0_'),
+          _('Car controls'),
+          'JsPlatform/Extensions/physics_car3d.svg',
+          'JsPlatform/Extensions/physics_car3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
+        .setFunctionName('simulateHandBrakeKey');
+
+      aut
+        .addScopedAction(
+          'SimulateAcceleratorStick',
+          _('Simulate accelerator stick control'),
+          _('Simulate an accelerator stick control.'),
+          _(
+            'Simulate an accelerator stick control for _PARAM0_ with a _PARAM2_ force'
+          ),
+          _('Car controls'),
+          'JsPlatform/Extensions/physics_car3d.svg',
+          'JsPlatform/Extensions/physics_car3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
+        .addParameter('expression', _('Stick force (between -1 and 1)'))
+        .markAsAdvanced()
+        .setFunctionName('simulateAcceleratorStick');
+
+      aut
+        .addScopedAction(
+          'SimulateSteeringStick',
+          _('Simulate steering stick control'),
+          _('Simulate a steering stick control.'),
+          _(
+            'Simulate a steering stick control for _PARAM0_ with a _PARAM2_ force'
+          ),
+          _('Car controls'),
+          'JsPlatform/Extensions/physics_car3d.svg',
+          'JsPlatform/Extensions/physics_car3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
+        .addParameter('expression', _('Stick force (between -1 and 1)'))
+        .markAsAdvanced()
+        .setFunctionName('simulateSteeringStick');
+
+      aut
+        .addExpressionAndCondition(
+          'number',
+          'SteerAngle',
+          _('Steer angle'),
+          _(
+            'the current steer angle (in degree). The value is negative when cars turn left'
+          ),
+          _('the steer angle'),
+          _('Car state'),
+          'JsPlatform/Extensions/physics_car3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Steer angle (in degree)')
+          )
+        )
+        .setFunctionName('getSteerAngle');
+
+      aut
+        .addExpressionAndCondition(
+          'number',
+          'EngineSpeed',
+          _('Engine speed'),
+          _('the current engine speed (RPM)'),
+          _('the engine speed'),
+          _('Car state'),
+          'JsPlatform/Extensions/physics_car3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Engine speed (RPM)')
+          )
+        )
+        .setFunctionName('getEngineSpeed');
+
+      aut
+        .addExpressionAndCondition(
+          'number',
+          'CurrentGear',
+          _('Current gear'),
+          _('the current gear (-1 = reverse, 0 = neutral, 1 = 1st gear)'),
+          _('the current gear'),
+          _('Car state'),
+          'JsPlatform/Extensions/physics_car3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(_('Current gear'))
+        )
+        .setFunctionName('getCurrentGear');
+
+      aut
+        .addScopedCondition(
+          'IsOnFloor',
+          _('Is on floor'),
+          _('Check if any wheel is in contact with the ground.'),
+          _('_PARAM0_ is on floor'),
+          _('Car state'),
+          'JsPlatform/Extensions/physics_car3d.svg',
+          'JsPlatform/Extensions/physics_car3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
+        .markAsSimple()
+        .setFunctionName('isOnFloor');
+
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
+          'EngineTorqueMax',
+          _('Engine max torque'),
+          _(
+            'the engine max torque (N·m). It allows cars to climb steep slopes and push heavy obstacles'
+          ),
+          _('the engine max torque'),
+          _('Car configuration'),
+          'JsPlatform/Extensions/physics_car3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Engine max torque (N·m)')
+          )
+        )
+        .setFunctionName('setEngineTorqueMax')
+        .setGetter('getEngineTorqueMax');
+
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
+          'EngineSpeedMax',
+          _('Engine max speed'),
+          _('the engine max speed (RPM)'),
+          _('the engine max speed'),
+          _('Car configuration'),
+          'JsPlatform/Extensions/physics_car3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Engine max speed (RPM)')
+          )
+        )
+        .setFunctionName('setEngineSpeedMax')
+        .setGetter('getEngineSpeedMax');
+
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
+          'EngineInertia',
+          _('Engine inertia'),
+          _('the engine inertia (kg·m²). It slows down car acceleration'),
+          _('the engine inertia'),
+          _('Car configuration'),
+          'JsPlatform/Extensions/physics_car3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Engine inertia (kg·m²)')
+          )
+        )
+        .setFunctionName('setEngineInertia')
+        .setGetter('getEngineInertia');
+    }
+
     extension
       .addCondition(
         'IsObjectOnGivenFloor',
@@ -2461,8 +3580,8 @@ module.exports = {
         _('Check if a 3D physics character is on a given platform.'),
         _('_PARAM0_ is on platform _PARAM2_'),
         _('Collision'),
-        'JsPlatform/Extensions/physics_character3d.svg',
-        'JsPlatform/Extensions/physics_character3d.svg'
+        'JsPlatform/Extensions/physics_car3d.svg',
+        'JsPlatform/Extensions/physics_car3d.svg'
       )
       .addParameter('objectList', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')

@@ -821,8 +821,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         }
         if (!codeGenerator.HasProjectAndLayout()) {
           functionParameters += ", eventsFunctionContext";
-          callArguments += ", typeof eventsFunctionContext !== \'undefined\' ? "
-                           "eventsFunctionContext : undefined";
+          callArguments += ", eventsFunctionContext";
         }
 
         // Generate the function code
@@ -842,13 +841,23 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                   event.GetParameterObjects(),
                   parentContext.GetCurrentObject());
 
-          callingCode += "var objects = [];\n";
-          for (unsigned int i = 0; i < realObjects.size(); ++i) {
-            parentContext.ObjectsListNeeded(realObjects[i]);
+          if (realObjects.size() == 1) {
+            parentContext.ObjectsListNeeded(realObjects[0]);
             callingCode +=
-                "objects.push.apply(objects," +
-                codeGenerator.GetObjectListName(realObjects[i], parentContext) +
-                ");\n";
+                "const objects = " +
+                codeGenerator.GetObjectListName(realObjects[0], parentContext) +
+                ";\n";
+          } else {
+            // Groups are rarely used in JS events so it's fine to make
+            // allocations.
+            callingCode += "const objects = [];\n";
+            for (unsigned int i = 0; i < realObjects.size(); ++i) {
+              parentContext.ObjectsListNeeded(realObjects[i]);
+              callingCode += "objects.push.apply(objects," +
+                             codeGenerator.GetObjectListName(realObjects[i],
+                                                             parentContext) +
+                             ");\n";
+            }
           }
         }
 

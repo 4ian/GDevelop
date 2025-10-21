@@ -21,7 +21,9 @@ module.exports = {
       .setExtensionInformation(
         'Leaderboards',
         _('Leaderboards'),
-        _('Allow your game to send scores to your leaderboards.'),
+        _(
+          'Allow your game to send scores to your leaderboards (anonymously or from the logged-in player) or display existing leaderboards to the player.'
+        ),
         'Florian Rival',
         'Open source (MIT License)'
       )
@@ -29,6 +31,12 @@ module.exports = {
       .setCategory('Players')
       .addInstructionOrExpressionGroupMetadata(_('Leaderboards'))
       .setIcon('JsPlatform/Extensions/leaderboard.svg');
+
+    extension
+      .addDependency()
+      .setName('Safari View Controller Cordova plugin')
+      .setDependencyType('cordova')
+      .setExportName('@gdevelop/cordova-plugin-safariviewcontroller');
 
     extension
       .addAction(

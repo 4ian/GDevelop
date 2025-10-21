@@ -1,0 +1,12 @@
+.textAndButtonsContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding-left: 8px;
+  padding-right: 2px;
+  color: var(--theme-text-secondary-color);
+  opacity: 0.9;
+  min-width: 0;
+}

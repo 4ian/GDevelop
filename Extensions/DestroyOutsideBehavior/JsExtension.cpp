@@ -5,10 +5,10 @@ Copyright (c) 2014-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 #if defined(GD_IDE_ONLY)
+#include <iostream>
+
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
-
-#include <iostream>
 
 void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension);
 
@@ -29,19 +29,36 @@ class DestroyOutsideBehaviorJsExtension : public gd::PlatformExtension {
             "Extensions/DestroyOutsideBehavior/"
             "destroyoutsideruntimebehavior.js");
 
+    GetAllExpressionsForBehavior(
+        "DestroyOutsideBehavior::DestroyOutside")["ExtraBorder"]
+        .SetFunctionName("getExtraBorder");
+    GetAllConditionsForBehavior("DestroyOutsideBehavior::DestroyOutside")
+        ["DestroyOutsideBehavior::DestroyOutside::ExtraBorder"]
+            .SetFunctionName("getExtraBorder");
+    GetAllActionsForBehavior("DestroyOutsideBehavior::DestroyOutside")
+        ["DestroyOutsideBehavior::DestroyOutside::SetExtraBorder"]
+            .SetFunctionName("setExtraBorder")
+            .SetGetter("getExtraBorder");
+
+    // Deprecated:
     GetAllConditionsForBehavior("DestroyOutsideBehavior::DestroyOutside")
         ["DestroyOutsideBehavior::ExtraBorder"]
-            .SetFunctionName("getExtraBorder")
-            .SetIncludeFile(
-                "Extensions/DestroyOutsideBehavior/"
-                "destroyoutsideruntimebehavior.js");
+            .SetFunctionName("getExtraBorder");
     GetAllActionsForBehavior("DestroyOutsideBehavior::DestroyOutside")
         ["DestroyOutsideBehavior::ExtraBorder"]
             .SetFunctionName("setExtraBorder")
-            .SetGetter("getExtraBorder")
-            .SetIncludeFile(
-                "Extensions/DestroyOutsideBehavior/"
-                "destroyoutsideruntimebehavior.js");
+            .SetGetter("getExtraBorder");
+
+    GetAllExpressionsForBehavior(
+        "DestroyOutsideBehavior::DestroyOutside")["UnseenGraceDistance"]
+        .SetFunctionName("getUnseenGraceDistance");
+    GetAllConditionsForBehavior("DestroyOutsideBehavior::DestroyOutside")
+        ["DestroyOutsideBehavior::DestroyOutside::UnseenGraceDistance"]
+            .SetFunctionName("getUnseenGraceDistance");
+    GetAllActionsForBehavior("DestroyOutsideBehavior::DestroyOutside")
+        ["DestroyOutsideBehavior::DestroyOutside::SetUnseenGraceDistance"]
+            .SetFunctionName("setUnseenGraceDistance")
+            .SetGetter("getUnseenGraceDistance");
 
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
   };

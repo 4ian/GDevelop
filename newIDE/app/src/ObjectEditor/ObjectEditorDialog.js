@@ -60,7 +60,23 @@ type Props = {|
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
-  onExtensionInstalled: (extensionName: string) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onOpenEventBasedObjectEditor: (
+    extensionName: string,
+    eventsBasedObjectName: string
+  ) => void,
+  onOpenEventBasedObjectVariantEditor: (
+    extensionName: string,
+    eventsBasedObjectName: string,
+    variantName: string
+  ) => void,
+  onDeleteEventsBasedObjectVariant: (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventBasedObject: gdEventsBasedObject,
+    variant: gdEventsBasedObjectVariant
+  ) => void,
+  isBehaviorListLocked: boolean,
+  isVariableListLocked: boolean,
 |};
 
 type InnerDialogProps = {|
@@ -90,6 +106,11 @@ const InnerDialog = (props: InnerDialogProps) => {
     onUpdateBehaviorsSharedData,
     onComputeAllVariableNames,
     onExtensionInstalled,
+    onOpenEventBasedObjectEditor,
+    onOpenEventBasedObjectVariantEditor,
+    onDeleteEventsBasedObjectVariant,
+    isBehaviorListLocked,
+    isVariableListLocked,
   } = props;
   const [currentTab, setCurrentTab] = React.useState<ObjectEditorTab>(
     initialTab || 'properties'
@@ -146,6 +167,13 @@ const InnerDialog = (props: InnerDialogProps) => {
       changeset,
       originalSerializedVariables
     );
+    if (eventsBasedObject) {
+      gd.ObjectVariableHelper.applyChangesToVariants(
+        eventsBasedObject,
+        object.getName(),
+        changeset
+      );
+    }
     object.clearPersistentUuid();
 
     // Do the renaming *after* applying changes, as "withSerializableObject"
@@ -287,12 +315,18 @@ const InnerDialog = (props: InnerDialogProps) => {
                 autoFocus="desktop"
               />
             )}
+            onOpenEventBasedObjectEditor={onOpenEventBasedObjectEditor}
+            onOpenEventBasedObjectVariantEditor={
+              onOpenEventBasedObjectVariantEditor
+            }
+            onDeleteEventsBasedObjectVariant={onDeleteEventsBasedObjectVariant}
           />
         </Column>
       ) : null}
       {currentTab === 'behaviors' && (
         <BehaviorsEditor
           object={object}
+          isChildObject={!!eventsBasedObject}
           project={project}
           eventsFunctionsExtension={eventsFunctionsExtension}
           resourceManagementProps={resourceManagementProps}
@@ -303,6 +337,7 @@ const InnerDialog = (props: InnerDialogProps) => {
           onBehaviorsUpdated={notifyOfChange}
           openBehaviorEvents={askConfirmationAndOpenBehaviorEvents}
           onExtensionInstalled={onExtensionInstalled}
+          isListLocked={isBehaviorListLocked}
         />
       )}
       {currentTab === 'variables' && (
@@ -329,6 +364,7 @@ const InnerDialog = (props: InnerDialogProps) => {
             helpPagePath={'/all-features/variables/object-variables'}
             onComputeAllVariableNames={onComputeAllVariableNames}
             onVariablesUpdated={notifyOfChange}
+            isListLocked={isVariableListLocked}
           />
         </Column>
       )}

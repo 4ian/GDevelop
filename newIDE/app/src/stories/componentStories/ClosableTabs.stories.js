@@ -308,6 +308,9 @@ export const WithObjectsList = () => (
                   resourceManagementProps={fakeResourceManagementProps}
                   onEditObject={action('On edit object')}
                   onOpenEventBasedObjectEditor={action('On edit children')}
+                  onOpenEventBasedObjectVariantEditor={action(
+                    'On edit variant'
+                  )}
                   onExportAssets={action('On export assets')}
                   onAddObjectInstance={action('On add instance to the scene')}
                   selectedObjectFolderOrObjectsWithContext={[]}
@@ -322,6 +325,8 @@ export const WithObjectsList = () => (
                   onObjectEdited={() => {}}
                   onObjectFolderOrObjectWithContextSelected={() => {}}
                   hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+                  isListLocked={false}
+                  onExtensionInstalled={action('onExtensionInstalled')}
                 />
               </TabContentContainer>
             }

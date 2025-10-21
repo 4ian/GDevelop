@@ -9,6 +9,7 @@ const { generateReadMoreLink } = require('./WikiHelpLink');
 /** @typedef {import('../../../../GDevelop.js/types').ExpressionMetadata} ExpressionMetadata */
 /** @typedef {import('../../../../GDevelop.js/types').ObjectMetadata} ObjectMetadata */
 /** @typedef {import('../../../../GDevelop.js/types').BehaviorMetadata} BehaviorMetadata */
+/** @typedef {import('../../../../GDevelop.js/types').ParameterMetadata} ParameterMetadata */
 
 /**
  * @typedef {Object} RawText A text to be shown on a page
@@ -170,6 +171,7 @@ const translateTypeToHumanReadableDescription = type => {
   if (type === 'expression') return '🔢 Number';
   if (type === 'camera') return '🔢 Camera index (Number)';
 
+  if (type === 'object') return '👾 Object';
   if (type === 'objectList') return '👾 Object';
   if (type === 'objectPtr') return '👾 Object';
   if (type === 'objectListOrEmptyIfJustDeclared') return '👾 Object';
@@ -199,6 +201,12 @@ const translateTypeToHumanReadableDescription = type => {
     return '🔤 Function Parameter Name (String)';
   if (type === 'externalLayoutName') return '🔤 External Layout Name (String)';
   if (type === 'leaderboardId') return '🔤 Leaderboard Identifier (String)';
+
+  if (type === 'operator') return '🟰 Operator';
+  if (type === 'relationalOperator') return '🟰 Relational operator';
+
+  if (type === 'yesorno') return '❓ Yes or No';
+  if (type === 'trueorfalse') return '❓ True or False';
 
   return type;
 };
@@ -235,7 +243,99 @@ const translateTypeToHumanReadableType = type => {
   if (type === 'externalLayoutName') return 'external layout name';
   if (type === 'leaderboardId') return 'leaderboard identifier';
 
+  if (type === 'yesorno') return 'yes or no';
+  if (type === 'trueorfalse') return 'true or false';
+
   return type;
+};
+
+/**
+ * @param {string} type
+ * @param {string} sanitizedDescription
+ */
+const isDescriptionObvious = (type, sanitizedDescription) => {
+  const isDescriptionSameAsType =
+    sanitizedDescription.toLowerCase().replace(/\s+/g, '') ===
+    type.toLowerCase();
+  if (isDescriptionSameAsType) return true;
+
+  if (
+    type === 'number' &&
+    (sanitizedDescription === 'Expression' ||
+      sanitizedDescription === 'Expression (number)' ||
+      sanitizedDescription === 'Expression.')
+  )
+    return true;
+
+  if (type === 'operator' || type === 'relationalOperator') {
+    return true;
+  }
+  if (
+    type === 'layerEffectName' ||
+    type === 'layerEffectParameterName' ||
+    type === 'objectEffectName' ||
+    type === 'objectEffectParameterName' ||
+    type === 'objectPointName' ||
+    type === 'objectAnimationName' ||
+    type === 'externalLayoutName'
+  ) {
+    return true;
+  }
+
+  return false;
+};
+
+const normalizeType = (/** @type {string} */ parameterType) => {
+  if (parameterType === 'expression') return 'number';
+
+  if (
+    parameterType === 'object' ||
+    parameterType === 'objectPtr' ||
+    parameterType === 'objectList' ||
+    parameterType === 'objectListOrEmptyIfJustDeclared' ||
+    parameterType === 'objectListOrEmptyWithoutPicking'
+  ) {
+    return 'object';
+  }
+
+  return parameterType;
+};
+
+/**
+ * @param {string} type
+ * @param {string} sanitizedDescription
+ */
+const getSimplifiedParameterDescription = (type, sanitizedDescription) => {
+  if (
+    type === 'number' &&
+    sanitizedDescription.toLowerCase().includes('camera number')
+  ) {
+    return 'Camera number';
+  }
+
+  return null;
+};
+
+/**
+ * @param {ParameterMetadata} parameterMetadata
+ * @returns {string}
+ */
+const getParameterExtraInfoDescription = parameterMetadata => {
+  if (parameterMetadata.getType() === 'stringWithSelector') {
+    const rawExtraInfo = parameterMetadata.getExtraInfo();
+    try {
+      const parsedExtraInfo = JSON.parse(rawExtraInfo);
+      if (Array.isArray(parsedExtraInfo)) {
+        return `(one of: ${parsedExtraInfo
+          .map(value => `"${value}"`)
+          .join(', ')})`;
+      }
+    } catch (err) {
+      return `(value must be: ${rawExtraInfo})`;
+    }
+  }
+
+  return '';
 };
 
 /** @returns {ReferenceText} */
@@ -246,15 +346,79 @@ const generateInstructionReferenceRowsText = ({
   objectMetadata,
   behaviorMetadata,
 }) => {
+  const paramPadding = '    ';
+  const codeOnlyParametersIndexes = [];
+  let parametersList = mapFor(
+    0,
+    instructionMetadata.getParameters().getParametersCount(),
+    index => {
+      const parameterMetadata = instructionMetadata
+        .getParameters()
+        .getParameterAt(index);
+
+      const longDescription = parameterMetadata.getLongDescription();
+      const sanitizedDescription = [
+        parameterMetadata.getDescription(),
+        longDescription,
+      ]
+        .filter(Boolean)
+        .join('\n')
+        .replace(/\n/g, `\n${paramPadding}  `);
+
+      const type = normalizeType(parameterMetadata.getType());
+      const humanReadableTypeDesc = translateTypeToHumanReadableDescription(
+        type
+      );
+
+      if (parameterMetadata.isCodeOnly()) {
+        codeOnlyParametersIndexes.push(index);
+        return null;
+      }
+
+      const simplifiedParameterDescription = getSimplifiedParameterDescription(
+        type,
+        sanitizedDescription
+      );
+
+      const extraInfoDescription = getParameterExtraInfoDescription(
+        parameterMetadata
+      );
+
+      return [
+        simplifiedParameterDescription
+          ? `${paramPadding}- Parameter ${index} (${humanReadableTypeDesc}): ${simplifiedParameterDescription}`
+          : isDescriptionObvious(type, sanitizedDescription)
+          ? `${paramPadding}- Parameter ${index}: ${humanReadableTypeDesc}`
+          : `${paramPadding}- Parameter ${index} (${humanReadableTypeDesc}): ${sanitizedDescription}`,
+        extraInfoDescription,
+      ]
+        .filter(Boolean)
+        .join(' ');
+    }
+  )
+    .filter(Boolean)
+    .join('\n');
+
+  if (codeOnlyParametersIndexes.length) {
+    parametersList +=
+      '\n\n' +
+      `${paramPadding}> Technical note: ${
+        codeOnlyParametersIndexes.length === 1 ? 'parameter' : 'parameters'
+      } ${codeOnlyParametersIndexes.join(
+        ', '
+      )} are internal parameters handled by GDevelop.`;
+  }
+
   return {
     orderKey: instructionType,
-    text:
-      '**' +
-      instructionMetadata.getFullName() +
-      '**  ' +
-      '\n' +
-      instructionMetadata.getDescription().replace(/\n/, '  \n') +
-      '\n',
+    text: [
+      '**' + instructionMetadata.getFullName() + '**  ',
+      instructionMetadata.getDescription().replace(/\n/, `  \n`),
+      '',
+      ...(parametersList
+        ? ['??? quote "See parameters"', '', parametersList, '']
+        : []),
+    ].join('\n'),
   };
 };
 
@@ -632,6 +796,56 @@ const generateExtensionRawText = (
         ...expressionsReferenceTexts,
       ];
     }),
+    { text: '' },
+    ...extension
+      .getExtensionEffectTypes()
+      .toJSArray()
+      .map(
+        /**
+         * @param {string} effectType
+         * @returns {RawText}
+         */
+        effectType => {
+          const effectMetadata = extension.getEffectMetadata(effectType);
+          const properties = effectMetadata.getProperties();
+          const propertyNames = properties.keys().toJSArray();
+
+          return {
+            text: [
+              `### Effect "${effectMetadata.getFullName()}"`,
+              '',
+              `${effectMetadata.getDescription().replace(/\n/g, '  ')}`,
+              '',
+              ...[
+                effectMetadata.isMarkedAsUnique()
+                  ? 'This effect can be added only once on a layer.'
+                  : null,
+                effectMetadata.isMarkedAsOnlyWorkingFor2D()
+                  ? effectMetadata.isMarkedAsNotWorkingForObjects()
+                    ? 'This effect is for 2D layers only.'
+                    : 'This effect is for 2D layers or objects only.'
+                  : null,
+                effectMetadata.isMarkedAsOnlyWorkingFor3D()
+                  ? 'This effect is for 3D layers only.'
+                  : null,
+              ].filter(Boolean),
+              '',
+              `Properties of this effect are:`,
+              '',
+              ...propertyNames.map(propertyName => {
+                const propertyMetadata = properties.get(propertyName);
+                return [
+                  propertyMetadata.getDescription()
+                    ? `- **${propertyMetadata.getLabel()}**: ${propertyMetadata.getDescription()}.`
+                    : `- **${propertyMetadata.getLabel()}**.`,
+                  `Default value is \`${propertyMetadata.getValue()}\`. For events, write: \`"${propertyName}"\`.`,
+                ].join(' ');
+              }),
+              '',
+            ].join(`\n`),
+          };
+        }
+      ),
     generateExtensionFooterText({ extension }),
   ].filter(Boolean);
 };

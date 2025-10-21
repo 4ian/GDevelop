@@ -8,7 +8,9 @@ namespace gdjs {
    * The DestroyOutsideRuntimeBehavior represents a behavior that destroys the object when it leaves the screen.
    */
   export class DestroyOutsideRuntimeBehavior extends gdjs.RuntimeBehavior {
-    _extraBorder: any;
+    _extraBorder: float;
+    _unseenGraceDistance: float;
+    _hasBeenOnScreen: boolean;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -17,11 +19,19 @@ namespace gdjs {
     ) {
       super(instanceContainer, behaviorData, owner);
       this._extraBorder = behaviorData.extraBorder || 0;
+      this._unseenGraceDistance = behaviorData.unseenGraceDistance || 0;
+      this._hasBeenOnScreen = false;
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
       if (oldBehaviorData.extraBorder !== newBehaviorData.extraBorder) {
         this._extraBorder = newBehaviorData.extraBorder;
+      }
+      if (
+        oldBehaviorData.unseenGraceDistance !==
+        newBehaviorData.unseenGraceDistance
+      ) {
+        this._unseenGraceDistance = newBehaviorData.unseenGraceDistance;
       }
       return true;
     }
@@ -35,23 +45,47 @@ namespace gdjs {
       const ocy = this.owner.getDrawableY() + this.owner.getCenterY();
       const layer = instanceContainer.getLayer(this.owner.getLayer());
       const boundingCircleRadius = Math.sqrt(ow * ow + oh * oh) / 2.0;
+
+      const cameraLeft = layer.getCameraX() - layer.getCameraWidth() / 2;
+      const cameraRight = layer.getCameraX() + layer.getCameraWidth() / 2;
+      const cameraTop = layer.getCameraY() - layer.getCameraHeight() / 2;
+      const cameraBottom = layer.getCameraY() + layer.getCameraHeight() / 2;
+
       if (
-        ocx + boundingCircleRadius + this._extraBorder <
-          layer.getCameraX() - layer.getCameraWidth() / 2 ||
-        ocx - boundingCircleRadius - this._extraBorder >
-          layer.getCameraX() + layer.getCameraWidth() / 2 ||
-        ocy + boundingCircleRadius + this._extraBorder <
-          layer.getCameraY() - layer.getCameraHeight() / 2 ||
-        ocy - boundingCircleRadius - this._extraBorder >
-          layer.getCameraY() + layer.getCameraHeight() / 2
+        ocx + boundingCircleRadius + this._extraBorder < cameraLeft ||
+        ocx - boundingCircleRadius - this._extraBorder > cameraRight ||
+        ocy + boundingCircleRadius + this._extraBorder < cameraTop ||
+        ocy - boundingCircleRadius - this._extraBorder > cameraBottom
       ) {
-        //We are outside the camera area.
-        this.owner.deleteFromScene(instanceContainer);
+        if (this._hasBeenOnScreen) {
+          // Object is outside the camera area and object was previously seen inside it:
+          // delete it now.
+          this.owner.deleteFromScene();
+        } else if (
+          ocx + boundingCircleRadius + this._unseenGraceDistance < cameraLeft ||
+          ocx - boundingCircleRadius - this._unseenGraceDistance >
+            cameraRight ||
+          ocy + boundingCircleRadius + this._unseenGraceDistance < cameraTop ||
+          ocy - boundingCircleRadius - this._unseenGraceDistance > cameraBottom
+        ) {
+          // Object is outside the camera area and also outside the grace distance:
+          // force deletion.
+          this.owner.deleteFromScene();
+        } else {
+          // Object is outside the camera area but inside the grace distance
+          // and was never seen inside the camera area: don't delete it yet.
+        }
+      } else {
+        this._hasBeenOnScreen = true;
       }
     }
 
     /**
-     * Set an additional border to the camera viewport as a buffer before the object gets destroyed.
+     * Set the additional border outside the camera area.
+     *
+     * If the object goes beyond the camera area and this border, it will be deleted (unless it was
+     * never seen inside the camera area and this border before, in which case it will be deleted
+     * according to the grace distance).
      * @param val Border in pixels.
      */
     setExtraBorder(val: number): void {
@@ -59,11 +93,35 @@ namespace gdjs {
     }
 
     /**
-     * Get the additional border of the camera viewport buffer which triggers the destruction of an object.
+     * Get the additional border outside the camera area.
      * @return The additional border around the camera viewport in pixels
      */
     getExtraBorder(): number {
       return this._extraBorder;
+    }
+
+    /**
+     * Change the grace distance before an object is deleted if it's outside the camera area
+     * and was never seen inside the camera area. Typically useful to avoid objects being deleted
+     * before they are visible when they spawn.
+     */
+    setUnseenGraceDistance(val: number): void {
+      this._unseenGraceDistance = val;
+    }
+
+    /**
+     * Get the grace distance before an object is deleted if it's outside the camera area
+     * and was never seen inside the camera area.
+     */
+    getUnseenGraceDistance(): number {
+      return this._unseenGraceDistance;
+    }
+
+    /**
+     * Check if this object has been visible on screen (precisely: inside the camera area *including* the extra border).
+     */
+    hasBeenOnScreen(): boolean {
+      return this._hasBeenOnScreen;
     }
   }
   gdjs.registerBehavior(

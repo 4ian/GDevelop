@@ -20,6 +20,7 @@ export type TestProject = {|
   spriteObjectWithoutBehaviors: gdObject,
   testSpriteObjectInstance: gdInitialInstance,
   testLayout: gdLayout,
+  testProjectScopedContainersAccessor: ProjectScopedContainersAccessor,
   testSceneProjectScopedContainersAccessor: ProjectScopedContainersAccessor,
   group1: gdObjectGroup,
   group2: gdObjectGroup,
@@ -466,7 +467,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   var evt = testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
-  testLayout
+  const evt2 = testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 1);
   testLayout
@@ -490,6 +491,8 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   var evtWithInvalidParameters = testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+
+  evt2.setAiGeneratedEventId('fake-ai-generated-event-id-1');
 
   const groupEvent = gd.asGroupEvent(evt6);
   groupEvent.setName('Group #1');
@@ -902,6 +905,12 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     'whatever-this-is-not-recognised'
   );
 
+  const testProjectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+    {
+      project,
+    }
+  );
+
   const testSceneProjectScopedContainersAccessor = new ProjectScopedContainersAccessor(
     {
       project,
@@ -942,6 +951,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     spriteObjectWithBehaviors,
     spriteObjectWithoutBehaviors,
     testLayout,
+    testProjectScopedContainersAccessor,
     testSceneProjectScopedContainersAccessor,
     group1,
     group2,

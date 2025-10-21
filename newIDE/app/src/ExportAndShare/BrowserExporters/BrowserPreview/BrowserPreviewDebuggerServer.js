@@ -165,6 +165,39 @@ class BrowserPreviewDebuggerServer {
   registerEmbeddedGameFrame(window: WindowProxy) {
     embbededGameFrameWindow = window;
   }
+  closeAllPreviews() {
+    // Close all preview windows
+    for (const id in existingPreviewWindows) {
+      const previewWindow = existingPreviewWindows[id];
+      try {
+        if (previewWindow && !previewWindow.closed) {
+          previewWindow.close();
+        }
+      } catch (error) {
+        console.warn('Failed to close preview window:', error);
+      }
+    }
+
+    // Clear all preview windows and embedded game frame
+    Object.keys(existingPreviewWindows).forEach(id => {
+      delete existingPreviewWindows[id];
+    });
+    embbededGameFrameWindow = null;
+
+    // Stop the polling if no windows remain
+    if (windowClosedPollingIntervalId !== null) {
+      clearInterval(windowClosedPollingIntervalId);
+      windowClosedPollingIntervalId = null;
+    }
+
+    // Notify callbacks that all connections are closed
+    callbacksList.forEach(({ onConnectionClosed }) => {
+      onConnectionClosed({
+        id: 'all',
+        debuggerIds: getExistingDebuggerIds(),
+      });
+    });
+  }
 }
 export const browserPreviewDebuggerServer: PreviewDebuggerServer = new BrowserPreviewDebuggerServer();
 

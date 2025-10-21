@@ -12,7 +12,7 @@ const autoUpdater = require('electron-updater').autoUpdater;
 const log = require('electron-log');
 const { uploadLocalFile } = require('./LocalFileUploader');
 const { serveFolder, stopServer } = require('./ServeFolder');
-const { startDebuggerServer, sendMessage } = require('./DebuggerServer');
+const { startDebuggerServer, sendMessage, closeAllConnections } = require('./DebuggerServer');
 const {
   buildElectronMenuFromDeclarativeTemplate,
   buildPlaceholderMainMenu,
@@ -26,7 +26,7 @@ const {
   downloadLocalFile,
   saveLocalFileFromArrayBuffer,
 } = require('./LocalFileDownloader');
-const { openPreviewWindow, closePreviewWindow } = require('./PreviewWindow');
+const { openPreviewWindow, closePreviewWindow, closeAllPreviewWindows } = require('./PreviewWindow');
 const {
   setupLocalGDJSDevelopmentWatcher,
   closeLocalGDJSDevelopmentWatcher,
@@ -188,6 +188,10 @@ app.on('ready', function() {
   });
   ipcMain.handle('preview-close', async (event, options) => {
     return closePreviewWindow(options.windowId);
+  });
+  ipcMain.on('preview-close-all', () => {
+    log.info('Closing all preview windows');
+    closeAllPreviewWindows();
   });
 
   // Piskel image editor
@@ -360,6 +364,10 @@ app.on('ready', function() {
     sendMessage(message, err =>
       event.sender.send('debugger-send-message-done', err)
     );
+  });
+  ipcMain.on('debugger-close-all-connections', () => {
+    log.info('Closing all debugger connections');
+    closeAllConnections();
   });
 
   ipcMain.on('updates-check-and-download', event => {

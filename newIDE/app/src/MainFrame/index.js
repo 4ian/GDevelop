@@ -864,6 +864,16 @@ const MainFrame = (props: Props) => {
       // - Add a dirty flag system to refresh on demand.
       setIsProjectClosedSoAvoidReloadingExtensions(true);
 
+      // Close all previews and unregister the embedded game frame
+      const previewLauncher = _previewLauncher.current;
+      if (previewLauncher && previewLauncher.getPreviewDebuggerServer) {
+        const debuggerServer = previewLauncher.getPreviewDebuggerServer();
+        if (debuggerServer && debuggerServer.closeAllPreviews) {
+          console.info('Closing all previews and unregistering embedded game frame...');
+          debuggerServer.closeAllPreviews();
+        }
+      }
+
       // While not strictly necessary, use `currentProjectRef` to be 100%
       // sure to have the latest project (avoid risking any stale variable to an old
       // `currentProject` from the state in case someone kept an old reference to `closeProject`

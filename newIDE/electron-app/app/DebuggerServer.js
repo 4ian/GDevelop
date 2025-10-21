@@ -24,6 +24,22 @@ const getServerAddress = wsServer => ({
  * Debugger logic is made inside Debugger (in newIDE) or gdjs.AbstractDebuggerClient
  * (in GDJS).
  */
+const closeAllConnections = () => {
+  // Close all active WebSocket connections
+  for (const id in webSockets) {
+    if (webSockets[id]) {
+      try {
+        log.info(`Closing debugger connection with id "${id}".`);
+        webSockets[id].close();
+      } catch (error) {
+        log.error(`Error closing debugger connection with id "${id}":`, error);
+      }
+      webSockets[id] = null;
+    }
+  }
+  webSockets = {};
+};
+
 module.exports = {
   startDebuggerServer: options => {
     if (wsServer) {
@@ -78,6 +94,7 @@ module.exports = {
     );
   },
   closeServer,
+  closeAllConnections,
   sendMessage: ({ id, message }, cb) => {
     if (!webSockets[id]) return cb(`Debugger connection with id "${id}" does not exist`);
 

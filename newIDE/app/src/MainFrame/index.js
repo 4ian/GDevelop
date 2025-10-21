@@ -871,6 +871,19 @@ const MainFrame = (props: Props) => {
       const currentProject = currentProjectRef.current;
       if (!currentProject) return;
 
+      // Ensure all previews are closed and debugger connections cleared.
+      try {
+        const previewLauncher = _previewLauncher.current;
+        if (previewLauncher && previewLauncher.getPreviewDebuggerServer) {
+          const previewDebuggerServer = previewLauncher.getPreviewDebuggerServer();
+          if (previewDebuggerServer && previewDebuggerServer.closeAndClearAllConnections) {
+            previewDebuggerServer.closeAndClearAllConnections();
+          }
+        }
+      } catch (e) {
+        console.warn('Error while closing previews on project close:', e);
+      }
+
       // Close the editors related to this project.
       await setState(state => ({
         ...state,

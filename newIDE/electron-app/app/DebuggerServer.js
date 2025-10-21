@@ -8,8 +8,25 @@ let webSockets = {};
 let nextDebuggerId = 0;
 
 const closeServer = () => {
+  if (wsServer) {
+    try {
+      wsServer.close();
+    } catch (e) {}
+  }
   wsServer = null;
   webSockets = {};
+};
+
+const closeAllConnections = () => {
+  // Best-effort: close every client websocket and clear the registry.
+  for (const id in webSockets) {
+    const ws = webSockets[id];
+    try {
+      if (ws && ws.readyState === WebSocket.OPEN) ws.close();
+    } catch (e) {}
+    // Do not delete here; let 'close' event propagate. Still clear local map.
+    delete webSockets[id];
+  }
 };
 
 /** @param {WebSocket.Server} wsServer */
@@ -78,6 +95,7 @@ module.exports = {
     );
   },
   closeServer,
+  closeAllConnections,
   sendMessage: ({ id, message }, cb) => {
     if (!webSockets[id]) return cb(`Debugger connection with id "${id}" does not exist`);
 

@@ -88,7 +88,18 @@ const closePreviewWindow = windowId => {
   if (previewWindow) previewWindow.close();
 };
 
+const closeAllPreviewWindows = () => {
+  // Close all windows best-effort and clear the array.
+  previewWindows.forEach(window => {
+    try {
+      if (window && !window.isDestroyed()) window.close();
+    } catch (e) {}
+  });
+  previewWindows = [];
+};
+
 module.exports = {
   openPreviewWindow,
   closePreviewWindow,
+  closeAllPreviewWindows,
 };

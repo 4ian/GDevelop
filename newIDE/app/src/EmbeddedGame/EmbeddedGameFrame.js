@@ -435,6 +435,13 @@ export const EmbeddedGameFrame = ({
     const hasSomethingLoaded = !!previewIndexHtmlLocation;
     if (previewDebuggerServer && iframe && hasSomethingLoaded)
       previewDebuggerServer.registerEmbeddedGameFrame(iframe.contentWindow);
+    return () => {
+      if (previewDebuggerServer) {
+        // Ensure the embedded game frame is unregistered when the component unmounts
+        // or when the debugger server instance changes.
+        previewDebuggerServer.unregisterEmbeddedGameFrame();
+      }
+    };
   });
 
   const [isDraggedItem3D, setDraggedItem3D] = React.useState(false);

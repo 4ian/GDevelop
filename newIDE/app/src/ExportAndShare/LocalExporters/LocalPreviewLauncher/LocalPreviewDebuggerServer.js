@@ -195,6 +195,27 @@ class LocalPreviewDebuggerServer {
     // Nothing to do, the local preview debugger server communicates
     // with the embedded game frame through WebSocket, like other preview windows.
   }
+  unregisterEmbeddedGameFrame() {
+    // Nothing to do: the embedded game frame uses WebSocket like other previews.
+  }
+  closeAndClearAllConnections() {
+    // Ask the main process to close all preview windows (best-effort)
+    // and clear local debugger ids.
+    if (ipcRenderer) {
+      try {
+        ipcRenderer.invoke('preview-close-all');
+      } catch (e) {}
+    }
+    // Clear debugger ids and notify callbacks of closures.
+    while (debuggerIds.length) {
+      const id = debuggerIds.pop();
+      if (id != null) {
+        callbacksList.forEach(({ onConnectionClosed }) =>
+          onConnectionClosed({ id, debuggerIds })
+        );
+      }
+    }
+  }
 }
 
 export const localPreviewDebuggerServer: PreviewDebuggerServer = new LocalPreviewDebuggerServer();

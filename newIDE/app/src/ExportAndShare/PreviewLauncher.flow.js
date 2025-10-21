@@ -136,6 +136,16 @@ export interface PreviewDebuggerServer {
   sendMessageWithResponse(message: Object): Promise<Object>;
   registerCallbacks(callbacks: PreviewDebuggerServerCallbacks): () => void;
   registerEmbeddedGameFrame(window: WindowProxy): void;
+  /**
+   * Ensure any reference to the EmbeddedGameFrame is cleared.
+   * Implementations should also notify connection closed callbacks if needed.
+   */
+  unregisterEmbeddedGameFrame(): void;
+  /**
+   * Close all previews (windows/frames) and clear any existing debugger connections.
+   * Implementations should best-effort close windows/sockets and MUST clear debugger ids.
+   */
+  closeAndClearAllConnections(): void;
 }
 
 /** The logs returned by the game hot-reloader. */

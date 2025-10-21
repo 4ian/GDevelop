@@ -12,7 +12,11 @@ const autoUpdater = require('electron-updater').autoUpdater;
 const log = require('electron-log');
 const { uploadLocalFile } = require('./LocalFileUploader');
 const { serveFolder, stopServer } = require('./ServeFolder');
-const { startDebuggerServer, sendMessage } = require('./DebuggerServer');
+const {
+  startDebuggerServer,
+  sendMessage,
+  closeAllConnections: closeAllDebuggerConnections,
+} = require('./DebuggerServer');
 const {
   buildElectronMenuFromDeclarativeTemplate,
   buildPlaceholderMainMenu,
@@ -26,7 +30,11 @@ const {
   downloadLocalFile,
   saveLocalFileFromArrayBuffer,
 } = require('./LocalFileDownloader');
-const { openPreviewWindow, closePreviewWindow } = require('./PreviewWindow');
+const {
+  openPreviewWindow,
+  closePreviewWindow,
+  closeAllPreviewWindows,
+} = require('./PreviewWindow');
 const {
   setupLocalGDJSDevelopmentWatcher,
   closeLocalGDJSDevelopmentWatcher,
@@ -188,6 +196,12 @@ app.on('ready', function() {
   });
   ipcMain.handle('preview-close', async (event, options) => {
     return closePreviewWindow(options.windowId);
+  });
+  ipcMain.handle('preview-close-all', async (event, options) => {
+    closeAllPreviewWindows();
+    try {
+      closeAllDebuggerConnections();
+    } catch (e) {}
   });
 
   // Piskel image editor

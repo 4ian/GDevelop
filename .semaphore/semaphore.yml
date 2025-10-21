@@ -18,7 +18,7 @@ blocks:
             - |-
               if ! cache has_key newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json); then
                 cd newIDE/app
-                npm ci
+                npm ci --include dev
                 cd ../..
                 cache store newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json) newIDE/app/node_modules
               fi
@@ -26,14 +26,14 @@ blocks:
               if ! cache has_key GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json); then
                 cd GDJS
                 git checkout package-lock.json # Ensure no changes was made by newIDE post-install tasks.
-                npm ci
+                npm ci --include dev
                 cd ..
                 cache store GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json) GDJS/node_modules
               fi
             - |-
               if ! cache has_key GDJS-tests-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json); then
                 cd GDJS/tests
-                npm ci
+                npm ci --include dev
                 cd ../..
                 cache store GDJS-tests-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json) GDJS/tests/node_modules
               fi

@@ -1561,6 +1561,12 @@ namespace gdjs {
       return this._inGameEditor;
     }
 
+    isBehaviorRunnableInEditor(type: string): boolean {
+      return this._data.runnableInEditorBehaviors
+        ? this._data.runnableInEditorBehaviors.includes(type)
+        : false;
+    }
+
     /**
      * Set the maximum FPS of the game.
      * @param maximumFps The maximum FPS.

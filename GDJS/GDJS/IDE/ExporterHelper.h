@@ -481,10 +481,9 @@ class ExporterHelper {
    * \return Empty string if everything is ok,
    * description of the error otherwise.
    */
-  static gd::String
-  ExportProjectData(gd::AbstractFileSystem &fs, gd::Project &project,
-                    gd::String filename,
-                    const gd::SerializerElement &runtimeGameOptions);
+  static gd::String ExportProjectData(
+      gd::AbstractFileSystem &fs, gd::Project &project, gd::String filename,
+      const gd::SerializerElement &runtimeGameOptions, bool isInGameEdition);
 
   /**
    * \brief Serialize a project without its events to JSON
@@ -747,9 +746,9 @@ class ExporterHelper {
     *
     * \param project The project to be exported.
     */
-   static void
-   StriptAndSerializeProjectData(gd::Project &project,
-                                 gd::SerializerElement &rootElement);
+   static void StriptAndSerializeProjectData(gd::Project &project,
+                                             gd::SerializerElement &rootElement,
+                                             bool isInGameEdition);
 };
 
 }  // namespace gdjs

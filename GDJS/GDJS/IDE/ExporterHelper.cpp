@@ -286,10 +286,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     gd::SerializerElement runtimeGameOptions;
     ExporterHelper::SerializeRuntimeGameOptions(fs, gdjsRoot, options,
                                                     includesFiles, runtimeGameOptions);
-    ExportProjectData(fs,
-                      exportedProject,
-                      codeOutputDir + "/data.js",
-                      runtimeGameOptions);
+    ExportProjectData(fs, exportedProject, codeOutputDir + "/data.js",
+                      runtimeGameOptions, options.isInGameEdition);
     includesFiles.push_back(codeOutputDir + "/data.js");
 
     previousTime = LogTimeSpent("Project data export", previousTime);
@@ -324,11 +322,12 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
 gd::String ExporterHelper::ExportProjectData(
     gd::AbstractFileSystem &fs, gd::Project &project, gd::String filename,
-    const gd::SerializerElement &runtimeGameOptions) {
+    const gd::SerializerElement &runtimeGameOptions, bool isInGameEdition) {
   fs.MkDir(fs.DirNameFrom(filename));
 
   gd::SerializerElement projectDataElement;
-  ExporterHelper::StriptAndSerializeProjectData(project, projectDataElement);
+  ExporterHelper::StriptAndSerializeProjectData(project, projectDataElement,
+                                                isInGameEdition);
 
   // Save the project to JSON
   gd::String output =
@@ -497,11 +496,13 @@ void ExporterHelper::SerializeProjectData(gd::AbstractFileSystem &fs,
   gd::ResourceExposer::ExposeWholeProjectResources(clonedProject,
                                                    resourcesMergingHelper);
 
-  ExporterHelper::StriptAndSerializeProjectData(clonedProject, rootElement);
+  ExporterHelper::StriptAndSerializeProjectData(clonedProject, rootElement,
+                                                options.isInGameEdition);
 }
 
 void ExporterHelper::StriptAndSerializeProjectData(
-    gd::Project &project, gd::SerializerElement &rootElement) {
+    gd::Project &project, gd::SerializerElement &rootElement,
+    bool isInGameEdition) {
   auto projectUsedResources =
       gd::SceneResourcesFinder::FindProjectResources(project);
   std::unordered_map<gd::String, std::set<gd::String>> scenesUsedResources;
@@ -547,6 +548,20 @@ void ExporterHelper::StriptAndSerializeProjectData(
   project.SerializeTo(rootElement);
   SerializeUsedResources(rootElement, projectUsedResources, scenesUsedResources,
                          eventsBasedObjectVariantsUsedResources);
+  if (isInGameEdition) {
+    auto &behaviorsElement = rootElement.AddChild("runnableInEditorBehaviors");
+    behaviorsElement.ConsiderAsArrayOf("runnableInEditorBehavior");
+    auto &platform = project.GetCurrentPlatform();
+    for (auto &extension : platform.GetAllPlatformExtensions()) {
+      for (auto &behaviorType : extension->GetBehaviorsTypes()) {
+        auto &behaviorMetadata = extension->GetBehaviorMetadata(behaviorType);
+        if (behaviorMetadata.IsRunnableInEditor()) {
+          behaviorsElement.AddChild("resourceReference")
+              .SetStringValue(behaviorType);
+        }
+      }
+    }
+  }
 }
 
 void ExporterHelper::SerializeUsedResources(

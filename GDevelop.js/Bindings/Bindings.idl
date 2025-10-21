@@ -2161,6 +2161,9 @@ interface BehaviorMetadata {
     boolean IsRelevantForChildObjects();
     [Ref] BehaviorMetadata MarkAsIrrelevantForChildObjects();
 
+    boolean IsRunnableInEditor();
+    [Ref] BehaviorMetadata MarkAsRunnableInEditor();
+
     QuickCustomization_Visibility GetQuickCustomizationVisibility();
     [Ref] BehaviorMetadata SetQuickCustomizationVisibility(QuickCustomization_Visibility visibility);
 

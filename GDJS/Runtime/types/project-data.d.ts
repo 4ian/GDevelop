@@ -19,6 +19,7 @@ declare interface ProjectData {
   externalLayouts: ExternalLayoutData[];
   eventsFunctionsExtensions: EventsFunctionsExtensionData[];
   areEffectsHiddenInEditor?: boolean;
+  runnableInEditorBehaviors?: Array<string>;
 }
 
 declare interface EventsFunctionsVariablesData {

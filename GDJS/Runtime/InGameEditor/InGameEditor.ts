@@ -3565,7 +3565,10 @@ namespace gdjs {
         // Mouse wheel: movement on the plane or forward/backward movement.
         const wheelDeltaY = inputManager.getMouseWheelDelta();
         if (wheelDeltaY !== 0 && shouldZoom(inputManager)) {
-          this.distance = Math.max(10, this.distance - wheelDeltaY);
+          this.distance = Math.max(
+            10,
+            this.distance * Math.pow(2, -wheelDeltaY / 512)
+          );
           this._editorCamera.onHasCameraChanged();
         }
 

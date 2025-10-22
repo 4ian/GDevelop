@@ -3003,14 +3003,14 @@ namespace gdjs {
 
     setSettings(instancesEditorSettings: InstancesEditorSettings): void {
       this.isForcefullyHidden = !instancesEditorSettings.grid;
-      this.gridWidth = instancesEditorSettings.gridWidth;
-      this.gridHeight = instancesEditorSettings.gridHeight;
+      this.gridWidth = instancesEditorSettings.gridWidth || 0;
+      this.gridHeight = instancesEditorSettings.gridHeight || 0;
       this.gridDepth =
         instancesEditorSettings.gridDepth === undefined
           ? 32
           : instancesEditorSettings.gridDepth;
-      this.gridOffsetX = instancesEditorSettings.gridOffsetX;
-      this.gridOffsetY = instancesEditorSettings.gridOffsetY;
+      this.gridOffsetX = instancesEditorSettings.gridOffsetX || 0;
+      this.gridOffsetY = instancesEditorSettings.gridOffsetY || 0;
       this.gridOffsetZ = instancesEditorSettings.gridOffsetZ || 0;
       this.gridColor = instancesEditorSettings.gridColor;
       this.gridAlpha = instancesEditorSettings.gridAlpha;

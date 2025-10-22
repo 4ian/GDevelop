@@ -61,24 +61,30 @@ namespace gdjs {
     }
 
     updateOpacity(): void {
-      // TODO: Currently, the renderer does not use the object alpha to set
-      // opacity. Setting alpha on each layer tile might not be useful as
-      // each layer would be separately transparent instead of the whole tilemap.
-      this._pixiObject.alpha = this._object._opacity / 255;
+      const newAlpha = this._object._opacity / 255;
+      if (this._pixiObject.alpha === newAlpha) {
+        return;
+      }
+
+      this._pixiObject.alpha = newAlpha;
       const tileMap = this._object.getTileMap();
       if (!tileMap) return;
       for (const layer of tileMap.getLayers()) {
-        if (
+        const isLayerHidden =
           (this._object._displayMode === 'index' &&
             this._object._layerIndex !== layer.id) ||
-          (this._object._displayMode === 'visible' && !layer.isVisible())
-        ) {
-          continue;
-        }
+          (this._object._displayMode === 'visible' && !layer.isVisible());
+
+        // Only set alpha on editable layers that are not hidden,
+        // as others are not rendered.
+        if (isLayerHidden) continue;
         if (layer instanceof TileMapHelper.EditableTileMapLayer) {
           layer.setAlpha(this._pixiObject.alpha);
         }
       }
+
+      // Changing the alpha requires a full re-render of the tile map.
+      this._object.updateTileMap();
     }
 
     setWidth(width: float): void {
@@ -127,7 +133,7 @@ namespace gdjs {
         tileMap,
         textureCache,
         // @ts-ignore
-        this._displayMode,
+        this._object._displayMode,
         this._object._layerIndex
       );
     }

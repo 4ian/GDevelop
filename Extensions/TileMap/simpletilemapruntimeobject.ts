@@ -107,42 +107,46 @@ namespace gdjs {
       return this._renderer.getRendererObject();
     }
 
+    updateTileMap(): void {
+      let shouldContinue = true;
+      this._tileMapManager.getOrLoadSimpleTileMapTextureCache(
+        (textureName) => {
+          return this.getInstanceContainer()
+            .getGame()
+            .getImageManager()
+            .getPIXITexture(
+              textureName
+            ) as unknown as PIXI.BaseTexture<PIXI.Resource>;
+        },
+        this._atlasImage,
+        this._tileSize,
+        this._columnCount,
+        this._rowCount,
+        (textureCache: TileMapHelper.TileTextureCache | null) => {
+          if (!textureCache) {
+            // getOrLoadTextureCache already log warns and errors.
+            return;
+          }
+          this._renderer.refreshPixiTileMap(textureCache);
+        },
+        (error) => {
+          shouldContinue = false;
+          console.error(
+            `Could not load texture cache for atlas ${this._atlasImage} during prerender. The tilemap might be badly configured or an issues happened with the loaded atlas image:`,
+            error
+          );
+        }
+      );
+      if (!shouldContinue) return;
+      if (this._collisionTileMap) {
+        if (this._tileMap)
+          this._collisionTileMap.updateFromTileMap(this._tileMap);
+      }
+    }
+
     updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       if (this._isTileMapDirty) {
-        let shouldContinue = true;
-        this._tileMapManager.getOrLoadSimpleTileMapTextureCache(
-          (textureName) => {
-            return this.getInstanceContainer()
-              .getGame()
-              .getImageManager()
-              .getPIXITexture(
-                textureName
-              ) as unknown as PIXI.BaseTexture<PIXI.Resource>;
-          },
-          this._atlasImage,
-          this._tileSize,
-          this._columnCount,
-          this._rowCount,
-          (textureCache: TileMapHelper.TileTextureCache | null) => {
-            if (!textureCache) {
-              // getOrLoadTextureCache already log warns and errors.
-              return;
-            }
-            this._renderer.refreshPixiTileMap(textureCache);
-          },
-          (error) => {
-            shouldContinue = false;
-            console.error(
-              `Could not load texture cache for atlas ${this._atlasImage} during prerender. The tilemap might be badly configured or an issues happened with the loaded atlas image:`,
-              error
-            );
-          }
-        );
-        if (!shouldContinue) return;
-        if (this._collisionTileMap) {
-          if (this._tileMap)
-            this._collisionTileMap.updateFromTileMap(this._tileMap);
-        }
+        this.updateTileMap();
         this._isTileMapDirty = false;
       }
     }

@@ -48,7 +48,7 @@ type Props = {|
   assetShortHeaders: Array<AssetShortHeader>,
   addedAssetIds: Set<string>,
   onClose: () => void,
-  onAssetsAdded: (createdObjects: gdObject[]) => void,
+  onAssetsAdded: InstallAssetOutput => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   project: gdProject,
   objectsContainer: ?gdObjectsContainer,
@@ -236,8 +236,15 @@ const AssetPackInstallDialog = ({
         const createdObjects = results
           .map(result => result.createdObjects)
           .flat();
+        const isTheFirstOfItsTypeInProject = results
+          .map(result => result.isTheFirstOfItsTypeInProject)
+          .reduce(
+            (accumulator: boolean, currentValue: boolean) =>
+              accumulator || currentValue,
+            false
+          );
         complyVariantsToEventsBasedObjectOf(project, createdObjects);
-        onAssetsAdded(createdObjects);
+        onAssetsAdded({ createdObjects, isTheFirstOfItsTypeInProject });
       } catch (error) {
         setAreAssetsBeingInstalled(false);
         console.error('Error while installing the assets', error);

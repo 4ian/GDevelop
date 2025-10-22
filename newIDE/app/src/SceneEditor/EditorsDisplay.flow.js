@@ -70,7 +70,7 @@ export type SceneEditorsDisplayProps = {|
   onLayersVisibilityInEditorChanged: () => void,
   onBackgroundColorChanged: () => void,
   onObjectCreated: (
-    object: gdObject,
+    objects: Array<gdObject>,
     isTheFirstOfItsTypeInProject: boolean
   ) => void,
   onObjectsModified: (objects: Array<gdObject>) => void,

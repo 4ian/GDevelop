@@ -62,7 +62,7 @@ export type ObjectFolderTreeViewItemProps = {|
   editName: (itemId: string) => void,
   onObjectModified: (shouldForceUpdateList: boolean) => void,
   onObjectCreated: (
-    object: gdObject,
+    objects: Array<gdObject>,
     isTheFirstOfItsTypeInProject: boolean
   ) => void,
   expandFolders: (
@@ -453,7 +453,10 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
       addInsideFolder: true,
     });
 
-    onObjectCreated(newObjectWithContext.object, isTheFirstOfItsTypeInProject);
+    onObjectCreated(
+      [newObjectWithContext.object],
+      isTheFirstOfItsTypeInProject
+    );
 
     onObjectModified(false);
     if (onObjectPasted) onObjectPasted(newObjectWithContext.object);

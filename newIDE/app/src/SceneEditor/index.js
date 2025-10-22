@@ -1359,9 +1359,13 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onObjectCreated = (
-    object: gdObject,
+    objects: Array<gdObject>,
     isTheFirstOfItsTypeInProject: boolean
   ) => {
+    if (objects.length === 0) {
+      return;
+    }
+    const object = objects[0];
     const infoBarDetails = onObjectAdded({
       object,
       layersContainer: this.props.layersContainer,

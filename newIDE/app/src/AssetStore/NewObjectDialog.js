@@ -50,6 +50,9 @@ import type { ObjectFolderOrObjectWithContext } from '../ObjectsList/EnumerateOb
 import LoaderModal from '../UI/LoaderModal';
 import { AssetStoreNavigatorContext } from './AssetStoreNavigator';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
+import uniq from 'lodash/uniq';
+
+const gd: libGDevelop = global.gd;
 
 const isDev = Window.isDev();
 
@@ -253,6 +256,13 @@ export const useInstallAsset = ({
         project,
         onExtensionInstalled,
       });
+
+      const isTheFirstOfItsTypeInProject = uniq(
+        asset.objectAssets.map(objectAsset => objectAsset.object.type)
+      ).some(
+        objectType => !gd.UsedObjectTypeFinder.scanProject(project, objectType)
+      );
+
       const isPrivate = isPrivateAsset(assetShortHeader);
       const installOutput = isPrivate
         ? await installPrivateAsset({
@@ -296,6 +306,7 @@ export const useInstallAsset = ({
 
       await resourceManagementProps.onFetchNewlyAddedResources();
       resourceManagementProps.onNewResourcesAdded();
+      installOutput.isTheFirstOfItsTypeInProject = isTheFirstOfItsTypeInProject;
       return installOutput;
     } catch (error) {
       console.error('Error while installing the asset:', error);
@@ -318,7 +329,7 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
   onClose: () => void,
   onCreateNewObject: (type: string) => void,
-  onObjectsAddedFromAssets: (Array<gdObject>) => void,
+  onObjectsAddedFromAssets: InstallAssetOutput => void,
   targetObjectFolderOrObjectWithContext?: ?ObjectFolderOrObjectWithContext,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
@@ -404,8 +415,7 @@ function NewObjectDialog({
         objectsContainer,
       });
       setIsAssetBeingInstalled(false);
-      if (installAssetOutput)
-        onObjectsAddedFromAssets(installAssetOutput.createdObjects);
+      if (installAssetOutput) onObjectsAddedFromAssets(installAssetOutput);
       return !!installAssetOutput;
     },
     [installAsset, onObjectsAddedFromAssets, objectsContainer]
@@ -677,9 +687,9 @@ function NewObjectDialog({
                 assetShortHeaders={displayedAssetShortHeaders}
                 addedAssetIds={existingAssetStoreIds}
                 onClose={() => setIsAssetPackDialogInstallOpen(false)}
-                onAssetsAdded={createdObjects => {
+                onAssetsAdded={installAssetOutput => {
                   setIsAssetPackDialogInstallOpen(false);
-                  onObjectsAddedFromAssets(createdObjects);
+                  onObjectsAddedFromAssets(installAssetOutput);
                 }}
                 project={project}
                 objectsContainer={objectsContainer}

@@ -1561,9 +1561,9 @@ namespace gdjs {
       return this._inGameEditor;
     }
 
-    isBehaviorRunnableInEditor(type: string): boolean {
-      return this._data.runnableInEditorBehaviors
-        ? this._data.runnableInEditorBehaviors.includes(type)
+    isBehaviorActivatedByDefaultInEditor(type: string): boolean {
+      return this._data.activatedByDefaultInEditorBehaviors
+        ? this._data.activatedByDefaultInEditorBehaviors.includes(type)
         : false;
     }
 

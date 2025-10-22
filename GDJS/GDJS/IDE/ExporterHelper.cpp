@@ -549,13 +549,13 @@ void ExporterHelper::StriptAndSerializeProjectData(
   SerializeUsedResources(rootElement, projectUsedResources, scenesUsedResources,
                          eventsBasedObjectVariantsUsedResources);
   if (isInGameEdition) {
-    auto &behaviorsElement = rootElement.AddChild("runnableInEditorBehaviors");
+    auto &behaviorsElement = rootElement.AddChild("activatedByDefaultInEditorBehaviors");
     behaviorsElement.ConsiderAsArrayOf("runnableInEditorBehavior");
     auto &platform = project.GetCurrentPlatform();
     for (auto &extension : platform.GetAllPlatformExtensions()) {
       for (auto &behaviorType : extension->GetBehaviorsTypes()) {
         auto &behaviorMetadata = extension->GetBehaviorMetadata(behaviorType);
-        if (behaviorMetadata.IsRunnableInEditor()) {
+        if (behaviorMetadata.IsActivatedByDefaultInEditor()) {
           behaviorsElement.AddChild("resourceReference")
               .SetStringValue(behaviorType);
         }

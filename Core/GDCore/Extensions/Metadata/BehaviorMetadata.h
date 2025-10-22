@@ -318,14 +318,14 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
    * When variants are edited behaviors attached to their direct child-objects
    * are not executed.
    */
-  bool IsRunnableInEditor() const { return isRunnableInEditor; }
+  bool IsActivatedByDefaultInEditor() const { return isActivatedByDefaultInEditor; }
 
   /**
    * Set that behavior should be run by the editor when it is attached to a
    * child-object.
    */
-  BehaviorMetadata &MarkAsRunnableInEditor() {
-    isRunnableInEditor = true;
+  BehaviorMetadata &MarkAsActivatedByDefaultInEditor() {
+    isActivatedByDefaultInEditor = true;
     return *this;
   }
 
@@ -425,7 +425,7 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
   bool isPrivate = false;
   bool isHidden = false;
   bool isRelevantForChildObjects = true;
-  bool isRunnableInEditor = false;
+  bool isActivatedByDefaultInEditor = false;
   gd::String openFullEditorLabel;
   QuickCustomization::Visibility quickCustomizationVisibility = QuickCustomization::Visibility::Default;
 

@@ -1685,8 +1685,8 @@ export class BehaviorMetadata extends EmscriptenObject {
   setHidden(): BehaviorMetadata;
   isRelevantForChildObjects(): boolean;
   markAsIrrelevantForChildObjects(): BehaviorMetadata;
-  isRunnableInEditor(): boolean;
-  markAsRunnableInEditor(): BehaviorMetadata;
+  isActivatedByDefaultInEditor(): boolean;
+  markAsActivatedByDefaultInEditor(): BehaviorMetadata;
   getQuickCustomizationVisibility(): QuickCustomization_Visibility;
   setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): BehaviorMetadata;
   setOpenFullEditorLabel(label: string): BehaviorMetadata;

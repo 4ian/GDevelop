@@ -60,7 +60,7 @@ namespace gdjs {
       const game = instanceContainer.getGame();
       this._activated =
         !game.isInGameEdition() ||
-        !!game.isBehaviorRunnableInEditor(this.type);
+        !!game.isBehaviorActivatedByDefaultInEditor(this.type);
     }
 
     /**

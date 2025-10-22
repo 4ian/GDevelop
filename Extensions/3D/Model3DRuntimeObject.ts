@@ -143,7 +143,7 @@ namespace gdjs {
      * - After the renderer was instantiated
      * - After reloading the model
      */
-    private onModelChanged(objectData) {
+    private onModelChanged(objectData: Model3DObjectData) {
       this._updateModel(objectData);
       if (this._animations.length > 0) {
         this._renderer.playAnimation(
@@ -198,7 +198,7 @@ namespace gdjs {
         this._centerPoint = getPointForLocation(
           newObjectData.content.centerLocation
         );
-        this._updateModel(newObjectData);
+        this.onModelChanged(newObjectData);
       }
       if (
         oldObjectData.content.originLocation !==

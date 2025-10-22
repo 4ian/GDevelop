@@ -859,7 +859,7 @@ const MainFrame = (props: Props) => {
 
       console.info('Closing project...');
       const previewLauncher = _previewLauncher.current;
-      if (previewLauncher) {
+      if (previewLauncher && previewLauncher.closeAllPreviews) {
         previewLauncher.closeAllPreviews();
       }
       if (previewDebuggerServer) {

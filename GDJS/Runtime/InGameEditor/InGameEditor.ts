@@ -4143,6 +4143,7 @@ namespace gdjs {
 
     setColor(color: THREE.ColorRepresentation) {
       this.boxHelper.material.color.set(color);
+      this.boxHelper.material.needsUpdate = true;
     }
   }
 }

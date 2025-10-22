@@ -18,10 +18,20 @@ export function serializeToJSObject(
   serializable[methodName](serializedElement);
 
   // JSON.parse + toJSON is 30% faster than gd.Serializer.toJSObject.
-  const object = JSON.parse(gd.Serializer.toJSON(serializedElement));
-  serializedElement.delete();
+  const json = gd.Serializer.toJSON(serializedElement);
+  try {
+    const object = JSON.parse(json);
 
-  return object;
+    serializedElement.delete();
+    return object;
+  } catch (error) {
+    serializedElement.delete();
+    console.error(
+      'Invalid JSON when serializing to JS object. toJSON should always return a valid JSON string.',
+      { json, error }
+    );
+    throw error;
+  }
 }
 
 export function serializeToObjectAsset(

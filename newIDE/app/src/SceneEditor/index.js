@@ -107,7 +107,7 @@ interface SelectedInstanceData {
   persistentUuid: string;
   defaultWidth: number;
   defaultHeight: number;
-  defaultDepth: number;
+  defaultDepth?: number; // Not defined for 2D instances.
 }
 
 interface InstanceNumberProperty {
@@ -446,29 +446,29 @@ export default class SceneEditor extends React.Component<Props, State> {
 
       instance.setX(x);
       instance.setY(y);
-      if (z !== undefined) {
+      if (z !== undefined && Number.isFinite(z)) {
         instance.setZ(z);
       }
       instance.setAngle(angle);
-      if (rotationY !== undefined) {
+      if (rotationY !== undefined && Number.isFinite(rotationY)) {
         instance.setRotationY(rotationY);
       }
-      if (rotationX !== undefined) {
+      if (rotationX !== undefined && Number.isFinite(rotationX)) {
         instance.setRotationX(rotationX);
       }
       instance.setHasCustomSize(customSize);
       if (customSize) {
-        instance.setCustomWidth(width);
-        instance.setCustomHeight(height);
+        instance.setCustomWidth(width || 0);
+        instance.setCustomHeight(height || 0);
       }
       const hasCustomDepth = Number.isFinite(depth);
       instance.setHasCustomDepth(hasCustomDepth);
-      if (hasCustomDepth && depth !== undefined) {
+      if (hasCustomDepth && depth !== undefined && Number.isFinite(depth)) {
         instance.setCustomDepth(depth);
       }
-      instance.setDefaultWidth(defaultWidth);
-      instance.setDefaultHeight(defaultHeight);
-      instance.setDefaultDepth(defaultDepth);
+      instance.setDefaultWidth(defaultWidth || 0);
+      instance.setDefaultHeight(defaultHeight || 0);
+      instance.setDefaultDepth(defaultDepth || 0);
 
       modifiedInstances.push(instance);
     });
@@ -491,7 +491,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         if (instance) {
           instance.setDefaultWidth(defaultWidth);
           instance.setDefaultHeight(defaultHeight);
-          instance.setDefaultDepth(defaultDepth);
+          instance.setDefaultDepth(defaultDepth || 0);
         }
         return instance || null;
       })

@@ -1114,7 +1114,7 @@ namespace gdjs {
               sceneName,
               externalLayoutName:
                 externalLayoutName === null ? undefined : externalLayoutName,
-              skipCreatingInstancesFromScene: !!externalLayoutName,
+              skipCreatingInstances: !!externalLayoutName,
               clear: true,
             });
           }

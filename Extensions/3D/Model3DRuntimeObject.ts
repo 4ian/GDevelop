@@ -127,12 +127,11 @@ namespace gdjs {
       this._materialType = this._convertMaterialType(
         objectData.content.materialType
       );
+      this._crossfadeDuration = objectData.content.crossfadeDuration || 0;
 
       this.setIsCastingShadow(objectData.content.isCastingShadow);
       this.setIsReceivingShadow(objectData.content.isReceivingShadow);
       this.onModelChanged(objectData);
-
-      this._crossfadeDuration = objectData.content.crossfadeDuration || 0;
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -148,7 +147,8 @@ namespace gdjs {
       if (this._animations.length > 0) {
         this._renderer.playAnimation(
           this._animations[0].source,
-          this._animations[0].loop
+          this._animations[0].loop,
+          true
         );
       }
     }

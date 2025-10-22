@@ -8,6 +8,8 @@ import {
   type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
+  type ObjectsOutsideEditorChanges,
+  type ObjectGroupsOutsideEditorChanges,
 } from './BaseEditor';
 import SubscriptionChecker, {
   type SubscriptionCheckerInterface,
@@ -78,6 +80,16 @@ export class DebuggerEditorContainer extends React.Component<
   switchInGameEditorIfNoHotReloadIsNeeded() {}
 
   onInstancesModifiedOutsideEditor(changes: InstancesOutsideEditorChanges) {
+    // No thing to be done.
+  }
+
+  onObjectsModifiedOutsideEditor(changes: ObjectsOutsideEditorChanges) {
+    // No thing to be done.
+  }
+
+  onObjectGroupsModifiedOutsideEditor(
+    changes: ObjectGroupsOutsideEditorChanges
+  ) {
     // No thing to be done.
   }
 

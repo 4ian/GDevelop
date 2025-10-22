@@ -186,7 +186,7 @@ namespace gdjs {
       }
 
       // This can be a:
-      // - Preview in GDevelop mobile app (iOS only)
+      // - Preview in GDevelop mobile app.
       if (shouldAuthenticationUseIframe(runtimeScene)) return 'web-iframe';
 
       if (typeof cordova !== 'undefined') {
@@ -1145,7 +1145,7 @@ namespace gdjs {
                 );
                 break;
               case 'cordova-websocket':
-                // The game is an iOS app.
+                // The game is an iOS or Android app.
                 status = await openAuthenticationWindowForCordovaWithWebSocket(
                   runtimeScene,
                   _gameId,
@@ -1154,7 +1154,7 @@ namespace gdjs {
                 break;
               case 'web-iframe':
                 // This can be a:
-                // - Preview in GDevelop mobile app (iOS only)
+                // - Preview in GDevelop mobile app.
                 status = await openAuthenticationIframeForWeb(
                   runtimeScene,
                   _gameId,
@@ -1174,7 +1174,6 @@ namespace gdjs {
               default:
                 // This can be a:
                 // - Preview in GDevelop web-app
-                // - Preview in Gdevelop mobile app (Android only)
                 // - Web game (any website/server except gd.games) accessed via a desktop browser...
                 // - Or a web game accessed via a mobile browser (Android/iOS).
                 status = await openAuthenticationWindowForWeb(

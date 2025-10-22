@@ -43,6 +43,7 @@ import {
   getDefaultAiConfigurationPresetId,
 } from '../AiConfiguration';
 import { AiConfigurationPresetSelector } from './AiConfigurationPresetSelector';
+import { AiRequestContext } from '../AiRequestContext';
 
 const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 5;
 const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 10;
@@ -282,6 +283,10 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     }: Props,
     ref
   ) => {
+    const {
+      aiRequestHistory: { handleNavigateHistory, resetNavigation },
+    } = React.useContext(AiRequestContext);
+
     // TODO: store the default mode in the user preferences?
     const [newAiRequestMode, setNewAiRequestMode] = React.useState<
       'chat' | 'agent'
@@ -336,6 +341,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       userRequestTextPerAiRequestId,
       setUserRequestTextPerRequestId,
     ] = React.useState<{ [string]: string }>({});
+
     const scrollViewRef = React.useRef<ScrollViewInterface | null>(null);
     const [shouldAutoScroll, setShouldAutoScroll] = React.useState<boolean>(
       true
@@ -399,13 +405,34 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       [newAiRequestMode, hasOpenedProject]
     );
 
+    const onUserRequestTextChange = React.useCallback(
+      (userRequestText: string, aiRequestIdToChange: string) => {
+        setUserRequestTextPerRequestId(userRequestTextPerAiRequestId => ({
+          ...userRequestTextPerAiRequestId,
+          [aiRequestIdToChange]: userRequestText,
+        }));
+        // Reset history navigation when field is cleared,
+        // so that pressing up goes to the last message again.
+        if (!userRequestText) {
+          resetNavigation();
+        }
+      },
+      [resetNavigation]
+    );
+
+    // Reset history navigation when aiRequest changes,
+    // ensuring pressing up and down doesn't depend on the previous aiRequest.
+    React.useEffect(
+      () => {
+        resetNavigation();
+      },
+      [resetNavigation, aiRequestId]
+    );
+
     React.useImperativeHandle(ref, () => ({
       resetUserInput: (aiRequestId: string | null) => {
         const aiRequestIdToReset: string = aiRequestId || '';
-        setUserRequestTextPerRequestId(userRequestTextPerAiRequestId => ({
-          ...userRequestTextPerAiRequestId,
-          [aiRequestIdToReset]: '',
-        }));
+        onUserRequestTextChange('', aiRequestIdToReset);
 
         if (scrollViewRef.current) {
           scrollViewRef.current.scrollToBottom({
@@ -557,14 +584,10 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                     hasNeonCorner
                     hasAnimatedNeonCorner={isSending}
                     errored={!!lastSendError}
-                    onChange={userRequestText =>
-                      setUserRequestTextPerRequestId(
-                        userRequestTextPerAiRequestId => ({
-                          ...userRequestTextPerAiRequestId,
-                          '': userRequestText,
-                        })
-                      )
-                    }
+                    onChange={userRequestText => {
+                      onUserRequestTextChange(userRequestText, '');
+                    }}
+                    onNavigateHistory={handleNavigateHistory}
                     onSubmit={() => {
                       onStartNewAiRequest({
                         mode: newAiRequestMode,
@@ -885,13 +908,9 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
               hasNeonCorner
               hasAnimatedNeonCorner={isSending}
               onChange={userRequestText =>
-                setUserRequestTextPerRequestId(
-                  userRequestTextPerAiRequestId => ({
-                    ...userRequestTextPerAiRequestId,
-                    [aiRequestId]: userRequestText,
-                  })
-                )
+                onUserRequestTextChange(userRequestText, aiRequestId)
               }
+              onNavigateHistory={handleNavigateHistory}
               placeholder={
                 aiRequest.mode === 'agent'
                   ? isForAnotherProject

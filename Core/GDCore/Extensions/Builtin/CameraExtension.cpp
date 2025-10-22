@@ -19,7 +19,16 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "Each scene can be composed of multiple layers. These conditions "
           "and actions allow to manipulate them during the game. In "
           "particular, you can move the camera of a layer to center it on an "
-          "object or a position.",
+          "object or a position. The zoom of a layer camera (in 2D) or its "
+          "position in the 3D space (for 3D games) can be changed.\n"
+          "\n"
+          "Each layer can be hidden or shown (but layers do not have opacity). "
+          "Actions/conditions are available to enable/disable 2D/3D effects on "
+          "layers. Parameters of each effect can be modified with actions.\n",
+          "\n"
+          "Each layer can have a time scale applied to it, which can be "
+          "changed with actions (1: normal speed, 0.5: slow down, 2: double "
+          "speed, etc...)."
           "Florian Rival",
           "Open source (MIT License)")
       .SetCategory("Camera")
@@ -328,22 +337,21 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .SetDefaultValue("0");
 
   extension
-      .AddCondition(
-          "CameraZoom",
-          _("Camera zoom"),
-          _("Compare the zoom of a camera of a layer."),
-          _("Zoom of camera _PARAM2_ of layer _PARAM1_"),
-          "",
-          "res/conditions/camera24.png",
-          "res/conditions/camera.png")
+      .AddCondition("CameraZoom",
+                    _("Camera zoom"),
+                    _("Compare the zoom of a camera of a layer."),
+                    _("Zoom of camera _PARAM2_ of layer _PARAM1_"),
+                    "",
+                    "res/conditions/camera24.png",
+                    "res/conditions/camera.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
       .SetDefaultValue("0")
       .UseStandardRelationalOperatorParameters(
-          "number", gd::ParameterOptions::MakeNewOptions().SetDescription(
-              _("Zoom")))
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(_("Zoom")))
       .MarkAsAdvanced();
 
   extension

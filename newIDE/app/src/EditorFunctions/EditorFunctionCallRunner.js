@@ -13,6 +13,8 @@ import {
   type AssetSearchAndInstallResult,
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
+  type ObjectsOutsideEditorChanges,
+  type ObjectGroupsOutsideEditorChanges,
 } from '.';
 
 export type EditorFunctionCallResult =
@@ -45,6 +47,12 @@ export type ProcessEditorFunctionCallsOptions = {|
   onInstancesModifiedOutsideEditor: (
     changes: InstancesOutsideEditorChanges
   ) => void,
+  onObjectsModifiedOutsideEditor: (
+    changes: ObjectsOutsideEditorChanges
+  ) => void,
+  onObjectGroupsModifiedOutsideEditor: (
+    changes: ObjectGroupsOutsideEditorChanges
+  ) => void,
   ensureExtensionInstalled: (options: {|
     extensionName: string,
   |}) => Promise<void>,
@@ -60,6 +68,8 @@ export const processEditorFunctionCalls = async ({
   generateEvents,
   onSceneEventsModifiedOutsideEditor,
   onInstancesModifiedOutsideEditor,
+  onObjectsModifiedOutsideEditor,
+  onObjectGroupsModifiedOutsideEditor,
   ignore,
   ensureExtensionInstalled,
   searchAndInstallAsset,
@@ -155,6 +165,8 @@ export const processEditorFunctionCalls = async ({
         generateEvents,
         onSceneEventsModifiedOutsideEditor,
         onInstancesModifiedOutsideEditor,
+        onObjectsModifiedOutsideEditor,
+        onObjectGroupsModifiedOutsideEditor,
         ensureExtensionInstalled,
         searchAndInstallAsset,
       };

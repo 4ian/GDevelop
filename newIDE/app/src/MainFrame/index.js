@@ -60,6 +60,8 @@ import {
   type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
+  type ObjectsOutsideEditorChanges,
+  type ObjectGroupsOutsideEditorChanges,
 } from './EditorContainers/BaseEditor';
 import { type Exporter } from '../ExportAndShare/ShareDialog';
 import ResourcesLoader from '../ResourcesLoader/index';
@@ -2962,6 +2964,30 @@ const MainFrame = (props: Props) => {
     [state.editorTabs]
   );
 
+  const onObjectsModifiedOutsideEditor = React.useCallback(
+    (changes: ObjectsOutsideEditorChanges) => {
+      for (const editor of getAllEditorTabs(state.editorTabs)) {
+        const { editorRef } = editor;
+        if (editorRef) {
+          editorRef.onObjectsModifiedOutsideEditor(changes);
+        }
+      }
+    },
+    [state.editorTabs]
+  );
+
+  const onObjectGroupsModifiedOutsideEditor = React.useCallback(
+    (changes: ObjectGroupsOutsideEditorChanges) => {
+      for (const editor of getAllEditorTabs(state.editorTabs)) {
+        const { editorRef } = editor;
+        if (editorRef) {
+          editorRef.onObjectGroupsModifiedOutsideEditor(changes);
+        }
+      }
+    },
+    [state.editorTabs]
+  );
+
   const _onProjectItemModified = () => {
     triggerUnsavedChanges();
     forceUpdate();
@@ -4447,6 +4473,8 @@ const MainFrame = (props: Props) => {
     onSceneObjectsDeleted: onSceneObjectsDeleted,
     onSceneEventsModifiedOutsideEditor: onSceneEventsModifiedOutsideEditor,
     onInstancesModifiedOutsideEditor: onInstancesModifiedOutsideEditor,
+    onObjectsModifiedOutsideEditor: onObjectsModifiedOutsideEditor,
+    onObjectGroupsModifiedOutsideEditor: onObjectGroupsModifiedOutsideEditor,
     onExtensionInstalled: onExtensionInstalled,
     onEffectAdded: onEffectAdded,
     onObjectListsModified: onObjectListsModified,

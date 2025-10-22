@@ -48,6 +48,7 @@ export const useGenerateEvents = ({ project }: {| project: ?gdProject |}) => {
         simplifiedProjectBuilder.getProjectSpecificExtensionsSummary(project)
       );
 
+      console.log('Preparing AI user content... in generateEvents');
       const preparedAiUserContent = await prepareAiUserContent({
         getAuthorizationHeader,
         userId: profile.id,

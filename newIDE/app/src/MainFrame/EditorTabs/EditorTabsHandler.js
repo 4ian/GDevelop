@@ -164,19 +164,79 @@ export const openEditorTab = (
     paneIdentifier,
   }: EditorOpeningOptions
 ): EditorTabsState => {
-  for (const paneIdentifier in state.panes) {
-    const pane = state.panes[paneIdentifier];
+  console.log('Opening editor tab with key:', key);
+  for (const statePaneIdentifier in state.panes) {
+    const pane = state.panes[statePaneIdentifier];
 
     const existingEditorId = findIndex(
       pane.editors,
       editor => editor.key === key
     );
     if (existingEditorId !== -1) {
+      console.log(
+        'Editor tab with key already opened:',
+        key,
+        state,
+        statePaneIdentifier
+      );
+
+      if (statePaneIdentifier !== paneIdentifier) {
+        // Move the tab to the new pane.
+        const editorTab = pane.editors[existingEditorId];
+        // Update the extraEditorProps if new ones are provided, to preserve state like aiRequestId
+        const updatedEditorTab = extraEditorProps
+          ? {
+              ...editorTab,
+              extraEditorProps: {
+                ...editorTab.extraEditorProps,
+                ...extraEditorProps,
+              },
+            }
+          : editorTab;
+        let newState = {
+          ...state,
+          panes: {
+            ...state.panes,
+            [statePaneIdentifier]: {
+              ...pane,
+              editors: pane.editors.filter(
+                (editor, index) => index !== existingEditorId
+              ),
+              currentTab:
+                pane.currentTab >= existingEditorId && pane.currentTab > 0
+                  ? pane.currentTab - 1
+                  : pane.currentTab,
+            },
+          },
+        };
+        const destinationPane = newState.panes[paneIdentifier];
+        newState = {
+          ...newState,
+          panes: {
+            ...newState.panes,
+            [paneIdentifier]: {
+              ...destinationPane,
+              editors: [...destinationPane.editors, updatedEditorTab],
+              currentTab: destinationPane.currentTab,
+            },
+          },
+        };
+        return dontFocusTab
+          ? newState
+          : changeCurrentTab(
+              newState,
+              paneIdentifier,
+              destinationPane.editors.length
+            );
+      }
+
       return dontFocusTab
         ? { ...state }
-        : changeCurrentTab(state, paneIdentifier, existingEditorId);
+        : changeCurrentTab(state, statePaneIdentifier, existingEditorId);
     }
   }
+
+  console.log('Editor tab with key not opened:', key, state, paneIdentifier);
 
   const editorTab: EditorTab = {
     label,
@@ -631,7 +691,7 @@ const hasEditorTabOpenedWithKey = (
 export const getOpenedAskAiEditor = (
   state: EditorTabsState
 ): null | {|
-  askAiEditor: AskAiEditorInterface,
+  askAiEditor: ?AskAiEditorInterface,
   editorTab: EditorTab,
   paneIdentifier: string,
 |} => {

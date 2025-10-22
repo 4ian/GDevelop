@@ -57,6 +57,7 @@ import useOnResize from '../Utils/UseOnResize';
 import DrawerTopBar from '../UI/DrawerTopBar';
 import { type FloatingPaneState } from './PanesContainer';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
+import { type OpenAskAiOptions } from '../AiGeneration/AskAiEditorContainer';
 
 const styles = {
   container: {
@@ -97,11 +98,7 @@ export type EditorTabsPaneCommonProps = {|
   |}) => void,
   openVersionHistoryPanel: () => void,
   onQuitVersionHistory: () => Promise<void>,
-  onOpenAskAi: ({|
-    mode: 'chat' | 'agent',
-    aiRequestId: string | null,
-    paneIdentifier: 'left' | 'center' | 'right' | null,
-  |}) => void,
+  onOpenAskAi: OpenAskAiOptions => void,
   getStorageProvider: () => StorageProvider,
   setPreviewedLayout: (layoutName: ?string) => void,
   openExternalEvents: (name: string) => void,

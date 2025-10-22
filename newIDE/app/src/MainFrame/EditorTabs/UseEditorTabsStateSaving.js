@@ -23,9 +23,8 @@ type Props = {|
     name: string,
     dontFocusTab?: boolean,
     project?: ?gdProject,
-    paneIdentifier?: 'left' | 'center' | 'right' | null,
-    mode?: 'chat' | 'agent',
-    aiRequestId?: string | null,
+    paneIdentifier?: 'left' | 'center' | 'right',
+    continueProcessingFunctionCallsOnMount?: boolean,
   |}) => EditorOpeningOptions,
 |};
 

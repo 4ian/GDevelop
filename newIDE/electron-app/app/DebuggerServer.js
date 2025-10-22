@@ -12,6 +12,23 @@ const closeServer = () => {
   webSockets = {};
 };
 
+const closeAllConnections = () => {
+  Object.keys(webSockets).forEach(id => {
+    const webSocket = webSockets[id];
+    if (!webSocket) return;
+
+    try {
+      webSocket.close();
+    } catch (error) {
+      log.warn(
+        `Unable to close debugger connection with id "${id}" while closing the project: ${error.message || error}`
+      );
+    }
+  });
+
+  webSockets = {};
+};
+
 /** @param {WebSocket.Server} wsServer */
 const getServerAddress = wsServer => ({
   address: findLocalIp() || '127.0.0.1',
@@ -78,6 +95,7 @@ module.exports = {
     );
   },
   closeServer,
+  closeAllConnections,
   sendMessage: ({ id, message }, cb) => {
     if (!webSockets[id]) return cb(`Debugger connection with id "${id}" does not exist`);
 

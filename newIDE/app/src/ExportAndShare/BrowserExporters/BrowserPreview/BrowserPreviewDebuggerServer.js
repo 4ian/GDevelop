@@ -41,6 +41,22 @@ const getDebuggerIdForPreviewWindow = (
 
 let windowClosedPollingIntervalId = null;
 
+const stopWindowClosedPolling = () => {
+  if (windowClosedPollingIntervalId === null) return;
+
+  clearInterval(windowClosedPollingIntervalId);
+  windowClosedPollingIntervalId = null;
+};
+
+const notifyConnectionClosed = (id: DebuggerId) => {
+  callbacksList.forEach(({ onConnectionClosed }) =>
+    onConnectionClosed({
+      id,
+      debuggerIds: getExistingDebuggerIds(),
+    })
+  );
+};
+
 /**
  * Listen to window closing so that we can notify the debuggers
  * when a preview window is closed.
@@ -55,15 +71,9 @@ const setupWindowClosedPolling = () => {
       if (previewWindow.closed) {
         console.info('A preview window was closed, with debugger id:', id);
         delete existingPreviewWindows[id];
-        callbacksList.forEach(({ onConnectionClosed }) =>
-          onConnectionClosed({
-            id,
-            debuggerIds: getExistingDebuggerIds(),
-          })
-        );
+        notifyConnectionClosed(id);
         if (!Object.keys(existingPreviewWindows).length) {
-          clearInterval(windowClosedPollingIntervalId);
-          windowClosedPollingIntervalId = null;
+          stopWindowClosedPolling();
         }
       }
     }
@@ -163,7 +173,57 @@ class BrowserPreviewDebuggerServer {
     };
   }
   registerEmbeddedGameFrame(window: WindowProxy) {
+    if (window === embbededGameFrameWindow) return;
+
+    console.info(
+      'Registered the embedded game frame window in the debugger server.'
+    );
     embbededGameFrameWindow = window;
+  }
+  unregisterEmbeddedGameFrame(window: WindowProxy) {
+    if (embbededGameFrameWindow !== window) {
+      if (!!embbededGameFrameWindow) {
+        console.warn(
+          'The embedded game frame window to unregister is not the same as the one registered. Ignoring the unregistration.'
+        );
+      }
+      return;
+    }
+
+    console.info(
+      'Unregistered the embedded game frame window in the debugger server.'
+    );
+    embbededGameFrameWindow = null;
+    notifyConnectionClosed('embedded-game-frame');
+  }
+  closeAllConnections() {
+    console.info(
+      'Closing all connections (i.e: windows and the embedded game frame) to the debugger server.'
+    );
+    Object.keys(existingPreviewWindows).forEach(id => {
+      const previewWindow = existingPreviewWindows[id];
+      delete existingPreviewWindows[id];
+
+      try {
+        if (previewWindow && !previewWindow.closed) previewWindow.close();
+      } catch (error) {
+        console.info(
+          'Unable to close a preview window - ignoring the error as the project is closing:',
+          error
+        );
+      }
+
+      notifyConnectionClosed(id);
+    });
+
+    stopWindowClosedPolling();
+
+    if (embbededGameFrameWindow) {
+      embbededGameFrameWindow = null;
+      notifyConnectionClosed('embedded-game-frame');
+    }
+
+    responseCallbacks.clear();
   }
 }
 export const browserPreviewDebuggerServer: PreviewDebuggerServer = new BrowserPreviewDebuggerServer();

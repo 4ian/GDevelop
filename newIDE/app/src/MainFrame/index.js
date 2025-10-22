@@ -858,6 +858,14 @@ const MainFrame = (props: Props) => {
       setPreviewState(initialPreviewState);
 
       console.info('Closing project...');
+      const previewLauncher = _previewLauncher.current;
+      if (previewLauncher) {
+        previewLauncher.closeAllPreviews();
+      }
+      if (previewDebuggerServer) {
+        previewDebuggerServer.closeAllConnections();
+      }
+
       // TODO Remove this state
       // Instead:
       // - Move the EventsFunctionsExtensionsLoader to Core
@@ -891,6 +899,7 @@ const MainFrame = (props: Props) => {
       console.info('Project closed.');
     },
     [
+      previewDebuggerServer,
       currentProjectRef,
       eventsFunctionsExtensionsState,
       setHasProjectOpened,

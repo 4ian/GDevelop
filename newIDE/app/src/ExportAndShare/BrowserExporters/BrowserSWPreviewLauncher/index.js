@@ -80,6 +80,11 @@ export default class BrowserSWPreviewLauncher extends React.Component<
     error: null,
   };
 
+  closeAllPreviews = () => {
+    // This will also close the preview windows themselves.
+    browserPreviewDebuggerServer.closeAllConnections();
+  };
+
   immediatelyPreparePreviewWindows = (
     options: PreparePreviewWindowsOptions
   ) => {

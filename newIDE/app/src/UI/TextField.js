@@ -1,8 +1,10 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
+import { t } from '@lingui/macro';
 import IconButton from '@material-ui/core/IconButton';
 import MUITextField from '@material-ui/core/TextField';
+import Tooltip from '@material-ui/core/Tooltip';
 import { type FieldFocusFunction } from '../EventsSheet/ParameterFields/ParameterFieldCommons';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import Visibility from './CustomSvgIcons/Visibility';
@@ -347,12 +349,20 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
             endAdornment:
               props.type !== undefined && props.type === 'password' ? (
                 <InputAdornment position="end">
-                  <IconButton
-                    size="small"
-                    onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+                  <Tooltip
+                    title={
+                      isPasswordVisible
+                        ? i18n._(t`Hide password`)
+                        : i18n._(t`Show password`)
+                    }
                   >
-                    <Visibility />
-                  </IconButton>
+                    <IconButton
+                      size="small"
+                      onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+                    >
+                      <Visibility />
+                    </IconButton>
+                  </Tooltip>
                 </InputAdornment>
               ) : props.endAdornment ? (
                 <InputAdornment

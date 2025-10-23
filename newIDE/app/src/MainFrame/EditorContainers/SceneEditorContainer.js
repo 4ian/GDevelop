@@ -220,6 +220,16 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         onObjectGroupsDeleted={() => {}}
         // Nothing to do as scenes are not events-based objects.
         onEventsBasedObjectChildrenEdited={() => {}}
+        zoomToFitContentOnSceneLoad={
+          this.props.extraEditorProps
+            ? this.props.extraEditorProps.zoomToFitContentOnSceneLoad
+            : undefined
+        }
+        onZoomToFitContentDone={
+          this.props.extraEditorProps
+            ? this.props.extraEditorProps.onZoomToFitContentDone
+            : undefined
+        }
       />
     );
   }

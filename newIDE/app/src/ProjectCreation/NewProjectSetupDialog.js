@@ -89,7 +89,8 @@ export type NewProjectCreationSource =
   | 'quick-customization'
   | 'ai-agent-request'
   | 'course-chapter'
-  | 'in-app-tutorial';
+  | 'in-app-tutorial'
+  | 'tutorial';
 
 export type NewProjectSetup = {|
   storageProvider: StorageProvider,

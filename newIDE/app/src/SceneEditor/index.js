@@ -151,6 +151,9 @@ type Props = {|
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
+
+  zoomToFitContentOnSceneLoad?: boolean,
+  onZoomToFitContentDone?: () => void,
 |};
 
 type State = {|
@@ -2152,6 +2155,10 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onOpenedEditorsChanged={this.updateToolbar}
                 lastSelectionType={this.state.lastSelectionType}
                 onExtensionInstalled={this.props.onExtensionInstalled}
+                zoomToFitContentOnSceneLoad={
+                  this.props.zoomToFitContentOnSceneLoad
+                }
+                onZoomToFitContentDone={this.props.onZoomToFitContentDone}
               />
               <I18n>
                 {({ i18n }) => (

@@ -377,6 +377,8 @@ const MosaicEditorsDisplay = React.forwardRef<
           pauseRendering={!props.isActive}
           tileMapTileSelection={props.tileMapTileSelection}
           onSelectTileMapTile={props.onSelectTileMapTile}
+          zoomToFitContentOnSceneLoad={props.zoomToFitContentOnSceneLoad}
+          onZoomToFitContentDone={props.onZoomToFitContentDone}
         />
       ),
     },

@@ -119,6 +119,8 @@ export type InstancesEditorPropsWithoutSizeAndScroll = {|
   instancesEditorShortcutsCallbacks: InstancesEditorShortcutsCallbacks,
   tileMapTileSelection: ?TileMapTileSelection,
   onSelectTileMapTile: (?TileMapTileSelection) => void,
+  zoomToFitContentOnSceneLoad?: boolean,
+  onZoomToFitContentDone?: () => void,
 |};
 
 type Props = {|
@@ -424,13 +426,37 @@ export default class InstancesEditor extends Component<Props, State> {
     });
 
     this._mountEditorComponents(this.props);
+    this.fpsLimiter.forceNextUpdate();
     this._renderScene();
     if (this.props.onViewPositionChanged) {
       // Call it at the end, so that the top component knows the view position
       // is initialized.
       this.props.onViewPositionChanged(this.viewPosition);
     }
+    this.onCanvasAndRendererInitialized();
   }
+
+  onCanvasAndRendererInitialized = () => {
+    if (this.props.zoomToFitContentOnSceneLoad) {
+      // Try zooming at multiple intervals to ensure we catch the content when it's ready
+      // Earlier attempts have a chance to have an incomplete AABB, (it's random depending on loading/rendering timing)
+      // so we do it several times.
+      setTimeout(() => {
+        this.zoomToFitContent();
+      }, 100);
+
+      setTimeout(() => {
+        this.zoomToFitContent();
+      }, 200);
+
+      setTimeout(() => {
+        this.zoomToFitContent();
+        if (this.props.onZoomToFitContentDone) {
+          this.props.onZoomToFitContentDone();
+        }
+      }, 500);
+    }
+  };
 
   /**
    * Force the internal InstancesRenderer to be destroyed and recreated
@@ -1477,7 +1503,9 @@ export default class InstancesEditor extends Component<Props, State> {
 
   zoomToFitContent = () => {
     const contentAABB = this.getContentAABB();
-    if (contentAABB) this.fitViewToRectangle(contentAABB, { adaptZoom: true });
+    if (contentAABB) {
+      this.fitViewToRectangle(contentAABB, { adaptZoom: true });
+    }
   };
 
   _getAreaRectangle = (): Rectangle => {

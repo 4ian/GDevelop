@@ -135,6 +135,9 @@ export type SceneEditorsDisplayProps = {|
   instancesEditorShortcutsCallbacks: InstancesEditorShortcutsCallbacks,
 
   onOpenedEditorsChanged: () => void,
+
+  zoomToFitContentOnSceneLoad?: boolean,
+  onZoomToFitContentDone?: () => void,
 |};
 
 export type SceneEditorsDisplayInterface = {|

@@ -229,6 +229,7 @@ namespace gdjs {
           );
           const inGameEditor = this._runtimeGame.getInGameEditor();
           if (inGameEditor) {
+            inGameEditor.onProjectDataChange(newProjectData);
             await inGameEditor.switchToSceneOrVariant(
               newRuntimeGameStatus.editorId || null,
               newRuntimeGameStatus.sceneName,

@@ -588,12 +588,9 @@ namespace gdjs {
     }
 
     onProjectDataChange(projectData: ProjectData): void {
-      for (const layoutData of projectData.layouts) {
-        this.onLayersDataChange(
-          layoutData.layers,
-          !!projectData.areEffectsHiddenInEditor
-        );
-      }
+      this.setEffectsHiddenInEditor(
+        !!projectData.properties.areEffectsHiddenInEditor
+      );
     }
 
     onLayersDataChange(
@@ -609,9 +606,35 @@ namespace gdjs {
         // Force 2D and 3D objects to be visible on any layer.
         layerData.renderingType = '2d+3d';
         if (areEffectsHiddenInEditor) {
-          layerData.effects = defaultEffectsData;
+          if (layerData.effects !== defaultEffectsData) {
+            layerData._hiddenEffects = layerData.effects;
+            layerData.effects = defaultEffectsData;
+          }
+        } else {
+          if (layerData._hiddenEffects) {
+            layerData.effects = layerData._hiddenEffects;
+          }
         }
       }
+    }
+
+    /**
+     * Modify the layer data accordingly.
+     * `gdjs.HotReloader.hotReloadRuntimeSceneLayers` must be run for the
+     * changes to be applied.
+     */
+    setEffectsHiddenInEditor(areEffectsHiddenInEditor: boolean) {
+      const projectData = this._runtimeGame.getGameData();
+      projectData.properties.areEffectsHiddenInEditor =
+        areEffectsHiddenInEditor;
+      for (const layoutData of projectData.layouts) {
+        this.onLayersDataChange(layoutData.layers, areEffectsHiddenInEditor);
+      }
+    }
+
+    areEffectsHidden(): boolean {
+      return !!this._runtimeGame.getGameData().properties
+        .areEffectsHiddenInEditor;
     }
 
     getEditorId(): string {
@@ -628,10 +651,6 @@ namespace gdjs {
 
     getCurrentScene(): gdjs.RuntimeScene | null {
       return this._currentScene;
-    }
-
-    areEffectsHidden(): boolean {
-      return !!this._runtimeGame.getGameData().areEffectsHiddenInEditor;
     }
 
     /**

@@ -18,7 +18,6 @@ declare interface ProjectData {
   layouts: LayoutData[];
   externalLayouts: ExternalLayoutData[];
   eventsFunctionsExtensions: EventsFunctionsExtensionData[];
-  areEffectsHiddenInEditor?: boolean;
   activatedByDefaultInEditorBehaviors?: Array<string>;
 }
 
@@ -470,6 +469,8 @@ declare interface LayerData {
   visibility: boolean;
   cameras: CameraData[];
   effects: EffectData[];
+  /** Used by `InGameEditor` to toggle effects */
+  _hiddenEffects?: EffectData[];
   ambientLightColorR: number;
   ambientLightColorG: number;
   ambientLightColorB: number;
@@ -544,6 +545,7 @@ declare interface ProjectPropertiesData {
   projectUuid?: string;
   sceneResourcesPreloading?: 'at-startup' | 'never';
   sceneResourcesUnloading?: 'at-scene-exit' | 'never';
+  areEffectsHiddenInEditor?: boolean;
 }
 
 declare interface ExtensionProperty {

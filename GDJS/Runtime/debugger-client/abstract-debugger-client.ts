@@ -309,11 +309,16 @@ namespace gdjs {
                 data.payload.layers,
                 data.payload.areEffectsHidden
               );
-              runtimeGame.getGameData().areEffectsHiddenInEditor =
-                data.payload.areEffectsHidden;
               that._hotReloader.hotReloadRuntimeSceneLayers(
                 data.payload.layers,
                 editedInstanceContainer
+              );
+              // Apply `areEffectsHidden` to all the layers of the project data.
+              // It avoids inconsistency when switching scene later on.
+              // We do it after `hotReloadRuntimeSceneLayers` because it relies
+              // on the differences with old project data.
+              inGameEditor.setEffectsHiddenInEditor(
+                data.payload.areEffectsHidden
               );
             }
           }

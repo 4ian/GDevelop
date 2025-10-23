@@ -414,7 +414,6 @@ namespace gdjs {
         this._graphics.geometry.graphicsData.length === 0
       ) {
         if (!this._placeholder) {
-          console.log(game.getGameData().resources.resources);
           const texture = game
             .getImageManager()
             .getPIXITexture('InGameEditor-ShapePainterIcon');

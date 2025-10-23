@@ -121,6 +121,7 @@ export const installResource = (
 
 export type InstallAssetOutput = {|
   createdObjects: Array<gdObject>,
+  isTheFirstOfItsTypeInProject: boolean,
 |};
 
 export type InstallAssetArgs = {|
@@ -329,6 +330,8 @@ export const addAssetToProject = async ({
 
   return {
     createdObjects,
+    // This boolean is set by `useInstallAsset`
+    isTheFirstOfItsTypeInProject: false,
   };
 };
 

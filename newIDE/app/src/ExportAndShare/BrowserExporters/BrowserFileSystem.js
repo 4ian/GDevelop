@@ -125,6 +125,10 @@ export default class BrowserFileSystem {
     if (!this.isAbsolute(baseDirectoryOrURL))
       baseDirectoryOrURL = pathPosix.resolve(baseDirectoryOrURL);
 
+    if (isURL(baseDirectoryOrURL)) {
+      return baseDirectoryOrURL + '/' + filePathOrURL;
+    }
+
     return pathPosix.resolve(
       baseDirectoryOrURL,
       pathPosix.normalize(filePathOrURL)

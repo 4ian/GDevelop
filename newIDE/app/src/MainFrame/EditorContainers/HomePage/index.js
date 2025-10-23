@@ -5,6 +5,8 @@ import {
   type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
+  type ObjectsOutsideEditorChanges,
+  type ObjectGroupsOutsideEditorChanges,
 } from '../BaseEditor';
 import {
   type FileMetadataAndStorageProviderName,
@@ -189,6 +191,12 @@ export type HomePageEditorInterface = {|
   switchInGameEditorIfNoHotReloadIsNeeded: () => void,
   onInstancesModifiedOutsideEditor: (
     changes: InstancesOutsideEditorChanges
+  ) => void,
+  onObjectsModifiedOutsideEditor: (
+    changes: ObjectsOutsideEditorChanges
+  ) => void,
+  onObjectGroupsModifiedOutsideEditor: (
+    changes: ObjectGroupsOutsideEditorChanges
   ) => void,
 |};
 
@@ -522,6 +530,8 @@ export const HomePage = React.memo<Props>(
         notifyChangesToInGameEditor: setEditorHotReloadNeeded,
         switchInGameEditorIfNoHotReloadIsNeeded: noop,
         onInstancesModifiedOutsideEditor: noop,
+        onObjectsModifiedOutsideEditor: noop,
+        onObjectGroupsModifiedOutsideEditor: noop,
       }));
 
       // As the homepage is never unmounted, we need to ensure the games platform

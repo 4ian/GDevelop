@@ -37,6 +37,11 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
           .AddDefaultBehavior("ScalableCapability::ScalableBehavior")
           .AddDefaultBehavior("FlippableCapability::FlippableBehavior");
 
+  obj.AddInGameEditorResource()
+      .SetResourceName("InGameEditor-ShapePainterIcon")
+      .SetFilePath("Extensions/PrimitiveDrawing/InGameEditor/ShapePainterIcon.png")
+      .SetKind("image");
+
 #if defined(GD_IDE_ONLY)
   obj.AddAction(
          "Rectangle",

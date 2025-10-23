@@ -55,6 +55,7 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import type { MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import type { EventsScope } from '../InstructionOrExpression/EventsScope';
+import { type InstallAssetOutput } from '../AssetStore/InstallAsset';
 
 const gd: libGDevelop = global.gd;
 
@@ -478,7 +479,7 @@ type Props = {|
   ) => void,
   onExportAssets: () => void,
   onObjectCreated: (
-    object: gdObject,
+    objects: Array<gdObject>,
     isTheFirstOfItsTypeInProject: boolean
   ) => void,
   onObjectEdited: (
@@ -681,7 +682,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             objectFolderOrObjectWithContext
           );
         }
-        onObjectCreated(object, isTheFirstOfItsTypeInProject);
+        onObjectCreated([object], isTheFirstOfItsTypeInProject);
       },
       [
         project,
@@ -696,17 +697,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
 
     const onObjectsAddedFromAssets = React.useCallback(
-      (objects: Array<gdObject>) => {
+      ({
+        createdObjects: objects,
+        isTheFirstOfItsTypeInProject,
+      }: InstallAssetOutput) => {
         if (objects.length === 0) return;
 
-        objects.forEach(object => {
-          onObjectCreated(
-            object,
-            // Editor hot-reload is already triggered by onFetchNewlyAddedResources at the
-            // end of asset installation. There is no need to trigger it here too especially in a loop.
-            false
-          );
-        });
+        onObjectCreated(objects, isTheFirstOfItsTypeInProject);
 
         // Here, the last object in the array might not be the last object
         // in the tree view, given the fact that assets are added in parallel

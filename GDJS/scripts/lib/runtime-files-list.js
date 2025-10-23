@@ -27,7 +27,7 @@ const transformIncludedExtensions = ['.js', '.ts', '.tsx'];
 
 // Among the files matching the previous extensions, these extensions won't be built with esbuild
 // (they will be copied).
-const transformExcludedExtensions = ['.min.js', '.d.ts'];
+const transformExcludedExtensions = ['.min.js', '.d.ts','.png'];
 
 // Files under these paths (relative to the GDevelop root path) won't
 // be built with esbuild, but simply copied.
@@ -43,7 +43,6 @@ const untransformedPaths = [
   'GDJS/Runtime/FacebookInstantGames',
   'GDJS/Runtime/libs/CocoonJS',
   'GDJS/Runtime/libs/rbush.js',
-  'GDJS/Runtime/InGameEditor/Resources/primitivedrawingicon.png',
 
   // Extensions pre-built files:
   'Extensions/Leaderboards/sha256.js',

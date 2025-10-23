@@ -136,6 +136,8 @@ export interface PreviewDebuggerServer {
   sendMessageWithResponse(message: Object): Promise<Object>;
   registerCallbacks(callbacks: PreviewDebuggerServerCallbacks): () => void;
   registerEmbeddedGameFrame(window: WindowProxy): void;
+  unregisterEmbeddedGameFrame(window: WindowProxy): void;
+  closeAllConnections(): void;
 }
 
 /** The logs returned by the game hot-reloader. */
@@ -156,6 +158,7 @@ export type PreviewLauncherInterface = {
   launchPreview: (previewOptions: PreviewOptions) => Promise<any>,
   canDoNetworkPreview: () => boolean,
   +closePreview?: (windowId: number) => void,
+  +closeAllPreviews?: () => void,
   +getPreviewDebuggerServer: () => ?PreviewDebuggerServer,
 };
 

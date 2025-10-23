@@ -1114,7 +1114,7 @@ namespace gdjs {
               sceneName,
               externalLayoutName:
                 externalLayoutName === null ? undefined : externalLayoutName,
-              skipCreatingInstancesFromScene: !!externalLayoutName,
+              skipCreatingInstances: !!externalLayoutName,
               clear: true,
             });
           }
@@ -1559,6 +1559,12 @@ namespace gdjs {
      */
     getInGameEditor(): InGameEditor | null {
       return this._inGameEditor;
+    }
+
+    isBehaviorActivatedByDefaultInEditor(type: string): boolean {
+      return this._data.activatedByDefaultInEditorBehaviors
+        ? this._data.activatedByDefaultInEditorBehaviors.includes(type)
+        : false;
     }
 
     /**

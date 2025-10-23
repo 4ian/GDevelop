@@ -512,6 +512,9 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                           value={variantName}
                           onChange={(e, i, value: string) => {
                             customObjectConfiguration.setVariantName(value);
+                            if (onObjectUpdated) {
+                              onObjectUpdated();
+                            }
                             forceUpdate();
                           }}
                         >

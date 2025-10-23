@@ -73,7 +73,7 @@ export type ObjectTreeViewItemProps = {|
   editName: (itemId: string) => void,
   onObjectModified: (shouldForceUpdateList: boolean) => void,
   onObjectCreated: (
-    object: gdObject,
+    objects: Array<gdObject>,
     isTheFirstOfItsTypeInProject: boolean
   ) => void,
   onMovedObjectFolderOrObjectToAnotherFolderInSameContainer: (
@@ -604,7 +604,10 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
 
     onObjectModified(false);
     if (onObjectPasted) onObjectPasted(newObjectWithContext.object);
-    onObjectCreated(newObjectWithContext.object, isTheFirstOfItsTypeInProject);
+    onObjectCreated(
+      [newObjectWithContext.object],
+      isTheFirstOfItsTypeInProject
+    );
   }
 
   duplicate(): void {
@@ -646,7 +649,10 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       global: this._isGlobal,
     };
 
-    onObjectCreated(newObjectWithContext.object, isTheFirstOfItsTypeInProject);
+    onObjectCreated(
+      [newObjectWithContext.object],
+      isTheFirstOfItsTypeInProject
+    );
 
     forceUpdateList();
     editName(getObjectTreeViewItemId(newObjectWithContext.object));

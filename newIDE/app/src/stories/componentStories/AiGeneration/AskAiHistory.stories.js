@@ -3,6 +3,11 @@ import * as React from 'react';
 import paperDecorator from '../../PaperDecorator';
 import { AskAiHistoryContent } from '../../../AiGeneration/AskAiHistory';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
+import {
+  AiRequestContext,
+  initialAiRequestContextState,
+} from '../../../AiGeneration/AiRequestContext';
+import { type AiRequest } from '../../../Utils/GDevelopServices/Generation';
 
 // Re-use fake AI request data from AiRequestChat.stories.js
 const fakeOutputWithUserRequestOnly = [
@@ -93,183 +98,190 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Loading = () => (
+const AskAIHistoryContentStoryTemplate = ({
+  error,
+  isLoading,
+  aiRequests,
+  canLoadMore,
+  selectedAiRequestId,
+}: {|
+  error: ?Error,
+  isLoading: boolean,
+  aiRequests: { [string]: AiRequest },
+  canLoadMore: boolean,
+  selectedAiRequestId: string | null,
+|}) => (
   <FixedHeightFlexContainer height={500}>
-    <AskAiHistoryContent
-      aiRequests={null}
-      isLoading={true}
-      error={null}
-      onSelectAiRequest={() => {}}
-      selectedAiRequestId={null}
-      onFetchAiRequests={async () => {}}
-    />
+    <AiRequestContext.Provider
+      value={{
+        ...initialAiRequestContextState,
+        aiRequestStorage: {
+          ...initialAiRequestContextState.aiRequestStorage,
+          aiRequests,
+          isLoading,
+          error,
+          canLoadMore,
+        },
+      }}
+    >
+      <AskAiHistoryContent
+        onSelectAiRequest={() => {}}
+        selectedAiRequestId={selectedAiRequestId}
+      />
+    </AiRequestContext.Provider>
   </FixedHeightFlexContainer>
+);
+
+export const Loading = () => (
+  <AskAIHistoryContentStoryTemplate
+    aiRequests={{}}
+    isLoading={true}
+    error={null}
+    selectedAiRequestId={null}
+    canLoadMore={false}
+  />
 );
 
 export const Errored = () => (
-  <FixedHeightFlexContainer height={500}>
-    <AskAiHistoryContent
-      aiRequests={null}
-      isLoading={false}
-      error={new Error('Failed to fetch AI requests')}
-      onSelectAiRequest={() => {}}
-      selectedAiRequestId={null}
-      onFetchAiRequests={async () => {}}
-    />
-  </FixedHeightFlexContainer>
+  <AskAIHistoryContentStoryTemplate
+    aiRequests={{}}
+    isLoading={false}
+    error={new Error('Failed to fetch AI requests')}
+    selectedAiRequestId={null}
+    canLoadMore={false}
+  />
 );
 
 export const Empty = () => (
-  <FixedHeightFlexContainer height={500}>
-    <AskAiHistoryContent
-      aiRequests={[]}
-      isLoading={false}
-      error={null}
-      onSelectAiRequest={() => {}}
-      selectedAiRequestId={null}
-      onFetchAiRequests={async () => {}}
-    />
-  </FixedHeightFlexContainer>
+  <AskAIHistoryContentStoryTemplate
+    aiRequests={{}}
+    isLoading={false}
+    error={null}
+    selectedAiRequestId={null}
+    canLoadMore={false}
+  />
 );
 
 export const SingleAiRequest = () => (
-  <FixedHeightFlexContainer height={500}>
-    <AskAiHistoryContent
-      aiRequests={[
-        createFakeAiRequest({
-          id: 'request-1',
-          createdAt: '2024-03-15T10:30:00Z',
-          output: fakeOutputWithAiResponses,
-        }),
-      ]}
-      isLoading={false}
-      error={null}
-      onSelectAiRequest={() => {}}
-      selectedAiRequestId={null}
-      onFetchAiRequests={async () => {}}
-    />
-  </FixedHeightFlexContainer>
+  <AskAIHistoryContentStoryTemplate
+    aiRequests={{
+      'request-1': createFakeAiRequest({
+        id: 'request-1',
+        createdAt: '2024-03-15T10:30:00Z',
+        output: fakeOutputWithAiResponses,
+      }),
+    }}
+    isLoading={false}
+    error={null}
+    selectedAiRequestId={null}
+    canLoadMore={false}
+  />
 );
 
 export const MultipleAiRequests = () => (
-  <FixedHeightFlexContainer height={500}>
-    <AskAiHistoryContent
-      aiRequests={[
-        createFakeAiRequest({
-          id: 'request-1',
-          createdAt: '2024-03-15T14:30:00Z',
-          output: fakeOutputWithAiResponses,
-        }),
-        createFakeAiRequest({
-          id: 'request-2',
-          createdAt: '2024-03-14T09:45:00Z',
-          output: fakeOutputWithDifferentUserRequest,
-        }),
-        createFakeAiRequest({
-          id: 'request-3',
-          createdAt: '2024-03-10T16:20:00Z',
-        }),
-      ]}
-      isLoading={false}
-      error={null}
-      onSelectAiRequest={() => {}}
-      selectedAiRequestId={null}
-      onFetchAiRequests={async () => {}}
-    />
-  </FixedHeightFlexContainer>
+  <AskAIHistoryContentStoryTemplate
+    aiRequests={{
+      'request-1': createFakeAiRequest({
+        id: 'request-1',
+        createdAt: '2024-03-15T14:30:00Z',
+        output: fakeOutputWithAiResponses,
+      }),
+      'request-2': createFakeAiRequest({
+        id: 'request-2',
+        createdAt: '2024-03-14T09:45:00Z',
+        output: fakeOutputWithDifferentUserRequest,
+      }),
+      'request-3': createFakeAiRequest({
+        id: 'request-3',
+        createdAt: '2024-03-10T16:20:00Z',
+      }),
+    }}
+    isLoading={false}
+    error={null}
+    selectedAiRequestId={null}
+    canLoadMore
+  />
 );
 
 export const WithSelectedRequest = () => (
-  <FixedHeightFlexContainer height={500}>
-    <AskAiHistoryContent
-      aiRequests={[
-        createFakeAiRequest({
-          id: 'request-1',
-          createdAt: '2024-03-15T14:30:00Z',
-          output: fakeOutputWithAiResponses,
-        }),
-        createFakeAiRequest({
-          id: 'request-2',
-          createdAt: '2024-03-14T09:45:00Z',
-          output: fakeOutputWithDifferentUserRequest,
-        }),
-      ]}
-      isLoading={false}
-      error={null}
-      onSelectAiRequest={() => {}}
-      selectedAiRequestId="request-2"
-      onFetchAiRequests={async () => {}}
-    />
-  </FixedHeightFlexContainer>
+  <AskAIHistoryContentStoryTemplate
+    aiRequests={{
+      'request-1': createFakeAiRequest({
+        id: 'request-1',
+        createdAt: '2024-03-15T14:30:00Z',
+        output: fakeOutputWithAiResponses,
+      }),
+      'request-2': createFakeAiRequest({
+        id: 'request-2',
+        createdAt: '2024-03-14T09:45:00Z',
+        output: fakeOutputWithDifferentUserRequest,
+      }),
+    }}
+    isLoading={false}
+    error={null}
+    selectedAiRequestId="request-2"
+    canLoadMore={false}
+  />
 );
 
 export const WithWorkingRequest = () => (
-  <FixedHeightFlexContainer height={500}>
-    <AskAiHistoryContent
-      aiRequests={[
-        createFakeAiRequest({
-          id: 'request-1',
-          status: 'working',
-          createdAt: '2024-03-15T14:30:00Z',
-        }),
-        createFakeAiRequest({
-          id: 'request-2',
-          createdAt: '2024-03-14T09:45:00Z',
-          output: fakeOutputWithDifferentUserRequest,
-        }),
-      ]}
-      isLoading={false}
-      error={null}
-      onSelectAiRequest={() => {}}
-      selectedAiRequestId={null}
-      onFetchAiRequests={async () => {}}
-    />
-  </FixedHeightFlexContainer>
+  <AskAIHistoryContentStoryTemplate
+    aiRequests={{
+      'request-1': createFakeAiRequest({
+        id: 'request-1',
+        status: 'working',
+        createdAt: '2024-03-15T14:30:00Z',
+      }),
+      'request-2': createFakeAiRequest({
+        id: 'request-2',
+        createdAt: '2024-03-14T09:45:00Z',
+        output: fakeOutputWithDifferentUserRequest,
+      }),
+    }}
+    isLoading={false}
+    error={null}
+    selectedAiRequestId={null}
+    canLoadMore={false}
+  />
 );
 
 export const WithErroredRequest = () => (
-  <FixedHeightFlexContainer height={500}>
-    <AskAiHistoryContent
-      aiRequests={[
-        createFakeAiRequest({
-          id: 'request-1',
-          status: 'error',
-          createdAt: '2024-03-15T14:30:00Z',
-          error: { code: 'internal-error', message: 'Some error happened' },
-        }),
-        createFakeAiRequest({
-          id: 'request-2',
-          createdAt: '2024-03-14T09:45:00Z',
-          output: fakeOutputWithDifferentUserRequest,
-        }),
-      ]}
-      isLoading={false}
-      error={null}
-      onSelectAiRequest={() => {}}
-      selectedAiRequestId={null}
-      onFetchAiRequests={async () => {}}
-    />
-  </FixedHeightFlexContainer>
+  <AskAIHistoryContentStoryTemplate
+    aiRequests={{
+      'request-1': createFakeAiRequest({
+        id: 'request-1',
+        status: 'error',
+        createdAt: '2024-03-15T14:30:00Z',
+        error: { code: 'internal-error', message: 'Some error happened' },
+      }),
+      'request-2': createFakeAiRequest({
+        id: 'request-2',
+        createdAt: '2024-03-14T09:45:00Z',
+        output: fakeOutputWithDifferentUserRequest,
+      }),
+    }}
+    isLoading={false}
+    error={null}
+    selectedAiRequestId={null}
+    canLoadMore={false}
+  />
 );
 
 export const RefreshingRequests = () => (
-  <FixedHeightFlexContainer height={500}>
-    <AskAiHistoryContent
-      aiRequests={[
-        createFakeAiRequest({
-          id: 'request-1',
-          createdAt: '2024-03-15T14:30:00Z',
-        }),
-        createFakeAiRequest({
-          id: 'request-2',
-          createdAt: '2024-03-14T09:45:00Z',
-        }),
-      ]}
-      isLoading={true}
-      error={null}
-      onSelectAiRequest={() => {}}
-      selectedAiRequestId={null}
-      onFetchAiRequests={async () => {}}
-    />
-  </FixedHeightFlexContainer>
+  <AskAIHistoryContentStoryTemplate
+    aiRequests={{
+      'request-1': createFakeAiRequest({
+        id: 'request-1',
+        createdAt: '2024-03-15T14:30:00Z',
+      }),
+      'request-2': createFakeAiRequest({
+        id: 'request-2',
+        createdAt: '2024-03-14T09:45:00Z',
+      }),
+    }}
+    isLoading={true}
+    error={null}
+    selectedAiRequestId={null}
+    canLoadMore={false}
+  />
 );

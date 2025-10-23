@@ -27,6 +27,8 @@ import { type PreviewState } from './PreviewState';
 import {
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
+  type ObjectsOutsideEditorChanges,
+  type ObjectGroupsOutsideEditorChanges,
 } from './EditorContainers/BaseEditor';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
@@ -243,6 +245,12 @@ export type EditorTabsPaneCommonProps = {|
   onInstancesModifiedOutsideEditor: (
     changes: InstancesOutsideEditorChanges
   ) => void,
+  onObjectsModifiedOutsideEditor: (
+    changes: ObjectsOutsideEditorChanges
+  ) => void,
+  onObjectGroupsModifiedOutsideEditor: (
+    changes: ObjectGroupsOutsideEditorChanges
+  ) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onLoadEventsFunctionsExtensions: ({|
     shouldHotReloadEditor: boolean,
@@ -342,6 +350,8 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
     onSceneObjectsDeleted,
     onSceneEventsModifiedOutsideEditor,
     onInstancesModifiedOutsideEditor,
+    onObjectsModifiedOutsideEditor,
+    onObjectGroupsModifiedOutsideEditor,
     onExtensionInstalled,
     onEffectAdded,
     onObjectListsModified,
@@ -742,6 +752,8 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
                       onSceneObjectsDeleted: onSceneObjectsDeleted,
                       onSceneEventsModifiedOutsideEditor: onSceneEventsModifiedOutsideEditor,
                       onInstancesModifiedOutsideEditor: onInstancesModifiedOutsideEditor,
+                      onObjectsModifiedOutsideEditor: onObjectsModifiedOutsideEditor,
+                      onObjectGroupsModifiedOutsideEditor: onObjectGroupsModifiedOutsideEditor,
                       onExtensionInstalled: onExtensionInstalled,
                       onEffectAdded: onEffectAdded,
                       onObjectListsModified: onObjectListsModified,

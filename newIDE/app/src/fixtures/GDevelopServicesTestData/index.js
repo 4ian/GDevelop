@@ -3224,6 +3224,91 @@ export const textBasedCourseChapter: TextBasedCourseChapter = {
   shortTitle: 'Introduction',
 };
 
+export const textBasedCourseChapterWithCode: TextBasedCourseChapter = {
+  title: 'Scripting Basics',
+  templates: [],
+  items: [
+    {
+      type: 'text',
+      text:
+        "Let's explore how JavaScript events can control objects in your game.",
+    },
+    {
+      type: 'code',
+      language: 'javascript',
+      code:
+        'const handleJump = () => {\n' +
+        "  const player = runtimeScene.getObjects('Player')[0];\n" +
+        '  if (!player) return;\n\n' +
+        "  if (player.getBehavior('PlatformerObject').isOnFloor()) {\n" +
+        "    player.getBehavior('PlatformerObject').simulateJumpKey();\n" +
+        '  }\n' +
+        '};\n\n' +
+        "eventsFunctionContext.onceTriggers.once('jump');\n" +
+        'handleJump();',
+    },
+    {
+      type: 'text',
+      text:
+        'This example shows how to run a small helper to trigger a jump when the player hits the floor.',
+    },
+  ],
+  id: 'scripting-basics',
+  shortTitle: 'Scripting basics',
+};
+
+export const textBasedCourseChapterWithTables: TextBasedCourseChapter = {
+  title: 'Balancing Your Game',
+  templates: [],
+  items: [
+    {
+      type: 'text',
+      text:
+        "Tables can help you compare the different values you plan to use in your game. Let's review some balancing examples.",
+    },
+    {
+      type: 'table',
+      header: ['Stat', 'Enemy', 'Player'],
+      rows: [
+        ['Health', '120', '100'],
+        ['Damage', '12', '18'],
+        ['Move speed', '160 px/s', '200 px/s'],
+      ],
+    },
+    {
+      type: 'text',
+      text:
+        'You can also layout drop chances to ensure players know what to expect from rewards.',
+    },
+    {
+      type: 'table',
+      header: ['Item', 'Rarity', 'Drop chance'],
+      rows: [
+        ['Gold coins', 'Common', '55%'],
+        ['Energy potion', 'Uncommon', '30%'],
+        ['Equipment blueprint', 'Rare', '12%'],
+        ['Legendary core', 'Legendary', '3%'],
+      ],
+    },
+    {
+      type: 'text',
+      text:
+        'Finally, outline how crafting costs scale so you can adjust your economy quickly during playtests.',
+    },
+    {
+      type: 'table',
+      rows: [
+        ['Craft level', 'Materials needed'],
+        ['1', '10 Iron Ore'],
+        ['2', 'const a = 5;'],
+        ['3', 'const a = { value: 5 };'],
+      ],
+    },
+  ],
+  id: 'balancing-your-game',
+  shortTitle: 'Balancing tables',
+};
+
 export const lockedCourseChapter: LockedVideoBasedCourseChapter = {
   id: 'game',
   title: 'Chapter 3 - Build a video game',

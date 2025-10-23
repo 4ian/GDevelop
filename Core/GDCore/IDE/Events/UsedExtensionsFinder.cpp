@@ -44,6 +44,9 @@ void UsedExtensionsFinder::DoVisitObject(gd::Object &object) {
   for (auto &&includeFile : metadata.GetMetadata().includeFiles) {
     result.AddUsedIncludeFiles(includeFile);
   }
+  for (auto &&inGameEditorResource : metadata.GetMetadata().GetInGameEditorResources()) {
+    result.AddUsedInGameEditorResource(inGameEditorResource);
+  }
 };
 
 // Behaviors scanner

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { GDevelopAiCdn, GDevelopGenerationApi } from './ApiConfigs';
 import { type MessageByLocale } from '../i18n/MessageByLocale';
 import { getIDEVersionWithHash } from '../../Version';
+import { extractNextPageUriFromLinkHeader } from './Play';
 
 export type Environment = 'staging' | 'live';
 
@@ -22,39 +23,43 @@ export type AiRequestFunctionCallOutput = {
   output: string,
 };
 
-export type AiRequestMessage =
-  | {
-      type: 'message',
-      status: 'completed',
-      role: 'assistant',
-      content: Array<
-        | {
-            type: 'reasoning',
-            status: 'completed',
-            summary: {
-              text: string,
-              type: 'summary_text',
-            },
-          }
-        | {
-            type: 'output_text',
-            status: 'completed',
-            text: string,
-            annotations: Array<{}>,
-          }
-        | AiRequestMessageAssistantFunctionCall
-      >,
-    }
-  | {
-      type: 'message',
-      status: 'completed',
-      role: 'user',
-      content: Array<{
-        type: 'user_request',
+export type AiRequestAssistantMessage = {
+  type: 'message',
+  status: 'completed',
+  role: 'assistant',
+  content: Array<
+    | {
+        type: 'reasoning',
+        status: 'completed',
+        summary: {
+          text: string,
+          type: 'summary_text',
+        },
+      }
+    | {
+        type: 'output_text',
         status: 'completed',
         text: string,
-      }>,
-    }
+        annotations: Array<{}>,
+      }
+    | AiRequestMessageAssistantFunctionCall
+  >,
+};
+
+export type AiRequestUserMessage = {
+  type: 'message',
+  status: 'completed',
+  role: 'user',
+  content: Array<{
+    type: 'user_request',
+    status: 'completed',
+    text: string,
+  }>,
+};
+
+export type AiRequestMessage =
+  | AiRequestAssistantMessage
+  | AiRequestUserMessage
   | AiRequestFunctionCallOutput;
 
 export type AiConfiguration = {
@@ -166,6 +171,10 @@ export type AssetSearch = {
   }> | null,
 };
 
+export const apiClient = axios.create({
+  baseURL: GDevelopGenerationApi.baseUrl,
+});
+
 export const getAiRequest = async (
   getAuthorizationHeader: () => Promise<string>,
   {
@@ -195,23 +204,37 @@ export const getAiRequests = async (
   getAuthorizationHeader: () => Promise<string>,
   {
     userId,
+    forceUri,
   }: {|
     userId: string,
+    forceUri: ?string,
   |}
-): Promise<Array<AiRequest>> => {
+): Promise<{
+  aiRequests: Array<AiRequest>,
+  nextPageUri: ?string,
+}> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.get(
-    `${GDevelopGenerationApi.baseUrl}/ai-request`,
-    {
-      params: {
-        userId,
-      },
-      headers: {
-        Authorization: authorizationHeader,
-      },
-    }
-  );
-  return response.data;
+  const uri = forceUri || '/ai-request';
+
+  // $FlowFixMe
+  const response = await apiClient.get(uri, {
+    headers: {
+      Authorization: authorizationHeader,
+    },
+    params: forceUri ? { userId } : { userId, perPage: 10 },
+  });
+  const nextPageUri = response.headers.link
+    ? extractNextPageUriFromLinkHeader(response.headers.link)
+    : null;
+  const aiRequests = response.data;
+  if (!Array.isArray(aiRequests)) {
+    throw new Error('Invalid response from Ai requests API.');
+  }
+
+  return {
+    aiRequests,
+    nextPageUri,
+  };
 };
 
 export const createAiRequest = async (
@@ -252,8 +275,8 @@ export const createAiRequest = async (
   |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.post(
-    `${GDevelopGenerationApi.baseUrl}/ai-request`,
+  const response = await apiClient.post(
+    '/ai-request',
     {
       gdevelopVersionWithHash: getIDEVersionWithHash(),
       userRequest,
@@ -306,10 +329,8 @@ export const addMessageToAiRequest = async (
   |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.post(
-    `${
-      GDevelopGenerationApi.baseUrl
-    }/ai-request/${aiRequestId}/action/add-message`,
+  const response = await apiClient.post(
+    `/ai-request/${aiRequestId}/action/add-message`,
     {
       gdevelopVersionWithHash: getIDEVersionWithHash(),
       functionCallOutputs,
@@ -351,10 +372,8 @@ export const sendAiRequestFeedback = async (
   |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.post(
-    `${
-      GDevelopGenerationApi.baseUrl
-    }/ai-request/${aiRequestId}/action/set-feedback`,
+  const response = await apiClient.post(
+    `/ai-request/${aiRequestId}/action/set-feedback`,
     {
       gdevelopVersionWithHash: getIDEVersionWithHash(),
       messageIndex,
@@ -415,8 +434,8 @@ export const createAiGeneratedEvent = async (
   |}
 ): Promise<CreateAiGeneratedEventResult> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.post(
-    `${GDevelopGenerationApi.baseUrl}/ai-generated-event`,
+  const response = await apiClient.post(
+    `/ai-generated-event`,
     {
       gdevelopVersionWithHash: getIDEVersionWithHash(),
       gameProjectJson,
@@ -474,8 +493,8 @@ export const getAiGeneratedEvent = async (
   |}
 ): Promise<AiGeneratedEvent> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.get(
-    `${GDevelopGenerationApi.baseUrl}/ai-generated-event/${aiGeneratedEventId}`,
+  const response = await apiClient.get(
+    `/ai-generated-event/${aiGeneratedEventId}`,
     {
       params: {
         userId,
@@ -505,8 +524,8 @@ export const createAssetSearch = async (
   |}
 ): Promise<AssetSearch> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.post(
-    `${GDevelopGenerationApi.baseUrl}/asset-search`,
+  const response = await apiClient.post(
+    `/asset-search`,
     {
       gdevelopVersionWithHash: getIDEVersionWithHash(),
       searchTerms,
@@ -546,10 +565,8 @@ export const createAiUserContentPresignedUrls = async (
   |}
 ): Promise<AiUserContentPresignedUrlsResult> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.post(
-    `${
-      GDevelopGenerationApi.baseUrl
-    }/ai-user-content/action/create-presigned-urls`,
+  const response = await apiClient.post(
+    `/ai-user-content/action/create-presigned-urls`,
     {
       gdevelopVersionWithHash: getIDEVersionWithHash(),
       gameProjectJsonHash,

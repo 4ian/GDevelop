@@ -160,9 +160,7 @@ namespace gdjs {
           ? false
           : options.skipStoppingSoundsOnStartup;
       const skipCreatingInstances =
-        typeof options === 'string'
-          ? false
-          : options.skipCreatingInstances;
+        typeof options === 'string' ? false : options.skipCreatingInstances;
       const externalLayoutName =
         deprecatedExternalLayoutName ||
         (typeof options === 'string' ? undefined : options.externalLayoutName);

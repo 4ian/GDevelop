@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "GDCore/Tools/Log.h"
+
 namespace gd {
 
 SerializerElement SerializerElement::nullElement;
@@ -56,7 +58,16 @@ SerializerElement& SerializerElement::SetAttribute(const gd::String& name,
                       // support code using attributes. Make sure that any
                       // existing child with this name is removed (otherwise it
                       // would erase the attribute at serialization).
-  attributes[name].SetDouble(value);
+
+  if (std::isnan(value)) {
+    gd::LogError("Attribute \"" + name +
+                 "\" was set to NaN - this is not allowed (would not be "
+                 "serialized correctly to JSON). Defaulting to 0.");
+    attributes[name].SetDouble(0);
+  } else {
+    attributes[name].SetDouble(value);
+  }
+
   return *this;
 }
 

@@ -24,6 +24,7 @@ class SourceFileMetadata;
 class WholeProjectDiagnosticReport;
 class CaptureOptions;
 class Screenshot;
+class InGameEditorResourceMetadata;
 }  // namespace gd
 
 namespace gdjs {
@@ -483,7 +484,8 @@ class ExporterHelper {
    */
   static gd::String ExportProjectData(
       gd::AbstractFileSystem &fs, gd::Project &project, gd::String filename,
-      const gd::SerializerElement &runtimeGameOptions, bool isInGameEdition);
+      const gd::SerializerElement &runtimeGameOptions, bool isInGameEdition,
+      const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources);
 
   /**
    * \brief Serialize a project without its events to JSON
@@ -492,11 +494,13 @@ class ExporterHelper {
    * \param project The project to be exported.
    * \param options The content of the extra configuration
    * \param projectDataElement The element where the project data is serialized
+   * \param inGameEditorResources The list of in-game editor resources to be used.
    */
   static void SerializeProjectData(gd::AbstractFileSystem &fs,
                                    const gd::Project &project,
                                    const PreviewExportOptions &options,
-                                   gd::SerializerElement &projectDataElement);
+                                   gd::SerializerElement &projectDataElement,
+                                   const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources);
 
   /**
    * \brief Serialize the content of the extra configuration to store
@@ -706,7 +710,7 @@ class ExporterHelper {
   /**
    * \brief Given an include file, returns the name of the file to reference
    * in the exported game.
-   * 
+   *
    * \param fs The abstract file system to use
    * \param gdjsRoot The root directory of GDJS, used to copy runtime files.
    */
@@ -747,27 +751,21 @@ class ExporterHelper {
                               &eventsBasedObjectVariantsUsedResources);
 
    /**
-    * \brief Stript a project and serialize it to JSON
-    *
-    * \param project The project to be exported.
+    * \brief Strip a project and serialize it to JSON.
     */
    static void StriptAndSerializeProjectData(gd::Project &project,
                                              gd::SerializerElement &rootElement,
-                                             bool isInGameEdition);
+                                             bool isInGameEdition,
+                                             const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources);
 
    /**
     * \brief Add additional resources that are used by the in-game editor to the
     * project.
-    *
-    * \param project The project to be exported where resource declarations are
-    * added.
-    *
-    * \param projectUsedResources The list of resource to be loaded
-    * globally by the runtime.
     */
    static void
    AddInGameEditorResources(gd::Project &project,
-                            std::set<gd::String> &projectUsedResources);
+                            std::set<gd::String> &projectUsedResources,
+                            const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources);
 };
 
 }  // namespace gdjs

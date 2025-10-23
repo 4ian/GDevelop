@@ -69,7 +69,7 @@ namespace gdjs {
         this,
         instanceContainer
       );
-      this._updateTileMap();
+      this.updateTileMap();
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -204,7 +204,7 @@ namespace gdjs {
       );
     }
 
-    private _updateTileMap(): void {
+    updateTileMap(): void {
       this._tileMapManager.getOrLoadTileMap(
         this._tilemapJsonFile,
         this._tilesetJsonFile,
@@ -255,7 +255,7 @@ namespace gdjs {
      */
     setTilemapJsonFile(tilemapJsonFile: string): void {
       this._tilemapJsonFile = tilemapJsonFile;
-      this._updateTileMap();
+      this.updateTileMap();
     }
 
     getTilemapJsonFile(): string {
@@ -268,7 +268,7 @@ namespace gdjs {
 
     setTilesetJsonFile(tilesetJsonFile: string): void {
       this._tilesetJsonFile = tilesetJsonFile;
-      this._updateTileMap();
+      this.updateTileMap();
     }
 
     getTilesetJsonFile(): string {
@@ -293,7 +293,7 @@ namespace gdjs {
 
     setDisplayMode(displayMode: string): void {
       this._displayMode = displayMode;
-      this._updateTileMap();
+      this.updateTileMap();
     }
 
     getDisplayMode(): string {
@@ -302,7 +302,7 @@ namespace gdjs {
 
     setLayerIndex(layerIndex): void {
       this._layerIndex = layerIndex;
-      this._updateTileMap();
+      this.updateTileMap();
     }
 
     getLayerIndex(): integer {
@@ -311,7 +311,7 @@ namespace gdjs {
 
     setLevelIndex(levelIndex): void {
       this._levelIndex = levelIndex;
-      this._updateTileMap();
+      this.updateTileMap();
     }
 
     getLevelIndex() {

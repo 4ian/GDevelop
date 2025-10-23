@@ -158,6 +158,14 @@ export type InstancesOutsideEditorChanges = {|
   scene: gdLayout,
 |};
 
+export type ObjectsOutsideEditorChanges = {|
+  scene: gdLayout,
+|};
+
+export type ObjectGroupsOutsideEditorChanges = {|
+  scene: gdLayout,
+|};
+
 type RenderForEditorOptions = {|
   project: gdProject | null,
   args: any,
@@ -176,6 +184,12 @@ type LaunchFunctionOptionsWithoutProject = {|
   ) => void,
   onInstancesModifiedOutsideEditor: (
     changes: InstancesOutsideEditorChanges
+  ) => void,
+  onObjectsModifiedOutsideEditor: (
+    changes: ObjectsOutsideEditorChanges
+  ) => void,
+  onObjectGroupsModifiedOutsideEditor: (
+    changes: ObjectGroupsOutsideEditorChanges
   ) => void,
   ensureExtensionInstalled: (options: {|
     extensionName: string,
@@ -483,6 +497,7 @@ const createOrReplaceObject: EditorFunction = {
     args,
     ensureExtensionInstalled,
     searchAndInstallAsset,
+    onObjectsModifiedOutsideEditor,
   }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_type = extractRequiredString(args, 'object_type');
@@ -556,6 +571,12 @@ const createOrReplaceObject: EditorFunction = {
             `Unable to search and install object (${message}).`
           );
         } else if (status === 'asset-installed') {
+          // /!\ Tell the editor that some objects have potentially been modified (and even removed).
+          // This will force the objects panel to refresh.
+          onObjectsModifiedOutsideEditor({
+            scene: layout,
+          });
+
           if (createdObjects.length === 1) {
             const object = createdObjects[0];
             return makeGenericSuccess(
@@ -619,6 +640,11 @@ const createOrReplaceObject: EditorFunction = {
         object_name,
         objectsContainer.getObjectsCount()
       );
+      // /!\ Tell the editor that some objects have potentially been modified (and even removed).
+      // This will force the objects panel to refresh.
+      onObjectsModifiedOutsideEditor({
+        scene: layout,
+      });
       return makeGenericSuccess(
         [
           `Created a new object (from scratch) called "${object_name}" of type "${object_type}" in scene "${scene_name}".`,
@@ -672,6 +698,11 @@ const createOrReplaceObject: EditorFunction = {
             objectsContainer.removeObject(createdObject.getName());
           }
 
+          // /!\ Tell the editor that some objects have potentially been modified (and even removed).
+          // This will force the objects panel to refresh.
+          onObjectsModifiedOutsideEditor({
+            scene: layout,
+          });
           return makeGenericSuccess(
             `Replaced object "${object.getName()}" by an object from the asset store fitting the search.`
           );
@@ -708,6 +739,11 @@ const createOrReplaceObject: EditorFunction = {
       );
       newObject.setName(object_name); // Unserialization has overwritten the name.
 
+      // /!\ Tell the editor that some objects have potentially been modified (and even removed).
+      // This will force the objects panel to refresh.
+      onObjectsModifiedOutsideEditor({
+        scene: layout,
+      });
       return makeGenericSuccess(
         `Duplicated object "${duplicatedObjectName}" as "${newObject.getName()}". The new object "${newObject.getName()}" has the same type, behaviors, properties and effects as the one it was duplicated from.`
       );
@@ -738,6 +774,11 @@ const createOrReplaceObject: EditorFunction = {
           );
         }
 
+        // /!\ Tell the editor that some objects have potentially been modified (and even removed).
+        // This will force the objects panel to refresh.
+        onObjectsModifiedOutsideEditor({
+          scene: layout,
+        });
         return makeGenericSuccess(
           `Object with name "${object_name}" already exists, no need to re-create it.`
         );
@@ -3461,7 +3502,7 @@ const isFuzzyMatch = (string1: string, string2: string) => {
   return simplifiedString1 === simplifiedString2;
 };
 
-const changeScenePropertiesLayersEffects: EditorFunction = {
+const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
   renderForEditor: ({ args, shouldShowDetails }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
 
@@ -3477,21 +3518,60 @@ const changeScenePropertiesLayersEffects: EditorFunction = {
       args,
       'changed_layer_effects'
     );
+    const changed_groups = SafeExtractor.extractArrayProperty(
+      args,
+      'changed_groups'
+    );
 
     const changedPropertiesCount =
       (changed_properties && changed_properties.length) || 0;
     const changedLayersCount = (changed_layers && changed_layers.length) || 0;
     const changedLayerEffectsCount =
       (changed_layer_effects && changed_layer_effects.length) || 0;
+    const changedGroupsCount = (changed_groups && changed_groups.length) || 0;
 
     return {
       text:
         changedPropertiesCount > 0 &&
         changedLayersCount > 0 &&
-        changedLayerEffectsCount > 0 ? (
+        changedLayerEffectsCount > 0 &&
+        changedGroupsCount > 0 ? (
           <Trans>
-            Changing some scene properties, layers and effects for scene{' '}
+            Changing some scene properties, layers, effects and groups for scene{' '}
             {scene_name}.
+          </Trans>
+        ) : changedPropertiesCount > 0 &&
+          changedLayersCount > 0 &&
+          changedGroupsCount > 0 ? (
+          <Trans>
+            Changing some scene properties, layers and groups for scene{' '}
+            {scene_name}.
+          </Trans>
+        ) : changedPropertiesCount > 0 &&
+          changedLayerEffectsCount > 0 &&
+          changedGroupsCount > 0 ? (
+          <Trans>
+            Changing some scene properties, effects and groups for scene{' '}
+            {scene_name}.
+          </Trans>
+        ) : changedLayerEffectsCount > 0 &&
+          changedLayersCount > 0 &&
+          changedGroupsCount > 0 ? (
+          <Trans>
+            Changing some scene effects, layers and groups for scene{' '}
+            {scene_name}.
+          </Trans>
+        ) : changedPropertiesCount > 0 && changedGroupsCount > 0 ? (
+          <Trans>
+            Changing some scene properties and groups for scene {scene_name}.
+          </Trans>
+        ) : changedLayersCount > 0 && changedGroupsCount > 0 ? (
+          <Trans>
+            Changing some scene layers and groups for scene {scene_name}.
+          </Trans>
+        ) : changedLayerEffectsCount > 0 && changedGroupsCount > 0 ? (
+          <Trans>
+            Changing some scene effects and groups for scene {scene_name}.
           </Trans>
         ) : changedPropertiesCount > 0 && changedLayersCount > 0 ? (
           <Trans>
@@ -3511,6 +3591,8 @@ const changeScenePropertiesLayersEffects: EditorFunction = {
           <Trans>Changing some scene layers for scene {scene_name}.</Trans>
         ) : changedLayerEffectsCount > 0 ? (
           <Trans>Changing some scene effects for scene {scene_name}.</Trans>
+        ) : changedGroupsCount > 0 ? (
+          <Trans>Changing some scene groups for scene {scene_name}.</Trans>
         ) : (
           <Trans>Unknown changes attempted for scene {scene_name}.</Trans>
         ),
@@ -3520,6 +3602,7 @@ const changeScenePropertiesLayersEffects: EditorFunction = {
     project,
     args,
     onInstancesModifiedOutsideEditor,
+    onObjectGroupsModifiedOutsideEditor,
   }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
 
@@ -3542,6 +3625,10 @@ const changeScenePropertiesLayersEffects: EditorFunction = {
     const changed_layer_effects = SafeExtractor.extractArrayProperty(
       args,
       'changed_layer_effects'
+    );
+    const changed_groups = SafeExtractor.extractArrayProperty(
+      args,
+      'changed_groups'
     );
 
     if (changed_properties)
@@ -3891,6 +3978,103 @@ const changeScenePropertiesLayersEffects: EditorFunction = {
       });
     }
 
+    if (changed_groups) {
+      const groups = scene.getObjects().getObjectGroups();
+      changed_groups.forEach(changed_group => {
+        const groupName = SafeExtractor.extractStringProperty(
+          changed_group,
+          'group_name'
+        );
+        const newGroupName = SafeExtractor.extractStringProperty(
+          changed_group,
+          'new_group_name'
+        );
+        const deleteThisGroup = SafeExtractor.extractBooleanProperty(
+          changed_group,
+          'delete_this_group'
+        );
+        const objects = SafeExtractor.extractArrayProperty(
+          changed_group,
+          'objects'
+        );
+        if (groupName === null) {
+          warnings.push(
+            `Missing "group_name" in an item of \`changed_groups\`. It was ignored and not changed. Make sure you follow the exact format for changing group properties.`
+          );
+          return;
+        }
+
+        let foundGroup: gdObjectGroup;
+        if (!groups.has(groupName)) {
+          // Create the group if it does not exist yet.
+          foundGroup = groups.insertNew(groupName, groups.count());
+        } else {
+          foundGroup = groups.get(groupName);
+        }
+
+        if (deleteThisGroup) {
+          groups.remove(groupName);
+          changes.push(
+            `Deleted group "${groupName}" from scene "${scene_name}".`
+          );
+        } else {
+          if (newGroupName) {
+            gd.WholeProjectRefactorer.objectOrGroupRenamedInScene(
+              project,
+              scene,
+              foundGroup.getName(),
+              newGroupName,
+              /* isObjectGroup=*/ true
+            );
+            foundGroup.setName(newGroupName);
+            changes.push(
+              `Renamed group "${groupName}" to "${newGroupName}" in scene "${scene_name}".`
+            );
+          }
+          if (objects) {
+            const newObjectNames = objects
+              .map(object =>
+                SafeExtractor.extractStringProperty(object, 'object_name')
+              )
+              .filter(Boolean);
+            // Remove objects that are not in the list, and add new objects.
+            const currentObjectNames = foundGroup
+              .getAllObjectsNames()
+              .toJSArray();
+            currentObjectNames.forEach(objectName => {
+              if (!newObjectNames.includes(objectName)) {
+                foundGroup.removeObject(objectName);
+              }
+            });
+            const globalObjects = project.getObjects();
+            const sceneObjects = scene.getObjects();
+            newObjectNames.forEach(objectName => {
+              if (!currentObjectNames.includes(objectName)) {
+                if (
+                  sceneObjects.hasObjectNamed(objectName) ||
+                  globalObjects.hasObjectNamed(objectName)
+                ) {
+                  foundGroup.addObject(objectName);
+                } else {
+                  warnings.push(
+                    `Object "${objectName}" not found in scene "${scene_name}", so it was not added to group "${groupName}".`
+                  );
+                }
+              }
+            });
+            changes.push(
+              `Modified objects of group "${groupName}" in scene "${scene_name}".`
+            );
+          }
+        }
+      });
+
+      // Notify the editor that object groups have been modified
+      onObjectGroupsModifiedOutsideEditor({
+        scene,
+      });
+    }
+
     if (changes.length === 0 && warnings.length === 0) {
       return {
         success: false,
@@ -4166,7 +4350,7 @@ export const editorFunctions: { [string]: EditorFunction } = {
   create_scene: createScene,
   delete_scene: deleteScene,
   inspect_scene_properties_layers_effects: inspectScenePropertiesLayersEffects,
-  change_scene_properties_layers_effects: changeScenePropertiesLayersEffects,
+  change_scene_properties_layers_effects_groups: changeScenePropertiesLayersEffectsGroups,
   add_or_edit_variable: addOrEditVariable,
 };
 

@@ -252,6 +252,18 @@ export type TextBasedCourseChapterVideoItem = {|
   caption?: string,
 |};
 
+export type TextBasedCourseChapterCodeItem = {|
+  type: 'code',
+  code: string,
+  language?: string,
+|};
+
+export type TextBasedCourseChapterTableItem = {|
+  type: 'table',
+  header?: Array<string>,
+  rows: Array<Array<string>>,
+|};
+
 export type TextBasedCourseChapterTaskItem = {|
   type: 'task',
   title: string,
@@ -259,12 +271,16 @@ export type TextBasedCourseChapterTaskItem = {|
     | TextBasedCourseChapterTextItem
     | TextBasedCourseChapterImageItem
     | TextBasedCourseChapterVideoItem
+    | TextBasedCourseChapterCodeItem
+    | TextBasedCourseChapterTableItem
   >,
   answer?: {
     items: Array<
       | TextBasedCourseChapterTextItem
       | TextBasedCourseChapterImageItem
       | TextBasedCourseChapterVideoItem
+      | TextBasedCourseChapterCodeItem
+      | TextBasedCourseChapterTableItem
     >,
   },
 |};
@@ -281,6 +297,8 @@ export type UnlockedTextBasedCourseChapter = {|
     | TextBasedCourseChapterImageItem
     | TextBasedCourseChapterTaskItem
     | TextBasedCourseChapterVideoItem
+    | TextBasedCourseChapterCodeItem
+    | TextBasedCourseChapterTableItem
   >,
 |};
 

@@ -59,6 +59,7 @@ import Chip from '../UI/Chip';
 import { LineStackLayout } from '../UI/Layout';
 import { BundleStoreContext } from '../AssetStore/Bundles/BundleStoreContext';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
+import { type OpenAskAiOptions } from '../AiGeneration/AskAiEditorContainer';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -124,11 +125,7 @@ type Props = {|
     newProjectSetup: NewProjectSetup,
     i18n: I18nType
   ) => Promise<CreateProjectResult>,
-  onOpenAskAi: ({|
-    mode: 'chat' | 'agent',
-    aiRequestId: string | null,
-    paneIdentifier: 'left' | 'center' | 'right' | null,
-  |}) => void,
+  onOpenAskAi: OpenAskAiOptions => void,
   selectedExampleShortHeader: ?ExampleShortHeader,
   onSelectExampleShortHeader: (exampleShortHeader: ?ExampleShortHeader) => void,
   selectedPrivateGameTemplateListingData: ?PrivateGameTemplateListingData,
@@ -647,7 +644,6 @@ const NewProjectSetupDialog = ({
                       onOpenAskAi({
                         mode: 'agent',
                         aiRequestId: null,
-                        paneIdentifier: 'center',
                       })
                     }
                   />

@@ -235,6 +235,16 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
     [getAuthorizationHeader, profile, updateAiRequest]
   );
 
+  React.useEffect(
+    () => {
+      // Reset AI requests when the user logs out.
+      if (!profile) {
+        setState(emptyPaginationState);
+      }
+    },
+    [profile]
+  );
+
   const [aiRequestSendStates, setAiRequestSendStates] = React.useState<{
     [string]: AiRequestSendState,
   }>({});

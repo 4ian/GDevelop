@@ -16,6 +16,7 @@ import NewProjectSetupDialog, {
 import { type StorageProvider } from '../ProjectsStorage';
 import RouterContext from './RouterContext';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
+import { type OpenAskAiOptions } from '../AiGeneration/AskAiEditorContainer';
 
 type Props = {|
   isProjectOpening: boolean,
@@ -29,11 +30,7 @@ type Props = {|
     privateGameTemplateListingData: PrivateGameTemplateListingData,
     newProjectSetup: NewProjectSetup
   ) => Promise<CreateProjectResult>,
-  openAskAi: ({|
-    mode: 'chat' | 'agent',
-    aiRequestId: string | null,
-    paneIdentifier: 'left' | 'center' | 'right' | null,
-  |}) => void,
+  openAskAi: OpenAskAiOptions => void,
   storageProviders: Array<StorageProvider>,
 |};
 
@@ -185,7 +182,6 @@ const useNewProjectDialog = ({
       openAskAi({
         mode: 'agent',
         aiRequestId: null,
-        paneIdentifier: 'center',
       });
     },
     [closeNewProjectDialog, openAskAi]

@@ -10,6 +10,7 @@
 
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
 #include "GDCore/Extensions/Metadata/SourceFileMetadata.h"
+#include "GDCore/Extensions/Metadata/InGameEditorResourceMetadata.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
 #include "GDCore/IDE/Project/ArbitraryObjectsWorker.h"
@@ -50,6 +51,10 @@ public:
     return usedSourceFiles;
   }
 
+  const std::vector<gd::InGameEditorResourceMetadata>& GetUsedInGameEditorResources() const {
+    return usedInGameEditorResources;
+  }
+
   /**
    * \brief Return true when at least 1 object uses the 3D renderer.
    */
@@ -61,6 +66,9 @@ public:
   void AddUsedBuiltinExtension(const gd::String& extensionName);
   void AddUsedIncludeFiles(const gd::String& includeFile) { usedIncludeFiles.insert(includeFile); }
   void AddUsedRequiredFiles(const gd::String& requiredFile) { usedRequiredFiles.insert(requiredFile); }
+  void AddUsedInGameEditorResource(const gd::InGameEditorResourceMetadata& inGameEditorResource) {
+    usedInGameEditorResources.push_back(inGameEditorResource);
+  }
 
   void MarkAsHaving3DObjects() {
     has3DObjects = true;
@@ -71,6 +79,7 @@ private:
   std::set<gd::String> usedIncludeFiles;
   std::set<gd::String> usedRequiredFiles;
   std::vector<gd::SourceFileMetadata> usedSourceFiles;
+  std::vector<gd::InGameEditorResourceMetadata> usedInGameEditorResources;
   bool has3DObjects = false;
 };
 

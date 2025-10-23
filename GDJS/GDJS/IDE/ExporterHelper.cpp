@@ -21,6 +21,7 @@
 #include "GDCore/Events/CodeGeneration/EffectsCodeGenerator.h"
 #include "GDCore/Extensions/Metadata/DependencyMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
+#include "GDCore/Extensions/Metadata/InGameEditorResourceMetadata.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
@@ -123,6 +124,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   includesFiles.clear();
   std::vector<gd::String> resourcesFiles;
 
+  std::vector<gd::InGameEditorResourceMetadata> inGameEditorResources;
+
   // TODO Try to remove side effects to avoid the copy
   // that destroys the AST in cache.
   gd::Project exportedProject = options.project;
@@ -192,7 +195,22 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     for (const auto &requiredFile : usedExtensionsResult.GetUsedRequiredFiles()) {
       InsertUnique(resourcesFiles, requiredFile);
     }
+
     if (options.isInGameEdition) {
+      // List the in-game editor resources used by the project, so they can
+      // be later included in the exported project resources.
+      for (const auto &inGameEditorResource : usedExtensionsResult.GetUsedInGameEditorResources()) {
+        inGameEditorResources.push_back(inGameEditorResource);
+
+        // Always use absolute paths for in-game editor resources.
+        // There are not copied and instead directly refer to the file in the Runtime folder.
+        gd::String resourceFile = inGameEditorResource.GetFilePath();
+        if (!fs.IsAbsolute(resourceFile)) {
+          fs.MakeAbsolute(resourceFile, gdjsRoot + "/Runtime");
+        }
+        inGameEditorResources.back().SetFilePath(resourceFile);
+      }
+
       // TODO Scan the objects and events of event-based objects
       // (it could be an alternative method ScanProjectAndEventsBasedObjects in
       // UsedExtensionsFinder).
@@ -287,7 +305,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     ExporterHelper::SerializeRuntimeGameOptions(fs, gdjsRoot, options,
                                                     includesFiles, runtimeGameOptions);
     ExportProjectData(fs, exportedProject, codeOutputDir + "/data.js",
-                      runtimeGameOptions, options.isInGameEdition);
+                      runtimeGameOptions, options.isInGameEdition,
+                      inGameEditorResources);
     includesFiles.push_back(codeOutputDir + "/data.js");
 
     previousTime = LogTimeSpent("Project data export", previousTime);
@@ -322,12 +341,14 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
 gd::String ExporterHelper::ExportProjectData(
     gd::AbstractFileSystem &fs, gd::Project &project, gd::String filename,
-    const gd::SerializerElement &runtimeGameOptions, bool isInGameEdition) {
+    const gd::SerializerElement &runtimeGameOptions, bool isInGameEdition,
+    const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources) {
   fs.MkDir(fs.DirNameFrom(filename));
 
   gd::SerializerElement projectDataElement;
   ExporterHelper::StriptAndSerializeProjectData(project, projectDataElement,
-                                                isInGameEdition);
+                                                isInGameEdition,
+                                                inGameEditorResources);
 
   // Save the project to JSON
   gd::String output =
@@ -343,8 +364,7 @@ gd::String ExporterHelper::ExportProjectData(
 
 void ExporterHelper::SerializeRuntimeGameOptions(
     gd::AbstractFileSystem &fs, const gd::String &gdjsRoot,
-    const PreviewExportOptions &options,
-    std::vector<gd::String> &includesFiles,
+    const PreviewExportOptions &options, std::vector<gd::String> &includesFiles,
     gd::SerializerElement &runtimeGameOptions) {
   // Create the setup options passed to the gdjs.RuntimeGame
   runtimeGameOptions.AddChild("isPreview").SetBoolValue(true);
@@ -476,10 +496,24 @@ void ExporterHelper::SerializeRuntimeGameOptions(
   }
 }
 
+void ExporterHelper::AddInGameEditorResources(
+    gd::Project &project,
+    std::set<gd::String> &projectUsedResources,
+    const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources) {
+  for (const auto &inGameEditorResource : inGameEditorResources) {
+    project.GetResourcesManager().AddResource(
+        inGameEditorResource.GetResourceName(),
+        inGameEditorResource.GetFilePath(),
+        inGameEditorResource.GetKind());
+    projectUsedResources.insert(inGameEditorResource.GetResourceName());
+  }
+}
+
 void ExporterHelper::SerializeProjectData(gd::AbstractFileSystem &fs,
                                           const gd::Project &project,
                                           const PreviewExportOptions &options,
-                                          gd::SerializerElement &rootElement) {
+                                          gd::SerializerElement &rootElement,
+                                          const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources) {
   gd::Project clonedProject = project;
 
   // Replace all resource file paths with the one used in exported projects.
@@ -497,14 +531,23 @@ void ExporterHelper::SerializeProjectData(gd::AbstractFileSystem &fs,
                                                    resourcesMergingHelper);
 
   ExporterHelper::StriptAndSerializeProjectData(clonedProject, rootElement,
-                                                options.isInGameEdition);
+                                                options.isInGameEdition,
+                                                inGameEditorResources);
 }
 
 void ExporterHelper::StriptAndSerializeProjectData(
     gd::Project &project, gd::SerializerElement &rootElement,
-    bool isInGameEdition) {
+    bool isInGameEdition,
+    const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources) {
   auto projectUsedResources =
       gd::SceneResourcesFinder::FindProjectResources(project);
+
+  if (isInGameEdition) {
+    // All used in-game editor resources must be always loaded and available.
+    ExporterHelper::AddInGameEditorResources(
+        project, projectUsedResources, inGameEditorResources);
+  }
+
   std::unordered_map<gd::String, std::set<gd::String>> scenesUsedResources;
   for (std::size_t layoutIndex = 0;
        layoutIndex < project.GetLayoutsCount(); layoutIndex++) {
@@ -512,6 +555,7 @@ void ExporterHelper::StriptAndSerializeProjectData(
     scenesUsedResources[layout.GetName()] =
         gd::SceneResourcesFinder::FindSceneResources(project, layout);
   }
+
   std::unordered_map<gd::String, std::set<gd::String>>
       eventsBasedObjectVariantsUsedResources;
   for (std::size_t extensionIndex = 0;

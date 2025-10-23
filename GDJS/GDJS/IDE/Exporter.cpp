@@ -13,6 +13,7 @@
 
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/DiagnosticReport.h"
+#include "GDCore/Extensions/Metadata/InGameEditorResourceMetadata.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
@@ -136,8 +137,9 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
 
     //...and export it
     gd::SerializerElement noRuntimeGameOptions;
+    std::vector<gd::InGameEditorResourceMetadata> noInGameEditorResources;
     helper.ExportProjectData(fs, exportedProject, codeOutputDir + "/data.js",
-                             noRuntimeGameOptions, false);
+                             noRuntimeGameOptions, false, noInGameEditorResources);
     includesFiles.push_back(codeOutputDir + "/data.js");
 
     helper.ExportIncludesAndLibs(includesFiles, exportDir, false);
@@ -203,8 +205,8 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
 void Exporter::SerializeProjectData(const gd::Project &project,
                                     const PreviewExportOptions &options,
                                     gd::SerializerElement &projectDataElement) {
-  ExporterHelper::SerializeProjectData(fs, project, options,
-                                       projectDataElement);
+  std::vector<gd::InGameEditorResourceMetadata> noInGameEditorResources;
+  ExporterHelper::SerializeProjectData(fs, project, options, projectDataElement, noInGameEditorResources);
 }
 
 void Exporter::SerializeRuntimeGameOptions(

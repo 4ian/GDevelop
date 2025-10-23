@@ -14,6 +14,7 @@
 
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
+#include "GDCore/Extensions/Metadata/InGameEditorResourceMetadata.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/ObjectConfiguration.h"
 #include "GDCore/String.h"
@@ -305,7 +306,6 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
    */
   std::map<gd::String, gd::ExpressionMetadata>& GetAllStrExpressions() override { return strExpressionsInfos; };
 
-
   /**
    * Check if the behavior is private - it can't be used outside of its
    * extension.
@@ -358,6 +358,19 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
     return openFullEditorLabel;
   }
 
+  /**
+   * \brief Declare a new resource to be used in the in-game editor.
+   */
+  InGameEditorResourceMetadata& AddInGameEditorResource() {
+    InGameEditorResourceMetadata newInGameEditorResource;
+    inGameEditorResources.push_back(newInGameEditorResource);
+    return inGameEditorResources.back();
+  }
+
+  const std::vector<gd::InGameEditorResourceMetadata>& GetInGameEditorResources() const {
+    return inGameEditorResources;
+  }
+
   std::map<gd::String, gd::InstructionMetadata> conditionsInfos;
   std::map<gd::String, gd::InstructionMetadata> actionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> expressionsInfos;
@@ -381,6 +394,7 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
   bool hidden = false;
   bool isRenderedIn3D = false;
   gd::String openFullEditorLabel;
+  std::vector<gd::InGameEditorResourceMetadata> inGameEditorResources;
 
   std::shared_ptr<gd::ObjectConfiguration>
       blueprintObject;  ///< The "blueprint" object to be copied when a new

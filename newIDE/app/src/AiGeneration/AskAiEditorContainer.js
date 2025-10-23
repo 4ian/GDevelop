@@ -331,6 +331,21 @@ export const useAiRequestState = () => {
     [profile, setAiState, selectedAiRequestMode]
   );
 
+  React.useEffect(
+    () => {
+      // Reset selected request if the request cannot be found.
+      // This can happen if it's saved in the state, but not loaded yet,
+      // so it's best to reset it and avoid a flickering effect.
+      if (selectedAiRequestId && !selectedAiRequest) {
+        setAiState({
+          aiRequestId: null,
+          mode: selectedAiRequestMode,
+        });
+      }
+    },
+    [selectedAiRequestId, selectedAiRequestMode, selectedAiRequest, setAiState]
+  );
+
   return {
     selectedAiRequest,
     selectedAiRequestId,
@@ -410,7 +425,7 @@ type Props = {|
   ) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   continueProcessingFunctionCallsOnMount?: boolean,
-  onOpenAskAi: OpenAskAiOptions => void,
+  onOpenAskAi: (?OpenAskAiOptions) => void,
 |};
 
 export type AskAiEditorInterface = {|
@@ -491,6 +506,9 @@ export const AskAiEditor = React.memo<Props>(
             // detecting which scenes were created,
             // allowing to send those messages to the AI, triggering the next steps.
             dontOpenAnySceneOrProjectManager: true,
+            // Don't reposition the Ask AI editor,
+            // as it will be done manually after the project is created too.
+            dontRepositionAskAiEditor: true,
             creationSource: 'ai-agent-request',
           };
 
@@ -1059,11 +1077,10 @@ export const AskAiEditor = React.memo<Props>(
             aiRequestId: string | null,
           |}
         ) => {
-          const newOpenedRequestId = options
-            ? options.aiRequestId
-            : selectedAiRequestId;
+          const newOpenedRequestId = options && options.aiRequestId;
           if (newOpenedRequestId) {
-            // Ensure the request opened is paused, so we don't resume processing
+            // If we're opening a new request,
+            // ensure it is paused, so we don't resume processing
             // without the user's consent.
             setAutoProcessFunctionCalls(newOpenedRequestId, false);
           }
@@ -1071,7 +1088,7 @@ export const AskAiEditor = React.memo<Props>(
             setAiState(options);
           }
         },
-        [setAiState, setAutoProcessFunctionCalls, selectedAiRequestId]
+        [setAiState, setAutoProcessFunctionCalls]
       );
       const onStartNewChat = React.useCallback(
         () => {
@@ -1204,7 +1221,7 @@ export const AskAiEditor = React.memo<Props>(
               updateAiRequest(aiRequest.id, aiRequest);
               setAiState({
                 aiRequestId: aiRequest.id,
-                mode: selectedAiRequestMode,
+                mode: aiRequest.mode || selectedAiRequestMode,
               });
               refreshAiRequest(aiRequest.id);
             }}

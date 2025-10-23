@@ -59,7 +59,6 @@ import Chip from '../UI/Chip';
 import { LineStackLayout } from '../UI/Layout';
 import { BundleStoreContext } from '../AssetStore/Bundles/BundleStoreContext';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
-import { type OpenAskAiOptions } from '../AiGeneration/AskAiEditorContainer';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -102,6 +101,7 @@ export type NewProjectSetup = {|
   optimizeForPixelArt?: boolean,
   openQuickCustomizationDialog?: boolean,
   dontOpenAnySceneOrProjectManager?: boolean,
+  dontRepositionAskAiEditor?: boolean,
   creationSource: NewProjectCreationSource,
 |};
 
@@ -125,7 +125,7 @@ type Props = {|
     newProjectSetup: NewProjectSetup,
     i18n: I18nType
   ) => Promise<CreateProjectResult>,
-  onOpenAskAi: OpenAskAiOptions => void,
+  onOpenAskAi: () => void,
   selectedExampleShortHeader: ?ExampleShortHeader,
   onSelectExampleShortHeader: (exampleShortHeader: ?ExampleShortHeader) => void,
   selectedPrivateGameTemplateListingData: ?PrivateGameTemplateListingData,
@@ -640,12 +640,7 @@ const NewProjectSetupDialog = ({
                     label={<Trans>Try the AI agent</Trans>}
                     rightIcon={<ArrowRight />}
                     style={styles.tryAIAgentButton}
-                    onClick={() =>
-                      onOpenAskAi({
-                        mode: 'agent',
-                        aiRequestId: null,
-                      })
-                    }
+                    onClick={onOpenAskAi}
                   />
                 </ResponsiveLineStackLayout>
                 {isOnline ? (

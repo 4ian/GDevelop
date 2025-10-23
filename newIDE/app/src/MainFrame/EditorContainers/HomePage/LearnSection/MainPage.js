@@ -71,7 +71,7 @@ type Props = {|
     courseId: string,
     chapterId: string
   ) => CourseChapterCompletion | null,
-  onOpenAskAi: OpenAskAiOptions => void,
+  onOpenAskAi: (?OpenAskAiOptions) => void,
   onOpenNewProjectSetupDialog: () => void,
   onSelectPrivateGameTemplateListingData: (
     privateGameTemplateListingData: PrivateGameTemplateListingData

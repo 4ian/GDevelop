@@ -74,7 +74,7 @@ type Props = {|
   ) => Promise<void>,
   purchasingCourseListingData: ?CourseListingData,
   setPurchasingCourseListingData: (CourseListingData | null) => void,
-  onOpenAskAi: OpenAskAiOptions => void,
+  onOpenAskAi: (?OpenAskAiOptions) => void,
   onOpenNewProjectSetupDialog: () => void,
   onSelectPrivateGameTemplateListingData: (
     privateGameTemplateListingData: PrivateGameTemplateListingData

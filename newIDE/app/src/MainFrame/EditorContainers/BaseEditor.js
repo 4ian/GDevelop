@@ -102,7 +102,7 @@ export type RenderEditorContainerProps = {|
     variantName: string
   ) => void,
   openObjectEvents: (extensionName: string, objectName: string) => void,
-  onOpenAskAi: OpenAskAiOptions => void,
+  onOpenAskAi: (?OpenAskAiOptions) => void,
 
   // Events function management:
   onLoadEventsFunctionsExtensions: () => Promise<void>,

@@ -98,7 +98,7 @@ export type EditorTabsPaneCommonProps = {|
   |}) => void,
   openVersionHistoryPanel: () => void,
   onQuitVersionHistory: () => Promise<void>,
-  onOpenAskAi: OpenAskAiOptions => void,
+  onOpenAskAi: (?OpenAskAiOptions) => void,
   getStorageProvider: () => StorageProvider,
   setPreviewedLayout: (layoutName: ?string) => void,
   openExternalEvents: (name: string) => void,
@@ -469,10 +469,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
         return;
       }
 
-      onOpenAskAi({
-        mode: 'agent',
-        aiRequestId: null,
-      });
+      onOpenAskAi();
     },
     [askAiPaneIdentifier, onOpenAskAi, onSetPaneDrawerState]
   );

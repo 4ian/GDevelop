@@ -831,45 +831,39 @@ const MainFrame = (props: Props) => {
   useDiscordRichPresence(currentProject);
 
   const openAskAi = React.useCallback(
-    ({
-      mode,
-      aiRequestId,
-      paneIdentifier,
-      continueProcessingFunctionCallsOnMount,
-    }: OpenAskAiOptions) => {
+    (options: ?OpenAskAiOptions) => {
+      const {
+        mode,
+        aiRequestId,
+        paneIdentifier,
+        continueProcessingFunctionCallsOnMount,
+      } = options || {};
       const newPaneIdentifier =
         paneIdentifier || (currentProject ? 'right' : 'center');
 
       setState(state => {
-        const openedEditor = getOpenedAskAiEditor(state.editorTabs);
+        let openedEditor = getOpenedAskAiEditor(state.editorTabs);
         let newEditorTabs = state.editorTabs;
         if (openedEditor) {
-          if (openedEditor.paneIdentifier === newPaneIdentifier) {
-            // The editor is opened, and at the right position, focus it.
-            const newState = {
-              ...state,
-              editorTabs: changeCurrentTab(
-                newEditorTabs,
-                openedEditor.paneIdentifier,
-                openedEditor.tabIndex
-              ),
-            };
-            const params =
-              // Both need to be defined.
-              mode === undefined || aiRequestId === undefined
-                ? undefined
-                : { mode, aiRequestId };
-            openedEditor.askAiEditor &&
-              openedEditor.askAiEditor.startOrOpenChat(params);
-            return newState;
+          if (openedEditor.paneIdentifier !== newPaneIdentifier) {
+            // The editor is opened, but not at the right position, close it.
+            // It will re-open in the right pane.
+            newEditorTabs = closeEditorTab(
+              newEditorTabs,
+              openedEditor.editorTab
+            );
+            newEditorTabs = openEditorTab(
+              newEditorTabs,
+              getEditorOpeningOptions({
+                kind: 'ask-ai',
+                name: '',
+                paneIdentifier: newPaneIdentifier,
+                continueProcessingFunctionCallsOnMount,
+              })
+            );
           }
-
-          // The editor is opened, but not in the right pane.
-          // Close it and it will re-open in the right pane.
-          newEditorTabs = closeEditorTab(newEditorTabs, openedEditor.editorTab);
         }
 
-        // Open, or focus if already opened, the editor.
         newEditorTabs = openEditorTab(
           newEditorTabs,
           getEditorOpeningOptions({
@@ -884,6 +878,24 @@ const MainFrame = (props: Props) => {
           ...state,
           editorTabs: newEditorTabs,
         };
+      }).then(state => {
+        // Wait for the state to be updated before starting/opening the chat,
+        // as the editor needs to be mounted.
+        const params =
+          // Both need to be defined.
+          mode === undefined || aiRequestId === undefined
+            ? undefined
+            : { mode, aiRequestId };
+        const openedEditor = getOpenedAskAiEditor(state.editorTabs);
+        if (!openedEditor) {
+          console.error(
+            'No Ask AI editor found after opening it. This should not happen.'
+          );
+          return;
+        }
+        if (openedEditor.askAiEditor) {
+          openedEditor.askAiEditor.startOrOpenChat(params);
+        }
       });
     },
     [setState, getEditorOpeningOptions, currentProject]
@@ -1259,6 +1271,15 @@ const MainFrame = (props: Props) => {
               currentProject: project,
               editorTabs: editorTabs,
             });
+      }
+      if (!options.dontRepositionAskAiEditor) {
+        // If Ask AI editor was opened, reposition it.
+        const openedAskAIEditor = getOpenedAskAiEditor(state.editorTabs);
+        if (openedAskAIEditor) {
+          openAskAi({
+            paneIdentifier: 'right',
+          });
+        }
       }
       setIsProjectClosedSoAvoidReloadingExtensions(false);
     },
@@ -3866,15 +3887,6 @@ const MainFrame = (props: Props) => {
     isApplicationTopLevelMenu: false,
     hideAskAi,
   };
-  const onOpenAskAiFromMainMenu = React.useCallback(
-    () => {
-      openAskAi({
-        mode: 'agent',
-        aiRequestId: null,
-      });
-    },
-    [openAskAi]
-  );
   const mainMenuCallbacks = {
     onChooseProject: () => openOpenFromStorageProviderDialog(),
     onOpenRecentFile: openFromFileMetadataWithStorageProvider,
@@ -3893,7 +3905,7 @@ const MainFrame = (props: Props) => {
     onOpenPreferences: () => openPreferencesDialog(true),
     onOpenLanguage: () => openLanguageDialog(true),
     onOpenProfile: onOpenProfileDialog,
-    onOpenAskAi: onOpenAskAiFromMainMenu,
+    onOpenAskAi: openAskAi,
     setElectronUpdateStatus: setElectronUpdateStatus,
   };
 

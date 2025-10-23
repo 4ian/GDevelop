@@ -13,7 +13,7 @@ import { type OpenAskAiOptions } from '../AiGeneration/AskAiEditorContainer';
 type Props = {|
   openInAppTutorialDialog: (tutorialId: string) => void,
   openProfileDialog: () => void,
-  openAskAi: OpenAskAiOptions => void,
+  openAskAi: (?OpenAskAiOptions) => void,
   openStandaloneDialog: () => void,
 |};
 

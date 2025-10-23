@@ -30,7 +30,7 @@ type Props = {|
     privateGameTemplateListingData: PrivateGameTemplateListingData,
     newProjectSetup: NewProjectSetup
   ) => Promise<CreateProjectResult>,
-  openAskAi: OpenAskAiOptions => void,
+  openAskAi: (?OpenAskAiOptions) => void,
   storageProviders: Array<StorageProvider>,
 |};
 

@@ -38,6 +38,7 @@ import {
   getBundleListingDataFromUserFriendlySlug,
 } from '../../../../AssetStore/AssetStoreUtils';
 import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
+import { type OpenAskAiOptions } from '../../../../AiGeneration/AskAiEditorContainer';
 
 type Props = {|
   selectInAppTutorial: (tutorialId: string) => void,
@@ -73,11 +74,7 @@ type Props = {|
   ) => Promise<void>,
   purchasingCourseListingData: ?CourseListingData,
   setPurchasingCourseListingData: (CourseListingData | null) => void,
-  onOpenAskAi: ({|
-    mode: 'chat' | 'agent',
-    aiRequestId: string | null,
-    paneIdentifier: 'left' | 'center' | 'right' | null,
-  |}) => void,
+  onOpenAskAi: (?OpenAskAiOptions) => void,
   onOpenNewProjectSetupDialog: () => void,
   onSelectPrivateGameTemplateListingData: (
     privateGameTemplateListingData: PrivateGameTemplateListingData

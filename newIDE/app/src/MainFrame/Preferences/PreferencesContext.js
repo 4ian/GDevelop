@@ -227,6 +227,7 @@ export type PreferencesValues = {|
   gamesDashboardOrderBy: GamesDashboardOrderBy,
   takeScreenshotOnPreview: boolean,
   showAiAskButtonInTitleBar: boolean,
+  aiState: {| aiRequestId: string | null, mode: 'chat' | 'agent' |},
 |};
 
 /**
@@ -332,6 +333,10 @@ export type Preferences = {|
   ) => void,
   setTakeScreenshotOnPreview: (enabled: boolean) => void,
   setShowAiAskButtonInTitleBar: (enabled: boolean) => void,
+  setAiState: ({|
+    aiRequestId: string | null,
+    mode: 'chat' | 'agent',
+  |}) => void,
 |};
 
 export const initialPreferences = {
@@ -390,6 +395,7 @@ export const initialPreferences = {
     gamesDashboardOrderBy: 'lastModifiedAt',
     takeScreenshotOnPreview: true,
     showAiAskButtonInTitleBar: true,
+    aiState: { aiRequestId: null, mode: 'agent' },
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -465,6 +471,13 @@ export const initialPreferences = {
   ) => {},
   setTakeScreenshotOnPreview: (enabled: boolean) => {},
   setShowAiAskButtonInTitleBar: (enabled: boolean) => {},
+  setAiState: ({
+    aiRequestId,
+    mode,
+  }: {|
+    aiRequestId: string | null,
+    mode: 'chat' | 'agent',
+  |}) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

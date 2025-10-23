@@ -101,6 +101,7 @@ export type NewProjectSetup = {|
   optimizeForPixelArt?: boolean,
   openQuickCustomizationDialog?: boolean,
   dontOpenAnySceneOrProjectManager?: boolean,
+  dontRepositionAskAiEditor?: boolean,
   creationSource: NewProjectCreationSource,
 |};
 
@@ -124,11 +125,7 @@ type Props = {|
     newProjectSetup: NewProjectSetup,
     i18n: I18nType
   ) => Promise<CreateProjectResult>,
-  onOpenAskAi: ({|
-    mode: 'chat' | 'agent',
-    aiRequestId: string | null,
-    paneIdentifier: 'left' | 'center' | 'right' | null,
-  |}) => void,
+  onOpenAskAi: () => void,
   selectedExampleShortHeader: ?ExampleShortHeader,
   onSelectExampleShortHeader: (exampleShortHeader: ?ExampleShortHeader) => void,
   selectedPrivateGameTemplateListingData: ?PrivateGameTemplateListingData,
@@ -643,13 +640,7 @@ const NewProjectSetupDialog = ({
                     label={<Trans>Try the AI agent</Trans>}
                     rightIcon={<ArrowRight />}
                     style={styles.tryAIAgentButton}
-                    onClick={() =>
-                      onOpenAskAi({
-                        mode: 'agent',
-                        aiRequestId: null,
-                        paneIdentifier: 'center',
-                      })
-                    }
+                    onClick={onOpenAskAi}
                   />
                 </ResponsiveLineStackLayout>
                 {isOnline ? (

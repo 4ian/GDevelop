@@ -57,7 +57,7 @@ import useOnResize from '../Utils/UseOnResize';
 import DrawerTopBar from '../UI/DrawerTopBar';
 import { type FloatingPaneState } from './PanesContainer';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
-import { type OpenAskAiOptions } from '../AiGeneration/AskAiEditorContainer';
+import { type OpenAskAiOptions } from '../AiGeneration/Utils';
 
 const styles = {
   container: {
@@ -99,6 +99,7 @@ export type EditorTabsPaneCommonProps = {|
   openVersionHistoryPanel: () => void,
   onQuitVersionHistory: () => Promise<void>,
   onOpenAskAi: (?OpenAskAiOptions) => void,
+  onCloseAskAi: () => void,
   getStorageProvider: () => StorageProvider,
   setPreviewedLayout: (layoutName: ?string) => void,
   openExternalEvents: (name: string) => void,
@@ -264,6 +265,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
     openVersionHistoryPanel,
     onQuitVersionHistory,
     onOpenAskAi,
+    onCloseAskAi,
     getStorageProvider,
     setPreviewedLayout,
     openExternalEvents,
@@ -590,6 +592,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
                       projectItemName: editorTab.projectItemName,
                       setPreviewedLayout,
                       onOpenAskAi,
+                      onCloseAskAi,
                       onOpenExternalEvents: openExternalEvents,
                       onOpenEvents: (sceneName: string) => {
                         openLayout(sceneName, {

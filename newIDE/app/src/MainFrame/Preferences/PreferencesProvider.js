@@ -106,6 +106,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     showAllTutorialHints: this._showAllTutorialHints.bind(this),
     showAnnouncement: this._showAnnouncement.bind(this),
     showAllAnnouncements: this._showAllAnnouncements.bind(this),
+    showAskAiStandAloneForm: this._showAskAiStandAloneForm.bind(this),
+    showAllAskAiStandAloneForms: this._showAllAskAiStandAloneForms.bind(this),
     verifyIfIsNewVersion: this._verifyIfIsNewVersion.bind(this),
     setEventsSheetShowObjectThumbnails: this._setEventsSheetShowObjectThumbnails.bind(
       this
@@ -648,6 +650,33 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           hiddenAnnouncements: {},
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _showAskAiStandAloneForm(identifier: string, show: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          hiddenAskAiStandAloneForms: {
+            ...state.values.hiddenAskAiStandAloneForms,
+            [identifier]: !show,
+          },
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _showAllAskAiStandAloneForms() {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          hiddenAskAiStandAloneForms: {},
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

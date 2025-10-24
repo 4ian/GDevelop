@@ -38,7 +38,7 @@ import Window from '../../../../Utils/Window';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import { RatingBanner } from './RatingBanner';
 import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
-import { type OpenAskAiOptions } from '../../../../AiGeneration/AskAiEditorContainer';
+import { type OpenAskAiOptions } from '../../../../AiGeneration/Utils';
 
 const styles = {
   desktopContainer: { display: 'flex', gap: 16 },

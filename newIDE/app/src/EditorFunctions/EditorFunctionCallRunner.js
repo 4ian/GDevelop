@@ -34,7 +34,7 @@ export type EditorFunctionCallResult =
     |};
 
 export type ProcessEditorFunctionCallsOptions = {|
-  project: gdProject | null,
+  project: ?gdProject,
   functionCalls: Array<EditorFunctionCall>,
   editorCallbacks: EditorCallbacks,
   ignore: boolean,

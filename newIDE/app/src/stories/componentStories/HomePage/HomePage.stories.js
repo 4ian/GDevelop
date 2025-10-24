@@ -129,6 +129,9 @@ const WrappedHomePage = ({
                 onCreateProjectFromExample={action(
                   'onCreateProjectFromExample'
                 )}
+                onCreateEmptyProject={action('onCreateEmptyProject')}
+                onOpenLayout={() => action('onOpenLayout')()}
+                storageProvider={CloudStorageProvider}
                 askToCloseProject={async () => true}
                 closeProject={async () => {}}
                 gamesList={{
@@ -149,6 +152,7 @@ const WrappedHomePage = ({
                 }}
                 onExtensionInstalled={action('onExtensionInstalled')}
                 onOpenAskAi={() => action('onOpenAskAi')()}
+                onCloseAskAi={() => action('onCloseAskAi')()}
               />
             </TutorialStateProvider>
           </ExampleStoreStateProvider>

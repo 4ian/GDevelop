@@ -16,6 +16,7 @@ import {
   fakePrivateGameTemplateListingData,
 } from '../../../fixtures/GDevelopServicesTestData';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
+import fakeResourceManagementProps from '../../FakeResourceManagement';
 
 export default {
   title: 'Project Creation/NewProjectSetupDialog',
@@ -27,16 +28,22 @@ export const OpenAndNotAuthenticated = () => {
   return (
     <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
       <NewProjectSetupDialog
+        project={null}
+        fileMetadata={null}
         storageProviders={[
           UrlStorageProvider,
           CloudStorageProvider,
           GoogleDriveStorageProvider,
           DownloadFileStorageProvider,
         ]}
+        storageProvider={UrlStorageProvider}
+        resourceManagementProps={fakeResourceManagementProps}
         onClose={() => action('click on close')()}
         onCreateEmptyProject={() => action('create empty')()}
         onCreateFromExample={() => action('create from example')()}
         onOpenAskAi={() => action('open ask AI')()}
+        onCloseAskAi={() => action('close ask AI')()}
+        onOpenLayout={() => action('open layout')()}
         onCreateProjectFromPrivateGameTemplate={() =>
           action('create project from private game template')()
         }
@@ -56,6 +63,8 @@ export const OpenAndAuthenticated = () => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <NewProjectSetupDialog
+        project={null}
+        fileMetadata={null}
         storageProviders={[
           UrlStorageProvider,
           CloudStorageProvider,
@@ -63,9 +72,13 @@ export const OpenAndAuthenticated = () => {
           DownloadFileStorageProvider,
         ]}
         onClose={() => action('click on close')()}
+        storageProvider={UrlStorageProvider}
+        resourceManagementProps={fakeResourceManagementProps}
         onCreateEmptyProject={() => action('create empty')()}
         onCreateFromExample={() => action('create from example')()}
         onOpenAskAi={() => action('open ask AI')()}
+        onCloseAskAi={() => action('close ask AI')()}
+        onOpenLayout={() => action('open layout')()}
         onCreateProjectFromPrivateGameTemplate={() =>
           action('create project from private game template')()
         }
@@ -85,6 +98,8 @@ export const Opening = () => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <NewProjectSetupDialog
+        project={null}
+        fileMetadata={null}
         isProjectOpening
         storageProviders={[
           UrlStorageProvider,
@@ -93,9 +108,13 @@ export const Opening = () => {
           DownloadFileStorageProvider,
         ]}
         onClose={() => action('click on close')()}
+        storageProvider={UrlStorageProvider}
+        resourceManagementProps={fakeResourceManagementProps}
         onCreateEmptyProject={() => action('create empty')()}
         onCreateFromExample={() => action('create from example')()}
         onOpenAskAi={() => action('open ask AI')()}
+        onCloseAskAi={() => action('close ask AI')()}
+        onOpenLayout={() => action('open layout')()}
         onCreateProjectFromPrivateGameTemplate={() =>
           action('create project from private game template')()
         }
@@ -117,6 +136,8 @@ export const LimitsReached = () => {
       value={fakeAuthenticatedUserWithNoSubscriptionAndTooManyCloudProjects}
     >
       <NewProjectSetupDialog
+        project={null}
+        fileMetadata={null}
         storageProviders={[
           CloudStorageProvider,
           UrlStorageProvider,
@@ -124,9 +145,13 @@ export const LimitsReached = () => {
           DownloadFileStorageProvider,
         ]}
         onClose={() => action('click on close')()}
+        storageProvider={UrlStorageProvider}
+        resourceManagementProps={fakeResourceManagementProps}
         onCreateEmptyProject={() => action('create empty')()}
         onCreateFromExample={() => action('create from example')()}
         onOpenAskAi={() => action('open ask AI')()}
+        onCloseAskAi={() => action('close ask AI')()}
+        onOpenLayout={() => action('open layout')()}
         onCreateProjectFromPrivateGameTemplate={() =>
           action('create project from private game template')()
         }
@@ -146,6 +171,8 @@ export const FromExample = () => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <NewProjectSetupDialog
+        project={null}
+        fileMetadata={null}
         storageProviders={[
           UrlStorageProvider,
           CloudStorageProvider,
@@ -153,9 +180,13 @@ export const FromExample = () => {
           DownloadFileStorageProvider,
         ]}
         onClose={() => action('click on close')()}
+        storageProvider={UrlStorageProvider}
+        resourceManagementProps={fakeResourceManagementProps}
         onCreateEmptyProject={() => action('create empty')()}
         onCreateFromExample={() => action('create from example')()}
         onOpenAskAi={() => action('open ask AI')()}
+        onCloseAskAi={() => action('close ask AI')()}
+        onOpenLayout={() => action('open layout')()}
         selectedExampleShortHeader={geometryMonsterExampleShortHeader}
         onCreateProjectFromPrivateGameTemplate={() =>
           action('create project from private game template')()
@@ -175,6 +206,8 @@ export const FromExampleWithoutGoingBack = () => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <NewProjectSetupDialog
+        project={null}
+        fileMetadata={null}
         storageProviders={[
           UrlStorageProvider,
           CloudStorageProvider,
@@ -182,9 +215,13 @@ export const FromExampleWithoutGoingBack = () => {
           DownloadFileStorageProvider,
         ]}
         onClose={() => action('click on close')()}
+        storageProvider={UrlStorageProvider}
+        resourceManagementProps={fakeResourceManagementProps}
         onCreateEmptyProject={() => action('create empty')()}
         onCreateFromExample={() => action('create from example')()}
         onOpenAskAi={() => action('open ask AI')()}
+        onCloseAskAi={() => action('close ask AI')()}
+        onOpenLayout={() => action('open layout')()}
         selectedExampleShortHeader={geometryMonsterExampleShortHeader}
         onCreateProjectFromPrivateGameTemplate={() =>
           action('create project from private game template')()
@@ -205,6 +242,8 @@ export const FromPrivateGameTemplate = () => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <NewProjectSetupDialog
+        project={null}
+        fileMetadata={null}
         storageProviders={[
           UrlStorageProvider,
           CloudStorageProvider,
@@ -212,9 +251,13 @@ export const FromPrivateGameTemplate = () => {
           DownloadFileStorageProvider,
         ]}
         onClose={() => action('click on close')()}
+        storageProvider={UrlStorageProvider}
+        resourceManagementProps={fakeResourceManagementProps}
         onCreateEmptyProject={() => action('create empty')()}
         onCreateFromExample={() => action('create from example')()}
         onOpenAskAi={() => action('open ask AI')()}
+        onCloseAskAi={() => action('close ask AI')()}
+        onOpenLayout={() => action('open layout')()}
         selectedExampleShortHeader={null}
         onCreateProjectFromPrivateGameTemplate={() =>
           action('create project from private game template')()
@@ -236,6 +279,8 @@ export const FromPrivateGameTemplateWithoutGoingBack = () => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <NewProjectSetupDialog
+        project={null}
+        fileMetadata={null}
         storageProviders={[
           UrlStorageProvider,
           CloudStorageProvider,
@@ -243,9 +288,13 @@ export const FromPrivateGameTemplateWithoutGoingBack = () => {
           DownloadFileStorageProvider,
         ]}
         onClose={() => action('click on close')()}
+        storageProvider={UrlStorageProvider}
+        resourceManagementProps={fakeResourceManagementProps}
         onCreateEmptyProject={() => action('create empty')()}
         onCreateFromExample={() => action('create from example')()}
         onOpenAskAi={() => action('open ask AI')()}
+        onCloseAskAi={() => action('close ask AI')()}
+        onOpenLayout={() => action('open layout')()}
         selectedExampleShortHeader={null}
         onCreateProjectFromPrivateGameTemplate={() =>
           action('create project from private game template')()

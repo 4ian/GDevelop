@@ -38,7 +38,7 @@ import {
   getBundleListingDataFromUserFriendlySlug,
 } from '../../../../AssetStore/AssetStoreUtils';
 import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
-import { type OpenAskAiOptions } from '../../../../AiGeneration/AskAiEditorContainer';
+import { type OpenAskAiOptions } from '../../../../AiGeneration/Utils';
 
 type Props = {|
   selectInAppTutorial: (tutorialId: string) => void,

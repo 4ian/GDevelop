@@ -157,6 +157,7 @@ declare class libGDevelop {
   ParameterMetadataContainer: Class<gdParameterMetadataContainer>;
   ParameterMetadataTools: Class<gdParameterMetadataTools>;
   ObjectMetadata: Class<gdObjectMetadata>;
+  InGameEditorResourceMetadata: Class<gdInGameEditorResourceMetadata>;
   QuickCustomization_Visibility: Class<QuickCustomization_Visibility>;
   QuickCustomization: Class<gdQuickCustomization>;
   QuickCustomizationVisibilitiesContainer: Class<gdQuickCustomizationVisibilitiesContainer>;

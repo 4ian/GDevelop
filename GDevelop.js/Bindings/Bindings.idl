@@ -1933,6 +1933,7 @@ interface ObjectMetadata {
     [Const, Ref] DOMString GetCategoryFullName();
 
     [Ref] ObjectMetadata SetCategoryFullName([Const] DOMString categoryFullName);
+    [Ref] InGameEditorResourceMetadata AddInGameEditorResource();
 
     [Const, Ref] InstructionMetadata AddScopedCondition([Const] DOMString name,
                                         [Const] DOMString fullname,
@@ -2021,6 +2022,12 @@ interface ObjectMetadata {
 
     [Ref] ObjectMetadata SetOpenFullEditorLabel([Const] DOMString label);
     [Const, Ref] DOMString GetOpenFullEditorLabel();
+};
+
+interface InGameEditorResourceMetadata {
+    [Ref] InGameEditorResourceMetadata SetResourceName([Const] DOMString resourceName);
+    [Ref] InGameEditorResourceMetadata SetFilePath([Const] DOMString relativeFilePath);
+    [Ref] InGameEditorResourceMetadata SetKind([Const] DOMString kind);
 };
 
 enum QuickCustomization_Visibility {

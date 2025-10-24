@@ -20,6 +20,7 @@ namespace gdjs {
     _debugMode: boolean = false;
     _debugLight: PIXI.Container | null = null;
     _debugGraphics: PIXI.Graphics | null = null;
+    _lightIconSprite: PIXI.Sprite | null = null;
 
     /**
      * A polygon updated when vertices of the light are computed
@@ -61,15 +62,31 @@ namespace gdjs {
 
       this.updateDebugMode();
 
+      const game = this._object.getInstanceContainer().getGame();
+      if (game.isInGameEdition()) {
+        const texture = game
+          .getImageManager()
+          .getPIXITexture('InGameEditor-LightIcon');
+        this._lightIconSprite = new PIXI.Sprite(texture);
+        this._lightIconSprite.anchor.x = 0.5;
+        this._lightIconSprite.anchor.y = 0.5;
+
+        this._debugGraphics = new PIXI.Graphics();
+
+        this._debugLight = new PIXI.Container();
+        this._debugLight.addChild(this._debugGraphics);
+        this._debugLight.addChild(this._lightIconSprite);
+        // Force a 1st rendering of the circle.
+        this._radius = 0;
+      }
+
       // Objects will be added in lighting layer, this is just to maintain consistency.
-      if (this._light) {
+      const rendererObject = this.getRendererObject();
+      if (rendererObject) {
         instanceContainer
           .getLayer('')
           .getRenderer()
-          .addRendererObject(
-            this.getRendererObject(),
-            runtimeObject.getZOrder()
-          );
+          .addRendererObject(rendererObject, runtimeObject.getZOrder());
       }
     }
 
@@ -123,6 +140,40 @@ namespace gdjs {
     }
 
     ensureUpToDate() {
+      if (this._object.getInstanceContainer().getGame().isInGameEdition()) {
+        if (!this._debugLight) {
+          return;
+        }
+        this._debugLight.x = this._object.getX();
+        this._debugLight.y = this._object.getY();
+        if (
+          this._radius === this._object.getRadius() &&
+          this._color[0] === this._object._color[0] &&
+          this._color[1] === this._object._color[1] &&
+          this._color[2] === this._object._color[2]
+        ) {
+          return;
+        }
+        if (this._debugGraphics) {
+          this._radius = this._object.getRadius();
+          this._color[0] = this._object._color[0];
+          this._color[1] = this._object._color[1];
+          this._color[2] = this._object._color[2];
+          const radiusBorderWidth = 2;
+          this._debugGraphics.clear();
+          this._debugGraphics.lineStyle(
+            radiusBorderWidth,
+            gdjs.rgbToHexNumber(this._color[0], this._color[1], this._color[2]),
+            0.8
+          );
+          this._debugGraphics.drawCircle(
+            0,
+            0,
+            Math.max(1, this._radius - radiusBorderWidth)
+          );
+        }
+        return;
+      }
       if (this._object.isHidden()) {
         return;
       }
@@ -133,6 +184,9 @@ namespace gdjs {
     }
 
     updateMesh(): void {
+      if (this._object.getInstanceContainer().getGame().isInGameEdition()) {
+        return;
+      }
       if (!PIXI.utils.isWebGLSupported()) {
         logger.warn(
           'This device does not support webgl, which is required for Lighting Extension.'

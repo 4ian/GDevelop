@@ -702,7 +702,9 @@ namespace gdjs {
      * @return true if it is a lighting layer, false otherwise.
      */
     isLightingLayer(): boolean {
-      return this._isLightingLayer;
+      return (
+        this._isLightingLayer && !this._runtimeScene.getGame().isInGameEdition()
+      );
     }
   }
 }

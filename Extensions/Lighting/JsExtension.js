@@ -176,6 +176,12 @@ module.exports = {
       .addDefaultBehavior('EffectCapability::EffectBehavior');
 
     object
+      .addInGameEditorResource()
+      .setResourceName('InGameEditor-LightIcon')
+      .setFilePath('Extensions/Lighting/InGameEditor/LightIcon.png')
+      .setKind('image');
+
+    object
       .addAction(
         'SetRadius',
         _('Light radius'),
@@ -338,11 +344,11 @@ module.exports = {
       }
 
       getOriginX() {
-        return this._radius;
+        return (this._radius / this.getDefaultWidth()) * this.getWidth();
       }
 
       getOriginY() {
-        return this._radius;
+        return (this._radius / this.getDefaultHeight()) * this.getHeight();
       }
     }
 

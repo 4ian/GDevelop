@@ -418,8 +418,8 @@ namespace gdjs {
             .getImageManager()
             .getPIXITexture('InGameEditor-ShapePainterIcon');
           this._placeholder = new PIXI.Sprite(texture);
+          this._graphics.addChild(this._placeholder);
         }
-        this._graphics.addChild(this._placeholder);
       } else if (this._placeholder) {
         this._placeholder.removeFromParent();
         this._placeholder.destroy();
@@ -633,6 +633,11 @@ namespace gdjs {
 
     destroy(): void {
       this._graphics.destroy();
+      if (this._placeholder) {
+        this._placeholder.removeFromParent();
+        this._placeholder.destroy();
+        this._placeholder = null;
+      }
     }
   }
 

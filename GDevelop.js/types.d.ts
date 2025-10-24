@@ -1596,6 +1596,7 @@ export class ObjectMetadata extends EmscriptenObject {
   getHelpPath(): string;
   getCategoryFullName(): string;
   setCategoryFullName(categoryFullName: string): ObjectMetadata;
+  addInGameEditorResource(): InGameEditorResourceMetadata;
   addScopedCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
   addScopedAction(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
   addCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
@@ -1621,6 +1622,12 @@ export class ObjectMetadata extends EmscriptenObject {
   isRenderedIn3D(): boolean;
   setOpenFullEditorLabel(label: string): ObjectMetadata;
   getOpenFullEditorLabel(): string;
+}
+
+export class InGameEditorResourceMetadata extends EmscriptenObject {
+  setResourceName(resourceName: string): InGameEditorResourceMetadata;
+  setFilePath(relativeFilePath: string): InGameEditorResourceMetadata;
+  setKind(kind: string): InGameEditorResourceMetadata;
 }
 
 export class QuickCustomization extends EmscriptenObject {

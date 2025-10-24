@@ -412,18 +412,26 @@ export default class LayerRenderer {
         this.objectsContainer,
         associatedObjectName
       );
-      if (!associatedObject) return null;
-
       //...so let's create a renderer.
-      renderedInstance = this.renderedInstances[
-        instance.ptr
-      ] = ObjectsRenderingService.createNewInstanceRenderer(
-        this.project,
-        instance,
-        associatedObject.getConfiguration(),
-        this.pixiContainer,
-        this._threeGroup
-      );
+      if (associatedObject) {
+        renderedInstance = this.renderedInstances[
+          instance.ptr
+        ] = ObjectsRenderingService.createNewInstanceRenderer(
+          this.project,
+          instance,
+          associatedObject.getConfiguration(),
+          this.pixiContainer,
+          this._threeGroup
+        );
+      } else {
+        renderedInstance = this.renderedInstances[
+          instance.ptr
+        ] = ObjectsRenderingService.createNewUnknownInstanceRenderer(
+          this.project,
+          instance,
+          this.pixiContainer
+        );
+      }
 
       renderedInstance._pixiObject.eventMode = 'static';
       panable(renderedInstance._pixiObject);

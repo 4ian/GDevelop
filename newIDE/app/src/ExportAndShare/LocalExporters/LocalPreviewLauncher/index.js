@@ -291,7 +291,9 @@ export default class LocalPreviewLauncher extends React.Component<
     const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
     const shouldHotReload = previewOptions.hotReload && !!debuggerIds.length;
     if (shouldHotReload) {
-      previewExportOptions.setShouldClearExportFolder(false);
+      previewExportOptions.setShouldClearExportFolder(
+        previewOptions.shouldHardReload
+      );
       // At hot-reload, the ProjectData are passed into the message.
       // It means that we don't need to write them in a file.
       previewExportOptions.setShouldReloadProjectData(false);
@@ -378,16 +380,24 @@ export default class LocalPreviewLauncher extends React.Component<
       );
       runtimeGameOptionsElement.delete();
 
-      debuggerIds.forEach(debuggerId => {
-        this.getPreviewDebuggerServer().sendMessage(debuggerId, {
-          command: 'hotReload',
-          payload: {
-            shouldReloadResources: previewOptions.shouldReloadResources,
-            projectData,
-            runtimeGameOptions,
-          },
+      if (previewOptions.shouldHardReload) {
+        debuggerIds.forEach(debuggerId => {
+          this.getPreviewDebuggerServer().sendMessage(debuggerId, {
+            command: 'hardReload',
+          });
         });
-      });
+      } else {
+        debuggerIds.forEach(debuggerId => {
+          this.getPreviewDebuggerServer().sendMessage(debuggerId, {
+            command: 'hotReload',
+            payload: {
+              shouldReloadResources: previewOptions.shouldReloadResources,
+              projectData,
+              runtimeGameOptions,
+            },
+          });
+        });
+      }
       if (!previewOptions.isForInGameEdition) {
         if (
           this.state.hotReloadsCount % 16 === 0 &&

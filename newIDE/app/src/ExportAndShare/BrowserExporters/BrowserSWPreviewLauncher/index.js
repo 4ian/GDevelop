@@ -182,7 +182,9 @@ export default class BrowserSWPreviewLauncher extends React.Component<
       // It doesn't have any side effect because when it wont actually do an hot-reload
       // since the game preview doesn't exist yet.
       if (shouldHotReload) {
-        previewExportOptions.setShouldClearExportFolder(false);
+        previewExportOptions.setShouldClearExportFolder(
+          previewOptions.shouldHardReload
+        );
         // At hot-reload, the ProjectData are passed into the message.
         // It means that we don't need to write them in a file.
         previewExportOptions.setShouldReloadProjectData(false);
@@ -292,17 +294,26 @@ export default class BrowserSWPreviewLauncher extends React.Component<
         );
         runtimeGameOptionsElement.delete();
 
-        console.log('[BrowserSWPreviewLauncher] Triggering hot reload...');
-        debuggerIds.forEach(debuggerId => {
-          this.getPreviewDebuggerServer().sendMessage(debuggerId, {
-            command: 'hotReload',
-            payload: {
-              shouldReloadResources: previewOptions.shouldReloadResources,
-              projectData,
-              runtimeGameOptions,
-            },
+        if (previewOptions.shouldHardReload) {
+          console.log('[BrowserSWPreviewLauncher] Triggering hard reload...');
+          debuggerIds.forEach(debuggerId => {
+            this.getPreviewDebuggerServer().sendMessage(debuggerId, {
+              command: 'hardReload',
+            });
           });
-        });
+        } else {
+          console.log('[BrowserSWPreviewLauncher] Triggering hot reload...');
+          debuggerIds.forEach(debuggerId => {
+            this.getPreviewDebuggerServer().sendMessage(debuggerId, {
+              command: 'hotReload',
+              payload: {
+                shouldReloadResources: previewOptions.shouldReloadResources,
+                projectData,
+                runtimeGameOptions,
+              },
+            });
+          });
+        }
       } else if (previewWindows) {
         if (previewOptions.isForInGameEdition) {
           setEmbeddedGameFramePreviewLocation({

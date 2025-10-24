@@ -16,6 +16,7 @@ export type LaunchPreviewOptions = {
   shouldReloadLibraries?: boolean,
   shouldGenerateScenesEventsCode?: boolean,
   shouldReloadResources?: boolean,
+  shouldHardReload?: boolean,
   fullLoadingScreen?: boolean,
   forceDiagnosticReport?: boolean,
   numberOfWindows?: number,
@@ -49,6 +50,7 @@ export type PreviewOptions = {|
   shouldReloadLibraries: boolean,
   shouldGenerateScenesEventsCode: boolean,
   shouldReloadResources: boolean,
+  shouldHardReload: boolean,
   fullLoadingScreen: boolean,
   fallbackAuthor: ?{ id: string, username: string },
   authenticatedPlayer: ?{

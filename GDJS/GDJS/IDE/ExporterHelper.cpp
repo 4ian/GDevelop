@@ -111,7 +111,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     std::vector<gd::String> &includesFiles) {
 
   if (options.isInGameEdition && !options.shouldReloadProjectData &&
-      !options.shouldReloadLibraries && !options.shouldGenerateScenesEventsCode) {
+      !options.shouldReloadLibraries && !options.shouldGenerateScenesEventsCode &&
+      !options.shouldClearExportFolder) {
     gd::LogStatus("Skip project export entirely");
     return "";
   }
@@ -133,7 +134,9 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   previousTime = LogTimeSpent("Project cloning", previousTime);
 
   if (options.isInGameEdition) {
-    if (options.shouldReloadProjectData || options.shouldGenerateScenesEventsCode) {
+    if (options.shouldReloadProjectData ||
+        options.shouldGenerateScenesEventsCode ||
+        options.shouldClearExportFolder) {
       auto projectDirectory = fs.DirNameFrom(exportedProject.GetProjectFile());
       gd::ResourcesMergingHelper resourcesMergingHelper(
           exportedProject.GetResourcesManager(), fs);
@@ -153,7 +156,9 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     previousTime = LogTimeSpent("Resource export", previousTime);
   }
 
-  if (options.shouldReloadProjectData || options.shouldGenerateScenesEventsCode) {
+  if (options.shouldReloadProjectData ||
+      options.shouldGenerateScenesEventsCode ||
+      options.shouldClearExportFolder) {
     // Compatibility with GD <= 5.0-beta56
     // Stay compatible with text objects declaring their font as just a filename
     // without a font resource - by manually adding these resources.
@@ -164,7 +169,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
   std::vector<gd::SourceFileMetadata> noUsedSourceFiles;
   std::vector<gd::SourceFileMetadata> &usedSourceFiles = noUsedSourceFiles;
-  if (options.shouldReloadLibraries) {
+  if (options.shouldReloadLibraries || options.shouldClearExportFolder) {
     auto usedExtensionsResult =
         gd::UsedExtensionsFinder::ScanProject(exportedProject);
     usedSourceFiles = usedExtensionsResult.GetUsedSourceFiles();
@@ -279,7 +284,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     gd::LogStatus("Events code export is skipped");
   }
 
-  if (options.shouldReloadProjectData) {
+  if (options.shouldReloadProjectData || options.shouldClearExportFolder) {
 
     if (options.fullLoadingScreen) {
       // Use project properties fallback to set empty properties
@@ -315,14 +320,14 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     gd::LogStatus("Project data export is skipped");
   }
 
-  if (options.shouldReloadLibraries) {
+  if (options.shouldReloadLibraries || options.shouldClearExportFolder) {
     // Copy all the dependencies and their source maps
     ExportIncludesAndLibs(includesFiles, options.exportPath, true);
     ExportIncludesAndLibs(resourcesFiles, options.exportPath, true);
 
     // TODO Build a full includesFiles list without actually doing export or
     // generation.
-    if (options.shouldGenerateScenesEventsCode) {
+    if (options.shouldGenerateScenesEventsCode || options.shouldClearExportFolder) {
       // Create the index file
       if (!ExportIndexFile(exportedProject, gdjsRoot + "/Runtime/index.html",
                            options.exportPath, includesFiles, usedSourceFiles,

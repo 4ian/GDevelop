@@ -39,6 +39,10 @@ export type HotReloadSteps = {|
    * Set to `true` when the resources must be reloaded in memory.
    */
   shouldReloadResources: boolean,
+  /**
+   * Set to `true` when an hard reload is needed.
+   */
+  shouldHardReload: boolean,
 |};
 
 const mergeNeededHotReloadSteps = (
@@ -51,12 +55,14 @@ const mergeNeededHotReloadSteps = (
     stepsA.shouldReloadLibraries || stepsB.shouldReloadLibraries,
   shouldReloadResources:
     stepsA.shouldReloadResources || stepsB.shouldReloadResources,
+  shouldHardReload: stepsA.shouldHardReload || stepsB.shouldHardReload,
 });
 
 const isHotReloadNeeded = (hotReloadSteps: HotReloadSteps): boolean =>
   hotReloadSteps.shouldReloadProjectData ||
   hotReloadSteps.shouldReloadLibraries ||
-  hotReloadSteps.shouldReloadResources;
+  hotReloadSteps.shouldReloadResources ||
+  hotReloadSteps.shouldHardReload;
 
 type ChangeViewPositionCommand =
   | 'centerViewOnLastSelectedInstance'
@@ -185,6 +191,7 @@ const noHotReloadSteps = {
   shouldReloadProjectData: false,
   shouldReloadLibraries: false,
   shouldReloadResources: false,
+  shouldHardReload: false,
 };
 
 export const EmbeddedGameFrame = ({
@@ -267,11 +274,13 @@ export const EmbeddedGameFrame = ({
             shouldReloadProjectData,
             shouldReloadLibraries,
             shouldReloadResources,
+            shouldHardReload,
           } = options;
           setEditorHotReloadNeeded({
             shouldReloadProjectData,
             shouldReloadLibraries,
             shouldReloadResources,
+            shouldHardReload,
           });
           return;
         }
@@ -280,15 +289,18 @@ export const EmbeddedGameFrame = ({
           shouldReloadProjectData,
           shouldReloadLibraries,
           shouldReloadResources,
+          shouldHardReload,
         } = mergeNeededHotReloadSteps(hotReloadSteps.current, {
           shouldReloadProjectData: options.shouldReloadProjectData,
           shouldReloadLibraries: options.shouldReloadLibraries,
           shouldReloadResources: options.shouldReloadResources,
+          shouldHardReload: options.shouldHardReload,
         });
         const hotReload = isHotReloadNeeded({
           shouldReloadProjectData,
           shouldReloadLibraries,
           shouldReloadResources,
+          shouldHardReload,
         });
         if (!previewIndexHtmlLocation || hotReload) {
           console.info(
@@ -313,6 +325,7 @@ export const EmbeddedGameFrame = ({
             shouldReloadProjectData,
             shouldReloadLibraries,
             shouldReloadResources,
+            shouldHardReload,
             editorCameraState3D: cameraStates.current.get(editorId) || null,
           }).finally(() => {
             isPreviewOngoing.current = false;
@@ -325,6 +338,7 @@ export const EmbeddedGameFrame = ({
                 shouldReloadProjectData: false,
                 shouldReloadLibraries: false,
                 shouldReloadResources: false,
+                shouldHardReload: false,
               });
             }
           });

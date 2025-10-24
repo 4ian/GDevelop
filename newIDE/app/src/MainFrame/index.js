@@ -1417,6 +1417,8 @@ const MainFrame = (props: Props) => {
     if (!answer) return;
 
     const extensionName = eventsFunctionsExtension.getName();
+    const hasCustomObject =
+      eventsFunctionsExtension.getEventsBasedObjects().size() > 0;
     setState(state => ({
       ...state,
       editorTabs: closeEventsFunctionsExtensionTabs(
@@ -1440,11 +1442,21 @@ const MainFrame = (props: Props) => {
         currentProject
       );
 
-      notifyChangesToInGameEditor({
-        shouldReloadProjectData: false,
-        shouldReloadLibraries: true,
-        shouldReloadResources: false,
-      });
+      if (hasCustomObject) {
+        notifyChangesToInGameEditor({
+          shouldReloadProjectData: true,
+          shouldReloadLibraries: true,
+          shouldReloadResources: false,
+          shouldHardReload: true,
+        });
+      } else {
+        notifyChangesToInGameEditor({
+          shouldReloadProjectData: true,
+          shouldReloadLibraries: true,
+          shouldReloadResources: false,
+          shouldHardReload: false,
+        });
+      }
     });
   };
 
@@ -1511,6 +1523,7 @@ const MainFrame = (props: Props) => {
         shouldReloadProjectData: true,
         shouldReloadLibraries: true,
         shouldReloadResources: false,
+        shouldHardReload: false,
       });
     }
   };
@@ -1521,6 +1534,7 @@ const MainFrame = (props: Props) => {
         shouldReloadProjectData: false,
         shouldReloadLibraries: false,
         shouldReloadResources: false,
+        shouldHardReload: false,
       }
     ) => {
       let hasReloadIfNeeded = false;
@@ -1582,6 +1596,7 @@ const MainFrame = (props: Props) => {
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
         shouldReloadResources: false,
+        shouldHardReload: false,
       });
     },
     [notifyChangesToInGameEditor]
@@ -1593,6 +1608,7 @@ const MainFrame = (props: Props) => {
         shouldReloadProjectData: false,
         shouldReloadLibraries: false,
         shouldReloadResources: true,
+        shouldHardReload: false,
       });
     },
     [notifyChangesToInGameEditor]
@@ -1607,6 +1623,7 @@ const MainFrame = (props: Props) => {
           shouldReloadProjectData: true,
           shouldReloadLibraries: false,
           shouldReloadResources: false,
+          shouldHardReload: false,
         });
       }
     },
@@ -1619,6 +1636,7 @@ const MainFrame = (props: Props) => {
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
         shouldReloadResources: false,
+        shouldHardReload: false,
       });
     },
     [notifyChangesToInGameEditor]
@@ -1630,6 +1648,7 @@ const MainFrame = (props: Props) => {
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
         shouldReloadResources: false,
+        shouldHardReload: false,
       });
     },
     [notifyChangesToInGameEditor]
@@ -1642,6 +1661,7 @@ const MainFrame = (props: Props) => {
         shouldReloadProjectData: true,
         shouldReloadLibraries: true,
         shouldReloadResources: false,
+        shouldHardReload: false,
       });
     },
     [notifyChangesToInGameEditor]
@@ -1653,6 +1673,7 @@ const MainFrame = (props: Props) => {
         shouldReloadProjectData: true,
         shouldReloadLibraries: isNewObjectTypeUsed,
         shouldReloadResources: false,
+        shouldHardReload: false,
       });
     },
     [notifyChangesToInGameEditor]
@@ -1695,6 +1716,7 @@ const MainFrame = (props: Props) => {
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
         shouldReloadResources: false,
+        shouldHardReload: false,
       });
       _onProjectItemModified();
     });
@@ -1730,6 +1752,7 @@ const MainFrame = (props: Props) => {
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
         shouldReloadResources: false,
+        shouldHardReload: false,
       });
       _onProjectItemModified();
     });
@@ -1812,6 +1835,7 @@ const MainFrame = (props: Props) => {
         shouldReloadProjectData: false,
         shouldReloadLibraries: true,
         shouldReloadResources: false,
+        shouldHardReload: false,
       });
       _onProjectItemModified();
     });
@@ -1946,6 +1970,7 @@ const MainFrame = (props: Props) => {
       shouldReloadLibraries,
       shouldGenerateScenesEventsCode,
       shouldReloadResources,
+      shouldHardReload,
       fullLoadingScreen,
       forceDiagnosticReport,
       launchCaptureOptions,
@@ -2038,6 +2063,7 @@ const MainFrame = (props: Props) => {
               ? true
               : shouldGenerateScenesEventsCode,
           shouldReloadResources: !!shouldReloadResources,
+          shouldHardReload: !!shouldHardReload,
           fullLoadingScreen: !!fullLoadingScreen,
           fallbackAuthor,
           authenticatedPlayer,
@@ -2185,6 +2211,7 @@ const MainFrame = (props: Props) => {
       shouldReloadProjectData,
       shouldReloadLibraries,
       shouldReloadResources,
+      shouldHardReload,
       editorCameraState3D,
     }: {|
       ...PreviewInGameEditorTarget,
@@ -2198,6 +2225,7 @@ const MainFrame = (props: Props) => {
         shouldReloadLibraries,
         shouldGenerateScenesEventsCode: false,
         shouldReloadResources,
+        shouldHardReload,
         forceDiagnosticReport: false,
         isForInGameEdition: {
           editorId,
@@ -2706,6 +2734,7 @@ const MainFrame = (props: Props) => {
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
         shouldReloadResources: false,
+        shouldHardReload: false,
       });
       openExternalLayout(name);
     },
@@ -2724,6 +2753,7 @@ const MainFrame = (props: Props) => {
         shouldReloadProjectData: false,
         shouldReloadLibraries: true,
         shouldReloadResources: false,
+        shouldHardReload: false,
       });
     },
     [
@@ -2759,6 +2789,7 @@ const MainFrame = (props: Props) => {
           shouldReloadProjectData: false,
           shouldReloadLibraries: true,
           shouldReloadResources: false,
+          shouldHardReload: false,
         });
       }
     },
@@ -2796,6 +2827,7 @@ const MainFrame = (props: Props) => {
         shouldReloadProjectData: false,
         shouldReloadLibraries: true,
         shouldReloadResources: false,
+        shouldHardReload: false,
       });
 
       openCustomObjectAndExtensionEditors(
@@ -2824,6 +2856,7 @@ const MainFrame = (props: Props) => {
         shouldReloadProjectData: true,
         shouldReloadLibraries: true,
         shouldReloadResources: false,
+        shouldHardReload: false,
       });
     },
     [notifyChangesToInGameEditor]
@@ -2876,6 +2909,7 @@ const MainFrame = (props: Props) => {
         shouldReloadProjectData: false,
         shouldReloadLibraries: true,
         shouldReloadResources: false,
+        shouldHardReload: false,
       });
       openCustomObjectEditor(
         eventsFunctionsExtension,
@@ -3038,6 +3072,7 @@ const MainFrame = (props: Props) => {
       shouldReloadProjectData: false,
       shouldReloadLibraries: true,
       shouldReloadResources: false,
+      shouldHardReload: false,
     });
   };
 
@@ -4170,6 +4205,7 @@ const MainFrame = (props: Props) => {
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
         shouldReloadResources: false,
+        shouldHardReload: false,
       });
     },
     [notifyChangesToInGameEditor]
@@ -4820,6 +4856,7 @@ const MainFrame = (props: Props) => {
               shouldReloadProjectData: true,
               shouldReloadLibraries: true,
               shouldReloadResources: true,
+              shouldHardReload: false,
             });
           }}
         />

@@ -78,6 +78,20 @@ const ObjectsRenderingService = {
       );
     }
   },
+  createNewUnknownInstanceRenderer: function(
+    project: gdProject,
+    instance: gdInitialInstance,
+    pixiContainer: PIXI.Container
+  ): RenderedInstance | Rendered3DInstance {
+    return new this.renderers['unknownObjectType'](
+      project,
+      instance,
+      //$FlowFixMe It's ok because RenderedUnknownInstance don't use it.
+      null,
+      pixiContainer,
+      PixiResourcesLoader
+    );
+  },
   createNewInstanceRenderer: function(
     project: gdProject,
     instance: gdInitialInstance,

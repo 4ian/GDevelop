@@ -221,6 +221,18 @@ namespace gdjs {
       ) {
         this.setIsReceivingShadow(newObjectData.content.isReceivingShadow);
       }
+      if (this.getInstanceContainer().getGame().isInGameEdition()) {
+        const oldDefaultAnimationSource = this._animations[0].source;
+        this._animations = newObjectData.content.animations;
+        const newDefaultAnimationSource = this._animations[0].source;
+        if (oldDefaultAnimationSource !== newDefaultAnimationSource) {
+          this._renderer.playAnimation(
+            newDefaultAnimationSource,
+            this._animations[0].loop,
+            true
+          );
+        }
+      }
       return true;
     }
 

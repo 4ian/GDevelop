@@ -17,6 +17,7 @@ import EditSceneIcon from '../../UI/CustomSvgIcons/EditScene';
 import CompactToggleButtons from '../../UI/CompactToggleButtons';
 import Grid2d from '../../UI/CustomSvgIcons/Grid2d';
 import Grid3d from '../../UI/CustomSvgIcons/Grid3d';
+import Window from '../../Utils/Window';
 
 type Props = {|
   gameEditorMode: 'embedded-game' | 'instances-editor',
@@ -64,32 +65,34 @@ const Toolbar = React.memo<Props>(function(props) {
         canDeleteSelection={props.selectedInstancesCount !== 0}
         onOpenSceneVariables={props.onOpenSceneVariables}
       />
-      <CompactToggleButtons
-        id="game-editor-toggle"
-        noSeparator
-        buttons={[
-          {
-            id: '2d-instances-editor',
-            renderIcon: className => <Grid2d className={className} />,
-            tooltip: <Trans>Top-down, classic editor</Trans>,
-            label: '2D',
-            onClick: () => {
-              props.setGameEditorMode('instances-editor');
+      {Window.isDev() && (
+        <CompactToggleButtons
+          id="game-editor-toggle"
+          noSeparator
+          buttons={[
+            {
+              id: '2d-instances-editor',
+              renderIcon: className => <Grid2d className={className} />,
+              tooltip: <Trans>Top-down, classic editor</Trans>,
+              label: '2D',
+              onClick: () => {
+                props.setGameEditorMode('instances-editor');
+              },
+              isActive: props.gameEditorMode === 'instances-editor',
             },
-            isActive: props.gameEditorMode === 'instances-editor',
-          },
-          {
-            id: '3d-game-editor',
-            renderIcon: className => <Grid3d className={className} />,
-            tooltip: <Trans>3D, real-time editor</Trans>,
-            label: '3D',
-            onClick: () => {
-              props.setGameEditorMode('embedded-game');
+            {
+              id: '3d-game-editor',
+              renderIcon: className => <Grid3d className={className} />,
+              tooltip: <Trans>3D, real-time editor</Trans>,
+              label: '3D',
+              onClick: () => {
+                props.setGameEditorMode('embedded-game');
+              },
+              isActive: props.gameEditorMode === 'embedded-game',
             },
-            isActive: props.gameEditorMode === 'embedded-game',
-          },
-        ]}
-      />
+          ]}
+        />
+      )}
       <IconButton
         size="small"
         color="default"

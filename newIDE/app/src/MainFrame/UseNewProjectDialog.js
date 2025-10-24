@@ -13,12 +13,16 @@ import NewProjectSetupDialog, {
   type NewProjectSetup,
   type ExampleProjectSetup,
 } from '../ProjectCreation/NewProjectSetupDialog';
-import { type StorageProvider } from '../ProjectsStorage';
+import { type FileMetadata, type StorageProvider } from '../ProjectsStorage';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import RouterContext from './RouterContext';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
-import { type OpenAskAiOptions } from '../AiGeneration/AskAiEditorContainer';
+import { type OpenAskAiOptions } from '../AiGeneration/Utils';
 
 type Props = {|
+  project: ?gdProject,
+  fileMetadata: ?FileMetadata,
+  resourceManagementProps: ResourceManagementProps,
   isProjectOpening: boolean,
   newProjectSetupDialogOpen: boolean,
   setNewProjectSetupDialogOpen: boolean => void,
@@ -31,10 +35,27 @@ type Props = {|
     newProjectSetup: NewProjectSetup
   ) => Promise<CreateProjectResult>,
   openAskAi: (?OpenAskAiOptions) => void,
+  closeAskAi: () => void,
   storageProviders: Array<StorageProvider>,
+  storageProvider: ?StorageProvider,
+  onOpenLayout: (
+    sceneName: string,
+    options: {|
+      openEventsEditor: boolean,
+      openSceneEditor: boolean,
+      focusWhenOpened:
+        | 'scene-or-events-otherwise'
+        | 'scene'
+        | 'events'
+        | 'none',
+    |}
+  ) => void,
 |};
 
 const useNewProjectDialog = ({
+  project,
+  fileMetadata,
+  resourceManagementProps,
   isProjectOpening,
   newProjectSetupDialogOpen,
   setNewProjectSetupDialogOpen,
@@ -42,7 +63,10 @@ const useNewProjectDialog = ({
   createProjectFromExample,
   createProjectFromPrivateGameTemplate,
   openAskAi,
+  closeAskAi,
   storageProviders,
+  storageProvider,
+  onOpenLayout,
 }: Props) => {
   const [isFetchingExample, setIsFetchingExample] = React.useState(false);
   const [
@@ -180,8 +204,12 @@ const useNewProjectDialog = ({
     () => {
       closeNewProjectDialog();
       openAskAi({
-        mode: 'agent',
-        aiRequestId: null,
+        paneIdentifier: 'right',
+        // By default, function calls are paused on mount,
+        // to avoid resuming processing old requests automatically.
+        // In this case, we want to continue processing right away, as
+        // we're in the middle of a flow.
+        continueProcessingFunctionCallsOnMount: true,
       });
     },
     [closeNewProjectDialog, openAskAi]
@@ -193,6 +221,9 @@ const useNewProjectDialog = ({
         {isFetchingExample && <LoaderModal show />}
         {newProjectSetupDialogOpen && (
           <NewProjectSetupDialog
+            project={project}
+            fileMetadata={fileMetadata}
+            resourceManagementProps={resourceManagementProps}
             isProjectOpening={isProjectOpening}
             onClose={closeNewProjectDialog}
             onCreateEmptyProject={createEmptyProject}
@@ -201,7 +232,9 @@ const useNewProjectDialog = ({
               createProjectFromPrivateGameTemplate
             }
             onOpenAskAi={onOpenAskAi}
+            onCloseAskAi={closeAskAi}
             storageProviders={storageProviders}
+            storageProvider={storageProvider}
             selectedExampleShortHeader={selectedExampleShortHeader}
             onSelectExampleShortHeader={exampleShortHeader =>
               onSelectExampleShortHeader({
@@ -222,6 +255,7 @@ const useNewProjectDialog = ({
               privateGameTemplateListingDatasFromSameCreator
             }
             preventBackHome={preventBackHome}
+            onOpenLayout={onOpenLayout}
           />
         )}
       </>

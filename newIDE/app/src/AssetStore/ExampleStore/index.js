@@ -17,7 +17,7 @@ import { PrivateGameTemplateStoreContext } from '../PrivateGameTemplates/Private
 import GridList from '@material-ui/core/GridList';
 import { getExampleAndTemplateTiles } from '../../MainFrame/EditorContainers/HomePage/CreateSection/utils';
 import BackgroundText from '../../UI/BackgroundText';
-import { ColumnStackLayout } from '../../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import {
   isLinkedToStartingPointExampleShortHeader,
   isStartingPointExampleShortHeader,
@@ -28,6 +28,7 @@ import {
   type WindowSizeType,
 } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import { LARGE_WIDGET_SIZE } from '../../MainFrame/EditorContainers/HomePage/CardWidget';
+import FlatButton from '../../UI/FlatButton';
 
 const ITEMS_SPACING = 5;
 const styles = {
@@ -73,6 +74,7 @@ type Props = {|
   ) => number,
   hideSearch?: boolean,
   limitRowsTo?: number,
+  showLoadMore?: boolean,
   hidePremiumTemplates?: boolean,
 |};
 
@@ -85,6 +87,7 @@ const ExampleStore = ({
   getColumnsFromWindowSize,
   hideSearch,
   limitRowsTo,
+  showLoadMore,
   hidePremiumTemplates,
 }: Props) => {
   const MAX_COLUMNS = getColumnsFromWindowSize('xlarge', true);
@@ -225,6 +228,22 @@ const ExampleStore = ({
     ]
   );
 
+  const [currentlyDisplayedRows, setCurrentlyDisplayedRows] = React.useState(
+    limitRowsTo || Infinity
+  );
+  const onShowMore = React.useCallback(
+    () => {
+      setCurrentlyDisplayedRows(currentlyDisplayedRows + (limitRowsTo || 6));
+    },
+    [currentlyDisplayedRows, limitRowsTo]
+  );
+  const canShowMore =
+    showLoadMore && resultTiles.length > currentlyDisplayedRows;
+  const displayedTiles = resultTiles.slice(
+    0,
+    currentlyDisplayedRows * columnsCount
+  );
+
   return (
     <React.Fragment>
       <Column expand noMargin>
@@ -262,11 +281,17 @@ const ExampleStore = ({
               cellHeight="auto"
               spacing={ITEMS_SPACING * 2}
             >
-              {resultTiles.slice(
-                0,
-                limitRowsTo ? limitRowsTo * columnsCount : Infinity
-              )}
+              {displayedTiles}
             </GridList>
+            {canShowMore && (
+              <LineStackLayout justifyContent="center">
+                <FlatButton
+                  primary
+                  label={<Trans>Show more</Trans>}
+                  onClick={onShowMore}
+                />
+              </LineStackLayout>
+            )}
           </ColumnStackLayout>
         )}
       </Column>

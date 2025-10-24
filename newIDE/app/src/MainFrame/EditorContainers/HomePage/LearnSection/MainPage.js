@@ -39,7 +39,7 @@ import {
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import Carousel from '../../../../UI/Carousel';
 import BundlePreviewBanner from '../../../../AssetStore/Bundles/BundlePreviewBanner';
-import { type OpenAskAiOptions } from '../../../../AiGeneration/AskAiEditorContainer';
+import { type OpenAskAiOptions } from '../../../../AiGeneration/Utils';
 
 const NUMBER_OF_SCROLLS = 2; // Number of times the carousel can be scrolled to see all items.
 const MAX_COLUMNS = getColumnsFromWindowSize('xlarge', true);

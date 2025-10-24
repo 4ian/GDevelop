@@ -31,7 +31,7 @@ import Paper from '../../UI/Paper';
 import { Line, Column } from '../../UI/Grid';
 
 type Props = {|
-  project: gdProject | null,
+  project: ?gdProject,
   functionCall: AiRequestMessageAssistantFunctionCall,
   editorFunctionCallResult: ?EditorFunctionCallResult,
   existingFunctionCallOutput: ?AiRequestFunctionCallOutput,

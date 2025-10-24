@@ -64,7 +64,7 @@ const styles = {
 };
 
 type Props = {
-  project: gdProject | null,
+  project: ?gdProject,
   i18n: I18nType,
   aiRequest: AiRequest | null,
 
@@ -110,6 +110,8 @@ type Props = {
   increaseQuotaOffering: 'subscribe' | 'upgrade' | 'none',
   price: UsagePrice | null,
   availableCredits: number,
+
+  standAloneForm?: boolean,
 };
 
 export type AiRequestChatInterface = {|
@@ -281,6 +283,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       setAutoProcessFunctionCalls,
       i18n,
       editorCallbacks,
+      standAloneForm,
     }: Props,
     ref
   ) => {
@@ -361,7 +364,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       () => {
         const newChatPlaceholders: Array<MessageDescriptor> =
           aiRequestMode === 'agent'
-            ? hasOpenedProject
+            ? hasOpenedProject && !standAloneForm
               ? [
                   t`Add solid rocks that falls from the sky at a random position around the player every 0.5 seconds`,
                   t`Add a score and display it on the screen`,
@@ -377,7 +380,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 t`How to display the health of my player?`,
                 t`How to add an explosion when an enemy is destroyed?`,
                 t`How to create a main menu for my game?`,
-                ...(hasOpenedProject
+                ...(hasOpenedProject && !standAloneForm
                   ? [
                       t`What would you add to my game?`,
                       t`How to make my game more fun?`,
@@ -390,7 +393,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
           Math.floor(Math.random() * newChatPlaceholders.length)
         ];
       },
-      [aiRequestMode, hasOpenedProject]
+      [aiRequestMode, hasOpenedProject, standAloneForm]
     );
 
     const onUserRequestTextChange = React.useCallback(
@@ -432,7 +435,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
 
     const { isMobile } = useResponsiveWindowSize();
 
-    const priceText = (
+    const priceText = standAloneForm ? null : (
       <Text size="body-small" color="secondary" noMargin>
         {getPriceText({
           aiRequestMode,
@@ -489,7 +492,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       </Text>
     ) : null;
 
-    const quotaOrCreditsText = (
+    const quotaOrCreditsText = standAloneForm ? null : (
       <Text size="body-small" color="secondary" noMargin>
         {getQuotaOrCreditsText({
           quota,
@@ -507,8 +510,18 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         aiRequestMode,
         aiConfigurationPresetsWithAvailability
       );
+    const hasWorkingFunctionCalls =
+      editorFunctionCallResults &&
+      editorFunctionCallResults.some(
+        functionCallOutput => functionCallOutput.status === 'working'
+      );
+    const shouldDisableForm =
+      isSending ||
+      ((!!hasWorkingFunctionCalls ||
+        (!!aiRequest && aiRequest.status === 'working')) &&
+        isAutoProcessingFunctionCalls);
 
-    if (!aiRequest) {
+    if (!aiRequest || standAloneForm) {
       return (
         <div
           className={classNames({
@@ -517,41 +530,47 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             'avoid-soft-keyboard': true,
           })}
         >
-          <ColumnStackLayout justifyContent="center" expand>
-            <Line noMargin justifyContent="center">
-              <RobotIcon rotating size={40} />
-            </Line>
-            <Column noMargin alignItems="center">
-              <Text size="bold-title" align="center">
-                {aiRequestMode === 'agent' ? (
-                  <Trans>What do you want to make?</Trans>
-                ) : (
-                  <Trans>Ask any gamedev question</Trans>
-                )}
-              </Text>
-            </Column>
-            <Line noMargin justifyContent="center">
-              <TwoStatesButton
-                value={aiRequestMode}
-                leftButton={{
-                  icon: <Hammer fontSize="small" />,
-                  label: <Trans>Build for me</Trans>,
-                  value: 'agent',
-                }}
-                rightButton={{
-                  icon: <Help fontSize="small" />,
-                  label: <Trans>Ask a question</Trans>,
-                  value: 'chat',
-                }}
-                onChange={value => {
-                  if (value !== 'chat' && value !== 'agent') {
-                    return;
-                  }
-                  setAiState({ mode: value, aiRequestId: null });
-                }}
-                disabled={isSending}
-              />
-            </Line>
+          <ColumnStackLayout justifyContent="center" expand noMargin>
+            {!standAloneForm && (
+              <Line noMargin justifyContent="center">
+                <RobotIcon rotating size={40} />
+              </Line>
+            )}
+            {!standAloneForm && (
+              <Column noMargin alignItems="center">
+                <Text size="bold-title" align="center">
+                  {aiRequestMode === 'agent' ? (
+                    <Trans>What do you want to make?</Trans>
+                  ) : (
+                    <Trans>Ask any gamedev question</Trans>
+                  )}
+                </Text>
+              </Column>
+            )}
+            {!standAloneForm && (
+              <Line noMargin justifyContent="center">
+                <TwoStatesButton
+                  value={aiRequestMode}
+                  leftButton={{
+                    icon: <Hammer fontSize="small" />,
+                    label: <Trans>Build for me</Trans>,
+                    value: 'agent',
+                  }}
+                  rightButton={{
+                    icon: <Help fontSize="small" />,
+                    label: <Trans>Ask a question</Trans>,
+                    value: 'chat',
+                  }}
+                  onChange={value => {
+                    if (value !== 'chat' && value !== 'agent') {
+                      return;
+                    }
+                    setAiState({ mode: value, aiRequestId: null });
+                  }}
+                  disabled={shouldDisableForm}
+                />
+              </Line>
+            )}
             <form
               onSubmit={() => {
                 onStartNewAiRequest({
@@ -567,9 +586,9 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                   <CompactTextAreaFieldWithControls
                     maxLength={6000}
                     value={userRequestTextPerAiRequestId[''] || ''}
-                    disabled={isSending}
-                    hasNeonCorner
-                    hasAnimatedNeonCorner={isSending}
+                    disabled={shouldDisableForm}
+                    neonCorner={standAloneForm ? 'large' : 'small'}
+                    hasAnimatedNeonCorner={shouldDisableForm}
                     errored={!!lastSendError}
                     onChange={userRequestText => {
                       onUserRequestTextChange(userRequestText, '');
@@ -582,8 +601,12 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                         aiConfigurationPresetId: chosenOrDefaultAiConfigurationPresetId,
                       });
                     }}
-                    placeholder={newChatPlaceholder}
-                    rows={5}
+                    placeholder={
+                      shouldDisableForm
+                        ? t`Thinking about your request...`
+                        : newChatPlaceholder
+                    }
+                    rows={standAloneForm ? 3 : 5}
                     controls={
                       <Column>
                         <LineStackLayout
@@ -601,24 +624,29 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                               aiConfigurationPresetsWithAvailability
                             }
                             aiRequestMode={aiRequestMode}
+                            disabled={shouldDisableForm}
                           />
                           <RaisedButton
                             color="primary"
                             icon={<Send />}
                             label={
                               aiRequestMode === 'agent' ? (
-                                hasOpenedProject ? (
+                                shouldDisableForm ? (
+                                  <Trans>Building...</Trans>
+                                ) : hasOpenedProject && !standAloneForm ? (
                                   <Trans>Build this on my game</Trans>
                                 ) : (
                                   <Trans>Start building the game</Trans>
                                 )
+                              ) : shouldDisableForm ? (
+                                <Trans>Sending...</Trans>
                               ) : (
                                 <Trans>Send question</Trans>
                               )
                             }
                             style={{ flexShrink: 0 }}
                             disabled={
-                              isSending ||
+                              shouldDisableForm ||
                               !userRequestTextPerAiRequestId[aiRequestId]
                             }
                             onClick={() => {
@@ -655,50 +683,72 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             ) : null}
           </ColumnStackLayout>
           <Spacer />
-          <Column justifyContent="center">
-            {aiRequestMode === 'agent' ? (
-              <Text size="body-small" color="secondary" align="center" noMargin>
-                <Trans>
-                  The AI agent will build simple games or features for you.{' '}
-                  <Link
-                    href={getHelpLink('/interface/ai')}
-                    color="secondary"
-                    onClick={() =>
-                      Window.openExternalURL(getHelpLink('/interface/ai'))
-                    }
-                  >
-                    It can inspect your game objects and events.
-                  </Link>
-                </Trans>
-              </Text>
-            ) : (
-              <Text size="body-small" color="secondary" align="center" noMargin>
-                <Trans>
-                  The AI chat is experimental and still being improved.{' '}
-                  <Link
-                    href={getHelpLink('/interface/ai')}
-                    color="secondary"
-                    onClick={() =>
-                      Window.openExternalURL(getHelpLink('/interface/ai'))
-                    }
-                  >
-                    It has access to your game objects but not events.
-                  </Link>
-                </Trans>
-              </Text>
-            )}
-            {aiRequestMode === 'agent' ? (
-              <Text size="body-small" color="secondary" align="center" noMargin>
-                <Trans>
-                  Results may vary: experiment and use it for learning.
-                </Trans>
-              </Text>
-            ) : (
-              <Text size="body-small" color="secondary" align="center" noMargin>
-                <Trans>Answers may have mistakes: always verify them.</Trans>
-              </Text>
-            )}
-          </Column>
+          {!standAloneForm && (
+            <Column justifyContent="center">
+              {aiRequestMode === 'agent' ? (
+                <Text
+                  size="body-small"
+                  color="secondary"
+                  align="center"
+                  noMargin
+                >
+                  <Trans>
+                    The AI agent will build simple games or features for you.{' '}
+                    <Link
+                      href={getHelpLink('/interface/ai')}
+                      color="secondary"
+                      onClick={() =>
+                        Window.openExternalURL(getHelpLink('/interface/ai'))
+                      }
+                    >
+                      It can inspect your game objects and events.
+                    </Link>
+                  </Trans>
+                </Text>
+              ) : (
+                <Text
+                  size="body-small"
+                  color="secondary"
+                  align="center"
+                  noMargin
+                >
+                  <Trans>
+                    The AI chat is experimental and still being improved.{' '}
+                    <Link
+                      href={getHelpLink('/interface/ai')}
+                      color="secondary"
+                      onClick={() =>
+                        Window.openExternalURL(getHelpLink('/interface/ai'))
+                      }
+                    >
+                      It has access to your game objects but not events.
+                    </Link>
+                  </Trans>
+                </Text>
+              )}
+              {aiRequestMode === 'agent' ? (
+                <Text
+                  size="body-small"
+                  color="secondary"
+                  align="center"
+                  noMargin
+                >
+                  <Trans>
+                    Results may vary: experiment and use it for learning.
+                  </Trans>
+                </Text>
+              ) : (
+                <Text
+                  size="body-small"
+                  color="secondary"
+                  align="center"
+                  noMargin
+                >
+                  <Trans>Answers may have mistakes: always verify them.</Trans>
+                </Text>
+              )}
+            </Column>
+          )}
         </div>
       );
     }
@@ -706,12 +756,6 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     const userMessagesCount = aiRequest.output.filter(
       message => message.type === 'message' && message.role === 'user'
     ).length;
-
-    const hasWorkingFunctionCalls =
-      editorFunctionCallResults &&
-      editorFunctionCallResults.some(
-        functionCallOutput => functionCallOutput.status === 'working'
-      );
     const allFunctionCallsToProcess = getFunctionCallsToProcess({
       aiRequest,
       editorFunctionCallResults,
@@ -827,11 +871,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             alignItems="stretch"
             noMargin
           >
-            {aiRequest.mode === 'agent' &&
-            isAutoProcessingFunctionCalls &&
-            (hasWorkingFunctionCalls ||
-              isSending ||
-              aiRequest.status === 'working') ? (
+            {aiRequest.mode === 'agent' && shouldDisableForm ? (
               <Paper background="dark" variant="outlined">
                 <Column>
                   <LineStackLayout
@@ -887,56 +927,60 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 </Column>
               </Paper>
             ) : null}
-            <CompactTextAreaFieldWithControls
-              maxLength={6000}
-              value={userRequestTextPerAiRequestId[aiRequestId] || ''}
-              disabled={isSending || isForAnotherProject}
-              errored={!!lastSendError}
-              hasNeonCorner
-              hasAnimatedNeonCorner={isSending}
-              onChange={userRequestText =>
-                onUserRequestTextChange(userRequestText, aiRequestId)
-              }
-              onNavigateHistory={handleNavigateHistory}
-              placeholder={
-                aiRequest.mode === 'agent'
-                  ? isForAnotherProject
-                    ? t`You must re-open the project to continue this chat.`
-                    : t`Specify something more to the AI to build`
-                  : t`Ask a follow up question`
-              }
-              rows={2}
-              onSubmit={() => {
-                onSendMessage({
-                  userMessage: userRequestTextPerAiRequestId[aiRequestId] || '',
-                });
-              }}
-              controls={
-                <Column>
-                  <LineStackLayout
-                    alignItems="center"
-                    justifyContent="flex-end"
-                  >
-                    <RaisedButton
-                      color="primary"
-                      disabled={
-                        aiRequest.status === 'working' ||
-                        isSending ||
-                        isForAnotherProject ||
-                        !userRequestTextPerAiRequestId[aiRequestId]
-                      }
-                      icon={<Send />}
-                      onClick={() => {
-                        onSendMessage({
-                          userMessage:
-                            userRequestTextPerAiRequestId[aiRequestId] || '',
-                        });
-                      }}
-                    />
-                  </LineStackLayout>
-                </Column>
-              }
-            />
+            {!standAloneForm && (
+              <CompactTextAreaFieldWithControls
+                maxLength={6000}
+                value={userRequestTextPerAiRequestId[aiRequestId] || ''}
+                disabled={shouldDisableForm || isForAnotherProject}
+                errored={!!lastSendError}
+                neonCorner="small"
+                hasAnimatedNeonCorner={shouldDisableForm}
+                onChange={userRequestText =>
+                  onUserRequestTextChange(userRequestText, aiRequestId)
+                }
+                onNavigateHistory={handleNavigateHistory}
+                placeholder={
+                  aiRequest.mode === 'agent'
+                    ? isForAnotherProject
+                      ? t`You must re-open the project to continue this chat.`
+                      : shouldDisableForm
+                      ? t`Thinking about your request...`
+                      : t`Specify something more to the AI to build`
+                    : t`Ask a follow up question`
+                }
+                rows={2}
+                onSubmit={() => {
+                  onSendMessage({
+                    userMessage:
+                      userRequestTextPerAiRequestId[aiRequestId] || '',
+                  });
+                }}
+                controls={
+                  <Column>
+                    <LineStackLayout
+                      alignItems="center"
+                      justifyContent="flex-end"
+                    >
+                      <RaisedButton
+                        color="primary"
+                        disabled={
+                          shouldDisableForm ||
+                          isForAnotherProject ||
+                          !userRequestTextPerAiRequestId[aiRequestId]
+                        }
+                        icon={<Send />}
+                        onClick={() => {
+                          onSendMessage({
+                            userMessage:
+                              userRequestTextPerAiRequestId[aiRequestId] || '',
+                          });
+                        }}
+                      />
+                    </LineStackLayout>
+                  </Column>
+                }
+              />
+            )}
             <Column noMargin alignItems="stretch">
               <LineStackLayout
                 expand

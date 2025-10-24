@@ -16,6 +16,8 @@ import GridListTile from '@material-ui/core/GridListTile';
 import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 import classes from './EmptyAndStartingPointProjects.module.css';
 import { getItemsColumns } from './NewProjectSetupDialog';
+import FlatButton from '../UI/FlatButton';
+import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
 
 const ITEMS_SPACING = 5;
 const getStyles = (theme: GDevelopTheme) => ({
@@ -102,50 +104,77 @@ type Props = {|
   onSelectEmptyProject: () => void,
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
   disabled?: boolean,
+  onSeeAll?: () => void,
 |};
 
 const EmptyAndStartingPointProjects = ({
   onSelectExampleShortHeader,
   onSelectEmptyProject,
   disabled,
+  onSeeAll,
 }: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getStyles(gdevelopTheme);
   const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
-  const startingPointExampleShortHeaders = React.useMemo(
-    () => {
-      return exampleShortHeaders
-        ? exampleShortHeaders.filter(isStartingPointExampleShortHeader)
-        : [];
-    },
-    [exampleShortHeaders]
-  );
   const { windowSize, isLandscape } = useResponsiveWindowSize();
   const columnsCount = getItemsColumns(windowSize, isLandscape);
+
+  const startingPointExampleShortHeaders = React.useMemo(
+    () => {
+      const allStarterShortHeaders = exampleShortHeaders
+        ? exampleShortHeaders.filter(isStartingPointExampleShortHeader)
+        : [];
+
+      if (onSeeAll) {
+        // only return 2 rows of items.
+        const maxItemsToShow = columnsCount * 2 - 1; // -1 for the empty project tile
+        return allStarterShortHeaders.slice(0, maxItemsToShow);
+      }
+
+      return allStarterShortHeaders;
+    },
+    [exampleShortHeaders, onSeeAll, columnsCount]
+  );
 
   return (
     <I18n>
       {({ i18n }) => (
-        <GridList
-          cols={columnsCount}
-          style={styles.grid}
-          cellHeight="auto"
-          spacing={ITEMS_SPACING * 2}
-        >
-          <EmptyProjectTile
-            onSelectEmptyProject={onSelectEmptyProject}
-            disabled={disabled}
-          />
-          {startingPointExampleShortHeaders.map(exampleShortHeader => (
-            <ExampleTile
-              exampleShortHeader={exampleShortHeader}
-              onSelect={() => onSelectExampleShortHeader(exampleShortHeader)}
-              key={exampleShortHeader.name}
+        <Column noMargin>
+          {onSeeAll ? (
+            <Line justifyContent="space-between" alignItems="center">
+              <Text size="block-title">
+                <Trans>Continue with Human Intelligence</Trans>
+              </Text>
+              <FlatButton
+                label={<Trans>See all</Trans>}
+                rightIcon={<ArrowRight fontSize="small" />}
+                onClick={onSeeAll}
+                primary
+                disabled={disabled}
+              />
+            </Line>
+          ) : null}
+          <GridList
+            cols={columnsCount}
+            style={styles.grid}
+            cellHeight="auto"
+            spacing={ITEMS_SPACING * 2}
+          >
+            <EmptyProjectTile
+              onSelectEmptyProject={onSelectEmptyProject}
               disabled={disabled}
-              centerTitle
             />
-          ))}
-        </GridList>
+            {startingPointExampleShortHeaders.map(exampleShortHeader => (
+              <ExampleTile
+                exampleShortHeader={exampleShortHeader}
+                onSelect={() => onSelectExampleShortHeader(exampleShortHeader)}
+                key={exampleShortHeader.name}
+                disabled={disabled}
+                centerTitle
+              />
+            ))}
+          </GridList>
+        </Column>
       )}
     </I18n>
   );

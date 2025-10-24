@@ -28,6 +28,7 @@ import {
   type FileMetadata,
   type StorageProvider,
 } from '../../../../ProjectsStorage';
+import { type ResourceManagementProps } from '../../../../ResourcesList/ResourceSource';
 import Text from '../../../../UI/Text';
 import Grid from '@material-ui/core/Grid';
 import WalletWidget from '../../../../GameDashboard/Wallet/WalletWidget';
@@ -54,6 +55,8 @@ import { useProjectsListFor } from './utils';
 import { deleteCloudProject } from '../../../../Utils/GDevelopServices/Project';
 import { getDefaultRegisterGameProperties } from '../../../../Utils/UseGameAndBuildsManager';
 import { type CreateProjectResult } from '../../../../Utils/UseCreateProject';
+import { AskAiStandAloneForm } from '../../../../AiGeneration/AskAiStandAloneForm';
+import { type OpenAskAiOptions } from '../../../../AiGeneration/Utils';
 
 const getExampleItemsColumns = (
   windowSize: WindowSizeType,
@@ -78,6 +81,25 @@ type Props = {|
   currentFileMetadata: ?FileMetadata,
   onOpenProject: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   storageProviders: Array<StorageProvider>,
+  storageProvider: ?StorageProvider,
+  resourceManagementProps: ResourceManagementProps,
+  onCreateEmptyProject: (
+    newProjectSetup: NewProjectSetup
+  ) => Promise<CreateProjectResult>,
+  onOpenLayout: (
+    sceneName: string,
+    options: {|
+      openEventsEditor: boolean,
+      openSceneEditor: boolean,
+      focusWhenOpened:
+        | 'scene-or-events-otherwise'
+        | 'scene'
+        | 'events'
+        | 'none',
+    |}
+  ) => void,
+  onOpenAskAi: (?OpenAskAiOptions) => void,
+  onCloseAskAi: () => void,
   closeProject: () => Promise<void>,
   canOpen: boolean,
   onOpenProfile: () => void,
@@ -109,6 +131,12 @@ const CreateSection = ({
   currentFileMetadata,
   onOpenProject,
   storageProviders,
+  storageProvider,
+  resourceManagementProps,
+  onCreateEmptyProject,
+  onOpenLayout,
+  onOpenAskAi,
+  onCloseAskAi,
   closeProject,
   canOpen,
   onOpenProfile,
@@ -420,6 +448,20 @@ const CreateSection = ({
     ]
   );
 
+  const onOpenAskAiForStandAloneForm = React.useCallback(
+    () => {
+      onOpenAskAi({
+        paneIdentifier: 'right',
+        // By default, function calls are paused on mount,
+        // to avoid resuming processing old requests automatically.
+        // In this case, we want to continue processing right away, as
+        // we're in the middle of a flow.
+        continueProcessingFunctionCallsOnMount: true,
+      });
+    },
+    [onOpenAskAi]
+  );
+
   if (openedGame) {
     return (
       <SectionContainer flexBody>
@@ -464,6 +506,19 @@ const CreateSection = ({
           <SectionRow expand>
             {!!profile || loginState === 'done' ? (
               <ColumnStackLayout noMargin>
+                <AskAiStandAloneForm
+                  i18n={i18n}
+                  project={project}
+                  resourceManagementProps={resourceManagementProps}
+                  fileMetadata={currentFileMetadata}
+                  storageProvider={storageProvider}
+                  onCreateProjectFromExample={onCreateProjectFromExample}
+                  onCreateEmptyProject={onCreateEmptyProject}
+                  onOpenLayout={onOpenLayout}
+                  onOpenAskAi={onOpenAskAiForStandAloneForm}
+                  onCloseAskAi={onCloseAskAi}
+                  dismissableIdentifier="home-page-create-section"
+                />
                 {hidePerformanceDashboard ? null : hasAProjectOpenedNowOrRecentlyOrGameSaved ? (
                   <ColumnStackLayout noMargin>
                     <Grid container spacing={2}>

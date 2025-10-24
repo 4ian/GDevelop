@@ -1854,7 +1854,14 @@ const MainFrame = (props: Props) => {
         eventsFunctionsExtension.getName(),
         oldName
       ),
-    }));
+    })).then(state => {
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: true,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+      });
+    });
   };
 
   const onDeletedEventsBasedObject = (
@@ -1868,7 +1875,14 @@ const MainFrame = (props: Props) => {
         eventsFunctionsExtension.getName(),
         name
       ),
-    }));
+    })).then(state => {
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: true,
+        shouldReloadResources: false,
+        shouldHardReload: true,
+      });
+    });
   };
 
   const deleteEventsBasedObjectVariant = (
@@ -1891,7 +1905,14 @@ const MainFrame = (props: Props) => {
         eventBasedObject.getName(),
         variantName
       ),
-    }));
+    })).then(state => {
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: true,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+      });
+    });
   };
 
   const setPreviewedLayout = ({

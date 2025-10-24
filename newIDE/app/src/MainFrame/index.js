@@ -1439,6 +1439,12 @@ const MainFrame = (props: Props) => {
       eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
         currentProject
       );
+
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: false,
+        shouldReloadLibraries: true,
+        shouldReloadResources: false,
+      });
     });
   };
 

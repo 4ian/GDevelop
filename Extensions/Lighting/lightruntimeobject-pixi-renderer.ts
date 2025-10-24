@@ -90,6 +90,28 @@ namespace gdjs {
       }
     }
 
+    destroy(): void {
+      if (this._lightIconSprite) {
+        this._lightIconSprite.removeFromParent();
+        this._lightIconSprite.destroy();
+        this._lightIconSprite = null;
+      }
+      if (this._debugGraphics) {
+        this._debugGraphics.removeFromParent();
+        this._debugGraphics.destroy();
+        this._debugGraphics = null;
+      }
+      if (this._texture) {
+        this._texture.destroy();
+        this._texture = null;
+      }
+      if (this._light) {
+        this._light.removeFromParent();
+        this._light.destroy();
+        this._light = null;
+      }
+    }
+
     static _verticesWithAngleComparator(vertexWithAngleA, vertexWithAngleB) {
       if (vertexWithAngleA.angle < vertexWithAngleB.angle) {
         return -1;

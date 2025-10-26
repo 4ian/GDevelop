@@ -222,10 +222,15 @@ namespace gdjs {
         this.setIsReceivingShadow(newObjectData.content.isReceivingShadow);
       }
       if (this.getInstanceContainer().getGame().isInGameEdition()) {
-        const oldDefaultAnimationSource = this._animations[0].source;
+        const oldDefaultAnimationSource =
+          this._animations.length > 0 ? this._animations[0].source : null;
         this._animations = newObjectData.content.animations;
-        const newDefaultAnimationSource = this._animations[0].source;
-        if (oldDefaultAnimationSource !== newDefaultAnimationSource) {
+        const newDefaultAnimationSource =
+          this._animations.length > 0 ? this._animations[0].source : null;
+        if (
+          newDefaultAnimationSource &&
+          oldDefaultAnimationSource !== newDefaultAnimationSource
+        ) {
           this._renderer.playAnimation(
             newDefaultAnimationSource,
             this._animations[0].loop,

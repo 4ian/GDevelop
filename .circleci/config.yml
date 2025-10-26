@@ -12,7 +12,7 @@ version: 2.1
 orbs:
   aws-cli: circleci/aws-cli@2.0.6
   macos: circleci/macos@2.5.1 # For Rosetta (see below)
-  node: circleci/node@5.2.0 # For a recent npm version (see below)
+  node: circleci/node@7.1.0 # For a recent npm version (see below)
   win: circleci/windows@5.1.0
 jobs:
   # Build the **entire** app for macOS (including the GDevelop.js library).
@@ -123,7 +123,7 @@ jobs:
     # CircleCI docker workers are failing if they don't have enough memory (no swap)
     resource_class: xlarge
     docker:
-      - image: cimg/node:16.13
+      - image: cimg/node:18.20.8
 
     working_directory: ~/GDevelop
 

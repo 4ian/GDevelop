@@ -1995,7 +1995,13 @@ module.exports = {
         ) {
           this._pixiObject.alpha = alphaForDisplay;
           for (const layer of this._editableTileMap.getLayers()) {
-            // Only update layers that are of type TileMapHelper.EditableTileMapLayer.
+            const isLayerHidden =
+              (displayMode === 'index' && layerIndex !== layer.id) ||
+              (displayMode === 'visible' && !layer.isVisible());
+
+            // Only set alpha on editable layers that are not hidden,
+            // as others are not rendered.
+            if (isLayerHidden) continue;
             // @ts-ignore - only this type of layer has setAlpha.
             if (layer.setAlpha) {
               const editableLayer =

@@ -26,7 +26,6 @@ import EditorTabsPane, {
 import {
   getEditorTabsInitialState,
   openEditorTab,
-  closeEditorTab,
   closeProjectTabs,
   closeLayoutTabs,
   closeExternalLayoutTabs,
@@ -44,6 +43,7 @@ import {
   changeCurrentTab,
   getAllEditorTabs,
   hasEditorsInPane,
+  closeEditorTab,
 } from './EditorTabs/EditorTabsHandler';
 import { renderDebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
 import { renderEventsEditorContainer } from './EditorContainers/EventsEditorContainer';
@@ -53,7 +53,10 @@ import { renderExternalLayoutEditorContainer } from './EditorContainers/External
 import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainers/EventsFunctionsExtensionEditorContainer';
 import { renderCustomObjectEditorContainer } from './EditorContainers/CustomObjectEditorContainer';
 import { renderHomePageContainer } from './EditorContainers/HomePage';
-import { renderAskAiEditorContainer } from '../AiGeneration/AskAiEditorContainer';
+import {
+  renderAskAiEditorContainer,
+  type OpenAskAiOptions,
+} from '../AiGeneration/AskAiEditorContainer';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import {
   type RenderEditorContainerPropsWithRef,
@@ -578,16 +581,14 @@ const MainFrame = (props: Props) => {
       dontFocusTab,
       project,
       paneIdentifier,
-      mode,
-      aiRequestId,
+      continueProcessingFunctionCallsOnMount,
     }: {
       kind: EditorKind,
       name: string,
       dontFocusTab?: boolean,
       project?: ?gdProject,
-      paneIdentifier?: 'left' | 'center' | 'right' | null,
-      mode?: 'chat' | 'agent',
-      aiRequestId?: string | null,
+      paneIdentifier?: 'left' | 'center' | 'right',
+      continueProcessingFunctionCallsOnMount?: boolean,
     }) => {
       const label =
         kind === 'resources'
@@ -661,7 +662,9 @@ const MainFrame = (props: Props) => {
         kind === 'start page'
           ? { storageProviders: props.storageProviders }
           : kind === 'ask-ai'
-          ? { mode, aiRequestId }
+          ? {
+              continueProcessingFunctionCallsOnMount,
+            }
           : undefined;
       return {
         icon,
@@ -827,6 +830,77 @@ const MainFrame = (props: Props) => {
 
   useDiscordRichPresence(currentProject);
 
+  const openAskAi = React.useCallback(
+    (options: ?OpenAskAiOptions) => {
+      const {
+        mode,
+        aiRequestId,
+        paneIdentifier,
+        continueProcessingFunctionCallsOnMount,
+      } = options || {};
+      const newPaneIdentifier =
+        paneIdentifier || (currentProject ? 'right' : 'center');
+
+      setState(state => {
+        let openedEditor = getOpenedAskAiEditor(state.editorTabs);
+        let newEditorTabs = state.editorTabs;
+        if (openedEditor) {
+          if (openedEditor.paneIdentifier !== newPaneIdentifier) {
+            // The editor is opened, but not at the right position, close it.
+            // It will re-open in the right pane.
+            newEditorTabs = closeEditorTab(
+              newEditorTabs,
+              openedEditor.editorTab
+            );
+            newEditorTabs = openEditorTab(
+              newEditorTabs,
+              getEditorOpeningOptions({
+                kind: 'ask-ai',
+                name: '',
+                paneIdentifier: newPaneIdentifier,
+                continueProcessingFunctionCallsOnMount,
+              })
+            );
+          }
+        }
+
+        newEditorTabs = openEditorTab(
+          newEditorTabs,
+          getEditorOpeningOptions({
+            kind: 'ask-ai',
+            name: '',
+            paneIdentifier: newPaneIdentifier,
+            continueProcessingFunctionCallsOnMount,
+          })
+        );
+
+        return {
+          ...state,
+          editorTabs: newEditorTabs,
+        };
+      }).then(state => {
+        // Wait for the state to be updated before starting/opening the chat,
+        // as the editor needs to be mounted.
+        const params =
+          // Both need to be defined.
+          mode === undefined || aiRequestId === undefined
+            ? undefined
+            : { mode, aiRequestId };
+        const openedEditor = getOpenedAskAiEditor(state.editorTabs);
+        if (!openedEditor) {
+          console.error(
+            'No Ask AI editor found after opening it. This should not happen.'
+          );
+          return;
+        }
+        if (openedEditor.askAiEditor) {
+          openedEditor.askAiEditor.startOrOpenChat(params);
+        }
+      });
+    },
+    [setState, getEditorOpeningOptions, currentProject]
+  );
+
   const closeProject = React.useCallback(
     async (): Promise<void> => {
       setHasProjectOpened(false);
@@ -864,6 +938,14 @@ const MainFrame = (props: Props) => {
       currentProject.delete();
       sealUnsavedChanges();
       console.info('Project closed.');
+
+      // If AIEditor is opened on a side panel, then reposition it on the center.
+      const openedAskAIEditor = getOpenedAskAiEditor(state.editorTabs);
+      if (openedAskAIEditor && openedAskAIEditor.paneIdentifier !== 'center') {
+        openAskAi({
+          paneIdentifier: 'center',
+        });
+      }
     },
     [
       currentProjectRef,
@@ -871,6 +953,8 @@ const MainFrame = (props: Props) => {
       setHasProjectOpened,
       setState,
       sealUnsavedChanges,
+      openAskAi,
+      state.editorTabs,
     ]
   );
 
@@ -1188,6 +1272,15 @@ const MainFrame = (props: Props) => {
               editorTabs: editorTabs,
             });
       }
+      if (!options.dontRepositionAskAiEditor) {
+        // If Ask AI editor was opened, reposition it.
+        const openedAskAIEditor = getOpenedAskAiEditor(state.editorTabs);
+        if (openedAskAIEditor) {
+          openAskAi({
+            paneIdentifier: 'right',
+          });
+        }
+      }
       setIsProjectClosedSoAvoidReloadingExtensions(false);
     },
     onError: () => {
@@ -1210,55 +1303,6 @@ const MainFrame = (props: Props) => {
     ensureResourcesAreMoved,
     onGameRegistered: gamesList.fetchGames,
   });
-
-  const openAskAi = React.useCallback(
-    ({
-      mode,
-      aiRequestId,
-      paneIdentifier,
-    }: {|
-      mode: 'chat' | 'agent',
-      aiRequestId: string | null,
-      paneIdentifier: 'left' | 'center' | 'right' | null,
-    |}) => {
-      setState(state => {
-        const openedEditor = getOpenedAskAiEditor(state.editorTabs);
-        let newEditorTabs = state.editorTabs;
-        if (openedEditor) {
-          if (
-            !paneIdentifier ||
-            openedEditor.paneIdentifier === paneIdentifier
-          ) {
-            // The editor is opened, and at the right position.
-            openedEditor.askAiEditor.startOrOpenChat({ mode, aiRequestId });
-            return state;
-          }
-
-          // The editor is opened, but not in the right pane.
-          // Close it and it will re-open in the right pane.
-          newEditorTabs = closeEditorTab(newEditorTabs, openedEditor.editorTab);
-        }
-
-        // Open, or focus if already opened, the editor.
-        newEditorTabs = openEditorTab(
-          newEditorTabs,
-          getEditorOpeningOptions({
-            kind: 'ask-ai',
-            name: '',
-            mode,
-            aiRequestId,
-            paneIdentifier,
-          })
-        );
-
-        return {
-          ...state,
-          editorTabs: newEditorTabs,
-        };
-      });
-    },
-    [setState, getEditorOpeningOptions]
-  );
 
   const {
     onSelectExampleShortHeader,
@@ -2784,6 +2828,16 @@ const MainFrame = (props: Props) => {
             if (currentStorageProvider.internalName === 'LocalFile') {
               setHasProjectOpened(true);
             }
+            // If AIEditor is opened in the center, ensure we reposition it on the side.
+            const openedAskAIEditor = getOpenedAskAiEditor(state.editorTabs);
+            if (
+              openedAskAIEditor &&
+              openedAskAIEditor.paneIdentifier === 'center'
+            ) {
+              openAskAi({
+                paneIdentifier: 'right',
+              });
+            }
           }
         })
         .catch(error => {
@@ -2803,6 +2857,7 @@ const MainFrame = (props: Props) => {
       openAllScenes,
       hasAPreviousSaveForEditorTabsState,
       openEditorTabsFromPersistedState,
+      openAskAi,
     ]
   );
 
@@ -3832,16 +3887,6 @@ const MainFrame = (props: Props) => {
     isApplicationTopLevelMenu: false,
     hideAskAi,
   };
-  const onOpenAskAiFromMainMenu = React.useCallback(
-    () => {
-      openAskAi({
-        mode: 'agent',
-        aiRequestId: null,
-        paneIdentifier: currentProject ? 'right' : 'center',
-      });
-    },
-    [openAskAi, currentProject]
-  );
   const mainMenuCallbacks = {
     onChooseProject: () => openOpenFromStorageProviderDialog(),
     onOpenRecentFile: openFromFileMetadataWithStorageProvider,
@@ -3860,7 +3905,7 @@ const MainFrame = (props: Props) => {
     onOpenPreferences: () => openPreferencesDialog(true),
     onOpenLanguage: () => openLanguageDialog(true),
     onOpenProfile: onOpenProfileDialog,
-    onOpenAskAi: onOpenAskAiFromMainMenu,
+    onOpenAskAi: openAskAi,
     setElectronUpdateStatus: setElectronUpdateStatus,
   };
 

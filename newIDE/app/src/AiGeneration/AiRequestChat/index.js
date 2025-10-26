@@ -44,6 +44,7 @@ import {
 } from '../AiConfiguration';
 import { AiConfigurationPresetSelector } from './AiConfigurationPresetSelector';
 import { AiRequestContext } from '../AiRequestContext';
+import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 
 const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 5;
 const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 10;
@@ -87,11 +88,12 @@ type Props = {
   hasOpenedProject: boolean,
   isAutoProcessingFunctionCalls: boolean,
   setAutoProcessFunctionCalls: boolean => void,
-  onStartOrOpenChat: ({|
-    mode: 'chat' | 'agent',
-    aiRequestId: string | null,
-  |}) => void,
-  initialMode?: 'chat' | 'agent',
+  onStartOrOpenChat: (
+    ?{|
+      mode: 'chat' | 'agent',
+      aiRequestId: string | null,
+    |}
+  ) => void,
   aiConfigurationPresetsWithAvailability: Array<AiConfigurationPresetWithAvailability>,
 
   onProcessFunctionCalls: (
@@ -267,7 +269,6 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       onSendMessage,
       onSendFeedback,
       onStartOrOpenChat,
-      initialMode,
       quota,
       increaseQuotaOffering,
       lastSendError,
@@ -286,21 +287,8 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     const {
       aiRequestHistory: { handleNavigateHistory, resetNavigation },
     } = React.useContext(AiRequestContext);
-
-    // TODO: store the default mode in the user preferences?
-    const [newAiRequestMode, setNewAiRequestMode] = React.useState<
-      'chat' | 'agent'
-    >(initialMode || 'agent');
-
-    // Update the mode when initialMode changes
-    React.useEffect(
-      () => {
-        if (initialMode) {
-          setNewAiRequestMode(initialMode);
-        }
-      },
-      [initialMode]
-    );
+    const { values, setAiState } = React.useContext(PreferencesContext);
+    const aiRequestMode = values.aiState.mode;
 
     const [
       aiConfigurationPresetId,
@@ -317,7 +305,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
           aiConfigurationPresetsWithAvailability.find(
             preset =>
               preset.id === aiConfigurationPresetId &&
-              preset.mode === newAiRequestMode
+              preset.mode === aiRequestMode
           )
         ) {
           return;
@@ -330,7 +318,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         setAiConfigurationPresetId(null);
       },
       [
-        newAiRequestMode,
+        aiRequestMode,
         aiConfigurationPresetsWithAvailability,
         aiConfigurationPresetId,
       ]
@@ -372,7 +360,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     const newChatPlaceholder = React.useMemo(
       () => {
         const newChatPlaceholders: Array<MessageDescriptor> =
-          newAiRequestMode === 'agent'
+          aiRequestMode === 'agent'
             ? hasOpenedProject
               ? [
                   t`Add solid rocks that falls from the sky at a random position around the player every 0.5 seconds`,
@@ -402,7 +390,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
           Math.floor(Math.random() * newChatPlaceholders.length)
         ];
       },
-      [newAiRequestMode, hasOpenedProject]
+      [aiRequestMode, hasOpenedProject]
     );
 
     const onUserRequestTextChange = React.useCallback(
@@ -447,9 +435,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     const priceText = (
       <Text size="body-small" color="secondary" noMargin>
         {getPriceText({
-          aiRequestMode: aiRequest
-            ? aiRequest.mode || 'chat'
-            : newAiRequestMode,
+          aiRequestMode,
           price,
           lastUserMessagePriceInCredits:
             (aiRequest && aiRequest.lastUserMessagePriceInCredits) || null,
@@ -518,7 +504,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     const chosenOrDefaultAiConfigurationPresetId =
       aiConfigurationPresetId ||
       getDefaultAiConfigurationPresetId(
-        newAiRequestMode,
+        aiRequestMode,
         aiConfigurationPresetsWithAvailability
       );
 
@@ -537,7 +523,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             </Line>
             <Column noMargin alignItems="center">
               <Text size="bold-title" align="center">
-                {newAiRequestMode === 'agent' ? (
+                {aiRequestMode === 'agent' ? (
                   <Trans>What do you want to make?</Trans>
                 ) : (
                   <Trans>Ask any gamedev question</Trans>
@@ -546,7 +532,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             </Column>
             <Line noMargin justifyContent="center">
               <TwoStatesButton
-                value={newAiRequestMode}
+                value={aiRequestMode}
                 leftButton={{
                   icon: <Hammer fontSize="small" />,
                   label: <Trans>Build for me</Trans>,
@@ -561,14 +547,15 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                   if (value !== 'chat' && value !== 'agent') {
                     return;
                   }
-                  setNewAiRequestMode(value);
+                  setAiState({ mode: value, aiRequestId: null });
                 }}
+                disabled={isSending}
               />
             </Line>
             <form
               onSubmit={() => {
                 onStartNewAiRequest({
-                  mode: newAiRequestMode,
+                  mode: aiRequestMode,
                   userRequest: userRequestTextPerAiRequestId[''],
                   aiConfigurationPresetId: chosenOrDefaultAiConfigurationPresetId,
                 });
@@ -590,7 +577,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                     onNavigateHistory={handleNavigateHistory}
                     onSubmit={() => {
                       onStartNewAiRequest({
-                        mode: newAiRequestMode,
+                        mode: aiRequestMode,
                         userRequest: userRequestTextPerAiRequestId[''],
                         aiConfigurationPresetId: chosenOrDefaultAiConfigurationPresetId,
                       });
@@ -613,13 +600,13 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                             aiConfigurationPresetsWithAvailability={
                               aiConfigurationPresetsWithAvailability
                             }
-                            aiRequestMode={newAiRequestMode}
+                            aiRequestMode={aiRequestMode}
                           />
                           <RaisedButton
                             color="primary"
                             icon={<Send />}
                             label={
-                              newAiRequestMode === 'agent' ? (
+                              aiRequestMode === 'agent' ? (
                                 hasOpenedProject ? (
                                   <Trans>Build this on my game</Trans>
                                 ) : (
@@ -636,7 +623,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                             }
                             onClick={() => {
                               onStartNewAiRequest({
-                                mode: newAiRequestMode,
+                                mode: aiRequestMode,
                                 userRequest: userRequestTextPerAiRequestId[''],
                                 aiConfigurationPresetId: chosenOrDefaultAiConfigurationPresetId,
                               });
@@ -669,7 +656,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
           </ColumnStackLayout>
           <Spacer />
           <Column justifyContent="center">
-            {newAiRequestMode === 'agent' ? (
+            {aiRequestMode === 'agent' ? (
               <Text size="body-small" color="secondary" align="center" noMargin>
                 <Trans>
                   The AI agent will build simple games or features for you.{' '}
@@ -700,7 +687,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 </Trans>
               </Text>
             )}
-            {newAiRequestMode === 'agent' ? (
+            {aiRequestMode === 'agent' ? (
               <Text size="body-small" color="secondary" align="center" noMargin>
                 <Trans>
                   Results may vary: experiment and use it for learning.

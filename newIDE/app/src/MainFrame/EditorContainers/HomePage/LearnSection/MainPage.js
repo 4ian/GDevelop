@@ -39,6 +39,7 @@ import {
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import Carousel from '../../../../UI/Carousel';
 import BundlePreviewBanner from '../../../../AssetStore/Bundles/BundlePreviewBanner';
+import { type OpenAskAiOptions } from '../../../../AiGeneration/AskAiEditorContainer';
 
 const NUMBER_OF_SCROLLS = 2; // Number of times the carousel can be scrolled to see all items.
 const MAX_COLUMNS = getColumnsFromWindowSize('xlarge', true);
@@ -70,11 +71,7 @@ type Props = {|
     courseId: string,
     chapterId: string
   ) => CourseChapterCompletion | null,
-  onOpenAskAi: ({|
-    mode: 'chat' | 'agent',
-    aiRequestId: string | null,
-    paneIdentifier: 'left' | 'center' | 'right' | null,
-  |}) => void,
+  onOpenAskAi: (?OpenAskAiOptions) => void,
   onOpenNewProjectSetupDialog: () => void,
   onSelectPrivateGameTemplateListingData: (
     privateGameTemplateListingData: PrivateGameTemplateListingData
@@ -411,7 +408,6 @@ const MainPage = ({
                                 onOpenAskAi({
                                   mode: 'chat',
                                   aiRequestId: null,
-                                  paneIdentifier: 'center',
                                 })
                               }
                             />

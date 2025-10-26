@@ -399,15 +399,28 @@ const generateInstructionReferenceRowsText = ({
     .filter(Boolean)
     .join('\n');
 
+  if (!parametersList) {
+    parametersList = `${paramPadding}There are no parameters to set for this ${
+      isCondition ? 'condition' : 'action'
+    }.`;
+  }
+
   if (codeOnlyParametersIndexes.length) {
     parametersList +=
       '\n\n' +
       `${paramPadding}> Technical note: ${
         codeOnlyParametersIndexes.length === 1 ? 'parameter' : 'parameters'
-      } ${codeOnlyParametersIndexes.join(
-        ', '
-      )} are internal parameters handled by GDevelop.`;
+      } ${codeOnlyParametersIndexes.join(', ')} ${
+        codeOnlyParametersIndexes.length === 1
+          ? 'is an internal parameter'
+          : 'are internal parameters'
+      } handled by GDevelop.`;
   }
+  parametersList +=
+    '\n\n' +
+    `${paramPadding}> Technical note: this ${
+      isCondition ? 'condition' : 'action'
+    } internal type (in GDevelop JSON) is \`${instructionType}\`.`;
 
   return {
     orderKey: instructionType,
@@ -416,7 +429,7 @@ const generateInstructionReferenceRowsText = ({
       instructionMetadata.getDescription().replace(/\n/, `  \n`),
       '',
       ...(parametersList
-        ? ['??? quote "See parameters"', '', parametersList, '']
+        ? ['??? quote "See parameters & details"', '', parametersList, '']
         : []),
     ].join('\n'),
   };

@@ -22,12 +22,13 @@ type Props = {|
   |},
   onChange: string => void,
   value: string,
+  disabled?: boolean,
 |};
 
 export type TwoStatesButtonInterface = {| focusLeftButton: () => void |};
 
 const TwoStatesButton = React.forwardRef<Props, TwoStatesButtonInterface>(
-  ({ leftButton, rightButton, onChange, value }, ref) => {
+  ({ leftButton, rightButton, onChange, value, disabled }, ref) => {
     const leftButtonRef = React.useRef<?Button>(null);
 
     const focusLeftButton = React.useCallback(() => {
@@ -42,7 +43,7 @@ const TwoStatesButton = React.forwardRef<Props, TwoStatesButtonInterface>(
     const leftButtonDataset = isLeft ? { effective: 'true' } : undefined;
     const rightButtonDataset = !isLeft ? { effective: 'true' } : undefined;
     return (
-      <ButtonGroup size="small" disableElevation>
+      <ButtonGroup size="small" disableElevation disabled={disabled}>
         <Button
           id={leftButton.id}
           {...dataObjectToProps(leftButtonDataset)}

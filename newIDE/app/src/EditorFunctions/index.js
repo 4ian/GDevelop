@@ -4247,6 +4247,26 @@ const addOrEditVariable: EditorFunction = {
   },
 };
 
+const readFullDocs: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    const extension_names = SafeExtractor.extractStringProperty(
+      args,
+      'extension_names'
+    );
+
+    return {
+      text: (
+        <Trans>Inspecting {extension_names} features and capabilities.</Trans>
+      ),
+    };
+  },
+  launchFunction: async ({ args }) => {
+    return makeGenericFailure(
+      `Unable to read full documentation - continue with your existing GDevelop knowledge.`
+    );
+  },
+};
+
 const initializeProject: EditorFunctionWithoutProject = {
   renderForEditor: ({ args }) => {
     const project_name = extractRequiredString(args, 'project_name');
@@ -4352,6 +4372,7 @@ export const editorFunctions: { [string]: EditorFunction } = {
   inspect_scene_properties_layers_effects: inspectScenePropertiesLayersEffects,
   change_scene_properties_layers_effects_groups: changeScenePropertiesLayersEffectsGroups,
   add_or_edit_variable: addOrEditVariable,
+  read_full_docs: readFullDocs,
 };
 
 export const editorFunctionsWithoutProject: {

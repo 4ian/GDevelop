@@ -1054,6 +1054,7 @@ const MainFrame = (props: Props) => {
         );
         if (!autoSaveCreationDate) return fileMetadata;
 
+        await delay(200); // Ensure confirmation is shown on top of the loader.
         const answer = await showConfirmation({
           title: t`This project has an auto-saved version`,
           message: t`GDevelop automatically saved a newer version of this project on ${new Date(
@@ -1078,6 +1079,7 @@ const MainFrame = (props: Props) => {
         );
         if (!autoSaveCreationDate) return null;
 
+        await delay(200); // Ensure confirmation is shown on top of the loader.
         const answer = await showConfirmation({
           title: t`This project cannot be opened`,
           message: t`The project file appears to be corrupted, but an autosave file exists (backup made automatically by GDevelop on ${new Date(
@@ -1096,7 +1098,7 @@ const MainFrame = (props: Props) => {
 
       // Try to find an autosave (and ask user if found)
       try {
-        await delay(150);
+        await delay(50);
         let content;
         let openingError: Error | null = null;
         try {

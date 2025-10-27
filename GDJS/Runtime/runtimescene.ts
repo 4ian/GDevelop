@@ -65,7 +65,7 @@ namespace gdjs {
      * @param runtimeGame The game associated to this scene.
      */
     constructor(runtimeGame: gdjs.RuntimeGame) {
-      super();
+      super(runtimeGame);
       this._runtimeGame = runtimeGame;
       this._variables = new gdjs.VariablesContainer();
       this._variablesByExtensionName = new Map<

@@ -6,6 +6,19 @@
 namespace gdjs {
   const logger = new gdjs.Logger('RuntimeInstanceContainer');
 
+  const unknownObjectData = {
+    name: '',
+    type: '',
+    variables: [],
+    behaviors: [],
+    effects: [],
+    content: {
+      width: 32,
+      height: 32,
+      depth: 32,
+    },
+  };
+
   /**
    * A container of object instances rendered on screen.
    */
@@ -42,7 +55,10 @@ namespace gdjs {
     _debugDrawShowPointsNames: boolean = false;
     _debugDrawShowCustomPoints: boolean = false;
 
-    constructor() {
+    /**
+     * @param runtimeGame The game associated to this scene.
+     */
+    constructor(runtimeGame: gdjs.RuntimeGame) {
       this._initialBehaviorSharedData = new Hashtable();
       this._instances = new Hashtable();
       this._instancesCache = new Hashtable();
@@ -50,6 +66,10 @@ namespace gdjs {
       this._objectsCtor = new Hashtable();
       this._layers = new Hashtable();
       this._orderedLayers = [];
+      if (runtimeGame.isInGameEdition()) {
+        // Register an UnknownRuntimeObject to use when the object doesn't exist.
+        this.registerObject(unknownObjectData);
+      }
     }
 
     /**
@@ -644,8 +664,13 @@ namespace gdjs {
         !this._objectsCtor.containsKey(objectName) ||
         !this._objects.containsKey(objectName)
       ) {
-        // There is no such object in this container.
-        return null;
+        if (this.getGame().isInGameEdition()) {
+          // Fallback on the UnknownRuntimeObject.
+          objectName = '';
+        } else {
+          // There is no such object in this container.
+          return null;
+        }
       }
 
       const objectData = this._objects.get(objectName);

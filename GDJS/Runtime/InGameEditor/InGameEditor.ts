@@ -4165,4 +4165,64 @@ namespace gdjs {
       this.boxHelper.material.needsUpdate = true;
     }
   }
+
+  /**
+   * A 3D object which displays a 3D model.
+   */
+  class UnknownRuntimeObject extends gdjs.RuntimeObject3D {
+    _renderer: UnknownRuntimeObjectRenderer;
+
+    constructor(
+      instanceContainer: gdjs.RuntimeInstanceContainer,
+      objectData: gdjs.Object3DData
+    ) {
+      super(instanceContainer, objectData);
+      this._renderer = new UnknownRuntimeObjectRenderer(
+        this,
+        instanceContainer
+      );
+    }
+
+    override getRenderer(): gdjs.RuntimeObject3DRenderer {
+      return this._renderer;
+    }
+
+    override onDestroyed(): void {
+      super.onDestroyed();
+      this._renderer.onDestroyed();
+    }
+  }
+  gdjs.registerObject('', UnknownRuntimeObject);
+
+  class UnknownRuntimeObjectRenderer extends gdjs.RuntimeObject3DRenderer {
+    private _threeObject: THREE.Mesh;
+
+    constructor(
+      runtimeObject: UnknownRuntimeObject,
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ) {
+      const cube = new THREE.Mesh(
+        new THREE.BoxGeometry(),
+        runtimeObject
+          .getInstanceContainer()
+          .getGame()
+          .getImageManager()
+          .getThreeMaterial('', {
+            useTransparentTexture: false,
+            forceBasicMaterial: true,
+            vertexColors: false,
+          })
+      );
+      super(runtimeObject, instanceContainer, cube);
+      this._threeObject = cube;
+      this.updateSize();
+      this.updatePosition();
+      this.updateRotation();
+    }
+
+    onDestroyed(): void {
+      this._threeObject.removeFromParent();
+      this._threeObject.geometry.dispose();
+    }
+  }
 }

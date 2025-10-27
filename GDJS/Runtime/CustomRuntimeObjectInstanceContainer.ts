@@ -40,7 +40,7 @@ namespace gdjs {
       parent: gdjs.RuntimeInstanceContainer,
       customObject: gdjs.CustomRuntimeObject
     ) {
-      super();
+      super(parent.getGame());
       this._parent = parent;
       this._customObject = customObject;
       this._runtimeScene = parent.getScene();

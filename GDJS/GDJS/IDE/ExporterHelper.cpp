@@ -1171,7 +1171,6 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     InsertUnique(includesFiles, "debugger-client/hot-reloader.js");
     InsertUnique(includesFiles, "debugger-client/abstract-debugger-client.js");
     InsertUnique(includesFiles, "debugger-client/InGameDebugger.js");
-    InsertUnique(includesFiles, "InGameEditor/InGameEditor.js");
   }
   if (includeWebsocketDebuggerClient) {
     InsertUnique(includesFiles, "debugger-client/websocket-debugger-client.js");
@@ -1192,6 +1191,11 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
                  "pixi-renderers/draco/gltf/draco_wasm_wrapper.js");
     // Extensions in JS may use it.
     InsertUnique(includesFiles, "Extensions/3D/Scene3DTools.js");
+    InsertUnique(includesFiles, "Extensions/3D/A_RuntimeObject3D.js");
+    InsertUnique(includesFiles, "Extensions/3D/A_RuntimeObject3DRenderer.js");
+    InsertUnique(includesFiles, "Extensions/3D/CustomRuntimeObject3D.js");
+    InsertUnique(includesFiles,
+                 "Extensions/3D/CustomRuntimeObject3DRenderer.js");
   }
   if (pixiRenderers || isInGameEdition) {
     InsertUnique(includesFiles, "pixi-renderers/pixi.js");
@@ -1221,13 +1225,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     // `InGameEditor` uses the `is3D` function.
     InsertUnique(includesFiles, "Extensions/3D/Base3DBehavior.js");
     InsertUnique(includesFiles, "Extensions/3D/HemisphereLight.js");
-  }
-  if (pixiInThreeRenderers || isInGameEdition) {
-    InsertUnique(includesFiles, "Extensions/3D/A_RuntimeObject3D.js");
-    InsertUnique(includesFiles, "Extensions/3D/A_RuntimeObject3DRenderer.js");
-    InsertUnique(includesFiles, "Extensions/3D/CustomRuntimeObject3D.js");
-    InsertUnique(includesFiles,
-                 "Extensions/3D/CustomRuntimeObject3DRenderer.js");
+    InsertUnique(includesFiles, "InGameEditor/InGameEditor.js");
   }
   if (includeCaptureManager) {
     InsertUnique(includesFiles, "capturemanager.js");

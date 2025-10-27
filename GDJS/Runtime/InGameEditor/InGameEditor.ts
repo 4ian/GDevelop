@@ -4167,7 +4167,8 @@ namespace gdjs {
   }
 
   /**
-   * A 3D object which displays a 3D model.
+   * A 3D object placeholder that is used as a fall back when the object type
+   * is not known.
    */
   class UnknownRuntimeObject extends gdjs.RuntimeObject3D {
     _renderer: UnknownRuntimeObjectRenderer;

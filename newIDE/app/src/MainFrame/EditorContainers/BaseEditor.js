@@ -46,6 +46,7 @@ export type InstancesOutsideEditorChanges = {|
 
 export type ObjectsOutsideEditorChanges = {|
   scene: gdLayout,
+  isNewObjectTypeUsed: boolean,
 |};
 
 export type ObjectGroupsOutsideEditorChanges = {|

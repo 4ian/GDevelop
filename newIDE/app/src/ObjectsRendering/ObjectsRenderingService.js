@@ -86,7 +86,6 @@ const ObjectsRenderingService = {
     return new this.renderers['unknownObjectType'](
       project,
       instance,
-      //$FlowFixMe It's ok because RenderedUnknownInstance don't use it.
       null,
       pixiContainer,
       PixiResourcesLoader

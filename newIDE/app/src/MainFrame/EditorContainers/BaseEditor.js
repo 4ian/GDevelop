@@ -20,6 +20,7 @@ import { type GamesList } from '../../GameDashboard/UseGamesList';
 import { type GamesPlatformFrameTools } from './HomePage/PlaySection/UseGamesPlatformFrame';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import { type CreateProjectResult } from '../../Utils/UseCreateProject';
+import { type OpenAskAiOptions } from '../../AiGeneration/AskAiEditorContainer';
 
 export type EditorContainerExtraProps = {|
   // Events function extension editor
@@ -31,8 +32,7 @@ export type EditorContainerExtraProps = {|
   storageProviders?: Array<StorageProvider>,
 
   // Ask AI
-  mode?: 'chat' | 'agent',
-  aiRequestId?: string | null,
+  continueProcessingFunctionCallsOnMount?: boolean,
 |};
 
 export type SceneEventsOutsideEditorChanges = {|
@@ -108,11 +108,7 @@ export type RenderEditorContainerProps = {|
     variantName: string
   ) => void,
   openObjectEvents: (extensionName: string, objectName: string) => void,
-  onOpenAskAi: ({|
-    mode: 'chat' | 'agent',
-    aiRequestId: string | null,
-    paneIdentifier: 'left' | 'center' | 'right' | null,
-  |}) => void,
+  onOpenAskAi: (?OpenAskAiOptions) => void,
 
   // Events function management:
   onLoadEventsFunctionsExtensions: ({|

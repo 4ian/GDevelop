@@ -140,8 +140,8 @@ export const openEditorTab = (
     paneIdentifier,
   }: EditorOpeningOptions
 ): EditorTabsState => {
-  for (const paneIdentifier in state.panes) {
-    const pane = state.panes[paneIdentifier];
+  for (const statePaneIdentifier in state.panes) {
+    const pane = state.panes[statePaneIdentifier];
 
     const existingEditorId = findIndex(
       pane.editors,
@@ -150,7 +150,7 @@ export const openEditorTab = (
     if (existingEditorId !== -1) {
       return dontFocusTab
         ? { ...state }
-        : changeCurrentTab(state, paneIdentifier, existingEditorId);
+        : changeCurrentTab(state, statePaneIdentifier, existingEditorId);
     }
   }
 
@@ -586,12 +586,15 @@ export const getEditorTabOpenedWithKey = (
 ): {|
   paneIdentifier: string,
   editorTab: EditorTab,
+  tabIndex: number,
 |} | null => {
   for (const paneIdentifier in editorTabsState.panes) {
     const pane = editorTabsState.panes[paneIdentifier];
-    const editorTab = pane && pane.editors.find(editor => editor.key === key);
-    if (editorTab) {
-      return { editorTab, paneIdentifier };
+    for (let tabIndex = 0; tabIndex < pane.editors.length; ++tabIndex) {
+      const editorTab = pane && pane.editors[tabIndex];
+      if (editorTab && editorTab.key === key) {
+        return { editorTab, paneIdentifier, tabIndex };
+      }
     }
   }
 
@@ -608,21 +611,20 @@ const hasEditorTabOpenedWithKey = (
 export const getOpenedAskAiEditor = (
   state: EditorTabsState
 ): null | {|
-  askAiEditor: AskAiEditorInterface,
+  askAiEditor: ?AskAiEditorInterface,
   editorTab: EditorTab,
   paneIdentifier: string,
+  tabIndex: number,
 |} => {
-  const currentEditorTabAndPaneIdentifier = getEditorTabOpenedWithKey(
-    state,
-    'ask-ai'
-  );
-  if (!currentEditorTabAndPaneIdentifier) return null;
+  const editorTabOpened = getEditorTabOpenedWithKey(state, 'ask-ai');
+  if (!editorTabOpened) return null;
 
   return {
     // $FlowFixMe - the key ensures that the editor is an AskAiEditorInterface.
-    askAiEditor: currentEditorTabAndPaneIdentifier.editorTab.editorRef,
-    editorTab: currentEditorTabAndPaneIdentifier.editorTab,
-    paneIdentifier: currentEditorTabAndPaneIdentifier.paneIdentifier,
+    askAiEditor: editorTabOpened.editorTab.editorRef,
+    editorTab: editorTabOpened.editorTab,
+    paneIdentifier: editorTabOpened.paneIdentifier,
+    tabIndex: editorTabOpened.tabIndex,
   };
 };
 

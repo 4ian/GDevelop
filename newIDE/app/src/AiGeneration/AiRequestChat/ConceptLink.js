@@ -35,6 +35,7 @@ export type ConceptMetadata = {|
   description: string,
   name: string,
   helpPath: string,
+  alreadyAvailableInProject?: boolean,
   parentExtension?: ConceptMetadata | null,
   parentObject?: ConceptMetadata | null,
   parentBehavior?: ConceptMetadata | null,
@@ -127,7 +128,12 @@ const getConceptParent = (conceptMetadata: ConceptMetadata) => {
         <ConceptLink
           forceNoLink
           conceptMetadata={conceptMetadata.parentExtension}
-        />
+        />{' '}
+        {conceptMetadata.parentExtension.alreadyAvailableInProject ? (
+          <Trans>(already installed in the project)</Trans>
+        ) : (
+          <Trans>(install it from the Project Manager)</Trans>
+        )}
         .
       </Trans>
     );
@@ -151,11 +157,24 @@ export const ConceptLink = ({
   return (
     <Tooltip
       title={[
-        <Text color="inherit">
+        <Text color="inherit" key="kind">
           <b>{getConceptKindLabel(conceptMetadata.kind)}</b>
         </Text>,
-        conceptParent ? <Text color="inherit">{conceptParent}</Text> : null,
-        <MarkdownText source={conceptMetadata.description} />,
+        conceptMetadata.alreadyAvailableInProject !== undefined ? (
+          <Text color="inherit" key="alreadyAvailableInProject">
+            {conceptMetadata.alreadyAvailableInProject ? (
+              <Trans>It is already installed/available in the project.</Trans>
+            ) : (
+              <Trans>You can install it from the Project Manager.</Trans>
+            )}
+          </Text>
+        ) : null,
+        conceptParent ? (
+          <Text color="inherit" key="parent">
+            {conceptParent}
+          </Text>
+        ) : null,
+        <MarkdownText source={conceptMetadata.description} key="description" />,
       ]}
       placement="bottom"
       PopperProps={{
@@ -313,18 +332,6 @@ export const useGetConceptMetadata = () => {
   const getExtensionMetadata = useRefWithInit(() => {
     return memoize(
       (type: string): ConceptMetadata | null => {
-        const extensionName = type;
-        const extensionShortHeader = extensionShortHeadersByName[extensionName];
-        if (extensionShortHeader) {
-          return {
-            kind: 'Extension',
-            name: extensionShortHeader.fullName,
-            description: extensionShortHeader.shortDescription,
-            iconSrc: extensionShortHeader.previewIconUrl,
-            helpPath: extensionShortHeader.helpPath,
-          };
-        }
-
         const platform = gd.JsPlatform.get();
         const platformExtensions = platform.getAllPlatformExtensions();
 
@@ -345,6 +352,20 @@ export const useGetConceptMetadata = () => {
             description: platformExtension.getDescription(),
             iconSrc: platformExtension.getIconUrl(),
             helpPath: platformExtension.getHelpPath(),
+            alreadyAvailableInProject: true,
+          };
+        }
+
+        const extensionName = type;
+        const extensionShortHeader = extensionShortHeadersByName[extensionName];
+        if (extensionShortHeader) {
+          return {
+            kind: 'Extension',
+            name: extensionShortHeader.fullName,
+            description: extensionShortHeader.shortDescription,
+            iconSrc: extensionShortHeader.previewIconUrl,
+            helpPath: extensionShortHeader.helpPath,
+            alreadyAvailableInProject: false,
           };
         }
 

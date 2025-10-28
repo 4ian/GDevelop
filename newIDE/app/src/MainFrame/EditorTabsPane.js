@@ -58,6 +58,7 @@ import useOnResize from '../Utils/UseOnResize';
 import DrawerTopBar from '../UI/DrawerTopBar';
 import { type FloatingPaneState } from './PanesContainer';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
+import { type OpenAskAiOptions } from '../AiGeneration/AskAiEditorContainer';
 
 const styles = {
   container: {
@@ -116,11 +117,7 @@ export type EditorTabsPaneCommonProps = {|
   |}) => void,
   openVersionHistoryPanel: () => void,
   onQuitVersionHistory: () => Promise<void>,
-  onOpenAskAi: ({|
-    mode: 'chat' | 'agent',
-    aiRequestId: string | null,
-    paneIdentifier: 'left' | 'center' | 'right' | null,
-  |}) => void,
+  onOpenAskAi: (?OpenAskAiOptions) => void,
   getStorageProvider: () => StorageProvider,
   setPreviewedLayout: ({|
     layoutName: string | null,
@@ -517,13 +514,9 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
         return;
       }
 
-      onOpenAskAi({
-        mode: 'agent',
-        aiRequestId: null,
-        paneIdentifier: currentProject ? 'right' : 'center',
-      });
+      onOpenAskAi();
     },
-    [askAiPaneIdentifier, onOpenAskAi, currentProject, onSetPaneDrawerState]
+    [askAiPaneIdentifier, onOpenAskAi, onSetPaneDrawerState]
   );
 
   return (

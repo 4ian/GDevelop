@@ -11,13 +11,14 @@ export default class RenderedUnknownInstance extends RenderedInstance {
   constructor(
     project: gdProject,
     instance: gdInitialInstance,
-    associatedObjectConfiguration: gdObjectConfiguration,
+    associatedObjectConfiguration: gdObjectConfiguration | null,
     pixiContainer: PIXI.Container,
     pixiResourcesLoader: Class<PixiResourcesLoader>
   ) {
     super(
       project,
       instance,
+      //$FlowFixMe It's ok because RenderedUnknownInstance don't use it.
       associatedObjectConfiguration,
       pixiContainer,
       pixiResourcesLoader

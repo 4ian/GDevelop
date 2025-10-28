@@ -239,6 +239,14 @@ namespace gdjs {
       return false;
     }
 
+    exceptionallyGetAllJustPressedKeys(): number[] {
+      const result: string[] = [];
+      this._justPressedKeys.keys(result);
+      return result.map((locationAwareKeyCode) =>
+        parseInt(locationAwareKeyCode, 10)
+      );
+    }
+
     /**
      * Should be called when the mouse is moved.
      *

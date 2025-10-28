@@ -27,10 +27,10 @@ const defaultShortcuts: ShortcutMap = {
   OPEN_PLATFORM_SPECIFIC_ASSETS_DIALOG: '',
   OPEN_PROJECT_RESOURCES: '',
 
-  OPEN_LAYOUT: 'Alt+KeyS',
-  OPEN_EXTERNAL_EVENTS: 'Alt+KeyV',
-  OPEN_EXTERNAL_LAYOUT: 'Alt+KeyW',
-  OPEN_EXTENSION: 'Alt+KeyE',
+  OPEN_LAYOUT: '',
+  OPEN_EXTERNAL_EVENTS: '',
+  OPEN_EXTERNAL_LAYOUT: '',
+  OPEN_EXTENSION: '',
 
   OPEN_SCENE_PROPERTIES: '',
   OPEN_SCENE_VARIABLES: 'KeyV',
@@ -45,7 +45,7 @@ const defaultShortcuts: ShortcutMap = {
   OPEN_SETUP_GRID: 'CmdOrCtrl+Shift+KeyG',
   EDIT_LAYER_EFFECTS: 'KeyE',
   EDIT_LAYER: 'KeyT',
-  EDIT_OBJECT: 'Shift+KeyE',
+  EDIT_OBJECT: '',
   EDIT_OBJECT_VARIABLES: 'Shift+KeyV',
   EDIT_OBJECT_GROUP: 'Shift+KeyG',
 

@@ -40,6 +40,12 @@ namespace gdjs {
   const Z_KEY = 90;
   const ESC_KEY = 27;
 
+  const exceptionallyGetKeyCodeFromLocationAwareKeyCode = (
+    locationAwareKeyCode: number
+  ): number => {
+    return locationAwareKeyCode % 1000;
+  };
+
   const instanceStateFlag = {
     selected: 1,
     locked: 2,
@@ -2347,26 +2353,39 @@ namespace gdjs {
 
     private _handleShortcuts() {
       const inputManager = this._runtimeGame.getInputManager();
+      let alreadyHandledShortcut = false;
       if (isControlPressedOnly(inputManager)) {
         // Note: use `wasKeyJustPressed` instead of `wasKeyReleased` to avoid
         // macOS stealing the key release ("key up") information
         // when the "Meta" key is pressed.
         if (inputManager.wasKeyJustPressed(Z_KEY)) {
           this._sendUndo();
+          alreadyHandledShortcut = true;
         } else if (inputManager.wasKeyJustPressed(Y_KEY)) {
           this._sendRedo();
+          alreadyHandledShortcut = true;
         } else if (inputManager.wasKeyJustPressed(C_KEY)) {
           this._sendCopy();
+          alreadyHandledShortcut = true;
         } else if (inputManager.wasKeyJustPressed(V_KEY)) {
           this._sendPaste();
+          alreadyHandledShortcut = true;
         } else if (inputManager.wasKeyJustPressed(X_KEY)) {
           this._sendCut();
+          alreadyHandledShortcut = true;
         }
       }
       if (isControlPlusShiftPressedOnly(inputManager)) {
         if (inputManager.wasKeyJustPressed(Z_KEY)) {
           this._sendRedo();
+          alreadyHandledShortcut = true;
         }
+      }
+
+      // Send the shortcut to the editor (as the iframe does not bubble up
+      // the event to the parent window).
+      if (!alreadyHandledShortcut) {
+        this._forwardShortcutsToEditor(inputManager);
       }
     }
 
@@ -2398,6 +2417,44 @@ namespace gdjs {
       const debuggerClient = this._runtimeGame._debuggerClient;
       if (!debuggerClient) return;
       debuggerClient.sendCut();
+    }
+
+    private _forwardShortcutsToEditor(inputManager: gdjs.InputManager) {
+      const isCtrlPressed =
+        inputManager.isKeyPressed(LEFT_CTRL_KEY) ||
+        inputManager.isKeyPressed(RIGHT_CTRL_KEY);
+      const isMetaPressed =
+        inputManager.isKeyPressed(LEFT_META_KEY) ||
+        inputManager.isKeyPressed(RIGHT_META_KEY);
+      const isShiftKeyPressed = isShiftPressed(inputManager);
+      const isAltKeyPressed = isAltPressed(inputManager);
+
+      if (
+        !isCtrlPressed &&
+        !isMetaPressed &&
+        !isAltKeyPressed &&
+        !isShiftKeyPressed
+      ) {
+        return;
+      }
+
+      for (const locationAwareKeyCode of this._runtimeGame
+        .getInputManager()
+        .exceptionallyGetAllJustPressedKeys()) {
+        const keyCode =
+          exceptionallyGetKeyCodeFromLocationAwareKeyCode(locationAwareKeyCode);
+
+        const debuggerClient = this._runtimeGame._debuggerClient;
+        if (debuggerClient) {
+          debuggerClient.sendKeyboardShortcut({
+            keyCode,
+            metaKey: isMetaPressed,
+            ctrlKey: isCtrlPressed,
+            altKey: isAltKeyPressed,
+            shiftKey: isShiftKeyPressed,
+          });
+        }
+      }
     }
 
     cancelDragNewInstance() {

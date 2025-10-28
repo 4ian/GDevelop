@@ -221,10 +221,14 @@ namespace gdjs {
     }
 
     update(delta: float): void {
-      const wasEmitting = this.emitter.emit;
-      this.emitter.update(delta);
-      if (!this.started && wasEmitting) {
-        this.started = true;
+      if (
+        !this.runtimeObject.getInstanceContainer().getGame().isInGameEdition()
+      ) {
+        const wasEmitting = this.emitter.emit;
+        this.emitter.update(delta);
+        if (!this.started && wasEmitting) {
+          this.started = true;
+        }
       }
       if (this.helperGraphics) {
         this.helperGraphics.clear();

@@ -4294,11 +4294,12 @@ const MainFrame = (props: Props) => {
     [notifyChangesToInGameEditor]
   );
 
-  useKeyboardShortcuts(
-    commandPaletteRef.current
+  useKeyboardShortcuts({
+    previewDebuggerServer,
+    onRunCommand: commandPaletteRef.current
       ? commandPaletteRef.current.launchCommand
-      : () => {}
-  );
+      : () => {},
+  });
 
   const openCommandPalette = React.useCallback(() => {
     if (commandPaletteRef.current) {
@@ -4471,6 +4472,7 @@ const MainFrame = (props: Props) => {
     authenticatedUser.limits.capabilities.classrooms.hideAskAi;
   const showLoader = isProjectOpening || isLoadingProject || previewLoading;
   const shortcutMap = useShortcutMap();
+
   const buildMainMenuProps = {
     i18n: i18n,
     project: state.currentProject,

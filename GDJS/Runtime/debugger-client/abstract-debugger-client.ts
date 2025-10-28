@@ -900,6 +900,26 @@ namespace gdjs {
       );
     }
 
+    sendKeyboardShortcut(keyEventLike: {
+      keyCode: number;
+      metaKey: boolean;
+      ctrlKey: boolean;
+      altKey: boolean;
+      shiftKey: boolean;
+    }): void {
+      const inGameEditor = this._runtimegame.getInGameEditor();
+      if (!inGameEditor) {
+        return;
+      }
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'handleKeyboardShortcutFromInGameEditor',
+          editorId: inGameEditor.getEditorId(),
+          payload: keyEventLike,
+        })
+      );
+    }
+
     sendSelectionAABB(messageId: number): void {
       const inGameEditor = this._runtimegame.getInGameEditor();
       if (!inGameEditor) {

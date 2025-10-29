@@ -151,8 +151,6 @@ type KeyEventLike = {
 };
 
 const getCodeFromEvent = (e: KeyEventLike): string => {
-  if (e.code) return e.code;
-
   if (
     typeof e.keyCode === 'number' &&
     e.keyCode.toString() in eventKeyCodeToCode
@@ -160,6 +158,8 @@ const getCodeFromEvent = (e: KeyEventLike): string => {
     return eventKeyCodeToCode[e.keyCode.toString()];
   if (typeof e.which === 'number' && e.which.toString() in eventKeyCodeToCode)
     return eventKeyCodeToCode[e.which.toString()];
+
+  if (e.code) return e.code;
   return '';
 };
 
@@ -309,22 +309,18 @@ export const useKeyboardShortcuts = ({
           }
 
           const keyEventLike = parsedMessage.payload;
-          const metaKey = SafeExtractor.extractBooleanProperty(
-            keyEventLike,
-            'metaKey'
-          ) || false;
-          const ctrlKey = SafeExtractor.extractBooleanProperty(
-            keyEventLike,
-            'ctrlKey'
-          ) || false;
-          const altKey = SafeExtractor.extractBooleanProperty(
-            keyEventLike,
-            'altKey'
-          ) || false;
-          const shiftKey = SafeExtractor.extractBooleanProperty(
-            keyEventLike,
-            'shiftKey'
-          ) || false;
+          const metaKey =
+            SafeExtractor.extractBooleanProperty(keyEventLike, 'metaKey') ||
+            false;
+          const ctrlKey =
+            SafeExtractor.extractBooleanProperty(keyEventLike, 'ctrlKey') ||
+            false;
+          const altKey =
+            SafeExtractor.extractBooleanProperty(keyEventLike, 'altKey') ||
+            false;
+          const shiftKey =
+            SafeExtractor.extractBooleanProperty(keyEventLike, 'shiftKey') ||
+            false;
           const keyCode = SafeExtractor.extractNumberProperty(
             keyEventLike,
             'keyCode'

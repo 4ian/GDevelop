@@ -257,8 +257,7 @@ const getPriceAndRequestsTextAndTooltip = ({
       ) : (
         <Trans>
           You can also use credits once your quota is reached. Each answer from
-          the AI costs {priceText} credits. It depends on the amount of work
-          needed to answer.
+          the AI costs {priceText} credits.
         </Trans>
       )}
       {quota.limitReached ? creditsText : null}

@@ -851,7 +851,9 @@ const generateExtensionRawText = (
                   propertyMetadata.getDescription()
                     ? `- **${propertyMetadata.getLabel()}**: ${propertyMetadata.getDescription()}.`
                     : `- **${propertyMetadata.getLabel()}**.`,
-                  `Default value is \`${propertyMetadata.getValue()}\`. For events, write: \`"${propertyName}"\`.`,
+                  propertyMetadata.getValue()
+                    ? `Default value is \`${propertyMetadata.getValue()}\`. For events, write: \`"${propertyName}"\`.`
+                    : `For events, write: \`"${propertyName}"\`.`,
                 ].join(' ');
               }),
               '',

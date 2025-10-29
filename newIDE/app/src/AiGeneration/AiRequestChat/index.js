@@ -297,8 +297,9 @@ const getSendButtonLabel = ({
   hasOpenedProject: boolean,
   standAloneForm?: boolean,
 |}): React.Node => {
-  if (aiRequest) {
-    // We're in a running chat, hide label, except if need to upgrade/buy credits.
+  if (aiRequest && !standAloneForm) {
+    // We're in a running chat, that is not standalone,
+    // hide label, except if need to upgrade/buy credits.
     return hasReachedLimitAndCannotUseCredits ? (
       hasSubcription ? (
         <Trans>Get credits</Trans>

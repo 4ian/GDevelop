@@ -666,7 +666,6 @@ const CreateSection = ({
                 </ColumnStackLayout>
               )}
             </ColumnStackLayout>
-            )}
           </SectionRow>
         </SectionContainer>
       )}

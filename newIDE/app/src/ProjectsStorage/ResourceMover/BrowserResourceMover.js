@@ -8,9 +8,7 @@ import {
 import CloudStorageProvider from '../CloudStorageProvider';
 import UrlStorageProvider from '../UrlStorageProvider';
 import DownloadFileStorageProvider from '../DownloadFileStorageProvider';
-import {
-  moveUrlResourcesToCloudProject,
-} from '../CloudStorageProvider/CloudResourceMover';
+import { moveUrlResourcesToCloudProject } from '../CloudStorageProvider/CloudResourceMover';
 
 const moveNothing = async () => {
   return {
@@ -34,7 +32,6 @@ const movers: {
   [`${UrlStorageProvider.internalName}=>${
     CloudStorageProvider.internalName
   }`]: moveUrlResourcesToCloudProject,
-
 
   // Moving to "DownloadFile":
 

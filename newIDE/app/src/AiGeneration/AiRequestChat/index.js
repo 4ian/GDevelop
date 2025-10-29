@@ -151,7 +151,7 @@ const getPriceAndRequestsTextAndTooltip = ({
 
   const requestsLeft = quota.max - quota.current;
 
-  const quotaText = isMobile ? (
+  const currentQuotaText = isMobile ? (
     increaseQuotaOffering === 'subscribe' ? (
       requestsLeft === 1 ? (
         <Trans>{requestsLeft} trial request left</Trans>
@@ -161,9 +161,7 @@ const getPriceAndRequestsTextAndTooltip = ({
     ) : requestsLeft === 1 ? (
       <Trans>{requestsLeft} request left</Trans>
     ) : (
-      <Trans>
-        {requestsLeft} of {quota.max} requests left
-      </Trans>
+      <Trans>{requestsLeft} requests left</Trans>
     )
   ) : quota.period === '30days' ? (
     increaseQuotaOffering === 'subscribe' ? (
@@ -175,9 +173,7 @@ const getPriceAndRequestsTextAndTooltip = ({
     ) : requestsLeft === 1 ? (
       <Trans>{requestsLeft} request left this month</Trans>
     ) : (
-      <Trans>
-        {requestsLeft} of {quota.max} requests left this month
-      </Trans>
+      <Trans>{requestsLeft} requests left this month</Trans>
     )
   ) : quota.period === '7days' ? (
     increaseQuotaOffering === 'subscribe' ? (
@@ -189,9 +185,7 @@ const getPriceAndRequestsTextAndTooltip = ({
     ) : requestsLeft === 1 ? (
       <Trans>{requestsLeft} request left this week</Trans>
     ) : (
-      <Trans>
-        {requestsLeft} of {quota.max} requests left this week
-      </Trans>
+      <Trans>{requestsLeft} requests left this week</Trans>
     )
   ) : quota.period === '1day' ? (
     increaseQuotaOffering === 'subscribe' ? (
@@ -203,9 +197,7 @@ const getPriceAndRequestsTextAndTooltip = ({
     ) : requestsLeft === 1 ? (
       <Trans>{requestsLeft} request left today</Trans>
     ) : (
-      <Trans>
-        {requestsLeft} of {quota.max} requests left today
-      </Trans>
+      <Trans>{requestsLeft} requests left today</Trans>
     )
   ) : requestsLeft === 1 ? (
     <Trans>{requestsLeft} request left</Trans>
@@ -235,7 +227,9 @@ const getPriceAndRequestsTextAndTooltip = ({
 
   const tooltipText = (
     <ColumnStackLayout noMargin>
-      {quotaText}
+      <Line noMargin>
+        {currentQuotaText} <Trans>(out of {quota.max} requests)</Trans>
+      </Line>
       {increaseQuotaOffering === 'subscribe' ? (
         <Trans>Get GDevelop premium to get more requests.</Trans>
       ) : (
@@ -270,8 +264,8 @@ const getPriceAndRequestsTextAndTooltip = ({
     </Tooltip>
   );
   const text = shouldShowText ? (
-    <Text size="body-small" color="secondary" noMargin>
-      {quota.limitReached ? creditsText : quotaText}
+    <Text size="body-small" color="secondary">
+      {quota.limitReached ? creditsText : currentQuotaText}
     </Text>
   ) : null;
   return { text, tooltipInfoIcon };
@@ -522,7 +516,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     const { isMobile } = useResponsiveWindowSize();
 
     const errorText = lastSendError ? (
-      <Text size="body-small" color="error" noMargin>
+      <Text size="body-small" color="error">
         <Trans>
           An error happened when sending your request, please try again.
         </Trans>
@@ -643,110 +637,84 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 });
               }}
             >
-              <ColumnStackLayout justifyContent="center" noMargin>
-                <Column noMargin alignItems="stretch" justifyContent="stretch">
-                  <Spacer />
-                  <CompactTextAreaFieldWithControls
-                    maxLength={6000}
-                    value={userRequestTextPerAiRequestId[''] || ''}
-                    disabled={isWorking}
-                    neonCorner
-                    hasAnimatedNeonCorner={isWorking}
-                    errored={!!lastSendError}
-                    onChange={userRequestText => {
-                      onUserRequestTextChange(userRequestText, '');
-                    }}
-                    onNavigateHistory={handleNavigateHistory}
-                    onSubmit={() => {
-                      onStartNewAiRequest({
-                        mode: aiRequestMode,
-                        userRequest: userRequestTextPerAiRequestId[''],
-                        aiConfigurationPresetId: chosenOrDefaultAiConfigurationPresetId,
-                      });
-                    }}
-                    placeholder={
-                      isWorking
-                        ? t`Thinking about your request...`
-                        : newChatPlaceholder
-                    }
-                    rows={standAloneForm ? 2 : 5}
-                    controls={
-                      <Column>
-                        <LineStackLayout
-                          alignItems="flex-end"
-                          justifyContent="space-between"
-                        >
-                          <Column noMargin>
-                            <AiConfigurationPresetSelector
-                              chosenOrDefaultAiConfigurationPresetId={
-                                chosenOrDefaultAiConfigurationPresetId
-                              }
-                              setAiConfigurationPresetId={
-                                setAiConfigurationPresetId
-                              }
-                              aiConfigurationPresetsWithAvailability={
-                                aiConfigurationPresetsWithAvailability
-                              }
-                              aiRequestMode={aiRequestMode}
-                              disabled={isWorking}
-                            />
-                            {isMobile && priceAndRequestsText && (
-                              <Column>
-                                <Line noMargin alignItems="center">
-                                  {priceAndRequestsText}
-                                  {priceAndRequestsTooltipInfoIcon}
-                                </Line>
-                              </Column>
-                            )}
-                          </Column>
-                          <LineStackLayout
-                            alignItems="flex-end"
-                            justifyContent="flex-end"
-                            expand
-                            noMargin
-                          >
-                            {(!isMobile || !priceAndRequestsText) && (
-                              <Line noMargin alignItems="center">
-                                {priceAndRequestsText}
-                                {priceAndRequestsTooltipInfoIcon}
-                              </Line>
-                            )}
-                            <RaisedButton
-                              color="primary"
-                              icon={sendButtonIcon}
-                              label={sendButtonLabel}
-                              style={{ flexShrink: 0 }}
-                              disabled={
-                                isWorking ||
-                                (!userRequestTextPerAiRequestId[aiRequestId] &&
-                                  !hasReachedLimitAndCannotUseCredits)
-                              }
-                              onClick={() => {
-                                onStartNewAiRequest({
-                                  mode: aiRequestMode,
-                                  userRequest:
-                                    userRequestTextPerAiRequestId[''],
-                                  aiConfigurationPresetId: chosenOrDefaultAiConfigurationPresetId,
-                                });
-                              }}
-                            />
-                          </LineStackLayout>
-                        </LineStackLayout>
-                      </Column>
-                    }
-                  />
-                </Column>
-                <Line noMargin>
-                  <LineStackLayout
-                    noMargin
-                    alignItems="center"
-                    justifyContent="space-between"
-                    expand
-                  >
-                    {errorText || ''}
-                  </LineStackLayout>
+              <Column noMargin alignItems="stretch" justifyContent="stretch">
+                <Spacer />
+                <CompactTextAreaFieldWithControls
+                  maxLength={6000}
+                  value={userRequestTextPerAiRequestId[''] || ''}
+                  disabled={isWorking}
+                  neonCorner
+                  hasAnimatedNeonCorner={isWorking}
+                  errored={!!lastSendError}
+                  onChange={userRequestText => {
+                    onUserRequestTextChange(userRequestText, '');
+                  }}
+                  onNavigateHistory={handleNavigateHistory}
+                  onSubmit={() => {
+                    onStartNewAiRequest({
+                      mode: aiRequestMode,
+                      userRequest: userRequestTextPerAiRequestId[''],
+                      aiConfigurationPresetId: chosenOrDefaultAiConfigurationPresetId,
+                    });
+                  }}
+                  placeholder={
+                    isWorking
+                      ? t`Thinking about your request...`
+                      : newChatPlaceholder
+                  }
+                  rows={standAloneForm ? 2 : 5}
+                  controls={
+                    <Column>
+                      <LineStackLayout
+                        alignItems="flex-end"
+                        justifyContent="space-between"
+                      >
+                        <AiConfigurationPresetSelector
+                          chosenOrDefaultAiConfigurationPresetId={
+                            chosenOrDefaultAiConfigurationPresetId
+                          }
+                          setAiConfigurationPresetId={
+                            setAiConfigurationPresetId
+                          }
+                          aiConfigurationPresetsWithAvailability={
+                            aiConfigurationPresetsWithAvailability
+                          }
+                          aiRequestMode={aiRequestMode}
+                          disabled={isWorking}
+                        />
+                        <RaisedButton
+                          color="primary"
+                          icon={sendButtonIcon}
+                          label={sendButtonLabel}
+                          style={{ flexShrink: 0 }}
+                          disabled={
+                            isWorking ||
+                            (!userRequestTextPerAiRequestId[aiRequestId] &&
+                              !hasReachedLimitAndCannotUseCredits)
+                          }
+                          onClick={() => {
+                            onStartNewAiRequest({
+                              mode: aiRequestMode,
+                              userRequest: userRequestTextPerAiRequestId[''],
+                              aiConfigurationPresetId: chosenOrDefaultAiConfigurationPresetId,
+                            });
+                          }}
+                        />
+                      </LineStackLayout>
+                    </Column>
+                  }
+                />
+                <Line
+                  expand
+                  noMargin
+                  alignItems="center"
+                  justifyContent="flex-end"
+                >
+                  {errorText}
+                  {errorText ? '' : priceAndRequestsText}
+                  {priceAndRequestsTooltipInfoIcon}
                 </Line>
-              </ColumnStackLayout>
+              </Column>
             </form>
           </ColumnStackLayout>
           <Spacer />
@@ -862,7 +830,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       !!requiredGameId &&
       (!project || requiredGameId !== project.getProjectUuid());
     const isForAnotherProjectText = isForAnotherProject ? (
-      <Text size="body-small" color="secondary" align="center" noMargin>
+      <Text size="body-small" color="secondary" align="center">
         <Trans>
           This request is for another project.{' '}
           <Link
@@ -931,11 +899,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             'avoid-soft-keyboard': true,
           })}
         >
-          <ColumnStackLayout
-            justifyContent="stretch"
-            alignItems="stretch"
-            noMargin
-          >
+          <Column justifyContent="stretch" alignItems="stretch" noMargin>
             {aiRequest.mode === 'agent' && isWorking ? (
               <Paper background="dark" variant="outlined">
                 <Column>
@@ -1024,12 +988,8 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                   <Column>
                     <LineStackLayout
                       alignItems="center"
-                      justifyContent="space-between"
+                      justifyContent="flex-end"
                     >
-                      <Line noMargin alignItems="center">
-                        {priceAndRequestsText}
-                        {priceAndRequestsTooltipInfoIcon}
-                      </Line>
                       <RaisedButton
                         color="primary"
                         disabled={
@@ -1052,18 +1012,22 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 }
               />
             )}
-            <Column noMargin alignItems="stretch">
-              <LineStackLayout
-                expand
+            {
+              <Line
                 noMargin
+                expand
                 alignItems="center"
-                justifyContent="space-between"
+                justifyContent="flex-end"
               >
-                {isForAnotherProjectText || errorText || ''}
-                {errorText || isForAnotherProjectText ? null : ''}
-              </LineStackLayout>
-            </Column>
-          </ColumnStackLayout>
+                {isForAnotherProjectText}
+                {isForAnotherProjectText ? '' : errorText}
+                {isForAnotherProjectText || errorText
+                  ? ''
+                  : priceAndRequestsText}
+                {priceAndRequestsTooltipInfoIcon}
+              </Line>
+            }
+          </Column>
         </form>
       </div>
     );

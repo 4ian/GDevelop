@@ -24,7 +24,6 @@ import { makeBrowserS3EventsFunctionCodeWriter } from './EventsFunctionsExtensio
 import Providers from './MainFrame/Providers';
 import ProjectStorageProviders from './ProjectsStorage/ProjectStorageProviders';
 import UrlStorageProvider from './ProjectsStorage/UrlStorageProvider';
-import GoogleDriveStorageProvider from './ProjectsStorage/GoogleDriveStorageProvider';
 import DownloadFileStorageProvider from './ProjectsStorage/DownloadFileStorageProvider';
 import CloudStorageProvider from './ProjectsStorage/CloudStorageProvider';
 import BrowserResourceMover from './ProjectsStorage/ResourceMover/BrowserResourceMover';
@@ -66,7 +65,6 @@ export const create = (authentication: Authentication) => {
           storageProviders={[
             UrlStorageProvider,
             CloudStorageProvider,
-            GoogleDriveStorageProvider,
             DownloadFileStorageProvider,
           ]}
           defaultStorageProvider={UrlStorageProvider}

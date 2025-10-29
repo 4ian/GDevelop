@@ -105,7 +105,7 @@ type Props = {|
   windowSize: WindowSizeType,
 
   scope: EventsScope,
-  resourcesManager: gdResourcesManager,
+  resourcesManager: gdResourcesContainer,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
@@ -216,7 +216,6 @@ const Instruction = (props: Props) => {
     onMoveToInstruction,
     onContextMenu,
     id,
-    resourcesManager,
     scope,
   } = props;
   const instrFormatter = React.useMemo(
@@ -365,7 +364,9 @@ const Instruction = (props: Props) => {
               const resourceName = instruction
                 .getParameter(parameterIndex)
                 .getPlainString();
-              expressionIsValid = resourcesManager.hasResource(resourceName);
+              expressionIsValid = projectScopedContainers
+                .getResourcesContainersList()
+                .hasResourceNamed(resourceName);
             }
             if (
               expressionIsValid &&

@@ -86,6 +86,9 @@ export const NoProjectOpen = () => {
                   isOpen
                   hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
                   resourceManagementProps={fakeResourceManagementProps}
+                  projectScopedContainersAccessor={
+                    testProject.testSceneProjectScopedContainersAccessor
+                  }
                   gamesList={{
                     games: null,
                     fetchGames: async () => {},
@@ -158,6 +161,9 @@ export const ProjectOpen = () => {
                   isOpen
                   hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
                   resourceManagementProps={fakeResourceManagementProps}
+                  projectScopedContainersAccessor={
+                    testProject.testSceneProjectScopedContainersAccessor
+                  }
                   gamesList={{
                     games: null,
                     fetchGames: async () => {},

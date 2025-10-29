@@ -21,6 +21,9 @@ export const ButtonObject = () => (
   <SerializedObjectDisplay object={testProject.customObject.getConfiguration()}>
     <CustomObjectPropertiesEditor
       objectConfiguration={testProject.customObject.getConfiguration()}
+      projectScopedContainersAccessor={
+        testProject.testSceneProjectScopedContainersAccessor
+      }
       project={testProject.project}
       layout={testProject.testLayout}
       eventsFunctionsExtension={null}

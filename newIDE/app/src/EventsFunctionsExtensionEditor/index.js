@@ -170,6 +170,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   _propertyVariablesContainer: gdVariablesContainer = new gd.VariablesContainer(
     gd.VariablesContainer.Properties
   );
+  _parameterResourcesContainer: gdResourcesContainer = new gd.ResourcesContainer(
+    gd.ResourcesContainer.Parameters
+  );
+  _propertyResourcesContainer: gdResourcesContainer = new gd.ResourcesContainer(
+    gd.ResourcesContainer.Properties
+  );
   _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = null;
 
   componentDidMount() {
@@ -223,7 +229,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       scope,
       this._objectsContainer,
       this._parameterVariablesContainer,
-      this._propertyVariablesContainer
+      this._propertyVariablesContainer,
+      this._parameterResourcesContainer,
+      this._propertyResourcesContainer
     );
   };
 

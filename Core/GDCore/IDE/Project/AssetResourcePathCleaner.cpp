@@ -6,7 +6,7 @@
 
 #include "AssetResourcePathCleaner.h"
 #include "GDCore/Project/Project.h"
-#include "GDCore/Project/ResourcesManager.h"
+#include "GDCore/Project/ResourcesContainer.h"
 #include "GDCore/String.h"
 
 namespace gd {

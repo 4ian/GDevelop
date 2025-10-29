@@ -12,6 +12,7 @@
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/ParameterMetadataContainer.h"
 #include "GDCore/Project/PropertiesContainer.h"
+#include "GDCore/Project/ResourcesContainer.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/Project/EventsFunction.h"
 #include "GDCore/Project/Object.h"
@@ -167,6 +168,58 @@ void EventsFunctionTools::PropertiesToVariablesContainer(
       auto &variable = outputVariablesContainer.InsertNew(
           property.GetName(), outputVariablesContainer.Count());
       variable.SetBool(false);
+    }
+  }
+}
+
+void EventsFunctionTools::ParametersToResourcesContainer(
+    const ParameterMetadataContainer &parameters,
+    gd::ResourcesContainer &outputResourcesContainer) {
+  if (outputResourcesContainer.GetSourceType() !=
+      gd::ResourcesContainer::SourceType::Parameters) {
+    throw std::logic_error("Tried to generate a resources container from "
+                           "parameters with the wrong source type.");
+  }
+  outputResourcesContainer.Clear();
+
+  gd::String lastObjectName;
+  for (std::size_t i = 0; i < parameters.GetParametersCount(); ++i) {
+    const auto &parameter = parameters.GetParameter(i);
+    if (parameter.GetName().empty())
+      continue;
+
+    auto &valueTypeMetadata = parameter.GetValueTypeMetadata();
+    if (valueTypeMetadata.IsResource()) {
+      outputResourcesContainer.AddResource(
+          parameter.GetName(), "",
+          gd::ValueTypeMetadata::GetResourceType(valueTypeMetadata.GetName()));
+    }
+  }
+}
+
+void EventsFunctionTools::PropertiesToResourcesContainer(
+    const PropertiesContainer &properties,
+    gd::ResourcesContainer &outputResourcesContainer) {
+  if (outputResourcesContainer.GetSourceType() !=
+      gd::ResourcesContainer::SourceType::Properties) {
+    throw std::logic_error("Tried to generate a resources container from "
+                           "properties with the wrong source type.");
+  }
+  outputResourcesContainer.Clear();
+
+  gd::String lastObjectName;
+  for (std::size_t i = 0; i < properties.GetCount(); ++i) {
+    const auto &property = properties.Get(i);
+    if (property.GetName().empty()) {
+      continue;
+    }
+    auto &extraInfos = property.GetExtraInfo();
+    if (extraInfos.size() == 0) {
+      continue;
+    }
+    if (property.GetType() == "Resource") {
+      outputResourcesContainer.AddResource(property.GetName(), "",
+                                           extraInfos[0]);
     }
   }
 }

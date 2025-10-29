@@ -83,6 +83,8 @@ import { ColumnStackLayout } from '../UI/Layout';
 import { isMacLike } from '../Utils/Platform';
 import optionalRequire from '../Utils/OptionalRequire';
 import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+
 const electron = optionalRequire('electron');
 
 export const getProjectManagerItemId = (identifier: string) =>
@@ -430,6 +432,8 @@ type Props = {|
   mainMenuCallbacks: MainMenuCallbacks,
   buildMainMenuProps: BuildMainMenuProps,
 
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor | null,
+
   // For resources:
   resourceManagementProps: ResourceManagementProps,
 
@@ -462,6 +466,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       onInstallExtension,
       onShareProject,
       resourceManagementProps,
+      projectScopedContainersAccessor,
       gamesList,
       onOpenHomePage,
       toggleProjectManager,
@@ -1412,19 +1417,26 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                       <Trans>To begin, open or create a new project.</Trans>
                     </EmptyMessage>
                   )}
-                  {project && projectPropertiesDialogOpen && (
-                    <ProjectPropertiesDialog
-                      open
-                      initialTab={projectPropertiesDialogInitialTab}
-                      project={project}
-                      onClose={() => setProjectPropertiesDialogOpen(false)}
-                      onApply={onSaveProjectProperties}
-                      onPropertiesApplied={onProjectPropertiesApplied}
-                      resourceManagementProps={resourceManagementProps}
-                      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-                      i18n={i18n}
-                    />
-                  )}
+                  {projectPropertiesDialogOpen &&
+                    project &&
+                    projectScopedContainersAccessor && (
+                      <ProjectPropertiesDialog
+                        open
+                        initialTab={projectPropertiesDialogInitialTab}
+                        project={project}
+                        onClose={() => setProjectPropertiesDialogOpen(false)}
+                        onApply={onSaveProjectProperties}
+                        onPropertiesApplied={onProjectPropertiesApplied}
+                        resourceManagementProps={resourceManagementProps}
+                        projectScopedContainersAccessor={
+                          projectScopedContainersAccessor
+                        }
+                        hotReloadPreviewButtonProps={
+                          hotReloadPreviewButtonProps
+                        }
+                        i18n={i18n}
+                      />
+                    )}
                   {project && projectVariablesEditorOpen && (
                     <GlobalVariablesDialog
                       project={project}
@@ -1438,26 +1450,31 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                       isListLocked={false}
                     />
                   )}
-                  {project && !!editedPropertiesLayout && (
-                    <ScenePropertiesDialog
-                      open
-                      layout={editedPropertiesLayout}
-                      project={project}
-                      onApply={() => {
-                        triggerUnsavedChanges();
-                        onOpenLayoutProperties(null);
-                      }}
-                      onClose={() => onOpenLayoutProperties(null)}
-                      onEditVariables={() => {
-                        onOpenLayoutVariables(editedPropertiesLayout);
-                        onOpenLayoutProperties(null);
-                      }}
-                      resourceManagementProps={resourceManagementProps}
-                      onBackgroundColorChanged={() => {
-                        // TODO This can probably wait the rework of scene properties.
-                      }}
-                    />
-                  )}
+                  {!!editedPropertiesLayout &&
+                    project &&
+                    projectScopedContainersAccessor && (
+                      <ScenePropertiesDialog
+                        open
+                        layout={editedPropertiesLayout}
+                        project={project}
+                        onApply={() => {
+                          triggerUnsavedChanges();
+                          onOpenLayoutProperties(null);
+                        }}
+                        onClose={() => onOpenLayoutProperties(null)}
+                        onEditVariables={() => {
+                          onOpenLayoutVariables(editedPropertiesLayout);
+                          onOpenLayoutProperties(null);
+                        }}
+                        resourceManagementProps={resourceManagementProps}
+                        projectScopedContainersAccessor={
+                          projectScopedContainersAccessor
+                        }
+                        onBackgroundColorChanged={() => {
+                          // TODO This can probably wait the rework of scene properties.
+                        }}
+                      />
+                    )}
                   {project && !!editedVariablesLayout && (
                     <SceneVariablesDialog
                       open

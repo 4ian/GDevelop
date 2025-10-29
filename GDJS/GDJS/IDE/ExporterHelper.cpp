@@ -1386,7 +1386,7 @@ void ExporterHelper::ExportResources(gd::AbstractFileSystem &fs,
 
 void ExporterHelper::AddDeprecatedFontFilesToFontResources(
     gd::AbstractFileSystem &fs,
-    gd::ResourcesManager &resourcesManager,
+    gd::ResourcesContainer &resourcesManager,
     const gd::String &exportDir,
     gd::String urlPrefix) {
   // Compatibility with GD <= 5.0-beta56

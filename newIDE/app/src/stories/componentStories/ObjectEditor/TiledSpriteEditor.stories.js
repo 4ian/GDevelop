@@ -21,6 +21,9 @@ export const Default = () => (
   <SerializedObjectDisplay object={testProject.tiledSpriteObjectConfiguration}>
     <TiledSpriteEditor
       objectConfiguration={testProject.tiledSpriteObjectConfiguration}
+      projectScopedContainersAccessor={
+        testProject.testSceneProjectScopedContainersAccessor
+      }
       project={testProject.project}
       layout={testProject.testLayout}
       eventsFunctionsExtension={null}

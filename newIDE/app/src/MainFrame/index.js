@@ -220,6 +220,7 @@ import {
 } from '../EmbeddedGame/EmbeddedGameFrame';
 import StandaloneDialog from './StandAloneDialog';
 import { useInGameEditorSettings } from '../EmbeddedGame/InGameEditorSettings';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -4529,6 +4530,14 @@ const MainFrame = (props: Props) => {
       onResourceUsageChanged,
     ]
   );
+ 
+  const projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = React.useMemo(
+    () =>
+      currentProject
+        ? new ProjectScopedContainersAccessor({ project: currentProject })
+        : null,
+    [currentProject]
+  );
 
   const {
     onSelectExampleShortHeader,
@@ -4782,6 +4791,7 @@ const MainFrame = (props: Props) => {
           isOpen={projectManagerOpen}
           hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
           resourceManagementProps={resourceManagementProps}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
           gamesList={gamesList}
           onOpenHomePage={openHomePage}
           toggleProjectManager={toggleProjectManager}

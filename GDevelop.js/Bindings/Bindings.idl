@@ -657,7 +657,7 @@ interface Project {
 
     [Ref] VariablesContainer GetVariables();
     [Ref] ObjectsContainer GetObjects();
-    [Ref] ResourcesManager GetResourcesManager();
+    [Ref] ResourcesContainer GetResourcesManager();
 
     void SetSceneResourcesPreloading([Const] DOMString resourcesPreloading);
     [Const, Ref] DOMString GetSceneResourcesPreloading();
@@ -724,7 +724,8 @@ interface ProjectScopedContainers {
         [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
         [Const, Ref] EventsFunction eventsFunction,
         [Ref] ObjectsContainer parameterObjectsContainer,
-        [Ref] VariablesContainer parameterVariablesContainer);
+        [Ref] VariablesContainer parameterVariablesContainer,
+        [Ref] ResourcesContainer parameterResourcesContainer);
 
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForBehaviorEventsFunction(
         [Const, Ref] Project project,
@@ -733,7 +734,9 @@ interface ProjectScopedContainers {
         [Const, Ref] EventsFunction eventsFunction,
         [Ref] ObjectsContainer parameterObjectsContainer,
         [Ref] VariablesContainer parameterVariablesContainer,
-        [Ref] VariablesContainer propertyVariablesContainer);
+        [Ref] VariablesContainer propertyVariablesContainer,
+        [Ref] ResourcesContainer parameterResourcesContainer,
+        [Ref] ResourcesContainer propertyResourcesContainer);
 
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForObjectEventsFunction(
         [Const, Ref] Project project,
@@ -742,7 +745,9 @@ interface ProjectScopedContainers {
         [Const, Ref] EventsFunction eventsFunction,
         [Ref] ObjectsContainer parameterObjectsContainer,
         [Ref] VariablesContainer parameterVariablesContainer,
-        [Ref] VariablesContainer propertyVariablesContainer);
+        [Ref] VariablesContainer propertyVariablesContainer,
+        [Ref] ResourcesContainer parameterResourcesContainer,
+        [Ref] ResourcesContainer propertyResourcesContainer);
 
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForEventsBasedObject(
         [Const, Ref] Project project,
@@ -762,6 +767,7 @@ interface ProjectScopedContainers {
 
   [Const, Ref] ObjectsContainersList GetObjectsContainersList();
   [Const, Ref] VariablesContainersList GetVariablesContainersList();
+  [Const, Ref] ResourcesContainersList GetResourcesContainersList();
 };
 
 interface ExtensionProperties {
@@ -1302,8 +1308,17 @@ interface Resource {
     void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
-interface ResourcesManager {
-    void ResourcesManager();
+enum ResourcesContainer_SourceType {
+  "ResourcesContainer::Unknown",
+  "ResourcesContainer::Global",
+  "ResourcesContainer::Parameters",
+  "ResourcesContainer::Properties",
+};
+
+interface ResourcesContainer {
+    void ResourcesContainer(ResourcesContainer_SourceType sourceType);
+
+    ResourcesContainer_SourceType GetSourceType();
 
     [Value] VectorString GetAllResourceNames();
     [Value] VectorString FindFilesNotInResources([Const, Ref] VectorString filesToCheck);
@@ -1318,6 +1333,15 @@ interface ResourcesManager {
     boolean MoveResourceUpInList([Const] DOMString oldName);
     boolean MoveResourceDownInList([Const] DOMString oldName);
     void MoveResource(unsigned long oldIndex, unsigned long newIndex);
+};
+
+interface ResourcesContainersList {
+  boolean HasResourceNamed([Const] DOMString name);
+  [Const, Ref] Resource GetResource([Const] DOMString name);
+  [Const, Ref] ResourcesContainer GetResourcesContainerFromResourceName([Const] DOMString resourceName);
+
+  [Const, Ref] ResourcesContainer GetResourcesContainer(unsigned long index);
+  unsigned long GetResourcesContainersCount();
 };
 
 interface ImageResource {
@@ -3464,7 +3488,7 @@ interface ArbitraryResourceWorker {
 };
 [JSImplementation=ArbitraryResourceWorker]
 interface ArbitraryResourceWorkerJS {
-    void ArbitraryResourceWorkerJS([Ref] ResourcesManager resourcesManager);
+    void ArbitraryResourceWorkerJS([Ref] ResourcesContainer resourcesManager);
 
     void ExposeImage([Ref] DOMString image);
     void ExposeShader([Ref] DOMString shader);
@@ -3472,7 +3496,7 @@ interface ArbitraryResourceWorkerJS {
 };
 
 interface ResourcesMergingHelper {
-    void ResourcesMergingHelper([Ref] ResourcesManager resourcesManager, [Ref] AbstractFileSystem fs);
+    void ResourcesMergingHelper([Ref] ResourcesContainer resourcesManager, [Ref] AbstractFileSystem fs);
 
     void SetBaseDirectory([Const] DOMString basePath);
     [Ref] MapStringString GetAllResourcesOldAndNewFilename();
@@ -3480,7 +3504,7 @@ interface ResourcesMergingHelper {
 ResourcesMergingHelper implements ArbitraryResourceWorker;
 
 interface ResourcesRenamer {
-    void ResourcesRenamer([Ref] ResourcesManager resourcesManager, [Const, Ref] MapStringString oldToNewNames);
+    void ResourcesRenamer([Ref] ResourcesContainer resourcesManager, [Const, Ref] MapStringString oldToNewNames);
 };
 ResourcesRenamer implements ArbitraryResourceWorker;
 
@@ -3494,7 +3518,7 @@ interface ProjectResourcesCopier {
 };
 
 interface ObjectsUsingResourceCollector {
-    void ObjectsUsingResourceCollector([Ref] ResourcesManager resourcesManager, [Const] DOMString resourceName);
+    void ObjectsUsingResourceCollector([Ref] ResourcesContainer resourcesManager, [Const] DOMString resourceName);
     [Const, Ref] VectorString GetObjectNames();
 
     //Inherited from ArbitraryObjectsWorker
@@ -3502,7 +3526,7 @@ interface ObjectsUsingResourceCollector {
 };
 
 interface ResourcesInUseHelper {
-    void ResourcesInUseHelper([Ref] ResourcesManager resourcesManager);
+    void ResourcesInUseHelper([Ref] ResourcesContainer resourcesManager);
 
     [Const, Ref] VectorString GetAllResources();
     [Ref] SetString GetAllImages();

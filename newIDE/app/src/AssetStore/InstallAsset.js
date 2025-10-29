@@ -47,7 +47,7 @@ export const installResource = (
     return;
   }
 
-  const resourcesManager: gdResourcesManager = project.getResourcesManager();
+  const resourcesManager: gdResourcesContainer = project.getResourcesManager();
 
   // Check if the resource that must be installed is already present. Use the "origin"
   // of the resource (if present), otherwise for compatibility we use the URL.

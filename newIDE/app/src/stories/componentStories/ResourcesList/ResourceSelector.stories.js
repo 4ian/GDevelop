@@ -20,6 +20,9 @@ export const ImageNotSelected = () => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
+    projectScopedContainersAccessor={
+      testProject.testSceneProjectScopedContainersAccessor
+    }
     resourceManagementProps={fakeResourceManagementProps}
     initialResourceName=""
     onChange={action('on change')}
@@ -31,6 +34,9 @@ export const ImageSelected = () => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
+    projectScopedContainersAccessor={
+      testProject.testSceneProjectScopedContainersAccessor
+    }
     resourceManagementProps={fakeResourceManagementProps}
     initialResourceName="icon128.png"
     onChange={action('on change')}
@@ -42,6 +48,9 @@ export const ImageWithMultipleExternalEditors = () => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
+    projectScopedContainersAccessor={
+      testProject.testSceneProjectScopedContainersAccessor
+    }
     resourceManagementProps={{
       getStorageProvider: () => emptyStorageProvider,
       onFetchNewlyAddedResources: async () => {},
@@ -75,6 +84,9 @@ export const NotExisting = () => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
+    projectScopedContainersAccessor={
+      testProject.testSceneProjectScopedContainersAccessor
+    }
     resourceManagementProps={fakeResourceManagementProps}
     initialResourceName="resource-that-does-not-exists-in-the-project"
     onChange={action('on change')}
@@ -87,6 +99,9 @@ export const ImageNoMargin = () => (
     margin="none"
     resourceKind="image"
     project={testProject.project}
+    projectScopedContainersAccessor={
+      testProject.testSceneProjectScopedContainersAccessor
+    }
     resourceManagementProps={fakeResourceManagementProps}
     initialResourceName="icon128.png"
     onChange={action('on change')}
@@ -98,6 +113,9 @@ export const ImageWithThumbnail = () => (
   <ResourceSelectorWithThumbnail
     resourceKind="image"
     project={testProject.project}
+    projectScopedContainersAccessor={
+      testProject.testSceneProjectScopedContainersAccessor
+    }
     resourceManagementProps={fakeResourceManagementProps}
     resourceName="icon128.png"
     onChange={action('on change')}
@@ -108,6 +126,9 @@ export const Audio = () => (
   <ResourceSelector
     resourceKind="audio"
     project={testProject.project}
+    projectScopedContainersAccessor={
+      testProject.testSceneProjectScopedContainersAccessor
+    }
     resourceManagementProps={fakeResourceManagementProps}
     initialResourceName="fake-audio1.mp3"
     onChange={action('on change')}
@@ -120,6 +141,9 @@ export const FontWithResetButton = () => (
     canBeReset
     resourceKind="font"
     project={testProject.project}
+    projectScopedContainersAccessor={
+      testProject.testSceneProjectScopedContainersAccessor
+    }
     resourceManagementProps={fakeResourceManagementProps}
     initialResourceName="font.otf"
     onChange={action('on change')}
@@ -133,6 +157,9 @@ export const FontNoMarginWithResetButton = () => (
     margin="none"
     resourceKind="font"
     project={testProject.project}
+    projectScopedContainersAccessor={
+      testProject.testSceneProjectScopedContainersAccessor
+    }
     resourceManagementProps={fakeResourceManagementProps}
     initialResourceName="font.otf"
     onChange={action('on change')}

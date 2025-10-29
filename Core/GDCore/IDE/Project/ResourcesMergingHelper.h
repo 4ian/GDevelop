@@ -28,7 +28,7 @@ namespace gd {
  */
 class GD_CORE_API ResourcesMergingHelper : public ArbitraryResourceWorker {
 public:
-  ResourcesMergingHelper(gd::ResourcesManager &resourcesManager,
+  ResourcesMergingHelper(gd::ResourcesContainer &resourcesManager,
                          gd::AbstractFileSystem &fileSystem)
       : ArbitraryResourceWorker(resourcesManager),
         preserveDirectoriesStructure(false), preserveAbsoluteFilenames(false),

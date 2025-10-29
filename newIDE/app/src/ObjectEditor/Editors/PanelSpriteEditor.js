@@ -18,6 +18,7 @@ export default class PanelSpriteEditor extends React.Component<
       objectConfiguration,
       project,
       resourceManagementProps,
+      projectScopedContainersAccessor,
       objectName,
       renderObjectNameField,
     } = this.props;
@@ -31,6 +32,7 @@ export default class PanelSpriteEditor extends React.Component<
         <ResourceSelectorWithThumbnail
           project={project}
           resourceManagementProps={resourceManagementProps}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
           resourceKind="image"
           resourceName={panelSpriteConfiguration.getTexture()}
           defaultNewResourceName={objectName}

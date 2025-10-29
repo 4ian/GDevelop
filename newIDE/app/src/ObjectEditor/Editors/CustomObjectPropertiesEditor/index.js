@@ -215,6 +215,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
     object,
     objectName,
     resourceManagementProps,
+    projectScopedContainersAccessor,
     onSizeUpdated,
     onObjectUpdated,
     unsavedChanges,
@@ -472,6 +473,9 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                     instances={[customObjectConfiguration]}
                     project={project}
                     resourceManagementProps={resourceManagementProps}
+                    projectScopedContainersAccessor={
+                      projectScopedContainersAccessor
+                    }
                   />
                   {!customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() && (
                     <>
@@ -665,6 +669,9 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                                             }
                                             eventsBasedObject={
                                               eventsBasedObject
+                                            }
+                                            projectScopedContainersAccessor={
+                                              projectScopedContainersAccessor
                                             }
                                             resourceManagementProps={
                                               resourceManagementProps

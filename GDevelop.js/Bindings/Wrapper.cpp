@@ -89,6 +89,8 @@
 #include <GDCore/Project/PropertiesContainer.h>
 #include <GDCore/Project/PropertiesContainersList.h>
 #include <GDCore/Project/PropertyDescriptor.h>
+#include <GDCore/Project/ResourcesContainer.h>
+#include <GDCore/Project/ResourcesContainersList.h>
 #include <GDCore/Project/Variable.h>
 #include <GDCore/Project/VariablesContainer.h>
 #include <GDCore/Project/VariablesContainersList.h>
@@ -132,7 +134,7 @@
  */
 class ArbitraryResourceWorkerJS : public ArbitraryResourceWorker {
  public:
-   ArbitraryResourceWorkerJS(gd::ResourcesManager &resourcesManager)
+   ArbitraryResourceWorkerJS(gd::ResourcesContainer &resourcesManager)
       : ArbitraryResourceWorker(resourcesManager){};
 
   void ExposeImage(gd::String &arg0) {
@@ -457,6 +459,7 @@ typedef std::map<gd::String, std::map<gd::String, gd::PropertyDescriptor>>
 typedef gd::Variable::Type Variable_Type;
 typedef gd::VariablesContainer::SourceType VariablesContainer_SourceType;
 typedef gd::ObjectsContainer::SourceType ObjectsContainer_SourceType;
+typedef gd::ResourcesContainer::SourceType ResourcesContainer_SourceType;
 typedef std::map<gd::String, gd::SerializerValue> MapStringSerializerValue;
 typedef std::vector<std::pair<gd::String, std::shared_ptr<SerializerElement>>>
     VectorPairStringSharedPtrSerializerElement;
@@ -566,8 +569,6 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
   MakeNewProjectScopedContainersForProjectAndLayout
 #define STATIC_MakeNewProjectScopedContainersForProject \
   MakeNewProjectScopedContainersForProject
-#define STATIC_MakeNewProjectScopedContainersFor \
-  MakeNewProjectScopedContainersFor
 #define STATIC_MakeNewProjectScopedContainersForEventsFunctionsExtension \
   MakeNewProjectScopedContainersForEventsFunctionsExtension
 #define STATIC_MakeNewProjectScopedContainersForFreeEventsFunction \

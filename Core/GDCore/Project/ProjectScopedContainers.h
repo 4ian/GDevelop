@@ -5,6 +5,7 @@
 #include "ObjectsContainersList.h"
 #include "PropertiesContainersList.h"
 #include "VariablesContainersList.h"
+#include "ResourcesContainersList.h"
 #include "VariablesContainer.h"
 
 namespace gd {
@@ -38,12 +39,14 @@ class ProjectScopedContainers {
       const gd::VariablesContainersList &variablesContainersList_,
       const gd::VariablesContainer *legacyGlobalVariables_,
       const gd::VariablesContainer *legacySceneVariables_,
-      const gd::PropertiesContainersList &propertiesContainersList_)
+      const gd::PropertiesContainersList &propertiesContainersList_,
+      const gd::ResourcesContainersList &resourcesContainersList_)
       : objectsContainersList(objectsContainersList_),
         variablesContainersList(variablesContainersList_),
         legacyGlobalVariables(legacyGlobalVariables_),
         legacySceneVariables(legacySceneVariables_),
-        propertiesContainersList(propertiesContainersList_){};
+        propertiesContainersList(propertiesContainersList_),
+        resourcesContainersList(resourcesContainersList_){};
   virtual ~ProjectScopedContainers(){};
 
   static ProjectScopedContainers
@@ -52,13 +55,6 @@ class ProjectScopedContainers {
 
   static ProjectScopedContainers
   MakeNewProjectScopedContainersForProject(const gd::Project &project);
-
-  /**
-   * @deprecated Use another method for an explicit context instead.
-   */
-  static ProjectScopedContainers MakeNewProjectScopedContainersFor(
-      const gd::ObjectsContainer &globalObjectsContainers,
-      const gd::ObjectsContainer &objectsContainers);
 
   static ProjectScopedContainers
   MakeNewProjectScopedContainersForEventsFunctionsExtension(
@@ -71,7 +67,8 @@ class ProjectScopedContainers {
       const gd::EventsFunctionsExtension &eventsFunctionsExtension,
       const gd::EventsFunction &eventsFunction,
       gd::ObjectsContainer &parameterObjectsContainer,
-      gd::VariablesContainer &parameterVariablesContainer);
+      gd::VariablesContainer &parameterVariablesContainer,
+      gd::ResourcesContainer &parameterResourcesContainer);
 
   static ProjectScopedContainers
   MakeNewProjectScopedContainersForBehaviorEventsFunction(
@@ -81,7 +78,9 @@ class ProjectScopedContainers {
       const gd::EventsFunction &eventsFunction,
       gd::ObjectsContainer &parameterObjectsContainer,
       gd::VariablesContainer &parameterVariablesContainer,
-      gd::VariablesContainer &propertyVariablesContainer);
+      gd::VariablesContainer &propertyVariablesContainer,
+      gd::ResourcesContainer &parameterResourcesContainer,
+      gd::ResourcesContainer &propertyResourcesContainer);
 
   static ProjectScopedContainers
   MakeNewProjectScopedContainersForObjectEventsFunction(
@@ -91,7 +90,9 @@ class ProjectScopedContainers {
       const gd::EventsFunction &eventsFunction,
       gd::ObjectsContainer &parameterObjectsContainer,
       gd::VariablesContainer &parameterVariablesContainer,
-    gd::VariablesContainer &propertyVariablesContainer);
+      gd::VariablesContainer &propertyVariablesContainer,
+      gd::ResourcesContainer &parameterResourcesContainer,
+      gd::ResourcesContainer &propertyResourcesContainer);
 
   static ProjectScopedContainers
   MakeNewProjectScopedContainersForEventsBasedObject(
@@ -236,6 +237,10 @@ class ProjectScopedContainers {
     return parametersVectorsList;
   };
 
+  const gd::ResourcesContainersList &GetResourcesContainersList() const {
+    return resourcesContainersList;
+  };
+
   /** Do not use - should be private but accessible to let Emscripten create a
    * temporary. */
   ProjectScopedContainers()
@@ -248,6 +253,7 @@ private:
   const gd::VariablesContainer *legacySceneVariables;
   gd::PropertiesContainersList propertiesContainersList;
   std::vector<const ParameterMetadataContainer *> parametersVectorsList;
+  gd::ResourcesContainersList resourcesContainersList;
 };
 
 }  // namespace gd

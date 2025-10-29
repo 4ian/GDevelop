@@ -55,6 +55,7 @@ import { type ConnectDragSource } from 'react-dnd';
 import ResponsiveFlatButton from '../UI/ResponsiveFlatButton';
 import { Accordion, AccordionHeader, AccordionBody } from '../UI/Accordion';
 import { type Field } from '../CompactPropertiesEditor';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
 
@@ -101,6 +102,7 @@ const Effect = React.forwardRef(
       target,
       project,
       resourceManagementProps,
+      projectScopedContainersAccessor,
       effectsContainer,
       effect,
       removeEffect,
@@ -118,6 +120,7 @@ const Effect = React.forwardRef(
       target: 'object' | 'layer',
       project: gdProject,
       resourceManagementProps: ResourceManagementProps,
+      projectScopedContainersAccessor: ProjectScopedContainersAccessor,
       effectsContainer: gdEffectsContainer,
       effect: gdEffect,
       onEffectsUpdated: () => void,
@@ -345,6 +348,9 @@ const Effect = React.forwardRef(
                     schema={basicPropertiesSchema}
                     project={project}
                     resourceManagementProps={resourceManagementProps}
+                    projectScopedContainersAccessor={
+                      projectScopedContainersAccessor
+                    }
                     renderExtraDescriptionText={
                       showEffectParameterNames
                         ? parameterName =>
@@ -372,6 +378,9 @@ const Effect = React.forwardRef(
                             schema={advancedPropertiesSchema}
                             project={project}
                             resourceManagementProps={resourceManagementProps}
+                            projectScopedContainersAccessor={
+                              projectScopedContainersAccessor
+                            }
                             renderExtraDescriptionText={
                               showEffectParameterNames
                                 ? parameterName =>
@@ -807,6 +816,7 @@ export const useManageEffects = ({
 type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   effectsContainer: gdEffectsContainer,
   onEffectsUpdated: () => void,
   onEffectsRenamed: (oldName: string, newName: string) => void,
@@ -990,6 +1000,9 @@ export default function EffectsList(props: Props) {
                                         layerRenderingType={'3d'}
                                         target={target}
                                         project={project}
+                                        projectScopedContainersAccessor={
+                                          props.projectScopedContainersAccessor
+                                        }
                                         resourceManagementProps={
                                           props.resourceManagementProps
                                         }
@@ -1083,6 +1096,9 @@ export default function EffectsList(props: Props) {
                                         project={project}
                                         resourceManagementProps={
                                           props.resourceManagementProps
+                                        }
+                                        projectScopedContainersAccessor={
+                                          props.projectScopedContainersAccessor
                                         }
                                         effectsContainer={effectsContainer}
                                         effect={effect}

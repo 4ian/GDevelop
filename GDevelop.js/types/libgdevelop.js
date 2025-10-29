@@ -116,7 +116,9 @@ declare class libGDevelop {
   MapStringSerializerValue: Class<gdMapStringSerializerValue>;
   VectorPairStringSharedPtrSerializerElement: Class<gdVectorPairStringSharedPtrSerializerElement>;
   Resource: Class<gdResource>;
-  ResourcesManager: Class<gdResourcesManager>;
+  ResourcesContainer_SourceType: Class<ResourcesContainer_SourceType>;
+  ResourcesContainer: Class<gdResourcesContainer>;
+  ResourcesContainersList: Class<gdResourcesContainersList>;
   ImageResource: Class<gdImageResource>;
   AudioResource: Class<gdAudioResource>;
   FontResource: Class<gdFontResource>;

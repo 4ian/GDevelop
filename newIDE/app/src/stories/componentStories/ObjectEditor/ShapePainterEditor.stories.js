@@ -21,6 +21,9 @@ export const Default = () => (
   <SerializedObjectDisplay object={testProject.shapePainterObjectConfiguration}>
     <ShapePainterEditor
       objectConfiguration={testProject.shapePainterObjectConfiguration}
+      projectScopedContainersAccessor={
+        testProject.testSceneProjectScopedContainersAccessor
+      }
       project={testProject.project}
       layout={testProject.testLayout}
       eventsFunctionsExtension={null}

@@ -3006,6 +3006,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                 <LayerEditorDialog
                   project={project}
                   resourceManagementProps={this.props.resourceManagementProps}
+                  projectScopedContainersAccessor={
+                    this.props.projectScopedContainersAccessor
+                  }
                   layout={layout}
                   eventsFunctionsExtension={eventsFunctionsExtension}
                   eventsBasedObject={eventsBasedObject}
@@ -3038,6 +3041,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                   onEditVariables={() => this.editLayoutVariables(true)}
                   onOpenMoreSettings={this.props.onOpenMoreSettings}
                   resourceManagementProps={this.props.resourceManagementProps}
+                  projectScopedContainersAccessor={
+                    this.props.projectScopedContainersAccessor
+                  }
                   onBackgroundColorChanged={this._sendSetBackgroundColor}
                 />
               )}

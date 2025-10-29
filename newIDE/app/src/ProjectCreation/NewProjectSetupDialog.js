@@ -59,6 +59,7 @@ import Chip from '../UI/Chip';
 import { LineStackLayout } from '../UI/Layout';
 import { BundleStoreContext } from '../AssetStore/Bundles/BundleStoreContext';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
+import { isNativeMobileApp } from '../Utils/Platform';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -770,6 +771,13 @@ const NewProjectSetupDialog = ({
                         disabled={storageProvider.disabled}
                       />
                     ))}
+                  {!electron && !isNativeMobileApp() && (
+                    <SelectOption
+                      value={'FakeLocalFile'}
+                      label={t`Save on your computer: download the GDevelop desktop app`}
+                      disabled
+                    />
+                  )}
                   {shouldAllowCreatingProjectWithoutSaving && (
                     <SelectOption
                       value={emptyStorageProvider.internalName}

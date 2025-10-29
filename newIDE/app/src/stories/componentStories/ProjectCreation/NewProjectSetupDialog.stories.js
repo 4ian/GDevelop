@@ -4,7 +4,6 @@ import { action } from '@storybook/addon-actions';
 
 import paperDecorator from '../../PaperDecorator';
 import NewProjectSetupDialog from '../../../ProjectCreation/NewProjectSetupDialog';
-import GoogleDriveStorageProvider from '../../../ProjectsStorage/GoogleDriveStorageProvider';
 import CloudStorageProvider from '../../../ProjectsStorage/CloudStorageProvider';
 import UrlStorageProvider from '../../../ProjectsStorage/UrlStorageProvider';
 import DownloadFileStorageProvider from '../../../ProjectsStorage/DownloadFileStorageProvider';
@@ -30,7 +29,6 @@ export const OpenAndNotAuthenticated = () => {
         storageProviders={[
           UrlStorageProvider,
           CloudStorageProvider,
-          GoogleDriveStorageProvider,
           DownloadFileStorageProvider,
         ]}
         onClose={() => action('click on close')()}
@@ -59,7 +57,6 @@ export const OpenAndAuthenticated = () => {
         storageProviders={[
           UrlStorageProvider,
           CloudStorageProvider,
-          GoogleDriveStorageProvider,
           DownloadFileStorageProvider,
         ]}
         onClose={() => action('click on close')()}
@@ -89,7 +86,6 @@ export const Opening = () => {
         storageProviders={[
           UrlStorageProvider,
           CloudStorageProvider,
-          GoogleDriveStorageProvider,
           DownloadFileStorageProvider,
         ]}
         onClose={() => action('click on close')()}
@@ -120,7 +116,6 @@ export const LimitsReached = () => {
         storageProviders={[
           CloudStorageProvider,
           UrlStorageProvider,
-          GoogleDriveStorageProvider,
           DownloadFileStorageProvider,
         ]}
         onClose={() => action('click on close')()}
@@ -149,7 +144,6 @@ export const FromExample = () => {
         storageProviders={[
           UrlStorageProvider,
           CloudStorageProvider,
-          GoogleDriveStorageProvider,
           DownloadFileStorageProvider,
         ]}
         onClose={() => action('click on close')()}
@@ -178,7 +172,6 @@ export const FromExampleWithoutGoingBack = () => {
         storageProviders={[
           UrlStorageProvider,
           CloudStorageProvider,
-          GoogleDriveStorageProvider,
           DownloadFileStorageProvider,
         ]}
         onClose={() => action('click on close')()}
@@ -208,7 +201,6 @@ export const FromPrivateGameTemplate = () => {
         storageProviders={[
           UrlStorageProvider,
           CloudStorageProvider,
-          GoogleDriveStorageProvider,
           DownloadFileStorageProvider,
         ]}
         onClose={() => action('click on close')()}
@@ -239,7 +231,6 @@ export const FromPrivateGameTemplateWithoutGoingBack = () => {
         storageProviders={[
           UrlStorageProvider,
           CloudStorageProvider,
-          GoogleDriveStorageProvider,
           DownloadFileStorageProvider,
         ]}
         onClose={() => action('click on close')()}

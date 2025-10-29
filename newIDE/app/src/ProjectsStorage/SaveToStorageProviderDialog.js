@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
@@ -13,12 +13,24 @@ import {
   checkIfHasTooManyCloudProjects,
   MaxProjectCountAlertMessage,
 } from '../MainFrame/EditorContainers/HomePage/CreateSection/MaxProjectCountAlertMessage';
+import Computer from '../UI/CustomSvgIcons/Computer';
+import { isNativeMobileApp } from '../Utils/Platform';
+import optionalRequire from '../Utils/OptionalRequire';
+const electron = optionalRequire('electron');
 
 type Props = {|
   storageProviders: Array<StorageProvider>,
   onChooseProvider: StorageProvider => void,
   onClose: () => void,
 |};
+
+const fakeLocalFileStorageProvider: StorageProvider = {
+  internalName: 'LocalFile',
+  name: t`Downlad GDevelop desktop app to save projects on your computer`,
+  disabled: true,
+  renderIcon: props => <Computer fontSize={props.size} />,
+  createOperations: () => ({}),
+};
 
 const SaveToStorageProviderDialog = ({
   onClose,
@@ -68,6 +80,12 @@ const SaveToStorageProviderDialog = ({
                 )}
             </React.Fragment>
           ))}
+        {!electron && !isNativeMobileApp() && (
+          <StorageProviderListItem
+            onChooseProvider={onChooseProvider}
+            storageProvider={fakeLocalFileStorageProvider}
+          />
+        )}
       </List>
     </Dialog>
   );

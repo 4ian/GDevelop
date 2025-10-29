@@ -5,7 +5,6 @@ import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
 import OpenFromStorageProviderDialogComponent from '../../../ProjectsStorage/OpenFromStorageProviderDialog';
-import GoogleDriveStorageProvider from '../../../ProjectsStorage/GoogleDriveStorageProvider';
 import LocalFileStorageProvider from '../../../ProjectsStorage/LocalFileStorageProvider';
 
 export default {
@@ -15,7 +14,7 @@ export default {
 
 export const OpenFromStorageProviderDialog = () => (
   <OpenFromStorageProviderDialogComponent
-    storageProviders={[GoogleDriveStorageProvider, LocalFileStorageProvider]}
+    storageProviders={[LocalFileStorageProvider]}
     onChooseProvider={action('onChooseProvider')}
     onClose={action('onClose')}
   />

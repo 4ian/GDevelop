@@ -28,10 +28,7 @@ import {
 } from '../ProjectCreation/NewProjectSetupDialog';
 import { type FileMetadata, type StorageProvider } from '../ProjectsStorage';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
-import {
-  sendAiRequestMessageSent,
-  sendAiRequestStarted,
-} from '../Utils/Analytics/EventSender';
+import { sendAiRequestStarted } from '../Utils/Analytics/EventSender';
 import { listAllExamples } from '../Utils/GDevelopServices/Example';
 import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
 import { prepareAiUserContent } from './PrepareAiUserContent';
@@ -331,13 +328,6 @@ export const AskAiStandAloneForm = ({
             });
           }
 
-          const aiRequestChatRefCurrent = aiRequestChatRef.current;
-          if (aiRequestChatRefCurrent) {
-            // Clear both the input for that request and for the new request form.
-            aiRequestChatRefCurrent.resetUserInput('');
-            aiRequestChatRefCurrent.resetUserInput(aiRequest.id);
-          }
-
           sendAiRequestStarted({
             simplifiedProjectJsonLength: 0,
             projectSpecificExtensionsSummaryJsonLength: 0,
@@ -402,14 +392,15 @@ export const AskAiStandAloneForm = ({
 
   const isLoading = isSendingAiRequest(aiRequestIdForForm);
 
-  // Send the results of the function call outputs, if any, and the user message (if any).
+  // Send the results of the function call outputs only.
+  // In a standalone form, the only user message is sent when starting the request.
   const onSendMessage = React.useCallback(
     async ({
-      userMessage,
       createdSceneNames,
+      userMessage,
     }: {|
-      userMessage: string,
       createdSceneNames?: Array<string>,
+      userMessage: string,
     |}) => {
       if (!profile || !aiRequestIdForForm || isLoading) return;
 
@@ -428,37 +419,7 @@ export const AskAiStandAloneForm = ({
       if (hasFunctionsCallsToProcess) return;
 
       // If nothing to send, stop there.
-      if (functionCallOutputs.length === 0 && !userMessage) return;
-
-      // Paying with credits is only when a user message is sent (and quota is exhausted).
-      let payWithCredits = false;
-      if (
-        userMessage &&
-        quota &&
-        quota.limitReached &&
-        aiRequestPriceInCredits
-      ) {
-        payWithCredits = true;
-        if (availableCredits < aiRequestPriceInCredits) {
-          // Not enough credits.
-          if (!hasValidSubscriptionPlan(subscription)) {
-            // User is not subscribed, suggest them to subscribe.
-            openSubscriptionDialog({
-              analyticsMetadata: {
-                reason: 'AI requests (subscribe)',
-                recommendedPlanId: 'gdevelop_gold',
-                placementId: 'ai-requests',
-              },
-            });
-            return;
-          }
-
-          openCreditsPackageDialog({
-            missingCredits: aiRequestPriceInCredits - availableCredits,
-          });
-          return;
-        }
-      }
+      if (functionCallOutputs.length === 0) return;
 
       try {
         setSendingAiRequest(aiRequestIdForForm, true);
@@ -491,52 +452,25 @@ export const AskAiStandAloneForm = ({
             functionCallOutputs,
             ...preparedAiUserContent,
             gameId: project ? project.getProjectUuid() : undefined,
-            payWithCredits,
-            userMessage,
+            payWithCredits: false,
+            userMessage: '', // No user message when sending only function call outputs.
           })
         );
         updateAiRequest(aiRequest.id, aiRequest);
         setSendingAiRequest(aiRequest.id, false);
         clearEditorFunctionCallResults(aiRequest.id);
-
-        if (userMessage) {
-          sendAiRequestMessageSent({
-            simplifiedProjectJsonLength: simplifiedProjectJson
-              ? simplifiedProjectJson.length
-              : 0,
-            projectSpecificExtensionsSummaryJsonLength: projectSpecificExtensionsSummaryJson
-              ? projectSpecificExtensionsSummaryJson.length
-              : 0,
-            payWithCredits,
-            mode: aiRequest.mode || 'chat',
-            aiRequestId: aiRequest.id,
-            outputLength: aiRequest.output.length,
-          });
-        }
       } catch (error) {
         // TODO: update the label of the button to send again.
         setLastSendError(aiRequestIdForForm, error);
       }
 
-      if (userMessage) {
+      if (aiRequestForForm) {
+        // Clear the selected AI request, to be able to start a new one if needed.
         const aiRequestChatRefCurrent = aiRequestChatRef.current;
         if (aiRequestChatRefCurrent) {
           aiRequestChatRefCurrent.resetUserInput('');
           aiRequestChatRefCurrent.resetUserInput(aiRequestIdForForm);
         }
-
-        // Refresh the user limits, to ensure quota and credits information
-        // is up-to-date after an AI request.
-        await delay(500);
-        try {
-          await retryIfFailed({ times: 2 }, onRefreshLimits);
-        } catch (error) {
-          // Ignore limits refresh error.
-        }
-      }
-
-      if (aiRequestForForm) {
-        // Clear the selected AI request, to be able to start a new one if needed.
         setAiRequestIdForForm('');
         // We handle moving the pane here
         // and not in the Mainframe afterCreatingProject function,
@@ -559,30 +493,23 @@ export const AskAiStandAloneForm = ({
       aiRequestIdForForm,
       isLoading,
       getEditorFunctionCallResults,
-      quota,
-      aiRequestPriceInCredits,
-      availableCredits,
-      openCreditsPackageDialog,
       setSendingAiRequest,
       updateAiRequest,
       clearEditorFunctionCallResults,
       getAuthorizationHeader,
       setLastSendError,
-      onRefreshLimits,
       project,
       hasFunctionsCallsToProcess,
       onOpenAskAi,
       onOpenLayout,
-      subscription,
-      openSubscriptionDialog,
       aiRequestForForm,
     ]
   );
   const onSendEditorFunctionCallResults = React.useCallback(
     async (options: null | {| createdSceneNames: Array<string> |}) => {
       await onSendMessage({
-        userMessage: '',
         createdSceneNames: options ? options.createdSceneNames : [],
+        userMessage: '',
       });
     },
     [onSendMessage]

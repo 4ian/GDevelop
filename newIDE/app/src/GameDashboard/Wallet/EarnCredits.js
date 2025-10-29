@@ -19,6 +19,8 @@ import { I18n } from '@lingui/react';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import TextButton from '../../UI/TextButton';
 import RouterContext from '../../MainFrame/RouterContext';
+import FlatButton from '../../UI/FlatButton';
+import MultipleCoins from '../../Credits/Icons/MultipleCoins';
 
 type CreditItemType = 'badge' | 'feedback';
 type BadgeInfo = {|
@@ -40,8 +42,8 @@ const styles = {
   },
   badgeContainer: {
     position: 'relative',
-    width: 65,
-    height: 65,
+    width: 40,
+    height: 40,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -193,49 +195,62 @@ const BadgeItem = ({
       {({ i18n }) => (
         <LineStackLayout expand alignItems="center" noMargin>
           <div style={styles.badgeContainer}>
-            <img
-              src={
-                (hasThisBadge && achievement && achievement.iconUrl) ||
-                'res/badges/empty-badge.svg'
-              }
-              alt="Empty badge"
-              style={styles.badgeImage}
-            />
-            {!hasThisBadge && (
-              <div style={styles.badgeTextContainer}>
-                <Coin style={styles.badgeCoinIcon} />
-                <Text align="center" size="body" noMargin color="inherit">
-                  {achievement ? achievement.rewardValueInCredits : ''}{' '}
-                </Text>
-              </div>
+            {hasThisBadge ? (
+              <img
+                src={
+                  (achievement && achievement.iconUrl) ||
+                  'res/badges/empty-badge.svg'
+                }
+                alt="Empty badge"
+                style={styles.badgeImage}
+              />
+            ) : (
+              <MultipleCoins style={styles.badgeImage} />
             )}
           </div>
           <Column noMargin expand>
-            <Text size="body" noMargin>
-              <b>
+            {hasThisBadge ? (
+              <Text size="body" noMargin>
+                <b>
+                  <Trans>
+                    {(achievement &&
+                      selectMessageByLocale(i18n, achievement.nameByLocale)) ||
+                      '-'}
+                  </Trans>
+                </b>
+              </Text>
+            ) : (
+              <Text size="body" noMargin color="secondary">
                 <Trans>
                   {(achievement &&
-                    selectMessageByLocale(i18n, achievement.nameByLocale)) ||
+                    selectMessageByLocale(
+                      i18n,
+                      achievement.shortDescriptionByLocale
+                    )) ||
                     '-'}
                 </Trans>
-              </b>
-            </Text>
-            <Text size="body" noMargin color="secondary">
-              <Trans>
-                {(achievement &&
-                  selectMessageByLocale(
-                    i18n,
-                    achievement.shortDescriptionByLocale
-                  )) ||
-                  '-'}
-              </Trans>
-            </Text>
+              </Text>
+            )}
           </Column>
-          <TextButton
-            label={!hasBeenClicked ? buttonLabel : <Trans>Claim credits</Trans>}
-            secondary
+          <FlatButton
+            leftIcon={
+              hasThisBadge ? null : <Coin style={styles.badgeCoinIcon} />
+            }
+            label={
+              hasThisBadge ? (
+                <Trans>Owned</Trans>
+              ) : !hasBeenClicked ? (
+                <Trans>
+                  Earn{' '}
+                  {achievement ? achievement.rewardValueInCredits : 'credits'}
+                </Trans>
+              ) : (
+                <Trans>Claim credits</Trans>
+              )
+            }
             onClick={onClick}
             disabled={hasThisBadge}
+            primary
           />
         </LineStackLayout>
       )}

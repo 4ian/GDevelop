@@ -24,7 +24,7 @@ export type CompactTextAreaFieldWithControlsProps = {|
   rows?: number,
   maxLength?: number,
   controls: React.Node,
-  neonCorner?: 'small' | 'large',
+  neonCorner?: boolean,
   hasAnimatedNeonCorner?: boolean,
 |};
 
@@ -142,8 +142,6 @@ export const CompactTextAreaFieldWithControls = React.forwardRef<
               className={classNames({
                 [classes.compactTextAreaField]: true,
                 [classes.neonCorner]: !!neonCorner,
-                [classes.neonCornerSmall]: neonCorner === 'small',
-                [classes.neonCornerLarge]: neonCorner === 'large',
                 [classes.animatedNeonCorner]:
                   !!neonCorner && hasAnimatedNeonCorner,
               })}

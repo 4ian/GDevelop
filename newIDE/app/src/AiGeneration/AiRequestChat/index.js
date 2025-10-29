@@ -134,7 +134,7 @@ const getPriceAndRequestsTextAndTooltip = ({
   price: UsagePrice | null,
   availableCredits: number,
   isMobile: boolean,
-  aiRequestMode?: 'chat' | 'agent',
+  aiRequestMode: 'chat' | 'agent',
   lastUserMessagePriceInCredits?: number | null,
 |}): {|
   text: React.Node | null,
@@ -216,6 +216,22 @@ const getPriceAndRequestsTextAndTooltip = ({
     <Trans>{Math.max(0, availableCredits)} credits available</Trans>
   );
   const priceInCredits = price.priceInCredits;
+  const maximumPriceInCredits =
+    (price.variablePrice &&
+      price.variablePrice[aiRequestMode] &&
+      price.variablePrice[aiRequestMode]['default'] &&
+      price.variablePrice[aiRequestMode]['default'].maximumPriceInCredits) ||
+    null;
+  const minimumPriceInCredits =
+    (price.variablePrice &&
+      price.variablePrice[aiRequestMode] &&
+      price.variablePrice[aiRequestMode]['default'] &&
+      price.variablePrice[aiRequestMode]['default'].minimumPriceInCredits) ||
+    null;
+
+  const priceText = maximumPriceInCredits
+    ? `${minimumPriceInCredits || priceInCredits}-${maximumPriceInCredits}`
+    : minimumPriceInCredits || priceInCredits;
 
   const tooltipText = (
     <ColumnStackLayout noMargin>
@@ -229,9 +245,8 @@ const getPriceAndRequestsTextAndTooltip = ({
         <>
           <Trans>
             You can also use credits once your quota is reached. Each request to
-            the AI agent costs around {priceInCredits} credits. It depends on
-            the amount of work the agent will do and the number of times it
-            generates events.
+            the AI agent costs {priceText} credits. It depends on the amount of
+            work the agent will do and the number of times it generates events.
           </Trans>{' '}
           {lastUserMessagePriceInCredits ? (
             <Trans>
@@ -242,8 +257,8 @@ const getPriceAndRequestsTextAndTooltip = ({
       ) : (
         <Trans>
           You can also use credits once your quota is reached. Each answer from
-          the AI costs around {priceInCredits} credits. It depends on the amount
-          of work needed to answer.
+          the AI costs {priceText} credits. It depends on the amount of work
+          needed to answer.
         </Trans>
       )}
       {quota.limitReached ? creditsText : null}
@@ -252,7 +267,7 @@ const getPriceAndRequestsTextAndTooltip = ({
 
   const tooltipInfoIcon = (
     <Tooltip title={tooltipText}>
-      <CircledInfo />
+      <CircledInfo color="disabled" />
     </Tooltip>
   );
   const text = shouldShowText ? (
@@ -520,6 +535,9 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       price,
       availableCredits,
       isMobile,
+      aiRequestMode,
+      lastUserMessagePriceInCredits:
+        (aiRequest && aiRequest.lastUserMessagePriceInCredits) || null,
     });
     const priceAndRequestsText = priceAndRequestsTextAndTooltip.text;
     const priceAndRequestsTooltipInfoIcon =
@@ -632,7 +650,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                     maxLength={6000}
                     value={userRequestTextPerAiRequestId[''] || ''}
                     disabled={isWorking}
-                    neonCorner={standAloneForm ? 'large' : 'small'}
+                    neonCorner
                     hasAnimatedNeonCorner={isWorking}
                     errored={!!lastSendError}
                     onChange={userRequestText => {
@@ -651,7 +669,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                         ? t`Thinking about your request...`
                         : newChatPlaceholder
                     }
-                    rows={standAloneForm ? 3 : 5}
+                    rows={standAloneForm ? 2 : 5}
                     controls={
                       <Column>
                         <LineStackLayout
@@ -980,7 +998,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 value={userRequestTextPerAiRequestId[aiRequestId] || ''}
                 disabled={isWorking || isForAnotherProject}
                 errored={!!lastSendError}
-                neonCorner="small"
+                neonCorner
                 hasAnimatedNeonCorner={isWorking}
                 onChange={userRequestText =>
                   onUserRequestTextChange(userRequestText, aiRequestId)

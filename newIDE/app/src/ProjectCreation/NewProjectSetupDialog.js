@@ -705,6 +705,7 @@ const NewProjectSetupDialog = ({
                       hideStartingPoints
                       limitRowsTo={6}
                       showLoadMore
+                      disabled={isLoading}
                     />
                   </>
                 ) : (

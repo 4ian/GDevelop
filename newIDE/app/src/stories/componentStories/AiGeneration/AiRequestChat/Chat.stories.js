@@ -87,126 +87,200 @@ const commonProps = {
   onStartOrOpenChat: () => {},
 };
 
-export const NewAiRequest = () => (
-  <FixedHeightFlexContainer height={500}>
+const WrappedChatComponent = (props: any) => (
+  <FixedHeightFlexContainer height={800}>
     <I18n>
-      {({ i18n }) => (
-        <AiRequestChat i18n={i18n} aiRequest={null} {...commonProps} />
-      )}
+      {({ i18n }) => <AiRequestChat i18n={i18n} {...commonProps} {...props} />}
     </I18n>
   </FixedHeightFlexContainer>
 );
 
-export const NewAiRequestAlreadyUsedOneInThePast = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={null}
-          {...commonProps}
-          quota={{
-            limitReached: false,
-            current: 1,
-            max: 2,
-            period: '1day',
-          }}
-          increaseQuotaOffering="upgrade"
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
+export const NewDailyAiRequest = () => (
+  <WrappedChatComponent aiRequest={null} />
+);
+export const NewWeeklyAiRequest = () => (
+  <WrappedChatComponent
+    aiRequest={null}
+    quota={{
+      limitReached: false,
+      current: 1,
+      max: 5,
+      period: '7days',
+    }}
+  />
+);
+export const NewMonthlyAiRequest = () => (
+  <WrappedChatComponent
+    aiRequest={null}
+    quota={{
+      limitReached: false,
+      current: 3,
+      max: 20,
+      period: '30days',
+    }}
+  />
 );
 
-export const ErrorLaunchingNewAiRequest = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={null}
-          {...commonProps}
-          lastSendError={new Error('Fake error while sending request')}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
+export const NewDailyAiRequestAlmostReachedQuota = () => (
+  <WrappedChatComponent
+    aiRequest={null}
+    quota={{
+      limitReached: false,
+      current: 1,
+      max: 2,
+      period: '1day',
+    }}
+    increaseQuotaOffering="upgrade"
+  />
+);
+export const NewWeeklyAiRequestAlmostReachedQuota = () => (
+  <WrappedChatComponent
+    aiRequest={null}
+    quota={{
+      limitReached: false,
+      current: 4,
+      max: 5,
+      period: '7days',
+    }}
+    increaseQuotaOffering="upgrade"
+  />
+);
+export const NewMonthlyAiRequestAlmostReachedQuota = () => (
+  <WrappedChatComponent
+    aiRequest={null}
+    quota={{
+      limitReached: false,
+      current: 18,
+      max: 20,
+      period: '30days',
+    }}
+    increaseQuotaOffering="upgrade"
+  />
 );
 
-export const NewAiRequestQuotaLimitReachedAndNoCredits = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={null}
-          {...commonProps}
-          quota={{
-            limitReached: true,
-            current: 2,
-            max: 2,
-          }}
-          availableCredits={0}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
+export const NewDailyAiRequestQuotaLimitReachedAndSomeCredits = () => (
+  <WrappedChatComponent
+    aiRequest={null}
+    quota={{
+      limitReached: true,
+      current: 2,
+      max: 2,
+      period: '1day',
+    }}
+    availableCredits={400}
+  />
+);
+export const NewWeeklyAiRequestQuotaLimitReachedAndSomeCredits = () => (
+  <WrappedChatComponent
+    aiRequest={null}
+    quota={{
+      limitReached: true,
+      current: 5,
+      max: 5,
+      period: '7days',
+    }}
+    availableCredits={400}
+  />
+);
+export const NewMonthlyAiRequestQuotaLimitReachedAndSomeCredits = () => (
+  <WrappedChatComponent
+    aiRequest={null}
+    quota={{
+      limitReached: true,
+      current: 20,
+      max: 20,
+      period: '30days',
+    }}
+    availableCredits={400}
+  />
 );
 
-export const NewAiRequestQuotaLimitReachedAndSomeCredits = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={null}
-          {...commonProps}
-          quota={{
-            limitReached: true,
-            current: 2,
-            max: 2,
-          }}
-          availableCredits={400}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
+export const NewDailyAiRequestQuotaLimitReachedNoSubscriptionAndNoCredits = () => (
+  <WrappedChatComponent
+    aiRequest={null}
+    quota={{
+      limitReached: true,
+      current: 2,
+      max: 2,
+      period: '1day',
+    }}
+    availableCredits={0}
+  />
+);
+export const NewWeeklyAiRequestQuotaLimitReachedNoSubscriptionAndNoCredits = () => (
+  <WrappedChatComponent
+    aiRequest={null}
+    quota={{
+      limitReached: true,
+      current: 5,
+      max: 5,
+      period: '7days',
+    }}
+    availableCredits={0}
+  />
+);
+export const NewMonthlyAiRequestQuotaLimitReachedNoSubscriptionAndNoCredits = () => (
+  <WrappedChatComponent
+    aiRequest={null}
+    quota={{
+      limitReached: true,
+      current: 20,
+      max: 20,
+      period: '30days',
+    }}
+    availableCredits={0}
+  />
 );
 
-export const NewAiRequestQuotaLimitReachedAndUpgrade = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={null}
-          {...commonProps}
-          quota={{
-            limitReached: true,
-            current: 2,
-            max: 2,
-          }}
-          increaseQuotaOffering="upgrade"
-          availableCredits={400}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
+export const NewDailyAiRequestQuotaLimitReachedSubscriptionAndNoCredits = () => (
+  <WrappedChatComponent
+    aiRequest={null}
+    quota={{
+      limitReached: true,
+      current: 2,
+      max: 2,
+      period: '1day',
+    }}
+    increaseQuotaOffering="upgrade"
+    availableCredits={0}
+  />
+);
+export const NewWeeklyAiRequestQuotaLimitReachedSubscriptionAndNoCredits = () => (
+  <WrappedChatComponent
+    aiRequest={null}
+    quota={{
+      limitReached: true,
+      current: 5,
+      max: 5,
+      period: '7days',
+    }}
+    increaseQuotaOffering="upgrade"
+    availableCredits={0}
+  />
+);
+export const NewMonthlyAiRequestQuotaLimitReachedSubscriptionAndNoCredits = () => (
+  <WrappedChatComponent
+    aiRequest={null}
+    quota={{
+      limitReached: true,
+      current: 20,
+      max: 20,
+      period: '30days',
+    }}
+    increaseQuotaOffering="upgrade"
+    availableCredits={0}
+  />
 );
 
 export const LaunchingNewAiRequest = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          {...commonProps}
-          aiRequest={null}
-          isSending={true}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
+  <WrappedChatComponent aiRequest={null} isSending={true} />
+);
+
+export const ErrorLaunchingNewAiRequest = () => (
+  <WrappedChatComponent
+    aiRequest={null}
+    lastSendError={new Error('Fake error while sending request')}
+  />
 );
 
 const fakeOutputWithUserRequestOnly = [
@@ -225,49 +299,33 @@ const fakeOutputWithUserRequestOnly = [
 ];
 
 export const ErroredNewAiRequest = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={{
-            createdAt: '',
-            updatedAt: '',
-            id: 'fake-working-new-ai-request',
-            status: 'error',
-            userId: 'fake-user-id',
-            gameProjectJson: 'FAKE DATA',
-            output: fakeOutputWithUserRequestOnly,
-            error: { code: 'internal-error', message: 'Some error happened' },
-          }}
-          {...commonProps}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
+  <WrappedChatComponent
+    aiRequest={{
+      createdAt: '',
+      updatedAt: '',
+      id: 'fake-working-new-ai-request',
+      status: 'error',
+      userId: 'fake-user-id',
+      gameProjectJson: 'FAKE DATA',
+      output: fakeOutputWithUserRequestOnly,
+      error: { code: 'internal-error', message: 'Some error happened' },
+    }}
+  />
 );
 
 export const WorkingNewAiRequest = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={{
-            createdAt: '',
-            updatedAt: '',
-            id: 'fake-working-new-ai-request',
-            status: 'working',
-            userId: 'fake-user-id',
-            gameProjectJson: 'FAKE DATA',
-            output: fakeOutputWithUserRequestOnly,
-            error: null,
-          }}
-          {...commonProps}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
+  <WrappedChatComponent
+    aiRequest={{
+      createdAt: '',
+      updatedAt: '',
+      id: 'fake-working-new-ai-request',
+      status: 'working',
+      userId: 'fake-user-id',
+      gameProjectJson: 'FAKE DATA',
+      output: fakeOutputWithUserRequestOnly,
+      error: null,
+    }}
+  />
 );
 
 const fakeOutputWithAiResponses = [
@@ -355,263 +413,189 @@ const fakeOutputWithEvenMoreAiResponses = [
 ];
 
 export const ReadyAiRequest = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={{
-            createdAt: '',
-            updatedAt: '',
-            id: 'fake-working-new-ai-request',
-            status: 'ready',
-            userId: 'fake-user-id',
-            gameProjectJson: 'FAKE DATA',
-            output: fakeOutputWithAiResponses,
-            error: null,
-          }}
-          {...commonProps}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
+  <WrappedChatComponent
+    aiRequest={{
+      createdAt: '',
+      updatedAt: '',
+      id: 'fake-working-new-ai-request',
+      status: 'ready',
+      userId: 'fake-user-id',
+      gameProjectJson: 'FAKE DATA',
+      output: fakeOutputWithAiResponses,
+      error: null,
+    }}
+  />
 );
 
 export const ReadyAiRequestWithMoreMessages = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={{
-            createdAt: '',
-            updatedAt: '',
-            id: 'fake-working-new-ai-request',
-            status: 'ready',
-            userId: 'fake-user-id',
-            gameProjectJson: 'FAKE DATA',
-            output: fakeOutputWithMoreAiResponses,
-            error: null,
-          }}
-          {...commonProps}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
+  <WrappedChatComponent
+    aiRequest={{
+      createdAt: '',
+      updatedAt: '',
+      id: 'fake-working-new-ai-request',
+      status: 'ready',
+      userId: 'fake-user-id',
+      gameProjectJson: 'FAKE DATA',
+      output: fakeOutputWithMoreAiResponses,
+      error: null,
+    }}
+  />
 );
 
 export const ReadyAiRequestWithEvenMoreMessages = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={{
-            createdAt: '',
-            updatedAt: '',
-            id: 'fake-working-new-ai-request',
-            status: 'ready',
-            userId: 'fake-user-id',
-            gameProjectJson: 'FAKE DATA',
-            output: fakeOutputWithEvenMoreAiResponses,
-            error: null,
-          }}
-          {...commonProps}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
+  <WrappedChatComponent
+    aiRequest={{
+      createdAt: '',
+      updatedAt: '',
+      id: 'fake-working-new-ai-request',
+      status: 'ready',
+      userId: 'fake-user-id',
+      gameProjectJson: 'FAKE DATA',
+      output: fakeOutputWithEvenMoreAiResponses,
+      error: null,
+    }}
+  />
 );
 
 export const ReadyAiRequestAndAlreadyUsedOneInThePast = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={{
-            createdAt: '',
-            updatedAt: '',
-            id: 'fake-working-new-ai-request',
-            status: 'ready',
-            userId: 'fake-user-id',
-            gameProjectJson: 'FAKE DATA',
-            output: fakeOutputWithAiResponses,
-            error: null,
-          }}
-          {...commonProps}
-          increaseQuotaOffering="upgrade"
-          quota={{
-            limitReached: false,
-            current: 1,
-            max: 30,
-            period: '1day',
-          }}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
+  <WrappedChatComponent
+    aiRequest={{
+      createdAt: '',
+      updatedAt: '',
+      id: 'fake-working-new-ai-request',
+      status: 'ready',
+      userId: 'fake-user-id',
+      gameProjectJson: 'FAKE DATA',
+      output: fakeOutputWithAiResponses,
+      error: null,
+    }}
+    increaseQuotaOffering="upgrade"
+    quota={{
+      limitReached: false,
+      current: 1,
+      max: 30,
+      period: '1day',
+    }}
+  />
+);
+
+export const ReadyAiRequestAndAlreadyUsedALotInThePast = () => (
+  <WrappedChatComponent
+    aiRequest={{
+      createdAt: '',
+      updatedAt: '',
+      id: 'fake-working-new-ai-request',
+      status: 'ready',
+      userId: 'fake-user-id',
+      gameProjectJson: 'FAKE DATA',
+      output: fakeOutputWithAiResponses,
+      error: null,
+    }}
+    increaseQuotaOffering="upgrade"
+    quota={{
+      limitReached: false,
+      current: 25,
+      max: 30,
+      period: '1day',
+    }}
+  />
 );
 
 export const ErrorLaunchingFollowupAiRequest = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={{
-            createdAt: '',
-            updatedAt: '',
-            id: 'fake-working-new-ai-request',
-            status: 'ready',
-            userId: 'fake-user-id',
-            gameProjectJson: 'FAKE DATA',
-            output: fakeOutputWithAiResponses,
-            error: null,
-          }}
-          {...commonProps}
-          lastSendError={new Error('fake error while sending request')}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
+  <WrappedChatComponent
+    aiRequest={{
+      createdAt: '',
+      updatedAt: '',
+      id: 'fake-working-new-ai-request',
+      status: 'ready',
+      userId: 'fake-user-id',
+      gameProjectJson: 'FAKE DATA',
+      output: fakeOutputWithAiResponses,
+      error: null,
+    }}
+    lastSendError={new Error('fake error while sending request')}
+  />
 );
 
 export const LaunchingFollowupAiRequest = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={{
-            createdAt: '',
-            updatedAt: '',
-            id: 'fake-working-new-ai-request',
-            status: 'ready',
-            userId: 'fake-user-id',
-            gameProjectJson: 'FAKE DATA',
-            output: fakeOutputWithAiResponses,
-            error: null,
-          }}
-          {...commonProps}
-          isSending={true}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
+  <WrappedChatComponent
+    aiRequest={{
+      createdAt: '',
+      updatedAt: '',
+      id: 'fake-working-new-ai-request',
+      status: 'ready',
+      userId: 'fake-user-id',
+      gameProjectJson: 'FAKE DATA',
+      output: fakeOutputWithAiResponses,
+      error: null,
+    }}
+    isSending={true}
+  />
 );
 
-export const QuotaLimitReached = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={{
-            createdAt: '',
-            updatedAt: '',
-            id: 'fake-working-new-ai-request',
-            status: 'ready',
-            userId: 'fake-user-id',
-            gameProjectJson: 'FAKE DATA',
-            output: fakeOutputWithAiResponses,
-            error: null,
-          }}
-          {...commonProps}
-          quota={{
-            limitReached: true,
-            current: 2,
-            max: 2,
-          }}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
+export const QuotaLimitReachedWithNoSubscriptionNoCredits = () => (
+  <WrappedChatComponent
+    aiRequest={{
+      createdAt: '',
+      updatedAt: '',
+      id: 'fake-working-new-ai-request',
+      status: 'ready',
+      userId: 'fake-user-id',
+      gameProjectJson: 'FAKE DATA',
+      output: fakeOutputWithAiResponses,
+      error: null,
+    }}
+    quota={{
+      limitReached: true,
+      current: 2,
+      max: 2,
+      period: '1day',
+    }}
+    availableCredits={0}
+  />
 );
 
-export const QuotaLimitReachedAndUpgrade = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={{
-            createdAt: '',
-            updatedAt: '',
-            id: 'fake-working-new-ai-request',
-            status: 'ready',
-            userId: 'fake-user-id',
-            gameProjectJson: 'FAKE DATA',
-            output: fakeOutputWithAiResponses,
-            error: null,
-          }}
-          {...commonProps}
-          quota={{
-            limitReached: true,
-            current: 2,
-            max: 2,
-          }}
-          increaseQuotaOffering="upgrade"
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
+export const QuotaLimitReachedWithSubscriptionAndNoCredits = () => (
+  <WrappedChatComponent
+    aiRequest={{
+      createdAt: '',
+      updatedAt: '',
+      id: 'fake-working-new-ai-request',
+      status: 'ready',
+      userId: 'fake-user-id',
+      gameProjectJson: 'FAKE DATA',
+      output: fakeOutputWithAiResponses,
+      error: null,
+    }}
+    quota={{
+      limitReached: true,
+      current: 2,
+      max: 2,
+      period: '1day',
+    }}
+    increaseQuotaOffering="upgrade"
+    availableCredits={0}
+  />
 );
 
-export const QuotaLimitReachedAndNoUpgrade = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={{
-            createdAt: '',
-            updatedAt: '',
-            id: 'fake-working-new-ai-request',
-            status: 'ready',
-            userId: 'fake-user-id',
-            gameProjectJson: 'FAKE DATA',
-            output: fakeOutputWithAiResponses,
-            error: null,
-          }}
-          {...commonProps}
-          quota={{
-            limitReached: true,
-            current: 2,
-            max: 2,
-          }}
-          increaseQuotaOffering="none"
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
-);
-export const QuotaLimitReachedAndNoCredits = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={{
-            createdAt: '',
-            updatedAt: '',
-            id: 'fake-working-new-ai-request',
-            status: 'ready',
-            userId: 'fake-user-id',
-            gameProjectJson: 'FAKE DATA',
-            output: fakeOutputWithAiResponses,
-            error: null,
-          }}
-          {...commonProps}
-          quota={{
-            limitReached: true,
-            current: 2,
-            max: 2,
-          }}
-          increaseQuotaOffering="none"
-          availableCredits={0}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
+export const QuotaLimitReachedWithAvailableCredits = () => (
+  <WrappedChatComponent
+    aiRequest={{
+      createdAt: '',
+      updatedAt: '',
+      id: 'fake-working-new-ai-request',
+      status: 'ready',
+      userId: 'fake-user-id',
+      gameProjectJson: 'FAKE DATA',
+      output: fakeOutputWithAiResponses,
+      error: null,
+    }}
+    quota={{
+      limitReached: true,
+      current: 2,
+      max: 2,
+      period: '1day',
+    }}
+    availableCredits={400}
+  />
 );

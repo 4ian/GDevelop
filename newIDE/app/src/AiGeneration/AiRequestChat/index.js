@@ -18,7 +18,6 @@ import AlertMessage from '../../UI/AlertMessage';
 import classes from './AiRequestChat.module.css';
 import RobotIcon from '../../ProjectCreation/RobotIcon';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
-import GetSubscriptionCard from '../../Profile/Subscription/GetSubscriptionCard';
 import {
   type Quota,
   type UsagePrice,
@@ -45,6 +44,9 @@ import {
 import { AiConfigurationPresetSelector } from './AiConfigurationPresetSelector';
 import { AiRequestContext } from '../AiRequestContext';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
+import CircledInfo from '../../UI/CustomSvgIcons/CircledInfo';
+import Coin from '../../Credits/Icons/Coin';
+import GoldCompact from '../../Profile/Subscription/Icons/GoldCompact';
 
 const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 5;
 const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 10;
@@ -118,145 +120,214 @@ export type AiRequestChatInterface = {|
   resetUserInput: (aiRequestId: string | null) => void,
 |};
 
-const getQuotaOrCreditsText = ({
+const getPriceAndRequestsTextAndTooltip = ({
   quota,
   increaseQuotaOffering,
   price,
   availableCredits,
   isMobile,
+  aiRequestMode,
+  lastUserMessagePriceInCredits,
 }: {|
   quota: Quota | null,
   increaseQuotaOffering: 'subscribe' | 'upgrade' | 'none',
   price: UsagePrice | null,
   availableCredits: number,
   isMobile: boolean,
-|}) => {
-  if (!quota) return null;
+  aiRequestMode?: 'chat' | 'agent',
+  lastUserMessagePriceInCredits?: number | null,
+|}): {|
+  text: React.Node | null,
+  tooltipInfoIcon: React.Node | null,
+|} => {
+  if (!quota || !price)
+    return {
+      text: null,
+      tooltipInfoIcon: null,
+    };
 
-  const quotaOrCreditsText = !quota.limitReached ? (
-    <Tooltip
-      title={
-        <>
-          {increaseQuotaOffering === 'subscribe' ? (
-            <Trans>
-              Get GDevelop premium to get more free requests every day.
-            </Trans>
-          ) : quota.period === '30days' ? (
-            <Trans>
-              These are parts of your GDevelop premium membership ({quota.max}{' '}
-              free requests per month).
-            </Trans>
-          ) : (
-            <Trans>
-              These are parts of your GDevelop premium membership ({quota.max}{' '}
-              free requests per day).
-            </Trans>
-          )}{' '}
-          <Trans>Free requests do not consume credits on your account.</Trans>
-        </>
-      }
-    >
-      <div>
-        {isMobile ? (
-          increaseQuotaOffering === 'subscribe' ? (
-            <Trans>{quota.max - quota.current} trial requests left</Trans>
-          ) : (
-            <Trans>{quota.max - quota.current} free requests left</Trans>
-          )
-        ) : quota.period === '30days' ? (
-          increaseQuotaOffering === 'subscribe' ? (
-            <Trans>
-              {quota.max - quota.current} free trial requests left this month
-            </Trans>
-          ) : (
-            <Trans>
-              {quota.max - quota.current} of {quota.max} free requests left this
-              month
-            </Trans>
-          )
-        ) : quota.period === '1day' ? (
-          <Trans>{quota.max - quota.current} free requests left today</Trans>
-        ) : (
-          <Trans>{quota.max - quota.current} free requests left</Trans>
-        )}
-      </div>
-    </Tooltip>
+  // Display a text if > 50% requests done.
+  const shouldShowText = quota.current / quota.max >= 0.5;
+
+  const requestsLeft = quota.max - quota.current;
+
+  const quotaText = isMobile ? (
+    increaseQuotaOffering === 'subscribe' ? (
+      requestsLeft === 1 ? (
+        <Trans>{requestsLeft} trial request left</Trans>
+      ) : (
+        <Trans>{requestsLeft} trial requests left</Trans>
+      )
+    ) : requestsLeft === 1 ? (
+      <Trans>{requestsLeft} request left</Trans>
+    ) : (
+      <Trans>
+        {requestsLeft} of {quota.max} requests left
+      </Trans>
+    )
+  ) : quota.period === '30days' ? (
+    increaseQuotaOffering === 'subscribe' ? (
+      requestsLeft === 1 ? (
+        <Trans>{requestsLeft} trial request left this month</Trans>
+      ) : (
+        <Trans>{requestsLeft} trial requests left this month</Trans>
+      )
+    ) : requestsLeft === 1 ? (
+      <Trans>{requestsLeft} request left this month</Trans>
+    ) : (
+      <Trans>
+        {requestsLeft} of {quota.max} requests left this month
+      </Trans>
+    )
+  ) : quota.period === '7days' ? (
+    increaseQuotaOffering === 'subscribe' ? (
+      requestsLeft === 1 ? (
+        <Trans>{requestsLeft} trial request left this week</Trans>
+      ) : (
+        <Trans>{requestsLeft} trial requests left this week</Trans>
+      )
+    ) : requestsLeft === 1 ? (
+      <Trans>{requestsLeft} request left this week</Trans>
+    ) : (
+      <Trans>
+        {requestsLeft} of {quota.max} requests left this week
+      </Trans>
+    )
+  ) : quota.period === '1day' ? (
+    increaseQuotaOffering === 'subscribe' ? (
+      requestsLeft === 1 ? (
+        <Trans>{requestsLeft} trial request left today</Trans>
+      ) : (
+        <Trans>{requestsLeft} trial requests left today</Trans>
+      )
+    ) : requestsLeft === 1 ? (
+      <Trans>{requestsLeft} request left today</Trans>
+    ) : (
+      <Trans>
+        {requestsLeft} of {quota.max} requests left today
+      </Trans>
+    )
+  ) : requestsLeft === 1 ? (
+    <Trans>{requestsLeft} request left</Trans>
   ) : (
+    <Trans>{requestsLeft} requests left</Trans>
+  );
+  const creditsText = (
     <Trans>{Math.max(0, availableCredits)} credits available</Trans>
   );
-
-  return quotaOrCreditsText;
-};
-
-const getPriceText = ({
-  aiRequestMode,
-  price,
-  lastUserMessagePriceInCredits,
-}: {|
-  aiRequestMode: 'chat' | 'agent',
-  price: UsagePrice | null,
-  lastUserMessagePriceInCredits: number | null,
-|}) => {
-  if (!price) return null;
-
   const priceInCredits = price.priceInCredits;
-  const maximumPriceInCredits =
-    (price.variablePrice &&
-      price.variablePrice[aiRequestMode] &&
-      price.variablePrice[aiRequestMode]['default'] &&
-      price.variablePrice[aiRequestMode]['default'].maximumPriceInCredits) ||
-    null;
-  const minimumPriceInCredits =
-    (price.variablePrice &&
-      price.variablePrice[aiRequestMode] &&
-      price.variablePrice[aiRequestMode]['default'] &&
-      price.variablePrice[aiRequestMode]['default'].minimumPriceInCredits) ||
-    null;
 
-  const priceText = maximumPriceInCredits ? (
-    <Trans>
-      {minimumPriceInCredits || priceInCredits} to {maximumPriceInCredits}
-    </Trans>
-  ) : (
-    <Trans>{minimumPriceInCredits || priceInCredits}</Trans>
+  const tooltipText = (
+    <ColumnStackLayout noMargin>
+      {quotaText}
+      {increaseQuotaOffering === 'subscribe' ? (
+        <Trans>Get GDevelop premium to get more requests.</Trans>
+      ) : (
+        <Trans>These are parts of your GDevelop premium membership.</Trans>
+      )}
+      {aiRequestMode === 'agent' ? (
+        <>
+          <Trans>
+            You can also use credits once your quota is reached. Each request to
+            the AI agent costs around {priceInCredits} credits. It depends on
+            the amount of work the agent will do and the number of times it
+            generates events.
+          </Trans>{' '}
+          {lastUserMessagePriceInCredits ? (
+            <Trans>
+              The last request used {lastUserMessagePriceInCredits} credits.
+            </Trans>
+          ) : null}
+        </>
+      ) : (
+        <Trans>
+          You can also use credits once your quota is reached. Each answer from
+          the AI costs around {priceInCredits} credits. It depends on the amount
+          of work needed to answer.
+        </Trans>
+      )}
+      {quota.limitReached ? creditsText : null}
+    </ColumnStackLayout>
   );
 
-  return (
-    <Tooltip
-      title={
-        aiRequestMode === 'agent' ? (
-          <>
-            <Trans>
-              Each request to the AI agent costs {priceText} credits. It depends
-              on the amount of work the agent will do and the number of times it
-              generates events.
-            </Trans>{' '}
-            {lastUserMessagePriceInCredits ? (
-              <Trans>
-                The last request used {lastUserMessagePriceInCredits} credits.
-              </Trans>
-            ) : null}
-          </>
-        ) : (
-          <Trans>Each answer from the AI costs {priceText} credits.</Trans>
-        )
-      }
-    >
-      <div>
-        <LineStackLayout alignItems="center" noMargin>
-          {aiRequestMode === 'agent' ? (
-            <Hammer fontSize="small" />
-          ) : (
-            <Help fontSize="small" />
-          )}
-          {aiRequestMode === 'agent' ? (
-            <Trans>{priceText} credits/request</Trans>
-          ) : (
-            <Trans>{priceText} credits/answer</Trans>
-          )}
-        </LineStackLayout>
-      </div>
+  const tooltipInfoIcon = (
+    <Tooltip title={tooltipText}>
+      <CircledInfo />
     </Tooltip>
+  );
+  const text = shouldShowText ? (
+    <Text size="body-small" color="secondary" noMargin>
+      {quota.limitReached ? creditsText : quotaText}
+    </Text>
+  ) : null;
+  return { text, tooltipInfoIcon };
+};
+
+const getSendButtonLabel = ({
+  aiRequest,
+  aiRequestMode,
+  isWorking,
+  hasReachedLimitAndCannotUseCredits,
+  hasSubcription,
+  isMobile,
+  hasOpenedProject,
+  standAloneForm,
+}: {|
+  aiRequest: AiRequest | null,
+  aiRequestMode?: 'chat' | 'agent',
+  isWorking: boolean,
+  hasReachedLimitAndCannotUseCredits: boolean,
+  hasSubcription: boolean,
+  isMobile: boolean,
+  hasOpenedProject: boolean,
+  standAloneForm?: boolean,
+|}): React.Node => {
+  if (aiRequest) {
+    // We're in a running chat, hide label, except if need to upgrade/buy credits.
+    return hasReachedLimitAndCannotUseCredits ? (
+      hasSubcription ? (
+        <Trans>Get credits</Trans>
+      ) : (
+        <Trans>Upgrade</Trans>
+      )
+    ) : null;
+  }
+
+  return aiRequestMode === 'agent' ? (
+    isWorking ? (
+      <Trans>Building...</Trans>
+    ) : hasReachedLimitAndCannotUseCredits ? (
+      hasSubcription ? (
+        <Trans>Get credits</Trans>
+      ) : (
+        <Trans>Upgrade</Trans>
+      )
+    ) : isMobile ? (
+      <Trans>Build</Trans>
+    ) : hasOpenedProject && !standAloneForm ? (
+      <Trans>Build this on my game</Trans>
+    ) : (
+      <Trans>Start building the game</Trans>
+    )
+  ) : isWorking ? (
+    <Trans>Sending...</Trans>
+  ) : (
+    <Trans>Send question</Trans>
+  );
+};
+
+const getSendButtonIcon = ({
+  hasReachedLimitAndCannotUseCredits,
+  hasSubcription,
+}) => {
+  return hasReachedLimitAndCannotUseCredits ? (
+    hasSubcription ? (
+      <Coin fontSize="small" />
+    ) : (
+      <GoldCompact fontSize="small" />
+    )
+  ) : (
+    <Send fontSize="small" />
   );
 };
 
@@ -435,55 +506,6 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
 
     const { isMobile } = useResponsiveWindowSize();
 
-    const priceText = standAloneForm ? null : (
-      <Text size="body-small" color="secondary" noMargin>
-        {getPriceText({
-          aiRequestMode,
-          price,
-          lastUserMessagePriceInCredits:
-            (aiRequest && aiRequest.lastUserMessagePriceInCredits) || null,
-        }) || '\u00A0'}
-      </Text>
-    );
-
-    const subscriptionBanner =
-      quota && quota.limitReached && increaseQuotaOffering !== 'none' ? (
-        <GetSubscriptionCard
-          placementId="ai-requests"
-          subscriptionDialogOpeningReason={
-            increaseQuotaOffering === 'subscribe'
-              ? 'AI requests (subscribe)'
-              : 'AI requests (upgrade)'
-          }
-          label={
-            increaseQuotaOffering === 'subscribe' ? (
-              <Trans>Get GDevelop premium</Trans>
-            ) : (
-              <Trans>Upgrade</Trans>
-            )
-          }
-          recommendedPlanIdIfNoSubscription="gdevelop_gold"
-          canHide
-        >
-          <Line>
-            <Column noMargin>
-              <Text noMargin>
-                {increaseQuotaOffering === 'subscribe' ? (
-                  <Trans>
-                    Unlock AI requests included with a GDevelop premium plan.
-                  </Trans>
-                ) : (
-                  <Trans>
-                    Get even more AI requests included with a higher premium
-                    plan.
-                  </Trans>
-                )}
-              </Text>
-            </Column>
-          </Line>
-        </GetSubscriptionCard>
-      ) : null;
-
     const errorText = lastSendError ? (
       <Text size="body-small" color="error" noMargin>
         <Trans>
@@ -492,17 +514,16 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       </Text>
     ) : null;
 
-    const quotaOrCreditsText = standAloneForm ? null : (
-      <Text size="body-small" color="secondary" noMargin>
-        {getQuotaOrCreditsText({
-          quota,
-          increaseQuotaOffering,
-          price,
-          availableCredits,
-          isMobile,
-        })}
-      </Text>
-    );
+    const priceAndRequestsTextAndTooltip = getPriceAndRequestsTextAndTooltip({
+      quota,
+      increaseQuotaOffering,
+      price,
+      availableCredits,
+      isMobile,
+    });
+    const priceAndRequestsText = priceAndRequestsTextAndTooltip.text;
+    const priceAndRequestsTooltipInfoIcon =
+      priceAndRequestsTextAndTooltip.tooltipInfoIcon;
 
     const chosenOrDefaultAiConfigurationPresetId =
       aiConfigurationPresetId ||
@@ -515,11 +536,35 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       editorFunctionCallResults.some(
         functionCallOutput => functionCallOutput.status === 'working'
       );
-    const shouldDisableForm =
+    const isWorking =
       isSending ||
       ((!!hasWorkingFunctionCalls ||
         (!!aiRequest && aiRequest.status === 'working')) &&
         isAutoProcessingFunctionCalls);
+
+    const hasReachedLimitAndCannotUseCredits =
+      !!quota &&
+      quota.limitReached &&
+      !!price &&
+      availableCredits <= price.priceInCredits;
+    const hasSubcription = increaseQuotaOffering !== 'subscribe';
+
+    const sendButtonLabel = getSendButtonLabel({
+      aiRequest,
+      aiRequestMode,
+      isWorking,
+      hasReachedLimitAndCannotUseCredits,
+      hasSubcription,
+      isMobile,
+      hasOpenedProject,
+      standAloneForm,
+    });
+    const sendButtonIcon = getSendButtonIcon({
+      hasReachedLimitAndCannotUseCredits,
+      hasSubcription,
+      isMobile,
+      standAloneForm,
+    });
 
     if (!aiRequest || standAloneForm) {
       return (
@@ -567,7 +612,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                     }
                     setAiState({ mode: value, aiRequestId: null });
                   }}
-                  disabled={shouldDisableForm}
+                  disabled={isWorking}
                 />
               </Line>
             )}
@@ -586,9 +631,9 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                   <CompactTextAreaFieldWithControls
                     maxLength={6000}
                     value={userRequestTextPerAiRequestId[''] || ''}
-                    disabled={shouldDisableForm}
+                    disabled={isWorking}
                     neonCorner={standAloneForm ? 'large' : 'small'}
-                    hasAnimatedNeonCorner={shouldDisableForm}
+                    hasAnimatedNeonCorner={isWorking}
                     errored={!!lastSendError}
                     onChange={userRequestText => {
                       onUserRequestTextChange(userRequestText, '');
@@ -602,7 +647,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                       });
                     }}
                     placeholder={
-                      shouldDisableForm
+                      isWorking
                         ? t`Thinking about your request...`
                         : newChatPlaceholder
                     }
@@ -610,53 +655,64 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                     controls={
                       <Column>
                         <LineStackLayout
-                          alignItems="center"
+                          alignItems="flex-end"
                           justifyContent="space-between"
                         >
-                          <AiConfigurationPresetSelector
-                            chosenOrDefaultAiConfigurationPresetId={
-                              chosenOrDefaultAiConfigurationPresetId
-                            }
-                            setAiConfigurationPresetId={
-                              setAiConfigurationPresetId
-                            }
-                            aiConfigurationPresetsWithAvailability={
-                              aiConfigurationPresetsWithAvailability
-                            }
-                            aiRequestMode={aiRequestMode}
-                            disabled={shouldDisableForm}
-                          />
-                          <RaisedButton
-                            color="primary"
-                            icon={<Send />}
-                            label={
-                              aiRequestMode === 'agent' ? (
-                                shouldDisableForm ? (
-                                  <Trans>Building...</Trans>
-                                ) : hasOpenedProject && !standAloneForm ? (
-                                  <Trans>Build this on my game</Trans>
-                                ) : (
-                                  <Trans>Start building the game</Trans>
-                                )
-                              ) : shouldDisableForm ? (
-                                <Trans>Sending...</Trans>
-                              ) : (
-                                <Trans>Send question</Trans>
-                              )
-                            }
-                            style={{ flexShrink: 0 }}
-                            disabled={
-                              shouldDisableForm ||
-                              !userRequestTextPerAiRequestId[aiRequestId]
-                            }
-                            onClick={() => {
-                              onStartNewAiRequest({
-                                mode: aiRequestMode,
-                                userRequest: userRequestTextPerAiRequestId[''],
-                                aiConfigurationPresetId: chosenOrDefaultAiConfigurationPresetId,
-                              });
-                            }}
-                          />
+                          <Column noMargin>
+                            <AiConfigurationPresetSelector
+                              chosenOrDefaultAiConfigurationPresetId={
+                                chosenOrDefaultAiConfigurationPresetId
+                              }
+                              setAiConfigurationPresetId={
+                                setAiConfigurationPresetId
+                              }
+                              aiConfigurationPresetsWithAvailability={
+                                aiConfigurationPresetsWithAvailability
+                              }
+                              aiRequestMode={aiRequestMode}
+                              disabled={isWorking}
+                            />
+                            {isMobile && priceAndRequestsText && (
+                              <Column>
+                                <Line noMargin alignItems="center">
+                                  {priceAndRequestsText}
+                                  {priceAndRequestsTooltipInfoIcon}
+                                </Line>
+                              </Column>
+                            )}
+                          </Column>
+                          <LineStackLayout
+                            alignItems="flex-end"
+                            justifyContent="flex-end"
+                            expand
+                            noMargin
+                          >
+                            {(!isMobile || !priceAndRequestsText) && (
+                              <Line noMargin alignItems="center">
+                                {priceAndRequestsText}
+                                {priceAndRequestsTooltipInfoIcon}
+                              </Line>
+                            )}
+                            <RaisedButton
+                              color="primary"
+                              icon={sendButtonIcon}
+                              label={sendButtonLabel}
+                              style={{ flexShrink: 0 }}
+                              disabled={
+                                isWorking ||
+                                (!userRequestTextPerAiRequestId[aiRequestId] &&
+                                  !hasReachedLimitAndCannotUseCredits)
+                              }
+                              onClick={() => {
+                                onStartNewAiRequest({
+                                  mode: aiRequestMode,
+                                  userRequest:
+                                    userRequestTextPerAiRequestId[''],
+                                  aiConfigurationPresetId: chosenOrDefaultAiConfigurationPresetId,
+                                });
+                              }}
+                            />
+                          </LineStackLayout>
                         </LineStackLayout>
                       </Column>
                     }
@@ -669,18 +725,11 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                     justifyContent="space-between"
                     expand
                   >
-                    {errorText || priceText}
-                    {errorText ? null : quotaOrCreditsText}
+                    {errorText || ''}
                   </LineStackLayout>
                 </Line>
               </ColumnStackLayout>
             </form>
-            {subscriptionBanner ? (
-              <>
-                <Spacer />
-                {subscriptionBanner}
-              </>
-            ) : null}
           </ColumnStackLayout>
           <Spacer />
           {!standAloneForm && (
@@ -850,9 +899,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                   request in a new chat.
                 </Trans>
               </AlertMessage>
-            ) : (
-              subscriptionBanner
-            )}
+            ) : null}
           </ColumnStackLayout>
         </ScrollView>
         <form
@@ -871,7 +918,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             alignItems="stretch"
             noMargin
           >
-            {aiRequest.mode === 'agent' && shouldDisableForm ? (
+            {aiRequest.mode === 'agent' && isWorking ? (
               <Paper background="dark" variant="outlined">
                 <Column>
                   <LineStackLayout
@@ -931,10 +978,10 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
               <CompactTextAreaFieldWithControls
                 maxLength={6000}
                 value={userRequestTextPerAiRequestId[aiRequestId] || ''}
-                disabled={shouldDisableForm || isForAnotherProject}
+                disabled={isWorking || isForAnotherProject}
                 errored={!!lastSendError}
                 neonCorner="small"
-                hasAnimatedNeonCorner={shouldDisableForm}
+                hasAnimatedNeonCorner={isWorking}
                 onChange={userRequestText =>
                   onUserRequestTextChange(userRequestText, aiRequestId)
                 }
@@ -943,7 +990,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                   aiRequest.mode === 'agent'
                     ? isForAnotherProject
                       ? t`You must re-open the project to continue this chat.`
-                      : shouldDisableForm
+                      : isWorking
                       ? t`Thinking about your request...`
                       : t`Specify something more to the AI to build`
                     : t`Ask a follow up question`
@@ -959,16 +1006,22 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                   <Column>
                     <LineStackLayout
                       alignItems="center"
-                      justifyContent="flex-end"
+                      justifyContent="space-between"
                     >
+                      <Line noMargin alignItems="center">
+                        {priceAndRequestsText}
+                        {priceAndRequestsTooltipInfoIcon}
+                      </Line>
                       <RaisedButton
                         color="primary"
                         disabled={
-                          shouldDisableForm ||
+                          isWorking ||
                           isForAnotherProject ||
-                          !userRequestTextPerAiRequestId[aiRequestId]
+                          (!userRequestTextPerAiRequestId[aiRequestId] &&
+                            !hasReachedLimitAndCannotUseCredits)
                         }
-                        icon={<Send />}
+                        icon={sendButtonIcon}
+                        label={sendButtonLabel}
                         onClick={() => {
                           onSendMessage({
                             userMessage:
@@ -988,10 +1041,8 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 alignItems="center"
                 justifyContent="space-between"
               >
-                {isForAnotherProjectText || errorText || priceText}
-                {errorText || isForAnotherProjectText
-                  ? null
-                  : quotaOrCreditsText}
+                {isForAnotherProjectText || errorText || ''}
+                {errorText || isForAnotherProjectText ? null : ''}
               </LineStackLayout>
             </Column>
           </ColumnStackLayout>

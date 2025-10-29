@@ -1265,8 +1265,7 @@ const MainFrame = (props: Props) => {
           currentFileMetadata: newFileMetadata,
         }));
       }
-      // to rename if works.
-      if (options.closeNewProjectSetupDialog) {
+      if (!options.dontCloseNewProjectSetupDialog) {
         setNewProjectSetupDialogOpen(false);
       }
       if (options.openQuickCustomizationDialog) {

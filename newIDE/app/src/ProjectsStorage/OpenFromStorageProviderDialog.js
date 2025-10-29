@@ -21,7 +21,7 @@ type Props = {|
 
 const fakeLocalFileStorageProvider: StorageProvider = {
   internalName: 'LocalFile',
-  name: t`Downlad GDevelop desktop app to open projects from your computer`,
+  name: t`Open from computer with GDevelop desktop app`,
   disabled: true,
   renderIcon: props => <Computer fontSize={props.size} />,
   createOperations: () => ({}),

@@ -774,7 +774,7 @@ const NewProjectSetupDialog = ({
                   {!electron && !isNativeMobileApp() && (
                     <SelectOption
                       value={'FakeLocalFile'}
-                      label={t`Save on your computer: download the GDevelop desktop app`}
+                      label={t`Save on your computer: download GDevelop desktop app`}
                       disabled
                     />
                   )}

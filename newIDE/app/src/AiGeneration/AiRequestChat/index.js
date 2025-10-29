@@ -69,6 +69,7 @@ type Props = {
   project: ?gdProject,
   i18n: I18nType,
   aiRequest: AiRequest | null,
+  aiRequestMode: 'chat' | 'agent',
 
   isSending: boolean,
   onStartNewAiRequest: (options: {|
@@ -143,7 +144,7 @@ const getPriceAndRequestsTextAndTooltip = ({
   if (!quota || !price)
     return {
       text: null,
-      tooltipInfoIcon: null,
+      tooltipInfoIcon: <div style={{ height: 24 }} />, // Placeholder to avoid layout shift.
     };
 
   // Display a text if > 50% requests done.
@@ -346,6 +347,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       aiConfigurationPresetsWithAvailability,
       project,
       aiRequest,
+      aiRequestMode,
       isSending,
       onStartNewAiRequest,
       onSendMessage,
@@ -370,8 +372,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     const {
       aiRequestHistory: { handleNavigateHistory, resetNavigation },
     } = React.useContext(AiRequestContext);
-    const { values, setAiState } = React.useContext(PreferencesContext);
-    const aiRequestMode = values.aiState.mode;
+    const { setAiState } = React.useContext(PreferencesContext);
 
     const [
       aiConfigurationPresetId,
@@ -710,8 +711,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                   alignItems="center"
                   justifyContent="flex-end"
                 >
-                  {errorText}
-                  {errorText ? '' : priceAndRequestsText}
+                  {errorText || priceAndRequestsText}
                   {priceAndRequestsTooltipInfoIcon}
                 </Line>
               </Column>
@@ -1019,11 +1019,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 alignItems="center"
                 justifyContent="flex-end"
               >
-                {isForAnotherProjectText}
-                {isForAnotherProjectText ? '' : errorText}
-                {isForAnotherProjectText || errorText
-                  ? ''
-                  : priceAndRequestsText}
+                {isForAnotherProjectText || errorText || priceAndRequestsText}
                 {priceAndRequestsTooltipInfoIcon}
               </Line>
             }

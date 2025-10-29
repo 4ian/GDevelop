@@ -250,11 +250,7 @@ export const AskAiStandAloneForm = ({
         onCloseAskAi();
 
         // Read the options and reset them (to avoid launching the same request twice).
-        const {
-          mode,
-          userRequest,
-          aiConfigurationPresetId,
-        } = newAiRequestOptions;
+        const { userRequest, aiConfigurationPresetId } = newAiRequestOptions;
         startNewAiRequest(null);
 
         // Ensure the user has enough credits to pay for the request, or ask them
@@ -305,7 +301,7 @@ export const AskAiStandAloneForm = ({
             gameId: null, // No game associated when starting from the standalone form.
             fileMetadata: null, // No file metadata when starting from the standalone form.
             storageProviderName,
-            mode,
+            mode: aiRequestModeForForm,
             toolsVersion: AI_TOOLS_VERSION,
             aiConfiguration: {
               presetId: aiConfigurationPresetId,
@@ -333,7 +329,7 @@ export const AskAiStandAloneForm = ({
             projectSpecificExtensionsSummaryJsonLength: 0,
             payWithCredits,
             storageProviderName,
-            mode,
+            mode: aiRequestModeForForm,
             aiRequestId: aiRequest.id,
           });
         } catch (error) {
@@ -419,6 +415,8 @@ export const AskAiStandAloneForm = ({
       if (hasFunctionsCallsToProcess) return;
 
       // If nothing to send, stop there.
+      // When in a standalone form, this can happen if the agent did not
+      // decide to create a project, in this case, abort and clear the form.
       if (functionCallOutputs.length === 0) return;
 
       try {
@@ -578,6 +576,7 @@ export const AskAiStandAloneForm = ({
         project={project}
         ref={aiRequestChatRef}
         aiRequest={aiRequestForForm}
+        aiRequestMode={aiRequestModeForForm}
         onStartNewAiRequest={startNewAiRequest}
         onSendMessage={onSendMessage}
         isSending={isLoading}

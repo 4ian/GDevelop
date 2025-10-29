@@ -871,6 +871,7 @@ export const AskAiEditor = React.memo<Props>(
                 project={project}
                 ref={aiRequestChatRef}
                 aiRequest={selectedAiRequest}
+                aiRequestMode={selectedAiRequestMode}
                 onStartNewAiRequest={startNewAiRequest}
                 onSendMessage={onSendMessage}
                 isSending={isSendingAiRequest(selectedAiRequestId)}

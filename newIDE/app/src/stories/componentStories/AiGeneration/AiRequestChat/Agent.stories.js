@@ -89,6 +89,7 @@ const commonProps = {
   setAutoProcessFunctionCalls: () => {},
   isAutoProcessingFunctionCalls: false,
   onStartOrOpenChat: () => {},
+  aiRequestMode: 'agent',
 };
 
 const WrappedChatComponent = (props: any) => (

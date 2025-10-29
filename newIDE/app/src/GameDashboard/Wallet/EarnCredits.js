@@ -17,7 +17,6 @@ import Coin from '../../Credits/Icons/Coin';
 import { selectMessageByLocale } from '../../Utils/i18n/MessageByLocale';
 import { I18n } from '@lingui/react';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
-import TextButton from '../../UI/TextButton';
 import RouterContext from '../../MainFrame/RouterContext';
 import FlatButton from '../../UI/FlatButton';
 import MultipleCoins from '../../Credits/Icons/MultipleCoins';
@@ -79,31 +78,17 @@ const FeedbackItem = () => {
   return (
     <LineStackLayout expand alignItems="center" noMargin>
       <div style={styles.badgeContainer}>
-        <img
-          src={'res/badges/empty-badge.svg'}
-          alt="Empty badge"
-          style={styles.badgeImage}
-        />
-        <div style={styles.badgeTextContainer}>
-          <Coin style={styles.badgeCoinIcon} />
-          <Text align="center" size="body" noMargin color="inherit">
-            10
-          </Text>
-        </div>
+        <MultipleCoins style={styles.badgeImage} />
       </div>
       <Column noMargin expand>
-        <Text size="body" noMargin>
-          <b>
-            <Trans>Community helper</Trans>
-          </b>
-        </Text>
         <Text size="body" noMargin color="secondary">
           <Trans>Give feedback on a game!</Trans>
         </Text>
       </Column>
-      <TextButton
+      <FlatButton
         label={<Trans>Play a game</Trans>}
-        secondary
+        leftIcon={<Coin style={styles.badgeCoinIcon} />}
+        primary
         onClick={() => {
           navigateToRoute('play', {
             'playable-game-id': 'random',

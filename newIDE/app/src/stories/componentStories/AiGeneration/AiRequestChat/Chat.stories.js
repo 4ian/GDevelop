@@ -85,6 +85,7 @@ const commonProps = {
   setAutoProcessFunctionCalls: () => {},
   isAutoProcessingFunctionCalls: false,
   onStartOrOpenChat: () => {},
+  aiRequestMode: 'agent',
 };
 
 const WrappedChatComponent = (props: any) => (
@@ -95,6 +96,12 @@ const WrappedChatComponent = (props: any) => (
   </FixedHeightFlexContainer>
 );
 
+export const LoggedOutAgentAiRequest = () => (
+  <WrappedChatComponent aiRequest={null} quota={null} aiRequestMode="agent" />
+);
+export const LoggedOutChatAiRequest = () => (
+  <WrappedChatComponent aiRequest={null} quota={null} aiRequestMode="chat" />
+);
 export const NewDailyAiRequest = () => (
   <WrappedChatComponent aiRequest={null} />
 );

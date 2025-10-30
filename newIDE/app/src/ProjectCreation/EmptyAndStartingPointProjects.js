@@ -77,10 +77,23 @@ const EmptyProjectTile = ({
   );
 };
 
+// To remove once all starting points are properly tagged.
+const isStartingPointButNotTaggedAsSuchYet = (
+  exampleShortHeader: ExampleShortHeader
+): boolean => {
+  return (
+    exampleShortHeader.slug.startsWith('starting-') &&
+    !exampleShortHeader.slug.includes('-pixel')
+  );
+};
+
 export const isStartingPointExampleShortHeader = (
   exampleShortHeader: ExampleShortHeader
 ): boolean => {
-  return exampleShortHeader.tags.includes('Starting point');
+  return (
+    exampleShortHeader.tags.includes('Starting point') ||
+    isStartingPointButNotTaggedAsSuchYet(exampleShortHeader)
+  );
 };
 
 export const isLinkedToStartingPointExampleShortHeader = (

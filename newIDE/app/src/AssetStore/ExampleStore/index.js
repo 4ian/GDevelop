@@ -230,7 +230,7 @@ const ExampleStore = ({
     [currentlyDisplayedRows, limitRowsTo]
   );
   const canShowMore =
-    showLoadMore && resultTiles.length > currentlyDisplayedRows;
+    showLoadMore && resultTiles.length > currentlyDisplayedRows * columnsCount;
   const displayedTiles = resultTiles.slice(
     0,
     currentlyDisplayedRows * columnsCount

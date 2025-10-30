@@ -88,6 +88,7 @@ declare class libGDevelop {
   ProjectScopedContainers: Class<gdProjectScopedContainers>;
   ExtensionProperties: Class<gdExtensionProperties>;
   BehaviorDefaultFlagClearer: Class<gdBehaviorDefaultFlagClearer>;
+  UniquePtrBehavior: Class<gdUniquePtrBehavior>;
   Behavior: Class<gdBehavior>;
   BehaviorJsImplementation: Class<gdBehaviorJsImplementation>;
   BehaviorsSharedData: Class<gdBehaviorsSharedData>;

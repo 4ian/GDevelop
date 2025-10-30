@@ -51,11 +51,7 @@ void Object::CopyWithoutConfiguration(const gd::Object& object) {
   assetStoreId = object.assetStoreId;
   objectVariables = object.objectVariables;
   effectsContainer = object.effectsContainer;
-
-  behaviors.clear();
-  for (auto& it : object.behaviors) {
-    behaviors[it.first] = gd::make_unique<gd::Behavior>(*it.second);
-  }
+  behaviors = gd::Clone(object.behaviors);
 }
 
 gd::ObjectConfiguration& Object::GetConfiguration() { return *configuration; }

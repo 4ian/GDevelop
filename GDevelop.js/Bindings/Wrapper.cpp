@@ -439,6 +439,7 @@ typedef EventsFunctionsContainer::FunctionOwner
     EventsFunctionsContainer_FunctionOwner;
 typedef std::unique_ptr<gd::Object> UniquePtrObject;
 typedef std::unique_ptr<gd::ObjectConfiguration> UniquePtrObjectConfiguration;
+typedef std::unique_ptr<gd::Behavior> UniquePtrBehavior;
 typedef std::unique_ptr<ExpressionNode> UniquePtrExpressionNode;
 typedef std::vector<gd::ExpressionParserError *>
     VectorExpressionParserError;

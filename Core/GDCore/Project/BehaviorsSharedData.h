@@ -4,8 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 
-#ifndef GDCORE_BEHAVIORSSHAREDDATA_H
-#define GDCORE_BEHAVIORSSHAREDDATA_H
+#pragma once
 
 #include "GDCore/String.h"
 #include "GDCore/Project/BehaviorConfigurationContainer.h"
@@ -27,9 +26,7 @@ class GD_CORE_API BehaviorsSharedData: public BehaviorConfigurationContainer {
   BehaviorsSharedData(const gd::String& name_, const gd::String& type_)
       : BehaviorConfigurationContainer(name_, type_) {};
   virtual ~BehaviorsSharedData();
-  virtual BehaviorsSharedData* Clone() const override { return new BehaviorsSharedData(*this); }
+  virtual BehaviorsSharedData* Clone() const { return new BehaviorsSharedData(*this); }
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_BEHAVIORSSHAREDDATA_H

@@ -452,9 +452,14 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                   t`Create a 3D explosion when the player is hit`,
                 ]
               : [
-                  t`Build a platformer game with a score and coins to collect`,
-                  t`Make a quizz game with a question and 4 answers`,
-                  t`Make a game where the player must avoid obstacles`,
+                  t`Start a simple platformer with a player that can move and jump`,
+                  t`Begin a top-down adventure with one controllable character.`,
+                  t`Start a game where a ball can bounce around the screen`,
+                  t`Start a quizz game with a question and 4 answers`,
+                  t`Make a minimal 3D shooter`,
+                  t`Start a simple endless runner game`,
+                  t`Begin a driving game with a controllable car`,
+                  t`Create a simple flying game with obstacles to avoid`,
                 ]
             : [
                 t`How to add a leaderboard?`,

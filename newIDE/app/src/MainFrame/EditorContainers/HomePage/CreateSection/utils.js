@@ -159,12 +159,14 @@ const formatItemForGrid = ({
   onSelectExample,
   i18n,
   receivedGameTemplates,
+  disabled,
 }: {
   item: PrivateGameTemplateListingData | ExampleShortHeader,
   onSelectGameTemplate: PrivateGameTemplateListingData => void,
   onSelectExample: ExampleShortHeader => void,
   i18n: I18nType,
   receivedGameTemplates: ?Array<PrivateGameTemplate>,
+  disabled?: boolean,
 }): React.Node => {
   if (item.previewImageUrls) {
     return (
@@ -172,6 +174,7 @@ const formatItemForGrid = ({
         exampleShortHeader={item}
         onSelect={() => onSelectExample(item)}
         key={item.id}
+        disabled={disabled}
       />
     );
   } else {
@@ -186,6 +189,7 @@ const formatItemForGrid = ({
         onSelect={() => onSelectGameTemplate(item)}
         owned={isTemplateOwned}
         key={item.id}
+        disabled={disabled}
       />
     );
   }
@@ -210,6 +214,7 @@ export const getExampleAndTemplateTiles = ({
   numberOfItemsInCarousel = 0,
   privateGameTemplatesPeriodicity,
   showOwnedGameTemplatesFirst,
+  disabled,
 }: {|
   receivedGameTemplates: ?Array<PrivateGameTemplate>,
   privateGameTemplateListingDatas?: ?Array<PrivateGameTemplateListingData>,
@@ -224,6 +229,7 @@ export const getExampleAndTemplateTiles = ({
   numberOfItemsInCarousel?: number,
   privateGameTemplatesPeriodicity: number,
   showOwnedGameTemplatesFirst?: boolean,
+  disabled?: boolean,
 |}): Array<React.Node> => {
   if (!exampleShortHeaders || !privateGameTemplateListingDatas) {
     return [];
@@ -318,6 +324,7 @@ export const getExampleAndTemplateTiles = ({
         onSelectExample: onSelectExampleShortHeader,
         i18n,
         receivedGameTemplates,
+        disabled,
       })
     );
 

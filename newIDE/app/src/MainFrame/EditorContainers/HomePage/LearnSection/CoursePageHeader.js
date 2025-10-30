@@ -32,7 +32,7 @@ import { PurchaseProductButtons } from '../../../../AssetStore/ProductPageHelper
 import { shouldUseAppStoreProduct } from '../../../../Utils/AppStorePurchases';
 import { Divider } from '@material-ui/core';
 import classes from './CoursePageHeader.module.css';
-import Gold from '../../../../Profile/Subscription/Icons/Gold';
+import GoldCompact from '../../../../Profile/Subscription/Icons/GoldCompact';
 import SecureCheckout from '../../../../AssetStore/SecureCheckout/SecureCheckout';
 
 const styles = {
@@ -194,7 +194,7 @@ const CoursePageHeader = ({
                             <Paper style={styles.paper} background="medium">
                               <Column>
                                 <Line expand alignItems="center" noMargin>
-                                  <Gold style={styles.diamondIcon} />
+                                  <GoldCompact style={styles.diamondIcon} />
                                   <Text>
                                     <Trans>
                                       Included with GDevelop subscriptions

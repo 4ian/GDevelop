@@ -12,6 +12,7 @@ type AiConfigurationPresetSelectorProps = {
   setAiConfigurationPresetId: string => void,
   aiConfigurationPresetsWithAvailability: Array<AiConfigurationPresetWithAvailability>,
   aiRequestMode: string,
+  disabled?: boolean,
 };
 
 export const AiConfigurationPresetSelector = ({
@@ -19,6 +20,7 @@ export const AiConfigurationPresetSelector = ({
   setAiConfigurationPresetId,
   aiConfigurationPresetsWithAvailability,
   aiRequestMode,
+  disabled,
 }: AiConfigurationPresetSelectorProps) => {
   const filteredAiConfigurationPresets = aiConfigurationPresetsWithAvailability.filter(
     preset => preset.mode === aiRequestMode
@@ -39,6 +41,7 @@ export const AiConfigurationPresetSelector = ({
           onChange={value => {
             setAiConfigurationPresetId(value);
           }}
+          disabled={disabled}
         >
           {noUpgradeAiConfigurationPresets.map(preset => (
             <SelectOption

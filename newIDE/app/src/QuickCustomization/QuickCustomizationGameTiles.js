@@ -40,11 +40,13 @@ type Props = {|
     exampleShortHeader: ExampleShortHeader
   ) => Promise<void>,
   quickCustomizationRecommendation: QuickCustomizationRecommendation,
+  disabled?: boolean,
 |};
 
 export const QuickCustomizationGameTiles = ({
   onSelectExampleShortHeader,
   quickCustomizationRecommendation,
+  disabled,
 }: Props) => {
   const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
   const { windowSize, isLandscape } = useResponsiveWindowSize();
@@ -100,6 +102,7 @@ export const QuickCustomizationGameTiles = ({
                     )}
                     key={exampleShortHeader.name}
                     useQuickCustomizationThumbnail
+                    disabled={disabled}
                   />
                 )
               )

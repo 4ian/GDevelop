@@ -1,14 +1,19 @@
 // @flow
 import * as React from 'react';
 import { Trans, t } from '@lingui/macro';
-import { type StorageProvider, type SaveAsLocation } from '../ProjectsStorage';
+import {
+  type StorageProvider,
+  type SaveAsLocation,
+  type FileMetadata,
+} from '../ProjectsStorage';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import TextField from '../UI/TextField';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import generateName from '../Utils/ProjectNameGenerator';
 import IconButton from '../UI/IconButton';
-import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
+import { ColumnStackLayout } from '../UI/Layout';
 import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
 import { findEmptyPathInWorkspaceFolder } from '../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
 import SelectField from '../UI/SelectField';
@@ -53,24 +58,15 @@ import { useOnlineStatus } from '../Utils/OnlineStatus';
 import PrivateGameTemplateOwnedInformationPage from '../AssetStore/PrivateGameTemplates/PrivateGameTemplateOwnedInformationPage';
 import { ExampleStoreContext } from '../AssetStore/ExampleStore/ExampleStoreContext';
 import EmptyMessage from '../UI/EmptyMessage';
-import RaisedButton from '../UI/RaisedButton';
-import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
-import Chip from '../UI/Chip';
-import { LineStackLayout } from '../UI/Layout';
 import { BundleStoreContext } from '../AssetStore/Bundles/BundleStoreContext';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
 import { isNativeMobileApp } from '../Utils/Platform';
+import { AskAiStandAloneForm } from '../AiGeneration/AskAiStandAloneForm';
+import { AiRequestContext } from '../AiGeneration/AiRequestContext';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
 const app = remote ? remote.app : null;
-
-const styles = {
-  chip: { height: 24 },
-  tryAIAgentButton: {
-    flexShrink: 0,
-  },
-};
 
 export const getItemsColumns = (
   windowSize: WindowSizeType,
@@ -103,6 +99,7 @@ export type NewProjectSetup = {|
   openQuickCustomizationDialog?: boolean,
   dontOpenAnySceneOrProjectManager?: boolean,
   dontRepositionAskAiEditor?: boolean,
+  dontCloseNewProjectSetupDialog?: boolean,
   creationSource: NewProjectCreationSource,
 |};
 
@@ -113,6 +110,9 @@ export type ExampleProjectSetup = {|
 |};
 
 type Props = {|
+  project: ?gdProject,
+  fileMetadata: ?FileMetadata,
+  resourceManagementProps: ResourceManagementProps,
   isProjectOpening?: boolean,
   onClose: () => void,
   onCreateEmptyProject: (
@@ -127,6 +127,7 @@ type Props = {|
     i18n: I18nType
   ) => Promise<CreateProjectResult>,
   onOpenAskAi: () => void,
+  onCloseAskAi: () => void,
   selectedExampleShortHeader: ?ExampleShortHeader,
   onSelectExampleShortHeader: (exampleShortHeader: ?ExampleShortHeader) => void,
   selectedPrivateGameTemplateListingData: ?PrivateGameTemplateListingData,
@@ -134,24 +135,43 @@ type Props = {|
     privateGameTemplateListingData: ?PrivateGameTemplateListingData
   ) => void,
   storageProviders: Array<StorageProvider>,
+  storageProvider: ?StorageProvider,
   privateGameTemplateListingDatasFromSameCreator: ?Array<PrivateGameTemplateListingData>,
   preventBackHome?: boolean,
+  onOpenLayout: (
+    sceneName: string,
+    options: {|
+      openEventsEditor: boolean,
+      openSceneEditor: boolean,
+      focusWhenOpened:
+        | 'scene-or-events-otherwise'
+        | 'scene'
+        | 'events'
+        | 'none',
+    |}
+  ) => void,
 |};
 
 const NewProjectSetupDialog = ({
+  project,
+  fileMetadata,
+  resourceManagementProps,
   isProjectOpening,
   onClose,
   onCreateEmptyProject,
   onCreateFromExample,
   onCreateProjectFromPrivateGameTemplate,
   onOpenAskAi,
+  onCloseAskAi,
   selectedExampleShortHeader,
   onSelectExampleShortHeader,
   selectedPrivateGameTemplateListingData,
   onSelectPrivateGameTemplateListingData,
   storageProviders,
+  storageProvider,
   privateGameTemplateListingDatasFromSameCreator,
   preventBackHome,
+  onOpenLayout,
 }: Props): React.Node => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
@@ -167,11 +187,21 @@ const NewProjectSetupDialog = ({
     emptyProjectSelected,
     setEmptyProjectSelected,
   ] = React.useState<boolean>(false);
+  const [startersSelected, setStartersSelected] = React.useState<boolean>(
+    false
+  );
   const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
   const isOnHomePage =
     !selectedExampleShortHeader &&
     !selectedPrivateGameTemplateListingData &&
-    !emptyProjectSelected;
+    !emptyProjectSelected &&
+    !startersSelected;
+  const isOnStartersPage =
+    !selectedExampleShortHeader &&
+    !selectedPrivateGameTemplateListingData &&
+    !emptyProjectSelected &&
+    startersSelected;
+
   const { privateGameTemplateListingDatas } = React.useContext(
     PrivateGameTemplateStoreContext
   );
@@ -205,7 +235,10 @@ const NewProjectSetupDialog = ({
   const newProjectsDefaultFolder = app
     ? findEmptyPathInWorkspaceFolder(app, values.newProjectsDefaultFolder || '')
     : '';
-  const [storageProvider, setStorageProvider] = React.useState<StorageProvider>(
+  const [
+    storageProviderForCreation,
+    setStorageProviderForCreation,
+  ] = React.useState<StorageProvider>(
     (): StorageProvider => {
       const localFileStorageProvider = storageProviders.find(
         ({ internalName }) => internalName === 'LocalFile'
@@ -250,8 +283,8 @@ const NewProjectSetupDialog = ({
     }
   );
   const [saveAsLocation, setSaveAsLocation] = React.useState<?SaveAsLocation>(
-    storageProvider.getProjectLocation
-      ? storageProvider.getProjectLocation({
+    storageProviderForCreation.getProjectLocation
+      ? storageProviderForCreation.getProjectLocation({
           projectName,
           saveAsLocation: null,
           newProjectsDefaultFolder,
@@ -260,11 +293,12 @@ const NewProjectSetupDialog = ({
   );
 
   const needUserAuthenticationForStorage =
-    storageProvider.needUserAuthentication && !authenticated;
+    storageProviderForCreation.needUserAuthentication && !authenticated;
   const hasTooManyCloudProjects =
-    storageProvider.internalName === 'Cloud' &&
+    storageProviderForCreation.internalName === 'Cloud' &&
     checkIfHasTooManyCloudProjects(authenticatedUser);
-  const hasSelectedAStorageProvider = storageProvider.internalName !== 'Empty';
+  const hasSelectedAStorageProvider =
+    storageProviderForCreation.internalName !== 'Empty';
 
   const selectedWidth =
     resolutionOptions[resolutionOption].width ||
@@ -276,7 +310,9 @@ const NewProjectSetupDialog = ({
     defaultCustomHeight;
   const selectedOrientation = resolutionOptions[resolutionOption].orientation;
 
-  const isLoading = isProjectOpening;
+  const { aiRequestStorage } = React.useContext(AiRequestContext);
+  const { isSendingAiRequest } = aiRequestStorage;
+  const isLoading = isProjectOpening || isSendingAiRequest('');
 
   const linkedExampleShortHeaders: {
     exampleShortHeader: ExampleShortHeader,
@@ -384,12 +420,10 @@ const NewProjectSetupDialog = ({
       receivedBundles,
     ]
   );
-  const noGameTemplateSelectedOrSelectedAndOwned =
-    !selectedPrivateGameTemplateListingData ||
+  const shouldShowCreateActions =
+    emptyProjectSelected ||
+    selectedExampleShortHeader ||
     !!selectedGameTemplatePurchaseUsageType;
-
-  const shouldShowCreateButton =
-    !isOnHomePage && noGameTemplateSelectedOrSelectedAndOwned;
 
   // On the local app, prefer to always have something saved so that the user is not blocked.
   // On the web-app, allow to create a project without saving it, unless a private game template is selected
@@ -416,8 +450,8 @@ const NewProjectSetupDialog = ({
       }
 
       // Make sure that the path is up to date with the project name.
-      const projectLocation = storageProvider.getProjectLocation
-        ? storageProvider.getProjectLocation({
+      const projectLocation = storageProviderForCreation.getProjectLocation
+        ? storageProviderForCreation.getProjectLocation({
             projectName,
             saveAsLocation,
             newProjectsDefaultFolder,
@@ -426,7 +460,7 @@ const NewProjectSetupDialog = ({
 
       const projectSetup: NewProjectSetup = {
         projectName,
-        storageProvider,
+        storageProvider: storageProviderForCreation,
         saveAsLocation: projectLocation,
         height: selectedHeight,
         width: selectedWidth,
@@ -440,7 +474,7 @@ const NewProjectSetupDialog = ({
           exampleShortHeader: selectedExampleShortHeader,
           newProjectSetup: {
             projectName,
-            storageProvider,
+            storageProvider: storageProviderForCreation,
             saveAsLocation: projectLocation,
             creationSource: 'default',
           },
@@ -452,7 +486,7 @@ const NewProjectSetupDialog = ({
           {
             // We only pass down the project name as this is the only cusomizable field for a template.
             projectName,
-            storageProvider,
+            storageProvider: storageProviderForCreation,
             saveAsLocation,
             creationSource: 'default',
           },
@@ -465,7 +499,7 @@ const NewProjectSetupDialog = ({
     [
       shouldAllowCreatingProject,
       projectName,
-      storageProvider,
+      storageProviderForCreation,
       saveAsLocation,
       newProjectsDefaultFolder,
       selectedHeight,
@@ -493,7 +527,8 @@ const NewProjectSetupDialog = ({
       if (
         !emptyProjectSelected &&
         !selectedExampleShortHeader &&
-        !selectedPrivateGameTemplateListingData
+        !selectedPrivateGameTemplateListingData &&
+        !startersSelected
       ) {
         // Reset project name when everything is unselected.
         setProjectName(generateProjectName());
@@ -526,6 +561,7 @@ const NewProjectSetupDialog = ({
       selectedExampleShortHeader,
       selectedPrivateGameTemplateListingData,
       emptyProjectSelected,
+      startersSelected,
       exampleShortHeaders,
     ]
   );
@@ -533,10 +569,22 @@ const NewProjectSetupDialog = ({
   const onBack = React.useCallback(
     () => {
       if (!isOnHomePage && !preventBackHome) {
-        if (emptyProjectSelected) setEmptyProjectSelected(false);
-        if (selectedExampleShortHeader) onSelectExampleShortHeader(null);
-        if (selectedPrivateGameTemplateListingData)
+        if (emptyProjectSelected) {
+          setEmptyProjectSelected(false);
+          return;
+        }
+        if (selectedExampleShortHeader) {
+          onSelectExampleShortHeader(null);
+          return;
+        }
+        if (selectedPrivateGameTemplateListingData) {
           onSelectPrivateGameTemplateListingData(null);
+          return;
+        }
+        if (startersSelected) {
+          setStartersSelected(false);
+          return;
+        }
       }
     },
     [
@@ -547,6 +595,7 @@ const NewProjectSetupDialog = ({
       onSelectExampleShortHeader,
       selectedPrivateGameTemplateListingData,
       onSelectPrivateGameTemplateListingData,
+      startersSelected,
       preventBackHome,
     ]
   );
@@ -571,7 +620,7 @@ const NewProjectSetupDialog = ({
               label={<Trans>Cancel</Trans>}
               onClick={onClose}
             />,
-            shouldShowCreateButton ? (
+            shouldShowCreateActions ? (
               <DialogPrimaryButton
                 key="create"
                 primary
@@ -584,11 +633,15 @@ const NewProjectSetupDialog = ({
           ].filter(Boolean)}
           cannotBeDismissed={isLoading}
           onRequestClose={onClose}
-          onApply={() => onCreateGameClick(i18n)}
           fullHeight={
+            // Make full height if on home page or starters page,
             isOnHomePage ||
+            (startersSelected &&
+              !selectedExampleShortHeader &&
+              !emptyProjectSelected) ||
+            // Or if a template is selected but not owned (to show the full information page).
             (!!selectedPrivateGameTemplateListingData &&
-              !noGameTemplateSelectedOrSelectedAndOwned)
+              !selectedGameTemplatePurchaseUsageType)
           }
           flexColumnBody
           forceScrollVisible
@@ -601,7 +654,7 @@ const NewProjectSetupDialog = ({
                     icon={<ChevronArrowLeft />}
                     label={<Trans>Back</Trans>}
                     onClick={onBack}
-                    disabled={isProjectOpening}
+                    disabled={isLoading}
                   />
                 </Line>
                 <Spacer />
@@ -609,6 +662,18 @@ const NewProjectSetupDialog = ({
             )}
             {isOnHomePage && (
               <ColumnStackLayout noMargin>
+                <AskAiStandAloneForm
+                  i18n={i18n}
+                  project={project}
+                  resourceManagementProps={resourceManagementProps}
+                  fileMetadata={fileMetadata}
+                  storageProvider={storageProvider}
+                  onCreateProjectFromExample={onCreateFromExample}
+                  onCreateEmptyProject={onCreateEmptyProject}
+                  onOpenLayout={onOpenLayout}
+                  onOpenAskAi={onOpenAskAi}
+                  onCloseAskAi={onCloseAskAi}
+                />
                 <EmptyAndStartingPointProjects
                   onSelectExampleShortHeader={exampleShortHeader => {
                     onSelectExampleShortHeader(exampleShortHeader);
@@ -616,34 +681,11 @@ const NewProjectSetupDialog = ({
                   onSelectEmptyProject={() => {
                     setEmptyProjectSelected(true);
                   }}
-                  disabled={isProjectOpening}
+                  disabled={isLoading}
+                  onSeeAll={() => {
+                    setStartersSelected(true);
+                  }}
                 />
-                <LineStackLayout noMargin>
-                  <Text size="block-title" noMargin>
-                    <Trans>Prototype with AI</Trans>
-                  </Text>
-                  <Chip label={<Trans>New</Trans>} style={styles.chip} />
-                </LineStackLayout>
-                <ResponsiveLineStackLayout
-                  justifyContent="space-between"
-                  alignItems="center"
-                  noColumnMargin
-                >
-                  <Text size="body2" noMargin>
-                    <Trans>
-                      Start prototyping a new game or build on top of an
-                      existing one with the GDevelop AI agent.
-                    </Trans>
-                  </Text>
-                  <RaisedButton
-                    size="large"
-                    color="success"
-                    label={<Trans>Try the AI agent</Trans>}
-                    rightIcon={<ArrowRight />}
-                    style={styles.tryAIAgentButton}
-                    onClick={onOpenAskAi}
-                  />
-                </ResponsiveLineStackLayout>
                 {isOnline ? (
                   <>
                     <Text size="block-title" noMargin>
@@ -661,6 +703,9 @@ const NewProjectSetupDialog = ({
                       i18n={i18n}
                       getColumnsFromWindowSize={getItemsColumns}
                       hideStartingPoints
+                      limitRowsTo={6}
+                      showLoadMore
+                      disabled={isLoading}
                     />
                   </>
                 ) : (
@@ -677,7 +722,7 @@ const NewProjectSetupDialog = ({
             )}
             {!isOnHomePage &&
               selectedPrivateGameTemplateListingData &&
-              !noGameTemplateSelectedOrSelectedAndOwned && (
+              !selectedGameTemplatePurchaseUsageType && (
                 <PrivateGameTemplateInformationPage
                   privateGameTemplateListingData={
                     selectedPrivateGameTemplateListingData
@@ -688,7 +733,18 @@ const NewProjectSetupDialog = ({
                   onGameTemplateOpen={onSelectPrivateGameTemplateListingData}
                 />
               )}
-            {!isOnHomePage && noGameTemplateSelectedOrSelectedAndOwned && (
+            {isOnStartersPage && (
+              <EmptyAndStartingPointProjects
+                onSelectExampleShortHeader={exampleShortHeader => {
+                  onSelectExampleShortHeader(exampleShortHeader);
+                }}
+                onSelectEmptyProject={() => {
+                  setEmptyProjectSelected(true);
+                }}
+                disabled={isLoading}
+              />
+            )}
+            {shouldShowCreateActions && (
               <ColumnStackLayout noMargin>
                 {selectedExampleShortHeader ? (
                   <ExampleInformationPage
@@ -741,14 +797,14 @@ const NewProjectSetupDialog = ({
                   fullWidth
                   disabled={isLoading}
                   floatingLabelText={<Trans>Where to store this project</Trans>}
-                  value={storageProvider.internalName}
+                  value={storageProviderForCreation.internalName}
                   onChange={(e, i, newValue: string) => {
                     setNewProjectsDefaultStorageProviderName(newValue);
                     const newStorageProvider =
                       storageProviders.find(
                         ({ internalName }) => internalName === newValue
                       ) || emptyStorageProvider;
-                    setStorageProvider(newStorageProvider);
+                    setStorageProviderForCreation(newStorageProvider);
 
                     // Reset the save as location, to avoid mixing it between storage providers
                     // and give a chance to the storage provider to set it to a default value.
@@ -760,15 +816,15 @@ const NewProjectSetupDialog = ({
                     // (for example: the "URL" storage provider, which is read only,
                     // or the "DownloadFile" storage provider, which is not a persistent storage).
                     .filter(
-                      storageProvider =>
-                        !!storageProvider.renderNewProjectSaveAsLocationChooser
+                      availableStorageProvider =>
+                        !!availableStorageProvider.renderNewProjectSaveAsLocationChooser
                     )
-                    .map(storageProvider => (
+                    .map(availableStorageProvider => (
                       <SelectOption
-                        key={storageProvider.internalName}
-                        value={storageProvider.internalName}
-                        label={storageProvider.name}
-                        disabled={storageProvider.disabled}
+                        key={availableStorageProvider.internalName}
+                        value={availableStorageProvider.internalName}
+                        label={availableStorageProvider.name}
+                        disabled={availableStorageProvider.disabled}
                       />
                     ))}
                   {!electron && !isNativeMobileApp() && (
@@ -786,13 +842,15 @@ const NewProjectSetupDialog = ({
                   )}
                 </SelectField>
                 {!needUserAuthenticationForStorage &&
-                  storageProvider.renderNewProjectSaveAsLocationChooser &&
-                  storageProvider.renderNewProjectSaveAsLocationChooser({
-                    projectName,
-                    saveAsLocation,
-                    setSaveAsLocation,
-                    newProjectsDefaultFolder,
-                  })}
+                  storageProviderForCreation.renderNewProjectSaveAsLocationChooser &&
+                  storageProviderForCreation.renderNewProjectSaveAsLocationChooser(
+                    {
+                      projectName,
+                      saveAsLocation,
+                      setSaveAsLocation,
+                      newProjectsDefaultFolder,
+                    }
+                  )}
                 {(emptyProjectSelected ||
                   !!linkedPixelArtExampleShortHeader ||
                   !!linkedNonPixelArtExampleShortHeader) && (

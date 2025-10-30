@@ -4,8 +4,8 @@ import * as React from 'react';
 import { ToolbarGroup } from '../UI/Toolbar';
 import AddIcon from '../UI/CustomSvgIcons/Add';
 import ChatBubblesIcon from '../UI/CustomSvgIcons/ChatBubbles';
-import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 import IconButton from '../UI/IconButton';
+import RaisedButton from '../UI/RaisedButton';
 
 type Props = {|
   onStartNewChat: () => void,
@@ -31,11 +31,11 @@ export const Toolbar = ({
         </IconButton>
       </ToolbarGroup>
       <ToolbarGroup lastChild>
-        <ResponsiveRaisedButton
+        <RaisedButton
           primary
           onClick={onStartNewChat}
           icon={<AddIcon />}
-          label={<Trans>Start a new chat</Trans>}
+          label={<Trans>New chat</Trans>}
           disabled={!canStartNewChat}
           style={{
             flexShrink: 0,

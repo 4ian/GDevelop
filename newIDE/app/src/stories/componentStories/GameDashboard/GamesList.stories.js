@@ -57,7 +57,7 @@ export const NoGamesOrProjects = () => {
           closeProject={action('closeProject')}
           canSaveProject
           currentFileMetadata={null}
-          isUpdatingGame={false}
+          disabled={false}
           onChooseProject={action('onChooseProject')}
           onOpenNewProjectSetupDialog={action('onOpenNewProjectSetupDialog')}
           onSaveProject={action('onSaveProject')}
@@ -112,7 +112,7 @@ export const WithOnlyGames = () => {
           closeProject={action('closeProject')}
           canSaveProject
           currentFileMetadata={null}
-          isUpdatingGame={false}
+          disabled={false}
           onChooseProject={action('onChooseProject')}
           onOpenNewProjectSetupDialog={action('onOpenNewProjectSetupDialog')}
           onSaveProject={action('onSaveProject')}
@@ -162,7 +162,7 @@ export const WithOnlyProjects = () => {
           closeProject={action('closeProject')}
           canSaveProject
           currentFileMetadata={null}
-          isUpdatingGame={false}
+          disabled={false}
           onChooseProject={action('onChooseProject')}
           onOpenNewProjectSetupDialog={action('onOpenNewProjectSetupDialog')}
           onSaveProject={action('onSaveProject')}
@@ -219,7 +219,7 @@ export const WithGamesAndProjects = () => {
           closeProject={action('closeProject')}
           canSaveProject
           currentFileMetadata={null}
-          isUpdatingGame={false}
+          disabled={false}
           onChooseProject={action('onChooseProject')}
           onOpenNewProjectSetupDialog={action('onOpenNewProjectSetupDialog')}
           onSaveProject={action('onSaveProject')}

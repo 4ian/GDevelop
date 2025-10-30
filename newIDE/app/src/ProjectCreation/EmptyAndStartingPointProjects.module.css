@@ -5,7 +5,6 @@
 }
 
 .emptyProject {
-  margin: 4px;
   border: 1px solid var(--theme-text-disabled-color);
   border-radius: 8px;
   height: 100%;

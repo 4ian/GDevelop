@@ -895,6 +895,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         </ScrollView>
         <form
           onSubmit={() => {
+            setAutoProcessFunctionCalls(true);
             onSendMessage({
               userMessage: userRequestTextPerAiRequestId[aiRequestId] || '',
             });
@@ -984,6 +985,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 }
                 rows={2}
                 onSubmit={() => {
+                  setAutoProcessFunctionCalls(true);
                   onSendMessage({
                     userMessage:
                       userRequestTextPerAiRequestId[aiRequestId] || '',
@@ -1006,6 +1008,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                         icon={sendButtonIcon}
                         label={sendButtonLabel}
                         onClick={() => {
+                          setAutoProcessFunctionCalls(true);
                           onSendMessage({
                             userMessage:
                               userRequestTextPerAiRequestId[aiRequestId] || '',

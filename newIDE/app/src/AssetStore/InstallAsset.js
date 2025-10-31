@@ -513,9 +513,8 @@ export const checkRequiredExtensionsUpdate = async ({
   const requiredExtensionShortHeaders = requiredExtensions.map(
     requiredExtension => {
       const extensionShortHeader = extensionsRegistry.headers.find(
-        extensionShortHeader => {
-          return extensionShortHeader.name === requiredExtension.extensionName;
-        }
+        extensionShortHeader =>
+          extensionShortHeader.name === requiredExtension.extensionName
       );
       if (!extensionShortHeader) {
         throw new Error(
@@ -528,6 +527,33 @@ export const checkRequiredExtensionsUpdate = async ({
       return extensionShortHeader;
     }
   );
+
+  // Add extensions dependencies
+  for (let i = 0; i < requiredExtensionShortHeaders.length; i++) {
+    const requiredExtensionShortHeader = requiredExtensionShortHeaders[i];
+    const { requiredExtensions } = requiredExtensionShortHeader;
+    if (!requiredExtensions) {
+      continue;
+    }
+    for (const requiredExtension of requiredExtensions) {
+      requiredExtensionShortHeaders.find(
+        extensionShortHeader =>
+          extensionShortHeader.name === requiredExtension.extensionName
+      );
+      const extensionShortHeader = extensionsRegistry.headers.find(
+        extensionShortHeader =>
+          extensionShortHeader.name === requiredExtension.extensionName
+      );
+      if (!extensionShortHeader) {
+        throw new Error(
+          'Unable to find extension ' +
+            requiredExtension.extensionName +
+            ' in the registry.'
+        );
+      }
+      requiredExtensionShortHeaders.push(extensionShortHeader);
+    }
+  }
 
   const incompatibleWithIdeExtensionShortHeaders = requiredExtensionShortHeaders.filter(
     requiredExtensionShortHeader =>

@@ -4,12 +4,18 @@ import { GDevelopAssetApi } from './ApiConfigs';
 import { type UserPublicProfile } from './User';
 import { retryIfFailed } from '../RetryIfFailed';
 
+
 // This file is mocked by tests.
 // Don't put any function that is not calling services.
 
 const gd: libGDevelop = global.gd;
 
 type ExtensionTier = 'experimental' | 'reviewed' | 'installed';
+
+export type ExtensionDependency = {|
+  extensionName: string,
+  extensionVersion: string,
+|};
 
 export type ExtensionRegistryItemHeader = {|
   tier: ExtensionTier,
@@ -26,6 +32,7 @@ export type ExtensionRegistryItemHeader = {|
   category: string,
   previewIconUrl: string,
   changelog?: Array<{ version: string, breaking?: string }>,
+  requiredExtensions?: Array<ExtensionDependency>,
   // Added by the editor.
   isInstalled?: boolean,
 |};

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8'>
+<title>Codecs interop test</title>
+</head>
+<body>
+	<p>
+		Test interoperability of 3 DEFLATE implementations.
+		Put zlib.js from zlib-asm project to ../zlib-asm/zlib.js, put pako.min.js from pako project to ../pako/pako.min.js.
+	</p>
+	<button onclick="doTest()">do test</button>
+	<script type="text/javascript" src="../zlib-asm/zlib.js"></script>
+	<script type="text/javascript" src="../zlib-asm/codecs.js"></script>
+	<script type="text/javascript" src="../pako/pako.min.js"></script>
+	<script type="text/javascript" src="../pako/codecs.js"></script>
+	<!-- jzlib -->
+	<script type="text/javascript" src="../inflate.js"></script>
+	<script type="text/javascript" src="../deflate.js"></script>
+	<script>
+		var inflaters = {
+			jzlib: _jzlib_Inflater,
+			pako: _pako_Inflater,
+			'zlib-asm': _zlib_asm_Inflater,
+		};
+		var deflaters = {
+			jzlib: _jzlib_Deflater,
+			pako: _pako_Deflater,
+			'zlib-asm': _zlib_asm_Deflater,
+		};
+
+		function doTest() {
+			var testData = [
+				getRandomArray(0),
+				getRandomArray(1),
+				getRandomArray(11),
+				getRandomArray(100 * 1024 + 3),
+				getRandomArray(3 * 1024 * 1024 + 5),
+			];
+			var level = 5, stepSize = 256 * 1024;
+			var passed = 0, failed = 0;
+			var defNames = Object.keys(deflaters), infNames = Object.keys(inflaters);
+			for (var i = 0; i < testData.length; i++) {
+				for (var j = 0; j < infNames.length; j++) {
+					for (var k = 0; k < defNames.length; k++) {
+						var defName = defNames[k], infName = infNames[j], data = testData[i];
+						var desc = 'testInterop: deflater: ' + defName + ', inflater: ' + infName
+							+ ', dataSize:' + data.length + ', level: ' + level + ', stepSize: ' + stepSize;
+						try {
+							testInterop(defName, infName, data, level, stepSize);
+							passed++;
+							console.log('[Passed]' + desc);
+						} catch (e) {
+							failed++;
+							console.log('[Failed]' + desc + '; Error: ' + e.message + ', stack: ' + e.stack);
+						}
+					}
+				}
+			}
+			console.log('Test finished, ' + passed + ' passed, ' + failed + ' failed.')
+		}
+
+		function testInterop(deflaterName, inflaterName, data, level, stepSize) {
+			var deflater = new deflaters[deflaterName]({level: level});
+			var inflater = new inflaters[inflaterName]();
+			var compressed = process(deflater, data, stepSize);
+			var uncompressed = process(inflater, compressed, stepSize);
+			assertArrayEquals(data, uncompressed);
+		}
+
+		function process(codec, data, stepSize) {
+			var outs = [], out;
+			for (var off = 0; off < data.length; off += stepSize) {
+				var slice = data.subarray(off, off + stepSize);
+				out = codec.append(slice);
+				out && outs.push(out);
+			}
+			out = codec.flush();
+			out && outs.push(out);
+			return flatternArray(outs);
+		}
+
+		function flatternArray(input) {
+			var totalLength = input.reduce(function(prev, elem) { return prev + elem.length; }, 0);
+			var bytes = new Uint8Array(totalLength);
+			for (var i = 0, n = input.length, off = 0; i < n; i++) {
+				var slice = input[i];
+				bytes.set(slice, off);
+				off += slice.length;
+			}
+			return bytes;
+		}
+
+		function assertArrayEquals(a1, a2) {
+			if (a1.length !== a2.length)
+				throw new Error('assertArrayEquals:length:' + a1.length + ', ' + a2.length);
+			for (var i = 0, n = a1.length; i < n; i++) {
+				if (a1[i] !== a2[i])
+					throw new Error('assertArrayEquals:at:' + i);
+			}
+		}
+
+		function getRandomArray(size) {
+			var buffer = new ArrayBuffer(size + 7);
+			var data = new Float64Array(buffer, 0, Math.floor(buffer.byteLength / 8));
+			var rand = Math.random;
+			for(var i = 0, n = data.length; i < n; i++)
+				data[i] = rand();
+			return new Uint8Array(buffer, 3, size); // skip leading 0s
+		}
+
+		//onload = doTest();
+	</script>
+</body>
+</html>

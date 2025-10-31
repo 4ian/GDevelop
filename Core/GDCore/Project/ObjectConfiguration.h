@@ -12,7 +12,7 @@
 
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/EffectsContainer.h"
-#include "GDCore/Project/ResourcesManager.h"
+#include "GDCore/Project/ResourcesContainer.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/MakeUnique.h"

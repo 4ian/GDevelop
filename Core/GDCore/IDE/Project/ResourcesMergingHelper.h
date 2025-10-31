@@ -3,8 +3,7 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef RESOURCESMERGINGHELPER_H
-#define RESOURCESMERGINGHELPER_H
+#pragma once
 
 #include <map>
 #include <memory>
@@ -29,7 +28,7 @@ namespace gd {
  */
 class GD_CORE_API ResourcesMergingHelper : public ArbitraryResourceWorker {
 public:
-  ResourcesMergingHelper(gd::ResourcesManager &resourcesManager,
+  ResourcesMergingHelper(gd::ResourcesContainer &resourcesManager,
                          gd::AbstractFileSystem &fileSystem)
       : ArbitraryResourceWorker(resourcesManager),
         preserveDirectoriesStructure(false), preserveAbsoluteFilenames(false),
@@ -98,5 +97,3 @@ public:
 };
 
 }  // namespace gd
-
-#endif  // RESOURCESMERGINGHELPER_H

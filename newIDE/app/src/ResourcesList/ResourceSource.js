@@ -18,7 +18,7 @@ import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/Reso
 const gd: libGDevelop = global.gd;
 
 // These are all the kind of resources that can be found in
-// Core/GDCore/Project/ResourcesManager.h
+// Core/GDCore/Project/ResourcesContainer.h
 export type ResourceKind =
   | 'image'
   | 'audio'

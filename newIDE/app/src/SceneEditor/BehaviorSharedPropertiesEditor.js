@@ -7,11 +7,13 @@ import propertiesMapToSchema from '../PropertiesEditor/PropertiesMapToSchema';
 import EmptyMessage from '../UI/EmptyMessage';
 import { Column } from '../UI/Grid';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 type Props = {|
   behaviorSharedData: gdBehaviorsSharedData,
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
 |};
 
 export default class BehaviorSharedPropertiesEditor extends React.Component<Props> {
@@ -32,7 +34,11 @@ export default class BehaviorSharedPropertiesEditor extends React.Component<Prop
           <PropertiesEditor
             schema={propertiesSchema}
             instances={[behaviorSharedData]}
+            project={this.props.project}
             resourceManagementProps={this.props.resourceManagementProps}
+            projectScopedContainersAccessor={
+              this.props.projectScopedContainersAccessor
+            }
           />
         ) : (
           <EmptyMessage>

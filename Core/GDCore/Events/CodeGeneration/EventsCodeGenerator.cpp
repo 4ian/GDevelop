@@ -898,22 +898,29 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     argOutput = GenerateGetBehaviorNameCode(parameter.GetPlainString());
   } else if (metadata.GetType() == "key") {
     argOutput = "\"" + ConvertToString(parameter.GetPlainString()) + "\"";
-  } else if (metadata.GetType() == "audioResource" ||
-             metadata.GetType() == "bitmapFontResource" ||
-             metadata.GetType() == "fontResource" ||
-             metadata.GetType() == "imageResource" ||
-             metadata.GetType() == "jsonResource" ||
-             metadata.GetType() == "tilemapResource" ||
-             metadata.GetType() == "tilesetResource" ||
-             metadata.GetType() == "videoResource" ||
-             metadata.GetType() == "model3DResource" ||
-             metadata.GetType() == "atlasResource" ||
-             metadata.GetType() == "spineResource" ||
-             // Deprecated, old parameter names:
-             metadata.GetType() == "password" ||
-             metadata.GetType() == "musicfile" ||
-             metadata.GetType() == "soundfile") {
-    argOutput = "\"" + ConvertToString(parameter.GetPlainString()) + "\"";
+  } else if (ParameterMetadata::IsExpression("resource", metadata.GetType())) {
+    const auto &resourceName = parameter.GetPlainString();
+    const auto &resourcesContainersList =
+        GetProjectScopedContainers().GetResourcesContainersList();
+    const auto sourceType =
+        resourcesContainersList.GetResourcesContainerSourceType(resourceName);
+    if (sourceType == ResourcesContainer::SourceType::Properties) {
+      const auto& propertiesContainersList =
+          GetProjectScopedContainers().GetPropertiesContainersList();
+      const auto& propertiesContainerAndProperty =
+          propertiesContainersList.Get(resourceName);
+      argOutput = GeneratePropertyGetterWithoutCasting(
+          propertiesContainerAndProperty.first,
+          propertiesContainerAndProperty.second);
+    } else if (sourceType == ResourcesContainer::SourceType::Parameters) {
+      const auto& parametersVectorsList =
+          GetProjectScopedContainers().GetParametersVectorsList();
+      const auto& parameter =
+          gd::ParameterMetadataTools::Get(parametersVectorsList, resourceName);
+      argOutput = GenerateParameterGetterWithoutCasting(parameter);
+    } else {
+      argOutput = "\"" + ConvertToString(resourceName) + "\"";
+    }
   } else if (metadata.GetType() == "mouse") {
     argOutput = "\"" + ConvertToString(parameter.GetPlainString()) + "\"";
   } else if (metadata.GetType() == "yesorno") {

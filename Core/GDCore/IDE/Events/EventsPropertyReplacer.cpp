@@ -272,7 +272,7 @@ bool EventsPropertyReplacer::DoVisitEventExpression(
 bool EventsPropertyReplacer::CanContainProperty(
     const gd::ValueTypeMetadata &valueTypeMetadata) {
   return valueTypeMetadata.IsVariable() || valueTypeMetadata.IsNumber() ||
-         valueTypeMetadata.IsString();
+         valueTypeMetadata.IsString() || valueTypeMetadata.IsResource();
 }
 
 EventsPropertyReplacer::~EventsPropertyReplacer() {}

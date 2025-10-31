@@ -22,7 +22,7 @@ namespace gd {
 class GD_CORE_API ResourcesAbsolutePathChecker
     : public ArbitraryResourceWorker {
 public:
-  ResourcesAbsolutePathChecker(gd::ResourcesManager &resourcesManager,
+  ResourcesAbsolutePathChecker(gd::ResourcesContainer &resourcesManager,
                                AbstractFileSystem &fileSystem)
       : ArbitraryResourceWorker(resourcesManager), hasAbsoluteFilenames(false),
         fs(fileSystem){};

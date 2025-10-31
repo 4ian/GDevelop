@@ -25,6 +25,9 @@ export const Default = () => (
       object={testProject.spriteObjectWithBehaviors}
       isChildObject={false}
       resourceManagementProps={fakeResourceManagementProps}
+      projectScopedContainersAccessor={
+        testProject.testSceneProjectScopedContainersAccessor
+      }
       onUpdateBehaviorsSharedData={() => {}}
       openBehaviorEvents={() => action('Open behavior events')}
       onBehaviorsUpdated={() => {}}
@@ -42,6 +45,9 @@ export const WithoutAnyBehaviors = () => (
       object={testProject.spriteObjectWithoutBehaviors}
       isChildObject={false}
       resourceManagementProps={fakeResourceManagementProps}
+      projectScopedContainersAccessor={
+        testProject.testSceneProjectScopedContainersAccessor
+      }
       onUpdateBehaviorsSharedData={() => {}}
       openBehaviorEvents={() => action('Open behavior events')}
       onBehaviorsUpdated={() => {}}
@@ -59,6 +65,9 @@ export const Locked = () => (
       object={testProject.spriteObjectWithBehaviors}
       isChildObject={false}
       resourceManagementProps={fakeResourceManagementProps}
+      projectScopedContainersAccessor={
+        testProject.testSceneProjectScopedContainersAccessor
+      }
       onUpdateBehaviorsSharedData={() => {}}
       openBehaviorEvents={() => action('Open behavior events')}
       onBehaviorsUpdated={() => {}}
@@ -76,6 +85,9 @@ export const LockedWithoutAnyBehaviors = () => (
       object={testProject.spriteObjectWithoutBehaviors}
       isChildObject={false}
       resourceManagementProps={fakeResourceManagementProps}
+      projectScopedContainersAccessor={
+        testProject.testSceneProjectScopedContainersAccessor
+      }
       onUpdateBehaviorsSharedData={() => {}}
       openBehaviorEvents={() => action('Open behavior events')}
       onBehaviorsUpdated={() => {}}

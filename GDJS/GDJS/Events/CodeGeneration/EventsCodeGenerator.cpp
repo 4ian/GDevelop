@@ -138,13 +138,16 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
       gd::ObjectsContainer::SourceType::Function);
   gd::VariablesContainer parameterVariablesContainer(
       gd::VariablesContainer::SourceType::Parameters);
+  gd::ResourcesContainer parameterResourcesContainer(
+      gd::ResourcesContainer::SourceType::Parameters);
   auto projectScopedContainers = gd::ProjectScopedContainers::
       MakeNewProjectScopedContainersForFreeEventsFunction(
           project,
           eventsFunctionsExtension,
           eventsFunction,
           parameterObjectsAndGroups,
-          parameterVariablesContainer);
+          parameterVariablesContainer,
+        parameterResourcesContainer);
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
@@ -204,6 +207,10 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
       gd::VariablesContainer::SourceType::Parameters);
   gd::VariablesContainer propertyVariablesContainer(
       gd::VariablesContainer::SourceType::Properties);
+  gd::ResourcesContainer parameterResourcesContainer(
+      gd::ResourcesContainer::SourceType::Parameters);
+  gd::ResourcesContainer propertyResourcesContainer(
+      gd::ResourcesContainer::SourceType::Properties);
   auto projectScopedContainers = gd::ProjectScopedContainers::
       MakeNewProjectScopedContainersForBehaviorEventsFunction(
           project,
@@ -212,7 +219,9 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
           eventsFunction,
           parameterObjectsContainers,
           parameterVariablesContainer,
-          propertyVariablesContainer);
+          propertyVariablesContainer,
+          parameterResourcesContainer,
+          propertyResourcesContainer);
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
@@ -295,6 +304,10 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
       gd::VariablesContainer::SourceType::Parameters);
   gd::VariablesContainer propertyVariablesContainer(
       gd::VariablesContainer::SourceType::Properties);
+  gd::ResourcesContainer parameterResourcesContainer(
+      gd::ResourcesContainer::SourceType::Parameters);
+  gd::ResourcesContainer propertyResourcesContainer(
+      gd::ResourcesContainer::SourceType::Properties);
   auto projectScopedContainers = gd::ProjectScopedContainers::
       MakeNewProjectScopedContainersForObjectEventsFunction(
           project,
@@ -303,7 +316,9 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
           eventsFunction,
           parameterObjectsContainers,
           parameterVariablesContainer,
-          propertyVariablesContainer);
+          propertyVariablesContainer,
+          parameterResourcesContainer,
+          propertyResourcesContainer);
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
@@ -1404,7 +1419,7 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
   const gd::VariablesContainer* variables = NULL;
   if (scope == ANY_VARIABLE || scope == VARIABLE_OR_PROPERTY ||
       scope == VARIABLE_OR_PROPERTY_OR_PARAMETER) {
-    const auto variablesContainersList =
+    const auto &variablesContainersList =
         GetProjectScopedContainers().GetVariablesContainersList();
     const auto& variablesContainer =
         scope == VARIABLE_OR_PROPERTY_OR_PARAMETER

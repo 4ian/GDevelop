@@ -61,7 +61,7 @@ type Props = {|
   windowSize: WindowSizeType,
 
   scope: EventsScope,
-  resourcesManager: gdResourcesManager,
+  resourcesManager: gdResourcesContainer,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,

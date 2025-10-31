@@ -33,6 +33,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       <ResourceSelector
         margin={props.isInline ? 'none' : 'dense'}
         project={props.project}
+        projectScopedContainersAccessor={props.projectScopedContainersAccessor}
         resourceManagementProps={props.resourceManagementProps}
         resourcesLoader={ResourcesLoader}
         resourceKind="video"

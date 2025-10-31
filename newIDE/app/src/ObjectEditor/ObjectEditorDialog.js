@@ -292,6 +292,7 @@ const InnerDialog = (props: InnerDialogProps) => {
             eventsBasedObject={eventsBasedObject}
             object={object}
             resourceManagementProps={resourceManagementProps}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
             onSizeUpdated={
               forceUpdate /*Force update to ensure dialog is properly positioned*/
             }
@@ -330,6 +331,7 @@ const InnerDialog = (props: InnerDialogProps) => {
           project={project}
           eventsFunctionsExtension={eventsFunctionsExtension}
           resourceManagementProps={resourceManagementProps}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
           onSizeUpdated={
             forceUpdate /*Force update to ensure dialog is properly positioned*/
           }
@@ -375,6 +377,7 @@ const InnerDialog = (props: InnerDialogProps) => {
           layerRenderingType="2d"
           project={project}
           resourceManagementProps={resourceManagementProps}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
           effectsContainer={object.getEffects()}
           onEffectsRenamed={(oldName, newName) => {
             if (layout) {

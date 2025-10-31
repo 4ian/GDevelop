@@ -21,6 +21,9 @@ export const Default = () => (
     <ParticleEmitterEditor
       objectConfiguration={testProject.particleEmitterConfiguration}
       project={testProject.project}
+      projectScopedContainersAccessor={
+        testProject.testSceneProjectScopedContainersAccessor
+      }
       layout={testProject.testLayout}
       eventsFunctionsExtension={null}
       eventsBasedObject={null}

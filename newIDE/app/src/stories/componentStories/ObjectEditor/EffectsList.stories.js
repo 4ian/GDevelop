@@ -18,6 +18,9 @@ export const withSomeEffectsForAMixedLayer = () => (
         layerRenderingType="2d+3d"
         project={testProject.project}
         resourceManagementProps={fakeResourceManagementProps}
+        projectScopedContainersAccessor={
+          testProject.testSceneProjectScopedContainersAccessor
+        }
         effectsContainer={testProject.layerWithEffects.getEffects()}
         onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
@@ -34,6 +37,9 @@ export const withSomeEffectsForA2DLayer = () => (
         layerRenderingType="2d"
         project={testProject.project}
         resourceManagementProps={fakeResourceManagementProps}
+        projectScopedContainersAccessor={
+          testProject.testSceneProjectScopedContainersAccessor
+        }
         effectsContainer={testProject.layerWith2DEffects.getEffects()}
         onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
@@ -53,6 +59,9 @@ export const withSomeEffectsForA3DLayer = () => (
         layerRenderingType="3d"
         project={testProject.project}
         resourceManagementProps={fakeResourceManagementProps}
+        projectScopedContainersAccessor={
+          testProject.testSceneProjectScopedContainersAccessor
+        }
         effectsContainer={testProject.layerWith3DEffects.getEffects()}
         onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
@@ -69,6 +78,9 @@ export const withSomeEffectsForAnObject = () => (
         layerRenderingType="2d"
         project={testProject.project}
         resourceManagementProps={fakeResourceManagementProps}
+        projectScopedContainersAccessor={
+          testProject.testSceneProjectScopedContainersAccessor
+        }
         effectsContainer={testProject.spriteObjectWithEffects.getEffects()}
         onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
@@ -85,6 +97,9 @@ export const withAnEffectWithoutEffectTypeForALayer = () => (
         layerRenderingType="2d"
         project={testProject.project}
         resourceManagementProps={fakeResourceManagementProps}
+        projectScopedContainersAccessor={
+          testProject.testSceneProjectScopedContainersAccessor
+        }
         effectsContainer={testProject.layerWithEffectWithoutEffectType.getEffects()}
         onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
@@ -101,6 +116,9 @@ export const withoutEffectsForAMixedLayer = () => (
         layerRenderingType="2d+3d"
         project={testProject.project}
         resourceManagementProps={fakeResourceManagementProps}
+        projectScopedContainersAccessor={
+          testProject.testSceneProjectScopedContainersAccessor
+        }
         effectsContainer={testProject.layerWithoutEffects.getEffects()}
         onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
@@ -125,6 +143,9 @@ export const withoutEffectsForA2DLayer = () => (
           resourceExternalEditors: fakeResourceExternalEditors,
           canInstallPrivateAsset: () => false,
         }}
+        projectScopedContainersAccessor={
+          testProject.testSceneProjectScopedContainersAccessor
+        }
         effectsContainer={testProject.layerWithoutEffects.getEffects()}
         onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
@@ -149,6 +170,9 @@ export const withoutEffectsForA3DLayer = () => (
           resourceExternalEditors: fakeResourceExternalEditors,
           canInstallPrivateAsset: () => false,
         }}
+        projectScopedContainersAccessor={
+          testProject.testSceneProjectScopedContainersAccessor
+        }
         effectsContainer={testProject.layerWithoutEffects.getEffects()}
         onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
@@ -165,6 +189,9 @@ export const withoutEffectsForAnObject = () => (
         layerRenderingType="2d"
         project={testProject.project}
         resourceManagementProps={fakeResourceManagementProps}
+        projectScopedContainersAccessor={
+          testProject.testSceneProjectScopedContainersAccessor
+        }
         effectsContainer={testProject.spriteObjectWithoutEffects.getEffects()}
         onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}

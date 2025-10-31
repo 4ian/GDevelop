@@ -3,6 +3,7 @@ import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 import { type ScrollViewInterface } from '../../UI/ScrollView';
 import * as React from 'react';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 
 /**
  * The props given to any object editor
@@ -10,6 +11,7 @@ import * as React from 'react';
 export type EditorProps = {|
   objectConfiguration: gdObjectConfiguration,
   project: gdProject,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   // TODO EBO : Layout and EventBasedObject should have a common interface to
   // browse their events. It would allow to refactor the events when an
   // animation is renamed for instance.
@@ -31,6 +33,7 @@ export type EditorProps = {|
    */
   objectName: string,
   resourceManagementProps: ResourceManagementProps,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   onSizeUpdated: () => void,
   onObjectUpdated?: () => void,
   unsavedChanges?: UnsavedChanges,

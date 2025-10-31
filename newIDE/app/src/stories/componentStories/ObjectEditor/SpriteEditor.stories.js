@@ -28,6 +28,9 @@ export const Default = () => (
       <SpriteEditor
         renderObjectNameField={() => null}
         objectConfiguration={testProject.spriteObjectConfiguration}
+        projectScopedContainersAccessor={
+          testProject.testSceneProjectScopedContainersAccessor
+        }
         project={testProject.project}
         layout={testProject.testLayout}
         eventsFunctionsExtension={null}
@@ -49,6 +52,9 @@ export const AnimationLocked = () => (
         isAnimationListLocked
         objectConfiguration={testProject.spriteObjectConfiguration}
         project={testProject.project}
+        projectScopedContainersAccessor={
+          testProject.testSceneProjectScopedContainersAccessor
+        }
         layout={testProject.testLayout}
         eventsFunctionsExtension={null}
         eventsBasedObject={null}
@@ -68,6 +74,9 @@ export const Empty = () => (
         renderObjectNameField={() => null}
         objectConfiguration={testProject.emptySpriteObjectConfiguration}
         project={testProject.project}
+        projectScopedContainersAccessor={
+          testProject.testSceneProjectScopedContainersAccessor
+        }
         layout={testProject.testLayout}
         eventsFunctionsExtension={null}
         eventsBasedObject={null}

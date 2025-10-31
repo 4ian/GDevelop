@@ -21,7 +21,9 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(
       VariablesContainersList::
           MakeNewVariablesContainersListForProjectAndLayout(project, layout),
       &project.GetVariables(), &layout.GetVariables(),
-      PropertiesContainersList::MakeNewEmptyPropertiesContainersList());
+      PropertiesContainersList::MakeNewEmptyPropertiesContainersList(),
+      ResourcesContainersList::MakeNewResourcesContainersListForProject(
+          project));
 
   return projectScopedContainers;
 }
@@ -34,24 +36,12 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForProject(
       VariablesContainersList::MakeNewVariablesContainersListForProject(
           project),
       &project.GetVariables(), nullptr,
-      PropertiesContainersList::MakeNewEmptyPropertiesContainersList());
+      PropertiesContainersList::MakeNewEmptyPropertiesContainersList(),
+      ResourcesContainersList::MakeNewResourcesContainersListForProject(
+          project));
 
   return projectScopedContainers;
 }
-
-ProjectScopedContainers
-ProjectScopedContainers::MakeNewProjectScopedContainersFor(
-    const gd::ObjectsContainer &globalObjectsContainers,
-    const gd::ObjectsContainer &objectsContainers) {
-  ProjectScopedContainers projectScopedContainers(
-      ObjectsContainersList::MakeNewObjectsContainersListForContainers(
-          globalObjectsContainers, objectsContainers),
-      VariablesContainersList::MakeNewEmptyVariablesContainersList(),
-      nullptr, nullptr,
-      PropertiesContainersList::MakeNewEmptyPropertiesContainersList());
-
-  return projectScopedContainers;
-};
 
 ProjectScopedContainers
 ProjectScopedContainers::MakeNewProjectScopedContainersForEventsFunctionsExtension(
@@ -63,7 +53,9 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForEventsFunctionsExtensi
           MakeNewVariablesContainersListForEventsFunctionsExtension(eventsFunctionsExtension),
       &eventsFunctionsExtension.GetGlobalVariables(),
       &eventsFunctionsExtension.GetSceneVariables(),
-      PropertiesContainersList::MakeNewEmptyPropertiesContainersList());
+      PropertiesContainersList::MakeNewEmptyPropertiesContainersList(),
+      ResourcesContainersList::MakeNewResourcesContainersListForProject(
+          project));
 
   return projectScopedContainers;
 };
@@ -74,7 +66,8 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForFreeEventsFunction(
     const gd::EventsFunctionsExtension &eventsFunctionsExtension,
     const gd::EventsFunction &eventsFunction,
     gd::ObjectsContainer &parameterObjectsContainer,
-    gd::VariablesContainer &parameterVariablesContainer) {
+    gd::VariablesContainer &parameterVariablesContainer,
+    gd::ResourcesContainer &parameterResourcesContainer) {
 
   gd::EventsFunctionTools::FreeEventsFunctionToObjectsContainer(
       project, eventsFunctionsExtension.GetEventsFunctions(), eventsFunction,
@@ -89,7 +82,11 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForFreeEventsFunction(
               parameterVariablesContainer),
       &eventsFunctionsExtension.GetGlobalVariables(),
       &eventsFunctionsExtension.GetSceneVariables(),
-      PropertiesContainersList::MakeNewEmptyPropertiesContainersList());
+      PropertiesContainersList::MakeNewEmptyPropertiesContainersList(),
+      ResourcesContainersList::
+          MakeNewResourcesContainersListForFreeEventsFunction(
+              project, eventsFunctionsExtension, eventsFunction,
+              parameterResourcesContainer));
 
   projectScopedContainers.AddParameters(eventsFunction.GetParametersForEvents(
       eventsFunctionsExtension.GetEventsFunctions()));
@@ -104,7 +101,9 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForBehaviorEventsFunction
     const gd::EventsFunction &eventsFunction,
     gd::ObjectsContainer &parameterObjectsContainer,
     gd::VariablesContainer &parameterVariablesContainer,
-    gd::VariablesContainer &propertyVariablesContainer) {
+    gd::VariablesContainer &propertyVariablesContainer,
+    gd::ResourcesContainer &parameterResourcesContainer,
+    gd::ResourcesContainer &propertyResourcesContainer) {
 
   gd::EventsFunctionTools::BehaviorEventsFunctionToObjectsContainer(
       project,
@@ -121,7 +120,12 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForBehaviorEventsFunction
               parameterVariablesContainer, propertyVariablesContainer),
       &eventsFunctionsExtension.GetGlobalVariables(),
       &eventsFunctionsExtension.GetSceneVariables(),
-      PropertiesContainersList::MakeNewEmptyPropertiesContainersList());
+      PropertiesContainersList::MakeNewEmptyPropertiesContainersList(),
+      ResourcesContainersList::
+          MakeNewResourcesContainersListForBehaviorEventsFunction(
+              project, eventsFunctionsExtension, eventsBasedBehavior,
+              eventsFunction, parameterResourcesContainer,
+              propertyResourcesContainer));
 
   projectScopedContainers.AddPropertiesContainer(
       eventsBasedBehavior.GetSharedPropertyDescriptors());
@@ -141,7 +145,9 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForObjectEventsFunction(
     const gd::EventsFunction &eventsFunction,
     gd::ObjectsContainer &parameterObjectsContainer,
     gd::VariablesContainer &parameterVariablesContainer,
-    gd::VariablesContainer &propertyVariablesContainer) {
+    gd::VariablesContainer &propertyVariablesContainer,
+    gd::ResourcesContainer &parameterResourcesContainer,
+    gd::ResourcesContainer &propertyResourcesContainer) {
 
   gd::EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
       project, eventsBasedObject, eventsFunction, parameterObjectsContainer);
@@ -156,7 +162,12 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForObjectEventsFunction(
               parameterVariablesContainer, propertyVariablesContainer),
       &eventsFunctionsExtension.GetGlobalVariables(),
       &eventsFunctionsExtension.GetSceneVariables(),
-      PropertiesContainersList::MakeNewEmptyPropertiesContainersList());
+      PropertiesContainersList::MakeNewEmptyPropertiesContainersList(),
+      ResourcesContainersList::
+          MakeNewResourcesContainersListForObjectEventsFunction(
+              project, eventsFunctionsExtension, eventsBasedObject,
+              eventsFunction, parameterResourcesContainer,
+              propertyResourcesContainer));
 
   projectScopedContainers.AddPropertiesContainer(
       eventsBasedObject.GetPropertyDescriptors());
@@ -201,7 +212,9 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForEventsBasedObject(
               eventsFunctionsExtension),
       &eventsFunctionsExtension.GetGlobalVariables(),
       &eventsFunctionsExtension.GetSceneVariables(),
-      PropertiesContainersList::MakeNewEmptyPropertiesContainersList());
+      PropertiesContainersList::MakeNewEmptyPropertiesContainersList(),
+      ResourcesContainersList::MakeNewResourcesContainersListForProject(
+          project));
 
   projectScopedContainers.AddPropertiesContainer(
       eventsBasedObject.GetPropertyDescriptors());

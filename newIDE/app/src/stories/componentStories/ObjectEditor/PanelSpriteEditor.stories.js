@@ -22,6 +22,9 @@ export const Default = () => (
   >
     <PanelSpriteEditor
       objectConfiguration={testProject.panelSpriteObject.getConfiguration()}
+      projectScopedContainersAccessor={
+        testProject.testSceneProjectScopedContainersAccessor
+      }
       project={testProject.project}
       layout={testProject.testLayout}
       eventsFunctionsExtension={null}

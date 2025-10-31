@@ -32,7 +32,7 @@ std::set<gd::String> & usedImages = resourcesInUse.GetAllImages();
  */
 class ResourcesInUseHelper : public gd::ArbitraryResourceWorker {
 public:
-  ResourcesInUseHelper(gd::ResourcesManager &resourcesManager)
+  ResourcesInUseHelper(gd::ResourcesContainer &resourcesManager)
       : gd::ArbitraryResourceWorker(resourcesManager){};
   virtual ~ResourcesInUseHelper(){};
 

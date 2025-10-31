@@ -105,6 +105,7 @@ const Model3DEditor = ({
   onSizeUpdated,
   onObjectUpdated,
   resourceManagementProps,
+  projectScopedContainersAccessor,
   renderObjectNameField,
 }: EditorProps) => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
@@ -487,6 +488,7 @@ const Model3DEditor = ({
             resourceKind="model3D"
             floatingLabelText={properties.get('modelResourceName').getLabel()}
             resourceManagementProps={resourceManagementProps}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
             resourceName={properties.get('modelResourceName').getValue()}
             onChange={newValue => {
               onChangeProperty('modelResourceName', newValue);

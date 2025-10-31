@@ -29,6 +29,7 @@ import SceneVariable from '../UI/CustomSvgIcons/SceneVariable';
 import SelectOption from '../UI/SelectOption';
 import SelectField from '../UI/SelectField';
 import Text from '../UI/Text';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
 
@@ -41,6 +42,7 @@ type Props = {|
   onOpenMoreSettings?: ?() => void,
   onEditVariables: () => void,
   resourceManagementProps: ResourceManagementProps,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
 |};
 
 const ScenePropertiesDialog = ({
@@ -52,6 +54,7 @@ const ScenePropertiesDialog = ({
   onOpenMoreSettings,
   onEditVariables,
   resourceManagementProps,
+  projectScopedContainersAccessor,
 }: Props) => {
   const [windowTitle, setWindowTitle] = React.useState<string>(
     layout.getWindowDefaultTitle()
@@ -218,6 +221,9 @@ const ScenePropertiesDialog = ({
                     behaviorSharedData={behaviorSharedData}
                     project={project}
                     resourceManagementProps={resourceManagementProps}
+                    projectScopedContainersAccessor={
+                      projectScopedContainersAccessor
+                    }
                   />
                 </Line>
               </Column>

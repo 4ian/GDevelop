@@ -28,7 +28,9 @@ std::set<gd::String> SceneResourcesFinder::FindSceneResources(gd::Project &proje
 }
 
 void SceneResourcesFinder::AddUsedResource(gd::String &resourceName) {
-  if (resourceName.empty()) {
+  if (resourceName.empty() ||
+      // It avoids to list resource parameters and properties.
+      !resourcesManager->HasResource(resourceName)) {
     return;
   }
   resourceNames.insert(resourceName);

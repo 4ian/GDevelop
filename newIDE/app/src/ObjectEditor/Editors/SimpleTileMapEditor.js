@@ -25,6 +25,7 @@ const SimpleTileMapEditor = ({
   onObjectUpdated,
   onSizeUpdated,
   resourceManagementProps,
+  projectScopedContainersAccessor,
   renderObjectNameField,
 }: EditorProps) => {
   const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
@@ -189,6 +190,7 @@ const SimpleTileMapEditor = ({
           propertyName="atlasImage"
           project={project}
           resourceManagementProps={resourceManagementProps}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
           onChange={onChangeAtlasImage}
         />
         {error && <AlertMessage kind="error">{error}</AlertMessage>}

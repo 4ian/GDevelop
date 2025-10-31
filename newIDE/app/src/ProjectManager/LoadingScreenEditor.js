@@ -24,6 +24,7 @@ import AlertMessage from '../UI/AlertMessage';
 import GetSubscriptionCard from '../Profile/Subscription/GetSubscriptionCard';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { hasValidSubscriptionPlan } from '../Utils/GDevelopServices/Usage';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 type Props = {|
   loadingScreen: gdLoadingScreen,
@@ -34,6 +35,7 @@ type Props = {|
   // For resources:
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
 |};
 
 type TimeSettings = {|
@@ -64,6 +66,7 @@ export const LoadingScreenEditor = ({
   onChangeSubscription,
   project,
   resourceManagementProps,
+  projectScopedContainersAccessor,
 }: Props) => {
   const subscriptionChecker = React.useRef<?SubscriptionCheckerInterface>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
@@ -260,6 +263,7 @@ export const LoadingScreenEditor = ({
               floatingLabelText={<Trans>Background image</Trans>}
               project={project}
               resourceManagementProps={resourceManagementProps}
+              projectScopedContainersAccessor={projectScopedContainersAccessor}
               resourceKind="image"
               resourceName={loadingScreen.getBackgroundImageResourceName()}
               defaultNewResourceName={'LoadingScreenBackground'}

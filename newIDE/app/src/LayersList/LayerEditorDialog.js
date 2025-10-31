@@ -26,12 +26,14 @@ import SemiControlledTextField from '../UI/SemiControlledTextField';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import Paper from '../UI/Paper';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   layout: gdLayout | null,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   eventsBasedObject: gdEventsBasedObject | null,
@@ -57,6 +59,7 @@ const LayerEditorDialog = ({
   onClose,
   hotReloadPreviewButtonProps,
   resourceManagementProps,
+  projectScopedContainersAccessor,
 }: Props) => {
   const forceUpdate = useForceUpdate();
   const {
@@ -456,6 +459,7 @@ const LayerEditorDialog = ({
           layerRenderingType={layer.getRenderingType()}
           project={project}
           resourceManagementProps={resourceManagementProps}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
           effectsContainer={layer.getEffects()}
           onEffectsRenamed={(oldName, newName) => {
             if (layout) {

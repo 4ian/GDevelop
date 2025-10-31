@@ -770,7 +770,7 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                         <SelectOption
                                           key="property-type-resource"
                                           value="Resource"
-                                          label={t`Resource (JavaScript only)`}
+                                          label={t`Resource`}
                                         />
                                         {!isSceneProperties && (
                                           <SelectOption

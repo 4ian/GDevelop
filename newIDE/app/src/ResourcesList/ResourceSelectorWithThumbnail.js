@@ -13,9 +13,11 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { LineStackLayout } from '../UI/Layout';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { Line } from '../UI/Grid';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 type Props = {|
   project: gdProject,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   resourceManagementProps: ResourceManagementProps,
   resourceKind: ResourceKind,
   resourceName: string,
@@ -31,6 +33,7 @@ type Props = {|
 
 const ResourceSelectorWithThumbnail = ({
   project,
+  projectScopedContainersAccessor,
   resourceManagementProps,
   resourceKind,
   resourceName,
@@ -50,6 +53,7 @@ const ResourceSelectorWithThumbnail = ({
   const resourcesSelector = (
     <ResourceSelector
       project={project}
+      projectScopedContainersAccessor={projectScopedContainersAccessor}
       resourceManagementProps={resourceManagementProps}
       resourcesLoader={ResourcesLoader}
       resourceKind={resourceKind}

@@ -2412,6 +2412,9 @@ storiesOf('ProjectPropertiesDialog', module)
           onApply={async () => true}
           onPropertiesApplied={action('onPropertiesApplied')}
           resourceManagementProps={fakeResourceManagementProps}
+          projectScopedContainersAccessor={
+            testProject.testSceneProjectScopedContainersAccessor
+          }
           i18n={i18n}
         />
       )}
@@ -2428,6 +2431,9 @@ storiesOf('ProjectPropertiesDialog/LoadingScreenEditor', module)
       onChangeSubscription={action('onChangeSubscription')}
       project={testProject.project}
       resourceManagementProps={fakeResourceManagementProps}
+      projectScopedContainersAccessor={
+        testProject.testSceneProjectScopedContainersAccessor
+      }
     />
   ));
 

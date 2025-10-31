@@ -38,6 +38,7 @@ import PlatformSpecificAssets, {
   desktopIconSizes,
   iosIconSizes,
 } from '../PlatformSpecificAssetsEditor/PlatformSpecificAssets';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 type ProjectPropertiesTab = 'properties' | 'loading-screen' | 'icons';
 
@@ -50,6 +51,7 @@ type Props = {|
   onPropertiesApplied: (options: { newName?: string }) => void,
   hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
   i18n: I18nType,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
 
   // For resources:
   resourceManagementProps: ResourceManagementProps,
@@ -893,12 +895,18 @@ const ProjectPropertiesDialog = (props: Props) => {
                 onChangeSubscription={onCancelChanges}
                 project={project}
                 resourceManagementProps={props.resourceManagementProps}
+                projectScopedContainersAccessor={
+                  props.projectScopedContainersAccessor
+                }
               />
             )}
             {currentTab === 'icons' && (
               <PlatformSpecificAssets
                 project={project}
                 resourceManagementProps={props.resourceManagementProps}
+                projectScopedContainersAccessor={
+                  props.projectScopedContainersAccessor
+                }
                 desktopIconResourceNames={desktopIconResourceNames}
                 onDesktopIconResourceNamesChanged={setDesktopIconResourceNames}
                 androidIconResourceNames={androidIconResourceNames}

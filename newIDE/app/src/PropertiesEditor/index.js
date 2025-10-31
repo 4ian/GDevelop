@@ -38,6 +38,7 @@ import {
 } from '../CompactPropertiesEditor';
 import LeaderboardIdPropertyField from './LeaderboardIdPropertyField';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 // Re-export the types.
 export type {
@@ -66,6 +67,7 @@ type Props = {|
 
   // Optional context:
   project?: ?gdProject,
+  projectScopedContainersAccessor?: ProjectScopedContainersAccessor,
   resourceManagementProps?: ?ResourceManagementProps,
 |};
 
@@ -166,6 +168,7 @@ const PropertiesEditor = ({
   renderExtraDescriptionText,
   unsavedChanges,
   project,
+  projectScopedContainersAccessor,
   resourceManagementProps,
 }: Props) => {
   const forceUpdate = useForceUpdate();
@@ -507,7 +510,11 @@ const PropertiesEditor = ({
   );
 
   const renderResourceField = (field: ResourceField) => {
-    if (!project || !resourceManagementProps) {
+    if (
+      !project ||
+      !resourceManagementProps ||
+      !projectScopedContainersAccessor
+    ) {
       console.error(
         'You tried to display a resource field in a PropertiesEditor that does not support display resources. If you need to display resources, pass additional props (project, resourceManagementProps).'
       );
@@ -519,6 +526,7 @@ const PropertiesEditor = ({
       <ResourceSelectorWithThumbnail
         key={field.name}
         project={project}
+        projectScopedContainersAccessor={projectScopedContainersAccessor}
         resourceManagementProps={resourceManagementProps}
         resourceKind={field.resourceKind}
         resourceName={getFieldValue({
@@ -601,6 +609,9 @@ const PropertiesEditor = ({
                 <PropertiesEditor
                   project={project}
                   resourceManagementProps={resourceManagementProps}
+                  projectScopedContainersAccessor={
+                    projectScopedContainersAccessor
+                  }
                   schema={field.children}
                   instances={instances}
                   mode="row"
@@ -629,6 +640,9 @@ const PropertiesEditor = ({
                 <PropertiesEditor
                   project={project}
                   resourceManagementProps={resourceManagementProps}
+                  projectScopedContainersAccessor={
+                    projectScopedContainersAccessor
+                  }
                   schema={field.children}
                   instances={instances}
                   mode="column"

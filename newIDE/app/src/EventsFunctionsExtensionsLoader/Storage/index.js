@@ -9,8 +9,8 @@ export type EventsFunctionsExtensionWriter = {
   chooseEventsFunctionExtensionFile: (
     extensionName?: string
   ) => Promise<?string>,
-  writeEventsFunctionsExtension: (
-    extension: gdEventsFunctionsExtension,
+  writeSerializedObject: (
+    serializedObject: Object,
     filepath: string
   ) => Promise<void>,
 };

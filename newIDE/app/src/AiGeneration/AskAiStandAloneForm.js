@@ -139,13 +139,7 @@ export const AskAiStandAloneForm = ({
         // The example was not found - still create an empty project.
       }
 
-      const { createdProject } = await onCreateEmptyProject({
-        projectName: name,
-        storageProvider: UrlStorageProvider,
-        saveAsLocation: null,
-        dontOpenAnySceneOrProjectManager: true,
-        creationSource: 'ai-agent-request',
-      });
+      const { createdProject } = await onCreateEmptyProject(newProjectSetup);
 
       return { exampleSlug: null, createdProject };
     },

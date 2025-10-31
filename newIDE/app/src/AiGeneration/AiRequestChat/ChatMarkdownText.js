@@ -26,7 +26,7 @@ const makeRenderChatLink = ({
 |}) => (props: ChatLinkProps) => {
   const originalHref =
     (props.node && props.node.properties && props.node.properties.href) || '';
-
+  const propsHref = props.href || '';
   // Try to first recognize a link to a GDevelop concept or item.
   const conceptMetadata = getConceptMetadataFromHref(originalHref);
   if (conceptMetadata) {
@@ -35,11 +35,13 @@ const makeRenderChatLink = ({
 
   // Otherwise, try to recognize a link to a GDevelop wiki page.
   const href =
-    props.href && props.href.startsWith('/gdevelop5/')
-      ? getHelpLink(props.href.replace('/gdevelop5/', '/'))
-      : props.href;
+    propsHref && propsHref.startsWith('/gdevelop5/')
+      ? getHelpLink(propsHref.replace('/gdevelop5/', '/'))
+      : propsHref;
 
-  return href ? (
+  // Handle case where markdown link is used without an actual href.
+  // eslint-disable-next-line no-script-url
+  return href && href !== 'javascript:void(0)' ? (
     <a
       href={href}
       target="_blank"

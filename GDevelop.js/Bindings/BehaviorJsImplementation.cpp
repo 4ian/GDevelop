@@ -9,7 +9,7 @@
 
 using namespace gd;
 
-BehaviorJsImplementation* BehaviorJsImplementation::Clone() const {
+std::unique_ptr<Behavior> BehaviorJsImplementation::Clone() const {
   BehaviorJsImplementation* clone = new BehaviorJsImplementation(*this);
 
   // Copy the references to the JS implementations of the functions (because we
@@ -28,7 +28,7 @@ BehaviorJsImplementation* BehaviorJsImplementation::Clone() const {
       (int)clone,
       (int)this);
 
-  return clone;
+  return std::unique_ptr<BehaviorJsImplementation>(clone);
 }
 std::map<gd::String, gd::PropertyDescriptor>
 BehaviorJsImplementation::GetProperties(const gd::SerializerElement& behaviorContent) const {

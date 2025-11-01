@@ -17,9 +17,8 @@
 
 using namespace gd;
 
-CustomBehavior *CustomBehavior::Clone() const {
-  CustomBehavior *clone = new CustomBehavior(*this);
-  return clone;
+std::unique_ptr<gd::Behavior> CustomBehavior::Clone() const {
+  return gd::make_unique<gd::CustomBehavior>(*this);
 }
 
 void CustomBehavior::InitializeContent(gd::SerializerElement &behaviorContent) {

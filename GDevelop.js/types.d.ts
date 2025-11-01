@@ -672,9 +672,14 @@ export class ExtensionProperties extends EmscriptenObject {
   unserializeFrom(element: SerializerElement): void;
 }
 
+export class UniquePtrBehavior extends EmscriptenObject {
+  get(): Behavior;
+  release(): Behavior;
+}
+
 export class Behavior extends EmscriptenObject {
   constructor();
-  clone(): Behavior;
+  clone(): UniquePtrBehavior;
   setName(name: string): void;
   getName(): string;
   getTypeName(): string;

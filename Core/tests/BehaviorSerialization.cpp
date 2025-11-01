@@ -140,6 +140,17 @@ TEST_CASE("BehaviorSerialization", "[common]") {
     CheckBehaviorProperty(readProject.GetLayout("Scene").GetObjects());
   }
 
+  SECTION("Copy constructor of Behavior") {
+    gd::Platform platform;
+    gd::Project originalProject;
+    SetupProject(originalProject, platform);
+    CheckBehaviorProperty(originalProject.GetLayout("Scene").GetObjects());
+
+    auto clonedProject = originalProject;
+
+    CheckBehaviorProperty(clonedProject.GetLayout("Scene").GetObjects());
+  }
+
   SECTION("Load a project with a property value on a custom behavior that no longer exists") {
     gd::Platform platform;
     gd::Project writtenProject;

@@ -3,8 +3,7 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_CUSTOMBEHAVIOR_H
-#define GDCORE_CUSTOMBEHAVIOR_H
+#pragma once
 
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
@@ -26,7 +25,7 @@ public:
                  const gd::String &fullType)
       : Behavior(name, fullType),
         project(project_) {}
-  CustomBehavior *Clone() const override;
+  std::unique_ptr<gd::Behavior> Clone() const override;
 
   using Behavior::GetProperties;
   using Behavior::InitializeContent;
@@ -44,5 +43,3 @@ private:
                           ///< EventBasedBehavior from the fullType.
 };
 }  // namespace gd
-
-#endif  // GDCORE_CUSTOMBEHAVIOR_H

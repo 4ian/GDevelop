@@ -36,15 +36,15 @@ class GD_EXTENSION_API AnchorBehavior : public gd::Behavior {
 
   AnchorBehavior() {};
   virtual ~AnchorBehavior(){};
-  virtual Behavior* Clone() const override { return new AnchorBehavior(*this); }
+  virtual std::unique_ptr<gd::Behavior> Clone() const override {
+    return gd::make_unique<AnchorBehavior>(*this);
+  }
 
-#if defined(GD_IDE_ONLY)
   virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(
       const gd::SerializerElement& behaviorContent) const override;
   virtual bool UpdateProperty(gd::SerializerElement& behaviorContent,
                               const gd::String& name,
                               const gd::String& value) override;
-#endif
 
   virtual void InitializeContent(
       gd::SerializerElement& behaviorContent) override;

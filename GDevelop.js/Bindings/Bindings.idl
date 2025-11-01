@@ -782,10 +782,15 @@ interface ExtensionProperties {
     void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
+interface UniquePtrBehavior {
+    Behavior get();
+    Behavior release();
+};
+
 interface Behavior {
     void Behavior();
 
-    Behavior Clone();
+    [Value] UniquePtrBehavior Clone();
 
     void SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();

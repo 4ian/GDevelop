@@ -1,5 +1,6 @@
 #include "GDCore/Serialization/SerializerElement.h"
 
+#include <cmath>
 #include <iostream>
 
 #include "GDCore/Tools/Log.h"

@@ -12,15 +12,23 @@ if (!args['outputPath']) {
 }
 const outputPath = args['outputPath'];
 const commitHash = args['commitHash'];
-const pathToArtifacts = `https://gdevelop-releases.s3.amazonaws.com/master/${
+const branch = args['branch'];
+if (!branch) {
+  shell.echo(
+    '❌ You must pass --branch with the branch name: master, stable, etc...'
+  );
+  shell.exit(1);
+}
+const pathToArtifacts = `https://gdevelop-releases.s3.amazonaws.com/${branch}/${
   commitHash ? 'commit/' + commitHash : 'latest'
 }`;
-
-// The version is read from `newIDE/electron-app/app/package.json`. It must
-// always be the source of truth and the only place to update when the version
-// is changed.
-const electronAppPackageJson = require('../../electron-app/app/package.json');
-const version = electronAppPackageJson.version;
+const version = args['version'];
+if (!version) {
+  shell.echo(
+    '❌ You must pass --version with the version number (e.g. 5.x.yyy).'
+  );
+  shell.exit(1);
+}
 
 // ℹ️ Note: the latest.yml, latest-mac.yml and latest-linux.yml are downloaded, but could also be generated
 // by computing:
@@ -30,7 +38,7 @@ const version = electronAppPackageJson.version;
 // - The size in bytes of the file.
 
 shell.echo(
-  `⚠️ This will download the latest artifacts built for master for version ${version}. Please ensure the CI finished building everything before continuing.`
+  `⚠️ This will download the latest artifacts built for ${branch} for version ${version}. Please ensure the CI finished building everything before continuing.`
 );
 
 const artifactsToDownload = {

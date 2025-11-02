@@ -361,6 +361,16 @@ class GD_CORE_API PlatformExtension {
    * generator.
    */
   void StripUnimplementedInstructionsAndExpressions();
+
+
+  /**
+   * \brief Declare a new resource to be used in the in-game editor.
+   */
+  InGameEditorResourceMetadata& AddInGameEditorResource() {
+    InGameEditorResourceMetadata newInGameEditorResource;
+    inGameEditorResources.push_back(newInGameEditorResource);
+    return inGameEditorResources.back();
+  }
   ///@}
 
   /** \name Extension accessors
@@ -632,6 +642,10 @@ class GD_CORE_API PlatformExtension {
   GetAllInstructionOrExpressionGroupMetadata() const {
     return instructionOrExpressionGroupMetadata;
   }
+
+  const std::vector<gd::InGameEditorResourceMetadata>& GetInGameEditorResources() const {
+    return inGameEditorResources;
+  }
   ///@}
 
   /**
@@ -708,6 +722,7 @@ static gd::String GetVariantFullType(const gd::String& extensionName,
   std::map<gd::String, gd::PropertyDescriptor> extensionPropertiesMetadata;
   std::map<gd::String, InstructionOrExpressionGroupMetadata>
       instructionOrExpressionGroupMetadata;
+  std::vector<gd::InGameEditorResourceMetadata> inGameEditorResources;
 
   ObjectMetadata badObjectMetadata;
   BehaviorMetadata badBehaviorMetadata;

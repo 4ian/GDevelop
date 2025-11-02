@@ -423,6 +423,12 @@ namespace gdjs {
             });
         } else if (data.command === 'cancelDragNewInstance') {
           if (inGameEditor) inGameEditor.cancelDragNewInstance();
+        } else if (data.command === 'setInGameEditorSettings') {
+          if (inGameEditor && data.payload?.inGameEditorSettings) {
+            inGameEditor.setInGameEditorSettings(
+              data.payload.inGameEditorSettings
+            );
+          }
         } else if (data.command === 'setInstancesEditorSettings') {
           if (inGameEditor)
             inGameEditor.updateInstancesEditorSettings(

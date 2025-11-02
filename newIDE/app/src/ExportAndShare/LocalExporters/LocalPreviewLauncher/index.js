@@ -357,6 +357,11 @@ export default class LocalPreviewLauncher extends React.Component<
         previewOptions.editorCameraState3D.distance
       );
     }
+    if (previewOptions.inGameEditorSettings) {
+      previewExportOptions.setInGameEditorSettingsJson(
+        JSON.stringify(previewOptions.inGameEditorSettings)
+      );
+    }
 
     exporter.exportProjectForPixiPreview(previewExportOptions);
 

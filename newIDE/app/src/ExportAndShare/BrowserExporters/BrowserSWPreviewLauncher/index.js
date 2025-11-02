@@ -250,6 +250,11 @@ export default class BrowserSWPreviewLauncher extends React.Component<
           previewOptions.editorCameraState3D.distance
         );
       }
+      if (previewOptions.inGameEditorSettings) {
+        previewExportOptions.setInGameEditorSettingsJson(
+          JSON.stringify(previewOptions.inGameEditorSettings)
+        );
+      }
 
       // The token, if any, to be used to read resources on GDevelop Cloud buckets.
       const gdevelopResourceToken = getGDevelopResourceJwtToken();

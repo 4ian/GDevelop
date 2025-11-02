@@ -4,6 +4,7 @@
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/Extensions/Platform.h"
 #include "GDCore/IDE/ProjectBrowserHelper.h"
 #include "GDCore/IDE/WholeProjectRefactorer.h"
 #include "GDCore/IDE/Events/ExpressionTypeFinder.h"
@@ -19,14 +20,24 @@ void UsedExtensionsResult::AddUsedExtension(const gd::PlatformExtension& extensi
   usedSourceFiles.insert(usedSourceFiles.end(),
                          extension.GetAllSourceFiles().begin(),
                          extension.GetAllSourceFiles().end());
+
+  for (auto &&inGameEditorResource : extension.GetInGameEditorResources()) {
+    AddUsedInGameEditorResource(inGameEditorResource);
+  }
 }
 
-void UsedExtensionsResult::AddUsedBuiltinExtension(const gd::String& extensionName) {
-  usedExtensions.insert(extensionName);
+void UsedExtensionsResult::AddUsedBuiltinExtension(const gd::Project& project, const gd::String& extensionName) {
+  if (project.GetCurrentPlatform().IsExtensionLoaded(extensionName)) {
+    auto extension = project.GetCurrentPlatform().GetExtension(extensionName);
+    if (extension) {
+      AddUsedExtension(*extension);
+    }
+  }
 }
 
 const UsedExtensionsResult UsedExtensionsFinder::ScanProject(gd::Project& project) {
   UsedExtensionsFinder worker(project);
+  worker.result.AddUsedBuiltinExtension(project, "BuiltinObject");
   gd::ProjectBrowserHelper::ExposeProjectObjects(project, worker);
   gd::ProjectBrowserHelper::ExposeProjectEvents(project, worker);
   return worker.result;
@@ -92,7 +103,7 @@ bool UsedExtensionsFinder::DoVisitInstruction(gd::Instruction& instruction,
       rootType = "number";
       parameterValue.GetRootNode()->Visit(*this);
     } else if (gd::ParameterMetadata::IsExpression("variable", parameterType))
-      result.AddUsedBuiltinExtension("BuiltinVariables");
+      result.AddUsedBuiltinExtension(project, "BuiltinVariables");
   });
 
   return false;
@@ -125,7 +136,7 @@ void UsedExtensionsFinder::OnVisitUnaryOperatorNode(UnaryOperatorNode& node) {
 
 // Add variable extension and visit sub-expressions on variable nodes
 void UsedExtensionsFinder::OnVisitVariableNode(VariableNode& node) {
-  result.AddUsedBuiltinExtension("BuiltinVariables");
+  result.AddUsedBuiltinExtension(project, "BuiltinVariables");
 
   auto type = gd::ExpressionTypeFinder::GetType(
       project.GetCurrentPlatform(), GetProjectScopedContainers(), rootType, node);
@@ -158,13 +169,13 @@ void UsedExtensionsFinder::OnVisitVariableNode(VariableNode& node) {
 
 void UsedExtensionsFinder::OnVisitVariableAccessorNode(
     VariableAccessorNode& node) {
-  result.AddUsedBuiltinExtension("BuiltinVariables");
+  result.AddUsedBuiltinExtension(project, "BuiltinVariables");
   if (node.child) node.child->Visit(*this);
 };
 
 void UsedExtensionsFinder::OnVisitVariableBracketAccessorNode(
     VariableBracketAccessorNode& node) {
-  result.AddUsedBuiltinExtension("BuiltinVariables");
+  result.AddUsedBuiltinExtension(project, "BuiltinVariables");
   node.expression->Visit(*this);
   if (node.child) node.child->Visit(*this);
 };

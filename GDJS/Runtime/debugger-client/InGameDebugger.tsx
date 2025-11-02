@@ -1,5 +1,8 @@
 namespace gdjs {
-  /** A minimal utility to define DOM elements. */
+  /**
+   * A minimal utility to define DOM elements.
+   * Also copied in InGameEditor.tsx.
+   */
   function h<K extends keyof HTMLElementTagNameMap>(
     tag: K,
     attrs: {

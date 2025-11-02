@@ -4041,6 +4041,7 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetFullLoadingScreen(boolean enable);
     [Ref] PreviewExportOptions SetIsDevelopmentEnvironment(boolean enable);
     [Ref] PreviewExportOptions SetIsInGameEdition(boolean enable);
+    [Ref] PreviewExportOptions SetInGameEditorSettingsJson([Const] DOMString inGameEditorSettingsJson);
     [Ref] PreviewExportOptions SetEditorId([Const] DOMString editorId);
     [Ref] PreviewExportOptions SetEditorCameraState3D(
         [Const] DOMString cameraMode,

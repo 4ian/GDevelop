@@ -416,6 +416,11 @@ void ExporterHelper::SerializeRuntimeGameOptions(
         .SetValue(options.eventsBasedObjectVariantName);
   }
 
+  if (!options.inGameEditorSettingsJson.empty()) {
+    runtimeGameOptions.AddChild("inGameEditorSettings") =
+        gd::Serializer::FromJSON(options.inGameEditorSettingsJson);
+  }
+
   runtimeGameOptions.AddChild("shouldReloadLibraries")
       .SetBoolValue(options.shouldReloadLibraries);
   runtimeGameOptions.AddChild("shouldGenerateScenesEventsCode")

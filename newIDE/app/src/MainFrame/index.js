@@ -221,6 +221,7 @@ import {
   type HotReloadSteps,
 } from '../EmbeddedGame/EmbeddedGameFrame';
 import StandaloneDialog from './StandAloneDialog';
+import { useInGameEditorSettings } from '../EmbeddedGame/InGameEditorSettings';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -2062,6 +2063,8 @@ const MainFrame = (props: Props) => {
     ]
   );
 
+  const inGameEditorSettings = useInGameEditorSettings();
+
   const _launchPreview = React.useCallback(
     async ({
       networkPreview,
@@ -2176,6 +2179,9 @@ const MainFrame = (props: Props) => {
           editorCameraState3D: isForInGameEdition
             ? isForInGameEdition.editorCameraState3D
             : null,
+          inGameEditorSettings: isForInGameEdition
+            ? inGameEditorSettings
+            : null,
           inAppTutorialMessageInPreview: inAppTutorialMessageInPreview.message,
           inAppTutorialMessagePositionInPreview:
             inAppTutorialMessageInPreview.position,
@@ -2242,6 +2248,7 @@ const MainFrame = (props: Props) => {
       quickCustomizationDialogOpenedFromGameId,
       onCaptureFinished,
       createCaptureOptionsForPreview,
+      inGameEditorSettings,
     ]
   );
 

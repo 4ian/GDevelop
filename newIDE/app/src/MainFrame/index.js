@@ -1494,6 +1494,7 @@ const MainFrame = (props: Props) => {
           shouldReloadLibraries: true,
           shouldReloadResources: false,
           shouldHardReload: true,
+          reasons: ['deleted-extension-with-custom-object'],
         });
       } else {
         notifyChangesToInGameEditor({
@@ -1501,6 +1502,7 @@ const MainFrame = (props: Props) => {
           shouldReloadLibraries: true,
           shouldReloadResources: false,
           shouldHardReload: false,
+          reasons: ['deleted-extension-without-custom-object'],
         });
       }
     });
@@ -1570,19 +1572,13 @@ const MainFrame = (props: Props) => {
         shouldReloadLibraries: true,
         shouldReloadResources: false,
         shouldHardReload: false,
+        reasons: ['installed-extension-with-custom-object'],
       });
     }
   };
 
   const notifyChangesToInGameEditor = React.useCallback(
-    (
-      hotReloadSteps: HotReloadSteps = {
-        shouldReloadProjectData: false,
-        shouldReloadLibraries: false,
-        shouldReloadResources: false,
-        shouldHardReload: false,
-      }
-    ) => {
+    (hotReloadSteps: HotReloadSteps) => {
       let hasReloadIfNeeded = false;
       for (const paneIdentifier in state.editorTabs.panes) {
         const currentTab = getCurrentTabForPane(
@@ -1602,6 +1598,19 @@ const MainFrame = (props: Props) => {
     [state.editorTabs]
   );
 
+  const triggerHotReloadInGameEditorIfNeeded = React.useCallback(
+    () => {
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: false,
+        shouldReloadLibraries: false,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+        reasons: ['triggered-if-needed'],
+      });
+    },
+    [notifyChangesToInGameEditor]
+  );
+
   React.useEffect(
     () => {
       if (gameEditorMode === 'embedded-game') {
@@ -1616,7 +1625,13 @@ const MainFrame = (props: Props) => {
         // Hot-reloads are triggered right away from a 3D editor.
         // Which means this call won't do any hot-reload when switching between
         // 2 3D editors but only switch the scene.
-        notifyChangesToInGameEditor();
+        notifyChangesToInGameEditor({
+          shouldReloadProjectData: false,
+          shouldReloadLibraries: false,
+          shouldReloadResources: false,
+          shouldHardReload: false,
+          reasons: ['switched-tab-while-using-3d-editor'],
+        });
       } else {
         // Switch the 3D editor to the same scene as the 2D one.
         // It allows to keep the 3D editor up to date for a fast switch
@@ -1643,6 +1658,7 @@ const MainFrame = (props: Props) => {
         shouldReloadLibraries: false,
         shouldReloadResources: false,
         shouldHardReload: false,
+        reasons: ['external-layout-association-changed'],
       });
     },
     [notifyChangesToInGameEditor]
@@ -1655,6 +1671,7 @@ const MainFrame = (props: Props) => {
         shouldReloadLibraries: false,
         shouldReloadResources: true,
         shouldHardReload: false,
+        reasons: ['resource-externally-changed'],
       });
     },
     [notifyChangesToInGameEditor]
@@ -1663,13 +1680,20 @@ const MainFrame = (props: Props) => {
   const onResourceUsageChanged = React.useCallback(
     () => {
       if (isEditorHotReloadNeeded()) {
-        notifyChangesToInGameEditor();
+        notifyChangesToInGameEditor({
+          shouldReloadProjectData: false,
+          shouldReloadLibraries: false,
+          shouldReloadResources: false,
+          shouldHardReload: false,
+          reasons: ['resource-usage-changed'],
+        });
       } else {
         notifyChangesToInGameEditor({
           shouldReloadProjectData: true,
           shouldReloadLibraries: false,
           shouldReloadResources: false,
           shouldHardReload: false,
+          reasons: ['resource-usage-changed'],
         });
       }
     },
@@ -1683,6 +1707,7 @@ const MainFrame = (props: Props) => {
         shouldReloadLibraries: false,
         shouldReloadResources: false,
         shouldHardReload: false,
+        reasons: ['scene-added'],
       });
     },
     [notifyChangesToInGameEditor]
@@ -1695,6 +1720,7 @@ const MainFrame = (props: Props) => {
         shouldReloadLibraries: false,
         shouldReloadResources: false,
         shouldHardReload: false,
+        reasons: ['external-layout-added'],
       });
     },
     [notifyChangesToInGameEditor]
@@ -1708,6 +1734,7 @@ const MainFrame = (props: Props) => {
         shouldReloadLibraries: true,
         shouldReloadResources: false,
         shouldHardReload: false,
+        reasons: ['effect-added'],
       });
     },
     [notifyChangesToInGameEditor]
@@ -1720,6 +1747,7 @@ const MainFrame = (props: Props) => {
         shouldReloadLibraries: isNewObjectTypeUsed,
         shouldReloadResources: false,
         shouldHardReload: false,
+        reasons: ['object-lists-modified'],
       });
     },
     [notifyChangesToInGameEditor]
@@ -1763,6 +1791,7 @@ const MainFrame = (props: Props) => {
         shouldReloadLibraries: false,
         shouldReloadResources: false,
         shouldHardReload: false,
+        reasons: ['renamed-scene'],
       });
       _onProjectItemModified();
     });
@@ -1799,6 +1828,7 @@ const MainFrame = (props: Props) => {
         shouldReloadLibraries: false,
         shouldReloadResources: false,
         shouldHardReload: false,
+        reasons: ['renamed-external-layout'],
       });
       _onProjectItemModified();
     });
@@ -1882,6 +1912,7 @@ const MainFrame = (props: Props) => {
         shouldReloadLibraries: true,
         shouldReloadResources: false,
         shouldHardReload: false,
+        reasons: ['renamed-extension'],
       });
       _onProjectItemModified();
     });
@@ -1906,6 +1937,7 @@ const MainFrame = (props: Props) => {
         shouldReloadLibraries: true,
         shouldReloadResources: false,
         shouldHardReload: false,
+        reasons: ['renamed-custom-object'],
       });
     });
   };
@@ -1927,6 +1959,7 @@ const MainFrame = (props: Props) => {
         shouldReloadLibraries: true,
         shouldReloadResources: false,
         shouldHardReload: true,
+        reasons: ['deleted-custom-object'],
       });
     });
   };
@@ -1957,6 +1990,7 @@ const MainFrame = (props: Props) => {
         shouldReloadLibraries: true,
         shouldReloadResources: false,
         shouldHardReload: false,
+        reasons: ['deleted-custom-object-variant'],
       });
     });
   };
@@ -2802,6 +2836,7 @@ const MainFrame = (props: Props) => {
         shouldReloadLibraries: false,
         shouldReloadResources: false,
         shouldHardReload: false,
+        reasons: ['extracted-instances-to-external-layout'],
       });
       openExternalLayout(name);
     },
@@ -2821,6 +2856,7 @@ const MainFrame = (props: Props) => {
         shouldReloadLibraries: true,
         shouldReloadResources: false,
         shouldHardReload: false,
+        reasons: ['reloaded-extensions'],
       });
     },
     [
@@ -2857,6 +2893,7 @@ const MainFrame = (props: Props) => {
           shouldReloadLibraries: true,
           shouldReloadResources: false,
           shouldHardReload: false,
+          reasons: ['loaded-extensions'],
         });
       }
     },
@@ -2895,6 +2932,7 @@ const MainFrame = (props: Props) => {
         shouldReloadLibraries: true,
         shouldReloadResources: false,
         shouldHardReload: false,
+        reasons: ['opened-custom-object-editor'],
       });
 
       openCustomObjectAndExtensionEditors(
@@ -2924,6 +2962,7 @@ const MainFrame = (props: Props) => {
         shouldReloadLibraries: true,
         shouldReloadResources: false,
         shouldHardReload: false,
+        reasons: ['changed-custom-object-type'],
       });
     },
     [notifyChangesToInGameEditor]
@@ -2977,6 +3016,7 @@ const MainFrame = (props: Props) => {
         shouldReloadLibraries: true,
         shouldReloadResources: false,
         shouldHardReload: false,
+        reasons: ['opened-custom-object-variant-editor'],
       });
       openCustomObjectEditor(
         eventsFunctionsExtension,
@@ -3145,6 +3185,7 @@ const MainFrame = (props: Props) => {
       shouldReloadLibraries: true,
       shouldReloadResources: false,
       shouldHardReload: false,
+      reasons: ['created-events-function'],
     });
   };
 
@@ -4289,6 +4330,7 @@ const MainFrame = (props: Props) => {
         shouldReloadLibraries: false,
         shouldReloadResources: false,
         shouldHardReload: false,
+        reasons: ['added-new-resources'],
       });
     },
     [notifyChangesToInGameEditor]
@@ -4597,7 +4639,7 @@ const MainFrame = (props: Props) => {
     onObjectListsModified: onObjectListsModified,
     onExternalLayoutAssociationChanged,
     gamesList: gamesList,
-    triggerHotReloadInGameEditorIfNeeded: notifyChangesToInGameEditor,
+    triggerHotReloadInGameEditorIfNeeded,
   };
 
   const hasEditorsInLeftPane = hasEditorsInPane(state.editorTabs, 'left');
@@ -4931,7 +4973,8 @@ const MainFrame = (props: Props) => {
               shouldReloadProjectData: true,
               shouldReloadLibraries: true,
               shouldReloadResources: true,
-              shouldHardReload: false,
+              shouldHardReload: true,
+              reasons: ['relaunched-after-uncaught-error-or-hot-reload-error'],
             });
           }}
         />

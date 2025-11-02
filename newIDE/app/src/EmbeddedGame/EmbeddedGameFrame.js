@@ -43,6 +43,11 @@ export type HotReloadSteps = {|
    * Set to `true` when an hard reload is needed.
    */
   shouldHardReload: boolean,
+
+  /**
+   * The reason for the hot reload. Used for debugging purposes.
+   */
+  reasons: Array<string>,
 |};
 
 const mergeNeededHotReloadSteps = (
@@ -56,6 +61,7 @@ const mergeNeededHotReloadSteps = (
   shouldReloadResources:
     stepsA.shouldReloadResources || stepsB.shouldReloadResources,
   shouldHardReload: stepsA.shouldHardReload || stepsB.shouldHardReload,
+  reasons: [...stepsA.reasons, ...stepsB.reasons],
 });
 
 const isHotReloadNeeded = (hotReloadSteps: HotReloadSteps): boolean =>
@@ -163,15 +169,22 @@ const logSwitchingInfo = ({
   externalLayoutName,
   eventsBasedObjectType,
   eventsBasedObjectVariantName,
-}: PreviewInGameEditorTarget) => {
+  reasons,
+}: {|
+  ...PreviewInGameEditorTarget,
+  reasons: Array<string>,
+|}) => {
   console.info(
     eventsBasedObjectType
       ? `Switching in-game edition preview for variant "${eventsBasedObjectVariantName ||
-          ''}" of "${eventsBasedObjectType || ''}".`
+          ''}" of "${eventsBasedObjectType || ''}". Reason(s): ${reasons.join(
+          ', '
+        )}.`
       : externalLayoutName
       ? `Switching in-game edition previews to external layout "${externalLayoutName ||
-          ''}" (scene: "${sceneName || ''}").`
-      : `Switching in-game edition previews to scene "${sceneName || ''}".`
+          ''}" (scene: "${sceneName || ''}". Reason(s): ${reasons.join(', ')}).`
+      : `Switching in-game edition previews to scene "${sceneName ||
+          ''}". Reason(s): ${reasons.join(', ')}.`
   );
 };
 
@@ -192,6 +205,7 @@ const noHotReloadSteps = {
   shouldReloadLibraries: false,
   shouldReloadResources: false,
   shouldHardReload: false,
+  reasons: [],
 };
 
 export const EmbeddedGameFrame = ({
@@ -275,12 +289,14 @@ export const EmbeddedGameFrame = ({
             shouldReloadLibraries,
             shouldReloadResources,
             shouldHardReload,
+            reasons,
           } = options;
           setEditorHotReloadNeeded({
             shouldReloadProjectData,
             shouldReloadLibraries,
             shouldReloadResources,
             shouldHardReload,
+            reasons,
           });
           return;
         }
@@ -290,28 +306,34 @@ export const EmbeddedGameFrame = ({
           shouldReloadLibraries,
           shouldReloadResources,
           shouldHardReload,
+          reasons,
         } = mergeNeededHotReloadSteps(hotReloadSteps.current, {
           shouldReloadProjectData: options.shouldReloadProjectData,
           shouldReloadLibraries: options.shouldReloadLibraries,
           shouldReloadResources: options.shouldReloadResources,
           shouldHardReload: options.shouldHardReload,
+          reasons: options.reasons,
         });
         const hotReload = isHotReloadNeeded({
           shouldReloadProjectData,
           shouldReloadLibraries,
           shouldReloadResources,
           shouldHardReload,
+          reasons,
         });
         if (!previewIndexHtmlLocation || hotReload) {
           console.info(
             eventsBasedObjectType
               ? `Launching in-game edition preview for variant "${eventsBasedObjectVariantName ||
-                  ''}" of "${eventsBasedObjectType || ''}".`
+                  ''}" of "${eventsBasedObjectType ||
+                  ''}". Reason(s): ${reasons.join(', ')}.`
               : externalLayoutName
               ? `Launching in-game edition preview for external layout "${externalLayoutName ||
-                  ''}" (scene: "${sceneName || ''}").`
+                  ''}" (scene: "${sceneName || ''}"). Reason(s): ${reasons.join(
+                  ', '
+                )}.`
               : `Launching in-game edition preview for scene "${sceneName ||
-                  ''}".`
+                  ''}". Reason(s): ${reasons.join(', ')}.`
           );
           hotReloadSteps.current = noHotReloadSteps;
           isPreviewOngoing.current = true;
@@ -326,6 +348,7 @@ export const EmbeddedGameFrame = ({
             shouldReloadLibraries,
             shouldReloadResources,
             shouldHardReload,
+            reasons,
             editorCameraState3D: cameraStates.current.get(editorId) || null,
           }).finally(() => {
             isPreviewOngoing.current = false;
@@ -339,6 +362,7 @@ export const EmbeddedGameFrame = ({
                 shouldReloadLibraries: false,
                 shouldReloadResources: false,
                 shouldHardReload: false,
+                reasons: ['post-launch-preview'],
               });
             }
           });
@@ -349,6 +373,7 @@ export const EmbeddedGameFrame = ({
             externalLayoutName,
             eventsBasedObjectType,
             eventsBasedObjectVariantName,
+            reasons,
           });
           previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
             previewDebuggerServer.sendMessage(debuggerId, {
@@ -388,6 +413,7 @@ export const EmbeddedGameFrame = ({
           externalLayoutName,
           eventsBasedObjectType,
           eventsBasedObjectVariantName,
+          reasons: ['switched-editor-and-no-hot-reload-is-needed'],
         });
         previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
           previewDebuggerServer.sendMessage(debuggerId, {

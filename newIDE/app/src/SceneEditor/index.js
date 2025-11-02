@@ -293,7 +293,6 @@ export default class SceneEditor extends React.Component<Props, State> {
   resourceExternallyChangedCallbackId: ?string;
   unregisterDebuggerCallback: (() => void) | null = null;
   editorViewPosition2D: EditorViewPosition2D = { viewX: null, viewY: null };
-  _isEditingObject = false;
 
   constructor(props: Props) {
     super(props);
@@ -816,7 +815,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   isEditingObject = (): boolean => {
-    return this._isEditingObject;
+    return !!this.state.editedObjectWithContext;
   };
 
   openObjectExporterDialog = (open: boolean = true) => {
@@ -2594,7 +2593,6 @@ export default class SceneEditor extends React.Component<Props, State> {
       editedObjectWithContext,
       selectedObjectFolderOrObjectsWithContext,
     } = this.state;
-    this._isEditingObject = this._isEditingObject || !!editedObjectWithContext;
     const variablesEditedAssociatedObjectName = this.state
       .variablesEditedInstance
       ? this.state.variablesEditedInstance.getObjectName()
@@ -2803,7 +2801,6 @@ export default class SceneEditor extends React.Component<Props, State> {
                           );
                         }}
                         onCancel={() => {
-                          this._isEditingObject = false;
                           if (editedObjectWithContext) {
                             // Object changes are reverted but not the
                             // resources modified with an external editor.
@@ -2827,7 +2824,6 @@ export default class SceneEditor extends React.Component<Props, State> {
                           hasResourceChanged: boolean,
                           hasAnyEffectBeenAdded: boolean
                         ) => {
-                          this._isEditingObject = false;
                           // When resource parameters changed an hot-reload is
                           // already triggered by _onObjectEdited.
                           if (!hasResourceChanged) {

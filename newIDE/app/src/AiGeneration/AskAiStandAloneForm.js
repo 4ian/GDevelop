@@ -204,6 +204,11 @@ export const AskAiStandAloneForm = ({
     SubscriptionSuggestionContext
   );
 
+  const hideAskAi =
+    !!limits &&
+    !!limits.capabilities.classrooms &&
+    limits.capabilities.classrooms.hideAskAi;
+
   const availableCredits = limits ? limits.credits.userBalance.amount : 0;
   const quota =
     (limits && limits.quotas && limits.quotas['ai-request']) || null;
@@ -535,6 +540,10 @@ export const AskAiStandAloneForm = ({
     dismissableIdentifier &&
     values.hiddenAskAiStandAloneForms[dismissableIdentifier]
   ) {
+    return null;
+  }
+
+  if (hideAskAi) {
     return null;
   }
 

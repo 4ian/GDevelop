@@ -48,8 +48,8 @@ import CircledInfo from '../../UI/CustomSvgIcons/CircledInfo';
 import Coin from '../../Credits/Icons/Coin';
 import GoldCompact from '../../Profile/Subscription/Icons/GoldCompact';
 
-const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 5;
-const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 10;
+const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 10;
+const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 15;
 
 const styles = {
   chatScrollView: {

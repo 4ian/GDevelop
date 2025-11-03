@@ -761,7 +761,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                         Window.openExternalURL(getHelpLink('/interface/ai'))
                       }
                     >
-                      It has access to your game objects but not events.
+                      It can inspect your game objects and events.
                     </Link>
                   </Trans>
                 </Text>

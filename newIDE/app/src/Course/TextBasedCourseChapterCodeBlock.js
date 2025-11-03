@@ -2,6 +2,10 @@
 
 import * as React from 'react';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import Copy from '../UI/CustomSvgIcons/Copy';
+import IconButton from '../UI/IconButton';
+import InfoBar from '../UI/Messages/InfoBar';
+import { Trans } from '@lingui/macro';
 
 const KEYWORDS = [
   'break',
@@ -399,34 +403,55 @@ const TextBasedCourseChapterCodeBlock = ({ code, language }: Props) => {
     [isDarkMode]
   );
 
+  const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState(false);
+
+  const handleCopy = () => {
+    if (!normalizedCode) return;
+    navigator.clipboard.writeText(normalizedCode);
+    setShowCopiedInfoBar(true);
+  };
+
   return (
-    <div
-      style={{
-        ...styles.wrapper,
-        backgroundColor,
-        borderColor,
-      }}
-    >
+    <div style={{ position: 'relative' }}>
+      <IconButton
+        onClick={handleCopy}
+        style={{
+          position: 'absolute',
+          top: 8,
+          right: 8,
+          backgroundColor,
+        }}
+      >
+        <Copy />
+      </IconButton>
       <div
         style={{
-          ...styles.lineNumbersColumn,
+          ...styles.wrapper,
           backgroundColor,
           color: lineNumberColor,
         }}
       >
-        {tokensByLine.map((_, lineIndex) => (
-          <div key={`line-number-${lineIndex}`} style={styles.lineNumber}>
-            {lineIndex + 1}
-          </div>
-        ))}
-      </div>
-      <div style={{ ...styles.codeColumn, backgroundColor }}>
-        {tokensByLine.map((tokens, lineIndex) => (
-          <div key={`code-line-${lineIndex}`} style={styles.codeLine}>
-            {tokens.length === 0 ? (
-              <span style={{ visibility: 'hidden' }}>.</span>
-            ) : (
-              tokens.map((token, tokenIndex) => (
+        <div
+          style={{
+            ...styles.lineNumbersColumn,
+            color: gdevelopTheme.text.secondary,
+          }}
+        >
+          {tokensByLine.map((_, lineIndex) => (
+            <div key={`line-number-${lineIndex}`} style={styles.lineNumber}>
+              {lineIndex + 1}
+            </div>
+          ))}
+        </div>
+        <div
+          style={{
+            ...styles.codeColumn,
+            backgroundColor,
+          }}
+        >
+          {tokensByLine.map((tokens, lineIndex) => (
+            <div key={`code-line-${lineIndex}`} style={styles.codeLine}>
+              {tokens.map((token, tokenIndex) => (
                 <span
                   key={`token-${lineIndex}-${tokenIndex}`}
                   style={{
@@ -439,11 +464,17 @@ const TextBasedCourseChapterCodeBlock = ({ code, language }: Props) => {
                 >
                   {token.text}
                 </span>
-              ))
-            )}
-          </div>
-        ))}
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
+
+      <InfoBar
+        message={<Trans>Copied to clipboard!</Trans>}
+        visible={showCopiedInfoBar}
+        hide={() => setShowCopiedInfoBar(false)}
+      />
     </div>
   );
 };

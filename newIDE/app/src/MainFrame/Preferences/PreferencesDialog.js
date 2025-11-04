@@ -53,6 +53,7 @@ const PreferencesDialog = ({
     showAllAlertMessages,
     showAllTutorialHints,
     showAllAnnouncements,
+    showAllAskAiStandAloneForms,
     setAutoDisplayChangelog,
     setEventsSheetShowObjectThumbnails,
     setAutosaveOnPreview,
@@ -535,6 +536,13 @@ const PreferencesDialog = ({
                 <Trans>Other</Trans>
               </Text>
               <ColumnStackLayout>
+                <FlatButton
+                  label={<Trans>Reset hidden Ask AI text inputs</Trans>}
+                  onClick={() => showAllAskAiStandAloneForms()}
+                  disabled={
+                    !Object.keys(values.hiddenAskAiStandAloneForms).length
+                  }
+                />
                 <CompactToggleField
                   labelColor="primary"
                   hideTooltip

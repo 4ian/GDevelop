@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
-import SearchBar, { type SearchBarInterface } from '../../UI/SearchBar';
+import SearchBar from '../../UI/SearchBar';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import { ExampleStoreContext } from './ExampleStoreContext';
@@ -10,14 +10,13 @@ import {
   sendGameTemplateInformationOpened,
 } from '../../Utils/Analytics/EventSender';
 import { t, Trans } from '@lingui/macro';
-import { useShouldAutofocusInput } from '../../UI/Responsive/ScreenTypeMeasurer';
 import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { PrivateGameTemplateStoreContext } from '../PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import GridList from '@material-ui/core/GridList';
 import { getExampleAndTemplateTiles } from '../../MainFrame/EditorContainers/HomePage/CreateSection/utils';
 import BackgroundText from '../../UI/BackgroundText';
-import { ColumnStackLayout } from '../../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import {
   isLinkedToStartingPointExampleShortHeader,
   isStartingPointExampleShortHeader,
@@ -28,6 +27,7 @@ import {
   type WindowSizeType,
 } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import { LARGE_WIDGET_SIZE } from '../../MainFrame/EditorContainers/HomePage/CardWidget';
+import FlatButton from '../../UI/FlatButton';
 
 const ITEMS_SPACING = 5;
 const styles = {
@@ -73,7 +73,9 @@ type Props = {|
   ) => number,
   hideSearch?: boolean,
   limitRowsTo?: number,
+  showLoadMore?: boolean,
   hidePremiumTemplates?: boolean,
+  disabled?: boolean,
 |};
 
 const ExampleStore = ({
@@ -85,7 +87,9 @@ const ExampleStore = ({
   getColumnsFromWindowSize,
   hideSearch,
   limitRowsTo,
+  showLoadMore,
   hidePremiumTemplates,
+  disabled,
 }: Props) => {
   const MAX_COLUMNS = getColumnsFromWindowSize('xlarge', true);
   const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
@@ -111,17 +115,6 @@ const ExampleStore = ({
   );
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const columnsCount = getColumnsFromWindowSize(windowSize, isLandscape);
-
-  const shouldAutofocusSearchbar = useShouldAutofocusInput();
-  const searchBarRef = React.useRef<?SearchBarInterface>(null);
-
-  React.useEffect(
-    () => {
-      if (shouldAutofocusSearchbar && searchBarRef.current)
-        searchBarRef.current.focus();
-    },
-    [shouldAutofocusSearchbar]
-  );
 
   // We search in both examples and game templates stores.
   const setSearchText = React.useCallback(
@@ -208,6 +201,7 @@ const ExampleStore = ({
         gdevelopTheme,
         privateGameTemplatesPeriodicity: 1,
         showOwnedGameTemplatesFirst: true,
+        disabled,
       });
     },
     [
@@ -222,7 +216,24 @@ const ExampleStore = ({
       hideStartingPoints,
       allExampleShortHeaders,
       hidePremiumTemplates,
+      disabled,
     ]
+  );
+
+  const [currentlyDisplayedRows, setCurrentlyDisplayedRows] = React.useState(
+    limitRowsTo || Infinity
+  );
+  const onShowMore = React.useCallback(
+    () => {
+      setCurrentlyDisplayedRows(currentlyDisplayedRows + (limitRowsTo || 6));
+    },
+    [currentlyDisplayedRows, limitRowsTo]
+  );
+  const canShowMore =
+    showLoadMore && resultTiles.length > currentlyDisplayedRows * columnsCount;
+  const displayedTiles = resultTiles.slice(
+    0,
+    currentlyDisplayedRows * columnsCount
   );
 
   return (
@@ -235,8 +246,8 @@ const ExampleStore = ({
                 value={localSearchText}
                 onChange={setSearchText}
                 onRequestSearch={() => {}}
-                ref={searchBarRef}
                 placeholder={t`Search examples`}
+                disabled={disabled}
               />
             </Column>
           </Line>
@@ -262,11 +273,18 @@ const ExampleStore = ({
               cellHeight="auto"
               spacing={ITEMS_SPACING * 2}
             >
-              {resultTiles.slice(
-                0,
-                limitRowsTo ? limitRowsTo * columnsCount : Infinity
-              )}
+              {displayedTiles}
             </GridList>
+            {canShowMore && (
+              <LineStackLayout justifyContent="center">
+                <FlatButton
+                  primary
+                  label={<Trans>Show more</Trans>}
+                  onClick={onShowMore}
+                  disabled={disabled}
+                />
+              </LineStackLayout>
+            )}
           </ColumnStackLayout>
         )}
       </Column>

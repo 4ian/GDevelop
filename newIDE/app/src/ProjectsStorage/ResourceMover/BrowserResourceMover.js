@@ -6,13 +6,9 @@ import {
   type MoveAllProjectResourcesFunction,
 } from './index';
 import CloudStorageProvider from '../CloudStorageProvider';
-import GoogleDriveStorageProvider from '../GoogleDriveStorageProvider';
 import UrlStorageProvider from '../UrlStorageProvider';
 import DownloadFileStorageProvider from '../DownloadFileStorageProvider';
-import {
-  ensureNoCloudProjectResources,
-  moveUrlResourcesToCloudProject,
-} from '../CloudStorageProvider/CloudResourceMover';
+import { moveUrlResourcesToCloudProject } from '../CloudStorageProvider/CloudResourceMover';
 
 const moveNothing = async () => {
   return {
@@ -36,28 +32,6 @@ const movers: {
   [`${UrlStorageProvider.internalName}=>${
     CloudStorageProvider.internalName
   }`]: moveUrlResourcesToCloudProject,
-  // Nothing to move around when going from a project on Google Drive
-  // to a cloud project (because only public URLs are supported on Google Drive).
-  [`${GoogleDriveStorageProvider.internalName}=>${
-    CloudStorageProvider.internalName
-  }`]: moveNothing,
-
-  // Moving to "GoogleDrive" storage:
-
-  // Google Drive does not support GDevelop cloud resources, so ensure there are none.
-  [`${CloudStorageProvider.internalName}=>${
-    GoogleDriveStorageProvider.internalName
-  }`]: ensureNoCloudProjectResources,
-  // Nothing to move around when saving to a Google Drive project from a public URL
-  // (because only public URLs are supported).
-  [`${UrlStorageProvider.internalName}=>${
-    GoogleDriveStorageProvider.internalName
-  }`]: moveNothing,
-  // Nothing to move around when saving from a Google Drive project to another
-  // (because only public URLs are supported).
-  [`${GoogleDriveStorageProvider.internalName}=>${
-    GoogleDriveStorageProvider.internalName
-  }`]: moveNothing,
 
   // Moving to "DownloadFile":
 
@@ -67,9 +41,6 @@ const movers: {
     DownloadFileStorageProvider.internalName
   }`]: moveNothing,
   [`${UrlStorageProvider.internalName}=>${
-    DownloadFileStorageProvider.internalName
-  }`]: moveNothing,
-  [`${GoogleDriveStorageProvider.internalName}=>${
     DownloadFileStorageProvider.internalName
   }`]: moveNothing,
 };

@@ -27,6 +27,7 @@ export const getAiConfigurationPresetsWithAvailability = ({
     return aiSettings.aiRequest.presets.map(preset => ({
       ...preset,
       enableWith: null,
+      disabled: preset.isDefault ? false : true,
     }));
   }
 

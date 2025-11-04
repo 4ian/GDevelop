@@ -5,7 +5,6 @@ import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
 import SaveToStorageProviderDialog from '../../../ProjectsStorage/SaveToStorageProviderDialog';
-import GoogleDriveStorageProvider from '../../../ProjectsStorage/GoogleDriveStorageProvider';
 import CloudStorageProvider from '../../../ProjectsStorage/CloudStorageProvider';
 import UrlStorageProvider from '../../../ProjectsStorage/UrlStorageProvider';
 import DownloadFileStorageProvider from '../../../ProjectsStorage/DownloadFileStorageProvider';
@@ -27,7 +26,6 @@ export const UserNotAuthenticated = () => (
       storageProviders={[
         UrlStorageProvider,
         CloudStorageProvider,
-        GoogleDriveStorageProvider,
         DownloadFileStorageProvider,
       ]}
       onChooseProvider={action('onChooseProvider')}
@@ -44,7 +42,6 @@ export const UserAuthenticatedWithEnoughStorage = () => (
       storageProviders={[
         UrlStorageProvider,
         CloudStorageProvider,
-        GoogleDriveStorageProvider,
         DownloadFileStorageProvider,
       ]}
       onChooseProvider={action('onChooseProvider')}
@@ -64,7 +61,6 @@ export const UserAuthenticatedWithNotEnoughStorage = () => (
       storageProviders={[
         UrlStorageProvider,
         CloudStorageProvider,
-        GoogleDriveStorageProvider,
         DownloadFileStorageProvider,
       ]}
       onChooseProvider={action('onChooseProvider')}

@@ -18,7 +18,7 @@ export const useSearchAndInstallAsset = ({
   resourceManagementProps,
   onExtensionInstalled,
 }: {|
-  project: gdProject | null,
+  project: ?gdProject,
   resourceManagementProps: ResourceManagementProps,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |}) => {

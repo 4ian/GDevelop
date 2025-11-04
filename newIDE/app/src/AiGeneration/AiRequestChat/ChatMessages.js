@@ -42,7 +42,7 @@ type Props = {|
     |}
   ) => Promise<void>,
   editorCallbacks: EditorCallbacks,
-  project: gdProject | null,
+  project: ?gdProject,
 |};
 
 export const ChatMessages = React.memo<Props>(function ChatMessages({

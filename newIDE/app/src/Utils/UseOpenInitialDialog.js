@@ -8,7 +8,7 @@ import { t } from '@lingui/macro';
 import { getListedBundle } from './GDevelopServices/Shop';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
-import { type OpenAskAiOptions } from '../AiGeneration/AskAiEditorContainer';
+import { type OpenAskAiOptions } from '../AiGeneration/Utils';
 
 type Props = {|
   openInAppTutorialDialog: (tutorialId: string) => void,

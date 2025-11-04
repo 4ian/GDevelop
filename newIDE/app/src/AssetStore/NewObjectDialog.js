@@ -186,7 +186,7 @@ export const useInstallAsset = ({
   resourceManagementProps,
   onExtensionInstalled,
 }: {|
-  project: gdProject | null,
+  project: ?gdProject,
   targetObjectFolderOrObjectWithContext?: ?ObjectFolderOrObjectWithContext,
   resourceManagementProps: ResourceManagementProps,
   onExtensionInstalled: (extensionNames: Array<string>) => void,

@@ -76,13 +76,14 @@ export const MaxProjectCountAlertMessage = ({ margin }: Props) => {
             {canMaximumCountBeIncreased ? (
               !hasValidSubscription ? (
                 <Trans>
-                  Thanks for trying GDevelop! Unlock more projects, publishing,
-                  multiplayer, courses and much more by upgrading.
+                  Thanks for trying GDevelop! Unlock more projects, AI usage,
+                  publishing, multiplayer, courses and much more by upgrading.
                 </Trans>
               ) : (
                 <Trans>
-                  Upgrade to get more cloud projects, publishing, multiplayer,
-                  courses and credits every month with GDevelop Premium.
+                  Upgrade to get more cloud projects, AI usage, publishing,
+                  multiplayer, courses and credits every month with GDevelop
+                  Premium.
                 </Trans>
               )
             ) : (

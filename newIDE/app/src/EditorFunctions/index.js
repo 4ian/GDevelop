@@ -168,7 +168,7 @@ export type ObjectGroupsOutsideEditorChanges = {|
 |};
 
 type RenderForEditorOptions = {|
-  project: gdProject | null,
+  project: ?gdProject,
   args: any,
   editorCallbacks: EditorCallbacks,
   shouldShowDetails: boolean,

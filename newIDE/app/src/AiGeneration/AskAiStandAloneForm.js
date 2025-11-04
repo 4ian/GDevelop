@@ -41,6 +41,8 @@ import {
   useProcessFunctionCalls,
   type NewAiRequestOptions,
   type OpenAskAiOptions,
+  AI_AGENT_TOOLS_VERSION,
+  AI_CHAT_TOOLS_VERSION,
 } from './Utils';
 import { LineStackLayout } from '../UI/Layout';
 import RobotIcon from '../ProjectCreation/RobotIcon';
@@ -52,8 +54,6 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import Cross from '../UI/CustomSvgIcons/Cross';
 
 const gd: libGDevelop = global.gd;
-
-const AI_TOOLS_VERSION = 'v5';
 
 type Props = {|
   project: ?gdProject,
@@ -301,7 +301,10 @@ export const AskAiStandAloneForm = ({
             fileMetadata: null, // No file metadata when starting from the standalone form.
             storageProviderName,
             mode: aiRequestModeForForm,
-            toolsVersion: AI_TOOLS_VERSION,
+            toolsVersion:
+              aiRequestModeForForm === 'agent'
+                ? AI_AGENT_TOOLS_VERSION
+                : AI_CHAT_TOOLS_VERSION,
             aiConfiguration: {
               presetId: aiConfigurationPresetId,
             },

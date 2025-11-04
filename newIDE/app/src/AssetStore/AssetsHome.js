@@ -123,6 +123,7 @@ export const shopCategories = {
 const MAX_COLUMNS = getShopItemsColumns('xlarge', true);
 const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
 const styles = {
+  scrollview: { overflowX: 'hidden' },
   grid: {
     // Avoid tiles taking too much space on large screens.
     maxWidth: MAX_SECTION_WIDTH,
@@ -326,6 +327,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
     return (
       <ScrollView
         ref={scrollView}
+        style={styles.scrollview}
         id="asset-store-home"
         data={{ isFiltered: !!openedShopCategory ? 'true' : 'false' }}
         onScroll={({ remainingScreensToBottom }) => {

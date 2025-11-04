@@ -511,6 +511,17 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.props.initialInstances.removeInstance(instance);
     });
     if (justRemovedInstances.length) {
+      // Make sure no deleted instance stays selected.
+      this.instancesSelection.selectInstances({
+        instances: [],
+        layersLocks: null,
+        multiSelect: false,
+      });
+
+      // Immediately update the properties editor to ensure they keep no reference
+      // to the deleted instances.
+      this.forceUpdatePropertiesEditor();
+
       this.setState(
         {
           selectedObjectFolderOrObjectsWithContext: [],
@@ -521,14 +532,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           ),
         },
         () => {
-          // Make sure no deleted instance stays selected.
-          this.instancesSelection.selectInstances({
-            instances: [],
-            layersLocks: null,
-            multiSelect: false,
-          });
           this.updateToolbar();
-          this.forceUpdatePropertiesEditor();
         }
       );
     }
@@ -1893,6 +1897,10 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.editorDisplay)
       this.editorDisplay.instancesHandlers.clearHighlightedInstance();
 
+    // Immediately update the properties editor to ensure they keep no reference
+    // to the deleted instances.
+    this.forceUpdatePropertiesEditor();
+
     this.setState(
       {
         selectedObjectFolderOrObjectsWithContext: [],
@@ -1904,7 +1912,6 @@ export default class SceneEditor extends React.Component<Props, State> {
       },
       () => {
         this.updateToolbar();
-        this.forceUpdatePropertiesEditor();
       }
     );
 
@@ -2323,6 +2330,8 @@ export default class SceneEditor extends React.Component<Props, State> {
       layersLocks: null,
     });
 
+    // Immediately update the properties editor to ensure they keep no reference
+    // to the deleted instances.
     this.forceUpdatePropertiesEditor();
   };
 
@@ -2382,6 +2391,9 @@ export default class SceneEditor extends React.Component<Props, State> {
         this._sendUpdatedInstances(newInstances);
       }
     }
+
+    // Immediately update the properties editor to ensure they keep no reference
+    // to the deleted instances.
     this.forceUpdatePropertiesEditor();
   };
 

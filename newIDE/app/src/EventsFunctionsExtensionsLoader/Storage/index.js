@@ -1,8 +1,11 @@
 // @flow
+import { type SerializedExtension } from '../../Utils/GDevelopServices/Extension';
 
 export type EventsFunctionsExtensionOpener = {
-  chooseEventsFunctionExtensionFile: () => Promise<?any>,
-  readEventsFunctionExtensionFile: (filepath: any) => Promise<Object>,
+  chooseEventsFunctionExtensionFile: () => Promise<Array<string>>,
+  readEventsFunctionExtensionFile: (
+    filepath: any
+  ) => Promise<SerializedExtension>,
 };
 
 export type EventsFunctionsExtensionWriter = {

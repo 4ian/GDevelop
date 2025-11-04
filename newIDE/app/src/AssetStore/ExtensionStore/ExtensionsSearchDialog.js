@@ -1,5 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
@@ -8,7 +9,11 @@ import FlatButton from '../../UI/FlatButton';
 import { ExtensionStore } from '.';
 import EventsFunctionsExtensionsContext from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import HelpButton from '../../UI/HelpButton';
-import { importExtension, installExtension } from './InstallExtension';
+import {
+  useImportExtension,
+  useInstallExtension,
+  getRequiredExtensions,
+} from './InstallExtension';
 import DismissableInfoBar from '../../UI/Messages/DismissableInfoBar';
 import { type ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
@@ -20,7 +25,9 @@ import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMea
 import Download from '../../UI/CustomSvgIcons/Download';
 import Add from '../../UI/CustomSvgIcons/Add';
 import ErrorBoundary from '../../UI/ErrorBoundary';
-import useAlertDialog from '../../UI/Alert/useAlertDialog';
+import { checkRequiredExtensionsUpdate } from '../../AssetStore/ExtensionStore/InstallExtension';
+import { showErrorBox } from '../../UI/Messages/MessageBox';
+import { ExtensionStoreContext } from './ExtensionStoreContext';
 
 type Props = {|
   project: gdProject,
@@ -41,6 +48,11 @@ const ExtensionsSearchDialog = ({
   onCreateNew,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
+  const installExtension = useInstallExtension();
+  const {
+    translatedExtensionShortHeadersByName: extensionShortHeadersByName,
+  } = React.useContext(ExtensionStoreContext);
+  const importExtension = useImportExtension();
   const [isInstalling, setIsInstalling] = React.useState(false);
   const [extensionWasInstalled, setExtensionWasInstalled] = React.useState(
     false
@@ -50,48 +62,75 @@ const ExtensionsSearchDialog = ({
   );
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
-  const installDisplayedExtension = addCreateBadgePreHookIfNotClaimed(
+  const createBadgeFistExtension = addCreateBadgePreHookIfNotClaimed(
     authenticatedUser,
     TRIVIAL_FIRST_EXTENSION,
-    installExtension
+    () => {}
   );
-  const { showConfirmation, showAlert } = useAlertDialog();
 
   const installOrImportExtension = async (
     i18n: I18nType,
     extensionShortHeader?: ExtensionShortHeader
-  ) => {
+  ): Promise<boolean> => {
     setIsInstalling(true);
     try {
-      let installedOrImportedExtensionName: string | null = null;
-      if (!!extensionShortHeader) {
+      if (extensionShortHeader) {
+        // TODO do it for all extensions
         onInstallExtension(extensionShortHeader.name);
-        const wasExtensionInstalledOrImported = await installDisplayedExtension(
-          i18n,
-          project,
-          eventsFunctionsExtensionsState,
-          extensionShortHeader
-        );
-        installedOrImportedExtensionName = wasExtensionInstalledOrImported
-          ? extensionShortHeader.name
-          : null;
+        try {
+          const extensionShortHeaders: Array<ExtensionShortHeader> = [
+            extensionShortHeader,
+          ];
+          const requiredExtensions = getRequiredExtensions(
+            extensionShortHeaders
+          );
+          requiredExtensions.push({
+            extensionName: extensionShortHeader.name,
+            extensionVersion: extensionShortHeader.version,
+          });
+          const requiredExtensionInstallation = await checkRequiredExtensionsUpdate(
+            {
+              requiredExtensions,
+              project,
+              extensionShortHeadersByName,
+            }
+          );
+          const wasExtensionInstalled = await installExtension({
+            project,
+            requiredExtensionInstallation,
+            userSelectedExtensionNames: [extensionShortHeader.name],
+            importedSerializedExtensions: [],
+            onExtensionInstalled,
+            updateMode: 'all',
+          });
+          if (!wasExtensionInstalled) {
+            return false;
+          }
+          createBadgeFistExtension();
+          setExtensionWasInstalled(true);
+        } catch (rawError) {
+          showErrorBox({
+            message: i18n._(
+              t`Unable to download and install the extension and its dependencies. Verify that your internet connection is working or try again later.`
+            ),
+            rawError,
+            errorId: 'download-extension-error',
+          });
+          return false;
+        }
       } else {
-        installedOrImportedExtensionName = await importExtension(
+        const installedOrImportedExtensionNames = await importExtension({
           i18n,
-          eventsFunctionsExtensionsState,
           project,
-          onInstallExtension,
-          showConfirmation,
-          showAlert
-        );
+          onWillInstallExtension: onInstallExtension,
+          onExtensionInstalled,
+        });
+        if (installedOrImportedExtensionNames.length > 0) {
+          setExtensionWasInstalled(true);
+          onExtensionInstalled(installedOrImportedExtensionNames);
+          return true;
+        }
       }
-
-      if (installedOrImportedExtensionName) {
-        setExtensionWasInstalled(true);
-        onExtensionInstalled([installedOrImportedExtensionName]);
-        return true;
-      }
-
       return false;
     } finally {
       setIsInstalling(false);

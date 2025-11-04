@@ -5,9 +5,13 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import ExtensionInstallDialog from '../AssetStore/ExtensionStore/ExtensionInstallDialog';
-import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
-import { installExtension } from '../AssetStore/ExtensionStore/InstallExtension';
+import {
+  checkRequiredExtensionsUpdate,
+  useInstallExtension,
+  getRequiredExtensions,
+} from '../AssetStore/ExtensionStore/InstallExtension';
+import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 
 type Props = {|
   project: gdProject,
@@ -27,20 +31,34 @@ function InstalledExtensionDetails({
   onOpenEventsFunctionsExtension,
 }: Props) {
   const [isInstalling, setIsInstalling] = React.useState<boolean>(false);
-  const eventsFunctionsExtensionsState = React.useContext(
-    EventsFunctionsExtensionsContext
-  );
+  const installExtension = useInstallExtension();
+  const {
+    translatedExtensionShortHeadersByName: extensionShortHeadersByName,
+  } = React.useContext(ExtensionStoreContext);
 
   const installOrUpdateExtension = async (i18n: I18nType) => {
     setIsInstalling(true);
     try {
       onInstallExtension(extensionShortHeader.name);
-      await installExtension(
-        i18n,
-        project,
-        eventsFunctionsExtensionsState,
-        extensionShortHeader
+      const extensionShortHeaders: Array<ExtensionShortHeader> = [
+        extensionShortHeader,
+      ];
+      const requiredExtensionInstallation = await checkRequiredExtensionsUpdate(
+        {
+          requiredExtensions: getRequiredExtensions(extensionShortHeaders),
+          project,
+          extensionShortHeadersByName,
+        }
       );
+      await installExtension({
+        project,
+        requiredExtensionInstallation,
+        userSelectedExtensionNames: [],
+        importedSerializedExtensions: [],
+        // TODO
+        onExtensionInstalled: () => {},
+        updateMode: 'all',
+      });
     } finally {
       setIsInstalling(false);
     }

@@ -1,13 +1,15 @@
 // @flow
 import {
   addAssetToProject,
-  addSerializedExtensionsToProject,
   getRequiredExtensionsFromAsset,
-  installRequiredExtensions,
   installPublicAsset,
-  checkRequiredExtensionsUpdate,
   checkRequiredExtensionsUpdateForAssets,
 } from './InstallAsset';
+import {
+  addSerializedExtensionsToProject,
+  installRequiredExtensions,
+  checkRequiredExtensionsUpdate,
+} from './ExtensionStore/InstallExtension';
 import { makeTestProject } from '../fixtures/TestProject';
 import { type EventsFunctionsExtensionsState } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import {
@@ -29,6 +31,7 @@ import {
   getExtensionsRegistry,
   getExtension,
   type ExtensionShortHeader,
+  type SerializedExtension,
 } from '../Utils/GDevelopServices/Extension';
 import * as Asset from '../Utils/GDevelopServices/Asset';
 
@@ -383,6 +386,20 @@ describe('InstallAsset', () => {
   //   });
   // });
 
+  const createExtensionRegistry = (
+    ...extensionShortHeaders: Array<ExtensionShortHeader>
+  ) => {
+    const extensionShortHeadersByName: {
+      [name: string]: ExtensionShortHeader,
+    } = {};
+    for (const extensionShortHeader of extensionShortHeaders) {
+      extensionShortHeadersByName[
+        extensionShortHeader.name
+      ] = extensionShortHeader;
+    }
+    return extensionShortHeadersByName;
+  };
+
   describe('checkRequiredExtensionsUpdate', () => {
     it('can find an extension to install', async () => {
       makeTestExtensions(gd);
@@ -390,10 +407,10 @@ describe('InstallAsset', () => {
       expect(project.hasEventsFunctionsExtensionNamed('Flash')).toBe(false);
 
       // The extension is in the registry.
-      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
-        version: '1.0.0',
-        headers: [fireBulletExtensionShortHeader, flashExtensionShortHeader],
-      }));
+      const extensionShortHeadersByName = createExtensionRegistry(
+        fireBulletExtensionShortHeader,
+        flashExtensionShortHeader
+      );
 
       await expect(
         checkRequiredExtensionsUpdate({
@@ -404,6 +421,7 @@ describe('InstallAsset', () => {
             },
           ],
           project,
+          extensionShortHeadersByName,
         })
       ).resolves.toEqual({
         requiredExtensionShortHeaders: [flashExtensionShortHeader],
@@ -422,10 +440,9 @@ describe('InstallAsset', () => {
       expect(project.hasEventsFunctionsExtensionNamed('Button')).toBe(true);
 
       // The extension is in the registry.
-      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
-        version: '1.0.0',
-        headers: [buttonV1ExtensionShortHeader],
-      }));
+      const extensionShortHeadersByName = createExtensionRegistry(
+        buttonV1ExtensionShortHeader
+      );
 
       await expect(
         checkRequiredExtensionsUpdate({
@@ -436,6 +453,7 @@ describe('InstallAsset', () => {
             },
           ],
           project,
+          extensionShortHeadersByName,
         })
       ).resolves.toEqual({
         requiredExtensionShortHeaders: [buttonV1ExtensionShortHeader],
@@ -454,10 +472,9 @@ describe('InstallAsset', () => {
       expect(project.hasEventsFunctionsExtensionNamed('Button')).toBe(true);
 
       // The extension is in the registry.
-      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
-        version: '1.0.0',
-        headers: [buttonV2ExtensionShortHeader],
-      }));
+      const extensionShortHeadersByName = createExtensionRegistry(
+        buttonV2ExtensionShortHeader
+      );
 
       await expect(
         checkRequiredExtensionsUpdate({
@@ -468,6 +485,7 @@ describe('InstallAsset', () => {
             },
           ],
           project,
+          extensionShortHeadersByName,
         })
       ).resolves.toEqual({
         requiredExtensionShortHeaders: [buttonV2ExtensionShortHeader],
@@ -486,10 +504,9 @@ describe('InstallAsset', () => {
       expect(project.hasEventsFunctionsExtensionNamed('Button')).toBe(true);
 
       // The extension is in the registry.
-      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
-        version: '1.0.0',
-        headers: [breakingButtonV3ExtensionShortHeader],
-      }));
+      const extensionShortHeadersByName = createExtensionRegistry(
+        breakingButtonV3ExtensionShortHeader
+      );
 
       await expect(
         checkRequiredExtensionsUpdate({
@@ -500,6 +517,7 @@ describe('InstallAsset', () => {
             },
           ],
           project,
+          extensionShortHeadersByName,
         })
       ).resolves.toEqual({
         requiredExtensionShortHeaders: [breakingButtonV3ExtensionShortHeader],
@@ -520,10 +538,9 @@ describe('InstallAsset', () => {
       expect(project.hasEventsFunctionsExtensionNamed('Button')).toBe(true);
 
       // The extension is in the registry.
-      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
-        version: '1.0.0',
-        headers: [incompatibleButtonV4ExtensionShortHeader],
-      }));
+      const extensionShortHeadersByName = createExtensionRegistry(
+        incompatibleButtonV4ExtensionShortHeader
+      );
 
       await expect(
         checkRequiredExtensionsUpdate({
@@ -535,6 +552,7 @@ describe('InstallAsset', () => {
             },
           ],
           project,
+          extensionShortHeadersByName,
         })
       ).resolves.toEqual({
         requiredExtensionShortHeaders: [
@@ -559,10 +577,9 @@ describe('InstallAsset', () => {
       expect(project.hasEventsFunctionsExtensionNamed('Flash')).toBe(false);
 
       // The extension is in the registry.
-      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
-        version: '1.0.0',
-        headers: [incompatibleFlashExtensionShortHeader],
-      }));
+      const extensionShortHeadersByName = createExtensionRegistry(
+        incompatibleFlashExtensionShortHeader
+      );
 
       await expect(
         checkRequiredExtensionsUpdate({
@@ -573,6 +590,7 @@ describe('InstallAsset', () => {
             },
           ],
           project,
+          extensionShortHeadersByName,
         })
       ).resolves.toEqual({
         requiredExtensionShortHeaders: [incompatibleFlashExtensionShortHeader],
@@ -591,10 +609,10 @@ describe('InstallAsset', () => {
       makeTestExtensions(gd);
       const { project } = makeTestProject(gd);
 
-      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
-        version: '1.0.0',
-        headers: [flashExtensionShortHeader, fireBulletExtensionShortHeader],
-      }));
+      const extensionShortHeadersByName = createExtensionRegistry(
+        flashExtensionShortHeader,
+        fireBulletExtensionShortHeader
+      );
 
       await expect(
         checkRequiredExtensionsUpdate({
@@ -605,32 +623,10 @@ describe('InstallAsset', () => {
             },
           ],
           project,
+          extensionShortHeadersByName,
         })
       ).rejects.toMatchObject({
         message: 'Unable to find extension UnknownExtension in the registry.',
-      });
-    });
-
-    it("errors if the registry can't be loaded ", async () => {
-      makeTestExtensions(gd);
-      const { project } = makeTestProject(gd);
-
-      mockFn(getExtensionsRegistry).mockImplementationOnce(() => {
-        throw new Error('Fake error');
-      });
-
-      await expect(
-        checkRequiredExtensionsUpdate({
-          requiredExtensions: [
-            {
-              extensionName: flashExtensionShortHeader.name,
-              extensionVersion: flashExtensionShortHeader.version,
-            },
-          ],
-          project,
-        })
-      ).rejects.toMatchObject({
-        message: 'Fake error',
       });
     });
   });
@@ -647,10 +643,10 @@ describe('InstallAsset', () => {
       );
 
       // ...and this extension is in the registry
-      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
-        version: '1.0.0',
-        headers: [flashExtensionShortHeader, fireBulletExtensionShortHeader],
-      }));
+      const extensionShortHeadersByName = createExtensionRegistry(
+        flashExtensionShortHeader,
+        fireBulletExtensionShortHeader
+      );
 
       await expect(
         checkRequiredExtensionsUpdateForAssets({
@@ -659,6 +655,7 @@ describe('InstallAsset', () => {
             fakeAssetWithFlashExtensionDependency1,
           ],
           project,
+          extensionShortHeadersByName,
         })
       ).resolves.toEqual({
         requiredExtensionShortHeaders: [flashExtensionShortHeader],
@@ -682,20 +679,18 @@ describe('InstallAsset', () => {
       );
 
       // ...and this extension is in the registry
-      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
-        version: '1.0.0',
-        headers: [
-          flashExtensionShortHeader,
-          fireBulletExtensionShortHeader,
-          // The project contains the 1.0.0 of this extension.
-          buttonV1ExtensionShortHeader,
-        ],
-      }));
+      const extensionShortHeadersByName = createExtensionRegistry(
+        flashExtensionShortHeader,
+        fireBulletExtensionShortHeader,
+        // The project contains the 1.0.0 of this extension.
+        buttonV1ExtensionShortHeader
+      );
 
       await expect(
         checkRequiredExtensionsUpdateForAssets({
           assets: [fakeAssetWithCustomObject, fakeAssetWithCustomObject],
           project,
+          extensionShortHeadersByName,
         })
       ).resolves.toEqual({
         requiredExtensionShortHeaders: [buttonV1ExtensionShortHeader],
@@ -719,20 +714,18 @@ describe('InstallAsset', () => {
       );
 
       // ...and this extension is in the registry
-      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
-        version: '1.0.0',
-        headers: [
-          flashExtensionShortHeader,
-          fireBulletExtensionShortHeader,
-          // The project contains the 1.0.0 of this extension.
-          buttonV2ExtensionShortHeader,
-        ],
-      }));
+      const extensionShortHeadersByName = createExtensionRegistry(
+        flashExtensionShortHeader,
+        fireBulletExtensionShortHeader,
+        // The project contains the 1.0.0 of this extension.
+        buttonV2ExtensionShortHeader
+      );
 
       await expect(
         checkRequiredExtensionsUpdateForAssets({
           assets: [fakeAssetWithCustomObject, fakeAssetWithCustomObject],
           project,
+          extensionShortHeadersByName,
         })
       ).resolves.toEqual({
         requiredExtensionShortHeaders: [buttonV2ExtensionShortHeader],
@@ -756,20 +749,18 @@ describe('InstallAsset', () => {
       );
 
       // ...and this extension is in the registry
-      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
-        version: '1.0.0',
-        headers: [
-          flashExtensionShortHeader,
-          fireBulletExtensionShortHeader,
-          // The project contains the 1.0.0 of this extension.
-          breakingButtonV3ExtensionShortHeader,
-        ],
-      }));
+      const extensionShortHeadersByName = createExtensionRegistry(
+        flashExtensionShortHeader,
+        fireBulletExtensionShortHeader,
+        // The project contains the 1.0.0 of this extension.
+        breakingButtonV3ExtensionShortHeader
+      );
 
       await expect(
         checkRequiredExtensionsUpdateForAssets({
           assets: [fakeAssetWithCustomObject, fakeAssetWithCustomObject],
           project,
+          extensionShortHeadersByName,
         })
       ).resolves.toEqual({
         requiredExtensionShortHeaders: [breakingButtonV3ExtensionShortHeader],
@@ -795,20 +786,18 @@ describe('InstallAsset', () => {
       );
 
       // ...and this extension is in the registry
-      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
-        version: '1.0.0',
-        headers: [
-          flashExtensionShortHeader,
-          fireBulletExtensionShortHeader,
-          // The project contains the 1.0.0 of this extension.
-          incompatibleButtonV4ExtensionShortHeader,
-        ],
-      }));
+      const extensionShortHeadersByName = createExtensionRegistry(
+        flashExtensionShortHeader,
+        fireBulletExtensionShortHeader,
+        // The project contains the 1.0.0 of this extension.
+        incompatibleButtonV4ExtensionShortHeader
+      );
 
       await expect(
         checkRequiredExtensionsUpdateForAssets({
           assets: [fakeAssetWithCustomObject, fakeAssetWithCustomObject],
           project,
+          extensionShortHeadersByName,
         })
       ).resolves.toEqual({
         requiredExtensionShortHeaders: [
@@ -838,13 +827,10 @@ describe('InstallAsset', () => {
       );
 
       // ...and this extension is in the registry
-      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
-        version: '1.0.0',
-        headers: [
-          incompatibleFlashExtensionShortHeader,
-          fireBulletExtensionShortHeader,
-        ],
-      }));
+      const extensionShortHeadersByName = createExtensionRegistry(
+        incompatibleFlashExtensionShortHeader,
+        fireBulletExtensionShortHeader
+      );
 
       await expect(
         checkRequiredExtensionsUpdateForAssets({
@@ -853,6 +839,7 @@ describe('InstallAsset', () => {
             fakeAssetWithFlashExtensionDependency1,
           ],
           project,
+          extensionShortHeadersByName,
         })
       ).resolves.toEqual({
         requiredExtensionShortHeaders: [incompatibleFlashExtensionShortHeader],
@@ -871,36 +858,19 @@ describe('InstallAsset', () => {
       makeTestExtensions(gd);
       const { project } = makeTestProject(gd);
 
-      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
-        version: '1.0.0',
-        headers: [flashExtensionShortHeader, fireBulletExtensionShortHeader],
-      }));
+      const extensionShortHeadersByName = createExtensionRegistry(
+        flashExtensionShortHeader,
+        fireBulletExtensionShortHeader
+      );
 
       await expect(
         checkRequiredExtensionsUpdateForAssets({
           assets: [fakeAssetWithUnknownExtension1],
           project,
+          extensionShortHeadersByName,
         })
       ).rejects.toMatchObject({
         message: 'Unable to find extension UnknownExtension in the registry.',
-      });
-    });
-
-    it("errors if the registry can't be loaded ", async () => {
-      makeTestExtensions(gd);
-      const { project } = makeTestProject(gd);
-
-      mockFn(getExtensionsRegistry).mockImplementationOnce(() => {
-        throw new Error('Fake error');
-      });
-
-      await expect(
-        checkRequiredExtensionsUpdateForAssets({
-          assets: [fakeAssetWithUnknownExtension1],
-          project,
-        })
-      ).rejects.toMatchObject({
-        message: 'Fake error',
       });
     });
   });
@@ -919,7 +889,7 @@ describe('InstallAsset', () => {
       getIncludeFileHashs: () => ({}),
     };
 
-    const serializedExtension = { name: 'ExtensionName' };
+    const serializedExtension: SerializedExtension = { name: 'ExtensionName' };
 
     it('adds an extension with origin set if it comes from the store', () => {
       makeTestExtensions(gd);
@@ -1035,6 +1005,7 @@ describe('InstallAsset', () => {
           eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
           project,
           onExtensionInstalled: () => {},
+          importedSerializedExtensions: [],
         })
       ).rejects.toMatchObject({
         // It's just because the mock doesn't reloadProjectEventsFunctionsExtensions.
@@ -1071,6 +1042,7 @@ describe('InstallAsset', () => {
           eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
           project,
           onExtensionInstalled: () => {},
+          importedSerializedExtensions: [],
         })
       ).rejects.toMatchObject({
         message: 'These extensions could not be installed: Flash',
@@ -1112,6 +1084,7 @@ describe('InstallAsset', () => {
         eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
         project,
         onExtensionInstalled: () => {},
+        importedSerializedExtensions: [],
       });
 
       // No extensions fetched because the extension is already installed.

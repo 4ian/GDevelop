@@ -4,7 +4,6 @@ import { GDevelopAssetApi } from './ApiConfigs';
 import { type UserPublicProfile } from './User';
 import { retryIfFailed } from '../RetryIfFailed';
 
-
 // This file is mocked by tests.
 // Don't put any function that is not calling services.
 
@@ -66,7 +65,7 @@ export type EventsBasedObjectInsideExtensionShortHeader = {
   eventsFunctions: EventsFunctionInsideExtensionShortHeader[],
 };
 
-export type ExtensionShortHeader = {
+export type ExtensionShortHeader = {|
   ...ExtensionRegistryItemHeader,
   shortDescription: string,
   eventsBasedBehaviorsCount: number,
@@ -77,13 +76,13 @@ export type ExtensionShortHeader = {
   eventsBasedObjects?: Array<EventsBasedObjectInsideExtensionShortHeader>,
 
   helpPath: string,
-};
+|};
 
-export type ExtensionHeader = {
+export type ExtensionHeader = {|
   ...ExtensionShortHeader,
   description: string,
   iconUrl: string,
-};
+|};
 
 export type BehaviorShortHeader = {|
   ...ExtensionRegistryItemHeader,
@@ -121,7 +120,7 @@ export type ObjectShortHeader = {|
  */
 export type SerializedExtension = {
   name: string,
-
+  requiredExtensions?: Array<ExtensionDependency>,
   // This type is inexact because the typing is not complete.
 };
 

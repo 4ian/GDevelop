@@ -429,6 +429,7 @@ const TextBasedCourseChapterCodeBlock = ({ code, language }: Props) => {
           ...styles.wrapper,
           backgroundColor,
           color: lineNumberColor,
+          borderColor,
         }}
       >
         <div

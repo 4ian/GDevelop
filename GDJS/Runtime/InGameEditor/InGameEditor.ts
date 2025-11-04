@@ -1917,8 +1917,12 @@ namespace gdjs {
                   }
                 }
               }
-
-              const scaleDamping = 0.2; // 0.2 = 20% of the movement speed (Three.js transform controls scaling is too fast)
+              // 0.2 = 20% of the movement speed (Three.js transform controls scaling is too fast)
+              const scaleDamping =
+                threeTransformControls.axis &&
+                threeTransformControls.axis.length === 1
+                  ? 1
+                  : 0.2;
               this._selectionControlsMovementTotalDelta = {
                 translationX,
                 translationY,

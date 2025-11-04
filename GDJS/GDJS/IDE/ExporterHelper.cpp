@@ -599,7 +599,7 @@ void ExporterHelper::StriptAndSerializeProjectData(
                          eventsBasedObjectVariantsUsedResources);
   if (isInGameEdition) {
     auto &behaviorsElement = rootElement.AddChild("activatedByDefaultInEditorBehaviors");
-    behaviorsElement.ConsiderAsArrayOf("runnableInEditorBehavior");
+    behaviorsElement.ConsiderAsArrayOf("resourceReference");
     auto &platform = project.GetCurrentPlatform();
     for (auto &extension : platform.GetAllPlatformExtensions()) {
       for (auto &behaviorType : extension->GetBehaviorsTypes()) {

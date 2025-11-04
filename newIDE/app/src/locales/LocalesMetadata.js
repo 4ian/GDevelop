@@ -131,7 +131,7 @@ module.exports = [
     "languageCode": "hu_HU",
     "languageName": "Hungarian",
     "languageNativeName": "magyar",
-    "translationRatio": 0.9838095238095238
+    "translationRatio": 0.983915343915344
   },
   {
     "languageCode": "id_ID",
@@ -311,7 +311,7 @@ module.exports = [
     "languageCode": "tr_TR",
     "languageName": "Turkish",
     "languageNativeName": "Türkçe",
-    "translationRatio": 0.9757671957671957
+    "translationRatio": 0.9758730158730159
   },
   {
     "languageCode": "uk_UA",

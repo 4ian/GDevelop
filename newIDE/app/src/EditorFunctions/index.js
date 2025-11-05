@@ -1097,6 +1097,7 @@ const changeObjectProperty: EditorFunction = {
       object = layoutObjects.getObject(object_name);
     } else if (globalObjects.hasObjectNamed(object_name)) {
       object = globalObjects.getObject(object_name);
+      isGlobalObject = true;
     }
 
     if (!object) {

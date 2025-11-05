@@ -3246,11 +3246,21 @@ namespace gdjs {
           top: 2px;
           left: 50%;
           transform: translateX(-50%);
-          background-color: var(--in-game-editor-theme-toolbar-background-color); /* Fallback for old Safari. */
-          background-color: color-mix(in srgb, var(--in-game-editor-theme-toolbar-background-color), transparent 30%);
           border-radius: 3px;
           padding: 4px;
           gap: 6px;
+        }
+        .InGameEditor-Toolbar-Container::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: var(--in-game-editor-theme-toolbar-background-color);
+          opacity: 0.5;
+          border-radius: 3px;
+          z-index: -1;
         }
         .InGameEditor-Toolbar-Button {
           width: 24px;
@@ -3340,6 +3350,7 @@ namespace gdjs {
               <span
                 class="InGameEditor-Toolbar-Button-Icon"
                 style={{
+                  '-webkit-mask': `url('${this._getSvgIconUrl('InGameEditor-FreeCameraIcon')}') center/contain no-repeat`,
                   mask: `url('${this._getSvgIconUrl('InGameEditor-FreeCameraIcon')}') center/contain no-repeat`,
                 }}
               ></span>
@@ -3353,6 +3364,7 @@ namespace gdjs {
               <span
                 class="InGameEditor-Toolbar-Button-Icon"
                 style={{
+                  '-webkit-mask': `url('${this._getSvgIconUrl('InGameEditor-OrbitCameraIcon')}') center/contain no-repeat`,
                   mask: `url('${this._getSvgIconUrl('InGameEditor-OrbitCameraIcon')}') center/contain no-repeat`,
                 }}
               ></span>
@@ -3367,6 +3379,7 @@ namespace gdjs {
               <span
                 class="InGameEditor-Toolbar-Button-Icon"
                 style={{
+                  '-webkit-mask': `url('${this._getSvgIconUrl('InGameEditor-MoveIcon')}') center/contain no-repeat`,
                   mask: `url('${this._getSvgIconUrl('InGameEditor-MoveIcon')}') center/contain no-repeat`,
                 }}
               ></span>
@@ -3380,6 +3393,7 @@ namespace gdjs {
               <span
                 class="InGameEditor-Toolbar-Button-Icon"
                 style={{
+                  '-webkit-mask': `url('${this._getSvgIconUrl('InGameEditor-RotateIcon')}') center/contain no-repeat`,
                   mask: `url('${this._getSvgIconUrl('InGameEditor-RotateIcon')}') center/contain no-repeat`,
                 }}
               ></span>
@@ -3393,6 +3407,7 @@ namespace gdjs {
               <span
                 class="InGameEditor-Toolbar-Button-Icon"
                 style={{
+                  '-webkit-mask': `url('${this._getSvgIconUrl('InGameEditor-ResizeIcon')}') center/contain no-repeat`,
                   mask: `url('${this._getSvgIconUrl('InGameEditor-ResizeIcon')}') center/contain no-repeat`,
                 }}
               ></span>
@@ -3407,6 +3422,7 @@ namespace gdjs {
               <span
                 class="InGameEditor-Toolbar-Button-Icon"
                 style={{
+                  '-webkit-mask': `url('${this._getSvgIconUrl('InGameEditor-FocusIcon')}') center/contain no-repeat`,
                   mask: `url('${this._getSvgIconUrl('InGameEditor-FocusIcon')}') center/contain no-repeat`,
                 }}
               ></span>

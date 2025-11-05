@@ -662,7 +662,7 @@ namespace gdjs {
           this._getEditorCamera().switchToOrbitAroundZ0(4000),
         isFreeCamera: () => this._getEditorCamera().isFreeCamera(),
         getSvgIconUrl: (iconName: string) => getSvgIconUrl(game, iconName),
-        hasSelection: () => this._selection.getSelectedObjects().length > 0,
+        hasSelectionControlsShown: () => !!this._selectionControls,
       });
 
       this._applyInGameEditorSettings();
@@ -3223,7 +3223,7 @@ namespace gdjs {
     private _switchToOrbitCamera: () => void;
     private _isFreeCamera: () => boolean;
     private _getSvgIconUrl: (iconName: string) => string;
-    private _hasSelection: () => boolean;
+    private _hasSelectionControlsShown: () => boolean;
 
     private addOrUpdateToolbarStyle() {
       const id = 'InGameEditor-Toolbar-Style';
@@ -3236,27 +3236,32 @@ namespace gdjs {
       }
 
       styleElement.textContent = `
-        .InGameEditor-Toolbar-Container {
+        .InGameEditor-Toolbar-Centering-Container {
           position: fixed;
+          left: 0;
+          right: 0;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: center;
+
+          transition: transform 0.1s ease-in-out;
+        }
+        .InGameEditor-Toolbar-Container {
+          position: relative;
           pointer-events: all;
           display: flex;
           flex-direction: row;
           align-items: center;
           justify-content: center;
           top: 2px;
-          left: 50%;
-          transform: translateX(-50%);
           border-radius: 3px;
           padding: 4px;
           gap: 6px;
         }
-        .InGameEditor-Toolbar-Container::before {
-          content: '';
+        .InGameEditor-Toolbar-Container-Background {
           position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
+          inset: 0;
           background-color: var(--in-game-editor-theme-toolbar-background-color);
           opacity: 0.5;
           border-radius: 3px;
@@ -3306,7 +3311,7 @@ namespace gdjs {
       switchToOrbitCamera,
       isFreeCamera,
       getSvgIconUrl,
-      hasSelection,
+      hasSelectionControlsShown,
     }: {
       getTransformControlsMode: () => 'translate' | 'rotate' | 'scale' | null;
       setTransformControlsMode: (
@@ -3317,7 +3322,7 @@ namespace gdjs {
       switchToOrbitCamera: () => void;
       isFreeCamera: () => boolean;
       getSvgIconUrl: (iconName: string) => string;
-      hasSelection: () => boolean;
+      hasSelectionControlsShown: () => boolean;
     }) {
       this._getTransformControlsMode = getTransformControlsMode;
       this._setTransformControlsMode = setTransformControlsMode;
@@ -3326,7 +3331,7 @@ namespace gdjs {
       this._switchToOrbitCamera = switchToOrbitCamera;
       this._isFreeCamera = isFreeCamera;
       this._getSvgIconUrl = getSvgIconUrl;
-      this._hasSelection = hasSelection;
+      this._hasSelectionControlsShown = hasSelectionControlsShown;
 
       this.addOrUpdateToolbarStyle();
     }
@@ -3338,95 +3343,88 @@ namespace gdjs {
       }
       this._parent = parent;
 
+      const makeIcon = ({ svgIconUrl }: { svgIconUrl: string }) => (
+        <span
+          class="InGameEditor-Toolbar-Button-Icon"
+          style={{
+            '-webkit-mask': `url('${svgIconUrl}') center/contain no-repeat`,
+            mask: `url('${svgIconUrl}') center/contain no-repeat`,
+          }}
+        ></span>
+      );
+
       if (!this._renderedElements) {
         const container = (
-          <div class="InGameEditor-Toolbar-Container">
-            <button
-              class="InGameEditor-Toolbar-Button"
-              id="free-camera-button"
-              onClick={this._switchToFreeCamera}
-              title="Free camera mode"
-            >
-              <span
-                class="InGameEditor-Toolbar-Button-Icon"
-                style={{
-                  '-webkit-mask': `url('${this._getSvgIconUrl('InGameEditor-FreeCameraIcon')}') center/contain no-repeat`,
-                  mask: `url('${this._getSvgIconUrl('InGameEditor-FreeCameraIcon')}') center/contain no-repeat`,
-                }}
-              ></span>
-            </button>
-            <button
-              class="InGameEditor-Toolbar-Button"
-              id="orbit-camera-button"
-              onClick={this._switchToOrbitCamera}
-              title="Orbit camera mode"
-            >
-              <span
-                class="InGameEditor-Toolbar-Button-Icon"
-                style={{
-                  '-webkit-mask': `url('${this._getSvgIconUrl('InGameEditor-OrbitCameraIcon')}') center/contain no-repeat`,
-                  mask: `url('${this._getSvgIconUrl('InGameEditor-OrbitCameraIcon')}') center/contain no-repeat`,
-                }}
-              ></span>
-            </button>
-            <div class="InGameEditor-Toolbar-Divider" />
-            <button
-              class="InGameEditor-Toolbar-Button"
-              id="move-button"
-              onClick={() => this._setTransformControlsMode('translate')}
-              title="Move (translate) selection"
-            >
-              <span
-                class="InGameEditor-Toolbar-Button-Icon"
-                style={{
-                  '-webkit-mask': `url('${this._getSvgIconUrl('InGameEditor-MoveIcon')}') center/contain no-repeat`,
-                  mask: `url('${this._getSvgIconUrl('InGameEditor-MoveIcon')}') center/contain no-repeat`,
-                }}
-              ></span>
-            </button>
-            <button
-              class="InGameEditor-Toolbar-Button"
-              id="rotate-button"
-              onClick={() => this._setTransformControlsMode('rotate')}
-              title="Rotate selection"
-            >
-              <span
-                class="InGameEditor-Toolbar-Button-Icon"
-                style={{
-                  '-webkit-mask': `url('${this._getSvgIconUrl('InGameEditor-RotateIcon')}') center/contain no-repeat`,
-                  mask: `url('${this._getSvgIconUrl('InGameEditor-RotateIcon')}') center/contain no-repeat`,
-                }}
-              ></span>
-            </button>
-            <button
-              class="InGameEditor-Toolbar-Button"
-              id="scale-button"
-              onClick={() => this._setTransformControlsMode('scale')}
-              title="Resize selection"
-            >
-              <span
-                class="InGameEditor-Toolbar-Button-Icon"
-                style={{
-                  '-webkit-mask': `url('${this._getSvgIconUrl('InGameEditor-ResizeIcon')}') center/contain no-repeat`,
-                  mask: `url('${this._getSvgIconUrl('InGameEditor-ResizeIcon')}') center/contain no-repeat`,
-                }}
-              ></span>
-            </button>
-            <div class="InGameEditor-Toolbar-Divider" />
-            <button
-              class="InGameEditor-Toolbar-Button"
-              id="focus-button"
-              onClick={this._focusOnSelection}
-              title="Focus on selection (F)"
-            >
-              <span
-                class="InGameEditor-Toolbar-Button-Icon"
-                style={{
-                  '-webkit-mask': `url('${this._getSvgIconUrl('InGameEditor-FocusIcon')}') center/contain no-repeat`,
-                  mask: `url('${this._getSvgIconUrl('InGameEditor-FocusIcon')}') center/contain no-repeat`,
-                }}
-              ></span>
-            </button>
+          <div class="InGameEditor-Toolbar-Centering-Container">
+            <div class="InGameEditor-Toolbar-Container">
+              <div class="InGameEditor-Toolbar-Container-Background" />
+              <button
+                class="InGameEditor-Toolbar-Button"
+                id="free-camera-button"
+                onClick={this._switchToFreeCamera}
+                title="Free camera mode"
+              >
+                {makeIcon({
+                  svgIconUrl: this._getSvgIconUrl(
+                    'InGameEditor-FreeCameraIcon'
+                  ),
+                })}
+              </button>
+              <button
+                class="InGameEditor-Toolbar-Button"
+                id="orbit-camera-button"
+                onClick={this._switchToOrbitCamera}
+                title="Orbit camera mode"
+              >
+                {makeIcon({
+                  svgIconUrl: this._getSvgIconUrl(
+                    'InGameEditor-OrbitCameraIcon'
+                  ),
+                })}
+              </button>
+              <div class="InGameEditor-Toolbar-Divider" />
+              <button
+                class="InGameEditor-Toolbar-Button"
+                id="move-button"
+                onClick={() => this._setTransformControlsMode('translate')}
+                title="Move (translate) selection"
+              >
+                {makeIcon({
+                  svgIconUrl: this._getSvgIconUrl('InGameEditor-MoveIcon'),
+                })}
+              </button>
+              <button
+                class="InGameEditor-Toolbar-Button"
+                id="rotate-button"
+                onClick={() => this._setTransformControlsMode('rotate')}
+                title="Rotate selection"
+              >
+                {makeIcon({
+                  svgIconUrl: this._getSvgIconUrl('InGameEditor-RotateIcon'),
+                })}
+              </button>
+              <button
+                class="InGameEditor-Toolbar-Button"
+                id="scale-button"
+                onClick={() => this._setTransformControlsMode('scale')}
+                title="Resize selection"
+              >
+                {makeIcon({
+                  svgIconUrl: this._getSvgIconUrl('InGameEditor-ResizeIcon'),
+                })}
+              </button>
+              <div class="InGameEditor-Toolbar-Divider" />
+              <button
+                class="InGameEditor-Toolbar-Button"
+                id="focus-button"
+                onClick={this._focusOnSelection}
+                title="Focus on selection (F)"
+              >
+                {makeIcon({
+                  svgIconUrl: this._getSvgIconUrl('InGameEditor-FocusIcon'),
+                })}
+              </button>
+            </div>
           </div>
         );
         this._parent.appendChild(container);
@@ -3441,9 +3439,12 @@ namespace gdjs {
         };
       }
 
-      this._renderedElements.container.style.display = this._hasSelection()
-        ? 'flex'
-        : 'none';
+      const displayed = this._hasSelectionControlsShown();
+
+      this._renderedElements.container.tabIndex = displayed ? 0 : -1;
+      this._renderedElements.container.style.transform = displayed
+        ? 'translateY(0)'
+        : 'translateY(-50px)';
 
       const transformControlsMode = this._getTransformControlsMode();
       this._renderedElements.freeCameraButton.classList.toggle(

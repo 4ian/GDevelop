@@ -34,7 +34,7 @@ export const useSearchAndInstallAsset = ({
   return {
     searchAndInstallAsset: React.useCallback(
       async ({
-        scene,
+        objectsContainer,
         objectName,
         ...assetSearchOptions
       }: AssetSearchAndInstallOptions): Promise<AssetSearchAndInstallResult> => {
@@ -63,7 +63,7 @@ export const useSearchAndInstallAsset = ({
 
         const installOutput = await installAsset({
           assetShortHeader,
-          objectsContainer: scene.getObjects(),
+          objectsContainer,
           requestedObjectName: objectName,
         });
 

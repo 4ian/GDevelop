@@ -102,12 +102,20 @@ namespace gdjs {
   export type InGameEditorSettings = {
     theme: {
       iconButtonSelectedBackgroundColor: string;
+      iconButtonSelectedColor: string;
+      toolbarBackgroundColor: string;
+      toolbarSeparatorColor: string;
+      textColorPrimary: string;
     };
   };
 
   const defaultInGameEditorSettings: InGameEditorSettings = {
     theme: {
-      iconButtonSelectedBackgroundColor: '#C9B6FC',
+      iconButtonSelectedBackgroundColor: 'black',
+      iconButtonSelectedColor: 'black',
+      toolbarBackgroundColor: 'black',
+      toolbarSeparatorColor: 'black',
+      textColorPrimary: 'black',
     },
   };
 
@@ -670,6 +678,22 @@ namespace gdjs {
       rootElement.style.setProperty(
         '--in-game-editor-theme-icon-button-selected-background-color',
         this._inGameEditorSettings.theme.iconButtonSelectedBackgroundColor
+      );
+      rootElement.style.setProperty(
+        '--in-game-editor-theme-icon-button-selected-color',
+        this._inGameEditorSettings.theme.iconButtonSelectedColor
+      );
+      rootElement.style.setProperty(
+        '--in-game-editor-theme-toolbar-background-color',
+        this._inGameEditorSettings.theme.toolbarBackgroundColor
+      );
+      rootElement.style.setProperty(
+        '--in-game-editor-theme-toolbar-separator-color',
+        this._inGameEditorSettings.theme.toolbarSeparatorColor
+      );
+      rootElement.style.setProperty(
+        '--in-game-editor-theme-text-color-primary',
+        this._inGameEditorSettings.theme.textColorPrimary
       );
     }
 
@@ -3222,7 +3246,8 @@ namespace gdjs {
           top: 2px;
           left: 50%;
           transform: translateX(-50%);
-          background-color: rgba(0, 0, 0, 0.4);
+          background-color: var(--in-game-editor-theme-toolbar-background-color); /* Fallback for old Safari. */
+          background-color: color-mix(in srgb, var(--in-game-editor-theme-toolbar-background-color), transparent 30%);
           border-radius: 3px;
           padding: 4px;
           gap: 6px;
@@ -3232,17 +3257,19 @@ namespace gdjs {
           height: 24px;
           border-radius: 4px;
           border: none;
-          color: white;
           padding: 0;
-          background-color: transparent;
           border-width: 0;
           display: flex;
           align-items: center;
           justify-content: center;
+
+          background-color: transparent;
         }
-        .InGameEditor-Toolbar-Button img {
+        .InGameEditor-Toolbar-Button-Icon {
           width: 20px;
           height: 20px;
+          display:inline-block;
+          background-color: var(--in-game-editor-theme-text-color-primary);
         }
         .InGameEditor-Toolbar-Button:hover:not(.InGameEditor-Toolbar-Button-Active):not(.InGameEditor-Toolbar-Button-Disabled) {
           background-color: rgba(255, 255, 255, 0.08);
@@ -3250,16 +3277,13 @@ namespace gdjs {
         .InGameEditor-Toolbar-Button-Active {
           background-color: var(--in-game-editor-theme-icon-button-selected-background-color);
         }
-        .InGameEditor-Toolbar-Button-Active img {
-          filter: invert(1);
-        }
-        .InGameEditor-Toolbar-ButtonIcon {
-          color: white;
+        .InGameEditor-Toolbar-Button-Active .InGameEditor-Toolbar-Button-Icon {
+          background-color: var(--in-game-editor-theme-icon-button-selected-color);
         }
         .InGameEditor-Toolbar-Divider {
           width: 1px;
           height: 24px;
-          background-color: rgb(62, 68, 82, 0.2);
+          background-color: var(--in-game-editor-theme-toolbar-separator-color);
         }
       `;
     }
@@ -3313,11 +3337,12 @@ namespace gdjs {
               onClick={this._switchToFreeCamera}
               title="Free camera mode"
             >
-              <img
-                src={this._getSvgIconUrl('InGameEditor-FreeCameraIcon')}
-                class="InGameEditor-Toolbar-ButtonIcon"
-                alt="Free camera"
-              />
+              <span
+                class="InGameEditor-Toolbar-Button-Icon"
+                style={{
+                  mask: `url('${this._getSvgIconUrl('InGameEditor-FreeCameraIcon')}') center/contain no-repeat`,
+                }}
+              ></span>
             </button>
             <button
               class="InGameEditor-Toolbar-Button"
@@ -3325,11 +3350,12 @@ namespace gdjs {
               onClick={this._switchToOrbitCamera}
               title="Orbit camera mode"
             >
-              <img
-                src={this._getSvgIconUrl('InGameEditor-OrbitCameraIcon')}
-                class="InGameEditor-Toolbar-ButtonIcon"
-                alt="Free camera"
-              />
+              <span
+                class="InGameEditor-Toolbar-Button-Icon"
+                style={{
+                  mask: `url('${this._getSvgIconUrl('InGameEditor-OrbitCameraIcon')}') center/contain no-repeat`,
+                }}
+              ></span>
             </button>
             <div class="InGameEditor-Toolbar-Divider" />
             <button
@@ -3338,11 +3364,12 @@ namespace gdjs {
               onClick={() => this._setTransformControlsMode('translate')}
               title="Move (translate) selection"
             >
-              <img
-                src={this._getSvgIconUrl('InGameEditor-MoveIcon')}
-                class="InGameEditor-Toolbar-ButtonIcon"
-                alt="Move"
-              />
+              <span
+                class="InGameEditor-Toolbar-Button-Icon"
+                style={{
+                  mask: `url('${this._getSvgIconUrl('InGameEditor-MoveIcon')}') center/contain no-repeat`,
+                }}
+              ></span>
             </button>
             <button
               class="InGameEditor-Toolbar-Button"
@@ -3350,11 +3377,12 @@ namespace gdjs {
               onClick={() => this._setTransformControlsMode('rotate')}
               title="Rotate selection"
             >
-              <img
-                src={this._getSvgIconUrl('InGameEditor-RotateIcon')}
-                class="InGameEditor-Toolbar-ButtonIcon"
-                alt="Rotate"
-              />
+              <span
+                class="InGameEditor-Toolbar-Button-Icon"
+                style={{
+                  mask: `url('${this._getSvgIconUrl('InGameEditor-RotateIcon')}') center/contain no-repeat`,
+                }}
+              ></span>
             </button>
             <button
               class="InGameEditor-Toolbar-Button"
@@ -3362,11 +3390,12 @@ namespace gdjs {
               onClick={() => this._setTransformControlsMode('scale')}
               title="Resize selection"
             >
-              <img
-                src={this._getSvgIconUrl('InGameEditor-ResizeIcon')}
-                class="InGameEditor-Toolbar-ButtonIcon"
-                alt="Resize"
-              />
+              <span
+                class="InGameEditor-Toolbar-Button-Icon"
+                style={{
+                  mask: `url('${this._getSvgIconUrl('InGameEditor-ResizeIcon')}') center/contain no-repeat`,
+                }}
+              ></span>
             </button>
             <div class="InGameEditor-Toolbar-Divider" />
             <button
@@ -3375,11 +3404,12 @@ namespace gdjs {
               onClick={this._focusOnSelection}
               title="Focus on selection (F)"
             >
-              <img
-                src={this._getSvgIconUrl('InGameEditor-FocusIcon')}
-                class="InGameEditor-Toolbar-ButtonIcon"
-                alt="Focus"
-              />
+              <span
+                class="InGameEditor-Toolbar-Button-Icon"
+                style={{
+                  mask: `url('${this._getSvgIconUrl('InGameEditor-FocusIcon')}') center/contain no-repeat`,
+                }}
+              ></span>
             </button>
           </div>
         );

@@ -12,6 +12,7 @@ type AiConfigurationPresetSelectorProps = {
   setAiConfigurationPresetId: string => void,
   aiConfigurationPresetsWithAvailability: Array<AiConfigurationPresetWithAvailability>,
   aiRequestMode: string,
+  disabled?: boolean,
 };
 
 export const AiConfigurationPresetSelector = ({
@@ -19,9 +20,35 @@ export const AiConfigurationPresetSelector = ({
   setAiConfigurationPresetId,
   aiConfigurationPresetsWithAvailability,
   aiRequestMode,
+  disabled,
 }: AiConfigurationPresetSelectorProps) => {
   const filteredAiConfigurationPresets = aiConfigurationPresetsWithAvailability.filter(
     preset => preset.mode === aiRequestMode
+  );
+
+  // Deselect the current preset if it becomes disabled
+  React.useEffect(
+    () => {
+      const currentPreset = filteredAiConfigurationPresets.find(
+        preset => preset.id === chosenOrDefaultAiConfigurationPresetId
+      );
+
+      if (currentPreset && currentPreset.disabled) {
+        // Find the first enabled preset as a fallback
+        const firstEnabledPreset = filteredAiConfigurationPresets.find(
+          preset => !preset.disabled
+        );
+
+        if (firstEnabledPreset) {
+          setAiConfigurationPresetId(firstEnabledPreset.id);
+        }
+      }
+    },
+    [
+      chosenOrDefaultAiConfigurationPresetId,
+      filteredAiConfigurationPresets,
+      setAiConfigurationPresetId,
+    ]
   );
 
   const noUpgradeAiConfigurationPresets = filteredAiConfigurationPresets.filter(
@@ -39,6 +66,7 @@ export const AiConfigurationPresetSelector = ({
           onChange={value => {
             setAiConfigurationPresetId(value);
           }}
+          disabled={disabled}
         >
           {noUpgradeAiConfigurationPresets.map(preset => (
             <SelectOption

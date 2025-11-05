@@ -20,7 +20,7 @@ import { type GamesList } from '../../GameDashboard/UseGamesList';
 import { type GamesPlatformFrameTools } from './HomePage/PlaySection/UseGamesPlatformFrame';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import { type CreateProjectResult } from '../../Utils/UseCreateProject';
-import { type OpenAskAiOptions } from '../../AiGeneration/AskAiEditorContainer';
+import { type OpenAskAiOptions } from '../../AiGeneration/Utils';
 
 export type EditorContainerExtraProps = {|
   // Events function extension editor
@@ -109,6 +109,7 @@ export type RenderEditorContainerProps = {|
   ) => void,
   openObjectEvents: (extensionName: string, objectName: string) => void,
   onOpenAskAi: (?OpenAskAiOptions) => void,
+  onCloseAskAi: () => void,
 
   // Events function management:
   onLoadEventsFunctionsExtensions: ({|

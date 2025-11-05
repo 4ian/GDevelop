@@ -30,8 +30,15 @@ import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
 import Paper from '../../UI/Paper';
 import { Line, Column } from '../../UI/Grid';
 
+const styles = {
+  functionCallText: {
+    // Anywhere because behavior names can be long and have no spaces.
+    overflowWrap: 'anywhere',
+  },
+};
+
 type Props = {|
-  project: gdProject | null,
+  project: ?gdProject,
   functionCall: AiRequestMessageAssistantFunctionCall,
   editorFunctionCallResult: ?EditorFunctionCallResult,
   existingFunctionCallOutput: ?AiRequestFunctionCallOutput,
@@ -152,7 +159,7 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
           noOverflowParent
         >
           <LineStackLayout noMargin alignItems="baseline">
-            <Text>{text || 'Working...'}</Text>
+            <Text style={styles.functionCallText}>{text || 'Working...'}</Text>
             {hasDetailsToShow && (
               <Text size="body-small" color="secondary">
                 <Link
@@ -160,7 +167,7 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
                   href={'#'}
                   onClick={() => setShowDetails(!showDetails)}
                 >
-                  <Trans>Details</Trans>
+                  <Trans>Details</Trans>&nbsp;
                   {details ? (
                     <ChevronArrowBottom
                       fontSize="small"

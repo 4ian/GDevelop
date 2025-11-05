@@ -502,6 +502,7 @@ workflows:
             branches:
               only:
                 - master
+                - stable
                 - /experimental-build.*/
   builds:
     jobs:
@@ -515,6 +516,7 @@ workflows:
             branches:
               only:
                 - master
+                - stable
                 - /experimental-build.*/
       - build-linux:
           requires:
@@ -523,6 +525,7 @@ workflows:
             branches:
               only:
                 - master
+                - stable
                 - /experimental-build.*/
       - build-windows:
           requires:
@@ -531,6 +534,7 @@ workflows:
             branches:
               only:
                 - master
+                - stable
                 - /experimental-build.*/
       - trigger-appveyor-windows-build:
           requires:
@@ -539,4 +543,5 @@ workflows:
             branches:
               only:
                 - master
+                - stable
                 - /experimental-build.*/

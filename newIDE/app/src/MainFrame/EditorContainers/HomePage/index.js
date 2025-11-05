@@ -36,7 +36,10 @@ import { type GameDetailsTab } from '../../../GameDashboard';
 import { canUseClassroomFeature } from '../../../Utils/GDevelopServices/Usage';
 import EducationMarketingSection from './EducationMarketingSection';
 import useEducationForm from './UseEducationForm';
-import { type ExampleProjectSetup } from '../../../ProjectCreation/NewProjectSetupDialog';
+import {
+  type ExampleProjectSetup,
+  type NewProjectSetup,
+} from '../../../ProjectCreation/NewProjectSetupDialog';
 import { type ObjectWithContext } from '../../../ObjectsList/EnumerateObjects';
 import { type GamesList } from '../../../GameDashboard/UseGamesList';
 import { type GamesPlatformFrameTools } from './PlaySection/UseGamesPlatformFrame';
@@ -51,7 +54,7 @@ import {
 } from '../../../EmbeddedGame/EmbeddedGameFrame';
 import { type CreateProjectResult } from '../../../Utils/UseCreateProject';
 import { CreditsPackageStoreContext } from '../../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
-import { type OpenAskAiOptions } from '../../../AiGeneration/AskAiEditorContainer';
+import { type OpenAskAiOptions } from '../../../AiGeneration/Utils';
 
 const noop = () => {};
 
@@ -120,6 +123,7 @@ type Props = {|
   setToolbar: (?React.Node) => void,
   setGamesPlatformFrameShown: ({| shown: boolean, isMobile: boolean |}) => void,
   storageProviders: Array<StorageProvider>,
+  storageProvider: ?StorageProvider,
 
   // Games
   gamesList: GamesList,
@@ -147,6 +151,7 @@ type Props = {|
   onOpenPreferences: () => void,
   onOpenAbout: () => void,
   onOpenAskAi: (?OpenAskAiOptions) => void,
+  onCloseAskAi: () => void,
 
   // Project creation
   onOpenNewProjectSetupDialog: () => void,
@@ -158,6 +163,9 @@ type Props = {|
     CourseChapter,
     templateId?: string
   ) => Promise<void>,
+  onCreateEmptyProject: (
+    newProjectSetup: NewProjectSetup
+  ) => Promise<CreateProjectResult>,
 
   // Asset store
   onExtensionInstalled: (extensionNames: Array<string>) => void,
@@ -167,6 +175,18 @@ type Props = {|
   canSave: boolean,
 
   resourceManagementProps: ResourceManagementProps,
+  onOpenLayout: (
+    sceneName: string,
+    options: {|
+      openEventsEditor: boolean,
+      openSceneEditor: boolean,
+      focusWhenOpened:
+        | 'scene-or-events-otherwise'
+        | 'scene'
+        | 'events'
+        | 'none',
+    |}
+  ) => void,
 
   gameEditorMode: 'embedded-game' | 'instances-editor',
 |};
@@ -214,14 +234,18 @@ export const HomePage = React.memo<Props>(
         onOpenLanguageDialog,
         onOpenProfile,
         onCreateProjectFromExample,
+        onCreateEmptyProject,
         setToolbar,
         setGamesPlatformFrameShown,
         selectInAppTutorial,
         onOpenPreferences,
         onOpenAbout,
         onOpenAskAi,
+        onCloseAskAi,
+        onOpenLayout,
         isActive,
         storageProviders,
+        storageProvider,
         onSave,
         canSave,
         resourceManagementProps,
@@ -576,6 +600,12 @@ export const HomePage = React.memo<Props>(
                       currentFileMetadata={fileMetadata}
                       onOpenProject={onOpenRecentFile}
                       storageProviders={storageProviders}
+                      storageProvider={storageProvider}
+                      resourceManagementProps={resourceManagementProps}
+                      onCreateEmptyProject={onCreateEmptyProject}
+                      onOpenLayout={onOpenLayout}
+                      onOpenAskAi={onOpenAskAi}
+                      onCloseAskAi={onCloseAskAi}
                       closeProject={closeProject}
                       games={games}
                       onRefreshGames={fetchGames}
@@ -738,15 +768,19 @@ export const renderHomePageContainer = (
     onOpenLanguageDialog={props.onOpenLanguageDialog}
     onOpenProfile={props.onOpenProfile}
     onCreateProjectFromExample={props.onCreateProjectFromExample}
+    onCreateEmptyProject={props.onCreateEmptyProject}
     askToCloseProject={props.askToCloseProject}
     closeProject={props.closeProject}
     selectInAppTutorial={props.selectInAppTutorial}
     onOpenPreferences={props.onOpenPreferences}
     onOpenAbout={props.onOpenAbout}
     onOpenAskAi={props.onOpenAskAi}
+    onCloseAskAi={props.onCloseAskAi}
+    onOpenLayout={props.onOpenLayout}
     storageProviders={
       (props.extraEditorProps && props.extraEditorProps.storageProviders) || []
     }
+    storageProvider={props.storageProvider}
     onSave={props.onSave}
     canSave={props.canSave}
     resourceManagementProps={props.resourceManagementProps}

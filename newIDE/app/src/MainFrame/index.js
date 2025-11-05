@@ -54,10 +54,8 @@ import { renderExternalLayoutEditorContainer } from './EditorContainers/External
 import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainers/EventsFunctionsExtensionEditorContainer';
 import { renderCustomObjectEditorContainer } from './EditorContainers/CustomObjectEditorContainer';
 import { renderHomePageContainer } from './EditorContainers/HomePage';
-import {
-  renderAskAiEditorContainer,
-  type OpenAskAiOptions,
-} from '../AiGeneration/AskAiEditorContainer';
+import { type OpenAskAiOptions } from '../AiGeneration/Utils';
+import { renderAskAiEditorContainer } from '../AiGeneration/AskAiEditorContainer';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import {
   type RenderEditorContainerPropsWithRef,
@@ -929,6 +927,21 @@ const MainFrame = (props: Props) => {
     [setState, getEditorOpeningOptions, currentProject]
   );
 
+  const closeAskAi = React.useCallback(
+    () => {
+      setState(state => {
+        const openedEditor = getOpenedAskAiEditor(state.editorTabs);
+        if (!openedEditor) return state;
+
+        return {
+          ...state,
+          editorTabs: closeEditorTab(state.editorTabs, openedEditor.editorTab),
+        };
+      });
+    },
+    [setState]
+  );
+
   const closeProject = React.useCallback(
     async (): Promise<void> => {
       setHasProjectOpened(false);
@@ -1291,7 +1304,9 @@ const MainFrame = (props: Props) => {
           currentFileMetadata: newFileMetadata,
         }));
       }
-      setNewProjectSetupDialogOpen(false);
+      if (!options.dontCloseNewProjectSetupDialog) {
+        setNewProjectSetupDialogOpen(false);
+      }
       if (options.openQuickCustomizationDialog) {
         setQuickCustomizationDialogOpenedFromGameId(oldProjectId);
       } else {
@@ -1343,34 +1358,12 @@ const MainFrame = (props: Props) => {
     onGameRegistered: gamesList.fetchGames,
   });
 
-  const {
-    onSelectExampleShortHeader,
-    onSelectPrivateGameTemplateListingData,
-    renderNewProjectDialog,
-    fetchAndOpenNewProjectSetupDialogForExample,
-    openNewProjectDialog,
-  } = useNewProjectDialog({
-    isProjectOpening,
-    newProjectSetupDialogOpen,
-    setNewProjectSetupDialogOpen,
-    createEmptyProject,
-    createProjectFromExample,
-    createProjectFromPrivateGameTemplate,
-    openAskAi,
-    storageProviders: props.storageProviders,
-  });
-
   const onOpenProfileDialog = React.useCallback(
     () => {
       openProfileDialog(true);
     },
     [openProfileDialog]
   );
-
-  const gamesPlatformFrameTools = useGamesPlatformFrame({
-    fetchAndOpenNewProjectSetupDialogForExample,
-    onOpenProfileDialog,
-  });
 
   const closeApp = React.useCallback((): void => {
     return Window.quit();
@@ -4515,6 +4508,34 @@ const MainFrame = (props: Props) => {
     ]
   );
 
+  const {
+    onSelectExampleShortHeader,
+    onSelectPrivateGameTemplateListingData,
+    renderNewProjectDialog,
+    fetchAndOpenNewProjectSetupDialogForExample,
+    openNewProjectDialog,
+  } = useNewProjectDialog({
+    project: state.currentProject,
+    fileMetadata: currentFileMetadata,
+    isProjectOpening,
+    newProjectSetupDialogOpen,
+    setNewProjectSetupDialogOpen,
+    createEmptyProject,
+    createProjectFromExample,
+    createProjectFromPrivateGameTemplate,
+    openAskAi,
+    closeAskAi,
+    storageProviders: props.storageProviders,
+    storageProvider: getStorageProvider(),
+    resourceManagementProps,
+    onOpenLayout: (name, options) => openLayout(name, options),
+  });
+
+  const gamesPlatformFrameTools = useGamesPlatformFrame({
+    fetchAndOpenNewProjectSetupDialogForExample,
+    onOpenProfileDialog,
+  });
+
   const hideAskAi =
     !!authenticatedUser.limits &&
     !!authenticatedUser.limits.capabilities.classrooms &&
@@ -4590,6 +4611,7 @@ const MainFrame = (props: Props) => {
     openVersionHistoryPanel: openVersionHistoryPanel,
     onQuitVersionHistory: onQuitVersionHistory,
     onOpenAskAi: openAskAi,
+    onCloseAskAi: closeAskAi,
     getStorageProvider: getStorageProvider,
     setPreviewedLayout: setPreviewedLayout,
     openExternalEvents: openExternalEvents,

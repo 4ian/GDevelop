@@ -80,6 +80,7 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
 
     // Prepare the export directory
     fs.MkDir(exportDir);
+    fs.ClearDir(exportDir);
     std::vector<gd::String> includesFiles;
     std::vector<gd::String> resourcesFiles;
 

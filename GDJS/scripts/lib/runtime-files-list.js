@@ -20,6 +20,7 @@ const allowedExtensions = [
   '.wasm',
   '.txt',
   '.png',
+  '.svg',
 ];
 
 // These extensions will be built with esbuild (the other will be copied).
@@ -27,7 +28,7 @@ const transformIncludedExtensions = ['.js', '.ts', '.tsx'];
 
 // Among the files matching the previous extensions, these extensions won't be built with esbuild
 // (they will be copied).
-const transformExcludedExtensions = ['.min.js', '.d.ts','.png'];
+const transformExcludedExtensions = ['.min.js', '.d.ts', '.png', '.svg'];
 
 // Files under these paths (relative to the GDevelop root path) won't
 // be built with esbuild, but simply copied.

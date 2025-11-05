@@ -3002,6 +3002,7 @@ export class PreviewExportOptions extends EmscriptenObject {
   setFullLoadingScreen(enable: boolean): PreviewExportOptions;
   setIsDevelopmentEnvironment(enable: boolean): PreviewExportOptions;
   setIsInGameEdition(enable: boolean): PreviewExportOptions;
+  setInGameEditorSettingsJson(inGameEditorSettingsJson: string): PreviewExportOptions;
   setEditorId(editorId: string): PreviewExportOptions;
   setEditorCameraState3D(cameraMode: string, positionX: number, positionY: number, positionZ: number, rotationAngle: number, elevationAngle: number, distance: number): PreviewExportOptions;
   setNonRuntimeScriptsCacheBurst(value: number): PreviewExportOptions;

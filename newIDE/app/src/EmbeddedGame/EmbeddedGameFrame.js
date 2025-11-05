@@ -13,6 +13,7 @@ import {
   registerActiveEmbeddedGameFrameHoleCountCallback,
 } from './EmbeddedGameFrameHole';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
+import { useInGameEditorSettings } from './InGameEditorSettings';
 
 type AttachToPreviewOptions = {|
   previewIndexHtmlLocation: string,
@@ -235,6 +236,23 @@ export const EmbeddedGameFrame = ({
       isActive: () => true,
       shortcutCallbacks: {},
     })
+  );
+
+  const inGameEditorSettings = useInGameEditorSettings();
+  React.useEffect(
+    () => {
+      if (!previewDebuggerServer) return;
+
+      previewDebuggerServer
+        .getExistingDebuggerIds()
+        .forEach((debuggerId: string) => {
+          previewDebuggerServer.sendMessage(debuggerId, {
+            command: 'setInGameEditorSettings',
+            payload: { inGameEditorSettings },
+          });
+        });
+    },
+    [previewDebuggerServer, inGameEditorSettings]
   );
 
   React.useEffect(
@@ -581,7 +599,6 @@ export const EmbeddedGameFrame = ({
         right: 0,
         bottom: 0,
       }}
-      // TODO No key event is received probably because the focus is on the object list.
       onKeyDown={keyboardShortcuts.current.onKeyDown}
       onKeyUp={keyboardShortcuts.current.onKeyUp}
     >
@@ -590,7 +607,7 @@ export const EmbeddedGameFrame = ({
           ref={iframeRef}
           title="Game Preview"
           src={previewIndexHtmlLocation}
-          tabIndex={-1}
+          tabIndex={0}
           style={{
             position: 'absolute',
             top: 0,

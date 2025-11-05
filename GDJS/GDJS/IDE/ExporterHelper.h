@@ -235,6 +235,14 @@ struct PreviewExportOptions {
   }
 
   /**
+   * \brief Set the JSON string representation of the in-game editor settings.
+   */
+  PreviewExportOptions &SetInGameEditorSettingsJson(const gd::String &inGameEditorSettingsJson_) {
+    inGameEditorSettingsJson = inGameEditorSettingsJson_;
+    return *this;
+  }
+
+  /**
    * \brief Set the in-game editor identifier.
    */
   PreviewExportOptions &SetEditorId(const gd::String &editorId_) {
@@ -392,6 +400,7 @@ struct PreviewExportOptions {
   bool isInGameEdition;
   gd::String editorId;
   gd::String editorCamera3DCameraMode;
+  gd::String inGameEditorSettingsJson;
   double editorCamera3DPositionX = 0;
   double editorCamera3DPositionY = 0;
   double editorCamera3DPositionZ = 0;

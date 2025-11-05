@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { type EditorCameraState } from '../EmbeddedGame/EmbeddedGameFrame';
+import { type InGameEditorSettings } from '../EmbeddedGame/InGameEditorSettings';
 
 // Simpler version of the CaptureOptions, as only the delayTimeInSeconds is needed to start configuring the preview capture.
 export type LaunchCaptureOptions = {|
@@ -67,7 +68,7 @@ export type PreviewOptions = {|
   inAppTutorialMessageInPreview: string,
   inAppTutorialMessagePositionInPreview: string,
   editorCameraState3D: EditorCameraState | null,
-
+  inGameEditorSettings: InGameEditorSettings | null,
   numberOfWindows: number,
 
   // Only for the web-app:

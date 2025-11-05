@@ -63,7 +63,7 @@ public:
   }
 
   void AddUsedExtension(const gd::PlatformExtension& extension);
-  void AddUsedBuiltinExtension(const gd::String& extensionName);
+  void AddUsedBuiltinExtension(const gd::Project& project, const gd::String& extensionName);
   void AddUsedIncludeFiles(const gd::String& includeFile) { usedIncludeFiles.insert(includeFile); }
   void AddUsedRequiredFiles(const gd::String& requiredFile) { usedRequiredFiles.insert(requiredFile); }
   void AddUsedInGameEditorResource(const gd::InGameEditorResourceMetadata& inGameEditorResource) {

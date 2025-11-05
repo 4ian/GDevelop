@@ -99,6 +99,8 @@ namespace gdjs {
     /** if set, the status of the game to be restored. */
     initialRuntimeGameStatus?: RuntimeGameStatus;
 
+    inGameEditorSettings?: InGameEditorSettings;
+
     /** Script files, used for hot-reloading. */
     scriptFiles?: Array<RuntimeGameOptionsScriptFile>;
     /** if true, export is a partial preview without reloading libraries. */
@@ -309,7 +311,11 @@ namespace gdjs {
         data.layouts
       );
       this._inGameEditor = this._isInGameEdition
-        ? new gdjs.InGameEditor(this, data)
+        ? new gdjs.InGameEditor(
+            this,
+            data,
+            this._options.inGameEditorSettings || null
+          )
         : null;
       this._debuggerClient = gdjs.DebuggerClient
         ? new gdjs.DebuggerClient(this)

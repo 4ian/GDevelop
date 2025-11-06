@@ -560,14 +560,22 @@ const createOrReplaceObject: EditorFunction = {
     const createNewObject = async () => {
       // Check if object already exists.
       let existingObject: gdObject | null = null;
+      let isGlobalObject = false;
 
       if (layoutObjects.hasObjectNamed(object_name)) {
         existingObject = layoutObjects.getObject(object_name);
       } else if (globalObjects.hasObjectNamed(object_name)) {
         existingObject = globalObjects.getObject(object_name);
+        isGlobalObject = true;
       }
       if (existingObject) {
         if (existingObject.getType() !== object_type) {
+          if (isGlobalObject) {
+            return makeGenericFailure(
+              `Object with name "${object_name}" already exists globally but with a different type ("${object_type}").`
+            );
+          }
+
           return makeGenericFailure(
             `Object with name "${object_name}" already exists in scene "${scene_name}" but with a different type ("${object_type}").`
           );

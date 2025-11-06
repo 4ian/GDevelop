@@ -41,16 +41,29 @@ module.exports = {
     const writer = fs.createWriteStream(outputPath);
 
     return new Promise((resolve, reject) => {
-      const cleanUpAndReject = (err) => {
-        try { writer.destroy(); } catch (e) {}
+      let isRejectedOrResolvedAlready = false;
+
+      const cleanUpAndReject = err => {
+        if (isRejectedOrResolvedAlready) return;
+        isRejectedOrResolvedAlready = true;
+
+        try {
+          writer.destroy();
+        } catch (e) {}
         // Best effort to remove the incomplete file
-        try { fs.unlinkSync(outputPath); } catch (e) {}
+        try {
+          fs.unlinkSync(outputPath);
+        } catch (e) {}
         reject(err);
-      }
+      };
 
       response.data.on('error', cleanUpAndReject);
       writer.on('error', cleanUpAndReject);
-      writer.on('finish', () => resolve(true));
+      writer.on('finish', () => {
+        if (isRejectedOrResolvedAlready) return;
+        isRejectedOrResolvedAlready = true;
+        resolve(true);
+      });
 
       response.data.pipe(writer);
     });

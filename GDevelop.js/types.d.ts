@@ -268,21 +268,13 @@ export class Platform extends EmscriptenObject {
   isExtensionLoaded(name: string): boolean;
   removeExtension(name: string): void;
   reloadBuiltinExtensions(): void;
+  createObjectConfiguration(type: string): UniquePtrObjectConfiguration;
   getAllPlatformExtensions(): VectorPlatformExtension;
 }
 
-export class JsPlatform extends EmscriptenObject {
+export class JsPlatform extends Platform {
   static get(): JsPlatform;
   addNewExtension(extension: PlatformExtension): void;
-  getName(): string;
-  getFullName(): string;
-  getSubtitle(): string;
-  getDescription(): string;
-  getInstructionOrExpressionGroupMetadata(name: string): InstructionOrExpressionGroupMetadata;
-  isExtensionLoaded(name: string): boolean;
-  removeExtension(name: string): void;
-  reloadBuiltinExtensions(): void;
-  getAllPlatformExtensions(): VectorPlatformExtension;
 }
 
 export class PairStringVariable extends EmscriptenObject {

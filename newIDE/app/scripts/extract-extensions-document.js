@@ -28,6 +28,9 @@ const { groupBy, sortKeys } = require('./lib/ArrayHelpers');
 const { generateAllExtensionsSections } = require('./lib/WikiExtensionTable');
 
 /** @typedef {import("./lib/ExtensionReferenceGenerator.js").RawText} RawText */
+/** @typedef {import('../../../GDevelop.js/types').EventsFunctionsExtension} EventsFunctionsExtension */
+/** @typedef {import('../../../GDevelop.js/types').Project} Project */
+/** @typedef {import('../../../GDevelop.js/types').PlatformExtension} PlatformExtension */
 
 /** @typedef {{ tier: 'community' | 'experimental' | 'reviewed', shortDescription: string, authorIds: Array<string>, authors?: Array<{id: string, username: string}>, extensionNamespace: string, fullName: string, name: string, version: string, gdevelopVersion?: string, url: string, headerUrl: string, tags: Array<string>, category: string, previewIconUrl: string, eventsBasedBehaviorsCount: number, eventsFunctionsCount: number}} ExtensionShortHeader */
 
@@ -60,9 +63,9 @@ const generateAuthorNamesWithLinks = authors => {
  * (useful as containing author public profiles information).
  *
  * @param {any} gd
- * @param {any} project (gdProject)
+ * @param {Project} project
  *
- * @returns {Promise<any>} A promise to all extensions (gdEventsFunctionsExtension)
+ * @returns {Promise<Array<EventsFunctionsExtension>>}
  */
 const addAllExtensionsToProject = async (gd, project) => {
   const response = await axios.get(extensionShortHeadersUrl);
@@ -149,23 +152,27 @@ const getAllExtensionShortHeaders = async () => {
  * Create a page for an extension.
  * @param {any} gd
  * @param {any} project (gdProject)
- * @param {any} extension The extension (gdEventsFunctionsExtension)
+ * @param {EventsFunctionsExtension} eventsFunctionsExtension
  * @param {ExtensionShortHeader} extensionShortHeader
  * @param {boolean} isExperimental The tier
  */
 const createExtensionReferencePage = async (
   gd,
   project,
-  extension,
+  eventsFunctionsExtension,
   extensionShortHeader,
   isExperimental
 ) => {
-  const extensionMetadata = generateEventsFunctionExtensionMetadata(
+  const platformExtension = generateEventsFunctionExtensionMetadata(
     gd,
     project,
-    extension
+    eventsFunctionsExtension
   );
-  const extensionReference = generateExtensionReference(extensionMetadata);
+  const extensionReference = generateExtensionReference({
+    platform: gd.JsPlatform.get(),
+    extension: platformExtension,
+    eventsFunctionsExtension,
+  });
   const referencePageContent = rawTextsToString(
     generateExtensionRawText(
       extensionReference,
@@ -179,7 +186,7 @@ const createExtensionReferencePage = async (
     )
   );
 
-  const folderName = getExtensionFolderName(extension.getName());
+  const folderName = getExtensionFolderName(platformExtension.getName());
   const extensionReferenceFilePath = path.join(
     extensionsRootPath,
     folderName,
@@ -246,7 +253,7 @@ const generateExtensionFooterText = ({ extension }) => {
       `
 ---
 
-*This page is an auto-generated reference page about the **${extension.getFullName()}** extension, made by the community of [GDevelop, the open-source, cross-platform game engine designed for everyone](https://gdevelop.io/).*` +
+*This page is an auto-generated reference page about the **${extension.getFullName()}** extension for [GDevelop, the open-source, AI-powered, cross-platform game engine designed for everyone](https://gdevelop.io/).*` +
       ' ' +
       'Learn more about [all GDevelop community-made extensions here](/gdevelop5/extensions).',
   };
@@ -254,9 +261,9 @@ const generateExtensionFooterText = ({ extension }) => {
 
 /**
  * Generate the metadata for the events based extension
- * @param {any} project A project containing of the extensions (gdProject)
- * @param {any} eventsFunctionsExtension An extension (gdEventsFunctionsExtension)
- * @returns {any} the extension metadata (gdPlatformExtension)
+ * @param {Project} project
+ * @param {EventsFunctionsExtension} eventsFunctionsExtension
+ * @returns {PlatformExtension}
  */
 const generateEventsFunctionExtensionMetadata = (
   gd,

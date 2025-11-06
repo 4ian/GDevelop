@@ -203,6 +203,7 @@ interface Platform {
     boolean IsExtensionLoaded([Const] DOMString name);
     void RemoveExtension([Const] DOMString name);
     void ReloadBuiltinExtensions();
+    [Value] UniquePtrObjectConfiguration CreateObjectConfiguration([Const] DOMString type);
 
     [Const, Ref] VectorPlatformExtension GetAllPlatformExtensions();
 };
@@ -210,19 +211,8 @@ interface Platform {
 interface JsPlatform {
     [Ref] JsPlatform STATIC_Get();
     void AddNewExtension([Const, Ref] PlatformExtension extension);
-
-    // Inherited from Platform:
-    [Const, Value] DOMString GetName();
-    [Const, Value] DOMString GetFullName();
-    [Const, Value] DOMString GetSubtitle();
-    [Const, Value] DOMString GetDescription();
-    [Const, Ref] InstructionOrExpressionGroupMetadata GetInstructionOrExpressionGroupMetadata([Const] DOMString name);
-    boolean IsExtensionLoaded([Const] DOMString name);
-    void RemoveExtension([Const] DOMString name);
-    void ReloadBuiltinExtensions();
-
-    [Const, Ref] VectorPlatformExtension GetAllPlatformExtensions();
 };
+JsPlatform implements Platform;
 
 interface PairStringVariable {
     void PairStringVariable();

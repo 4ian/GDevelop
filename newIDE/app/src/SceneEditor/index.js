@@ -81,7 +81,10 @@ import {
   registerOnResourceExternallyChangedCallback,
   unregisterOnResourceExternallyChangedCallback,
 } from '../MainFrame/ResourcesWatcher';
-import { unserializeFromJSObject } from '../Utils/Serializer';
+import {
+  unserializeFromJSObject,
+  serializeObjectWithCleanDefaultBehaviorFlags,
+} from '../Utils/Serializer';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer';
 import { extractAsCustomObject } from './CustomObjectExtractor/CustomObjectExtractor';
@@ -93,6 +96,7 @@ import {
   setCameraState,
 } from '../EmbeddedGame/EmbeddedGameFrame';
 import Rectangle from '../Utils/Rectangle';
+import { mapVector } from '../Utils/MapFor';
 
 const gd: libGDevelop = global.gd;
 
@@ -1249,15 +1253,16 @@ export default class SceneEditor extends React.Component<Props, State> {
   }: {|
     updatedObjects: Array<gdObject>,
   |}) => {
+    const serializedObjects = updatedObjects.map(object =>
+      serializeObjectWithCleanDefaultBehaviorFlags(object)
+    );
     const { previewDebuggerServer } = this.props;
     if (previewDebuggerServer) {
       previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
         previewDebuggerServer.sendMessage(debuggerId, {
           command: 'hotReloadObjects',
           payload: {
-            updatedObjects: updatedObjects.map(object =>
-              serializeToJSObject(object)
-            ),
+            updatedObjects: serializedObjects,
           },
         });
       });

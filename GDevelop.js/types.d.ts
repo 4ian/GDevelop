@@ -674,6 +674,10 @@ export class ExtensionProperties extends EmscriptenObject {
   unserializeFrom(element: SerializerElement): void;
 }
 
+export class BehaviorDefaultFlagClearer extends EmscriptenObject {
+  static serializeObjectWithCleanDefaultBehaviorFlags(obj: gdObject, serializerElement: SerializerElement): void;
+}
+
 export class Behavior extends EmscriptenObject {
   constructor();
   clone(): Behavior;

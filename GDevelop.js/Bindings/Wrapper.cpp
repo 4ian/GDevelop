@@ -25,6 +25,7 @@
 #include <GDCore/IDE/AbstractFileSystem.h>
 #include <GDCore/IDE/Dialogs/LayoutEditorCanvas/EditorSettings.h>
 #include <GDCore/IDE/Events/ArbitraryEventsWorker.h>
+#include <GDCore/IDE/Events/BehaviorDefaultFlagClearer.h>
 #include <GDCore/IDE/Events/EventsContextAnalyzer.h>
 #include <GDCore/IDE/Events/EventsFunctionSelfCallChecker.h>
 #include <GDCore/IDE/Events/EventsIdentifiersFinder.h>
@@ -828,6 +829,7 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_ScanProject ScanProject
 #define STATIC_GetUsedExtensions GetUsedExtensions
 #define STATIC_SerializeProjectData SerializeProjectData
+#define STATIC_SerializeObjectWithCleanDefaultBehaviorFlags SerializeObjectWithCleanDefaultBehaviorFlags
 
 #define STATIC_ApplyTranslation ApplyTranslation
 #define STATIC_GetUndefined GetUndefined

@@ -178,92 +178,113 @@ const sanitizeExpressionDescription = str => {
   );
 };
 
-const translateTypeToHumanReadableDescription = anyType => {
-  const type = anyType.toLowerCase();
+const caseInsensitiveCheck = (type, check) => {
+  return type.toLowerCase() === check.toLowerCase();
+};
 
-  if (type === 'number') return '🔢 Number';
-  if (type === 'expression') return '🔢 Number';
-  if (type === 'camera') return '🔢 Camera index (Number)';
+const translateTypeToHumanReadableDescription = type => {
+  if (caseInsensitiveCheck(type, 'number')) return '🔢 Number';
+  if (caseInsensitiveCheck(type, 'expression')) return '🔢 Number';
+  if (caseInsensitiveCheck(type, 'camera')) return '🔢 Camera index (Number)';
 
-  if (type === 'object') return '👾 Object';
-  if (type === 'objectList') return '👾 Object';
-  if (type === 'objectPtr') return '👾 Object';
-  if (type === 'objectListOrEmptyIfJustDeclared') return '👾 Object';
-  if (type === 'objectListOrEmptyWithoutPicking') return '👾 Object';
+  if (caseInsensitiveCheck(type, 'object')) return '👾 Object';
+  if (caseInsensitiveCheck(type, 'objectList')) return '👾 Object';
+  if (caseInsensitiveCheck(type, 'objectPtr')) return '👾 Object';
+  if (caseInsensitiveCheck(type, 'objectListOrEmptyIfJustDeclared'))
+    return '👾 Object';
+  if (caseInsensitiveCheck(type, 'objectListOrEmptyWithoutPicking'))
+    return '👾 Object';
 
-  if (type === 'variable') return '🗄️ Any variable';
-  if (type === 'objectvar') return '🗄️ Object variable';
-  if (type === 'scenevar') return '🗄️ Scene variable';
-  if (type === 'globalvar') return '🗄️ Global variable';
+  if (caseInsensitiveCheck(type, 'variable')) return '🗄️ Any variable';
+  if (caseInsensitiveCheck(type, 'objectvar')) return '🗄️ Object variable';
+  if (caseInsensitiveCheck(type, 'scenevar')) return '🗄️ Scene variable';
+  if (caseInsensitiveCheck(type, 'globalvar')) return '🗄️ Global variable';
 
-  if (type === 'behavior') return '🧩 Behavior';
+  if (caseInsensitiveCheck(type, 'behavior')) return '🧩 Behavior';
 
-  if (type === 'layer') return '🔤 Layer name (String)';
-  if (type === 'stringWithSelector') return '🔤 String';
-  if (type === 'identifier') return '🔤 Name (String)';
-  if (type === 'sceneName') return '🔤 Name of a scene (String)';
-  if (type === 'layerEffectName') return '🔤 Layer Effect Name (String)';
-  if (type === 'layerEffectParameterName')
+  if (caseInsensitiveCheck(type, 'layer')) return '🔤 Layer name (String)';
+  if (caseInsensitiveCheck(type, 'string')) return '🔤 String';
+  if (caseInsensitiveCheck(type, 'stringWithSelector')) return '🔤 String';
+  if (caseInsensitiveCheck(type, 'identifier')) return '🔤 Name (String)';
+  if (caseInsensitiveCheck(type, 'sceneName'))
+    return '🔤 Name of a scene (String)';
+  if (caseInsensitiveCheck(type, 'layerEffectName'))
+    return '🔤 Layer Effect Name (String)';
+  if (caseInsensitiveCheck(type, 'layerEffectParameterName'))
     return '🔤 Layer Effect Property Name (String)';
-  if (type === 'objectEffectName') return '🔤 Object Effect Name (String)';
-  if (type === 'objectEffectParameterName')
+  if (caseInsensitiveCheck(type, 'objectEffectName'))
+    return '🔤 Object Effect Name (String)';
+  if (caseInsensitiveCheck(type, 'objectEffectParameterName'))
     return '🔤 Object Effect Property Name (String)';
-  if (type === 'objectPointName') return '🔤 Object Point Name (String)';
-  if (type === 'objectAnimationName')
+  if (caseInsensitiveCheck(type, 'objectPointName'))
+    return '🔤 Object Point Name (String)';
+  if (caseInsensitiveCheck(type, 'objectAnimationName'))
     return '🔤 Object Animation Name (String)';
-  if (type === 'functionParameterName')
+  if (caseInsensitiveCheck(type, 'functionParameterName'))
     return '🔤 Function Parameter Name (String)';
-  if (type === 'externalLayoutName') return '🔤 External Layout Name (String)';
-  if (type === 'leaderboardId') return '🔤 Leaderboard Identifier (String)';
+  if (caseInsensitiveCheck(type, 'externalLayoutName'))
+    return '🔤 External Layout Name (String)';
+  if (caseInsensitiveCheck(type, 'leaderboardId'))
+    return '🔤 Leaderboard Identifier (String)';
 
-  if (type === 'operator') return '🟰 Operator';
-  if (type === 'relationalOperator') return '🟰 Relational operator';
+  if (caseInsensitiveCheck(type, 'operator')) return '🟰 Operator';
+  if (caseInsensitiveCheck(type, 'relationalOperator'))
+    return '🟰 Relational operator';
 
-  if (type === 'yesorno') return '❓ Yes or No';
-  if (type === 'trueorfalse') return '❓ True or False';
+  if (caseInsensitiveCheck(type, 'yesorno')) return '❓ Yes or No';
+  if (caseInsensitiveCheck(type, 'trueorfalse')) return '❓ True or False';
 
-  if (type === 'multilinestring') return '🔤 Multiline text (String)';
-  if (type === 'boolean') return '🔘 Boolean';
-  if (type === 'color') return '🎨 Color';
-  if (type === 'resource') return '🗂️ Resource';
+  if (caseInsensitiveCheck(type, 'multilinestring'))
+    return '🔤 Multiline text (String)';
+  if (caseInsensitiveCheck(type, 'boolean')) return '🔘 Boolean';
+  if (caseInsensitiveCheck(type, 'color')) return '🎨 Color';
+  if (caseInsensitiveCheck(type, 'resource')) return '🗂️ Resource';
 
   return type;
 };
 
 const translateTypeToHumanReadableType = type => {
-  if (type === 'number') return 'number';
-  if (type === 'expression') return 'number';
-  if (type === 'camera') return 'number';
+  if (caseInsensitiveCheck(type, 'number')) return 'number';
+  if (caseInsensitiveCheck(type, 'expression')) return 'number';
+  if (caseInsensitiveCheck(type, 'camera')) return 'number';
 
-  if (type === 'objectList') return 'object';
-  if (type === 'objectPtr') return 'object';
-  if (type === 'objectListOrEmptyIfJustDeclared') return 'object';
-  if (type === 'objectListOrEmptyWithoutPicking') return 'object';
+  if (caseInsensitiveCheck(type, 'objectList')) return 'object';
+  if (caseInsensitiveCheck(type, 'objectPtr')) return 'object';
+  if (caseInsensitiveCheck(type, 'objectListOrEmptyIfJustDeclared'))
+    return 'object';
+  if (caseInsensitiveCheck(type, 'objectListOrEmptyWithoutPicking'))
+    return 'object';
 
-  if (type === 'variable') return 'variable';
-  if (type === 'objectvar') return 'object variable';
-  if (type === 'scenevar') return 'scene variable';
-  if (type === 'globalvar') return 'global variable';
+  if (caseInsensitiveCheck(type, 'variable')) return 'variable';
+  if (caseInsensitiveCheck(type, 'objectvar')) return 'object variable';
+  if (caseInsensitiveCheck(type, 'scenevar')) return 'scene variable';
+  if (caseInsensitiveCheck(type, 'globalvar')) return 'global variable';
 
-  if (type === 'behavior') return 'behavior';
+  if (caseInsensitiveCheck(type, 'behavior')) return 'behavior';
 
-  if (type === 'layer') return 'layer name';
-  if (type === 'stringWithSelector') return 'string';
-  if (type === 'identifier') return 'string';
-  if (type === 'sceneName') return 'scene name';
-  if (type === 'layerEffectName') return 'layer effect name';
-  if (type === 'layerEffectParameterName') return 'layer effect property name';
-  if (type === 'objectEffectName') return 'object effect name';
-  if (type === 'objectEffectParameterName')
+  if (caseInsensitiveCheck(type, 'layer')) return 'layer name';
+  if (caseInsensitiveCheck(type, 'stringWithSelector')) return 'string';
+  if (caseInsensitiveCheck(type, 'identifier')) return 'string';
+  if (caseInsensitiveCheck(type, 'sceneName')) return 'scene name';
+  if (caseInsensitiveCheck(type, 'layerEffectName')) return 'layer effect name';
+  if (caseInsensitiveCheck(type, 'layerEffectParameterName'))
+    return 'layer effect property name';
+  if (caseInsensitiveCheck(type, 'objectEffectName'))
+    return 'object effect name';
+  if (caseInsensitiveCheck(type, 'objectEffectParameterName'))
     return 'object effect property name';
-  if (type === 'objectPointName') return 'object point name';
-  if (type === 'objectAnimationName') return 'object animation name';
-  if (type === 'functionParameterName') return 'function parameter name';
-  if (type === 'externalLayoutName') return 'external layout name';
-  if (type === 'leaderboardId') return 'leaderboard identifier';
+  if (caseInsensitiveCheck(type, 'objectPointName')) return 'object point name';
+  if (caseInsensitiveCheck(type, 'objectAnimationName'))
+    return 'object animation name';
+  if (caseInsensitiveCheck(type, 'functionParameterName'))
+    return 'function parameter name';
+  if (caseInsensitiveCheck(type, 'externalLayoutName'))
+    return 'external layout name';
+  if (caseInsensitiveCheck(type, 'leaderboardId'))
+    return 'leaderboard identifier';
 
-  if (type === 'yesorno') return 'yes or no';
-  if (type === 'trueorfalse') return 'true or false';
+  if (caseInsensitiveCheck(type, 'yesorno')) return 'yes or no';
+  if (caseInsensitiveCheck(type, 'trueorfalse')) return 'true or false';
 
   return type;
 };

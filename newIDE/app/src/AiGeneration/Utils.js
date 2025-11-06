@@ -28,8 +28,8 @@ import { AiRequestContext } from './AiRequestContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { useInterval } from '../Utils/UseInterval';
 
-export const AI_AGENT_TOOLS_VERSION = 'v6';
-export const AI_CHAT_TOOLS_VERSION = 'v6';
+export const AI_AGENT_TOOLS_VERSION = 'v7';
+export const AI_CHAT_TOOLS_VERSION = 'v7';
 
 export const useProcessFunctionCalls = ({
   i18n,

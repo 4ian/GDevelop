@@ -1,5 +1,5 @@
 // @flow
-let testExtensionsAdded = false;
+let testExtensionsAdded = new WeakSet();
 
 /**
  * Create dummy extensions into gd.JsPlatform
@@ -7,8 +7,8 @@ let testExtensionsAdded = false;
  */
 export const makeTestExtensions = (gd: libGDevelop) => {
   // Be sure to only add test extensions once, as gd.JsPlatform is a singleton.
-  if (testExtensionsAdded) return;
-  testExtensionsAdded = true;
+  if (testExtensionsAdded.has(gd)) return;
+  testExtensionsAdded.add(gd);
 
   const platform = gd.JsPlatform.get();
 
@@ -185,9 +185,11 @@ export const makeTestExtensions = (gd: libGDevelop) => {
 
       behaviorProperties
         .getOrCreate('property1')
+        .setLabel('Property 1')
         .setValue(behaviorContent.getStringAttribute('property1'));
       behaviorProperties
         .getOrCreate('property2')
+        .setDescription('A description for property 2')
         .setValue(
           behaviorContent.getBoolAttribute('property2') ? 'true' : 'false'
         )
@@ -335,6 +337,13 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       'Fake event-based object',
       '',
       'MIT'
+    );
+    extension.addObject(
+      'PanelSpriteButton',
+      'PanelSpriteButton',
+      'A fake button made with a panel sprite and events.',
+      'res/button.svg',
+      new gd.ObjectJsImplementation()
     );
     platform.addNewExtension(extension);
     extension.delete(); // Release the extension as it was copied inside gd.JsPlatform

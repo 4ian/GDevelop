@@ -687,7 +687,9 @@ const PreferencesDialog = ({
           actions={[
             <FlatButton
               key="accept"
-              label={<Trans>Ok, I understand all of this and will be careful</Trans>}
+              label={
+                <Trans>Ok, I understand all of this and will be careful</Trans>
+              }
               primary={false}
               onClick={() => {
                 setShowGameEditorToggle(true);

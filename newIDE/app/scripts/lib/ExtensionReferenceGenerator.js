@@ -1,15 +1,23 @@
 // @ts-check
 const { mapFor } = require('./MapFor');
 const { generateReadMoreLink } = require('./WikiHelpLink');
+const { isNullPtr } = require('./IsNullPtr');
+const { mapVector } = require('./MapFor');
 
 // Types definitions used in this script:
 
+/** @typedef {import('../../../../GDevelop.js/types').Platform} Platform */
 /** @typedef {import('../../../../GDevelop.js/types').PlatformExtension} PlatformExtension */
+/** @typedef {import('../../../../GDevelop.js/types').EventsFunctionsExtension} EventsFunctionsExtension */
 /** @typedef {import('../../../../GDevelop.js/types').MapStringExpressionMetadata} MapStringExpressionMetadata */
 /** @typedef {import('../../../../GDevelop.js/types').ExpressionMetadata} ExpressionMetadata */
 /** @typedef {import('../../../../GDevelop.js/types').ObjectMetadata} ObjectMetadata */
 /** @typedef {import('../../../../GDevelop.js/types').BehaviorMetadata} BehaviorMetadata */
 /** @typedef {import('../../../../GDevelop.js/types').ParameterMetadata} ParameterMetadata */
+/** @typedef {import('../../../../GDevelop.js/types').MapStringPropertyDescriptor} MapStringPropertyDescriptor */
+/** @typedef {import('../../../../GDevelop.js/types').NamedPropertyDescriptor} NamedPropertyDescriptor */
+/** @typedef {import('../../../../GDevelop.js/types').PropertiesContainer} PropertiesContainer */
+/** @typedef {import('../../../../GDevelop.js/types').PropertyDescriptor} PropertyDescriptor */
 
 /**
  * @typedef {Object} RawText A text to be shown on a page
@@ -25,6 +33,7 @@ const { generateReadMoreLink } = require('./WikiHelpLink');
 /**
  * @typedef {Object} ObjectReference
  * @prop {ObjectMetadata} objectMetadata The object.
+ * @prop {Array<ReferenceText>} propertiesReferenceTexts Reference texts for the object properties.
  * @prop {Array<ReferenceText>} actionsReferenceTexts Reference texts for the object actions.
  * @prop {Array<ReferenceText>} conditionsReferenceTexts Reference texts for the object conditions.
  * @prop {Array<ReferenceText>} expressionsReferenceTexts Reference texts for the object expressions.
@@ -33,6 +42,8 @@ const { generateReadMoreLink } = require('./WikiHelpLink');
 /**
  * @typedef {Object} BehaviorReference
  * @prop {BehaviorMetadata} behaviorMetadata The behavior.
+ * @prop {Array<ReferenceText>} propertiesReferenceTexts Reference texts for the behavior properties.
+ * @prop {Array<ReferenceText>} sharedPropertiesReferenceTexts Reference texts for the behavior shared properties.
  * @prop {Array<ReferenceText>} actionsReferenceTexts Reference texts for the behavior actions.
  * @prop {Array<ReferenceText>} conditionsReferenceTexts Reference texts for the behavior conditions.
  * @prop {Array<ReferenceText>} expressionsReferenceTexts Reference texts for the behavior expressions.
@@ -41,6 +52,7 @@ const { generateReadMoreLink } = require('./WikiHelpLink');
 /**
  * @typedef {Object} ExtensionReference
  * @prop {PlatformExtension} extension The extension.
+ * @prop {EventsFunctionsExtension | null} eventsFunctionsExtension The "source" events-based extension.
  * @prop {Array<ReferenceText>} freeExpressionsReferenceTexts Reference texts for free expressions.
  * @prop {Array<ReferenceText>} freeActionsReferenceTexts Reference texts for free actions.
  * @prop {Array<ReferenceText>} freeConditionsReferenceTexts Reference texts for free conditions.
@@ -166,85 +178,113 @@ const sanitizeExpressionDescription = str => {
   );
 };
 
+const caseInsensitiveCheck = (type, check) => {
+  return type.toLowerCase() === check.toLowerCase();
+};
+
 const translateTypeToHumanReadableDescription = type => {
-  if (type === 'number') return '🔢 Number';
-  if (type === 'expression') return '🔢 Number';
-  if (type === 'camera') return '🔢 Camera index (Number)';
+  if (caseInsensitiveCheck(type, 'number')) return '🔢 Number';
+  if (caseInsensitiveCheck(type, 'expression')) return '🔢 Number';
+  if (caseInsensitiveCheck(type, 'camera')) return '🔢 Camera index (Number)';
 
-  if (type === 'object') return '👾 Object';
-  if (type === 'objectList') return '👾 Object';
-  if (type === 'objectPtr') return '👾 Object';
-  if (type === 'objectListOrEmptyIfJustDeclared') return '👾 Object';
-  if (type === 'objectListOrEmptyWithoutPicking') return '👾 Object';
+  if (caseInsensitiveCheck(type, 'object')) return '👾 Object';
+  if (caseInsensitiveCheck(type, 'objectList')) return '👾 Object';
+  if (caseInsensitiveCheck(type, 'objectPtr')) return '👾 Object';
+  if (caseInsensitiveCheck(type, 'objectListOrEmptyIfJustDeclared'))
+    return '👾 Object';
+  if (caseInsensitiveCheck(type, 'objectListOrEmptyWithoutPicking'))
+    return '👾 Object';
 
-  if (type === 'variable') return '🗄️ Any variable';
-  if (type === 'objectvar') return '🗄️ Object variable';
-  if (type === 'scenevar') return '🗄️ Scene variable';
-  if (type === 'globalvar') return '🗄️ Global variable';
+  if (caseInsensitiveCheck(type, 'variable')) return '🗄️ Any variable';
+  if (caseInsensitiveCheck(type, 'objectvar')) return '🗄️ Object variable';
+  if (caseInsensitiveCheck(type, 'scenevar')) return '🗄️ Scene variable';
+  if (caseInsensitiveCheck(type, 'globalvar')) return '🗄️ Global variable';
 
-  if (type === 'behavior') return '🧩 Behavior';
+  if (caseInsensitiveCheck(type, 'behavior')) return '🧩 Behavior';
 
-  if (type === 'layer') return '🔤 Layer name (String)';
-  if (type === 'stringWithSelector') return '🔤 String';
-  if (type === 'identifier') return '🔤 Name (String)';
-  if (type === 'sceneName') return '🔤 Name of a scene (String)';
-  if (type === 'layerEffectName') return '🔤 Layer Effect Name (String)';
-  if (type === 'layerEffectParameterName')
+  if (caseInsensitiveCheck(type, 'layer')) return '🔤 Layer name (String)';
+  if (caseInsensitiveCheck(type, 'string')) return '🔤 String';
+  if (caseInsensitiveCheck(type, 'stringWithSelector')) return '🔤 String';
+  if (caseInsensitiveCheck(type, 'identifier')) return '🔤 Name (String)';
+  if (caseInsensitiveCheck(type, 'sceneName'))
+    return '🔤 Name of a scene (String)';
+  if (caseInsensitiveCheck(type, 'layerEffectName'))
+    return '🔤 Layer Effect Name (String)';
+  if (caseInsensitiveCheck(type, 'layerEffectParameterName'))
     return '🔤 Layer Effect Property Name (String)';
-  if (type === 'objectEffectName') return '🔤 Object Effect Name (String)';
-  if (type === 'objectEffectParameterName')
+  if (caseInsensitiveCheck(type, 'objectEffectName'))
+    return '🔤 Object Effect Name (String)';
+  if (caseInsensitiveCheck(type, 'objectEffectParameterName'))
     return '🔤 Object Effect Property Name (String)';
-  if (type === 'objectPointName') return '🔤 Object Point Name (String)';
-  if (type === 'objectAnimationName')
+  if (caseInsensitiveCheck(type, 'objectPointName'))
+    return '🔤 Object Point Name (String)';
+  if (caseInsensitiveCheck(type, 'objectAnimationName'))
     return '🔤 Object Animation Name (String)';
-  if (type === 'functionParameterName')
+  if (caseInsensitiveCheck(type, 'functionParameterName'))
     return '🔤 Function Parameter Name (String)';
-  if (type === 'externalLayoutName') return '🔤 External Layout Name (String)';
-  if (type === 'leaderboardId') return '🔤 Leaderboard Identifier (String)';
+  if (caseInsensitiveCheck(type, 'externalLayoutName'))
+    return '🔤 External Layout Name (String)';
+  if (caseInsensitiveCheck(type, 'leaderboardId'))
+    return '🔤 Leaderboard Identifier (String)';
 
-  if (type === 'operator') return '🟰 Operator';
-  if (type === 'relationalOperator') return '🟰 Relational operator';
+  if (caseInsensitiveCheck(type, 'operator')) return '🟰 Operator';
+  if (caseInsensitiveCheck(type, 'relationalOperator'))
+    return '🟰 Relational operator';
 
-  if (type === 'yesorno') return '❓ Yes or No';
-  if (type === 'trueorfalse') return '❓ True or False';
+  if (caseInsensitiveCheck(type, 'yesorno')) return '❓ Yes or No';
+  if (caseInsensitiveCheck(type, 'trueorfalse')) return '❓ True or False';
+
+  if (caseInsensitiveCheck(type, 'multilinestring'))
+    return '🔤 Multiline text (String)';
+  if (caseInsensitiveCheck(type, 'boolean')) return '🔘 Boolean';
+  if (caseInsensitiveCheck(type, 'color')) return '🎨 Color';
+  if (caseInsensitiveCheck(type, 'resource')) return '🗂️ Resource';
 
   return type;
 };
 
 const translateTypeToHumanReadableType = type => {
-  if (type === 'number') return 'number';
-  if (type === 'expression') return 'number';
-  if (type === 'camera') return 'number';
+  if (caseInsensitiveCheck(type, 'number')) return 'number';
+  if (caseInsensitiveCheck(type, 'expression')) return 'number';
+  if (caseInsensitiveCheck(type, 'camera')) return 'number';
 
-  if (type === 'objectList') return 'object';
-  if (type === 'objectPtr') return 'object';
-  if (type === 'objectListOrEmptyIfJustDeclared') return 'object';
-  if (type === 'objectListOrEmptyWithoutPicking') return 'object';
+  if (caseInsensitiveCheck(type, 'objectList')) return 'object';
+  if (caseInsensitiveCheck(type, 'objectPtr')) return 'object';
+  if (caseInsensitiveCheck(type, 'objectListOrEmptyIfJustDeclared'))
+    return 'object';
+  if (caseInsensitiveCheck(type, 'objectListOrEmptyWithoutPicking'))
+    return 'object';
 
-  if (type === 'variable') return 'variable';
-  if (type === 'objectvar') return 'object variable';
-  if (type === 'scenevar') return 'scene variable';
-  if (type === 'globalvar') return 'global variable';
+  if (caseInsensitiveCheck(type, 'variable')) return 'variable';
+  if (caseInsensitiveCheck(type, 'objectvar')) return 'object variable';
+  if (caseInsensitiveCheck(type, 'scenevar')) return 'scene variable';
+  if (caseInsensitiveCheck(type, 'globalvar')) return 'global variable';
 
-  if (type === 'behavior') return 'behavior';
+  if (caseInsensitiveCheck(type, 'behavior')) return 'behavior';
 
-  if (type === 'layer') return 'layer name';
-  if (type === 'stringWithSelector') return 'string';
-  if (type === 'identifier') return 'string';
-  if (type === 'sceneName') return 'scene name';
-  if (type === 'layerEffectName') return 'layer effect name';
-  if (type === 'layerEffectParameterName') return 'layer effect property name';
-  if (type === 'objectEffectName') return 'object effect name';
-  if (type === 'objectEffectParameterName')
+  if (caseInsensitiveCheck(type, 'layer')) return 'layer name';
+  if (caseInsensitiveCheck(type, 'stringWithSelector')) return 'string';
+  if (caseInsensitiveCheck(type, 'identifier')) return 'string';
+  if (caseInsensitiveCheck(type, 'sceneName')) return 'scene name';
+  if (caseInsensitiveCheck(type, 'layerEffectName')) return 'layer effect name';
+  if (caseInsensitiveCheck(type, 'layerEffectParameterName'))
+    return 'layer effect property name';
+  if (caseInsensitiveCheck(type, 'objectEffectName'))
+    return 'object effect name';
+  if (caseInsensitiveCheck(type, 'objectEffectParameterName'))
     return 'object effect property name';
-  if (type === 'objectPointName') return 'object point name';
-  if (type === 'objectAnimationName') return 'object animation name';
-  if (type === 'functionParameterName') return 'function parameter name';
-  if (type === 'externalLayoutName') return 'external layout name';
-  if (type === 'leaderboardId') return 'leaderboard identifier';
+  if (caseInsensitiveCheck(type, 'objectPointName')) return 'object point name';
+  if (caseInsensitiveCheck(type, 'objectAnimationName'))
+    return 'object animation name';
+  if (caseInsensitiveCheck(type, 'functionParameterName'))
+    return 'function parameter name';
+  if (caseInsensitiveCheck(type, 'externalLayoutName'))
+    return 'external layout name';
+  if (caseInsensitiveCheck(type, 'leaderboardId'))
+    return 'leaderboard identifier';
 
-  if (type === 'yesorno') return 'yes or no';
-  if (type === 'trueorfalse') return 'true or false';
+  if (caseInsensitiveCheck(type, 'yesorno')) return 'yes or no';
+  if (caseInsensitiveCheck(type, 'trueorfalse')) return 'true or false';
 
   return type;
 };
@@ -575,10 +615,188 @@ const sortReferenceTexts = (referenceText1, referenceText2) => {
 };
 
 /**
- * @param {PlatformExtension} extension
+ * @param {string} text
+ * @returns {string}
+ */
+const sanitizePropertyDescription = text => {
+  const sanitizedText = text.replace(/\n/g, ' ').trim();
+  if (sanitizedText.endsWith('.')) return sanitizedText;
+  return sanitizedText + '.';
+};
+
+/**
+ * @param {{ propertiesMetadata?: MapStringPropertyDescriptor, propertiesContainer?: PropertiesContainer }} options
+ * @returns {Array<ReferenceText>}
+ */
+const generatePropertiesReferenceTexts = ({
+  propertiesMetadata,
+  propertiesContainer,
+}) => {
+  /**
+   * @param {string} name
+   * @param {PropertyDescriptor | NamedPropertyDescriptor} property
+   * @returns {ReferenceText | null}
+   */
+  const generatePropertyReferenceText = (name, property) => {
+    if (name.startsWith('_')) return null;
+    if (property.isHidden()) return null;
+
+    if (property.getType() === 'Behavior') {
+      return null;
+    }
+
+    const type = property.getType();
+    const measurementUnit = property.getMeasurementUnit();
+    const measurementUnitText = measurementUnit.isUndefined()
+      ? null
+      : measurementUnit.getLabel();
+
+    const choices =
+      type.toLowerCase() === 'choice'
+        ? [
+            ...mapVector(property.getChoices(), choice => choice.getValue()),
+            // TODO Remove this once we made sure no built-in extension still use `addExtraInfo` instead of `addChoice`.
+            ...property.getExtraInfo().toJSArray(),
+          ]
+        : null;
+    const information = [
+      translateTypeToHumanReadableDescription(type),
+      choices
+        ? `one of: ${choices.map(choice => `"${choice}"`).join(', ')}`
+        : null,
+      measurementUnitText,
+    ].filter(Boolean);
+
+    return {
+      orderKey: name,
+      text: [
+        `- **${property.getLabel() || name}** (${information.join(', ')}).`,
+        property.getDescription()
+          ? `${sanitizePropertyDescription(property.getDescription())}`
+          : null,
+        property.getValue()
+          ? `Default value is \`${property.getValue()}\`.`
+          : null,
+      ]
+        .filter(Boolean)
+        .join(' '),
+    };
+  };
+
+  /**
+   * @param {string} name
+   * @param {PropertyDescriptor | NamedPropertyDescriptor} property
+   * @returns {ReferenceText | null}
+   */
+  const generatePropertyInternalReferenceText = (name, property) => {
+    if (name.startsWith('_')) return null;
+    if (property.isHidden()) return null;
+
+    const padding = '    ';
+
+    if (property.getType() === 'Behavior') {
+      return {
+        orderKey: name,
+        text: `${padding}> This behavior must be used on an object also having a behavior with type "${property
+          .getExtraInfo()
+          .toJSArray()
+          .join(', ')}". This is stored on property \`${name}\`.\n`,
+      };
+    }
+
+    const type = property.getType();
+    const measurementUnit = property.getMeasurementUnit();
+    const measurementUnitText = measurementUnit.isUndefined()
+      ? null
+      : measurementUnit.getName();
+
+    return {
+      orderKey: name,
+      text: [
+        `${padding}- **${property.getLabel() ||
+          name}** is stored as \`${name}\` (${type}).`,
+        measurementUnitText ? `Unit is ${measurementUnitText}.` : null,
+        `Default value is \`${property.getValue()}\`.`,
+      ]
+        .filter(Boolean)
+        .join(' '),
+    };
+  };
+
+  const propertiesReferenceTexts = [
+    ...(propertiesMetadata
+      ? propertiesMetadata
+          .keys()
+          .toJSArray()
+          .map(propertyName => {
+            const propertyDescriptor = propertiesMetadata.get(propertyName);
+            return generatePropertyReferenceText(
+              propertyName,
+              propertyDescriptor
+            );
+          })
+      : []),
+    ...(propertiesContainer
+      ? mapVector(propertiesContainer, namedPropertyDescriptor => {
+          const propertyName = namedPropertyDescriptor.getName();
+
+          return generatePropertyReferenceText(
+            propertyName,
+            namedPropertyDescriptor
+          );
+        })
+      : []),
+  ].filter(Boolean);
+
+  if (!propertiesReferenceTexts.length) return [];
+
+  const internalPropertiesReferenceTexts = [
+    ...(propertiesMetadata
+      ? propertiesMetadata
+          .keys()
+          .toJSArray()
+          .map(propertyName => {
+            const propertyDescriptor = propertiesMetadata.get(propertyName);
+            return generatePropertyInternalReferenceText(
+              propertyName,
+              propertyDescriptor
+            );
+          })
+      : []),
+    ...(propertiesContainer
+      ? mapVector(propertiesContainer, namedPropertyDescriptor => {
+          const propertyName = namedPropertyDescriptor.getName();
+          return generatePropertyInternalReferenceText(
+            propertyName,
+            namedPropertyDescriptor
+          );
+        })
+      : []),
+  ].filter(Boolean);
+
+  return [
+    ...propertiesReferenceTexts,
+    {
+      orderKey: '',
+      text: '\n??? quote "See internal technical details"\n\n',
+    },
+    ...internalPropertiesReferenceTexts,
+  ];
+};
+
+/**
+ * @param {{
+ * platform: Platform,
+ * extension: PlatformExtension,
+ * eventsFunctionsExtension: EventsFunctionsExtension | null
+ * }} options
  * @returns {ExtensionReference}
  */
-const generateExtensionReference = extension => {
+const generateExtensionReference = ({
+  platform,
+  extension,
+  eventsFunctionsExtension,
+}) => {
   const extensionExpressions = extension.getAllExpressions();
   const extensionStrExpressions = extension.getAllStrExpressions();
 
@@ -595,6 +813,45 @@ const generateExtensionReference = extension => {
       if (objectMetadata.isPrivate()) {
         return null;
       }
+
+      const propertiesReferenceTexts = [];
+
+      if (eventsFunctionsExtension) {
+        // Objects from "events-based" extensions:
+        const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
+        const objectName =
+          objectType.split('::').pop() || 'Unrecognized object type format';
+
+        if (eventsBasedObjects.has(objectName)) {
+          const eventsBasedObject = eventsBasedObjects.get(objectName);
+          propertiesReferenceTexts.push(
+            ...generatePropertiesReferenceTexts({
+              propertiesContainer: eventsBasedObject.getPropertyDescriptors(),
+            })
+          );
+        } else {
+          throw new Error(
+            `Object "${objectType}" not found in events-based extension "${eventsFunctionsExtension.getFullName()}".`
+          );
+        }
+      } else {
+        // "Built-in" objects:
+        const objectConfiguration = platform
+          .createObjectConfiguration(objectType)
+          .release();
+        if (isNullPtr(objectConfiguration)) {
+          throw new Error(
+            `Failed to create object configuration for object type "${objectType}".`
+          );
+        }
+
+        propertiesReferenceTexts.push(
+          ...generatePropertiesReferenceTexts({
+            propertiesMetadata: objectConfiguration.getProperties(),
+          })
+        );
+      }
+
       const actionsReferenceTexts = generateInstructionsReferenceRowsTexts({
         areConditions: false,
         instructionsMetadata: extension.getAllActionsForObject(objectType),
@@ -621,6 +878,7 @@ const generateExtensionReference = extension => {
 
       return {
         objectMetadata,
+        propertiesReferenceTexts,
         actionsReferenceTexts,
         conditionsReferenceTexts,
         expressionsReferenceTexts,
@@ -637,6 +895,13 @@ const generateExtensionReference = extension => {
       if (behaviorMetadata.isPrivate()) {
         return null;
       }
+
+      const propertiesReferenceTexts = generatePropertiesReferenceTexts({
+        propertiesMetadata: behaviorMetadata.getProperties(),
+      });
+      const sharedPropertiesReferenceTexts = generatePropertiesReferenceTexts({
+        propertiesMetadata: behaviorMetadata.getSharedProperties(),
+      });
 
       const actionsReferenceTexts = generateInstructionsReferenceRowsTexts({
         areConditions: false,
@@ -668,6 +933,8 @@ const generateExtensionReference = extension => {
 
       return {
         behaviorMetadata,
+        propertiesReferenceTexts,
+        sharedPropertiesReferenceTexts,
         actionsReferenceTexts,
         conditionsReferenceTexts,
         expressionsReferenceTexts,
@@ -696,6 +963,7 @@ const generateExtensionReference = extension => {
 
   return {
     extension,
+    eventsFunctionsExtension,
     freeActionsReferenceTexts,
     freeConditionsReferenceTexts,
     freeExpressionsReferenceTexts,
@@ -727,7 +995,7 @@ const generateExtensionRawText = (
   const withHeaderIfNotEmpty = (texts, { headerName, depth }) => {
     if (!texts.length) return [];
 
-    return [generateHeader({ headerName, depth }), ...texts];
+    return [generateHeader({ headerName, depth }), ...texts, { text: '' }];
   };
 
   return [
@@ -750,6 +1018,7 @@ const generateExtensionRawText = (
     ...objectReferences.flatMap(objectReference => {
       const {
         objectMetadata,
+        propertiesReferenceTexts,
         actionsReferenceTexts,
         conditionsReferenceTexts,
         expressionsReferenceTexts,
@@ -760,6 +1029,10 @@ const generateExtensionRawText = (
           objectMetadata,
           showExtensionName: false,
           showHelpLink: false,
+        }),
+        ...withHeaderIfNotEmpty(propertiesReferenceTexts, {
+          headerName: 'Object properties',
+          depth: 3,
         }),
         ...withHeaderIfNotEmpty(actionsReferenceTexts, {
           headerName: 'Object actions',
@@ -781,6 +1054,8 @@ const generateExtensionRawText = (
     ...behaviorReferences.flatMap(behaviorReference => {
       const {
         behaviorMetadata,
+        propertiesReferenceTexts,
+        sharedPropertiesReferenceTexts,
         actionsReferenceTexts,
         conditionsReferenceTexts,
         expressionsReferenceTexts,
@@ -791,6 +1066,14 @@ const generateExtensionRawText = (
           behaviorMetadata,
           showExtensionName: false,
           showHelpLink: false,
+        }),
+        ...withHeaderIfNotEmpty(propertiesReferenceTexts, {
+          headerName: 'Behavior properties',
+          depth: 3,
+        }),
+        ...withHeaderIfNotEmpty(sharedPropertiesReferenceTexts, {
+          headerName: 'Behavior shared properties',
+          depth: 3,
         }),
         ...withHeaderIfNotEmpty(actionsReferenceTexts, {
           headerName: 'Behavior actions',

@@ -27,8 +27,6 @@ module.exports = {
   downloadLocalFile: async (url, outputPath) => {
     const gdevelopCloudCookieValue = await findGDevelopCloudCookieValue();
 
-    const writer = fs.createWriteStream(outputPath);
-
     log.verbose(`Downloading ${url} to ${outputPath}...`);
     const response = await axios.get(url, {
       responseType: 'stream',
@@ -39,21 +37,35 @@ module.exports = {
         : {},
     });
 
+    // Create the writer only after the request is successful.
+    const writer = fs.createWriteStream(outputPath);
+
     return new Promise((resolve, reject) => {
-      response.data.pipe(writer);
-      let error = null;
-      writer.on('error', err => {
-        error = err;
-        writer.close();
+      let isRejectedOrResolvedAlready = false;
+
+      const cleanUpAndReject = err => {
+        if (isRejectedOrResolvedAlready) return;
+        isRejectedOrResolvedAlready = true;
+
+        try {
+          writer.destroy();
+        } catch (e) {}
+        // Best effort to remove the incomplete file
+        try {
+          fs.unlinkSync(outputPath);
+        } catch (e) {}
         reject(err);
+      };
+
+      response.data.on('error', cleanUpAndReject);
+      writer.on('error', cleanUpAndReject);
+      writer.on('finish', () => {
+        if (isRejectedOrResolvedAlready) return;
+        isRejectedOrResolvedAlready = true;
+        resolve(true);
       });
-      writer.on('close', () => {
-        if (!error) {
-          resolve(true);
-        }
-        // No need to call `reject` here, as it will have been called in the
-        // 'error' callback.
-      });
+
+      response.data.pipe(writer);
     });
   },
   /**

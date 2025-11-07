@@ -1,5 +1,8 @@
 // @flow
 import { getObjectParameterIndex } from './EnumerateInstructions';
+import { getSelectableBehavior } from '../EventsSheet/ParameterFields/BehaviorField';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+
 const gd: libGDevelop = global.gd;
 
 /**
@@ -8,8 +11,7 @@ const gd: libGDevelop = global.gd;
  * and set up the behavior name (if a behavior instruction was chosen).
  */
 export const setupInstructionParameters = (
-  globalObjectsContainer: gdObjectsContainer,
-  objectsContainer: gdObjectsContainer,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   instruction: gdInstruction,
   instructionMetadata: gdInstructionMetadata,
   objectName: ?string
@@ -46,33 +48,11 @@ export const setupInstructionParameters = (
 
     const allowedBehaviorType = maybeBehaviorParameterMetadata.getExtraInfo();
     // TODO Factorize it with BehaviorField
-    const behaviorNames = gd
-      .getBehaviorsOfObject(
-        globalObjectsContainer,
-        objectsContainer,
-        objectName,
-        true
-      )
-      .toJSArray()
-      .filter(behaviorName => {
-        return (
-          (!allowedBehaviorType ||
-            gd.getTypeOfBehavior(
-              globalObjectsContainer,
-              objectsContainer,
-              behaviorName,
-              false
-            ) === allowedBehaviorType) &&
-          (allowedBehaviorType ||
-            !gd.isDefaultBehavior(
-              globalObjectsContainer,
-              objectsContainer,
-              objectName,
-              behaviorName,
-              true
-            ))
-        );
-      });
+    const behaviorNames = getSelectableBehavior(
+      projectScopedContainersAccessor,
+      objectName,
+      allowedBehaviorType
+    );
 
     if (
       // Don't auto-select a behavior in the case of allowedBehaviorType being not specified

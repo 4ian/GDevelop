@@ -256,8 +256,7 @@ const InstructionParametersEditor = React.forwardRef<
     const objectParameterIndex = getObjectParameterIndex(instructionMetadata);
 
     setupInstructionParameters(
-      globalObjectsContainer,
-      objectsContainer,
+      projectScopedContainersAccessor,
       instruction,
       instructionMetadata,
       objectName

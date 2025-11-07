@@ -4,6 +4,8 @@ import {
   enumerateFreeInstructions,
 } from './EnumerateInstructions';
 import { setupInstructionParameters } from './SetupInstructionParameters';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+
 const gd: libGDevelop = global.gd;
 
 // $FlowExpectedError
@@ -18,6 +20,12 @@ describe('setupInstructionParameters', () => {
     const layout = project.insertNewLayout('Scene', 0);
     const objectName = 'MySpriteObject';
     layout.getObjects().insertNewObject(project, 'Sprite', objectName, 0);
+    const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+      {
+        project,
+        layout,
+      }
+    );
 
     // Simulate that we select an instruction
     const enumeratedInstructions = enumerateFreeInstructions(
@@ -34,8 +42,7 @@ describe('setupInstructionParameters', () => {
 
     const instruction = new gd.Instruction();
     setupInstructionParameters(
-      project.getObjects(),
-      layout.getObjects(),
+      projectScopedContainersAccessor,
       instruction,
       playMusicInstruction.metadata
     );
@@ -55,6 +62,12 @@ describe('setupInstructionParameters', () => {
     const objectName = 'MySpriteObject';
     const behaviorName = 'Animation';
     layout.getObjects().insertNewObject(project, 'Sprite', objectName, 0);
+    const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+      {
+        project,
+        layout,
+      }
+    );
 
     // Simulate that we select an instruction for the object
     const enumeratedInstructions = enumerateObjectAndBehaviorsInstructions(
@@ -76,8 +89,7 @@ describe('setupInstructionParameters', () => {
 
     const instruction = new gd.Instruction();
     setupInstructionParameters(
-      project.getObjects(),
-      layout.getObjects(),
+      projectScopedContainersAccessor,
       instruction,
       setAnimationNameInstruction.metadata,
       objectName
@@ -105,6 +117,12 @@ describe('setupInstructionParameters', () => {
       'PlatformBehavior::PlatformerObjectBehavior',
       'PlatformerObject'
     );
+    const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+      {
+        project,
+        layout,
+      }
+    );
 
     // Simulate that we select an instruction of the object behavior
     const enumeratedInstructions = enumerateObjectAndBehaviorsInstructions(
@@ -125,8 +143,7 @@ describe('setupInstructionParameters', () => {
 
     const instruction = new gd.Instruction();
     setupInstructionParameters(
-      project.getObjects(),
-      layout.getObjects(),
+      projectScopedContainersAccessor,
       instruction,
       jumpSpeedInstruction.metadata,
       objectName
@@ -159,6 +176,12 @@ describe('setupInstructionParameters', () => {
       'PlatformBehavior::PlatformerObjectBehavior',
       'OtherPlatformerObject'
     );
+    const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+      {
+        project,
+        layout,
+      }
+    );
 
     // Simulate that we select an instruction of the object behavior
     const enumeratedInstructions = enumerateObjectAndBehaviorsInstructions(
@@ -179,8 +202,7 @@ describe('setupInstructionParameters', () => {
 
     const instruction = new gd.Instruction();
     setupInstructionParameters(
-      project.getObjects(),
-      layout.getObjects(),
+      projectScopedContainersAccessor,
       instruction,
       jumpSpeedInstruction.metadata,
       objectName
@@ -211,6 +233,12 @@ describe('setupInstructionParameters', () => {
       'PlatformBehavior::PlatformerObjectBehavior',
       'OtherPlatformerObject'
     );
+    const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+      {
+        project,
+        layout,
+      }
+    );
 
     // Simulate that we select an instruction of the object behavior
     const enumeratedInstructions = enumerateObjectAndBehaviorsInstructions(
@@ -234,8 +262,7 @@ describe('setupInstructionParameters', () => {
     instruction.setParameter(0, objectName);
     instruction.setParameter(1, 'WrongName');
     setupInstructionParameters(
-      project.getObjects(),
-      layout.getObjects(),
+      projectScopedContainersAccessor,
       instruction,
       jumpSpeedInstruction.metadata,
       objectName
@@ -266,6 +293,12 @@ describe('setupInstructionParameters', () => {
       'PlatformBehavior::PlatformerObjectBehavior',
       'OtherPlatformerObject'
     );
+    const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+      {
+        project,
+        layout,
+      }
+    );
 
     // Simulate that we select an instruction of the object behavior
     const enumeratedInstructions = enumerateObjectAndBehaviorsInstructions(
@@ -289,8 +322,7 @@ describe('setupInstructionParameters', () => {
     instruction.setParameter(0, objectName);
     instruction.setParameter(1, 'OtherPlatformerObject');
     setupInstructionParameters(
-      project.getObjects(),
-      layout.getObjects(),
+      projectScopedContainersAccessor,
       instruction,
       jumpSpeedInstruction.metadata,
       objectName

@@ -141,6 +141,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         margin={props.isInline ? 'none' : 'dense'}
         project={project}
         value={props.value}
+        // Behaviors are set by `setupInstructionParameters`
         onChange={props.onChange}
         onRequestClose={props.onRequestClose}
         onApply={props.onApply}

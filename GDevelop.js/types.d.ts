@@ -632,6 +632,7 @@ export class ObjectsContainersList extends EmscriptenObject {
   getTypeOfBehavior(name: string, searchInGroups: boolean): string;
   getBehaviorsOfObject(objectOrGroupName: string, searchInGroups: boolean): VectorString;
   getBehaviorNamesInObjectOrGroup(objectOrGroupName: string, behaviorType: string, searchInGroups: boolean): VectorString;
+  isDefaultBehavior(objectOrGroupName: string, behaviorType: string, searchInGroups: boolean): boolean;
   getAnimationNamesOfObject(name: string): VectorString;
   getTypeOfBehaviorInObjectOrGroup(objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): string;
   hasObjectOrGroupNamed(name: string): boolean;

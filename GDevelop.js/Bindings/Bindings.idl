@@ -695,6 +695,10 @@ interface ObjectsContainersList {
     [Const] DOMString objectOrGroupName,
     [Const] DOMString behaviorType,
     boolean searchInGroups);
+  boolean IsDefaultBehavior(
+    [Const] DOMString objectOrGroupName,
+    [Const] DOMString behaviorType,
+    boolean searchInGroups);
   [Value] VectorString GetAnimationNamesOfObject([Const] DOMString name);
   [Const, Value] DOMString GetTypeOfBehaviorInObjectOrGroup([Const] DOMString objectOrGroupName, [Const] DOMString behaviorName, boolean searchInGroups);
   boolean HasObjectOrGroupNamed([Const] DOMString name);

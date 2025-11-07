@@ -2047,6 +2047,10 @@ export class WholeProjectRefactorer extends EmscriptenObject {
   static updateBehaviorsSharedData(project: Project): void;
 }
 
+export class BehaviorParameterFiller extends EmscriptenObject {
+  static fillBehaviorParameters(platform: Platform, projectScopedContainers: ProjectScopedContainers, instructionMetadata: InstructionMetadata, instruction: Instruction): void;
+}
+
 export class ObjectTools extends EmscriptenObject {
   static isBehaviorCompatibleWithObject(platform: Platform, objectType: string, behaviorType: string): boolean;
 }

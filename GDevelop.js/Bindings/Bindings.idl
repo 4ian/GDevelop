@@ -2867,6 +2867,14 @@ interface WholeProjectRefactorer {
     void STATIC_UpdateBehaviorsSharedData([Ref] Project project);
 };
 
+interface BehaviorParameterFiller {
+    void STATIC_FillBehaviorParameters(
+        [Const, Ref] Platform platform,
+        [Const, Ref] ProjectScopedContainers projectScopedContainers,
+        [Const, Ref] InstructionMetadata instructionMetadata,
+        [Ref] Instruction instruction);
+};
+
 interface ObjectTools {
     boolean STATIC_IsBehaviorCompatibleWithObject(
         [Const, Ref] Platform platform,

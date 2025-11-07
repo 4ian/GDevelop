@@ -23,6 +23,7 @@
 #include <GDCore/Extensions/Metadata/ParameterOptions.h>
 #include <GDCore/Extensions/Platform.h>
 #include <GDCore/IDE/AbstractFileSystem.h>
+#include <GDCore/IDE/BehaviorParameterFiller.h>
 #include <GDCore/IDE/Dialogs/LayoutEditorCanvas/EditorSettings.h>
 #include <GDCore/IDE/Events/ArbitraryEventsWorker.h>
 #include <GDCore/IDE/Events/BehaviorDefaultFlagClearer.h>
@@ -668,6 +669,7 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
   FindInvalidRequiredBehaviorProperties
 #define STATIC_GetBehaviorsWithType GetBehaviorsWithType
 #define STATIC_IsBehaviorCompatibleWithObject IsBehaviorCompatibleWithObject
+#define STATIC_FillBehaviorParameters FillBehaviorParameters
 #define STATIC_FixInvalidRequiredBehaviorProperties \
   FixInvalidRequiredBehaviorProperties
 #define STATIC_RemoveLayerInScene RemoveLayerInScene

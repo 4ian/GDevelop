@@ -42,6 +42,7 @@ describe('setupInstructionParameters', () => {
 
     const instruction = new gd.Instruction();
     setupInstructionParameters(
+      project,
       projectScopedContainersAccessor,
       instruction,
       playMusicInstruction.metadata
@@ -89,6 +90,7 @@ describe('setupInstructionParameters', () => {
 
     const instruction = new gd.Instruction();
     setupInstructionParameters(
+      project,
       projectScopedContainersAccessor,
       instruction,
       setAnimationNameInstruction.metadata,
@@ -143,6 +145,7 @@ describe('setupInstructionParameters', () => {
 
     const instruction = new gd.Instruction();
     setupInstructionParameters(
+      project,
       projectScopedContainersAccessor,
       instruction,
       jumpSpeedInstruction.metadata,
@@ -202,6 +205,7 @@ describe('setupInstructionParameters', () => {
 
     const instruction = new gd.Instruction();
     setupInstructionParameters(
+      project,
       projectScopedContainersAccessor,
       instruction,
       jumpSpeedInstruction.metadata,
@@ -262,6 +266,7 @@ describe('setupInstructionParameters', () => {
     instruction.setParameter(0, objectName);
     instruction.setParameter(1, 'WrongName');
     setupInstructionParameters(
+      project,
       projectScopedContainersAccessor,
       instruction,
       jumpSpeedInstruction.metadata,
@@ -322,6 +327,7 @@ describe('setupInstructionParameters', () => {
     instruction.setParameter(0, objectName);
     instruction.setParameter(1, 'OtherPlatformerObject');
     setupInstructionParameters(
+      project,
       projectScopedContainersAccessor,
       instruction,
       jumpSpeedInstruction.metadata,

@@ -129,6 +129,7 @@ const InlineParameterEditor = ({
           instructionMetadata
         );
         setupInstructionParameters(
+          project,
           projectScopedContainersAccessor,
           instruction,
           instructionMetadata,
@@ -140,7 +141,13 @@ const InlineParameterEditor = ({
 
       onApply();
     },
-    [instruction, instructionMetadata, onApply, projectScopedContainersAccessor]
+    [
+      instruction,
+      instructionMetadata,
+      onApply,
+      project,
+      projectScopedContainersAccessor,
+    ]
   );
 
   if (

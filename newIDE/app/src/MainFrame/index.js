@@ -518,10 +518,9 @@ const MainFrame = (props: Props) => {
     setQuickCustomizationDialogOpenedFromGameId,
   ] = React.useState<?string>(null);
 
-  // TODO: Make it 2D by default.
   const [gameEditorMode, setGameEditorMode] = React.useState<
     'embedded-game' | 'instances-editor'
-  >('embedded-game');
+  >('instances-editor');
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.

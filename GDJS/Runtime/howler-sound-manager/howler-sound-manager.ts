@@ -476,6 +476,8 @@ namespace gdjs {
     _freeSounds: HowlerSound[] = []; // Sounds without an assigned channel.
     _freeMusics: HowlerSound[] = []; // Musics without an assigned channel.
 
+    _muteEverythingReasons: Set<string> = new Set();
+
     /** Paused sounds or musics that should be played once the game is resumed.  */
     _pausedSounds: HowlerSound[] = [];
     _paused: boolean = false;
@@ -960,6 +962,16 @@ namespace gdjs {
       this._cachedSpatialPosition = {};
     }
 
+    muteEverything(reason: string): void {
+      this._muteEverythingReasons.add(reason);
+      this._updateGlobalVolume();
+    }
+
+    unmuteEverything(reason: string): void {
+      this._muteEverythingReasons.delete(reason);
+      this._updateGlobalVolume();
+    }
+
     setGlobalVolume(volume: float): void {
       this._globalVolume = volume;
       if (this._globalVolume > 100) {
@@ -968,11 +980,19 @@ namespace gdjs {
       if (this._globalVolume < 0) {
         this._globalVolume = 0;
       }
-      Howler.volume(this._globalVolume / 100);
+      this._updateGlobalVolume();
     }
 
     getGlobalVolume(): float {
       return this._globalVolume;
+    }
+
+    private _updateGlobalVolume(): void {
+      if (this._muteEverythingReasons.size > 0) {
+        Howler.volume(0);
+      } else {
+        Howler.volume(this._globalVolume / 100);
+      }
     }
 
     clearAll() {

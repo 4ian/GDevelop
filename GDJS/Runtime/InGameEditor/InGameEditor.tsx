@@ -2207,6 +2207,7 @@ namespace gdjs {
       if (enable) {
         // Nothing to do.
       } else {
+        this._runtimeGame.getSoundManager().unmuteEverything('in-game-editor');
         this._removeSelectionControls();
 
         // Cleanup selection boxes
@@ -3122,6 +3123,8 @@ namespace gdjs {
     updateAndRender() {
       const objectUnderCursor: gdjs.RuntimeObject | null =
         this.getObjectUnderCursor();
+
+      this._runtimeGame.getSoundManager().muteEverything('in-game-editor');
 
       const inputManager = this._runtimeGame.getInputManager();
 

@@ -4,7 +4,6 @@ import * as React from 'react';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 
-import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import EditorMosaic, {
   type EditorMosaicInterface,
@@ -52,29 +51,19 @@ const noop = () => {};
 
 const defaultPanelConfigByEditor = {
   'objects-list': {
-    position: 'end',
-    splitPercentage: 75,
-    direction: 'column',
+    position: 'right',
   },
   properties: {
-    position: 'start',
-    splitPercentage: 25,
-    direction: 'column',
+    position: 'left',
   },
   'object-groups-list': {
-    position: 'end',
-    splitPercentage: 75,
-    direction: 'column',
+    position: 'right',
   },
   'instances-list': {
-    position: 'end',
-    splitPercentage: 75,
-    direction: 'row',
+    position: 'bottom',
   },
   'layers-list': {
-    position: 'end',
-    splitPercentage: 75,
-    direction: 'row',
+    position: 'right',
   },
 };
 
@@ -103,7 +92,6 @@ const MosaicEditorsDisplay = React.forwardRef<
     onExtensionInstalled,
     isActive,
   } = props;
-  const { isMobile } = useResponsiveWindowSize();
   const {
     getDefaultEditorMosaicNode,
     setDefaultEditorMosaicNode,
@@ -165,12 +153,7 @@ const MosaicEditorsDisplay = React.forwardRef<
   const toggleEditorView = React.useCallback((editorId: EditorId) => {
     if (!editorMosaicRef.current) return;
     const config = defaultPanelConfigByEditor[editorId];
-    editorMosaicRef.current.toggleEditor(
-      editorId,
-      config.position,
-      config.splitPercentage,
-      config.direction
-    );
+    editorMosaicRef.current.toggleEditor(editorId, config.position);
   }, []);
   const isEditorVisible = React.useCallback((editorId: EditorId) => {
     if (!editorMosaicRef.current) return false;
@@ -509,7 +492,7 @@ const MosaicEditorsDisplay = React.forwardRef<
   return (
     <EditorMosaic
       editors={editors}
-      limitToOneSecondaryEditor={isMobile}
+      centralNodeId="instances-editor"
       initialNodes={
         getDefaultEditorMosaicNode('scene-editor') || initialMosaicEditorNodes
       }

@@ -1658,6 +1658,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   <EditorMosaic
                     ref={editorMosaic => (this._editorMosaic = editorMosaic)}
                     editors={editors}
+                    centralNodeId="events-sheet"
                     onPersistNodes={node =>
                       setDefaultEditorMosaicNode(
                         'events-functions-extension-editor',

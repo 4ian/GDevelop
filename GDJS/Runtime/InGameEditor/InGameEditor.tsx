@@ -30,6 +30,176 @@ namespace gdjs {
     return node;
   }
 
+  /**
+   * Adapt the Three.js TransformControls gizmos so that the axis are in the same direction as in GDevelop.
+   * This does not change the way the controls work (notably when dragged), it's only a visual adaptation.
+   */
+  const patchAxesOnTransformControlsGizmos = (controls) => {
+    const gizmoRoot = controls && controls._gizmo;
+    if (!gizmoRoot) return controls;
+
+    // Flip gizmo (visual), picker (raycast), and helper (guide lines)
+    const groupsToFlip = ['gizmo', 'picker', 'helper'];
+
+    // Bake axis reflections into geometry so per-frame handle scaling
+    // inside TransformControlsGizmo.updateMatrixWorld() won't undo it.
+    const flipY = new THREE.Matrix4().makeScale(1, -1, 1);
+    const flipX = new THREE.Matrix4().makeScale(-1, 1, 1);
+
+    // For translate mode: flip Y-axis handles
+    const shouldFlipYByName = (name) => name === 'Y' || name === 'XY' || name === 'YZ';
+
+    // For scale mode: flip X-axis handles
+    const shouldFlipXByName = (name) => name === 'X' || name === 'XY' || name === 'XZ';
+
+    // Process translate mode (flip Y)
+    for (const group of groupsToFlip) {
+      const root = gizmoRoot[group] && gizmoRoot[group]['translate'];
+      if (!root) continue;
+
+      root.traverse((obj) => {
+        if (!obj || !obj.geometry) return;
+        const name = obj.name || '';
+        if (!shouldFlipYByName(name)) return;
+
+        // Bake the Y flip directly into the geometry
+        obj.geometry.applyMatrix4(flipY);
+
+        // Keep raycasting bounds correct after mutation
+        if (typeof obj.geometry.computeBoundingBox === 'function') {
+          obj.geometry.computeBoundingBox();
+        }
+        if (typeof obj.geometry.computeBoundingSphere === 'function') {
+          obj.geometry.computeBoundingSphere();
+        }
+      });
+    }
+
+    // Process scale mode (flip X)
+    for (const group of groupsToFlip) {
+      const root = gizmoRoot[group] && gizmoRoot[group]['scale'];
+      if (!root) continue;
+
+      root.traverse((obj) => {
+        if (!obj || !obj.geometry) return;
+        const name = obj.name || '';
+        if (!shouldFlipXByName(name)) return;
+
+        // Bake the X flip directly into the geometry
+        obj.geometry.applyMatrix4(flipX);
+
+        // Keep raycasting bounds correct after mutation
+        if (typeof obj.geometry.computeBoundingBox === 'function') {
+          obj.geometry.computeBoundingBox();
+        }
+        if (typeof obj.geometry.computeBoundingSphere === 'function') {
+          obj.geometry.computeBoundingSphere();
+        }
+      });
+    }
+
+    return controls;
+  }
+
+  const patchColorsOnTransformControlsGizmos = (controls) => {
+    const gizmoRoot = controls && controls._gizmo;
+    if (!gizmoRoot) return controls;
+
+    const colorMap = {
+      x: 0xf53e63,
+      y: 0xa4e507,
+      z: 0x36a9f5,
+      e: 0xffff00,
+      xyz: 0xffffff,
+      xyze: 0x787878,
+      highlight: 0xeeeeee,
+    };
+    const modes = ['translate', 'rotate', 'scale'];
+    const groups = ['gizmo', 'helper'];
+
+    // Helper to determine which color to use based on handle name
+    const getColorForHandle = (name) => {
+      const nameLower = (name || '').toLowerCase();
+
+      if (nameLower === 'xyze') return colorMap.xyze;
+      if (nameLower === 'xyz') return colorMap.xyz;
+      if (nameLower === 'e') return colorMap.e;
+
+      // For plane handles (XY, YZ, XZ), use the color of the missing axis
+      if (nameLower === 'xy') return colorMap.z;
+      if (nameLower === 'yz') return colorMap.x;
+      if (nameLower === 'xz') return colorMap.y;
+
+      // Single axis handles
+      if (nameLower === 'x' || nameLower.includes('x')) return colorMap.x;
+      if (nameLower === 'y' || nameLower.includes('y')) return colorMap.y;
+      if (nameLower === 'z' || nameLower.includes('z')) return colorMap.z;
+
+      return null;
+    };
+
+    // Apply colors to all gizmo materials
+    for (const mode of modes) {
+      for (const group of groups) {
+        const root = gizmoRoot[group] && gizmoRoot[group][mode];
+        if (!root) continue;
+
+        root.traverse((obj) => {
+          if (!obj || !obj.material) return;
+
+          const color = getColorForHandle(obj.name);
+          if (color === null) return;
+
+          // Update the material color and store it as the base color
+          obj.material.color.setHex(color);
+          obj.material._color = obj.material.color.clone();
+          obj.material._opacity = obj.material.opacity;
+        });
+      }
+    }
+
+    // Patch the gizmo's updateMatrixWorld to use custom highlight color
+    if (!gizmoRoot._originalUpdateMatrixWorld) {
+      gizmoRoot._originalUpdateMatrixWorld = gizmoRoot.updateMatrixWorld.bind(gizmoRoot);
+      gizmoRoot._customHighlightColor = colorMap.highlight;
+
+      gizmoRoot.updateMatrixWorld = function(force) {
+        // Call original update first
+        this._originalUpdateMatrixWorld(force);
+
+        // Override the highlight color if an axis is selected
+        if (this.enabled && this.axis) {
+          const modes = ['translate', 'rotate', 'scale'];
+          const groups = ['gizmo', 'helper'];
+
+          for (const mode of modes) {
+            for (const group of groups) {
+              const root = this[group] && this[group][mode];
+              if (!root) continue;
+
+              root.traverse((obj) => {
+                if (!obj || !obj.material) return;
+
+                // Check if this handle should be highlighted
+                const shouldHighlight = obj.name === this.axis ||
+                  this.axis.split('').some(a => obj.name === a);
+
+                if (shouldHighlight) {
+                  // Apply custom highlight color
+                  obj.material.color.setHex(this._customHighlightColor);
+                  obj.material.opacity = 1.0;
+                }
+              });
+            }
+          }
+        }
+      };
+    } else {
+      // Update the stored highlight color if already patched
+      gizmoRoot._customHighlightColor = colorMap.highlight;
+    }
+  }
+
   const getSvgIconUrl = (game: RuntimeGame, resourceName: string) => {
     const resource = game.getResourceLoader().getResource(resourceName);
     if (!resource) return '';
@@ -1935,6 +2105,9 @@ namespace gdjs {
               threeCamera,
               this._runtimeGame.getRenderer().getCanvas() || undefined
             );
+
+            patchAxesOnTransformControlsGizmos(threeTransformControls);
+            patchColorsOnTransformControlsGizmos(threeTransformControls);
             threeTransformControls.rotation.order = 'ZYX';
             threeTransformControls.scale.y = -1;
             threeTransformControls.traverse((obj) => {

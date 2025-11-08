@@ -94,11 +94,11 @@ export default class DebuggerContent extends React.Component<Props, State> {
   };
 
   toggleProfiler = () => {
-    if (this._editors) this._editors.toggleEditor('profiler', 'end', 75, 'row');
+    if (this._editors) this._editors.toggleEditor('profiler', 'bottom');
   };
 
   toggleConsole = () => {
-    if (this._editors) this._editors.toggleEditor('console', 'end', 75, 'row');
+    if (this._editors) this._editors.toggleEditor('console', 'bottom');
   };
 
   render() {
@@ -251,6 +251,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
           <EditorMosaic
             ref={editors => (this._editors = editors)}
             editors={editors}
+            centralNodeId="selected-inspector"
             initialNodes={
               getDefaultEditorMosaicNode('debugger') || initialMosaicEditorNodes
             }

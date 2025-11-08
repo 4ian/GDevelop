@@ -788,118 +788,60 @@ storiesOf('UI Building Blocks/ColorField', module)
     </div>
   ));
 
-storiesOf('UI Building Blocks/EditorMosaic', module)
-  .add('default', () => (
-    <EditorMosaicPlayground
-      renderButtons={({ openEditor }) => (
-        <FlatButton
-          onClick={() => openEditor('thirdEditor', 'end', 65, 'column')}
-          label="Open the third editor"
-        />
-      )}
-      renderEditorMosaic={({ editorRef }) => (
-        <EditorMosaic
-          ref={editorRef}
-          editors={{
-            firstEditor: {
-              type: 'primary',
-              title: t`First editor`,
-              toolbarControls: [],
-              renderEditor: () => (
-                <div>
-                  This is the first editor (left), with title bar but no
-                  controls to close the window.
-                </div>
-              ),
-            },
-            secondEditor: {
-              type: 'primary',
-              noTitleBar: true,
-              renderEditor: () => (
-                <div>
-                  This is the second editor ("central"), without title bar.
-                </div>
-              ),
-            },
-            thirdEditor: {
-              type: 'secondary',
-              title: t`Third editor`,
-              renderEditor: () => <div>This is the third editor (bottom).</div>,
-            },
-          }}
-          initialNodes={{
-            direction: 'column',
-            first: {
-              direction: 'row',
-              first: 'firstEditor',
-              second: 'secondEditor',
-              splitPercentage: 25,
-            },
-            second: 'thirdEditor',
-            splitPercentage: 65,
-          }}
-        />
-      )}
-    />
-  ))
-  .add('limit to one secondary editor', () => (
-    <EditorMosaicPlayground
-      renderButtons={({ openEditor }) => (
-        <React.Fragment>
-          <FlatButton
-            onClick={() => openEditor('firstEditor', 'end', 65, 'column')}
-            label="Open the 1st secondary editor"
-          />
-          <FlatButton
-            onClick={() => openEditor('secondEditor', 'end', 65, 'column')}
-            label="Open the 2nd secondary editor"
-          />
-          <FlatButton
-            onClick={() => openEditor('thirdEditor', 'end', 65, 'column')}
-            label="Open the 3rd secondary editor"
-          />
-        </React.Fragment>
-      )}
-      renderEditorMosaic={({ editorRef }) => (
-        <EditorMosaic
-          limitToOneSecondaryEditor
-          ref={editorRef}
-          editors={{
-            firstEditor: {
-              type: 'secondary',
-              title: t`1st secondary editor`,
-              renderEditor: () => <div>This is a secondary editor.</div>,
-            },
-            secondEditor: {
-              type: 'secondary',
-              title: t`2nd secondary editor`,
-              renderEditor: () => <div>This is another secondary editor.</div>,
-            },
-            thirdEditor: {
-              type: 'secondary',
-              title: t`3rd secondary editor`,
-              renderEditor: () => (
-                <div>This is yet another secondary editor.</div>
-              ),
-            },
-            mainEditor: {
-              type: 'primary',
-              noTitleBar: true,
-              renderEditor: () => (
-                <div>This is the main editor, always shown</div>
-              ),
-            },
-          }}
-          initialNodes={{
+storiesOf('UI Building Blocks/EditorMosaic', module).add('default', () => (
+  <EditorMosaicPlayground
+    renderButtons={({ openEditor }) => (
+      <FlatButton
+        onClick={() => openEditor('thirdEditor', 'bottom')}
+        label="Open the third editor"
+      />
+    )}
+    renderEditorMosaic={({ editorRef }) => (
+      <EditorMosaic
+        ref={editorRef}
+        centralNodeId="secondEditor"
+        editors={{
+          firstEditor: {
+            type: 'primary',
+            title: t`First editor`,
+            toolbarControls: [],
+            renderEditor: () => (
+              <div>
+                This is the first editor (left), with title bar but no controls
+                to close the window.
+              </div>
+            ),
+          },
+          secondEditor: {
+            type: 'primary',
+            noTitleBar: true,
+            renderEditor: () => (
+              <div>
+                This is the second editor ("central"), without title bar.
+              </div>
+            ),
+          },
+          thirdEditor: {
+            type: 'secondary',
+            title: t`Third editor`,
+            renderEditor: () => <div>This is the third editor (bottom).</div>,
+          },
+        }}
+        initialNodes={{
+          direction: 'column',
+          first: {
             direction: 'row',
-            first: 'mainEditor',
-            second: 'firstEditor',
-            splitPercentage: 65,
-          }}
-        />
-      )}
-    />
-  ));
+            first: 'firstEditor',
+            second: 'secondEditor',
+            splitPercentage: 25,
+          },
+          second: 'thirdEditor',
+          splitPercentage: 65,
+        }}
+      />
+    )}
+  />
+));
 
 storiesOf('UI Building Blocks/EditorNavigator', module)
   .addDecorator(paperDecorator)
@@ -908,13 +850,11 @@ storiesOf('UI Building Blocks/EditorNavigator', module)
       renderButtons={({ openEditor }) => (
         <React.Fragment>
           <FlatButton
-            onClick={() => openEditor('thirdEditor', 'end', 65, 'column')}
+            onClick={() => openEditor('thirdEditor', 'bottom')}
             label="Open the third editor"
           />
           <FlatButton
-            onClick={() =>
-              openEditor('noTransitionsEditor', 'end', 65, 'column')
-            }
+            onClick={() => openEditor('noTransitionsEditor', 'bottom')}
             label="Open the editor without transitions"
           />
         </React.Fragment>

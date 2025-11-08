@@ -309,7 +309,11 @@ const PointsEditor = ({
 
   return (
     <div style={{ flex: 1 }}>
-      <EditorMosaic editors={editors} initialNodes={editorNodes} />
+      <EditorMosaic
+        editors={editors}
+        initialNodes={editorNodes}
+        centralNodeId=""
+      />
     </div>
   );
 };

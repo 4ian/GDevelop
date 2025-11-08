@@ -34,9 +34,11 @@ namespace gdjs {
    * Adapt the Three.js TransformControls gizmos so that the axis are in the same direction as in GDevelop.
    * This does not change the way the controls work (notably when dragged), it's only a visual adaptation.
    */
-  const patchAxesOnTransformControlsGizmos = (controls) => {
-    const gizmoRoot = controls && controls._gizmo;
-    if (!gizmoRoot) return controls;
+  const patchAxesOnTransformControlsGizmos = (
+    controls: THREE_ADDONS.TransformControls
+  ) => {
+    const gizmoRoot = controls && (controls as any)._gizmo;
+    if (!gizmoRoot) return;
 
     // Flip gizmo (visual), picker (raycast), and helper (guide lines)
     const groupsToFlip = ['gizmo', 'picker', 'helper'];
@@ -47,10 +49,12 @@ namespace gdjs {
     const flipX = new THREE.Matrix4().makeScale(-1, 1, 1);
 
     // For translate mode: flip Y-axis handles
-    const shouldFlipYByName = (name) => name === 'Y' || name === 'XY' || name === 'YZ';
+    const shouldFlipYByName = (name) =>
+      name === 'Y' || name === 'XY' || name === 'YZ';
 
     // For scale mode: flip X-axis handles
-    const shouldFlipXByName = (name) => name === 'X' || name === 'XY' || name === 'XZ';
+    const shouldFlipXByName = (name) =>
+      name === 'X' || name === 'XY' || name === 'XZ';
 
     // Process translate mode (flip Y)
     for (const group of groupsToFlip) {
@@ -97,13 +101,13 @@ namespace gdjs {
         }
       });
     }
+  };
 
-    return controls;
-  }
-
-  const patchColorsOnTransformControlsGizmos = (controls) => {
-    const gizmoRoot = controls && controls._gizmo;
-    if (!gizmoRoot) return controls;
+  const patchColorsOnTransformControlsGizmos = (
+    controls: THREE_ADDONS.TransformControls
+  ) => {
+    const gizmoRoot = controls && (controls as any)._gizmo;
+    if (!gizmoRoot) return;
 
     const colorMap = {
       x: 0xf53e63,
@@ -160,10 +164,11 @@ namespace gdjs {
 
     // Patch the gizmo's updateMatrixWorld to use custom highlight color
     if (!gizmoRoot._originalUpdateMatrixWorld) {
-      gizmoRoot._originalUpdateMatrixWorld = gizmoRoot.updateMatrixWorld.bind(gizmoRoot);
+      gizmoRoot._originalUpdateMatrixWorld =
+        gizmoRoot.updateMatrixWorld.bind(gizmoRoot);
       gizmoRoot._customHighlightColor = colorMap.highlight;
 
-      gizmoRoot.updateMatrixWorld = function(force) {
+      gizmoRoot.updateMatrixWorld = function (force) {
         // Call original update first
         this._originalUpdateMatrixWorld(force);
 
@@ -181,8 +186,9 @@ namespace gdjs {
                 if (!obj || !obj.material) return;
 
                 // Check if this handle should be highlighted
-                const shouldHighlight = obj.name === this.axis ||
-                  this.axis.split('').some(a => obj.name === a);
+                const shouldHighlight =
+                  obj.name === this.axis ||
+                  this.axis.split('').some((a) => obj.name === a);
 
                 if (shouldHighlight) {
                   // Apply custom highlight color
@@ -198,6 +204,65 @@ namespace gdjs {
       // Update the stored highlight color if already patched
       gizmoRoot._customHighlightColor = colorMap.highlight;
     }
+  };
+
+  function patchNegativeAxisHandlesOnTransformControlsGizmos(
+    controls: THREE_ADDONS.TransformControls
+  ) {
+    const gizmo = (controls as any)._gizmo;
+    if (!gizmo) return;
+
+    // Helper function to remove specific children from gizmo groups
+    function removeNegativeHandles(gizmoGroup, mode) {
+      if (!gizmoGroup || !gizmoGroup.children) return;
+
+      const toRemove: Array<THREE.Mesh> = [];
+      const seenAxes = { X: [], Y: [], Z: [] };
+
+      // First pass: catalog all children by axis
+      gizmoGroup.children.forEach((child) => {
+        if (child.name === 'X' || child.name === 'Y' || child.name === 'Z') {
+          seenAxes[child.name].push(child);
+        }
+      });
+
+      // Second pass: mark negative handles for removal
+      Object.keys(seenAxes).forEach((axisName) => {
+        const axisChildren = seenAxes[axisName];
+
+        if (mode === 'translate' && axisChildren.length >= 2) {
+          // In translate: [positive arrow at index 0, negative arrow at index 1, line at index 2]
+          // Remove the negative arrow (index 1)
+          toRemove.push(axisChildren[1]);
+        } else if (mode === 'scale' && axisChildren.length >= 3) {
+          // In scale: [negative cube at index 0, line at index 1, positive cube at index 2]
+          // Remove the negative cube (index 2)
+          toRemove.push(axisChildren[0]);
+        }
+      });
+
+      // Remove marked children
+      toRemove.forEach((child) => {
+        gizmoGroup.remove(child);
+        if (child.geometry) child.geometry.dispose();
+        if (child.material && Array.isArray(child.material)) {
+          child.material.forEach((material) => material.dispose());
+        } else if (child.material) {
+          child.material.dispose();
+        }
+      });
+    }
+
+    // Only process the visual gizmos, NOT the pickers (which handle interaction)
+    if (gizmo.gizmo && gizmo.gizmo['translate']) {
+      removeNegativeHandles(gizmo.gizmo['translate'], 'translate');
+    }
+
+    if (gizmo.gizmo && gizmo.gizmo['scale']) {
+      removeNegativeHandles(gizmo.gizmo['scale'], 'scale');
+    }
+
+    // Keep the pickers intact for interaction - they're invisible anyway
   }
 
   const getSvgIconUrl = (game: RuntimeGame, resourceName: string) => {
@@ -2105,9 +2170,12 @@ namespace gdjs {
               threeCamera,
               this._runtimeGame.getRenderer().getCanvas() || undefined
             );
-
             patchAxesOnTransformControlsGizmos(threeTransformControls);
             patchColorsOnTransformControlsGizmos(threeTransformControls);
+            patchNegativeAxisHandlesOnTransformControlsGizmos(
+              threeTransformControls
+            );
+
             threeTransformControls.rotation.order = 'ZYX';
             threeTransformControls.scale.y = -1;
             threeTransformControls.traverse((obj) => {

@@ -5,7 +5,7 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import { mapReverseFor } from '../Utils/MapFor';
 import LayerRow, { styles } from './LayerRow';
 import BackgroundColorRow from './BackgroundColorRow';
-import { Column, Line } from '../UI/Grid';
+import { Column } from '../UI/Grid';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import ScrollView from '../UI/ScrollView';
 import { FullSizeMeasurer } from '../UI/FullSizeMeasurer';
@@ -19,7 +19,9 @@ import Add from '../UI/CustomSvgIcons/Add';
 import { addDefaultLightToLayer } from '../ProjectCreation/CreateProject';
 import { getEffects2DCount, getEffects3DCount } from '../EffectsList';
 import ErrorBoundary from '../UI/ErrorBoundary';
-import Toggle from '../UI/Toggle';
+import IconButton from '../UI/IconButton';
+import LightbulbIcon from '../UI/CustomSvgIcons/Lightbulb';
+import { LineStackLayout } from '../UI/Layout';
 
 const gd: libGDevelop = global.gd;
 
@@ -335,36 +337,42 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
             )}
           </FullSizeMeasurer>
           <Column>
-            <Line noMargin>
-              <Line>
-                <Toggle
-                  onToggle={(e, check) => {
-                    project.setEffectsHiddenInEditor(!check);
-                    props.onLayersVisibilityInEditorChanged();
-                    forceUpdate();
-                  }}
-                  toggled={!project.areEffectsHiddenInEditor()}
-                  labelPosition="right"
-                  label={<Trans>Show effects</Trans>}
-                />
-              </Line>
-              <Line justifyContent="flex-end" expand>
-                <RaisedButtonWithSplitMenu
-                  label={<Trans>Add a layer</Trans>}
-                  id="add-layer-button"
-                  primary
-                  onClick={addLayer}
-                  icon={<Add />}
-                  buildMenuTemplate={i18n => [
-                    {
-                      label: i18n._(t`Add lighting layer`),
-                      enabled: !isLightingLayerPresent,
-                      click: addLightingLayer,
-                    },
-                  ]}
-                />
-              </Line>
-            </Line>
+            <LineStackLayout justifyContent="flex-end" expand>
+              <IconButton
+                size="small"
+                color="default"
+                id={'show-effects-button'}
+                onClick={() => {
+                  project.setEffectsHiddenInEditor(
+                    !project.areEffectsHiddenInEditor()
+                  );
+                  props.onLayersVisibilityInEditorChanged();
+                  forceUpdate();
+                }}
+                selected={!project.areEffectsHiddenInEditor()}
+                tooltip={
+                  !project.areEffectsHiddenInEditor()
+                    ? t`Disable effects/lighting in the editor`
+                    : t`Display effects/lighting in the editor`
+                }
+              >
+                <LightbulbIcon />
+              </IconButton>
+              <RaisedButtonWithSplitMenu
+                label={<Trans>Add a layer</Trans>}
+                id="add-layer-button"
+                primary
+                onClick={addLayer}
+                icon={<Add />}
+                buildMenuTemplate={i18n => [
+                  {
+                    label: i18n._(t`Add 2D lighting layer`),
+                    enabled: !isLightingLayerPresent,
+                    click: addLightingLayer,
+                  },
+                ]}
+              />
+            </LineStackLayout>
           </Column>
         </ScrollView>
       </Background>

@@ -309,12 +309,18 @@ namespace gdjs {
   const Y_KEY = 89;
   const Z_KEY = 90;
   const ESC_KEY = 27;
+  const EQUAL_KEY = 187;
+  const MINUS_KEY = 189;
 
   const exceptionallyGetKeyCodeFromLocationAwareKeyCode = (
     locationAwareKeyCode: number
   ): number => {
     return locationAwareKeyCode % 1000;
   };
+
+  // See same factors in `newIDE/app/src/Utils/ZoomUtils.js`.
+  const zoomInFactor = Math.pow(2, 2 * 1 / 16);
+  const zoomOutFactor = Math.pow(2, -2 * 1 / 16);
 
   const instanceStateFlag = {
     selected: 1,
@@ -4320,6 +4326,15 @@ namespace gdjs {
           this._editorCamera.onHasCameraChanged();
         }
 
+        // Movement with keyboard: zoom in/out.
+        if (isControlOrCmdPressed(inputManager)) {
+          if (inputManager.wasKeyJustPressed(EQUAL_KEY)) {
+            this.zoomBy(zoomInFactor);
+          } else if (inputManager.wasKeyJustPressed(MINUS_KEY)) {
+            this.zoomBy(zoomOutFactor);
+          }
+        }
+
         // Touch gestures
         const touchIds = getCurrentTouchIdentifiers(inputManager);
         const touchCount = touchIds.length;
@@ -4634,6 +4649,15 @@ namespace gdjs {
           }
           if (inputManager.isKeyPressed(E_KEY)) {
             moveCameraByVector(up, moveSpeed);
+          }
+        }
+
+        // Movement with keyboard: zoom in/out.
+        if (isControlOrCmdPressed(inputManager)) {
+          if (inputManager.wasKeyJustPressed(EQUAL_KEY)) {
+            this.zoomBy(zoomInFactor);
+          } else if (inputManager.wasKeyJustPressed(MINUS_KEY)) {
+            this.zoomBy(zoomOutFactor);
           }
         }
 

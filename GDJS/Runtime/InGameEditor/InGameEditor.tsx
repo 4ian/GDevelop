@@ -1637,7 +1637,24 @@ namespace gdjs {
 
     private _handleSelectedObjectDragging(): void {
       const inputManager = this._runtimeGame.getInputManager();
+
+      // Always check first if we should end an existing drag.
+      if (
+        this._draggedSelectedObject &&
+        (inputManager.isMouseButtonReleased(0) ||
+          !this._shouldDragSelectedObject())
+      ) {
+        this._draggedSelectedObject = null;
+        const changeHappened = this._objectMover.endMove();
+        this._sendSelectionUpdate({
+          hasSelectedObjectBeenModified: changeHappened,
+        });
+      }
+
+      // Inspect then if a drag should be started or continued.
       if (!this._shouldDragSelectedObject()) {
+        // We can early return as the rest is not applicable (we've already checked
+        // if a drag should be ended).
         return;
       }
       if (!this._currentScene) return;
@@ -1648,6 +1665,7 @@ namespace gdjs {
         inputManager.isMouseButtonPressed(0) &&
         !this._draggedSelectedObject
       ) {
+        // Start a new drag.
         let object = this.getObjectUnderCursor();
         if (object && this._selection.getSelectedObjects().includes(object)) {
           if (isControlOrCmdPressed(inputManager)) {
@@ -1666,6 +1684,7 @@ namespace gdjs {
         }
       }
 
+      // Continue an existing drag.
       if (!this._draggedSelectedObject) {
         return;
       }
@@ -1725,14 +1744,6 @@ namespace gdjs {
         this._selection.getSelectedObjects(),
         this._draggedSelectedObjectTotalDelta
       );
-
-      if (inputManager.isMouseButtonReleased(0)) {
-        this._draggedSelectedObject = null;
-        const changeHappened = this._objectMover.endMove();
-        this._sendSelectionUpdate({
-          hasSelectedObjectBeenModified: changeHappened,
-        });
-      }
     }
 
     private _duplicateSelectedObjects(

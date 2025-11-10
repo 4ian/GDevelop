@@ -842,6 +842,14 @@ namespace gdjs {
     private _previousCursorX: float = 0;
     private _previousCursorY: float = 0;
 
+    private _lastClickOnObjectUnderCursor: {
+      object: gdjs.RuntimeObject | null;
+      time: number;
+    } = {
+      object: null,
+      time: 0,
+    };
+
     // Dragged new object:
     private _draggedNewObject: gdjs.RuntimeObject | null = null;
     private _draggedSelectedObject: gdjs.RuntimeObject | null = null;
@@ -1956,6 +1964,7 @@ namespace gdjs {
         if (!isShiftPressed(inputManager)) {
           this._selection.clear();
         }
+        let objectToEdit: gdjs.RuntimeObject | null = null;
         if (objectUnderCursor) {
           const layer = this.getEditorLayer(objectUnderCursor.getLayer());
           if (
@@ -1965,8 +1974,28 @@ namespace gdjs {
           ) {
             this._selection.toggle(objectUnderCursor);
           }
+
+          if (
+            this._lastClickOnObjectUnderCursor.object === objectUnderCursor &&
+            Date.now() - this._lastClickOnObjectUnderCursor.time < 400
+          ) {
+            // Double click on the same object: edit the object.
+            objectToEdit = objectUnderCursor;
+
+            this._lastClickOnObjectUnderCursor = {
+              object: null,
+              time: 0,
+            };
+          } else {
+            this._lastClickOnObjectUnderCursor = {
+              object: objectUnderCursor,
+              time: Date.now(),
+            };
+          }
         }
-        this._sendSelectionUpdate();
+        this._sendSelectionUpdate({
+          objectToEdit,
+        });
       }
 
       if (shouldDeleteSelection(inputManager)) {
@@ -2458,6 +2487,7 @@ namespace gdjs {
       isSendingBackSelectionForDefaultSize?: boolean;
       addedObjects?: Array<gdjs.RuntimeObject>;
       removedObjects?: Array<gdjs.RuntimeObject>;
+      objectToEdit?: gdjs.RuntimeObject | null;
     }) {
       const debuggerClient = this._runtimeGame._debuggerClient;
       if (!debuggerClient) return;
@@ -2524,6 +2554,7 @@ namespace gdjs {
           this._selection.getSelectedObjects()
         ),
         removedInstances: getPersistentUuidsFromObjects(removedInstances),
+        objectNameToEdit: options && options.objectToEdit ? options.objectToEdit.getName() : null,
       });
     }
 

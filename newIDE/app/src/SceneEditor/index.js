@@ -163,6 +163,7 @@ type InstanceChanges = {|
   addedInstances: Array<InstanceData>,
   selectedInstances: Array<SelectedInstanceData>,
   removedInstances: Array<InstancePersistentUuidData>,
+  objectNameToEdit: string | null,
 |};
 
 export type EditorId =
@@ -558,6 +559,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         ignoreSeal: true,
       });
       this._selectObjectOfInstances(newlySelectedInstances);
+    }
+
+    if (changes.objectNameToEdit) {
+      this.editObjectInPropertiesPanel(changes.objectNameToEdit);
     }
   }
 

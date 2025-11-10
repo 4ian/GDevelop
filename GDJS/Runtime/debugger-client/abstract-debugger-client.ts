@@ -794,6 +794,7 @@ namespace gdjs {
       addedInstances: Array<InstanceData>;
       selectedInstances: Array<InstancePersistentUuidData>;
       removedInstances: Array<InstancePersistentUuidData>;
+      objectNameToEdit: string | null;
     }): void {
       const inGameEditor = this._runtimegame.getInGameEditor();
       if (!inGameEditor) {

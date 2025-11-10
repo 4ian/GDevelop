@@ -1604,6 +1604,28 @@ const MainFrame = (props: Props) => {
     [notifyChangesToInGameEditor]
   );
 
+  const [
+    showRestartInGameEditorAfterErrorButton,
+    setShowRestartInGameEditorAfterErrorButton,
+  ] = React.useState(false);
+  const onRestartInGameEditor = React.useCallback(
+    () => {
+      setShowRestartInGameEditorAfterErrorButton(false);
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: true,
+        shouldReloadResources: true,
+        shouldHardReload: true,
+        reasons: [
+          showRestartInGameEditorAfterErrorButton
+            ? 'relaunched-after-uncaught-error-or-hot-reload-error'
+            : 'relaunched-manually',
+        ],
+      });
+    },
+    [notifyChangesToInGameEditor, showRestartInGameEditorAfterErrorButton]
+  );
+
   React.useEffect(
     () => {
       if (gameEditorMode === 'embedded-game') {
@@ -4480,6 +4502,7 @@ const MainFrame = (props: Props) => {
     onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
     onOpenCommandPalette: openCommandPalette,
     onOpenProfile: onOpenProfileDialog,
+    onRestartInGameEditor,
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(
@@ -4668,6 +4691,9 @@ const MainFrame = (props: Props) => {
     onExternalLayoutAssociationChanged,
     gamesList: gamesList,
     triggerHotReloadInGameEditorIfNeeded,
+    onRestartInGameEditorAfterError: showRestartInGameEditorAfterErrorButton
+      ? onRestartInGameEditor
+      : null,
   };
 
   const hasEditorsInLeftPane = hasEditorsInPane(state.editorTabs, 'left');
@@ -4982,6 +5008,7 @@ const MainFrame = (props: Props) => {
       )}
       {(editorHotReloadLogs.length > 0 || editorUncaughtError !== null) && (
         <HotReloadLogsDialog
+          isForEditor
           logs={
             editorUncaughtError
               ? [
@@ -4993,17 +5020,12 @@ const MainFrame = (props: Props) => {
           onClose={() => {
             clearEditorHotReloadLogs();
             clearEditorUncaughtError();
+            setShowRestartInGameEditorAfterErrorButton(true);
           }}
           onLaunchNewPreview={() => {
             clearEditorHotReloadLogs();
             clearEditorUncaughtError();
-            notifyChangesToInGameEditor({
-              shouldReloadProjectData: true,
-              shouldReloadLibraries: true,
-              shouldReloadResources: true,
-              shouldHardReload: true,
-              reasons: ['relaunched-after-uncaught-error-or-hot-reload-error'],
-            });
+            onRestartInGameEditor();
           }}
         />
       )}

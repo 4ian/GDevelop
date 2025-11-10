@@ -150,6 +150,7 @@ export type SceneEditorsDisplayProps = {|
   instancesEditorShortcutsCallbacks: InstancesEditorShortcutsCallbacks,
 
   onOpenedEditorsChanged: () => void,
+  onRestartInGameEditorAfterError: (() => void) | null,
 |};
 
 export type SceneEditorsDisplayInterface = {|

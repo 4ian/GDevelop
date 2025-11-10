@@ -83,6 +83,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     onInstancesModified,
     onExtensionInstalled,
     isActive,
+    onRestartInGameEditorAfterError,
   } = props;
   const selectedInstances = props.instancesSelection.getSelectedInstances();
   const { values } = React.useContext(PreferencesContext);
@@ -296,6 +297,9 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
               <EmbeddedGameFrameHole
                 marginBottom={bottomContainerHeight}
                 isActive={isActive}
+                onRestartInGameEditorAfterError={
+                  onRestartInGameEditorAfterError
+                }
               />
             ) : (
               <InstancesEditor

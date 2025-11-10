@@ -186,6 +186,7 @@ type Props = {|
   editorId: string,
   gameEditorMode: 'embedded-game' | 'instances-editor',
   setGameEditorMode: ('embedded-game' | 'instances-editor') => void,
+  onRestartInGameEditorAfterError: (() => void) | null,
   project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   layout: gdLayout | null,
@@ -2668,6 +2669,9 @@ export default class SceneEditor extends React.Component<Props, State> {
               <EditorsDisplay
                 ref={ref => (this.editorDisplay = ref)}
                 gameEditorMode={this.props.gameEditorMode}
+                onRestartInGameEditorAfterError={
+                  this.props.onRestartInGameEditorAfterError
+                }
                 project={project}
                 layout={layout}
                 eventsFunctionsExtension={eventsFunctionsExtension}

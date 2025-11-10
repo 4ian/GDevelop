@@ -13,12 +13,14 @@ type Props = {|
   logs: Array<HotReloaderLog>,
   onClose: () => void,
   onLaunchNewPreview: () => void,
+  isForEditor?: boolean,
 |};
 
 const shouldDisplayDialogForLogs = logs =>
   logs.filter(log => log.kind === 'error' || log.kind === 'fatal').length > 0;
 
 export default function HotReloadLogsDialog({
+  isForEditor,
   onClose,
   onLaunchNewPreview,
   logs,
@@ -29,7 +31,13 @@ export default function HotReloadLogsDialog({
 
   return (
     <Dialog
-      title={<Trans>Restarting the preview from scratch is required</Trans>}
+      title={
+        isForEditor ? (
+          <Trans>The 3D editor or the game crashed</Trans>
+        ) : (
+          <Trans>Restarting the preview from scratch is required</Trans>
+        )
+      }
       actions={[
         <FlatButton
           label={<Trans>Close</Trans>}
@@ -39,7 +47,13 @@ export default function HotReloadLogsDialog({
         />,
         <DialogPrimaryButton
           icon={<PreviewIcon />}
-          label={<Trans>Close and launch a new preview</Trans>}
+          label={
+            isForEditor ? (
+              <Trans>Relaunch the 3D editor</Trans>
+            ) : (
+              <Trans>Close and launch a new preview</Trans>
+            )
+          }
           key="new-preview"
           primary
           onClick={onLaunchNewPreview}
@@ -54,9 +68,19 @@ export default function HotReloadLogsDialog({
       <ColumnStackLayout noMargin>
         <Text>
           <Trans>
-            Your latest changes could not be applied to the preview(s) being
-            run. You should start a new preview instead to make sure that all
-            your changes are reflected in the game.
+            {isForEditor ? (
+              <Trans>
+                The 3D editor, or some logic/code inside the game, has
+                encountered an unhandled exception or error. It's necessary to
+                restart the 3D editor.
+              </Trans>
+            ) : (
+              <Trans>
+                Your latest changes could not be applied to the preview(s) being
+                run. You should start a new preview instead to make sure that
+                all your changes are reflected in the game.
+              </Trans>
+            )}
           </Trans>
         </Text>
       </ColumnStackLayout>

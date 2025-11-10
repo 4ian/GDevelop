@@ -20,6 +20,7 @@ export type CommandName =
   | 'INVITE_COLLABORATORS'
   | 'OPEN_RECENT_PROJECT'
   | 'OPEN_COMMAND_PALETTE'
+  | 'RESTART_IN_GAME_EDITOR'
   | 'OPEN_PROJECT_PROPERTIES'
   | 'OPEN_PROJECT_LOADING_SCREEN'
   | 'OPEN_PROJECT_VARIABLES'
@@ -161,6 +162,10 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     area: 'IDE',
     displayText: t`Open command palette`,
     ghost: true,
+  },
+  RESTART_IN_GAME_EDITOR: {
+    area: 'IDE',
+    displayText: t`Restart 3D editor`,
   },
 
   // Project manager commands

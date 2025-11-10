@@ -82,6 +82,7 @@ export type RenderEditorContainerProps = {|
   |}) => void,
   previewDebuggerServer: ?PreviewDebuggerServer,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
+  onRestartInGameEditorAfterError: (() => void) | null,
 
   // Opening other editors:
   onOpenExternalEvents: string => void,

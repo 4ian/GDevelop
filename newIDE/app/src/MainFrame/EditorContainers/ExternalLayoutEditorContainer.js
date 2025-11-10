@@ -332,6 +332,9 @@ export class ExternalLayoutEditorContainer extends React.Component<
             editorId={this.props.editorId}
             gameEditorMode={this.props.gameEditorMode}
             setGameEditorMode={this.props.setGameEditorMode}
+            onRestartInGameEditorAfterError={
+              this.props.onRestartInGameEditorAfterError
+            }
             setToolbar={this.props.setToolbar}
             resourceManagementProps={this.props.resourceManagementProps}
             unsavedChanges={this.props.unsavedChanges}

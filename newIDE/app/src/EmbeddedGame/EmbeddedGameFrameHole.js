@@ -45,6 +45,7 @@ export const getActiveEmbeddedGameFrameHoleRect = (): ?ClientRect => {
 
 type Props = {|
   isActive: boolean,
+  onRestartInGameEditorAfterError: (() => void) | null,
   marginBottom?: number,
 |};
 
@@ -68,10 +69,25 @@ export const EmbeddedGameFrameHole = (props: Props) => {
     <div
       style={{
         height: `calc(100% - ${props.marginBottom || 0}px)`,
+        display: 'flex',
+        justifyContent: 'flex-end',
+        alignItems: 'flex-start',
+        boxSizing: 'border-box',
         // Uncomment this to debug the embedded game frame hole placement.
         // backgroundColor: 'rgba(255, 255, 0, 0.5)',
       }}
       id={props.isActive ? embeddedGameFrameHoleId : undefined}
-    />
+    >
+      {props.onRestartInGameEditorAfterError && (
+        <button
+          style={{
+            pointerEvents: 'all',
+          }}
+          onClick={props.onRestartInGameEditorAfterError}
+        >
+          Restart 3D editor
+        </button>
+      )}
+    </div>
   );
 };

@@ -96,7 +96,6 @@ import {
   setCameraState,
 } from '../EmbeddedGame/EmbeddedGameFrame';
 import Rectangle from '../Utils/Rectangle';
-import { mapVector } from '../Utils/MapFor';
 
 const gd: libGDevelop = global.gd;
 

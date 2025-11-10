@@ -2929,6 +2929,9 @@ interface UsedExtensionsFinder {
   [Value] UsedExtensionsResult STATIC_ScanEventsFunctionsExtension(
     [Ref] Project project, [Const, Ref]
     EventsFunctionsExtension eventsFunctionsExtension);
+  [Value] VectorString STATIC_FindExtensionsDependentOn(
+    [Ref] Project project, [Const, Ref]
+    EventsFunctionsExtension eventsFunctionsExtension);
 };
 
 interface UsedObjectTypeFinder {

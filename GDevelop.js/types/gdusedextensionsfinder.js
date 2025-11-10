@@ -2,6 +2,7 @@
 declare class gdUsedExtensionsFinder {
   static scanProject(project: gdProject): gdUsedExtensionsResult;
   static scanEventsFunctionsExtension(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension): gdUsedExtensionsResult;
+  static findExtensionsDependentOn(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension): gdVectorString;
   delete(): void;
   ptr: number;
 };

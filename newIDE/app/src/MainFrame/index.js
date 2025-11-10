@@ -429,7 +429,11 @@ const MainFrame = (props: Props) => {
     standaloneDialogOpen,
     setStandaloneDialogOpen,
   ] = React.useState<boolean>(false);
-  const { showConfirmation, showAlert } = useAlertDialog();
+  const {
+    showConfirmation,
+    showAlert,
+    showDeleteConfirmation,
+  } = useAlertDialog();
   const preferences = React.useContext(PreferencesContext);
   const { setHasProjectOpened } = preferences;
   const [previewLoading, setPreviewLoading] = React.useState<boolean>(false);
@@ -1442,19 +1446,42 @@ const MainFrame = (props: Props) => {
     });
   };
 
-  const deleteEventsFunctionsExtension = (
+  const deleteEventsFunctionsExtension = async (
     eventsFunctionsExtension: gdEventsFunctionsExtension
   ) => {
     const { currentProject } = state;
     const { i18n } = props;
     if (!currentProject) return;
 
-    const answer = Window.showConfirmDialog(
-      i18n._(
-        t`Are you sure you want to remove this extension? This can't be undone.`
-      )
-    );
-    if (!answer) return;
+    const dependentExtensionNames = gd.UsedExtensionsFinder.findExtensionsDependentOn(
+      currentProject,
+      eventsFunctionsExtension
+    ).toJSArray();
+
+    const deleteAnswer = await showDeleteConfirmation({
+      title: t`Remove the extension`,
+      message: t`${
+        dependentExtensionNames.length > 0
+          ? i18n._(
+              `This extension is used by the following extensions:${'\n\n' +
+                dependentExtensionNames
+                  .map(
+                    extensionName =>
+                      `- ${(currentProject.hasEventsFunctionsExtensionNamed(
+                        extensionName
+                      )
+                        ? currentProject
+                            .getEventsFunctionsExtension(extensionName)
+                            .getFullName()
+                        : extensionName) || extensionName}\n`
+                  )
+                  .join('') +
+                '\n'}`
+            )
+          : ''
+      }Are you sure you want to remove this extension? This can't be undone.`,
+    });
+    if (!deleteAnswer) return;
 
     const extensionName = eventsFunctionsExtension.getName();
     const hasCustomObject =

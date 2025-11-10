@@ -311,6 +311,9 @@ namespace gdjs {
   const ESC_KEY = 27;
   const EQUAL_KEY = 187;
   const MINUS_KEY = 189;
+  const KEY_DIGIT_1 = 49;
+  const KEY_DIGIT_2 = 50;
+  const KEY_DIGIT_3 = 51;
 
   const exceptionallyGetKeyCodeFromLocationAwareKeyCode = (
     locationAwareKeyCode: number
@@ -319,8 +322,8 @@ namespace gdjs {
   };
 
   // See same factors in `newIDE/app/src/Utils/ZoomUtils.js`.
-  const zoomInFactor = Math.pow(2, 2 * 1 / 16);
-  const zoomOutFactor = Math.pow(2, -2 * 1 / 16);
+  const zoomInFactor = Math.pow(2, (2 * 1) / 16);
+  const zoomOutFactor = Math.pow(2, (-2 * 1) / 16);
 
   const instanceStateFlag = {
     selected: 1,
@@ -369,12 +372,6 @@ namespace gdjs {
       hasWindowFocus = false;
     });
   }
-
-  const transformControlsModes: ['translate', 'rotate', 'scale'] = [
-    'translate',
-    'rotate',
-    'scale',
-  ];
 
   function isDefined<T>(value: T | null | undefined): value is NonNullable<T> {
     return value !== null && value !== undefined;
@@ -1956,28 +1953,20 @@ namespace gdjs {
         inputManager.isMouseButtonReleased(0) &&
         this._hasCursorStayedStillWhilePressed({ toleranceRadius: 10 })
       ) {
-        if (
-          !isShiftPressed(inputManager) &&
-          !this._shouldDragSelectedObject() &&
-          this._selection.getLastSelectedObject() === objectUnderCursor
-        ) {
-          this._swapTransformControlsMode();
-        } else {
-          if (!isShiftPressed(inputManager)) {
-            this._selection.clear();
-          }
-          if (objectUnderCursor) {
-            const layer = this.getEditorLayer(objectUnderCursor.getLayer());
-            if (
-              layer &&
-              !layer._initialLayerData.isLocked &&
-              !this.isInstanceSealed(objectUnderCursor)
-            ) {
-              this._selection.toggle(objectUnderCursor);
-            }
-          }
-          this._sendSelectionUpdate();
+        if (!isShiftPressed(inputManager)) {
+          this._selection.clear();
         }
+        if (objectUnderCursor) {
+          const layer = this.getEditorLayer(objectUnderCursor.getLayer());
+          if (
+            layer &&
+            !layer._initialLayerData.isLocked &&
+            !this.isInstanceSealed(objectUnderCursor)
+          ) {
+            this._selection.toggle(objectUnderCursor);
+          }
+        }
+        this._sendSelectionUpdate();
       }
 
       if (shouldDeleteSelection(inputManager)) {
@@ -2056,22 +2045,6 @@ namespace gdjs {
       const objectBoxHelper = new ObjectSelectionBoxHelper(object);
       threeGroup.add(objectBoxHelper.container);
       this._selectionBoxes.set(object, objectBoxHelper);
-    }
-
-    private _swapTransformControlsMode(): void {
-      if (!this._selectionControls) {
-        return;
-      }
-      this._setTransformControlsMode(
-        transformControlsModes[
-          gdjs.evtTools.common.mod(
-            transformControlsModes.indexOf(
-              this._selectionControls.threeTransformControls.mode
-            ) + 1,
-            transformControlsModes.length
-          )
-        ]
-      );
     }
 
     private _getTransformControlsMode():
@@ -3348,6 +3321,17 @@ namespace gdjs {
       }
     }
 
+    private _handleTransformControlsMode() {
+      const inputManager = this._runtimeGame.getInputManager();
+      if (inputManager.wasKeyJustPressed(KEY_DIGIT_1)) {
+        this._setTransformControlsMode('translate');
+      } else if (inputManager.wasKeyJustPressed(KEY_DIGIT_2)) {
+        this._setTransformControlsMode('rotate');
+      } else if (inputManager.wasKeyJustPressed(KEY_DIGIT_3)) {
+        this._setTransformControlsMode('scale');
+      }
+    }
+
     updateTargetFramerate(elapsedTime: float) {
       const inputManager = this._runtimeGame.getInputManager();
       if (
@@ -3412,6 +3396,7 @@ namespace gdjs {
           !!this._selectionControls.threeTransformControls.axis;
       }
 
+      this._handleTransformControlsMode();
       this._handleCameraMovement();
       this._handleSelectedObjectDragging();
       this._handleSelectionMovement();
@@ -3648,7 +3633,7 @@ namespace gdjs {
                 class="InGameEditor-Toolbar-Button"
                 id="move-button"
                 onClick={() => this._setTransformControlsMode('translate')}
-                title="Move (translate) selection"
+                title="Move (translate) selection (1)"
               >
                 {makeIcon({
                   svgIconUrl: this._getSvgIconUrl('InGameEditor-MoveIcon'),
@@ -3658,7 +3643,7 @@ namespace gdjs {
                 class="InGameEditor-Toolbar-Button"
                 id="rotate-button"
                 onClick={() => this._setTransformControlsMode('rotate')}
-                title="Rotate selection"
+                title="Rotate selection (2)"
               >
                 {makeIcon({
                   svgIconUrl: this._getSvgIconUrl('InGameEditor-RotateIcon'),
@@ -3668,7 +3653,7 @@ namespace gdjs {
                 class="InGameEditor-Toolbar-Button"
                 id="scale-button"
                 onClick={() => this._setTransformControlsMode('scale')}
-                title="Resize selection"
+                title="Resize selection (3)"
               >
                 {makeIcon({
                   svgIconUrl: this._getSvgIconUrl('InGameEditor-ResizeIcon'),

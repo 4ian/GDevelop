@@ -1945,11 +1945,18 @@ namespace gdjs {
       const editedInstanceContainer = this.getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
 
-      if (this._isTransformControlsHovered) {
-        return;
-      }
-
       const inputManager = this._runtimeGame.getInputManager();
+
+      if (shouldDeleteSelection(inputManager)) {
+        const removedObjects = this._selection.getSelectedObjects();
+        removedObjects.forEach((object) => {
+          object.deleteFromScene();
+        });
+        this._selection.clear();
+        this._sendSelectionUpdate({
+          removedObjects,
+        });
+      }
 
       if (inputManager.wasKeyJustPressed(ESC_KEY)) {
         this._selection.clear();
@@ -1958,6 +1965,7 @@ namespace gdjs {
 
       // Left click: select the object under the cursor.
       if (
+        !this._isTransformControlsHovered &&
         inputManager.isMouseButtonReleased(0) &&
         this._hasCursorStayedStillWhilePressed({ toleranceRadius: 10 })
       ) {
@@ -1995,17 +2003,6 @@ namespace gdjs {
         }
         this._sendSelectionUpdate({
           objectToEdit,
-        });
-      }
-
-      if (shouldDeleteSelection(inputManager)) {
-        const removedObjects = this._selection.getSelectedObjects();
-        removedObjects.forEach((object) => {
-          object.deleteFromScene();
-        });
-        this._selection.clear();
-        this._sendSelectionUpdate({
-          removedObjects,
         });
       }
     }

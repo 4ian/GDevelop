@@ -22,6 +22,7 @@ export const Default = () => (
     onApply={() => action('Apply changes')}
     onEditVariables={() => action('Edit variables')}
     resourceManagementProps={fakeResourceManagementProps}
+    onBackgroundColorChanged={() => action('onBackgroundColorChanged')}
   />
 );
 
@@ -35,5 +36,6 @@ export const MoreSettings = () => (
     onEditVariables={() => action('Edit variables')}
     onOpenMoreSettings={() => action('Open more settings')}
     resourceManagementProps={fakeResourceManagementProps}
+    onBackgroundColorChanged={() => action('onBackgroundColorChanged')}
   />
 );

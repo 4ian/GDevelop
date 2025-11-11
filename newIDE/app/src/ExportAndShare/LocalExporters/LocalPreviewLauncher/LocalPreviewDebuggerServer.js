@@ -13,6 +13,8 @@ let debuggerServerState: 'started' | 'stopped' = 'stopped';
 let debuggerServerAddress: ?ServerAddress = null;
 const callbacksList: Array<PreviewDebuggerServerCallbacks> = [];
 const debuggerIds: Array<DebuggerId> = [];
+const responseCallbacks = new Map<number, (value: Object) => void>();
+let nextMessageWithResponseId = 1;
 
 const removeServerListeners = () => {
   if (!ipcRenderer) return;
@@ -30,8 +32,8 @@ const removeServerListeners = () => {
  * A debugger server implemented using Electron (this one is just a bridge to it,
  * communicating through events with it).
  */
-export const localPreviewDebuggerServer: PreviewDebuggerServer = {
-  startServer: () => {
+class LocalPreviewDebuggerServer {
+  startServer() {
     if (!ipcRenderer) return Promise.reject();
     if (debuggerServerState === 'started') return Promise.resolve();
 
@@ -99,18 +101,32 @@ export const localPreviewDebuggerServer: PreviewDebuggerServer = {
       });
 
       ipcRenderer.on('debugger-message-received', (event, { id, message }) => {
-        console.info('Processing message received for debugger');
+        let parsedMessage = null;
         try {
-          const parsedMessage = JSON.parse(message);
-          callbacksList.forEach(({ onHandleParsedMessage }) =>
-            onHandleParsedMessage({ id, parsedMessage })
-          );
+          parsedMessage = JSON.parse(message);
         } catch (e) {
           console.warn(
             'Error while parsing message received from debugger client:',
             e
           );
         }
+
+        if (parsedMessage && parsedMessage.messageId) {
+          const answerCallback = responseCallbacks.get(parsedMessage.messageId);
+          if (answerCallback) {
+            answerCallback(parsedMessage);
+            responseCallbacks.delete(parsedMessage.messageId);
+          } else {
+            console.warn(
+              `Discarding response for messageId=${
+                parsedMessage.messageId
+              } - already handled or invalid id.`
+            );
+          }
+        }
+        callbacksList.forEach(({ onHandleParsedMessage }) =>
+          onHandleParsedMessage({ id, parsedMessage })
+        );
       });
       ipcRenderer.send('debugger-start-server');
     });
@@ -127,8 +143,8 @@ export const localPreviewDebuggerServer: PreviewDebuggerServer = {
       }, 5000);
     });
     return Promise.race([serverStartPromise, serverStartTimeoutPromise]);
-  },
-  sendMessage: (id: DebuggerId, message: Object) => {
+  }
+  sendMessage(id: DebuggerId, message: Object) {
     if (!ipcRenderer) return;
     if (debuggerServerState === 'stopped') {
       console.error('Cannot send message when debugger server is stopped.');
@@ -139,18 +155,71 @@ export const localPreviewDebuggerServer: PreviewDebuggerServer = {
       id,
       message: JSON.stringify(message),
     });
-  },
-  getServerState: () => debuggerServerState,
-  getExistingDebuggerIds: () => debuggerIds,
-  registerCallbacks: (callbacks: PreviewDebuggerServerCallbacks) => {
+  }
+  sendMessageWithResponse(message: Object): Promise<Object> {
+    const messageId = nextMessageWithResponseId;
+    nextMessageWithResponseId++;
+    for (const id of debuggerIds) {
+      this.sendMessage(id, { ...message, messageId });
+    }
+
+    const timeout = 1000;
+    const promise = new Promise<Object>((resolve, reject) => {
+      responseCallbacks.set(messageId, resolve);
+      setTimeout(() => {
+        reject(
+          new Error(
+            `Timeout while waiting for response from the debugger(s) for message with id ${messageId}.`
+          )
+        );
+        responseCallbacks.delete(messageId);
+      }, timeout);
+    });
+    return promise;
+  }
+  getServerState() {
+    return debuggerServerState;
+  }
+  getExistingDebuggerIds() {
+    return debuggerIds;
+  }
+  registerCallbacks(callbacks: PreviewDebuggerServerCallbacks) {
     callbacksList.push(callbacks);
 
     return () => {
       const callbacksIndex = callbacksList.indexOf(callbacks);
       if (callbacksIndex !== -1) callbacksList.splice(callbacksIndex, 1);
     };
-  },
-};
+  }
+  registerEmbeddedGameFrame(window: WindowProxy) {
+    // Nothing to do, the local preview debugger server communicates
+    // with the embedded game frame through WebSocket, like other preview windows.
+  }
+  unregisterEmbeddedGameFrame(window: WindowProxy) {
+    // Nothing to do, see registerEmbeddedGameFrame comment.
+  }
+  closeAllConnections() {
+    const previousDebuggerIds = [...debuggerIds];
+    debuggerIds.length = 0;
+
+    previousDebuggerIds.forEach(id => {
+      callbacksList.forEach(({ onConnectionClosed }) =>
+        onConnectionClosed({
+          id,
+          debuggerIds,
+        })
+      );
+    });
+
+    responseCallbacks.clear();
+
+    if (ipcRenderer && previousDebuggerIds.length) {
+      ipcRenderer.send('debugger-close-all-connections');
+    }
+  }
+}
+
+export const localPreviewDebuggerServer: PreviewDebuggerServer = new LocalPreviewDebuggerServer();
 
 export const getDebuggerServerAddress = (): ?ServerAddress =>
   debuggerServerAddress;

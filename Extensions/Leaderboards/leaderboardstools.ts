@@ -478,6 +478,9 @@ namespace gdjs {
 
         return new gdjs.PromiseTask(
           (async () => {
+            if (runtimeScene.getGame().isInGameEdition()) {
+              return;
+            }
             const scoreSavingState = (_scoreSavingStateByLeaderboard[
               leaderboardId
             ] =
@@ -516,6 +519,9 @@ namespace gdjs {
       ) =>
         new gdjs.PromiseTask(
           (async () => {
+            if (runtimeScene.getGame().isInGameEdition()) {
+              return;
+            }
             const playerId = gdjs.playerAuthentication.getUserId();
             const playerToken = gdjs.playerAuthentication.getUserToken();
             if (!playerId || !playerToken) {
@@ -843,6 +849,9 @@ namespace gdjs {
         leaderboardId: string,
         displayLoader: boolean
       ) {
+        if (runtimeScene.getGame().isInGameEdition()) {
+          return;
+        }
         // First ensure we're not trying to display multiple times the same leaderboard (in which case
         // we "de-duplicate" the request to display it).
         if (leaderboardId === _requestedLeaderboardId) {

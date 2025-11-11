@@ -55,13 +55,14 @@ namespace gdjs {
     _timeScale: float = 1;
     _defaultZOrder: integer = 0;
     _hidden: boolean;
-    _initialEffectsData: Array<EffectData>;
+    _initialLayerData: LayerData;
 
     // TODO EBO Don't store scene layer related data in layers used by custom objects.
     // (both these 3D settings and the lighting layer properties below).
     _initialCamera3DFieldOfView: float;
     _initialCamera3DFarPlaneDistance: float;
     _initialCamera3DNearPlaneDistance: float;
+    _initialCamera2DPlaneMaxDrawingDistance: float;
 
     _runtimeScene: gdjs.RuntimeInstanceContainer;
     _effectsManager: gdjs.EffectsManager;
@@ -94,7 +95,9 @@ namespace gdjs {
         layerData.camera3DNearPlaneDistance || 0.1;
       this._initialCamera3DFarPlaneDistance =
         layerData.camera3DFarPlaneDistance || 2000;
-      this._initialEffectsData = layerData.effects || [];
+      this._initialCamera2DPlaneMaxDrawingDistance =
+        layerData.camera2DPlaneMaxDrawingDistance || 5000;
+      this._initialLayerData = layerData;
       this._runtimeScene = instanceContainer;
       this._effectsManager = instanceContainer.getGame().getEffectsManager();
       this._isLightingLayer = layerData.isLightingLayer;
@@ -491,6 +494,9 @@ namespace gdjs {
     getInitialCamera3DFarPlaneDistance(): float {
       return this._initialCamera3DFarPlaneDistance;
     }
+    getInitialCamera2DPlaneMaxDrawingDistance(): float {
+      return this._initialCamera2DPlaneMaxDrawingDistance;
+    }
 
     /**
      * Return the initial effects data for the layer. Only to
@@ -498,7 +504,7 @@ namespace gdjs {
      * @deprecated
      */
     getInitialEffectsData(): EffectData[] {
-      return this._initialEffectsData;
+      return this._initialLayerData.effects || [];
     }
 
     /**
@@ -696,7 +702,9 @@ namespace gdjs {
      * @return true if it is a lighting layer, false otherwise.
      */
     isLightingLayer(): boolean {
-      return this._isLightingLayer;
+      return (
+        this._isLightingLayer && !this._runtimeScene.getGame().isInGameEdition()
+      );
     }
   }
 }

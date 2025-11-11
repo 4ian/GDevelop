@@ -159,15 +159,9 @@ namespace gdjs {
       if (initialInstanceData.depth !== undefined) {
         this.setDepth(initialInstanceData.depth);
       }
-      if (initialInstanceData.flippedX) {
-        this.flipX(initialInstanceData.flippedX);
-      }
-      if (initialInstanceData.flippedY) {
-        this.flipY(initialInstanceData.flippedY);
-      }
-      if (initialInstanceData.flippedZ) {
-        this.flipZ(initialInstanceData.flippedZ);
-      }
+      this.flipX(!!initialInstanceData.flippedX);
+      this.flipY(!!initialInstanceData.flippedY);
+      this.flipZ(!!initialInstanceData.flippedZ);
     }
 
     setX(x: float): void {
@@ -334,6 +328,18 @@ namespace gdjs {
       this.setAngle(gdjs.toDegrees(mesh.rotation.z));
     }
 
+    override getOriginalWidth(): float {
+      return this._originalWidth;
+    }
+
+    override getOriginalHeight(): float {
+      return this._originalHeight;
+    }
+
+    getOriginalDepth(): float {
+      return this._originalDepth;
+    }
+
     getWidth(): float {
       return this._width;
     }
@@ -378,31 +384,6 @@ namespace gdjs {
 
       this._depth = depth;
       this.getRenderer().updateSize();
-    }
-
-    /**
-     * Return the width of the object for a scale of 1.
-     *
-     * It can't be 0.
-     */
-    _getOriginalWidth(): float {
-      return this._originalWidth;
-    }
-
-    /**
-     * Return the height of the object for a scale of 1.
-     *
-     * It can't be 0.
-     */
-    _getOriginalHeight(): float {
-      return this._originalHeight;
-    }
-
-    /**
-     * Return the object size on the Z axis (called "depth") when the scale equals 1.
-     */
-    _getOriginalDepth(): float {
-      return this._originalDepth;
     }
 
     /**

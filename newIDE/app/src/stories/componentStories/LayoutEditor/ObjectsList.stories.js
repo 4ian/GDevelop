@@ -50,6 +50,7 @@ export const Default = () => (
           cb
         ) => cb(true)}
         onObjectFolderOrObjectWithContextSelected={() => {}}
+        onSetAsGlobalObject={action('onSetAsGlobalObject')}
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
         isListLocked={false}
         onExtensionInstalled={action('onExtensionInstalled')}
@@ -89,6 +90,7 @@ export const WithSerializedObjectView = () => (
             cb
           ) => cb(true)}
           onObjectFolderOrObjectWithContextSelected={() => {}}
+          onSetAsGlobalObject={action('onSetAsGlobalObject')}
           hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
           isListLocked={false}
           onExtensionInstalled={action('onExtensionInstalled')}
@@ -128,6 +130,7 @@ export const Locked = () => (
           cb
         ) => cb(true)}
         onObjectFolderOrObjectWithContextSelected={() => {}}
+        onSetAsGlobalObject={action('onSetAsGlobalObject')}
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
         isListLocked={true}
         onExtensionInstalled={action('onExtensionInstalled')}

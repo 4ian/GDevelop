@@ -13,6 +13,19 @@ namespace gdjs {
     40, // ArrowDown
   ];
 
+  // Workaround for a macOS issue where "keyup" is not triggered when a key
+  // is released while meta key is pressed.
+  const keysPressedWithMetaPressedByCode = new Map<
+    string,
+    { keyCode: number; location: number }
+  >();
+
+  const isMacLike =
+    typeof navigator !== 'undefined' &&
+    navigator.platform.match(/(Mac|iPhone|iPod|iPad)/i)
+      ? true
+      : false;
+
   /**
    * The renderer for a gdjs.RuntimeGame using Pixi.js.
    */
@@ -101,6 +114,7 @@ namespace gdjs {
         this._threeRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this._threeRenderer.useLegacyLights = true;
         this._threeRenderer.autoClear = false;
+        this._threeRenderer.pixelRatio = window.devicePixelRatio;
         this._threeRenderer.setSize(
           this._game.getGameResolutionWidth(),
           this._game.getGameResolutionHeight()
@@ -643,7 +657,7 @@ namespace gdjs {
           return false;
         return true;
       };
-      document.onkeydown = function (e) {
+      document.onkeydown = (e) => {
         if (isFocusingDomElement()) {
           // Bail out if the game canvas is not focused. For example,
           // an `<input>` element can be focused, and needs to receive
@@ -651,9 +665,29 @@ namespace gdjs {
           return;
         }
 
+        // See reason for this workaround in the "keyup" event handler.
+        if (isMacLike) {
+          if (e.code !== 'MetaLeft' && e.code !== 'MetaRight') {
+            if (e.metaKey) {
+              keysPressedWithMetaPressedByCode.set(e.code, {
+                keyCode: e.keyCode,
+                location: e.location,
+              });
+            } else {
+              keysPressedWithMetaPressedByCode.delete(e.code);
+            }
+          }
+        }
+
         if (defaultPreventedKeyCodes.includes(e.keyCode)) {
           // Some keys are "default prevented" to avoid scrolling when the game
           // is integrated in a page as an iframe.
+          e.preventDefault();
+        }
+
+        if (this._game.isInGameEdition()) {
+          // When in in-game edition, prevent all the keys to have their default behavior
+          // so that the shortcuts are all handled by the editor (apart from OS-level shortcuts).
           e.preventDefault();
         }
 
@@ -667,12 +701,35 @@ namespace gdjs {
 
         manager.onKeyPressed(e.keyCode, e.location);
       };
-      document.onkeyup = function (e) {
+      document.onkeyup = (e) => {
         if (isFocusingDomElement()) {
           // Bail out if the game canvas is not focused. For example,
           // an `<input>` element can be focused, and needs to receive
           // arrow keys events.
           return;
+        }
+
+        if (isMacLike) {
+          if (e.code === 'MetaLeft' || e.code === 'MetaRight') {
+            // Meta key is released. On macOS, a key pressed in combination with meta key, and
+            // which has been released while meta is pressed, will not trigger a "keyup" event.
+            // This means the key would be considered as "stuck" from the game's perspective
+            // it would never be released unless it's pressed and released again (without meta).
+            // Out of caution, we simulate a release of the key that were pressed with meta key.
+            for (const {
+              location,
+              keyCode,
+            } of keysPressedWithMetaPressedByCode.values()) {
+              manager.onKeyReleased(keyCode, location);
+            }
+            keysPressedWithMetaPressedByCode.clear();
+          }
+        }
+
+        if (this._game.isInGameEdition()) {
+          // When in in-game edition, prevent all the keys to have their default behavior
+          // so that the shortcuts are all handled by the editor (apart from OS-level shortcuts).
+          e.preventDefault();
         }
 
         if (defaultPreventedKeyCodes.includes(e.keyCode)) {
@@ -761,7 +818,7 @@ namespace gdjs {
       };
       // @ts-ignore
       canvas.onwheel = function (event) {
-        manager.onMouseWheel(-event.deltaY);
+        manager.onMouseWheel(-event.deltaY, event.deltaX, event.deltaZ);
       };
 
       // Touches:
@@ -783,6 +840,7 @@ namespace gdjs {
                 touch.pageX,
                 touch.pageY
               );
+              manager.onTouchMove(touch.identifier, pos[0], pos[1]);
               manager.onTouchMove(touch.identifier, pos[0], pos[1]);
               // This works because touch events are sent
               // when they continue outside of the canvas.

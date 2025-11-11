@@ -423,6 +423,14 @@ type CustomObjectConfiguration_EdgeAnchor = 0 | 1 | 2 | 3 | 4`
       'types/gdexporter.js'
     );
 
+    // Rename classes from GDJS:
+    shell.sed(
+      '-i',
+      'declare class gdExporterHelper {',
+      'declare class gdjsExporterHelper {',
+      'types/gdexporter.js'
+    );
+
     // Improve typing of resources kind.
     shell.sed(
       '-i',

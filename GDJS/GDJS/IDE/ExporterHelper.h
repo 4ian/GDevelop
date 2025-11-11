@@ -24,6 +24,7 @@ class SourceFileMetadata;
 class WholeProjectDiagnosticReport;
 class CaptureOptions;
 class Screenshot;
+class InGameEditorResourceMetadata;
 }  // namespace gd
 
 namespace gdjs {
@@ -42,9 +43,9 @@ struct PreviewExportOptions {
         useWindowMessageDebuggerClient(false),
         useMinimalDebuggerClient(false),
         nativeMobileApp(false),
-        projectDataOnlyExport(false),
         fullLoadingScreen(false),
         isDevelopmentEnvironment(false),
+        isInGameEdition(false),
         nonRuntimeScriptsCacheBurst(0),
         inAppTutorialMessageInPreview(""),
         inAppTutorialMessagePositionInPreview(""),
@@ -146,6 +147,26 @@ struct PreviewExportOptions {
   }
 
   /**
+   * \brief Set the (optional) events-based object to be instantiated in the scene
+   * at the beginning of the previewed game.
+   */
+  PreviewExportOptions &SetEventsBasedObjectType(
+      const gd::String &eventsBasedObjectType_) {
+    eventsBasedObjectType = eventsBasedObjectType_;
+    return *this;
+  }
+
+  /**
+   * \brief Set the (optional) events-based object variant to be instantiated in the scene
+   * at the beginning of the previewed game.
+   */
+  PreviewExportOptions &SetEventsBasedObjectVariantName(
+      const gd::String &eventsBasedObjectVariantName_) {
+    eventsBasedObjectVariantName = eventsBasedObjectVariantName_;
+    return *this;
+  }
+
+  /**
    * \brief Set the hash associated to an include file. Useful for the preview
    * hot-reload, to know if a file changed.
    */
@@ -156,11 +177,34 @@ struct PreviewExportOptions {
   }
 
   /**
-   * \brief Set if the export should only export the project data, not
-   * exporting events code.
+   * \brief Set if the exported folder should be cleared befor the export.
    */
-  PreviewExportOptions &SetProjectDataOnlyExport(bool enable) {
-    projectDataOnlyExport = enable;
+  PreviewExportOptions &SetShouldClearExportFolder(bool enable) {
+    shouldClearExportFolder = enable;
+    return *this;
+  }
+
+  /**
+   * \brief Set if the `ProjectData` must be reloaded.
+   */
+  PreviewExportOptions &SetShouldReloadProjectData(bool enable) {
+    shouldReloadProjectData = enable;
+    return *this;
+  }
+
+  /**
+   * \brief Set if GDJS libraries must be reloaded.
+   */
+  PreviewExportOptions &SetShouldReloadLibraries(bool enable) {
+    shouldReloadLibraries = enable;
+    return *this;
+  }
+
+  /**
+   * \brief Set if the export should export events code.
+   */
+  PreviewExportOptions &SetShouldGenerateScenesEventsCode(bool enable) {
+    shouldGenerateScenesEventsCode = enable;
     return *this;
   }
 
@@ -179,6 +223,48 @@ struct PreviewExportOptions {
    */
   PreviewExportOptions &SetIsDevelopmentEnvironment(bool enable) {
     isDevelopmentEnvironment = enable;
+    return *this;
+  }
+
+  /**
+   * \brief Set if the export is made for being edited in the editor.
+   */
+  PreviewExportOptions &SetIsInGameEdition(bool enable) {
+    isInGameEdition = enable;
+    return *this;
+  }
+
+  /**
+   * \brief Set the JSON string representation of the in-game editor settings.
+   */
+  PreviewExportOptions &SetInGameEditorSettingsJson(const gd::String &inGameEditorSettingsJson_) {
+    inGameEditorSettingsJson = inGameEditorSettingsJson_;
+    return *this;
+  }
+
+  /**
+   * \brief Set the in-game editor identifier.
+   */
+  PreviewExportOptions &SetEditorId(const gd::String &editorId_) {
+    editorId = editorId_;
+    return *this;
+  }
+
+  /**
+   * \brief Set the camera state to use in the in-game editor.
+   */
+  PreviewExportOptions &
+  SetEditorCameraState3D(const gd::String &cameraMode, double positionX,
+                         double positionY, double positionZ,
+                         double rotationAngle, double elevationAngle,
+                         double distance) {
+    editorCamera3DCameraMode = cameraMode;
+    editorCamera3DPositionX = positionX;
+    editorCamera3DPositionY = positionY;
+    editorCamera3DPositionZ = positionZ;
+    editorCamera3DRotationAngle = rotationAngle;
+    editorCamera3DElevationAngle = elevationAngle;
+    editorCamera3DDistance = distance;
     return *this;
   }
 
@@ -294,6 +380,8 @@ struct PreviewExportOptions {
   bool useMinimalDebuggerClient;
   gd::String layoutName;
   gd::String externalLayoutName;
+  gd::String eventsBasedObjectType;
+  gd::String eventsBasedObjectVariantName;
   gd::String fallbackAuthorUsername;
   gd::String fallbackAuthorId;
   gd::String playerId;
@@ -303,9 +391,22 @@ struct PreviewExportOptions {
   gd::String inAppTutorialMessagePositionInPreview;
   bool nativeMobileApp;
   std::map<gd::String, int> includeFileHashes;
-  bool projectDataOnlyExport;
+  bool shouldClearExportFolder = true;
+  bool shouldReloadProjectData = true;
+  bool shouldReloadLibraries = true;
+  bool shouldGenerateScenesEventsCode = true;
   bool fullLoadingScreen;
   bool isDevelopmentEnvironment;
+  bool isInGameEdition;
+  gd::String editorId;
+  gd::String editorCamera3DCameraMode;
+  gd::String inGameEditorSettingsJson;
+  double editorCamera3DPositionX = 0;
+  double editorCamera3DPositionY = 0;
+  double editorCamera3DPositionZ = 0;
+  double editorCamera3DRotationAngle = 0;
+  double editorCamera3DElevationAngle = 0;
+  double editorCamera3DDistance = 0;
   unsigned int nonRuntimeScriptsCacheBurst;
   gd::String electronRemoteRequirePath;
   gd::String gdevelopResourceToken;
@@ -379,23 +480,54 @@ class ExporterHelper {
   const gd::String &GetLastError() const { return lastError; };
 
   /**
-   * \brief Export a project to JSON
+   * \brief Export a project without its events and options to 2 JS variables
    *
    * \param fs The abstract file system to use to write the file
    * \param project The project to be exported.
    * \param filename The filename where export the project
    * \param runtimeGameOptions The content of the extra configuration to store
-   * in gdjs.runtimeGameOptions \return Empty string if everything is ok,
+   * in gdjs.runtimeGameOptions
+   *
+   * \return Empty string if everything is ok,
    * description of the error otherwise.
    */
   static gd::String ExportProjectData(
-      gd::AbstractFileSystem &fs,
-      gd::Project &project,
-      gd::String filename,
-      const gd::SerializerElement &runtimeGameOptions,
-      std::set<gd::String> &projectUsedResources,
-      std::unordered_map<gd::String, std::set<gd::String>>
-          &layersUsedResources);
+      gd::AbstractFileSystem &fs, gd::Project &project, gd::String filename,
+      const gd::SerializerElement &runtimeGameOptions, bool isInGameEdition,
+      const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources);
+
+  /**
+   * \brief Serialize a project without its events to JSON
+   *
+   * \param fs The abstract file system to use to write the file
+   * \param project The project to be exported.
+   * \param options The content of the extra configuration
+   * \param projectDataElement The element where the project data is serialized
+   * \param inGameEditorResources The list of in-game editor resources to be used.
+   */
+  static void SerializeProjectData(gd::AbstractFileSystem &fs,
+                                   const gd::Project &project,
+                                   const PreviewExportOptions &options,
+                                   gd::SerializerElement &projectDataElement,
+                                   const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources);
+
+  /**
+   * \brief Serialize the content of the extra configuration to store
+   * in gdjs.runtimeGameOptions to JSON
+   *
+   * \param fs The abstract file system to use to write the file
+   * \param gdjsRoot The root directory of GDJS, used to copy runtime files.
+   * \param options The content of the extra configuration
+   * \param includesFiles The list of scripts files - useful for hot-reloading
+   * \param runtimeGameOptionsElement The element where the game options are
+   * serialized
+   */
+  static void
+  SerializeRuntimeGameOptions(gd::AbstractFileSystem &fs,
+                              const gd::String &gdjsRoot,
+                              const PreviewExportOptions &options,
+                              std::vector<gd::String> &includesFiles,
+                              gd::SerializerElement &runtimeGameOptionsElement);
 
   /**
    * \brief Copy all the resources of the project to to the export directory,
@@ -416,6 +548,7 @@ class ExporterHelper {
    */
   void AddLibsInclude(bool pixiRenderers,
                       bool pixiInThreeRenderers,
+                      bool isInGameEdition,
                       bool includeWebsocketDebuggerClient,
                       bool includeWindowMessageDebuggerClient,
                       bool includeMinimalDebuggerClient,
@@ -453,7 +586,7 @@ class ExporterHelper {
    * includesFiles A reference to a vector that will be filled with JS files to
    * be exported along with the project. ( including "codeX.js" files ).
    */
-  bool ExportEventsCode(
+  bool ExportScenesEventsCode(
       const gd::Project &project,
       gd::String outputDir,
       std::vector<gd::String> &includesFiles,
@@ -578,14 +711,20 @@ class ExporterHelper {
    * a browser pointing to the preview.
    *
    * \param options The options to generate the preview.
+   * \param includesFiles The list of scripts files - useful for hot-reloading
    */
-  bool ExportProjectForPixiPreview(const PreviewExportOptions &options);
+  bool ExportProjectForPixiPreview(const PreviewExportOptions &options,
+                                   std::vector<gd::String> &includesFiles);
 
   /**
    * \brief Given an include file, returns the name of the file to reference
    * in the exported game.
+   *
+   * \param fs The abstract file system to use
+   * \param gdjsRoot The root directory of GDJS, used to copy runtime files.
    */
-  gd::String GetExportedIncludeFilename(
+  static gd::String GetExportedIncludeFilename(
+      gd::AbstractFileSystem &fs, const gd::String &gdjsRoot,
       const gd::String &include, unsigned int nonRuntimeScriptsCacheBurst = 0);
 
   /**
@@ -612,11 +751,30 @@ class ExporterHelper {
                              ///< be then copied to the final output directory.
 
  private:
-  static void SerializeUsedResources(
-      gd::SerializerElement &rootElement,
-      std::set<gd::String> &projectUsedResources,
-      std::unordered_map<gd::String, std::set<gd::String>>
-          &layersUsedResources);
+   static void
+   SerializeUsedResources(gd::SerializerElement &rootElement,
+                          std::set<gd::String> &projectUsedResources,
+                          std::unordered_map<gd::String, std::set<gd::String>>
+                              &layersUsedResources,
+                          std::unordered_map<gd::String, std::set<gd::String>>
+                              &eventsBasedObjectVariantsUsedResources);
+
+   /**
+    * \brief Strip a project and serialize it to JSON.
+    */
+   static void StriptAndSerializeProjectData(gd::Project &project,
+                                             gd::SerializerElement &rootElement,
+                                             bool isInGameEdition,
+                                             const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources);
+
+   /**
+    * \brief Add additional resources that are used by the in-game editor to the
+    * project.
+    */
+   static void
+   AddInGameEditorResources(gd::Project &project,
+                            std::set<gd::String> &projectUsedResources,
+                            const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources);
 };
 
 }  // namespace gdjs

@@ -38,6 +38,7 @@ import {
   type EditorKind,
   getEventsFunctionsExtensionEditor,
   notifyPreviewOrExportWillStart,
+  getCurrentTabForPane,
   getCustomObjectEditor,
   getOpenedAskAiEditor,
   changeCurrentTab,
@@ -197,13 +198,28 @@ import { QuickCustomizationDialog } from '../QuickCustomization/QuickCustomizati
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
+import {
+  EmbeddedGameFrame,
+  setEditorHotReloadNeeded,
+  isEditorHotReloadNeeded,
+} from '../EmbeddedGame/EmbeddedGameFrame';
 import useHomePageSwitch from './useHomePageSwitch';
 import RobotIcon from '../ProjectCreation/RobotIcon';
 import PublicProfileContext from '../Profile/PublicProfileContext';
 import { useGamesPlatformFrame } from './EditorContainers/HomePage/PlaySection/UseGamesPlatformFrame';
 import { useExtensionLoadErrorDialog } from '../Utils/UseExtensionLoadErrorDialog';
 import { PanesContainer } from './PanesContainer';
+import {
+  registerOnResourceExternallyChangedCallback,
+  unregisterOnResourceExternallyChangedCallback,
+} from '../MainFrame/ResourcesWatcher';
+import {
+  type EditorCameraState,
+  type PreviewInGameEditorTarget,
+  type HotReloadSteps,
+} from '../EmbeddedGame/EmbeddedGameFrame';
 import StandaloneDialog from './StandAloneDialog';
+import { useInGameEditorSettings } from '../EmbeddedGame/InGameEditorSettings';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -324,7 +340,9 @@ export type Props = {|
   resourceExternalEditors: Array<ResourceExternalEditor>,
   requestUpdate?: () => void,
   renderShareDialog: ShareDialogWithoutExportsProps => React.Node,
-  renderGDJSDevelopmentWatcher?: ?() => React.Node,
+  renderGDJSDevelopmentWatcher?: ?({|
+    onGDJSUpdated: () => Promise<void> | void,
+  |}) => React.Node,
   extensionsLoader?: JsExtensionsLoader,
   initialFileMetadataToOpen: ?FileMetadata,
   initialExampleSlugToOpen: ?string,
@@ -431,11 +449,15 @@ const MainFrame = (props: Props) => {
     _previewLauncher.current &&
     _previewLauncher.current.getPreviewDebuggerServer();
   const {
-    previewDebuggerIds,
-    hotReloadLogs,
-    clearHotReloadLogs,
+    hasNonEditionPreviewsRunning,
+    gameHotReloadLogs,
+    editorHotReloadLogs,
+    editorUncaughtError,
+    clearGameHotReloadLogs,
+    clearEditorHotReloadLogs,
+    clearEditorUncaughtError,
+    hardReloadAllPreviews,
   } = usePreviewDebuggerServerWatcher(previewDebuggerServer);
-  const hasPreviewsRunning = !!previewDebuggerIds.length;
   const {
     ensureInteractionHappened,
     renderOpenConfirmDialog,
@@ -495,6 +517,10 @@ const MainFrame = (props: Props) => {
     quickCustomizationDialogOpenedFromGameId,
     setQuickCustomizationDialogOpenedFromGameId,
   ] = React.useState<?string>(null);
+
+  const [gameEditorMode, setGameEditorMode] = React.useState<
+    'embedded-game' | 'instances-editor'
+  >('instances-editor');
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -679,6 +705,7 @@ const MainFrame = (props: Props) => {
         label,
         projectItemName: name,
         tabOptions,
+        kind,
         renderEditorContainer: editorKindToRenderer[kind],
         extraEditorProps,
         key,
@@ -920,6 +947,14 @@ const MainFrame = (props: Props) => {
       setPreviewState(initialPreviewState);
 
       console.info('Closing project...');
+      const previewLauncher = _previewLauncher.current;
+      if (previewLauncher && previewLauncher.closeAllPreviews) {
+        previewLauncher.closeAllPreviews();
+      }
+      if (previewDebuggerServer) {
+        previewDebuggerServer.closeAllConnections();
+      }
+
       // TODO Remove this state
       // Instead:
       // - Move the EventsFunctionsExtensionsLoader to Core
@@ -961,6 +996,7 @@ const MainFrame = (props: Props) => {
       }
     },
     [
+      previewDebuggerServer,
       currentProjectRef,
       eventsFunctionsExtensionsState,
       setHasProjectOpened,
@@ -1115,6 +1151,7 @@ const MainFrame = (props: Props) => {
         );
         if (!autoSaveCreationDate) return fileMetadata;
 
+        await delay(200); // Ensure confirmation is shown on top of the loader.
         const answer = await showConfirmation({
           title: t`This project has an auto-saved version`,
           message: t`GDevelop automatically saved a newer version of this project on ${new Date(
@@ -1139,6 +1176,7 @@ const MainFrame = (props: Props) => {
         );
         if (!autoSaveCreationDate) return null;
 
+        await delay(200); // Ensure confirmation is shown on top of the loader.
         const answer = await showConfirmation({
           title: t`This project cannot be opened`,
           message: t`The project file appears to be corrupted, but an autosave file exists (backup made automatically by GDevelop on ${new Date(
@@ -1157,7 +1195,7 @@ const MainFrame = (props: Props) => {
 
       // Try to find an autosave (and ask user if found)
       try {
-        await delay(150);
+        await delay(50);
         let content;
         let openingError: Error | null = null;
         try {
@@ -1418,6 +1456,8 @@ const MainFrame = (props: Props) => {
     if (!answer) return;
 
     const extensionName = eventsFunctionsExtension.getName();
+    const hasCustomObject =
+      eventsFunctionsExtension.getEventsBasedObjects().size() > 0;
     setState(state => ({
       ...state,
       editorTabs: closeEventsFunctionsExtensionTabs(
@@ -1440,6 +1480,24 @@ const MainFrame = (props: Props) => {
       eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
         currentProject
       );
+
+      if (hasCustomObject) {
+        notifyChangesToInGameEditor({
+          shouldReloadProjectData: true,
+          shouldReloadLibraries: true,
+          shouldReloadResources: false,
+          shouldHardReload: true,
+          reasons: ['deleted-extension-with-custom-object'],
+        });
+      } else {
+        notifyChangesToInGameEditor({
+          shouldReloadProjectData: true,
+          shouldReloadLibraries: true,
+          shouldReloadResources: false,
+          shouldHardReload: false,
+          reasons: ['deleted-extension-without-custom-object'],
+        });
+      }
     });
   };
 
@@ -1471,6 +1529,7 @@ const MainFrame = (props: Props) => {
     if (!currentProject) {
       return;
     }
+    let hasEventsBasedObject = false;
     for (const extensionName of extensionNames) {
       const eventsBasedObjects = currentProject
         .getEventsFunctionsExtension(extensionName)
@@ -1496,8 +1555,218 @@ const MainFrame = (props: Props) => {
           extensionName
         ),
       }));
+
+      hasEventsBasedObject =
+        hasEventsBasedObject || eventsBasedObjects.getCount() > 0;
+    }
+    if (hasEventsBasedObject) {
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: true,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+        reasons: ['installed-extension-with-custom-object'],
+      });
     }
   };
+
+  const notifyChangesToInGameEditor = React.useCallback(
+    (hotReloadSteps: HotReloadSteps) => {
+      let hasReloadIfNeeded = false;
+      for (const paneIdentifier in state.editorTabs.panes) {
+        const currentTab = getCurrentTabForPane(
+          state.editorTabs,
+          paneIdentifier
+        );
+        const editorRef = currentTab ? currentTab.editorRef : null;
+        if (editorRef) {
+          editorRef.notifyChangesToInGameEditor(hotReloadSteps);
+          hasReloadIfNeeded = true;
+        }
+      }
+      if (!hasReloadIfNeeded) {
+        setEditorHotReloadNeeded(hotReloadSteps);
+      }
+    },
+    [state.editorTabs]
+  );
+
+  const triggerHotReloadInGameEditorIfNeeded = React.useCallback(
+    () => {
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: false,
+        shouldReloadLibraries: false,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+        reasons: ['triggered-if-needed'],
+      });
+    },
+    [notifyChangesToInGameEditor]
+  );
+
+  const [
+    showRestartInGameEditorAfterErrorButton,
+    setShowRestartInGameEditorAfterErrorButton,
+  ] = React.useState(false);
+  const onRestartInGameEditor = React.useCallback(
+    () => {
+      setShowRestartInGameEditorAfterErrorButton(false);
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: true,
+        shouldReloadResources: true,
+        shouldHardReload: true,
+        reasons: [
+          showRestartInGameEditorAfterErrorButton
+            ? 'relaunched-after-uncaught-error-or-hot-reload-error'
+            : 'relaunched-manually',
+        ],
+      });
+    },
+    [notifyChangesToInGameEditor, showRestartInGameEditorAfterErrorButton]
+  );
+
+  React.useEffect(
+    () => {
+      if (gameEditorMode === 'embedded-game') {
+        // The in-game editor is never hot-reloaded:
+        // - in 2D mode
+        // - from a tab without 3D editor
+        //
+        // It triggers required hot-reload level when users:
+        // - switch to 3D mode
+        // - switch to a 3D editor tab
+        //
+        // Hot-reloads are triggered right away from a 3D editor.
+        // Which means this call won't do any hot-reload when switching between
+        // 2 3D editors but only switch the scene.
+        notifyChangesToInGameEditor({
+          shouldReloadProjectData: false,
+          shouldReloadLibraries: false,
+          shouldReloadResources: false,
+          shouldHardReload: false,
+          reasons: ['switched-tab-while-using-3d-editor'],
+        });
+      } else {
+        // Switch the 3D editor to the same scene as the 2D one.
+        // It allows to keep the 3D editor up to date for a fast switch
+        // between 2D and 3D.
+        for (const paneIdentifier in state.editorTabs.panes) {
+          const currentTab = getCurrentTabForPane(
+            state.editorTabs,
+            paneIdentifier
+          );
+          const editorRef = currentTab ? currentTab.editorRef : null;
+          if (editorRef) {
+            editorRef.switchInGameEditorIfNoHotReloadIsNeeded();
+          }
+        }
+      }
+    },
+    [gameEditorMode, state.editorTabs, notifyChangesToInGameEditor]
+  );
+
+  const onExternalLayoutAssociationChanged = React.useCallback(
+    () => {
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: false,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+        reasons: ['external-layout-association-changed'],
+      });
+    },
+    [notifyChangesToInGameEditor]
+  );
+
+  const onResourceExternallyChanged = React.useCallback(
+    () => {
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: false,
+        shouldReloadLibraries: false,
+        shouldReloadResources: true,
+        shouldHardReload: false,
+        reasons: ['resource-externally-changed'],
+      });
+    },
+    [notifyChangesToInGameEditor]
+  );
+
+  const onResourceUsageChanged = React.useCallback(
+    () => {
+      if (isEditorHotReloadNeeded()) {
+        notifyChangesToInGameEditor({
+          shouldReloadProjectData: false,
+          shouldReloadLibraries: false,
+          shouldReloadResources: false,
+          shouldHardReload: false,
+          reasons: ['resource-usage-changed'],
+        });
+      } else {
+        notifyChangesToInGameEditor({
+          shouldReloadProjectData: true,
+          shouldReloadLibraries: false,
+          shouldReloadResources: false,
+          shouldHardReload: false,
+          reasons: ['resource-usage-changed'],
+        });
+      }
+    },
+    [notifyChangesToInGameEditor]
+  );
+
+  const onSceneAdded = React.useCallback(
+    () => {
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: false,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+        reasons: ['scene-added'],
+      });
+    },
+    [notifyChangesToInGameEditor]
+  );
+
+  const onExternalLayoutAdded = React.useCallback(
+    () => {
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: false,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+        reasons: ['external-layout-added'],
+      });
+    },
+    [notifyChangesToInGameEditor]
+  );
+
+  const onEffectAdded = React.useCallback(
+    () => {
+      // Ensure the effect implementation is exported.
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: true,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+        reasons: ['effect-added'],
+      });
+    },
+    [notifyChangesToInGameEditor]
+  );
+
+  const onObjectListsModified = React.useCallback(
+    ({ isNewObjectTypeUsed }: { isNewObjectTypeUsed: boolean }) => {
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: isNewObjectTypeUsed,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+        reasons: ['object-lists-modified'],
+      });
+    },
+    [notifyChangesToInGameEditor]
+  );
 
   const renameLayout = (oldName: string, newName: string) => {
     const { currentProject } = state;
@@ -1529,8 +1798,16 @@ const MainFrame = (props: Props) => {
       if (inAppTutorialOrchestratorRef.current) {
         inAppTutorialOrchestratorRef.current.changeData(oldName, uniqueNewName);
       }
-      if (shouldChangeProjectFirstLayout)
+      if (shouldChangeProjectFirstLayout) {
         currentProject.setFirstLayout(uniqueNewName);
+      }
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: false,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+        reasons: ['renamed-scene'],
+      });
       _onProjectItemModified();
     });
   };
@@ -1561,6 +1838,13 @@ const MainFrame = (props: Props) => {
         oldName,
         uniqueNewName
       );
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: false,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+        reasons: ['renamed-external-layout'],
+      });
       _onProjectItemModified();
     });
   };
@@ -1634,10 +1918,17 @@ const MainFrame = (props: Props) => {
     setState(state => ({
       ...state,
       editorTabs: closeEventsFunctionsExtensionTabs(state.editorTabs, oldName),
-    })).then(state => {
-      eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
+    })).then(async state => {
+      await eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
         currentProject
       );
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: false,
+        shouldReloadLibraries: true,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+        reasons: ['renamed-extension'],
+      });
       _onProjectItemModified();
     });
   };
@@ -1655,7 +1946,15 @@ const MainFrame = (props: Props) => {
         eventsFunctionsExtension.getName(),
         oldName
       ),
-    }));
+    })).then(state => {
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: true,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+        reasons: ['renamed-custom-object'],
+      });
+    });
   };
 
   const onDeletedEventsBasedObject = (
@@ -1669,7 +1968,15 @@ const MainFrame = (props: Props) => {
         eventsFunctionsExtension.getName(),
         name
       ),
-    }));
+    })).then(state => {
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: true,
+        shouldReloadResources: false,
+        shouldHardReload: true,
+        reasons: ['deleted-custom-object'],
+      });
+    });
   };
 
   const deleteEventsBasedObjectVariant = (
@@ -1692,19 +1999,30 @@ const MainFrame = (props: Props) => {
         eventBasedObject.getName(),
         variantName
       ),
-    }));
+    })).then(state => {
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: true,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+        reasons: ['deleted-custom-object-variant'],
+      });
+    });
   };
 
-  const setPreviewedLayout = (
-    previewLayoutName: ?string,
-    previewExternalLayoutName?: ?string
-  ) => {
+  const setPreviewedLayout = ({
+    layoutName,
+    externalLayoutName,
+  }: {
+    layoutName: string | null,
+    externalLayoutName: string | null,
+  }) => {
     setPreviewState(
       previewState =>
         ({
           ...previewState,
-          previewLayoutName,
-          previewExternalLayoutName,
+          previewLayoutName: layoutName,
+          previewExternalLayoutName: externalLayoutName,
         }: PreviewState)
     );
   };
@@ -1759,15 +2077,22 @@ const MainFrame = (props: Props) => {
     ]
   );
 
+  const inGameEditorSettings = useInGameEditorSettings();
+
   const _launchPreview = React.useCallback(
     async ({
       networkPreview,
       numberOfWindows,
       hotReload,
-      projectDataOnlyExport,
+      shouldReloadProjectData,
+      shouldReloadLibraries,
+      shouldGenerateScenesEventsCode,
+      shouldReloadResources,
+      shouldHardReload,
       fullLoadingScreen,
       forceDiagnosticReport,
       launchCaptureOptions,
+      isForInGameEdition,
     }: LaunchPreviewOptions) => {
       if (!currentProject) return;
       if (currentProject.getLayoutsCount() === 0) return;
@@ -1783,28 +2108,23 @@ const MainFrame = (props: Props) => {
             project: currentProject,
             hotReload: !!hotReload,
             numberOfWindows: numberOfWindows || 1,
+            isForInGameEdition: !!isForInGameEdition,
           })
         : null;
 
       setPreviewLoading(true);
       notifyPreviewOrExportWillStart(state.editorTabs);
 
-      const layoutName = previewState.isPreviewOverriden
+      const sceneName = isForInGameEdition
+        ? isForInGameEdition.forcedSceneName
+        : previewState.isPreviewOverriden
         ? previewState.overridenPreviewLayoutName
         : previewState.previewLayoutName;
-      const externalLayoutName = previewState.isPreviewOverriden
+      const externalLayoutName = isForInGameEdition
+        ? isForInGameEdition.forcedExternalLayoutName
+        : previewState.isPreviewOverriden
         ? previewState.overridenPreviewExternalLayoutName
         : previewState.previewExternalLayoutName;
-
-      const layout =
-        layoutName && currentProject.hasLayoutNamed(layoutName)
-          ? currentProject.getLayout(layoutName)
-          : currentProject.getLayoutAt(0);
-      const externalLayout =
-        externalLayoutName &&
-        currentProject.hasExternalLayoutNamed(externalLayoutName)
-          ? currentProject.getExternalLayout(externalLayoutName)
-          : null;
 
       autosaveProjectIfNeeded().catch(err => {
         console.error('Error while auto-saving the project. Ignoring.', err);
@@ -1840,17 +2160,42 @@ const MainFrame = (props: Props) => {
         }
         await previewLauncher.launchPreview({
           project: currentProject,
-          layout,
-          externalLayout,
+          sceneName: sceneName || currentProject.getLayoutAt(0).getName(),
+          externalLayoutName: externalLayoutName || null,
+          eventsBasedObjectType: isForInGameEdition
+            ? isForInGameEdition.eventsBasedObjectType
+            : null,
+          eventsBasedObjectVariantName: isForInGameEdition
+            ? isForInGameEdition.eventsBasedObjectVariantName
+            : null,
           networkPreview: !!networkPreview,
           hotReload: !!hotReload,
-          projectDataOnlyExport: !!projectDataOnlyExport,
+          shouldReloadProjectData:
+            shouldReloadProjectData === undefined
+              ? true
+              : shouldReloadProjectData,
+          shouldReloadLibraries:
+            shouldReloadLibraries === undefined ? true : shouldReloadLibraries,
+          shouldGenerateScenesEventsCode:
+            shouldGenerateScenesEventsCode === undefined
+              ? true
+              : shouldGenerateScenesEventsCode,
+          shouldReloadResources: !!shouldReloadResources,
+          shouldHardReload: !!shouldHardReload,
           fullLoadingScreen: !!fullLoadingScreen,
           fallbackAuthor,
           authenticatedPlayer,
           getIsMenuBarHiddenInPreview: preferences.getIsMenuBarHiddenInPreview,
           getIsAlwaysOnTopInPreview: preferences.getIsAlwaysOnTopInPreview,
-          numberOfWindows: numberOfWindows || 1,
+          numberOfWindows: numberOfWindows === undefined ? 1 : numberOfWindows,
+          isForInGameEdition: !!isForInGameEdition,
+          editorId: isForInGameEdition ? isForInGameEdition.editorId : '',
+          editorCameraState3D: isForInGameEdition
+            ? isForInGameEdition.editorCameraState3D
+            : null,
+          inGameEditorSettings: isForInGameEdition
+            ? inGameEditorSettings
+            : null,
           inAppTutorialMessageInPreview: inAppTutorialMessageInPreview.message,
           inAppTutorialMessagePositionInPreview:
             inAppTutorialMessageInPreview.position,
@@ -1861,17 +2206,21 @@ const MainFrame = (props: Props) => {
         });
         setPreviewLoading(false);
 
-        sendPreviewStarted({
-          quickCustomizationGameId:
-            quickCustomizationDialogOpenedFromGameId || null,
-          networkPreview: !!networkPreview,
-          hotReload: !!hotReload,
-          projectDataOnlyExport: !!projectDataOnlyExport,
-          fullLoadingScreen: !!fullLoadingScreen,
-          numberOfWindows: numberOfWindows || 1,
-          forceDiagnosticReport: !!forceDiagnosticReport,
-          previewLaunchDuration: Date.now() - startTime,
-        });
+        if (!isForInGameEdition)
+          sendPreviewStarted({
+            quickCustomizationGameId:
+              quickCustomizationDialogOpenedFromGameId || null,
+            networkPreview: !!networkPreview,
+            hotReload: !!hotReload,
+            projectDataOnlyExport:
+              shouldGenerateScenesEventsCode === undefined
+                ? false
+                : !shouldGenerateScenesEventsCode,
+            fullLoadingScreen: !!fullLoadingScreen,
+            numberOfWindows: numberOfWindows || 1,
+            forceDiagnosticReport: !!forceDiagnosticReport,
+            previewLaunchDuration: Date.now() - startTime,
+          });
 
         if (inAppTutorialOrchestratorRef.current) {
           inAppTutorialOrchestratorRef.current.onPreviewLaunch();
@@ -1879,6 +2228,7 @@ const MainFrame = (props: Props) => {
         if (!currentlyRunningInAppTutorial) {
           const wholeProjectDiagnosticReport = currentProject.getWholeProjectDiagnosticReport();
           if (
+            !isForInGameEdition &&
             (forceDiagnosticReport ||
               preferences.values.openDiagnosticReportAutomatically) &&
             wholeProjectDiagnosticReport.hasAnyIssue()
@@ -1912,6 +2262,7 @@ const MainFrame = (props: Props) => {
       quickCustomizationDialogOpenedFromGameId,
       onCaptureFinished,
       createCaptureOptionsForPreview,
+      inGameEditorSettings,
     ]
   );
 
@@ -1923,10 +2274,27 @@ const MainFrame = (props: Props) => {
 
   const launchNewPreview = React.useCallback(
     async options => {
+      const launchCaptureOptions =
+        currentProject && !hasNonEditionPreviewsRunning
+          ? // TODO Rename it getPreviewLaunchCaptureOptions
+            getHotReloadPreviewLaunchCaptureOptions(
+              currentProject.getProjectUuid()
+            )
+          : undefined;
+
       const numberOfWindows = options ? options.numberOfWindows : 1;
-      await launchPreview({ networkPreview: false, numberOfWindows });
+      await launchPreview({
+        networkPreview: false,
+        numberOfWindows,
+        launchCaptureOptions,
+      });
     },
-    [launchPreview]
+    [
+      currentProject,
+      launchPreview,
+      getHotReloadPreviewLaunchCaptureOptions,
+      hasNonEditionPreviewsRunning,
+    ]
   );
 
   const launchHotReloadPreview = React.useCallback(
@@ -1955,6 +2323,62 @@ const MainFrame = (props: Props) => {
     [launchPreview]
   );
 
+  const onLaunchPreviewForInGameEdition = React.useCallback(
+    async ({
+      editorId,
+      sceneName,
+      externalLayoutName,
+      eventsBasedObjectType,
+      eventsBasedObjectVariantName,
+      shouldReloadProjectData,
+      shouldReloadLibraries,
+      shouldReloadResources,
+      shouldHardReload,
+      editorCameraState3D,
+    }: {|
+      ...PreviewInGameEditorTarget,
+      ...HotReloadSteps,
+      editorCameraState3D: EditorCameraState | null,
+    |}) => {
+      await _launchPreview({
+        networkPreview: false,
+        hotReload: true,
+        shouldReloadProjectData,
+        shouldReloadLibraries,
+        shouldGenerateScenesEventsCode: false,
+        shouldReloadResources,
+        shouldHardReload,
+        forceDiagnosticReport: false,
+        isForInGameEdition: {
+          editorId,
+          forcedSceneName: sceneName,
+          forcedExternalLayoutName: externalLayoutName,
+          eventsBasedObjectType,
+          eventsBasedObjectVariantName,
+          editorCameraState3D,
+        },
+        numberOfWindows: 0,
+      });
+    },
+    [_launchPreview]
+  );
+
+  const relaunchAndThenHardReloadAllPreviews = React.useCallback(
+    async () => {
+      // Build a new preview (so that any changes in runtime files are picked up)
+      // and then ask all previews to "hard reload" themselves (i.e: refresh their page).
+      await launchPreview({
+        networkPreview: false,
+        hotReload: false,
+        forceDiagnosticReport: false,
+        numberOfWindows: 0,
+      });
+
+      hardReloadAllPreviews();
+    },
+    [hardReloadAllPreviews, launchPreview]
+  );
+
   const launchQuickCustomizationPreview = React.useCallback(
     () =>
       launchPreview({
@@ -1966,22 +2390,28 @@ const MainFrame = (props: Props) => {
           ],
         },
         hotReload: true,
-        projectDataOnlyExport: true,
+        shouldGenerateScenesEventsCode: false,
       }),
     [launchPreview]
   );
 
   const hotReloadPreviewButtonProps: HotReloadPreviewButtonProps = React.useMemo(
     () => ({
-      hasPreviewsRunning,
+      hasPreviewsRunning: hasNonEditionPreviewsRunning,
       launchProjectWithLoadingScreenPreview: () =>
         launchPreview({ fullLoadingScreen: true }),
       launchProjectDataOnlyPreview: () =>
-        launchPreview({ hotReload: true, projectDataOnlyExport: true }),
+        launchPreview({
+          hotReload: true,
+          shouldGenerateScenesEventsCode: false,
+        }),
       launchProjectCodeAndDataPreview: () =>
-        launchPreview({ hotReload: true, projectDataOnlyExport: false }),
+        launchPreview({
+          hotReload: true,
+          shouldGenerateScenesEventsCode: true,
+        }),
     }),
-    [hasPreviewsRunning, launchPreview]
+    [hasNonEditionPreviewsRunning, launchPreview]
   );
 
   const getEditorsTabStateWithScene = React.useCallback(
@@ -2301,6 +2731,51 @@ const MainFrame = (props: Props) => {
     [getEditorOpeningOptions, setState, state]
   );
 
+  const openCustomObjectAndExtensionEditors = React.useCallback(
+    (
+      eventsFunctionsExtension: gdEventsFunctionsExtension,
+      eventsBasedObject: gdEventsBasedObject,
+      variantName: string
+    ) => {
+      const { currentProject } = state;
+      if (!currentProject) return;
+
+      // Open both tabs at the same time to avoid the extension tab to trigger
+      // a code generation when it loses the focus.
+      setState(state => ({
+        ...state,
+        editorTabs: openEditorTab(
+          openEditorTab(state.editorTabs, {
+            ...getEditorOpeningOptions({
+              kind: 'events functions extension',
+              name: eventsFunctionsExtension.getName(),
+              project: currentProject,
+            }),
+            extraEditorProps: {
+              initiallyFocusedFunctionName: null,
+              initiallyFocusedBehaviorName: null,
+              initiallyFocusedObjectName: eventsBasedObject.getName(),
+            },
+          }),
+          {
+            ...getEditorOpeningOptions({
+              kind: 'custom object',
+              name:
+                eventsFunctionsExtension.getName() +
+                '::' +
+                eventsBasedObject.getName() +
+                (eventsBasedObject.getVariants().hasVariantNamed(variantName)
+                  ? '::' + variantName
+                  : ''),
+              project: currentProject,
+            }),
+          }
+        ),
+      }));
+    },
+    [getEditorOpeningOptions, setState, state]
+  );
+
   const openObjectEvents = (extensionName: string, objectName: string) => {
     const { currentProject, editorTabs } = state;
     if (!currentProject) return;
@@ -2375,72 +2850,218 @@ const MainFrame = (props: Props) => {
     }
   };
 
-  const onExtractAsExternalLayout = (name: string) => {
-    openExternalLayout(name);
-  };
+  const onExtractAsExternalLayout = React.useCallback(
+    (name: string) => {
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: false,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+        reasons: ['extracted-instances-to-external-layout'],
+      });
+      openExternalLayout(name);
+    },
+    [notifyChangesToInGameEditor, openExternalLayout]
+  );
 
-  const onOpenEventBasedObjectEditor = (
-    extensionName: string,
-    eventsBasedObjectName: string
-  ) => {
-    if (
-      !currentProject ||
-      !currentProject.hasEventsFunctionsExtensionNamed(extensionName)
-    ) {
-      return;
-    }
-    openEventsFunctionsExtension(
-      extensionName,
-      null,
-      null,
-      eventsBasedObjectName
-    );
-    const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
-      extensionName
-    );
-    const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
-    if (!eventsBasedObjects.has(eventsBasedObjectName)) {
-      return;
-    }
-    const eventsBasedObject = eventsBasedObjects.get(eventsBasedObjectName);
-    openCustomObjectEditor(eventsFunctionsExtension, eventsBasedObject, '');
+  const _onReloadEventsFunctionsExtensionsAsync = React.useCallback(
+    async () => {
+      if (isProjectClosedSoAvoidReloadingExtensions) {
+        return;
+      }
+      await eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
+        currentProject
+      );
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: false,
+        shouldReloadLibraries: true,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+        reasons: ['reloaded-extensions'],
+      });
+    },
+    [
+      isProjectClosedSoAvoidReloadingExtensions,
+      currentProject,
+      eventsFunctionsExtensionsState,
+      notifyChangesToInGameEditor,
+    ]
+  );
 
-    // Trigger reloading of extensions as an extension was modified (or even added)
-    // to create the custom object.
-    eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
-      currentProject
-    );
-  };
+  const onReloadEventsFunctionsExtensions = React.useCallback(
+    () => {
+      _onReloadEventsFunctionsExtensionsAsync();
+    },
+    [_onReloadEventsFunctionsExtensionsAsync]
+  );
 
-  const onOpenEventBasedObjectVariantEditor = (
-    extensionName: string,
-    eventsBasedObjectName: string,
-    variantName: string
-  ) => {
-    if (!currentProject) return;
-    if (!currentProject.hasEventsFunctionsExtensionNamed(extensionName)) {
-      return;
-    }
-    const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
-      extensionName
-    );
-    const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
-    if (!eventsBasedObjects.has(eventsBasedObjectName)) {
-      return;
-    }
-    const eventsBasedObject = eventsBasedObjects.get(eventsBasedObjectName);
-    openCustomObjectEditor(
-      eventsFunctionsExtension,
-      eventsBasedObject,
-      variantName
-    );
+  // TODO Check why we don't always use `onReloadEventsFunctionsExtensions`.
+  /**
+   * It's the same as `onReloadEventsFunctionsExtensions` but extensions are
+   * not unloaded first.
+   */
+  const onLoadEventsFunctionsExtensions = React.useCallback(
+    async ({ shouldHotReloadEditor }: {| shouldHotReloadEditor: boolean |}) => {
+      if (isProjectClosedSoAvoidReloadingExtensions) {
+        return;
+      }
+      await eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+        currentProject
+      );
+      if (shouldHotReloadEditor) {
+        notifyChangesToInGameEditor({
+          shouldReloadProjectData: false,
+          shouldReloadLibraries: true,
+          shouldReloadResources: false,
+          shouldHardReload: false,
+          reasons: ['loaded-extensions'],
+        });
+      }
+    },
+    [
+      isProjectClosedSoAvoidReloadingExtensions,
+      currentProject,
+      eventsFunctionsExtensionsState,
+      notifyChangesToInGameEditor,
+    ]
+  );
 
-    // Trigger reloading of extensions as an extension was modified (or even added)
-    // to create the custom object.
-    eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
-      currentProject
-    );
-  };
+  const _onOpenEventBasedObjectEditorAsync = React.useCallback(
+    async (extensionName: string, eventsBasedObjectName: string) => {
+      if (
+        !currentProject ||
+        !currentProject.hasEventsFunctionsExtensionNamed(extensionName)
+      ) {
+        return;
+      }
+      const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
+        extensionName
+      );
+      const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
+      if (!eventsBasedObjects.has(eventsBasedObjectName)) {
+        return;
+      }
+      const eventsBasedObject = eventsBasedObjects.get(eventsBasedObjectName);
+
+      // Trigger reloading of extensions as an extension was modified (or even added)
+      // to create the custom object.
+      await eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+        currentProject
+      );
+      setEditorHotReloadNeeded({
+        shouldReloadProjectData: false,
+        shouldReloadLibraries: true,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+        reasons: ['opened-custom-object-editor'],
+      });
+
+      openCustomObjectAndExtensionEditors(
+        eventsFunctionsExtension,
+        eventsBasedObject,
+        ''
+      );
+    },
+    [
+      currentProject,
+      openCustomObjectAndExtensionEditors,
+      eventsFunctionsExtensionsState,
+    ]
+  );
+
+  const onOpenEventBasedObjectEditor = React.useCallback(
+    (extensionName: string, eventsBasedObjectName: string) => {
+      _onOpenEventBasedObjectEditorAsync(extensionName, eventsBasedObjectName);
+    },
+    [_onOpenEventBasedObjectEditorAsync]
+  );
+
+  const onEventBasedObjectTypeChanged = React.useCallback(
+    () => {
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: true,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+        reasons: ['changed-custom-object-type'],
+      });
+    },
+    [notifyChangesToInGameEditor]
+  );
+
+  const _onExtractAsEventBasedObjectAsync = React.useCallback(
+    async (extensionName: string, eventsBasedObjectName: string) => {
+      // This method already trigger an hot-reload of the libraries after
+      // generation extension code.
+      await _onOpenEventBasedObjectEditorAsync(
+        extensionName,
+        eventsBasedObjectName
+      );
+    },
+    [_onOpenEventBasedObjectEditorAsync]
+  );
+
+  const onExtractAsEventBasedObject = React.useCallback(
+    (extensionName: string, eventsBasedObjectName: string) => {
+      _onExtractAsEventBasedObjectAsync(extensionName, eventsBasedObjectName);
+    },
+    [_onExtractAsEventBasedObjectAsync]
+  );
+
+  const _onOpenEventBasedObjectVariantEditorAsync = React.useCallback(
+    async (
+      extensionName: string,
+      eventsBasedObjectName: string,
+      variantName: string
+    ) => {
+      if (!currentProject) return;
+      if (!currentProject.hasEventsFunctionsExtensionNamed(extensionName)) {
+        return;
+      }
+      const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
+        extensionName
+      );
+      const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
+      if (!eventsBasedObjects.has(eventsBasedObjectName)) {
+        return;
+      }
+      const eventsBasedObject = eventsBasedObjects.get(eventsBasedObjectName);
+
+      // Trigger reloading of extensions as an extension was modified (or even added)
+      // to create the custom object.
+      await eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+        currentProject
+      );
+      setEditorHotReloadNeeded({
+        shouldReloadProjectData: false,
+        shouldReloadLibraries: true,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+        reasons: ['opened-custom-object-variant-editor'],
+      });
+      openCustomObjectEditor(
+        eventsFunctionsExtension,
+        eventsBasedObject,
+        variantName
+      );
+    },
+    [currentProject, openCustomObjectEditor, eventsFunctionsExtensionsState]
+  );
+
+  const onOpenEventBasedObjectVariantEditor = React.useCallback(
+    (
+      extensionName: string,
+      eventsBasedObjectName: string,
+      variantName: string
+    ) => {
+      _onOpenEventBasedObjectVariantEditorAsync(
+        extensionName,
+        eventsBasedObjectName,
+        variantName
+      );
+    },
+    [_onOpenEventBasedObjectVariantEditorAsync]
+  );
 
   const onEventsBasedObjectChildrenEdited = React.useCallback(
     (eventsBasedObject: gdEventsBasedObject) => {
@@ -2519,8 +3140,13 @@ const MainFrame = (props: Props) => {
           editorRef.onObjectsModifiedOutsideEditor(changes);
         }
       }
+      if (changes.isNewObjectTypeUsed) {
+        onObjectListsModified({
+          isNewObjectTypeUsed: changes.isNewObjectTypeUsed,
+        });
+      }
     },
-    [state.editorTabs]
+    [state.editorTabs, onObjectListsModified]
   );
 
   const onObjectGroupsModifiedOutsideEditor = React.useCallback(
@@ -2575,6 +3201,13 @@ const MainFrame = (props: Props) => {
     eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
       currentProject
     );
+    setEditorHotReloadNeeded({
+      shouldReloadProjectData: false,
+      shouldReloadLibraries: true,
+      shouldReloadResources: false,
+      shouldHardReload: false,
+      reasons: ['created-events-function'],
+    });
   };
 
   const openOpenFromStorageProviderDialog = React.useCallback(
@@ -3711,11 +4344,25 @@ const MainFrame = (props: Props) => {
     fetchNewlyAddedResources
   );
 
-  useKeyboardShortcuts(
-    commandPaletteRef.current
-      ? commandPaletteRef.current.launchCommand
-      : () => {}
+  const onNewResourcesAdded = React.useCallback(
+    () => {
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: false,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+        reasons: ['added-new-resources'],
+      });
+    },
+    [notifyChangesToInGameEditor]
   );
+
+  useKeyboardShortcuts({
+    previewDebuggerServer,
+    onRunCommand: commandPaletteRef.current
+      ? commandPaletteRef.current.launchCommand
+      : () => {},
+  });
 
   const openCommandPalette = React.useCallback(() => {
     if (commandPaletteRef.current) {
@@ -3808,13 +4455,26 @@ const MainFrame = (props: Props) => {
     []
   );
 
+  // Register the onResourceExternallyChanged with an up to date context.
+  React.useEffect(
+    () => {
+      const callbackId = registerOnResourceExternallyChangedCallback(
+        onResourceExternallyChanged
+      );
+      return () => {
+        unregisterOnResourceExternallyChangedCallback(callbackId);
+      };
+    },
+    [onResourceExternallyChanged]
+  );
+
   useMainFrameCommands({
     i18n,
     project: state.currentProject,
     previewEnabled:
       !!state.currentProject && state.currentProject.getLayoutsCount() > 0,
     onOpenProjectManager: toggleProjectManager,
-    hasPreviewsRunning,
+    hasPreviewsRunning: hasNonEditionPreviewsRunning,
     allowNetworkPreview:
       !!_previewLauncher.current &&
       _previewLauncher.current.canDoNetworkPreview(),
@@ -3842,6 +4502,7 @@ const MainFrame = (props: Props) => {
     onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
     onOpenCommandPalette: openCommandPalette,
     onOpenProfile: onOpenProfileDialog,
+    onRestartInGameEditor,
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(
@@ -3853,6 +4514,8 @@ const MainFrame = (props: Props) => {
       onFetchNewlyAddedResources,
       getStorageProviderResourceOperations,
       canInstallPrivateAsset,
+      onNewResourcesAdded,
+      onResourceUsageChanged,
     }),
     [
       resourceSources,
@@ -3862,6 +4525,8 @@ const MainFrame = (props: Props) => {
       onFetchNewlyAddedResources,
       getStorageProviderResourceOperations,
       canInstallPrivateAsset,
+      onNewResourcesAdded,
+      onResourceUsageChanged,
     ]
   );
 
@@ -3899,6 +4564,7 @@ const MainFrame = (props: Props) => {
     authenticatedUser.limits.capabilities.classrooms.hideAskAi;
   const showLoader = isProjectOpening || isLoadingProject || previewLoading;
   const shortcutMap = useShortcutMap();
+
   const buildMainMenuProps = {
     i18n: i18n,
     project: state.currentProject,
@@ -3938,6 +4604,8 @@ const MainFrame = (props: Props) => {
     (!currentFileMetadata || !isProjectOwnedBySomeoneElse);
 
   const editorTabsPaneProps: EditorTabsPaneCommonProps = {
+    gameEditorMode,
+    setGameEditorMode,
     editorTabs: state.editorTabs,
     currentProject: currentProject,
     currentFileMetadata: currentFileMetadata,
@@ -3945,7 +4613,7 @@ const MainFrame = (props: Props) => {
     isSavingProject: isSavingProject,
     isSharingEnabled:
       !checkedOutVersionStatus && !cloudProjectRecoveryOpenedVersionId,
-    hasPreviewsRunning: hasPreviewsRunning,
+    hasPreviewsRunning: hasNonEditionPreviewsRunning,
     previewState: previewState,
     checkedOutVersionStatus: checkedOutVersionStatus,
     canDoNetworkPreview:
@@ -4004,10 +4672,13 @@ const MainFrame = (props: Props) => {
     renameResourcesInProject: renameResourcesInProject,
     openBehaviorEvents: openBehaviorEvents,
     onExtractAsExternalLayout: onExtractAsExternalLayout,
+    onExtractAsEventBasedObject: onExtractAsEventBasedObject,
+    onEventBasedObjectTypeChanged: onEventBasedObjectTypeChanged,
     onOpenEventBasedObjectEditor: onOpenEventBasedObjectEditor,
     onOpenEventBasedObjectVariantEditor: onOpenEventBasedObjectVariantEditor,
     deleteEventsBasedObjectVariant: deleteEventsBasedObjectVariant,
     onEventsBasedObjectChildrenEdited: onEventsBasedObjectChildrenEdited,
+    onLoadEventsFunctionsExtensions: onLoadEventsFunctionsExtensions,
     onSceneObjectEdited: onSceneObjectEdited,
     onSceneObjectsDeleted: onSceneObjectsDeleted,
     onSceneEventsModifiedOutsideEditor: onSceneEventsModifiedOutsideEditor,
@@ -4015,7 +4686,14 @@ const MainFrame = (props: Props) => {
     onObjectsModifiedOutsideEditor: onObjectsModifiedOutsideEditor,
     onObjectGroupsModifiedOutsideEditor: onObjectGroupsModifiedOutsideEditor,
     onExtensionInstalled: onExtensionInstalled,
+    onEffectAdded: onEffectAdded,
+    onObjectListsModified: onObjectListsModified,
+    onExternalLayoutAssociationChanged,
     gamesList: gamesList,
+    triggerHotReloadInGameEditorIfNeeded,
+    onRestartInGameEditorAfterError: showRestartInGameEditorAfterErrorButton
+      ? onRestartInGameEditor
+      : null,
   };
 
   const hasEditorsInLeftPane = hasEditorsInPane(state.editorTabs, 'left');
@@ -4027,6 +4705,31 @@ const MainFrame = (props: Props) => {
         'main-frame' /* The root styling, done in CSS to read some CSS variables. */
       }
     >
+      {!!renderPreviewLauncher &&
+        renderPreviewLauncher(
+          {
+            crashReportUploadLevel:
+              preferences.values.previewCrashReportUploadLevel ||
+              'exclude-javascript-code-events',
+            previewContext: quickCustomizationDialogOpenedFromGameId
+              ? 'preview-quick-customization'
+              : 'preview',
+            sourceGameId: quickCustomizationDialogOpenedFromGameId || '',
+            getIncludeFileHashs:
+              eventsFunctionsExtensionsContext.getIncludeFileHashs,
+            onExport: () => openShareDialog('publish'),
+            onCaptureFinished,
+          },
+          (previewLauncher: ?PreviewLauncherInterface) => {
+            _previewLauncher.current = previewLauncher;
+          }
+        )}
+      <EmbeddedGameFrame
+        key={currentProject ? currentProject.ptr : 0}
+        enabled={gameEditorMode === 'embedded-game'}
+        previewDebuggerServer={previewDebuggerServer || null}
+        onLaunchPreviewForInGameEdition={onLaunchPreviewForInGameEdition}
+      />
       {!!renderMainMenu &&
         renderMainMenu(
           { ...buildMainMenuProps, isApplicationTopLevelMenu: true },
@@ -4071,15 +4774,10 @@ const MainFrame = (props: Props) => {
           onRenameEventsFunctionsExtension={renameEventsFunctionsExtension}
           onRenameExternalEvents={renameExternalEvents}
           onOpenResources={openResources}
-          onReloadEventsFunctionsExtensions={() => {
-            if (isProjectClosedSoAvoidReloadingExtensions) {
-              return;
-            }
-            eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
-              currentProject
-            );
-          }}
+          onReloadEventsFunctionsExtensions={onReloadEventsFunctionsExtensions}
           onExtensionInstalled={onExtensionInstalled}
+          onSceneAdded={onSceneAdded}
+          onExternalLayoutAdded={onExternalLayoutAdded}
           onShareProject={() => openShareDialog()}
           isOpen={projectManagerOpen}
           hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
@@ -4128,7 +4826,11 @@ const MainFrame = (props: Props) => {
       <LoaderModal
         show={showLoader}
         progress={fileMetadataOpeningProgress}
-        message={loaderModalOpeningMessage || fileMetadataOpeningMessage}
+        message={
+          loaderModalOpeningMessage ||
+          fileMetadataOpeningMessage ||
+          (previewLoading ? t`Loading preview...` : null)
+        }
       />
       <Snackbar
         open={state.snackMessageOpen}
@@ -4151,25 +4853,6 @@ const MainFrame = (props: Props) => {
           initialTab: shareDialogInitialTab,
           gamesList,
         })}
-      {!!renderPreviewLauncher &&
-        renderPreviewLauncher(
-          {
-            crashReportUploadLevel:
-              preferences.values.previewCrashReportUploadLevel ||
-              'exclude-javascript-code-events',
-            previewContext: quickCustomizationDialogOpenedFromGameId
-              ? 'preview-quick-customization'
-              : 'preview',
-            sourceGameId: quickCustomizationDialogOpenedFromGameId || '',
-            getIncludeFileHashs:
-              eventsFunctionsExtensionsContext.getIncludeFileHashs,
-            onExport: () => openShareDialog('publish'),
-            onCaptureFinished,
-          },
-          (previewLauncher: ?PreviewLauncherInterface) => {
-            _previewLauncher.current = previewLauncher;
-          }
-        )}
       {chooseResourceOptions && onResourceChosen && !!currentProject && (
         <NewResourceDialog
           project={currentProject}
@@ -4310,14 +4993,39 @@ const MainFrame = (props: Props) => {
       )}
       {state.gdjsDevelopmentWatcherEnabled &&
         renderGDJSDevelopmentWatcher &&
-        renderGDJSDevelopmentWatcher()}
-      {!!hotReloadLogs.length && (
+        renderGDJSDevelopmentWatcher({
+          onGDJSUpdated: relaunchAndThenHardReloadAllPreviews,
+        })}
+      {gameHotReloadLogs.length > 0 && (
         <HotReloadLogsDialog
-          logs={hotReloadLogs}
-          onClose={clearHotReloadLogs}
+          logs={gameHotReloadLogs}
+          onClose={clearGameHotReloadLogs}
           onLaunchNewPreview={() => {
-            clearHotReloadLogs();
+            clearGameHotReloadLogs();
             launchNewPreview();
+          }}
+        />
+      )}
+      {(editorHotReloadLogs.length > 0 || editorUncaughtError !== null) && (
+        <HotReloadLogsDialog
+          isForEditor
+          logs={
+            editorUncaughtError
+              ? [
+                  ...editorHotReloadLogs,
+                  { kind: 'error', message: editorUncaughtError.message },
+                ]
+              : editorHotReloadLogs
+          }
+          onClose={() => {
+            clearEditorHotReloadLogs();
+            clearEditorUncaughtError();
+            setShowRestartInGameEditorAfterErrorButton(true);
+          }}
+          onLaunchNewPreview={() => {
+            clearEditorHotReloadLogs();
+            clearEditorUncaughtError();
+            onRestartInGameEditor();
           }}
         />
       )}

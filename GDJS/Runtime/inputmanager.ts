@@ -33,24 +33,28 @@ namespace gdjs {
     /**
      * The cursor X position (moved by mouse and touch events).
      */
-    _cursorX: float = 0;
+    private _cursorX: float = 0;
     /**
      * The cursor Y position (moved by mouse and touch events).
      */
-    _cursorY: float = 0;
+    private _cursorY: float = 0;
     /**
      * The mouse X position (only moved by mouse events).
      */
-    _mouseX: float = 0;
+    private _mouseX: float = 0;
     /**
      * The mouse Y position (only moved by mouse events).
      */
-    _mouseY: float = 0;
-    _isMouseInsideCanvas: boolean = true;
-    _mouseWheelDelta: float = 0;
+    private _mouseY: float = 0;
+    private _isMouseInsideCanvas: boolean = true;
+    private _wheelDeltaX: float = 0;
+    private _wheelDeltaY: float = 0;
+    private _wheelDeltaZ: float = 0;
+
     // TODO Remove _touches when there is no longer SpritePanelButton 1.2.0
     // extension in the wild.
-    _touches = {
+    // @ts-ignore
+    private _touches = {
       firstKey: (): string | number | null => {
         for (const key in this._mouseOrTouches.items) {
           // Exclude mouse key.
@@ -61,22 +65,23 @@ namespace gdjs {
         return null;
       },
     };
-    _mouseOrTouches: Hashtable<Touch>;
+
+    private _mouseOrTouches: Hashtable<Touch>;
     //Identifiers of the touches that started during/before the frame.
-    _startedTouches: Array<integer> = [];
+    private _startedTouches: Array<integer> = [];
 
     //Identifiers of the touches that ended during/before the frame.
-    _endedTouches: Array<integer> = [];
-    _touchSimulateMouse: boolean = true;
+    private _endedTouches: Array<integer> = [];
+    private _touchSimulateMouse: boolean = true;
 
     /**
      * @deprecated
      */
-    _lastStartedTouchIndex = 0;
+    private _lastStartedTouchIndex = 0;
     /**
      * @deprecated
      */
-    _lastEndedTouchIndex = 0;
+    private _lastEndedTouchIndex = 0;
 
     constructor() {
       this._pressedKeys = new Hashtable();
@@ -96,7 +101,7 @@ namespace gdjs {
      * @param keyCode The raw key code
      * @param location The location
      */
-    _getLocationAwareKeyCode(
+    static getLocationAwareKeyCode(
       keyCode: number,
       location: number | null | undefined
     ): integer {
@@ -121,7 +126,7 @@ namespace gdjs {
      * @param location The location of the event.
      */
     onKeyPressed(keyCode: number, location?: number): void {
-      const locationAwareKeyCode = this._getLocationAwareKeyCode(
+      const locationAwareKeyCode = InputManager.getLocationAwareKeyCode(
         keyCode,
         location
       );
@@ -138,7 +143,7 @@ namespace gdjs {
      * @param location The location of the event.
      */
     onKeyReleased(keyCode: number, location?: number): void {
-      const locationAwareKeyCode = this._getLocationAwareKeyCode(
+      const locationAwareKeyCode = InputManager.getLocationAwareKeyCode(
         keyCode,
         location
       );
@@ -232,6 +237,14 @@ namespace gdjs {
         }
       }
       return false;
+    }
+
+    exceptionallyGetAllJustPressedKeys(): number[] {
+      const result: string[] = [];
+      this._justPressedKeys.keys(result);
+      return result.map((locationAwareKeyCode) =>
+        parseInt(locationAwareKeyCode, 10)
+      );
     }
 
     /**
@@ -335,6 +348,19 @@ namespace gdjs {
       }
     }
 
+    /**
+     * Return true if any mouse button is pressed.
+     * @return true if any mouse button is pressed.
+     */
+    anyMouseButtonPressed(): boolean {
+      for (const buttonCode in this._pressedMouseButtons) {
+        if (this._pressedMouseButtons[buttonCode]) {
+          return true;
+        }
+      }
+      return false;
+    }
+
     _setMouseButtonPressed(buttonCode: number): void {
       this._pressedMouseButtons[buttonCode] = true;
       this._releasedMouseButtons[buttonCode] = false;
@@ -380,17 +406,37 @@ namespace gdjs {
 
     /**
      * Should be called whenever the mouse wheel is used
-     * @param wheelDelta The mouse wheel delta
+     * @param wheelDeltaY The mouse wheel delta
      */
-    onMouseWheel(wheelDelta: number): void {
-      this._mouseWheelDelta = wheelDelta;
+    onMouseWheel(
+      wheelDeltaY: number,
+      wheelDeltaX: number,
+      wheelDeltaZ: number
+    ): void {
+      this._wheelDeltaY = wheelDeltaY;
+      if (wheelDeltaX !== undefined) this._wheelDeltaX = wheelDeltaX;
+      if (wheelDeltaZ !== undefined) this._wheelDeltaZ = wheelDeltaZ;
     }
 
     /**
-     * Return the mouse wheel delta
+     * Return the mouse wheel delta on Y axis.
      */
     getMouseWheelDelta(): float {
-      return this._mouseWheelDelta;
+      return this._wheelDeltaY;
+    }
+
+    /**
+     * Return the mouse wheel delta on X axis.
+     */
+    getMouseWheelDeltaX(): float {
+      return this._wheelDeltaX;
+    }
+
+    /**
+     * Return the mouse wheel delta on Z axis.
+     */
+    getMouseWheelDeltaZ(): float {
+      return this._wheelDeltaZ;
     }
 
     /**
@@ -578,7 +624,9 @@ namespace gdjs {
       this._releasedKeys.clear();
       this._justPressedKeys.clear();
       this._releasedMouseButtons.length = 0;
-      this._mouseWheelDelta = 0;
+      this._wheelDeltaX = 0;
+      this._wheelDeltaY = 0;
+      this._wheelDeltaZ = 0;
       this._lastStartedTouchIndex = 0;
       this._lastEndedTouchIndex = 0;
     }

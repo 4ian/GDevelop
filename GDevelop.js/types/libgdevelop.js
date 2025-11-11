@@ -87,6 +87,7 @@ declare class libGDevelop {
   ObjectsContainersList: Class<gdObjectsContainersList>;
   ProjectScopedContainers: Class<gdProjectScopedContainers>;
   ExtensionProperties: Class<gdExtensionProperties>;
+  BehaviorDefaultFlagClearer: Class<gdBehaviorDefaultFlagClearer>;
   Behavior: Class<gdBehavior>;
   BehaviorJsImplementation: Class<gdBehaviorJsImplementation>;
   BehaviorsSharedData: Class<gdBehaviorsSharedData>;
@@ -157,6 +158,7 @@ declare class libGDevelop {
   ParameterMetadataContainer: Class<gdParameterMetadataContainer>;
   ParameterMetadataTools: Class<gdParameterMetadataTools>;
   ObjectMetadata: Class<gdObjectMetadata>;
+  InGameEditorResourceMetadata: Class<gdInGameEditorResourceMetadata>;
   QuickCustomization_Visibility: Class<QuickCustomization_Visibility>;
   QuickCustomization: Class<gdQuickCustomization>;
   QuickCustomizationVisibilitiesContainer: Class<gdQuickCustomizationVisibilitiesContainer>;
@@ -192,6 +194,7 @@ declare class libGDevelop {
   PropertyFunctionGenerator: Class<gdPropertyFunctionGenerator>;
   UsedExtensionsResult: Class<gdUsedExtensionsResult>;
   UsedExtensionsFinder: Class<gdUsedExtensionsFinder>;
+  UsedObjectTypeFinder: Class<gdUsedObjectTypeFinder>;
   ExampleExtensionUsagesFinder: Class<gdExampleExtensionUsagesFinder>;
   InstructionsCountEvaluator: Class<gdInstructionsCountEvaluator>;
   ExtensionAndBehaviorMetadata: Class<gdExtensionAndBehaviorMetadata>;

@@ -9,7 +9,7 @@ import * as PIXI from 'pixi.js-legacy';
 import * as THREE from 'three';
 import { shouldBeHandledByPinch } from '../PinchHandler';
 import { makeDoubleClickable } from './PixiDoubleClickEvent';
-import Rectangle from '../../Utils/Rectangle'; // TODO (3D): add support for zMin/zMax/depth.
+import Rectangle from '../../Utils/Rectangle';
 import {
   flipPolygon,
   rotatePolygon,

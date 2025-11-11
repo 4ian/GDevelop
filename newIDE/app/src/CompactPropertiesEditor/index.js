@@ -784,7 +784,7 @@ const CompactPropertiesEditor = ({
 
       return (
         <React.Fragment key={`toggle-buttons-${field.name}`}>
-          <CompactToggleButtons id={field.name} buttons={buttons} />
+          <CompactToggleButtons id={field.name} buttons={buttons} expand />
         </React.Fragment>
       );
     },

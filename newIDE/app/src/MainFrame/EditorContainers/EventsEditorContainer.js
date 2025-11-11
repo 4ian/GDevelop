@@ -12,6 +12,10 @@ import {
 } from './BaseEditor';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
+import {
+  setEditorHotReloadNeeded,
+  type HotReloadSteps,
+} from '../../EmbeddedGame/EmbeddedGameFrame';
 
 export class EventsEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?EventsSheetInterface;
@@ -26,14 +30,24 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
   componentDidMount() {
     if (this.props.isActive) {
       const layout = this.getLayout();
-      this.props.setPreviewedLayout(layout ? layout.getName() : null);
+      this.props.setPreviewedLayout({
+        layoutName: layout ? layout.getName() : null,
+        externalLayoutName: null,
+        eventsBasedObjectType: null,
+        eventsBasedObjectVariantName: null,
+      });
     }
   }
 
   componentDidUpdate(prevProps: RenderEditorContainerProps) {
     if (!prevProps.isActive && this.props.isActive) {
       const layout = this.getLayout();
-      this.props.setPreviewedLayout(layout ? layout.getName() : null);
+      this.props.setPreviewedLayout({
+        layoutName: layout ? layout.getName() : null,
+        externalLayoutName: null,
+        eventsBasedObjectType: null,
+        eventsBasedObjectVariantName: null,
+      });
     }
   }
 
@@ -70,6 +84,12 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
         });
     }
   }
+
+  notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {
+    setEditorHotReloadNeeded(hotReloadSteps);
+  }
+
+  switchInGameEditorIfNoHotReloadIsNeeded() {}
 
   onInstancesModifiedOutsideEditor(changes: InstancesOutsideEditorChanges) {
     // No thing to be done.

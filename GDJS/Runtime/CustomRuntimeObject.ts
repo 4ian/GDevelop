@@ -13,7 +13,7 @@ namespace gdjs {
   export type CustomObjectConfiguration = ObjectConfiguration & {
     animatable?: SpriteAnimationData[];
     variant: string;
-    childrenContent: { [objectName: string]: ObjectConfiguration & any };
+    childrenContent?: { [objectName: string]: ObjectConfiguration & any };
     isInnerAreaFollowingParentSize: boolean;
   };
 
@@ -118,37 +118,19 @@ namespace gdjs {
         );
         return;
       }
-
-      if (!eventsBasedObjectData.defaultVariant) {
-        eventsBasedObjectData.defaultVariant = {
-          ...eventsBasedObjectData,
-          name: '',
-        };
-      }
-      // Legacy events-based objects don't have any instance in their default
-      // variant since there wasn't a graphical editor at the time.
-      // In this case, the editor doesn't allow to choose a variant, but a
-      // variant may have stayed after a user rolled back the extension.
-      // This variant must be ignored to match what the editor shows.
-      const isForcedToOverrideEventsBasedObjectChildrenConfiguration =
-        eventsBasedObjectData.defaultVariant.instances.length == 0;
-      let usedVariantData: EventsBasedObjectVariantData =
-        eventsBasedObjectData.defaultVariant;
-      if (
-        customObjectData.variant &&
-        !isForcedToOverrideEventsBasedObjectChildrenConfiguration
-      ) {
-        for (
-          let variantIndex = 0;
-          variantIndex < eventsBasedObjectData.variants.length;
-          variantIndex++
-        ) {
-          const variantData = eventsBasedObjectData.variants[variantIndex];
-          if (variantData.name === customObjectData.variant) {
-            usedVariantData = variantData;
-            break;
-          }
-        }
+      const usedVariantData: EventsBasedObjectVariantData | null =
+        this.getRuntimeScene()
+          .getGame()
+          .getEventsBasedObjectVariantData(
+            customObjectData.type,
+            customObjectData.variant
+          );
+      if (!usedVariantData) {
+        // This can't actually happen.
+        logger.error(
+          `Unknown variant "${customObjectData.variant}" for object "${customObjectData.type}".`
+        );
+        return;
       }
 
       this._isInnerAreaFollowingParentSize =
@@ -178,13 +160,20 @@ namespace gdjs {
     override reinitialize(objectData: ObjectData & CustomObjectConfiguration) {
       super.reinitialize(objectData);
 
-      this._reinitializeRenderer();
-      this._initializeFromObjectData(objectData);
+      this._reinitializeContentFromObjectData(objectData);
 
       // When changing the variant, the instance is like a new instance.
       // We call again `onCreated` at the end, like done by the constructor
       // the first time it's created.
       this.onCreated();
+    }
+
+    private _reinitializeContentFromObjectData(
+      objectData: ObjectData & CustomObjectConfiguration
+    ) {
+      this._reinitializeRenderer();
+      this._instanceContainer._unloadContent();
+      this._initializeFromObjectData(objectData);
     }
 
     override updateFromObjectData(
@@ -214,8 +203,7 @@ namespace gdjs {
             this._instanceContainer._initialInnerArea.max[1] !==
               this._innerArea.max[1]);
 
-        this._reinitializeRenderer();
-        this._initializeFromObjectData(newObjectData);
+        this._reinitializeContentFromObjectData(newObjectData);
 
         // The generated code calls the onCreated super implementation at the end.
         this.onCreated();
@@ -311,15 +299,13 @@ namespace gdjs {
         this.setWidth(initialInstanceData.width);
         this.setHeight(initialInstanceData.height);
       }
-      if (initialInstanceData.opacity !== undefined) {
-        this.setOpacity(initialInstanceData.opacity);
-      }
-      if (initialInstanceData.flippedX) {
-        this.flipX(initialInstanceData.flippedX);
-      }
-      if (initialInstanceData.flippedY) {
-        this.flipY(initialInstanceData.flippedY);
-      }
+      this.setOpacity(
+        initialInstanceData.opacity === undefined
+          ? 255
+          : initialInstanceData.opacity
+      );
+      this.flipX(!!initialInstanceData.flippedX);
+      this.flipY(!!initialInstanceData.flippedY);
     }
 
     override onDeletedFromScene(): void {
@@ -656,6 +642,20 @@ namespace gdjs {
         this._updateUntransformedHitBoxes();
       }
       return this._unrotatedAABB.max[1];
+    }
+
+    getOriginalWidth(): float {
+      return (
+        this._instanceContainer.getInitialUnrotatedViewportMaxX() -
+        this._instanceContainer.getInitialUnrotatedViewportMinX()
+      );
+    }
+
+    getOriginalHeight(): float {
+      return (
+        this._instanceContainer.getInitialUnrotatedViewportMaxY() -
+        this._instanceContainer.getInitialUnrotatedViewportMinY()
+      );
     }
 
     /**

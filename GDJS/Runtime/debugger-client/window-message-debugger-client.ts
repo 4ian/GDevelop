@@ -11,7 +11,13 @@ namespace gdjs {
     constructor(runtimeGame: RuntimeGame) {
       super(runtimeGame);
 
+      // Opener is either the `opener` for popups, or the `parent` if the game
+      // is running as an iframe (notably: in-game edition).
       this._opener = window.opener || null;
+      if (!this._opener && window.parent !== window) {
+        this._opener = window.parent;
+      }
+
       if (!this._opener) {
         logger.info("`window.opener` not existing, the debugger won't work.");
         return;

@@ -48,9 +48,15 @@ import useCourses from './UseCourses';
 import PreferencesContext from '../../Preferences/PreferencesContext';
 import useSubscriptionPlans from '../../../Utils/UseSubscriptionPlans';
 import { BundleStoreContext } from '../../../AssetStore/Bundles/BundleStoreContext';
+import {
+  setEditorHotReloadNeeded,
+  type HotReloadSteps,
+} from '../../../EmbeddedGame/EmbeddedGameFrame';
 import { type CreateProjectResult } from '../../../Utils/UseCreateProject';
 import { CreditsPackageStoreContext } from '../../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import { type OpenAskAiOptions } from '../../../AiGeneration/Utils';
+
+const noop = () => {};
 
 const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
   if (
@@ -181,6 +187,8 @@ type Props = {|
         | 'none',
     |}
   ) => void,
+
+  gameEditorMode: 'embedded-game' | 'instances-editor',
 |};
 
 export type HomePageEditorInterface = {|
@@ -196,6 +204,8 @@ export type HomePageEditorInterface = {|
   onSceneEventsModifiedOutsideEditor: (
     scene: SceneEventsOutsideEditorChanges
   ) => void,
+  notifyChangesToInGameEditor: (hotReloadSteps: HotReloadSteps) => void,
+  switchInGameEditorIfNoHotReloadIsNeeded: () => void,
   onInstancesModifiedOutsideEditor: (
     changes: InstancesOutsideEditorChanges
   ) => void,
@@ -246,6 +256,7 @@ export const HomePage = React.memo<Props>(
         gamesList,
         gamesPlatformFrameTools,
         onExtensionInstalled,
+        gameEditorMode,
       }: Props,
       ref
     ) => {
@@ -529,64 +540,19 @@ export const HomePage = React.memo<Props>(
         [updateToolbar, activeTab, setGamesPlatformFrameShown, isMobile]
       );
 
-      const forceUpdateEditor = React.useCallback(() => {
-        // No updates to be done
-      }, []);
-
-      const onEventsBasedObjectChildrenEdited = React.useCallback(() => {
-        // No thing to be done
-      }, []);
-
-      const onSceneObjectEdited = React.useCallback(
-        (scene: gdLayout, objectWithContext: ObjectWithContext) => {
-          // No thing to be done
-        },
-        []
-      );
-
-      const onSceneObjectsDeleted = React.useCallback((scene: gdLayout) => {
-        // No thing to be done.
-      }, []);
-
-      const onSceneEventsModifiedOutsideEditor = React.useCallback(
-        (changes: SceneEventsOutsideEditorChanges) => {
-          // No thing to be done.
-        },
-        []
-      );
-
-      const onInstancesModifiedOutsideEditor = React.useCallback(
-        (changes: InstancesOutsideEditorChanges) => {
-          // No thing to be done.
-        },
-        []
-      );
-
-      const onObjectsModifiedOutsideEditor = React.useCallback(
-        (changes: ObjectsOutsideEditorChanges) => {
-          // No thing to be done.
-        },
-        []
-      );
-
-      const onObjectGroupsModifiedOutsideEditor = React.useCallback(
-        (changes: ObjectGroupsOutsideEditorChanges) => {
-          // No thing to be done.
-        },
-        []
-      );
-
       React.useImperativeHandle(ref, () => ({
         getProject,
         updateToolbar,
-        forceUpdateEditor,
-        onEventsBasedObjectChildrenEdited,
-        onSceneObjectEdited,
-        onSceneObjectsDeleted,
-        onSceneEventsModifiedOutsideEditor,
-        onInstancesModifiedOutsideEditor,
-        onObjectsModifiedOutsideEditor,
-        onObjectGroupsModifiedOutsideEditor,
+        forceUpdateEditor: noop,
+        onEventsBasedObjectChildrenEdited: noop,
+        onSceneObjectEdited: noop,
+        onSceneObjectsDeleted: noop,
+        onSceneEventsModifiedOutsideEditor: noop,
+        notifyChangesToInGameEditor: setEditorHotReloadNeeded,
+        switchInGameEditorIfNoHotReloadIsNeeded: noop,
+        onInstancesModifiedOutsideEditor: noop,
+        onObjectsModifiedOutsideEditor: noop,
+        onObjectGroupsModifiedOutsideEditor: noop,
       }));
 
       // As the homepage is never unmounted, we need to ensure the games platform
@@ -821,5 +787,6 @@ export const renderHomePageContainer = (
     gamesList={props.gamesList}
     gamesPlatformFrameTools={props.gamesPlatformFrameTools}
     onExtensionInstalled={props.onExtensionInstalled}
+    gameEditorMode={props.gameEditorMode}
   />
 );

@@ -56,6 +56,19 @@ namespace gdjs {
       };
       this._ws.onclose = function close() {
         logger.info('Debugger connection closed');
+
+        if (that._runtimegame.isInGameEdition()) {
+          // Sometimes, for example if the editor is launched for a long time and the device goes to sleep,
+          // the WebSocket connection between the editor and the game is closed. When we are in in-game edition,
+          // we can't afford to lose the connection because it means the editor is unusable.
+          // In this case, we hard reload the game to re-establish a new connection.
+          setTimeout(() => {
+            logger.info(
+              'Debugger connection closed while in in-game edition - this is suspicious so hard reloading to re-establish a new connection.'
+            );
+            that.launchHardReload();
+          }, 1000);
+        }
       };
       this._ws.onerror = function errored(error) {
         logger.warn('Debugger client error:', error);

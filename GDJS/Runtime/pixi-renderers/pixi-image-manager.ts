@@ -103,6 +103,10 @@ namespace gdjs {
       if (!existingTexture) {
         return this._invalidTexture;
       }
+      if (existingTexture.destroyed) {
+        logger.error('Texture for ' + resourceName + ' is not valid anymore.');
+        return this._invalidTexture;
+      }
       if (!existingTexture.valid) {
         logger.error(
           'Texture for ' +

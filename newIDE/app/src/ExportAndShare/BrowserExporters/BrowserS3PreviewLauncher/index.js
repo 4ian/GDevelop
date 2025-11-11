@@ -19,6 +19,7 @@ import Window from '../../../Utils/Window';
 import { getGDevelopResourceJwtToken } from '../../../Utils/GDevelopServices/Project';
 import { isNativeMobileApp } from '../../../Utils/Platform';
 import { getIDEVersionWithHash } from '../../../Version';
+import { setEmbeddedGameFramePreviewLocation } from '../../../EmbeddedGame/EmbeddedGameFrame';
 import { immediatelyOpenNewPreviewWindow } from '../BrowserPreview/BrowserPreviewWindow';
 const gd: libGDevelop = global.gd;
 
@@ -68,7 +69,14 @@ export default class BrowserS3PreviewLauncher extends React.Component<
   };
 
   launchPreview = async (previewOptions: PreviewOptions): Promise<any> => {
-    const { project, layout, externalLayout, numberOfWindows } = previewOptions;
+    const {
+      project,
+      sceneName,
+      externalLayoutName,
+      eventsBasedObjectType,
+      eventsBasedObjectVariantName,
+      numberOfWindows,
+    } = previewOptions;
     this.setState({
       error: null,
     });
@@ -125,10 +133,20 @@ export default class BrowserS3PreviewLauncher extends React.Component<
         project,
         outputDir
       );
-      previewExportOptions.setLayoutName(layout.getName());
+      previewExportOptions.setLayoutName(sceneName);
       previewExportOptions.setIsDevelopmentEnvironment(Window.isDev());
-      if (externalLayout) {
-        previewExportOptions.setExternalLayoutName(externalLayout.getName());
+      previewExportOptions.setIsInGameEdition(
+        previewOptions.isForInGameEdition
+      );
+      previewExportOptions.setEditorId(previewOptions.editorId || '');
+      if (externalLayoutName) {
+        previewExportOptions.setExternalLayoutName(externalLayoutName);
+      }
+      if (eventsBasedObjectType) {
+        previewExportOptions.setEventsBasedObjectType(eventsBasedObjectType);
+        previewExportOptions.setEventsBasedObjectVariantName(
+          eventsBasedObjectVariantName || ''
+        );
       }
 
       if (isNativeMobileApp()) {
@@ -183,6 +201,22 @@ export default class BrowserS3PreviewLauncher extends React.Component<
           );
         });
       }
+      if (previewOptions.editorCameraState3D) {
+        previewExportOptions.setEditorCameraState3D(
+          previewOptions.editorCameraState3D.cameraMode,
+          previewOptions.editorCameraState3D.positionX,
+          previewOptions.editorCameraState3D.positionY,
+          previewOptions.editorCameraState3D.positionZ,
+          previewOptions.editorCameraState3D.rotationAngle,
+          previewOptions.editorCameraState3D.elevationAngle,
+          previewOptions.editorCameraState3D.distance
+        );
+      }
+      if (previewOptions.inGameEditorSettings) {
+        previewExportOptions.setInGameEditorSettingsJson(
+          JSON.stringify(previewOptions.inGameEditorSettings)
+        );
+      }
 
       // The token, if any, to be used to read resources on GDevelop Cloud buckets.
       const gdevelopResourceToken = getGDevelopResourceJwtToken();
@@ -195,6 +229,12 @@ export default class BrowserS3PreviewLauncher extends React.Component<
 
       // Upload any file that must be exported for the preview.
       await browserS3FileSystem.uploadPendingObjects();
+
+      if (previewOptions.isForInGameEdition) {
+        setEmbeddedGameFramePreviewLocation({
+          previewIndexHtmlLocation: outputDir + '/index.html',
+        });
+      }
 
       // Change the HTML file displayed by the preview window so that it starts loading
       // the game.

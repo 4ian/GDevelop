@@ -240,9 +240,11 @@ namespace gdjs {
             this.setWidth(initialInstanceData.width);
             this.setHeight(initialInstanceData.height);
           }
-          if (initialInstanceData.opacity !== undefined) {
-            this.setOpacity(initialInstanceData.opacity);
-          }
+          this.setOpacity(
+            initialInstanceData.opacity === undefined
+              ? 255
+              : initialInstanceData.opacity
+          );
 
           // 4. Update position (calculations based on renderer's dimensions).
           this._renderer.updatePosition();
@@ -451,6 +453,14 @@ namespace gdjs {
 
     getHeight(): float {
       return this._renderer.getHeight();
+    }
+
+    override getOriginalWidth(): float {
+      return this.getTileMapWidth();
+    }
+
+    override getOriginalHeight(): float {
+      return this.getTileMapHeight();
     }
 
     getScaleX(): float {

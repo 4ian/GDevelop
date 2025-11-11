@@ -1,0 +1,13 @@
+import React from 'react';
+import SvgIcon from '@material-ui/core/SvgIcon';
+
+export default React.memo(props => (
+  <SvgIcon {...props} width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M19 3.25C19.9665 3.25 20.75 4.0335 20.75 5V19C20.75 19.9665 19.9665 20.75 19 20.75H5C4.0335 20.75 3.25 19.9665 3.25 19V5C3.25 4.0335 4.0335 3.25 5 3.25H19ZM4.75 19C4.75 19.1381 4.86193 19.25 5 19.25H8.5V15.5H4.75V19ZM10 19.25H14V15.5H10V19.25ZM15.5 19.25H19C19.1381 19.25 19.25 19.1381 19.25 19V15.5H15.5V19.25ZM4.75 14H8.5V10H4.75V14ZM10 14H14V10H10V14ZM15.5 14H19.25V10H15.5V14ZM5 4.75C4.86193 4.75 4.75 4.86193 4.75 5V8.5H8.5V4.75H5ZM10 8.5H14V4.75H10V8.5ZM15.5 8.5H19.25V5C19.25 4.86193 19.1381 4.75 19 4.75H15.5V8.5Z"
+      fill="currentColor"
+    />
+  </SvgIcon>
+));

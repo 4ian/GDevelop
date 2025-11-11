@@ -1438,6 +1438,22 @@ namespace gdjs {
     }
 
     /**
+     * Return the width of the object before any custom size is applied.
+     * @return The width of the object
+     */
+    getOriginalWidth(): float {
+      return this.getWidth();
+    }
+
+    /**
+     * Return the width of the object before any custom size is applied.
+     * @return The width of the object
+     */
+    getOriginalHeight(): float {
+      return this.getHeight();
+    }
+
+    /**
      * Set the width of the object, if applicable.
      * @param width The new width in pixels.
      */

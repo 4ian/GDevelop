@@ -11,6 +11,8 @@ namespace gdjs {
       this._object = runtimeObject;
       this._threeObject3D = threeObject3D;
       this._threeObject3D.rotation.order = 'ZYX';
+      //@ts-ignore
+      this._threeObject3D.gdjsRuntimeObject = runtimeObject;
 
       instanceContainer
         .getLayer('')

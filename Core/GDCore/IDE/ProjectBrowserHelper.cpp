@@ -332,6 +332,12 @@ void ProjectBrowserHelper::ExposeLayoutObjects(gd::Layout &layout,
   worker.Launch(layout.GetObjects());
 }
 
+void ProjectBrowserHelper::ExposeEventsBasedObjectVariantObjects(
+    gd::EventsBasedObjectVariant &eventsBasedObjectVariant,
+    gd::ArbitraryObjectsWorker &worker) {
+  worker.Launch(eventsBasedObjectVariant.GetObjects());
+}
+
 void ProjectBrowserHelper::ExposeProjectFunctions(
     gd::Project &project, gd::ArbitraryEventsFunctionsWorker &worker) {
 

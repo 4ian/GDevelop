@@ -130,15 +130,30 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
       [initialResourceName]
     );
 
+    const _onChange = React.useCallback(
+      (value: string) => {
+        if (value === resourceName) {
+          return;
+        }
+        if (onChange) {
+          onChange(value);
+        }
+        if (resourceManagementProps.onResourceUsageChanged) {
+          resourceManagementProps.onResourceUsageChanged();
+        }
+      },
+      [resourceName, onChange, resourceManagementProps]
+    );
+
     const onResetResourceName = React.useCallback(
       () => {
         setResourceName('');
         if (autoCompleteRef.current)
           autoCompleteRef.current.forceInputValueTo('');
         setNotFoundError(false);
-        if (onChange) onChange('');
+        _onChange('');
       },
-      [onChange]
+      [_onChange]
     );
 
     const onChangeResourceName = React.useCallback(
@@ -147,18 +162,21 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
           onResetResourceName();
           return;
         }
+        if (newResourceName === resourceName) {
+          return;
+        }
         const isMissing =
           allResourcesNamesRef.current.indexOf(newResourceName) === -1;
 
         if (!isMissing) {
-          if (onChange) onChange(newResourceName);
+          _onChange(newResourceName);
         }
         setResourceName(newResourceName);
         if (autoCompleteRef.current)
           autoCompleteRef.current.forceInputValueTo(newResourceName);
         setNotFoundError(isMissing);
       },
-      [onChange, onResetResourceName]
+      [resourceName, _onChange, onResetResourceName]
     );
 
     const onInputValueChange = React.useCallback(
@@ -259,13 +277,18 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
 
             // addResource will check if a resource with the same name exists, and if it is
             // the case, no new resource will be added.
-            project.getResourcesManager().addResource(resource);
+            const hasCreatedAnyResource = project
+              .getResourcesManager()
+              .addResource(resource);
 
             // Important, we are responsible for deleting the resources that were given to us.
             // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
             selectedResources.forEach(resource => resource.delete());
 
-            await resourceManagementProps.onFetchNewlyAddedResources();
+            if (hasCreatedAnyResource) {
+              await resourceManagementProps.onFetchNewlyAddedResources();
+              resourceManagementProps.onNewResourcesAdded();
+            }
             triggerResourcesHaveChanged();
           }
 
@@ -344,7 +367,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
             resources[0].name,
           ]);
 
-          onChange(resources[0].name);
+          _onChange(resources[0].name);
           triggerResourcesHaveChanged();
           forceUpdate();
         } catch (error) {
@@ -368,7 +391,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
       [
         defaultNewResourceName,
         forceUpdate,
-        onChange,
+        _onChange,
         project,
         resourceManagementProps,
         resourceName,

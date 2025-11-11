@@ -2,7 +2,6 @@
 import * as React from 'react';
 
 import {
-  getEditorTabMetadata,
   type EditorTabsState,
   type EditorOpeningOptions,
   type EditorKind,
@@ -85,7 +84,10 @@ const useEditorTabsStateSaving = ({
         currentTab: editorTabs.panes.center.currentTab,
         editors: editorTabs.panes.center.editors
           .filter(editor => editor.key !== 'start page')
-          .map(getEditorTabMetadata),
+          .map(editor => ({
+            projectItemName: editor.projectItemName,
+            editorKind: editor.kind,
+          })),
       };
 
       setEditorStateForProject(

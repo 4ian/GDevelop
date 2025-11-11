@@ -151,6 +151,7 @@ const PlatformSpecificAssets = ({
       });
 
       await resourceManagementProps.onFetchNewlyAddedResources();
+      resourceManagementProps.onNewResourcesAdded();
 
       // Make sure the resources are (re)loaded.
       ResourcesLoader.burstUrlsCacheForResources(

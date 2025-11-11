@@ -1,6 +1,15 @@
 /* Mosaic layout */
 .mosaic-gd-theme.mosaic {
+  background-color: transparent !important;
+}
+
+.mosaic-gd-theme.mosaic.opaque {
   background-color: var(--mosaic-layout-background-color) !important;
+  pointer-events: all;
+}
+
+.mosaic-drop-target .drop-target-container {
+  pointer-events: all;
 }
 
 /* Mosaic window and tile */
@@ -9,8 +18,15 @@
   box-shadow: none !important;
 }
 
+.mosaic-gd-theme .mosaic-window-toolbar {
+  border-top-right-radius: 4px !important;
+  border-top-left-radius: 4px !important;
+}
+
 .mosaic-gd-theme .mosaic-window-body {
   background: var(--mosaic-layout-background-color) !important;
+  border-bottom-left-radius: 4px !important;
+  border-bottom-right-radius: 4px !important;
 }
 
 .mosaic-gd-theme .mosaic-window .mosaic-window-title {
@@ -27,8 +43,12 @@
   background: var(--mosaic-toolbar-background-color) !important;
 }
 
-.mosaic-gd-theme .mosaic-split.-column {
-  background-color: var(--mosaic-layout-background-color) !important;
+.mosaic-gd-theme .mosaic-window {
+  pointer-events: all;
+}
+
+.mosaic-gd-theme .mosaic-split {
+  pointer-events: all;
 }
 
 /* Separator draggable background (horizontal split) */

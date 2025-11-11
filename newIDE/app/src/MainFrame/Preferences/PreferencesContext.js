@@ -229,6 +229,7 @@ export type PreferencesValues = {|
   takeScreenshotOnPreview: boolean,
   showAiAskButtonInTitleBar: boolean,
   aiState: {| aiRequestId: string | null, mode: 'chat' | 'agent' |},
+  showGameEditorToggle: boolean,
 |};
 
 /**
@@ -340,6 +341,7 @@ export type Preferences = {|
     aiRequestId: string | null,
     mode: 'chat' | 'agent',
   |}) => void,
+  setShowGameEditorToggle: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -400,6 +402,7 @@ export const initialPreferences = {
     takeScreenshotOnPreview: true,
     showAiAskButtonInTitleBar: true,
     aiState: { aiRequestId: null, mode: 'agent' },
+    showGameEditorToggle: false,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -484,6 +487,7 @@ export const initialPreferences = {
     aiRequestId: string | null,
     mode: 'chat' | 'agent',
   |}) => {},
+  setShowGameEditorToggle: (enabled: boolean) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

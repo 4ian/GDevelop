@@ -18,6 +18,7 @@ declare interface ProjectData {
   layouts: LayoutData[];
   externalLayouts: ExternalLayoutData[];
   eventsFunctionsExtensions: EventsFunctionsExtensionData[];
+  activatedByDefaultInEditorBehaviors?: Array<string>;
 }
 
 declare interface EventsFunctionsVariablesData {
@@ -290,6 +291,21 @@ declare interface LayoutData extends InstanceContainerData {
   usedResources: ResourceReference[];
   resourcesPreloading?: 'at-startup' | 'never' | 'inherit';
   resourcesUnloading?: 'at-scene-exit' | 'never' | 'inherit';
+  uiSettings: InstancesEditorSettings;
+}
+
+declare interface InstancesEditorSettings {
+  grid: boolean;
+  gridType: 'rectangular' | 'isometric';
+  gridWidth: float;
+  gridHeight: float;
+  gridDepth?: float;
+  gridOffsetX: float;
+  gridOffsetY: float;
+  gridOffsetZ?: float;
+  gridColor: int;
+  gridAlpha: float;
+  snap: boolean;
 }
 
 declare interface LayoutNetworkSyncData {
@@ -385,6 +401,8 @@ declare interface EventsBasedObjectVariantData extends InstanceContainerData {
   instances: InstanceData[];
   objects: ObjectData[];
   layers: LayerData[];
+  usedResources: ResourceReference[];
+  editionSettings: InstancesEditorSettings;
 }
 
 declare interface BehaviorSharedData {
@@ -396,13 +414,17 @@ declare interface ExternalLayoutData {
   name: string;
   associatedLayout: string;
   instances: InstanceData[];
+  editionSettings: InstancesEditorSettings;
 }
 
-declare interface InstanceData {
+declare interface InstancePersistentUuidData {
   persistentUuid: string;
+}
 
+declare interface InstanceData extends InstancePersistentUuidData {
   layer: string;
-  locked: boolean;
+  locked?: boolean;
+  sealed?: boolean;
   name: string;
 
   x: number;
@@ -447,14 +469,18 @@ declare interface LayerData {
   visibility: boolean;
   cameras: CameraData[];
   effects: EffectData[];
+  /** Used by `InGameEditor` to toggle effects */
+  _hiddenEffects?: EffectData[];
   ambientLightColorR: number;
   ambientLightColorG: number;
   ambientLightColorB: number;
   camera3DFieldOfView?: float;
   camera3DFarPlaneDistance?: float;
   camera3DNearPlaneDistance?: float;
+  camera2DPlaneMaxDrawingDistance?: float;
   isLightingLayer: boolean;
   followBaseLayerCamera: boolean;
+  isLocked?: boolean;
 }
 
 declare interface CameraData {
@@ -499,7 +525,7 @@ declare interface ProjectPropertiesData {
   pixelsRounding: boolean;
   antialiasingMode: 'none' | 'MSAA';
   antialisingEnabledOnMobile: boolean;
-  sizeOnStartupMode: string;
+  sizeOnStartupMode: '' | 'scaleOuter' | 'adaptWidth' | 'adaptHeight';
   version: string;
   name: string;
   author: string;
@@ -519,6 +545,7 @@ declare interface ProjectPropertiesData {
   projectUuid?: string;
   sceneResourcesPreloading?: 'at-startup' | 'never';
   sceneResourcesUnloading?: 'at-scene-exit' | 'never';
+  areEffectsHiddenInEditor?: boolean;
 }
 
 declare interface ExtensionProperty {
@@ -587,4 +614,5 @@ declare type ResourceKind =
   | 'model3D'
   | 'atlas'
   | 'spine'
+  | 'internal-in-game-editor-only-svg'
   | 'fake-resource-kind-for-testing-only';

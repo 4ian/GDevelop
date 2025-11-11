@@ -2,6 +2,7 @@
 
 const zoomStepBasePower = 1 / 16;
 
+// See same factors in `GDJS/Runtime/InGameEditor/InGameEditor.tsx`.
 const stepZoomFactor = Math.pow(2, 2 * zoomStepBasePower);
 export const zoomInFactor = stepZoomFactor;
 export const zoomOutFactor = Math.pow(stepZoomFactor, -1);

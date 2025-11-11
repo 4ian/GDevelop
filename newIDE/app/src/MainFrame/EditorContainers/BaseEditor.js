@@ -46,6 +46,7 @@ export type InstancesOutsideEditorChanges = {|
 
 export type ObjectsOutsideEditorChanges = {|
   scene: gdLayout,
+  isNewObjectTypeUsed: boolean,
 |};
 
 export type ObjectGroupsOutsideEditorChanges = {|
@@ -54,7 +55,10 @@ export type ObjectGroupsOutsideEditorChanges = {|
 
 export type RenderEditorContainerProps = {|
   isActive: boolean,
+  gameEditorMode: 'embedded-game' | 'instances-editor',
+  setGameEditorMode: ('embedded-game' | 'instances-editor') => void,
   projectItemName: ?string,
+  editorId: string,
   project: ?gdProject,
   fileMetadata: ?FileMetadata,
   storageProvider: StorageProvider,
@@ -70,12 +74,15 @@ export type RenderEditorContainerProps = {|
   unsavedChanges: ?UnsavedChanges,
 
   // Preview:
-  setPreviewedLayout: (
-    layoutName: ?string,
-    externalLayoutName?: ?string
-  ) => void,
+  setPreviewedLayout: ({|
+    layoutName: string | null,
+    externalLayoutName: string | null,
+    eventsBasedObjectType: string | null,
+    eventsBasedObjectVariantName: string | null,
+  |}) => void,
   previewDebuggerServer: ?PreviewDebuggerServer,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
+  onRestartInGameEditorAfterError: (() => void) | null,
 
   // Opening other editors:
   onOpenExternalEvents: string => void,
@@ -106,7 +113,9 @@ export type RenderEditorContainerProps = {|
   onCloseAskAi: () => void,
 
   // Events function management:
-  onLoadEventsFunctionsExtensions: () => Promise<void>,
+  onLoadEventsFunctionsExtensions: ({|
+    shouldHotReloadEditor: boolean,
+  |}) => Promise<void>,
   onReloadEventsFunctionsExtensionMetadata: (
     extension: gdEventsFunctionsExtension
   ) => void,
@@ -189,6 +198,7 @@ export type RenderEditorContainerProps = {|
     objectWithContext: ObjectWithContext
   ) => void,
   onSceneObjectsDeleted: (scene: gdLayout) => void,
+  triggerHotReloadInGameEditorIfNeeded: () => void,
 
   onInstancesModifiedOutsideEditor: (
     changes: InstancesOutsideEditorChanges
@@ -209,6 +219,7 @@ export type RenderEditorContainerProps = {|
     extensionName: string,
     eventsBasedObjectName: string
   ) => void,
+  onEventBasedObjectTypeChanged: () => void,
   onOpenEventBasedObjectEditor: (
     extensionName: string,
     eventsBasedObjectName: string
@@ -224,6 +235,9 @@ export type RenderEditorContainerProps = {|
     eventBasedObject: gdEventsBasedObject,
     variant: gdEventsBasedObjectVariant
   ) => void,
+  onEffectAdded: () => void,
+  onObjectListsModified: ({ isNewObjectTypeUsed: boolean }) => void,
+  onExternalLayoutAssociationChanged: () => void,
 |};
 
 export type RenderEditorContainerPropsWithRef = {|

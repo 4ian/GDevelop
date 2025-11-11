@@ -50,6 +50,10 @@ import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
 import { prepareAiUserContent } from './PrepareAiUserContent';
 import { AiRequestContext } from './AiRequestContext';
 import { getAiConfigurationPresetsWithAvailability } from './AiConfiguration';
+import {
+  setEditorHotReloadNeeded,
+  type HotReloadSteps,
+} from '../EmbeddedGame/EmbeddedGameFrame';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
 import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 import {
@@ -125,6 +129,12 @@ type Props = {|
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onOpenAskAi: ({|
+    mode: 'chat' | 'agent',
+    aiRequestId: string | null,
+    paneIdentifier: 'left' | 'center' | 'right' | null,
+  |}) => void,
+  gameEditorMode: 'embedded-game' | 'instances-editor',
   continueProcessingFunctionCallsOnMount?: boolean,
   onOpenAskAi: (?OpenAskAiOptions) => void,
 |};
@@ -157,6 +167,8 @@ export type AskAiEditorInterface = {|
       aiRequestId: string | null,
     |}
   ) => void,
+  notifyChangesToInGameEditor: (hotReloadSteps: HotReloadSteps) => void,
+  switchInGameEditorIfNoHotReloadIsNeeded: () => void,
 |};
 
 const noop = () => {};
@@ -181,6 +193,7 @@ export const AskAiEditor = React.memo<Props>(
         onObjectGroupsModifiedOutsideEditor,
         onExtensionInstalled,
         onOpenAskAi,
+        gameEditorMode,
         continueProcessingFunctionCallsOnMount,
       }: Props,
       ref
@@ -834,6 +847,8 @@ export const AskAiEditor = React.memo<Props>(
         onObjectsModifiedOutsideEditor: noop,
         onObjectGroupsModifiedOutsideEditor: noop,
         startOrOpenChat: onStartOrOpenChat,
+        notifyChangesToInGameEditor: setEditorHotReloadNeeded,
+        switchInGameEditorIfNoHotReloadIsNeeded: noop,
       }));
 
       const onSendFeedback = React.useCallback(
@@ -970,6 +985,7 @@ export const renderAskAiEditorContainer = (
         }
         onExtensionInstalled={props.onExtensionInstalled}
         onOpenAskAi={props.onOpenAskAi}
+        gameEditorMode={props.gameEditorMode}
         continueProcessingFunctionCallsOnMount={
           props.extraEditorProps
             ? props.extraEditorProps.continueProcessingFunctionCallsOnMount

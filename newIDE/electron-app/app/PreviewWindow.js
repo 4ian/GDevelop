@@ -88,7 +88,20 @@ const closePreviewWindow = windowId => {
   if (previewWindow) previewWindow.close();
 };
 
+const closeAllPreviewWindows = () => {
+  previewWindows.forEach(previewWindow => {
+    try {
+      if (previewWindow && !previewWindow.isDestroyed()) {
+        previewWindow.close();
+      }
+    } catch (error) {
+      console.warn('Ignoring exception when closing preview window:', error);
+    }
+  });
+};
+
 module.exports = {
   openPreviewWindow,
   closePreviewWindow,
+  closeAllPreviewWindows,
 };

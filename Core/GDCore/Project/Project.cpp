@@ -730,6 +730,8 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   SetPackageName(propElement.GetStringAttribute("packageName"));
   SetTemplateSlug(propElement.GetStringAttribute("templateSlug"));
   SetOrientation(propElement.GetStringAttribute("orientation", "default"));
+  SetEffectsHiddenInEditor(
+      propElement.GetBoolAttribute("areEffectsHiddenInEditor", false));
   SetFolderProject(propElement.GetBoolAttribute("folderProject"));
   SetLastCompilationDirectory(propElement
                                   .GetChild("latestCompilationDirectory",
@@ -1109,6 +1111,10 @@ void Project::SerializeTo(SerializerElement& element) const {
   propElement.SetAttribute("packageName", packageName);
   propElement.SetAttribute("templateSlug", templateSlug);
   propElement.SetAttribute("orientation", orientation);
+  if (areEffectsHiddenInEditor) {
+    propElement.SetBoolAttribute("areEffectsHiddenInEditor",
+                                 areEffectsHiddenInEditor);
+  }
   platformSpecificAssets.SerializeTo(
       propElement.AddChild("platformSpecificAssets"));
   loadingScreen.SerializeTo(propElement.AddChild("loadingScreen"));
@@ -1150,6 +1156,8 @@ void Project::SerializeTo(SerializerElement& element) const {
   // end of compatibility code
 
   extensionProperties.SerializeTo(propElement.AddChild("extensionProperties"));
+  
+  playableDevicesElement.AddChild("").SetStringValue("mobile");
 
   SerializerElement& platformsElement = propElement.AddChild("platforms");
   platformsElement.ConsiderAsArrayOf("platform");
@@ -1319,6 +1327,8 @@ void Project::Init(const gd::Project& game) {
 
   sceneResourcesPreloading = game.sceneResourcesPreloading;
   sceneResourcesUnloading = game.sceneResourcesUnloading;
+
+  areEffectsHiddenInEditor = game.areEffectsHiddenInEditor;
 }
 
 }  // namespace gd

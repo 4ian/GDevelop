@@ -60,6 +60,18 @@ void InitialInstance::UnserializeFrom(const SerializerElement& element) {
   } else {
     SetHasCustomDepth(false);
   }
+  if (element.HasChild("defaultWidth") ||
+      element.HasAttribute("defaultWidth")) {
+    defaultWidth = element.GetDoubleAttribute("defaultWidth");
+  }
+  if (element.HasChild("defaultHeight") ||
+      element.HasAttribute("defaultHeight")) {
+    defaultHeight = element.GetDoubleAttribute("defaultHeight");
+  }
+  if (element.HasChild("defaultDepth") ||
+      element.HasAttribute("defaultDepth")) {
+    defaultDepth = element.GetDoubleAttribute("defaultDepth");
+  }
   SetZOrder(element.GetIntAttribute("zOrder", 0, "plan"));
   SetOpacity(element.GetIntAttribute("opacity", 255));
   SetLayer(element.GetStringAttribute("layer"));
@@ -74,45 +86,51 @@ void InitialInstance::UnserializeFrom(const SerializerElement& element) {
   if (persistentUuid.empty()) ResetPersistentUuid();
 
   numberProperties.clear();
-  const SerializerElement& numberPropertiesElement =
-      element.GetChild("numberProperties", 0, "floatInfos");
-  numberPropertiesElement.ConsiderAsArrayOf("property", "Info");
-  for (std::size_t j = 0; j < numberPropertiesElement.GetChildrenCount(); ++j) {
-    gd::String name =
-        numberPropertiesElement.GetChild(j).GetStringAttribute("name");
-    double value =
-        numberPropertiesElement.GetChild(j).GetDoubleAttribute("value");
+  if (element.HasChild("numberProperties", "floatInfos")) {
+    const SerializerElement& numberPropertiesElement =
+        element.GetChild("numberProperties", 0, "floatInfos");
+    numberPropertiesElement.ConsiderAsArrayOf("property", "Info");
+    for (std::size_t j = 0; j < numberPropertiesElement.GetChildrenCount(); ++j) {
+      gd::String name =
+          numberPropertiesElement.GetChild(j).GetStringAttribute("name");
+      double value =
+          numberPropertiesElement.GetChild(j).GetDoubleAttribute("value");
 
-    // Compatibility with GD <= 5.1.164
-    if (name == "z") {
-      SetZ(value);
-    } else if (name == "rotationX") {
-      SetRotationX(value);
-    } else if (name == "rotationY") {
-      SetRotationY(value);
-    } else if (name == "depth") {
-      SetHasCustomDepth(true);
-      SetCustomDepth(value);
-    }
-    // end of compatibility code
-    else {
-      numberProperties[name] = value;
+      // Compatibility with GD <= 5.1.164
+      if (name == "z") {
+        SetZ(value);
+      } else if (name == "rotationX") {
+        SetRotationX(value);
+      } else if (name == "rotationY") {
+        SetRotationY(value);
+      } else if (name == "depth") {
+        SetHasCustomDepth(true);
+        SetCustomDepth(value);
+      }
+      // end of compatibility code
+      else {
+        numberProperties[name] = value;
+      }
     }
   }
 
   stringProperties.clear();
-  const SerializerElement& stringPropElement =
-      element.GetChild("stringProperties", 0, "stringInfos");
-  stringPropElement.ConsiderAsArrayOf("property", "Info");
-  for (std::size_t j = 0; j < stringPropElement.GetChildrenCount(); ++j) {
-    gd::String name = stringPropElement.GetChild(j).GetStringAttribute("name");
-    gd::String value =
-        stringPropElement.GetChild(j).GetStringAttribute("value");
-    stringProperties[name] = value;
+  if (element.HasChild("stringProperties", "stringInfos")) {
+    const SerializerElement& stringPropElement =
+        element.GetChild("stringProperties", 0, "stringInfos");
+    stringPropElement.ConsiderAsArrayOf("property", "Info");
+    for (std::size_t j = 0; j < stringPropElement.GetChildrenCount(); ++j) {
+      gd::String name = stringPropElement.GetChild(j).GetStringAttribute("name");
+      gd::String value =
+          stringPropElement.GetChild(j).GetStringAttribute("value");
+      stringProperties[name] = value;
+    }
   }
 
-  GetVariables().UnserializeFrom(
-      element.GetChild("initialVariables", 0, "InitialVariables"));
+  if (element.HasChild("initialVariables", "InitialVariables")) {
+    GetVariables().UnserializeFrom(
+        element.GetChild("initialVariables", 0, "InitialVariables"));
+  }
 }
 
 void InitialInstance::SerializeTo(SerializerElement& element) const {
@@ -133,6 +151,8 @@ void InitialInstance::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("width", GetCustomWidth());
   element.SetAttribute("height", GetCustomHeight());
   if (HasCustomDepth()) element.SetAttribute("depth", GetCustomDepth());
+  // defaultWidth, defaultHeight and defaultDepth are not serialized
+  // because they are evaluated by InGameEditor.
   if (IsLocked()) element.SetAttribute("locked", IsLocked());
   if (IsSealed()) element.SetAttribute("sealed", IsSealed());
   if (ShouldKeepRatio()) element.SetAttribute("keepRatio", ShouldKeepRatio());

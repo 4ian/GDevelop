@@ -7,6 +7,7 @@ declare class gdObjectMetadata {
   getHelpPath(): string;
   getCategoryFullName(): string;
   setCategoryFullName(categoryFullName: string): gdObjectMetadata;
+  addInGameEditorResource(): gdInGameEditorResourceMetadata;
   addScopedCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): gdInstructionMetadata;
   addScopedAction(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): gdInstructionMetadata;
   addCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): gdInstructionMetadata;

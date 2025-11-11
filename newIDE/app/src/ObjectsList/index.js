@@ -55,6 +55,7 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import type { MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import type { EventsScope } from '../InstructionOrExpression/EventsScope';
+import { type InstallAssetOutput } from '../AssetStore/InstallAsset';
 
 const gd: libGDevelop = global.gd;
 
@@ -134,6 +135,7 @@ export interface TreeViewItemContent {
   isDescendantOf(treeViewItemContent: TreeViewItemContent): boolean;
   isSibling(treeViewItemContent: TreeViewItemContent): boolean;
   isGlobal(): boolean;
+  is3D(): boolean;
   getObjectFolderOrObject(): gdObjectFolderOrObject | null;
 }
 
@@ -353,6 +355,10 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
     return false;
   }
 
+  is3D(): boolean {
+    return false;
+  }
+
   getObjectFolderOrObject(): gdObjectFolderOrObject | null {
     return null;
   }
@@ -457,8 +463,9 @@ type Props = {|
   ) => void,
   selectedObjectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext>,
 
-  beforeSetAsGlobalObject?: (groupName: string) => boolean,
+  beforeSetAsGlobalObject?: (objectName: string) => boolean,
   canSetAsGlobalObject?: boolean,
+  onSetAsGlobalObject: (object: gdObject) => void,
 
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onOpenEventBasedObjectEditor: (
@@ -471,8 +478,14 @@ type Props = {|
     variantName: string
   ) => void,
   onExportAssets: () => void,
-  onObjectCreated: gdObject => void,
-  onObjectEdited: ObjectWithContext => void,
+  onObjectCreated: (
+    objects: Array<gdObject>,
+    isTheFirstOfItsTypeInProject: boolean
+  ) => void,
+  onObjectEdited: (
+    objectWithContext: ObjectWithContext,
+    hasResourceChanged: boolean
+  ) => void,
   onObjectFolderOrObjectWithContextSelected: (
     ?ObjectFolderOrObjectWithContext
   ) => void,
@@ -508,6 +521,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
       beforeSetAsGlobalObject,
       canSetAsGlobalObject,
+      onSetAsGlobalObject,
 
       onEditObject,
       onOpenEventBasedObjectEditor,
@@ -598,6 +612,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               globalObjectsContainer.hasObjectNamed(name))
         );
 
+        const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
+          project,
+          objectType
+        );
+
         let object;
         let objectFolderOrObjectWithContext;
         if (
@@ -659,11 +678,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         // TODO Should it be called later?
         if (onEditObject) {
           onEditObject(object);
-          onObjectCreated(object);
           onObjectFolderOrObjectWithContextSelected(
             objectFolderOrObjectWithContext
           );
         }
+        onObjectCreated([object], isTheFirstOfItsTypeInProject);
       },
       [
         project,
@@ -678,12 +697,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
 
     const onObjectsAddedFromAssets = React.useCallback(
-      (objects: Array<gdObject>) => {
+      ({
+        createdObjects: objects,
+        isTheFirstOfItsTypeInProject,
+      }: InstallAssetOutput) => {
         if (objects.length === 0) return;
 
-        objects.forEach(object => {
-          onObjectCreated(object);
-        });
+        onObjectCreated(objects, isTheFirstOfItsTypeInProject);
 
         // Here, the last object in the array might not be the last object
         // in the tree view, given the fact that assets are added in parallel
@@ -851,6 +871,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         );
         gd.WholeProjectRefactorer.updateBehaviorsSharedData(project);
         onObjectModified(true);
+        onSetAsGlobalObject(object);
 
         const newObjectFolderOrObjectWithContext = {
           objectFolderOrObject,
@@ -873,6 +894,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         globalObjectsContainer,
         objectsContainer,
         beforeSetAsGlobalObject,
+        onSetAsGlobalObject,
         onObjectModified,
         selectObjectFolderOrObjectWithContext,
         scrollToItem,
@@ -999,6 +1021,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         getValidatedObjectOrGroupName,
         onRenameObjectFolderOrObjectWithContextFinish,
         onObjectModified,
+        onObjectCreated,
         swapObjectAsset,
         onMovedObjectFolderOrObjectToAnotherFolderInSameContainer,
         canSetAsGlobalObject,
@@ -1027,6 +1050,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         getValidatedObjectOrGroupName,
         onRenameObjectFolderOrObjectWithContextFinish,
         onObjectModified,
+        onObjectCreated,
         swapObjectAsset,
         onMovedObjectFolderOrObjectToAnotherFolderInSameContainer,
         canSetAsGlobalObject,
@@ -1048,6 +1072,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         objectsContainer,
         onObjectPasted,
         onObjectModified,
+        onObjectCreated,
         editName,
         expandFolders,
         addFolder,
@@ -1067,6 +1092,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         objectsContainer,
         onObjectPasted,
         onObjectModified,
+        onObjectCreated,
         editName,
         expandFolders,
         addFolder,
@@ -1601,7 +1627,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             onClose={({ swappingDone }) => {
               setObjectAssetSwappingDialogOpen(null);
               if (swappingDone)
-                onObjectEdited(objectAssetSwappingDialogOpen.objectWithContext);
+                onObjectEdited(
+                  objectAssetSwappingDialogOpen.objectWithContext,
+                  true
+                );
             }}
             project={project}
             layout={layout}

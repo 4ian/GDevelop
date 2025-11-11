@@ -17,8 +17,10 @@ const instancesEditorSettings: InstancesEditorSettings = {
   gridType: 'isometric',
   gridWidth: 1200,
   gridHeight: 600,
+  gridDepth: 200,
   gridOffsetX: 0,
   gridOffsetY: 0,
+  gridOffsetZ: 0,
   gridColor: 0,
   gridAlpha: 0,
   snap: false,
@@ -76,6 +78,7 @@ export const Default = () => (
         pauseRendering={false}
         tileMapTileSelection={null}
         onSelectTileMapTile={() => {}}
+        editorViewPosition2D={{ viewX: null, viewY: null }}
       />
     </DragAndDropContextProvider>
   </FixedHeightFlexContainer>

@@ -207,7 +207,7 @@ namespace gdjs {
     }
 
     unloadResource(resourceData: ResourceData): void {
-      const resource = this._loadedFontFamily.get(resourceData);
+      const resource = this._loadedFontFamily.getFromName(resourceData.name);
       if (resource) {
         this._loadedFontFamily.delete(resourceData);
       }

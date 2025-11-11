@@ -28,6 +28,10 @@ export const Default = () => {
         selectedLayer={selectedLayer}
         onSelectLayer={setSelectedLayer}
         onEditLayerEffects={action('onEditLayerEffects')}
+        onLayersModified={action('onLayersModified')}
+        onLayersVisibilityInEditorChanged={action(
+          'onLayersVisibilityInEditorChanged'
+        )}
         onEditLayer={action('onEditLayer')}
         onRemoveLayer={(layerName, cb) => {
           cb(true);
@@ -37,6 +41,7 @@ export const Default = () => {
         layout={testProject.testLayout}
         layersContainer={testProject.testLayout.getLayers()}
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
+        onBackgroundColorChanged={action('onBackgroundColorChanged')}
       />
     </DragAndDropContextProvider>
   );
@@ -55,6 +60,10 @@ export const SmallWidthAndHeight = () => {
           selectedLayer={selectedLayer}
           onSelectLayer={setSelectedLayer}
           onEditLayerEffects={action('onEditLayerEffects')}
+          onLayersModified={action('onLayersModified')}
+          onLayersVisibilityInEditorChanged={action(
+            'onLayersVisibilityInEditorChanged'
+          )}
           onEditLayer={action('onEditLayer')}
           onRemoveLayer={(layerName, cb) => {
             cb(true);
@@ -64,6 +73,7 @@ export const SmallWidthAndHeight = () => {
           layout={testProject.testLayout}
           layersContainer={testProject.testLayout.getLayers()}
           hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
+          onBackgroundColorChanged={action('onBackgroundColorChanged')}
         />
       </div>
     </DragAndDropContextProvider>

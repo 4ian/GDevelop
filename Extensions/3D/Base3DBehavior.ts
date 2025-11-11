@@ -115,6 +115,12 @@ namespace gdjs {
      * Rotations around X and Y are not taken into account.
      */
     getUnrotatedAABBMaxZ(): number;
+
+    /**
+     * Return the depth of the object before any custom size is applied.
+     * @return The depth of the object
+     */
+    getOriginalDepth(): float;
   }
 
   export interface Object3DDataContent {
@@ -131,7 +137,11 @@ namespace gdjs {
   export namespace Base3DHandler {
     export const is3D = (
       object: gdjs.RuntimeObject
-    ): object is gdjs.RuntimeObject & gdjs.Base3DHandler => {
+    ): object is gdjs.RuntimeObject &
+      gdjs.Base3DHandler &
+      gdjs.Resizable &
+      gdjs.Scalable &
+      gdjs.Flippable => {
       //@ts-ignore We are checking if the methods are present.
       return object.getZ && object.setZ;
     };
@@ -242,6 +252,10 @@ namespace gdjs {
 
     getUnrotatedAABBMaxZ(): number {
       return this.object.getUnrotatedAABBMaxZ();
+    }
+
+    getOriginalDepth(): float {
+      return this.object.getOriginalDepth();
     }
   }
 

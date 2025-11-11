@@ -9,10 +9,11 @@ namespace gd {
 class Platform;
 class Project;
 class ArbitraryResourceWorker;
+class EventsBasedObjectVariant;
 class EventsFunctionsExtension;
 class Effect;
 class Layout;
-}  // namespace gd
+} // namespace gd
 
 namespace gd {
 
@@ -20,7 +21,7 @@ namespace gd {
  * \brief
  */
 class GD_CORE_API ResourceExposer {
- public:
+public:
   /**
    * \brief Called ( e.g. during compilation ) so as to inventory internal
    * resources, sometimes update their filename or any other work or resources.
@@ -49,6 +50,14 @@ class GD_CORE_API ResourceExposer {
   static void ExposeLayoutResources(gd::Project &project,
                                     gd::Layout &layout,
                                     gd::ArbitraryResourceWorker &worker);
+
+  /**
+   * @brief Expose the resources used in a given events-based object variant.
+   */
+  static void ExposeEventsBasedObjectVariantResources(
+      gd::Project &project,
+      gd::EventsBasedObjectVariant &eventsBasedObjectVariant,
+      gd::ArbitraryResourceWorker &worker);
 
   /**
    * @brief Expose the resources used in a given effect.

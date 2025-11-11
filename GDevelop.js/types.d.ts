@@ -557,6 +557,8 @@ export class Project extends EmscriptenObject {
   isFolderProject(): boolean;
   setUseDeprecatedZeroAsDefaultZOrder(enable: boolean): void;
   getUseDeprecatedZeroAsDefaultZOrder(): boolean;
+  areEffectsHiddenInEditor(): boolean;
+  setEffectsHiddenInEditor(enable: boolean): void;
   setLastCompilationDirectory(path: string): void;
   getLastCompilationDirectory(): string;
   getExtensionProperties(): ExtensionProperties;
@@ -662,6 +664,10 @@ export class ExtensionProperties extends EmscriptenObject {
   getAllExtensionProperties(extension: string, project: Project): MapStringPropertyDescriptor;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
+}
+
+export class BehaviorDefaultFlagClearer extends EmscriptenObject {
+  static serializeObjectWithCleanDefaultBehaviorFlags(obj: gdObject, serializerElement: SerializerElement): void;
 }
 
 export class Behavior extends EmscriptenObject {
@@ -915,6 +921,8 @@ export class Layer extends EmscriptenObject {
   setCamera3DFarPlaneDistance(distance: number): void;
   getCamera3DFieldOfView(): number;
   setCamera3DFieldOfView(angle: number): void;
+  getCamera2DPlaneMaxDrawingDistance(): number;
+  setCamera2DPlaneMaxDrawingDistance(distance: number): void;
   setAmbientLightColor(r: number, g: number, b: number): void;
   getAmbientLightColorRed(): number;
   getAmbientLightColorGreen(): number;
@@ -1185,6 +1193,12 @@ export class InitialInstance extends EmscriptenObject {
   getCustomHeight(): number;
   setCustomDepth(depth: number): void;
   getCustomDepth(): number;
+  getDefaultWidth(): number;
+  getDefaultHeight(): number;
+  getDefaultDepth(): number;
+  setDefaultWidth(width: number): void;
+  setDefaultHeight(height: number): void;
+  setDefaultDepth(depth: number): void;
   resetPersistentUuid(): InitialInstance;
   getPersistentUuid(): string;
   updateCustomProperty(name: string, value: string, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer): void;
@@ -1578,6 +1592,7 @@ export class ObjectMetadata extends EmscriptenObject {
   getHelpPath(): string;
   getCategoryFullName(): string;
   setCategoryFullName(categoryFullName: string): ObjectMetadata;
+  addInGameEditorResource(): InGameEditorResourceMetadata;
   addScopedCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
   addScopedAction(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
   addCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
@@ -1603,6 +1618,12 @@ export class ObjectMetadata extends EmscriptenObject {
   isRenderedIn3D(): boolean;
   setOpenFullEditorLabel(label: string): ObjectMetadata;
   getOpenFullEditorLabel(): string;
+}
+
+export class InGameEditorResourceMetadata extends EmscriptenObject {
+  setResourceName(resourceName: string): InGameEditorResourceMetadata;
+  setFilePath(relativeFilePath: string): InGameEditorResourceMetadata;
+  setKind(kind: string): InGameEditorResourceMetadata;
 }
 
 export class QuickCustomization extends EmscriptenObject {
@@ -1667,6 +1688,8 @@ export class BehaviorMetadata extends EmscriptenObject {
   setHidden(): BehaviorMetadata;
   isRelevantForChildObjects(): boolean;
   markAsIrrelevantForChildObjects(): BehaviorMetadata;
+  isActivatedByDefaultInEditor(): boolean;
+  markAsActivatedByDefaultInEditor(): BehaviorMetadata;
   getQuickCustomizationVisibility(): QuickCustomization_Visibility;
   setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): BehaviorMetadata;
   setOpenFullEditorLabel(label: string): BehaviorMetadata;
@@ -2044,6 +2067,10 @@ export class UsedExtensionsResult extends EmscriptenObject {
 
 export class UsedExtensionsFinder extends EmscriptenObject {
   static scanProject(project: Project): UsedExtensionsResult;
+}
+
+export class UsedObjectTypeFinder extends EmscriptenObject {
+  static scanProject(project: Project, objectType: string): boolean;
 }
 
 export class ExampleExtensionUsagesFinder extends EmscriptenObject {
@@ -2960,11 +2987,20 @@ export class PreviewExportOptions extends EmscriptenObject {
   setFallbackAuthor(id: string, username: string): PreviewExportOptions;
   setAuthenticatedPlayer(playerId: string, playerUsername: string, playerToken: string): PreviewExportOptions;
   setExternalLayoutName(externalLayoutName: string): PreviewExportOptions;
+  setEventsBasedObjectType(eventsBasedObjectType: string): PreviewExportOptions;
+  setEventsBasedObjectVariantName(eventsBasedObjectVariantName: string): PreviewExportOptions;
   setIncludeFileHash(includeFile: string, hash: number): PreviewExportOptions;
-  setProjectDataOnlyExport(enable: boolean): PreviewExportOptions;
+  setShouldClearExportFolder(enable: boolean): PreviewExportOptions;
+  setShouldReloadProjectData(enable: boolean): PreviewExportOptions;
+  setShouldReloadLibraries(enable: boolean): PreviewExportOptions;
+  setShouldGenerateScenesEventsCode(enable: boolean): PreviewExportOptions;
   setNativeMobileApp(enable: boolean): PreviewExportOptions;
   setFullLoadingScreen(enable: boolean): PreviewExportOptions;
   setIsDevelopmentEnvironment(enable: boolean): PreviewExportOptions;
+  setIsInGameEdition(enable: boolean): PreviewExportOptions;
+  setInGameEditorSettingsJson(inGameEditorSettingsJson: string): PreviewExportOptions;
+  setEditorId(editorId: string): PreviewExportOptions;
+  setEditorCameraState3D(cameraMode: string, positionX: number, positionY: number, positionZ: number, rotationAngle: number, elevationAngle: number, distance: number): PreviewExportOptions;
   setNonRuntimeScriptsCacheBurst(value: number): PreviewExportOptions;
   setElectronRemoteRequirePath(electronRemoteRequirePath: string): PreviewExportOptions;
   setGDevelopResourceToken(gdevelopResourceToken: string): PreviewExportOptions;
@@ -2988,6 +3024,8 @@ export class Exporter extends EmscriptenObject {
   setCodeOutputDirectory(path: string): void;
   exportProjectForPixiPreview(options: PreviewExportOptions): boolean;
   exportWholePixiProject(options: ExportOptions): boolean;
+  serializeProjectData(project: Project, options: PreviewExportOptions, projectDataElement: SerializerElement): void;
+  serializeRuntimeGameOptions(options: PreviewExportOptions, runtimeGameOptionsElement: SerializerElement): void;
   getLastError(): string;
 }
 

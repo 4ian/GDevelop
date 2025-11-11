@@ -324,6 +324,7 @@ export const WithObjectsList = () => (
                   onObjectCreated={() => {}}
                   onObjectEdited={() => {}}
                   onObjectFolderOrObjectWithContextSelected={() => {}}
+                  onSetAsGlobalObject={action('onSetAsGlobalObject')}
                   hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
                   isListLocked={false}
                   onExtensionInstalled={action('onExtensionInstalled')}

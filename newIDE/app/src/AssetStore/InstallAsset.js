@@ -121,6 +121,7 @@ export const installResource = (
 
 export type InstallAssetOutput = {|
   createdObjects: Array<gdObject>,
+  isTheFirstOfItsTypeInProject: boolean,
 |};
 
 export type InstallAssetArgs = {|
@@ -254,6 +255,8 @@ export const addAssetToProject = async ({
       objectsContainer.hasObjectNamed(name)
     );
 
+    // Editor hot-reload is already triggered by onFetchNewlyAddedResources at the
+    // end of asset installation. There is no need to trigger it here too.
     let object: gdObject;
     if (targetObjectFolderOrObject) {
       const { folder, position } = getInsertionParentAndPositionFromSelection(
@@ -327,6 +330,8 @@ export const addAssetToProject = async ({
 
   return {
     createdObjects,
+    // This boolean is set by `useInstallAsset`
+    isTheFirstOfItsTypeInProject: false,
   };
 };
 

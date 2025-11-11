@@ -5,7 +5,7 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import { mapReverseFor } from '../Utils/MapFor';
 import LayerRow, { styles } from './LayerRow';
 import BackgroundColorRow from './BackgroundColorRow';
-import { Column, Line } from '../UI/Grid';
+import { Column } from '../UI/Grid';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import ScrollView from '../UI/ScrollView';
 import { FullSizeMeasurer } from '../UI/FullSizeMeasurer';
@@ -19,6 +19,9 @@ import Add from '../UI/CustomSvgIcons/Add';
 import { addDefaultLightToLayer } from '../ProjectCreation/CreateProject';
 import { getEffects2DCount, getEffects3DCount } from '../EffectsList';
 import ErrorBoundary from '../UI/ErrorBoundary';
+import IconButton from '../UI/IconButton';
+import LightbulbIcon from '../UI/CustomSvgIcons/Lightbulb';
+import { LineStackLayout } from '../UI/Layout';
 
 const gd: libGDevelop = global.gd;
 
@@ -35,8 +38,10 @@ type LayersListBodyProps = {|
   unsavedChanges?: ?UnsavedChanges,
   onRemoveLayer: (layerName: string, cb: (done: boolean) => void) => void,
   onLayerRenamed: () => void,
-  onEditEffects: (layer: ?gdLayer) => void,
+  onEditLayerEffects: (layer: ?gdLayer) => void,
   onEdit: (layer: ?gdLayer) => void,
+  onLayersModified: () => void,
+  onBackgroundColorChanged: () => void,
   width: number,
 |};
 
@@ -55,7 +60,7 @@ const LayersListBody = ({
   eventsFunctionsExtension,
   eventsBasedObject,
   layersContainer,
-  onEditEffects,
+  onEditLayerEffects,
   onEdit,
   width,
   onLayerRenamed,
@@ -63,6 +68,8 @@ const LayersListBody = ({
   unsavedChanges,
   selectedLayer,
   onSelectLayer,
+  onLayersModified,
+  onBackgroundColorChanged,
 }: LayersListBodyProps) => {
   const forceUpdate = useForceUpdate();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -71,12 +78,22 @@ const LayersListBody = ({
   }>({});
   const draggedLayerIndexRef = React.useRef<number | null>(null);
 
-  const onLayerModified = React.useCallback(
+  const triggerOnLayersModified = React.useCallback(
     () => {
+      onLayersModified();
       if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
       forceUpdate();
     },
-    [forceUpdate, unsavedChanges]
+    [forceUpdate, onLayersModified, unsavedChanges]
+  );
+
+  const triggerOnBackgroundColorChanged = React.useCallback(
+    () => {
+      onBackgroundColorChanged();
+      if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+      forceUpdate();
+    },
+    [forceUpdate, onBackgroundColorChanged, unsavedChanges]
   );
 
   const onDropLayer = React.useCallback(
@@ -89,11 +106,11 @@ const LayersListBody = ({
           draggedLayerIndex,
           targetIndex < draggedLayerIndex ? targetIndex + 1 : targetIndex
         );
-        onLayerModified();
+        triggerOnLayersModified();
       }
       draggedLayerIndexRef.current = null;
     },
-    [layersContainer, onLayerModified]
+    [layersContainer, triggerOnLayersModified]
   );
 
   const layersCount = layersContainer.getLayersCount();
@@ -110,7 +127,7 @@ const LayersListBody = ({
         onSelect={() => onSelectLayer(layerName)}
         nameError={nameErrors[layerName]}
         effectsCount={getEffectsCount(project.getCurrentPlatform(), layer)}
-        onEditEffects={() => onEditEffects(layer)}
+        onEditLayerEffects={() => onEditLayerEffects(layer)}
         onEdit={() => onEdit(layer)}
         onBeginDrag={() => {
           draggedLayerIndexRef.current = i;
@@ -149,7 +166,7 @@ const LayersListBody = ({
               );
             }
             onLayerRenamed();
-            onLayerModified();
+            triggerOnLayersModified();
           }
         }}
         onRemove={() => {
@@ -157,18 +174,18 @@ const LayersListBody = ({
             if (!doRemove) return;
 
             layersContainer.removeLayer(layerName);
-            onLayerModified();
+            triggerOnLayersModified();
           });
         }}
         isVisible={layer.getVisibility()}
         onChangeVisibility={visible => {
           layer.setVisibility(visible);
-          onLayerModified();
+          triggerOnLayersModified();
         }}
         isLocked={layer.isLocked()}
         onChangeLockState={isLocked => {
           layer.setLocked(isLocked);
-          onLayerModified();
+          triggerOnLayersModified();
         }}
         width={width}
       />
@@ -198,7 +215,7 @@ const LayersListBody = ({
               {layout && (
                 <BackgroundColorRow
                   layout={layout}
-                  onBackgroundColorChanged={onLayerModified}
+                  onBackgroundColorChanged={triggerOnBackgroundColorChanged}
                 />
               )}
             </div>
@@ -219,9 +236,12 @@ type Props = {|
   layersContainer: gdLayersContainer,
   onEditLayerEffects: (layer: ?gdLayer) => void,
   onEditLayer: (layer: ?gdLayer) => void,
+  onLayersModified: () => void,
   onRemoveLayer: (layerName: string, cb: (done: boolean) => void) => void,
   onLayerRenamed: () => void,
   onCreateLayer: () => void,
+  onLayersVisibilityInEditorChanged: () => void,
+  onBackgroundColorChanged: () => void,
   unsavedChanges?: ?UnsavedChanges,
 
   // Preview:
@@ -243,7 +263,7 @@ const hasLightingLayer = (layersContainer: gdLayersContainer) => {
 
 const LayersList = React.forwardRef<Props, LayersListInterface>(
   (props, ref) => {
-    const { eventsFunctionsExtension, eventsBasedObject } = props;
+    const { eventsFunctionsExtension, eventsBasedObject, project } = props;
     const forceUpdate = useForceUpdate();
 
     React.useImperativeHandle(ref, () => ({
@@ -279,6 +299,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
 
     const onLayerModified = () => {
       if (props.unsavedChanges) props.unsavedChanges.triggerUnsavedChanges();
+      props.onLayersModified();
       forceUpdate();
     };
 
@@ -304,17 +325,39 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
                 eventsFunctionsExtension={eventsFunctionsExtension}
                 eventsBasedObject={eventsBasedObject}
                 layersContainer={props.layersContainer}
-                onEditEffects={props.onEditLayerEffects}
+                onEditLayerEffects={props.onEditLayerEffects}
                 onEdit={props.onEditLayer}
+                onLayersModified={props.onLayersModified}
                 onRemoveLayer={props.onRemoveLayer}
                 onLayerRenamed={props.onLayerRenamed}
+                onBackgroundColorChanged={props.onBackgroundColorChanged}
                 unsavedChanges={props.unsavedChanges}
                 width={width}
               />
             )}
           </FullSizeMeasurer>
           <Column>
-            <Line justifyContent="flex-end" expand>
+            <LineStackLayout justifyContent="flex-end" expand>
+              <IconButton
+                size="small"
+                color="default"
+                id={'show-effects-button'}
+                onClick={() => {
+                  project.setEffectsHiddenInEditor(
+                    !project.areEffectsHiddenInEditor()
+                  );
+                  props.onLayersVisibilityInEditorChanged();
+                  forceUpdate();
+                }}
+                selected={!project.areEffectsHiddenInEditor()}
+                tooltip={
+                  !project.areEffectsHiddenInEditor()
+                    ? t`Disable effects/lighting in the editor`
+                    : t`Display effects/lighting in the editor`
+                }
+              >
+                <LightbulbIcon />
+              </IconButton>
               <RaisedButtonWithSplitMenu
                 label={<Trans>Add a layer</Trans>}
                 id="add-layer-button"
@@ -323,13 +366,13 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
                 icon={<Add />}
                 buildMenuTemplate={i18n => [
                   {
-                    label: i18n._(t`Add lighting layer`),
+                    label: i18n._(t`Add 2D lighting layer`),
                     enabled: !isLightingLayerPresent,
                     click: addLightingLayer,
                   },
                 ]}
               />
-            </Line>
+            </LineStackLayout>
           </Column>
         </ScrollView>
       </Background>

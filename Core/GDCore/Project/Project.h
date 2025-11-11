@@ -506,6 +506,20 @@ class GD_CORE_API Project {
    */
   void SetCurrentPlatform(const gd::String& platformName);
 
+  /**
+   * Check if the effects are shown.
+   */
+  bool AreEffectsHiddenInEditor() const { return areEffectsHiddenInEditor; }
+
+  /**
+   * Define the project as playable on a mobile.
+   * \param enable True When false effects are not shown and a default light is
+   * used for 3D layers.
+   */
+  void SetEffectsHiddenInEditor(bool enable = true) {
+    areEffectsHiddenInEditor = enable;
+  }
+
   ///@}
 
   /** \name Factory method
@@ -1165,6 +1179,9 @@ class GD_CORE_API Project {
   mutable unsigned int gdBuildVersion =
       0;  ///< The GD build version used the last
           ///< time the project was saved.
+  bool areEffectsHiddenInEditor =
+      false; ///< When false effects are not shown and a default light is used
+             ///< for 3D layers.
 };
 
 }  // namespace gd

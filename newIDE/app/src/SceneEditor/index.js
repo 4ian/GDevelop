@@ -32,6 +32,7 @@ import getObjectByName from '../Utils/GetObjectByName';
 import UseSceneEditorCommands from './UseSceneEditorCommands';
 import { type InstancesEditorSettings } from '../InstancesEditor/InstancesEditorSettings';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
+import { type PreviewDebuggerServer } from '../ExportAndShare/PreviewLauncher.flow';
 import EditSceneIcon from '../UI/CustomSvgIcons/EditScene';
 import {
   type HistoryState,
@@ -55,7 +56,10 @@ import { type InfoBarDetails } from '../Hints/ObjectsAdditionalWork';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import { MOVEMENT_BIG_DELTA } from '../UI/KeyboardShortcuts';
-import { getInstancesInLayoutForObject } from '../Utils/Layout';
+import {
+  getInstanceInLayoutWithPersistentUuid,
+  getInstancesInLayoutForObject,
+} from '../Utils/Layout';
 import { zoomInFactor, zoomOutFactor } from '../Utils/ZoomUtils';
 import debounce from 'lodash/debounce';
 import { mapFor } from '../Utils/MapFor';
@@ -77,16 +81,97 @@ import {
   registerOnResourceExternallyChangedCallback,
   unregisterOnResourceExternallyChangedCallback,
 } from '../MainFrame/ResourcesWatcher';
-import { unserializeFromJSObject } from '../Utils/Serializer';
+import {
+  unserializeFromJSObject,
+  serializeObjectWithCleanDefaultBehaviorFlags,
+} from '../Utils/Serializer';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer';
 import { extractAsCustomObject } from './CustomObjectExtractor/CustomObjectExtractor';
 import { isVariantEditable } from '../ObjectEditor/Editors/CustomObjectPropertiesEditor';
+import { addSerializedInstances } from '../InstancesEditor/InstancesAdder';
+import { type EditorViewPosition2D } from '../InstancesEditor';
+import {
+  changeViewPosition,
+  setCameraState,
+} from '../EmbeddedGame/EmbeddedGameFrame';
+import Rectangle from '../Utils/Rectangle';
 
 const gd: libGDevelop = global.gd;
 
 const BASE_LAYER_NAME = '';
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
+
+interface InstancePersistentUuidData {
+  persistentUuid: string;
+}
+
+interface SelectedInstanceData {
+  persistentUuid: string;
+  defaultWidth: number;
+  defaultHeight: number;
+  defaultDepth?: number; // Not defined for 2D instances.
+}
+
+interface InstanceNumberProperty {
+  name: string;
+  value: number;
+}
+interface InstanceStringProperty {
+  name: string;
+  value: string;
+}
+
+interface InstanceData extends InstancePersistentUuidData {
+  layer: string;
+  locked?: boolean;
+  sealed?: boolean;
+  name: string;
+
+  x: number;
+  y: number;
+  z?: number;
+
+  angle: number;
+  rotationX?: number;
+  rotationY?: number;
+
+  zOrder: number;
+  opacity?: number;
+
+  flippedX?: boolean;
+  flippedY?: boolean;
+  flippedZ?: boolean;
+
+  customSize: boolean;
+  width: number;
+  height: number;
+  depth?: number;
+
+  defaultWidth: number;
+  defaultHeight: number;
+  defaultDepth: number;
+
+  numberProperties: InstanceNumberProperty[];
+  stringProperties: InstanceStringProperty[];
+  initialVariables: any[];
+}
+
+type InstanceChanges = {|
+  isSendingBackSelectionForDefaultSize: boolean,
+  updatedInstances: Array<InstanceData>,
+  addedInstances: Array<InstanceData>,
+  selectedInstances: Array<SelectedInstanceData>,
+  removedInstances: Array<InstancePersistentUuidData>,
+  objectNameToEdit: string | null,
+|};
+
+export type EditorId =
+  | 'objects-list'
+  | 'properties'
+  | 'object-groups-list'
+  | 'instances-list'
+  | 'layers-list';
 
 const styles = {
   container: {
@@ -98,6 +183,10 @@ const styles = {
 };
 
 type Props = {|
+  editorId: string,
+  gameEditorMode: 'embedded-game' | 'instances-editor',
+  setGameEditorMode: ('embedded-game' | 'instances-editor') => void,
+  onRestartInGameEditorAfterError: (() => void) | null,
   project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   layout: gdLayout | null,
@@ -148,9 +237,13 @@ type Props = {|
     eventBasedObject: gdEventsBasedObject,
     variant: gdEventsBasedObjectVariant
   ) => void,
+  onEffectAdded: () => void,
+  onObjectListsModified: ({ isNewObjectTypeUsed: boolean }) => void,
+  triggerHotReloadInGameEditorIfNeeded: () => void,
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
+  previewDebuggerServer: ?PreviewDebuggerServer,
 |};
 
 type State = {|
@@ -203,6 +296,8 @@ export default class SceneEditor extends React.Component<Props, State> {
   contextMenu: ?ContextMenuInterface;
   editorDisplay: ?SceneEditorsDisplayInterface;
   resourceExternallyChangedCallbackId: ?string;
+  unregisterDebuggerCallback: (() => void) | null = null;
+  editorViewPosition2D: EditorViewPosition2D = { viewX: null, viewY: null };
 
   constructor(props: Props) {
     super(props);
@@ -263,15 +358,212 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
       this.onResourceExternallyChanged.bind(this)
     );
+    if (this.props.previewDebuggerServer && !this.unregisterDebuggerCallback) {
+      this.unregisterDebuggerCallback = this.props.previewDebuggerServer.registerCallbacks(
+        {
+          onErrorReceived: () => {},
+          onConnectionClosed: () => {},
+          onConnectionOpened: () => {},
+          onConnectionErrored: () => {},
+          onServerStateChanged: () => {},
+          onHandleParsedMessage: ({ id, parsedMessage }) => {
+            if (
+              this.props.gameEditorMode !== 'embedded-game' ||
+              parsedMessage.editorId !== this.props.editorId
+            ) {
+              return;
+            }
+            if (parsedMessage.command === 'updateInstances') {
+              this.onReceiveInstanceChanges(parsedMessage.payload);
+            } else if (parsedMessage.command === 'setCameraState') {
+              setCameraState(parsedMessage.editorId, parsedMessage.payload);
+            } else if (parsedMessage.command === 'openContextMenu') {
+              this._onContextMenu(
+                parsedMessage.payload.cursorX,
+                parsedMessage.payload.cursorY
+              );
+            } else if (parsedMessage.command === 'undo') {
+              if (canUndo(this.state.history)) {
+                this.undo();
+              }
+            } else if (parsedMessage.command === 'redo') {
+              if (canRedo(this.state.history)) {
+                this.redo();
+              }
+            } else if (parsedMessage.command === 'copy') {
+              this.copySelection();
+            } else if (parsedMessage.command === 'paste') {
+              this.paste();
+            } else if (parsedMessage.command === 'cut') {
+              this.cutSelection();
+            }
+          },
+        }
+      );
+    }
   }
+
   componentWillUnmount() {
     unregisterOnResourceExternallyChangedCallback(
       this.resourceExternallyChangedCallbackId
     );
+    if (this.unregisterDebuggerCallback) {
+      this.unregisterDebuggerCallback();
+      this.unregisterDebuggerCallback = null;
+    }
+  }
+
+  onEditorReloaded() {
+    this._sendSelectedInstances();
   }
 
   getInstancesEditorSettings() {
     return this.state.instancesEditorSettings;
+  }
+
+  onReceiveInstanceChanges(changes: InstanceChanges) {
+    // TODO: adapt all of this to get all instances in one shot.
+    // and reorganize this.
+    const modifiedInstances: gdInitialInstance[] = [];
+    changes.updatedInstances.forEach(instanceData => {
+      const {
+        persistentUuid,
+        x,
+        y,
+        z,
+        angle,
+        rotationY,
+        rotationX,
+        customSize,
+        width,
+        height,
+        depth,
+        defaultWidth,
+        defaultHeight,
+        defaultDepth,
+      } = instanceData;
+      const instance = getInstanceInLayoutWithPersistentUuid(
+        this.props.initialInstances,
+        persistentUuid
+      );
+      if (!instance) return;
+
+      instance.setX(x);
+      instance.setY(y);
+      if (z !== undefined && Number.isFinite(z)) {
+        instance.setZ(z);
+      }
+      instance.setAngle(angle);
+      if (rotationY !== undefined && Number.isFinite(rotationY)) {
+        instance.setRotationY(rotationY);
+      }
+      if (rotationX !== undefined && Number.isFinite(rotationX)) {
+        instance.setRotationX(rotationX);
+      }
+      instance.setHasCustomSize(customSize);
+      if (customSize) {
+        instance.setCustomWidth(width || 0);
+        instance.setCustomHeight(height || 0);
+      }
+      const hasCustomDepth = Number.isFinite(depth);
+      instance.setHasCustomDepth(hasCustomDepth);
+      if (hasCustomDepth && depth !== undefined && Number.isFinite(depth)) {
+        instance.setCustomDepth(depth);
+      }
+      instance.setDefaultWidth(defaultWidth || 0);
+      instance.setDefaultHeight(defaultHeight || 0);
+      instance.setDefaultDepth(defaultDepth || 0);
+
+      modifiedInstances.push(instance);
+    });
+    if (modifiedInstances.length > 0) {
+      this._onInstancesMoved(modifiedInstances);
+    }
+
+    const newlySelectedInstances = changes.selectedInstances
+      .map(selectedInstanceData => {
+        const {
+          persistentUuid,
+          defaultWidth,
+          defaultHeight,
+          defaultDepth,
+        } = selectedInstanceData;
+        const instance = getInstanceInLayoutWithPersistentUuid(
+          this.props.initialInstances,
+          persistentUuid
+        );
+        if (instance) {
+          instance.setDefaultWidth(defaultWidth);
+          instance.setDefaultHeight(defaultHeight);
+          instance.setDefaultDepth(defaultDepth || 0);
+        }
+        return instance || null;
+      })
+      .filter(Boolean);
+
+    const justRemovedInstances = changes.removedInstances
+      .map(removedInstanceData => {
+        const { persistentUuid } = removedInstanceData;
+        const instance = getInstanceInLayoutWithPersistentUuid(
+          this.props.initialInstances,
+          persistentUuid
+        );
+        return instance || null;
+      })
+      .filter(Boolean);
+
+    justRemovedInstances.forEach(instance => {
+      this.props.initialInstances.removeInstance(instance);
+    });
+    if (justRemovedInstances.length) {
+      // Make sure no deleted instance stays selected.
+      this.instancesSelection.selectInstances({
+        instances: [],
+        layersLocks: null,
+        multiSelect: false,
+      });
+
+      // Immediately update the properties editor to ensure they keep no reference
+      // to the deleted instances.
+      this.forceUpdatePropertiesEditor();
+
+      this.setState(
+        {
+          selectedObjectFolderOrObjectsWithContext: [],
+          history: saveToHistory(
+            this.state.history,
+            this.props.initialInstances,
+            'DELETE'
+          ),
+        },
+        () => {
+          this.updateToolbar();
+        }
+      );
+    }
+
+    const justAddedInstances = changes.addedInstances.map(addedInstance => {
+      const instance: gdInitialInstance = this.props.initialInstances.insertNewInitialInstance();
+      unserializeFromJSObject(instance, addedInstance);
+      return instance;
+    });
+    if (justAddedInstances.length) {
+      this._onInstancesAdded(justAddedInstances);
+    }
+
+    if (!changes.isSendingBackSelectionForDefaultSize) {
+      this.instancesSelection.selectInstances({
+        instances: newlySelectedInstances,
+        multiSelect: false,
+        layersLocks: null,
+        ignoreSeal: true,
+      });
+      this._selectObjectOfInstances(newlySelectedInstances);
+    }
+
+    if (changes.objectNameToEdit) {
+      this.editObjectInPropertiesPanel(changes.objectNameToEdit);
+    }
   }
 
   onResourceExternallyChanged = async (resourceInfo: {|
@@ -325,6 +617,8 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.editorDisplay)
       this.editorDisplay.instancesHandlers.forceRemountInstancesRenderers();
     this.updateToolbar();
+
+    this._sendHotReloadAllInstances();
   };
 
   onObjectsModifiedOutsideEditor = () => {
@@ -344,6 +638,8 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (editorDisplay.getName() === 'mosaic') {
       this.props.setToolbar(
         <MosaicEditorsDisplayToolbar
+          gameEditorMode={this.props.gameEditorMode}
+          setGameEditorMode={this.props.setGameEditorMode}
           selectedInstancesCount={
             this.instancesSelection.getSelectedInstances().length
           }
@@ -379,6 +675,8 @@ export default class SceneEditor extends React.Component<Props, State> {
     } else {
       this.props.setToolbar(
         <SwipeableDrawerEditorsDisplayToolbar
+          gameEditorMode={this.props.gameEditorMode}
+          setGameEditorMode={this.props.setGameEditorMode}
           selectedInstancesCount={
             this.instancesSelection.getSelectedInstances().length
           }
@@ -463,28 +761,18 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   toggleWindowMask = () => {
-    this.setState(
-      {
-        instancesEditorSettings: {
-          ...this.state.instancesEditorSettings,
-          windowMask: !this.state.instancesEditorSettings.windowMask,
-        },
-      },
-      () => this.updateToolbar()
-    );
+    this.setInstancesEditorSettings({
+      ...this.state.instancesEditorSettings,
+      windowMask: !this.state.instancesEditorSettings.windowMask,
+    });
   };
 
   toggleGrid = () => {
-    this.setState(
-      {
-        instancesEditorSettings: {
-          ...this.state.instancesEditorSettings,
-          grid: !this.state.instancesEditorSettings.grid,
-          snap: !this.state.instancesEditorSettings.grid,
-        },
-      },
-      () => this.updateToolbar()
-    );
+    this.setInstancesEditorSettings({
+      ...this.state.instancesEditorSettings,
+      grid: !this.state.instancesEditorSettings.grid,
+      snap: !this.state.instancesEditorSettings.grid,
+    });
   };
 
   openSetupGrid = (open: boolean = true) => {
@@ -537,6 +825,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         editedObjectInitialTab: 'properties',
       });
     }
+  };
+
+  isEditingObject = (): boolean => {
+    return !!this.state.editedObjectWithContext;
   };
 
   openObjectExporterDialog = (open: boolean = true) => {
@@ -594,8 +886,24 @@ export default class SceneEditor extends React.Component<Props, State> {
   setInstancesEditorSettings = (
     instancesEditorSettings: InstancesEditorSettings
   ) => {
-    this.setState({
-      instancesEditorSettings,
+    this.setState(
+      {
+        instancesEditorSettings,
+      },
+      () => {
+        this.updateToolbar();
+      }
+    );
+    const { previewDebuggerServer } = this.props;
+    if (!previewDebuggerServer) return;
+
+    previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+      previewDebuggerServer.sendMessage(debuggerId, {
+        command: 'setInstancesEditorSettings',
+        payload: {
+          instancesEditorSettings,
+        },
+      });
     });
   };
 
@@ -629,6 +937,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         if (this.editorDisplay)
           this.editorDisplay.instancesHandlers.forceRemountInstancesRenderers();
         this.updateToolbar();
+        this._sendHotReloadAllInstances();
       }
     );
   };
@@ -647,8 +956,25 @@ export default class SceneEditor extends React.Component<Props, State> {
         if (this.editorDisplay)
           this.editorDisplay.instancesHandlers.forceRemountInstancesRenderers();
         this.updateToolbar();
+        this._sendHotReloadAllInstances();
       }
     );
+  };
+
+  _sendHotReloadAllInstances = () => {
+    const { previewDebuggerServer } = this.props;
+    if (!previewDebuggerServer) return;
+
+    const instances = serializeToJSObject(this.props.initialInstances);
+
+    previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+      previewDebuggerServer.sendMessage(debuggerId, {
+        command: 'hotReloadAllInstances',
+        payload: {
+          instances,
+        },
+      });
+    });
   };
 
   _onObjectFolderOrObjectWithContextSelected = (
@@ -716,7 +1042,14 @@ export default class SceneEditor extends React.Component<Props, State> {
       [objectName],
       this.state.selectedLayer
     );
+    this._onInstancesAddedAndSendToEditor3D(instances);
+  };
+
+  _onInstancesAddedAndSendToEditor3D = (
+    instances: Array<gdInitialInstance>
+  ) => {
     this._onInstancesAdded(instances);
+    this._sendAddedInstances(instances);
   };
 
   _onInstancesAdded = (instances: Array<gdInitialInstance>) => {
@@ -763,7 +1096,27 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.setState({ invisibleLayerOnWhichInstancesHaveJustBeenAdded: layer });
   };
 
+  _sendAddedInstances = (instances: Array<gdInitialInstance>) => {
+    const { previewDebuggerServer } = this.props;
+    if (previewDebuggerServer) {
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'addInstances',
+          payload: {
+            instances: instances.map(instance => serializeToJSObject(instance)),
+            moveUnderCursor: false,
+          },
+        });
+      });
+    }
+  };
+
   _onInstancesSelected = (instances: Array<gdInitialInstance>) => {
+    this._sendSelectedInstances();
+    this._selectObjectOfInstances(instances);
+  };
+
+  _selectObjectOfInstances = (instances: Array<gdInitialInstance>) => {
     if (instances.length === 0) {
       this.setState(
         {
@@ -819,6 +1172,13 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.editObjectByName(instance.getObjectName());
   };
 
+  _onInstancesMovedAndSendToEditor3D = (
+    instances: Array<gdInitialInstance>
+  ) => {
+    this._onInstancesMoved(instances);
+    this._sendUpdatedInstances(instances);
+  };
+
   _onInstancesMoved = (instances: Array<gdInitialInstance>) => {
     this.setState(
       {
@@ -830,6 +1190,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       },
       () => this.forceUpdatePropertiesEditor()
     );
+    this._sendUpdatedInstances(instances);
   };
 
   _onInstancesResized = (instances: Array<gdInitialInstance>) => {
@@ -843,6 +1204,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       },
       () => this.forceUpdatePropertiesEditor()
     );
+    this._sendUpdatedInstances(instances);
   };
 
   _onInstancesRotated = (instances: Array<gdInitialInstance>) => {
@@ -856,21 +1218,106 @@ export default class SceneEditor extends React.Component<Props, State> {
       },
       () => this.forceUpdatePropertiesEditor()
     );
+    this._sendUpdatedInstances(instances);
   };
 
+  _exportDataOnly = debounce(() => {
+    this.props.hotReloadPreviewButtonProps.launchProjectDataOnlyPreview();
+  }, 250);
+
   _onInstancesModified = (instances: Array<gdInitialInstance>) => {
+    this._sendUpdatedInstances(instances);
     this.forceUpdate();
     //TODO: Save for redo with debounce (and cancel on unmount)
+  };
+
+  _sendUpdatedInstances = (instances: Array<gdInitialInstance>) => {
+    const { previewDebuggerServer } = this.props;
+    if (!previewDebuggerServer) return;
+
+    previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+      previewDebuggerServer.sendMessage(debuggerId, {
+        command: 'updateInstances',
+        payload: {
+          instances: instances.map(instance => serializeToJSObject(instance)),
+        },
+      });
+    });
+  };
+
+  _onObjectsModified = (objects: Array<gdObject>) => {
+    this._hotReloadObjects({ updatedObjects: objects });
+  };
+
+  _onSetAsGlobalObject = (object: gdObject) => {
+    this.props.onObjectListsModified({ isNewObjectTypeUsed: false });
+  };
+
+  _hotReloadObjects = ({
+    updatedObjects,
+  }: {|
+    updatedObjects: Array<gdObject>,
+  |}) => {
+    const serializedObjects = updatedObjects.map(object =>
+      serializeObjectWithCleanDefaultBehaviorFlags(object)
+    );
+    const { previewDebuggerServer } = this.props;
+    if (previewDebuggerServer) {
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'hotReloadObjects',
+          payload: {
+            updatedObjects: serializedObjects,
+          },
+        });
+      });
+    }
+  };
+
+  _onObjectEdited = (
+    objectWithContext: ObjectWithContext,
+    hasResourceChanged: boolean
+  ) => {
+    const { project, layout, resourceManagementProps } = this.props;
+    // It triggers forceUpdateRenderedInstancesOfObject on this editor too.
+    this.props.onObjectEdited(objectWithContext);
+    if (layout) {
+      if (objectWithContext.global) {
+        gd.WholeProjectRefactorer.behaviorsAddedToGlobalObject(
+          project,
+          objectWithContext.object.getName()
+        );
+      } else {
+        // TODO EBO Add same refactor for event-based objects
+        gd.WholeProjectRefactorer.behaviorsAddedToObjectInScene(
+          project,
+          layout,
+          objectWithContext.object.getName()
+        );
+      }
+    }
+    this.updateBehaviorsSharedData();
+    if (this.props.unsavedChanges)
+      this.props.unsavedChanges.triggerUnsavedChanges();
+
+    if (hasResourceChanged) {
+      // ObjectEditorDialog intercepts onResourceUsageChanged callbacks.
+      // Send it now that the dialog changes are accepted.
+      resourceManagementProps.onResourceUsageChanged();
+    } else {
+      this._hotReloadObjects({
+        updatedObjects: [objectWithContext.object],
+      });
+    }
   };
 
   onSelectTileMapTile = (tileMapTileSelection: ?TileMapTileSelection) => {
     this.setState({ tileMapTileSelection });
   };
 
-  _onSelectInstances = (
+  _setSelectedInstances = (
     instances: Array<gdInitialInstance>,
-    multiSelect: boolean,
-    targetPosition?: 'center' | 'upperCenter'
+    multiSelect: boolean
   ) => {
     this.instancesSelection.selectInstances({
       instances,
@@ -878,9 +1325,35 @@ export default class SceneEditor extends React.Component<Props, State> {
       layersLocks: null,
       ignoreSeal: true,
     });
-    if (this.editorDisplay) {
+    this._onInstancesSelected(instances);
+  };
+
+  _sendSelectedInstances = () => {
+    const { previewDebuggerServer } = this.props;
+    if (previewDebuggerServer) {
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'setSelectedInstances',
+          payload: {
+            instanceUuids: this.instancesSelection
+              .getSelectedInstances()
+              .map(instance => instance.getPersistentUuid()),
+          },
+        });
+      });
+    }
+  };
+
+  _onSelectInstances = (
+    instances: Array<gdInitialInstance>,
+    multiSelect: boolean,
+    targetPosition?: 'center' | 'upperCenter'
+  ) => {
+    this._setSelectedInstances(instances, multiSelect);
+    const { editorDisplay } = this;
+    if (editorDisplay) {
       let offset = null;
-      const { viewControls } = this.editorDisplay;
+      const { viewControls } = editorDisplay;
       const viewPosition = viewControls.getViewPosition();
       if (viewPosition && targetPosition === 'upperCenter') {
         offset = [0, viewPosition.toSceneScale(viewPosition.getHeight() / 4)];
@@ -888,8 +1361,10 @@ export default class SceneEditor extends React.Component<Props, State> {
 
       viewControls.centerViewOnLastInstance(instances, offset);
     }
-    this.setState({ lastSelectionType: 'instance' });
-    this.updateToolbar();
+
+    if (this.props.gameEditorMode === 'embedded-game') {
+      changeViewPosition('centerViewOnLastSelectedInstance');
+    }
   };
 
   /**
@@ -906,7 +1381,14 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.setState({ newObjectInstanceSceneCoordinates: null });
   };
 
-  _onObjectCreated = (object: gdObject) => {
+  _onObjectCreated = (
+    objects: Array<gdObject>,
+    isTheFirstOfItsTypeInProject: boolean
+  ) => {
+    if (objects.length === 0) {
+      return;
+    }
+    const object = objects[0];
     const infoBarDetails = onObjectAdded({
       object,
       layersContainer: this.props.layersContainer,
@@ -923,6 +1405,10 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.props.unsavedChanges.triggerUnsavedChanges();
 
     this._addInstanceForNewObject(object.getName());
+
+    this.props.onObjectListsModified({
+      isNewObjectTypeUsed: isTheFirstOfItsTypeInProject,
+    });
   };
 
   _onRemoveLayer = (layerName: string, done: boolean => void) => {
@@ -994,18 +1480,84 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
   };
 
-  _onSelectLayer = (layer: string) => {
-    this.setState({
-      selectedLayer: layer,
-      instancesEditorSettings: {
-        ...this.state.instancesEditorSettings,
-        selectedLayer: layer,
-      },
-    });
-  };
-
   _onLayerRenamed = () => {
     this.forceUpdatePropertiesEditor();
+  };
+
+  _sendHotReloadLayers = () => {
+    const { previewDebuggerServer, layersContainer, project } = this.props;
+    const layers = mapFor(0, layersContainer.getLayersCount(), i => {
+      const layer = layersContainer.getLayerAt(i);
+      return serializeToJSObject(layer);
+    });
+    if (previewDebuggerServer) {
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'hotReloadLayers',
+          payload: {
+            layers,
+            areEffectsHidden: project.areEffectsHiddenInEditor(),
+          },
+        });
+      });
+    }
+  };
+
+  _sendSetBackgroundColor = () => {
+    const { previewDebuggerServer, layout } = this.props;
+    if (!layout) {
+      return;
+    }
+    if (previewDebuggerServer) {
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'setBackgroundColor',
+          payload: {
+            backgroundColor: [
+              layout.getBackgroundColorRed(),
+              layout.getBackgroundColorGreen(),
+              layout.getBackgroundColorBlue(),
+            ],
+          },
+        });
+      });
+    }
+  };
+
+  _onLayersModified = (hasAnyEffectBeenAdded: boolean) => {
+    const { onEffectAdded } = this.props;
+    if (hasAnyEffectBeenAdded) {
+      // This triggers a full hot-reload. We don't need to reload layers specifically.
+      onEffectAdded();
+    } else {
+      this._sendHotReloadLayers();
+    }
+  };
+
+  _onLayersVisibilityInEditorChanged = () => {
+    this._sendHotReloadLayers();
+  };
+
+  _onSelectLayer = (layerName: string) => {
+    this.setState({
+      selectedLayer: layerName,
+      instancesEditorSettings: {
+        ...this.state.instancesEditorSettings,
+        selectedLayer: layerName,
+      },
+    });
+
+    const { previewDebuggerServer } = this.props;
+    if (previewDebuggerServer) {
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'setSelectedLayer',
+          payload: {
+            layerName,
+          },
+        });
+      });
+    }
   };
 
   _onDeleteObjects = (
@@ -1044,6 +1596,8 @@ export default class SceneEditor extends React.Component<Props, State> {
         );
       }
     });
+
+    this.props.onObjectListsModified({ isNewObjectTypeUsed: false });
 
     // Note: done() actually does the deletion of the objects,
     // so ensure objectsWithContext are not used after this call.
@@ -1167,6 +1721,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
 
     object.setName(newName);
+    this.props.onObjectListsModified({ isNewObjectTypeUsed: false });
   };
 
   _onRenameObjectFolderOrObjectWithContextFinish = (
@@ -1352,6 +1907,10 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.editorDisplay)
       this.editorDisplay.instancesHandlers.clearHighlightedInstance();
 
+    // Immediately update the properties editor to ensure they keep no reference
+    // to the deleted instances.
+    this.forceUpdatePropertiesEditor();
+
     this.setState(
       {
         selectedObjectFolderOrObjectsWithContext: [],
@@ -1363,23 +1922,54 @@ export default class SceneEditor extends React.Component<Props, State> {
       },
       () => {
         this.updateToolbar();
-        this.forceUpdatePropertiesEditor();
       }
     );
+
+    const { previewDebuggerServer } = this.props;
+    if (previewDebuggerServer) {
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'deleteSelection',
+          payload: {},
+        });
+      });
+    }
   };
 
   zoomToInitialPosition = () => {
-    if (this.editorDisplay)
-      this.editorDisplay.viewControls.zoomToInitialPosition();
+    const { editorDisplay } = this;
+    if (!editorDisplay) {
+      return;
+    }
+    editorDisplay.viewControls.zoomToInitialPosition();
+
+    if (this.props.gameEditorMode === 'embedded-game') {
+      changeViewPosition('zoomToInitialPosition');
+    }
   };
 
   zoomToFitContent = () => {
-    if (this.editorDisplay) this.editorDisplay.viewControls.zoomToFitContent();
+    const { editorDisplay } = this;
+    if (!editorDisplay) {
+      return;
+    }
+    editorDisplay.viewControls.zoomToFitContent();
+
+    if (this.props.gameEditorMode === 'embedded-game') {
+      changeViewPosition('zoomToFitContent');
+    }
   };
 
   zoomToFitSelection = () => {
-    if (this.editorDisplay)
-      this.editorDisplay.viewControls.zoomToFitSelection();
+    const { editorDisplay } = this;
+    if (!editorDisplay) {
+      return;
+    }
+    editorDisplay.viewControls.zoomToFitSelection();
+
+    if (this.props.gameEditorMode === 'embedded-game') {
+      changeViewPosition('zoomToFitSelection');
+    }
   };
 
   getContextMenuZoomItems = (i18n: I18nType) => {
@@ -1506,18 +2096,54 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   setZoomFactor = (zoomFactor: number) => {
-    if (this.editorDisplay)
+    if (this.editorDisplay) {
       this.editorDisplay.viewControls.setZoomFactor(zoomFactor);
+    }
+    this._sendSetZoom(zoomFactor);
   };
 
+  _sendSetZoom(zoom: number): void {
+    if (this.props.gameEditorMode === 'embedded-game') {
+      const { previewDebuggerServer } = this.props;
+      if (!previewDebuggerServer) return;
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'setZoom',
+          payload: {
+            zoom,
+          },
+        });
+      });
+    }
+  }
+
+  _sendZoomBy(zoomFactor: number): void {
+    if (this.props.gameEditorMode === 'embedded-game') {
+      const { previewDebuggerServer } = this.props;
+      if (!previewDebuggerServer) return;
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'zoomBy',
+          payload: {
+            zoomFactor,
+          },
+        });
+      });
+    }
+  }
+
   zoomIn = () => {
-    if (this.editorDisplay)
+    if (this.editorDisplay) {
       this.editorDisplay.viewControls.zoomBy(zoomInFactor);
+    }
+    this._sendZoomBy(zoomInFactor);
   };
 
   zoomOut = () => {
     if (this.editorDisplay)
       this.editorDisplay.viewControls.zoomBy(zoomOutFactor);
+
+    this._sendZoomBy(zoomOutFactor);
   };
 
   _onContextMenu = (
@@ -1525,10 +2151,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     y: number,
     ignoreSelectedObjectsForContextMenu?: boolean = false
   ) => {
-    if (this.contextMenu)
+    if (this.contextMenu) {
       this.contextMenu.open(x, y, {
         ignoreSelectedObjectsForContextMenu: !!ignoreSelectedObjectsForContextMenu,
       });
+    }
   };
 
   isInstanceOf3DObject = (instance: gdInitialInstance) => {
@@ -1693,40 +2320,32 @@ export default class SceneEditor extends React.Component<Props, State> {
   duplicateSelection = ({
     useLastCursorPosition,
   }: CopyCutPasteOptions = {}) => {
-    const { editorDisplay } = this;
-    if (!editorDisplay) return;
     const serializedSelection = this.instancesSelection
       .getSelectedInstances()
       .map(instance => serializeToJSObject(instance));
 
-    const newInstances = editorDisplay.instancesHandlers.addSerializedInstances(
-      {
-        position: [0, 0],
-        copyReferential: [-2 * MOVEMENT_BIG_DELTA, -2 * MOVEMENT_BIG_DELTA],
-        serializedInstances: serializedSelection,
-        doesObjectExistInContext:
-          // Instance duplication can only be done in the same scene, so no need to check
-          () => true,
-      }
-    );
-    this._onInstancesAdded(newInstances);
+    const newInstances = addSerializedInstances({
+      instancesContainer: this.props.initialInstances,
+      copyReferential: [-2 * MOVEMENT_BIG_DELTA, -2 * MOVEMENT_BIG_DELTA],
+      serializedInstances: serializedSelection,
+      doesObjectExistInContext:
+        // Instance duplication can only be done in the same scene, so no need to check
+        () => true,
+    });
+    this._onInstancesAddedAndSendToEditor3D(newInstances);
     this.instancesSelection.clearSelection();
     this.instancesSelection.selectInstances({
       instances: newInstances,
       multiSelect: true,
       layersLocks: null,
     });
+
+    // Immediately update the properties editor to ensure they keep no reference
+    // to the deleted instances.
     this.forceUpdatePropertiesEditor();
   };
 
   paste = ({ useLastCursorPosition }: CopyCutPasteOptions = {}) => {
-    const { editorDisplay } = this;
-    if (!editorDisplay) return;
-
-    const position = useLastCursorPosition
-      ? editorDisplay.viewControls.getLastCursorSceneCoordinates()
-      : editorDisplay.viewControls.getLastContextMenuSceneCoordinates();
-
     const clipboardContent = Clipboard.get(INSTANCES_CLIPBOARD_KIND);
     const instancesContent = SafeExtractor.extractArrayProperty(
       clipboardContent,
@@ -1740,33 +2359,51 @@ export default class SceneEditor extends React.Component<Props, State> {
         'pasteInTheForeground'
       ) || false;
     if (x === null || y === null || instancesContent === null) return;
-    const viewPosition = editorDisplay.viewControls.getViewPosition();
-    if (!viewPosition) return;
 
-    const newInstances = editorDisplay.instancesHandlers.addSerializedInstances(
-      {
-        position: viewPosition.containsPoint(position[0], position[1])
-          ? position
-          : [viewPosition.getViewX(), viewPosition.getViewY()],
-        copyReferential: [x, y],
-        serializedInstances: instancesContent,
-        addInstancesInTheForeground: pasteInTheForeground,
-        doesObjectExistInContext: objectName =>
-          this.props.projectScopedContainersAccessor
-            .get()
-            .getObjectsContainersList()
-            .hasObjectNamed(objectName),
-      }
-    );
-    editorDisplay.instancesHandlers.snapSelection(newInstances);
+    const newInstances = addSerializedInstances({
+      instancesContainer: this.props.initialInstances,
+      copyReferential: [x, y],
+      serializedInstances: instancesContent,
+      addInstancesInTheForeground: pasteInTheForeground,
+      doesObjectExistInContext: objectName =>
+        this.props.projectScopedContainersAccessor
+          .get()
+          .getObjectsContainersList()
+          .hasObjectNamed(objectName),
+    });
 
-    this._onInstancesAdded(newInstances);
+    this._onInstancesAddedAndSendToEditor3D(newInstances);
     this.instancesSelection.clearSelection();
     this.instancesSelection.selectInstances({
       instances: newInstances,
       multiSelect: true,
       layersLocks: null,
     });
+
+    const { editorDisplay } = this;
+    if (editorDisplay) {
+      const viewPosition = editorDisplay.viewControls.getViewPosition();
+      if (viewPosition) {
+        const lastPosition = useLastCursorPosition
+          ? editorDisplay.viewControls.getLastCursorSceneCoordinates()
+          : editorDisplay.viewControls.getLastContextMenuSceneCoordinates();
+        const position = viewPosition.containsPoint(
+          lastPosition[0],
+          lastPosition[1]
+        )
+          ? lastPosition
+          : [viewPosition.getViewX(), viewPosition.getViewY()];
+        for (const instance of newInstances) {
+          instance.setX(instance.getX() + position[0]);
+          instance.setY(instance.getY() + position[1]);
+        }
+        editorDisplay.instancesHandlers.snapSelection(newInstances);
+        this._sendUpdatedInstances(newInstances);
+      }
+    }
+
+    // Immediately update the properties editor to ensure they keep no reference
+    // to the deleted instances.
     this.forceUpdatePropertiesEditor();
   };
 
@@ -1804,7 +2441,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     onExtractAsExternalLayout(newName);
   };
 
-  extractAsCustomObject = (
+  extractAsCustomObject = async (
     chosenExtensionName: string,
     isNewExtension: boolean,
     chosenEventsBasedObjectName: string,
@@ -1818,8 +2455,31 @@ export default class SceneEditor extends React.Component<Props, State> {
       onExtractAsEventBasedObject,
     } = this.props;
     const { editorDisplay, deleteSelection, instancesSelection } = this;
-    if (!onExtractAsEventBasedObject || !editorDisplay) return;
+    if (!onExtractAsEventBasedObject) return;
 
+    let selectionAABB = new Rectangle();
+    if (this.props.gameEditorMode === 'embedded-game') {
+      const { previewDebuggerServer } = this.props;
+      if (!previewDebuggerServer) return;
+      try {
+        const answer = await previewDebuggerServer.sendMessageWithResponse({
+          command: 'getSelectionAABB',
+        });
+        selectionAABB.set({
+          left: answer.payload.minX,
+          top: answer.payload.minY,
+          right: answer.payload.maxX,
+          bottom: answer.payload.maxY,
+          zMin: answer.payload.minZ,
+          zMax: answer.payload.maxZ,
+        });
+      } catch (error) {
+        console.error("Can't get the selection AABB.", error);
+      }
+    } else {
+      if (!editorDisplay) return;
+      selectionAABB = editorDisplay.instancesHandlers.getSelectionAABB();
+    }
     extractAsCustomObject({
       project,
       globalObjects: globalObjectsContainer,
@@ -1830,7 +2490,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       chosenEventsBasedObjectName,
       shouldRemoveSceneObjectsWhenNoMoreInstance,
       selectedInstances: instancesSelection.getSelectedInstances(),
-      selectionAABB: editorDisplay.instancesHandlers.getSelectionAABB(),
+      selectionAABB,
       deleteSelection,
       onExtractAsEventBasedObject,
     });
@@ -1844,12 +2504,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       initialInstances,
       objectName
     );
-    this.instancesSelection.selectInstances({
-      instances: instancesToSelect,
-      ignoreSeal: true,
-      multiSelect: false,
-      layersLocks: null,
-    });
+    this._setSelectedInstances(instancesToSelect, false);
     this.forceUpdateInstancesList();
     this._onInstancesSelected(instancesToSelect);
   };
@@ -1944,30 +2599,6 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
   };
 
-  _onObjectEdited = (objectWithContext: ObjectWithContext) => {
-    const { project, layout } = this.props;
-    // It triggers forceUpdateRenderedInstancesOfObject on this editor too.
-    this.props.onObjectEdited(objectWithContext);
-    if (layout) {
-      if (objectWithContext.global) {
-        gd.WholeProjectRefactorer.behaviorsAddedToGlobalObject(
-          project,
-          objectWithContext.object.getName()
-        );
-      } else {
-        // TODO EBO Add same refactor for event-based objects
-        gd.WholeProjectRefactorer.behaviorsAddedToObjectInScene(
-          project,
-          layout,
-          objectWithContext.object.getName()
-        );
-      }
-    }
-    this.updateBehaviorsSharedData();
-    if (this.props.unsavedChanges)
-      this.props.unsavedChanges.triggerUnsavedChanges();
-  };
-
   render() {
     const {
       project,
@@ -2041,6 +2672,10 @@ export default class SceneEditor extends React.Component<Props, State> {
               />
               <EditorsDisplay
                 ref={ref => (this.editorDisplay = ref)}
+                gameEditorMode={this.props.gameEditorMode}
+                onRestartInGameEditorAfterError={
+                  this.props.onRestartInGameEditorAfterError
+                }
                 project={project}
                 layout={layout}
                 eventsFunctionsExtension={eventsFunctionsExtension}
@@ -2055,6 +2690,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 initialInstances={initialInstances}
                 instancesSelection={this.instancesSelection}
                 onSelectInstances={this._onSelectInstances}
+                onInstancesModified={this._onInstancesModified}
                 onAddObjectInstance={this.addInstanceOnTheScene}
                 selectedLayer={this.state.selectedLayer}
                 editLayer={this.editLayer}
@@ -2066,6 +2702,11 @@ export default class SceneEditor extends React.Component<Props, State> {
                   selectedObjectFolderOrObjectsWithContext
                 }
                 onLayerRenamed={this._onLayerRenamed}
+                onLayersModified={() => this._onLayersModified(false)}
+                onBackgroundColorChanged={this._sendSetBackgroundColor}
+                onLayersVisibilityInEditorChanged={
+                  this._onLayersVisibilityInEditorChanged
+                }
                 onRemoveLayer={this._onRemoveLayer}
                 onSelectLayer={this._onSelectLayer}
                 tileMapTileSelection={this.state.tileMapTileSelection}
@@ -2096,9 +2737,11 @@ export default class SceneEditor extends React.Component<Props, State> {
                 }
                 onObjectCreated={this._onObjectCreated}
                 onObjectEdited={this._onObjectEdited}
+                onObjectsModified={this._onObjectsModified}
                 onObjectFolderOrObjectWithContextSelected={
                   this._onObjectFolderOrObjectWithContextSelected
                 }
+                onSetAsGlobalObject={this._onSetAsGlobalObject}
                 historyHandler={{
                   undo: this.undo,
                   redo: this.redo,
@@ -2129,10 +2772,10 @@ export default class SceneEditor extends React.Component<Props, State> {
                   onShift2: this.zoomToInitialPosition,
                   onShift3: this.zoomToFitContent,
                 }}
-                onInstancesAdded={this._onInstancesAdded}
+                onInstancesAdded={this._onInstancesAddedAndSendToEditor3D}
                 onInstancesSelected={this._onInstancesSelected}
                 onInstanceDoubleClicked={this._onInstanceDoubleClicked}
-                onInstancesMoved={this._onInstancesMoved}
+                onInstancesMoved={this._onInstancesMovedAndSendToEditor3D}
                 onInstancesResized={this._onInstancesResized}
                 onInstancesRotated={this._onInstancesRotated}
                 isInstanceOf3DObject={this.isInstanceOf3DObject}
@@ -2152,6 +2795,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onOpenedEditorsChanged={this.updateToolbar}
                 lastSelectionType={this.state.lastSelectionType}
                 onExtensionInstalled={this.props.onExtensionInstalled}
+                editorViewPosition2D={this.editorViewPosition2D}
               />
               <I18n>
                 {({ i18n }) => (
@@ -2188,6 +2832,8 @@ export default class SceneEditor extends React.Component<Props, State> {
                             this.props.onObjectEdited(editedObjectWithContext);
                           }
                           this.editObject(null);
+                          // An hot-reload for an edited image may be on hold.
+                          this.props.triggerHotReloadInGameEditorIfNeeded();
                         }}
                         getValidatedObjectOrGroupName={newName =>
                           this._getValidatedObjectOrGroupName(
@@ -2199,9 +2845,24 @@ export default class SceneEditor extends React.Component<Props, State> {
                         onRename={newName => {
                           this._onRenameEditedObject(newName);
                         }}
-                        onApply={() => {
+                        onApply={(
+                          hasResourceChanged: boolean,
+                          hasAnyEffectBeenAdded: boolean
+                        ) => {
+                          // When resource parameters changed an hot-reload is
+                          // already triggered by _onObjectEdited.
+                          if (!hasResourceChanged) {
+                            // An hot-reload for an edited image may be on hold.
+                            this.props.triggerHotReloadInGameEditorIfNeeded();
+                          }
                           if (editedObjectWithContext) {
-                            this._onObjectEdited(editedObjectWithContext);
+                            this._onObjectEdited(
+                              editedObjectWithContext,
+                              hasResourceChanged
+                            );
+                          }
+                          if (hasAnyEffectBeenAdded) {
+                            this.props.onEffectAdded();
                           }
                           this.editObject(null);
                         }}
@@ -2227,7 +2888,10 @@ export default class SceneEditor extends React.Component<Props, State> {
                             variantName
                           );
                           if (editedObjectWithContext) {
-                            this._onObjectEdited(editedObjectWithContext);
+                            this._onObjectEdited(
+                              editedObjectWithContext,
+                              false
+                            );
                           }
                           this.editObject(null);
                         }}
@@ -2348,7 +3012,13 @@ export default class SceneEditor extends React.Component<Props, State> {
                   layer={this.state.editedLayer}
                   initialInstances={initialInstances}
                   initialTab={this.state.editedLayerInitialTab}
-                  onClose={() =>
+                  onApply={(hasAnyEffectBeenAdded: boolean) => {
+                    this._onLayersModified(hasAnyEffectBeenAdded);
+                    this.setState({
+                      editedLayer: null,
+                    });
+                  }}
+                  onCancel={() =>
                     this.setState({
                       editedLayer: null,
                     })
@@ -2368,6 +3038,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                   onEditVariables={() => this.editLayoutVariables(true)}
                   onOpenMoreSettings={this.props.onOpenMoreSettings}
                   resourceManagementProps={this.props.resourceManagementProps}
+                  onBackgroundColorChanged={this._sendSetBackgroundColor}
                 />
               )}
               {this.state.scenePropertiesDialogOpen &&
@@ -2378,7 +3049,28 @@ export default class SceneEditor extends React.Component<Props, State> {
                     eventsBasedObject={eventsBasedObject}
                     eventsBasedObjectVariant={eventsBasedObjectVariant}
                     onClose={() => this.openSceneProperties(false)}
-                    onApply={() => this.openSceneProperties(false)}
+                    onApply={() => {
+                      this.openSceneProperties(false);
+
+                      const { previewDebuggerServer } = this.props;
+                      if (previewDebuggerServer) {
+                        previewDebuggerServer
+                          .getExistingDebuggerIds()
+                          .forEach(debuggerId => {
+                            previewDebuggerServer.sendMessage(debuggerId, {
+                              command: 'updateInnerArea',
+                              payload: {
+                                areaMinX: eventsBasedObjectVariant.getAreaMinX(),
+                                areaMinY: eventsBasedObjectVariant.getAreaMinY(),
+                                areaMinZ: eventsBasedObjectVariant.getAreaMinZ(),
+                                areaMaxX: eventsBasedObjectVariant.getAreaMaxX(),
+                                areaMaxY: eventsBasedObjectVariant.getAreaMaxY(),
+                                areaMaxZ: eventsBasedObjectVariant.getAreaMaxZ(),
+                              },
+                            });
+                          });
+                      }
+                    }}
                     getContentAABB={
                       this.editorDisplay
                         ? this.editorDisplay.instancesHandlers.getContentAABB

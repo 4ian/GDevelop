@@ -4,14 +4,15 @@ import {
   type PreviewDebuggerServer,
   type DebuggerId,
   type HotReloaderLog,
+  type DebuggerStatus,
 } from '../ExportAndShare/PreviewLauncher.flow';
 
 /** Represents what should be run when a preview is launched */
 export type PreviewState = {|
   /** The previewed layout name, set by the current editor. */
-  previewLayoutName: ?string,
+  previewLayoutName: string | null,
   /** The previewed external layout name, set by the current editor. */
-  previewExternalLayoutName: ?string,
+  previewExternalLayoutName: string | null,
 
   /** If true, the previewed layout/external layout is overriden, */
   isPreviewOverriden: boolean,
@@ -22,26 +23,42 @@ export type PreviewState = {|
 |};
 
 type PreviewDebuggerServerWatcherResults = {|
-  previewDebuggerIds: Array<DebuggerId>,
-  hotReloadLogs: Array<HotReloaderLog>,
-  clearHotReloadLogs: () => void,
+  hasNonEditionPreviewsRunning: boolean,
+
+  gameHotReloadLogs: Array<HotReloaderLog>,
+  clearGameHotReloadLogs: () => void,
+  editorHotReloadLogs: Array<HotReloaderLog>,
+  clearEditorHotReloadLogs: () => void,
+  editorUncaughtError: Error | null,
+  clearEditorUncaughtError: () => void,
+
+  hardReloadAllPreviews: () => void,
 |};
 
 /**
- * Return the ids of the debuggers being run, watching for changes (new
+ * Return the status of the debuggers being run, watching for changes (new
  * debugger launched or existing one closed).
  */
 export const usePreviewDebuggerServerWatcher = (
   previewDebuggerServer: ?PreviewDebuggerServer
 ): PreviewDebuggerServerWatcherResults => {
-  const [debuggerIds, setDebuggerIds] = React.useState<Array<DebuggerId>>([]);
-  const [hotReloadLogs, setHotReloadLogs] = React.useState<
+  const [debuggerStatus, setDebuggerStatus] = React.useState<{
+    [DebuggerId]: DebuggerStatus,
+  }>({});
+  const [gameHotReloadLogs, setGameHotReloadLogs] = React.useState<
     Array<HotReloaderLog>
   >([]);
+  const [editorHotReloadLogs, setEditorHotReloadLogs] = React.useState<
+    Array<HotReloaderLog>
+  >([]);
+  const [
+    editorUncaughtError,
+    setEditorUncaughtError,
+  ] = React.useState<Error | null>(null);
   React.useEffect(
     () => {
       if (!previewDebuggerServer) {
-        setDebuggerIds([]);
+        setDebuggerStatus({});
         return;
       }
 
@@ -50,10 +67,24 @@ export const usePreviewDebuggerServerWatcher = (
           // Nothing to do.
         },
         onConnectionClosed: ({ id, debuggerIds }) => {
-          setDebuggerIds([...debuggerIds]);
+          // Remove the debugger status.
+          setDebuggerStatus(debuggerStatus => {
+            const {
+              [id]: closedDebuggerStatus,
+              ...otherDebuggerStatus
+            } = debuggerStatus;
+            console.info(
+              `Connection closed with preview with id "${id}". Last status was:`,
+              closedDebuggerStatus
+            );
+
+            return otherDebuggerStatus;
+          });
         },
         onConnectionOpened: ({ id, debuggerIds }) => {
-          setDebuggerIds([...debuggerIds]);
+          // Ask the new debugger client for its status (but don't assume anything
+          // at this stage).
+          previewDebuggerServer.sendMessage(id, { command: 'getStatus' });
         },
         onConnectionErrored: ({ id }) => {
           // Nothing to do (onConnectionClosed is called if necessary).
@@ -63,7 +94,28 @@ export const usePreviewDebuggerServerWatcher = (
         },
         onHandleParsedMessage: ({ id, parsedMessage }) => {
           if (parsedMessage.command === 'hotReloader.logs') {
-            setHotReloadLogs(parsedMessage.payload);
+            if (parsedMessage.payload.isInGameEdition) {
+              setEditorHotReloadLogs(parsedMessage.payload.logs);
+            } else {
+              setGameHotReloadLogs(parsedMessage.payload.logs);
+            }
+          } else if (parsedMessage.command === 'status') {
+            setDebuggerStatus(debuggerStatus => ({
+              ...debuggerStatus,
+              [id]: {
+                isPaused: !!parsedMessage.payload.isPaused,
+                isInGameEdition: !!parsedMessage.payload.isInGameEdition,
+                sceneName: parsedMessage.payload.sceneName,
+              },
+            }));
+          } else if (parsedMessage.command === 'game.crashed') {
+            // Only keep the first exception.
+            if (parsedMessage.payload.isInGameEdition) {
+              setEditorUncaughtError(
+                previousEditorUncaughtError =>
+                  previousEditorUncaughtError || parsedMessage.payload.exception
+              );
+            }
           }
         },
       });
@@ -73,9 +125,45 @@ export const usePreviewDebuggerServerWatcher = (
     },
     [previewDebuggerServer]
   );
-  const clearHotReloadLogs = React.useCallback(() => setHotReloadLogs([]), [
-    setHotReloadLogs,
-  ]);
+  const clearGameHotReloadLogs = React.useCallback(
+    () => setGameHotReloadLogs([]),
+    [setGameHotReloadLogs]
+  );
+  const clearEditorHotReloadLogs = React.useCallback(
+    () => setEditorHotReloadLogs([]),
+    [setEditorHotReloadLogs]
+  );
+  const clearEditorUncaughtError = React.useCallback(
+    () => setEditorUncaughtError(null),
+    [setEditorUncaughtError]
+  );
 
-  return { previewDebuggerIds: debuggerIds, hotReloadLogs, clearHotReloadLogs };
+  const hardReloadAllPreviews = React.useCallback(
+    () => {
+      if (!previewDebuggerServer) return;
+
+      console.info('Hard reloading all previews...');
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'hardReload',
+        });
+      });
+    },
+    [previewDebuggerServer]
+  );
+
+  const hasNonEditionPreviewsRunning = Object.keys(debuggerStatus).some(
+    key => !debuggerStatus[key].isInGameEdition
+  );
+
+  return {
+    hasNonEditionPreviewsRunning,
+    gameHotReloadLogs,
+    clearGameHotReloadLogs,
+    editorHotReloadLogs,
+    clearEditorHotReloadLogs,
+    editorUncaughtError,
+    clearEditorUncaughtError,
+    hardReloadAllPreviews,
+  };
 };

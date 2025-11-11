@@ -89,6 +89,7 @@ const WrappedHomePage = ({
           <ExampleStoreStateProvider>
             <TutorialStateProvider>
               <HomePage
+                gameEditorMode="instances-editor"
                 project={project}
                 fileMetadata={null}
                 isActive={true}

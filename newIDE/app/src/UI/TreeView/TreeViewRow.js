@@ -267,6 +267,12 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
             const draggedItem: DraggedItem = {
               name: node.name,
               thumbnail: node.thumbnailSrc || undefined,
+              is3D:
+                // $FlowFixMe
+                !!node.item.content &&
+                !!node.item.content.is3D &&
+                // $FlowFixMe
+                node.item.content.is3D(),
             };
             return draggedItem;
           }

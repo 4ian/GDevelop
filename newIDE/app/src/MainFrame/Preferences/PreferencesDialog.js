@@ -7,7 +7,7 @@ import FlatButton from '../../UI/FlatButton';
 import LocalFolderPicker from '../../UI/LocalFolderPicker';
 import SelectOption from '../../UI/SelectOption';
 import { CompactToggleField } from '../../UI/CompactToggleField';
-import Dialog from '../../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import { Column, Line } from '../../UI/Grid';
 import { themes } from '../../UI/Theme/ThemeRegistry';
 import { getAllThemes } from '../../CodeEditor/Theme';
@@ -85,9 +85,14 @@ const PreferencesDialog = ({
     setTakeScreenshotOnPreview,
     setShowAiAskButtonInTitleBar,
     setShowCreateSectionByDefault,
+    setShowGameEditorToggle,
   } = React.useContext(PreferencesContext);
 
   const initialUse3DEditor = React.useRef<boolean>(values.use3DEditor);
+  const [
+    gameEditorToggleWarningDialogOpen,
+    setGameEditorToggleWarningDialogOpen,
+  ] = React.useState(false);
 
   return (
     <Dialog
@@ -627,6 +632,21 @@ const PreferencesDialog = ({
                       t`Watch changes in game engine (GDJS) sources and auto import them (dev only)`
                     )}
                   />
+                  <CompactToggleField
+                    labelColor="primary"
+                    hideTooltip
+                    onCheck={check => {
+                      if (check) {
+                        setGameEditorToggleWarningDialogOpen(true);
+                      } else {
+                        setShowGameEditorToggle(false);
+                      }
+                    }}
+                    checked={values.showGameEditorToggle}
+                    label={i18n._(
+                      t`Show experimental, unfinished "Game Editor" toggle`
+                    )}
+                  />
                   <FlatButton
                     fullWidth
                     onClick={onOpenQuickCustomizationDialog}
@@ -659,6 +679,41 @@ const PreferencesDialog = ({
             type="default-workspace"
           />
         </ColumnStackLayout>
+      )}
+      {gameEditorToggleWarningDialogOpen && (
+        <Dialog
+          open
+          title={<Trans>Here be dragons</Trans>}
+          actions={[
+            <FlatButton
+              key="accept"
+              label={
+                <Trans>Ok, I understand all of this and will be careful</Trans>
+              }
+              primary={false}
+              onClick={() => {
+                setShowGameEditorToggle(true);
+                setGameEditorToggleWarningDialogOpen(false);
+              }}
+            />,
+            <DialogPrimaryButton
+              primary
+              key="close"
+              label={<Trans>Close</Trans>}
+              onClick={() => setGameEditorToggleWarningDialogOpen(false)}
+            />,
+          ]}
+          flexColumnBody
+          onRequestClose={() => setGameEditorToggleWarningDialogOpen(false)}
+          maxWidth="md"
+        >
+          <Text>
+            <Trans>
+              This feature is experimental, unfinished and probably bugged. It's{' '}
+              <b>not ready to be shared</b> for now as it's being improved.
+            </Trans>
+          </Text>
+        </Dialog>
       )}
     </Dialog>
   );

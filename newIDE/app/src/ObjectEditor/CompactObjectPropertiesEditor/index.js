@@ -89,6 +89,8 @@ export const styles = {
   },
 };
 
+const noop = () => {};
+
 const behaviorsHelpLink = getHelpLink('/behaviors');
 const effectsHelpLink = getHelpLink('/objects/effects');
 const objectVariablesHelpLink = getHelpLink(
@@ -226,6 +228,7 @@ type Props = {|
 
   objects: Array<gdObject>,
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
+  onObjectsModified: (objects: Array<gdObject>) => void,
   onOpenEventBasedObjectVariantEditor: (
     extensionName: string,
     eventsBasedObjectName: string,
@@ -256,6 +259,7 @@ export const CompactObjectPropertiesEditor = ({
   historyHandler,
   objects,
   onEditObject,
+  onObjectsModified,
   onOpenEventBasedObjectVariantEditor,
   onDeleteEventsBasedObjectVariant,
   onExtensionInstalled,
@@ -316,8 +320,10 @@ export const CompactObjectPropertiesEditor = ({
         properties,
         getProperties: ({ object, objectConfiguration }) =>
           objectConfiguration.getProperties(),
-        onUpdateProperty: ({ object, objectConfiguration }, name, value) =>
-          objectConfiguration.updateProperty(name, value),
+        onUpdateProperty: ({ object, objectConfiguration }, name, value) => {
+          objectConfiguration.updateProperty(name, value);
+          onObjectsModified([object]);
+        },
         visibility: 'Basic',
       });
 
@@ -334,6 +340,7 @@ export const CompactObjectPropertiesEditor = ({
       fullEditorLabel,
       object,
       onEditObject,
+      onObjectsModified,
     ]
   );
   const objectAdvancedPropertiesSchema = React.useMemo(
@@ -347,12 +354,14 @@ export const CompactObjectPropertiesEditor = ({
         properties,
         getProperties: ({ object, objectConfiguration }) =>
           objectConfiguration.getProperties(),
-        onUpdateProperty: ({ object, objectConfiguration }, name, value) =>
-          objectConfiguration.updateProperty(name, value),
+        onUpdateProperty: ({ object, objectConfiguration }, name, value) => {
+          objectConfiguration.updateProperty(name, value);
+          onObjectsModified([object]);
+        },
         visibility: 'Advanced',
       });
     },
-    [objectConfigurationAsGd, schemaRecomputeTrigger]
+    [objectConfigurationAsGd, schemaRecomputeTrigger, onObjectsModified]
   );
   const hasObjectAdvancedProperties = objectAdvancedPropertiesSchema.length > 0;
   const hasSomeObjectProperties =
@@ -392,6 +401,7 @@ export const CompactObjectPropertiesEditor = ({
     effectsContainer,
     project,
     onEffectsUpdated: forceUpdate,
+    onEffectAdded: noop,
     onUpdate: forceUpdate,
     target: 'object',
   });
@@ -686,6 +696,7 @@ export const CompactObjectPropertiesEditor = ({
                       onChange={(newValue: string) => {
                         customObjectConfiguration &&
                           customObjectConfiguration.setVariantName(newValue);
+                        onObjectsModified([object]);
                         forceUpdate();
                       }}
                     >

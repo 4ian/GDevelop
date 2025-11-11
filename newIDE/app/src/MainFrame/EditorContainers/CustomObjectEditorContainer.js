@@ -17,6 +17,12 @@ import SceneEditor from '../../SceneEditor';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import {
+  switchToSceneEdition,
+  setEditorHotReloadNeeded,
+  switchInGameEditorIfNoHotReloadIsNeeded,
+  type HotReloadSteps,
+} from '../../EmbeddedGame/EmbeddedGameFrame';
+import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../../Utils/Serializer';
@@ -52,12 +58,13 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
 
   componentDidMount() {
     if (this.props.isActive) {
-      // const { projectItemName } = this.props;
-      // const layout = this.getLayout();
-      // this.props.setPreviewedLayout(
-      //   layout ? layout.getName() : null,
-      //   projectItemName
-      // );
+      const { projectItemName } = this.props;
+      this.props.setPreviewedLayout({
+        layoutName: null,
+        externalLayoutName: null,
+        eventsBasedObjectType: projectItemName || null,
+        eventsBasedObjectVariantName: this.getVariantName(),
+      });
     }
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
       this.onResourceExternallyChanged.bind(this)
@@ -70,15 +77,52 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     if (this._objectsContainer) this._objectsContainer.delete();
   }
 
-  componentDidUpdate(prevProps: RenderEditorContainerProps) {
-    if (!prevProps.isActive && this.props.isActive) {
-      // const { projectItemName } = this.props;
-      // const layout = this.getLayout();
-      // this.props.setPreviewedLayout(
-      //   layout ? layout.getName() : null,
-      //   projectItemName
-      // );
+  notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {
+    this._switchToSceneEdition(hotReloadSteps);
+  }
+
+  _switchToSceneEdition(hotReloadSteps: HotReloadSteps): void {
+    const { projectItemName, editorId } = this.props;
+    this.props.setPreviewedLayout({
+      layoutName: null,
+      externalLayoutName: null,
+      eventsBasedObjectType: projectItemName || null,
+      eventsBasedObjectVariantName: this.getVariantName(),
+    });
+    if (
+      this.props.gameEditorMode === 'embedded-game' &&
+      projectItemName &&
+      // Avoid to hot-reload the editor every time an image is edited with Pixi.
+      (!this.editor || !this.editor.isEditingObject())
+    ) {
+      switchToSceneEdition({
+        ...hotReloadSteps,
+        editorId,
+        sceneName: null,
+        externalLayoutName: null,
+        eventsBasedObjectType: this.getEventsBasedObjectType() || null,
+        eventsBasedObjectVariantName: this.getVariantName(),
+      });
+      if (this.editor) {
+        this.editor.onEditorReloaded();
+      }
+    } else {
+      setEditorHotReloadNeeded(hotReloadSteps);
     }
+  }
+
+  switchInGameEditorIfNoHotReloadIsNeeded() {
+    const { projectItemName, editorId } = this.props;
+    if (!projectItemName) {
+      return;
+    }
+    switchInGameEditorIfNoHotReloadIsNeeded({
+      editorId,
+      sceneName: null,
+      externalLayoutName: null,
+      eventsBasedObjectType: this.getEventsBasedObjectType() || null,
+      eventsBasedObjectVariantName: this.getVariantName(),
+    });
   }
 
   onResourceExternallyChanged(resourceInfo: {| identifier: string |}) {
@@ -180,6 +224,17 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     return extension.getEventsBasedObjects().get(eventsBasedObjectName);
   }
 
+  getEventsBasedObjectType(): string {
+    const { projectItemName } = this.props;
+    return (
+      (projectItemName &&
+        projectItemName.split('::')[0] +
+          '::' +
+          projectItemName.split('::')[1]) ||
+      ''
+    );
+  }
+
   getVariantName(): string {
     const { projectItemName } = this.props;
     return (projectItemName && projectItemName.split('::')[2]) || '';
@@ -235,6 +290,12 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     return (
       <div style={styles.container}>
         <SceneEditor
+          editorId={this.props.editorId}
+          gameEditorMode={this.props.gameEditorMode}
+          setGameEditorMode={this.props.setGameEditorMode}
+          onRestartInGameEditorAfterError={
+            this.props.onRestartInGameEditorAfterError
+          }
           setToolbar={this.props.setToolbar}
           resourceManagementProps={this.props.resourceManagementProps}
           unsavedChanges={this.props.unsavedChanges}
@@ -265,6 +326,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
             )
           }
           isActive={isActive}
+          previewDebuggerServer={this.props.previewDebuggerServer}
           hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           openBehaviorEvents={this.props.openBehaviorEvents}
           onObjectEdited={() =>
@@ -290,6 +352,11 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           onExtensionInstalled={this.props.onExtensionInstalled}
           onDeleteEventsBasedObjectVariant={
             this.props.onDeleteEventsBasedObjectVariant
+          }
+          onEffectAdded={this.props.onEffectAdded}
+          onObjectListsModified={this.props.onObjectListsModified}
+          triggerHotReloadInGameEditorIfNeeded={
+            this.props.triggerHotReloadInGameEditorIfNeeded
           }
         />
       </div>

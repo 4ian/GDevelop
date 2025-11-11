@@ -63,6 +63,8 @@ export const NoProjectOpen = () => {
                     'onOpenEventsFunctionsExtension'
                   )}
                   onInstallExtension={action('onInstallExtension')}
+                  onSceneAdded={action('onSceneAdded')}
+                  onExternalLayoutAdded={action('onExternalLayoutAdded')}
                   onDeleteLayout={action('onDeleteLayout')}
                   onDeleteExternalLayout={action('onDeleteExternalLayout')}
                   onDeleteEventsFunctionsExtension={action(
@@ -133,6 +135,8 @@ export const ProjectOpen = () => {
                     'onOpenEventsFunctionsExtension'
                   )}
                   onInstallExtension={action('onInstallExtension')}
+                  onSceneAdded={action('onSceneAdded')}
+                  onExternalLayoutAdded={action('onExternalLayoutAdded')}
                   onDeleteLayout={action('onDeleteLayout')}
                   onDeleteExternalLayout={action('onDeleteExternalLayout')}
                   onDeleteEventsFunctionsExtension={action(

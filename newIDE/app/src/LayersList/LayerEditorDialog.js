@@ -40,7 +40,8 @@ type Props = {|
 
   initialTab: 'properties' | 'effects',
 
-  onClose: () => void,
+  onCancel: () => void,
+  onApply: (hasAnyEffectBeenAdded: boolean) => void,
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
@@ -54,7 +55,8 @@ const LayerEditorDialog = ({
   eventsBasedObject,
   layer,
   initialInstances,
-  onClose,
+  onCancel,
+  onApply,
   hotReloadPreviewButtonProps,
   resourceManagementProps,
 }: Props) => {
@@ -64,7 +66,7 @@ const LayerEditorDialog = ({
     notifyOfChange,
   } = useSerializableObjectCancelableEditor({
     serializableObject: layer,
-    onCancel: onClose,
+    onCancel,
   });
   const [
     camera3DFieldOfViewError,
@@ -77,6 +79,10 @@ const LayerEditorDialog = ({
   const [
     camera3DNearPlaneDistanceError,
     setCamera3DNearPlaneDistanceError,
+  ] = React.useState<?React.Node>(null);
+  const [
+    camera2DPlaneMaxDrawingDistanceError,
+    setCamera2DPlaneMaxDrawingDistanceError,
   ] = React.useState<?React.Node>(null);
   const [currentTab, setCurrentTab] = React.useState(initialTab);
   const { instancesCount, highestZOrder } = React.useMemo(
@@ -92,6 +98,7 @@ const LayerEditorDialog = ({
     },
     [layer, initialInstances]
   );
+  const [hasAnyEffectBeenAdded, setAnyEffectBeenAdded] = React.useState(false);
 
   const onChangeCamera3DFieldOfView = React.useCallback(
     value => {
@@ -168,6 +175,26 @@ const LayerEditorDialog = ({
     [forceUpdate, layer, notifyOfChange]
   );
 
+  const onChangeCamera2DPlaneMaxDrawingDistance = React.useCallback(
+    value => {
+      setCamera2DPlaneMaxDrawingDistanceError(null);
+      const newValue = parseFloat(value) || 0;
+      if (newValue <= 0) {
+        setCamera2DPlaneMaxDrawingDistanceError(
+          <Trans>
+            The maximum 2D drawing distance must be strictly greater than 0.
+          </Trans>
+        );
+        return;
+      }
+      if (newValue === layer.getCamera2DPlaneMaxDrawingDistance()) return;
+      layer.setCamera2DPlaneMaxDrawingDistance(newValue);
+      forceUpdate();
+      notifyOfChange();
+    },
+    [forceUpdate, layer, notifyOfChange]
+  );
+
   return (
     <Dialog
       title={
@@ -197,12 +224,12 @@ const LayerEditorDialog = ({
         <DialogPrimaryButton
           label={<Trans>Apply</Trans>}
           primary
-          onClick={onClose}
+          onClick={() => onApply(hasAnyEffectBeenAdded)}
           key={'Apply'}
         />,
       ]}
       onRequestClose={onCancelChanges}
-      onApply={onClose}
+      onApply={() => onApply(hasAnyEffectBeenAdded)}
       fullHeight
       flexColumnBody
       fixedContent={
@@ -390,6 +417,19 @@ const LayerEditorDialog = ({
                       floatingLabelFixed
                     />
                   </ResponsiveLineStackLayout>
+                  <SemiControlledTextField
+                    commitOnBlur
+                    fullWidth
+                    errorText={camera2DPlaneMaxDrawingDistanceError}
+                    onChange={onChangeCamera2DPlaneMaxDrawingDistance}
+                    value={layer
+                      .getCamera2DPlaneMaxDrawingDistance()
+                      .toString(10)}
+                    floatingLabelText={
+                      <Trans>Maximum 2D drawing distance</Trans>
+                    }
+                    floatingLabelFixed
+                  />
                 </ColumnStackLayout>
               )}
             </ColumnStackLayout>
@@ -480,6 +520,9 @@ const LayerEditorDialog = ({
           onEffectsUpdated={() => {
             forceUpdate(); /*Force update to ensure dialog is properly positioned*/
             notifyOfChange();
+          }}
+          onEffectAdded={() => {
+            setAnyEffectBeenAdded(true);
           }}
         />
       )}

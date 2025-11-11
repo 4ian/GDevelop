@@ -31,6 +31,13 @@ import {
 } from '../ResourcesWatcher';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
+import {
+  switchToSceneEdition,
+  setEditorHotReloadNeeded,
+  switchInGameEditorIfNoHotReloadIsNeeded,
+  type HotReloadSteps,
+} from '../../EmbeddedGame/EmbeddedGameFrame';
+import Background from '../../UI/Background';
 
 const styles = {
   container: {
@@ -69,10 +76,12 @@ export class ExternalLayoutEditorContainer extends React.Component<
     if (this.props.isActive) {
       const { projectItemName } = this.props;
       const layout = this.getLayout();
-      this.props.setPreviewedLayout(
-        layout ? layout.getName() : null,
-        projectItemName
-      );
+      this.props.setPreviewedLayout({
+        layoutName: layout ? layout.getName() : null,
+        externalLayoutName: projectItemName || null,
+        eventsBasedObjectType: null,
+        eventsBasedObjectVariantName: null,
+      });
     }
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
       this.onResourceExternallyChanged.bind(this)
@@ -84,15 +93,55 @@ export class ExternalLayoutEditorContainer extends React.Component<
     );
   }
 
-  componentDidUpdate(prevProps: RenderEditorContainerProps) {
-    if (!prevProps.isActive && this.props.isActive) {
-      const { projectItemName } = this.props;
-      const layout = this.getLayout();
-      this.props.setPreviewedLayout(
-        layout ? layout.getName() : null,
-        projectItemName
-      );
+  notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {
+    this._switchToSceneEdition(hotReloadSteps);
+  }
+
+  _switchToSceneEdition(hotReloadSteps: HotReloadSteps): void {
+    const { projectItemName, editorId } = this.props;
+    const layout = this.getLayout();
+    this.props.setPreviewedLayout({
+      layoutName: layout ? layout.getName() : null,
+      externalLayoutName: projectItemName || null,
+      eventsBasedObjectType: null,
+      eventsBasedObjectVariantName: null,
+    });
+    if (
+      this.props.gameEditorMode === 'embedded-game' &&
+      layout &&
+      projectItemName &&
+      // Avoid to hot-reload the editor every time an image is edited with Pixi.
+      (!this.editor || !this.editor.isEditingObject())
+    ) {
+      switchToSceneEdition({
+        ...hotReloadSteps,
+        editorId,
+        sceneName: layout.getName(),
+        externalLayoutName: projectItemName,
+        eventsBasedObjectType: null,
+        eventsBasedObjectVariantName: null,
+      });
+      if (this.editor) {
+        this.editor.onEditorReloaded();
+      }
+    } else {
+      setEditorHotReloadNeeded(hotReloadSteps);
     }
+  }
+
+  switchInGameEditorIfNoHotReloadIsNeeded() {
+    const { projectItemName, editorId } = this.props;
+    const layout = this.getLayout();
+    if (!projectItemName || !layout) {
+      return;
+    }
+    switchInGameEditorIfNoHotReloadIsNeeded({
+      editorId,
+      sceneName: layout.getName(),
+      externalLayoutName: projectItemName,
+      eventsBasedObjectType: null,
+      eventsBasedObjectVariantName: null,
+    });
   }
 
   onResourceExternallyChanged(resourceInfo: {| identifier: string |}) {
@@ -238,6 +287,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
       },
       () => this.updateToolbar()
     );
+    this.props.onExternalLayoutAssociationChanged();
   };
 
   openExternalPropertiesDialog = () => {
@@ -279,6 +329,12 @@ export class ExternalLayoutEditorContainer extends React.Component<
       <div style={styles.container}>
         {layout && (
           <SceneEditor
+            editorId={this.props.editorId}
+            gameEditorMode={this.props.gameEditorMode}
+            setGameEditorMode={this.props.setGameEditorMode}
+            onRestartInGameEditorAfterError={
+              this.props.onRestartInGameEditorAfterError
+            }
             setToolbar={this.props.setToolbar}
             resourceManagementProps={this.props.resourceManagementProps}
             unsavedChanges={this.props.unsavedChanges}
@@ -308,6 +364,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
             onOpenEvents={this.props.onOpenEvents}
             onOpenMoreSettings={this.openExternalPropertiesDialog}
             isActive={isActive}
+            previewDebuggerServer={this.props.previewDebuggerServer}
             openBehaviorEvents={this.props.openBehaviorEvents}
             onExtractAsExternalLayout={this.props.onExtractAsExternalLayout}
             onExtractAsEventBasedObject={this.props.onExtractAsEventBasedObject}
@@ -330,33 +387,40 @@ export class ExternalLayoutEditorContainer extends React.Component<
             onDeleteEventsBasedObjectVariant={
               this.props.onDeleteEventsBasedObjectVariant
             }
+            onEffectAdded={this.props.onEffectAdded}
+            onObjectListsModified={this.props.onObjectListsModified}
+            triggerHotReloadInGameEditorIfNeeded={
+              this.props.triggerHotReloadInGameEditorIfNeeded
+            }
           />
         )}
         {!layout && (
-          <PlaceholderMessage>
-            <Text>
-              <Trans>
-                To edit the external layout, choose the scene in which it will
-                be included
-              </Trans>
-            </Text>
-            <Line justifyContent="center">
-              <RaisedButton
-                label={<Trans>Choose the scene</Trans>}
-                primary
-                onClick={this.openExternalPropertiesDialog}
-              />
-            </Line>
-            <Line justifyContent="flex-start" noMargin>
-              <TutorialButton
-                tutorialId="Intermediate-externals"
-                label={<Trans>Watch tutorial</Trans>}
-                renderIfNotFound={
-                  <HelpButton helpPagePath="/interface/events-editor/external-events" />
-                }
-              />
-            </Line>
-          </PlaceholderMessage>
+          <Background>
+            <PlaceholderMessage>
+              <Text>
+                <Trans>
+                  To edit the external layout, choose the scene in which it will
+                  be included
+                </Trans>
+              </Text>
+              <Line justifyContent="center">
+                <RaisedButton
+                  label={<Trans>Choose the scene</Trans>}
+                  primary
+                  onClick={this.openExternalPropertiesDialog}
+                />
+              </Line>
+              <Line justifyContent="flex-start" noMargin>
+                <TutorialButton
+                  tutorialId="Intermediate-externals"
+                  label={<Trans>Watch tutorial</Trans>}
+                  renderIfNotFound={
+                    <HelpButton helpPagePath="/interface/events-editor/external-events" />
+                  }
+                />
+              </Line>
+            </PlaceholderMessage>
+          </Background>
         )}
         <ExternalPropertiesDialog
           title={<Trans>Configure the external layout</Trans>}

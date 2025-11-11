@@ -813,6 +813,13 @@ gd::String PlatformExtension::GetObjectFullType(const gd::String& extensionName,
   return extensionName + separator + objectName;
 }
 
+gd::String PlatformExtension::GetVariantFullType(const gd::String& extensionName,
+                                                const gd::String& objectName,
+                                                const gd::String& variantName) {
+  const auto& separator = GetNamespaceSeparator();
+  return extensionName + separator + objectName + separator + variantName;
+}
+
 gd::String PlatformExtension::GetExtensionFromFullObjectType(
     const gd::String& type) {
   const auto separatorIndex =

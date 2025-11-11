@@ -26,7 +26,7 @@ const styles = {
     display: 'flex',
     flexShrink: 0,
     alignItems: 'flex-end',
-    position: 'relative', // to ensure it is displayed above any global iframe.
+    position: 'relative', // to ensure it is displayed above any global iframe
   },
   menuIcon: {
     marginLeft: 4,

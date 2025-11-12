@@ -363,7 +363,8 @@ export const installRequiredExtensions = async ({
 
   if (
     missingExtensionShortHeaders.length === 0 &&
-    outOfDateExtensionShortHeaders.length === 0
+    outOfDateExtensionShortHeaders.length === 0 &&
+    importedSerializedExtensions.length === 0
   ) {
     return;
   }
@@ -486,11 +487,6 @@ export const useImportExtension = () => {
       if (pathOrUrls.length === 0) {
         return [];
       }
-      /*</string>
-      const {
-        results: importedSerializedExtensions
-      } = 
-       */
       const {
         results: importedSerializedExtensions,
       }: {
@@ -526,11 +522,7 @@ export const useImportExtension = () => {
           .asPlatform(gd.JsPlatform.get())
           .getAllPlatformExtensions();
         mapVector(allExtensions, extension => {
-          if (
-            importedExtensionNames.includes(
-              extensionName => extensionName === extension.getName()
-            )
-          ) {
+          if (importedExtensionNames.includes(extension.getName())) {
             hasConflictWithBuiltInExtension = true;
           }
         });
@@ -554,28 +546,34 @@ export const useImportExtension = () => {
           extensionShortHeadersByName,
         }
       );
-      const isImportedExtension = (
+      const isNotImportedExtension = (
         extensionShortHeader: ExtensionShortHeader
-      ) =>
-        importedSerializedExtensions.some(
-          extension => extension.name === extensionShortHeader.name
-        );
+      ) => !importedExtensionNames.includes(extensionShortHeader.name);
       // When users import an extension with its dependencies,
       // we should not try to get them from the extension store.
-      requiredExtensionInstallation.outOfDateExtensionShortHeaders = requiredExtensionInstallation.outOfDateExtensionShortHeaders.filter(
-        isImportedExtension
-      );
-      requiredExtensionInstallation.safeToUpdateExtensions = requiredExtensionInstallation.safeToUpdateExtensions.filter(
-        isImportedExtension
-      );
       requiredExtensionInstallation.breakingChangesExtensionShortHeaders = requiredExtensionInstallation.breakingChangesExtensionShortHeaders.filter(
-        isImportedExtension
-      );
-      requiredExtensionInstallation.missingExtensionShortHeaders = requiredExtensionInstallation.missingExtensionShortHeaders.filter(
-        isImportedExtension
+        isNotImportedExtension
       );
       requiredExtensionInstallation.incompatibleWithIdeExtensionShortHeaders = requiredExtensionInstallation.incompatibleWithIdeExtensionShortHeaders.filter(
-        isImportedExtension
+        isNotImportedExtension
+      );
+      requiredExtensionInstallation.missingExtensionShortHeaders = requiredExtensionInstallation.missingExtensionShortHeaders.filter(
+        isNotImportedExtension
+      );
+      requiredExtensionInstallation.outOfDateExtensionShortHeaders = requiredExtensionInstallation.outOfDateExtensionShortHeaders.filter(
+        isNotImportedExtension
+      );
+      requiredExtensionInstallation.requiredExtensionShortHeaders = requiredExtensionInstallation.requiredExtensionShortHeaders.filter(
+        isNotImportedExtension
+      );
+      requiredExtensionInstallation.safeToUpdateExtensions = requiredExtensionInstallation.safeToUpdateExtensions.filter(
+        isNotImportedExtension
+      );
+      requiredExtensionInstallation.isGDevelopUpdateNeeded = requiredExtensionInstallation.incompatibleWithIdeExtensionShortHeaders.some(
+        extension =>
+          requiredExtensionInstallation.missingExtensionShortHeaders.includes(
+            extension
+          )
       );
 
       const wasExtensionInstalled = await installExtension({

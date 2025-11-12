@@ -135,10 +135,12 @@ export const useInstallAsset = ({
     assetShortHeader,
     objectsContainer,
     requestedObjectName,
+    setIsAssetBeingInstalled,
   }: {|
     assetShortHeader: AssetShortHeader,
     objectsContainer: gdObjectsContainer,
     requestedObjectName?: string,
+    setIsAssetBeingInstalled: boolean => void,
   |}): Promise<InstallAssetOutput | null> => {
     if (!project) {
       return null;
@@ -157,6 +159,8 @@ export const useInstallAsset = ({
           extensionShortHeadersByName,
         }
       );
+      // Disable the loader because it is above the dialogs opened by `installExtension`.
+      setIsAssetBeingInstalled(false);
       const wasExtensionsInstalled = await installExtension({
         project,
         requiredExtensionInstallation,
@@ -165,6 +169,7 @@ export const useInstallAsset = ({
         onExtensionInstalled,
         updateMode: 'all',
       });
+      setIsAssetBeingInstalled(true);
       if (!wasExtensionsInstalled) {
         return null;
       }
@@ -325,6 +330,7 @@ function NewObjectDialog({
       const installAssetOutput = await installAsset({
         assetShortHeader,
         objectsContainer,
+        setIsAssetBeingInstalled,
       });
       setIsAssetBeingInstalled(false);
       if (installAssetOutput) onObjectsAddedFromAssets(installAssetOutput);

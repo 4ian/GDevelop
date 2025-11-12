@@ -168,6 +168,7 @@ export const useInstallAsset = ({
         importedSerializedExtensions: [],
         onExtensionInstalled,
         updateMode: 'all',
+        reason: 'asset',
       });
       setIsAssetBeingInstalled(true);
       if (!wasExtensionsInstalled) {
@@ -361,6 +362,7 @@ function NewObjectDialog({
           // Users must be able to create an object from scratch without being
           // forced to update extensions that may break their projects.
           updateMode: 'safeOnly',
+          reason: 'asset',
         });
         if (!wasExtensionsInstalled) {
           return;

@@ -58,6 +58,7 @@ function InstalledExtensionDetails({
         // TODO
         onExtensionInstalled: () => {},
         updateMode: 'all',
+        reason: 'extension',
       });
     } finally {
       setIsInstalling(false);

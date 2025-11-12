@@ -102,6 +102,7 @@ const ExtensionsSearchDialog = ({
             importedSerializedExtensions: [],
             onExtensionInstalled,
             updateMode: 'all',
+            reason: 'extension',
           });
           if (!wasExtensionInstalled) {
             return false;

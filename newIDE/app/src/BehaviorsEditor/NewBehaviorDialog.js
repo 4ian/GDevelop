@@ -212,6 +212,7 @@ export default function NewBehaviorDialog({
         importedSerializedExtensions: [],
         onExtensionInstalled,
         updateMode: 'all',
+        reason: 'behavior',
       });
       if (wasExtensionInstalled) {
         createBadgeFistExtension();

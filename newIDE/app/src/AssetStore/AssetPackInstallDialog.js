@@ -166,6 +166,7 @@ const AssetPackInstallDialog = ({
           importedSerializedExtensions: [],
           onExtensionInstalled,
           updateMode: 'all',
+          reason: 'asset',
         });
         if (!wasExtensionsInstalled) {
           return;

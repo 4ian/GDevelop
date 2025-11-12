@@ -58,6 +58,7 @@ export const useEnsureExtensionInstalled = ({
           // TODO
           onExtensionInstalled: () => {},
           updateMode: 'safeOnly',
+          reason: 'extension',
         });
       },
       [extensionShortHeadersByName, installExtension, project]

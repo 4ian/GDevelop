@@ -179,10 +179,12 @@ export const useExtensionUpdateAlertDialog = () => {
     project,
     outOfDateExtensionShortHeaders,
     userSelectedExtensionNames,
+    reason,
   }: {|
     project: gdProject,
     outOfDateExtensionShortHeaders: Array<ExtensionShortHeader>,
     userSelectedExtensionNames: Array<string>,
+    reason: 'asset' | 'extension' | 'behavior',
   |}): Promise<string> => {
     if (currentlyRunningInAppTutorial) {
       return 'skip';
@@ -216,9 +218,18 @@ export const useExtensionUpdateAlertDialog = () => {
       // the message more confusing.
       return (await showDeleteConfirmation({
         title: t`Breaking changes`,
-        message: t`This asset requires updates to extensions that have breaking changes${'\n\n' +
-          formatExtensionsBreakingChanges(breakingChanges) +
-          '\n'}Do you want to update them now?`,
+        message:
+          reason === 'asset'
+            ? t`This asset requires updates to extensions that have breaking changes${'\n\n' +
+                formatExtensionsBreakingChanges(breakingChanges) +
+                '\n'}Do you want to update them now?`
+            : reason === 'behavior'
+            ? t`This behavior requires updates to extensions that have breaking changes${'\n\n' +
+                formatExtensionsBreakingChanges(breakingChanges) +
+                '\n'}Do you want to update them now?`
+            : t`This extension requires updates to extensions that have breaking changes${'\n\n' +
+                formatExtensionsBreakingChanges(breakingChanges) +
+                '\n'}Do you want to update them now?`,
         confirmButtonLabel: t`Update the extension`,
         dismissButtonLabel: t`Abort`,
       }))
@@ -228,11 +239,24 @@ export const useExtensionUpdateAlertDialog = () => {
     } else if (notBreakingExtensions.length > 0) {
       return (await showConfirmation({
         title: t`Extension update`,
-        message: t`Before installing this asset, it's strongly recommended to update these extensions${'\n\n - ' +
-          notBreakingExtensions
-            .map(extension => extension.fullName)
-            .join('\n - ') +
-          '\n\n'}Do you want to update them now?`,
+        message:
+          reason === 'asset'
+            ? t`Before installing this asset, it's strongly recommended to update these extensions${'\n\n - ' +
+                notBreakingExtensions
+                  .map(extension => extension.fullName)
+                  .join('\n - ') +
+                '\n\n'}Do you want to update them now?`
+            : reason === 'behavior'
+            ? t`Before installing this behavior, it's strongly recommended to update these extensions${'\n\n - ' +
+                notBreakingExtensions
+                  .map(extension => extension.fullName)
+                  .join('\n - ') +
+                '\n\n'}Do you want to update them now?`
+            : t`Before installing this extension, it's strongly recommended to update these extensions${'\n\n - ' +
+                notBreakingExtensions
+                  .map(extension => extension.fullName)
+                  .join('\n - ') +
+                '\n\n'}Do you want to update them now?`,
         confirmButtonLabel: t`Update the extension`,
         dismissButtonLabel: t`Skip the update`,
       }))
@@ -277,6 +301,7 @@ export const useInstallExtension = () => {
     importedSerializedExtensions,
     onExtensionInstalled,
     updateMode,
+    reason,
   }: {|
     project: gdProject,
     requiredExtensionInstallation: RequiredExtensionInstallation,
@@ -284,6 +309,7 @@ export const useInstallExtension = () => {
     importedSerializedExtensions: Array<SerializedExtension>,
     onExtensionInstalled: (extensionNames: Array<string>) => void,
     updateMode: 'all' | 'safeOnly',
+    reason: 'asset' | 'extension' | 'behavior',
   |}): Promise<boolean> => {
     if (requiredExtensionInstallation.isGDevelopUpdateNeeded) {
       showAlert({
@@ -306,6 +332,7 @@ export const useInstallExtension = () => {
                 ? outOfDateExtensionShortHeaders
                 : safeToUpdateExtensions,
             userSelectedExtensionNames,
+            reason,
           });
     if (extensionUpdateAction === 'abort') {
       return false;
@@ -583,6 +610,7 @@ export const useImportExtension = () => {
         importedSerializedExtensions,
         onExtensionInstalled,
         updateMode: 'all',
+        reason: 'extension',
       });
       if (!wasExtensionInstalled) {
         return [];

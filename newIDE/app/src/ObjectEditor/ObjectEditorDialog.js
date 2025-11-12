@@ -63,6 +63,7 @@ type Props = {|
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onOpenEventBasedObjectEditor: (
     extensionName: string,
@@ -108,6 +109,7 @@ const InnerDialog = (props: InnerDialogProps) => {
     projectScopedContainersAccessor,
     onUpdateBehaviorsSharedData,
     onComputeAllVariableNames,
+    onWillInstallExtension,
     onExtensionInstalled,
     onOpenEventBasedObjectEditor,
     onOpenEventBasedObjectVariantEditor,
@@ -353,6 +355,7 @@ const InnerDialog = (props: InnerDialogProps) => {
           onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}
           onBehaviorsUpdated={notifyOfChange}
           openBehaviorEvents={askConfirmationAndOpenBehaviorEvents}
+          onWillInstallExtension={onWillInstallExtension}
           onExtensionInstalled={onExtensionInstalled}
           isListLocked={isBehaviorListLocked}
         />

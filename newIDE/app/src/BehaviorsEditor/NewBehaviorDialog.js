@@ -37,6 +37,7 @@ type Props = {|
   open: boolean,
   onClose: () => void,
   onChoose: (type: string, defaultName: string) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
@@ -49,6 +50,7 @@ export default function NewBehaviorDialog({
   objectType,
   objectBehaviorsTypes,
   isChildObject,
+  onWillInstallExtension,
   onExtensionInstalled,
 }: Props) {
   const [isInstalling, setIsInstalling] = React.useState(false);
@@ -210,13 +212,13 @@ export default function NewBehaviorDialog({
         requiredExtensionInstallation,
         userSelectedExtensionNames: [behaviorShortHeader.extensionName],
         importedSerializedExtensions: [],
+        onWillInstallExtension,
         onExtensionInstalled,
         updateMode: 'all',
         reason: 'behavior',
       });
       if (wasExtensionInstalled) {
         createBadgeFistExtension();
-        onExtensionInstalled([behaviorShortHeader.extensionName]);
       }
       return wasExtensionInstalled;
     } finally {

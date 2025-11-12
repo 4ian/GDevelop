@@ -299,6 +299,7 @@ export const useInstallExtension = () => {
     requiredExtensionInstallation,
     userSelectedExtensionNames,
     importedSerializedExtensions,
+    onWillInstallExtension,
     onExtensionInstalled,
     updateMode,
     reason,
@@ -307,6 +308,7 @@ export const useInstallExtension = () => {
     requiredExtensionInstallation: RequiredExtensionInstallation,
     userSelectedExtensionNames: Array<string>,
     importedSerializedExtensions: Array<SerializedExtension>,
+    onWillInstallExtension: (extensionNames: Array<string>) => void,
     onExtensionInstalled: (extensionNames: Array<string>) => void,
     updateMode: 'all' | 'safeOnly',
     reason: 'asset' | 'extension' | 'behavior',
@@ -342,6 +344,7 @@ export const useInstallExtension = () => {
       shouldUpdateExtension: extensionUpdateAction === 'update',
       eventsFunctionsExtensionsState,
       project,
+      onWillInstallExtension,
       onExtensionInstalled,
       importedSerializedExtensions,
     });
@@ -370,6 +373,7 @@ export type InstallRequiredExtensionsArgs = {|
   shouldUpdateExtension: boolean,
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   project: gdProject,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   importedSerializedExtensions: Array<SerializedExtension>,
 |};
@@ -379,6 +383,7 @@ export const installRequiredExtensions = async ({
   shouldUpdateExtension,
   eventsFunctionsExtensionsState,
   project,
+  onWillInstallExtension,
   onExtensionInstalled,
   importedSerializedExtensions,
 }: InstallRequiredExtensionsArgs): Promise<void> => {
@@ -413,14 +418,20 @@ export const installRequiredExtensions = async ({
     )
   );
 
+  const installedExtensions = [
+    ...importedSerializedExtensions,
+    ...downloadedSerializedExtensions,
+  ];
+  const installedExtensionNames = installedExtensions.map(
+    extensions => extensions.name
+  );
+  onWillInstallExtension(installedExtensionNames);
   await addSerializedExtensionsToProject(
     eventsFunctionsExtensionsState,
     project,
-    [...importedSerializedExtensions, ...downloadedSerializedExtensions]
+    installedExtensions
   );
-  onExtensionInstalled(
-    neededExtensions.map(extensionShortHeader => extensionShortHeader.name)
-  );
+  onExtensionInstalled(installedExtensionNames);
 
   const stillMissingExtensions = filterMissingExtensions(
     gd,
@@ -502,7 +513,7 @@ export const useImportExtension = () => {
   }: {|
     i18n: I18nType,
     project: gdProject,
-    onWillInstallExtension: (extensionName: string) => void,
+    onWillInstallExtension: (extensionNames: Array<string>) => void,
     onExtensionInstalled: (extensionNames: Array<string>) => void,
   |}): Promise<Array<string>> => {
     const eventsFunctionsExtensionOpener = eventsFunctionsExtensionsState.getEventsFunctionsExtensionOpener();
@@ -561,9 +572,6 @@ export const useImportExtension = () => {
           return [];
         }
       }
-      // TODO make it an array
-      onWillInstallExtension(importedExtensionNames[0]);
-
       const requiredExtensionInstallation = await checkRequiredExtensionsUpdate(
         {
           requiredExtensions: getRequiredExtensions(
@@ -608,6 +616,7 @@ export const useImportExtension = () => {
         requiredExtensionInstallation,
         userSelectedExtensionNames: [],
         importedSerializedExtensions,
+        onWillInstallExtension,
         onExtensionInstalled,
         updateMode: 'all',
         reason: 'extension',

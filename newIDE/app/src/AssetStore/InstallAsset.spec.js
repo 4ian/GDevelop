@@ -1004,6 +1004,7 @@ describe('InstallAsset', () => {
           shouldUpdateExtension: true,
           eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
           project,
+          onWillInstallExtension: () => {},
           onExtensionInstalled: () => {},
           importedSerializedExtensions: [],
         })
@@ -1041,6 +1042,7 @@ describe('InstallAsset', () => {
           shouldUpdateExtension: true,
           eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
           project,
+          onWillInstallExtension: () => {},
           onExtensionInstalled: () => {},
           importedSerializedExtensions: [],
         })
@@ -1083,6 +1085,7 @@ describe('InstallAsset', () => {
         shouldUpdateExtension: true,
         eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
         project,
+        onWillInstallExtension: () => {},
         onExtensionInstalled: () => {},
         importedSerializedExtensions: [],
       });

@@ -53,6 +53,7 @@ export const Default = () => (
         onSetAsGlobalObject={action('onSetAsGlobalObject')}
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
         isListLocked={false}
+        onWillInstallExtension={action('extension will be installed')}
         onExtensionInstalled={action('onExtensionInstalled')}
       />
     </div>
@@ -93,6 +94,7 @@ export const WithSerializedObjectView = () => (
           onSetAsGlobalObject={action('onSetAsGlobalObject')}
           hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
           isListLocked={false}
+          onWillInstallExtension={action('extension will be installed')}
           onExtensionInstalled={action('onExtensionInstalled')}
         />
       </div>
@@ -133,6 +135,7 @@ export const Locked = () => (
         onSetAsGlobalObject={action('onSetAsGlobalObject')}
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
         isListLocked={true}
+        onWillInstallExtension={action('extension will be installed')}
         onExtensionInstalled={action('onExtensionInstalled')}
       />
     </div>

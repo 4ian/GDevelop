@@ -18,7 +18,8 @@ type Props = {|
   onClose: () => void,
   extensionShortHeader: ExtensionShortHeader,
   extensionName: string,
-  onInstallExtension: (extensionName: string) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
   onOpenEventsFunctionsExtension: string => void,
 |};
 
@@ -27,7 +28,8 @@ function InstalledExtensionDetails({
   onClose,
   extensionShortHeader,
   extensionName,
-  onInstallExtension,
+  onWillInstallExtension,
+  onExtensionInstalled,
   onOpenEventsFunctionsExtension,
 }: Props) {
   const [isInstalling, setIsInstalling] = React.useState<boolean>(false);
@@ -39,7 +41,6 @@ function InstalledExtensionDetails({
   const installOrUpdateExtension = async (i18n: I18nType) => {
     setIsInstalling(true);
     try {
-      onInstallExtension(extensionShortHeader.name);
       const extensionShortHeaders: Array<ExtensionShortHeader> = [
         extensionShortHeader,
       ];
@@ -55,8 +56,8 @@ function InstalledExtensionDetails({
         requiredExtensionInstallation,
         userSelectedExtensionNames: [],
         importedSerializedExtensions: [],
-        // TODO
-        onExtensionInstalled: () => {},
+        onWillInstallExtension,
+        onExtensionInstalled,
         updateMode: 'all',
         reason: 'extension',
       });

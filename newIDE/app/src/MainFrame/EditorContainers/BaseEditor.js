@@ -229,6 +229,7 @@ export type RenderEditorContainerProps = {|
     eventsBasedObjectName: string,
     variantName: string
   ) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onDeleteEventsBasedObjectVariant: (
     eventsFunctionsExtension: gdEventsFunctionsExtension,

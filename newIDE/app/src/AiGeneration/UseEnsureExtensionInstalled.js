@@ -10,8 +10,10 @@ import {
 } from '../AssetStore/ExtensionStore/InstallExtension';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 
-type EnsureExtensionInstalledOptions = {|
+export type EnsureExtensionInstalledOptions = {|
   extensionName: string,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
 export const useEnsureExtensionInstalled = ({
@@ -28,7 +30,11 @@ export const useEnsureExtensionInstalled = ({
 
   return {
     ensureExtensionInstalled: React.useCallback(
-      async ({ extensionName }: EnsureExtensionInstalledOptions) => {
+      async ({
+        extensionName,
+        onExtensionInstalled,
+        onWillInstallExtension,
+      }: EnsureExtensionInstalledOptions) => {
         if (!project) return;
 
         const extensionShortHeader = getExtensionHeader(
@@ -55,8 +61,8 @@ export const useEnsureExtensionInstalled = ({
           requiredExtensionInstallation,
           userSelectedExtensionNames: [],
           importedSerializedExtensions: [],
-          // TODO
-          onExtensionInstalled: () => {},
+          onWillInstallExtension,
+          onExtensionInstalled,
           updateMode: 'safeOnly',
           reason: 'extension',
         });

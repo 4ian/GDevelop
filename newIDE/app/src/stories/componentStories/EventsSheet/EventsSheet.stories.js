@@ -37,6 +37,7 @@ export const DefaultNoScope = () => (
         onBeginCreateEventsFunction={action('begin create events function')}
         isActive={true}
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
+        onWillInstallExtension={action('extension will be installed')}
         onExtensionInstalled={action('extension installed')}
       />
     </FixedHeightFlexContainer>
@@ -68,6 +69,7 @@ export const EmptyNoScope = () => (
         onBeginCreateEventsFunction={action('begin create events function')}
         isActive={true}
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
+        onWillInstallExtension={action('extension will be installed')}
         onExtensionInstalled={action('extension installed')}
       />
     </FixedHeightFlexContainer>

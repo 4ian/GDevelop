@@ -167,6 +167,7 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
         onOpenExternalEvents={this.props.onOpenExternalEvents}
         isActive={this.props.isActive}
         hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
+        onWillInstallExtension={this.props.onWillInstallExtension}
         onExtensionInstalled={this.props.onExtensionInstalled}
       />
     );

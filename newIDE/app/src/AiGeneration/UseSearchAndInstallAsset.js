@@ -16,10 +16,12 @@ import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 export const useSearchAndInstallAsset = ({
   project,
   resourceManagementProps,
+  onWillInstallExtension,
   onExtensionInstalled,
 }: {|
   project: ?gdProject,
   resourceManagementProps: ResourceManagementProps,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |}) => {
   const { profile, getAuthorizationHeader } = React.useContext(
@@ -28,6 +30,7 @@ export const useSearchAndInstallAsset = ({
   const installAsset = useInstallAsset({
     project,
     resourceManagementProps,
+    onWillInstallExtension,
     onExtensionInstalled,
   });
 

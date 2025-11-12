@@ -32,7 +32,7 @@ import { ExtensionStoreContext } from './ExtensionStoreContext';
 type Props = {|
   project: gdProject,
   onClose: () => void,
-  onInstallExtension: (extensionName: string) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onCreateNew?: () => void,
 |};
@@ -43,7 +43,7 @@ type Props = {|
 const ExtensionsSearchDialog = ({
   project,
   onClose,
-  onInstallExtension,
+  onWillInstallExtension,
   onExtensionInstalled,
   onCreateNew,
 }: Props) => {
@@ -75,8 +75,6 @@ const ExtensionsSearchDialog = ({
     setIsInstalling(true);
     try {
       if (extensionShortHeader) {
-        // TODO do it for all extensions
-        onInstallExtension(extensionShortHeader.name);
         try {
           const extensionShortHeaders: Array<ExtensionShortHeader> = [
             extensionShortHeader,
@@ -100,6 +98,7 @@ const ExtensionsSearchDialog = ({
             requiredExtensionInstallation,
             userSelectedExtensionNames: [extensionShortHeader.name],
             importedSerializedExtensions: [],
+            onWillInstallExtension,
             onExtensionInstalled,
             updateMode: 'all',
             reason: 'extension',
@@ -123,7 +122,7 @@ const ExtensionsSearchDialog = ({
         const installedOrImportedExtensionNames = await importExtension({
           i18n,
           project,
-          onWillInstallExtension: onInstallExtension,
+          onWillInstallExtension,
           onExtensionInstalled,
         });
         if (installedOrImportedExtensionNames.length > 0) {

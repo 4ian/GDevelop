@@ -62,7 +62,6 @@ export const NoProjectOpen = () => {
                   onOpenEventsFunctionsExtension={action(
                     'onOpenEventsFunctionsExtension'
                   )}
-                  onInstallExtension={action('onInstallExtension')}
                   onSceneAdded={action('onSceneAdded')}
                   onExternalLayoutAdded={action('onExternalLayoutAdded')}
                   onDeleteLayout={action('onDeleteLayout')}
@@ -81,6 +80,7 @@ export const NoProjectOpen = () => {
                   onReloadEventsFunctionsExtensions={action(
                     'onReloadEventsFunctionsExtensions'
                   )}
+                  onWillInstallExtension={action('extension will be installed')}
                   onExtensionInstalled={action('onExtensionInstalled')}
                   onShareProject={action('onShareProject')}
                   isOpen
@@ -134,7 +134,6 @@ export const ProjectOpen = () => {
                   onOpenEventsFunctionsExtension={action(
                     'onOpenEventsFunctionsExtension'
                   )}
-                  onInstallExtension={action('onInstallExtension')}
                   onSceneAdded={action('onSceneAdded')}
                   onExternalLayoutAdded={action('onExternalLayoutAdded')}
                   onDeleteLayout={action('onDeleteLayout')}
@@ -153,6 +152,7 @@ export const ProjectOpen = () => {
                   onReloadEventsFunctionsExtensions={action(
                     'onReloadEventsFunctionsExtensions'
                   )}
+                  onWillInstallExtension={action('extension will be installed')}
                   onExtensionInstalled={action('onExtensionInstalled')}
                   onShareProject={action('onShareProject')}
                   isOpen

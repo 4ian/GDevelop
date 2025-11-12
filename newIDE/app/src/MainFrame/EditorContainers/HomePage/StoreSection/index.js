@@ -24,6 +24,7 @@ type Props = {|
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
   onOpenProfile: () => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   getSubscriptionPlansWithPricingSystems: () => Array<SubscriptionPlanWithPricingSystems> | null,
   onCourseOpen: (courseId: string) => void,
@@ -36,6 +37,7 @@ const StoreSection = ({
   resourceManagementProps,
   onOpenPrivateGameTemplateListingData,
   onOpenProfile,
+  onWillInstallExtension,
   onExtensionInstalled,
   onCourseOpen,
   courses,
@@ -148,6 +150,7 @@ const StoreSection = ({
             project={project}
             objectsContainer={null}
             resourceManagementProps={resourceManagementProps}
+            onWillInstallExtension={onWillInstallExtension}
             onExtensionInstalled={onExtensionInstalled}
           />
         )}

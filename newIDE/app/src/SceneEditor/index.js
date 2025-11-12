@@ -231,6 +231,7 @@ type Props = {|
     eventsBasedObjectName: string,
     variantName: string
   ) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onDeleteEventsBasedObjectVariant: (
     eventsFunctionsExtension: gdEventsFunctionsExtension,
@@ -2794,6 +2795,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 isActive={isActive}
                 onOpenedEditorsChanged={this.updateToolbar}
                 lastSelectionType={this.state.lastSelectionType}
+                onWillInstallExtension={this.props.onWillInstallExtension}
                 onExtensionInstalled={this.props.onExtensionInstalled}
                 editorViewPosition2D={this.editorViewPosition2D}
               />
@@ -2873,6 +2875,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                           this.updateBehaviorsSharedData()
                         }
                         openBehaviorEvents={this.props.openBehaviorEvents}
+                        onWillInstallExtension={
+                          this.props.onWillInstallExtension
+                        }
                         onExtensionInstalled={this.props.onExtensionInstalled}
                         onOpenEventBasedObjectEditor={
                           this.props.onOpenEventBasedObjectEditor

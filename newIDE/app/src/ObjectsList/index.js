@@ -492,6 +492,7 @@ type Props = {|
   onObjectPasted?: gdObject => void,
   getValidatedObjectOrGroupName: (newName: string, global: boolean) => string,
   onAddObjectInstance: (objectName: string) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 
   getThumbnail: (
@@ -533,6 +534,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       onObjectPasted,
       getValidatedObjectOrGroupName,
       onAddObjectInstance,
+      onWillInstallExtension,
       onExtensionInstalled,
 
       getThumbnail,
@@ -1619,6 +1621,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             objectsContainer={objectsContainer}
             resourceManagementProps={resourceManagementProps}
             targetObjectFolderOrObjectWithContext={newObjectDialogOpen.from}
+            onWillInstallExtension={onWillInstallExtension}
             onExtensionInstalled={onExtensionInstalled}
           />
         )}
@@ -1638,6 +1641,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             objectsContainer={objectsContainer}
             object={objectAssetSwappingDialogOpen.objectWithContext.object}
             resourceManagementProps={resourceManagementProps}
+            onWillInstallExtension={onWillInstallExtension}
             onExtensionInstalled={onExtensionInstalled}
           />
         )}

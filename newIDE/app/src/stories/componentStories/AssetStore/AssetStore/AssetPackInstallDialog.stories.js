@@ -101,6 +101,7 @@ export const LayoutPublicAssetInstallSuccess = () => (
         ...fakeResourceManagementProps,
         canInstallPrivateAsset: () => true,
       }}
+      onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('onExtensionInstalled')}
     />
   </Wrapper>
@@ -123,6 +124,7 @@ export const LayoutPublicAssetInstallFailure = () => (
         ...fakeResourceManagementProps,
         canInstallPrivateAsset: () => true,
       }}
+      onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('onExtensionInstalled')}
     />
   </Wrapper>
@@ -145,6 +147,7 @@ export const LayoutPublicAssetAllAlreadyInstalled = () => (
         ...fakeResourceManagementProps,
         canInstallPrivateAsset: () => true,
       }}
+      onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('onExtensionInstalled')}
     />
   </Wrapper>
@@ -164,6 +167,7 @@ export const LayoutPublicAssetSomeAlreadyInstalled = () => (
         ...fakeResourceManagementProps,
         canInstallPrivateAsset: () => true,
       }}
+      onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('onExtensionInstalled')}
     />
   </Wrapper>
@@ -202,6 +206,7 @@ export const LayoutPrivateAssetInstallSuccess = () => {
               ...fakeResourceManagementProps,
               canInstallPrivateAsset: () => true,
             }}
+            onWillInstallExtension={action('extension will be installed')}
             onExtensionInstalled={action('onExtensionInstalled')}
           />
         </AssetStoreStateProvider>
@@ -239,6 +244,7 @@ export const LayoutPrivateAssetInstallFailure = () => {
               ...fakeResourceManagementProps,
               canInstallPrivateAsset: () => true,
             }}
+            onWillInstallExtension={action('extension will be installed')}
             onExtensionInstalled={action('onExtensionInstalled')}
           />
         </AssetStoreStateProvider>
@@ -258,6 +264,7 @@ export const LayoutPrivateAssetButCantInstall = () => (
       project={testProject.project}
       objectsContainer={testProject.testLayout.getObjects()}
       resourceManagementProps={fakeResourceManagementProps}
+      onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('onExtensionInstalled')}
     />
   </Wrapper>
@@ -280,6 +287,7 @@ export const LayoutPrivateAssetButInstallingTooMany = () => (
         ...fakeResourceManagementProps,
         canInstallPrivateAsset: () => true,
       }}
+      onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('onExtensionInstalled')}
     />
   </Wrapper>
@@ -299,6 +307,7 @@ export const NoObjectsContainerPublicAssetInstallSuccess = () => (
         ...fakeResourceManagementProps,
         canInstallPrivateAsset: () => true,
       }}
+      onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('onExtensionInstalled')}
     />
   </Wrapper>
@@ -318,6 +327,7 @@ export const NoObjectsContainerPrivateAssetButCantInstall = () => (
       project={testProject.project}
       objectsContainer={null}
       resourceManagementProps={fakeResourceManagementProps}
+      onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('onExtensionInstalled')}
     />
   </Wrapper>

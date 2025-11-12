@@ -42,6 +42,8 @@ export const OpenAndNotAuthenticated = () => {
         onOpenAskAi={() => action('open ask AI')()}
         onCloseAskAi={() => action('close ask AI')()}
         onOpenLayout={() => action('open layout')()}
+        onWillInstallExtension={action('extension will be installed')}
+        onExtensionInstalled={action('extension installed')}
         onCreateProjectFromPrivateGameTemplate={() =>
           action('create project from private game template')()
         }
@@ -76,6 +78,8 @@ export const OpenAndAuthenticated = () => {
         onOpenAskAi={() => action('open ask AI')()}
         onCloseAskAi={() => action('close ask AI')()}
         onOpenLayout={() => action('open layout')()}
+        onWillInstallExtension={action('extension will be installed')}
+        onExtensionInstalled={action('extension installed')}
         onCreateProjectFromPrivateGameTemplate={() =>
           action('create project from private game template')()
         }
@@ -111,6 +115,8 @@ export const Opening = () => {
         onOpenAskAi={() => action('open ask AI')()}
         onCloseAskAi={() => action('close ask AI')()}
         onOpenLayout={() => action('open layout')()}
+        onWillInstallExtension={action('extension will be installed')}
+        onExtensionInstalled={action('extension installed')}
         onCreateProjectFromPrivateGameTemplate={() =>
           action('create project from private game template')()
         }
@@ -147,6 +153,8 @@ export const LimitsReached = () => {
         onOpenAskAi={() => action('open ask AI')()}
         onCloseAskAi={() => action('close ask AI')()}
         onOpenLayout={() => action('open layout')()}
+        onWillInstallExtension={action('extension will be installed')}
+        onExtensionInstalled={action('extension installed')}
         onCreateProjectFromPrivateGameTemplate={() =>
           action('create project from private game template')()
         }
@@ -181,6 +189,8 @@ export const FromExample = () => {
         onOpenAskAi={() => action('open ask AI')()}
         onCloseAskAi={() => action('close ask AI')()}
         onOpenLayout={() => action('open layout')()}
+        onWillInstallExtension={action('extension will be installed')}
+        onExtensionInstalled={action('extension installed')}
         selectedExampleShortHeader={geometryMonsterExampleShortHeader}
         onCreateProjectFromPrivateGameTemplate={() =>
           action('create project from private game template')()
@@ -215,6 +225,8 @@ export const FromExampleWithoutGoingBack = () => {
         onOpenAskAi={() => action('open ask AI')()}
         onCloseAskAi={() => action('close ask AI')()}
         onOpenLayout={() => action('open layout')()}
+        onWillInstallExtension={action('extension will be installed')}
+        onExtensionInstalled={action('extension installed')}
         selectedExampleShortHeader={geometryMonsterExampleShortHeader}
         onCreateProjectFromPrivateGameTemplate={() =>
           action('create project from private game template')()
@@ -250,6 +262,8 @@ export const FromPrivateGameTemplate = () => {
         onOpenAskAi={() => action('open ask AI')()}
         onCloseAskAi={() => action('close ask AI')()}
         onOpenLayout={() => action('open layout')()}
+        onWillInstallExtension={action('extension will be installed')}
+        onExtensionInstalled={action('extension installed')}
         selectedExampleShortHeader={null}
         onCreateProjectFromPrivateGameTemplate={() =>
           action('create project from private game template')()
@@ -286,6 +300,8 @@ export const FromPrivateGameTemplateWithoutGoingBack = () => {
         onOpenAskAi={() => action('open ask AI')()}
         onCloseAskAi={() => action('close ask AI')()}
         onOpenLayout={() => action('open layout')()}
+        onWillInstallExtension={action('extension will be installed')}
+        onExtensionInstalled={action('extension installed')}
         selectedExampleShortHeader={null}
         onCreateProjectFromPrivateGameTemplate={() =>
           action('create project from private game template')()

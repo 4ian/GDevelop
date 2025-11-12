@@ -150,6 +150,8 @@ type Props = {|
         | 'none',
     |}
   ) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
 const NewProjectSetupDialog = ({
@@ -172,6 +174,8 @@ const NewProjectSetupDialog = ({
   privateGameTemplateListingDatasFromSameCreator,
   preventBackHome,
   onOpenLayout,
+  onWillInstallExtension,
+  onExtensionInstalled,
 }: Props): React.Node => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
@@ -671,6 +675,8 @@ const NewProjectSetupDialog = ({
                   onCreateProjectFromExample={onCreateFromExample}
                   onCreateEmptyProject={onCreateEmptyProject}
                   onOpenLayout={onOpenLayout}
+                  onWillInstallExtension={onWillInstallExtension}
+                  onExtensionInstalled={onExtensionInstalled}
                   onOpenAskAi={onOpenAskAi}
                   onCloseAskAi={onCloseAskAi}
                 />

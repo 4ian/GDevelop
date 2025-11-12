@@ -418,10 +418,10 @@ type Props = {|
   onReloadEventsFunctionsExtensions: () => void,
   isOpen: boolean,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
-  onInstallExtension: (extensionName: string) => void,
   onShareProject: () => void,
   onOpenHomePage: () => void,
   toggleProjectManager: () => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onSceneAdded: () => void,
   onExternalLayoutAdded: () => void,
@@ -459,7 +459,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       onReloadEventsFunctionsExtensions,
       isOpen,
       hotReloadPreviewButtonProps,
-      onInstallExtension,
+      onWillInstallExtension,
       onShareProject,
       resourceManagementProps,
       gamesList,
@@ -1476,7 +1476,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     <ExtensionsSearchDialog
                       project={project}
                       onClose={() => setExtensionsSearchDialogOpen(false)}
-                      onInstallExtension={onInstallExtension}
+                      onWillInstallExtension={onWillInstallExtension}
                       onCreateNew={() => {
                         onCreateNewExtension(project, i18n);
                       }}
@@ -1497,7 +1497,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         }
                         extensionShortHeader={openedExtensionShortHeader}
                         extensionName={openedExtensionName}
-                        onInstallExtension={onInstallExtension}
+                        onWillInstallExtension={onWillInstallExtension}
+                        onExtensionInstalled={onExtensionInstalled}
                       />
                     )}
                 </>

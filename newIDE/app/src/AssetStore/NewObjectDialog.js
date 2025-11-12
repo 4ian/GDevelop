@@ -109,11 +109,13 @@ export const useInstallAsset = ({
   project,
   targetObjectFolderOrObjectWithContext,
   resourceManagementProps,
+  onWillInstallExtension,
   onExtensionInstalled,
 }: {|
   project: ?gdProject,
   targetObjectFolderOrObjectWithContext?: ?ObjectFolderOrObjectWithContext,
   resourceManagementProps: ResourceManagementProps,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |}) => {
   const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
@@ -166,6 +168,7 @@ export const useInstallAsset = ({
         requiredExtensionInstallation,
         userSelectedExtensionNames: [],
         importedSerializedExtensions: [],
+        onWillInstallExtension,
         onExtensionInstalled,
         updateMode: 'all',
         reason: 'asset',
@@ -249,6 +252,7 @@ type Props = {|
   onCreateNewObject: (type: string) => void,
   onObjectsAddedFromAssets: InstallAssetOutput => void,
   targetObjectFolderOrObjectWithContext?: ?ObjectFolderOrObjectWithContext,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
@@ -262,6 +266,7 @@ function NewObjectDialog({
   onCreateNewObject,
   onObjectsAddedFromAssets,
   targetObjectFolderOrObjectWithContext,
+  onWillInstallExtension,
   onExtensionInstalled,
 }: Props) {
   const { isMobile } = useResponsiveWindowSize();
@@ -316,6 +321,7 @@ function NewObjectDialog({
     project,
     resourceManagementProps,
     targetObjectFolderOrObjectWithContext,
+    onWillInstallExtension,
     onExtensionInstalled,
   });
   const {
@@ -358,6 +364,7 @@ function NewObjectDialog({
           requiredExtensionInstallation,
           userSelectedExtensionNames: [],
           importedSerializedExtensions: [],
+          onWillInstallExtension,
           onExtensionInstalled,
           // Users must be able to create an object from scratch without being
           // forced to update extensions that may break their projects.
@@ -384,6 +391,7 @@ function NewObjectDialog({
       project,
       extensionShortHeadersByName,
       installExtension,
+      onWillInstallExtension,
       onExtensionInstalled,
       onCreateNewObject,
       showAlert,
@@ -601,6 +609,7 @@ function NewObjectDialog({
                 targetObjectFolderOrObjectWithContext={
                   targetObjectFolderOrObjectWithContext
                 }
+                onWillInstallExtension={onWillInstallExtension}
                 onExtensionInstalled={onExtensionInstalled}
               />
             )}

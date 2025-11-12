@@ -904,20 +904,20 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
         GetProjectScopedContainers().GetResourcesContainersList();
     const auto sourceType =
         resourcesContainersList.GetResourcesContainerSourceType(resourceName);
-    if (sourceType == ResourcesContainer::SourceType::Properties) {
-      const auto& propertiesContainersList =
+    if (sourceType == ResourcesContainer::SourceType::Parameters) {
+      const auto &parametersVectorsList =
+          GetProjectScopedContainers().GetParametersVectorsList();
+      const auto &parameter =
+          gd::ParameterMetadataTools::Get(parametersVectorsList, resourceName);
+      argOutput = GenerateParameterGetterWithoutCasting(parameter);
+    } else if (sourceType == ResourcesContainer::SourceType::Properties) {
+      const auto &propertiesContainersList =
           GetProjectScopedContainers().GetPropertiesContainersList();
-      const auto& propertiesContainerAndProperty =
+      const auto &propertiesContainerAndProperty =
           propertiesContainersList.Get(resourceName);
       argOutput = GeneratePropertyGetterWithoutCasting(
           propertiesContainerAndProperty.first,
           propertiesContainerAndProperty.second);
-    } else if (sourceType == ResourcesContainer::SourceType::Parameters) {
-      const auto& parametersVectorsList =
-          GetProjectScopedContainers().GetParametersVectorsList();
-      const auto& parameter =
-          gd::ParameterMetadataTools::Get(parametersVectorsList, resourceName);
-      argOutput = GenerateParameterGetterWithoutCasting(parameter);
     } else {
       argOutput = "\"" + ConvertToString(resourceName) + "\"";
     }

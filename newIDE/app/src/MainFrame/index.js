@@ -4530,7 +4530,7 @@ const MainFrame = (props: Props) => {
       onResourceUsageChanged,
     ]
   );
- 
+
   const projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = React.useMemo(
     () =>
       currentProject

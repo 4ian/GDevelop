@@ -174,10 +174,7 @@ export default function ValueTypeEditor({
                   />
                 )}
                 {!isExpressionType && (
-                  <SelectOption
-                    value="jsonResource"
-                    label={t`Resource`}
-                  />
+                  <SelectOption value="jsonResource" label={t`Resource`} />
                 )}
               </SelectField>
             )}

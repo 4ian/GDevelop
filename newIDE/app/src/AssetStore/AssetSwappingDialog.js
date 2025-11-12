@@ -78,6 +78,7 @@ function AssetSwappingDialog({
         const installAssetOutput = await installAsset({
           assetShortHeader: openedAssetShortHeader,
           objectsContainer,
+          setIsAssetBeingInstalled: () => {},
         });
         if (!installAssetOutput) {
           throw new Error('Failed to install asset');

@@ -65,6 +65,7 @@ export const useSearchAndInstallAsset = ({
           assetShortHeader,
           objectsContainer,
           requestedObjectName: objectName,
+          setIsAssetBeingInstalled: () => {},
         });
 
         if (!installOutput) {

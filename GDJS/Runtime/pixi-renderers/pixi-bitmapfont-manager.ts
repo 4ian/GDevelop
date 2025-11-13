@@ -316,19 +316,27 @@ namespace gdjs {
     }
 
     unloadResource(resourceData: ResourceData): void {
-      const loadedFont = this._loadedFontsData.getFromName(resourceData.name);
-      if (loadedFont) {
-        this._loadedFontsData.delete(resourceData);
-      }
+      this._loadedFontsData.delete(resourceData);
 
       for (const bitmapFontInstallKey in this._pixiBitmapFontsInUse) {
-        if (bitmapFontInstallKey.endsWith(resourceData.file))
+        if (bitmapFontInstallKey.startsWith(resourceData.name + '@')) {
           PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
+          delete this._pixiBitmapFontsInUse[bitmapFontInstallKey];
+        }
       }
 
-      for (const bitmapFontInstallKey of this._pixiBitmapFontsToUninstall) {
-        if (bitmapFontInstallKey.endsWith(resourceData.file))
+      for (
+        let index = 0;
+        index < this._pixiBitmapFontsToUninstall.length;
+        index++
+      ) {
+        const bitmapFontInstallKey = this._pixiBitmapFontsToUninstall[index];
+
+        if (bitmapFontInstallKey.startsWith(resourceData.name + '@')) {
           PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
+          this._pixiBitmapFontsToUninstall.splice(index, 1);
+          index--;
+        }
       }
     }
   }

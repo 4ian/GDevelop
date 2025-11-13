@@ -319,7 +319,7 @@ namespace gdjs {
       this._loadedFontsData.delete(resourceData);
 
       for (const bitmapFontInstallKey in this._pixiBitmapFontsInUse) {
-        if (bitmapFontInstallKey.startsWith(resourceData.name)) {
+        if (bitmapFontInstallKey.startsWith(resourceData.name + '@')) {
           PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
           delete this._pixiBitmapFontsInUse[bitmapFontInstallKey];
         }
@@ -332,7 +332,7 @@ namespace gdjs {
       ) {
         const bitmapFontInstallKey = this._pixiBitmapFontsToUninstall[index];
 
-        if (bitmapFontInstallKey.startsWith(resourceData.name)) {
+        if (bitmapFontInstallKey.startsWith(resourceData.name + '@')) {
           PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
           this._pixiBitmapFontsToUninstall.splice(index, 1);
           index--;

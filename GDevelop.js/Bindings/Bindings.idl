@@ -780,15 +780,8 @@ interface BehaviorDefaultFlagClearer {
         [Ref] SerializerElement serializerElement);
 };
 
-interface UniquePtrBehavior {
-    Behavior get();
-    Behavior release();
-};
-
 interface Behavior {
     void Behavior();
-
-    [Value] UniquePtrBehavior Clone();
 
     void SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();

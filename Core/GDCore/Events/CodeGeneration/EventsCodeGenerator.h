@@ -839,8 +839,13 @@ class GD_CORE_API EventsCodeGenerator {
   virtual gd::String GenerateGetBehaviorNameCode(
       const gd::String& behaviorName);
 
-  bool CheckBehaviorParameters(const gd::Instruction& instruction,
-                               const gd::InstructionMetadata& instrInfos);
+  bool AreBehaviorParametersOfAllObjectsValid(
+      const gd::Instruction &instruction,
+      const gd::InstructionMetadata &instrInfos);
+
+  bool AreBehaviorParametersOfFirstObjectValid(
+      const gd::String &objectName, const gd::Instruction &instruction,
+      const gd::InstructionMetadata &instrInfos, bool isObjectInGroup);
 
   const gd::Platform& platform;  ///< The platform being used.
 

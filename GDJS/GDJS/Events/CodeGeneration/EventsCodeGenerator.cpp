@@ -901,30 +901,20 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(
   }
   if (conditionInverted) predicate = GenerateNegatedPredicate(predicate);
 
-  // Verify that object has behavior.
-  vector<gd::String> behaviors =
-      GetObjectsContainersList().GetBehaviorsOfObject(objectName);
-  if (find(behaviors.begin(), behaviors.end(), behaviorName) ==
-      behaviors.end()) {
-    cout << "Error: bad behavior \"" << behaviorName
-         << "\" requested for object \'" << objectName
-         << "\" (condition: " << instrInfos.GetFullName() << ")." << endl;
-  } else {
-    conditionCode +=
-        "for (var i = 0, k = 0, l = " + GetObjectListName(objectName, context) +
-        ".length;i<l;++i) {\n";
-    conditionCode += "    if ( " + predicate + " ) {\n";
-    conditionCode += "        " +
-                     GenerateBooleanFullName(returnBoolean, context) +
-                     " = true;\n";
-    conditionCode += "        " + GetObjectListName(objectName, context) +
-                     "[k] = " + GetObjectListName(objectName, context) +
-                     "[i];\n";
-    conditionCode += "        ++k;\n";
-    conditionCode += "    }\n";
-    conditionCode += "}\n";
-    conditionCode += GetObjectListName(objectName, context) + ".length = k;\n";
-  }
+  conditionCode +=
+      "for (var i = 0, k = 0, l = " + GetObjectListName(objectName, context) +
+      ".length;i<l;++i) {\n";
+  conditionCode += "    if ( " + predicate + " ) {\n";
+  conditionCode += "        " +
+                    GenerateBooleanFullName(returnBoolean, context) +
+                    " = true;\n";
+  conditionCode += "        " + GetObjectListName(objectName, context) +
+                    "[k] = " + GetObjectListName(objectName, context) +
+                    "[i];\n";
+  conditionCode += "        ++k;\n";
+  conditionCode += "    }\n";
+  conditionCode += "}\n";
+  conditionCode += GetObjectListName(objectName, context) + ".length = k;\n";
 
   return conditionCode;
 }
@@ -1062,35 +1052,24 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
            GenerateArgumentsList(arguments, 2) + ")";
   }
 
-  // Verify that object has behavior.
-  vector<gd::String> behaviors =
-      GetObjectsContainersList().GetBehaviorsOfObject(objectName);
-  if (find(behaviors.begin(), behaviors.end(), behaviorName) ==
-      behaviors.end()) {
-    cout << "Error: bad behavior \"" << behaviorName
-         << "\" requested for object \'" << objectName
-         << "\" (action: " << instrInfos.GetFullName() << ")." << endl;
-  } else {
-    if (!optionalAsyncCallbackName.empty()) {
-      actionCode += "{\n  const asyncTaskGroup = new gdjs.TaskGroup();\n";
-      call = "asyncTaskGroup.addTask(" + call + ")";
-    }
-
-    actionCode +=
-        "for(var i = 0, len = " + GetObjectListName(objectName, context) +
-        ".length ;i < len;++i) {\n";
-    actionCode += "    " + call + ";\n";
-    actionCode += "}\n";
-
-    if (!optionalAsyncCallbackName.empty() &&
-        !optionalAsyncCallbackId.empty()) {
-      actionCode +=
-          "runtimeScene.getAsyncTasksManager().addTask(asyncTaskGroup, " +
-          optionalAsyncCallbackName + ", " + optionalAsyncCallbackId +
-          ", asyncObjectsList);\n  };";
-    }
+  if (!optionalAsyncCallbackName.empty()) {
+    actionCode += "{\n  const asyncTaskGroup = new gdjs.TaskGroup();\n";
+    call = "asyncTaskGroup.addTask(" + call + ")";
   }
 
+  actionCode +=
+      "for(var i = 0, len = " + GetObjectListName(objectName, context) +
+      ".length ;i < len;++i) {\n";
+  actionCode += "    " + call + ";\n";
+  actionCode += "}\n";
+
+  if (!optionalAsyncCallbackName.empty() &&
+      !optionalAsyncCallbackId.empty()) {
+    actionCode +=
+        "runtimeScene.getAsyncTasksManager().addTask(asyncTaskGroup, " +
+        optionalAsyncCallbackName + ", " + optionalAsyncCallbackId +
+        ", asyncObjectsList);\n  };";
+  }
   return actionCode;
 }
 

@@ -197,6 +197,14 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   componentWillUnmount() {
     if (this._globalObjectsContainer) this._globalObjectsContainer.delete();
     if (this._objectsContainer) this._objectsContainer.delete();
+    if (this._parameterVariablesContainer)
+      this._parameterVariablesContainer.delete();
+    if (this._propertyVariablesContainer)
+      this._propertyVariablesContainer.delete();
+    if (this._parameterResourcesContainer)
+      this._parameterResourcesContainer.delete();
+    if (this._propertyResourcesContainer)
+      this._propertyResourcesContainer.delete();
   }
 
   _updateProjectScopedContainer = () => {

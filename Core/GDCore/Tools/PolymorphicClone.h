@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <vector>
+#include <map>
 
 namespace gd {
 
@@ -19,10 +20,10 @@ std::vector<std::unique_ptr<T>> Clone(
   return copy;
 }
 
-template <class T>
-std::map<gd::String, std::unique_ptr<T>>
-Clone(const std::map<gd::String, std::unique_ptr<T>> &map) {
-  std::map<gd::String, std::unique_ptr<T>> copy;
+template <class K, class T>
+std::map<K, std::unique_ptr<T>>
+Clone(const std::map<K, std::unique_ptr<T>> &map) {
+  std::map<K, std::unique_ptr<T>> copy;
 
   for (const auto &it : map) {
     copy[it.first] = gd::Clone(it.second);

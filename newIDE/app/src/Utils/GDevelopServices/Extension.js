@@ -11,12 +11,12 @@ const gd: libGDevelop = global.gd;
 
 type ExtensionTier = 'experimental' | 'reviewed' | 'installed';
 
-export type ExtensionDependency = {|
+export type ExtensionDependency = {
   extensionName: string,
   extensionVersion: string,
-|};
+};
 
-export type ExtensionRegistryItemHeader = {|
+export type ExtensionRegistryItemHeader = {
   tier: ExtensionTier,
   authorIds: Array<string>,
   authors?: Array<UserPublicProfile>,
@@ -34,7 +34,7 @@ export type ExtensionRegistryItemHeader = {|
   requiredExtensions?: Array<ExtensionDependency>,
   // Added by the editor.
   isInstalled?: boolean,
-|};
+};
 
 export type EventsFunctionInsideExtensionShortHeader = {
   description: string,
@@ -65,7 +65,7 @@ export type EventsBasedObjectInsideExtensionShortHeader = {
   eventsFunctions: EventsFunctionInsideExtensionShortHeader[],
 };
 
-export type ExtensionShortHeader = {|
+export type ExtensionShortHeader = {
   ...ExtensionRegistryItemHeader,
   shortDescription: string,
   eventsBasedBehaviorsCount: number,
@@ -76,15 +76,15 @@ export type ExtensionShortHeader = {|
   eventsBasedObjects?: Array<EventsBasedObjectInsideExtensionShortHeader>,
 
   helpPath: string,
-|};
+};
 
-export type ExtensionHeader = {|
+export type ExtensionHeader = {
   ...ExtensionShortHeader,
   description: string,
   iconUrl: string,
-|};
+};
 
-export type BehaviorShortHeader = {|
+export type BehaviorShortHeader = {
   ...ExtensionRegistryItemHeader,
   description: string,
   extensionName: string,
@@ -101,13 +101,13 @@ export type BehaviorShortHeader = {|
    * Can only be true for `installed` extensions.
    */
   isDeprecated?: boolean,
-|};
+};
 
-export type ObjectShortHeader = {|
+export type ObjectShortHeader = {
   ...ExtensionRegistryItemHeader,
   description: string,
   extensionName: string,
-|};
+};
 
 /**
  * This represents a serialized `gdEventsFunctionsExtension`.

@@ -62,7 +62,7 @@ const ExtensionsSearchDialog = ({
   );
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
-  const createBadgeFistExtension = addCreateBadgePreHookIfNotClaimed(
+  const createBadgeFirstExtension = addCreateBadgePreHookIfNotClaimed(
     authenticatedUser,
     TRIVIAL_FIRST_EXTENSION,
     () => {}
@@ -106,7 +106,7 @@ const ExtensionsSearchDialog = ({
           if (!wasExtensionInstalled) {
             return false;
           }
-          createBadgeFistExtension();
+          createBadgeFirstExtension();
           setExtensionWasInstalled(true);
         } catch (rawError) {
           showErrorBox({

@@ -60,7 +60,7 @@ export default function NewBehaviorDialog({
   } = React.useContext(ExtensionStoreContext);
   const installExtension = useInstallExtension();
 
-  const createBadgeFistExtension = addCreateBadgePreHookIfNotClaimed(
+  const createBadgeFirstExtension = addCreateBadgePreHookIfNotClaimed(
     authenticatedUser,
     TRIVIAL_FIRST_EXTENSION,
     () => {}
@@ -218,7 +218,7 @@ export default function NewBehaviorDialog({
         reason: 'behavior',
       });
       if (wasExtensionInstalled) {
-        createBadgeFistExtension();
+        createBadgeFirstExtension();
       }
       return wasExtensionInstalled;
     } finally {

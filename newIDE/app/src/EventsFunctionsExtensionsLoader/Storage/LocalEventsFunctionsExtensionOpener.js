@@ -5,9 +5,9 @@ import { type SerializedExtension } from '../../Utils/GDevelopServices/Extension
 export default class LocalEventsFunctionsExtensionOpener {
   static chooseEventsFunctionExtensionFile = (): Promise<Array<string>> => {
     return openFilesPicker({
-      title: 'Import an extension in the project',
+      title: 'Import extensions into the project',
       properties: ['openFile', 'multiSelections'],
-      message: 'Choose an extension file to import (.json file)',
+      message: 'Choose extension files to import (.json file)',
       filters: [
         {
           name: 'GDevelop 5 "events based" extension',

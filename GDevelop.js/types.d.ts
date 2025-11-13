@@ -632,6 +632,7 @@ export class ObjectsContainersList extends EmscriptenObject {
   getTypeOfBehavior(name: string, searchInGroups: boolean): string;
   getBehaviorsOfObject(objectOrGroupName: string, searchInGroups: boolean): VectorString;
   getBehaviorNamesInObjectOrGroup(objectOrGroupName: string, behaviorType: string, searchInGroups: boolean): VectorString;
+  isDefaultBehavior(objectOrGroupName: string, behaviorType: string, searchInGroups: boolean): boolean;
   getAnimationNamesOfObject(name: string): VectorString;
   getTypeOfBehaviorInObjectOrGroup(objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): string;
   hasObjectOrGroupNamed(name: string): boolean;
@@ -2043,6 +2044,10 @@ export class WholeProjectRefactorer extends EmscriptenObject {
   static renameLeaderboards(project: Project, leaderboardIdMap: MapStringString): void;
   static findAllLeaderboardIds(project: Project): SetString;
   static updateBehaviorsSharedData(project: Project): void;
+}
+
+export class BehaviorParameterFiller extends EmscriptenObject {
+  static fillBehaviorParameters(platform: Platform, projectScopedContainers: ProjectScopedContainers, instructionMetadata: InstructionMetadata, instruction: Instruction): void;
 }
 
 export class ObjectTools extends EmscriptenObject {

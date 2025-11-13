@@ -10,7 +10,37 @@ import { getLastObjectParameterValue } from './ParameterMetadataTools';
 import SemiControlledAutoComplete, {
   type SemiControlledAutoCompleteInterface,
 } from '../../UI/SemiControlledAutoComplete';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+
 const gd: libGDevelop = global.gd;
+
+export const getSelectableBehavior = (
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
+  objectOrGroupName: string,
+  allowedBehaviorType: string
+): Array<string> => {
+  const projectScopedContainers = projectScopedContainersAccessor.get();
+  const objectsContainersList = projectScopedContainers.getObjectsContainersList();
+  return allowedBehaviorType
+    ? objectsContainersList
+        .getBehaviorNamesInObjectOrGroup(
+          objectOrGroupName,
+          allowedBehaviorType,
+          true
+        )
+        .toJSArray()
+    : objectsContainersList
+        .getBehaviorsOfObject(objectOrGroupName, true)
+        .toJSArray()
+        .filter(
+          behaviorName =>
+            !objectsContainersList.isDefaultBehavior(
+              objectOrGroupName,
+              behaviorName,
+              true
+            )
+        );
+};
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function BehaviorField(props: ParameterFieldProps, ref) {
@@ -37,7 +67,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     const allowedBehaviorType = parameterMetadata
       ? parameterMetadata.getExtraInfo()
-      : undefined;
+      : '';
 
     const updateBehaviorsList = React.useCallback(
       () => {
@@ -47,8 +77,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           expressionMetadata,
           expression,
           parameterIndex,
-          globalObjectsContainer,
-          objectsContainer,
+          projectScopedContainersAccessor,
         } = props;
         const objectName = getLastObjectParameterValue({
           instructionMetadata,
@@ -59,36 +88,17 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         });
         if (!objectName) return;
 
-        const newBehaviorNames = gd
-          .getBehaviorsOfObject(
-            globalObjectsContainer,
-            objectsContainer,
-            objectName,
-            true
-          )
-          .toJSArray()
-          .filter(behaviorName => {
-            return (
-              (!allowedBehaviorType ||
-                gd.getTypeOfBehavior(
-                  globalObjectsContainer,
-                  objectsContainer,
-                  behaviorName,
-                  false
-                ) === allowedBehaviorType) &&
-              (allowedBehaviorType ||
-                !gd.isDefaultBehavior(
-                  globalObjectsContainer,
-                  objectsContainer,
-                  objectName,
-                  behaviorName,
-                  true
-                ))
-            );
-          });
-
+        const newBehaviorNames = getSelectableBehavior(
+          projectScopedContainersAccessor,
+          objectName,
+          allowedBehaviorType
+        );
         setBehaviorNames(newBehaviorNames);
-        if (!!props.value && newBehaviorNames.length === 0) {
+        if (
+          !allowedBehaviorType &&
+          !!props.value &&
+          newBehaviorNames.length === 0
+        ) {
           // Force emptying the current value if there is no behavior.
           // Useful when the object is changed to one without behaviors.
           props.onChange('');
@@ -142,22 +152,21 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [updateBehaviorsList]
     );
 
-    const noBehaviorErrorText =
-      allowedBehaviorType !== '' ? (
-        <Trans>
-          The behavior is not attached to this object. Please select another
-          object or add this behavior:{' '}
-          {gd.MetadataProvider.getBehaviorMetadata(
-            gd.JsPlatform.get(),
-            allowedBehaviorType
-          ).getFullName() || allowedBehaviorType}
-        </Trans>
-      ) : (
-        <Trans>
-          This object has no behaviors: please add this behavior to the object
-          first.
-        </Trans>
-      );
+    const noBehaviorErrorText = allowedBehaviorType ? (
+      <Trans>
+        The behavior is not attached to this object. Please select another
+        object or add this behavior:{' '}
+        {gd.MetadataProvider.getBehaviorMetadata(
+          gd.JsPlatform.get(),
+          allowedBehaviorType
+        ).getFullName() || allowedBehaviorType}
+      </Trans>
+    ) : (
+      <Trans>
+        This object has no behaviors: please add this behavior to the object
+        first.
+      </Trans>
+    );
 
     return (
       <SemiControlledAutoComplete

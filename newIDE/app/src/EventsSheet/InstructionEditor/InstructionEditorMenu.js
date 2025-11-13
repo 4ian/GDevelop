@@ -131,8 +131,8 @@ const InstructionEditorMenu = ({
     });
     if (instructionMetadata) {
       setupInstructionParameters(
-        globalObjectsContainer,
-        objectsContainer,
+        project,
+        projectScopedContainersAccessor,
         instruction,
         instructionMetadata,
         chosenObjectName

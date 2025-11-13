@@ -810,6 +810,27 @@ export const EventsFunctionParametersEditor = ({
                                         i
                                       )}
                                       onTypeUpdated={() => {
+                                        const valueTypeMetadata = parameter.getValueTypeMetadata();
+                                        if (
+                                          parameter
+                                            .getValueTypeMetadata()
+                                            .isBehavior()
+                                        ) {
+                                          const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+                                            project.getCurrentPlatform(),
+                                            valueTypeMetadata.getExtraInfo()
+                                          );
+                                          const projectScopedContainers = projectScopedContainersAccessor.get();
+                                          const validatedNewName = getValidatedParameterName(
+                                            eventsFunction.getParameters(),
+                                            projectScopedContainers,
+                                            behaviorMetadata.getDefaultName()
+                                          );
+                                          parameter.setName(validatedNewName);
+                                          parameter.setDescription(
+                                            behaviorMetadata.getFullName()
+                                          );
+                                        }
                                         onFunctionParameterTypeChanged(
                                           eventsFunction,
                                           parameter.getName()

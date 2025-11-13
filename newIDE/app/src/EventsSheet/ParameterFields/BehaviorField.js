@@ -94,7 +94,11 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           allowedBehaviorType
         );
         setBehaviorNames(newBehaviorNames);
-        if (!!props.value && newBehaviorNames.length === 0) {
+        if (
+          !allowedBehaviorType &&
+          !!props.value &&
+          newBehaviorNames.length === 0
+        ) {
           // Force emptying the current value if there is no behavior.
           // Useful when the object is changed to one without behaviors.
           props.onChange('');

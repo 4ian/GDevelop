@@ -246,6 +246,28 @@ const InstructionParametersEditor = React.forwardRef<
       isCondition,
       project,
     });
+    React.useEffect(
+      () => {
+        if (!instructionMetadata) {
+          return;
+        }
+        setupInstructionParameters(
+          project,
+          projectScopedContainersAccessor,
+          instruction,
+          instructionMetadata,
+          objectName
+        );
+      },
+      [
+        instruction,
+        instructionMetadata,
+        objectName,
+        project,
+        projectScopedContainersAccessor,
+      ]
+    );
+
     if (!instructionMetadata) return renderEmpty();
 
     const helpPage = instructionMetadata.getHelpPath();
@@ -254,14 +276,6 @@ const InstructionParametersEditor = React.forwardRef<
     );
     const tutorialIds = getInstructionTutorialIds(instructionType);
     const objectParameterIndex = getObjectParameterIndex(instructionMetadata);
-
-    setupInstructionParameters(
-      project,
-      projectScopedContainersAccessor,
-      instruction,
-      instructionMetadata,
-      objectName
-    );
 
     // For some reason, iconFileName can sometimes be undefined. see https://github.com/4ian/GDevelop/issues/5958.
     const iconFilename = instructionMetadata.getIconFilename() || '';

@@ -783,8 +783,6 @@ interface BehaviorDefaultFlagClearer {
 interface Behavior {
     void Behavior();
 
-    Behavior Clone();
-
     void SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();
     [Const, Ref] DOMString GetTypeName();

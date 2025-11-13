@@ -5,11 +5,12 @@ Copyright (c) 2010-present Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#ifndef TOPDOWNMOVEMENTBEHAVIOR_H
-#define TOPDOWNMOVEMENTBEHAVIOR_H
+#pragma once
+
 #include <vector>
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/Object.h"
+
 namespace gd {
 class SerializerElement;
 }  // namespace gd
@@ -21,15 +22,16 @@ class GD_EXTENSION_API TopDownMovementBehavior : public gd::Behavior {
  public:
   TopDownMovementBehavior(){};
   virtual ~TopDownMovementBehavior(){};
-  virtual Behavior* Clone() const override { return new TopDownMovementBehavior(*this); }
+  virtual std::unique_ptr<gd::Behavior> Clone() const override {
+    return gd::make_unique<TopDownMovementBehavior>(*this);
+  }
 
-#if defined(GD_IDE_ONLY)
   virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(
       const gd::SerializerElement& behaviorContent) const override;
   virtual bool UpdateProperty(gd::SerializerElement& behaviorContent,
                               const gd::String& name,
                               const gd::String& value) override;
-#endif
+
   /**
    * \brief Serialize the behavior
    */
@@ -38,4 +40,3 @@ class GD_EXTENSION_API TopDownMovementBehavior : public gd::Behavior {
 
  private:
 };
-#endif  // TOPDOWNMOVEMENTBEHAVIOR_H

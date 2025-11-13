@@ -672,7 +672,6 @@ export class BehaviorDefaultFlagClearer extends EmscriptenObject {
 
 export class Behavior extends EmscriptenObject {
   constructor();
-  clone(): Behavior;
   setName(name: string): void;
   getName(): string;
   getTypeName(): string;

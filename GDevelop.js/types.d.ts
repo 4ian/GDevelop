@@ -64,6 +64,13 @@ export enum CustomObjectConfiguration_EdgeAnchor {
   Center = 4,
 }
 
+export enum ResourcesContainer_SourceType {
+  Unknown = 0,
+  Global = 1,
+  Parameters = 2,
+  Properties = 3,
+}
+
 export enum QuickCustomization_Visibility {
   Default = 0,
   Visible = 1,
@@ -613,7 +620,7 @@ export class Project extends EmscriptenObject {
   getEventsBasedObject(type: string): EventsBasedObject;
   getVariables(): VariablesContainer;
   getObjects(): ObjectsContainer;
-  getResourcesManager(): ResourcesManager;
+  getResourcesManager(): ResourcesContainer;
   setSceneResourcesPreloading(resourcesPreloading: string): void;
   getSceneResourcesPreloading(): string;
   setSceneResourcesUnloading(resourcesUnloading: string): void;
@@ -647,15 +654,16 @@ export class ProjectScopedContainers extends EmscriptenObject {
   static makeNewProjectScopedContainersForProjectAndLayout(project: Project, layout: Layout): ProjectScopedContainers;
   static makeNewProjectScopedContainersForProject(project: Project): ProjectScopedContainers;
   static makeNewProjectScopedContainersForEventsFunctionsExtension(project: Project, eventsFunctionsExtension: EventsFunctionsExtension): ProjectScopedContainers;
-  static makeNewProjectScopedContainersForFreeEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer, parameterVariablesContainer: VariablesContainer): ProjectScopedContainers;
-  static makeNewProjectScopedContainersForBehaviorEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer, parameterVariablesContainer: VariablesContainer, propertyVariablesContainer: VariablesContainer): ProjectScopedContainers;
-  static makeNewProjectScopedContainersForObjectEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer, parameterVariablesContainer: VariablesContainer, propertyVariablesContainer: VariablesContainer): ProjectScopedContainers;
+  static makeNewProjectScopedContainersForFreeEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer, parameterVariablesContainer: VariablesContainer, parameterResourcesContainer: ResourcesContainer): ProjectScopedContainers;
+  static makeNewProjectScopedContainersForBehaviorEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer, parameterVariablesContainer: VariablesContainer, propertyVariablesContainer: VariablesContainer, parameterResourcesContainer: ResourcesContainer, propertyResourcesContainer: ResourcesContainer): ProjectScopedContainers;
+  static makeNewProjectScopedContainersForObjectEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer, parameterVariablesContainer: VariablesContainer, propertyVariablesContainer: VariablesContainer, parameterResourcesContainer: ResourcesContainer, propertyResourcesContainer: ResourcesContainer): ProjectScopedContainers;
   static makeNewProjectScopedContainersForEventsBasedObject(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, outputObjectsContainer: ObjectsContainer): ProjectScopedContainers;
   static makeNewProjectScopedContainersWithLocalVariables(projectScopedContainers: ProjectScopedContainers, event: BaseEvent): ProjectScopedContainers;
   addPropertiesContainer(propertiesContainer: PropertiesContainer): ProjectScopedContainers;
   addParameters(parameters: ParameterMetadataContainer): ProjectScopedContainers;
   getObjectsContainersList(): ObjectsContainersList;
   getVariablesContainersList(): VariablesContainersList;
+  getResourcesContainersList(): ResourcesContainersList;
 }
 
 export class ExtensionProperties extends EmscriptenObject {
@@ -1082,8 +1090,9 @@ export class Resource extends EmscriptenObject {
   unserializeFrom(element: SerializerElement): void;
 }
 
-export class ResourcesManager extends EmscriptenObject {
-  constructor();
+export class ResourcesContainer extends EmscriptenObject {
+  constructor(sourceType: ResourcesContainer_SourceType);
+  getSourceType(): ResourcesContainer_SourceType;
   getAllResourceNames(): VectorString;
   findFilesNotInResources(filesToCheck: VectorString): VectorString;
   hasResource(name: string): boolean;
@@ -1097,6 +1106,14 @@ export class ResourcesManager extends EmscriptenObject {
   moveResourceUpInList(oldName: string): boolean;
   moveResourceDownInList(oldName: string): boolean;
   moveResource(oldIndex: number, newIndex: number): void;
+}
+
+export class ResourcesContainersList extends EmscriptenObject {
+  hasResourceNamed(name: string): boolean;
+  getResource(name: string): Resource;
+  getResourcesContainerFromResourceName(resourceName: string): ResourcesContainer;
+  getResourcesContainer(index: number): ResourcesContainer;
+  getResourcesContainersCount(): number;
 }
 
 export class ImageResource extends Resource {
@@ -2550,20 +2567,20 @@ export class EventsContextAnalyzer extends EmscriptenObject {
 export class ArbitraryResourceWorker extends EmscriptenObject {}
 
 export class ArbitraryResourceWorkerJS extends ArbitraryResourceWorker {
-  constructor(resourcesManager: ResourcesManager);
+  constructor(resourcesManager: ResourcesContainer);
   exposeImage(image: string): void;
   exposeShader(shader: string): void;
   exposeFile(file: string): void;
 }
 
 export class ResourcesMergingHelper extends ArbitraryResourceWorker {
-  constructor(resourcesManager: ResourcesManager, fs: AbstractFileSystem);
+  constructor(resourcesManager: ResourcesContainer, fs: AbstractFileSystem);
   setBaseDirectory(basePath: string): void;
   getAllResourcesOldAndNewFilename(): MapStringString;
 }
 
 export class ResourcesRenamer extends ArbitraryResourceWorker {
-  constructor(resourcesManager: ResourcesManager, oldToNewNames: MapStringString);
+  constructor(resourcesManager: ResourcesContainer, oldToNewNames: MapStringString);
 }
 
 export class ProjectResourcesCopier extends EmscriptenObject {
@@ -2571,13 +2588,13 @@ export class ProjectResourcesCopier extends EmscriptenObject {
 }
 
 export class ObjectsUsingResourceCollector extends EmscriptenObject {
-  constructor(resourcesManager: ResourcesManager, resourceName: string);
+  constructor(resourcesManager: ResourcesContainer, resourceName: string);
   getObjectNames(): VectorString;
   launch(container: ObjectsContainer): void;
 }
 
 export class ResourcesInUseHelper extends ArbitraryResourceWorker {
-  constructor(resourcesManager: ResourcesManager);
+  constructor(resourcesManager: ResourcesContainer);
   getAllResources(): VectorString;
   getAllImages(): SetString;
   getAllAudios(): SetString;

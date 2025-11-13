@@ -33,6 +33,8 @@ import Cross from '../UI/CustomSvgIcons/Cross';
 import useResourcesChangedWatcher from './UseResourcesChangedWatcher';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import { mapVector } from '../Utils/MapFor';
 
 const styles = {
   textFieldStyle: { display: 'flex', flex: 1 },
@@ -40,6 +42,7 @@ const styles = {
 
 type Props = {|
   project: gdProject,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   resourceManagementProps: ResourceManagementProps,
   resourcesLoader: typeof ResourcesLoader,
   resourceKind: ResourceKind,
@@ -66,6 +69,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
   (props, ref) => {
     const {
       project,
+      projectScopedContainersAccessor,
       initialResourceName,
       defaultNewResourceName,
       resourceManagementProps,
@@ -190,30 +194,44 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
     );
 
     const loadFrom = React.useCallback(
-      (resourcesManager: gdResourcesManager) => {
-        const allResourcesNames = resourcesManager
-          .getAllResourceNames()
-          .toJSArray();
-        if (resourceKind) {
-          const mainResourcesNames = allResourcesNames.filter(resourceName => {
-            return (
-              resourcesManager.getResource(resourceName).getKind() ===
-              resourceKind
-            );
-          });
+      (resourcesContainersList: gdResourcesContainersList) => {
+        const allResourcesNames = new Set<string>();
+        for (
+          let i = 0;
+          i < resourcesContainersList.getResourcesContainersCount();
+          i++
+        ) {
+          const resourcesContainer = resourcesContainersList.getResourcesContainer(
+            i
+          );
+
+          mapVector(
+            resourcesContainer.getAllResourceNames(),
+            (resourceName, index) => {
+              if (
+                resourcesContainer.getResource(resourceName).getKind() ===
+                resourceKind
+              ) {
+                allResourcesNames.add(resourceName);
+              }
+            }
+          );
 
           if (fallbackResourceKind) {
-            mainResourcesNames.push(
-              ...allResourcesNames.filter(resourceName => {
-                return (
-                  resourcesManager.getResource(resourceName).getKind() ===
+            mapVector(
+              resourcesContainer.getAllResourceNames(),
+              (resourceName, index) => {
+                if (
+                  resourcesContainer.getResource(resourceName).getKind() ===
                   fallbackResourceKind
-                );
-              })
+                ) {
+                  allResourcesNames.add(resourceName);
+                }
+              }
             );
           }
 
-          allResourcesNamesRef.current = mainResourcesNames;
+          allResourcesNamesRef.current = [...allResourcesNames];
         }
       },
       [resourceKind, fallbackResourceKind]
@@ -221,12 +239,12 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
 
     const refreshResources = React.useCallback(
       () => {
-        if (project) {
-          loadFrom(project.getResourcesManager());
-          forceUpdate();
-        }
+        loadFrom(
+          projectScopedContainersAccessor.get().getResourcesContainersList()
+        );
+        forceUpdate();
       },
-      [project, forceUpdate, loadFrom]
+      [projectScopedContainersAccessor, forceUpdate, loadFrom]
     );
 
     React.useEffect(

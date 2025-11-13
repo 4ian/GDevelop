@@ -23,6 +23,7 @@ const ObjectPropertiesEditor = (props: Props) => {
     objectConfiguration,
     project,
     resourceManagementProps,
+    projectScopedContainersAccessor,
     unsavedChanges,
     renderObjectNameField,
   } = props;
@@ -80,6 +81,9 @@ const ObjectPropertiesEditor = (props: Props) => {
                 instances={[objectConfigurationAsGd]}
                 project={project}
                 resourceManagementProps={resourceManagementProps}
+                projectScopedContainersAccessor={
+                  projectScopedContainersAccessor
+                }
               />
             </React.Fragment>
           ) : (

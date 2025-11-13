@@ -19,7 +19,7 @@ class Layout;
 class ExternalLayout;
 class SerializerElement;
 class AbstractFileSystem;
-class ResourcesManager;
+class ResourcesContainer;
 class SourceFileMetadata;
 class WholeProjectDiagnosticReport;
 class CaptureOptions;
@@ -738,7 +738,7 @@ class ExporterHelper {
 
   static void AddDeprecatedFontFilesToFontResources(
       gd::AbstractFileSystem &fs,
-      gd::ResourcesManager &resourcesManager,
+      gd::ResourcesContainer &resourcesManager,
       const gd::String &exportDir,
       gd::String urlPrefix = "");
 

@@ -108,7 +108,7 @@ declare class gdProject {
   getEventsBasedObject(type: string): gdEventsBasedObject;
   getVariables(): gdVariablesContainer;
   getObjects(): gdObjectsContainer;
-  getResourcesManager(): gdResourcesManager;
+  getResourcesManager(): gdResourcesContainer;
   setSceneResourcesPreloading(resourcesPreloading: string): void;
   getSceneResourcesPreloading(): string;
   setSceneResourcesUnloading(resourcesUnloading: string): void;

@@ -50,6 +50,7 @@ const BehaviorPropertiesEditor = ({
   object,
   onBehaviorUpdated,
   resourceManagementProps,
+  projectScopedContainersAccessor,
 }: Props) => {
   const [
     shouldShowDeprecatedProperties,
@@ -115,6 +116,7 @@ const BehaviorPropertiesEditor = ({
             instances={[behavior]}
             onInstancesModified={onBehaviorUpdated}
             resourceManagementProps={resourceManagementProps}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
           />
           {(advancedPropertiesSchema.length > 0 ||
             deprecatedPropertiesSchema.length > 0) && (
@@ -135,6 +137,9 @@ const BehaviorPropertiesEditor = ({
                     instances={[behavior]}
                     onInstancesModified={onBehaviorUpdated}
                     resourceManagementProps={resourceManagementProps}
+                    projectScopedContainersAccessor={
+                      projectScopedContainersAccessor
+                    }
                   />
                   {deprecatedPropertiesSchema.length > 0 &&
                     (shouldShowDeprecatedProperties ? (
@@ -144,6 +149,9 @@ const BehaviorPropertiesEditor = ({
                         instances={[behavior]}
                         onInstancesModified={onBehaviorUpdated}
                         resourceManagementProps={resourceManagementProps}
+                        projectScopedContainersAccessor={
+                          projectScopedContainersAccessor
+                        }
                       />
                     ) : (
                       <Line justifyContent="center">

@@ -1429,7 +1429,7 @@ describe('libGD.js', function () {
     });
   });
 
-  describe('gd.ResourcesManager', function () {
+  describe('gd.ResourcesContainer', function () {
     it('should support adding resources', function () {
       let project = gd.ProjectHelper.createNewGDJSProject();
       let resource = new gd.Resource();

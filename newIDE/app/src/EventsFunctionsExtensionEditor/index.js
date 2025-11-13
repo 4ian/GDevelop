@@ -170,6 +170,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   _propertyVariablesContainer: gdVariablesContainer = new gd.VariablesContainer(
     gd.VariablesContainer.Properties
   );
+  _parameterResourcesContainer: gdResourcesContainer = new gd.ResourcesContainer(
+    gd.ResourcesContainer.Parameters
+  );
+  _propertyResourcesContainer: gdResourcesContainer = new gd.ResourcesContainer(
+    gd.ResourcesContainer.Properties
+  );
   _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = null;
 
   componentDidMount() {
@@ -191,6 +197,14 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   componentWillUnmount() {
     if (this._globalObjectsContainer) this._globalObjectsContainer.delete();
     if (this._objectsContainer) this._objectsContainer.delete();
+    if (this._parameterVariablesContainer)
+      this._parameterVariablesContainer.delete();
+    if (this._propertyVariablesContainer)
+      this._propertyVariablesContainer.delete();
+    if (this._parameterResourcesContainer)
+      this._parameterResourcesContainer.delete();
+    if (this._propertyResourcesContainer)
+      this._propertyResourcesContainer.delete();
   }
 
   _updateProjectScopedContainer = () => {
@@ -223,7 +237,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       scope,
       this._objectsContainer,
       this._parameterVariablesContainer,
-      this._propertyVariablesContainer
+      this._propertyVariablesContainer,
+      this._parameterResourcesContainer,
+      this._propertyResourcesContainer
     );
   };
 

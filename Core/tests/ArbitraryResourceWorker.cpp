@@ -30,7 +30,7 @@
 
 class ArbitraryResourceWorkerTest : public gd::ArbitraryResourceWorker {
 public:
-  ArbitraryResourceWorkerTest(gd::ResourcesManager &resourcesManager)
+  ArbitraryResourceWorkerTest(gd::ResourcesContainer &resourcesManager)
       : ArbitraryResourceWorker(resourcesManager){};
   virtual void ExposeFile(gd::String& file) { files.push_back(file); };
   virtual void ExposeImage(gd::String& imageName) {

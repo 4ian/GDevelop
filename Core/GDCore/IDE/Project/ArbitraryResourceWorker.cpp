@@ -18,7 +18,7 @@
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/Project.h"
-#include "GDCore/Project/ResourcesManager.h"
+#include "GDCore/Project/ResourcesContainer.h"
 #include "GDCore/Project/Effect.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/IDE/ResourceExposer.h"

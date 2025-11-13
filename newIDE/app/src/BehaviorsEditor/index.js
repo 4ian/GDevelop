@@ -47,6 +47,7 @@ import ResponsiveFlatButton from '../UI/ResponsiveFlatButton';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import QuickCustomizationPropertiesVisibilityDialog from '../QuickCustomization/QuickCustomizationPropertiesVisibilityDialog';
 import Text from '../UI/Text';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
 
@@ -73,6 +74,7 @@ type BehaviorConfigurationEditorProps = {|
   behavior: gdBehavior,
   isChildObject: boolean,
   resourceManagementProps: ResourceManagementProps,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   onBehaviorsUpdated: () => void,
   onChangeBehaviorName: (behavior: gdBehavior, newName: string) => void,
   onRemoveBehavior: (behaviorName: string) => void,
@@ -97,6 +99,7 @@ const BehaviorConfigurationEditor = React.forwardRef<
       behavior,
       isChildObject,
       resourceManagementProps,
+      projectScopedContainersAccessor,
       onBehaviorsUpdated,
       onChangeBehaviorName,
       onRemoveBehavior,
@@ -282,6 +285,9 @@ const BehaviorConfigurationEditor = React.forwardRef<
                 project={project}
                 object={object}
                 resourceManagementProps={resourceManagementProps}
+                projectScopedContainersAccessor={
+                  projectScopedContainersAccessor
+                }
                 onBehaviorUpdated={onBehaviorsUpdated}
               />
             </Line>
@@ -624,6 +630,7 @@ type Props = {|
   onUpdateBehaviorsSharedData: () => void,
   onSizeUpdated?: ?() => void,
   resourceManagementProps: ResourceManagementProps,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   onBehaviorsUpdated: () => void,
   openBehaviorEvents: (
     extensionName: string,
@@ -806,6 +813,9 @@ const BehaviorsEditor = (props: Props) => {
                   canPasteBehaviors={isClipboardContainingBehaviors}
                   pasteBehaviors={pasteBehaviors}
                   resourceManagementProps={props.resourceManagementProps}
+                  projectScopedContainersAccessor={
+                    props.projectScopedContainersAccessor
+                  }
                   isListLocked={isListLocked}
                 />
               );

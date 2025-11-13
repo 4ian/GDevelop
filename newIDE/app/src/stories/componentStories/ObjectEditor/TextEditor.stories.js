@@ -21,6 +21,9 @@ export const Default = () => (
   <SerializedObjectDisplay object={testProject.textObjectConfiguration}>
     <TextEditor
       objectConfiguration={testProject.textObjectConfiguration}
+      projectScopedContainersAccessor={
+        testProject.testSceneProjectScopedContainersAccessor
+      }
       project={testProject.project}
       layout={testProject.testLayout}
       eventsFunctionsExtension={null}

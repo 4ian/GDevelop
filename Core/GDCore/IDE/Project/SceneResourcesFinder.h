@@ -52,7 +52,7 @@ public:
   virtual ~SceneResourcesFinder(){};
 
 private:
-  SceneResourcesFinder(gd::ResourcesManager &resourcesManager)
+  SceneResourcesFinder(gd::ResourcesContainer &resourcesManager)
       : gd::ArbitraryResourceWorker(resourcesManager){};
 
   void AddUsedResource(gd::String &resourceName);

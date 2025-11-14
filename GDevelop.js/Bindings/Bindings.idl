@@ -252,6 +252,7 @@ interface Variable {
     void Variable();
 
     boolean STATIC_IsPrimitive([Const] Variable_Type type);
+    [Const, Value] DOMString STATIC_TypeAsString([Const] Variable_Type type);
 
     Variable_Type GetType();
     void CastTo([Const] DOMString type);

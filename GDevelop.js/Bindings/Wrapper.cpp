@@ -634,6 +634,7 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_GetObjectStrExpressionMetadata GetObjectStrExpressionMetadata
 #define STATIC_GetBehaviorStrExpressionMetadata GetBehaviorStrExpressionMetadata
 #define STATIC_IsPrimitive IsPrimitive
+#define STATIC_TypeAsString TypeAsString
 
 #define STATIC_Major Major
 #define STATIC_Minor Minor

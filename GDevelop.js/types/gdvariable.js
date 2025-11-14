@@ -9,6 +9,7 @@ declare class gdVariable {
   static Array: 6;
   constructor(): void;
   static isPrimitive(type: Variable_Type): boolean;
+  static typeAsString(type: Variable_Type): string;
   getType(): Variable_Type;
   castTo(type: string): void;
   setString(str: string): void;

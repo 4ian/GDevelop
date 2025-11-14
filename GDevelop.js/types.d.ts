@@ -296,6 +296,7 @@ export class VariableInstructionSwitcher extends EmscriptenObject {
 export class Variable extends EmscriptenObject {
   constructor();
   static isPrimitive(type: Variable_Type): boolean;
+  static typeAsString(type: Variable_Type): string;
   getType(): Variable_Type;
   castTo(type: string): void;
   setString(str: string): void;

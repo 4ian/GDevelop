@@ -328,6 +328,13 @@ ResourcesContainer::GetResourceSPtr(const gd::String &name) {
   return std::shared_ptr<gd::Resource>();
 }
 
+void ResourcesContainer::RenameResource(const gd::String& oldName,
+                                      const gd::String& newName) {
+  for (std::size_t i = 0; i < resources.size(); ++i) {
+    if (resources[i]->GetName() == oldName) resources[i]->SetName(newName);
+  }
+}
+
 void ResourcesContainer::RemoveResource(const gd::String &name) {
   for (std::size_t i = 0; i < resources.size();) {
     if (resources[i] != std::shared_ptr<Resource>() &&

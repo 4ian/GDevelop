@@ -1,0 +1,62 @@
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+build/
+dist/
+*.tsbuildinfo
+
+# GDevelop
+*.autosave
+*.backup
+.cache/
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+.temp/
+
+# Logs
+logs/
+*.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Asset working files
+*.psd
+*.ai
+*.xcf
+*.blend
+*.blend1
+
+# Distribution packages
+*.zip
+*.tar.gz
+*.rar
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Misc
+.cache/

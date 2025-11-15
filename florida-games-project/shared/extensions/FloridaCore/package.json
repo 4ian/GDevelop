@@ -1,0 +1,19 @@
+{
+  "name": "@florida-games/core",
+  "version": "1.0.0",
+  "description": "Core extension for Florida Games - Weather, day/night cycle, achievements",
+  "main": "JsExtension.js",
+  "scripts": {
+    "test": "echo 'Tests coming soon' && exit 0",
+    "build": "echo 'Build coming soon' && exit 0"
+  },
+  "keywords": [
+    "gdevelop",
+    "extension",
+    "florida",
+    "weather",
+    "achievements"
+  ],
+  "author": "Florida Games Team",
+  "license": "MIT"
+}

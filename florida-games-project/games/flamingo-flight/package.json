@@ -1,0 +1,16 @@
+{
+  "name": "@florida-games/flamingo-flight",
+  "version": "0.1.0",
+  "description": "Guide a flamingo through beautiful Florida landscapes in this addictive flying game",
+  "private": true,
+  "dependencies": {
+    "@florida-games/core": "^1.0.0"
+  },
+  "scripts": {
+    "build": "echo 'Build script coming soon'",
+    "test": "echo 'Test script coming soon'"
+  },
+  "keywords": ["gdevelop", "game", "florida", "flamingo", "casual"],
+  "author": "Florida Games Team",
+  "license": "MIT"
+}

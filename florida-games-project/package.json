@@ -1,0 +1,57 @@
+{
+  "name": "florida-games-project",
+  "version": "0.1.0",
+  "description": "A collection of Florida-themed games built on GDevelop",
+  "private": true,
+  "workspaces": [
+    "games/*",
+    "shared/extensions/*"
+  ],
+  "scripts": {
+    "create-game": "node scripts/create-game.js",
+    "build": "node scripts/build-game.js",
+    "build:all": "node scripts/build-all-games.js",
+    "test": "node scripts/test-game.js",
+    "test:all": "node scripts/test-all-games.js",
+    "deploy": "node scripts/deploy-game.js",
+    "link-extensions": "node scripts/link-extensions.js",
+    "link-shared-assets": "node scripts/link-shared-assets.js",
+    "update-extensions": "node scripts/update-extensions.js",
+    "optimize-images": "node scripts/optimize-images.js",
+    "optimize-assets": "node scripts/optimize-assets.js",
+    "create-spritesheet": "node scripts/create-spritesheet.js",
+    "convert-audio": "node scripts/convert-audio.js",
+    "check-versions": "node scripts/check-versions.js",
+    "health-check": "node scripts/health-check.js",
+    "setup-hooks": "node scripts/setup-git-hooks.js",
+    "profile": "node scripts/profile-game.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/florida-games-project.git"
+  },
+  "keywords": [
+    "gdevelop",
+    "games",
+    "florida",
+    "educational",
+    "indie-games"
+  ],
+  "author": "Florida Games Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "chalk": "^4.1.2",
+    "commander": "^9.0.0",
+    "fs-extra": "^11.0.0",
+    "glob": "^8.0.0",
+    "inquirer": "^8.2.0",
+    "prettier": "^2.8.0",
+    "sharp": "^0.31.0",
+    "typescript": "^4.9.0"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  }
+}

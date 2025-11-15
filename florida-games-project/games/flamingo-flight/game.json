@@ -1,0 +1,1312 @@
+{
+  "firstLayout": "MenuScene",
+  "gdVersion": {
+    "build": 0,
+    "major": 5,
+    "minor": 4,
+    "revision": 0
+  },
+  "properties": {
+    "adaptGameResolutionAtRuntime": true,
+    "folderProject": false,
+    "orientation": "landscape",
+    "packageName": "com.floridagames.flamingoflight",
+    "projectFile": "game.json",
+    "scaleMode": "linear",
+    "sizeOnStartupMode": "adaptWidth",
+    "useExternalSourceFiles": false,
+    "version": "0.1.0",
+    "name": "Flamingo Flight",
+    "description": "Guide Flora the Flamingo through beautiful Florida landscapes!",
+    "author": "Florida Games Team",
+    "windowWidth": 1920,
+    "windowHeight": 1080,
+    "latestCompilationDirectory": "",
+    "maxFPS": 60,
+    "minFPS": 30,
+    "verticalSync": false,
+    "platformSpecificAssets": {},
+    "loadingScreen": {
+      "showGDevelopSplash": true,
+      "backgroundColor": 15062992,
+      "backgroundFadeInDuration": 0.2,
+      "backgroundImageResourceName": "",
+      "gdevelopLogoStyle": "light",
+      "logoAndProgressFadeInDuration": 0.2,
+      "logoAndProgressLogoFadeInDelay": 0.2,
+      "minDuration": 0,
+      "progressBarColor": 16777215,
+      "progressBarHeight": 20,
+      "progressBarMaxWidth": 200,
+      "progressBarMinWidth": 40,
+      "progressBarWidthPercent": 30,
+      "showGDevelopLogo": true,
+      "showProgressBar": true
+    },
+    "watermark": {
+      "placement": "bottom-left",
+      "showWatermark": false
+    },
+    "authorIds": [],
+    "authorUsernames": [],
+    "categories": ["casual", "arcade"],
+    "playableDevices": ["keyboard", "mouse", "touch"],
+    "extensionProperties": [],
+    "platforms": [
+      {
+        "name": "GDevelop JS platform"
+      }
+    ],
+    "currentPlatform": "GDevelop JS platform"
+  },
+  "resources": {
+    "resources": [],
+    "resourceFolders": []
+  },
+  "objects": [],
+  "objectsGroups": [],
+  "variables": [
+    {
+      "name": "HighScore",
+      "type": "number",
+      "value": 0
+    },
+    {
+      "name": "GameState",
+      "type": "structure",
+      "children": [
+        {
+          "name": "CurrentScore",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "Distance",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "IsPlaying",
+          "type": "boolean",
+          "value": false
+        },
+        {
+          "name": "PowerUpActive",
+          "type": "boolean",
+          "value": false
+        },
+        {
+          "name": "Difficulty",
+          "type": "number",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "name": "FloridaAchievements",
+      "type": "structure",
+      "children": [
+        {
+          "name": "first_flight",
+          "type": "boolean",
+          "value": false
+        },
+        {
+          "name": "everglades_explorer",
+          "type": "boolean",
+          "value": false
+        },
+        {
+          "name": "coastal_cruiser",
+          "type": "boolean",
+          "value": false
+        },
+        {
+          "name": "hurricane_survivor",
+          "type": "boolean",
+          "value": false
+        },
+        {
+          "name": "sunrise_chaser",
+          "type": "boolean",
+          "value": false
+        },
+        {
+          "name": "pelican_pal",
+          "type": "boolean",
+          "value": false
+        }
+      ]
+    },
+    {
+      "name": "Settings",
+      "type": "structure",
+      "children": [
+        {
+          "name": "MusicVolume",
+          "type": "number",
+          "value": 0.7
+        },
+        {
+          "name": "SFXVolume",
+          "type": "number",
+          "value": 0.8
+        },
+        {
+          "name": "GameMode",
+          "type": "string",
+          "value": "Classic"
+        }
+      ]
+    }
+  ],
+  "layouts": [
+    {
+      "b": 135,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "MenuScene",
+      "name": "MenuScene",
+      "r": 206,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": true,
+      "title": "Main Menu",
+      "v": 250,
+      "uiSettings": {
+        "grid": false,
+        "gridType": "rectangular",
+        "gridWidth": 32,
+        "gridHeight": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridColor": 10401023,
+        "gridAlpha": 0.8,
+        "snap": false,
+        "zoomFactor": 1,
+        "windowMask": false
+      },
+      "objectsGroups": [],
+      "variables": [],
+      "instances": [],
+      "objects": [
+        {
+          "assetStoreId": "",
+          "name": "MenuBackground",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Default",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "assetStoreId": "",
+          "name": "TitleText",
+          "tags": "",
+          "type": "TextObject::Text",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "FLAMINGO FLIGHT",
+          "fontName": "Arial",
+          "fontSize": 120,
+          "bold": true,
+          "italic": false,
+          "underlined": false,
+          "smoothed": true,
+          "color": {
+            "b": 255,
+            "g": 105,
+            "r": 255
+          },
+          "content": {
+            "bold": true,
+            "isOutlineEnabled": true,
+            "isShadowEnabled": true,
+            "fontSize": 120,
+            "fontName": "Arial",
+            "outlineColor": "255;255;255",
+            "outlineThickness": 4,
+            "shadowAngle": 90,
+            "shadowBlurRadius": 2,
+            "shadowColor": "0;0;0",
+            "shadowDistance": 4,
+            "shadowOpacity": 127,
+            "smoothed": true,
+            "text": "FLAMINGO FLIGHT",
+            "textAlignment": "left"
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "PlayButton",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                }
+              ]
+            },
+            {
+              "name": "Hover",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "assetStoreId": "",
+          "name": "HighScoreText",
+          "tags": "",
+          "type": "TextObject::Text",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "High Score: 0",
+          "fontName": "Arial",
+          "fontSize": 48,
+          "bold": false,
+          "italic": false,
+          "underlined": false,
+          "smoothed": true,
+          "color": {
+            "b": 255,
+            "g": 255,
+            "r": 255
+          },
+          "content": {
+            "bold": false,
+            "fontSize": 48,
+            "fontName": "Arial",
+            "isOutlineEnabled": true,
+            "outlineColor": "0;0;0",
+            "outlineThickness": 3,
+            "smoothed": true,
+            "text": "High Score: 0",
+            "textAlignment": "center"
+          }
+        }
+      ],
+      "layers": [
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "cameraType": "",
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "behaviorsSharedData": []
+    },
+    {
+      "b": 135,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "MainGame",
+      "name": "MainGame",
+      "r": 206,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": false,
+      "title": "Main Game",
+      "v": 250,
+      "uiSettings": {
+        "grid": false,
+        "gridType": "rectangular",
+        "gridWidth": 32,
+        "gridHeight": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridColor": 10401023,
+        "gridAlpha": 0.8,
+        "snap": false,
+        "zoomFactor": 0.5,
+        "windowMask": false
+      },
+      "objectsGroups": [
+        {
+          "name": "Obstacles",
+          "objects": [
+            {
+              "name": "PalmTree"
+            },
+            {
+              "name": "Building"
+            },
+            {
+              "name": "Pelican"
+            }
+          ]
+        },
+        {
+          "name": "PowerUps",
+          "objects": [
+            {
+              "name": "SpeedBoost"
+            },
+            {
+              "name": "Shield"
+            },
+            {
+              "name": "ScoreMultiplier"
+            },
+            {
+              "name": "Sunshine"
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "name": "SpawnTimer",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "PowerUpTimer",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "ScrollSpeed",
+          "type": "number",
+          "value": 200
+        },
+        {
+          "name": "PelicansAvoided",
+          "type": "number",
+          "value": 0
+        }
+      ],
+      "instances": [],
+      "objects": [
+        {
+          "assetStoreId": "",
+          "name": "Flamingo",
+          "tags": "player",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "VerticalSpeed",
+              "type": "number",
+              "value": 0
+            },
+            {
+              "name": "FlapPower",
+              "type": "number",
+              "value": 400
+            },
+            {
+              "name": "Gravity",
+              "type": "number",
+              "value": 1200
+            },
+            {
+              "name": "IsAlive",
+              "type": "boolean",
+              "value": true
+            },
+            {
+              "name": "HasShield",
+              "type": "boolean",
+              "value": false
+            }
+          ],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.1,
+                  "sprites": []
+                }
+              ]
+            },
+            {
+              "name": "Flap",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.05,
+                  "sprites": []
+                }
+              ]
+            },
+            {
+              "name": "Glide",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.15,
+                  "sprites": []
+                }
+              ]
+            },
+            {
+              "name": "Hit",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "assetStoreId": "",
+          "name": "SkyBackground",
+          "tags": "background",
+          "type": "TiledSpriteObject::TiledSprite",
+          "width": 1920,
+          "height": 1080,
+          "texture": "",
+          "variables": [],
+          "effects": [],
+          "behaviors": []
+        },
+        {
+          "assetStoreId": "",
+          "name": "CloudsLayer",
+          "tags": "background",
+          "type": "TiledSpriteObject::TiledSprite",
+          "width": 1920,
+          "height": 400,
+          "texture": "",
+          "variables": [],
+          "effects": [],
+          "behaviors": []
+        },
+        {
+          "assetStoreId": "",
+          "name": "GroundLayer",
+          "tags": "background",
+          "type": "TiledSpriteObject::TiledSprite",
+          "width": 1920,
+          "height": 300,
+          "texture": "",
+          "variables": [],
+          "effects": [],
+          "behaviors": []
+        },
+        {
+          "assetStoreId": "",
+          "name": "PalmTree",
+          "tags": "obstacle",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "Speed",
+              "type": "number",
+              "value": 200
+            }
+          ],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Default",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "assetStoreId": "",
+          "name": "Building",
+          "tags": "obstacle",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "Speed",
+              "type": "number",
+              "value": 200
+            }
+          ],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "ArtDeco",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                }
+              ]
+            },
+            {
+              "name": "Modern",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "assetStoreId": "",
+          "name": "Pelican",
+          "tags": "obstacle",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "Speed",
+              "type": "number",
+              "value": 180
+            }
+          ],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Flying",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.1,
+                  "sprites": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "assetStoreId": "",
+          "name": "SpeedBoost",
+          "tags": "powerup",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "Speed",
+              "type": "number",
+              "value": 200
+            },
+            {
+              "name": "Duration",
+              "type": "number",
+              "value": 5
+            }
+          ],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "assetStoreId": "",
+          "name": "Shield",
+          "tags": "powerup",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "Speed",
+              "type": "number",
+              "value": 200
+            },
+            {
+              "name": "Duration",
+              "type": "number",
+              "value": 8
+            }
+          ],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "assetStoreId": "",
+          "name": "ScoreMultiplier",
+          "tags": "powerup",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "Speed",
+              "type": "number",
+              "value": 200
+            },
+            {
+              "name": "Duration",
+              "type": "number",
+              "value": 10
+            }
+          ],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "assetStoreId": "",
+          "name": "Sunshine",
+          "tags": "powerup",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "Speed",
+              "type": "number",
+              "value": 200
+            }
+          ],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "assetStoreId": "",
+          "name": "ScoreText",
+          "tags": "ui",
+          "type": "TextObject::Text",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "0",
+          "fontName": "Arial",
+          "fontSize": 72,
+          "bold": true,
+          "italic": false,
+          "underlined": false,
+          "smoothed": true,
+          "color": {
+            "b": 255,
+            "g": 255,
+            "r": 255
+          },
+          "content": {
+            "bold": true,
+            "fontSize": 72,
+            "fontName": "Arial",
+            "isOutlineEnabled": true,
+            "isShadowEnabled": true,
+            "outlineColor": "0;0;0",
+            "outlineThickness": 4,
+            "shadowAngle": 90,
+            "shadowBlurRadius": 3,
+            "shadowColor": "0;0;0",
+            "shadowDistance": 2,
+            "shadowOpacity": 100,
+            "smoothed": true,
+            "text": "0",
+            "textAlignment": "center"
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "DistanceText",
+          "tags": "ui",
+          "type": "TextObject::Text",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "0m",
+          "fontName": "Arial",
+          "fontSize": 48,
+          "bold": false,
+          "italic": false,
+          "underlined": false,
+          "smoothed": true,
+          "color": {
+            "b": 255,
+            "g": 255,
+            "r": 255
+          },
+          "content": {
+            "bold": false,
+            "fontSize": 48,
+            "fontName": "Arial",
+            "isOutlineEnabled": true,
+            "outlineColor": "0;0;0",
+            "outlineThickness": 3,
+            "smoothed": true,
+            "text": "0m",
+            "textAlignment": "left"
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "ParticleTrail",
+          "tags": "effect",
+          "type": "ParticleSystem::ParticleEmitter",
+          "angle": 0,
+          "emissionEdgeAngle1": 0,
+          "emissionEdgeAngle2": 0,
+          "emitterAngleB": 0,
+          "emitterAngleA": 0,
+          "emitterForceMax": 50,
+          "emitterForceMin": 40,
+          "emitterXDirection": -1,
+          "emitterYDirection": 0,
+          "emitterZDirection": 0,
+          "friction": 0,
+          "gravityAngle": 0,
+          "gravityLength": 0,
+          "lifeTimeMax": 0.8,
+          "lifeTimeMin": 0.5,
+          "maxParticles": 100,
+          "particleAlpha1": 255,
+          "particleAlpha2": 0,
+          "particleBlue1": 180,
+          "particleBlue2": 255,
+          "particleGreen1": 105,
+          "particleGreen2": 200,
+          "particleRed1": 255,
+          "particleRed2": 255,
+          "particleSize1": 20,
+          "particleSize2": 5,
+          "particleSizeRandomness1": 5,
+          "particleSizeRandomness2": 5,
+          "rendererParam1": 0,
+          "rendererParam2": 0,
+          "rendererType": "Quad",
+          "tank": 1000,
+          "textureParticleName": "",
+          "zoneRadius": 10,
+          "flow": 80,
+          "destroyWhenNoParticles": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": []
+        },
+        {
+          "assetStoreId": "",
+          "name": "WeatherParticles",
+          "tags": "effect",
+          "type": "ParticleSystem::ParticleEmitter",
+          "angle": 90,
+          "emissionEdgeAngle1": 0,
+          "emissionEdgeAngle2": 0,
+          "emitterAngleB": 10,
+          "emitterAngleA": -10,
+          "emitterForceMax": 400,
+          "emitterForceMin": 350,
+          "emitterXDirection": 0,
+          "emitterYDirection": 1,
+          "emitterZDirection": 0,
+          "friction": 0,
+          "gravityAngle": 90,
+          "gravityLength": 100,
+          "lifeTimeMax": 3,
+          "lifeTimeMin": 2,
+          "maxParticles": 500,
+          "particleAlpha1": 180,
+          "particleAlpha2": 0,
+          "particleBlue1": 255,
+          "particleBlue2": 255,
+          "particleGreen1": 255,
+          "particleGreen2": 255,
+          "particleRed1": 255,
+          "particleRed2": 255,
+          "particleSize1": 8,
+          "particleSize2": 3,
+          "particleSizeRandomness1": 2,
+          "particleSizeRandomness2": 1,
+          "rendererParam1": 0,
+          "rendererParam2": 0,
+          "rendererType": "Line",
+          "tank": 10000,
+          "textureParticleName": "",
+          "zoneRadius": 1920,
+          "flow": 200,
+          "destroyWhenNoParticles": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": []
+        }
+      ],
+      "layers": [
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "cameraType": "",
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "Sky",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        },
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "cameraType": "",
+          "followBaseLayerCamera": true,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "Clouds",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [],
+          "effects": []
+        },
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "cameraType": "",
+          "followBaseLayerCamera": true,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [],
+          "effects": []
+        },
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "cameraType": "",
+          "followBaseLayerCamera": true,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "Ground",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [],
+          "effects": []
+        },
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "cameraType": "",
+          "followBaseLayerCamera": true,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "UI",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [],
+          "effects": []
+        },
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "cameraType": "",
+          "followBaseLayerCamera": true,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "Weather",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [],
+          "effects": []
+        }
+      ],
+      "behaviorsSharedData": []
+    },
+    {
+      "b": 135,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "GameOver",
+      "name": "GameOver",
+      "r": 206,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": false,
+      "title": "Game Over",
+      "v": 250,
+      "uiSettings": {
+        "grid": false,
+        "gridType": "rectangular",
+        "gridWidth": 32,
+        "gridHeight": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridColor": 10401023,
+        "gridAlpha": 0.8,
+        "snap": false,
+        "zoomFactor": 1,
+        "windowMask": false
+      },
+      "objectsGroups": [],
+      "variables": [],
+      "instances": [],
+      "objects": [
+        {
+          "assetStoreId": "",
+          "name": "GameOverBackground",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Default",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "assetStoreId": "",
+          "name": "GameOverText",
+          "tags": "",
+          "type": "TextObject::Text",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "GAME OVER",
+          "fontName": "Arial",
+          "fontSize": 100,
+          "bold": true,
+          "italic": false,
+          "underlined": false,
+          "smoothed": true,
+          "color": {
+            "b": 100,
+            "g": 100,
+            "r": 255
+          },
+          "content": {
+            "bold": true,
+            "fontSize": 100,
+            "fontName": "Arial",
+            "isOutlineEnabled": true,
+            "isShadowEnabled": true,
+            "outlineColor": "255;255;255",
+            "outlineThickness": 4,
+            "shadowAngle": 90,
+            "shadowBlurRadius": 3,
+            "shadowColor": "0;0;0",
+            "shadowDistance": 3,
+            "shadowOpacity": 150,
+            "smoothed": true,
+            "text": "GAME OVER",
+            "textAlignment": "center"
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "FinalScoreText",
+          "tags": "",
+          "type": "TextObject::Text",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "Score: 0",
+          "fontName": "Arial",
+          "fontSize": 60,
+          "bold": false,
+          "italic": false,
+          "underlined": false,
+          "smoothed": true,
+          "color": {
+            "b": 255,
+            "g": 255,
+            "r": 255
+          },
+          "content": {
+            "fontSize": 60,
+            "fontName": "Arial",
+            "isOutlineEnabled": true,
+            "outlineColor": "0;0;0",
+            "outlineThickness": 3,
+            "smoothed": true,
+            "text": "Score: 0",
+            "textAlignment": "center"
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "BestScoreText",
+          "tags": "",
+          "type": "TextObject::Text",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "Best: 0",
+          "fontName": "Arial",
+          "fontSize": 48,
+          "bold": false,
+          "italic": false,
+          "underlined": false,
+          "smoothed": true,
+          "color": {
+            "b": 180,
+            "g": 215,
+            "r": 255
+          },
+          "content": {
+            "fontSize": 48,
+            "fontName": "Arial",
+            "isOutlineEnabled": true,
+            "outlineColor": "0;0;0",
+            "outlineThickness": 2,
+            "smoothed": true,
+            "text": "Best: 0",
+            "textAlignment": "center"
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "RetryButton",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                }
+              ]
+            },
+            {
+              "name": "Hover",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "assetStoreId": "",
+          "name": "MenuButton",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                }
+              ]
+            },
+            {
+              "name": "Hover",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "layers": [
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 0.1,
+          "cameraType": "",
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "behaviorsSharedData": []
+    }
+  ],
+  "externalEvents": [],
+  "eventsFunctionsExtensions": [],
+  "externalLayouts": [],
+  "externalSourceFiles": []
+}

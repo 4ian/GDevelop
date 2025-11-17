@@ -18,7 +18,10 @@ import SaveProjectIcon from '../../SaveProjectIcon';
 import Mobile from '../../../UI/CustomSvgIcons/Mobile';
 import Desktop from '../../../UI/CustomSvgIcons/Desktop';
 import HistoryIcon from '../../../UI/CustomSvgIcons/History';
+import SunIcon from '../../../UI/CustomSvgIcons/Sun';
+import Brightness3Icon from '@material-ui/icons/Brightness3';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
+import PreferencesContext from '../../Preferences/PreferencesContext';
 const electron = optionalRequire('electron');
 
 type Props = {|
@@ -40,6 +43,18 @@ export const HomePageHeader = ({
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const { profile } = React.useContext(AuthenticatedUserContext);
+  const preferences = React.useContext(PreferencesContext);
+  const isDarkTheme = preferences.values.themeName.includes('Dark');
+
+  const toggleTheme = React.useCallback(
+    () => {
+      const newTheme = isDarkTheme
+        ? 'GDevelop default Light'
+        : 'GDevelop default Dark';
+      preferences.setThemeName(newTheme);
+    },
+    [isDarkTheme, preferences]
+  );
 
   return (
     <I18n>
@@ -96,6 +111,21 @@ export const HomePageHeader = ({
                 ))}
               <UserChip onOpenProfile={onOpenProfile} />
               {profile && <NotificationChip />}
+              <IconButton
+                size="small"
+                id="homepage-theme-toggle-button"
+                onClick={toggleTheme}
+                tooltip={
+                  isDarkTheme ? t`Switch to light mode` : t`Switch to dark mode`
+                }
+                color="default"
+              >
+                {isDarkTheme ? (
+                  <SunIcon style={{ fontSize: 20 }} />
+                ) : (
+                  <Brightness3Icon style={{ fontSize: 20 }} />
+                )}
+              </IconButton>
               {isMobile ? (
                 <IconButton size="small" onClick={onOpenLanguageDialog}>
                   <TranslateIcon fontSize="small" />

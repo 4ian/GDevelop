@@ -1408,6 +1408,38 @@ namespace gdjs {
           message: `Could not add/remove a lighting layer at runtime (for layer "${newLayer.name}").`,
         });
       }
+      if (
+        newLayer.camera3DNearPlaneDistance &&
+        newLayer.camera3DNearPlaneDistance !==
+          oldLayer.camera3DNearPlaneDistance
+      ) {
+        runtimeLayer.setCamera3DNearPlaneDistance(
+          newLayer.camera3DNearPlaneDistance
+        );
+      }
+      if (
+        newLayer.camera3DFarPlaneDistance &&
+        newLayer.camera3DFarPlaneDistance !== oldLayer.camera3DFarPlaneDistance
+      ) {
+        runtimeLayer.setCamera3DFarPlaneDistance(
+          newLayer.camera3DFarPlaneDistance
+        );
+      }
+      if (
+        newLayer.camera3DFieldOfView &&
+        newLayer.camera3DFieldOfView !== oldLayer.camera3DFieldOfView
+      ) {
+        runtimeLayer.setCamera3DFieldOfView(newLayer.camera3DFieldOfView);
+      }
+      if (
+        newLayer.camera2DPlaneMaxDrawingDistance &&
+        newLayer.camera2DPlaneMaxDrawingDistance !==
+          oldLayer.camera2DPlaneMaxDrawingDistance
+      ) {
+        runtimeLayer.setCamera2DPlaneMaxDrawingDistance(
+          newLayer.camera2DPlaneMaxDrawingDistance
+        );
+      }
 
       // Effects
       this._hotReloadRuntimeLayerEffects(

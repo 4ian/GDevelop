@@ -179,6 +179,8 @@ namespace gdjs {
     return origin.addScaledVector(dir, t).setZ(0);
   };
 
+  const assumedFovIn2D = 45;
+
   /**
    * The renderer for a gdjs.Layer using Pixi.js.
    */
@@ -561,8 +563,50 @@ namespace gdjs {
       }
     }
 
-    setThreeCameraDirty(enable: boolean) {
-      this._threeCameraDirty = enable;
+    setCamera3DNearPlaneDistance(distance: number) {
+      if (!this._threeCamera) return;
+
+      this._threeCamera.near = Math.min(
+        // 0 is not a valid value for three js perspective camera:
+        // https://threejs.org/docs/#api/en/cameras/PerspectiveCamera.
+        Math.max(distance, 0.0001),
+        // Near value cannot exceed far value.
+        this._threeCamera.far
+      );
+      this._threeCameraDirty = true;
+    }
+
+    getCamera3DNearPlaneDistance(): float {
+      if (!this._threeCamera) return 0;
+      return this._threeCamera.near;
+    }
+
+    setCamera3DFarPlaneDistance(distance: number) {
+      if (!this._threeCamera) return;
+      this._threeCamera.far = Math.max(distance, this._threeCamera.near);
+      this._threeCameraDirty = true;
+    }
+
+    getCamera3DFarPlaneDistance(): float {
+      if (!this._threeCamera) return 0;
+      return this._threeCamera.far;
+    }
+
+    setCamera3DFieldOfView(angle: number) {
+      if (!this._threeCamera) return;
+      if (this._threeCamera instanceof THREE.OrthographicCamera) return;
+
+      this._threeCamera.fov = Math.min(Math.max(angle, 0), 180);
+      this._threeCameraDirty = true;
+    }
+
+    getCamera3DFieldOfView(): float {
+      if (!this._threeCamera) return 0;
+      return this._threeCamera
+        ? this._threeCamera instanceof THREE.OrthographicCamera
+          ? 0
+          : this._threeCamera.fov
+        : assumedFovIn2D;
     }
 
     show2DRenderingPlane(enable: boolean) {
@@ -598,12 +642,12 @@ namespace gdjs {
     }
 
     /** Maximum size of the 2D plane, in pixels. */
-    private _2DPlaneMaxDrawingDistance: number = 5000;
+    private _2DPlaneMaxDrawingDistance: float = 5000;
     /** Tilt degrees below which the 2D plane is not clamped. */
-    private _2DPlaneClampFreeTiltDeg: number = 0.1;
+    private _2DPlaneClampFreeTiltDeg: float = 0.1;
     /** Tilt degrees below which the 2D plane is fully clamped. */
-    private _2DPlaneClampHardTiltDeg: number = 6;
-    private _2DPlaneClampRampPower: number = 1.5; // 1 = linear, >1 = smoother
+    private _2DPlaneClampHardTiltDeg: float = 6;
+    private _2DPlaneClampRampPower: float = 1.5; // 1 = linear, >1 = smoother
 
     /**
      * Set the maximum "drawing distance", in pixels, of the 2D when in the 3D world.
@@ -612,8 +656,12 @@ namespace gdjs {
      * as it's done by default for 2D games).
      * This is useful to avoid the 2D plane being too big when the camera is tilted.
      */
-    set2DPlaneMaxDrawingDistance(h: number) {
+    set2DPlaneMaxDrawingDistance(h: float) {
       this._2DPlaneMaxDrawingDistance = Math.max(0, h);
+    }
+
+    get2DPlaneMaxDrawingDistance(): float {
+      return this._2DPlaneMaxDrawingDistance;
     }
 
     /**

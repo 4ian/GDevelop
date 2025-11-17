@@ -485,17 +485,87 @@ namespace gdjs {
       return this._runtimeScene.getViewportHeight();
     }
 
+    /**
+     * Get the camera 3D field of view when the layer was created.
+     */
     getInitialCamera3DFieldOfView(): float {
       return this._initialCamera3DFieldOfView;
     }
+
+    /**
+     * Get the camera 3D near plane distance when the layer was created.
+     */
     getInitialCamera3DNearPlaneDistance(): float {
       return this._initialCamera3DNearPlaneDistance;
     }
+
+    /**
+     * Get the camera 3D far plane distance when the layer was created.
+     */
     getInitialCamera3DFarPlaneDistance(): float {
       return this._initialCamera3DFarPlaneDistance;
     }
+
+    /**
+     * Get the camera 2D plane max drawing distance when the layer was created.
+     */
     getInitialCamera2DPlaneMaxDrawingDistance(): float {
       return this._initialCamera2DPlaneMaxDrawingDistance;
+    }
+
+    /**
+     * Set the camera 3D field of view.
+     */
+    setCamera3DFieldOfView(fieldOfView: float): void {
+      this._renderer.setCamera3DFieldOfView(fieldOfView);
+    }
+
+    /**
+     * Set the camera 3D near plane distance.
+     */
+    setCamera3DNearPlaneDistance(nearPlaneDistance: float): void {
+      this._renderer.setCamera3DNearPlaneDistance(nearPlaneDistance);
+    }
+
+    /**
+     * Set the camera 3D far plane distance.
+     */
+    setCamera3DFarPlaneDistance(farPlaneDistance: float): void {
+      this._renderer.setCamera3DFarPlaneDistance(farPlaneDistance);
+    }
+
+    /**
+     * Set the camera 2D plane max drawing distance.
+     */
+    setCamera2DPlaneMaxDrawingDistance(maxDrawingDistance: float): void {
+      this._renderer.set2DPlaneMaxDrawingDistance(maxDrawingDistance);
+    }
+
+    /**
+     * Get the camera 3D near plane distance.
+     */
+    getCamera3DNearPlaneDistance(): float {
+      return this._renderer.getCamera3DNearPlaneDistance();
+    }
+    /**
+     * Get the camera 3D far plane distance.
+     */
+    getCamera3DFarPlaneDistance(): float {
+      return this._renderer.getCamera3DFarPlaneDistance();
+    }
+
+    /**
+     * Get the camera 3D field of view.
+     */
+    getCamera3DFieldOfView(): float {
+      return this._renderer.getCamera3DFieldOfView();
+    }
+
+    /**
+     * Get the camera 2D plane max drawing distance.
+     */
+    getCamera2DPlaneMaxDrawingDistance(): float {
+      return this._renderer.get2DPlaneMaxDrawingDistance();
     }
 
     /**

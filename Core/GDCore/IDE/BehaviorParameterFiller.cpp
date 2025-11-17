@@ -14,16 +14,17 @@
 
 namespace gd {
 
-void BehaviorParameterFiller::FillBehaviorParameters(
+bool BehaviorParameterFiller::FillBehaviorParameters(
     const gd::Platform &platform,
     const gd::ProjectScopedContainers &projectScopedContainers,
     const gd::InstructionMetadata &instructionMetadata,
     gd::Instruction &instruction) {
+  bool hasChangeAnyParameterValue = false;
   auto &objectsContainersList =
       projectScopedContainers.GetObjectsContainersList();
   gd::ParameterMetadataTools::IterateOverParametersWithIndex(
       instruction.GetParameters(), instructionMetadata.parameters,
-      [&platform, &objectsContainersList, &instruction](
+      [&platform, &objectsContainersList, &instruction, &hasChangeAnyParameterValue](
           const gd::ParameterMetadata &parameterMetadata,
           const gd::Expression &parameterValue, size_t parameterIndex,
           const gd::String &lastObjectName, size_t lastObjectIndex) {
@@ -50,6 +51,7 @@ void BehaviorParameterFiller::FillBehaviorParameters(
         if (actualBehaviorType == expectedBehaviorType) {
           return;
         }
+        hasChangeAnyParameterValue = true;
         const auto &behaviorNames =
             objectsContainersList.GetBehaviorNamesInObjectOrGroup(
                 lastObjectName, expectedBehaviorType, true);
@@ -63,6 +65,7 @@ void BehaviorParameterFiller::FillBehaviorParameters(
           instruction.SetParameter(parameterIndex, behaviorNames[0]);
         }
       });
+  return hasChangeAnyParameterValue;
 }
 
 } // namespace gd

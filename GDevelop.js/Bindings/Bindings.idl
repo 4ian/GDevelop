@@ -2891,7 +2891,7 @@ interface WholeProjectRefactorer {
 };
 
 interface BehaviorParameterFiller {
-    void STATIC_FillBehaviorParameters(
+    boolean STATIC_FillBehaviorParameters(
         [Const, Ref] Platform platform,
         [Const, Ref] ProjectScopedContainers projectScopedContainers,
         [Const, Ref] InstructionMetadata instructionMetadata,

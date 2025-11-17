@@ -22,7 +22,7 @@ public:
    * \brief Fill all empty or invalid behavior parameters according to the
    * objects.
    */
-  static void FillBehaviorParameters(
+  static bool FillBehaviorParameters(
       const gd::Platform &platform,
       const gd::ProjectScopedContainers &projectScopedContainers,
       const gd::InstructionMetadata &instructionMetadata,

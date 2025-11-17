@@ -2065,7 +2065,7 @@ export class WholeProjectRefactorer extends EmscriptenObject {
 }
 
 export class BehaviorParameterFiller extends EmscriptenObject {
-  static fillBehaviorParameters(platform: Platform, projectScopedContainers: ProjectScopedContainers, instructionMetadata: InstructionMetadata, instruction: Instruction): void;
+  static fillBehaviorParameters(platform: Platform, projectScopedContainers: ProjectScopedContainers, instructionMetadata: InstructionMetadata, instruction: Instruction): boolean;
 }
 
 export class ObjectTools extends EmscriptenObject {

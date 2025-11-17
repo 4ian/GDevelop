@@ -15,7 +15,7 @@ export const setupInstructionParameters = (
   instruction: gdInstruction,
   instructionMetadata: gdInstructionMetadata,
   objectName: ?string
-) => {
+): boolean => {
   instruction.setParametersCount(instructionMetadata.getParametersCount());
 
   if (objectName) {
@@ -25,11 +25,11 @@ export const setupInstructionParameters = (
       console.error(
         `Instruction "${instructionMetadata.getFullName()}" is used for an object, but does not have an object as first parameter`
       );
-      return;
+      return false;
     }
     instruction.setParameter(objectParameterIndex, objectName);
   }
-  gd.BehaviorParameterFiller.fillBehaviorParameters(
+  return gd.BehaviorParameterFiller.fillBehaviorParameters(
     project.getCurrentPlatform(),
     projectScopedContainersAccessor.get(),
     instructionMetadata,

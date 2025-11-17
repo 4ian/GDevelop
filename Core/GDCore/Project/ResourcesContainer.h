@@ -38,6 +38,7 @@ public:
   static const gd::String atlasType;
   static const gd::String spineType;
   static const gd::String javaScriptType;
+  static const gd::String internalInGameEditorOnlySvgType;
 
   Resource(){};
   virtual ~Resource(){};

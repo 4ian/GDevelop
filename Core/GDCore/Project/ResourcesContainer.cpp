@@ -132,6 +132,8 @@ ResourcesContainer::CreateResource(const gd::String &kind) {
     return std::make_shared<SpineResource>();
   else if (kind == "javascript")
     return std::make_shared<JavaScriptResource>();
+  else if (kind == "internal-in-game-editor-only-svg")
+    return std::make_shared<InternalInGameEditorOnlySvgResource>();
 
   std::cout << "Bad resource created (type: " << kind << ")" << std::endl;
   return std::make_shared<Resource>();
@@ -149,6 +151,7 @@ const gd::String Resource::model3DType = "model3D";
 const gd::String Resource::atlasType = "atlas";
 const gd::String Resource::spineType = "spine";
 const gd::String Resource::javaScriptType = "javascript";
+const gd::String Resource::internalInGameEditorOnlySvgType = "internal-in-game-editor-only-svg";
 
 bool ResourcesContainer::HasResource(const gd::String &name) const {
   for (std::size_t i = 0; i < resources.size(); ++i) {
@@ -623,6 +626,20 @@ void JavaScriptResource::UnserializeFrom(const SerializerElement &element) {
 }
 
 void JavaScriptResource::SerializeTo(SerializerElement &element) const {
+  element.SetAttribute("userAdded", IsUserAdded());
+  element.SetAttribute("file", GetFile());
+}
+
+void InternalInGameEditorOnlySvgResource::SetFile(const gd::String &newFile) {
+  file = NormalizePathSeparator(newFile);
+}
+
+void InternalInGameEditorOnlySvgResource::UnserializeFrom(const SerializerElement &element) {
+  SetUserAdded(element.GetBoolAttribute("userAdded"));
+  SetFile(element.GetStringAttribute("file"));
+}
+
+void InternalInGameEditorOnlySvgResource::SerializeTo(SerializerElement &element) const {
   element.SetAttribute("userAdded", IsUserAdded());
   element.SetAttribute("file", GetFile());
 }

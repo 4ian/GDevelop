@@ -1,0 +1,40 @@
+<!doctype html>
+
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Gojo vs Sukuna — Dino uslubida</title>
+<style>
+html,body{height:100%;margin:0;background:#0b0b0d;color:#eee;font-family:Inter,Arial;overflow:hidden}
+canvas{background:linear-gradient(#07101a,#000);display:block;margin:0 auto;border:6px solid #111;border-radius:8px}
+</style>
+</head>
+<body>
+<canvas id="game" width="900" height="220"></canvas>
+<script>
+const canvas=document.getElementById('game');
+const ctx=canvas.getContext('2d');
+let running=true,score=0,speed=6,spawnTimer=0,obstacles=[],players=[];
+const gravity=0.9,groundY=canvas.height-40,maxPlayers=6;function createPlayer(x,y,w,h,color){return {x,y,w,h,vy:0,onGround:true,color:color||'#1fbf4a',isAlive:true};} players.push(createPlayer(60,groundY-40,28,40,'#1fbf4a'));
+
+function spawnObstacle(){ const r=Math.random(); if(r<0.6) obstacles.push({x:canvas.width+40,w:38,h:60,type:'sukuna',color:'#c62828'}); else obstacles.push({x:canvas.width+40,w:20+Math.random()*20,h:24+Math.random()*36,type:'block',color:'#222'}); }
+
+function update(){ if(!running) return; score+=0.05*(speed/6); speed+=0.0005; for(let p of players){if(!p.isAlive) continue; p.vy+=gravity*0.6; p.y+=p.vy; if(p.y+p.h>=groundY){p.y=groundY-p.h;p.vy=0;p.onGround=true;}} for(let o of obstacles) o.x-=speed; obstacles=obstacles.filter(o=>o.x+o.w>-50); spawnTimer--; if(spawnTimer<=0){spawnObstacle(); spawnTimer=70-Math.min(40,Math.floor(score/10));}
+
+// Sukuna va Gojo har 100 balda joy almashtirish if(Math.floor(score)%100===0 && Math.floor(score)>0){ if(players.length>1){let tempX=players[0].x;players[0].x=players[1].x;players[1].x=tempX;} }
+
+for(let o of obstacles){for(let i=0;i<players.length;i++){const p=players[i];if(!p.isAlive) continue;if(collideRect(p,o)) handleSukunaCollision(i,o);}}
+
+// 1000 ballda Sukuna Gojoni bo'laklash if(score>=1000){ running=false; alert("The game isn't over yet, it could have been different."); } }
+
+function collideRect(a,b){return a.x<a.x+b.w&&a.x+a.w>b.x&&a.y<groundY&&a.y+a.h>(groundY-b.h);}
+
+function handleSukunaCollision(playerIndex,obstacle){ const p=players[playerIndex]; if(score>=1000){ // Sukuna Gojoni bo'laklaydi for(let i=0;i<3;i++){ const newP=createPlayer(p.x+i*10,p.y,p.w/3,p.h,'#1fbf4a'); players.push(newP); } obstacles=[]; running=false; alert("The game isn't over yet, it could have been different."); return; } const newW=Math.max(8,Math.floor(p.w/2)); p.w=newW; const nx=p.x+p.w+4; const newP=createPlayer(nx,p.y,newW,p.h,'#1fbf4a'); newP.vy=-6; newP.onGround=false; players.push(newP); obstacles=obstacles.filter(o=>o!==obstacle); try{const u=new SpeechSynthesisUtterance('ganbai ganbari'); u.rate=0.8; u.pitch=0.5; u.lang='ja-JP'; speechSynthesis.speak(u);}catch(e){} }
+
+function draw(){ ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle='#0b7a5f17'; ctx.fillRect(0,groundY,canvas.width,canvas.height-groundY); ctx.fillStyle='#111'; ctx.fillRect(0,groundY+8,canvas.width,6); drawEyesBackground(); for(let p of players){if(!p.isAlive) continue; ctx.fillStyle=p.color; roundRect(ctx,p.x,p.y,p.w,p.h,4,true,false); ctx.fillStyle='#070707'; ctx.fillRect(p.x+4,p.y+8,Math.max(8,p.w-8),8);} for(let o of obstacles){ctx.fillStyle=o.color; ctx.fillRect(o.x,groundY-o.h,o.w,o.h);} ctx.fillStyle='#cbd5e1'; ctx.font='16px Arial'; ctx.fillText('Score: '+Math.floor(score),12,22); }
+
+function drawEyesBackground(){for(let i=0;i<12;i++){const rx=(i73)%canvas.width+(Math.sin(i+score/20)20);const ry=40+((i43)%140);const r=4+(i%3);ctx.beginPath();ctx.fillStyle='rgba(255,255,255,0.06)';ctx.arc(rx,ry,r,0,Math.PI2);ctx.fill();}} function roundRect(ctx,x,y,w,h,r,fill,stroke){if(typeof r==='undefined')r=5;ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath(); if(fill)ctx.fill(); if(stroke)ctx.stroke();} canvas.addEventListener('touchstart',()=>{for(let p of players){if(p.onGround){p.vy=-12;p.onGround=false;}}}); function loop(){update(); draw(); if(running) requestAnimationFrame(loop);} loop(); </script>
+
+</body>
+</html>

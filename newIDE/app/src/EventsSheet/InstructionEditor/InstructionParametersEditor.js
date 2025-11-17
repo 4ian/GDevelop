@@ -251,15 +251,19 @@ const InstructionParametersEditor = React.forwardRef<
         if (!instructionMetadata) {
           return;
         }
-        setupInstructionParameters(
+        const hasChangeAnyParameterValue = setupInstructionParameters(
           project,
           projectScopedContainersAccessor,
           instruction,
           instructionMetadata,
           objectName
         );
+        if (hasChangeAnyParameterValue) {
+          forceUpdate();
+        }
       },
       [
+        forceUpdate,
         instruction,
         instructionMetadata,
         objectName,

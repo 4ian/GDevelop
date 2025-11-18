@@ -645,6 +645,37 @@ namespace gdjs {
       return this.getMouseWheelDelta() < 0;
     }
 
+    /**
+     * Request pointer lock on the given canvas element.
+     * This locks the mouse cursor to the canvas, allowing for continuous camera rotation.
+     * @param canvas The canvas element to request pointer lock on.
+     * @returns A promise that resolves when pointer lock is acquired, or null if not supported.
+     */
+    requestPointerLock(canvas: HTMLCanvasElement | null): Promise<void> | null {
+      if (!canvas || !canvas.requestPointerLock) {
+        return null;
+      }
+      return canvas.requestPointerLock();
+    }
+
+    /**
+     * Exit pointer lock if it's currently active.
+     * @param canvas The canvas element (used to access document.exitPointerLock if needed).
+     */
+    exitPointerLock(canvas: HTMLCanvasElement | null): void {
+      if (document.exitPointerLock) {
+        document.exitPointerLock();
+      }
+    }
+
+    /**
+     * Check if pointer lock is currently active.
+     * @returns true if pointer lock is active, false otherwise.
+     */
+    isPointerLocked(): boolean {
+      return document.pointerLockElement !== null;
+    }
+
     static _allTouchIds: Array<integer> = [];
   }
 }

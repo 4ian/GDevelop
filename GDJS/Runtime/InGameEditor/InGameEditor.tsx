@@ -4309,7 +4309,28 @@ namespace gdjs {
     step(): void {
       const runtimeGame = this._editorCamera.editor.getRuntimeGame();
       const inputManager = runtimeGame.getInputManager();
+      const canvas = runtimeGame.getRenderer().getCanvas();
       if (this._isEnabled) {
+        // Request pointer lock when right/middle click is just pressed
+        const isRightButtonJustPressed =
+          inputManager.isMouseButtonPressed(1) && !this._wasMouseRightButtonPressed;
+        const isMiddleButtonJustPressed =
+          inputManager.isMouseButtonPressed(2) && !this._wasMouseMiddleButtonPressed;
+        if (isRightButtonJustPressed || isMiddleButtonJustPressed) {
+          inputManager.requestPointerLock(canvas);
+        }
+
+        // Release pointer lock when both right and middle click are released
+        // (only exit if neither button is pressed anymore)
+        const wasEitherButtonPressed =
+          this._wasMouseRightButtonPressed || this._wasMouseMiddleButtonPressed;
+        const isEitherButtonPressed =
+          inputManager.isMouseButtonPressed(1) ||
+          inputManager.isMouseButtonPressed(2);
+        if (wasEitherButtonPressed && !isEitherButtonPressed) {
+          inputManager.exitPointerLock(canvas);
+        }
+
         // Right click: rotate the camera.
         // Middle click: also rotate the camera.
         if (
@@ -4556,7 +4577,22 @@ namespace gdjs {
     step(): void {
       const runtimeGame = this._editorCamera.editor.getRuntimeGame();
       const inputManager = runtimeGame.getInputManager();
+      const canvas = runtimeGame.getRenderer().getCanvas();
       if (this._isEnabled) {
+        // Request pointer lock when right click is just pressed
+        const isRightButtonJustPressed =
+          inputManager.isMouseButtonPressed(1) && !this._wasMouseRightButtonPressed;
+        if (isRightButtonJustPressed) {
+          inputManager.requestPointerLock(canvas);
+        }
+
+        // Release pointer lock when right click is released
+        const isRightButtonJustReleased =
+          !inputManager.isMouseButtonPressed(1) && this._wasMouseRightButtonPressed;
+        if (isRightButtonJustReleased) {
+          inputManager.exitPointerLock(canvas);
+        }
+
         const { right, up, forward } = this.getCameraVectors();
 
         const moveCameraByVector = (vector: THREE.Vector3, scale: number) => {

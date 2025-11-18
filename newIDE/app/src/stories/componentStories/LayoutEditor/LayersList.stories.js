@@ -42,6 +42,7 @@ export const Default = () => {
         layersContainer={testProject.testLayout.getLayers()}
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
         onBackgroundColorChanged={action('onBackgroundColorChanged')}
+        gameEditorMode={'embedded-game'}
       />
     </DragAndDropContextProvider>
   );
@@ -74,6 +75,7 @@ export const SmallWidthAndHeight = () => {
           layersContainer={testProject.testLayout.getLayers()}
           hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
           onBackgroundColorChanged={action('onBackgroundColorChanged')}
+          gameEditorMode={'embedded-game'}
         />
       </div>
     </DragAndDropContextProvider>

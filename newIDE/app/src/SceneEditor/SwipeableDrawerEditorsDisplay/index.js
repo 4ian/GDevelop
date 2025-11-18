@@ -538,6 +538,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                     props.hotReloadPreviewButtonProps
                   }
                   onBackgroundColorChanged={props.onBackgroundColorChanged}
+                  gameEditorMode={props.gameEditorMode}
                 />
               )}
             </SwipeableDrawer>

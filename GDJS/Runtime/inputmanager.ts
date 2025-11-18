@@ -50,6 +50,18 @@ namespace gdjs {
     private _wheelDeltaX: float = 0;
     private _wheelDeltaY: float = 0;
     private _wheelDeltaZ: float = 0;
+    /**
+     * The mouse movement X (from movementX when pointer is locked).
+     */
+    private _mouseMovementX: float = 0;
+    /**
+     * The mouse movement Y (from movementY when pointer is locked).
+     */
+    private _mouseMovementY: float = 0;
+    /**
+     * The canvas element for pointer lock.
+     */
+    private _canvasElement: HTMLCanvasElement | null = null;
 
     // TODO Remove _touches when there is no longer SpritePanelButton 1.2.0
     // extension in the wild.
@@ -254,11 +266,15 @@ namespace gdjs {
      *
      * @param x The mouse new X position
      * @param y The mouse new Y position
+     * @param movementX The mouse movement X (from movementX)
+     * @param movementY The mouse movement Y (from movementY)
      */
-    onMouseMove(x: float, y: float): void {
+    onMouseMove(x: float, y: float, movementX?: float, movementY?: float): void {
       this._setCursorPosition(x, y);
       this._mouseX = x;
       this._mouseY = y;
+      if (movementX !== undefined) this._mouseMovementX = movementX;
+      if (movementY !== undefined) this._mouseMovementY = movementY;
       if (this.isMouseButtonPressed(InputManager.MOUSE_LEFT_BUTTON)) {
         this._moveTouch(
           InputManager.MOUSE_TOUCH_ID,
@@ -309,6 +325,66 @@ namespace gdjs {
      */
     getMouseY(): float {
       return this._mouseY;
+    }
+
+    /**
+     * Get the mouse movement X (from movementX, useful when pointer is locked).
+     *
+     * @return the mouse movement X.
+     */
+    getMouseMovementX(): float {
+      return this._mouseMovementX;
+    }
+
+    /**
+     * Get the mouse movement Y (from movementY, useful when pointer is locked).
+     *
+     * @return the mouse movement Y.
+     */
+    getMouseMovementY(): float {
+      return this._mouseMovementY;
+    }
+
+    /**
+     * Set the canvas element for pointer lock.
+     * @param canvas The canvas element to use for pointer lock.
+     */
+    setPointerLockCanvas(canvas: HTMLCanvasElement | null): void {
+      this._canvasElement = canvas;
+    }
+
+    /**
+     * Request pointer lock on the canvas.
+     * @returns true if the request was initiated, false otherwise.
+     */
+    requestPointerLock(): boolean {
+      if (!this._canvasElement) {
+        return false;
+      }
+      try {
+        this._canvasElement.requestPointerLock();
+        return true;
+      } catch (error) {
+        console.error('Failed to request pointer lock:', error);
+        return false;
+      }
+    }
+
+    /**
+     * Exit pointer lock.
+     */
+    exitPointerLock(): void {
+      if (document.pointerLockElement) {
+        document.exitPointerLock();
+      }
+    }
+
+    /**
+     * Check if pointer is currently locked.
+     * @returns true if pointer is locked, false otherwise.
+     */
+    isPointerLocked(): boolean {
+      return document.pointerLockElement === this._canvasElement;
     }
 
     /**
@@ -627,6 +703,8 @@ namespace gdjs {
       this._wheelDeltaX = 0;
       this._wheelDeltaY = 0;
       this._wheelDeltaZ = 0;
+      this._mouseMovementX = 0;
+      this._mouseMovementY = 0;
       this._lastStartedTouchIndex = 0;
       this._lastEndedTouchIndex = 0;
     }

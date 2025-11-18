@@ -4310,18 +4310,43 @@ namespace gdjs {
       const runtimeGame = this._editorCamera.editor.getRuntimeGame();
       const inputManager = runtimeGame.getInputManager();
       if (this._isEnabled) {
+        const isRightButtonPressed = inputManager.isMouseButtonPressed(1);
+        const isMiddleButtonPressed = inputManager.isMouseButtonPressed(2);
+
+        // Request pointer lock when right or middle button is first pressed
+        if (
+          (isRightButtonPressed && !this._wasMouseRightButtonPressed) ||
+          (isMiddleButtonPressed && !this._wasMouseMiddleButtonPressed)
+        ) {
+          inputManager.requestPointerLock();
+        }
+
+        // Exit pointer lock when both buttons are released
+        if (
+          !isRightButtonPressed &&
+          !isMiddleButtonPressed &&
+          (this._wasMouseRightButtonPressed || this._wasMouseMiddleButtonPressed)
+        ) {
+          inputManager.exitPointerLock();
+        }
+
         // Right click: rotate the camera.
         // Middle click: also rotate the camera.
         if (
-          (inputManager.isMouseButtonPressed(1) &&
+          (isRightButtonPressed &&
             // The camera should not move the 1st frame
             this._wasMouseRightButtonPressed) ||
-          (inputManager.isMouseButtonPressed(2) &&
+          (isMiddleButtonPressed &&
             // The camera should not move the 1st frame
             this._wasMouseMiddleButtonPressed)
         ) {
-          const xDelta = inputManager.getCursorX() - this._lastCursorX;
-          const yDelta = inputManager.getCursorY() - this._lastCursorY;
+          // Use movement deltas when pointer is locked, otherwise use cursor position delta
+          const xDelta = inputManager.isPointerLocked()
+            ? inputManager.getMouseMovementX()
+            : inputManager.getCursorX() - this._lastCursorX;
+          const yDelta = inputManager.isPointerLocked()
+            ? inputManager.getMouseMovementY()
+            : inputManager.getCursorY() - this._lastCursorY;
 
           const rotationSpeed = 0.2;
           this.rotationAngle += xDelta * rotationSpeed;
@@ -4392,8 +4417,10 @@ namespace gdjs {
         this._gestureActiveTouchIds = [];
       }
 
-      this._wasMouseRightButtonPressed = inputManager.isMouseButtonPressed(1);
-      this._wasMouseMiddleButtonPressed = inputManager.isMouseButtonPressed(2);
+      const isRightButtonPressed = inputManager.isMouseButtonPressed(1);
+      const isMiddleButtonPressed = inputManager.isMouseButtonPressed(2);
+      this._wasMouseRightButtonPressed = isRightButtonPressed;
+      this._wasMouseMiddleButtonPressed = isMiddleButtonPressed;
       this._lastCursorX = inputManager.getCursorX();
       this._lastCursorY = inputManager.getCursorY();
     }
@@ -4556,6 +4583,7 @@ namespace gdjs {
     step(): void {
       const runtimeGame = this._editorCamera.editor.getRuntimeGame();
       const inputManager = runtimeGame.getInputManager();
+      const isRightButtonPressed = inputManager.isMouseButtonPressed(1);
       if (this._isEnabled) {
         const { right, up, forward } = this.getCameraVectors();
 
@@ -4687,14 +4715,29 @@ namespace gdjs {
           moveCameraByVector(right, xDelta);
         }
 
+        // Request pointer lock when right button is first pressed
+        if (isRightButtonPressed && !this._wasMouseRightButtonPressed) {
+          inputManager.requestPointerLock();
+        }
+
+        // Exit pointer lock when right button is released
+        if (!isRightButtonPressed && this._wasMouseRightButtonPressed) {
+          inputManager.exitPointerLock();
+        }
+
         // Right click: rotate the camera.
         if (
-          inputManager.isMouseButtonPressed(1) &&
+          isRightButtonPressed &&
           // The camera should not move the 1st frame
           this._wasMouseRightButtonPressed
         ) {
-          const xDelta = inputManager.getCursorX() - this._lastCursorX;
-          const yDelta = inputManager.getCursorY() - this._lastCursorY;
+          // Use movement deltas when pointer is locked, otherwise use cursor position delta
+          const xDelta = inputManager.isPointerLocked()
+            ? inputManager.getMouseMovementX()
+            : inputManager.getCursorX() - this._lastCursorX;
+          const yDelta = inputManager.isPointerLocked()
+            ? inputManager.getMouseMovementY()
+            : inputManager.getCursorY() - this._lastCursorY;
 
           const rotationSpeed = 0.2;
           this.rotationAngle += xDelta * rotationSpeed;
@@ -4705,7 +4748,7 @@ namespace gdjs {
         // Reset gesture tracking when camera control is disabled.
         this._gestureActiveTouchIds = [];
       }
-      this._wasMouseRightButtonPressed = inputManager.isMouseButtonPressed(1);
+      this._wasMouseRightButtonPressed = isRightButtonPressed;
       this._lastCursorX = inputManager.getCursorX();
       this._lastCursorY = inputManager.getCursorY();
     }

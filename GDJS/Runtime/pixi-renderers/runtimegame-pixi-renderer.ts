@@ -588,6 +588,9 @@ namespace gdjs {
       const canvas = this._gameCanvas;
       if (!canvas) return;
 
+      // Set the canvas for pointer lock
+      manager.setPointerLockCanvas(canvas);
+
       const isInsideCanvas = (e: MouseEvent | Touch) => {
         const x = e.pageX - canvas.offsetLeft;
         const y = e.pageY - canvas.offsetTop;
@@ -757,7 +760,7 @@ namespace gdjs {
       }
       canvas.onmousemove = (e) => {
         const pos = this.convertPageToGameCoords(e.pageX, e.pageY);
-        manager.onMouseMove(pos[0], pos[1]);
+        manager.onMouseMove(pos[0], pos[1], e.movementX, e.movementY);
       };
       canvas.onmousedown = (e) => {
         const pos = this.convertPageToGameCoords(e.pageX, e.pageY);

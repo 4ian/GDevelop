@@ -37,7 +37,9 @@ const handleParsedMessage = (
       responseCallbacks.delete(parsedMessage.messageId);
     } else {
       console.warn(
-        `Discarding response for messageId=${parsedMessage.messageId} - already handled or invalid id.`
+        `Discarding response for messageId=${
+          parsedMessage.messageId
+        } - already handled or invalid id.`
       );
     }
   }

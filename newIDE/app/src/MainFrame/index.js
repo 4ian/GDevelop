@@ -2610,9 +2610,9 @@ const MainFrame = (props: Props) => {
   const launchDebuggerAndPreview = React.useCallback(
     () => {
       openDebugger();
-      launchHotReloadPreview();
+      launchNewPreview();
     },
-    [openDebugger, launchHotReloadPreview]
+    [openDebugger, launchNewPreview]
   );
 
   const openInstructionOrExpression = (

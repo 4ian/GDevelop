@@ -16,6 +16,46 @@ const debuggerIds: Array<DebuggerId> = [];
 const responseCallbacks = new Map<number, (value: Object) => void>();
 let nextMessageWithResponseId = 1;
 
+let embeddedGameFrameWindow: WindowProxy | null = null;
+let isWindowMessageListenerRegistered = false;
+
+const getExistingDebuggerIds = (): Array<DebuggerId> => [
+  ...debuggerIds,
+  ...(embeddedGameFrameWindow ? ['embedded-game-frame'] : []),
+];
+
+const handleParsedMessage = (
+  id: DebuggerId,
+  parsedMessage: Object | null
+): void => {
+  if (!parsedMessage) return;
+
+  if (parsedMessage.messageId) {
+    const answerCallback = responseCallbacks.get(parsedMessage.messageId);
+    if (answerCallback) {
+      answerCallback(parsedMessage);
+      responseCallbacks.delete(parsedMessage.messageId);
+    } else {
+      console.warn(
+        `Discarding response for messageId=${parsedMessage.messageId} - already handled or invalid id.`
+      );
+    }
+  }
+
+  callbacksList.forEach(({ onHandleParsedMessage }) =>
+    onHandleParsedMessage({ id, parsedMessage })
+  );
+};
+
+const notifyConnectionClosed = (id: DebuggerId) => {
+  callbacksList.forEach(({ onConnectionClosed }) =>
+    onConnectionClosed({
+      id,
+      debuggerIds: getExistingDebuggerIds(),
+    })
+  );
+};
+
 const removeServerListeners = () => {
   if (!ipcRenderer) return;
 
@@ -37,6 +77,26 @@ class LocalPreviewDebuggerServer {
     if (!ipcRenderer) return Promise.reject();
     if (debuggerServerState === 'started') return Promise.resolve();
 
+    if (!isWindowMessageListenerRegistered) {
+      window.addEventListener('message', event => {
+        if (!embeddedGameFrameWindow) return;
+        if (event.source !== embeddedGameFrameWindow) return;
+
+        let parsedMessage = null;
+        try {
+          parsedMessage = JSON.parse(event.data);
+        } catch (error) {
+          console.warn(
+            'Error while parsing a message received from the embedded game frame:',
+            error
+          );
+        }
+
+        handleParsedMessage('embedded-game-frame', parsedMessage);
+      });
+      isWindowMessageListenerRegistered = true;
+    }
+
     const serverStartPromise = new Promise((resolve, reject) => {
       let serverStartPromiseCompleted = false;
       debuggerServerState = 'stopped';
@@ -56,12 +116,7 @@ class LocalPreviewDebuggerServer {
         const debuggerIdIndex = debuggerIds.indexOf(id);
         if (debuggerIdIndex !== -1) debuggerIds.splice(debuggerIdIndex, 1);
 
-        callbacksList.forEach(({ onConnectionClosed }) =>
-          onConnectionClosed({
-            id,
-            debuggerIds,
-          })
-        );
+        notifyConnectionClosed(id);
       });
 
       ipcRenderer.on('debugger-connection-opened', (event, { id }) => {
@@ -69,7 +124,7 @@ class LocalPreviewDebuggerServer {
         callbacksList.forEach(({ onConnectionOpened }) =>
           onConnectionOpened({
             id,
-            debuggerIds,
+            debuggerIds: getExistingDebuggerIds(),
           })
         );
       });
@@ -111,22 +166,7 @@ class LocalPreviewDebuggerServer {
           );
         }
 
-        if (parsedMessage && parsedMessage.messageId) {
-          const answerCallback = responseCallbacks.get(parsedMessage.messageId);
-          if (answerCallback) {
-            answerCallback(parsedMessage);
-            responseCallbacks.delete(parsedMessage.messageId);
-          } else {
-            console.warn(
-              `Discarding response for messageId=${
-                parsedMessage.messageId
-              } - already handled or invalid id.`
-            );
-          }
-        }
-        callbacksList.forEach(({ onHandleParsedMessage }) =>
-          onHandleParsedMessage({ id, parsedMessage })
-        );
+        handleParsedMessage(id, parsedMessage);
       });
       ipcRenderer.send('debugger-start-server');
     });
@@ -145,6 +185,18 @@ class LocalPreviewDebuggerServer {
     return Promise.race([serverStartPromise, serverStartTimeoutPromise]);
   }
   sendMessage(id: DebuggerId, message: Object) {
+    if (id === 'embedded-game-frame') {
+      if (!embeddedGameFrameWindow) {
+        console.error(
+          'Cannot send message to the embedded game frame as it is not registered.'
+        );
+        return;
+      }
+
+      embeddedGameFrameWindow.postMessage(message, '*');
+      return;
+    }
+
     if (!ipcRenderer) return;
     if (debuggerServerState === 'stopped') {
       console.error('Cannot send message when debugger server is stopped.');
@@ -159,7 +211,7 @@ class LocalPreviewDebuggerServer {
   sendMessageWithResponse(message: Object): Promise<Object> {
     const messageId = nextMessageWithResponseId;
     nextMessageWithResponseId++;
-    for (const id of debuggerIds) {
+    for (const id of getExistingDebuggerIds()) {
       this.sendMessage(id, { ...message, messageId });
     }
 
@@ -181,7 +233,7 @@ class LocalPreviewDebuggerServer {
     return debuggerServerState;
   }
   getExistingDebuggerIds() {
-    return debuggerIds;
+    return getExistingDebuggerIds();
   }
   registerCallbacks(callbacks: PreviewDebuggerServerCallbacks) {
     callbacksList.push(callbacks);
@@ -191,30 +243,53 @@ class LocalPreviewDebuggerServer {
       if (callbacksIndex !== -1) callbacksList.splice(callbacksIndex, 1);
     };
   }
-  registerEmbeddedGameFrame(window: WindowProxy) {
-    // Nothing to do, the local preview debugger server communicates
-    // with the embedded game frame through WebSocket, like other preview windows.
+  registerEmbeddedGameFrame(embeddedWindow: WindowProxy) {
+    if (embeddedWindow === embeddedGameFrameWindow) return;
+
+    if (embeddedGameFrameWindow) {
+      console.warn(
+        'An embedded game frame window was already registered. It will be replaced by the new one.'
+      );
+    }
+
+    embeddedGameFrameWindow = embeddedWindow;
+    callbacksList.forEach(({ onConnectionOpened }) =>
+      onConnectionOpened({
+        id: 'embedded-game-frame',
+        debuggerIds: getExistingDebuggerIds(),
+      })
+    );
   }
-  unregisterEmbeddedGameFrame(window: WindowProxy) {
-    // Nothing to do, see registerEmbeddedGameFrame comment.
+  unregisterEmbeddedGameFrame(embeddedWindow: WindowProxy) {
+    if (embeddedGameFrameWindow !== embeddedWindow) {
+      if (!!embeddedGameFrameWindow) {
+        console.warn(
+          'The embedded game frame window to unregister is not the same as the one registered. Ignoring the unregistration.'
+        );
+      }
+      return;
+    }
+
+    embeddedGameFrameWindow = null;
+    notifyConnectionClosed('embedded-game-frame');
   }
   closeAllConnections() {
     const previousDebuggerIds = [...debuggerIds];
     debuggerIds.length = 0;
 
     previousDebuggerIds.forEach(id => {
-      callbacksList.forEach(({ onConnectionClosed }) =>
-        onConnectionClosed({
-          id,
-          debuggerIds,
-        })
-      );
+      notifyConnectionClosed(id);
     });
 
     responseCallbacks.clear();
 
     if (ipcRenderer && previousDebuggerIds.length) {
       ipcRenderer.send('debugger-close-all-connections');
+    }
+
+    if (embeddedGameFrameWindow) {
+      embeddedGameFrameWindow = null;
+      notifyConnectionClosed('embedded-game-frame');
     }
   }
 }

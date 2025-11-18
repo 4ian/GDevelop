@@ -50,6 +50,9 @@ namespace gdjs {
     private _wheelDeltaX: float = 0;
     private _wheelDeltaY: float = 0;
     private _wheelDeltaZ: float = 0;
+    private _isPointerLocked: boolean = false;
+    private _pointerMovementX: float = 0;
+    private _pointerMovementY: float = 0;
 
     // TODO Remove _touches when there is no longer SpritePanelButton 1.2.0
     // extension in the wild.
@@ -266,6 +269,56 @@ namespace gdjs {
           this.getCursorY()
         );
       }
+    }
+
+    /**
+     * Should be called when the pointer is moved while locked.
+     * This is used for pointer lock API movement deltas.
+     *
+     * @param movementX The movement delta on X axis
+     * @param movementY The movement delta on Y axis
+     */
+    onPointerLockMove(movementX: float, movementY: float): void {
+      this._pointerMovementX = movementX;
+      this._pointerMovementY = movementY;
+    }
+
+    /**
+     * Get the pointer movement delta on X axis (from pointer lock).
+     * This is reset after each frame.
+     *
+     * @return the pointer movement delta on X axis
+     */
+    getPointerMovementX(): float {
+      return this._pointerMovementX;
+    }
+
+    /**
+     * Get the pointer movement delta on Y axis (from pointer lock).
+     * This is reset after each frame.
+     *
+     * @return the pointer movement delta on Y axis
+     */
+    getPointerMovementY(): float {
+      return this._pointerMovementY;
+    }
+
+    /**
+     * Set whether the pointer is currently locked.
+     *
+     * @param isLocked true if the pointer is locked, false otherwise
+     */
+    setPointerLocked(isLocked: boolean): void {
+      this._isPointerLocked = isLocked;
+    }
+
+    /**
+     * Return true if the pointer is currently locked.
+     *
+     * @return true if the pointer is locked
+     */
+    isPointerLocked(): boolean {
+      return this._isPointerLocked;
     }
 
     _setCursorPosition(x: float, y: float): void {
@@ -627,6 +680,8 @@ namespace gdjs {
       this._wheelDeltaX = 0;
       this._wheelDeltaY = 0;
       this._wheelDeltaZ = 0;
+      this._pointerMovementX = 0;
+      this._pointerMovementY = 0;
       this._lastStartedTouchIndex = 0;
       this._lastEndedTouchIndex = 0;
     }

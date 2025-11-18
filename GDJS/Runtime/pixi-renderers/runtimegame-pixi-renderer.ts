@@ -756,8 +756,16 @@ namespace gdjs {
         return button;
       }
       canvas.onmousemove = (e) => {
-        const pos = this.convertPageToGameCoords(e.pageX, e.pageY);
-        manager.onMouseMove(pos[0], pos[1]);
+        // When pointer is locked, use movementX/movementY from the event
+        if (document.pointerLockElement === canvas) {
+          manager.onPointerLockMove(
+            (e as MouseEvent).movementX || 0,
+            (e as MouseEvent).movementY || 0
+          );
+        } else {
+          const pos = this.convertPageToGameCoords(e.pageX, e.pageY);
+          manager.onMouseMove(pos[0], pos[1]);
+        }
       };
       canvas.onmousedown = (e) => {
         const pos = this.convertPageToGameCoords(e.pageX, e.pageY);
@@ -820,6 +828,13 @@ namespace gdjs {
       canvas.onwheel = function (event) {
         manager.onMouseWheel(-event.deltaY, event.deltaX, event.deltaZ);
       };
+      // Handle pointer lock state changes
+      document.addEventListener('pointerlockchange', () => {
+        manager.setPointerLocked(document.pointerLockElement === canvas);
+      });
+      document.addEventListener('pointerlockerror', () => {
+        manager.setPointerLocked(false);
+      });
 
       // Touches:
       window.addEventListener(

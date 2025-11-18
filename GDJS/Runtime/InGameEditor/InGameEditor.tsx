@@ -4303,25 +4303,66 @@ namespace gdjs {
 
     setEnabled(isEnabled: boolean): void {
       this._isEnabled = isEnabled;
+      // Release pointer lock when camera control is disabled
+      if (!isEnabled && document.exitPointerLock) {
+        const runtimeGame = this._editorCamera.editor.getRuntimeGame();
+        const inputManager = runtimeGame.getInputManager();
+        if (inputManager.isPointerLocked()) {
+          document.exitPointerLock();
+        }
+      }
       this._editorCamera.onHasCameraChanged();
     }
 
     step(): void {
       const runtimeGame = this._editorCamera.editor.getRuntimeGame();
       const inputManager = runtimeGame.getInputManager();
+      const canvas = runtimeGame.getRenderer().getCanvas();
       if (this._isEnabled) {
+        // Request pointer lock when right or middle click is pressed
+        const isRightButtonPressed = inputManager.isMouseButtonPressed(1);
+        const isMiddleButtonPressed = inputManager.isMouseButtonPressed(2);
+        const shouldLockPointer =
+          (isRightButtonPressed || isMiddleButtonPressed) &&
+          !inputManager.isPointerLocked() &&
+          canvas &&
+          canvas.requestPointerLock;
+
+        if (shouldLockPointer) {
+          canvas.requestPointerLock();
+        }
+
+        // Release pointer lock when both buttons are released
+        if (
+          !isRightButtonPressed &&
+          !isMiddleButtonPressed &&
+          inputManager.isPointerLocked() &&
+          document.exitPointerLock
+        ) {
+          document.exitPointerLock();
+        }
+
         // Right click: rotate the camera.
         // Middle click: also rotate the camera.
         if (
-          (inputManager.isMouseButtonPressed(1) &&
+          (isRightButtonPressed &&
             // The camera should not move the 1st frame
             this._wasMouseRightButtonPressed) ||
-          (inputManager.isMouseButtonPressed(2) &&
+          (isMiddleButtonPressed &&
             // The camera should not move the 1st frame
             this._wasMouseMiddleButtonPressed)
         ) {
-          const xDelta = inputManager.getCursorX() - this._lastCursorX;
-          const yDelta = inputManager.getCursorY() - this._lastCursorY;
+          let xDelta: float;
+          let yDelta: float;
+
+          // Use pointer lock movement deltas if locked, otherwise use cursor position deltas
+          if (inputManager.isPointerLocked()) {
+            xDelta = inputManager.getPointerMovementX();
+            yDelta = inputManager.getPointerMovementY();
+          } else {
+            xDelta = inputManager.getCursorX() - this._lastCursorX;
+            yDelta = inputManager.getCursorY() - this._lastCursorY;
+          }
 
           const rotationSpeed = 0.2;
           this.rotationAngle += xDelta * rotationSpeed;
@@ -4550,6 +4591,14 @@ namespace gdjs {
 
     setEnabled(isEnabled: boolean): void {
       this._isEnabled = isEnabled;
+      // Release pointer lock when camera control is disabled
+      if (!isEnabled && document.exitPointerLock) {
+        const runtimeGame = this._editorCamera.editor.getRuntimeGame();
+        const inputManager = runtimeGame.getInputManager();
+        if (inputManager.isPointerLocked()) {
+          document.exitPointerLock();
+        }
+      }
       this._editorCamera.onHasCameraChanged();
     }
 
@@ -4687,14 +4736,45 @@ namespace gdjs {
           moveCameraByVector(right, xDelta);
         }
 
+        // Request pointer lock when right click is pressed
+        const isRightButtonPressed = inputManager.isMouseButtonPressed(1);
+        const canvas = runtimeGame.getRenderer().getCanvas();
+        const shouldLockPointer =
+          isRightButtonPressed &&
+          !inputManager.isPointerLocked() &&
+          canvas &&
+          canvas.requestPointerLock;
+
+        if (shouldLockPointer) {
+          canvas.requestPointerLock();
+        }
+
+        // Release pointer lock when right button is released
+        if (
+          !isRightButtonPressed &&
+          inputManager.isPointerLocked() &&
+          document.exitPointerLock
+        ) {
+          document.exitPointerLock();
+        }
+
         // Right click: rotate the camera.
         if (
-          inputManager.isMouseButtonPressed(1) &&
+          isRightButtonPressed &&
           // The camera should not move the 1st frame
           this._wasMouseRightButtonPressed
         ) {
-          const xDelta = inputManager.getCursorX() - this._lastCursorX;
-          const yDelta = inputManager.getCursorY() - this._lastCursorY;
+          let xDelta: float;
+          let yDelta: float;
+
+          // Use pointer lock movement deltas if locked, otherwise use cursor position deltas
+          if (inputManager.isPointerLocked()) {
+            xDelta = inputManager.getPointerMovementX();
+            yDelta = inputManager.getPointerMovementY();
+          } else {
+            xDelta = inputManager.getCursorX() - this._lastCursorX;
+            yDelta = inputManager.getCursorY() - this._lastCursorY;
+          }
 
           const rotationSpeed = 0.2;
           this.rotationAngle += xDelta * rotationSpeed;

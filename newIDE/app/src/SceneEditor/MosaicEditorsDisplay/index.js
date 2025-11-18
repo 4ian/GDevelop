@@ -330,6 +330,7 @@ const MosaicEditorsDisplay = React.forwardRef<
           ref={layersListRef}
           hotReloadPreviewButtonProps={props.hotReloadPreviewButtonProps}
           onBackgroundColorChanged={props.onBackgroundColorChanged}
+          gameEditorMode={props.gameEditorMode}
         />
       ),
     },

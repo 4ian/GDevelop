@@ -243,6 +243,7 @@ type Props = {|
   onLayersVisibilityInEditorChanged: () => void,
   onBackgroundColorChanged: () => void,
   unsavedChanges?: ?UnsavedChanges,
+  gameEditorMode: 'embedded-game' | 'instances-editor',
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
@@ -338,26 +339,28 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
           </FullSizeMeasurer>
           <Column>
             <LineStackLayout justifyContent="flex-end" expand>
-              <IconButton
-                size="small"
-                color="default"
-                id={'show-effects-button'}
-                onClick={() => {
-                  project.setEffectsHiddenInEditor(
+              {props.gameEditorMode === 'embedded-game' && (
+                <IconButton
+                  size="small"
+                  color="default"
+                  id={'show-effects-button'}
+                  onClick={() => {
+                    project.setEffectsHiddenInEditor(
+                      !project.areEffectsHiddenInEditor()
+                    );
+                    props.onLayersVisibilityInEditorChanged();
+                    forceUpdate();
+                  }}
+                  selected={!project.areEffectsHiddenInEditor()}
+                  tooltip={
                     !project.areEffectsHiddenInEditor()
-                  );
-                  props.onLayersVisibilityInEditorChanged();
-                  forceUpdate();
-                }}
-                selected={!project.areEffectsHiddenInEditor()}
-                tooltip={
-                  !project.areEffectsHiddenInEditor()
-                    ? t`Disable effects/lighting in the editor`
-                    : t`Display effects/lighting in the editor`
-                }
-              >
-                <LightbulbIcon />
-              </IconButton>
+                      ? t`Disable effects/lighting in the editor`
+                      : t`Display effects/lighting in the editor`
+                  }
+                >
+                  <LightbulbIcon />
+                </IconButton>
+              )}
               <RaisedButtonWithSplitMenu
                 label={<Trans>Add a layer</Trans>}
                 id="add-layer-button"

@@ -1,0 +1,35 @@
+.coloredButtonContainer {
+    position: relative;
+    overflow: hidden;
+    padding: 2px;
+    border-radius: 10px;
+    display: flex;
+    flex-shrink: 0;
+}
+
+.coloredButtonContainer::before {
+    content: '';
+    display: block;
+    width: 100%;
+    padding-bottom: 100%;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.coloredButtonContainer.buttonContainerSuccess::before {
+    background: var(--theme-success-color);
+}
+
+.coloredButtonContainer.buttonContainerDanger::before {
+    background: var(--theme-error-color);
+}
+
+.coloredButtonContainer.buttonContainerPremium::before {
+    background: linear-gradient(90deg, var(--theme-premium-teal) 0%, var(--theme-premium-orange) 100%);
+}
+
+.coloredButtonContainer.buttonContainerAi::before {
+    background: linear-gradient(90deg, rgb(153, 121, 241) 0%, rgb(255, 188, 87) 100%);
+}

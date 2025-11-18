@@ -101,6 +101,54 @@ export const Default = () => (
     </LineStackLayout>
     <LineStackLayout noMargin>
       <RaisedButton
+        label="Premium Raised button"
+        color="premium"
+        onClick={action('onClick')()}
+      />
+      <RaisedButton
+        label="Premium Raised button"
+        disabled
+        color="premium"
+        onClick={action('onClick')()}
+      />
+      <RaisedButton
+        icon={<Download />}
+        label="Premium Raised button"
+        color="premium"
+        onClick={action('onClick')()}
+      />
+      <RaisedButton
+        icon={<Download />}
+        color="premium"
+        onClick={action('onClick')()}
+      />
+    </LineStackLayout>
+    <LineStackLayout noMargin>
+      <RaisedButton
+        label="AI Raised button"
+        color="ai"
+        onClick={action('onClick')()}
+      />
+      <RaisedButton
+        label="AI Raised button"
+        disabled
+        color="ai"
+        onClick={action('onClick')()}
+      />
+      <RaisedButton
+        icon={<Download />}
+        label="AI Raised button"
+        color="ai"
+        onClick={action('onClick')()}
+      />
+      <RaisedButton
+        icon={<Download />}
+        color="ai"
+        onClick={action('onClick')()}
+      />
+    </LineStackLayout>
+    <LineStackLayout noMargin>
+      <RaisedButton
         label="Success Raised button"
         color="success"
         onClick={action('onClick')()}
@@ -189,6 +237,82 @@ export const Default = () => (
         leftIcon={<Download />}
         label="Primary Flat button"
         primary
+        onClick={action('onClick')()}
+      />
+    </LineStackLayout>
+    <LineStackLayout noMargin>
+      <FlatButton
+        label="Premium Flat button"
+        color="premium"
+        onClick={action('onClick')()}
+      />
+      <FlatButton
+        disabled
+        label="Premium Flat button"
+        color="premium"
+        onClick={action('onClick')()}
+      />
+      <FlatButton
+        leftIcon={<Download />}
+        label="Premium Flat button"
+        color="premium"
+        onClick={action('onClick')()}
+      />
+    </LineStackLayout>
+    <LineStackLayout noMargin>
+      <FlatButton
+        label="AI Flat button"
+        color="ai"
+        onClick={action('onClick')()}
+      />
+      <FlatButton
+        disabled
+        label="AI Flat button"
+        color="ai"
+        onClick={action('onClick')()}
+      />
+      <FlatButton
+        leftIcon={<Download />}
+        label="AI Flat button"
+        color="ai"
+        onClick={action('onClick')()}
+      />
+    </LineStackLayout>
+    <LineStackLayout noMargin>
+      <FlatButton
+        label="Success Flat button"
+        color="success"
+        onClick={action('onClick')()}
+      />
+      <FlatButton
+        disabled
+        label="Success Flat button"
+        color="success"
+        onClick={action('onClick')()}
+      />
+      <FlatButton
+        leftIcon={<Download />}
+        label="Success Flat button"
+        color="success"
+        onClick={action('onClick')()}
+      />
+    </LineStackLayout>
+    <LineStackLayout noMargin>
+      <FlatButton
+        label="Danger Flat button"
+        color="danger"
+        onClick={action('onClick')()}
+      />
+      <FlatButton
+        disabled
+        label="Danger Flat button"
+        color="danger"
+        onClick={action('onClick')()}
+      />
+      <FlatButton
+        leftIcon={<Download />}
+        label="Danger Flat button"
+        color="danger"
         onClick={action('onClick')()}
       />
     </LineStackLayout>

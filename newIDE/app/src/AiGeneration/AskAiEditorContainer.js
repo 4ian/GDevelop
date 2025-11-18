@@ -268,7 +268,7 @@ export const AskAiEditor = React.memo<Props>(
         selectedAiRequestId,
         selectedAiRequestMode,
         setAiState,
-      } = useAiRequestState();
+      } = useAiRequestState({ project });
       const upToDateSelectedAiRequestId = useStableUpToDateRef(
         selectedAiRequestId
       );
@@ -631,6 +631,14 @@ export const AskAiEditor = React.memo<Props>(
               projectSpecificExtensionsSummaryJson,
             });
 
+            // If we're updating the request, following a function call to initialize the project,
+            // pause the request, so that suggestions can be given by the agent.
+            const paused =
+              functionCallOutputs.length > 0 &&
+              functionCallOutputs.some(
+                output => output.call_id.indexOf('initialize_project') !== -1
+              );
+
             const aiRequest: AiRequest = await retryIfFailed({ times: 2 }, () =>
               addMessageToAiRequest(getAuthorizationHeader, {
                 userId: profile.id,
@@ -640,6 +648,7 @@ export const AskAiEditor = React.memo<Props>(
                 gameId: project ? project.getProjectUuid() : undefined,
                 payWithCredits,
                 userMessage,
+                paused,
               })
             );
             updateAiRequest(aiRequest.id, aiRequest);

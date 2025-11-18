@@ -259,7 +259,9 @@ export default class LocalPreviewLauncher extends React.Component<
     }
 
     const previewDebuggerServerAddress = getDebuggerServerAddress();
-    if (previewDebuggerServerAddress) {
+    if (previewOptions.isForInGameEdition) {
+      previewExportOptions.useWindowMessageDebuggerClient();
+    } else if (previewDebuggerServerAddress) {
       previewExportOptions.useWebsocketDebuggerClientWithServerAddress(
         previewDebuggerServerAddress.address,
         '' + previewDebuggerServerAddress.port

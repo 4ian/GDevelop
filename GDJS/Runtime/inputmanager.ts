@@ -38,6 +38,7 @@ namespace gdjs {
      * The cursor Y position (moved by mouse and touch events).
      */
     private _cursorY: float = 0;
+
     /**
      * The mouse X position (only moved by mouse events).
      */
@@ -50,6 +51,15 @@ namespace gdjs {
     private _wheelDeltaX: float = 0;
     private _wheelDeltaY: float = 0;
     private _wheelDeltaZ: float = 0;
+
+    /**
+     * The mouse movement X (only moved by mouse events).
+     */
+    private _mouseMovementX: float = 0;
+    /**
+     * The mouse movement Y (only moved by mouse events).
+     */
+    private _mouseMovementY: float = 0;
 
     // TODO Remove _touches when there is no longer SpritePanelButton 1.2.0
     // extension in the wild.
@@ -249,16 +259,32 @@ namespace gdjs {
 
     /**
      * Should be called when the mouse is moved.
+     * Some browsers or environments may call this function multiple times during a single frame.
      *
      * Please note that the coordinates must be expressed relative to the view position.
      *
      * @param x The mouse new X position
      * @param y The mouse new Y position
+     * @param options An object containing the mouse movement X and Y if available.
      */
-    onMouseMove(x: float, y: float): void {
+    onMouseMove(
+      x: float,
+      y: float,
+      options?: { movementX: float; movementY: float }
+    ): void {
       this._setCursorPosition(x, y);
       this._mouseX = x;
       this._mouseY = y;
+
+      if (options) {
+        // Mouse movement can be accumulated over multiple calls to onMouseMove during a single frame.
+        // This is the case with Firefox which calls onMouseMove multiple times, including with
+        // values being 0 (so we can't just rely on the last one).
+        const { movementX, movementY } = options;
+        if (movementX !== undefined) this._mouseMovementX += movementX;
+        if (movementY !== undefined) this._mouseMovementY += movementY;
+      }
+
       if (this.isMouseButtonPressed(InputManager.MOUSE_LEFT_BUTTON)) {
         this._moveTouch(
           InputManager.MOUSE_TOUCH_ID,
@@ -309,6 +335,24 @@ namespace gdjs {
      */
     getMouseY(): float {
       return this._mouseY;
+    }
+
+    /**
+     * Get the mouse movement on X axis.
+     *
+     * @return the mouse movement X.
+     */
+    getMouseMovementX(): float {
+      return this._mouseMovementX;
+    }
+
+    /**
+     * Get the mouse movement on Y axis.
+     *
+     * @return the mouse movement Y.
+     */
+    getMouseMovementY(): float {
+      return this._mouseMovementY;
     }
 
     /**
@@ -627,6 +671,8 @@ namespace gdjs {
       this._wheelDeltaX = 0;
       this._wheelDeltaY = 0;
       this._wheelDeltaZ = 0;
+      this._mouseMovementX = 0;
+      this._mouseMovementY = 0;
       this._lastStartedTouchIndex = 0;
       this._lastEndedTouchIndex = 0;
     }

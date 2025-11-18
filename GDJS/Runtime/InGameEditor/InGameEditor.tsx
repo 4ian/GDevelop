@@ -485,6 +485,9 @@ namespace gdjs {
     }
   };
 
+  const pressAndReleaseForClickDuration = 200;
+  const timeBetweenClicksForDoubleClick = 400;
+
   /** Get the identifiers of the touches that are currently active, without the mouse. */
   const getCurrentTouchIdentifiers = (inputManager: gdjs.InputManager) => {
     return inputManager
@@ -835,12 +838,15 @@ namespace gdjs {
       new Map();
     private _objectMover = new ObjectMover(this);
 
-    private _wasMouseRightButtonPressed = false;
     private _wasMouseLeftButtonPressed = false;
+    private _wasMouseRightButtonPressed = false;
+    private _wasMouseMiddleButtonPressed = false;
     private _pressedOriginalCursorX: float = 0;
     private _pressedOriginalCursorY: float = 0;
     private _previousCursorX: float = 0;
     private _previousCursorY: float = 0;
+    private _pressedRightButtonTime: number = 0;
+    private _pressedMiddleButtonTime: number = 0;
 
     private _lastClickOnObjectUnderCursor: {
       object: gdjs.RuntimeObject | null;
@@ -1985,7 +1991,8 @@ namespace gdjs {
 
           if (
             this._lastClickOnObjectUnderCursor.object === objectUnderCursor &&
-            Date.now() - this._lastClickOnObjectUnderCursor.time < 400
+            Date.now() - this._lastClickOnObjectUnderCursor.time <
+              timeBetweenClicksForDoubleClick
           ) {
             // Double click on the same object: edit the object.
             objectToEdit = objectUnderCursor;
@@ -2551,7 +2558,10 @@ namespace gdjs {
           this._selection.getSelectedObjects()
         ),
         removedInstances: getPersistentUuidsFromObjects(removedInstances),
-        objectNameToEdit: options && options.objectToEdit ? options.objectToEdit.getName() : null,
+        objectNameToEdit:
+          options && options.objectToEdit
+            ? options.objectToEdit.getName()
+            : null,
       });
     }
 
@@ -2715,10 +2725,10 @@ namespace gdjs {
 
     private _handleContextMenu() {
       const inputManager = this._runtimeGame.getInputManager();
-      if (
-        inputManager.isMouseButtonReleased(1) &&
-        this._hasCursorStayedStillWhilePressed({ toleranceRadius: 0 })
-      ) {
+      const isClick =
+        Date.now() - this._pressedRightButtonTime <=
+        pressAndReleaseForClickDuration;
+      if (inputManager.isMouseButtonReleased(1) && isClick) {
         this._sendOpenContextMenu(
           inputManager.getCursorX(),
           inputManager.getCursorY()
@@ -3360,6 +3370,33 @@ namespace gdjs {
       }
     }
 
+    private _handlePointerLock() {
+      const inputManager = this._runtimeGame.getInputManager();
+      const renderer = this._runtimeGame.getRenderer();
+      const isRightButtonPressed = inputManager.isMouseButtonPressed(1);
+      const isMiddleButtonPressed = inputManager.isMouseButtonPressed(2);
+
+      // Request pointer lock when right or middle button is pressed,
+      // but only after the delay to ensure it's not a click.
+      if (
+        (isRightButtonPressed &&
+          Date.now() - this._pressedRightButtonTime >
+            pressAndReleaseForClickDuration) ||
+        (isMiddleButtonPressed &&
+          Date.now() - this._pressedMiddleButtonTime >
+            pressAndReleaseForClickDuration)
+      ) {
+        renderer.requestPointerLock('in-game-editor');
+      }
+
+      // Exit pointer lock as soon as we can.
+      if (!isRightButtonPressed && !isMiddleButtonPressed) {
+        if (renderer.isPointerLocked()) {
+          renderer.exitPointerLock('in-game-editor');
+        }
+      }
+    }
+
     updateTargetFramerate(elapsedTime: float) {
       const inputManager = this._runtimeGame.getInputManager();
       if (
@@ -3404,15 +3441,29 @@ namespace gdjs {
       }
       this._windowHadFocus = hasWindowFocus;
 
-      if (
+      // Update the state of the mouse/cursor for this frame.
+      const mouseLeftButtonJustPressed =
         !this._wasMouseLeftButtonPressed &&
+        inputManager.isMouseButtonPressed(0);
+      const mouseRightButtonJustPressed =
         !this._wasMouseRightButtonPressed &&
-        (inputManager.isMouseButtonPressed(0) ||
-          inputManager.isMouseButtonPressed(1))
-      ) {
+        inputManager.isMouseButtonPressed(1);
+      const mouseMiddleButtonJustPressed =
+        !this._wasMouseMiddleButtonPressed &&
+        inputManager.isMouseButtonPressed(2);
+      if (mouseLeftButtonJustPressed || mouseRightButtonJustPressed) {
         this._pressedOriginalCursorX = inputManager.getCursorX();
         this._pressedOriginalCursorY = inputManager.getCursorY();
       }
+      if (mouseRightButtonJustPressed) {
+        this._pressedRightButtonTime = Date.now();
+      }
+      if (mouseMiddleButtonJustPressed) {
+        this._pressedMiddleButtonTime = Date.now();
+      }
+
+      // Note: don't add more logic here. Instead, create a new method
+      // to handle what you need, possibly with a dedicated class to abstract it.
 
       if (!this._selectionControls) {
         this._isTransformControlsHovered = false;
@@ -3424,6 +3475,7 @@ namespace gdjs {
           !!this._selectionControls.threeTransformControls.axis;
       }
 
+      this._handlePointerLock();
       this._handleTransformControlsMode();
       this._handleCameraMovement();
       this._handleSelectedObjectDragging();
@@ -3452,6 +3504,7 @@ namespace gdjs {
         this._toolbar.render(domElementContainer);
       }
 
+      // Prepare state of the mouse/cursor for the next frame.
       this._wasMovingSelectionLastFrame =
         !!this._selectionControlsMovementTotalDelta;
       if (!this._selectionControlsMovementTotalDelta) {
@@ -3459,6 +3512,7 @@ namespace gdjs {
       }
       this._wasMouseLeftButtonPressed = inputManager.isMouseButtonPressed(0);
       this._wasMouseRightButtonPressed = inputManager.isMouseButtonPressed(1);
+      this._wasMouseMiddleButtonPressed = inputManager.isMouseButtonPressed(2);
       this._previousCursorX = inputManager.getMouseX();
       this._previousCursorY = inputManager.getMouseY();
 
@@ -3466,6 +3520,7 @@ namespace gdjs {
         this._currentScene._updateObjectsForInGameEditor();
         this._currentScene.render();
       }
+
       this._isFirstFrame = false;
     }
 
@@ -4309,19 +4364,28 @@ namespace gdjs {
     step(): void {
       const runtimeGame = this._editorCamera.editor.getRuntimeGame();
       const inputManager = runtimeGame.getInputManager();
+      const renderer = runtimeGame.getRenderer();
+      const isRightButtonPressed = inputManager.isMouseButtonPressed(1);
+      const isMiddleButtonPressed = inputManager.isMouseButtonPressed(2);
+
       if (this._isEnabled) {
         // Right click: rotate the camera.
         // Middle click: also rotate the camera.
         if (
-          (inputManager.isMouseButtonPressed(1) &&
+          (isRightButtonPressed &&
             // The camera should not move the 1st frame
             this._wasMouseRightButtonPressed) ||
-          (inputManager.isMouseButtonPressed(2) &&
+          (isMiddleButtonPressed &&
             // The camera should not move the 1st frame
             this._wasMouseMiddleButtonPressed)
         ) {
-          const xDelta = inputManager.getCursorX() - this._lastCursorX;
-          const yDelta = inputManager.getCursorY() - this._lastCursorY;
+          // Use movement deltas when pointer is locked, otherwise use cursor position delta
+          const xDelta = renderer.isPointerLocked()
+            ? inputManager.getMouseMovementX()
+            : inputManager.getCursorX() - this._lastCursorX;
+          const yDelta = renderer.isPointerLocked()
+            ? inputManager.getMouseMovementY()
+            : inputManager.getCursorY() - this._lastCursorY;
 
           const rotationSpeed = 0.2;
           this.rotationAngle += xDelta * rotationSpeed;
@@ -4392,8 +4456,8 @@ namespace gdjs {
         this._gestureActiveTouchIds = [];
       }
 
-      this._wasMouseRightButtonPressed = inputManager.isMouseButtonPressed(1);
-      this._wasMouseMiddleButtonPressed = inputManager.isMouseButtonPressed(2);
+      this._wasMouseRightButtonPressed = isRightButtonPressed;
+      this._wasMouseMiddleButtonPressed = isMiddleButtonPressed;
       this._lastCursorX = inputManager.getCursorX();
       this._lastCursorY = inputManager.getCursorY();
     }
@@ -4556,6 +4620,8 @@ namespace gdjs {
     step(): void {
       const runtimeGame = this._editorCamera.editor.getRuntimeGame();
       const inputManager = runtimeGame.getInputManager();
+      const renderer = runtimeGame.getRenderer();
+      const isRightButtonPressed = inputManager.isMouseButtonPressed(1);
       if (this._isEnabled) {
         const { right, up, forward } = this.getCameraVectors();
 
@@ -4689,12 +4755,17 @@ namespace gdjs {
 
         // Right click: rotate the camera.
         if (
-          inputManager.isMouseButtonPressed(1) &&
+          isRightButtonPressed &&
           // The camera should not move the 1st frame
           this._wasMouseRightButtonPressed
         ) {
-          const xDelta = inputManager.getCursorX() - this._lastCursorX;
-          const yDelta = inputManager.getCursorY() - this._lastCursorY;
+          // Use movement deltas when pointer is locked, otherwise use cursor position delta
+          const xDelta = renderer.isPointerLocked()
+            ? inputManager.getMouseMovementX()
+            : inputManager.getCursorX() - this._lastCursorX;
+          const yDelta = renderer.isPointerLocked()
+            ? inputManager.getMouseMovementY()
+            : inputManager.getCursorY() - this._lastCursorY;
 
           const rotationSpeed = 0.2;
           this.rotationAngle += xDelta * rotationSpeed;
@@ -4705,7 +4776,7 @@ namespace gdjs {
         // Reset gesture tracking when camera control is disabled.
         this._gestureActiveTouchIds = [];
       }
-      this._wasMouseRightButtonPressed = inputManager.isMouseButtonPressed(1);
+      this._wasMouseRightButtonPressed = isRightButtonPressed;
       this._lastCursorX = inputManager.getCursorX();
       this._lastCursorY = inputManager.getCursorY();
     }

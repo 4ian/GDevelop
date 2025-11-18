@@ -39,6 +39,8 @@ namespace gdjs {
     //Used to track if the window is displayed as fullscreen (see setFullscreen method).
     _forceFullscreen: any;
 
+    private _pointerLockReasons: Set<string> = new Set();
+
     _pixiRenderer: PIXI.Renderer | null = null;
     private _threeRenderer: THREE.WebGLRenderer | null = null;
     private _gameCanvas: HTMLCanvasElement | null = null;
@@ -524,6 +526,57 @@ namespace gdjs {
     }
 
     /**
+     * Request pointer lock for the game.
+     * Mouse cursor will disappear and its movement will be captured by the game,
+     * and can be read with the input manager of the game.
+     *
+     * @param reason The reason (arbitrary string) for the pointer lock request.
+     * This allows multiple parts of the game to request pointer lock for different reasons.
+     * @returns true if the request was initiated, false otherwise.
+     */
+    requestPointerLock(reason: string): boolean {
+      if (!this._gameCanvas) {
+        return false;
+      }
+
+      // Ensure we don't request pointer lock in a loop for the same reason.
+      if (this._pointerLockReasons.has(reason)) {
+        return false;
+      }
+
+      this._pointerLockReasons.add(reason);
+      try {
+        this._gameCanvas.requestPointerLock();
+        return true;
+      } catch (error) {
+        logger.error('Failed to request pointer lock:', error);
+        return false;
+      }
+    }
+
+    /**
+     * Exit pointer lock.
+     * Pointer lock will be dismissed if no other part of the game is requesting it.
+     *
+     * @param reason The reason (arbitrary string) to dismiss.
+     */
+    exitPointerLock(reason: string): void {
+      this._pointerLockReasons.delete(reason);
+      if (document.pointerLockElement && this._pointerLockReasons.size === 0) {
+        document.exitPointerLock();
+      }
+    }
+
+    /**
+     * Check if pointer is currently locked.
+     *
+     * @returns true if pointer is locked, false otherwise.
+     */
+    isPointerLocked(): boolean {
+      return document.pointerLockElement === this._gameCanvas;
+    }
+
+    /**
      * Convert a point from the canvas coordinates to the dom element container coordinates.
      *
      * @param canvasCoords The point in the canvas coordinates.
@@ -757,7 +810,10 @@ namespace gdjs {
       }
       canvas.onmousemove = (e) => {
         const pos = this.convertPageToGameCoords(e.pageX, e.pageY);
-        manager.onMouseMove(pos[0], pos[1]);
+        manager.onMouseMove(pos[0], pos[1], {
+          movementX: e.movementX,
+          movementY: e.movementY,
+        });
       };
       canvas.onmousedown = (e) => {
         const pos = this.convertPageToGameCoords(e.pageX, e.pageY);

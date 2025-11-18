@@ -335,7 +335,12 @@ export default class Debugger extends React.Component<Props, State> {
 
   _hasSelectedDebugger = () => {
     const { selectedId, debuggerIds } = this.state;
-    return debuggerIds.indexOf(selectedId) !== -1;
+    if (debuggerIds.indexOf(selectedId) === -1) return false;
+
+    const debuggerStatus = this.state.debuggerStatus[selectedId];
+    if (debuggerStatus && debuggerStatus.isInGameEdition) return false;
+
+    return true;
   };
 
   render() {

@@ -812,7 +812,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   editObject = (
     editedObject: ?gdObject,
     initialTab: ?ObjectEditorTab,
-    callback?: () => mixed
+    callback?: () => void
   ) => {
     const { project } = this.props;
     if (editedObject) {

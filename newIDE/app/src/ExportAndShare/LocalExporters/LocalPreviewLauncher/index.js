@@ -258,12 +258,19 @@ export default class LocalPreviewLauncher extends React.Component<
       );
     }
 
-    const previewDebuggerServerAddress = getDebuggerServerAddress();
-    if (previewDebuggerServerAddress) {
-      previewExportOptions.useWebsocketDebuggerClientWithServerAddress(
-        previewDebuggerServerAddress.address,
-        '' + previewDebuggerServerAddress.port
-      );
+    if (previewOptions.isForInGameEdition) {
+      // For in-game edition, use window message debugger client to communicate
+      // via postMessage instead of WebSocket (to avoid firewall issues).
+      previewExportOptions.useWindowMessageDebuggerClient();
+    } else {
+      // For regular previews, use WebSocket debugger client.
+      const previewDebuggerServerAddress = getDebuggerServerAddress();
+      if (previewDebuggerServerAddress) {
+        previewExportOptions.useWebsocketDebuggerClientWithServerAddress(
+          previewDebuggerServerAddress.address,
+          '' + previewDebuggerServerAddress.port
+        );
+      }
     }
 
     const includeFileHashs = this.props.getIncludeFileHashs();

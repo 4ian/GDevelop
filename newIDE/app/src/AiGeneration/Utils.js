@@ -44,6 +44,7 @@ export const useProcessFunctionCalls = ({
   onInstancesModifiedOutsideEditor,
   onObjectsModifiedOutsideEditor,
   onObjectGroupsModifiedOutsideEditor,
+  onWillInstallExtension,
   onExtensionInstalled,
   isReadyToProcessFunctionCalls,
 }: {|
@@ -72,6 +73,7 @@ export const useProcessFunctionCalls = ({
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   isReadyToProcessFunctionCalls: boolean,
 |}) => {
@@ -82,6 +84,7 @@ export const useProcessFunctionCalls = ({
   const { searchAndInstallAsset } = useSearchAndInstallAsset({
     project,
     resourceManagementProps,
+    onWillInstallExtension,
     onExtensionInstalled,
   });
   const { generateEvents } = useGenerateEvents({ project });
@@ -151,6 +154,8 @@ export const useProcessFunctionCalls = ({
         onObjectsModifiedOutsideEditor,
         onObjectGroupsModifiedOutsideEditor,
         ensureExtensionInstalled,
+        onWillInstallExtension,
+        onExtensionInstalled,
         searchAndInstallAsset,
       });
 
@@ -163,19 +168,21 @@ export const useProcessFunctionCalls = ({
       });
     },
     [
-      project,
       selectedAiRequest,
+      isReadyToProcessFunctionCalls,
       addEditorFunctionCallResults,
-      ensureExtensionInstalled,
-      searchAndInstallAsset,
-      generateEvents,
+      project,
+      editorCallbacks,
       onSceneEventsModifiedOutsideEditor,
       onInstancesModifiedOutsideEditor,
       onObjectsModifiedOutsideEditor,
       onObjectGroupsModifiedOutsideEditor,
+      ensureExtensionInstalled,
+      onWillInstallExtension,
+      onExtensionInstalled,
+      searchAndInstallAsset,
       triggerSendEditorFunctionCallResults,
-      editorCallbacks,
-      isReadyToProcessFunctionCalls,
+      generateEvents,
     ]
   );
 

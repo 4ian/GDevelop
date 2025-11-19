@@ -79,6 +79,8 @@ type Props = {|
         | 'none',
     |}
   ) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
   onOpenAskAi: (?OpenAskAiOptions) => void,
   onCloseAskAi: () => void,
   dismissableIdentifier?: string,
@@ -96,6 +98,8 @@ export const AskAiStandAloneForm = ({
   onOpenAskAi,
   onCloseAskAi,
   dismissableIdentifier,
+  onWillInstallExtension,
+  onExtensionInstalled,
 }: Props) => {
   const onCreateProject = React.useCallback(
     async ({
@@ -531,7 +535,8 @@ export const AskAiStandAloneForm = ({
     onInstancesModifiedOutsideEditor: () => {},
     onObjectsModifiedOutsideEditor: () => {},
     onObjectGroupsModifiedOutsideEditor: () => {},
-    onExtensionInstalled: () => {},
+    onWillInstallExtension,
+    onExtensionInstalled,
     isReadyToProcessFunctionCalls: true,
   });
 

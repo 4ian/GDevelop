@@ -1502,26 +1502,28 @@ const MainFrame = (props: Props) => {
     });
   };
 
-  const onInstallExtension = (extensionName: string) => {
+  const onWillInstallExtension = (extensionNames: Array<string>) => {
     const { currentProject } = state;
     if (!currentProject) return;
 
-    // Close the extension tab before updating/reinstalling the extension.
-    // This is especially important when the extension tab in selected.
-    const eventsFunctionsExtensionName = extensionName;
+    for (const extensionName of extensionNames) {
+      // Close the extension tab before updating/reinstalling the extension.
+      // This is especially important when the extension tab in selected.
+      const eventsFunctionsExtensionName = extensionName;
 
-    if (
-      currentProject.hasEventsFunctionsExtensionNamed(
-        eventsFunctionsExtensionName
-      )
-    ) {
-      setState(state => ({
-        ...state,
-        editorTabs: closeEventsFunctionsExtensionTabs(
-          state.editorTabs,
+      if (
+        currentProject.hasEventsFunctionsExtensionNamed(
           eventsFunctionsExtensionName
-        ),
-      }));
+        )
+      ) {
+        setState(state => ({
+          ...state,
+          editorTabs: closeEventsFunctionsExtensionTabs(
+            state.editorTabs,
+            eventsFunctionsExtensionName
+          ),
+        }));
+      }
     }
   };
 
@@ -4560,6 +4562,8 @@ const MainFrame = (props: Props) => {
     storageProvider: getStorageProvider(),
     resourceManagementProps,
     onOpenLayout: (name, options) => openLayout(name, options),
+    onWillInstallExtension,
+    onExtensionInstalled,
   });
 
   const gamesPlatformFrameTools = useGamesPlatformFrame({
@@ -4694,6 +4698,7 @@ const MainFrame = (props: Props) => {
     onInstancesModifiedOutsideEditor: onInstancesModifiedOutsideEditor,
     onObjectsModifiedOutsideEditor: onObjectsModifiedOutsideEditor,
     onObjectGroupsModifiedOutsideEditor: onObjectGroupsModifiedOutsideEditor,
+    onWillInstallExtension: onWillInstallExtension,
     onExtensionInstalled: onExtensionInstalled,
     onEffectAdded: onEffectAdded,
     onObjectListsModified: onObjectListsModified,
@@ -4773,7 +4778,6 @@ const MainFrame = (props: Props) => {
           onOpenLayout={(name, options) => openLayout(name, options)}
           onOpenExternalLayout={openExternalLayout}
           onOpenEventsFunctionsExtension={openEventsFunctionsExtension}
-          onInstallExtension={onInstallExtension}
           onDeleteLayout={deleteLayout}
           onDeleteExternalLayout={deleteExternalLayout}
           onDeleteEventsFunctionsExtension={deleteEventsFunctionsExtension}
@@ -4784,6 +4788,7 @@ const MainFrame = (props: Props) => {
           onRenameExternalEvents={renameExternalEvents}
           onOpenResources={openResources}
           onReloadEventsFunctionsExtensions={onReloadEventsFunctionsExtensions}
+          onWillInstallExtension={onWillInstallExtension}
           onExtensionInstalled={onExtensionInstalled}
           onSceneAdded={onSceneAdded}
           onExternalLayoutAdded={onExternalLayoutAdded}
@@ -5153,6 +5158,7 @@ const MainFrame = (props: Props) => {
             currentProject.getProjectUuid()
           )}
           onScreenshotsClaimed={onGameScreenshotsClaimed}
+          onWillInstallExtension={onWillInstallExtension}
           onExtensionInstalled={onExtensionInstalled}
         />
       )}

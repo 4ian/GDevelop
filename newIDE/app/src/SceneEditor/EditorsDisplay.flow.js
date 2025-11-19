@@ -117,6 +117,7 @@ export type SceneEditorsDisplayProps = {|
     i18n: I18nType,
     objectOrGroupName: string
   ) => boolean,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 
   updateBehaviorsSharedData: () => void,

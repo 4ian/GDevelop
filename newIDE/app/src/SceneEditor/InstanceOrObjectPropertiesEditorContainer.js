@@ -43,6 +43,7 @@ type Props = {|
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onObjectsModified: (objects: Array<gdObject>) => void,
   onUpdateBehaviorsSharedData: () => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onOpenEventBasedObjectVariantEditor: (
     extensionName: string,
@@ -96,6 +97,7 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
     resourceManagementProps,
     eventsFunctionsExtension,
     onUpdateBehaviorsSharedData,
+    onWillInstallExtension,
     onExtensionInstalled,
     onOpenEventBasedObjectVariantEditor,
     onDeleteEventsBasedObjectVariant,
@@ -133,6 +135,7 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
           resourceManagementProps={resourceManagementProps}
           eventsFunctionsExtension={eventsFunctionsExtension}
           onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}
+          onWillInstallExtension={onWillInstallExtension}
           onExtensionInstalled={onExtensionInstalled}
           isBehaviorListLocked={isBehaviorListLocked}
           onOpenEventBasedObjectVariantEditor={

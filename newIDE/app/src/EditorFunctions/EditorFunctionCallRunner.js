@@ -16,6 +16,7 @@ import {
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
 } from '.';
+import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
 
 export type EditorFunctionCallResult =
   | {|
@@ -53,9 +54,11 @@ export type ProcessEditorFunctionCallsOptions = {|
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
-  ensureExtensionInstalled: (options: {|
-    extensionName: string,
-  |}) => Promise<void>,
+  ensureExtensionInstalled: (
+    options: EnsureExtensionInstalledOptions
+  ) => Promise<void>,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
   searchAndInstallAsset: (
     options: AssetSearchAndInstallOptions
   ) => Promise<AssetSearchAndInstallResult>,
@@ -72,6 +75,8 @@ export const processEditorFunctionCalls = async ({
   onObjectGroupsModifiedOutsideEditor,
   ignore,
   ensureExtensionInstalled,
+  onWillInstallExtension,
+  onExtensionInstalled,
   searchAndInstallAsset,
 }: ProcessEditorFunctionCallsOptions): Promise<{|
   results: Array<EditorFunctionCallResult>,
@@ -168,6 +173,8 @@ export const processEditorFunctionCalls = async ({
         onObjectsModifiedOutsideEditor,
         onObjectGroupsModifiedOutsideEditor,
         ensureExtensionInstalled,
+        onWillInstallExtension,
+        onExtensionInstalled,
         searchAndInstallAsset,
       };
 

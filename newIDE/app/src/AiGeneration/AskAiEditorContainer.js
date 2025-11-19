@@ -128,6 +128,7 @@ type Props = {|
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onOpenAskAi: ({|
     mode: 'chat' | 'agent',
@@ -191,6 +192,7 @@ export const AskAiEditor = React.memo<Props>(
         onInstancesModifiedOutsideEditor,
         onObjectsModifiedOutsideEditor,
         onObjectGroupsModifiedOutsideEditor,
+        onWillInstallExtension,
         onExtensionInstalled,
         onOpenAskAi,
         gameEditorMode,
@@ -756,6 +758,7 @@ export const AskAiEditor = React.memo<Props>(
         onObjectsModifiedOutsideEditor,
         onObjectGroupsModifiedOutsideEditor,
         i18n,
+        onWillInstallExtension,
         onExtensionInstalled,
         isReadyToProcessFunctionCalls,
       });
@@ -983,6 +986,7 @@ export const renderAskAiEditorContainer = (
         onObjectGroupsModifiedOutsideEditor={
           props.onObjectGroupsModifiedOutsideEditor
         }
+        onWillInstallExtension={props.onWillInstallExtension}
         onExtensionInstalled={props.onExtensionInstalled}
         onOpenAskAi={props.onOpenAskAi}
         gameEditorMode={props.gameEditorMode}

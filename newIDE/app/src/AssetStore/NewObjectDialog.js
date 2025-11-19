@@ -15,26 +15,18 @@ import { AssetStoreContext } from './AssetStoreContext';
 import AssetPackInstallDialog from './AssetPackInstallDialog';
 import { type EnumeratedObjectMetadata } from '../ObjectsList/EnumerateObjects';
 import {
-  installRequiredExtensions,
   installPublicAsset,
-  checkRequiredExtensionsUpdate,
   checkRequiredExtensionsUpdateForAssets,
   type InstallAssetOutput,
   complyVariantsToEventsBasedObjectOf,
 } from './InstallAsset';
+import { checkRequiredExtensionsUpdate } from './ExtensionStore/InstallExtension';
 import {
   type Asset,
   type AssetShortHeader,
   getPublicAsset,
   isPrivateAsset,
 } from '../Utils/GDevelopServices/Asset';
-import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
-import {
-  getBreakingChanges,
-  formatExtensionsBreakingChanges,
-  type ExtensionChange,
-} from '../Utils/Extension/ExtensionCompatibilityChecker.js';
-import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import Window from '../Utils/Window';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
@@ -49,80 +41,13 @@ import ErrorBoundary from '../UI/ErrorBoundary';
 import type { ObjectFolderOrObjectWithContext } from '../ObjectsList/EnumerateObjectFolderOrObject';
 import LoaderModal from '../UI/LoaderModal';
 import { AssetStoreNavigatorContext } from './AssetStoreNavigator';
-import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import uniq from 'lodash/uniq';
+import { useInstallExtension } from './ExtensionStore/InstallExtension';
+import { ExtensionStoreContext } from './ExtensionStore/ExtensionStoreContext';
 
 const gd: libGDevelop = global.gd;
 
 const isDev = Window.isDev();
-
-export const useExtensionUpdateAlertDialog = () => {
-  const { showConfirmation, showDeleteConfirmation } = useAlertDialog();
-  const { currentlyRunningInAppTutorial } = React.useContext(
-    InAppTutorialContext
-  );
-  return async ({
-    project,
-    outOfDateExtensionShortHeaders,
-  }: {|
-    project: gdProject,
-    outOfDateExtensionShortHeaders: Array<ExtensionShortHeader>,
-  |}): Promise<string> => {
-    if (currentlyRunningInAppTutorial) {
-      return 'skip';
-    }
-    const breakingChanges = new Map<
-      ExtensionShortHeader,
-      Array<ExtensionChange>
-    >();
-    for (const extension of outOfDateExtensionShortHeaders) {
-      if (!project.hasEventsFunctionsExtensionNamed(extension.name)) {
-        continue;
-      }
-      const installedVersion = project
-        .getEventsFunctionsExtension(extension.name)
-        .getVersion();
-      const extensionBreakingChanges = getBreakingChanges(
-        installedVersion,
-        extension
-      );
-      if (extensionBreakingChanges.length > 0) {
-        breakingChanges.set(extension, extensionBreakingChanges);
-      }
-    }
-    const notBreakingExtensions = outOfDateExtensionShortHeaders.filter(
-      extension => !breakingChanges.has(extension)
-    );
-    if (breakingChanges.size > 0) {
-      // Extensions without breaking changes are not listed since it would make
-      // the message more confusing.
-      return (await showDeleteConfirmation({
-        title: t`Breaking changes`,
-        message: t`This asset requires updates to extensions that have breaking changes${'\n\n' +
-          formatExtensionsBreakingChanges(breakingChanges) +
-          '\n'}Do you want to update them now ?`,
-        confirmButtonLabel: t`Update the extension`,
-        dismissButtonLabel: t`Abort`,
-      }))
-        ? 'update'
-        : // Avoid to install assets which wouldn't work with the installed version.
-          'abort';
-    } else {
-      return (await showConfirmation({
-        title: t`Extension update`,
-        message: t`Before installing this asset, it's strongly recommended to update these extensions${'\n\n - ' +
-          notBreakingExtensions
-            .map(extension => extension.fullName)
-            .join('\n - ') +
-          '\n\n'}Do you want to update them now ?`,
-        confirmButtonLabel: t`Update the extension`,
-        dismissButtonLabel: t`Skip the update`,
-      }))
-        ? 'update'
-        : 'skip';
-    }
-  };
-};
 
 export const useProjectNeedToBeSavedAlertDialog = (
   canInstallPrivateAsset: () => boolean
@@ -184,36 +109,40 @@ export const useInstallAsset = ({
   project,
   targetObjectFolderOrObjectWithContext,
   resourceManagementProps,
+  onWillInstallExtension,
   onExtensionInstalled,
 }: {|
   project: ?gdProject,
   targetObjectFolderOrObjectWithContext?: ?ObjectFolderOrObjectWithContext,
   resourceManagementProps: ResourceManagementProps,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |}) => {
   const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
   const { openedAssetPack } = shopNavigationState.getCurrentPage();
-  const eventsFunctionsExtensionsState = React.useContext(
-    EventsFunctionsExtensionsContext
-  );
   const { installPrivateAsset } = React.useContext(
     PrivateAssetsAuthorizationContext
   );
   const { showAlert } = useAlertDialog();
   const fetchAssets = useFetchAssets();
-  const showExtensionUpdateConfirmation = useExtensionUpdateAlertDialog();
   const showProjectNeedToBeSaved = useProjectNeedToBeSavedAlertDialog(
     resourceManagementProps.canInstallPrivateAsset
   );
+  const {
+    translatedExtensionShortHeadersByName: extensionShortHeadersByName,
+  } = React.useContext(ExtensionStoreContext);
+  const installExtension = useInstallExtension();
 
   return async ({
     assetShortHeader,
     objectsContainer,
     requestedObjectName,
+    setIsAssetBeingInstalled,
   }: {|
     assetShortHeader: AssetShortHeader,
     objectsContainer: gdObjectsContainer,
     requestedObjectName?: string,
+    setIsAssetBeingInstalled: boolean => void,
   |}): Promise<InstallAssetOutput | null> => {
     if (!project) {
       return null;
@@ -224,38 +153,30 @@ export const useInstallAsset = ({
       }
       const assets = await fetchAssets([assetShortHeader]);
       const asset = assets[0];
+
       const requiredExtensionInstallation = await checkRequiredExtensionsUpdateForAssets(
         {
           assets,
           project,
+          extensionShortHeadersByName,
         }
       );
-      if (requiredExtensionInstallation.isGDevelopUpdateNeeded) {
-        showAlert({
-          title: t`Could not install the asset`,
-          message: t`Please upgrade the editor to the latest version.`,
-        });
-        return null;
-      }
-      const extensionUpdateAction =
-        requiredExtensionInstallation.outOfDateExtensionShortHeaders.length ===
-        0
-          ? 'skip'
-          : await showExtensionUpdateConfirmation({
-              project,
-              outOfDateExtensionShortHeaders:
-                requiredExtensionInstallation.outOfDateExtensionShortHeaders,
-            });
-      if (extensionUpdateAction === 'abort') {
-        return null;
-      }
-      await installRequiredExtensions({
-        requiredExtensionInstallation,
-        shouldUpdateExtension: extensionUpdateAction === 'update',
-        eventsFunctionsExtensionsState,
+      // Disable the loader because it is above the dialogs opened by `installExtension`.
+      setIsAssetBeingInstalled(false);
+      const wasExtensionsInstalled = await installExtension({
         project,
+        requiredExtensionInstallation,
+        userSelectedExtensionNames: [],
+        importedSerializedExtensions: [],
+        onWillInstallExtension,
         onExtensionInstalled,
+        updateMode: 'all',
+        reason: 'asset',
       });
+      setIsAssetBeingInstalled(true);
+      if (!wasExtensionsInstalled) {
+        return null;
+      }
 
       const isTheFirstOfItsTypeInProject = uniq(
         asset.objectAssets.map(objectAsset => objectAsset.object.type)
@@ -331,6 +252,7 @@ type Props = {|
   onCreateNewObject: (type: string) => void,
   onObjectsAddedFromAssets: InstallAssetOutput => void,
   targetObjectFolderOrObjectWithContext?: ?ObjectFolderOrObjectWithContext,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
@@ -344,6 +266,7 @@ function NewObjectDialog({
   onCreateNewObject,
   onObjectsAddedFromAssets,
   targetObjectFolderOrObjectWithContext,
+  onWillInstallExtension,
   onExtensionInstalled,
 }: Props) {
   const { isMobile } = useResponsiveWindowSize();
@@ -389,21 +312,22 @@ function NewObjectDialog({
     selectedCustomObjectEnumeratedMetadata,
     setSelectedCustomObjectEnumeratedMetadata,
   ] = React.useState<?EnumeratedObjectMetadata>(null);
-  const eventsFunctionsExtensionsState = React.useContext(
-    EventsFunctionsExtensionsContext
-  );
   const isAssetAddedToScene =
     openedAssetShortHeader &&
     existingAssetStoreIds.has(openedAssetShortHeader.id);
   const { showAlert } = useAlertDialog();
 
-  const showExtensionUpdateConfirmation = useExtensionUpdateAlertDialog();
   const installAsset = useInstallAsset({
     project,
     resourceManagementProps,
     targetObjectFolderOrObjectWithContext,
+    onWillInstallExtension,
     onExtensionInstalled,
   });
+  const {
+    translatedExtensionShortHeadersByName: extensionShortHeadersByName,
+  } = React.useContext(ExtensionStoreContext);
+  const installExtension = useInstallExtension();
 
   const onInstallAsset = React.useCallback(
     async (assetShortHeader): Promise<boolean> => {
@@ -413,6 +337,7 @@ function NewObjectDialog({
       const installAssetOutput = await installAsset({
         assetShortHeader,
         objectsContainer,
+        setIsAssetBeingInstalled,
       });
       setIsAssetBeingInstalled(false);
       if (installAssetOutput) onObjectsAddedFromAssets(installAssetOutput);
@@ -423,7 +348,7 @@ function NewObjectDialog({
 
   const onInstallEmptyCustomObject = React.useCallback(
     async (enumeratedObjectMetadata: EnumeratedObjectMetadata) => {
-      const requiredExtensions = enumeratedObjectMetadata.requiredExtensions;
+      const { requiredExtensions } = enumeratedObjectMetadata;
       if (!requiredExtensions) return;
       try {
         setIsAssetBeingInstalled(true);
@@ -431,38 +356,24 @@ function NewObjectDialog({
           {
             requiredExtensions,
             project,
+            extensionShortHeadersByName,
           }
         );
-        if (requiredExtensionInstallation.isGDevelopUpdateNeeded) {
-          showAlert({
-            title: t`Could not install required extensions`,
-            message: t`Please upgrade the editor to the latest version.`,
-          });
-          return;
-        }
-        // Users must be able to create an object from scratch without being
-        // forced to update extensions that may break their projects.
-        const safeToUpdateExtensions =
-          requiredExtensionInstallation.safeToUpdateExtensions;
-        const extensionUpdateAction =
-          requiredExtensionInstallation.outOfDateExtensionShortHeaders
-            .length === 0
-            ? 'skip'
-            : (await showExtensionUpdateConfirmation({
-                project,
-                outOfDateExtensionShortHeaders: safeToUpdateExtensions,
-              })) === 'update';
-        if (extensionUpdateAction === 'abort') {
-          return;
-        }
-        await installRequiredExtensions({
-          requiredExtensionInstallation,
-          shouldUpdateExtension: extensionUpdateAction === 'update',
-          eventsFunctionsExtensionsState,
+        const wasExtensionsInstalled = await installExtension({
           project,
+          requiredExtensionInstallation,
+          userSelectedExtensionNames: [],
+          importedSerializedExtensions: [],
+          onWillInstallExtension,
           onExtensionInstalled,
+          // Users must be able to create an object from scratch without being
+          // forced to update extensions that may break their projects.
+          updateMode: 'safeOnly',
+          reason: 'asset',
         });
-
+        if (!wasExtensionsInstalled) {
+          return;
+        }
         onCreateNewObject(enumeratedObjectMetadata.name);
       } catch (error) {
         console.error('Error while creating the object:', error);
@@ -477,12 +388,13 @@ function NewObjectDialog({
       }
     },
     [
-      onCreateNewObject,
       project,
-      showExtensionUpdateConfirmation,
-      eventsFunctionsExtensionsState,
-      showAlert,
+      extensionShortHeadersByName,
+      installExtension,
+      onWillInstallExtension,
       onExtensionInstalled,
+      onCreateNewObject,
+      showAlert,
     ]
   );
 
@@ -697,6 +609,7 @@ function NewObjectDialog({
                 targetObjectFolderOrObjectWithContext={
                   targetObjectFolderOrObjectWithContext
                 }
+                onWillInstallExtension={onWillInstallExtension}
                 onExtensionInstalled={onExtensionInstalled}
               />
             )}

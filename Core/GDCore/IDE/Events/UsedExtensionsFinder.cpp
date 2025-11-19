@@ -43,6 +43,15 @@ const UsedExtensionsResult UsedExtensionsFinder::ScanProject(gd::Project& projec
   return worker.result;
 };
 
+const UsedExtensionsResult UsedExtensionsFinder::ScanEventsFunctionsExtension(
+    gd::Project &project,
+    const gd::EventsFunctionsExtension &eventsFunctionsExtension) {
+  UsedExtensionsFinder worker(project);
+  gd::ProjectBrowserHelper::ExposeEventsFunctionsExtensionEvents(
+      project, eventsFunctionsExtension, worker);
+  return worker.result;
+}
+
 // Objects scanner
 
 void UsedExtensionsFinder::DoVisitObject(gd::Object &object) {

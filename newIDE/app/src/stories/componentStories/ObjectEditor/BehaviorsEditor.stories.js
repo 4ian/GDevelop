@@ -31,6 +31,7 @@ export const Default = () => (
       onUpdateBehaviorsSharedData={() => {}}
       openBehaviorEvents={() => action('Open behavior events')}
       onBehaviorsUpdated={() => {}}
+      onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('extension installed')}
       isListLocked={false}
     />
@@ -51,6 +52,7 @@ export const WithoutAnyBehaviors = () => (
       onUpdateBehaviorsSharedData={() => {}}
       openBehaviorEvents={() => action('Open behavior events')}
       onBehaviorsUpdated={() => {}}
+      onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('extension installed')}
       isListLocked={false}
     />
@@ -71,6 +73,7 @@ export const Locked = () => (
       onUpdateBehaviorsSharedData={() => {}}
       openBehaviorEvents={() => action('Open behavior events')}
       onBehaviorsUpdated={() => {}}
+      onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('extension installed')}
       isListLocked={true}
     />
@@ -91,6 +94,7 @@ export const LockedWithoutAnyBehaviors = () => (
       onUpdateBehaviorsSharedData={() => {}}
       openBehaviorEvents={() => action('Open behavior events')}
       onBehaviorsUpdated={() => {}}
+      onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('extension installed')}
       isListLocked={true}
     />

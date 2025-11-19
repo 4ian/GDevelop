@@ -29,6 +29,7 @@ type Props = {|
   onClose: ({ swappingDone: boolean }) => void,
   // Use minimal UI to hide filters & the details page (useful for Quick Customization)
   minimalUI?: boolean,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
@@ -41,6 +42,7 @@ function AssetSwappingDialog({
   resourceManagementProps,
   onClose,
   minimalUI,
+  onWillInstallExtension,
   onExtensionInstalled,
 }: Props) {
   const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
@@ -53,6 +55,7 @@ function AssetSwappingDialog({
   const installAsset = useInstallAsset({
     project,
     resourceManagementProps,
+    onWillInstallExtension,
     onExtensionInstalled,
   });
   const { showAlert } = useAlertDialog();
@@ -78,6 +81,7 @@ function AssetSwappingDialog({
         const installAssetOutput = await installAsset({
           assetShortHeader: openedAssetShortHeader,
           objectsContainer,
+          setIsAssetBeingInstalled: () => {},
         });
         if (!installAssetOutput) {
           throw new Error('Failed to install asset');

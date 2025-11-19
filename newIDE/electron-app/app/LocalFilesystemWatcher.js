@@ -1,5 +1,6 @@
 // @flow
 const fileWatcher = require('chokidar');
+const path = require('path');
 
 let subscriptionCancelers = {};
 let newSubscriptionId = 1;
@@ -14,7 +15,25 @@ const setupWatcher = (folderPath, fileWiseCallback, serializedOptions) => {
   const newSubscriptionId = getNewSubscriptionId();
   const watcher = fileWatcher
     .watch(folderPath, {
-      ignored: options.ignore,
+      ignored: candidatePath => {
+        if (
+          (options.ignore || []).some(ignore =>
+            candidatePath.includes(ignore)
+          ) ||
+          // Force ignore, for safety, any node_modules folder as they are too big and would crash the watcher on macOS.
+          // Note that this will ignore any folder whose name is prefixed by "node_modules".
+          candidatePath.includes(path.sep + 'node_modules') ||
+          // Same for git repositories (and any file starting by ".git").
+          candidatePath.includes(path.sep + '.git')
+        ) {
+          console.info(
+            `Local file watcher has ignored path "${candidatePath}".`
+          );
+          return true;
+        }
+
+        return false;
+      },
       ignoreInitial: true,
       awaitWriteFinish: {
         stabilityThreshold: 250,

@@ -794,6 +794,11 @@ namespace gdjs {
         manager.onKeyReleased(e.keyCode, e.location);
       };
 
+      // Prevent "stuck" keys when the game loses focus
+      window.addEventListener('blur', () => {
+        manager.clearAllPressedKeys();
+      });
+
       // Mouse:
 
       // Converts HTML mouse button to InputManager mouse button.

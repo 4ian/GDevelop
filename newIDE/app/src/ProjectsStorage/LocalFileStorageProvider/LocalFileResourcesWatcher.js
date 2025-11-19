@@ -51,6 +51,7 @@ export const setupResourcesWatcher =
         const ignore = [
           '**/.DS_Store', // macOS folder attributes file
           '**/.git/**', // For projects using git as a versioning tool.
+          '**/node_modules/**', // For projects using npm (node_modules has way too many files and would crash the watcher on macOS)
           path.join(folderPath, gameFile),
           path.join(folderPath, autosaveFile),
         ];

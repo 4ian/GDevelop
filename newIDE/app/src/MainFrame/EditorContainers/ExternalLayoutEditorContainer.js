@@ -65,6 +65,9 @@ export class ExternalLayoutEditorContainer extends React.Component<
   }
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
+    if (!this.props.isActive && nextProps.isActive) {
+      this._setPreviewedLayout();
+    }
     // This optimization is a bit more cautious than the traditional one, to still allow
     // children, and in particular SceneEditor and InstancesEditor, to be notified when isActive
     // goes from true to false (in which case PIXI rendering is halted). If isActive was false
@@ -74,14 +77,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
 
   componentDidMount() {
     if (this.props.isActive) {
-      const { projectItemName } = this.props;
-      const layout = this.getLayout();
-      this.props.setPreviewedLayout({
-        layoutName: layout ? layout.getName() : null,
-        externalLayoutName: projectItemName || null,
-        eventsBasedObjectType: null,
-        eventsBasedObjectVariantName: null,
-      });
+      this._setPreviewedLayout();
     }
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
       this.onResourceExternallyChanged.bind(this)
@@ -93,12 +89,8 @@ export class ExternalLayoutEditorContainer extends React.Component<
     );
   }
 
-  notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {
-    this._switchToSceneEdition(hotReloadSteps);
-  }
-
-  _switchToSceneEdition(hotReloadSteps: HotReloadSteps): void {
-    const { projectItemName, editorId } = this.props;
+  _setPreviewedLayout() {
+    const { projectItemName } = this.props;
     const layout = this.getLayout();
     this.props.setPreviewedLayout({
       layoutName: layout ? layout.getName() : null,
@@ -106,6 +98,16 @@ export class ExternalLayoutEditorContainer extends React.Component<
       eventsBasedObjectType: null,
       eventsBasedObjectVariantName: null,
     });
+  }
+
+  notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {
+    this._switchToSceneEdition(hotReloadSteps);
+  }
+
+  _switchToSceneEdition(hotReloadSteps: HotReloadSteps): void {
+    const { projectItemName, editorId } = this.props;
+    const layout = this.getLayout();
+    this._setPreviewedLayout();
     if (
       this.props.gameEditorMode === 'embedded-game' &&
       layout &&

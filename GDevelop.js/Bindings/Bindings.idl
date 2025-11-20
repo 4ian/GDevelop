@@ -2898,6 +2898,16 @@ interface BehaviorParameterFiller {
         [Ref] Instruction instruction);
 };
 
+interface InstructionValidator {
+  boolean STATIC_IsParameterValid(
+    [Const, Ref] Platform platform,
+    [Const, Ref] ProjectScopedContainers projectScopedContainers,
+    [Const, Ref] Instruction instruction,
+    [Const, Ref] InstructionMetadata metadata,
+    long parameterIndex,
+    [Const] DOMString value);
+};
+
 interface ObjectTools {
     boolean STATIC_IsBehaviorCompatibleWithObject(
         [Const, Ref] Platform platform,

@@ -2068,6 +2068,10 @@ export class BehaviorParameterFiller extends EmscriptenObject {
   static fillBehaviorParameters(platform: Platform, projectScopedContainers: ProjectScopedContainers, instructionMetadata: InstructionMetadata, instruction: Instruction): boolean;
 }
 
+export class InstructionValidator extends EmscriptenObject {
+  static isParameterValid(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction, metadata: InstructionMetadata, parameterIndex: number, value: string): boolean;
+}
+
 export class ObjectTools extends EmscriptenObject {
   static isBehaviorCompatibleWithObject(platform: Platform, objectType: string, behaviorType: string): boolean;
 }

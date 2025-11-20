@@ -29,26 +29,24 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
 
   componentDidMount() {
     if (this.props.isActive) {
-      const layout = this.getLayout();
-      this.props.setPreviewedLayout({
-        layoutName: layout ? layout.getName() : null,
-        externalLayoutName: null,
-        eventsBasedObjectType: null,
-        eventsBasedObjectVariantName: null,
-      });
+      this._setPreviewedLayout();
     }
   }
 
   componentDidUpdate(prevProps: RenderEditorContainerProps) {
     if (!prevProps.isActive && this.props.isActive) {
-      const layout = this.getLayout();
-      this.props.setPreviewedLayout({
-        layoutName: layout ? layout.getName() : null,
-        externalLayoutName: null,
-        eventsBasedObjectType: null,
-        eventsBasedObjectVariantName: null,
-      });
+      this._setPreviewedLayout();
     }
+  }
+
+  _setPreviewedLayout() {
+    const layout = this.getLayout();
+    this.props.setPreviewedLayout({
+      layoutName: layout ? layout.getName() : null,
+      externalLayoutName: null,
+      eventsBasedObjectType: null,
+      eventsBasedObjectVariantName: null,
+    });
   }
 
   getProject(): ?gdProject {
@@ -167,6 +165,7 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
         onOpenExternalEvents={this.props.onOpenExternalEvents}
         isActive={this.props.isActive}
         hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
+        onWillInstallExtension={this.props.onWillInstallExtension}
         onExtensionInstalled={this.props.onExtensionInstalled}
       />
     );

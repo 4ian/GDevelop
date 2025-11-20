@@ -11,7 +11,12 @@ const gd: libGDevelop = global.gd;
 
 type ExtensionTier = 'experimental' | 'reviewed' | 'installed';
 
-export type ExtensionRegistryItemHeader = {|
+export type ExtensionDependency = {
+  extensionName: string,
+  extensionVersion: string,
+};
+
+export type ExtensionRegistryItemHeader = {
   tier: ExtensionTier,
   authorIds: Array<string>,
   authors?: Array<UserPublicProfile>,
@@ -26,9 +31,10 @@ export type ExtensionRegistryItemHeader = {|
   category: string,
   previewIconUrl: string,
   changelog?: Array<{ version: string, breaking?: string }>,
+  requiredExtensions?: Array<ExtensionDependency>,
   // Added by the editor.
   isInstalled?: boolean,
-|};
+};
 
 export type EventsFunctionInsideExtensionShortHeader = {
   description: string,
@@ -78,7 +84,7 @@ export type ExtensionHeader = {
   iconUrl: string,
 };
 
-export type BehaviorShortHeader = {|
+export type BehaviorShortHeader = {
   ...ExtensionRegistryItemHeader,
   description: string,
   extensionName: string,
@@ -95,13 +101,13 @@ export type BehaviorShortHeader = {|
    * Can only be true for `installed` extensions.
    */
   isDeprecated?: boolean,
-|};
+};
 
-export type ObjectShortHeader = {|
+export type ObjectShortHeader = {
   ...ExtensionRegistryItemHeader,
   description: string,
   extensionName: string,
-|};
+};
 
 /**
  * This represents a serialized `gdEventsFunctionsExtension`.
@@ -114,7 +120,7 @@ export type ObjectShortHeader = {|
  */
 export type SerializedExtension = {
   name: string,
-
+  requiredExtensions?: Array<ExtensionDependency>,
   // This type is inexact because the typing is not complete.
 };
 

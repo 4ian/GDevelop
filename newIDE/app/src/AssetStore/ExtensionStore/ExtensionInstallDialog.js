@@ -293,7 +293,9 @@ const ExtensionInstallDialog = ({
         <Text noMargin>
           {extensionHeader
             ? extensionHeader.shortDescription
-            : extensionShortHeader.shortDescription || ''}
+            : typeof extensionShortHeader.shortDescription === 'string'
+            ? extensionShortHeader.shortDescription || ''
+            : ''}
         </Text>
         <Divider />
         {extensionHeader && (

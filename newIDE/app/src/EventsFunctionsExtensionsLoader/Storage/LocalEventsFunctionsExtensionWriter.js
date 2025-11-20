@@ -1,5 +1,4 @@
 // @flow
-import { serializeToJSObject } from '../../Utils/Serializer';
 import optionalRequire from '../../Utils/OptionalRequire';
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
@@ -44,7 +43,7 @@ export default class LocalEventsFunctionsExtensionWriter {
             extensions: ['json'],
           },
         ],
-        defaultPath: extensionName || 'Extension.json',
+        defaultPath: (extensionName || 'Extension') + '.json',
       })
       .then(({ filePath }) => {
         if (!filePath) return null;
@@ -52,14 +51,10 @@ export default class LocalEventsFunctionsExtensionWriter {
       });
   };
 
-  static writeEventsFunctionsExtension = (
-    extension: gdEventsFunctionsExtension,
+  static writeSerializedObject = (
+    serializedObject: Object,
     filepath: string
   ): Promise<void> => {
-    const serializedObject = serializeToJSObject(
-      extension,
-      'serializeToExternal'
-    );
     return writeJSONFile(serializedObject, filepath).catch(err => {
       console.error('Unable to write the events function extension:', err);
       throw err;

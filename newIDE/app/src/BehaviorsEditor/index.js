@@ -325,6 +325,7 @@ export const useManageObjectBehaviors = ({
   onSizeUpdated,
   onBehaviorsUpdated,
   onUpdateBehaviorsSharedData,
+  onWillInstallExtension,
   onExtensionInstalled,
 }: {
   project: gdProject,
@@ -335,6 +336,7 @@ export const useManageObjectBehaviors = ({
   onSizeUpdated?: ?() => void,
   onBehaviorsUpdated?: ?() => void,
   onUpdateBehaviorsSharedData: () => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 }): UseManageBehaviorsState => {
   const [
@@ -601,6 +603,7 @@ export const useManageObjectBehaviors = ({
       onChoose={addBehavior}
       project={project}
       eventsFunctionsExtension={eventsFunctionsExtension}
+      onWillInstallExtension={onWillInstallExtension}
       onExtensionInstalled={onExtensionInstalled}
     />
   );
@@ -636,6 +639,7 @@ type Props = {|
     extensionName: string,
     behaviorName: string
   ) => Promise<void>,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   isListLocked: boolean,
 |};
@@ -656,6 +660,7 @@ const BehaviorsEditor = (props: Props) => {
     onBehaviorsUpdated,
     onUpdateBehaviorsSharedData,
     openBehaviorEvents,
+    onWillInstallExtension,
     onExtensionInstalled,
     isListLocked,
   } = props;
@@ -685,6 +690,7 @@ const BehaviorsEditor = (props: Props) => {
     onSizeUpdated,
     onBehaviorsUpdated,
     onUpdateBehaviorsSharedData,
+    onWillInstallExtension,
     onExtensionInstalled,
   });
 

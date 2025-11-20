@@ -327,6 +327,7 @@ export const WithObjectsList = () => (
                   onSetAsGlobalObject={action('onSetAsGlobalObject')}
                   hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
                   isListLocked={false}
+                  onWillInstallExtension={action('extension will be installed')}
                   onExtensionInstalled={action('onExtensionInstalled')}
                 />
               </TabContentContainer>

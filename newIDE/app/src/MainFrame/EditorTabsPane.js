@@ -250,6 +250,7 @@ export type EditorTabsPaneCommonProps = {|
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onLoadEventsFunctionsExtensions: ({|
     shouldHotReloadEditor: boolean,
@@ -352,6 +353,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
     onInstancesModifiedOutsideEditor,
     onObjectsModifiedOutsideEditor,
     onObjectGroupsModifiedOutsideEditor,
+    onWillInstallExtension,
     onExtensionInstalled,
     onEffectAdded,
     onObjectListsModified,
@@ -753,6 +755,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
                       onInstancesModifiedOutsideEditor: onInstancesModifiedOutsideEditor,
                       onObjectsModifiedOutsideEditor: onObjectsModifiedOutsideEditor,
                       onObjectGroupsModifiedOutsideEditor: onObjectGroupsModifiedOutsideEditor,
+                      onWillInstallExtension: onWillInstallExtension,
                       onExtensionInstalled: onExtensionInstalled,
                       onEffectAdded: onEffectAdded,
                       onObjectListsModified: onObjectListsModified,

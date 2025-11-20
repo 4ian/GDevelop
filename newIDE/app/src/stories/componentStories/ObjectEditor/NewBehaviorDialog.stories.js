@@ -68,6 +68,7 @@ export const DefaultForSpriteObject = () => (
             'DestroyOutsideBehavior::DestroyOutside',
             'PlatformBehavior::PlatformBehavior',
           ]}
+          onWillInstallExtension={action('extension will be installed')}
           onExtensionInstalled={action('extension installed')}
         />
       </BehaviorStoreStateProvider>
@@ -105,6 +106,7 @@ export const WithCommunityExtensions = () => {
                   'DestroyOutsideBehavior::DestroyOutside',
                   'PlatformBehavior::PlatformBehavior',
                 ]}
+                onWillInstallExtension={action('extension will be installed')}
                 onExtensionInstalled={action('extension installed')}
               />
             </BehaviorStoreStateProvider>
@@ -133,6 +135,7 @@ export const WithServerSideErrors = () => (
               'DestroyOutsideBehavior::DestroyOutside',
               'PlatformBehavior::PlatformBehavior',
             ]}
+            onWillInstallExtension={action('extension will be installed')}
             onExtensionInstalled={action('extension installed')}
           />
         </BehaviorStoreStateProvider>

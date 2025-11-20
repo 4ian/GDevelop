@@ -71,6 +71,7 @@ type Props = {|
   anchorEl?: any, // Unused
   canPasteInstructions: boolean, // Unused
   onPasteInstructions: () => void, // Unused
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
@@ -105,6 +106,7 @@ const InstructionEditorDialog = ({
   onSubmit,
   resourceManagementProps,
   openInstructionOrExpression,
+  onWillInstallExtension,
   onExtensionInstalled,
   i18n,
 }: Props) => {
@@ -431,6 +433,7 @@ const InstructionEditorDialog = ({
           isChildObject={!scope.layout}
           onClose={() => setNewBehaviorDialogOpen(false)}
           onChoose={addBehavior}
+          onWillInstallExtension={onWillInstallExtension}
           onExtensionInstalled={extensionName => {
             freeInstructionComponentRef.current &&
               freeInstructionComponentRef.current.reEnumerateInstructions(i18n);
@@ -444,7 +447,7 @@ const InstructionEditorDialog = ({
             <ExtensionsSearchDialog
               project={project}
               onClose={() => setNewExtensionDialogOpen(false)}
-              onInstallExtension={() => {}}
+              onWillInstallExtension={onWillInstallExtension}
               onExtensionInstalled={extensionName => {
                 setNewExtensionDialogOpen(false);
                 freeInstructionComponentRef.current &&

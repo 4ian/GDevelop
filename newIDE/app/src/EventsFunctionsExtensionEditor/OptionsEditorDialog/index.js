@@ -108,6 +108,7 @@ export default function OptionsEditorDialog({
       )}
       {exportDialogOpen && (
         <ExtensionExporterDialog
+          project={project}
           eventsFunctionsExtension={eventsFunctionsExtension}
           onClose={() => setExportDialogOpen(false)}
         />

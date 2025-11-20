@@ -1,24 +1,25 @@
 // @flow
-import { openFilePicker, readJSONFile } from '../../Utils/FileSystem';
+import { openFilesPicker, readJSONFile } from '../../Utils/FileSystem';
+import { type SerializedExtension } from '../../Utils/GDevelopServices/Extension';
 
 export default class LocalEventsFunctionsExtensionOpener {
-  static chooseEventsFunctionExtensionFile = (): Promise<?string> => {
-    return openFilePicker({
-      title: 'Import an extension in the project',
-      properties: ['openFile'],
-      message: 'Choose an extension file to import (.json file)',
+  static chooseEventsFunctionExtensionFile = (): Promise<Array<string>> => {
+    return openFilesPicker({
+      title: 'Import extensions into the project',
+      properties: ['openFile', 'multiSelections'],
+      message: 'Choose extension files to import (.json file)',
       filters: [
         {
           name: 'GDevelop 5 "events based" extension',
           extensions: ['json'],
         },
       ],
-    }).then(filePath => filePath);
+    }).then(filePaths => filePaths);
   };
 
   static readEventsFunctionExtensionFile = (
     filepath: string
-  ): Promise<Object> => {
+  ): Promise<SerializedExtension> => {
     return readJSONFile(filepath);
   };
 }

@@ -11,11 +11,33 @@ import EventsFunctionsExtensionsContext, {
 } from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import Window from '../../Utils/Window';
 import Upload from '../../UI/CustomSvgIcons/Upload';
+import { serializeToJSObject } from '../../Utils/Serializer';
+
+const gd: libGDevelop = global.gd;
 
 const exportExtension = async (
-  eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
-  eventsFunctionsExtension: gdEventsFunctionsExtension
+  project: gdProject,
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
+  eventsFunctionsExtensionsState: EventsFunctionsExtensionsState
 ) => {
+  const requiredExtensions = gd.UsedExtensionsFinder.scanEventsFunctionsExtension(
+    project,
+    eventsFunctionsExtension
+  )
+    .getUsedExtensions()
+    .toNewVectorString()
+    .toJSArray()
+    .filter(
+      extensionName =>
+        extensionName !== eventsFunctionsExtension.getName() &&
+        project.hasEventsFunctionsExtensionNamed(extensionName)
+    )
+    .map(extensionName => ({
+      extensionName,
+      extensionVersion: project
+        .getEventsFunctionsExtension(extensionName)
+        .getVersion(),
+    }));
   const eventsFunctionsExtensionWriter = eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
   if (!eventsFunctionsExtensionWriter) {
     // This won't happen in practice because this view can't be reached from the web-app.
@@ -29,8 +51,15 @@ const exportExtension = async (
 
   if (!pathOrUrl) return;
 
-  await eventsFunctionsExtensionWriter.writeEventsFunctionsExtension(
+  const serializedObject = serializeToJSObject(
     eventsFunctionsExtension,
+    'serializeToExternal'
+  );
+  if (requiredExtensions.length > 0) {
+    serializedObject.requiredExtensions = requiredExtensions;
+  }
+  await eventsFunctionsExtensionWriter.writeSerializedObject(
+    serializedObject,
     pathOrUrl
   );
 };
@@ -42,6 +71,7 @@ const openGitHubIssue = () => {
 };
 
 type Props = {|
+  project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   onClose: () => void,
 |};
@@ -77,8 +107,9 @@ const ExtensionExporterDialog = (props: Props) => {
           label={<Trans>Export to a file</Trans>}
           onClick={() => {
             exportExtension(
-              eventsFunctionsExtensionsState,
-              props.eventsFunctionsExtension
+              props.project,
+              props.eventsFunctionsExtension,
+              eventsFunctionsExtensionsState
             );
           }}
         />,

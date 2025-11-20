@@ -43,3 +43,29 @@ export const openFilePicker = ({
       return filePaths[0];
     });
 };
+
+export const openFilesPicker = ({
+  title,
+  properties,
+  message,
+  filters,
+}: {|
+  title: string,
+  properties: string[],
+  message: string,
+  filters: {| name: string, extensions: string[] |}[],
+|}) => {
+  if (!dialog) return Promise.reject('Not supported');
+  const browserWindow = remote.getCurrentWindow();
+
+  return dialog
+    .showOpenDialog(browserWindow, {
+      title,
+      properties,
+      message,
+      filters,
+    })
+    .then(({ filePaths }) => {
+      return filePaths;
+    });
+};

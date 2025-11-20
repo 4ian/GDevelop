@@ -11,9 +11,13 @@ import { showMessageBox } from '../UI/Messages/MessageBox';
 import { getDeprecatedBehaviorsInformation } from '../Hints';
 import { enumerateBehaviorsMetadata } from './EnumerateBehaviorsMetadata';
 import { BehaviorStore } from '../AssetStore/BehaviorStore';
+import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { type BehaviorShortHeader } from '../Utils/GDevelopServices/Extension';
-import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
-import { installExtension } from '../AssetStore/ExtensionStore/InstallExtension';
+import {
+  checkRequiredExtensionsUpdate,
+  getRequiredExtensions,
+  useInstallExtension,
+} from '../AssetStore/ExtensionStore/InstallExtension';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import {
   addCreateBadgePreHookIfNotClaimed,
@@ -33,6 +37,7 @@ type Props = {|
   open: boolean,
   onClose: () => void,
   onChoose: (type: string, defaultName: string) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
@@ -45,18 +50,20 @@ export default function NewBehaviorDialog({
   objectType,
   objectBehaviorsTypes,
   isChildObject,
+  onWillInstallExtension,
   onExtensionInstalled,
 }: Props) {
   const [isInstalling, setIsInstalling] = React.useState(false);
-  const eventsFunctionsExtensionsState = React.useContext(
-    EventsFunctionsExtensionsContext
-  );
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const {
+    translatedExtensionShortHeadersByName: extensionShortHeadersByName,
+  } = React.useContext(ExtensionStoreContext);
+  const installExtension = useInstallExtension();
 
-  const installDisplayedExtension = addCreateBadgePreHookIfNotClaimed(
+  const createBadgeFirstExtension = addCreateBadgePreHookIfNotClaimed(
     authenticatedUser,
     TRIVIAL_FIRST_EXTENSION,
-    installExtension
+    () => {}
   );
 
   const deprecatedBehaviorsInformation = React.useMemo(
@@ -185,14 +192,33 @@ export default function NewBehaviorDialog({
   ) => {
     setIsInstalling(true);
     try {
-      const wasExtensionInstalled = await installDisplayedExtension(
-        i18n,
-        project,
-        eventsFunctionsExtensionsState,
-        behaviorShortHeader
+      const behaviorShortHeaders: Array<BehaviorShortHeader> = [
+        behaviorShortHeader,
+      ];
+      const requiredExtensions = getRequiredExtensions(behaviorShortHeaders);
+      requiredExtensions.push({
+        extensionName: behaviorShortHeader.extensionName,
+        extensionVersion: behaviorShortHeader.version,
+      });
+      const requiredExtensionInstallation = await checkRequiredExtensionsUpdate(
+        {
+          requiredExtensions,
+          project,
+          extensionShortHeadersByName,
+        }
       );
+      const wasExtensionInstalled = await installExtension({
+        project,
+        requiredExtensionInstallation,
+        userSelectedExtensionNames: [behaviorShortHeader.extensionName],
+        importedSerializedExtensions: [],
+        onWillInstallExtension,
+        onExtensionInstalled,
+        updateMode: 'all',
+        reason: 'behavior',
+      });
       if (wasExtensionInstalled) {
-        onExtensionInstalled([behaviorShortHeader.extensionName]);
+        createBadgeFirstExtension();
       }
       return wasExtensionInstalled;
     } finally {

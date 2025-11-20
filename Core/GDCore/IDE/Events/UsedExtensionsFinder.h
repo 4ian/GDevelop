@@ -4,8 +4,8 @@
  * reserved. This project is released under the MIT License.
  */
 
-#ifndef GDCORE_USED_EXTENSIONS_FINDER_H
-#define GDCORE_USED_EXTENSIONS_FINDER_H
+#pragma once
+
 #include <set>
 
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
@@ -89,8 +89,11 @@ class GD_CORE_API UsedExtensionsFinder
       public ExpressionParser2NodeWorker {
  public:
   static const UsedExtensionsResult ScanProject(gd::Project& project);
+  static const UsedExtensionsResult ScanEventsFunctionsExtension(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension);
 
- private:
+private:
   UsedExtensionsFinder(gd::Project& project_) : project(project_){};
   gd::Project& project;
   gd::String rootType;
@@ -123,5 +126,3 @@ class GD_CORE_API UsedExtensionsFinder
 };
 
 };  // namespace gd
-
-#endif

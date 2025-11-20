@@ -60,8 +60,8 @@ export const Default = () => (
           <ExtensionsSearchDialog
             project={testProject.project}
             onClose={action('onClose')}
-            onInstallExtension={action('onInstallExtension')}
             onCreateNew={action('onCreateNew')}
+            onWillInstallExtension={action('extension will be installed')}
             onExtensionInstalled={action('onExtensionInstalled')}
           />
         </ExtensionStoreStateProvider>
@@ -84,8 +84,8 @@ export const WithServerSideError = () => (
           <ExtensionsSearchDialog
             project={testProject.project}
             onClose={action('onClose')}
-            onInstallExtension={action('onInstallExtension')}
             onCreateNew={action('onCreateNew')}
+            onWillInstallExtension={action('extension will be installed')}
             onExtensionInstalled={action('onExtensionInstalled')}
           />
         </ExtensionStoreStateProvider>

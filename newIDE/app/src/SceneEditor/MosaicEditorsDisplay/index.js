@@ -89,6 +89,7 @@ const MosaicEditorsDisplay = React.forwardRef<
     selectedLayer,
     onSelectInstances,
     onInstancesModified,
+    onWillInstallExtension,
     onExtensionInstalled,
     isActive,
     onRestartInGameEditorAfterError,
@@ -291,6 +292,7 @@ const MosaicEditorsDisplay = React.forwardRef<
               tileMapTileSelection={props.tileMapTileSelection}
               onSelectTileMapTile={props.onSelectTileMapTile}
               lastSelectionType={props.lastSelectionType}
+              onWillInstallExtension={props.onWillInstallExtension}
               onExtensionInstalled={props.onExtensionInstalled}
               onOpenEventBasedObjectVariantEditor={
                 props.onOpenEventBasedObjectVariantEditor
@@ -459,6 +461,7 @@ const MosaicEditorsDisplay = React.forwardRef<
               unsavedChanges={props.unsavedChanges}
               hotReloadPreviewButtonProps={props.hotReloadPreviewButtonProps}
               isListLocked={isCustomVariant}
+              onWillInstallExtension={onWillInstallExtension}
               onExtensionInstalled={onExtensionInstalled}
             />
           )}

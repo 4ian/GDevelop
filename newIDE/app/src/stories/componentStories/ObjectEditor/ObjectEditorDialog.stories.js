@@ -42,6 +42,7 @@ export const CustomObject = () => (
         launchProjectWithLoadingScreenPreview: () => action('Reload'),
       }}
       openBehaviorEvents={() => action('Open behavior events')}
+      onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('extension installed')}
       onOpenEventBasedObjectEditor={() =>
         action('Open event-based object editor')
@@ -85,6 +86,7 @@ export const StandardObject = () => (
         launchProjectWithLoadingScreenPreview: () => action('Reload'),
       }}
       openBehaviorEvents={() => action('Open behavior events')}
+      onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('extension installed')}
       onOpenEventBasedObjectEditor={() =>
         action('Open event-based object editor')
@@ -137,6 +139,7 @@ export const LockedStandardObject = () => (
       onDeleteEventsBasedObjectVariant={() =>
         action('Delete event-based object variant')
       }
+      onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('extension installed')}
       isBehaviorListLocked={true}
       isVariableListLocked={true}

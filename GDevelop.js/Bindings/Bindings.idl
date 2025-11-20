@@ -2926,6 +2926,9 @@ interface UsedExtensionsResult {
 
 interface UsedExtensionsFinder {
   [Value] UsedExtensionsResult STATIC_ScanProject([Ref] Project project);
+  [Value] UsedExtensionsResult STATIC_ScanEventsFunctionsExtension(
+    [Ref] Project project, [Const, Ref]
+    EventsFunctionsExtension eventsFunctionsExtension);
 };
 
 interface UsedObjectTypeFinder {

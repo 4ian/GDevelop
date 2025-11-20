@@ -4747,8 +4747,13 @@ namespace gdjs {
             inputManager.isMouseButtonPressed(0)) ||
           (isShiftPressed(inputManager) && inputManager.isMouseButtonPressed(2))
         ) {
-          const xDelta = this._lastCursorX - inputManager.getCursorX();
-          const yDelta = this._lastCursorY - inputManager.getCursorY();
+          // Use movement deltas when pointer is locked, otherwise use cursor position delta
+          const xDelta = renderer.isPointerLocked()
+            ? inputManager.getMouseMovementX()
+            : inputManager.getCursorX() - this._lastCursorX;
+          const yDelta = renderer.isPointerLocked()
+            ? inputManager.getMouseMovementY()
+            : inputManager.getCursorY() - this._lastCursorY;
           moveCameraByVector(up, -yDelta);
           moveCameraByVector(right, xDelta);
         }

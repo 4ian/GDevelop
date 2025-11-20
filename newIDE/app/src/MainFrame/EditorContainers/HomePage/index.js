@@ -168,6 +168,7 @@ type Props = {|
   ) => Promise<CreateProjectResult>,
 
   // Asset store
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 
   // Project save
@@ -255,6 +256,7 @@ export const HomePage = React.memo<Props>(
         onOpenTemplateFromCourseChapter,
         gamesList,
         gamesPlatformFrameTools,
+        onWillInstallExtension,
         onExtensionInstalled,
         gameEditorMode,
       }: Props,
@@ -604,6 +606,8 @@ export const HomePage = React.memo<Props>(
                       resourceManagementProps={resourceManagementProps}
                       onCreateEmptyProject={onCreateEmptyProject}
                       onOpenLayout={onOpenLayout}
+                      onWillInstallExtension={onWillInstallExtension}
+                      onExtensionInstalled={onExtensionInstalled}
                       onOpenAskAi={onOpenAskAi}
                       onCloseAskAi={onCloseAskAi}
                       closeProject={closeProject}
@@ -686,6 +690,7 @@ export const HomePage = React.memo<Props>(
                         onOpenPrivateGameTemplateListingData
                       }
                       onOpenProfile={onOpenProfile}
+                      onWillInstallExtension={onWillInstallExtension}
                       onExtensionInstalled={onExtensionInstalled}
                       onCourseOpen={(courseId: string) => {
                         onSelectCourse(courseId);
@@ -786,6 +791,7 @@ export const renderHomePageContainer = (
     resourceManagementProps={props.resourceManagementProps}
     gamesList={props.gamesList}
     gamesPlatformFrameTools={props.gamesPlatformFrameTools}
+    onWillInstallExtension={props.onWillInstallExtension}
     onExtensionInstalled={props.onExtensionInstalled}
     gameEditorMode={props.gameEditorMode}
   />

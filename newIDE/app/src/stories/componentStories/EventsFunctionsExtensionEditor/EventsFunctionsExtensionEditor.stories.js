@@ -41,6 +41,7 @@ export const Default = () => (
           'onEventsBasedObjectChildrenEdited'
         )}
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
+        onWillInstallExtension={action('extension will be installed')}
         onExtensionInstalled={action('extension installed')}
         onEventBasedObjectTypeChanged={action('onEventBasedObjectTypeChanged')}
       />
@@ -76,6 +77,7 @@ export const WithObjectEditor = () => {
               'onEventsBasedObjectChildrenEdited'
             )}
             hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
+            onWillInstallExtension={action('extension will be installed')}
             onExtensionInstalled={action('extension installed')}
             onEventBasedObjectTypeChanged={action(
               'onEventBasedObjectTypeChanged'

@@ -22,11 +22,11 @@ const emptySearchText = '';
 const noExcludedTiers = new Set();
 const excludedExperimentalTiers = new Set(['experimental']);
 
-type TranslatedBehaviorShortHeader = {|
+type TranslatedBehaviorShortHeader = {
   ...BehaviorShortHeader,
   englishFullName: string,
   englishDescription: string,
-|};
+};
 
 type BehaviorStoreState = {|
   filters: ?Filters,

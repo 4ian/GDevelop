@@ -81,6 +81,8 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     selectedLayer,
     onSelectInstances,
     onInstancesModified,
+
+    onWillInstallExtension,
     onExtensionInstalled,
     isActive,
     onRestartInGameEditorAfterError,
@@ -416,6 +418,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                         props.hotReloadPreviewButtonProps
                       }
                       isListLocked={isCustomVariant}
+                      onWillInstallExtension={onWillInstallExtension}
                       onExtensionInstalled={onExtensionInstalled}
                     />
                   )}
@@ -453,6 +456,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       tileMapTileSelection={props.tileMapTileSelection}
                       onSelectTileMapTile={props.onSelectTileMapTile}
                       lastSelectionType={props.lastSelectionType}
+                      onWillInstallExtension={props.onWillInstallExtension}
                       onExtensionInstalled={props.onExtensionInstalled}
                       onOpenEventBasedObjectVariantEditor={
                         props.onOpenEventBasedObjectVariantEditor

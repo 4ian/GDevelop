@@ -36,6 +36,7 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import { swapAsset } from '../AssetStore/AssetSwapper';
+import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
 
 const gd: libGDevelop = global.gd;
 
@@ -192,9 +193,11 @@ type LaunchFunctionOptionsWithoutProject = {|
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
-  ensureExtensionInstalled: (options: {|
-    extensionName: string,
-  |}) => Promise<void>,
+  ensureExtensionInstalled: (
+    options: EnsureExtensionInstalledOptions
+  ) => Promise<void>,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
   searchAndInstallAsset: (
     options: AssetSearchAndInstallOptions
   ) => Promise<AssetSearchAndInstallResult>,
@@ -499,6 +502,8 @@ const createOrReplaceObject: EditorFunction = {
     ensureExtensionInstalled,
     searchAndInstallAsset,
     onObjectsModifiedOutsideEditor,
+    onWillInstallExtension,
+    onExtensionInstalled,
   }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_type = extractRequiredString(args, 'object_type');
@@ -660,7 +665,11 @@ const createOrReplaceObject: EditorFunction = {
       if (object_type.includes('::')) {
         const extensionName = object_type.split('::')[0];
         try {
-          await ensureExtensionInstalled({ extensionName });
+          await ensureExtensionInstalled({
+            extensionName,
+            onWillInstallExtension,
+            onExtensionInstalled,
+          });
         } catch (error) {
           console.error(
             `Could not get extension "${extensionName}" installed:`,
@@ -1291,7 +1300,13 @@ const addBehavior: EditorFunction = {
 
     return makeText(behaviorMetadata.getFullName());
   },
-  launchFunction: async ({ project, args, ensureExtensionInstalled }) => {
+  launchFunction: async ({
+    project,
+    args,
+    ensureExtensionInstalled,
+    onWillInstallExtension,
+    onExtensionInstalled,
+  }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const behavior_type = extractRequiredString(args, 'behavior_type');
@@ -1326,7 +1341,11 @@ const addBehavior: EditorFunction = {
     if (behavior_type.includes('::')) {
       const extensionName = behavior_type.split('::')[0];
       try {
-        await ensureExtensionInstalled({ extensionName });
+        await ensureExtensionInstalled({
+          extensionName,
+          onWillInstallExtension,
+          onExtensionInstalled,
+        });
       } catch (error) {
         console.error(
           `Could not get extension "${extensionName}" installed:`,
@@ -3218,6 +3237,8 @@ const addSceneEvents: EditorFunction = {
     generateEvents,
     onSceneEventsModifiedOutsideEditor,
     ensureExtensionInstalled,
+    onWillInstallExtension,
+    onExtensionInstalled,
   }) => {
     const sceneName = extractRequiredString(args, 'scene_name');
     const eventsDescription = extractRequiredString(args, 'events_description');
@@ -3322,7 +3343,11 @@ const addSceneEvents: EditorFunction = {
           }
         }
         for (const extensionName of extensionNames) {
-          await ensureExtensionInstalled({ extensionName });
+          await ensureExtensionInstalled({
+            extensionName,
+            onWillInstallExtension,
+            onExtensionInstalled,
+          });
         }
       } catch (e) {
         return makeAiGeneratedEventFailure(

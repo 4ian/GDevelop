@@ -50,6 +50,8 @@ type Props = {|
         | 'none',
     |}
   ) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
 const useNewProjectDialog = ({
@@ -67,6 +69,8 @@ const useNewProjectDialog = ({
   storageProviders,
   storageProvider,
   onOpenLayout,
+  onWillInstallExtension,
+  onExtensionInstalled,
 }: Props) => {
   const [isFetchingExample, setIsFetchingExample] = React.useState(false);
   const [
@@ -256,6 +260,8 @@ const useNewProjectDialog = ({
             }
             preventBackHome={preventBackHome}
             onOpenLayout={onOpenLayout}
+            onWillInstallExtension={onWillInstallExtension}
+            onExtensionInstalled={onExtensionInstalled}
           />
         )}
       </>

@@ -151,6 +151,7 @@ const WrappedHomePage = ({
                   updateIframePosition: () => {},
                   renderGamesPlatformFrame: () => null,
                 }}
+                onWillInstallExtension={action('extension will be installed')}
                 onExtensionInstalled={action('onExtensionInstalled')}
                 onOpenAskAi={() => action('onOpenAskAi')()}
                 onCloseAskAi={() => action('onCloseAskAi')()}

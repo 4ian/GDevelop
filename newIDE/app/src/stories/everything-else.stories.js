@@ -2000,6 +2000,7 @@ storiesOf('InstructionEditorDialog', module)
           onSubmit={action('submit')}
           canPasteInstructions={true}
           onPasteInstructions={action('paste instructions')}
+          onWillInstallExtension={action('extension will be installed')}
           onExtensionInstalled={action('extension installed')}
         />
       )}
@@ -2027,6 +2028,7 @@ storiesOf('InstructionEditorDialog', module)
           onSubmit={action('submit')}
           canPasteInstructions={true}
           onPasteInstructions={action('paste instructions')}
+          onWillInstallExtension={action('extension will be installed')}
           onExtensionInstalled={action('extension installed')}
         />
       )}
@@ -2063,6 +2065,7 @@ storiesOf('InstructionEditorDialog', module)
             onSubmit={action('submit')}
             canPasteInstructions={true}
             onPasteInstructions={action('paste instructions')}
+            onWillInstallExtension={action('extension will be installed')}
             onExtensionInstalled={action('extension installed')}
           />
         )}
@@ -2109,6 +2112,7 @@ storiesOf('InstructionEditorMenu', module)
                 anchorEl={buttonElement}
                 canPasteInstructions={true}
                 onPasteInstructions={action('paste instructions')}
+                onWillInstallExtension={action('extension will be installed')}
                 onExtensionInstalled={action('extension installed')}
               />
             )}

@@ -98,6 +98,8 @@ type Props = {|
         | 'none',
     |}
   ) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
   onOpenAskAi: (?OpenAskAiOptions) => void,
   onCloseAskAi: () => void,
   closeProject: () => Promise<void>,
@@ -135,6 +137,8 @@ const CreateSection = ({
   resourceManagementProps,
   onCreateEmptyProject,
   onOpenLayout,
+  onWillInstallExtension,
+  onExtensionInstalled,
   onOpenAskAi,
   onCloseAskAi,
   closeProject,
@@ -518,6 +522,8 @@ const CreateSection = ({
               onCreateProjectFromExample={onCreateProjectFromExample}
               onCreateEmptyProject={onCreateEmptyProject}
               onOpenLayout={onOpenLayout}
+              onWillInstallExtension={onWillInstallExtension}
+              onExtensionInstalled={onExtensionInstalled}
               onOpenAskAi={onOpenAskAiForStandAloneForm}
               onCloseAskAi={onCloseAskAi}
               dismissableIdentifier="home-page-create-section"

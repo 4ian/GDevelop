@@ -15,6 +15,7 @@ import {
   createProductAuthorizedUrl,
   isPrivateAssetResourceAuthorizedUrl,
 } from './Shop';
+import { type ExtensionDependency } from '../../Utils/GDevelopServices/Extension';
 
 export type License = {|
   name: string,
@@ -35,11 +36,6 @@ export type SerializedParameterMetadata = {|
   optional: boolean,
   supplementaryInformation: string,
   type: string, // See ParameterRenderingService for valid types.
-|};
-
-export type ExtensionDependency = {|
-  extensionName: string,
-  extensionVersion: string,
 |};
 
 export type ObjectAsset = {|

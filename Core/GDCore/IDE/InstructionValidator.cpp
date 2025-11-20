@@ -29,12 +29,16 @@ bool InstructionValidator::IsParameterValid(
     const gd::ProjectScopedContainers projectScopedContainers,
     const gd::Instruction &instruction, const InstructionMetadata &metadata,
     std::size_t parameterIndex, const gd::String &value) {
-  auto &parameterMetadata = metadata.GetParameter(parameterIndex);
-  // TODO Remove the ternary when any parameter declaration uses
+  if (parameterIndex >= instruction.GetParametersCount() ||
+      parameterIndex >= metadata.GetParametersCount()) {
+    return false;
+  }
+  const auto &parameterMetadata = metadata.GetParameter(parameterIndex);
+  // TODO Remove the ternary when all parameter declarations use
   // "number" instead of "expression".
-  auto &parameterType = parameterMetadata.GetType() == "expression"
-                            ? "number"
-                            : parameterMetadata.GetType();
+  const auto &parameterType = parameterMetadata.GetType() == "expression"
+                                  ? "number"
+                                  : parameterMetadata.GetType();
   bool shouldNotBeValidated = parameterType == "layer" && value.empty();
   if (shouldNotBeValidated) {
     return true;
@@ -52,17 +56,17 @@ bool InstructionValidator::IsParameterValid(
       return false;
     }
     // New object variable instructions require the variable to be
-    // declared while legacy ones don"t.
-    // This is why it"s done here instead of in the parser directly.
+    // declared while legacy ones don't.
+    // This is why it's done here instead of in the parser directly.
     if (parameterType == "objectvar" &&
         gd::VariableInstructionSwitcher::IsSwitchableVariableInstruction(
             instruction.GetType())) {
-      // Check at least the name of the root variable, it"s the best we can
+      // Check at least the name of the root variable, it's the best we can
       // do.
-      auto &objectsContainersList =
+      const auto &objectsContainersList =
           projectScopedContainers.GetObjectsContainersList();
-      auto &objectName = instruction.GetParameter(0).GetPlainString();
-      auto &variableName =
+      const auto &objectName = instruction.GetParameter(0).GetPlainString();
+      const auto &variableName =
           instruction.GetParameter(parameterIndex).GetPlainString();
       if (objectsContainersList.HasObjectOrGroupWithVariableNamed(
               objectName,
@@ -72,9 +76,9 @@ bool InstructionValidator::IsParameterValid(
       }
     }
   } else if (gd::ParameterMetadata::IsObject(parameterType)) {
-    auto &objectOrGroupName =
+    const auto &objectOrGroupName =
         instruction.GetParameter(parameterIndex).GetPlainString();
-    auto &objectsContainersList =
+    const auto &objectsContainersList =
         projectScopedContainers.GetObjectsContainersList();
     return objectsContainersList.HasObjectOrGroupNamed(objectOrGroupName) &&
            (parameterMetadata.GetExtraInfo().empty() ||
@@ -83,7 +87,7 @@ bool InstructionValidator::IsParameterValid(
            InstructionValidator::HasRequiredBehaviors(
                instruction, metadata, parameterIndex, objectsContainersList);
   } else if (gd::ParameterMetadata::IsExpression("resource", parameterType)) {
-    auto &resourceName =
+    const auto &resourceName =
         instruction.GetParameter(parameterIndex).GetPlainString();
     return projectScopedContainers.GetResourcesContainersList()
         .HasResourceNamed(resourceName);
@@ -92,8 +96,8 @@ bool InstructionValidator::IsParameterValid(
 }
 
 gd::String InstructionValidator::GetRootVariableName(const gd::String &name) {
-  auto dotPosition = name.find('.');
-  auto squareBracketPosition = name.find('[');
+  const auto dotPosition = name.find('.');
+  const auto squareBracketPosition = name.find('[');
   if (dotPosition == gd::String::npos &&
       squareBracketPosition == gd::String::npos) {
     return name;
@@ -108,27 +112,27 @@ bool InstructionValidator::HasRequiredBehaviors(
     const gd::InstructionMetadata &instructionMetadata,
     std::size_t objectParameterIndex,
     const gd::ObjectsContainersList &objectsContainersList) {
-  auto &objectOrGroupName =
+  const auto &objectOrGroupName =
       instruction.GetParameter(objectParameterIndex).GetPlainString();
   for (size_t index = objectParameterIndex + 1;
        index < instructionMetadata.GetParametersCount(); index++) {
-    auto &behaviorParameter = instructionMetadata.GetParameter(index);
+    const auto &behaviorParameter = instructionMetadata.GetParameter(index);
 
-    auto &parameterType = behaviorParameter.GetValueTypeMetadata();
+    const auto &parameterType = behaviorParameter.GetValueTypeMetadata();
     if (parameterType.IsObject()) {
       return true;
     }
     if (!parameterType.IsBehavior()) {
       continue;
     }
-    auto &behaviorType = behaviorParameter.GetExtraInfo();
+    const auto &behaviorType = behaviorParameter.GetExtraInfo();
     if (behaviorType.empty()) {
       continue;
     }
     if (index >= instruction.GetParametersCount()) {
       return false;
     }
-    auto &behaviorName = instruction.GetParameter(index).GetPlainString();
+    const auto &behaviorName = instruction.GetParameter(index).GetPlainString();
     if (objectsContainersList.GetTypeOfBehaviorInObjectOrGroup(
             objectOrGroupName, behaviorName,
             /** searchInGroups = */ true) != behaviorType) {

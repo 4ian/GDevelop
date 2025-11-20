@@ -9,6 +9,7 @@
 #include "GDCore/IDE/WholeProjectRefactorer.h"
 #include "GDCore/IDE/Events/ExpressionTypeFinder.h"
 #include "GDCore/Project/Behavior.h"
+#include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/Project.h"
 
@@ -50,6 +51,30 @@ const UsedExtensionsResult UsedExtensionsFinder::ScanEventsFunctionsExtension(
   gd::ProjectBrowserHelper::ExposeEventsFunctionsExtensionEvents(
       project, eventsFunctionsExtension, worker);
   return worker.result;
+}
+
+const std::vector<gd::String> UsedExtensionsFinder::FindExtensionsDependentOn(
+    gd::Project &project,
+    const gd::EventsFunctionsExtension &eventsFunctionsExtension) {
+  std::vector<gd::String> dependentExtensions;
+  for (std::size_t s = 0; s < project.GetEventsFunctionsExtensionsCount();
+       s++) {
+    auto &otherEventsFunctionsExtension =
+        project.GetEventsFunctionsExtension(s);
+    if (otherEventsFunctionsExtension.GetName() ==
+        eventsFunctionsExtension.GetName()) {
+      continue;
+    }
+    auto usedExtensionsResult =
+        gd::UsedExtensionsFinder::ScanEventsFunctionsExtension(
+            project, otherEventsFunctionsExtension);
+    const auto &usedExtensions = usedExtensionsResult.GetUsedExtensions();
+    if (usedExtensions.find(eventsFunctionsExtension.GetName()) !=
+        usedExtensions.end()) {
+      dependentExtensions.push_back(otherEventsFunctionsExtension.GetName());
+    }
+  }
+  return dependentExtensions;
 }
 
 // Objects scanner

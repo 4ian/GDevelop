@@ -4754,8 +4754,8 @@ namespace gdjs {
           const yDelta = renderer.isPointerLocked()
             ? inputManager.getMouseMovementY()
             : inputManager.getCursorY() - this._lastCursorY;
-          moveCameraByVector(up, -yDelta);
-          moveCameraByVector(right, xDelta);
+          moveCameraByVector(up, yDelta);
+          moveCameraByVector(right, -xDelta);
         }
 
         // Right click: rotate the camera.

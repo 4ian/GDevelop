@@ -112,6 +112,9 @@ bool InstructionValidator::HasRequiredBehaviors(
     const gd::InstructionMetadata &instructionMetadata,
     std::size_t objectParameterIndex,
     const gd::ObjectsContainersList &objectsContainersList) {
+  if (objectParameterIndex >= instruction.GetParametersCount()) {
+    return false;
+  }
   const auto &objectOrGroupName =
       instruction.GetParameter(objectParameterIndex).GetPlainString();
   for (size_t index = objectParameterIndex + 1;

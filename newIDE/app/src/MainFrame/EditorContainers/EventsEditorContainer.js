@@ -29,26 +29,24 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
 
   componentDidMount() {
     if (this.props.isActive) {
-      const layout = this.getLayout();
-      this.props.setPreviewedLayout({
-        layoutName: layout ? layout.getName() : null,
-        externalLayoutName: null,
-        eventsBasedObjectType: null,
-        eventsBasedObjectVariantName: null,
-      });
+      this._setPreviewedLayout();
     }
   }
 
   componentDidUpdate(prevProps: RenderEditorContainerProps) {
     if (!prevProps.isActive && this.props.isActive) {
-      const layout = this.getLayout();
-      this.props.setPreviewedLayout({
-        layoutName: layout ? layout.getName() : null,
-        externalLayoutName: null,
-        eventsBasedObjectType: null,
-        eventsBasedObjectVariantName: null,
-      });
+      this._setPreviewedLayout();
     }
+  }
+
+  _setPreviewedLayout() {
+    const layout = this.getLayout();
+    this.props.setPreviewedLayout({
+      layoutName: layout ? layout.getName() : null,
+      externalLayoutName: null,
+      eventsBasedObjectType: null,
+      eventsBasedObjectVariantName: null,
+    });
   }
 
   getProject(): ?gdProject {

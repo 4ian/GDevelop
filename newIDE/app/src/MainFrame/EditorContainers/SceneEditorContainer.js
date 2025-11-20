@@ -31,6 +31,9 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
   }
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
+    if (!this.props.isActive && nextProps.isActive) {
+      this._setPreviewedLayout();
+    }
     // This optimization is a bit more cautious than the traditional one, to still allow
     // children, and in particular SceneEditor and InstancesEditor, to be notified when isActive
     // goes from true to false (in which case PIXI rendering is halted). If isActive was false
@@ -40,14 +43,18 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
 
   componentDidMount() {
     if (this.props.isActive) {
-      const { projectItemName } = this.props;
-      this.props.setPreviewedLayout({
-        layoutName: projectItemName || null,
-        externalLayoutName: null,
-        eventsBasedObjectType: null,
-        eventsBasedObjectVariantName: null,
-      });
+      this._setPreviewedLayout();
     }
+  }
+
+  _setPreviewedLayout() {
+    const { projectItemName } = this.props;
+    this.props.setPreviewedLayout({
+      layoutName: projectItemName || null,
+      externalLayoutName: null,
+      eventsBasedObjectType: null,
+      eventsBasedObjectVariantName: null,
+    });
   }
 
   notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {
@@ -56,12 +63,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
 
   _switchToSceneEdition(hotReloadSteps: HotReloadSteps): void {
     const { projectItemName, editorId } = this.props;
-    this.props.setPreviewedLayout({
-      layoutName: projectItemName || null,
-      externalLayoutName: null,
-      eventsBasedObjectType: null,
-      eventsBasedObjectVariantName: null,
-    });
+    this._setPreviewedLayout();
     if (
       this.props.gameEditorMode === 'embedded-game' &&
       projectItemName &&

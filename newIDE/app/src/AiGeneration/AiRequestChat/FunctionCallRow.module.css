@@ -32,7 +32,28 @@
   }
 }
 
+.detailsButtonContainer {
+  padding-left: 20px;
+  user-select: none;
+  padding-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  outline: none;
+}
+
+.detailsButtonContainer:hover {
+  opacity: 0.7;
+}
+
+.detailsButtonContainer:focus-visible {
+  outline: 2px solid;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 .detailsPaperContainer {
   transform-origin: top left;
   animation: details-paper-appear 0.1s;
+  padding-left: 20px;
 }

@@ -22,7 +22,6 @@
 }
 
 .header {
-  cursor: pointer;
   user-select: none;
   padding: 4px 0;
   display: flex;

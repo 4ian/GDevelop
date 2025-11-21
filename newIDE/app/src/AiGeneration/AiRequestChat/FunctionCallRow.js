@@ -20,8 +20,7 @@ import {
   type EditorFunctionWithoutProject,
   type EditorCallbacks,
 } from '../../EditorFunctions';
-import Link from '../../UI/Link';
-import { LineStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
+import { LineStackLayout } from '../../UI/Layout';
 import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
 import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
 import Paper from '../../UI/Paper';
@@ -153,50 +152,39 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
             )}
           </span>
         </Tooltip>
-        <ResponsiveLineStackLayout
-          justifyContent="space-between"
-          expand
-          noOverflowParent
+        <Text
+          size="body-small"
+          color="secondary"
+          style={styles.functionCallText}
         >
-          <LineStackLayout noMargin alignItems="baseline">
-            <Text
-              size="body-small"
-              color="secondary"
-              style={styles.functionCallText}
-            >
-              {text || <Trans>Working...</Trans>}
-            </Text>
-            {hasDetailsToShow && (
-              <Text size="body-small" color="secondary">
-                <Link
-                  color="inherit"
-                  href={'#'}
-                  onClick={() => setShowDetails(!showDetails)}
-                >
-                  <span style={{ whiteSpace: 'nowrap', gap: 2 }}>
-                    <Trans>Details</Trans>
-                    {details ? (
-                      <ChevronArrowBottom
-                        fontSize="small"
-                        style={{
-                          verticalAlign: 'middle',
-                        }}
-                      />
-                    ) : (
-                      <ChevronArrowRight
-                        fontSize="small"
-                        style={{
-                          verticalAlign: 'middle',
-                        }}
-                      />
-                    )}
-                  </span>
-                </Link>
-              </Text>
-            )}
-          </LineStackLayout>
-        </ResponsiveLineStackLayout>
+          {text || <Trans>Working...</Trans>}
+        </Text>
       </LineStackLayout>
+      {hasDetailsToShow && (
+        <div
+          className={classes.detailsButtonContainer}
+          onClick={() => setShowDetails(!showDetails)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setShowDetails(!showDetails);
+            }
+          }}
+        >
+          <LineStackLayout noMargin alignItems="center">
+            {showDetails ? (
+              <ChevronArrowBottom fontSize="small" />
+            ) : (
+              <ChevronArrowRight fontSize="small" />
+            )}
+            <Text noMargin size="body-small" color="secondary">
+              <Trans>Details</Trans>
+            </Text>
+          </LineStackLayout>
+        </div>
+      )}
       {details && (
         <div className={classes.detailsPaperContainer}>
           <Paper background="medium" elevation={0} square variant="outlined">

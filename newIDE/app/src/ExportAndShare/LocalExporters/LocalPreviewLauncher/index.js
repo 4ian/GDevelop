@@ -292,7 +292,9 @@ export default class LocalPreviewLauncher extends React.Component<
     // won't necessarily be the first debugger.
     // It doesn't have any side effect because when it wont actually do an hot-reload
     // since the game preview doesn't exist yet.
-    const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
+    const debuggerIds = previewOptions.isForInGameEdition
+      ? this.getPreviewDebuggerServer().getExistingEmbeddedGameFrameDebuggerIds()
+      : this.getPreviewDebuggerServer().getExistingPreviewDebuggerIds();
     const shouldHotReload = previewOptions.hotReload && !!debuggerIds.length;
     if (shouldHotReload) {
       previewExportOptions.setShouldClearExportFolder(

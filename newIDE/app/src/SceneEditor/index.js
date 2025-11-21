@@ -908,14 +908,16 @@ export default class SceneEditor extends React.Component<Props, State> {
     const { previewDebuggerServer } = this.props;
     if (!previewDebuggerServer) return;
 
-    previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-      previewDebuggerServer.sendMessage(debuggerId, {
-        command: 'setInstancesEditorSettings',
-        payload: {
-          instancesEditorSettings,
-        },
+    previewDebuggerServer
+      .getExistingEmbeddedGameFrameDebuggerIds()
+      .forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'setInstancesEditorSettings',
+          payload: {
+            instancesEditorSettings,
+          },
+        });
       });
-    });
   };
 
   /**
@@ -978,14 +980,16 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     const instances = serializeToJSObject(this.props.initialInstances);
 
-    previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-      previewDebuggerServer.sendMessage(debuggerId, {
-        command: 'hotReloadAllInstances',
-        payload: {
-          instances,
-        },
+    previewDebuggerServer
+      .getExistingEmbeddedGameFrameDebuggerIds()
+      .forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'hotReloadAllInstances',
+          payload: {
+            instances,
+          },
+        });
       });
-    });
   };
 
   _onObjectFolderOrObjectWithContextSelected = (
@@ -1110,15 +1114,19 @@ export default class SceneEditor extends React.Component<Props, State> {
   _sendAddedInstances = (instances: Array<gdInitialInstance>) => {
     const { previewDebuggerServer } = this.props;
     if (previewDebuggerServer) {
-      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-        previewDebuggerServer.sendMessage(debuggerId, {
-          command: 'addInstances',
-          payload: {
-            instances: instances.map(instance => serializeToJSObject(instance)),
-            moveUnderCursor: false,
-          },
+      previewDebuggerServer
+        .getExistingEmbeddedGameFrameDebuggerIds()
+        .forEach(debuggerId => {
+          previewDebuggerServer.sendMessage(debuggerId, {
+            command: 'addInstances',
+            payload: {
+              instances: instances.map(instance =>
+                serializeToJSObject(instance)
+              ),
+              moveUnderCursor: false,
+            },
+          });
         });
-      });
     }
   };
 
@@ -1246,14 +1254,16 @@ export default class SceneEditor extends React.Component<Props, State> {
     const { previewDebuggerServer } = this.props;
     if (!previewDebuggerServer) return;
 
-    previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-      previewDebuggerServer.sendMessage(debuggerId, {
-        command: 'updateInstances',
-        payload: {
-          instances: instances.map(instance => serializeToJSObject(instance)),
-        },
+    previewDebuggerServer
+      .getExistingEmbeddedGameFrameDebuggerIds()
+      .forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'updateInstances',
+          payload: {
+            instances: instances.map(instance => serializeToJSObject(instance)),
+          },
+        });
       });
-    });
   };
 
   _onObjectsModified = (objects: Array<gdObject>) => {
@@ -1274,14 +1284,16 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
     const { previewDebuggerServer } = this.props;
     if (previewDebuggerServer) {
-      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-        previewDebuggerServer.sendMessage(debuggerId, {
-          command: 'hotReloadObjects',
-          payload: {
-            updatedObjects: serializedObjects,
-          },
+      previewDebuggerServer
+        .getExistingEmbeddedGameFrameDebuggerIds()
+        .forEach(debuggerId => {
+          previewDebuggerServer.sendMessage(debuggerId, {
+            command: 'hotReloadObjects',
+            payload: {
+              updatedObjects: serializedObjects,
+            },
+          });
         });
-      });
     }
   };
 
@@ -1342,16 +1354,18 @@ export default class SceneEditor extends React.Component<Props, State> {
   _sendSelectedInstances = () => {
     const { previewDebuggerServer } = this.props;
     if (previewDebuggerServer) {
-      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-        previewDebuggerServer.sendMessage(debuggerId, {
-          command: 'setSelectedInstances',
-          payload: {
-            instanceUuids: this.instancesSelection
-              .getSelectedInstances()
-              .map(instance => instance.getPersistentUuid()),
-          },
+      previewDebuggerServer
+        .getExistingEmbeddedGameFrameDebuggerIds()
+        .forEach(debuggerId => {
+          previewDebuggerServer.sendMessage(debuggerId, {
+            command: 'setSelectedInstances',
+            payload: {
+              instanceUuids: this.instancesSelection
+                .getSelectedInstances()
+                .map(instance => instance.getPersistentUuid()),
+            },
+          });
         });
-      });
     }
   };
 
@@ -1502,15 +1516,17 @@ export default class SceneEditor extends React.Component<Props, State> {
       return serializeToJSObject(layer);
     });
     if (previewDebuggerServer) {
-      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-        previewDebuggerServer.sendMessage(debuggerId, {
-          command: 'hotReloadLayers',
-          payload: {
-            layers,
-            areEffectsHidden: project.areEffectsHiddenInEditor(),
-          },
+      previewDebuggerServer
+        .getExistingEmbeddedGameFrameDebuggerIds()
+        .forEach(debuggerId => {
+          previewDebuggerServer.sendMessage(debuggerId, {
+            command: 'hotReloadLayers',
+            payload: {
+              layers,
+              areEffectsHidden: project.areEffectsHiddenInEditor(),
+            },
+          });
         });
-      });
     }
   };
 
@@ -1520,18 +1536,20 @@ export default class SceneEditor extends React.Component<Props, State> {
       return;
     }
     if (previewDebuggerServer) {
-      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-        previewDebuggerServer.sendMessage(debuggerId, {
-          command: 'setBackgroundColor',
-          payload: {
-            backgroundColor: [
-              layout.getBackgroundColorRed(),
-              layout.getBackgroundColorGreen(),
-              layout.getBackgroundColorBlue(),
-            ],
-          },
+      previewDebuggerServer
+        .getExistingEmbeddedGameFrameDebuggerIds()
+        .forEach(debuggerId => {
+          previewDebuggerServer.sendMessage(debuggerId, {
+            command: 'setBackgroundColor',
+            payload: {
+              backgroundColor: [
+                layout.getBackgroundColorRed(),
+                layout.getBackgroundColorGreen(),
+                layout.getBackgroundColorBlue(),
+              ],
+            },
+          });
         });
-      });
     }
   };
 
@@ -1560,14 +1578,16 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     const { previewDebuggerServer } = this.props;
     if (previewDebuggerServer) {
-      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-        previewDebuggerServer.sendMessage(debuggerId, {
-          command: 'setSelectedLayer',
-          payload: {
-            layerName,
-          },
+      previewDebuggerServer
+        .getExistingEmbeddedGameFrameDebuggerIds()
+        .forEach(debuggerId => {
+          previewDebuggerServer.sendMessage(debuggerId, {
+            command: 'setSelectedLayer',
+            payload: {
+              layerName,
+            },
+          });
         });
-      });
     }
   };
 
@@ -1938,12 +1958,14 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     const { previewDebuggerServer } = this.props;
     if (previewDebuggerServer) {
-      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-        previewDebuggerServer.sendMessage(debuggerId, {
-          command: 'deleteSelection',
-          payload: {},
+      previewDebuggerServer
+        .getExistingEmbeddedGameFrameDebuggerIds()
+        .forEach(debuggerId => {
+          previewDebuggerServer.sendMessage(debuggerId, {
+            command: 'deleteSelection',
+            payload: {},
+          });
         });
-      });
     }
   };
 
@@ -2117,14 +2139,16 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.props.gameEditorMode === 'embedded-game') {
       const { previewDebuggerServer } = this.props;
       if (!previewDebuggerServer) return;
-      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-        previewDebuggerServer.sendMessage(debuggerId, {
-          command: 'setZoom',
-          payload: {
-            zoom,
-          },
+      previewDebuggerServer
+        .getExistingEmbeddedGameFrameDebuggerIds()
+        .forEach(debuggerId => {
+          previewDebuggerServer.sendMessage(debuggerId, {
+            command: 'setZoom',
+            payload: {
+              zoom,
+            },
+          });
         });
-      });
     }
   }
 
@@ -2132,14 +2156,16 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.props.gameEditorMode === 'embedded-game') {
       const { previewDebuggerServer } = this.props;
       if (!previewDebuggerServer) return;
-      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-        previewDebuggerServer.sendMessage(debuggerId, {
-          command: 'zoomBy',
-          payload: {
-            zoomFactor,
-          },
+      previewDebuggerServer
+        .getExistingEmbeddedGameFrameDebuggerIds()
+        .forEach(debuggerId => {
+          previewDebuggerServer.sendMessage(debuggerId, {
+            command: 'zoomBy',
+            payload: {
+              zoomFactor,
+            },
+          });
         });
-      });
     }
   }
 
@@ -3080,7 +3106,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                       const { previewDebuggerServer } = this.props;
                       if (previewDebuggerServer) {
                         previewDebuggerServer
-                          .getExistingDebuggerIds()
+                          .getExistingEmbeddedGameFrameDebuggerIds()
                           .forEach(debuggerId => {
                             previewDebuggerServer.sendMessage(debuggerId, {
                               command: 'updateInnerArea',

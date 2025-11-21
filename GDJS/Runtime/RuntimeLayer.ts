@@ -115,7 +115,11 @@ namespace gdjs {
       );
       this.show(!this._hidden);
       for (let i = 0; i < layerData.effects.length; ++i) {
-        this.addEffect(layerData.effects[i]);
+        const effectData = layerData.effects[i];
+        this.addEffect(effectData);
+        if (effectData.isDisabled) {
+          this.enableEffect(effectData.name, false);
+        }
       }
     }
 

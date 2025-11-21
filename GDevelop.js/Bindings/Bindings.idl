@@ -1064,6 +1064,8 @@ interface Effect {
 
   void SetFolded(boolean val);
   boolean IsFolded();
+  void SetEnabled(boolean val);
+  boolean IsEnabled();
 
   void SetDoubleParameter([Const] DOMString name, double value);
   double GetDoubleParameter([Const] DOMString name);

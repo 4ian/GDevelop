@@ -1252,10 +1252,19 @@ namespace gdjs {
                 hotReloadSucceeded =
                   runtimeObject.updateAllEffectParameters(newEffectData) &&
                   hotReloadSucceeded;
+                if (oldEffectData.isDisabled !== newEffectData.isDisabled) {
+                  runtimeObject.enableEffect(
+                    newEffectData.name,
+                    !newEffectData.isDisabled
+                  );
+                }
               } else {
                 // Another effect type was applied
                 runtimeObject.removeEffect(oldEffectData.name);
                 runtimeObject.addEffect(newEffectData);
+                if (newEffectData.isDisabled) {
+                  runtimeObject.enableEffect(newEffectData.name, false);
+                }
               }
             });
             if (!hotReloadSucceeded) {
@@ -1279,6 +1288,9 @@ namespace gdjs {
           runtimeObjects.forEach((runtimeObject) => {
             hotReloadSucceeded =
               runtimeObject.addEffect(newEffectData) && hotReloadSucceeded;
+            if (newEffectData.isDisabled) {
+              runtimeObject.enableEffect(newEffectData.name, false);
+            }
           });
           if (!hotReloadSucceeded) {
             this._logs.push({
@@ -1470,6 +1482,9 @@ namespace gdjs {
               // Effect changed type, consider it was removed and added back.
               runtimeLayer.removeEffect(name);
               runtimeLayer.addEffect(newEffectData);
+              if (newEffectData.isDisabled) {
+                runtimeLayer.enableEffect(newEffectData.name, false);
+              }
             } else {
               this._hotReloadRuntimeLayerEffect(
                 oldEffectData,
@@ -1489,6 +1504,9 @@ namespace gdjs {
         if (!oldEffectData && !runtimeLayer.hasEffect(name)) {
           // Effect was added
           runtimeLayer.addEffect(newEffectData);
+          if (newEffectData.isDisabled) {
+            runtimeLayer.enableEffect(newEffectData.name, false);
+          }
         }
       });
     }
@@ -1499,6 +1517,12 @@ namespace gdjs {
       runtimeLayer: gdjs.RuntimeLayer,
       effectName: string
     ): void {
+      if (oldEffectData.isDisabled !== newEffectData.isDisabled) {
+        runtimeLayer.enableEffect(
+          newEffectData.name,
+          !newEffectData.isDisabled
+        );
+      }
       // We consider oldEffectData.effectType and newEffectData.effectType
       // are the same - it's responsibility of the caller to verify this.
       for (let parameterName in newEffectData.booleanParameters) {

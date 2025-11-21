@@ -9,6 +9,7 @@ import {
 } from '../MainFrame/EditorContainers/BaseEditor';
 import {
   getAiRequest,
+  getAiRequestSuggestions,
   type AiRequest,
   type AiRequestMessageAssistantFunctionCall,
 } from '../Utils/GDevelopServices/Generation';
@@ -18,7 +19,10 @@ import {
   type EditorFunctionCallResult,
 } from '../EditorFunctions/EditorFunctionCallRunner';
 import { type EditorCallbacks } from '../EditorFunctions';
-import { getFunctionCallsToProcess } from './AiRequestUtils';
+import {
+  getFunctionCallOutputsFromEditorFunctionCallResults,
+  getFunctionCallsToProcess,
+} from './AiRequestUtils';
 import { useTriggerAtNextRender } from '../Utils/useTriggerAtNextRender';
 import { useEnsureExtensionInstalled } from './UseEnsureExtensionInstalled';
 import { useGenerateEvents } from './UseGenerateEvents';
@@ -27,6 +31,10 @@ import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { AiRequestContext } from './AiRequestContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { useInterval } from '../Utils/UseInterval';
+import { makeSimplifiedProjectBuilder } from '../EditorFunctions/SimplifiedProject/SimplifiedProject';
+import { prepareAiUserContent } from './PrepareAiUserContent';
+
+const gd: libGDevelop = global.gd;
 
 export const AI_AGENT_TOOLS_VERSION = 'v7';
 export const AI_CHAT_TOOLS_VERSION = 'v7';
@@ -228,12 +236,16 @@ export const useProcessFunctionCalls = ({
   };
 };
 
-export const useAiRequestState = () => {
+export const useAiRequestState = ({ project }: {| project: ?gdProject |}) => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );
-  const { aiRequestStorage } = React.useContext(AiRequestContext);
-  const { aiRequests, updateAiRequest } = aiRequestStorage;
+  const {
+    aiRequestStorage,
+    editorFunctionCallResultsStorage,
+  } = React.useContext(AiRequestContext);
+  const { aiRequests, updateAiRequest, isSendingAiRequest } = aiRequestStorage;
+  const { getEditorFunctionCallResults } = editorFunctionCallResultsStorage;
 
   const { values, setAiState } = React.useContext(PreferencesContext);
   const selectedAiRequestId = values.aiState.aiRequestId;
@@ -265,6 +277,121 @@ export const useAiRequestState = () => {
       onWatch();
     },
     shouldWatchRequest ? 1000 : null
+  );
+
+  React.useEffect(
+    () => {
+      async function fetchSuggestionsIfNeeded() {
+        // If the request :
+        // - is an agent request,
+        // - is not sending a new message right now,
+        // - went from "working" to "ready",
+        // - has a few messages already (not an empty request),
+        // - does not have any tools waiting to run,
+        // - and does not have any suggestions yet,
+        // Then ask for some.
+        if (
+          !selectedAiRequest ||
+          selectedAiRequest.mode !== 'agent' ||
+          isSendingAiRequest(selectedAiRequest.id) ||
+          selectedAiRequest.output.length === 0 ||
+          selectedAiRequest.status !== 'ready' ||
+          !profile
+        )
+          return;
+
+        const hasFunctionsCallsToProcess =
+          getFunctionCallsToProcess({
+            aiRequest: selectedAiRequest,
+            editorFunctionCallResults: getEditorFunctionCallResults(
+              selectedAiRequest.id
+            ),
+          }).length > 0;
+        if (hasFunctionsCallsToProcess) return;
+
+        const {
+          hasUnfinishedResult,
+        } = getFunctionCallOutputsFromEditorFunctionCallResults(
+          getEditorFunctionCallResults(selectedAiRequest.id)
+        );
+        if (hasUnfinishedResult) return;
+
+        const lastMessage =
+          selectedAiRequest.output.length > 0
+            ? selectedAiRequest.output[selectedAiRequest.output.length - 1]
+            : null;
+        if (
+          !lastMessage ||
+          (!(
+            lastMessage.type === 'message' && lastMessage.role === 'assistant'
+          ) &&
+            lastMessage.type !== 'function_call_output') ||
+          lastMessage.suggestions
+        ) {
+          return;
+        }
+
+        const simplifiedProjectBuilder = makeSimplifiedProjectBuilder(gd);
+        const simplifiedProjectJson = project
+          ? JSON.stringify(
+              simplifiedProjectBuilder.getSimplifiedProject(project, {})
+            )
+          : null;
+        const projectSpecificExtensionsSummaryJson = project
+          ? JSON.stringify(
+              simplifiedProjectBuilder.getProjectSpecificExtensionsSummary(
+                project
+              )
+            )
+          : null;
+        const preparedAiUserContent = await prepareAiUserContent({
+          getAuthorizationHeader,
+          userId: profile.id,
+          simplifiedProjectJson,
+          projectSpecificExtensionsSummaryJson,
+        });
+
+        const isLastMessageFunctionCallOutputProjectInitialization =
+          lastMessage.type === 'function_call_output' &&
+          lastMessage.call_id.indexOf('initialize_project') !== -1;
+
+        try {
+          // The request will switch from "ready" to "working" while suggestions are generated.
+          const aiRequestWithSuggestions = await getAiRequestSuggestions(
+            getAuthorizationHeader,
+            {
+              userId: profile.id,
+              aiRequestId: selectedAiRequest.id,
+              suggestionsType: isLastMessageFunctionCallOutputProjectInitialization
+                ? 'list-with-explanations'
+                : 'simple-list',
+              ...preparedAiUserContent,
+            }
+          );
+
+          updateAiRequest(selectedAiRequest.id, aiRequestWithSuggestions);
+        } catch (error) {
+          console.error('Error getting AI request suggestions:', error);
+          // Do not block updating the request if suggestions fetching fails.
+        }
+      }
+
+      // Debounce the call to avoid too many requests in a short period
+      const timeoutId = setTimeout(() => {
+        fetchSuggestionsIfNeeded();
+      }, 300);
+
+      return () => clearTimeout(timeoutId);
+    },
+    [
+      selectedAiRequest,
+      profile,
+      getAuthorizationHeader,
+      project,
+      getEditorFunctionCallResults,
+      updateAiRequest,
+      isSendingAiRequest,
+    ]
   );
 
   React.useEffect(

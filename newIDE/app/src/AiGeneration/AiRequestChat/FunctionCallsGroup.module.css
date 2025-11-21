@@ -1,0 +1,48 @@
+@keyframes group-appear {
+  0% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  60% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+}
+
+.container {
+  animation: group-appear 0.3s;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+
+.header {
+  cursor: pointer;
+  user-select: none;
+  padding: 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  outline: none;
+}
+
+.header:hover {
+  opacity: 0.7;
+}
+
+.header:focus-visible {
+  outline: 2px solid;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  padding-left: 20px;
+}

@@ -181,7 +181,7 @@ export const AskAiStandAloneForm = ({
     setSendingAiRequest,
     setLastSendError,
   } = aiRequestStorage;
-  const { setAiState } = useAiRequestState();
+  const { setAiState } = useAiRequestState({ project });
   const [aiRequestIdForForm, setAiRequestIdForForm] = React.useState<
     string | null
   >(null);
@@ -449,6 +449,14 @@ export const AskAiStandAloneForm = ({
           projectSpecificExtensionsSummaryJson,
         });
 
+        // If we're updating the request, following a function call to initialize the project,
+        // pause the request, so that suggestions can be given by the agent.
+        const paused =
+          functionCallOutputs.length > 0 &&
+          functionCallOutputs.some(
+            output => output.call_id.indexOf('initialize_project') !== -1
+          );
+
         const aiRequest: AiRequest = await retryIfFailed({ times: 2 }, () =>
           addMessageToAiRequest(getAuthorizationHeader, {
             userId: profile.id,
@@ -458,6 +466,7 @@ export const AskAiStandAloneForm = ({
             gameId: project ? project.getProjectUuid() : undefined,
             payWithCredits: false,
             userMessage: '', // No user message when sending only function call outputs.
+            paused,
           })
         );
         updateAiRequest(aiRequest.id, aiRequest);

@@ -12,7 +12,6 @@ import RaisedButton from '../../UI/RaisedButton';
 import { CompactTextAreaFieldWithControls } from '../../UI/CompactTextAreaFieldWithControls';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import Tooltip from '@material-ui/core/Tooltip';
-import Paper from '../../UI/Paper';
 import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import AlertMessage from '../../UI/AlertMessage';
 import classes from './AiRequestChat.module.css';
@@ -28,14 +27,15 @@ import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
 import { type EditorFunctionCallResult } from '../../EditorFunctions/EditorFunctionCallRunner';
 import { type EditorCallbacks } from '../../EditorFunctions';
-import { getFunctionCallsToProcess } from '../AiRequestUtils';
-import CircularProgress from '../../UI/CircularProgress';
+import {
+  getFunctionCallOutputsFromEditorFunctionCallResults,
+  getFunctionCallsToProcess,
+} from '../AiRequestUtils';
 import TwoStatesButton from '../../UI/TwoStatesButton';
 import Help from '../../UI/CustomSvgIcons/Help';
 import Hammer from '../../UI/CustomSvgIcons/Hammer';
 import { ChatMessages } from './ChatMessages';
 import Send from '../../UI/CustomSvgIcons/Send';
-import { FeedbackBanner } from './FeedbackBanner';
 import classNames from 'classnames';
 import {
   type AiConfigurationPresetWithAvailability,
@@ -345,7 +345,9 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
   ) => {
     const {
       aiRequestHistory: { handleNavigateHistory, resetNavigation },
+      editorFunctionCallResultsStorage,
     } = React.useContext(AiRequestContext);
+    const { getEditorFunctionCallResults } = editorFunctionCallResultsStorage;
     const { setAiState } = React.useContext(PreferencesContext);
 
     const [
@@ -520,16 +522,29 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         aiRequestMode,
         aiConfigurationPresetsWithAvailability
       );
+    const hasFunctionsCallsToProcess =
+      aiRequest &&
+      getFunctionCallsToProcess({
+        aiRequest: aiRequest,
+        editorFunctionCallResults: getEditorFunctionCallResults(aiRequest.id),
+      }).length > 0;
     const hasWorkingFunctionCalls =
       editorFunctionCallResults &&
       editorFunctionCallResults.some(
         functionCallOutput => functionCallOutput.status === 'working'
       );
-    const isWorking =
-      isSending ||
-      ((!!hasWorkingFunctionCalls ||
-        (!!aiRequest && aiRequest.status === 'working')) &&
-        isAutoProcessingFunctionCalls);
+    const hasUnfinishedResult =
+      aiRequest &&
+      getFunctionCallOutputsFromEditorFunctionCallResults(
+        getEditorFunctionCallResults(aiRequest.id)
+      ).hasUnfinishedResult;
+    const hasWorkToProcess =
+      hasUnfinishedResult ||
+      !!hasWorkingFunctionCalls ||
+      !!hasFunctionsCallsToProcess ||
+      (!!aiRequest && aiRequest.status === 'working');
+    const isPaused = !!aiRequest && !isAutoProcessingFunctionCalls;
+    const isWorking = isSending || (hasWorkToProcess && !isPaused);
 
     const hasReachedLimitAndCannotUseCredits =
       !!quota &&
@@ -773,33 +788,12 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     const isPausedAndHasFunctionCallsToProcess =
       !isAutoProcessingFunctionCalls && allFunctionCallsToProcess.length > 0;
 
-    const lastMessageIndex = aiRequest.output.length - 1;
-    const lastMessage = aiRequest.output[lastMessageIndex];
     const shouldDisplayFeedbackBanner =
       !hasWorkingFunctionCalls &&
       !isPausedAndHasFunctionCallsToProcess &&
       !isSending &&
       aiRequest.status === 'ready' &&
-      aiRequest.mode === 'agent' &&
-      lastMessage.type === 'message' &&
-      lastMessage.role === 'assistant';
-    const lastMessageFeedbackBanner = shouldDisplayFeedbackBanner && (
-      <FeedbackBanner
-        onSendFeedback={(
-          feedback: 'like' | 'dislike',
-          reason?: string,
-          freeFormDetails?: string
-        ) => {
-          onSendFeedback(
-            aiRequestId,
-            lastMessageIndex,
-            feedback,
-            reason,
-            freeFormDetails
-          );
-        }}
-      />
-    );
+      aiRequest.mode === 'agent';
 
     const isForAnotherProject =
       !!requiredGameId &&
@@ -842,10 +836,15 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             editorCallbacks={editorCallbacks}
             project={project}
             onProcessFunctionCalls={onProcessFunctionCalls}
+            onUserRequestTextChange={onUserRequestTextChange}
+            isPaused={isPaused}
+            shouldBeWorkingIfNotPaused={hasWorkToProcess || isWorking}
+            isForAnotherProject={isForAnotherProject}
+            shouldDisplayFeedbackBanner={shouldDisplayFeedbackBanner}
+            onPause={(pause: boolean) => setAutoProcessFunctionCalls(!pause)}
           />
           <Spacer />
           <ColumnStackLayout noMargin>
-            {lastMessageFeedbackBanner}
             {userMessagesCount >= TOO_MANY_USER_MESSAGES_WARNING_COUNT ? (
               <AlertMessage
                 kind={
@@ -876,62 +875,6 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
           })}
         >
           <Column justifyContent="stretch" alignItems="stretch" noMargin>
-            {aiRequest.mode === 'agent' && isWorking ? (
-              <Paper background="dark" variant="outlined">
-                <Column>
-                  <LineStackLayout
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <LineStackLayout alignItems="center" noMargin>
-                      <CircularProgress variant="indeterminate" size={12} />
-                      <Text size="body" color="secondary" noMargin>
-                        <Trans>The AI is building your request.</Trans>
-                      </Text>
-                    </LineStackLayout>
-                    <Text size="body" noMargin>
-                      <Link
-                        href={'#'}
-                        color="secondary"
-                        onClick={() => {
-                          setAutoProcessFunctionCalls(false);
-                        }}
-                      >
-                        <Trans>Pause</Trans>
-                      </Link>
-                    </Text>
-                  </LineStackLayout>
-                </Column>
-              </Paper>
-            ) : aiRequest.mode === 'agent' &&
-              isPausedAndHasFunctionCallsToProcess ? (
-              <Paper background="dark" variant="outlined">
-                <Column>
-                  <LineStackLayout
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <LineStackLayout alignItems="center" noMargin>
-                      <Text size="body" color="secondary" noMargin>
-                        <Trans>The AI agent is paused.</Trans>
-                      </Text>
-                    </LineStackLayout>
-                    <Text size="body" noMargin>
-                      <Link
-                        href={'#'}
-                        color="secondary"
-                        onClick={() => {
-                          setAutoProcessFunctionCalls(true);
-                          onProcessFunctionCalls(allFunctionCallsToProcess);
-                        }}
-                      >
-                        <Trans>Resume all</Trans>
-                      </Link>
-                    </Text>
-                  </LineStackLayout>
-                </Column>
-              </Paper>
-            ) : null}
             {!standAloneForm && (
               <CompactTextAreaFieldWithControls
                 maxLength={6000}
@@ -954,6 +897,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                     : t`Ask a follow up question`
                 }
                 rows={2}
+                maxRows={6}
                 onSubmit={() => {
                   setAutoProcessFunctionCalls(true);
                   onSendMessage({

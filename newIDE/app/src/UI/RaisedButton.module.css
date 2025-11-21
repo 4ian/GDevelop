@@ -26,3 +26,12 @@ button.buttonPremium {
 button.buttonPremium:hover {
     background: linear-gradient(90deg, var(--theme-premium-teal-dark) 0%, var(--theme-premium-orange-dark) 100%);
 }
+
+button.buttonAi {
+    background: linear-gradient(90deg, rgb(153, 121, 241) 0%, rgb(255, 188, 87) 100%);
+    color: var(--theme-premium-text-contrast-color);
+}
+
+button.buttonAi:hover {
+    background: linear-gradient(90deg, rgb(143, 111, 231) 0%, rgb(245, 178, 77) 100%);
+}

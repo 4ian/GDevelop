@@ -9,6 +9,16 @@ export type Environment = 'staging' | 'live';
 
 export type GenerationStatus = 'working' | 'ready' | 'error';
 
+export type AiRequestSuggestion = {
+  title: string,
+  suggestedMessage: string,
+};
+
+export type AiRequestSuggestions = {
+  explanationMessage: string,
+  suggestions: Array<AiRequestSuggestion>,
+};
+
 export type AiRequestMessageAssistantFunctionCall = {|
   type: 'function_call',
   status: 'completed',
@@ -21,8 +31,8 @@ export type AiRequestFunctionCallOutput = {
   type: 'function_call_output',
   call_id: string,
   output: string,
+  suggestions?: AiRequestSuggestions,
 };
-
 export type AiRequestAssistantMessage = {
   type: 'message',
   status: 'completed',
@@ -44,6 +54,7 @@ export type AiRequestAssistantMessage = {
       }
     | AiRequestMessageAssistantFunctionCall
   >,
+  suggestions?: AiRequestSuggestions,
 };
 
 export type AiRequestUserMessage = {
@@ -318,6 +329,7 @@ export const addMessageToAiRequest = async (
     gameProjectJsonUserRelativeKey,
     projectSpecificExtensionsSummaryJson,
     projectSpecificExtensionsSummaryJsonUserRelativeKey,
+    paused,
   }: {|
     userId: string,
     aiRequestId: string,
@@ -329,6 +341,7 @@ export const addMessageToAiRequest = async (
     gameProjectJsonUserRelativeKey: string | null,
     projectSpecificExtensionsSummaryJson: string | null,
     projectSpecificExtensionsSummaryJsonUserRelativeKey: string | null,
+    paused?: boolean,
   |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -345,6 +358,7 @@ export const addMessageToAiRequest = async (
       gameProjectJsonUserRelativeKey,
       projectSpecificExtensionsSummaryJson,
       projectSpecificExtensionsSummaryJsonUserRelativeKey,
+      paused,
     },
     {
       params: {
@@ -385,6 +399,49 @@ export const sendAiRequestFeedback = async (
       feedback,
       reason,
       freeFormDetails,
+    },
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const getAiRequestSuggestions = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    aiRequestId,
+    suggestionsType,
+    gameProjectJson,
+    gameProjectJsonUserRelativeKey,
+    projectSpecificExtensionsSummaryJson,
+    projectSpecificExtensionsSummaryJsonUserRelativeKey,
+  }: {|
+    userId: string,
+    aiRequestId: string,
+    suggestionsType: 'simple-list' | 'list-with-explanations',
+    gameProjectJson: string | null,
+    gameProjectJsonUserRelativeKey: string | null,
+    projectSpecificExtensionsSummaryJson: string | null,
+    projectSpecificExtensionsSummaryJsonUserRelativeKey: string | null,
+  |}
+): Promise<AiRequest> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.post(
+    `/ai-request/${aiRequestId}/action/get-suggestions`,
+    {
+      suggestionsType,
+      gdevelopVersionWithHash: getIDEVersionWithHash(),
+      gameProjectJson,
+      gameProjectJsonUserRelativeKey,
+      projectSpecificExtensionsSummaryJson,
+      projectSpecificExtensionsSummaryJsonUserRelativeKey,
     },
     {
       params: {

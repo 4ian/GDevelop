@@ -15,7 +15,7 @@
 }
 
 .functionCallContainer {
-  animation: function-call-appear 0.5s;
+  animation: function-call-appear 0.3s;
   display: flex;
   flex-direction: column;
   gap: 4px;

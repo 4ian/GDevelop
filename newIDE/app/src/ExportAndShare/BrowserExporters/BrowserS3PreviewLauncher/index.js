@@ -81,7 +81,9 @@ export default class BrowserS3PreviewLauncher extends React.Component<
       error: null,
     });
 
-    const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
+    const debuggerIds = previewOptions.isForInGameEdition
+      ? this.getPreviewDebuggerServer().getExistingEmbeddedGameFrameDebuggerIds()
+      : this.getPreviewDebuggerServer().getExistingPreviewDebuggerIds();
     const lastDebuggerId = debuggerIds.length
       ? debuggerIds[debuggerIds.length - 1]
       : null;

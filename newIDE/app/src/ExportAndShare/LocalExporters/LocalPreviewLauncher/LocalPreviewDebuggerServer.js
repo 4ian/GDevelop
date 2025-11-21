@@ -20,9 +20,14 @@ let embeddedGameFrameWindow: WindowProxy | null = null;
 let isWindowMessageListenerRegistered = false;
 
 const getExistingDebuggerIds = (): Array<DebuggerId> => [
-  ...debuggerIds,
-  ...(embeddedGameFrameWindow ? ['embedded-game-frame'] : []),
+  ...getExistingEmbeddedGameFrameDebuggerIds(),
+  ...getExistingPreviewDebuggerIds(),
 ];
+
+const getExistingEmbeddedGameFrameDebuggerIds = (): Array<DebuggerId> =>
+  embeddedGameFrameWindow ? ['embedded-game-frame'] : [];
+
+const getExistingPreviewDebuggerIds = (): Array<DebuggerId> => debuggerIds;
 
 const handleParsedMessage = (
   id: DebuggerId,
@@ -236,6 +241,12 @@ class LocalPreviewDebuggerServer {
   }
   getExistingDebuggerIds() {
     return getExistingDebuggerIds();
+  }
+  getExistingEmbeddedGameFrameDebuggerIds() {
+    return getExistingEmbeddedGameFrameDebuggerIds();
+  }
+  getExistingPreviewDebuggerIds() {
+    return getExistingPreviewDebuggerIds();
   }
   registerCallbacks(callbacks: PreviewDebuggerServerCallbacks) {
     callbacksList.push(callbacks);

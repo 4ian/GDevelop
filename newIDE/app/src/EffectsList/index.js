@@ -56,6 +56,9 @@ import ResponsiveFlatButton from '../UI/ResponsiveFlatButton';
 import { Accordion, AccordionHeader, AccordionBody } from '../UI/Accordion';
 import { type Field } from '../CompactPropertiesEditor';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import InlineCheckbox from '../UI/InlineCheckbox';
+import VisibilityIcon from '../UI/CustomSvgIcons/Visibility';
+import VisibilityOffIcon from '../UI/CustomSvgIcons/VisibilityOff';
 
 const gd: libGDevelop = global.gd;
 
@@ -300,6 +303,24 @@ const Effect = React.forwardRef(
                       />
                     ))}
                   </SelectField>
+                  <InlineCheckbox
+                    id="layer-visibility"
+                    paddingSize="small"
+                    checkedIcon={<VisibilityIcon />}
+                    uncheckedIcon={<VisibilityOffIcon />}
+                    checked={!effect.isInitiallyDisabled()}
+                    onCheck={(e, checked) => {
+                      effect.setInitiallyDisabled(!checked);
+                      forceUpdate();
+                    }}
+                    tooltipOrHelperText={
+                      !effect.isInitiallyDisabled() ? (
+                        <Trans>Disable from the start</Trans>
+                      ) : (
+                        <Trans>Enable from the start</Trans>
+                      )
+                    }
+                  />
                 </Line>
               </ResponsiveLineStackLayout>
               <ElementWithMenu

@@ -1252,10 +1252,23 @@ namespace gdjs {
                 hotReloadSucceeded =
                   runtimeObject.updateAllEffectParameters(newEffectData) &&
                   hotReloadSucceeded;
+                if (
+                  oldEffectData.isInitiallyDisabled !==
+                  newEffectData.isInitiallyDisabled
+                ) {
+                  runtimeObject.enableEffect(
+                    newEffectData.name,
+                    !newEffectData.isInitiallyDisabled
+                  );
+                }
               } else {
                 // Another effect type was applied
                 runtimeObject.removeEffect(oldEffectData.name);
                 runtimeObject.addEffect(newEffectData);
+
+                if (newEffectData.isInitiallyDisabled) {
+                  runtimeObject.enableEffect(newEffectData.name, false);
+                }
               }
             });
             if (!hotReloadSucceeded) {
@@ -1279,6 +1292,9 @@ namespace gdjs {
           runtimeObjects.forEach((runtimeObject) => {
             hotReloadSucceeded =
               runtimeObject.addEffect(newEffectData) && hotReloadSucceeded;
+            if (newEffectData.isInitiallyDisabled) {
+              runtimeObject.enableEffect(newEffectData.name, false);
+            }
           });
           if (!hotReloadSucceeded) {
             this._logs.push({
@@ -1470,6 +1486,9 @@ namespace gdjs {
               // Effect changed type, consider it was removed and added back.
               runtimeLayer.removeEffect(name);
               runtimeLayer.addEffect(newEffectData);
+              if (newEffectData.isInitiallyDisabled) {
+                runtimeLayer.enableEffect(newEffectData.name, false);
+              }
             } else {
               this._hotReloadRuntimeLayerEffect(
                 oldEffectData,
@@ -1499,6 +1518,14 @@ namespace gdjs {
       runtimeLayer: gdjs.RuntimeLayer,
       effectName: string
     ): void {
+      if (
+        oldEffectData.isInitiallyDisabled !== newEffectData.isInitiallyDisabled
+      ) {
+        runtimeLayer.enableEffect(
+          newEffectData.name,
+          !newEffectData.isInitiallyDisabled
+        );
+      }
       // We consider oldEffectData.effectType and newEffectData.effectType
       // are the same - it's responsibility of the caller to verify this.
       for (let parameterName in newEffectData.booleanParameters) {

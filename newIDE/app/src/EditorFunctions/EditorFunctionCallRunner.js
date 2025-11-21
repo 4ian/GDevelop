@@ -1,4 +1,5 @@
 // @flow
+import { type I18n as I18nType } from '@lingui/core';
 import { type EventsGenerationResult } from '.';
 import {
   editorFunctions,
@@ -37,6 +38,7 @@ export type EditorFunctionCallResult =
 export type ProcessEditorFunctionCallsOptions = {|
   project: ?gdProject,
   functionCalls: Array<EditorFunctionCall>,
+  i18n: I18nType,
   editorCallbacks: EditorCallbacks,
   ignore: boolean,
   generateEvents: (
@@ -67,6 +69,7 @@ export type ProcessEditorFunctionCallsOptions = {|
 export const processEditorFunctionCalls = async ({
   functionCalls,
   project,
+  i18n,
   editorCallbacks,
   generateEvents,
   onSceneEventsModifiedOutsideEditor,
@@ -166,6 +169,7 @@ export const processEditorFunctionCalls = async ({
 
       const argumentsWithoutProject = {
         args,
+        i18n,
         editorCallbacks,
         generateEvents,
         onSceneEventsModifiedOutsideEditor,

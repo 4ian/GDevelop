@@ -80,6 +80,7 @@ type Props = {
   onSendMessage: (options: {|
     userMessage: string,
     createdSceneNames?: Array<string>,
+    editorFunctionCallResults?: Array<EditorFunctionCallResult>,
   |}) => Promise<void>,
   onSendFeedback: (
     aiRequestId: string,
@@ -396,16 +397,24 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     );
     const requiredGameId = (aiRequest && aiRequest.gameId) || null;
 
-    // Auto-scroll to bottom when content changes, if user is at the bottom
+    const scrollToBottom = React.useCallback(() => {
+      if (scrollViewRef.current) {
+        scrollViewRef.current.scrollToBottom({ behavior: 'smooth' });
+      }
+    }, []);
+
+    // Auto-scroll to bottom when content changes, if user is at the bottom.
     React.useEffect(
       () => {
-        if (shouldAutoScroll && scrollViewRef.current) {
-          scrollViewRef.current.scrollToBottom({
-            behavior: 'smooth',
-          });
-        }
+        if (shouldAutoScroll) scrollToBottom();
       },
-      [aiRequest, editorFunctionCallResults, lastSendError, shouldAutoScroll]
+      [
+        scrollToBottom,
+        aiRequest,
+        editorFunctionCallResults,
+        lastSendError,
+        shouldAutoScroll,
+      ]
     );
 
     const onScroll = React.useCallback(
@@ -487,11 +496,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         const aiRequestIdToReset: string = aiRequestId || '';
         onUserRequestTextChange('', aiRequestIdToReset);
 
-        if (scrollViewRef.current) {
-          scrollViewRef.current.scrollToBottom({
-            behavior: 'smooth',
-          });
-        }
+        scrollToBottom();
       },
     }));
 
@@ -622,6 +627,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             )}
             <form
               onSubmit={() => {
+                scrollToBottom();
                 onStartNewAiRequest({
                   mode: aiRequestMode,
                   userRequest: userRequestTextPerAiRequestId[''],
@@ -643,6 +649,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                   }}
                   onNavigateHistory={handleNavigateHistory}
                   onSubmit={() => {
+                    scrollToBottom();
                     onStartNewAiRequest({
                       mode: aiRequestMode,
                       userRequest: userRequestTextPerAiRequestId[''],
@@ -685,6 +692,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                               !hasReachedLimitAndCannotUseCredits)
                           }
                           onClick={() => {
+                            scrollToBottom();
                             onStartNewAiRequest({
                               mode: aiRequestMode,
                               userRequest: userRequestTextPerAiRequestId[''],

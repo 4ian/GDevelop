@@ -23,7 +23,6 @@ import {
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
 } from './AiRequestUtils';
-import { useTriggerAtNextRender } from '../Utils/useTriggerAtNextRender';
 import { useEnsureExtensionInstalled } from './UseEnsureExtensionInstalled';
 import { useGenerateEvents } from './UseGenerateEvents';
 import { useSearchAndInstallAsset } from './UseSearchAndInstallAsset';
@@ -62,13 +61,16 @@ export const useProcessFunctionCalls = ({
   editorCallbacks: EditorCallbacks,
   selectedAiRequest: ?AiRequest,
   onSendEditorFunctionCallResults: (
-    options: null | {| createdSceneNames: Array<string> |}
+    editorFunctionCallResults: Array<EditorFunctionCallResult>,
+    options: {|
+      createdSceneNames: Array<string>,
+    |}
   ) => Promise<void>,
   getEditorFunctionCallResults: string => Array<EditorFunctionCallResult> | null,
   addEditorFunctionCallResults: (
     string,
     Array<EditorFunctionCallResult>
-  ) => void,
+  ) => Array<EditorFunctionCallResult>,
   onSceneEventsModifiedOutsideEditor: (
     changes: SceneEventsOutsideEditorChanges
   ) => void,
@@ -96,10 +98,6 @@ export const useProcessFunctionCalls = ({
     onExtensionInstalled,
   });
   const { generateEvents } = useGenerateEvents({ project });
-
-  const triggerSendEditorFunctionCallResults = useTriggerAtNextRender(
-    onSendEditorFunctionCallResults
-  );
 
   const [
     aiRequestAutoProcessState,
@@ -145,6 +143,7 @@ export const useProcessFunctionCalls = ({
       const { results, createdSceneNames } = await processEditorFunctionCalls({
         project,
         editorCallbacks,
+        i18n,
         functionCalls: functionCalls.map(functionCall => ({
           name: functionCall.name,
           arguments: functionCall.arguments,
@@ -167,15 +166,19 @@ export const useProcessFunctionCalls = ({
         searchAndInstallAsset,
       });
 
-      addEditorFunctionCallResults(selectedAiRequest.id, results);
+      const newResults = addEditorFunctionCallResults(
+        selectedAiRequest.id,
+        results
+      );
 
       // We may have processed everything, so try to send the results
       // to the backend.
-      triggerSendEditorFunctionCallResults({
+      await onSendEditorFunctionCallResults(newResults, {
         createdSceneNames,
       });
     },
     [
+      i18n,
       selectedAiRequest,
       isReadyToProcessFunctionCalls,
       addEditorFunctionCallResults,
@@ -189,8 +192,8 @@ export const useProcessFunctionCalls = ({
       onWillInstallExtension,
       onExtensionInstalled,
       searchAndInstallAsset,
-      triggerSendEditorFunctionCallResults,
       generateEvents,
+      onSendEditorFunctionCallResults,
     ]
   );
 

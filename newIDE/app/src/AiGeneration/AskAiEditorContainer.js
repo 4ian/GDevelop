@@ -34,6 +34,7 @@ import {
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
 } from './AiRequestUtils';
+import { type EditorFunctionCallResult } from '../EditorFunctions/EditorFunctionCallRunner';
 import { useStableUpToDateRef } from '../Utils/UseStableUpToDateCallback';
 import {
   type NewProjectSetup,
@@ -219,6 +220,9 @@ export const AskAiEditor = React.memo<Props>(
             // Don't reposition the Ask AI editor,
             // as it will be done manually after the project is created too.
             dontRepositionAskAiEditor: true,
+            // Don't close the New project setup dialog,
+            // as it will be done manually after the project is created too.
+            dontCloseNewProjectSetupDialog: true,
             creationSource: 'ai-agent-request',
           };
 
@@ -239,13 +243,9 @@ export const AskAiEditor = React.memo<Props>(
             // The example was not found - still create an empty project.
           }
 
-          const { createdProject } = await onCreateEmptyProject({
-            projectName: name,
-            storageProvider: UrlStorageProvider,
-            saveAsLocation: null,
-            dontOpenAnySceneOrProjectManager: true,
-            creationSource: 'ai-agent-request',
-          });
+          const { createdProject } = await onCreateEmptyProject(
+            newProjectSetup
+          );
 
           return { exampleSlug: null, createdProject };
         },
@@ -532,34 +532,28 @@ export const AskAiEditor = React.memo<Props>(
         ]
       );
 
-      const hasFunctionsCallsToProcess = React.useMemo(
-        () =>
-          selectedAiRequest
-            ? getFunctionCallsToProcess({
-                aiRequest: selectedAiRequest,
-                editorFunctionCallResults: getEditorFunctionCallResults(
-                  selectedAiRequest.id
-                ),
-              }).length > 0
-            : false,
-        [selectedAiRequest, getEditorFunctionCallResults]
-      );
-
       // Send the results of the function call outputs, if any, and the user message (if any).
       const onSendMessage = React.useCallback(
         async ({
           userMessage,
           createdSceneNames,
+          editorFunctionCallResults,
         }: {|
           userMessage: string,
           createdSceneNames?: Array<string>,
+          editorFunctionCallResults?: Array<EditorFunctionCallResult>,
         |}) => {
           if (
             !profile ||
             !selectedAiRequestId ||
+            !selectedAiRequest ||
             isSendingAiRequest(selectedAiRequestId)
           )
             return;
+
+          const editorFunctionCallResultsToUse =
+            editorFunctionCallResults ||
+            getEditorFunctionCallResults(selectedAiRequestId);
 
           // Read the results from the editor that applied the function calls.
           // and transform them into the output that will be stored on the AI request.
@@ -567,8 +561,14 @@ export const AskAiEditor = React.memo<Props>(
             hasUnfinishedResult,
             functionCallOutputs,
           } = getFunctionCallOutputsFromEditorFunctionCallResults(
-            getEditorFunctionCallResults(selectedAiRequestId)
+            editorFunctionCallResultsToUse
           );
+
+          const hasFunctionsCallsToProcess =
+            getFunctionCallsToProcess({
+              aiRequest: selectedAiRequest,
+              editorFunctionCallResults: editorFunctionCallResultsToUse,
+            }).length > 0;
 
           // If anything is not finished yet, stop there (we only send all
           // results at once, AI do not support partial results).
@@ -734,7 +734,6 @@ export const AskAiEditor = React.memo<Props>(
           setLastSendError,
           onRefreshLimits,
           project,
-          hasFunctionsCallsToProcess,
           onOpenAskAi,
           onOpenLayout,
           subscription,
@@ -743,10 +742,16 @@ export const AskAiEditor = React.memo<Props>(
         ]
       );
       const onSendEditorFunctionCallResults = React.useCallback(
-        async (options: null | {| createdSceneNames: Array<string> |}) => {
+        async (
+          editorFunctionCallResults: Array<EditorFunctionCallResult>,
+          options: {|
+            createdSceneNames: Array<string>,
+          |}
+        ) => {
           await onSendMessage({
             userMessage: '',
-            createdSceneNames: options ? options.createdSceneNames : [],
+            createdSceneNames: options.createdSceneNames,
+            editorFunctionCallResults,
           });
         },
         [onSendMessage]

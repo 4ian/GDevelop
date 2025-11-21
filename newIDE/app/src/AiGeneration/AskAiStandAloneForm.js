@@ -21,6 +21,7 @@ import {
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
 } from './AiRequestUtils';
+import { type EditorFunctionCallResult } from '../EditorFunctions/EditorFunctionCallRunner';
 import { useStableUpToDateRef } from '../Utils/UseStableUpToDateCallback';
 import {
   type NewProjectSetup,
@@ -379,32 +380,26 @@ export const AskAiStandAloneForm = ({
     ]
   );
 
-  const hasFunctionsCallsToProcess = React.useMemo(
-    () =>
-      aiRequestForForm
-        ? getFunctionCallsToProcess({
-            aiRequest: aiRequestForForm,
-            editorFunctionCallResults: getEditorFunctionCallResults(
-              aiRequestForForm.id
-            ),
-          }).length > 0
-        : false,
-    [aiRequestForForm, getEditorFunctionCallResults]
-  );
-
   const isLoading = isSendingAiRequest(aiRequestIdForForm);
 
   // Send the results of the function call outputs only.
   // In a standalone form, the only user message is sent when starting the request.
   const onSendMessage = React.useCallback(
     async ({
-      createdSceneNames,
       userMessage,
+      createdSceneNames,
+      editorFunctionCallResults,
     }: {|
-      createdSceneNames?: Array<string>,
       userMessage: string,
+      createdSceneNames?: Array<string>,
+      editorFunctionCallResults?: Array<EditorFunctionCallResult>,
     |}) => {
-      if (!profile || !aiRequestIdForForm || isLoading) return;
+      if (!profile || !aiRequestIdForForm || !aiRequestForForm || isLoading)
+        return;
+
+      const editorFunctionCallResultsToUse =
+        editorFunctionCallResults ||
+        getEditorFunctionCallResults(aiRequestIdForForm);
 
       // Read the results from the editor that applied the function calls.
       // and transform them into the output that will be stored on the AI request.
@@ -412,8 +407,14 @@ export const AskAiStandAloneForm = ({
         hasUnfinishedResult,
         functionCallOutputs,
       } = getFunctionCallOutputsFromEditorFunctionCallResults(
-        getEditorFunctionCallResults(aiRequestIdForForm)
+        editorFunctionCallResultsToUse
       );
+
+      const hasFunctionsCallsToProcess =
+        getFunctionCallsToProcess({
+          aiRequest: aiRequestForForm,
+          editorFunctionCallResults: editorFunctionCallResultsToUse,
+        }).length > 0;
 
       // If anything is not finished yet, stop there (we only send all
       // results at once, AI do not support partial results).
@@ -512,17 +513,20 @@ export const AskAiStandAloneForm = ({
       getAuthorizationHeader,
       setLastSendError,
       project,
-      hasFunctionsCallsToProcess,
       onOpenAskAi,
       onOpenLayout,
       aiRequestForForm,
     ]
   );
   const onSendEditorFunctionCallResults = React.useCallback(
-    async (options: null | {| createdSceneNames: Array<string> |}) => {
+    async (
+      editorFunctionCallResults: Array<EditorFunctionCallResult>,
+      options: {| createdSceneNames: Array<string> |}
+    ) => {
       await onSendMessage({
-        createdSceneNames: options ? options.createdSceneNames : [],
         userMessage: '',
+        createdSceneNames: options.createdSceneNames,
+        editorFunctionCallResults,
       });
     },
     [onSendMessage]

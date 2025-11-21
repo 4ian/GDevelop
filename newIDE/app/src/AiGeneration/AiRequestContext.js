@@ -21,7 +21,7 @@ type EditorFunctionCallResultsStorage = {|
   addEditorFunctionCallResults: (
     aiRequestId: string,
     editorFunctionCallResults: EditorFunctionCallResult[]
-  ) => void,
+  ) => EditorFunctionCallResult[],
   clearEditorFunctionCallResults: (aiRequestId: string) => void,
 |};
 
@@ -44,32 +44,31 @@ const useEditorFunctionCallResultsStorage = (): EditorFunctionCallResultsStorage
         aiRequestId: string,
         editorFunctionCallResults: EditorFunctionCallResult[]
       ) => {
-        setEditorFunctionCallResultsPerRequest(
-          editorFunctionCallResultsPerRequest => {
-            const existingEditorFunctionCallResults = (
-              editorFunctionCallResultsPerRequest[aiRequestId] || []
-            ).filter(existingEditorFunctionCallResult => {
-              return !editorFunctionCallResults.some(
-                editorFunctionCallResult => {
-                  return (
-                    editorFunctionCallResult.call_id ===
-                    existingEditorFunctionCallResult.call_id
-                  );
-                }
-              );
-            });
+        const existingEditorFunctionCallResults = (
+          editorFunctionCallResultsPerRequest[aiRequestId] || []
+        ).filter(existingEditorFunctionCallResult => {
+          return !editorFunctionCallResults.some(editorFunctionCallResult => {
+            return (
+              editorFunctionCallResult.call_id ===
+              existingEditorFunctionCallResult.call_id
+            );
+          });
+        });
 
-            return {
-              ...editorFunctionCallResultsPerRequest,
-              [aiRequestId]: [
-                ...existingEditorFunctionCallResults,
-                ...editorFunctionCallResults,
-              ],
-            };
-          }
+        const newEditorFunctionCallResultsPerRequest = {
+          ...editorFunctionCallResultsPerRequest,
+          [aiRequestId]: [
+            ...existingEditorFunctionCallResults,
+            ...editorFunctionCallResults,
+          ],
+        };
+        setEditorFunctionCallResultsPerRequest(
+          newEditorFunctionCallResultsPerRequest
         );
+
+        return newEditorFunctionCallResultsPerRequest[aiRequestId];
       },
-      []
+      [editorFunctionCallResultsPerRequest]
     ),
     clearEditorFunctionCallResults: React.useCallback((aiRequestId: string) => {
       setEditorFunctionCallResultsPerRequest(
@@ -435,7 +434,7 @@ export const initialAiRequestContextState: AiRequestContextState = {
   },
   editorFunctionCallResultsStorage: {
     getEditorFunctionCallResults: () => [],
-    addEditorFunctionCallResults: () => {},
+    addEditorFunctionCallResults: () => [],
     clearEditorFunctionCallResults: () => {},
   },
   getAiSettings: () => null,

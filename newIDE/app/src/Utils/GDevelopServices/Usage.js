@@ -143,6 +143,7 @@ export type Quota = {|
   current: number,
   max: number,
   period?: '1day' | '30days',
+  resetsAt?: number,
 |};
 
 export type Quotas = {

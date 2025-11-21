@@ -62,18 +62,24 @@ const commonProps = {
   project: null,
   quota: {
     limitReached: false,
-    current: 1,
-    max: 2,
+    current: 100,
+    max: 200,
   },
   onStartNewAiRequest: () => {},
   onSendMessage: async () => {},
   isSending: false,
   price: {
-    priceInCredits: 5,
+    priceInCredits: 3,
     variablePrice: {
       agent: {
         default: {
-          minimumPriceInCredits: 4,
+          minimumPriceInCredits: 3,
+          maximumPriceInCredits: 20,
+        },
+      },
+      chat: {
+        default: {
+          minimumPriceInCredits: 3,
           maximumPriceInCredits: 20,
         },
       },

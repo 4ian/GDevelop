@@ -137,73 +137,42 @@ const getPriceAndRequestsTextAndTooltip = ({
   isMobile: boolean,
   aiRequestMode: 'chat' | 'agent',
   lastUserMessagePriceInCredits?: number | null,
-|}): {|
-  text: React.Node | null,
-  tooltipInfoIcon: React.Node | null,
-|} => {
-  if (!quota || !price)
-    return {
-      text: null,
-      tooltipInfoIcon: <div style={{ height: 24 }} />, // Placeholder to avoid layout shift.
-    };
+|}): React.Node => {
+  if (!quota || !price) {
+    // Placeholder to avoid layout shift.
+    return <div style={{ height: 29 }} />;
+  }
 
-  // Display a text if > 50% requests done.
-  const shouldShowText = quota.current / quota.max >= 0.5;
+  const shouldShowText = true;
 
-  const requestsLeft = quota.max - quota.current;
+  const aiCreditsLeft = quota.max - quota.current;
 
   const currentQuotaText = isMobile ? (
     increaseQuotaOffering === 'subscribe' ? (
-      requestsLeft === 1 ? (
-        <Trans>{requestsLeft} trial request left</Trans>
-      ) : (
-        <Trans>{requestsLeft} trial requests left</Trans>
-      )
-    ) : requestsLeft === 1 ? (
-      <Trans>{requestsLeft} request left</Trans>
+      <Trans>{aiCreditsLeft} free AI credits left</Trans>
     ) : (
-      <Trans>{requestsLeft} requests left</Trans>
+      <Trans>{aiCreditsLeft} AI credits left</Trans>
     )
   ) : quota.period === '30days' ? (
     increaseQuotaOffering === 'subscribe' ? (
-      requestsLeft === 1 ? (
-        <Trans>{requestsLeft} trial request left this month</Trans>
-      ) : (
-        <Trans>{requestsLeft} trial requests left this month</Trans>
-      )
-    ) : requestsLeft === 1 ? (
-      <Trans>{requestsLeft} request left this month</Trans>
+      <Trans>{aiCreditsLeft} free AI credits left this month</Trans>
     ) : (
-      <Trans>{requestsLeft} requests left this month</Trans>
+      <Trans>{aiCreditsLeft} AI credits left this month</Trans>
     )
   ) : quota.period === '7days' ? (
     increaseQuotaOffering === 'subscribe' ? (
-      requestsLeft === 1 ? (
-        <Trans>{requestsLeft} trial request left this week</Trans>
-      ) : (
-        <Trans>{requestsLeft} trial requests left this week</Trans>
-      )
-    ) : requestsLeft === 1 ? (
-      <Trans>{requestsLeft} request left this week</Trans>
+      <Trans>{aiCreditsLeft} free AI credits left this week</Trans>
     ) : (
-      <Trans>{requestsLeft} requests left this week</Trans>
+      <Trans>{aiCreditsLeft} AI credits left this week</Trans>
     )
   ) : quota.period === '1day' ? (
     increaseQuotaOffering === 'subscribe' ? (
-      requestsLeft === 1 ? (
-        <Trans>{requestsLeft} trial request left today</Trans>
-      ) : (
-        <Trans>{requestsLeft} trial requests left today</Trans>
-      )
-    ) : requestsLeft === 1 ? (
-      <Trans>{requestsLeft} request left today</Trans>
+      <Trans>{aiCreditsLeft} free AI credits left today</Trans>
     ) : (
-      <Trans>{requestsLeft} requests left today</Trans>
+      <Trans>{aiCreditsLeft} AI credits left today</Trans>
     )
-  ) : requestsLeft === 1 ? (
-    <Trans>{requestsLeft} request left</Trans>
   ) : (
-    <Trans>{requestsLeft} requests left</Trans>
+    <Trans>{aiCreditsLeft} AI credits left</Trans>
   );
   const creditsText = (
     <Trans>{Math.max(0, availableCredits)} credits available</Trans>
@@ -226,50 +195,55 @@ const getPriceAndRequestsTextAndTooltip = ({
     ? `${minimumPriceInCredits || priceInCredits}-${maximumPriceInCredits}`
     : minimumPriceInCredits || priceInCredits;
 
+  const remainingDaysBeforeReset = quota.resetsAt
+    ? Math.ceil((quota.resetsAt - Date.now()) / (1000 * 60 * 60 * 24))
+    : null;
+
   const tooltipText = (
     <ColumnStackLayout noMargin>
       <Line noMargin>
-        {currentQuotaText} <Trans>(out of {quota.max} requests)</Trans>
+        <Trans>
+          {currentQuotaText} (out of {quota.max}). They reset in
+          {remainingDaysBeforeReset} day(s).
+        </Trans>
       </Line>
       {increaseQuotaOffering === 'subscribe' ? (
-        <Trans>Get GDevelop premium to get more requests.</Trans>
+        <Trans>Get GDevelop premium to get more AI credits every week.</Trans>
       ) : (
         <Trans>These are parts of your GDevelop premium membership.</Trans>
       )}
-      {aiRequestMode === 'agent' ? (
-        <>
-          <Trans>
-            You can also use credits once your quota is reached. Each request to
-            the AI agent costs {priceText} credits. It depends on the amount of
-            work the agent will do and the number of times it generates events.
-          </Trans>{' '}
-          {lastUserMessagePriceInCredits ? (
-            <Trans>
-              The last request used {lastUserMessagePriceInCredits} credits.
-            </Trans>
-          ) : null}
-        </>
-      ) : (
+      <Trans>
+        You can also use paid credits once your quota is reached. Each request
+        costs {priceText} credits, depending on the amount of research and work
+        the AI does.
+      </Trans>
+      {lastUserMessagePriceInCredits ? (
         <Trans>
-          You can also use credits once your quota is reached. Each answer from
-          the AI costs {priceText} credits.
+          The last request used {lastUserMessagePriceInCredits} credits.
         </Trans>
-      )}
+      ) : null}
       {quota.limitReached ? creditsText : null}
     </ColumnStackLayout>
   );
 
-  const tooltipInfoIcon = (
-    <Tooltip title={tooltipText}>
-      <CircledInfo color="disabled" />
-    </Tooltip>
-  );
   const text = shouldShowText ? (
-    <Text size="body-small" color="secondary">
+    <Text size="body-small" color="secondary" noMargin>
       {quota.limitReached ? creditsText : currentQuotaText}
+      <span
+        style={{
+          verticalAlign: 'middle',
+          display: 'inline-block',
+          marginRight: -3,
+          marginTop: 1,
+        }}
+      >
+        <Tooltip title={tooltipText}>
+          <CircledInfo color="inherit" />
+        </Tooltip>
+      </span>
     </Text>
   ) : null;
-  return { text, tooltipInfoIcon };
+  return text;
 };
 
 const getSendButtonLabel = ({
@@ -529,7 +503,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       </Text>
     ) : null;
 
-    const priceAndRequestsTextAndTooltip = getPriceAndRequestsTextAndTooltip({
+    const priceAndRequestsText = getPriceAndRequestsTextAndTooltip({
       quota,
       increaseQuotaOffering,
       price,
@@ -539,9 +513,6 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       lastUserMessagePriceInCredits:
         (aiRequest && aiRequest.lastUserMessagePriceInCredits) || null,
     });
-    const priceAndRequestsText = priceAndRequestsTextAndTooltip.text;
-    const priceAndRequestsTooltipInfoIcon =
-      priceAndRequestsTextAndTooltip.tooltipInfoIcon;
 
     const chosenOrDefaultAiConfigurationPresetId =
       aiConfigurationPresetId ||
@@ -717,7 +688,6 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                   justifyContent="flex-end"
                 >
                   {errorText || priceAndRequestsText}
-                  {priceAndRequestsTooltipInfoIcon}
                 </Line>
               </Column>
             </form>
@@ -1028,7 +998,6 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 justifyContent="flex-end"
               >
                 {isForAnotherProjectText || errorText || priceAndRequestsText}
-                {priceAndRequestsTooltipInfoIcon}
               </Line>
             }
           </Column>

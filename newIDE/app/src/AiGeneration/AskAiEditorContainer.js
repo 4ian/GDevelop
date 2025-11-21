@@ -347,7 +347,8 @@ export const AskAiEditor = React.memo<Props>(
 
       const availableCredits = limits ? limits.credits.userBalance.amount : 0;
       const quota =
-        (limits && limits.quotas && limits.quotas['ai-request']) || null;
+        (limits && limits.quotas && limits.quotas['consumed-ai-credits']) ||
+        null;
       const aiRequestPrice =
         (limits && limits.credits && limits.credits.prices['ai-request']) ||
         null;

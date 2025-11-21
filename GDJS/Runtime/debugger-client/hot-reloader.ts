@@ -1265,7 +1265,6 @@ namespace gdjs {
                 // Another effect type was applied
                 runtimeObject.removeEffect(oldEffectData.name);
                 runtimeObject.addEffect(newEffectData);
-
                 if (newEffectData.isInitiallyDisabled) {
                   runtimeObject.enableEffect(newEffectData.name, false);
                 }
@@ -1508,6 +1507,9 @@ namespace gdjs {
         if (!oldEffectData && !runtimeLayer.hasEffect(name)) {
           // Effect was added
           runtimeLayer.addEffect(newEffectData);
+          if (newEffectData.isInitiallyDisabled) {
+            runtimeLayer.enableEffect(newEffectData.name, false);
+          }
         }
       });
     }

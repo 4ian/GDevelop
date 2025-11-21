@@ -233,7 +233,7 @@ namespace gdjs {
      */
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      objectData: ObjectData // & any
+      objectData: ObjectData & any
     ) {
       this.name = objectData.name || '';
       this.type = objectData.type || '';

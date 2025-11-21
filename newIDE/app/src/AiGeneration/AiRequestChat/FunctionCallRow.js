@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { t } from '@lingui/macro';
 import {
   type AiRequestMessageAssistantFunctionCall,
   type AiRequestFunctionCallOutput,
@@ -9,9 +8,7 @@ import { type EditorFunctionCallResult } from '../../EditorFunctions/EditorFunct
 import CircularProgress from '../../UI/CircularProgress';
 import { Tooltip } from '@material-ui/core';
 import Text from '../../UI/Text';
-import RaisedButton from '../../UI/RaisedButton';
 import { Trans } from '@lingui/macro';
-import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
 import Check from '../../UI/CustomSvgIcons/Check';
 import Error from '../../UI/CustomSvgIcons/Error';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
@@ -137,7 +134,7 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
             existingFunctionCallOutput || editorFunctionCallResult
           )}
         >
-          <div style={{ width: 16 }}>
+          <span style={{ width: 16 }}>
             {hasErrored ? (
               <Error htmlColor={gdevelopTheme.message.error} fontSize="small" />
             ) : isIgnored ? (
@@ -154,7 +151,7 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
                 variant={isWorking ? 'indeterminate' : 'determinate'}
               />
             )}
-          </div>
+          </span>
         </Tooltip>
         <ResponsiveLineStackLayout
           justifyContent="space-between"
@@ -198,40 +195,6 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
               </Text>
             )}
           </LineStackLayout>
-          {((!isFinished && !isWorking) || functionCallResultIsErrored) && (
-            <LineStackLayout
-              noMargin
-              alignItems="baseline"
-              justifyContent="flex-end"
-              neverShrink
-            >
-              {!isFinished && !isWorking && (
-                <FlatButtonWithSplitMenu
-                  primary
-                  style={{ flexShrink: 0 }}
-                  onClick={() => onProcessFunctionCalls([functionCall])}
-                  label={<Trans>Execute this action</Trans>}
-                  buildMenuTemplate={i18n => [
-                    {
-                      label: i18n._(t`Ignore this`),
-                      click: () => {
-                        onProcessFunctionCalls([functionCall], {
-                          ignore: true,
-                        });
-                      },
-                    },
-                  ]}
-                />
-              )}
-              {functionCallResultIsErrored && (
-                <RaisedButton
-                  color="primary"
-                  onClick={() => onProcessFunctionCalls([functionCall])}
-                  label={<Trans>Retry</Trans>}
-                />
-              )}
-            </LineStackLayout>
-          )}
         </ResponsiveLineStackLayout>
       </LineStackLayout>
       {details && (

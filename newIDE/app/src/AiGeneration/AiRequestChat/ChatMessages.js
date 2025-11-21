@@ -172,6 +172,7 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
           freeFormDetails
         );
       }}
+      key={`feedback-banner-${aiRequest.id}-${lastMessageIndex}`}
     />
   );
 

@@ -36,6 +36,8 @@ export const useEnsureExtensionInstalled = ({
         onWillInstallExtension,
       }: EnsureExtensionInstalledOptions) => {
         if (!project) return;
+        if (project.getCurrentPlatform().isExtensionLoaded(extensionName))
+          return;
 
         const extensionShortHeader = getExtensionHeader(
           extensionShortHeadersByName,

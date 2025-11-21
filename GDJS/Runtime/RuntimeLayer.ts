@@ -117,7 +117,7 @@ namespace gdjs {
       for (let i = 0; i < layerData.effects.length; ++i) {
         const effectData = layerData.effects[i];
         this.addEffect(effectData);
-        if (effectData.isInitiallyDisabled) {
+        if (effectData.isDisabled) {
           this.enableEffect(effectData.name, false);
         }
       }

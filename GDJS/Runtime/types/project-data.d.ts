@@ -497,7 +497,7 @@ declare interface CameraData {
 declare interface EffectData {
   effectType: string;
   name: string;
-  isInitiallyDisabled?: boolean;
+  isDisabled?: boolean;
   doubleParameters: {
     [name: string]: number;
   };

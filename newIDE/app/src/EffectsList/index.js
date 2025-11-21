@@ -308,16 +308,16 @@ const Effect = React.forwardRef(
                     paddingSize="small"
                     checkedIcon={<VisibilityIcon />}
                     uncheckedIcon={<VisibilityOffIcon />}
-                    checked={!effect.isInitiallyDisabled()}
+                    checked={effect.isEnabled()}
                     onCheck={(e, checked) => {
-                      effect.setInitiallyDisabled(!checked);
+                      effect.setEnabled(checked);
                       forceUpdate();
                     }}
                     tooltipOrHelperText={
-                      !effect.isInitiallyDisabled() ? (
-                        <Trans>Disable from the start</Trans>
+                      effect.isEnabled() ? (
+                        <Trans>Hide effect</Trans>
                       ) : (
-                        <Trans>Enable from the start</Trans>
+                        <Trans>Show effect</Trans>
                       )
                     }
                   />

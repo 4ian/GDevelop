@@ -872,8 +872,8 @@ export class Effect extends EmscriptenObject {
   getEffectType(): string;
   setFolded(val: boolean): void;
   isFolded(): boolean;
-  setInitiallyDisabled(val: boolean): void;
-  isInitiallyDisabled(): boolean;
+  setEnabled(val: boolean): void;
+  isEnabled(): boolean;
   setDoubleParameter(name: string, value: number): void;
   getDoubleParameter(name: string): number;
   hasDoubleParameter(name: string): boolean;

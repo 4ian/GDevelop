@@ -67,6 +67,7 @@ export type EditorFunctionGenericOutput = {|
   success: boolean,
   meta?: {
     newSceneNames?: Array<string>,
+    createdProject?: gdProject,
   },
   message?: string,
   eventsAsText?: string,
@@ -4505,9 +4506,9 @@ const initializeProject: EditorFunctionWithoutProject = {
         }
       }
       output.meta = {
-        newSceneNames: mapFor(0, createdProject.getLayoutsCount(), i =>
-          createdProject.getLayoutAt(i).getName()
-        ),
+        // Do not include the scene names, as the project will automatically
+        // open the scenes.
+        createdProject,
       };
 
       return output;

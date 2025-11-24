@@ -84,9 +84,11 @@ export const processEditorFunctionCalls = async ({
 }: ProcessEditorFunctionCallsOptions): Promise<{|
   results: Array<EditorFunctionCallResult>,
   createdSceneNames: Array<string>,
+  createdProject: ?gdProject,
 |}> => {
   const results: Array<EditorFunctionCallResult> = [];
   const createdSceneNames: Array<string> = [];
+  let createdProject: ?gdProject = null;
 
   for (const functionCall of functionCalls) {
     const call_id = functionCall.call_id;
@@ -218,6 +220,9 @@ export const processEditorFunctionCalls = async ({
       if (meta && meta.newSceneNames) {
         createdSceneNames.push(...meta.newSceneNames);
       }
+      if (meta && meta.createdProject) {
+        createdProject = meta.createdProject;
+      }
     } catch (error) {
       results.push({
         status: 'finished',
@@ -228,5 +233,5 @@ export const processEditorFunctionCalls = async ({
     }
   }
 
-  return { results, createdSceneNames };
+  return { results, createdSceneNames, createdProject };
 };

@@ -97,9 +97,7 @@ export type NewProjectSetup = {|
   orientation?: 'landscape' | 'portrait' | 'default',
   optimizeForPixelArt?: boolean,
   openQuickCustomizationDialog?: boolean,
-  dontOpenAnySceneOrProjectManager?: boolean,
-  dontRepositionAskAiEditor?: boolean,
-  dontCloseNewProjectSetupDialog?: boolean,
+  forceOpenAskAiEditor?: boolean,
   creationSource: NewProjectCreationSource,
 |};
 
@@ -126,7 +124,6 @@ type Props = {|
     newProjectSetup: NewProjectSetup,
     i18n: I18nType
   ) => Promise<CreateProjectResult>,
-  onOpenAskAi: () => void,
   onCloseAskAi: () => void,
   selectedExampleShortHeader: ?ExampleShortHeader,
   onSelectExampleShortHeader: (exampleShortHeader: ?ExampleShortHeader) => void,
@@ -163,7 +160,6 @@ const NewProjectSetupDialog = ({
   onCreateEmptyProject,
   onCreateFromExample,
   onCreateProjectFromPrivateGameTemplate,
-  onOpenAskAi,
   onCloseAskAi,
   selectedExampleShortHeader,
   onSelectExampleShortHeader,
@@ -677,7 +673,6 @@ const NewProjectSetupDialog = ({
                   onOpenLayout={onOpenLayout}
                   onWillInstallExtension={onWillInstallExtension}
                   onExtensionInstalled={onExtensionInstalled}
-                  onOpenAskAi={onOpenAskAi}
                   onCloseAskAi={onCloseAskAi}
                 />
                 <EmptyAndStartingPointProjects

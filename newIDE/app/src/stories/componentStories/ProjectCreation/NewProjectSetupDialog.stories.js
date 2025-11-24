@@ -39,7 +39,6 @@ export const OpenAndNotAuthenticated = () => {
         onClose={() => action('click on close')()}
         onCreateEmptyProject={() => action('create empty')()}
         onCreateFromExample={() => action('create from example')()}
-        onOpenAskAi={() => action('open ask AI')()}
         onCloseAskAi={() => action('close ask AI')()}
         onOpenLayout={() => action('open layout')()}
         onWillInstallExtension={action('extension will be installed')}
@@ -75,7 +74,6 @@ export const OpenAndAuthenticated = () => {
         resourceManagementProps={fakeResourceManagementProps}
         onCreateEmptyProject={() => action('create empty')()}
         onCreateFromExample={() => action('create from example')()}
-        onOpenAskAi={() => action('open ask AI')()}
         onCloseAskAi={() => action('close ask AI')()}
         onOpenLayout={() => action('open layout')()}
         onWillInstallExtension={action('extension will be installed')}
@@ -112,7 +110,6 @@ export const Opening = () => {
         resourceManagementProps={fakeResourceManagementProps}
         onCreateEmptyProject={() => action('create empty')()}
         onCreateFromExample={() => action('create from example')()}
-        onOpenAskAi={() => action('open ask AI')()}
         onCloseAskAi={() => action('close ask AI')()}
         onOpenLayout={() => action('open layout')()}
         onWillInstallExtension={action('extension will be installed')}
@@ -150,7 +147,6 @@ export const LimitsReached = () => {
         resourceManagementProps={fakeResourceManagementProps}
         onCreateEmptyProject={() => action('create empty')()}
         onCreateFromExample={() => action('create from example')()}
-        onOpenAskAi={() => action('open ask AI')()}
         onCloseAskAi={() => action('close ask AI')()}
         onOpenLayout={() => action('open layout')()}
         onWillInstallExtension={action('extension will be installed')}
@@ -186,7 +182,6 @@ export const FromExample = () => {
         resourceManagementProps={fakeResourceManagementProps}
         onCreateEmptyProject={() => action('create empty')()}
         onCreateFromExample={() => action('create from example')()}
-        onOpenAskAi={() => action('open ask AI')()}
         onCloseAskAi={() => action('close ask AI')()}
         onOpenLayout={() => action('open layout')()}
         onWillInstallExtension={action('extension will be installed')}
@@ -222,7 +217,6 @@ export const FromExampleWithoutGoingBack = () => {
         resourceManagementProps={fakeResourceManagementProps}
         onCreateEmptyProject={() => action('create empty')()}
         onCreateFromExample={() => action('create from example')()}
-        onOpenAskAi={() => action('open ask AI')()}
         onCloseAskAi={() => action('close ask AI')()}
         onOpenLayout={() => action('open layout')()}
         onWillInstallExtension={action('extension will be installed')}
@@ -259,7 +253,6 @@ export const FromPrivateGameTemplate = () => {
         resourceManagementProps={fakeResourceManagementProps}
         onCreateEmptyProject={() => action('create empty')()}
         onCreateFromExample={() => action('create from example')()}
-        onOpenAskAi={() => action('open ask AI')()}
         onCloseAskAi={() => action('close ask AI')()}
         onOpenLayout={() => action('open layout')()}
         onWillInstallExtension={action('extension will be installed')}
@@ -297,7 +290,6 @@ export const FromPrivateGameTemplateWithoutGoingBack = () => {
         resourceManagementProps={fakeResourceManagementProps}
         onCreateEmptyProject={() => action('create empty')()}
         onCreateFromExample={() => action('create from example')()}
-        onOpenAskAi={() => action('open ask AI')()}
         onCloseAskAi={() => action('close ask AI')()}
         onOpenLayout={() => action('open layout')()}
         onWillInstallExtension={action('extension will be installed')}

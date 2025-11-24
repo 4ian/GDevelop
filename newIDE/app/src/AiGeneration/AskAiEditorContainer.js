@@ -213,16 +213,6 @@ export const AskAiEditor = React.memo<Props>(
             projectName: name,
             storageProvider: UrlStorageProvider,
             saveAsLocation: null,
-            // Don't open scenes, as it will be done manually by the AI,
-            // detecting which scenes were created,
-            // allowing to send those messages to the AI, triggering the next steps.
-            dontOpenAnySceneOrProjectManager: true,
-            // Don't reposition the Ask AI editor,
-            // as it will be done manually after the project is created too.
-            dontRepositionAskAiEditor: true,
-            // Don't close the New project setup dialog,
-            // as it will be done manually after the project is created too.
-            dontCloseNewProjectSetupDialog: true,
             creationSource: 'ai-agent-request',
           };
 
@@ -537,11 +527,13 @@ export const AskAiEditor = React.memo<Props>(
         async ({
           userMessage,
           createdSceneNames,
+          createdProject,
           editorFunctionCallResults,
         }: {|
           userMessage: string,
           createdSceneNames?: Array<string>,
-          editorFunctionCallResults?: Array<EditorFunctionCallResult>,
+          createdProject?: ?gdProject,
+          editorFunctionCallResults: Array<EditorFunctionCallResult>,
         |}) => {
           if (
             !profile ||
@@ -551,23 +543,19 @@ export const AskAiEditor = React.memo<Props>(
           )
             return;
 
-          const editorFunctionCallResultsToUse =
-            editorFunctionCallResults ||
-            getEditorFunctionCallResults(selectedAiRequestId);
-
           // Read the results from the editor that applied the function calls.
           // and transform them into the output that will be stored on the AI request.
           const {
             hasUnfinishedResult,
             functionCallOutputs,
           } = getFunctionCallOutputsFromEditorFunctionCallResults(
-            editorFunctionCallResultsToUse
+            editorFunctionCallResults
           );
 
           const hasFunctionsCallsToProcess =
             getFunctionCallsToProcess({
               aiRequest: selectedAiRequest,
-              editorFunctionCallResults: editorFunctionCallResultsToUse,
+              editorFunctionCallResults,
             }).length > 0;
 
           // If anything is not finished yet, stop there (we only send all
@@ -611,16 +599,21 @@ export const AskAiEditor = React.memo<Props>(
           try {
             setSendingAiRequest(selectedAiRequestId, true);
 
+            const upToDateProject = createdProject || project;
+
             const simplifiedProjectBuilder = makeSimplifiedProjectBuilder(gd);
-            const simplifiedProjectJson = project
+            const simplifiedProjectJson = upToDateProject
               ? JSON.stringify(
-                  simplifiedProjectBuilder.getSimplifiedProject(project, {})
+                  simplifiedProjectBuilder.getSimplifiedProject(
+                    upToDateProject,
+                    {}
+                  )
                 )
               : null;
-            const projectSpecificExtensionsSummaryJson = project
+            const projectSpecificExtensionsSummaryJson = upToDateProject
               ? JSON.stringify(
                   simplifiedProjectBuilder.getProjectSpecificExtensionsSummary(
-                    project
+                    upToDateProject
                   )
                 )
               : null;
@@ -646,7 +639,9 @@ export const AskAiEditor = React.memo<Props>(
                 aiRequestId: selectedAiRequestId,
                 functionCallOutputs,
                 ...preparedAiUserContent,
-                gameId: project ? project.getProjectUuid() : undefined,
+                gameId: upToDateProject
+                  ? upToDateProject.getProjectUuid()
+                  : undefined,
                 payWithCredits,
                 userMessage,
                 paused,
@@ -697,18 +692,6 @@ export const AskAiEditor = React.memo<Props>(
             createdSceneNames &&
             createdSceneNames.length > 0
           ) {
-            // We handle moving the pane here
-            // and not in the Mainframe afterCreatingProject function,
-            // as it gives time to the AI to send the created scenes messages,
-            // triggering the status change from 'ready' to 'working'.
-            onOpenAskAi({
-              paneIdentifier: 'right',
-              // By default, function calls are paused on mount,
-              // to avoid resuming processing old requests automatically.
-              // In this case, we want to continue processing right away, as
-              // we're in the middle of a flow.
-              continueProcessingFunctionCallsOnMount: true,
-            });
             createdSceneNames.forEach(sceneName => {
               onOpenLayout(sceneName, {
                 openEventsEditor: true,
@@ -722,7 +705,6 @@ export const AskAiEditor = React.memo<Props>(
           profile,
           selectedAiRequestId,
           isSendingAiRequest,
-          getEditorFunctionCallResults,
           quota,
           aiRequestPriceInCredits,
           availableCredits,
@@ -734,7 +716,6 @@ export const AskAiEditor = React.memo<Props>(
           setLastSendError,
           onRefreshLimits,
           project,
-          onOpenAskAi,
           onOpenLayout,
           subscription,
           openSubscriptionDialog,
@@ -745,11 +726,13 @@ export const AskAiEditor = React.memo<Props>(
         async (
           editorFunctionCallResults: Array<EditorFunctionCallResult>,
           options: {|
-            createdSceneNames: Array<string>,
+            createdProject?: ?gdProject,
+            createdSceneNames?: Array<string>,
           |}
         ) => {
           await onSendMessage({
             userMessage: '',
+            createdProject: options.createdProject,
             createdSceneNames: options.createdSceneNames,
             editorFunctionCallResults,
           });
@@ -909,7 +892,14 @@ export const AskAiEditor = React.memo<Props>(
                 aiRequest={selectedAiRequest}
                 aiRequestMode={selectedAiRequestMode}
                 onStartNewAiRequest={startNewAiRequest}
-                onSendMessage={onSendMessage}
+                onSendUserMessage={(userMessage: string) =>
+                  onSendMessage({
+                    userMessage,
+                    editorFunctionCallResults: selectedAiRequest
+                      ? getEditorFunctionCallResults(selectedAiRequest.id) || []
+                      : [],
+                  })
+                }
                 isSending={isSendingAiRequest(selectedAiRequestId)}
                 lastSendError={getLastSendError(selectedAiRequestId)}
                 quota={quota}

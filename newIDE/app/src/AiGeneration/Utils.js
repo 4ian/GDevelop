@@ -32,6 +32,7 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { useInterval } from '../Utils/UseInterval';
 import { makeSimplifiedProjectBuilder } from '../EditorFunctions/SimplifiedProject/SimplifiedProject';
 import { prepareAiUserContent } from './PrepareAiUserContent';
+import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 
 const gd: libGDevelop = global.gd;
 
@@ -63,7 +64,8 @@ export const useProcessFunctionCalls = ({
   onSendEditorFunctionCallResults: (
     editorFunctionCallResults: Array<EditorFunctionCallResult>,
     options: {|
-      createdSceneNames: Array<string>,
+      createdSceneNames?: Array<string>,
+      createdProject?: ?gdProject,
     |}
   ) => Promise<void>,
   getEditorFunctionCallResults: string => Array<EditorFunctionCallResult> | null,
@@ -140,7 +142,11 @@ export const useProcessFunctionCalls = ({
         }))
       );
 
-      const { results, createdSceneNames } = await processEditorFunctionCalls({
+      const {
+        results,
+        createdSceneNames,
+        createdProject,
+      } = await processEditorFunctionCalls({
         project,
         editorCallbacks,
         i18n,
@@ -175,6 +181,7 @@ export const useProcessFunctionCalls = ({
       // to the backend.
       await onSendEditorFunctionCallResults(newResults, {
         createdSceneNames,
+        createdProject,
       });
     },
     [
@@ -374,6 +381,18 @@ export const useAiRequestState = ({ project }: {| project: ?gdProject |}) => {
 
           updateAiRequest(selectedAiRequest.id, aiRequestWithSuggestions);
         } catch (error) {
+          const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+            error
+          );
+          if (
+            extractedStatusAndCode &&
+            extractedStatusAndCode.status === 400 &&
+            extractedStatusAndCode.code === 'ai-request/request-still-working'
+          ) {
+            // Don't log anything.
+            return;
+          }
+
           console.error('Error getting AI request suggestions:', error);
           // Do not block updating the request if suggestions fetching fails.
         }

@@ -1308,9 +1308,7 @@ const MainFrame = (props: Props) => {
           currentFileMetadata: newFileMetadata,
         }));
       }
-      if (!options.dontCloseNewProjectSetupDialog) {
-        setNewProjectSetupDialogOpen(false);
-      }
+      setNewProjectSetupDialogOpen(false);
       if (options.openQuickCustomizationDialog) {
         setQuickCustomizationDialogOpenedFromGameId(oldProjectId);
       } else {
@@ -1319,25 +1317,22 @@ const MainFrame = (props: Props) => {
         openLeaderboardReplacerDialogIfNeeded(project, oldProjectId);
         configureMultiplayerLobbiesIfNeeded(project, oldProjectId);
       }
-      if (!options.dontOpenAnySceneOrProjectManager) {
-        options.openAllScenes || options.openQuickCustomizationDialog
-          ? openAllScenes({
-              currentProject: project,
-              editorTabs,
-            })
-          : openSceneOrProjectManager({
-              currentProject: project,
-              editorTabs: editorTabs,
-            });
-      }
-      if (!options.dontRepositionAskAiEditor) {
-        // If Ask AI editor was opened, reposition it.
-        const openedAskAIEditor = getOpenedAskAiEditor(state.editorTabs);
-        if (openedAskAIEditor) {
-          openAskAi({
-            paneIdentifier: 'right',
+      options.openAllScenes || options.openQuickCustomizationDialog
+        ? openAllScenes({
+            currentProject: project,
+            editorTabs,
+          })
+        : openSceneOrProjectManager({
+            currentProject: project,
+            editorTabs: editorTabs,
           });
-        }
+      // If Ask AI editor was opened, reposition it.
+      const openedAskAIEditor = getOpenedAskAiEditor(state.editorTabs);
+      if (openedAskAIEditor || options.forceOpenAskAiEditor) {
+        openAskAi({
+          paneIdentifier: 'right',
+          continueProcessingFunctionCallsOnMount: true,
+        });
       }
       setIsProjectClosedSoAvoidReloadingExtensions(false);
     },
@@ -4583,7 +4578,6 @@ const MainFrame = (props: Props) => {
     createEmptyProject,
     createProjectFromExample,
     createProjectFromPrivateGameTemplate,
-    openAskAi,
     closeAskAi,
     storageProviders: props.storageProviders,
     storageProvider: getStorageProvider(),

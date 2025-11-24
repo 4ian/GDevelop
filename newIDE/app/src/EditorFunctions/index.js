@@ -16,7 +16,7 @@ import {
   applyEventsChanges,
 } from './ApplyEventsChanges';
 import { isBehaviorDefaultCapability } from '../BehaviorsEditor/EnumerateBehaviorsMetadata';
-import { t, Trans } from '@lingui/macro';
+import { Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import Link from '../UI/Link';
 import {
@@ -4463,14 +4463,6 @@ const initializeProject: EditorFunctionWithoutProject = {
 
       if (!createdProject) {
         throw new Error('Unexpected null project after creation.');
-      }
-
-      if (!exampleSlug) {
-        // Created an empty project, let's add a default scene.
-        const layoutName = i18n._(t`Untitled scene`);
-        createdProject.insertNewLayout(layoutName, 0);
-        const layout = createdProject.getLayout(layoutName);
-        addDefaultLightToAllLayers(layout);
       }
 
       const output: EditorFunctionGenericOutput = {

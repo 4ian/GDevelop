@@ -23,7 +23,6 @@ import {
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
 } from './AiRequestUtils';
-import { useTriggerAtNextRender } from '../Utils/useTriggerAtNextRender';
 import { useEnsureExtensionInstalled } from './UseEnsureExtensionInstalled';
 import { useGenerateEvents } from './UseGenerateEvents';
 import { useSearchAndInstallAsset } from './UseSearchAndInstallAsset';
@@ -33,6 +32,7 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { useInterval } from '../Utils/UseInterval';
 import { makeSimplifiedProjectBuilder } from '../EditorFunctions/SimplifiedProject/SimplifiedProject';
 import { prepareAiUserContent } from './PrepareAiUserContent';
+import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 
 const gd: libGDevelop = global.gd;
 
@@ -62,13 +62,17 @@ export const useProcessFunctionCalls = ({
   editorCallbacks: EditorCallbacks,
   selectedAiRequest: ?AiRequest,
   onSendEditorFunctionCallResults: (
-    options: null | {| createdSceneNames: Array<string> |}
+    editorFunctionCallResults: Array<EditorFunctionCallResult>,
+    options: {|
+      createdSceneNames?: Array<string>,
+      createdProject?: ?gdProject,
+    |}
   ) => Promise<void>,
   getEditorFunctionCallResults: string => Array<EditorFunctionCallResult> | null,
   addEditorFunctionCallResults: (
     string,
     Array<EditorFunctionCallResult>
-  ) => void,
+  ) => Array<EditorFunctionCallResult>,
   onSceneEventsModifiedOutsideEditor: (
     changes: SceneEventsOutsideEditorChanges
   ) => void,
@@ -96,10 +100,6 @@ export const useProcessFunctionCalls = ({
     onExtensionInstalled,
   });
   const { generateEvents } = useGenerateEvents({ project });
-
-  const triggerSendEditorFunctionCallResults = useTriggerAtNextRender(
-    onSendEditorFunctionCallResults
-  );
 
   const [
     aiRequestAutoProcessState,
@@ -142,9 +142,14 @@ export const useProcessFunctionCalls = ({
         }))
       );
 
-      const { results, createdSceneNames } = await processEditorFunctionCalls({
+      const {
+        results,
+        createdSceneNames,
+        createdProject,
+      } = await processEditorFunctionCalls({
         project,
         editorCallbacks,
+        i18n,
         functionCalls: functionCalls.map(functionCall => ({
           name: functionCall.name,
           arguments: functionCall.arguments,
@@ -167,15 +172,20 @@ export const useProcessFunctionCalls = ({
         searchAndInstallAsset,
       });
 
-      addEditorFunctionCallResults(selectedAiRequest.id, results);
+      const newResults = addEditorFunctionCallResults(
+        selectedAiRequest.id,
+        results
+      );
 
       // We may have processed everything, so try to send the results
       // to the backend.
-      triggerSendEditorFunctionCallResults({
+      await onSendEditorFunctionCallResults(newResults, {
         createdSceneNames,
+        createdProject,
       });
     },
     [
+      i18n,
       selectedAiRequest,
       isReadyToProcessFunctionCalls,
       addEditorFunctionCallResults,
@@ -189,8 +199,8 @@ export const useProcessFunctionCalls = ({
       onWillInstallExtension,
       onExtensionInstalled,
       searchAndInstallAsset,
-      triggerSendEditorFunctionCallResults,
       generateEvents,
+      onSendEditorFunctionCallResults,
     ]
   );
 
@@ -371,6 +381,18 @@ export const useAiRequestState = ({ project }: {| project: ?gdProject |}) => {
 
           updateAiRequest(selectedAiRequest.id, aiRequestWithSuggestions);
         } catch (error) {
+          const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+            error
+          );
+          if (
+            extractedStatusAndCode &&
+            extractedStatusAndCode.status === 400 &&
+            extractedStatusAndCode.code === 'ai-request/request-still-working'
+          ) {
+            // Don't log anything.
+            return;
+          }
+
           console.error('Error getting AI request suggestions:', error);
           // Do not block updating the request if suggestions fetching fails.
         }

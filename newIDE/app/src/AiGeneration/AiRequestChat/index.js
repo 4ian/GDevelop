@@ -65,7 +65,7 @@ const styles = {
   },
 };
 
-type Props = {
+type Props = {|
   project: ?gdProject,
   i18n: I18nType,
   aiRequest: AiRequest | null,
@@ -77,10 +77,7 @@ type Props = {
     mode: 'chat' | 'agent',
     aiConfigurationPresetId: string,
   |}) => void,
-  onSendMessage: (options: {|
-    userMessage: string,
-    createdSceneNames?: Array<string>,
-  |}) => Promise<void>,
+  onSendUserMessage: (userMessage: string) => Promise<void>,
   onSendFeedback: (
     aiRequestId: string,
     messageIndex: number,
@@ -115,7 +112,7 @@ type Props = {
   availableCredits: number,
 
   standAloneForm?: boolean,
-};
+|};
 
 export type AiRequestChatInterface = {|
   resetUserInput: (aiRequestId: string | null) => void,
@@ -324,7 +321,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       aiRequestMode,
       isSending,
       onStartNewAiRequest,
-      onSendMessage,
+      onSendUserMessage,
       onSendFeedback,
       onStartOrOpenChat,
       quota,
@@ -345,9 +342,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
   ) => {
     const {
       aiRequestHistory: { handleNavigateHistory, resetNavigation },
-      editorFunctionCallResultsStorage,
     } = React.useContext(AiRequestContext);
-    const { getEditorFunctionCallResults } = editorFunctionCallResultsStorage;
     const { setAiState } = React.useContext(PreferencesContext);
 
     const [
@@ -396,16 +391,24 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     );
     const requiredGameId = (aiRequest && aiRequest.gameId) || null;
 
-    // Auto-scroll to bottom when content changes, if user is at the bottom
+    const scrollToBottom = React.useCallback(() => {
+      if (scrollViewRef.current) {
+        scrollViewRef.current.scrollToBottom({ behavior: 'smooth' });
+      }
+    }, []);
+
+    // Auto-scroll to bottom when content changes, if user is at the bottom.
     React.useEffect(
       () => {
-        if (shouldAutoScroll && scrollViewRef.current) {
-          scrollViewRef.current.scrollToBottom({
-            behavior: 'smooth',
-          });
-        }
+        if (shouldAutoScroll) scrollToBottom();
       },
-      [aiRequest, editorFunctionCallResults, lastSendError, shouldAutoScroll]
+      [
+        scrollToBottom,
+        aiRequest,
+        editorFunctionCallResults,
+        lastSendError,
+        shouldAutoScroll,
+      ]
     );
 
     const onScroll = React.useCallback(
@@ -487,11 +490,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         const aiRequestIdToReset: string = aiRequestId || '';
         onUserRequestTextChange('', aiRequestIdToReset);
 
-        if (scrollViewRef.current) {
-          scrollViewRef.current.scrollToBottom({
-            behavior: 'smooth',
-          });
-        }
+        scrollToBottom();
       },
     }));
 
@@ -526,7 +525,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       aiRequest &&
       getFunctionCallsToProcess({
         aiRequest: aiRequest,
-        editorFunctionCallResults: getEditorFunctionCallResults(aiRequest.id),
+        editorFunctionCallResults,
       }).length > 0;
     const hasWorkingFunctionCalls =
       editorFunctionCallResults &&
@@ -536,7 +535,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     const hasUnfinishedResult =
       aiRequest &&
       getFunctionCallOutputsFromEditorFunctionCallResults(
-        getEditorFunctionCallResults(aiRequest.id)
+        editorFunctionCallResults
       ).hasUnfinishedResult;
     const hasWorkToProcess =
       hasUnfinishedResult ||
@@ -622,6 +621,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             )}
             <form
               onSubmit={() => {
+                scrollToBottom();
                 onStartNewAiRequest({
                   mode: aiRequestMode,
                   userRequest: userRequestTextPerAiRequestId[''],
@@ -643,6 +643,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                   }}
                   onNavigateHistory={handleNavigateHistory}
                   onSubmit={() => {
+                    scrollToBottom();
                     onStartNewAiRequest({
                       mode: aiRequestMode,
                       userRequest: userRequestTextPerAiRequestId[''],
@@ -685,6 +686,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                               !hasReachedLimitAndCannotUseCredits)
                           }
                           onClick={() => {
+                            scrollToBottom();
                             onStartNewAiRequest({
                               mode: aiRequestMode,
                               userRequest: userRequestTextPerAiRequestId[''],
@@ -865,9 +867,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         <form
           onSubmit={() => {
             setAutoProcessFunctionCalls(true);
-            onSendMessage({
-              userMessage: userRequestTextPerAiRequestId[aiRequestId] || '',
-            });
+            onSendUserMessage(userRequestTextPerAiRequestId[aiRequestId] || '');
           }}
           className={classNames({
             // Move the form up when the soft keyboard is open:
@@ -900,10 +900,9 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 maxRows={6}
                 onSubmit={() => {
                   setAutoProcessFunctionCalls(true);
-                  onSendMessage({
-                    userMessage:
-                      userRequestTextPerAiRequestId[aiRequestId] || '',
-                  });
+                  onSendUserMessage(
+                    userRequestTextPerAiRequestId[aiRequestId] || ''
+                  );
                 }}
                 controls={
                   <Column>
@@ -923,10 +922,9 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                         label={sendButtonLabel}
                         onClick={() => {
                           setAutoProcessFunctionCalls(true);
-                          onSendMessage({
-                            userMessage:
-                              userRequestTextPerAiRequestId[aiRequestId] || '',
-                          });
+                          onSendUserMessage(
+                            userRequestTextPerAiRequestId[aiRequestId] || ''
+                          );
                         }}
                       />
                     </LineStackLayout>

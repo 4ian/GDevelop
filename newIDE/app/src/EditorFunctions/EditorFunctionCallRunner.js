@@ -1,4 +1,5 @@
 // @flow
+import { type I18n as I18nType } from '@lingui/core';
 import { type EventsGenerationResult } from '.';
 import {
   editorFunctions,
@@ -37,6 +38,7 @@ export type EditorFunctionCallResult =
 export type ProcessEditorFunctionCallsOptions = {|
   project: ?gdProject,
   functionCalls: Array<EditorFunctionCall>,
+  i18n: I18nType,
   editorCallbacks: EditorCallbacks,
   ignore: boolean,
   generateEvents: (
@@ -67,6 +69,7 @@ export type ProcessEditorFunctionCallsOptions = {|
 export const processEditorFunctionCalls = async ({
   functionCalls,
   project,
+  i18n,
   editorCallbacks,
   generateEvents,
   onSceneEventsModifiedOutsideEditor,
@@ -81,9 +84,11 @@ export const processEditorFunctionCalls = async ({
 }: ProcessEditorFunctionCallsOptions): Promise<{|
   results: Array<EditorFunctionCallResult>,
   createdSceneNames: Array<string>,
+  createdProject: ?gdProject,
 |}> => {
   const results: Array<EditorFunctionCallResult> = [];
   const createdSceneNames: Array<string> = [];
+  let createdProject: ?gdProject = null;
 
   for (const functionCall of functionCalls) {
     const call_id = functionCall.call_id;
@@ -166,6 +171,7 @@ export const processEditorFunctionCalls = async ({
 
       const argumentsWithoutProject = {
         args,
+        i18n,
         editorCallbacks,
         generateEvents,
         onSceneEventsModifiedOutsideEditor,
@@ -214,6 +220,9 @@ export const processEditorFunctionCalls = async ({
       if (meta && meta.newSceneNames) {
         createdSceneNames.push(...meta.newSceneNames);
       }
+      if (meta && meta.createdProject) {
+        createdProject = meta.createdProject;
+      }
     } catch (error) {
       results.push({
         status: 'finished',
@@ -224,5 +233,5 @@ export const processEditorFunctionCalls = async ({
     }
   }
 
-  return { results, createdSceneNames };
+  return { results, createdSceneNames, createdProject };
 };

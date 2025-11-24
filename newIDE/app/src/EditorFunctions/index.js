@@ -16,7 +16,8 @@ import {
   applyEventsChanges,
 } from './ApplyEventsChanges';
 import { isBehaviorDefaultCapability } from '../BehaviorsEditor/EnumerateBehaviorsMetadata';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import Link from '../UI/Link';
 import {
   hexNumberToRGBArray,
@@ -66,6 +67,7 @@ export type EditorFunctionGenericOutput = {|
   success: boolean,
   meta?: {
     newSceneNames?: Array<string>,
+    createdProject?: gdProject,
   },
   message?: string,
   eventsAsText?: string,
@@ -178,6 +180,7 @@ type RenderForEditorOptions = {|
 type LaunchFunctionOptionsWithoutProject = {|
   args: any,
   editorCallbacks: EditorCallbacks,
+  i18n: I18nType,
   generateEvents: (
     options: EventsGenerationOptions
   ) => Promise<EventsGenerationResult>,
@@ -4435,7 +4438,7 @@ const initializeProject: EditorFunctionWithoutProject = {
       ),
     };
   },
-  launchFunction: async ({ args, editorCallbacks }) => {
+  launchFunction: async ({ args, editorCallbacks, i18n }) => {
     const project_name = extractRequiredString(args, 'project_name');
     const template_slug = extractRequiredString(args, 'template_slug');
     const also_read_existing_events = SafeExtractor.extractBooleanProperty(
@@ -4460,6 +4463,14 @@ const initializeProject: EditorFunctionWithoutProject = {
 
       if (!createdProject) {
         throw new Error('Unexpected null project after creation.');
+      }
+
+      if (!exampleSlug) {
+        // Created an empty project, let's add a default scene.
+        const layoutName = i18n._(t`Untitled scene`);
+        createdProject.insertNewLayout(layoutName, 0);
+        const layout = createdProject.getLayout(layoutName);
+        addDefaultLightToAllLayers(layout);
       }
 
       const output: EditorFunctionGenericOutput = {
@@ -4487,17 +4498,17 @@ const initializeProject: EditorFunctionWithoutProject = {
         output.initializedFromTemplateSlug = exampleSlug;
       } else {
         if (template_slug) {
-          output.message = `Initialized project but this is an empty project.`;
+          output.message = `Initialized project but this is an empty project, with 1 scene.`;
           output.initializedProject = true;
         } else {
-          output.message = `Initialized empty project.`;
+          output.message = `Initialized empty project with 1 scene.`;
           output.initializedProject = true;
         }
       }
       output.meta = {
-        newSceneNames: mapFor(0, createdProject.getLayoutsCount(), i =>
-          createdProject.getLayoutAt(i).getName()
-        ),
+        // Do not include the scene names, as the project will automatically
+        // open the scenes.
+        createdProject,
       };
 
       return output;

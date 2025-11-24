@@ -460,9 +460,10 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
                 size="small"
                 style={{
                   backgroundColor: !isPaused
-                    ? getBackgroundColor(theme, 'medium')
+                    ? getBackgroundColor(theme, 'light')
                     : undefined,
                   borderRadius: 4,
+                  padding: 0,
                 }}
                 selected={isPaused}
               >

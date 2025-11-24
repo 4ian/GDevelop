@@ -335,7 +335,7 @@ module.exports = [
     "languageCode": "vi_VN",
     "languageName": "Vietnamese",
     "languageNativeName": "Tiếng Việt",
-    "translationRatio": 0.9760143702451395
+    "translationRatio": 0.9761200338123415
   },
   {
     "languageCode": "yo_NG",

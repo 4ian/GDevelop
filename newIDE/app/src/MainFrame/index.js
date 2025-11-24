@@ -3165,11 +3165,9 @@ const MainFrame = (props: Props) => {
           editorRef.onObjectsModifiedOutsideEditor(changes);
         }
       }
-      if (changes.isNewObjectTypeUsed) {
-        onObjectListsModified({
-          isNewObjectTypeUsed: changes.isNewObjectTypeUsed,
-        });
-      }
+      onObjectListsModified({
+        isNewObjectTypeUsed: changes.isNewObjectTypeUsed,
+      });
     },
     [state.editorTabs, onObjectListsModified]
   );

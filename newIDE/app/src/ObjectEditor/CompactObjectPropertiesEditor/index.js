@@ -64,6 +64,7 @@ import {
 } from '../Editors/CustomObjectPropertiesEditor';
 import NewVariantDialog from '../Editors/CustomObjectPropertiesEditor/NewVariantDialog';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
+import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 
 const gd: libGDevelop = global.gd;
 
@@ -104,6 +105,7 @@ const CollapsibleSubPanel = ({
   title,
   titleIcon,
   onRemove,
+  removeLabel,
 }: {|
   renderContent: () => React.Node,
   isFolded: boolean,
@@ -111,6 +113,7 @@ const CollapsibleSubPanel = ({
   titleIcon?: ?React.Node,
   title: string,
   onRemove?: () => void,
+  removeLabel?: MessageDescriptor,
 |}) => (
   <Paper background="medium">
     <Line expand>
@@ -134,11 +137,7 @@ const CollapsibleSubPanel = ({
 
           {onRemove ? (
             <Line noMargin>
-              <IconButton
-                tooltip={t`Remove behavior`}
-                onClick={onRemove}
-                size="small"
-              >
+              <IconButton tooltip={removeLabel} onClick={onRemove} size="small">
                 <Remove style={styles.icon} />
               </IconButton>
               <Spacer />
@@ -854,6 +853,7 @@ export const CompactObjectPropertiesEditor = ({
                       onRemove={() => {
                         removeBehavior(behavior.getName());
                       }}
+                      removeLabel={t`Remove behavior`}
                     />
                   );
                 })}
@@ -1005,6 +1005,7 @@ export const CompactObjectPropertiesEditor = ({
                             onRemove={() => {
                               removeEffect(effect);
                             }}
+                            removeLabel={t`Remove effect`}
                           />
                         );
                       }

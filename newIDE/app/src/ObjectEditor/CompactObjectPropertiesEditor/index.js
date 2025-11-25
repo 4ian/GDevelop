@@ -92,8 +92,6 @@ export const styles = {
   },
 };
 
-const noop = () => {};
-
 const behaviorsHelpLink = getHelpLink('/behaviors');
 const effectsHelpLink = getHelpLink('/objects/effects');
 const objectVariablesHelpLink = getHelpLink(

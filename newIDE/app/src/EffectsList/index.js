@@ -303,26 +303,26 @@ const Effect = React.forwardRef(
                       />
                     ))}
                   </SelectField>
-                  <InlineCheckbox
-                    id="layer-visibility"
-                    paddingSize="small"
-                    checkedIcon={<VisibilityIcon />}
-                    uncheckedIcon={<VisibilityOffIcon />}
-                    checked={effect.isEnabled()}
-                    onCheck={(e, checked) => {
-                      effect.setEnabled(checked);
-                      forceUpdate();
-                    }}
-                    tooltipOrHelperText={
-                      effect.isEnabled() ? (
-                        <Trans>Hide effect</Trans>
-                      ) : (
-                        <Trans>Show effect</Trans>
-                      )
-                    }
-                  />
                 </Line>
               </ResponsiveLineStackLayout>
+              <InlineCheckbox
+                id="effect-visibility"
+                paddingSize="small"
+                checkedIcon={<VisibilityIcon />}
+                uncheckedIcon={<VisibilityOffIcon />}
+                checked={effect.isEnabled()}
+                onCheck={(e, checked) => {
+                  effect.setEnabled(checked);
+                  forceUpdate();
+                }}
+                tooltipOrHelperText={
+                  effect.isEnabled() ? (
+                    <Trans>Hide effect</Trans>
+                  ) : (
+                    <Trans>Show effect</Trans>
+                  )
+                }
+              />
               <ElementWithMenu
                 element={
                   <IconButton size="small">

@@ -42,6 +42,7 @@ type Props = {|
   objects: Array<gdObject>,
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onObjectsModified: (objects: Array<gdObject>) => void,
+  onEffectAdded: () => void,
   onUpdateBehaviorsSharedData: () => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
@@ -94,6 +95,7 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
     objects,
     onEditObject,
     onObjectsModified,
+    onEffectAdded,
     resourceManagementProps,
     eventsFunctionsExtension,
     onUpdateBehaviorsSharedData,
@@ -132,6 +134,7 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
           objects={objects}
           onEditObject={onEditObject}
           onObjectsModified={onObjectsModified}
+          onEffectAdded={onEffectAdded}
           resourceManagementProps={resourceManagementProps}
           eventsFunctionsExtension={eventsFunctionsExtension}
           onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}

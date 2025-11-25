@@ -46,6 +46,7 @@ export type SceneEditorsDisplayProps = {|
   editObjectByName: (objectName: string, initialTab?: ObjectEditorTab) => void,
   editObjectInPropertiesPanel: (objectName: string) => void,
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
+  onEffectAdded: () => void,
   onOpenEventBasedObjectEditor: (
     extensionName: string,
     eventsBasedObjectName: string

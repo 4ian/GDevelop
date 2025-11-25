@@ -16,7 +16,7 @@ void Effect::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("effectType", GetEffectType());
   if (IsFolded()) element.SetBoolAttribute("folded", true);
   if (!IsEnabled()) {
-    element.SetBoolAttribute("isDisabled", true);
+    element.SetBoolAttribute("disabled", true);
   }
   SerializerElement& doubleParametersElement =
       element.AddChild("doubleParameters");
@@ -47,7 +47,7 @@ void Effect::UnserializeFrom(const SerializerElement& element) {
       // end of compatibility code
       ));
   SetFolded(element.GetBoolAttribute("folded", false));
-  SetEnabled(!element.GetBoolAttribute("isDisabled", false));
+  SetEnabled(!element.GetBoolAttribute("disabled", false));
 
   doubleParameters.clear();
   const SerializerElement& doubleParametersElement =

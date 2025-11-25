@@ -2775,6 +2775,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onObjectCreated={this._onObjectCreated}
                 onObjectEdited={this._onObjectEdited}
                 onObjectsModified={this._onObjectsModified}
+                onEffectAdded={this.props.onEffectAdded}
                 onObjectFolderOrObjectWithContextSelected={
                   this._onObjectFolderOrObjectWithContextSelected
                 }

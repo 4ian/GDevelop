@@ -16,11 +16,13 @@ export const CompactEffectPropertiesEditor = ({
   effect,
   effectMetadata,
   resourceManagementProps,
+  onPropertyModified,
 }: {|
   project: gdProject,
   effect: gdEffect,
   effectMetadata: ?EnumeratedEffectMetadata,
   resourceManagementProps: ResourceManagementProps,
+  onPropertyModified: () => void,
 |}) => {
   if (!effectMetadata) return null;
 
@@ -31,6 +33,7 @@ export const CompactEffectPropertiesEditor = ({
       instances={[effect]}
       resourceManagementProps={resourceManagementProps}
       onRefreshAllFields={noRefreshOfAllFields}
+      onInstancesModified={onPropertyModified}
     />
   );
 };

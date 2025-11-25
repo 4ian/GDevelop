@@ -248,11 +248,15 @@ namespace gdjs {
       this._totalForce = new gdjs.Force(0, 0, 0);
       this._behaviorsTable = new Hashtable();
       for (let i = 0; i < objectData.effects.length; ++i) {
+        const effectData = objectData.effects[i];
         this._runtimeScene
           .getGame()
           .getEffectsManager()
-          .initializeEffect(objectData.effects[i], this._rendererEffects, this);
-        this.updateAllEffectParameters(objectData.effects[i]);
+          .initializeEffect(effectData, this._rendererEffects, this);
+        this.updateAllEffectParameters(effectData);
+        if (effectData.isDisabled) {
+          this.enableEffect(effectData.name, false);
+        }
       }
       //Also contains the behaviors: Used when a behavior is accessed by its name ( see getBehavior ).
       for (let i = 0, len = objectData.behaviors.length; i < len; ++i) {
@@ -360,11 +364,15 @@ namespace gdjs {
 
       // Reinitialize effects.
       for (let i = 0; i < objectData.effects.length; ++i) {
+        const effectData = objectData.effects[i];
         this._runtimeScene
           .getGame()
           .getEffectsManager()
-          .initializeEffect(objectData.effects[i], this._rendererEffects, this);
-        this.updateAllEffectParameters(objectData.effects[i]);
+          .initializeEffect(effectData, this._rendererEffects, this);
+        this.updateAllEffectParameters(effectData);
+        if (effectData.disabled) {
+          this.enableEffect(effectData.name, false);
+        }
       }
 
       // Make sure to delete existing timers.

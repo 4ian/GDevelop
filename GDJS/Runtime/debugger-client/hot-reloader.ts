@@ -1518,10 +1518,7 @@ namespace gdjs {
       effectName: string
     ): void {
       if (oldEffectData.disabled !== newEffectData.disabled) {
-        runtimeLayer.enableEffect(
-          newEffectData.name,
-          !newEffectData.disabled
-        );
+        runtimeLayer.enableEffect(newEffectData.name, !newEffectData.disabled);
       }
       // We consider oldEffectData.effectType and newEffectData.effectType
       // are the same - it's responsibility of the caller to verify this.

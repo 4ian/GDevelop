@@ -5,8 +5,6 @@ import { type ButtonInterface } from './Button';
 import { Spacer } from './Grid';
 import classes from './FlatButton.module.css';
 import classNames from 'classnames';
-import { getBackgroundColor } from './Paper';
-import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 
 // We support a subset of the props supported by Material-UI v0.x FlatButton
 // They should be self descriptive - refer to Material UI docs otherwise.
@@ -64,12 +62,11 @@ const FlatButton = React.forwardRef<FlatButtonProps, ButtonInterface>(
     // always visible to be sure we're getting focusing right.
     const focusRipple = true;
 
-    const gdevelopTheme = React.useContext(GDevelopThemeContext);
-    const backgroundColor = getBackgroundColor(gdevelopTheme, 'dark');
-
     return (
       <div
         className={classNames({
+          [classes.buttonContainer]: true,
+          [classes.fullWidthButtonContainer]: !!otherProps.fullWidth,
           [classes.coloredButtonContainer]: !!color,
           [classes.buttonContainerSuccess]: color === 'success',
           [classes.buttonContainerDanger]: color === 'danger',
@@ -85,14 +82,7 @@ const FlatButton = React.forwardRef<FlatButtonProps, ButtonInterface>(
           focusRipple={focusRipple}
           disabled={disabled}
           id={id}
-          style={{
-            // Reapply a background color and width to fill the container.
-            backgroundColor,
-            width: '100%',
-            // Remove existing outlined border from MUI Button if applying a custom color.
-            border: !!color ? 0 : undefined,
-            ...(otherProps.style || {}),
-          }}
+          style={otherProps.style}
           {...otherProps}
           ref={ref}
         >

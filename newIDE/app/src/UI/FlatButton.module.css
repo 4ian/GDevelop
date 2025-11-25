@@ -3,13 +3,17 @@
 }
 
 .buttonContainer button {
-    /* Reapply a background color and width/height to fill the container. */
+    /* Reapply width/height to fill the container. */
     width: 100%;
     height: 100%;
+}
+
+.backgroundButtonContainer button {
+    /* Reapply background color for container */
     background-color: var(--theme-surface-canvas-background-color);
 }
 
-.buttonContainer button:hover {
+.backgroundButtonContainer button:hover {
     /* Control the hover, to avoid the default transparent hover */
     background-color: var(--theme-surface-alternate-canvas-light-background-color);
 }

@@ -25,13 +25,8 @@ export type FlatButtonProps = {|
     marginRight?: number,
     margin?: number,
     flexShrink?: 0,
-
-    // Allow in special cases to set color and border color
-    // (when the button is above a background with a fixed color that
-    // does not depend on the theme).
-    +color?: string,
-    +borderColor?: string,
   |},
+  noBackground?: boolean,
   size?: 'medium' | 'large',
   target?: '_blank',
   id?: ?string,
@@ -52,6 +47,7 @@ const FlatButton = React.forwardRef<FlatButtonProps, ButtonInterface>(
       disabled,
       size,
       id,
+      style,
       ...otherProps
     }: FlatButtonProps,
     ref
@@ -66,6 +62,7 @@ const FlatButton = React.forwardRef<FlatButtonProps, ButtonInterface>(
       <div
         className={classNames({
           [classes.buttonContainer]: true,
+          [classes.backgroundButtonContainer]: !otherProps.noBackground,
           [classes.fullWidthButtonContainer]: !!otherProps.fullWidth,
           [classes.coloredButtonContainer]: !!color,
           [classes.buttonContainerSuccess]: color === 'success',
@@ -73,6 +70,7 @@ const FlatButton = React.forwardRef<FlatButtonProps, ButtonInterface>(
           [classes.buttonContainerPremium]: color === 'premium',
           [classes.buttonContainerAi]: color === 'ai',
         })}
+        style={style}
       >
         <Button
           variant="outlined"
@@ -82,7 +80,6 @@ const FlatButton = React.forwardRef<FlatButtonProps, ButtonInterface>(
           focusRipple={focusRipple}
           disabled={disabled}
           id={id}
-          style={otherProps.style}
           {...otherProps}
           ref={ref}
         >

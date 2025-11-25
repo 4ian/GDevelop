@@ -6,14 +6,16 @@ import NordTheme from './NordTheme';
 import SolarizedDarkTheme from './SolarizedDarkTheme';
 import OneDarkTheme from './OneDarkTheme';
 import RosePineTheme from './RosePineTheme';
+import ProfessionalDarkTheme from './ProfessionalDarkTheme';
 
 /*eslint no-useless-computed-key: "off"*/
 export const themes = {
-  ['GDevelop default Dark']: DefaultDarkTheme,
-  ['GDevelop default Light']: DefaultLightTheme,
-  ['Blue Dark']: BlueDarkTheme,
-  ['Nord']: NordTheme,
-  ['Solarized Dark']: SolarizedDarkTheme,
-  ['One Dark']: OneDarkTheme,
-  ['Rosé Pine']: RosePineTheme,
+    ['GDevelop default Dark']: DefaultDarkTheme,
+    ['GDevelop default Light']: DefaultLightTheme,
+    ['Blue Dark']: BlueDarkTheme,
+    ['Nord']: NordTheme,
+    ['Solarized Dark']: SolarizedDarkTheme,
+    ['One Dark']: OneDarkTheme,
+    ['Rosé Pine']: RosePineTheme,
+    ['Professional Dark']: ProfessionalDarkTheme,
 };

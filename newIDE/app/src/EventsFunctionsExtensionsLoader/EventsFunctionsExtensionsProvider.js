@@ -47,28 +47,25 @@ export const EventsFunctionsExtensionsProvider = ({
     eventsFunctionsExtensionsError,
     setEventsFunctionsExtensionsError,
   ] = React.useState<Error | null>(null);
-  const _includeFileHashs = React.useRef<{ [string]: number }>({});
-  const _lastLoadPromise = React.useRef<?Promise<void>>(null);
+  const includeFileHashs = React.useRef<{ [string]: number }>({});
+  const lastLoadPromise = React.useRef<?Promise<void>>(null);
 
-  const _onWriteFile = React.useCallback(
+  const onWriteFile = React.useCallback(
     ({ includeFile, content }: IncludeFileContent) => {
-      _includeFileHashs.current[includeFile] = xxhashjs
+      includeFileHashs.current[includeFile] = xxhashjs
         .h32(content, 0xabcd)
         .toNumber();
     },
     []
   );
 
-  const _eventsFunctionCodeWriter: ?EventsFunctionCodeWriter = React.useMemo(
-    () =>
-      makeEventsFunctionCodeWriter({
-        onWriteFile: _onWriteFile,
-      }),
-    [_onWriteFile, makeEventsFunctionCodeWriter]
+  const eventsFunctionCodeWriter: ?EventsFunctionCodeWriter = React.useMemo(
+    () => makeEventsFunctionCodeWriter({ onWriteFile }),
+    [onWriteFile, makeEventsFunctionCodeWriter]
   );
 
-  const _ensureLoadFinished = React.useCallback((): Promise<void> => {
-    if (_lastLoadPromise.current) {
+  const ensureLoadFinished = React.useCallback((): Promise<void> => {
+    if (lastLoadPromise.current) {
       console.info(
         'Waiting on the events functions extensions to finish loading...'
       );
@@ -76,8 +73,8 @@ export const EventsFunctionsExtensionsProvider = ({
       console.info('Events functions extensions are ready.');
     }
 
-    return _lastLoadPromise.current
-      ? _lastLoadPromise.current.then(() => {
+    return lastLoadPromise.current
+      ? lastLoadPromise.current.then(() => {
           console.info('Events functions extensions finished loading.');
         })
       : Promise.resolve();
@@ -85,15 +82,16 @@ export const EventsFunctionsExtensionsProvider = ({
 
   const _loadProjectEventsFunctionsExtensions = React.useCallback(
     (project: ?gdProject): Promise<void> => {
-      if (!project || !_eventsFunctionCodeWriter) return Promise.resolve();
+      if (!project || !eventsFunctionCodeWriter) return Promise.resolve();
 
-      const lastLoadPromise = _lastLoadPromise.current || Promise.resolve();
+      const previousLastLoadPromise =
+        lastLoadPromise.current || Promise.resolve();
 
-      _lastLoadPromise.current = lastLoadPromise
+      lastLoadPromise.current = previousLastLoadPromise
         .then(() =>
           loadProjectEventsFunctionsExtensions(
             project,
-            _eventsFunctionCodeWriter,
+            eventsFunctionCodeWriter,
             i18n
           )
         )
@@ -109,23 +107,23 @@ export const EventsFunctionsExtensionsProvider = ({
           });
         })
         .then(() => {
-          _lastLoadPromise.current = null;
+          lastLoadPromise.current = null;
         });
 
-      return _lastLoadPromise.current;
+      return lastLoadPromise.current;
     },
-    [_eventsFunctionCodeWriter, i18n]
+    [eventsFunctionCodeWriter, i18n]
   );
 
   const _reloadProjectEventsFunctionsExtensionMetadata = React.useCallback(
     (project: ?gdProject, extension: gdEventsFunctionsExtension): void => {
-      if (!project || !_eventsFunctionCodeWriter) return;
+      if (!project || !eventsFunctionCodeWriter) return;
 
       try {
         reloadProjectEventsFunctionsExtensionMetadata(
           project,
           extension,
-          _eventsFunctionCodeWriter,
+          eventsFunctionCodeWriter,
           i18n
         );
       } catch (eventsFunctionsExtensionsError) {
@@ -139,7 +137,7 @@ export const EventsFunctionsExtensionsProvider = ({
         });
       }
     },
-    [_eventsFunctionCodeWriter, i18n]
+    [eventsFunctionCodeWriter, i18n]
   );
 
   const _unloadProjectEventsFunctionsExtensions = React.useCallback(
@@ -177,13 +175,13 @@ export const EventsFunctionsExtensionsProvider = ({
       unloadProjectEventsFunctionsExtension: _unloadProjectEventsFunctionsExtension,
       reloadProjectEventsFunctionsExtensions: _reloadProjectEventsFunctionsExtensions,
       reloadProjectEventsFunctionsExtensionMetadata: _reloadProjectEventsFunctionsExtensionMetadata,
-      ensureLoadFinished: _ensureLoadFinished,
+      ensureLoadFinished,
       getEventsFunctionsExtensionWriter: () => eventsFunctionsExtensionWriter,
       getEventsFunctionsExtensionOpener: () => eventsFunctionsExtensionOpener,
-      getIncludeFileHashs: () => _includeFileHashs.current,
+      getIncludeFileHashs: () => includeFileHashs.current,
     }),
     [
-      _ensureLoadFinished,
+      ensureLoadFinished,
       _loadProjectEventsFunctionsExtensions,
       _reloadProjectEventsFunctionsExtensionMetadata,
       _reloadProjectEventsFunctionsExtensions,

@@ -24,9 +24,10 @@ export default {
 
 export const NotAuthenticatedSilverRecommended = () => {
   const Component = () => {
-    const { subscriptionPlansWithPricingSystems } = React.useContext(
+    const { getSubscriptionPlansWithPricingSystems } = React.useContext(
       SubscriptionContext
     );
+    const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
 
     return (
       <PromotionSubscriptionDialog
@@ -53,9 +54,10 @@ export const NotAuthenticatedSilverRecommended = () => {
 
 export const AuthenticatedSilverRecommended = () => {
   const Component = () => {
-    const { subscriptionPlansWithPricingSystems } = React.useContext(
+    const { getSubscriptionPlansWithPricingSystems } = React.useContext(
       SubscriptionContext
     );
+    const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
 
     return (
       <PromotionSubscriptionDialog
@@ -84,9 +86,10 @@ export const AuthenticatedSilverRecommended = () => {
 
 export const GoldRecommended = () => {
   const Component = () => {
-    const { subscriptionPlansWithPricingSystems } = React.useContext(
+    const { getSubscriptionPlansWithPricingSystems } = React.useContext(
       SubscriptionContext
     );
+    const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
 
     return (
       <PromotionSubscriptionDialog
@@ -115,9 +118,10 @@ export const GoldRecommended = () => {
 
 export const ProRecommended = () => {
   const Component = () => {
-    const { subscriptionPlansWithPricingSystems } = React.useContext(
+    const { getSubscriptionPlansWithPricingSystems } = React.useContext(
       SubscriptionContext
     );
+    const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
 
     return (
       <PromotionSubscriptionDialog
@@ -146,9 +150,10 @@ export const ProRecommended = () => {
 
 export const EducationRecommended = () => {
   const Component = () => {
-    const { subscriptionPlansWithPricingSystems } = React.useContext(
+    const { getSubscriptionPlansWithPricingSystems } = React.useContext(
       SubscriptionContext
     );
+    const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
 
     return (
       <PromotionSubscriptionDialog
@@ -177,9 +182,10 @@ export const EducationRecommended = () => {
 
 export const WithoutSilverButRecommended = () => {
   const Component = () => {
-    const { subscriptionPlansWithPricingSystems } = React.useContext(
+    const { getSubscriptionPlansWithPricingSystems } = React.useContext(
       SubscriptionContext
     );
+    const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
 
     return !subscriptionPlansWithPricingSystems ? (
       <PlaceholderLoader />

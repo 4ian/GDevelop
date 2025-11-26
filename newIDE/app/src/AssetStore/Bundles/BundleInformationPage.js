@@ -117,9 +117,10 @@ const BundleInformationPage = ({
     receivedGameTemplates,
     receivedAssetPacks,
   } = React.useContext(AuthenticatedUserContext);
-  const { subscriptionPlansWithPricingSystems } = React.useContext(
+  const { getSubscriptionPlansWithPricingSystems } = React.useContext(
     SubscriptionContext
   );
+  const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
   const [bundle, setBundle] = React.useState<?Bundle>(null);
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
   const {

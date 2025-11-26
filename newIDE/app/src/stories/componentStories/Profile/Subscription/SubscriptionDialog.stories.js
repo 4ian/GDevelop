@@ -165,8 +165,9 @@ export const Default = ({
   const Component = () => {
     const { subscription: userSubscription } = authenticatedUser;
     const {
-      subscriptionPlansWithPricingSystemsIncludingLegacy,
+      getSubscriptionPlansWithPricingSystemsIncludingLegacy,
     } = React.useContext(SubscriptionContext);
+    const subscriptionPlansWithPricingSystemsIncludingLegacy = getSubscriptionPlansWithPricingSystemsIncludingLegacy();
 
     const userLegacySubscriptionPlanWithPricingSystem =
       (userSubscription &&

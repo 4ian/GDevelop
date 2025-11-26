@@ -30,58 +30,45 @@ type Props = {|
   eventsFunctionsExtensionOpener: ?EventsFunctionsExtensionOpener,
 |};
 
-type State = EventsFunctionsExtensionsState;
-
 /**
  * Allow children components to request the loading (or unloading) of
  * the events functions extensions of the project.
  * Useful when dealing with events functions extensions (new extension created,
  * removed, pasted, installed, etc...).
  */
-export default class EventsFunctionsExtensionsProvider extends React.Component<
-  Props,
-  State
-> {
-  _eventsFunctionCodeWriter: ?EventsFunctionCodeWriter = this.props.makeEventsFunctionCodeWriter(
-    {
-      onWriteFile: this._onWriteFile.bind(this),
-    }
+export const EventsFunctionsExtensionsProvider = ({
+  children,
+  i18n,
+  makeEventsFunctionCodeWriter,
+  eventsFunctionsExtensionWriter,
+  eventsFunctionsExtensionOpener,
+}: Props) => {
+  const [
+    eventsFunctionsExtensionsError,
+    setEventsFunctionsExtensionsError,
+  ] = React.useState<Error | null>(null);
+  const _includeFileHashs = React.useRef<{ [string]: number }>({});
+  const _lastLoadPromise = React.useRef<?Promise<void>>(null);
+
+  const _onWriteFile = React.useCallback(
+    ({ includeFile, content }: IncludeFileContent) => {
+      _includeFileHashs.current[includeFile] = xxhashjs
+        .h32(content, 0xabcd)
+        .toNumber();
+    },
+    []
   );
-  _includeFileHashs: { [string]: number } = {};
-  _lastLoadPromise: ?Promise<void> = null;
-  state = {
-    eventsFunctionsExtensionsError: null,
-    loadProjectEventsFunctionsExtensions: this._loadProjectEventsFunctionsExtensions.bind(
-      this
-    ),
-    unloadProjectEventsFunctionsExtensions: this._unloadProjectEventsFunctionsExtensions.bind(
-      this
-    ),
-    unloadProjectEventsFunctionsExtension: this._unloadProjectEventsFunctionsExtension.bind(
-      this
-    ),
-    reloadProjectEventsFunctionsExtensions: this._reloadProjectEventsFunctionsExtensions.bind(
-      this
-    ),
-    reloadProjectEventsFunctionsExtensionMetadata: this._reloadProjectEventsFunctionsExtensionMetadata.bind(
-      this
-    ),
-    ensureLoadFinished: this._ensureLoadFinished.bind(this),
-    getEventsFunctionsExtensionWriter: () =>
-      this.props.eventsFunctionsExtensionWriter,
-    getEventsFunctionsExtensionOpener: () =>
-      this.props.eventsFunctionsExtensionOpener,
-    getIncludeFileHashs: () => this._includeFileHashs,
-  };
 
-  _onWriteFile({ includeFile, content }: IncludeFileContent) {
-    this._includeFileHashs[includeFile] = xxhashjs
-      .h32(content, 0xabcd)
-      .toNumber();
-  }
+  const _eventsFunctionCodeWriter: ?EventsFunctionCodeWriter = React.useMemo(
+    () =>
+      makeEventsFunctionCodeWriter({
+        onWriteFile: _onWriteFile,
+      }),
+    [_onWriteFile, makeEventsFunctionCodeWriter]
+  );
 
-  _ensureLoadFinished(): Promise<void> {
-    if (this._lastLoadPromise) {
+  const _ensureLoadFinished = React.useCallback((): Promise<void> => {
+    if (_lastLoadPromise.current) {
       console.info(
         'Waiting on the events functions extensions to finish loading...'
       );
@@ -89,37 +76,60 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
       console.info('Events functions extensions are ready.');
     }
 
-    return this._lastLoadPromise
-      ? this._lastLoadPromise.then(() => {
+    return _lastLoadPromise.current
+      ? _lastLoadPromise.current.then(() => {
           console.info('Events functions extensions finished loading.');
         })
       : Promise.resolve();
-  }
+  }, []);
 
-  _loadProjectEventsFunctionsExtensions(project: ?gdProject): Promise<void> {
-    const { i18n } = this.props;
-    const eventsFunctionCodeWriter = this._eventsFunctionCodeWriter;
-    if (!project || !eventsFunctionCodeWriter) return Promise.resolve();
+  const _loadProjectEventsFunctionsExtensions = React.useCallback(
+    (project: ?gdProject): Promise<void> => {
+      if (!project || !_eventsFunctionCodeWriter) return Promise.resolve();
 
-    const lastLoadPromise = this._lastLoadPromise || Promise.resolve();
+      const lastLoadPromise = _lastLoadPromise.current || Promise.resolve();
 
-    this._lastLoadPromise = lastLoadPromise
-      .then(() =>
-        loadProjectEventsFunctionsExtensions(
-          project,
-          eventsFunctionCodeWriter,
-          i18n
+      _lastLoadPromise.current = lastLoadPromise
+        .then(() =>
+          loadProjectEventsFunctionsExtensions(
+            project,
+            _eventsFunctionCodeWriter,
+            i18n
+          )
         )
-      )
-      .then(() =>
-        this.setState({
-          eventsFunctionsExtensionsError: null,
+        .then(() => setEventsFunctionsExtensionsError(null))
+        .catch((eventsFunctionsExtensionsError: Error) => {
+          setEventsFunctionsExtensionsError(eventsFunctionsExtensionsError);
+          showErrorBox({
+            message: i18n._(
+              t`An error has occurred during functions generation. If GDevelop is installed, verify that nothing is preventing GDevelop from writing on disk. If you're running GDevelop online, verify your internet connection and refresh functions from the Project Manager.`
+            ),
+            rawError: eventsFunctionsExtensionsError,
+            errorId: 'events-functions-extensions-load-error',
+          });
         })
-      )
-      .catch((eventsFunctionsExtensionsError: Error) => {
-        this.setState({
-          eventsFunctionsExtensionsError,
+        .then(() => {
+          _lastLoadPromise.current = null;
         });
+
+      return _lastLoadPromise.current;
+    },
+    [_eventsFunctionCodeWriter, i18n]
+  );
+
+  const _reloadProjectEventsFunctionsExtensionMetadata = React.useCallback(
+    (project: ?gdProject, extension: gdEventsFunctionsExtension): void => {
+      if (!project || !_eventsFunctionCodeWriter) return;
+
+      try {
+        reloadProjectEventsFunctionsExtensionMetadata(
+          project,
+          extension,
+          _eventsFunctionCodeWriter,
+          i18n
+        );
+      } catch (eventsFunctionsExtensionsError) {
+        setEventsFunctionsExtensionsError(eventsFunctionsExtensionsError);
         showErrorBox({
           message: i18n._(
             t`An error has occurred during functions generation. If GDevelop is installed, verify that nothing is preventing GDevelop from writing on disk. If you're running GDevelop online, verify your internet connection and refresh functions from the Project Manager.`
@@ -127,66 +137,67 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
           rawError: eventsFunctionsExtensionsError,
           errorId: 'events-functions-extensions-load-error',
         });
-      })
-      .then(() => {
-        this._lastLoadPromise = null;
-      });
+      }
+    },
+    [_eventsFunctionCodeWriter, i18n]
+  );
 
-    return this._lastLoadPromise;
-  }
+  const _unloadProjectEventsFunctionsExtensions = React.useCallback(
+    (project: gdProject) => {
+      unloadProjectEventsFunctionsExtensions(project);
+    },
+    []
+  );
 
-  _reloadProjectEventsFunctionsExtensionMetadata(
-    project: ?gdProject,
-    extension: gdEventsFunctionsExtension
-  ): void {
-    const { i18n } = this.props;
-    const eventsFunctionCodeWriter = this._eventsFunctionCodeWriter;
-    if (!project || !eventsFunctionCodeWriter) return;
+  const _unloadProjectEventsFunctionsExtension = React.useCallback(
+    (project: gdProject, extensionName: string) => {
+      unloadProjectEventsFunctionsExtension(project, extensionName);
+    },
+    []
+  );
 
-    try {
-      reloadProjectEventsFunctionsExtensionMetadata(
-        project,
-        extension,
-        eventsFunctionCodeWriter,
-        i18n
-      );
-    } catch (eventsFunctionsExtensionsError) {
-      this.setState({
-        eventsFunctionsExtensionsError,
-      });
-      showErrorBox({
-        message: i18n._(
-          t`An error has occurred during functions generation. If GDevelop is installed, verify that nothing is preventing GDevelop from writing on disk. If you're running GDevelop online, verify your internet connection and refresh functions from the Project Manager.`
-        ),
-        rawError: eventsFunctionsExtensionsError,
-        errorId: 'events-functions-extensions-load-error',
-      });
-    }
-  }
+  const _reloadProjectEventsFunctionsExtensions = React.useCallback(
+    (project: ?gdProject): Promise<void> => {
+      if (project) {
+        _unloadProjectEventsFunctionsExtensions(project);
+      }
+      return _loadProjectEventsFunctionsExtensions(project);
+    },
+    [
+      _loadProjectEventsFunctionsExtensions,
+      _unloadProjectEventsFunctionsExtensions,
+    ]
+  );
 
-  _unloadProjectEventsFunctionsExtensions(project: gdProject) {
-    unloadProjectEventsFunctionsExtensions(project);
-  }
+  const state = React.useMemo<EventsFunctionsExtensionsState>(
+    () => ({
+      eventsFunctionsExtensionsError,
+      loadProjectEventsFunctionsExtensions: _loadProjectEventsFunctionsExtensions,
+      unloadProjectEventsFunctionsExtensions: _unloadProjectEventsFunctionsExtensions,
+      unloadProjectEventsFunctionsExtension: _unloadProjectEventsFunctionsExtension,
+      reloadProjectEventsFunctionsExtensions: _reloadProjectEventsFunctionsExtensions,
+      reloadProjectEventsFunctionsExtensionMetadata: _reloadProjectEventsFunctionsExtensionMetadata,
+      ensureLoadFinished: _ensureLoadFinished,
+      getEventsFunctionsExtensionWriter: () => eventsFunctionsExtensionWriter,
+      getEventsFunctionsExtensionOpener: () => eventsFunctionsExtensionOpener,
+      getIncludeFileHashs: () => _includeFileHashs.current,
+    }),
+    [
+      _ensureLoadFinished,
+      _loadProjectEventsFunctionsExtensions,
+      _reloadProjectEventsFunctionsExtensionMetadata,
+      _reloadProjectEventsFunctionsExtensions,
+      _unloadProjectEventsFunctionsExtension,
+      _unloadProjectEventsFunctionsExtensions,
+      eventsFunctionsExtensionOpener,
+      eventsFunctionsExtensionWriter,
+      eventsFunctionsExtensionsError,
+    ]
+  );
 
-  _unloadProjectEventsFunctionsExtension(
-    project: gdProject,
-    extensionName: string
-  ) {
-    unloadProjectEventsFunctionsExtension(project, extensionName);
-  }
-
-  _reloadProjectEventsFunctionsExtensions(project: ?gdProject): Promise<void> {
-    if (project) {
-      this._unloadProjectEventsFunctionsExtensions(project);
-    }
-    return this._loadProjectEventsFunctionsExtensions(project);
-  }
-
-  render() {
-    return (
-      <EventsFunctionsExtensionsContext.Provider value={this.state}>
-        {this.props.children}
-      </EventsFunctionsExtensionsContext.Provider>
-    );
-  }
-}
+  return (
+    <EventsFunctionsExtensionsContext.Provider value={state}>
+      {children}
+    </EventsFunctionsExtensionsContext.Provider>
+  );
+};

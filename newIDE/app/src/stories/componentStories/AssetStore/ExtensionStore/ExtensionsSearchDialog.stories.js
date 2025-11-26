@@ -5,7 +5,7 @@ import { action } from '@storybook/addon-actions';
 import paperDecorator from '../../../PaperDecorator';
 import ExtensionsSearchDialog from '../../../../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 import { I18n } from '@lingui/react';
-import EventsFunctionsExtensionsProvider from '../../../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsProvider';
+import { EventsFunctionsExtensionsProvider } from '../../../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsProvider';
 import { ExtensionStoreStateProvider } from '../../../../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { testProject } from '../../../GDevelopJsInitializerDecorator';
 import { GDevelopAssetApi } from '../../../../Utils/GDevelopServices/ApiConfigs';

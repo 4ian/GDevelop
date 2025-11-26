@@ -184,8 +184,13 @@ const transformTagsAsStringToTagsAsArray = <
   };
 };
 
+export const client = axios.create({
+  baseURL: GDevelopAssetApi.baseUrl,
+});
+export const cdnClient = axios.create();
+
 export const getExtensionsRegistry = async (): Promise<ExtensionsRegistry> => {
-  const response = await axios.get(`${GDevelopAssetApi.baseUrl}/extension`, {
+  const response = await client.get(`/extension`, {
     params: {
       // Could be changed according to the editor environment, but keep
       // reading from the "live" data for now.
@@ -196,7 +201,7 @@ export const getExtensionsRegistry = async (): Promise<ExtensionsRegistry> => {
 
   const extensionsRegistry: ExtensionsRegistry = await retryIfFailed(
     { times: 2 },
-    async () => (await axios.get(databaseUrl)).data
+    async () => (await cdnClient.get(databaseUrl)).data
   );
 
   if (!extensionsRegistry) {
@@ -222,7 +227,7 @@ export const getExtensionsRegistry = async (): Promise<ExtensionsRegistry> => {
 };
 
 export const getBehaviorsRegistry = async (): Promise<BehaviorsRegistry> => {
-  const response = await axios.get(`${GDevelopAssetApi.baseUrl}/behavior`, {
+  const response = await client.get(`/behavior`, {
     params: {
       // Could be changed according to the editor environment, but keep
       // reading from the "live" data for now.
@@ -233,7 +238,7 @@ export const getBehaviorsRegistry = async (): Promise<BehaviorsRegistry> => {
 
   const behaviorsRegistry: BehaviorsRegistry = await retryIfFailed(
     { times: 2 },
-    async () => (await axios.get(databaseUrl)).data
+    async () => (await cdnClient.get(databaseUrl)).data
   );
 
   if (!behaviorsRegistry) {
@@ -262,7 +267,7 @@ const adaptBehaviorHeader = (
 export const getExtensionHeader = (
   extensionShortHeader: ExtensionShortHeader | BehaviorShortHeader
 ): Promise<ExtensionHeader> => {
-  return axios.get(extensionShortHeader.headerUrl).then(response => {
+  return cdnClient.get(extensionShortHeader.headerUrl).then(response => {
     const data: ExtensionHeaderWithTagsAsString = response.data;
     const transformedData: ExtensionHeader = transformTagsAsStringToTagsAsArray(
       data
@@ -277,7 +282,7 @@ export const getExtensionHeader = (
 export const getExtension = (
   extensionHeader: ExtensionShortHeader | BehaviorShortHeader
 ): Promise<SerializedExtension> => {
-  return axios.get(extensionHeader.url).then(response => {
+  return cdnClient.get(extensionHeader.url).then(response => {
     const data: SerializedExtensionWithTagsAsString = response.data;
     const transformedData: SerializedExtension = transformTagsAsStringToTagsAsArray(
       data
@@ -289,17 +294,14 @@ export const getExtension = (
 export const getUserExtensionShortHeaders = async (
   authorId: string
 ): Promise<Array<ExtensionShortHeader>> => {
-  const response = await axios.get(
-    `${GDevelopAssetApi.baseUrl}/extension-short-header`,
-    {
-      params: {
-        authorId,
-        // Could be changed according to the editor environment, but keep
-        // reading from the "live" data for now.
-        environment: 'live',
-      },
-    }
-  );
+  const response = await client.get(`/extension-short-header`, {
+    params: {
+      authorId,
+      // Could be changed according to the editor environment, but keep
+      // reading from the "live" data for now.
+      environment: 'live',
+    },
+  });
 
   return response.data;
 };

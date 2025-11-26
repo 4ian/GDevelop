@@ -17,10 +17,11 @@ import {
 } from '../../../../fixtures/GDevelopServicesTestData';
 import SubscriptionDialog from '../../../../Profile/Subscription/SubscriptionDialog';
 import AlertProvider from '../../../../UI/Alert/AlertProvider';
-import useSubscriptionPlans, {
-  filterAvailableSubscriptionPlansWithPrices,
-} from '../../../../Utils/UseSubscriptionPlans';
 import LoaderModal from '../../../../UI/LoaderModal';
+import {
+  SubscriptionContext,
+  SubscriptionProvider,
+} from '../../../../Profile/Subscription/SubscriptionContext';
 
 export default {
   title: 'Subscription/SubscriptionDialog',
@@ -161,42 +162,46 @@ export const Default = ({
     }
   }
 
-  const { getSubscriptionPlansWithPricingSystems } = useSubscriptionPlans({
-    includeLegacy: true,
-    authenticatedUser,
-  });
-  const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
+  const Component = () => {
+    const { subscription: userSubscription } = authenticatedUser;
+    const {
+      subscriptionPlansWithPricingSystemsIncludingLegacy,
+    } = React.useContext(SubscriptionContext);
 
-  const { subscription: userSubscription } = authenticatedUser;
-  const userLegacySubscriptionPlanWithPricingSystem =
-    (userSubscription &&
-      subscriptionPlansWithPricingSystems &&
-      subscriptionPlansWithPricingSystems.find(
-        planWithPricingSystem =>
-          planWithPricingSystem.id === userSubscription.planId &&
-          planWithPricingSystem.isLegacy
-      )) ||
-    null;
+    const userLegacySubscriptionPlanWithPricingSystem =
+      (userSubscription &&
+        subscriptionPlansWithPricingSystemsIncludingLegacy &&
+        subscriptionPlansWithPricingSystemsIncludingLegacy.find(
+          planWithPricingSystem =>
+            planWithPricingSystem.id === userSubscription.planId &&
+            planWithPricingSystem.isLegacy
+        )) ||
+      null;
 
-  return subscriptionPlansWithPricingSystems ? (
+    return subscriptionPlansWithPricingSystemsIncludingLegacy ? (
+      <SubscriptionDialog
+        availableSubscriptionPlansWithPrices={
+          subscriptionPlansWithPricingSystemsIncludingLegacy
+        }
+        userLegacySubscriptionPlanWithPricingSystem={
+          userLegacySubscriptionPlanWithPricingSystem
+        }
+        onClose={() => action('on close')()}
+        filter={filter === 'none' ? undefined : filter}
+        onOpenPendingDialog={() => action('on open pending dialog')()}
+      />
+    ) : (
+      <LoaderModal showImmediately />
+    );
+  };
+
+  return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider value={authenticatedUser}>
-        <SubscriptionDialog
-          getAvailableSubscriptionPlansWithPrices={() =>
-            filterAvailableSubscriptionPlansWithPrices(
-              subscriptionPlansWithPricingSystems
-            )
-          }
-          getUserLegacySubscriptionPlanWithPricingSystem={() =>
-            userLegacySubscriptionPlanWithPricingSystem
-          }
-          onClose={() => action('on close')()}
-          filter={filter === 'none' ? undefined : filter}
-          onOpenPendingDialog={() => action('on open pending dialog')()}
-        />
+        <SubscriptionProvider>
+          <Component />
+        </SubscriptionProvider>
       </AuthenticatedUserContext.Provider>
     </AlertProvider>
-  ) : (
-    <LoaderModal showImmediately />
   );
 };

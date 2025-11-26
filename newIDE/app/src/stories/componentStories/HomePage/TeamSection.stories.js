@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import MockAdapter from 'axios-mock-adapter';
 import { action } from '@storybook/addon-actions';
 
 import paperDecorator from '../../PaperDecorator';
@@ -7,10 +8,8 @@ import { testProject } from '../../GDevelopJsInitializerDecorator';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import TeamSection from '../../../MainFrame/EditorContainers/HomePage/TeamSection';
 import CloudStorageProvider from '../../../ProjectsStorage/CloudStorageProvider';
-import {
-  emptySubscriptionPlanMockData,
-  MockTeamProvider,
-} from '../../MockTeamProvider';
+import { MockTeamProvider } from '../../MockTeamProvider';
+import { apiClient as usageClient } from '../../../Utils/GDevelopServices/Usage';
 
 export default {
   title: 'HomePage/TeamSection',
@@ -19,6 +18,27 @@ export default {
 };
 
 export const Default = () => {
+  const usageApiMock = React.useMemo(() => {
+    const mock = new MockAdapter(usageClient, {
+      delayResponse: 250,
+    });
+
+    mock
+      .onGet('/subscription-plan', { params: { includeLegacy: true } })
+      .reply(200, []);
+
+    return mock;
+  }, []);
+
+  React.useEffect(
+    () => {
+      return () => {
+        usageApiMock.restore();
+      };
+    },
+    [usageApiMock]
+  );
+
   return (
     <MockTeamProvider loading={false} teamSize={12}>
       <FixedHeightFlexContainer height={600}>
@@ -33,74 +53,151 @@ export const Default = () => {
     </MockTeamProvider>
   );
 };
-Default.parameters = {
-  mockData: [...emptySubscriptionPlanMockData],
+
+export const WithNoGroupsYet = () => {
+  const usageApiMock = React.useMemo(() => {
+    const mock = new MockAdapter(usageClient, {
+      delayResponse: 250,
+    });
+
+    mock
+      .onGet('/subscription-plan', { params: { includeLegacy: true } })
+      .reply(200, []);
+
+    return mock;
+  }, []);
+
+  React.useEffect(
+    () => {
+      return () => {
+        usageApiMock.restore();
+      };
+    },
+    [usageApiMock]
+  );
+
+  return (
+    <MockTeamProvider loading={false} noGroups>
+      <FixedHeightFlexContainer height={600}>
+        <TeamSection
+          project={testProject.project}
+          currentFileMetadata={null}
+          onOpenRecentFile={action('onOpenRecentFile')}
+          storageProviders={[CloudStorageProvider]}
+          onOpenTeachingResources={action('onOpenTeachingResources')}
+        />
+      </FixedHeightFlexContainer>
+    </MockTeamProvider>
+  );
 };
 
-export const WithNoGroupsYet = () => (
-  <MockTeamProvider loading={false} noGroups>
-    <FixedHeightFlexContainer height={600}>
-      <TeamSection
-        project={testProject.project}
-        currentFileMetadata={null}
-        onOpenRecentFile={action('onOpenRecentFile')}
-        storageProviders={[CloudStorageProvider]}
-        onOpenTeachingResources={action('onOpenTeachingResources')}
-      />
-    </FixedHeightFlexContainer>
-  </MockTeamProvider>
-);
-WithNoGroupsYet.parameters = {
-  mockData: [...emptySubscriptionPlanMockData],
+export const WithNoStudentsYet = () => {
+  const usageApiMock = React.useMemo(() => {
+    const mock = new MockAdapter(usageClient, {
+      delayResponse: 250,
+    });
+
+    mock
+      .onGet('/subscription-plan', { params: { includeLegacy: true } })
+      .reply(200, []);
+
+    return mock;
+  }, []);
+
+  React.useEffect(
+    () => {
+      return () => {
+        usageApiMock.restore();
+      };
+    },
+    [usageApiMock]
+  );
+
+  return (
+    <MockTeamProvider loading={false} noGroups noMembers>
+      <FixedHeightFlexContainer height={600}>
+        <TeamSection
+          project={testProject.project}
+          currentFileMetadata={null}
+          onOpenRecentFile={action('onOpenRecentFile')}
+          storageProviders={[CloudStorageProvider]}
+          onOpenTeachingResources={action('onOpenTeachingResources')}
+        />
+      </FixedHeightFlexContainer>
+    </MockTeamProvider>
+  );
 };
 
-export const WithNoStudentsYet = () => (
-  <MockTeamProvider loading={false} noGroups noMembers>
-    <FixedHeightFlexContainer height={600}>
-      <TeamSection
-        project={testProject.project}
-        currentFileMetadata={null}
-        onOpenRecentFile={action('onOpenRecentFile')}
-        storageProviders={[CloudStorageProvider]}
-        onOpenTeachingResources={action('onOpenTeachingResources')}
-      />
-    </FixedHeightFlexContainer>
-  </MockTeamProvider>
-);
-WithNoStudentsYet.parameters = {
-  mockData: [...emptySubscriptionPlanMockData],
+export const WithArchivedStudentsOnly = () => {
+  const usageApiMock = React.useMemo(() => {
+    const mock = new MockAdapter(usageClient, {
+      delayResponse: 250,
+    });
+
+    mock
+      .onGet('/subscription-plan', { params: { includeLegacy: true } })
+      .reply(200, []);
+
+    return mock;
+  }, []);
+
+  React.useEffect(
+    () => {
+      return () => {
+        usageApiMock.restore();
+      };
+    },
+    [usageApiMock]
+  );
+
+  return (
+    <MockTeamProvider loading={false} noGroups noActiveMembers>
+      <FixedHeightFlexContainer height={600}>
+        <TeamSection
+          project={testProject.project}
+          currentFileMetadata={null}
+          onOpenRecentFile={action('onOpenRecentFile')}
+          storageProviders={[CloudStorageProvider]}
+          onOpenTeachingResources={action('onOpenTeachingResources')}
+        />
+      </FixedHeightFlexContainer>
+    </MockTeamProvider>
+  );
 };
 
-export const WithArchivedStudentsOnly = () => (
-  <MockTeamProvider loading={false} noGroups noActiveMembers>
-    <FixedHeightFlexContainer height={600}>
-      <TeamSection
-        project={testProject.project}
-        currentFileMetadata={null}
-        onOpenRecentFile={action('onOpenRecentFile')}
-        storageProviders={[CloudStorageProvider]}
-        onOpenTeachingResources={action('onOpenTeachingResources')}
-      />
-    </FixedHeightFlexContainer>
-  </MockTeamProvider>
-);
-WithArchivedStudentsOnly.parameters = {
-  mockData: [...emptySubscriptionPlanMockData],
-};
+export const Loading = () => {
+  const usageApiMock = React.useMemo(() => {
+    const mock = new MockAdapter(usageClient, {
+      delayResponse: 250,
+    });
 
-export const Loading = () => (
-  <MockTeamProvider loading={true}>
-    <FixedHeightFlexContainer height={600}>
-      <TeamSection
-        project={testProject.project}
-        currentFileMetadata={null}
-        onOpenRecentFile={action('onOpenRecentFile')}
-        storageProviders={[CloudStorageProvider]}
-        onOpenTeachingResources={action('onOpenTeachingResources')}
-      />
-    </FixedHeightFlexContainer>
-  </MockTeamProvider>
-);
-Loading.parameters = {
-  mockData: [...emptySubscriptionPlanMockData],
+    mock
+      .onGet('/subscription-plan', { params: { includeLegacy: true } })
+      .reply(200, []);
+
+    return mock;
+  }, []);
+
+  React.useEffect(
+    () => {
+      return () => {
+        usageApiMock.restore();
+      };
+    },
+    [usageApiMock]
+  );
+
+  return (
+    <MockTeamProvider loading={true}>
+      <FixedHeightFlexContainer height={600}>
+        <TeamSection
+          project={testProject.project}
+          currentFileMetadata={null}
+          onOpenRecentFile={action('onOpenRecentFile')}
+          storageProviders={[CloudStorageProvider]}
+          onOpenTeachingResources={action('onOpenTeachingResources')}
+        />
+      </FixedHeightFlexContainer>
+    </MockTeamProvider>
+  );
 };

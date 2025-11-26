@@ -56,7 +56,7 @@ import {
   type HotReloadSteps,
 } from '../EmbeddedGame/EmbeddedGameFrame';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
-import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
+import { SubscriptionContext } from '../Profile/Subscription/SubscriptionContext';
 import {
   useAiRequestState,
   type OpenAskAiOptions,
@@ -323,6 +323,7 @@ export const AskAiEditor = React.memo<Props>(
         CreditsPackageStoreContext
       );
 
+      const authenticatedUser = React.useContext(AuthenticatedUserContext);
       const {
         profile,
         getAuthorizationHeader,
@@ -330,10 +331,8 @@ export const AskAiEditor = React.memo<Props>(
         limits,
         onRefreshLimits,
         subscription,
-      } = React.useContext(AuthenticatedUserContext);
-      const { openSubscriptionDialog } = React.useContext(
-        SubscriptionSuggestionContext
-      );
+      } = authenticatedUser;
+      const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
 
       const availableCredits = limits ? limits.credits.userBalance.amount : 0;
       const quota =
@@ -952,6 +951,7 @@ export const AskAiEditor = React.memo<Props>(
                 mode: aiRequest.mode || selectedAiRequestMode,
               });
               refreshAiRequest(aiRequest.id);
+              onCloseHistory();
             }}
             selectedAiRequestId={selectedAiRequestId}
           />

@@ -25,7 +25,7 @@ import {
   initialAssetStoreState,
 } from '../../../../AssetStore/AssetStoreContext';
 import { ProductLicenseStoreStateProvider } from '../../../../AssetStore/ProductLicense/ProductLicenseStoreContext';
-import { SubscriptionSuggestionProvider } from '../../../../Profile/Subscription/SubscriptionSuggestionContext';
+import { SubscriptionProvider } from '../../../../Profile/Subscription/SubscriptionContext';
 import { type AuthenticatedUser } from '../../../../Profile/AuthenticatedUserContext';
 
 export default {
@@ -293,7 +293,7 @@ const PrivateAssetPackInformationPageStory = ({
           })),
         }}
       >
-        <SubscriptionSuggestionProvider>
+        <SubscriptionProvider>
           <ProductLicenseStoreStateProvider>
             <PrivateAssetPackInformationPage
               privateAssetPackListingData={privateAssetPackListingData}
@@ -306,7 +306,7 @@ const PrivateAssetPackInformationPageStory = ({
               )}
             />
           </ProductLicenseStoreStateProvider>
-        </SubscriptionSuggestionProvider>
+        </SubscriptionProvider>
       </AuthenticatedUserContext.Provider>
     </AssetStoreContext.Provider>
   );

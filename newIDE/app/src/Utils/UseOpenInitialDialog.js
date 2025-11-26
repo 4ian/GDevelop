@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import RouterContext from '../MainFrame/RouterContext';
-import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
+import { SubscriptionContext } from '../Profile/Subscription/SubscriptionContext';
 import { FLING_GAME_IN_APP_TUTORIAL_ID } from './GDevelopServices/InAppTutorial';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { t } from '@lingui/macro';
@@ -30,9 +30,7 @@ const useOpenInitialDialog = ({
   const { routeArguments, removeRouteArguments } = React.useContext(
     RouterContext
   );
-  const { openSubscriptionDialog } = React.useContext(
-    SubscriptionSuggestionContext
-  );
+  const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
   const {
     onOpenCreateAccountDialog,
     onOpenCreateAccountWithPurchaseClaimDialog,

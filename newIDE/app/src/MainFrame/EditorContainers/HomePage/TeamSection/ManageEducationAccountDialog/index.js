@@ -50,12 +50,11 @@ import Window from '../../../../../Utils/Window';
 import useAlertDialog from '../../../../../UI/Alert/useAlertDialog';
 import { delay } from '../../../../../Utils/Delay';
 import Check from '../../../../../UI/CustomSvgIcons/Check';
-import useSubscriptionPlans from '../../../../../Utils/UseSubscriptionPlans';
 import { getPlanIcon } from '../../../../../Profile/Subscription/PlanCard';
 import { selectMessageByLocale } from '../../../../../Utils/i18n/MessageByLocale';
 import TextButton from '../../../../../UI/TextButton';
 import Chip from '../../../../../UI/Chip';
-import { SubscriptionSuggestionContext } from '../../../../../Profile/Subscription/SubscriptionSuggestionContext';
+import { SubscriptionContext } from '../../../../../Profile/Subscription/SubscriptionContext';
 import { type EditUserChanges } from '../../../../../Utils/GDevelopServices/User';
 
 const styles = {
@@ -271,12 +270,10 @@ type Props = {|
 
 const ManageEducationAccountDialog = ({ onClose }: Props) => {
   const { profile, subscription } = React.useContext(AuthenticatedUserContext);
-  const { openSubscriptionDialog } = React.useContext(
-    SubscriptionSuggestionContext
-  );
-  const { getSubscriptionPlansWithPricingSystems } = useSubscriptionPlans({
-    includeLegacy: true,
-  });
+  const {
+    openSubscriptionDialog,
+    subscriptionPlansWithPricingSystems,
+  } = React.useContext(SubscriptionContext);
   const [selectedUserIds, setSelectedUserIds] = React.useState<string[]>([]);
   const [isCreatingMembers, setIsCreatingMembers] = React.useState<boolean>(
     false
@@ -390,7 +387,6 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
     [selectedUserIds, members]
   );
 
-  const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
   const isLoading = !subscriptionPlansWithPricingSystems;
 
   const availableSeats = getAvailableSeats();

@@ -14,6 +14,8 @@ import Window from '../../../Utils/Window';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import CheckCircleFilled from '../../../UI/CustomSvgIcons/CheckCircleFilled';
 import CircledClose from '../../../UI/CustomSvgIcons/CircledClose';
+import RaisedButton from '../../../UI/RaisedButton';
+import { SubscriptionContext } from '../SubscriptionContext';
 
 const styles = {
   summarizeFeatureRow: {
@@ -39,12 +41,17 @@ const styles = {
 
 const SubscriptionPlanTableSummary = ({
   subscriptionPlanWithPricingSystems,
-  hideActions,
+  displayedFeatures,
+  hideFullTableLink,
+  showChooseAction,
 }: {|
   subscriptionPlanWithPricingSystems: SubscriptionPlanWithPricingSystems,
-  hideActions?: boolean,
+  displayedFeatures?: Array<string>,
+  hideFullTableLink?: boolean,
+  showChooseAction?: boolean,
 |}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
 
   return (
     <I18n>
@@ -69,54 +76,80 @@ const SubscriptionPlanTableSummary = ({
           {getSummarizedSubscriptionPlanFeatures(
             i18n,
             subscriptionPlanWithPricingSystems
-          ).map((summarizedFeature, index) => (
-            <Column key={index} noMargin>
-              <div
-                style={{
-                  ...styles.summarizeFeatureRow,
-                  borderTop:
-                    index !== 0 &&
-                    `1px solid ${gdevelopTheme.listItem.separatorColor}`,
-                }}
-              >
-                <Line
-                  noMargin
-                  alignItems="center"
-                  justifyContent="space-between"
+          )
+            .filter(
+              summarizedFeature =>
+                !displayedFeatures ||
+                displayedFeatures.includes(summarizedFeature.featureName)
+            )
+            .map((summarizedFeature, index) => (
+              <Column key={index} noMargin>
+                <div
+                  style={{
+                    ...styles.summarizeFeatureRow,
+                    borderTop:
+                      index !== 0 &&
+                      `1px solid ${gdevelopTheme.listItem.separatorColor}`,
+                  }}
                 >
-                  <Text style={styles.bulletText}>
-                    {summarizedFeature.displayedFeatureName}
-                  </Text>
-                  <div style={styles.tableRightItemContainer}>
-                    {summarizedFeature.enabled === 'yes' ? (
-                      <CheckCircleFilled
-                        style={{
-                          ...styles.bulletIcon,
-                          color: gdevelopTheme.message.valid,
-                        }}
-                      />
-                    ) : summarizedFeature.enabled === 'no' ? (
-                      <CircledClose style={styles.bulletIcon} />
-                    ) : summarizedFeature.unlimited ? (
-                      <div
-                        style={{
-                          ...styles.unlimitedContainer,
-                          backgroundColor: gdevelopTheme.message.valid,
-                        }}
-                      >
-                        <Text noMargin color="inherit">
-                          ∞ <Trans>Unlimited</Trans>
-                        </Text>
-                      </div>
-                    ) : (
-                      <Text>{summarizedFeature.description}</Text>
-                    )}
-                  </div>
-                </Line>
+                  <Line
+                    noMargin
+                    alignItems="center"
+                    justifyContent="space-between"
+                  >
+                    <Text style={styles.bulletText}>
+                      {summarizedFeature.displayedFeatureName}
+                    </Text>
+                    <div style={styles.tableRightItemContainer}>
+                      {summarizedFeature.enabled === 'yes' ? (
+                        <CheckCircleFilled
+                          style={{
+                            ...styles.bulletIcon,
+                            color: gdevelopTheme.message.valid,
+                          }}
+                        />
+                      ) : summarizedFeature.enabled === 'no' ? (
+                        <CircledClose style={styles.bulletIcon} />
+                      ) : summarizedFeature.unlimited ? (
+                        <div
+                          style={{
+                            ...styles.unlimitedContainer,
+                            backgroundColor: gdevelopTheme.message.valid,
+                          }}
+                        >
+                          <Text noMargin color="inherit">
+                            ∞ <Trans>Unlimited</Trans>
+                          </Text>
+                        </div>
+                      ) : (
+                        <Text>{summarizedFeature.description}</Text>
+                      )}
+                    </div>
+                  </Line>
+                </div>
+              </Column>
+            ))}
+          {showChooseAction && (
+            <Line alignItems="center" justifyContent="flex-end">
+              <div style={styles.tableRightItemContainer}>
+                <RaisedButton
+                  color="premium"
+                  label={<Trans>Choose</Trans>}
+                  onClick={() => {
+                    openSubscriptionDialog({
+                      analyticsMetadata: {
+                        reason: 'AI requests (subscribe)',
+                        recommendedPlanId:
+                          subscriptionPlanWithPricingSystems.id,
+                        placementId: 'ai-requests',
+                      },
+                    });
+                  }}
+                />
               </div>
-            </Column>
-          ))}
-          {!hideActions && (
+            </Line>
+          )}
+          {!hideFullTableLink && (
             <>
               <LargeSpacer />
               <Line noMargin justifyContent="center">

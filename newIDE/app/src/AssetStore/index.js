@@ -70,7 +70,6 @@ import { delay } from '../Utils/Delay';
 import { BundleStoreContext } from './Bundles/BundleStoreContext';
 import BundleInformationPage from './Bundles/BundleInformationPage';
 import { type CourseCompletion } from '../MainFrame/EditorContainers/HomePage/UseCourses';
-import { type SubscriptionPlanWithPricingSystems } from '../Utils/GDevelopServices/Usage';
 
 type Props = {|
   onlyShowAssets?: boolean, // TODO: if we add more options, use an array instead.
@@ -81,7 +80,6 @@ type Props = {|
   onOpenProfile?: () => void,
   courses?: ?Array<Course>,
   onCourseOpen?: (courseId: string) => void,
-  getSubscriptionPlansWithPricingSystems?: () => Array<SubscriptionPlanWithPricingSystems> | null,
   getCourseCompletion?: (courseId: string) => CourseCompletion | null,
   assetSwappedObject?: ?gdObject,
   minimalUI?: boolean,
@@ -125,7 +123,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       onOpenProfile,
       courses,
       onCourseOpen,
-      getSubscriptionPlansWithPricingSystems,
       getCourseCompletion,
       assetSwappedObject,
       minimalUI,
@@ -958,9 +955,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                     privateGameTemplateListingDatasFromSameCreator
                   }
                 />
-              ) : !!openedBundleListingData &&
-                getSubscriptionPlansWithPricingSystems &&
-                getCourseCompletion ? (
+              ) : !!openedBundleListingData && getCourseCompletion ? (
                 <BundleInformationPage
                   bundleListingData={openedBundleListingData}
                   noPadding
@@ -969,9 +964,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                   onGameTemplateOpen={selectPrivateGameTemplate}
                   onAssetPackOpen={selectPrivateAssetPack}
                   onCourseOpen={selectCourse}
-                  getSubscriptionPlansWithPricingSystems={
-                    getSubscriptionPlansWithPricingSystems
-                  }
                   courses={courses}
                   getCourseCompletion={getCourseCompletion}
                 />

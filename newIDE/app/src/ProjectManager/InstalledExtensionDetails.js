@@ -51,6 +51,16 @@ function InstalledExtensionDetails({
           extensionShortHeadersByName,
         }
       );
+      if (
+        !requiredExtensionInstallation.missingExtensionShortHeaders.includes(
+          extensionShortHeader
+        )
+      ) {
+        // Allow to reinstall the extension even if the versions match.
+        requiredExtensionInstallation.missingExtensionShortHeaders.push(
+          extensionShortHeader
+        );
+      }
       await installExtension({
         project,
         requiredExtensionInstallation,

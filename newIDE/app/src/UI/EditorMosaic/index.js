@@ -24,8 +24,14 @@ export type EditorMosaicNode =
       splitPercentage: number,
       first: EditorMosaicNode,
       second: EditorMosaicNode,
+
+      // Visibility:
       firstHidden?: boolean,
       secondHidden?: boolean,
+
+      // The "original" node before visibility filtering. This allows
+      // to apply changes to split percentage made on the filtered view
+      // to the original node. See `filterHiddenNodes`.
       source?: EditorMosaicNode,
     |}
   | string;
@@ -143,6 +149,10 @@ const filterHiddenNodes = (
     splitPercentage: currentNode.splitPercentage,
     first,
     second,
+
+    // Remember the original node so that when we apply
+    // changes to a "filtered" node, we can apply it back
+    // to the original node. See `updateSourceSplit`.
     source: currentNode,
   };
 };

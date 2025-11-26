@@ -48,6 +48,7 @@ import {
 } from '../../../UI/Layout';
 import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import Add from '../../../UI/CustomSvgIcons/Add';
+import Copy from '../../../UI/CustomSvgIcons/Copy';
 import Trash from '../../../UI/CustomSvgIcons/Trash';
 import Edit from '../../../UI/CustomSvgIcons/ShareExternal';
 import Dialog from '../../../UI/Dialog';
@@ -63,6 +64,7 @@ import {
 } from '../../../Utils/Serializer';
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 import { MarkdownText } from '../../../UI/MarkdownText';
+import ResponsiveFlatButton from '../../../UI/ResponsiveFlatButton';
 
 const gd: libGDevelop = global.gd;
 
@@ -487,17 +489,17 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                         <Text size="block-title">Variant</Text>
                         <Column>
                           <LineStackLayout>
-                            <FlatButton
+                            <ResponsiveFlatButton
                               key={'delete-variant'}
                               label={<Trans>Delete</Trans>}
                               leftIcon={<Trash />}
                               onClick={doDeleteVariant}
                               disabled={!variantName}
                             />
-                            <FlatButton
+                            <ResponsiveFlatButton
                               key={'duplicate-variant'}
                               label={<Trans>Duplicate</Trans>}
-                              leftIcon={<Add />}
+                              leftIcon={<Copy />}
                               onClick={() => setNewVariantDialogOpen(true)}
                             />
                             <FlatButton

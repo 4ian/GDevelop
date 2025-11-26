@@ -429,7 +429,11 @@ const MainFrame = (props: Props) => {
     standaloneDialogOpen,
     setStandaloneDialogOpen,
   ] = React.useState<boolean>(false);
-  const { showConfirmation, showAlert } = useAlertDialog();
+  const {
+    showConfirmation,
+    showAlert,
+    showDeleteConfirmation,
+  } = useAlertDialog();
   const preferences = React.useContext(PreferencesContext);
   const { setHasProjectOpened } = preferences;
   const [previewLoading, setPreviewLoading] = React.useState<boolean>(false);
@@ -1304,9 +1308,7 @@ const MainFrame = (props: Props) => {
           currentFileMetadata: newFileMetadata,
         }));
       }
-      if (!options.dontCloseNewProjectSetupDialog) {
-        setNewProjectSetupDialogOpen(false);
-      }
+      setNewProjectSetupDialogOpen(false);
       if (options.openQuickCustomizationDialog) {
         setQuickCustomizationDialogOpenedFromGameId(oldProjectId);
       } else {
@@ -1315,25 +1317,22 @@ const MainFrame = (props: Props) => {
         openLeaderboardReplacerDialogIfNeeded(project, oldProjectId);
         configureMultiplayerLobbiesIfNeeded(project, oldProjectId);
       }
-      if (!options.dontOpenAnySceneOrProjectManager) {
-        options.openAllScenes || options.openQuickCustomizationDialog
-          ? openAllScenes({
-              currentProject: project,
-              editorTabs,
-            })
-          : openSceneOrProjectManager({
-              currentProject: project,
-              editorTabs: editorTabs,
-            });
-      }
-      if (!options.dontRepositionAskAiEditor) {
-        // If Ask AI editor was opened, reposition it.
-        const openedAskAIEditor = getOpenedAskAiEditor(state.editorTabs);
-        if (openedAskAIEditor) {
-          openAskAi({
-            paneIdentifier: 'right',
+      options.openAllScenes || options.openQuickCustomizationDialog
+        ? openAllScenes({
+            currentProject: project,
+            editorTabs,
+          })
+        : openSceneOrProjectManager({
+            currentProject: project,
+            editorTabs: editorTabs,
           });
-        }
+      // If Ask AI editor was opened, reposition it.
+      const openedAskAIEditor = getOpenedAskAiEditor(state.editorTabs);
+      if (openedAskAIEditor || options.forceOpenAskAiEditor) {
+        openAskAi({
+          paneIdentifier: 'right',
+          continueProcessingFunctionCallsOnMount: true,
+        });
       }
       setIsProjectClosedSoAvoidReloadingExtensions(false);
     },
@@ -1442,19 +1441,42 @@ const MainFrame = (props: Props) => {
     });
   };
 
-  const deleteEventsFunctionsExtension = (
+  const deleteEventsFunctionsExtension = async (
     eventsFunctionsExtension: gdEventsFunctionsExtension
   ) => {
     const { currentProject } = state;
     const { i18n } = props;
     if (!currentProject) return;
 
-    const answer = Window.showConfirmDialog(
-      i18n._(
-        t`Are you sure you want to remove this extension? This can't be undone.`
-      )
-    );
-    if (!answer) return;
+    const dependentExtensionNames = gd.UsedExtensionsFinder.findExtensionsDependentOn(
+      currentProject,
+      eventsFunctionsExtension
+    ).toJSArray();
+
+    const deleteAnswer = await showDeleteConfirmation({
+      title: t`Remove the extension`,
+      message: t`${
+        dependentExtensionNames.length > 0
+          ? i18n._(
+              `This extension is used by the following extensions:${'\n\n' +
+                dependentExtensionNames
+                  .map(
+                    extensionName =>
+                      `- ${(currentProject.hasEventsFunctionsExtensionNamed(
+                        extensionName
+                      )
+                        ? currentProject
+                            .getEventsFunctionsExtension(extensionName)
+                            .getFullName()
+                        : extensionName) || extensionName}\n`
+                  )
+                  .join('') +
+                '\n'}`
+            )
+          : ''
+      }Are you sure you want to remove this extension? This can't be undone.`,
+    });
+    if (!deleteAnswer) return;
 
     const extensionName = eventsFunctionsExtension.getName();
     const hasCustomObject =
@@ -3143,11 +3165,9 @@ const MainFrame = (props: Props) => {
           editorRef.onObjectsModifiedOutsideEditor(changes);
         }
       }
-      if (changes.isNewObjectTypeUsed) {
-        onObjectListsModified({
-          isNewObjectTypeUsed: changes.isNewObjectTypeUsed,
-        });
-      }
+      onObjectListsModified({
+        isNewObjectTypeUsed: changes.isNewObjectTypeUsed,
+      });
     },
     [state.editorTabs, onObjectListsModified]
   );
@@ -4556,7 +4576,6 @@ const MainFrame = (props: Props) => {
     createEmptyProject,
     createProjectFromExample,
     createProjectFromPrivateGameTemplate,
-    openAskAi,
     closeAskAi,
     storageProviders: props.storageProviders,
     storageProvider: getStorageProvider(),

@@ -665,6 +665,9 @@ namespace gdjs {
         !this._objects.containsKey(objectName)
       ) {
         if (this.getGame().isInGameEdition()) {
+          logger.error(
+            `Object "${objectName}" not found - creating a placeholder object as a fallback.`
+          );
           // Fallback on the UnknownRuntimeObject.
           objectName = '';
         } else {

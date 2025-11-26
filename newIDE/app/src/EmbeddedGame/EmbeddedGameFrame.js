@@ -244,7 +244,7 @@ export const EmbeddedGameFrame = ({
       if (!previewDebuggerServer) return;
 
       previewDebuggerServer
-        .getExistingDebuggerIds()
+        .getExistingEmbeddedGameFrameDebuggerIds()
         .forEach((debuggerId: string) => {
           previewDebuggerServer.sendMessage(debuggerId, {
             command: 'setInGameEditorSettings',
@@ -393,17 +393,19 @@ export const EmbeddedGameFrame = ({
             eventsBasedObjectVariantName,
             reasons,
           });
-          previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-            previewDebuggerServer.sendMessage(debuggerId, {
-              command: 'switchForInGameEdition',
-              editorId,
-              sceneName,
-              externalLayoutName,
-              eventsBasedObjectType,
-              eventsBasedObjectVariantName,
-              editorCamera3D: cameraStates.current.get(editorId),
+          previewDebuggerServer
+            .getExistingEmbeddedGameFrameDebuggerIds()
+            .forEach(debuggerId => {
+              previewDebuggerServer.sendMessage(debuggerId, {
+                command: 'switchForInGameEdition',
+                editorId,
+                sceneName,
+                externalLayoutName,
+                eventsBasedObjectType,
+                eventsBasedObjectVariantName,
+                editorCamera3D: cameraStates.current.get(editorId),
+              });
             });
-          });
         }
       };
       onSwitchInGameEditorIfNoHotReloadIsNeeded = ({
@@ -433,17 +435,19 @@ export const EmbeddedGameFrame = ({
           eventsBasedObjectVariantName,
           reasons: ['switched-editor-and-no-hot-reload-is-needed'],
         });
-        previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-          previewDebuggerServer.sendMessage(debuggerId, {
-            command: 'switchForInGameEdition',
-            editorId,
-            sceneName,
-            externalLayoutName,
-            eventsBasedObjectType,
-            eventsBasedObjectVariantName,
-            cameraState3D: cameraStates.current.get(editorId),
+        previewDebuggerServer
+          .getExistingEmbeddedGameFrameDebuggerIds()
+          .forEach(debuggerId => {
+            previewDebuggerServer.sendMessage(debuggerId, {
+              command: 'switchForInGameEdition',
+              editorId,
+              sceneName,
+              externalLayoutName,
+              eventsBasedObjectType,
+              eventsBasedObjectVariantName,
+              cameraState3D: cameraStates.current.get(editorId),
+            });
           });
-        });
       };
       onChangeViewPosition = (command: ChangeViewPositionCommand) => {
         const iframe = iframeRef.current;
@@ -454,30 +458,33 @@ export const EmbeddedGameFrame = ({
         if (!embeddedGameFrameHoleRect || !embeddedGameFrameRect) return;
 
         if (!previewDebuggerServer) return;
-        previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-          previewDebuggerServer.sendMessage(debuggerId, {
-            command,
-            payload: {
-              visibleScreenArea: {
-                minX:
-                  (embeddedGameFrameHoleRect.left -
-                    embeddedGameFrameRect.left) /
-                  embeddedGameFrameRect.width,
-                minY:
-                  (embeddedGameFrameHoleRect.top - embeddedGameFrameRect.top) /
-                  embeddedGameFrameRect.height,
-                maxX:
-                  (embeddedGameFrameHoleRect.right -
-                    embeddedGameFrameRect.left) /
-                  embeddedGameFrameRect.width,
-                maxY:
-                  (embeddedGameFrameHoleRect.bottom -
-                    embeddedGameFrameRect.top) /
-                  embeddedGameFrameRect.height,
+        previewDebuggerServer
+          .getExistingEmbeddedGameFrameDebuggerIds()
+          .forEach(debuggerId => {
+            previewDebuggerServer.sendMessage(debuggerId, {
+              command,
+              payload: {
+                visibleScreenArea: {
+                  minX:
+                    (embeddedGameFrameHoleRect.left -
+                      embeddedGameFrameRect.left) /
+                    embeddedGameFrameRect.width,
+                  minY:
+                    (embeddedGameFrameHoleRect.top -
+                      embeddedGameFrameRect.top) /
+                    embeddedGameFrameRect.height,
+                  maxX:
+                    (embeddedGameFrameHoleRect.right -
+                      embeddedGameFrameRect.left) /
+                    embeddedGameFrameRect.width,
+                  maxY:
+                    (embeddedGameFrameHoleRect.bottom -
+                      embeddedGameFrameRect.top) /
+                    embeddedGameFrameRect.height,
+                },
               },
-            },
+            });
           });
-        });
       };
     },
     [
@@ -537,16 +544,18 @@ export const EmbeddedGameFrame = ({
       const clientOffset = monitor.getClientOffset();
       const dropTargetRect = dropTarget.getBoundingClientRect();
 
-      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-        previewDebuggerServer.sendMessage(debuggerId, {
-          command: 'dragNewInstance',
-          x: clientOffset.x - dropTargetRect.left,
-          y: clientOffset.y - dropTargetRect.top,
-          name,
-          dropped,
-          isAltPressed: keyboardShortcuts.current.shouldNotSnapToGrid(),
+      previewDebuggerServer
+        .getExistingEmbeddedGameFrameDebuggerIds()
+        .forEach(debuggerId => {
+          previewDebuggerServer.sendMessage(debuggerId, {
+            command: 'dragNewInstance',
+            x: clientOffset.x - dropTargetRect.left,
+            y: clientOffset.y - dropTargetRect.top,
+            name,
+            dropped,
+            isAltPressed: keyboardShortcuts.current.shouldNotSnapToGrid(),
+          });
         });
-      });
     },
     [previewDebuggerServer]
   );
@@ -558,12 +567,15 @@ export const EmbeddedGameFrame = ({
 
       const sendInGameEditorVisibleStatus = () => {
         if (previewDebuggerServer) {
-          previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-            previewDebuggerServer.sendMessage(debuggerId, {
-              command: 'setVisibleStatus',
-              visible: !hasSomeDialogOpen && hasSomeEmbeddedGameFrameHoleActive,
+          previewDebuggerServer
+            .getExistingEmbeddedGameFrameDebuggerIds()
+            .forEach(debuggerId => {
+              previewDebuggerServer.sendMessage(debuggerId, {
+                command: 'setVisibleStatus',
+                visible:
+                  !hasSomeDialogOpen && hasSomeEmbeddedGameFrameHoleActive,
+              });
             });
-          });
         }
       };
 
@@ -632,7 +644,7 @@ export const EmbeddedGameFrame = ({
               // TODO: Move these into a helper.
               if (previewDebuggerServer) {
                 previewDebuggerServer
-                  .getExistingDebuggerIds()
+                  .getExistingEmbeddedGameFrameDebuggerIds()
                   .forEach(debuggerId => {
                     previewDebuggerServer.sendMessage(debuggerId, {
                       command: 'cancelDragNewInstance',

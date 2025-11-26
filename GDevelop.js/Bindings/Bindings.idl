@@ -1064,6 +1064,8 @@ interface Effect {
 
   void SetFolded(boolean val);
   boolean IsFolded();
+  void SetEnabled(boolean val);
+  boolean IsEnabled();
 
   void SetDoubleParameter([Const] DOMString name, double value);
   double GetDoubleParameter([Const] DOMString name);
@@ -2898,6 +2900,16 @@ interface BehaviorParameterFiller {
         [Ref] Instruction instruction);
 };
 
+interface InstructionValidator {
+  boolean STATIC_IsParameterValid(
+    [Const, Ref] Platform platform,
+    [Const, Ref] ProjectScopedContainers projectScopedContainers,
+    [Const, Ref] Instruction instruction,
+    [Const, Ref] InstructionMetadata metadata,
+    long parameterIndex,
+    [Const] DOMString value);
+};
+
 interface ObjectTools {
     boolean STATIC_IsBehaviorCompatibleWithObject(
         [Const, Ref] Platform platform,
@@ -2927,6 +2939,9 @@ interface UsedExtensionsResult {
 interface UsedExtensionsFinder {
   [Value] UsedExtensionsResult STATIC_ScanProject([Ref] Project project);
   [Value] UsedExtensionsResult STATIC_ScanEventsFunctionsExtension(
+    [Ref] Project project, [Const, Ref]
+    EventsFunctionsExtension eventsFunctionsExtension);
+  [Value] VectorString STATIC_FindExtensionsDependentOn(
     [Ref] Project project, [Const, Ref]
     EventsFunctionsExtension eventsFunctionsExtension);
 };

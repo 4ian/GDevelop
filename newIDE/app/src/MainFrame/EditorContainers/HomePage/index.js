@@ -608,7 +608,6 @@ export const HomePage = React.memo<Props>(
                       onOpenLayout={onOpenLayout}
                       onWillInstallExtension={onWillInstallExtension}
                       onExtensionInstalled={onExtensionInstalled}
-                      onOpenAskAi={onOpenAskAi}
                       onCloseAskAi={onCloseAskAi}
                       closeProject={closeProject}
                       games={games}

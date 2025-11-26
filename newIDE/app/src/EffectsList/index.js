@@ -56,6 +56,9 @@ import ResponsiveFlatButton from '../UI/ResponsiveFlatButton';
 import { Accordion, AccordionHeader, AccordionBody } from '../UI/Accordion';
 import { type Field } from '../CompactPropertiesEditor';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import InlineCheckbox from '../UI/InlineCheckbox';
+import VisibilityIcon from '../UI/CustomSvgIcons/Visibility';
+import VisibilityOffIcon from '../UI/CustomSvgIcons/VisibilityOff';
 
 const gd: libGDevelop = global.gd;
 
@@ -302,6 +305,24 @@ const Effect = React.forwardRef(
                   </SelectField>
                 </Line>
               </ResponsiveLineStackLayout>
+              <InlineCheckbox
+                id="effect-visibility"
+                paddingSize="small"
+                checkedIcon={<VisibilityIcon />}
+                uncheckedIcon={<VisibilityOffIcon />}
+                checked={effect.isEnabled()}
+                onCheck={(e, checked) => {
+                  effect.setEnabled(checked);
+                  forceUpdate();
+                }}
+                tooltipOrHelperText={
+                  effect.isEnabled() ? (
+                    <Trans>Hide effect</Trans>
+                  ) : (
+                    <Trans>Show effect</Trans>
+                  )
+                }
+              />
               <ElementWithMenu
                 element={
                   <IconButton size="small">

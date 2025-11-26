@@ -20,9 +20,15 @@ const existingPreviewWindows: {
 let embbededGameFrameWindow: WindowProxy | null = null;
 
 const getExistingDebuggerIds = (): Array<DebuggerId> => [
-  ...(embbededGameFrameWindow ? ['embedded-game-frame'] : []),
-  ...Object.keys(existingPreviewWindows).map(key => key),
+  ...getExistingEmbeddedGameFrameDebuggerIds(),
+  ...getExistingPreviewDebuggerIds(),
 ];
+
+const getExistingEmbeddedGameFrameDebuggerIds = (): Array<DebuggerId> =>
+  embbededGameFrameWindow ? ['embedded-game-frame'] : [];
+
+const getExistingPreviewDebuggerIds = (): Array<DebuggerId> =>
+  Object.keys(existingPreviewWindows).map(key => key);
 
 const getDebuggerIdForPreviewWindow = (
   previewWindow: any
@@ -163,6 +169,12 @@ class BrowserPreviewDebuggerServer {
   }
   getExistingDebuggerIds() {
     return getExistingDebuggerIds();
+  }
+  getExistingEmbeddedGameFrameDebuggerIds() {
+    return getExistingEmbeddedGameFrameDebuggerIds();
+  }
+  getExistingPreviewDebuggerIds() {
+    return getExistingPreviewDebuggerIds();
   }
   registerCallbacks(callbacks: PreviewDebuggerServerCallbacks) {
     callbacksList.push(callbacks);

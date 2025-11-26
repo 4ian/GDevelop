@@ -12,7 +12,6 @@ import RaisedButton from '../../UI/RaisedButton';
 import { CompactTextAreaFieldWithControls } from '../../UI/CompactTextAreaFieldWithControls';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import Tooltip from '@material-ui/core/Tooltip';
-import Paper from '../../UI/Paper';
 import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import AlertMessage from '../../UI/AlertMessage';
 import classes from './AiRequestChat.module.css';
@@ -28,14 +27,15 @@ import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
 import { type EditorFunctionCallResult } from '../../EditorFunctions/EditorFunctionCallRunner';
 import { type EditorCallbacks } from '../../EditorFunctions';
-import { getFunctionCallsToProcess } from '../AiRequestUtils';
-import CircularProgress from '../../UI/CircularProgress';
+import {
+  getFunctionCallOutputsFromEditorFunctionCallResults,
+  getFunctionCallsToProcess,
+} from '../AiRequestUtils';
 import TwoStatesButton from '../../UI/TwoStatesButton';
 import Help from '../../UI/CustomSvgIcons/Help';
 import Hammer from '../../UI/CustomSvgIcons/Hammer';
 import { ChatMessages } from './ChatMessages';
 import Send from '../../UI/CustomSvgIcons/Send';
-import { FeedbackBanner } from './FeedbackBanner';
 import classNames from 'classnames';
 import {
   type AiConfigurationPresetWithAvailability,
@@ -65,7 +65,7 @@ const styles = {
   },
 };
 
-type Props = {
+type Props = {|
   project: ?gdProject,
   i18n: I18nType,
   aiRequest: AiRequest | null,
@@ -77,10 +77,7 @@ type Props = {
     mode: 'chat' | 'agent',
     aiConfigurationPresetId: string,
   |}) => void,
-  onSendMessage: (options: {|
-    userMessage: string,
-    createdSceneNames?: Array<string>,
-  |}) => Promise<void>,
+  onSendUserMessage: (userMessage: string) => Promise<void>,
   onSendFeedback: (
     aiRequestId: string,
     messageIndex: number,
@@ -115,7 +112,7 @@ type Props = {
   availableCredits: number,
 
   standAloneForm?: boolean,
-};
+|};
 
 export type AiRequestChatInterface = {|
   resetUserInput: (aiRequestId: string | null) => void,
@@ -137,73 +134,42 @@ const getPriceAndRequestsTextAndTooltip = ({
   isMobile: boolean,
   aiRequestMode: 'chat' | 'agent',
   lastUserMessagePriceInCredits?: number | null,
-|}): {|
-  text: React.Node | null,
-  tooltipInfoIcon: React.Node | null,
-|} => {
-  if (!quota || !price)
-    return {
-      text: null,
-      tooltipInfoIcon: <div style={{ height: 24 }} />, // Placeholder to avoid layout shift.
-    };
+|}): React.Node => {
+  if (!quota || !price) {
+    // Placeholder to avoid layout shift.
+    return <div style={{ height: 29 }} />;
+  }
 
-  // Display a text if > 50% requests done.
-  const shouldShowText = quota.current / quota.max >= 0.5;
+  const shouldShowText = true;
 
-  const requestsLeft = quota.max - quota.current;
+  const aiCreditsLeft = Math.max(0, quota.max - quota.current);
 
   const currentQuotaText = isMobile ? (
     increaseQuotaOffering === 'subscribe' ? (
-      requestsLeft === 1 ? (
-        <Trans>{requestsLeft} trial request left</Trans>
-      ) : (
-        <Trans>{requestsLeft} trial requests left</Trans>
-      )
-    ) : requestsLeft === 1 ? (
-      <Trans>{requestsLeft} request left</Trans>
+      <Trans>{aiCreditsLeft} free AI credits left</Trans>
     ) : (
-      <Trans>{requestsLeft} requests left</Trans>
+      <Trans>{aiCreditsLeft} AI credits left</Trans>
     )
   ) : quota.period === '30days' ? (
     increaseQuotaOffering === 'subscribe' ? (
-      requestsLeft === 1 ? (
-        <Trans>{requestsLeft} trial request left this month</Trans>
-      ) : (
-        <Trans>{requestsLeft} trial requests left this month</Trans>
-      )
-    ) : requestsLeft === 1 ? (
-      <Trans>{requestsLeft} request left this month</Trans>
+      <Trans>{aiCreditsLeft} free AI credits left this month</Trans>
     ) : (
-      <Trans>{requestsLeft} requests left this month</Trans>
+      <Trans>{aiCreditsLeft} AI credits left this month</Trans>
     )
   ) : quota.period === '7days' ? (
     increaseQuotaOffering === 'subscribe' ? (
-      requestsLeft === 1 ? (
-        <Trans>{requestsLeft} trial request left this week</Trans>
-      ) : (
-        <Trans>{requestsLeft} trial requests left this week</Trans>
-      )
-    ) : requestsLeft === 1 ? (
-      <Trans>{requestsLeft} request left this week</Trans>
+      <Trans>{aiCreditsLeft} free AI credits left this week</Trans>
     ) : (
-      <Trans>{requestsLeft} requests left this week</Trans>
+      <Trans>{aiCreditsLeft} AI credits left this week</Trans>
     )
   ) : quota.period === '1day' ? (
     increaseQuotaOffering === 'subscribe' ? (
-      requestsLeft === 1 ? (
-        <Trans>{requestsLeft} trial request left today</Trans>
-      ) : (
-        <Trans>{requestsLeft} trial requests left today</Trans>
-      )
-    ) : requestsLeft === 1 ? (
-      <Trans>{requestsLeft} request left today</Trans>
+      <Trans>{aiCreditsLeft} free AI credits left today</Trans>
     ) : (
-      <Trans>{requestsLeft} requests left today</Trans>
+      <Trans>{aiCreditsLeft} AI credits left today</Trans>
     )
-  ) : requestsLeft === 1 ? (
-    <Trans>{requestsLeft} request left</Trans>
   ) : (
-    <Trans>{requestsLeft} requests left</Trans>
+    <Trans>{aiCreditsLeft} AI credits left</Trans>
   );
   const creditsText = (
     <Trans>{Math.max(0, availableCredits)} credits available</Trans>
@@ -226,50 +192,61 @@ const getPriceAndRequestsTextAndTooltip = ({
     ? `${minimumPriceInCredits || priceInCredits}-${maximumPriceInCredits}`
     : minimumPriceInCredits || priceInCredits;
 
+  const remainingDaysBeforeReset = quota.resetsAt
+    ? Math.ceil((quota.resetsAt - Date.now()) / (1000 * 60 * 60 * 24))
+    : null;
+
   const tooltipText = (
     <ColumnStackLayout noMargin>
       <Line noMargin>
-        {currentQuotaText} <Trans>(out of {quota.max} requests)</Trans>
+        {remainingDaysBeforeReset ? (
+          <Trans>
+            {currentQuotaText} (out of {quota.max}). They reset in
+            {remainingDaysBeforeReset} day(s).
+          </Trans>
+        ) : (
+          <Trans>
+            {currentQuotaText} (out of {quota.max}).
+          </Trans>
+        )}
       </Line>
       {increaseQuotaOffering === 'subscribe' ? (
-        <Trans>Get GDevelop premium to get more requests.</Trans>
+        <Trans>Get GDevelop premium to get more AI credits every week.</Trans>
       ) : (
         <Trans>These are parts of your GDevelop premium membership.</Trans>
       )}
-      {aiRequestMode === 'agent' ? (
-        <>
-          <Trans>
-            You can also use credits once your quota is reached. Each request to
-            the AI agent costs {priceText} credits. It depends on the amount of
-            work the agent will do and the number of times it generates events.
-          </Trans>{' '}
-          {lastUserMessagePriceInCredits ? (
-            <Trans>
-              The last request used {lastUserMessagePriceInCredits} credits.
-            </Trans>
-          ) : null}
-        </>
-      ) : (
+      <Trans>
+        You can also use paid credits once your quota is reached. Each request
+        costs {priceText} credits, depending on the amount of research and work
+        the AI does.
+      </Trans>
+      {lastUserMessagePriceInCredits ? (
         <Trans>
-          You can also use credits once your quota is reached. Each answer from
-          the AI costs {priceText} credits.
+          The last request used {lastUserMessagePriceInCredits} credits.
         </Trans>
-      )}
+      ) : null}
       {quota.limitReached ? creditsText : null}
     </ColumnStackLayout>
   );
 
-  const tooltipInfoIcon = (
-    <Tooltip title={tooltipText}>
-      <CircledInfo color="disabled" />
-    </Tooltip>
-  );
   const text = shouldShowText ? (
-    <Text size="body-small" color="secondary">
+    <Text size="body-small" color="secondary" noMargin>
       {quota.limitReached ? creditsText : currentQuotaText}
+      <span
+        style={{
+          verticalAlign: 'middle',
+          display: 'inline-block',
+          marginRight: -3,
+          marginTop: 1,
+        }}
+      >
+        <Tooltip title={tooltipText}>
+          <CircledInfo color="inherit" />
+        </Tooltip>
+      </span>
     </Text>
   ) : null;
-  return { text, tooltipInfoIcon };
+  return text;
 };
 
 const getSendButtonLabel = ({
@@ -350,7 +327,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       aiRequestMode,
       isSending,
       onStartNewAiRequest,
-      onSendMessage,
+      onSendUserMessage,
       onSendFeedback,
       onStartOrOpenChat,
       quota,
@@ -420,16 +397,24 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     );
     const requiredGameId = (aiRequest && aiRequest.gameId) || null;
 
-    // Auto-scroll to bottom when content changes, if user is at the bottom
+    const scrollToBottom = React.useCallback(() => {
+      if (scrollViewRef.current) {
+        scrollViewRef.current.scrollToBottom({ behavior: 'smooth' });
+      }
+    }, []);
+
+    // Auto-scroll to bottom when content changes, if user is at the bottom.
     React.useEffect(
       () => {
-        if (shouldAutoScroll && scrollViewRef.current) {
-          scrollViewRef.current.scrollToBottom({
-            behavior: 'smooth',
-          });
-        }
+        if (shouldAutoScroll) scrollToBottom();
       },
-      [aiRequest, editorFunctionCallResults, lastSendError, shouldAutoScroll]
+      [
+        scrollToBottom,
+        aiRequest,
+        editorFunctionCallResults,
+        lastSendError,
+        shouldAutoScroll,
+      ]
     );
 
     const onScroll = React.useCallback(
@@ -511,11 +496,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         const aiRequestIdToReset: string = aiRequestId || '';
         onUserRequestTextChange('', aiRequestIdToReset);
 
-        if (scrollViewRef.current) {
-          scrollViewRef.current.scrollToBottom({
-            behavior: 'smooth',
-          });
-        }
+        scrollToBottom();
       },
     }));
 
@@ -529,7 +510,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       </Text>
     ) : null;
 
-    const priceAndRequestsTextAndTooltip = getPriceAndRequestsTextAndTooltip({
+    const priceAndRequestsText = getPriceAndRequestsTextAndTooltip({
       quota,
       increaseQuotaOffering,
       price,
@@ -539,9 +520,6 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       lastUserMessagePriceInCredits:
         (aiRequest && aiRequest.lastUserMessagePriceInCredits) || null,
     });
-    const priceAndRequestsText = priceAndRequestsTextAndTooltip.text;
-    const priceAndRequestsTooltipInfoIcon =
-      priceAndRequestsTextAndTooltip.tooltipInfoIcon;
 
     const chosenOrDefaultAiConfigurationPresetId =
       aiConfigurationPresetId ||
@@ -549,16 +527,29 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         aiRequestMode,
         aiConfigurationPresetsWithAvailability
       );
+    const hasFunctionsCallsToProcess =
+      aiRequest &&
+      getFunctionCallsToProcess({
+        aiRequest: aiRequest,
+        editorFunctionCallResults,
+      }).length > 0;
     const hasWorkingFunctionCalls =
       editorFunctionCallResults &&
       editorFunctionCallResults.some(
         functionCallOutput => functionCallOutput.status === 'working'
       );
-    const isWorking =
-      isSending ||
-      ((!!hasWorkingFunctionCalls ||
-        (!!aiRequest && aiRequest.status === 'working')) &&
-        isAutoProcessingFunctionCalls);
+    const hasUnfinishedResult =
+      aiRequest &&
+      getFunctionCallOutputsFromEditorFunctionCallResults(
+        editorFunctionCallResults
+      ).hasUnfinishedResult;
+    const hasWorkToProcess =
+      hasUnfinishedResult ||
+      !!hasWorkingFunctionCalls ||
+      !!hasFunctionsCallsToProcess ||
+      (!!aiRequest && aiRequest.status === 'working');
+    const isPaused = !!aiRequest && !isAutoProcessingFunctionCalls;
+    const isWorking = isSending || (hasWorkToProcess && !isPaused);
 
     const hasReachedLimitAndCannotUseCredits =
       !!quota &&
@@ -636,6 +627,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             )}
             <form
               onSubmit={() => {
+                scrollToBottom();
                 onStartNewAiRequest({
                   mode: aiRequestMode,
                   userRequest: userRequestTextPerAiRequestId[''],
@@ -657,6 +649,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                   }}
                   onNavigateHistory={handleNavigateHistory}
                   onSubmit={() => {
+                    scrollToBottom();
                     onStartNewAiRequest({
                       mode: aiRequestMode,
                       userRequest: userRequestTextPerAiRequestId[''],
@@ -699,6 +692,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                               !hasReachedLimitAndCannotUseCredits)
                           }
                           onClick={() => {
+                            scrollToBottom();
                             onStartNewAiRequest({
                               mode: aiRequestMode,
                               userRequest: userRequestTextPerAiRequestId[''],
@@ -717,7 +711,6 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                   justifyContent="flex-end"
                 >
                   {errorText || priceAndRequestsText}
-                  {priceAndRequestsTooltipInfoIcon}
                 </Line>
               </Column>
             </form>
@@ -803,33 +796,12 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     const isPausedAndHasFunctionCallsToProcess =
       !isAutoProcessingFunctionCalls && allFunctionCallsToProcess.length > 0;
 
-    const lastMessageIndex = aiRequest.output.length - 1;
-    const lastMessage = aiRequest.output[lastMessageIndex];
     const shouldDisplayFeedbackBanner =
       !hasWorkingFunctionCalls &&
       !isPausedAndHasFunctionCallsToProcess &&
       !isSending &&
       aiRequest.status === 'ready' &&
-      aiRequest.mode === 'agent' &&
-      lastMessage.type === 'message' &&
-      lastMessage.role === 'assistant';
-    const lastMessageFeedbackBanner = shouldDisplayFeedbackBanner && (
-      <FeedbackBanner
-        onSendFeedback={(
-          feedback: 'like' | 'dislike',
-          reason?: string,
-          freeFormDetails?: string
-        ) => {
-          onSendFeedback(
-            aiRequestId,
-            lastMessageIndex,
-            feedback,
-            reason,
-            freeFormDetails
-          );
-        }}
-      />
-    );
+      aiRequest.mode === 'agent';
 
     const isForAnotherProject =
       !!requiredGameId &&
@@ -872,10 +844,15 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             editorCallbacks={editorCallbacks}
             project={project}
             onProcessFunctionCalls={onProcessFunctionCalls}
+            onUserRequestTextChange={onUserRequestTextChange}
+            isPaused={isPaused}
+            shouldBeWorkingIfNotPaused={hasWorkToProcess || isWorking}
+            isForAnotherProject={isForAnotherProject}
+            shouldDisplayFeedbackBanner={shouldDisplayFeedbackBanner}
+            onPause={(pause: boolean) => setAutoProcessFunctionCalls(!pause)}
           />
           <Spacer />
           <ColumnStackLayout noMargin>
-            {lastMessageFeedbackBanner}
             {userMessagesCount >= TOO_MANY_USER_MESSAGES_WARNING_COUNT ? (
               <AlertMessage
                 kind={
@@ -896,9 +873,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         <form
           onSubmit={() => {
             setAutoProcessFunctionCalls(true);
-            onSendMessage({
-              userMessage: userRequestTextPerAiRequestId[aiRequestId] || '',
-            });
+            onSendUserMessage(userRequestTextPerAiRequestId[aiRequestId] || '');
           }}
           className={classNames({
             // Move the form up when the soft keyboard is open:
@@ -906,62 +881,6 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
           })}
         >
           <Column justifyContent="stretch" alignItems="stretch" noMargin>
-            {aiRequest.mode === 'agent' && isWorking ? (
-              <Paper background="dark" variant="outlined">
-                <Column>
-                  <LineStackLayout
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <LineStackLayout alignItems="center" noMargin>
-                      <CircularProgress variant="indeterminate" size={12} />
-                      <Text size="body" color="secondary" noMargin>
-                        <Trans>The AI is building your request.</Trans>
-                      </Text>
-                    </LineStackLayout>
-                    <Text size="body" noMargin>
-                      <Link
-                        href={'#'}
-                        color="secondary"
-                        onClick={() => {
-                          setAutoProcessFunctionCalls(false);
-                        }}
-                      >
-                        <Trans>Pause</Trans>
-                      </Link>
-                    </Text>
-                  </LineStackLayout>
-                </Column>
-              </Paper>
-            ) : aiRequest.mode === 'agent' &&
-              isPausedAndHasFunctionCallsToProcess ? (
-              <Paper background="dark" variant="outlined">
-                <Column>
-                  <LineStackLayout
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <LineStackLayout alignItems="center" noMargin>
-                      <Text size="body" color="secondary" noMargin>
-                        <Trans>The AI agent is paused.</Trans>
-                      </Text>
-                    </LineStackLayout>
-                    <Text size="body" noMargin>
-                      <Link
-                        href={'#'}
-                        color="secondary"
-                        onClick={() => {
-                          setAutoProcessFunctionCalls(true);
-                          onProcessFunctionCalls(allFunctionCallsToProcess);
-                        }}
-                      >
-                        <Trans>Resume all</Trans>
-                      </Link>
-                    </Text>
-                  </LineStackLayout>
-                </Column>
-              </Paper>
-            ) : null}
             {!standAloneForm && (
               <CompactTextAreaFieldWithControls
                 maxLength={6000}
@@ -984,12 +903,12 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                     : t`Ask a follow up question`
                 }
                 rows={2}
+                maxRows={6}
                 onSubmit={() => {
                   setAutoProcessFunctionCalls(true);
-                  onSendMessage({
-                    userMessage:
-                      userRequestTextPerAiRequestId[aiRequestId] || '',
-                  });
+                  onSendUserMessage(
+                    userRequestTextPerAiRequestId[aiRequestId] || ''
+                  );
                 }}
                 controls={
                   <Column>
@@ -1009,10 +928,9 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                         label={sendButtonLabel}
                         onClick={() => {
                           setAutoProcessFunctionCalls(true);
-                          onSendMessage({
-                            userMessage:
-                              userRequestTextPerAiRequestId[aiRequestId] || '',
-                          });
+                          onSendUserMessage(
+                            userRequestTextPerAiRequestId[aiRequestId] || ''
+                          );
                         }}
                       />
                     </LineStackLayout>
@@ -1028,7 +946,6 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 justifyContent="flex-end"
               >
                 {isForAnotherProjectText || errorText || priceAndRequestsText}
-                {priceAndRequestsTooltipInfoIcon}
               </Line>
             }
           </Column>

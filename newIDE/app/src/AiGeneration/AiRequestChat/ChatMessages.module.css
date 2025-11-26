@@ -15,7 +15,10 @@
 }
 
 .thinkingText {
+  display: flex;
+  align-items: center;
   animation: thinking-appear 1s;
+  color: var(--theme-text-disabled-color)
 }
 
 .feedbackButtonsContainer {

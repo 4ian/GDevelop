@@ -11,6 +11,7 @@ import RaisedButton from '../../../UI/RaisedButton';
 import MessagesIcon from '../../../UI/CustomSvgIcons/Messages';
 import CompactSelectField from '../../../UI/CompactSelectField';
 import SelectOption from '../../../UI/SelectOption';
+import Text from '../../../UI/Text';
 
 export default {
   title: 'UI Building Blocks/CompactTextAreaFieldWithControls',
@@ -19,15 +20,19 @@ export default {
 };
 
 export const Default = () => {
-  const [value, setValue] = React.useState<string>('');
+  const [value1, setValue1] = React.useState<string>('');
+  const [value2, setValue2] = React.useState<string>('');
+  const [value3, setValue3] = React.useState<string>('');
+  const [value4, setValue4] = React.useState<string>('');
   return (
     <ElementHighlighterProvider
       elements={[{ label: 'Default', id: 'default' }]}
     >
       <ColumnStackLayout expand>
+        <Text size="sub-title">With Button</Text>
         <CompactTextAreaFieldWithControls
-          value={value}
-          onChange={setValue}
+          value={value1}
+          onChange={setValue1}
           id="default"
           controls={
             <Column>
@@ -42,10 +47,10 @@ export const Default = () => {
             </Column>
           }
         />
+        <Text size="sub-title">With Button and Select</Text>
         <CompactTextAreaFieldWithControls
-          value={value}
-          onChange={setValue}
-          id="default"
+          value={value2}
+          onChange={setValue2}
           controls={
             <Column>
               <LineStackLayout
@@ -65,6 +70,43 @@ export const Default = () => {
               </LineStackLayout>
             </Column>
           }
+        />
+        <Text size="sub-title">With fixed rows</Text>
+        <CompactTextAreaFieldWithControls
+          value={value3}
+          onChange={setValue3}
+          controls={
+            <Column>
+              <LineStackLayout alignItems="center" justifyContent="flex-end">
+                <RaisedButton
+                  color="primary"
+                  onClick={() => {}}
+                  label={'Send'}
+                  icon={<MessagesIcon />}
+                />
+              </LineStackLayout>
+            </Column>
+          }
+          rows={4}
+        />
+        <Text size="sub-title">With dynamic rows</Text>
+        <CompactTextAreaFieldWithControls
+          value={value4}
+          onChange={setValue4}
+          controls={
+            <Column>
+              <LineStackLayout alignItems="center" justifyContent="flex-end">
+                <RaisedButton
+                  color="primary"
+                  onClick={() => {}}
+                  label={'Send'}
+                  icon={<MessagesIcon />}
+                />
+              </LineStackLayout>
+            </Column>
+          }
+          rows={4}
+          maxRows={10}
         />
       </ColumnStackLayout>
     </ElementHighlighterProvider>

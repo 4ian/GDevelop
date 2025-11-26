@@ -58,18 +58,24 @@ const commonProps = {
   quota: {
     limitReached: false,
     current: 0,
-    max: 2,
+    max: 20,
     period: '1day',
   },
   onStartNewAiRequest: () => {},
   onSendMessage: async () => {},
   isSending: false,
   price: {
-    priceInCredits: 5,
+    priceInCredits: 3,
     variablePrice: {
       agent: {
         default: {
-          minimumPriceInCredits: 4,
+          minimumPriceInCredits: 3,
+          maximumPriceInCredits: 20,
+        },
+      },
+      chat: {
+        default: {
+          minimumPriceInCredits: 3,
           maximumPriceInCredits: 20,
         },
       },
@@ -110,8 +116,8 @@ export const NewWeeklyAiRequest = () => (
     aiRequest={null}
     quota={{
       limitReached: false,
-      current: 1,
-      max: 5,
+      current: 10,
+      max: 50,
       period: '7days',
     }}
   />
@@ -121,8 +127,8 @@ export const NewMonthlyAiRequest = () => (
     aiRequest={null}
     quota={{
       limitReached: false,
-      current: 3,
-      max: 20,
+      current: 30,
+      max: 200,
       period: '30days',
     }}
   />
@@ -133,8 +139,8 @@ export const NewDailyAiRequestAlmostReachedQuota = () => (
     aiRequest={null}
     quota={{
       limitReached: false,
-      current: 1,
-      max: 2,
+      current: 10,
+      max: 20,
       period: '1day',
     }}
     increaseQuotaOffering="upgrade"
@@ -145,8 +151,8 @@ export const NewWeeklyAiRequestAlmostReachedQuota = () => (
     aiRequest={null}
     quota={{
       limitReached: false,
-      current: 4,
-      max: 5,
+      current: 40,
+      max: 50,
       period: '7days',
     }}
     increaseQuotaOffering="upgrade"
@@ -157,8 +163,8 @@ export const NewMonthlyAiRequestAlmostReachedQuota = () => (
     aiRequest={null}
     quota={{
       limitReached: false,
-      current: 18,
-      max: 20,
+      current: 180,
+      max: 200,
       period: '30days',
     }}
     increaseQuotaOffering="upgrade"
@@ -170,8 +176,8 @@ export const NewDailyAiRequestQuotaLimitReachedAndSomeCredits = () => (
     aiRequest={null}
     quota={{
       limitReached: true,
-      current: 2,
-      max: 2,
+      current: 20,
+      max: 20,
       period: '1day',
     }}
     availableCredits={400}
@@ -182,8 +188,8 @@ export const NewWeeklyAiRequestQuotaLimitReachedAndSomeCredits = () => (
     aiRequest={null}
     quota={{
       limitReached: true,
-      current: 5,
-      max: 5,
+      current: 50,
+      max: 50,
       period: '7days',
     }}
     availableCredits={400}
@@ -194,8 +200,8 @@ export const NewMonthlyAiRequestQuotaLimitReachedAndSomeCredits = () => (
     aiRequest={null}
     quota={{
       limitReached: true,
-      current: 20,
-      max: 20,
+      current: 200,
+      max: 200,
       period: '30days',
     }}
     availableCredits={400}
@@ -207,8 +213,8 @@ export const NewDailyAiRequestQuotaLimitReachedNoSubscriptionAndNoCredits = () =
     aiRequest={null}
     quota={{
       limitReached: true,
-      current: 2,
-      max: 2,
+      current: 20,
+      max: 20,
       period: '1day',
     }}
     availableCredits={0}
@@ -219,8 +225,8 @@ export const NewWeeklyAiRequestQuotaLimitReachedNoSubscriptionAndNoCredits = () 
     aiRequest={null}
     quota={{
       limitReached: true,
-      current: 5,
-      max: 5,
+      current: 50,
+      max: 50,
       period: '7days',
     }}
     availableCredits={0}
@@ -231,8 +237,8 @@ export const NewMonthlyAiRequestQuotaLimitReachedNoSubscriptionAndNoCredits = ()
     aiRequest={null}
     quota={{
       limitReached: true,
-      current: 20,
-      max: 20,
+      current: 200,
+      max: 200,
       period: '30days',
     }}
     availableCredits={0}
@@ -244,8 +250,8 @@ export const NewDailyAiRequestQuotaLimitReachedSubscriptionAndNoCredits = () => 
     aiRequest={null}
     quota={{
       limitReached: true,
-      current: 2,
-      max: 2,
+      current: 20,
+      max: 20,
       period: '1day',
     }}
     increaseQuotaOffering="upgrade"
@@ -257,8 +263,8 @@ export const NewWeeklyAiRequestQuotaLimitReachedSubscriptionAndNoCredits = () =>
     aiRequest={null}
     quota={{
       limitReached: true,
-      current: 5,
-      max: 5,
+      current: 50,
+      max: 50,
       period: '7days',
     }}
     increaseQuotaOffering="upgrade"
@@ -270,8 +276,8 @@ export const NewMonthlyAiRequestQuotaLimitReachedSubscriptionAndNoCredits = () =
     aiRequest={null}
     quota={{
       limitReached: true,
-      current: 20,
-      max: 20,
+      current: 200,
+      max: 200,
       period: '30days',
     }}
     increaseQuotaOffering="upgrade"

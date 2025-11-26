@@ -93,6 +93,16 @@ const ExtensionsSearchDialog = ({
               extensionShortHeadersByName,
             }
           );
+          if (
+            !requiredExtensionInstallation.missingExtensionShortHeaders.includes(
+              extensionShortHeader
+            )
+          ) {
+            // Allow to reinstall the extension even if the versions match.
+            requiredExtensionInstallation.missingExtensionShortHeaders.push(
+              extensionShortHeader
+            );
+          }
           const wasExtensionInstalled = await installExtension({
             project,
             requiredExtensionInstallation,

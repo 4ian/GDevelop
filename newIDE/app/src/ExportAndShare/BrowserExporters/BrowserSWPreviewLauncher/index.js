@@ -88,7 +88,9 @@ export default class BrowserSWPreviewLauncher extends React.Component<
   immediatelyPreparePreviewWindows = (
     options: PreparePreviewWindowsOptions
   ) => {
-    const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
+    const debuggerIds = options.isForInGameEdition
+      ? this.getPreviewDebuggerServer().getExistingEmbeddedGameFrameDebuggerIds()
+      : this.getPreviewDebuggerServer().getExistingPreviewDebuggerIds();
     const shouldHotReload = options.hotReload && !!debuggerIds.length;
 
     // Immediately open windows (otherwise Safari will block the window opening if done after

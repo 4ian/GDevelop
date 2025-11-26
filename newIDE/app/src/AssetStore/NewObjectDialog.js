@@ -148,9 +148,11 @@ export const useInstallAsset = ({
       return null;
     }
     try {
+      setIsAssetBeingInstalled(false);
       if (await showProjectNeedToBeSaved(assetShortHeader)) {
         return null;
       }
+      setIsAssetBeingInstalled(true);
       const assets = await fetchAssets([assetShortHeader]);
       const asset = assets[0];
 

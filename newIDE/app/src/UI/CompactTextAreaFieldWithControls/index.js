@@ -22,6 +22,7 @@ export type CompactTextAreaFieldWithControlsProps = {|
   errored?: boolean,
   placeholder?: MessageDescriptor,
   rows?: number,
+  maxRows?: number,
   maxLength?: number,
   controls: React.Node,
   neonCorner?: boolean,
@@ -45,6 +46,7 @@ export const CompactTextAreaFieldWithControls = React.forwardRef<
       errored,
       placeholder,
       rows,
+      maxRows,
       maxLength,
       onSubmit,
       onNavigateHistory,
@@ -66,6 +68,43 @@ export const CompactTextAreaFieldWithControls = React.forwardRef<
     React.useImperativeHandle(ref, () => ({
       setCursorPosition,
     }));
+
+    // Auto-resize textarea based on content when maxRows is provided
+    React.useEffect(
+      () => {
+        const textarea = textareaRef.current;
+        if (!textarea || !maxRows) return;
+        const minRows = rows || 3;
+
+        // Remove flex to measure content
+        textarea.style.flex = 'none';
+        textarea.style.height = 'auto';
+
+        // Calculate the height based on scrollHeight
+        const style = window.getComputedStyle(textarea);
+        const lineHeight = parseInt(style.lineHeight);
+        const paddingTop = parseInt(style.paddingTop);
+        const paddingBottom = parseInt(style.paddingBottom);
+
+        const minHeight = lineHeight * minRows + paddingTop + paddingBottom;
+        const maxHeight = lineHeight * maxRows + paddingTop + paddingBottom;
+        const contentHeight = textarea.scrollHeight;
+
+        // Set height between min and max bounds
+        let newHeight;
+        if (contentHeight <= minHeight) {
+          newHeight = minHeight;
+        } else if (contentHeight >= maxHeight) {
+          newHeight = maxHeight;
+        } else {
+          newHeight = contentHeight;
+        }
+
+        textarea.style.height = `${newHeight}px`;
+        textarea.style.maxHeight = `${maxHeight}px`;
+      },
+      [value, rows, maxRows]
+    );
 
     const handleKeyDown = React.useCallback(
       (e: SyntheticKeyboardEvent<HTMLTextAreaElement>) => {

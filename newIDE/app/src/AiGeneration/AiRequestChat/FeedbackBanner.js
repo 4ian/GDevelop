@@ -12,6 +12,13 @@ import classes from './FeedbackBanner.module.css';
 import { DislikeFeedbackDialog } from './DislikeFeedbackDialog';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 
+const styles = {
+  paper: {
+    width: '100%',
+    maxWidth: 250,
+  },
+};
+
 type Props = {
   onSendFeedback: (
     feedback: 'like' | 'dislike',
@@ -32,10 +39,10 @@ export const FeedbackBanner = ({ onSendFeedback }: Props) => {
 
   return (
     <Line noMargin justifyContent="center">
-      <Paper background="dark" variant="outlined">
+      <Paper background="dark" variant="outlined" style={styles.paper}>
         <Column expand>
           <div className={classes.textAndButtonsContainer}>
-            <Text size="block-title" color="inherit">
+            <Text size="sub-title" color="inherit" noMargin>
               <Trans>Did it work?</Trans>
             </Text>
             <Line alignItems="center" noMargin neverShrink>
@@ -46,6 +53,7 @@ export const FeedbackBanner = ({ onSendFeedback }: Props) => {
                   onSendFeedback('like');
                 }}
                 color="inherit"
+                size="small"
               >
                 <Like
                   htmlColor={
@@ -59,6 +67,7 @@ export const FeedbackBanner = ({ onSendFeedback }: Props) => {
                   setDislikeFeedbackDialogOpened(true);
                 }}
                 color="inherit"
+                size="small"
               >
                 <Dislike
                   htmlColor={

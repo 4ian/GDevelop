@@ -7,6 +7,7 @@
 #pragma once
 
 #include <set>
+#include <vector>
 
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
 #include "GDCore/Extensions/Metadata/SourceFileMetadata.h"
@@ -90,6 +91,9 @@ class GD_CORE_API UsedExtensionsFinder
  public:
   static const UsedExtensionsResult ScanProject(gd::Project& project);
   static const UsedExtensionsResult ScanEventsFunctionsExtension(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension);
+  static const std::vector<gd::String> FindExtensionsDependentOn(
       gd::Project &project,
       const gd::EventsFunctionsExtension &eventsFunctionsExtension);
 

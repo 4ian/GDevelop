@@ -872,6 +872,8 @@ export class Effect extends EmscriptenObject {
   getEffectType(): string;
   setFolded(val: boolean): void;
   isFolded(): boolean;
+  setEnabled(val: boolean): void;
+  isEnabled(): boolean;
   setDoubleParameter(name: string, value: number): void;
   getDoubleParameter(name: string): number;
   hasDoubleParameter(name: string): boolean;
@@ -2068,6 +2070,10 @@ export class BehaviorParameterFiller extends EmscriptenObject {
   static fillBehaviorParameters(platform: Platform, projectScopedContainers: ProjectScopedContainers, instructionMetadata: InstructionMetadata, instruction: Instruction): boolean;
 }
 
+export class InstructionValidator extends EmscriptenObject {
+  static isParameterValid(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction, metadata: InstructionMetadata, parameterIndex: number, value: string): boolean;
+}
+
 export class ObjectTools extends EmscriptenObject {
   static isBehaviorCompatibleWithObject(platform: Platform, objectType: string, behaviorType: string): boolean;
 }
@@ -2090,6 +2096,7 @@ export class UsedExtensionsResult extends EmscriptenObject {
 export class UsedExtensionsFinder extends EmscriptenObject {
   static scanProject(project: Project): UsedExtensionsResult;
   static scanEventsFunctionsExtension(project: Project, eventsFunctionsExtension: EventsFunctionsExtension): UsedExtensionsResult;
+  static findExtensionsDependentOn(project: Project, eventsFunctionsExtension: EventsFunctionsExtension): VectorString;
 }
 
 export class UsedObjectTypeFinder extends EmscriptenObject {

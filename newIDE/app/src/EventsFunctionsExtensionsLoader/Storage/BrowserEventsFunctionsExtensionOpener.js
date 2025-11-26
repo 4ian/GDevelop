@@ -2,7 +2,7 @@
 import { type SerializedExtension } from '../../Utils/GDevelopServices/Extension';
 
 export default class BrowserEventsFunctionsExtensionOpener {
-  static chooseEventsFunctionExtensionFile = (): Promise<Array<string>> => {
+  static chooseEventsFunctionExtensionFile = (): Promise<Array<any>> => {
     return new Promise(resolve => {
       if (window.showOpenFilePicker) {
         window
@@ -20,7 +20,7 @@ export default class BrowserEventsFunctionsExtensionOpener {
           })
           .then(handles => {
             if (!handles) return resolve([]);
-            resolve(handles.map(handle => handle.getFile()));
+            resolve(Promise.all(handles.map(handle => handle.getFile())));
           })
           .catch(() => {
             resolve([]);

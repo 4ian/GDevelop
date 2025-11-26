@@ -142,7 +142,7 @@ const getPriceAndRequestsTextAndTooltip = ({
 
   const shouldShowText = true;
 
-  const aiCreditsLeft = quota.max - quota.current;
+  const aiCreditsLeft = Math.max(0, quota.max - quota.current);
 
   const currentQuotaText = isMobile ? (
     increaseQuotaOffering === 'subscribe' ? (
@@ -199,10 +199,16 @@ const getPriceAndRequestsTextAndTooltip = ({
   const tooltipText = (
     <ColumnStackLayout noMargin>
       <Line noMargin>
-        <Trans>
-          {currentQuotaText} (out of {quota.max}). They reset in
-          {remainingDaysBeforeReset} day(s).
-        </Trans>
+        {remainingDaysBeforeReset ? (
+          <Trans>
+            {currentQuotaText} (out of {quota.max}). They reset in
+            {remainingDaysBeforeReset} day(s).
+          </Trans>
+        ) : (
+          <Trans>
+            {currentQuotaText} (out of {quota.max}).
+          </Trans>
+        )}
       </Line>
       {increaseQuotaOffering === 'subscribe' ? (
         <Trans>Get GDevelop premium to get more AI credits every week.</Trans>

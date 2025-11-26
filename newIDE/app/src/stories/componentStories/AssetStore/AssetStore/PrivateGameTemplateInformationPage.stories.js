@@ -25,7 +25,7 @@ import {
   PrivateGameTemplateStoreContext,
   initialPrivateGameTemplateStoreState,
 } from '../../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
-import { SubscriptionSuggestionProvider } from '../../../../Profile/Subscription/SubscriptionSuggestionContext';
+import { SubscriptionProvider } from '../../../../Profile/Subscription/SubscriptionContext';
 import { ProductLicenseStoreStateProvider } from '../../../../AssetStore/ProductLicense/ProductLicenseStoreContext';
 
 export default {
@@ -297,7 +297,7 @@ const PrivateGameTemplateInformationPageStory = ({
           ),
         }}
       >
-        <SubscriptionSuggestionProvider>
+        <SubscriptionProvider>
           <ProductLicenseStoreStateProvider>
             <PrivateGameTemplateInformationPage
               privateGameTemplateListingData={privateGameTemplateListingData}
@@ -312,7 +312,7 @@ const PrivateGameTemplateInformationPageStory = ({
               )}
             />
           </ProductLicenseStoreStateProvider>
-        </SubscriptionSuggestionProvider>
+        </SubscriptionProvider>
       </AuthenticatedUserContext.Provider>
     </PrivateGameTemplateStoreContext.Provider>
   );

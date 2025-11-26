@@ -25,7 +25,6 @@ import InAppTutorialsPage from './InAppTutorialsPage';
 import CoursesPage from './CoursesPage';
 import { type LearnCategory } from './Utils';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
-import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
 import RouterContext from '../../../RouterContext';
 import {
   sendBundleInformationOpened,
@@ -80,7 +79,6 @@ type Props = {|
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
-  getSubscriptionPlansWithPricingSystems: () => Array<SubscriptionPlanWithPricingSystems> | null,
   initialBundleUserFriendlySlug: ?string,
   initialBundleCategory: ?string,
   clearInitialBundleValues: () => void,
@@ -109,7 +107,6 @@ const LearnSection = ({
   onOpenNewProjectSetupDialog,
   onSelectPrivateGameTemplateListingData,
   onSelectExampleShortHeader,
-  getSubscriptionPlansWithPricingSystems,
   initialBundleUserFriendlySlug,
   initialBundleCategory,
   clearInitialBundleValues,
@@ -277,9 +274,6 @@ const LearnSection = ({
       <BundleInformationPage
         bundleListingData={selectedBundleListingData}
         onBack={() => setSelectedBundleListingData(null)}
-        getSubscriptionPlansWithPricingSystems={
-          getSubscriptionPlansWithPricingSystems
-        }
         onAssetPackOpen={privateAssetPackListingData => {
           // Ideally we would open it in the Learn Section,
           // but asset packs are not supported in the Learn Section yet.

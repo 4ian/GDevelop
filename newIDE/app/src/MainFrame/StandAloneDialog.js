@@ -12,8 +12,6 @@ import { getBundleListingDataFromCategory } from '../AssetStore/AssetStoreUtils'
 import { sendBundleInformationOpened } from '../Utils/Analytics/EventSender';
 import BundleInformationPage from '../AssetStore/Bundles/BundleInformationPage';
 import useCourses from './EditorContainers/HomePage/UseCourses';
-import useSubscriptionPlans from '../Utils/UseSubscriptionPlans';
-import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 type Props = {|
   // This dialog is not meant to be closed, but in case of an error, we provide a way to close it.
@@ -21,16 +19,11 @@ type Props = {|
 |};
 
 const StandaloneDialog = ({ onClose }: Props) => {
-  const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
     routeArguments,
     removeRouteArguments,
     navigateToRoute,
   } = React.useContext(RouterContext);
-  const { getSubscriptionPlansWithPricingSystems } = useSubscriptionPlans({
-    authenticatedUser,
-    includeLegacy: false,
-  });
   const [
     selectedBundleListingData,
     setSelectedBundleListingData,
@@ -98,9 +91,6 @@ const StandaloneDialog = ({ onClose }: Props) => {
       ) : (
         <BundleInformationPage
           bundleListingData={selectedBundleListingData}
-          getSubscriptionPlansWithPricingSystems={
-            getSubscriptionPlansWithPricingSystems
-          }
           onAssetPackOpen={() => {}}
           onGameTemplateOpen={() => {}}
           onBundleOpen={() => {}}

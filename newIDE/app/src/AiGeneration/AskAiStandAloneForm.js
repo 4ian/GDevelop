@@ -36,7 +36,7 @@ import { prepareAiUserContent } from './PrepareAiUserContent';
 import { AiRequestContext } from './AiRequestContext';
 import { getAiConfigurationPresetsWithAvailability } from './AiConfiguration';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
-import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
+import { SubscriptionContext } from '../Profile/Subscription/SubscriptionContext';
 import {
   useAiRequestState,
   useProcessFunctionCalls,
@@ -195,9 +195,7 @@ export const AskAiStandAloneForm = ({
     onRefreshLimits,
     subscription,
   } = React.useContext(AuthenticatedUserContext);
-  const { openSubscriptionDialog } = React.useContext(
-    SubscriptionSuggestionContext
-  );
+  const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
 
   const hideAskAi =
     !!limits &&

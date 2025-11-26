@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import MockAdapter from 'axios-mock-adapter';
 
 import paperDecorator from '../PaperDecorator';
 
@@ -12,7 +13,7 @@ import {
   fakeNotAuthenticatedUser,
 } from '../../fixtures/GDevelopServicesTestData';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import { GDevelopGameApi } from '../../Utils/GDevelopServices/ApiConfigs';
+import { client as gameApiClient } from '../../Utils/GDevelopServices/Game';
 
 export default {
   title: 'GameDashboard/GameRegistration',
@@ -35,133 +36,121 @@ export const NotLoggedIn = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const NotAuthorized = () => (
-  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-    <GameRegistration
-      project={testProject.project}
-      onGameRegistered={() => {}}
-    />
-  </AuthenticatedUserContext.Provider>
-);
-NotAuthorized.parameters = {
-  mockData: [
-    {
-      url: `${GDevelopGameApi.baseUrl}/game/?userId=indie-user`,
-      method: 'GET',
-      status: 403,
-      response: {},
-      delay: 500,
-    },
-  ],
+export const NotAuthorized = () => {
+  const gameServiceMock = new MockAdapter(gameApiClient, {
+    delayResponse: 500,
+  });
+  gameServiceMock
+    .onGet('/game/', { params: { userId: 'indie-user' } })
+    .reply(403, {});
+
+  return (
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <GameRegistration
+        project={testProject.project}
+        onGameRegistered={() => {}}
+      />
+    </AuthenticatedUserContext.Provider>
+  );
 };
 
-export const GameNotExisting = () => (
-  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-    <GameRegistration
-      project={testProject.project}
-      onGameRegistered={() => {}}
-    />
-  </AuthenticatedUserContext.Provider>
-);
-GameNotExisting.parameters = {
-  mockData: [
-    {
-      url: `${GDevelopGameApi.baseUrl}/game/?userId=indie-user`,
-      method: 'GET',
-      status: 404,
-      response: {},
-      delay: 500,
-    },
-  ],
+export const GameNotExisting = () => {
+  const gameServiceMock = new MockAdapter(gameApiClient, {
+    delayResponse: 500,
+  });
+  gameServiceMock
+    .onGet('/game/', { params: { userId: 'indie-user' } })
+    .reply(404, {});
+
+  return (
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <GameRegistration
+        project={testProject.project}
+        onGameRegistered={() => {}}
+      />
+    </AuthenticatedUserContext.Provider>
+  );
 };
 
-export const ErrorLoadingGame = () => (
-  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-    <GameRegistration
-      project={testProject.project}
-      onGameRegistered={() => {}}
-    />
-  </AuthenticatedUserContext.Provider>
-);
-ErrorLoadingGame.parameters = {
-  mockData: [
-    {
-      url: `${GDevelopGameApi.baseUrl}/game/?userId=indie-user`,
-      method: 'GET',
-      status: 500,
-      response: {},
-      delay: 500,
-    },
-  ],
+export const ErrorLoadingGame = () => {
+  const gameServiceMock = new MockAdapter(gameApiClient, {
+    delayResponse: 500,
+  });
+  gameServiceMock
+    .onGet('/game/', { params: { userId: 'indie-user' } })
+    .reply(500, {});
+
+  return (
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <GameRegistration
+        project={testProject.project}
+        onGameRegistered={() => {}}
+      />
+    </AuthenticatedUserContext.Provider>
+  );
 };
 
-export const RegisteredWithAdditionalActions = () => (
-  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-    <GameRegistration
-      project={testProject.project}
-      onGameRegistered={() => {}}
-      suggestAdditionalActions
-    />
-  </AuthenticatedUserContext.Provider>
-);
-RegisteredWithAdditionalActions.parameters = {
-  mockData: [
-    {
-      url: `${GDevelopGameApi.baseUrl}/game/?userId=indie-user`,
-      method: 'GET',
-      status: 200,
-      response: {
-        id: 'game-id',
-        name: 'My game',
-      },
-      delay: 500,
-    },
-  ],
+export const RegisteredWithAdditionalActions = () => {
+  const gameServiceMock = new MockAdapter(gameApiClient, {
+    delayResponse: 500,
+  });
+  gameServiceMock
+    .onGet('/game/', { params: { userId: 'indie-user' } })
+    .reply(200, {
+      id: 'game-id',
+      name: 'My game',
+    });
+
+  return (
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <GameRegistration
+        project={testProject.project}
+        onGameRegistered={() => {}}
+        suggestAdditionalActions
+      />
+    </AuthenticatedUserContext.Provider>
+  );
 };
 
-export const RegisteredWithLoader = () => (
-  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-    <GameRegistration
-      project={testProject.project}
-      onGameRegistered={() => {}}
-    />
-  </AuthenticatedUserContext.Provider>
-);
-RegisteredWithLoader.parameters = {
-  mockData: [
-    {
-      url: `${GDevelopGameApi.baseUrl}/game/?userId=indie-user`,
-      method: 'GET',
-      status: 200,
-      response: {
-        id: 'game-id',
-        name: 'My game',
-      },
-      delay: 500,
-    },
-  ],
+export const RegisteredWithLoader = () => {
+  const gameServiceMock = new MockAdapter(gameApiClient, {
+    delayResponse: 500,
+  });
+  gameServiceMock
+    .onGet('/game/', { params: { userId: 'indie-user' } })
+    .reply(200, {
+      id: 'game-id',
+      name: 'My game',
+    });
+
+  return (
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <GameRegistration
+        project={testProject.project}
+        onGameRegistered={() => {}}
+      />
+    </AuthenticatedUserContext.Provider>
+  );
 };
 
-export const RegisteredWithoutLoader = () => (
-  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-    <GameRegistration
-      project={testProject.project}
-      onGameRegistered={() => {}}
-      hideLoader
-    />
-  </AuthenticatedUserContext.Provider>
-);
-RegisteredWithoutLoader.parameters = {
-  mockData: [
-    {
-      url: `${GDevelopGameApi.baseUrl}/game/?userId=indie-user`,
-      method: 'GET',
-      status: 200,
-      response: {
-        id: 'game-id',
-        name: 'My game',
-      },
-      delay: 500,
-    },
-  ],
+export const RegisteredWithoutLoader = () => {
+  const gameServiceMock = new MockAdapter(gameApiClient, {
+    delayResponse: 500,
+  });
+  gameServiceMock
+    .onGet('/game/', { params: { userId: 'indie-user' } })
+    .reply(200, {
+      id: 'game-id',
+      name: 'My game',
+    });
+
+  return (
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <GameRegistration
+        project={testProject.project}
+        onGameRegistered={() => {}}
+        hideLoader
+      />
+    </AuthenticatedUserContext.Provider>
+  );
 };

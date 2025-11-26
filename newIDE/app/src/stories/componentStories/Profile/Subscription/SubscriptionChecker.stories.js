@@ -13,12 +13,11 @@ import {
   fakeGoldAuthenticatedUser,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import RaisedButton from '../../../../UI/RaisedButton';
-import subscriptionSuggestionDecorator from '../../../SubscriptionSuggestionDecorator';
 
 export default {
   title: 'Subscription/SubscriptionChecker',
   component: SubscriptionChecker,
-  decorators: [subscriptionSuggestionDecorator, paperDecorator],
+  decorators: [paperDecorator],
 };
 
 export const NotAuthenticatedTryMode = () => {

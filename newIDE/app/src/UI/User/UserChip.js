@@ -8,7 +8,7 @@ import TextButton from '../TextButton';
 import { LineStackLayout } from '../Layout';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import CircularProgress from '../CircularProgress';
-import { SubscriptionSuggestionContext } from '../../Profile/Subscription/SubscriptionSuggestionContext';
+import { SubscriptionContext } from '../../Profile/Subscription/SubscriptionContext';
 import { hasValidSubscriptionPlan } from '../../Utils/GDevelopServices/Usage';
 import CrownShining from '../CustomSvgIcons/CrownShining';
 import UserAvatar from './UserAvatar';
@@ -21,9 +21,7 @@ const styles = {
 };
 
 const GetPremiumButton = () => {
-  const { openSubscriptionDialog } = React.useContext(
-    SubscriptionSuggestionContext
-  );
+  const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
   return (
     <RaisedButton
       icon={<CrownShining />}

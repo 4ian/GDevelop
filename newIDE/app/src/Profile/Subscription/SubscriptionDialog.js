@@ -25,7 +25,7 @@ import {
   sendChoosePlanClicked,
   sendCancelSubscriptionToChange,
 } from '../../Utils/Analytics/EventSender';
-import { type SubscriptionType } from './SubscriptionSuggestionContext';
+import { type SubscriptionType } from './SubscriptionContext';
 import Window from '../../Utils/Window';
 import Text from '../../UI/Text';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
@@ -201,18 +201,16 @@ export const getPlanSpecificRequirements = (
 
 type Props = {|
   onClose: Function,
-  getAvailableSubscriptionPlansWithPrices: () =>
-    | SubscriptionPlanWithPricingSystems[]
-    | null,
-  getUserLegacySubscriptionPlanWithPricingSystem: () => SubscriptionPlanWithPricingSystems | null,
+  availableSubscriptionPlansWithPrices: ?(SubscriptionPlanWithPricingSystems[]),
+  userLegacySubscriptionPlanWithPricingSystem: SubscriptionPlanWithPricingSystems | null,
   filter: ?SubscriptionType,
   onOpenPendingDialog: (open: boolean) => void,
 |};
 
 export default function SubscriptionDialog({
   onClose,
-  getAvailableSubscriptionPlansWithPrices,
-  getUserLegacySubscriptionPlanWithPricingSystem,
+  availableSubscriptionPlansWithPrices,
+  userLegacySubscriptionPlanWithPricingSystem,
   filter,
   onOpenPendingDialog,
 }: Props) {
@@ -224,12 +222,10 @@ export default function SubscriptionDialog({
     setEducationPlanSeatsCount,
   ] = React.useState<number>(20);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const subscriptionPlansWithPricingSystems = getAvailableSubscriptionPlansWithPrices();
-  const userLegacySubscriptionPlanWithPricingSystem = getUserLegacySubscriptionPlanWithPricingSystem();
   const [period, setPeriod] = React.useState<'year' | 'month'>(
     getSubscriptionPricingSystemPeriod(
       authenticatedUser.subscription,
-      subscriptionPlansWithPricingSystems
+      availableSubscriptionPlansWithPrices
     ) || 'year'
   );
 
@@ -369,8 +365,8 @@ export default function SubscriptionDialog({
     ? authenticatedUser.subscription.pricingSystemId
     : null;
   const userSubscriptionPlanWithPricingSystems =
-    userPlanId && subscriptionPlansWithPricingSystems
-      ? subscriptionPlansWithPricingSystems.find(
+    userPlanId && availableSubscriptionPlansWithPrices
+      ? availableSubscriptionPlansWithPrices.find(
           subscriptionPlanWithPricingSystems =>
             subscriptionPlanWithPricingSystems.id === userPlanId
         )
@@ -378,10 +374,10 @@ export default function SubscriptionDialog({
 
   const { windowSize, isMobile } = useResponsiveWindowSize();
 
-  const displayedSubscriptionPlanWithPricingSystems = subscriptionPlansWithPricingSystems
+  const displayedSubscriptionPlanWithPricingSystems = availableSubscriptionPlansWithPrices
     ? [
         userLegacySubscriptionPlanWithPricingSystem,
-        ...subscriptionPlansWithPricingSystems,
+        ...availableSubscriptionPlansWithPrices,
       ]
         .filter(Boolean)
         .filter(plan => {
@@ -419,7 +415,7 @@ export default function SubscriptionDialog({
       ? 'xl'
       : false;
   const maximumDiscount = getMaximumYearlyDiscountOverPlans({
-    subscriptionPlansWithPricingSystems,
+    subscriptionPlansWithPricingSystems: availableSubscriptionPlansWithPrices,
   });
 
   return (

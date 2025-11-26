@@ -24,6 +24,15 @@ export type EditorMosaicNode =
       splitPercentage: number,
       first: EditorMosaicNode,
       second: EditorMosaicNode,
+
+      // Visibility:
+      firstHidden?: boolean,
+      secondHidden?: boolean,
+
+      // The "original" node before visibility filtering. This allows
+      // to apply changes to split percentage made on the filtered view
+      // to the original node. See `filterHiddenNodes`.
+      source?: EditorMosaicNode,
     |}
   | string;
 
@@ -32,6 +41,9 @@ export type EditorMosaicBranch = {|
   splitPercentage: number,
   first: EditorMosaicNode,
   second: EditorMosaicNode,
+  firstHidden?: boolean,
+  secondHidden?: boolean,
+  source?: EditorMosaicNode,
 |};
 
 export type Editor = {|
@@ -55,36 +67,6 @@ export const mosaicContainsNode = (
         // $FlowFixMe
         (!!mosaic.second && mosaicContainsNode(mosaic.second, node))))
   );
-};
-
-// Remove the specified node (editor).
-const removeNode = (
-  currentNode: ?EditorMosaicNode,
-  oldNode: ?EditorMosaicNode
-): ?EditorMosaicNode => {
-  if (!currentNode) {
-    return currentNode;
-  } else if (typeof currentNode === 'string') {
-    if (currentNode === oldNode) return null;
-
-    return currentNode;
-  } else {
-    if (currentNode === oldNode) return null;
-
-    const first = removeNode(currentNode.first, oldNode);
-    const second = removeNode(currentNode.second, oldNode);
-
-    if (first && second) {
-      return {
-        ...currentNode,
-        first,
-        second,
-      };
-    } else {
-      if (!first) return second;
-      else return first;
-    }
-  }
 };
 
 const resizeNode = (
@@ -137,6 +119,112 @@ const getNodeSize = (
     getNodeSize(currentNode.first, resizedNode) ||
     getNodeSize(currentNode.second, resizedNode)
   );
+};
+
+const filterHiddenNodes = (
+  currentNode: EditorMosaicNode
+): EditorMosaicNode | null => {
+  if (typeof currentNode === 'string') {
+    return currentNode;
+  }
+  const first = filterHiddenNodes(currentNode.first);
+  const second = filterHiddenNodes(currentNode.second);
+  const hasFirst = first && !currentNode.firstHidden;
+  const hasSecond = second && !currentNode.secondHidden;
+  if (!hasFirst && !hasSecond) {
+    return null;
+  }
+  if (!hasFirst) {
+    return second;
+  }
+  if (!hasSecond) {
+    return first;
+  }
+  if (!first || !second) {
+    // Just to help Flow
+    return null;
+  }
+  return {
+    direction: currentNode.direction,
+    splitPercentage: currentNode.splitPercentage,
+    first,
+    second,
+
+    // Remember the original node so that when we apply
+    // changes to a "filtered" node, we can apply it back
+    // to the original node. See `updateSourceSplit`.
+    source: currentNode,
+  };
+};
+
+const toggleNodeVisibility = (
+  currentNode: EditorMosaicNode,
+  leafName: string
+): void => {
+  if (typeof currentNode === 'string') {
+    return;
+  }
+  const { first, second } = currentNode;
+  if (first === leafName) {
+    currentNode.firstHidden = !currentNode.firstHidden;
+    return;
+  }
+  if (second === leafName) {
+    currentNode.secondHidden = !currentNode.secondHidden;
+    return;
+  }
+  toggleNodeVisibility(first, leafName);
+  toggleNodeVisibility(second, leafName);
+};
+
+const updateSourceSplit = (currentNode: EditorMosaicNode): void => {
+  if (typeof currentNode === 'string') {
+    return;
+  }
+  const { source, first, second } = currentNode;
+  if (source && typeof source !== 'string') {
+    source.splitPercentage = currentNode.splitPercentage;
+  }
+  updateSourceSplit(first);
+  updateSourceSplit(second);
+};
+
+const getVisibleLeaves = (
+  currentNode: EditorMosaicNode,
+  result?: Array<string> = []
+): Array<string> => {
+  if (typeof currentNode === 'string') {
+    result.push(currentNode);
+    return result;
+  }
+  const { first, second, firstHidden, secondHidden } = currentNode;
+  if (!firstHidden) {
+    getVisibleLeaves(first, result);
+  }
+  if (!secondHidden) {
+    getVisibleLeaves(second, result);
+  }
+  return result;
+};
+
+const haveSameBranches = (
+  newNode: EditorMosaicNode,
+  oldNode: EditorMosaicNode
+): boolean => {
+  if (typeof newNode === 'string' || typeof oldNode === 'string') {
+    return newNode === oldNode;
+  }
+  return (
+    haveSameBranches(newNode.first, oldNode.first) &&
+    haveSameBranches(newNode.second, oldNode.second)
+  );
+};
+
+const shallowClone = (node: EditorMosaicNode): EditorMosaicNode => {
+  if (typeof node === 'string') {
+    return node;
+  }
+  return { ...node };
 };
 
 const defaultToolbarControls = [<CloseButton key="close" />];
@@ -197,8 +285,26 @@ const EditorMosaic = React.forwardRef<Props, EditorMosaicInterface>(
     ref
   ) => {
     const isResizing = React.useRef(false);
-    const [mosaicNode, setMosaicNode] = React.useState<?EditorMosaicNode>(
-      initialNodes
+    const [
+      hidableMosaicNode,
+      setHidableMosaicNode,
+    ] = React.useState<EditorMosaicNode>(initialNodes);
+    const mosaicNode = React.useMemo<?EditorMosaicNode>(
+      () => filterHiddenNodes(hidableMosaicNode),
+      [hidableMosaicNode]
+    );
+    const setMosaicNode = React.useCallback(
+      (newMosaicNode: EditorMosaicNode) => {
+        if (!mosaicNode || !haveSameBranches(newMosaicNode, mosaicNode)) {
+          setHidableMosaicNode(newMosaicNode);
+        } else {
+          updateSourceSplit(newMosaicNode);
+          setHidableMosaicNode(hidableMosaicNode =>
+            shallowClone(hidableMosaicNode)
+          );
+        }
+      },
+      [mosaicNode]
     );
     const collapsedEditorSize = React.useRef<Map<string, number>>(new Map());
 
@@ -207,34 +313,29 @@ const EditorMosaic = React.forwardRef<Props, EditorMosaicInterface>(
         const editor = editors[editorName];
         if (!editor) return false;
 
-        const openedEditorNames = getLeaves(mosaicNode);
+        const openedEditorNames = getLeaves(hidableMosaicNode);
         if (openedEditorNames.indexOf(editorName) !== -1) {
           // Editor is already opened.
           return false;
         }
 
-        if (!mosaicNode) {
-          // Should never happen.
-          return false;
-        }
-
         // Open a new editor at the indicated position.
         const newNodes = addNode(
-          mosaicNode,
+          hidableMosaicNode,
           editorName,
           position,
           centralNodeId
         );
-        setMosaicNode(newNodes);
+        setHidableMosaicNode(newNodes);
 
         return true;
       },
-      [mosaicNode, editors, centralNodeId]
+      [editors, hidableMosaicNode, centralNodeId]
     );
 
     React.useImperativeHandle(ref, () => ({
       getOpenedEditorNames: (): Array<string> => {
-        return getLeaves(mosaicNode);
+        return mosaicNode ? getVisibleLeaves(mosaicNode) : [];
       },
       toggleEditor: (
         editorName: string,
@@ -243,14 +344,13 @@ const EditorMosaic = React.forwardRef<Props, EditorMosaicInterface>(
         const editor = editors[editorName];
         if (!editor) return false;
 
-        const openedEditorNames = getLeaves(mosaicNode);
+        const openedEditorNames = getLeaves(hidableMosaicNode);
         if (openedEditorNames.indexOf(editorName) !== -1) {
-          // The editor is already opened: close it.
-          setMosaicNode(removeNode(mosaicNode, editorName));
-
+          toggleNodeVisibility(hidableMosaicNode, editorName);
+          setHidableMosaicNode(shallowClone(hidableMosaicNode));
           return false;
         }
-
+        // The editor position is not set yet, add it to its default position.
         return openEditor(editorName, position);
       },
       collapseEditor: (editorName: string) => {
@@ -323,7 +423,7 @@ const EditorMosaic = React.forwardRef<Props, EditorMosaicInterface>(
         }
         setMosaicNode(nodes);
       },
-      [isResizing, onDragOrResizedStarted]
+      [isResizing, onDragOrResizedStarted, setMosaicNode]
     );
 
     const onRelease = React.useCallback(

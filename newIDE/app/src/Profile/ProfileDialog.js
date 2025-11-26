@@ -36,9 +36,10 @@ const ProfileDialog = ({ onClose }: Props) => {
   const badgesSeenNotificationTimeoutRef = React.useRef<?TimeoutID>(null);
   const badgesSeenNotificationSentRef = React.useRef<boolean>(false);
   const {
-    subscriptionPlansWithPricingSystems,
+    getSubscriptionPlansWithPricingSystems,
     openSubscriptionPendingDialog,
   } = React.useContext(SubscriptionContext);
+  const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
   const { isMobile } = useResponsiveWindowSize();
   const [redeemCodeDialogOpen, setRedeemCodeDialogOpen] = React.useState(false);
 

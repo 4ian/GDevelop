@@ -182,8 +182,9 @@ export const Default = ({
 
   const { subscription: userSubscription } = authenticatedUser;
   const {
-    subscriptionPlansWithPricingSystemsIncludingLegacy,
+    getSubscriptionPlansWithPricingSystemsIncludingLegacy,
   } = React.useContext(SubscriptionContext);
+  const subscriptionPlansWithPricingSystemsIncludingLegacy = getSubscriptionPlansWithPricingSystemsIncludingLegacy();
 
   return subscriptionPlansWithPricingSystemsIncludingLegacy ? (
     <AlertProvider>

@@ -22,6 +22,7 @@ import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import PromotionSubscriptionDialog from './PromotionSubscriptionDialog';
 import SubscriptionPendingDialog from './SubscriptionPendingDialog';
 import LoaderModal from '../../UI/LoaderModal';
+import { useAsyncLazyMemo } from '../../Utils/UseLazyMemo';
 
 export type SubscriptionType = 'individual' | 'team' | 'education';
 
@@ -75,10 +76,18 @@ const filterAvailableSubscriptionPlansWithPrices = (
 };
 
 type SubscriptionState = {|
-  subscriptionPlansWithPricingSystems:
+  /**
+   * Returns subscription plans with pricing systems, or null if not yet fetched.
+   * Calling this function will trigger a fetch in the background if not already loaded.
+   */
+  getSubscriptionPlansWithPricingSystems: () =>
     | SubscriptionPlanWithPricingSystems[]
     | null,
-  subscriptionPlansWithPricingSystemsIncludingLegacy:
+  /**
+   * Returns subscription plans with pricing systems including legacy plans, or null if not yet fetched.
+   * Calling this function will trigger a fetch in the background if not already loaded.
+   */
+  getSubscriptionPlansWithPricingSystemsIncludingLegacy: () =>
     | SubscriptionPlanWithPricingSystems[]
     | null,
   /**
@@ -92,8 +101,8 @@ type SubscriptionState = {|
 |};
 
 export const SubscriptionContext = React.createContext<SubscriptionState>({
-  subscriptionPlansWithPricingSystems: null,
-  subscriptionPlansWithPricingSystemsIncludingLegacy: null,
+  getSubscriptionPlansWithPricingSystems: () => null,
+  getSubscriptionPlansWithPricingSystemsIncludingLegacy: () => null,
   openSubscriptionDialog: () => {},
   openSubscriptionPendingDialog: () => {},
 });
@@ -111,6 +120,9 @@ export const SubscriptionProvider = ({
     analyticsMetadata,
     setAnalyticsMetadata,
   ] = React.useState<?SubscriptionAnalyticsMetadata>(null);
+  const recommendedPlanId = analyticsMetadata
+    ? analyticsMetadata.recommendedPlanId
+    : null;
   const [filter, setFilter] = React.useState<
     'individual' | 'team' | 'education' | null
   >(null);
@@ -120,91 +132,76 @@ export const SubscriptionProvider = ({
     subscriptionPendingDialogOpen,
     setSubscriptionPendingDialogOpen,
   ] = React.useState(false);
-  const isLoading = React.useRef<boolean>(false);
+  const userId =
+    authenticatedUser && authenticatedUser.profile
+      ? authenticatedUser.profile.id
+      : null;
+  const getAuthorizationHeader = authenticatedUser
+    ? authenticatedUser.getAuthorizationHeader
+    : null;
 
-  // Fetch subscription plans on mount
-  const [
-    subscriptionPlansWithPricingSystems,
-    setSubscriptionPlansWithPricingSystems,
-  ] = React.useState<SubscriptionPlanWithPricingSystems[] | null>(null);
-  const [
-    subscriptionPlansWithPricingSystemsIncludingLegacy,
-    setSubscriptionPlansWithPricingSystemsIncludingLegacy,
-  ] = React.useState<SubscriptionPlanWithPricingSystems[] | null>(null);
-
+  // Fetch subscription plans lazily - only when requested
   const fetchSubscriptionPlansAndPrices = React.useCallback(
-    async () => {
-      // If the sub plans are already loaded, don't load them again.
-      if (
-        isLoading.current ||
-        (subscriptionPlansWithPricingSystemsIncludingLegacy &&
-          subscriptionPlansWithPricingSystems)
-      )
-        return;
+    async (): Promise<{
+      subscriptionPlansWithPricingSystems: SubscriptionPlanWithPricingSystems[],
+      subscriptionPlansWithPricingSystemsIncludingLegacy: SubscriptionPlanWithPricingSystems[],
+    }> => {
+      console.info(
+        `Fetching subscription plans and pricing systems (includeLegacy=true, userId=${userId ||
+          'null'})...`
+      );
 
-      isLoading.current = true;
-      try {
-        const userId =
-          authenticatedUser && authenticatedUser.profile
-            ? authenticatedUser.profile.id
-            : null;
-        const getAuthorizationHeader = authenticatedUser
-          ? authenticatedUser.getAuthorizationHeader
-          : null;
+      const [
+        subscriptionPlans,
+        subscriptionPlanPricingSystems,
+      ] = await Promise.all([
+        listSubscriptionPlans({
+          includeLegacy: true,
+          getAuthorizationHeader,
+          userId,
+        }),
+        listSubscriptionPlanPricingSystems({
+          includeLegacy: true,
+          getAuthorizationHeader,
+          userId,
+        }),
+      ]);
 
-        console.info(
-          `Fetching subscription plans and pricing systems (includeLegacy=true, userId=${userId ||
-            'null'})...`
-        );
+      const merged = mergeSubscriptionPlansWithPrices(
+        subscriptionPlans,
+        subscriptionPlanPricingSystems
+      );
 
-        const [
-          subscriptionPlans,
-          subscriptionPlanPricingSystems,
-        ] = await Promise.all([
-          listSubscriptionPlans({
-            includeLegacy: true,
-            getAuthorizationHeader,
-            userId,
-          }),
-          listSubscriptionPlanPricingSystems({
-            includeLegacy: true,
-            getAuthorizationHeader,
-            userId,
-          }),
-        ]);
-
-        const merged = mergeSubscriptionPlansWithPrices(
-          subscriptionPlans,
-          subscriptionPlanPricingSystems
-        );
-
-        setSubscriptionPlansWithPricingSystemsIncludingLegacy(merged);
-        setSubscriptionPlansWithPricingSystems(
-          filterAvailableSubscriptionPlansWithPrices(merged)
-        );
-      } catch (error) {
-        console.error(
-          'Error while fetching subscription plans and pricing systems:',
-          error
-        );
-      } finally {
-        isLoading.current = false;
-      }
+      return {
+        subscriptionPlansWithPricingSystemsIncludingLegacy: merged,
+        subscriptionPlansWithPricingSystems: filterAvailableSubscriptionPlansWithPrices(
+          merged
+        ),
+      };
     },
-    [
-      authenticatedUser,
-      subscriptionPlansWithPricingSystems,
-      subscriptionPlansWithPricingSystemsIncludingLegacy,
-    ]
+    [getAuthorizationHeader, userId]
   );
 
-  React.useEffect(
-    () => {
-      if (isLoading.current) return;
+  const getSubscriptionPlansData = useAsyncLazyMemo(
+    fetchSubscriptionPlansAndPrices
+  );
 
-      fetchSubscriptionPlansAndPrices();
+  const getSubscriptionPlansWithPricingSystems = React.useCallback(
+    () => {
+      const data = getSubscriptionPlansData();
+      return data ? data.subscriptionPlansWithPricingSystems : null;
     },
-    [fetchSubscriptionPlansAndPrices]
+    [getSubscriptionPlansData]
+  );
+
+  const getSubscriptionPlansWithPricingSystemsIncludingLegacy = React.useCallback(
+    () => {
+      const data = getSubscriptionPlansData();
+      return data
+        ? data.subscriptionPlansWithPricingSystemsIncludingLegacy
+        : null;
+    },
+    [getSubscriptionPlansData]
   );
 
   const openSubscriptionPendingDialog = React.useCallback(
@@ -238,8 +235,9 @@ export const SubscriptionProvider = ({
     [authenticatedUser.subscription, showAlert, simulateMobileApp]
   );
 
-  const userLegacySubscriptionPlanWithPricingSystem = React.useMemo(
+  const getUserLegacySubscriptionPlanWithPricingSystem = React.useCallback(
     () => {
+      const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
       if (
         !authenticatedUser.subscription ||
         !authenticatedUser.subscription.planId ||
@@ -267,19 +265,19 @@ export const SubscriptionProvider = ({
         pricingSystems: [userPricingSystem],
       };
     },
-    [subscriptionPlansWithPricingSystems, authenticatedUser.subscription]
+    [getSubscriptionPlansWithPricingSystems, authenticatedUser.subscription]
   );
 
   const value = React.useMemo(
     () => ({
-      subscriptionPlansWithPricingSystems,
-      subscriptionPlansWithPricingSystemsIncludingLegacy,
+      getSubscriptionPlansWithPricingSystems,
+      getSubscriptionPlansWithPricingSystemsIncludingLegacy,
       openSubscriptionDialog,
       openSubscriptionPendingDialog,
     }),
     [
-      subscriptionPlansWithPricingSystems,
-      subscriptionPlansWithPricingSystemsIncludingLegacy,
+      getSubscriptionPlansWithPricingSystems,
+      getSubscriptionPlansWithPricingSystemsIncludingLegacy,
       openSubscriptionDialog,
       openSubscriptionPendingDialog,
     ]
@@ -312,25 +310,19 @@ export const SubscriptionProvider = ({
         authenticatedUser.loginState === 'loggingIn' ? (
           <LoaderModal showImmediately />
         ) : !hasValidSubscriptionPlan(authenticatedUser.subscription) &&
-          analyticsMetadata.recommendedPlanId ? (
+          recommendedPlanId ? (
           <PromotionSubscriptionDialog
-            availableSubscriptionPlansWithPrices={
-              subscriptionPlansWithPricingSystems
-            }
+            availableSubscriptionPlansWithPrices={getSubscriptionPlansWithPricingSystems()}
             onClose={closeSubscriptionDialog}
-            recommendedPlanId={analyticsMetadata.recommendedPlanId}
+            recommendedPlanId={recommendedPlanId}
             onOpenPendingDialog={(open: boolean) =>
               setSubscriptionPendingDialogOpen(open)
             }
           />
         ) : (
           <SubscriptionDialog
-            availableSubscriptionPlansWithPrices={
-              subscriptionPlansWithPricingSystems
-            }
-            userLegacySubscriptionPlanWithPricingSystem={
-              userLegacySubscriptionPlanWithPricingSystem
-            }
+            availableSubscriptionPlansWithPrices={getSubscriptionPlansWithPricingSystems()}
+            userLegacySubscriptionPlanWithPricingSystem={getUserLegacySubscriptionPlanWithPricingSystem()}
             onClose={closeSubscriptionDialog}
             filter={filter}
             onOpenPendingDialog={(open: boolean) =>

@@ -272,8 +272,9 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
   const { profile, subscription } = React.useContext(AuthenticatedUserContext);
   const {
     openSubscriptionDialog,
-    subscriptionPlansWithPricingSystems,
+    getSubscriptionPlansWithPricingSystems,
   } = React.useContext(SubscriptionContext);
+  const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
   const [selectedUserIds, setSelectedUserIds] = React.useState<string[]>([]);
   const [isCreatingMembers, setIsCreatingMembers] = React.useState<boolean>(
     false

@@ -22,52 +22,20 @@ const styles = {
   },
 };
 
-function useDelayedBoolean(target: boolean, delayMs: number): boolean {
-  const [value, setValue] = React.useState<boolean>(false);
-  const timerRef = React.useRef<?TimeoutID>(null);
-
-  React.useEffect(
-    () => {
-      if (target) {
-        if (timerRef.current) clearTimeout(timerRef.current);
-        timerRef.current = setTimeout(() => {
-          setValue(true);
-          timerRef.current = null;
-        }, delayMs);
-      } else {
-        setValue(false);
-        if (timerRef.current) {
-          clearTimeout(timerRef.current);
-          timerRef.current = null;
-        }
-      }
-      return () => {
-        if (timerRef.current) clearTimeout(timerRef.current);
-      };
-    },
-    [target, delayMs]
-  );
-
-  return value;
-}
-
 type Props = {|
   show: boolean,
   message?: ?MessageDescriptor,
   progress?: ?number,
 |};
 
-const transitionDuration = { enter: 400 };
+const transitionDuration = { enter: 0, exit: 150 };
 
 const LoaderModal = ({ progress, message, show }: Props) => {
-  const delayedShow = useDelayedBoolean(show, 150);
   const isInfinite = progress === null || progress === undefined;
-  if (!delayedShow) return null;
-
   return (
     <I18n>
       {({ i18n }) => (
-        <Dialog open transitionDuration={transitionDuration}>
+        <Dialog open={show} transitionDuration={transitionDuration}>
           <DialogContent style={styles.dialogContent}>
             <div
               style={{

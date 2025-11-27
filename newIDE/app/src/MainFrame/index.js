@@ -2123,7 +2123,22 @@ const MainFrame = (props: Props) => {
       if (currentProject.getLayoutsCount() === 0) return;
 
       const previewLauncher = _previewLauncher.current;
-      if (!previewLauncher) return;
+      if (!previewLauncher) {
+        console.error('Preview launcher not found.');
+        return;
+      }
+
+      if (previewLoading) {
+        console.error(
+          'Preview already loading. Ignoring but it should not be even possible to launch a preview while another one is loading, as this could break the game of the first preview when it is loading or reading files.'
+        );
+        // Note that in an ideal situation, each previewed game could continue to load
+        // without being impacted by a new preview being worked on.
+        // The main issue currently is files being erased/copied by the second preview,
+        // which can break the game of the first preview,
+        // when the game is loading its resources or reading files.
+        return;
+      }
 
       // Open the preview windows immediately, if required by the preview launcher.
       // This is because some browsers (like Safari or Firefox) will block the
@@ -2137,7 +2152,12 @@ const MainFrame = (props: Props) => {
           })
         : null;
 
+      // Mark the preview as loading. Note that it's important that nothing is asynchronous
+      // before this point (no asynchronous work, no delay):
+      // - to ensure the state is changed as soon as possible (avoid wrongly launching two previews),
+      // - and to ensure preview windows are opened on browsers following a "user gesture".
       setPreviewLoading(true);
+
       notifyPreviewOrExportWillStart(state.editorTabs);
 
       const sceneName = isForInGameEdition
@@ -2262,6 +2282,7 @@ const MainFrame = (props: Props) => {
           }
         }
       } catch (error) {
+        setPreviewLoading(false);
         console.error(
           'Error caught while launching preview, this should never happen.',
           error
@@ -2288,6 +2309,7 @@ const MainFrame = (props: Props) => {
       onCaptureFinished,
       createCaptureOptionsForPreview,
       inGameEditorSettings,
+      previewLoading,
     ]
   );
 

@@ -2569,7 +2569,7 @@ module.exports = {
           'CurrentFallSpeed',
           _('Current falling speed'),
           _(
-            'Compare the current falling speed of the object. Its value is always positive.'
+            'the current falling speed of the object. Its value is always positive.'
           ),
           _('the current falling speed'),
           _('Character state'),
@@ -2593,7 +2593,7 @@ module.exports = {
           'CurrentJumpSpeed',
           _('Current jump speed'),
           _(
-            'Compare the current jump speed of the object. Its value is always positive.'
+            'the current jump speed of the object. Its value is always positive.'
           ),
           _('the current jump speed'),
           _('Character state'),

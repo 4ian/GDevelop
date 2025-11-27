@@ -168,7 +168,6 @@ export const useInstallAsset = ({
       const wasExtensionsInstalled = await installExtension({
         project,
         requiredExtensionInstallation,
-        userSelectedExtensionNames: [],
         importedSerializedExtensions: [],
         onWillInstallExtension,
         onExtensionInstalled,
@@ -364,7 +363,6 @@ function NewObjectDialog({
         const wasExtensionsInstalled = await installExtension({
           project,
           requiredExtensionInstallation,
-          userSelectedExtensionNames: [],
           importedSerializedExtensions: [],
           onWillInstallExtension,
           onExtensionInstalled,

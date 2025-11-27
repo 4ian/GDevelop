@@ -17,6 +17,7 @@ import {
   checkRequiredExtensionsUpdate,
   getRequiredExtensions,
   useInstallExtension,
+  getExtensionHeader,
 } from '../AssetStore/ExtensionStore/InstallExtension';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import {
@@ -196,10 +197,6 @@ export default function NewBehaviorDialog({
         behaviorShortHeader,
       ];
       const requiredExtensions = getRequiredExtensions(behaviorShortHeaders);
-      requiredExtensions.push({
-        extensionName: behaviorShortHeader.extensionName,
-        extensionVersion: behaviorShortHeader.version,
-      });
       const requiredExtensionInstallation = await checkRequiredExtensionsUpdate(
         {
           requiredExtensions,
@@ -207,10 +204,26 @@ export default function NewBehaviorDialog({
           extensionShortHeadersByName,
         }
       );
+      const extensionShortHeader = getExtensionHeader(
+        extensionShortHeadersByName,
+        behaviorShortHeader.extensionName
+      );
+      if (
+        !requiredExtensionInstallation.missingExtensionShortHeaders.includes(
+          extensionShortHeader
+        )
+      ) {
+        // The behavior's extension is not part of `requiredExtensions` but
+        // should always be installed. Indeed, at this point, either:
+        // - the extension is missing
+        // - the user choses to update it (see `useExtensionUpdateAlertDialog`)
+        requiredExtensionInstallation.missingExtensionShortHeaders.push(
+          extensionShortHeader
+        );
+      }
       const wasExtensionInstalled = await installExtension({
         project,
         requiredExtensionInstallation,
-        userSelectedExtensionNames: [behaviorShortHeader.extensionName],
         importedSerializedExtensions: [],
         onWillInstallExtension,
         onExtensionInstalled,
@@ -254,9 +267,7 @@ export default function NewBehaviorDialog({
             objectBehaviorsTypes={objectBehaviorsTypes}
             isChildObject={isChildObject}
             isInstalling={isInstalling}
-            onInstall={async shortHeader =>
-              onInstallExtension(i18n, shortHeader)
-            }
+            onInstall={shortHeader => onInstallExtension(i18n, shortHeader)}
             onChoose={behaviorType => chooseBehavior(i18n, behaviorType)}
             installedBehaviorMetadataList={installedBehaviorMetadataList}
             deprecatedBehaviorMetadataList={deprecatedBehaviorMetadataList}

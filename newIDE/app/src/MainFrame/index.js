@@ -1487,20 +1487,24 @@ const MainFrame = (props: Props) => {
         state.editorTabs,
         extensionName
       ),
-    })).then(state => {
+    })).then(async state => {
+      // Ensure no other previous call to this method is happening on an
+      // outdated extension list.
+      await eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+        currentProject
+      );
+
       // Unload the Platform extension that was generated from the events
       // functions extension.
       eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtension(
         currentProject,
         extensionName
       );
-
       currentProject.removeEventsFunctionsExtension(extensionName);
-      _onProjectItemModified();
 
       // Reload extensions to make sure any extension that would have been relying
       // on the unloaded extension is updated.
-      eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
+      await eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
         currentProject
       );
 
@@ -1521,6 +1525,7 @@ const MainFrame = (props: Props) => {
           reasons: ['deleted-extension-without-custom-object'],
         });
       }
+      _onProjectItemModified();
     });
   };
 

@@ -32,7 +32,7 @@ import AlertProvider from '../UI/Alert/AlertProvider';
 import { AnnouncementsFeedStateProvider } from '../AnnouncementsFeed/AnnouncementsFeedContext';
 import PrivateAssetsAuthorizationProvider from '../AssetStore/PrivateAssets/PrivateAssetsAuthorizationProvider';
 import InAppTutorialProvider from '../InAppTutorial/InAppTutorialProvider';
-import { SubscriptionSuggestionProvider } from '../Profile/Subscription/SubscriptionSuggestionContext';
+import { SubscriptionProvider } from '../Profile/Subscription/SubscriptionContext';
 import { RouterContextProvider } from './RouterContext';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import { FullThemeProvider } from '../UI/Theme/FullThemeProvider';
@@ -102,7 +102,7 @@ const Providers = ({
                                       eventsFunctionsExtensionOpener
                                     }
                                   >
-                                    <SubscriptionSuggestionProvider>
+                                    <SubscriptionProvider>
                                       <CommandsContextProvider>
                                         <AssetStoreNavigatorStateProvider>
                                           <AssetStoreStateProvider>
@@ -148,7 +148,7 @@ const Providers = ({
                                           </AssetStoreStateProvider>
                                         </AssetStoreNavigatorStateProvider>
                                       </CommandsContextProvider>
-                                    </SubscriptionSuggestionProvider>
+                                    </SubscriptionProvider>
                                   </EventsFunctionsExtensionsProvider>
                                 )}
                               </I18n>

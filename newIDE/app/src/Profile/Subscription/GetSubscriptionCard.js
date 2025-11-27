@@ -7,7 +7,7 @@ import {
   type SubscriptionDialogDisplayReason,
   type SubscriptionPlacementId,
 } from '../../Utils/Analytics/EventSender';
-import { SubscriptionSuggestionContext } from './SubscriptionSuggestionContext';
+import { SubscriptionContext } from './SubscriptionContext';
 import RaisedButton from '../../UI/RaisedButton';
 import FlatButton from '../../UI/FlatButton';
 import Coin from '../../Credits/Icons/Coin';
@@ -78,9 +78,7 @@ const GetSubscriptionCard = ({
     ? // If the user already has a subscription, show the original subscription dialog.
       undefined
     : recommendedPlanIdIfNoSubscription;
-  const { openSubscriptionDialog } = React.useContext(
-    SubscriptionSuggestionContext
-  );
+  const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
   const { isMobile } = useResponsiveWindowSize();
   const columnLayout = forceColumnLayout || isMobile;
 

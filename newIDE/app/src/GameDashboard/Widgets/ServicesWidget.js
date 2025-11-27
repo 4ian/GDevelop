@@ -15,7 +15,7 @@ import Link from '../../UI/Link';
 import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
 import RaisedButton from '../../UI/RaisedButton';
-import { SubscriptionSuggestionContext } from '../../Profile/Subscription/SubscriptionSuggestionContext';
+import { SubscriptionContext } from '../../Profile/Subscription/SubscriptionContext';
 
 const leaderboardsHelpLink = getHelpLink('/all-features/leaderboards');
 const multiplayerHelpLink = getHelpLink('/all-features/multiplayer');
@@ -34,9 +34,7 @@ const ServicesWidget = ({
   displayUnlockMoreLeaderboardsCallout,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
-  const { openSubscriptionDialog } = React.useContext(
-    SubscriptionSuggestionContext
-  );
+  const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
   return (
     <DashboardWidget
       widgetSize={'full'}

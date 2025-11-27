@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import MockAdapter from 'axios-mock-adapter';
 import { action } from '@storybook/addon-actions';
 
 import paperDecorator from '../../../PaperDecorator';
@@ -19,61 +20,13 @@ import EventsFunctionsExtensionsContext from '../../../../EventsFunctionsExtensi
 import fakeResourceManagementProps from '../../../FakeResourceManagement';
 import { fakeEventsFunctionsExtensionsState } from '../../../FakeEventsFunctionsExtensionsContext';
 import { AssetStoreNavigatorStateProvider } from '../../../../AssetStore/AssetStoreNavigator';
+import { client as assetClient } from '../../../../Utils/GDevelopServices/Asset';
 
 export default {
   title: 'AssetStore/AssetStore/AssetPackInstallDialog',
   component: AssetPackInstallDialog,
   decorators: [paperDecorator],
 };
-
-const mockApiDataForPublicAssets = [
-  // Mock a successful response for the first asset:
-  {
-    url: `https://api-dev.gdevelop.io/asset/asset/${
-      fakeAssetShortHeader1.id
-    }?environment=live`,
-    method: 'GET',
-    status: 200,
-    response: {
-      assetUrl: 'https://resources-fake.gdevelop.io/fake-asset-1',
-    },
-    delay: 250,
-  },
-  {
-    url: `https://resources-fake.gdevelop.io/fake-asset-1`,
-    method: 'GET',
-    status: 200,
-    response: fakeAsset1,
-    delay: 250,
-  },
-
-  // Also mock a successful response for the second asset:
-  {
-    url: `https://api-dev.gdevelop.io/asset/asset/${
-      fakeAssetShortHeader2.id
-    }?environment=live`,
-    method: 'GET',
-    status: 200,
-    response: {
-      assetUrl: 'https://resources-fake.gdevelop.io/fake-asset-1',
-    },
-    delay: 250,
-  },
-];
-
-const mockFailedApiDataForPublicAsset1 = [
-  {
-    url: `https://api-dev.gdevelop.io/asset/asset/${
-      fakeAssetShortHeader1.id
-    }?environment=live`,
-    method: 'GET',
-    status: 500,
-    response: {
-      assetUrl: 'https://resources-fake.gdevelop.io/fake-asset-1',
-    },
-    delay: 250,
-  },
-];
 
 const Wrapper = ({ children }: {| children: React.Node |}) => {
   return (
@@ -87,50 +40,78 @@ const Wrapper = ({ children }: {| children: React.Node |}) => {
   );
 };
 
-export const LayoutPublicAssetInstallSuccess = () => (
-  <Wrapper>
-    <AssetPackInstallDialog
-      assetPack={fakeAssetPacks.starterPacks[0]}
-      assetShortHeaders={[fakeAssetShortHeader1]}
-      addedAssetIds={new Set<string>()}
-      onClose={action('onClose')}
-      onAssetsAdded={action('onAssetsAdded')}
-      project={testProject.project}
-      objectsContainer={testProject.testLayout.getObjects()}
-      resourceManagementProps={{
-        ...fakeResourceManagementProps,
-        canInstallPrivateAsset: () => true,
-      }}
-      onWillInstallExtension={action('extension will be installed')}
-      onExtensionInstalled={action('onExtensionInstalled')}
-    />
-  </Wrapper>
-);
-LayoutPublicAssetInstallSuccess.parameters = {
-  mockData: mockApiDataForPublicAssets,
+export const LayoutPublicAssetInstallSuccess = () => {
+  const assetServiceMock = new MockAdapter(assetClient, {
+    delayResponse: 250,
+  });
+
+  // Mock a successful response for the first asset:
+  assetServiceMock
+    .onGet(`/asset/${fakeAssetShortHeader1.id}`, {
+      params: { environment: 'live' },
+    })
+    .reply(200, {
+      assetUrl: 'https://resources-fake.gdevelop.io/fake-asset-1',
+    });
+
+  assetServiceMock
+    .onGet('https://resources-fake.gdevelop.io/fake-asset-1')
+    .reply(200, fakeAsset1);
+
+  return (
+    <Wrapper>
+      <AssetPackInstallDialog
+        assetPack={fakeAssetPacks.starterPacks[0]}
+        assetShortHeaders={[fakeAssetShortHeader1]}
+        addedAssetIds={new Set<string>()}
+        onClose={action('onClose')}
+        onAssetsAdded={action('onAssetsAdded')}
+        project={testProject.project}
+        objectsContainer={testProject.testLayout.getObjects()}
+        resourceManagementProps={{
+          ...fakeResourceManagementProps,
+          canInstallPrivateAsset: () => true,
+        }}
+        onWillInstallExtension={action('extension will be installed')}
+        onExtensionInstalled={action('onExtensionInstalled')}
+      />
+    </Wrapper>
+  );
 };
 
-export const LayoutPublicAssetInstallFailure = () => (
-  <Wrapper>
-    <AssetPackInstallDialog
-      assetPack={fakeAssetPacks.starterPacks[0]}
-      assetShortHeaders={[fakeAssetShortHeader1]}
-      addedAssetIds={new Set<string>()}
-      onClose={action('onClose')}
-      onAssetsAdded={action('onAssetsAdded')}
-      project={testProject.project}
-      objectsContainer={testProject.testLayout.getObjects()}
-      resourceManagementProps={{
-        ...fakeResourceManagementProps,
-        canInstallPrivateAsset: () => true,
-      }}
-      onWillInstallExtension={action('extension will be installed')}
-      onExtensionInstalled={action('onExtensionInstalled')}
-    />
-  </Wrapper>
-);
-LayoutPublicAssetInstallFailure.parameters = {
-  mockData: mockFailedApiDataForPublicAsset1,
+export const LayoutPublicAssetInstallFailure = () => {
+  const assetServiceMock = new MockAdapter(assetClient, {
+    delayResponse: 250,
+  });
+
+  // Mock a failed response for the first asset:
+  assetServiceMock
+    .onGet(`/asset/${fakeAssetShortHeader1.id}`, {
+      params: { environment: 'live' },
+    })
+    .reply(500, {
+      assetUrl: 'https://resources-fake.gdevelop.io/fake-asset-1',
+    });
+
+  return (
+    <Wrapper>
+      <AssetPackInstallDialog
+        assetPack={fakeAssetPacks.starterPacks[0]}
+        assetShortHeaders={[fakeAssetShortHeader1]}
+        addedAssetIds={new Set<string>()}
+        onClose={action('onClose')}
+        onAssetsAdded={action('onAssetsAdded')}
+        project={testProject.project}
+        objectsContainer={testProject.testLayout.getObjects()}
+        resourceManagementProps={{
+          ...fakeResourceManagementProps,
+          canInstallPrivateAsset: () => true,
+        }}
+        onWillInstallExtension={action('extension will be installed')}
+        onExtensionInstalled={action('onExtensionInstalled')}
+      />
+    </Wrapper>
+  );
 };
 
 export const LayoutPublicAssetAllAlreadyInstalled = () => (
@@ -153,27 +134,51 @@ export const LayoutPublicAssetAllAlreadyInstalled = () => (
   </Wrapper>
 );
 
-export const LayoutPublicAssetSomeAlreadyInstalled = () => (
-  <Wrapper>
-    <AssetPackInstallDialog
-      assetPack={fakeAssetPacks.starterPacks[0]}
-      assetShortHeaders={[fakeAssetShortHeader1, fakeAssetShortHeader2]}
-      addedAssetIds={new Set([fakeAssetShortHeader1.id])}
-      onClose={action('onClose')}
-      onAssetsAdded={action('onAssetsAdded')}
-      project={testProject.project}
-      objectsContainer={testProject.testLayout.getObjects()}
-      resourceManagementProps={{
-        ...fakeResourceManagementProps,
-        canInstallPrivateAsset: () => true,
-      }}
-      onWillInstallExtension={action('extension will be installed')}
-      onExtensionInstalled={action('onExtensionInstalled')}
-    />
-  </Wrapper>
-);
-LayoutPublicAssetSomeAlreadyInstalled.parameters = {
-  mockData: mockApiDataForPublicAssets,
+export const LayoutPublicAssetSomeAlreadyInstalled = () => {
+  const assetServiceMock = new MockAdapter(assetClient, {
+    delayResponse: 250,
+  });
+
+  // Mock successful responses for both assets:
+  assetServiceMock
+    .onGet(`/asset/${fakeAssetShortHeader1.id}`, {
+      params: { environment: 'live' },
+    })
+    .reply(200, {
+      assetUrl: 'https://resources-fake.gdevelop.io/fake-asset-1',
+    });
+
+  assetServiceMock
+    .onGet(`/asset/${fakeAssetShortHeader2.id}`, {
+      params: { environment: 'live' },
+    })
+    .reply(200, {
+      assetUrl: 'https://resources-fake.gdevelop.io/fake-asset-1',
+    });
+
+  assetServiceMock
+    .onGet('https://resources-fake.gdevelop.io/fake-asset-1')
+    .reply(200, fakeAsset1);
+
+  return (
+    <Wrapper>
+      <AssetPackInstallDialog
+        assetPack={fakeAssetPacks.starterPacks[0]}
+        assetShortHeaders={[fakeAssetShortHeader1, fakeAssetShortHeader2]}
+        addedAssetIds={new Set([fakeAssetShortHeader1.id])}
+        onClose={action('onClose')}
+        onAssetsAdded={action('onAssetsAdded')}
+        project={testProject.project}
+        objectsContainer={testProject.testLayout.getObjects()}
+        resourceManagementProps={{
+          ...fakeResourceManagementProps,
+          canInstallPrivateAsset: () => true,
+        }}
+        onWillInstallExtension={action('extension will be installed')}
+        onExtensionInstalled={action('onExtensionInstalled')}
+      />
+    </Wrapper>
+  );
 };
 
 export const LayoutPrivateAssetInstallSuccess = () => {
@@ -293,27 +298,51 @@ export const LayoutPrivateAssetButInstallingTooMany = () => (
   </Wrapper>
 );
 
-export const NoObjectsContainerPublicAssetInstallSuccess = () => (
-  <Wrapper>
-    <AssetPackInstallDialog
-      assetPack={fakeAssetPacks.starterPacks[0]}
-      assetShortHeaders={[fakeAssetShortHeader1, fakeAssetShortHeader2]}
-      addedAssetIds={new Set<string>()}
-      onClose={action('onClose')}
-      onAssetsAdded={action('onAssetsAdded')}
-      project={testProject.project}
-      objectsContainer={null}
-      resourceManagementProps={{
-        ...fakeResourceManagementProps,
-        canInstallPrivateAsset: () => true,
-      }}
-      onWillInstallExtension={action('extension will be installed')}
-      onExtensionInstalled={action('onExtensionInstalled')}
-    />
-  </Wrapper>
-);
-NoObjectsContainerPublicAssetInstallSuccess.parameters = {
-  mockData: mockApiDataForPublicAssets,
+export const NoObjectsContainerPublicAssetInstallSuccess = () => {
+  const assetServiceMock = new MockAdapter(assetClient, {
+    delayResponse: 250,
+  });
+
+  // Mock successful responses for both assets:
+  assetServiceMock
+    .onGet(`/asset/${fakeAssetShortHeader1.id}`, {
+      params: { environment: 'live' },
+    })
+    .reply(200, {
+      assetUrl: 'https://resources-fake.gdevelop.io/fake-asset-1',
+    });
+
+  assetServiceMock
+    .onGet(`/asset/${fakeAssetShortHeader2.id}`, {
+      params: { environment: 'live' },
+    })
+    .reply(200, {
+      assetUrl: 'https://resources-fake.gdevelop.io/fake-asset-1',
+    });
+
+  assetServiceMock
+    .onGet('https://resources-fake.gdevelop.io/fake-asset-1')
+    .reply(200, fakeAsset1);
+
+  return (
+    <Wrapper>
+      <AssetPackInstallDialog
+        assetPack={fakeAssetPacks.starterPacks[0]}
+        assetShortHeaders={[fakeAssetShortHeader1, fakeAssetShortHeader2]}
+        addedAssetIds={new Set<string>()}
+        onClose={action('onClose')}
+        onAssetsAdded={action('onAssetsAdded')}
+        project={testProject.project}
+        objectsContainer={null}
+        resourceManagementProps={{
+          ...fakeResourceManagementProps,
+          canInstallPrivateAsset: () => true,
+        }}
+        onWillInstallExtension={action('extension will be installed')}
+        onExtensionInstalled={action('onExtensionInstalled')}
+      />
+    </Wrapper>
+  );
 };
 
 export const NoObjectsContainerPrivateAssetButCantInstall = () => (

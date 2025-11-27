@@ -34,7 +34,7 @@ import {
   initialAssetStoreState,
 } from '../../AssetStore/AssetStoreContext';
 import { ProductLicenseStoreStateProvider } from '../../AssetStore/ProductLicense/ProductLicenseStoreContext';
-import { SubscriptionSuggestionProvider } from '../../Profile/Subscription/SubscriptionSuggestionContext';
+import { SubscriptionProvider } from '../../Profile/Subscription/SubscriptionContext';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import CourseStoreContext, {
   initialCourseStoreState,
@@ -189,11 +189,11 @@ const StandAloneDialogStory = ({
                     creditsPackageListingDatas: [],
                   }}
                 >
-                  <SubscriptionSuggestionProvider>
+                  <SubscriptionProvider>
                     <ProductLicenseStoreStateProvider>
                       <StandAloneDialog onClose={() => action('close')()} />
                     </ProductLicenseStoreStateProvider>
-                  </SubscriptionSuggestionProvider>
+                  </SubscriptionProvider>
                 </CreditsPackageStoreContext.Provider>
               </CourseStoreContext.Provider>
             </AuthenticatedUserContext.Provider>

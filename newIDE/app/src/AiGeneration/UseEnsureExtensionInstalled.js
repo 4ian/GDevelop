@@ -61,7 +61,6 @@ export const useEnsureExtensionInstalled = ({
         await installExtension({
           project,
           requiredExtensionInstallation,
-          userSelectedExtensionNames: [],
           importedSerializedExtensions: [],
           onWillInstallExtension,
           onExtensionInstalled,

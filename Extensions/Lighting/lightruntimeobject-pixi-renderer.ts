@@ -101,15 +101,12 @@ namespace gdjs {
         this._debugGraphics.destroy();
         this._debugGraphics = null;
       }
-      if (this._texture) {
-        this._texture.destroy();
-        this._texture = null;
-      }
       if (this._light) {
         this._light.removeFromParent();
         this._light.destroy();
         this._light = null;
       }
+      // We dot not destroy the texture, as it is managed by the PixiImageManager.
     }
 
     static _verticesWithAngleComparator(vertexWithAngleA, vertexWithAngleB) {

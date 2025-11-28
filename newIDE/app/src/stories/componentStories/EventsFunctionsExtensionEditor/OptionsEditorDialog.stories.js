@@ -9,7 +9,7 @@ import fakeResourceManagementProps from '../../FakeResourceManagement';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
 import OptionsEditorDialog from '../../../EventsFunctionsExtensionEditor/OptionsEditorDialog';
-import EventsFunctionsExtensionsProvider from '../../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsProvider';
+import { EventsFunctionsExtensionsProvider } from '../../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsProvider';
 
 export default {
   title: 'EventsFunctionsExtensionEditor/OptionsEditorDialog',

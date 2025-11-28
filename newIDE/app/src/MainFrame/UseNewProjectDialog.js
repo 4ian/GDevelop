@@ -204,7 +204,7 @@ const useNewProjectDialog = ({
   const renderNewProjectDialog = () => {
     return (
       <>
-        {isFetchingExample && <LoaderModal show />}
+        {isFetchingExample && <LoaderModal showImmediately />}
         {newProjectSetupDialogOpen && (
           <NewProjectSetupDialog
             project={project}

@@ -52,22 +52,30 @@ function useDelayedBoolean(target: boolean, delayMs: number): boolean {
 }
 
 type Props = {|
-  show: boolean,
+  showImmediately: boolean,
+  showAfterDelay?: boolean,
   message?: ?MessageDescriptor,
   progress?: ?number,
 |};
 
-const transitionDuration = { enter: 400 };
+const transitionDuration = { enter: 0, exit: 150 };
 
-const LoaderModal = ({ progress, message, show }: Props) => {
-  const delayedShow = useDelayedBoolean(show, 150);
+const LoaderModal = ({
+  progress,
+  message,
+  showImmediately,
+  showAfterDelay,
+}: Props) => {
+  const delayedShow = useDelayedBoolean(!!showAfterDelay, 150);
   const isInfinite = progress === null || progress === undefined;
-  if (!delayedShow) return null;
 
   return (
     <I18n>
       {({ i18n }) => (
-        <Dialog open transitionDuration={transitionDuration}>
+        <Dialog
+          open={showImmediately || delayedShow}
+          transitionDuration={transitionDuration}
+        >
           <DialogContent style={styles.dialogContent}>
             <div
               style={{

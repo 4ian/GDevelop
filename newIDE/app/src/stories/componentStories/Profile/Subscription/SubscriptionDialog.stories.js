@@ -197,6 +197,6 @@ export const Default = ({
       </AuthenticatedUserContext.Provider>
     </AlertProvider>
   ) : (
-    <LoaderModal show />
+    <LoaderModal showImmediately />
   );
 };

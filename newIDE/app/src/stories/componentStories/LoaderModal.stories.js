@@ -10,7 +10,7 @@ export default {
   component: LoaderModal,
 };
 
-export const Default = () => <LoaderModal show />;
+export const Default = () => <LoaderModal showImmediately />;
 
 const STEP_COUNT = 4;
 
@@ -27,7 +27,7 @@ export const WithProgress = () => {
   ];
   return (
     <LoaderModal
-      show
+      showImmediately
       message={messages[Math.min(step, messages.length - 1)]}
       progress={(step / STEP_COUNT) * 100}
     />

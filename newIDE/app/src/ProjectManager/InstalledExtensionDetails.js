@@ -56,7 +56,9 @@ function InstalledExtensionDetails({
           extensionShortHeader
         )
       ) {
-        // Allow to reinstall the extension even if the versions match.
+        // The extension chosen by users is not part of `requiredExtensions`
+        // but should always be installed. This is true even if the versions
+        // are matching to allow to reinstall the extension.
         requiredExtensionInstallation.missingExtensionShortHeaders.push(
           extensionShortHeader
         );
@@ -64,7 +66,6 @@ function InstalledExtensionDetails({
       await installExtension({
         project,
         requiredExtensionInstallation,
-        userSelectedExtensionNames: [],
         importedSerializedExtensions: [],
         onWillInstallExtension,
         onExtensionInstalled,

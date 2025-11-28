@@ -9,7 +9,7 @@ import PreferencesContext from './Preferences/PreferencesContext';
 import GDI18nProvider from '../Utils/i18n/GDI18nProvider';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
-import EventsFunctionsExtensionsProvider from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsProvider';
+import { EventsFunctionsExtensionsProvider } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsProvider';
 import {
   type EventsFunctionCodeWriter,
   type EventsFunctionCodeWriterCallbacks,

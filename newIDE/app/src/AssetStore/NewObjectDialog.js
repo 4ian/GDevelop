@@ -168,7 +168,6 @@ export const useInstallAsset = ({
       const wasExtensionsInstalled = await installExtension({
         project,
         requiredExtensionInstallation,
-        userSelectedExtensionNames: [],
         importedSerializedExtensions: [],
         onWillInstallExtension,
         onExtensionInstalled,
@@ -364,7 +363,6 @@ function NewObjectDialog({
         const wasExtensionsInstalled = await installExtension({
           project,
           requiredExtensionInstallation,
-          userSelectedExtensionNames: [],
           importedSerializedExtensions: [],
           onWillInstallExtension,
           onExtensionInstalled,
@@ -592,7 +590,7 @@ function NewObjectDialog({
                 />
               ))}
           </Dialog>
-          {isAssetBeingInstalled && <LoaderModal show={true} />}
+          {isAssetBeingInstalled && <LoaderModal showImmediately />}
           {isAssetPackDialogInstallOpen &&
             displayedAssetShortHeaders &&
             openedAssetPack && (

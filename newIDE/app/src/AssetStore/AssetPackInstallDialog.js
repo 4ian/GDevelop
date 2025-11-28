@@ -164,7 +164,6 @@ const AssetPackInstallDialog = ({
         const wasExtensionsInstalled = await installExtension({
           project,
           requiredExtensionInstallation,
-          userSelectedExtensionNames: [],
           importedSerializedExtensions: [],
           onWillInstallExtension,
           onExtensionInstalled,

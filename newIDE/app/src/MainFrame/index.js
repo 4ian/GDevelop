@@ -436,7 +436,9 @@ const MainFrame = (props: Props) => {
   } = useAlertDialog();
   const preferences = React.useContext(PreferencesContext);
   const { setHasProjectOpened } = preferences;
-  const [previewLoading, setPreviewLoading] = React.useState<boolean>(false);
+  const [previewLoading, setPreviewLoading] = React.useState<
+    null | 'preview' | 'hot-reload-for-in-game-edition'
+  >(null);
   const [previewState, setPreviewState] = React.useState(initialPreviewState);
   const commandPaletteRef = React.useRef((null: ?CommandPaletteInterface));
   const inAppTutorialOrchestratorRef = React.useRef<?InAppTutorialOrchestratorInterface>(
@@ -1487,20 +1489,24 @@ const MainFrame = (props: Props) => {
         state.editorTabs,
         extensionName
       ),
-    })).then(state => {
+    })).then(async state => {
+      // Ensure no other previous call to this method is happening on an
+      // outdated extension list.
+      await eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+        currentProject
+      );
+
       // Unload the Platform extension that was generated from the events
       // functions extension.
       eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtension(
         currentProject,
         extensionName
       );
-
       currentProject.removeEventsFunctionsExtension(extensionName);
-      _onProjectItemModified();
 
       // Reload extensions to make sure any extension that would have been relying
       // on the unloaded extension is updated.
-      eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
+      await eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
         currentProject
       );
 
@@ -1521,6 +1527,7 @@ const MainFrame = (props: Props) => {
           reasons: ['deleted-extension-without-custom-object'],
         });
       }
+      _onProjectItemModified();
     });
   };
 
@@ -2123,7 +2130,22 @@ const MainFrame = (props: Props) => {
       if (currentProject.getLayoutsCount() === 0) return;
 
       const previewLauncher = _previewLauncher.current;
-      if (!previewLauncher) return;
+      if (!previewLauncher) {
+        console.error('Preview launcher not found.');
+        return;
+      }
+
+      if (previewLoading) {
+        console.error(
+          'Preview already loading. Ignoring but it should not be even possible to launch a preview while another one is loading, as this could break the game of the first preview when it is loading or reading files.'
+        );
+        // Note that in an ideal situation, each previewed game could continue to load
+        // without being impacted by a new preview being worked on.
+        // The main issue currently is files being erased/copied by the second preview,
+        // which can break the game of the first preview,
+        // when the game is loading its resources or reading files.
+        return;
+      }
 
       // Open the preview windows immediately, if required by the preview launcher.
       // This is because some browsers (like Safari or Firefox) will block the
@@ -2137,7 +2159,16 @@ const MainFrame = (props: Props) => {
           })
         : null;
 
-      setPreviewLoading(true);
+      // Mark the preview as loading. Note that it's important that nothing is asynchronous
+      // before this point (no asynchronous work, no delay):
+      // - to ensure the state is changed as soon as possible (avoid wrongly launching two previews),
+      // - and to ensure preview windows are opened on browsers following a "user gesture".
+      setPreviewLoading(
+        isForInGameEdition && hotReload
+          ? 'hot-reload-for-in-game-edition'
+          : 'preview'
+      );
+
       notifyPreviewOrExportWillStart(state.editorTabs);
 
       const sceneName = isForInGameEdition
@@ -2229,7 +2260,7 @@ const MainFrame = (props: Props) => {
 
           previewWindows,
         });
-        setPreviewLoading(false);
+        setPreviewLoading(null);
 
         if (!isForInGameEdition)
           sendPreviewStarted({
@@ -2262,6 +2293,7 @@ const MainFrame = (props: Props) => {
           }
         }
       } catch (error) {
+        setPreviewLoading(null);
         console.error(
           'Error caught while launching preview, this should never happen.',
           error
@@ -2288,6 +2320,7 @@ const MainFrame = (props: Props) => {
       onCaptureFinished,
       createCaptureOptionsForPreview,
       inGameEditorSettings,
+      previewLoading,
     ]
   );
 
@@ -4594,7 +4627,10 @@ const MainFrame = (props: Props) => {
     !!authenticatedUser.limits &&
     !!authenticatedUser.limits.capabilities.classrooms &&
     authenticatedUser.limits.capabilities.classrooms.hideAskAi;
-  const showLoader = isProjectOpening || isLoadingProject || previewLoading;
+  const showLoaderAfterDelay =
+    previewLoading === 'hot-reload-for-in-game-edition';
+  const showLoaderImmediately =
+    isProjectOpening || isLoadingProject || previewLoading === 'preview';
   const shortcutMap = useShortcutMap();
 
   const buildMainMenuProps = {
@@ -4858,7 +4894,8 @@ const MainFrame = (props: Props) => {
       </LeaderboardProvider>
       <CommandPaletteWithAlgoliaSearch ref={commandPaletteRef} />
       <LoaderModal
-        show={showLoader}
+        showImmediately={showLoaderImmediately}
+        showAfterDelay={showLoaderAfterDelay}
         progress={fileMetadataOpeningProgress}
         message={
           loaderModalOpeningMessage ||

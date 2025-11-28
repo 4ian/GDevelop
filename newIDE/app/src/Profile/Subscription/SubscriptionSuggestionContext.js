@@ -190,7 +190,7 @@ export const SubscriptionSuggestionProvider = ({
       )}
       {analyticsMetadata ? (
         authenticatedUser.loginState === 'loggingIn' ? (
-          <LoaderModal show />
+          <LoaderModal showImmediately />
         ) : !hasValidSubscriptionPlan(authenticatedUser.subscription) &&
           analyticsMetadata.recommendedPlanId ? (
           <PromotionSubscriptionDialog

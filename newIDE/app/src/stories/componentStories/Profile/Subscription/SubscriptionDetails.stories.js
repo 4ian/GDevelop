@@ -203,6 +203,6 @@ export const Default = ({
       />
     </AlertProvider>
   ) : (
-    <LoaderModal show />
+    <LoaderModal showImmediately />
   );
 };

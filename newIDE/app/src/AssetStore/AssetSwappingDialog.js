@@ -200,7 +200,7 @@ function AssetSwappingDialog({
               minimalUI={minimalUI}
             />
           </Dialog>
-          {isAssetBeingInstalled && <LoaderModal show={true} />}
+          {isAssetBeingInstalled && <LoaderModal showImmediately />}
         </>
       )}
     </I18n>

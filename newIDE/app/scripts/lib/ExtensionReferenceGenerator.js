@@ -716,7 +716,7 @@ const generatePropertiesReferenceTexts = ({
         `${padding}- **${property.getLabel() ||
           name}** is stored as \`${name}\` (${type}).`,
         measurementUnitText ? `Unit is ${measurementUnitText}.` : null,
-        `Default value is \`${property.getValue()}\`.`,
+        `Default value is \`${property.getValue().replace(/\n/g, ' ')}\`.`,
       ]
         .filter(Boolean)
         .join(' '),

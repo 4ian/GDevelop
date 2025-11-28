@@ -590,7 +590,7 @@ function NewObjectDialog({
                 />
               ))}
           </Dialog>
-          {isAssetBeingInstalled && <LoaderModal show={true} />}
+          {isAssetBeingInstalled && <LoaderModal showImmediately />}
           {isAssetPackDialogInstallOpen &&
             displayedAssetShortHeaders &&
             openedAssetPack && (

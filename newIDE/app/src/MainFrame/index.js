@@ -436,7 +436,9 @@ const MainFrame = (props: Props) => {
   } = useAlertDialog();
   const preferences = React.useContext(PreferencesContext);
   const { setHasProjectOpened } = preferences;
-  const [previewLoading, setPreviewLoading] = React.useState<boolean>(false);
+  const [previewLoading, setPreviewLoading] = React.useState<
+    null | 'preview' | 'hot-reload-for-in-game-edition'
+  >(null);
   const [previewState, setPreviewState] = React.useState(initialPreviewState);
   const commandPaletteRef = React.useRef((null: ?CommandPaletteInterface));
   const inAppTutorialOrchestratorRef = React.useRef<?InAppTutorialOrchestratorInterface>(
@@ -2161,7 +2163,11 @@ const MainFrame = (props: Props) => {
       // before this point (no asynchronous work, no delay):
       // - to ensure the state is changed as soon as possible (avoid wrongly launching two previews),
       // - and to ensure preview windows are opened on browsers following a "user gesture".
-      setPreviewLoading(true);
+      setPreviewLoading(
+        isForInGameEdition && hotReload
+          ? 'hot-reload-for-in-game-edition'
+          : 'preview'
+      );
 
       notifyPreviewOrExportWillStart(state.editorTabs);
 
@@ -2254,7 +2260,7 @@ const MainFrame = (props: Props) => {
 
           previewWindows,
         });
-        setPreviewLoading(false);
+        setPreviewLoading(null);
 
         if (!isForInGameEdition)
           sendPreviewStarted({
@@ -2287,7 +2293,7 @@ const MainFrame = (props: Props) => {
           }
         }
       } catch (error) {
-        setPreviewLoading(false);
+        setPreviewLoading(null);
         console.error(
           'Error caught while launching preview, this should never happen.',
           error
@@ -4621,7 +4627,10 @@ const MainFrame = (props: Props) => {
     !!authenticatedUser.limits &&
     !!authenticatedUser.limits.capabilities.classrooms &&
     authenticatedUser.limits.capabilities.classrooms.hideAskAi;
-  const showLoader = isProjectOpening || isLoadingProject || previewLoading;
+  const showLoaderAfterDelay =
+    previewLoading === 'hot-reload-for-in-game-edition';
+  const showLoaderImmediately =
+    isProjectOpening || isLoadingProject || previewLoading === 'preview';
   const shortcutMap = useShortcutMap();
 
   const buildMainMenuProps = {
@@ -4885,7 +4894,8 @@ const MainFrame = (props: Props) => {
       </LeaderboardProvider>
       <CommandPaletteWithAlgoliaSearch ref={commandPaletteRef} />
       <LoaderModal
-        show={showLoader}
+        showImmediately={showLoaderImmediately}
+        showAfterDelay={showLoaderAfterDelay}
         progress={fileMetadataOpeningProgress}
         message={
           loaderModalOpeningMessage ||

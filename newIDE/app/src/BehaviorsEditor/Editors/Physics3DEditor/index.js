@@ -21,7 +21,9 @@ import {
   AccordionHeader,
   AccordionBody,
 } from '../../../UI/Accordion';
-import { areAdvancedPropertiesModified } from '../BehaviorPropertiesEditor';
+import { areAdvancedPropertiesModified } from '../../../PropertiesEditor/PropertiesEditorByVisibility';
+
+const gd: libGDevelop = global.gd;
 
 type Props = BehaviorEditorProps;
 
@@ -64,7 +66,20 @@ const Physics3DEditor = (props: Props) => {
   const forceUpdate = useForceUpdate();
 
   const areAdvancedPropertiesExpandedByDefault = React.useMemo(
-    () => areAdvancedPropertiesModified(behavior),
+    () => {
+      const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+        gd.JsPlatform.get(),
+        behavior.getTypeName()
+      );
+      return areAdvancedPropertiesModified(
+        behavior.getProperties(),
+        propertyName =>
+          behaviorMetadata
+            .getProperties()
+            .get(propertyName)
+            .getValue()
+      );
+    },
     [behavior]
   );
 

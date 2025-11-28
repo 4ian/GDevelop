@@ -4,12 +4,24 @@ import { I18n } from '@lingui/react';
 import paperDecorator from '../../../PaperDecorator';
 import { AiRequestChat } from '../../../../AiGeneration/AiRequestChat';
 import FixedHeightFlexContainer from '../../../FixedHeightFlexContainer';
+import FixedWidthFlexContainer from '../../../FixedWidthFlexContainer';
 import {
   agentAiRequest,
   agentAiRequestWithFailedAndIgnoredFunctionCallOutputs,
   agentAiRequestWithFunctionCallToDo,
 } from '../../../../fixtures/GDevelopServicesTestData/FakeAiRequests';
 import { action } from '@storybook/addon-actions';
+import {
+  defaultAuthenticatedUserWithNoSubscription,
+  fakeSilverAuthenticatedUser,
+  limitsForNoSubscriptionUser,
+} from '../../../../fixtures/GDevelopServicesTestData';
+import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
+import { SubscriptionProvider } from '../../../../Profile/Subscription/SubscriptionContext';
+import PreferencesContext, {
+  initialPreferences,
+} from '../../../../MainFrame/Preferences/PreferencesContext';
+import { CreditsPackageStoreStateProvider } from '../../../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 
 export default {
   title: 'EventsFunctionsExtensionEditor/AiRequestChat/Agent',
@@ -64,9 +76,10 @@ const commonProps = {
     limitReached: false,
     current: 100,
     max: 200,
+    resetsAt: Date.now() + 1000 * 60 * 60 * 24 * 2,
   },
-  onStartNewAiRequest: () => {},
-  onSendMessage: async () => {},
+  onStartNewAiRequest: action('onStartNewAiRequest'),
+  onSendUserMessage: action('onSendUserMessage'),
   isSending: false,
   price: {
     priceInCredits: 3,
@@ -98,13 +111,52 @@ const commonProps = {
   aiRequestMode: 'agent',
 };
 
-const WrappedChatComponent = (props: any) => (
-  <FixedHeightFlexContainer height={800}>
-    <I18n>
-      {({ i18n }) => <AiRequestChat i18n={i18n} {...commonProps} {...props} />}
-    </I18n>
-  </FixedHeightFlexContainer>
-);
+const WrappedChatComponent = (allProps: any) => {
+  const {
+    authenticatedUser,
+    automaticallyUseCreditsForAiRequests,
+    ...chatProps
+  } = allProps;
+  const authenticatedUserToUse =
+    authenticatedUser || fakeSilverAuthenticatedUser;
+  const [automaticallyUseCredits, setAutomaticallyUseCredits] = React.useState(
+    automaticallyUseCreditsForAiRequests || false
+  );
+  return (
+    <FixedHeightFlexContainer height={800}>
+      <FixedWidthFlexContainer width={600}>
+        <PreferencesContext.Provider
+          value={{
+            ...initialPreferences,
+            values: {
+              ...initialPreferences.values,
+              automaticallyUseCreditsForAiRequests: automaticallyUseCredits,
+            },
+            setAutomaticallyUseCreditsForAiRequests: (value: boolean) => {
+              setAutomaticallyUseCredits(value);
+            },
+          }}
+        >
+          <AuthenticatedUserContext.Provider value={authenticatedUserToUse}>
+            <SubscriptionProvider>
+              <CreditsPackageStoreStateProvider>
+                <I18n>
+                  {({ i18n }) => (
+                    <AiRequestChat
+                      i18n={i18n}
+                      {...commonProps}
+                      {...chatProps}
+                    />
+                  )}
+                </I18n>
+              </CreditsPackageStoreStateProvider>
+            </SubscriptionProvider>
+          </AuthenticatedUserContext.Provider>
+        </PreferencesContext.Provider>
+      </FixedWidthFlexContainer>
+    </FixedHeightFlexContainer>
+  );
+};
 
 const fakeOutputWithUserRequestOnly = [
   {
@@ -429,3 +481,135 @@ export const LongReadyAiRequestForAnotherProject = () => (
 export const LongReadyAiRequestWithFunctionCallToDo = () => (
   <WrappedChatComponent aiRequest={agentAiRequestWithFunctionCallToDo} />
 );
+
+export const NoAiCreditsLeftAndAutomaticallyUsingCredits = () => {
+  const quota = {
+    limitReached: true,
+    current: 100,
+    max: 100,
+    resetsAt: Date.now() + 1000 * 60 * 60 * 24 * 2,
+  };
+
+  return (
+    <WrappedChatComponent
+      aiRequest={agentAiRequest}
+      quota={quota}
+      isAutoProcessingFunctionCalls={true}
+      authenticatedUser={{
+        ...defaultAuthenticatedUserWithNoSubscription,
+        limits: {
+          ...limitsForNoSubscriptionUser,
+          credits: {
+            userBalance: {
+              amount: 400,
+            },
+          },
+          quotas: {
+            'consumed-ai-credits': quota,
+          },
+        },
+      }}
+      automaticallyUseCreditsForAiRequests={true}
+      availableCredits={400}
+    />
+  );
+};
+
+export const NoAiCreditsLeftAndAutomaticallyUsingCreditsButNoneLeft = () => {
+  const quota = {
+    limitReached: true,
+    current: 100,
+    max: 100,
+    resetsAt: Date.now() + 1000 * 60 * 60 * 24 * 2,
+  };
+
+  return (
+    <WrappedChatComponent
+      aiRequest={agentAiRequest}
+      quota={quota}
+      isAutoProcessingFunctionCalls={true}
+      authenticatedUser={{
+        ...defaultAuthenticatedUserWithNoSubscription,
+        limits: {
+          ...limitsForNoSubscriptionUser,
+          credits: {
+            userBalance: {
+              amount: 0,
+            },
+          },
+          quotas: {
+            'consumed-ai-credits': quota,
+          },
+        },
+      }}
+      automaticallyUseCreditsForAiRequests={true}
+      availableCredits={0}
+    />
+  );
+};
+
+export const NoAiCreditsLeftAndNotAutomaticallyUsingCredits = () => {
+  const quota = {
+    limitReached: true,
+    current: 100,
+    max: 100,
+    resetsAt: Date.now() + 1000 * 60 * 60 * 24 * 2,
+  };
+
+  return (
+    <WrappedChatComponent
+      aiRequest={agentAiRequest}
+      quota={quota}
+      isAutoProcessingFunctionCalls={true}
+      authenticatedUser={{
+        ...defaultAuthenticatedUserWithNoSubscription,
+        limits: {
+          ...limitsForNoSubscriptionUser,
+          credits: {
+            userBalance: {
+              amount: 400,
+            },
+          },
+          quotas: {
+            'consumed-ai-credits': quota,
+          },
+        },
+      }}
+      automaticallyUseCreditsForAiRequests={false}
+      availableCredits={400}
+    />
+  );
+};
+
+export const NoAiCreditsLeftAndNotAutomaticallyUsingCreditsButNoneLeft = () => {
+  const quota = {
+    limitReached: true,
+    current: 100,
+    max: 100,
+    resetsAt: Date.now() + 1000 * 60 * 60 * 24 * 2,
+  };
+
+  return (
+    <WrappedChatComponent
+      aiRequest={agentAiRequest}
+      quota={quota}
+      isAutoProcessingFunctionCalls={true}
+      authenticatedUser={{
+        ...defaultAuthenticatedUserWithNoSubscription,
+        limits: {
+          ...limitsForNoSubscriptionUser,
+          credits: {
+            userBalance: {
+              amount: 0,
+            },
+          },
+          quotas: {
+            'consumed-ai-credits': quota,
+          },
+        },
+      }}
+      automaticallyUseCreditsForAiRequests={false}
+      availableCredits={0}
+    />
+  );
+};

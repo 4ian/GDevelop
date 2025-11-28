@@ -26,12 +26,32 @@ import classes from './ChatMessages.module.css';
 import { DislikeFeedbackDialog } from './DislikeFeedbackDialog';
 import Text from '../../UI/Text';
 import AlertMessage from '../../UI/AlertMessage';
-import { ResponsiveLineStackLayout } from '../../UI/Layout';
+import {
+  ColumnStackLayout,
+  LineStackLayout,
+  ResponsiveLineStackLayout,
+} from '../../UI/Layout';
 import FlatButton from '../../UI/FlatButton';
 import { FeedbackBanner } from './FeedbackBanner';
 import Pause from '../../UI/CustomSvgIcons/Pause';
-import { getBackgroundColor } from '../../UI/Paper';
+import Paper, { getBackgroundColor } from '../../UI/Paper';
 import Play from '../../UI/CustomSvgIcons/Play';
+import SubscriptionPlanTableSummary from '../../Profile/Subscription/PromotionSubscriptionDialog/SubscriptionPlanTableSummary';
+import { SubscriptionContext } from '../../Profile/Subscription/SubscriptionContext';
+import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
+import { canUpgradeSubscription } from '../../Utils/GDevelopServices/Usage';
+import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
+import Coin from '../../Credits/Icons/Coin';
+import { CreditsPackageStoreContext } from '../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
+
+const styles = {
+  subscriptionPaper: {
+    paddingTop: 5,
+    paddingLeft: 16,
+    paddingRight: 16,
+    paddingBottom: 5,
+  },
+};
 
 const getMessageSuggestionsLines = ({
   aiRequest,
@@ -138,6 +158,9 @@ type Props = {|
   isForAnotherProject?: boolean,
   shouldDisplayFeedbackBanner?: boolean,
   onPause: (pause: boolean) => void,
+  onScrollToBottom: () => void,
+  hasStartedRequestButCannotContinue: boolean,
+  onSwitchedToGDevelopCredits: () => void,
 |};
 
 export const ChatMessages = React.memo<Props>(function ChatMessages({
@@ -153,8 +176,82 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
   isForAnotherProject,
   shouldDisplayFeedbackBanner,
   onPause,
+  onScrollToBottom,
+  hasStartedRequestButCannotContinue,
+  onSwitchedToGDevelopCredits,
 }: Props) {
   const theme = React.useContext(GDevelopThemeContext);
+  const {
+    getSubscriptionPlansWithPricingSystems,
+    openSubscriptionDialog,
+  } = React.useContext(SubscriptionContext);
+  const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
+  const { subscription, limits } = React.useContext(AuthenticatedUserContext);
+  const availableCredits = limits ? limits.credits.userBalance.amount : 0;
+  const quota =
+    (limits && limits.quotas && limits.quotas['consumed-ai-credits']) || null;
+  const hasReachedLimit = !!quota && quota.limitReached;
+
+  const {
+    values: { automaticallyUseCreditsForAiRequests },
+    setAutomaticallyUseCreditsForAiRequests,
+  } = React.useContext(PreferencesContext);
+
+  const { openCreditsPackageDialog } = React.useContext(
+    CreditsPackageStoreContext
+  );
+
+  const suggestedSubscriptionPlanWithPricingSystem = React.useMemo(
+    () => {
+      if (
+        !subscriptionPlansWithPricingSystems ||
+        subscriptionPlansWithPricingSystems.length === 0 ||
+        !hasReachedLimit ||
+        (subscription && !canUpgradeSubscription(subscription)) ||
+        !hasStartedRequestButCannotContinue
+      )
+        return null;
+
+      const goldPlan = subscriptionPlansWithPricingSystems.find(
+        plan => plan.id === 'gdevelop_gold'
+      );
+      const proPlan = subscriptionPlansWithPricingSystems.find(
+        plan => plan.id === 'gdevelop_startup'
+      );
+      return (
+        (subscription && subscription.planId === 'gdevelop_gold'
+          ? proPlan
+          : goldPlan) || subscriptionPlansWithPricingSystems[0]
+      );
+    },
+    [
+      subscriptionPlansWithPricingSystems,
+      subscription,
+      hasReachedLimit,
+      hasStartedRequestButCannotContinue,
+    ]
+  );
+
+  const shouldShowCreditsPrompt =
+    subscriptionPlansWithPricingSystems && // To ensure it's loaded.
+    hasReachedLimit &&
+    hasStartedRequestButCannotContinue;
+
+  React.useEffect(
+    () => {
+      if (
+        suggestedSubscriptionPlanWithPricingSystem ||
+        shouldShowCreditsPrompt
+      ) {
+        onScrollToBottom();
+      }
+    },
+    [
+      suggestedSubscriptionPlanWithPricingSystem,
+      shouldShowCreditsPrompt,
+      onScrollToBottom,
+    ]
+  );
 
   const lastMessageIndex = aiRequest.output.length - 1;
   const lastMessageFeedbackBanner = shouldDisplayFeedbackBanner && (
@@ -482,6 +579,115 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
           </div>
         </Line>
       ) : null}
+
+      {suggestedSubscriptionPlanWithPricingSystem && (
+        <Line justifyContent="center">
+          <Paper background="medium" style={styles.subscriptionPaper}>
+            <ColumnStackLayout noMargin>
+              <Text size="sub-title">
+                <Trans>
+                  You don't have enough AI credits to continue this
+                  conversation.
+                </Trans>
+              </Text>
+              <Text>
+                {!!subscription ? (
+                  <Trans>
+                    Upgrade your Premium subscription to have more AI requests
+                    and GDevelop coins to unlock the engine's extra benefits.
+                  </Trans>
+                ) : (
+                  <Trans>
+                    Get a Premium subscription to have more AI requests and
+                    GDevelop coins to unlock the engine's extra benefits.
+                  </Trans>
+                )}
+              </Text>
+              <SubscriptionPlanTableSummary
+                subscriptionPlanWithPricingSystems={
+                  suggestedSubscriptionPlanWithPricingSystem
+                }
+                displayedFeatures={['AI_PROTOTYPING', 'FREE_CREDITS']}
+                hideFullTableLink
+                actionLabel={<Trans>Upgrade</Trans>}
+              />
+            </ColumnStackLayout>
+          </Paper>
+        </Line>
+      )}
+
+      {shouldShowCreditsPrompt && (
+        <Line justifyContent="center">
+          <Paper background="medium" style={styles.subscriptionPaper}>
+            <ColumnStackLayout noMargin>
+              <LineStackLayout alignItems="center" noMargin>
+                <Coin />
+                <Text size="sub-title">
+                  <Trans>You can switch to GDevelop credits.</Trans>
+                </Text>
+              </LineStackLayout>
+              <Text>
+                {availableCredits > 0 ? (
+                  <Trans>
+                    You still have {availableCredits} credits you can use for AI
+                    requests.
+                  </Trans>
+                ) : (
+                  <Trans>
+                    You don't have any credits left. You can purchase GDevelop
+                    credits to continue making AI requests.
+                  </Trans>
+                )}
+              </Text>
+              <Line noMargin>
+                <Text size="sub-title">
+                  <Trans>What would you like to do next?</Trans>
+                </Text>
+              </Line>
+              <FlatButton
+                color="ai"
+                onClick={() => {
+                  openSubscriptionDialog({
+                    analyticsMetadata: {
+                      reason: 'AI requests (subscribe)',
+                      recommendedPlanId: suggestedSubscriptionPlanWithPricingSystem
+                        ? suggestedSubscriptionPlanWithPricingSystem.id
+                        : 'gdevelop_gold',
+                      placementId: 'ai-requests',
+                    },
+                  });
+                }}
+                label={<Trans>See subscriptions</Trans>}
+              />
+              {availableCredits > 0 ? (
+                <FlatButton
+                  color="ai"
+                  onClick={() => {
+                    setAutomaticallyUseCreditsForAiRequests(true);
+                    onSwitchedToGDevelopCredits();
+                  }}
+                  label={
+                    automaticallyUseCreditsForAiRequests ? (
+                      <Trans>Using GDevelop Credits</Trans>
+                    ) : (
+                      <Trans>Switch to GDevelop Credits</Trans>
+                    )
+                  }
+                  disabled={automaticallyUseCreditsForAiRequests}
+                />
+              ) : (
+                <FlatButton
+                  color="ai"
+                  onClick={openCreditsPackageDialog}
+                  label={<Trans>Get more credits</Trans>}
+                  disabled={false}
+                />
+              )}
+            </ColumnStackLayout>
+          </Paper>
+        </Line>
+      )}
+
       {dislikeFeedbackDialogOpenedFor && (
         <DislikeFeedbackDialog
           mode={aiRequest.mode || 'chat'}

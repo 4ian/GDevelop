@@ -28,7 +28,6 @@ import {
   hasValidSubscriptionPlan,
 } from '../Utils/GDevelopServices/Usage';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
-import { CreditsPackageStoreContext } from '../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import { type EditorCallbacks } from '../EditorFunctions';
 import {
   getFunctionCallOutputsFromEditorFunctionCallResults,
@@ -56,7 +55,6 @@ import {
   type HotReloadSteps,
 } from '../EmbeddedGame/EmbeddedGameFrame';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
-import { SubscriptionContext } from '../Profile/Subscription/SubscriptionContext';
 import {
   useAiRequestState,
   type OpenAskAiOptions,
@@ -65,6 +63,7 @@ import {
   AI_AGENT_TOOLS_VERSION,
   AI_CHAT_TOOLS_VERSION,
 } from './Utils';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -319,9 +318,9 @@ export const AskAiEditor = React.memo<Props>(
         null
       );
 
-      const { openCreditsPackageDialog } = React.useContext(
-        CreditsPackageStoreContext
-      );
+      const {
+        values: { automaticallyUseCreditsForAiRequests },
+      } = React.useContext(PreferencesContext);
 
       const authenticatedUser = React.useContext(AuthenticatedUserContext);
       const {
@@ -332,7 +331,6 @@ export const AskAiEditor = React.memo<Props>(
         onRefreshLimits,
         subscription,
       } = authenticatedUser;
-      const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
 
       const availableCredits = limits ? limits.credits.userBalance.amount : 0;
       const quota =
@@ -384,22 +382,13 @@ export const AskAiEditor = React.memo<Props>(
             let payWithCredits = false;
             if (quota && quota.limitReached && aiRequestPriceInCredits) {
               payWithCredits = true;
-              if (availableCredits < aiRequestPriceInCredits) {
-                // Not enough credits.
-                if (!hasValidSubscriptionPlan(subscription)) {
-                  // User is not subscribed, suggest them to subscribe.
-                  openSubscriptionDialog({
-                    analyticsMetadata: {
-                      reason: 'AI requests (subscribe)',
-                      recommendedPlanId: 'gdevelop_gold',
-                      placementId: 'ai-requests',
-                    },
-                  });
-                  return;
-                }
-                openCreditsPackageDialog({
-                  missingCredits: aiRequestPriceInCredits - availableCredits,
-                });
+              const doesNotHaveEnoughCreditsToContinue =
+                availableCredits < aiRequestPriceInCredits;
+              const cannotContinue =
+                !automaticallyUseCreditsForAiRequests ||
+                doesNotHaveEnoughCreditsToContinue;
+
+              if (cannotContinue) {
                 return;
               }
             }
@@ -502,7 +491,6 @@ export const AskAiEditor = React.memo<Props>(
           getAuthorizationHeader,
           onOpenCreateAccountDialog,
           onRefreshLimits,
-          openCreditsPackageDialog,
           profile,
           project,
           fileMetadata,
@@ -516,8 +504,7 @@ export const AskAiEditor = React.memo<Props>(
           upToDateSelectedAiRequestId,
           updateAiRequest,
           newAiRequestOptions,
-          subscription,
-          openSubscriptionDialog,
+          automaticallyUseCreditsForAiRequests,
         ]
       );
 
@@ -574,23 +561,13 @@ export const AskAiEditor = React.memo<Props>(
             aiRequestPriceInCredits
           ) {
             payWithCredits = true;
-            if (availableCredits < aiRequestPriceInCredits) {
-              // Not enough credits.
-              if (!hasValidSubscriptionPlan(subscription)) {
-                // User is not subscribed, suggest them to subscribe.
-                openSubscriptionDialog({
-                  analyticsMetadata: {
-                    reason: 'AI requests (subscribe)',
-                    recommendedPlanId: 'gdevelop_gold',
-                    placementId: 'ai-requests',
-                  },
-                });
-                return;
-              }
+            const doesNotHaveEnoughCreditsToContinue =
+              availableCredits < aiRequestPriceInCredits;
+            const cannotContinue =
+              !automaticallyUseCreditsForAiRequests ||
+              doesNotHaveEnoughCreditsToContinue;
 
-              openCreditsPackageDialog({
-                missingCredits: aiRequestPriceInCredits - availableCredits,
-              });
+            if (cannotContinue) {
               return;
             }
           }
@@ -675,15 +652,15 @@ export const AskAiEditor = React.memo<Props>(
               aiRequestChatRefCurrent.resetUserInput('');
               aiRequestChatRefCurrent.resetUserInput(selectedAiRequestId);
             }
+          }
 
-            // Refresh the user limits, to ensure quota and credits information
-            // is up-to-date after an AI request.
-            await delay(500);
-            try {
-              await retryIfFailed({ times: 2 }, onRefreshLimits);
-            } catch (error) {
-              // Ignore limits refresh error.
-            }
+          // Refresh the user limits, to ensure quota and credits information
+          // is up-to-date after an AI request.
+          await delay(500);
+          try {
+            await retryIfFailed({ times: 2 }, onRefreshLimits);
+          } catch (error) {
+            // Ignore limits refresh error.
           }
 
           if (
@@ -707,7 +684,6 @@ export const AskAiEditor = React.memo<Props>(
           quota,
           aiRequestPriceInCredits,
           availableCredits,
-          openCreditsPackageDialog,
           setSendingAiRequest,
           updateAiRequest,
           clearEditorFunctionCallResults,
@@ -716,9 +692,8 @@ export const AskAiEditor = React.memo<Props>(
           onRefreshLimits,
           project,
           onOpenLayout,
-          subscription,
-          openSubscriptionDialog,
           selectedAiRequest,
+          automaticallyUseCreditsForAiRequests,
         ]
       );
       const onSendEditorFunctionCallResults = React.useCallback(

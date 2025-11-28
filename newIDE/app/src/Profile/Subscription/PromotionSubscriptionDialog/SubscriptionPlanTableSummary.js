@@ -43,12 +43,12 @@ const SubscriptionPlanTableSummary = ({
   subscriptionPlanWithPricingSystems,
   displayedFeatures,
   hideFullTableLink,
-  showChooseAction,
+  actionLabel,
 }: {|
   subscriptionPlanWithPricingSystems: SubscriptionPlanWithPricingSystems,
   displayedFeatures?: Array<string>,
   hideFullTableLink?: boolean,
-  showChooseAction?: boolean,
+  actionLabel?: React.Node,
 |}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
@@ -129,12 +129,12 @@ const SubscriptionPlanTableSummary = ({
                 </div>
               </Column>
             ))}
-          {showChooseAction && (
+          {actionLabel && (
             <Line alignItems="center" justifyContent="flex-end">
               <div style={styles.tableRightItemContainer}>
                 <RaisedButton
                   color="premium"
-                  label={<Trans>Choose</Trans>}
+                  label={actionLabel}
                   onClick={() => {
                     openSubscriptionDialog({
                       analyticsMetadata: {

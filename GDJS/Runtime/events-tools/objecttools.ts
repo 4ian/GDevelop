@@ -414,7 +414,7 @@ namespace gdjs {
         objectsLists: ObjectsLists,
         x: float,
         y: float,
-        inverted?: boolean | undefined
+        inverted: boolean = false
       ) {
         let bestObject = null;
         let best = 0;
@@ -426,7 +426,7 @@ namespace gdjs {
           for (let j = 0; j < list.length; ++j) {
             const object = list[j];
             const distance = object.getSqDistanceToPosition(x, y);
-            if (first || distance < best !== inverted) {
+            if (first || distance < best !== !!inverted) {
               best = distance;
               bestObject = object;
             }

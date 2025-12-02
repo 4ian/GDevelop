@@ -84,6 +84,7 @@ const PreferencesDialog = ({
     setPreviewCrashReportUploadLevel,
     setTakeScreenshotOnPreview,
     setShowAiAskButtonInTitleBar,
+    setAutomaticallyUseCreditsForAiRequests,
     setShowCreateSectionByDefault,
     setShowGameEditorToggle,
   } = React.useContext(PreferencesContext);
@@ -554,6 +555,15 @@ const PreferencesDialog = ({
                   onCheck={setShowAiAskButtonInTitleBar}
                   checked={values.showAiAskButtonInTitleBar}
                   label={i18n._(t`Show "Ask AI" button in the title bar`)}
+                />
+                <CompactToggleField
+                  labelColor="primary"
+                  hideTooltip
+                  onCheck={setAutomaticallyUseCreditsForAiRequests}
+                  checked={values.automaticallyUseCreditsForAiRequests}
+                  label={i18n._(
+                    t`Automatically use GDevelop credits for AI requests when run out of AI credits`
+                  )}
                 />
                 <CompactToggleField
                   labelColor="primary"

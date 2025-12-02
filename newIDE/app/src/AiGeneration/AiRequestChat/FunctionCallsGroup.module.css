@@ -18,7 +18,6 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  margin-bottom: 8px;
 }
 
 .header {

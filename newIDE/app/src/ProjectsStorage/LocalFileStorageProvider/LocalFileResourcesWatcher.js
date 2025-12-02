@@ -48,6 +48,9 @@ export const setupResourcesWatcher =
           // never ending.
           debouncedCallback(path);
         });
+
+        // Note: this ignore list is not a list of glob. Any file that matches a string in this list will be ignored.
+        // This could be improved to separate this in a list of paths, filenames, etc.
         const ignore = [
           path.sep + '.DS_Store', // macOS folder attributes file
           path.sep + '.git', // For projects using git as a versioning tool.
@@ -58,7 +61,7 @@ export const setupResourcesWatcher =
         if (options && options.isProjectSplitInMultipleFiles) {
           ignore.push(
             ...splittedProjectFolderNames.map(folderName =>
-              path.join(folderPath, folderName, '*.json')
+              path.join(folderPath, folderName)
             )
           );
         }

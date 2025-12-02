@@ -10,24 +10,35 @@ const getNewSubscriptionId = () => {
   return id.toString();
 };
 
+const normalizePath = path => {
+  if (!path) return ''; // Safety check
+
+  return path.replace(/\\/g, '/');
+};
+
 const setupWatcher = (folderPath, fileWiseCallback, serializedOptions) => {
   const options = JSON.parse(serializedOptions);
   const newSubscriptionId = getNewSubscriptionId();
   const watcher = fileWatcher
     .watch(folderPath, {
       ignored: candidatePath => {
+        // Normalize the path to avoid issues with different path separators (\ on Windows, / on other OSes).
+        // Even on Windows, "candidatePath" returned by chokidar is always using "/".
+        // So we normalize all paths (candidatePath and ignore paths) to avoid missing ignored files on Windows.
+        const normalizedCandidatePath = normalizePath(candidatePath);
+
         if (
           (options.ignore || []).some(ignore =>
-            candidatePath.includes(ignore)
+            normalizedCandidatePath.includes(normalizePath(ignore))
           ) ||
           // Force ignore, for safety, any node_modules folder as they are too big and would crash the watcher on macOS.
           // Note that this will ignore any folder whose name is prefixed by "node_modules".
-          candidatePath.includes(path.sep + 'node_modules') ||
+          normalizedCandidatePath.includes('/node_modules') ||
           // Same for git repositories (and any file starting by ".git").
-          candidatePath.includes(path.sep + '.git')
+          normalizedCandidatePath.includes('/.git')
         ) {
           console.info(
-            `Local file watcher has ignored path "${candidatePath}".`
+            `Local file watcher has ignored path "${normalizedCandidatePath}".`
           );
           return true;
         }

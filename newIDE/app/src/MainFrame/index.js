@@ -2182,9 +2182,11 @@ const MainFrame = (props: Props) => {
         ? previewState.overridenPreviewExternalLayoutName
         : previewState.previewExternalLayoutName;
 
-      autosaveProjectIfNeeded().catch(err => {
-        console.error('Error while auto-saving the project. Ignoring.', err);
-      });
+      if (!isForInGameEdition) {
+        autosaveProjectIfNeeded().catch(err => {
+          console.error('Error while auto-saving the project. Ignoring.', err);
+        });
+      }
 
       // Note that in the future, this kind of checks could be done
       // and stored in a "diagnostic report", rather than hiding errors
@@ -2198,11 +2200,12 @@ const MainFrame = (props: Props) => {
           }
         : null;
 
-      const authenticatedPlayer = await getAuthenticatedPlayerForPreview();
-
-      const captureOptions = await createCaptureOptionsForPreview(
-        launchCaptureOptions
-      );
+      const [authenticatedPlayer, captureOptions] = await Promise.all([
+        isForInGameEdition ? null : getAuthenticatedPlayerForPreview(),
+        isForInGameEdition
+          ? null
+          : createCaptureOptionsForPreview(launchCaptureOptions),
+      ]);
 
       try {
         await eventsFunctionsExtensionsState.ensureLoadFinished();

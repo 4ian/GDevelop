@@ -308,34 +308,20 @@ export default class AuthenticatedUserProvider extends React.Component<
     try {
       const firebaseUser = await authentication.getFirebaseUser();
       if (!firebaseUser) {
-        if (this._notificationPollingIntervalId) {
-          clearInterval(this._notificationPollingIntervalId);
-          this._notificationPollingIntervalId = null;
-        }
-        this.setState(({ authenticatedUser }) => ({
-          authenticatedUser: {
-            ...authenticatedUser,
-            authenticated: false,
-            profile: null,
-            usages: null,
-            userEarningsBalance: null,
-            limits: null,
-            subscription: null,
-          },
-        }));
+        this._markAuthenticatedUserAsLoggedOut();
         return null;
       }
 
       this.setState(({ authenticatedUser }) => ({
         authenticatedUser: {
           ...authenticatedUser,
-          authenticated: true,
           firebaseUser,
         },
       }));
       return firebaseUser;
     } catch (error) {
       console.error('Unable to fetch the authenticated Firebase user:', error);
+      this._markAuthenticatedUserAsLoggedOut();
       throw error;
     }
   };
@@ -394,12 +380,10 @@ export default class AuthenticatedUserProvider extends React.Component<
       firebaseUser = await this._reloadFirebaseProfile();
       if (!firebaseUser) {
         console.info('User is not authenticated.');
-        this._markAuthenticatedUserAsLoggedOut();
         return;
       }
     } catch (error) {
       console.error('Unable to fetch the authenticated Firebase user:', error);
-      this._markAuthenticatedUserAsLoggedOut();
       throw error;
     }
 
@@ -672,7 +656,10 @@ export default class AuthenticatedUserProvider extends React.Component<
         authenticatedUser: {
           ...authenticatedUser,
           profile: userProfile,
+          // Make sure we set loginState and authenticated at the same time,
+          // in case we read both values from the state in the app.
           loginState: 'done',
+          authenticated: true,
         },
       }),
       () => {

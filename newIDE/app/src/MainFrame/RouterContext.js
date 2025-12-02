@@ -6,6 +6,7 @@ export type Route =
   | 'onboarding' // For compatibility when there was only one tutorial.
   | 'guided-lesson' // New way of opening a tutorial.
   | 'signup'
+  | 'profile'
   | 'subscription'
   | 'games-dashboard'
   | 'asset-store' // For compatibility when there was only asset packs.
@@ -16,7 +17,8 @@ export type Route =
   | 'learn'
   | 'play'
   | 'standalone'
-  | 'ask-ai';
+  | 'ask-ai'
+  | 'credits-purchase';
 type RouteKey =
   | 'initial-dialog'
   | 'game-id'

@@ -228,6 +228,7 @@ export interface UserEarningsBalance {
 }
 
 export type SummarizedPlanFeature = {|
+  featureName: string,
   displayedFeatureName: string,
   description?: string,
   tooltip?: string,
@@ -673,6 +674,7 @@ export function getSummarizedSubscriptionPlanFeatures(
     }
 
     planFeature = {
+      featureName: feature.featureName,
       displayedFeatureName: selectMessageByLocale(i18n, featureNameByLocale),
     };
 

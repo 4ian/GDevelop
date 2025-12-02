@@ -366,6 +366,9 @@ export const client = axios.create({
   baseURL: GDevelopAssetApi.baseUrl,
 });
 
+// Separate client for fetching static JSON files from the CDN
+export const cdnClient = axios.create();
+
 export const isAssetPackAudioOnly = (assetPack: PrivateAssetPack): boolean => {
   const contentKeys = Object.keys(assetPack.content);
   return contentKeys.length === 1 && contentKeys[0] === 'audio';
@@ -401,15 +404,15 @@ export const listAllPublicAssets = async ({
   }
 
   const responsesData = await Promise.all([
-    client
+    cdnClient
       .get(assetShortHeadersUrl)
       .then(response => response.data)
       .catch(e => e),
-    client
+    cdnClient
       .get(filtersUrl)
       .then(response => response.data)
       .catch(e => e),
-    client
+    cdnClient
       .get(assetPacksUrl)
       .then(response => response.data)
       .catch(e => e),
@@ -440,7 +443,7 @@ export const getPublicAsset = async (
   assetShortHeader: AssetShortHeader,
   { environment }: {| environment: Environment |}
 ): Promise<Asset> => {
-  const assetResponse = await client.get(
+  const assetResponse = await cdnClient.get(
     `${GDevelopAssetCdn.baseUrl[environment]}/assets/${
       assetShortHeader.id
     }.json`

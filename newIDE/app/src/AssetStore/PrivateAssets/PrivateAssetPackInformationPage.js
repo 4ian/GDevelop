@@ -58,7 +58,7 @@ import SecureCheckout from '../SecureCheckout/SecureCheckout';
 import ProductLicenseOptions from '../ProductLicense/ProductLicenseOptions';
 import HelpIcon from '../../UI/HelpIcon';
 import Avatar from '@material-ui/core/Avatar';
-import { SubscriptionSuggestionContext } from '../../Profile/Subscription/SubscriptionSuggestionContext';
+import { SubscriptionContext } from '../../Profile/Subscription/SubscriptionContext';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import PasswordPromptDialog from '../PasswordPromptDialog';
 import Window from '../../Utils/Window';
@@ -210,9 +210,7 @@ const PrivateAssetPackInformationPage = ({
     purchasingPrivateAssetPackListingData,
     setPurchasingPrivateAssetPackListingData,
   ] = React.useState<?PrivateAssetPackListingData>(null);
-  const { openSubscriptionDialog } = React.useContext(
-    SubscriptionSuggestionContext
-  );
+  const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
   const [assetPack, setAssetPack] = React.useState<?PrivateAssetPack>(null);
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
   const [isRedeemingProduct, setIsRedeemingProduct] = React.useState<boolean>(

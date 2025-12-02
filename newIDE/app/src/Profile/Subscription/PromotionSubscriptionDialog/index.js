@@ -24,16 +24,14 @@ import AlertMessage from '../../../UI/AlertMessage';
 
 type Props = {|
   onClose: Function,
-  getAvailableSubscriptionPlansWithPrices: () =>
-    | SubscriptionPlanWithPricingSystems[]
-    | null,
+  availableSubscriptionPlansWithPrices: ?(SubscriptionPlanWithPricingSystems[]),
   recommendedPlanId: string,
   onOpenPendingDialog: (open: boolean) => void,
 |};
 
 export default function PromotionSubscriptionDialog({
   onClose,
-  getAvailableSubscriptionPlansWithPrices,
+  availableSubscriptionPlansWithPrices,
   recommendedPlanId,
   onOpenPendingDialog,
 }: Props) {
@@ -81,18 +79,16 @@ export default function PromotionSubscriptionDialog({
     );
   };
 
-  const subscriptionPlansWithPricingSystems = getAvailableSubscriptionPlansWithPrices();
-
   const purchasablePlansWithPricingSystems = React.useMemo(
     () =>
-      subscriptionPlansWithPricingSystems
-        ? subscriptionPlansWithPricingSystems.filter(
+      availableSubscriptionPlansWithPrices
+        ? availableSubscriptionPlansWithPrices.filter(
             subscriptionPlanWithPricingSystems =>
               // Hide free plan
               subscriptionPlanWithPricingSystems.pricingSystems.length > 0
           )
         : null,
-    [subscriptionPlansWithPricingSystems]
+    [availableSubscriptionPlansWithPrices]
   );
 
   // If the recommended plan is not available, select the first plan.
@@ -202,7 +198,7 @@ export default function PromotionSubscriptionDialog({
                     </Column>
                     {getPlanSpecificRequirements(
                       i18n,
-                      subscriptionPlansWithPricingSystems
+                      availableSubscriptionPlansWithPrices
                     ).map(planSpecificRequirements => (
                       <AlertMessage
                         kind="info"

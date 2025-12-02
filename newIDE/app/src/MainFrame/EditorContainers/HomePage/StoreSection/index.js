@@ -11,7 +11,6 @@ import AssetPackInstallDialog from '../../../../AssetStore/AssetPackInstallDialo
 import { enumerateAssetStoreIds } from '../../../../AssetStore/EnumerateAssetStoreIds';
 import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopServices/Shop';
 import { type Course } from '../../../../Utils/GDevelopServices/Asset';
-import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import { getAssetShortHeadersToDisplay } from '../../../../AssetStore/AssetsList';
 import { AssetStoreNavigatorContext } from '../../../../AssetStore/AssetStoreNavigator';
@@ -26,7 +25,6 @@ type Props = {|
   onOpenProfile: () => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
-  getSubscriptionPlansWithPricingSystems: () => Array<SubscriptionPlanWithPricingSystems> | null,
   onCourseOpen: (courseId: string) => void,
   courses?: ?Array<Course>,
   getCourseCompletion: (courseId: string) => CourseCompletion | null,
@@ -41,7 +39,6 @@ const StoreSection = ({
   onExtensionInstalled,
   onCourseOpen,
   courses,
-  getSubscriptionPlansWithPricingSystems,
   getCourseCompletion,
 }: Props) => {
   const [
@@ -99,9 +96,6 @@ const StoreSection = ({
         onOpenProfile={onOpenProfile}
         courses={courses}
         onCourseOpen={onCourseOpen}
-        getSubscriptionPlansWithPricingSystems={
-          getSubscriptionPlansWithPricingSystems
-        }
         getCourseCompletion={getCourseCompletion}
       />
       {(openedAssetPack || openedAssetShortHeader) && (

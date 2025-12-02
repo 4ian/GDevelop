@@ -63,7 +63,7 @@ export type PreviewOptions = {|
   editorId: string,
   getIsMenuBarHiddenInPreview: () => boolean,
   getIsAlwaysOnTopInPreview: () => boolean,
-  captureOptions: CaptureOptions,
+  captureOptions: CaptureOptions | null,
   onCaptureFinished: CaptureOptions => Promise<void>,
   inAppTutorialMessageInPreview: string,
   inAppTutorialMessagePositionInPreview: string,

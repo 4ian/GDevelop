@@ -194,7 +194,10 @@ export default class BrowserS3PreviewLauncher extends React.Component<
           previewOptions.authenticatedPlayer.playerToken
         );
       }
-      if (previewOptions.captureOptions.screenshots) {
+      if (
+        previewOptions.captureOptions &&
+        previewOptions.captureOptions.screenshots
+      ) {
         previewOptions.captureOptions.screenshots.forEach(screenshot => {
           previewExportOptions.addScreenshotCapture(
             screenshot.delayTimeInSeconds,

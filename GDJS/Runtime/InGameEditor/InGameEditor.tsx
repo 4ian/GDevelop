@@ -790,6 +790,7 @@ namespace gdjs {
     private _editedInstanceContainer: gdjs.RuntimeInstanceContainer | null =
       null;
     private _editedInstanceDataList: InstanceData[] = [];
+    private _editedLayerDataList: LayerData[] = [];
     private _selectedLayerName: string = '';
     private _innerArea: AABB3D | null = null;
     private _threeInnerArea: THREE.Object3D | null = null;
@@ -1019,6 +1020,10 @@ namespace gdjs {
       return this._editedInstanceDataList;
     }
 
+    getEditedLayerDataList(): LayerData[] {
+      return this._editedLayerDataList;
+    }
+
     getEditedInstanceContainer(): gdjs.RuntimeInstanceContainer | null {
       return this._editedInstanceContainer;
     }
@@ -1085,6 +1090,7 @@ namespace gdjs {
         .map((object) => object.persistentUuid)
         .filter(Boolean) as Array<string>;
 
+      let editedLayerDataList: Array<LayerData> = [];
       let editedInstanceDataList: Array<InstanceData> = [];
       if (eventsBasedObjectType) {
         const eventsBasedObjectVariantData =
@@ -1093,6 +1099,7 @@ namespace gdjs {
             eventsBasedObjectVariantName || ''
           );
         if (eventsBasedObjectVariantData) {
+          editedLayerDataList = eventsBasedObjectVariantData.layers;
           editedInstanceDataList = eventsBasedObjectVariantData.instances;
           await this._runtimeGame._resourcesLoader.loadResources(
             eventsBasedObjectVariantData.usedResources.map(
@@ -1154,6 +1161,9 @@ namespace gdjs {
         }
         this._currentScene = newScene;
         this._editedInstanceContainer = newScene;
+        if (sceneAndExtensionsData) {
+          editedLayerDataList = sceneAndExtensionsData.sceneData.layers;
+        }
         if (externalLayoutName) {
           const externalLayoutData =
             this._runtimeGame.getExternalLayoutData(externalLayoutName);
@@ -1171,6 +1181,7 @@ namespace gdjs {
         console.warn('eventsBasedObjectType or sceneName must be set.');
       }
       this._editedInstanceDataList = editedInstanceDataList;
+      this._editedLayerDataList = editedLayerDataList;
       this._editorId = editorId || '';
       if (editorCamera3D) {
         this.restoreCameraState(editorCamera3D);

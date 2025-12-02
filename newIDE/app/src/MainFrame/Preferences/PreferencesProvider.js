@@ -205,7 +205,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setAutomaticallyUseCreditsForAiRequests: this._setAutomaticallyUseCreditsForAiRequests.bind(
       this
     ),
-    setShowGameEditorToggle: this._setShowGameEditorToggle.bind(this),
+    setHasSeenInGameEditorWarning: this._setHasSeenInGameEditorWarning.bind(
+      this
+    ),
   };
 
   componentDidMount() {
@@ -996,12 +998,12 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _setShowGameEditorToggle(newValue: boolean) {
+  _setHasSeenInGameEditorWarning(newValue: boolean) {
     this.setState(
       state => ({
         values: {
           ...state.values,
-          showGameEditorToggle: newValue,
+          hasSeenInGameEditorWarning: newValue,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

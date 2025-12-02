@@ -30,6 +30,7 @@ import CompactToggleButtons from '../../UI/CompactToggleButtons';
 import Grid2d from '../../UI/CustomSvgIcons/Grid2d';
 import Grid3d from '../../UI/CustomSvgIcons/Grid3d';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
+import { InGameEditorWarningDialog } from './InGameEditorWarningDialog';
 
 type Props = {|
   gameEditorMode: 'embedded-game' | 'instances-editor',
@@ -63,7 +64,10 @@ type Props = {|
 |};
 
 const Toolbar = React.memo<Props>(function Toolbar(props) {
-  const { values } = React.useContext(PreferencesContext);
+  const { values, setHasSeenInGameEditorWarning } = React.useContext(
+    PreferencesContext
+  );
+  const [showWarningDialog, setShowWarningDialog] = React.useState(false);
 
   return (
     <>
@@ -85,35 +89,36 @@ const Toolbar = React.memo<Props>(function Toolbar(props) {
         onOpenSceneVariables={props.onOpenSceneVariables}
       />
       <ToolbarGroup lastChild>
-        {values.showGameEditorToggle && (
-          <CompactToggleButtons
-            id="game-editor-toggle"
-            noSeparator
-            buttons={[
-              {
-                id: '2d-instances-editor',
-                renderIcon: className => <Grid2d className={className} />,
-                tooltip: <Trans>Top-down, classic editor</Trans>,
-                label: '2D',
-                onClick: () => {
-                  props.setGameEditorMode('instances-editor');
-                },
-                isActive: props.gameEditorMode === 'instances-editor',
+        <CompactToggleButtons
+          id="game-editor-toggle"
+          noSeparator
+          buttons={[
+            {
+              id: '2d-instances-editor',
+              renderIcon: className => <Grid2d className={className} />,
+              tooltip: <Trans>Top-down, classic editor</Trans>,
+              label: '2D',
+              onClick: () => {
+                props.setGameEditorMode('instances-editor');
               },
-              {
-                id: '3d-game-editor',
-                renderIcon: className => <Grid3d className={className} />,
-                tooltip: <Trans>3D, real-time editor</Trans>,
-                label: '3D',
-                onClick: () => {
-                  props.setGameEditorMode('embedded-game');
-                },
-                isActive: props.gameEditorMode === 'embedded-game',
+              isActive: props.gameEditorMode === 'instances-editor',
+            },
+            {
+              id: '3d-game-editor',
+              renderIcon: className => <Grid3d className={className} />,
+              tooltip: <Trans>3D, real-time editor (new)</Trans>,
+              label: '3D',
+              onClick: () => {
+                if (!values.hasSeenInGameEditorWarning) {
+                  setShowWarningDialog(true);
+                }
+                props.setGameEditorMode('embedded-game');
               },
-            ]}
-          />
-        )}
-        {values.showGameEditorToggle && <ToolbarSeparator />}
+              isActive: props.gameEditorMode === 'embedded-game',
+            },
+          ]}
+        />
+        <ToolbarSeparator />
         <IconButton
           size="small"
           color="default"
@@ -277,6 +282,14 @@ const Toolbar = React.memo<Props>(function Toolbar(props) {
           </IconButton>
         )}
       </ToolbarGroup>
+      {showWarningDialog && (
+        <InGameEditorWarningDialog
+          onClose={() => {
+            setShowWarningDialog(false);
+            setHasSeenInGameEditorWarning(true);
+          }}
+        />
+      )}
     </>
   );
 });

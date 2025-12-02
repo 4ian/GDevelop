@@ -230,7 +230,7 @@ export type PreferencesValues = {|
   showAiAskButtonInTitleBar: boolean,
   aiState: {| aiRequestId: string | null, mode: 'chat' | 'agent' |},
   automaticallyUseCreditsForAiRequests: boolean,
-  showGameEditorToggle: boolean,
+  hasSeenInGameEditorWarning: boolean,
 |};
 
 /**
@@ -343,7 +343,7 @@ export type Preferences = {|
     mode: 'chat' | 'agent',
   |}) => void,
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => void,
-  setShowGameEditorToggle: (enabled: boolean) => void,
+  setHasSeenInGameEditorWarning: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -405,7 +405,7 @@ export const initialPreferences = {
     showAiAskButtonInTitleBar: true,
     aiState: { aiRequestId: null, mode: 'agent' },
     automaticallyUseCreditsForAiRequests: false,
-    showGameEditorToggle: false,
+    hasSeenInGameEditorWarning: false,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -491,7 +491,7 @@ export const initialPreferences = {
     mode: 'chat' | 'agent',
   |}) => {},
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => {},
-  setShowGameEditorToggle: (enabled: boolean) => {},
+  setHasSeenInGameEditorWarning: (enabled: boolean) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

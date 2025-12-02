@@ -1323,27 +1323,16 @@ namespace gdjs {
 
     hotReloadRuntimeSceneLayers(
       newLayers: LayerData[],
+      oldLayers: LayerData[],
       runtimeInstanceContainer: gdjs.RuntimeInstanceContainer
     ): void {
-      const layerNames = [];
-      runtimeInstanceContainer.getAllLayerNames(layerNames);
-      const oldLayers = layerNames.map((layerName) =>
-        runtimeInstanceContainer.hasLayer(layerName)
-          ? runtimeInstanceContainer.getLayer(layerName)._initialLayerData
-          : null
-      );
       this._hotReloadRuntimeSceneLayers(
         oldLayers.filter(Boolean) as LayerData[],
         newLayers,
         runtimeInstanceContainer
       );
       // Update the GameData
-      for (let index = 0; index < newLayers.length; index++) {
-        const oldLayer = oldLayers[index];
-        if (oldLayer) {
-          HotReloader.assignOrDelete(oldLayer, newLayers[index]);
-        }
-      }
+      gdjs.copyArray(newLayers, oldLayers);
     }
 
     _hotReloadRuntimeSceneLayers(

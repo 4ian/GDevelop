@@ -304,6 +304,7 @@ namespace gdjs {
           if (inGameEditor) {
             const editedInstanceContainer =
               inGameEditor.getEditedInstanceContainer();
+            const editedLayerDataList = inGameEditor.getEditedLayerDataList();
             if (editedInstanceContainer) {
               inGameEditor.onLayersDataChange(
                 data.payload.layers,
@@ -311,6 +312,7 @@ namespace gdjs {
               );
               that._hotReloader.hotReloadRuntimeSceneLayers(
                 data.payload.layers,
+                editedLayerDataList,
                 editedInstanceContainer
               );
               // Apply `areEffectsHidden` to all the layers of the project data.

@@ -152,6 +152,11 @@ export default class AuthenticatedUserProvider extends React.Component<
   >(listUserCloudProjects);
 
   async componentDidMount() {
+    // Wait for Firebase to complete its initial auth check before doing anything.
+    // This prevents a race condition where we check auth state before Firebase
+    // has finished initializing, causing us to incorrectly think the user is logged out.
+    await this.props.authentication.waitForInitialAuthCheck();
+
     this._initializeAuthenticatedUser();
 
     // Those callbacks are added a bit too late (after the authentication `hasAuthChanged` has already been triggered)
@@ -185,8 +190,9 @@ export default class AuthenticatedUserProvider extends React.Component<
       }
     });
 
-    // At startup, if the provider has mounted too late and the user is already logged in with Firebase,
-    // we fetch the user profile.
+    // At startup, check if the user is already logged in with Firebase.
+    // Note: We can now safely check this synchronously because we've waited for
+    // Firebase's initial auth check to complete above.
     if (this.props.authentication.getFirebaseUserSync()) {
       // The user is logged already: fetch its user profile (because the "user update"
       // won't trigger, as registered too late).

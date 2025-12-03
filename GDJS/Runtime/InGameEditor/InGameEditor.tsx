@@ -812,6 +812,8 @@ namespace gdjs {
       dummyThreeObject: THREE.Object3D;
       threeTransformControls: THREE_ADDONS.TransformControls;
     } | null = null;
+    private _transformControlsMode: 'translate' | 'rotate' | 'scale' =
+      'translate';
     private _editorGrid: EditorGrid;
     private _selectionControlsMovementTotalDelta: {
       translationX: float;
@@ -2091,20 +2093,14 @@ namespace gdjs {
       this._selectionBoxes.set(object, objectBoxHelper);
     }
 
-    private _getTransformControlsMode():
-      | 'translate'
-      | 'rotate'
-      | 'scale'
-      | null {
-      if (!this._selectionControls) {
-        return null;
-      }
-      return this._selectionControls.threeTransformControls.mode;
+    private _getTransformControlsMode(): 'translate' | 'rotate' | 'scale' {
+      return this._transformControlsMode;
     }
 
     private _setTransformControlsMode(
       mode: 'translate' | 'rotate' | 'scale'
     ): void {
+      this._transformControlsMode = mode;
       if (!this._selectionControls) {
         return;
       }
@@ -2124,22 +2120,17 @@ namespace gdjs {
         return;
       }
       dummyThreeObject.rotation.copy(threeObject.rotation);
-      if (threeTransformControls.mode === 'rotate') {
+      if (this._transformControlsMode === 'rotate') {
         dummyThreeObject.rotation.y = -dummyThreeObject.rotation.y;
         dummyThreeObject.rotation.z = -dummyThreeObject.rotation.z;
       }
     }
 
     private _forceUpdateSelectionControls() {
-      let mode: 'translate' | 'rotate' | 'scale' | null = null;
       if (this._selectionControls) {
-        mode = this._selectionControls.threeTransformControls.mode;
         this._removeSelectionControls();
       }
       this._updateSelectionControls();
-      if (mode && this._selectionControls) {
-        this._setTransformControlsMode(mode);
-      }
     }
 
     private _updateSelectionControls() {
@@ -2212,6 +2203,7 @@ namespace gdjs {
 
             threeTransformControls.rotation.order = 'ZYX';
             threeTransformControls.scale.y = -1;
+            threeTransformControls.mode = this._transformControlsMode;
             threeTransformControls.traverse((obj) => {
               // To be detected correctly by OutlinePass.
               // @ts-ignore
@@ -2267,7 +2259,7 @@ namespace gdjs {
               let translationZ =
                 dummyThreeObject.position.z - initialDummyPosition.z;
               if (
-                threeTransformControls.mode === 'translate' &&
+                this._transformControlsMode === 'translate' &&
                 threeTransformControls.axis
               ) {
                 if (threeTransformControls.axis === 'XYZ') {
@@ -2428,7 +2420,7 @@ namespace gdjs {
           this._editorGrid.setTreeScene(threeScene);
         }
         this._editorGrid.setVisible(
-          threeTransformControls.mode === 'translate'
+          this._transformControlsMode === 'translate'
         );
       }
     }
@@ -2443,7 +2435,7 @@ namespace gdjs {
       dummyThreeObject.position.copy(threeObject.position);
       dummyThreeObject.rotation.copy(threeObject.rotation);
       dummyThreeObject.scale.copy(threeObject.scale);
-      if (threeTransformControls.mode === 'rotate') {
+      if (this._transformControlsMode === 'rotate') {
         // This is only done for the rotate mode because it messes with the
         // orientation of the scale mode.
         dummyThreeObject.rotation.y = -dummyThreeObject.rotation.y;
@@ -3550,11 +3542,7 @@ namespace gdjs {
       orbitCameraButton: HTMLButtonElement;
     } | null = null;
     private _parent: HTMLElement | null = null;
-    private _getTransformControlsMode: () =>
-      | 'translate'
-      | 'rotate'
-      | 'scale'
-      | null;
+    private _getTransformControlsMode: () => 'translate' | 'rotate' | 'scale';
     private _setTransformControlsMode: (
       mode: 'translate' | 'rotate' | 'scale'
     ) => void;
@@ -3653,7 +3641,7 @@ namespace gdjs {
       getSvgIconUrl,
       hasSelectionControlsShown,
     }: {
-      getTransformControlsMode: () => 'translate' | 'rotate' | 'scale' | null;
+      getTransformControlsMode: () => 'translate' | 'rotate' | 'scale';
       setTransformControlsMode: (
         mode: 'translate' | 'rotate' | 'scale'
       ) => void;

@@ -163,8 +163,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       </Trans>
     ) : (
       <Trans>
-        This object has no behaviors: please add this behavior to the object
-        first.
+        This object has no behaviors: please add a behavior to the object first.
       </Trans>
     );
 

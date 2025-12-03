@@ -142,7 +142,14 @@ const getPriceAndRequestsTextAndTooltip = ({
 
   const timeForReset = quota.resetsAt ? new Date(quota.resetsAt) : null;
   const now = new Date();
-  let summarySentence = undefined;
+  let summarySentence =
+    quota.period === '7days' ? (
+      <Trans>Your credits reset every week.</Trans>
+    ) : quota.period === '30days' ? (
+      <Trans>Your credits reset every month.</Trans>
+    ) : (
+      <Trans>Your credits reset every day.</Trans>
+    );
   if (timeForReset) {
     const timeDiff = timeForReset.getTime() - now.getTime();
     // Date to look like 'Nov 30th'

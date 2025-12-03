@@ -28,12 +28,12 @@ const BehaviorPropertiesEditor = ({
         project={project}
         object={object}
         propertiesValues={behavior.getProperties()}
-        getPropertyDefaultValue={propertyName =>
-          behaviorMetadata
-            .getProperties()
-            .get(propertyName)
-            .getValue()
-        }
+        getPropertyDefaultValue={propertyName => {
+          const properties = behaviorMetadata.getProperties();
+          return properties.has(propertyName)
+            ? properties.get(propertyName).getValue()
+            : '';
+        }}
         instances={[behavior]}
         onInstancesModified={onBehaviorUpdated}
         resourceManagementProps={resourceManagementProps}

@@ -73,11 +73,12 @@ const Physics3DEditor = (props: Props) => {
       );
       return areAdvancedPropertiesModified(
         behavior.getProperties(),
-        propertyName =>
-          behaviorMetadata
-            .getProperties()
-            .get(propertyName)
-            .getValue()
+        propertyName => {
+          const properties = behaviorMetadata.getProperties();
+          return properties.has(propertyName)
+            ? properties.get(propertyName).getValue()
+            : '';
+        }
       );
     },
     [behavior]

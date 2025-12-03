@@ -461,14 +461,15 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                     project={project}
                     object={object}
                     propertiesValues={customObjectConfiguration.getProperties()}
-                    getPropertyDefaultValue={propertyName =>
-                      customObjectEventsBasedObject
-                        ? customObjectEventsBasedObject
-                            .getPropertyDescriptors()
-                            .get(propertyName)
-                            .getValue()
-                        : ''
-                    }
+                    getPropertyDefaultValue={propertyName => {
+                      if (!customObjectEventsBasedObject) {
+                        return '';
+                      }
+                      const properties = customObjectEventsBasedObject.getPropertyDescriptors();
+                      return properties.has(propertyName)
+                        ? properties.get(propertyName).getValue()
+                        : '';
+                    }}
                     instances={[customObjectConfiguration]}
                     unsavedChanges={unsavedChanges}
                     resourceManagementProps={resourceManagementProps}

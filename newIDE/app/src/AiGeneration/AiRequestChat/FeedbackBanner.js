@@ -14,8 +14,8 @@ import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 
 const styles = {
   paper: {
-    width: '100%',
-    maxWidth: 250,
+    flex: 1,
+    display: 'flex',
   },
 };
 
@@ -42,7 +42,7 @@ export const FeedbackBanner = ({ onSendFeedback }: Props) => {
       <div className={classes.feedbackBannerContainer}>
         <Line noMargin justifyContent="center">
           <Paper background="dark" variant="outlined" style={styles.paper}>
-            <Column expand>
+            <Column expand alignItems="center" justifyContent="center">
               <div className={classes.textAndButtonsContainer}>
                 <Text size="sub-title" color="inherit" noMargin>
                   <Trans>Did it work?</Trans>

@@ -161,6 +161,14 @@ const MosaicEditorsDisplay = React.forwardRef<
     if (!editorMosaicRef.current) return false;
     return editorMosaicRef.current.getOpenedEditorNames().includes(editorId);
   }, []);
+  const ensureEditorVisible = React.useCallback(
+    (editorId: EditorId) => {
+      if (!isEditorVisible(editorId)) {
+        toggleEditorView(editorId);
+      }
+    },
+    [isEditorVisible, toggleEditorView]
+  );
 
   const startSceneRendering = React.useCallback((start: boolean) => {
     const editor = editorRef.current;
@@ -197,6 +205,7 @@ const MosaicEditorsDisplay = React.forwardRef<
       openNewObjectDialog,
       toggleEditorView,
       isEditorVisible,
+      ensureEditorVisible,
       startSceneRendering,
       viewControls: {
         zoomBy: editor ? editor.zoomBy : noop,

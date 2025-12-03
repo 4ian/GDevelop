@@ -873,6 +873,8 @@ export default class SceneEditor extends React.Component<Props, State> {
       ],
       lastSelectionType: 'object',
     });
+    if (this.editorDisplay)
+      this.editorDisplay.ensureEditorVisible('properties');
   };
 
   _editObjectGroup = (group: ?gdObjectGroup) => {

@@ -167,6 +167,14 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     },
     [selectedEditorId, drawerOpeningState]
   );
+  const ensureEditorVisible = React.useCallback(
+    (editorId: EditorId) => {
+      if (!isEditorVisible(editorId)) {
+        halfOpenOrCloseDrawerOnEditor(editorId);
+      }
+    },
+    [halfOpenOrCloseDrawerOnEditor, isEditorVisible]
+  );
   const openNewObjectDialog = React.useCallback(
     () => {
       if (!isEditorVisible('objects-list')) {
@@ -217,6 +225,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
       openNewObjectDialog,
       toggleEditorView: halfOpenOrCloseDrawerOnEditor,
       isEditorVisible,
+      ensureEditorVisible,
       startSceneRendering,
       viewControls: {
         zoomBy: editor ? editor.zoomBy : noop,

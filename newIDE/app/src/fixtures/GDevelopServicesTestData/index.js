@@ -386,16 +386,19 @@ export const limitsForNoSubscriptionUser: Limits = {
       current: 0,
       max: 2,
       limitReached: false,
+      period: '30days',
     },
     'ai-project-generation': {
       current: 0,
       max: 3,
       limitReached: false,
+      period: '30days',
     },
     'ask-question': {
       current: 1,
       max: 3,
       limitReached: false,
+      period: '30days',
     },
   },
   credits: {
@@ -444,16 +447,19 @@ export const limitsForSilverUser: Limits = {
       current: 2,
       max: 10,
       limitReached: false,
+      period: '30days',
     },
     'ai-project-generation': {
       current: 3,
       max: 1000,
       limitReached: false,
+      period: '30days',
     },
     'ask-question': {
       current: 1,
       max: 10,
       limitReached: false,
+      period: '30days',
     },
   },
   credits: {
@@ -502,16 +508,19 @@ export const limitsForGoldUser: Limits = {
       current: 2,
       max: 70,
       limitReached: false,
+      period: '30days',
     },
     'ai-project-generation': {
       current: 3,
       max: 1000,
       limitReached: false,
+      period: '30days',
     },
     'ask-question': {
       current: 1,
       max: 3,
       limitReached: false,
+      period: '30days',
     },
   },
   credits: {
@@ -572,16 +581,19 @@ export const limitsForTeacherUser: Limits = {
       current: 2,
       max: 70,
       limitReached: false,
+      period: '30days',
     },
     'ai-project-generation': {
       current: 3,
       max: 1000,
       limitReached: false,
+      period: '30days',
     },
     'ask-question': {
       current: 1,
       max: 3,
       limitReached: false,
+      period: '30days',
     },
   },
   credits: {
@@ -639,16 +651,19 @@ export const limitsForStudentUser: Limits = {
       current: 2,
       max: 70,
       limitReached: false,
+      period: '30days',
     },
     'ai-project-generation': {
       current: 3,
       max: 1000,
       limitReached: false,
+      period: '30days',
     },
     'ask-question': {
       current: 1,
       max: 3,
       limitReached: false,
+      period: '30days',
     },
   },
   credits: {
@@ -697,16 +712,19 @@ export const limitsForStartupUser: Limits = {
       current: 2,
       max: 1000,
       limitReached: false,
+      period: '30days',
     },
     'ai-project-generation': {
       current: 3,
       max: 1000,
       limitReached: false,
+      period: '30days',
     },
     'ask-question': {
       current: 1,
       max: 3,
       limitReached: false,
+      period: '30days',
     },
   },
   credits: {
@@ -755,11 +773,13 @@ export const limitsReached: Limits = {
       current: 10,
       max: 10,
       limitReached: true,
+      period: '30days',
     },
     'ai-project-generation': {
       current: 3,
       max: 3,
       limitReached: true,
+      period: '30days',
     },
   },
   credits: {
@@ -808,11 +828,13 @@ export const limitsForNoSubscriptionUserWithCredits: Limits = {
       current: 0,
       max: 2,
       limitReached: false,
+      period: '30days',
     },
     'ai-project-generation': {
       current: 0,
       max: 3,
       limitReached: false,
+      period: '30days',
     },
   },
   credits: {

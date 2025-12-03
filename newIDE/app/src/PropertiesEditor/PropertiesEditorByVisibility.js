@@ -2,7 +2,10 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import PropertiesEditor, { type Instances } from '../PropertiesEditor';
+import PropertiesEditor, {
+  type Schema,
+  type Instances,
+} from '../PropertiesEditor';
 import propertiesMapToSchema from '../PropertiesEditor/PropertiesMapToSchema';
 import EmptyMessage from '../UI/EmptyMessage';
 import { Column, Line } from '../UI/Grid';
@@ -38,6 +41,14 @@ export const areAdvancedPropertiesModified = (
   });
   return hasFoundModifiedAdvancedProperty;
 };
+
+const hasSchemaAnyProperty = (propertiesSchema: Schema) =>
+  !propertiesSchema.every(
+    property =>
+      property.isHiddenWhenOnlyOneChoice &&
+      property.getChoices &&
+      property.getChoices().length <= 1
+  );
 
 type Props = {|
   onInstancesModified?: Instances => void,
@@ -98,7 +109,7 @@ const PropertiesEditorByVisibility = ({
     [getPropertyDefaultValue, propertiesValues]
   );
 
-  const advancedPropertiesSchema = React.useMemo(
+  const advancedPropertiesSchema = React.useMemo<Schema>(
     () =>
       propertiesMapToSchema(
         propertiesValues,
@@ -112,7 +123,7 @@ const PropertiesEditorByVisibility = ({
     [propertiesValues, object]
   );
 
-  const deprecatedPropertiesSchema = React.useMemo(
+  const deprecatedPropertiesSchema = React.useMemo<Schema>(
     () =>
       propertiesMapToSchema(
         propertiesValues,
@@ -126,9 +137,19 @@ const PropertiesEditorByVisibility = ({
     [propertiesValues, object]
   );
 
-  return basicPropertiesSchema.length > 0 ||
-    advancedPropertiesSchema.length > 0 ||
-    deprecatedPropertiesSchema.length > 0 ? (
+  const hasAnyProperty = React.useMemo(
+    () =>
+      hasSchemaAnyProperty(basicPropertiesSchema) ||
+      hasSchemaAnyProperty(advancedPropertiesSchema) ||
+      deprecatedPropertiesSchema.length > 0,
+    [
+      basicPropertiesSchema,
+      advancedPropertiesSchema,
+      deprecatedPropertiesSchema,
+    ]
+  );
+
+  return hasAnyProperty ? (
     <ColumnStackLayout expand noMargin>
       <PropertiesEditor
         project={project}

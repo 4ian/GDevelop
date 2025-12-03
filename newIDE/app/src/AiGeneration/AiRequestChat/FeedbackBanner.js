@@ -14,8 +14,8 @@ import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 
 const styles = {
   paper: {
-    width: '100%',
-    maxWidth: 250,
+    flex: 1,
+    display: 'flex',
   },
 };
 
@@ -38,49 +38,55 @@ export const FeedbackBanner = ({ onSendFeedback }: Props) => {
   ] = React.useState<boolean>(false);
 
   return (
-    <Line noMargin justifyContent="center">
-      <Paper background="dark" variant="outlined" style={styles.paper}>
-        <Column expand>
-          <div className={classes.textAndButtonsContainer}>
-            <Text size="sub-title" color="inherit" noMargin>
-              <Trans>Did it work?</Trans>
-            </Text>
-            <Line alignItems="center" noMargin neverShrink>
-              <IconButton
-                tooltip={t`This was helpful`}
-                onClick={() => {
-                  setCurrentFeedback('like');
-                  onSendFeedback('like');
-                }}
-                color="inherit"
-                size="small"
-              >
-                <Like
-                  htmlColor={
-                    currentFeedback === 'like' ? theme.message.valid : undefined
-                  }
-                />
-              </IconButton>
-              <IconButton
-                tooltip={t`There was a problem`}
-                onClick={() => {
-                  setDislikeFeedbackDialogOpened(true);
-                }}
-                color="inherit"
-                size="small"
-              >
-                <Dislike
-                  htmlColor={
-                    currentFeedback === 'dislike'
-                      ? theme.message.warning
-                      : undefined
-                  }
-                />
-              </IconButton>
-            </Line>
-          </div>
-        </Column>
-      </Paper>
+    <>
+      <div className={classes.feedbackBannerContainer}>
+        <Line noMargin justifyContent="center">
+          <Paper background="dark" variant="outlined" style={styles.paper}>
+            <Column expand alignItems="center" justifyContent="center">
+              <div className={classes.textAndButtonsContainer}>
+                <Text size="sub-title" color="inherit" noMargin>
+                  <Trans>Did it work?</Trans>
+                </Text>
+                <Line alignItems="center" noMargin neverShrink>
+                  <IconButton
+                    tooltip={t`This was helpful`}
+                    onClick={() => {
+                      setCurrentFeedback('like');
+                      onSendFeedback('like');
+                    }}
+                    color="inherit"
+                    size="small"
+                  >
+                    <Like
+                      htmlColor={
+                        currentFeedback === 'like'
+                          ? theme.message.valid
+                          : undefined
+                      }
+                    />
+                  </IconButton>
+                  <IconButton
+                    tooltip={t`There was a problem`}
+                    onClick={() => {
+                      setDislikeFeedbackDialogOpened(true);
+                    }}
+                    color="inherit"
+                    size="small"
+                  >
+                    <Dislike
+                      htmlColor={
+                        currentFeedback === 'dislike'
+                          ? theme.message.warning
+                          : undefined
+                      }
+                    />
+                  </IconButton>
+                </Line>
+              </div>
+            </Column>
+          </Paper>
+        </Line>
+      </div>
       {dislikeFeedbackDialogOpened && (
         <DislikeFeedbackDialog
           mode="agent"
@@ -93,6 +99,6 @@ export const FeedbackBanner = ({ onSendFeedback }: Props) => {
           }}
         />
       )}
-    </Line>
+    </>
   );
 };

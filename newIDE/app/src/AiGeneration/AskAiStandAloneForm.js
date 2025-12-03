@@ -186,6 +186,9 @@ export const AskAiStandAloneForm = ({
   const { openCreditsPackageDialog } = React.useContext(
     CreditsPackageStoreContext
   );
+  const {
+    values: { automaticallyUseCreditsForAiRequests },
+  } = React.useContext(PreferencesContext);
 
   const {
     profile,
@@ -250,22 +253,13 @@ export const AskAiStandAloneForm = ({
         let payWithCredits = false;
         if (quota && quota.limitReached && aiRequestPriceInCredits) {
           payWithCredits = true;
-          if (availableCredits < aiRequestPriceInCredits) {
-            // Not enough credits.
-            if (!hasValidSubscriptionPlan(subscription)) {
-              // User is not subscribed, suggest them to subscribe.
-              openSubscriptionDialog({
-                analyticsMetadata: {
-                  reason: 'AI requests (subscribe)',
-                  recommendedPlanId: 'gdevelop_gold',
-                  placementId: 'ai-requests',
-                },
-              });
-              return;
-            }
-            openCreditsPackageDialog({
-              missingCredits: aiRequestPriceInCredits - availableCredits,
-            });
+          const doesNotHaveEnoughCreditsToContinue =
+            availableCredits < aiRequestPriceInCredits;
+          const cannotContinue =
+            !automaticallyUseCreditsForAiRequests ||
+            doesNotHaveEnoughCreditsToContinue;
+
+          if (cannotContinue) {
             return;
           }
         }
@@ -365,6 +359,7 @@ export const AskAiStandAloneForm = ({
       subscription,
       openSubscriptionDialog,
       onCloseAskAi,
+      automaticallyUseCreditsForAiRequests,
     ]
   );
 
@@ -477,6 +472,15 @@ export const AskAiStandAloneForm = ({
         }
         setAiRequestIdForForm('');
       }
+
+      // Refresh the user limits, to ensure quota and credits information
+      // is up-to-date after an AI request.
+      await delay(500);
+      try {
+        await retryIfFailed({ times: 2 }, onRefreshLimits);
+      } catch (error) {
+        // Ignore limits refresh error.
+      }
     },
     [
       profile,
@@ -489,6 +493,7 @@ export const AskAiStandAloneForm = ({
       setLastSendError,
       project,
       aiRequestForForm,
+      onRefreshLimits,
     ]
   );
   const onSendEditorFunctionCallResults = React.useCallback(

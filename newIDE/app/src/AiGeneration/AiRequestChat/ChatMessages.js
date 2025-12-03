@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { ChatBubble } from './ChatBubble';
-import { Line, Spacer } from '../../UI/Grid';
+import { Column, Line, Spacer } from '../../UI/Grid';
 import { ChatMarkdownText } from './ChatMarkdownText';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { getFunctionCallToFunctionCallOutputMap } from '../AiRequestUtils';
@@ -26,12 +26,36 @@ import classes from './ChatMessages.module.css';
 import { DislikeFeedbackDialog } from './DislikeFeedbackDialog';
 import Text from '../../UI/Text';
 import AlertMessage from '../../UI/AlertMessage';
-import { ResponsiveLineStackLayout } from '../../UI/Layout';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import FlatButton from '../../UI/FlatButton';
 import { FeedbackBanner } from './FeedbackBanner';
 import Pause from '../../UI/CustomSvgIcons/Pause';
-import { getBackgroundColor } from '../../UI/Paper';
+import Paper, { getBackgroundColor } from '../../UI/Paper';
 import Play from '../../UI/CustomSvgIcons/Play';
+import SubscriptionPlanTableSummary from '../../Profile/Subscription/PromotionSubscriptionDialog/SubscriptionPlanTableSummary';
+import { SubscriptionContext } from '../../Profile/Subscription/SubscriptionContext';
+import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
+import { canUpgradeSubscription } from '../../Utils/GDevelopServices/Usage';
+import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
+import Coin from '../../Credits/Icons/Coin';
+import { CreditsPackageStoreContext } from '../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
+import RobotIcon from '../../ProjectCreation/RobotIcon';
+import { Divider } from '@material-ui/core';
+
+const styles = {
+  subscriptionPaper: {
+    paddingTop: 5,
+    paddingLeft: 16,
+    paddingRight: 16,
+    paddingBottom: 5,
+  },
+  assistantChatBubbleLight: {
+    background: 'linear-gradient(90deg, #F5F5F7 77%, #EAE3FF 100%)',
+  },
+  assistantChatBubbleDark: {
+    background: 'linear-gradient(90deg, #25252E 0%, #312442 100%)',
+  },
+};
 
 const getMessageSuggestionsLines = ({
   aiRequest,
@@ -40,6 +64,10 @@ const getMessageSuggestionsLines = ({
   message,
   messageIndex,
   onlyShowExplanationMessage,
+  functionCallItems,
+  project,
+  onProcessFunctionCalls,
+  editorCallbacks,
 }: {|
   aiRequest: AiRequest,
   onUserRequestTextChange: (
@@ -50,6 +78,15 @@ const getMessageSuggestionsLines = ({
   message: AiRequestAssistantMessage | AiRequestFunctionCallOutput,
   messageIndex: number,
   onlyShowExplanationMessage?: boolean,
+  functionCallItems?: Array<any>,
+  project: ?gdProject,
+  onProcessFunctionCalls: (
+    functionCalls: Array<AiRequestMessageAssistantFunctionCall>,
+    options: ?{|
+      ignore?: boolean,
+    |}
+  ) => Promise<void>,
+  editorCallbacks: EditorCallbacks,
 |}) => {
   const lines = [];
   const suggestions = message.suggestions;
@@ -61,7 +98,31 @@ const getMessageSuggestionsLines = ({
         justifyContent="flex-start"
       >
         <ChatBubble role="assistant">
-          <ChatMarkdownText source={suggestions.explanationMessage} />
+          <Column noMargin>
+            {functionCallItems && functionCallItems.length > 0 && (
+              <FunctionCallsGroup>
+                {functionCallItems.map(
+                  ({
+                    key: functionCallKey,
+                    messageContent: functionCallMessageContent,
+                    existingFunctionCallOutput,
+                    editorFunctionCallResult,
+                  }) => (
+                    <FunctionCallRow
+                      project={project}
+                      key={functionCallKey}
+                      onProcessFunctionCalls={onProcessFunctionCalls}
+                      functionCall={functionCallMessageContent}
+                      editorFunctionCallResult={editorFunctionCallResult}
+                      existingFunctionCallOutput={existingFunctionCallOutput}
+                      editorCallbacks={editorCallbacks}
+                    />
+                  )
+                )}
+              </FunctionCallsGroup>
+            )}
+            <ChatMarkdownText source={suggestions.explanationMessage} />
+          </Column>
         </ChatBubble>
       </Line>
     );
@@ -138,6 +199,9 @@ type Props = {|
   isForAnotherProject?: boolean,
   shouldDisplayFeedbackBanner?: boolean,
   onPause: (pause: boolean) => void,
+  onScrollToBottom: () => void,
+  hasStartedRequestButCannotContinue: boolean,
+  onSwitchedToGDevelopCredits: () => void,
 |};
 
 export const ChatMessages = React.memo<Props>(function ChatMessages({
@@ -153,8 +217,76 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
   isForAnotherProject,
   shouldDisplayFeedbackBanner,
   onPause,
+  onScrollToBottom,
+  hasStartedRequestButCannotContinue,
+  onSwitchedToGDevelopCredits,
 }: Props) {
   const theme = React.useContext(GDevelopThemeContext);
+  const isLightTheme = theme.palette.type === 'light';
+  const {
+    getSubscriptionPlansWithPricingSystems,
+    openSubscriptionDialog,
+  } = React.useContext(SubscriptionContext);
+  const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
+  const { subscription, limits } = React.useContext(AuthenticatedUserContext);
+  const availableCredits = limits ? limits.credits.userBalance.amount : 0;
+  const quota =
+    (limits && limits.quotas && limits.quotas['consumed-ai-credits']) || null;
+  const hasReachedLimit = !!quota && quota.limitReached;
+
+  const {
+    values: { automaticallyUseCreditsForAiRequests },
+    setAutomaticallyUseCreditsForAiRequests,
+  } = React.useContext(PreferencesContext);
+
+  const { openCreditsPackageDialog } = React.useContext(
+    CreditsPackageStoreContext
+  );
+
+  const suggestedSubscriptionPlanWithPricingSystem = React.useMemo(
+    () => {
+      if (
+        !subscriptionPlansWithPricingSystems ||
+        subscriptionPlansWithPricingSystems.length === 0 ||
+        !hasReachedLimit ||
+        (subscription && !canUpgradeSubscription(subscription)) ||
+        !hasStartedRequestButCannotContinue
+      )
+        return null;
+
+      const goldPlan = subscriptionPlansWithPricingSystems.find(
+        plan => plan.id === 'gdevelop_gold'
+      );
+      const proPlan = subscriptionPlansWithPricingSystems.find(
+        plan => plan.id === 'gdevelop_startup'
+      );
+      return (
+        (subscription && subscription.planId === 'gdevelop_gold'
+          ? proPlan
+          : goldPlan) || subscriptionPlansWithPricingSystems[0]
+      );
+    },
+    [
+      subscriptionPlansWithPricingSystems,
+      subscription,
+      hasReachedLimit,
+      hasStartedRequestButCannotContinue,
+    ]
+  );
+
+  const shouldShowCreditsOrSubscriptionPrompt =
+    subscriptionPlansWithPricingSystems && // To ensure it's loaded.
+    hasReachedLimit &&
+    hasStartedRequestButCannotContinue;
+
+  React.useEffect(
+    () => {
+      if (shouldShowCreditsOrSubscriptionPrompt) {
+        onScrollToBottom();
+      }
+    },
+    [shouldShowCreditsOrSubscriptionPrompt, onScrollToBottom]
+  );
 
   const lastMessageIndex = aiRequest.output.length - 1;
   const lastMessageFeedbackBanner = shouldDisplayFeedbackBanner && (
@@ -219,6 +351,8 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
             message,
           });
         } else if (message.type === 'message' && message.role === 'assistant') {
+          let pendingFunctionCallItems = [];
+
           message.content.forEach((messageContent, messageContentIndex) => {
             if (messageContent.type === 'function_call') {
               const existingFunctionCallOutput = functionCallToFunctionCallOutput.get(
@@ -240,7 +374,12 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
                 editorFunctionCallResult,
               });
             } else {
-              flushFunctionCallGroup();
+              // Attach pending function calls to this message content
+              if (currentFunctionCallItems.length > 0) {
+                pendingFunctionCallItems = [...currentFunctionCallItems];
+                currentFunctionCallItems = [];
+              }
+
               items.push({
                 type: 'message_content',
                 messageIndex,
@@ -248,13 +387,15 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
                 message,
                 messageContent,
                 isLastMessage,
+                functionCallItems:
+                  pendingFunctionCallItems.length > 0
+                    ? pendingFunctionCallItems
+                    : undefined,
               });
+
+              pendingFunctionCallItems = [];
             }
           });
-        }
-
-        if (isLastMessage) {
-          flushFunctionCallGroup();
         }
 
         if (
@@ -262,14 +403,31 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
             (message.type === 'message' && message.role === 'assistant')) &&
           !!message.suggestions
         ) {
-          flushFunctionCallGroup();
+          // Attach pending function calls to suggestions if they have an explanation message
+          const suggestionsHasExplanation =
+            message.suggestions && message.suggestions.explanationMessage;
+          const functionCallItemsForSuggestions =
+            suggestionsHasExplanation && currentFunctionCallItems.length > 0
+              ? [...currentFunctionCallItems]
+              : undefined;
+
+          if (functionCallItemsForSuggestions) {
+            currentFunctionCallItems = [];
+          } else {
+            flushFunctionCallGroup();
+          }
 
           items.push({
             type: 'suggestions',
             messageIndex: messageIndex,
             message: message,
             onlyShowExplanationMessage: !isLastMessage,
+            functionCallItems: functionCallItemsForSuggestions,
           });
+        }
+
+        if (isLastMessage) {
+          flushFunctionCallGroup();
         }
       });
 
@@ -302,26 +460,32 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
 
           if (item.type === 'function_call_group') {
             return [
-              <FunctionCallsGroup key={`group-${itemIndex}`}>
-                {item.items.map(
-                  ({
-                    key,
-                    messageContent,
-                    existingFunctionCallOutput,
-                    editorFunctionCallResult,
-                  }) => (
-                    <FunctionCallRow
-                      project={project}
-                      key={key}
-                      onProcessFunctionCalls={onProcessFunctionCalls}
-                      functionCall={messageContent}
-                      editorFunctionCallResult={editorFunctionCallResult}
-                      existingFunctionCallOutput={existingFunctionCallOutput}
-                      editorCallbacks={editorCallbacks}
-                    />
-                  )
-                )}
-              </FunctionCallsGroup>,
+              <Line key={`group-line-${itemIndex}`} justifyContent="flex-start">
+                <ChatBubble role="assistant">
+                  <FunctionCallsGroup key={`group-${itemIndex}`}>
+                    {item.items.map(
+                      ({
+                        key,
+                        messageContent,
+                        existingFunctionCallOutput,
+                        editorFunctionCallResult,
+                      }) => (
+                        <FunctionCallRow
+                          project={project}
+                          key={key}
+                          onProcessFunctionCalls={onProcessFunctionCalls}
+                          functionCall={messageContent}
+                          editorFunctionCallResult={editorFunctionCallResult}
+                          existingFunctionCallOutput={
+                            existingFunctionCallOutput
+                          }
+                          editorCallbacks={editorCallbacks}
+                        />
+                      )
+                    )}
+                  </FunctionCallsGroup>
+                </ChatBubble>
+              </Line>,
             ];
           }
 
@@ -331,6 +495,7 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
               messageContentIndex,
               messageContent,
               isLastMessage,
+              functionCallItems,
             } = item;
             const key = `messageIndex${messageIndex}-${messageContentIndex}`;
 
@@ -404,7 +569,35 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
                       </div>
                     }
                   >
-                    <ChatMarkdownText source={trimmedText} />
+                    <Column noMargin>
+                      {functionCallItems && functionCallItems.length > 0 && (
+                        <FunctionCallsGroup>
+                          {functionCallItems.map(
+                            ({
+                              key: functionCallKey,
+                              messageContent: functionCallMessageContent,
+                              existingFunctionCallOutput,
+                              editorFunctionCallResult,
+                            }) => (
+                              <FunctionCallRow
+                                project={project}
+                                key={functionCallKey}
+                                onProcessFunctionCalls={onProcessFunctionCalls}
+                                functionCall={functionCallMessageContent}
+                                editorFunctionCallResult={
+                                  editorFunctionCallResult
+                                }
+                                existingFunctionCallOutput={
+                                  existingFunctionCallOutput
+                                }
+                                editorCallbacks={editorCallbacks}
+                              />
+                            )
+                          )}
+                        </FunctionCallsGroup>
+                      )}
+                      <ChatMarkdownText source={trimmedText} />
+                    </Column>
                   </ChatBubble>
                 </Line>,
                 isLastMessage ? lastMessageFeedbackBanner : null,
@@ -425,7 +618,12 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
           }
 
           if (item.type === 'suggestions') {
-            const { messageIndex, message, onlyShowExplanationMessage } = item;
+            const {
+              messageIndex,
+              message,
+              onlyShowExplanationMessage,
+              functionCallItems,
+            } = item;
             return [
               ...getMessageSuggestionsLines({
                 aiRequest,
@@ -434,6 +632,10 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
                 message,
                 messageIndex,
                 onlyShowExplanationMessage,
+                functionCallItems,
+                project,
+                onProcessFunctionCalls,
+                editorCallbacks,
               }),
             ];
           }
@@ -482,6 +684,143 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
           </div>
         </Line>
       ) : null}
+
+      {shouldShowCreditsOrSubscriptionPrompt && (
+        <Line justifyContent="center">
+          <Paper
+            background="medium"
+            style={{
+              ...styles.subscriptionPaper,
+              ...(isLightTheme
+                ? styles.assistantChatBubbleLight
+                : styles.assistantChatBubbleDark),
+            }}
+          >
+            {suggestedSubscriptionPlanWithPricingSystem && (
+              <ColumnStackLayout noMargin>
+                <Line>
+                  <RobotIcon size={20} sad />
+                </Line>
+                <Text size="block-title" noMargin>
+                  <Trans>
+                    You don't have enough AI credits to continue this
+                    conversation.
+                  </Trans>
+                </Text>
+                <Text>
+                  {!!subscription ? (
+                    <Trans>
+                      Upgrade your Premium subscription to have more AI requests
+                      and GDevelop coins to unlock the engine's extra benefits.
+                    </Trans>
+                  ) : (
+                    <Trans>
+                      Get a Premium subscription to have more AI requests and
+                      GDevelop coins to unlock the engine's extra benefits.
+                    </Trans>
+                  )}
+                </Text>
+                <SubscriptionPlanTableSummary
+                  subscriptionPlanWithPricingSystems={
+                    suggestedSubscriptionPlanWithPricingSystem
+                  }
+                  displayedFeatures={['AI_PROTOTYPING', 'FREE_CREDITS']}
+                  hideFullTableLink
+                  actionLabel={<Trans>Upgrade</Trans>}
+                />
+              </ColumnStackLayout>
+            )}
+
+            {suggestedSubscriptionPlanWithPricingSystem && (
+              <Line>
+                <Column expand noMargin>
+                  <Divider orientation="horizontal" />
+                </Column>
+              </Line>
+            )}
+
+            <ColumnStackLayout noMargin>
+              {suggestedSubscriptionPlanWithPricingSystem ? (
+                <Text size="sub-title">
+                  <Trans>You can switch to GDevelop credits.</Trans>
+                </Text>
+              ) : (
+                <ColumnStackLayout noMargin>
+                  <Line>
+                    <Coin />
+                  </Line>
+                  <Text size="block-title" noMargin>
+                    <Trans>
+                      You've ran out of GDevelop credits to continue this
+                      conversation.
+                    </Trans>
+                  </Text>
+                </ColumnStackLayout>
+              )}
+              <Text noMargin color="secondary">
+                {availableCredits > 0 ? (
+                  <Trans>
+                    You still have {availableCredits} credits you can use for AI
+                    requests.
+                  </Trans>
+                ) : (
+                  <Trans>
+                    You don't have any credits available. You can purchase
+                    GDevelop credits to continue making AI requests.
+                  </Trans>
+                )}
+              </Text>
+              <Line noMargin>
+                <Text>
+                  <Trans>What would you like to do next?</Trans>
+                </Text>
+              </Line>
+              <FlatButton
+                color="ai"
+                onClick={() => {
+                  openSubscriptionDialog({
+                    analyticsMetadata: {
+                      reason: 'AI requests (subscribe)',
+                      recommendedPlanId: suggestedSubscriptionPlanWithPricingSystem
+                        ? suggestedSubscriptionPlanWithPricingSystem.id
+                        : 'gdevelop_gold',
+                      placementId: 'ai-requests',
+                    },
+                  });
+                }}
+                label={<Trans>See subscriptions</Trans>}
+              />
+              {availableCredits > 0 ? (
+                <FlatButton
+                  leftIcon={<Coin fontSize="small" />}
+                  color="ai"
+                  onClick={() => {
+                    setAutomaticallyUseCreditsForAiRequests(true);
+                    onSwitchedToGDevelopCredits();
+                  }}
+                  label={
+                    automaticallyUseCreditsForAiRequests ? (
+                      <Trans>Using GDevelop Credits</Trans>
+                    ) : (
+                      <Trans>Switch to GDevelop Credits</Trans>
+                    )
+                  }
+                  disabled={automaticallyUseCreditsForAiRequests}
+                />
+              ) : (
+                <FlatButton
+                  leftIcon={<Coin fontSize="small" />}
+                  color="ai"
+                  onClick={openCreditsPackageDialog}
+                  label={<Trans>Get more credits</Trans>}
+                  disabled={false}
+                />
+              )}
+            </ColumnStackLayout>
+          </Paper>
+        </Line>
+      )}
+
       {dislikeFeedbackDialogOpenedFor && (
         <DislikeFeedbackDialog
           mode={aiRequest.mode || 'chat'}

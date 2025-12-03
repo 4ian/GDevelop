@@ -16,6 +16,8 @@ export const setupInstructionParameters = (
   instructionMetadata: gdInstructionMetadata,
   objectName: ?string
 ): boolean => {
+  let hasChangeAnyParameterValue = false;
+
   instruction.setParametersCount(instructionMetadata.getParametersCount());
 
   if (objectName) {
@@ -28,11 +30,15 @@ export const setupInstructionParameters = (
       return false;
     }
     instruction.setParameter(objectParameterIndex, objectName);
+    hasChangeAnyParameterValue = true;
   }
-  return gd.BehaviorParameterFiller.fillBehaviorParameters(
+  const hasFilledAnyBehaviorParameter = gd.BehaviorParameterFiller.fillBehaviorParameters(
     project.getCurrentPlatform(),
     projectScopedContainersAccessor.get(),
     instructionMetadata,
     instruction
   );
+  hasChangeAnyParameterValue =
+    hasChangeAnyParameterValue || hasFilledAnyBehaviorParameter;
+  return hasChangeAnyParameterValue;
 };

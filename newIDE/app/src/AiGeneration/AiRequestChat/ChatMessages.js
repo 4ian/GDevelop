@@ -460,28 +460,32 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
 
           if (item.type === 'function_call_group') {
             return [
-              <ChatBubble role="assistant">
-                <FunctionCallsGroup key={`group-${itemIndex}`}>
-                  {item.items.map(
-                    ({
-                      key,
-                      messageContent,
-                      existingFunctionCallOutput,
-                      editorFunctionCallResult,
-                    }) => (
-                      <FunctionCallRow
-                        project={project}
-                        key={key}
-                        onProcessFunctionCalls={onProcessFunctionCalls}
-                        functionCall={messageContent}
-                        editorFunctionCallResult={editorFunctionCallResult}
-                        existingFunctionCallOutput={existingFunctionCallOutput}
-                        editorCallbacks={editorCallbacks}
-                      />
-                    )
-                  )}
-                </FunctionCallsGroup>
-              </ChatBubble>,
+              <Line key={`group-line-${itemIndex}`} justifyContent="flex-start">
+                <ChatBubble role="assistant">
+                  <FunctionCallsGroup key={`group-${itemIndex}`}>
+                    {item.items.map(
+                      ({
+                        key,
+                        messageContent,
+                        existingFunctionCallOutput,
+                        editorFunctionCallResult,
+                      }) => (
+                        <FunctionCallRow
+                          project={project}
+                          key={key}
+                          onProcessFunctionCalls={onProcessFunctionCalls}
+                          functionCall={messageContent}
+                          editorFunctionCallResult={editorFunctionCallResult}
+                          existingFunctionCallOutput={
+                            existingFunctionCallOutput
+                          }
+                          editorCallbacks={editorCallbacks}
+                        />
+                      )
+                    )}
+                  </FunctionCallsGroup>
+                </ChatBubble>
+              </Line>,
             ];
           }
 

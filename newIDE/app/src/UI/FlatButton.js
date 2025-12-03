@@ -48,6 +48,7 @@ const FlatButton = React.forwardRef<FlatButtonProps, ButtonInterface>(
       size,
       id,
       style,
+      noBackground,
       ...otherProps
     }: FlatButtonProps,
     ref
@@ -62,7 +63,7 @@ const FlatButton = React.forwardRef<FlatButtonProps, ButtonInterface>(
       <div
         className={classNames({
           [classes.buttonContainer]: true,
-          [classes.backgroundButtonContainer]: !otherProps.noBackground,
+          [classes.backgroundButtonContainer]: !noBackground,
           [classes.fullWidthButtonContainer]: !!otherProps.fullWidth,
           [classes.coloredButtonContainer]: !!color,
           [classes.buttonContainerSuccess]: color === 'success',

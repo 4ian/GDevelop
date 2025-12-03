@@ -87,18 +87,14 @@ const getRowsAndHeight = ({
 
 const getPriceAndRequestsTextAndTooltip = ({
   quota,
-  increaseQuotaOffering,
   price,
   availableCredits,
-  isMobile,
   aiRequestMode,
   automaticallyUseCreditsForAiRequests,
 }: {|
   quota: Quota | null,
-  increaseQuotaOffering: 'subscribe' | 'upgrade' | 'none',
   price: UsagePrice | null,
   availableCredits: number,
-  isMobile: boolean,
   aiRequestMode: 'chat' | 'agent',
   automaticallyUseCreditsForAiRequests: boolean,
 |}): React.Node => {
@@ -109,31 +105,7 @@ const getPriceAndRequestsTextAndTooltip = ({
 
   const aiCreditsAvailable = Math.max(0, quota.max - quota.current);
 
-  const currentQuotaText = isMobile ? (
-    increaseQuotaOffering === 'subscribe' ? (
-      <Trans>{aiCreditsAvailable} free AI credits available</Trans>
-    ) : (
-      <Trans>{aiCreditsAvailable} AI credits available</Trans>
-    )
-  ) : quota.period === '30days' ? (
-    increaseQuotaOffering === 'subscribe' ? (
-      <Trans>{aiCreditsAvailable} free AI credits available this month</Trans>
-    ) : (
-      <Trans>{aiCreditsAvailable} AI credits available this month</Trans>
-    )
-  ) : quota.period === '7days' ? (
-    increaseQuotaOffering === 'subscribe' ? (
-      <Trans>{aiCreditsAvailable} free AI credits available this week</Trans>
-    ) : (
-      <Trans>{aiCreditsAvailable} AI credits available this week</Trans>
-    )
-  ) : quota.period === '1day' ? (
-    increaseQuotaOffering === 'subscribe' ? (
-      <Trans>{aiCreditsAvailable} free AI credits available today</Trans>
-    ) : (
-      <Trans>{aiCreditsAvailable} AI credits available today</Trans>
-    )
-  ) : (
+  const currentQuotaText = (
     <Trans>{aiCreditsAvailable} AI credits available</Trans>
   );
   const creditsText = (
@@ -522,10 +494,8 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
 
     const priceAndRequestsText = getPriceAndRequestsTextAndTooltip({
       quota,
-      increaseQuotaOffering,
       price,
       availableCredits,
-      isMobile,
       aiRequestMode,
       automaticallyUseCreditsForAiRequests,
     });

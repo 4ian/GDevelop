@@ -9,6 +9,7 @@ import { getListedBundle } from './GDevelopServices/Shop';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { type OpenAskAiOptions } from '../AiGeneration/Utils';
+import { CreditsPackageStoreContext } from '../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 
 type Props = {|
   openInAppTutorialDialog: (tutorialId: string) => void,
@@ -31,6 +32,9 @@ const useOpenInitialDialog = ({
     RouterContext
   );
   const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
+  const { openCreditsPackageDialog } = React.useContext(
+    CreditsPackageStoreContext
+  );
   const {
     onOpenCreateAccountDialog,
     onOpenCreateAccountWithPurchaseClaimDialog,
@@ -58,6 +62,21 @@ const useOpenInitialDialog = ({
               },
             });
             removeRouteArguments(['initial-dialog', 'recommended-plan-id']);
+            break;
+          case 'profile':
+            if (loginState !== 'done') {
+              // Wait for the login state to be done (user is authenticated or not) before opening the dialog.
+              return;
+            }
+
+            if (authenticated) {
+              openProfileDialog();
+            } else {
+              // Similar to signup param, except we open the login dialog,
+              // this is meant for users who already have an account.
+              onOpenLoginDialog();
+            }
+            removeRouteArguments(['initial-dialog']);
             break;
           case 'signup':
             if (loginState !== 'done') {
@@ -150,6 +169,10 @@ const useOpenInitialDialog = ({
             // we don't remove the route argument so that the user always comes back to it
             // when they come back from a checkout flow for instance.
             break;
+          case 'credits-purchase':
+            openCreditsPackageDialog();
+            removeRouteArguments(['initial-dialog']);
+            break;
           default:
             break;
         }
@@ -173,6 +196,7 @@ const useOpenInitialDialog = ({
       showAlert,
       gdevelopTheme,
       onOpenPurchaseClaimDialog,
+      openCreditsPackageDialog,
     ]
   );
 };

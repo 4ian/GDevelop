@@ -125,11 +125,28 @@ export default class Authentication {
   _onUserLogoutCallbacks: Array<() => void | Promise<void>> = [];
   _onUserUpdateCallbacks: Array<() => void | Promise<void>> = [];
   loginProvider: ?LoginProvider;
+  _initialAuthCheckPromise: Promise<void>;
 
   constructor() {
     const app = initializeApp(GDevelopFirebaseConfig);
     this.auth = getAuth(app);
+
+    // Create a promise that resolves when Firebase completes its initial auth check.
+    // This prevents race conditions where components check auth state before Firebase
+    // has finished initializing.
+    let resolveInitialCheck;
+    this._initialAuthCheckPromise = new Promise(resolve => {
+      resolveInitialCheck = resolve;
+    });
+
+    let isFirstCall = true;
     onAuthStateChanged(this.auth, user => {
+      if (isFirstCall) {
+        // First call - Firebase has completed initial auth check
+        isFirstCall = false;
+        resolveInitialCheck();
+      }
+
       if (user) {
         // User has logged in or changed.
         this._onUserUpdateCallbacks.forEach(cb => cb());
@@ -529,5 +546,9 @@ export default class Authentication {
 
   isAuthenticated = (): boolean => {
     return !!this.auth.currentUser;
+  };
+
+  waitForInitialAuthCheck = (): Promise<void> => {
+    return this._initialAuthCheckPromise;
   };
 }

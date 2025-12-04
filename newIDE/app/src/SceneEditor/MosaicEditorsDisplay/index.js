@@ -135,7 +135,7 @@ const MosaicEditorsDisplay = React.forwardRef<
     []
   );
   const forceUpdateLayersList = React.useCallback(() => {
-    if (layersListRef.current) layersListRef.current.forceUpdate();
+    if (layersListRef.current) layersListRef.current.forceUpdateList();
   }, []);
   const getInstanceSize = React.useCallback((instance: gdInitialInstance) => {
     return editorRef.current
@@ -339,7 +339,6 @@ const MosaicEditorsDisplay = React.forwardRef<
           onLayerRenamed={props.onLayerRenamed}
           onCreateLayer={forceUpdatePropertiesEditor}
           layersContainer={layersContainer}
-          unsavedChanges={props.unsavedChanges}
           ref={layersListRef}
           hotReloadPreviewButtonProps={props.hotReloadPreviewButtonProps}
           onBackgroundColorChanged={props.onBackgroundColorChanged}

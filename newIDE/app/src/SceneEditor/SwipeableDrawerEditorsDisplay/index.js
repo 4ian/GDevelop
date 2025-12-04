@@ -151,7 +151,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     []
   );
   const forceUpdateLayersList = React.useCallback(() => {
-    if (layersListRef.current) layersListRef.current.forceUpdate();
+    if (layersListRef.current) layersListRef.current.forceUpdateList();
   }, []);
   const getInstanceSize = React.useCallback((instance: gdInitialInstance) => {
     return editorRef.current
@@ -463,7 +463,6 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       onInstancesModified={forceUpdateInstancesList}
                       onGetInstanceSize={getInstanceSize}
                       ref={instanceOrObjectPropertiesEditorRef}
-                      unsavedChanges={props.unsavedChanges}
                       historyHandler={props.historyHandler}
                       tileMapTileSelection={props.tileMapTileSelection}
                       onSelectTileMapTile={props.onSelectTileMapTile}
@@ -548,7 +547,6 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                   onLayerRenamed={props.onLayerRenamed}
                   onCreateLayer={forceUpdatePropertiesEditor}
                   layersContainer={layersContainer}
-                  unsavedChanges={props.unsavedChanges}
                   ref={layersListRef}
                   hotReloadPreviewButtonProps={
                     props.hotReloadPreviewButtonProps

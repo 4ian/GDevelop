@@ -795,6 +795,27 @@ module.exports = {
       .setFunctionName('setKinematic');
 
     aut
+      .addAction(
+        'SetBodyType',
+        _('Set body type'),
+        _('Set the body type of an object.'),
+        _('Set the body type of _PARAM0_ to _PARAM2_'),
+        _('Dynamics'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+      .addParameter(
+        'stringWithSelector',
+        _('Body type'),
+        '["Static", "Dynamic", "Kinematic"]',
+        false
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('setBodyType');
+
+    aut
       .addCondition(
         'IsBullet',
         _('Is treated as a bullet'),

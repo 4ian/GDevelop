@@ -1,7 +1,8 @@
 // @flow
 import * as React from 'react';
 
-const embeddedGameFrameHoleId = 'instances-editor-embedded-game-frame-hole';
+export const embeddedGameFrameHoleId =
+  'instances-editor-embedded-game-frame-hole';
 
 let activeEmbeddedGameFrameHoleCount = 0;
 

@@ -1016,7 +1016,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                       : t`Specify something more to the AI to build`
                     : t`Ask a follow up question`
                 }
-                rows={getRowsAndHeight({ standAloneForm }).rows}
+                rows={2}
                 maxRows={6}
                 onSubmit={onSubmitForExistingChat}
                 controls={

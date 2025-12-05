@@ -1249,6 +1249,9 @@ namespace gdjs {
      * @param removeCanvas If true, the canvas will be removed from the DOM.
      */
     dispose(removeCanvas?: boolean): void {
+      if (this._inGameEditor) {
+        this._inGameEditor.dispose();
+      }
       this._renderer.stopGameLoop();
       this._sceneStack.dispose();
       this._renderer.dispose(removeCanvas);

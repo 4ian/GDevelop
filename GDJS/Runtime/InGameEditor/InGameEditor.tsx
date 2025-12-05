@@ -794,6 +794,7 @@ namespace gdjs {
     private _selectedLayerName: string = '';
     private _innerArea: AABB3D | null = null;
     private _threeInnerArea: THREE.Object3D | null = null;
+    private _unregisterContextLostListener: (() => void) | null = null;
     private _tempVector2d: THREE.Vector2 = new THREE.Vector2();
     private _raycaster: THREE.Raycaster = new THREE.Raycaster();
 
@@ -922,6 +923,42 @@ namespace gdjs {
 
       this._applyInGameEditorSettings();
       this.onProjectDataChange(projectData);
+
+      // Uncomment to get access to the runtime game from the console and do
+      // testing.
+      // window.globalRuntimeGameForTesting = game;
+    }
+
+    private _setupWebGLContextLostListener(): void {
+      const canvas = this._runtimeGame.getRenderer().getCanvas();
+      if (!canvas) return;
+
+      const handleContextLost = (event: Event) => {
+        console.warn('WebGL context lost, notifying the editor...');
+
+        // Prevent to restore the context, and prefer to let the editor handle this
+        // to restart from a clean state.
+        event.preventDefault();
+
+        const debuggerClient = this._runtimeGame._debuggerClient;
+        if (debuggerClient) {
+          debuggerClient.sendGraphicsContextLost();
+        }
+      };
+
+      canvas.addEventListener('webglcontextlost', handleContextLost);
+      canvas.addEventListener('contextlost', handleContextLost);
+      this._unregisterContextLostListener = () => {
+        canvas.removeEventListener('webglcontextlost', handleContextLost);
+        canvas.removeEventListener('contextlost', handleContextLost);
+      };
+    }
+
+    dispose(): void {
+      if (this._unregisterContextLostListener) {
+        this._unregisterContextLostListener();
+        this._unregisterContextLostListener = null;
+      }
     }
 
     private _applyInGameEditorSettings() {
@@ -3431,6 +3468,10 @@ namespace gdjs {
     }
 
     updateAndRender() {
+      if (!this._unregisterContextLostListener) {
+        this._setupWebGLContextLostListener();
+      }
+
       const objectUnderCursor: gdjs.RuntimeObject | null =
         this.getObjectUnderCursor();
 

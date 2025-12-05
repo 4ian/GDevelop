@@ -115,7 +115,8 @@ export type EditorTabsPaneCommonProps = {|
     overridenPreviewLayoutName: ?string,
     overridenPreviewExternalLayoutName: ?string,
   |}) => void,
-  onRestartInGameEditorAfterError: (() => void) | null,
+  onRestartInGameEditor: (reason: string) => void,
+  showRestartInGameEditorAfterErrorButton: boolean,
   openVersionHistoryPanel: () => void,
   onQuitVersionHistory: () => Promise<void>,
   onOpenAskAi: (?OpenAskAiOptions) => void,
@@ -370,7 +371,8 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
     areSidePanesDrawers,
     gameEditorMode,
     setGameEditorMode,
-    onRestartInGameEditorAfterError,
+    onRestartInGameEditor,
+    showRestartInGameEditorAfterErrorButton,
   } = props;
 
   const toolbarRef = React.useRef<?ToolbarInterface>(null);
@@ -667,7 +669,8 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
                       onOpenTemplateFromCourseChapter: openTemplateFromCourseChapter,
                       previewDebuggerServer,
                       hotReloadPreviewButtonProps,
-                      onRestartInGameEditorAfterError,
+                      onRestartInGameEditor,
+                      showRestartInGameEditorAfterErrorButton,
                       resourceManagementProps,
                       onSave: saveProject,
                       canSave,

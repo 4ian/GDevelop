@@ -3,6 +3,9 @@
   align-items: center;
   min-width: 0px;
 }
+.container.rounded {
+  border-radius: 24px;
+}
 
 .compactSelectField {
   border-radius: 4px;
@@ -79,6 +82,10 @@
   min-width: 0px;
 }
 
+.compactSelectField.withOptionIcon select {
+  padding-left: 30px;
+}
+
 .compactSelectField select::placeholder {
   color: var(--theme-text-field-placeholder-color);
 }
@@ -145,4 +152,19 @@ svg.leftIcon {
 }
 .container:not(.disabled):focus-within .leftIcon {
   color: var(--theme-text-default-color);
+}
+
+.optionIconContainer {
+  pointer-events: none;
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  display: flex;
+  align-items: center;
+}
+svg.optionIcon {
+  font-size: 18px;
+}
+.container.disabled .optionIcon {
+  color: var(--theme-text-field-disabled-color);
 }

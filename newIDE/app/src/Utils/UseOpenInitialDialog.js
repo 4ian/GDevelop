@@ -158,7 +158,6 @@ const useOpenInitialDialog = ({
             break;
           case 'ask-ai':
             openAskAi({
-              mode: 'agent',
               aiRequestId: null,
             });
             removeRouteArguments(['initial-dialog']);

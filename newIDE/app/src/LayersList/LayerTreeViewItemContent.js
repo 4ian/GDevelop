@@ -19,11 +19,11 @@ const styles = {
 export type LayerTreeViewItemProps = {|
   ...TreeItemProps,
   layersContainer: gdLayersContainer,
-  selectedLayer: string,
-  onSelectLayer: (layerName: string) => void,
-  onDeleteLayer: (layer: gdLayer) => void,
-  onOpenLayer: (layer: ?gdLayer) => void,
+  chosenLayer: string,
+  onChooseLayer: (layerName: string) => void,
+  onSelectLayer: (layer: gdLayer) => void,
   onEditLayer: (layer: ?gdLayer) => void,
+  onDeleteLayer: (layer: gdLayer) => void,
   onLayersModified: () => void,
   onRenameLayer: (oldName: string, newName: string) => void,
   triggerOnLayersModified: () => void,
@@ -79,7 +79,7 @@ export class LayerTreeViewItemContent implements TreeViewItemContent {
   }
 
   onClick(): void {
-    this.props.onOpenLayer(this.layer);
+    this.props.onSelectLayer(this.layer);
   }
 
   rename(newName: string): void {
@@ -156,7 +156,7 @@ export class LayerTreeViewItemContent implements TreeViewItemContent {
       },
       {
         label: i18n._(t`Open layer editor`),
-        click: () => this.props.onOpenLayer(this.layer),
+        click: () => this.props.onEditLayer(this.layer),
       },
       {
         type: 'separator',
@@ -177,23 +177,23 @@ export class LayerTreeViewItemContent implements TreeViewItemContent {
     ];
   }
 
-  _isEditedLayer(): boolean {
-    return this.layer.getName() === this.props.selectedLayer;
+  _isChosenLayer(): boolean {
+    return this.layer.getName() === this.props.chosenLayer;
   }
 
   renderRightComponent(i18n: I18nType): ?React.Node {
-    const layerName = this.layer.getName();
-    const isSelected = this.props.selectedLayer === layerName;
     return (
       <Tooltip
         style={styles.tooltip}
         title={<Trans>Layer where instances are added by default</Trans>}
       >
         <Radio
-          checked={isSelected}
-          onChange={() => this.props.onSelectLayer(layerName)}
+          checked={this._isChosenLayer()}
+          onChange={() => this.props.onSelectLayer(this.layer)}
           size="small"
-          id={`layer-selected-${isSelected ? 'checked' : 'unchecked'}`}
+          id={`layer-selected-${
+            this._isChosenLayer() ? 'checked' : 'unchecked'
+          }`}
         />
       </Tooltip>
     );
@@ -224,9 +224,4 @@ export class LayerTreeViewItemContent implements TreeViewItemContent {
       this.props.unsavedChanges.triggerUnsavedChanges();
     this.props.forceUpdate();
   }
-
-  // _setEditedLayer(sceneName: string): void {
-  //   this.props.project.setFirstLayer(sceneName);
-  //   this.props.forceUpdate();
-  // }
 }

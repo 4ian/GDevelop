@@ -279,11 +279,12 @@ type State = {|
   additionalWorkInfoBar: InfoBarDetails,
 
   selectedObjectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext>,
-  selectedLayer: string,
+  chosenLayer: string,
+  selectedLayer: gdLayer | null,
 
   tileMapTileSelection: ?TileMapTileSelection,
 
-  lastSelectionType: 'instance' | 'object',
+  lastSelectionType: 'instance' | 'object' | 'layer',
 |};
 
 type CopyCutPasteOptions = {|
@@ -342,8 +343,9 @@ export default class SceneEditor extends React.Component<Props, State> {
       tileMapTileSelection: null,
 
       selectedObjectFolderOrObjectsWithContext: [],
-      selectedLayer:
+      chosenLayer:
         initialInstancesEditorSettings.selectedLayer || BASE_LAYER_NAME,
+      selectedLayer: null,
       invisibleLayerOnWhichInstancesHaveJustBeenAdded: null,
 
       lastSelectionType: 'instance',
@@ -1071,7 +1073,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     const instances = this.editorDisplay.instancesHandlers.addInstances(
       pos,
       [objectName],
-      this.state.selectedLayer
+      this.state.chosenLayer
     );
     this._onInstancesAddedAndSendToEditor3D(instances);
   };
@@ -1454,11 +1456,11 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   _onRemoveLayer = (layerName: string, done: boolean => void) => {
     const getNewState = (doRemove: boolean) => {
-      const newState: {| layerRemoved: null, selectedLayer?: string |} = {
+      const newState: {| layerRemoved: null, chosenLayer?: string |} = {
         layerRemoved: null,
       };
-      if (doRemove && layerName === this.state.selectedLayer) {
-        newState.selectedLayer = BASE_LAYER_NAME;
+      if (doRemove && layerName === this.state.chosenLayer) {
+        newState.chosenLayer = BASE_LAYER_NAME;
       }
       return newState;
     };
@@ -1583,13 +1585,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     this._sendHotReloadLayers();
   };
 
-  _onSelectLayer = (layerName: string) => {
+  _onChooseLayer = (layerName: string) => {
     this.setState({
-      selectedLayer: layerName,
-      instancesEditorSettings: {
-        ...this.state.instancesEditorSettings,
-        selectedLayer: layerName,
-      },
+      chosenLayer: layerName,
     });
 
     const { previewDebuggerServer } = this.props;
@@ -1605,6 +1603,13 @@ export default class SceneEditor extends React.Component<Props, State> {
           });
         });
     }
+  };
+
+  _onSelectLayer = (layer: gdLayer) => {
+    this.setState({
+      selectedLayer: layer,
+      lastSelectionType: 'layer',
+    });
   };
 
   _onDeleteObjects = (
@@ -2581,8 +2586,8 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   forceUpdateLayersList = () => {
     // The selected layer could have been deleted when editing a linked external layout.
-    if (!this.props.layersContainer.hasLayerNamed(this.state.selectedLayer)) {
-      this.setState({ selectedLayer: BASE_LAYER_NAME });
+    if (!this.props.layersContainer.hasLayerNamed(this.state.chosenLayer)) {
+      this.setState({ chosenLayer: BASE_LAYER_NAME });
     }
     if (this.editorDisplay) this.editorDisplay.forceUpdateLayersList();
   };
@@ -2746,7 +2751,10 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onSelectInstances={this._onSelectInstances}
                 onInstancesModified={this._onInstancesModified}
                 onAddObjectInstance={this.addInstanceOnTheScene}
+                chosenLayer={this.state.chosenLayer}
+                onChooseLayer={this._onChooseLayer}
                 selectedLayer={this.state.selectedLayer}
+                onSelectLayer={this._onSelectLayer}
                 editLayer={this.editLayer}
                 editLayerEffects={this.editLayerEffects}
                 editInstanceVariables={this.editInstanceVariables}
@@ -2762,7 +2770,6 @@ export default class SceneEditor extends React.Component<Props, State> {
                   this._onLayersVisibilityInEditorChanged
                 }
                 onRemoveLayer={this._onRemoveLayer}
-                onSelectLayer={this._onSelectLayer}
                 tileMapTileSelection={this.state.tileMapTileSelection}
                 onSelectTileMapTile={this.onSelectTileMapTile}
                 onExportAssets={this.openObjectExporterDialog}

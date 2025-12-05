@@ -18,15 +18,16 @@ export default {
 };
 
 export const Default = () => {
-  const [selectedLayer, setSelectedLayer] = React.useState<string>('');
+  const [chosenLayer, setChosenLayer] = React.useState<string>('');
   return (
     <DragAndDropContextProvider>
       <LayersList
         project={testProject.project}
         eventsFunctionsExtension={null}
         eventsBasedObject={null}
-        selectedLayer={selectedLayer}
-        onSelectLayer={setSelectedLayer}
+        chosenLayer={chosenLayer}
+        onChooseLayer={setChosenLayer}
+        onSelectLayer={action('onSelectLayer')}
         onEditLayerEffects={action('onEditLayerEffects')}
         onLayersModified={action('onLayersModified')}
         onLayersVisibilityInEditorChanged={action(
@@ -49,7 +50,7 @@ export const Default = () => {
 };
 
 export const SmallWidthAndHeight = () => {
-  const [selectedLayer, setSelectedLayer] = React.useState<string>('');
+  const [chosenLayer, setChosenLayer] = React.useState<string>('');
 
   return (
     <DragAndDropContextProvider>
@@ -58,8 +59,9 @@ export const SmallWidthAndHeight = () => {
           project={testProject.project}
           eventsFunctionsExtension={null}
           eventsBasedObject={null}
-          selectedLayer={selectedLayer}
-          onSelectLayer={setSelectedLayer}
+          chosenLayer={chosenLayer}
+          onChooseLayer={setChosenLayer}
+          onSelectLayer={action('onSelectLayer')}
           onEditLayerEffects={action('onEditLayerEffects')}
           onLayersModified={action('onLayersModified')}
           onLayersVisibilityInEditorChanged={action(

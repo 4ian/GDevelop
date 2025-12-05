@@ -47,7 +47,7 @@ export type ValueFieldCommonProperties = {|
   getExtraDescription?: Instance => string,
   hasImpactOnAllOtherFields?: boolean,
   canBeUnlimitedUsingMinus1?: boolean,
-  disabled?: (instances: Array<gdInitialInstance>) => boolean,
+  disabled?: (instances: Array<Instance>) => boolean,
   onEditButtonBuildMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
   onEditButtonClick?: () => void,
   getValueFromDisplayedValue?: string => string,
@@ -204,6 +204,7 @@ export type Field =
       removeSpacers?: boolean,
       title?: ?string,
       children: Array<Field>,
+      isHidden?: (Array<Instance>) => boolean,
     |};
 
 // The schema is the tree of all fields.
@@ -217,6 +218,7 @@ type Props = {|
   mode?: 'column' | 'row',
   preventWrap?: boolean,
   removeSpacers?: boolean,
+  isHidden?: (Array<Instance>) => boolean,
 
   // If set, render the "extra" description content from fields
   // (see getExtraDescription).
@@ -380,6 +382,7 @@ const CompactPropertiesEditor = ({
   resourceManagementProps,
   preventWrap,
   removeSpacers,
+  isHidden,
 }: Props) => {
   const forceUpdate = useForceUpdate();
 
@@ -871,7 +874,9 @@ const CompactPropertiesEditor = ({
     );
 
   const renderContainer =
-    mode === 'row'
+    isHidden && isHidden(instances)
+      ? (fields: React.Node) => null
+      : mode === 'row'
       ? (fields: React.Node) =>
           preventWrap ? (
             removeSpacers ? (
@@ -1018,6 +1023,7 @@ const CompactPropertiesEditor = ({
               onRefreshAllFields={onRefreshAllFields}
               preventWrap={field.preventWrap}
               removeSpacers={field.removeSpacers}
+              isHidden={field.isHidden}
             />
           ) : (
             <div key={field.name} style={styles.container}>
@@ -1032,6 +1038,7 @@ const CompactPropertiesEditor = ({
                 onRefreshAllFields={onRefreshAllFields}
                 preventWrap={field.preventWrap}
                 removeSpacers={field.removeSpacers}
+                isHidden={field.isHidden}
               />
             </div>
           );

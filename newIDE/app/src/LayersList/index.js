@@ -249,8 +249,9 @@ export type ProjectManagerInterface = {|
 
 type Props = {|
   project: gdProject,
-  selectedLayer: string,
-  onSelectLayer: string => void,
+  chosenLayer: string,
+  onChooseLayer: (layerName: string) => void,
+  onSelectLayer: (layer: gdLayer) => void,
   layout: gdLayout | null,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   eventsBasedObject: gdEventsBasedObject | null,
@@ -277,7 +278,8 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
   (
     {
       project,
-      selectedLayer,
+      chosenLayer,
+      onChooseLayer,
       onSelectLayer,
       layout,
       eventsFunctionsExtension,
@@ -448,7 +450,8 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
           ? {
               project,
               layersContainer,
-              selectedLayer,
+              chosenLayer,
+              onChooseLayer,
               onSelectLayer,
               onDeleteLayer: layer => {
                 const layerName = layer.getName();
@@ -459,8 +462,6 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
                   triggerOnLayersModified();
                 });
               },
-              // TODO
-              onOpenLayer: onEditLayer,
               onEditLayer,
               onLayersModified,
               editName,
@@ -477,7 +478,8 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
       [
         project,
         layersContainer,
-        selectedLayer,
+        chosenLayer,
+        onChooseLayer,
         onSelectLayer,
         onEditLayer,
         onLayersModified,
@@ -489,8 +491,8 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
         preferences,
         scrollToItem,
         showDeleteConfirmation,
-        onRemoveLayer,
         triggerOnLayersModified,
+        onRemoveLayer,
       ]
     );
 

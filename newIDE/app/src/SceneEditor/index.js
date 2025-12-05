@@ -369,10 +369,23 @@ export default class SceneEditor extends React.Component<Props, State> {
           onConnectionErrored: () => {},
           onServerStateChanged: () => {},
           onHandleParsedMessage: ({ id, parsedMessage }) => {
-            if (
-              this.props.gameEditorMode !== 'embedded-game' ||
-              parsedMessage.editorId !== this.props.editorId
-            ) {
+            if (parsedMessage.editorId !== this.props.editorId) {
+              return; // Message is not for this editor - ignore it.
+            }
+
+            if (parsedMessage.command === 'notifyGraphicsContextLost') {
+              // Even if the in0game editor is not visible, a lost context needs
+              // to have the in-game editor restarted as it is impossible to use for the user.
+              console.info(
+                'Embedded game frame notified the graphics context was lost, restarting the editor...'
+              );
+              this.props.onRestartInGameEditor(
+                'relaunched-because-graphics-context-lost'
+              );
+            }
+
+            // The rest of the messages are only relevant when the embedded game editor is visible.
+            if (this.props.gameEditorMode !== 'embedded-game') {
               return;
             }
             if (parsedMessage.command === 'updateInstances') {
@@ -398,15 +411,6 @@ export default class SceneEditor extends React.Component<Props, State> {
               this.paste();
             } else if (parsedMessage.command === 'cut') {
               this.cutSelection();
-            } else if (parsedMessage.command === 'notifyGraphicsContextLost') {
-              if (this.props.onRestartInGameEditor) {
-                console.info(
-                  'Embedded game frame notified the graphics context was lost, restarting the editor...'
-                );
-                this.props.onRestartInGameEditor(
-                  'relaunched-because-graphics-context-lost'
-                );
-              }
             }
           },
         }

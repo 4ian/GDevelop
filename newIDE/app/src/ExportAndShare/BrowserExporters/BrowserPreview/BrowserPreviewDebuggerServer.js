@@ -103,7 +103,9 @@ class BrowserPreviewDebuggerServer {
       if (event.origin !== previewOrigin) return;
 
       const id = getDebuggerIdForPreviewWindow(event.source);
-      if (id === null) return; // Could not find the id of this preview window.
+      if (id === null) {
+        return; // Could not find the id of this preview window.
+      }
 
       try {
         const parsedMessage = JSON.parse(event.data);

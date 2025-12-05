@@ -406,7 +406,6 @@ const MainPage = ({
                               rightIcon={<ArrowRight />}
                               onClick={() =>
                                 onOpenAskAi({
-                                  mode: 'chat',
                                   aiRequestId: null,
                                 })
                               }

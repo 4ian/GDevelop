@@ -31,8 +31,7 @@ import {
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
 } from '../AiRequestUtils';
-import TwoStatesButton from '../../UI/TwoStatesButton';
-import Help from '../../UI/CustomSvgIcons/Help';
+import HelpQuestion from '../../UI/CustomSvgIcons/HelpQuestion';
 import Hammer from '../../UI/CustomSvgIcons/Hammer';
 import { ChatMessages } from './ChatMessages';
 import Send from '../../UI/CustomSvgIcons/Send';
@@ -51,6 +50,10 @@ import GoldCompact from '../../Profile/Subscription/Icons/GoldCompact';
 import { SubscriptionContext } from '../../Profile/Subscription/SubscriptionContext';
 import { CreditsPackageStoreContext } from '../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import Paper from '../../UI/Paper';
+import SelectOption from '../../UI/SelectOption';
+import CompactSelectField from '../../UI/CompactSelectField';
+import TwoStatesButton from '../../UI/TwoStatesButton';
+import Help from '../../UI/CustomSvgIcons/Help';
 
 const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 10;
 const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 15;
@@ -89,13 +92,13 @@ const getPriceAndRequestsTextAndTooltip = ({
   quota,
   price,
   availableCredits,
-  aiRequestMode,
+  selectedMode,
   automaticallyUseCreditsForAiRequests,
 }: {|
   quota: Quota | null,
   price: UsagePrice | null,
   availableCredits: number,
-  aiRequestMode: 'chat' | 'agent',
+  selectedMode: 'chat' | 'agent',
   automaticallyUseCreditsForAiRequests: boolean,
 |}): React.Node => {
   if (!quota || !price) {
@@ -193,14 +196,14 @@ const getPriceAndRequestsTextAndTooltip = ({
 
 const getSendButtonLabelAndIcon = ({
   aiRequest,
-  aiRequestMode,
+  selectedMode,
   isWorking,
   isMobile,
   hasOpenedProject,
   standAloneForm,
 }: {|
   aiRequest: AiRequest | null,
-  aiRequestMode?: 'chat' | 'agent',
+  selectedMode?: 'chat' | 'agent',
   isWorking: boolean,
   isMobile: boolean,
   hasOpenedProject: boolean,
@@ -212,7 +215,7 @@ const getSendButtonLabelAndIcon = ({
     return { label: null, icon: <Send fontSize="small" /> };
   }
 
-  return aiRequestMode === 'agent'
+  return selectedMode === 'agent'
     ? isWorking
       ? { label: <Trans>Building...</Trans>, icon: <Send fontSize="small" /> }
       : isMobile
@@ -231,19 +234,50 @@ const getSendButtonLabelAndIcon = ({
     : { label: <Trans>Send question</Trans>, icon: <Send fontSize="small" /> };
 };
 
+const actionsOnExistingProject = [
+  t`Add solid rocks that falls from the sky at a random position around the player every 0.5 seconds`,
+  t`Add a score and display it on the screen`,
+  t`Create a 3D explosion when the player is hit`,
+];
+
+const actionsToCreateAProject = [
+  t`Start a simple platformer with a player that can move and jump`,
+  t`Begin a top-down adventure with one controllable character.`,
+  t`Start a game where a ball can bounce around the screen`,
+  t`Start a quizz game with a question and 4 answers`,
+  t`Make a minimal 3D shooter`,
+  t`Start a simple endless runner game`,
+  t`Begin a driving game with a controllable car`,
+  t`Create a simple flying game with obstacles to avoid`,
+];
+
+const generalQuestions = [
+  t`How to add a leaderboard?`,
+  t`How to display the health of my player?`,
+  t`How to add an explosion when an enemy is destroyed?`,
+  t`How to create a main menu for my game?`,
+];
+
+const questionsOnExistingProject = [
+  t`What would you add to my game?`,
+  t`How to make my game more fun?`,
+  t`What is a good GDevelop feature I could use in my game?`,
+];
+
 type Props = {|
   project: ?gdProject,
   i18n: I18nType,
   aiRequest: AiRequest | null,
-  aiRequestMode: 'chat' | 'agent',
 
   isSending: boolean,
-  onStartNewAiRequest: (options: {|
+  onStartNewAiRequest: ({|
     userRequest: string,
-    mode: 'chat' | 'agent',
     aiConfigurationPresetId: string,
   |}) => void,
-  onSendUserMessage: (userMessage: string) => Promise<void>,
+  onSendUserMessage: ({|
+    userMessage: string,
+    mode: 'chat' | 'agent',
+  |}) => Promise<void>,
   onSendFeedback: (
     aiRequestId: string,
     messageIndex: number,
@@ -256,7 +290,6 @@ type Props = {|
   setAutoProcessFunctionCalls: boolean => void,
   onStartOrOpenChat: (
     ?{|
-      mode: 'chat' | 'agent',
       aiRequestId: string | null,
     |}
   ) => void,
@@ -290,7 +323,6 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       aiConfigurationPresetsWithAvailability,
       project,
       aiRequest,
-      aiRequestMode,
       isSending,
       onStartNewAiRequest,
       onSendUserMessage,
@@ -315,7 +347,9 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     const {
       aiRequestHistory: { handleNavigateHistory, resetNavigation },
     } = React.useContext(AiRequestContext);
-    const { setAiState } = React.useContext(PreferencesContext);
+    const [selectedMode, setSelectedMode] = React.useState<'chat' | 'agent'>(
+      (aiRequest && aiRequest.mode) || 'chat'
+    );
     const {
       values: { automaticallyUseCreditsForAiRequests },
       setAutomaticallyUseCreditsForAiRequests,
@@ -348,7 +382,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
           aiConfigurationPresetsWithAvailability.find(
             preset =>
               preset.id === aiConfigurationPresetId &&
-              preset.mode === aiRequestMode
+              preset.mode === selectedMode
           )
         ) {
           return;
@@ -361,7 +395,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         setAiConfigurationPresetId(null);
       },
       [
-        aiRequestMode,
+        selectedMode,
         aiConfigurationPresetsWithAvailability,
         aiConfigurationPresetId,
       ]
@@ -411,42 +445,23 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     const newChatPlaceholder = React.useMemo(
       () => {
         const newChatPlaceholders: Array<MessageDescriptor> =
-          aiRequestMode === 'agent'
+          selectedMode === 'agent'
             ? hasOpenedProject && !standAloneForm
-              ? [
-                  t`Add solid rocks that falls from the sky at a random position around the player every 0.5 seconds`,
-                  t`Add a score and display it on the screen`,
-                  t`Create a 3D explosion when the player is hit`,
-                ]
-              : [
-                  t`Start a simple platformer with a player that can move and jump`,
-                  t`Begin a top-down adventure with one controllable character.`,
-                  t`Start a game where a ball can bounce around the screen`,
-                  t`Start a quizz game with a question and 4 answers`,
-                  t`Make a minimal 3D shooter`,
-                  t`Start a simple endless runner game`,
-                  t`Begin a driving game with a controllable car`,
-                  t`Create a simple flying game with obstacles to avoid`,
-                ]
-            : [
-                t`How to add a leaderboard?`,
-                t`How to display the health of my player?`,
-                t`How to add an explosion when an enemy is destroyed?`,
-                t`How to create a main menu for my game?`,
-                ...(hasOpenedProject && !standAloneForm
-                  ? [
-                      t`What would you add to my game?`,
-                      t`How to make my game more fun?`,
-                      t`What is a good GDevelop feature I could use in my game?`,
-                    ]
-                  : []),
-              ];
+              ? actionsOnExistingProject
+              : actionsToCreateAProject
+            : hasOpenedProject && !standAloneForm
+            ? [
+                ...questionsOnExistingProject,
+                ...actionsOnExistingProject,
+                ...generalQuestions,
+              ]
+            : [...generalQuestions, ...actionsToCreateAProject];
 
         return newChatPlaceholders[
           Math.floor(Math.random() * newChatPlaceholders.length)
         ];
       },
-      [aiRequestMode, hasOpenedProject, standAloneForm]
+      [selectedMode, hasOpenedProject, standAloneForm]
     );
 
     const onUserRequestTextChange = React.useCallback(
@@ -496,14 +511,14 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       quota,
       price,
       availableCredits,
-      aiRequestMode,
+      selectedMode,
       automaticallyUseCreditsForAiRequests,
     });
 
     const chosenOrDefaultAiConfigurationPresetId =
       aiConfigurationPresetId ||
       getDefaultAiConfigurationPresetId(
-        aiRequestMode,
+        selectedMode,
         aiConfigurationPresetsWithAvailability
       );
     const hasFunctionsCallsToProcess =
@@ -563,7 +578,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       icon: sendButtonIcon,
     } = getSendButtonLabelAndIcon({
       aiRequest,
-      aiRequestMode,
+      selectedMode,
       isWorking,
       isMobile,
       hasOpenedProject,
@@ -578,13 +593,11 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         if (cannotContinue) return;
 
         onStartNewAiRequest({
-          mode: aiRequestMode,
           userRequest: userRequestTextPerAiRequestId[''],
           aiConfigurationPresetId: chosenOrDefaultAiConfigurationPresetId,
         });
       },
       [
-        aiRequestMode,
         onStartNewAiRequest,
         userRequestTextPerAiRequestId,
         chosenOrDefaultAiConfigurationPresetId,
@@ -601,7 +614,10 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         if (cannotContinue) return;
 
         setAutoProcessFunctionCalls(true);
-        onSendUserMessage(userRequestTextPerAiRequestId[aiRequestId] || '');
+        onSendUserMessage({
+          userMessage: userRequestTextPerAiRequestId[aiRequestId] || '',
+          mode: selectedMode,
+        });
       },
       [
         aiRequestId,
@@ -610,6 +626,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         scrollToBottom,
         setAutoProcessFunctionCalls,
         cannotContinue,
+        selectedMode,
       ]
     );
 
@@ -631,18 +648,14 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             {!standAloneForm && (
               <Column noMargin alignItems="center">
                 <Text size="bold-title" align="center">
-                  {aiRequestMode === 'agent' ? (
-                    <Trans>What do you want to make?</Trans>
-                  ) : (
-                    <Trans>Ask any gamedev question</Trans>
-                  )}
+                  <Trans>What do you want to make?</Trans>
                 </Text>
               </Column>
             )}
             {!standAloneForm && (
               <Line noMargin justifyContent="center">
                 <TwoStatesButton
-                  value={aiRequestMode}
+                  value={selectedMode}
                   leftButton={{
                     icon: <Hammer fontSize="small" />,
                     label: <Trans>Build for me</Trans>,
@@ -657,7 +670,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                     if (value !== 'chat' && value !== 'agent') {
                       return;
                     }
-                    setAiState({ mode: value, aiRequestId: null });
+                    setSelectedMode(value);
                   }}
                   disabled={isWorking}
                 />
@@ -701,7 +714,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                             aiConfigurationPresetsWithAvailability={
                               aiConfigurationPresetsWithAvailability
                             }
-                            aiRequestMode={aiRequestMode}
+                            aiRequestMode={selectedMode}
                             disabled={isWorking}
                           />
                           <RaisedButton
@@ -831,68 +844,26 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
           <Spacer />
           {!standAloneForm && (
             <Column justifyContent="center">
-              {aiRequestMode === 'agent' ? (
-                <Text
-                  size="body-small"
-                  color="secondary"
-                  align="center"
-                  noMargin
-                >
-                  <Trans>
-                    The AI agent will build simple games or features for you.{' '}
-                    <Link
-                      href={getHelpLink('/interface/ai')}
-                      color="secondary"
-                      onClick={() =>
-                        Window.openExternalURL(getHelpLink('/interface/ai'))
-                      }
-                    >
-                      It can inspect your game objects and events.
-                    </Link>
-                  </Trans>
-                </Text>
-              ) : (
-                <Text
-                  size="body-small"
-                  color="secondary"
-                  align="center"
-                  noMargin
-                >
-                  <Trans>
-                    The AI chat is experimental and still being improved.{' '}
-                    <Link
-                      href={getHelpLink('/interface/ai')}
-                      color="secondary"
-                      onClick={() =>
-                        Window.openExternalURL(getHelpLink('/interface/ai'))
-                      }
-                    >
-                      It can inspect your game objects and events.
-                    </Link>
-                  </Trans>
-                </Text>
-              )}
-              {aiRequestMode === 'agent' ? (
-                <Text
-                  size="body-small"
-                  color="secondary"
-                  align="center"
-                  noMargin
-                >
-                  <Trans>
-                    Results may vary: experiment and use it for learning.
-                  </Trans>
-                </Text>
-              ) : (
-                <Text
-                  size="body-small"
-                  color="secondary"
-                  align="center"
-                  noMargin
-                >
-                  <Trans>Answers may have mistakes: always verify them.</Trans>
-                </Text>
-              )}
+              <Text size="body-small" color="secondary" align="center" noMargin>
+                <Trans>
+                  The AI is experimental and still being improved.{' '}
+                  <Link
+                    href={getHelpLink('/interface/ai')}
+                    color="secondary"
+                    onClick={() =>
+                      Window.openExternalURL(getHelpLink('/interface/ai'))
+                    }
+                  >
+                    It can inspect your game objects and events.
+                  </Link>
+                </Trans>
+              </Text>
+              <Text size="body-small" color="secondary" align="center" noMargin>
+                <Trans>
+                  Changes and answers may have mistakes: experiment and use it
+                  for learning.
+                </Trans>
+              </Text>
             </Column>
           )}
         </div>
@@ -924,7 +895,6 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             href="#"
             onClick={() =>
               onStartOrOpenChat({
-                mode: aiRequest.mode || 'chat',
                 aiRequestId: null,
               })
             }
@@ -1042,8 +1012,29 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 noMargin
                 expand
                 alignItems="center"
-                justifyContent="flex-end"
+                justifyContent="space-between"
               >
+                <CompactSelectField
+                  disabled={isWorking}
+                  value={selectedMode}
+                  onChange={value => {
+                    if (value !== 'chat' && value !== 'agent') {
+                      return;
+                    }
+                    setSelectedMode(value);
+                  }}
+                  renderOptionIcon={className =>
+                    selectedMode === 'chat' ? (
+                      <HelpQuestion className={className} />
+                    ) : (
+                      <Hammer className={className} />
+                    )
+                  }
+                  rounded
+                >
+                  <SelectOption key="chat" value="chat" label={t`Ask`} />
+                  <SelectOption key="agent" value="agent" label={t`Build`} />
+                </CompactSelectField>
                 {isForAnotherProjectText || errorText || priceAndRequestsText}
               </Line>
             }

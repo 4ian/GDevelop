@@ -330,6 +330,8 @@ export const addMessageToAiRequest = async (
     projectSpecificExtensionsSummaryJson,
     projectSpecificExtensionsSummaryJsonUserRelativeKey,
     paused,
+    mode,
+    toolsVersion,
   }: {|
     userId: string,
     aiRequestId: string,
@@ -342,6 +344,8 @@ export const addMessageToAiRequest = async (
     projectSpecificExtensionsSummaryJson: string | null,
     projectSpecificExtensionsSummaryJsonUserRelativeKey: string | null,
     paused?: boolean,
+    mode?: 'chat' | 'agent',
+    toolsVersion?: string,
   |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -359,6 +363,8 @@ export const addMessageToAiRequest = async (
       projectSpecificExtensionsSummaryJson,
       projectSpecificExtensionsSummaryJsonUserRelativeKey,
       paused,
+      mode,
+      toolsVersion,
     },
     {
       params: {

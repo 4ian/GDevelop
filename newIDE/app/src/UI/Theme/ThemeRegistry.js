@@ -6,7 +6,7 @@ import NordTheme from './NordTheme';
 import SolarizedDarkTheme from './SolarizedDarkTheme';
 import OneDarkTheme from './OneDarkTheme';
 import RosePineTheme from './RosePineTheme';
-import ProfessionalDarkTheme from './ProfessionalDarkTheme';
+import DeepBlueTheme from './DeepBlueTheme';
 
 /*eslint no-useless-computed-key: "off"*/
 export const themes = {
@@ -17,5 +17,5 @@ export const themes = {
     ['Solarized Dark']: SolarizedDarkTheme,
     ['One Dark']: OneDarkTheme,
     ['Rosé Pine']: RosePineTheme,
-    ['Professional Dark']: ProfessionalDarkTheme,
+    ['Deep Blue']: DeepBlueTheme,
 };

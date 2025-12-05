@@ -1,12 +1,12 @@
 import { createGdevelopTheme } from '../CreateTheme';
 
-import styles from './ProfessionalDarkThemeVariables.json';
-import './ProfessionalDarkThemeVariables.css';
+import styles from './DeepBlueThemeVariables.json';
+import './DeepBlueThemeVariables.css';
 
 export default createGdevelopTheme({
   styles,
 
-  rootClassNameIdentifier: 'ProfessionalDarkTheme',
+  rootClassNameIdentifier: 'DeepBlueTheme',
   paletteType: 'dark',
   gdevelopIconsCSSFilter: 'hue-rotate(-10deg) saturate(50%)',
 });

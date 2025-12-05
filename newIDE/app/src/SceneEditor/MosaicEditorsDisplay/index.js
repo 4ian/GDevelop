@@ -92,7 +92,8 @@ const MosaicEditorsDisplay = React.forwardRef<
     onWillInstallExtension,
     onExtensionInstalled,
     isActive,
-    onRestartInGameEditorAfterError,
+    onRestartInGameEditor,
+    showRestartInGameEditorAfterErrorButton,
   } = props;
   const {
     getDefaultEditorMosaicNode,
@@ -368,8 +369,9 @@ const MosaicEditorsDisplay = React.forwardRef<
             renderEditor: () => (
               <EmbeddedGameFrameHole
                 isActive={isActive}
-                onRestartInGameEditorAfterError={
-                  onRestartInGameEditorAfterError
+                onRestartInGameEditor={onRestartInGameEditor}
+                showRestartInGameEditorAfterErrorButton={
+                  showRestartInGameEditorAfterErrorButton
                 }
               />
             ),

@@ -296,8 +296,9 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           editorId={this.props.editorId}
           gameEditorMode={this.props.gameEditorMode}
           setGameEditorMode={this.props.setGameEditorMode}
-          onRestartInGameEditorAfterError={
-            this.props.onRestartInGameEditorAfterError
+          onRestartInGameEditor={this.props.onRestartInGameEditor}
+          showRestartInGameEditorAfterErrorButton={
+            this.props.showRestartInGameEditorAfterErrorButton
           }
           setToolbar={this.props.setToolbar}
           resourceManagementProps={this.props.resourceManagementProps}

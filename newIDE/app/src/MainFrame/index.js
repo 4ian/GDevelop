@@ -1641,21 +1641,17 @@ const MainFrame = (props: Props) => {
     setShowRestartInGameEditorAfterErrorButton,
   ] = React.useState(false);
   const onRestartInGameEditor = React.useCallback(
-    () => {
+    (reason: string) => {
       setShowRestartInGameEditorAfterErrorButton(false);
       notifyChangesToInGameEditor({
         shouldReloadProjectData: true,
         shouldReloadLibraries: true,
         shouldReloadResources: true,
         shouldHardReload: true,
-        reasons: [
-          showRestartInGameEditorAfterErrorButton
-            ? 'relaunched-after-uncaught-error-or-hot-reload-error'
-            : 'relaunched-manually',
-        ],
+        reasons: [reason],
       });
     },
-    [notifyChangesToInGameEditor, showRestartInGameEditorAfterErrorButton]
+    [notifyChangesToInGameEditor]
   );
 
   React.useEffect(
@@ -4763,9 +4759,8 @@ const MainFrame = (props: Props) => {
     onExternalLayoutAssociationChanged,
     gamesList: gamesList,
     triggerHotReloadInGameEditorIfNeeded,
-    onRestartInGameEditorAfterError: showRestartInGameEditorAfterErrorButton
-      ? onRestartInGameEditor
-      : null,
+    onRestartInGameEditor,
+    showRestartInGameEditorAfterErrorButton,
   };
 
   const hasEditorsInLeftPane = hasEditorsInPane(state.editorTabs, 'left');
@@ -5099,7 +5094,9 @@ const MainFrame = (props: Props) => {
           onLaunchNewPreview={() => {
             clearEditorHotReloadLogs();
             clearEditorUncaughtError();
-            onRestartInGameEditor();
+            onRestartInGameEditor(
+              'relaunched-after-uncaught-error-or-hot-reload-error'
+            );
           }}
         />
       )}

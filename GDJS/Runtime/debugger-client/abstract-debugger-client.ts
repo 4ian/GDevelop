@@ -961,6 +961,20 @@ namespace gdjs {
       );
     }
 
+    sendGraphicsContextLost(): void {
+      const inGameEditor = this._runtimegame.getInGameEditor();
+      if (!inGameEditor) {
+        return;
+      }
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'notifyGraphicsContextLost',
+          editorId: inGameEditor.getEditorId(),
+          payload: {},
+        })
+      );
+    }
+
     /**
      * Send profiling results.
      * @param framesAverageMeasures The measures made for each frames.

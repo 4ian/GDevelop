@@ -186,7 +186,8 @@ type Props = {|
   editorId: string,
   gameEditorMode: 'embedded-game' | 'instances-editor',
   setGameEditorMode: ('embedded-game' | 'instances-editor') => void,
-  onRestartInGameEditorAfterError: (() => void) | null,
+  onRestartInGameEditor: (reason: string) => void,
+  showRestartInGameEditorAfterErrorButton: boolean,
   project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   layout: gdLayout | null,
@@ -397,6 +398,15 @@ export default class SceneEditor extends React.Component<Props, State> {
               this.paste();
             } else if (parsedMessage.command === 'cut') {
               this.cutSelection();
+            } else if (parsedMessage.command === 'notifyGraphicsContextLost') {
+              if (this.props.onRestartInGameEditor) {
+                console.info(
+                  'Embedded game frame notified the graphics context was lost, restarting the editor...'
+                );
+                this.props.onRestartInGameEditor(
+                  'relaunched-because-graphics-context-lost'
+                );
+              }
             }
           },
         }
@@ -2712,8 +2722,9 @@ export default class SceneEditor extends React.Component<Props, State> {
               <EditorsDisplay
                 ref={ref => (this.editorDisplay = ref)}
                 gameEditorMode={this.props.gameEditorMode}
-                onRestartInGameEditorAfterError={
-                  this.props.onRestartInGameEditorAfterError
+                onRestartInGameEditor={this.props.onRestartInGameEditor}
+                showRestartInGameEditorAfterErrorButton={
+                  this.props.showRestartInGameEditorAfterErrorButton
                 }
                 project={project}
                 layout={layout}

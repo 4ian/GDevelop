@@ -38,6 +38,7 @@ export const getDefaultResourceThumbnail = (resource: gdResource) => {
     case 'tilemap':
     case 'tileset':
     case 'spine':
+    case 'spritesheet':
       return 'res/actions/fichier24.png';
     case 'video':
       return 'JsPlatform/Extensions/videoicon24.png';

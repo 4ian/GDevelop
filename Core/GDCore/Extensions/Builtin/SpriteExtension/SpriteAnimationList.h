@@ -19,8 +19,10 @@ namespace gd {
 
 /**
  * \brief A list of animations, containing directions with images and collision mask.
- * 
+ *
  * It's used in the configuration of object that implements image-based animations.
+ * Each image is called a "Sprite" (not to be confused with the "Sprite" object),
+ * and can be either a standalone image or a frame from a spritesheet.
  *
  * \see Animation
  * \see Direction

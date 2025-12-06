@@ -301,8 +301,15 @@ const SpritesList = ({
   const { showConfirmation } = useAlertDialog();
 
   const storageProvider = resourceManagementProps.getStorageProvider();
-  const resourceSources = resourceManagementProps.resourceSources
+  const imageResourceSources = resourceManagementProps.resourceSources
     .filter(source => source.kind === 'image')
+    .filter(
+      ({ onlyForStorageProvider }) =>
+        !onlyForStorageProvider ||
+        onlyForStorageProvider === storageProvider.internalName
+    );
+  const spritesheetResourceSources = resourceManagementProps.resourceSources
+    .filter(source => source.kind === 'spritesheet')
     .filter(
       ({ onlyForStorageProvider }) =>
         !onlyForStorageProvider ||
@@ -406,7 +413,7 @@ const SpritesList = ({
       });
 
       if (!selectedResources.length) return;
-      const selectedResourceSource = resourceSources.find(
+      const selectedResourceSource = imageResourceSources.find(
         source => source.name === selectedSourceName
       );
       if (!selectedResourceSource) return;
@@ -475,7 +482,73 @@ const SpritesList = ({
       addAnimations,
       animations,
       onSpriteAdded,
-      resourceSources,
+      imageResourceSources,
+    ]
+  );
+
+  const onAddSpriteFromSpritesheet = React.useCallback(
+    async (initialResourceSource: ResourceSource) => {
+      try {
+        const directionSpritesCountBeforeAdding = direction.getSpritesCount();
+        if (!initialResourceSource) return;
+
+        const {
+          selectedResources,
+          selectedSourceName,
+        } = await resourceManagementProps.onChooseResource({
+          initialSourceName: initialResourceSource.name,
+          multiSelection: false,
+          resourceKind: 'spritesheet',
+        });
+
+        if (!selectedResources.length) return;
+        const selectedResourceSource = spritesheetResourceSources.find(
+          source => source.name === selectedSourceName
+        );
+        if (!selectedResourceSource) return;
+
+        const resource = selectedResources[0];
+
+        if (selectedResourceSource.shouldCreateResource) {
+          applyResourceDefaults(project, resource);
+
+          // addResource will check if a resource with the same name exists, and if it is
+          // the case, no new resource will be added.
+          const hasCreatedAnyResource = project
+            .getResourcesManager()
+            .addResource(resource);
+
+          // Important, we are responsible for deleting the resources that were given to us.
+          // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
+          selectedResources.forEach(resource => resource.delete());
+
+          if (hasCreatedAnyResource) {
+            await resourceManagementProps.onFetchNewlyAddedResources();
+            resourceManagementProps.onNewResourcesAdded();
+          }
+        }
+
+        // TODO: show a dialog allowing the user to select the animation of one/more frames of the spritesheet to add.
+        // And then create the sprites:
+        // addAnimationFrame(animations, direction, resource, onSpriteAdded);
+
+        if (selectedResources.length && onSpriteUpdated) onSpriteUpdated();
+        if (directionSpritesCountBeforeAdding === 0 && onFirstSpriteUpdated) {
+          // If there was no sprites before, we can assume the first sprite was added.
+          onFirstSpriteUpdated();
+        }
+      } catch (err) {
+        // Should never happen, errors should be shown in the interface.
+        console.error('Unable to choose a resource', err);
+      }
+    },
+    [
+      direction,
+      onFirstSpriteUpdated,
+      onSpriteUpdated,
+      project,
+      resourceManagementProps,
+      spritesheetResourceSources,
     ]
   );
 
@@ -634,26 +707,50 @@ const SpritesList = ({
         <Column noMargin>
           <RaisedButtonWithSplitMenu
             onClick={() => {
-              onAddSprite(resourceSources[0]);
+              onAddSprite(imageResourceSources[0]);
             }}
             // The event-based object editor gives an empty list.
-            disabled={resourceSources.length === 0}
+            disabled={imageResourceSources.length === 0}
             label={<Trans>Add a sprite</Trans>}
             icon={<Add />}
             primary
             buildMenuTemplate={(i18n: I18nType) => {
               const storageProvider = resourceManagementProps.getStorageProvider();
-              return resourceManagementProps.resourceSources
-                .filter(source => source.kind === 'image')
-                .filter(
-                  ({ onlyForStorageProvider }) =>
-                    !onlyForStorageProvider ||
-                    onlyForStorageProvider === storageProvider.internalName
-                )
-                .map(source => ({
-                  label: i18n._(source.displayName),
-                  click: () => onAddSprite(source),
-                }));
+              return [
+                {
+                  label: i18n._(t`Image(s):`),
+                  enabled: false,
+                },
+                ...resourceManagementProps.resourceSources
+                  .filter(source => source.kind === 'image')
+                  .filter(
+                    ({ onlyForStorageProvider }) =>
+                      !onlyForStorageProvider ||
+                      onlyForStorageProvider === storageProvider.internalName
+                  )
+                  .map(source => ({
+                    label: i18n._(source.displayName),
+                    click: () => onAddSprite(source),
+                  })),
+                {
+                  type: 'separator',
+                },
+                {
+                  label: i18n._(t`From a spritesheet (PixiJS format):`),
+                  enabled: false,
+                },
+                ...resourceManagementProps.resourceSources
+                  .filter(source => source.kind === 'spritesheet')
+                  .filter(
+                    ({ onlyForStorageProvider }) =>
+                      !onlyForStorageProvider ||
+                      onlyForStorageProvider === storageProvider.internalName
+                  )
+                  .map(source => ({
+                    label: i18n._(source.displayName),
+                    click: () => onAddSpriteFromSpritesheet(source),
+                  })),
+              ];
             }}
           />
         </Column>

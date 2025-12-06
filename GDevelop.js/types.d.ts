@@ -1149,6 +1149,10 @@ export class SpineResource extends JsonResource {
   constructor();
 }
 
+export class SpritesheetResource extends Resource {
+  constructor();
+}
+
 export class TilemapResource extends Resource {
   constructor();
 }

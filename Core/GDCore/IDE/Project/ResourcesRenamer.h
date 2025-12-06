@@ -74,6 +74,9 @@ class ResourcesRenamer : public gd::ArbitraryResourceWorker {
   virtual void ExposeSpine(gd::String& resourceName) override {
     RenameIfNeeded(resourceName);
   };
+  virtual void ExposeSpritesheet(gd::String& resourceName) override {
+    RenameIfNeeded(resourceName);
+  };
 
  private:
   void RenameIfNeeded(gd::String& resourceName) {

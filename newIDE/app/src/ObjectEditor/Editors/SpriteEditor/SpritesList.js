@@ -39,6 +39,9 @@ import ContextMenu, {
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 import { groupResourcesByAnimations } from './AnimationImportHelper';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor';
+import SpritesheetFramesSelectorDialog, {
+  type SpritesheetSelectionResult,
+} from '../Spritesheet/SpritesheetFramesSelectorDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -299,6 +302,10 @@ const SpritesList = ({
   const spriteContextMenu = React.useRef<?ContextMenuInterface>(null);
   const forceUpdate = useForceUpdate();
   const { showConfirmation } = useAlertDialog();
+  const [
+    selectedSpritesheetResourceName,
+    setSelectedSpritesheetResourceName,
+  ] = React.useState<string | null>(null);
 
   const storageProvider = resourceManagementProps.getStorageProvider();
   const imageResourceSources = resourceManagementProps.resourceSources
@@ -489,7 +496,6 @@ const SpritesList = ({
   const onAddSpriteFromSpritesheet = React.useCallback(
     async (initialResourceSource: ResourceSource) => {
       try {
-        const directionSpritesCountBeforeAdding = direction.getSpritesCount();
         if (!initialResourceSource) return;
 
         const {
@@ -508,6 +514,7 @@ const SpritesList = ({
         if (!selectedResourceSource) return;
 
         const resource = selectedResources[0];
+        const resourceName = resource.getName();
 
         if (selectedResourceSource.shouldCreateResource) {
           applyResourceDefaults(project, resource);
@@ -530,26 +537,27 @@ const SpritesList = ({
 
         // TODO: show a dialog allowing the user to select the animation of one/more frames of the spritesheet to add.
         // And then create the sprites:
-        // addAnimationFrame(animations, direction, resource, onSpriteAdded);
+        setSelectedSpritesheetResourceName(resourceName);
 
-        if (selectedResources.length && onSpriteUpdated) onSpriteUpdated();
-        if (directionSpritesCountBeforeAdding === 0 && onFirstSpriteUpdated) {
-          // If there was no sprites before, we can assume the first sprite was added.
-          onFirstSpriteUpdated();
-        }
+        // if (selectedResources.length && onSpriteUpdated) onSpriteUpdated();
+        // if (directionSpritesCountBeforeAdding === 0 && onFirstSpriteUpdated) {
+        //   // If there was no sprites before, we can assume the first sprite was added.
+        //   onFirstSpriteUpdated();
+        // }
       } catch (err) {
         // Should never happen, errors should be shown in the interface.
         console.error('Unable to choose a resource', err);
       }
     },
-    [
-      direction,
-      onFirstSpriteUpdated,
-      onSpriteUpdated,
-      project,
-      resourceManagementProps,
-      spritesheetResourceSources,
-    ]
+    [project, resourceManagementProps, spritesheetResourceSources]
+  );
+
+  const onSelectFromSpritesheet = React.useCallback(
+    (selection: SpritesheetSelectionResult) => {
+      console.log('selection', selection);
+      setSelectedSpritesheetResourceName(null);
+    },
+    [setSelectedSpritesheetResourceName]
   );
 
   const deleteSprites = React.useCallback(
@@ -755,6 +763,14 @@ const SpritesList = ({
           />
         </Column>
       </ResponsiveLineStackLayout>
+      {selectedSpritesheetResourceName && (
+        <SpritesheetFramesSelectorDialog
+          project={project}
+          spritesheetResourceName={selectedSpritesheetResourceName}
+          onSelect={onSelectFromSpritesheet}
+          onRequestClose={() => setSelectedSpritesheetResourceName(null)}
+        />
+      )}
     </ColumnStackLayout>
   );
 };

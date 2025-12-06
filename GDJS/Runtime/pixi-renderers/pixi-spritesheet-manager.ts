@@ -144,7 +144,7 @@ namespace gdjs {
         this._loadedSpritesheetData.set(resource, jsonData);
 
         // Get the base texture from the image referenced in the spritesheet
-        if (!jsonData.meta.image) {
+        if (!jsonData.meta || !jsonData.meta.image) {
           throw new Error(
             `Spritesheet JSON is missing the 'meta.image' field: ${resource.name}`
           );

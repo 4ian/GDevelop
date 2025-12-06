@@ -199,11 +199,15 @@ namespace gdjs {
     }
 
     static getAnimationFrameTextureManager(
-      imageManager: gdjs.PixiImageManager
+      imageManager: gdjs.PixiImageManager,
+      spritesheetManager: gdjs.PixiSpritesheetManager
     ): PixiAnimationFrameTextureManager {
       if (!imageManager._pixiAnimationFrameTextureManager) {
         imageManager._pixiAnimationFrameTextureManager =
-          new PixiAnimationFrameTextureManager(imageManager);
+          new PixiAnimationFrameTextureManager(
+            imageManager,
+            spritesheetManager
+          );
       }
       return imageManager._pixiAnimationFrameTextureManager;
     }
@@ -213,13 +217,34 @@ namespace gdjs {
     implements gdjs.AnimationFrameTextureManager<PIXI.Texture>
   {
     private _imageManager: gdjs.PixiImageManager;
+    private _spritesheetManager: gdjs.PixiSpritesheetManager;
 
-    constructor(imageManager: gdjs.PixiImageManager) {
+    constructor(
+      imageManager: gdjs.PixiImageManager,
+      spritesheetManager: gdjs.PixiSpritesheetManager
+    ) {
       this._imageManager = imageManager;
+      this._spritesheetManager = spritesheetManager;
     }
 
     getAnimationFrameTexture(imageName: string) {
       return this._imageManager.getPIXITexture(imageName);
+    }
+
+    /**
+     * Get a texture from a spritesheet frame.
+     * @param spritesheetResourceName The spritesheet resource name.
+     * @param frameName The frame name within the spritesheet.
+     * @returns The texture for the specified frame.
+     */
+    getAnimationFrameTextureFromSpritesheet(
+      spritesheetResourceName: string,
+      frameName: string
+    ): PIXI.Texture {
+      return this._spritesheetManager.getSpritesheetFramePixiTexture(
+        spritesheetResourceName,
+        frameName
+      );
     }
 
     getAnimationFrameWidth(pixiTexture: PIXI.Texture) {

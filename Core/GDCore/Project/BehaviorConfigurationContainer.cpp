@@ -58,6 +58,8 @@ void BehaviorConfigurationContainer::ExposeResources(gd::ArbitraryResourceWorker
         worker.ExposeAtlas(newPropertyValue);
       } else if (resourceType == "spine") {
         worker.ExposeSpine(newPropertyValue);
+      } else if (resourceType == "spritesheet") {
+        worker.ExposeSpritesheet(newPropertyValue);
       }
 
       if (newPropertyValue != oldPropertyValue) {

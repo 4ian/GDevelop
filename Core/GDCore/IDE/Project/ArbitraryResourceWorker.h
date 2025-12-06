@@ -108,6 +108,11 @@ public:
   virtual void ExposeSpine(gd::String &resourceName);
 
   /**
+   * \brief Expose a spritesheet, which is always a reference to a "spritesheet" resource.
+   */
+  virtual void ExposeSpritesheet(gd::String &resourceName);
+
+  /**
    * \brief Expose a video, which is always a reference to a "video" resource.
    */
   virtual void ExposeVideo(gd::String &videoName);

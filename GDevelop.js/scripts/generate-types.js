@@ -452,13 +452,13 @@ type CustomObjectConfiguration_EdgeAnchor = 0 | 1 | 2 | 3 | 4`
     shell.sed(
       '-i',
       /setKind\(kind: string\): void/,
-      "setKind(kind: 'image' | 'audio' | 'font' | 'video' | 'json' | 'tilemap' | 'tileset' | 'model3D' | 'atlas' | 'spine'): void",
+      "setKind(kind: 'image' | 'audio' | 'font' | 'video' | 'json' | 'tilemap' | 'tileset' | 'model3D' | 'atlas' | 'spine' | 'spritesheet'): void",
       'types/gdresource.js'
     );
     shell.sed(
       '-i',
       /getKind\(\): string/,
-      "getKind(): 'image' | 'audio' | 'font' | 'video' | 'json' | 'tilemap' | 'tileset' | 'model3D' | 'atlas' | 'spine'",
+      "getKind(): 'image' | 'audio' | 'font' | 'video' | 'json' | 'tilemap' | 'tileset' | 'model3D' | 'atlas' | 'spine' | 'spritesheet'",
       'types/gdresource.js'
     );
 

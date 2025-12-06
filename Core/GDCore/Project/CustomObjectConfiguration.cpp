@@ -236,6 +236,8 @@ void CustomObjectConfiguration::ExposeResources(gd::ArbitraryResourceWorker& wor
         worker.ExposeAtlas(newPropertyValue);
       } else if (resourceType == "spine") {
         worker.ExposeSpine(newPropertyValue);
+      } else if (resourceType == "spritesheet") {
+        worker.ExposeSpritesheet(newPropertyValue);
       }
 
       if (newPropertyValue != oldPropertyValue) {

@@ -146,6 +146,7 @@ namespace gdjs {
     private _bitmapFontManager: BitmapFontManager;
     private _spineAtlasManager: SpineAtlasManager | null = null;
     private _spineManager: SpineManager | null = null;
+    private _spritesheetManager: PixiSpritesheetManager;
     private _svgManager: InternalInGameEditorOnlySvgManager;
 
     /**
@@ -192,6 +193,10 @@ namespace gdjs {
         this._imageManager
       );
       this._model3DManager = new gdjs.Model3DManager(this);
+      this._spritesheetManager = new gdjs.PixiSpritesheetManager(
+        this,
+        this._imageManager
+      );
       this._svgManager = new InternalInGameEditorOnlySvgManager();
 
       // add spine related managers only if spine extension is used
@@ -213,6 +218,7 @@ namespace gdjs {
         this._jsonManager,
         this._bitmapFontManager,
         this._model3DManager,
+        this._spritesheetManager,
         this._svgManager,
       ];
 
@@ -812,6 +818,15 @@ namespace gdjs {
      */
     getSpineAtlasManager(): gdjs.SpineAtlasManager | null {
       return this._spineAtlasManager;
+    }
+
+    /**
+     * Get the Spritesheet manager of the game, used to load spritesheet JSON
+     * data and access individual frame textures.
+     * @return The Spritesheet manager for the game
+     */
+    getSpritesheetManager(): gdjs.PixiSpritesheetManager {
+      return this._spritesheetManager;
     }
 
     injectMockResourceManagerForTesting(

@@ -119,7 +119,8 @@ gd::String ObjectCodeGenerator::GenerateRuntimeObjectCompleteCode(
     this._animator = new gdjs.SpriteAnimator(
         objectData.animatable.animations,
         gdjs.RENDERER_CLASS_NAME.getAnimationFrameTextureManager(
-            parentInstanceContainer.getGame().getImageManager()));
+            parentInstanceContainer.getGame().getImageManager(),
+            parentInstanceContainer.getGame().getSpritesheetManager()));
 )jscode_template")
       .FindAndReplace("RENDERER_CLASS_NAME", eventsBasedObject.IsRenderedIn3D() ? "CustomRuntimeObject3DRenderer" : "CustomRuntimeObject2DRenderer");
       },

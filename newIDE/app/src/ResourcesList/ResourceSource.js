@@ -31,6 +31,7 @@ export type ResourceKind =
   | 'model3D'
   | 'atlas'
   | 'spine'
+  | 'spritesheet'
   | 'javascript';
 
 export const resourcesKindSupportedByResourceStore = ['audio', 'font'];
@@ -62,7 +63,7 @@ export const allResourceKindsAndMetadata = [
   },
   {
     kind: 'json',
-    displayName: t`Json`,
+    displayName: t`JSON file`,
     fileExtensions: ['json'],
     createNewResource: () => {
       return new gd.JsonResource();
@@ -70,40 +71,48 @@ export const allResourceKindsAndMetadata = [
   },
   {
     kind: 'tilemap',
-    displayName: t`Tile Map`,
+    displayName: t`Tilemap (LDtk .ldtk/JSON or Tiled .tmj/JSON)`,
     fileExtensions: ['json', 'ldtk', 'tmj'],
     createNewResource: () => new gd.TilemapResource(),
   },
   {
     kind: 'tileset',
-    displayName: t`Tile Set`,
+    displayName: t`Tileset (Tiled .tsj/JSON)`,
     fileExtensions: ['json', 'tsj'],
     createNewResource: () => new gd.TilesetResource(),
   },
   {
     kind: 'bitmapFont',
-    displayName: t`Bitmap Font`,
+    displayName: t`Bitmap Font (.fnt/XML file)`,
     fileExtensions: ['fnt', 'xml'],
     createNewResource: () => new gd.BitmapFontResource(),
   },
   {
     kind: 'model3D',
-    displayName: t`3D model`,
+    displayName: t`3D model (GLB format)`,
     fileExtensions: ['glb'],
     createNewResource: () => new gd.Model3DResource(),
   },
   {
     kind: 'atlas',
-    displayName: t`Atlas`,
+    displayName: t`Spine Atlas`,
     fileExtensions: ['atlas'],
     createNewResource: () => new gd.AtlasResource(),
   },
   {
     kind: 'spine',
-    displayName: t`Spine Json`,
+    displayName: t`Spine Skeleton JSON`,
     fileExtensions: ['json'],
     createNewResource: () => {
       return new gd.SpineResource();
+    },
+  },
+  {
+    kind: 'spritesheet',
+    displayName: t`Spritesheet (PixiJS format)`,
+    fileExtensions: ['json'],
+    createNewResource: () => {
+      return new gd.SpritesheetResource();
     },
   },
   {

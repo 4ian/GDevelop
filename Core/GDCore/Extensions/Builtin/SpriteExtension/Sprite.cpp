@@ -19,7 +19,9 @@ Sprite::Sprite()
     : fullImageCollisionMask(false),
       origine("origine"),
       centre("centre"),
-      automaticCentre(true) {}
+      automaticCentre(true),
+      spritesheetName(""),
+      spritesheetFrameName("") {}
 
 Sprite::~Sprite(){};
 

@@ -130,6 +130,8 @@ ResourcesContainer::CreateResource(const gd::String &kind) {
     return std::make_shared<AtlasResource>();
   else if (kind == "spine")
     return std::make_shared<SpineResource>();
+  else if (kind == "spritesheet")
+    return std::make_shared<SpritesheetResource>();
   else if (kind == "javascript")
     return std::make_shared<JavaScriptResource>();
   else if (kind == "internal-in-game-editor-only-svg")
@@ -144,6 +146,7 @@ const gd::String Resource::audioType = "audio";
 const gd::String Resource::fontType = "font";
 const gd::String Resource::videoType = "video";
 const gd::String Resource::jsonType = "json";
+const gd::String Resource::spritesheetType = "spritesheet";
 const gd::String Resource::tileMapType = "tilemap";
 const gd::String Resource::tileSetType = "tileset";
 const gd::String Resource::bitmapType = "bitmapFont";

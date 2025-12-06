@@ -146,6 +146,7 @@ namespace gdjs {
     private _bitmapFontManager: BitmapFontManager;
     private _spineAtlasManager: SpineAtlasManager | null = null;
     private _spineManager: SpineManager | null = null;
+    private _spritesheetManager: PixiSpritesheetManager | null = null;
     private _svgManager: InternalInGameEditorOnlySvgManager;
 
     /**
@@ -206,6 +207,12 @@ namespace gdjs {
         );
       }
 
+      // Create spritesheet manager
+      this._spritesheetManager = new gdjs.PixiSpritesheetManager(
+        this,
+        this._imageManager
+      );
+
       const resourceManagers: Array<ResourceManager> = [
         this._imageManager,
         this._soundManager,
@@ -214,6 +221,7 @@ namespace gdjs {
         this._bitmapFontManager,
         this._model3DManager,
         this._svgManager,
+        this._spritesheetManager,
       ];
 
       if (this._spineAtlasManager)
@@ -812,6 +820,15 @@ namespace gdjs {
      */
     getSpineAtlasManager(): gdjs.SpineAtlasManager | null {
       return this._spineAtlasManager;
+    }
+
+    /**
+     * Get the Spritesheet manager of the game, used to load spritesheets from game
+     * resources.
+     * @return The Spritesheet manager for the game
+     */
+    getSpritesheetManager(): gdjs.PixiSpritesheetManager | null {
+      return this._spritesheetManager;
     }
 
     injectMockResourceManagerForTesting(

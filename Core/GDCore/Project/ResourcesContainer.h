@@ -37,6 +37,7 @@ public:
   static const gd::String model3DType;
   static const gd::String atlasType;
   static const gd::String spineType;
+  static const gd::String spritesheetType;
   static const gd::String javaScriptType;
   static const gd::String internalInGameEditorOnlySvgType;
 
@@ -564,6 +565,22 @@ public:
 
 private:
   gd::String file;
+};
+
+/**
+ * \brief Describe a spritesheet JSON file used by a project.
+ * A spritesheet contains frame definitions that reference an image resource.
+ *
+ * \see Resource
+ * \ingroup ResourcesManagement
+ */
+class GD_CORE_API SpritesheetResource : public JsonResource {
+public:
+  SpritesheetResource() : JsonResource() { SetKind("spritesheet"); };
+  virtual ~SpritesheetResource(){};
+  virtual SpritesheetResource *Clone() const override {
+    return new SpritesheetResource(*this);
+  }
 };
 
 /**

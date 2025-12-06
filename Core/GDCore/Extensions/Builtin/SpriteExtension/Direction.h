@@ -24,6 +24,19 @@ namespace gd {
  *
  * \todo Support UTF8 (currently convert all loaded strings from UTF8 to the
  * current locale)
+ *
+ * \note Spritesheet support: Each Sprite in a Direction can use either:
+ * - A regular image resource (via Sprite::GetImageName())
+ * - A frame from a spritesheet (via Sprite::GetSpritesheetName() and
+ *   Sprite::GetSpritesheetFrameName())
+ *
+ * \note Future enhancement: The spritesheet JSON format may include an
+ * "animations" field that maps animation names to arrays of frame names.
+ * This could be used to automatically populate a Direction with all frames
+ * from a spritesheet animation. For example:
+ * - A Direction could be configured to use a spritesheet animation name
+ * - All frames from that animation would be automatically added to the Direction
+ * - This would simplify importing animations from tools like TexturePacker
  */
 class GD_CORE_API Direction {
  public:

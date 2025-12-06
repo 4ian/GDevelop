@@ -43,6 +43,52 @@ class GD_CORE_API Sprite {
   inline gd::String& GetImageName() { return image; }
 
   /**
+   * \brief Set the spritesheet resource name and frame name.
+   * When both are set, the sprite will use a frame from a spritesheet instead of an image.
+   */
+  inline void SetSpritesheetName(const gd::String& spritesheetName_) {
+    spritesheetName = spritesheetName_;
+  }
+
+  /**
+   * \brief Get the spritesheet resource name.
+   */
+  inline const gd::String& GetSpritesheetName() const { return spritesheetName; }
+
+  /**
+   * \brief Get the spritesheet resource name.
+   */
+  inline gd::String& GetSpritesheetName() { return spritesheetName; }
+
+  /**
+   * \brief Set the frame name within the spritesheet.
+   */
+  inline void SetSpritesheetFrameName(const gd::String& frameName_) {
+    spritesheetFrameName = frameName_;
+  }
+
+  /**
+   * \brief Get the frame name within the spritesheet.
+   */
+  inline const gd::String& GetSpritesheetFrameName() const {
+    return spritesheetFrameName;
+  }
+
+  /**
+   * \brief Get the frame name within the spritesheet.
+   */
+  inline gd::String& GetSpritesheetFrameName() {
+    return spritesheetFrameName;
+  }
+
+  /**
+   * \brief Return true if the sprite uses a spritesheet frame instead of an image.
+   */
+  inline bool UsesSpritesheet() const {
+    return !spritesheetName.empty() && !spritesheetFrameName.empty();
+  }
+
+  /**
    * \brief Get the collision mask (custom or automatically generated owing to
    * IsFullImageCollisionMask())
    *
@@ -161,6 +207,8 @@ class GD_CORE_API Sprite {
 
  private:
   gd::String image;  ///< Name of the image to be loaded in Image Manager.
+  gd::String spritesheetName;  ///< Name of the spritesheet resource (if using spritesheet).
+  gd::String spritesheetFrameName;  ///< Name of the frame within the spritesheet (if using spritesheet).
 
   bool fullImageCollisionMask;  ///< True to use a bounding box wrapping the
                                 ///< whole image as collision mask. If false,

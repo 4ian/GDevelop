@@ -69,11 +69,16 @@ namespace gdjs {
         this,
         instanceContainer
       );
+      const textureManager = gdjs.SpriteRuntimeObjectRenderer.getAnimationFrameTextureManager(
+        instanceContainer.getGame().getImageManager()
+      );
+      const spritesheetManager = instanceContainer.getGame().getSpritesheetManager();
+      if (spritesheetManager && textureManager.setSpritesheetManager) {
+        textureManager.setSpritesheetManager(spritesheetManager);
+      }
       this._animator = new gdjs.SpriteAnimator(
         spriteObjectData.animations,
-        gdjs.SpriteRuntimeObjectRenderer.getAnimationFrameTextureManager(
-          instanceContainer.getGame().getImageManager()
-        )
+        textureManager
       );
       this._updateAnimationFrame();
 
@@ -84,6 +89,13 @@ namespace gdjs {
     reinitialize(spriteObjectData: SpriteObjectData) {
       super.reinitialize(spriteObjectData);
       const instanceContainer = this.getInstanceContainer();
+      const textureManager = gdjs.SpriteRuntimeObjectRenderer.getAnimationFrameTextureManager(
+        instanceContainer.getGame().getImageManager()
+      );
+      const spritesheetManager = instanceContainer.getGame().getSpritesheetManager();
+      if (spritesheetManager && textureManager.setSpritesheetManager) {
+        textureManager.setSpritesheetManager(spritesheetManager);
+      }
       this._animator.reinitialize(spriteObjectData.animations);
       this._scaleX = 1;
       this._scaleY = 1;

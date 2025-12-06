@@ -213,12 +213,38 @@ namespace gdjs {
     implements gdjs.AnimationFrameTextureManager<PIXI.Texture>
   {
     private _imageManager: gdjs.PixiImageManager;
+    private _spritesheetManager: gdjs.PixiSpritesheetManager | null = null;
 
     constructor(imageManager: gdjs.PixiImageManager) {
       this._imageManager = imageManager;
+      // The spritesheet manager will be set later when available
     }
 
-    getAnimationFrameTexture(imageName: string) {
+    setSpritesheetManager(spritesheetManager: gdjs.PixiSpritesheetManager) {
+      this._spritesheetManager = spritesheetManager;
+    }
+
+    getAnimationFrameTexture(
+      imageName: string,
+      spritesheetName?: string,
+      spritesheetFrameName?: string
+    ) {
+      // If spritesheet name and frame name are provided, use spritesheet
+      if (
+        spritesheetName &&
+        spritesheetFrameName &&
+        this._spritesheetManager
+      ) {
+        const frameTexture = this._spritesheetManager.getFrameTexture(
+          spritesheetName,
+          spritesheetFrameName
+        );
+        if (frameTexture) {
+          return frameTexture;
+        }
+        // Fallback to image if spritesheet frame not found
+      }
+      // Otherwise, use regular image
       return this._imageManager.getPIXITexture(imageName);
     }
 

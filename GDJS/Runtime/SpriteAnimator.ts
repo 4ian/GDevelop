@@ -33,6 +33,10 @@ namespace gdjs {
   export type SpriteFrameData = {
     /** The resource name of the image used in this frame. */
     image: string;
+    /** The spritesheet resource name (if using a spritesheet frame instead of an image). */
+    spritesheetName?: string;
+    /** The frame name within the spritesheet (if using a spritesheet frame instead of an image). */
+    spritesheetFrameName?: string;
     /** The points of the frame. */
     points: Array<SpriteCustomPointData>;
     /** The origin point. */
@@ -79,7 +83,11 @@ namespace gdjs {
    * Abstraction from graphic libraries texture classes.
    */
   export interface AnimationFrameTextureManager<T> {
-    getAnimationFrameTexture(imageName: string): T;
+    getAnimationFrameTexture(
+      imageName: string,
+      spritesheetName?: string,
+      spritesheetFrameName?: string
+    ): T;
     getAnimationFrameWidth(pixiTexture: T);
     getAnimationFrameHeight(pixiTexture: T);
   }
@@ -110,7 +118,11 @@ namespace gdjs {
       textureManager: gdjs.AnimationFrameTextureManager<T>
     ) {
       this.image = frameData ? frameData.image : '';
-      this.texture = textureManager.getAnimationFrameTexture(this.image);
+      this.texture = textureManager.getAnimationFrameTexture(
+        this.image,
+        frameData?.spritesheetName,
+        frameData?.spritesheetFrameName
+      );
       this.points = new Hashtable();
       this.reinitialize(frameData, textureManager);
     }
@@ -124,7 +136,11 @@ namespace gdjs {
       textureManager: gdjs.AnimationFrameTextureManager<T>
     ) {
       this.image = frameData.image;
-      this.texture = textureManager.getAnimationFrameTexture(this.image);
+      this.texture = textureManager.getAnimationFrameTexture(
+        this.image,
+        frameData.spritesheetName,
+        frameData.spritesheetFrameName
+      );
 
       this.points.clear();
       for (let i = 0, len = frameData.points.length; i < len; ++i) {

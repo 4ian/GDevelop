@@ -529,6 +529,15 @@ namespace gdjs {
     }
 
     /**
+     * Get the Spritesheet manager of the game, used to load spritesheets from game
+     * resources.
+     * @return The Spritesheet manager for the game
+     */
+    getSpritesheetManager(): gdjs.PixiSpritesheetManager | null {
+      return this._resourcesLoader.getSpritesheetManager();
+    }
+
+    /**
      * Get the input manager of the game, storing mouse, keyboard
      * and touches states.
      * @return The input manager owned by the game

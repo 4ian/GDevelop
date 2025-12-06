@@ -314,9 +314,91 @@ export async function listSpineTextureAtlasEmbeddedResources(
   };
 }
 
+/**
+ * List the embedded resources of a PixiJS Spritesheet JSON resource.
+ * A spritesheet JSON file contains a `meta.image` field that references the
+ * texture atlas image file.
+ *
+ * @param project The project
+ * @param filePath The file path of a spritesheet JSON resource
+ * @returns The embedded resources (the texture image), or null if parsing fails
+ */
+export async function listSpritesheetEmbeddedResources(
+  project: gdProject,
+  filePath: string
+): Promise<?EmbeddedResources> {
+  if (!fs || !path) return null;
+
+  let spritesheetContent: ?string = null;
+  try {
+    spritesheetContent = await fs.promises.readFile(filePath, 'utf8');
+  } catch (error) {
+    console.error(
+      `Unable to read spritesheet JSON file at path ${filePath}:`,
+      error
+    );
+    return null;
+  }
+
+  if (!spritesheetContent) return null;
+
+  try {
+    const spritesheetData = JSON.parse(spritesheetContent);
+
+    // Check if this looks like a valid PixiJS spritesheet JSON
+    // (must have "frames" and "meta" fields)
+    if (
+      !spritesheetData ||
+      typeof spritesheetData !== 'object' ||
+      !spritesheetData.frames ||
+      !spritesheetData.meta
+    ) {
+      console.warn(
+        `File ${filePath} does not appear to be a valid PixiJS spritesheet JSON (missing "frames" or "meta" fields).`
+      );
+      return null;
+    }
+
+    // Get the image path from meta.image
+    const imageRelPath = spritesheetData.meta.image;
+    if (!imageRelPath || typeof imageRelPath !== 'string') {
+      console.warn(
+        `Spritesheet JSON file ${filePath} is missing the "meta.image" field or it is not a string.`
+      );
+      return null;
+    }
+
+    const dir = path.dirname(filePath);
+    const embeddedResources = new Map<string, EmbeddedResource>();
+
+    const fullPath = path.resolve(dir, imageRelPath);
+    const isOutsideProjectFolder = !isPathInProjectFolder(project, fullPath);
+    const resource: EmbeddedResource = {
+      resourceKind: 'image',
+      relPath: imageRelPath,
+      fullPath,
+      isOutsideProjectFolder,
+    };
+
+    embeddedResources.set(imageRelPath, resource);
+
+    return {
+      embeddedResources,
+      hasAnyEmbeddedResourceOutsideProjectFolder: isOutsideProjectFolder,
+    };
+  } catch (error) {
+    console.error(
+      `Unable to parse spritesheet JSON file ${filePath}:`,
+      error
+    );
+    return null;
+  }
+}
+
 export const embeddedResourcesParsers: { [string]: ParseEmbeddedFiles } = {
   tilemap: listTileMapEmbeddedResources,
   json: listTileMapEmbeddedResources,
   spine: listSpineEmbeddedResources,
   atlas: listSpineTextureAtlasEmbeddedResources,
+  spritesheet: listSpritesheetEmbeddedResources,
 };

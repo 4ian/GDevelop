@@ -1,6 +1,7 @@
 namespace gdjs {
   export interface PixiImageManager {
     _pixiAnimationFrameTextureManager: PixiAnimationFrameTextureManager;
+    _pixiSpritesheetManager: gdjs.PixiSpritesheetManager | null;
   }
   /**
    * The renderer for a gdjs.SpriteRuntimeObject using Pixi.js.
@@ -220,6 +221,29 @@ namespace gdjs {
 
     getAnimationFrameTexture(imageName: string) {
       return this._imageManager.getPIXITexture(imageName);
+    }
+
+    /**
+     * Get a texture for a spritesheet frame.
+     * @param spritesheetResourceName The spritesheet resource name.
+     * @param frameName The frame name within the spritesheet.
+     * @returns The texture for the specified frame.
+     */
+    getSpritesheetFrameTexture(
+      spritesheetResourceName: string,
+      frameName: string
+    ): PIXI.Texture {
+      const spritesheetManager = this._imageManager._pixiSpritesheetManager;
+      if (!spritesheetManager) {
+        console.error(
+          'Spritesheet manager not initialized. Returning invalid texture.'
+        );
+        return this._imageManager.getInvalidPIXITexture();
+      }
+      return spritesheetManager.getFrameTexture(
+        spritesheetResourceName,
+        frameName
+      );
     }
 
     getAnimationFrameWidth(pixiTexture: PIXI.Texture) {

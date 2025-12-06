@@ -163,6 +163,22 @@ namespace gdjs {
       });
     }
 
+    getSpritesheetFrameTexture(
+      spritesheetResourceName: string,
+      frameName: string
+    ): THREE.Material {
+      // Spritesheet frames are not supported for 3D objects.
+      // Return an invalid/empty material.
+      console.warn(
+        'Spritesheet frames are not supported for 3D objects. Returning empty material.'
+      );
+      return this._imageManager.getThreeMaterial('', {
+        useTransparentTexture: true,
+        forceBasicMaterial: true,
+        vertexColors: false,
+      });
+    }
+
     getAnimationFrameWidth(material: THREE.Material) {
       const map = (
         material as THREE.MeshBasicMaterial | THREE.MeshStandardMaterial

@@ -98,6 +98,16 @@ void Direction::UnserializeFrom(const gd::SerializerElement& element) {
     Sprite sprite;
 
     sprite.SetImageName(spriteElement.GetStringAttribute("image"));
+
+    // Spritesheet support: load spritesheet resource name and frame name if present
+    if (spriteElement.HasAttribute("spritesheetResourceName") ||
+        spriteElement.HasChild("spritesheetResourceName")) {
+      sprite.SetSpritesheetResourceName(
+          spriteElement.GetStringAttribute("spritesheetResourceName", ""));
+      sprite.SetSpritesheetFrameName(
+          spriteElement.GetStringAttribute("spritesheetFrameName", ""));
+    }
+
     OpenPointsSprites(sprite.GetAllNonDefaultPoints(),
                       spriteElement.GetChild("points", 0, "Points"));
 
@@ -164,6 +174,15 @@ void SaveSpritesDirection(const vector<Sprite>& sprites,
     gd::SerializerElement& spriteElement = element.AddChild("sprite");
 
     spriteElement.SetAttribute("image", sprites[i].GetImageName());
+
+    // Spritesheet support: save spritesheet resource name and frame name if used
+    if (sprites[i].UsesSpritesheetFrame()) {
+      spriteElement.SetAttribute("spritesheetResourceName",
+                                 sprites[i].GetSpritesheetResourceName());
+      spriteElement.SetAttribute("spritesheetFrameName",
+                                 sprites[i].GetSpritesheetFrameName());
+    }
+
     SavePointsSprites(sprites[i].GetAllNonDefaultPoints(),
                       spriteElement.AddChild("points"));
 

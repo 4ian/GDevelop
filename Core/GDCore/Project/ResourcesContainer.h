@@ -37,6 +37,7 @@ public:
   static const gd::String model3DType;
   static const gd::String atlasType;
   static const gd::String spineType;
+  static const gd::String spritesheetType;
   static const gd::String javaScriptType;
   static const gd::String internalInGameEditorOnlySvgType;
 
@@ -552,6 +553,37 @@ public:
   virtual ~AtlasResource(){};
   virtual AtlasResource *Clone() const override {
     return new AtlasResource(*this);
+  }
+
+  virtual const gd::String &GetFile() const override { return file; };
+  virtual void SetFile(const gd::String &newFile) override;
+
+  virtual bool UseFile() const override { return true; }
+  void SerializeTo(SerializerElement &element) const override;
+
+  void UnserializeFrom(const SerializerElement &element) override;
+
+private:
+  gd::String file;
+};
+
+/**
+ * \brief Describe a spritesheet JSON file used by a project.
+ *
+ * A spritesheet resource contains JSON data that describes frames in a texture
+ * atlas. The JSON format follows the standard PixiJS/TexturePacker format with
+ * "frames" (mapping frame names to coordinates/dimensions) and "meta" (containing
+ * the texture image reference).
+ *
+ * \see Resource
+ * \ingroup ResourcesManagement
+ */
+class GD_CORE_API SpritesheetResource : public Resource {
+public:
+  SpritesheetResource() : Resource() { SetKind("spritesheet"); };
+  virtual ~SpritesheetResource(){};
+  virtual SpritesheetResource *Clone() const override {
+    return new SpritesheetResource(*this);
   }
 
   virtual const gd::String &GetFile() const override { return file; };

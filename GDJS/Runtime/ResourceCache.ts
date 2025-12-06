@@ -50,5 +50,13 @@ namespace gdjs {
       this._nameToContent.clear();
       this._fileToContent.clear();
     }
+
+    /**
+     * Get all the values stored in the cache.
+     * @returns An iterable of all cached content values.
+     */
+    getAllValues(): IterableIterator<C> {
+      return this._nameToContent.values();
+    }
   }
 }

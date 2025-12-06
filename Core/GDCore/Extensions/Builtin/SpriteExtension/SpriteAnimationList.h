@@ -22,6 +22,35 @@ namespace gd {
  * 
  * It's used in the configuration of object that implements image-based animations.
  *
+ * ## Spritesheet Support
+ *
+ * Individual sprites (frames) can use textures from spritesheets. When a sprite's
+ * `spritesheetResourceName` and `spritesheetFrameName` are set, the texture is
+ * obtained from the spritesheet's frame data instead of a standalone image.
+ *
+ * ### Future Improvements (Spritesheet Animation Import)
+ *
+ * Spritesheet JSON files can contain animation definitions in their `meta.animations`
+ * field. These are arrays of frame names that define complete animations. For example:
+ * 
+ * ```json
+ * {
+ *   "frames": { "walk1": {...}, "walk2": {...}, "idle1": {...}, "idle2": {...} },
+ *   "meta": {
+ *     "image": "sprites.png",
+ *     "animations": {
+ *       "walk": ["walk1", "walk2"],
+ *       "idle": ["idle1", "idle2"]
+ *     }
+ *   }
+ * }
+ * ```
+ *
+ * A future improvement could add methods to:
+ * - Import all frames from a spritesheet as a Direction
+ * - Import animation definitions from `meta.animations` as complete Animations
+ * - The Sprite editor could provide UI to import spritesheet animations directly
+ *
  * \see Animation
  * \see Direction
  * \see Sprite

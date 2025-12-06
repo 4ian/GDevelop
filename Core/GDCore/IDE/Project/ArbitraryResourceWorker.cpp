@@ -62,6 +62,11 @@ void ArbitraryResourceWorker::ExposeSpine(gd::String& resourceName){
     // do.
 };
 
+void ArbitraryResourceWorker::ExposeSpritesheet(gd::String& resourceName){
+    // Nothing to do by default - each child class can define here the action to
+    // do.
+};
+
 void ArbitraryResourceWorker::ExposeJavaScript(gd::String& resourceName){
     // Nothing to do by default - each child class can define here the action to
     // do.
@@ -198,6 +203,11 @@ void ArbitraryResourceWorker::ExposeResourceWithType(
   }
   if (resourceType == "spine") {
     ExposeSpine(resourceName);
+    return;
+  }
+  if (resourceType == "spritesheet") {
+    ExposeSpritesheet(resourceName);
+    ExposeEmbeddeds(resourceName);
     return;
   }
   if (resourceType == "javascript") {

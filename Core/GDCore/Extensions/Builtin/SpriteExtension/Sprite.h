@@ -18,6 +18,13 @@ namespace gd {
 /**
  * \brief Represents a sprite to be displayed on the screen.
  *
+ * A sprite can display either:
+ * - A standalone image (using `image` field)
+ * - A frame from a spritesheet (using `spritesheetResourceName` and `spritesheetFrameName`)
+ *
+ * When using a spritesheet, the `image` field should be empty, and the texture
+ * will be obtained from the spritesheet's frame data.
+ *
  * \see Direction
  * \see SpriteObject
  * \ingroup SpriteObjectExtension
@@ -29,6 +36,7 @@ class GD_CORE_API Sprite {
 
   /**
    * \brief Change the name of the sprite image.
+   * \note When using a spritesheet, this should be empty.
    */
   inline void SetImageName(const gd::String& image_) { image = image_; }
 
@@ -41,6 +49,46 @@ class GD_CORE_API Sprite {
    * \brief Get the name of the sprite image.
    */
   inline gd::String& GetImageName() { return image; }
+
+  /**
+   * \brief Set the spritesheet resource name for this frame.
+   * \note When set, the frame texture will be obtained from the spritesheet.
+   */
+  inline void SetSpritesheetResourceName(const gd::String& resourceName) {
+    spritesheetResourceName = resourceName;
+  }
+
+  /**
+   * \brief Get the spritesheet resource name for this frame.
+   * \return The spritesheet resource name, or empty string if not using a spritesheet.
+   */
+  inline const gd::String& GetSpritesheetResourceName() const {
+    return spritesheetResourceName;
+  }
+
+  /**
+   * \brief Set the frame name within the spritesheet.
+   * \note This corresponds to a key in the "frames" object of the spritesheet JSON.
+   */
+  inline void SetSpritesheetFrameName(const gd::String& frameName) {
+    spritesheetFrameName = frameName;
+  }
+
+  /**
+   * \brief Get the frame name within the spritesheet.
+   * \return The frame name within the spritesheet, or empty string if not using a spritesheet.
+   */
+  inline const gd::String& GetSpritesheetFrameName() const {
+    return spritesheetFrameName;
+  }
+
+  /**
+   * \brief Check if this sprite uses a spritesheet frame.
+   * \return true if using a spritesheet frame, false if using a standalone image.
+   */
+  inline bool UsesSpritesheetFrame() const {
+    return !spritesheetResourceName.empty() && !spritesheetFrameName.empty();
+  }
 
   /**
    * \brief Get the collision mask (custom or automatically generated owing to
@@ -161,6 +209,11 @@ class GD_CORE_API Sprite {
 
  private:
   gd::String image;  ///< Name of the image to be loaded in Image Manager.
+
+  // Spritesheet support: if spritesheetResourceName is not empty, the texture
+  // is obtained from the spritesheet's frame data instead of the image field.
+  gd::String spritesheetResourceName;  ///< Name of the spritesheet resource (if using spritesheet).
+  gd::String spritesheetFrameName;     ///< Frame name within the spritesheet (key in "frames" object).
 
   bool fullImageCollisionMask;  ///< True to use a bounding box wrapping the
                                 ///< whole image as collision mask. If false,

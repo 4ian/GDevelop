@@ -255,6 +255,23 @@ export const addAnimationFrame = (
   sprite.delete();
 };
 
+export const addAnimationFrameFromSpritesheetFrame = (
+  animations: gdSpriteAnimationList,
+  direction: gdDirection,
+  spritesheetResourceName: string,
+  spritesheetFrameName: string,
+  onSpriteAdded: (sprite: gdSprite) => void
+) => {
+  const sprite = new gd.Sprite();
+  sprite.setSpritesheetResourceName(spritesheetResourceName);
+  sprite.setSpritesheetFrameName(spritesheetFrameName);
+  applyPointsAndMasksToSpriteIfNecessary(animations, direction, sprite);
+
+  onSpriteAdded(sprite); // Call the callback before `addSprite`, as `addSprite` will store a copy of it.
+  direction.addSprite(sprite);
+  sprite.delete();
+};
+
 type Props = {|
   animations: gdSpriteAnimationList,
   direction: gdDirection,
@@ -554,10 +571,22 @@ const SpritesList = ({
 
   const onSelectFromSpritesheet = React.useCallback(
     (selection: SpritesheetSelectionResult) => {
-      console.log('selection', selection);
+      if (!selectedSpritesheetResourceName) return;
+      const { frameNames } = selection;
+
+      frameNames.forEach(frameName => {
+        addAnimationFrameFromSpritesheetFrame(
+          animations,
+          direction,
+          selectedSpritesheetResourceName,
+          frameName,
+          onSpriteAdded
+        );
+      });
+
       setSelectedSpritesheetResourceName(null);
     },
-    [setSelectedSpritesheetResourceName]
+    [animations, direction, onSpriteAdded, selectedSpritesheetResourceName]
   );
 
   const deleteSprites = React.useCallback(

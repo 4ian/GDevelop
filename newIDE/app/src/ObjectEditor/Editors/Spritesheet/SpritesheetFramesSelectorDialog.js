@@ -6,7 +6,6 @@ import Dialog, { DialogPrimaryButton } from '../../../UI/Dialog';
 import FlatButton from '../../../UI/FlatButton';
 import AlertMessage from '../../../UI/AlertMessage';
 import { ColumnStackLayout } from '../../../UI/Layout';
-import { Spacer } from '../../../UI/Grid';
 import Text from '../../../UI/Text';
 import Checkbox from '../../../UI/Checkbox';
 import PixiResourcesLoader from '../../../ObjectsRendering/PixiResourcesLoader';
@@ -165,8 +164,7 @@ const FrameThumbnail = ({
 };
 
 export type SpritesheetSelectionResult = {|
-  selectedFrames: string[] | null,
-  selectedAnimation: string | null,
+  frameNames: string[],
 |};
 
 type Props = {|
@@ -187,31 +185,22 @@ const SpritesheetFramesSelectorDialog = ({
     setSpritesheetData,
   ] = React.useState<SpritesheetOrLoadingError | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
-  const [selectedFrames, setSelectedFrames] = React.useState<Set<string>>(
-    new Set()
-  );
+  const [selectedFrames, setSelectedFrames] = React.useState<Array<string>>([]);
   const [selectedAnimation, setSelectedAnimation] = React.useState<
     string | null
   >(null);
 
-  // Load the spritesheet data
   React.useEffect(
     () => {
-      setIsLoading(true);
-      PixiResourcesLoader.getSpritesheet(project, spritesheetResourceName)
-        .then(result => {
-          setSpritesheetData(result);
-          setIsLoading(false);
-        })
-        .catch(error => {
-          console.error('Error loading spritesheet:', error);
-          setSpritesheetData({
-            spritesheet: null,
-            loadingError: error,
-            loadingErrorReason: 'spritesheet-pixi-loading-error',
-          });
-          setIsLoading(false);
-        });
+      (async () => {
+        setIsLoading(true);
+        const result = await PixiResourcesLoader.getSpritesheet(
+          project,
+          spritesheetResourceName
+        );
+        setSpritesheetData(result);
+        setIsLoading(false);
+      })();
     },
     [project, spritesheetResourceName]
   );
@@ -221,13 +210,11 @@ const SpritesheetFramesSelectorDialog = ({
       // When selecting frames, clear any selected animation
       setSelectedAnimation(null);
       setSelectedFrames(prevSelected => {
-        const newSelected = new Set(prevSelected);
         if (selected) {
-          newSelected.add(frameName);
+          return [...prevSelected, frameName];
         } else {
-          newSelected.delete(frameName);
+          return prevSelected.filter(name => name !== frameName);
         }
-        return newSelected;
       });
     },
     []
@@ -235,24 +222,13 @@ const SpritesheetFramesSelectorDialog = ({
 
   const handleAnimationSelect = React.useCallback((animationName: string) => {
     // When selecting an animation, clear any selected frames
-    setSelectedFrames(new Set());
+    setSelectedFrames([]);
     setSelectedAnimation(prevAnimation =>
       prevAnimation === animationName ? null : animationName
     );
   }, []);
 
-  const handleConfirm = React.useCallback(
-    () => {
-      onSelect({
-        selectedFrames:
-          selectedFrames.size > 0 ? Array.from(selectedFrames) : null,
-        selectedAnimation,
-      });
-    },
-    [onSelect, selectedFrames, selectedAnimation]
-  );
-
-  const hasSelection = selectedFrames.size > 0 || selectedAnimation !== null;
+  const hasSelection = selectedFrames.length > 0 || selectedAnimation !== null;
 
   // Get frames and animations from the spritesheet
   const frames = React.useMemo(
@@ -265,10 +241,29 @@ const SpritesheetFramesSelectorDialog = ({
 
   const animations = React.useMemo(
     () => {
-      if (!spritesheetData || !spritesheetData.spritesheet) return {};
-      return spritesheetData.spritesheet.animations || {};
+      if (
+        !spritesheetData ||
+        !spritesheetData.spritesheet ||
+        !spritesheetData.spritesheet.data
+      )
+        return {};
+      return spritesheetData.spritesheet.data.animations || {};
     },
     [spritesheetData]
+  );
+
+  const handleConfirm = React.useCallback(
+    () => {
+      const frameNames =
+        selectedFrames.length > 0
+          ? selectedFrames
+          : animations[selectedAnimation || ''] || [];
+
+      onSelect({
+        frameNames,
+      });
+    },
+    [onSelect, selectedFrames, animations, selectedAnimation]
   );
 
   const frameNames = Object.keys(frames);
@@ -394,7 +389,7 @@ const SpritesheetFramesSelectorDialog = ({
                         key={frameName}
                         frameName={frameName}
                         texture={frames[frameName]}
-                        selected={selectedFrames.has(frameName)}
+                        selected={selectedFrames.includes(frameName)}
                         onSelect={selected =>
                           handleFrameSelect(frameName, selected)
                         }

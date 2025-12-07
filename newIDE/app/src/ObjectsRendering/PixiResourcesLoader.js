@@ -939,7 +939,7 @@ export default class PixiResourcesLoader {
         };
       }
 
-      const spritesheetTexture = await this.getPIXITexture(
+      const spritesheetTexture = this.getPIXITexture(
         project,
         spritesheetImageName
       );

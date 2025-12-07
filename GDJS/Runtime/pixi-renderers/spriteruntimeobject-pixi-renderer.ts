@@ -79,15 +79,15 @@ namespace gdjs {
         originX = animationFrame.origin.x;
         originY = animationFrame.origin.y;
       } else {
-        centerX = this._sprite.texture.frame.width / 2;
-        centerY = this._sprite.texture.frame.height / 2;
+        centerX = this._sprite.texture.orig.width / 2;
+        centerY = this._sprite.texture.orig.height / 2;
         originX = 0;
         originY = 0;
       }
       const scaleX = this._object._scaleX * this._object._preScale;
       const scaleY = this._object._scaleY * this._object._preScale;
-      this._sprite.anchor.x = centerX / this._sprite.texture.frame.width;
-      this._sprite.anchor.y = centerY / this._sprite.texture.frame.height;
+      this._sprite.anchor.x = centerX / this._sprite.texture.orig.width;
+      this._sprite.anchor.y = centerY / this._sprite.texture.orig.height;
       this._sprite.position.x =
         this._object.x + (centerX - originX) * Math.abs(scaleX);
       this._sprite.position.y =
@@ -191,11 +191,11 @@ namespace gdjs {
     }
 
     getUnscaledWidth(): float {
-      return this._sprite.texture.frame.width;
+      return this._sprite.texture.orig.width;
     }
 
     getUnscaledHeight(): float {
-      return this._sprite.texture.frame.height;
+      return this._sprite.texture.orig.height;
     }
 
     static getAnimationFrameTextureManager(
@@ -248,11 +248,11 @@ namespace gdjs {
     }
 
     getAnimationFrameWidth(pixiTexture: PIXI.Texture) {
-      return pixiTexture.width;
+      return pixiTexture.orig.width;
     }
 
     getAnimationFrameHeight(pixiTexture: PIXI.Texture) {
-      return pixiTexture.height;
+      return pixiTexture.orig.height;
     }
   }
 

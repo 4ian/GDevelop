@@ -97,20 +97,20 @@ export default class RenderedSpriteInstance extends RenderedInstance {
     if (!this._pixiObject) {
       return;
     }
-    const objectTextureFrame = this._pixiObject.texture.frame;
+    const objectTexture = this._pixiObject.texture;
     // In case the texture is not loaded yet, we don't want to crash.
-    if (!objectTextureFrame) return;
+    if (!objectTexture || !objectTexture.orig) return;
 
-    this._pixiObject.anchor.x = this._centerX / objectTextureFrame.width;
-    this._pixiObject.anchor.y = this._centerY / objectTextureFrame.height;
+    this._pixiObject.anchor.x = this._centerX / objectTexture.orig.width;
+    this._pixiObject.anchor.y = this._centerY / objectTexture.orig.height;
     this._pixiObject.rotation = this._shouldNotRotate
       ? 0
       : RenderedInstance.toRad(this._instance.getAngle());
     if (this._instance.hasCustomSize()) {
       this._pixiObject.scale.x =
-        this.getCustomWidth() / objectTextureFrame.width;
+        this.getCustomWidth() / objectTexture.orig.width;
       this._pixiObject.scale.y =
-        this.getCustomHeight() / objectTextureFrame.height;
+        this.getCustomHeight() / objectTexture.orig.height;
     } else {
       this._pixiObject.scale.x = this._preScale;
       this._pixiObject.scale.y = this._preScale;
@@ -230,8 +230,8 @@ export default class RenderedSpriteInstance extends RenderedInstance {
     }
 
     if (sprite.isDefaultCenterPoint()) {
-      this._centerX = texture.width / 2;
-      this._centerY = texture.height / 2;
+      this._centerX = texture.orig.width / 2;
+      this._centerY = texture.orig.height / 2;
     } else {
       const center = sprite.getCenter();
       this._centerX = center.getX();
@@ -263,19 +263,19 @@ export default class RenderedSpriteInstance extends RenderedInstance {
   }
 
   getDefaultWidth(): number {
-    const objectTextureFrame = this._pixiObject.texture.frame;
+    const objectTextureFrame = this._pixiObject.texture;
     // In case the texture is not loaded yet, we don't want to crash.
-    if (!objectTextureFrame) return 32;
+    if (!objectTextureFrame || !objectTextureFrame.orig) return 32;
 
-    return Math.abs(objectTextureFrame.width) * this._preScale;
+    return Math.abs(objectTextureFrame.orig.width) * this._preScale;
   }
 
   getDefaultHeight(): number {
-    const objectTextureFrame = this._pixiObject.texture.frame;
+    const objectTextureFrame = this._pixiObject.texture;
     // In case the texture is not loaded yet, we don't want to crash.
-    if (!objectTextureFrame) return 32;
+    if (!objectTextureFrame || !objectTextureFrame.orig) return 32;
 
-    return Math.abs(objectTextureFrame.height) * this._preScale;
+    return Math.abs(objectTextureFrame.orig.height) * this._preScale;
   }
 
   getCenterX(): number {

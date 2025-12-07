@@ -19,6 +19,9 @@ export default class RenderedSpriteInstance extends RenderedInstance {
   _shouldNotRotate: boolean = false;
   _preScale = 1;
 
+  _currentSpritesheetResourceName: string = '';
+  _currentSpritesheetFrameName: string = '';
+
   constructor(
     project: gdProject,
     instance: gdInitialInstance,
@@ -179,24 +182,52 @@ export default class RenderedSpriteInstance extends RenderedInstance {
     const sprite = this._sprite;
     if (!sprite) return;
 
-    const texture = this._pixiResourcesLoader.getPIXITexture(
-      this._project,
-      sprite.getImageName()
-    );
-    this._pixiObject.texture = texture;
+    if (sprite.usesSpritesheetFrame()) {
+      if (
+        this._currentSpritesheetResourceName !==
+          sprite.getSpritesheetResourceName() ||
+        this._currentSpritesheetFrameName !== sprite.getSpritesheetFrameName()
+      ) {
+        (async () => {
+          const texture = await this._pixiResourcesLoader.getSpritesheetFramePIXITexture(
+            this._project,
+            sprite.getSpritesheetResourceName(),
+            sprite.getSpritesheetFrameName()
+          );
+          if (this._wasDestroyed) return;
 
-    if (!texture.baseTexture.valid) {
-      // Post pone texture update if texture is not loaded.
-      texture.once('update', () => {
-        if (this._wasDestroyed) return;
-        this.updatePIXITextureAndSprite();
-      });
-      return;
+          this._pixiObject.texture = texture;
+          this._currentSpritesheetResourceName = sprite.getSpritesheetResourceName();
+          this._currentSpritesheetFrameName = sprite.getSpritesheetFrameName();
+
+          this.updatePIXITextureAndSprite();
+        })();
+      }
+    } else {
+      const texture = this._pixiResourcesLoader.getPIXITexture(
+        this._project,
+        sprite.getImageName()
+      );
+      this._pixiObject.texture = texture;
+
+      if (!texture.baseTexture.valid) {
+        // Post pone texture update if texture is not loaded.
+        texture.once('update', () => {
+          if (this._wasDestroyed) return;
+          this.updatePIXITextureAndSprite();
+        });
+        return;
+      }
     }
 
     const origin = sprite.getOrigin();
     this._originX = origin.getX();
     this._originY = origin.getY();
+
+    const texture = this._pixiObject.texture;
+    if (!texture.baseTexture.valid) {
+      return; // Should never happen.
+    }
 
     if (sprite.isDefaultCenterPoint()) {
       this._centerX = texture.width / 2;

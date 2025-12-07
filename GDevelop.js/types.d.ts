@@ -2666,6 +2666,11 @@ export class Sprite extends EmscriptenObject {
   constructor();
   setImageName(name: string): void;
   getImageName(): string;
+  setSpritesheetResourceName(name: string): void;
+  getSpritesheetResourceName(): string;
+  setSpritesheetFrameName(name: string): void;
+  getSpritesheetFrameName(): string;
+  usesSpritesheetFrame(): boolean;
   getOrigin(): Point;
   getCenter(): Point;
   isDefaultCenterPoint(): boolean;

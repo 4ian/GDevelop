@@ -3,6 +3,11 @@ declare class gdSprite {
   constructor(): void;
   setImageName(name: string): void;
   getImageName(): string;
+  setSpritesheetResourceName(name: string): void;
+  getSpritesheetResourceName(): string;
+  setSpritesheetFrameName(name: string): void;
+  getSpritesheetFrameName(): string;
+  usesSpritesheetFrame(): boolean;
   getOrigin(): gdPoint;
   getCenter(): gdPoint;
   isDefaultCenterPoint(): boolean;

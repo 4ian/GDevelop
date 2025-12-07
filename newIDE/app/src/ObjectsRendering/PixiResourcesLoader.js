@@ -48,7 +48,6 @@ export type SpritesheetOrLoadingError = {|
     | 'missing-spritesheet-image-field'
     | 'invalid-spritesheet-image-resource'
     | 'spritesheet-pixi-loading-error',
-
 |};
 
 type ResourcePromise<T> = { [resourceName: string]: Promise<T> };
@@ -883,9 +882,13 @@ export default class PixiResourcesLoader {
         };
       }
 
-      const fullUrl = ResourcesLoader.getResourceFullUrl(project, resource.getName(), {
-        isResourceForPixi: true,
-      });
+      const fullUrl = ResourcesLoader.getResourceFullUrl(
+        project,
+        resource.getName(),
+        {
+          isResourceForPixi: true,
+        }
+      );
 
       const spritesheetJsonData = await axios
         .get(fullUrl, {
@@ -900,7 +903,8 @@ export default class PixiResourcesLoader {
         };
       }
 
-      const imageField = spritesheetJsonData.meta && spritesheetJsonData.meta.image;
+      const imageField =
+        spritesheetJsonData.meta && spritesheetJsonData.meta.image;
       const embeddedResourcesMapping = readEmbeddedResourcesMapping(resource);
       const spritesheetImageName = embeddedResourcesMapping
         ? embeddedResourcesMapping[imageField]
@@ -967,6 +971,22 @@ export default class PixiResourcesLoader {
         };
       }
     })());
+  }
+
+  static async getSpritesheetFramePIXITexture(
+    project: gdProject,
+    spritesheetName: string,
+    frameName: string
+  ): Promise<PIXI.Texture> {
+    const spritesheetOrLoadingError = await this.getSpritesheet(
+      project,
+      spritesheetName
+    );
+    const spritesheet = spritesheetOrLoadingError.spritesheet;
+    if (!spritesheet) {
+      return invalidTexture;
+    }
+    return spritesheet.textures[frameName] || invalidTexture;
   }
 
   /**

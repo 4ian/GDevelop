@@ -88,38 +88,44 @@ const FrameThumbnail = ({
     : theme.imagePreview.borderColor;
 
   // Get the image source from the texture
-  const imageSrc = React.useMemo(() => {
-    if (!texture || !texture.baseTexture || !texture.baseTexture.resource) {
+  const imageSrc = React.useMemo(
+    () => {
+      if (!texture || !texture.baseTexture || !texture.baseTexture.resource) {
+        return '';
+      }
+      const source = texture.baseTexture.resource.source;
+      if (source instanceof HTMLImageElement) {
+        return source.src;
+      }
       return '';
-    }
-    const source = texture.baseTexture.resource.source;
-    if (source instanceof HTMLImageElement) {
-      return source.src;
-    }
-    return '';
-  }, [texture]);
+    },
+    [texture]
+  );
 
   // Calculate the crop for this frame
-  const frameStyle = React.useMemo(() => {
-    if (!texture || !texture.frame) {
-      return {};
-    }
-    const frame = texture.frame;
-    const orig = texture.orig;
-    return {
-      objectFit: 'none',
-      objectPosition: `-${frame.x}px -${frame.y}px`,
-      width: orig.width,
-      height: orig.height,
-      maxWidth: 'none',
-      maxHeight: 'none',
-      transform: `scale(${Math.min(
-        FRAME_SIZE / orig.width,
-        FRAME_SIZE / orig.height,
-        1
-      )})`,
-    };
-  }, [texture]);
+  const frameStyle = React.useMemo(
+    () => {
+      if (!texture || !texture.frame) {
+        return {};
+      }
+      const frame = texture.frame;
+      const orig = texture.orig;
+      return {
+        objectFit: 'none',
+        objectPosition: `-${frame.x}px -${frame.y}px`,
+        width: orig.width,
+        height: orig.height,
+        maxWidth: 'none',
+        maxHeight: 'none',
+        transform: `scale(${Math.min(
+          FRAME_SIZE / orig.width,
+          FRAME_SIZE / orig.height,
+          1
+        )})`,
+      };
+    },
+    [texture]
+  );
 
   return (
     <div
@@ -249,15 +255,21 @@ const SpritesheetFramesSelectorDialog = ({
   const hasSelection = selectedFrames.size > 0 || selectedAnimation !== null;
 
   // Get frames and animations from the spritesheet
-  const frames = React.useMemo(() => {
-    if (!spritesheetData || !spritesheetData.spritesheet) return {};
-    return spritesheetData.spritesheet.textures || {};
-  }, [spritesheetData]);
+  const frames = React.useMemo(
+    () => {
+      if (!spritesheetData || !spritesheetData.spritesheet) return {};
+      return spritesheetData.spritesheet.textures || {};
+    },
+    [spritesheetData]
+  );
 
-  const animations = React.useMemo(() => {
-    if (!spritesheetData || !spritesheetData.spritesheet) return {};
-    return spritesheetData.spritesheet.animations || {};
-  }, [spritesheetData]);
+  const animations = React.useMemo(
+    () => {
+      if (!spritesheetData || !spritesheetData.spritesheet) return {};
+      return spritesheetData.spritesheet.animations || {};
+    },
+    [spritesheetData]
+  );
 
   const frameNames = Object.keys(frames);
   const animationNames = Object.keys(animations);
@@ -277,14 +289,15 @@ const SpritesheetFramesSelectorDialog = ({
           break;
         case 'spritesheet-json-loading-error':
           errorMessage = (
-            <Trans>Failed to load the spritesheet JSON file. Verify if it a proper PixiJS spritesheet file in JSON format.</Trans>
+            <Trans>
+              Failed to load the spritesheet JSON file. Verify if it a proper
+              PixiJS spritesheet file in JSON format.
+            </Trans>
           );
           break;
         case 'missing-spritesheet-image-field':
           errorMessage = (
-            <Trans>
-              The spritesheet JSON is missing the image reference.
-            </Trans>
+            <Trans>The spritesheet JSON is missing the image reference.</Trans>
           );
           break;
         case 'invalid-spritesheet-image-resource':
@@ -309,11 +322,7 @@ const SpritesheetFramesSelectorDialog = ({
           );
       }
 
-      return (
-        <AlertMessage kind="error">
-          {errorMessage}
-        </AlertMessage>
-      );
+      return <AlertMessage kind="error">{errorMessage}</AlertMessage>;
     }
 
     return null;
@@ -354,10 +363,8 @@ const SpritesheetFramesSelectorDialog = ({
         {!isLoading && spritesheetData && spritesheetData.spritesheet && (
           <ScrollView>
             <ColumnStackLayout noMargin>
-              {/* Animations section */}
               {animationNames.length > 0 && (
                 <>
-                  <Spacer />
                   <Text size="sub-title">
                     <Trans>Animations</Trans>
                   </Text>
@@ -365,7 +372,9 @@ const SpritesheetFramesSelectorDialog = ({
                     {animationNames.map(animationName => (
                       <ListItem
                         key={animationName}
-                        primaryText={`${animationName} (${animations[animationName].length} frames)`}
+                        primaryText={`${animationName} (${
+                          animations[animationName].length
+                        } frames)`}
                         onClick={() => handleAnimationSelect(animationName)}
                         selected={selectedAnimation === animationName}
                       />
@@ -374,10 +383,8 @@ const SpritesheetFramesSelectorDialog = ({
                 </>
               )}
 
-              {/* Frames section */}
               {frameNames.length > 0 && (
                 <>
-                  <Spacer />
                   <Text size="sub-title">
                     <Trans>Frames</Trans>
                   </Text>

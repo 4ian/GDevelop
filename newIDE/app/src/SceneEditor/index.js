@@ -602,6 +602,8 @@ export default class SceneEditor extends React.Component<Props, State> {
 
         editorDisplay.forceUpdateObjectsList();
 
+        // Reset the "instance renderers" of objects using the resource. This means
+        // that instances renderers will be recreated, making sure they are up-to-date.
         const objectsCollector = new gd.ObjectsUsingResourceCollector(
           project.getResourcesManager(),
           resourceName

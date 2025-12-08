@@ -221,6 +221,7 @@ import {
 import StandaloneDialog from './StandAloneDialog';
 import { useInGameEditorSettings } from '../EmbeddedGame/InGameEditorSettings';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import { useAutomatedRegularInGameEditorRestart } from '../EmbeddedGame/UseAutomatedRegularInGameEditorRestart';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -1693,6 +1694,11 @@ const MainFrame = (props: Props) => {
     },
     [gameEditorMode, state.editorTabs, notifyChangesToInGameEditor]
   );
+
+  useAutomatedRegularInGameEditorRestart({
+    onRestartInGameEditor,
+    gameEditorMode,
+  });
 
   const onExternalLayoutAssociationChanged = React.useCallback(
     () => {

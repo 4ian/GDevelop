@@ -20,6 +20,7 @@ namespace gdjs {
     _reloadedScriptElement: Record<string, HTMLScriptElement> = {};
     _logs: HotReloaderLog[] = [];
     _alreadyLoadedScriptFiles: Record<string, boolean> = {};
+    _existingScriptFiles: RuntimeGameOptionsScriptFile[] | null = null;
     _isHotReloading: boolean = false;
 
     /**
@@ -27,6 +28,11 @@ namespace gdjs {
      */
     constructor(runtimeGame: gdjs.RuntimeGame) {
       this._runtimeGame = runtimeGame;
+
+      // Remember the script files that were loaded when the game was started.
+      if (this._runtimeGame._options.scriptFiles) {
+        this._existingScriptFiles = this._runtimeGame._options.scriptFiles;
+      }
     }
 
     static indexByPersistentUuid<
@@ -171,17 +177,13 @@ namespace gdjs {
       const oldProjectData: ProjectData = gdjs.projectData;
       gdjs.projectData = newProjectData;
 
-      const oldRuntimeGameOptions = gdjs.runtimeGameOptions;
-      gdjs.runtimeGameOptions = newRuntimeGameOptions;
-
-      const oldScriptFiles =
-        oldRuntimeGameOptions.scriptFiles as RuntimeGameOptionsScriptFile[];
-
-      oldScriptFiles.forEach((scriptFile) => {
+      (this._existingScriptFiles || []).forEach((scriptFile) => {
         this._alreadyLoadedScriptFiles[scriptFile.path] = true;
       });
-      const oldBehaviorConstructors: { [key: string]: Function } = {};
 
+      gdjs.runtimeGameOptions = newRuntimeGameOptions;
+
+      const oldBehaviorConstructors: { [key: string]: Function } = {};
       for (let behaviorTypeName in gdjs.behaviorsTypes.items) {
         oldBehaviorConstructors[behaviorTypeName] =
           gdjs.behaviorsTypes.items[behaviorTypeName];
@@ -195,8 +197,7 @@ namespace gdjs {
         );
       }
 
-      const newScriptFiles =
-        newRuntimeGameOptions.scriptFiles as RuntimeGameOptionsScriptFile[];
+      const newScriptFiles = newRuntimeGameOptions.scriptFiles;
       const shouldGenerateScenesEventsCode =
         !!newRuntimeGameOptions.shouldGenerateScenesEventsCode;
       const shouldReloadLibraries =
@@ -210,7 +211,7 @@ namespace gdjs {
         if (shouldReloadLibraries) {
           await this.reloadScriptFiles(
             newProjectData,
-            oldScriptFiles,
+            this._existingScriptFiles,
             newScriptFiles,
             shouldGenerateScenesEventsCode
           );
@@ -278,6 +279,15 @@ namespace gdjs {
         }
       }
 
+      // Remember the script files that were loaded for the game now that
+      // the hot-reload is finished. This will allow a next hot-reload to
+      // reload the scripts files that have been added or changed.
+      // Note that some hot-reload options do not have any "scriptFiles", in which
+      // case the game script files have not changed.
+      if (newRuntimeGameOptions.scriptFiles) {
+        this._existingScriptFiles = newRuntimeGameOptions.scriptFiles;
+      }
+
       this._isHotReloading = false;
       logger.info(
         'Hot reload finished with logs:',
@@ -327,8 +337,8 @@ namespace gdjs {
 
     reloadScriptFiles(
       newProjectData: ProjectData,
-      oldScriptFiles: RuntimeGameOptionsScriptFile[],
-      newScriptFiles: RuntimeGameOptionsScriptFile[],
+      oldScriptFiles: RuntimeGameOptionsScriptFile[] | null,
+      newScriptFiles: RuntimeGameOptionsScriptFile[] | undefined,
       shouldGenerateScenesEventsCode: boolean
     ): Promise<void[]> {
       const reloadPromises: Array<Promise<void>> = [];
@@ -339,46 +349,67 @@ namespace gdjs {
           reloadPromises.push(this._reloadScript('code' + index + '.js'));
         });
       }
-      for (let i = 0; i < newScriptFiles.length; ++i) {
-        const newScriptFile = newScriptFiles[i];
-        const oldScriptFile = oldScriptFiles.filter(
-          (scriptFile) => scriptFile.path === newScriptFile.path
-        )[0];
-        if (!oldScriptFile) {
-          // Script file added
-          this._logs.push({
-            kind: 'info',
-            message:
-              'Loading ' +
-              newScriptFile.path +
-              ' as it was added to the list of scripts.',
-          });
-          reloadPromises.push(this._reloadScript(newScriptFile.path));
-        } else {
-          // Script file changed, which can be the case for extensions created
-          // from the editor, containing free functions or behaviors.
-          if (newScriptFile.hash !== oldScriptFile.hash) {
+
+      if (!newScriptFiles) {
+        // Script files were not exported for this hot-reload.
+        // This means the hot-reload was just done for a new resource, object
+        // or other thing not reload to code generation. Just do nothing.
+        logger.info(
+          'Script files were not exported (previously or now for this hot-reload).'
+        );
+      } else if (!oldScriptFiles) {
+        // Script files are not available. This is suspicious as we should always
+        // have them stored.
+        logger.error(
+          'Existing script files are not available for the hot-reload. No new or modified script will be hot-reloaded.'
+        );
+
+        // TODO: Consider if this should be communicated as an error or fatal error.
+      } else {
+        for (let i = 0; i < newScriptFiles.length; ++i) {
+          const newScriptFile = newScriptFiles[i];
+          const oldScriptFile = oldScriptFiles.filter(
+            (scriptFile) => scriptFile.path === newScriptFile.path
+          )[0];
+          if (!oldScriptFile) {
+            // Script file added
             this._logs.push({
               kind: 'info',
               message:
-                'Reloading ' + newScriptFile.path + ' because it was changed.',
+                'Loading ' +
+                newScriptFile.path +
+                ' as it was added to the list of scripts.',
             });
             reloadPromises.push(this._reloadScript(newScriptFile.path));
+          } else {
+            // Script file changed, which can be the case for extensions created
+            // from the editor, containing free functions or behaviors.
+            if (newScriptFile.hash !== oldScriptFile.hash) {
+              this._logs.push({
+                kind: 'info',
+                message:
+                  'Reloading ' +
+                  newScriptFile.path +
+                  ' because it was changed.',
+              });
+              reloadPromises.push(this._reloadScript(newScriptFile.path));
+            }
           }
         }
-      }
-      for (let i = 0; i < oldScriptFiles.length; ++i) {
-        const oldScriptFile = oldScriptFiles[i];
-        const newScriptFile = newScriptFiles.filter(
-          (scriptFile) => scriptFile.path === oldScriptFile.path
-        )[0];
+        for (let i = 0; i < oldScriptFiles.length; ++i) {
+          const oldScriptFile = oldScriptFiles[i];
+          const newScriptFile = newScriptFiles.filter(
+            (scriptFile) => scriptFile.path === oldScriptFile.path
+          )[0];
 
-        // A file may be removed because of a partial preview.
-        if (!newScriptFile && !shouldGenerateScenesEventsCode) {
-          this._logs.push({
-            kind: 'warning',
-            message: 'Script file ' + oldScriptFile.path + ' was removed.',
-          });
+          // A file may be removed because of a partial preview.
+          if (!newScriptFile && !shouldGenerateScenesEventsCode) {
+            this._logs.push({
+              kind: 'warning',
+              message:
+                'Script file ' + oldScriptFile.path + ' was removed. Ignoring.',
+            });
+          }
         }
       }
       return Promise.all(reloadPromises);

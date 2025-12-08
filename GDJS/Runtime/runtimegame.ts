@@ -210,6 +210,7 @@ namespace gdjs {
      * Game loop management (see startGameLoop method)
      */
     _renderer: RuntimeGameRenderer;
+    _displayedLoadingScreen: gdjs.LoadingScreenRenderer | null = null;
     _sessionId: string | null;
     _playerId: string | null;
     _watermark: watermark.RuntimeWatermark;
@@ -1046,6 +1047,7 @@ namespace gdjs {
         this._data.properties.watermark.showWatermark,
         isFirstScene
       );
+      this._displayedLoadingScreen = loadingScreen;
 
       const onProgress = async (count: integer, total: integer) => {
         const percent = Math.floor((100 * count) / total);
@@ -1063,6 +1065,7 @@ namespace gdjs {
 
       await loadingScreen.unload();
 
+      this._displayedLoadingScreen = null;
       if (!this._isInGameEdition) {
         this.pause(false);
       }
@@ -1204,9 +1207,15 @@ namespace gdjs {
             // Render and possibly step the game.
             if (this._paused) {
               if (this._inGameEditor) {
-                // The game is paused for edition: the in-game editor runs and render
-                // the scene.
-                this._inGameEditor.updateAndRender();
+                if (this._displayedLoadingScreen) {
+                  // Nothing to do, the loading screen is rendering itself by
+                  // having renderIfNeeded called when there is some progress,
+                  // and will directly call into the game renderer.
+                } else {
+                  // The game is paused for edition: the in-game editor runs and render
+                  // the scene.
+                  this._inGameEditor.updateAndRender();
+                }
               } else {
                 // The game is paused (for debugging): the rendering of the scene is done,
                 // but the game logic is not executed (no full "step").

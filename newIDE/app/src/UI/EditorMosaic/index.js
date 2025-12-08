@@ -157,6 +157,19 @@ const filterHiddenNodes = (
   };
 };
 
+const stripSourceReferences = (node: EditorMosaicNode): EditorMosaicNode => {
+  if (typeof node === 'string') {
+    return node;
+  }
+
+  const { source, ...rest } = node; // Remove source
+  return {
+    ...rest,
+    first: stripSourceReferences(rest.first),
+    second: stripSourceReferences(rest.second),
+  };
+};
+
 const toggleNodeVisibility = (
   currentNode: EditorMosaicNode,
   leafName: string
@@ -397,8 +410,14 @@ const EditorMosaic = React.forwardRef<Props, EditorMosaicInterface>(
     }));
 
     const debouncedPersistNodes = useDebounce(() => {
-      if (onPersistNodes && mosaicNode) {
-        onPersistNodes(mosaicNode);
+      if (onPersistNodes && hidableMosaicNode) {
+        // Persist `hidableMosaicNode`, not `mosaicNode`, so we persist the
+        // hidden node positions and no "source" references
+        // (which are JavaScript "pointers" to the original node).
+
+        // Stripe "source" references out of caution and to fix previous GDevelop versions
+        // that wrongly stored "source" in the preferences.
+        onPersistNodes(stripSourceReferences(hidableMosaicNode));
       }
     }, 2000);
 

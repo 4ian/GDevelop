@@ -351,7 +351,7 @@ gd::String ExporterHelper::ExportProjectData(
   fs.MkDir(fs.DirNameFrom(filename));
 
   gd::SerializerElement projectDataElement;
-  ExporterHelper::StriptAndSerializeProjectData(project, projectDataElement,
+  ExporterHelper::StripAndSerializeProjectData(project, projectDataElement,
                                                 isInGameEdition,
                                                 inGameEditorResources);
 
@@ -537,15 +537,25 @@ void ExporterHelper::SerializeProjectData(gd::AbstractFileSystem &fs,
     resourcesMergingHelper.PreserveDirectoriesStructure(false);
     resourcesMergingHelper.PreserveAbsoluteFilenames(false);
   }
+
+  if (!options.fullLoadingScreen) {
+    // Most of the time, we skip the logo and minimum duration so that
+    // the preview start as soon as possible.
+    clonedProject.GetLoadingScreen()
+        .ShowGDevelopLogoDuringLoadingScreen(false)
+        .SetMinDuration(0);
+    clonedProject.GetWatermark().ShowGDevelopWatermark(false);
+  }
+
   gd::ResourceExposer::ExposeWholeProjectResources(clonedProject,
                                                    resourcesMergingHelper);
 
-  ExporterHelper::StriptAndSerializeProjectData(clonedProject, rootElement,
+  ExporterHelper::StripAndSerializeProjectData(clonedProject, rootElement,
                                                 options.isInGameEdition,
                                                 inGameEditorResources);
 }
 
-void ExporterHelper::StriptAndSerializeProjectData(
+void ExporterHelper::StripAndSerializeProjectData(
     gd::Project &project, gd::SerializerElement &rootElement,
     bool isInGameEdition,
     const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources) {

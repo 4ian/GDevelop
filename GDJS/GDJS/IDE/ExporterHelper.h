@@ -762,7 +762,7 @@ class ExporterHelper {
    /**
     * \brief Strip a project and serialize it to JSON.
     */
-   static void StriptAndSerializeProjectData(gd::Project &project,
+   static void StripAndSerializeProjectData(gd::Project &project,
                                              gd::SerializerElement &rootElement,
                                              bool isInGameEdition,
                                              const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources);

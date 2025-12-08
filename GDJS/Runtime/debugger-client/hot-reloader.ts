@@ -20,6 +20,7 @@ namespace gdjs {
     _reloadedScriptElement: Record<string, HTMLScriptElement> = {};
     _logs: HotReloaderLog[] = [];
     _alreadyLoadedScriptFiles: Record<string, boolean> = {};
+    _isHotReloading: boolean = false;
 
     /**
      * @param runtimeGame - The `gdjs.RuntimeGame` to be hot-reloaded.
@@ -153,6 +154,13 @@ namespace gdjs {
       projectData: ProjectData;
       runtimeGameOptions: RuntimeGameOptions;
     }): Promise<HotReloaderLog[]> {
+      if (this._isHotReloading) {
+        console.error('Hot reload already in progress, skipping.');
+        return [];
+      }
+
+      this._isHotReloading = true;
+
       logger.info('Hot reload started');
       const wasPaused = this._runtimeGame.isPaused();
       this._runtimeGame.pause(true);
@@ -270,6 +278,7 @@ namespace gdjs {
         }
       }
 
+      this._isHotReloading = false;
       logger.info(
         'Hot reload finished with logs:',
         this._logs.map((log) => '\n' + log.kind + ': ' + log.message)

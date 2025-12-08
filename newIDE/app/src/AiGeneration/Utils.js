@@ -259,7 +259,6 @@ export const useAiRequestState = ({ project }: {| project: ?gdProject |}) => {
 
   const { values, setAiState } = React.useContext(PreferencesContext);
   const selectedAiRequestId = values.aiState.aiRequestId;
-  const selectedAiRequestMode = values.aiState.mode;
 
   const selectedAiRequest =
     (selectedAiRequestId && aiRequests[selectedAiRequestId]) || null;
@@ -442,11 +441,10 @@ export const useAiRequestState = ({ project }: {| project: ?gdProject |}) => {
       if (!profile) {
         setAiState({
           aiRequestId: null,
-          mode: selectedAiRequestMode,
         });
       }
     },
-    [profile, setAiState, selectedAiRequestMode]
+    [profile, setAiState]
   );
 
   React.useEffect(
@@ -457,24 +455,21 @@ export const useAiRequestState = ({ project }: {| project: ?gdProject |}) => {
       if (selectedAiRequestId && !selectedAiRequest) {
         setAiState({
           aiRequestId: null,
-          mode: selectedAiRequestMode,
         });
       }
     },
-    [selectedAiRequestId, selectedAiRequestMode, selectedAiRequest, setAiState]
+    [selectedAiRequestId, selectedAiRequest, setAiState]
   );
 
   return {
     selectedAiRequest,
     selectedAiRequestId,
-    selectedAiRequestMode,
     setAiState,
   };
 };
 
 // If any of those props is undefined, the previous value is kept.
 export type OpenAskAiOptions = {|
-  mode?: 'chat' | 'agent',
   aiRequestId?: string | null, // If null, a new request will be created.
   paneIdentifier?: 'left' | 'center' | 'right',
   continueProcessingFunctionCallsOnMount?: boolean,

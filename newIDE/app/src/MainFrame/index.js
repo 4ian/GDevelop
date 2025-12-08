@@ -866,7 +866,6 @@ const MainFrame = (props: Props) => {
   const openAskAi = React.useCallback(
     (options: ?OpenAskAiOptions) => {
       const {
-        mode,
         aiRequestId,
         paneIdentifier,
         continueProcessingFunctionCallsOnMount,
@@ -914,11 +913,7 @@ const MainFrame = (props: Props) => {
       }).then(state => {
         // Wait for the state to be updated before starting/opening the chat,
         // as the editor needs to be mounted.
-        const params =
-          // Both need to be defined.
-          mode === undefined || aiRequestId === undefined
-            ? undefined
-            : { mode, aiRequestId };
+        const params = aiRequestId === undefined ? undefined : { aiRequestId };
         const openedEditor = getOpenedAskAiEditor(state.editorTabs);
         if (!openedEditor) {
           console.error(

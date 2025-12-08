@@ -131,7 +131,6 @@ type Props = {|
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onOpenAskAi: ({|
-    mode: 'chat' | 'agent',
     aiRequestId: string | null,
     paneIdentifier: 'left' | 'center' | 'right' | null,
   |}) => void,
@@ -164,7 +163,6 @@ export type AskAiEditorInterface = {|
   ) => void,
   startOrOpenChat: (
     ?{|
-      mode: 'chat' | 'agent',
       aiRequestId: string | null,
     |}
   ) => void,
@@ -255,7 +253,6 @@ export const AskAiEditor = React.memo<Props>(
       const {
         selectedAiRequest,
         selectedAiRequestId,
-        selectedAiRequestMode,
         setAiState,
       } = useAiRequestState({ project });
       const upToDateSelectedAiRequestId = useStableUpToDateRef(
@@ -430,10 +427,7 @@ export const AskAiEditor = React.memo<Props>(
                 fileMetadata,
                 storageProviderName,
                 mode,
-                toolsVersion:
-                  mode === 'agent'
-                    ? AI_AGENT_TOOLS_VERSION
-                    : AI_CHAT_TOOLS_VERSION,
+                toolsVersion: AI_CHAT_TOOLS_VERSION,
                 aiConfiguration: {
                   presetId: aiConfigurationPresetId,
                 },
@@ -448,7 +442,6 @@ export const AskAiEditor = React.memo<Props>(
               if (!upToDateSelectedAiRequestId.current) {
                 setAiState({
                   aiRequestId: aiRequest.id,
-                  mode: selectedAiRequestMode,
                 });
               }
 
@@ -498,7 +491,6 @@ export const AskAiEditor = React.memo<Props>(
           quota,
           selectedAiRequestId,
           setLastSendError,
-          selectedAiRequestMode,
           setAiState,
           setSendingAiRequest,
           upToDateSelectedAiRequestId,
@@ -515,11 +507,13 @@ export const AskAiEditor = React.memo<Props>(
           createdSceneNames,
           createdProject,
           editorFunctionCallResults,
+          mode,
         }: {|
           userMessage: string,
           createdSceneNames?: Array<string>,
           createdProject?: ?gdProject,
           editorFunctionCallResults: Array<EditorFunctionCallResult>,
+          mode?: 'chat' | 'agent',
         |}) => {
           if (
             !profile ||
@@ -621,6 +615,13 @@ export const AskAiEditor = React.memo<Props>(
                 payWithCredits,
                 userMessage,
                 paused,
+                mode,
+                toolsVersion:
+                  mode === 'agent'
+                    ? AI_AGENT_TOOLS_VERSION
+                    : mode === 'chat'
+                    ? AI_CHAT_TOOLS_VERSION
+                    : undefined,
               })
             );
             updateAiRequest(aiRequest.id, aiRequest);
@@ -746,7 +747,6 @@ export const AskAiEditor = React.memo<Props>(
           if (!profile) {
             setAiState({
               aiRequestId: null,
-              mode: selectedAiRequestMode,
             });
             return;
           }
@@ -765,7 +765,6 @@ export const AskAiEditor = React.memo<Props>(
       const onStartOrOpenChat = React.useCallback(
         (
           options: ?{|
-            mode: 'chat' | 'agent',
             aiRequestId: string | null,
           |}
         ) => {
@@ -784,13 +783,11 @@ export const AskAiEditor = React.memo<Props>(
       );
       const onStartNewChat = React.useCallback(
         () => {
-          // Keep mode, but reset aiRequestId to start a new chat.
           onStartOrOpenChat({
-            mode: selectedAiRequestMode,
             aiRequestId: null,
           });
         },
-        [onStartOrOpenChat, selectedAiRequestMode]
+        [onStartOrOpenChat]
       );
 
       const updateToolbar = React.useCallback(
@@ -864,11 +861,17 @@ export const AskAiEditor = React.memo<Props>(
                 project={project}
                 ref={aiRequestChatRef}
                 aiRequest={selectedAiRequest}
-                aiRequestMode={selectedAiRequestMode}
                 onStartNewAiRequest={startNewAiRequest}
-                onSendUserMessage={(userMessage: string) =>
+                onSendUserMessage={({
+                  userMessage,
+                  mode,
+                }: {|
+                  userMessage: string,
+                  mode: 'chat' | 'agent',
+                |}) =>
                   onSendMessage({
                     userMessage,
+                    mode,
                     editorFunctionCallResults: selectedAiRequest
                       ? getEditorFunctionCallResults(selectedAiRequest.id) || []
                       : [],
@@ -923,7 +926,6 @@ export const AskAiEditor = React.memo<Props>(
               updateAiRequest(aiRequest.id, aiRequest);
               setAiState({
                 aiRequestId: aiRequest.id,
-                mode: aiRequest.mode || selectedAiRequestMode,
               });
               refreshAiRequest(aiRequest.id);
               onCloseHistory();

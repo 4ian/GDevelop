@@ -228,7 +228,7 @@ export type PreferencesValues = {|
   gamesDashboardOrderBy: GamesDashboardOrderBy,
   takeScreenshotOnPreview: boolean,
   showAiAskButtonInTitleBar: boolean,
-  aiState: {| aiRequestId: string | null, mode: 'chat' | 'agent' |},
+  aiState: {| aiRequestId: string | null |},
   automaticallyUseCreditsForAiRequests: boolean,
   hasSeenInGameEditorWarning: boolean,
 |};
@@ -340,7 +340,6 @@ export type Preferences = {|
   setShowAiAskButtonInTitleBar: (enabled: boolean) => void,
   setAiState: ({|
     aiRequestId: string | null,
-    mode: 'chat' | 'agent',
   |}) => void,
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => void,
   setHasSeenInGameEditorWarning: (enabled: boolean) => void,
@@ -403,7 +402,7 @@ export const initialPreferences = {
     gamesDashboardOrderBy: 'lastModifiedAt',
     takeScreenshotOnPreview: true,
     showAiAskButtonInTitleBar: true,
-    aiState: { aiRequestId: null, mode: 'agent' },
+    aiState: { aiRequestId: null },
     automaticallyUseCreditsForAiRequests: false,
     hasSeenInGameEditorWarning: false,
   },
@@ -483,13 +482,7 @@ export const initialPreferences = {
   ) => {},
   setTakeScreenshotOnPreview: (enabled: boolean) => {},
   setShowAiAskButtonInTitleBar: (enabled: boolean) => {},
-  setAiState: ({
-    aiRequestId,
-    mode,
-  }: {|
-    aiRequestId: string | null,
-    mode: 'chat' | 'agent',
-  |}) => {},
+  setAiState: ({ aiRequestId }: {| aiRequestId: string | null |}) => {},
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => {},
   setHasSeenInGameEditorWarning: (enabled: boolean) => {},
 };

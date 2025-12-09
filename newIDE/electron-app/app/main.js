@@ -271,6 +271,17 @@ app.on('ready', function() {
     }
   );
 
+  // Window maximize toggle (for double-click on titlebar):
+  ipcMain.handle('window-maximize-toggle', async () => {
+    if (!mainWindow) return;
+
+    if (mainWindow.isMaximized()) {
+      mainWindow.unmaximize();
+    } else {
+      mainWindow.maximize();
+    }
+  });
+
   // LocalFileDownloader events:
   ipcMain.handle('local-file-download', async (event, url, outputPath) => {
     const result = await downloadLocalFile(url, outputPath);

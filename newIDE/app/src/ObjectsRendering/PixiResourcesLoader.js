@@ -754,17 +754,8 @@ export default class PixiResourcesLoader {
     const promise = spineDataPromises[spineName];
     if (promise) return promise;
 
-    if (!spineName) {
-      // Nothing is even tried to be loaded.
-      return {
-        skeleton: null,
-        loadingError: null,
-        loadingErrorReason: null,
-      };
-    }
-
     const resourceManager = project.getResourcesManager();
-    if (spineName.length === 0 || !resourceManager.hasResource(spineName)) {
+    if (!spineName || !resourceManager.hasResource(spineName)) {
       return {
         skeleton: null,
         loadingError: null,

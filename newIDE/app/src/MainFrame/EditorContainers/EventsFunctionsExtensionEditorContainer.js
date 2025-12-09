@@ -10,6 +10,10 @@ import {
   type ObjectGroupsOutsideEditorChanges,
 } from './BaseEditor';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
+import {
+  setEditorHotReloadNeeded,
+  type HotReloadSteps,
+} from '../../EmbeddedGame/EmbeddedGameFrame';
 
 const styles = {
   container: {
@@ -58,6 +62,12 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     // No thing to be done.
   }
 
+  notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {
+    setEditorHotReloadNeeded(hotReloadSteps);
+  }
+
+  switchInGameEditorIfNoHotReloadIsNeeded() {}
+
   onInstancesModifiedOutsideEditor(changes: InstancesOutsideEditorChanges) {
     // No thing to be done.
   }
@@ -84,7 +94,11 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     // reload/regeneration of extensions when the user
     // is focusing another editor
     if (prevProps.isActive && !this.props.isActive) {
-      this.props.onLoadEventsFunctionsExtensions();
+      this.props.onLoadEventsFunctionsExtensions({
+        // Extensions without any events-based object are unlikely to have any
+        // impact on the editor.
+        shouldHotReloadEditor: this.hasAnyEventBasedObject(),
+      });
     }
   }
 
@@ -93,8 +107,15 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     // reload/regeneration of extensions, as changes can have
     // been made inside before it's closed.
     if (this.props.isActive) {
-      this.props.onLoadEventsFunctionsExtensions();
+      this.props.onLoadEventsFunctionsExtensions({
+        shouldHotReloadEditor: this.hasAnyEventBasedObject(),
+      });
     }
+  }
+
+  hasAnyEventBasedObject() {
+    const extension = this.getEventsFunctionsExtension();
+    return extension ? extension.getEventsBasedObjects().getCount() > 0 : false;
   }
 
   _reloadExtensionMetadata = () => {
@@ -120,7 +141,9 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     // inside. The preview or export is responsible for waiting
     // for extensions to be loaded before starting.
     if (this.props.isActive) {
-      this.props.onLoadEventsFunctionsExtensions();
+      this.props.onLoadEventsFunctionsExtensions({
+        shouldHotReloadEditor: false,
+      });
     }
   };
 
@@ -205,7 +228,11 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
           }
           onRenamedEventsBasedObject={this.props.onRenamedEventsBasedObject}
           onDeletedEventsBasedObject={this.props.onDeletedEventsBasedObject}
+          onWillInstallExtension={this.props.onWillInstallExtension}
           onExtensionInstalled={this.props.onExtensionInstalled}
+          onEventBasedObjectTypeChanged={
+            this.props.onEventBasedObjectTypeChanged
+          }
         />
       </div>
     );

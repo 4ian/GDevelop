@@ -1,7 +1,8 @@
 // @flow
+import { type SerializedExtension } from '../../Utils/GDevelopServices/Extension';
 
 export default class BrowserEventsFunctionsExtensionOpener {
-  static chooseEventsFunctionExtensionFile = (): Promise<?any> => {
+  static chooseEventsFunctionExtensionFile = (): Promise<Array<any>> => {
     return new Promise(resolve => {
       if (window.showOpenFilePicker) {
         window
@@ -15,23 +16,22 @@ export default class BrowserEventsFunctionsExtensionOpener {
               },
             ],
             excludeAcceptAllOption: true,
-            multiple: false,
+            multiple: true,
           })
-          .then(([handle]) => {
-            if (!handle) return resolve(null);
-            resolve(handle.getFile());
+          .then(handles => {
+            if (!handles) return resolve([]);
+            resolve(Promise.all(handles.map(handle => handle.getFile())));
           })
           .catch(() => {
-            resolve(null);
+            resolve([]);
           });
       } else {
         const adhocInput = document.createElement('input');
         adhocInput.type = 'file';
-        adhocInput.multiple = false;
+        adhocInput.multiple = true;
         adhocInput.accept = 'application/json,.json';
         adhocInput.onchange = e => {
-          const file = e.target.files[0];
-          return resolve(file);
+          return resolve(e.target.files);
         };
 
         // There is no built-in way to know if the user closed the file picking dialog
@@ -59,7 +59,7 @@ export default class BrowserEventsFunctionsExtensionOpener {
             );
           }
           if (!adhocInput.files.length) {
-            resolve(null);
+            resolve([]);
           }
         };
 
@@ -71,7 +71,7 @@ export default class BrowserEventsFunctionsExtensionOpener {
 
   static readEventsFunctionExtensionFile = async (
     file: any
-  ): Promise<Object> => {
+  ): Promise<SerializedExtension> => {
     if (!(file instanceof File)) {
       console.error('Given file is not a JS File object. Instead it is:', {
         file,

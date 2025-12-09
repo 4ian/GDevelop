@@ -142,6 +142,8 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     .insertNew('LeftPadding', 1)
     .setType('number')
     .setLabel('Left padding')
+    .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+    .setDescription('The left padding of the button')
     .setGroup('Padding');
   buttonProperties
     .insertNew('RightPadding', 2)

@@ -7,6 +7,7 @@
 
 #include "GDCore/CommonTools.h"
 #include "GDCore/Serialization/SerializerElement.h"
+#include "GDCore/Project/ResourcesContainer.h"
 
 namespace gd {
 
@@ -68,6 +69,46 @@ ValueTypeMetadata::GetPrimitiveValueType(const gd::String &parameterType) {
   if (parameterType == "boolean" ||
       gd::ValueTypeMetadata::IsTypeValue("boolean", parameterType)) {
     return ValueTypeMetadata::booleanType;
+  }
+  return parameterType;
+}
+
+const gd::String &
+ValueTypeMetadata::GetResourceType(const gd::String &parameterType) {
+  if (parameterType == "fontResource") {
+    return gd::Resource::fontType;
+  }
+  if (parameterType == "audioResource" ||
+      // Deprecated, old parameter types:
+      parameterType == "soundfile" || parameterType == "musicfile") {
+    return gd::Resource::audioType;
+  }
+  if (parameterType == "videoResource") {
+    return gd::Resource::videoType;
+  }
+  if (parameterType == "bitmapFontResource") {
+    return gd::Resource::bitmapType;
+  }
+  if (parameterType == "imageResource") {
+    return gd::Resource::imageType;
+  }
+  if (parameterType == "jsonResource") {
+    return gd::Resource::jsonType;
+  }
+  if (parameterType == "tilemapResource") {
+    return gd::Resource::tileMapType;
+  }
+  if (parameterType == "tilesetResource") {
+    return gd::Resource::tileSetType;
+  }
+  if (parameterType == "model3DResource") {
+    return gd::Resource::model3DType;
+  }
+  if (parameterType == "atlasResource") {
+    return gd::Resource::atlasType;
+  }
+  if (parameterType == "spineResource") {
+    return gd::Resource::spineType;
   }
   return parameterType;
 }

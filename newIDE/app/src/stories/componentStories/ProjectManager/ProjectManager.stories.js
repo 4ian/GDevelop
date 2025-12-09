@@ -62,7 +62,8 @@ export const NoProjectOpen = () => {
                   onOpenEventsFunctionsExtension={action(
                     'onOpenEventsFunctionsExtension'
                   )}
-                  onInstallExtension={action('onInstallExtension')}
+                  onSceneAdded={action('onSceneAdded')}
+                  onExternalLayoutAdded={action('onExternalLayoutAdded')}
                   onDeleteLayout={action('onDeleteLayout')}
                   onDeleteExternalLayout={action('onDeleteExternalLayout')}
                   onDeleteEventsFunctionsExtension={action(
@@ -79,11 +80,15 @@ export const NoProjectOpen = () => {
                   onReloadEventsFunctionsExtensions={action(
                     'onReloadEventsFunctionsExtensions'
                   )}
+                  onWillInstallExtension={action('extension will be installed')}
                   onExtensionInstalled={action('onExtensionInstalled')}
                   onShareProject={action('onShareProject')}
                   isOpen
                   hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
                   resourceManagementProps={fakeResourceManagementProps}
+                  projectScopedContainersAccessor={
+                    testProject.testSceneProjectScopedContainersAccessor
+                  }
                   gamesList={{
                     games: null,
                     fetchGames: async () => {},
@@ -132,7 +137,8 @@ export const ProjectOpen = () => {
                   onOpenEventsFunctionsExtension={action(
                     'onOpenEventsFunctionsExtension'
                   )}
-                  onInstallExtension={action('onInstallExtension')}
+                  onSceneAdded={action('onSceneAdded')}
+                  onExternalLayoutAdded={action('onExternalLayoutAdded')}
                   onDeleteLayout={action('onDeleteLayout')}
                   onDeleteExternalLayout={action('onDeleteExternalLayout')}
                   onDeleteEventsFunctionsExtension={action(
@@ -149,11 +155,15 @@ export const ProjectOpen = () => {
                   onReloadEventsFunctionsExtensions={action(
                     'onReloadEventsFunctionsExtensions'
                   )}
+                  onWillInstallExtension={action('extension will be installed')}
                   onExtensionInstalled={action('onExtensionInstalled')}
                   onShareProject={action('onShareProject')}
                   isOpen
                   hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
                   resourceManagementProps={fakeResourceManagementProps}
+                  projectScopedContainersAccessor={
+                    testProject.testSceneProjectScopedContainersAccessor
+                  }
                   gamesList={{
                     games: null,
                     fetchGames: async () => {},

@@ -16,6 +16,7 @@ class Project;
 class Layout;
 class ExternalLayout;
 class AbstractFileSystem;
+class SerializerElement;
 }  // namespace gd
 namespace gdjs {
 struct PreviewExportOptions;
@@ -64,7 +65,33 @@ class Exporter {
     codeOutputDir = codeOutputDir_;
   }
 
- private:
+  /**
+   * \brief Serialize a project without its events to JSON
+   *
+   * \param project The project to be exported
+   * \param options The content of the extra configuration
+   * \param projectDataElement The element where the project data is serialized
+   */
+  void SerializeProjectData(const gd::Project &project,
+                            const PreviewExportOptions &options,
+                            gd::SerializerElement &projectDataElement);
+
+  /**
+   * \brief Serialize the content of the extra configuration to store
+   * in gdjs.runtimeGameOptions to JSON
+   *
+   * \warning `ExportProjectForPixiPreview` must be called first to serialize
+   * the list of scripts files.
+   *
+   * \param options The content of the extra configuration
+   * \param runtimeGameOptionsElement The element where the game options are
+   * serialized
+   */
+  void
+  SerializeRuntimeGameOptions(const PreviewExportOptions &options,
+                              gd::SerializerElement &runtimeGameOptionsElement);
+
+private:
   gd::AbstractFileSystem&
       fs;  ///< The abstract file system to be used for exportation.
   gd::String lastError;  ///< The last error that occurred.
@@ -72,6 +99,8 @@ class Exporter {
       gdjsRoot;  ///< The root directory of GDJS, used to copy runtime files.
   gd::String codeOutputDir;  ///< The directory where JS code is outputted. Will
                              ///< be then copied to the final output directory.
+  std::vector<gd::String>
+      includesFiles; ///< The list of scripts files - useful for hot-reloading
 };
 
 }  // namespace gdjs

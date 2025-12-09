@@ -55,7 +55,6 @@ import { deleteCloudProject } from '../../../../Utils/GDevelopServices/Project';
 import { getDefaultRegisterGameProperties } from '../../../../Utils/UseGameAndBuildsManager';
 import { type CreateProjectResult } from '../../../../Utils/UseCreateProject';
 import { AskAiStandAloneForm } from '../../../../AiGeneration/AskAiStandAloneForm';
-import { type OpenAskAiOptions } from '../../../../AiGeneration/Utils';
 import { AiRequestContext } from '../../../../AiGeneration/AiRequestContext';
 
 const getExampleItemsColumns = (
@@ -98,7 +97,8 @@ type Props = {|
         | 'none',
     |}
   ) => void,
-  onOpenAskAi: (?OpenAskAiOptions) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
   onCloseAskAi: () => void,
   closeProject: () => Promise<void>,
   canOpen: boolean,
@@ -135,7 +135,8 @@ const CreateSection = ({
   resourceManagementProps,
   onCreateEmptyProject,
   onOpenLayout,
-  onOpenAskAi,
+  onWillInstallExtension,
+  onExtensionInstalled,
   onCloseAskAi,
   closeProject,
   canOpen,
@@ -447,20 +448,6 @@ const CreateSection = ({
     ]
   );
 
-  const onOpenAskAiForStandAloneForm = React.useCallback(
-    () => {
-      onOpenAskAi({
-        paneIdentifier: 'right',
-        // By default, function calls are paused on mount,
-        // to avoid resuming processing old requests automatically.
-        // In this case, we want to continue processing right away, as
-        // we're in the middle of a flow.
-        continueProcessingFunctionCallsOnMount: true,
-      });
-    },
-    [onOpenAskAi]
-  );
-
   const { aiRequestStorage } = React.useContext(AiRequestContext);
   const { isSendingAiRequest } = aiRequestStorage;
   const isLoadingAiRequest = isSendingAiRequest('');
@@ -518,7 +505,8 @@ const CreateSection = ({
               onCreateProjectFromExample={onCreateProjectFromExample}
               onCreateEmptyProject={onCreateEmptyProject}
               onOpenLayout={onOpenLayout}
-              onOpenAskAi={onOpenAskAiForStandAloneForm}
+              onWillInstallExtension={onWillInstallExtension}
+              onExtensionInstalled={onExtensionInstalled}
               onCloseAskAi={onCloseAskAi}
               dismissableIdentifier="home-page-create-section"
             />

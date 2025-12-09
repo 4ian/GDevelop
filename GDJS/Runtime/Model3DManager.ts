@@ -164,14 +164,17 @@ namespace gdjs {
     }
 
     unloadResource(resourceData: ResourceData): void {
-      const loadedThreeModel = this._loadedThreeModels.get(resourceData);
+      const loadedThreeModel = this._loadedThreeModels.getFromName(
+        resourceData.name
+      );
       if (loadedThreeModel) {
         loadedThreeModel.scene.clear();
         this._loadedThreeModels.delete(resourceData);
       }
 
-      const downloadedArrayBuffer =
-        this._downloadedArrayBuffers.get(resourceData);
+      const downloadedArrayBuffer = this._downloadedArrayBuffers.getFromName(
+        resourceData.name
+      );
       if (downloadedArrayBuffer) {
         this._downloadedArrayBuffers.delete(resourceData);
       }

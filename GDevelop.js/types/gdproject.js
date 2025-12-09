@@ -52,6 +52,8 @@ declare class gdProject {
   isFolderProject(): boolean;
   setUseDeprecatedZeroAsDefaultZOrder(enable: boolean): void;
   getUseDeprecatedZeroAsDefaultZOrder(): boolean;
+  areEffectsHiddenInEditor(): boolean;
+  setEffectsHiddenInEditor(enable: boolean): void;
   setLastCompilationDirectory(path: string): void;
   getLastCompilationDirectory(): string;
   getExtensionProperties(): gdExtensionProperties;
@@ -106,7 +108,7 @@ declare class gdProject {
   getEventsBasedObject(type: string): gdEventsBasedObject;
   getVariables(): gdVariablesContainer;
   getObjects(): gdObjectsContainer;
-  getResourcesManager(): gdResourcesManager;
+  getResourcesManager(): gdResourcesContainer;
   setSceneResourcesPreloading(resourcesPreloading: string): void;
   getSceneResourcesPreloading(): string;
   setSceneResourcesUnloading(resourcesUnloading: string): void;

@@ -1,5 +1,4 @@
 // @flow
-import { serializeToJSObject } from '../../Utils/Serializer';
 
 const downloadStringContentAsFile = async (
   filename: string,
@@ -28,14 +27,10 @@ export default class BrowserEventsFunctionsExtensionWriter {
     return extensionName;
   };
 
-  static writeEventsFunctionsExtension = async (
-    extension: gdEventsFunctionsExtension,
+  static writeSerializedObject = async (
+    serializedObject: Object,
     filename: string
   ): Promise<void> => {
-    const serializedObject = serializeToJSObject(
-      extension,
-      'serializeToExternal'
-    );
     try {
       await downloadStringContentAsFile(
         filename,

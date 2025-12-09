@@ -371,7 +371,11 @@ namespace gdjs {
       this._action.paused = false;
     }
 
-    playAnimation(animationName: string, shouldLoop: boolean) {
+    playAnimation(
+      animationName: string,
+      shouldLoop: boolean,
+      ignoreCrossFade: boolean = false
+    ) {
       const clip = THREE.AnimationClip.findByName(
         this._originalModel.animations,
         animationName
@@ -396,7 +400,11 @@ namespace gdjs {
       this._action.timeScale =
         this._model3DRuntimeObject.getAnimationSpeedScale();
 
-      if (previousAction && previousAction !== this._action) {
+      if (
+        previousAction &&
+        previousAction !== this._action &&
+        !ignoreCrossFade
+      ) {
         this._action.crossFadeFrom(
           previousAction,
           this._model3DRuntimeObject._crossfadeDuration,

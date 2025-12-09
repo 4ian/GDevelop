@@ -84,7 +84,9 @@ const PreferencesDialog = ({
     setPreviewCrashReportUploadLevel,
     setTakeScreenshotOnPreview,
     setShowAiAskButtonInTitleBar,
+    setAutomaticallyUseCreditsForAiRequests,
     setShowCreateSectionByDefault,
+    setHasSeenInGameEditorWarning,
   } = React.useContext(PreferencesContext);
 
   const initialUse3DEditor = React.useRef<boolean>(values.use3DEditor);
@@ -553,6 +555,15 @@ const PreferencesDialog = ({
                 <CompactToggleField
                   labelColor="primary"
                   hideTooltip
+                  onCheck={setAutomaticallyUseCreditsForAiRequests}
+                  checked={values.automaticallyUseCreditsForAiRequests}
+                  label={i18n._(
+                    t`Automatically use GDevelop credits for AI requests when run out of AI credits`
+                  )}
+                />
+                <CompactToggleField
+                  labelColor="primary"
+                  hideTooltip
                   onCheck={check =>
                     setDisplaySaveReminder({ activated: check })
                   }
@@ -631,6 +642,12 @@ const PreferencesDialog = ({
                     fullWidth
                     onClick={onOpenQuickCustomizationDialog}
                     label={<Trans>Open quick customization</Trans>}
+                  />
+                  <FlatButton
+                    fullWidth
+                    label={<Trans>Show again in-game editor warning</Trans>}
+                    onClick={() => setHasSeenInGameEditorWarning(false)}
+                    disabled={!values.hasSeenInGameEditorWarning}
                   />
                 </ColumnStackLayout>
               </ColumnStackLayout>

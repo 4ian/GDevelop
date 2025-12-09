@@ -12,18 +12,27 @@ type CompactToggleButton = {|
   tooltip: React.Node,
   onClick: () => void,
   isActive: boolean,
+  label?: string,
 |};
 export type CompactToggleButtonsProps = {|
   id: string,
+  noSeparator?: boolean,
   buttons: CompactToggleButton[],
+  expand?: boolean,
 |};
 
-const CompactToggleButtons = ({ id, buttons }: CompactToggleButtonsProps) => {
+const CompactToggleButtons = ({
+  id,
+  noSeparator,
+  buttons,
+  expand,
+}: CompactToggleButtonsProps) => {
   return (
     <div
       id={id}
       className={classNames({
         [classes.container]: true,
+        [classes.containerExpand]: expand,
       })}
     >
       {buttons.map((button, index) => (
@@ -41,9 +50,12 @@ const CompactToggleButtons = ({ id, buttons }: CompactToggleButtonsProps) => {
               onClick={button.onClick}
             >
               {button.renderIcon(classes.icon)}
+              {button.label && (
+                <span className={classes.label}>{button.label}</span>
+              )}
             </button>
           </Tooltip>
-          {index < buttons.length - 1 && (
+          {index < buttons.length - 1 && !noSeparator && (
             <div
               key={`spacer-${index}`}
               className={classNames({

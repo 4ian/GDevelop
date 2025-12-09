@@ -14,6 +14,7 @@ import {
   getCurrentTabForPane,
   type EditorTabsState,
   type EditorTab,
+  type EditorKind,
   getEditorTabOpenedWithKey,
   changeCurrentTab,
   closeEditorTab,
@@ -69,6 +70,22 @@ const styles = {
   },
 };
 
+const shouldRemovePointerEvents = (
+  kind: EditorKind,
+  gameEditorMode: 'embedded-game' | 'instances-editor'
+) => {
+  if (gameEditorMode === 'embedded-game') {
+    // Scene editors can have an embedded game, so they redefine manually
+    // which components can have clicks/touches.
+    return (
+      kind === 'layout' ||
+      kind === 'external layout' ||
+      kind === 'custom object'
+    );
+  }
+  return false;
+};
+
 export type EditorTabsPaneCommonProps = {|
   editorTabs: EditorTabsState,
   currentProject: ?gdProject,
@@ -81,6 +98,8 @@ export type EditorTabsPaneCommonProps = {|
   checkedOutVersionStatus: ?OpenedVersionStatus,
   canDoNetworkPreview: boolean,
   gamesPlatformFrameTools: GamesPlatformFrameTools,
+  gameEditorMode: 'embedded-game' | 'instances-editor',
+  setGameEditorMode: ('embedded-game' | 'instances-editor') => void,
 
   // Callbacks from MainFrame
   toggleProjectManager: () => void,
@@ -96,12 +115,19 @@ export type EditorTabsPaneCommonProps = {|
     overridenPreviewLayoutName: ?string,
     overridenPreviewExternalLayoutName: ?string,
   |}) => void,
+  onRestartInGameEditor: (reason: string) => void,
+  showRestartInGameEditorAfterErrorButton: boolean,
   openVersionHistoryPanel: () => void,
   onQuitVersionHistory: () => Promise<void>,
   onOpenAskAi: (?OpenAskAiOptions) => void,
   onCloseAskAi: () => void,
   getStorageProvider: () => StorageProvider,
-  setPreviewedLayout: (layoutName: ?string) => void,
+  setPreviewedLayout: ({|
+    layoutName: string | null,
+    externalLayoutName: string | null,
+    eventsBasedObjectType: string | null,
+    eventsBasedObjectVariantName: string | null,
+  |}) => void,
   openExternalEvents: (name: string) => void,
   openLayout: (
     name: string,
@@ -186,6 +212,11 @@ export type EditorTabsPaneCommonProps = {|
   ) => void,
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
   onExtractAsExternalLayout: (name: string) => void,
+  onExtractAsEventBasedObject: (
+    extensionName: string,
+    eventsBasedObjectName: string
+  ) => void,
+  onEventBasedObjectTypeChanged: () => void,
   onOpenEventBasedObjectEditor: (
     extensionName: string,
     eventsBasedObjectName: string
@@ -220,7 +251,15 @@ export type EditorTabsPaneCommonProps = {|
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onLoadEventsFunctionsExtensions: ({|
+    shouldHotReloadEditor: boolean,
+  |}) => Promise<void>,
+  onEffectAdded: () => void,
+  onObjectListsModified: ({ isNewObjectTypeUsed: boolean }) => void,
+  onExternalLayoutAssociationChanged: () => void,
+  triggerHotReloadInGameEditorIfNeeded: () => void,
   gamesList: GamesList,
 
   setEditorTabs: (editorTabs: EditorTabsState) => void,
@@ -299,9 +338,12 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
     selectInAppTutorial,
     eventsFunctionsExtensionsState,
     isProjectClosedSoAvoidReloadingExtensions,
+    onLoadEventsFunctionsExtensions,
     renameResourcesInProject,
     openBehaviorEvents,
     onExtractAsExternalLayout,
+    onExtractAsEventBasedObject,
+    onEventBasedObjectTypeChanged,
     onOpenEventBasedObjectEditor,
     onOpenEventBasedObjectVariantEditor,
     deleteEventsBasedObjectVariant,
@@ -312,7 +354,12 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
     onInstancesModifiedOutsideEditor,
     onObjectsModifiedOutsideEditor,
     onObjectGroupsModifiedOutsideEditor,
+    onWillInstallExtension,
     onExtensionInstalled,
+    onEffectAdded,
+    onObjectListsModified,
+    onExternalLayoutAssociationChanged,
+    triggerHotReloadInGameEditorIfNeeded,
     gamesList,
     setEditorTabs,
     onSetPointerEventsNone,
@@ -322,6 +369,10 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
     isDrawer,
     onSetPaneDrawerState,
     areSidePanesDrawers,
+    gameEditorMode,
+    setGameEditorMode,
+    onRestartInGameEditor,
+    showRestartInGameEditorAfterErrorButton,
   } = props;
 
   const toolbarRef = React.useRef<?ToolbarInterface>(null);
@@ -573,13 +624,25 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
             );
 
             return (
-              <TabContentContainer key={editorTab.key} active={isCurrentTab}>
+              <TabContentContainer
+                key={editorTab.key}
+                active={isCurrentTab}
+                removePointerEvents={
+                  // Deactivate pointer events when the play tab is active, so the iframe
+                  // can be interacted with.
+                  gamesPlatformFrameTools.iframeVisible ||
+                  shouldRemovePointerEvents(editorTab.kind, gameEditorMode)
+                }
+              >
                 <CommandsContextScopedProvider active={isCurrentTab}>
                   <ErrorBoundary
                     componentTitle={errorBoundaryProps.componentTitle}
                     scope={errorBoundaryProps.scope}
                   >
                     {editorTab.renderEditorContainer({
+                      editorId: editorTab.key,
+                      gameEditorMode,
+                      setGameEditorMode,
                       isActive: isCurrentTab,
                       extraEditorProps: editorTab.extraEditorProps,
                       project: currentProject,
@@ -606,6 +669,8 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
                       onOpenTemplateFromCourseChapter: openTemplateFromCourseChapter,
                       previewDebuggerServer,
                       hotReloadPreviewButtonProps,
+                      onRestartInGameEditor,
+                      showRestartInGameEditorAfterErrorButton,
                       resourceManagementProps,
                       onSave: saveProject,
                       canSave,
@@ -650,14 +715,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
                       onOpenPreferences: () => openPreferencesDialog(true),
                       onOpenAbout: () => openAboutDialog(true),
                       selectInAppTutorial: selectInAppTutorial,
-                      onLoadEventsFunctionsExtensions: async () => {
-                        if (isProjectClosedSoAvoidReloadingExtensions) {
-                          return;
-                        }
-                        return eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
-                          currentProject
-                        );
-                      },
+                      onLoadEventsFunctionsExtensions: onLoadEventsFunctionsExtensions,
                       onReloadEventsFunctionsExtensionMetadata: extension => {
                         if (isProjectClosedSoAvoidReloadingExtensions) {
                           return;
@@ -688,7 +746,8 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
                       },
                       openBehaviorEvents: openBehaviorEvents,
                       onExtractAsExternalLayout: onExtractAsExternalLayout,
-                      onExtractAsEventBasedObject: onOpenEventBasedObjectEditor,
+                      onExtractAsEventBasedObject: onExtractAsEventBasedObject,
+                      onEventBasedObjectTypeChanged: onEventBasedObjectTypeChanged,
                       onOpenEventBasedObjectEditor: onOpenEventBasedObjectEditor,
                       onOpenEventBasedObjectVariantEditor: onOpenEventBasedObjectVariantEditor,
                       onDeleteEventsBasedObjectVariant: deleteEventsBasedObjectVariant,
@@ -699,7 +758,12 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
                       onInstancesModifiedOutsideEditor: onInstancesModifiedOutsideEditor,
                       onObjectsModifiedOutsideEditor: onObjectsModifiedOutsideEditor,
                       onObjectGroupsModifiedOutsideEditor: onObjectGroupsModifiedOutsideEditor,
+                      onWillInstallExtension: onWillInstallExtension,
                       onExtensionInstalled: onExtensionInstalled,
+                      onEffectAdded: onEffectAdded,
+                      onObjectListsModified: onObjectListsModified,
+                      onExternalLayoutAssociationChanged,
+                      triggerHotReloadInGameEditorIfNeeded: triggerHotReloadInGameEditorIfNeeded,
                       gamesList,
                       gamesPlatformFrameTools,
                     })}

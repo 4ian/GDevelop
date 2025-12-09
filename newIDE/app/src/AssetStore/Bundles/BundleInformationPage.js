@@ -17,7 +17,6 @@ import {
   type PrivateGameTemplateListingData,
   type CourseListingData,
 } from '../../Utils/GDevelopServices/Shop';
-import { type SubscriptionPlanWithPricingSystems } from '../../Utils/GDevelopServices/Usage';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 import { Trans } from '@lingui/macro';
 import AlertMessage from '../../UI/AlertMessage';
@@ -36,6 +35,7 @@ import {
 import Text from '../../UI/Text';
 import CourseStoreContext from '../../Course/CourseStoreContext';
 import { planIdSortingFunction } from '../../Profile/Subscription/PlanCard';
+import { SubscriptionContext } from '../../Profile/Subscription/SubscriptionContext';
 import SubscriptionPlanPricingSummary from '../../Profile/Subscription/PromotionSubscriptionDialog/SubscriptionPlanPricingSummary';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import SubscriptionPlanTableSummary from '../../Profile/Subscription/PromotionSubscriptionDialog/SubscriptionPlanTableSummary';
@@ -77,7 +77,6 @@ const styles = {
 type Props = {|
   bundleListingData: BundleListingData,
   onBack?: () => void | Promise<void>,
-  getSubscriptionPlansWithPricingSystems: () => Array<SubscriptionPlanWithPricingSystems> | null,
   onBundleOpen: BundleListingData => void,
   onGameTemplateOpen: PrivateGameTemplateListingData => void,
   onAssetPackOpen: (
@@ -95,7 +94,6 @@ type Props = {|
 const BundleInformationPage = ({
   bundleListingData,
   onBack,
-  getSubscriptionPlansWithPricingSystems,
   onAssetPackOpen,
   onGameTemplateOpen,
   onBundleOpen,
@@ -119,6 +117,10 @@ const BundleInformationPage = ({
     receivedGameTemplates,
     receivedAssetPacks,
   } = React.useContext(AuthenticatedUserContext);
+  const { getSubscriptionPlansWithPricingSystems } = React.useContext(
+    SubscriptionContext
+  );
+  const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
   const [bundle, setBundle] = React.useState<?Bundle>(null);
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
   const {
@@ -198,8 +200,6 @@ const BundleInformationPage = ({
       noActions,
     ]
   );
-
-  const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
 
   const highestSubscriptionPlanIncludedInBundle = React.useMemo(
     () => {
@@ -392,7 +392,7 @@ const BundleInformationPage = ({
                   subscriptionPlanWithPricingSystems={
                     highestSubscriptionPlanIncludedInBundle
                   }
-                  hideActions
+                  hideFullTableLink
                 />
               </Column>
             </ResponsiveLineStackLayout>

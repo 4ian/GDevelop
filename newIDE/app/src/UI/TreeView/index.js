@@ -68,7 +68,7 @@ export type ItemData<Item> = {|
   |}) => void,
   renamedItemId: ?string,
   canDrop?: ?(Item, where: 'before' | 'inside' | 'after') => boolean,
-  onDrop: (Item, where: 'before' | 'inside' | 'after') => void,
+  onDrop: (Item, where: 'before' | 'inside' | 'after') => void | Promise<void>,
   onEditItem?: Item => void,
   isMobile: boolean,
   DragSourceAndDropTarget: any => React.Node,
@@ -93,7 +93,10 @@ const getItemProps = memoizeOne(
       y: number,
     |}) => void,
     canDrop?: ?(Item, where: 'before' | 'inside' | 'after') => boolean,
-    onDrop: (Item, where: 'before' | 'inside' | 'after') => void,
+    onDrop: (
+      Item,
+      where: 'before' | 'inside' | 'after'
+    ) => void | Promise<void>,
     onEditItem?: Item => void,
     isMobile: boolean,
     DragSourceAndDropTarget: any => React.Node,
@@ -161,7 +164,7 @@ type Props<Item> = {|
   onMoveSelectionToItem: (
     destinationItem: Item,
     where: 'before' | 'inside' | 'after'
-  ) => void,
+  ) => void | Promise<void>,
   canMoveSelectionToItem?: ?(
     destinationItem: Item,
     where: 'before' | 'inside' | 'after'
@@ -178,7 +181,7 @@ type Props<Item> = {|
   shouldHideMenuIcon?: (item: Item) => boolean,
 |};
 
-const TreeView = <Item: ItemBaseAttributes>(
+const InnerTreeView = <Item: ItemBaseAttributes>(
   {
     height,
     width,
@@ -758,5 +761,14 @@ const TreeView = <Item: ItemBaseAttributes>(
   );
 };
 
-// $FlowFixMe
-export default React.forwardRef(TreeView);
+// Define the polymorphic component type that will be exported:
+type TreeViewComponent = <Item: ItemBaseAttributes>(
+  Props<Item> & { +ref?: React.Ref<TreeViewInterface<Item>> }
+) => React.Node;
+
+// Search for "treeview typing issues" in the codebase.
+// $FlowFixMe - InnerTreeView ref is not properly typed.
+const TreeView: TreeViewComponent = (React.forwardRef(InnerTreeView): any);
+
+// ✅ Properly-typed generic export:
+export default TreeView;

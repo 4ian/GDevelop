@@ -509,6 +509,11 @@ module.exports = {
           )
           .setType('Number')
           .setLabel(_('Linear Damping'))
+          .setDescription(
+            _(
+              "Linear damping reduces an object's movement speed over time, making its motion slow down smoothly."
+            )
+          )
           .setGroup(_('Movement'));
 
         behaviorProperties
@@ -521,6 +526,11 @@ module.exports = {
           )
           .setType('Number')
           .setLabel(_('Angular Damping'))
+          .setDescription(
+            _(
+              "Angular damping reduces an object's rotational speed over time, making its spins slow down smoothly."
+            )
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setGroup(_('Movement'));
         behaviorProperties
@@ -533,6 +543,12 @@ module.exports = {
           )
           .setType('Number')
           .setLabel('Gravity Scale')
+          .setDescription(
+            _(
+              "Gravity Scale multiplies the world's gravity for a specific body, making it experience stronger or weaker gravitational force than normal."
+            )
+          )
+
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setGroup(_('Gravity'))
           .setAdvanced(true);
@@ -2553,7 +2569,7 @@ module.exports = {
           'CurrentFallSpeed',
           _('Current falling speed'),
           _(
-            'Compare the current falling speed of the object. Its value is always positive.'
+            'the current falling speed of the object. Its value is always positive.'
           ),
           _('the current falling speed'),
           _('Character state'),
@@ -2577,7 +2593,7 @@ module.exports = {
           'CurrentJumpSpeed',
           _('Current jump speed'),
           _(
-            'Compare the current jump speed of the object. Its value is always positive.'
+            'the current jump speed of the object. Its value is always positive.'
           ),
           _('the current jump speed'),
           _('Character state'),

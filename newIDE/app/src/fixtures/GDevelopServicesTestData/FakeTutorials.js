@@ -414,7 +414,7 @@ export const fakeTutorials: Array<Tutorial> = [
     },
   },
   {
-    id: 'intro-event-system',
+    id: 'the-events',
     title: 'Intro: Event system',
     titleByLocale: {
       en: 'Intro: Event system',

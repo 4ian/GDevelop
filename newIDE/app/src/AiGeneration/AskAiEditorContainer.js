@@ -28,12 +28,12 @@ import {
   hasValidSubscriptionPlan,
 } from '../Utils/GDevelopServices/Usage';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
-import { CreditsPackageStoreContext } from '../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import { type EditorCallbacks } from '../EditorFunctions';
 import {
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
 } from './AiRequestUtils';
+import { type EditorFunctionCallResult } from '../EditorFunctions/EditorFunctionCallRunner';
 import { useStableUpToDateRef } from '../Utils/UseStableUpToDateCallback';
 import {
   type NewProjectSetup,
@@ -50,18 +50,22 @@ import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
 import { prepareAiUserContent } from './PrepareAiUserContent';
 import { AiRequestContext } from './AiRequestContext';
 import { getAiConfigurationPresetsWithAvailability } from './AiConfiguration';
+import {
+  setEditorHotReloadNeeded,
+  type HotReloadSteps,
+} from '../EmbeddedGame/EmbeddedGameFrame';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
-import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 import {
   useAiRequestState,
   type OpenAskAiOptions,
   type NewAiRequestOptions,
   useProcessFunctionCalls,
+  AI_AGENT_TOOLS_VERSION,
+  AI_CHAT_TOOLS_VERSION,
 } from './Utils';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 
 const gd: libGDevelop = global.gd;
-
-const AI_TOOLS_VERSION = 'v5';
 
 const styles = {
   paper: {
@@ -124,7 +128,14 @@ type Props = {|
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onOpenAskAi: ({|
+    mode: 'chat' | 'agent',
+    aiRequestId: string | null,
+    paneIdentifier: 'left' | 'center' | 'right' | null,
+  |}) => void,
+  gameEditorMode: 'embedded-game' | 'instances-editor',
   continueProcessingFunctionCallsOnMount?: boolean,
   onOpenAskAi: (?OpenAskAiOptions) => void,
 |};
@@ -157,6 +168,8 @@ export type AskAiEditorInterface = {|
       aiRequestId: string | null,
     |}
   ) => void,
+  notifyChangesToInGameEditor: (hotReloadSteps: HotReloadSteps) => void,
+  switchInGameEditorIfNoHotReloadIsNeeded: () => void,
 |};
 
 const noop = () => {};
@@ -179,8 +192,10 @@ export const AskAiEditor = React.memo<Props>(
         onInstancesModifiedOutsideEditor,
         onObjectsModifiedOutsideEditor,
         onObjectGroupsModifiedOutsideEditor,
+        onWillInstallExtension,
         onExtensionInstalled,
         onOpenAskAi,
+        gameEditorMode,
         continueProcessingFunctionCallsOnMount,
       }: Props,
       ref
@@ -197,13 +212,6 @@ export const AskAiEditor = React.memo<Props>(
             projectName: name,
             storageProvider: UrlStorageProvider,
             saveAsLocation: null,
-            // Don't open scenes, as it will be done manually by the AI,
-            // detecting which scenes were created,
-            // allowing to send those messages to the AI, triggering the next steps.
-            dontOpenAnySceneOrProjectManager: true,
-            // Don't reposition the Ask AI editor,
-            // as it will be done manually after the project is created too.
-            dontRepositionAskAiEditor: true,
             creationSource: 'ai-agent-request',
           };
 
@@ -224,13 +232,9 @@ export const AskAiEditor = React.memo<Props>(
             // The example was not found - still create an empty project.
           }
 
-          const { createdProject } = await onCreateEmptyProject({
-            projectName: name,
-            storageProvider: UrlStorageProvider,
-            saveAsLocation: null,
-            dontOpenAnySceneOrProjectManager: true,
-            creationSource: 'ai-agent-request',
-          });
+          const { createdProject } = await onCreateEmptyProject(
+            newProjectSetup
+          );
 
           return { exampleSlug: null, createdProject };
         },
@@ -253,7 +257,7 @@ export const AskAiEditor = React.memo<Props>(
         selectedAiRequestId,
         selectedAiRequestMode,
         setAiState,
-      } = useAiRequestState();
+      } = useAiRequestState({ project });
       const upToDateSelectedAiRequestId = useStableUpToDateRef(
         selectedAiRequestId
       );
@@ -314,10 +318,11 @@ export const AskAiEditor = React.memo<Props>(
         null
       );
 
-      const { openCreditsPackageDialog } = React.useContext(
-        CreditsPackageStoreContext
-      );
+      const {
+        values: { automaticallyUseCreditsForAiRequests },
+      } = React.useContext(PreferencesContext);
 
+      const authenticatedUser = React.useContext(AuthenticatedUserContext);
       const {
         profile,
         getAuthorizationHeader,
@@ -325,14 +330,12 @@ export const AskAiEditor = React.memo<Props>(
         limits,
         onRefreshLimits,
         subscription,
-      } = React.useContext(AuthenticatedUserContext);
-      const { openSubscriptionDialog } = React.useContext(
-        SubscriptionSuggestionContext
-      );
+      } = authenticatedUser;
 
       const availableCredits = limits ? limits.credits.userBalance.amount : 0;
       const quota =
-        (limits && limits.quotas && limits.quotas['ai-request']) || null;
+        (limits && limits.quotas && limits.quotas['consumed-ai-credits']) ||
+        null;
       const aiRequestPrice =
         (limits && limits.credits && limits.credits.prices['ai-request']) ||
         null;
@@ -379,22 +382,13 @@ export const AskAiEditor = React.memo<Props>(
             let payWithCredits = false;
             if (quota && quota.limitReached && aiRequestPriceInCredits) {
               payWithCredits = true;
-              if (availableCredits < aiRequestPriceInCredits) {
-                // Not enough credits.
-                if (!hasValidSubscriptionPlan(subscription)) {
-                  // User is not subscribed, suggest them to subscribe.
-                  openSubscriptionDialog({
-                    analyticsMetadata: {
-                      reason: 'AI requests (subscribe)',
-                      recommendedPlanId: 'gdevelop_gold',
-                      placementId: 'ai-requests',
-                    },
-                  });
-                  return;
-                }
-                openCreditsPackageDialog({
-                  missingCredits: aiRequestPriceInCredits - availableCredits,
-                });
+              const doesNotHaveEnoughCreditsToContinue =
+                availableCredits < aiRequestPriceInCredits;
+              const cannotContinue =
+                !automaticallyUseCreditsForAiRequests ||
+                doesNotHaveEnoughCreditsToContinue;
+
+              if (cannotContinue) {
                 return;
               }
             }
@@ -436,7 +430,10 @@ export const AskAiEditor = React.memo<Props>(
                 fileMetadata,
                 storageProviderName,
                 mode,
-                toolsVersion: AI_TOOLS_VERSION,
+                toolsVersion:
+                  mode === 'agent'
+                    ? AI_AGENT_TOOLS_VERSION
+                    : AI_CHAT_TOOLS_VERSION,
                 aiConfiguration: {
                   presetId: aiConfigurationPresetId,
                 },
@@ -494,7 +491,6 @@ export const AskAiEditor = React.memo<Props>(
           getAuthorizationHeader,
           onOpenCreateAccountDialog,
           onRefreshLimits,
-          openCreditsPackageDialog,
           profile,
           project,
           fileMetadata,
@@ -508,22 +504,8 @@ export const AskAiEditor = React.memo<Props>(
           upToDateSelectedAiRequestId,
           updateAiRequest,
           newAiRequestOptions,
-          subscription,
-          openSubscriptionDialog,
+          automaticallyUseCreditsForAiRequests,
         ]
-      );
-
-      const hasFunctionsCallsToProcess = React.useMemo(
-        () =>
-          selectedAiRequest
-            ? getFunctionCallsToProcess({
-                aiRequest: selectedAiRequest,
-                editorFunctionCallResults: getEditorFunctionCallResults(
-                  selectedAiRequest.id
-                ),
-              }).length > 0
-            : false,
-        [selectedAiRequest, getEditorFunctionCallResults]
       );
 
       // Send the results of the function call outputs, if any, and the user message (if any).
@@ -531,13 +513,18 @@ export const AskAiEditor = React.memo<Props>(
         async ({
           userMessage,
           createdSceneNames,
+          createdProject,
+          editorFunctionCallResults,
         }: {|
           userMessage: string,
           createdSceneNames?: Array<string>,
+          createdProject?: ?gdProject,
+          editorFunctionCallResults: Array<EditorFunctionCallResult>,
         |}) => {
           if (
             !profile ||
             !selectedAiRequestId ||
+            !selectedAiRequest ||
             isSendingAiRequest(selectedAiRequestId)
           )
             return;
@@ -548,8 +535,14 @@ export const AskAiEditor = React.memo<Props>(
             hasUnfinishedResult,
             functionCallOutputs,
           } = getFunctionCallOutputsFromEditorFunctionCallResults(
-            getEditorFunctionCallResults(selectedAiRequestId)
+            editorFunctionCallResults
           );
+
+          const hasFunctionsCallsToProcess =
+            getFunctionCallsToProcess({
+              aiRequest: selectedAiRequest,
+              editorFunctionCallResults,
+            }).length > 0;
 
           // If anything is not finished yet, stop there (we only send all
           // results at once, AI do not support partial results).
@@ -568,23 +561,13 @@ export const AskAiEditor = React.memo<Props>(
             aiRequestPriceInCredits
           ) {
             payWithCredits = true;
-            if (availableCredits < aiRequestPriceInCredits) {
-              // Not enough credits.
-              if (!hasValidSubscriptionPlan(subscription)) {
-                // User is not subscribed, suggest them to subscribe.
-                openSubscriptionDialog({
-                  analyticsMetadata: {
-                    reason: 'AI requests (subscribe)',
-                    recommendedPlanId: 'gdevelop_gold',
-                    placementId: 'ai-requests',
-                  },
-                });
-                return;
-              }
+            const doesNotHaveEnoughCreditsToContinue =
+              availableCredits < aiRequestPriceInCredits;
+            const cannotContinue =
+              !automaticallyUseCreditsForAiRequests ||
+              doesNotHaveEnoughCreditsToContinue;
 
-              openCreditsPackageDialog({
-                missingCredits: aiRequestPriceInCredits - availableCredits,
-              });
+            if (cannotContinue) {
               return;
             }
           }
@@ -592,16 +575,21 @@ export const AskAiEditor = React.memo<Props>(
           try {
             setSendingAiRequest(selectedAiRequestId, true);
 
+            const upToDateProject = createdProject || project;
+
             const simplifiedProjectBuilder = makeSimplifiedProjectBuilder(gd);
-            const simplifiedProjectJson = project
+            const simplifiedProjectJson = upToDateProject
               ? JSON.stringify(
-                  simplifiedProjectBuilder.getSimplifiedProject(project, {})
+                  simplifiedProjectBuilder.getSimplifiedProject(
+                    upToDateProject,
+                    {}
+                  )
                 )
               : null;
-            const projectSpecificExtensionsSummaryJson = project
+            const projectSpecificExtensionsSummaryJson = upToDateProject
               ? JSON.stringify(
                   simplifiedProjectBuilder.getProjectSpecificExtensionsSummary(
-                    project
+                    upToDateProject
                   )
                 )
               : null;
@@ -613,15 +601,26 @@ export const AskAiEditor = React.memo<Props>(
               projectSpecificExtensionsSummaryJson,
             });
 
+            // If we're updating the request, following a function call to initialize the project,
+            // pause the request, so that suggestions can be given by the agent.
+            const paused =
+              functionCallOutputs.length > 0 &&
+              functionCallOutputs.some(
+                output => output.call_id.indexOf('initialize_project') !== -1
+              );
+
             const aiRequest: AiRequest = await retryIfFailed({ times: 2 }, () =>
               addMessageToAiRequest(getAuthorizationHeader, {
                 userId: profile.id,
                 aiRequestId: selectedAiRequestId,
                 functionCallOutputs,
                 ...preparedAiUserContent,
-                gameId: project ? project.getProjectUuid() : undefined,
+                gameId: upToDateProject
+                  ? upToDateProject.getProjectUuid()
+                  : undefined,
                 payWithCredits,
                 userMessage,
+                paused,
               })
             );
             updateAiRequest(aiRequest.id, aiRequest);
@@ -653,15 +652,15 @@ export const AskAiEditor = React.memo<Props>(
               aiRequestChatRefCurrent.resetUserInput('');
               aiRequestChatRefCurrent.resetUserInput(selectedAiRequestId);
             }
+          }
 
-            // Refresh the user limits, to ensure quota and credits information
-            // is up-to-date after an AI request.
-            await delay(500);
-            try {
-              await retryIfFailed({ times: 2 }, onRefreshLimits);
-            } catch (error) {
-              // Ignore limits refresh error.
-            }
+          // Refresh the user limits, to ensure quota and credits information
+          // is up-to-date after an AI request.
+          await delay(500);
+          try {
+            await retryIfFailed({ times: 2 }, onRefreshLimits);
+          } catch (error) {
+            // Ignore limits refresh error.
           }
 
           if (
@@ -669,18 +668,6 @@ export const AskAiEditor = React.memo<Props>(
             createdSceneNames &&
             createdSceneNames.length > 0
           ) {
-            // We handle moving the pane here
-            // and not in the Mainframe afterCreatingProject function,
-            // as it gives time to the AI to send the created scenes messages,
-            // triggering the status change from 'ready' to 'working'.
-            onOpenAskAi({
-              paneIdentifier: 'right',
-              // By default, function calls are paused on mount,
-              // to avoid resuming processing old requests automatically.
-              // In this case, we want to continue processing right away, as
-              // we're in the middle of a flow.
-              continueProcessingFunctionCallsOnMount: true,
-            });
             createdSceneNames.forEach(sceneName => {
               onOpenLayout(sceneName, {
                 openEventsEditor: true,
@@ -694,11 +681,9 @@ export const AskAiEditor = React.memo<Props>(
           profile,
           selectedAiRequestId,
           isSendingAiRequest,
-          getEditorFunctionCallResults,
           quota,
           aiRequestPriceInCredits,
           availableCredits,
-          openCreditsPackageDialog,
           setSendingAiRequest,
           updateAiRequest,
           clearEditorFunctionCallResults,
@@ -706,19 +691,24 @@ export const AskAiEditor = React.memo<Props>(
           setLastSendError,
           onRefreshLimits,
           project,
-          hasFunctionsCallsToProcess,
-          onOpenAskAi,
           onOpenLayout,
-          subscription,
-          openSubscriptionDialog,
           selectedAiRequest,
+          automaticallyUseCreditsForAiRequests,
         ]
       );
       const onSendEditorFunctionCallResults = React.useCallback(
-        async (options: null | {| createdSceneNames: Array<string> |}) => {
+        async (
+          editorFunctionCallResults: Array<EditorFunctionCallResult>,
+          options: {|
+            createdProject?: ?gdProject,
+            createdSceneNames?: Array<string>,
+          |}
+        ) => {
           await onSendMessage({
             userMessage: '',
-            createdSceneNames: options ? options.createdSceneNames : [],
+            createdProject: options.createdProject,
+            createdSceneNames: options.createdSceneNames,
+            editorFunctionCallResults,
           });
         },
         [onSendMessage]
@@ -740,6 +730,7 @@ export const AskAiEditor = React.memo<Props>(
         onObjectsModifiedOutsideEditor,
         onObjectGroupsModifiedOutsideEditor,
         i18n,
+        onWillInstallExtension,
         onExtensionInstalled,
         isReadyToProcessFunctionCalls,
       });
@@ -831,6 +822,8 @@ export const AskAiEditor = React.memo<Props>(
         onObjectsModifiedOutsideEditor: noop,
         onObjectGroupsModifiedOutsideEditor: noop,
         startOrOpenChat: onStartOrOpenChat,
+        notifyChangesToInGameEditor: setEditorHotReloadNeeded,
+        switchInGameEditorIfNoHotReloadIsNeeded: noop,
       }));
 
       const onSendFeedback = React.useCallback(
@@ -873,7 +866,14 @@ export const AskAiEditor = React.memo<Props>(
                 aiRequest={selectedAiRequest}
                 aiRequestMode={selectedAiRequestMode}
                 onStartNewAiRequest={startNewAiRequest}
-                onSendMessage={onSendMessage}
+                onSendUserMessage={(userMessage: string) =>
+                  onSendMessage({
+                    userMessage,
+                    editorFunctionCallResults: selectedAiRequest
+                      ? getEditorFunctionCallResults(selectedAiRequest.id) || []
+                      : [],
+                  })
+                }
                 isSending={isSendingAiRequest(selectedAiRequestId)}
                 lastSendError={getLastSendError(selectedAiRequestId)}
                 quota={quota}
@@ -926,6 +926,7 @@ export const AskAiEditor = React.memo<Props>(
                 mode: aiRequest.mode || selectedAiRequestMode,
               });
               refreshAiRequest(aiRequest.id);
+              onCloseHistory();
             }}
             selectedAiRequestId={selectedAiRequestId}
           />
@@ -965,8 +966,10 @@ export const renderAskAiEditorContainer = (
         onObjectGroupsModifiedOutsideEditor={
           props.onObjectGroupsModifiedOutsideEditor
         }
+        onWillInstallExtension={props.onWillInstallExtension}
         onExtensionInstalled={props.onExtensionInstalled}
         onOpenAskAi={props.onOpenAskAi}
+        gameEditorMode={props.gameEditorMode}
         continueProcessingFunctionCallsOnMount={
           props.extraEditorProps
             ? props.extraEditorProps.continueProcessingFunctionCallsOnMount

@@ -139,7 +139,8 @@ module.exports = {
     class RenderedSpineInstance extends RenderedInstance {
       /** @type {pixi_spine.Spine | null} */
       _spine = null;
-      _rect = new PIXI.Graphics();
+      /** @type {PIXI.Sprite} */
+      _placeholder;
       _initialWidth = 256;
       _initialHeight = 256;
       _animationIndex = -1;
@@ -163,12 +164,14 @@ module.exports = {
 
         // there is issue with spine selection. mouse events are not triggering during interaction.
         // create the invisible background rectangle to fill spine range.
-        this._rect.alpha = 0;
+        this._placeholder = new PIXI.Sprite(
+          this._pixiResourcesLoader.getInvalidPIXITexture()
+        );
+        this._placeholder.alpha = 0;
         this._pixiObject = new PIXI.Container();
-        this._pixiObject.addChild(this._rect);
+        this._pixiObject.addChild(this._placeholder);
         this._pixiContainer.addChild(this._pixiObject);
 
-        this._spineResourceName = '';
         this._loadSpine();
       }
 
@@ -219,6 +222,9 @@ module.exports = {
           const localBounds = spine.getLocalBounds(undefined, true);
           this._initialWidth = localBounds.width * scale;
           this._initialHeight = localBounds.height * scale;
+        } else {
+          this._initialWidth = 256;
+          this._initialHeight = 256;
         }
 
         const width = this.getWidth();
@@ -230,16 +236,17 @@ module.exports = {
 
           this._spineOriginOffsetX = localBounds.x * spine.scale.x;
           this._spineOriginOffsetY = localBounds.y * spine.scale.y;
-          this._rect.position.set(
-            this._spineOriginOffsetX,
-            this._spineOriginOffsetY
-          );
+        } else {
+          this._spineOriginOffsetX = -width / 2;
+          this._spineOriginOffsetY = -height / 2;
         }
-
-        this._rect.clear();
-        this._rect.beginFill(0xffffff);
-        this._rect.lineStyle(1, 0xff0000);
-        this._rect.drawRect(0, 0, width, height);
+        this._placeholder.position.set(
+          this._spineOriginOffsetX,
+          this._spineOriginOffsetY
+        );
+        const frame = this._placeholder.texture.frame;
+        this._placeholder.scale.x = width / frame.width;
+        this._placeholder.scale.y = height / frame.height;
       }
 
       /**
@@ -321,8 +328,12 @@ module.exports = {
       }
 
       _loadSpine() {
+        const object = gd.castObject(
+          this._associatedObjectConfiguration,
+          gd.SpineObjectConfiguration
+        );
         this._pixiResourcesLoader
-          .getSpineData(this._project, this._spineResourceName)
+          .getSpineData(this._project, object.getSpineResourceName())
           .then((spineDataOrLoadingError) => {
             if (this._wasDestroyed) return;
             if (this._spine) this._pixiObject.removeChild(this._spine);
@@ -336,15 +347,19 @@ module.exports = {
                 spineDataOrLoadingError.loadingError
               );
               this._spine = null;
+              this._placeholder.alpha = 255;
               return;
             }
 
             try {
               this._spine = new PIXI.Spine(spineDataOrLoadingError.skeleton);
               this._pixiObject.addChild(this._spine);
+              this._placeholder.alpha = 0;
             } catch (error) {
               console.error('Exception while loading Spine.', error);
               this._spine = null;
+              this._placeholder.alpha = 255;
+              return;
             }
           });
       }

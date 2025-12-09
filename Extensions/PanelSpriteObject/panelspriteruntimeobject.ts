@@ -53,6 +53,8 @@ namespace gdjs {
 
     _renderer: gdjs.PanelSpriteRuntimeObjectRenderer;
 
+    _objectData: PanelSpriteObjectData;
+
     /**
      * @param instanceContainer The container the object belongs to.
      * @param panelSpriteObjectData The initial properties of the object
@@ -62,6 +64,7 @@ namespace gdjs {
       panelSpriteObjectData: PanelSpriteObjectData
     ) {
       super(instanceContainer, panelSpriteObjectData);
+      this._objectData = panelSpriteObjectData;
       this._rBorder = panelSpriteObjectData.rightMargin;
       this._lBorder = panelSpriteObjectData.leftMargin;
       this._tBorder = panelSpriteObjectData.topMargin;
@@ -84,6 +87,7 @@ namespace gdjs {
       oldObjectData: PanelSpriteObjectData,
       newObjectData: PanelSpriteObjectData
     ): boolean {
+      this._objectData = newObjectData;
       if (oldObjectData.width !== newObjectData.width) {
         this.setWidth(newObjectData.width);
       }
@@ -166,9 +170,11 @@ namespace gdjs {
         this.setWidth(initialInstanceData.width);
         this.setHeight(initialInstanceData.height);
       }
-      if (initialInstanceData.opacity !== undefined) {
-        this.setOpacity(initialInstanceData.opacity);
-      }
+      this.setOpacity(
+        initialInstanceData.opacity === undefined
+          ? 255
+          : initialInstanceData.opacity
+      );
     }
 
     /**
@@ -245,6 +251,14 @@ namespace gdjs {
     setSize(newWidth: float, newHeight: float): void {
       this.setWidth(newWidth);
       this.setHeight(newHeight);
+    }
+
+    override getOriginalWidth(): float {
+      return this._objectData.width;
+    }
+
+    override getOriginalHeight(): float {
+      return this._objectData.height;
     }
 
     setOpacity(opacity: float): void {

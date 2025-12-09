@@ -16,6 +16,12 @@ import {
 } from './BaseEditor';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
+import {
+  switchToSceneEdition,
+  setEditorHotReloadNeeded,
+  type HotReloadSteps,
+  switchInGameEditorIfNoHotReloadIsNeeded,
+} from '../../EmbeddedGame/EmbeddedGameFrame';
 
 export class SceneEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?SceneEditor;
@@ -25,6 +31,9 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
   }
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
+    if (!this.props.isActive && nextProps.isActive) {
+      this._setPreviewedLayout();
+    }
     // This optimization is a bit more cautious than the traditional one, to still allow
     // children, and in particular SceneEditor and InstancesEditor, to be notified when isActive
     // goes from true to false (in which case PIXI rendering is halted). If isActive was false
@@ -34,16 +43,61 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
 
   componentDidMount() {
     if (this.props.isActive) {
-      const { projectItemName } = this.props;
-      this.props.setPreviewedLayout(projectItemName);
+      this._setPreviewedLayout();
     }
   }
 
-  componentDidUpdate(prevProps: RenderEditorContainerProps) {
-    if (!prevProps.isActive && this.props.isActive) {
-      const { projectItemName } = this.props;
-      this.props.setPreviewedLayout(projectItemName);
+  _setPreviewedLayout() {
+    const { projectItemName } = this.props;
+    this.props.setPreviewedLayout({
+      layoutName: projectItemName || null,
+      externalLayoutName: null,
+      eventsBasedObjectType: null,
+      eventsBasedObjectVariantName: null,
+    });
+  }
+
+  notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {
+    this._switchToSceneEdition(hotReloadSteps);
+  }
+
+  _switchToSceneEdition(hotReloadSteps: HotReloadSteps): void {
+    const { projectItemName, editorId } = this.props;
+    this._setPreviewedLayout();
+    if (
+      this.props.gameEditorMode === 'embedded-game' &&
+      projectItemName &&
+      // Avoid to hot-reload the editor every time an image is edited with Pixi.
+      (!this.editor || !this.editor.isEditingObject())
+    ) {
+      switchToSceneEdition({
+        ...hotReloadSteps,
+        editorId,
+        sceneName: projectItemName,
+        externalLayoutName: null,
+        eventsBasedObjectType: null,
+        eventsBasedObjectVariantName: null,
+      });
+      if (this.editor) {
+        this.editor.onEditorReloaded();
+      }
+    } else {
+      setEditorHotReloadNeeded(hotReloadSteps);
     }
+  }
+
+  switchInGameEditorIfNoHotReloadIsNeeded() {
+    const { projectItemName, editorId } = this.props;
+    if (!projectItemName) {
+      return;
+    }
+    switchInGameEditorIfNoHotReloadIsNeeded({
+      editorId,
+      sceneName: projectItemName,
+      externalLayoutName: null,
+      eventsBasedObjectType: null,
+      eventsBasedObjectVariantName: null,
+    });
   }
 
   updateToolbar() {
@@ -174,6 +228,13 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
 
     return (
       <SceneEditor
+        editorId={this.props.editorId}
+        gameEditorMode={this.props.gameEditorMode}
+        setGameEditorMode={this.props.setGameEditorMode}
+        onRestartInGameEditor={this.props.onRestartInGameEditor}
+        showRestartInGameEditorAfterErrorButton={
+          this.props.showRestartInGameEditorAfterErrorButton
+        }
         setToolbar={this.props.setToolbar}
         resourceManagementProps={this.props.resourceManagementProps}
         unsavedChanges={this.props.unsavedChanges}
@@ -199,6 +260,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         }
         onOpenEvents={this.props.onOpenEvents}
         isActive={isActive}
+        previewDebuggerServer={this.props.previewDebuggerServer}
         hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
         openBehaviorEvents={this.props.openBehaviorEvents}
         onExtractAsExternalLayout={this.props.onExtractAsExternalLayout}
@@ -207,14 +269,20 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         onOpenEventBasedObjectVariantEditor={
           this.props.onOpenEventBasedObjectVariantEditor
         }
+        onWillInstallExtension={this.props.onWillInstallExtension}
         onExtensionInstalled={this.props.onExtensionInstalled}
         onDeleteEventsBasedObjectVariant={
           this.props.onDeleteEventsBasedObjectVariant
         }
+        onEffectAdded={this.props.onEffectAdded}
+        onObjectListsModified={this.props.onObjectListsModified}
         onObjectEdited={objectWithContext =>
           this.props.onSceneObjectEdited(layout, objectWithContext)
         }
         onObjectsDeleted={() => this.props.onSceneObjectsDeleted(layout)}
+        triggerHotReloadInGameEditorIfNeeded={
+          this.props.triggerHotReloadInGameEditorIfNeeded
+        }
         // It's only used to refresh events-based object variants.
         onObjectGroupEdited={() => {}}
         onObjectGroupsDeleted={() => {}}

@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react';
+import { action } from '@storybook/addon-actions';
 
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
@@ -20,6 +21,9 @@ export const Default = () => (
   <SerializedObjectDisplay object={testProject.shapePainterObjectConfiguration}>
     <ShapePainterEditor
       objectConfiguration={testProject.shapePainterObjectConfiguration}
+      projectScopedContainersAccessor={
+        testProject.testSceneProjectScopedContainersAccessor
+      }
       project={testProject.project}
       layout={testProject.testLayout}
       eventsFunctionsExtension={null}

@@ -502,8 +502,7 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
     );
 
     const tutorial = React.useMemo(
-      () =>
-        getTutorial(props.preferences, props.tutorials, 'intro-event-system'),
+      () => getTutorial(props.preferences, props.tutorials, 'the-events'),
       [props.preferences, props.tutorials]
     );
 
@@ -941,7 +940,7 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
                   }
                   actionLabel={<Trans>Add an event</Trans>}
                   helpPagePath="/events"
-                  tutorialId="intro-event-system"
+                  tutorialId="the-events"
                   actionButtonId="add-event-button"
                   onAction={() =>
                     props.onAddNewEvent(

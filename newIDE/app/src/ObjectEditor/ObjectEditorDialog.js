@@ -38,7 +38,10 @@ type Props = {|
   open: boolean,
   object: ?gdObject,
 
-  onApply: () => void,
+  onApply: (
+    hasResourceChanged: boolean,
+    hasAnyEffectBeenAdded: boolean
+  ) => void,
   onCancel: () => void,
 
   // Object renaming:
@@ -60,6 +63,7 @@ type Props = {|
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onOpenEventBasedObjectEditor: (
     extensionName: string,
@@ -105,6 +109,7 @@ const InnerDialog = (props: InnerDialogProps) => {
     projectScopedContainersAccessor,
     onUpdateBehaviorsSharedData,
     onComputeAllVariableNames,
+    onWillInstallExtension,
     onExtensionInstalled,
     onOpenEventBasedObjectEditor,
     onOpenEventBasedObjectVariantEditor,
@@ -129,6 +134,20 @@ const InnerDialog = (props: InnerDialogProps) => {
     resetThenClearPersistentUuid: true,
   });
 
+  const [hasResourceChanged, setResourceChanged] = React.useState<boolean>(
+    false
+  );
+  const _resourceManagementProps = React.useMemo(
+    () => ({
+      ...resourceManagementProps,
+      onResourceUsageChanged: () => {
+        setResourceChanged(true);
+      },
+    }),
+    [resourceManagementProps]
+  );
+  const [hasAnyEffectBeenAdded, setAnyEffectBeenAdded] = React.useState(false);
+
   // Don't use a memo for this because metadata from custom objects are built
   // from event-based object when extensions are refreshed after an extension
   // installation.
@@ -141,7 +160,7 @@ const InnerDialog = (props: InnerDialogProps) => {
     props.editorComponent;
 
   const onApply = async () => {
-    props.onApply();
+    props.onApply(hasResourceChanged, hasAnyEffectBeenAdded);
 
     const initialInstances =
       (layout && layout.getInitialInstances()) ||
@@ -291,7 +310,8 @@ const InnerDialog = (props: InnerDialogProps) => {
             eventsFunctionsExtension={eventsFunctionsExtension}
             eventsBasedObject={eventsBasedObject}
             object={object}
-            resourceManagementProps={resourceManagementProps}
+            resourceManagementProps={_resourceManagementProps}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
             onSizeUpdated={
               forceUpdate /*Force update to ensure dialog is properly positioned*/
             }
@@ -329,13 +349,15 @@ const InnerDialog = (props: InnerDialogProps) => {
           isChildObject={!!eventsBasedObject}
           project={project}
           eventsFunctionsExtension={eventsFunctionsExtension}
-          resourceManagementProps={resourceManagementProps}
+          resourceManagementProps={_resourceManagementProps}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
           onSizeUpdated={
             forceUpdate /*Force update to ensure dialog is properly positioned*/
           }
           onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}
           onBehaviorsUpdated={notifyOfChange}
           openBehaviorEvents={askConfirmationAndOpenBehaviorEvents}
+          onWillInstallExtension={onWillInstallExtension}
           onExtensionInstalled={onExtensionInstalled}
           isListLocked={isBehaviorListLocked}
         />
@@ -374,7 +396,8 @@ const InnerDialog = (props: InnerDialogProps) => {
           // TODO (3D): declare the renderer type in object metadata.
           layerRenderingType="2d"
           project={project}
-          resourceManagementProps={resourceManagementProps}
+          resourceManagementProps={_resourceManagementProps}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
           effectsContainer={object.getEffects()}
           onEffectsRenamed={(oldName, newName) => {
             if (layout) {
@@ -399,6 +422,9 @@ const InnerDialog = (props: InnerDialogProps) => {
           onEffectsUpdated={() => {
             forceUpdate(); /*Force update to ensure dialog is properly positioned*/
             notifyOfChange();
+          }}
+          onEffectAdded={() => {
+            setAnyEffectBeenAdded(true);
           }}
         />
       )}

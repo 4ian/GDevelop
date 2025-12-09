@@ -50,12 +50,10 @@ class GD_CORE_API ProjectResourcesCopier {
                                  bool preserveDirectoryStructure = true);
 
 private:
-  static bool CopyAllResourcesTo(gd::Project& originalProject,
-                                 gd::Project& clonedProject,
-                                 gd::AbstractFileSystem& fs,
-                                 gd::String destinationDirectory,
-                                 bool preserveAbsoluteFilenames = true,
-                                 bool preserveDirectoryStructure = true);
+  static bool AdaptFilePathsAndCopyAllResourcesTo(
+      gd::Project &project, gd::AbstractFileSystem &fs,
+      gd::String destinationDirectory, bool preserveAbsoluteFilenames = true,
+      bool preserveDirectoryStructure = true);
 };
 
 }  // namespace gd

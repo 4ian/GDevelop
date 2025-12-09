@@ -198,6 +198,13 @@ class GD_CORE_API ValueTypeMetadata {
   }
 
   /**
+   * \brief Return true if the type is a resource.
+   */
+  bool IsResource() const {
+    return gd::ValueTypeMetadata::IsTypeValue("resource", name);
+  }
+
+  /**
    * \brief Return true if the type is an expression of the given type from the
    * caller point of view.
    *
@@ -253,7 +260,8 @@ class GD_CORE_API ValueTypeMetadata {
              parameterType == "spineResource" ||
              // Deprecated, old parameter types:
              parameterType == "soundfile" ||
-             parameterType == "musicfile";
+             parameterType == "musicfile" ||
+             parameterType == "password";
     }
     return false;
   }
@@ -305,6 +313,12 @@ class GD_CORE_API ValueTypeMetadata {
    * \see gd::PropertyDescriptor
    */
   static const gd::String &ConvertPropertyTypeToValueType(const gd::String &propertyType);
+
+  /**
+   * \brief Return the resource type for a parameter type.
+   * \see gd::Resource
+   */
+  static const gd::String &GetResourceType(const gd::String &parameterType);
 
   /** \name Serialization
    */

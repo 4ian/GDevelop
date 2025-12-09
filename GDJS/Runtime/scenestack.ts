@@ -9,6 +9,7 @@ namespace gdjs {
   interface PushSceneOptions {
     sceneName: string;
     externalLayoutName?: string;
+    skipCreatingInstances?: boolean;
     getExcludedObjectNames?: (runtimeScene: RuntimeScene) => Set<string>;
     skipStoppingSoundsOnStartup?: boolean;
   }
@@ -97,10 +98,10 @@ namespace gdjs {
     renderWithoutStep(): boolean {
       this._throwIfDisposed();
 
-      if (this._stack.length === 0) {
+      const currentScene = this.getCurrentScene();
+      if (!currentScene) {
         return false;
       }
-      const currentScene = this._stack[this._stack.length - 1];
       currentScene.render();
       return true;
     }
@@ -158,6 +159,8 @@ namespace gdjs {
         typeof options === 'string'
           ? false
           : options.skipStoppingSoundsOnStartup;
+      const skipCreatingInstances =
+        typeof options === 'string' ? false : options.skipCreatingInstances;
       const externalLayoutName =
         deprecatedExternalLayoutName ||
         (typeof options === 'string' ? undefined : options.externalLayoutName);
@@ -176,6 +179,7 @@ namespace gdjs {
           externalLayoutName,
           getExcludedObjectNames,
           skipStoppingSoundsOnStartup,
+          skipCreatingInstances,
         });
       }
 
@@ -186,6 +190,7 @@ namespace gdjs {
           externalLayoutName,
           getExcludedObjectNames,
           skipStoppingSoundsOnStartup,
+          skipCreatingInstances,
         });
         this._isNextLayoutLoading = false;
       });
@@ -205,6 +210,7 @@ namespace gdjs {
             ? options.getExcludedObjectNames(newScene)
             : undefined,
           skipStoppingSoundsOnStartup: options.skipStoppingSoundsOnStartup,
+          skipCreatingInstances: options.skipCreatingInstances,
         }
       );
       this._wasFirstSceneLoaded = true;

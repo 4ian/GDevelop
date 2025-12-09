@@ -29,6 +29,7 @@ import SceneVariable from '../UI/CustomSvgIcons/SceneVariable';
 import SelectOption from '../UI/SelectOption';
 import SelectField from '../UI/SelectField';
 import Text from '../UI/Text';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
 
@@ -41,6 +42,8 @@ type Props = {|
   onOpenMoreSettings?: ?() => void,
   onEditVariables: () => void,
   resourceManagementProps: ResourceManagementProps,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
+  onBackgroundColorChanged: () => void,
 |};
 
 const ScenePropertiesDialog = ({
@@ -52,6 +55,8 @@ const ScenePropertiesDialog = ({
   onOpenMoreSettings,
   onEditVariables,
   resourceManagementProps,
+  projectScopedContainersAccessor,
+  onBackgroundColorChanged,
 }: Props) => {
   const [windowTitle, setWindowTitle] = React.useState<string>(
     layout.getWindowDefaultTitle()
@@ -98,12 +103,20 @@ const ScenePropertiesDialog = ({
     layout.setStopSoundsOnStartup(shouldStopSoundsOnStartup);
     layout.setResourcesPreloading(resourcesPreloading);
     layout.setResourcesUnloading(resourcesUnloading);
+    const hasBackgroundColorChanged =
+      backgroundColor &&
+      layout.getBackgroundColorRed() !== backgroundColor.r &&
+      layout.getBackgroundColorGreen() !== backgroundColor.g &&
+      layout.getBackgroundColorBlue() !== backgroundColor.b;
     layout.setBackgroundColor(
       backgroundColor ? backgroundColor.r : 0,
       backgroundColor ? backgroundColor.g : 0,
       backgroundColor ? backgroundColor.b : 0
     );
     onApply();
+    if (hasBackgroundColorChanged) {
+      onBackgroundColorChanged();
+    }
   };
 
   const actions = [
@@ -218,6 +231,9 @@ const ScenePropertiesDialog = ({
                     behaviorSharedData={behaviorSharedData}
                     project={project}
                     resourceManagementProps={resourceManagementProps}
+                    projectScopedContainersAccessor={
+                      projectScopedContainersAccessor
+                    }
                   />
                 </Line>
               </Column>

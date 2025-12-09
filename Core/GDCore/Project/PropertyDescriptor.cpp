@@ -70,7 +70,9 @@ void PropertyDescriptor::UnserializeFrom(const SerializerElement& element) {
   currentValue = element.GetChild("value").GetStringValue();
   type = element.GetChild("type").GetStringValue();
   if (type == "Number") {
-    gd::String unitName = element.GetChild("unit").GetStringValue();
+    gd::String unitName = element.HasChild("unit")
+                              ? element.GetChild("unit").GetStringValue()
+                              : "";
     measurementUnit =
         gd::MeasurementUnit::HasDefaultMeasurementUnitNamed(unitName)
             ? measurementUnit =

@@ -210,12 +210,12 @@ namespace gdjs {
     }
 
     unloadResource(resourceData: ResourceData): void {
-      const loadedJson = this._loadedJsons.get(resourceData);
+      const loadedJson = this._loadedJsons.getFromName(resourceData.name);
       if (loadedJson) {
         this._loadedJsons.delete(resourceData);
       }
 
-      const callback = this._callbacks.get(resourceData);
+      const callback = this._callbacks.getFromName(resourceData.name);
       if (callback) {
         this._callbacks.delete(resourceData);
       }

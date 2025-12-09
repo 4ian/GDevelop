@@ -230,11 +230,11 @@ const ProfileDetails = ({
                   {!discordUsername ? (
                     !canUserBenefitFromDiscordRole ? (
                       <MarkdownText
-                        translatableSource={t`No discord username defined. Add it and get a Gold, Pro or Education subscription to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
+                        translatableSource={t`Get access to an exclusive channel on the [GDevelop Discord](https://discord.gg/gdevelop) by subscribing to a Gold, Pro or Education plan.`}
                       />
                     ) : (
                       <MarkdownText
-                        translatableSource={t`No discord username defined. Add it to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
+                        translatableSource={t`Edit your profile and fill your discord username to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
                       />
                     )
                   ) : (

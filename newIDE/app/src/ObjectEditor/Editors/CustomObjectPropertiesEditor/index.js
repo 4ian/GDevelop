@@ -5,9 +5,7 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
-import PropertiesEditor from '../../../PropertiesEditor';
-import propertiesMapToSchema from '../../../PropertiesEditor/PropertiesMapToSchema';
-import EmptyMessage from '../../../UI/EmptyMessage';
+import PropertiesEditorByVisibility from '../../../PropertiesEditor/PropertiesEditorByVisibility';
 import { type EditorProps } from '../EditorProps.flow';
 import { Column, Line } from '../../../UI/Grid';
 import { getExtraObjectsInformation } from '../../../Hints';
@@ -48,6 +46,7 @@ import {
 } from '../../../UI/Layout';
 import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import Add from '../../../UI/CustomSvgIcons/Add';
+import Copy from '../../../UI/CustomSvgIcons/Copy';
 import Trash from '../../../UI/CustomSvgIcons/Trash';
 import Edit from '../../../UI/CustomSvgIcons/ShareExternal';
 import Dialog from '../../../UI/Dialog';
@@ -63,6 +62,7 @@ import {
 } from '../../../Utils/Serializer';
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 import { MarkdownText } from '../../../UI/MarkdownText';
+import ResponsiveFlatButton from '../../../UI/ResponsiveFlatButton';
 
 const gd: libGDevelop = global.gd;
 
@@ -215,6 +215,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
     object,
     objectName,
     resourceManagementProps,
+    projectScopedContainersAccessor,
     onSizeUpdated,
     onObjectUpdated,
     unsavedChanges,
@@ -228,13 +229,6 @@ const CustomObjectPropertiesEditor = (props: Props) => {
 
   const customObjectConfiguration = gd.asCustomObjectConfiguration(
     objectConfiguration
-  );
-  const properties = customObjectConfiguration.getProperties();
-
-  const propertiesSchema = propertiesMapToSchema(
-    properties,
-    object => object.getProperties(),
-    (object, name, value) => object.updateProperty(name, value)
   );
 
   const extraInformation = getExtraObjectsInformation()[
@@ -450,10 +444,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                   tutorialId={tutorialId}
                 />
               ))}
-              {propertiesSchema.length ||
-              (customObjectEventsBasedObject &&
-                (customObjectEventsBasedObject.getObjects().getObjectsCount() ||
-                  customObjectEventsBasedObject.isAnimatable())) ? (
+              {
                 <React.Fragment>
                   {extraInformation ? (
                     <Line>
@@ -466,12 +457,37 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                       </ColumnStackLayout>
                     </Line>
                   ) : null}
-                  <PropertiesEditor
-                    unsavedChanges={unsavedChanges}
-                    schema={propertiesSchema}
-                    instances={[customObjectConfiguration]}
+                  <PropertiesEditorByVisibility
                     project={project}
+                    object={object}
+                    propertiesValues={customObjectConfiguration.getProperties()}
+                    getPropertyDefaultValue={propertyName => {
+                      if (!customObjectEventsBasedObject) {
+                        return '';
+                      }
+                      const properties = customObjectEventsBasedObject.getPropertyDescriptors();
+                      return properties.has(propertyName)
+                        ? properties.get(propertyName).getValue()
+                        : '';
+                    }}
+                    instances={[customObjectConfiguration]}
+                    unsavedChanges={unsavedChanges}
                     resourceManagementProps={resourceManagementProps}
+                    projectScopedContainersAccessor={
+                      projectScopedContainersAccessor
+                    }
+                    placeholder={
+                      customObjectEventsBasedObject &&
+                      (customObjectEventsBasedObject
+                        .getObjects()
+                        .getObjectsCount() === 0 &&
+                        !customObjectEventsBasedObject.isAnimatable()) ? (
+                        <Trans>
+                          There is nothing to configure for this object. You can
+                          still use events to interact with the object.
+                        </Trans>
+                      ) : null
+                    }
                   />
                   {!customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() && (
                     <>
@@ -483,17 +499,17 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                         <Text size="block-title">Variant</Text>
                         <Column>
                           <LineStackLayout>
-                            <FlatButton
+                            <ResponsiveFlatButton
                               key={'delete-variant'}
                               label={<Trans>Delete</Trans>}
                               leftIcon={<Trash />}
                               onClick={doDeleteVariant}
                               disabled={!variantName}
                             />
-                            <FlatButton
+                            <ResponsiveFlatButton
                               key={'duplicate-variant'}
                               label={<Trans>Duplicate</Trans>}
-                              leftIcon={<Add />}
+                              leftIcon={<Copy />}
                               onClick={() => setNewVariantDialogOpen(true)}
                             />
                             <FlatButton
@@ -512,6 +528,9 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                           value={variantName}
                           onChange={(e, i, value: string) => {
                             customObjectConfiguration.setVariantName(value);
+                            if (onObjectUpdated) {
+                              onObjectUpdated();
+                            }
                             forceUpdate();
                           }}
                         >
@@ -663,6 +682,9 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                                             eventsBasedObject={
                                               eventsBasedObject
                                             }
+                                            projectScopedContainersAccessor={
+                                              projectScopedContainersAccessor
+                                            }
                                             resourceManagementProps={
                                               resourceManagementProps
                                             }
@@ -714,14 +736,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                       </Column>
                     )}
                 </React.Fragment>
-              ) : (
-                <EmptyMessage>
-                  <Trans>
-                    There is nothing to configure for this object. You can still
-                    use events to interact with the object.
-                  </Trans>
-                </EmptyMessage>
-              )}
+              }
             </ColumnStackLayout>
           </ScrollView>
           {customObjectEventsBasedObject &&

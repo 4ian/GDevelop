@@ -21,6 +21,7 @@ import {
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
 } from './AiRequestUtils';
+import { type EditorFunctionCallResult } from '../EditorFunctions/EditorFunctionCallRunner';
 import { useStableUpToDateRef } from '../Utils/UseStableUpToDateCallback';
 import {
   type NewProjectSetup,
@@ -35,12 +36,13 @@ import { prepareAiUserContent } from './PrepareAiUserContent';
 import { AiRequestContext } from './AiRequestContext';
 import { getAiConfigurationPresetsWithAvailability } from './AiConfiguration';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
-import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
+import { SubscriptionContext } from '../Profile/Subscription/SubscriptionContext';
 import {
   useAiRequestState,
   useProcessFunctionCalls,
   type NewAiRequestOptions,
-  type OpenAskAiOptions,
+  AI_AGENT_TOOLS_VERSION,
+  AI_CHAT_TOOLS_VERSION,
 } from './Utils';
 import { LineStackLayout } from '../UI/Layout';
 import RobotIcon from '../ProjectCreation/RobotIcon';
@@ -52,8 +54,6 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import Cross from '../UI/CustomSvgIcons/Cross';
 
 const gd: libGDevelop = global.gd;
-
-const AI_TOOLS_VERSION = 'v5';
 
 type Props = {|
   project: ?gdProject,
@@ -79,7 +79,8 @@ type Props = {|
         | 'none',
     |}
   ) => void,
-  onOpenAskAi: (?OpenAskAiOptions) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
   onCloseAskAi: () => void,
   dismissableIdentifier?: string,
 |};
@@ -93,9 +94,10 @@ export const AskAiStandAloneForm = ({
   onCreateProjectFromExample,
   onCreateEmptyProject,
   onOpenLayout,
-  onOpenAskAi,
   onCloseAskAi,
   dismissableIdentifier,
+  onWillInstallExtension,
+  onExtensionInstalled,
 }: Props) => {
   const onCreateProject = React.useCallback(
     async ({
@@ -109,16 +111,9 @@ export const AskAiStandAloneForm = ({
         projectName: name,
         storageProvider: UrlStorageProvider,
         saveAsLocation: null,
-        // Don't open scenes, as it will be done manually by the AI,
-        // detecting which scenes were created,
-        // allowing to send those messages to the AI, triggering the next steps.
-        dontOpenAnySceneOrProjectManager: true,
-        // Don't reposition the Ask AI editor,
-        // as it will be done manually after the project is created too.
-        dontRepositionAskAiEditor: true,
-        // Don't close the New project setup dialog,
-        // as it will be done manually after the project is created too.
-        dontCloseNewProjectSetupDialog: true,
+        // As the request is coming from the Standalone Ask AI form,
+        // ensure the Ask AI editor is opened once the project is created.
+        forceOpenAskAiEditor: true,
         creationSource: 'ai-agent-request',
       };
 
@@ -177,7 +172,7 @@ export const AskAiStandAloneForm = ({
     setSendingAiRequest,
     setLastSendError,
   } = aiRequestStorage;
-  const { setAiState } = useAiRequestState();
+  const { setAiState } = useAiRequestState({ project });
   const [aiRequestIdForForm, setAiRequestIdForForm] = React.useState<
     string | null
   >(null);
@@ -191,6 +186,9 @@ export const AskAiStandAloneForm = ({
   const { openCreditsPackageDialog } = React.useContext(
     CreditsPackageStoreContext
   );
+  const {
+    values: { automaticallyUseCreditsForAiRequests },
+  } = React.useContext(PreferencesContext);
 
   const {
     profile,
@@ -200,9 +198,7 @@ export const AskAiStandAloneForm = ({
     onRefreshLimits,
     subscription,
   } = React.useContext(AuthenticatedUserContext);
-  const { openSubscriptionDialog } = React.useContext(
-    SubscriptionSuggestionContext
-  );
+  const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
 
   const hideAskAi =
     !!limits &&
@@ -211,7 +207,7 @@ export const AskAiStandAloneForm = ({
 
   const availableCredits = limits ? limits.credits.userBalance.amount : 0;
   const quota =
-    (limits && limits.quotas && limits.quotas['ai-request']) || null;
+    (limits && limits.quotas && limits.quotas['consumed-ai-credits']) || null;
   const aiRequestPrice =
     (limits && limits.credits && limits.credits.prices['ai-request']) || null;
   const aiRequestPriceInCredits = aiRequestPrice
@@ -257,22 +253,13 @@ export const AskAiStandAloneForm = ({
         let payWithCredits = false;
         if (quota && quota.limitReached && aiRequestPriceInCredits) {
           payWithCredits = true;
-          if (availableCredits < aiRequestPriceInCredits) {
-            // Not enough credits.
-            if (!hasValidSubscriptionPlan(subscription)) {
-              // User is not subscribed, suggest them to subscribe.
-              openSubscriptionDialog({
-                analyticsMetadata: {
-                  reason: 'AI requests (subscribe)',
-                  recommendedPlanId: 'gdevelop_gold',
-                  placementId: 'ai-requests',
-                },
-              });
-              return;
-            }
-            openCreditsPackageDialog({
-              missingCredits: aiRequestPriceInCredits - availableCredits,
-            });
+          const doesNotHaveEnoughCreditsToContinue =
+            availableCredits < aiRequestPriceInCredits;
+          const cannotContinue =
+            !automaticallyUseCreditsForAiRequests ||
+            doesNotHaveEnoughCreditsToContinue;
+
+          if (cannotContinue) {
             return;
           }
         }
@@ -301,7 +288,10 @@ export const AskAiStandAloneForm = ({
             fileMetadata: null, // No file metadata when starting from the standalone form.
             storageProviderName,
             mode: aiRequestModeForForm,
-            toolsVersion: AI_TOOLS_VERSION,
+            toolsVersion:
+              aiRequestModeForForm === 'agent'
+                ? AI_AGENT_TOOLS_VERSION
+                : AI_CHAT_TOOLS_VERSION,
             aiConfiguration: {
               presetId: aiConfigurationPresetId,
             },
@@ -369,20 +359,8 @@ export const AskAiStandAloneForm = ({
       subscription,
       openSubscriptionDialog,
       onCloseAskAi,
+      automaticallyUseCreditsForAiRequests,
     ]
-  );
-
-  const hasFunctionsCallsToProcess = React.useMemo(
-    () =>
-      aiRequestForForm
-        ? getFunctionCallsToProcess({
-            aiRequest: aiRequestForForm,
-            editorFunctionCallResults: getEditorFunctionCallResults(
-              aiRequestForForm.id
-            ),
-          }).length > 0
-        : false,
-    [aiRequestForForm, getEditorFunctionCallResults]
   );
 
   const isLoading = isSendingAiRequest(aiRequestIdForForm);
@@ -391,13 +369,18 @@ export const AskAiStandAloneForm = ({
   // In a standalone form, the only user message is sent when starting the request.
   const onSendMessage = React.useCallback(
     async ({
-      createdSceneNames,
       userMessage,
+      createdSceneNames,
+      createdProject,
+      editorFunctionCallResults,
     }: {|
-      createdSceneNames?: Array<string>,
       userMessage: string,
+      createdSceneNames?: Array<string>,
+      createdProject?: ?gdProject,
+      editorFunctionCallResults: Array<EditorFunctionCallResult>,
     |}) => {
-      if (!profile || !aiRequestIdForForm || isLoading) return;
+      if (!profile || !aiRequestIdForForm || !aiRequestForForm || isLoading)
+        return;
 
       // Read the results from the editor that applied the function calls.
       // and transform them into the output that will be stored on the AI request.
@@ -405,8 +388,14 @@ export const AskAiStandAloneForm = ({
         hasUnfinishedResult,
         functionCallOutputs,
       } = getFunctionCallOutputsFromEditorFunctionCallResults(
-        getEditorFunctionCallResults(aiRequestIdForForm)
+        editorFunctionCallResults
       );
+
+      const hasFunctionsCallsToProcess =
+        getFunctionCallsToProcess({
+          aiRequest: aiRequestForForm,
+          editorFunctionCallResults,
+        }).length > 0;
 
       // If anything is not finished yet, stop there (we only send all
       // results at once, AI do not support partial results).
@@ -421,16 +410,18 @@ export const AskAiStandAloneForm = ({
       try {
         setSendingAiRequest(aiRequestIdForForm, true);
 
+        const upToDateProject = createdProject || project;
+
         const simplifiedProjectBuilder = makeSimplifiedProjectBuilder(gd);
-        const simplifiedProjectJson = project
+        const simplifiedProjectJson = upToDateProject
           ? JSON.stringify(
-              simplifiedProjectBuilder.getSimplifiedProject(project, {})
+              simplifiedProjectBuilder.getSimplifiedProject(upToDateProject, {})
             )
           : null;
-        const projectSpecificExtensionsSummaryJson = project
+        const projectSpecificExtensionsSummaryJson = upToDateProject
           ? JSON.stringify(
               simplifiedProjectBuilder.getProjectSpecificExtensionsSummary(
-                project
+                upToDateProject
               )
             )
           : null;
@@ -442,15 +433,26 @@ export const AskAiStandAloneForm = ({
           projectSpecificExtensionsSummaryJson,
         });
 
+        // If we're updating the request, following a function call to initialize the project,
+        // pause the request, so that suggestions can be given by the agent.
+        const paused =
+          functionCallOutputs.length > 0 &&
+          functionCallOutputs.some(
+            output => output.call_id.indexOf('initialize_project') !== -1
+          );
+
         const aiRequest: AiRequest = await retryIfFailed({ times: 2 }, () =>
           addMessageToAiRequest(getAuthorizationHeader, {
             userId: profile.id,
             aiRequestId: aiRequestIdForForm,
             functionCallOutputs,
             ...preparedAiUserContent,
-            gameId: project ? project.getProjectUuid() : undefined,
+            gameId: upToDateProject
+              ? upToDateProject.getProjectUuid()
+              : undefined,
             payWithCredits: false,
             userMessage: '', // No user message when sending only function call outputs.
+            paused,
           })
         );
         updateAiRequest(aiRequest.id, aiRequest);
@@ -469,44 +471,44 @@ export const AskAiStandAloneForm = ({
           aiRequestChatRefCurrent.resetUserInput(aiRequestIdForForm);
         }
         setAiRequestIdForForm('');
-        // We handle moving the pane here
-        // and not in the Mainframe afterCreatingProject function,
-        // as it gives time to the AI to send the created scenes messages,
-        // triggering the status change from 'ready' to 'working'.
-        onOpenAskAi();
-        if (createdSceneNames && createdSceneNames.length > 0) {
-          createdSceneNames.forEach(sceneName => {
-            onOpenLayout(sceneName, {
-              openEventsEditor: true,
-              openSceneEditor: true,
-              focusWhenOpened: 'scene',
-            });
-          });
-        }
+      }
+
+      // Refresh the user limits, to ensure quota and credits information
+      // is up-to-date after an AI request.
+      await delay(500);
+      try {
+        await retryIfFailed({ times: 2 }, onRefreshLimits);
+      } catch (error) {
+        // Ignore limits refresh error.
       }
     },
     [
       profile,
       aiRequestIdForForm,
       isLoading,
-      getEditorFunctionCallResults,
       setSendingAiRequest,
       updateAiRequest,
       clearEditorFunctionCallResults,
       getAuthorizationHeader,
       setLastSendError,
       project,
-      hasFunctionsCallsToProcess,
-      onOpenAskAi,
-      onOpenLayout,
       aiRequestForForm,
+      onRefreshLimits,
     ]
   );
   const onSendEditorFunctionCallResults = React.useCallback(
-    async (options: null | {| createdSceneNames: Array<string> |}) => {
+    async (
+      editorFunctionCallResults: Array<EditorFunctionCallResult>,
+      options: {|
+        createdSceneNames?: Array<string>,
+        createdProject?: ?gdProject,
+      |}
+    ) => {
       await onSendMessage({
-        createdSceneNames: options ? options.createdSceneNames : [],
         userMessage: '',
+        createdSceneNames: options.createdSceneNames,
+        createdProject: options.createdProject,
+        editorFunctionCallResults,
       });
     },
     [onSendMessage]
@@ -528,7 +530,8 @@ export const AskAiStandAloneForm = ({
     onInstancesModifiedOutsideEditor: () => {},
     onObjectsModifiedOutsideEditor: () => {},
     onObjectGroupsModifiedOutsideEditor: () => {},
-    onExtensionInstalled: () => {},
+    onWillInstallExtension,
+    onExtensionInstalled,
     isReadyToProcessFunctionCalls: true,
   });
 
@@ -581,7 +584,14 @@ export const AskAiStandAloneForm = ({
         aiRequest={aiRequestForForm}
         aiRequestMode={aiRequestModeForForm}
         onStartNewAiRequest={startNewAiRequest}
-        onSendMessage={onSendMessage}
+        onSendUserMessage={(userMessage: string) =>
+          onSendMessage({
+            userMessage,
+            editorFunctionCallResults: aiRequestForForm
+              ? getEditorFunctionCallResults(aiRequestForForm.id) || []
+              : [],
+          })
+        }
         isSending={isLoading}
         lastSendError={getLastSendError(aiRequestIdForForm)}
         quota={quota}

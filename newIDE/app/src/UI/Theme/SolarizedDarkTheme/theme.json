@@ -147,10 +147,10 @@
       }
     },
     "icon-button": {
-      "color": {
-        "value": "#002B36"
-      },
       "selected": {
+        "color": {
+          "value": "#002B36"
+        },
         "background-color": {
           "value": "#2799b9"
         }

@@ -1,10 +1,11 @@
 // @flow
 import * as React from 'react';
+import MockAdapter from 'axios-mock-adapter';
 import { action } from '@storybook/addon-actions';
 
 import paperDecorator from '../../../PaperDecorator';
 import { testProject } from '../../../GDevelopJsInitializerDecorator';
-
+import AlertProvider from '../../../../UI/Alert/AlertProvider';
 import ExtensionInstallDialog from '../../../../AssetStore/ExtensionStore/ExtensionInstallDialog';
 import {
   fireBulletExtensionShortHeader,
@@ -16,6 +17,7 @@ import {
   alreadyInstalledCommunityExtensionShortHeader,
   newerVersionExtensionShortHeader,
 } from '../../../../fixtures/GDevelopServicesTestData';
+import { cdnClient } from '../../../../Utils/GDevelopServices/Extension';
 
 export default {
   title: 'AssetStore/ExtensionStore/ExtensionInstallDialog',
@@ -23,131 +25,306 @@ export default {
   decorators: [paperDecorator],
 };
 
-const apiDataServerSideError = {
-  mockData: [
-    {
-      url: `https://resources.gdevelop-app.com/extensions/FireBullet-header.json`,
-      method: 'GET',
-      status: 500,
-      response: { data: 'status' },
+export const Default = () => {
+  const extensionCdnMock = React.useMemo(() => {
+    const mock = new MockAdapter(cdnClient, {
+      delayResponse: 250,
+    });
+
+    mock
+      .onGet(
+        'https://resources.gdevelop-app.com/extensions/FireBullet-header.json'
+      )
+      .reply(200, fireBulletExtensionHeader);
+
+    return mock;
+  }, []);
+
+  React.useEffect(
+    () => {
+      return () => {
+        extensionCdnMock.restore();
+      };
     },
-  ],
+    [extensionCdnMock]
+  );
+
+  return (
+    <AlertProvider>
+      <ExtensionInstallDialog
+        project={testProject.project}
+        extensionShortHeader={fireBulletExtensionShortHeader}
+        isInstalling={false}
+        onClose={action('close')}
+        onInstall={() => Promise.resolve()}
+        onEdit={action('edit')}
+      />
+    </AlertProvider>
+  );
 };
 
-const apiDataFakeFireBulletExtension = {
-  mockData: [
-    {
-      url: `https://resources.gdevelop-app.com/extensions/FireBullet-header.json`,
-      method: 'GET',
-      status: 200,
-      response: fireBulletExtensionHeader,
+export const BeingInstalled = () => {
+  const extensionCdnMock = React.useMemo(() => {
+    const mock = new MockAdapter(cdnClient, {
+      delayResponse: 250,
+    });
+
+    mock
+      .onGet(
+        'https://resources.gdevelop-app.com/extensions/FireBullet-header.json'
+      )
+      .reply(200, fireBulletExtensionHeader);
+
+    return mock;
+  }, []);
+
+  React.useEffect(
+    () => {
+      return () => {
+        extensionCdnMock.restore();
+      };
     },
-  ],
+    [extensionCdnMock]
+  );
+
+  return (
+    <AlertProvider>
+      <ExtensionInstallDialog
+        project={testProject.project}
+        extensionShortHeader={fireBulletExtensionShortHeader}
+        isInstalling={true}
+        onClose={action('close')}
+        onInstall={() => Promise.resolve()}
+        onEdit={action('edit')}
+      />
+    </AlertProvider>
+  );
 };
 
-const apiDataFakeCommunityExtension = {
-  mockData: [
-    {
-      url: `https://resources.gdevelop-app.com/extensions/FakeCommunityExtension-header.json`,
-      method: 'GET',
-      status: 200,
-      response: communityTierExtensionHeader,
+export const IncompatibleGdevelopVersion = () => {
+  const extensionCdnMock = React.useMemo(() => {
+    const mock = new MockAdapter(cdnClient, {
+      delayResponse: 250,
+    });
+
+    mock
+      .onGet(
+        'https://resources.gdevelop-app.com/extensions/FireBullet-header.json'
+      )
+      .reply(200, fireBulletExtensionHeader);
+
+    return mock;
+  }, []);
+
+  React.useEffect(
+    () => {
+      return () => {
+        extensionCdnMock.restore();
+      };
     },
-  ],
+    [extensionCdnMock]
+  );
+
+  return (
+    <AlertProvider>
+      <ExtensionInstallDialog
+        project={testProject.project}
+        extensionShortHeader={uncompatibleFireBulletExtensionShortHeader}
+        isInstalling={false}
+        onClose={action('close')}
+        onInstall={() => Promise.resolve()}
+        onEdit={action('edit')}
+      />
+    </AlertProvider>
+  );
 };
 
-export const Default = () => (
-  <ExtensionInstallDialog
-    project={testProject.project}
-    extensionShortHeader={fireBulletExtensionShortHeader}
-    isInstalling={false}
-    onClose={action('close')}
-    onInstall={() => Promise.resolve()}
-    onEdit={action('edit')}
-  />
-);
-Default.parameters = apiDataFakeFireBulletExtension;
+export const AlreadyInstalled = () => {
+  const extensionCdnMock = React.useMemo(() => {
+    const mock = new MockAdapter(cdnClient, {
+      delayResponse: 250,
+    });
 
-export const BeingInstalled = () => (
-  <ExtensionInstallDialog
-    project={testProject.project}
-    extensionShortHeader={fireBulletExtensionShortHeader}
-    isInstalling={true}
-    onClose={action('close')}
-    onInstall={() => Promise.resolve()}
-    onEdit={action('edit')}
-  />
-);
-Default.parameters = apiDataFakeFireBulletExtension;
+    mock
+      .onGet(
+        'https://resources.gdevelop-app.com/extensions/FireBullet-header.json'
+      )
+      .reply(200, fireBulletExtensionHeader);
 
-export const IncompatibleGdevelopVersion = () => (
-  <ExtensionInstallDialog
-    project={testProject.project}
-    extensionShortHeader={uncompatibleFireBulletExtensionShortHeader}
-    isInstalling={false}
-    onClose={action('close')}
-    onInstall={() => Promise.resolve()}
-    onEdit={action('edit')}
-  />
-);
-IncompatibleGdevelopVersion.parameters = apiDataFakeFireBulletExtension;
+    return mock;
+  }, []);
 
-export const AlreadyInstalled = () => (
-  <ExtensionInstallDialog
-    project={testProject.project}
-    extensionShortHeader={alreadyInstalledExtensionShortHeader}
-    isInstalling={false}
-    onClose={action('close')}
-    onInstall={() => Promise.resolve()}
-    onEdit={action('edit')}
-  />
-);
-AlreadyInstalled.parameters = apiDataFakeFireBulletExtension;
+  React.useEffect(
+    () => {
+      return () => {
+        extensionCdnMock.restore();
+      };
+    },
+    [extensionCdnMock]
+  );
 
-export const Outdated = () => (
-  <ExtensionInstallDialog
-    project={testProject.project}
-    extensionShortHeader={newerVersionExtensionShortHeader}
-    isInstalling={false}
-    onClose={action('close')}
-    onInstall={() => Promise.resolve()}
-    onEdit={action('edit')}
-  />
-);
-Outdated.parameters = apiDataFakeFireBulletExtension;
+  return (
+    <AlertProvider>
+      <ExtensionInstallDialog
+        project={testProject.project}
+        extensionShortHeader={alreadyInstalledExtensionShortHeader}
+        isInstalling={false}
+        onClose={action('close')}
+        onInstall={() => Promise.resolve()}
+        onEdit={action('edit')}
+      />
+    </AlertProvider>
+  );
+};
 
-export const AlreadyInstalledCommunityExtension = () => (
-  <ExtensionInstallDialog
-    project={testProject.project}
-    extensionShortHeader={alreadyInstalledCommunityExtensionShortHeader}
-    isInstalling={false}
-    onClose={action('close')}
-    onInstall={() => Promise.resolve()}
-    onEdit={action('edit')}
-  />
-);
-AlreadyInstalled.parameters = apiDataFakeFireBulletExtension;
+export const Outdated = () => {
+  const extensionCdnMock = React.useMemo(() => {
+    const mock = new MockAdapter(cdnClient, {
+      delayResponse: 250,
+    });
 
-export const WithServerSideError = () => (
-  <ExtensionInstallDialog
-    project={testProject.project}
-    extensionShortHeader={fireBulletExtensionShortHeader}
-    isInstalling={false}
-    onClose={action('close')}
-    onInstall={() => Promise.resolve()}
-    onEdit={action('edit')}
-  />
-);
-WithServerSideError.parameters = apiDataServerSideError;
+    mock
+      .onGet(
+        'https://resources.gdevelop-app.com/extensions/FireBullet-header.json'
+      )
+      .reply(200, fireBulletExtensionHeader);
 
-export const CommunityExtension = () => (
-  <ExtensionInstallDialog
-    project={testProject.project}
-    extensionShortHeader={communityTierExtensionShortHeader}
-    isInstalling={false}
-    onClose={action('close')}
-    onInstall={() => Promise.resolve()}
-    onEdit={action('edit')}
-  />
-);
-CommunityExtension.parameters = apiDataFakeCommunityExtension;
+    return mock;
+  }, []);
+
+  React.useEffect(
+    () => {
+      return () => {
+        extensionCdnMock.restore();
+      };
+    },
+    [extensionCdnMock]
+  );
+
+  return (
+    <AlertProvider>
+      <ExtensionInstallDialog
+        project={testProject.project}
+        extensionShortHeader={newerVersionExtensionShortHeader}
+        isInstalling={false}
+        onClose={action('close')}
+        onInstall={() => Promise.resolve()}
+        onEdit={action('edit')}
+      />
+    </AlertProvider>
+  );
+};
+
+export const AlreadyInstalledCommunityExtension = () => {
+  const extensionCdnMock = React.useMemo(() => {
+    const mock = new MockAdapter(cdnClient, {
+      delayResponse: 250,
+    });
+
+    mock
+      .onGet(
+        'https://resources.gdevelop-app.com/extensions/FireBullet-header.json'
+      )
+      .reply(200, fireBulletExtensionHeader);
+
+    return mock;
+  }, []);
+
+  React.useEffect(
+    () => {
+      return () => {
+        extensionCdnMock.restore();
+      };
+    },
+    [extensionCdnMock]
+  );
+
+  return (
+    <AlertProvider>
+      <ExtensionInstallDialog
+        project={testProject.project}
+        extensionShortHeader={alreadyInstalledCommunityExtensionShortHeader}
+        isInstalling={false}
+        onClose={action('close')}
+        onInstall={() => Promise.resolve()}
+        onEdit={action('edit')}
+      />
+    </AlertProvider>
+  );
+};
+
+export const WithServerSideError = () => {
+  const extensionCdnMock = React.useMemo(() => {
+    const mock = new MockAdapter(cdnClient, {
+      delayResponse: 250,
+    });
+
+    mock
+      .onGet(
+        'https://resources.gdevelop-app.com/extensions/FireBullet-header.json'
+      )
+      .reply(500, { data: 'status' });
+
+    return mock;
+  }, []);
+
+  React.useEffect(
+    () => {
+      return () => {
+        extensionCdnMock.restore();
+      };
+    },
+    [extensionCdnMock]
+  );
+
+  return (
+    <AlertProvider>
+      <ExtensionInstallDialog
+        project={testProject.project}
+        extensionShortHeader={fireBulletExtensionShortHeader}
+        isInstalling={false}
+        onClose={action('close')}
+        onInstall={() => Promise.resolve()}
+        onEdit={action('edit')}
+      />
+    </AlertProvider>
+  );
+};
+
+export const CommunityExtension = () => {
+  const extensionCdnMock = React.useMemo(() => {
+    const mock = new MockAdapter(cdnClient, {
+      delayResponse: 250,
+    });
+
+    mock
+      .onGet(
+        'https://resources.gdevelop-app.com/extensions/FakeCommunityExtension-header.json'
+      )
+      .reply(200, communityTierExtensionHeader);
+
+    return mock;
+  }, []);
+
+  React.useEffect(
+    () => {
+      return () => {
+        extensionCdnMock.restore();
+      };
+    },
+    [extensionCdnMock]
+  );
+
+  return (
+    <AlertProvider>
+      <ExtensionInstallDialog
+        project={testProject.project}
+        extensionShortHeader={communityTierExtensionShortHeader}
+        isInstalling={false}
+        onClose={action('close')}
+        onInstall={() => Promise.resolve()}
+        onEdit={action('edit')}
+      />
+    </AlertProvider>
+  );
+};

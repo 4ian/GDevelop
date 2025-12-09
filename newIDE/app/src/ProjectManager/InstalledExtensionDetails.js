@@ -5,16 +5,21 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import ExtensionInstallDialog from '../AssetStore/ExtensionStore/ExtensionInstallDialog';
-import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
-import { installExtension } from '../AssetStore/ExtensionStore/InstallExtension';
+import {
+  checkRequiredExtensionsUpdate,
+  useInstallExtension,
+  getRequiredExtensions,
+} from '../AssetStore/ExtensionStore/InstallExtension';
+import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 
 type Props = {|
   project: gdProject,
   onClose: () => void,
   extensionShortHeader: ExtensionShortHeader,
   extensionName: string,
-  onInstallExtension: (extensionName: string) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
   onOpenEventsFunctionsExtension: string => void,
 |};
 
@@ -23,24 +28,50 @@ function InstalledExtensionDetails({
   onClose,
   extensionShortHeader,
   extensionName,
-  onInstallExtension,
+  onWillInstallExtension,
+  onExtensionInstalled,
   onOpenEventsFunctionsExtension,
 }: Props) {
   const [isInstalling, setIsInstalling] = React.useState<boolean>(false);
-  const eventsFunctionsExtensionsState = React.useContext(
-    EventsFunctionsExtensionsContext
-  );
+  const installExtension = useInstallExtension();
+  const {
+    translatedExtensionShortHeadersByName: extensionShortHeadersByName,
+  } = React.useContext(ExtensionStoreContext);
 
   const installOrUpdateExtension = async (i18n: I18nType) => {
     setIsInstalling(true);
     try {
-      onInstallExtension(extensionShortHeader.name);
-      await installExtension(
-        i18n,
-        project,
-        eventsFunctionsExtensionsState,
-        extensionShortHeader
+      const extensionShortHeaders: Array<ExtensionShortHeader> = [
+        extensionShortHeader,
+      ];
+      const requiredExtensionInstallation = await checkRequiredExtensionsUpdate(
+        {
+          requiredExtensions: getRequiredExtensions(extensionShortHeaders),
+          project,
+          extensionShortHeadersByName,
+        }
       );
+      if (
+        !requiredExtensionInstallation.missingExtensionShortHeaders.includes(
+          extensionShortHeader
+        )
+      ) {
+        // The extension chosen by users is not part of `requiredExtensions`
+        // but should always be installed. This is true even if the versions
+        // are matching to allow to reinstall the extension.
+        requiredExtensionInstallation.missingExtensionShortHeaders.push(
+          extensionShortHeader
+        );
+      }
+      await installExtension({
+        project,
+        requiredExtensionInstallation,
+        importedSerializedExtensions: [],
+        onWillInstallExtension,
+        onExtensionInstalled,
+        updateMode: 'all',
+        reason: 'extension',
+      });
     } finally {
       setIsInstalling(false);
     }

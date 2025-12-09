@@ -197,9 +197,11 @@ namespace gdjs {
         this.setWidth(initialInstanceData.width);
         this.setHeight(initialInstanceData.height);
       }
-      if (initialInstanceData.opacity !== undefined) {
-        this.setOpacity(initialInstanceData.opacity);
-      }
+      this.setOpacity(
+        initialInstanceData.opacity === undefined
+          ? 255
+          : initialInstanceData.opacity
+      );
     }
 
     updateTileMap(): void {
@@ -341,6 +343,14 @@ namespace gdjs {
     setSize(newWidth: float, newHeight: float): void {
       this.setWidth(newWidth);
       this.setHeight(newHeight);
+    }
+
+    override getOriginalWidth(): float {
+      return this.getTileMapWidth();
+    }
+
+    override getOriginalHeight(): float {
+      return this.getTileMapHeight();
     }
 
     /**

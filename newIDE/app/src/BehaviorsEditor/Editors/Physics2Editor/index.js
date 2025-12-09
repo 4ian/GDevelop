@@ -325,6 +325,9 @@ const Physics2Editor = (props: Props) => {
             </Trans>
           }
           project={props.project}
+          projectScopedContainersAccessor={
+            props.projectScopedContainersAccessor
+          }
           resourceManagementProps={props.resourceManagementProps}
           resourcesLoader={resourcesLoader}
           resourceKind={'image'}

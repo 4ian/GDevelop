@@ -61,11 +61,11 @@ namespace gdjs {
       return [(hexNumber >> 16) & 255, (hexNumber >> 8) & 255, hexNumber & 255];
     }
 
-    getRendererObject() {
+    override getRendererObject() {
       return this._renderer.getRendererObject();
     }
 
-    updateFromObjectData(
+    override updateFromObjectData(
       oldObjectData: LightObjectData,
       newObjectData: LightObjectData
     ): boolean {
@@ -87,7 +87,7 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(
+    override getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): LightNetworkSyncData {
       return {
@@ -97,7 +97,7 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(
+    override updateFromNetworkSyncData(
       networkSyncData: LightNetworkSyncData,
       options: UpdateFromNetworkSyncDataOptions
     ): void {
@@ -111,8 +111,13 @@ namespace gdjs {
       }
     }
 
-    updatePreRender(): void {
+    override updatePreRender(): void {
       this._renderer.ensureUpToDate();
+    }
+
+    override onDestroyed(): void {
+      super.onDestroyed();
+      this._renderer.destroy();
     }
 
     /**
@@ -131,19 +136,11 @@ namespace gdjs {
       this._renderer.updateRadius();
     }
 
-    /**
-     * Get the height of the light object.
-     * @returns height of light object.
-     */
-    getHeight(): float {
+    override getHeight(): float {
       return 2 * this._radius;
     }
 
-    /**
-     * Get the width of the light object.
-     * @returns width of light object.
-     */
-    getWidth(): float {
+    override getWidth(): float {
       return 2 * this._radius;
     }
 

@@ -25,7 +25,9 @@ import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource
 import Paper from '../../UI/Paper';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import { IconContainer } from '../../UI/IconContainer';
-import Remove from '../../UI/CustomSvgIcons/Remove';
+import RemoveIcon from '../../UI/CustomSvgIcons/Remove';
+import VisibilityIcon from '../../UI/CustomSvgIcons/Visibility';
+import VisibilityOffIcon from '../../UI/CustomSvgIcons/VisibilityOff';
 import useForceUpdate, { useForceRecompute } from '../../Utils/UseForceUpdate';
 import ChevronArrowTop from '../../UI/CustomSvgIcons/ChevronArrowTop';
 import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
@@ -64,6 +66,7 @@ import {
 } from '../Editors/CustomObjectPropertiesEditor';
 import NewVariantDialog from '../Editors/CustomObjectPropertiesEditor/NewVariantDialog';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
+import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 
 const gd: libGDevelop = global.gd;
 
@@ -95,20 +98,27 @@ const objectVariablesHelpLink = getHelpLink(
   '/all-features/variables/object-variables'
 );
 
+type TitleBarButton = {|
+  id: string,
+  icon: any,
+  label?: MessageDescriptor,
+  onClick?: () => void,
+|};
+
 const CollapsibleSubPanel = ({
   renderContent,
   isFolded,
   toggleFolded,
   title,
   titleIcon,
-  onRemove,
+  titleBarButtons,
 }: {|
   renderContent: () => React.Node,
   isFolded: boolean,
   toggleFolded: () => void,
   titleIcon?: ?React.Node,
   title: string,
-  onRemove?: () => void,
+  titleBarButtons?: Array<TitleBarButton>,
 |}) => (
   <Paper background="medium">
     <Line expand>
@@ -129,19 +139,24 @@ const CollapsibleSubPanel = ({
               {title}
             </Text>
           </Line>
-
-          {onRemove ? (
-            <Line noMargin>
-              <IconButton
-                tooltip={t`Remove behavior`}
-                onClick={onRemove}
-                size="small"
-              >
-                <Remove style={styles.icon} />
-              </IconButton>
-              <Spacer />
-            </Line>
-          ) : null}
+          <Line noMargin>
+            {titleBarButtons &&
+              titleBarButtons.map(button => {
+                const Icon = button.icon;
+                return (
+                  <IconButton
+                    key={button.id}
+                    id={button.id}
+                    tooltip={button.label}
+                    onClick={button.onClick}
+                    size="small"
+                  >
+                    <Icon style={styles.icon} />
+                  </IconButton>
+                );
+              })}
+            <Spacer />
+          </Line>
         </LineStackLayout>
         {isFolded ? null : (
           <div style={styles.subPanelContentContainer}>{renderContent()}</div>
@@ -226,6 +241,8 @@ type Props = {|
 
   objects: Array<gdObject>,
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
+  onObjectsModified: (objects: Array<gdObject>) => void,
+  onEffectAdded: () => void,
   onOpenEventBasedObjectVariantEditor: (
     extensionName: string,
     eventsBasedObjectName: string,
@@ -236,6 +253,7 @@ type Props = {|
     eventBasedObject: gdEventsBasedObject,
     variant: gdEventsBasedObjectVariant
   ) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   isVariableListLocked: boolean,
   isBehaviorListLocked: boolean,
@@ -256,8 +274,11 @@ export const CompactObjectPropertiesEditor = ({
   historyHandler,
   objects,
   onEditObject,
+  onObjectsModified,
+  onEffectAdded,
   onOpenEventBasedObjectVariantEditor,
   onDeleteEventsBasedObjectVariant,
+  onWillInstallExtension,
   onExtensionInstalled,
   isVariableListLocked,
   isBehaviorListLocked,
@@ -316,8 +337,10 @@ export const CompactObjectPropertiesEditor = ({
         properties,
         getProperties: ({ object, objectConfiguration }) =>
           objectConfiguration.getProperties(),
-        onUpdateProperty: ({ object, objectConfiguration }, name, value) =>
-          objectConfiguration.updateProperty(name, value),
+        onUpdateProperty: ({ object, objectConfiguration }, name, value) => {
+          objectConfiguration.updateProperty(name, value);
+          onObjectsModified([object]);
+        },
         visibility: 'Basic',
       });
 
@@ -334,6 +357,7 @@ export const CompactObjectPropertiesEditor = ({
       fullEditorLabel,
       object,
       onEditObject,
+      onObjectsModified,
     ]
   );
   const objectAdvancedPropertiesSchema = React.useMemo(
@@ -347,12 +371,14 @@ export const CompactObjectPropertiesEditor = ({
         properties,
         getProperties: ({ object, objectConfiguration }) =>
           objectConfiguration.getProperties(),
-        onUpdateProperty: ({ object, objectConfiguration }, name, value) =>
-          objectConfiguration.updateProperty(name, value),
+        onUpdateProperty: ({ object, objectConfiguration }, name, value) => {
+          objectConfiguration.updateProperty(name, value);
+          onObjectsModified([object]);
+        },
         visibility: 'Advanced',
       });
     },
-    [objectConfigurationAsGd, schemaRecomputeTrigger]
+    [objectConfigurationAsGd, schemaRecomputeTrigger, onObjectsModified]
   );
   const hasObjectAdvancedProperties = objectAdvancedPropertiesSchema.length > 0;
   const hasSomeObjectProperties =
@@ -371,6 +397,7 @@ export const CompactObjectPropertiesEditor = ({
     onUpdate: forceUpdate,
     onBehaviorsUpdated: forceUpdate,
     onUpdateBehaviorsSharedData,
+    onWillInstallExtension,
     onExtensionInstalled,
   });
 
@@ -391,7 +418,11 @@ export const CompactObjectPropertiesEditor = ({
   } = useManageEffects({
     effectsContainer,
     project,
-    onEffectsUpdated: forceUpdate,
+    onEffectsUpdated: () => {
+      onObjectsModified([object]);
+      forceUpdate();
+    },
+    onEffectAdded,
     onUpdate: forceUpdate,
     target: 'object',
   });
@@ -686,6 +717,7 @@ export const CompactObjectPropertiesEditor = ({
                       onChange={(newValue: string) => {
                         customObjectConfiguration &&
                           customObjectConfiguration.setVariantName(newValue);
+                        onObjectsModified([object]);
                         forceUpdate();
                       }}
                     >
@@ -837,9 +869,16 @@ export const CompactObjectPropertiesEditor = ({
                         ) : null
                       }
                       title={behavior.getName()}
-                      onRemove={() => {
-                        removeBehavior(behavior.getName());
-                      }}
+                      titleBarButtons={[
+                        {
+                          id: 'remove-behavior',
+                          icon: RemoveIcon,
+                          label: t`Remove behavior`,
+                          onClick: () => {
+                            removeBehavior(behavior.getName());
+                          },
+                        },
+                      ]}
                     />
                   );
                 })}
@@ -979,6 +1018,9 @@ export const CompactObjectPropertiesEditor = ({
                                   resourceManagementProps={
                                     resourceManagementProps
                                   }
+                                  onPropertyModified={() =>
+                                    onObjectsModified([object])
+                                  }
                                 />
                               </ColumnStackLayout>
                             )}
@@ -988,9 +1030,31 @@ export const CompactObjectPropertiesEditor = ({
                               forceUpdate();
                             }}
                             title={effect.getName()}
-                            onRemove={() => {
-                              removeEffect(effect);
-                            }}
+                            titleBarButtons={[
+                              {
+                                id: 'effect-visibility',
+                                icon: effect.isEnabled()
+                                  ? VisibilityIcon
+                                  : VisibilityOffIcon,
+                                label: effect.isEnabled()
+                                  ? t`Hide effect`
+                                  : t`Show effect`,
+                                onClick: () => {
+                                  effect.setEnabled(!effect.isEnabled());
+                                  onObjectsModified([object]);
+                                  forceUpdate();
+                                },
+                              },
+                              {
+                                id: 'remove-effect',
+                                icon: RemoveIcon,
+                                label: t`Remove effect`,
+                                onClick: () => {
+                                  removeEffect(effect);
+                                  onObjectsModified([object]);
+                                },
+                              },
+                            ]}
                           />
                         );
                       }

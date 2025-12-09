@@ -55,6 +55,10 @@ import { type ConnectDragSource } from 'react-dnd';
 import ResponsiveFlatButton from '../UI/ResponsiveFlatButton';
 import { Accordion, AccordionHeader, AccordionBody } from '../UI/Accordion';
 import { type Field } from '../CompactPropertiesEditor';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import InlineCheckbox from '../UI/InlineCheckbox';
+import VisibilityIcon from '../UI/CustomSvgIcons/Visibility';
+import VisibilityOffIcon from '../UI/CustomSvgIcons/VisibilityOff';
 
 const gd: libGDevelop = global.gd;
 
@@ -101,6 +105,7 @@ const Effect = React.forwardRef(
       target,
       project,
       resourceManagementProps,
+      projectScopedContainersAccessor,
       effectsContainer,
       effect,
       removeEffect,
@@ -118,6 +123,7 @@ const Effect = React.forwardRef(
       target: 'object' | 'layer',
       project: gdProject,
       resourceManagementProps: ResourceManagementProps,
+      projectScopedContainersAccessor: ProjectScopedContainersAccessor,
       effectsContainer: gdEffectsContainer,
       effect: gdEffect,
       onEffectsUpdated: () => void,
@@ -299,6 +305,24 @@ const Effect = React.forwardRef(
                   </SelectField>
                 </Line>
               </ResponsiveLineStackLayout>
+              <InlineCheckbox
+                id="effect-visibility"
+                paddingSize="small"
+                checkedIcon={<VisibilityIcon />}
+                uncheckedIcon={<VisibilityOffIcon />}
+                checked={effect.isEnabled()}
+                onCheck={(e, checked) => {
+                  effect.setEnabled(checked);
+                  forceUpdate();
+                }}
+                tooltipOrHelperText={
+                  effect.isEnabled() ? (
+                    <Trans>Hide effect</Trans>
+                  ) : (
+                    <Trans>Show effect</Trans>
+                  )
+                }
+              />
               <ElementWithMenu
                 element={
                   <IconButton size="small">
@@ -345,6 +369,9 @@ const Effect = React.forwardRef(
                     schema={basicPropertiesSchema}
                     project={project}
                     resourceManagementProps={resourceManagementProps}
+                    projectScopedContainersAccessor={
+                      projectScopedContainersAccessor
+                    }
                     renderExtraDescriptionText={
                       showEffectParameterNames
                         ? parameterName =>
@@ -372,6 +399,9 @@ const Effect = React.forwardRef(
                             schema={advancedPropertiesSchema}
                             project={project}
                             resourceManagementProps={resourceManagementProps}
+                            projectScopedContainersAccessor={
+                              projectScopedContainersAccessor
+                            }
                             renderExtraDescriptionText={
                               showEffectParameterNames
                                 ? parameterName =>
@@ -396,16 +426,6 @@ const Effect = React.forwardRef(
     );
   }
 );
-
-type Props = {|
-  project: gdProject,
-  resourceManagementProps: ResourceManagementProps,
-  effectsContainer: gdEffectsContainer,
-  onEffectsUpdated: () => void,
-  onEffectsRenamed: (oldName: string, newName: string) => void,
-  target: 'object' | 'layer',
-  layerRenderingType: string,
-|};
 
 export const getEnumeratedEffectMetadata = (
   allEffectDescriptions: Array<EnumeratedEffectMetadata>,
@@ -477,12 +497,14 @@ export const useManageEffects = ({
   effectsContainer,
   project,
   onEffectsUpdated,
+  onEffectAdded,
   onUpdate,
   target,
 }: {|
   effectsContainer: gdEffectsContainer,
   project: gdProject,
   onEffectsUpdated: () => void,
+  onEffectAdded: () => void,
   onUpdate: () => void,
   target: 'object' | 'layer',
 |}): UseManageEffectsState => {
@@ -544,8 +566,11 @@ export const useManageEffects = ({
 
       onUpdate();
       onEffectsUpdated();
+      // Changing the type is like adding a new effect.
+      // TODO Make a new effect dialog like for objects or behaviors to make this clearer.
+      onEffectAdded();
     },
-    [allEffectMetadata, onUpdate, onEffectsUpdated]
+    [allEffectMetadata, onUpdate, onEffectsUpdated, onEffectAdded]
   );
 
   const _addEffect = React.useCallback(
@@ -809,6 +834,18 @@ export const useManageEffects = ({
   };
 };
 
+type Props = {|
+  project: gdProject,
+  resourceManagementProps: ResourceManagementProps,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
+  effectsContainer: gdEffectsContainer,
+  onEffectsUpdated: () => void,
+  onEffectsRenamed: (oldName: string, newName: string) => void,
+  onEffectAdded: () => void,
+  target: 'object' | 'layer',
+  layerRenderingType: string,
+|};
+
 /**
  * Display a list of effects and allow to add/remove/edit them.
  *
@@ -819,6 +856,7 @@ export default function EffectsList(props: Props) {
     effectsContainer,
     onEffectsUpdated,
     onEffectsRenamed,
+    onEffectAdded,
     project,
     target,
   } = props;
@@ -847,6 +885,7 @@ export default function EffectsList(props: Props) {
     effectsContainer,
     project,
     onEffectsUpdated,
+    onEffectAdded,
     onUpdate: forceUpdate,
     target,
   });
@@ -982,6 +1021,9 @@ export default function EffectsList(props: Props) {
                                         layerRenderingType={'3d'}
                                         target={target}
                                         project={project}
+                                        projectScopedContainersAccessor={
+                                          props.projectScopedContainersAccessor
+                                        }
                                         resourceManagementProps={
                                           props.resourceManagementProps
                                         }
@@ -1075,6 +1117,9 @@ export default function EffectsList(props: Props) {
                                         project={project}
                                         resourceManagementProps={
                                           props.resourceManagementProps
+                                        }
+                                        projectScopedContainersAccessor={
+                                          props.projectScopedContainersAccessor
                                         }
                                         effectsContainer={effectsContainer}
                                         effect={effect}

@@ -18,12 +18,15 @@ namespace gdjs {
     renderer: PIXI.Container;
     emitter: PIXI.particles.Emitter;
     started: boolean = false;
+    helperGraphics: PIXI.Graphics | null = null;
+    runtimeObject: gdjs.ParticleEmitterObject;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      runtimeObject: gdjs.RuntimeObject,
+      runtimeObject: gdjs.ParticleEmitterObject,
       objectData: any
     ) {
+      this.runtimeObject = runtimeObject;
       const pixiRenderer = instanceContainer
         .getGame()
         .getRenderer()
@@ -218,10 +221,52 @@ namespace gdjs {
     }
 
     update(delta: float): void {
-      const wasEmitting = this.emitter.emit;
-      this.emitter.update(delta);
-      if (!this.started && wasEmitting) {
-        this.started = true;
+      if (
+        !this.runtimeObject.getInstanceContainer().getGame().isInGameEdition()
+      ) {
+        const wasEmitting = this.emitter.emit;
+        this.emitter.update(delta);
+        if (!this.started && wasEmitting) {
+          this.started = true;
+        }
+      }
+      if (this.helperGraphics) {
+        this.helperGraphics.clear();
+        this.helperGraphics.position.x = this.runtimeObject.getX();
+        this.helperGraphics.position.y = this.runtimeObject.getY();
+
+        const emitterAngle = gdjs.toRad(this.runtimeObject.getAngle());
+        const sprayConeAngle = gdjs.toRad(
+          this.runtimeObject.getConeSprayAngle()
+        );
+        const line1Angle = emitterAngle - sprayConeAngle / 2;
+        const line2Angle = emitterAngle + sprayConeAngle / 2;
+        const length = 64;
+
+        this.helperGraphics.beginFill(0, 0);
+        this.helperGraphics.lineStyle(
+          3,
+          this.runtimeObject.getParticleColorEnd(),
+          1
+        );
+        this.helperGraphics.moveTo(0, 0);
+        this.helperGraphics.lineTo(
+          Math.cos(line1Angle) * length,
+          Math.sin(line1Angle) * length
+        );
+        this.helperGraphics.moveTo(0, 0);
+        this.helperGraphics.lineTo(
+          Math.cos(line2Angle) * length,
+          Math.sin(line2Angle) * length
+        );
+        this.helperGraphics.endFill();
+
+        this.helperGraphics.lineStyle(0, 0x000000, 1);
+        this.helperGraphics.beginFill(
+          this.runtimeObject.getParticleColorStart()
+        );
+        this.helperGraphics.drawCircle(0, 0, 8);
+        this.helperGraphics.endFill();
       }
     }
 
@@ -443,6 +488,17 @@ namespace gdjs {
     }
 
     private static readonly frequencyMinimumValue = 0.0001;
+
+    setHelperVisible(visible: boolean) {
+      if (visible && !this.helperGraphics) {
+        this.helperGraphics = new PIXI.Graphics();
+        this.renderer.addChild(this.helperGraphics);
+      } else if (!visible && this.helperGraphics) {
+        this.helperGraphics.removeFromParent();
+        this.helperGraphics.destroy();
+        this.helperGraphics = null;
+      }
+    }
   }
 
   // @ts-ignore - Register the class to let the engine use it.

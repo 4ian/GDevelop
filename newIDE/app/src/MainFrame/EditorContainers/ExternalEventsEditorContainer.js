@@ -27,6 +27,11 @@ import {
 } from '../ResourcesWatcher';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
+import {
+  setEditorHotReloadNeeded,
+  type HotReloadSteps,
+} from '../../EmbeddedGame/EmbeddedGameFrame';
+import Background from '../../UI/Background';
 
 const styles = {
   container: {
@@ -101,6 +106,12 @@ export class ExternalEventsEditorContainer extends React.Component<
   onSceneEventsModifiedOutsideEditor(changes: SceneEventsOutsideEditorChanges) {
     // No thing to be done.
   }
+
+  notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {
+    setEditorHotReloadNeeded(hotReloadSteps);
+  }
+
+  switchInGameEditorIfNoHotReloadIsNeeded() {}
 
   onInstancesModifiedOutsideEditor(changes: InstancesOutsideEditorChanges) {
     // No thing to be done.
@@ -226,34 +237,37 @@ export class ExternalEventsEditorContainer extends React.Component<
             onOpenExternalEvents={this.props.onOpenExternalEvents}
             isActive={this.props.isActive}
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
+            onWillInstallExtension={this.props.onWillInstallExtension}
             onExtensionInstalled={this.props.onExtensionInstalled}
           />
         )}
         {!layout && (
-          <PlaceholderMessage>
-            <Text>
-              <Trans>
-                To edit the external events, choose the scene in which it will
-                be included
-              </Trans>
-            </Text>
-            <Line justifyContent="center">
-              <RaisedButton
-                label={<Trans>Choose the scene</Trans>}
-                primary
-                onClick={this.openExternalPropertiesDialog}
-              />
-            </Line>
-            <Line justifyContent="flex-start" noMargin>
-              <TutorialButton
-                tutorialId="Intermediate-externals"
-                label={<Trans>Watch tutorial</Trans>}
-                renderIfNotFound={
-                  <HelpButton helpPagePath="/interface/events-editor/external-events" />
-                }
-              />
-            </Line>
-          </PlaceholderMessage>
+          <Background>
+            <PlaceholderMessage>
+              <Text>
+                <Trans>
+                  To edit the external events, choose the scene in which it will
+                  be included
+                </Trans>
+              </Text>
+              <Line justifyContent="center">
+                <RaisedButton
+                  label={<Trans>Choose the scene</Trans>}
+                  primary
+                  onClick={this.openExternalPropertiesDialog}
+                />
+              </Line>
+              <Line justifyContent="flex-start" noMargin>
+                <TutorialButton
+                  tutorialId="Intermediate-externals"
+                  label={<Trans>Watch tutorial</Trans>}
+                  renderIfNotFound={
+                    <HelpButton helpPagePath="/interface/events-editor/external-events" />
+                  }
+                />
+              </Line>
+            </PlaceholderMessage>
+          </Background>
         )}
         <ExternalPropertiesDialog
           title={<Trans>Configure the external events</Trans>}

@@ -13,11 +13,15 @@
 
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/DiagnosticReport.h"
+#include "GDCore/Extensions/Metadata/InGameEditorResourceMetadata.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
 #include "GDCore/IDE/Project/SceneResourcesFinder.h"
 #include "GDCore/IDE/ProjectStripper.h"
+#include "GDCore/Project/EventsBasedObject.h"
+#include "GDCore/Project/EventsBasedObjectVariant.h"
+#include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/Project/Layout.h"
@@ -47,7 +51,7 @@ Exporter::~Exporter() {}
 bool Exporter::ExportProjectForPixiPreview(
     const PreviewExportOptions &options) {
   ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
-  return helper.ExportProjectForPixiPreview(options);
+  return helper.ExportProjectForPixiPreview(options, includesFiles);
 }
 
 bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
@@ -80,7 +84,7 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
 
     // Prepare the export directory
     fs.MkDir(exportDir);
-    std::vector<gd::String> includesFiles;
+    includesFiles.clear();
     std::vector<gd::String> resourcesFiles;
 
     // Export the resources (before generating events as some resources
@@ -98,6 +102,7 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
     helper.AddLibsInclude(
         /*pixiRenderers=*/true,
         usedExtensionsResult.Has3DObjects(),
+        /*isInGameEditor=*/false,
         /*includeWebsocketDebuggerClient=*/false,
         /*includeWindowMessageDebuggerClient=*/false,
         /*includeMinimalDebuggerClient=*/false,
@@ -120,7 +125,7 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
     helper.ExportEffectIncludes(exportedProject, includesFiles);
 
     // Export events
-    if (!helper.ExportEventsCode(exportedProject,
+    if (!helper.ExportScenesEventsCode(exportedProject,
                                  codeOutputDir,
                                  includesFiles,
                                  wholeProjectDiagnosticReport,
@@ -130,29 +135,11 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
       return false;
     }
 
-    auto projectUsedResources =
-        gd::SceneResourcesFinder::FindProjectResources(exportedProject);
-    std::unordered_map<gd::String, std::set<gd::String>> scenesUsedResources;
-    for (std::size_t layoutIndex = 0;
-         layoutIndex < exportedProject.GetLayoutsCount();
-         layoutIndex++) {
-      auto &layout = exportedProject.GetLayout(layoutIndex);
-      scenesUsedResources[layout.GetName()] =
-          gd::SceneResourcesFinder::FindSceneResources(exportedProject, layout);
-    }
-
-    // Strip the project (*after* generating events as the events may use
-    // stripped things like objects groups...)...
-    gd::ProjectStripper::StripProjectForExport(exportedProject);
-
     //...and export it
     gd::SerializerElement noRuntimeGameOptions;
-    helper.ExportProjectData(fs,
-                             exportedProject,
-                             codeOutputDir + "/data.js",
-                             noRuntimeGameOptions,
-                             projectUsedResources,
-                             scenesUsedResources);
+    std::vector<gd::InGameEditorResourceMetadata> noInGameEditorResources;
+    helper.ExportProjectData(fs, exportedProject, codeOutputDir + "/data.js",
+                             noRuntimeGameOptions, false, noInGameEditorResources);
     includesFiles.push_back(codeOutputDir + "/data.js");
 
     helper.ExportIncludesAndLibs(includesFiles, exportDir, false);
@@ -213,6 +200,20 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
   }
 
   return true;
+}
+
+void Exporter::SerializeProjectData(const gd::Project &project,
+                                    const PreviewExportOptions &options,
+                                    gd::SerializerElement &projectDataElement) {
+  std::vector<gd::InGameEditorResourceMetadata> noInGameEditorResources;
+  ExporterHelper::SerializeProjectData(fs, project, options, projectDataElement, noInGameEditorResources);
+}
+
+void Exporter::SerializeRuntimeGameOptions(
+    const PreviewExportOptions &options,
+    gd::SerializerElement &runtimeGameOptionsElement) {
+  ExporterHelper::SerializeRuntimeGameOptions(
+      fs, gdjsRoot, options, includesFiles, runtimeGameOptionsElement);
 }
 
 }  // namespace gdjs

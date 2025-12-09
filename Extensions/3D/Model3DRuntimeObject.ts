@@ -127,12 +127,11 @@ namespace gdjs {
       this._materialType = this._convertMaterialType(
         objectData.content.materialType
       );
+      this._crossfadeDuration = objectData.content.crossfadeDuration || 0;
 
       this.setIsCastingShadow(objectData.content.isCastingShadow);
       this.setIsReceivingShadow(objectData.content.isReceivingShadow);
       this.onModelChanged(objectData);
-
-      this._crossfadeDuration = objectData.content.crossfadeDuration || 0;
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -143,12 +142,13 @@ namespace gdjs {
      * - After the renderer was instantiated
      * - After reloading the model
      */
-    private onModelChanged(objectData) {
+    private onModelChanged(objectData: Model3DObjectData) {
       this._updateModel(objectData);
       if (this._animations.length > 0) {
         this._renderer.playAnimation(
           this._animations[0].source,
-          this._animations[0].loop
+          this._animations[0].loop,
+          true
         );
       }
     }
@@ -198,7 +198,7 @@ namespace gdjs {
         this._centerPoint = getPointForLocation(
           newObjectData.content.centerLocation
         );
-        this._updateModel(newObjectData);
+        this.onModelChanged(newObjectData);
       }
       if (
         oldObjectData.content.originLocation !==
@@ -220,6 +220,23 @@ namespace gdjs {
         newObjectData.content.isReceivingShadow
       ) {
         this.setIsReceivingShadow(newObjectData.content.isReceivingShadow);
+      }
+      if (this.getInstanceContainer().getGame().isInGameEdition()) {
+        const oldDefaultAnimationSource =
+          this._animations.length > 0 ? this._animations[0].source : null;
+        this._animations = newObjectData.content.animations;
+        const newDefaultAnimationSource =
+          this._animations.length > 0 ? this._animations[0].source : null;
+        if (
+          newDefaultAnimationSource &&
+          oldDefaultAnimationSource !== newDefaultAnimationSource
+        ) {
+          this._renderer.playAnimation(
+            newDefaultAnimationSource,
+            this._animations[0].loop,
+            true
+          );
+        }
       }
       return true;
     }

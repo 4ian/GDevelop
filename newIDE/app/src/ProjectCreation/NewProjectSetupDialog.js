@@ -97,9 +97,7 @@ export type NewProjectSetup = {|
   orientation?: 'landscape' | 'portrait' | 'default',
   optimizeForPixelArt?: boolean,
   openQuickCustomizationDialog?: boolean,
-  dontOpenAnySceneOrProjectManager?: boolean,
-  dontRepositionAskAiEditor?: boolean,
-  dontCloseNewProjectSetupDialog?: boolean,
+  forceOpenAskAiEditor?: boolean,
   creationSource: NewProjectCreationSource,
 |};
 
@@ -126,7 +124,6 @@ type Props = {|
     newProjectSetup: NewProjectSetup,
     i18n: I18nType
   ) => Promise<CreateProjectResult>,
-  onOpenAskAi: () => void,
   onCloseAskAi: () => void,
   selectedExampleShortHeader: ?ExampleShortHeader,
   onSelectExampleShortHeader: (exampleShortHeader: ?ExampleShortHeader) => void,
@@ -150,6 +147,8 @@ type Props = {|
         | 'none',
     |}
   ) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
 const NewProjectSetupDialog = ({
@@ -161,7 +160,6 @@ const NewProjectSetupDialog = ({
   onCreateEmptyProject,
   onCreateFromExample,
   onCreateProjectFromPrivateGameTemplate,
-  onOpenAskAi,
   onCloseAskAi,
   selectedExampleShortHeader,
   onSelectExampleShortHeader,
@@ -172,6 +170,8 @@ const NewProjectSetupDialog = ({
   privateGameTemplateListingDatasFromSameCreator,
   preventBackHome,
   onOpenLayout,
+  onWillInstallExtension,
+  onExtensionInstalled,
 }: Props): React.Node => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
@@ -671,7 +671,8 @@ const NewProjectSetupDialog = ({
                   onCreateProjectFromExample={onCreateFromExample}
                   onCreateEmptyProject={onCreateEmptyProject}
                   onOpenLayout={onOpenLayout}
-                  onOpenAskAi={onOpenAskAi}
+                  onWillInstallExtension={onWillInstallExtension}
+                  onExtensionInstalled={onExtensionInstalled}
                   onCloseAskAi={onCloseAskAi}
                 />
                 <EmptyAndStartingPointProjects

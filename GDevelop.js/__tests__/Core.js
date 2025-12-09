@@ -151,7 +151,11 @@ describe('libGD.js', function () {
           .getUsedExtensions()
           .toNewVectorString()
           .toJSArray()
-      ).toEqual([]);
+      ).toEqual([
+        // This extension is always considerde as used, as it
+        // includes files necessary for the in-game editor.
+        'BuiltinObject',
+      ]);
 
       project.getObjects().insertNewObject(project, 'Sprite', 'MyObject', 0);
 
@@ -162,6 +166,7 @@ describe('libGD.js', function () {
           .toJSArray()
       ).toEqual([
         'AnimatableCapability',
+        'BuiltinObject',
         'EffectCapability',
         'FlippableCapability',
         'OpacityCapability',
@@ -1424,7 +1429,7 @@ describe('libGD.js', function () {
     });
   });
 
-  describe('gd.ResourcesManager', function () {
+  describe('gd.ResourcesContainer', function () {
     it('should support adding resources', function () {
       let project = gd.ProjectHelper.createNewGDJSProject();
       let resource = new gd.Resource();

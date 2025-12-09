@@ -142,7 +142,8 @@ export type Quota = {|
   limitReached: boolean,
   current: number,
   max: number,
-  period?: '1day' | '30days',
+  period: '1day' | '30days' | '7days',
+  resetsAt?: number,
 |};
 
 export type Quotas = {
@@ -227,6 +228,7 @@ export interface UserEarningsBalance {
 }
 
 export type SummarizedPlanFeature = {|
+  featureName: string,
   displayedFeatureName: string,
   description?: string,
   tooltip?: string,
@@ -672,6 +674,7 @@ export function getSummarizedSubscriptionPlanFeatures(
     }
 
     planFeature = {
+      featureName: feature.featureName,
       displayedFeatureName: selectMessageByLocale(i18n, featureNameByLocale),
     };
 

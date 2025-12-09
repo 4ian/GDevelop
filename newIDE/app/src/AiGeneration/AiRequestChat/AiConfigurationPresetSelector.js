@@ -26,6 +26,31 @@ export const AiConfigurationPresetSelector = ({
     preset => preset.mode === aiRequestMode
   );
 
+  // Deselect the current preset if it becomes disabled
+  React.useEffect(
+    () => {
+      const currentPreset = filteredAiConfigurationPresets.find(
+        preset => preset.id === chosenOrDefaultAiConfigurationPresetId
+      );
+
+      if (currentPreset && currentPreset.disabled) {
+        // Find the first enabled preset as a fallback
+        const firstEnabledPreset = filteredAiConfigurationPresets.find(
+          preset => !preset.disabled
+        );
+
+        if (firstEnabledPreset) {
+          setAiConfigurationPresetId(firstEnabledPreset.id);
+        }
+      }
+    },
+    [
+      chosenOrDefaultAiConfigurationPresetId,
+      filteredAiConfigurationPresets,
+      setAiConfigurationPresetId,
+    ]
+  );
+
   const noUpgradeAiConfigurationPresets = filteredAiConfigurationPresets.filter(
     preset => !preset.disabled || preset.enableWith !== 'higher-tier-plan'
   );

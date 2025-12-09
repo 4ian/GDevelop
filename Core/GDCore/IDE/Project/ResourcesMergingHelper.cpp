@@ -22,6 +22,14 @@ void ResourcesMergingHelper::ExposeFile(gd::String& resourceFilename) {
   resourceFullFilename = gd::AbstractFileSystem::NormalizeSeparator(
       resourceFullFilename);  // Protect against \ on Linux.
 
+  if (shouldUseOriginalAbsoluteFilenames) {
+    // There is no need to fill `newFilenames` and `oldFilenames` since the file
+    // location stays the same.
+    fs.MakeAbsolute(resourceFullFilename, baseDirectory);
+    resourceFilename = resourceFullFilename;
+    return;
+  }
+
   // In the case of absolute filenames that we don't want to preserve, or
   // in the case of copying files without preserving relative folders, the new
   // names will be generated from the filename alone (with collision protection).

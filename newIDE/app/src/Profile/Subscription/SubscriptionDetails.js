@@ -23,9 +23,9 @@ import {
 } from '../../UI/Layout';
 import FlatButton from '../../UI/FlatButton';
 import {
-  SubscriptionSuggestionContext,
+  SubscriptionContext,
   type SubscriptionType,
-} from './SubscriptionSuggestionContext';
+} from './SubscriptionContext';
 import Paper from '../../UI/Paper';
 import PlanSmallCard from './PlanSmallCard';
 import { isNativeMobileApp } from '../../Utils/Platform';
@@ -115,9 +115,7 @@ const SubscriptionDetails = ({
   onManageSubscription,
   simulateNativeMobileApp,
 }: Props) => {
-  const { openSubscriptionDialog } = React.useContext(
-    SubscriptionSuggestionContext
-  );
+  const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
   const { showAlert } = useAlertDialog();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const [

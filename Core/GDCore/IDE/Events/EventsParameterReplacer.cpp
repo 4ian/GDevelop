@@ -233,7 +233,7 @@ bool EventsParameterReplacer::DoVisitEventExpression(
 bool EventsParameterReplacer::CanContainParameter(
     const gd::ValueTypeMetadata &valueTypeMetadata) {
   return valueTypeMetadata.IsVariable() || valueTypeMetadata.IsNumber() ||
-         valueTypeMetadata.IsString();
+         valueTypeMetadata.IsString() || valueTypeMetadata.IsResource();
 }
 
 EventsParameterReplacer::~EventsParameterReplacer() {}

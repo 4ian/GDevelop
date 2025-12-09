@@ -203,6 +203,7 @@ interface Platform {
     boolean IsExtensionLoaded([Const] DOMString name);
     void RemoveExtension([Const] DOMString name);
     void ReloadBuiltinExtensions();
+    [Value] UniquePtrObjectConfiguration CreateObjectConfiguration([Const] DOMString type);
 
     [Const, Ref] VectorPlatformExtension GetAllPlatformExtensions();
 };
@@ -210,19 +211,8 @@ interface Platform {
 interface JsPlatform {
     [Ref] JsPlatform STATIC_Get();
     void AddNewExtension([Const, Ref] PlatformExtension extension);
-
-    // Inherited from Platform:
-    [Const, Value] DOMString GetName();
-    [Const, Value] DOMString GetFullName();
-    [Const, Value] DOMString GetSubtitle();
-    [Const, Value] DOMString GetDescription();
-    [Const, Ref] InstructionOrExpressionGroupMetadata GetInstructionOrExpressionGroupMetadata([Const] DOMString name);
-    boolean IsExtensionLoaded([Const] DOMString name);
-    void RemoveExtension([Const] DOMString name);
-    void ReloadBuiltinExtensions();
-
-    [Const, Ref] VectorPlatformExtension GetAllPlatformExtensions();
 };
+JsPlatform implements Platform;
 
 interface PairStringVariable {
     void PairStringVariable();
@@ -262,6 +252,7 @@ interface Variable {
     void Variable();
 
     boolean STATIC_IsPrimitive([Const] Variable_Type type);
+    [Const, Value] DOMString STATIC_TypeAsString([Const] Variable_Type type);
 
     Variable_Type GetType();
     void CastTo([Const] DOMString type);
@@ -602,6 +593,8 @@ interface Project {
     boolean IsFolderProject();
     void SetUseDeprecatedZeroAsDefaultZOrder(boolean enable);
     boolean GetUseDeprecatedZeroAsDefaultZOrder();
+    boolean AreEffectsHiddenInEditor();
+    void SetEffectsHiddenInEditor(boolean enable);
 
     void SetLastCompilationDirectory([Const] DOMString path);
     [Const, Ref] DOMString GetLastCompilationDirectory();
@@ -665,7 +658,7 @@ interface Project {
 
     [Ref] VariablesContainer GetVariables();
     [Ref] ObjectsContainer GetObjects();
-    [Ref] ResourcesManager GetResourcesManager();
+    [Ref] ResourcesContainer GetResourcesManager();
 
     void SetSceneResourcesPreloading([Const] DOMString resourcesPreloading);
     [Const, Ref] DOMString GetSceneResourcesPreloading();
@@ -703,6 +696,10 @@ interface ObjectsContainersList {
     [Const] DOMString objectOrGroupName,
     [Const] DOMString behaviorType,
     boolean searchInGroups);
+  boolean IsDefaultBehavior(
+    [Const] DOMString objectOrGroupName,
+    [Const] DOMString behaviorType,
+    boolean searchInGroups);
   [Value] VectorString GetAnimationNamesOfObject([Const] DOMString name);
   [Const, Value] DOMString GetTypeOfBehaviorInObjectOrGroup([Const] DOMString objectOrGroupName, [Const] DOMString behaviorName, boolean searchInGroups);
   boolean HasObjectOrGroupNamed([Const] DOMString name);
@@ -732,7 +729,8 @@ interface ProjectScopedContainers {
         [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
         [Const, Ref] EventsFunction eventsFunction,
         [Ref] ObjectsContainer parameterObjectsContainer,
-        [Ref] VariablesContainer parameterVariablesContainer);
+        [Ref] VariablesContainer parameterVariablesContainer,
+        [Ref] ResourcesContainer parameterResourcesContainer);
 
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForBehaviorEventsFunction(
         [Const, Ref] Project project,
@@ -741,7 +739,9 @@ interface ProjectScopedContainers {
         [Const, Ref] EventsFunction eventsFunction,
         [Ref] ObjectsContainer parameterObjectsContainer,
         [Ref] VariablesContainer parameterVariablesContainer,
-        [Ref] VariablesContainer propertyVariablesContainer);
+        [Ref] VariablesContainer propertyVariablesContainer,
+        [Ref] ResourcesContainer parameterResourcesContainer,
+        [Ref] ResourcesContainer propertyResourcesContainer);
 
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForObjectEventsFunction(
         [Const, Ref] Project project,
@@ -750,7 +750,9 @@ interface ProjectScopedContainers {
         [Const, Ref] EventsFunction eventsFunction,
         [Ref] ObjectsContainer parameterObjectsContainer,
         [Ref] VariablesContainer parameterVariablesContainer,
-        [Ref] VariablesContainer propertyVariablesContainer);
+        [Ref] VariablesContainer propertyVariablesContainer,
+        [Ref] ResourcesContainer parameterResourcesContainer,
+        [Ref] ResourcesContainer propertyResourcesContainer);
 
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForEventsBasedObject(
         [Const, Ref] Project project,
@@ -770,6 +772,7 @@ interface ProjectScopedContainers {
 
   [Const, Ref] ObjectsContainersList GetObjectsContainersList();
   [Const, Ref] VariablesContainersList GetVariablesContainersList();
+  [Const, Ref] ResourcesContainersList GetResourcesContainersList();
 };
 
 interface ExtensionProperties {
@@ -782,10 +785,14 @@ interface ExtensionProperties {
     void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
+interface BehaviorDefaultFlagClearer {
+    void STATIC_SerializeObjectWithCleanDefaultBehaviorFlags(
+        [Const, Ref] gdObject obj,
+        [Ref] SerializerElement serializerElement);
+};
+
 interface Behavior {
     void Behavior();
-
-    Behavior Clone();
 
     void SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();
@@ -1057,6 +1064,8 @@ interface Effect {
 
   void SetFolded(boolean val);
   boolean IsFolded();
+  void SetEnabled(boolean val);
+  boolean IsEnabled();
 
   void SetDoubleParameter([Const] DOMString name, double value);
   double GetDoubleParameter([Const] DOMString name);
@@ -1119,6 +1128,8 @@ interface Layer {
     void SetCamera3DFarPlaneDistance(double distance);
     double GetCamera3DFieldOfView();
     void SetCamera3DFieldOfView(double angle);
+    double GetCamera2DPlaneMaxDrawingDistance();
+    void SetCamera2DPlaneMaxDrawingDistance(double distance);
 
     void SetAmbientLightColor(unsigned long r, unsigned long g, unsigned long b);
     unsigned long GetAmbientLightColorRed();
@@ -1302,8 +1313,17 @@ interface Resource {
     void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
-interface ResourcesManager {
-    void ResourcesManager();
+enum ResourcesContainer_SourceType {
+  "ResourcesContainer::Unknown",
+  "ResourcesContainer::Global",
+  "ResourcesContainer::Parameters",
+  "ResourcesContainer::Properties",
+};
+
+interface ResourcesContainer {
+    void ResourcesContainer(ResourcesContainer_SourceType sourceType);
+
+    ResourcesContainer_SourceType GetSourceType();
 
     [Value] VectorString GetAllResourceNames();
     [Value] VectorString FindFilesNotInResources([Const, Ref] VectorString filesToCheck);
@@ -1318,6 +1338,15 @@ interface ResourcesManager {
     boolean MoveResourceUpInList([Const] DOMString oldName);
     boolean MoveResourceDownInList([Const] DOMString oldName);
     void MoveResource(unsigned long oldIndex, unsigned long newIndex);
+};
+
+interface ResourcesContainersList {
+  boolean HasResourceNamed([Const] DOMString name);
+  [Const, Ref] Resource GetResource([Const] DOMString name);
+  [Const, Ref] ResourcesContainer GetResourcesContainerFromResourceName([Const] DOMString resourceName);
+
+  [Const, Ref] ResourcesContainer GetResourcesContainer(unsigned long index);
+  unsigned long GetResourcesContainersCount();
 };
 
 interface ImageResource {
@@ -1432,6 +1461,13 @@ interface InitialInstance {
     double GetCustomHeight();
     void SetCustomDepth(double depth);
     double GetCustomDepth();
+
+    double GetDefaultWidth();
+    double GetDefaultHeight();
+    double GetDefaultDepth();
+    void SetDefaultWidth(double width);
+    void SetDefaultHeight(double height);
+    void SetDefaultDepth(double depth);
 
     [Ref] InitialInstance ResetPersistentUuid();
     [Const, Ref] DOMString GetPersistentUuid();
@@ -1922,6 +1958,7 @@ interface ObjectMetadata {
     [Const, Ref] DOMString GetCategoryFullName();
 
     [Ref] ObjectMetadata SetCategoryFullName([Const] DOMString categoryFullName);
+    [Ref] InGameEditorResourceMetadata AddInGameEditorResource();
 
     [Const, Ref] InstructionMetadata AddScopedCondition([Const] DOMString name,
                                         [Const] DOMString fullname,
@@ -2010,6 +2047,12 @@ interface ObjectMetadata {
 
     [Ref] ObjectMetadata SetOpenFullEditorLabel([Const] DOMString label);
     [Const, Ref] DOMString GetOpenFullEditorLabel();
+};
+
+interface InGameEditorResourceMetadata {
+    [Ref] InGameEditorResourceMetadata SetResourceName([Const] DOMString resourceName);
+    [Ref] InGameEditorResourceMetadata SetFilePath([Const] DOMString relativeFilePath);
+    [Ref] InGameEditorResourceMetadata SetKind([Const] DOMString kind);
 };
 
 enum QuickCustomization_Visibility {
@@ -2149,6 +2192,9 @@ interface BehaviorMetadata {
 
     boolean IsRelevantForChildObjects();
     [Ref] BehaviorMetadata MarkAsIrrelevantForChildObjects();
+
+    boolean IsActivatedByDefaultInEditor();
+    [Ref] BehaviorMetadata MarkAsActivatedByDefaultInEditor();
 
     QuickCustomization_Visibility GetQuickCustomizationVisibility();
     [Ref] BehaviorMetadata SetQuickCustomizationVisibility(QuickCustomization_Visibility visibility);
@@ -2846,6 +2892,24 @@ interface WholeProjectRefactorer {
     void STATIC_UpdateBehaviorsSharedData([Ref] Project project);
 };
 
+interface BehaviorParameterFiller {
+    boolean STATIC_FillBehaviorParameters(
+        [Const, Ref] Platform platform,
+        [Const, Ref] ProjectScopedContainers projectScopedContainers,
+        [Const, Ref] InstructionMetadata instructionMetadata,
+        [Ref] Instruction instruction);
+};
+
+interface InstructionValidator {
+  boolean STATIC_IsParameterValid(
+    [Const, Ref] Platform platform,
+    [Const, Ref] ProjectScopedContainers projectScopedContainers,
+    [Const, Ref] Instruction instruction,
+    [Const, Ref] InstructionMetadata metadata,
+    long parameterIndex,
+    [Const] DOMString value);
+};
+
 interface ObjectTools {
     boolean STATIC_IsBehaviorCompatibleWithObject(
         [Const, Ref] Platform platform,
@@ -2874,6 +2938,16 @@ interface UsedExtensionsResult {
 
 interface UsedExtensionsFinder {
   [Value] UsedExtensionsResult STATIC_ScanProject([Ref] Project project);
+  [Value] UsedExtensionsResult STATIC_ScanEventsFunctionsExtension(
+    [Ref] Project project, [Const, Ref]
+    EventsFunctionsExtension eventsFunctionsExtension);
+  [Value] VectorString STATIC_FindExtensionsDependentOn(
+    [Ref] Project project, [Const, Ref]
+    EventsFunctionsExtension eventsFunctionsExtension);
+};
+
+interface UsedObjectTypeFinder {
+  boolean STATIC_ScanProject([Ref] Project project, [Const] DOMString objectType);
 };
 
 interface ExampleExtensionUsagesFinder {
@@ -3443,7 +3517,7 @@ interface ArbitraryResourceWorker {
 };
 [JSImplementation=ArbitraryResourceWorker]
 interface ArbitraryResourceWorkerJS {
-    void ArbitraryResourceWorkerJS([Ref] ResourcesManager resourcesManager);
+    void ArbitraryResourceWorkerJS([Ref] ResourcesContainer resourcesManager);
 
     void ExposeImage([Ref] DOMString image);
     void ExposeShader([Ref] DOMString shader);
@@ -3451,7 +3525,7 @@ interface ArbitraryResourceWorkerJS {
 };
 
 interface ResourcesMergingHelper {
-    void ResourcesMergingHelper([Ref] ResourcesManager resourcesManager, [Ref] AbstractFileSystem fs);
+    void ResourcesMergingHelper([Ref] ResourcesContainer resourcesManager, [Ref] AbstractFileSystem fs);
 
     void SetBaseDirectory([Const] DOMString basePath);
     [Ref] MapStringString GetAllResourcesOldAndNewFilename();
@@ -3459,7 +3533,7 @@ interface ResourcesMergingHelper {
 ResourcesMergingHelper implements ArbitraryResourceWorker;
 
 interface ResourcesRenamer {
-    void ResourcesRenamer([Ref] ResourcesManager resourcesManager, [Const, Ref] MapStringString oldToNewNames);
+    void ResourcesRenamer([Ref] ResourcesContainer resourcesManager, [Const, Ref] MapStringString oldToNewNames);
 };
 ResourcesRenamer implements ArbitraryResourceWorker;
 
@@ -3473,7 +3547,7 @@ interface ProjectResourcesCopier {
 };
 
 interface ObjectsUsingResourceCollector {
-    void ObjectsUsingResourceCollector([Ref] ResourcesManager resourcesManager, [Const] DOMString resourceName);
+    void ObjectsUsingResourceCollector([Ref] ResourcesContainer resourcesManager, [Const] DOMString resourceName);
     [Const, Ref] VectorString GetObjectNames();
 
     //Inherited from ArbitraryObjectsWorker
@@ -3481,7 +3555,7 @@ interface ObjectsUsingResourceCollector {
 };
 
 interface ResourcesInUseHelper {
-    void ResourcesInUseHelper([Ref] ResourcesManager resourcesManager);
+    void ResourcesInUseHelper([Ref] ResourcesContainer resourcesManager);
 
     [Const, Ref] VectorString GetAllResources();
     [Ref] SetString GetAllImages();
@@ -4005,11 +4079,27 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetFallbackAuthor([Const] DOMString id, [Const] DOMString username);
     [Ref] PreviewExportOptions SetAuthenticatedPlayer([Const] DOMString playerId, [Const] DOMString playerUsername, [Const] DOMString playerToken);
     [Ref] PreviewExportOptions SetExternalLayoutName([Const] DOMString externalLayoutName);
+    [Ref] PreviewExportOptions SetEventsBasedObjectType([Const] DOMString eventsBasedObjectType);
+    [Ref] PreviewExportOptions SetEventsBasedObjectVariantName([Const] DOMString eventsBasedObjectVariantName);
     [Ref] PreviewExportOptions SetIncludeFileHash([Const] DOMString includeFile, long hash);
-    [Ref] PreviewExportOptions SetProjectDataOnlyExport(boolean enable);
+    [Ref] PreviewExportOptions SetShouldClearExportFolder(boolean enable);
+    [Ref] PreviewExportOptions SetShouldReloadProjectData(boolean enable);
+    [Ref] PreviewExportOptions SetShouldReloadLibraries(boolean enable);
+    [Ref] PreviewExportOptions SetShouldGenerateScenesEventsCode(boolean enable);
     [Ref] PreviewExportOptions SetNativeMobileApp(boolean enable);
     [Ref] PreviewExportOptions SetFullLoadingScreen(boolean enable);
     [Ref] PreviewExportOptions SetIsDevelopmentEnvironment(boolean enable);
+    [Ref] PreviewExportOptions SetIsInGameEdition(boolean enable);
+    [Ref] PreviewExportOptions SetInGameEditorSettingsJson([Const] DOMString inGameEditorSettingsJson);
+    [Ref] PreviewExportOptions SetEditorId([Const] DOMString editorId);
+    [Ref] PreviewExportOptions SetEditorCameraState3D(
+        [Const] DOMString cameraMode,
+        double positionX,
+        double positionY,
+        double positionZ,
+        double rotationAngle,
+        double elevationAngle,
+        double distance);
     [Ref] PreviewExportOptions SetNonRuntimeScriptsCacheBurst(unsigned long value);
     [Ref] PreviewExportOptions SetElectronRemoteRequirePath([Const] DOMString electronRemoteRequirePath);
     [Ref] PreviewExportOptions SetGDevelopResourceToken([Const] DOMString gdevelopResourceToken);
@@ -4036,6 +4126,13 @@ interface Exporter {
 
     boolean ExportProjectForPixiPreview([Const, Ref] PreviewExportOptions options);
     boolean ExportWholePixiProject([Const, Ref] ExportOptions options);
+    void SerializeProjectData(
+        [Const, Ref] Project project,
+        [Const, Ref] PreviewExportOptions options,
+        [Ref] SerializerElement projectDataElement);
+    void SerializeRuntimeGameOptions(
+        [Const, Ref] PreviewExportOptions options,
+        [Ref] SerializerElement runtimeGameOptionsElement);
 
     [Const, Ref] DOMString GetLastError();
 };

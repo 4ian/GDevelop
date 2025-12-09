@@ -203,13 +203,17 @@ namespace gdjs {
     }
 
     unloadResource(resourceData: ResourceData): void {
-      const loadedSpineAtlas = this._loadedSpineAtlases.get(resourceData);
+      const loadedSpineAtlas = this._loadedSpineAtlases.getFromName(
+        resourceData.name
+      );
       if (loadedSpineAtlas) {
         loadedSpineAtlas.dispose();
         this._loadedSpineAtlases.delete(resourceData);
       }
 
-      const loadingSpineAtlas = this._loadingSpineAtlases.get(resourceData);
+      const loadingSpineAtlas = this._loadingSpineAtlases.getFromName(
+        resourceData.name
+      );
       if (loadingSpineAtlas) {
         loadingSpineAtlas.then((atl) => atl.dispose());
         this._loadingSpineAtlases.delete(resourceData);

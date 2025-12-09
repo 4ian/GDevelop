@@ -17,7 +17,6 @@ import { type FileMetadata, type StorageProvider } from '../ProjectsStorage';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import RouterContext from './RouterContext';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
-import { type OpenAskAiOptions } from '../AiGeneration/Utils';
 
 type Props = {|
   project: ?gdProject,
@@ -34,7 +33,6 @@ type Props = {|
     privateGameTemplateListingData: PrivateGameTemplateListingData,
     newProjectSetup: NewProjectSetup
   ) => Promise<CreateProjectResult>,
-  openAskAi: (?OpenAskAiOptions) => void,
   closeAskAi: () => void,
   storageProviders: Array<StorageProvider>,
   storageProvider: ?StorageProvider,
@@ -50,6 +48,8 @@ type Props = {|
         | 'none',
     |}
   ) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
 const useNewProjectDialog = ({
@@ -62,11 +62,12 @@ const useNewProjectDialog = ({
   createEmptyProject,
   createProjectFromExample,
   createProjectFromPrivateGameTemplate,
-  openAskAi,
   closeAskAi,
   storageProviders,
   storageProvider,
   onOpenLayout,
+  onWillInstallExtension,
+  onExtensionInstalled,
 }: Props) => {
   const [isFetchingExample, setIsFetchingExample] = React.useState(false);
   const [
@@ -200,25 +201,10 @@ const useNewProjectDialog = ({
     [onSelectExampleShortHeader, removeRouteArguments]
   );
 
-  const onOpenAskAi = React.useCallback(
-    () => {
-      closeNewProjectDialog();
-      openAskAi({
-        paneIdentifier: 'right',
-        // By default, function calls are paused on mount,
-        // to avoid resuming processing old requests automatically.
-        // In this case, we want to continue processing right away, as
-        // we're in the middle of a flow.
-        continueProcessingFunctionCallsOnMount: true,
-      });
-    },
-    [closeNewProjectDialog, openAskAi]
-  );
-
   const renderNewProjectDialog = () => {
     return (
       <>
-        {isFetchingExample && <LoaderModal show />}
+        {isFetchingExample && <LoaderModal showImmediately />}
         {newProjectSetupDialogOpen && (
           <NewProjectSetupDialog
             project={project}
@@ -231,7 +217,6 @@ const useNewProjectDialog = ({
             onCreateProjectFromPrivateGameTemplate={
               createProjectFromPrivateGameTemplate
             }
-            onOpenAskAi={onOpenAskAi}
             onCloseAskAi={closeAskAi}
             storageProviders={storageProviders}
             storageProvider={storageProvider}
@@ -256,6 +241,8 @@ const useNewProjectDialog = ({
             }
             preventBackHome={preventBackHome}
             onOpenLayout={onOpenLayout}
+            onWillInstallExtension={onWillInstallExtension}
+            onExtensionInstalled={onExtensionInstalled}
           />
         )}
       </>

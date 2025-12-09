@@ -33,6 +33,8 @@ import Cross from '../UI/CustomSvgIcons/Cross';
 import useResourcesChangedWatcher from './UseResourcesChangedWatcher';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import { mapVector } from '../Utils/MapFor';
 
 const styles = {
   textFieldStyle: { display: 'flex', flex: 1 },
@@ -40,6 +42,7 @@ const styles = {
 
 type Props = {|
   project: gdProject,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   resourceManagementProps: ResourceManagementProps,
   resourcesLoader: typeof ResourcesLoader,
   resourceKind: ResourceKind,
@@ -66,6 +69,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
   (props, ref) => {
     const {
       project,
+      projectScopedContainersAccessor,
       initialResourceName,
       defaultNewResourceName,
       resourceManagementProps,
@@ -130,15 +134,30 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
       [initialResourceName]
     );
 
+    const _onChange = React.useCallback(
+      (value: string) => {
+        if (value === resourceName) {
+          return;
+        }
+        if (onChange) {
+          onChange(value);
+        }
+        if (resourceManagementProps.onResourceUsageChanged) {
+          resourceManagementProps.onResourceUsageChanged();
+        }
+      },
+      [resourceName, onChange, resourceManagementProps]
+    );
+
     const onResetResourceName = React.useCallback(
       () => {
         setResourceName('');
         if (autoCompleteRef.current)
           autoCompleteRef.current.forceInputValueTo('');
         setNotFoundError(false);
-        if (onChange) onChange('');
+        _onChange('');
       },
-      [onChange]
+      [_onChange]
     );
 
     const onChangeResourceName = React.useCallback(
@@ -147,18 +166,21 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
           onResetResourceName();
           return;
         }
+        if (newResourceName === resourceName) {
+          return;
+        }
         const isMissing =
           allResourcesNamesRef.current.indexOf(newResourceName) === -1;
 
         if (!isMissing) {
-          if (onChange) onChange(newResourceName);
+          _onChange(newResourceName);
         }
         setResourceName(newResourceName);
         if (autoCompleteRef.current)
           autoCompleteRef.current.forceInputValueTo(newResourceName);
         setNotFoundError(isMissing);
       },
-      [onChange, onResetResourceName]
+      [resourceName, _onChange, onResetResourceName]
     );
 
     const onInputValueChange = React.useCallback(
@@ -172,30 +194,44 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
     );
 
     const loadFrom = React.useCallback(
-      (resourcesManager: gdResourcesManager) => {
-        const allResourcesNames = resourcesManager
-          .getAllResourceNames()
-          .toJSArray();
-        if (resourceKind) {
-          const mainResourcesNames = allResourcesNames.filter(resourceName => {
-            return (
-              resourcesManager.getResource(resourceName).getKind() ===
-              resourceKind
-            );
-          });
+      (resourcesContainersList: gdResourcesContainersList) => {
+        const allResourcesNames = new Set<string>();
+        for (
+          let i = 0;
+          i < resourcesContainersList.getResourcesContainersCount();
+          i++
+        ) {
+          const resourcesContainer = resourcesContainersList.getResourcesContainer(
+            i
+          );
+
+          mapVector(
+            resourcesContainer.getAllResourceNames(),
+            (resourceName, index) => {
+              if (
+                resourcesContainer.getResource(resourceName).getKind() ===
+                resourceKind
+              ) {
+                allResourcesNames.add(resourceName);
+              }
+            }
+          );
 
           if (fallbackResourceKind) {
-            mainResourcesNames.push(
-              ...allResourcesNames.filter(resourceName => {
-                return (
-                  resourcesManager.getResource(resourceName).getKind() ===
+            mapVector(
+              resourcesContainer.getAllResourceNames(),
+              (resourceName, index) => {
+                if (
+                  resourcesContainer.getResource(resourceName).getKind() ===
                   fallbackResourceKind
-                );
-              })
+                ) {
+                  allResourcesNames.add(resourceName);
+                }
+              }
             );
           }
 
-          allResourcesNamesRef.current = mainResourcesNames;
+          allResourcesNamesRef.current = [...allResourcesNames];
         }
       },
       [resourceKind, fallbackResourceKind]
@@ -203,12 +239,12 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
 
     const refreshResources = React.useCallback(
       () => {
-        if (project) {
-          loadFrom(project.getResourcesManager());
-          forceUpdate();
-        }
+        loadFrom(
+          projectScopedContainersAccessor.get().getResourcesContainersList()
+        );
+        forceUpdate();
       },
-      [project, forceUpdate, loadFrom]
+      [projectScopedContainersAccessor, forceUpdate, loadFrom]
     );
 
     React.useEffect(
@@ -259,13 +295,18 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
 
             // addResource will check if a resource with the same name exists, and if it is
             // the case, no new resource will be added.
-            project.getResourcesManager().addResource(resource);
+            const hasCreatedAnyResource = project
+              .getResourcesManager()
+              .addResource(resource);
 
             // Important, we are responsible for deleting the resources that were given to us.
             // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
             selectedResources.forEach(resource => resource.delete());
 
-            await resourceManagementProps.onFetchNewlyAddedResources();
+            if (hasCreatedAnyResource) {
+              await resourceManagementProps.onFetchNewlyAddedResources();
+              resourceManagementProps.onNewResourcesAdded();
+            }
             triggerResourcesHaveChanged();
           }
 
@@ -344,7 +385,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
             resources[0].name,
           ]);
 
-          onChange(resources[0].name);
+          _onChange(resources[0].name);
           triggerResourcesHaveChanged();
           forceUpdate();
         } catch (error) {
@@ -368,7 +409,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
       [
         defaultNewResourceName,
         forceUpdate,
-        onChange,
+        _onChange,
         project,
         resourceManagementProps,
         resourceName,

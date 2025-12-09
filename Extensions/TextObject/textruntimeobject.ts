@@ -340,7 +340,9 @@ namespace gdjs {
       return this._renderer.getRendererObject();
     }
 
-    override update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+    override updatePreRender(
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ): void {
       this._renderer.ensureUpToDate();
     }
 
@@ -358,9 +360,11 @@ namespace gdjs {
       } else {
         this.setWrapping(false);
       }
-      if (initialInstanceData.opacity !== undefined) {
-        this.setOpacity(initialInstanceData.opacity);
-      }
+      this.setOpacity(
+        initialInstanceData.opacity === undefined
+          ? 255
+          : initialInstanceData.opacity
+      );
     }
 
     /**

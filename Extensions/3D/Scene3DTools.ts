@@ -153,11 +153,7 @@ namespace gdjs {
         cameraIndex: integer
       ): float => {
         const layer = runtimeScene.getLayer(layerName);
-        const layerRenderer = layer.getRenderer();
-
-        const threeCamera = layerRenderer.getThreeCamera();
-        if (!threeCamera) return 0;
-        return threeCamera.near;
+        return layer.getCamera3DNearPlaneDistance();
       };
 
       export const setNearPlane = (
@@ -167,19 +163,7 @@ namespace gdjs {
         cameraIndex: integer
       ) => {
         const layer = runtimeScene.getLayer(layerName);
-        const layerRenderer = layer.getRenderer();
-
-        const threeCamera = layerRenderer.getThreeCamera();
-        if (!threeCamera) return;
-
-        threeCamera.near = Math.min(
-          // 0 is not a valid value for three js perspective camera:
-          // https://threejs.org/docs/#api/en/cameras/PerspectiveCamera.
-          Math.max(distance, 0.0001),
-          // Near value cannot exceed far value.
-          threeCamera.far
-        );
-        layerRenderer.setThreeCameraDirty(true);
+        layer.setCamera3DNearPlaneDistance(distance);
       };
 
       export const getFarPlane = (
@@ -188,11 +172,7 @@ namespace gdjs {
         cameraIndex: integer
       ): float => {
         const layer = runtimeScene.getLayer(layerName);
-        const layerRenderer = layer.getRenderer();
-
-        const threeCamera = layerRenderer.getThreeCamera();
-        if (!threeCamera) return 0;
-        return threeCamera.far;
+        return layer.getCamera3DFarPlaneDistance();
       };
 
       export const setFarPlane = (
@@ -202,14 +182,7 @@ namespace gdjs {
         cameraIndex: integer
       ) => {
         const layer = runtimeScene.getLayer(layerName);
-        const layerRenderer = layer.getRenderer();
-
-        const threeCamera = layerRenderer.getThreeCamera();
-        if (!threeCamera) return;
-
-        // Far value cannot be lower than near value
-        threeCamera.far = Math.max(distance, threeCamera.near);
-        layerRenderer.setThreeCameraDirty(true);
+        layer.setCamera3DFarPlaneDistance(distance);
       };
 
       export const getFov = (
@@ -218,14 +191,7 @@ namespace gdjs {
         cameraIndex: integer
       ): float => {
         const layer = runtimeScene.getLayer(layerName);
-        const layerRenderer = layer.getRenderer();
-
-        const threeCamera = layerRenderer.getThreeCamera();
-        return threeCamera
-          ? threeCamera instanceof THREE.OrthographicCamera
-            ? 0
-            : threeCamera.fov
-          : assumedFovIn2D;
+        return layer.getCamera3DFieldOfView();
       };
 
       export const setFov = (
@@ -235,14 +201,7 @@ namespace gdjs {
         cameraIndex: integer
       ) => {
         const layer = runtimeScene.getLayer(layerName);
-        const layerRenderer = layer.getRenderer();
-
-        const threeCamera = layerRenderer.getThreeCamera();
-        if (!threeCamera || threeCamera instanceof THREE.OrthographicCamera)
-          return;
-
-        threeCamera.fov = Math.min(Math.max(angle, 0), 180);
-        layerRenderer.setThreeCameraDirty(true);
+        layer.setCamera3DFieldOfView(angle);
       };
     }
   }

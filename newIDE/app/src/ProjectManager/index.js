@@ -83,6 +83,8 @@ import { ColumnStackLayout } from '../UI/Layout';
 import { isMacLike } from '../Utils/Platform';
 import optionalRequire from '../Utils/OptionalRequire';
 import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+
 const electron = optionalRequire('electron');
 
 export const getProjectManagerItemId = (identifier: string) =>
@@ -418,15 +420,19 @@ type Props = {|
   onReloadEventsFunctionsExtensions: () => void,
   isOpen: boolean,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
-  onInstallExtension: (extensionName: string) => void,
   onShareProject: () => void,
   onOpenHomePage: () => void,
   toggleProjectManager: () => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onSceneAdded: () => void,
+  onExternalLayoutAdded: () => void,
 
   // Main menu
   mainMenuCallbacks: MainMenuCallbacks,
   buildMainMenuProps: BuildMainMenuProps,
+
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor | null,
 
   // For resources:
   resourceManagementProps: ResourceManagementProps,
@@ -457,15 +463,18 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       onReloadEventsFunctionsExtensions,
       isOpen,
       hotReloadPreviewButtonProps,
-      onInstallExtension,
+      onWillInstallExtension,
       onShareProject,
       resourceManagementProps,
+      projectScopedContainersAccessor,
       gamesList,
       onOpenHomePage,
       toggleProjectManager,
       mainMenuCallbacks,
       buildMainMenuProps,
       onExtensionInstalled,
+      onSceneAdded,
+      onExternalLayoutAdded,
     },
     ref
   ) => {
@@ -646,6 +655,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         newScene.updateBehaviorsSharedData(project);
         addDefaultLightToAllLayers(newScene);
 
+        onSceneAdded();
+
         onProjectItemModified();
 
         const sceneItemId = getSceneTreeViewItemId(newScene);
@@ -663,7 +674,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         // We focus it so the user can edit the name directly.
         editName(sceneItemId);
       },
-      [project, onProjectItemModified, editName, scrollToItem]
+      [project, onProjectItemModified, editName, scrollToItem, onSceneAdded]
     );
 
     const onCreateNewExtension = React.useCallback(
@@ -780,6 +791,9 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           newName,
           index + 1
         );
+
+        onExternalLayoutAdded();
+
         onProjectItemModified();
 
         const externalLayoutItemId = getExternalLayoutTreeViewItemId(
@@ -802,7 +816,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         // We focus it so the user can edit the name directly.
         editName(externalLayoutItemId);
       },
-      [project, onProjectItemModified, editName, scrollToItem]
+      [
+        project,
+        onProjectItemModified,
+        editName,
+        scrollToItem,
+        onExternalLayoutAdded,
+      ]
     );
 
     const onTreeModified = React.useCallback(
@@ -1397,19 +1417,26 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                       <Trans>To begin, open or create a new project.</Trans>
                     </EmptyMessage>
                   )}
-                  {project && projectPropertiesDialogOpen && (
-                    <ProjectPropertiesDialog
-                      open
-                      initialTab={projectPropertiesDialogInitialTab}
-                      project={project}
-                      onClose={() => setProjectPropertiesDialogOpen(false)}
-                      onApply={onSaveProjectProperties}
-                      onPropertiesApplied={onProjectPropertiesApplied}
-                      resourceManagementProps={resourceManagementProps}
-                      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-                      i18n={i18n}
-                    />
-                  )}
+                  {projectPropertiesDialogOpen &&
+                    project &&
+                    projectScopedContainersAccessor && (
+                      <ProjectPropertiesDialog
+                        open
+                        initialTab={projectPropertiesDialogInitialTab}
+                        project={project}
+                        onClose={() => setProjectPropertiesDialogOpen(false)}
+                        onApply={onSaveProjectProperties}
+                        onPropertiesApplied={onProjectPropertiesApplied}
+                        resourceManagementProps={resourceManagementProps}
+                        projectScopedContainersAccessor={
+                          projectScopedContainersAccessor
+                        }
+                        hotReloadPreviewButtonProps={
+                          hotReloadPreviewButtonProps
+                        }
+                        i18n={i18n}
+                      />
+                    )}
                   {project && projectVariablesEditorOpen && (
                     <GlobalVariablesDialog
                       project={project}
@@ -1423,23 +1450,31 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                       isListLocked={false}
                     />
                   )}
-                  {project && !!editedPropertiesLayout && (
-                    <ScenePropertiesDialog
-                      open
-                      layout={editedPropertiesLayout}
-                      project={project}
-                      onApply={() => {
-                        triggerUnsavedChanges();
-                        onOpenLayoutProperties(null);
-                      }}
-                      onClose={() => onOpenLayoutProperties(null)}
-                      onEditVariables={() => {
-                        onOpenLayoutVariables(editedPropertiesLayout);
-                        onOpenLayoutProperties(null);
-                      }}
-                      resourceManagementProps={resourceManagementProps}
-                    />
-                  )}
+                  {!!editedPropertiesLayout &&
+                    project &&
+                    projectScopedContainersAccessor && (
+                      <ScenePropertiesDialog
+                        open
+                        layout={editedPropertiesLayout}
+                        project={project}
+                        onApply={() => {
+                          triggerUnsavedChanges();
+                          onOpenLayoutProperties(null);
+                        }}
+                        onClose={() => onOpenLayoutProperties(null)}
+                        onEditVariables={() => {
+                          onOpenLayoutVariables(editedPropertiesLayout);
+                          onOpenLayoutProperties(null);
+                        }}
+                        resourceManagementProps={resourceManagementProps}
+                        projectScopedContainersAccessor={
+                          projectScopedContainersAccessor
+                        }
+                        onBackgroundColorChanged={() => {
+                          // TODO This can probably wait the rework of scene properties.
+                        }}
+                      />
+                    )}
                   {project && !!editedVariablesLayout && (
                     <SceneVariablesDialog
                       open
@@ -1458,7 +1493,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     <ExtensionsSearchDialog
                       project={project}
                       onClose={() => setExtensionsSearchDialogOpen(false)}
-                      onInstallExtension={onInstallExtension}
+                      onWillInstallExtension={onWillInstallExtension}
                       onCreateNew={() => {
                         onCreateNewExtension(project, i18n);
                       }}
@@ -1479,7 +1514,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         }
                         extensionShortHeader={openedExtensionShortHeader}
                         extensionName={openedExtensionName}
-                        onInstallExtension={onInstallExtension}
+                        onWillInstallExtension={onWillInstallExtension}
+                        onExtensionInstalled={onExtensionInstalled}
                       />
                     )}
                 </>

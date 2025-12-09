@@ -307,7 +307,7 @@ const CollisionMasksEditor = ({
   if (!animations.getAnimationsCount()) return null;
   const resourceName = sprite ? sprite.getImageName() : '';
 
-  const editors: { [string]: Editor } = {
+  const editors: { [string]: Editor | null } = {
     preview: {
       type: 'primary',
       noTitleBar: true,
@@ -458,7 +458,11 @@ const CollisionMasksEditor = ({
 
   return (
     <div style={{ flex: 1 }}>
-      <EditorMosaic editors={editors} initialNodes={editorNodes} />
+      <EditorMosaic
+        editors={editors}
+        initialNodes={editorNodes}
+        centralNodeId=""
+      />
     </div>
   );
 };

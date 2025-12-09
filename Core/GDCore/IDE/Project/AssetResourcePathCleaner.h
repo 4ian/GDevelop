@@ -30,7 +30,7 @@ namespace gd {
 class GD_CORE_API AssetResourcePathCleaner : public ArbitraryResourceWorker {
 public:
   AssetResourcePathCleaner(
-      gd::ResourcesManager &resourcesManager,
+      gd::ResourcesContainer &resourcesManager,
       std::map<gd::String, gd::String> &resourcesFileNameMap_,
       std::map<gd::String, gd::String> &resourcesNameReverseMap_)
       : ArbitraryResourceWorker(resourcesManager),

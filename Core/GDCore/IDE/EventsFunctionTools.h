@@ -14,6 +14,7 @@ class EventsFunctionsContainer;
 class ObjectsContainer;
 class ParameterMetadataContainer;
 class PropertiesContainer;
+class ResourcesContainer;
 class VariablesContainer;
 class ParameterMetadata;
 class EventsFunction;
@@ -79,5 +80,13 @@ class GD_CORE_API EventsFunctionTools {
   static void PropertiesToVariablesContainer(
       const PropertiesContainer &properties,
       gd::VariablesContainer &outputVariablesContainer);
+
+  static void ParametersToResourcesContainer(
+      const ParameterMetadataContainer &parameters,
+      gd::ResourcesContainer &outputResourcesContainer);
+
+  static void PropertiesToResourcesContainer(
+      const PropertiesContainer &properties,
+      gd::ResourcesContainer &outputResourcesContainer);
 };
 }  // namespace gd

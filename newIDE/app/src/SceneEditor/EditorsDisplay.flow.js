@@ -19,8 +19,10 @@ import ViewPosition from '../InstancesEditor/ViewPosition';
 import { type ObjectFolderOrObjectWithContext } from '../ObjectsList/EnumerateObjectFolderOrObject';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer';
+import { type EditorViewPosition2D } from '../InstancesEditor';
 
 export type SceneEditorsDisplayProps = {|
+  gameEditorMode: 'embedded-game' | 'instances-editor',
   project: gdProject,
   layout: gdLayout | null,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
@@ -39,10 +41,12 @@ export type SceneEditorsDisplayProps = {|
     multiSelect: boolean,
     targetPosition?: 'center' | 'upperCenter'
   ) => void,
+  onInstancesModified?: (Array<gdInitialInstance>) => void,
   editInstanceVariables: (instance: ?gdInitialInstance) => void,
   editObjectByName: (objectName: string, initialTab?: ObjectEditorTab) => void,
   editObjectInPropertiesPanel: (objectName: string) => void,
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
+  onEffectAdded: () => void,
   onOpenEventBasedObjectEditor: (
     extensionName: string,
     eventsBasedObjectName: string
@@ -63,11 +67,22 @@ export type SceneEditorsDisplayProps = {|
   editLayer: (layer: ?gdLayer) => void,
   onRemoveLayer: (layerName: string, done: (boolean) => void) => void,
   onLayerRenamed: () => void,
-  onObjectCreated: gdObject => void,
-  onObjectEdited: ObjectWithContext => void,
+  onLayersModified: () => void,
+  onLayersVisibilityInEditorChanged: () => void,
+  onBackgroundColorChanged: () => void,
+  onObjectCreated: (
+    objects: Array<gdObject>,
+    isTheFirstOfItsTypeInProject: boolean
+  ) => void,
+  onObjectsModified: (objects: Array<gdObject>) => void,
+  onObjectEdited: (
+    objectWithContext: ObjectWithContext,
+    hasResourceChanged: boolean
+  ) => void,
   onObjectFolderOrObjectWithContextSelected: (
     ?ObjectFolderOrObjectWithContext
   ) => void,
+  onSetAsGlobalObject: (object: gdObject) => void,
   onExportAssets: () => void,
   onDeleteObjects: (
     i18n: I18nType,
@@ -103,6 +118,7 @@ export type SceneEditorsDisplayProps = {|
     i18n: I18nType,
     objectOrGroupName: string
   ) => boolean,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 
   updateBehaviorsSharedData: () => void,
@@ -120,6 +136,7 @@ export type SceneEditorsDisplayProps = {|
 
   instancesEditorSettings: InstancesEditorSettings,
   onInstancesEditorSettingsMutated: InstancesEditorSettings => void,
+  editorViewPosition2D: EditorViewPosition2D,
 
   historyHandler: HistoryHandler,
   unsavedChanges?: ?UnsavedChanges,
@@ -135,6 +152,8 @@ export type SceneEditorsDisplayProps = {|
   instancesEditorShortcutsCallbacks: InstancesEditorShortcutsCallbacks,
 
   onOpenedEditorsChanged: () => void,
+  onRestartInGameEditor: (reason: string) => void,
+  showRestartInGameEditorAfterErrorButton: boolean,
 |};
 
 export type SceneEditorsDisplayInterface = {|
@@ -148,6 +167,7 @@ export type SceneEditorsDisplayInterface = {|
   openNewObjectDialog: () => void,
   toggleEditorView: (editorId: EditorId) => void,
   isEditorVisible: (editorId: EditorId) => boolean,
+  ensureEditorVisible: (editorId: EditorId) => void,
   viewControls: {|
     zoomBy: (factor: number) => void,
     setZoomFactor: (factor: number) => void,

@@ -11,7 +11,7 @@ export default class InstancesSelection {
     return !!this.getSelectedInstances().length;
   }
 
-  getSelectedInstances() {
+  getSelectedInstances(): Array<gdInitialInstance> {
     return this.selection;
   }
 

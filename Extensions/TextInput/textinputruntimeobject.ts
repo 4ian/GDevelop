@@ -141,7 +141,9 @@ namespace gdjs {
       );
       this._borderOpacity = objectData.content.borderOpacity;
       this._borderWidth = objectData.content.borderWidth;
-      this._disabled = objectData.content.disabled;
+      this._disabled = instanceContainer.getGame().isInGameEdition()
+        ? true
+        : objectData.content.disabled;
       this._readOnly = objectData.content.readOnly;
       this._spellCheck =
         objectData.content.spellCheck !== undefined
@@ -334,9 +336,11 @@ namespace gdjs {
         this.setHeight(initialInstanceData.height);
         this._renderer.updatePadding();
       }
-      if (initialInstanceData.opacity !== undefined) {
-        this.setOpacity(initialInstanceData.opacity);
-      }
+      this.setOpacity(
+        initialInstanceData.opacity === undefined
+          ? 255
+          : initialInstanceData.opacity
+      );
     }
 
     onScenePaused(runtimeScene: gdjs.RuntimeScene): void {
@@ -566,6 +570,9 @@ namespace gdjs {
     }
 
     setDisabled(value: boolean) {
+      if (this.getInstanceContainer().getGame().isInGameEdition()) {
+        return;
+      }
       this._disabled = value;
       this._renderer.updateDisabled();
     }

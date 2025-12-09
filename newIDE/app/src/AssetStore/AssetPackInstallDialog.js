@@ -15,12 +15,10 @@ import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import { Column, Line } from '../UI/Grid';
 import {
   checkRequiredExtensionsUpdateForAssets,
-  installRequiredExtensions,
   installPublicAsset,
-  type RequiredExtensionInstallation,
   complyVariantsToEventsBasedObjectOf,
 } from './InstallAsset';
-import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
+import { useInstallExtension } from './ExtensionStore/InstallExtension';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import LinearProgress from '../UI/LinearProgress';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
@@ -32,12 +30,10 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import { mapFor } from '../Utils/MapFor';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import AlertMessage from '../UI/AlertMessage';
-import {
-  useExtensionUpdateAlertDialog,
-  useFetchAssets,
-} from './NewObjectDialog';
+import { useFetchAssets } from './NewObjectDialog';
 import { type InstallAssetOutput } from './InstallAsset';
 import { type ObjectFolderOrObjectWithContext } from '../ObjectsList/EnumerateObjectFolderOrObject';
+import { ExtensionStoreContext } from './ExtensionStore/ExtensionStoreContext';
 
 // We limit the number of assets that can be installed at once to avoid
 // timeouts especially with premium packs.
@@ -48,7 +44,8 @@ type Props = {|
   assetShortHeaders: Array<AssetShortHeader>,
   addedAssetIds: Set<string>,
   onClose: () => void,
-  onAssetsAdded: (createdObjects: gdObject[]) => void,
+  onAssetsAdded: InstallAssetOutput => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   project: gdProject,
   objectsContainer: ?gdObjectsContainer,
@@ -62,6 +59,7 @@ const AssetPackInstallDialog = ({
   addedAssetIds,
   onClose,
   onAssetsAdded,
+  onWillInstallExtension,
   onExtensionInstalled,
   project,
   objectsContainer,
@@ -94,15 +92,15 @@ const AssetPackInstallDialog = ({
     [resourceManagementProps]
   );
 
-  const eventsFunctionsExtensionsState = React.useContext(
-    EventsFunctionsExtensionsContext
-  );
   const { installPrivateAsset } = React.useContext(
     PrivateAssetsAuthorizationContext
   );
+  const {
+    translatedExtensionShortHeadersByName: extensionShortHeadersByName,
+  } = React.useContext(ExtensionStoreContext);
+  const installExtension = useInstallExtension();
 
   const fetchAssets = useFetchAssets();
-  const showExtensionUpdateConfirmation = useExtensionUpdateAlertDialog();
 
   const [selectedLayoutName, setSelectedLayoutName] = React.useState<string>(
     ''
@@ -155,31 +153,26 @@ const AssetPackInstallDialog = ({
       setAreAssetsBeingInstalled(true);
       try {
         const assets = await fetchAssets(assetShortHeaders);
-        const requiredExtensionInstallation: RequiredExtensionInstallation = await checkRequiredExtensionsUpdateForAssets(
+
+        const requiredExtensionInstallation = await checkRequiredExtensionsUpdateForAssets(
           {
             assets,
             project,
+            extensionShortHeadersByName,
           }
         );
-        const extensionUpdateAction =
-          requiredExtensionInstallation.outOfDateExtensionShortHeaders
-            .length === 0
-            ? 'skip'
-            : await showExtensionUpdateConfirmation({
-                project,
-                outOfDateExtensionShortHeaders:
-                  requiredExtensionInstallation.outOfDateExtensionShortHeaders,
-              });
-        if (extensionUpdateAction === 'abort') {
+        const wasExtensionsInstalled = await installExtension({
+          project,
+          requiredExtensionInstallation,
+          importedSerializedExtensions: [],
+          onWillInstallExtension,
+          onExtensionInstalled,
+          updateMode: 'all',
+          reason: 'asset',
+        });
+        if (!wasExtensionsInstalled) {
           return;
         }
-        await installRequiredExtensions({
-          requiredExtensionInstallation,
-          shouldUpdateExtension: extensionUpdateAction === 'update',
-          eventsFunctionsExtensionsState,
-          project,
-          onExtensionInstalled,
-        });
 
         // Use a pool to avoid installing an unbounded amount of assets at the same time.
         const { errors, results } = await PromisePool.withConcurrency(6)
@@ -219,7 +212,6 @@ const AssetPackInstallDialog = ({
             if (!installOutput) {
               throw new Error('Unable to install the asset.');
             }
-
             return installOutput;
           });
 
@@ -231,13 +223,21 @@ const AssetPackInstallDialog = ({
         }
 
         await resourceManagementProps.onFetchNewlyAddedResources();
+        resourceManagementProps.onNewResourcesAdded();
 
         setAreAssetsBeingInstalled(false);
         const createdObjects = results
           .map(result => result.createdObjects)
           .flat();
+        const isTheFirstOfItsTypeInProject = results
+          .map(result => result.isTheFirstOfItsTypeInProject)
+          .reduce(
+            (accumulator: boolean, currentValue: boolean) =>
+              accumulator || currentValue,
+            false
+          );
         complyVariantsToEventsBasedObjectOf(project, createdObjects);
-        onAssetsAdded(createdObjects);
+        onAssetsAdded({ createdObjects, isTheFirstOfItsTypeInProject });
       } catch (error) {
         setAreAssetsBeingInstalled(false);
         console.error('Error while installing the assets', error);
@@ -252,11 +252,12 @@ const AssetPackInstallDialog = ({
     [
       fetchAssets,
       project,
-      showExtensionUpdateConfirmation,
-      eventsFunctionsExtensionsState,
+      extensionShortHeadersByName,
+      installExtension,
+      onWillInstallExtension,
+      onExtensionInstalled,
       resourceManagementProps,
       onAssetsAdded,
-      onExtensionInstalled,
       installPrivateAsset,
       targetObjectsContainer,
       targetObjectFolderOrObjectWithContext,

@@ -94,27 +94,9 @@ app.on('ready', function() {
   registerGdideProtocol({ isDev });
 
   // Create the browser window.
-  const options = {
-    width: args.width || 800,
-    height: args.height || 600,
-    x: args.x,
-    y: args.y,
-    titleBarStyle: 'hidden',
-    titleBarOverlay: {
-      color: '#000000',
-      symbolColor: '#ffffff',
-    },
-    trafficLightPosition: { x: 12, y: 12 },
-    webPreferences: {
-      webSecurity: false, // Allow to access to local files,
-      // Allow Node.js API access in renderer process, as long
+  const options = { width: args.width || 800, height: args.height || 600, x: args.x, y: args.y, titleBarStyle: 'hidden', titleBarOverlay: { color: '#000000', symbolColor: '#ffffff' }, trafficLightPosition: { x: 12, y: 12 }, webPreferences: { webSecurity: false, // Allow Node.js API access in renderer process, as long // Allow to access to local files,
       // as we've not removed dependency on it and on "@electron/remote".
-      nodeIntegration: true,
-      contextIsolation: false,
-    },
-    enableLargerThanScreen: true,
-    backgroundColor: '#000',
-  };
+      nodeIntegration: true, contextIsolation: false }, enableLargerThanScreen: true, backgroundColor: '#000', frame: false, titleBarStyle: 'hiddenInset' }; // свой заголовок // чтоб красиво на macOS
 
   if (isIntegrated) {
     options.acceptFirstMouse = true;
@@ -270,6 +252,17 @@ app.on('ready', function() {
         mainWindow.setBackgroundColor(overlayOptions.color);
     }
   );
+
+  // Window maximize toggle (for double-click on titlebar):
+  ipcMain.handle('window-maximize-toggle', async () => {
+    if (!mainWindow) return;
+
+    if (mainWindow.isMaximized()) {
+      mainWindow.unmaximize();
+    } else {
+      mainWindow.maximize();
+    }
+  });
 
   // LocalFileDownloader events:
   ipcMain.handle('local-file-download', async (event, url, outputPath) => {

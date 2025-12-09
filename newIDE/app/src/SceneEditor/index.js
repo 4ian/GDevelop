@@ -1605,7 +1605,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
-  _onSelectLayer = (layer: gdLayer) => {
+  _onSelectLayer = (layer: gdLayer | null) => {
     this.setState({
       selectedLayer: layer,
       lastSelectionType: 'layer',

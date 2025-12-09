@@ -21,30 +21,32 @@ export const Default = () => {
   const [chosenLayer, setChosenLayer] = React.useState<string>('');
   return (
     <DragAndDropContextProvider>
-      <LayersList
-        project={testProject.project}
-        eventsFunctionsExtension={null}
-        eventsBasedObject={null}
-        chosenLayer={chosenLayer}
-        onChooseLayer={setChosenLayer}
-        onSelectLayer={action('onSelectLayer')}
-        onEditLayerEffects={action('onEditLayerEffects')}
-        onLayersModified={action('onLayersModified')}
-        onLayersVisibilityInEditorChanged={action(
-          'onLayersVisibilityInEditorChanged'
-        )}
-        onEditLayer={action('onEditLayer')}
-        onRemoveLayer={(layerName, cb) => {
-          cb(true);
-        }}
-        onLayerRenamed={action('onLayerRenamed')}
-        onCreateLayer={action('onCreateLayer')}
-        layout={testProject.testLayout}
-        layersContainer={testProject.testLayout.getLayers()}
-        hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
-        onBackgroundColorChanged={action('onBackgroundColorChanged')}
-        gameEditorMode={'embedded-game'}
-      />
+      <div style={{ height: 400 }}>
+        <LayersList
+          project={testProject.project}
+          eventsFunctionsExtension={null}
+          eventsBasedObject={null}
+          chosenLayer={chosenLayer}
+          onChooseLayer={setChosenLayer}
+          onSelectLayer={action('onSelectLayer')}
+          onEditLayerEffects={action('onEditLayerEffects')}
+          onLayersModified={action('onLayersModified')}
+          onLayersVisibilityInEditorChanged={action(
+            'onLayersVisibilityInEditorChanged'
+          )}
+          onEditLayer={action('onEditLayer')}
+          onRemoveLayer={(layerName, cb) => {
+            cb(true);
+          }}
+          onLayerRenamed={action('onLayerRenamed')}
+          onCreateLayer={action('onCreateLayer')}
+          layout={testProject.testLayout}
+          layersContainer={testProject.testLayout.getLayers()}
+          hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
+          onBackgroundColorChanged={action('onBackgroundColorChanged')}
+          gameEditorMode={'embedded-game'}
+        />
+      </div>
     </DragAndDropContextProvider>
   );
 };

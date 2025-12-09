@@ -100,14 +100,10 @@ app.on('ready', function() {
     x: args.x,
     y: args.y,
     titleBarStyle: 'hidden',
-    titleBarOverlay: {
-      color: '#000000',
-      symbolColor: '#ffffff',
-    },
+    titleBarOverlay: { color: '#000000', symbolColor: '#ffffff' },
     trafficLightPosition: { x: 12, y: 12 },
     webPreferences: {
-      webSecurity: false, // Allow to access to local files,
-      // Allow Node.js API access in renderer process, as long
+      webSecurity: false, // Allow Node.js API access in renderer process, as long // Allow to access to local files,
       // as we've not removed dependency on it and on "@electron/remote".
       nodeIntegration: true,
       contextIsolation: false,
@@ -270,6 +266,17 @@ app.on('ready', function() {
         mainWindow.setBackgroundColor(overlayOptions.color);
     }
   );
+
+  // Window maximize toggle (for double-click on titlebar):
+  ipcMain.handle('window-maximize-toggle', async () => {
+    if (!mainWindow) return;
+
+    if (mainWindow.isMaximized()) {
+      mainWindow.unmaximize();
+    } else {
+      mainWindow.maximize();
+    }
+  });
 
   // LocalFileDownloader events:
   ipcMain.handle('local-file-download', async (event, url, outputPath) => {

@@ -189,7 +189,7 @@ export class LayerTreeViewItemContent implements TreeViewItemContent {
       >
         <Radio
           checked={this._isChosenLayer()}
-          onChange={() => this.props.onSelectLayer(this.layer)}
+          onChange={() => this.props.onChooseLayer(this.layer.getName())}
           size="small"
           id={`layer-selected-${
             this._isChosenLayer() ? 'checked' : 'unchecked'

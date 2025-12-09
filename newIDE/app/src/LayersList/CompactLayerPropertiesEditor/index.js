@@ -155,7 +155,7 @@ export const CompactLayerPropertiesEditor = ({
   onEffectAdded,
 }: Props) => {
   const forceUpdate = useForceUpdate();
-  const [isPropertiesFolded, setIsPropertiesFolded] = React.useState(false);
+  const [isPropertiesFolded, setIsPropertiesFolded] = React.useState(true);
 
   // Properties:
   const { object, instanceSchema } = React.useMemo<{|

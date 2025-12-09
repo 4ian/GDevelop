@@ -155,7 +155,9 @@ export const CompactLayerPropertiesEditor = ({
   onEffectAdded,
 }: Props) => {
   const forceUpdate = useForceUpdate();
-  const [isPropertiesFolded, setIsPropertiesFolded] = React.useState(true);
+  const [isPropertiesFolded, setIsPropertiesFolded] = React.useState<
+    boolean | null
+  >(null);
 
   // Properties:
   const { object, instanceSchema } = React.useMemo<{|
@@ -219,7 +221,11 @@ export const CompactLayerPropertiesEditor = ({
           {instanceSchema && (
             <TopLevelCollapsibleSection
               title={<Trans>Properties</Trans>}
-              isFolded={isPropertiesFolded}
+              isFolded={
+                isPropertiesFolded === null
+                  ? !layer.isLightingLayer()
+                  : !!isPropertiesFolded
+              }
               toggleFolded={() => setIsPropertiesFolded(!isPropertiesFolded)}
               onOpenFullEditor={openFullEditor}
               renderContent={() => (

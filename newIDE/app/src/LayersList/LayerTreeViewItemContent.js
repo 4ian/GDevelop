@@ -21,7 +21,7 @@ export type LayerTreeViewItemProps = {|
   layersContainer: gdLayersContainer,
   chosenLayer: string,
   onChooseLayer: (layerName: string) => void,
-  onSelectLayer: (layer: gdLayer) => void,
+  onSelectLayer: (layer: gdLayer | null) => void,
   onEditLayer: (layer: ?gdLayer) => void,
   onDeleteLayer: (layer: gdLayer) => void,
   onLayersModified: () => void,
@@ -156,7 +156,10 @@ export class LayerTreeViewItemContent implements TreeViewItemContent {
       },
       {
         label: i18n._(t`Open layer editor`),
-        click: () => this.props.onEditLayer(this.layer),
+        click: () => {
+          this.props.onEditLayer(this.layer);
+          this.props.onSelectLayer(null);
+        },
       },
       {
         type: 'separator',

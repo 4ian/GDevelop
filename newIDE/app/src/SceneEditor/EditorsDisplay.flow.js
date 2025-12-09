@@ -64,7 +64,7 @@ export type SceneEditorsDisplayProps = {|
   chosenLayer: string,
   onChooseLayer: (layerName: string) => void,
   selectedLayer: gdLayer | null,
-  onSelectLayer: (layer: gdLayer) => void,
+  onSelectLayer: (layer: gdLayer | null) => void,
   editLayerEffects: (layer: ?gdLayer) => void,
   editLayer: (layer: ?gdLayer) => void,
   onRemoveLayer: (layerName: string, done: (boolean) => void) => void,

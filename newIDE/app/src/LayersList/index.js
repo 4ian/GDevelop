@@ -251,7 +251,7 @@ type Props = {|
   project: gdProject,
   chosenLayer: string,
   onChooseLayer: (layerName: string) => void,
-  onSelectLayer: (layer: gdLayer) => void,
+  onSelectLayer: (layer: gdLayer | null) => void,
   layout: gdLayout | null,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   eventsBasedObject: gdEventsBasedObject | null,

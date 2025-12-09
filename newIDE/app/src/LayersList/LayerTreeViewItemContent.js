@@ -204,16 +204,24 @@ export class LayerTreeViewItemContent implements TreeViewItemContent {
   }
 
   getIndex(): number {
-    return this.props.layersContainer.getLayerPosition(this.layer.getName());
+    return this._getRevertedIndex(
+      this.props.layersContainer.getLayerPosition(this.layer.getName())
+    );
+  }
+
+  _getRevertedIndex(index: number): number {
+    return this.props.layersContainer.getLayersCount() - 1 - index;
   }
 
   moveAt(destinationIndex: number): void {
     const originIndex = this.getIndex();
     if (destinationIndex !== originIndex) {
       this.props.layersContainer.moveLayer(
-        originIndex,
+        this._getRevertedIndex(originIndex),
         // When moving the item down, it must not be counted.
-        destinationIndex + (destinationIndex <= originIndex ? 0 : -1)
+        this._getRevertedIndex(
+          destinationIndex + (destinationIndex <= originIndex ? 0 : -1)
+        )
       );
       this._onProjectItemModified();
     }

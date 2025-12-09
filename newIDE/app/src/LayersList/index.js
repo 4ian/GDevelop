@@ -33,7 +33,6 @@ import {
 } from './LayerTreeViewItemContent';
 import {
   BackgroundColorTreeViewItemContent,
-  backgroundColorId,
 } from './BackgroundColorTreeViewItemContent';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
@@ -566,6 +565,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
               i18n._(t`Layers`),
               [
                 {
+                  // TODO Add an icon for the hidden state.
                   icon: <LightbulbIcon />,
                   label: !project.areEffectsHiddenInEditor()
                     ? i18n._(t`Disable effects/lighting in the editor`)

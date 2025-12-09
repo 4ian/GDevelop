@@ -756,9 +756,6 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
                     reactDndType={extensionItemReactDndType}
                     initiallyOpenedNodeIds={initiallyOpenedNodeIds}
                     forceDefaultDraggingPreview
-                    shouldHideMenuIcon={item =>
-                      item.content.getId() === backgroundColorId
-                    }
                   />
                 )}
               </AutoSizer>

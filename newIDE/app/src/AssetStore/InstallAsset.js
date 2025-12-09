@@ -112,6 +112,10 @@ export const installResource = (
   resourceNewNames[originalResourceName] = newName;
 };
 
+export type AddAssetOutput = {|
+  createdObjects: Array<gdObject>,
+|};
+
 export type InstallAssetOutput = {|
   createdObjects: Array<gdObject>,
   isTheFirstOfItsTypeInProject: boolean,
@@ -148,7 +152,7 @@ export const addAssetToProject = async ({
   objectsContainer,
   targetObjectFolderOrObject,
   requestedObjectName,
-}: InstallAssetArgs): Promise<InstallAssetOutput> => {
+}: InstallAssetArgs): Promise<AddAssetOutput> => {
   const objectNewNames = {};
   const resourceNewNames = {};
   const createdObjects: Array<gdObject> = [];
@@ -323,8 +327,6 @@ export const addAssetToProject = async ({
 
   return {
     createdObjects,
-    // This boolean is set by `useInstallAsset`
-    isTheFirstOfItsTypeInProject: false,
   };
 };
 

@@ -716,7 +716,9 @@ namespace gdjs {
      */
     getFullUrl(url: string) {
       if (this._runtimeGame.isInGameEdition()) {
-        url = addSearchParameterToUrl(url, 'cache', '' + Date.now());
+        if (url.startsWith('file://')) {
+          url = addSearchParameterToUrl(url, 'cache', '' + Date.now());
+        }
       }
       const { gdevelopResourceToken } = this._runtimeGame._options;
       if (!gdevelopResourceToken) return url;

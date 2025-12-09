@@ -11,6 +11,31 @@ namespace gdjs {
     behaviorTypeName: string;
   };
 
+  /** Each hot-reload has a unique ID to ease the debugging/reading logs. */
+  let nextHotReloadId = 1;
+
+  type HotReloadOptions = {
+    shouldReloadResources: boolean;
+    projectData: ProjectData;
+    runtimeGameOptions: RuntimeGameOptions;
+  };
+
+  const cloneHotReloadOptions = (
+    options: HotReloadOptions
+  ): HotReloadOptions => {
+    return JSON.parse(JSON.stringify(options));
+  };
+
+  const getOptionsLogString = (options: HotReloadOptions): string => {
+    return JSON.stringify({
+      shouldReloadResources: options.shouldReloadResources,
+      shouldReloadLibraries: options.runtimeGameOptions.shouldReloadLibraries,
+      shouldGenerateScenesEventsCode:
+        options.runtimeGameOptions.shouldGenerateScenesEventsCode,
+      newScriptFilesCount: options.runtimeGameOptions.scriptFiles?.length,
+    });
+  };
+
   /**
    * Reload scripts/data of an exported game and applies the changes
    * to the running runtime game.
@@ -21,7 +46,13 @@ namespace gdjs {
     _logs: HotReloaderLog[] = [];
     _alreadyLoadedScriptFiles: Record<string, boolean> = {};
     _existingScriptFiles: RuntimeGameOptionsScriptFile[] | null = null;
-    _isHotReloading: boolean = false;
+    _isHotReloadingSince: number | null = null;
+
+    _hotReloadsQueue: Array<{
+      hotReloadId: number;
+      onDone: (logs: HotReloaderLog[]) => void;
+      options: HotReloadOptions;
+    }> = [];
 
     /**
      * @param runtimeGame - The `gdjs.RuntimeGame` to be hot-reloaded.
@@ -151,23 +182,57 @@ namespace gdjs {
       });
     }
 
-    async hotReload({
-      shouldReloadResources,
-      projectData: newProjectData,
-      runtimeGameOptions: newRuntimeGameOptions,
-    }: {
-      shouldReloadResources: boolean;
-      projectData: ProjectData;
-      runtimeGameOptions: RuntimeGameOptions;
-    }): Promise<HotReloaderLog[]> {
-      if (this._isHotReloading) {
-        console.error('Hot reload already in progress, skipping.');
-        return [];
+    /**
+     * Trigger a hot-reload of the game.
+     * The hot-reload is added to a queue and processed in order.
+     *
+     * This allows the editor to trigger multiple hot-reloads in a row (even if
+     * it's sub-optimal) and not miss any (one could for example be reloading libraries
+     * or code, while other are just reloading resources).
+     */
+    async hotReload(options: HotReloadOptions): Promise<HotReloaderLog[]> {
+      return new Promise((resolve) => {
+        const hotReloadId = nextHotReloadId++;
+
+        this._hotReloadsQueue.push({
+          hotReloadId,
+          onDone: resolve,
+          // Clone the options to avoid any mutation while
+          // waiting for the hot-reload to be processed.
+          options: cloneHotReloadOptions(options),
+        });
+
+        if (this._hotReloadsQueue.length > 1) {
+          logger.info(
+            `Hot reload #${hotReloadId} added to queue. Options are: ${getOptionsLogString(options)}.`
+          );
+        }
+
+        this._processHotReloadsQueue();
+      });
+    }
+
+    private async _processHotReloadsQueue(): Promise<void> {
+      // Don't do anything if a hot-reload is already in progress:
+      // it will be processed later (see the end).
+      if (this._isHotReloadingSince || this._hotReloadsQueue.length === 0) {
+        return;
       }
 
-      this._isHotReloading = true;
+      // Mark the hot reload as started (so no other hot-reload is started).
+      this._isHotReloadingSince = Date.now();
 
-      logger.info('Hot reload started');
+      const { options, onDone, hotReloadId } = this._hotReloadsQueue.shift()!;
+      const {
+        shouldReloadResources,
+        projectData: newProjectData,
+        runtimeGameOptions: newRuntimeGameOptions,
+      } = options;
+
+      logger.info(
+        `Hot reload #${hotReloadId} started. Options are: ${getOptionsLogString(options)}.`
+      );
+
       const wasPaused = this._runtimeGame.isPaused();
       this._runtimeGame.pause(true);
       this._logs = [];
@@ -288,13 +353,23 @@ namespace gdjs {
         this._existingScriptFiles = newRuntimeGameOptions.scriptFiles;
       }
 
-      this._isHotReloading = false;
       logger.info(
-        'Hot reload finished with logs:',
-        this._logs.map((log) => '\n' + log.kind + ': ' + log.message)
+        `Hot reload #${hotReloadId} finished in ${Math.ceil(Date.now() - this._isHotReloadingSince)}ms with logs:\n${
+          this._logs.length > 0
+            ? this._logs.map((log) => '\n' + log.kind + ': ' + log.message)
+            : '(no logs)'
+        }`
       );
+      this._isHotReloadingSince = null;
       this._runtimeGame.pause(wasPaused);
-      return this._logs;
+      onDone(this._logs);
+
+      if (this._hotReloadsQueue.length > 0) {
+        logger.info(
+          `Still ${this._hotReloadsQueue.length} hot-reloads in queue. Starting the next one...`
+        );
+        this._processHotReloadsQueue();
+      }
     }
 
     _computeChangedRuntimeBehaviors(

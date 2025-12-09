@@ -25,6 +25,8 @@ import { setEmbeddedGameFramePreviewLocation } from '../../../EmbeddedGame/Embed
 import { immediatelyOpenNewPreviewWindow } from '../BrowserPreview/BrowserPreviewWindow';
 const gd: libGDevelop = global.gd;
 
+let nextPreviewId = 1;
+
 const prepareExporter = async ({
   isForInGameEdition,
 }: {
@@ -122,9 +124,16 @@ export default class BrowserSWPreviewLauncher extends React.Component<
       eventsBasedObjectVariantName,
       previewWindows,
     } = previewOptions;
+    const previewStartTime = Date.now();
     this.setState({
       error: null,
     });
+
+    const previewId = nextPreviewId++;
+    console.log(
+      `[BrowserSWPreviewLauncher] Launching preview #${previewId} with options:`,
+      previewOptions
+    );
 
     const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
     const shouldHotReload = previewOptions.hotReload && !!debuggerIds.length;
@@ -267,12 +276,12 @@ export default class BrowserSWPreviewLauncher extends React.Component<
         previewExportOptions.setGDevelopResourceToken(gdevelopResourceToken);
 
       console.log(
-        '[BrowserSWPreviewLauncher] Exporting project for preview...'
+        `[BrowserSWPreviewLauncher] Exporting project for preview #${previewId}...`
       );
       exporter.exportProjectForPixiPreview(previewExportOptions);
 
       console.log(
-        '[BrowserSWPreviewLauncher] Storing preview files in IndexedDB...'
+        `[BrowserSWPreviewLauncher] Storing preview files in IndexedDB for preview #${previewId}...`
       );
       await browserSWFileSystem.applyPendingOperations();
 
@@ -305,14 +314,18 @@ export default class BrowserSWPreviewLauncher extends React.Component<
         runtimeGameOptionsElement.delete();
 
         if (previewOptions.shouldHardReload) {
-          console.log('[BrowserSWPreviewLauncher] Triggering hard reload...');
+          console.log(
+            `[BrowserSWPreviewLauncher] Triggering hard reload for preview #${previewId}...`
+          );
           debuggerIds.forEach(debuggerId => {
             this.getPreviewDebuggerServer().sendMessage(debuggerId, {
               command: 'hardReload',
             });
           });
         } else {
-          console.log('[BrowserSWPreviewLauncher] Triggering hot reload...');
+          console.log(
+            `[BrowserSWPreviewLauncher] Triggering hot reload for preview #${previewId}...`
+          );
           debuggerIds.forEach(debuggerId => {
             this.getPreviewDebuggerServer().sendMessage(debuggerId, {
               command: 'hotReload',
@@ -373,10 +386,14 @@ export default class BrowserSWPreviewLauncher extends React.Component<
       previewExportOptions.delete();
       exporter.delete();
 
-      console.log('[BrowserSWPreviewLauncher] Preview launched successfully!');
+      console.log(
+        `[BrowserSWPreviewLauncher] Preview ${previewId} launched successfully in ${Math.ceil(
+          Date.now() - previewStartTime
+        )}ms.`
+      );
     } catch (error) {
       console.error(
-        '[BrowserSWPreviewLauncher] Error launching preview:',
+        `[BrowserSWPreviewLauncher] Error launching preview ${previewId}:`,
         error
       );
       this.setState({

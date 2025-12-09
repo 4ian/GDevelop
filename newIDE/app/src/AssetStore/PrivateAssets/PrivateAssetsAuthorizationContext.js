@@ -5,10 +5,7 @@ import {
   type Asset,
   type Environment,
 } from '../../Utils/GDevelopServices/Asset';
-import {
-  type InstallAssetOutput,
-  type InstallAssetArgs,
-} from '../InstallAsset';
+import { type AddAssetOutput, type InstallAssetArgs } from '../InstallAsset';
 
 export type PrivateAssetsState = {|
   authorizationToken: ?string,
@@ -17,9 +14,7 @@ export type PrivateAssetsState = {|
     assetShortHeader: AssetShortHeader,
     options: {| environment: Environment |}
   ) => Promise<?Asset>,
-  installPrivateAsset: (
-    options: InstallAssetArgs
-  ) => Promise<?InstallAssetOutput>,
+  installPrivateAsset: (options: InstallAssetArgs) => Promise<?AddAssetOutput>,
   getPrivateAssetPackAudioArchiveUrl: (
     privateAssetPackId: string
   ) => Promise<string | null>,

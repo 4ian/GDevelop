@@ -27,6 +27,8 @@ const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const gd: libGDevelop = global.gd;
 
+let nextPreviewId = 1;
+
 type State = {|
   networkPreviewDialogOpen: boolean,
   networkPreviewHost: ?string,
@@ -222,6 +224,12 @@ export default class LocalPreviewLauncher extends React.Component<
       eventsBasedObjectVariantName,
     } = previewOptions;
 
+    const previewId = nextPreviewId++;
+    console.log(
+      `[LocalPreviewLauncher] Launching preview #${previewId} with options:`,
+      previewOptions
+    );
+
     // Start the debugger server for previews. Even if not used,
     // useful if the user opens the Debugger editor later, or want to
     // hot reload.
@@ -392,6 +400,9 @@ export default class LocalPreviewLauncher extends React.Component<
       runtimeGameOptionsElement.delete();
 
       if (previewOptions.shouldHardReload) {
+        console.log(
+          `[LocalPreviewLauncher] Triggering hard reload for preview #${previewId}...`
+        );
         debuggerIds.forEach(debuggerId => {
           this.getPreviewDebuggerServer().sendMessage(debuggerId, {
             command: 'hardReload',
@@ -399,6 +410,9 @@ export default class LocalPreviewLauncher extends React.Component<
         });
       } else {
         debuggerIds.forEach(debuggerId => {
+          console.log(
+            `[LocalPreviewLauncher] Triggering hot reload for preview #${previewId}...`
+          );
           this.getPreviewDebuggerServer().sendMessage(debuggerId, {
             command: 'hotReload',
             payload: {
@@ -436,7 +450,10 @@ export default class LocalPreviewLauncher extends React.Component<
     previewExportOptions.delete();
 
     const previewStopTime = performance.now();
-    console.info(`Preview took ${previewStopTime - previewStartTime}ms`);
+    console.info(
+      `[LocalPreviewLauncher] Preview #${previewId} took ${previewStopTime -
+        previewStartTime}ms`
+    );
   };
 
   getPreviewDebuggerServer() {

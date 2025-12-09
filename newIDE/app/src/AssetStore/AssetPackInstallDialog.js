@@ -17,6 +17,8 @@ import {
   checkRequiredExtensionsUpdateForAssets,
   installPublicAsset,
   complyVariantsToEventsBasedObjectOf,
+  type AddAssetOutput,
+  type InstallAssetOutput,
 } from './InstallAsset';
 import { useInstallExtension } from './ExtensionStore/InstallExtension';
 import { showErrorBox } from '../UI/Messages/MessageBox';
@@ -31,9 +33,11 @@ import { mapFor } from '../Utils/MapFor';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import AlertMessage from '../UI/AlertMessage';
 import { useFetchAssets } from './NewObjectDialog';
-import { type InstallAssetOutput } from './InstallAsset';
 import { type ObjectFolderOrObjectWithContext } from '../ObjectsList/EnumerateObjectFolderOrObject';
 import { ExtensionStoreContext } from './ExtensionStore/ExtensionStoreContext';
+import uniq from 'lodash/uniq';
+
+const gd: libGDevelop = global.gd;
 
 // We limit the number of assets that can be installed at once to avoid
 // timeouts especially with premium packs.
@@ -174,10 +178,22 @@ const AssetPackInstallDialog = ({
           return;
         }
 
+        const isTheFirstOfItsTypeInProject = uniq(
+          assets
+            .map(asset =>
+              asset.objectAssets.map(objectAsset => objectAsset.object.type)
+            )
+            .flat()
+            .filter(objectType => !!objectType)
+        ).some(
+          objectType =>
+            !gd.UsedObjectTypeFinder.scanProject(project, objectType)
+        );
+
         // Use a pool to avoid installing an unbounded amount of assets at the same time.
         const { errors, results } = await PromisePool.withConcurrency(6)
           .for(assets)
-          .process<InstallAssetOutput>(async asset => {
+          .process<AddAssetOutput>(async asset => {
             const isAssetCompatibleWithIde = asset.objectAssets.every(
               objectAsset =>
                 !objectAsset.requiredExtensions ||
@@ -198,7 +214,7 @@ const AssetPackInstallDialog = ({
             const doInstall = isPrivateAsset(asset)
               ? installPrivateAsset
               : installPublicAsset;
-            const installOutput = await doInstall({
+            const addAssetOutput = await doInstall({
               asset,
               project,
               objectsContainer: targetObjectsContainer,
@@ -209,10 +225,10 @@ const AssetPackInstallDialog = ({
                   : null,
             });
 
-            if (!installOutput) {
+            if (!addAssetOutput) {
               throw new Error('Unable to install the asset.');
             }
-            return installOutput;
+            return addAssetOutput;
           });
 
         if (errors.length) {
@@ -222,6 +238,8 @@ const AssetPackInstallDialog = ({
           );
         }
 
+        console.log('results:', results);
+
         await resourceManagementProps.onFetchNewlyAddedResources();
         resourceManagementProps.onNewResourcesAdded();
 
@@ -229,13 +247,6 @@ const AssetPackInstallDialog = ({
         const createdObjects = results
           .map(result => result.createdObjects)
           .flat();
-        const isTheFirstOfItsTypeInProject = results
-          .map(result => result.isTheFirstOfItsTypeInProject)
-          .reduce(
-            (accumulator: boolean, currentValue: boolean) =>
-              accumulator || currentValue,
-            false
-          );
         complyVariantsToEventsBasedObjectOf(project, createdObjects);
         onAssetsAdded({ createdObjects, isTheFirstOfItsTypeInProject });
       } catch (error) {

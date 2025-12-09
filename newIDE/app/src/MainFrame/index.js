@@ -2113,6 +2113,7 @@ const MainFrame = (props: Props) => {
 
   const inGameEditorSettings = useInGameEditorSettings();
 
+  const isLaunchingPreviewRef = React.useRef(false);
   const _launchPreview = React.useCallback(
     async ({
       networkPreview,
@@ -2131,13 +2132,33 @@ const MainFrame = (props: Props) => {
       if (!currentProject) return;
       if (currentProject.getLayoutsCount() === 0) return;
 
+      console.info(
+        `Launching a new ${
+          isForInGameEdition ? 'in-game edition preview' : 'preview'
+        } with options:`,
+        {
+          networkPreview,
+          numberOfWindows,
+          hotReload,
+          shouldReloadProjectData,
+          shouldReloadLibraries,
+          shouldGenerateScenesEventsCode,
+          shouldReloadResources,
+          shouldHardReload,
+          fullLoadingScreen,
+          forceDiagnosticReport,
+          launchCaptureOptions,
+          isForInGameEdition,
+        }
+      );
+
       const previewLauncher = _previewLauncher.current;
       if (!previewLauncher) {
         console.error('Preview launcher not found.');
         return;
       }
 
-      if (previewLoading) {
+      if (isLaunchingPreviewRef.current) {
         console.error(
           'Preview already loading. Ignoring but it should not be even possible to launch a preview while another one is loading, as this could break the game of the first preview when it is loading or reading files.'
         );
@@ -2170,6 +2191,7 @@ const MainFrame = (props: Props) => {
           ? 'hot-reload-for-in-game-edition'
           : 'preview'
       );
+      isLaunchingPreviewRef.current = true;
 
       notifyPreviewOrExportWillStart(state.editorTabs);
 
@@ -2265,7 +2287,10 @@ const MainFrame = (props: Props) => {
 
           previewWindows,
         });
+
+        // TODO: factor
         setPreviewLoading(null);
+        isLaunchingPreviewRef.current = false;
 
         if (!isForInGameEdition)
           sendPreviewStarted({
@@ -2298,7 +2323,9 @@ const MainFrame = (props: Props) => {
           }
         }
       } catch (error) {
+        // TODO: factor
         setPreviewLoading(null);
+        isLaunchingPreviewRef.current = false;
         console.error(
           'Error caught while launching preview, this should never happen.',
           error
@@ -2325,7 +2352,6 @@ const MainFrame = (props: Props) => {
       onCaptureFinished,
       createCaptureOptionsForPreview,
       inGameEditorSettings,
-      previewLoading,
     ]
   );
 

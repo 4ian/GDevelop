@@ -27,10 +27,6 @@ export const styles = {
 type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
-  layout?: ?gdLayout,
-  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
-  objectsContainer: gdObjectsContainer,
-  globalObjectsContainer: gdObjectsContainer | null,
   layersContainer: gdLayersContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   unsavedChanges?: ?UnsavedChanges,
@@ -40,6 +36,9 @@ type Props = {|
   // For objects or instances:
   historyHandler?: HistoryHandler,
   isVariableListLocked: boolean,
+  layout?: ?gdLayout,
+  objectsContainer: gdObjectsContainer,
+  globalObjectsContainer: gdObjectsContainer | null,
 
   // For objects:
   objects: Array<gdObject>,
@@ -60,6 +59,7 @@ type Props = {|
     variant: gdEventsBasedObjectVariant
   ) => void,
   isBehaviorListLocked: boolean,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
 
   // For instances:
   instances: Array<gdInitialInstance>,
@@ -132,6 +132,9 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
     // For objects or instances:
     historyHandler,
     isVariableListLocked,
+    layout,
+    objectsContainer,
+    globalObjectsContainer,
 
     ...commonProps
   } = props;
@@ -149,6 +152,9 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
           onSelectTileMapTile={onSelectTileMapTile}
           historyHandler={historyHandler}
           isVariableListLocked={isVariableListLocked}
+          layout={layout}
+          objectsContainer={objectsContainer}
+          globalObjectsContainer={globalObjectsContainer}
           {...commonProps}
         />
       ) : !!objects.length && lastSelectionType === 'object' ? (
@@ -169,6 +175,9 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
           onDeleteEventsBasedObjectVariant={onDeleteEventsBasedObjectVariant}
           historyHandler={historyHandler}
           isVariableListLocked={isVariableListLocked}
+          layout={layout}
+          objectsContainer={objectsContainer}
+          globalObjectsContainer={globalObjectsContainer}
           {...commonProps}
         />
       ) : layer && lastSelectionType === 'layer' ? (
@@ -179,7 +188,6 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
           onLayersModified={onLayersModified}
           onEffectAdded={onEffectAdded}
           resourceManagementProps={resourceManagementProps}
-          eventsFunctionsExtension={eventsFunctionsExtension}
           {...commonProps}
         />
       ) : (

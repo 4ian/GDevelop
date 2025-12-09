@@ -121,10 +121,6 @@ const TopLevelCollapsibleSection = ({
 type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
-  layout?: ?gdLayout,
-  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
-  objectsContainer: gdObjectsContainer,
-  globalObjectsContainer: gdObjectsContainer | null,
   layersContainer: gdLayersContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   unsavedChanges?: ?UnsavedChanges,
@@ -140,10 +136,6 @@ type Props = {|
 export const CompactLayerPropertiesEditor = ({
   project,
   resourceManagementProps,
-  layout,
-  eventsFunctionsExtension,
-  objectsContainer,
-  globalObjectsContainer,
   layersContainer,
   projectScopedContainersAccessor,
   unsavedChanges,

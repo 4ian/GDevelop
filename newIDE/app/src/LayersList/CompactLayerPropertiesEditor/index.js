@@ -5,7 +5,7 @@ import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 import { type ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import ScrollView from '../../UI/ScrollView';
-import { Column, Line, Spacer, marginsSize } from '../../UI/Grid';
+import { Column, Line, marginsSize } from '../../UI/Grid';
 import CompactPropertiesEditor, {
   Separator,
 } from '../../CompactPropertiesEditor';
@@ -13,40 +13,21 @@ import Text from '../../UI/Text';
 import { Trans, t } from '@lingui/macro';
 import IconButton from '../../UI/IconButton';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
-import propertiesMapToSchema from '../../CompactPropertiesEditor/PropertiesMapToCompactSchema';
-import { type ObjectEditorTab } from '../../ObjectEditor/ObjectEditorDialog';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
-import Paper from '../../UI/Paper';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
-import RemoveIcon from '../../UI/CustomSvgIcons/Remove';
-import VisibilityIcon from '../../UI/CustomSvgIcons/Visibility';
-import VisibilityOffIcon from '../../UI/CustomSvgIcons/VisibilityOff';
-import useForceUpdate, { useForceRecompute } from '../../Utils/UseForceUpdate';
-import ChevronArrowTop from '../../UI/CustomSvgIcons/ChevronArrowTop';
-import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
-import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
+import useForceUpdate from '../../Utils/UseForceUpdate';
 import ChevronArrowDownWithRoundedBorder from '../../UI/CustomSvgIcons/ChevronArrowDownWithRoundedBorder';
 import ChevronArrowRightWithRoundedBorder from '../../UI/CustomSvgIcons/ChevronArrowRightWithRoundedBorder';
 import Add from '../../UI/CustomSvgIcons/Add';
 import LayersIcon from '../../UI/CustomSvgIcons/Layers';
-import { CompactEffectPropertiesEditor } from '../../EffectsList/CompactEffectPropertiesEditor';
-import { mapFor } from '../../Utils/MapFor';
-import {
-  getEnumeratedEffectMetadata,
-  useManageEffects,
-} from '../../EffectsList';
-import CompactSelectField from '../../UI/CompactSelectField';
-import SelectOption from '../../UI/SelectOption';
-import FlatButton from '../../UI/FlatButton';
 import Help from '../../UI/CustomSvgIcons/Help';
 import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
 import CompactTextField from '../../UI/CompactTextField';
 import { textEllipsisStyle } from '../../UI/TextEllipsis';
-import Link from '../../UI/Link';
-import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { makeSchema } from './CompactLayerPropertiesSchema';
 import { type Schema } from '../../CompactPropertiesEditor';
+import { CompactEffectsListEditor } from './CompactEffectsListEditor';
 
 export const styles = {
   icon: {
@@ -77,74 +58,6 @@ const noRefreshOfAllFields = () => {
 };
 
 const effectsHelpLink = getHelpLink('/interface/scene-editor/layer-effects');
-
-type TitleBarButton = {|
-  id: string,
-  icon: any,
-  label?: MessageDescriptor,
-  onClick?: () => void,
-|};
-
-const CollapsibleSubPanel = ({
-  renderContent,
-  isFolded,
-  toggleFolded,
-  title,
-  titleIcon,
-  titleBarButtons,
-}: {|
-  renderContent: () => React.Node,
-  isFolded: boolean,
-  toggleFolded: () => void,
-  titleIcon?: ?React.Node,
-  title: string,
-  titleBarButtons?: Array<TitleBarButton>,
-|}) => (
-  <Paper background="medium">
-    <Line expand>
-      <ColumnStackLayout noMargin expand noOverflowParent>
-        <LineStackLayout noMargin justifyContent="space-between">
-          <Line noMargin alignItems="center">
-            <IconButton onClick={toggleFolded} size="small">
-              {isFolded ? (
-                <ChevronArrowRight style={styles.icon} />
-              ) : (
-                <ChevronArrowBottom style={styles.icon} />
-              )}
-            </IconButton>
-
-            {titleIcon}
-            {titleIcon && <Spacer />}
-            <Text noMargin size="body" style={textEllipsisStyle}>
-              {title}
-            </Text>
-          </Line>
-          <Line noMargin>
-            {titleBarButtons &&
-              titleBarButtons.map(button => {
-                const Icon = button.icon;
-                return (
-                  <IconButton
-                    key={button.id}
-                    id={button.id}
-                    tooltip={button.label}
-                    onClick={button.onClick}
-                    size="small"
-                  >
-                    <Icon style={styles.icon} />
-                  </IconButton>
-                );
-              })}
-            <Spacer />
-          </Line>
-        </LineStackLayout>
-        {isFolded ? null : (
-          <div style={styles.subPanelContentContainer}>{renderContent()}</div>
-        )}
-      </ColumnStackLayout>
-    </Line>
-  </Paper>
-);
 
 const TopLevelCollapsibleSection = ({
   title,
@@ -243,8 +156,6 @@ export const CompactLayerPropertiesEditor = ({
 }: Props) => {
   const forceUpdate = useForceUpdate();
   const [isPropertiesFolded, setIsPropertiesFolded] = React.useState(false);
-  const [is2DEffectsFolded, set2DEffectsFolded] = React.useState(false);
-  const [is3DEffectsFolded, set3DEffectsFolded] = React.useState(false);
 
   // Properties:
   const { object, instanceSchema } = React.useMemo<{|
@@ -265,27 +176,6 @@ export const CompactLayerPropertiesEditor = ({
     },
     [i18n, onEditLayer, layersContainer, forceUpdate]
   );
-
-  // Effects:
-  const effectsContainer = layer.getEffects();
-  const {
-    allEffectMetadata,
-    all2DEffectMetadata,
-    all3DEffectMetadata,
-    addEffect,
-    removeEffect,
-    chooseEffectType,
-  } = useManageEffects({
-    effectsContainer,
-    project,
-    onEffectsUpdated: () => {
-      onLayersModified([layer]);
-      forceUpdate();
-    },
-    onEffectAdded,
-    onUpdate: forceUpdate,
-    target: 'object',
-  });
 
   const openFullEditor = React.useCallback(() => onEditLayer(layer), [
     layer,
@@ -346,229 +236,33 @@ export const CompactLayerPropertiesEditor = ({
             />
           )}
           {layer.getRenderingType() !== '3d' && (
-            <TopLevelCollapsibleSection
-              title={<Trans>2D effects</Trans>}
-              isFolded={is2DEffectsFolded}
-              toggleFolded={() => set2DEffectsFolded(!is2DEffectsFolded)}
-              onOpenFullEditor={() => onEditLayerEffects(layer)}
-              onAdd={() => addEffect(false)}
-              renderContent={() => (
-                <ColumnStackLayout noMargin>
-                  {effectsContainer.getEffectsCount() === 0 && (
-                    <Text size="body2" align="center" color="secondary">
-                      <Trans>
-                        There are no{' '}
-                        <Link
-                          href={effectsHelpLink}
-                          onClick={() =>
-                            Window.openExternalURL(effectsHelpLink)
-                          }
-                        >
-                          2D effects
-                        </Link>{' '}
-                        on this layer.
-                      </Trans>
-                    </Text>
-                  )}
-                  {mapFor(
-                    0,
-                    effectsContainer.getEffectsCount(),
-                    (index: number) => {
-                      const effect: gdEffect = effectsContainer.getEffectAt(
-                        index
-                      );
-                      const effectType = effect.getEffectType();
-                      const effectMetadata = getEnumeratedEffectMetadata(
-                        allEffectMetadata,
-                        effectType
-                      );
-
-                      return !effectMetadata ||
-                        !effectMetadata.isMarkedAsOnlyWorkingFor3D ? (
-                        <CollapsibleSubPanel
-                          key={effect.ptr}
-                          renderContent={() => (
-                            <ColumnStackLayout noMargin expand noOverflowParent>
-                              <CompactSelectField
-                                value={effectType}
-                                onChange={type =>
-                                  chooseEffectType(effect, type)
-                                }
-                              >
-                                {all2DEffectMetadata.map(effectMetadata => (
-                                  <SelectOption
-                                    key={effectMetadata.type}
-                                    value={effectMetadata.type}
-                                    label={effectMetadata.fullName}
-                                    disabled={
-                                      effectMetadata.isMarkedAsNotWorkingForObjects
-                                    }
-                                  />
-                                ))}
-                              </CompactSelectField>
-                              <CompactEffectPropertiesEditor
-                                project={project}
-                                effect={effect}
-                                effectMetadata={effectMetadata}
-                                resourceManagementProps={
-                                  resourceManagementProps
-                                }
-                                onPropertyModified={() =>
-                                  onLayersModified([layer])
-                                }
-                              />
-                            </ColumnStackLayout>
-                          )}
-                          isFolded={effect.isFolded()}
-                          toggleFolded={() => {
-                            effect.setFolded(!effect.isFolded());
-                            forceUpdate();
-                          }}
-                          title={effect.getName()}
-                          titleBarButtons={[
-                            {
-                              id: 'effect-visibility',
-                              icon: effect.isEnabled()
-                                ? VisibilityIcon
-                                : VisibilityOffIcon,
-                              label: effect.isEnabled()
-                                ? t`Hide effect`
-                                : t`Show effect`,
-                              onClick: () => {
-                                effect.setEnabled(!effect.isEnabled());
-                                onLayersModified([layer]);
-                                forceUpdate();
-                              },
-                            },
-                            {
-                              id: 'remove-effect',
-                              icon: RemoveIcon,
-                              label: t`Remove effect`,
-                              onClick: () => {
-                                removeEffect(effect);
-                                onLayersModified([layer]);
-                              },
-                            },
-                          ]}
-                        />
-                      ) : null;
-                    }
-                  )}
-                </ColumnStackLayout>
-              )}
+            <CompactEffectsListEditor
+              is3D={false}
+              project={project}
+              resourceManagementProps={resourceManagementProps}
+              layersContainer={layersContainer}
+              projectScopedContainersAccessor={projectScopedContainersAccessor}
+              unsavedChanges={unsavedChanges}
+              i18n={i18n}
+              layer={layer}
+              onEditLayerEffects={onEditLayerEffects}
+              onLayersModified={onLayersModified}
+              onEffectAdded={onEffectAdded}
             />
           )}
           {layer.getRenderingType() !== '2d' && !layer.isLightingLayer() && (
-            <TopLevelCollapsibleSection
-              title={<Trans>3D effects</Trans>}
-              isFolded={is3DEffectsFolded}
-              toggleFolded={() => set3DEffectsFolded(!is3DEffectsFolded)}
-              onOpenFullEditor={() => onEditLayerEffects(layer)}
-              onAdd={() => addEffect(true)}
-              renderContent={() => (
-                <ColumnStackLayout noMargin>
-                  {effectsContainer.getEffectsCount() === 0 && (
-                    <Text size="body2" align="center" color="secondary">
-                      <Trans>
-                        There are no{' '}
-                        <Link
-                          href={effectsHelpLink}
-                          onClick={() =>
-                            Window.openExternalURL(effectsHelpLink)
-                          }
-                        >
-                          3D effects
-                        </Link>{' '}
-                        on this layer.
-                      </Trans>
-                    </Text>
-                  )}
-                  {mapFor(
-                    0,
-                    effectsContainer.getEffectsCount(),
-                    (index: number) => {
-                      const effect: gdEffect = effectsContainer.getEffectAt(
-                        index
-                      );
-                      const effectType = effect.getEffectType();
-                      const effectMetadata = getEnumeratedEffectMetadata(
-                        allEffectMetadata,
-                        effectType
-                      );
-
-                      return !effectMetadata ||
-                        !effectMetadata.isMarkedAsOnlyWorkingFor2D ? (
-                        <CollapsibleSubPanel
-                          key={effect.ptr}
-                          renderContent={() => (
-                            <ColumnStackLayout noMargin expand noOverflowParent>
-                              <CompactSelectField
-                                value={effectType}
-                                onChange={type =>
-                                  chooseEffectType(effect, type)
-                                }
-                              >
-                                {all3DEffectMetadata.map(effectMetadata => (
-                                  <SelectOption
-                                    key={effectMetadata.type}
-                                    value={effectMetadata.type}
-                                    label={effectMetadata.fullName}
-                                    disabled={
-                                      effectMetadata.isMarkedAsNotWorkingForObjects
-                                    }
-                                  />
-                                ))}
-                              </CompactSelectField>
-                              <CompactEffectPropertiesEditor
-                                project={project}
-                                effect={effect}
-                                effectMetadata={effectMetadata}
-                                resourceManagementProps={
-                                  resourceManagementProps
-                                }
-                                onPropertyModified={() =>
-                                  onLayersModified([layer])
-                                }
-                              />
-                            </ColumnStackLayout>
-                          )}
-                          isFolded={effect.isFolded()}
-                          toggleFolded={() => {
-                            effect.setFolded(!effect.isFolded());
-                            forceUpdate();
-                          }}
-                          title={effect.getName()}
-                          titleBarButtons={[
-                            {
-                              id: 'effect-visibility',
-                              icon: effect.isEnabled()
-                                ? VisibilityIcon
-                                : VisibilityOffIcon,
-                              label: effect.isEnabled()
-                                ? t`Hide effect`
-                                : t`Show effect`,
-                              onClick: () => {
-                                effect.setEnabled(!effect.isEnabled());
-                                onLayersModified([layer]);
-                                forceUpdate();
-                              },
-                            },
-                            {
-                              id: 'remove-effect',
-                              icon: RemoveIcon,
-                              label: t`Remove effect`,
-                              onClick: () => {
-                                removeEffect(effect);
-                                onLayersModified([layer]);
-                              },
-                            },
-                          ]}
-                        />
-                      ) : null;
-                    }
-                  )}
-                </ColumnStackLayout>
-              )}
+            <CompactEffectsListEditor
+              is3D={true}
+              project={project}
+              resourceManagementProps={resourceManagementProps}
+              layersContainer={layersContainer}
+              projectScopedContainersAccessor={projectScopedContainersAccessor}
+              unsavedChanges={unsavedChanges}
+              i18n={i18n}
+              layer={layer}
+              onEditLayerEffects={onEditLayerEffects}
+              onLayersModified={onLayersModified}
+              onEffectAdded={onEffectAdded}
             />
           )}
         </Column>

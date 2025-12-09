@@ -1,35 +1,8 @@
 // @flow
 
-import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
-
 import { type Schema } from '../../CompactPropertiesEditor';
-import { styles } from '.';
-
-import Layers from '../../UI/CustomSvgIcons/Layers';
-import LetterX from '../../UI/CustomSvgIcons/LetterX';
-import LetterY from '../../UI/CustomSvgIcons/LetterY';
-import LetterH from '../../UI/CustomSvgIcons/LetterH';
-import LetterW from '../../UI/CustomSvgIcons/LetterW';
-import LetterD from '../../UI/CustomSvgIcons/LetterD';
-import LetterZ from '../../UI/CustomSvgIcons/LetterZ';
-import Opacity from '../../UI/CustomSvgIcons/Opacity';
-import FlipHorizontal from '../../UI/CustomSvgIcons/FlipHorizontal';
-import FlipVertical from '../../UI/CustomSvgIcons/FlipVertical';
-import Instance from '../../UI/CustomSvgIcons/Instance';
-import Link from '../../UI/CustomSvgIcons/Link';
-import Unlink from '../../UI/CustomSvgIcons/Unlink';
-import RemoveCircle from '../../UI/CustomSvgIcons/RemoveCircle';
-import Lock from '../../UI/CustomSvgIcons/Lock';
-import LockOpen from '../../UI/CustomSvgIcons/LockOpen';
-import Restore from '../../UI/CustomSvgIcons/Restore';
-import Object3d from '../../UI/CustomSvgIcons/Object3d';
-import Object2d from '../../UI/CustomSvgIcons/Object2d';
-import RotateX from '../../UI/CustomSvgIcons/RotateX';
-import RotateY from '../../UI/CustomSvgIcons/RotateY';
-import RotateZ from '../../UI/CustomSvgIcons/RotateZ';
-import FlipZ from '../../UI/CustomSvgIcons/FlipZ';
 import {
   rgbColorToRGBString,
   rgbStringAndAlphaToRGBColor,
@@ -249,6 +222,5 @@ export const makeSchema = ({
         getAmbientLightColorField({ i18n }),
       ],
     },
-    // TODO Lighting layer settings
   ].filter(Boolean);
 };

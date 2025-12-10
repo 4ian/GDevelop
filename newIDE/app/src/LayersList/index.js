@@ -410,7 +410,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
         const uniqueNewName = newNameGenerator(
           newName || 'Unnamed',
           tentativeNewName => {
-            return layersContainer.hasLayerNamed(newName);
+            return layersContainer.hasLayerNamed(tentativeNewName);
           }
         );
 

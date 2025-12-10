@@ -81,7 +81,7 @@ describe('Usage service', () => {
       expect(result).toBe(true);
     });
 
-    it('should return true for startup subscription', () => {
+    it('should return true for Startup (Pro) subscription', () => {
       const subscription: Subscription = {
         planId: 'gdevelop_startup',
         createdAt: Date.now(),

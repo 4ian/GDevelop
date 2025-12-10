@@ -11,7 +11,7 @@ import { shouldSubmit } from '../KeyboardShortcuts/InteractionKeys';
 export type CompactTextAreaFieldWithControlsProps = {|
   value: string,
   onChange: (newValue: string) => void,
-  onSubmit?: () => void,
+  onSubmit?: () => void | Promise<void>,
   onNavigateHistory?: ({|
     direction: 'up' | 'down',
     currentText: string,

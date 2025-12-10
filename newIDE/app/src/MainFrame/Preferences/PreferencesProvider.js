@@ -1092,10 +1092,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _setAiState(newValue: {|
-    aiRequestId: string | null,
-    mode: 'chat' | 'agent',
-  |}) {
+  _setAiState(newValue: {| aiRequestId: string | null |}) {
     this.setState(
       state => ({
         values: {

@@ -42,7 +42,6 @@ import {
   useProcessFunctionCalls,
   type NewAiRequestOptions,
   AI_AGENT_TOOLS_VERSION,
-  AI_CHAT_TOOLS_VERSION,
 } from './Utils';
 import { LineStackLayout } from '../UI/Layout';
 import RobotIcon from '../ProjectCreation/RobotIcon';
@@ -288,10 +287,7 @@ export const AskAiStandAloneForm = ({
             fileMetadata: null, // No file metadata when starting from the standalone form.
             storageProviderName,
             mode: aiRequestModeForForm,
-            toolsVersion:
-              aiRequestModeForForm === 'agent'
-                ? AI_AGENT_TOOLS_VERSION
-                : AI_CHAT_TOOLS_VERSION,
+            toolsVersion: AI_AGENT_TOOLS_VERSION,
             aiConfiguration: {
               presetId: aiConfigurationPresetId,
             },
@@ -309,7 +305,6 @@ export const AskAiStandAloneForm = ({
             // so that the editor is in sync, when we'll open it.
             setAiState({
               aiRequestId: aiRequest.id,
-              mode: aiRequestModeForForm,
             });
           }
 
@@ -453,6 +448,8 @@ export const AskAiStandAloneForm = ({
             payWithCredits: false,
             userMessage: '', // No user message when sending only function call outputs.
             paused,
+            mode: aiRequestModeForForm,
+            toolsVersion: AI_AGENT_TOOLS_VERSION,
           })
         );
         updateAiRequest(aiRequest.id, aiRequest);
@@ -582,11 +579,17 @@ export const AskAiStandAloneForm = ({
         project={project}
         ref={aiRequestChatRef}
         aiRequest={aiRequestForForm}
-        aiRequestMode={aiRequestModeForForm}
         onStartNewAiRequest={startNewAiRequest}
-        onSendUserMessage={(userMessage: string) =>
+        onSendUserMessage={({
+          userMessage,
+          mode,
+        }: {|
+          userMessage: string,
+          mode: 'chat' | 'agent',
+        |}) =>
           onSendMessage({
             userMessage,
+            // mode, Mode is forced to agent in standalone form, no need to pass it here.
             editorFunctionCallResults: aiRequestForForm
               ? getEditorFunctionCallResults(aiRequestForForm.id) || []
               : [],

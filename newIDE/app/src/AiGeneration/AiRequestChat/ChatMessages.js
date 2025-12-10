@@ -648,7 +648,7 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
         <Line justifyContent="flex-start">
           <AlertMessage kind="error">
             <Trans>
-              The AI encountered an error while handling your request - this was
+              The AI encountered an error while handling your request - this
               request was not counted in your AI usage. Try again later.
             </Trans>
           </AlertMessage>

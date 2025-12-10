@@ -457,7 +457,6 @@ const CoursePage = ({
                           label={<Trans>Ask the AI</Trans>}
                           onClick={() =>
                             onOpenAskAi({
-                              mode: 'chat',
                               aiRequestId: null,
                             })
                           }

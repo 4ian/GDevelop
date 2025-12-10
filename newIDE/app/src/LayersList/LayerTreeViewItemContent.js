@@ -94,7 +94,8 @@ export class LayerTreeViewItemContent implements TreeViewItemContent {
   }
 
   edit(): void {
-    this.props.editName(this.getId());
+    this.props.onEditLayer(this.layer);
+    this.props.onSelectLayer(null);
   }
 
   _isVisible(): boolean {

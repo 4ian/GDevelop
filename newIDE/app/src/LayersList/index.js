@@ -38,7 +38,8 @@ import { type ShowConfirmDeleteDialogOptions } from '../UI/Alert/AlertContext';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { type GDevelopTheme } from '../UI/Theme';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
-import LightbulbIcon from '../UI/CustomSvgIcons/Lightbulb';
+import LightbulbIconOn from '../UI/CustomSvgIcons/LightbulbOn';
+import LightbulbIconOff from '../UI/CustomSvgIcons/LightbulbOff';
 import { mapReverseFor } from '../Utils/MapFor';
 import { addDefaultLightToLayer } from '../ProjectCreation/CreateProject';
 
@@ -564,8 +565,11 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
               [
                 gameEditorMode === 'embedded-game'
                   ? {
-                      // TODO Add an icon for the hidden state.
-                      icon: <LightbulbIcon />,
+                      icon: !project.areEffectsHiddenInEditor() ? (
+                        <LightbulbIconOn />
+                      ) : (
+                        <LightbulbIconOff />
+                      ),
                       label: !project.areEffectsHiddenInEditor()
                         ? i18n._(t`Disable effects/lighting in the editor`)
                         : i18n._(t`Display effects/lighting in the editor`),

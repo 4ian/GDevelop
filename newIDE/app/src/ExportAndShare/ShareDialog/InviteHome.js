@@ -50,7 +50,7 @@ const getEmailErrorText = (addError: ?string) => {
       return (
         <Trans>
           You have reached the maximum number of guest collaborators for your
-          subscription. Ask this user to get a Startup subscription!
+          subscription. Ask this user to get a Pro subscription!
         </Trans>
       );
     case 'unexpected':
@@ -335,7 +335,7 @@ const InviteHome = ({ cloudProjectId }: Props) => {
             >
               <Text>
                 <Trans>
-                  Get a startup subscription to invite collaborators into your
+                  Get a Pro subscription to invite collaborators into your
                   project.
                 </Trans>
               </Text>

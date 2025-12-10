@@ -49,6 +49,8 @@ export class LayerTreeViewItemContent implements TreeViewItemContent {
   }
 
   getRootId(): string {
+    // This is not actually a parent, but it's useful to check where layers
+    // can be dropped.
     return layersRootFolderId;
   }
 

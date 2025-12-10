@@ -562,51 +562,56 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
               layersRootFolderId,
               i18n._(t`Layers`),
               [
-                {
-                  // TODO Add an icon for the hidden state.
-                  icon: <LightbulbIcon />,
-                  label: !project.areEffectsHiddenInEditor()
-                    ? i18n._(t`Disable effects/lighting in the editor`)
-                    : i18n._(t`Display effects/lighting in the editor`),
-                  click: () => {
-                    project.setEffectsHiddenInEditor(
-                      !project.areEffectsHiddenInEditor()
-                    );
-                    onLayersVisibilityInEditorChanged();
-                    forceUpdate();
-                  },
-                  id: 'show-effects-button',
-                },
+                gameEditorMode === 'embedded-game'
+                  ? {
+                      // TODO Add an icon for the hidden state.
+                      icon: <LightbulbIcon />,
+                      label: !project.areEffectsHiddenInEditor()
+                        ? i18n._(t`Disable effects/lighting in the editor`)
+                        : i18n._(t`Display effects/lighting in the editor`),
+                      click: () => {
+                        project.setEffectsHiddenInEditor(
+                          !project.areEffectsHiddenInEditor()
+                        );
+                        onLayersVisibilityInEditorChanged();
+                        forceUpdate();
+                      },
+                      id: 'show-effects-button',
+                    }
+                  : null,
                 {
                   icon: <Add />,
                   label: i18n._(t`Add a layer`),
                   click: addLayer,
                   id: 'add-layer-button',
                 },
-              ],
-              () => [
-                {
-                  label: !project.areEffectsHiddenInEditor()
-                    ? i18n._(t`Disable effects/lighting in the editor`)
-                    : i18n._(t`Display effects/lighting in the editor`),
-                  click: () => {
-                    project.setEffectsHiddenInEditor(
-                      !project.areEffectsHiddenInEditor()
-                    );
-                    onLayersVisibilityInEditorChanged();
-                    forceUpdate();
+              ].filter(Boolean),
+              () =>
+                [
+                  gameEditorMode === 'embedded-game'
+                    ? {
+                        label: !project.areEffectsHiddenInEditor()
+                          ? i18n._(t`Disable effects/lighting in the editor`)
+                          : i18n._(t`Display effects/lighting in the editor`),
+                        click: () => {
+                          project.setEffectsHiddenInEditor(
+                            !project.areEffectsHiddenInEditor()
+                          );
+                          onLayersVisibilityInEditorChanged();
+                          forceUpdate();
+                        },
+                      }
+                    : null,
+                  {
+                    label: i18n._(t`Add a layer`),
+                    click: addLayer,
                   },
-                },
-                {
-                  label: i18n._(t`Add a layer`),
-                  click: addLayer,
-                },
-                {
-                  label: i18n._(t`Add 2D lighting layer`),
-                  enabled: !isLightingLayerPresent,
-                  click: addLightingLayer,
-                },
-              ]
+                  {
+                    label: i18n._(t`Add 2D lighting layer`),
+                    enabled: !isLightingLayerPresent,
+                    click: addLightingLayer,
+                  },
+                ].filter(Boolean)
             ),
             getChildren(i18n: I18nType): ?Array<TreeViewItem> {
               return mapReverseFor(
@@ -638,16 +643,17 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
         return items;
       },
       [
+        project,
+        layerTreeViewItemProps,
+        gameEditorMode,
         addLayer,
-        addLightingLayer,
+        layout,
+        onLayersVisibilityInEditorChanged,
         forceUpdate,
         isLightingLayerPresent,
-        layerTreeViewItemProps,
+        addLightingLayer,
         layersContainer,
-        layout,
         triggerOnBackgroundColorChanged,
-        onLayersVisibilityInEditorChanged,
-        project,
       ]
     );
 
@@ -655,7 +661,6 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
       (destinationItem: TreeViewItem, where: 'before' | 'inside' | 'after') =>
         selectedItems.every(item => {
           return (
-            // Project and game settings children `getRootId` return an empty string.
             item.content.getRootId().length > 0 &&
             item.content.getRootId() === destinationItem.content.getRootId()
           );

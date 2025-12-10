@@ -31,9 +31,7 @@ import {
   getLayerTreeViewItemId,
   type LayerTreeViewItemProps,
 } from './LayerTreeViewItemContent';
-import {
-  BackgroundColorTreeViewItemContent,
-} from './BackgroundColorTreeViewItemContent';
+import { BackgroundColorTreeViewItemContent } from './BackgroundColorTreeViewItemContent';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { type ShowConfirmDeleteDialogOptions } from '../UI/Alert/AlertContext';

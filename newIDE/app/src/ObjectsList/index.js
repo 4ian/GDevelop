@@ -384,6 +384,9 @@ const renderTreeViewItemRightComponent = (i18n: I18nType) => (
 const renameItem = (item: TreeViewItem, newName: string) => {
   item.content.rename(newName);
 };
+const onClickItem = (item: TreeViewItem) => {
+  item.content.onClick();
+};
 const editItem = (item: TreeViewItem) => {
   item.content.edit();
 };
@@ -1575,6 +1578,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       getItemHtmlId={getTreeViewItemHtmlId}
                       getItemDataset={getTreeViewItemDataSet}
                       onEditItem={editItem}
+                      onClickItem={onClickItem}
                       onCollapseItem={onCollapseItem}
                       selectedItems={selectedItems}
                       onSelectItems={items => {

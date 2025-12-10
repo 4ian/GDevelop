@@ -186,7 +186,7 @@ export const useInstallAsset = ({
       );
 
       const isPrivate = isPrivateAsset(assetShortHeader);
-      const installOutput = isPrivate
+      const addAssetOutput = isPrivate
         ? await installPrivateAsset({
             asset,
             project,
@@ -209,7 +209,7 @@ export const useInstallAsset = ({
                 ? targetObjectFolderOrObjectWithContext.objectFolderOrObject
                 : null,
           });
-      if (!installOutput) {
+      if (!addAssetOutput) {
         throw new Error('Unable to install private Asset.');
       }
       sendAssetAddedToProject({
@@ -223,13 +223,16 @@ export const useInstallAsset = ({
       });
       complyVariantsToEventsBasedObjectOf(
         project,
-        installOutput.createdObjects
+        addAssetOutput.createdObjects
       );
 
       await resourceManagementProps.onFetchNewlyAddedResources();
       resourceManagementProps.onNewResourcesAdded();
-      installOutput.isTheFirstOfItsTypeInProject = isTheFirstOfItsTypeInProject;
-      return installOutput;
+
+      return {
+        createdObjects: addAssetOutput.createdObjects,
+        isTheFirstOfItsTypeInProject,
+      };
     } catch (error) {
       console.error('Error while installing the asset:', error);
       showAlert({

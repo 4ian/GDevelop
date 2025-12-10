@@ -191,7 +191,6 @@ export const LayoutPrivateAssetInstallSuccess = () => {
         installPrivateAsset: async () => ({
           // Mock a successful installation
           createdObjects: [],
-          isTheFirstOfItsTypeInProject: false,
         }),
         getPrivateAssetPackAudioArchiveUrl: async () =>
           'https://resources.gevelop.io/path/to/audio/archive',

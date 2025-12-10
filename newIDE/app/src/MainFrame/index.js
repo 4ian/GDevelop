@@ -319,6 +319,24 @@ const initialPreviewState: PreviewState = {
   overridenPreviewExternalLayoutName: null,
 };
 
+const usePreviewLoadingState = () => {
+  const forceUpdate = useForceUpdate();
+  const previewLoadingRef = React.useRef<
+    null | 'preview' | 'hot-reload-for-in-game-edition'
+  >(null);
+
+  return {
+    previewLoadingRef,
+    setPreviewLoading: React.useCallback(
+      (previewLoading: null | 'preview' | 'hot-reload-for-in-game-edition') => {
+        previewLoadingRef.current = previewLoading;
+        forceUpdate();
+      },
+      [forceUpdate]
+    ),
+  };
+};
+
 export type Props = {|
   renderMainMenu?: (
     BuildMainMenuProps,
@@ -437,9 +455,7 @@ const MainFrame = (props: Props) => {
   } = useAlertDialog();
   const preferences = React.useContext(PreferencesContext);
   const { setHasProjectOpened } = preferences;
-  const [previewLoading, setPreviewLoading] = React.useState<
-    null | 'preview' | 'hot-reload-for-in-game-edition'
-  >(null);
+  const { previewLoadingRef, setPreviewLoading } = usePreviewLoadingState();
   const [previewState, setPreviewState] = React.useState(initialPreviewState);
   const commandPaletteRef = React.useRef((null: ?CommandPaletteInterface));
   const inAppTutorialOrchestratorRef = React.useRef<?InAppTutorialOrchestratorInterface>(
@@ -2126,13 +2142,33 @@ const MainFrame = (props: Props) => {
       if (!currentProject) return;
       if (currentProject.getLayoutsCount() === 0) return;
 
+      console.info(
+        `Launching a new ${
+          isForInGameEdition ? 'in-game edition preview' : 'preview'
+        } with options:`,
+        {
+          networkPreview,
+          numberOfWindows,
+          hotReload,
+          shouldReloadProjectData,
+          shouldReloadLibraries,
+          shouldGenerateScenesEventsCode,
+          shouldReloadResources,
+          shouldHardReload,
+          fullLoadingScreen,
+          forceDiagnosticReport,
+          launchCaptureOptions,
+          isForInGameEdition,
+        }
+      );
+
       const previewLauncher = _previewLauncher.current;
       if (!previewLauncher) {
         console.error('Preview launcher not found.');
         return;
       }
 
-      if (previewLoading) {
+      if (previewLoadingRef.current) {
         console.error(
           'Preview already loading. Ignoring but it should not be even possible to launch a preview while another one is loading, as this could break the game of the first preview when it is loading or reading files.'
         );
@@ -2260,6 +2296,7 @@ const MainFrame = (props: Props) => {
 
           previewWindows,
         });
+
         setPreviewLoading(null);
 
         if (!isForInGameEdition)
@@ -2320,7 +2357,8 @@ const MainFrame = (props: Props) => {
       onCaptureFinished,
       createCaptureOptionsForPreview,
       inGameEditorSettings,
-      previewLoading,
+      previewLoadingRef,
+      setPreviewLoading,
     ]
   );
 
@@ -4623,6 +4661,7 @@ const MainFrame = (props: Props) => {
     onOpenProfileDialog,
   });
 
+  const previewLoading = previewLoadingRef.current;
   const hideAskAi =
     !!authenticatedUser.limits &&
     !!authenticatedUser.limits.capabilities.classrooms &&

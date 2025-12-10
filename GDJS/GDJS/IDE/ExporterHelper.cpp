@@ -492,17 +492,22 @@ void ExporterHelper::SerializeRuntimeGameOptions(
   }
 
   // Pass in the options the list of scripts files - useful for hot-reloading.
-  auto &scriptFilesElement = runtimeGameOptions.AddChild("scriptFiles");
-  scriptFilesElement.ConsiderAsArrayOf("scriptFile");
+  // If includeFiles is empty, it means that the include files have not been
+  // generated, so do not even add them to the runtime game options, so the
+  // hot-reloader will not try to reload them.
+  if (!includesFiles.empty()) {
+    auto &scriptFilesElement = runtimeGameOptions.AddChild("scriptFiles");
+    scriptFilesElement.ConsiderAsArrayOf("scriptFile");
 
-  for (const auto &includeFile : includesFiles) {
-    auto hashIt = options.includeFileHashes.find(includeFile);
-    gd::String scriptSrc = GetExportedIncludeFilename(fs, gdjsRoot, includeFile);
-    scriptFilesElement.AddChild("scriptFile")
-        .SetStringAttribute("path", scriptSrc)
-        .SetIntAttribute(
-            "hash",
-            hashIt != options.includeFileHashes.end() ? hashIt->second : 0);
+    for (const auto &includeFile : includesFiles) {
+      auto hashIt = options.includeFileHashes.find(includeFile);
+      gd::String scriptSrc = GetExportedIncludeFilename(fs, gdjsRoot, includeFile);
+      scriptFilesElement.AddChild("scriptFile")
+          .SetStringAttribute("path", scriptSrc)
+          .SetIntAttribute(
+              "hash",
+              hashIt != options.includeFileHashes.end() ? hashIt->second : 0);
+    }
   }
 }
 

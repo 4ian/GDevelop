@@ -238,8 +238,6 @@ const AssetPackInstallDialog = ({
           );
         }
 
-        console.log('results:', results);
-
         await resourceManagementProps.onFetchNewlyAddedResources();
         resourceManagementProps.onNewResourcesAdded();
 

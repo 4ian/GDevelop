@@ -716,6 +716,8 @@ namespace gdjs {
      */
     getFullUrl(url: string) {
       if (this._runtimeGame.isInGameEdition()) {
+        // Avoid adding cache burst to URLs which are assumed to be immutable files,
+        // to avoid costly useless requests each time the game is hot-reloaded.
         if (url.startsWith('file://')) {
           url = addSearchParameterToUrl(url, 'cache', '' + Date.now());
         }

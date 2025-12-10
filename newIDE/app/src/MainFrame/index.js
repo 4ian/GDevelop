@@ -319,6 +319,24 @@ const initialPreviewState: PreviewState = {
   overridenPreviewExternalLayoutName: null,
 };
 
+const usePreviewLoadingState = () => {
+  const forceUpdate = useForceUpdate();
+  const previewLoadingRef = React.useRef<
+    null | 'preview' | 'hot-reload-for-in-game-edition'
+  >(null);
+
+  return {
+    previewLoadingRef,
+    setPreviewLoading: React.useCallback(
+      (previewLoading: null | 'preview' | 'hot-reload-for-in-game-edition') => {
+        previewLoadingRef.current = previewLoading;
+        forceUpdate();
+      },
+      [forceUpdate]
+    ),
+  };
+};
+
 export type Props = {|
   renderMainMenu?: (
     BuildMainMenuProps,
@@ -437,9 +455,7 @@ const MainFrame = (props: Props) => {
   } = useAlertDialog();
   const preferences = React.useContext(PreferencesContext);
   const { setHasProjectOpened } = preferences;
-  const [previewLoading, setPreviewLoading] = React.useState<
-    null | 'preview' | 'hot-reload-for-in-game-edition'
-  >(null);
+  const { previewLoadingRef, setPreviewLoading } = usePreviewLoadingState();
   const [previewState, setPreviewState] = React.useState(initialPreviewState);
   const commandPaletteRef = React.useRef((null: ?CommandPaletteInterface));
   const inAppTutorialOrchestratorRef = React.useRef<?InAppTutorialOrchestratorInterface>(
@@ -2113,7 +2129,6 @@ const MainFrame = (props: Props) => {
 
   const inGameEditorSettings = useInGameEditorSettings();
 
-  const isLaunchingPreviewRef = React.useRef(false);
   const _launchPreview = React.useCallback(
     async ({
       networkPreview,
@@ -2158,7 +2173,7 @@ const MainFrame = (props: Props) => {
         return;
       }
 
-      if (isLaunchingPreviewRef.current) {
+      if (previewLoadingRef.current) {
         console.error(
           'Preview already loading. Ignoring but it should not be even possible to launch a preview while another one is loading, as this could break the game of the first preview when it is loading or reading files.'
         );
@@ -2191,7 +2206,6 @@ const MainFrame = (props: Props) => {
           ? 'hot-reload-for-in-game-edition'
           : 'preview'
       );
-      isLaunchingPreviewRef.current = true;
 
       notifyPreviewOrExportWillStart(state.editorTabs);
 
@@ -2288,9 +2302,7 @@ const MainFrame = (props: Props) => {
           previewWindows,
         });
 
-        // TODO: factor
         setPreviewLoading(null);
-        isLaunchingPreviewRef.current = false;
 
         if (!isForInGameEdition)
           sendPreviewStarted({
@@ -2323,9 +2335,7 @@ const MainFrame = (props: Props) => {
           }
         }
       } catch (error) {
-        // TODO: factor
         setPreviewLoading(null);
-        isLaunchingPreviewRef.current = false;
         console.error(
           'Error caught while launching preview, this should never happen.',
           error
@@ -2352,6 +2362,8 @@ const MainFrame = (props: Props) => {
       onCaptureFinished,
       createCaptureOptionsForPreview,
       inGameEditorSettings,
+      previewLoadingRef,
+      setPreviewLoading,
     ]
   );
 
@@ -4654,6 +4666,7 @@ const MainFrame = (props: Props) => {
     onOpenProfileDialog,
   });
 
+  const previewLoading = previewLoadingRef.current;
   const hideAskAi =
     !!authenticatedUser.limits &&
     !!authenticatedUser.limits.capabilities.classrooms &&

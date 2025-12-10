@@ -1219,6 +1219,7 @@ namespace gdjs {
               } else {
                 // The game is paused (for debugging): the rendering of the scene is done,
                 // but the game logic is not executed (no full "step").
+                // Note we might want to disable rendering if there is a loading screen?
                 this._sceneStack.renderWithoutStep();
               }
             } else {

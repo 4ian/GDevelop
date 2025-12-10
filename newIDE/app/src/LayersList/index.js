@@ -31,7 +31,10 @@ import {
   getLayerTreeViewItemId,
   type LayerTreeViewItemProps,
 } from './LayerTreeViewItemContent';
-import { BackgroundColorTreeViewItemContent } from './BackgroundColorTreeViewItemContent';
+import {
+  BackgroundColorTreeViewItemContent,
+  backgroundColorId,
+} from './BackgroundColorTreeViewItemContent';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { type ShowConfirmDeleteDialogOptions } from '../UI/Alert/AlertContext';
@@ -556,12 +559,12 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
         if (!project || !layerTreeViewItemProps) {
           return [];
         }
-        const items = [
+        return [
           {
-            isRoot: true,
+            isRoot: false,
             content: new LabelTreeViewItemContent(
               layersRootFolderId,
-              i18n._(t`Layers`),
+              '',
               [
                 gameEditorMode === 'embedded-game'
                   ? {
@@ -618,33 +621,33 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
                 ].filter(Boolean)
             ),
             getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-              return mapReverseFor(
-                0,
-                layersContainer.getLayersCount(),
-                i =>
-                  new LeafTreeViewItem(
-                    new LayerTreeViewItemContent(
-                      layersContainer.getLayerAt(i),
-                      layerTreeViewItemProps
-                    )
-                  )
-              );
+              return null;
             },
           },
-        ];
-        if (layout) {
-          items.push({
-            isRoot: true,
-            content: new BackgroundColorTreeViewItemContent(
-              layout,
-              triggerOnBackgroundColorChanged
-            ),
-            getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-              return [];
-            },
-          });
-        }
-        return items;
+          ...mapReverseFor(
+            0,
+            layersContainer.getLayersCount(),
+            i =>
+              new LeafTreeViewItem(
+                new LayerTreeViewItemContent(
+                  layersContainer.getLayerAt(i),
+                  layerTreeViewItemProps
+                )
+              )
+          ),
+          layout
+            ? {
+                isRoot: false,
+                content: new BackgroundColorTreeViewItemContent(
+                  layout,
+                  triggerOnBackgroundColorChanged
+                ),
+                getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+                  return null;
+                },
+              }
+            : null,
+        ].filter(Boolean);
       },
       [
         project,
@@ -763,6 +766,10 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
                     reactDndType={extensionItemReactDndType}
                     initiallyOpenedNodeIds={initiallyOpenedNodeIds}
                     forceDefaultDraggingPreview
+                    shouldHideMenuIcon={item =>
+                      item.content.getId() === layersRootFolderId ||
+                      item.content.getId() === backgroundColorId
+                    }
                   />
                 )}
               </AutoSizer>

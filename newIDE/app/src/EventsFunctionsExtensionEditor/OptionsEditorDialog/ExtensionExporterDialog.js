@@ -64,9 +64,10 @@ const exportExtension = async (
   );
 };
 
-const openGitHubIssue = () => {
+const openGitHubIssue = (isFromTheStore: boolean) => {
   Window.openExternalURL(
-    'https://github.com/GDevelopApp/GDevelop-extensions/issues/new?assignees=&labels=%E2%9C%A8+New+extension&template=new-extension.yml&title=New+extension%3A+%3Ctitle%3E'
+    'https://github.com/GDevelopApp/GDevelop-extensions/issues/new?template=' +
+      (isFromTheStore ? 'extension-update.yml' : 'new-extension.yml')
   );
 };
 
@@ -81,14 +82,24 @@ const ExtensionExporterDialog = (props: Props) => {
     EventsFunctionsExtensionsContext
   );
 
+  const isFromTheStore =
+    props.eventsFunctionsExtension.getOriginName() ===
+    'gdevelop-extension-store';
+
   return (
     <Dialog
       title={<Trans>Export extension</Trans>}
       secondaryActions={[
         <HelpButton key="help" helpPagePath="/extensions/share-extension/" />,
         <FlatButton
-          label={<Trans>Submit to the community</Trans>}
-          onClick={openGitHubIssue}
+          label={
+            isFromTheStore ? (
+              <Trans>Submit an update</Trans>
+            ) : (
+              <Trans>Submit to the community</Trans>
+            )
+          }
+          onClick={() => openGitHubIssue(isFromTheStore)}
         />,
       ]}
       actions={[

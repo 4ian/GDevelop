@@ -235,31 +235,31 @@ export const CompactLayerPropertiesEditor = ({
           )}
           {layer.getRenderingType() !== '3d' && (
             <CompactEffectsListEditor
-              is3D={false}
+              layerRenderingType={'2d'}
+              target={'layer'}
               project={project}
               resourceManagementProps={resourceManagementProps}
-              layersContainer={layersContainer}
               projectScopedContainersAccessor={projectScopedContainersAccessor}
               unsavedChanges={unsavedChanges}
               i18n={i18n}
-              layer={layer}
-              onEditLayerEffects={onEditLayerEffects}
-              onLayersModified={onLayersModified}
+              effectsContainer={layer.getEffects()}
+              onEffectsUpdated={() => onLayersModified([layer])}
+              onOpenFullEditor={() => onEditLayerEffects(layer)}
               onEffectAdded={onEffectAdded}
             />
           )}
           {layer.getRenderingType() !== '2d' && !layer.isLightingLayer() && (
             <CompactEffectsListEditor
-              is3D={true}
+              layerRenderingType={'3d'}
+              target={'layer'}
               project={project}
               resourceManagementProps={resourceManagementProps}
-              layersContainer={layersContainer}
               projectScopedContainersAccessor={projectScopedContainersAccessor}
               unsavedChanges={unsavedChanges}
               i18n={i18n}
-              layer={layer}
-              onEditLayerEffects={onEditLayerEffects}
-              onLayersModified={onLayersModified}
+              effectsContainer={layer.getEffects()}
+              onEffectsUpdated={() => onLayersModified([layer])}
+              onOpenFullEditor={() => onEditLayerEffects(layer)}
               onEffectAdded={onEffectAdded}
             />
           )}

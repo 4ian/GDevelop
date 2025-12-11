@@ -57,7 +57,10 @@ export const styles = {
   },
 };
 
-const effectsHelpLink = getHelpLink('/interface/scene-editor/layer-effects');
+const layerEffectsHelpLink = getHelpLink(
+  '/interface/scene-editor/layer-effects'
+);
+const objectEffectsHelpLink = getHelpLink('/objects/effects');
 
 type TitleBarButton = {|
   id: string,
@@ -189,36 +192,35 @@ const TopLevelCollapsibleSection = ({
 type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
-  layersContainer: gdLayersContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   unsavedChanges?: ?UnsavedChanges,
   i18n: I18nType,
 
-  layer: gdLayer,
-  onEditLayerEffects: (layer: gdLayer) => void,
-  onLayersModified: (layers: Array<gdLayer>) => void,
+  effectsContainer: gdEffectsContainer,
+  onEffectsUpdated: () => void,
+  onOpenFullEditor: () => void,
   onEffectAdded: () => void,
-  is3D: boolean,
+  layerRenderingType: '2d' | '3d',
+  target: 'object' | 'layer',
 |};
 
 export const CompactEffectsListEditor = ({
   project,
   resourceManagementProps,
-  layersContainer,
   projectScopedContainersAccessor,
   unsavedChanges,
   i18n,
-  layer,
-  onEditLayerEffects,
-  onLayersModified,
+  effectsContainer,
+  onEffectsUpdated,
+  onOpenFullEditor,
   onEffectAdded,
-  is3D,
+  layerRenderingType,
+  target,
 }: Props) => {
   const forceUpdate = useForceUpdate();
   const [isEffectsFolded, setEffectsFolded] = React.useState(false);
 
   // Effects:
-  const effectsContainer = layer.getEffects();
   const {
     allEffectMetadata,
     all2DEffectMetadata,
@@ -230,35 +232,55 @@ export const CompactEffectsListEditor = ({
     effectsContainer,
     project,
     onEffectsUpdated: () => {
-      onLayersModified([layer]);
+      onEffectsUpdated();
       forceUpdate();
     },
     onEffectAdded,
     onUpdate: forceUpdate,
-    target: 'object',
+    target,
   });
 
-  const filteredEffectMetadata = is3D
-    ? all3DEffectMetadata
-    : all2DEffectMetadata;
+  const filteredEffectMetadata =
+    layerRenderingType === '3d' ? all3DEffectMetadata : all2DEffectMetadata;
 
   return (
     <TopLevelCollapsibleSection
-      title={is3D ? <Trans>3D effects</Trans> : <Trans>2D effects</Trans>}
+      title={
+        target === 'object' ? (
+          <Trans>Effects</Trans>
+        ) : layerRenderingType === '3d' ? (
+          <Trans>3D effects</Trans>
+        ) : (
+          <Trans>2D effects</Trans>
+        )
+      }
       isFolded={isEffectsFolded}
       toggleFolded={() => setEffectsFolded(!isEffectsFolded)}
-      onOpenFullEditor={() => onEditLayerEffects(layer)}
+      onOpenFullEditor={onOpenFullEditor}
       onAdd={() => addEffect(false)}
       renderContent={() => (
         <ColumnStackLayout noMargin>
           {effectsContainer.getEffectsCount() === 0 && (
             <Text size="body2" align="center" color="secondary">
-              {is3D ? (
+              {target === 'object' ? (
                 <Trans>
                   There are no{' '}
                   <Link
-                    href={effectsHelpLink}
-                    onClick={() => Window.openExternalURL(effectsHelpLink)}
+                    href={objectEffectsHelpLink}
+                    onClick={() =>
+                      Window.openExternalURL(objectEffectsHelpLink)
+                    }
+                  >
+                    effects
+                  </Link>{' '}
+                  on this object.
+                </Trans>
+              ) : layerRenderingType === '3d' ? (
+                <Trans>
+                  There are no{' '}
+                  <Link
+                    href={layerEffectsHelpLink}
+                    onClick={() => Window.openExternalURL(layerEffectsHelpLink)}
                   >
                     3D effects
                   </Link>{' '}
@@ -268,8 +290,8 @@ export const CompactEffectsListEditor = ({
                 <Trans>
                   There are no{' '}
                   <Link
-                    href={effectsHelpLink}
-                    onClick={() => Window.openExternalURL(effectsHelpLink)}
+                    href={layerEffectsHelpLink}
+                    onClick={() => Window.openExternalURL(layerEffectsHelpLink)}
                   >
                     2D effects
                   </Link>{' '}
@@ -287,8 +309,10 @@ export const CompactEffectsListEditor = ({
             );
 
             return !effectMetadata ||
-              (!is3D && !effectMetadata.isMarkedAsOnlyWorkingFor3D) ||
-              (is3D && !effectMetadata.isMarkedAsOnlyWorkingFor2D) ? (
+              (layerRenderingType !== '3d' &&
+                !effectMetadata.isMarkedAsOnlyWorkingFor3D) ||
+              (layerRenderingType !== '2d' &&
+                !effectMetadata.isMarkedAsOnlyWorkingFor2D) ? (
               <CollapsibleSubPanel
                 key={effect.ptr}
                 renderContent={() => (
@@ -303,6 +327,7 @@ export const CompactEffectsListEditor = ({
                           value={effectMetadata.type}
                           label={effectMetadata.fullName}
                           disabled={
+                            target !== 'object' &&
                             effectMetadata.isMarkedAsNotWorkingForObjects
                           }
                         />
@@ -313,7 +338,7 @@ export const CompactEffectsListEditor = ({
                       effect={effect}
                       effectMetadata={effectMetadata}
                       resourceManagementProps={resourceManagementProps}
-                      onPropertyModified={() => onLayersModified([layer])}
+                      onPropertyModified={onEffectsUpdated}
                     />
                   </ColumnStackLayout>
                 )}
@@ -332,7 +357,7 @@ export const CompactEffectsListEditor = ({
                     label: effect.isEnabled() ? t`Hide effect` : t`Show effect`,
                     onClick: () => {
                       effect.setEnabled(!effect.isEnabled());
-                      onLayersModified([layer]);
+                      onEffectsUpdated();
                       forceUpdate();
                     },
                   },
@@ -342,7 +367,7 @@ export const CompactEffectsListEditor = ({
                     label: t`Remove effect`,
                     onClick: () => {
                       removeEffect(effect);
-                      onLayersModified([layer]);
+                      onEffectsUpdated();
                     },
                   },
                 ]}

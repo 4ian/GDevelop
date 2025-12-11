@@ -111,7 +111,7 @@ const getPriceAndRequestsTextAndTooltip = ({
     <Trans>{aiCreditsAvailable} AI credits available</Trans>
   );
   const creditsText = (
-    <Trans>{Math.max(0, availableCredits)} GDevelop credits available</Trans>
+    <Trans>{Math.max(0, availableCredits)} credits available</Trans>
   );
 
   const timeForReset = quota.resetsAt ? new Date(quota.resetsAt) : null;
@@ -450,12 +450,8 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
               ? actionsOnExistingProject
               : actionsToCreateAProject
             : hasOpenedProject && !standAloneForm
-            ? [
-                ...questionsOnExistingProject,
-                ...actionsOnExistingProject,
-                ...generalQuestions,
-              ]
-            : [...generalQuestions, ...actionsToCreateAProject];
+            ? [...questionsOnExistingProject, ...generalQuestions]
+            : generalQuestions;
 
         return newChatPlaceholders[
           Math.floor(Math.random() * newChatPlaceholders.length)
@@ -592,10 +588,10 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         setHasStartedRequestButCannotContinue(cannotContinue);
         if (cannotContinue) return;
 
-        if (hasOpenedProject) {
+        if (hasOpenedProject && standAloneForm) {
           const response = await showConfirmation({
-            title: t`Close your project?`,
-            message: t`This action will close your current project. All your changes will be lost.`,
+            title: t`Start a new game?`,
+            message: t`This will close your current project. Unsaved changes will be lost.`,
             confirmButtonLabel: t`Continue`,
           });
 
@@ -619,6 +615,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         hasOpenedProject,
         showConfirmation,
         selectedMode,
+        standAloneForm,
       ]
     );
 
@@ -832,7 +829,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                   justifyContent="space-between"
                 >
                   <Column noMargin>
-                    {!standAloneForm && !project && (
+                    {!standAloneForm && (
                       <CompactSelectField
                         disabled={isWorking}
                         value={selectedMode}

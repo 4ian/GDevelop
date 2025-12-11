@@ -208,7 +208,15 @@ export const searchCreatorPublicProfilesByUsername = (
         type: 'creator',
       },
     })
-    .then(response => response.data);
+    .then(response => {
+      const data = response.data;
+      if (!Array.isArray(data)) {
+        throw new Error(
+          'Invalid response from endpoint /user-public-profile/search of User API, was expecting an array.'
+        );
+      }
+      return data;
+    });
 };
 
 export const getUserBadges = async (id: string): Promise<Array<Badge>> => {
@@ -216,7 +224,9 @@ export const getUserBadges = async (id: string): Promise<Array<Badge>> => {
   const badges = response.data;
 
   if (!Array.isArray(badges)) {
-    throw new Error('Invalid response from the badges API');
+    throw new Error(
+      'Invalid response from endpoint /user/{id}/badge of User API, was expecting an array.'
+    );
   }
 
   return badges;
@@ -231,7 +241,13 @@ export const listUserTeams = async (
     headers: { Authorization: authorizationHeader },
     params: { userId, role: 'admin' },
   });
-  return response.data;
+  const data = response.data;
+  if (!Array.isArray(data)) {
+    throw new Error(
+      'Invalid response from endpoint /team of User API, was expecting an array.'
+    );
+  }
+  return data;
 };
 
 export const listTeamMembers = async (
@@ -249,7 +265,13 @@ export const listTeamMembers = async (
       include: 'decryptedPassword',
     },
   });
-  return response.data;
+  const data = response.data;
+  if (!Array.isArray(data)) {
+    throw new Error(
+      'Invalid response from endpoint /user of User API, was expecting an array.'
+    );
+  }
+  return data;
 };
 
 export const listTeamAdmins = async (
@@ -262,7 +284,13 @@ export const listTeamAdmins = async (
     headers: { Authorization: authorizationHeader },
     params: { userId, teamId, memberType: 'admin' },
   });
-  return response.data;
+  const data = response.data;
+  if (!Array.isArray(data)) {
+    throw new Error(
+      'Invalid response from endpoint /user of User API, was expecting an array.'
+    );
+  }
+  return data;
 };
 
 export const listTeamMemberships = async (
@@ -275,7 +303,13 @@ export const listTeamMemberships = async (
     headers: { Authorization: authorizationHeader },
     params: { userId, teamId },
   });
-  return response.data;
+  const data = response.data;
+  if (!Array.isArray(data)) {
+    throw new Error(
+      'Invalid response from endpoint /team-membership of User API, was expecting an array.'
+    );
+  }
+  return data;
 };
 
 export const listTeamGroups = async (
@@ -288,7 +322,13 @@ export const listTeamGroups = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  return response.data;
+  const data = response.data;
+  if (!Array.isArray(data)) {
+    throw new Error(
+      'Invalid response from endpoint /team/{id}/group of User API, was expecting an array.'
+    );
+  }
+  return data;
 };
 
 export const updateGroup = async (
@@ -307,7 +347,18 @@ export const updateGroup = async (
       params: { userId },
     }
   );
-  return response.data;
+  const data = response.data;
+  if (!data || typeof data !== 'object') {
+    throw new Error(
+      'Invalid response from endpoint /team/{id}/group/{id} of User API, was expecting an object.'
+    );
+  }
+  if (!data.id) {
+    throw new Error(
+      'Invalid response from endpoint /team/{id}/group/{id} of User API, was expecting an object with an id field.'
+    );
+  }
+  return data;
 };
 
 export const createGroup = async (
@@ -321,7 +372,18 @@ export const createGroup = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  return response.data;
+  const data = response.data;
+  if (!data || typeof data !== 'object') {
+    throw new Error(
+      'Invalid response from endpoint /team/{id}/group of User API, was expecting an object.'
+    );
+  }
+  if (!data.id) {
+    throw new Error(
+      'Invalid response from endpoint /team/{id}/group of User API, was expecting an object with an id field.'
+    );
+  }
+  return data;
 };
 
 export const deleteGroup = async (
@@ -335,7 +397,13 @@ export const deleteGroup = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  return response.data;
+  const data = response.data;
+  if (!Array.isArray(data)) {
+    throw new Error(
+      'Invalid response from endpoint /team/{id}/action/update-members of User API, was expecting an array.'
+    );
+  }
+  return data;
 };
 
 export const listRecommendations = async (
@@ -347,14 +415,26 @@ export const listRecommendations = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  return response.data;
+  const data = response.data;
+  if (!Array.isArray(data)) {
+    throw new Error(
+      'Invalid response from endpoint /recommendation of User API, was expecting an array.'
+    );
+  }
+  return data;
 };
 
 export const listDefaultRecommendations = async (): Promise<
   Array<Recommendation>
 > => {
   const response = await client.get(`/recommendation`);
-  return response.data;
+  const data = response.data;
+  if (!Array.isArray(data)) {
+    throw new Error(
+      'Invalid response from endpoint /recommendation of User API, was expecting an array.'
+    );
+  }
+  return data;
 };
 
 export const updateUserGroup = async (
@@ -373,7 +453,13 @@ export const updateUserGroup = async (
       params: { userId: adminUserId },
     }
   );
-  return response.data;
+  const data = response.data;
+  if (!Array.isArray(data)) {
+    throw new Error(
+      'Invalid response from endpoint /team/{id}/action/update-members of User API, was expecting an array.'
+    );
+  }
+  return data;
 };
 
 export const getUserPublicProfilesByIds = async (
@@ -386,7 +472,18 @@ export const getUserPublicProfilesByIds = async (
       id: ids.join(','),
     },
   });
-  return response.data;
+  const data = response.data;
+  if (!data || typeof data !== 'object') {
+    throw new Error(
+      'Invalid response from endpoint /user-public-profile of User API, was expecting an object.'
+    );
+  }
+  if (!data.id) {
+    throw new Error(
+      'Invalid response from endpoint /user-public-profile of User API, was expecting an object with an id field.'
+    );
+  }
+  return data;
 };
 
 export const getUserPublicProfile = async (
@@ -394,7 +491,18 @@ export const getUserPublicProfile = async (
 ): Promise<UserPublicProfile> => {
   const response = await client.get(`/user-public-profile/${id}`);
 
-  return response.data;
+  const data = response.data;
+  if (!data || typeof data !== 'object') {
+    throw new Error(
+      'Invalid response from endpoint /user-public-profile/{id} of User API, was expecting an object.'
+    );
+  }
+  if (!data.id) {
+    throw new Error(
+      'Invalid response from endpoint /user-public-profile/{id} of User API, was expecting an object with an id field.'
+    );
+  }
+  return data;
 };
 
 export const changeTeamMemberPassword = async (
@@ -475,7 +583,13 @@ export const createTeamMembers = async (
       headers: { Authorization: authorizationHeader },
     }
   );
-  return response.data;
+  const data = response.data;
+  if (!Array.isArray(data)) {
+    throw new Error(
+      'Invalid response from endpoint /team/{id}/action/batch-create-users of User API, was expecting an array.'
+    );
+  }
+  return data;
 };
 
 export const setUserAsAdmin = async (
@@ -510,7 +624,18 @@ export const getUsernameAvailability = async (
   username: string
 ): Promise<UsernameAvailability> => {
   const response = await client.get(`/username-availability/${username}`);
-  return response.data;
+  const data = response.data;
+  if (!data || typeof data !== 'object') {
+    throw new Error(
+      'Invalid response from endpoint /username-availability/{username} of User API, was expecting an object.'
+    );
+  }
+  if (typeof data.isAvailable !== 'boolean') {
+    throw new Error(
+      'Invalid response from endpoint /username-availability/{username} of User API, was expecting an object with an isAvailable field.'
+    );
+  }
+  return data;
 };
 
 export const syncDiscordUsername = async (
@@ -536,7 +661,9 @@ export const getUserCommentQualityRatingsLeaderboards = async (): Promise<
   );
 
   if (!Array.isArray(response.data)) {
-    throw new Error('Invalid response from the user leaderboard API');
+    throw new Error(
+      'Invalid response from endpoint /user-comment-quality-ratings-leaderboard of User API, was expecting an array.'
+    );
   }
 
   return response.data;
@@ -776,7 +903,18 @@ export const fetchUserCourseProgress = async (
       params: { userId },
     });
 
-    return response.data;
+    const data = response.data;
+    if (data && (!data || typeof data !== 'object')) {
+      throw new Error(
+        'Invalid response from endpoint /course/{id}/progress of User API, was expecting an object or null.'
+      );
+    }
+    if (data && !data.userId) {
+      throw new Error(
+        'Invalid response from endpoint /course/{id}/progress of User API, was expecting an object with a userId field.'
+      );
+    }
+    return data;
   } catch (error) {
     const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(error);
     if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
@@ -814,7 +952,18 @@ export const generateCustomAuthToken = async (
       params: { userId },
     }
   );
-  return response.data.customAuthToken;
+  const data = response.data;
+  if (!data || typeof data !== 'object') {
+    throw new Error(
+      'Invalid response from endpoint /user/action/generate-custom-auth-token of User API, was expecting an object.'
+    );
+  }
+  if (typeof data.customAuthToken !== 'string') {
+    throw new Error(
+      'Invalid response from endpoint /user/action/generate-custom-auth-token of User API, was expecting an object with a customAuthToken field.'
+    );
+  }
+  return data.customAuthToken;
 };
 
 export const editUser = async (
@@ -835,5 +984,16 @@ export const editUser = async (
     params: { userId },
   });
 
-  return response.data;
+  const data = response.data;
+  if (!data || typeof data !== 'object') {
+    throw new Error(
+      'Invalid response from endpoint /user/{id} of User API, was expecting an object.'
+    );
+  }
+  if (!data.id) {
+    throw new Error(
+      'Invalid response from endpoint /user/{id} of User API, was expecting an object with an id field.'
+    );
+  }
+  return data;
 };

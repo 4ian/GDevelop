@@ -84,7 +84,18 @@ export const createOrEnsureBadgeForUser = async (
       }
     );
     onBadgesChanged();
-    return response.data;
+    const data = response.data;
+    if (!data || typeof data !== 'object') {
+      throw new Error(
+        'Invalid response from endpoint /user/{id}/badge of User API, was expecting an object.'
+      );
+    }
+    if (!data.achievementId) {
+      throw new Error(
+        'Invalid response from endpoint /user/{id}/badge of User API, was expecting an object with an achievementId field.'
+      );
+    }
+    return data;
   } catch (error) {
     const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(error);
     if (extractedStatusAndCode && extractedStatusAndCode.status === 409) {
@@ -167,7 +178,9 @@ export const markBadgesAsSeen = async (
       }
     );
     onBadgesChanged();
-    return response.data;
+    const data = response.data;
+    // Note: response.data might be undefined for PATCH requests, so we don't validate it
+    return data;
   } catch (err) {
     console.error(`Couldn't mark badges as seen: ${err}`);
   }

@@ -16,7 +16,9 @@ export const getReleases = async (): Promise<Array<Release>> => {
   });
   const releases = response.data;
   if (!Array.isArray(releases)) {
-    throw new Error('Invalid releases');
+    throw new Error(
+      'Invalid response from endpoint /release of Release API, was expecting an array.'
+    );
   }
 
   return releases;

@@ -163,12 +163,29 @@ export const fetchInAppTutorialShortHeaders = async (): Promise<
   const response = await axios.get(
     `${GDevelopAssetApi.baseUrl}/in-app-tutorial-short-header`
   );
-  return response.data;
+  const data = response.data;
+  if (!Array.isArray(data)) {
+    throw new Error(
+      'Invalid response from endpoint /in-app-tutorial-short-header of Asset API, was expecting an array.'
+    );
+  }
+  return data;
 };
 
 export const fetchInAppTutorial = async (
   shortHeader: InAppTutorialShortHeader
 ): Promise<InAppTutorial> => {
   const response = await axios.get(shortHeader.contentUrl);
-  return response.data;
+  const data = response.data;
+  if (!data || typeof data !== 'object') {
+    throw new Error(
+      'Invalid response from endpoint in-app-tutorial contentUrl of Asset API, was expecting an object.'
+    );
+  }
+  if (!data.id) {
+    throw new Error(
+      'Invalid response from endpoint in-app-tutorial contentUrl of Asset API, was expecting an object with an id field.'
+    );
+  }
+  return data;
 };

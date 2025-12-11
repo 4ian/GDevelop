@@ -29,5 +29,6 @@ export const submitQuestion = async (
       },
     }
   );
+  // Note: submitQuestion returns void, so no validation needed
   return response.data;
 };

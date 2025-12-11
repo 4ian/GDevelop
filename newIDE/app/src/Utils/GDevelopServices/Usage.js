@@ -289,12 +289,24 @@ export const listSubscriptionPlans = async (options: {|
         Authorization: authorizationHeader,
       },
     });
-    return response.data;
+    const data = response.data;
+    if (!Array.isArray(data)) {
+      throw new Error(
+        'Invalid response from endpoint /subscription-plan of Usage API, was expecting an array.'
+      );
+    }
+    return data;
   }
   const response = await apiClient.get('/subscription-plan', {
     params: { includeLegacy: options.includeLegacy ? 'true' : 'false' },
   });
-  return response.data;
+  const data = response.data;
+  if (!Array.isArray(data)) {
+    throw new Error(
+      'Invalid response from endpoint /subscription-plan of Usage API, was expecting an array.'
+    );
+  }
+  return data;
 };
 
 export const getSubscriptionPlanPricingSystem = async (
@@ -339,13 +351,25 @@ export const listSubscriptionPlanPricingSystems = async (options: {|
         Authorization: authorizationHeader,
       },
     });
-    return response.data;
+    const data = response.data;
+    if (!Array.isArray(data)) {
+      throw new Error(
+        'Invalid response from endpoint /subscription-plan-pricing-system of Usage API, was expecting an array.'
+      );
+    }
+    return data;
   }
 
   const response = await apiClient.get('/subscription-plan-pricing-system', {
     params,
   });
-  return response.data;
+  const data = response.data;
+  if (!Array.isArray(data)) {
+    throw new Error(
+      'Invalid response from endpoint /subscription-plan-pricing-system of Usage API, was expecting an array.'
+    );
+  }
+  return data;
 };
 
 export const getUserUsages = async (
@@ -362,7 +386,13 @@ export const getUserUsages = async (
       Authorization: authorizationHeader,
     },
   });
-  return response.data;
+  const data = response.data;
+  if (!Array.isArray(data)) {
+    throw new Error(
+      'Invalid response from endpoint /usage of Usage API, was expecting an array.'
+    );
+  }
+  return data;
 };
 
 export const getUserEarningsBalance = async (
@@ -381,7 +411,9 @@ export const getUserEarningsBalance = async (
   });
   const userEarningsBalances = response.data;
   if (!Array.isArray(userEarningsBalances)) {
-    throw new Error('Invalid response from the user earnings API');
+    throw new Error(
+      'Invalid response from endpoint /user-earnings-balance of Usage API, was expecting an array.'
+    );
   }
 
   if (userEarningsBalances.length === 0) {
@@ -432,7 +464,18 @@ export const getUserLimits = async (
       Authorization: authorizationHeader,
     },
   });
-  return response.data;
+  const data = response.data;
+  if (!data || typeof data !== 'object') {
+    throw new Error(
+      'Invalid response from endpoint /limits of Usage API, was expecting an object.'
+    );
+  }
+  if (!data.capabilities) {
+    throw new Error(
+      'Invalid response from endpoint /limits of Usage API, was expecting an object with a capabilities field.'
+    );
+  }
+  return data;
 };
 
 export const getUserSubscription = async (
@@ -449,7 +492,18 @@ export const getUserSubscription = async (
       Authorization: authorizationHeader,
     },
   });
-  return response.data;
+  const data = response.data;
+  if (!data || typeof data !== 'object') {
+    throw new Error(
+      'Invalid response from endpoint /subscription-v2 of Usage API, was expecting an object.'
+    );
+  }
+  if (!data.userId) {
+    throw new Error(
+      'Invalid response from endpoint /subscription-v2 of Usage API, was expecting an object with a userId field.'
+    );
+  }
+  return data;
 };
 
 export const changeUserSubscription = async (
@@ -477,7 +531,18 @@ export const changeUserSubscription = async (
     }
   );
 
-  return response.data;
+  const data = response.data;
+  if (!data || typeof data !== 'object') {
+    throw new Error(
+      'Invalid response from endpoint /subscription-v2 of Usage API, was expecting an object.'
+    );
+  }
+  if (!data.userId) {
+    throw new Error(
+      'Invalid response from endpoint /subscription-v2 of Usage API, was expecting an object with a userId field.'
+    );
+  }
+  return data;
 };
 
 export const canSeamlesslyChangeSubscription = (
@@ -534,7 +599,18 @@ export const getSignedUrl = async (params: {|
   signedUrl: string,
 }> => {
   const response = await apiClient.post('/upload-options/signed-url', params);
-  return response.data;
+  const data = response.data;
+  if (!data || typeof data !== 'object') {
+    throw new Error(
+      'Invalid response from endpoint /upload-options/signed-url of Usage API, was expecting an object.'
+    );
+  }
+  if (typeof data.signedUrl !== 'string') {
+    throw new Error(
+      'Invalid response from endpoint /upload-options/signed-url of Usage API, was expecting an object with a signedUrl field.'
+    );
+  }
+  return data;
 };
 
 export const getSignedUrls = async (params: {|
@@ -547,7 +623,18 @@ export const getSignedUrls = async (params: {|
   signedUrls: Array<string>,
 }> => {
   const response = await apiClient.post('/upload-options/signed-url', params);
-  return response.data;
+  const data = response.data;
+  if (!data || typeof data !== 'object') {
+    throw new Error(
+      'Invalid response from endpoint /upload-options/signed-url of Usage API, was expecting an object.'
+    );
+  }
+  if (!Array.isArray(data.signedUrls)) {
+    throw new Error(
+      'Invalid response from endpoint /upload-options/signed-url of Usage API, was expecting an object with a signedUrls array field.'
+    );
+  }
+  return data;
 };
 
 export const getRedirectToSubscriptionPortalUrl = async (
@@ -569,7 +656,13 @@ export const getRedirectToSubscriptionPortalUrl = async (
     }
   );
 
-  const { sessionPortalUrl } = response.data;
+  const data = response.data;
+  if (!data || typeof data !== 'object') {
+    throw new Error(
+      'Invalid response from endpoint /subscription-v2/action/redirect-to-portal of Usage API, was expecting an object.'
+    );
+  }
+  const { sessionPortalUrl } = data;
   if (!sessionPortalUrl || typeof sessionPortalUrl !== 'string')
     throw new Error('Could not find the session portal url.');
 
@@ -718,5 +811,11 @@ export const getRedemptionCodes = async (
     },
   });
 
-  return response.data;
+  const data = response.data;
+  if (!Array.isArray(data)) {
+    throw new Error(
+      'Invalid response from endpoint /redemption-code of Usage API, was expecting an array.'
+    );
+  }
+  return data;
 };

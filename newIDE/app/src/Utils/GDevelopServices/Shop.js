@@ -251,7 +251,9 @@ export const listListedPrivateAssetPacks = async (): Promise<
   const response = await client.get('/asset-pack');
   const assetPacks = response.data;
   if (!Array.isArray(assetPacks)) {
-    throw new Error('Invalid response from the asset packs API');
+    throw new Error(
+      'Invalid response from endpoint /asset-pack of Shop API, was expecting an array.'
+    );
   }
 
   return assetPacks;
@@ -263,7 +265,9 @@ export const listListedPrivateGameTemplates = async (): Promise<
   const response = await client.get('/game-template');
   const gameTemplates = response.data;
   if (!Array.isArray(gameTemplates)) {
-    throw new Error('Invalid response from the game templates API');
+    throw new Error(
+      'Invalid response from endpoint /game-template of Shop API, was expecting an array.'
+    );
   }
 
   return gameTemplates;
@@ -275,7 +279,9 @@ export const listListedCreditsPackages = async (): Promise<
   const response = await client.get('/credits-package');
   const creditsPackages = response.data;
   if (!Array.isArray(creditsPackages)) {
-    throw new Error('Invalid response from the credits packages API');
+    throw new Error(
+      'Invalid response from endpoint /credits-package of Shop API, was expecting an array.'
+    );
   }
 
   return creditsPackages;
@@ -287,7 +293,9 @@ export const listListedCourseChapters = async (): Promise<
   const response = await client.get('/course-chapter');
   const courseChapters = response.data;
   if (!Array.isArray(courseChapters)) {
-    throw new Error('Invalid response from the course chapters API');
+    throw new Error(
+      'Invalid response from endpoint /course-chapter of Shop API, was expecting an array.'
+    );
   }
 
   return courseChapters;
@@ -299,7 +307,9 @@ export const listListedCourses = async (): Promise<
   const response = await client.get('/course');
   const courses = response.data;
   if (!Array.isArray(courses)) {
-    throw new Error('Invalid response from the courses API');
+    throw new Error(
+      'Invalid response from endpoint /course of Shop API, was expecting an array.'
+    );
   }
 
   return courses;
@@ -311,7 +321,9 @@ export const listListedBundles = async (): Promise<
   const response = await client.get('/bundle');
   const bundles = response.data;
   if (!Array.isArray(bundles)) {
-    throw new Error('Invalid response from the bundles API');
+    throw new Error(
+      'Invalid response from endpoint /bundle of Shop API, was expecting an array.'
+    );
   }
 
   return bundles;
@@ -330,7 +342,18 @@ export const getListedBundle = async ({
     },
   });
 
-  return response.data;
+  const data = response.data;
+  if (data && (!data || typeof data !== 'object')) {
+    throw new Error(
+      'Invalid response from endpoint /bundle/{id} of Shop API, was expecting an object or null.'
+    );
+  }
+  if (data && !data.id) {
+    throw new Error(
+      'Invalid response from endpoint /bundle/{id} of Shop API, was expecting an object with an id field.'
+    );
+  }
+  return data;
 };
 
 export const listSellerAssetPacks = async ({
@@ -388,7 +411,13 @@ export const listUserPurchases = async (
       Authorization: authorizationHeader,
     },
   });
-  return response.data;
+  const data = response.data;
+  if (!Array.isArray(data)) {
+    throw new Error(
+      'Invalid response from endpoint /purchase of Shop API, was expecting an array.'
+    );
+  }
+  return data;
 };
 
 export const getAuthorizationTokenForPrivateAssets = async (
@@ -408,7 +437,13 @@ export const getAuthorizationTokenForPrivateAssets = async (
       params: { userId },
     }
   );
-  return response.data;
+  const data = response.data;
+  if (typeof data !== 'string') {
+    throw new Error(
+      'Invalid response from endpoint /asset-pack/action/authorize of Shop API, was expecting a string.'
+    );
+  }
+  return data;
 };
 
 export const getAuthorizationTokenForPrivateGameTemplates = async (
@@ -428,7 +463,13 @@ export const getAuthorizationTokenForPrivateGameTemplates = async (
       params: { userId },
     }
   );
-  return response.data;
+  const data = response.data;
+  if (typeof data !== 'string') {
+    throw new Error(
+      'Invalid response from endpoint /game-template/action/authorize of Shop API, was expecting a string.'
+    );
+  }
+  return data;
 };
 
 export const createProductAuthorizedUrl = (
@@ -562,7 +603,9 @@ export const listProductLicenses = async ({
   const productLicenses = response.data;
 
   if (!Array.isArray(productLicenses)) {
-    throw new Error('Invalid response from the product licenses API');
+    throw new Error(
+      'Invalid response from endpoint /product-license of Shop API, was expecting an array.'
+    );
   }
 
   return productLicenses;
@@ -773,5 +816,16 @@ export const claimPurchase = async ({
     }
   );
 
-  return result.data;
+  const data = result.data;
+  if (!data || typeof data !== 'object') {
+    throw new Error(
+      'Invalid response from endpoint /purchase/{id}/action/claim of Shop API, was expecting an object.'
+    );
+  }
+  if (!data.id) {
+    throw new Error(
+      'Invalid response from endpoint /purchase/{id}/action/claim of Shop API, was expecting an object with an id field.'
+    );
+  }
+  return data;
 };

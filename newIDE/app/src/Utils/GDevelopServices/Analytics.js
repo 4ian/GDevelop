@@ -70,7 +70,18 @@ export const getGameMetrics = async (
   });
 
   if (response.status === 404) return null;
-  return response.data;
+  const data = response.data;
+  if (data && typeof data !== 'object') {
+    throw new Error(
+      'Invalid response from endpoint /game-metrics of Analytics API, was expecting an object.'
+    );
+  }
+  if (data && !data.date) {
+    throw new Error(
+      'Invalid response from endpoint /game-metrics of Analytics API, was expecting an object with a date field.'
+    );
+  }
+  return data;
 };
 
 export const getGameMetricsFrom = async (
@@ -94,5 +105,11 @@ export const getGameMetricsFrom = async (
   });
 
   if (response.status === 404) return null;
-  return response.data;
+  const data = response.data;
+  if (!Array.isArray(data)) {
+    throw new Error(
+      'Invalid response from endpoint /game-metrics of Analytics API, was expecting an array.'
+    );
+  }
+  return data;
 };

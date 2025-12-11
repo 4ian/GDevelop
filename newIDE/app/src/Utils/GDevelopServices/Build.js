@@ -205,7 +205,20 @@ export const buildElectron = (
         },
       })
     )
-    .then(response => response.data);
+    .then(response => {
+      const data = response.data;
+      if (!data || typeof data !== 'object') {
+        throw new Error(
+          'Invalid response from endpoint /build of Build API, was expecting an object.'
+        );
+      }
+      if (!data.id) {
+        throw new Error(
+          'Invalid response from endpoint /build of Build API, was expecting an object with an id field.'
+        );
+      }
+      return data;
+    });
 };
 
 export const buildWeb = (
@@ -235,7 +248,20 @@ export const buildWeb = (
         },
       })
     )
-    .then(response => response.data);
+    .then(response => {
+      const data = response.data;
+      if (!data || typeof data !== 'object') {
+        throw new Error(
+          'Invalid response from endpoint /build of Build API, was expecting an object.'
+        );
+      }
+      if (!data.id) {
+        throw new Error(
+          'Invalid response from endpoint /build of Build API, was expecting an object with an id field.'
+        );
+      }
+      return data;
+    });
 };
 
 export const buildCordovaAndroid = (
@@ -276,7 +302,20 @@ export const buildCordovaAndroid = (
         }
       )
     )
-    .then(response => response.data);
+    .then(response => {
+      const data = response.data;
+      if (!data || typeof data !== 'object') {
+        throw new Error(
+          'Invalid response from endpoint /build of Build API, was expecting an object.'
+        );
+      }
+      if (!data.id) {
+        throw new Error(
+          'Invalid response from endpoint /build of Build API, was expecting an object with an id field.'
+        );
+      }
+      return data;
+    });
 };
 
 export const buildCordovaIos = (
@@ -315,7 +354,20 @@ export const buildCordovaIos = (
         }
       )
     )
-    .then(response => response.data);
+    .then(response => {
+      const data = response.data;
+      if (!data || typeof data !== 'object') {
+        throw new Error(
+          'Invalid response from endpoint /build of Build API, was expecting an object.'
+        );
+      }
+      if (!data.id) {
+        throw new Error(
+          'Invalid response from endpoint /build of Build API, was expecting an object with an id field.'
+        );
+      }
+      return data;
+    });
 };
 
 export const getBuild = (
@@ -334,7 +386,20 @@ export const getBuild = (
         },
       })
     )
-    .then(response => response.data);
+    .then(response => {
+      const data = response.data;
+      if (!data || typeof data !== 'object') {
+        throw new Error(
+          'Invalid response from endpoint /build/{id} of Build API, was expecting an object.'
+        );
+      }
+      if (!data.id) {
+        throw new Error(
+          'Invalid response from endpoint /build/{id} of Build API, was expecting an object with an id field.'
+        );
+      }
+      return data;
+    });
 };
 
 export const getBuilds = (
@@ -354,7 +419,15 @@ export const getBuilds = (
         },
       })
     )
-    .then(response => response.data);
+    .then(response => {
+      const data = response.data;
+      if (!Array.isArray(data)) {
+        throw new Error(
+          'Invalid response from endpoint /build of Build API, was expecting an array.'
+        );
+      }
+      return data;
+    });
 };
 
 export const updateBuild = (
@@ -397,7 +470,20 @@ export const deleteBuild = (
         },
       })
     )
-    .then(response => response.data);
+    .then(response => {
+      const data = response.data;
+      if (!data || typeof data !== 'object') {
+        throw new Error(
+          'Invalid response from endpoint /build/{id} of Build API, was expecting an object.'
+        );
+      }
+      if (!data.id) {
+        throw new Error(
+          'Invalid response from endpoint /build/{id} of Build API, was expecting an object with an id field.'
+        );
+      }
+      return data;
+    });
 };
 
 export const getUserSigningCredentials = async (

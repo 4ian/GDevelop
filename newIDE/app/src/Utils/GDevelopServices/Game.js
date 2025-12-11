@@ -324,7 +324,18 @@ export const registerGame = async (
     }
   );
 
-  return response.data;
+  const data = response.data;
+  if (!data || typeof data !== 'object') {
+    throw new Error(
+      'Invalid response from endpoint /game/{id} of Game API, was expecting an object.'
+    );
+  }
+  if (!data.id) {
+    throw new Error(
+      'Invalid response from endpoint /game/{id} of Game API, was expecting an object with an id field.'
+    );
+  }
+  return data;
 };
 
 export const updateGame = async (
@@ -381,7 +392,18 @@ export const updateGame = async (
     }
   );
 
-  return response.data;
+  const data = response.data;
+  if (!data || typeof data !== 'object') {
+    throw new Error(
+      'Invalid response from endpoint /game/{id} of Game API, was expecting an object.'
+    );
+  }
+  if (!data.id) {
+    throw new Error(
+      'Invalid response from endpoint /game/{id} of Game API, was expecting an object with an id field.'
+    );
+  }
+  return data;
 };
 
 export const setGameUserAcls = async (
@@ -456,7 +478,18 @@ export const getGame = async (
     },
   });
 
-  return response.data;
+  const data = response.data;
+  if (!data || typeof data !== 'object') {
+    throw new Error(
+      'Invalid response from endpoint /game/{id} of Game API, was expecting an object.'
+    );
+  }
+  if (!data.id) {
+    throw new Error(
+      'Invalid response from endpoint /game/{id} of Game API, was expecting an object with an id field.'
+    );
+  }
+  return data;
 };
 
 export const deleteGame = async (
@@ -473,7 +506,18 @@ export const deleteGame = async (
       Authorization: authorizationHeader,
     },
   });
-  return response.data;
+  const data = response.data;
+  if (!data || typeof data !== 'object') {
+    throw new Error(
+      'Invalid response from endpoint /game/{id} of Game API, was expecting an object.'
+    );
+  }
+  if (!data.id) {
+    throw new Error(
+      'Invalid response from endpoint /game/{id} of Game API, was expecting an object with an id field.'
+    );
+  }
+  return data;
 };
 
 export const getGames = async (
@@ -491,17 +535,40 @@ export const getGames = async (
     },
   });
 
-  return response.data;
+  const data = response.data;
+  if (!Array.isArray(data)) {
+    throw new Error(
+      'Invalid response from endpoint /game of Game API, was expecting an array.'
+    );
+  }
+  return data;
 };
 
 export const getPublicGame = async (gameId: string): Promise<PublicGame> => {
   const response = await client.get(`/public-game/${gameId}`);
-  return response.data;
+  const data = response.data;
+  if (!data || typeof data !== 'object') {
+    throw new Error(
+      'Invalid response from endpoint /public-game/{id} of Game API, was expecting an object.'
+    );
+  }
+  if (!data.id) {
+    throw new Error(
+      'Invalid response from endpoint /public-game/{id} of Game API, was expecting an object with an id field.'
+    );
+  }
+  return data;
 };
 
 export const getGameCategories = async (): Promise<GameCategory[]> => {
   const response = await client.get('/game-category');
-  return response.data;
+  const data = response.data;
+  if (!Array.isArray(data)) {
+    throw new Error(
+      'Invalid response from endpoint /game-category of Game API, was expecting an array.'
+    );
+  }
+  return data;
 };
 
 export const buyGameFeaturing = async (
@@ -544,12 +611,24 @@ export const listGameFeaturings = async (
     },
   });
 
-  return response.data;
+  const data = response.data;
+  if (!Array.isArray(data)) {
+    throw new Error(
+      'Invalid response from endpoint /game-featuring of Game API, was expecting an array.'
+    );
+  }
+  return data;
 };
 
 export const listMarketingPlans = async (): Promise<MarketingPlan[]> => {
   const response = await client.get('/marketing-plan');
-  return response.data;
+  const data = response.data;
+  if (!Array.isArray(data)) {
+    throw new Error(
+      'Invalid response from endpoint /marketing-plan of Game API, was expecting an array.'
+    );
+  }
+  return data;
 };
 
 export const getRecommendedMarketingPlan = async (

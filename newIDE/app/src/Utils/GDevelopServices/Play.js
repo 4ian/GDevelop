@@ -115,7 +115,13 @@ export const listGameActiveLeaderboards = async (
     headers: { Authorization: authorizationHeader },
     params: { userId, deleted: 'false' },
   });
-  return response.data;
+  const data = response.data;
+  if (data !== null && !Array.isArray(data)) {
+    throw new Error(
+      'Invalid response from endpoint /game/{id}/leaderboard of Play API, was expecting an array or null.'
+    );
+  }
+  return data;
 };
 
 export const extractNextPageUriFromLinkHeader = (
@@ -158,8 +164,14 @@ export const listLeaderboardEntries = async (
   const nextPageUri = response.headers.link
     ? extractNextPageUriFromLinkHeader(response.headers.link)
     : null;
+  const entries = response.data;
+  if (!Array.isArray(entries)) {
+    throw new Error(
+      'Invalid response from endpoint /game/{id}/leaderboard/{id}/entry of Play API, was expecting an array.'
+    );
+  }
   return {
-    entries: response.data,
+    entries,
     nextPageUri,
   };
 };
@@ -185,7 +197,18 @@ export const createLeaderboard = async (
       params: { userId },
     }
   );
-  return response.data;
+  const data = response.data;
+  if (data && (!data || typeof data !== 'object')) {
+    throw new Error(
+      'Invalid response from endpoint /game/{id}/leaderboard of Play API, was expecting an object or null.'
+    );
+  }
+  if (data && !data.id) {
+    throw new Error(
+      'Invalid response from endpoint /game/{id}/leaderboard of Play API, was expecting an object with an id field.'
+    );
+  }
+  return data;
 };
 
 type LeaderboardDuplicationPayload = {|
@@ -211,7 +234,18 @@ export const duplicateLeaderboard = async (
       params: { userId },
     }
   );
-  return response.data;
+  const data = response.data;
+  if (!data || typeof data !== 'object') {
+    throw new Error(
+      'Invalid response from endpoint /game/{id}/leaderboard/action/copy of Play API, was expecting an object.'
+    );
+  }
+  if (!data.id) {
+    throw new Error(
+      'Invalid response from endpoint /game/{id}/leaderboard/action/copy of Play API, was expecting an object with an id field.'
+    );
+  }
+  return data;
 };
 
 export const updateLeaderboard = async (
@@ -233,7 +267,18 @@ export const updateLeaderboard = async (
       params: { userId },
     }
   );
-  return response.data;
+  const data = response.data;
+  if (data && (!data || typeof data !== 'object')) {
+    throw new Error(
+      'Invalid response from endpoint /game/{id}/leaderboard/{id} of Play API, was expecting an object or null.'
+    );
+  }
+  if (data && !data.id) {
+    throw new Error(
+      'Invalid response from endpoint /game/{id}/leaderboard/{id} of Play API, was expecting an object with an id field.'
+    );
+  }
+  return data;
 };
 
 export const resetLeaderboard = async (
@@ -274,7 +319,18 @@ export const deleteLeaderboard = async (
       params: { userId },
     }
   );
-  return response.data;
+  const data = response.data;
+  if (data && (!data || typeof data !== 'object')) {
+    throw new Error(
+      'Invalid response from endpoint /game/{id}/leaderboard/{id}/reset of Play API, was expecting an object or null.'
+    );
+  }
+  if (data && !data.id) {
+    throw new Error(
+      'Invalid response from endpoint /game/{id}/leaderboard/{id}/reset of Play API, was expecting an object with an id field.'
+    );
+  }
+  return data;
 };
 
 export const deleteLeaderboardEntry = async (
@@ -295,7 +351,18 @@ export const deleteLeaderboardEntry = async (
       params: { userId },
     }
   );
-  return response.data;
+  const data = response.data;
+  if (data && (!data || typeof data !== 'object')) {
+    throw new Error(
+      'Invalid response from endpoint /game/{id}/leaderboard/{id}/entry/{id} of Play API, was expecting an object or null.'
+    );
+  }
+  if (data && !data.id) {
+    throw new Error(
+      'Invalid response from endpoint /game/{id}/leaderboard/{id}/entry/{id} of Play API, was expecting an object with an id field.'
+    );
+  }
+  return data;
 };
 
 // 2 types of comments. Feedback is private, Review is public.
@@ -350,7 +417,15 @@ export const listComments = async (
         },
       })
     )
-    .then(response => response.data);
+    .then(response => {
+      const data = response.data;
+      if (!Array.isArray(data)) {
+        throw new Error(
+          'Invalid response from endpoint /game/{id}/comment of Play API, was expecting an array.'
+        );
+      }
+      return data;
+    });
 };
 
 export const canCommentBeRatedByOwner = (comment: Comment): boolean => {
@@ -387,7 +462,20 @@ export const updateComment = async (
         }
       )
     )
-    .then(response => response.data);
+    .then(response => {
+      const data = response.data;
+      if (!data || typeof data !== 'object') {
+        throw new Error(
+          'Invalid response from endpoint /game/{id}/comment/{id} of Play API, was expecting an object.'
+        );
+      }
+      if (!data.id) {
+        throw new Error(
+          'Invalid response from endpoint /game/{id}/comment/{id} of Play API, was expecting an object with an id field.'
+        );
+      }
+      return data;
+    });
 };
 
 export const canUserCustomizeLeaderboardTheme = (
@@ -465,7 +553,18 @@ export const getLobbyConfiguration = async (
       Authorization: authorizationHeader,
     },
   });
-  return response.data;
+  const data = response.data;
+  if (!data || typeof data !== 'object') {
+    throw new Error(
+      'Invalid response from endpoint /game/{id}/lobby-configuration of Play API, was expecting an object.'
+    );
+  }
+  if (typeof data.maxPlayers !== 'number') {
+    throw new Error(
+      'Invalid response from endpoint /game/{id}/lobby-configuration of Play API, was expecting an object with a maxPlayers field.'
+    );
+  }
+  return data;
 };
 
 export const updateLobbyConfiguration = async (
@@ -494,7 +593,18 @@ export const updateLobbyConfiguration = async (
       },
     }
   );
-  return response.data;
+  const data = response.data;
+  if (!data || typeof data !== 'object') {
+    throw new Error(
+      'Invalid response from endpoint /game/{id}/lobby-configuration of Play API, was expecting an object.'
+    );
+  }
+  if (typeof data.maxPlayers !== 'number') {
+    throw new Error(
+      'Invalid response from endpoint /game/{id}/lobby-configuration of Play API, was expecting an object with a maxPlayers field.'
+    );
+  }
+  return data;
 };
 
 export const duplicateLobbyConfiguration = async ({
@@ -517,7 +627,18 @@ export const duplicateLobbyConfiguration = async ({
       params: { userId },
     }
   );
-  return response.data;
+  const data = response.data;
+  if (!data || typeof data !== 'object') {
+    throw new Error(
+      'Invalid response from endpoint /game/{id}/lobby-configuration/action/copy of Play API, was expecting an object.'
+    );
+  }
+  if (typeof data.maxPlayers !== 'number') {
+    throw new Error(
+      'Invalid response from endpoint /game/{id}/lobby-configuration/action/copy of Play API, was expecting an object with a maxPlayers field.'
+    );
+  }
+  return data;
 };
 
 export const getPlayerToken = async ({
@@ -542,5 +663,11 @@ export const getPlayerToken = async ({
       },
     }
   );
-  return response.data;
+  const data = response.data;
+  if (typeof data !== 'string') {
+    throw new Error(
+      'Invalid response from endpoint /game/{id}/player-token of Play API, was expecting a string.'
+    );
+  }
+  return data;
 };

@@ -280,7 +280,18 @@ export const createCloudProject = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  return response.data;
+  const data = response.data;
+  if (!data || typeof data !== 'object') {
+    throw new Error(
+      'Invalid response from endpoint /project/{id} of Project API, was expecting an object.'
+    );
+  }
+  if (!data.id) {
+    throw new Error(
+      'Invalid response from endpoint /project/{id} of Project API, was expecting an object with an id field.'
+    );
+  }
+  return data;
 };
 
 /**
@@ -424,7 +435,9 @@ export const listUserCloudProjects = async (
   const cloudProjects = response.data;
 
   if (!Array.isArray(cloudProjects)) {
-    throw new Error('Invalid response from the projects API');
+    throw new Error(
+      'Invalid response from endpoint /project of Project API, was expecting an array.'
+    );
   }
 
   return cloudProjects;
@@ -443,7 +456,9 @@ export const listOtherUserCloudProjects = async (
   const cloudProjects = response.data;
 
   if (!Array.isArray(cloudProjects)) {
-    throw new Error('Invalid response from the projects API');
+    throw new Error(
+      'Invalid response from endpoint /user/{id}/project of Project API, was expecting an array.'
+    );
   }
 
   return cloudProjects;
@@ -464,7 +479,18 @@ export const getCloudProject = async (
     },
     params: { userId },
   });
-  return response.data;
+  const data = response.data;
+  if (data && (!data || typeof data !== 'object')) {
+    throw new Error(
+      'Invalid response from endpoint /project/{id} of Project API, was expecting an object or null.'
+    );
+  }
+  if (data && !data.id) {
+    throw new Error(
+      'Invalid response from endpoint /project/{id} of Project API, was expecting an object with an id field.'
+    );
+  }
+  return data;
 };
 
 export const getOtherUserCloudProject = async (
@@ -486,7 +512,18 @@ export const getOtherUserCloudProject = async (
       params: { userId },
     }
   );
-  return response.data;
+  const data = response.data;
+  if (data && (!data || typeof data !== 'object')) {
+    throw new Error(
+      'Invalid response from endpoint /user/{id}/project/{id} of Project API, was expecting an object or null.'
+    );
+  }
+  if (data && !data.id) {
+    throw new Error(
+      'Invalid response from endpoint /user/{id}/project/{id} of Project API, was expecting an object with an id field.'
+    );
+  }
+  return data;
 };
 
 export const updateCloudProject = async (
@@ -516,7 +553,18 @@ export const updateCloudProject = async (
       params: { userId },
     }
   );
-  return response.data;
+  const data = response.data;
+  if (data && (!data || typeof data !== 'object')) {
+    throw new Error(
+      'Invalid response from endpoint /project/{id} of Project API, was expecting an object or null.'
+    );
+  }
+  if (data && !data.id) {
+    throw new Error(
+      'Invalid response from endpoint /project/{id} of Project API, was expecting an object with an id field.'
+    );
+  }
+  return data;
 };
 
 export const deleteCloudProject = async (
@@ -534,7 +582,18 @@ export const deleteCloudProject = async (
     },
     params: { userId },
   });
-  return response.data;
+  const data = response.data;
+  if (data && (!data || typeof data !== 'object')) {
+    throw new Error(
+      'Invalid response from endpoint /project/{id} of Project API, was expecting an object or null.'
+    );
+  }
+  if (data && !data.id) {
+    throw new Error(
+      'Invalid response from endpoint /project/{id} of Project API, was expecting an object with an id field.'
+    );
+  }
+  return data;
 };
 
 const getPresignedUrlForVersionUpload = async (
@@ -682,7 +741,18 @@ export const createProjectUserAcl = async (
       params: { userId: currentUserId },
     }
   );
-  return response.data;
+  const data = response.data;
+  if (data && (!data || typeof data !== 'object')) {
+    throw new Error(
+      'Invalid response from endpoint /project-user-acl of Project API, was expecting an object or null.'
+    );
+  }
+  if (data && !data.projectId) {
+    throw new Error(
+      'Invalid response from endpoint /project-user-acl of Project API, was expecting an object with a projectId field.'
+    );
+  }
+  return data;
 };
 
 export const deleteProjectUserAcl = async (
@@ -700,6 +770,7 @@ export const deleteProjectUserAcl = async (
     },
     params: { userId: currentUserId, projectId, feature, targetUserId: userId },
   });
+  // Note: deleteProjectUserAcl returns void, so no validation needed
   return response.data;
 };
 
@@ -721,7 +792,9 @@ export const listProjectUserAcls = async (
   const projectUserAcls = response.data;
 
   if (!Array.isArray(projectUserAcls)) {
-    throw new Error('Invalid response from the project user acls API');
+    throw new Error(
+      'Invalid response from endpoint /project-user-acl of Project API, was expecting an array.'
+    );
   }
 
   return projectUserAcls;
@@ -756,7 +829,18 @@ export const updateCloudProjectVersion = async (
       params: { userId },
     }
   );
-  return response.data;
+  const data = response.data;
+  if (data && (!data || typeof data !== 'object')) {
+    throw new Error(
+      'Invalid response from endpoint /project/{id}/version/{id} of Project API, was expecting an object or null.'
+    );
+  }
+  if (data && !data.id) {
+    throw new Error(
+      'Invalid response from endpoint /project/{id}/version/{id} of Project API, was expecting an object with an id field.'
+    );
+  }
+  return data;
 };
 
 /**
@@ -793,7 +877,9 @@ export const listVersionsOfProject = async (
   const projectVersions = response.data;
 
   if (!Array.isArray(projectVersions)) {
-    throw new Error('Invalid response from the project versions API');
+    throw new Error(
+      'Invalid response from endpoint /project/{id}/version of Project API, was expecting an array.'
+    );
   }
   return {
     versions: projectVersions,

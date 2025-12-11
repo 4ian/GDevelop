@@ -66,8 +66,11 @@ export class LayerTreeViewItemContent implements TreeViewItemContent {
     return getLayerTreeViewItemId(this.layer);
   }
 
-  getHtmlId(index: number): ?string {
-    return `layer-${index}`;
+  getHtmlId(nodeIndex: number): ?string {
+    // This index is not reversed with `_getRevertedIndex`
+    return `layer-${this.props.layersContainer.getLayerPosition(
+      this.layer.getName()
+    )}`;
   }
 
   getDataSet(): ?HTMLDataset {

@@ -4,6 +4,7 @@ import { GDevelopAiCdn, GDevelopGenerationApi } from './ApiConfigs';
 import { type MessageByLocale } from '../i18n/MessageByLocale';
 import { getIDEVersionWithHash } from '../../Version';
 import { extractNextPageUriFromLinkHeader } from './Play';
+import { ensureIsArray } from '../DataValidator';
 
 export type Environment = 'staging' | 'live';
 
@@ -237,13 +238,12 @@ export const getAiRequests = async (
   const nextPageUri = response.headers.link
     ? extractNextPageUriFromLinkHeader(response.headers.link)
     : null;
-  const aiRequests = response.data;
-  if (!Array.isArray(aiRequests)) {
-    throw new Error('Invalid response from Ai requests API.');
-  }
 
   return {
-    aiRequests,
+    aiRequests: ensureIsArray({
+      data: response.data,
+      endpointName: 'ai-request (Generation API)',
+    }),
     nextPageUri,
   };
 };

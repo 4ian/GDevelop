@@ -16,6 +16,7 @@ import {
   isPrivateAssetResourceAuthorizedUrl,
 } from './Shop';
 import { type ExtensionDependency } from '../../Utils/GDevelopServices/Extension';
+import { ensureIsArray } from '../DataValidator';
 
 export type License = {|
   name: string,
@@ -422,15 +423,12 @@ export const listAllPublicAssets = async ({
     throw new Error('Unexpected response from the assets endpoints.');
   }
 
-  const publicAssetShortHeaders = responsesData[0];
+  const publicAssetShortHeaders = ensureIsArray({
+    data: responsesData[0],
+    endpointName: 'asset (Asset API)',
+  });
   const publicFilters = responsesData[1];
   const publicAssetPacks = responsesData[2];
-
-  if (!Array.isArray(publicAssetShortHeaders)) {
-    throw new Error(
-      'Invalid response from the asset endpoint of the Asset API, expected an array of asset short headers.'
-    );
-  }
 
   if (!publicAssetPacks.starterPacks) {
     throw new Error(
@@ -645,14 +643,10 @@ export const listReceivedAssetShortHeaders = async (
     params: { userId },
   });
 
-  const assetShortHeaders = response.data;
-  if (!Array.isArray(assetShortHeaders)) {
-    throw new Error(
-      'Invalid response from the asset-short-header endpoint of the Asset API, expected an array of asset short headers.'
-    );
-  }
-
-  return assetShortHeaders;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'asset-short-header (Asset API)',
+  });
 };
 
 export const listReceivedAssetPacks = async (
@@ -669,14 +663,10 @@ export const listReceivedAssetPacks = async (
     params: { userId },
   });
 
-  const assetPacks = response.data;
-  if (!Array.isArray(assetPacks)) {
-    throw new Error(
-      'Invalid response from the asset-pack endpoint of the Asset API, expected an array of asset packs.'
-    );
-  }
-
-  return assetPacks;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'asset-pack (Asset API)',
+  });
 };
 
 export const listReceivedGameTemplates = async (
@@ -693,14 +683,10 @@ export const listReceivedGameTemplates = async (
     params: { userId },
   });
 
-  const gameTemplates = response.data;
-  if (!Array.isArray(gameTemplates)) {
-    throw new Error(
-      'Invalid response from the game-template endpoint of the Asset API, expected an array of game templates.'
-    );
-  }
-
-  return gameTemplates;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'game-template (Asset API)',
+  });
 };
 
 export const listReceivedBundles = async (
@@ -717,14 +703,10 @@ export const listReceivedBundles = async (
     params: { userId },
   });
 
-  const bundles = response.data;
-  if (!Array.isArray(bundles)) {
-    throw new Error(
-      'Invalid response from the bundle endpoint of the Asset API, expected an array of bundles.'
-    );
-  }
-
-  return bundles;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'bundle (Asset API)',
+  });
 };
 
 export const isPublicAssetResourceUrl = (url: string) =>
@@ -774,25 +756,17 @@ export const listCourses = async (
       },
     });
 
-    const courses = response.data;
-    if (!Array.isArray(courses)) {
-      throw new Error(
-        'Invalid response from the course endpoint of the Asset API, expected an array of courses.'
-      );
-    }
-
-    return courses;
+    return ensureIsArray({
+      data: response.data,
+      endpointName: 'course (Asset API)',
+    });
   }
   const response = await client.get(`/course`);
 
-  const courses = response.data;
-  if (!Array.isArray(courses)) {
-    throw new Error(
-      'Invalid response from the course endpoint of the Asset API, expected an array of courses.'
-    );
-  }
-
-  return courses;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'course (Asset API)',
+  });
 };
 
 export const listCourseChapters = async (
@@ -820,27 +794,19 @@ export const listCourseChapters = async (
       },
     });
 
-    const courseChapters = response.data;
-    if (!Array.isArray(courseChapters)) {
-      throw new Error(
-        'Invalid response from the course chapter endpoint of the Asset API, expected an array of course chapters.'
-      );
-    }
-
-    return courseChapters;
+    return ensureIsArray({
+      data: response.data,
+      endpointName: 'course chapter (Asset API)',
+    });
   }
   const response = await client.get(`/course/${courseId}/chapter`, {
     params: { language },
   });
 
-  const courseChapters = response.data;
-  if (!Array.isArray(courseChapters)) {
-    throw new Error(
-      'Invalid response from the course chapter endpoint of the Asset API, expected an array of course chapters.'
-    );
-  }
-
-  return courseChapters;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'course chapter (Asset API)',
+  });
 };
 
 export const getCourseChapterRatingUrl = ({

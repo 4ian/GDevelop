@@ -4,6 +4,7 @@ import { GDevelopAssetApi } from './ApiConfigs';
 import { type Filters } from './Filters';
 import { type UserPublicProfile } from './User';
 import { retryIfFailed } from '../RetryIfFailed';
+import { ensureIsArray } from '../DataValidator';
 
 export type ExampleShortHeader = {|
   id: string,
@@ -52,14 +53,11 @@ export const listAllExamples = async (): Promise<AllExamples> => {
     retryIfFailed({ times: 2 }, async () => (await axios.get(filtersUrl)).data),
   ]);
 
-  if (!Array.isArray(exampleShortHeaders)) {
-    throw new Error(
-      'Invalid response from the example endpoint of the Asset API, expected an array of example short headers.'
-    );
-  }
-
   const allExamples: AllExamples = {
-    exampleShortHeaders,
+    exampleShortHeaders: ensureIsArray({
+      data: exampleShortHeaders,
+      endpointName: 'example (Asset API)',
+    }),
     filters,
   };
 
@@ -88,12 +86,8 @@ export const getUserExampleShortHeaders = async (
     }
   );
 
-  const exampleShortHeaders = response.data;
-  if (!Array.isArray(exampleShortHeaders)) {
-    throw new Error(
-      'Invalid response from the example-short-header endpoint of the Asset API, expected an array of example short headers.'
-    );
-  }
-
-  return exampleShortHeaders;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'example-short-header (Asset API)',
+  });
 };

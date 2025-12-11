@@ -9,6 +9,7 @@ import {
 } from '../i18n/MessageByLocale';
 import { extractGDevelopApiErrorStatusAndCode } from './Errors';
 import { isNativeMobileApp } from '../Platform';
+import { ensureIsArray } from '../DataValidator';
 
 export type Usage = {
   id: string,
@@ -290,27 +291,19 @@ export const listSubscriptionPlans = async (options: {|
       },
     });
 
-    const subscriptionPlans = response.data;
-    if (!Array.isArray(subscriptionPlans)) {
-      throw new Error(
-        'Invalid response from the subscription-plan endpoint of the Usage API, expected an array of subscription plans.'
-      );
-    }
-
-    return subscriptionPlans;
+    return ensureIsArray({
+      data: response.data,
+      endpointName: 'subscription-plan (Usage API)',
+    });
   }
   const response = await apiClient.get('/subscription-plan', {
     params: { includeLegacy: options.includeLegacy ? 'true' : 'false' },
   });
 
-  const subscriptionPlans = response.data;
-  if (!Array.isArray(subscriptionPlans)) {
-    throw new Error(
-      'Invalid response from the subscription-plan endpoint of the Usage API, expected an array of subscription plans.'
-    );
-  }
-
-  return subscriptionPlans;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'subscription-plan (Usage API)',
+  });
 };
 
 export const getSubscriptionPlanPricingSystem = async (
@@ -356,28 +349,20 @@ export const listSubscriptionPlanPricingSystems = async (options: {|
       },
     });
 
-    const pricingSystems = response.data;
-    if (!Array.isArray(pricingSystems)) {
-      throw new Error(
-        'Invalid response from the subscription-plan-pricing-system endpoint of the Usage API, expected an array of pricing systems.'
-      );
-    }
-
-    return pricingSystems;
+    return ensureIsArray({
+      data: response.data,
+      endpointName: 'subscription-plan-pricing-system (Usage API)',
+    });
   }
 
   const response = await apiClient.get('/subscription-plan-pricing-system', {
     params,
   });
 
-  const pricingSystems = response.data;
-  if (!Array.isArray(pricingSystems)) {
-    throw new Error(
-      'Invalid response from the subscription-plan-pricing-system endpoint of the Usage API, expected an array of pricing systems.'
-    );
-  }
-
-  return pricingSystems;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'subscription-plan-pricing-system (Usage API)',
+  });
 };
 
 export const getUserUsages = async (
@@ -395,14 +380,10 @@ export const getUserUsages = async (
     },
   });
 
-  const usages = response.data;
-  if (!Array.isArray(usages)) {
-    throw new Error(
-      'Invalid response from the usage endpoint of the Usage API, expected an array of usages.'
-    );
-  }
-
-  return usages;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'usage (Usage API)',
+  });
 };
 
 export const getUserEarningsBalance = async (
@@ -419,10 +400,10 @@ export const getUserEarningsBalance = async (
       Authorization: authorizationHeader,
     },
   });
-  const userEarningsBalances = response.data;
-  if (!Array.isArray(userEarningsBalances)) {
-    throw new Error('Invalid response from the user earnings API');
-  }
+  const userEarningsBalances = ensureIsArray({
+    data: response.data,
+    endpointName: 'user-earnings-balance (Usage API)',
+  });
 
   if (userEarningsBalances.length === 0) {
     throw new Error('No user earnings balance found');
@@ -758,12 +739,8 @@ export const getRedemptionCodes = async (
     },
   });
 
-  const redemptionCodes = response.data;
-  if (!Array.isArray(redemptionCodes)) {
-    throw new Error(
-      'Invalid response from the redemption-code endpoint of the Usage API, expected an array of redemption codes.'
-    );
-  }
-
-  return redemptionCodes;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'redemption-code (Usage API)',
+  });
 };

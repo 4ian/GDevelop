@@ -3,6 +3,7 @@ import axios from 'axios';
 import { GDevelopAssetApi } from './ApiConfigs';
 import { type UserPublicProfile } from './User';
 import { retryIfFailed } from '../RetryIfFailed';
+import { ensureIsArray } from '../DataValidator';
 
 // This file is mocked by tests.
 // Don't put any function that is not calling services.
@@ -303,12 +304,8 @@ export const getUserExtensionShortHeaders = async (
     },
   });
 
-  const extensionShortHeaders = response.data;
-  if (!Array.isArray(extensionShortHeaders)) {
-    throw new Error(
-      'Invalid response from the extension-short-header endpoint of the Asset API, expected an array of extension short headers.'
-    );
-  }
-
-  return extensionShortHeaders;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'extension-short-header (Asset API)',
+  });
 };

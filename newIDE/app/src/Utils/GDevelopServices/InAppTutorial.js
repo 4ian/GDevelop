@@ -4,6 +4,7 @@ import axios from 'axios';
 import { GDevelopAssetApi } from './ApiConfigs';
 import { type MessageDescriptor } from '../i18n/MessageDescriptor.flow';
 import { type MessageByLocale } from '../i18n/MessageByLocale';
+import { ensureIsArray } from '../DataValidator';
 
 export const FLING_GAME_IN_APP_TUTORIAL_ID = 'flingGame';
 export const PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID = 'plinkoMultiplier';
@@ -164,14 +165,10 @@ export const fetchInAppTutorialShortHeaders = async (): Promise<
     `${GDevelopAssetApi.baseUrl}/in-app-tutorial-short-header`
   );
 
-  const inAppTutorialShortHeaders = response.data;
-  if (!Array.isArray(inAppTutorialShortHeaders)) {
-    throw new Error(
-      'Invalid response from the in-app-tutorial-short-header endpoint of the Asset API, expected an array of in-app tutorial short headers.'
-    );
-  }
-
-  return inAppTutorialShortHeaders;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'in-app-tutorial-short-header (Asset API)',
+  });
 };
 
 export const fetchInAppTutorial = async (

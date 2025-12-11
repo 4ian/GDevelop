@@ -6,6 +6,7 @@ import { type MessageByLocale } from '../i18n/MessageByLocale';
 
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { extractGDevelopApiErrorStatusAndCode } from './Errors';
+import { ensureIsArray } from '../DataValidator';
 
 export const TRIVIAL_FIRST_EVENT = 'trivial_first-event';
 export const TRIVIAL_FIRST_BEHAVIOR = 'trivial_first-behavior';
@@ -126,12 +127,10 @@ export const addCreateBadgePreHookIfNotClaimed = <
 export const getAchievements = async (): Promise<Array<Achievement>> => {
   const response = await axios.get(`${GDevelopUserApi.baseUrl}/achievement`);
 
-  const achievements = response.data;
-  if (!Array.isArray(achievements)) {
-    throw new Error('Invalid response from the achievements API');
-  }
-
-  return achievements;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'achievement (User API)',
+  });
 };
 
 export const markBadgesAsSeen = async (

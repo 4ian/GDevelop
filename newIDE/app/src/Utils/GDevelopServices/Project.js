@@ -11,6 +11,7 @@ import { isNativeMobileApp } from '../Platform';
 import { unzipFirstEntryOfBlob } from '../Zip.js/Utils';
 import { extractGDevelopApiErrorStatusAndCode } from './Errors';
 import { extractNextPageUriFromLinkHeader } from './Play';
+import { ensureIsArray } from '../DataValidator';
 
 export const CLOUD_PROJECT_NAME_MAX_LENGTH = 60;
 export const CLOUD_PROJECT_VERSION_LABEL_MAX_LENGTH = 50;
@@ -212,13 +213,10 @@ export const getLastVersionsOfProject = async (
     },
     params: { userId },
   });
-  const projectVersions = response.data;
-
-  if (!Array.isArray(projectVersions)) {
-    throw new Error('Invalid response from the project versions API');
-  }
-
-  return projectVersions;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'project version (Project API)',
+  });
 };
 
 export const getCredentialsForCloudProject = async (
@@ -421,13 +419,11 @@ export const listUserCloudProjects = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  const cloudProjects = response.data;
 
-  if (!Array.isArray(cloudProjects)) {
-    throw new Error('Invalid response from the projects API');
-  }
-
-  return cloudProjects;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'project (Project API)',
+  });
 };
 
 export const listOtherUserCloudProjects = async (
@@ -440,13 +436,11 @@ export const listOtherUserCloudProjects = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  const cloudProjects = response.data;
 
-  if (!Array.isArray(cloudProjects)) {
-    throw new Error('Invalid response from the projects API');
-  }
-
-  return cloudProjects;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'user project (Project API)',
+  });
 };
 
 export const getCloudProject = async (
@@ -594,10 +588,12 @@ const getPresignedUrlForResourcesUpload = async (
       params: { userId },
     }
   );
-  if (!response.data || !Array.isArray(response.data))
-    throw new Error('Response does not contain pre-signed urls for upload.');
+  const presignedUrls = ensureIsArray({
+    data: response.data,
+    endpointName: 'create-presigned-urls (Project API)',
+  });
 
-  const resourceFileWithPresignedUrls = response.data.map(
+  const resourceFileWithPresignedUrls = presignedUrls.map(
     (presignedUrl, index) => ({
       resourceFile: resourceFiles[index],
       presignedUrl,
@@ -718,13 +714,11 @@ export const listProjectUserAcls = async (
     },
     params: { userId: currentUserId, projectId },
   });
-  const projectUserAcls = response.data;
 
-  if (!Array.isArray(projectUserAcls)) {
-    throw new Error('Invalid response from the project user acls API');
-  }
-
-  return projectUserAcls;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'project-user-acl (Project API)',
+  });
 };
 
 export const updateCloudProjectVersion = async (
@@ -790,13 +784,12 @@ export const listVersionsOfProject = async (
   const nextPageUri = response.headers.link
     ? extractNextPageUriFromLinkHeader(response.headers.link)
     : null;
-  const projectVersions = response.data;
 
-  if (!Array.isArray(projectVersions)) {
-    throw new Error('Invalid response from the project versions API');
-  }
   return {
-    versions: projectVersions,
+    versions: ensureIsArray({
+      data: response.data,
+      endpointName: 'project version (Project API)',
+    }),
     nextPageUri,
   };
 };

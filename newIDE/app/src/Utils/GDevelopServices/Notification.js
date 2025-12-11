@@ -1,6 +1,7 @@
 // @flow
 import Axios from 'axios';
 import { GDevelopUserApi } from './ApiConfigs';
+import { ensureIsArray } from '../DataValidator';
 
 export const client = Axios.create({
   baseURL: GDevelopUserApi.baseUrl,
@@ -102,14 +103,10 @@ export const listNotifications = async (
     params: { userId, perPage: 25 },
   });
 
-  const notifications = response.data;
-  if (!Array.isArray(notifications)) {
-    throw new Error(
-      'Invalid response from the notification endpoint of the User API, expected an array of notifications.'
-    );
-  }
-
-  return notifications;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'notification (User API)',
+  });
 };
 
 export const markNotificationsAsSeen = async (

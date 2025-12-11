@@ -19,6 +19,7 @@ import { type Badge } from './Badge';
 import { type Profile } from './Authentication';
 import { type UserCourseProgress } from './Asset';
 import { extractGDevelopApiErrorStatusAndCode } from './Errors';
+import { ensureIsArray } from '../DataValidator';
 
 export type BatchCreationResultUser = {|
   email: string,
@@ -208,27 +209,21 @@ export const searchCreatorPublicProfilesByUsername = (
         type: 'creator',
       },
     })
-    .then(response => {
-      const userPublicProfiles = response.data;
-      if (!Array.isArray(userPublicProfiles)) {
-        throw new Error(
-          'Invalid response from the user-public-profile/search endpoint of the User API, expected an array of user public profiles.'
-        );
-      }
-
-      return userPublicProfiles;
-    });
+    .then(response =>
+      ensureIsArray({
+        data: response.data,
+        endpointName: 'user-public-profile/search (User API)',
+      })
+    );
 };
 
 export const getUserBadges = async (id: string): Promise<Array<Badge>> => {
   const response = await client.get(`/user/${id}/badge`);
-  const badges = response.data;
 
-  if (!Array.isArray(badges)) {
-    throw new Error('Invalid response from the badges API');
-  }
-
-  return badges;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'user badge (User API)',
+  });
 };
 
 export const listUserTeams = async (
@@ -241,14 +236,7 @@ export const listUserTeams = async (
     params: { userId, role: 'admin' },
   });
 
-  const teams = response.data;
-  if (!Array.isArray(teams)) {
-    throw new Error(
-      'Invalid response from the team endpoint of the User API, expected an array of teams.'
-    );
-  }
-
-  return teams;
+  return ensureIsArray({ data: response.data, endpointName: 'team (User API)' });
 };
 
 export const listTeamMembers = async (
@@ -267,14 +255,7 @@ export const listTeamMembers = async (
     },
   });
 
-  const users = response.data;
-  if (!Array.isArray(users)) {
-    throw new Error(
-      'Invalid response from the user endpoint of the User API, expected an array of users.'
-    );
-  }
-
-  return users;
+  return ensureIsArray({ data: response.data, endpointName: 'user (User API)' });
 };
 
 export const listTeamAdmins = async (
@@ -288,14 +269,7 @@ export const listTeamAdmins = async (
     params: { userId, teamId, memberType: 'admin' },
   });
 
-  const users = response.data;
-  if (!Array.isArray(users)) {
-    throw new Error(
-      'Invalid response from the user endpoint of the User API, expected an array of users.'
-    );
-  }
-
-  return users;
+  return ensureIsArray({ data: response.data, endpointName: 'user (User API)' });
 };
 
 export const listTeamMemberships = async (
@@ -309,14 +283,10 @@ export const listTeamMemberships = async (
     params: { userId, teamId },
   });
 
-  const teamMemberships = response.data;
-  if (!Array.isArray(teamMemberships)) {
-    throw new Error(
-      'Invalid response from the team-membership endpoint of the User API, expected an array of team memberships.'
-    );
-  }
-
-  return teamMemberships;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'team-membership (User API)',
+  });
 };
 
 export const listTeamGroups = async (
@@ -330,14 +300,10 @@ export const listTeamGroups = async (
     params: { userId },
   });
 
-  const teamGroups = response.data;
-  if (!Array.isArray(teamGroups)) {
-    throw new Error(
-      'Invalid response from the team group endpoint of the User API, expected an array of team groups.'
-    );
-  }
-
-  return teamGroups;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'team group (User API)',
+  });
 };
 
 export const updateGroup = async (
@@ -397,14 +363,10 @@ export const listRecommendations = async (
     params: { userId },
   });
 
-  const recommendations = response.data;
-  if (!Array.isArray(recommendations)) {
-    throw new Error(
-      'Invalid response from the recommendation endpoint of the User API, expected an array of recommendations.'
-    );
-  }
-
-  return recommendations;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'recommendation (User API)',
+  });
 };
 
 export const listDefaultRecommendations = async (): Promise<
@@ -412,14 +374,10 @@ export const listDefaultRecommendations = async (): Promise<
 > => {
   const response = await client.get(`/recommendation`);
 
-  const recommendations = response.data;
-  if (!Array.isArray(recommendations)) {
-    throw new Error(
-      'Invalid response from the recommendation endpoint of the User API, expected an array of recommendations.'
-    );
-  }
-
-  return recommendations;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'recommendation (User API)',
+  });
 };
 
 export const updateUserGroup = async (
@@ -600,11 +558,10 @@ export const getUserCommentQualityRatingsLeaderboards = async (): Promise<
     '/user-comment-quality-ratings-leaderboard?leaderboardRegionName=global'
   );
 
-  if (!Array.isArray(response.data)) {
-    throw new Error('Invalid response from the user leaderboard API');
-  }
-
-  return response.data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'user-comment-quality-ratings-leaderboard (User API)',
+  });
 };
 
 export const registerUserInterest = async (

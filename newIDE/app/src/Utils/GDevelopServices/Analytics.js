@@ -1,6 +1,7 @@
 // @flow
 import axios from 'axios';
 import { GDevelopAnalyticsApi } from './ApiConfigs';
+import { ensureIsArray } from '../DataValidator';
 
 export type GameMetrics = {
   date: string,
@@ -95,12 +96,8 @@ export const getGameMetricsFrom = async (
 
   if (response.status === 404) return null;
 
-  const gameMetrics = response.data;
-  if (!Array.isArray(gameMetrics)) {
-    throw new Error(
-      'Invalid response from the game-metrics endpoint of the Analytics API, expected an array of game metrics.'
-    );
-  }
-
-  return gameMetrics;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'game-metrics (Analytics API)',
+  });
 };

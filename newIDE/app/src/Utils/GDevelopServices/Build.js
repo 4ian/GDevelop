@@ -3,6 +3,7 @@ import axios from 'axios';
 import { makeTimestampedId } from '../../Utils/TimestampedId';
 import { GDevelopBuildApi, GDevelopGamesPlatform } from './ApiConfigs';
 import { getSignedUrl } from './Usage';
+import { ensureIsArray } from '../DataValidator';
 
 export type TargetName =
   | 'winExe'
@@ -354,16 +355,9 @@ export const getBuilds = (
         },
       })
     )
-    .then(response => {
-      const builds = response.data;
-      if (!Array.isArray(builds)) {
-        throw new Error(
-          'Invalid response from the build endpoint of the Build API, expected an array of builds.'
-        );
-      }
-
-      return builds;
-    });
+    .then(response =>
+      ensureIsArray({ data: response.data, endpointName: 'build (Build API)' })
+    );
 };
 
 export const updateBuild = (
@@ -424,10 +418,10 @@ export const getUserSigningCredentials = async (
     },
   });
 
-  if (!response.data || !Array.isArray(response.data))
-    throw new Error('Unexpected data returned by the endpoint.');
-
-  return response.data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'signing-credential (Build API)',
+  });
 };
 
 export const signingCredentialApi = {

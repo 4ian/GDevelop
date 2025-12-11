@@ -7,6 +7,7 @@ import { type MessageByLocale } from '../i18n/MessageByLocale';
 import { type Filters } from './Filters';
 import { type UserPublicProfile } from './User';
 import { t } from '@lingui/macro';
+import { ensureIsArray } from '../DataValidator';
 
 export type GameUploadType = 'game-thumbnail' | 'game-screenshot';
 
@@ -278,14 +279,11 @@ export const listAllShowcasedGames = async (): Promise<AllShowcasedGames> => {
     throw new Error('Unexpected response from the assets endpoints.');
   }
 
-  const showcasedGames = responsesData[0];
+  const showcasedGames = ensureIsArray({
+    data: responsesData[0],
+    endpointName: 'showcased-game (Game API)',
+  });
   const filters = responsesData[1];
-
-  if (!Array.isArray(showcasedGames)) {
-    throw new Error(
-      'Invalid response from the showcased-game endpoint of the Game API, expected an array of showcased games.'
-    );
-  }
 
   return {
     showcasedGames,
@@ -497,14 +495,7 @@ export const getGames = async (
     },
   });
 
-  const games = response.data;
-  if (!Array.isArray(games)) {
-    throw new Error(
-      'Invalid response from the game endpoint of the Game API, expected an array of games.'
-    );
-  }
-
-  return games;
+  return ensureIsArray({ data: response.data, endpointName: 'game (Game API)' });
 };
 
 export const getPublicGame = async (gameId: string): Promise<PublicGame> => {
@@ -515,14 +506,10 @@ export const getPublicGame = async (gameId: string): Promise<PublicGame> => {
 export const getGameCategories = async (): Promise<GameCategory[]> => {
   const response = await client.get('/game-category');
 
-  const gameCategories = response.data;
-  if (!Array.isArray(gameCategories)) {
-    throw new Error(
-      'Invalid response from the game-category endpoint of the Game API, expected an array of game categories.'
-    );
-  }
-
-  return gameCategories;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'game-category (Game API)',
+  });
 };
 
 export const buyGameFeaturing = async (
@@ -565,27 +552,19 @@ export const listGameFeaturings = async (
     },
   });
 
-  const gameFeaturings = response.data;
-  if (!Array.isArray(gameFeaturings)) {
-    throw new Error(
-      'Invalid response from the game-featuring endpoint of the Game API, expected an array of game featurings.'
-    );
-  }
-
-  return gameFeaturings;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'game-featuring (Game API)',
+  });
 };
 
 export const listMarketingPlans = async (): Promise<MarketingPlan[]> => {
   const response = await client.get('/marketing-plan');
 
-  const marketingPlans = response.data;
-  if (!Array.isArray(marketingPlans)) {
-    throw new Error(
-      'Invalid response from the marketing-plan endpoint of the Game API, expected an array of marketing plans.'
-    );
-  }
-
-  return marketingPlans;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'marketing-plan (Game API)',
+  });
 };
 
 export const getRecommendedMarketingPlan = async (
@@ -604,13 +583,12 @@ export const getRecommendedMarketingPlan = async (
     },
   });
 
-  if (!Array.isArray(response.data)) {
-    throw new Error(
-      'Invalid response from the game API marketing plan listing endpoint'
-    );
-  }
+  const marketingPlans = ensureIsArray({
+    data: response.data,
+    endpointName: 'marketing-plan (Game API)',
+  });
 
-  return response.data[0];
+  return marketingPlans[0];
 };
 
 export const getGameCommentQualityRatingsLeaderboards = async (): Promise<
@@ -620,11 +598,10 @@ export const getGameCommentQualityRatingsLeaderboards = async (): Promise<
     '/game-comment-quality-ratings-leaderboard?leaderboardRegionName=global'
   );
 
-  if (!Array.isArray(response.data)) {
-    throw new Error('Invalid response from the game leaderboard API');
-  }
-
-  return response.data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'game-comment-quality-ratings-leaderboard (Game API)',
+  });
 };
 
 export const createGameResourceSignedUrls = async ({

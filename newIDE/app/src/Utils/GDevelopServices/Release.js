@@ -1,6 +1,7 @@
 // @flow
 import axios from 'axios';
 import { GDevelopReleaseApi } from './ApiConfigs';
+import { ensureIsArray } from '../DataValidator';
 
 export type Release = {
   name: ?string,
@@ -14,12 +15,11 @@ export const getReleases = async (): Promise<Array<Release>> => {
       last: 4,
     },
   });
-  const releases = response.data;
-  if (!Array.isArray(releases)) {
-    throw new Error('Invalid releases');
-  }
 
-  return releases;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'release (Release API)',
+  });
 };
 
 export const hasBreakingChange = (release: Release): boolean => {

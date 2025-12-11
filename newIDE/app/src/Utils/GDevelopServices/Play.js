@@ -4,6 +4,7 @@ import { GDevelopPlayApi } from './ApiConfigs';
 
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { rgbOrHexToRGBString } from '../ColorTransformer';
+import { ensureIsArray } from '../DataValidator';
 
 export type LeaderboardSortOption = 'ASC' | 'DESC';
 export type LeaderboardVisibilityOption = 'HIDDEN' | 'PUBLIC';
@@ -116,14 +117,10 @@ export const listGameActiveLeaderboards = async (
     params: { userId, deleted: 'false' },
   });
 
-  const leaderboards = response.data;
-  if (!Array.isArray(leaderboards)) {
-    throw new Error(
-      'Invalid response from the leaderboard endpoint of the Play API, expected an array of leaderboards.'
-    );
-  }
-
-  return leaderboards;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: 'leaderboard (Play API)',
+  });
 };
 
 export const extractNextPageUriFromLinkHeader = (
@@ -167,15 +164,11 @@ export const listLeaderboardEntries = async (
     ? extractNextPageUriFromLinkHeader(response.headers.link)
     : null;
 
-  const entries = response.data;
-  if (!Array.isArray(entries)) {
-    throw new Error(
-      'Invalid response from the leaderboard entry endpoint of the Play API, expected an array of entries.'
-    );
-  }
-
   return {
-    entries,
+    entries: ensureIsArray({
+      data: response.data,
+      endpointName: 'leaderboard entry (Play API)',
+    }),
     nextPageUri,
   };
 };
@@ -366,16 +359,9 @@ export const listComments = async (
         },
       })
     )
-    .then(response => {
-      const comments = response.data;
-      if (!Array.isArray(comments)) {
-        throw new Error(
-          'Invalid response from the comment endpoint of the Play API, expected an array of comments.'
-        );
-      }
-
-      return comments;
-    });
+    .then(response =>
+      ensureIsArray({ data: response.data, endpointName: 'comment (Play API)' })
+    );
 };
 
 export const canCommentBeRatedByOwner = (comment: Comment): boolean => {

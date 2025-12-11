@@ -3,6 +3,10 @@ import axios from 'axios';
 import { makeTimestampedId } from '../../Utils/TimestampedId';
 import { GDevelopBuildApi, GDevelopGamesPlatform } from './ApiConfigs';
 import { getSignedUrl } from './Usage';
+import {
+  ensureIsArray,
+  ensureIsNullOrObjectHasProperty,
+} from '../DataValidator';
 
 export type TargetName =
   | 'winExe'
@@ -205,20 +209,13 @@ export const buildElectron = (
         },
       })
     )
-    .then(response => {
-      const data = response.data;
-      if (!data || typeof data !== 'object') {
-        throw new Error(
-          'Invalid response from endpoint /build of Build API, was expecting an object.'
-        );
-      }
-      if (!data.id) {
-        throw new Error(
-          'Invalid response from endpoint /build of Build API, was expecting an object with an id field.'
-        );
-      }
-      return data;
-    });
+    .then(response =>
+      ensureIsNullOrObjectHasProperty({
+        data: response.data,
+        propertyName: 'id',
+        endpointName: '/build of Build API',
+      })
+    );
 };
 
 export const buildWeb = (
@@ -248,20 +245,13 @@ export const buildWeb = (
         },
       })
     )
-    .then(response => {
-      const data = response.data;
-      if (!data || typeof data !== 'object') {
-        throw new Error(
-          'Invalid response from endpoint /build of Build API, was expecting an object.'
-        );
-      }
-      if (!data.id) {
-        throw new Error(
-          'Invalid response from endpoint /build of Build API, was expecting an object with an id field.'
-        );
-      }
-      return data;
-    });
+    .then(response =>
+      ensureIsNullOrObjectHasProperty({
+        data: response.data,
+        propertyName: 'id',
+        endpointName: '/build of Build API',
+      })
+    );
 };
 
 export const buildCordovaAndroid = (
@@ -302,20 +292,13 @@ export const buildCordovaAndroid = (
         }
       )
     )
-    .then(response => {
-      const data = response.data;
-      if (!data || typeof data !== 'object') {
-        throw new Error(
-          'Invalid response from endpoint /build of Build API, was expecting an object.'
-        );
-      }
-      if (!data.id) {
-        throw new Error(
-          'Invalid response from endpoint /build of Build API, was expecting an object with an id field.'
-        );
-      }
-      return data;
-    });
+    .then(response =>
+      ensureIsNullOrObjectHasProperty({
+        data: response.data,
+        propertyName: 'id',
+        endpointName: '/build of Build API',
+      })
+    );
 };
 
 export const buildCordovaIos = (
@@ -354,20 +337,13 @@ export const buildCordovaIos = (
         }
       )
     )
-    .then(response => {
-      const data = response.data;
-      if (!data || typeof data !== 'object') {
-        throw new Error(
-          'Invalid response from endpoint /build of Build API, was expecting an object.'
-        );
-      }
-      if (!data.id) {
-        throw new Error(
-          'Invalid response from endpoint /build of Build API, was expecting an object with an id field.'
-        );
-      }
-      return data;
-    });
+    .then(response =>
+      ensureIsNullOrObjectHasProperty({
+        data: response.data,
+        propertyName: 'id',
+        endpointName: '/build of Build API',
+      })
+    );
 };
 
 export const getBuild = (
@@ -386,20 +362,13 @@ export const getBuild = (
         },
       })
     )
-    .then(response => {
-      const data = response.data;
-      if (!data || typeof data !== 'object') {
-        throw new Error(
-          'Invalid response from endpoint /build/{id} of Build API, was expecting an object.'
-        );
-      }
-      if (!data.id) {
-        throw new Error(
-          'Invalid response from endpoint /build/{id} of Build API, was expecting an object with an id field.'
-        );
-      }
-      return data;
-    });
+    .then(response =>
+      ensureIsNullOrObjectHasProperty({
+        data: response.data,
+        propertyName: 'id',
+        endpointName: '/build/{id} of Build API',
+      })
+    );
 };
 
 export const getBuilds = (
@@ -419,15 +388,12 @@ export const getBuilds = (
         },
       })
     )
-    .then(response => {
-      const data = response.data;
-      if (!Array.isArray(data)) {
-        throw new Error(
-          'Invalid response from endpoint /build of Build API, was expecting an array.'
-        );
-      }
-      return data;
-    });
+    .then(response =>
+      ensureIsArray({
+        data: response.data,
+        endpointName: '/build of Build API',
+      })
+    );
 };
 
 export const updateBuild = (
@@ -451,7 +417,13 @@ export const updateBuild = (
         }
       )
     )
-    .then(response => response.data);
+    .then(response =>
+      ensureIsNullOrObjectHasProperty({
+        data: response.data,
+        propertyName: 'id',
+        endpointName: '/build/{id} of Build API',
+      })
+    );
 };
 
 export const deleteBuild = (
@@ -470,20 +442,13 @@ export const deleteBuild = (
         },
       })
     )
-    .then(response => {
-      const data = response.data;
-      if (!data || typeof data !== 'object') {
-        throw new Error(
-          'Invalid response from endpoint /build/{id} of Build API, was expecting an object.'
-        );
-      }
-      if (!data.id) {
-        throw new Error(
-          'Invalid response from endpoint /build/{id} of Build API, was expecting an object with an id field.'
-        );
-      }
-      return data;
-    });
+    .then(response =>
+      ensureIsNullOrObjectHasProperty({
+        data: response.data,
+        propertyName: 'id',
+        endpointName: '/build/{id} of Build API',
+      })
+    );
 };
 
 export const getUserSigningCredentials = async (
@@ -501,10 +466,10 @@ export const getUserSigningCredentials = async (
     },
   });
 
-  if (!response.data || !Array.isArray(response.data))
-    throw new Error('Unexpected data returned by the endpoint.');
-
-  return response.data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/signing-credential of Build API',
+  });
 };
 
 export const signingCredentialApi = {
@@ -533,7 +498,10 @@ export const signingCredentialApi = {
       }
     );
 
-    return response.data;
+    return ensureIsObject({
+      data: response.data,
+      endpointName: '/signing-credential/action/create-csr of Build API',
+    });
   },
   uploadCertificate: async (
     getAuthorizationHeader: () => Promise<string>,
@@ -561,7 +529,10 @@ export const signingCredentialApi = {
       }
     );
 
-    return response.data;
+    return ensureIsObject({
+      data: response.data,
+      endpointName: '/signing-credential/action/create-csr of Build API',
+    });
   },
   createCertificateP12: async (
     getAuthorizationHeader: () => Promise<string>,
@@ -591,7 +562,10 @@ export const signingCredentialApi = {
       }
     );
 
-    return response.data;
+    return ensureIsObject({
+      data: response.data,
+      endpointName: '/signing-credential/action/create-csr of Build API',
+    });
   },
   uploadMobileProvision: async (
     getAuthorizationHeader: () => Promise<string>,
@@ -619,7 +593,10 @@ export const signingCredentialApi = {
       }
     );
 
-    return response.data;
+    return ensureIsObject({
+      data: response.data,
+      endpointName: '/signing-credential/action/create-csr of Build API',
+    });
   },
   uploadAuthKey: async (
     getAuthorizationHeader: () => Promise<string>,
@@ -648,7 +625,10 @@ export const signingCredentialApi = {
       }
     );
 
-    return response.data;
+    return ensureIsObject({
+      data: response.data,
+      endpointName: '/signing-credential/action/create-csr of Build API',
+    });
   },
   deleteSigningCredential: async (
     getAuthorizationHeader: () => Promise<string>,

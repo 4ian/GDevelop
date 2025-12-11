@@ -16,6 +16,11 @@ import {
   isPrivateAssetResourceAuthorizedUrl,
 } from './Shop';
 import { type ExtensionDependency } from '../../Utils/GDevelopServices/Extension';
+import {
+  ensureIsObject,
+  ensureIsNullOrObjectHasProperty,
+  ensureIsArray,
+} from '../DataValidator';
 
 export type License = {|
   name: string,
@@ -448,18 +453,11 @@ export const getPublicAsset = async (
       assetShortHeader.id
     }.json`
   );
-  const data = assetResponse.data;
-  if (!data || typeof data !== 'object') {
-    throw new Error(
-      'Invalid response from endpoint /assets/{id}.json of Asset API, was expecting an object.'
-    );
-  }
-  if (!data.id) {
-    throw new Error(
-      'Invalid response from endpoint /assets/{id}.json of Asset API, was expecting an object with an id field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: assetResponse.data,
+    propertyName: 'id',
+    endpointName: '/assets/{id}.json of Asset API',
+  });
 };
 
 export const getPrivateAsset = async (
@@ -479,18 +477,11 @@ export const getPrivateAsset = async (
     authorizationToken
   );
   const assetResponse = await client.get(authorizedUrl);
-  const data = assetResponse.data;
-  if (!data || typeof data !== 'object') {
-    throw new Error(
-      'Invalid response from endpoint /private-assets/{packId}/{assetId}.json of Asset API, was expecting an object.'
-    );
-  }
-  if (!data.id) {
-    throw new Error(
-      'Invalid response from endpoint /private-assets/{packId}/{assetId}.json of Asset API, was expecting an object with an id field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: assetResponse.data,
+    propertyName: 'id',
+    endpointName: '/private-assets/{packId}/{assetId}.json of Asset API',
+  });
 };
 
 export const getPrivateAssetPackAudioFilesArchiveUrl = (
@@ -554,15 +545,12 @@ export const listAllAuthors = ({
         throw new Error('Unexpected response from author endpoint.');
       return client.get(authorsUrl);
     })
-    .then(response => {
-      const data = response.data;
-      if (!Array.isArray(data)) {
-        throw new Error(
-          'Invalid response from endpoint /author of Asset API, was expecting an array.'
-        );
-      }
-      return data;
-    });
+    .then(response =>
+      ensureIsArray({
+        data: response.data,
+        endpointName: '/author of Asset API',
+      })
+    );
 };
 
 export const listAllLicenses = ({
@@ -582,67 +570,43 @@ export const listAllLicenses = ({
         throw new Error('Unexpected response from license endpoint.');
       return client.get(licensesUrl);
     })
-    .then(response => {
-      const data = response.data;
-      if (!Array.isArray(data)) {
-        throw new Error(
-          'Invalid response from endpoint /license of Asset API, was expecting an array.'
-        );
-      }
-      return data;
-    });
+    .then(response =>
+      ensureIsArray({
+        data: response.data,
+        endpointName: '/license of Asset API',
+      })
+    );
 };
 
 export const getPrivateAssetPack = async (
   assetPackId: string
 ): Promise<PrivateAssetPack> => {
   const response = await client.get(`/asset-pack/${assetPackId}`);
-  const data = response.data;
-  if (!data || typeof data !== 'object') {
-    throw new Error(
-      'Invalid response from endpoint /asset-pack/{id} of Asset API, was expecting an object.'
-    );
-  }
-  if (!data.id) {
-    throw new Error(
-      'Invalid response from endpoint /asset-pack/{id} of Asset API, was expecting an object with an id field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/asset-pack/{id} of Asset API',
+  });
 };
 
 export const getPrivateGameTemplate = async (
   gameTemplateId: string
 ): Promise<PrivateGameTemplate> => {
   const response = await client.get(`/game-template/${gameTemplateId}`);
-  const data = response.data;
-  if (!data || typeof data !== 'object') {
-    throw new Error(
-      'Invalid response from endpoint /game-template/{id} of Asset API, was expecting an object.'
-    );
-  }
-  if (!data.id) {
-    throw new Error(
-      'Invalid response from endpoint /game-template/{id} of Asset API, was expecting an object with an id field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/game-template/{id} of Asset API',
+  });
 };
 
 export const getBundle = async (bundleId: string): Promise<Bundle> => {
   const response = await client.get(`/bundle/${bundleId}`);
-  const data = response.data;
-  if (!data || typeof data !== 'object') {
-    throw new Error(
-      'Invalid response from endpoint /bundle/{id} of Asset API, was expecting an object.'
-    );
-  }
-  if (!data.id) {
-    throw new Error(
-      'Invalid response from endpoint /bundle/{id} of Asset API, was expecting an object with an id field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/bundle/{id} of Asset API',
+  });
 };
 
 export const getPrivatePdfTutorial = async (
@@ -664,18 +628,11 @@ export const getPrivatePdfTutorial = async (
       Authorization: authorizationHeader,
     },
   });
-  const data = response.data;
-  if (!data || typeof data !== 'object') {
-    throw new Error(
-      'Invalid response from endpoint /pdf-tutorial/{id} of Asset API, was expecting an object.'
-    );
-  }
-  if (!data.id) {
-    throw new Error(
-      'Invalid response from endpoint /pdf-tutorial/{id} of Asset API, was expecting an object with an id field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/pdf-tutorial/{id} of Asset API',
+  });
 };
 
 export const createPrivateGameTemplateUrl = async (
@@ -720,13 +677,10 @@ export const listReceivedAssetShortHeaders = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  const data = response.data;
-  if (!Array.isArray(data)) {
-    throw new Error(
-      'Invalid response from endpoint /asset-short-header of Asset API, was expecting an array.'
-    );
-  }
-  return data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/asset-short-header of Asset API',
+  });
 };
 
 export const listReceivedAssetPacks = async (
@@ -742,13 +696,10 @@ export const listReceivedAssetPacks = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  const data = response.data;
-  if (!Array.isArray(data)) {
-    throw new Error(
-      'Invalid response from endpoint /asset-pack of Asset API, was expecting an array.'
-    );
-  }
-  return data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/asset-pack of Asset API',
+  });
 };
 
 export const listReceivedGameTemplates = async (
@@ -764,13 +715,10 @@ export const listReceivedGameTemplates = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  const data = response.data;
-  if (!Array.isArray(data)) {
-    throw new Error(
-      'Invalid response from endpoint /game-template of Asset API, was expecting an array.'
-    );
-  }
-  return data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/game-template of Asset API',
+  });
 };
 
 export const listReceivedBundles = async (
@@ -786,13 +734,10 @@ export const listReceivedBundles = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  const data = response.data;
-  if (!Array.isArray(data)) {
-    throw new Error(
-      'Invalid response from endpoint /bundle of Asset API, was expecting an array.'
-    );
-  }
-  return data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/bundle of Asset API',
+  });
 };
 
 export const isPublicAssetResourceUrl = (url: string) =>
@@ -841,22 +786,15 @@ export const listCourses = async (
         Authorization: authorizationHeader,
       },
     });
-    const data = response.data;
-    if (!Array.isArray(data)) {
-      throw new Error(
-        'Invalid response from endpoint /course of Asset API, was expecting an array.'
-      );
-    }
-    return data;
+    return ensureIsArray({
+      data: response.data,
+      endpointName: '/course of Asset API',
+    });
   }
-  const response = await client.get(`/course`);
-  const data = response.data;
-  if (!Array.isArray(data)) {
-    throw new Error(
-      'Invalid response from endpoint /course of Asset API, was expecting an array.'
-    );
-  }
-  return data;
+  return ensureIsArray({
+    data: (await client.get(`/course`)).data,
+    endpointName: '/course of Asset API',
+  });
 };
 
 export const listCourseChapters = async (
@@ -883,24 +821,19 @@ export const listCourseChapters = async (
         Authorization: authorizationHeader,
       },
     });
-    const data = response.data;
-    if (!Array.isArray(data)) {
-      throw new Error(
-        'Invalid response from endpoint /course/{id}/chapter of Asset API, was expecting an array.'
-      );
-    }
-    return data;
+    return ensureIsArray({
+      data: response.data,
+      endpointName: '/course/{id}/chapter of Asset API',
+    });
   }
-  const response = await client.get(`/course/${courseId}/chapter`, {
-    params: { language },
+  return ensureIsArray({
+    data: (
+      await client.get(`/course/${courseId}/chapter`, {
+        params: { language },
+      })
+    ).data,
+    endpointName: '/course/{id}/chapter of Asset API',
   });
-  const data = response.data;
-  if (!Array.isArray(data)) {
-    throw new Error(
-      'Invalid response from endpoint /course/{id}/chapter of Asset API, was expecting an array.'
-    );
-  }
-  return data;
 };
 
 export const getCourseChapterRatingUrl = ({

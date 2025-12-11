@@ -17,6 +17,10 @@ import type { LoginProvider } from '../../LoginProvider';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { type CommunityLinks, type UserSurvey } from './User';
 import { userCancellationErrorName } from '../../LoginProvider/Utils';
+import {
+  ensureIsObject,
+  ensureIsNullOrObjectHasProperty,
+} from '../DataValidator';
 
 export type Profile = {|
   id: string,
@@ -374,20 +378,13 @@ export default class Authentication {
           },
         });
       })
-      .then(response => {
-        const data = response.data;
-        if (!data || typeof data !== 'object') {
-          throw new Error(
-            'Invalid response from endpoint /user/{id} of User API, was expecting an object.'
-          );
-        }
-        if (!data.id) {
-          throw new Error(
-            'Invalid response from endpoint /user/{id} of User API, was expecting an object with an id field.'
-          );
-        }
-        return data;
-      })
+      .then(response =>
+        ensureIsNullOrObjectHasProperty({
+          data: response.data,
+          propertyName: 'id',
+          endpointName: '/user/{id} of User API',
+        })
+      )
       .catch(error => {
         console.error('Error while fetching user:', error);
         throw error;
@@ -412,18 +409,11 @@ export default class Authentication {
       }
     );
 
-    const data = response.data;
-    if (!data || typeof data !== 'object') {
-      throw new Error(
-        'Invalid response from endpoint /user/{id}/action/update-github-star of User API, was expecting an object.'
-      );
-    }
-    if (!data.code) {
-      throw new Error(
-        'Invalid response from endpoint /user/{id}/action/update-github-star of User API, was expecting an object with a code field.'
-      );
-    }
-    return data;
+    return ensureIsNullOrObjectHasProperty({
+      data: response.data,
+      propertyName: 'code',
+      endpointName: '/user/{id}/action/update-github-star of User API',
+    });
   };
 
   updateTiktokFollow = async (
@@ -444,18 +434,11 @@ export default class Authentication {
       }
     );
 
-    const data = response.data;
-    if (!data || typeof data !== 'object') {
-      throw new Error(
-        'Invalid response from endpoint /user/{id}/action/update-tiktok-follow of User API, was expecting an object.'
-      );
-    }
-    if (!data.code) {
-      throw new Error(
-        'Invalid response from endpoint /user/{id}/action/update-tiktok-follow of User API, was expecting an object with a code field.'
-      );
-    }
-    return data;
+    return ensureIsNullOrObjectHasProperty({
+      data: response.data,
+      propertyName: 'code',
+      endpointName: '/user/{id}/action/update-tiktok-follow of User API',
+    });
   };
 
   updateTwitterFollow = async (
@@ -478,18 +461,11 @@ export default class Authentication {
       }
     );
 
-    const data = response.data;
-    if (!data || typeof data !== 'object') {
-      throw new Error(
-        'Invalid response from endpoint /user/{id}/action/update-twitter-follow of User API, was expecting an object.'
-      );
-    }
-    if (!data.code) {
-      throw new Error(
-        'Invalid response from endpoint /user/{id}/action/update-twitter-follow of User API, was expecting an object with a code field.'
-      );
-    }
-    return data;
+    return ensureIsNullOrObjectHasProperty({
+      data: response.data,
+      propertyName: 'code',
+      endpointName: '/user/{id}/action/update-twitter-follow of User API',
+    });
   };
 
   updateYoutubeSubscription = async (
@@ -514,18 +490,11 @@ export default class Authentication {
       }
     );
 
-    const data = response.data;
-    if (!data || typeof data !== 'object') {
-      throw new Error(
-        'Invalid response from endpoint /user/{id}/action/update-youtube-subscription of User API, was expecting an object.'
-      );
-    }
-    if (!data.code) {
-      throw new Error(
-        'Invalid response from endpoint /user/{id}/action/update-youtube-subscription of User API, was expecting an object with a code field.'
-      );
-    }
-    return data;
+    return ensureIsNullOrObjectHasProperty({
+      data: response.data,
+      propertyName: 'code',
+      endpointName: '/user/{id}/action/update-youtube-subscription of User API',
+    });
   };
 
   acceptGameStatsEmail = async (
@@ -549,15 +518,12 @@ export default class Authentication {
           }
         );
       })
-      .then(response => {
-        const data = response.data;
-        if (!data || typeof data !== 'object') {
-          throw new Error(
-            'Invalid response from endpoint /user/{id} of User API, was expecting an object.'
-          );
-        }
-        return data;
-      })
+      .then(response =>
+        ensureIsObject({
+          data: response.data,
+          endpointName: '/user/{id} of User API',
+        })
+      )
       .catch(error => {
         console.error('Error while accepting game stats email:', error);
         throw error;

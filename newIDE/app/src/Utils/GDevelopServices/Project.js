@@ -11,6 +11,10 @@ import { isNativeMobileApp } from '../Platform';
 import { unzipFirstEntryOfBlob } from '../Zip.js/Utils';
 import { extractGDevelopApiErrorStatusAndCode } from './Errors';
 import { extractNextPageUriFromLinkHeader } from './Play';
+import {
+  ensureIsArray,
+  ensureIsNullOrObjectHasProperty,
+} from '../DataValidator';
 
 export const CLOUD_PROJECT_NAME_MAX_LENGTH = 60;
 export const CLOUD_PROJECT_VERSION_LABEL_MAX_LENGTH = 50;
@@ -212,13 +216,10 @@ export const getLastVersionsOfProject = async (
     },
     params: { userId },
   });
-  const projectVersions = response.data;
-
-  if (!Array.isArray(projectVersions)) {
-    throw new Error('Invalid response from the project versions API');
-  }
-
-  return projectVersions;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/project/{id}/version of Project API',
+  });
 };
 
 export const getCredentialsForCloudProject = async (
@@ -280,18 +281,11 @@ export const createCloudProject = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  const data = response.data;
-  if (!data || typeof data !== 'object') {
-    throw new Error(
-      'Invalid response from endpoint /project/{id} of Project API, was expecting an object.'
-    );
-  }
-  if (!data.id) {
-    throw new Error(
-      'Invalid response from endpoint /project/{id} of Project API, was expecting an object with an id field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/project of Project API',
+  });
 };
 
 /**
@@ -432,15 +426,10 @@ export const listUserCloudProjects = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  const cloudProjects = response.data;
-
-  if (!Array.isArray(cloudProjects)) {
-    throw new Error(
-      'Invalid response from endpoint /project of Project API, was expecting an array.'
-    );
-  }
-
-  return cloudProjects;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/project of Project API',
+  });
 };
 
 export const listOtherUserCloudProjects = async (
@@ -453,15 +442,10 @@ export const listOtherUserCloudProjects = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  const cloudProjects = response.data;
-
-  if (!Array.isArray(cloudProjects)) {
-    throw new Error(
-      'Invalid response from endpoint /user/{id}/project of Project API, was expecting an array.'
-    );
-  }
-
-  return cloudProjects;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/user/{id}/project of Project API',
+  });
 };
 
 export const getCloudProject = async (
@@ -479,18 +463,11 @@ export const getCloudProject = async (
     },
     params: { userId },
   });
-  const data = response.data;
-  if (data && (!data || typeof data !== 'object')) {
-    throw new Error(
-      'Invalid response from endpoint /project/{id} of Project API, was expecting an object or null.'
-    );
-  }
-  if (data && !data.id) {
-    throw new Error(
-      'Invalid response from endpoint /project/{id} of Project API, was expecting an object with an id field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/project/{id} of Project API',
+  });
 };
 
 export const getOtherUserCloudProject = async (
@@ -512,18 +489,11 @@ export const getOtherUserCloudProject = async (
       params: { userId },
     }
   );
-  const data = response.data;
-  if (data && (!data || typeof data !== 'object')) {
-    throw new Error(
-      'Invalid response from endpoint /user/{id}/project/{id} of Project API, was expecting an object or null.'
-    );
-  }
-  if (data && !data.id) {
-    throw new Error(
-      'Invalid response from endpoint /user/{id}/project/{id} of Project API, was expecting an object with an id field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/user/{id}/project/{id} of Project API',
+  });
 };
 
 export const updateCloudProject = async (
@@ -553,18 +523,11 @@ export const updateCloudProject = async (
       params: { userId },
     }
   );
-  const data = response.data;
-  if (data && (!data || typeof data !== 'object')) {
-    throw new Error(
-      'Invalid response from endpoint /project/{id} of Project API, was expecting an object or null.'
-    );
-  }
-  if (data && !data.id) {
-    throw new Error(
-      'Invalid response from endpoint /project/{id} of Project API, was expecting an object with an id field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/project/{id} of Project API',
+  });
 };
 
 export const deleteCloudProject = async (
@@ -582,18 +545,11 @@ export const deleteCloudProject = async (
     },
     params: { userId },
   });
-  const data = response.data;
-  if (data && (!data || typeof data !== 'object')) {
-    throw new Error(
-      'Invalid response from endpoint /project/{id} of Project API, was expecting an object or null.'
-    );
-  }
-  if (data && !data.id) {
-    throw new Error(
-      'Invalid response from endpoint /project/{id} of Project API, was expecting an object with an id field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/project/{id} of Project API',
+  });
 };
 
 const getPresignedUrlForVersionUpload = async (
@@ -741,18 +697,11 @@ export const createProjectUserAcl = async (
       params: { userId: currentUserId },
     }
   );
-  const data = response.data;
-  if (data && (!data || typeof data !== 'object')) {
-    throw new Error(
-      'Invalid response from endpoint /project-user-acl of Project API, was expecting an object or null.'
-    );
-  }
-  if (data && !data.projectId) {
-    throw new Error(
-      'Invalid response from endpoint /project-user-acl of Project API, was expecting an object with a projectId field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'projectId',
+    endpointName: '/project-user-acl of Project API',
+  });
 };
 
 export const deleteProjectUserAcl = async (
@@ -789,15 +738,10 @@ export const listProjectUserAcls = async (
     },
     params: { userId: currentUserId, projectId },
   });
-  const projectUserAcls = response.data;
-
-  if (!Array.isArray(projectUserAcls)) {
-    throw new Error(
-      'Invalid response from endpoint /project-user-acl of Project API, was expecting an array.'
-    );
-  }
-
-  return projectUserAcls;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/project-user-acl of Project API',
+  });
 };
 
 export const updateCloudProjectVersion = async (
@@ -829,18 +773,11 @@ export const updateCloudProjectVersion = async (
       params: { userId },
     }
   );
-  const data = response.data;
-  if (data && (!data || typeof data !== 'object')) {
-    throw new Error(
-      'Invalid response from endpoint /project/{id}/version/{id} of Project API, was expecting an object or null.'
-    );
-  }
-  if (data && !data.id) {
-    throw new Error(
-      'Invalid response from endpoint /project/{id}/version/{id} of Project API, was expecting an object with an id field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/project/{id}/version/{id} of Project API',
+  });
 };
 
 /**
@@ -874,15 +811,11 @@ export const listVersionsOfProject = async (
   const nextPageUri = response.headers.link
     ? extractNextPageUriFromLinkHeader(response.headers.link)
     : null;
-  const projectVersions = response.data;
-
-  if (!Array.isArray(projectVersions)) {
-    throw new Error(
-      'Invalid response from endpoint /project/{id}/version of Project API, was expecting an array.'
-    );
-  }
   return {
-    versions: projectVersions,
+    versions: ensureIsArray({
+      data: response.data,
+      endpointName: '/project/{id}/version of Project API',
+    }),
     nextPageUri,
   };
 };

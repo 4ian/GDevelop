@@ -4,6 +4,11 @@ import { GDevelopAiCdn, GDevelopGenerationApi } from './ApiConfigs';
 import { type MessageByLocale } from '../i18n/MessageByLocale';
 import { getIDEVersionWithHash } from '../../Version';
 import { extractNextPageUriFromLinkHeader } from './Play';
+import {
+  ensureIsArray,
+  ensureIsObject,
+  ensureIsNullOrObjectHasProperty,
+} from '../DataValidator';
 
 export type Environment = 'staging' | 'live';
 
@@ -208,18 +213,11 @@ export const getAiRequest = async (
       },
     }
   );
-  const data = response.data;
-  if (!data || typeof data !== 'object') {
-    throw new Error(
-      'Invalid response from endpoint /ai-request/{id} of Generation API, was expecting an object.'
-    );
-  }
-  if (!data.id) {
-    throw new Error(
-      'Invalid response from endpoint /ai-request/{id} of Generation API, was expecting an object with an id field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/ai-request/{id} of Generation API',
+  });
 };
 
 export const getAiRequests = async (
@@ -248,13 +246,11 @@ export const getAiRequests = async (
   const nextPageUri = response.headers.link
     ? extractNextPageUriFromLinkHeader(response.headers.link)
     : null;
-  const aiRequests = response.data;
-  if (!Array.isArray(aiRequests)) {
-    throw new Error('Invalid response from Ai requests API.');
-  }
-
   return {
-    aiRequests,
+    aiRequests: ensureIsArray({
+      data: response.data,
+      endpointName: '/ai-request of Generation API',
+    }),
     nextPageUri,
   };
 };
@@ -324,18 +320,11 @@ export const createAiRequest = async (
       },
     }
   );
-  const data = response.data;
-  if (!data || typeof data !== 'object') {
-    throw new Error(
-      'Invalid response from endpoint /ai-request of Generation API, was expecting an object.'
-    );
-  }
-  if (!data.id) {
-    throw new Error(
-      'Invalid response from endpoint /ai-request of Generation API, was expecting an object with an id field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/ai-request of Generation API',
+  });
 };
 
 export const addMessageToAiRequest = async (
@@ -397,18 +386,11 @@ export const addMessageToAiRequest = async (
       },
     }
   );
-  const data = response.data;
-  if (!data || typeof data !== 'object') {
-    throw new Error(
-      'Invalid response from endpoint /ai-request/{id}/action/add-message of Generation API, was expecting an object.'
-    );
-  }
-  if (!data.id) {
-    throw new Error(
-      'Invalid response from endpoint /ai-request/{id}/action/add-message of Generation API, was expecting an object with an id field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/ai-request/{id}/action/add-message of Generation API',
+  });
 };
 
 export const sendAiRequestFeedback = async (
@@ -448,18 +430,11 @@ export const sendAiRequestFeedback = async (
       },
     }
   );
-  const data = response.data;
-  if (!data || typeof data !== 'object') {
-    throw new Error(
-      'Invalid response from endpoint /ai-request/{id}/action/set-feedback of Generation API, was expecting an object.'
-    );
-  }
-  if (!data.id) {
-    throw new Error(
-      'Invalid response from endpoint /ai-request/{id}/action/set-feedback of Generation API, was expecting an object with an id field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/ai-request/{id}/action/set-feedback of Generation API',
+  });
 };
 
 export const getAiRequestSuggestions = async (
@@ -502,18 +477,11 @@ export const getAiRequestSuggestions = async (
       },
     }
   );
-  const data = response.data;
-  if (!data || typeof data !== 'object') {
-    throw new Error(
-      'Invalid response from endpoint /ai-request/{id}/action/get-suggestions of Generation API, was expecting an object.'
-    );
-  }
-  if (!data.id) {
-    throw new Error(
-      'Invalid response from endpoint /ai-request/{id}/action/get-suggestions of Generation API, was expecting an object with an id field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/ai-request/{id}/action/get-suggestions of Generation API',
+  });
 };
 
 export type CreateAiGeneratedEventResult =
@@ -585,17 +553,11 @@ export const createAiGeneratedEvent = async (
   );
 
   if (response.status === 200) {
-    const data = response.data;
-    if (!data || typeof data !== 'object') {
-      throw new Error(
-        'Invalid response from endpoint /ai-generated-event of Generation API, was expecting an object.'
-      );
-    }
-    if (!data.id) {
-      throw new Error(
-        'Invalid response from endpoint /ai-generated-event of Generation API, was expecting an object with an id field.'
-      );
-    }
+    const data = ensureIsNullOrObjectHasProperty({
+      data: response.data,
+      propertyName: 'id',
+      endpointName: '/ai-generated-event of Generation API',
+    });
     return {
       creationSucceeded: true,
       aiGeneratedEvent: data,
@@ -638,18 +600,11 @@ export const getAiGeneratedEvent = async (
       },
     }
   );
-  const data = response.data;
-  if (!data || typeof data !== 'object') {
-    throw new Error(
-      'Invalid response from endpoint /ai-generated-event/{id} of Generation API, was expecting an object.'
-    );
-  }
-  if (!data.id) {
-    throw new Error(
-      'Invalid response from endpoint /ai-generated-event/{id} of Generation API, was expecting an object with an id field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/ai-generated-event/{id} of Generation API',
+  });
 };
 
 export const createAssetSearch = async (
@@ -687,18 +642,11 @@ export const createAssetSearch = async (
       },
     }
   );
-  const data = response.data;
-  if (!data || typeof data !== 'object') {
-    throw new Error(
-      'Invalid response from endpoint /asset-search of Generation API, was expecting an object.'
-    );
-  }
-  if (!data.id) {
-    throw new Error(
-      'Invalid response from endpoint /asset-search of Generation API, was expecting an object with an id field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/asset-search of Generation API',
+  });
 };
 
 export type AiUserContentPresignedUrlsResult = {
@@ -737,13 +685,10 @@ export const createAiUserContentPresignedUrls = async (
       },
     }
   );
-  const data = response.data;
-  if (!data || typeof data !== 'object') {
-    throw new Error(
-      'Invalid response from endpoint /ai-user-content/action/create-presigned-urls of Generation API, was expecting an object.'
-    );
-  }
-  return data;
+  return ensureIsObject({
+    data: response.data,
+    endpointName: '/ai-user-content/action/create-presigned-urls of Generation API',
+  });
 };
 
 export type AiConfigurationPreset = {|
@@ -768,16 +713,9 @@ export const fetchAiSettings = async ({
   const response = await axios.get(
     `${GDevelopAiCdn.baseUrl[environment]}/ai-settings.json`
   );
-  const data = response.data;
-  if (!data || typeof data !== 'object') {
-    throw new Error(
-      'Invalid response from endpoint /ai-settings.json of Generation API, was expecting an object.'
-    );
-  }
-  if (!data.aiRequest) {
-    throw new Error(
-      'Invalid response from endpoint /ai-settings.json of Generation API, was expecting an object with an aiRequest field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'aiRequest',
+    endpointName: '/ai-settings.json of Generation API',
+  });
 };

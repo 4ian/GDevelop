@@ -13,6 +13,11 @@ import {
   type PrivateAssetPack,
   type PrivateGameTemplate,
 } from '../../Utils/GDevelopServices/Asset';
+import {
+  ensureIsArray,
+  ensureIsNullOrObjectHasProperty,
+  ensureIsString,
+} from '../DataValidator';
 
 export const client = axios.create({
   baseURL: GDevelopShopApi.baseUrl,
@@ -249,84 +254,60 @@ export const listListedPrivateAssetPacks = async (): Promise<
   Array<PrivateAssetPackListingData>
 > => {
   const response = await client.get('/asset-pack');
-  const assetPacks = response.data;
-  if (!Array.isArray(assetPacks)) {
-    throw new Error(
-      'Invalid response from endpoint /asset-pack of Shop API, was expecting an array.'
-    );
-  }
-
-  return assetPacks;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/asset-pack of Shop API',
+  });
 };
 
 export const listListedPrivateGameTemplates = async (): Promise<
   Array<PrivateGameTemplateListingData>
 > => {
   const response = await client.get('/game-template');
-  const gameTemplates = response.data;
-  if (!Array.isArray(gameTemplates)) {
-    throw new Error(
-      'Invalid response from endpoint /game-template of Shop API, was expecting an array.'
-    );
-  }
-
-  return gameTemplates;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/game-template of Shop API',
+  });
 };
 
 export const listListedCreditsPackages = async (): Promise<
   Array<CreditsPackageListingData>
 > => {
   const response = await client.get('/credits-package');
-  const creditsPackages = response.data;
-  if (!Array.isArray(creditsPackages)) {
-    throw new Error(
-      'Invalid response from endpoint /credits-package of Shop API, was expecting an array.'
-    );
-  }
-
-  return creditsPackages;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/credits-package of Shop API',
+  });
 };
 
 export const listListedCourseChapters = async (): Promise<
   Array<CourseChapterListingData>
 > => {
   const response = await client.get('/course-chapter');
-  const courseChapters = response.data;
-  if (!Array.isArray(courseChapters)) {
-    throw new Error(
-      'Invalid response from endpoint /course-chapter of Shop API, was expecting an array.'
-    );
-  }
-
-  return courseChapters;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/course-chapter of Shop API',
+  });
 };
 
 export const listListedCourses = async (): Promise<
   Array<CourseListingData>
 > => {
   const response = await client.get('/course');
-  const courses = response.data;
-  if (!Array.isArray(courses)) {
-    throw new Error(
-      'Invalid response from endpoint /course of Shop API, was expecting an array.'
-    );
-  }
-
-  return courses;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/course of Shop API',
+  });
 };
 
 export const listListedBundles = async (): Promise<
   Array<BundleListingData>
 > => {
   const response = await client.get('/bundle');
-  const bundles = response.data;
-  if (!Array.isArray(bundles)) {
-    throw new Error(
-      'Invalid response from endpoint /bundle of Shop API, was expecting an array.'
-    );
-  }
-
-  return bundles;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/bundle of Shop API',
+  });
 };
 
 export const getListedBundle = async ({
@@ -342,18 +323,11 @@ export const getListedBundle = async ({
     },
   });
 
-  const data = response.data;
-  if (data && (!data || typeof data !== 'object')) {
-    throw new Error(
-      'Invalid response from endpoint /bundle/{id} of Shop API, was expecting an object or null.'
-    );
-  }
-  if (data && !data.id) {
-    throw new Error(
-      'Invalid response from endpoint /bundle/{id} of Shop API, was expecting an object with an id field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/bundle/{id} of Shop API',
+  });
 };
 
 export const listSellerAssetPacks = async ({
@@ -411,13 +385,10 @@ export const listUserPurchases = async (
       Authorization: authorizationHeader,
     },
   });
-  const data = response.data;
-  if (!Array.isArray(data)) {
-    throw new Error(
-      'Invalid response from endpoint /purchase of Shop API, was expecting an array.'
-    );
-  }
-  return data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/purchase of Shop API',
+  });
 };
 
 export const getAuthorizationTokenForPrivateAssets = async (
@@ -437,13 +408,10 @@ export const getAuthorizationTokenForPrivateAssets = async (
       params: { userId },
     }
   );
-  const data = response.data;
-  if (typeof data !== 'string') {
-    throw new Error(
-      'Invalid response from endpoint /asset-pack/action/authorize of Shop API, was expecting a string.'
-    );
-  }
-  return data;
+  return ensureIsString({
+    data: response.data,
+    endpointName: '/asset-pack/action/authorize of Shop API',
+  });
 };
 
 export const getAuthorizationTokenForPrivateGameTemplates = async (
@@ -463,13 +431,10 @@ export const getAuthorizationTokenForPrivateGameTemplates = async (
       params: { userId },
     }
   );
-  const data = response.data;
-  if (typeof data !== 'string') {
-    throw new Error(
-      'Invalid response from endpoint /game-template/action/authorize of Shop API, was expecting a string.'
-    );
-  }
-  return data;
+  return ensureIsString({
+    data: response.data,
+    endpointName: '/game-template/action/authorize of Shop API',
+  });
 };
 
 export const createProductAuthorizedUrl = (
@@ -600,15 +565,10 @@ export const listProductLicenses = async ({
       productType,
     },
   });
-  const productLicenses = response.data;
-
-  if (!Array.isArray(productLicenses)) {
-    throw new Error(
-      'Invalid response from endpoint /product-license of Shop API, was expecting an array.'
-    );
-  }
-
-  return productLicenses;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/product-license of Shop API',
+  });
 };
 
 export const buyProductWithCredits = async (
@@ -816,16 +776,9 @@ export const claimPurchase = async ({
     }
   );
 
-  const data = result.data;
-  if (!data || typeof data !== 'object') {
-    throw new Error(
-      'Invalid response from endpoint /purchase/{id}/action/claim of Shop API, was expecting an object.'
-    );
-  }
-  if (!data.id) {
-    throw new Error(
-      'Invalid response from endpoint /purchase/{id}/action/claim of Shop API, was expecting an object with an id field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: result.data,
+    propertyName: 'id',
+    endpointName: '/purchase/{id}/action/claim of Shop API',
+  });
 };

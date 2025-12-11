@@ -4,6 +4,10 @@ import axios from 'axios';
 import { GDevelopAssetApi } from './ApiConfigs';
 import { type MessageDescriptor } from '../i18n/MessageDescriptor.flow';
 import { type MessageByLocale } from '../i18n/MessageByLocale';
+import {
+  ensureIsArray,
+  ensureIsNullOrObjectHasProperty,
+} from '../DataValidator';
 
 export const FLING_GAME_IN_APP_TUTORIAL_ID = 'flingGame';
 export const PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID = 'plinkoMultiplier';
@@ -163,29 +167,19 @@ export const fetchInAppTutorialShortHeaders = async (): Promise<
   const response = await axios.get(
     `${GDevelopAssetApi.baseUrl}/in-app-tutorial-short-header`
   );
-  const data = response.data;
-  if (!Array.isArray(data)) {
-    throw new Error(
-      'Invalid response from endpoint /in-app-tutorial-short-header of Asset API, was expecting an array.'
-    );
-  }
-  return data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/in-app-tutorial-short-header of Asset API',
+  });
 };
 
 export const fetchInAppTutorial = async (
   shortHeader: InAppTutorialShortHeader
 ): Promise<InAppTutorial> => {
   const response = await axios.get(shortHeader.contentUrl);
-  const data = response.data;
-  if (!data || typeof data !== 'object') {
-    throw new Error(
-      'Invalid response from endpoint in-app-tutorial contentUrl of Asset API, was expecting an object.'
-    );
-  }
-  if (!data.id) {
-    throw new Error(
-      'Invalid response from endpoint in-app-tutorial contentUrl of Asset API, was expecting an object with an id field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: 'in-app-tutorial contentUrl of Asset API',
+  });
 };

@@ -7,6 +7,10 @@ import { type MessageByLocale } from '../i18n/MessageByLocale';
 import { type Filters } from './Filters';
 import { type UserPublicProfile } from './User';
 import { t } from '@lingui/macro';
+import {
+  ensureIsArray,
+  ensureIsNullOrObjectHasProperty,
+} from '../DataValidator';
 
 export type GameUploadType = 'game-thumbnail' | 'game-screenshot';
 
@@ -324,18 +328,11 @@ export const registerGame = async (
     }
   );
 
-  const data = response.data;
-  if (!data || typeof data !== 'object') {
-    throw new Error(
-      'Invalid response from endpoint /game/{id} of Game API, was expecting an object.'
-    );
-  }
-  if (!data.id) {
-    throw new Error(
-      'Invalid response from endpoint /game/{id} of Game API, was expecting an object with an id field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/game/{id} of Game API',
+  });
 };
 
 export const updateGame = async (
@@ -392,18 +389,11 @@ export const updateGame = async (
     }
   );
 
-  const data = response.data;
-  if (!data || typeof data !== 'object') {
-    throw new Error(
-      'Invalid response from endpoint /game/{id} of Game API, was expecting an object.'
-    );
-  }
-  if (!data.id) {
-    throw new Error(
-      'Invalid response from endpoint /game/{id} of Game API, was expecting an object with an id field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/game/{id} of Game API',
+  });
 };
 
 export const setGameUserAcls = async (
@@ -478,18 +468,11 @@ export const getGame = async (
     },
   });
 
-  const data = response.data;
-  if (!data || typeof data !== 'object') {
-    throw new Error(
-      'Invalid response from endpoint /game/{id} of Game API, was expecting an object.'
-    );
-  }
-  if (!data.id) {
-    throw new Error(
-      'Invalid response from endpoint /game/{id} of Game API, was expecting an object with an id field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/game/{id} of Game API',
+  });
 };
 
 export const deleteGame = async (
@@ -506,18 +489,11 @@ export const deleteGame = async (
       Authorization: authorizationHeader,
     },
   });
-  const data = response.data;
-  if (!data || typeof data !== 'object') {
-    throw new Error(
-      'Invalid response from endpoint /game/{id} of Game API, was expecting an object.'
-    );
-  }
-  if (!data.id) {
-    throw new Error(
-      'Invalid response from endpoint /game/{id} of Game API, was expecting an object with an id field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/game/{id} of Game API',
+  });
 };
 
 export const getGames = async (
@@ -535,40 +511,27 @@ export const getGames = async (
     },
   });
 
-  const data = response.data;
-  if (!Array.isArray(data)) {
-    throw new Error(
-      'Invalid response from endpoint /game of Game API, was expecting an array.'
-    );
-  }
-  return data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/game of Game API',
+  });
 };
 
 export const getPublicGame = async (gameId: string): Promise<PublicGame> => {
   const response = await client.get(`/public-game/${gameId}`);
-  const data = response.data;
-  if (!data || typeof data !== 'object') {
-    throw new Error(
-      'Invalid response from endpoint /public-game/{id} of Game API, was expecting an object.'
-    );
-  }
-  if (!data.id) {
-    throw new Error(
-      'Invalid response from endpoint /public-game/{id} of Game API, was expecting an object with an id field.'
-    );
-  }
-  return data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/public-game/{id} of Game API',
+  });
 };
 
 export const getGameCategories = async (): Promise<GameCategory[]> => {
   const response = await client.get('/game-category');
-  const data = response.data;
-  if (!Array.isArray(data)) {
-    throw new Error(
-      'Invalid response from endpoint /game-category of Game API, was expecting an array.'
-    );
-  }
-  return data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/game-category of Game API',
+  });
 };
 
 export const buyGameFeaturing = async (
@@ -611,24 +574,18 @@ export const listGameFeaturings = async (
     },
   });
 
-  const data = response.data;
-  if (!Array.isArray(data)) {
-    throw new Error(
-      'Invalid response from endpoint /game-featuring of Game API, was expecting an array.'
-    );
-  }
-  return data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/game-featuring of Game API',
+  });
 };
 
 export const listMarketingPlans = async (): Promise<MarketingPlan[]> => {
   const response = await client.get('/marketing-plan');
-  const data = response.data;
-  if (!Array.isArray(data)) {
-    throw new Error(
-      'Invalid response from endpoint /marketing-plan of Game API, was expecting an array.'
-    );
-  }
-  return data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/marketing-plan of Game API',
+  });
 };
 
 export const getRecommendedMarketingPlan = async (
@@ -647,13 +604,10 @@ export const getRecommendedMarketingPlan = async (
     },
   });
 
-  if (!Array.isArray(response.data)) {
-    throw new Error(
-      'Invalid response from the game API marketing plan listing endpoint'
-    );
-  }
-
-  return response.data[0];
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/marketing-plan of Game API',
+  })[0];
 };
 
 export const getGameCommentQualityRatingsLeaderboards = async (): Promise<
@@ -663,11 +617,10 @@ export const getGameCommentQualityRatingsLeaderboards = async (): Promise<
     '/game-comment-quality-ratings-leaderboard?leaderboardRegionName=global'
   );
 
-  if (!Array.isArray(response.data)) {
-    throw new Error('Invalid response from the game leaderboard API');
-  }
-
-  return response.data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/game-comment-quality-ratings-leaderboard of Game API',
+  });
 };
 
 export const createGameResourceSignedUrls = async ({

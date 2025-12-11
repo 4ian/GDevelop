@@ -3,6 +3,7 @@ import axios from 'axios';
 import { GDevelopAssetApi } from './ApiConfigs';
 import { type Capabilities } from './Usage';
 import { type MessageByLocale } from '../i18n/MessageByLocale';
+import { ensureIsArray } from '../DataValidator';
 
 export type TutorialCategory =
   | 'game-mechanic'
@@ -70,15 +71,12 @@ export const listAllTutorials = (): Promise<Array<Tutorial>> => {
     .get(`/tutorial`, {
       params: { include: 'upcoming' },
     })
-    .then(response => {
-      const data = response.data;
-      if (!Array.isArray(data)) {
-        throw new Error(
-          'Invalid response from endpoint /tutorial of Asset API, was expecting an array.'
-        );
-      }
-      return data;
-    });
+    .then(response =>
+      ensureIsArray({
+        data: response.data,
+        endpointName: '/tutorial of Asset API',
+      })
+    );
 };
 
 export const getObjectTutorialIds = (type: string): Array<string> => {

@@ -6,6 +6,7 @@ import { getSignedUrl } from './Usage';
 import {
   ensureIsArray,
   ensureIsNullOrObjectHasProperty,
+  ensureIsObject,
 } from '../DataValidator';
 
 export type TargetName =

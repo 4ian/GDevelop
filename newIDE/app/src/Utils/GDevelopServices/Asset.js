@@ -16,11 +16,7 @@ import {
   isPrivateAssetResourceAuthorizedUrl,
 } from './Shop';
 import { type ExtensionDependency } from '../../Utils/GDevelopServices/Extension';
-import {
-  ensureIsObject,
-  ensureIsNullOrObjectHasProperty,
-  ensureIsArray,
-} from '../DataValidator';
+import { ensureObjectHasProperty, ensureIsArray } from '../DataValidator';
 
 export type License = {|
   name: string,
@@ -453,7 +449,7 @@ export const getPublicAsset = async (
       assetShortHeader.id
     }.json`
   );
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: assetResponse.data,
     propertyName: 'id',
     endpointName: '/assets/{id}.json of Asset API',
@@ -477,7 +473,7 @@ export const getPrivateAsset = async (
     authorizationToken
   );
   const assetResponse = await client.get(authorizedUrl);
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: assetResponse.data,
     propertyName: 'id',
     endpointName: '/private-assets/{packId}/{assetId}.json of Asset API',
@@ -582,7 +578,7 @@ export const getPrivateAssetPack = async (
   assetPackId: string
 ): Promise<PrivateAssetPack> => {
   const response = await client.get(`/asset-pack/${assetPackId}`);
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'id',
     endpointName: '/asset-pack/{id} of Asset API',
@@ -593,7 +589,7 @@ export const getPrivateGameTemplate = async (
   gameTemplateId: string
 ): Promise<PrivateGameTemplate> => {
   const response = await client.get(`/game-template/${gameTemplateId}`);
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'id',
     endpointName: '/game-template/{id} of Asset API',
@@ -602,7 +598,7 @@ export const getPrivateGameTemplate = async (
 
 export const getBundle = async (bundleId: string): Promise<Bundle> => {
   const response = await client.get(`/bundle/${bundleId}`);
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'id',
     endpointName: '/bundle/{id} of Asset API',
@@ -628,7 +624,7 @@ export const getPrivatePdfTutorial = async (
       Authorization: authorizationHeader,
     },
   });
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'id',
     endpointName: '/pdf-tutorial/{id} of Asset API',
@@ -827,11 +823,9 @@ export const listCourseChapters = async (
     });
   }
   return ensureIsArray({
-    data: (
-      await client.get(`/course/${courseId}/chapter`, {
-        params: { language },
-      })
-    ).data,
+    data: (await client.get(`/course/${courseId}/chapter`, {
+      params: { language },
+    })).data,
     endpointName: '/course/{id}/chapter of Asset API',
   });
 };

@@ -4,10 +4,7 @@ import axios from 'axios';
 import { GDevelopAssetApi } from './ApiConfigs';
 import { type MessageDescriptor } from '../i18n/MessageDescriptor.flow';
 import { type MessageByLocale } from '../i18n/MessageByLocale';
-import {
-  ensureIsArray,
-  ensureIsNullOrObjectHasProperty,
-} from '../DataValidator';
+import { ensureIsArray, ensureObjectHasProperty } from '../DataValidator';
 
 export const FLING_GAME_IN_APP_TUTORIAL_ID = 'flingGame';
 export const PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID = 'plinkoMultiplier';
@@ -177,7 +174,7 @@ export const fetchInAppTutorial = async (
   shortHeader: InAppTutorialShortHeader
 ): Promise<InAppTutorial> => {
   const response = await axios.get(shortHeader.contentUrl);
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'id',
     endpointName: 'in-app-tutorial contentUrl of Asset API',

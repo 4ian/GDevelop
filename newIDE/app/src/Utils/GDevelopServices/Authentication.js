@@ -17,10 +17,7 @@ import type { LoginProvider } from '../../LoginProvider';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { type CommunityLinks, type UserSurvey } from './User';
 import { userCancellationErrorName } from '../../LoginProvider/Utils';
-import {
-  ensureIsObject,
-  ensureIsNullOrObjectHasProperty,
-} from '../DataValidator';
+import { ensureIsObject, ensureObjectHasProperty } from '../DataValidator';
 
 export type Profile = {|
   id: string,
@@ -379,7 +376,7 @@ export default class Authentication {
         });
       })
       .then(response =>
-        ensureIsNullOrObjectHasProperty({
+        ensureObjectHasProperty({
           data: response.data,
           propertyName: 'id',
           endpointName: '/user/{id} of User API',
@@ -409,7 +406,7 @@ export default class Authentication {
       }
     );
 
-    return ensureIsNullOrObjectHasProperty({
+    return ensureObjectHasProperty({
       data: response.data,
       propertyName: 'code',
       endpointName: '/user/{id}/action/update-github-star of User API',
@@ -434,7 +431,7 @@ export default class Authentication {
       }
     );
 
-    return ensureIsNullOrObjectHasProperty({
+    return ensureObjectHasProperty({
       data: response.data,
       propertyName: 'code',
       endpointName: '/user/{id}/action/update-tiktok-follow of User API',
@@ -461,7 +458,7 @@ export default class Authentication {
       }
     );
 
-    return ensureIsNullOrObjectHasProperty({
+    return ensureObjectHasProperty({
       data: response.data,
       propertyName: 'code',
       endpointName: '/user/{id}/action/update-twitter-follow of User API',
@@ -490,7 +487,7 @@ export default class Authentication {
       }
     );
 
-    return ensureIsNullOrObjectHasProperty({
+    return ensureObjectHasProperty({
       data: response.data,
       propertyName: 'code',
       endpointName: '/user/{id}/action/update-youtube-subscription of User API',

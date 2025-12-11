@@ -7,10 +7,7 @@ import { type MessageByLocale } from '../i18n/MessageByLocale';
 import { type Filters } from './Filters';
 import { type UserPublicProfile } from './User';
 import { t } from '@lingui/macro';
-import {
-  ensureIsArray,
-  ensureIsNullOrObjectHasProperty,
-} from '../DataValidator';
+import { ensureIsArray, ensureObjectHasProperty } from '../DataValidator';
 
 export type GameUploadType = 'game-thumbnail' | 'game-screenshot';
 
@@ -328,7 +325,7 @@ export const registerGame = async (
     }
   );
 
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'id',
     endpointName: '/game/{id} of Game API',
@@ -389,7 +386,7 @@ export const updateGame = async (
     }
   );
 
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'id',
     endpointName: '/game/{id} of Game API',
@@ -468,7 +465,7 @@ export const getGame = async (
     },
   });
 
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'id',
     endpointName: '/game/{id} of Game API',
@@ -489,7 +486,7 @@ export const deleteGame = async (
       Authorization: authorizationHeader,
     },
   });
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'id',
     endpointName: '/game/{id} of Game API',
@@ -519,7 +516,7 @@ export const getGames = async (
 
 export const getPublicGame = async (gameId: string): Promise<PublicGame> => {
   const response = await client.get(`/public-game/${gameId}`);
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'id',
     endpointName: '/public-game/{id} of Game API',

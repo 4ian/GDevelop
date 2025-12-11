@@ -7,7 +7,7 @@ import { extractNextPageUriFromLinkHeader } from './Play';
 import {
   ensureIsArray,
   ensureIsObject,
-  ensureIsNullOrObjectHasProperty,
+  ensureObjectHasProperty,
 } from '../DataValidator';
 
 export type Environment = 'staging' | 'live';
@@ -213,7 +213,7 @@ export const getAiRequest = async (
       },
     }
   );
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'id',
     endpointName: '/ai-request/{id} of Generation API',
@@ -320,7 +320,7 @@ export const createAiRequest = async (
       },
     }
   );
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'id',
     endpointName: '/ai-request of Generation API',
@@ -386,7 +386,7 @@ export const addMessageToAiRequest = async (
       },
     }
   );
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'id',
     endpointName: '/ai-request/{id}/action/add-message of Generation API',
@@ -430,7 +430,7 @@ export const sendAiRequestFeedback = async (
       },
     }
   );
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'id',
     endpointName: '/ai-request/{id}/action/set-feedback of Generation API',
@@ -477,7 +477,7 @@ export const getAiRequestSuggestions = async (
       },
     }
   );
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'id',
     endpointName: '/ai-request/{id}/action/get-suggestions of Generation API',
@@ -553,7 +553,7 @@ export const createAiGeneratedEvent = async (
   );
 
   if (response.status === 200) {
-    const data = ensureIsNullOrObjectHasProperty({
+    const data = ensureObjectHasProperty({
       data: response.data,
       propertyName: 'id',
       endpointName: '/ai-generated-event of Generation API',
@@ -600,7 +600,7 @@ export const getAiGeneratedEvent = async (
       },
     }
   );
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'id',
     endpointName: '/ai-generated-event/{id} of Generation API',
@@ -642,7 +642,7 @@ export const createAssetSearch = async (
       },
     }
   );
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'id',
     endpointName: '/asset-search of Generation API',
@@ -687,7 +687,8 @@ export const createAiUserContentPresignedUrls = async (
   );
   return ensureIsObject({
     data: response.data,
-    endpointName: '/ai-user-content/action/create-presigned-urls of Generation API',
+    endpointName:
+      '/ai-user-content/action/create-presigned-urls of Generation API',
   });
 };
 
@@ -713,7 +714,7 @@ export const fetchAiSettings = async ({
   const response = await axios.get(
     `${GDevelopAiCdn.baseUrl[environment]}/ai-settings.json`
   );
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'aiRequest',
     endpointName: '/ai-settings.json of Generation API',

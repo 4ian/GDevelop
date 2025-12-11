@@ -5,7 +5,7 @@ import { GDevelopBuildApi, GDevelopGamesPlatform } from './ApiConfigs';
 import { getSignedUrl } from './Usage';
 import {
   ensureIsArray,
-  ensureIsNullOrObjectHasProperty,
+  ensureObjectHasProperty,
   ensureIsObject,
 } from '../DataValidator';
 
@@ -211,7 +211,7 @@ export const buildElectron = (
       })
     )
     .then(response =>
-      ensureIsNullOrObjectHasProperty({
+      ensureObjectHasProperty({
         data: response.data,
         propertyName: 'id',
         endpointName: '/build of Build API',
@@ -247,7 +247,7 @@ export const buildWeb = (
       })
     )
     .then(response =>
-      ensureIsNullOrObjectHasProperty({
+      ensureObjectHasProperty({
         data: response.data,
         propertyName: 'id',
         endpointName: '/build of Build API',
@@ -294,7 +294,7 @@ export const buildCordovaAndroid = (
       )
     )
     .then(response =>
-      ensureIsNullOrObjectHasProperty({
+      ensureObjectHasProperty({
         data: response.data,
         propertyName: 'id',
         endpointName: '/build of Build API',
@@ -339,7 +339,7 @@ export const buildCordovaIos = (
       )
     )
     .then(response =>
-      ensureIsNullOrObjectHasProperty({
+      ensureObjectHasProperty({
         data: response.data,
         propertyName: 'id',
         endpointName: '/build of Build API',
@@ -364,7 +364,7 @@ export const getBuild = (
       })
     )
     .then(response =>
-      ensureIsNullOrObjectHasProperty({
+      ensureObjectHasProperty({
         data: response.data,
         propertyName: 'id',
         endpointName: '/build/{id} of Build API',
@@ -419,7 +419,7 @@ export const updateBuild = (
       )
     )
     .then(response =>
-      ensureIsNullOrObjectHasProperty({
+      ensureObjectHasProperty({
         data: response.data,
         propertyName: 'id',
         endpointName: '/build/{id} of Build API',
@@ -444,7 +444,7 @@ export const deleteBuild = (
       })
     )
     .then(response =>
-      ensureIsNullOrObjectHasProperty({
+      ensureObjectHasProperty({
         data: response.data,
         propertyName: 'id',
         endpointName: '/build/{id} of Build API',

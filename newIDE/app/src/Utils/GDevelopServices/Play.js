@@ -8,6 +8,7 @@ import {
   ensureIsArray,
   ensureIsArrayOrNull,
   ensureIsNullOrObjectHasProperty,
+  ensureObjectHasProperty,
   ensureIsString,
   ensureIsObjectWithPropertyOfType,
 } from '../DataValidator';
@@ -228,7 +229,7 @@ export const duplicateLeaderboard = async (
       params: { userId },
     }
   );
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'id',
     endpointName: '/game/{id}/leaderboard/action/copy of Play API',

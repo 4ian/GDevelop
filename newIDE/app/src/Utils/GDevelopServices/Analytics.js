@@ -2,7 +2,6 @@
 import axios from 'axios';
 import { GDevelopAnalyticsApi } from './ApiConfigs';
 import {
-  ensureIsObjectOrNull,
   ensureIsNullOrObjectHasProperty,
   ensureIsArrayOrNull,
 } from '../DataValidator';

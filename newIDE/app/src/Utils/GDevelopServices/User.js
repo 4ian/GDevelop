@@ -21,8 +21,10 @@ import { type UserCourseProgress } from './Asset';
 import { extractGDevelopApiErrorStatusAndCode } from './Errors';
 import {
   ensureIsArray,
+  ensureIsObject,
   ensureIsNullOrObjectHasProperty,
   ensureIsObjectWithPropertyOfType,
+  ensureObjectHasProperty,
 } from '../DataValidator';
 
 export type BatchCreationResultUser = {|
@@ -329,7 +331,7 @@ export const updateGroup = async (
       params: { userId },
     }
   );
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'id',
     endpointName: '/team/{id}/group/{id} of User API',
@@ -347,7 +349,7 @@ export const createGroup = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'id',
     endpointName: '/team/{id}/group of User API',
@@ -428,9 +430,8 @@ export const getUserPublicProfilesByIds = async (
       id: ids.join(','),
     },
   });
-  return ensureIsNullOrObjectHasProperty({
+  return ensureIsObject({
     data: response.data,
-    propertyName: 'id',
     endpointName: '/user-public-profile of User API',
   });
 };
@@ -440,7 +441,7 @@ export const getUserPublicProfile = async (
 ): Promise<UserPublicProfile> => {
   const response = await client.get(`/user-public-profile/${id}`);
 
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'id',
     endpointName: '/user-public-profile/{id} of User API',
@@ -902,7 +903,7 @@ export const editUser = async (
     params: { userId },
   });
 
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'id',
     endpointName: '/user/{id} of User API',

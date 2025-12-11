@@ -16,6 +16,7 @@ import {
 import {
   ensureIsArray,
   ensureIsNullOrObjectHasProperty,
+  ensureObjectHasProperty,
   ensureIsString,
 } from '../DataValidator';
 
@@ -776,7 +777,7 @@ export const claimPurchase = async ({
     }
   );
 
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: result.data,
     propertyName: 'id',
     endpointName: '/purchase/{id}/action/claim of Shop API',

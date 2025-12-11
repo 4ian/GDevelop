@@ -12,7 +12,7 @@ import { isNativeMobileApp } from '../Platform';
 import {
   ensureIsArray,
   ensureIsObjectOrNull,
-  ensureIsNullOrObjectHasProperty,
+  ensureObjectHasProperty,
   ensureIsObjectWithPropertyOfType,
 } from '../DataValidator';
 
@@ -301,11 +301,9 @@ export const listSubscriptionPlans = async (options: {|
     });
   }
   return ensureIsArray({
-    data: (
-      await apiClient.get('/subscription-plan', {
-        params: { includeLegacy: options.includeLegacy ? 'true' : 'false' },
-      })
-    ).data,
+    data: (await apiClient.get('/subscription-plan', {
+      params: { includeLegacy: options.includeLegacy ? 'true' : 'false' },
+    })).data,
     endpointName: '/subscription-plan of Usage API',
   });
 };
@@ -456,7 +454,7 @@ export const getUserLimits = async (
       Authorization: authorizationHeader,
     },
   });
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'capabilities',
     endpointName: '/limits of Usage API',
@@ -477,7 +475,7 @@ export const getUserSubscription = async (
       Authorization: authorizationHeader,
     },
   });
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'userId',
     endpointName: '/subscription-v2 of Usage API',
@@ -509,7 +507,7 @@ export const changeUserSubscription = async (
     }
   );
 
-  return ensureIsNullOrObjectHasProperty({
+  return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'userId',
     endpointName: '/subscription-v2 of Usage API',

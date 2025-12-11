@@ -67,7 +67,7 @@ export class LayerTreeViewItemContent implements TreeViewItemContent {
   }
 
   getHtmlId(index: number): ?string {
-    return `layer-item-${index}`;
+    return `layer-${index}`;
   }
 
   getDataSet(): ?HTMLDataset {

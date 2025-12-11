@@ -57,7 +57,7 @@ const noRefreshOfAllFields = () => {
   );
 };
 
-const effectsHelpLink = getHelpLink('/interface/scene-editor/layer-effects');
+const effectsHelpLink = getHelpLink('/interface/scene-editor/layers-and-cameras');
 
 const TopLevelCollapsibleSection = ({
   title,

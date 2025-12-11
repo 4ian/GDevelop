@@ -343,7 +343,15 @@ export const listSellerAssetPacks = async ({
       productType: 'asset-pack',
     },
   });
-  return response.data;
+
+  const assetPacks = response.data;
+  if (!Array.isArray(assetPacks)) {
+    throw new Error(
+      'Invalid response from the user product endpoint of the Shop API, expected an array of asset packs.'
+    );
+  }
+
+  return assetPacks;
 };
 
 export const listSellerGameTemplates = async ({
@@ -356,7 +364,15 @@ export const listSellerGameTemplates = async ({
       productType: 'game-template',
     },
   });
-  return response.data;
+
+  const gameTemplates = response.data;
+  if (!Array.isArray(gameTemplates)) {
+    throw new Error(
+      'Invalid response from the user product endpoint of the Shop API, expected an array of game templates.'
+    );
+  }
+
+  return gameTemplates;
 };
 
 export const listUserPurchases = async (
@@ -388,7 +404,15 @@ export const listUserPurchases = async (
       Authorization: authorizationHeader,
     },
   });
-  return response.data;
+
+  const purchases = response.data;
+  if (!Array.isArray(purchases)) {
+    throw new Error(
+      'Invalid response from the purchase endpoint of the Shop API, expected an array of purchases.'
+    );
+  }
+
+  return purchases;
 };
 
 export const getAuthorizationTokenForPrivateAssets = async (

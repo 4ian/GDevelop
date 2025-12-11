@@ -289,12 +289,28 @@ export const listSubscriptionPlans = async (options: {|
         Authorization: authorizationHeader,
       },
     });
-    return response.data;
+
+    const subscriptionPlans = response.data;
+    if (!Array.isArray(subscriptionPlans)) {
+      throw new Error(
+        'Invalid response from the subscription-plan endpoint of the Usage API, expected an array of subscription plans.'
+      );
+    }
+
+    return subscriptionPlans;
   }
   const response = await apiClient.get('/subscription-plan', {
     params: { includeLegacy: options.includeLegacy ? 'true' : 'false' },
   });
-  return response.data;
+
+  const subscriptionPlans = response.data;
+  if (!Array.isArray(subscriptionPlans)) {
+    throw new Error(
+      'Invalid response from the subscription-plan endpoint of the Usage API, expected an array of subscription plans.'
+    );
+  }
+
+  return subscriptionPlans;
 };
 
 export const getSubscriptionPlanPricingSystem = async (
@@ -339,13 +355,29 @@ export const listSubscriptionPlanPricingSystems = async (options: {|
         Authorization: authorizationHeader,
       },
     });
-    return response.data;
+
+    const pricingSystems = response.data;
+    if (!Array.isArray(pricingSystems)) {
+      throw new Error(
+        'Invalid response from the subscription-plan-pricing-system endpoint of the Usage API, expected an array of pricing systems.'
+      );
+    }
+
+    return pricingSystems;
   }
 
   const response = await apiClient.get('/subscription-plan-pricing-system', {
     params,
   });
-  return response.data;
+
+  const pricingSystems = response.data;
+  if (!Array.isArray(pricingSystems)) {
+    throw new Error(
+      'Invalid response from the subscription-plan-pricing-system endpoint of the Usage API, expected an array of pricing systems.'
+    );
+  }
+
+  return pricingSystems;
 };
 
 export const getUserUsages = async (
@@ -362,7 +394,15 @@ export const getUserUsages = async (
       Authorization: authorizationHeader,
     },
   });
-  return response.data;
+
+  const usages = response.data;
+  if (!Array.isArray(usages)) {
+    throw new Error(
+      'Invalid response from the usage endpoint of the Usage API, expected an array of usages.'
+    );
+  }
+
+  return usages;
 };
 
 export const getUserEarningsBalance = async (
@@ -718,5 +758,12 @@ export const getRedemptionCodes = async (
     },
   });
 
-  return response.data;
+  const redemptionCodes = response.data;
+  if (!Array.isArray(redemptionCodes)) {
+    throw new Error(
+      'Invalid response from the redemption-code endpoint of the Usage API, expected an array of redemption codes.'
+    );
+  }
+
+  return redemptionCodes;
 };

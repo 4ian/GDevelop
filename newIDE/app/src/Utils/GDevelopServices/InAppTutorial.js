@@ -163,7 +163,15 @@ export const fetchInAppTutorialShortHeaders = async (): Promise<
   const response = await axios.get(
     `${GDevelopAssetApi.baseUrl}/in-app-tutorial-short-header`
   );
-  return response.data;
+
+  const inAppTutorialShortHeaders = response.data;
+  if (!Array.isArray(inAppTutorialShortHeaders)) {
+    throw new Error(
+      'Invalid response from the in-app-tutorial-short-header endpoint of the Asset API, expected an array of in-app tutorial short headers.'
+    );
+  }
+
+  return inAppTutorialShortHeaders;
 };
 
 export const fetchInAppTutorial = async (

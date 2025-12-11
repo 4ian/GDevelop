@@ -101,7 +101,15 @@ export const listNotifications = async (
     headers: { Authorization: authorizationHeader },
     params: { userId, perPage: 25 },
   });
-  return response.data;
+
+  const notifications = response.data;
+  if (!Array.isArray(notifications)) {
+    throw new Error(
+      'Invalid response from the notification endpoint of the User API, expected an array of notifications.'
+    );
+  }
+
+  return notifications;
 };
 
 export const markNotificationsAsSeen = async (

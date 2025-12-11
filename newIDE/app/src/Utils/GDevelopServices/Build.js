@@ -354,7 +354,16 @@ export const getBuilds = (
         },
       })
     )
-    .then(response => response.data);
+    .then(response => {
+      const builds = response.data;
+      if (!Array.isArray(builds)) {
+        throw new Error(
+          'Invalid response from the build endpoint of the Build API, expected an array of builds.'
+        );
+      }
+
+      return builds;
+    });
 };
 
 export const updateBuild = (

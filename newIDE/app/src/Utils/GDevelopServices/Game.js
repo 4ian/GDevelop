@@ -281,6 +281,12 @@ export const listAllShowcasedGames = async (): Promise<AllShowcasedGames> => {
   const showcasedGames = responsesData[0];
   const filters = responsesData[1];
 
+  if (!Array.isArray(showcasedGames)) {
+    throw new Error(
+      'Invalid response from the showcased-game endpoint of the Game API, expected an array of showcased games.'
+    );
+  }
+
   return {
     showcasedGames,
     filters,
@@ -491,7 +497,14 @@ export const getGames = async (
     },
   });
 
-  return response.data;
+  const games = response.data;
+  if (!Array.isArray(games)) {
+    throw new Error(
+      'Invalid response from the game endpoint of the Game API, expected an array of games.'
+    );
+  }
+
+  return games;
 };
 
 export const getPublicGame = async (gameId: string): Promise<PublicGame> => {
@@ -501,7 +514,15 @@ export const getPublicGame = async (gameId: string): Promise<PublicGame> => {
 
 export const getGameCategories = async (): Promise<GameCategory[]> => {
   const response = await client.get('/game-category');
-  return response.data;
+
+  const gameCategories = response.data;
+  if (!Array.isArray(gameCategories)) {
+    throw new Error(
+      'Invalid response from the game-category endpoint of the Game API, expected an array of game categories.'
+    );
+  }
+
+  return gameCategories;
 };
 
 export const buyGameFeaturing = async (
@@ -544,12 +565,27 @@ export const listGameFeaturings = async (
     },
   });
 
-  return response.data;
+  const gameFeaturings = response.data;
+  if (!Array.isArray(gameFeaturings)) {
+    throw new Error(
+      'Invalid response from the game-featuring endpoint of the Game API, expected an array of game featurings.'
+    );
+  }
+
+  return gameFeaturings;
 };
 
 export const listMarketingPlans = async (): Promise<MarketingPlan[]> => {
   const response = await client.get('/marketing-plan');
-  return response.data;
+
+  const marketingPlans = response.data;
+  if (!Array.isArray(marketingPlans)) {
+    throw new Error(
+      'Invalid response from the marketing-plan endpoint of the Game API, expected an array of marketing plans.'
+    );
+  }
+
+  return marketingPlans;
 };
 
 export const getRecommendedMarketingPlan = async (

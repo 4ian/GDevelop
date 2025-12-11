@@ -52,6 +52,12 @@ export const listAllExamples = async (): Promise<AllExamples> => {
     retryIfFailed({ times: 2 }, async () => (await axios.get(filtersUrl)).data),
   ]);
 
+  if (!Array.isArray(exampleShortHeaders)) {
+    throw new Error(
+      'Invalid response from the example endpoint of the Asset API, expected an array of example short headers.'
+    );
+  }
+
   const allExamples: AllExamples = {
     exampleShortHeaders,
     filters,
@@ -82,5 +88,12 @@ export const getUserExampleShortHeaders = async (
     }
   );
 
-  return response.data;
+  const exampleShortHeaders = response.data;
+  if (!Array.isArray(exampleShortHeaders)) {
+    throw new Error(
+      'Invalid response from the example-short-header endpoint of the Asset API, expected an array of example short headers.'
+    );
+  }
+
+  return exampleShortHeaders;
 };

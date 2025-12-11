@@ -70,7 +70,16 @@ export const listAllTutorials = (): Promise<Array<Tutorial>> => {
     .get(`/tutorial`, {
       params: { include: 'upcoming' },
     })
-    .then(response => response.data);
+    .then(response => {
+      const tutorials = response.data;
+      if (!Array.isArray(tutorials)) {
+        throw new Error(
+          'Invalid response from the tutorial endpoint of the Asset API, expected an array of tutorials.'
+        );
+      }
+
+      return tutorials;
+    });
 };
 
 export const getObjectTutorialIds = (type: string): Array<string> => {

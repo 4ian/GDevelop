@@ -426,6 +426,12 @@ export const listAllPublicAssets = async ({
   const publicFilters = responsesData[1];
   const publicAssetPacks = responsesData[2];
 
+  if (!Array.isArray(publicAssetShortHeaders)) {
+    throw new Error(
+      'Invalid response from the asset endpoint of the Asset API, expected an array of asset short headers.'
+    );
+  }
+
   if (!publicAssetPacks.starterPacks) {
     throw new Error(
       'Unexpected response from the public asset packs endpoint.'
@@ -638,7 +644,15 @@ export const listReceivedAssetShortHeaders = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  return response.data;
+
+  const assetShortHeaders = response.data;
+  if (!Array.isArray(assetShortHeaders)) {
+    throw new Error(
+      'Invalid response from the asset-short-header endpoint of the Asset API, expected an array of asset short headers.'
+    );
+  }
+
+  return assetShortHeaders;
 };
 
 export const listReceivedAssetPacks = async (
@@ -654,7 +668,15 @@ export const listReceivedAssetPacks = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  return response.data;
+
+  const assetPacks = response.data;
+  if (!Array.isArray(assetPacks)) {
+    throw new Error(
+      'Invalid response from the asset-pack endpoint of the Asset API, expected an array of asset packs.'
+    );
+  }
+
+  return assetPacks;
 };
 
 export const listReceivedGameTemplates = async (
@@ -670,7 +692,15 @@ export const listReceivedGameTemplates = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  return response.data;
+
+  const gameTemplates = response.data;
+  if (!Array.isArray(gameTemplates)) {
+    throw new Error(
+      'Invalid response from the game-template endpoint of the Asset API, expected an array of game templates.'
+    );
+  }
+
+  return gameTemplates;
 };
 
 export const listReceivedBundles = async (
@@ -686,7 +716,15 @@ export const listReceivedBundles = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  return response.data;
+
+  const bundles = response.data;
+  if (!Array.isArray(bundles)) {
+    throw new Error(
+      'Invalid response from the bundle endpoint of the Asset API, expected an array of bundles.'
+    );
+  }
+
+  return bundles;
 };
 
 export const isPublicAssetResourceUrl = (url: string) =>
@@ -735,10 +773,26 @@ export const listCourses = async (
         Authorization: authorizationHeader,
       },
     });
-    return response.data;
+
+    const courses = response.data;
+    if (!Array.isArray(courses)) {
+      throw new Error(
+        'Invalid response from the course endpoint of the Asset API, expected an array of courses.'
+      );
+    }
+
+    return courses;
   }
   const response = await client.get(`/course`);
-  return response.data;
+
+  const courses = response.data;
+  if (!Array.isArray(courses)) {
+    throw new Error(
+      'Invalid response from the course endpoint of the Asset API, expected an array of courses.'
+    );
+  }
+
+  return courses;
 };
 
 export const listCourseChapters = async (
@@ -765,12 +819,28 @@ export const listCourseChapters = async (
         Authorization: authorizationHeader,
       },
     });
-    return response.data;
+
+    const courseChapters = response.data;
+    if (!Array.isArray(courseChapters)) {
+      throw new Error(
+        'Invalid response from the course chapter endpoint of the Asset API, expected an array of course chapters.'
+      );
+    }
+
+    return courseChapters;
   }
   const response = await client.get(`/course/${courseId}/chapter`, {
     params: { language },
   });
-  return response.data;
+
+  const courseChapters = response.data;
+  if (!Array.isArray(courseChapters)) {
+    throw new Error(
+      'Invalid response from the course chapter endpoint of the Asset API, expected an array of course chapters.'
+    );
+  }
+
+  return courseChapters;
 };
 
 export const getCourseChapterRatingUrl = ({

@@ -115,7 +115,15 @@ export const listGameActiveLeaderboards = async (
     headers: { Authorization: authorizationHeader },
     params: { userId, deleted: 'false' },
   });
-  return response.data;
+
+  const leaderboards = response.data;
+  if (!Array.isArray(leaderboards)) {
+    throw new Error(
+      'Invalid response from the leaderboard endpoint of the Play API, expected an array of leaderboards.'
+    );
+  }
+
+  return leaderboards;
 };
 
 export const extractNextPageUriFromLinkHeader = (
@@ -158,8 +166,16 @@ export const listLeaderboardEntries = async (
   const nextPageUri = response.headers.link
     ? extractNextPageUriFromLinkHeader(response.headers.link)
     : null;
+
+  const entries = response.data;
+  if (!Array.isArray(entries)) {
+    throw new Error(
+      'Invalid response from the leaderboard entry endpoint of the Play API, expected an array of entries.'
+    );
+  }
+
   return {
-    entries: response.data,
+    entries,
     nextPageUri,
   };
 };
@@ -350,7 +366,16 @@ export const listComments = async (
         },
       })
     )
-    .then(response => response.data);
+    .then(response => {
+      const comments = response.data;
+      if (!Array.isArray(comments)) {
+        throw new Error(
+          'Invalid response from the comment endpoint of the Play API, expected an array of comments.'
+        );
+      }
+
+      return comments;
+    });
 };
 
 export const canCommentBeRatedByOwner = (comment: Comment): boolean => {

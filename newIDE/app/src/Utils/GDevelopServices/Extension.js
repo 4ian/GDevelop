@@ -303,5 +303,12 @@ export const getUserExtensionShortHeaders = async (
     },
   });
 
-  return response.data;
+  const extensionShortHeaders = response.data;
+  if (!Array.isArray(extensionShortHeaders)) {
+    throw new Error(
+      'Invalid response from the extension-short-header endpoint of the Asset API, expected an array of extension short headers.'
+    );
+  }
+
+  return extensionShortHeaders;
 };

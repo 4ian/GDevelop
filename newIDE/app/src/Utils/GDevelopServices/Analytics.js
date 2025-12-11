@@ -94,5 +94,13 @@ export const getGameMetricsFrom = async (
   });
 
   if (response.status === 404) return null;
-  return response.data;
+
+  const gameMetrics = response.data;
+  if (!Array.isArray(gameMetrics)) {
+    throw new Error(
+      'Invalid response from the game-metrics endpoint of the Analytics API, expected an array of game metrics.'
+    );
+  }
+
+  return gameMetrics;
 };

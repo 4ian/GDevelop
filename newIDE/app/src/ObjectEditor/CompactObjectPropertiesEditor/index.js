@@ -10,15 +10,12 @@ import { type ProjectScopedContainersAccessor } from '../../InstructionOrExpress
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import ScrollView from '../../UI/ScrollView';
 import { Column, Line, Spacer, marginsSize } from '../../UI/Grid';
-import CompactPropertiesEditor, {
-  Separator,
-} from '../../CompactPropertiesEditor';
+import { Separator } from '../../CompactPropertiesEditor';
 import Text from '../../UI/Text';
 import { Trans, t } from '@lingui/macro';
 import IconButton from '../../UI/IconButton';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
-import propertiesMapToSchema from '../../CompactPropertiesEditor/PropertiesMapToCompactSchema';
 import { type ObjectEditorTab } from '../../ObjectEditor/ObjectEditorDialog';
 import { CompactBehaviorPropertiesEditor } from './CompactBehaviorPropertiesEditor';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
@@ -27,7 +24,6 @@ import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import { IconContainer } from '../../UI/IconContainer';
 import RemoveIcon from '../../UI/CustomSvgIcons/Remove';
 import useForceUpdate, { useForceRecompute } from '../../Utils/UseForceUpdate';
-import ChevronArrowTop from '../../UI/CustomSvgIcons/ChevronArrowTop';
 import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
 import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
 import ChevronArrowDownWithRoundedBorder from '../../UI/CustomSvgIcons/ChevronArrowDownWithRoundedBorder';
@@ -43,7 +39,6 @@ import CompactSelectField from '../../UI/CompactSelectField';
 import SelectOption from '../../UI/SelectOption';
 import { ChildObjectPropertiesEditor } from './ChildObjectPropertiesEditor';
 import { getSchemaWithOpenFullEditorButton } from './CompactObjectPropertiesSchema';
-import FlatButton from '../../UI/FlatButton';
 import Help from '../../UI/CustomSvgIcons/Help';
 import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
@@ -61,6 +56,7 @@ import NewVariantDialog from '../Editors/CustomObjectPropertiesEditor/NewVariant
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { CompactEffectsListEditor } from '../../LayersList/CompactLayerPropertiesEditor/CompactEffectsListEditor';
+import { CompactPropertiesEditorByVisibility } from '../../CompactPropertiesEditor/CompactPropertiesEditorByVisibility';
 
 const gd: libGDevelop = global.gd;
 
@@ -277,10 +273,6 @@ export const CompactObjectPropertiesEditor = ({
   isBehaviorListLocked,
 }: Props) => {
   const forceUpdate = useForceUpdate();
-  const [
-    showObjectAdvancedOptions,
-    setShowObjectAdvancedOptions,
-  ] = React.useState(false);
   const [isPropertiesFolded, setIsPropertiesFolded] = React.useState(false);
   const [isBehaviorsFolded, setIsBehaviorsFolded] = React.useState(false);
   const [isVariablesFolded, setIsVariablesFolded] = React.useState(false);
@@ -289,7 +281,6 @@ export const CompactObjectPropertiesEditor = ({
     duplicateAndEditVariantDialogOpen,
     setDuplicateAndEditVariantDialogOpen,
   ] = React.useState(false);
-  const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
   const { showDeleteConfirmation } = useAlertDialog();
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
   const object = objects[0];
@@ -316,65 +307,6 @@ export const CompactObjectPropertiesEditor = ({
     objectConfiguration,
     gd.ObjectConfiguration
   );
-
-  // Properties:
-  const objectBasicPropertiesSchema = React.useMemo(
-    () => {
-      if (schemaRecomputeTrigger) {
-        // schemaRecomputeTrigger allows to invalidate the schema when required.
-      }
-
-      const properties = objectConfigurationAsGd.getProperties();
-      const objectBasicPropertiesSchema = propertiesMapToSchema({
-        properties,
-        getProperties: ({ object, objectConfiguration }) =>
-          objectConfiguration.getProperties(),
-        onUpdateProperty: ({ object, objectConfiguration }, name, value) => {
-          objectConfiguration.updateProperty(name, value);
-          onObjectsModified([object]);
-        },
-        visibility: 'Basic',
-      });
-
-      return getSchemaWithOpenFullEditorButton({
-        schema: objectBasicPropertiesSchema,
-        fullEditorLabel,
-        object,
-        onEditObject,
-      });
-    },
-    [
-      objectConfigurationAsGd,
-      schemaRecomputeTrigger,
-      fullEditorLabel,
-      object,
-      onEditObject,
-      onObjectsModified,
-    ]
-  );
-  const objectAdvancedPropertiesSchema = React.useMemo(
-    () => {
-      if (schemaRecomputeTrigger) {
-        // schemaRecomputeTrigger allows to invalidate the schema when required.
-      }
-
-      const properties = objectConfigurationAsGd.getProperties();
-      return propertiesMapToSchema({
-        properties,
-        getProperties: ({ object, objectConfiguration }) =>
-          objectConfiguration.getProperties(),
-        onUpdateProperty: ({ object, objectConfiguration }, name, value) => {
-          objectConfiguration.updateProperty(name, value);
-          onObjectsModified([object]);
-        },
-        visibility: 'Advanced',
-      });
-    },
-    [objectConfigurationAsGd, schemaRecomputeTrigger, onObjectsModified]
-  );
-  const hasObjectAdvancedProperties = objectAdvancedPropertiesSchema.length > 0;
-  const hasSomeObjectProperties =
-    objectBasicPropertiesSchema.length > 0 || hasObjectAdvancedProperties;
 
   // Behaviors:
   const {
@@ -595,63 +527,36 @@ export const CompactObjectPropertiesEditor = ({
             onOpenFullEditor={openFullEditor}
             renderContent={() => (
               <ColumnStackLayout noMargin noOverflowParent>
-                {!hasSomeObjectProperties && (
-                  <Text size="body2" align="center" color="secondary">
-                    <Trans>This object has no properties.</Trans>
-                  </Text>
-                )}
-                {hasSomeObjectProperties && (
-                  <CompactPropertiesEditor
-                    project={project}
-                    resourceManagementProps={resourceManagementProps}
-                    unsavedChanges={unsavedChanges}
-                    schema={objectBasicPropertiesSchema}
-                    instances={[
-                      { object, objectConfiguration: objectConfigurationAsGd },
-                    ]}
-                    onInstancesModified={() => {
-                      // TODO: undo/redo?
-                    }}
-                    onRefreshAllFields={forceRecomputeSchema}
-                  />
-                )}
-                {!showObjectAdvancedOptions && hasObjectAdvancedProperties && (
-                  <FlatButton
-                    fullWidth
-                    primary
-                    leftIcon={<ChevronArrowRight style={styles.icon} />}
-                    label={<Trans>Show more</Trans>}
-                    onClick={() => {
-                      setShowObjectAdvancedOptions(true);
-                    }}
-                  />
-                )}
-                {showObjectAdvancedOptions && hasObjectAdvancedProperties && (
-                  <CompactPropertiesEditor
-                    project={project}
-                    resourceManagementProps={resourceManagementProps}
-                    unsavedChanges={unsavedChanges}
-                    schema={objectAdvancedPropertiesSchema}
-                    instances={[
-                      { object, objectConfiguration: objectConfigurationAsGd },
-                    ]}
-                    onInstancesModified={() => {
-                      // TODO: undo/redo?
-                    }}
-                    onRefreshAllFields={forceRecomputeSchema}
-                  />
-                )}
-                {showObjectAdvancedOptions && hasObjectAdvancedProperties && (
-                  <FlatButton
-                    fullWidth
-                    primary
-                    leftIcon={<ChevronArrowTop style={styles.icon} />}
-                    label={<Trans>Show less</Trans>}
-                    onClick={() => {
-                      setShowObjectAdvancedOptions(false);
-                    }}
-                  />
-                )}
+                <CompactPropertiesEditorByVisibility
+                  project={project}
+                  object={object}
+                  propertiesValues={objectConfigurationAsGd.getProperties()}
+                  getPropertyDefaultValue={propertyName => {
+                    const properties = customObjectEventsBasedObject
+                      ? customObjectEventsBasedObject.getPropertyDescriptors()
+                      // We can't access default values for built-in objects.
+                      // The current value is used to avoid to expand the
+                      // advanced properties. 
+                      : objectConfigurationAsGd.getProperties();
+                    return properties.has(propertyName)
+                      ? properties.get(propertyName).getValue()
+                      : '';
+                  }}
+                  instances={[objectConfigurationAsGd]}
+                  onInstancesModified={() => {
+                    // TODO: undo/redo?
+                  }}
+                  resourceManagementProps={resourceManagementProps}
+                  placeholder={<Trans>This object has no properties.</Trans>}
+                  customizeBasicSchema={schema =>
+                    getSchemaWithOpenFullEditorButton({
+                      schema,
+                      fullEditorLabel,
+                      object,
+                      onEditObject,
+                    })
+                  }
+                />
                 {shouldDisplayVariant && (
                   <ColumnStackLayout noMargin noOverflowParent>
                     <LineStackLayout noMargin justifyContent="space-between">
@@ -757,7 +662,7 @@ export const CompactObjectPropertiesEditor = ({
                                 customObjectConfiguration
                               }
                               childObject={childObject}
-                              onRefreshAllFields={forceRecomputeSchema}
+                              onRefreshAllFields={() => {}}
                               onEditObject={openFullEditor}
                             />
                           )}

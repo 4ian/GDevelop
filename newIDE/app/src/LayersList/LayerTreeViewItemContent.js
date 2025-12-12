@@ -148,7 +148,7 @@ export class LayerTreeViewItemContent implements TreeViewItemContent {
     return [
       {
         label: i18n._(t`Rename`),
-        click: () => this.edit(),
+        click: () => this.props.editName(this.getId()),
         accelerator: 'F2',
         enabled: !this._isBaseLayer(),
       },
@@ -156,6 +156,7 @@ export class LayerTreeViewItemContent implements TreeViewItemContent {
         label: i18n._(t`Delete`),
         click: () => this.delete(),
         accelerator: 'Backspace',
+        enabled: !this._isBaseLayer(),
       },
       {
         type: 'separator',

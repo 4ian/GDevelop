@@ -2178,6 +2178,15 @@ namespace gdjs {
       const touchIds = getCurrentTouchIdentifiers(inputManager);
       const hasMultipleTouches = touchIds.length >= 2;
 
+      // Disable the transform controls when there are multiple touches to prevent
+      // accidental gizmo interactions when doing pinch-to-zoom or other multi-touch gestures.
+      // This must be done before checking if controls should be hidden, as the TransformControls
+      // processes pointer events independently and could start dragging between frames.
+      if (this._selectionControls) {
+        this._selectionControls.threeTransformControls.enabled =
+          !hasMultipleTouches;
+      }
+
       // Selection controls are shown on the last object that can be manipulated
       // (and if none, selection controls are not shown).
       const lastEditableSelectedObject = this._selection.getLastSelectedObject({

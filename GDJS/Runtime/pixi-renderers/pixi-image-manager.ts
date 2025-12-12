@@ -400,12 +400,7 @@ namespace gdjs {
         );
         return;
       }
-      
-      try {
-        await this._loadTexture(resource);
-      } catch (error) {
-        throw error;
-      }
+      await this._loadTexture(resource);
     }
 
     async processResource(resourceName: string): Promise<void> {

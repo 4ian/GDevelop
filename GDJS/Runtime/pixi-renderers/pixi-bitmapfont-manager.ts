@@ -279,7 +279,9 @@ namespace gdjs {
           }
         );
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          throw new Error(
+            `HTTP error while loading bitmap font. Status is ${response.status}.`
+          );
         }
 
         const fontDataRaw = await response.text();

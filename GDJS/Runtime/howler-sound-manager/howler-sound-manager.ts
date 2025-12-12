@@ -1072,7 +1072,9 @@ namespace gdjs {
               if (sound.status >= 200 && sound.status < 300) {
                 resolve(undefined);
               } else {
-                reject(`HTTP error! status: ${sound.status}`);
+                reject(
+                  `HTTP error while preloading audio file in cache. Status is ${sound.status}.`
+                );
               }
             });
             sound.addEventListener('error', (_) =>

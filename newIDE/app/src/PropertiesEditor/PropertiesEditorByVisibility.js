@@ -15,8 +15,8 @@ import { Accordion, AccordionHeader, AccordionBody } from '../UI/Accordion';
 import { mapFor } from '../Utils/MapFor';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { ColumnStackLayout } from '../UI/Layout';
-import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 
 export const areAdvancedPropertiesModified = (
   propertiesValues: gdMapStringPropertyDescriptor,
@@ -42,7 +42,7 @@ export const areAdvancedPropertiesModified = (
   return hasFoundModifiedAdvancedProperty;
 };
 
-const hasSchemaAnyProperty = (propertiesSchema: Schema) =>
+export const hasSchemaAnyProperty = (propertiesSchema: Schema) =>
   !propertiesSchema.every(
     property =>
       property.isHiddenWhenOnlyOneChoice &&
@@ -53,7 +53,6 @@ const hasSchemaAnyProperty = (propertiesSchema: Schema) =>
 type Props = {|
   onInstancesModified?: Instances => void,
   instances: Instances,
-  mode?: 'column' | 'row',
   propertiesValues: gdMapStringPropertyDescriptor,
   getPropertyDefaultValue: (propertyName: string) => string,
   placeholder: React.Node,
@@ -76,7 +75,6 @@ const PropertiesEditorByVisibility = ({
   propertiesValues,
   getPropertyDefaultValue,
   object,
-  mode,
   renderExtraDescriptionText,
   unsavedChanges,
   project,
@@ -93,9 +91,9 @@ const PropertiesEditorByVisibility = ({
     () =>
       propertiesMapToSchema(
         propertiesValues,
-        behavior => behavior.getProperties(),
-        (behavior, name, value) => {
-          behavior.updateProperty(name, value);
+        instance => instance.getProperties(),
+        (instance, name, value) => {
+          instance.updateProperty(name, value);
         },
         object,
         'Basic'
@@ -113,9 +111,9 @@ const PropertiesEditorByVisibility = ({
     () =>
       propertiesMapToSchema(
         propertiesValues,
-        behavior => behavior.getProperties(),
-        (behavior, name, value) => {
-          behavior.updateProperty(name, value);
+        instance => instance.getProperties(),
+        (instance, name, value) => {
+          instance.updateProperty(name, value);
         },
         object,
         'Advanced'
@@ -127,9 +125,9 @@ const PropertiesEditorByVisibility = ({
     () =>
       propertiesMapToSchema(
         propertiesValues,
-        behavior => behavior.getProperties(),
-        (behavior, name, value) => {
-          behavior.updateProperty(name, value);
+        instance => instance.getProperties(),
+        (instance, name, value) => {
+          instance.updateProperty(name, value);
         },
         object,
         'Deprecated'
@@ -158,6 +156,8 @@ const PropertiesEditorByVisibility = ({
         onInstancesModified={onInstancesModified}
         resourceManagementProps={resourceManagementProps}
         projectScopedContainersAccessor={projectScopedContainersAccessor}
+        renderExtraDescriptionText={renderExtraDescriptionText}
+        unsavedChanges={unsavedChanges}
       />
       {(advancedPropertiesSchema.length > 0 ||
         deprecatedPropertiesSchema.length > 0) && (
@@ -181,6 +181,8 @@ const PropertiesEditorByVisibility = ({
                 projectScopedContainersAccessor={
                   projectScopedContainersAccessor
                 }
+                renderExtraDescriptionText={renderExtraDescriptionText}
+                unsavedChanges={unsavedChanges}
               />
               {deprecatedPropertiesSchema.length > 0 &&
                 (shouldShowDeprecatedProperties ? (
@@ -193,6 +195,8 @@ const PropertiesEditorByVisibility = ({
                     projectScopedContainersAccessor={
                       projectScopedContainersAccessor
                     }
+                    renderExtraDescriptionText={renderExtraDescriptionText}
+                    unsavedChanges={unsavedChanges}
                   />
                 ) : (
                   <Line justifyContent="center">

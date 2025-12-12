@@ -430,7 +430,7 @@ const propertiesMapToSchema = ({
     propertyName: string,
     newValue: string
   ) => void,
-  object?: gdObject,
+  object?: ?gdObject,
   visibility?: 'All' | 'Basic' | 'Advanced' | 'Deprecated' | 'Basic-Quick',
   quickCustomizationVisibilities?: gdQuickCustomizationVisibilitiesContainer,
 |}): Schema => {

@@ -28,10 +28,6 @@ namespace gdjs {
     );
   };
 
-  const maxForegroundConcurrency = 20;
-  const maxBackgroundConcurrency = 5;
-  const maxAttempt = 3;
-
   /**
    * A task of pre-loading resources used by a scene.
    *
@@ -104,10 +100,22 @@ namespace gdjs {
     }
   }
 
+  type PromiseError<T> = { item: T; error: Error };
+
+  type PromisePoolOutput<T, U> = {
+    results: Array<U>;
+    errors: Array<PromiseError<T>>;
+  };
+
   /**
    * Pre-load resources of any kind needed for a game or a scene.
    */
   export class ResourceLoader {
+
+    static maxForegroundConcurrency = 20;
+    static maxBackgroundConcurrency = 5;
+    static maxAttempt = 3;
+
     _runtimeGame: RuntimeGame;
     /**
      * All the resource of a game by resource name.
@@ -290,10 +298,10 @@ namespace gdjs {
       onProgress: (loadingCount: integer, totalCount: integer) => void
     ): Promise<void> {
       let loadedCount = 0;
-      await processAndRetryIfNeededWithPromisePool(
+      await ResourceLoader.processAndRetryIfNeededWithPromisePool(
         [...this._resources.values()],
-        maxForegroundConcurrency,
-        maxAttempt,
+        ResourceLoader.maxForegroundConcurrency,
+        ResourceLoader.maxAttempt,
         async (resource) => {
           await this._loadResource(resource);
           await this._processResource(resource);
@@ -312,10 +320,10 @@ namespace gdjs {
       onProgress: (loadingCount: integer, totalCount: integer) => void
     ): Promise<void> {
       let loadedCount = 0;
-      await processAndRetryIfNeededWithPromisePool(
+      await ResourceLoader.processAndRetryIfNeededWithPromisePool(
         resourceNames,
-        maxForegroundConcurrency,
-        maxAttempt,
+        ResourceLoader.maxForegroundConcurrency,
+        ResourceLoader.maxAttempt,
         async (resourceName) => {
           const resource = this._resources.get(resourceName);
           if (resource) {
@@ -348,10 +356,10 @@ namespace gdjs {
         ...this._globalResources,
         ...firstSceneState.resourceNames,
       ];
-      await processAndRetryIfNeededWithPromisePool(
+      await ResourceLoader.processAndRetryIfNeededWithPromisePool(
         resourceNames,
-        maxForegroundConcurrency,
-        maxAttempt,
+        ResourceLoader.maxForegroundConcurrency,
+        ResourceLoader.maxAttempt,
         async (resourceName) => {
           const resource = this._resources.get(resourceName);
           if (!resource) {
@@ -429,12 +437,12 @@ namespace gdjs {
       }
 
       let loadedCount = 0;
-      await processAndRetryIfNeededWithPromisePool(
+      await ResourceLoader.processAndRetryIfNeededWithPromisePool(
         sceneState.resourceNames,
         this._isLoadingInForeground
-          ? maxForegroundConcurrency
-          : maxBackgroundConcurrency,
-        maxAttempt,
+          ? ResourceLoader.maxForegroundConcurrency
+          : ResourceLoader.maxBackgroundConcurrency,
+        ResourceLoader.maxAttempt,
         async (resourceName) => {
           const resource = this._resources.get(resourceName);
           if (!resource) {
@@ -881,80 +889,73 @@ namespace gdjs {
 
       return result;
     }
-  }
 
-  type PromiseError<T> = { item: T; error: Error };
+    static processWithPromisePool<T, U>(
+      items: Array<T>,
+      maxConcurrency: number,
+      asyncFunction: (item: T) => Promise<U>
+    ): Promise<PromisePoolOutput<T, U>> {
+      const results: Array<U> = [];
+      const errors: Array<PromiseError<T>> = [];
+      let activePromises = 0;
+      let index = 0;
 
-  type PromisePoolOutput<T, U> = {
-    results: Array<U>;
-    errors: Array<PromiseError<T>>;
-  };
+      return new Promise((resolve, reject) => {
+        const executeNext = () => {
+          if (items.length === 0) {
+            resolve({ results, errors });
+            return;
+          }
+          while (activePromises < maxConcurrency && index < items.length) {
+            const item = items[index++];
+            activePromises++;
 
-  const processWithPromisePool = <T, U>(
-    items: Array<T>,
-    maxConcurrency: number,
-    asyncFunction: (item: T) => Promise<U>
-  ): Promise<PromisePoolOutput<T, U>> => {
-    const results: Array<U> = [];
-    const errors: Array<PromiseError<T>> = [];
-    let activePromises = 0;
-    let index = 0;
+            asyncFunction(item)
+              .then((result) => results.push(result))
+              .catch((error) => errors.push({ item, error }))
+              .finally(() => {
+                activePromises--;
+                if (index === items.length && activePromises === 0) {
+                  resolve({ results, errors });
+                } else {
+                  executeNext();
+                }
+              });
+          }
+        };
 
-    return new Promise((resolve, reject) => {
-      const executeNext = () => {
-        if (items.length === 0) {
-          resolve({ results, errors });
-          return;
-        }
-        while (activePromises < maxConcurrency && index < items.length) {
-          const item = items[index++];
-          activePromises++;
-
-          asyncFunction(item)
-            .then((result) => results.push(result))
-            .catch((error) => errors.push({ item, error }))
-            .finally(() => {
-              activePromises--;
-              if (index === items.length && activePromises === 0) {
-                resolve({ results, errors });
-              } else {
-                executeNext();
-              }
-            });
-        }
-      };
-
-      executeNext();
-    });
-  };
-
-  const processAndRetryIfNeededWithPromisePool = async <T, U>(
-    items: Array<T>,
-    maxConcurrency: number,
-    maxAttempt: number,
-    asyncFunction: (item: T) => Promise<U>
-  ): Promise<PromisePoolOutput<T, U>> => {
-    const output = await processWithPromisePool<T, U>(
-      items,
-      maxConcurrency,
-      asyncFunction
-    );
-    if (output.errors.length !== 0) {
-      logger.warn("Some assets couldn't be downloaded. Trying again now.");
+        executeNext();
+      });
     }
-    for (
-      let attempt = 1;
-      attempt < maxAttempt && output.errors.length !== 0;
-      attempt++
-    ) {
-      const retryOutput = await processWithPromisePool<T, U>(
+
+    static async processAndRetryIfNeededWithPromisePool<T, U>(
+      items: Array<T>,
+      maxConcurrency: number,
+      maxAttempt: number,
+      asyncFunction: (item: T) => Promise<U>
+    ): Promise<PromisePoolOutput<T, U>> {
+      const output = await ResourceLoader.processWithPromisePool<T, U>(
         items,
         maxConcurrency,
         asyncFunction
       );
-      output.results.push.apply(output.results, retryOutput.results);
-      output.errors = retryOutput.errors;
+      if (output.errors.length !== 0) {
+        logger.warn("Some assets couldn't be downloaded. Trying again now.");
+      }
+      for (
+        let attempt = 1;
+        attempt < maxAttempt && output.errors.length !== 0;
+        attempt++
+      ) {
+        const retryOutput = await ResourceLoader.processWithPromisePool<T, U>(
+          items,
+          maxConcurrency,
+          asyncFunction
+        );
+        output.results.push.apply(output.results, retryOutput.results);
+        output.errors = retryOutput.errors;
+      }
+      return output;
     }
-    return output;
-  };
+  }
 }

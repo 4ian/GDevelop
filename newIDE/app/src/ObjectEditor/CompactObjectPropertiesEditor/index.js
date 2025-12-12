@@ -23,7 +23,7 @@ import Paper from '../../UI/Paper';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import { IconContainer } from '../../UI/IconContainer';
 import RemoveIcon from '../../UI/CustomSvgIcons/Remove';
-import useForceUpdate, { useForceRecompute } from '../../Utils/UseForceUpdate';
+import useForceUpdate from '../../Utils/UseForceUpdate';
 import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
 import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
 import ChevronArrowDownWithRoundedBorder from '../../UI/CustomSvgIcons/ChevronArrowDownWithRoundedBorder';

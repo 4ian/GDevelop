@@ -39,6 +39,9 @@ import ContextMenu, {
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 import { groupResourcesByAnimations } from './AnimationImportHelper';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor';
+import SpritesheetFramesSelectorDialog, {
+  type SpritesheetSelectionResult,
+} from '../Spritesheet/SpritesheetFramesSelectorDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -252,6 +255,23 @@ export const addAnimationFrame = (
   sprite.delete();
 };
 
+export const addAnimationFrameFromSpritesheetFrame = (
+  animations: gdSpriteAnimationList,
+  direction: gdDirection,
+  spritesheetResourceName: string,
+  spritesheetFrameName: string,
+  onSpriteAdded: (sprite: gdSprite) => void
+) => {
+  const sprite = new gd.Sprite();
+  sprite.setSpritesheetResourceName(spritesheetResourceName);
+  sprite.setSpritesheetFrameName(spritesheetFrameName);
+  applyPointsAndMasksToSpriteIfNecessary(animations, direction, sprite);
+
+  onSpriteAdded(sprite); // Call the callback before `addSprite`, as `addSprite` will store a copy of it.
+  direction.addSprite(sprite);
+  sprite.delete();
+};
+
 type Props = {|
   animations: gdSpriteAnimationList,
   direction: gdDirection,
@@ -299,10 +319,21 @@ const SpritesList = ({
   const spriteContextMenu = React.useRef<?ContextMenuInterface>(null);
   const forceUpdate = useForceUpdate();
   const { showConfirmation } = useAlertDialog();
+  const [
+    selectedSpritesheetResourceName,
+    setSelectedSpritesheetResourceName,
+  ] = React.useState<string | null>(null);
 
   const storageProvider = resourceManagementProps.getStorageProvider();
-  const resourceSources = resourceManagementProps.resourceSources
+  const imageResourceSources = resourceManagementProps.resourceSources
     .filter(source => source.kind === 'image')
+    .filter(
+      ({ onlyForStorageProvider }) =>
+        !onlyForStorageProvider ||
+        onlyForStorageProvider === storageProvider.internalName
+    );
+  const spritesheetResourceSources = resourceManagementProps.resourceSources
+    .filter(source => source.kind === 'spritesheet')
     .filter(
       ({ onlyForStorageProvider }) =>
         !onlyForStorageProvider ||
@@ -406,7 +437,7 @@ const SpritesList = ({
       });
 
       if (!selectedResources.length) return;
-      const selectedResourceSource = resourceSources.find(
+      const selectedResourceSource = imageResourceSources.find(
         source => source.name === selectedSourceName
       );
       if (!selectedResourceSource) return;
@@ -475,8 +506,87 @@ const SpritesList = ({
       addAnimations,
       animations,
       onSpriteAdded,
-      resourceSources,
+      imageResourceSources,
     ]
+  );
+
+  const onAddSpriteFromSpritesheet = React.useCallback(
+    async (initialResourceSource: ResourceSource) => {
+      try {
+        if (!initialResourceSource) return;
+
+        const {
+          selectedResources,
+          selectedSourceName,
+        } = await resourceManagementProps.onChooseResource({
+          initialSourceName: initialResourceSource.name,
+          multiSelection: false,
+          resourceKind: 'spritesheet',
+        });
+
+        if (!selectedResources.length) return;
+        const selectedResourceSource = spritesheetResourceSources.find(
+          source => source.name === selectedSourceName
+        );
+        if (!selectedResourceSource) return;
+
+        const resource = selectedResources[0];
+        const resourceName = resource.getName();
+
+        if (selectedResourceSource.shouldCreateResource) {
+          applyResourceDefaults(project, resource);
+
+          // addResource will check if a resource with the same name exists, and if it is
+          // the case, no new resource will be added.
+          const hasCreatedAnyResource = project
+            .getResourcesManager()
+            .addResource(resource);
+
+          // Important, we are responsible for deleting the resources that were given to us.
+          // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
+          selectedResources.forEach(resource => resource.delete());
+
+          if (hasCreatedAnyResource) {
+            await resourceManagementProps.onFetchNewlyAddedResources();
+            resourceManagementProps.onNewResourcesAdded();
+          }
+        }
+
+        // TODO: show a dialog allowing the user to select the animation of one/more frames of the spritesheet to add.
+        // And then create the sprites:
+        setSelectedSpritesheetResourceName(resourceName);
+
+        // if (selectedResources.length && onSpriteUpdated) onSpriteUpdated();
+        // if (directionSpritesCountBeforeAdding === 0 && onFirstSpriteUpdated) {
+        //   // If there was no sprites before, we can assume the first sprite was added.
+        //   onFirstSpriteUpdated();
+        // }
+      } catch (err) {
+        // Should never happen, errors should be shown in the interface.
+        console.error('Unable to choose a resource', err);
+      }
+    },
+    [project, resourceManagementProps, spritesheetResourceSources]
+  );
+
+  const onSelectFromSpritesheet = React.useCallback(
+    (selection: SpritesheetSelectionResult) => {
+      if (!selectedSpritesheetResourceName) return;
+      const { frameNames } = selection;
+
+      frameNames.forEach(frameName => {
+        addAnimationFrameFromSpritesheetFrame(
+          animations,
+          direction,
+          selectedSpritesheetResourceName,
+          frameName,
+          onSpriteAdded
+        );
+      });
+
+      setSelectedSpritesheetResourceName(null);
+    },
+    [animations, direction, onSpriteAdded, selectedSpritesheetResourceName]
   );
 
   const deleteSprites = React.useCallback(
@@ -634,30 +744,62 @@ const SpritesList = ({
         <Column noMargin>
           <RaisedButtonWithSplitMenu
             onClick={() => {
-              onAddSprite(resourceSources[0]);
+              onAddSprite(imageResourceSources[0]);
             }}
             // The event-based object editor gives an empty list.
-            disabled={resourceSources.length === 0}
+            disabled={imageResourceSources.length === 0}
             label={<Trans>Add a sprite</Trans>}
             icon={<Add />}
             primary
             buildMenuTemplate={(i18n: I18nType) => {
               const storageProvider = resourceManagementProps.getStorageProvider();
-              return resourceManagementProps.resourceSources
-                .filter(source => source.kind === 'image')
-                .filter(
-                  ({ onlyForStorageProvider }) =>
-                    !onlyForStorageProvider ||
-                    onlyForStorageProvider === storageProvider.internalName
-                )
-                .map(source => ({
-                  label: i18n._(source.displayName),
-                  click: () => onAddSprite(source),
-                }));
+              return [
+                {
+                  label: i18n._(t`Image(s):`),
+                  enabled: false,
+                },
+                ...resourceManagementProps.resourceSources
+                  .filter(source => source.kind === 'image')
+                  .filter(
+                    ({ onlyForStorageProvider }) =>
+                      !onlyForStorageProvider ||
+                      onlyForStorageProvider === storageProvider.internalName
+                  )
+                  .map(source => ({
+                    label: i18n._(source.displayName),
+                    click: () => onAddSprite(source),
+                  })),
+                {
+                  type: 'separator',
+                },
+                {
+                  label: i18n._(t`From a spritesheet (PixiJS format):`),
+                  enabled: false,
+                },
+                ...resourceManagementProps.resourceSources
+                  .filter(source => source.kind === 'spritesheet')
+                  .filter(
+                    ({ onlyForStorageProvider }) =>
+                      !onlyForStorageProvider ||
+                      onlyForStorageProvider === storageProvider.internalName
+                  )
+                  .map(source => ({
+                    label: i18n._(source.displayName),
+                    click: () => onAddSpriteFromSpritesheet(source),
+                  })),
+              ];
             }}
           />
         </Column>
       </ResponsiveLineStackLayout>
+      {selectedSpritesheetResourceName && (
+        <SpritesheetFramesSelectorDialog
+          project={project}
+          spritesheetResourceName={selectedSpritesheetResourceName}
+          onSelect={onSelectFromSpritesheet}
+          onRequestClose={() => setSelectedSpritesheetResourceName(null)}
+        />
+      )}
     </ColumnStackLayout>
   );
 };

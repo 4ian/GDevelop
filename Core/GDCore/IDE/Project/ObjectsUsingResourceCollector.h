@@ -88,6 +88,9 @@ public:
   virtual void ExposeSpine(gd::String& otherResourceName) override {
     MatchResourceName(otherResourceName);
   };
+  virtual void ExposeSpritesheet(gd::String& otherResourceName) override {
+    MatchResourceName(otherResourceName);
+  };
 
   void MatchResourceName(gd::String& otherResourceName) {
     if (otherResourceName == resourceName) matchesResourceName = true;

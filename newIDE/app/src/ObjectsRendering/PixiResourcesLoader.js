@@ -38,6 +38,18 @@ export type SpineDataOrLoadingError = {|
     | 'atlas-resource-loading-error',
 |};
 
+export type SpritesheetOrLoadingError = {|
+  spritesheet: ?PIXI.Spritesheet,
+  loadingError: ?Error,
+  loadingErrorReason:
+    | null
+    | 'invalid-spritesheet-resource'
+    | 'spritesheet-json-loading-error'
+    | 'missing-spritesheet-image-field'
+    | 'invalid-spritesheet-image-resource'
+    | 'spritesheet-pixi-loading-error',
+|};
+
 type ResourcePromise<T> = { [resourceName: string]: Promise<T> };
 
 let loadedBitmapFonts = {};
@@ -52,6 +64,7 @@ let loadedOrLoadingThreeMaterials: ResourcePromise<THREE.Material> = {};
 let loadedOrLoading3DModelPromises: ResourcePromise<THREE.THREE_ADDONS.GLTF> = {};
 let spineAtlasPromises: ResourcePromise<SpineTextureAtlasOrLoadingError> = {};
 let spineDataPromises: ResourcePromise<SpineDataOrLoadingError> = {};
+let spritesheetPromises: ResourcePromise<SpritesheetOrLoadingError> = {};
 
 const createInvalidModel = (): GLTF => {
   /**
@@ -285,6 +298,7 @@ export default class PixiResourcesLoader {
 
       // Also reload any resource embedding this resource:
       await this._reloadEmbedderResources(project, resourceName, 'atlas');
+      await this._reloadEmbedderResources(project, resourceName, 'spritesheet');
     }
 
     await PixiResourcesLoader.loadTextures(project, [resourceName]);
@@ -329,6 +343,9 @@ export default class PixiResourcesLoader {
       // So every time we unload spine resources, we need to call it to clean the resolver cache
       // and pick up fresh data next time we call `getSpineData`.
       PIXI.Assets.resolver.prefer();
+    }
+    if (spritesheetPromises[resourceName]) {
+      delete spritesheetPromises[resourceName];
     }
 
     const matchingMaterialCacheKeys = Object.keys(
@@ -837,6 +854,139 @@ export default class PixiResourcesLoader {
         }
       );
     }));
+  }
+
+  static async getSpritesheet(
+    project: gdProject,
+    spritesheetName: string
+  ): Promise<SpritesheetOrLoadingError> {
+    const promise = spritesheetPromises[spritesheetName];
+    if (promise) return promise;
+
+    return (spritesheetPromises[spritesheetName] = (async () => {
+      const resourceManager = project.getResourcesManager();
+      if (!spritesheetName || !resourceManager.hasResource(spritesheetName)) {
+        return {
+          spritesheet: null,
+          loadingError: null,
+          loadingErrorReason: 'invalid-spritesheet-resource',
+        };
+      }
+
+      const resource = resourceManager.getResource(spritesheetName);
+      if (resource.getKind() !== 'spritesheet') {
+        return {
+          spritesheet: null,
+          loadingError: null,
+          loadingErrorReason: 'invalid-spritesheet-resource',
+        };
+      }
+
+      const fullUrl = ResourcesLoader.getResourceFullUrl(
+        project,
+        resource.getName(),
+        {
+          isResourceForPixi: true,
+        }
+      );
+
+      const spritesheetJsonData = await axios
+        .get(fullUrl, {
+          withCredentials: checkIfCredentialsRequired(fullUrl),
+        })
+        .then(response => response.data, error => null);
+      if (!spritesheetJsonData) {
+        return {
+          spritesheet: null,
+          loadingError: null,
+          loadingErrorReason: 'spritesheet-json-loading-error',
+        };
+      }
+
+      const imageField =
+        spritesheetJsonData.meta && spritesheetJsonData.meta.image;
+      const embeddedResourcesMapping = readEmbeddedResourcesMapping(resource);
+      const spritesheetImageName = embeddedResourcesMapping
+        ? embeddedResourcesMapping[imageField]
+        : null;
+      if (typeof spritesheetImageName !== 'string') {
+        return {
+          spritesheet: null,
+          loadingError: null,
+          loadingErrorReason: 'missing-spritesheet-image-field',
+        };
+      }
+
+      if (
+        spritesheetImageName.length === 0 ||
+        !resourceManager.hasResource(spritesheetImageName)
+      ) {
+        return {
+          spritesheet: null,
+          loadingError: null,
+          loadingErrorReason: 'invalid-spritesheet-image-resource',
+        };
+      }
+
+      const spritesheetImageResource = resourceManager.getResource(
+        spritesheetImageName
+      );
+      if (spritesheetImageResource.getKind() !== 'image') {
+        return {
+          spritesheet: null,
+          loadingError: null,
+          loadingErrorReason: 'invalid-spritesheet-image-resource',
+        };
+      }
+
+      const spritesheetTexture = this.getPIXITexture(
+        project,
+        spritesheetImageName
+      );
+      if (!spritesheetTexture) {
+        return {
+          spritesheet: null,
+          loadingError: null,
+          loadingErrorReason: 'invalid-spritesheet-image-resource',
+        };
+      }
+
+      try {
+        const spritesheet = new PIXI.Spritesheet(
+          spritesheetTexture.baseTexture,
+          spritesheetJsonData
+        );
+        await spritesheet.parse();
+
+        return {
+          spritesheet,
+          loadingError: null,
+          loadingErrorReason: null,
+        };
+      } catch (error) {
+        return {
+          spritesheet: null,
+          loadingError: error,
+          loadingErrorReason: 'spritesheet-pixi-loading-error',
+        };
+      }
+    })());
+  }
+
+  static async getSpritesheetFramePIXITexture(
+    project: gdProject,
+    spritesheetName: string,
+    frameName: string
+  ): Promise<PIXI.Texture> {
+    const spritesheetOrLoadingError = await this.getSpritesheet(
+      project,
+      spritesheetName
+    );
+    const spritesheet = spritesheetOrLoadingError.spritesheet;
+    if (!spritesheet) {
+      return invalidTexture;
+    }
+    return spritesheet.textures[frameName] || invalidTexture;
   }
 
   /**

@@ -72,7 +72,8 @@ namespace gdjs {
       this._animator = new gdjs.SpriteAnimator(
         spriteObjectData.animations,
         gdjs.SpriteRuntimeObjectRenderer.getAnimationFrameTextureManager(
-          instanceContainer.getGame().getImageManager()
+          instanceContainer.getGame().getImageManager(),
+          instanceContainer.getGame().getSpritesheetManager()
         )
       );
       this._updateAnimationFrame();

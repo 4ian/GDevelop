@@ -136,7 +136,8 @@ namespace gdjs {
     }
 
     static getAnimationFrameTextureManager(
-      imageManager: gdjs.PixiImageManager
+      imageManager: gdjs.PixiImageManager,
+      spritesheetManager: gdjs.PixiSpritesheetManager // Unused for 3D custom objects.
     ): ThreeAnimationFrameTextureManager {
       if (!imageManager._threeAnimationFrameTextureManager) {
         imageManager._threeAnimationFrameTextureManager =
@@ -157,6 +158,22 @@ namespace gdjs {
 
     getAnimationFrameTexture(imageName: string) {
       return this._imageManager.getThreeMaterial(imageName, {
+        useTransparentTexture: true,
+        forceBasicMaterial: true,
+        vertexColors: false,
+      });
+    }
+
+    getAnimationFrameTextureFromSpritesheet(
+      spritesheetResourceName: string,
+      frameName: string
+    ): THREE.Material {
+      // "Spritesheet" frames are not supported for 3D objects.
+      // Return an invalid/empty material.
+      console.warn(
+        'Spritesheet frames are not supported for 3D objects. Returning empty material.'
+      );
+      return this._imageManager.getThreeMaterial('', {
         useTransparentTexture: true,
         forceBasicMaterial: true,
         vertexColors: false,

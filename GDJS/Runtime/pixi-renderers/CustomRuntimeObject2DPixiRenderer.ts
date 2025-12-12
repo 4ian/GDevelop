@@ -150,10 +150,12 @@ namespace gdjs {
     }
 
     static getAnimationFrameTextureManager(
-      imageManager: gdjs.PixiImageManager
+      imageManager: gdjs.PixiImageManager,
+      spritesheetManager: gdjs.PixiSpritesheetManager
     ) {
       return gdjs.SpriteRuntimeObjectPixiRenderer.getAnimationFrameTextureManager(
-        imageManager
+        imageManager,
+        spritesheetManager
       );
     }
   }

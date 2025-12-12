@@ -205,6 +205,7 @@ export const ResourceCard = ({
     case 'tilemap':
     case 'tileset':
     case 'spine':
+    case 'spritesheet':
       return (
         <GenericCard onChoose={onChoose} resource={resource} size={size}>
           <Line justifyContent="center">

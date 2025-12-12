@@ -109,8 +109,25 @@ void SpriteAnimationList::ExposeResources(gd::ArbitraryResourceWorker& worker) {
       for (std::size_t l = 0;
            l < GetAnimation(j).GetDirection(k).GetSpritesCount();
            l++) {
-        worker.ExposeImage(
-            GetAnimation(j).GetDirection(k).GetSprite(l).GetImageName());
+        Sprite& sprite = GetAnimation(j).GetDirection(k).GetSprite(l);
+
+        // Expose either the image or the spritesheet resource
+        if (sprite.UsesSpritesheetFrame()) {
+          // Expose the spritesheet resource (and its embedded image)
+          gd::String spritesheetResourceName = sprite.GetSpritesheetResourceName();
+          worker.ExposeSpritesheet(spritesheetResourceName);
+
+          if (spritesheetResourceName != sprite.GetSpritesheetResourceName()) {
+            // Update the resource name if it was changed by the worker
+            sprite.SetSpritesheetResourceName(spritesheetResourceName);
+          }
+
+          // The spritesheet has a reference to an image (often with the same name
+          // as the resource name, but the mapping can vary) which should also be exposed.
+          worker.ExposeEmbeddeds(spritesheetResourceName);
+        } else {
+          worker.ExposeImage(sprite.GetImageName());
+        }
       }
     }
   }

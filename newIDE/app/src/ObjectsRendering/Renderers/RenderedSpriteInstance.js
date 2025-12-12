@@ -19,6 +19,9 @@ export default class RenderedSpriteInstance extends RenderedInstance {
   _shouldNotRotate: boolean = false;
   _preScale = 1;
 
+  _currentSpritesheetResourceName: string = '';
+  _currentSpritesheetFrameName: string = '';
+
   constructor(
     project: gdProject,
     instance: gdInitialInstance,
@@ -94,20 +97,20 @@ export default class RenderedSpriteInstance extends RenderedInstance {
     if (!this._pixiObject) {
       return;
     }
-    const objectTextureFrame = this._pixiObject.texture.frame;
+    const objectTexture = this._pixiObject.texture;
     // In case the texture is not loaded yet, we don't want to crash.
-    if (!objectTextureFrame) return;
+    if (!objectTexture || !objectTexture.orig) return;
 
-    this._pixiObject.anchor.x = this._centerX / objectTextureFrame.width;
-    this._pixiObject.anchor.y = this._centerY / objectTextureFrame.height;
+    this._pixiObject.anchor.x = this._centerX / objectTexture.orig.width;
+    this._pixiObject.anchor.y = this._centerY / objectTexture.orig.height;
     this._pixiObject.rotation = this._shouldNotRotate
       ? 0
       : RenderedInstance.toRad(this._instance.getAngle());
     if (this._instance.hasCustomSize()) {
       this._pixiObject.scale.x =
-        this.getCustomWidth() / objectTextureFrame.width;
+        this.getCustomWidth() / objectTexture.orig.width;
       this._pixiObject.scale.y =
-        this.getCustomHeight() / objectTextureFrame.height;
+        this.getCustomHeight() / objectTexture.orig.height;
     } else {
       this._pixiObject.scale.x = this._preScale;
       this._pixiObject.scale.y = this._preScale;
@@ -179,28 +182,56 @@ export default class RenderedSpriteInstance extends RenderedInstance {
     const sprite = this._sprite;
     if (!sprite) return;
 
-    const texture = this._pixiResourcesLoader.getPIXITexture(
-      this._project,
-      sprite.getImageName()
-    );
-    this._pixiObject.texture = texture;
+    if (sprite.usesSpritesheetFrame()) {
+      if (
+        this._currentSpritesheetResourceName !==
+          sprite.getSpritesheetResourceName() ||
+        this._currentSpritesheetFrameName !== sprite.getSpritesheetFrameName()
+      ) {
+        (async () => {
+          const texture = await this._pixiResourcesLoader.getSpritesheetFramePIXITexture(
+            this._project,
+            sprite.getSpritesheetResourceName(),
+            sprite.getSpritesheetFrameName()
+          );
+          if (this._wasDestroyed) return;
 
-    if (!texture.baseTexture.valid) {
-      // Post pone texture update if texture is not loaded.
-      texture.once('update', () => {
-        if (this._wasDestroyed) return;
-        this.updatePIXITextureAndSprite();
-      });
-      return;
+          this._pixiObject.texture = texture;
+          this._currentSpritesheetResourceName = sprite.getSpritesheetResourceName();
+          this._currentSpritesheetFrameName = sprite.getSpritesheetFrameName();
+
+          this.updatePIXITextureAndSprite();
+        })();
+      }
+    } else {
+      const texture = this._pixiResourcesLoader.getPIXITexture(
+        this._project,
+        sprite.getImageName()
+      );
+      this._pixiObject.texture = texture;
+
+      if (!texture.baseTexture.valid) {
+        // Post pone texture update if texture is not loaded.
+        texture.once('update', () => {
+          if (this._wasDestroyed) return;
+          this.updatePIXITextureAndSprite();
+        });
+        return;
+      }
     }
 
     const origin = sprite.getOrigin();
     this._originX = origin.getX();
     this._originY = origin.getY();
 
+    const texture = this._pixiObject.texture;
+    if (!texture.baseTexture.valid) {
+      return; // Should never happen.
+    }
+
     if (sprite.isDefaultCenterPoint()) {
-      this._centerX = texture.width / 2;
-      this._centerY = texture.height / 2;
+      this._centerX = texture.orig.width / 2;
+      this._centerY = texture.orig.height / 2;
     } else {
       const center = sprite.getCenter();
       this._centerX = center.getX();
@@ -232,19 +263,19 @@ export default class RenderedSpriteInstance extends RenderedInstance {
   }
 
   getDefaultWidth(): number {
-    const objectTextureFrame = this._pixiObject.texture.frame;
+    const objectTextureFrame = this._pixiObject.texture;
     // In case the texture is not loaded yet, we don't want to crash.
-    if (!objectTextureFrame) return 32;
+    if (!objectTextureFrame || !objectTextureFrame.orig) return 32;
 
-    return Math.abs(objectTextureFrame.width) * this._preScale;
+    return Math.abs(objectTextureFrame.orig.width) * this._preScale;
   }
 
   getDefaultHeight(): number {
-    const objectTextureFrame = this._pixiObject.texture.frame;
+    const objectTextureFrame = this._pixiObject.texture;
     // In case the texture is not loaded yet, we don't want to crash.
-    if (!objectTextureFrame) return 32;
+    if (!objectTextureFrame || !objectTextureFrame.orig) return 32;
 
-    return Math.abs(objectTextureFrame.height) * this._preScale;
+    return Math.abs(objectTextureFrame.orig.height) * this._preScale;
   }
 
   getCenterX(): number {

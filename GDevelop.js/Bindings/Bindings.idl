@@ -1387,6 +1387,11 @@ interface SpineResource {
 };
 SpineResource implements JsonResource;
 
+interface SpritesheetResource {
+    void SpritesheetResource();
+};
+SpritesheetResource implements Resource;
+
 interface TilemapResource {
     void TilemapResource();
 };
@@ -3625,6 +3630,12 @@ interface Sprite {
 
     void SetImageName([Const] DOMString name);
     [Const, Ref] DOMString GetImageName();
+
+    void SetSpritesheetResourceName([Const] DOMString name);
+    [Const, Ref] DOMString GetSpritesheetResourceName();
+    void SetSpritesheetFrameName([Const] DOMString name);
+    [Const, Ref] DOMString GetSpritesheetFrameName();
+    boolean UsesSpritesheetFrame();
 
     [Ref] Point GetOrigin();
     [Ref] Point GetCenter();

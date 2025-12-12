@@ -257,7 +257,7 @@ export const CompactEffectsListEditor = ({
       isFolded={isEffectsFolded}
       toggleFolded={() => setEffectsFolded(!isEffectsFolded)}
       onOpenFullEditor={onOpenFullEditor}
-      onAdd={() => addEffect(false)}
+      onAdd={() => addEffect(layerRenderingType === '3d')}
       renderContent={() => (
         <ColumnStackLayout noMargin>
           {effectsContainer.getEffectsCount() === 0 && (
@@ -327,7 +327,7 @@ export const CompactEffectsListEditor = ({
                           value={effectMetadata.type}
                           label={effectMetadata.fullName}
                           disabled={
-                            target !== 'object' &&
+                            target === 'object' &&
                             effectMetadata.isMarkedAsNotWorkingForObjects
                           }
                         />

@@ -89,6 +89,8 @@ namespace gdjs {
         logger.error(
           `Error while preloading spine resource ${resource.name}: ${error}`
         );
+        PIXI.Assets.unload(resource.name);
+        throw error;
       }
     }
 

@@ -416,6 +416,7 @@ namespace gdjs {
       if (this._loadedTextures.get(resource)) {
         return;
       }
+      const resourceUrl = this._resourceLoader.getFullUrl(resource.file);
       try {
         if (resource.kind === 'video') {
           // For videos, we want to preload them so they are available as soon as we want to use them.
@@ -424,19 +425,16 @@ namespace gdjs {
           // to continue, otherwise if we try to play the video too soon (at the beginning of scene for instance),
           // it will fail.
           await new Promise<void>((resolve, reject) => {
-            const texture = PIXI.Texture.from(
-              this._resourceLoader.getFullUrl(resource.file),
-              {
-                resourceOptions: {
-                  crossorigin: this._resourceLoader.checkIfCredentialsRequired(
-                    resource.file
-                  )
-                    ? 'use-credentials'
-                    : 'anonymous',
-                  autoPlay: false,
-                },
-              }
-            ).on('error', (error) => {
+            const texture = PIXI.Texture.from(resourceUrl, {
+              resourceOptions: {
+                crossorigin: this._resourceLoader.checkIfCredentialsRequired(
+                  resource.file
+                )
+                  ? 'use-credentials'
+                  : 'anonymous',
+                autoPlay: false,
+              },
+            }).on('error', (error) => {
               reject(error);
             });
 
@@ -458,19 +456,16 @@ namespace gdjs {
           // TODO: When PIXI v8+ is used, PIXI.Assets.load can be used because
           // loadParser can be forced in PIXI.Assets.load
           // (see https://github.com/pixijs/pixijs/blob/71ed56c569ebc6b53da19e3c49258a0a84892101/packages/assets/src/loader/Loader.ts#L68)
-          const loadedTexture = PIXI.Texture.from(
-            this._resourceLoader.getFullUrl(resource.file),
-            {
-              resourceOptions: {
-                autoLoad: false,
-                crossorigin: this._resourceLoader.checkIfCredentialsRequired(
-                  resource.file
-                )
-                  ? 'use-credentials'
-                  : 'anonymous',
-              },
-            }
-          );
+          const loadedTexture = PIXI.Texture.from(resourceUrl, {
+            resourceOptions: {
+              autoLoad: false,
+              crossorigin: this._resourceLoader.checkIfCredentialsRequired(
+                resource.file
+              )
+                ? 'use-credentials'
+                : 'anonymous',
+            },
+          });
           await loadedTexture.baseTexture.resource.load();
 
           this._loadedTextures.set(resource, loadedTexture);
@@ -479,6 +474,9 @@ namespace gdjs {
         }
       } catch (error) {
         logFileLoadingError(resource.file, error);
+        PIXI.Texture.removeFromCache(resourceUrl);
+        PIXI.BaseTexture.removeFromCache(resourceUrl);
+        throw error;
       }
     }
 

@@ -28,10 +28,6 @@ namespace gdjs {
     );
   };
 
-  const maxForegroundConcurrency = 20;
-  const maxBackgroundConcurrency = 5;
-  const maxAttempt = 3;
-
   /**
    * A task of pre-loading resources used by a scene.
    *
@@ -115,6 +111,11 @@ namespace gdjs {
    * Pre-load resources of any kind needed for a game or a scene.
    */
   export class ResourceLoader {
+
+    static maxForegroundConcurrency = 20;
+    static maxBackgroundConcurrency = 5;
+    static maxAttempt = 3;
+
     _runtimeGame: RuntimeGame;
     /**
      * All the resource of a game by resource name.
@@ -299,8 +300,8 @@ namespace gdjs {
       let loadedCount = 0;
       await ResourceLoader.processAndRetryIfNeededWithPromisePool(
         [...this._resources.values()],
-        maxForegroundConcurrency,
-        maxAttempt,
+        ResourceLoader.maxForegroundConcurrency,
+        ResourceLoader.maxAttempt,
         async (resource) => {
           await this._loadResource(resource);
           await this._processResource(resource);
@@ -321,8 +322,8 @@ namespace gdjs {
       let loadedCount = 0;
       await ResourceLoader.processAndRetryIfNeededWithPromisePool(
         resourceNames,
-        maxForegroundConcurrency,
-        maxAttempt,
+        ResourceLoader.maxForegroundConcurrency,
+        ResourceLoader.maxAttempt,
         async (resourceName) => {
           const resource = this._resources.get(resourceName);
           if (resource) {
@@ -357,8 +358,8 @@ namespace gdjs {
       ];
       await ResourceLoader.processAndRetryIfNeededWithPromisePool(
         resourceNames,
-        maxForegroundConcurrency,
-        maxAttempt,
+        ResourceLoader.maxForegroundConcurrency,
+        ResourceLoader.maxAttempt,
         async (resourceName) => {
           const resource = this._resources.get(resourceName);
           if (!resource) {
@@ -439,9 +440,9 @@ namespace gdjs {
       await ResourceLoader.processAndRetryIfNeededWithPromisePool(
         sceneState.resourceNames,
         this._isLoadingInForeground
-          ? maxForegroundConcurrency
-          : maxBackgroundConcurrency,
-        maxAttempt,
+          ? ResourceLoader.maxForegroundConcurrency
+          : ResourceLoader.maxBackgroundConcurrency,
+        ResourceLoader.maxAttempt,
         async (resourceName) => {
           const resource = this._resources.get(resourceName);
           if (!resource) {

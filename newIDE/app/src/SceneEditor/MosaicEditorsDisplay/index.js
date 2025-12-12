@@ -86,6 +86,7 @@ const MosaicEditorsDisplay = React.forwardRef<
     objectsContainer,
     projectScopedContainersAccessor,
     initialInstances,
+    chosenLayer,
     selectedLayer,
     onSelectInstances,
     onInstancesModified,
@@ -135,7 +136,7 @@ const MosaicEditorsDisplay = React.forwardRef<
     []
   );
   const forceUpdateLayersList = React.useCallback(() => {
-    if (layersListRef.current) layersListRef.current.forceUpdate();
+    if (layersListRef.current) layersListRef.current.forceUpdateList();
   }, []);
   const getInstanceSize = React.useCallback((instance: gdInitialInstance) => {
     return editorRef.current
@@ -290,6 +291,7 @@ const MosaicEditorsDisplay = React.forwardRef<
               projectScopedContainersAccessor={projectScopedContainersAccessor}
               instances={selectedInstances}
               objects={selectedObjects}
+              layer={selectedLayer}
               editInstanceVariables={props.editInstanceVariables}
               editObjectInPropertiesPanel={props.editObjectInPropertiesPanel}
               onEditObject={props.onEditObject}
@@ -313,6 +315,9 @@ const MosaicEditorsDisplay = React.forwardRef<
               }
               isVariableListLocked={isCustomVariant}
               isBehaviorListLocked={isCustomVariant}
+              onEditLayerEffects={props.editLayerEffects}
+              onEditLayer={props.editLayer}
+              onLayersModified={props.onLayersModified}
             />
           )}
         </I18n>
@@ -327,7 +332,8 @@ const MosaicEditorsDisplay = React.forwardRef<
           layout={layout}
           eventsFunctionsExtension={eventsFunctionsExtension}
           eventsBasedObject={eventsBasedObject}
-          selectedLayer={selectedLayer}
+          chosenLayer={chosenLayer}
+          onChooseLayer={props.onChooseLayer}
           onSelectLayer={props.onSelectLayer}
           onEditLayerEffects={props.editLayerEffects}
           onEditLayer={props.editLayer}
@@ -339,7 +345,6 @@ const MosaicEditorsDisplay = React.forwardRef<
           onLayerRenamed={props.onLayerRenamed}
           onCreateLayer={forceUpdatePropertiesEditor}
           layersContainer={layersContainer}
-          unsavedChanges={props.unsavedChanges}
           ref={layersListRef}
           hotReloadPreviewButtonProps={props.hotReloadPreviewButtonProps}
           onBackgroundColorChanged={props.onBackgroundColorChanged}
@@ -389,7 +394,7 @@ const MosaicEditorsDisplay = React.forwardRef<
                 globalObjectsContainer={globalObjectsContainer}
                 objectsContainer={objectsContainer}
                 layersContainer={layersContainer}
-                selectedLayer={selectedLayer}
+                chosenLayer={chosenLayer}
                 initialInstances={initialInstances}
                 instancesEditorSettings={props.instancesEditorSettings}
                 onInstancesEditorSettingsMutated={

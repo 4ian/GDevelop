@@ -39,8 +39,8 @@ type FlattenedNode<Item> = {|
   id: string,
   name: string | React.Node,
   rightComponent: ?React.Node,
-  rightButton: ?MenuButton,
-  shouldHideMenuIcon: boolean,
+  rightButton: ?MenuButton | Array<MenuButton>,
+  shouldHideMenuIcon: boolean | null,
   hasChildren: boolean,
   canHaveChildren: boolean,
   extraClass: string,
@@ -149,7 +149,7 @@ type Props<Item> = {|
   getItemDataset?: Item => ?HTMLDataset,
   onEditItem?: Item => void,
   buildMenuTemplate: (Item, index: number) => any,
-  getItemRightButton?: Item => ?MenuButton,
+  getItemRightButton?: Item => ?MenuButton | Array<MenuButton>,
   renderRightComponent?: Item => ?React.Node,
   /**
    * Callback called when a folder is collapsed (folded).
@@ -297,7 +297,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
             rightButton,
             shouldHideMenuIcon: shouldHideMenuIcon
               ? shouldHideMenuIcon(item)
-              : false,
+              : null,
             hasChildren: !!children && children.length > 0,
             canHaveChildren,
             depth,

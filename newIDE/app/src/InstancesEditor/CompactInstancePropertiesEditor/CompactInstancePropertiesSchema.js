@@ -695,7 +695,7 @@ export const reorderInstanceSchemaForCustomProperties = (
   const contentSectionTitle: SectionTitle = {
     nonFieldType: 'sectionTitle',
     name: 'Content',
-    title: 'Content',
+    title: i18n._(t`Content`),
     getValue: undefined,
   };
   if (animationFieldIndex === -1) {

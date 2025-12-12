@@ -33,9 +33,8 @@ export type SceneEditorsDisplayProps = {|
   objectsContainer: gdObjectsContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   initialInstances: gdInitialInstancesContainer,
-  lastSelectionType: 'instance' | 'object',
+  lastSelectionType: 'instance' | 'object' | 'layer',
   instancesSelection: InstancesSelection,
-  selectedLayer: string,
   onSelectInstances: (
     instances: Array<gdInitialInstance>,
     multiSelect: boolean,
@@ -62,7 +61,10 @@ export type SceneEditorsDisplayProps = {|
     variant: gdEventsBasedObjectVariant
   ) => void,
   selectedObjectFolderOrObjectsWithContext: ObjectFolderOrObjectWithContext[],
-  onSelectLayer: (layerName: string) => void,
+  chosenLayer: string,
+  onChooseLayer: (layerName: string) => void,
+  selectedLayer: gdLayer | null,
+  onSelectLayer: (layer: gdLayer | null) => void,
   editLayerEffects: (layer: ?gdLayer) => void,
   editLayer: (layer: ?gdLayer) => void,
   onRemoveLayer: (layerName: string, done: (boolean) => void) => void,

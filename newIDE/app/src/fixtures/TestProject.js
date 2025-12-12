@@ -50,6 +50,7 @@ export type TestProject = {|
   layerWith2DEffects: gdLayer,
   layerWithEffectWithoutEffectType: gdLayer,
   layerWithoutEffects: gdLayer,
+  lightingLayer: gdLayer,
   spriteObjectWithEffects: gdObject,
   spriteObjectWithoutEffects: gdObject,
   stringRelationalOperatorParameterMetadata: gdParameterMetadata,
@@ -855,6 +856,12 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
 
   const layerWithoutEffects = new gd.Layer();
 
+  const lightingLayer = new gd.Layer();
+  lightingLayer.setName('Lighting');
+  lightingLayer.setLightingLayer(true);
+  lightingLayer.setFollowBaseLayerCamera(true);
+  lightingLayer.setAmbientLightColor(200, 200, 200);
+
   {
     const effect1 = spriteObjectWithEffects
       .getEffects()
@@ -983,6 +990,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     layerWith2DEffects,
     layerWithEffectWithoutEffectType,
     layerWithoutEffects,
+    lightingLayer,
     spriteObjectWithEffects,
     spriteObjectWithoutEffects,
     stringRelationalOperatorParameterMetadata,

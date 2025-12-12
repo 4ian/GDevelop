@@ -13,6 +13,7 @@ import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer'
 import { CompactObjectPropertiesEditor } from '../ObjectEditor/CompactObjectPropertiesEditor';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
+import { CompactLayerPropertiesEditor } from '../LayersList/CompactLayerPropertiesEditor';
 
 export const styles = {
   paper: {
@@ -26,17 +27,18 @@ export const styles = {
 type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
-  layout?: ?gdLayout,
-  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
-  objectsContainer: gdObjectsContainer,
-  globalObjectsContainer: gdObjectsContainer | null,
   layersContainer: gdLayersContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   unsavedChanges?: ?UnsavedChanges,
   i18n: I18nType,
+  lastSelectionType: 'instance' | 'object' | 'layer',
+
+  // For objects or instances:
   historyHandler?: HistoryHandler,
-  lastSelectionType: 'instance' | 'object',
   isVariableListLocked: boolean,
+  layout?: ?gdLayout,
+  objectsContainer: gdObjectsContainer,
+  globalObjectsContainer: gdObjectsContainer | null,
 
   // For objects:
   objects: Array<gdObject>,
@@ -57,6 +59,7 @@ type Props = {|
     variant: gdEventsBasedObjectVariant
   ) => void,
   isBehaviorListLocked: boolean,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
 
   // For instances:
   instances: Array<gdInitialInstance>,
@@ -66,6 +69,12 @@ type Props = {|
   editInstanceVariables: gdInitialInstance => void,
   tileMapTileSelection: ?TileMapTileSelection,
   onSelectTileMapTile: (?TileMapTileSelection) => void,
+
+  // For layers:
+  layer: gdLayer | null,
+  onEditLayer: (layer: gdLayer) => void,
+  onEditLayerEffects: (layer: gdLayer) => void,
+  onLayersModified: (layers: Array<gdLayer>) => void,
 |};
 
 export type InstanceOrObjectPropertiesEditorInterface = {|
@@ -113,6 +122,20 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
     editInstanceVariables,
     tileMapTileSelection,
     onSelectTileMapTile,
+
+    // For layers
+    layer,
+    onEditLayer,
+    onEditLayerEffects,
+    onLayersModified,
+
+    // For objects or instances:
+    historyHandler,
+    isVariableListLocked,
+    layout,
+    objectsContainer,
+    globalObjectsContainer,
+
     ...commonProps
   } = props;
 
@@ -127,6 +150,11 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
           editInstanceVariables={editInstanceVariables}
           tileMapTileSelection={tileMapTileSelection}
           onSelectTileMapTile={onSelectTileMapTile}
+          historyHandler={historyHandler}
+          isVariableListLocked={isVariableListLocked}
+          layout={layout}
+          objectsContainer={objectsContainer}
+          globalObjectsContainer={globalObjectsContainer}
           {...commonProps}
         />
       ) : !!objects.length && lastSelectionType === 'object' ? (
@@ -145,6 +173,21 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
             onOpenEventBasedObjectVariantEditor
           }
           onDeleteEventsBasedObjectVariant={onDeleteEventsBasedObjectVariant}
+          historyHandler={historyHandler}
+          isVariableListLocked={isVariableListLocked}
+          layout={layout}
+          objectsContainer={objectsContainer}
+          globalObjectsContainer={globalObjectsContainer}
+          {...commonProps}
+        />
+      ) : layer && lastSelectionType === 'layer' ? (
+        <CompactLayerPropertiesEditor
+          layer={layer}
+          onEditLayer={onEditLayer}
+          onEditLayerEffects={onEditLayerEffects}
+          onLayersModified={onLayersModified}
+          onEffectAdded={onEffectAdded}
+          resourceManagementProps={resourceManagementProps}
           {...commonProps}
         />
       ) : (

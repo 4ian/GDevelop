@@ -241,7 +241,12 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     );
   }
 
-  onClick(): void {}
+  onClick(): void {
+    this.props.selectObjectFolderOrObjectWithContext({
+      objectFolderOrObject: this.object,
+      global: this._isGlobal,
+    });
+  }
 
   rename(newName: string): void {
     if (this.getName() === newName) {

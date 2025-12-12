@@ -18,38 +18,41 @@ export default {
 };
 
 export const Default = () => {
-  const [selectedLayer, setSelectedLayer] = React.useState<string>('');
+  const [chosenLayer, setChosenLayer] = React.useState<string>('');
   return (
     <DragAndDropContextProvider>
-      <LayersList
-        project={testProject.project}
-        eventsFunctionsExtension={null}
-        eventsBasedObject={null}
-        selectedLayer={selectedLayer}
-        onSelectLayer={setSelectedLayer}
-        onEditLayerEffects={action('onEditLayerEffects')}
-        onLayersModified={action('onLayersModified')}
-        onLayersVisibilityInEditorChanged={action(
-          'onLayersVisibilityInEditorChanged'
-        )}
-        onEditLayer={action('onEditLayer')}
-        onRemoveLayer={(layerName, cb) => {
-          cb(true);
-        }}
-        onLayerRenamed={action('onLayerRenamed')}
-        onCreateLayer={action('onCreateLayer')}
-        layout={testProject.testLayout}
-        layersContainer={testProject.testLayout.getLayers()}
-        hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
-        onBackgroundColorChanged={action('onBackgroundColorChanged')}
-        gameEditorMode={'embedded-game'}
-      />
+      <div style={{ height: 400 }}>
+        <LayersList
+          project={testProject.project}
+          eventsFunctionsExtension={null}
+          eventsBasedObject={null}
+          chosenLayer={chosenLayer}
+          onChooseLayer={setChosenLayer}
+          onSelectLayer={action('onSelectLayer')}
+          onEditLayerEffects={action('onEditLayerEffects')}
+          onLayersModified={action('onLayersModified')}
+          onLayersVisibilityInEditorChanged={action(
+            'onLayersVisibilityInEditorChanged'
+          )}
+          onEditLayer={action('onEditLayer')}
+          onRemoveLayer={(layerName, cb) => {
+            cb(true);
+          }}
+          onLayerRenamed={action('onLayerRenamed')}
+          onCreateLayer={action('onCreateLayer')}
+          layout={testProject.testLayout}
+          layersContainer={testProject.testLayout.getLayers()}
+          hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
+          onBackgroundColorChanged={action('onBackgroundColorChanged')}
+          gameEditorMode={'embedded-game'}
+        />
+      </div>
     </DragAndDropContextProvider>
   );
 };
 
 export const SmallWidthAndHeight = () => {
-  const [selectedLayer, setSelectedLayer] = React.useState<string>('');
+  const [chosenLayer, setChosenLayer] = React.useState<string>('');
 
   return (
     <DragAndDropContextProvider>
@@ -58,8 +61,9 @@ export const SmallWidthAndHeight = () => {
           project={testProject.project}
           eventsFunctionsExtension={null}
           eventsBasedObject={null}
-          selectedLayer={selectedLayer}
-          onSelectLayer={setSelectedLayer}
+          chosenLayer={chosenLayer}
+          onChooseLayer={setChosenLayer}
+          onSelectLayer={action('onSelectLayer')}
           onEditLayerEffects={action('onEditLayerEffects')}
           onLayersModified={action('onLayersModified')}
           onLayersVisibilityInEditorChanged={action(

@@ -100,7 +100,7 @@ export type InstancesEditorPropsWithoutSizeAndScroll = {|
   layersContainer: gdLayersContainer,
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
-  selectedLayer: string,
+  chosenLayer: string,
   initialInstances: gdInitialInstancesContainer,
   instancesEditorSettings: InstancesEditorSettings,
   isInstanceOf3DObject: gdInitialInstance => boolean,
@@ -1686,7 +1686,7 @@ export default class InstancesEditor extends Component<Props, State> {
           _instancesAdder.createOrUpdateTemporaryInstancesFromObjectNames(
             pos,
             this.props.selectedObjectNames,
-            this.props.selectedLayer
+            this.props.chosenLayer
           );
         }}
         drop={monitor => {

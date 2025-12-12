@@ -78,6 +78,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     objectsContainer,
     projectScopedContainersAccessor,
     initialInstances,
+    chosenLayer,
     selectedLayer,
     onSelectInstances,
     onInstancesModified,
@@ -151,7 +152,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     []
   );
   const forceUpdateLayersList = React.useCallback(() => {
-    if (layersListRef.current) layersListRef.current.forceUpdate();
+    if (layersListRef.current) layersListRef.current.forceUpdateList();
   }, []);
   const getInstanceSize = React.useCallback((instance: gdInitialInstance) => {
     return editorRef.current
@@ -326,7 +327,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                 globalObjectsContainer={globalObjectsContainer}
                 objectsContainer={objectsContainer}
                 layersContainer={layersContainer}
-                selectedLayer={selectedLayer}
+                chosenLayer={chosenLayer}
                 screenType={screenType}
                 initialInstances={initialInstances}
                 instancesEditorSettings={props.instancesEditorSettings}
@@ -453,6 +454,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       }
                       objects={selectedObjects}
                       instances={selectedInstances}
+                      layer={selectedLayer}
                       editInstanceVariables={props.editInstanceVariables}
                       editObjectInPropertiesPanel={
                         props.editObjectInPropertiesPanel
@@ -463,7 +465,6 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       onInstancesModified={forceUpdateInstancesList}
                       onGetInstanceSize={getInstanceSize}
                       ref={instanceOrObjectPropertiesEditorRef}
-                      unsavedChanges={props.unsavedChanges}
                       historyHandler={props.historyHandler}
                       tileMapTileSelection={props.tileMapTileSelection}
                       onSelectTileMapTile={props.onSelectTileMapTile}
@@ -478,6 +479,9 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       }
                       isVariableListLocked={isCustomVariant}
                       isBehaviorListLocked={isCustomVariant}
+                      onEditLayerEffects={props.editLayerEffects}
+                      onEditLayer={props.editLayer}
+                      onLayersModified={props.onLayersModified}
                     />
                   )}
                 </I18n>
@@ -536,7 +540,8 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                   layout={layout}
                   eventsFunctionsExtension={eventsFunctionsExtension}
                   eventsBasedObject={eventsBasedObject}
-                  selectedLayer={selectedLayer}
+                  chosenLayer={chosenLayer}
+                  onChooseLayer={props.onChooseLayer}
                   onSelectLayer={props.onSelectLayer}
                   onEditLayerEffects={props.editLayerEffects}
                   onLayersModified={props.onLayersModified}
@@ -548,7 +553,6 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                   onLayerRenamed={props.onLayerRenamed}
                   onCreateLayer={forceUpdatePropertiesEditor}
                   layersContainer={layersContainer}
-                  unsavedChanges={props.unsavedChanges}
                   ref={layersListRef}
                   hotReloadPreviewButtonProps={
                     props.hotReloadPreviewButtonProps

@@ -278,6 +278,10 @@ namespace gdjs {
                 'same-origin',
           }
         );
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const fontDataRaw = await response.text();
 
         // Sanitize: remove lines starting with # (acting as comments)
@@ -294,6 +298,8 @@ namespace gdjs {
             ', error: ' +
             error
         );
+        this._loadedFontsData.delete(resource);
+        throw error;
       }
     }
 

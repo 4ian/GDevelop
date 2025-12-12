@@ -50,7 +50,11 @@ namespace gdjs {
     }
 
     async loadResource(resourceName: string): Promise<void> {
-      await this.getOrLoad(resourceName);
+      try {
+        await this.getOrLoad(resourceName);
+      } catch (error) {
+        throw error;
+      }
     }
 
     /**

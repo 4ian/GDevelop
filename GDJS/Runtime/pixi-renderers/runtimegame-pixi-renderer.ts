@@ -147,6 +147,7 @@ namespace gdjs {
           view: gameCanvas,
           preserveDrawingBuffer: true,
           antialias: false,
+          backgroundAlpha: 0,
         }) as PIXI.Renderer;
       }
 

@@ -255,6 +255,13 @@ export type TextBasedCourseChapterCodeItem = {|
   language?: string,
 |};
 
+export type TextBasedCourseChapterCalloutItem = {|
+  type: 'callout',
+  calloutType?: 'info' | 'warning' | 'tip' | 'note',
+  title: string,
+  text: string,
+|};
+
 export type TextBasedCourseChapterTableItem = {|
   type: 'table',
   header?: Array<string>,
@@ -269,6 +276,7 @@ export type TextBasedCourseChapterTaskItem = {|
     | TextBasedCourseChapterImageItem
     | TextBasedCourseChapterVideoItem
     | TextBasedCourseChapterCodeItem
+    | TextBasedCourseChapterCalloutItem
     | TextBasedCourseChapterTableItem
   >,
   answer?: {
@@ -277,6 +285,7 @@ export type TextBasedCourseChapterTaskItem = {|
       | TextBasedCourseChapterImageItem
       | TextBasedCourseChapterVideoItem
       | TextBasedCourseChapterCodeItem
+      | TextBasedCourseChapterCalloutItem
       | TextBasedCourseChapterTableItem
     >,
   },
@@ -295,6 +304,7 @@ export type UnlockedTextBasedCourseChapter = {|
     | TextBasedCourseChapterTaskItem
     | TextBasedCourseChapterVideoItem
     | TextBasedCourseChapterCodeItem
+    | TextBasedCourseChapterCalloutItem
     | TextBasedCourseChapterTableItem
   >,
 |};

@@ -2864,6 +2864,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onWillInstallExtension={this.props.onWillInstallExtension}
                 onExtensionInstalled={this.props.onExtensionInstalled}
                 editorViewPosition2D={this.editorViewPosition2D}
+                onEventsBasedObjectChildrenEdited={
+                  this.props.onEventsBasedObjectChildrenEdited
+                }
               />
               <I18n>
                 {({ i18n }) => (

@@ -514,17 +514,6 @@ export const changeUserSubscription = async (
   });
 };
 
-export const canSeamlesslyChangeSubscription = (
-  subscription: Subscription,
-  planId: string
-) => {
-  // Bringing prices with different currencies prevents subscriptions to be changed seamlessly
-  // on Stripe.
-  // TODO: When the backend allows it, make it possible to seamlessly change subscription
-  // if the currencies of the current and requested subscriptions match.
-  return false;
-};
-
 export const hasMobileAppStoreSubscriptionPlan = (
   subscription: ?Subscription
 ): boolean => {

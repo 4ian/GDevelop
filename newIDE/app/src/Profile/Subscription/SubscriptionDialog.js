@@ -9,7 +9,6 @@ import AuthenticatedUserContext from '../AuthenticatedUserContext';
 import {
   changeUserSubscription,
   getRedirectToCheckoutUrl,
-  canSeamlesslyChangeSubscription,
   hasValidSubscriptionPlan,
   EDUCATION_PLAN_MAX_SEATS,
   EDUCATION_PLAN_MIN_SEATS,
@@ -94,32 +93,34 @@ const styles = {
 };
 
 const cancelConfirmationTexts = {
-  title: t`Cancel your subscription?`,
-  message: t`By canceling your subscription, you will lose all your premium features at the end of the period you already paid for. Continue?`,
-  confirmButtonLabel: t`Continue`,
-  dismissButtonLabel: t`Keep subscription`,
-  maxWidth: 'sm',
-};
-const seamlesslyChangeConfirmationTexts = {
-  title: t`Update your subscription`,
-  message: t`Are you sure you want to change your plan? Your next payment will be pro-rated.`,
-  confirmButtonLabel: t`Update my subscription`,
-  dismissButtonLabel: t`Go back`,
-  maxWidth: 'sm',
+  level: 'normal',
+  dialogTexts: {
+    title: t`Cancel your subscription?`,
+    message: t`By canceling your subscription, you will lose all your premium features at the end of the period you already paid for. Continue?`,
+    confirmButtonLabel: t`Continue`,
+    dismissButtonLabel: t`Keep subscription`,
+    maxWidth: 'sm',
+  },
 };
 const cancelAndChangeConfirmationTexts = {
-  title: t`Update your subscription`,
-  message: t`To get this new subscription, we need to stop your existing one before you can pay for the new one. This is immediate but your payment will NOT be pro-rated (you will pay the full price for the new subscription). You won't lose any project, game or other data.`,
-  confirmButtonLabel: t`Cancel and upgrade my subscription`,
-  dismissButtonLabel: t`Go back`,
-  maxWidth: 'sm',
+  level: 'normal',
+  dialogTexts: {
+    title: t`Update your subscription`,
+    message: t`To get this new subscription, we need to stop your existing one before you can pay for the new one. This is immediate but your payment will NOT be pro-rated (you will pay the full price for the new subscription). You won't lose any project, game or other data.`,
+    confirmButtonLabel: t`Cancel and upgrade my subscription`,
+    dismissButtonLabel: t`Go back`,
+    maxWidth: 'sm',
+  },
 };
 const cancelAndChangeWithValidRedeemedCodeConfirmationTexts = {
-  title: t`Update your subscription`,
-  message: t`To get this new subscription, we need to stop your existing one before you can pay for the new one. The change will be immediate. You will also lose your redeemed code.`,
-  confirmButtonLabel: t`Update my subscription`,
-  dismissButtonLabel: t`Go back`,
-  maxWidth: 'sm',
+  level: 'danger',
+  dialogTexts: {
+    title: t`Update your subscription`,
+    message: t`To buy this new subscription, we need to stop your existing one before you can pay for the new one. This means the redemption code you're currently used won't be usable anymore.`,
+    confirmButtonLabel: t`Forfeit my redeemed subscription and continue`,
+    dismissButtonLabel: t`Go back`,
+    maxWidth: 'sm',
+  },
 };
 
 const getSubscriptionPricingSystemPeriod = (
@@ -229,7 +230,7 @@ export default function SubscriptionDialog({
     ) || 'year'
   );
 
-  const { showConfirmation } = useAlertDialog();
+  const { showConfirmation, showDeleteConfirmation } = useAlertDialog();
   const [cancelReasonDialogOpen, setCancelReasonDialogOpen] = React.useState(
     false
   );
@@ -266,86 +267,86 @@ export default function SubscriptionDialog({
 
     if (!subscriptionPlanPricingSystem) {
       // Cancelling the existing subscription.
-      const answer = await showConfirmation(cancelConfirmationTexts);
+      const answer = await showConfirmation(
+        cancelConfirmationTexts.dialogTexts
+      );
       if (!answer) return;
 
       setCancelReasonDialogOpen(true);
       return;
     }
 
-    const { planId } = subscriptionPlanPricingSystem;
-    const needToCancelSubscription = !canSeamlesslyChangeSubscription(
-      subscription,
-      planId
-    );
     const hasValidRedeemedSubscription =
       !!subscription.redemptionCodeValidUntil &&
       subscription.redemptionCodeValidUntil > Date.now();
     const hasExpiredRedeemedSubscription =
       !!subscription.redemptionCodeValidUntil &&
       subscription.redemptionCodeValidUntil < Date.now();
-    const shouldSkipAlert = hasExpiredRedeemedSubscription; // we don't show an alert if the redeemed code is expired
 
     // Changing the existing subscription.
-    const confirmDialogTexts =
-      !needToCancelSubscription || hasExpiredRedeemedSubscription
-        ? seamlesslyChangeConfirmationTexts
-        : hasValidRedeemedSubscription
-        ? cancelAndChangeWithValidRedeemedCodeConfirmationTexts
-        : cancelAndChangeConfirmationTexts;
+    const confirmDialogTexts = hasExpiredRedeemedSubscription
+      ? null // We don't show an alert if the redeemed code is expired.
+      : hasValidRedeemedSubscription
+      ? cancelAndChangeWithValidRedeemedCodeConfirmationTexts
+      : cancelAndChangeConfirmationTexts;
 
-    if (!shouldSkipAlert) {
-      const answer = await showConfirmation(confirmDialogTexts);
+    if (confirmDialogTexts) {
+      const { level, dialogTexts } = confirmDialogTexts;
+
+      const answer =
+        level === 'danger'
+          ? await showDeleteConfirmation({
+              title: dialogTexts.title,
+              message: dialogTexts.message,
+              confirmButtonLabel: dialogTexts.confirmButtonLabel,
+              dismissButtonLabel: dialogTexts.dismissButtonLabel,
+            })
+          : await showConfirmation(dialogTexts);
       if (!answer) return;
     }
 
-    if (!needToCancelSubscription) {
-      // Changing the existing subscription without asking for payment details again.
-      // TODO: When possible, handle cases when a subscription can be updated seamlessly.
-    } else {
-      // Changing the existing subscription by cancelling first.
-      setIsChangingSubscription(true);
-      await sendCancelSubscriptionToChange({
-        planId: subscriptionPlanPricingSystem.planId,
-        pricingSystemId: subscriptionPlanPricingSystem.id,
-      });
-      try {
-        await changeUserSubscription(
-          getAuthorizationHeader,
-          profile.id,
-          {
-            planId: null,
+    // Changing the existing subscription by cancelling first.
+    setIsChangingSubscription(true);
+    await sendCancelSubscriptionToChange({
+      planId: subscriptionPlanPricingSystem.planId,
+      pricingSystemId: subscriptionPlanPricingSystem.id,
+    });
+    try {
+      await changeUserSubscription(
+        getAuthorizationHeader,
+        profile.id,
+        {
+          planId: null,
+        },
+        {
+          cancelImmediately: true,
+          cancelReasons: {
+            'changing-subscription': true,
           },
-          {
-            cancelImmediately: true,
-            cancelReasons: {
-              'changing-subscription': true,
-            },
-          }
-        );
-        await authenticatedUser.onRefreshSubscription();
-      } catch (rawError) {
-        showErrorBox({
-          message: i18n._(
-            t`Your subscription could not be cancelled. Please try again later!`
-          ),
-          rawError,
-          errorId: 'subscription-update-error',
-        });
-      } finally {
-        setIsChangingSubscription(false);
-      }
-
-      // Then redirect as if a new subscription is being chosen.
-      onOpenPendingDialog(true);
-      Window.openExternalURL(
-        getRedirectToCheckoutUrl({
-          pricingSystemId: subscriptionPlanPricingSystem.id,
-          userId: profile.id,
-          userEmail: profile.email,
-        })
+        }
       );
+      await authenticatedUser.onRefreshSubscription();
+    } catch (rawError) {
+      showErrorBox({
+        message: i18n._(
+          t`Your subscription could not be cancelled. Please try again later!`
+        ),
+        rawError,
+        errorId: 'subscription-update-error',
+      });
+    } finally {
+      setIsChangingSubscription(false);
     }
+
+    // Then redirect as if a new subscription is being chosen.
+    onOpenPendingDialog(true);
+    Window.openExternalURL(
+      getRedirectToCheckoutUrl({
+        pricingSystemId: subscriptionPlanPricingSystem.id,
+        userId: profile.id,
+        userEmail: profile.email,
+      })
+    );
   };
 
   const isLoading =

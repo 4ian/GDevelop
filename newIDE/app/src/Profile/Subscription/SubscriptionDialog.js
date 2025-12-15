@@ -117,9 +117,8 @@ const cancelAndChangeConfirmationTexts = {
 const cancelAndChangeWithValidRedeemedCodeConfirmationTexts = {
   title: t`Update your subscription`,
   message: t`To get this new subscription, we need to stop your existing one before you can pay for the new one. The change will be immediate. You will also lose your redeemed code.`,
-  confirmButtonLabel: t`Update my subscription`,
+  confirmButtonLabel: t`Forfeit my redemption code right now`,
   dismissButtonLabel: t`Go back`,
-  maxWidth: 'sm',
 };
 
 const getSubscriptionPricingSystemPeriod = (
@@ -229,7 +228,7 @@ export default function SubscriptionDialog({
     ) || 'year'
   );
 
-  const { showConfirmation } = useAlertDialog();
+  const { showConfirmation, showDeleteConfirmation } = useAlertDialog();
   const [cancelReasonDialogOpen, setCancelReasonDialogOpen] = React.useState(
     false
   );
@@ -291,12 +290,19 @@ export default function SubscriptionDialog({
       !needToCancelSubscription || hasExpiredRedeemedSubscription
         ? seamlesslyChangeConfirmationTexts
         : hasValidRedeemedSubscription
-        ? cancelAndChangeWithValidRedeemedCodeConfirmationTexts
+        ? null // Handled separately with showDeleteConfirmation
         : cancelAndChangeConfirmationTexts;
 
     if (!shouldSkipAlert) {
-      const answer = await showConfirmation(confirmDialogTexts);
-      if (!answer) return;
+      if (hasValidRedeemedSubscription) {
+        const answer = await showDeleteConfirmation(
+          cancelAndChangeWithValidRedeemedCodeConfirmationTexts
+        );
+        if (!answer) return;
+      } else if (confirmDialogTexts) {
+        const answer = await showConfirmation(confirmDialogTexts);
+        if (!answer) return;
+      }
     }
 
     if (!needToCancelSubscription) {

@@ -31,8 +31,15 @@ namespace gdjs {
 
   /** Represents a {@link gdjs.SpriteAnimationFrame}. */
   export type SpriteFrameData = {
-    /** The resource name of the image used in this frame. */
+    /** The resource name of the image used in this frame.
+     * If using a spritesheet, this should be empty. */
     image: string;
+    /** The spritesheet resource name (if using a spritesheet frame).
+     * When set, the texture is obtained from the spritesheet's frame data. */
+    spritesheetResourceName?: string;
+    /** The frame name within the spritesheet (key in the "frames" object).
+     * Required when spritesheetResourceName is set. */
+    spritesheetFrameName?: string;
     /** The points of the frame. */
     points: Array<SpriteCustomPointData>;
     /** The origin point. */
@@ -76,12 +83,27 @@ namespace gdjs {
   };
 
   /**
-   * Abstraction from graphic libraries texture classes.
+   * Interface allowing access to textures for object having animations.
+   * See notably: `gdjs.SpriteAnimator`. In practice, it's either giving access
+   * to textures for PixiJS or Three.js.
    */
   export interface AnimationFrameTextureManager<T> {
-    getAnimationFrameTexture(imageName: string): T;
-    getAnimationFrameWidth(pixiTexture: T);
-    getAnimationFrameHeight(pixiTexture: T);
+    /**
+     * Get a texture from a standalone image.
+     */
+    getAnimationFrameTexture(imageResourceName: string): T;
+    /**
+     * Get a texture from a spritesheet frame.
+     * @param spritesheetResourceName The spritesheet resource name.
+     * @param frameName The frame name within the spritesheet.
+     * @returns The texture for the specified frame.
+     */
+    getAnimationFrameTextureFromSpritesheet(
+      spritesheetResourceName: string,
+      frameName: string
+    ): T;
+    getAnimationFrameWidth(texture: T);
+    getAnimationFrameHeight(texture: T);
   }
 
   /**
@@ -91,7 +113,12 @@ namespace gdjs {
    * or the collision mask.
    */
   export class SpriteAnimationFrame<T> {
+    /** The image name (for standalone images) or empty string (for spritesheet frames). */
     image: string;
+    /** The spritesheet resource name (if using a spritesheet frame). */
+    spritesheetResourceName: string | null = null;
+    /** The frame name within the spritesheet. */
+    spritesheetFrameName: string | null = null;
 
     //TODO: Rename in imageName, and do not store it in the object?
     texture: T;
@@ -110,9 +137,26 @@ namespace gdjs {
       textureManager: gdjs.AnimationFrameTextureManager<T>
     ) {
       this.image = frameData ? frameData.image : '';
-      this.texture = textureManager.getAnimationFrameTexture(this.image);
+      this.spritesheetResourceName = frameData?.spritesheetResourceName || null;
+      this.spritesheetFrameName = frameData?.spritesheetFrameName || null;
+      this.texture = this._getAnimationFrameTexture(textureManager);
       this.points = new Hashtable();
       this.reinitialize(frameData, textureManager);
+    }
+
+    /**
+     * Get the texture for this frame (from either standalone image or spritesheet).
+     */
+    private _getAnimationFrameTexture(
+      textureManager: gdjs.AnimationFrameTextureManager<T>
+    ): T {
+      if (this.spritesheetResourceName && this.spritesheetFrameName) {
+        return textureManager.getAnimationFrameTextureFromSpritesheet(
+          this.spritesheetResourceName,
+          this.spritesheetFrameName
+        );
+      }
+      return textureManager.getAnimationFrameTexture(this.image);
     }
 
     /**
@@ -124,7 +168,9 @@ namespace gdjs {
       textureManager: gdjs.AnimationFrameTextureManager<T>
     ) {
       this.image = frameData.image;
-      this.texture = textureManager.getAnimationFrameTexture(this.image);
+      this.spritesheetResourceName = frameData.spritesheetResourceName || '';
+      this.spritesheetFrameName = frameData.spritesheetFrameName || '';
+      this.texture = this._getAnimationFrameTexture(textureManager);
 
       this.points.clear();
       for (let i = 0, len = frameData.points.length; i < len; ++i) {

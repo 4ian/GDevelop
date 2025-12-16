@@ -62,6 +62,11 @@ void ArbitraryResourceWorker::ExposeSpine(gd::String& resourceName){
     // do.
 };
 
+void ArbitraryResourceWorker::ExposeSpritesheet(gd::String& resourceName){
+    // Nothing to do by default - each child class can define here the action to
+    // do.
+};
+
 void ArbitraryResourceWorker::ExposeJavaScript(gd::String& resourceName){
     // Nothing to do by default - each child class can define here the action to
     // do.
@@ -129,7 +134,6 @@ void ArbitraryResourceWorker::ExposeEmbeddeds(gd::String& resourceName) {
             child.second->GetValue().GetString();
 
         if (resourcesManager->HasResource(targetResourceName)) {
-          std::cout << targetResourceName << std::endl;
           gd::Resource& targetResource =
               resourcesManager->GetResource(targetResourceName);
 
@@ -198,6 +202,12 @@ void ArbitraryResourceWorker::ExposeResourceWithType(
   }
   if (resourceType == "spine") {
     ExposeSpine(resourceName);
+    ExposeEmbeddeds(resourceName);
+    return;
+  }
+  if (resourceType == "spritesheet") {
+    ExposeSpritesheet(resourceName);
+    ExposeEmbeddeds(resourceName);
     return;
   }
   if (resourceType == "javascript") {
@@ -276,6 +286,11 @@ bool ResourceWorkerInEventsWorker::DoVisitInstruction(gd::Instruction& instructi
         } else if (parameterMetadata.GetType() == "spineResource") {
           gd::String updatedParameterValue = parameterValue;
           worker.ExposeSpine(updatedParameterValue);
+          instruction.SetParameter(parameterIndex, updatedParameterValue);
+        } else if (parameterMetadata.GetType() == "spritesheetResource") {
+          gd::String updatedParameterValue = parameterValue;
+          worker.ExposeSpritesheet(updatedParameterValue);
+          worker.ExposeEmbeddeds(updatedParameterValue);
           instruction.SetParameter(parameterIndex, updatedParameterValue);
         }
       });

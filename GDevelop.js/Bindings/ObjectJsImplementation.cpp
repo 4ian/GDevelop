@@ -210,6 +210,10 @@ void ObjectJsImplementation::ExposeResources(gd::ArbitraryResourceWorker& worker
         worker.ExposeAtlas(newPropertyValue);
       } else if (resourceType == "spine") {
         worker.ExposeSpine(newPropertyValue);
+        worker.ExposeEmbeddeds(newPropertyValue);
+      } else if (resourceType == "spritesheet") {
+        worker.ExposeSpritesheet(newPropertyValue);
+        worker.ExposeEmbeddeds(newPropertyValue);
       }
 
       if (newPropertyValue != oldPropertyValue) {

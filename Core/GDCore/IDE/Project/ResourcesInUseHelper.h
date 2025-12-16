@@ -48,6 +48,7 @@ public:
   std::set<gd::String>& GetAll3DModels() { return GetAll("model3D"); };
   std::set<gd::String>& GetAllAtlases() { return GetAll("atlas"); };
   std::set<gd::String>& GetAllSpines() { return GetAll("spine"); };
+  std::set<gd::String>& GetAllSpritesheets() { return GetAll("spritesheet"); };
   std::set<gd::String>& GetAll(const gd::String& resourceType) {
     if (resourceType == "image") return allImages;
     if (resourceType == "audio") return allAudios;
@@ -61,6 +62,7 @@ public:
     if (resourceType == "atlas") return allAtlases;
     if (resourceType == "spine") return allSpines;
     if (resourceType == "javascript") return allJavaScripts;
+    if (resourceType == "spritesheet") return allSpritesheets;
 
     return emptyResources;
   };
@@ -104,6 +106,9 @@ public:
   virtual void ExposeSpine(gd::String& resourceName) override {
     allSpines.insert(resourceName);
   };
+  virtual void ExposeSpritesheet(gd::String& resourceName) override {
+    allSpritesheets.insert(resourceName);
+  };
 
  protected:
   std::vector<gd::String> allResources;
@@ -119,6 +124,7 @@ public:
   std::set<gd::String> allAtlases;
   std::set<gd::String> allSpines;
   std::set<gd::String> allJavaScripts;
+  std::set<gd::String> allSpritesheets;
   std::set<gd::String> emptyResources;
 
   static const std::vector<gd::String> resourceTypes;

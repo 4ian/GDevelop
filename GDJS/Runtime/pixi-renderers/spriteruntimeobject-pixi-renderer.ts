@@ -3,7 +3,8 @@ namespace gdjs {
     _pixiAnimationFrameTextureManager: PixiAnimationFrameTextureManager;
   }
   /**
-   * The renderer for a gdjs.SpriteRuntimeObject using Pixi.js.
+   * The renderer for a gdjs.SpriteRuntimeObject using PixiJS.
+   * @category Renderers > Sprite
    */
   export class SpriteRuntimeObjectPixiRenderer {
     _object: gdjs.SpriteRuntimeObject;
@@ -209,6 +210,9 @@ namespace gdjs {
     }
   }
 
+  /**
+   * @category Renderers > Sprite
+   */
   class PixiAnimationFrameTextureManager
     implements gdjs.AnimationFrameTextureManager<PIXI.Texture>
   {
@@ -232,6 +236,12 @@ namespace gdjs {
   }
 
   // Register the class to let the engine use it.
+  /**
+   * @category Renderers > Sprite
+   */
   export const SpriteRuntimeObjectRenderer = SpriteRuntimeObjectPixiRenderer;
+  /**
+   * @category Renderers > Sprite
+   */
   export type SpriteRuntimeObjectRenderer = SpriteRuntimeObjectPixiRenderer;
 }

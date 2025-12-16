@@ -69,6 +69,7 @@ namespace gdjs {
   /**
    * PlatformerObjectRuntimeBehavior represents a behavior allowing objects to be
    * considered as a platform by objects having PlatformerObject Behavior.
+   * @category Behaviors > Platform
    */
   export class PlatformerObjectRuntimeBehavior extends gdjs.RuntimeBehavior {
     /**

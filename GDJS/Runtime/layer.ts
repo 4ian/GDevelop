@@ -6,6 +6,7 @@
 namespace gdjs {
   /**
    * Represents a layer of a scene, used to display objects.
+   * @category Core Engine > Layers
    */
   export class Layer extends gdjs.RuntimeLayer {
     _cameraRotation: float = 0;

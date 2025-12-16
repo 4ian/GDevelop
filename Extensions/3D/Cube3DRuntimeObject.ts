@@ -55,6 +55,7 @@ namespace gdjs {
 
   /**
    * Shows a 3D box object.
+   * @category Objects > 3D Box
    */
   export class Cube3DRuntimeObject extends gdjs.RuntimeObject3D {
     private _renderer: Cube3DRuntimeObjectRenderer;
@@ -563,6 +564,7 @@ namespace gdjs {
   }
 
   export namespace Cube3DRuntimeObject {
+    /** @category Objects > 3D Box */
     export enum MaterialType {
       Basic,
       StandardWithoutMetalness,

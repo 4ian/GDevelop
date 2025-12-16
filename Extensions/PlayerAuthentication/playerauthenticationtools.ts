@@ -5,6 +5,7 @@ namespace gdjs {
   const logger = new gdjs.Logger('Player Authentication');
   const authComponents = gdjs.playerAuthenticationComponents;
 
+  /** @category Other extensions > Player Authentication */
   export type PlayerAuthenticationPlatform =
     | 'electron'
     | 'cordova-websocket'

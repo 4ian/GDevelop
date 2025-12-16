@@ -7,6 +7,7 @@ namespace gdjs {
   /**
    * VariablesContainer stores variables, usually for a a RuntimeGame, a RuntimeScene
    * or a RuntimeObject.
+   * @category Core Engine > Variables
    */
   export class VariablesContainer {
     _variables: Hashtable<gdjs.Variable>;

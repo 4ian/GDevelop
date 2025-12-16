@@ -3,6 +3,7 @@ namespace gdjs {
     i: number;
     o: number;
   }
+  /** @category Effects > Filters */
   export class NightPixiFilter extends PIXI.Filter {
     constructor() {
       const vertexShader = undefined;

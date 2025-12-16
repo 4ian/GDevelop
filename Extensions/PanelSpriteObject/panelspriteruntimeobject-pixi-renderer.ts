@@ -437,6 +437,7 @@ namespace gdjs {
 
   export const PanelSpriteRuntimeObjectRenderer =
     PanelSpriteRuntimeObjectPixiRenderer;
+  /** @category Renderers > Panel Sprite */
   export type PanelSpriteRuntimeObjectRenderer =
     PanelSpriteRuntimeObjectPixiRenderer;
 }

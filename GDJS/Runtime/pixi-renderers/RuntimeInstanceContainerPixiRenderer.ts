@@ -26,6 +26,9 @@ namespace gdjs {
   }
 
   // Register the class to let the engine use it.
+  /**
+   * @category Renderers > Instance Container
+   */
   export type RuntimeInstanceContainerRenderer =
     gdjs.RuntimeInstanceContainerPixiRenderer;
 }

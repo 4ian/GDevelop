@@ -1,6 +1,7 @@
 namespace gdjs {
   declare var rbush: any;
 
+  /** @category Other extensions > Lighting */
   export class LightObstaclesManager {
     _obstacleRBush: any;
 
@@ -78,6 +79,9 @@ namespace gdjs {
     }
   }
 
+  /**
+   * @category Behaviors > Light Obstacle
+   */
   export class LightObstacleRuntimeBehavior extends gdjs.RuntimeBehavior {
     _oldX: float = 0;
     _oldY: float = 0;

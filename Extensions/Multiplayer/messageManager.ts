@@ -94,6 +94,7 @@ namespace gdjs {
     }
   };
 
+  /** @category Other extensions > Multiplayer */
   export type MultiplayerMessageManager = ReturnType<
     typeof makeMultiplayerMessageManager
   >;

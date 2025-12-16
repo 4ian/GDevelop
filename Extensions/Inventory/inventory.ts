@@ -1,4 +1,7 @@
 namespace gdjs {
+  /**
+   * @category Other extensions > Inventory
+   */
   export class Inventory {
     _items: any = {};
 

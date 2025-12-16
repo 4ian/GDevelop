@@ -193,6 +193,7 @@ namespace gdjs {
       /**
        * A tween manager that is used for layout tweens or object tweens.
        * @ignore
+       * @category Other extensions > Tween
        */
       export class TweenManager {
         /**
@@ -554,6 +555,7 @@ namespace gdjs {
       /**
        * An interpolation function.
        * @ignore
+       * @category Other extensions > Tween
        */
       export type Interpolation = (
         from: float,
@@ -588,6 +590,7 @@ namespace gdjs {
       /**
        * A tween.
        * @ignore
+       * @category Other extensions > Tween
        */
       export abstract class AbstractTweenInstance<T>
         implements TweenInstance<T>
@@ -674,6 +677,7 @@ namespace gdjs {
       /**
        * A tween with only one value.
        * @ignore
+       * @category Other extensions > Tween
        */
       export class SimpleTweenInstance extends AbstractTweenInstance<float> {
         initialValue: float;
@@ -777,6 +781,7 @@ namespace gdjs {
       /**
        * A tween with multiple values.
        * @ignore
+       * @category Other extensions > Tween
        */
       export class MultiTweenInstance extends AbstractTweenInstance<
         Array<float>
@@ -909,6 +914,9 @@ namespace gdjs {
         return fromValue + (toValue - fromValue) * easingFunction(weighting);
       };
 
+      /**
+       * @category Other extensions > Tween
+       */
       export type EasingFunction = (progress: float) => float;
     }
   }

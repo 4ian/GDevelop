@@ -127,6 +127,7 @@ namespace gdjs {
         timeManager.removeTimer(timerName);
       };
 
+      /** @category Synchronization > Async Tasks */
       export class WaitTask extends gdjs.AsyncTask {
         private duration: float;
         private timeElapsedOnScene = 0;

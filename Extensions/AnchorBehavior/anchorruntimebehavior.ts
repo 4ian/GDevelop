@@ -19,6 +19,9 @@ namespace gdjs {
     WindowCenter,
   }
 
+  /**
+   * @category Behaviors > Anchor
+   */
   export class AnchorRuntimeBehavior extends gdjs.RuntimeBehavior {
     // Configuration
 

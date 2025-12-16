@@ -149,6 +149,7 @@ namespace gdjs {
 
   /**
    * A behavior that forwards the Base3D interface to its object.
+   * @category Behaviors > Base 3D
    */
   export class Base3DBehavior
     extends gdjs.RuntimeBehavior

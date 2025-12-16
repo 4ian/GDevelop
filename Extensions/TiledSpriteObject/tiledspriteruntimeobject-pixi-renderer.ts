@@ -123,6 +123,9 @@ namespace gdjs {
 
   export const TiledSpriteRuntimeObjectRenderer =
     TiledSpriteRuntimeObjectPixiRenderer;
+  /**
+   * @category Renderers > Tiled Sprite
+   */
   export type TiledSpriteRuntimeObjectRenderer =
     TiledSpriteRuntimeObjectPixiRenderer;
 }

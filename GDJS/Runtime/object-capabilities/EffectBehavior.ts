@@ -58,6 +58,7 @@ namespace gdjs {
 
   /**
    * A behavior that forwards the EffectBehavior interface to its object.
+   * @category Behaviors > Effects
    */
   export class EffectBehavior
     extends gdjs.RuntimeBehavior

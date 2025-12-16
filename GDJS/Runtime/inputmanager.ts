@@ -9,6 +9,7 @@ namespace gdjs {
   /**
    * Store input made on a canvas: mouse position, key pressed
    * and touches states.
+   * @category Core Engine > Input
    */
   export class InputManager {
     static MOUSE_LEFT_BUTTON: integer = 0;

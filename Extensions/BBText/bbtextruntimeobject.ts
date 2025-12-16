@@ -1,5 +1,8 @@
 namespace gdjs {
-  /** Base parameters for {@link gdjs.BBTextRuntimeObject} */
+  /**
+   * Base parameters for {@link gdjs.BBTextRuntimeObject}
+   * @category Objects > BBText
+   */
   export type BBTextObjectDataType = {
     /** The base parameters of the BBText */
     content: {
@@ -22,8 +25,14 @@ namespace gdjs {
       verticalTextAlignment: 'top' | 'center' | 'bottom';
     };
   };
+  /**
+   * @category Objects > BBText
+   */
   export type BBTextObjectData = ObjectData & BBTextObjectDataType;
 
+  /**
+   * @category Synchronization > BBText
+   */
   export type BBTextObjectNetworkSyncDataType = {
     text: string;
     o: float;
@@ -37,11 +46,15 @@ namespace gdjs {
     hidden: boolean;
   };
 
+  /**
+   * @category Synchronization > BBText
+   */
   export type BBTextObjectNetworkSyncData = ObjectNetworkSyncData &
     BBTextObjectNetworkSyncDataType;
 
   /**
    * Displays a rich text using BBCode markup (allowing to set parts of the text as bold, italic, use different colors and shadows).
+   * @category Objects > BBText
    */
   export class BBTextRuntimeObject
     extends gdjs.RuntimeObject

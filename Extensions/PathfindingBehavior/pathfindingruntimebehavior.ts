@@ -25,6 +25,7 @@ namespace gdjs {
   /**
    * PathfindingRuntimeBehavior represents a behavior allowing objects to
    * follow a path computed to avoid obstacles.
+   * @category Behaviors > Pathfinding
    */
   export class PathfindingRuntimeBehavior extends gdjs.RuntimeBehavior {
     _path: Array<FloatPoint> = [];
@@ -595,6 +596,7 @@ namespace gdjs {
   export namespace PathfindingRuntimeBehavior {
     /**
      * Internal tool class representing a node when looking for a path
+     * @category Behaviors > Pathfinding
      */
     export class Node {
       pos: FloatPoint;
@@ -623,6 +625,7 @@ namespace gdjs {
      * Internal tool class containing the structures used by A* and members functions related
      * to them.
      * @ignore
+     * @category Behaviors > Pathfinding
      */
     export class SearchContext {
       _obstacles: PathfindingObstaclesManager;

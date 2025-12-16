@@ -14,6 +14,7 @@ namespace gdjs {
   /**
    * The MultiplayerObjectRuntimeBehavior represents a behavior that can be added to objects
    * to make them synchronized over the network.
+   * @category Behaviors > Multiplayer
    */
   export class MultiplayerObjectRuntimeBehavior extends gdjs.RuntimeBehavior {
     // Which player is the owner of the object.

@@ -22,6 +22,9 @@ namespace gdjs {
   export interface Physics2NetworkSyncData extends BehaviorNetworkSyncData {
     props: Physics2NetworkSyncDataType;
   }
+  /**
+   * @category Behaviors > Physics 2
+   */
   export class Physics2SharedData {
     gravityX: float;
     gravityY: float;
@@ -314,6 +317,9 @@ namespace gdjs {
     }
   });
 
+  /**
+   * @category Behaviors > Physics 2
+   */
   export class Physics2RuntimeBehavior extends gdjs.RuntimeBehavior {
     bodyType: string;
     bullet: boolean;

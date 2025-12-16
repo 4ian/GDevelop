@@ -7,6 +7,7 @@ namespace gdjs {
   /**
    * The DraggableRuntimeBehavior represents a behavior allowing objects to be
    * moved using the mouse.
+   * @category Behaviors > Draggable
    */
   export class DraggableRuntimeBehavior extends gdjs.RuntimeBehavior {
     /**

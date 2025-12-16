@@ -50,6 +50,7 @@ namespace gdjs {
     props: Physics3DNetworkSyncDataType;
   }
 
+  /** @category Behaviors > Physics 3D */
   export class Physics3DSharedData {
     gravityX: float;
     gravityY: float;
@@ -292,6 +293,9 @@ namespace gdjs {
     }
   });
 
+  /**
+   * @category Behaviors > Physics 3D
+   */
   export class Physics3DRuntimeBehavior extends gdjs.RuntimeBehavior {
     bodyUpdater: gdjs.Physics3DRuntimeBehavior.BodyUpdater;
     collisionChecker: gdjs.Physics3DRuntimeBehavior.CollisionChecker;
@@ -1900,6 +1904,7 @@ namespace gdjs {
       destroyBody(): void;
     }
 
+    /** @category Behaviors > Physics 3D */
     export class DefaultBodyUpdater
       implements gdjs.Physics3DRuntimeBehavior.BodyUpdater
     {
@@ -2030,6 +2035,7 @@ namespace gdjs {
      * The default collision checker uses the contacts found while
      * stepping the physics simulation. For characters, another one is used
      * as characters are simulated before the rest of the physics simulation.
+     * @category Behaviors > Physics 3D
      */
     export class DefaultCollisionChecker implements CollisionChecker {
       behavior: gdjs.Physics3DRuntimeBehavior;

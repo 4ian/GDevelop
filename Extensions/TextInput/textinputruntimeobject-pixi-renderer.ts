@@ -386,6 +386,7 @@ namespace gdjs {
   }
   export const TextInputRuntimeObjectRenderer =
     TextInputRuntimeObjectPixiRenderer;
+  /** @category Renderers > Text Input */
   export type TextInputRuntimeObjectRenderer =
     TextInputRuntimeObjectPixiRenderer;
 }

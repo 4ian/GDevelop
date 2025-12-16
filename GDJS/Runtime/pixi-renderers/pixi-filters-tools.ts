@@ -95,7 +95,10 @@ namespace gdjs {
       updateFromNetworkSyncData(syncData: any): void;
     }
 
-    /** A wrapper allowing to create a PIXI filter and update it using a common interface */
+    /**
+     * A wrapper allowing to create a PIXI filter and update it using a common interface
+     * @category Effects > Filters
+     */
     export abstract class PixiFilterCreator implements FilterCreator {
       /** Function to call to create the filter */
       makeFilter(target: EffectsTarget, effectData: EffectData): Filter {
@@ -153,7 +156,10 @@ namespace gdjs {
       ): void;
     }
 
-    /**An effect used to manipulate a Pixi filter. */
+    /**
+     * An effect used to manipulate a Pixi filter.
+     * @category Effects > Filters
+     */
     export class PixiFilter implements Filter {
       /** The PIXI filter */
       pixiFilter: PIXI.Filter;
@@ -269,6 +275,9 @@ namespace gdjs {
       }
     }
 
+    /**
+     * @category Effects > Filters
+     */
     export class EmptyFilter implements Filter {
       isEnabled(target: EffectsTarget): boolean {
         return false;

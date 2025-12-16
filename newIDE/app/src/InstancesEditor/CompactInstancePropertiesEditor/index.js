@@ -140,6 +140,8 @@ export const CompactInstancePropertiesEditor = ({
       );
       const instanceSchemaForCustomProperties = propertiesMapToSchema({
         properties,
+        // We can't access default values for instance custom properties.
+        defaultValueProperties: null,
         getProperties: (instance: gdInitialInstance) =>
           instance.getCustomProperties(
             globalObjectsContainer || objectsContainer,

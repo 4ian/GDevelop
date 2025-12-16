@@ -1,6 +1,6 @@
 // @flow
 import { mapFor, mapVector } from '../Utils/MapFor';
-import { type Schema } from '../CompactPropertiesEditor';
+import { type Schema, type FieldVisibility } from '../CompactPropertiesEditor';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
 import flatten from 'lodash/flatten';
 
@@ -49,7 +49,11 @@ export const enumerateEffectsMetadata = (
               const getLabel = () => propertyLabel;
               const getDescription = () => propertyDescription;
               const getExtraDescription = () => parameterName;
-              const advanced = property.isAdvanced();
+              const visibility: FieldVisibility = property.isAdvanced()
+                ? 'advanced'
+                : property.isDeprecated()
+                ? 'deprecated'
+                : 'basic';
               const defaultValue = property.getValue();
 
               if (valueType === 'number') {
@@ -65,7 +69,7 @@ export const enumerateEffectsMetadata = (
                   getLabel,
                   getDescription,
                   getExtraDescription,
-                  advanced,
+                  visibility,
                   defaultValue: parseFloat(defaultValue) || 0,
                 };
               } else if (valueType === 'boolean') {
@@ -81,7 +85,7 @@ export const enumerateEffectsMetadata = (
                   getLabel,
                   getDescription,
                   getExtraDescription,
-                  advanced,
+                  visibility,
                   defaultValue: defaultValue === 'true',
                 };
               } else if (valueType === 'resource') {
@@ -102,7 +106,7 @@ export const enumerateEffectsMetadata = (
                   getLabel,
                   getDescription,
                   getExtraDescription,
-                  advanced,
+                  visibility,
                   defaultValue,
                 };
               } else if (valueType === 'color') {
@@ -118,7 +122,7 @@ export const enumerateEffectsMetadata = (
                   getLabel,
                   getDescription,
                   getExtraDescription,
-                  advanced,
+                  visibility,
                   defaultValue,
                 };
               } else if (valueType === 'choice') {
@@ -148,7 +152,7 @@ export const enumerateEffectsMetadata = (
                   getLabel,
                   getDescription,
                   getExtraDescription,
-                  advanced,
+                  visibility,
                   defaultValue,
                 };
               } else {

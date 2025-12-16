@@ -200,14 +200,18 @@ const Effect = React.forwardRef(
     const basicPropertiesSchema = React.useMemo(
       () =>
         parametersSchema
-          ? parametersSchema.filter(param => param.valueType && !param.advanced)
+          ? parametersSchema.filter(
+              param => param.valueType && param.visibility !== 'advanced'
+            )
           : [],
       [parametersSchema]
     );
     const advancedPropertiesSchema = React.useMemo(
       () =>
         parametersSchema
-          ? parametersSchema.filter(param => param.valueType && param.advanced)
+          ? parametersSchema.filter(
+              param => param.valueType && param.visibility === 'advanced'
+            )
           : [],
       [parametersSchema]
     );

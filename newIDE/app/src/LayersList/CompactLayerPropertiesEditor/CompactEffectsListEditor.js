@@ -21,7 +21,6 @@ import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
 import ChevronArrowDownWithRoundedBorder from '../../UI/CustomSvgIcons/ChevronArrowDownWithRoundedBorder';
 import ChevronArrowRightWithRoundedBorder from '../../UI/CustomSvgIcons/ChevronArrowRightWithRoundedBorder';
 import Add from '../../UI/CustomSvgIcons/Add';
-import { CompactEffectPropertiesEditor } from '../../EffectsList/CompactEffectPropertiesEditor';
 import { mapFor } from '../../Utils/MapFor';
 import {
   getEnumeratedEffectMetadata,
@@ -34,6 +33,7 @@ import Window from '../../Utils/Window';
 import { textEllipsisStyle } from '../../UI/TextEllipsis';
 import Link from '../../UI/Link';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
+import { CompactPropertiesEditorByVisibility } from '../../CompactPropertiesEditor/CompactPropertiesEditorByVisibility';
 
 export const styles = {
   icon: {
@@ -189,6 +189,12 @@ const TopLevelCollapsibleSection = ({
   </>
 );
 
+const noRefreshOfAllFields = () => {
+  console.warn(
+    "An effect tried to refresh all fields, but the editor doesn't support it."
+  );
+};
+
 type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
@@ -333,13 +339,19 @@ export const CompactEffectsListEditor = ({
                         />
                       ))}
                     </CompactSelectField>
-                    <CompactEffectPropertiesEditor
-                      project={project}
-                      effect={effect}
-                      effectMetadata={effectMetadata}
-                      resourceManagementProps={resourceManagementProps}
-                      onPropertyModified={onEffectsUpdated}
-                    />
+                    {effectMetadata && (
+                      <CompactPropertiesEditorByVisibility
+                        project={project}
+                        schema={effectMetadata.parametersSchema}
+                        instances={[effect]}
+                        onInstancesModified={onEffectsUpdated}
+                        resourceManagementProps={resourceManagementProps}
+                        placeholder={
+                          <Trans>Nothing to configure for this effect.</Trans>
+                        }
+                        onRefreshAllFields={noRefreshOfAllFields}
+                      />
+                    )}
                   </ColumnStackLayout>
                 )}
                 isFolded={effect.isFolded()}

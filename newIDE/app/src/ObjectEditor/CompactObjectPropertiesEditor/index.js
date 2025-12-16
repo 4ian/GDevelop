@@ -57,6 +57,8 @@ import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { CompactEffectsListEditor } from '../../LayersList/CompactLayerPropertiesEditor/CompactEffectsListEditor';
 import { CompactPropertiesEditorByVisibility } from '../../CompactPropertiesEditor/CompactPropertiesEditorByVisibility';
+import propertiesMapToSchema from '../../CompactPropertiesEditor/PropertiesMapToCompactSchema';
+import { useForceRecompute } from '../../Utils/UseForceUpdate';
 
 const gd: libGDevelop = global.gd;
 
@@ -476,6 +478,37 @@ export const CompactObjectPropertiesEditor = ({
     ]
   );
 
+  const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
+
+  const propertiesSchema = React.useMemo(
+    () => {
+      if (schemaRecomputeTrigger) {
+        // schemaRecomputeTrigger allows to invalidate the schema when required.
+      }
+      const properties = objectConfigurationAsGd.getProperties();
+      return propertiesMapToSchema({
+        properties,
+        defaultValueProperties: customObjectEventsBasedObject
+          ? customObjectEventsBasedObject.getPropertyDescriptors()
+          : // We can't access default values for built-in objects.
+            null,
+        getProperties: ({ objectConfiguration }) =>
+          objectConfiguration.getProperties(),
+        onUpdateProperty: ({ objectConfiguration }, name, value) => {
+          objectConfiguration.updateProperty(name, value);
+        },
+        object,
+        visibility: 'All',
+      });
+    },
+    [
+      schemaRecomputeTrigger,
+      objectConfigurationAsGd,
+      object,
+      customObjectEventsBasedObject,
+    ]
+  );
+
   return (
     <ErrorBoundary
       componentTitle={<Trans>Object properties</Trans>}
@@ -530,19 +563,10 @@ export const CompactObjectPropertiesEditor = ({
                 <CompactPropertiesEditorByVisibility
                   project={project}
                   object={object}
-                  propertiesValues={objectConfigurationAsGd.getProperties()}
-                  getPropertyDefaultValue={propertyName => {
-                    const properties = customObjectEventsBasedObject
-                      ? customObjectEventsBasedObject.getPropertyDescriptors()
-                      // We can't access default values for built-in objects.
-                      // The current value is used to avoid to expand the
-                      // advanced properties. 
-                      : objectConfigurationAsGd.getProperties();
-                    return properties.has(propertyName)
-                      ? properties.get(propertyName).getValue()
-                      : '';
-                  }}
-                  instances={[objectConfigurationAsGd]}
+                  schema={propertiesSchema}
+                  instances={[
+                    { object, objectConfiguration: objectConfigurationAsGd },
+                  ]}
                   onInstancesModified={() => {
                     // TODO: undo/redo?
                   }}
@@ -556,6 +580,7 @@ export const CompactObjectPropertiesEditor = ({
                       onEditObject,
                     })
                   }
+                  onRefreshAllFields={forceRecomputeSchema}
                 />
                 {shouldDisplayVariant && (
                   <ColumnStackLayout noMargin noOverflowParent>

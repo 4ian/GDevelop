@@ -6,6 +6,8 @@ import { Trans } from '@lingui/macro';
 import { type Schema, type ActionButton } from '../../CompactPropertiesEditor';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import { CompactPropertiesEditorByVisibility } from '../../CompactPropertiesEditor/CompactPropertiesEditorByVisibility';
+import propertiesMapToSchema from '../../CompactPropertiesEditor/PropertiesMapToCompactSchema';
+import { useForceRecompute } from '../../Utils/UseForceUpdate';
 
 export const styles = {
   icon: {
@@ -68,26 +70,37 @@ export const CompactBehaviorPropertiesEditor = ({
 |}) => {
   const fullEditorLabel = behaviorMetadata.getOpenFullEditorLabel();
 
+  const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
+
+  const propertiesSchema = React.useMemo(
+    () => {
+      if (schemaRecomputeTrigger) {
+        // schemaRecomputeTrigger allows to invalidate the schema when required.
+      }
+      return propertiesMapToSchema({
+        properties: behavior.getProperties(),
+        defaultValueProperties: behaviorMetadata.getProperties(),
+        getProperties: instance => instance.getProperties(),
+        onUpdateProperty: (instance, name, value) => {
+          instance.updateProperty(name, value);
+        },
+        object,
+        visibility: 'All',
+      });
+    },
+    [schemaRecomputeTrigger, behavior, behaviorMetadata, object]
+  );
+
   return (
     <ColumnStackLayout expand noMargin noOverflowParent>
       <CompactPropertiesEditorByVisibility
         project={project}
         object={object}
-        propertiesValues={behavior.getProperties()}
-        getPropertyDefaultValue={propertyName => {
-          const properties = behaviorMetadata.getProperties();
-          return properties.has(propertyName)
-            ? properties.get(propertyName).getValue()
-            : '';
-        }}
+        schema={propertiesSchema}
         instances={[behavior]}
         onInstancesModified={onBehaviorUpdated}
         resourceManagementProps={resourceManagementProps}
-        placeholder={
-          <Trans>
-            Nothing to configure for this behavior.
-          </Trans>
-        }
+        placeholder={<Trans>Nothing to configure for this behavior.</Trans>}
         customizeBasicSchema={schema =>
           getSchemaWithOpenFullEditorButton({
             schema,
@@ -96,6 +109,7 @@ export const CompactBehaviorPropertiesEditor = ({
             onOpenFullEditor,
           })
         }
+        onRefreshAllFields={forceRecomputeSchema}
       />
     </ColumnStackLayout>
   );

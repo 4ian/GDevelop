@@ -38,6 +38,8 @@ import CompactLeaderboardIdPropertyField from './CompactLeaderboardIdPropertyFie
 export type Instance = Object; // This could be improved using generics.
 export type Instances = Array<Instance>;
 
+export type FieldVisibility = 'basic' | 'advanced' | 'deprecated';
+
 // "Value" fields are fields displayed in the properties.
 export type ValueFieldCommonProperties = {|
   name: string,
@@ -52,10 +54,8 @@ export type ValueFieldCommonProperties = {|
   onEditButtonClick?: () => void,
   getValueFromDisplayedValue?: string => string,
   getDisplayedValueFromValue?: string => string,
-
-  // Only used for effects for now:
-  advanced?: boolean,
-  defaultValue?: string | number | boolean,
+  visibility?: FieldVisibility | null,
+  defaultValue?: string | number | boolean | null,
 |};
 
 // "Primitive" value fields are "simple" fields.

@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
-import propertiesMapToSchema from './PropertiesMapToCompactSchema';
 import CompactPropertiesEditor from '.';
 import FlatButton from '../UI/FlatButton';
 import { ColumnStackLayout } from '../UI/Layout';
@@ -10,19 +9,97 @@ import ChevronArrowTop from '../UI/CustomSvgIcons/ChevronArrowTop';
 import ChevronArrowRight from '../UI/CustomSvgIcons/ChevronArrowRight';
 import Text from '../UI/Text';
 import { Line } from '../UI/Grid';
-import { useForceRecompute } from '../Utils/UseForceUpdate';
-import { type Schema, type ActionButton, type Instances } from '.';
+import {
+  type Schema,
+  type ActionButton,
+  type Instances,
+  type SectionTitle,
+  type Field,
+  type FieldVisibility,
+} from '.';
 import ShareExternal from '../UI/CustomSvgIcons/ShareExternal';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
-import {
-  areAdvancedPropertiesModified,
-  hasSchemaAnyProperty,
-} from '../PropertiesEditor/PropertiesEditorByVisibility';
+import { hasSchemaAnyProperty } from '../PropertiesEditor/PropertiesEditorByVisibility';
 
 export const styles = {
   icon: {
     fontSize: 18,
   },
+};
+
+const fieldVisibilitiesByPriority: Array<FieldVisibility | ''> = [
+  'basic',
+  'advanced',
+  'deprecated',
+  '',
+];
+
+const mergeFieldVisibility = (
+  visibility: FieldVisibility | '',
+  otherVisibility: FieldVisibility | ''
+) =>
+  fieldVisibilitiesByPriority[
+    Math.min(
+      fieldVisibilitiesByPriority.indexOf(visibility),
+      fieldVisibilitiesByPriority.indexOf(otherVisibility)
+    )
+  ];
+
+const getFieldVisibility = (field: Field): FieldVisibility | '' => {
+  if (field.children) {
+    let visibility: FieldVisibility | '' = '';
+    for (const child of field.children) {
+      visibility = mergeFieldVisibility(visibility, getFieldVisibility(child));
+      if (visibility === 'basic') {
+        return visibility;
+      }
+    }
+    return visibility;
+  } else if (field.visibility) {
+    return field.visibility || 'basic';
+  }
+  return '';
+};
+
+const filterSchema = (source: Schema, visibility: FieldVisibility) => {
+  const destination: Schema = [];
+  let holdingSectionTitle: SectionTitle | null = null;
+  for (const field of source) {
+    if (field.nonFieldType === 'sectionTitle') {
+      holdingSectionTitle = ((field: any): SectionTitle);
+    } else {
+      if ((getFieldVisibility(field) || 'basic') === visibility) {
+        if (holdingSectionTitle) {
+          destination.push(holdingSectionTitle);
+          holdingSectionTitle = null;
+        }
+        destination.push(field);
+      }
+    }
+  }
+  return destination;
+};
+
+const isAnyPropertyModified = (
+  schema: Schema,
+  instances: Instances
+): boolean => {
+  for (const field of schema) {
+    if (
+      !field.getValue ||
+      !field.setValue ||
+      field.defaultValue === undefined ||
+      field.defaultValue === null
+    ) {
+      continue;
+    }
+    const getValue = field.getValue;
+    const defaultValue = field.defaultValue;
+    if (instances.some(instance => getValue(instance) !== defaultValue)) {
+      return true;
+    }
+  }
+  return false;
 };
 
 export const getSchemaWithOpenFullEditorButton = ({
@@ -64,8 +141,7 @@ export const getSchemaWithOpenFullEditorButton = ({
 export const CompactPropertiesEditorByVisibility = ({
   onInstancesModified,
   instances,
-  propertiesValues,
-  getPropertyDefaultValue,
+  schema,
   placeholder,
   renderExtraDescriptionText,
   unsavedChanges,
@@ -75,15 +151,16 @@ export const CompactPropertiesEditorByVisibility = ({
   preventWrap,
   removeSpacers,
   customizeBasicSchema,
+  onRefreshAllFields,
 }: {|
   onInstancesModified?: Instances => void,
+  schema: Schema,
   instances: Instances,
-  propertiesValues: gdMapStringPropertyDescriptor,
-  getPropertyDefaultValue: (propertyName: string) => string,
   preventWrap?: boolean,
   removeSpacers?: boolean,
   customizeBasicSchema?: Schema => Schema,
   placeholder: React.Node,
+  onRefreshAllFields: () => void,
 
   // If set, render the "extra" description content from fields
   // (see getExtraDescription).
@@ -95,61 +172,34 @@ export const CompactPropertiesEditorByVisibility = ({
   object?: ?gdObject,
   resourceManagementProps?: ?ResourceManagementProps,
 |}) => {
-  const areAdvancedPropertiesExpandedByDefault = React.useMemo(
-    () =>
-      areAdvancedPropertiesModified(propertiesValues, getPropertyDefaultValue),
-    [getPropertyDefaultValue, propertiesValues]
-  );
-
-  const [showAdvancedOptions, setShowAdvancedOptions] = React.useState(
-    areAdvancedPropertiesExpandedByDefault
-  );
-  const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
-
   const basicPropertiesSchema = React.useMemo(
     () => {
-      if (schemaRecomputeTrigger) {
-        // schemaRecomputeTrigger allows to invalidate the schema when required.
-      }
-
-      const schema = propertiesMapToSchema({
-        properties: propertiesValues,
-        getProperties: instance => instance.getProperties(),
-        onUpdateProperty: (instance, name, value) => {
-          instance.updateProperty(name, value);
-        },
-        object,
-        visibility: 'Basic',
-      });
-
-      return customizeBasicSchema ? customizeBasicSchema(schema) : schema;
+      const basicSchema = filterSchema(schema, 'basic');
+      return customizeBasicSchema
+        ? customizeBasicSchema(basicSchema)
+        : basicSchema;
     },
-    [schemaRecomputeTrigger, propertiesValues, object, customizeBasicSchema]
+    [schema, customizeBasicSchema]
   );
 
   const advancedPropertiesSchema = React.useMemo(
-    () => {
-      if (schemaRecomputeTrigger) {
-        // schemaRecomputeTrigger allows to invalidate the schema when required.
-      }
-
-      return propertiesMapToSchema({
-        properties: propertiesValues,
-        getProperties: instance => instance.getProperties(),
-        onUpdateProperty: (instance, name, value) => {
-          instance.updateProperty(name, value);
-        },
-        object,
-        visibility: 'Advanced',
-      });
-    },
-    [object, propertiesValues, schemaRecomputeTrigger]
+    () => filterSchema(schema, 'advanced'),
+    [schema]
   );
   const hasAdvancedProperties = advancedPropertiesSchema.length > 0;
 
   const hasAnyProperty = React.useMemo(
     () => hasSchemaAnyProperty(basicPropertiesSchema) || hasAdvancedProperties,
     [basicPropertiesSchema, hasAdvancedProperties]
+  );
+
+  const areAdvancedPropertiesExpandedByDefault = React.useMemo(
+    () => isAnyPropertyModified(advancedPropertiesSchema, instances),
+    [instances, advancedPropertiesSchema]
+  );
+
+  const [showAdvancedOptions, setShowAdvancedOptions] = React.useState(
+    areAdvancedPropertiesExpandedByDefault
   );
 
   return (
@@ -168,7 +218,7 @@ export const CompactPropertiesEditorByVisibility = ({
           instances={instances}
           onInstancesModified={onInstancesModified}
           resourceManagementProps={resourceManagementProps}
-          onRefreshAllFields={forceRecomputeSchema}
+          onRefreshAllFields={onRefreshAllFields}
           renderExtraDescriptionText={renderExtraDescriptionText}
           unsavedChanges={unsavedChanges}
         />
@@ -191,7 +241,7 @@ export const CompactPropertiesEditorByVisibility = ({
           instances={instances}
           onInstancesModified={onInstancesModified}
           resourceManagementProps={resourceManagementProps}
-          onRefreshAllFields={forceRecomputeSchema}
+          onRefreshAllFields={onRefreshAllFields}
           renderExtraDescriptionText={renderExtraDescriptionText}
           unsavedChanges={unsavedChanges}
         />

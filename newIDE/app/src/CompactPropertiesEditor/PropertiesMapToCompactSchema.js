@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { mapFor, mapVector } from '../Utils/MapFor';
-import { type Schema, type Instance } from '.';
+import { type Schema, type Instance, type FieldVisibility } from '.';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
 import { type Field } from '.';
 import MeasurementUnitDocumentation from '../PropertiesEditor/MeasurementUnitDocumentation';
@@ -12,6 +12,7 @@ const gd: libGDevelop = global.gd;
 const createField = (
   name: string,
   property: gdPropertyDescriptor,
+  defaultValue: string | null,
   getProperties: (instance: Instance) => any,
   onUpdateProperty: (
     instance: Instance,
@@ -49,6 +50,11 @@ const createField = (
       ),
     };
   };
+  const visibility: FieldVisibility = property.isAdvanced()
+    ? 'advanced'
+    : property.isDeprecated()
+    ? 'deprecated'
+    : 'basic';
 
   const valueType = property.getType().toLowerCase();
   if (valueType === 'number') {
@@ -67,6 +73,7 @@ const createField = (
       setValue: (instance: Instance, newValue: number) => {
         onUpdateProperty(instance, name, '' + newValue);
       },
+      defaultValue: defaultValue ? parseFloat(defaultValue) || 0 : null,
       getLabel,
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
@@ -75,6 +82,7 @@ const createField = (
         .toJSArray()
         .includes('canBeUnlimitedUsingMinus1'),
       getEndAdornment,
+      visibility,
     };
   } else if (valueType === 'string' || valueType === '') {
     return {
@@ -88,9 +96,11 @@ const createField = (
       setValue: (instance: Instance, newValue: string) => {
         onUpdateProperty(instance, name, newValue);
       },
+      defaultValue,
       getLabel,
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
+      visibility,
     };
   } else if (valueType === 'boolean') {
     return {
@@ -106,9 +116,11 @@ const createField = (
       setValue: (instance: Instance, newValue: boolean) => {
         onUpdateProperty(instance, name, newValue ? '1' : '0');
       },
+      defaultValue: defaultValue ? defaultValue === 'true' : null,
       getLabel,
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
+      visibility,
     };
   } else if (valueType === 'choice') {
     // Choice is a "string" (with a selector for the user in the UI)
@@ -141,6 +153,7 @@ const createField = (
       getLabel,
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
+      visibility,
     };
   } else if (valueType === 'behavior') {
     const behaviorType =
@@ -174,6 +187,7 @@ const createField = (
       getLabel,
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
+      visibility,
     };
   } else if (valueType === 'leaderboardid') {
     // LeaderboardId is a "string" (with a selector in the UI)
@@ -191,6 +205,7 @@ const createField = (
       getLabel,
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
+      visibility,
     };
   } else if (valueType === 'resource') {
     // Resource is a "string" (with a selector in the UI)
@@ -212,6 +227,7 @@ const createField = (
       getLabel,
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
+      visibility,
     };
   } else if (valueType === 'color') {
     return {
@@ -228,6 +244,7 @@ const createField = (
       getLabel,
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
+      visibility,
     };
   } else if (valueType === 'multilinestring') {
     return {
@@ -244,6 +261,7 @@ const createField = (
       getLabel,
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
+      visibility,
     };
   } else if (valueType === 'objectanimationname') {
     return {
@@ -279,6 +297,7 @@ const createField = (
       },
       getLabel,
       getDescription,
+      visibility,
     };
   } else if (valueType === 'keyboardkey') {
     return {
@@ -302,6 +321,7 @@ const createField = (
       },
       getLabel,
       getDescription,
+      visibility,
     };
   } else {
     console.error(
@@ -417,6 +437,7 @@ const isPropertyVisible = ({
  */
 const propertiesMapToSchema = ({
   properties,
+  defaultValueProperties,
   getProperties,
   onUpdateProperty,
   object,
@@ -424,6 +445,10 @@ const propertiesMapToSchema = ({
   quickCustomizationVisibilities,
 }: {|
   properties: gdMapStringPropertyDescriptor,
+  defaultValueProperties:
+    | gdPropertiesContainer
+    | gdMapStringPropertyDescriptor
+    | null,
   getProperties: (instance: Instance) => any,
   onUpdateProperty: (
     instance: Instance,
@@ -520,10 +545,16 @@ const propertiesMapToSchema = ({
           ) {
             const rowProperty = rowProperties[index];
             const rowPropertyName = rowPropertyNames[index];
+            const rowPropertyDefaultValue = defaultValueProperties
+              ? defaultValueProperties.has(rowPropertyName)
+                ? defaultValueProperties.get(rowPropertyName).getValue()
+                : ''
+              : null;
 
             const field = createField(
               rowPropertyName,
               rowProperty,
+              rowPropertyDefaultValue,
               getProperties,
               onUpdateProperty,
               object
@@ -550,6 +581,11 @@ const propertiesMapToSchema = ({
       field = createField(
         name,
         property,
+        defaultValueProperties
+          ? defaultValueProperties.has(name)
+            ? defaultValueProperties.get(name).getValue()
+            : ''
+          : null,
         getProperties,
         onUpdateProperty,
         object

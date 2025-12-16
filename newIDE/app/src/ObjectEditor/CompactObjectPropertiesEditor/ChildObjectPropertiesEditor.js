@@ -64,6 +64,7 @@ export const ChildObjectPropertiesEditor = ({
       const properties = childObjectConfigurationAsGd.getProperties();
       const schema = propertiesMapToSchema({
         properties,
+        defaultValueProperties: null,
         getProperties: ({ object, objectConfiguration }) =>
           objectConfiguration.getProperties(),
         onUpdateProperty: ({ object, objectConfiguration }, name, value) =>
@@ -86,6 +87,7 @@ export const ChildObjectPropertiesEditor = ({
       const properties = childObjectConfigurationAsGd.getProperties();
       const schema = propertiesMapToSchema({
         properties,
+        defaultValueProperties: null,
         getProperties: ({ object, objectConfiguration }) =>
           objectConfiguration.getProperties(),
         onUpdateProperty: ({ object, objectConfiguration }, name, value) =>

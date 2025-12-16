@@ -335,6 +335,8 @@ namespace gdjs {
   /**
    * Register a function to be called each time a scene is stepped (i.e: at every frame),
    * before events are run.
+   *
+   * @see {@link gdjs.registerRuntimeScenePostEventsCallback}
    * @param callback The function to be called.
    */
   export const registerRuntimeScenePreEventsCallback = function (
@@ -346,7 +348,49 @@ namespace gdjs {
   /**
    * Register a function to be called each time a scene is stepped (i.e: at every frame),
    * after events are run and before rendering.
-   * @param callback The function to be called.
+   *
+   * This is the recommended way to synchronize state changes with GDevelop's game loop,
+   * rather than using browser APIs like `requestAnimationFrame`. The game engine owns
+   * the game loop and controls the order of execution, so browser APIs may not sync
+   * reliably with frame timing.
+   *
+   * ## Use case: Implementing trigger-like conditions
+   *
+   * When creating conditions that should act as "triggers" (true for one frame, then
+   * automatically false), use this callback to reset flags at frame end. This ensures
+   * the flag will:
+   * 1. Remain true throughout the current frame (so conditions can detect it)
+   * 2. Be reset to false before the next frame begins
+   *
+   * ### Why this works reliably
+   *
+   * JavaScript is single-threaded, and asynchronous operations (promises, setTimeout,
+   * etc.) only execute between frames, never during frame execution. This means:
+   * - A frame runs completely (behaviors update → events run → this callback → render)
+   * - Async operations (like Promise resolutions) run after the frame completes
+   * - If an async operation sets a flag to true, it stays true until this callback
+   *   resets it at the end of the next frame
+   *
+   * ### Example usage
+   * ```js
+   * // In your extension initialization. Only do this once.
+   * gdjs.registerRuntimeScenePostEventsCallback((runtimeScene) => {
+   *   // Reset trigger flags after events have been processed
+   *   myExtension._dataRequestCompleted = false;
+   * });
+   *
+   * // When some async operation completes (probably in an action or somewhere else):
+   * doSomething().then((data) => {
+   *   myExtension._dataRequestCompleted = true; // Will be true for one frame
+   * });
+   *
+   * // or using await:
+   * const data = await doSomething();
+   * myExtension._dataRequestCompleted = true; // Will be true for one frame
+   * ```
+   *
+   * @param callback The function to be called after events and before rendering each frame.
+   *                 Receives the RuntimeScene as parameter.
    */
   export const registerRuntimeScenePostEventsCallback = function (
     callback: RuntimeSceneCallback

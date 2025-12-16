@@ -13,7 +13,6 @@ import {
   type Schema,
   type ActionButton,
   type Instances,
-  type SectionTitle,
   type Field,
   type FieldVisibility,
 } from '.';
@@ -61,26 +60,26 @@ const getFieldVisibility = (field: Field): FieldVisibility | '' => {
   return '';
 };
 
-const filterSchema = (source: Schema, visibility: FieldVisibility) => {
+export const filterSchema = (source: Schema, visibility: FieldVisibility) => {
   const destination: Schema = [];
-  let holdingSectionTitle: SectionTitle | null = null;
   for (const field of source) {
-    if (field.nonFieldType === 'sectionTitle') {
-      holdingSectionTitle = ((field: any): SectionTitle);
-    } else {
+    if (field.children) {
+      const children = filterSchema(field.children, visibility);
+      if (children.length > 0) {
+        destination.push({ ...field, children });
+      }
+    } else if (field.getValue && field.setValue) {
       if ((getFieldVisibility(field) || 'basic') === visibility) {
-        if (holdingSectionTitle) {
-          destination.push(holdingSectionTitle);
-          holdingSectionTitle = null;
-        }
         destination.push(field);
       }
+    } else {
+      destination.push(field);
     }
   }
   return destination;
 };
 
-const isAnyPropertyModified = (
+export const isAnyPropertyModified = (
   schema: Schema,
   instances: Instances
 ): boolean => {

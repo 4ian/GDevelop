@@ -151,19 +151,21 @@ const ScenePropertiesDialog = ({
 
       if (isNullPtr(gd, behaviorSharedData)) return null;
 
-      const properties = behaviorSharedData.getProperties();
-      const propertiesSchema = propertiesMapToSchema(
-        properties,
-        sharedDataContent => behaviorSharedData.getProperties(),
-        (sharedDataContent, name, value) => {
-          behaviorSharedData.updateProperty(name, value);
-        }
-      );
       const behaviorTypeName = behaviorSharedData.getTypeName();
 
       const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
         gd.JsPlatform.get(),
         behaviorTypeName
+      );
+
+      const properties = behaviorSharedData.getProperties();
+      const propertiesSchema = propertiesMapToSchema(
+        properties,
+        behaviorMetadata ? behaviorMetadata.getSharedProperties() : null,
+        sharedDataContent => behaviorSharedData.getProperties(),
+        (sharedDataContent, name, value) => {
+          behaviorSharedData.updateProperty(name, value);
+        }
       );
       const tutorialIds = getBehaviorTutorialIds(behaviorTypeName);
       // TODO Make this a functional component to use PreferencesContext

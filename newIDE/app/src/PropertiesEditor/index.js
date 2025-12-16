@@ -48,6 +48,7 @@ export type {
   SectionTitle,
   ResourceField,
   Field,
+  FieldVisibility,
 } from '../CompactPropertiesEditor';
 
 // An "instance" here is the objects for which properties are shown

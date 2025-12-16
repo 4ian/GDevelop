@@ -41,6 +41,7 @@ const ObjectPropertiesEditor = (props: Props) => {
 
   const propertiesSchema = propertiesMapToSchema(
     properties,
+    null,
     object => object.getProperties(),
     (object, name, value) => object.updateProperty(name, value)
   );

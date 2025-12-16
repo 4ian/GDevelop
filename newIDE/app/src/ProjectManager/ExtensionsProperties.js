@@ -22,6 +22,7 @@ function ExtensionsProperties(props: Props) {
     if (properties.keys().size() === 0) continue;
     const propertiesSchema = propertiesMapToSchema(
       properties,
+      null,
       instance =>
         project
           .getExtensionProperties()

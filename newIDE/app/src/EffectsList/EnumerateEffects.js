@@ -49,10 +49,10 @@ export const enumerateEffectsMetadata = (
               const getLabel = () => propertyLabel;
               const getDescription = () => propertyDescription;
               const getExtraDescription = () => parameterName;
-              const visibility: FieldVisibility = property.isAdvanced()
-                ? 'advanced'
-                : property.isDeprecated()
+              const visibility: FieldVisibility = property.isDeprecated()
                 ? 'deprecated'
+                : property.isAdvanced()
+                ? 'advanced'
                 : 'basic';
               const defaultValue = property.getValue();
 

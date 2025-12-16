@@ -63,6 +63,7 @@ import {
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 import { MarkdownText } from '../../../UI/MarkdownText';
 import ResponsiveFlatButton from '../../../UI/ResponsiveFlatButton';
+import propertiesMapToSchema from '../../../PropertiesEditor/PropertiesMapToSchema';
 
 const gd: libGDevelop = global.gd;
 
@@ -431,6 +432,23 @@ const CustomObjectPropertiesEditor = (props: Props) => {
     customObjectConfiguration
   );
 
+  const schema = React.useMemo(
+    () =>
+      propertiesMapToSchema(
+        customObjectConfiguration.getProperties(),
+        customObjectEventsBasedObject
+          ? customObjectEventsBasedObject.getPropertyDescriptors()
+          : null,
+        instance => instance.getProperties(),
+        (instance, name, value) => {
+          instance.updateProperty(name, value);
+        },
+        object,
+        'All'
+      ),
+    [customObjectConfiguration, customObjectEventsBasedObject, object]
+  );
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -460,16 +478,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                   <PropertiesEditorByVisibility
                     project={project}
                     object={object}
-                    propertiesValues={customObjectConfiguration.getProperties()}
-                    getPropertyDefaultValue={propertyName => {
-                      if (!customObjectEventsBasedObject) {
-                        return '';
-                      }
-                      const properties = customObjectEventsBasedObject.getPropertyDescriptors();
-                      return properties.has(propertyName)
-                        ? properties.get(propertyName).getValue()
-                        : '';
-                    }}
+                    schema={schema}
                     instances={[customObjectConfiguration]}
                     unsavedChanges={unsavedChanges}
                     resourceManagementProps={resourceManagementProps}

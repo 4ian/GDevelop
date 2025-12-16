@@ -50,10 +50,10 @@ const createField = (
       ),
     };
   };
-  const visibility: FieldVisibility = property.isAdvanced()
-    ? 'advanced'
-    : property.isDeprecated()
+  const visibility: FieldVisibility = property.isDeprecated()
     ? 'deprecated'
+    : property.isAdvanced()
+    ? 'advanced'
     : 'basic';
 
   const valueType = property.getType().toLowerCase();

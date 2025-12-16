@@ -5,6 +5,7 @@ import * as React from 'react';
 import PropertiesEditorByVisibility from '../../PropertiesEditor/PropertiesEditorByVisibility';
 import { type BehaviorEditorProps } from './BehaviorEditorProps.flow';
 import { Column } from '../../UI/Grid';
+import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 
 const gd: libGDevelop = global.gd;
 
@@ -22,18 +23,28 @@ const BehaviorPropertiesEditor = ({
     gd.JsPlatform.get(),
     behavior.getTypeName()
   );
+
+  const schema = React.useMemo(
+    () =>
+      propertiesMapToSchema(
+        behavior.getProperties(),
+        behaviorMetadata.getProperties(),
+        instance => instance.getProperties(),
+        (instance, name, value) => {
+          instance.updateProperty(name, value);
+        },
+        object,
+        'All'
+      ),
+    [behavior, behaviorMetadata, object]
+  );
+
   return (
     <Column expand>
       <PropertiesEditorByVisibility
         project={project}
         object={object}
-        propertiesValues={behavior.getProperties()}
-        getPropertyDefaultValue={propertyName => {
-          const properties = behaviorMetadata.getProperties();
-          return properties.has(propertyName)
-            ? properties.get(propertyName).getValue()
-            : '';
-        }}
+        schema={schema}
         instances={[behavior]}
         onInstancesModified={onBehaviorUpdated}
         resourceManagementProps={resourceManagementProps}

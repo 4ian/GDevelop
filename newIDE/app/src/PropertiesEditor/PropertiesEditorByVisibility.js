@@ -6,41 +6,19 @@ import PropertiesEditor, {
   type Schema,
   type Instances,
 } from '../PropertiesEditor';
-import propertiesMapToSchema from '../PropertiesEditor/PropertiesMapToSchema';
 import EmptyMessage from '../UI/EmptyMessage';
 import { Column, Line } from '../UI/Grid';
 import FlatButton from '../UI/FlatButton';
 import Text from '../UI/Text';
 import { Accordion, AccordionHeader, AccordionBody } from '../UI/Accordion';
-import { mapFor } from '../Utils/MapFor';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { ColumnStackLayout } from '../UI/Layout';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
-
-export const areAdvancedPropertiesModified = (
-  propertiesValues: gdMapStringPropertyDescriptor,
-  getPropertyDefaultValue: (propertyName: string) => string
-) => {
-  const propertyNames = propertiesValues.keys();
-  let hasFoundModifiedAdvancedProperty = false;
-  mapFor(0, propertyNames.size(), i => {
-    const name = propertyNames.at(i);
-    const property = propertiesValues.get(name);
-    const currentValue = property.getValue();
-    const defaultValue = getPropertyDefaultValue(name);
-
-    // Some boolean properties can be set to an empty string to mean false.
-    const hasDefaultValue =
-      property.getType().toLowerCase() === 'boolean'
-        ? (currentValue === 'true') === (defaultValue === 'true')
-        : currentValue === defaultValue;
-    if (property.isAdvanced() && !hasDefaultValue) {
-      hasFoundModifiedAdvancedProperty = true;
-    }
-  });
-  return hasFoundModifiedAdvancedProperty;
-};
+import {
+  filterSchema,
+  isAnyPropertyModified,
+} from '../CompactPropertiesEditor/CompactPropertiesEditorByVisibility';
 
 export const hasSchemaAnyProperty = (propertiesSchema: Schema) =>
   !propertiesSchema.every(
@@ -53,8 +31,7 @@ export const hasSchemaAnyProperty = (propertiesSchema: Schema) =>
 type Props = {|
   onInstancesModified?: Instances => void,
   instances: Instances,
-  propertiesValues: gdMapStringPropertyDescriptor,
-  getPropertyDefaultValue: (propertyName: string) => string,
+  schema: Schema,
   placeholder: React.Node,
 
   // If set, render the "extra" description content from fields
@@ -72,8 +49,7 @@ type Props = {|
 const PropertiesEditorByVisibility = ({
   onInstancesModified,
   instances,
-  propertiesValues,
-  getPropertyDefaultValue,
+  schema,
   object,
   renderExtraDescriptionText,
   unsavedChanges,
@@ -88,51 +64,18 @@ const PropertiesEditorByVisibility = ({
   ] = React.useState<boolean>(false);
 
   const basicPropertiesSchema = React.useMemo(
-    () =>
-      propertiesMapToSchema(
-        propertiesValues,
-        instance => instance.getProperties(),
-        (instance, name, value) => {
-          instance.updateProperty(name, value);
-        },
-        object,
-        'Basic'
-      ),
-    [propertiesValues, object]
+    () => filterSchema(schema, 'basic'),
+    [schema]
   );
 
-  const areAdvancedPropertiesExpandedByDefault = React.useMemo(
-    () =>
-      areAdvancedPropertiesModified(propertiesValues, getPropertyDefaultValue),
-    [getPropertyDefaultValue, propertiesValues]
+  const advancedPropertiesSchema = React.useMemo(
+    () => filterSchema(schema, 'advanced'),
+    [schema]
   );
 
-  const advancedPropertiesSchema = React.useMemo<Schema>(
-    () =>
-      propertiesMapToSchema(
-        propertiesValues,
-        instance => instance.getProperties(),
-        (instance, name, value) => {
-          instance.updateProperty(name, value);
-        },
-        object,
-        'Advanced'
-      ),
-    [propertiesValues, object]
-  );
-
-  const deprecatedPropertiesSchema = React.useMemo<Schema>(
-    () =>
-      propertiesMapToSchema(
-        propertiesValues,
-        instance => instance.getProperties(),
-        (instance, name, value) => {
-          instance.updateProperty(name, value);
-        },
-        object,
-        'Deprecated'
-      ),
-    [propertiesValues, object]
+  const deprecatedPropertiesSchema = React.useMemo(
+    () => filterSchema(schema, 'deprecated'),
+    [schema]
   );
 
   const hasAnyProperty = React.useMemo(
@@ -145,6 +88,11 @@ const PropertiesEditorByVisibility = ({
       advancedPropertiesSchema,
       deprecatedPropertiesSchema,
     ]
+  );
+
+  const areAdvancedPropertiesExpandedByDefault = React.useMemo(
+    () => isAnyPropertyModified(advancedPropertiesSchema, instances),
+    [instances, advancedPropertiesSchema]
   );
 
   return hasAnyProperty ? (

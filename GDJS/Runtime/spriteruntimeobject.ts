@@ -4,7 +4,11 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
-  /** Represents the data of a {@link gdjs.SpriteRuntimeObject}. */
+  /**
+   * Represents the data of a {@link gdjs.SpriteRuntimeObject}.
+   * @group Objects
+   * @category Sprite
+   */
   export type SpriteObjectDataType = {
     /** Update the object even if he is not visible?. */
     updateIfNotVisible: boolean;
@@ -14,8 +18,16 @@ namespace gdjs {
     animations: Array<SpriteAnimationData>;
   };
 
+  /**
+   * @group Objects
+   * @category Sprite
+   */
   export type SpriteObjectData = ObjectData & SpriteObjectDataType;
 
+  /**
+   * @group Objects
+   * @category Sprite
+   */
   export type SpriteNetworkSyncDataType = {
     anim: SpriteAnimatorNetworkSyncData;
     ifx: boolean;
@@ -26,11 +38,17 @@ namespace gdjs {
     color: string;
   };
 
+  /**
+   * @group Objects
+   * @category Sprite
+   */
   export type SpriteNetworkSyncData = ObjectNetworkSyncData &
     SpriteNetworkSyncDataType;
 
   /**
    * The SpriteRuntimeObject represents an object that can display images.
+   * @group Objects
+   * @category Sprite
    */
   export class SpriteRuntimeObject
     extends gdjs.RuntimeObject

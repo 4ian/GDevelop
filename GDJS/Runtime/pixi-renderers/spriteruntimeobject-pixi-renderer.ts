@@ -4,6 +4,9 @@ namespace gdjs {
   }
   /**
    * The renderer for a gdjs.SpriteRuntimeObject using Pixi.js.
+   * @group Objects
+   * @category Sprite
+   * @group Renderers
    */
   export class SpriteRuntimeObjectPixiRenderer {
     _object: gdjs.SpriteRuntimeObject;

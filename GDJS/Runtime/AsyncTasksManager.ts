@@ -4,18 +4,50 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  /**
+   * @group Core Engine
+   * @group Multiplayer and synchronization
+   * @category Async Tasks
+   */
   export type WaitTaskNetworkSyncData = {
     type: 'wait';
     duration: float;
     timeElapsedOnScene: float;
   };
+  /**
+   * @group Core Engine
+   * @group Multiplayer and synchronization
+   * @category Async Tasks
+   */
   export type ResolveTaskNetworkSyncData = null;
+  /**
+   * @group Core Engine
+   * @group Multiplayer and synchronization
+   * @category Async Tasks
+   */
   export type PromiseTaskNetworkSyncData = null;
+  /**
+   * @group Core Engine
+   * @group Multiplayer and synchronization
+   * @category Async Tasks
+   */
   export type ManuallyResolvableTaskNetworkSyncData = null;
+
+  /**
+   * @group Core Engine
+   * @group Multiplayer and synchronization
+   * @category Async Tasks
+   */
   export type TaskGroupNetworkSyncData = {
     type: 'group';
     tasks: AsyncTaskNetworkSyncData[];
   };
+
+  /**
+   * @group Core Engine
+   * @group Multiplayer and synchronization
+   * @category Async Tasks
+   */
   export type AsyncTaskNetworkSyncData =
     | WaitTaskNetworkSyncData
     | TaskGroupNetworkSyncData
@@ -23,6 +55,11 @@ namespace gdjs {
     | ManuallyResolvableTaskNetworkSyncData
     | ResolveTaskNetworkSyncData;
 
+  /**
+   * @group Core Engine
+   * @group Multiplayer and synchronization
+   * @category Async Tasks
+   */
   export type AsyncTasksManagerNetworkSyncData = {
     tasks: Array<{
       callbackId: string;
@@ -35,6 +72,8 @@ namespace gdjs {
    * This stores all asynchronous tasks waiting to be completed,
    * for a given scene.
    * @see {@link RuntimeScene.getAsyncTasksManager}.
+   * @group Core Engine
+   * @category Async Tasks
    */
   export class AsyncTasksManager {
     /**
@@ -174,6 +213,8 @@ namespace gdjs {
 
   /**
    * An asynchronous task to be run between frames.
+   * @group Core Engine
+   * @category Async Tasks
    */
   export abstract class AsyncTask {
     /**
@@ -190,6 +231,10 @@ namespace gdjs {
     ): void;
   }
 
+  /**
+   * @group Core Engine
+   * @category Async Tasks
+   */
   export class TaskGroup extends AsyncTask {
     private tasks = new Array<AsyncTask>();
 
@@ -243,6 +288,10 @@ namespace gdjs {
     }
   }
 
+  /**
+   * @group Core Engine
+   * @category Async Tasks
+   */
   export class ResolveTask extends AsyncTask {
     update() {
       return true;
@@ -259,6 +308,8 @@ namespace gdjs {
 
   /**
    * A task that resolves with a promise.
+   * @group Core Engine
+   * @category Async Tasks
    */
   export class PromiseTask<ResultType = void> extends AsyncTask {
     private isResolved: boolean = false;
@@ -296,6 +347,10 @@ ${error ? 'The following error was thrown: ' + error : ''}`
     updateFromNetworkSyncData(syncData: AsyncTaskNetworkSyncData): void {}
   }
 
+  /**
+   * @group Core Engine
+   * @category Async Tasks
+   */
   export class ManuallyResolvableTask extends AsyncTask {
     private isResolved = false;
 

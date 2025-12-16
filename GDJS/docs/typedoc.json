@@ -12,6 +12,12 @@
   "validation": {
     "invalidLink": true
   },
+  "categorizeByGroup": true,
+  "navigation": {
+    "includeCategories": true,
+    "includeGroups": true,
+    "includeFolders": true
+  },
   "out": "../../docs/GDJS Runtime Documentation",
   "sort": ["visibility", "alphabetical"],
   "name": "GDevelop JavaScript game engine",

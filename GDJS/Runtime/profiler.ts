@@ -1,8 +1,16 @@
 namespace gdjs {
+  /**
+   * @group Debugging
+   * @category Profiler
+   */
   export type ProfilerStats = {
     framesCount: integer;
   };
 
+  /**
+   * @group Debugging
+   * @category Profiler
+   */
   export type FrameMeasure = {
     parent: FrameMeasure | null;
     time: float;
@@ -12,6 +20,8 @@ namespace gdjs {
 
   /**
    * A basic profiling tool that can be used to measure time spent in sections of the engine.
+   * @group Debugging
+   * @category Profiler
    */
   export class Profiler {
     /** All the measures for the last frames */

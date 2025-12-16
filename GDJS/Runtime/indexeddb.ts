@@ -4,6 +4,10 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  /**
+   * @group Core Engine
+   * @category Storage
+   */
   export namespace indexedDb {
     export const loadFromIndexedDB = async function (
       dbName: string,

@@ -38,6 +38,7 @@ namespace gdjs {
 
   /**
    * PixiImageManager loads and stores textures that can be used by the Pixi.js renderers.
+   * @group Resources
    */
   export class PixiImageManager implements gdjs.ResourceManager {
     /**

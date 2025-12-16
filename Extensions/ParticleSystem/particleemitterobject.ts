@@ -5,6 +5,10 @@
  */
 
 namespace gdjs {
+  /**
+   * @group Objects
+   * @category Particle Emitter
+   */
   export type ParticleEmitterObjectDataType = {
     /**
      * @deprecated Data not used
@@ -54,6 +58,11 @@ namespace gdjs {
   export type ParticleEmitterObjectData = ObjectData &
     ParticleEmitterObjectDataType;
 
+  /**
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category Particle Emitter
+   */
   export type ParticleEmitterObjectNetworkSyncDataType = {
     // Technically, all attributes can change at runtime, so we sync as many as possible.
     // TODO: ensure we only send props that change to optimize the sync.
@@ -102,6 +111,9 @@ namespace gdjs {
 
   /**
    * Displays particles.
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category Particle Emitter
    */
   export class ParticleEmitterObject extends gdjs.RuntimeObject {
     /**

@@ -7,6 +7,8 @@ namespace gdjs {
   export namespace evtTools {
     /**
      * Tools related to window, for events generated code.
+     * @group Core Engine
+     * @category Window
      */
     export namespace window {
       export const setMargins = function (

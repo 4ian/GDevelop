@@ -5,6 +5,11 @@ Copyright (c) 2010-2023 Florian Rival (Florian.Rival@gmail.com)
 namespace gdjs {
   const logger = new gdjs.Logger('Tween');
 
+  /**
+   * @group Behaviors
+   * @group Multiplayer and synchronization
+   * @category Tween
+   */
   interface TweenBehaviorNetworkSyncDataType {
     tweenManager: TweenManagerNetworkSyncData;
   }
@@ -367,6 +372,11 @@ namespace gdjs {
       return () => {};
     };
 
+  /**
+   * @group Behaviors
+   * @group Multiplayer and synchronization
+   * @category Tween
+   */
   export class TweenRuntimeBehavior extends gdjs.RuntimeBehavior {
     private _tweens = new gdjs.evtTools.tween.TweenManager();
     private _isActive: boolean = true;

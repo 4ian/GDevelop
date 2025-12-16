@@ -7,6 +7,8 @@ namespace gdjs {
   export namespace evtTools {
     /**
      * A namespace of functional equivalents to the gdjs.Variable methods, needed for events code generation.
+     * @group Core Engine
+     * @category Variables
      * @private
      * @namespace
      */

@@ -1,4 +1,9 @@
 namespace gdjs {
+  /**
+   * @group Objects
+   * @group Renderers
+   * @category Text Entry
+   */
   class TextEntryRuntimeObjectPixiRenderer {
     _object: gdjs.TextEntryRuntimeObject;
     _pressHandler: any;

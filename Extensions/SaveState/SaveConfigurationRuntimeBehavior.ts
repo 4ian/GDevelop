@@ -1,6 +1,10 @@
 namespace gdjs {
   // const logger = new gdjs.Logger('Save State');
 
+  /**
+   * @group Behaviors
+   * @category Save State
+   */
   export class SaveConfigurationRuntimeBehavior extends gdjs.RuntimeBehavior {
     private readonly _defaultProfilePersistence: 'Persisted' | 'DoNotSave' =
       'Persisted';

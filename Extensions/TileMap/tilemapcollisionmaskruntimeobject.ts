@@ -1,5 +1,9 @@
 /// <reference path="helper/TileMapHelper.d.ts" />
 namespace gdjs {
+  /**
+   * @group Objects
+   * @category Tile Map
+   */
   export type TilemapCollisionMaskObjectDataType = {
     content: {
       tilemapJsonFile: string;
@@ -17,6 +21,11 @@ namespace gdjs {
   export type TilemapCollisionMaskObjectData = ObjectData &
     TilemapCollisionMaskObjectDataType;
 
+  /**
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category Tile Map
+   */
   export type TilemapCollisionMaskNetworkSyncDataType = {
     tmjf: string;
     tsjf: string;
@@ -34,6 +43,9 @@ namespace gdjs {
   /**
    * An object that handle hitboxes for a tile map.
    * @extends gdjs.RuntimeObject
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category Tile Map
    */
   export class TileMapCollisionMaskRuntimeObject
     extends gdjs.RuntimeObject

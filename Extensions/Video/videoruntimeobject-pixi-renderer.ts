@@ -3,6 +3,9 @@ namespace gdjs {
 
   /**
    * The PIXI.js renderer for the VideoRuntimeObject.
+   * @group Objects
+   * @group Renderers
+   * @category Video
    */
   export class VideoRuntimeObjectPixiRenderer {
     _object: gdjs.VideoRuntimeObject;

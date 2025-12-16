@@ -5,6 +5,9 @@
  */
 namespace gdjs {
   export namespace evtTools {
+    /**
+     * @group Audio
+     */
     export namespace sound {
       export const getGlobalVolume = function (
         runtimeScene: gdjs.RuntimeScene

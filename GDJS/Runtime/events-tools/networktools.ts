@@ -5,6 +5,10 @@
  */
 namespace gdjs {
   export namespace evtTools {
+    /**
+     * @group Core Engine
+     * @category Network
+     */
     export namespace network {
       /**
        * Send an asynchronous request to the specified URL, with the specified (text)

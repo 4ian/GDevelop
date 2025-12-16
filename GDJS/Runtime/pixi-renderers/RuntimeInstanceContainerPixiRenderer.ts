@@ -6,6 +6,7 @@
 namespace gdjs {
   /**
    * A render for instance container.
+   * @group Renderers
    *
    * @see gdjs.RuntimeInstanceContainer
    */

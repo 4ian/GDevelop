@@ -6,10 +6,18 @@
 namespace gdjs {
   const logger = new gdjs.Logger('CustomRuntimeObject');
 
+  /**
+   * @group Objects
+   * @category Custom Objects
+   */
   export type ObjectConfiguration = {
     content: any;
   };
 
+  /**
+   * @group Objects
+   * @category Custom Objects
+   */
   export type CustomObjectConfiguration = ObjectConfiguration & {
     animatable?: SpriteAnimationData[];
     variant: string;
@@ -17,6 +25,11 @@ namespace gdjs {
     isInnerAreaFollowingParentSize: boolean;
   };
 
+  /**
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category Custom Objects
+   */
   export type CustomObjectNetworkSyncDataType = {
     anim?: SpriteAnimatorNetworkSyncData;
     ifx: boolean;
@@ -27,6 +40,11 @@ namespace gdjs {
     cc?: [float, float];
   };
 
+  /**
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category Custom Objects
+   */
   export type CustomObjectNetworkSyncData = ObjectNetworkSyncData &
     CustomObjectNetworkSyncDataType;
 
@@ -36,6 +54,9 @@ namespace gdjs {
    * This is the base class for objects generated from EventsBasedObject.
    *
    * @see gdjs.CustomRuntimeObjectInstanceContainer
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category Custom Objects
    */
   export abstract class CustomRuntimeObject
     extends gdjs.RuntimeObject

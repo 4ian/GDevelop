@@ -16,6 +16,8 @@ namespace gdjs {
      *
      * These objects are persisted into the environment `localStorage` - which
      * might not always be available (if not, objects won't be persisted).
+     * @group Core Engine
+     * @category Storage
      */
     export namespace storage {
       let localStorage: Storage | null = null;

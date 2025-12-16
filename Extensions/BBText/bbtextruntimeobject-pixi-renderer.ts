@@ -1,6 +1,9 @@
 namespace gdjs {
   /**
    * The PIXI.js renderer for the BBCode Text runtime object.
+   * @group Objects
+   * @group Renderers
+   * @category BBText
    */
   export class BBTextRuntimeObjectPixiRenderer {
     _object: gdjs.BBTextRuntimeObject;

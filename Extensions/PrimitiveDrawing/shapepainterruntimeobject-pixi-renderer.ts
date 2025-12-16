@@ -1,4 +1,9 @@
 namespace gdjs {
+  /**
+   * @group Objects
+   * @group Renderers
+   * @category Shape Painter
+   */
   class ShapePainterRuntimeObjectPixiRenderer {
     _object: gdjs.ShapePainterRuntimeObject;
     _graphics: PIXI.Graphics;

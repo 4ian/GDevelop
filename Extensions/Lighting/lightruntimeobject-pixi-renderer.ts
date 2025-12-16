@@ -3,6 +3,9 @@ namespace gdjs {
 
   /**
    * Pixi renderer for light runtime objects.
+   * @group Objects
+   * @group Renderers
+   * @category Light
    */
   export class LightRuntimeObjectPixiRenderer {
     _object: gdjs.LightRuntimeObject;

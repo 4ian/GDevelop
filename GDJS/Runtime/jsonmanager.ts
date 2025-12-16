@@ -6,7 +6,11 @@
 namespace gdjs {
   const logger = new gdjs.Logger('JSON Manager');
 
-  /** The callback called when a json that was requested is loaded (or an error occurred). */
+  /**
+   * The callback called when a json that was requested is loaded (or an error occurred).
+   * @group Resources
+   * @category JSON
+   */
   export type JsonManagerRequestCallback = (
     error: Error | null,
     content: Object | null
@@ -20,6 +24,8 @@ namespace gdjs {
    * Contrary to audio/fonts, json files are loaded asynchronously, when requested.
    * You should properly handle errors, and give the developer/player a way to know
    * that loading failed.
+   * @group Resources
+   * @category JSON
    */
   export class JsonManager implements gdjs.ResourceManager {
     _resourceLoader: ResourceLoader;

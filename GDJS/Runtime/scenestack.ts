@@ -20,6 +20,8 @@ namespace gdjs {
 
   /**
    * Hold the stack of scenes ({@link gdjs.RuntimeScene}) being played.
+   * @group Core Engine
+   * @category Runtime Scene
    */
   export class SceneStack {
     _runtimeGame: gdjs.RuntimeGame;

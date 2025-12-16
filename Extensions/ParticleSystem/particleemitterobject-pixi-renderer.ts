@@ -14,6 +14,11 @@ namespace gdjs {
     first.next.value = endValue;
   };
 
+  /**
+   * @group Objects
+   * @group Renderers
+   * @category Particle Emitter
+   */
   export class ParticleEmitterObjectPixiRenderer {
     renderer: PIXI.Container;
     emitter: PIXI.particles.Emitter;

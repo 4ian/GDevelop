@@ -1,6 +1,11 @@
 /// <reference path="./jolt-physics.d.ts" />
 
 namespace gdjs {
+  /**
+   * @group Behaviors
+   * @group Multiplayer and synchronization
+   * @category Physics 3D Car
+   */
   interface PhysicsCar3DNetworkSyncDataType {
     lek: boolean;
     rik: boolean;
@@ -23,6 +28,11 @@ namespace gdjs {
     behavior: gdjs.Physics3DRuntimeBehavior;
   };
 
+  /**
+   * @group Behaviors
+   * @group Multiplayer and synchronization
+   * @category Physics 3D Car
+   */
   export class PhysicsCar3DRuntimeBehavior
     extends gdjs.RuntimeBehavior
     implements gdjs.Physics3DRuntimeBehavior.Physics3DHook

@@ -4,6 +4,10 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  /**
+   * @group Core Engine
+   * @category Layers
+   */
   export enum RuntimeLayerRenderingType {
     TWO_D,
     THREE_D,
@@ -19,6 +23,10 @@ namespace gdjs {
         ? RuntimeLayerRenderingType.TWO_D_PLUS_THREE_D
         : RuntimeLayerRenderingType.TWO_D;
 
+  /**
+   * @group Core Engine
+   * @category Layers
+   */
   export enum RuntimeLayerCameraType {
     PERSPECTIVE,
     ORTHOGRAPHIC,
@@ -30,6 +38,10 @@ namespace gdjs {
       ? RuntimeLayerCameraType.ORTHOGRAPHIC
       : RuntimeLayerCameraType.PERSPECTIVE;
 
+  /**
+   * @group Core Engine
+   * @category Layers
+   */
   export enum RuntimeLayerDefaultCameraBehavior {
     DO_NOTHING,
     TOP_LEFT_ANCHORED_IF_NEVER_MOVED,
@@ -46,6 +58,8 @@ namespace gdjs {
    * Represents a layer of a "container", used to display objects.
    * The container can be a scene (see gdjs.Layer)
    * or a custom object (see gdjs.RuntimeCustomObjectLayer).
+   * @group Core Engine
+   * @category Layers
    */
   export abstract class RuntimeLayer implements EffectsTarget {
     _name: string;

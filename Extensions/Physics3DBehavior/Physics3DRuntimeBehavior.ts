@@ -27,6 +27,11 @@ namespace gdjs {
   export interface RuntimeScene {
     physics3DSharedData: gdjs.Physics3DSharedData | null;
   }
+  /**
+   * @group Behaviors
+   * @group Multiplayer and synchronization
+   * @category Physics 3D
+   */
   interface Physics3DNetworkSyncDataType {
     px: number | undefined;
     py: number | undefined;
@@ -50,6 +55,10 @@ namespace gdjs {
     props: Physics3DNetworkSyncDataType;
   }
 
+  /**
+   * @group Behaviors
+   * @category Physics 3D
+   */
   export class Physics3DSharedData {
     gravityX: float;
     gravityY: float;
@@ -292,6 +301,11 @@ namespace gdjs {
     }
   });
 
+  /**
+   * @group Behaviors
+   * @group Multiplayer and synchronization
+   * @category Physics 3D
+   */
   export class Physics3DRuntimeBehavior extends gdjs.RuntimeBehavior {
     bodyUpdater: gdjs.Physics3DRuntimeBehavior.BodyUpdater;
     collisionChecker: gdjs.Physics3DRuntimeBehavior.CollisionChecker;

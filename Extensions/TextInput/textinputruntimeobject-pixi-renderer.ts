@@ -26,6 +26,11 @@ namespace gdjs {
     );
   };
 
+  /**
+   * @group Objects
+   * @group Renderers
+   * @category Text Input
+   */
   class TextInputRuntimeObjectPixiRenderer {
     private _object: gdjs.TextInputRuntimeObject;
     private _input: HTMLInputElement | HTMLTextAreaElement | null = null;

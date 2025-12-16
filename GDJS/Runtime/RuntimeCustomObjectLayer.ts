@@ -7,6 +7,8 @@ namespace gdjs {
   /**
    * Represents a layer of a custom object. It doesn't allow to move any camera
    * because it doesn't make sense inside an object.
+   * @group Core Engine
+   * @category Layers
    */
   export class RuntimeCustomObjectLayer extends gdjs.RuntimeLayer {
     /**

@@ -1,6 +1,8 @@
 namespace gdjs {
   /**
    * A renderer for debug instances location of a container using Pixi.js.
+   * @group Debugging
+   * @group Renderers
    *
    * @see gdjs.CustomRuntimeObject2DPixiRenderer
    */

@@ -4,6 +4,10 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 
 namespace gdjs {
+  /**
+   * @group Behaviors
+   * @category Anchor
+   */
   const enum HorizontalAnchor {
     None = 0,
     WindowLeft,
@@ -19,6 +23,10 @@ namespace gdjs {
     WindowCenter,
   }
 
+  /**
+   * @group Behaviors
+   * @category Anchor
+   */
   export class AnchorRuntimeBehavior extends gdjs.RuntimeBehavior {
     // Configuration
 

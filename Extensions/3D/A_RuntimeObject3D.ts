@@ -2,6 +2,11 @@ namespace gdjs {
   const getValidDimensionValue = (value: float | undefined) =>
     value === undefined ? 100 : value <= 0 ? 1 : value;
 
+  /**
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category 3D
+   */
   type Object3DNetworkSyncDataType = {
     // z is position on the Z axis, different from zo, which is Z order
     z: number;
@@ -19,6 +24,9 @@ namespace gdjs {
 
   /**
    * Base class for 3D objects.
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category 3D
    */
   export abstract class RuntimeObject3D
     extends gdjs.RuntimeObject

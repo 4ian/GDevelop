@@ -11,6 +11,8 @@ namespace gdjs {
    * platform behavior: in particular, the platforms behaviors are required to
    * declare themselves (see PlatformObjectsManager.addPlatform) to the manager
    * of their associated container (see PlatformRuntimeBehavior.getManager).
+   * @group Behaviors
+   * @category Platformer
    */
   export class PlatformObjectsManager {
     private _platformRBush: any;
@@ -107,6 +109,8 @@ namespace gdjs {
   /**
    * PlatformRuntimeBehavior represents a behavior allowing objects to be
    * considered as a platform by objects having PlatformerObject Behavior.
+   * @group Behaviors
+   * @category Platformer
    */
   export class PlatformRuntimeBehavior extends gdjs.RuntimeBehavior {
     //Load the platform type

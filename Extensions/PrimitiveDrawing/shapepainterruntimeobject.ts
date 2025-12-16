@@ -3,7 +3,11 @@
  *  2013 Florian Rival (Florian.Rival@gmail.com)
  */
 namespace gdjs {
-  /** Represents a color in RGB Format */
+  /**
+   * Represents a color in RGB Format
+   * @group Objects
+   * @category Shape Painter
+   */
   export type RGBColor = {
     /** The Red component of the color, from 0 to 255. */
     r: integer;
@@ -15,7 +19,11 @@ namespace gdjs {
 
   export type Antialiasing = 'none' | 'low' | 'medium' | 'high';
 
-  /** Initial properties for a for {@link gdjs.ShapePainterRuntimeObject}. */
+  /**
+   * Initial properties for a for {@link gdjs.ShapePainterRuntimeObject}.
+   * @group Objects
+   * @category Shape Painter
+   */
   export type ShapePainterObjectDataType = {
     /** The color of the inner part of the painted shape */
     fillColor: RGBColor | string;
@@ -37,6 +45,11 @@ namespace gdjs {
 
   export type ShapePainterObjectData = ObjectData & ShapePainterObjectDataType;
 
+  /**
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category Shape Painter
+   */
   type ShapePainterNetworkSyncDataType = {
     cbf: boolean; // clearBetweenFrames
     aa: Antialiasing; // antialiasing
@@ -57,6 +70,9 @@ namespace gdjs {
 
   /**
    * The ShapePainterRuntimeObject allows to draw graphics shapes on screen.
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category Shape Painter
    */
   export class ShapePainterRuntimeObject
     extends gdjs.RuntimeObject

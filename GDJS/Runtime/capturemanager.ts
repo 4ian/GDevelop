@@ -4,6 +4,10 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  /**
+   * @group Core Engine
+   * @category Screenshot
+   */
   export type CaptureOptions = {
     screenshots?: Array<{
       delayTimeInSeconds: number;
@@ -29,6 +33,8 @@ namespace gdjs {
 
   /**
    * Manage the captures (screenshots, videos, etc...) that need to be taken during the game.
+   * @group Core Engine
+   * @category Screenshot
    */
   export class CaptureManager {
     _gameRenderer: gdjs.RuntimeGameRenderer;

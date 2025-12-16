@@ -1,5 +1,9 @@
 namespace gdjs {
-  /** The initial properties for {@link gdjs.VideoRuntimeObject} */
+  /**
+   * The initial properties for {@link gdjs.VideoRuntimeObject}
+   * @group Objects
+   * @category Video
+   */
   export type VideoObjectDataType = {
     /** The base parameters of the video */
     content: {
@@ -16,6 +20,11 @@ namespace gdjs {
 
   export type VideoObjectData = ObjectData & VideoObjectDataType;
 
+  /**
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category Video
+   */
   export type VideoObjectNetworkSyncDataType = {
     op: float;
     // We don't sync volume, as it's probably a user setting?
@@ -35,6 +44,9 @@ namespace gdjs {
    * as a HTMLVideoElement). This means that two objects displaying the same
    * video will have the same state for this video (paused/playing, current time,
    * volume, etc...).
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category Video
    */
   export class VideoRuntimeObject
     extends gdjs.RuntimeObject

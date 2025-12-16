@@ -5,6 +5,10 @@
  */
 namespace gdjs {
   export namespace evtTools {
+    /**
+     * @group Core Engine
+     * @category Camera and Layers
+     */
     export namespace camera {
       export const setCameraX = function (
         instanceContainer: gdjs.RuntimeInstanceContainer,

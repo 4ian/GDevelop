@@ -1,4 +1,9 @@
 namespace gdjs {
+  /**
+   * @group Objects
+   * @group Renderers
+   * @category Tiled Sprite
+   */
   class TiledSpriteRuntimeObjectPixiRenderer {
     _object: gdjs.TiledSpriteRuntimeObject;
     _tiledSprite: PIXI.TilingSprite;

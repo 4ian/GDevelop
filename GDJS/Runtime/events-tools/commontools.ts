@@ -5,6 +5,9 @@
  */
 namespace gdjs {
   export namespace evtTools {
+    /**
+     * @group Utils
+     */
     export namespace common {
       /**
        * Convert a string to a number.

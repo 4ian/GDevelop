@@ -2,6 +2,8 @@ namespace gdjs {
   /**
    * A LoggerOutput specifies a single method to be called to display
    * or register a log.
+   * @group Utils
+   * @category Logging
    */
   export interface LoggerOutput {
     log(
@@ -63,6 +65,8 @@ namespace gdjs {
 
   /**
    * A Console API like class for logging in a GDevelop game.
+   * @group Utils
+   * @category Logging
    */
   export class Logger {
     private readonly group: string;

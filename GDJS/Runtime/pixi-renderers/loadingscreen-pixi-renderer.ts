@@ -1,4 +1,8 @@
 namespace gdjs {
+  /**
+   * @group Renderers
+   * @category Loading Screen
+   */
   enum LoadingScreenState {
     NOT_STARTED,
     STARTED,
@@ -22,6 +26,10 @@ namespace gdjs {
     return !object || object.alpha >= 1;
   };
 
+  /**
+   * @group Renderers
+   * @category Loading Screen
+   */
   class LoadingScreenPixiRenderer {
     _pixiRenderer: PIXI.Renderer | null;
     _loadingScreenData: LoadingScreenData;

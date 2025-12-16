@@ -5,6 +5,10 @@
  */
 namespace gdjs {
   export namespace evtTools {
+    /**
+     * @group Core Engine
+     * @category Runtime Scene
+     */
     export namespace runtimeScene {
       export const sceneJustBegins = function (
         runtimeScene: gdjs.RuntimeScene
@@ -127,6 +131,11 @@ namespace gdjs {
         timeManager.removeTimer(timerName);
       };
 
+      /**
+       * @group Core Engine
+       * @group Multiplayer and synchronization
+       * @category Async Tasks
+       */
       export class WaitTask extends gdjs.AsyncTask {
         private duration: float;
         private timeElapsedOnScene = 0;

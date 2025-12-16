@@ -7,6 +7,11 @@ namespace gdjs {
   export interface RuntimeScene {
     physics2SharedData: gdjs.Physics2SharedData | null;
   }
+  /**
+   * @group Behaviors
+   * @group Multiplayer and synchronization
+   * @category Physics 2.0
+   */
   interface Physics2NetworkSyncDataType {
     tpx: number | undefined;
     tpy: number | undefined;
@@ -22,6 +27,10 @@ namespace gdjs {
   export interface Physics2NetworkSyncData extends BehaviorNetworkSyncData {
     props: Physics2NetworkSyncDataType;
   }
+  /**
+   * @group Behaviors
+   * @category Physics 2.0
+   */
   export class Physics2SharedData {
     gravityX: float;
     gravityY: float;
@@ -314,6 +323,11 @@ namespace gdjs {
     }
   });
 
+  /**
+   * @group Behaviors
+   * @group Multiplayer and synchronization
+   * @category Physics 2.0
+   */
   export class Physics2RuntimeBehavior extends gdjs.RuntimeBehavior {
     bodyType: string;
     bullet: boolean;

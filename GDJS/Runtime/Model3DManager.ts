@@ -11,6 +11,8 @@ namespace gdjs {
   /**
    * Load GLB files (using `Three.js`), using the "model3D" resources
    * registered in the game resources.
+   * @group Resources
+   * @category 3D Models
    */
   export class Model3DManager implements gdjs.ResourceManager {
     /**

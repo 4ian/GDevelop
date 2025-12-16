@@ -2,6 +2,10 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Dummy effect');
 
+  /**
+   * @group Effects
+   * @category Example Extension
+   */
   const DummyPixiFilter = function () {
     var vertexShader = null;
     var fragmentShader = [

@@ -9,6 +9,8 @@ namespace gdjs {
 
   /**
    * A scene being played, containing instances of objects rendered on screen.
+   * @group Core Engine
+   * @category Runtime Scene
    */
   export class RuntimeScene extends gdjs.RuntimeInstanceContainer {
     _eventsFunction: null | ((runtimeScene: RuntimeScene) => void) = null;
@@ -966,7 +968,11 @@ namespace gdjs {
     }
   }
 
-  //The flags to describe the change request by a scene:
+  /**
+   * The flags to describe the change request by a scene.
+   * @group Core Engine
+   * @category Runtime Scene
+   */
   export enum SceneChangeRequest {
     CONTINUE,
     PUSH_SCENE,

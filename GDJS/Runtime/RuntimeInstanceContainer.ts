@@ -21,6 +21,8 @@ namespace gdjs {
 
   /**
    * A container of object instances rendered on screen.
+   * @group Core Engine
+   * @category Runtime Scene
    */
   export abstract class RuntimeInstanceContainer {
     _initialBehaviorSharedData: Hashtable<BehaviorSharedData | null>;

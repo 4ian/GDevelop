@@ -1,5 +1,9 @@
 namespace gdjs {
-  /** Base parameters for {@link gdjs.BitmapTextRuntimeObject} */
+  /**
+   * Base parameters for {@link gdjs.BitmapTextRuntimeObject}
+   * @group Objects
+   * @category Bitmap Text
+   */
   export type BitmapTextObjectDataType = {
     /** The base parameters of the Bitmap Text */
     content: {
@@ -24,6 +28,11 @@ namespace gdjs {
   };
   export type BitmapTextObjectData = ObjectData & BitmapTextObjectDataType;
 
+  /**
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category Bitmap Text
+   */
   export type BitmapTextObjectNetworkSyncDataType = {
     text: string;
     opa: float;
@@ -49,6 +58,9 @@ namespace gdjs {
    * * BMFont (Windows, free): http://www.angelcode.com/products/bmfont/|http://www.angelcode.com/products/bmfont/
    * * Glyph Designer (OS X, commercial): http://www.71squared.com/en/glyphdesigner|http://www.71squared.com/en/glyphdesigner
    * * Littera (Web-based, free): http://kvazars.com/littera/|http://kvazars.com/littera/
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category Bitmap Text
    */
   export class BitmapTextRuntimeObject
     extends gdjs.RuntimeObject

@@ -3,7 +3,11 @@
  *  2013-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 namespace gdjs {
-  /** Base parameters for gdjs.TextRuntimeObject */
+  /**
+   * Base parameters for gdjs.TextRuntimeObject
+   * @group Objects
+   * @category Text
+   */
   export type TextObjectDataType = {
     content: {
       /** The size of the characters */
@@ -41,6 +45,11 @@ namespace gdjs {
 
   export type TextObjectData = ObjectData & TextObjectDataType;
 
+  /**
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category Text
+   */
   export type TextObjectNetworkSyncDataType = {
     str: string;
     o: float;
@@ -73,6 +82,9 @@ namespace gdjs {
 
   /**
    * Displays a text.
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category Text
    */
   export class TextRuntimeObject
     extends gdjs.RuntimeObject

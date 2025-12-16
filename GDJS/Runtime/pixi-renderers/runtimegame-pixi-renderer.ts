@@ -28,6 +28,8 @@ namespace gdjs {
 
   /**
    * The renderer for a gdjs.RuntimeGame using Pixi.js.
+   * @group Renderers
+   * @category Runtime Game
    */
   export class RuntimeGamePixiRenderer {
     _game: gdjs.RuntimeGame;

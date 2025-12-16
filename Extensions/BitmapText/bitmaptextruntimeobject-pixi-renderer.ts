@@ -1,6 +1,9 @@
 namespace gdjs {
   /**
    * The PIXI.js renderer for the Bitmap Text runtime object.
+   * @group Objects
+   * @group Renderers
+   * @category Bitmap Text
    */
   export class BitmapTextRuntimeObjectPixiRenderer {
     _object: gdjs.BitmapTextRuntimeObject;

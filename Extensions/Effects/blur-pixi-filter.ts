@@ -1,4 +1,8 @@
 namespace gdjs {
+  /**
+   * @group Effects
+   * @category Blur
+   */
   interface BlurFilterNetworkSyncData {
     b: number;
     q: number;

@@ -36,7 +36,11 @@ namespace gdjs {
     return 'left';
   };
 
-  /** Base parameters for {@link gdjs.TextInputRuntimeObject} */
+  /**
+   * Base parameters for {@link gdjs.TextInputRuntimeObject}
+   * @group Objects
+   * @category Text Input
+   */
   export interface TextInputObjectData extends ObjectData {
     /** The base parameters of the TextInput */
     content: {
@@ -63,6 +67,11 @@ namespace gdjs {
     };
   }
 
+  /**
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category Text Input
+   */
   export type TextInputNetworkSyncDataType = {
     opa: float;
     txt: string;
@@ -93,6 +102,9 @@ namespace gdjs {
 
   /**
    * Shows a text input on the screen the player can type text into.
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category Text Input
    */
   export class TextInputRuntimeObject
     extends gdjs.RuntimeObject

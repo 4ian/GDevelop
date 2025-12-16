@@ -17,6 +17,11 @@ namespace gdjs {
   ): attachment is IPointAttachment =>
     !!attachment && attachment.type === pixi_spine.AttachmentType.Point;
 
+  /**
+   * @group Objects
+   * @group Renderers
+   * @category Spine
+   */
   export class SpineRuntimeObjectPixiRenderer {
     private _object: gdjs.SpineRuntimeObject;
     private _rendererObject: pixi_spine.Spine | PIXI.Container;

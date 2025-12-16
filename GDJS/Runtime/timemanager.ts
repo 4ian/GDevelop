@@ -8,6 +8,9 @@ namespace gdjs {
    * Manage the timers and times elapsed during last
    * frame, since the beginning of the scene and other time related values.
    * All durations are expressed in milliseconds.
+   * @group Core Engine
+   * @group Multiplayer and synchronization
+   * @category Time
    */
 
   declare interface TimeManagerSyncData {
@@ -18,6 +21,11 @@ namespace gdjs {
     timers: Hashtable<TimerNetworkSyncData>;
     firstUpdateDone: boolean;
   }
+  /**
+   * @group Core Engine
+   * @group Multiplayer and synchronization
+   * @category Time
+   */
   export class TimeManager {
     _elapsedTime: float = 0;
     _timeScale: float = 1;

@@ -6,6 +6,9 @@
 namespace gdjs {
   /**
    * Represents a timer, which must be updated manually with {@link gdjs.Timer.updateTime}.
+   * @group Core Engine
+   * @group Multiplayer and synchronization
+   * @category Time
    */
   export class Timer {
     _name: string;

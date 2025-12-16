@@ -1,5 +1,9 @@
 namespace gdjs {
   export namespace evtTools {
+    /**
+     * @group Other extensions
+     * @category Tween
+     */
     export namespace tween {
       /*!
        * All equations are adapted from Thomas Fuchs'

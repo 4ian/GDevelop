@@ -5,6 +5,10 @@
  */
 namespace gdjs {
   export namespace evtTools {
+    /**
+     * @group Core Engine
+     * @category Input
+     */
     export namespace input {
       /**
        * @deprecated

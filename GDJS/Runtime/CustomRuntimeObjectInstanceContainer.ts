@@ -8,6 +8,8 @@ namespace gdjs {
    * The instance container of a custom object, containing instances of objects rendered on screen.
    *
    * @see gdjs.CustomRuntimeObject
+   * @group Core Engine
+   * @category Custom Objects
    */
   export class CustomRuntimeObjectInstanceContainer extends gdjs.RuntimeInstanceContainer {
     _debuggerRenderer: gdjs.DebuggerRenderer;

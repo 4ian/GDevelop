@@ -5,6 +5,10 @@
  */
 namespace gdjs {
   export namespace evtTools {
+    /**
+     * @group Core Engine
+     * @category Objects
+     */
     export namespace object {
       /**
        * Keep only the specified object in the lists of picked objects.
@@ -627,6 +631,12 @@ namespace gdjs {
   }
 
   const logger = new gdjs.Logger('LongLivedObjectsLists');
+
+  /**
+   * @group Core Engine
+   * @group Multiplayer and synchronization
+   * @category Objects
+   */
   export type LongLivedObjectsListNetworkSyncData = {
     objectsLists: {
       [objectName: string]: Array<string>;
@@ -637,6 +647,9 @@ namespace gdjs {
   /**
    * A container for objects lists that should last more than the current frame.
    * It automatically removes objects that were destroyed from the objects lists.
+   * @group Core Engine
+   * @group Multiplayer and synchronization
+   * @category Objects
    */
   export class LongLivedObjectsList {
     private objectsLists = new Map<string, Array<RuntimeObject>>();

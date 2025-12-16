@@ -5,6 +5,8 @@
 namespace gdjs {
   /**
    * The TextEntryRuntimeObject allows to capture text typed on the keyboard.
+   * @group Objects
+   * @category Text Entry
    */
   export class TextEntryRuntimeObject extends gdjs.RuntimeObject {
     _str: string = '';

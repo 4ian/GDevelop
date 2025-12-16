@@ -5,6 +5,8 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
 namespace gdjs {
   /**
    * Returned by _findHighestFloorAndMoveOnTop
+   * @group Behaviors
+   * @category Platformer
    */
   type PlatformSearchResult = {
     highestGroundPlatform: gdjs.PlatformRuntimeBehavior | null;
@@ -12,6 +14,11 @@ namespace gdjs {
     isCollidingAnyPlatform: boolean;
   };
 
+  /**
+   * @group Behaviors
+   * @group Multiplayer and synchronization
+   * @category Platformer
+   */
   interface OnFloorStateNetworkSyncData {
     flx: number;
     fly: number;
@@ -69,6 +76,9 @@ namespace gdjs {
   /**
    * PlatformerObjectRuntimeBehavior represents a behavior allowing objects to be
    * considered as a platform by objects having PlatformerObject Behavior.
+   * @group Behaviors
+   * @group Multiplayer and synchronization
+   * @category Platformer
    */
   export class PlatformerObjectRuntimeBehavior extends gdjs.RuntimeBehavior {
     /**

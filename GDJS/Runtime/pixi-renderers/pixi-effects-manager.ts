@@ -6,6 +6,9 @@
 namespace gdjs {
   type RendererEffects = Record<string, gdjs.PixiFiltersTools.Filter>;
 
+  /**
+   * @group Effects
+   */
   export interface EffectsTarget {
     getRuntimeScene: () => gdjs.RuntimeInstanceContainer;
     getElapsedTime: (
@@ -22,6 +25,7 @@ namespace gdjs {
 
   /**
    * Handle effects (aka PixiJS "filters") on PixiJS objects.
+   * @group Effects
    */
   class PixiEffectsManager {
     /**

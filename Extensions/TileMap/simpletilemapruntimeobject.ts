@@ -1,5 +1,9 @@
 /// <reference path="helper/TileMapHelper.d.ts" />
 namespace gdjs {
+  /**
+   * @group Objects
+   * @category Simple Tile Map
+   */
   export type SimpleTileMapObjectDataType = {
     content: {
       atlasImage: string;
@@ -13,6 +17,11 @@ namespace gdjs {
   export type SimpleTileMapObjectData = ObjectData &
     SimpleTileMapObjectDataType;
 
+  /**
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category Simple Tile Map
+   */
   export type SimpleTileMapNetworkSyncDataType = {
     op: number;
     tm?: TileMapHelper.EditableTileMapAsJsObject;
@@ -23,6 +32,9 @@ namespace gdjs {
 
   /**
    * Displays a SimpleTileMap object.
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category Simple Tile Map
    */
   export class SimpleTileMapRuntimeObject
     extends gdjs.RuntimeObject

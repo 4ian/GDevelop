@@ -1,4 +1,9 @@
 namespace gdjs {
+  /**
+   * @group Objects
+   * @group Renderers
+   * @category Text
+   */
   class TextRuntimeObjectPixiRenderer {
     _object: gdjs.TextRuntimeObject;
     _fontManager: any;

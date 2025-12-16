@@ -5,6 +5,11 @@ Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
 namespace gdjs {
   const logger = new gdjs.Logger('Pathfinding behavior');
 
+  /**
+   * @group Behaviors
+   * @group Multiplayer and synchronization
+   * @category Pathfinding
+   */
   interface PathfindingNetworkSyncDataType {
     // Syncing the path and its position on it should be enough to have a good prediction.
     path: FloatPoint[];
@@ -25,6 +30,9 @@ namespace gdjs {
   /**
    * PathfindingRuntimeBehavior represents a behavior allowing objects to
    * follow a path computed to avoid obstacles.
+   * @group Behaviors
+   * @group Multiplayer and synchronization
+   * @category Pathfinding
    */
   export class PathfindingRuntimeBehavior extends gdjs.RuntimeBehavior {
     _path: Array<FloatPoint> = [];

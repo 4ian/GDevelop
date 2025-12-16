@@ -1,4 +1,8 @@
 namespace gdjs {
+  /**
+   * @group Objects
+   * @category Light
+   */
   export type LightObjectDataType = {
     /** The base parameters of light object. */
     content: {
@@ -15,6 +19,11 @@ namespace gdjs {
 
   export type LightObjectData = ObjectData & LightObjectDataType;
 
+  /**
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category Light
+   */
   export type LightNetworkSyncDataType = {
     rad: number;
     col: string;
@@ -25,6 +34,9 @@ namespace gdjs {
 
   /**
    * Displays a Light object.
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category Light
    */
   export class LightRuntimeObject extends gdjs.RuntimeObject {
     _radius: number;

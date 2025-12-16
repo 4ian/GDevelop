@@ -1,6 +1,11 @@
 /// <reference path="./jolt-physics.d.ts" />
 
 namespace gdjs {
+  /**
+   * @group Behaviors
+   * @group Multiplayer and synchronization
+   * @category Physics 3D Character
+   */
   interface PhysicsCharacter3DNetworkSyncDataType {
     sma: float;
     shm: float;
@@ -47,6 +52,11 @@ namespace gdjs {
     shapeFilter: Jolt.ShapeFilter;
   };
 
+  /**
+   * @group Behaviors
+   * @group Multiplayer and synchronization
+   * @category Physics 3D Character
+   */
   export class PhysicsCharacter3DRuntimeBehavior
     extends gdjs.RuntimeBehavior
     implements gdjs.Physics3DRuntimeBehavior.Physics3DHook

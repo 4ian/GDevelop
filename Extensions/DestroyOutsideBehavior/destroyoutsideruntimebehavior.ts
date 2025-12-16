@@ -6,6 +6,8 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
 namespace gdjs {
   /**
    * The DestroyOutsideRuntimeBehavior represents a behavior that destroys the object when it leaves the screen.
+   * @group Behaviors
+   * @category Destroy Outside
    */
   export class DestroyOutsideRuntimeBehavior extends gdjs.RuntimeBehavior {
     _extraBorder: float;

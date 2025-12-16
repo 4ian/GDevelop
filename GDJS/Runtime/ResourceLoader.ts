@@ -106,6 +106,7 @@ namespace gdjs {
 
   /**
    * Pre-load resources of any kind needed for a game or a scene.
+   * @group Resources
    */
   export class ResourceLoader {
     _runtimeGame: RuntimeGame;

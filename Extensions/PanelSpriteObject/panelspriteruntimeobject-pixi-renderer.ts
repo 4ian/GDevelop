@@ -1,4 +1,9 @@
 namespace gdjs {
+  /**
+   * @group Objects
+   * @group Renderers
+   * @category Panel Sprite
+   */
   class PanelSpriteRuntimeObjectPixiRenderer {
     _object: gdjs.PanelSpriteRuntimeObject;
     /**

@@ -1,6 +1,10 @@
 namespace gdjs {
   type SpineAnimation = { name: string; source: string; loop: boolean };
 
+  /**
+   * @group Objects
+   * @category Spine
+   */
   export type SpineObjectDataType = {
     content: {
       opacity: float;
@@ -12,6 +16,11 @@ namespace gdjs {
   };
   export type SpineObjectData = ObjectData & SpineObjectDataType;
 
+  /**
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category Spine
+   */
   export type SpineNetworkSyncDataType = {
     opa: float;
     scaX: float;
@@ -28,6 +37,11 @@ namespace gdjs {
   export type SpineNetworkSyncData = ObjectNetworkSyncData &
     SpineNetworkSyncDataType;
 
+  /**
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category Spine
+   */
   export class SpineRuntimeObject
     extends gdjs.RuntimeObject
     implements

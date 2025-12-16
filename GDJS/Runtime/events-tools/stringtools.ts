@@ -7,6 +7,7 @@ namespace gdjs {
   export namespace evtTools {
     /**
      * Tools related to strings manipulation, for events generated code.
+     * @group Utils
      */
     export namespace string {
       /**

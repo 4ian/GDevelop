@@ -1,5 +1,9 @@
 namespace gdjs {
-  /** Base parameters for {@link gdjs.BBTextRuntimeObject} */
+  /**
+   * Base parameters for {@link gdjs.BBTextRuntimeObject}
+   * @group Objects
+   * @category BBText
+   */
   export type BBTextObjectDataType = {
     /** The base parameters of the BBText */
     content: {
@@ -24,6 +28,11 @@ namespace gdjs {
   };
   export type BBTextObjectData = ObjectData & BBTextObjectDataType;
 
+  /**
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category BBText
+   */
   export type BBTextObjectNetworkSyncDataType = {
     text: string;
     o: float;
@@ -42,6 +51,9 @@ namespace gdjs {
 
   /**
    * Displays a rich text using BBCode markup (allowing to set parts of the text as bold, italic, use different colors and shadows).
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category BBText
    */
   export class BBTextRuntimeObject
     extends gdjs.RuntimeObject

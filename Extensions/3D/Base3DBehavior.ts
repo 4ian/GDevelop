@@ -4,6 +4,10 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  /**
+   * @group Behaviors
+   * @category 3D
+   */
   export interface Base3DHandler {
     /**
      * Set the object position on the Z axis.
@@ -149,6 +153,8 @@ namespace gdjs {
 
   /**
    * A behavior that forwards the Base3D interface to its object.
+   * @group Behaviors
+   * @category 3D
    */
   export class Base3DBehavior
     extends gdjs.RuntimeBehavior

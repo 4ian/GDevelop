@@ -5,6 +5,9 @@ namespace gdjs {
    * The PIXI.js renderer for the Tile map runtime object.
    *
    * @class TileMapRuntimeObjectPixiRenderer
+   * @group Objects
+   * @group Renderers
+   * @category Tile Map
    */
   export class TileMapRuntimeObjectPixiRenderer {
     private _object:

@@ -4,6 +4,11 @@ Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 
 namespace gdjs {
+  /**
+   * @group Behaviors
+   * @group Multiplayer and synchronization
+   * @category Top-down Movement
+   */
   interface TopDownMovementNetworkSyncDataType {
     a: float;
     xv: float;
@@ -25,6 +30,9 @@ namespace gdjs {
   /**
    * Allows an object to move in 4 or 8 directions, with customizable speed, accelerations
    * and rotation.
+   * @group Behaviors
+   * @group Multiplayer and synchronization
+   * @category Top-down Movement
    */
   export class TopDownMovementRuntimeBehavior extends gdjs.RuntimeBehavior {
     //Behavior configuration:

@@ -3,6 +3,10 @@
  *  2013 Florian Rival (Florian.Rival@gmail.com)
  */
 namespace gdjs {
+  /**
+   * @group Objects
+   * @category Panel Sprite
+   */
   export type PanelSpriteObjectDataType = {
     /** The right margin */
     rightMargin: number;
@@ -24,6 +28,11 @@ namespace gdjs {
 
   export type PanelSpriteObjectData = ObjectData & PanelSpriteObjectDataType;
 
+  /**
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category Panel Sprite
+   */
   export type PanelSpriteNetworkSyncDataType = {
     op: number;
     color: string;
@@ -34,6 +43,9 @@ namespace gdjs {
 
   /**
    * The PanelSpriteRuntimeObject displays a tiled texture.
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category Panel Sprite
    */
   export class PanelSpriteRuntimeObject
     extends gdjs.RuntimeObject

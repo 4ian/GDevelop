@@ -183,6 +183,8 @@ namespace gdjs {
 
   /**
    * The renderer for a gdjs.Layer using Pixi.js.
+   * @group Renderers
+   * @category Layers
    */
   export class LayerPixiRenderer {
     private _pixiContainer: PIXI.Container;

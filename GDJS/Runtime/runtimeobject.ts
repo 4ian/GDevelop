@@ -4,7 +4,11 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
-  /** An axis-aligned bounding box. Used to represents a box around an object for example. */
+  /**
+   * An axis-aligned bounding box. Used to represents a box around an object for example.
+   * @group Core Engine
+   * @category Utils
+   */
   export type AABB = {
     /** The [x,y] coordinates of the top left point */
     min: FloatPoint;
@@ -12,6 +16,10 @@ namespace gdjs {
     max: FloatPoint;
   };
 
+  /**
+   * @group Core Engine
+   * @category Utils
+   */
   export type RendererObjectInterface = {
     visible: boolean;
   };
@@ -152,6 +160,7 @@ namespace gdjs {
    *
    * A `gdjs.RuntimeObject` should not be instantiated directly, always a child class
    * (because gdjs.RuntimeObject don't call onCreated at the end of its constructor).
+   * @group Objects
    */
   export class RuntimeObject implements EffectsTarget, gdjs.EffectHandler {
     name: string;

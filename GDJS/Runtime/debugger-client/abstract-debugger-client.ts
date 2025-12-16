@@ -160,6 +160,8 @@ namespace gdjs {
   /**
    * The base class describing a debugger client, that can be used to inspect
    * a runtime game (dump its state) or alter it.
+   * @group Debugging
+   * @category Debugger Client
    */
   export abstract class AbstractDebuggerClient {
     _runtimegame: gdjs.RuntimeGame;

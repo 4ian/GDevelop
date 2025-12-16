@@ -1,6 +1,11 @@
 namespace gdjs {
   type Model3DAnimation = { name: string; source: string; loop: boolean };
 
+  /**
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category 3D Model
+   */
   type Model3DObjectNetworkSyncDataType = {
     mt: number;
     op: FloatPoint3D | null;
@@ -65,6 +70,9 @@ namespace gdjs {
 
   /**
    * A 3D object which displays a 3D model.
+   * @group Objects
+   * @group Multiplayer and synchronization
+   * @category 3D Model
    */
   export class Model3DRuntimeObject
     extends gdjs.RuntimeObject3D

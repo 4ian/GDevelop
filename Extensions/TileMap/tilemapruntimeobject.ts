@@ -1,5 +1,9 @@
 /// <reference path="helper/TileMapHelper.d.ts" />
 namespace gdjs {
+  /**
+   * @group Objects
+   * @category Tile Map
+   */
   export type TilemapObjectDataType = {
     content: {
       tilemapJsonFile: string;
@@ -13,8 +17,17 @@ namespace gdjs {
     };
   };
 
+  /**
+   * @group Objects
+   * @category Tile Map
+   */
   export type TilemapObjectData = ObjectData & TilemapObjectDataType;
 
+  /**
+   * @group Objects
+   * @category Tile Map
+   * @group Multiplayer and synchronization
+   */
   export type TilemapNetworkSyncDataType = {
     op: number;
     tmjf: string;
@@ -26,11 +39,18 @@ namespace gdjs {
     asps: number;
   };
 
+  /**
+   * @group Objects
+   * @category Tile Map
+   * @group Multiplayer and synchronization
+   */
   export type TilemapNetworkSyncData = ObjectNetworkSyncData &
     TilemapNetworkSyncDataType;
 
   /**
    * Displays a Tilemap object (LDtk and Tiled).
+   * @group Objects
+   * @category Tile Map
    */
   export class TileMapRuntimeObject
     extends gdjs.RuntimeObject

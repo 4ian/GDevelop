@@ -183,6 +183,8 @@ namespace gdjs {
 
   /**
    * The renderer for a gdjs.Layer using Pixi.js.
+   * @group Core Engine
+   * @group Renderers
    */
   export class LayerPixiRenderer {
     private _pixiContainer: PIXI.Container;
@@ -1246,6 +1248,10 @@ namespace gdjs {
   }
 
   //Register the class to let the engine use it.
+  /**
+   * @group Core Engine
+   * @group Renderers
+   */
   export type LayerRenderer = gdjs.LayerPixiRenderer;
   export const LayerRenderer = gdjs.LayerPixiRenderer;
 }

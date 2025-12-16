@@ -4,6 +4,9 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  /**
+   * @group Behaviors
+   */
   export interface TextContainer {
     /**
      * Get the text displayed by the object.
@@ -19,6 +22,8 @@ namespace gdjs {
 
   /**
    * A behavior that forwards the TextContainer interface to its object.
+   * @group Behaviors
+   * @category Text Container
    */
   export class TextContainerBehavior
     extends gdjs.RuntimeBehavior

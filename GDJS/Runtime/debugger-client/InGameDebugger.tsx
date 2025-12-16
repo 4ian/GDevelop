@@ -85,6 +85,7 @@ namespace gdjs {
   /**
    * Displays uncaught exceptions on top of the game.
    * Could be reworked in the future to support a minimal debugger inside the game.
+   * @group Debugging
    */
   export class InGameDebugger {
     _runtimeGame: RuntimeGame;

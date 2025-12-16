@@ -18,6 +18,11 @@ namespace gdjs {
     sf: float;
   }
 
+  /**
+   * @group Behaviors
+   * @category Top-down movement
+   * @group Multiplayer and synchronization
+   */
   export interface TopDownMovementNetworkSyncData
     extends BehaviorNetworkSyncData {
     props: TopDownMovementNetworkSyncDataType;
@@ -25,6 +30,8 @@ namespace gdjs {
   /**
    * Allows an object to move in 4 or 8 directions, with customizable speed, accelerations
    * and rotation.
+   * @group Behaviors
+   * @category Top-down movement
    */
   export class TopDownMovementRuntimeBehavior extends gdjs.RuntimeBehavior {
     //Behavior configuration:
@@ -741,6 +748,10 @@ namespace gdjs {
   }
 
   export namespace TopDownMovementRuntimeBehavior {
+    /**
+     * @group Behaviors
+     * @category Top-down movement
+     */
     export class TopDownMovementHookContext {
       private direction: integer = -1;
 
@@ -769,6 +780,8 @@ namespace gdjs {
     /**
      * Allow extensions relying on the top-down movement to customize its
      * behavior a bit.
+     * @group Behaviors
+     * @category Top-down movement
      */
     export interface TopDownMovementHook {
       /**
@@ -788,10 +801,18 @@ namespace gdjs {
       beforePositionUpdate(hookContext: TopDownMovementHookContext): void;
     }
 
+    /**
+     * @group Behaviors
+     * @category Top-down movement
+     */
     export interface BasisTransformation {
       toScreen(worldPoint: FloatPoint, screenPoint: FloatPoint): void;
     }
 
+    /**
+     * @group Behaviors
+     * @category Top-down movement
+     */
     export class IsometryTransformation
       implements gdjs.TopDownMovementRuntimeBehavior.BasisTransformation
     {

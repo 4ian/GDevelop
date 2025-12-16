@@ -783,6 +783,9 @@ namespace gdjs {
     return { forward };
   };
 
+  /**
+   * @group Debugging
+   */
   export class InGameEditor {
     private _editorId: string = '';
     private _runtimeGame: RuntimeGame;

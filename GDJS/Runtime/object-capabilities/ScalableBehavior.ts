@@ -4,6 +4,9 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  /**
+   * @group Behaviors
+   */
   export interface Scalable {
     /**
      * Change the scale on X and Y axis of the object.
@@ -52,6 +55,8 @@ namespace gdjs {
 
   /**
    * A behavior that forwards the Scalable interface to its object.
+   * @group Behaviors
+   * @category Scalable
    */
   export class ScalableBehavior
     extends gdjs.RuntimeBehavior

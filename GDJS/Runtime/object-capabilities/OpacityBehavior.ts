@@ -4,6 +4,9 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  /**
+   * @group Behaviors
+   */
   export interface OpacityHandler {
     /**
      * Change the transparency of the object.
@@ -20,6 +23,8 @@ namespace gdjs {
 
   /**
    * A behavior that forwards the Opacity interface to its object.
+   * @group Behaviors
+   * @category Opacity
    */
   export class OpacityBehavior
     extends gdjs.RuntimeBehavior

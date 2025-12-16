@@ -1,4 +1,7 @@
 namespace gdjs {
+  /**
+   * @group Resources
+   */
   export interface PixiImageManager {
     _pixiAnimationFrameTextureManager: PixiAnimationFrameTextureManager;
   }
@@ -236,5 +239,10 @@ namespace gdjs {
 
   // Register the class to let the engine use it.
   export const SpriteRuntimeObjectRenderer = SpriteRuntimeObjectPixiRenderer;
+  /**
+   * @group Objects
+   * @category Sprite
+   * @group Renderers
+   */
   export type SpriteRuntimeObjectRenderer = SpriteRuntimeObjectPixiRenderer;
 }

@@ -8,11 +8,13 @@ namespace gdjs {
 
   /**
    * Children of a structure.
+   * @group Core Engine
    */
   export type Children = Record<string, gdjs.Variable>;
 
   /**
    * A Variable is an object storing a value (number or a string) or children variables.
+   * @group Core Engine
    */
   export class Variable {
     // TODO: convert this to an integer to speed up the type checks at runtime.

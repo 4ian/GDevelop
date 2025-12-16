@@ -28,6 +28,8 @@ namespace gdjs {
 
   /**
    * The renderer for a gdjs.RuntimeGame using Pixi.js.
+   * @group Core Engine
+   * @group Renderers
    */
   export class RuntimeGamePixiRenderer {
     _game: gdjs.RuntimeGame;
@@ -1185,6 +1187,10 @@ namespace gdjs {
   }
 
   //Register the class to let the engine use it.
+  /**
+   * @group Core Engine
+   * @group Renderers
+   */
   export type RuntimeGameRenderer = RuntimeGamePixiRenderer;
   export const RuntimeGameRenderer = RuntimeGamePixiRenderer;
 }

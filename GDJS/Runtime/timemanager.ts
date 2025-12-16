@@ -4,12 +4,6 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
-  /**
-   * Manage the timers and times elapsed during last
-   * frame, since the beginning of the scene and other time related values.
-   * All durations are expressed in milliseconds.
-   */
-
   declare interface TimeManagerSyncData {
     elapsedTime: float;
     timeScale: float;
@@ -18,6 +12,12 @@ namespace gdjs {
     timers: Hashtable<TimerNetworkSyncData>;
     firstUpdateDone: boolean;
   }
+  /**
+   * Manage the timers and times elapsed during last
+   * frame, since the beginning of the scene and other time related values.
+   * All durations are expressed in milliseconds.
+   * @group Core Engine
+   */
   export class TimeManager {
     _elapsedTime: float = 0;
     _timeScale: float = 1;

@@ -8,6 +8,8 @@ namespace gdjs {
    * A render for instance container.
    *
    * @see gdjs.RuntimeInstanceContainer
+   * @group Core Engine
+   * @group Renderers
    */
   export interface RuntimeInstanceContainerPixiRenderer {
     /**
@@ -26,6 +28,10 @@ namespace gdjs {
   }
 
   // Register the class to let the engine use it.
+  /**
+   * @group Core Engine
+   * @group Renderers
+   */
   export type RuntimeInstanceContainerRenderer =
     gdjs.RuntimeInstanceContainerPixiRenderer;
 }

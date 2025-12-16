@@ -9,6 +9,7 @@ namespace gdjs {
 
   /**
    * A scene being played, containing instances of objects rendered on screen.
+   * @group Core Engine
    */
   export class RuntimeScene extends gdjs.RuntimeInstanceContainer {
     _eventsFunction: null | ((runtimeScene: RuntimeScene) => void) = null;

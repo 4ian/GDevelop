@@ -312,5 +312,9 @@ namespace gdjs {
 
   //Register the class to let the engine use it.
   export const LoadingScreenRenderer = LoadingScreenPixiRenderer;
+  /**
+   * @group Core Engine
+   * @group Renderers
+   */
   export type LoadingScreenRenderer = LoadingScreenPixiRenderer;
 }

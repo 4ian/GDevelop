@@ -12,6 +12,7 @@ namespace gdjs {
    * FontFaceObserverFontManager loads fonts (using `FontFace` or `fontfaceobserver` library)
    * from the game resources (see `loadFonts`), and allow to access to
    * the font families of the loaded fonts during the game (see `getFontFamily`).
+   * @group Resources
    */
   export class FontFaceObserverFontManager implements gdjs.ResourceManager {
     _resourceLoader: gdjs.ResourceLoader;

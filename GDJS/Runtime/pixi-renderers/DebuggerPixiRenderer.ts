@@ -3,6 +3,8 @@ namespace gdjs {
    * A renderer for debug instances location of a container using Pixi.js.
    *
    * @see gdjs.CustomRuntimeObject2DPixiRenderer
+   * @group Debugging
+   * @group Renderers
    */
   export class DebuggerPixiRenderer {
     _instanceContainer: gdjs.RuntimeInstanceContainer;
@@ -326,6 +328,10 @@ namespace gdjs {
   }
 
   // Register the class to let the engine use it.
+  /**
+   * @group Debugging
+   * @group Renderers
+   */
   export type DebuggerRenderer = gdjs.DebuggerPixiRenderer;
   export const DebuggerRenderer = gdjs.DebuggerPixiRenderer;
 }

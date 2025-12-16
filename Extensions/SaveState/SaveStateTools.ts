@@ -11,6 +11,9 @@ namespace gdjs {
     persistedInProfiles: Set<string>;
   };
 
+  /**
+   * @category Other extensions > Save State
+   */
   export type RestoreRequestOptions = {
     profileNames: string[];
     clearSceneStack: boolean;

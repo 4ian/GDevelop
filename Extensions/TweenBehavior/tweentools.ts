@@ -3,6 +3,9 @@ GDevelop - Tween Behavior Extension
 Copyright (c) 2010-2023 Florian Rival (Florian.Rival@gmail.com)
  */
 namespace gdjs {
+  /**
+   * @category Core Engine > Runtime Scene
+   */
   export interface RuntimeScene {
     _tweens: gdjs.evtTools.tween.TweenManager;
   }

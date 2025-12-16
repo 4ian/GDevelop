@@ -627,6 +627,9 @@ namespace gdjs {
   }
 
   const logger = new gdjs.Logger('LongLivedObjectsLists');
+  /**
+   * @category Synchronization > Objects List
+   */
   export type LongLivedObjectsListNetworkSyncData = {
     objectsLists: {
       [objectName: string]: Array<string>;
@@ -637,6 +640,7 @@ namespace gdjs {
   /**
    * A container for objects lists that should last more than the current frame.
    * It automatically removes objects that were destroyed from the objects lists.
+   * @category Core Engine > Objects List
    */
   export class LongLivedObjectsList {
     private objectsLists = new Map<string, Array<RuntimeObject>>();

@@ -33,6 +33,9 @@ namespace gdjs {
     jkhsjs: boolean;
   }
 
+  /**
+   * @category Synchronization > Physics 3D Character
+   */
   export interface PhysicsCharacter3DNetworkSyncData
     extends BehaviorNetworkSyncData {
     props: PhysicsCharacter3DNetworkSyncDataType;
@@ -47,6 +50,9 @@ namespace gdjs {
     shapeFilter: Jolt.ShapeFilter;
   };
 
+  /**
+   * @category Behaviors > Physics 3D Character
+   */
   export class PhysicsCharacter3DRuntimeBehavior
     extends gdjs.RuntimeBehavior
     implements gdjs.Physics3DRuntimeBehavior.Physics3DHook

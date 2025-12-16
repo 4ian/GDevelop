@@ -5,6 +5,9 @@
  */
 namespace gdjs {
   export namespace indexedDb {
+    /**
+     * @category Utils > IndexedDB
+     */
     export const loadFromIndexedDB = async function (
       dbName: string,
       objectStoreName: string,
@@ -56,6 +59,9 @@ namespace gdjs {
       });
     };
 
+    /**
+     * @category Utils > IndexedDB
+     */
     export const saveToIndexedDB = async function (
       dbName: string,
       objectStoreName: string,

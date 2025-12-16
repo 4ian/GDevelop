@@ -18,6 +18,9 @@ namespace gdjs {
     sf: float;
   }
 
+  /**
+   * @category Synchronization > Top Down Movement
+   */
   export interface TopDownMovementNetworkSyncData
     extends BehaviorNetworkSyncData {
     props: TopDownMovementNetworkSyncDataType;
@@ -25,6 +28,7 @@ namespace gdjs {
   /**
    * Allows an object to move in 4 or 8 directions, with customizable speed, accelerations
    * and rotation.
+   * @category Behaviors > Top Down Movement
    */
   export class TopDownMovementRuntimeBehavior extends gdjs.RuntimeBehavior {
     //Behavior configuration:

@@ -1,5 +1,8 @@
 namespace gdjs {
   export namespace watermark {
+    /**
+     * @category Core Engine > Watermark
+     */
     export class RuntimeWatermark {
       _gameRenderer: RuntimeGameRenderer;
       _isDevEnvironment: boolean;

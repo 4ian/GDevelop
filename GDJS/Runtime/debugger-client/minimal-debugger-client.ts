@@ -1,6 +1,7 @@
 namespace gdjs {
   /**
    * Does nothing apart from allowing to reporting errors.
+   * @category Debugging > Debugger Client
    */
   export class MinimalDebuggerClient extends gdjs.AbstractDebuggerClient {
     constructor(runtimeGame: RuntimeGame) {
@@ -12,5 +13,8 @@ namespace gdjs {
 
   //Register the class to let the engine use it.
   // @ts-ignore
+  /**
+   * @category Debugging > Debugger Client
+   */
   export const DebuggerClient = WindowMessageDebuggerClient;
 }

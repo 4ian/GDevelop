@@ -17,6 +17,9 @@ namespace gdjs {
        */
 
       /*! Shifty 3.0.3 - https://github.com/jeremyckahn/shifty */
+      /**
+       * @category Utils > Tween
+       */
       export const easingFunctions: Record<string, EasingFunction> = {
         linear: (pos: number) => pos,
 
@@ -193,6 +196,7 @@ namespace gdjs {
       /**
        * A tween manager that is used for layout tweens or object tweens.
        * @ignore
+       * @category Utils > Tween
        */
       export class TweenManager {
         /**
@@ -547,6 +551,9 @@ namespace gdjs {
         }
       }
 
+      /**
+       * @category Utils > Tween
+       */
       export interface TimeSource {
         getElapsedTime(): float;
       }
@@ -554,6 +561,7 @@ namespace gdjs {
       /**
        * An interpolation function.
        * @ignore
+       * @category Utils > Tween
        */
       export type Interpolation = (
         from: float,
@@ -566,6 +574,7 @@ namespace gdjs {
       /**
        * A tween.
        * @ignore
+       * @category Utils > Tween
        */
       export interface TweenInstance<T> {
         /**
@@ -588,6 +597,7 @@ namespace gdjs {
       /**
        * A tween.
        * @ignore
+       * @category Utils > Tween
        */
       export abstract class AbstractTweenInstance<T>
         implements TweenInstance<T>
@@ -674,6 +684,7 @@ namespace gdjs {
       /**
        * A tween with only one value.
        * @ignore
+       * @category Utils > Tween
        */
       export class SimpleTweenInstance extends AbstractTweenInstance<float> {
         initialValue: float;
@@ -777,6 +788,7 @@ namespace gdjs {
       /**
        * A tween with multiple values.
        * @ignore
+       * @category Utils > Tween
        */
       export class MultiTweenInstance extends AbstractTweenInstance<
         Array<float>
@@ -852,6 +864,9 @@ namespace gdjs {
         }
       }
 
+      /**
+       * @category Utils > Color
+       */
       export const rgbToHsl = (r: number, g: number, b: number): number[] => {
         r /= 255;
         g /= 255;
@@ -869,6 +884,9 @@ namespace gdjs {
         ];
       };
 
+      /**
+       * @category Utils > Color
+       */
       export const hslToRgb = (h: number, s: number, l: number): number[] => {
         h = h %= 360;
         if (h < 0) {
@@ -892,6 +910,7 @@ namespace gdjs {
        * @param toValue End value
        * @param easingValue Type of easing
        * @param weighting from 0 to 1
+       * @category Utils > Tween
        */
       export const ease = (
         easingValue: string,
@@ -909,6 +928,9 @@ namespace gdjs {
         return fromValue + (toValue - fromValue) * easingFunction(weighting);
       };
 
+      /**
+       * @category Utils > Tween
+       */
       export type EasingFunction = (progress: float) => float;
     }
   }

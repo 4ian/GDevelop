@@ -37,6 +37,9 @@ namespace gdjs {
   };
 
   /** Base parameters for {@link gdjs.TextInputRuntimeObject} */
+  /**
+   * @category Objects > Text Input
+   */
   export interface TextInputObjectData extends ObjectData {
     /** The base parameters of the TextInput */
     content: {
@@ -63,6 +66,9 @@ namespace gdjs {
     };
   }
 
+  /**
+   * @category Synchronization > Text Input
+   */
   export type TextInputNetworkSyncDataType = {
     opa: float;
     txt: string;
@@ -81,6 +87,9 @@ namespace gdjs {
     sc: boolean;
   };
 
+  /**
+   * @category Synchronization > Text Input
+   */
   export type TextInputNetworkSyncData = ObjectNetworkSyncData &
     TextInputNetworkSyncDataType;
 
@@ -93,6 +102,7 @@ namespace gdjs {
 
   /**
    * Shows a text input on the screen the player can type text into.
+   * @category Objects > Text Input
    */
   export class TextInputRuntimeObject
     extends gdjs.RuntimeObject

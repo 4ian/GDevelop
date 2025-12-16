@@ -1,5 +1,8 @@
 namespace gdjs {
   /** Represents a point in a coordinate system. */
+  /**
+   * @category Utils > Sprite Animation
+   */
   export type SpritePoint = {
     /** X position of the point. */
     x: float;
@@ -8,6 +11,9 @@ namespace gdjs {
   };
 
   /** Represents a custom point in a frame. */
+  /**
+   * @category Utils > Sprite Animation
+   */
   export type SpriteCustomPointData = {
     /** Name of the point. */
     name: string;
@@ -18,6 +24,9 @@ namespace gdjs {
   };
 
   /** Represents the center point in a frame. */
+  /**
+   * @category Utils > Sprite Animation
+   */
   export type SpriteCenterPointData = {
     /** Name of the point. */
     name: string;
@@ -30,6 +39,9 @@ namespace gdjs {
   };
 
   /** Represents a {@link gdjs.SpriteAnimationFrame}. */
+  /**
+   * @category Utils > Sprite Animation
+   */
   export type SpriteFrameData = {
     /** The resource name of the image used in this frame. */
     image: string;
@@ -46,6 +58,9 @@ namespace gdjs {
   };
 
   /** Represents the data of a {@link gdjs.SpriteAnimationDirection}. */
+  /**
+   * @category Utils > Sprite Animation
+   */
   export type SpriteDirectionData = {
     /** Time between each frame, in seconds. */
     timeBetweenFrames: float;
@@ -56,6 +71,9 @@ namespace gdjs {
   };
 
   /** Represents the data of a {@link gdjs.SpriteAnimation}. */
+  /**
+   * @category Utils > Sprite Animation
+   */
   export type SpriteAnimationData = {
     /** The name of the animation. */
     name: string;
@@ -66,6 +84,9 @@ namespace gdjs {
   };
 
   /** Represents all the information needed to synchronize the animations of an object. */
+  /**
+   * @category Synchronization > Sprite Animation
+   */
   export type SpriteAnimatorNetworkSyncData = {
     an: integer;
     di: integer;
@@ -77,6 +98,7 @@ namespace gdjs {
 
   /**
    * Abstraction from graphic libraries texture classes.
+   * @category Utils > Sprite Animation
    */
   export interface AnimationFrameTextureManager<T> {
     getAnimationFrameTexture(imageName: string): T;
@@ -89,6 +111,7 @@ namespace gdjs {
    *
    * It contains the texture displayed as well as information like the points position
    * or the collision mask.
+   * @category Utils > Sprite Animation
    */
   export class SpriteAnimationFrame<T> {
     image: string;
@@ -198,6 +221,9 @@ namespace gdjs {
   /**
    * Represents a direction of an animation of a {@link gdjs.SpriteRuntimeObject}.
    */
+  /**
+   * @category Utils > Sprite Animation
+   */
   export class SpriteAnimationDirection<T> {
     timeBetweenFrames: float;
     loop: boolean;
@@ -248,6 +274,9 @@ namespace gdjs {
   /**
    * Represents an animation of a {@link SpriteRuntimeObject}.
    */
+  /**
+   * @category Utils > Sprite Animation
+   */
   export class SpriteAnimation<T> {
     hasMultipleDirections: boolean;
     name: string;
@@ -294,6 +323,7 @@ namespace gdjs {
 
   /**
    * Image-base animation model.
+   * @category Utils > Sprite Animation
    */
   export class SpriteAnimator<T> implements gdjs.Animatable {
     _animations: gdjs.SpriteAnimation<T>[] = [];

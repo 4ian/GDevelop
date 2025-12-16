@@ -24,6 +24,9 @@ namespace gdjs {
   };
   gdjs.registerAsynchronouslyLoadingLibraryPromise(loadJolt());
 
+  /**
+   * @category Core Engine > Runtime Scene
+   */
   export interface RuntimeScene {
     physics3DSharedData: gdjs.Physics3DSharedData | null;
   }
@@ -46,10 +49,16 @@ namespace gdjs {
     masks: number;
   }
 
+  /**
+   * @category Synchronization > Physics 3D
+   */
   export interface Physics3DNetworkSyncData extends BehaviorNetworkSyncData {
     props: Physics3DNetworkSyncDataType;
   }
 
+  /**
+   * @category Behaviors > Physics 3D
+   */
   export class Physics3DSharedData {
     gravityX: float;
     gravityY: float;
@@ -292,6 +301,9 @@ namespace gdjs {
     }
   });
 
+  /**
+   * @category Behaviors > Physics 3D
+   */
   export class Physics3DRuntimeBehavior extends gdjs.RuntimeBehavior {
     bodyUpdater: gdjs.Physics3DRuntimeBehavior.BodyUpdater;
     collisionChecker: gdjs.Physics3DRuntimeBehavior.CollisionChecker;

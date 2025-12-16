@@ -5,6 +5,9 @@
  */
 
 namespace gdjs {
+  /**
+   * @category Objects > Particle Emitter
+   */
   export type ParticleEmitterObjectDataType = {
     /**
      * @deprecated Data not used
@@ -51,9 +54,15 @@ namespace gdjs {
     jumpForwardInTimeOnCreation: float;
   };
 
+  /**
+   * @category Objects > Particle Emitter
+   */
   export type ParticleEmitterObjectData = ObjectData &
     ParticleEmitterObjectDataType;
 
+  /**
+   * @category Synchronization > Particle Emitter
+   */
   export type ParticleEmitterObjectNetworkSyncDataType = {
     // Technically, all attributes can change at runtime, so we sync as many as possible.
     // TODO: ensure we only send props that change to optimize the sync.
@@ -97,11 +106,15 @@ namespace gdjs {
     paused: boolean;
   };
 
+  /**
+   * @category Synchronization > Particle Emitter
+   */
   export type ParticleEmitterObjectNetworkSyncData = ObjectNetworkSyncData &
     ParticleEmitterObjectNetworkSyncDataType;
 
   /**
    * Displays particles.
+   * @category Objects > Particle Emitter
    */
   export class ParticleEmitterObject extends gdjs.RuntimeObject {
     /**

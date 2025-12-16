@@ -13,6 +13,9 @@ namespace gdjs {
     onceTriggers: Record<integer, boolean>;
     lastFrameOnceTriggers: Record<integer, boolean>;
   };
+  /**
+   * @category Core Engine > Events
+   */
   export class OnceTriggers {
     _onceTriggers: Record<integer, boolean> = {};
     _lastFrameOnceTrigger: Record<integer, boolean> = {};

@@ -68,6 +68,7 @@ namespace gdjs {
    *
    * @memberof gdjs
    * @class HowlerSound
+   * @category Audio > Sound
    */
   export class HowlerSound {
     /**
@@ -464,6 +465,7 @@ namespace gdjs {
    *
    * It is basically a container to associate channels to sounds and keep a list
    * of all sounds being played.
+   * @category Audio > Sound Manager
    */
   export class HowlerSoundManager implements gdjs.ResourceManager {
     _loadedMusics = new gdjs.ResourceCache<Howl>();
@@ -1190,6 +1192,12 @@ namespace gdjs {
   }
 
   // Register the class to let the engine use it.
+  /**
+   * @category Audio > Sound Manager
+   */
   export const SoundManager = HowlerSoundManager;
+  /**
+   * @category Audio > Sound Manager
+   */
   export type SoundManager = HowlerSoundManager;
 }

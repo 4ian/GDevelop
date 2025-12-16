@@ -4,6 +4,9 @@
  */
 namespace gdjs {
   /** Base parameters for gdjs.TextRuntimeObject */
+  /**
+   * @category Objects > Text
+   */
   export type TextObjectDataType = {
     content: {
       /** The size of the characters */
@@ -39,8 +42,14 @@ namespace gdjs {
     };
   };
 
+  /**
+   * @category Objects > Text
+   */
   export type TextObjectData = ObjectData & TextObjectDataType;
 
+  /**
+   * @category Synchronization > Text
+   */
   export type TextObjectNetworkSyncDataType = {
     str: string;
     o: float;
@@ -68,11 +77,15 @@ namespace gdjs {
     lh: float;
   };
 
+  /**
+   * @category Synchronization > Text
+   */
   export type TextObjectNetworkSyncData = ObjectNetworkSyncData &
     TextObjectNetworkSyncDataType;
 
   /**
    * Displays a text.
+   * @category Objects > Text
    */
   export class TextRuntimeObject
     extends gdjs.RuntimeObject

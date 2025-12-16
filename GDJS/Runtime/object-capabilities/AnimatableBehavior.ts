@@ -4,6 +4,9 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  /**
+   * @category Behaviors > Animatable
+   */
   export interface Animatable {
     /**
      * Get the index of the animation being played.
@@ -67,6 +70,7 @@ namespace gdjs {
 
   /**
    * A behavior that forwards the Animatable interface to its object.
+   * @category Behaviors > Animatable
    */
   export class AnimatableBehavior
     extends gdjs.RuntimeBehavior

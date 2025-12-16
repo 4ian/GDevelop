@@ -4,6 +4,9 @@
  */
 namespace gdjs {
   /** Represents a color in RGB Format */
+  /**
+   * @category Utils > Color
+   */
   export type RGBColor = {
     /** The Red component of the color, from 0 to 255. */
     r: integer;
@@ -13,9 +16,15 @@ namespace gdjs {
     b: integer;
   };
 
+  /**
+   * @category Utils > Rendering
+   */
   export type Antialiasing = 'none' | 'low' | 'medium' | 'high';
 
   /** Initial properties for a for {@link gdjs.ShapePainterRuntimeObject}. */
+  /**
+   * @category Objects > Shape Painter
+   */
   export type ShapePainterObjectDataType = {
     /** The color of the inner part of the painted shape */
     fillColor: RGBColor | string;
@@ -35,6 +44,9 @@ namespace gdjs {
     antialiasing: Antialiasing;
   };
 
+  /**
+   * @category Objects > Shape Painter
+   */
   export type ShapePainterObjectData = ObjectData & ShapePainterObjectDataType;
 
   type ShapePainterNetworkSyncDataType = {
@@ -52,11 +64,15 @@ namespace gdjs {
     ify: boolean; // isFlippedY
   };
 
+  /**
+   * @category Synchronization > Shape Painter
+   */
   export type ShapePainterNetworkSyncData = ObjectNetworkSyncData &
     ShapePainterNetworkSyncDataType;
 
   /**
    * The ShapePainterRuntimeObject allows to draw graphics shapes on screen.
+   * @category Objects > Shape Painter
    */
   export class ShapePainterRuntimeObject
     extends gdjs.RuntimeObject

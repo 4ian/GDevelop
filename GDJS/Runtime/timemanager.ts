@@ -18,6 +18,9 @@ namespace gdjs {
     timers: Hashtable<TimerNetworkSyncData>;
     firstUpdateDone: boolean;
   }
+  /**
+   * @category Core Engine > Time Manager
+   */
   export class TimeManager {
     _elapsedTime: float = 0;
     _timeScale: float = 1;

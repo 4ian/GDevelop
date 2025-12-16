@@ -2,10 +2,16 @@ namespace gdjs {
   const logger = new gdjs.Logger('Filters');
 
   export namespace PixiFiltersTools {
+    /**
+     * @category Effects > Filter Tools
+     */
     export const clampValue = function (value, min, max) {
       return Math.max(min, Math.min(max, value));
     };
 
+    /**
+     * @category Effects > Filter Tools
+     */
     export const clampKernelSize = function (value, min, max) {
       const len = Math.round((max - min) / 2 + 1);
       const arr = new Array(len);
@@ -23,6 +29,7 @@ namespace gdjs {
      * Return the creator for the filter with the given name, if any.
      * @param filterName The name of the filter to get
      * @return The filter creator, if any (null otherwise).
+     * @category Effects > Filter Tools
      */
     export const getFilterCreator = function (
       filterName: string
@@ -37,6 +44,7 @@ namespace gdjs {
      * Register a new PIXI filter creator, to be used by GDJS.
      * @param filterName The name of the filter to get
      * @param filterCreator The object used to create the filter.
+     * @category Effects > Filter Tools
      */
     export const registerFilterCreator = function (
       filterName: string,
@@ -53,12 +61,18 @@ namespace gdjs {
     };
 
     /** A wrapper allowing to create an effect. */
+    /**
+     * @category Effects > Filter Tools
+     */
     export interface FilterCreator {
       /** Function to call to create the filter */
       makeFilter(target: EffectsTarget, effectData: EffectData): Filter;
     }
 
     /** An effect. */
+    /**
+     * @category Effects > Filter Tools
+     */
     export interface Filter {
       /**
        * Check if an effect is enabled.
@@ -96,6 +110,9 @@ namespace gdjs {
     }
 
     /** A wrapper allowing to create a PIXI filter and update it using a common interface */
+    /**
+     * @category Effects > Filter Tools
+     */
     export abstract class PixiFilterCreator implements FilterCreator {
       /** Function to call to create the filter */
       makeFilter(target: EffectsTarget, effectData: EffectData): Filter {
@@ -154,6 +171,9 @@ namespace gdjs {
     }
 
     /**An effect used to manipulate a Pixi filter. */
+    /**
+     * @category Effects > Filter Tools
+     */
     export class PixiFilter implements Filter {
       /** The PIXI filter */
       pixiFilter: PIXI.Filter;
@@ -269,6 +289,9 @@ namespace gdjs {
       }
     }
 
+    /**
+     * @category Effects > Filter Tools
+     */
     export class EmptyFilter implements Filter {
       isEnabled(target: EffectsTarget): boolean {
         return false;

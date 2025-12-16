@@ -3,6 +3,7 @@ namespace gdjs {
 
   /**
    * Pixi renderer for light runtime objects.
+   * @category Renderers > Light
    */
   export class LightRuntimeObjectPixiRenderer {
     _object: gdjs.LightRuntimeObject;
@@ -637,6 +638,12 @@ namespace gdjs {
   }
 
   // @ts-ignore - Register the class to let the engine use it.
+  /**
+   * @category Renderers > Light
+   */
   export const LightRuntimeObjectRenderer = LightRuntimeObjectPixiRenderer;
+  /**
+   * @category Renderers > Light
+   */
   export type LightRuntimeObjectRenderer = LightRuntimeObjectPixiRenderer;
 }

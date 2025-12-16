@@ -5,6 +5,9 @@
  */
 namespace gdjs {
   /** The callback called when a text that was requested is loaded (or an error occurred). */
+  /**
+   * @category Resources > Spine Atlas
+   */
   export type SpineAtlasManagerRequestCallback = (
     error: Error | null,
     content?: pixi_spine.TextureAtlas
@@ -19,6 +22,7 @@ namespace gdjs {
    * Contrary to audio/fonts, text files are loaded asynchronously, when requested.
    * You should properly handle errors, and give the developer/player a way to know
    * that loading failed.
+   * @category Resources > Spine Atlas
    */
   export class SpineAtlasManager implements gdjs.ResourceManager {
     private _imageManager: ImageManager;

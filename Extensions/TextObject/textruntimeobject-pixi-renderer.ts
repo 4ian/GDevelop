@@ -226,6 +226,12 @@ namespace gdjs {
   }
 
   // Register the class to let the engine use it.
+  /**
+   * @category Renderers > Text
+   */
   export const TextRuntimeObjectRenderer = TextRuntimeObjectPixiRenderer;
+  /**
+   * @category Renderers > Text
+   */
   export type TextRuntimeObjectRenderer = TextRuntimeObjectPixiRenderer;
 }

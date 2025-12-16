@@ -4,6 +4,9 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  /**
+   * @category Behaviors > Resizable
+   */
   export interface Resizable {
     /**
      * Change the width of the object. This changes the scale on X axis of the object.
@@ -42,6 +45,7 @@ namespace gdjs {
 
   /**
    * A behavior that forwards the Resizable interface to its object.
+   * @category Behaviors > Resizable
    */
   export class ResizableBehavior
     extends gdjs.RuntimeBehavior

@@ -2,6 +2,7 @@ namespace gdjs {
   const logger = new gdjs.Logger('Multiplayer');
   const debugLogger = new gdjs.Logger('Multiplayer - Debug');
 
+  /** @category Other extensions > Multiplayer */
   export type MultiplayerVariablesManager = ReturnType<
     typeof makeMultiplayerVariablesManager
   >;

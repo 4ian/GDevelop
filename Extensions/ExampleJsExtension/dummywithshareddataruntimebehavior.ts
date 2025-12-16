@@ -1,5 +1,6 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Dummy behavior (with shared data)');
+  /** @category Behaviors > Dummy */
   export class DummyWithSharedDataRuntimeBehavior extends gdjs.RuntimeBehavior {
     _textToSet: string;
 

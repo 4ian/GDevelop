@@ -2,6 +2,7 @@ namespace gdjs {
   export interface LightNightFilterExtra {
     o: number;
   }
+  /** @category Effects > Filters */
   export class LightNightPixiFilter extends PIXI.Filter {
     constructor() {
       const vertexShader = undefined;

@@ -63,6 +63,7 @@ namespace gdjs {
 
   /**
    * A Console API like class for logging in a GDevelop game.
+   * @category Utils > Logger
    */
   export class Logger {
     private readonly group: string;

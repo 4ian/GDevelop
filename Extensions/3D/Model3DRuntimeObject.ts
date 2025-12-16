@@ -65,6 +65,7 @@ namespace gdjs {
 
   /**
    * A 3D object which displays a 3D model.
+   * @category Objects > 3D Model
    */
   export class Model3DRuntimeObject
     extends gdjs.RuntimeObject3D
@@ -498,6 +499,7 @@ namespace gdjs {
   }
 
   export namespace Model3DRuntimeObject {
+    /** @category Objects > 3D Model */
     export enum MaterialType {
       Basic,
       StandardWithoutMetalness,

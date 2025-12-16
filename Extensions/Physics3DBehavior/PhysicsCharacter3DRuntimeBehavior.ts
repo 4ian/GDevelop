@@ -47,6 +47,9 @@ namespace gdjs {
     shapeFilter: Jolt.ShapeFilter;
   };
 
+  /**
+   * @category Behaviors > Physics 3D
+   */
   export class PhysicsCharacter3DRuntimeBehavior
     extends gdjs.RuntimeBehavior
     implements gdjs.Physics3DRuntimeBehavior.Physics3DHook
@@ -1520,6 +1523,7 @@ namespace gdjs {
   export namespace PhysicsCharacter3DRuntimeBehavior {
     /**
      * Handle collisions between characters that can push each other.
+     * @category Behaviors > Physics 3D
      */
     export class CharactersManager {
       /** Handle collisions between characters that can push each other. */
@@ -1574,6 +1578,7 @@ namespace gdjs {
       ).destroy();
     });
 
+    /** @category Behaviors > Physics 3D */
     export class CharacterBodyUpdater
       implements gdjs.Physics3DRuntimeBehavior.BodyUpdater
     {
@@ -1879,6 +1884,7 @@ namespace gdjs {
      * the physics engine if using the default contact listeners.
      * Instead, this class allows to properly track contacts of the character
      * using Jolt `CharacterVirtual::GetActiveContacts`.
+     * @category Behaviors > Physics 3D
      */
     export class CharacterCollisionChecker
       implements gdjs.Physics3DRuntimeBehavior.CollisionChecker

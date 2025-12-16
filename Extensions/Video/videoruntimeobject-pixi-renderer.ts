@@ -3,6 +3,7 @@ namespace gdjs {
 
   /**
    * The PIXI.js renderer for the VideoRuntimeObject.
+   * @category Renderers > Video
    */
   export class VideoRuntimeObjectPixiRenderer {
     _object: gdjs.VideoRuntimeObject;
@@ -336,5 +337,8 @@ namespace gdjs {
   }
 
   export const VideoRuntimeObjectRenderer = VideoRuntimeObjectPixiRenderer;
+  /**
+   * @category Renderers > Video
+   */
   export type VideoRuntimeObjectRenderer = VideoRuntimeObjectPixiRenderer;
 }

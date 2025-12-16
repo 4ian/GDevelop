@@ -16,6 +16,7 @@ namespace gdjs {
    * `PathfindingObstaclesManager.addObstacle`) to the manager of their
    * associated container (see
    * `gdjs.PathfindingRuntimeBehavior.obstaclesManagers`).
+   * @category Behaviors > Pathfinding
    */
   export class PathfindingObstaclesManager {
     _obstaclesRBush: any;
@@ -97,6 +98,7 @@ namespace gdjs {
   /**
    * PathfindingObstacleRuntimeBehavior represents a behavior allowing objects to be
    * considered as a obstacle by objects having Pathfinding Behavior.
+   * @category Behaviors > Pathfinding
    */
   export class PathfindingObstacleRuntimeBehavior extends gdjs.RuntimeBehavior {
     _impassable: boolean;

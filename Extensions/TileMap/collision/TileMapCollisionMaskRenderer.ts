@@ -3,6 +3,7 @@ namespace gdjs {
     /**
      * This render is only useful for debugging purposes.
      * @see {@link PixiTileMapHelper.updatePixiCollisionMask}, the render used by the GUI.
+     * @category Renderers > Tile Map
      */
     export class TileMapCollisionMaskRenderer {
       _object: gdjs.TileMapCollisionMaskRuntimeObject;

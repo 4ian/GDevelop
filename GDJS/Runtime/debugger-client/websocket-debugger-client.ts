@@ -4,6 +4,7 @@ namespace gdjs {
   /**
    * This debugger client connects to a websocket server, exchanging
    * and receiving messages with this server.
+   * @category Debugging > Debugger Client
    */
   export class WebsocketDebuggerClient extends gdjs.AbstractDebuggerClient {
     _ws: WebSocket | null;

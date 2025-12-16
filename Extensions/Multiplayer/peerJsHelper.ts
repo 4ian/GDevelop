@@ -15,6 +15,7 @@ namespace gdjs {
       onPeerUnavailable?: () => void;
     };
 
+    /** @category Other extensions > Multiplayer */
     export type CompressionMethod = 'none' | 'cs:gzip' | 'cs:deflate';
 
     /**
@@ -36,6 +37,7 @@ namespace gdjs {
     }
     /**
      * The data bound to a message name.
+     * @category Other extensions > Multiplayer
      */
     export class MessageData implements IMessageData {
       public readonly data: any;
@@ -57,6 +59,7 @@ namespace gdjs {
       getMessages(): IMessageData[];
       pushMessage(data: object, sender: string): void;
     }
+    /** @category Other extensions > Multiplayer */
     export class MessagesList implements IMessagesList {
       private readonly data: IMessageData[] = [];
       private readonly messageName: string;

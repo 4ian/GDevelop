@@ -14,11 +14,13 @@ namespace gdjs {
     flipZ: boolean;
   };
 
+  /** @category Synchronization > 3D Objects */
   export type Object3DNetworkSyncData = ObjectNetworkSyncData &
     Object3DNetworkSyncDataType;
 
   /**
    * Base class for 3D objects.
+   * @category Objects > 3D Objects
    */
   export abstract class RuntimeObject3D
     extends gdjs.RuntimeObject

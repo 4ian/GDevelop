@@ -25,6 +25,7 @@ namespace gdjs {
   /**
    * Allows an object to move in 4 or 8 directions, with customizable speed, accelerations
    * and rotation.
+   * @category Behaviors > Top-down movement
    */
   export class TopDownMovementRuntimeBehavior extends gdjs.RuntimeBehavior {
     //Behavior configuration:
@@ -741,6 +742,7 @@ namespace gdjs {
   }
 
   export namespace TopDownMovementRuntimeBehavior {
+    /** @category Behaviors > Top-down movement */
     export class TopDownMovementHookContext {
       private direction: integer = -1;
 
@@ -792,6 +794,7 @@ namespace gdjs {
       toScreen(worldPoint: FloatPoint, screenPoint: FloatPoint): void;
     }
 
+    /** @category Behaviors > Top-down movement */
     export class IsometryTransformation
       implements gdjs.TopDownMovementRuntimeBehavior.BasisTransformation
     {

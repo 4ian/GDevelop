@@ -3,7 +3,10 @@
  *  2013 Florian Rival (Florian.Rival@gmail.com)
  */
 namespace gdjs {
-  /** Initial properties for a Tiled Sprite object */
+  /**
+   * Initial properties for a Tiled Sprite object
+   * @category Objects > Tiled Sprite
+   */
   export type TiledSpriteObjectDataType = {
     /** Default width of the object, if the instance has no custom width. */
     width: number;
@@ -12,8 +15,14 @@ namespace gdjs {
     texture: string;
   };
 
+  /**
+   * @category Objects > Tiled Sprite
+   */
   export type TiledSpriteObjectData = ObjectData & TiledSpriteObjectDataType;
 
+  /**
+   * @category Synchronization > Tiled Sprite
+   */
   export type TiledSpriteNetworkSyncDataType = {
     xo: number;
     yo: number;
@@ -21,11 +30,15 @@ namespace gdjs {
     color: string;
   };
 
+  /**
+   * @category Synchronization > Tiled Sprite
+   */
   export type TiledSpriteNetworkSyncData = ObjectNetworkSyncData &
     TiledSpriteNetworkSyncDataType;
 
   /**
    * The TiledSpriteRuntimeObject displays a tiled texture.
+   * @category Objects > Tiled Sprite
    */
   export class TiledSpriteRuntimeObject
     extends gdjs.RuntimeObject

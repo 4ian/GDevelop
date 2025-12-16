@@ -23,6 +23,9 @@ namespace gdjs {
     behavior: gdjs.Physics3DRuntimeBehavior;
   };
 
+  /**
+   * @category Behaviors > Physics 3D
+   */
   export class PhysicsCar3DRuntimeBehavior
     extends gdjs.RuntimeBehavior
     implements gdjs.Physics3DRuntimeBehavior.Physics3DHook
@@ -955,6 +958,7 @@ namespace gdjs {
   );
 
   export namespace PhysicsCar3DRuntimeBehavior {
+    /** @category Behaviors > Physics 3D */
     export class VehicleBodyUpdater
       implements gdjs.Physics3DRuntimeBehavior.BodyUpdater
     {

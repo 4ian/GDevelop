@@ -4,6 +4,7 @@ namespace gdjs {
   }
   declare var ShopifyBuy: any;
 
+  /** @category Other extensions > Shopify */
   export class ShopifyClientsManager {
     static set(
       instanceContainer: gdjs.RuntimeInstanceContainer,

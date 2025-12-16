@@ -4,11 +4,17 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  /**
+   * @category Utils > Geometry
+   */
   export type CollisionTestResult = {
     collision: boolean;
     move_axis: FloatPoint;
   };
 
+  /**
+   * @category Utils > Geometry
+   */
   export type RaycastTestResult = {
     collision: boolean;
     closeX: float;
@@ -85,6 +91,7 @@ namespace gdjs {
 
   /**
    * Polygon represents a polygon which can be used to create collisions masks for RuntimeObject.
+   * @category Utils > Geometry
    */
   export class Polygon {
     /**

@@ -6,6 +6,7 @@ namespace gdjs {
    * it, at every tick before events are run, to set it to the string that was
    * set in one of the behavior property.
    * @ignore
+   * @category Behaviors > Dummy
    */
   export class DummyRuntimeBehavior extends gdjs.RuntimeBehavior {
     _textToSet: string;

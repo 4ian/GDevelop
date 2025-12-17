@@ -434,18 +434,18 @@ const CustomObjectPropertiesEditor = (props: Props) => {
 
   const schema = React.useMemo(
     () =>
-      propertiesMapToSchema(
-        customObjectConfiguration.getProperties(),
-        customObjectEventsBasedObject
+      propertiesMapToSchema({
+        properties: customObjectConfiguration.getProperties(),
+        defaultValueProperties: customObjectEventsBasedObject
           ? customObjectEventsBasedObject.getPropertyDescriptors()
           : null,
-        instance => instance.getProperties(),
-        (instance, name, value) => {
+        getProperties: instance => instance.getProperties(),
+        onUpdateProperty: (instance, name, value) => {
           instance.updateProperty(name, value);
         },
         object,
-        'All'
-      ),
+        visibility: 'All',
+      }),
     [customObjectConfiguration, customObjectEventsBasedObject, object]
   );
 

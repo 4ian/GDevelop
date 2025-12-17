@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import CompactPropertiesEditor from '../../CompactPropertiesEditor';
-import propertiesMapToSchema from '../../CompactPropertiesEditor/PropertiesMapToCompactSchema';
+import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 import { ColumnStackLayout } from '../../UI/Layout';

@@ -57,7 +57,7 @@ import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { CompactEffectsListEditor } from '../../LayersList/CompactLayerPropertiesEditor/CompactEffectsListEditor';
 import { CompactPropertiesEditorByVisibility } from '../../CompactPropertiesEditor/CompactPropertiesEditorByVisibility';
-import propertiesMapToSchema from '../../CompactPropertiesEditor/PropertiesMapToCompactSchema';
+import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import { useForceRecompute } from '../../Utils/UseForceUpdate';
 
 const gd: libGDevelop = global.gd;

@@ -2,7 +2,7 @@
 import { mapFor } from '../Utils/MapFor';
 import { type Schema } from '../CompactPropertiesEditor';
 import flatten from 'lodash/flatten';
-import { effectPropertiesMapToSchema } from '../CompactPropertiesEditor/PropertiesMapToCompactSchema';
+import { effectPropertiesMapToSchema } from '../PropertiesEditor/PropertiesMapToSchema';
 
 export type EnumeratedEffectMetadata = {|
   extension: gdPlatformExtension,

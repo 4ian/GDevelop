@@ -154,15 +154,15 @@ const ResourcePropertiesEditor = React.forwardRef<
       () => {
         //TODO: Multiple resources support
         const properties = resources[0].getProperties();
-        const resourceSchema = propertiesMapToSchema(
+        const resourceSchema = propertiesMapToSchema({
           properties,
-          null,
-          resource => resource.getProperties(),
-          (resource, name, value) => {
+          defaultValueProperties: null,
+          getProperties: resource => resource.getProperties(),
+          onUpdateProperty: (resource, name, value) => {
             resource.updateProperty(name, value);
             forceUpdate();
-          }
-        );
+          },
+        });
 
         return (
           <PropertiesEditor

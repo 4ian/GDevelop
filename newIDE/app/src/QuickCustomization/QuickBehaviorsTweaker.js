@@ -7,7 +7,7 @@ import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import Text from '../UI/Text';
 import { enumerateObjectFolderOrObjects } from '.';
 import CompactPropertiesEditor from '../CompactPropertiesEditor';
-import propertiesMapToSchema from '../CompactPropertiesEditor/PropertiesMapToCompactSchema';
+import propertiesMapToSchema from '../PropertiesEditor/PropertiesMapToSchema';
 import { Trans } from '@lingui/macro';
 import { useForceRecompute } from '../Utils/UseForceUpdate';
 import TipCard from './TipCard';

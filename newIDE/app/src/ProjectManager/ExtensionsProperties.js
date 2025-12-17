@@ -20,14 +20,14 @@ function ExtensionsProperties(props: Props) {
       .getExtensionProperties()
       .getAllExtensionProperties(extension.getName(), project);
     if (properties.keys().size() === 0) continue;
-    const propertiesSchema = propertiesMapToSchema(
+    const propertiesSchema = propertiesMapToSchema({
       properties,
-      null,
-      instance =>
+      defaultValueProperties: null,
+      getProperties: instance =>
         project
           .getExtensionProperties()
           .getAllExtensionProperties(extension.getName(), project),
-      (instance, propertyName, newValue) => {
+      onUpdateProperty: (instance, propertyName, newValue) => {
         if (
           project
             .getExtensionProperties()
@@ -47,8 +47,8 @@ function ExtensionsProperties(props: Props) {
             .getExtensionProperties()
             .setValue(extension.getName(), propertyName, newValue);
         }
-      }
-    );
+      },
+    });
 
     propertyList.push(
       <ColumnStackLayout key={extension.getName()} noMargin>

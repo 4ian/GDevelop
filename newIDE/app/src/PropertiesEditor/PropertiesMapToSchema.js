@@ -4,19 +4,34 @@ import { mapFor, mapVector } from '../Utils/MapFor';
 import { type Schema, type Instance, type FieldVisibility } from '.';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
 import { type Field } from '.';
-import MeasurementUnitDocumentation from './MeasurementUnitDocumentation';
+import MeasurementUnitDocumentation from '../PropertiesEditor/MeasurementUnitDocumentation';
 import { keyNames } from '../EventsSheet/ParameterFields/KeyboardKeyField';
+
+const gd: libGDevelop = global.gd;
 
 const createField = (
   name: string,
   property: gdPropertyDescriptor,
-  defaultValue: string | null,
-  getProperties: (instance: Instance) => any,
-  onUpdateProperty: (
+  getNumberValue: (instance: Instance, propertyName: string) => number,
+  getStringValue: (instance: Instance, propertyName: string) => string,
+  getBooleanValue: (instance: Instance, propertyName: string) => boolean,
+  setNumberValue: (
     instance: Instance,
     propertyName: string,
-    newValue: string
+    value: number
   ) => void,
+  setStringValue: (
+    instance: Instance,
+    propertyName: string,
+    value: string
+  ) => void,
+  setBooleanValue: (
+    instance: Instance,
+    propertyName: string,
+    value: boolean
+  ) => void,
+  defaultValue: string | null,
+  getProperties: (instance: Instance) => any,
   object: ?gdObject
 ): ?Field => {
   const propertyDescription = property.getDescription();
@@ -59,21 +74,18 @@ const createField = (
     return {
       name,
       valueType,
-      getValue: (instance: Instance): number => {
-        return (
-          parseFloat(
-            getProperties(instance)
-              .get(name)
-              .getValue()
-          ) || 0
-        ); // Consider a missing value as 0 to avoid propagating NaN.
-      },
+      getValue: (instance: Instance): number => getNumberValue(instance, name),
       setValue: (instance: Instance, newValue: number) => {
-        onUpdateProperty(instance, name, '' + newValue);
+        setNumberValue(instance, name, newValue);
       },
       defaultValue: defaultValue ? parseFloat(defaultValue) || 0 : null,
       getLabel,
       getDescription,
+      hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
+      canBeUnlimitedUsingMinus1: property
+        .getExtraInfo()
+        .toJSArray()
+        .includes('canBeUnlimitedUsingMinus1'),
       getEndAdornment,
       visibility,
     };
@@ -81,36 +93,29 @@ const createField = (
     return {
       name,
       valueType: 'string',
-      getValue: (instance: Instance): string => {
-        return getProperties(instance)
-          .get(name)
-          .getValue();
-      },
+      getValue: (instance: Instance): string => getStringValue(instance, name),
       setValue: (instance: Instance, newValue: string) => {
-        onUpdateProperty(instance, name, newValue);
+        setStringValue(instance, name, newValue);
       },
       defaultValue,
       getLabel,
       getDescription,
+      hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
     };
   } else if (valueType === 'boolean') {
     return {
       name,
       valueType,
-      getValue: (instance: Instance): boolean => {
-        return (
-          getProperties(instance)
-            .get(name)
-            .getValue() === 'true'
-        );
-      },
+      getValue: (instance: Instance): boolean =>
+        getBooleanValue(instance, name),
       setValue: (instance: Instance, newValue: boolean) => {
-        onUpdateProperty(instance, name, newValue ? '1' : '0');
+        setBooleanValue(instance, name, newValue);
       },
       defaultValue: defaultValue ? defaultValue === 'true' : null,
       getLabel,
       getDescription,
+      hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
     };
   } else if (valueType === 'choice') {
@@ -123,7 +128,6 @@ const createField = (
           ? ` — ${choice.getLabel()}`
           : ''),
     }));
-
     // TODO Remove this once we made sure no built-in extension still use `addExtraInfo` instead of `addChoice`.
     const deprecatedChoices = property
       .getExtraInfo()
@@ -134,16 +138,13 @@ const createField = (
       name,
       valueType: 'string',
       getChoices: () => [...choices, ...deprecatedChoices],
-      getValue: (instance: Instance): string => {
-        return getProperties(instance)
-          .get(name)
-          .getValue();
-      },
+      getValue: (instance: Instance): string => getStringValue(instance, name),
       setValue: (instance: Instance, newValue: string) => {
-        onUpdateProperty(instance, name, newValue);
+        setStringValue(instance, name, newValue);
       },
       getLabel,
       getDescription,
+      hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
     };
   } else if (valueType === 'behavior') {
@@ -167,16 +168,13 @@ const createField = (
               .filter(Boolean)
               .map(value => ({ value, label: value }));
       },
-      getValue: (instance: Instance): string => {
-        return getProperties(instance)
-          .get(name)
-          .getValue();
-      },
+      getValue: (instance: Instance): string => getStringValue(instance, name),
       setValue: (instance: Instance, newValue: string) => {
-        onUpdateProperty(instance, name, newValue);
+        setStringValue(instance, name, newValue);
       },
       getLabel,
       getDescription,
+      hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
     };
   } else if (valueType === 'leaderboardid') {
@@ -184,16 +182,13 @@ const createField = (
     return {
       name,
       valueType: 'leaderboardId',
-      getValue: (instance: Instance): string => {
-        return getProperties(instance)
-          .get(name)
-          .getValue();
-      },
+      getValue: (instance: Instance): string => getStringValue(instance, name),
       setValue: (instance: Instance, newValue: string) => {
-        onUpdateProperty(instance, name, newValue);
+        setStringValue(instance, name, newValue);
       },
       getLabel,
       getDescription,
+      hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
     };
   } else if (valueType === 'resource') {
@@ -201,53 +196,43 @@ const createField = (
     const extraInfos = property.getExtraInfo().toJSArray();
     // $FlowFixMe - assume the passed resource kind is always valid.
     const kind: ResourceKind = extraInfos[0] || '';
-
     return {
       name,
       valueType: 'resource',
       resourceKind: kind,
-      getValue: (instance: Instance): string => {
-        return getProperties(instance)
-          .get(name)
-          .getValue();
-      },
+      getValue: (instance: Instance): string => getStringValue(instance, name),
       setValue: (instance: Instance, newValue: string) => {
-        onUpdateProperty(instance, name, newValue);
+        setStringValue(instance, name, newValue);
       },
       getLabel,
       getDescription,
+      hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
     };
   } else if (valueType === 'color') {
     return {
       name,
       valueType: 'color',
-      getValue: (instance: Instance): string => {
-        return getProperties(instance)
-          .get(name)
-          .getValue();
-      },
+      getValue: (instance: Instance): string => getStringValue(instance, name),
       setValue: (instance: Instance, newValue: string) => {
-        onUpdateProperty(instance, name, newValue);
+        setStringValue(instance, name, newValue);
       },
       getLabel,
       getDescription,
+      hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
     };
   } else if (valueType === 'multilinestring') {
     return {
       name,
       valueType: 'multilinestring',
-      getValue: (instance: Instance): string => {
-        return getProperties(instance)
-          .get(name)
-          .getValue();
-      },
+      getValue: (instance: Instance): string => getStringValue(instance, name),
       setValue: (instance: Instance, newValue: string) => {
-        onUpdateProperty(instance, name, newValue);
+        setStringValue(instance, name, newValue);
       },
       getLabel,
       getDescription,
+      hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
     };
   } else if (valueType === 'objectanimationname') {
@@ -274,15 +259,12 @@ const createField = (
       },
       name,
       valueType: 'string',
-      getValue: (instance: Instance): string => {
-        return getProperties(instance)
-          .get(name)
-          .getValue();
-      },
+      getValue: (instance: Instance): string => getStringValue(instance, name),
       setValue: (instance: Instance, newValue: string) => {
-        onUpdateProperty(instance, name, newValue);
+        setStringValue(instance, name, newValue);
       },
       getLabel,
+      getDescription,
       visibility,
     };
   } else if (valueType === 'keyboardkey') {
@@ -295,19 +277,14 @@ const createField = (
         choices.push({ value: '', label: '(no key)' });
         return choices;
       },
-      isAutocompleted: true,
-      isAllowingAnyValue: false,
       name,
       valueType: 'string',
-      getValue: (instance: Instance): string => {
-        return getProperties(instance)
-          .get(name)
-          .getValue();
-      },
+      getValue: (instance: Instance): string => getStringValue(instance, name),
       setValue: (instance: Instance, newValue: string) => {
-        onUpdateProperty(instance, name, newValue);
+        setStringValue(instance, name, newValue);
       },
       getLabel,
+      getDescription,
       visibility,
     };
   } else {
@@ -323,7 +300,7 @@ const propertyKeywordCouples: Array<Array<string>> = [
   ['Width', 'Height', 'Depth'],
   ['Top', 'Bottom'],
   ['Left', 'Right'],
-  ['Back', 'Front'],
+  ['Front', 'Back'],
   ['Up', 'Down'],
   ['Min', 'Max'],
   ['Low', 'High'],
@@ -357,11 +334,17 @@ const uncapitalize = str => {
  * @param visibility `true` when only deprecated properties must be displayed
  * and `false` when only not deprecated ones must be displayed
  */
-const isPropertyVisible = (
+const isPropertyVisible = ({
+  properties,
+  name,
+  visibility,
+  quickCustomizationVisibilities,
+}: {
   properties: gdMapStringPropertyDescriptor,
   name: string,
-  visibility: 'All' | 'Basic' | 'Advanced' | 'Deprecated'
-): boolean => {
+  visibility: 'All' | 'Basic' | 'Advanced' | 'Deprecated' | 'Basic-Quick',
+  quickCustomizationVisibilities?: gdQuickCustomizationVisibilitiesContainer,
+}): boolean => {
   if (!properties.has(name)) {
     return false;
   }
@@ -381,31 +364,197 @@ const isPropertyVisible = (
   if (visibility === 'Basic') {
     return !property.isAdvanced() && !property.isDeprecated();
   }
+  if (visibility === 'Basic-Quick') {
+    // "Basic":
+    if (property.isDeprecated()) return false;
+    if (property.isAdvanced()) return false;
+
+    // Honor visibility if set on the property.
+    if (
+      property.getQuickCustomizationVisibility() ===
+      gd.QuickCustomization.Hidden
+    )
+      return false;
+    if (
+      property.getQuickCustomizationVisibility() ===
+      gd.QuickCustomization.Visible
+    )
+      return true;
+
+    // Honor visibility if set on the container.
+    if (quickCustomizationVisibilities) {
+      const visibility = quickCustomizationVisibilities.get(name);
+      if (visibility === gd.QuickCustomization.Hidden) return false;
+      if (visibility === gd.QuickCustomization.Visible) return true;
+    }
+
+    // Otherwise, hide some properties that we know are complex.
+    const propertyType = property.getType();
+    if (propertyType === 'Behavior') return false; // Hide "required behaviors".
+  }
   return true;
 };
 
-/**
- * Transform a MapStringPropertyDescriptor to a schema that can be used in PropertiesEditor.
- *
- * @param properties The properties to use
- * @param getProperties The function called to read again the properties
- * @param onUpdateProperty The function called to update a property of an object
- */
-const propertiesMapToSchema = (
-  properties: gdMapStringPropertyDescriptor,
+type CommonProps = {|
   defaultValueProperties:
     | gdPropertiesContainer
     | gdMapStringPropertyDescriptor
     | null,
   getProperties: (instance: Instance) => any,
+  object?: ?gdObject,
+  visibility?: 'All' | 'Basic' | 'Advanced' | 'Deprecated' | 'Basic-Quick',
+  quickCustomizationVisibilities?: gdQuickCustomizationVisibilitiesContainer,
+|};
+
+export const effectPropertiesMapToSchema = ({
+  defaultValueProperties,
+  getProperties,
+  object,
+  visibility = 'All',
+  quickCustomizationVisibilities,
+}: {
+  ...CommonProps,
+  defaultValueProperties: gdMapStringPropertyDescriptor,
+}): Schema => {
+  return _propertiesMapToSchema({
+    properties: defaultValueProperties,
+    defaultValueProperties,
+    getProperties,
+    object,
+    visibility,
+    quickCustomizationVisibilities,
+    getNumberValue: (instance: Instance, propertyName: string): number =>
+      instance.hasDoubleParameter(propertyName)
+        ? instance.getDoubleParameter(propertyName)
+        : defaultValueProperties.has(propertyName)
+        ? parseFloat(defaultValueProperties.get(propertyName).getValue()) || 0
+        : 0,
+    getStringValue: (instance: Instance, propertyName: string): string =>
+      instance.hasStringParameter(propertyName)
+        ? instance.getStringParameter(propertyName)
+        : defaultValueProperties.has(propertyName)
+        ? defaultValueProperties.get(propertyName).getValue()
+        : '',
+    getBooleanValue: (instance: Instance, propertyName: string): boolean =>
+      instance.hasBooleanParameter(propertyName)
+        ? instance.getBooleanParameter(propertyName)
+        : defaultValueProperties.has(propertyName)
+        ? defaultValueProperties.get(propertyName).getValue() === 'true'
+        : false,
+    setNumberValue: (instance: Instance, propertyName: string, value: number) =>
+      instance.setDoubleParameter(propertyName, value),
+    setStringValue: (instance: Instance, propertyName: string, value: string) =>
+      instance.setStringParameter(propertyName, value),
+    setBooleanValue: (
+      instance: Instance,
+      propertyName: string,
+      value: boolean
+    ) => instance.setBooleanParameter(propertyName, value),
+  });
+};
+
+/**
+ * Transform a MapStringPropertyDescriptor to a schema that can be used
+ * in CompactPropertiesEditor.
+ * This method is similar to PropertiesMapToSchema.propertiesMapToSchema but returns
+ * fields compatible with CompactPropertiesEditor.
+ *
+ * @param properties The properties to use
+ * @param getProperties The function called to read again the properties
+ * @param onUpdateProperty The function called to update a property of an object
+ */
+const propertiesMapToSchema = ({
+  properties,
+  defaultValueProperties,
+  getProperties,
+  onUpdateProperty,
+  object,
+  visibility = 'All',
+  quickCustomizationVisibilities,
+}: {
+  ...CommonProps,
+  properties: gdMapStringPropertyDescriptor,
   onUpdateProperty: (
     instance: Instance,
     propertyName: string,
     newValue: string
   ) => void,
-  object: ?gdObject,
-  visibility: 'All' | 'Basic' | 'Advanced' | 'Deprecated' = 'All'
-): Schema => {
+}): Schema => {
+  return _propertiesMapToSchema({
+    properties,
+    defaultValueProperties,
+    getProperties,
+    object,
+    visibility,
+    quickCustomizationVisibilities,
+    getNumberValue: (instance: Instance, propertyName: string): number => {
+      return (
+        parseFloat(
+          getProperties(instance)
+            .get(propertyName)
+            .getValue()
+        ) || 0
+      ); // Consider a missing value as 0 to avoid propagating NaN.
+    },
+    getStringValue: (instance: Instance, propertyName: string): string => {
+      return getProperties(instance)
+        .get(propertyName)
+        .getValue();
+    },
+    getBooleanValue: (instance: Instance, propertyName: string): boolean => {
+      return (
+        getProperties(instance)
+          .get(propertyName)
+          .getValue() === 'true'
+      );
+    },
+    setNumberValue: (instance: Instance, propertyName: string, value: number) =>
+      onUpdateProperty(instance, propertyName, '' + value),
+    setStringValue: (instance: Instance, propertyName: string, value: string) =>
+      onUpdateProperty(instance, propertyName, value),
+    setBooleanValue: (
+      instance: Instance,
+      propertyName: string,
+      value: boolean
+    ) => onUpdateProperty(instance, propertyName, value ? '1' : '0'),
+  });
+};
+
+const _propertiesMapToSchema = ({
+  properties,
+  defaultValueProperties,
+  getProperties,
+  object,
+  visibility = 'All',
+  quickCustomizationVisibilities,
+  getNumberValue,
+  getStringValue,
+  getBooleanValue,
+  setNumberValue,
+  setStringValue,
+  setBooleanValue,
+}: {|
+  ...CommonProps,
+  properties: gdMapStringPropertyDescriptor,
+  getNumberValue: (instance: Instance, propertyName: string) => number,
+  getStringValue: (instance: Instance, propertyName: string) => string,
+  getBooleanValue: (instance: Instance, propertyName: string) => boolean,
+  setNumberValue: (
+    instance: Instance,
+    propertyName: string,
+    value: number
+  ) => void,
+  setStringValue: (
+    instance: Instance,
+    propertyName: string,
+    value: string
+  ) => void,
+  setBooleanValue: (
+    instance: Instance,
+    propertyName: string,
+    value: boolean
+  ) => void,
+|}): Schema => {
   const propertyNames = properties.keys();
   // Aggregate field by groups to be able to build field groups with a title.
   const fieldsByGroups = new Map<string, Array<Field>>();
@@ -413,7 +562,14 @@ const propertiesMapToSchema = (
   mapFor(0, propertyNames.size(), i => {
     const name = propertyNames.at(i);
     const property = properties.get(name);
-    if (!isPropertyVisible(properties, name, visibility)) {
+    if (
+      !isPropertyVisible({
+        properties,
+        name,
+        visibility,
+        quickCustomizationVisibilities,
+      })
+    ) {
       return null;
     }
     if (alreadyHandledProperties.has(name)) return null;
@@ -437,7 +593,14 @@ const propertiesMapToSchema = (
             name.replace(keyword, otherKeyword)
           );
           for (const rowPropertyName of rowAllPropertyNames) {
-            if (isPropertyVisible(properties, rowPropertyName, visibility)) {
+            if (
+              isPropertyVisible({
+                properties,
+                name: rowPropertyName,
+                visibility,
+                quickCustomizationVisibilities,
+              })
+            ) {
               rowPropertyNames.push(rowPropertyName);
             }
           }
@@ -448,7 +611,14 @@ const propertiesMapToSchema = (
             name.replace(uncapitalizeKeyword, uncapitalize(otherKeyword))
           );
           for (const rowPropertyName of rowAllPropertyNames) {
-            if (isPropertyVisible(properties, rowPropertyName, visibility)) {
+            if (
+              isPropertyVisible({
+                properties,
+                name: rowPropertyName,
+                visibility,
+                quickCustomizationVisibilities,
+              })
+            ) {
               rowPropertyNames.push(rowPropertyName);
             }
           }
@@ -480,9 +650,14 @@ const propertiesMapToSchema = (
             const field = createField(
               rowPropertyName,
               rowProperty,
+              getNumberValue,
+              getStringValue,
+              getBooleanValue,
+              setNumberValue,
+              setStringValue,
+              setBooleanValue,
               rowPropertyDefaultValue,
               getProperties,
-              onUpdateProperty,
               object
             );
 
@@ -507,13 +682,18 @@ const propertiesMapToSchema = (
       field = createField(
         name,
         property,
+        getNumberValue,
+        getStringValue,
+        getBooleanValue,
+        setNumberValue,
+        setStringValue,
+        setBooleanValue,
         defaultValueProperties
           ? defaultValueProperties.has(name)
             ? defaultValueProperties.get(name).getValue()
             : ''
           : null,
         getProperties,
-        onUpdateProperty,
         object
       );
     }

@@ -6,7 +6,7 @@ import { Trans } from '@lingui/macro';
 import { type Schema, type ActionButton } from '../../CompactPropertiesEditor';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import { CompactPropertiesEditorByVisibility } from '../../CompactPropertiesEditor/CompactPropertiesEditorByVisibility';
-import propertiesMapToSchema from '../../CompactPropertiesEditor/PropertiesMapToCompactSchema';
+import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import { useForceRecompute } from '../../Utils/UseForceUpdate';
 
 export const styles = {

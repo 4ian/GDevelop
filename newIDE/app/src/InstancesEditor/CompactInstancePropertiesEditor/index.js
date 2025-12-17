@@ -6,7 +6,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import CompactPropertiesEditor, {
   Separator,
 } from '../../CompactPropertiesEditor';
-import propertiesMapToSchema from '../../CompactPropertiesEditor/PropertiesMapToCompactSchema';
+import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import { type Schema } from '../../CompactPropertiesEditor';
 import getObjectByName from '../../Utils/GetObjectByName';
 import IconButton from '../../UI/IconButton';

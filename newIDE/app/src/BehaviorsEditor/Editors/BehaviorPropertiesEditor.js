@@ -26,16 +26,16 @@ const BehaviorPropertiesEditor = ({
 
   const schema = React.useMemo(
     () =>
-      propertiesMapToSchema(
-        behavior.getProperties(),
-        behaviorMetadata.getProperties(),
-        instance => instance.getProperties(),
-        (instance, name, value) => {
+      propertiesMapToSchema({
+        properties: behavior.getProperties(),
+        defaultValueProperties: behaviorMetadata.getProperties(),
+        getProperties: instance => instance.getProperties(),
+        onUpdateProperty: (instance, name, value) => {
           instance.updateProperty(name, value);
         },
         object,
-        'All'
-      ),
+        visibility: 'All',
+      }),
     [behavior, behaviorMetadata, object]
   );
 

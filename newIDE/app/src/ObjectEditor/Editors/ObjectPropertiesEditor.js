@@ -39,12 +39,13 @@ const ObjectPropertiesEditor = (props: Props) => {
   );
   const properties = objectConfigurationAsGd.getProperties();
 
-  const propertiesSchema = propertiesMapToSchema(
+  const propertiesSchema = propertiesMapToSchema({
     properties,
-    null,
-    object => object.getProperties(),
-    (object, name, value) => object.updateProperty(name, value)
-  );
+    defaultValueProperties: null,
+    getProperties: object => object.getProperties(),
+    onUpdateProperty: (object, name, value) =>
+      object.updateProperty(name, value),
+  });
 
   const extraInformation = getExtraObjectsInformation()[
     objectConfigurationAsGd.getType()

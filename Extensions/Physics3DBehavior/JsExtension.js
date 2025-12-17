@@ -288,10 +288,18 @@ module.exports = {
           .setType('Choice')
           .setLabel('Shape')
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .addExtraInfo('Box')
-          .addExtraInfo('Capsule')
-          .addExtraInfo('Cylinder')
-          .addExtraInfo('Sphere');
+          .addChoice('Box', _('Box'))
+          .addChoice('Capsule', _('Capsule'))
+          .addChoice('Sphere', _('Sphere'))
+          .addChoice('Mesh', _('Mesh'));
+
+        behaviorProperties
+          .getOrCreate('meshShapeResourceName')
+          .setValue(behaviorContent.getChild('meshShapeResourceName').getStringValue())
+          .setType('resource')
+          .addExtraInfo('model3D')
+          .setLabel(_('3D model'));
+
         behaviorProperties
           .getOrCreate('shapeOrientation')
           .setValue(

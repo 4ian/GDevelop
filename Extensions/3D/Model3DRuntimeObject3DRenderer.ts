@@ -147,29 +147,23 @@ namespace gdjs {
       originalDepth: float,
       keepAspectRatio: boolean
     ) {
-      // These formulas are also used in:
-      // - Model3DEditor.modelSize
-      // - Model3DRendered2DInstance
-      threeObject.rotation.set(
-        gdjs.toRad(rotationX),
-        gdjs.toRad(rotationY),
-        gdjs.toRad(rotationZ)
-      );
-      threeObject.updateMatrixWorld(true);
-      const boundingBox = new THREE.Box3().setFromObject(threeObject);
-
       const shouldKeepModelOrigin = !this._model3DRuntimeObject._originPoint;
-      if (shouldKeepModelOrigin) {
-        // Keep the origin as part of the model.
-        // For instance, a model can be 1 face of a cube and we want to keep the
-        // inside as part of the object even if it's just void.
-        // It also avoids to have the origin outside of the object box.
-        boundingBox.expandByPoint(new THREE.Vector3(0, 0, 0));
-      }
+      const boundingBox = this._object
+        .getInstanceContainer()
+        .getGame()
+        .getModel3DManager()
+        .getModelBoundingBox(
+          this._model3DRuntimeObject._modelResourceName,
+          rotationX,
+          rotationY,
+          rotationZ,
+          shouldKeepModelOrigin
+        );
 
       const modelWidth = boundingBox.max.x - boundingBox.min.x;
       const modelHeight = boundingBox.max.y - boundingBox.min.y;
       const modelDepth = boundingBox.max.z - boundingBox.min.z;
+
       this._modelOriginPoint[0] =
         modelWidth < epsilon ? 0 : -boundingBox.min.x / modelWidth;
       this._modelOriginPoint[1] =

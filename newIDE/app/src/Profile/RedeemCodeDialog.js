@@ -30,6 +30,14 @@ export const getRedeemCodeErrorText = (error: ?Error) => {
         </Trans>
       );
     }
+    if (extractedStatusAndCode.code === 'redemption-code/code-is-a-coupon') {
+      return (
+        <Trans>
+          This code is a coupon code and can't be redeemed here. Start a
+          purchase and enter it there to get a discount.
+        </Trans>
+      );
+    }
     if (
       extractedStatusAndCode.code ===
       'redemption-code/cannot-be-redeemed-anymore'

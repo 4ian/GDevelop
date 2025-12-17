@@ -12,13 +12,26 @@ const gd: libGDevelop = global.gd;
 const createField = (
   name: string,
   property: gdPropertyDescriptor,
-  defaultValue: string | null,
-  getProperties: (instance: Instance) => any,
-  onUpdateProperty: (
+  getNumberValue: (instance: Instance, propertyName: string) => number,
+  getStringValue: (instance: Instance, propertyName: string) => string,
+  getBooleanValue: (instance: Instance, propertyName: string) => boolean,
+  setNumberValue: (
     instance: Instance,
     propertyName: string,
-    newValue: string
+    value: number
   ) => void,
+  setStringValue: (
+    instance: Instance,
+    propertyName: string,
+    value: string
+  ) => void,
+  setBooleanValue: (
+    instance: Instance,
+    propertyName: string,
+    value: boolean
+  ) => void,
+  defaultValue: string | null,
+  getProperties: (instance: Instance) => any,
   object: ?gdObject
 ): ?Field => {
   const propertyDescription = property.getDescription();
@@ -61,17 +74,9 @@ const createField = (
     return {
       name,
       valueType,
-      getValue: (instance: Instance): number => {
-        return (
-          parseFloat(
-            getProperties(instance)
-              .get(name)
-              .getValue()
-          ) || 0
-        ); // Consider a missing value as 0 to avoid propagating NaN.
-      },
+      getValue: (instance: Instance): number => getNumberValue(instance, name),
       setValue: (instance: Instance, newValue: number) => {
-        onUpdateProperty(instance, name, '' + newValue);
+        setNumberValue(instance, name, newValue);
       },
       defaultValue: defaultValue ? parseFloat(defaultValue) || 0 : null,
       getLabel,
@@ -88,13 +93,9 @@ const createField = (
     return {
       name,
       valueType: 'string',
-      getValue: (instance: Instance): string => {
-        return getProperties(instance)
-          .get(name)
-          .getValue();
-      },
+      getValue: (instance: Instance): string => getStringValue(instance, name),
       setValue: (instance: Instance, newValue: string) => {
-        onUpdateProperty(instance, name, newValue);
+        setStringValue(instance, name, newValue);
       },
       defaultValue,
       getLabel,
@@ -106,15 +107,10 @@ const createField = (
     return {
       name,
       valueType,
-      getValue: (instance: Instance): boolean => {
-        return (
-          getProperties(instance)
-            .get(name)
-            .getValue() === 'true'
-        );
-      },
+      getValue: (instance: Instance): boolean =>
+        getBooleanValue(instance, name),
       setValue: (instance: Instance, newValue: boolean) => {
-        onUpdateProperty(instance, name, newValue ? '1' : '0');
+        setBooleanValue(instance, name, newValue);
       },
       defaultValue: defaultValue ? defaultValue === 'true' : null,
       getLabel,
@@ -142,13 +138,9 @@ const createField = (
       name,
       valueType: 'string',
       getChoices: () => [...choices, ...deprecatedChoices],
-      getValue: (instance: Instance): string => {
-        return getProperties(instance)
-          .get(name)
-          .getValue();
-      },
+      getValue: (instance: Instance): string => getStringValue(instance, name),
       setValue: (instance: Instance, newValue: string) => {
-        onUpdateProperty(instance, name, newValue);
+        setStringValue(instance, name, newValue);
       },
       getLabel,
       getDescription,
@@ -176,13 +168,9 @@ const createField = (
               .filter(Boolean)
               .map(value => ({ value, label: value }));
       },
-      getValue: (instance: Instance): string => {
-        return getProperties(instance)
-          .get(name)
-          .getValue();
-      },
+      getValue: (instance: Instance): string => getStringValue(instance, name),
       setValue: (instance: Instance, newValue: string) => {
-        onUpdateProperty(instance, name, newValue);
+        setStringValue(instance, name, newValue);
       },
       getLabel,
       getDescription,
@@ -194,13 +182,9 @@ const createField = (
     return {
       name,
       valueType: 'leaderboardId',
-      getValue: (instance: Instance): string => {
-        return getProperties(instance)
-          .get(name)
-          .getValue();
-      },
+      getValue: (instance: Instance): string => getStringValue(instance, name),
       setValue: (instance: Instance, newValue: string) => {
-        onUpdateProperty(instance, name, newValue);
+        setStringValue(instance, name, newValue);
       },
       getLabel,
       getDescription,
@@ -216,13 +200,9 @@ const createField = (
       name,
       valueType: 'resource',
       resourceKind: kind,
-      getValue: (instance: Instance): string => {
-        return getProperties(instance)
-          .get(name)
-          .getValue();
-      },
+      getValue: (instance: Instance): string => getStringValue(instance, name),
       setValue: (instance: Instance, newValue: string) => {
-        onUpdateProperty(instance, name, newValue);
+        setStringValue(instance, name, newValue);
       },
       getLabel,
       getDescription,
@@ -233,13 +213,9 @@ const createField = (
     return {
       name,
       valueType: 'color',
-      getValue: (instance: Instance): string => {
-        return getProperties(instance)
-          .get(name)
-          .getValue();
-      },
+      getValue: (instance: Instance): string => getStringValue(instance, name),
       setValue: (instance: Instance, newValue: string) => {
-        onUpdateProperty(instance, name, newValue);
+        setStringValue(instance, name, newValue);
       },
       getLabel,
       getDescription,
@@ -250,13 +226,9 @@ const createField = (
     return {
       name,
       valueType: 'multilinestring',
-      getValue: (instance: Instance): string => {
-        return getProperties(instance)
-          .get(name)
-          .getValue();
-      },
+      getValue: (instance: Instance): string => getStringValue(instance, name),
       setValue: (instance: Instance, newValue: string) => {
-        onUpdateProperty(instance, name, newValue);
+        setStringValue(instance, name, newValue);
       },
       getLabel,
       getDescription,
@@ -287,13 +259,9 @@ const createField = (
       },
       name,
       valueType: 'string',
-      getValue: (instance: Instance): string => {
-        return getProperties(instance)
-          .get(name)
-          .getValue();
-      },
+      getValue: (instance: Instance): string => getStringValue(instance, name),
       setValue: (instance: Instance, newValue: string) => {
-        onUpdateProperty(instance, name, newValue);
+        setStringValue(instance, name, newValue);
       },
       getLabel,
       getDescription,
@@ -311,13 +279,9 @@ const createField = (
       },
       name,
       valueType: 'string',
-      getValue: (instance: Instance): string => {
-        return getProperties(instance)
-          .get(name)
-          .getValue();
-      },
+      getValue: (instance: Instance): string => getStringValue(instance, name),
       setValue: (instance: Instance, newValue: string) => {
-        onUpdateProperty(instance, name, newValue);
+        setStringValue(instance, name, newValue);
       },
       getLabel,
       getDescription,
@@ -349,6 +313,12 @@ const propertyKeywordCouples: Array<Array<string>> = [
   ['JumpSpeed', 'JumpSustainTime'],
   ['XGrabTolerance', 'YGrabOffset'],
   ['MaxSpeed', 'SlopeMaxAngle'],
+  ['Beginning', 'End'],
+  ['Start', 'End'],
+  ['Rear', 'Front'],
+  ['1', '2'],
+  ['3', '4'],
+  ['5', '6'],
 ];
 
 const uncapitalize = str => {
@@ -425,6 +395,64 @@ const isPropertyVisible = ({
   return true;
 };
 
+type CommonProps = {|
+  defaultValueProperties:
+    | gdPropertiesContainer
+    | gdMapStringPropertyDescriptor
+    | null,
+  getProperties: (instance: Instance) => any,
+  object?: ?gdObject,
+  visibility?: 'All' | 'Basic' | 'Advanced' | 'Deprecated' | 'Basic-Quick',
+  quickCustomizationVisibilities?: gdQuickCustomizationVisibilitiesContainer,
+|};
+
+export const effectPropertiesMapToSchema = ({
+  defaultValueProperties,
+  getProperties,
+  object,
+  visibility = 'All',
+  quickCustomizationVisibilities,
+}: {
+  ...CommonProps,
+  defaultValueProperties: gdMapStringPropertyDescriptor,
+}): Schema => {
+  return _propertiesMapToSchema({
+    properties: defaultValueProperties,
+    defaultValueProperties,
+    getProperties,
+    object,
+    visibility,
+    quickCustomizationVisibilities,
+    getNumberValue: (instance: Instance, propertyName: string): number =>
+      instance.hasDoubleParameter(propertyName)
+        ? instance.getDoubleParameter(propertyName)
+        : defaultValueProperties.has(propertyName)
+        ? parseFloat(defaultValueProperties.get(propertyName).getValue()) || 0
+        : 0,
+    getStringValue: (instance: Instance, propertyName: string): string =>
+      instance.hasStringParameter(propertyName)
+        ? instance.getStringParameter(propertyName)
+        : defaultValueProperties.has(propertyName)
+        ? defaultValueProperties.get(propertyName).getValue()
+        : '',
+    getBooleanValue: (instance: Instance, propertyName: string): boolean =>
+      instance.hasBooleanParameter(propertyName)
+        ? instance.getBooleanParameter(propertyName)
+        : defaultValueProperties.has(propertyName)
+        ? defaultValueProperties.get(propertyName).getValue() === 'true'
+        : false,
+    setNumberValue: (instance: Instance, propertyName: string, value: number) =>
+      instance.setDoubleParameter(propertyName, value),
+    setStringValue: (instance: Instance, propertyName: string, value: string) =>
+      instance.setStringParameter(propertyName, value),
+    setBooleanValue: (
+      instance: Instance,
+      propertyName: string,
+      value: boolean
+    ) => instance.setBooleanParameter(propertyName, value),
+  });
+};
+
 /**
  * Transform a MapStringPropertyDescriptor to a schema that can be used
  * in CompactPropertiesEditor.
@@ -443,21 +471,89 @@ const propertiesMapToSchema = ({
   object,
   visibility = 'All',
   quickCustomizationVisibilities,
-}: {|
+}: {
+  ...CommonProps,
   properties: gdMapStringPropertyDescriptor,
-  defaultValueProperties:
-    | gdPropertiesContainer
-    | gdMapStringPropertyDescriptor
-    | null,
-  getProperties: (instance: Instance) => any,
   onUpdateProperty: (
     instance: Instance,
     propertyName: string,
     newValue: string
   ) => void,
-  object?: ?gdObject,
-  visibility?: 'All' | 'Basic' | 'Advanced' | 'Deprecated' | 'Basic-Quick',
-  quickCustomizationVisibilities?: gdQuickCustomizationVisibilitiesContainer,
+}): Schema => {
+  return _propertiesMapToSchema({
+    properties,
+    defaultValueProperties,
+    getProperties,
+    object,
+    visibility,
+    quickCustomizationVisibilities,
+    getNumberValue: (instance: Instance, propertyName: string): number => {
+      return (
+        parseFloat(
+          getProperties(instance)
+            .get(propertyName)
+            .getValue()
+        ) || 0
+      ); // Consider a missing value as 0 to avoid propagating NaN.
+    },
+    getStringValue: (instance: Instance, propertyName: string): string => {
+      return getProperties(instance)
+        .get(propertyName)
+        .getValue();
+    },
+    getBooleanValue: (instance: Instance, propertyName: string): boolean => {
+      return (
+        getProperties(instance)
+          .get(propertyName)
+          .getValue() === 'true'
+      );
+    },
+    setNumberValue: (instance: Instance, propertyName: string, value: number) =>
+      onUpdateProperty(instance, propertyName, '' + value),
+    setStringValue: (instance: Instance, propertyName: string, value: string) =>
+      onUpdateProperty(instance, propertyName, value),
+    setBooleanValue: (
+      instance: Instance,
+      propertyName: string,
+      value: boolean
+    ) => onUpdateProperty(instance, propertyName, value ? '1' : '0'),
+  });
+};
+
+const _propertiesMapToSchema = ({
+  properties,
+  defaultValueProperties,
+  getProperties,
+  object,
+  visibility = 'All',
+  quickCustomizationVisibilities,
+  getNumberValue,
+  getStringValue,
+  getBooleanValue,
+  setNumberValue,
+  setStringValue,
+  setBooleanValue,
+}: {|
+  ...CommonProps,
+  properties: gdMapStringPropertyDescriptor,
+  getNumberValue: (instance: Instance, propertyName: string) => number,
+  getStringValue: (instance: Instance, propertyName: string) => string,
+  getBooleanValue: (instance: Instance, propertyName: string) => boolean,
+  setNumberValue: (
+    instance: Instance,
+    propertyName: string,
+    value: number
+  ) => void,
+  setStringValue: (
+    instance: Instance,
+    propertyName: string,
+    value: string
+  ) => void,
+  setBooleanValue: (
+    instance: Instance,
+    propertyName: string,
+    value: boolean
+  ) => void,
 |}): Schema => {
   const propertyNames = properties.keys();
   // Aggregate field by groups to be able to build field groups with a title.
@@ -554,9 +650,14 @@ const propertiesMapToSchema = ({
             const field = createField(
               rowPropertyName,
               rowProperty,
+              getNumberValue,
+              getStringValue,
+              getBooleanValue,
+              setNumberValue,
+              setStringValue,
+              setBooleanValue,
               rowPropertyDefaultValue,
               getProperties,
-              onUpdateProperty,
               object
             );
 
@@ -581,13 +682,18 @@ const propertiesMapToSchema = ({
       field = createField(
         name,
         property,
+        getNumberValue,
+        getStringValue,
+        getBooleanValue,
+        setNumberValue,
+        setStringValue,
+        setBooleanValue,
         defaultValueProperties
           ? defaultValueProperties.has(name)
             ? defaultValueProperties.get(name).getValue()
             : ''
           : null,
         getProperties,
-        onUpdateProperty,
         object
       );
     }

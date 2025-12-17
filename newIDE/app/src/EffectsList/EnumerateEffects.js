@@ -1,8 +1,8 @@
 // @flow
-import { mapFor, mapVector } from '../Utils/MapFor';
-import { type Schema, type FieldVisibility } from '../CompactPropertiesEditor';
-import { type ResourceKind } from '../ResourcesList/ResourceSource';
+import { mapFor } from '../Utils/MapFor';
+import { type Schema } from '../CompactPropertiesEditor';
 import flatten from 'lodash/flatten';
+import { effectPropertiesMapToSchema } from '../CompactPropertiesEditor/PropertiesMapToCompactSchema';
 
 export type EnumeratedEffectMetadata = {|
   extension: gdPlatformExtension,
@@ -38,132 +38,10 @@ export const enumerateEffectsMetadata = (
           const effectType = effectMetadata.getType();
 
           // Convert the effect type properties to a PropertiesEditor Schema.
-          const properties = effectMetadata.getProperties();
-          const parameterNames = properties.keys().toJSArray();
-          const parametersSchema: Schema = parameterNames
-            .map((parameterName: string) => {
-              const property = properties.get(parameterName);
-              const valueType = property.getType().toLowerCase();
-              const propertyLabel = property.getLabel();
-              const propertyDescription = property.getDescription();
-              const getLabel = () => propertyLabel;
-              const getDescription = () => propertyDescription;
-              const getExtraDescription = () => parameterName;
-              const visibility: FieldVisibility = property.isDeprecated()
-                ? 'deprecated'
-                : property.isAdvanced()
-                ? 'advanced'
-                : 'basic';
-              const defaultValue = property.getValue();
-
-              if (valueType === 'number') {
-                return {
-                  name: parameterName,
-                  valueType: 'number',
-                  getValue: (effect: gdEffect) =>
-                    effect.hasDoubleParameter(parameterName)
-                      ? effect.getDoubleParameter(parameterName)
-                      : parseFloat(defaultValue) || 0,
-                  setValue: (effect: gdEffect, newValue: number) =>
-                    effect.setDoubleParameter(parameterName, newValue),
-                  getLabel,
-                  getDescription,
-                  getExtraDescription,
-                  visibility,
-                  defaultValue: parseFloat(defaultValue) || 0,
-                };
-              } else if (valueType === 'boolean') {
-                return {
-                  name: parameterName,
-                  valueType: 'boolean',
-                  getValue: (effect: gdEffect) =>
-                    effect.hasBooleanParameter(parameterName)
-                      ? effect.getBooleanParameter(parameterName)
-                      : defaultValue === 'true',
-                  setValue: (effect: gdEffect, newValue: boolean) =>
-                    effect.setBooleanParameter(parameterName, newValue),
-                  getLabel,
-                  getDescription,
-                  getExtraDescription,
-                  visibility,
-                  defaultValue: defaultValue === 'true',
-                };
-              } else if (valueType === 'resource') {
-                // Resource is a "string" (with a selector in the UI)
-                const kind: ResourceKind =
-                  // $FlowFixMe - assume the passed resource kind is always valid.
-                  property.getExtraInfo().toJSArray()[0] || '';
-                return {
-                  name: parameterName,
-                  valueType: 'resource',
-                  resourceKind: kind,
-                  getValue: (effect: gdEffect) =>
-                    effect.hasStringParameter(parameterName)
-                      ? effect.getStringParameter(parameterName)
-                      : defaultValue,
-                  setValue: (effect: gdEffect, newValue: string) =>
-                    effect.setStringParameter(parameterName, newValue),
-                  getLabel,
-                  getDescription,
-                  getExtraDescription,
-                  visibility,
-                  defaultValue,
-                };
-              } else if (valueType === 'color') {
-                return {
-                  name: parameterName,
-                  valueType: 'color',
-                  getValue: (effect: gdEffect) =>
-                    effect.hasStringParameter(parameterName)
-                      ? effect.getStringParameter(parameterName)
-                      : defaultValue,
-                  setValue: (effect: gdEffect, newValue: string) =>
-                    effect.setStringParameter(parameterName, newValue),
-                  getLabel,
-                  getDescription,
-                  getExtraDescription,
-                  visibility,
-                  defaultValue,
-                };
-              } else if (valueType === 'choice') {
-                const choices = mapVector(property.getChoices(), choice => ({
-                  value: choice.getValue(),
-                  label:
-                    choice.getValue() +
-                    (choice.getLabel() &&
-                    choice.getLabel() !== choice.getValue()
-                      ? ` — ${choice.getLabel()}`
-                      : ''),
-                }));
-                const deprecatedChoices = property
-                  .getExtraInfo()
-                  .toJSArray()
-                  .map(value => ({ value, label: value }));
-                return {
-                  name: parameterName,
-                  valueType: 'string',
-                  getChoices: () => [...choices, ...deprecatedChoices],
-                  getValue: (effect: gdEffect) =>
-                    effect.hasStringParameter(parameterName)
-                      ? effect.getStringParameter(parameterName)
-                      : defaultValue,
-                  setValue: (effect: gdEffect, newValue: string) =>
-                    effect.setStringParameter(parameterName, newValue),
-                  getLabel,
-                  getDescription,
-                  getExtraDescription,
-                  visibility,
-                  defaultValue,
-                };
-              } else {
-                console.error(
-                  `A property with type=${valueType} could not be mapped to a field for effect ${effectType}. Ensure that this type is correct.`
-                );
-                return null;
-              }
-            })
-            .filter(Boolean);
-
+          const parametersSchema: Schema = effectPropertiesMapToSchema({
+            defaultValueProperties: effectMetadata.getProperties(),
+            getProperties: instance => effectMetadata.getProperties(),
+          });
           return {
             extension,
             type: effectType,

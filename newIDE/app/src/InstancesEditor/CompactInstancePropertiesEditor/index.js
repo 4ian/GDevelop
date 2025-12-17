@@ -7,7 +7,7 @@ import CompactPropertiesEditor, {
   Separator,
 } from '../../CompactPropertiesEditor';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
-import { type Schema } from '../../CompactPropertiesEditor';
+import { type Schema } from '../../PropertiesEditor/PropertiesEditorSchema';
 import getObjectByName from '../../Utils/GetObjectByName';
 import IconButton from '../../UI/IconButton';
 import { Line, Column, Spacer, marginsSize } from '../../UI/Grid';

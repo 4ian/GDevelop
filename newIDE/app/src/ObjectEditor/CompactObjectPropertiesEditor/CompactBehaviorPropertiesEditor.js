@@ -3,7 +3,10 @@ import * as React from 'react';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import { ColumnStackLayout } from '../../UI/Layout';
 import { Trans } from '@lingui/macro';
-import { type Schema, type ActionButton } from '../../CompactPropertiesEditor';
+import {
+  type Schema,
+  type ActionButton,
+} from '../../PropertiesEditor/PropertiesEditorSchema';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import { CompactPropertiesEditorByVisibility } from '../../CompactPropertiesEditor/CompactPropertiesEditorByVisibility';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';

@@ -26,7 +26,7 @@ import Window from '../../Utils/Window';
 import CompactTextField from '../../UI/CompactTextField';
 import { textEllipsisStyle } from '../../UI/TextEllipsis';
 import { makeSchema } from './CompactLayerPropertiesSchema';
-import { type Schema } from '../../CompactPropertiesEditor';
+import { type Schema } from '../../PropertiesEditor/PropertiesEditorSchema';
 import { CompactEffectsListEditor } from './CompactEffectsListEditor';
 
 export const styles = {

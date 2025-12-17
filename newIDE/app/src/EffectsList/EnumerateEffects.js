@@ -1,6 +1,6 @@
 // @flow
 import { mapFor } from '../Utils/MapFor';
-import { type Schema } from '../CompactPropertiesEditor';
+import { type Schema } from '../PropertiesEditor/PropertiesEditorSchema';
 import flatten from 'lodash/flatten';
 import { effectPropertiesMapToSchema } from '../PropertiesEditor/PropertiesMapToSchema';
 

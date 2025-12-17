@@ -9,7 +9,7 @@ import PropertiesEditor from '../../PropertiesEditor';
 import ResourcePreview from '../../ResourcesList/ResourcePreview';
 import ResourcesLoader from '../../ResourcesLoader';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
-import { type Schema } from '../../PropertiesEditor';
+import { type Schema } from '../../PropertiesEditor/PropertiesEditorSchema';
 
 import {
   type ResourceSource,

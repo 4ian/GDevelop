@@ -2,10 +2,11 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import PropertiesEditor, {
+import {
   type Schema,
   type Instances,
-} from '../PropertiesEditor';
+} from '../PropertiesEditor/PropertiesEditorSchema';
+import PropertiesEditor from '../PropertiesEditor';
 import EmptyMessage from '../UI/EmptyMessage';
 import { Column, Line } from '../UI/Grid';
 import FlatButton from '../UI/FlatButton';

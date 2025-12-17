@@ -15,7 +15,7 @@ import {
   type Instances,
   type Field,
   type FieldVisibility,
-} from '.';
+} from '../PropertiesEditor/PropertiesEditorSchema';
 import ShareExternal from '../UI/CustomSvgIcons/ShareExternal';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { hasSchemaAnyProperty } from '../PropertiesEditor/PropertiesEditorByVisibility';

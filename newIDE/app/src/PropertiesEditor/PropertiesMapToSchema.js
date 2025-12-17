@@ -1,9 +1,13 @@
 // @flow
 import * as React from 'react';
 import { mapFor, mapVector } from '../Utils/MapFor';
-import { type Schema, type Instance, type FieldVisibility } from '.';
+import {
+  type Schema,
+  type Instance,
+  type FieldVisibility,
+  type Field,
+} from './PropertiesEditorSchema';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
-import { type Field } from '.';
 import MeasurementUnitDocumentation from '../PropertiesEditor/MeasurementUnitDocumentation';
 import { keyNames } from '../EventsSheet/ParameterFields/KeyboardKeyField';
 

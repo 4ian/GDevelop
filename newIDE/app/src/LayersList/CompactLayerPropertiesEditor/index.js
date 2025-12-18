@@ -28,6 +28,7 @@ import { textEllipsisStyle } from '../../UI/TextEllipsis';
 import { makeSchema } from './CompactLayerPropertiesSchema';
 import { type Schema } from '../../PropertiesEditor/PropertiesEditorSchema';
 import { CompactEffectsListEditor } from './CompactEffectsListEditor';
+import { useForceRecompute } from '../../Utils/UseForceUpdate';
 
 export const styles = {
   icon: {
@@ -49,12 +50,6 @@ export const styles = {
     paddingLeft: marginsSize * 3,
     paddingRight: marginsSize,
   },
-};
-
-const noRefreshOfAllFields = () => {
-  console.warn(
-    "An instance tried to refresh all fields, but the editor doesn't support it."
-  );
 };
 
 const effectsHelpLink = getHelpLink(
@@ -157,24 +152,21 @@ export const CompactLayerPropertiesEditor = ({
       ? !layer.isLightingLayer()
       : !!isPropertiesFoldedOrDefault;
 
-  // Properties:
-  const { object, instanceSchema } = React.useMemo<{|
-    object?: gdObject,
-    instanceSchema?: Schema,
-  |}>(
+  const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
+
+  const layerPropertiesSchema = React.useMemo<Schema>(
     () => {
-      const instanceSchema = makeSchema({
+      if (schemaRecomputeTrigger) {
+        // schemaRecomputeTrigger allows to invalidate the schema when required.
+      }
+      return makeSchema({
         i18n,
         onEditLayer,
         layersContainer,
         forceUpdate,
       });
-      return {
-        object,
-        instanceSchema,
-      };
     },
-    [i18n, onEditLayer, layersContainer, forceUpdate]
+    [schemaRecomputeTrigger, i18n, onEditLayer, layersContainer, forceUpdate]
   );
 
   const openFullEditor = React.useCallback(() => onEditLayer(layer), [
@@ -216,7 +208,7 @@ export const CompactLayerPropertiesEditor = ({
               disabled
             />
           </ColumnStackLayout>
-          {instanceSchema && (
+          {layerPropertiesSchema && (
             <TopLevelCollapsibleSection
               title={<Trans>Properties</Trans>}
               isFolded={isPropertiesFolded}
@@ -226,10 +218,10 @@ export const CompactLayerPropertiesEditor = ({
                 <ColumnStackLayout noMargin noOverflowParent>
                   <CompactPropertiesEditor
                     unsavedChanges={unsavedChanges}
-                    schema={instanceSchema}
+                    schema={layerPropertiesSchema}
                     instances={[layer]}
                     onInstancesModified={onLayersModified}
-                    onRefreshAllFields={noRefreshOfAllFields}
+                    onRefreshAllFields={forceRecomputeSchema}
                   />
                 </ColumnStackLayout>
               )}

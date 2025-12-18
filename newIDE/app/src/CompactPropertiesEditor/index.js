@@ -1,12 +1,7 @@
 // @flow
-import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import SelectOption from '../UI/SelectOption';
-import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
-import {
-  type ResourceKind,
-  type ResourceManagementProps,
-} from '../ResourcesList/ResourceSource';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import {
   ResponsiveLineStackLayout,
   ColumnStackLayout,

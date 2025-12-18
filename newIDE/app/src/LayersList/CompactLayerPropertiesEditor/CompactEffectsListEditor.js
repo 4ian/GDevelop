@@ -189,12 +189,6 @@ const TopLevelCollapsibleSection = ({
   </>
 );
 
-const noRefreshOfAllFields = () => {
-  console.warn(
-    "An effect tried to refresh all fields, but the editor doesn't support it."
-  );
-};
-
 type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
@@ -349,7 +343,7 @@ export const CompactEffectsListEditor = ({
                         placeholder={
                           <Trans>Nothing to configure for this effect.</Trans>
                         }
-                        onRefreshAllFields={noRefreshOfAllFields}
+                        onRefreshAllFields={forceUpdate}
                       />
                     )}
                   </ColumnStackLayout>

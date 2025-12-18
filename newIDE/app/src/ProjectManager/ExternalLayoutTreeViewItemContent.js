@@ -20,6 +20,7 @@ import { type HTMLDataset } from '../Utils/HTMLDataset';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
 
 export type ExternalLayoutTreeViewItemCallbacks = {|
+  onExternalLayoutAdded: () => void,
   onDeleteExternalLayout: gdExternalLayout => void,
   onRenameExternalLayout: (string, string) => void,
   onOpenExternalLayout: string => void,
@@ -204,6 +205,7 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
 
     this._onProjectItemModified();
     this.props.editName(getExternalLayoutTreeViewItemId(newExternalLayout));
+    this.props.onExternalLayoutAdded();
   }
 
   _duplicate(): void {

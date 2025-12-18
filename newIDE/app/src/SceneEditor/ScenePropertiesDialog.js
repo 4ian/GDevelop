@@ -151,20 +151,24 @@ const ScenePropertiesDialog = ({
 
       if (isNullPtr(gd, behaviorSharedData)) return null;
 
-      const properties = behaviorSharedData.getProperties();
-      const propertiesSchema = propertiesMapToSchema(
-        properties,
-        sharedDataContent => behaviorSharedData.getProperties(),
-        (sharedDataContent, name, value) => {
-          behaviorSharedData.updateProperty(name, value);
-        }
-      );
       const behaviorTypeName = behaviorSharedData.getTypeName();
 
       const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
         gd.JsPlatform.get(),
         behaviorTypeName
       );
+
+      const properties = behaviorSharedData.getProperties();
+      const propertiesSchema = propertiesMapToSchema({
+        properties,
+        defaultValueProperties: behaviorMetadata
+          ? behaviorMetadata.getSharedProperties()
+          : null,
+        getProperties: sharedDataContent => behaviorSharedData.getProperties(),
+        onUpdateProperty: (sharedDataContent, name, value) => {
+          behaviorSharedData.updateProperty(name, value);
+        },
+      });
       const tutorialIds = getBehaviorTutorialIds(behaviorTypeName);
       // TODO Make this a functional component to use PreferencesContext
       const enabledTutorialIds = [];

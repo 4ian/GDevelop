@@ -2,47 +2,26 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import PropertiesEditor, {
+import {
   type Schema,
   type Instances,
-} from '../PropertiesEditor';
-import propertiesMapToSchema from '../PropertiesEditor/PropertiesMapToSchema';
+} from '../PropertiesEditor/PropertiesEditorSchema';
+import PropertiesEditor from '../PropertiesEditor';
 import EmptyMessage from '../UI/EmptyMessage';
 import { Column, Line } from '../UI/Grid';
 import FlatButton from '../UI/FlatButton';
 import Text from '../UI/Text';
 import { Accordion, AccordionHeader, AccordionBody } from '../UI/Accordion';
-import { mapFor } from '../Utils/MapFor';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { ColumnStackLayout } from '../UI/Layout';
-import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import {
+  filterSchema,
+  isAnyPropertyModified,
+} from '../CompactPropertiesEditor/CompactPropertiesEditorByVisibility';
 
-export const areAdvancedPropertiesModified = (
-  propertiesValues: gdMapStringPropertyDescriptor,
-  getPropertyDefaultValue: (propertyName: string) => string
-) => {
-  const propertyNames = propertiesValues.keys();
-  let hasFoundModifiedAdvancedProperty = false;
-  mapFor(0, propertyNames.size(), i => {
-    const name = propertyNames.at(i);
-    const property = propertiesValues.get(name);
-    const currentValue = property.getValue();
-    const defaultValue = getPropertyDefaultValue(name);
-
-    // Some boolean properties can be set to an empty string to mean false.
-    const hasDefaultValue =
-      property.getType().toLowerCase() === 'boolean'
-        ? (currentValue === 'true') === (defaultValue === 'true')
-        : currentValue === defaultValue;
-    if (property.isAdvanced() && !hasDefaultValue) {
-      hasFoundModifiedAdvancedProperty = true;
-    }
-  });
-  return hasFoundModifiedAdvancedProperty;
-};
-
-const hasSchemaAnyProperty = (propertiesSchema: Schema) =>
+export const hasSchemaAnyProperty = (propertiesSchema: Schema) =>
   !propertiesSchema.every(
     property =>
       property.isHiddenWhenOnlyOneChoice &&
@@ -53,9 +32,7 @@ const hasSchemaAnyProperty = (propertiesSchema: Schema) =>
 type Props = {|
   onInstancesModified?: Instances => void,
   instances: Instances,
-  mode?: 'column' | 'row',
-  propertiesValues: gdMapStringPropertyDescriptor,
-  getPropertyDefaultValue: (propertyName: string) => string,
+  schema: Schema,
   placeholder: React.Node,
 
   // If set, render the "extra" description content from fields
@@ -73,10 +50,8 @@ type Props = {|
 const PropertiesEditorByVisibility = ({
   onInstancesModified,
   instances,
-  propertiesValues,
-  getPropertyDefaultValue,
+  schema,
   object,
-  mode,
   renderExtraDescriptionText,
   unsavedChanges,
   project,
@@ -90,51 +65,18 @@ const PropertiesEditorByVisibility = ({
   ] = React.useState<boolean>(false);
 
   const basicPropertiesSchema = React.useMemo(
-    () =>
-      propertiesMapToSchema(
-        propertiesValues,
-        behavior => behavior.getProperties(),
-        (behavior, name, value) => {
-          behavior.updateProperty(name, value);
-        },
-        object,
-        'Basic'
-      ),
-    [propertiesValues, object]
+    () => filterSchema(schema, 'basic'),
+    [schema]
   );
 
-  const areAdvancedPropertiesExpandedByDefault = React.useMemo(
-    () =>
-      areAdvancedPropertiesModified(propertiesValues, getPropertyDefaultValue),
-    [getPropertyDefaultValue, propertiesValues]
+  const advancedPropertiesSchema = React.useMemo(
+    () => filterSchema(schema, 'advanced'),
+    [schema]
   );
 
-  const advancedPropertiesSchema = React.useMemo<Schema>(
-    () =>
-      propertiesMapToSchema(
-        propertiesValues,
-        behavior => behavior.getProperties(),
-        (behavior, name, value) => {
-          behavior.updateProperty(name, value);
-        },
-        object,
-        'Advanced'
-      ),
-    [propertiesValues, object]
-  );
-
-  const deprecatedPropertiesSchema = React.useMemo<Schema>(
-    () =>
-      propertiesMapToSchema(
-        propertiesValues,
-        behavior => behavior.getProperties(),
-        (behavior, name, value) => {
-          behavior.updateProperty(name, value);
-        },
-        object,
-        'Deprecated'
-      ),
-    [propertiesValues, object]
+  const deprecatedPropertiesSchema = React.useMemo(
+    () => filterSchema(schema, 'deprecated'),
+    [schema]
   );
 
   const hasAnyProperty = React.useMemo(
@@ -149,6 +91,11 @@ const PropertiesEditorByVisibility = ({
     ]
   );
 
+  const areAdvancedPropertiesExpandedByDefault = React.useMemo(
+    () => isAnyPropertyModified(advancedPropertiesSchema, instances),
+    [instances, advancedPropertiesSchema]
+  );
+
   return hasAnyProperty ? (
     <ColumnStackLayout expand noMargin>
       <PropertiesEditor
@@ -158,6 +105,8 @@ const PropertiesEditorByVisibility = ({
         onInstancesModified={onInstancesModified}
         resourceManagementProps={resourceManagementProps}
         projectScopedContainersAccessor={projectScopedContainersAccessor}
+        renderExtraDescriptionText={renderExtraDescriptionText}
+        unsavedChanges={unsavedChanges}
       />
       {(advancedPropertiesSchema.length > 0 ||
         deprecatedPropertiesSchema.length > 0) && (
@@ -181,6 +130,8 @@ const PropertiesEditorByVisibility = ({
                 projectScopedContainersAccessor={
                   projectScopedContainersAccessor
                 }
+                renderExtraDescriptionText={renderExtraDescriptionText}
+                unsavedChanges={unsavedChanges}
               />
               {deprecatedPropertiesSchema.length > 0 &&
                 (shouldShowDeprecatedProperties ? (
@@ -193,6 +144,8 @@ const PropertiesEditorByVisibility = ({
                     projectScopedContainersAccessor={
                       projectScopedContainersAccessor
                     }
+                    renderExtraDescriptionText={renderExtraDescriptionText}
+                    unsavedChanges={unsavedChanges}
                   />
                 ) : (
                   <Line justifyContent="center">

@@ -14,7 +14,6 @@ import IconButton from '../UI/IconButton';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import PropertiesEditor from '../PropertiesEditor';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import AlertMessage from '../UI/AlertMessage';
 import BackgroundText from '../UI/BackgroundText';
@@ -53,12 +52,11 @@ import PasteIcon from '../UI/CustomSvgIcons/Clipboard';
 import CopyIcon from '../UI/CustomSvgIcons/Copy';
 import { type ConnectDragSource } from 'react-dnd';
 import ResponsiveFlatButton from '../UI/ResponsiveFlatButton';
-import { Accordion, AccordionHeader, AccordionBody } from '../UI/Accordion';
-import { type Field } from '../CompactPropertiesEditor';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import InlineCheckbox from '../UI/InlineCheckbox';
 import VisibilityIcon from '../UI/CustomSvgIcons/Visibility';
 import VisibilityOffIcon from '../UI/CustomSvgIcons/VisibilityOff';
+import PropertiesEditorByVisibility from '../PropertiesEditor/PropertiesEditorByVisibility';
 
 const gd: libGDevelop = global.gd;
 
@@ -196,51 +194,6 @@ const Effect = React.forwardRef(
       effectType
     );
 
-    const parametersSchema = effectMetadata && effectMetadata.parametersSchema;
-    const basicPropertiesSchema = React.useMemo(
-      () =>
-        parametersSchema
-          ? parametersSchema.filter(param => param.valueType && !param.advanced)
-          : [],
-      [parametersSchema]
-    );
-    const advancedPropertiesSchema = React.useMemo(
-      () =>
-        parametersSchema
-          ? parametersSchema.filter(param => param.valueType && param.advanced)
-          : [],
-      [parametersSchema]
-    );
-
-    const areAdvancedPropertiesModified = React.useMemo(
-      () => {
-        return advancedPropertiesSchema.some((field: Field) => {
-          const name = field.valueType ? field.name : null;
-          if (!name) return false;
-          if (
-            field.valueType === 'number'
-              ? !effect.hasDoubleParameter(name)
-              : field.valueType === 'boolean'
-              ? !effect.hasBooleanParameter(name)
-              : !effect.hasStringParameter(name)
-          ) {
-            return false;
-          }
-
-          const current =
-            field.valueType === 'number'
-              ? effect.getDoubleParameter(name)
-              : field.valueType === 'boolean'
-              ? effect.getBooleanParameter(name)
-              : effect.getStringParameter(name);
-
-          const defaultValue = field.valueType ? field.defaultValue : null;
-          return current !== defaultValue;
-        });
-      },
-      [advancedPropertiesSchema, effect]
-    );
-
     return (
       <I18n>
         {({ i18n }) => (
@@ -363,11 +316,10 @@ const Effect = React.forwardRef(
                       <MarkdownText source={effectMetadata.description} />
                     </BackgroundText>
                   </Line>
-                  <PropertiesEditor
-                    key={effect.getEffectType() + '-basic'}
-                    instances={[effect]}
-                    schema={basicPropertiesSchema}
+                  <PropertiesEditorByVisibility
                     project={project}
+                    schema={effectMetadata.parametersSchema}
+                    instances={[effect]}
                     resourceManagementProps={resourceManagementProps}
                     projectScopedContainersAccessor={
                       projectScopedContainersAccessor
@@ -380,43 +332,12 @@ const Effect = React.forwardRef(
                             )
                         : undefined
                     }
+                    placeholder={
+                      <Trans>
+                        There is nothing to configure for this effect.
+                      </Trans>
+                    }
                   />
-                  {advancedPropertiesSchema.length > 0 && (
-                    <Accordion
-                      defaultExpanded={areAdvancedPropertiesModified}
-                      noMargin
-                    >
-                      <AccordionHeader noMargin>
-                        <Text size="sub-title">
-                          <Trans>Advanced properties</Trans>
-                        </Text>
-                      </AccordionHeader>
-                      <AccordionBody disableGutters>
-                        <Column expand noMargin>
-                          <PropertiesEditor
-                            key={effect.getEffectType() + '-advanced'}
-                            instances={[effect]}
-                            schema={advancedPropertiesSchema}
-                            project={project}
-                            resourceManagementProps={resourceManagementProps}
-                            projectScopedContainersAccessor={
-                              projectScopedContainersAccessor
-                            }
-                            renderExtraDescriptionText={
-                              showEffectParameterNames
-                                ? parameterName =>
-                                    i18n._(
-                                      t`Property name in events: \`${parameterName}\` `
-                                    )
-                                : undefined
-                            }
-                          />
-                        </Column>
-                      </AccordionBody>
-                    </Accordion>
-                  )}
-
-                  <Spacer />
                 </Column>
               </Line>
             )}

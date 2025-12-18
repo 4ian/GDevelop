@@ -9,7 +9,7 @@ import PropertiesEditor from '../../PropertiesEditor';
 import ResourcePreview from '../../ResourcesList/ResourcePreview';
 import ResourcesLoader from '../../ResourcesLoader';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
-import { type Schema } from '../../PropertiesEditor';
+import { type Schema } from '../../PropertiesEditor/PropertiesEditorSchema';
 
 import {
   type ResourceSource,
@@ -154,14 +154,15 @@ const ResourcePropertiesEditor = React.forwardRef<
       () => {
         //TODO: Multiple resources support
         const properties = resources[0].getProperties();
-        const resourceSchema = propertiesMapToSchema(
+        const resourceSchema = propertiesMapToSchema({
           properties,
-          resource => resource.getProperties(),
-          (resource, name, value) => {
+          defaultValueProperties: null,
+          getProperties: resource => resource.getProperties(),
+          onUpdateProperty: (resource, name, value) => {
             resource.updateProperty(name, value);
             forceUpdate();
-          }
-        );
+          },
+        });
 
         return (
           <PropertiesEditor

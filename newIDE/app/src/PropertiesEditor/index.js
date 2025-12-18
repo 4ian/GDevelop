@@ -35,24 +35,11 @@ import {
   type SectionTitle,
   type ResourceField,
   type LeaderboardIdField,
-} from '../CompactPropertiesEditor';
+  type Instances,
+} from './PropertiesEditorSchema';
 import LeaderboardIdPropertyField from './LeaderboardIdPropertyField';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
-
-// Re-export the types.
-export type {
-  Schema,
-  ValueField,
-  ActionButton,
-  SectionTitle,
-  ResourceField,
-  Field,
-} from '../CompactPropertiesEditor';
-
-// An "instance" here is the objects for which properties are shown
-export type Instance = Object; // This could be improved using generics.
-export type Instances = Array<Instance>;
 
 type Props = {|
   onInstancesModified?: Instances => void,

@@ -1966,15 +1966,17 @@ module.exports = {
       properties
         .getOrCreate('elevation')
         .setValue('45')
-        .setLabel(_('Elevation (in degrees)'))
+        .setLabel(_('Elevation'))
         .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
         .setGroup(_('Orientation'))
         .setDescription(_('Maximal elevation is reached at 90°.'));
       properties
         .getOrCreate('rotation')
         .setValue('0')
-        .setLabel(_('Rotation (in degrees)'))
+        .setLabel(_('Rotation'))
         .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
         .setGroup(_('Orientation'));
       properties
         .getOrCreate('isCastingShadow')
@@ -2008,6 +2010,7 @@ module.exports = {
         .setValue('4000')
         .setLabel(_('Shadow frustum size'))
         .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setGroup(_('Shadows'))
         .setAdvanced(true);
       properties
@@ -2015,6 +2018,7 @@ module.exports = {
         .setValue('1500')
         .setLabel(_("Distance from layer's camera"))
         .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setGroup(_('Shadows'))
         .setAdvanced(true);
     }
@@ -2057,15 +2061,17 @@ module.exports = {
       properties
         .getOrCreate('elevation')
         .setValue('90')
-        .setLabel(_('Elevation (in degrees)'))
+        .setLabel(_('Elevation'))
         .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
         .setGroup(_('Orientation'))
         .setDescription(_('Maximal elevation is reached at 90°.'));
       properties
         .getOrCreate('rotation')
         .setValue('0')
-        .setLabel(_('Rotation (in degrees)'))
+        .setLabel(_('Rotation'))
         .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
         .setGroup(_('Orientation'));
     }
     {
@@ -2122,13 +2128,16 @@ module.exports = {
       properties
         .getOrCreate('hue')
         .setValue('0')
-        .setLabel(_('Hue in degrees (between -180 and 180)'))
-        .setType('number');
+        .setLabel(_('Hue'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
+        .setDescription(_('Between -180° and 180°'));
       properties
         .getOrCreate('saturation')
         .setValue('0')
-        .setLabel(_('Saturation (between -1 and 1)'))
-        .setType('number');
+        .setLabel(_('Saturation'))
+        .setType('number')
+        .setDescription(_('Between -1 and 1'));
     }
     {
       const effect = extension
@@ -2142,8 +2151,9 @@ module.exports = {
       properties
         .getOrCreate('exposure')
         .setValue('1')
-        .setLabel(_('Exposure (positive value)'))
-        .setType('number');
+        .setLabel(_('Exposure'))
+        .setType('number')
+        .setDescription(_('Positive value'));
     }
     {
       const effect = extension
@@ -2157,18 +2167,21 @@ module.exports = {
       properties
         .getOrCreate('strength')
         .setValue('1')
-        .setLabel(_('Strength (between 0 and 3)'))
-        .setType('number');
+        .setLabel(_('Strength'))
+        .setType('number')
+        .setDescription(_('Between 0 and 3'));
       properties
         .getOrCreate('radius')
         .setValue('0')
-        .setLabel(_('Radius (between 0 and 1)'))
-        .setType('number');
+        .setLabel(_('Radius'))
+        .setType('number')
+        .setDescription(_('Between 0 and 1'));
       properties
         .getOrCreate('threshold')
         .setValue('0')
-        .setLabel(_('Threshold (between 0 and 1)'))
-        .setType('number');
+        .setLabel(_('Threshold'))
+        .setType('number')
+        .setDescription(_('Between 0 and 1'));
     }
     {
       const effect = extension
@@ -2182,13 +2195,15 @@ module.exports = {
       properties
         .getOrCreate('brightness')
         .setValue('0')
-        .setLabel(_('Brightness (between -1 and 1)'))
-        .setType('number');
+        .setLabel(_('Brightness'))
+        .setType('number')
+        .setDescription(_('Between -1 and 1'));
       properties
         .getOrCreate('contrast')
         .setValue('0')
-        .setLabel(_('Contrast (between -1 and 1)'))
-        .setType('number');
+        .setLabel(_('Contrast'))
+        .setType('number')
+        .setDescription(_('Between -1 and 1'));
     }
     // Don't forget to update the alert condition in Model3DEditor.js when
     // adding a new light.

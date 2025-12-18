@@ -20,13 +20,14 @@ export default class BehaviorSharedPropertiesEditor extends React.Component<Prop
   render() {
     const { behaviorSharedData } = this.props;
 
-    const propertiesSchema = propertiesMapToSchema(
-      behaviorSharedData.getProperties(),
-      behavior => behavior.getProperties(),
-      (behavior, name, value) => {
+    const propertiesSchema = propertiesMapToSchema({
+      properties: behaviorSharedData.getProperties(),
+      defaultValueProperties: null,
+      getProperties: behavior => behavior.getProperties(),
+      onUpdateProperty: (behavior, name, value) => {
         behavior.updateProperty(name, value);
-      }
-    );
+      },
+    });
 
     return (
       <Column expand noMargin>

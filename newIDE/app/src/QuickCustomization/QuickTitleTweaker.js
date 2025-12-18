@@ -3,7 +3,7 @@ import * as React from 'react';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import CompactPropertiesEditor from '../CompactPropertiesEditor';
-import propertiesMapToSchema from '../CompactPropertiesEditor/PropertiesMapToCompactSchema';
+import propertiesMapToSchema from '../PropertiesEditor/PropertiesMapToSchema';
 import { useForceRecompute } from '../Utils/UseForceUpdate';
 import { Column, Line } from '../UI/Grid';
 import Text from '../UI/Text';
@@ -57,6 +57,7 @@ const QuickObjectPropertiesEditor = ({
       const properties = objectConfiguration.getProperties();
       const schema = propertiesMapToSchema({
         properties,
+        defaultValueProperties: null,
         getProperties: object => object.getProperties(),
         onUpdateProperty: (object, name, value) =>
           object.updateProperty(name, value),

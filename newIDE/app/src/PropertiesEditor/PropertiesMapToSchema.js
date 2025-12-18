@@ -420,7 +420,7 @@ export const effectPropertiesMapToSchema = ({
   ...CommonProps,
   defaultValueProperties: gdMapStringPropertyDescriptor,
 }): Schema => {
-  return _propertiesMapToSchema({
+  return adaptablePropertiesMapToSchema({
     properties: defaultValueProperties,
     defaultValueProperties,
     getProperties,
@@ -458,10 +458,11 @@ export const effectPropertiesMapToSchema = ({
 };
 
 /**
- * Transform a MapStringPropertyDescriptor to a schema that can be used
- * in CompactPropertiesEditor.
- * This method is similar to PropertiesMapToSchema.propertiesMapToSchema but returns
- * fields compatible with CompactPropertiesEditor.
+ * Transform a MapStringPropertyDescriptor to a schema that can be used in:
+ * - CompactPropertiesEditor
+ * - CompactPropertiesEditorByVisibility
+ * - PropertiesEditor
+ * - PropertiesEditorByVisibility.
  *
  * @param properties The properties to use
  * @param getProperties The function called to read again the properties
@@ -484,7 +485,7 @@ const propertiesMapToSchema = ({
     newValue: string
   ) => void,
 }): Schema => {
-  return _propertiesMapToSchema({
+  return adaptablePropertiesMapToSchema({
     properties,
     defaultValueProperties,
     getProperties,
@@ -524,7 +525,7 @@ const propertiesMapToSchema = ({
   });
 };
 
-const _propertiesMapToSchema = ({
+const adaptablePropertiesMapToSchema = ({
   properties,
   defaultValueProperties,
   getProperties,

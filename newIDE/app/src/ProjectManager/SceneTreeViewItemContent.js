@@ -22,6 +22,7 @@ const styles = {
 };
 
 export type SceneTreeViewItemCallbacks = {|
+  onSceneAdded: () => void,
   onDeleteLayout: gdLayout => void,
   onRenameLayout: (string, string) => void,
   onOpenLayout: (
@@ -277,6 +278,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
 
     this._onProjectItemModified();
     this.props.editName(getSceneTreeViewItemId(newScene));
+    this.props.onSceneAdded();
   }
 
   _duplicate(): void {
@@ -299,6 +301,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
 
     this._onProjectItemModified();
     this.props.editName(getSceneTreeViewItemId(newScene));
+    this.props.onSceneAdded();
   }
 
   _onProjectItemModified() {

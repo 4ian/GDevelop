@@ -46,10 +46,12 @@ namespace gdjs {
     masks: number;
   }
 
+  /** @category Behaviors > Physics 3D */
   export interface Physics3DNetworkSyncData extends BehaviorNetworkSyncData {
     props: Physics3DNetworkSyncDataType;
   }
 
+  /** @category Behaviors > Physics 3D */
   export class Physics3DSharedData {
     gravityX: float;
     gravityY: float;
@@ -292,6 +294,9 @@ namespace gdjs {
     }
   });
 
+  /**
+   * @category Behaviors > Physics 3D
+   */
   export class Physics3DRuntimeBehavior extends gdjs.RuntimeBehavior {
     bodyUpdater: gdjs.Physics3DRuntimeBehavior.BodyUpdater;
     collisionChecker: gdjs.Physics3DRuntimeBehavior.CollisionChecker;
@@ -1880,6 +1885,7 @@ namespace gdjs {
     gdjs.Physics3DRuntimeBehavior
   );
 
+  /** @category Behaviors > Physics 3D */
   export namespace Physics3DRuntimeBehavior {
     /**
      * Allow extensions relying on the 3D physics to customize its

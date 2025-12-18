@@ -13,12 +13,17 @@ declare type float = number;
 /** A point in cartesian space. */
 declare type FloatPoint = [number, number];
 
-/** A Hastable with the picked objects lists. */
+/**
+ * A Hashtable with the picked objects lists.
+ *
+ * @category Core Engine > Events interfacing
+ */
 declare type ObjectsLists = Hashtable<gdjs.RuntimeObject[]>;
 
 /**
  * Represents the context of the events function (or the behavior method),
  * if any. If the JavaScript code is running in a scene, this will be undefined (so you can't use this in a scene).
+ * @category Core Engine > Events interfacing
  */
 declare type EventsFunctionContext = {
   /**
@@ -70,7 +75,13 @@ declare type EventsFunctionContext = {
 };
 
 declare namespace gdjs {
+  /**
+   * @category Core Engine > Game
+   */
   var projectData: ProjectData;
+  /**
+   * @category Core Engine > Game
+   */
   var runtimeGameOptions: gdjs.RuntimeGameOptions;
 }
 

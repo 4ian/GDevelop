@@ -4,6 +4,9 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  /**
+   * @category Utils > IndexedDB
+   */
   export namespace indexedDb {
     export const loadFromIndexedDB = async function (
       dbName: string,

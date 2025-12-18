@@ -1,10 +1,17 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Hot reloader');
+
+  /**
+   * @category Debugging > Hot reloader
+   */
   export type HotReloaderLog = {
     message: string;
     kind: 'fatal' | 'error' | 'warning' | 'info';
   };
 
+  /**
+   * @category Debugging > Hot reloader
+   */
   export type ChangedRuntimeBehavior = {
     oldBehaviorConstructor: Function;
     newBehaviorConstructor: Function;
@@ -39,6 +46,7 @@ namespace gdjs {
   /**
    * Reload scripts/data of an exported game and applies the changes
    * to the running runtime game.
+   * @category Debugging > Hot reloader
    */
   export class HotReloader {
     _runtimeGame: gdjs.RuntimeGame;

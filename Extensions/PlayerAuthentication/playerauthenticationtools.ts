@@ -5,6 +5,7 @@ namespace gdjs {
   const logger = new gdjs.Logger('Player Authentication');
   const authComponents = gdjs.playerAuthenticationComponents;
 
+  /** @category Other extensions > Player Authentication */
   export type PlayerAuthenticationPlatform =
     | 'electron'
     | 'cordova-websocket'
@@ -13,6 +14,7 @@ namespace gdjs {
     | 'games-platform';
 
   // TODO EBO Replace runtimeScene to instanceContainer.
+  /** @category Other extensions > Player Authentication */
   export namespace playerAuthentication {
     // Authentication information.
     let _username: string | null = null;

@@ -343,6 +343,7 @@ namespace gdjs {
 
   const editorCameraFov = 45;
 
+  /** @category In-Game Editor */
   export type InGameEditorSettings = {
     theme: {
       iconButtonSelectedBackgroundColor: string;
@@ -783,6 +784,7 @@ namespace gdjs {
     return { forward };
   };
 
+  /** @category In-Game Editor */
   export class InGameEditor {
     private _editorId: string = '';
     private _runtimeGame: RuntimeGame;
@@ -3988,6 +3990,7 @@ namespace gdjs {
     }
   }
 
+  /** @category In-Game Editor */
   export type EditorCameraState = {
     cameraMode: 'free' | 'orbit';
     positionX: float;

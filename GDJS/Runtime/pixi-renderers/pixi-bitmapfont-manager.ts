@@ -39,6 +39,7 @@ namespace gdjs {
    * PixiBitmapFontManager loads fnt/xml files (using `fetch`), from the "bitmapFont" resources of the game.
    *
    * It installs the "BitmapFont" with PixiJS to be used with PIXI.BitmapText.
+   * @category Resources > Bitmap Fonts
    */
   export class PixiBitmapFontManager implements gdjs.ResourceManager {
     private _imageManager: gdjs.PixiImageManager;
@@ -342,6 +343,8 @@ namespace gdjs {
   }
 
   // Register the class to let the engine use it.
+  /** @category Resources > Bitmap Fonts */
   export const BitmapFontManager = gdjs.PixiBitmapFontManager;
+  /** @category Resources > Bitmap Fonts */
   export type BitmapFontManager = gdjs.PixiBitmapFontManager;
 }

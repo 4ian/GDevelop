@@ -11,6 +11,7 @@ namespace gdjs {
     persistedInProfiles: Set<string>;
   };
 
+  /** @category Behaviors > Save State */
   export type RestoreRequestOptions = {
     profileNames: string[];
     clearSceneStack: boolean;
@@ -19,6 +20,7 @@ namespace gdjs {
     fromVariable?: gdjs.Variable;
   };
 
+  /** @category Behaviors > Save State */
   export namespace saveState {
     export const getIndexedDbDatabaseName = () => {
       const gameId = gdjs.projectData.properties.projectUuid;

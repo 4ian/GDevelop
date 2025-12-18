@@ -13,6 +13,7 @@ namespace gdjs {
 
   /**
    * Base class for 3D custom objects.
+   * @category Objects > Custom Object 3D
    */
   export class CustomRuntimeObject3D
     extends gdjs.CustomRuntimeObject

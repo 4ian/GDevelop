@@ -4,6 +4,9 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  /**
+   * @category Objects > 3D Objects
+   */
   export interface Base3DHandler {
     /**
      * Set the object position on the Z axis.
@@ -123,17 +126,22 @@ namespace gdjs {
     getOriginalDepth(): float;
   }
 
+  /** @category Objects > 3D Objects */
   export interface Object3DDataContent {
     width: float;
     height: float;
     depth: float;
   }
-  /** Base parameters for {@link gdjs.RuntimeObject3D} */
+  /**
+   * Base parameters for {@link gdjs.RuntimeObject3D}
+   * @category Objects > 3D Objects
+   */
   export interface Object3DData extends ObjectData {
     /** The base parameters of the RuntimeObject3D */
     content: Object3DDataContent;
   }
 
+  /** @category Objects > 3D Objects */
   export namespace Base3DHandler {
     export const is3D = (
       object: gdjs.RuntimeObject
@@ -149,6 +157,7 @@ namespace gdjs {
 
   /**
    * A behavior that forwards the Base3D interface to its object.
+   * @category Core Engine > Behavior
    */
   export class Base3DBehavior
     extends gdjs.RuntimeBehavior

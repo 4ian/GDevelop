@@ -108,6 +108,9 @@ namespace gdjs {
     }
   };
 
+  /**
+   * @category Multiplayer
+   */
   export namespace multiplayer {
     /** Set to true in testing to avoid relying on the multiplayer extension. */
     export let disableMultiplayerForTesting = false;

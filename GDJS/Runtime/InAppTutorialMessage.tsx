@@ -74,6 +74,7 @@ namespace gdjs {
     transform?: string;
   };
 
+  /** @internal */
   export namespace inAppTutorialMessage {
     const containerId = 'in-app-tutorial-container';
 

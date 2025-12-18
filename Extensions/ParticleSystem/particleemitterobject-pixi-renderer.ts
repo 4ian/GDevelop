@@ -14,6 +14,9 @@ namespace gdjs {
     first.next.value = endValue;
   };
 
+  /**
+   * @category Renderers > Particle Emitter
+   */
   export class ParticleEmitterObjectPixiRenderer {
     renderer: PIXI.Container;
     emitter: PIXI.particles.Emitter;
@@ -501,8 +504,10 @@ namespace gdjs {
     }
   }
 
+  /** @category Renderers > Particle Emitter */
   // @ts-ignore - Register the class to let the engine use it.
   export const ParticleEmitterObjectRenderer =
     ParticleEmitterObjectPixiRenderer;
+  /** @category Renderers > Particle Emitter */
   export type ParticleEmitterObjectRenderer = ParticleEmitterObjectPixiRenderer;
 }

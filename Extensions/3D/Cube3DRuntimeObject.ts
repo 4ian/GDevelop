@@ -1,5 +1,8 @@
 namespace gdjs {
-  /** Base parameters for {@link gdjs.Cube3DRuntimeObject} */
+  /**
+   * Base parameters for {@link gdjs.Cube3DRuntimeObject}
+   * @category Objects > 3D Box
+   */
   export interface Cube3DObjectData extends Object3DData {
     /** The base parameters of the Cube3D object */
     content: Object3DDataContent & {
@@ -55,6 +58,7 @@ namespace gdjs {
 
   /**
    * Shows a 3D box object.
+   * @category Objects > 3D Box
    */
   export class Cube3DRuntimeObject extends gdjs.RuntimeObject3D {
     private _renderer: Cube3DRuntimeObjectRenderer;
@@ -562,6 +566,7 @@ namespace gdjs {
     }
   }
 
+  /** @category Objects > 3D Box */
   export namespace Cube3DRuntimeObject {
     export enum MaterialType {
       Basic,

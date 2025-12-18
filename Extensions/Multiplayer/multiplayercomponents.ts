@@ -1,5 +1,9 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Multiplayer');
+
+  /**
+   * @category Multiplayer
+   */
   export namespace multiplayerComponents {
     const loaderContainerId = 'loader-container';
     const lobbiesRootContainerId = 'lobbies-root-container';

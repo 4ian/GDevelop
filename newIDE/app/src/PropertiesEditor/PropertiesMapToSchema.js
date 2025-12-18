@@ -9,7 +9,7 @@ import {
 } from './PropertiesEditorSchema';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
 import MeasurementUnitDocumentation from '../PropertiesEditor/MeasurementUnitDocumentation';
-import { keyNames } from '../EventsSheet/ParameterFields/KeyboardKeyField';
+import { keyNames } from '../Utils/KeyboardKeyNames';
 
 const gd: libGDevelop = global.gd;
 

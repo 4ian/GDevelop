@@ -405,7 +405,7 @@ namespace gdjs {
       this.bullet = behaviorData.bullet;
       this.fixedRotation = behaviorData.fixedRotation;
       this.shape = behaviorData.shape;
-      this.meshShapeResourceName = behaviorData.meshShapeResourceName;
+      this.meshShapeResourceName = behaviorData.meshShapeResourceName || '';
       this.shapeOrientation =
         behaviorData.shape === 'Box' ? 'Z' : behaviorData.shapeOrientation;
       this.shapeDimensionA = behaviorData.shapeDimensionA;
@@ -732,12 +732,15 @@ namespace gdjs {
       let quat: Jolt.Quat;
       if (this.shape === 'Mesh') {
         const meshes = this.getMeshShapeTriangles(width, height, depth);
+
+        console.log("meshes", meshes.map(mesh => mesh.size()).join(", "));
+
         if (meshes.length === 1) {
           shapeSettings = new Jolt.MeshShapeSettings(meshes[0]);
         } else {
-          const compoundShapeSettings = new Jolt.CompoundShapeSettings();
+          const compoundShapeSettings = new Jolt.StaticCompoundShapeSettings();
           for (let index = 0; index < meshes.length; index++) {
-            compoundShapeSettings.AddShape(
+            compoundShapeSettings.AddShapeShapeSettings(
               this.getVec3(0, 0, 0),
               this.getQuat(0, 0, 0, 1),
               new Jolt.MeshShapeSettings(meshes[index]),
@@ -896,6 +899,7 @@ namespace gdjs {
         boundingBox = new THREE.Box3();
       }
 
+      console.log("meshShapeResourceName", this.meshShapeResourceName);
       const originalModel = this.owner
         .getInstanceContainer()
         .getGame()
@@ -953,8 +957,8 @@ namespace gdjs {
       threeObject.add(modelInCube);
       const object = this.owner3D;
       threeObject.scale.set(
-        object.isFlippedX() ? -width : depth,
-        object.isFlippedY() ? -height : depth,
+        object.isFlippedX() ? -width : width,
+        object.isFlippedY() ? -height : height,
         object.isFlippedZ() ? -depth : depth
       );
 

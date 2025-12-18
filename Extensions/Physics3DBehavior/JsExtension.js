@@ -69,6 +69,11 @@ module.exports = {
           return true;
         }
 
+        if (propertyName === 'meshShapeResourceName') {
+          behaviorContent.getChild('meshShapeResourceName').setStringValue(newValue);
+          return true;
+        }
+
         if (propertyName === 'shapeOrientation') {
           behaviorContent.getChild('shapeOrientation').setStringValue(newValue);
           return true;
@@ -291,7 +296,7 @@ module.exports = {
           .addChoice('Box', _('Box'))
           .addChoice('Capsule', _('Capsule'))
           .addChoice('Sphere', _('Sphere'))
-          .addChoice('Mesh', _('Mesh'));
+          .addChoice('Mesh', _('Mesh (static only)'));
 
         behaviorProperties
           .getOrCreate('meshShapeResourceName')
@@ -588,6 +593,7 @@ module.exports = {
         behaviorContent.addChild('bullet').setBoolValue(false);
         behaviorContent.addChild('fixedRotation').setBoolValue(false);
         behaviorContent.addChild('shape').setStringValue('Box');
+        behaviorContent.addChild('meshShapeResourceName').setStringValue('');
         behaviorContent.addChild('shapeOrientation').setStringValue('Z');
         behaviorContent.addChild('shapeDimensionA').setDoubleValue(0);
         behaviorContent.addChild('shapeDimensionB').setDoubleValue(0);

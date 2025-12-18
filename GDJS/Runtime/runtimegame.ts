@@ -1242,8 +1242,8 @@ namespace gdjs {
             this.getInputManager().onFrameEnded();
             return true;
           } catch (e) {
-            if (this._debuggerClient)
-              this._debuggerClient.onUncaughtException(e);
+            // if (this._debuggerClient)
+            //   this._debuggerClient.onUncaughtException(e);
 
             throw e;
           }

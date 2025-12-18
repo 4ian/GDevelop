@@ -219,7 +219,7 @@ const Physics3DEditor = (props: Props) => {
           />
           <SelectOption key={'mesh'} value={'Mesh'} label={t`Mesh`} />
         </SelectField>
-        <SelectField
+        {shape !== 'Mesh' && (<SelectField
           id="physics3d-parameter-shape-orientation"
           fullWidth
           floatingLabelText={properties.get('shapeOrientation').getLabel()}
@@ -236,9 +236,11 @@ const Physics3DEditor = (props: Props) => {
           <SelectOption key={'shape-orientation-z'} value={'Z'} label={t`Z`} />
           <SelectOption key={'shape-orientation-y'} value={'Y'} label={t`Y`} />
           <SelectOption key={'shape-orientation-x'} value={'X'} label={t`X`} />
-        </SelectField>
+        </SelectField>)}
       </ResponsiveLineStackLayout>
       <ResponsiveLineStackLayout>
+        {shape !== 'Mesh' && (
+          <React.Fragment>
         <SemiControlledTextField
           fullWidth
           value={properties.get('shapeDimensionA').getValue()}
@@ -288,6 +290,8 @@ const Physics3DEditor = (props: Props) => {
               <UnitAdornment property={properties.get('shapeDimensionC')} />
             }
           />
+        )}
+        </React.Fragment>
         )}
         {shape === 'Mesh' && (
           <ResourceSelectorWithThumbnail

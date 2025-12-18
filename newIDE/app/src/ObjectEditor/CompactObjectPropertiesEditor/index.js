@@ -687,7 +687,6 @@ export const CompactObjectPropertiesEditor = ({
                                 customObjectConfiguration
                               }
                               childObject={childObject}
-                              onRefreshAllFields={() => {}}
                               onEditObject={openFullEditor}
                             />
                           )}

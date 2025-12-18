@@ -11,12 +11,12 @@ import FlatButton from '../../UI/FlatButton';
 import ChevronArrowTop from '../../UI/CustomSvgIcons/ChevronArrowTop';
 import Text from '../../UI/Text';
 import { getSchemaWithOpenFullEditorButton } from './CompactObjectPropertiesSchema';
+import { useForceRecompute } from '../../Utils/UseForceUpdate';
 
 const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
-  onRefreshAllFields: () => void,
   resourceManagementProps: ResourceManagementProps,
   unsavedChanges?: ?UnsavedChanges,
   customObjectConfiguration: gdCustomObjectConfiguration,
@@ -26,7 +26,6 @@ type Props = {|
 
 export const ChildObjectPropertiesEditor = ({
   project,
-  onRefreshAllFields,
   resourceManagementProps,
   unsavedChanges,
   customObjectConfiguration,
@@ -58,9 +57,14 @@ export const ChildObjectPropertiesEditor = ({
     gd.ObjectConfiguration
   );
 
+  const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
+
   // Properties:
   const objectBasicPropertiesSchema = React.useMemo(
     () => {
+      if (schemaRecomputeTrigger) {
+        // schemaRecomputeTrigger allows to invalidate the schema when required.
+      }
       const properties = childObjectConfigurationAsGd.getProperties();
       const schema = propertiesMapToSchema({
         properties,
@@ -79,11 +83,20 @@ export const ChildObjectPropertiesEditor = ({
         onEditObject,
       });
     },
-    [childObjectConfigurationAsGd, childObject, fullEditorLabel, onEditObject]
+    [
+      schemaRecomputeTrigger,
+      childObjectConfigurationAsGd,
+      fullEditorLabel,
+      childObject,
+      onEditObject,
+    ]
   );
 
   const objectAdvancedPropertiesSchema = React.useMemo(
     () => {
+      if (schemaRecomputeTrigger) {
+        // schemaRecomputeTrigger allows to invalidate the schema when required.
+      }
       const properties = childObjectConfigurationAsGd.getProperties();
       const schema = propertiesMapToSchema({
         properties,
@@ -97,7 +110,7 @@ export const ChildObjectPropertiesEditor = ({
 
       return schema;
     },
-    [childObjectConfigurationAsGd]
+    [childObjectConfigurationAsGd, schemaRecomputeTrigger]
   );
   const hasObjectAdvancedProperties = objectAdvancedPropertiesSchema.length > 0;
   const hasSomeObjectProperties =
@@ -125,7 +138,7 @@ export const ChildObjectPropertiesEditor = ({
           onInstancesModified={() => {
             // TODO: undo/redo?
           }}
-          onRefreshAllFields={onRefreshAllFields}
+          onRefreshAllFields={forceRecomputeSchema}
         />
       )}
       {!showObjectAdvancedOptions && hasObjectAdvancedProperties && (
@@ -154,7 +167,7 @@ export const ChildObjectPropertiesEditor = ({
           onInstancesModified={() => {
             // TODO: undo/redo?
           }}
-          onRefreshAllFields={onRefreshAllFields}
+          onRefreshAllFields={forceRecomputeSchema}
         />
       )}
       {showObjectAdvancedOptions && hasObjectAdvancedProperties && (

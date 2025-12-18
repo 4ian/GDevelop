@@ -1,4 +1,7 @@
 namespace gdjs {
+  /**
+   * @category Core Engine > Events interfacing
+   */
   export namespace scene3d {
     const assumedFovIn2D = 45;
 

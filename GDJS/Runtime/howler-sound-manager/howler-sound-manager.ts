@@ -68,7 +68,7 @@ namespace gdjs {
    *
    * @memberof gdjs
    * @class HowlerSound
-   * @category Audio > Howler Sound
+   * @category Audio > Sound Manager
    */
   export class HowlerSound {
     /**
@@ -1192,6 +1192,9 @@ namespace gdjs {
   }
 
   // Register the class to let the engine use it.
+  /**
+   * @category Audio > Sound Manager
+   */
   export const SoundManager = HowlerSoundManager;
   /**
    * @category Audio > Sound Manager

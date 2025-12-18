@@ -22,7 +22,6 @@ namespace gdjs {
      * puts the tile map in cache and avoid unnecessary parsing.
      *
      * @see {@link TileMapManager}
-     * @category Other extensions > Tile Map
      */
     export class TileMapRuntimeManager {
       private _instanceContainer: gdjs.RuntimeInstanceContainer;

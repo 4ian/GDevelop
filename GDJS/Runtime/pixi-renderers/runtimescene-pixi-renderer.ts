@@ -449,5 +449,6 @@ namespace gdjs {
   // Register the class to let the engine use it.
   /** @category Renderers > Scene */
   export type RuntimeSceneRenderer = gdjs.RuntimeScenePixiRenderer;
+  /** @category Renderers > Scene */
   export const RuntimeSceneRenderer = gdjs.RuntimeScenePixiRenderer;
 }

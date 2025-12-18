@@ -12,6 +12,7 @@ namespace gdjs {
   }
 
   //Register the class to let the engine use it.
+  /** @category Debugging > Debugger Client */
   // @ts-ignore
   export const DebuggerClient = WindowMessageDebuggerClient;
 }

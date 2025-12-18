@@ -640,7 +640,7 @@ namespace gdjs {
   /**
    * A container for objects lists that should last more than the current frame.
    * It automatically removes objects that were destroyed from the objects lists.
-   * @category Core Engine > Objects
+   * @category Core Engine > Object
    */
   export class LongLivedObjectsList {
     private objectsLists = new Map<string, Array<RuntimeObject>>();

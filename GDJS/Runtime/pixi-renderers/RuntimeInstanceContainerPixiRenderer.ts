@@ -8,6 +8,7 @@ namespace gdjs {
    * A render for instance container.
    *
    * @see gdjs.RuntimeInstanceContainer
+   * @category Renderers > Instance Container
    */
   export interface RuntimeInstanceContainerPixiRenderer {
     /**

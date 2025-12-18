@@ -1,4 +1,7 @@
 namespace Box2D {
+  /**
+   * @category Behaviors > Physics 2D
+   */
   export interface b2Body {
     gdjsAssociatedBehavior: gdjs.Physics2RuntimeBehavior | null;
   }
@@ -19,11 +22,14 @@ namespace gdjs {
     masks: number;
   }
 
+  /**
+   * @category Synchronization > Physics 2D
+   */
   export interface Physics2NetworkSyncData extends BehaviorNetworkSyncData {
     props: Physics2NetworkSyncDataType;
   }
   /**
-   * @category Behaviors > Physics 2
+   * @category Behaviors > Physics 2D
    */
   export class Physics2SharedData {
     gravityX: float;
@@ -318,7 +324,7 @@ namespace gdjs {
   });
 
   /**
-   * @category Behaviors > Physics 2
+   * @category Behaviors > Physics 2D
    */
   export class Physics2RuntimeBehavior extends gdjs.RuntimeBehavior {
     bodyType: string;

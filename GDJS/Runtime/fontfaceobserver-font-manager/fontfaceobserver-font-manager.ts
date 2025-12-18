@@ -225,5 +225,8 @@ namespace gdjs {
    * @category Resources > Fonts
    */
   export type FontManager = FontFaceObserverFontManager;
+  /**
+   * @category Resources > Fonts
+   */
   export const FontManager = FontFaceObserverFontManager;
 }

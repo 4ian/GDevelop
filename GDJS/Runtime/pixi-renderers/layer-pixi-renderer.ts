@@ -1251,5 +1251,8 @@ namespace gdjs {
    * @category Renderers > Layers
    */
   export type LayerRenderer = gdjs.LayerPixiRenderer;
+  /**
+   * @category Renderers > Layers
+   */
   export const LayerRenderer = gdjs.LayerPixiRenderer;
 }

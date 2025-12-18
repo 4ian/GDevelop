@@ -2,6 +2,7 @@ namespace gdjs {
   /**
    * A LoggerOutput specifies a single method to be called to display
    * or register a log.
+   * @category Utils > Logger
    */
   export interface LoggerOutput {
     log(

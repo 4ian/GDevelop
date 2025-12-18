@@ -5,7 +5,6 @@ namespace gdjs {
      * A tile map transformed with an affine transformation.
      *
      * @see {@link getHitboxesAround} It gives a fast access to hitboxes for collision handling.
-     * @category Other extensions > Tile Map
      */
     export class TransformedCollisionTileMap {
       /**
@@ -411,7 +410,6 @@ namespace gdjs {
 
     /**
      * A tile map layer transformed with an affine transformation.
-     * @category Other extensions > Tile Map
      */
     export class TransformedCollisionTileMapLayer {
       /**

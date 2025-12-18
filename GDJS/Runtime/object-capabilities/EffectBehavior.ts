@@ -4,6 +4,7 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  /** @category Behaviors > Default behaviors */
   export interface EffectHandler {
     /**
      * Change an effect property value (for properties that are numbers).

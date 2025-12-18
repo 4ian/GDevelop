@@ -144,6 +144,9 @@ namespace gdjs {
       this._pixiObject.destroy(false);
     }
   }
+  /**
+   * @category Renderers > Tile Map
+   */
   export const TileMapRuntimeObjectRenderer =
     gdjs.TileMapRuntimeObjectPixiRenderer;
   /**

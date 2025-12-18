@@ -16,7 +16,10 @@ namespace gdjs {
   type Model3DObjectNetworkSyncData = Object3DNetworkSyncData &
     Model3DObjectNetworkSyncDataType;
 
-  /** Base parameters for {@link gdjs.Cube3DRuntimeObject} */
+  /**
+   * Base parameters for {@link gdjs.Cube3DRuntimeObject}
+   * @category Objects > 3D Model
+   */
   export interface Model3DObjectData extends Object3DData {
     /** The base parameters of the Model3D object */
     content: Object3DDataContent & {

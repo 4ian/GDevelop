@@ -165,6 +165,9 @@ namespace gdjs {
    */
   export type CustomRuntimeObject2DRenderer =
     gdjs.CustomRuntimeObject2DPixiRenderer;
+  /**
+   * @category Renderers > Custom Object
+   */
   export const CustomRuntimeObject2DRenderer =
     gdjs.CustomRuntimeObject2DPixiRenderer;
 }

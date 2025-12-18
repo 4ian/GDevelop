@@ -384,6 +384,7 @@ namespace gdjs {
       this._input.focus();
     }
   }
+  /** @category Renderers > Text Input */
   export const TextInputRuntimeObjectRenderer =
     TextInputRuntimeObjectPixiRenderer;
   /** @category Renderers > Text Input */

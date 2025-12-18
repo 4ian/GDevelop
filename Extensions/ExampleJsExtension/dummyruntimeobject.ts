@@ -3,7 +3,7 @@ namespace gdjs {
 
   /**
    * A dummy object doing showing a text on screen.
-   * @ignore
+   * @internal This is an example extension.
    * @category Objects > Dummy
    */
   export class DummyRuntimeObject extends gdjs.RuntimeObject {

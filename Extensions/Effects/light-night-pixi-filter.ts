@@ -1,4 +1,5 @@
 namespace gdjs {
+  /** @internal - should not have been exported? */
   export interface LightNightFilterExtra {
     o: number;
   }

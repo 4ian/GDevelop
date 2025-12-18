@@ -504,6 +504,7 @@ namespace gdjs {
     }
   }
 
+  /** @category Renderers > Particle Emitter */
   // @ts-ignore - Register the class to let the engine use it.
   export const ParticleEmitterObjectRenderer =
     ParticleEmitterObjectPixiRenderer;

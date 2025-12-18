@@ -36,7 +36,10 @@ namespace gdjs {
     return 'left';
   };
 
-  /** Base parameters for {@link gdjs.TextInputRuntimeObject} */
+  /**
+   * Base parameters for {@link gdjs.TextInputRuntimeObject}
+   * @category Objects > Text Input
+   */
   export interface TextInputObjectData extends ObjectData {
     /** The base parameters of the TextInput */
     content: {

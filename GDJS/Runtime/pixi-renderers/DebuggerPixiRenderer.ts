@@ -331,5 +331,8 @@ namespace gdjs {
    * @category Debugging > Debugger Renderer
    */
   export type DebuggerRenderer = gdjs.DebuggerPixiRenderer;
+  /**
+   * @category Debugging > Debugger Renderer
+   */
   export const DebuggerRenderer = gdjs.DebuggerPixiRenderer;
 }

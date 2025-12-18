@@ -22,6 +22,7 @@ import {
   AccordionBody,
 } from '../../../UI/Accordion';
 import { mapFor } from '../../../Utils/MapFor';
+import ResourceSelectorWithThumbnail from '../../../ResourcesList/ResourceSelectorWithThumbnail';
 
 const gd: libGDevelop = global.gd;
 
@@ -86,7 +87,13 @@ const enableBit = (bitsValue: number, pos: number, enable: boolean) => {
 };
 
 const Physics3DEditor = (props: Props) => {
-  const { behavior, onBehaviorUpdated } = props;
+  const {
+    behavior,
+    onBehaviorUpdated,
+    project,
+    projectScopedContainersAccessor,
+    resourceManagementProps,
+  } = props;
   const forceUpdate = useForceUpdate();
 
   const areAdvancedPropertiesExpandedByDefault = React.useMemo(
@@ -210,6 +217,7 @@ const Physics3DEditor = (props: Props) => {
             value={'Cylinder'}
             label={t`Cylinder`}
           />
+          <SelectOption key={'mesh'} value={'Mesh'} label={t`Mesh`} />
         </SelectField>
         <SelectField
           id="physics3d-parameter-shape-orientation"
@@ -279,6 +287,23 @@ const Physics3DEditor = (props: Props) => {
             endAdornment={
               <UnitAdornment property={properties.get('shapeDimensionC')} />
             }
+          />
+        )}
+        {shape === 'Mesh' && (
+          <ResourceSelectorWithThumbnail
+            project={project}
+            resourceKind="model3D"
+            floatingLabelText={properties
+              .get('meshShapeResourceName')
+              .getLabel()}
+            resourceManagementProps={resourceManagementProps}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            resourceName={properties.get('meshShapeResourceName').getValue()}
+            onChange={newValue => {
+              updateBehaviorProperty('meshShapeResourceName', newValue);
+              forceUpdate();
+            }}
+            id={`physics3d-parameter-mesh-shape-resource-name`}
           />
         )}
       </ResponsiveLineStackLayout>

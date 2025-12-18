@@ -21,7 +21,7 @@ namespace gdjs {
   export type TiledSpriteObjectData = ObjectData & TiledSpriteObjectDataType;
 
   /**
-   * @category Synchronization > Tiled Sprite
+   * @category Objects > Tiled Sprite
    */
   export type TiledSpriteNetworkSyncDataType = {
     xo: number;
@@ -31,7 +31,7 @@ namespace gdjs {
   };
 
   /**
-   * @category Synchronization > Tiled Sprite
+   * @category Objects > Tiled Sprite
    */
   export type TiledSpriteNetworkSyncData = ObjectNetworkSyncData &
     TiledSpriteNetworkSyncDataType;

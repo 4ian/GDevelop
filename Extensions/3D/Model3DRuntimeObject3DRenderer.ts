@@ -441,6 +441,7 @@ namespace gdjs {
     }
   }
 
+  /** @category Renderers > 3D Model */
   export const Model3DRuntimeObjectRenderer = Model3DRuntimeObject3DRenderer;
   /** @category Renderers > 3D Model */
   export type Model3DRuntimeObjectRenderer = Model3DRuntimeObject3DRenderer;

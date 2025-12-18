@@ -14,7 +14,7 @@ namespace gdjs {
   /** @category Objects > Spine */
   export type SpineObjectData = ObjectData & SpineObjectDataType;
 
-  /** @category Synchronization > Spine */
+  /** @category Objects > Spine */
   export type SpineNetworkSyncDataType = {
     opa: float;
     scaX: float;
@@ -28,7 +28,7 @@ namespace gdjs {
     anet: number;
   };
 
-  /** @category Synchronization > Spine */
+  /** @category Objects > Spine */
   export type SpineNetworkSyncData = ObjectNetworkSyncData &
     SpineNetworkSyncDataType;
 

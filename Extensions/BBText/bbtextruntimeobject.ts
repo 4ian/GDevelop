@@ -31,7 +31,7 @@ namespace gdjs {
   export type BBTextObjectData = ObjectData & BBTextObjectDataType;
 
   /**
-   * @category Synchronization > BBText
+   * @category Objects > BBText
    */
   export type BBTextObjectNetworkSyncDataType = {
     text: string;
@@ -47,7 +47,7 @@ namespace gdjs {
   };
 
   /**
-   * @category Synchronization > BBText
+   * @category Objects > BBText
    */
   export type BBTextObjectNetworkSyncData = ObjectNetworkSyncData &
     BBTextObjectNetworkSyncDataType;

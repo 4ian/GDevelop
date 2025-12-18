@@ -10,7 +10,7 @@ namespace gdjs {
    * stays the same even if the underlying object is moved
    * (in which case the behavior is responsible for removing/adding
    * back/updating this BehaviorRBushAABB).
-   * @category Behaviors > Base
+   * @category Core Engine > Behavior
    */
   export class BehaviorRBushAABB<T extends RuntimeBehavior> {
     minX: float = 0;
@@ -34,7 +34,7 @@ namespace gdjs {
 
   /**
    * RuntimeBehavior represents a behavior being used by a RuntimeObject.
-   * @category Behaviors > Base
+   * @category Core Engine > Behavior
    */
   export class RuntimeBehavior {
     name: string;

@@ -5,8 +5,10 @@
   "externalPattern": [
     "Runtime/Cordova/",
     "Runtime/Electron/",
-    "Runtime/FacebookInstantGames/"
+    "Runtime/FacebookInstantGames/",
+    "tests/"
   ],
+  "exclude": ["GDJS/tests/**/*"],
   "excludeExternals": true,
   "excludeInternal": true,
   "validation": {

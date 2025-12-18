@@ -14,7 +14,7 @@ namespace gdjs {
     flipZ: boolean;
   };
 
-  /** @category Synchronization > 3D Objects */
+  /** @category Objects > 3D Objects */
   export type Object3DNetworkSyncData = ObjectNetworkSyncData &
     Object3DNetworkSyncDataType;
 

@@ -2,11 +2,14 @@ namespace gdjs {
   const logger = new gdjs.Logger('Multiplayer');
   const debugLogger = new gdjs.Logger('Multiplayer - Debug');
 
-  /** @category Other extensions > Multiplayer */
+  /** @category Multiplayer */
   export type MultiplayerVariablesManager = ReturnType<
     typeof makeMultiplayerVariablesManager
   >;
 
+  /**
+   * @category Multiplayer
+   */
   export const makeMultiplayerVariablesManager = () => {
     const variableOwnershipChangesToSyncAtEndOfFrame: {
       [variableNetworkId: string]: {
@@ -272,6 +275,7 @@ namespace gdjs {
 
   /**
    * The MultiplayerVariablesManager used by the game.
+   * @category Multiplayer
    */
   export let multiplayerVariablesManager = makeMultiplayerVariablesManager();
 }

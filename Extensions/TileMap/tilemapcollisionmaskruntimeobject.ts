@@ -24,7 +24,7 @@ namespace gdjs {
     TilemapCollisionMaskObjectDataType;
 
   /**
-   * @category Synchronization > Tile Map
+   * @category Objects > Tile Map
    */
   export type TilemapCollisionMaskNetworkSyncDataType = {
     tmjf: string;
@@ -38,7 +38,7 @@ namespace gdjs {
   };
 
   /**
-   * @category Synchronization > Tile Map
+   * @category Objects > Tile Map
    */
   export type TilemapCollisionMaskNetworkSyncData = ObjectNetworkSyncData &
     TilemapCollisionMaskNetworkSyncDataType;

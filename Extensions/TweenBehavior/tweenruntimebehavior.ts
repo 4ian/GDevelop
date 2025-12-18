@@ -9,7 +9,7 @@ namespace gdjs {
     tweenManager: TweenManagerNetworkSyncData;
   }
   /**
-   * @category Synchronization > Tween
+   * @category Behaviors > Tween
    */
   export interface TweenBehaviorNetworkSyncData
     extends BehaviorNetworkSyncData {

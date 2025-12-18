@@ -1,4 +1,7 @@
 namespace gdjs {
+  /**
+   * @category Other extensions > Device Sensors
+   */
   export namespace deviceSensors {
     export namespace orientation {
       let _isActive = false;

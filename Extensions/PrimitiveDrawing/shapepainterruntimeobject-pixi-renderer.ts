@@ -1,4 +1,5 @@
 namespace gdjs {
+  /** @category Renderers > Shape Painter */
   class ShapePainterRuntimeObjectPixiRenderer {
     _object: gdjs.ShapePainterRuntimeObject;
     _graphics: PIXI.Graphics;
@@ -641,6 +642,7 @@ namespace gdjs {
     }
   }
 
+  /** @category Renderers > Shape Painter */
   export const ShapePainterRuntimeObjectRenderer =
     ShapePainterRuntimeObjectPixiRenderer;
   /** @category Renderers > Shape Painter */

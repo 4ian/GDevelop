@@ -5,7 +5,7 @@
  */
 namespace gdjs {
   /**
-   * @category Synchronization > Async Tasks
+   * @category Core Engine > Async Tasks
    */
   export type WaitTaskNetworkSyncData = {
     type: 'wait';
@@ -13,20 +13,20 @@ namespace gdjs {
     timeElapsedOnScene: float;
   };
   /**
-   * @category Synchronization > Async Tasks
+   * @category Core Engine > Async Tasks
    */
   export type ResolveTaskNetworkSyncData = null;
   /**
-   * @category Synchronization > Async Tasks
+   * @category Core Engine > Async Tasks
    */
   export type PromiseTaskNetworkSyncData = null;
   /**
-   * @category Synchronization > Async Tasks
+   * @category Core Engine > Async Tasks
    */
   export type ManuallyResolvableTaskNetworkSyncData = null;
 
   /**
-   * @category Synchronization > Async Tasks
+   * @category Core Engine > Async Tasks
    */
   export type TaskGroupNetworkSyncData = {
     type: 'group';
@@ -34,7 +34,7 @@ namespace gdjs {
   };
 
   /**
-   * @category Synchronization > Async Tasks
+   * @category Core Engine > Async Tasks
    */
   export type AsyncTaskNetworkSyncData =
     | WaitTaskNetworkSyncData
@@ -44,7 +44,7 @@ namespace gdjs {
     | ResolveTaskNetworkSyncData;
 
   /**
-   * @category Synchronization > Async Tasks
+   * @category Core Engine > Async Tasks
    */
   export type AsyncTasksManagerNetworkSyncData = {
     tasks: Array<{

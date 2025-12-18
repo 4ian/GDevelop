@@ -3,6 +3,9 @@ namespace gdjs {
   declare var cordova: any;
   declare var consent: any;
 
+  /**
+   * @category Other extensions > AdMob
+   */
   export namespace adMob {
     const logger = new gdjs.Logger('AdMob');
 

@@ -159,6 +159,9 @@ namespace gdjs {
     }
   }
 
+  /**
+   * @category Renderers > BBText
+   */
   export const BBTextRuntimeObjectRenderer = BBTextRuntimeObjectPixiRenderer;
   /**
    * @category Renderers > BBText

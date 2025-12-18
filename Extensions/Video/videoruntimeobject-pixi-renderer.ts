@@ -336,6 +336,9 @@ namespace gdjs {
     }
   }
 
+  /**
+   * @category Renderers > Video
+   */
   export const VideoRuntimeObjectRenderer = VideoRuntimeObjectPixiRenderer;
   /**
    * @category Renderers > Video

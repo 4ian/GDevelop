@@ -14,6 +14,7 @@ namespace gdjs {
     | 'games-platform';
 
   // TODO EBO Replace runtimeScene to instanceContainer.
+  /** @category Other extensions > Player Authentication */
   export namespace playerAuthentication {
     // Authentication information.
     let _username: string | null = null;

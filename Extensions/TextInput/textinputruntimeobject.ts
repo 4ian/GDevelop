@@ -64,7 +64,7 @@ namespace gdjs {
   }
 
   /**
-   * @category Synchronization > Text Input
+   * @category Objects > Text Input
    */
   export type TextInputNetworkSyncDataType = {
     opa: float;
@@ -85,7 +85,7 @@ namespace gdjs {
   };
 
   /**
-   * @category Synchronization > Text Input
+   * @category Objects > Text Input
    */
   export type TextInputNetworkSyncData = ObjectNetworkSyncData &
     TextInputNetworkSyncDataType;

@@ -61,6 +61,7 @@ namespace gdjs {
     ssd: StateNetworkSyncData;
   }
 
+  /** @category Behaviors > Platform */
   export interface PlatformerObjectNetworkSyncData
     extends BehaviorNetworkSyncData {
     props: PlatformerObjectNetworkSyncDataType;

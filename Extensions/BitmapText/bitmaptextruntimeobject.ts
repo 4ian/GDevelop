@@ -31,7 +31,7 @@ namespace gdjs {
   export type BitmapTextObjectData = ObjectData & BitmapTextObjectDataType;
 
   /**
-   * @category Synchronization > Bitmap Text
+   * @category Objects > Bitmap Text
    */
   export type BitmapTextObjectNetworkSyncDataType = {
     text: string;
@@ -47,7 +47,7 @@ namespace gdjs {
   };
 
   /**
-   * @category Synchronization > Bitmap Text
+   * @category Objects > Bitmap Text
    */
   export type BitmapTextObjectNetworkSyncData = ObjectNetworkSyncData &
     BitmapTextObjectNetworkSyncDataType;

@@ -628,7 +628,7 @@ namespace gdjs {
 
   const logger = new gdjs.Logger('LongLivedObjectsLists');
   /**
-   * @category Synchronization > Objects
+   * @category Core Engine > Object
    */
   export type LongLivedObjectsListNetworkSyncData = {
     objectsLists: {

@@ -33,6 +33,7 @@ namespace gdjs {
     jkhsjs: boolean;
   }
 
+  /** @category Behaviors > Physics 3D */
   export interface PhysicsCharacter3DNetworkSyncData
     extends BehaviorNetworkSyncData {
     props: PhysicsCharacter3DNetworkSyncDataType;
@@ -1520,10 +1521,10 @@ namespace gdjs {
     gdjs.PhysicsCharacter3DRuntimeBehavior
   );
 
+  /** @category Behaviors > Physics 3D */
   export namespace PhysicsCharacter3DRuntimeBehavior {
     /**
      * Handle collisions between characters that can push each other.
-     * @category Behaviors > Physics 3D
      */
     export class CharactersManager {
       /** Handle collisions between characters that can push each other. */

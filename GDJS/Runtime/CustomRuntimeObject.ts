@@ -24,7 +24,7 @@ namespace gdjs {
   };
 
   /**
-   * @category Synchronization > Custom Object
+   * @category Objects > Custom Object
    */
   export type CustomObjectNetworkSyncDataType = {
     anim?: SpriteAnimatorNetworkSyncData;
@@ -37,7 +37,7 @@ namespace gdjs {
   };
 
   /**
-   * @category Synchronization > Custom Object
+   * @category Objects > Custom Object
    */
   export type CustomObjectNetworkSyncData = ObjectNetworkSyncData &
     CustomObjectNetworkSyncDataType;

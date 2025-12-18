@@ -23,7 +23,7 @@ namespace gdjs {
   }
 
   /**
-   * @category Synchronization > Physics 2D
+   * @category Behaviors > Physics 2D
    */
   export interface Physics2NetworkSyncData extends BehaviorNetworkSyncData {
     props: Physics2NetworkSyncDataType;

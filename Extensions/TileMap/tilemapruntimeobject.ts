@@ -22,7 +22,7 @@ namespace gdjs {
   export type TilemapObjectData = ObjectData & TilemapObjectDataType;
 
   /**
-   * @category Synchronization > Tile Map
+   * @category Objects > Tile Map
    */
   export type TilemapNetworkSyncDataType = {
     op: number;
@@ -36,7 +36,7 @@ namespace gdjs {
   };
 
   /**
-   * @category Synchronization > Tile Map
+   * @category Objects > Tile Map
    */
   export type TilemapNetworkSyncData = ObjectNetworkSyncData &
     TilemapNetworkSyncDataType;

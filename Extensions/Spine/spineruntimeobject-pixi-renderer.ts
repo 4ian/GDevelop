@@ -260,5 +260,8 @@ namespace gdjs {
       );
     }
   }
+  /**
+   * @category Renderers > Spine
+   */
   export const SpineRuntimeObjectRenderer = SpineRuntimeObjectPixiRenderer;
 }

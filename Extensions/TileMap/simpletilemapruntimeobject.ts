@@ -20,7 +20,7 @@ namespace gdjs {
     SimpleTileMapObjectDataType;
 
   /**
-   * @category Synchronization > Tile Map
+   * @category Objects > Tile Map
    */
   export type SimpleTileMapNetworkSyncDataType = {
     op: number;
@@ -28,7 +28,7 @@ namespace gdjs {
   };
 
   /**
-   * @category Synchronization > Tile Map
+   * @category Objects > Tile Map
    */
   export type SimpleTileMapNetworkSyncData = ObjectNetworkSyncData &
     SimpleTileMapNetworkSyncDataType;

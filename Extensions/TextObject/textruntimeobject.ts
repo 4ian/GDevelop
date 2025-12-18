@@ -48,7 +48,7 @@ namespace gdjs {
   export type TextObjectData = ObjectData & TextObjectDataType;
 
   /**
-   * @category Synchronization > Text
+   * @category Objects > Text
    */
   export type TextObjectNetworkSyncDataType = {
     str: string;
@@ -78,7 +78,7 @@ namespace gdjs {
   };
 
   /**
-   * @category Synchronization > Text
+   * @category Objects > Text
    */
   export type TextObjectNetworkSyncData = ObjectNetworkSyncData &
     TextObjectNetworkSyncDataType;

@@ -18,6 +18,7 @@ namespace gdjs {
     sf: float;
   }
 
+  /** @category Behaviors > Top-down movement */
   export interface TopDownMovementNetworkSyncData
     extends BehaviorNetworkSyncData {
     props: TopDownMovementNetworkSyncDataType;
@@ -741,8 +742,8 @@ namespace gdjs {
     }
   }
 
+  /** @category Behaviors > Top-down movement */
   export namespace TopDownMovementRuntimeBehavior {
-    /** @category Behaviors > Top-down movement */
     export class TopDownMovementHookContext {
       private direction: integer = -1;
 

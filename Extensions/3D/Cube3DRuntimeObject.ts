@@ -1,7 +1,7 @@
 namespace gdjs {
   /**
    * Base parameters for {@link gdjs.Cube3DRuntimeObject}
-   * @category Synchronization > 3D Box
+   * @category Objects > 3D Box
    */
   export interface Cube3DObjectData extends Object3DData {
     /** The base parameters of the Cube3D object */
@@ -568,7 +568,6 @@ namespace gdjs {
 
   /** @category Objects > 3D Box */
   export namespace Cube3DRuntimeObject {
-    /** @category Objects > 3D Box */
     export enum MaterialType {
       Basic,
       StandardWithoutMetalness,

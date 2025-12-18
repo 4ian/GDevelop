@@ -23,7 +23,7 @@ namespace gdjs {
   export type VideoObjectData = ObjectData & VideoObjectDataType;
 
   /**
-   * @category Synchronization > Video
+   * @category Objects > Video
    */
   export type VideoObjectNetworkSyncDataType = {
     op: float;
@@ -35,7 +35,7 @@ namespace gdjs {
   };
 
   /**
-   * @category Synchronization > Video
+   * @category Objects > Video
    */
   export type VideoObjectNetworkSyncData = ObjectNetworkSyncData &
     VideoObjectNetworkSyncDataType;

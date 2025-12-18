@@ -338,6 +338,7 @@ namespace gdjs {
     }
   }
 
+  /** @category Renderers > 3D Box */
   export const Cube3DRuntimeObjectRenderer = Cube3DRuntimeObjectPixiRenderer;
   /** @category Renderers > 3D Box */
   export type Cube3DRuntimeObjectRenderer = Cube3DRuntimeObjectPixiRenderer;

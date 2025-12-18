@@ -498,8 +498,8 @@ namespace gdjs {
     }
   }
 
+  /** @category Objects > 3D Model */
   export namespace Model3DRuntimeObject {
-    /** @category Objects > 3D Model */
     export enum MaterialType {
       Basic,
       StandardWithoutMetalness,

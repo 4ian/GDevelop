@@ -22,7 +22,7 @@ namespace gdjs {
   export type LightObjectData = ObjectData & LightObjectDataType;
 
   /**
-   * @category Synchronization > Light
+   * @category Objects > Light
    */
   export type LightNetworkSyncDataType = {
     rad: number;
@@ -30,7 +30,7 @@ namespace gdjs {
   };
 
   /**
-   * @category Synchronization > Light
+   * @category Objects > Light
    */
   export type LightNetworkSyncData = ObjectNetworkSyncData &
     LightNetworkSyncDataType;

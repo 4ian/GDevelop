@@ -44,6 +44,7 @@ namespace gdjs {
     antialiasing: Antialiasing;
   };
 
+  /** @category Objects > Shape Painter */
   export type ShapePainterObjectData = ObjectData & ShapePainterObjectDataType;
 
   type ShapePainterNetworkSyncDataType = {
@@ -61,7 +62,7 @@ namespace gdjs {
     ify: boolean; // isFlippedY
   };
 
-  /** @category Synchronization > Shape Painter */
+  /** @category Objects > Shape Painter */
   export type ShapePainterNetworkSyncData = ObjectNetworkSyncData &
     ShapePainterNetworkSyncDataType;
 

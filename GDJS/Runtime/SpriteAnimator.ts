@@ -85,7 +85,7 @@ namespace gdjs {
 
   /**
    * Represents all the information needed to synchronize the animations of an object.
-   * @category Synchronization > Sprite
+   * @category Objects > Sprite
    */
   export type SpriteAnimatorNetworkSyncData = {
     an: integer;

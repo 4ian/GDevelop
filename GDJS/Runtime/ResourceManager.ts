@@ -7,6 +7,7 @@ namespace gdjs {
   /**
    * A resource managers that download and remember downloaded content for one
    * kind of resource.
+   * @category Resources
    */
   export interface ResourceManager {
     /**

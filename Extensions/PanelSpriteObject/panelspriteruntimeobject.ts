@@ -31,7 +31,7 @@ namespace gdjs {
   export type PanelSpriteObjectData = ObjectData & PanelSpriteObjectDataType;
 
   /**
-   * @category Synchronization > Panel Sprite
+   * @category Objects > Panel Sprite
    */
   export type PanelSpriteNetworkSyncDataType = {
     op: number;
@@ -39,7 +39,7 @@ namespace gdjs {
   };
 
   /**
-   * @category Synchronization > Panel Sprite
+   * @category Objects > Panel Sprite
    */
   export type PanelSpriteNetworkSyncData = ObjectNetworkSyncData &
     PanelSpriteNetworkSyncDataType;

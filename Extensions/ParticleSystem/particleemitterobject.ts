@@ -61,7 +61,7 @@ namespace gdjs {
     ParticleEmitterObjectDataType;
 
   /**
-   * @category Synchronization > Particle Emitter
+   * @category Objects > Particle Emitter
    */
   export type ParticleEmitterObjectNetworkSyncDataType = {
     // Technically, all attributes can change at runtime, so we sync as many as possible.
@@ -106,7 +106,7 @@ namespace gdjs {
     paused: boolean;
   };
 
-  /** @category Synchronization > Particle Emitter */
+  /** @category Objects > Particle Emitter */
   export type ParticleEmitterObjectNetworkSyncData = ObjectNetworkSyncData &
     ParticleEmitterObjectNetworkSyncDataType;
 

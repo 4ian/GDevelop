@@ -15,6 +15,9 @@ namespace gdjs {
     es: float;
   }
 
+  /**
+   * @category Behaviors > Physics 3D
+   */
   export interface PhysicsCar3DNetworkSyncData extends BehaviorNetworkSyncData {
     props: PhysicsCar3DNetworkSyncDataType;
   }
@@ -957,8 +960,8 @@ namespace gdjs {
     gdjs.PhysicsCar3DRuntimeBehavior
   );
 
+  /** @category Behaviors > Physics 3D */
   export namespace PhysicsCar3DRuntimeBehavior {
-    /** @category Behaviors > Physics 3D */
     export class VehicleBodyUpdater
       implements gdjs.Physics3DRuntimeBehavior.BodyUpdater
     {

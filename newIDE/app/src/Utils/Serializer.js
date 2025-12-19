@@ -133,3 +133,103 @@ export function unserializeFromJSObject(
   }
   serializedElement.delete();
 }
+
+// Worker management
+let serializerWorker: Worker | null = null;
+
+function getOrCreateSerializerWorker(): Worker {
+  if (!serializerWorker) {
+    serializerWorker = new Worker('serializer-worker.js');
+  }
+  return serializerWorker;
+}
+
+export async function serializeToJSObjectInBackground(
+  serializable: gdSerializable,
+  methodName: string = 'serializeTo'
+) {
+  // console.log('Background serialization started');
+  // const startTime = Date.now();
+  
+  // Step 1: Build SerializerElement tree (fast, on main thread)
+  const serializedElement = new gd.SerializerElement();
+  serializable[methodName](serializedElement);
+  // const serializationTime = Date.now();
+  // console.log('serializeTo took', serializationTime - startTime, 'ms');
+  
+  if (!gd._createBinarySnapshot) {
+    console.warn("Background serialization not supported (missing _createBinarySnapshot). Falling back to sync serialization.");
+    const json = gd.Serializer.toJSON(serializedElement);
+    try {
+      const object = JSON.parse(json);
+      serializedElement.delete();
+      return object;
+    } catch (error) {
+      serializedElement.delete();
+      throw error;
+    }
+  }
+
+  try {
+    // Step 2: Create binary snapshot
+    const sizePtr = gd._malloc(4);
+    // Note: serializedElement.ptr should be the raw pointer. 
+    // If it's not available, we might need a workaround, but Emscripten usually exposes it.
+    // However, for opaque objects, we might need `getPointer()`.
+    // Let's assume `ptr` property works as it is standard in Emscripten bindings.
+    // If not, we might need to cast or use a helper.
+    const elementPtr = serializedElement.ptr; 
+    
+    const binaryPtr = gd._createBinarySnapshot(
+      elementPtr, 
+      sizePtr
+    );
+    const binarySize = gd.HEAPU32[sizePtr >> 2];
+    // const snapshotTime = Date.now();
+    // console.log('Binary snapshot took', snapshotTime - serializationTime, 'ms');
+    
+    // Step 3: Copy to transferable buffer
+    const binaryBuffer = new Uint8Array(
+      gd.HEAPU8.buffer,
+      binaryPtr,
+      binarySize
+    ).slice(); // Create copy outside WASM heap
+    
+    // const copyTime = Date.now();
+    // console.log('Buffer copy took', copyTime - snapshotTime, 'ms');
+    
+    // Cleanup main thread
+    gd._freeBinarySnapshot(binaryPtr);
+    gd._free(sizePtr);
+    serializedElement.delete();
+    
+    // Step 4: Send to worker
+    const object = await new Promise((resolve, reject) => {
+      const worker = getOrCreateSerializerWorker();
+      
+      const messageHandler = (e) => {
+        if (e.data.type === 'serialized') {
+          worker.removeEventListener('message', messageHandler);
+          resolve(e.data.object);
+        } else if (e.data.type === 'error') {
+          worker.removeEventListener('message', messageHandler);
+          reject(new Error(e.data.message));
+        }
+      };
+      
+      worker.addEventListener('message', messageHandler);
+      worker.postMessage({
+        type: 'serialize',
+        binary: binaryBuffer
+      }, [binaryBuffer.buffer]); // Transfer ownership
+    });
+    
+    // const totalTime = Date.now();
+    // console.log('Total background serialization:', totalTime - startTime, 'ms');
+    
+    return object;
+  } catch (err) {
+    console.error("Error in background serialization:", err);
+    throw err;
+  }
+}

@@ -25,6 +25,7 @@ import PlaceholderError from '../UI/PlaceholderError';
 import CloudStorageProvider from '../ProjectsStorage/CloudStorageProvider';
 import GetSubscriptionCard from '../Profile/Subscription/GetSubscriptionCard';
 import Text from '../UI/Text';
+import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 
 const getCloudProjectFileMetadataIdentifier = (
   storageProviderInternalName: string,
@@ -133,7 +134,7 @@ const useVersionHistory = ({
   ] = React.useState<?number>(
     isCloudProject && fileMetadata ? fileMetadata.lastModifiedDate : null
   );
-  const shouldFetchVersions = isCloudProject && historyRetentionDays > 0;
+  const shouldFetchVersions = isCloudProject && historyRetentionDays !== 0;
   const latestVersionId =
     state.versions && state.versions[0] ? state.versions[0].id : null;
   const authenticatedUserId = profile ? profile.id : null;
@@ -207,6 +208,18 @@ const useVersionHistory = ({
             'An error occurred while fetching project versions:',
             error
           );
+          const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+            error
+          );
+          if (extractedStatusAndCode && extractedStatusAndCode.status === 403) {
+            setVersionsFetchingError(
+              <Trans>
+                You don't have the rights to access the version history of this
+                project. Are you connected with the right account?
+              </Trans>
+            );
+            return;
+          }
           setVersionsFetchingError(
             <Trans>
               Could not load the project versions. Verify your internet
@@ -223,6 +236,7 @@ const useVersionHistory = ({
       cloudProjectId,
       shouldFetchVersions,
       cloudProjectLastModifiedDate,
+      limits,
     ]
   );
 
@@ -437,7 +451,7 @@ const useVersionHistory = ({
               id="version-history-drawer"
             />
             {!cloudProjectId ? (
-              <Line expand>
+              <Line>
                 <Column expand>
                   <AlertMessage kind="info">
                     <Trans>
@@ -447,7 +461,7 @@ const useVersionHistory = ({
                 </Column>
               </Line>
             ) : historyRetentionDays === 0 ? (
-              <Line expand>
+              <Line>
                 <Column expand>
                   <GetSubscriptionCard
                     subscriptionDialogOpeningReason="Version history"
@@ -467,7 +481,7 @@ const useVersionHistory = ({
                 </Column>
               </Line>
             ) : !state.versions && versionsFetchingError ? (
-              <Line expand>
+              <Line>
                 <Column expand>
                   <PlaceholderError onRetry={onLoadMoreVersions}>
                     {versionsFetchingError}
@@ -476,25 +490,27 @@ const useVersionHistory = ({
               </Line>
             ) : state.versions ? (
               <Column>
-                <Line expand>
-                  <Column expand>
-                    <GetSubscriptionCard
-                      subscriptionDialogOpeningReason="Version history"
-                      forceColumnLayout
-                      filter="team"
-                      placementId="version-history"
-                    >
-                      <Text>
-                        <Trans>
-                          Your current subscription plan allows restoring
-                          versions from the last {historyRetentionDays} days.
-                          <br />
-                          Get a higher plan to access older versions.
-                        </Trans>
-                      </Text>
-                    </GetSubscriptionCard>
-                  </Column>
-                </Line>
+                {historyRetentionDays !== -1 && (
+                  <Line>
+                    <Column expand>
+                      <GetSubscriptionCard
+                        subscriptionDialogOpeningReason="Version history"
+                        forceColumnLayout
+                        filter="team"
+                        placementId="version-history"
+                      >
+                        <Text>
+                          <Trans>
+                            Your current subscription plan allows restoring
+                            versions from the last {historyRetentionDays} days.
+                            <br />
+                            Get a higher plan to access older versions.
+                          </Trans>
+                        </Text>
+                      </GetSubscriptionCard>
+                    </Column>
+                  </Line>
+                )}
                 <VersionHistory
                   authenticatedUserId={
                     authenticatedUser.profile

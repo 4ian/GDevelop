@@ -26,7 +26,6 @@ const anonymousAvatars = [
 
 const styles = {
   scrollView: {
-    flex: 1,
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',

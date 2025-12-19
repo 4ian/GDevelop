@@ -376,7 +376,7 @@ export const limitsForNoSubscriptionUser: Limits = {
       maxPlayersPerLobby: 4,
       themeCustomizationCapabilities: 'NONE',
     },
-    versionHistory: { enabled: false },
+    versionHistory: { enabled: false, retentionDays: 0 },
     ai: {
       availablePresets: [],
     },
@@ -437,7 +437,7 @@ export const limitsForSilverUser: Limits = {
       maxPlayersPerLobby: 8,
       themeCustomizationCapabilities: 'BASIC',
     },
-    versionHistory: { enabled: false },
+    versionHistory: { enabled: false, retentionDays: 2 },
     ai: {
       availablePresets: [],
     },
@@ -498,7 +498,7 @@ export const limitsForGoldUser: Limits = {
       maxPlayersPerLobby: 8,
       themeCustomizationCapabilities: 'BASIC',
     },
-    versionHistory: { enabled: false },
+    versionHistory: { enabled: false, retentionDays: 5 },
     ai: {
       availablePresets: [],
     },
@@ -571,7 +571,7 @@ export const limitsForTeacherUser: Limits = {
       maxPlayersPerLobby: 8,
       themeCustomizationCapabilities: 'BASIC',
     },
-    versionHistory: { enabled: true },
+    versionHistory: { enabled: true, retentionDays: -1 },
     ai: {
       availablePresets: [],
     },
@@ -641,7 +641,7 @@ export const limitsForStudentUser: Limits = {
       maxPlayersPerLobby: 8,
       themeCustomizationCapabilities: 'BASIC',
     },
-    versionHistory: { enabled: true },
+    versionHistory: { enabled: true, retentionDays: -1 },
     ai: {
       availablePresets: [],
     },
@@ -702,7 +702,7 @@ export const limitsForStartupUser: Limits = {
       maxPlayersPerLobby: 8,
       themeCustomizationCapabilities: 'FULL',
     },
-    versionHistory: { enabled: true },
+    versionHistory: { enabled: true, retentionDays: -1 },
     ai: {
       availablePresets: [],
     },
@@ -763,7 +763,7 @@ export const limitsReached: Limits = {
       maxPlayersPerLobby: 8,
       themeCustomizationCapabilities: 'BASIC',
     },
-    versionHistory: { enabled: false },
+    versionHistory: { enabled: false, retentionDays: 0 },
     ai: {
       availablePresets: [],
     },
@@ -818,7 +818,7 @@ export const limitsForNoSubscriptionUserWithCredits: Limits = {
       maxPlayersPerLobby: 4,
       themeCustomizationCapabilities: 'NONE',
     },
-    versionHistory: { enabled: false },
+    versionHistory: { enabled: false, retentionDays: 0 },
     ai: {
       availablePresets: [],
     },

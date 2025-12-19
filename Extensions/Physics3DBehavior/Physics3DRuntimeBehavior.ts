@@ -54,6 +54,13 @@ namespace gdjs {
     props: Physics3DNetworkSyncDataType;
   }
 
+  const isModel3D = (
+    object: gdjs.RuntimeObject
+  ): object is gdjs.Model3DRuntimeObject => {
+    //@ts-ignore We are checking if the methods are present.
+    return object._modelResourceName;
+  };
+
   /** @category Behaviors > Physics 3D */
   export class Physics3DSharedData {
     gravityX: float;
@@ -731,11 +738,17 @@ namespace gdjs {
       let shapeSettings: Jolt.ShapeSettings;
       /** This is fine only because no other Quat is used locally. */
       let quat: Jolt.Quat;
-      if (this._shape === 'Mesh' && this.bodyType === 'Static') {
-        const meshes = this.getMeshShapeTriangles(width, height, depth);
-
-        console.log('meshes', meshes.map((mesh) => mesh.size()).join(', '));
-
+      if (
+        this._shape === 'Mesh' &&
+        this.bodyType === 'Static' &&
+        isModel3D(this.owner)
+      ) {
+        const meshes = this.getMeshShapeTriangles(
+          this.owner,
+          width,
+          height,
+          depth
+        );
         if (meshes.length === 1) {
           shapeSettings = new Jolt.MeshShapeSettings(meshes[0]);
         } else {
@@ -868,90 +881,33 @@ namespace gdjs {
     }
 
     private getMeshShapeTriangles(
+      model3DRuntimeObject: gdjs.Model3DRuntimeObject,
       width: float,
       height: float,
       depth: float
     ): Array<Jolt.TriangleList> {
-      const model3DRuntimeObject = this.owner as gdjs.Model3DRuntimeObject;
-      let boundingBox: THREE.Box3;
-      let rotationX: float;
-      let rotationY: float;
-      let rotationZ: float;
-      if (model3DRuntimeObject._modelResourceName) {
-        const data = model3DRuntimeObject._data.content;
-        rotationX = data.rotationX;
-        rotationY = data.rotationY;
-        rotationZ = data.rotationZ;
-        boundingBox = this.owner
-          .getInstanceContainer()
-          .getGame()
-          .getModel3DManager()
-          .getModelBoundingBox(
-            model3DRuntimeObject._modelResourceName,
-            data.rotationX,
-            data.rotationY,
-            data.rotationZ,
-            data.originLocation === 'ModelOrigin'
-          );
-      } else {
-        rotationX = 0;
-        rotationY = 0;
-        rotationZ = 0;
-        boundingBox = new THREE.Box3();
-      }
-
       const originalModel = this.owner
         .getInstanceContainer()
         .getGame()
         .getModel3DManager()
         .getModel(
-          this.meshShapeResourceName || model3DRuntimeObject._modelResourceName
+          this.meshShapeResourceName ||
+            model3DRuntimeObject._modelResourceName ||
+            ''
         );
 
-      // TODO factorize this?
-
-      // This group hold the rotation defined by properties.
       const modelInCube = new THREE.Group();
       modelInCube.rotation.order = 'ZYX';
       const root = THREE_ADDONS.SkeletonUtils.clone(originalModel.scene);
       modelInCube.add(root);
 
-      const modelWidth = boundingBox.max.x - boundingBox.min.x;
-      const modelHeight = boundingBox.max.y - boundingBox.min.y;
-      const modelDepth = boundingBox.max.z - boundingBox.min.z;
-
-      // TODO
-
-      // // Center the model.
-      // const centerPoint = this._model3DRuntimeObject._centerPoint;
-      // if (centerPoint) {
-      //   modelInCube.position.set(
-      //     -(boundingBox.min.x + modelWidth * centerPoint[0]),
-      //     // The model is flipped on Y axis.
-      //     -(boundingBox.min.y + modelHeight * (1 - centerPoint[1])),
-      //     -(boundingBox.min.z + modelDepth * centerPoint[2])
-      //   );
-      // }
-
-      // Rotate the model.
-      modelInCube.scale.set(1, 1, 1);
-      modelInCube.rotation.set(
-        gdjs.toRad(rotationX),
-        gdjs.toRad(rotationY),
-        gdjs.toRad(rotationZ)
+      const data = model3DRuntimeObject._data.content;
+      model3DRuntimeObject._renderer.stretchModelIntoUnitaryCube(
+        modelInCube,
+        data.rotationX,
+        data.rotationY,
+        data.rotationZ
       );
-
-      // Stretch the model in a 1x1x1 cube.
-      const scaleX = modelWidth < epsilon ? 1 : 1 / modelWidth;
-      const scaleY = modelHeight < epsilon ? 1 : 1 / modelHeight;
-      const scaleZ = modelDepth < epsilon ? 1 : 1 / modelDepth;
-
-      const scaleMatrix = new THREE.Matrix4();
-      // Flip on Y because the Y axis is on the opposite side of direct basis.
-      // It avoids models to be like a mirror refection.
-      scaleMatrix.makeScale(scaleX, -scaleY, scaleZ);
-      modelInCube.updateMatrix();
-      modelInCube.applyMatrix4(scaleMatrix);
 
       const threeObject = new THREE.Group();
       threeObject.rotation.order = 'ZYX';

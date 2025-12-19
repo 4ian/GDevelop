@@ -61,6 +61,8 @@ const mergeVersionsLists = (
   list1: ExpandedCloudProjectVersion[],
   list2: ExpandedCloudProjectVersion[]
 ) => {
+  if (list2.length === 0) return list1;
+
   const mostRecentVersionDateInList2 = Date.parse(list2[0].createdAt);
   const moreRecentVersionsInList1 = list1.filter(
     version => Date.parse(version.createdAt) > mostRecentVersionDateInList2

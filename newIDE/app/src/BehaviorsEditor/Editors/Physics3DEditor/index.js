@@ -151,12 +151,6 @@ const Physics3DEditor = (props: Props) => {
           propertyName={'bodyType'}
           onUpdate={(e, i, newValue: string) => {
             updateBehaviorProperty('bodyType', newValue);
-            if (
-              newValue !== 'Static' &&
-              properties.get('shape').getValue() === 'Mesh'
-            ) {
-              updateBehaviorProperty('shape', 'Box');
-            }
           }}
         />
       </Line>
@@ -197,12 +191,6 @@ const Physics3DEditor = (props: Props) => {
           propertyName={'shape'}
           onUpdate={(e, i, newValue: string) => {
             updateBehaviorProperty('shape', newValue);
-            if (
-              newValue === 'Mesh' &&
-              properties.get('bodyType').getValue() !== 'Static'
-            ) {
-              updateBehaviorProperty('bodyType', 'Static');
-            }
           }}
         />
         {shape !== 'Mesh' && (

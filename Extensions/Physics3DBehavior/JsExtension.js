@@ -49,6 +49,12 @@ module.exports = {
 
         if (propertyName === 'bodyType') {
           behaviorContent.getChild('bodyType').setStringValue(newValue);
+          if (
+            newValue !== 'Static' &&
+            behaviorContent.getChild('shape').getStringValue() === 'Mesh'
+          ) {
+            behaviorContent.getChild('shape').setStringValue('Box');
+          }
           return true;
         }
 
@@ -66,6 +72,9 @@ module.exports = {
 
         if (propertyName === 'shape') {
           behaviorContent.getChild('shape').setStringValue(newValue);
+          if (newValue === 'Mesh') {
+            behaviorContent.getChild('bodyType').setStringValue('Static');
+          }
           return true;
         }
 
@@ -299,7 +308,6 @@ module.exports = {
           .addChoice('Capsule', _('Capsule'))
           .addChoice('Sphere', _('Sphere'))
           .addChoice('Mesh', _('Mesh (static only)'));
-
         behaviorProperties
           .getOrCreate('meshShapeResourceName')
           .setValue(
@@ -307,8 +315,8 @@ module.exports = {
           )
           .setType('resource')
           .addExtraInfo('model3D')
-          .setLabel(_('3D model'));
-
+          .setLabel(_('Simplified 3D model (leave empty to use object\'s one)'))
+          .setHidden(true); // Hidden as required to be changed in the full editor.
         behaviorProperties
           .getOrCreate('shapeOrientation')
           .setValue(

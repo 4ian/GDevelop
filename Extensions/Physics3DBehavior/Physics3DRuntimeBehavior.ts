@@ -731,10 +731,7 @@ namespace gdjs {
       let shapeSettings: Jolt.ShapeSettings;
       /** This is fine only because no other Quat is used locally. */
       let quat: Jolt.Quat;
-      if (
-        this._shape === 'Mesh' &&
-        this.bodyType === 'Static'
-      ) {
+      if (this._shape === 'Mesh' && this.bodyType === 'Static') {
         const meshes = this.getMeshShapeTriangles(width, height, depth);
 
         console.log('meshes', meshes.map((mesh) => mesh.size()).join(', '));
@@ -890,7 +887,7 @@ namespace gdjs {
           .getGame()
           .getModel3DManager()
           .getModelBoundingBox(
-            data.modelResourceName,
+            model3DRuntimeObject._modelResourceName,
             data.rotationX,
             data.rotationY,
             data.rotationZ,
@@ -903,12 +900,13 @@ namespace gdjs {
         boundingBox = new THREE.Box3();
       }
 
-      console.log('meshShapeResourceName', this.meshShapeResourceName);
       const originalModel = this.owner
         .getInstanceContainer()
         .getGame()
         .getModel3DManager()
-        .getModel(this.meshShapeResourceName);
+        .getModel(
+          this.meshShapeResourceName || model3DRuntimeObject._modelResourceName
+        );
 
       // TODO factorize this?
 

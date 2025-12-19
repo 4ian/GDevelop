@@ -269,6 +269,70 @@ var adaptNamingConventions = function (gd) {
     return null;
   };
 
+  // Binary serialization helpers for background serialization to web workers
+  /**
+   * Create a binary snapshot of a SerializerElement that can be transferred
+   * to a web worker efficiently.
+   *
+   * @param {gd.SerializerElement} element The element to serialize
+   * @returns {{buffer: Uint8Array, ptr: number, sizePtr: number}} An object containing
+   *   the binary buffer (which can be transferred to a worker) and pointers that
+   *   must be freed after transfer.
+   */
+  gd.createBinarySnapshot = function (element) {
+    const sizePtr = Module._malloc(4);
+    const binaryPtr = Module._createBinarySnapshot(element.ptr, sizePtr);
+
+    if (!binaryPtr) {
+      Module._free(sizePtr);
+      throw new Error('Failed to create binary snapshot');
+    }
+
+    const binarySize = Module.HEAPU32[sizePtr >> 2];
+
+    // Create a copy of the binary data outside WASM heap so it can be
+    // transferred to a worker
+    const binaryBuffer = new Uint8Array(
+      Module.HEAPU8.buffer,
+      binaryPtr,
+      binarySize
+    ).slice();
+
+    // Free the C++ allocated memory
+    Module._freeBinarySnapshot(binaryPtr);
+    Module._free(sizePtr);
+
+    return binaryBuffer;
+  };
+
+  /**
+   * Deserialize a binary snapshot back to a SerializerElement.
+   * This is typically called in a worker thread.
+   *
+   * @param {Uint8Array} binaryBuffer The binary data
+   * @returns {gd.SerializerElement} The deserialized element (caller must call delete())
+   */
+  gd.deserializeBinarySnapshot = function (binaryBuffer) {
+    // Copy buffer into WASM heap
+    const binaryPtr = Module._malloc(binaryBuffer.length);
+    Module.HEAPU8.set(binaryBuffer, binaryPtr);
+
+    // Deserialize
+    const elementPtr = Module._deserializeBinarySnapshot(
+      binaryPtr,
+      binaryBuffer.length
+    );
+
+    Module._free(binaryPtr);
+
+    if (!elementPtr) {
+      throw new Error('Failed to deserialize binary snapshot');
+    }
+
+    // Wrap the raw pointer in a SerializerElement object
+    return Module.wrapPointer(elementPtr, Module.SerializerElement);
+  };
+
   //Preserve backward compatibility with some alias for methods:
   gd.VectorString.prototype.get = gd.VectorString.prototype.at;
   gd.VectorPlatformExtension.prototype.get =

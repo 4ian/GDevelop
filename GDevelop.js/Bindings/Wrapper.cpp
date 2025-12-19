@@ -97,6 +97,7 @@
 #include <GDCore/Project/VariablesContainer.h>
 #include <GDCore/Project/VariablesContainersList.h>
 #include <GDCore/Project/QuickCustomization.h>
+#include <GDCore/Serialization/BinarySerializer.h>
 #include <GDCore/Serialization/Serializer.h>
 #include <GDCore/Serialization/SerializerElement.h>
 #include <GDCore/IDE/ObjectAssetSerializer.h>
@@ -876,5 +877,61 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 // that can't find in its list of interfaces a class which has a prefix.
 using namespace gd;
 using namespace std;
+
+// Binary serialization functions for background serialization
+// These are exported as C functions to be called directly from JavaScript
+extern "C" {
+
+/**
+ * \brief Create a binary snapshot of a SerializerElement.
+ * \param elementPtr Pointer to the SerializerElement
+ * \param outSize Pointer to store the output buffer size
+ * \return Pointer to binary data (caller must free with freeBinarySnapshot)
+ */
+EMSCRIPTEN_KEEPALIVE
+uint8_t* createBinarySnapshot(gd::SerializerElement* element, size_t* outSize) {
+  if (!element || !outSize) return nullptr;
+
+  std::vector<uint8_t> buffer;
+  gd::BinarySerializer::SerializeToBinary(*element, buffer);
+
+  *outSize = buffer.size();
+  uint8_t* result = (uint8_t*)malloc(buffer.size());
+  if (result) {
+    std::memcpy(result, buffer.data(), buffer.size());
+  }
+
+  return result;
+}
+
+/**
+ * \brief Free a binary snapshot created by createBinarySnapshot.
+ * \param buffer The buffer to free
+ */
+EMSCRIPTEN_KEEPALIVE
+void freeBinarySnapshot(uint8_t* buffer) {
+  free(buffer);
+}
+
+/**
+ * \brief Deserialize binary snapshot back to SerializerElement.
+ * \param buffer The binary data
+ * \param size Size of the binary data
+ * \return New SerializerElement (caller must delete)
+ */
+EMSCRIPTEN_KEEPALIVE
+gd::SerializerElement* deserializeBinarySnapshot(const uint8_t* buffer, size_t size) {
+  if (!buffer || size == 0) return nullptr;
+
+  gd::SerializerElement* element = new gd::SerializerElement();
+  if (!gd::BinarySerializer::DeserializeFromBinary(buffer, size, *element)) {
+    delete element;
+    return nullptr;
+  }
+
+  return element;
+}
+
+}  // extern "C"
 
 #include "glue.cpp"

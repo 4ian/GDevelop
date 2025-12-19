@@ -141,4 +141,81 @@ describe('libGD.js object serialization', function() {
       checkJsonParseAndStringify('{"7":[],"a":[1,2,{"b":3},{"c":[4,5]},6]}');
     });
   });
+
+  describe('gd.createBinarySnapshot and gd.deserializeBinarySnapshot', function() {
+    const checkBinaryRoundTrip = (json) => {
+      // Create a SerializerElement from JSON
+      const originalElement = gd.Serializer.fromJSON(json);
+
+      // Create binary snapshot
+      const binaryBuffer = gd.createBinarySnapshot(originalElement);
+      expect(binaryBuffer).toBeInstanceOf(Uint8Array);
+      expect(binaryBuffer.length).toBeGreaterThan(0);
+
+      // Deserialize binary snapshot
+      const restoredElement = gd.deserializeBinarySnapshot(binaryBuffer);
+
+      // Convert back to JSON and compare
+      const outputJson = gd.Serializer.toJSON(restoredElement);
+
+      restoredElement.delete();
+      originalElement.delete();
+
+      expect(outputJson).toBe(json);
+    };
+
+    it('should round-trip simple values', function() {
+      checkBinaryRoundTrip('"hello"');
+      checkBinaryRoundTrip('123');
+      checkBinaryRoundTrip('123.456');
+      checkBinaryRoundTrip('true');
+      checkBinaryRoundTrip('false');
+    });
+
+    it('should round-trip strings with unicode characters', function() {
+      checkBinaryRoundTrip('"String with 官话 characters"');
+      checkBinaryRoundTrip('"Émojis: 🎮🎲🎯"');
+    });
+
+    it('should round-trip objects', function() {
+      checkBinaryRoundTrip('{}');
+      checkBinaryRoundTrip('{"a":"b"}');
+      checkBinaryRoundTrip('{"a":{"nested":"value"}}');
+      checkBinaryRoundTrip(
+        '{"a":{"a1":{"name":"","referenceTo":"/a/a1"}},"b":{"b1":"world"},"c":{"c1":3.0}}'
+      );
+    });
+
+    it('should round-trip arrays', function() {
+      checkBinaryRoundTrip('[]');
+      checkBinaryRoundTrip('[1]');
+      checkBinaryRoundTrip('[1,2,3]');
+      checkBinaryRoundTrip('[{"a":1},{"b":2}]');
+      checkBinaryRoundTrip('{"items":[1,2,3],"nested":[{"x":1},{"y":2}]}');
+    });
+
+    it('should round-trip a complex object like a Text Object', function() {
+      var obj = new gd.TextObject('testObject');
+      obj.setText('Text with 官话 characters');
+
+      var serializedElement = new gd.SerializerElement();
+      obj.serializeTo(serializedElement);
+
+      // Create binary snapshot
+      const binaryBuffer = gd.createBinarySnapshot(serializedElement);
+
+      // Deserialize binary snapshot
+      const restoredElement = gd.deserializeBinarySnapshot(binaryBuffer);
+
+      // Compare JSON output
+      const originalJson = gd.Serializer.toJSON(serializedElement);
+      const restoredJson = gd.Serializer.toJSON(restoredElement);
+
+      expect(restoredJson).toBe(originalJson);
+
+      restoredElement.delete();
+      serializedElement.delete();
+      obj.delete();
+    });
+  });
 });

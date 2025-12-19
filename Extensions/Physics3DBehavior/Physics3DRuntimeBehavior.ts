@@ -6,7 +6,7 @@ namespace Jolt {
   }
 }
 
-  const epsilon = 1 / (1 << 16);
+const epsilon = 1 / (1 << 16);
 
 namespace gdjs {
   const loadJolt = async () => {
@@ -18,6 +18,7 @@ namespace gdjs {
       }
 
       const Jolt = await initializeJoltPhysics();
+      //@ts-ignore
       window.Jolt = Jolt;
     } catch (err) {
       console.error('Unable to load Jolt physics library.', err);
@@ -307,7 +308,7 @@ namespace gdjs {
     bodyType: string;
     bullet: boolean;
     fixedRotation: boolean;
-    private shape: string;
+    _shape: string;
     private meshShapeResourceName: string;
     private shapeOrientation: string;
     private shapeDimensionA: float;
@@ -404,7 +405,7 @@ namespace gdjs {
       this.bodyType = behaviorData.bodyType;
       this.bullet = behaviorData.bullet;
       this.fixedRotation = behaviorData.fixedRotation;
-      this.shape = behaviorData.shape;
+      this._shape = behaviorData.shape;
       this.meshShapeResourceName = behaviorData.meshShapeResourceName || '';
       this.shapeOrientation =
         behaviorData.shape === 'Box' ? 'Z' : behaviorData.shapeOrientation;
@@ -730,10 +731,13 @@ namespace gdjs {
       let shapeSettings: Jolt.ShapeSettings;
       /** This is fine only because no other Quat is used locally. */
       let quat: Jolt.Quat;
-      if (this.shape === 'Mesh') {
+      if (
+        this._shape === 'Mesh' &&
+        this.bodyType === 'Static'
+      ) {
         const meshes = this.getMeshShapeTriangles(width, height, depth);
 
-        console.log("meshes", meshes.map(mesh => mesh.size()).join(", "));
+        console.log('meshes', meshes.map((mesh) => mesh.size()).join(', '));
 
         if (meshes.length === 1) {
           shapeSettings = new Jolt.MeshShapeSettings(meshes[0]);
@@ -752,7 +756,7 @@ namespace gdjs {
         quat = this.getQuat(0, 0, 0, 1);
       } else {
         let convexShapeSettings: Jolt.ConvexShapeSettings;
-        if (this.shape === 'Box') {
+        if (this._shape === 'Box') {
           const boxWidth =
             shapeDimensionA > 0
               ? shapeDimensionA
@@ -784,7 +788,7 @@ namespace gdjs {
           this._shapeHalfWidth = boxWidth / 2;
           this._shapeHalfHeight = boxHeight / 2;
           this._shapeHalfDepth = boxDepth / 2;
-        } else if (this.shape === 'Capsule') {
+        } else if (this._shape === 'Capsule') {
           const radius =
             shapeDimensionA > 0
               ? shapeDimensionA
@@ -808,7 +812,7 @@ namespace gdjs {
             this.shapeOrientation === 'Y' ? capsuleDepth / 2 : radius;
           this._shapeHalfDepth =
             this.shapeOrientation === 'Z' ? capsuleDepth / 2 : radius;
-        } else if (this.shape === 'Cylinder') {
+        } else if (this._shape === 'Cylinder') {
           const radius =
             shapeDimensionA > 0
               ? shapeDimensionA
@@ -899,7 +903,7 @@ namespace gdjs {
         boundingBox = new THREE.Box3();
       }
 
-      console.log("meshShapeResourceName", this.meshShapeResourceName);
+      console.log('meshShapeResourceName', this.meshShapeResourceName);
       const originalModel = this.owner
         .getInstanceContainer()
         .getGame()
@@ -951,7 +955,6 @@ namespace gdjs {
       modelInCube.updateMatrix();
       modelInCube.applyMatrix4(scaleMatrix);
 
-
       const threeObject = new THREE.Group();
       threeObject.rotation.order = 'ZYX';
       threeObject.add(modelInCube);
@@ -976,13 +979,7 @@ namespace gdjs {
         for (let i = 0; i < positionAttribute.count; i++) {
           vector3.fromBufferAttribute(positionAttribute, i);
           object3d.localToWorld(vector3);
-          positions.push(
-            new Jolt.Vec3(
-              vector3.x,
-              vector3.y,
-              vector3.z
-            )
-          );
+          positions.push(new Jolt.Vec3(vector3.x, vector3.y, vector3.z));
         }
         const triangles = new Jolt.TriangleList();
         const index = mesh.geometry.getIndex();

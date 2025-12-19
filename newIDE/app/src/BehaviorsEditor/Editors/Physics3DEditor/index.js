@@ -150,9 +150,15 @@ const Physics3DEditor = (props: Props) => {
           fullWidth
           floatingLabelText={properties.get('bodyType').getLabel()}
           value={properties.get('bodyType').getValue()}
-          onChange={(e, i, newValue: string) =>
-            updateBehaviorProperty('bodyType', newValue)
-          }
+          onChange={(e, i, newValue: string) => {
+            updateBehaviorProperty('bodyType', newValue);
+            if (
+              newValue !== 'Static' &&
+              properties.get('shape').getValue() === 'Mesh'
+            ) {
+              updateBehaviorProperty('shape', 'Box');
+            }
+          }}
         >
           {[
             <SelectOption
@@ -205,9 +211,15 @@ const Physics3DEditor = (props: Props) => {
           fullWidth
           floatingLabelText={properties.get('shape').getLabel()}
           value={properties.get('shape').getValue()}
-          onChange={(e, i, newValue: string) =>
-            updateBehaviorProperty('shape', newValue)
-          }
+          onChange={(e, i, newValue: string) => {
+            updateBehaviorProperty('shape', newValue);
+            if (
+              newValue === 'Mesh' &&
+              properties.get('bodyType').getValue() !== 'Static'
+            ) {
+              updateBehaviorProperty('bodyType', 'Static');
+            }
+          }}
         >
           <SelectOption key={'sphere'} value={'Sphere'} label={t`Sphere`} />
           <SelectOption key={'box'} value={'Box'} label={t`Box`} />
@@ -217,81 +229,99 @@ const Physics3DEditor = (props: Props) => {
             value={'Cylinder'}
             label={t`Cylinder`}
           />
-          <SelectOption key={'mesh'} value={'Mesh'} label={t`Mesh`} />
+          <SelectOption
+            key={'mesh'}
+            value={'Mesh'}
+            label={t`Mesh (static only)`}
+          />
         </SelectField>
-        {shape !== 'Mesh' && (<SelectField
-          id="physics3d-parameter-shape-orientation"
-          fullWidth
-          floatingLabelText={properties.get('shapeOrientation').getLabel()}
-          value={
-            canShapeBeOriented
-              ? properties.get('shapeOrientation').getValue()
-              : 'Z'
-          }
-          onChange={(e, i, newValue: string) =>
-            updateBehaviorProperty('shapeOrientation', newValue)
-          }
-          disabled={!canShapeBeOriented}
-        >
-          <SelectOption key={'shape-orientation-z'} value={'Z'} label={t`Z`} />
-          <SelectOption key={'shape-orientation-y'} value={'Y'} label={t`Y`} />
-          <SelectOption key={'shape-orientation-x'} value={'X'} label={t`X`} />
-        </SelectField>)}
+        {shape !== 'Mesh' && (
+          <SelectField
+            id="physics3d-parameter-shape-orientation"
+            fullWidth
+            floatingLabelText={properties.get('shapeOrientation').getLabel()}
+            value={
+              canShapeBeOriented
+                ? properties.get('shapeOrientation').getValue()
+                : 'Z'
+            }
+            onChange={(e, i, newValue: string) =>
+              updateBehaviorProperty('shapeOrientation', newValue)
+            }
+            disabled={!canShapeBeOriented}
+          >
+            <SelectOption
+              key={'shape-orientation-z'}
+              value={'Z'}
+              label={t`Z`}
+            />
+            <SelectOption
+              key={'shape-orientation-y'}
+              value={'Y'}
+              label={t`Y`}
+            />
+            <SelectOption
+              key={'shape-orientation-x'}
+              value={'X'}
+              label={t`X`}
+            />
+          </SelectField>
+        )}
       </ResponsiveLineStackLayout>
       <ResponsiveLineStackLayout>
         {shape !== 'Mesh' && (
           <React.Fragment>
-        <SemiControlledTextField
-          fullWidth
-          value={properties.get('shapeDimensionA').getValue()}
-          key={'shapeDimensionA'}
-          floatingLabelText={
-            shape === 'Box' ? <Trans>Width</Trans> : <Trans>Radius</Trans>
-          }
-          min={0}
-          onChange={newValue =>
-            updateBehaviorProperty('shapeDimensionA', newValue)
-          }
-          type="number"
-          endAdornment={
-            <UnitAdornment property={properties.get('shapeDimensionA')} />
-          }
-        />
-        {shape !== 'Sphere' && (
-          <SemiControlledTextField
-            fullWidth
-            value={properties.get('shapeDimensionB').getValue()}
-            key={'shapeDimensionB'}
-            floatingLabelText={
-              shape === 'Box' ? <Trans>Height</Trans> : <Trans>Depth</Trans>
-            }
-            min={0}
-            onChange={newValue =>
-              updateBehaviorProperty('shapeDimensionB', newValue)
-            }
-            type="number"
-            endAdornment={
-              <UnitAdornment property={properties.get('shapeDimensionB')} />
-            }
-          />
-        )}
-        {shape === 'Box' && (
-          <SemiControlledTextField
-            fullWidth
-            value={properties.get('shapeDimensionC').getValue()}
-            key={'shapeDimensionC'}
-            floatingLabelText={<Trans>Depth</Trans>}
-            min={0}
-            onChange={newValue =>
-              updateBehaviorProperty('shapeDimensionC', newValue)
-            }
-            type="number"
-            endAdornment={
-              <UnitAdornment property={properties.get('shapeDimensionC')} />
-            }
-          />
-        )}
-        </React.Fragment>
+            <SemiControlledTextField
+              fullWidth
+              value={properties.get('shapeDimensionA').getValue()}
+              key={'shapeDimensionA'}
+              floatingLabelText={
+                shape === 'Box' ? <Trans>Width</Trans> : <Trans>Radius</Trans>
+              }
+              min={0}
+              onChange={newValue =>
+                updateBehaviorProperty('shapeDimensionA', newValue)
+              }
+              type="number"
+              endAdornment={
+                <UnitAdornment property={properties.get('shapeDimensionA')} />
+              }
+            />
+            {shape !== 'Sphere' && (
+              <SemiControlledTextField
+                fullWidth
+                value={properties.get('shapeDimensionB').getValue()}
+                key={'shapeDimensionB'}
+                floatingLabelText={
+                  shape === 'Box' ? <Trans>Height</Trans> : <Trans>Depth</Trans>
+                }
+                min={0}
+                onChange={newValue =>
+                  updateBehaviorProperty('shapeDimensionB', newValue)
+                }
+                type="number"
+                endAdornment={
+                  <UnitAdornment property={properties.get('shapeDimensionB')} />
+                }
+              />
+            )}
+            {shape === 'Box' && (
+              <SemiControlledTextField
+                fullWidth
+                value={properties.get('shapeDimensionC').getValue()}
+                key={'shapeDimensionC'}
+                floatingLabelText={<Trans>Depth</Trans>}
+                min={0}
+                onChange={newValue =>
+                  updateBehaviorProperty('shapeDimensionC', newValue)
+                }
+                type="number"
+                endAdornment={
+                  <UnitAdornment property={properties.get('shapeDimensionC')} />
+                }
+              />
+            )}
+          </React.Fragment>
         )}
         {shape === 'Mesh' && (
           <ResourceSelectorWithThumbnail

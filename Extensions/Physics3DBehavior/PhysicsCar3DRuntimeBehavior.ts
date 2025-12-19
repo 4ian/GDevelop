@@ -164,7 +164,9 @@ namespace gdjs {
       if (!behavior.activated()) {
         return null;
       }
-
+      if (behavior._shape === 'Mesh') {
+        behavior._shape = 'Capsule';
+      }
       const sharedData = behavior._sharedData;
 
       this._physics3D = {

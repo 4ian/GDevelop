@@ -13,7 +13,7 @@ import {
 } from '../Utils/GDevelopServices/Project';
 import type { FileMetadata, StorageProvider } from '../ProjectsStorage';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import { canUseCloudProjectHistory } from '../Utils/GDevelopServices/Usage';
+import { getCloudProjectHistoryRetentionDays } from '../Utils/GDevelopServices/Usage';
 import { Column, Line } from '../UI/Grid';
 import VersionHistory, { type OpenedVersionStatus } from '.';
 import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
@@ -25,6 +25,7 @@ import PlaceholderError from '../UI/PlaceholderError';
 import CloudStorageProvider from '../ProjectsStorage/CloudStorageProvider';
 import GetSubscriptionCard from '../Profile/Subscription/GetSubscriptionCard';
 import Text from '../UI/Text';
+import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 
 const getCloudProjectFileMetadataIdentifier = (
   storageProviderInternalName: string,
@@ -120,7 +121,7 @@ const useVersionHistory = ({
   const storageProviderInternalName = storageProvider.internalName;
   const isCloudProject =
     storageProviderInternalName === CloudStorageProvider.internalName;
-  const isUserAllowedToSeeVersionHistory = canUseCloudProjectHistory(limits);
+  const historyRetentionDays = getCloudProjectHistoryRetentionDays(limits);
   const [cloudProjectId, setCloudProjectId] = React.useState<?string>(
     getCloudProjectFileMetadataIdentifier(
       storageProviderInternalName,
@@ -133,8 +134,7 @@ const useVersionHistory = ({
   ] = React.useState<?number>(
     isCloudProject && fileMetadata ? fileMetadata.lastModifiedDate : null
   );
-  const shouldFetchVersions =
-    isCloudProject && isUserAllowedToSeeVersionHistory;
+  const shouldFetchVersions = isCloudProject && historyRetentionDays !== 0;
   const latestVersionId =
     state.versions && state.versions[0] ? state.versions[0].id : null;
   const authenticatedUserId = profile ? profile.id : null;
@@ -208,6 +208,18 @@ const useVersionHistory = ({
             'An error occurred while fetching project versions:',
             error
           );
+          const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+            error
+          );
+          if (extractedStatusAndCode && extractedStatusAndCode.status === 403) {
+            setVersionsFetchingError(
+              <Trans>
+                You don't have the rights to access the version history of this
+                project. Are you connected with the right account?
+              </Trans>
+            );
+            return;
+          }
           setVersionsFetchingError(
             <Trans>
               Could not load the project versions. Verify your internet
@@ -224,6 +236,7 @@ const useVersionHistory = ({
       cloudProjectId,
       shouldFetchVersions,
       cloudProjectLastModifiedDate,
+      limits,
     ]
   );
 
@@ -438,7 +451,7 @@ const useVersionHistory = ({
               id="version-history-drawer"
             />
             {!cloudProjectId ? (
-              <Line expand>
+              <Line>
                 <Column expand>
                   <AlertMessage kind="info">
                     <Trans>
@@ -447,14 +460,13 @@ const useVersionHistory = ({
                   </AlertMessage>
                 </Column>
               </Line>
-            ) : !isUserAllowedToSeeVersionHistory ? (
-              <Line expand>
+            ) : historyRetentionDays === 0 ? (
+              <Line>
                 <Column expand>
                   <GetSubscriptionCard
                     subscriptionDialogOpeningReason="Version history"
                     forceColumnLayout
-                    filter="team"
-                    recommendedPlanIdIfNoSubscription="gdevelop_startup"
+                    recommendedPlanIdIfNoSubscription="gdevelop_gold"
                     placementId="version-history"
                   >
                     <Text>
@@ -462,14 +474,14 @@ const useVersionHistory = ({
                         Access project history, name saves, restore older
                         versions.
                         <br />
-                        Upgrade to a Pro plan to get started!
+                        Get a subscription to enable this feature.
                       </Trans>
                     </Text>
                   </GetSubscriptionCard>
                 </Column>
               </Line>
             ) : !state.versions && versionsFetchingError ? (
-              <Line expand>
+              <Line>
                 <Column expand>
                   <PlaceholderError onRetry={onLoadMoreVersions}>
                     {versionsFetchingError}
@@ -477,19 +489,44 @@ const useVersionHistory = ({
                 </Column>
               </Line>
             ) : state.versions ? (
-              <VersionHistory
-                authenticatedUserId={
-                  authenticatedUser.profile ? authenticatedUser.profile.id : ''
-                }
-                isVisible={versionHistoryPanelOpen}
-                projectId={fileMetadata ? fileMetadata.fileIdentifier : ''}
-                canLoadMore={!!state.nextPageUri}
-                onCheckoutVersion={onCheckoutVersion}
-                onLoadMore={onLoadMoreVersions}
-                onRenameVersion={onRenameVersion}
-                openedVersionStatus={checkedOutVersionStatus}
-                versions={state.versions}
-              />
+              <Column>
+                {historyRetentionDays !== -1 && (
+                  <Line>
+                    <Column expand>
+                      <GetSubscriptionCard
+                        subscriptionDialogOpeningReason="Version history"
+                        forceColumnLayout
+                        filter="team"
+                        placementId="version-history"
+                      >
+                        <Text>
+                          <Trans>
+                            Your current subscription plan allows restoring
+                            versions from the last {historyRetentionDays} days.
+                            <br />
+                            Get a higher plan to access older versions.
+                          </Trans>
+                        </Text>
+                      </GetSubscriptionCard>
+                    </Column>
+                  </Line>
+                )}
+                <VersionHistory
+                  authenticatedUserId={
+                    authenticatedUser.profile
+                      ? authenticatedUser.profile.id
+                      : ''
+                  }
+                  isVisible={versionHistoryPanelOpen}
+                  projectId={fileMetadata ? fileMetadata.fileIdentifier : ''}
+                  canLoadMore={!!state.nextPageUri}
+                  onCheckoutVersion={onCheckoutVersion}
+                  onLoadMore={onLoadMoreVersions}
+                  onRenameVersion={onRenameVersion}
+                  openedVersionStatus={checkedOutVersionStatus}
+                  versions={state.versions}
+                />
+              </Column>
             ) : (
               <PlaceholderLoader />
             )}

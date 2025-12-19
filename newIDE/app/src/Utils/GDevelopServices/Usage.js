@@ -110,7 +110,10 @@ export type Capabilities = {|
     maxPlayersPerLobby: number,
     themeCustomizationCapabilities: 'NONE' | 'BASIC' | 'FULL',
   |},
-  versionHistory: {| enabled: boolean |},
+  versionHistory: {|
+    enabled: boolean,
+    retentionDays: number,
+  |},
   ai: AiCapability,
 |};
 
@@ -686,8 +689,10 @@ export const shouldHideClassroomTab = (limits: ?Limits) =>
     ? false
     : true;
 
-export const canUseCloudProjectHistory = (limits: ?Limits): boolean =>
-  limits && limits.capabilities.versionHistory.enabled ? true : false;
+export const getCloudProjectHistoryRetentionDays = (limits: ?Limits): number =>
+  limits && limits.capabilities.versionHistory.enabled
+    ? limits.capabilities.versionHistory.retentionDays
+    : 0;
 
 export function getSummarizedSubscriptionPlanFeatures(
   i18n: I18nType,

@@ -187,9 +187,9 @@ module.exports = {
         .setType('Choice')
         .setLabel('Type')
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-        .addExtraInfo('Static')
-        .addExtraInfo('Dynamic')
-        .addExtraInfo('Kinematic')
+        .addChoice('Static', _('Static'))
+        .addChoice('Dynamic', _('Dynamic'))
+        .addChoice('Kinematic', _('Kinematic'))
         .setDescription(
           _(
             "A static object won't move (perfect for obstacles). Dynamic objects can move. Kinematic will move according to forces applied to it only (useful for characters or specific mechanisms)."
@@ -247,10 +247,10 @@ module.exports = {
         .setType('Choice')
         .setLabel('Shape')
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-        .addExtraInfo('Box')
-        .addExtraInfo('Circle')
-        .addExtraInfo('Edge')
-        .addExtraInfo('Polygon');
+        .addChoice('Box', _('Box'))
+        .addChoice('Circle', _('Circle'))
+        .addChoice('Edge', _('Edge'))
+        .addChoice('Polygon', _('Polygon'));
       behaviorProperties
         .getOrCreate('shapeDimensionA')
         .setValue(
@@ -306,9 +306,9 @@ module.exports = {
         )
         .setType('Choice')
         .setLabel('Polygon Origin')
-        .addExtraInfo('Center')
-        .addExtraInfo('Origin')
-        .addExtraInfo('TopLeft')
+        .addChoice('Center', _('Center'))
+        .addChoice('Origin', _('Origin'))
+        .addChoice('TopLeft', _('TopLeft'))
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
         .setHidden(true); // Hidden as required to be changed in the full editor.
       behaviorProperties

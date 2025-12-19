@@ -1,12 +1,9 @@
 // @flow
-import { t } from '@lingui/macro';
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import { Line, Column, Spacer } from '../../../UI/Grid';
 import Checkbox from '../../../UI/Checkbox';
-import SelectField from '../../../UI/SelectField';
-import SelectOption from '../../../UI/SelectOption';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import { type BehaviorEditorProps } from '../BehaviorEditorProps.flow';
 import Text from '../../../UI/Text';
@@ -15,7 +12,11 @@ import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
-import { NumericProperty, UnitAdornment } from '../Physics2Editor';
+import {
+  NumericProperty,
+  UnitAdornment,
+  ChoiceProperty,
+} from '../Physics2Editor';
 import {
   Accordion,
   AccordionHeader,
@@ -144,13 +145,11 @@ const Physics3DEditor = (props: Props) => {
       noOverflowParent
     >
       <Line>
-        <SelectField
+        <ChoiceProperty
           id="physics3d-parameter-body-type"
-          key={'bodyType'}
-          fullWidth
-          floatingLabelText={properties.get('bodyType').getLabel()}
-          value={properties.get('bodyType').getValue()}
-          onChange={(e, i, newValue: string) => {
+          properties={properties}
+          propertyName={'bodyType'}
+          onUpdate={(e, i, newValue: string) => {
             updateBehaviorProperty('bodyType', newValue);
             if (
               newValue !== 'Static' &&
@@ -159,21 +158,7 @@ const Physics3DEditor = (props: Props) => {
               updateBehaviorProperty('shape', 'Box');
             }
           }}
-        >
-          {[
-            <SelectOption
-              key={'dynamic'}
-              value={'Dynamic'}
-              label={t`Dynamic`}
-            />,
-            <SelectOption key={'static'} value={'Static'} label={t`Static`} />,
-            <SelectOption
-              key={'kinematic'}
-              value={'Kinematic'}
-              label={t`Kinematic`}
-            />,
-          ]}
-        </SelectField>
+        />
       </Line>
       <ResponsiveLineStackLayout>
         <Checkbox
@@ -206,12 +191,11 @@ const Physics3DEditor = (props: Props) => {
         </DismissableAlertMessage>
       </Line>
       <ResponsiveLineStackLayout>
-        <SelectField
+        <ChoiceProperty
           id="physics3d-parameter-shape"
-          fullWidth
-          floatingLabelText={properties.get('shape').getLabel()}
-          value={properties.get('shape').getValue()}
-          onChange={(e, i, newValue: string) => {
+          properties={properties}
+          propertyName={'shape'}
+          onUpdate={(e, i, newValue: string) => {
             updateBehaviorProperty('shape', newValue);
             if (
               newValue === 'Mesh' &&
@@ -220,52 +204,22 @@ const Physics3DEditor = (props: Props) => {
               updateBehaviorProperty('bodyType', 'Static');
             }
           }}
-        >
-          <SelectOption key={'sphere'} value={'Sphere'} label={t`Sphere`} />
-          <SelectOption key={'box'} value={'Box'} label={t`Box`} />
-          <SelectOption key={'capsule'} value={'Capsule'} label={t`Capsule`} />
-          <SelectOption
-            key={'cylinder'}
-            value={'Cylinder'}
-            label={t`Cylinder`}
-          />
-          <SelectOption
-            key={'mesh'}
-            value={'Mesh'}
-            label={t`Mesh (static only)`}
-          />
-        </SelectField>
+        />
         {shape !== 'Mesh' && (
-          <SelectField
+          <ChoiceProperty
             id="physics3d-parameter-shape-orientation"
-            fullWidth
-            floatingLabelText={properties.get('shapeOrientation').getLabel()}
+            properties={properties}
+            propertyName={'shapeOrientation'}
             value={
               canShapeBeOriented
                 ? properties.get('shapeOrientation').getValue()
                 : 'Z'
             }
-            onChange={(e, i, newValue: string) =>
+            onUpdate={(e, i, newValue: string) =>
               updateBehaviorProperty('shapeOrientation', newValue)
             }
             disabled={!canShapeBeOriented}
-          >
-            <SelectOption
-              key={'shape-orientation-z'}
-              value={'Z'}
-              label={t`Z`}
-            />
-            <SelectOption
-              key={'shape-orientation-y'}
-              value={'Y'}
-              label={t`Y`}
-            />
-            <SelectOption
-              key={'shape-orientation-x'}
-              value={'X'}
-              label={t`X`}
-            />
-          </SelectField>
+          />
         )}
       </ResponsiveLineStackLayout>
       <ResponsiveLineStackLayout>

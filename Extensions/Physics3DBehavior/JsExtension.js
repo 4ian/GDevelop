@@ -70,7 +70,9 @@ module.exports = {
         }
 
         if (propertyName === 'meshShapeResourceName') {
-          behaviorContent.getChild('meshShapeResourceName').setStringValue(newValue);
+          behaviorContent
+            .getChild('meshShapeResourceName')
+            .setStringValue(newValue);
           return true;
         }
 
@@ -248,9 +250,9 @@ module.exports = {
           .setType('Choice')
           .setLabel('Type')
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .addExtraInfo('Static')
-          .addExtraInfo('Dynamic')
-          .addExtraInfo('Kinematic')
+          .addChoice('Static', _('Static'))
+          .addChoice('Dynamic', _('Dynamic'))
+          .addChoice('Kinematic', _('Kinematic'))
           .setDescription(
             _(
               "A static object won't move (perfect for obstacles). Dynamic objects can move. Kinematic will move according to forces applied to it only (useful for characters or specific mechanisms)."
@@ -300,7 +302,9 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('meshShapeResourceName')
-          .setValue(behaviorContent.getChild('meshShapeResourceName').getStringValue())
+          .setValue(
+            behaviorContent.getChild('meshShapeResourceName').getStringValue()
+          )
           .setType('resource')
           .addExtraInfo('model3D')
           .setLabel(_('3D model'));
@@ -313,9 +317,9 @@ module.exports = {
           .setType('Choice')
           .setLabel('Shape orientation')
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .addExtraInfo('Z')
-          .addExtraInfo('Y')
-          .addExtraInfo('X');
+          .addChoice('Z', _('Z'))
+          .addChoice('Y', _('Y'))
+          .addChoice('X', _('X'));
         behaviorProperties
           .getOrCreate('shapeDimensionA')
           .setValue(

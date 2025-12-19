@@ -6,7 +6,9 @@
 
 #ifndef GDCORE_SERIALIZERVALUE_H
 #define GDCORE_SERIALIZERVALUE_H
+#include <cstdint>
 #include <string>
+#include <utility>
 #include "GDCore/String.h"
 
 namespace gd {
@@ -16,15 +18,52 @@ namespace gd {
  *
  * \see gd::Serializer
  * \see gd::SerializerElement
+ *
+ * ## Performance optimizations
+ *
+ * This class has been optimized for serialization performance:
+ *
+ * - **Single enum for type tracking**: Instead of using 5 separate boolean flags
+ *   (`isUnknown`, `isBoolean`, `isString`, `isInt`, `isDouble`), a single `Type` enum
+ *   is used. This reduces memory footprint (1 byte vs 5 bytes for the flags) and
+ *   improves cache locality. The enum comparison is also faster than checking
+ *   multiple boolean conditions.
+ *
+ * - **Move semantics**: Move constructor and move assignment operator are provided
+ *   to avoid unnecessary string copies when SerializerValue objects are moved
+ *   (e.g., when stored in containers or returned from functions).
+ *
+ * - **Optimized constructors**: Constructors directly initialize the type and value
+ *   without going through setter methods, avoiding redundant flag clearing.
  */
 class GD_CORE_API SerializerValue {
  public:
+  /**
+   * \brief The type of value stored.
+   */
+  enum class Type : uint8_t {
+    Unknown,  ///< Type is unknown but the value is stored as a string.
+    Boolean,
+    String,
+    Int,
+    Double
+  };
+
   SerializerValue();
   SerializerValue(bool val);
   SerializerValue(const gd::String &val);
+  SerializerValue(gd::String &&val);
   SerializerValue(int val);
   SerializerValue(double val);
   virtual ~SerializerValue(){};
+
+  // Move semantics for performance
+  SerializerValue(SerializerValue&& other) noexcept;
+  SerializerValue& operator=(SerializerValue&& other) noexcept;
+
+  // Copy semantics (default behavior)
+  SerializerValue(const SerializerValue& other) = default;
+  SerializerValue& operator=(const SerializerValue& other) = default;
 
   /**
    * Set the value, its type being a boolean.
@@ -35,6 +74,11 @@ class GD_CORE_API SerializerValue {
    * Set the value, its type being a gd::String.
    */
   void SetString(const gd::String &val);
+
+  /**
+   * Set the value, its type being a gd::String (move version).
+   */
+  void SetString(gd::String &&val);
 
   /**
    * Set the value, its type being an integer.
@@ -50,6 +94,11 @@ class GD_CORE_API SerializerValue {
    * Set the value, its type being unknown, but representable as a string.
    */
   void Set(const gd::String &val);
+
+  /**
+   * Set the value, its type being unknown, but representable as a string (move version).
+   */
+  void Set(gd::String &&val);
 
   /**
    * Get the value, its type being a boolean.
@@ -80,27 +129,27 @@ class GD_CORE_API SerializerValue {
   /**
    * \brief Return true if the value is a boolean.
    */
-  bool IsBoolean() const { return isBoolean; }
+  bool IsBoolean() const { return type == Type::Boolean; }
   /**
    * \brief Return true if the value is a string.
    */
-  bool IsString() const { return isString; }
+  bool IsString() const { return type == Type::String; }
   /**
    * \brief Return true if the value is an int.
    */
-  bool IsInt() const { return isInt; }
+  bool IsInt() const { return type == Type::Int; }
   /**
    * \brief Return true if the value is a double.
    */
-  bool IsDouble() const { return isDouble; }
+  bool IsDouble() const { return type == Type::Double; }
+
+  /**
+   * \brief Return the type of the value.
+   */
+  Type GetType() const { return type; }
 
  private:
-  bool isUnknown;  ///< If true, the type is unknown but the value is stored as
-                   ///< a string in stringValue member.
-  bool isBoolean;
-  bool isString;
-  bool isInt;
-  bool isDouble;
+  Type type;  ///< The type of the value stored.
 
   bool booleanValue;
   gd::String stringValue;

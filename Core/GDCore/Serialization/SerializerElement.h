@@ -9,6 +9,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "GDCore/Serialization/SerializerValue.h"
@@ -32,6 +33,28 @@ namespace gd {
  * means that their access/removal is O(number of children). This class
  * is not appropriated for a use in game where fast access is required.
  *
+ * ## Performance optimizations
+ *
+ * This class has been optimized for serialization performance:
+ *
+ * - **unique_ptr instead of shared_ptr**: Children are stored using `unique_ptr`
+ *   instead of `shared_ptr`. This eliminates the overhead of reference counting
+ *   and atomic operations that `shared_ptr` requires. Since children are exclusively
+ *   owned by their parent, shared ownership semantics are not needed.
+ *
+ * - **Move semantics**: Move constructor and move assignment operator are provided
+ *   to efficiently transfer ownership of elements without deep copying. This is
+ *   particularly beneficial when elements are stored in containers that may reallocate.
+ *
+ * - **Optimized SetAttribute**: The `SetAttribute` methods check if we're in
+ *   "serialization mode" (no children yet added with conflicting names) to avoid
+ *   the overhead of `RemoveChild` calls during pure serialization workflows.
+ *   This is safe because during serialization, we only add children/attributes,
+ *   never mixing the two for the same name in a single element.
+ *
+ * - **ReserveChildren method**: Allows pre-allocating the children vector to avoid
+ *   multiple reallocations when the number of children is known in advance.
+ *
  * \see gd::Serializer
  */
 class GD_CORE_API SerializerElement {
@@ -53,12 +76,22 @@ class GD_CORE_API SerializerElement {
   SerializerElement(const gd::SerializerElement &object) { Init(object); };
 
   /**
+   * Move constructor.
+   */
+  SerializerElement(gd::SerializerElement &&object) noexcept;
+
+  /**
    * Assignment operator.
    */
   SerializerElement &operator=(const gd::SerializerElement &object) {
     if ((this) != &object) Init(object);
     return *this;
   }
+
+  /**
+   * Move assignment operator.
+   */
+  SerializerElement &operator=(gd::SerializerElement &&object) noexcept;
 
   virtual ~SerializerElement();
 
@@ -441,10 +474,21 @@ class GD_CORE_API SerializerElement {
   /**
    * \brief Return all the children of the element.
    */
-  const std::vector<std::pair<gd::String, std::shared_ptr<SerializerElement> > >
+  const std::vector<std::pair<gd::String, std::unique_ptr<SerializerElement> > >
       &GetAllChildren() const {
     return children;
   };
+
+  /**
+   * \brief Pre-allocate space for the specified number of children.
+   *
+   * This optimization is useful when the number of children is known in advance
+   * (e.g., when serializing an array of known size). It avoids multiple
+   * reallocations of the children vector as elements are added.
+   *
+   * \param count The number of children to reserve space for.
+   */
+  void ReserveChildren(std::size_t count) { children.reserve(count); }
   ///@}
 
   static SerializerElement nullElement;
@@ -460,7 +504,9 @@ class GD_CORE_API SerializerElement {
   SerializerValue elementValue;
 
   std::map<gd::String, SerializerValue> attributes;
-  std::vector<std::pair<gd::String, std::shared_ptr<SerializerElement> > >
+  // Optimization: Using unique_ptr instead of shared_ptr to avoid the overhead
+  // of reference counting. Children are exclusively owned by their parent.
+  std::vector<std::pair<gd::String, std::unique_ptr<SerializerElement> > >
       children;
   mutable bool isArray = false;  ///< true if element is considered as an array
   mutable gd::String arrayOf;  ///< The name of the children (was useful for XML

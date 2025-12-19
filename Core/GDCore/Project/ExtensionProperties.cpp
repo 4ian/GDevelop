@@ -42,10 +42,8 @@ void ExtensionProperties::SerializeTo(SerializerElement& element) const {
 void ExtensionProperties::UnserializeFrom(const SerializerElement& element) {
   properties.clear();
   element.ConsiderAsArrayOf("extensionProperties");
-  for (std::pair<const gd::String, std::shared_ptr<SerializerElement>>
-           extensionProperties : element.GetAllChildren()) {
-    std::shared_ptr<SerializerElement> extensionPropertiesElement =
-        extensionProperties.second;
+  for (const auto& extensionProperties : element.GetAllChildren()) {
+    const auto& extensionPropertiesElement = extensionProperties.second;
     properties
         [extensionPropertiesElement->GetChild("extension").GetStringValue()]
         [extensionPropertiesElement->GetChild("property").GetStringValue()] =

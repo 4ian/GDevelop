@@ -3,154 +3,187 @@
 
 namespace gd {
 
+// ============================================================================
+// CONSTRUCTORS
+// ============================================================================
+// Optimization: Direct initialization without calling setters.
+// Each constructor directly sets the type enum and value, avoiding the overhead
+// of setter methods that would redundantly clear other type flags.
+
 SerializerValue::SerializerValue()
-    : isUnknown(true),
-      isBoolean(false),
-      isString(false),
-      isInt(false),
-      isDouble(false),
+    : type(Type::Unknown),
       booleanValue(false),
       intValue(0),
       doubleValue(0) {}
 
 SerializerValue::SerializerValue(bool val)
-    : isUnknown(true),
-      isBoolean(false),
-      isString(false),
-      isInt(false),
-      isDouble(false),
-      booleanValue(false),
+    : type(Type::Boolean),
+      booleanValue(val),
       intValue(0),
-      doubleValue(0) {
-  SetBool(val);
-}
+      doubleValue(0) {}
+
 SerializerValue::SerializerValue(const gd::String &val)
-    : isUnknown(true),
-      isBoolean(false),
-      isString(false),
-      isInt(false),
-      isDouble(false),
+    : type(Type::String),
       booleanValue(false),
+      stringValue(val),
       intValue(0),
-      doubleValue(0) {
-  SetString(val);
-}
+      doubleValue(0) {}
+
+SerializerValue::SerializerValue(gd::String &&val)
+    : type(Type::String),
+      booleanValue(false),
+      stringValue(std::move(val)),
+      intValue(0),
+      doubleValue(0) {}
+
 SerializerValue::SerializerValue(int val)
-    : isUnknown(true),
-      isBoolean(false),
-      isString(false),
-      isInt(false),
-      isDouble(false),
+    : type(Type::Int),
       booleanValue(false),
-      intValue(0),
-      doubleValue(0) {
-  SetInt(val);
-}
+      intValue(val),
+      doubleValue(0) {}
+
 SerializerValue::SerializerValue(double val)
-    : isUnknown(true),
-      isBoolean(false),
-      isString(false),
-      isInt(false),
-      isDouble(false),
+    : type(Type::Double),
       booleanValue(false),
       intValue(0),
-      doubleValue(0) {
-  SetDouble(val);
+      doubleValue(val) {}
+
+// ============================================================================
+// MOVE SEMANTICS
+// ============================================================================
+// Optimization: Move constructor and assignment avoid copying the string value,
+// which can be expensive for large strings. This is particularly beneficial
+// during serialization when SerializerValue objects are frequently created
+// and stored in containers.
+
+SerializerValue::SerializerValue(SerializerValue&& other) noexcept
+    : type(other.type),
+      booleanValue(other.booleanValue),
+      stringValue(std::move(other.stringValue)),
+      intValue(other.intValue),
+      doubleValue(other.doubleValue) {
+  // Reset the moved-from object to a valid state
+  other.type = Type::Unknown;
 }
+
+SerializerValue& SerializerValue::operator=(SerializerValue&& other) noexcept {
+  if (this != &other) {
+    type = other.type;
+    booleanValue = other.booleanValue;
+    stringValue = std::move(other.stringValue);
+    intValue = other.intValue;
+    doubleValue = other.doubleValue;
+    // Reset the moved-from object to a valid state
+    other.type = Type::Unknown;
+  }
+  return *this;
+}
+
+// ============================================================================
+// GETTERS
+// ============================================================================
+// Optimization: Using switch on enum is typically faster than multiple if-else
+// chains with boolean comparisons. The compiler can optimize switch statements
+// into jump tables for O(1) dispatch.
 
 bool SerializerValue::GetBool() const {
-  if (isString || isUnknown)
-    return stringValue != "false";
-  else if (isInt)
-    return intValue != 0;
-  else if (isDouble)
-    return doubleValue != 0.0;
-
-  return booleanValue;
+  switch (type) {
+    case Type::Boolean:
+      return booleanValue;
+    case Type::Int:
+      return intValue != 0;
+    case Type::Double:
+      return doubleValue != 0.0;
+    case Type::String:
+    case Type::Unknown:
+    default:
+      return stringValue != "false";
+  }
 }
 
 gd::String SerializerValue::GetString() const {
-  if (isBoolean)
-    return booleanValue ? gd::String("true") : gd::String("false");
-  else if (isInt)
-    return gd::String::From(intValue);
-  else if (isDouble)
-    return gd::String::From(doubleValue);
-  else if (isUnknown)
-    return stringValue;
-
-  return stringValue;
+  switch (type) {
+    case Type::Boolean:
+      return booleanValue ? gd::String("true") : gd::String("false");
+    case Type::Int:
+      return gd::String::From(intValue);
+    case Type::Double:
+      return gd::String::From(doubleValue);
+    case Type::String:
+    case Type::Unknown:
+    default:
+      return stringValue;
+  }
 }
 
 int SerializerValue::GetInt() const {
-  if (isBoolean)
-    return booleanValue ? 1 : 0;
-  else if (isString || isUnknown)
-    return stringValue.To<int>();
-  else if (isDouble)
-    return doubleValue;
-
-  return intValue;
+  switch (type) {
+    case Type::Boolean:
+      return booleanValue ? 1 : 0;
+    case Type::Int:
+      return intValue;
+    case Type::Double:
+      return static_cast<int>(doubleValue);
+    case Type::String:
+    case Type::Unknown:
+    default:
+      return stringValue.To<int>();
+  }
 }
 
 double SerializerValue::GetDouble() const {
-  if (isBoolean)
-    return booleanValue ? 1 : 0;
-  else if (isString || isUnknown)
-    return stringValue.To<double>();
-  else if (isInt)
-    return intValue;
-
-  return doubleValue;
+  switch (type) {
+    case Type::Boolean:
+      return booleanValue ? 1.0 : 0.0;
+    case Type::Int:
+      return static_cast<double>(intValue);
+    case Type::Double:
+      return doubleValue;
+    case Type::String:
+    case Type::Unknown:
+    default:
+      return stringValue.To<double>();
+  }
 }
 
-void SerializerValue::Set(const gd::String &val) {
-  isUnknown = true;
-  isBoolean = false;
-  isString = false;
-  isInt = false;
-  isDouble = false;
+// ============================================================================
+// SETTERS
+// ============================================================================
+// Optimization: Single enum assignment replaces 5 boolean assignments.
+// This reduces the number of memory writes from 5 to 1 for the type tracking.
 
+void SerializerValue::Set(const gd::String &val) {
+  type = Type::Unknown;
   stringValue = val;
 }
 
-void SerializerValue::SetBool(bool val) {
-  isUnknown = false;
-  isBoolean = true;
-  isString = false;
-  isInt = false;
-  isDouble = false;
+void SerializerValue::Set(gd::String &&val) {
+  type = Type::Unknown;
+  stringValue = std::move(val);
+}
 
+void SerializerValue::SetBool(bool val) {
+  type = Type::Boolean;
   booleanValue = val;
 }
 
 void SerializerValue::SetString(const gd::String &val) {
-  isUnknown = false;
-  isBoolean = false;
-  isString = true;
-  isInt = false;
-  isDouble = false;
-
+  type = Type::String;
   stringValue = val;
 }
 
-void SerializerValue::SetInt(int val) {
-  isUnknown = false;
-  isBoolean = false;
-  isString = false;
-  isInt = true;
-  isDouble = false;
+void SerializerValue::SetString(gd::String &&val) {
+  type = Type::String;
+  stringValue = std::move(val);
+}
 
+void SerializerValue::SetInt(int val) {
+  type = Type::Int;
   intValue = val;
 }
 
 void SerializerValue::SetDouble(double val) {
-  isUnknown = false;
-  isBoolean = false;
-  isString = false;
-  isInt = false;
-  isDouble = true;
-
+  type = Type::Double;
   doubleValue = val;
 }
 

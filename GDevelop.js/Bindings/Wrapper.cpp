@@ -464,9 +464,11 @@ typedef gd::VariablesContainer::SourceType VariablesContainer_SourceType;
 typedef gd::ObjectsContainer::SourceType ObjectsContainer_SourceType;
 typedef gd::ResourcesContainer::SourceType ResourcesContainer_SourceType;
 typedef std::map<gd::String, gd::SerializerValue> MapStringSerializerValue;
-typedef std::vector<std::pair<gd::String, std::shared_ptr<SerializerElement>>>
+// Note: These typedefs keep the old names for backwards compatibility with the
+// WebIDL bindings, but now use unique_ptr internally instead of shared_ptr.
+typedef std::vector<std::pair<gd::String, std::unique_ptr<SerializerElement>>>
     VectorPairStringSharedPtrSerializerElement;
-typedef std::shared_ptr<SerializerElement> SharedPtrSerializerElement;
+typedef std::unique_ptr<SerializerElement> SharedPtrSerializerElement;
 typedef std::vector<UnfilledRequiredBehaviorPropertyProblem>
     VectorUnfilledRequiredBehaviorPropertyProblem;
 typedef std::vector<const gd::ObjectFolderOrObject*> VectorObjectFolderOrObject;

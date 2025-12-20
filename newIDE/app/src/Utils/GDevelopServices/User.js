@@ -361,15 +361,11 @@ export const deleteGroup = async (
   userId: string,
   teamId: string,
   groupId: string
-): Promise<Array<TeamGroup>> => {
+): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await client.delete(`/team/${teamId}/group/${groupId}`, {
+  await client.delete(`/team/${teamId}/group/${groupId}`, {
     headers: { Authorization: authorizationHeader },
     params: { userId },
-  });
-  return ensureIsArray({
-    data: response.data,
-    endpointName: '/team/{id}/action/update-members of User API',
   });
 };
 

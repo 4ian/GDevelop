@@ -24,6 +24,10 @@ import {
 } from '../../../UI/Accordion';
 import { mapFor } from '../../../Utils/MapFor';
 import ResourceSelectorWithThumbnail from '../../../ResourcesList/ResourceSelectorWithThumbnail';
+import PixiResourcesLoader from '../../../ObjectsRendering/PixiResourcesLoader';
+import { type GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
+import * as THREE from 'three';
+import AlertMessage from '../../../UI/AlertMessage';
 
 const gd: libGDevelop = global.gd;
 
@@ -89,6 +93,7 @@ const enableBit = (bitsValue: number, pos: number, enable: boolean) => {
 
 const Physics3DEditor = (props: Props) => {
   const {
+    object,
     behavior,
     onBehaviorUpdated,
     project,
@@ -137,6 +142,52 @@ const Physics3DEditor = (props: Props) => {
   const canShapeBeOriented =
     properties.get('shape').getValue() !== 'Sphere' &&
     properties.get('shape').getValue() !== 'Box';
+
+  const [gltf, setGltf] = React.useState<GLTF | null>(null);
+  const loadGltf = React.useCallback(
+    async (modelResourceName: string) => {
+      if (!modelResourceName && object.getType() === 'Scene3D::Model3DObject') {
+        const model3DConfiguration = gd.asModel3DConfiguration(
+          object.getConfiguration()
+        );
+        modelResourceName = model3DConfiguration
+          .getProperties()
+          .get('modelResourceName')
+          .getValue();
+      }
+      const newModel3d = await PixiResourcesLoader.get3DModel(
+        project,
+        modelResourceName
+      );
+      setGltf(newModel3d);
+    },
+    [object, project]
+  );
+  if (!gltf) {
+    loadGltf(properties.get('meshShapeResourceName').getValue());
+  }
+
+  const meshShapeTrianglesCount = React.useMemo<number>(
+    () => {
+      if (!gltf) {
+        return 0;
+      }
+      let triangleCount = 0;
+      gltf.scene.traverse(object3d => {
+        const mesh = (object3d: THREE.Mesh);
+        if (!mesh.isMesh) {
+          return;
+        }
+        const index = mesh.geometry.getIndex();
+        const positionAttribute = mesh.geometry.getAttribute('position');
+        triangleCount += Math.floor(
+          (index ? index : positionAttribute).count / 3
+        );
+      });
+      return triangleCount;
+    },
+    [gltf]
+  );
 
   return (
     <Column
@@ -265,7 +316,9 @@ const Physics3DEditor = (props: Props) => {
             )}
           </React.Fragment>
         )}
-        {shape === 'Mesh' && (
+      </ResponsiveLineStackLayout>
+      {shape === 'Mesh' && (
+        <React.Fragment>
           <ResourceSelectorWithThumbnail
             project={project}
             resourceKind="model3D"
@@ -277,12 +330,24 @@ const Physics3DEditor = (props: Props) => {
             resourceName={properties.get('meshShapeResourceName').getValue()}
             onChange={newValue => {
               updateBehaviorProperty('meshShapeResourceName', newValue);
+              loadGltf(newValue);
               forceUpdate();
             }}
             id={`physics3d-parameter-mesh-shape-resource-name`}
           />
-        )}
-      </ResponsiveLineStackLayout>
+          {meshShapeTrianglesCount > 10000 && (
+            <Line>
+              <AlertMessage kind="warning">
+                <Trans>
+                  The model has {meshShapeTrianglesCount} triangles. To keep
+                  good performance, consider making a simplified model with a
+                  modeling tool.
+                </Trans>
+              </AlertMessage>
+            </Line>
+          )}
+        </React.Fragment>
+      )}
       <ResponsiveLineStackLayout>
         <NumericProperty
           id="physics3d-parameter-density"

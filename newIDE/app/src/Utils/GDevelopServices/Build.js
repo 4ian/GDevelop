@@ -427,29 +427,21 @@ export const updateBuild = (
     );
 };
 
-export const deleteBuild = (
+export const deleteBuild = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
   buildId: string
-): Promise<Build> => {
-  return getAuthorizationHeader()
-    .then(authorizationHeader =>
-      client.delete(`/build/${buildId}`, {
-        params: {
-          userId,
-        },
-        headers: {
-          Authorization: authorizationHeader,
-        },
-      })
-    )
-    .then(response =>
-      ensureObjectHasProperty({
-        data: response.data,
-        propertyName: 'id',
-        endpointName: '/build/{id} of Build API',
-      })
-    );
+): Promise<void> => {
+  const authorizationHeader = await getAuthorizationHeader();
+
+  await client.delete(`/build/${buildId}`, {
+    params: {
+      userId,
+    },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+  });
 };
 
 export const getUserSigningCredentials = async (
@@ -643,7 +635,7 @@ export const signingCredentialApi = {
   ): Promise<void> => {
     const authorizationHeader = await getAuthorizationHeader();
 
-    const response = await client.delete(`/signing-credential`, {
+    await client.delete(`/signing-credential`, {
       params: {
         userId,
         ...options,
@@ -652,7 +644,5 @@ export const signingCredentialApi = {
         Authorization: authorizationHeader,
       },
     });
-
-    return response.data;
   },
 };

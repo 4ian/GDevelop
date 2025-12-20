@@ -266,7 +266,8 @@ module.exports = {
             _(
               "A static object won't move (perfect for obstacles). Dynamic objects can move. Kinematic will move according to forces applied to it only (useful for characters or specific mechanisms)."
             )
-          );
+          )
+          .setHasImpactOnOtherProperties();
         behaviorProperties
           .getOrCreate('bullet')
           .setValue(
@@ -316,7 +317,9 @@ module.exports = {
           .setType('resource')
           .addExtraInfo('model3D')
           .setLabel(_('Simplified 3D model (leave empty to use object\'s one)'))
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+           // Hidden as required to be changed in the full editor.
+          .setHidden(true)
+          .setHasImpactOnOtherProperties();
         behaviorProperties
           .getOrCreate('shapeOrientation')
           .setValue(

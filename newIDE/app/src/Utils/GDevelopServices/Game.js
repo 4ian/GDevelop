@@ -476,20 +476,15 @@ export const deleteGame = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
   gameId: string
-): Promise<Game> => {
+): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await client.delete(`/game/${gameId}`, {
+  await client.delete(`/game/${gameId}`, {
     params: {
       userId,
     },
     headers: {
       Authorization: authorizationHeader,
     },
-  });
-  return ensureObjectHasProperty({
-    data: response.data,
-    propertyName: 'id',
-    endpointName: '/game/{id} of Game API',
   });
 };
 

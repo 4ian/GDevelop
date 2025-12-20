@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24" height="24" version="1.1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+ <g>
+  <g transform="scale(.75)">
+   <g fill="#243286">
+    <rect x="8" y="16" width="8" height="8"/>
+    <rect y="24" width="8" height="8"/>
+    <rect x="16" y="24" width="8" height="8"/>
+    <rect x="24" y="16" width="8" height="8"/>
+    <rect x="16" y="8" width="8" height="8"/>
+    <rect x="24" y="5.47e-7" width="8" height="8"/>
+   </g>
+   <g fill="#2c7ea1">
+    <rect x="24" y="24" width="8" height="8"/>
+    <rect x="16" y="16" width="8" height="8"/>
+    <rect x="24" y="8" width="8" height="8"/>
+    <rect x="8" y="24" width="8" height="8"/>
+    <rect y="16" width="8" height="8"/>
+    <rect x="8" y="8" width="8" height="8"/>
+    <rect x="16" width="8" height="8"/>
+   </g>
+  </g>
+  <g fill="#2c7ea1">
+   <path d="m19 1v4h4v-4zm1 1h2v2h-2z"/>
+   <path d="m13 7v4h4v-4zm1 1h2v2h-2z"/>
+   <path d="m7 13v4h4v-4zm1 1h2v2h-2z"/>
+   <path d="m1 19v4h4v-4zm1 1h2v2h-2z"/>
+  </g>
+  <g fill="#243286" fill-rule="evenodd">
+   <path d="m17 1-4 4h4zm-1 2.4v0.6h-0.6z"/>
+   <path d="m23 7-4 4v-4zm-2.4 1h-0.6v0.6z"/>
+   <path d="m11 7-4 4h4zm-1 2.4v0.6h-0.6z"/>
+   <path d="m5 13-4 4h4zm-1 2.4v0.6h-0.6z"/>
+   <path d="m11 19-4 4v-4zm-2.4 1h-0.6v0.6z"/>
+   <path d="m17 13-4 4v-4zm-2.4 1h-0.6v0.6z"/>
+  </g>
+ </g>
+</svg>

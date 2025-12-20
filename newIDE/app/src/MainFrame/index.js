@@ -3907,6 +3907,7 @@ const MainFrame = (props: Props) => {
 
   const saveProject = React.useCallback(
     async () => {
+      console.log('saveProject started');
       if (!currentProject) return;
       // Prevent saving if there are errors in the extension modules, as
       // this can lead to corrupted projects.
@@ -3923,16 +3924,19 @@ const MainFrame = (props: Props) => {
         return;
       }
 
+      console.log('getStorageProviderOperations call');
       const storageProviderOperations = getStorageProviderOperations();
       const {
         onSaveProject,
-        canFileMetadataBeSafelySaved,
+        // canFileMetadataBeSafelySaved,
       } = storageProviderOperations;
       if (!onSaveProject) {
         return saveProjectAs();
       }
 
+      console.log('save ui settings');
       saveUiSettings(state.editorTabs);
+      console.log('save ui settings done');
 
       // Protect against concurrent saves, which can trigger issues with the
       // file system.
@@ -3947,16 +3951,8 @@ const MainFrame = (props: Props) => {
           message: t`You're trying to save changes made to a previous version of your project. If you continue, it will be used as the new latest version.`,
         });
         if (!shouldRestoreCheckedOutVersion) return;
-      } else if (canFileMetadataBeSafelySaved) {
-        const canProjectBeSafelySaved = await canFileMetadataBeSafelySaved(
-          currentFileMetadata,
-          {
-            showAlert,
-            showConfirmation,
-          }
-        );
-        if (!canProjectBeSafelySaved) return;
       }
+      console.log('show message');
 
       _showSnackMessage(i18n._(t`Saving...`), null);
       setIsSavingProject(true);
@@ -3972,6 +3968,8 @@ const MainFrame = (props: Props) => {
         const saveOptions = {};
         if (cloudProjectRecoveryOpenedVersionId) {
           saveOptions.previousVersion = cloudProjectRecoveryOpenedVersionId;
+        } else {
+          saveOptions.previousVersion = currentFileMetadata.version;
         }
         if (checkedOutVersionStatus) {
           saveOptions.restoredFromVersionId =
@@ -3980,7 +3978,11 @@ const MainFrame = (props: Props) => {
         const { wasSaved, fileMetadata } = await onSaveProject(
           currentProject,
           currentFileMetadata,
-          saveOptions
+          saveOptions,
+          {
+            showAlert,
+            showConfirmation,
+          }
         );
 
         if (wasSaved) {

@@ -1,13 +1,13 @@
 const initializeGDevelopJs = require('../../Binaries/embuild/GDevelop.js/libGD.js');
 
-describe('libGD.js object serialization', function() {
+describe('libGD.js object serialization', function () {
   let gd = null;
   beforeAll(async () => {
     gd = await initializeGDevelopJs();
   });
 
-  describe('gd.SerializerElement', function() {
-    it('should support operations on its value', function() {
+  describe('gd.SerializerElement', function () {
+    it('should support operations on its value', function () {
       var element = new gd.SerializerElement();
       element.setStringValue('aaa');
       expect(element.getStringValue()).toBe('aaa');
@@ -18,7 +18,7 @@ describe('libGD.js object serialization', function() {
       element.setDoubleValue(123.457);
       expect(element.getDoubleValue()).toBeCloseTo(123.457);
     });
-    it('should cast values from a type to another', function() {
+    it('should cast values from a type to another', function () {
       var element = new gd.SerializerElement();
       element.setStringValue('123');
       expect(element.getStringValue()).toBe('123');
@@ -30,7 +30,7 @@ describe('libGD.js object serialization', function() {
       element.setBoolValue(false);
       expect(element.getBoolValue()).toBe(false);
     });
-    it('should support operations on its children', function() {
+    it('should support operations on its children', function () {
       var element = new gd.SerializerElement();
 
       expect(element.hasChild('Missing')).toBe(false);
@@ -44,16 +44,13 @@ describe('libGD.js object serialization', function() {
       element.setChild('Child2', child2);
 
       expect(
-        element
-          .getChild('Child2')
-          .getChild('subChild')
-          .getStringValue()
+        element.getChild('Child2').getChild('subChild').getStringValue()
       ).toBe('Hello world!');
     });
   });
 
-  describe('gd.Serializer', function() {
-    it('should serialize a Text Object', function() {
+  describe('gd.Serializer', function () {
+    it('should serialize a Text Object', function () {
       var obj = new gd.TextObject('testObject');
       obj.setText('Text of the object, with 官话 characters');
 
@@ -69,31 +66,25 @@ describe('libGD.js object serialization', function() {
     });
   });
 
-  describe('gd.Serializer.fromJSON and gd.Serializer.toJSON', function() {
+  describe('gd.Serializer.fromJSON and gd.Serializer.toJSON', function () {
     const checkJsonParseAndStringify = (json) => {
       const element = gd.Serializer.fromJSON(json);
       const outputJson = gd.Serializer.toJSON(element);
 
       expect(outputJson).toBe(json);
-    }
+    };
 
-    it('should unserialize and reserialize JSON (string)', function() {
-      checkJsonParseAndStringify(
-        '"a"'
-      );
-      checkJsonParseAndStringify(
-        '"String with 官话 characters"'
-      );
-      checkJsonParseAndStringify(
-        '""'
-      );
+    it('should unserialize and reserialize JSON (string)', function () {
+      checkJsonParseAndStringify('"a"');
+      checkJsonParseAndStringify('"String with 官话 characters"');
+      checkJsonParseAndStringify('""');
     });
-    it('should unserialize and reserialize JSON (objects)', function() {
+    it('should unserialize and reserialize JSON (objects)', function () {
       checkJsonParseAndStringify(
         '{"a":{"a1":{"name":"","referenceTo":"/a/a1"}},"b":{"b1":"world"},"c":{"c1":3.0},"things":{"0":{"name":"layout0","referenceTo":"/layouts/layout"},"1":{"name":"layout1","referenceTo":"/layouts/layout"},"2":{"name":"layout2","referenceTo":"/layouts/layout"},"3":{"name":"layout3","referenceTo":"/layouts/layout"},"4":{"name":"layout4","referenceTo":"/layouts/layout"}}}'
       );
     });
-    it('should unserialize and reserialize JSON (arrays)', function() {
+    it('should unserialize and reserialize JSON (arrays)', function () {
       checkJsonParseAndStringify('[]');
       checkJsonParseAndStringify('[1]');
       checkJsonParseAndStringify('[1,2]');
@@ -106,32 +97,26 @@ describe('libGD.js object serialization', function() {
 
   // TODO: test failures
 
-  describe('gd.Serializer.fromJSObject and gd.Serializer.toJSObject', function() {
+  describe('gd.Serializer.fromJSObject and gd.Serializer.toJSObject', function () {
     const checkJsonParseAndStringify = (json) => {
       const object = JSON.parse(json);
       const element = gd.Serializer.fromJSObject(object);
       const outputObject = gd.Serializer.toJSObject(element);
 
       expect(JSON.stringify(outputObject)).toBe(json);
-    }
+    };
 
-    it('should unserialize and reserialize JSON (string)', function() {
-      checkJsonParseAndStringify(
-        '"a"'
-      );
-      checkJsonParseAndStringify(
-        '"String with 官话 characters"'
-      );
-      checkJsonParseAndStringify(
-        '""'
-      );
+    it('should unserialize and reserialize JSON (string)', function () {
+      checkJsonParseAndStringify('"a"');
+      checkJsonParseAndStringify('"String with 官话 characters"');
+      checkJsonParseAndStringify('""');
     });
-    it('should unserialize and reserialize JSON (objects)', function() {
+    it('should unserialize and reserialize JSON (objects)', function () {
       checkJsonParseAndStringify(
         '{"a":{"a1":{"name":"","referenceTo":"/a/a1"}},"b":{"b1":"world"},"c":{"c1":3},"things":{"0":{"name":"layout0","referenceTo":"/layouts/layout"},"1":{"name":"layout1","referenceTo":"/layouts/layout"},"2":{"name":"layout2","referenceTo":"/layouts/layout"},"3":{"name":"layout3","referenceTo":"/layouts/layout"},"4":{"name":"layout4","referenceTo":"/layouts/layout"}}}'
       );
     });
-    it('should unserialize and reserialize JSON (arrays)', function() {
+    it('should unserialize and reserialize JSON (arrays)', function () {
       checkJsonParseAndStringify('[]');
       checkJsonParseAndStringify('[1]');
       checkJsonParseAndStringify('[1,2]');
@@ -141,4 +126,81 @@ describe('libGD.js object serialization', function() {
       checkJsonParseAndStringify('{"7":[],"a":[1,2,{"b":3},{"c":[4,5]},6]}');
     });
   });
+
+  // describe('gd.createBinarySnapshot and gd.deserializeBinarySnapshot', function () {
+  //   const checkBinaryRoundTrip = (json) => {
+  //     // Create a SerializerElement from JSON
+  //     const originalElement = gd.Serializer.fromJSON(json);
+
+  //     // Create binary snapshot
+  //     const binaryBuffer = gd.createBinarySnapshot(originalElement);
+  //     expect(binaryBuffer).toBeInstanceOf(Uint8Array);
+  //     expect(binaryBuffer.length).toBeGreaterThan(0);
+
+  //     // Deserialize binary snapshot
+  //     const restoredElement = gd.deserializeBinarySnapshot(binaryBuffer);
+
+  //     // Convert back to JSON and compare
+  //     const outputJson = gd.Serializer.toJSON(restoredElement);
+
+  //     restoredElement.delete();
+  //     originalElement.delete();
+
+  //     expect(outputJson).toBe(json);
+  //   };
+
+  //   it('should round-trip simple values', function () {
+  //     checkBinaryRoundTrip('"hello"');
+  //     checkBinaryRoundTrip('123');
+  //     checkBinaryRoundTrip('123.456');
+  //     checkBinaryRoundTrip('true');
+  //     checkBinaryRoundTrip('false');
+  //   });
+
+  //   it('should round-trip strings with unicode characters', function () {
+  //     checkBinaryRoundTrip('"String with 官话 characters"');
+  //     checkBinaryRoundTrip('"Émojis: 🎮🎲🎯"');
+  //   });
+
+  //   it('should round-trip objects', function () {
+  //     checkBinaryRoundTrip('{}');
+  //     checkBinaryRoundTrip('{"a":"b"}');
+  //     checkBinaryRoundTrip('{"a":{"nested":"value"}}');
+  //     checkBinaryRoundTrip(
+  //       '{"a":{"a1":{"name":"","referenceTo":"/a/a1"}},"b":{"b1":"world"},"c":{"c1":3.0}}'
+  //     );
+  //   });
+
+  //   it('should round-trip arrays', function () {
+  //     checkBinaryRoundTrip('[]');
+  //     checkBinaryRoundTrip('[1]');
+  //     checkBinaryRoundTrip('[1,2,3]');
+  //     checkBinaryRoundTrip('[{"a":1},{"b":2}]');
+  //     checkBinaryRoundTrip('{"items":[1,2,3],"nested":[{"x":1},{"y":2}]}');
+  //   });
+
+  //   it('should round-trip a complex object like a Text Object', function () {
+  //     var obj = new gd.TextObject('testObject');
+  //     obj.setText('Text with 官话 characters');
+
+  //     var serializedElement = new gd.SerializerElement();
+  //     obj.serializeTo(serializedElement);
+
+  //     // Create binary snapshot
+  //     const binaryBuffer = gd.createBinarySnapshot(serializedElement);
+
+  //     // Deserialize binary snapshot
+  //     const restoredElement = gd.deserializeBinarySnapshot(binaryBuffer);
+
+  //     // Compare JSON output
+  //     const originalJson = gd.Serializer.toJSON(serializedElement);
+  //     const restoredJson = gd.Serializer.toJSON(restoredElement);
+
+  //     expect(restoredJson).toBe(originalJson);
+
+  //     restoredElement.delete();
+  //     serializedElement.delete();
+  //     obj.delete();
+  //   });
+  // });
 });

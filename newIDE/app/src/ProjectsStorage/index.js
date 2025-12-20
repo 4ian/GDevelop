@@ -106,7 +106,11 @@ export type StorageProviderOperations = {|
   onSaveProject?: (
     project: gdProject,
     fileMetadata: FileMetadata,
-    options?: {| previousVersion?: string, restoredFromVersionId?: string |}
+    options?: {| previousVersion?: string, restoredFromVersionId?: string |},
+    actions: {|
+      showAlert: ShowAlertFunction,
+      showConfirmation: ShowConfirmFunction,
+    |}
   ) => Promise<{|
     wasSaved: boolean,
     fileMetadata: FileMetadata,
@@ -133,13 +137,6 @@ export type StorageProviderOperations = {|
     /** This is the location where the project was saved, or null if not persisted. */
     fileMetadata: ?FileMetadata,
   |}>,
-  canFileMetadataBeSafelySaved?: (
-    fileMetadata: FileMetadata,
-    actions: {|
-      showAlert: ShowAlertFunction,
-      showConfirmation: ShowConfirmFunction,
-    |}
-  ) => Promise<boolean>,
   canFileMetadataBeSafelySavedAs?: (
     fileMetadata: FileMetadata,
     actions: {|

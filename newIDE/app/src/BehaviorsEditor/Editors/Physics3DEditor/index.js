@@ -261,62 +261,60 @@ const Physics3DEditor = (props: Props) => {
           />
         )}
       </ResponsiveLineStackLayout>
-      <ResponsiveLineStackLayout>
-        {shape !== 'Mesh' && (
-          <React.Fragment>
+      {shape !== 'Mesh' && (
+        <ResponsiveLineStackLayout>
+          <SemiControlledTextField
+            fullWidth
+            value={properties.get('shapeDimensionA').getValue()}
+            key={'shapeDimensionA'}
+            floatingLabelText={
+              shape === 'Box' ? <Trans>Width</Trans> : <Trans>Radius</Trans>
+            }
+            min={0}
+            onChange={newValue =>
+              updateBehaviorProperty('shapeDimensionA', newValue)
+            }
+            type="number"
+            endAdornment={
+              <UnitAdornment property={properties.get('shapeDimensionA')} />
+            }
+          />
+          {shape !== 'Sphere' && (
             <SemiControlledTextField
               fullWidth
-              value={properties.get('shapeDimensionA').getValue()}
-              key={'shapeDimensionA'}
+              value={properties.get('shapeDimensionB').getValue()}
+              key={'shapeDimensionB'}
               floatingLabelText={
-                shape === 'Box' ? <Trans>Width</Trans> : <Trans>Radius</Trans>
+                shape === 'Box' ? <Trans>Height</Trans> : <Trans>Depth</Trans>
               }
               min={0}
               onChange={newValue =>
-                updateBehaviorProperty('shapeDimensionA', newValue)
+                updateBehaviorProperty('shapeDimensionB', newValue)
               }
               type="number"
               endAdornment={
-                <UnitAdornment property={properties.get('shapeDimensionA')} />
+                <UnitAdornment property={properties.get('shapeDimensionB')} />
               }
             />
-            {shape !== 'Sphere' && (
-              <SemiControlledTextField
-                fullWidth
-                value={properties.get('shapeDimensionB').getValue()}
-                key={'shapeDimensionB'}
-                floatingLabelText={
-                  shape === 'Box' ? <Trans>Height</Trans> : <Trans>Depth</Trans>
-                }
-                min={0}
-                onChange={newValue =>
-                  updateBehaviorProperty('shapeDimensionB', newValue)
-                }
-                type="number"
-                endAdornment={
-                  <UnitAdornment property={properties.get('shapeDimensionB')} />
-                }
-              />
-            )}
-            {shape === 'Box' && (
-              <SemiControlledTextField
-                fullWidth
-                value={properties.get('shapeDimensionC').getValue()}
-                key={'shapeDimensionC'}
-                floatingLabelText={<Trans>Depth</Trans>}
-                min={0}
-                onChange={newValue =>
-                  updateBehaviorProperty('shapeDimensionC', newValue)
-                }
-                type="number"
-                endAdornment={
-                  <UnitAdornment property={properties.get('shapeDimensionC')} />
-                }
-              />
-            )}
-          </React.Fragment>
-        )}
-      </ResponsiveLineStackLayout>
+          )}
+          {shape === 'Box' && (
+            <SemiControlledTextField
+              fullWidth
+              value={properties.get('shapeDimensionC').getValue()}
+              key={'shapeDimensionC'}
+              floatingLabelText={<Trans>Depth</Trans>}
+              min={0}
+              onChange={newValue =>
+                updateBehaviorProperty('shapeDimensionC', newValue)
+              }
+              type="number"
+              endAdornment={
+                <UnitAdornment property={properties.get('shapeDimensionC')} />
+              }
+            />
+          )}
+        </ResponsiveLineStackLayout>
+      )}
       {shape === 'Mesh' && (
         <React.Fragment>
           <ResourceSelectorWithThumbnail

@@ -743,12 +743,10 @@ namespace gdjs {
         this.bodyType === 'Static' &&
         isModel3D(this.owner)
       ) {
-        const meshes = this.getMeshShapeTriangles(
-          this.owner,
-          width,
-          height,
-          depth
+        const meshes: Array<Jolt.TriangleList> = gdjs.staticArray(
+          Physics3DRuntimeBehavior.prototype.getMeshShapeTriangles
         );
+        this.getMeshShapeTriangles(this.owner, width, height, depth, meshes);
         if (meshes.length === 1) {
           shapeSettings = new Jolt.MeshShapeSettings(meshes[0]);
         } else {
@@ -763,6 +761,7 @@ namespace gdjs {
           }
           shapeSettings = compoundShapeSettings;
         }
+        meshes.length = 0;
         quat = this.getQuat(0, 0, 0, 1);
       } else {
         let convexShapeSettings: Jolt.ConvexShapeSettings;
@@ -884,7 +883,8 @@ namespace gdjs {
       model3DRuntimeObject: gdjs.Model3DRuntimeObject,
       width: float,
       height: float,
-      depth: float
+      depth: float,
+      meshes: Array<Jolt.TriangleList>
     ): Array<Jolt.TriangleList> {
       const originalModel = this.owner
         .getInstanceContainer()
@@ -921,15 +921,14 @@ namespace gdjs {
 
       threeObject.updateMatrixWorld();
 
-      const meshes: Array<Jolt.TriangleList> = [];
+      const vector3 = new THREE.Vector3();
+      const positions: Array<Jolt.Vec3> = [];
       threeObject.traverse((object3d) => {
         const mesh = object3d as THREE.Mesh;
         if (!mesh.isMesh) {
           return;
         }
         const positionAttribute = mesh.geometry.getAttribute('position');
-        const positions: Array<Jolt.Vec3> = [];
-        const vector3 = new THREE.Vector3();
         object3d.getWorldScale(vector3);
         const shouldTrianglesBeFlipped = vector3.x * vector3.y * vector3.z < 0;
         for (let i = 0; i < positionAttribute.count; i++) {
@@ -961,6 +960,7 @@ namespace gdjs {
           }
         }
         meshes.push(triangles);
+        positions.length = 0;
       });
       return meshes;
     }

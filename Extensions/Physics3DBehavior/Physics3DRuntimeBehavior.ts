@@ -930,6 +930,8 @@ namespace gdjs {
         const positionAttribute = mesh.geometry.getAttribute('position');
         const positions: Array<Jolt.Vec3> = [];
         const vector3 = new THREE.Vector3();
+        object3d.getWorldScale(vector3);
+        const shouldTrianglesBeFlipped = vector3.x * vector3.y * vector3.z < 0;
         for (let i = 0; i < positionAttribute.count; i++) {
           vector3.fromBufferAttribute(positionAttribute, i);
           object3d.localToWorld(vector3);
@@ -941,8 +943,8 @@ namespace gdjs {
           for (let i = 0; i < index.count; i += 3) {
             triangles.push_back(
               new Jolt.Triangle(
-                positions[index.getX(i)],
-                positions[index.getX(i + 1)],
+                positions[index.getX(shouldTrianglesBeFlipped ? i + 1 : i)],
+                positions[index.getX(shouldTrianglesBeFlipped ? i : i + 1)],
                 positions[index.getX(i + 2)]
               )
             );
@@ -951,8 +953,8 @@ namespace gdjs {
           for (let i = 0; i < positionAttribute.count; i += 3) {
             triangles.push_back(
               new Jolt.Triangle(
-                positions[i],
-                positions[i + 1],
+                positions[shouldTrianglesBeFlipped ? i + 1 : i],
+                positions[shouldTrianglesBeFlipped ? i : i + 1],
                 positions[i + 2]
               )
             );

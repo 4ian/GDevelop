@@ -63,7 +63,7 @@ module.exports = {
       .addParameter('string', _('Name to register for the player'), '', false)
       .setParameterLongDescription(
         _(
-          'Let this empty to let the leaderboard auto-generate a player name (e.g: "Player23464"). You can configure this in the leaderboard administration.'
+          'Leave this empty to let the leaderboard automatically generate a player name (e.g: "Player23464"). You can configure this in the leaderboard administration.'
         )
       )
       .setHelpPath('/all-features/leaderboards')

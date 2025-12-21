@@ -165,7 +165,7 @@ namespace gdjs {
         return null;
       }
       if (behavior._shape === 'Mesh') {
-        behavior._shape = 'Capsule';
+        behavior._shape = 'Box';
       }
       const sharedData = behavior._sharedData;
 

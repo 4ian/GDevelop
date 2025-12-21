@@ -19,7 +19,6 @@ namespace gdjs {
      */
     private _loadedThreeModels = new gdjs.ResourceCache<THREE_ADDONS.GLTF>();
     private _downloadedArrayBuffers = new gdjs.ResourceCache<ArrayBuffer>();
-    private _loadedThreeModelBoundingBoxes = new Map<string, THREE.Box3>();
 
     _resourceLoader: gdjs.ResourceLoader;
 
@@ -145,61 +144,6 @@ namespace gdjs {
       );
     }
 
-    getModelBoundingBox(
-      resourceName: string,
-      rotationX: float,
-      rotationY: float,
-      rotationZ: float,
-      shouldKeepModelOrigin: boolean
-    ): THREE.Box3 {
-      const key =
-        resourceName +
-        '|' +
-        rotationX +
-        '|' +
-        rotationY +
-        '|' +
-        rotationZ +
-        '|' +
-        (shouldKeepModelOrigin ? 1 : 0);
-      const existingBoundingBox = this._loadedThreeModelBoundingBoxes.get(key);
-      if (existingBoundingBox) {
-        return existingBoundingBox;
-      }
-
-      const originalModel = this.getModel(resourceName);
-      // Start from the original model because:
-      // - _replaceMaterials is destructive
-      // - _updateDefaultTransformation may need to work with meshes in local space
-
-      // This group hold the rotation defined by properties.
-      const threeObject = new THREE.Group();
-      threeObject.rotation.order = 'ZYX';
-      const root = THREE_ADDONS.SkeletonUtils.clone(originalModel.scene);
-      threeObject.add(root);
-
-      // These formulas are also used in:
-      // - Model3DEditor.modelSize
-      // - Model3DRendered2DInstance
-      threeObject.rotation.set(
-        gdjs.toRad(rotationX),
-        gdjs.toRad(rotationY),
-        gdjs.toRad(rotationZ)
-      );
-      threeObject.updateMatrixWorld(true);
-
-      const boundingBox = new THREE.Box3().setFromObject(threeObject);
-      if (shouldKeepModelOrigin) {
-        // Keep the origin as part of the model.
-        // For instance, a model can be 1 face of a cube and we want to keep the
-        // inside as part of the object even if it's just void.
-        // It also avoids to have the origin outside of the object box.
-        boundingBox.expandByPoint(new THREE.Vector3(0, 0, 0));
-      }
-      this._loadedThreeModelBoundingBoxes.set(key, boundingBox);
-      return boundingBox;
-    }
-
     /**
      * To be called when the game is disposed.
      * Clear the models, resources loaded and destroy 3D models loaders in this manager.
@@ -207,7 +151,6 @@ namespace gdjs {
     dispose(): void {
       this._loadedThreeModels.clear();
       this._downloadedArrayBuffers.clear();
-      this._loadedThreeModelBoundingBoxes.clear();
       this._loader = null;
       this._dracoLoader = null;
 
@@ -236,8 +179,6 @@ namespace gdjs {
       if (downloadedArrayBuffer) {
         this._downloadedArrayBuffers.delete(resourceData);
       }
-
-      this._loadedThreeModelBoundingBoxes.clear();
     }
   }
 }

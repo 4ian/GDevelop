@@ -778,20 +778,20 @@ namespace gdjs {
             shapeDimensionA > 0
               ? shapeDimensionA
               : width > 0
-              ? width
-              : onePixel;
+                ? width
+                : onePixel;
           const boxHeight =
             shapeDimensionB > 0
               ? shapeDimensionB
               : height > 0
-              ? height
-              : onePixel;
+                ? height
+                : onePixel;
           const boxDepth =
             shapeDimensionC > 0
               ? shapeDimensionC
               : depth > 0
-              ? depth
-              : onePixel;
+                ? depth
+                : onePixel;
           // The convex radius should not eat up the whole volume.
           const convexRadius = Math.min(
             onePixel,
@@ -810,14 +810,14 @@ namespace gdjs {
             shapeDimensionA > 0
               ? shapeDimensionA
               : width > 0
-              ? Math.sqrt(width * height) / 2
-              : onePixel;
+                ? Math.sqrt(width * height) / 2
+                : onePixel;
           const capsuleDepth =
             shapeDimensionB > 0
               ? shapeDimensionB
               : depth > 0
-              ? depth
-              : onePixel;
+                ? depth
+                : onePixel;
           convexShapeSettings = new Jolt.CapsuleShapeSettings(
             Math.max(0, capsuleDepth / 2 - radius),
             radius
@@ -834,14 +834,14 @@ namespace gdjs {
             shapeDimensionA > 0
               ? shapeDimensionA
               : width > 0
-              ? Math.sqrt(width * height) / 2
-              : onePixel;
+                ? Math.sqrt(width * height) / 2
+                : onePixel;
           const cylinderDepth =
             shapeDimensionB > 0
               ? shapeDimensionB
               : depth > 0
-              ? depth
-              : onePixel;
+                ? depth
+                : onePixel;
           // The convex radius should not eat up the whole volume.
           const convexRadius = Math.min(
             onePixel,
@@ -865,8 +865,8 @@ namespace gdjs {
             shapeDimensionA > 0
               ? shapeDimensionA
               : width > 0
-              ? Math.pow(width * height * depth, 1 / 3) / 2
-              : onePixel;
+                ? Math.pow(width * height * depth, 1 / 3) / 2
+                : onePixel;
           convexShapeSettings = new Jolt.SphereShapeSettings(radius);
           quat = this.getQuat(0, 0, 0, 1);
           this._shapeHalfWidth = radius;
@@ -1119,33 +1119,33 @@ namespace gdjs {
       const linearVelocityX = previousBodyData
         ? previousBodyData.linearVelocityX
         : this._body
-        ? this._body.GetLinearVelocity().GetX()
-        : 0;
+          ? this._body.GetLinearVelocity().GetX()
+          : 0;
       const linearVelocityY = previousBodyData
         ? previousBodyData.linearVelocityY
         : this._body
-        ? this._body.GetLinearVelocity().GetY()
-        : 0;
+          ? this._body.GetLinearVelocity().GetY()
+          : 0;
       const linearVelocityZ = previousBodyData
         ? previousBodyData.linearVelocityZ
         : this._body
-        ? this._body.GetLinearVelocity().GetZ()
-        : 0;
+          ? this._body.GetLinearVelocity().GetZ()
+          : 0;
       const angularVelocityX = previousBodyData
         ? previousBodyData.angularVelocityX
         : this._body
-        ? this._body.GetAngularVelocity().GetX()
-        : 0;
+          ? this._body.GetAngularVelocity().GetX()
+          : 0;
       const angularVelocityY = previousBodyData
         ? previousBodyData.angularVelocityY
         : this._body
-        ? this._body.GetAngularVelocity().GetY()
-        : 0;
+          ? this._body.GetAngularVelocity().GetY()
+          : 0;
       const angularVelocityZ = previousBodyData
         ? previousBodyData.angularVelocityZ
         : this._body
-        ? this._body.GetAngularVelocity().GetZ()
-        : 0;
+          ? this._body.GetAngularVelocity().GetZ()
+          : 0;
 
       if (this._body) {
         this.bodyUpdater.destroyBody();
@@ -2105,8 +2105,8 @@ namespace gdjs {
           behavior.bodyType === 'Static'
             ? Jolt.EMotionType_Static
             : behavior.bodyType === 'Kinematic'
-            ? Jolt.EMotionType_Kinematic
-            : Jolt.EMotionType_Dynamic,
+              ? Jolt.EMotionType_Kinematic
+              : Jolt.EMotionType_Dynamic,
           behavior.getBodyLayer()
         );
         bodyCreationSettings.mMotionQuality = behavior.bullet

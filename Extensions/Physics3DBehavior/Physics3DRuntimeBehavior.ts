@@ -745,7 +745,8 @@ namespace gdjs {
       ) {
         const meshShapeSettings: Array<Jolt.MeshShapeSettings> =
           gdjs.staticArray(
-            Physics3DRuntimeBehavior.prototype.getMeshShapeTriangles
+            Physics3DRuntimeBehavior.prototype
+              ._createNewShapeSettingsWithoutMassCenterOffset
           );
         this.getMeshShapeTriangles(
           this.owner,
@@ -929,7 +930,10 @@ namespace gdjs {
       threeObject.updateMatrixWorld();
 
       const vector3 = new THREE.Vector3();
-      const positions: Array<Jolt.Vec3> = [];
+      const positions: Array<Jolt.Vec3> = gdjs.staticArray(
+        Physics3DRuntimeBehavior.prototype.getMeshShapeTriangles
+      );
+      const triangles = new Jolt.TriangleList();
       threeObject.traverse((object3d) => {
         const mesh = object3d as THREE.Mesh;
         if (!mesh.isMesh) {
@@ -960,6 +964,8 @@ namespace gdjs {
             );
           }
           const physicsMaterialList = new Jolt.PhysicsMaterialList();
+          // `MeshShapeSettings` moves the parameters into its members,
+          // we should not delete them.
           meshes.push(
             new Jolt.MeshShapeSettings(
               vertexList,
@@ -968,12 +974,13 @@ namespace gdjs {
             )
           );
         } else {
+          positions.length = 0;
           for (let i = 0; i < positionAttribute.count; i++) {
             vector3.fromBufferAttribute(positionAttribute, i);
             object3d.localToWorld(vector3);
             positions.push(new Jolt.Vec3(vector3.x, vector3.y, vector3.z));
           }
-          const triangles = new Jolt.TriangleList();
+          triangles.clear();
           for (let i = 0; i < positionAttribute.count; i += 3) {
             triangles.push_back(
               new Jolt.Triangle(
@@ -983,10 +990,13 @@ namespace gdjs {
               )
             );
           }
+          // `MeshShapeSettings` creates a copy when it indexes the triangle,
+          // we need to delete them.
           meshes.push(new Jolt.MeshShapeSettings(triangles));
         }
-        positions.length = 0;
       });
+      positions.length = 0;
+      Jolt.destroy(triangles);
       return meshes;
     }
 

@@ -261,6 +261,15 @@ const Physics3DEditor = (props: Props) => {
           />
         )}
       </ResponsiveLineStackLayout>
+          {shape === 'Mesh' && object.getType() !== 'Scene3D::Model3DObject' && (
+            <Line>
+              <AlertMessage kind="error">
+                <Trans>
+                  Mesh shapes are only supported for 3D model objects.
+                </Trans>
+              </AlertMessage>
+            </Line>
+          )}
       {shape !== 'Mesh' && (
         <ResponsiveLineStackLayout>
           <SemiControlledTextField

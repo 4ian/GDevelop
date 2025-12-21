@@ -748,7 +748,7 @@ namespace gdjs {
             Physics3DRuntimeBehavior.prototype
               ._createNewShapeSettingsWithoutMassCenterOffset
           );
-        this.getMeshShapeTriangles(
+        this.getMeshShapeSettings(
           this.owner,
           width,
           height,
@@ -887,7 +887,7 @@ namespace gdjs {
       );
     }
 
-    private getMeshShapeTriangles(
+    private getMeshShapeSettings(
       model3DRuntimeObject: gdjs.Model3DRuntimeObject,
       width: float,
       height: float,
@@ -931,7 +931,7 @@ namespace gdjs {
 
       const vector3 = new THREE.Vector3();
       const positions: Array<Jolt.Vec3> = gdjs.staticArray(
-        Physics3DRuntimeBehavior.prototype.getMeshShapeTriangles
+        Physics3DRuntimeBehavior.prototype.getMeshShapeSettings
       );
       const triangles = new Jolt.TriangleList();
       threeObject.traverse((object3d) => {

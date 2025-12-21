@@ -743,25 +743,32 @@ namespace gdjs {
         this.bodyType === 'Static' &&
         isModel3D(this.owner)
       ) {
-        const meshes: Array<Jolt.TriangleList> = gdjs.staticArray(
-          Physics3DRuntimeBehavior.prototype.getMeshShapeTriangles
+        const meshShapeSettings: Array<Jolt.MeshShapeSettings> =
+          gdjs.staticArray(
+            Physics3DRuntimeBehavior.prototype.getMeshShapeTriangles
+          );
+        this.getMeshShapeTriangles(
+          this.owner,
+          width,
+          height,
+          depth,
+          meshShapeSettings
         );
-        this.getMeshShapeTriangles(this.owner, width, height, depth, meshes);
-        if (meshes.length === 1) {
-          shapeSettings = new Jolt.MeshShapeSettings(meshes[0]);
+        if (meshShapeSettings.length === 1) {
+          shapeSettings = meshShapeSettings[0];
         } else {
           const compoundShapeSettings = new Jolt.StaticCompoundShapeSettings();
-          for (let index = 0; index < meshes.length; index++) {
+          for (let index = 0; index < meshShapeSettings.length; index++) {
             compoundShapeSettings.AddShapeShapeSettings(
               this.getVec3(0, 0, 0),
               this.getQuat(0, 0, 0, 1),
-              new Jolt.MeshShapeSettings(meshes[index]),
+              meshShapeSettings[index],
               index
             );
           }
           shapeSettings = compoundShapeSettings;
         }
-        meshes.length = 0;
+        meshShapeSettings.length = 0;
         quat = this.getQuat(0, 0, 0, 1);
       } else {
         let convexShapeSettings: Jolt.ConvexShapeSettings;
@@ -884,8 +891,8 @@ namespace gdjs {
       width: float,
       height: float,
       depth: float,
-      meshes: Array<Jolt.TriangleList>
-    ): Array<Jolt.TriangleList> {
+      meshes: Array<Jolt.MeshShapeSettings>
+    ): Array<Jolt.MeshShapeSettings> {
       const originalModel = this.owner
         .getInstanceContainer()
         .getGame()
@@ -931,24 +938,42 @@ namespace gdjs {
         const positionAttribute = mesh.geometry.getAttribute('position');
         object3d.getWorldScale(vector3);
         const shouldTrianglesBeFlipped = vector3.x * vector3.y * vector3.z < 0;
-        for (let i = 0; i < positionAttribute.count; i++) {
-          vector3.fromBufferAttribute(positionAttribute, i);
-          object3d.localToWorld(vector3);
-          positions.push(new Jolt.Vec3(vector3.x, vector3.y, vector3.z));
-        }
-        const triangles = new Jolt.TriangleList();
         const index = mesh.geometry.getIndex();
         if (index) {
+          const vertexList = new Jolt.VertexList();
+          for (let i = 0; i < positionAttribute.count; i++) {
+            vector3.fromBufferAttribute(positionAttribute, i);
+            object3d.localToWorld(vector3);
+            vertexList.push_back(
+              new Jolt.Float3(vector3.x, vector3.y, vector3.z)
+            );
+          }
+          const triangles = new Jolt.IndexedTriangleList();
           for (let i = 0; i < index.count; i += 3) {
             triangles.push_back(
-              new Jolt.Triangle(
-                positions[index.getX(shouldTrianglesBeFlipped ? i + 1 : i)],
-                positions[index.getX(shouldTrianglesBeFlipped ? i : i + 1)],
-                positions[index.getX(i + 2)]
+              new Jolt.IndexedTriangle(
+                index.getX(shouldTrianglesBeFlipped ? i + 1 : i),
+                index.getX(shouldTrianglesBeFlipped ? i : i + 1),
+                index.getX(i + 2),
+                0
               )
             );
           }
+          const physicsMaterialList = new Jolt.PhysicsMaterialList();
+          meshes.push(
+            new Jolt.MeshShapeSettings(
+              vertexList,
+              triangles,
+              physicsMaterialList
+            )
+          );
         } else {
+          for (let i = 0; i < positionAttribute.count; i++) {
+            vector3.fromBufferAttribute(positionAttribute, i);
+            object3d.localToWorld(vector3);
+            positions.push(new Jolt.Vec3(vector3.x, vector3.y, vector3.z));
+          }
+          const triangles = new Jolt.TriangleList();
           for (let i = 0; i < positionAttribute.count; i += 3) {
             triangles.push_back(
               new Jolt.Triangle(
@@ -958,8 +983,8 @@ namespace gdjs {
               )
             );
           }
+          meshes.push(new Jolt.MeshShapeSettings(triangles));
         }
-        meshes.push(triangles);
         positions.length = 0;
       });
       return meshes;

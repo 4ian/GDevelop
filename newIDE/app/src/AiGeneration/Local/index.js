@@ -29,8 +29,11 @@ export {
 export {
   runLocalInference,
   isLocalInferenceAvailable,
+  isGPUAccelerationAvailable,
   getSupportedFormats,
   estimateMemoryRequirement,
+  unloadLocalModel,
+  getCurrentMemoryUsage,
   type InferenceOptions,
   type InferenceResult,
 } from './LocalInference';
@@ -46,3 +49,11 @@ export {
   addMessageToAiRequestWithCustomKeys,
   isUsingCustomApiKeys,
 } from './AiRequestWrapper';
+export {
+  loadModel,
+  generateText,
+  unloadModel as unloadTransformersModel,
+  isTransformersAvailable,
+  isWebGPUAvailable,
+  getMemoryUsage,
+} from './TransformersInference';

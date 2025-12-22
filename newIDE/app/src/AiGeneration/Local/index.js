@@ -34,3 +34,15 @@ export {
   type InferenceOptions,
   type InferenceResult,
 } from './LocalInference';
+export {
+  makeDirectApiCall,
+  hasCustomApiKeys,
+  getConfiguredProviders,
+  type DirectApiMessage,
+  type DirectApiResponse,
+} from './DirectApiClient';
+export {
+  createAiRequestWithCustomKeys,
+  addMessageToAiRequestWithCustomKeys,
+  isUsingCustomApiKeys,
+} from './AiRequestWrapper';

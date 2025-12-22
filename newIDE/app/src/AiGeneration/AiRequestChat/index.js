@@ -529,13 +529,16 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         aiConfigurationPresetsWithAvailability
       );
 
+    // Check if using a local model (which has unlimited requests)
+    const isUsingLocalModel = isLocalModelPreset(chosenOrDefaultAiConfigurationPresetId);
+
     const priceAndRequestsText = getPriceAndRequestsTextAndTooltip({
       quota,
       price,
       availableCredits,
       selectedMode,
       automaticallyUseCreditsForAiRequests,
-      isUsingLocalModel: isLocalModelPreset(chosenOrDefaultAiConfigurationPresetId),
+      isUsingLocalModel,
     });
 
     const hasFunctionsCallsToProcess =
@@ -564,11 +567,6 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
 
     const doesNotHaveEnoughCreditsToContinue =
       !!price && availableCredits < price.priceInCredits;
-    
-    // Check if using a local model (which has unlimited requests)
-    const isUsingLocalModel = chosenOrDefaultAiConfigurationPresetId 
-      ? isLocalModelPreset(chosenOrDefaultAiConfigurationPresetId)
-      : false;
     
     const cannotContinue =
       !isUsingLocalModel && // Local models have unlimited requests

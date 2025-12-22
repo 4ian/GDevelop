@@ -12,7 +12,7 @@ import {
   getActiveLocalModel,
   setUseLocalModel,
   shouldUseLocalModel,
-} from './Local/LocalStorage';
+} from './LocalStorage';
 
 // Mock localStorage
 const localStorageMock = (() => {

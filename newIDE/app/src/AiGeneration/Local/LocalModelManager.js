@@ -41,9 +41,20 @@ export const AVAILABLE_LOCAL_MODELS: Array<LocalModel> = [
   },
 ];
 
-const MODEL_BASE_PATH = process.env.NODE_ENV === 'production' 
-  ? '/app/resources/AiGeneration/Local'
-  : require('path').join(__dirname);
+const MODEL_BASE_PATH = (() => {
+  // Try to use environment variable first, fall back to current directory
+  if (typeof process !== 'undefined' && process.env.GDEVELOP_AI_MODELS_PATH) {
+    return process.env.GDEVELOP_AI_MODELS_PATH;
+  }
+  // In production, use a configurable path
+  if (typeof process !== 'undefined' && process.env.NODE_ENV === 'production') {
+    return process.env.GDEVELOP_RESOURCES_PATH 
+      ? `${process.env.GDEVELOP_RESOURCES_PATH}/AiGeneration/Local`
+      : '/app/resources/AiGeneration/Local';
+  }
+  // In development, use the current directory
+  return typeof __dirname !== 'undefined' ? __dirname : '.';
+})();
 
 /**
  * Check if a model is downloaded locally by checking for model files
@@ -126,7 +137,13 @@ export const deleteModel = async (
         const filePath = path.join(modelPath, file);
         const stat = fs.statSync(filePath);
         if (stat.isDirectory()) {
-          fs.rmSync(filePath, { recursive: true, force: true });
+          // Use recursive option for better compatibility
+          if (fs.rmSync) {
+            fs.rmSync(filePath, { recursive: true, force: true });
+          } else {
+            // Fallback for older Node versions
+            fs.rmdirSync(filePath, { recursive: true });
+          }
         } else {
           fs.unlinkSync(filePath);
         }

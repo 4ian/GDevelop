@@ -1,0 +1,17 @@
+# Ignore downloaded model files (they are too large for git)
+# But keep the model_info.json files and directory structure
+apriel-1.5-15b-thinker/*
+!apriel-1.5-15b-thinker/model_info.json
+
+gpt-oss-20b/*
+!gpt-oss-20b/model_info.json
+
+qwen3-vl-32b-instruct/*
+!qwen3-vl-32b-instruct/model_info.json
+
+# Keep the scripts and documentation in the Local directory
+!*.py
+!*.sh
+!*.md
+!*.js
+!.gitignore

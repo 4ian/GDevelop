@@ -39,6 +39,7 @@ import classNames from 'classnames';
 import {
   type AiConfigurationPresetWithAvailability,
   getDefaultAiConfigurationPresetId,
+  isLocalModelPreset,
 } from '../AiConfiguration';
 import { AiConfigurationPresetSelector } from './AiConfigurationPresetSelector';
 import { AiRequestContext } from '../AiRequestContext';
@@ -53,6 +54,9 @@ import Paper from '../../UI/Paper';
 import SelectOption from '../../UI/SelectOption';
 import CompactSelectField from '../../UI/CompactSelectField';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
+import LocalModelDialog from '../Local/LocalModelDialog';
+import CustomApiKeysDialog from '../Local/CustomApiKeysDialog';
+import { saveApiKeys, loadApiKeys, type ApiKeyConfig } from '../Local/LocalStorage';
 
 const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 15;
 const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 20;
@@ -93,13 +97,26 @@ const getPriceAndRequestsTextAndTooltip = ({
   availableCredits,
   selectedMode,
   automaticallyUseCreditsForAiRequests,
+  isUsingLocalModel,
 }: {|
   quota: Quota | null,
   price: UsagePrice | null,
   availableCredits: number,
   selectedMode: 'chat' | 'agent',
   automaticallyUseCreditsForAiRequests: boolean,
+  isUsingLocalModel?: boolean,
 |}): React.Node => {
+  // Show unlimited for local models
+  if (isUsingLocalModel) {
+    return (
+      <LineStackLayout alignItems="center" noMargin>
+        <Text color="secondary" size="body-small" noMargin>
+          <Trans>Unlimited requests (Local model)</Trans>
+        </Text>
+      </LineStackLayout>
+    );
+  }
+  
   if (!quota || !price) {
     // Placeholder to avoid layout shift.
     return <div style={{ height: 29 }} />;
@@ -371,6 +388,8 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       aiConfigurationPresetId,
       setAiConfigurationPresetId,
     ] = React.useState<string | null>(null);
+    const [isLocalModelDialogOpen, setIsLocalModelDialogOpen] = React.useState<boolean>(false);
+    const [isCustomApiKeysDialogOpen, setIsCustomApiKeysDialogOpen] = React.useState<boolean>(false);
 
     React.useEffect(
       () => {
@@ -503,20 +522,25 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       </Text>
     ) : null;
 
-    const priceAndRequestsText = getPriceAndRequestsTextAndTooltip({
-      quota,
-      price,
-      availableCredits,
-      selectedMode,
-      automaticallyUseCreditsForAiRequests,
-    });
-
     const chosenOrDefaultAiConfigurationPresetId =
       aiConfigurationPresetId ||
       getDefaultAiConfigurationPresetId(
         selectedMode,
         aiConfigurationPresetsWithAvailability
       );
+
+    // Check if using a local model (which has unlimited requests)
+    const isUsingLocalModel = isLocalModelPreset(chosenOrDefaultAiConfigurationPresetId);
+
+    const priceAndRequestsText = getPriceAndRequestsTextAndTooltip({
+      quota,
+      price,
+      availableCredits,
+      selectedMode,
+      automaticallyUseCreditsForAiRequests,
+      isUsingLocalModel,
+    });
+
     const hasFunctionsCallsToProcess =
       aiRequest &&
       getFunctionCallsToProcess({
@@ -543,7 +567,9 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
 
     const doesNotHaveEnoughCreditsToContinue =
       !!price && availableCredits < price.priceInCredits;
+    
     const cannotContinue =
+      !isUsingLocalModel && // Local models have unlimited requests
       !!quota &&
       quota.limitReached &&
       (!automaticallyUseCreditsForAiRequests ||
@@ -1060,12 +1086,34 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                   <SelectOption key="agent" value="agent" label={t`Build`} />
                 </CompactSelectField>
               </Column>
+              <LineStackLayout noMargin alignItems="center">
+                <FlatButton
+                  label={<Trans>Local Models</Trans>}
+                  onClick={() => setIsLocalModelDialogOpen(true)}
+                />
+                <FlatButton
+                  label={<Trans>API Keys</Trans>}
+                  onClick={() => setIsCustomApiKeysDialogOpen(true)}
+                />
+              </LineStackLayout>
               <Column noMargin>
                 {isForAnotherProjectText || errorText || priceAndRequestsText}
               </Column>
             </Line>
           </ColumnStackLayout>
         </form>
+        <LocalModelDialog
+          open={isLocalModelDialogOpen}
+          onClose={() => setIsLocalModelDialogOpen(false)}
+        />
+        <CustomApiKeysDialog
+          open={isCustomApiKeysDialogOpen}
+          onClose={() => setIsCustomApiKeysDialogOpen(false)}
+          onSave={(apiKeys: Array<ApiKeyConfig>) => {
+            saveApiKeys(apiKeys);
+          }}
+          savedApiKeys={loadApiKeys()}
+        />
       </div>
     );
   }

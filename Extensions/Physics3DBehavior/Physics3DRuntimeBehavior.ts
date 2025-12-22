@@ -933,7 +933,9 @@ namespace gdjs {
       const positions: Array<Jolt.Vec3> = gdjs.staticArray(
         Physics3DRuntimeBehavior.prototype.getMeshShapeSettings
       );
-      const triangles = new Jolt.TriangleList();
+      const triangleList = new Jolt.TriangleList();
+      const vertexList = new Jolt.VertexList();
+      const indexedTriangleList = new Jolt.IndexedTriangleList();
       threeObject.traverse((object3d) => {
         const mesh = object3d as THREE.Mesh;
         if (!mesh.isMesh) {
@@ -944,7 +946,7 @@ namespace gdjs {
         const shouldTrianglesBeFlipped = vector3.x * vector3.y * vector3.z < 0;
         const index = mesh.geometry.getIndex();
         if (index) {
-          const vertexList = new Jolt.VertexList();
+          vertexList.clear();
           for (let i = 0; i < positionAttribute.count; i++) {
             vector3.fromBufferAttribute(positionAttribute, i);
             object3d.localToWorld(vector3);
@@ -952,9 +954,9 @@ namespace gdjs {
               new Jolt.Float3(vector3.x, vector3.y, vector3.z)
             );
           }
-          const triangles = new Jolt.IndexedTriangleList();
+          indexedTriangleList.clear();
           for (let i = 0; i < index.count; i += 3) {
-            triangles.push_back(
+            indexedTriangleList.push_back(
               new Jolt.IndexedTriangle(
                 index.getX(shouldTrianglesBeFlipped ? i + 1 : i),
                 index.getX(shouldTrianglesBeFlipped ? i : i + 1),
@@ -964,12 +966,12 @@ namespace gdjs {
             );
           }
           const physicsMaterialList = new Jolt.PhysicsMaterialList();
-          // `MeshShapeSettings` moves the parameters into its members,
-          // we should not delete them.
+          // `MeshShapeSettings` parameters are passed as values,
+          // we need to delete them.
           meshes.push(
             new Jolt.MeshShapeSettings(
               vertexList,
-              triangles,
+              indexedTriangleList,
               physicsMaterialList
             )
           );
@@ -980,9 +982,9 @@ namespace gdjs {
             object3d.localToWorld(vector3);
             positions.push(new Jolt.Vec3(vector3.x, vector3.y, vector3.z));
           }
-          triangles.clear();
+          triangleList.clear();
           for (let i = 0; i < positionAttribute.count; i += 3) {
-            triangles.push_back(
+            triangleList.push_back(
               new Jolt.Triangle(
                 positions[shouldTrianglesBeFlipped ? i + 1 : i],
                 positions[shouldTrianglesBeFlipped ? i : i + 1],
@@ -992,11 +994,13 @@ namespace gdjs {
           }
           // `MeshShapeSettings` creates a copy when it indexes the triangle,
           // we need to delete them.
-          meshes.push(new Jolt.MeshShapeSettings(triangles));
+          meshes.push(new Jolt.MeshShapeSettings(triangleList));
         }
       });
       positions.length = 0;
-      Jolt.destroy(triangles);
+      Jolt.destroy(triangleList);
+      Jolt.destroy(vertexList);
+      Jolt.destroy(indexedTriangleList);
       return meshes;
     }
 

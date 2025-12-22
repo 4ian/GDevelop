@@ -11,9 +11,11 @@
 
 namespace gd {
 
+size_t BinarySerializer::lastBinarySnapshotSize = 0;
+
 using NodeType = BinarySerializer::NodeType;
 
-void BinarySerializer::SerializeToBinary(const SerializerElement& element,
+void BinarySerializer::SerializeToBinaryBuffer(const SerializerElement& element,
                                          std::vector<uint8_t>& outBuffer) {
   // Reserve approximate size (heuristic: 1KB minimum)
   outBuffer.clear();
@@ -89,7 +91,7 @@ void BinarySerializer::SerializeString(const gd::String& str,
   buffer.insert(buffer.end(), utf8.begin(), utf8.end());
 }
 
-bool BinarySerializer::DeserializeFromBinary(const uint8_t* buffer,
+bool BinarySerializer::DeserializeFromBinaryBuffer(const uint8_t* buffer,
                                              size_t bufferSize,
                                              SerializerElement& outElement) {
   const uint8_t* ptr = buffer;
@@ -234,39 +236,48 @@ bool BinarySerializer::DeserializeString(const uint8_t*& ptr,
   return true;
 }
 
-#ifdef EMSCRIPTEN
-extern "C" {
-
-EMSCRIPTEN_KEEPALIVE uint8_t* createBinarySnapshot(SerializerElement* element,
-                                                  size_t* outSize) {
-  if (!element || !outSize) return nullptr;
-
+uintptr_t BinarySerializer::CreateBinarySnapshot(const SerializerElement& element) {
   std::vector<uint8_t> buffer;
-  gd::BinarySerializer::SerializeToBinary(*element, buffer);
+  SerializeToBinaryBuffer(element, buffer);
 
-  *outSize = buffer.size();
-  uint8_t* result = (uint8_t*)malloc(buffer.size());
-  std::memcpy(result, buffer.data(), buffer.size());
+  lastBinarySnapshotSize = buffer.size();
 
-  return result;
+  // Allocate memory in Emscripten heap
+  uint8_t* heapBuffer = (uint8_t*)malloc(buffer.size());
+  if (!heapBuffer) {
+    lastBinarySnapshotSize = 0;
+    return 0;
+  }
+
+  std::memcpy(heapBuffer, buffer.data(), buffer.size());
+  return reinterpret_cast<uintptr_t>(heapBuffer);
 }
 
-EMSCRIPTEN_KEEPALIVE void freeBinarySnapshot(uint8_t* buffer) { free(buffer); }
+size_t BinarySerializer::GetLastBinarySnapshotSize() {
+  return lastBinarySnapshotSize;
+}
 
-EMSCRIPTEN_KEEPALIVE SerializerElement* deserializeBinarySnapshot(
-    const uint8_t* buffer, size_t size) {
-  if (!buffer || size == 0) return nullptr;
+void BinarySerializer::FreeBinarySnapshot(uintptr_t bufferPtr) {
+  if (bufferPtr) {
+    free(reinterpret_cast<void*>(bufferPtr));
+  }
+}
 
+SerializerElement* BinarySerializer::DeserializeBinarySnapshot(uintptr_t bufferPtr,
+                                                                size_t size) {
+  if (!bufferPtr || size == 0) {
+    return nullptr;
+  }
+
+  const uint8_t* buffer = reinterpret_cast<const uint8_t*>(bufferPtr);
   SerializerElement* element = new SerializerElement();
-  if (!gd::BinarySerializer::DeserializeFromBinary(buffer, size, *element)) {
+
+  if (!DeserializeFromBinaryBuffer(buffer, size, *element)) {
     delete element;
     return nullptr;
   }
 
   return element;
 }
-
-}  // extern "C"
-#endif
 
 }  // namespace gd

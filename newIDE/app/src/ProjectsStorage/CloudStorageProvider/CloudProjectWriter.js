@@ -13,9 +13,9 @@ import {
 import type { $AxiosError } from 'axios';
 import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import {
-  serializeToJSObjectInBackground,
   serializeToJSON,
 } from '../../Utils/Serializer';
+import { serializeToJSONInBackground } from '../../Utils/BackgroundSerializer';
 import { t } from '@lingui/macro';
 import {
   createZipWithSingleTextFile,
@@ -48,16 +48,17 @@ const zipProject = async (project: gdProject): Promise<[Blob, string]> => {
     'ms'
   );
 
-  // const startTime2 = Date.now();
-  // // TODO: should serialize to JSON instead of JS object.
-  // const serializedProjectObject = await serializeToJSObjectInBackground(
-  //   project
-  // );
-  // console.log(
-  //   '--- serializeToJSObjectInBackground done in: ',
-  //   Date.now() - startTime2,
-  //   'ms (in total, including worker promise)'
-  // );
+  const startTime2 = Date.now();
+  // TODO: should serialize to JSON instead of JS object.
+  const projectJson2 = await serializeToJSONInBackground(project);
+  console.log(
+    '--- serializeToJSONInBackground done in: ',
+    Date.now() - startTime2,
+    'ms (in total, including worker promise)'
+  );
+  if (projectJson2 !== projectJson) {
+    console.log('Project JSONs are different.', projectJson, projectJson2);
+  }
 
   const zipStartTime = Date.now();
   const zippedProject = await createZipWithSingleTextFile(

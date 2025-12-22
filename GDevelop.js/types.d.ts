@@ -1325,6 +1325,13 @@ export class Serializer extends EmscriptenObject {
   static toJSObject(element: gdSerializerElement): any;
 }
 
+export class BinarySerializer extends EmscriptenObject {
+  static unsigned long CreateBinarySnapshot(element: SerializerElement): static;
+  static unsigned long GetLastBinarySnapshotSize(): static;
+  static void FreeBinarySnapshot(bufferPtr: number): static;
+  static serializerElement DeserializeBinarySnapshot(bufferPtr: number, size: number): static;
+}
+
 export class ObjectAssetSerializer extends EmscriptenObject {
   static serializeTo(project: Project, obj: gdObject, objectFullName: string, element: SerializerElement, usedResourceNames: VectorString): void;
 }
@@ -3227,6 +3234,10 @@ export function compare<T extends EmscriptenObject>(object1: T, object2: T): boo
  * The alias {@link EmscriptenObject.delete} is recommended instead, for readability.
  */
 export function destroy(object: EmscriptenObject): void;
+
+export function _malloc(size: number): number;
+export function _free(ptr: number): void;
+export const HEAPU8: Uint8Array;
 
 export as namespace gd;
 

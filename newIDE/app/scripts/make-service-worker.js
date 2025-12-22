@@ -56,7 +56,7 @@ const buildSW = () => {
         'static/js/locales-*.js', // Locales.
         'static/js/!local-app*.js', // Exclude electron app.
         'static/js/Resource3DPreview.worker.*.js', // Include the 3D preview worker
-        'static/js/Serializer.worker.*.js', // Include the serializer worker
+        'static/js/BackgroundSerializer.worker.*.js', // Include the serializer worker
         // ...But not libGD.js/wasm (there are cached with their URL
         // query string that depends on the VersionMetadata, see below).
 

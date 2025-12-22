@@ -1,11 +1,10 @@
 /*
  * GDevelop Core
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * Copyright 2008-present Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
 
-#ifndef GDCORE_BINARY_SERIALIZER_H
-#define GDCORE_BINARY_SERIALIZER_H
+#pragma once
 
 #include <cstdint>
 #include <cstring>
@@ -19,7 +18,7 @@ namespace gd {
  * \brief Fast binary serialization/deserialization for SerializerElement trees.
  *
  * This format is optimized for speed and compactness, not for human readability
- * or long-term storage. Use it for transferring data between threads.
+ * or long-term storage. For transferring data between "threads" (web workers).
  */
 class GD_CORE_API BinarySerializer {
  public:
@@ -29,7 +28,7 @@ class GD_CORE_API BinarySerializer {
    * \param element The root element to serialize
    * \param outBuffer Output buffer that will contain the binary data
    */
-  static void SerializeToBinary(const SerializerElement& element,
+  static void SerializeToBinaryBuffer(const SerializerElement& element,
                                 std::vector<uint8_t>& outBuffer);
 
   /**
@@ -40,9 +39,38 @@ class GD_CORE_API BinarySerializer {
    * \param outElement The output element (will be populated)
    * \return true if successful, false if corrupted data
    */
-  static bool DeserializeFromBinary(const uint8_t* buffer,
+  static bool DeserializeFromBinaryBuffer(const uint8_t* buffer,
                                     size_t bufferSize,
                                     SerializerElement& outElement);
+
+  /** \name Helpers
+   */
+  ///@{
+  /**
+   * \brief Create a binary snapshot and return the size.
+   * The binary data is written to Emscripten's heap at the returned pointer.
+   * \return Pointer to binary data in Emscripten heap (use GetLastBinarySnapshotSize to get size)
+   */
+  static uintptr_t CreateBinarySnapshot(const SerializerElement& element);
+
+  /**
+   * \brief Get the size of the last created binary snapshot.
+   * Must be called immediately after CreateBinarySnapshot.
+   */
+  static size_t GetLastBinarySnapshotSize();
+
+  /**
+   * \brief Free a binary snapshot.
+   */
+  static void FreeBinarySnapshot(uintptr_t bufferPtr);
+
+  /**
+   * \brief Deserialize binary snapshot back to SerializerElement.
+   * \return New SerializerElement pointer (caller owns it)
+   */
+  static SerializerElement* DeserializeBinarySnapshot(uintptr_t bufferPtr,
+                                                       size_t size);
+  ///@}
 
   enum class NodeType : uint8_t {
     Element = 0x01,
@@ -89,34 +117,9 @@ class GD_CORE_API BinarySerializer {
     ptr += sizeof(T);
     return true;
   }
+
+  // Store the last binary size for retrieval
+  static size_t lastBinarySnapshotSize;
 };
 
-// Emscripten bindings
-#ifdef EMSCRIPTEN
-#include <emscripten.h>
-
-extern "C" {
-/**
- * \brief Create a binary snapshot of a SerializerElement.
- * \return Pointer to binary data (caller must free with freeBinarySnapshot)
- */
-EMSCRIPTEN_KEEPALIVE uint8_t* createBinarySnapshot(SerializerElement* element,
-                                                   size_t* outSize);
-
-/**
- * \brief Free a binary snapshot created by createBinarySnapshot.
- */
-EMSCRIPTEN_KEEPALIVE void freeBinarySnapshot(uint8_t* buffer);
-
-/**
- * \brief Deserialize binary snapshot back to SerializerElement.
- * \return New SerializerElement (caller must delete)
- */
-EMSCRIPTEN_KEEPALIVE SerializerElement* deserializeBinarySnapshot(
-    const uint8_t* buffer, size_t size);
-}
-#endif
-
 }  // namespace gd
-
-#endif  // GDCORE_BINARY_SERIALIZER_H

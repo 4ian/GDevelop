@@ -453,6 +453,10 @@ export function compare<T extends EmscriptenObject>(object1: T, object2: T): boo
  */
 export function destroy(object: EmscriptenObject): void;
 
+export function _malloc(size: number): number;
+export function _free(ptr: number): void;
+export const HEAPU8: Uint8Array;
+
 export as namespace gd;
 
 declare global {

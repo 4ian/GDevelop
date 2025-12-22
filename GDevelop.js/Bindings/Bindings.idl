@@ -1603,6 +1603,21 @@ interface Serializer {
     [Value] SerializerElement STATIC_FromJSON([Const] DOMString json);
 };
 
+[NoDelete]
+interface BinarySerializer {
+  // Create a binary snapshot, returns pointer to buffer in Emscripten heap
+  static unsigned long STATIC_CreateBinarySnapshot([Ref] SerializerElement element);
+
+  // Get the size of the last created snapshot
+  static unsigned long STATIC_GetLastBinarySnapshotSize();
+
+  // Free the binary snapshot
+  static void STATIC_FreeBinarySnapshot(unsigned long bufferPtr);
+
+  // Deserialize from a pointer in Emscripten heap
+  static SerializerElement STATIC_DeserializeBinarySnapshot(unsigned long bufferPtr, unsigned long size);
+};
+
 interface ObjectAssetSerializer {
     void STATIC_SerializeTo([Ref] Project project, [Const, Ref] gdObject obj,
         [Const] DOMString objectFullName, [Ref] SerializerElement element,

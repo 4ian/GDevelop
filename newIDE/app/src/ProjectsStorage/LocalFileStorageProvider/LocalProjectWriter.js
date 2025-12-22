@@ -1,11 +1,8 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
-import {
-  serializeToJSObject,
-  serializeToJSON,
-  serializeToJSObjectInBackground,
-} from '../../Utils/Serializer';
+import { serializeToJSObject, serializeToJSON } from '../../Utils/Serializer';
+import { serializeToJSObjectInBackground } from '../../Utils/BackgroundSerializer';
 import {
   type FileMetadata,
   type SaveAsLocation,
@@ -118,63 +115,79 @@ const writeProjectFiles = async (
   console.log('--- writeProjectFiles started');
 
   const startTime2 = Date.now();
-  serializeToJSObject(project);
+  const serializedProjectObject = serializeToJSObject(project);
   console.log(
     '--- serializeToJSObject done in: ',
     Date.now() - startTime2,
     'ms (all on the main thread)'
   );
 
-  const startTime = Date.now();
-  const serializedProjectObject = await serializeToJSObjectInBackground(
-    project
-  );
-  console.log(
-    '--- serializeToJSObjectInBackground done in: ',
-    Date.now() - startTime,
-    'ms (in total, including worker promise)'
-  );
+  try {
+    const startTime = Date.now();
+    const serializedProjectObject2 = await serializeToJSObjectInBackground(
+      project
+    );
+    console.log(
+      '--- serializeToJSObjectInBackground done in: ',
+      Date.now() - startTime,
+      'ms (in total, including worker promise)'
+    );
 
-  // if (project.isFolderProject()) {
-  //   const partialObjects = split(serializedProjectObject, {
-  //     pathSeparator: '/',
-  //     getArrayItemReferenceName: getSlugifiedUniqueNameFromProperty('name'),
-  //     shouldSplit: splitPaths(
-  //       new Set(
-  //         splittedProjectFolderNames.map(folderName => `/${folderName}/*`)
-  //       )
-  //     ),
-  //     isReferenceMagicPropertyName: '__REFERENCE_TO_SPLIT_OBJECT',
-  //   });
+    if (
+      JSON.stringify(serializedProjectObject) !==
+      JSON.stringify(serializedProjectObject2)
+    ) {
+      console.log(
+        'Project JSONs are different.',
+        serializedProjectObject,
+        serializedProjectObject2
+      );
+    }
+  } catch (error) {
+    console.error('Unable to serialize to JS object in background:', error);
+    throw error;
+  }
 
-  //   return Promise.all(
-  //     partialObjects.map(partialObject => {
-  //       return writeAndCheckFormattedJSONFile(
-  //         partialObject.object,
-  //         path.join(projectPath, partialObject.reference) + '.json'
-  //       ).catch(err => {
-  //         console.error('Unable to write a partial file:', err);
-  //         throw err;
-  //       });
-  //     })
-  //   ).then(() => {
-  //     return writeAndCheckFormattedJSONFile(
-  //       serializedProjectObject,
-  //       filePath
-  //     ).catch(err => {
-  //       console.error('Unable to write the split project:', err);
-  //       throw err;
-  //     });
-  //   });
-  // } else {
-  //   return writeAndCheckFormattedJSONFile(
-  //     serializedProjectObject,
-  //     filePath
-  //   ).catch(err => {
-  //     console.error('Unable to write the project:', err);
-  //     throw err;
-  //   });
-  // }
+  if (project.isFolderProject()) {
+    const partialObjects = split(serializedProjectObject, {
+      pathSeparator: '/',
+      getArrayItemReferenceName: getSlugifiedUniqueNameFromProperty('name'),
+      shouldSplit: splitPaths(
+        new Set(
+          splittedProjectFolderNames.map(folderName => `/${folderName}/*`)
+        )
+      ),
+      isReferenceMagicPropertyName: '__REFERENCE_TO_SPLIT_OBJECT',
+    });
+
+    return Promise.all(
+      partialObjects.map(partialObject => {
+        return writeAndCheckFormattedJSONFile(
+          partialObject.object,
+          path.join(projectPath, partialObject.reference) + '.json'
+        ).catch(err => {
+          console.error('Unable to write a partial file:', err);
+          throw err;
+        });
+      })
+    ).then(() => {
+      return writeAndCheckFormattedJSONFile(
+        serializedProjectObject,
+        filePath
+      ).catch(err => {
+        console.error('Unable to write the split project:', err);
+        throw err;
+      });
+    });
+  } else {
+    return writeAndCheckFormattedJSONFile(
+      serializedProjectObject,
+      filePath
+    ).catch(err => {
+      console.error('Unable to write the project:', err);
+      throw err;
+    });
+  }
 };
 
 export const onSaveProject = async (

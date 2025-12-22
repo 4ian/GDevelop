@@ -91,7 +91,7 @@ target_link_libraries(GD "-s TOTAL_MEMORY=48MB") # Get some initial memory size 
 target_link_libraries(GD "-s ALLOW_MEMORY_GROWTH=1")
 target_link_libraries(GD "-s NODEJS_CATCH_EXIT=0") # Don't print the entire GDCore code on error when running in node
 target_link_libraries(GD "-s ERROR_ON_UNDEFINED_SYMBOLS=0")
-target_link_libraries(GD "-s \"EXPORTED_FUNCTIONS=['_free','_malloc','_createBinarySnapshot','_freeBinarySnapshot','_deserializeBinarySnapshot']\"")
+target_link_libraries(GD "-s \"EXPORTED_FUNCTIONS=['_free','_malloc']\"")
 
 if("${GDEVELOPJS_BUILD_VARIANT}" STREQUAL "dev")
 	# Disable optimizations at linking time for slightly faster builds.

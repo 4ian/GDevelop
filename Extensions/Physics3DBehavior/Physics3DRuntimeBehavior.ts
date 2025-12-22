@@ -964,7 +964,7 @@ namespace gdjs {
           }
           const physicsMaterialList = new Jolt.PhysicsMaterialList();
           // `MeshShapeSettings` parameters are passed as values,
-          // we need to delete them.
+          // we need to destroy them.
           meshes.push(
             new Jolt.MeshShapeSettings(
               vertexList,
@@ -996,7 +996,7 @@ namespace gdjs {
             );
           }
           // `MeshShapeSettings` creates a copy when it indexes the triangle,
-          // we need to delete them.
+          // we need to destroy them.
           meshes.push(new Jolt.MeshShapeSettings(triangleList));
         }
       });

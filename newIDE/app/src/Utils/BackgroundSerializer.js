@@ -95,7 +95,10 @@ export async function serializeInBackground(
 
     const binaryBufferEndTime = Date.now();
     log(
-      `Spent ${binaryBufferEndTime - startTime}ms on main thread (including ${serializeToEndTime - startTime}ms for SerializerElement serialization and ${binaryBufferEndTime - serializeToEndTime}ms for BinaryBuffer preparation).`
+      `Spent ${binaryBufferEndTime -
+        startTime}ms on main thread (including ${serializeToEndTime -
+        startTime}ms for SerializerElement serialization and ${binaryBufferEndTime -
+        serializeToEndTime}ms for BinaryBuffer preparation).`
     );
 
     const result = await sendMessageToBackgroundSerializerWorker({

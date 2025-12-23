@@ -2,10 +2,12 @@
 import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
 import { serializeToJSObject, serializeToJSON } from '../../Utils/Serializer';
+import { serializeToJSObjectInBackground } from '../../Utils/BackgroundSerializer';
 import {
   type FileMetadata,
   type SaveAsLocation,
   type SaveAsOptions,
+  type SaveProjectOptions,
 } from '../index';
 import optionalRequire from '../../Utils/OptionalRequire';
 import {
@@ -16,6 +18,10 @@ import {
 import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import LocalFolderPicker from '../../UI/LocalFolderPicker';
 import SaveAsOptionsDialog from '../SaveAsOptionsDialog';
+import {
+  type ShowAlertFunction,
+  type ShowConfirmFunction,
+} from '../../UI/Alert/AlertContext';
 
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
@@ -102,12 +108,27 @@ const writeAndCheckFormattedJSONFile = async (
   await writeAndCheckFile(content, filePath);
 };
 
-const writeProjectFiles = (
+const writeProjectFiles = async ({
+  project,
+  filePath,
+  projectPath,
+  useBackgroundSerializer,
+}: {
   project: gdProject,
   filePath: string,
-  projectPath: string
-): Promise<void> => {
-  const serializedProjectObject = serializeToJSObject(project);
+  projectPath: string,
+  useBackgroundSerializer: boolean,
+}): Promise<void> => {
+  const startTime = Date.now();
+
+  let serializedProjectObject;
+  if (useBackgroundSerializer) {
+    serializedProjectObject = await serializeToJSObjectInBackground(project);
+  } else {
+    serializedProjectObject = serializeToJSObject(project);
+  }
+  const serializeEndTime = Date.now();
+
   if (project.isFolderProject()) {
     const partialObjects = split(serializedProjectObject, {
       pathSeparator: '/',
@@ -140,23 +161,37 @@ const writeProjectFiles = (
       });
     });
   } else {
-    return writeAndCheckFormattedJSONFile(
-      serializedProjectObject,
-      filePath
-    ).catch(err => {
-      console.error('Unable to write the project:', err);
-      throw err;
-    });
+    await writeAndCheckFormattedJSONFile(serializedProjectObject, filePath);
   }
+
+  console.log(
+    `[LocalProjectWriter] Project file(s) written in ${Date.now() -
+      startTime}ms (including ${serializeEndTime - startTime}ms for ${
+      useBackgroundSerializer ? 'background' : 'main'
+    } thread serialization)`
+  );
 };
 
 export const onSaveProject = async (
   project: gdProject,
-  fileMetadata: FileMetadata
+  fileMetadata: FileMetadata,
+  saveOptions?: SaveProjectOptions,
+  actions: {|
+    showAlert: ShowAlertFunction,
+    showConfirmation: ShowConfirmFunction,
+  |}
 ): Promise<{|
   wasSaved: boolean,
   fileMetadata: FileMetadata,
 |}> => {
+  const canBeSafelySaved = await canFileMetadataBeSafelySaved(
+    fileMetadata,
+    actions
+  );
+  if (!canBeSafelySaved) {
+    return { wasSaved: false, fileMetadata: fileMetadata };
+  }
+
   const filePath = fileMetadata.fileIdentifier;
   const now = Date.now();
   if (!filePath) {
@@ -178,7 +213,13 @@ export const onSaveProject = async (
     console.warn('Unable to clean project folder before saving project: ', e);
   }
 
-  await writeProjectFiles(project, filePath, projectPath);
+  await writeProjectFiles({
+    project,
+    filePath,
+    projectPath,
+    useBackgroundSerializer:
+      !!saveOptions && !!saveOptions.useBackgroundSerializer,
+  });
   return {
     wasSaved: true,
     fileMetadata: newFileMetadata,
@@ -295,7 +336,12 @@ export const onSaveProjectAs = async (
   const projectPath = path.dirname(filePath);
   project.setProjectFile(filePath);
 
-  await writeProjectFiles(project, filePath, projectPath);
+  await writeProjectFiles({
+    project,
+    filePath,
+    projectPath,
+    useBackgroundSerializer: false,
+  });
   return {
     wasSaved: true,
     fileMetadata: newFileMetadata,
@@ -392,7 +438,7 @@ export const renderNewProjectSaveAsLocationChooser = ({
   );
 };
 
-export const isTryingToSaveInForbiddenPath = (filePath: string): boolean => {
+const isTryingToSaveInForbiddenPath = (filePath: string): boolean => {
   if (!remote) return false; // This should not happen, but let's be safe.
   // If the user is saving locally and chose the same location as where the
   // executable is running, prevent this, as it will be deleted when the app is updated.
@@ -400,4 +446,44 @@ export const isTryingToSaveInForbiddenPath = (filePath: string): boolean => {
   if (!exePath) return false; // This should not happen, but let's be safe.
   const gdevelopDirectory = path.dirname(exePath);
   return filePath.startsWith(gdevelopDirectory);
+};
+
+export const canFileMetadataBeSafelySaved = async (
+  fileMetadata: FileMetadata,
+  actions: {|
+    showAlert: ShowAlertFunction,
+    showConfirmation: ShowConfirmFunction,
+  |}
+) => {
+  const path = fileMetadata.fileIdentifier;
+  if (isTryingToSaveInForbiddenPath(path)) {
+    await actions.showAlert({
+      title: t`Choose another location`,
+      message: t`Your project is saved in the same folder as the application. This folder will be deleted when the application is updated. Please choose another location if you don't want to lose your project.`,
+    });
+  }
+
+  // We don't block the save, in case the user wants to save anyway.
+  return true;
+};
+
+export const canFileMetadataBeSafelySavedAs = async (
+  fileMetadata: FileMetadata,
+  actions: {|
+    showAlert: ShowAlertFunction,
+    showConfirmation: ShowConfirmFunction,
+  |}
+) => {
+  const path = fileMetadata.fileIdentifier;
+  if (isTryingToSaveInForbiddenPath(path)) {
+    await actions.showAlert({
+      title: t`Choose another location`,
+      message: t`Your project is saved in the same folder as the application. This folder will be deleted when the application is updated. Please choose another location if you don't want to lose your project.`,
+    });
+
+    // We block the save as we don't want new projects to be saved there.
+    return false;
+  }
+
+  return true;
 };

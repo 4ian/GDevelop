@@ -99,6 +99,7 @@
 #include <GDCore/Project/QuickCustomization.h>
 #include <GDCore/Serialization/Serializer.h>
 #include <GDCore/Serialization/SerializerElement.h>
+#include <GDCore/Serialization/BinarySerializer.h>
 #include <GDCore/IDE/ObjectAssetSerializer.h>
 #include <GDJS/Events/Builtin/JsCodeEvent.h>
 #include <GDJS/Events/CodeGeneration/BehaviorCodeGenerator.h>
@@ -855,6 +856,10 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_GetDefaultMeasurementUnitByName GetDefaultMeasurementUnitByName
 #define STATIC_HasDefaultMeasurementUnitNamed HasDefaultMeasurementUnitNamed
 #define STATIC_GetEdgeAnchorFromString GetEdgeAnchorFromString
+#define STATIC_CreateBinarySnapshot CreateBinarySnapshot
+#define STATIC_GetLastBinarySnapshotSize GetLastBinarySnapshotSize
+#define STATIC_FreeBinarySnapshot FreeBinarySnapshot
+#define STATIC_DeserializeBinarySnapshot DeserializeBinarySnapshot
 
 // We postfix some methods with "At" as Javascript does not support overloading
 #define GetLayoutAt GetLayout

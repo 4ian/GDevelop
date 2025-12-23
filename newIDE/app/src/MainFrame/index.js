@@ -109,6 +109,7 @@ import {
   type SaveAsOptions,
   type FileMetadataAndStorageProviderName,
   type ResourcesActionsMenuBuilder,
+  type SaveProjectOptions,
 } from '../ProjectsStorage';
 import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStorageProviderDialog';
 import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProviderDialog';
@@ -3905,6 +3906,8 @@ const MainFrame = (props: Props) => {
     ]
   );
 
+  const saveWithBackgroundSerializer =
+    preferences.values.useBackgroundSerializerForSaving;
   const saveProject = React.useCallback(
     async () => {
       if (!currentProject) return;
@@ -3924,10 +3927,7 @@ const MainFrame = (props: Props) => {
       }
 
       const storageProviderOperations = getStorageProviderOperations();
-      const {
-        onSaveProject,
-        canFileMetadataBeSafelySaved,
-      } = storageProviderOperations;
+      const { onSaveProject } = storageProviderOperations;
       if (!onSaveProject) {
         return saveProjectAs();
       }
@@ -3947,15 +3947,6 @@ const MainFrame = (props: Props) => {
           message: t`You're trying to save changes made to a previous version of your project. If you continue, it will be used as the new latest version.`,
         });
         if (!shouldRestoreCheckedOutVersion) return;
-      } else if (canFileMetadataBeSafelySaved) {
-        const canProjectBeSafelySaved = await canFileMetadataBeSafelySaved(
-          currentFileMetadata,
-          {
-            showAlert,
-            showConfirmation,
-          }
-        );
-        if (!canProjectBeSafelySaved) return;
       }
 
       _showSnackMessage(i18n._(t`Saving...`), null);
@@ -3969,9 +3960,13 @@ const MainFrame = (props: Props) => {
         // store their values in variables now.
         const storageProviderInternalName = getStorageProvider().internalName;
 
-        const saveOptions = {};
+        const saveOptions: SaveProjectOptions = {
+          useBackgroundSerializer: saveWithBackgroundSerializer,
+        };
         if (cloudProjectRecoveryOpenedVersionId) {
           saveOptions.previousVersion = cloudProjectRecoveryOpenedVersionId;
+        } else {
+          saveOptions.previousVersion = currentFileMetadata.version;
         }
         if (checkedOutVersionStatus) {
           saveOptions.restoredFromVersionId =
@@ -3980,7 +3975,11 @@ const MainFrame = (props: Props) => {
         const { wasSaved, fileMetadata } = await onSaveProject(
           currentProject,
           currentFileMetadata,
-          saveOptions
+          saveOptions,
+          {
+            showAlert,
+            showConfirmation,
+          }
         );
 
         if (wasSaved) {
@@ -4048,6 +4047,7 @@ const MainFrame = (props: Props) => {
       }
     },
     [
+      saveWithBackgroundSerializer,
       isSavingProject,
       currentProject,
       currentProjectRef,

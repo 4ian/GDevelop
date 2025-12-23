@@ -25,6 +25,7 @@ import {
 } from './CloudProjectOpener';
 import Cloud from '../../UI/CustomSvgIcons/Cloud';
 import { generateGetResourceActions } from './CloudProjectResourcesHandler';
+import { cloudStorageProviderInternalName } from './CloudStoageProviderInternalName';
 
 const isURL = (filename: string) => {
   return (
@@ -37,7 +38,7 @@ const isURL = (filename: string) => {
 };
 
 export default ({
-  internalName: 'Cloud',
+  internalName: cloudStorageProviderInternalName,
   name: t`GDevelop Cloud`,
   renderIcon: props => <Cloud fontSize={props.size} />,
   hiddenInOpenDialog: true,

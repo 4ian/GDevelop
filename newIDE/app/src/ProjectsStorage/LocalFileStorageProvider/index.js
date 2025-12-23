@@ -33,13 +33,14 @@ import {
 } from './LocalProjectResourcesHandler';
 import { allResourceKindsAndMetadata } from '../../ResourcesList/ResourceSource';
 import { setupResourcesWatcher } from './LocalFileResourcesWatcher';
+import { localFileStorageProviderInternalName } from './LocalFileStorageProviderInternalName';
 
 /**
  * Use the Electron APIs to provide access to the native
  * file system (with native save/open dialogs).
  */
 export default ({
-  internalName: 'LocalFile',
+  internalName: localFileStorageProviderInternalName,
   name: t`Your computer`,
   renderIcon: props => <Computer fontSize={props.size} />,
   getFileMetadataFromAppArguments: (appArguments: AppArguments) => {

@@ -4,10 +4,8 @@ import {
   type MoveAllProjectResourcesResult,
   type MoveAllProjectResourcesFunction,
 } from './index';
-import LocalFileStorageProvider from '../LocalFileStorageProvider';
 import { moveUrlResourcesToLocalFiles } from '../LocalFileStorageProvider/LocalFileResourceMover';
 import UrlStorageProvider from '../UrlStorageProvider';
-import CloudStorageProvider from '../CloudStorageProvider';
 import LocalFileSystem from '../../ExportAndShare/LocalExporters/LocalFileSystem';
 import assignIn from 'lodash/assignIn';
 import optionalRequire from '../../Utils/OptionalRequire';
@@ -21,6 +19,8 @@ import {
 import { processByChunk } from '../../Utils/ProcessByChunk';
 import { readLocalFileToFile } from '../../Utils/LocalFileUploader';
 import { isURL, isBlobURL } from '../../ResourcesList/ResourceUtils';
+import { cloudStorageProviderInternalName } from '../CloudStorageProvider/CloudStoageProviderInternalName';
+import { localFileStorageProviderInternalName } from '../LocalFileStorageProvider/LocalFileStorageProviderInternalName';
 const path = optionalRequire('path');
 
 const gd: libGDevelop = global.gd;
@@ -164,9 +164,10 @@ export const moveAllLocalResourcesToCloudResources = async ({
 const movers: {
   [string]: MoveAllProjectResourcesFunction,
 } = {
-  [`${LocalFileStorageProvider.internalName}=>${
-    LocalFileStorageProvider.internalName
-  }`]: async ({ project, newFileMetadata }: MoveAllProjectResourcesOptions) => {
+  [`${localFileStorageProviderInternalName}=>${localFileStorageProviderInternalName}`]: async ({
+    project,
+    newFileMetadata,
+  }: MoveAllProjectResourcesOptions) => {
     // TODO: Ideally, errors while copying resources should be reported.
     // TODO: Report progress.
     const projectPath = path.dirname(newFileMetadata.fileIdentifier);
@@ -189,9 +190,12 @@ const movers: {
   },
   // When saving a Cloud project locally, all resources are downloaded (including
   // the ones on GDevelop Cloud or private game templates).
-  [`${CloudStorageProvider.internalName}=>${
-    LocalFileStorageProvider.internalName
-  }`]: ({ project, newFileMetadata, onProgress, authenticatedUser }) =>
+  [`${cloudStorageProviderInternalName}=>${localFileStorageProviderInternalName}`]: ({
+    project,
+    newFileMetadata,
+    onProgress,
+    authenticatedUser,
+  }) =>
     moveUrlResourcesToLocalFiles({
       project,
       fileMetadata: newFileMetadata,
@@ -204,9 +208,14 @@ const movers: {
   // for resources).
   // This is also helpful to download private game templates resources so that
   // the game can be opened offline.
-  [`${UrlStorageProvider.internalName}=>${
-    LocalFileStorageProvider.internalName
-  }`]: ({ project, newFileMetadata, onProgress, authenticatedUser }) =>
+  [`${
+    UrlStorageProvider.internalName
+  }=>${localFileStorageProviderInternalName}`]: ({
+    project,
+    newFileMetadata,
+    onProgress,
+    authenticatedUser,
+  }) =>
     moveUrlResourcesToLocalFiles({
       project,
       fileMetadata: newFileMetadata,
@@ -217,20 +226,16 @@ const movers: {
   // Moving to GDevelop "Cloud" storage:
 
   // From a local project to a Cloud project, all resources are uploaded.
-  [`${LocalFileStorageProvider.internalName}=>${
-    CloudStorageProvider.internalName
-  }`]: moveAllLocalResourcesToCloudResources,
+  [`${localFileStorageProviderInternalName}=>${cloudStorageProviderInternalName}`]: moveAllLocalResourcesToCloudResources,
   // From a Cloud project to another, resources need to be copied
   // (unless they are public URLs).
-  [`${CloudStorageProvider.internalName}=>${
-    CloudStorageProvider.internalName
-  }`]: moveUrlResourcesToCloudProject,
+  [`${cloudStorageProviderInternalName}=>${cloudStorageProviderInternalName}`]: moveUrlResourcesToCloudProject,
   // Nothing to move around when going from a project on a public URL
   // to a cloud project (we could offer an option one day though to download
   // and upload the URL resources on GDevelop Cloud).
-  [`${UrlStorageProvider.internalName}=>${
-    CloudStorageProvider.internalName
-  }`]: moveUrlResourcesToCloudProject,
+  [`${
+    UrlStorageProvider.internalName
+  }=>${cloudStorageProviderInternalName}`]: moveUrlResourcesToCloudProject,
 };
 
 const LocalResourceMover = {

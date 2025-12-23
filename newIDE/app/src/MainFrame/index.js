@@ -191,6 +191,7 @@ import { type CourseChapter } from '../Utils/GDevelopServices/Asset';
 import useVersionHistory from '../VersionHistory/UseVersionHistory';
 import { ProjectManagerDrawer } from '../ProjectManager/ProjectManagerDrawer';
 import DiagnosticReportDialog from '../ExportAndShare/DiagnosticReportDialog';
+import { scanProjectForValidationErrors } from '../Utils/EventsValidationScanner';
 import useSaveReminder from './UseSaveReminder';
 import { useMultiplayerLobbyConfigurator } from './UseMultiplayerLobbyConfigurator';
 import { useAuthenticatedPlayer } from './UseAuthenticatedPlayer';
@@ -457,6 +458,43 @@ const MainFrame = (props: Props) => {
   const preferences = React.useContext(PreferencesContext);
   const { setHasProjectOpened } = preferences;
   const { previewLoadingRef, setPreviewLoading } = usePreviewLoadingState();
+
+  /**
+   * Checks for diagnostic errors in the project if blocking is enabled.
+   * Returns true if there are errors and the action should be blocked.
+   */
+  const checkDiagnosticErrorsAndBlock = React.useCallback(
+    async (
+      project: ?gdProject,
+      actionType: 'preview' | 'export'
+    ): Promise<boolean> => {
+      if (
+        !project ||
+        !preferences.getBlockPreviewAndExportOnDiagnosticErrors()
+      ) {
+        return false;
+      }
+
+      try {
+        const validationErrors = scanProjectForValidationErrors(project);
+        if (validationErrors.length > 0) {
+          await showAlert({
+            title: t`Diagnostic errors found`,
+            message:
+              actionType === 'preview'
+                ? t`Your project has ${validationErrors.length} diagnostic error(s). Please fix them before launching a preview. Press F7 to open the diagnostic report.`
+                : t`Your project has ${validationErrors.length} diagnostic error(s). Please fix them before exporting. Press F7 to open the diagnostic report.`,
+          });
+          return true;
+        }
+      } catch (error) {
+        console.error('Error scanning project for validation errors:', error);
+      }
+
+      return false;
+    },
+    [preferences, showAlert]
+  );
   const [previewState, setPreviewState] = React.useState(initialPreviewState);
   const commandPaletteRef = React.useRef((null: ?CommandPaletteInterface));
   const inAppTutorialOrchestratorRef = React.useRef<?InAppTutorialOrchestratorInterface>(
@@ -530,6 +568,47 @@ const MainFrame = (props: Props) => {
     diagnosticReportDialogOpen,
     setDiagnosticReportDialogOpen,
   ] = React.useState<boolean>(false);
+  const [pendingEventNavigation, setPendingEventNavigation] = React.useState<?{|
+    name: string,
+    locationType: 'layout' | 'external-events',
+    eventPath: Array<number>,
+  |}>(null);
+
+  // Handle pending event navigation after editor is opened
+  React.useEffect(
+    () => {
+      if (!pendingEventNavigation) return;
+
+      // Wait for the editor to be mounted and ready
+      const timeoutId = setTimeout(() => {
+        const { name, locationType, eventPath } = pendingEventNavigation;
+        const editorKind =
+          locationType === 'layout' ? 'layout events' : 'external events';
+
+        // Find the events editor tab
+        for (const paneIdentifier in state.editorTabs.panes) {
+          const pane = state.editorTabs.panes[paneIdentifier];
+          for (const editor of pane.editors) {
+            if (
+              editor.kind === editorKind &&
+              editor.projectItemName === name &&
+              editor.editorRef &&
+              editor.editorRef.scrollToEventPath
+            ) {
+              editor.editorRef.scrollToEventPath(eventPath);
+              break;
+            }
+          }
+        }
+
+        // Clear the pending navigation
+        setPendingEventNavigation(null);
+      }, 300); // Wait for editor to mount
+
+      return () => clearTimeout(timeoutId);
+    },
+    [pendingEventNavigation, state.editorTabs]
+  );
   const [
     fileMetadataOpeningProgress,
     setFileMetadataOpeningProgress,
@@ -798,13 +877,17 @@ const MainFrame = (props: Props) => {
   );
 
   const openShareDialog = React.useCallback(
-    (initialTab?: ShareTab) => {
+    async (initialTab?: ShareTab) => {
+      if (await checkDiagnosticErrorsAndBlock(currentProject, 'export')) {
+        return;
+      }
+
       notifyPreviewOrExportWillStart(state.editorTabs);
 
       setShareDialogInitialTab(initialTab || null);
       setShareDialogOpen(true);
     },
-    [state.editorTabs]
+    [state.editorTabs, currentProject, checkDiagnosticErrorsAndBlock]
   );
 
   const closeShareDialog = React.useCallback(
@@ -2143,6 +2226,10 @@ const MainFrame = (props: Props) => {
       if (!currentProject) return;
       if (currentProject.getLayoutsCount() === 0) return;
 
+      if (await checkDiagnosticErrorsAndBlock(currentProject, 'preview')) {
+        return;
+      }
+
       console.info(
         `Launching a new ${
           isForInGameEdition ? 'in-game edition preview' : 'preview'
@@ -2360,6 +2447,7 @@ const MainFrame = (props: Props) => {
       inGameEditorSettings,
       previewLoadingRef,
       setPreviewLoading,
+      checkDiagnosticErrorsAndBlock,
     ]
   );
 
@@ -4577,6 +4665,7 @@ const MainFrame = (props: Props) => {
     onLaunchDebugPreview: launchDebuggerAndPreview,
     onLaunchNetworkPreview: launchNetworkPreview,
     onLaunchPreviewWithDiagnosticReport: launchPreviewWithDiagnosticReport,
+    onOpenDiagnosticReport: () => setDiagnosticReportDialogOpen(true),
     onOpenHomePage: openHomePage,
     onCreateProject: () => setNewProjectSetupDialogOpen(true),
     onOpenProject: () => openOpenFromStorageProviderDialog(),
@@ -5182,8 +5271,29 @@ const MainFrame = (props: Props) => {
       )}
       {diagnosticReportDialogOpen && currentProject && (
         <DiagnosticReportDialog
+          project={currentProject}
           wholeProjectDiagnosticReport={currentProject.getWholeProjectDiagnosticReport()}
           onClose={() => setDiagnosticReportDialogOpen(false)}
+          onNavigateToLayoutEvent={(layoutName, eventPath) => {
+            setPendingEventNavigation({
+              name: layoutName,
+              locationType: 'layout',
+              eventPath,
+            });
+            openLayout(layoutName, {
+              openEventsEditor: true,
+              openSceneEditor: false,
+              focusWhenOpened: 'events',
+            });
+          }}
+          onNavigateToExternalEventsEvent={(externalEventsName, eventPath) => {
+            setPendingEventNavigation({
+              name: externalEventsName,
+              locationType: 'external-events',
+              eventPath,
+            });
+            openExternalEvents(externalEventsName);
+          }}
         />
       )}
       {standaloneDialogOpen && (

@@ -1605,17 +1605,17 @@ interface Serializer {
 
 [NoDelete]
 interface BinarySerializer {
-  // Create a binary snapshot, returns pointer to buffer in Emscripten heap
-  static unsigned long STATIC_CreateBinarySnapshot([Ref] SerializerElement element);
+    // Create a binary snapshot, returns pointer to buffer in Emscripten heap
+    unsigned long STATIC_CreateBinarySnapshot([Ref] SerializerElement element);
 
-  // Get the size of the last created snapshot
-  static unsigned long STATIC_GetLastBinarySnapshotSize();
+    // Get the size of the last created snapshot
+    unsigned long STATIC_GetLastBinarySnapshotSize();
 
-  // Free the binary snapshot
-  static void STATIC_FreeBinarySnapshot(unsigned long bufferPtr);
+    // Free the binary snapshot
+    void STATIC_FreeBinarySnapshot(unsigned long bufferPtr);
 
-  // Deserialize from a pointer in Emscripten heap
-  static SerializerElement STATIC_DeserializeBinarySnapshot(unsigned long bufferPtr, unsigned long size);
+    // Deserialize from a pointer in Emscripten heap
+    SerializerElement STATIC_DeserializeBinarySnapshot(unsigned long bufferPtr, unsigned long size);
 };
 
 interface ObjectAssetSerializer {

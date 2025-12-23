@@ -1326,10 +1326,10 @@ export class Serializer extends EmscriptenObject {
 }
 
 export class BinarySerializer extends EmscriptenObject {
-  static unsigned long CreateBinarySnapshot(element: SerializerElement): static;
-  static unsigned long GetLastBinarySnapshotSize(): static;
-  static void FreeBinarySnapshot(bufferPtr: number): static;
-  static serializerElement DeserializeBinarySnapshot(bufferPtr: number, size: number): static;
+  static createBinarySnapshot(element: SerializerElement): number;
+  static getLastBinarySnapshotSize(): number;
+  static freeBinarySnapshot(bufferPtr: number): void;
+  static deserializeBinarySnapshot(bufferPtr: number, size: number): SerializerElement;
 }
 
 export class ObjectAssetSerializer extends EmscriptenObject {

@@ -127,80 +127,149 @@ describe('libGD.js object serialization', function () {
     });
   });
 
-  // describe('gd.createBinarySnapshot and gd.deserializeBinarySnapshot', function () {
-  //   const checkBinaryRoundTrip = (json) => {
-  //     // Create a SerializerElement from JSON
-  //     const originalElement = gd.Serializer.fromJSON(json);
+  describe('gd.BinarySerializer', function () {
+    const serializeToBinarySnapshot = (serializerElement) => {
+      // Create binary snapshot
+      const binaryPtr =
+        gd.BinarySerializer.createBinarySnapshot(serializerElement);
+      const binarySize = gd.BinarySerializer.getLastBinarySnapshotSize();
 
-  //     // Create binary snapshot
-  //     const binaryBuffer = gd.createBinarySnapshot(originalElement);
-  //     expect(binaryBuffer).toBeInstanceOf(Uint8Array);
-  //     expect(binaryBuffer.length).toBeGreaterThan(0);
+      if (!binaryPtr) {
+        throw new Error('Failed to create binary snapshot.');
+      }
 
-  //     // Deserialize binary snapshot
-  //     const restoredElement = gd.deserializeBinarySnapshot(binaryBuffer);
+      const binaryView = new Uint8Array(
+        gd.HEAPU8.buffer,
+        binaryPtr,
+        binarySize
+      );
+      // Copy the buffer out of the WASM heap to simulate it was transferred.
+      const binaryBuffer = binaryView.slice();
 
-  //     // Convert back to JSON and compare
-  //     const outputJson = gd.Serializer.toJSON(restoredElement);
+      gd.BinarySerializer.freeBinarySnapshot(binaryPtr);
 
-  //     restoredElement.delete();
-  //     originalElement.delete();
+      return binaryBuffer;
+    };
 
-  //     expect(outputJson).toBe(json);
-  //   };
+    const serializeJsonToBinarySnapshot = (json) => {
+      const element = gd.Serializer.fromJSON(json);
+      // Do NOT delete element, it's a static value.
 
-  //   it('should round-trip simple values', function () {
-  //     checkBinaryRoundTrip('"hello"');
-  //     checkBinaryRoundTrip('123');
-  //     checkBinaryRoundTrip('123.456');
-  //     checkBinaryRoundTrip('true');
-  //     checkBinaryRoundTrip('false');
-  //   });
+      return serializeToBinarySnapshot(element);
+    };
 
-  //   it('should round-trip strings with unicode characters', function () {
-  //     checkBinaryRoundTrip('"String with 官话 characters"');
-  //     checkBinaryRoundTrip('"Émojis: 🎮🎲🎯"');
-  //   });
+    const unserializeBinarySnapshotToJson = (binaryBuffer) => {
+      const binaryArray =
+        binaryBuffer instanceof Uint8Array
+          ? binaryBuffer
+          : new Uint8Array(binaryBuffer);
+      const binarySize = binaryArray.byteLength || binaryArray.length;
 
-  //   it('should round-trip objects', function () {
-  //     checkBinaryRoundTrip('{}');
-  //     checkBinaryRoundTrip('{"a":"b"}');
-  //     checkBinaryRoundTrip('{"a":{"nested":"value"}}');
-  //     checkBinaryRoundTrip(
-  //       '{"a":{"a1":{"name":"","referenceTo":"/a/a1"}},"b":{"b1":"world"},"c":{"c1":3.0}}'
-  //     );
-  //   });
+      // Allocate memory in Emscripten heap and copy binary data
+      const binaryPtr = gd._malloc(binarySize);
+      gd.HEAPU8.set(binaryArray, binaryPtr);
 
-  //   it('should round-trip arrays', function () {
-  //     checkBinaryRoundTrip('[]');
-  //     checkBinaryRoundTrip('[1]');
-  //     checkBinaryRoundTrip('[1,2,3]');
-  //     checkBinaryRoundTrip('[{"a":1},{"b":2}]');
-  //     checkBinaryRoundTrip('{"items":[1,2,3],"nested":[{"x":1},{"y":2}]}');
-  //   });
+      const element = gd.BinarySerializer.deserializeBinarySnapshot(
+        binaryPtr,
+        binarySize
+      );
 
-  //   it('should round-trip a complex object like a Text Object', function () {
-  //     var obj = new gd.TextObject('testObject');
-  //     obj.setText('Text with 官话 characters');
+      // Free the input buffer
+      gd._free(binaryPtr);
 
-  //     var serializedElement = new gd.SerializerElement();
-  //     obj.serializeTo(serializedElement);
+      if (element.ptr === 0) {
+        throw new Error('Failed to deserialize binary snapshot.');
+      }
 
-  //     // Create binary snapshot
-  //     const binaryBuffer = gd.createBinarySnapshot(serializedElement);
+      const json = gd.Serializer.toJSON(element);
+      element.delete();
+      return json;
+    };
 
-  //     // Deserialize binary snapshot
-  //     const restoredElement = gd.deserializeBinarySnapshot(binaryBuffer);
+    const checkBinaryRoundTrip = (json) => {
+      const binaryBuffer = serializeJsonToBinarySnapshot(json);
+      expect(binaryBuffer).toBeInstanceOf(Uint8Array);
+      expect(binaryBuffer.length).toBeGreaterThan(0);
 
-  //     // Compare JSON output
-  //     const originalJson = gd.Serializer.toJSON(serializedElement);
-  //     const restoredJson = gd.Serializer.toJSON(restoredElement);
+      const outputJson = unserializeBinarySnapshotToJson(binaryBuffer);
+      expect(outputJson).toBe(json);
+    };
 
-  //     expect(restoredJson).toBe(originalJson);
+    it('should round-trip simple values', function () {
+      checkBinaryRoundTrip('"hello"');
+      checkBinaryRoundTrip('"hello"');
+      checkBinaryRoundTrip('123');
+      checkBinaryRoundTrip('123.456');
+      checkBinaryRoundTrip('true');
+      checkBinaryRoundTrip('false');
+    });
 
-  //     restoredElement.delete();
-  //     serializedElement.delete();
-  //     obj.delete();
-  //   });
-  // });
+    it('should round-trip strings with unicode characters', function () {
+      checkBinaryRoundTrip('"String with 官话 characters"');
+      checkBinaryRoundTrip('"Émojis: 🎮🎲🎯"');
+    });
+
+    it('should round-trip objects', function () {
+      checkBinaryRoundTrip('{}');
+      checkBinaryRoundTrip('{"a":"b"}');
+      checkBinaryRoundTrip('{"a":{"nested":"value"}}');
+      checkBinaryRoundTrip(
+        '{"a":{"a1":{"name":"","referenceTo":"/a/a1"}},"b":{"b1":"world"},"c":{"c1":3.0}}'
+      );
+    });
+
+    it('should round-trip arrays', function () {
+      checkBinaryRoundTrip('[]');
+      checkBinaryRoundTrip('[1]');
+      checkBinaryRoundTrip('[1,2,3]');
+      checkBinaryRoundTrip('[{"a":1},{"b":2}]');
+      checkBinaryRoundTrip('{"items":[1,2,3],"nested":[{"x":1},{"y":2}]}');
+    });
+
+    it('should round-trip a complex object like a Text Object', function () {
+      const obj = new gd.TextObject('testObject');
+      obj.setText('Text with 官话 characters');
+
+      const serializedElement = new gd.SerializerElement();
+      obj.serializeTo(serializedElement);
+
+      const binaryBuffer = serializeToBinarySnapshot(serializedElement);
+      const jsonFromBinaryBuffer =
+        unserializeBinarySnapshotToJson(binaryBuffer);
+
+      // Compare JSON output from the original SerializerElement
+      // with the JSON obtained from the binary buffer:
+      const originalJson = gd.Serializer.toJSON(serializedElement);
+      serializedElement.delete();
+      obj.delete();
+
+      expect(jsonFromBinaryBuffer).toBe(originalJson);
+    });
+
+    it('should round-trip a complex object like a Project', function () {
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+      const layout = project.insertNewLayout('Scene', 0);
+      layout.getObjects().insertNewObject(project, 'Sprite', 'Object1', 0);
+      layout.getObjects().insertNewObject(project, 'Sprite', 'Object2', 1);
+      const instance1 = layout.getInitialInstances().insertNewInitialInstance();
+      const instance2 = layout.getInitialInstances().insertNewInitialInstance();
+      instance1.setObjectName('Object1');
+      instance2.setObjectName('Object2');
+
+      const serializedElement = new gd.SerializerElement();
+      project.serializeTo(serializedElement);
+
+      const binaryBuffer = serializeToBinarySnapshot(serializedElement);
+      const jsonFromBinaryBuffer =
+        unserializeBinarySnapshotToJson(binaryBuffer);
+
+      // Compare JSON output from the original SerializerElement
+      // with the JSON obtained from the binary buffer:
+      const originalJson = gd.Serializer.toJSON(serializedElement);
+      serializedElement.delete();
+      project.delete();
+
+      expect(jsonFromBinaryBuffer).toBe(originalJson);
+    });
+  });
 });

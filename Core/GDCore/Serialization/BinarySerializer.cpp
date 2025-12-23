@@ -5,7 +5,7 @@
  */
 
 #include "GDCore/Serialization/BinarySerializer.h"
-
+#include "GDCore/Tools/Log.h"
 #include <cstdlib>
 #include <cstring>
 
@@ -100,12 +100,14 @@ bool BinarySerializer::DeserializeFromBinaryBuffer(const uint8_t* buffer,
   // Read and verify magic header
   uint32_t magic;
   if (!Read(ptr, end, magic) || magic != 0x47444253) {
+    gd::LogError("Failed to deserialize binary snapshot: invalid magic.");
     return false;  // Invalid magic
   }
 
   // Read version
   uint32_t version;
   if (!Read(ptr, end, version) || version != 1) {
+    gd::LogError("Failed to deserialize binary snapshot: unsupported version.");
     return false;  // Unsupported version
   }
 
@@ -118,12 +120,16 @@ bool BinarySerializer::DeserializeElement(const uint8_t*& ptr,
                                           SerializerElement& element) {
   NodeType nodeType;
   if (!Read(ptr, end, nodeType) || nodeType != NodeType::Element) {
+    gd::LogError("Failed to deserialize binary snapshot: invalid node type.");
     return false;
   }
 
   // Deserialize value
   NodeType valueType;
-  if (!Read(ptr, end, valueType)) return false;
+  if (!Read(ptr, end, valueType)) {
+    gd::LogError("Failed to deserialize binary snapshot: invalid value type.");
+    return false;
+  }
 
   if (valueType != NodeType::ValueUndefined) {
     SerializerValue value;
@@ -266,6 +272,7 @@ void BinarySerializer::FreeBinarySnapshot(uintptr_t bufferPtr) {
 SerializerElement* BinarySerializer::DeserializeBinarySnapshot(uintptr_t bufferPtr,
                                                                 size_t size) {
   if (!bufferPtr || size == 0) {
+    gd::LogError("Failed to deserialize binary snapshot: invalid buffer pointer or size.");
     return nullptr;
   }
 
@@ -273,6 +280,7 @@ SerializerElement* BinarySerializer::DeserializeBinarySnapshot(uintptr_t bufferP
   SerializerElement* element = new SerializerElement();
 
   if (!DeserializeFromBinaryBuffer(buffer, size, *element)) {
+    gd::LogError("Failed to deserialize binary snapshot.");
     delete element;
     return nullptr;
   }

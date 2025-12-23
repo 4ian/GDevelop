@@ -76,49 +76,46 @@ export async function serializeInBackground(
   serializable: gdSerializable
 ): Promise<any> {
   const startTime = Date.now();
-  const serializedElement = new gd.SerializerElement();
+  let serializedElement = new gd.SerializerElement();
   serializable.serializeTo(serializedElement);
 
   const serializeToEndTime = Date.now();
 
-  let binaryPtr = 0;
-  try {
-    binaryPtr = gd.BinarySerializer.createBinarySnapshot(serializedElement);
-    if (!binaryPtr) {
-      throw new Error('Failed to create binary snapshot.');
-    }
+  const binaryPtr = gd.BinarySerializer.createBinarySnapshot(serializedElement);
+  const binarySize = gd.BinarySerializer.getLastBinarySnapshotSize();
+  serializedElement.delete();
+  serializedElement = null;
 
-    const binarySize = gd.BinarySerializer.getLastBinarySnapshotSize();
-    const binaryView = new Uint8Array(gd.HEAPU8.buffer, binaryPtr, binarySize);
-    // Copy the buffer out of the WASM heap so it can be transferred.
-    const binaryBuffer = binaryView.slice();
-
-    const binaryBufferEndTime = Date.now();
-    log(
-      `Spent ${binaryBufferEndTime -
-        startTime}ms on main thread (including ${serializeToEndTime -
-        startTime}ms for SerializerElement serialization and ${binaryBufferEndTime -
-        serializeToEndTime}ms for BinaryBuffer preparation).`
-    );
-
-    const result = await sendMessageToBackgroundSerializerWorker({
-      type,
-      binary: binaryBuffer,
-      versionWithHash: VersionMetadata.versionWithHash,
-    });
-
-    const workerPromiseEndTime = Date.now();
-    log(
-      `The worker returned in ${workerPromiseEndTime - binaryBufferEndTime}ms.`
-    );
-
-    return result;
-  } finally {
-    if (binaryPtr) {
-      gd.BinarySerializer.freeBinarySnapshot(binaryPtr);
-    }
-    serializedElement.delete();
+  if (!binaryPtr) {
+    throw new Error('Failed to create binary snapshot.');
   }
+
+  const binaryView = new Uint8Array(gd.HEAPU8.buffer, binaryPtr, binarySize);
+  // Copy the buffer out of the WASM heap so it can be transferred.
+  const binaryBuffer = binaryView.slice();
+
+  gd.BinarySerializer.freeBinarySnapshot(binaryPtr);
+
+  const binaryBufferEndTime = Date.now();
+  log(
+    `Spent ${binaryBufferEndTime -
+      startTime}ms on main thread (including ${serializeToEndTime -
+      startTime}ms for SerializerElement serialization and ${binaryBufferEndTime -
+      serializeToEndTime}ms for BinaryBuffer preparation).`
+  );
+
+  const result = await sendMessageToBackgroundSerializerWorker({
+    type,
+    binary: binaryBuffer,
+    versionWithHash: VersionMetadata.versionWithHash,
+  });
+
+  const workerPromiseEndTime = Date.now();
+  log(
+    `The worker returned in ${workerPromiseEndTime - binaryBufferEndTime}ms.`
+  );
+
+  return result;
 }
 
 export const serializeToJSONInBackground = async (

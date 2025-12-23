@@ -19,7 +19,10 @@ import { type EventsFunctionCreationParameters } from '../EventsFunctionsList/Ev
 import { type EventsBasedObjectCreationParameters } from '../EventsFunctionsList/EventsBasedObjectTreeViewItemContent';
 import Background from '../UI/Background';
 import OptionsEditorDialog from './OptionsEditorDialog';
-import EventsBasedBehaviorEditorPanel from '../EventsBasedBehaviorEditor/EventsBasedBehaviorEditorPanel';
+import {
+  EventsBasedBehaviorEditorPanel,
+  type EventsBasedBehaviorEditorPanelInterface,
+} from '../EventsBasedBehaviorEditor/EventsBasedBehaviorEditorPanel';
 import EventsBasedObjectEditorPanel from '../EventsBasedObjectEditor/EventsBasedObjectEditorPanel';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import BehaviorMethodSelectorDialog from './BehaviorMethodSelectorDialog';
@@ -152,6 +155,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   };
   editor: ?EventsSheetInterface;
   eventsFunctionList: ?EventsFunctionsListInterface;
+  eventsBasedBehaviorEditorPanel: ?EventsBasedBehaviorEditorPanelInterface;
   _editorMosaic: ?EditorMosaicInterface;
   _editorNavigator: ?EditorNavigatorInterface;
   // Create an empty "context" of objects.
@@ -1444,8 +1448,13 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                         );
                       }
                     }}
-                    // TODO Scroll to the property
-                    onOpenProperty={() => {}}
+                    onOpenProperty={propertyName => {
+                      if (this.eventsBasedBehaviorEditorPanel) {
+                        this.eventsBasedBehaviorEditorPanel.scrollToProperty(
+                          propertyName
+                        );
+                      }
+                    }}
                   />
                 ) : (
                   <EmptyMessage>
@@ -1516,6 +1525,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           ) : selectedEventsBasedBehavior &&
             this._projectScopedContainersAccessor ? (
             <EventsBasedBehaviorEditorPanel
+              ref={ref => (this.eventsBasedBehaviorEditorPanel = ref)}
               project={project}
               projectScopedContainersAccessor={
                 this._projectScopedContainersAccessor

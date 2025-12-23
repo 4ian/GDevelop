@@ -2,15 +2,18 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import EventsBasedBehaviorEditor from './index';
-import { Tabs } from '../UI/Tabs';
-import EventsBasedBehaviorPropertiesEditor from './EventsBasedBehaviorPropertiesEditor';
+import {
+  EventsBasedBehaviorPropertiesEditor,
+  type EventsBasedBehaviorPropertiesEditorInterface,
+} from './EventsBasedBehaviorPropertiesEditor';
 import Background from '../UI/Background';
 import { Column, Line } from '../UI/Grid';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type ExtensionItemConfigurationAttribute } from '../EventsFunctionsExtensionEditor';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
-
-type TabName = 'configuration' | 'behavior-properties' | 'scene-properties';
+import Text from '../UI/Text';
+import { ColumnStackLayout } from '../UI/Layout';
+import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
 
 type Props = {|
   project: gdProject,
@@ -25,92 +28,103 @@ type Props = {|
   onConfigurationUpdated?: (?ExtensionItemConfigurationAttribute) => void,
 |};
 
-export default function EventsBasedBehaviorEditorPanel({
-  eventsBasedBehavior,
-  eventsFunctionsExtension,
-  project,
-  projectScopedContainersAccessor,
-  onRenameProperty,
-  onRenameSharedProperty,
-  onPropertyTypeChanged,
-  unsavedChanges,
-  onEventsFunctionsAdded,
-  onConfigurationUpdated,
-}: Props) {
-  const [currentTab, setCurrentTab] = React.useState<TabName>('configuration');
+export type EventsBasedBehaviorEditorPanelInterface = {|
+  scrollToProperty: (propertyName: string) => void,
+|};
 
-  const onPropertiesUpdated = React.useCallback(
-    () => {
-      if (unsavedChanges) {
-        unsavedChanges.triggerUnsavedChanges();
+export const EventsBasedBehaviorEditorPanel = React.forwardRef<
+  Props,
+  EventsBasedBehaviorEditorPanelInterface
+>(
+  (
+    {
+      eventsBasedBehavior,
+      eventsFunctionsExtension,
+      project,
+      projectScopedContainersAccessor,
+      onRenameProperty,
+      onRenameSharedProperty,
+      onPropertyTypeChanged,
+      unsavedChanges,
+      onEventsFunctionsAdded,
+      onConfigurationUpdated,
+    }: Props,
+    ref
+  ) => {
+    const onPropertiesUpdated = React.useCallback(
+      () => {
+        if (unsavedChanges) {
+          unsavedChanges.triggerUnsavedChanges();
+        }
+      },
+      [unsavedChanges]
+    );
+
+    const scrollView = React.useRef<?ScrollViewInterface>(null);
+    const propertiesEditor = React.useRef<?EventsBasedBehaviorPropertiesEditorInterface>(
+      null
+    );
+
+    const scrollToProperty = React.useCallback((propertyName: string) => {
+      if (scrollView.current && propertiesEditor.current) {
+        scrollView.current.scrollTo(
+          propertiesEditor.current.getPropertyEditorRef(propertyName)
+        );
       }
-    },
-    [unsavedChanges]
-  );
+    }, []);
 
-  return (
-    <Background>
-      <Column expand useFullHeight noOverflowParent>
-        <Line>
-          <Column noMargin expand noOverflowParent>
-            <Tabs
-              value={currentTab}
-              onChange={setCurrentTab}
-              options={[
-                {
-                  value: 'configuration',
-                  label: <Trans>Configuration</Trans>,
-                },
-                {
-                  value: 'behavior-properties',
-                  label: <Trans>Behavior properties</Trans>,
-                },
-                {
-                  value: 'scene-properties',
-                  label: <Trans>Scene properties</Trans>,
-                },
-              ]}
+    React.useImperativeHandle(ref, () => ({
+      scrollToProperty,
+    }));
+
+    return (
+      <Background>
+        <ScrollView ref={scrollView}>
+          <ColumnStackLayout expand useFullHeight noOverflowParent>
+            <Text size="block-title">
+              <Trans>Configuration</Trans>
+            </Text>
+            <EventsBasedBehaviorEditor
+              project={project}
+              eventsFunctionsExtension={eventsFunctionsExtension}
+              eventsBasedBehavior={eventsBasedBehavior}
+              unsavedChanges={unsavedChanges}
+              onConfigurationUpdated={onConfigurationUpdated}
             />
-          </Column>
-        </Line>
-        {currentTab === 'configuration' && (
-          <EventsBasedBehaviorEditor
-            project={project}
-            eventsFunctionsExtension={eventsFunctionsExtension}
-            eventsBasedBehavior={eventsBasedBehavior}
-            unsavedChanges={unsavedChanges}
-            onConfigurationUpdated={onConfigurationUpdated}
-          />
-        )}
-        {currentTab === 'behavior-properties' && (
-          <EventsBasedBehaviorPropertiesEditor
-            project={project}
-            projectScopedContainersAccessor={projectScopedContainersAccessor}
-            extension={eventsFunctionsExtension}
-            eventsBasedBehavior={eventsBasedBehavior}
-            properties={eventsBasedBehavior.getPropertyDescriptors()}
-            onRenameProperty={onRenameProperty}
-            behaviorObjectType={eventsBasedBehavior.getObjectType()}
-            onPropertiesUpdated={onPropertiesUpdated}
-            onPropertyTypeChanged={onPropertyTypeChanged}
-            onEventsFunctionsAdded={onEventsFunctionsAdded}
-          />
-        )}
-        {currentTab === 'scene-properties' && (
-          <EventsBasedBehaviorPropertiesEditor
-            isSceneProperties
-            project={project}
-            projectScopedContainersAccessor={projectScopedContainersAccessor}
-            extension={eventsFunctionsExtension}
-            eventsBasedBehavior={eventsBasedBehavior}
-            properties={eventsBasedBehavior.getSharedPropertyDescriptors()}
-            onRenameProperty={onRenameSharedProperty}
-            onPropertiesUpdated={onPropertiesUpdated}
-            onPropertyTypeChanged={onPropertyTypeChanged}
-            onEventsFunctionsAdded={onEventsFunctionsAdded}
-          />
-        )}
-      </Column>
-    </Background>
-  );
-}
+            <Text size="block-title">
+              <Trans>Behavior properties</Trans>
+            </Text>
+            <EventsBasedBehaviorPropertiesEditor
+              ref={propertiesEditor}
+              project={project}
+              projectScopedContainersAccessor={projectScopedContainersAccessor}
+              extension={eventsFunctionsExtension}
+              eventsBasedBehavior={eventsBasedBehavior}
+              properties={eventsBasedBehavior.getPropertyDescriptors()}
+              onRenameProperty={onRenameProperty}
+              behaviorObjectType={eventsBasedBehavior.getObjectType()}
+              onPropertiesUpdated={onPropertiesUpdated}
+              onPropertyTypeChanged={onPropertyTypeChanged}
+              onEventsFunctionsAdded={onEventsFunctionsAdded}
+            />
+            <Text size="block-title">
+              <Trans>Scene properties</Trans>
+            </Text>
+            <EventsBasedBehaviorPropertiesEditor
+              isSceneProperties
+              project={project}
+              projectScopedContainersAccessor={projectScopedContainersAccessor}
+              extension={eventsFunctionsExtension}
+              eventsBasedBehavior={eventsBasedBehavior}
+              properties={eventsBasedBehavior.getSharedPropertyDescriptors()}
+              onRenameProperty={onRenameSharedProperty}
+              onPropertiesUpdated={onPropertiesUpdated}
+              onPropertyTypeChanged={onPropertyTypeChanged}
+              onEventsFunctionsAdded={onEventsFunctionsAdded}
+            />
+          </ColumnStackLayout>
+        </ScrollView>
+      </Background>
+    );
+  }
+);

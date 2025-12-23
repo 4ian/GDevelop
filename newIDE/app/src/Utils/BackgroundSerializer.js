@@ -42,6 +42,7 @@ const getOrCreateBackgroundSerializerWorker = (): Worker => {
       );
       return;
     }
+    pendingRequests.delete(data.requestId);
 
     if (data.type === 'DONE') {
       pending.resolve(data.result);

@@ -50,6 +50,12 @@ export type SaveAsLocation = {|
   // a new location where to save a project to.
 |};
 
+export type SaveProjectOptions = {|
+  previousVersion?: string,
+  restoredFromVersionId?: string,
+  useBackgroundSerializer?: boolean,
+|};
+
 export type SaveAsOptions = {|
   generateNewProjectUuid?: boolean,
   setProjectNameFromLocation?: boolean,
@@ -106,7 +112,7 @@ export type StorageProviderOperations = {|
   onSaveProject?: (
     project: gdProject,
     fileMetadata: FileMetadata,
-    options?: {| previousVersion?: string, restoredFromVersionId?: string |},
+    options?: SaveProjectOptions,
     actions: {|
       showAlert: ShowAlertFunction,
       showConfirmation: ShowConfirmFunction,

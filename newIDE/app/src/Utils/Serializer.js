@@ -13,37 +13,16 @@ export function serializeToJSObject(
   serializable: gdSerializable,
   methodName: string = 'serializeTo'
 ) {
-  const startTime = Date.now();
   const serializedElement = new gd.SerializerElement();
   serializable[methodName](serializedElement);
-  const serializeToTime = Date.now();
-  console.log(
-    '[Main thread] serializeTo done in: ',
-    serializeToTime - startTime,
-    'ms'
-  );
 
   // JSON.parse + toJSON is 30% faster than gd.Serializer.toJSObject.
-  const toJSONStartTime = Date.now();
   const json = gd.Serializer.toJSON(serializedElement);
-  const toJSONTime = Date.now();
-  console.log(
-    '[Main thread] toJSON done in: ',
-    toJSONTime - toJSONStartTime,
-    'ms'
-  );
 
   try {
     const object = JSON.parse(json);
-    const parseTime = Date.now();
-    console.log('[Main thread] parse done in: ', parseTime - toJSONTime, 'ms');
 
     serializedElement.delete();
-    console.log(
-      '[Main thread] serializeToJSObject done in: ',
-      Date.now() - startTime,
-      'ms'
-    );
     return object;
   } catch (error) {
     serializedElement.delete();
@@ -119,25 +98,12 @@ export function serializeToJSON(
   serializable: gdSerializable,
   methodName: string = 'serializeTo'
 ): string {
-  const startTime = Date.now();
   const serializedElement = new gd.SerializerElement();
   serializable[methodName](serializedElement);
-  const serializeToTime = Date.now();
-  console.log(
-    '[Main thread] serializeTo done in: ',
-    serializeToTime - startTime,
-    'ms'
-  );
 
   // toJSON is 20% faster than gd.Serializer.toJSObject + JSON.stringify.
   const json = gd.Serializer.toJSON(serializedElement);
   serializedElement.delete();
-  const toJSONTime = Date.now();
-  console.log(
-    '[Main thread] toJSON done in: ',
-    toJSONTime - serializeToTime,
-    'ms'
-  );
 
   return json;
 }

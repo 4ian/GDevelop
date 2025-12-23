@@ -109,6 +109,7 @@ import {
   type SaveAsOptions,
   type FileMetadataAndStorageProviderName,
   type ResourcesActionsMenuBuilder,
+  type SaveProjectOptions,
 } from '../ProjectsStorage';
 import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStorageProviderDialog';
 import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProviderDialog';
@@ -3907,7 +3908,6 @@ const MainFrame = (props: Props) => {
 
   const saveProject = React.useCallback(
     async () => {
-      console.log('saveProject started');
       if (!currentProject) return;
       // Prevent saving if there are errors in the extension modules, as
       // this can lead to corrupted projects.
@@ -3924,19 +3924,13 @@ const MainFrame = (props: Props) => {
         return;
       }
 
-      console.log('getStorageProviderOperations call');
       const storageProviderOperations = getStorageProviderOperations();
-      const {
-        onSaveProject,
-        // canFileMetadataBeSafelySaved,
-      } = storageProviderOperations;
+      const { onSaveProject } = storageProviderOperations;
       if (!onSaveProject) {
         return saveProjectAs();
       }
 
-      console.log('save ui settings');
       saveUiSettings(state.editorTabs);
-      console.log('save ui settings done');
 
       // Protect against concurrent saves, which can trigger issues with the
       // file system.
@@ -3952,7 +3946,6 @@ const MainFrame = (props: Props) => {
         });
         if (!shouldRestoreCheckedOutVersion) return;
       }
-      console.log('show message');
 
       _showSnackMessage(i18n._(t`Saving...`), null);
       setIsSavingProject(true);
@@ -3965,7 +3958,7 @@ const MainFrame = (props: Props) => {
         // store their values in variables now.
         const storageProviderInternalName = getStorageProvider().internalName;
 
-        const saveOptions = {};
+        const saveOptions: SaveProjectOptions = {};
         if (cloudProjectRecoveryOpenedVersionId) {
           saveOptions.previousVersion = cloudProjectRecoveryOpenedVersionId;
         } else {

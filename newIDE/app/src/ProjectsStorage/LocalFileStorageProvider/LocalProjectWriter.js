@@ -7,6 +7,7 @@ import {
   type FileMetadata,
   type SaveAsLocation,
   type SaveAsOptions,
+  type SaveProjectOptions,
 } from '../index';
 import optionalRequire from '../../Utils/OptionalRequire';
 import {
@@ -107,46 +108,26 @@ const writeAndCheckFormattedJSONFile = async (
   await writeAndCheckFile(content, filePath);
 };
 
-const writeProjectFiles = async (
+const writeProjectFiles = async ({
+  project,
+  filePath,
+  projectPath,
+  useBackgroundSerializer,
+}: {
   project: gdProject,
   filePath: string,
-  projectPath: string
-): Promise<void> => {
-  console.log('--- writeProjectFiles started');
+  projectPath: string,
+  useBackgroundSerializer: boolean,
+}): Promise<void> => {
+  const startTime = Date.now();
 
-  const startTime2 = Date.now();
-  const serializedProjectObject = serializeToJSObject(project);
-  console.log(
-    '--- serializeToJSObject done in: ',
-    Date.now() - startTime2,
-    'ms (all on the main thread)'
-  );
-
-  try {
-    const startTime = Date.now();
-    const serializedProjectObject2 = await serializeToJSObjectInBackground(
-      project
-    );
-    console.log(
-      '--- serializeToJSObjectInBackground done in: ',
-      Date.now() - startTime,
-      'ms (in total, including worker promise)'
-    );
-
-    if (
-      JSON.stringify(serializedProjectObject) !==
-      JSON.stringify(serializedProjectObject2)
-    ) {
-      console.log(
-        'Project JSONs are different.',
-        serializedProjectObject,
-        serializedProjectObject2
-      );
-    }
-  } catch (error) {
-    console.error('Unable to serialize to JS object in background:', error);
-    throw error;
+  let serializedProjectObject;
+  if (useBackgroundSerializer) {
+    serializedProjectObject = await serializeToJSObjectInBackground(project);
+  } else {
+    serializedProjectObject = serializeToJSObject(project);
   }
+  const serializeEndTime = Date.now();
 
   if (project.isFolderProject()) {
     const partialObjects = split(serializedProjectObject, {
@@ -180,23 +161,21 @@ const writeProjectFiles = async (
       });
     });
   } else {
-    return writeAndCheckFormattedJSONFile(
-      serializedProjectObject,
-      filePath
-    ).catch(err => {
-      console.error('Unable to write the project:', err);
-      throw err;
-    });
+    await writeAndCheckFormattedJSONFile(serializedProjectObject, filePath);
   }
+
+  console.log(
+    `[LocalProjectWriter] Project file(s) written in ${Date.now() -
+      startTime}ms (including ${serializeEndTime - startTime}ms for ${
+      useBackgroundSerializer ? 'background' : 'main'
+    } thread serialization)`
+  );
 };
 
 export const onSaveProject = async (
   project: gdProject,
   fileMetadata: FileMetadata,
-  unusedSaveOptions?: {|
-    previousVersion?: string,
-    restoredFromVersionId?: string,
-  |},
+  saveOptions?: SaveProjectOptions,
   actions: {|
     showAlert: ShowAlertFunction,
     showConfirmation: ShowConfirmFunction,
@@ -234,7 +213,13 @@ export const onSaveProject = async (
     console.warn('Unable to clean project folder before saving project: ', e);
   }
 
-  await writeProjectFiles(project, filePath, projectPath);
+  await writeProjectFiles({
+    project,
+    filePath,
+    projectPath,
+    useBackgroundSerializer:
+      !!saveOptions && !!saveOptions.useBackgroundSerializer,
+  });
   return {
     wasSaved: true,
     fileMetadata: newFileMetadata,
@@ -351,7 +336,12 @@ export const onSaveProjectAs = async (
   const projectPath = path.dirname(filePath);
   project.setProjectFile(filePath);
 
-  await writeProjectFiles(project, filePath, projectPath);
+  await writeProjectFiles({
+    project,
+    filePath,
+    projectPath,
+    useBackgroundSerializer: false,
+  });
   return {
     wasSaved: true,
     fileMetadata: newFileMetadata,

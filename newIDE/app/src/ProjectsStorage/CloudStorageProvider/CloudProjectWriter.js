@@ -1,7 +1,12 @@
 // @flow
 import * as React from 'react';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
-import { type FileMetadata, type SaveAsLocation, type SaveAsOptions } from '..';
+import {
+  type FileMetadata,
+  type SaveAsLocation,
+  type SaveAsOptions,
+  type SaveProjectOptions,
+} from '..';
 import {
   CLOUD_PROJECT_NAME_MAX_LENGTH,
   commitVersion,
@@ -35,40 +40,36 @@ import {
 import { format } from 'date-fns';
 import { getUserPublicProfile } from '../../Utils/GDevelopServices/User';
 
-const zipProject = async (project: gdProject): Promise<[Blob, string]> => {
-  console.log('--- zipProject started');
+const zipProject = async ({
+  project,
+  useBackgroundSerializer,
+}: {
+  project: gdProject,
+  useBackgroundSerializer: boolean,
+}): Promise<{ zippedProject: Blob, projectJson: string }> => {
   const startTime = Date.now();
-  const projectJson = serializeToJSON(project);
-  const serializeToJSONTime = Date.now();
-  console.log(
-    '--- serializeToJSON done in: ',
-    serializeToJSONTime - startTime,
-    'ms'
-  );
 
-  const startTime2 = Date.now();
-  // TODO: should serialize to JSON instead of JS object.
-  const projectJson2 = await serializeToJSONInBackground(project);
-  console.log(
-    '--- serializeToJSONInBackground done in: ',
-    Date.now() - startTime2,
-    'ms (in total, including worker promise)'
-  );
-  if (projectJson2 !== projectJson) {
-    console.log('Project JSONs are different.', projectJson, projectJson2);
+  let projectJson: string;
+  if (useBackgroundSerializer) {
+    projectJson = await serializeToJSONInBackground(project);
+  } else {
+    projectJson = serializeToJSON(project);
   }
 
-  const zipStartTime = Date.now();
+  const serializeToJSONEndTime = Date.now();
+
   const zippedProject = await createZipWithSingleTextFile(
     projectJson,
     'game.json'
   );
+
   console.log(
-    '[Main thread] Zipping done in: ',
-    Date.now() - zipStartTime,
-    'ms'
+    `[CloudProjectWriter] Zipping done in ${Date.now() -
+      startTime}ms (including ${serializeToJSONEndTime - startTime}ms for ${
+      useBackgroundSerializer ? 'background' : 'main'
+    } thread serialization).`
   );
-  return [zippedProject, projectJson];
+  return { zippedProject, projectJson };
 };
 
 const checkZipContent = async (
@@ -95,14 +96,17 @@ const zipAndPrepareProjectVersionForCommit = async ({
   authenticatedUser: AuthenticatedUser,
   project: gdProject,
   cloudProjectId: string,
-  options?: {| previousVersion?: string, restoredFromVersionId?: string |},
+  options?: SaveProjectOptions,
 |}): Promise<{|
   presignedUrl: string,
   zippedProject: Blob,
 |}> => {
-  const [presignedUrl, [zippedProject, projectJson]] = await Promise.all([
+  const [presignedUrl, { zippedProject, projectJson }] = await Promise.all([
     getPresignedUrlForVersionUpload(authenticatedUser, cloudProjectId),
-    zipProject(project),
+    zipProject({
+      project,
+      useBackgroundSerializer: !!options && !!options.useBackgroundSerializer,
+    }),
   ]);
 
   const archiveIsSane = await checkZipContent(zippedProject, projectJson);
@@ -129,7 +133,7 @@ const commitProjectVersion = async ({
   presignedUrl: string,
   zippedProject: Blob,
   cloudProjectId: string,
-  options?: {| previousVersion?: string, restoredFromVersionId?: string |},
+  options?: SaveProjectOptions,
 |}): Promise<?string> => {
   const newVersion = await retryIfFailed({ times: 2 }, () =>
     commitVersion({
@@ -149,7 +153,7 @@ export const generateOnSaveProject = (
 ) => async (
   project: gdProject,
   fileMetadata: FileMetadata,
-  options?: {| previousVersion?: string, restoredFromVersionId?: string |},
+  options?: SaveProjectOptions,
   actions: {|
     showAlert: ShowAlertFunction,
     showConfirmation: ShowConfirmFunction,

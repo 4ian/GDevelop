@@ -3906,7 +3906,8 @@ const MainFrame = (props: Props) => {
     ]
   );
 
-  const saveWithBackgroundSerializer = preferences.values.useBackgroundSerializerForSaving;
+  const saveWithBackgroundSerializer =
+    preferences.values.useBackgroundSerializerForSaving;
   const saveProject = React.useCallback(
     async () => {
       if (!currentProject) return;

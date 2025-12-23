@@ -43,6 +43,7 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import GlobalAndSceneVariablesDialog from '../VariablesList/GlobalAndSceneVariablesDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
+import PropertyListEditor from './PropertyListEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -359,7 +360,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             selectedEventsFunction &&
             !selectedEventsFunction.getEvents().getEventsCount()
           ) {
-            this._editorNavigator.openEditor('parameters');
+            //this._editorNavigator.openEditor('parameters');
           } else {
             this._editorNavigator.openEditor('events-sheet');
           }
@@ -641,7 +642,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         this.updateToolbar();
         if (selectedEventsBasedBehavior) {
           if (this._editorMosaic) {
-            this._editorMosaic.collapseEditor('parameters');
+            //this._editorMosaic.collapseEditor('parameters');
           }
           if (this._editorNavigator) {
             this._editorNavigator.openEditor('events-sheet');
@@ -668,7 +669,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         this.updateToolbar();
         if (selectedEventsBasedObject) {
           if (this._editorMosaic) {
-            this._editorMosaic.collapseEditor('parameters');
+            //this._editorMosaic.collapseEditor('parameters');
           }
           if (this._editorNavigator)
             this._editorNavigator.openEditor('events-sheet');
@@ -1361,7 +1362,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     const editors = {
       parameters: {
         type: 'primary',
-        title: t`Function Configuration`,
+        title: selectedEventsFunction
+          ? t`Function Configuration`
+          : t`Properties`,
         toolbarControls: [],
         renderEditor: () => (
           <I18n>
@@ -1419,6 +1422,30 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     }
                     unsavedChanges={this.props.unsavedChanges}
                     getFunctionGroupNames={this._getFunctionGroupNames}
+                  />
+                ) : selectedEventsBasedObject || selectedEventsBasedBehavior ? (
+                  <PropertyListEditor
+                    eventsBasedBehavior={selectedEventsBasedBehavior}
+                    eventsBasedObject={selectedEventsBasedObject}
+                    // TODO Force update the other view
+                    onPropertiesUpdated={() => {}}
+                    onRenameProperty={(oldName, newName) => {
+                      if (selectedEventsBasedBehavior) {
+                        this._onBehaviorPropertyRenamed(
+                          selectedEventsBasedBehavior,
+                          oldName,
+                          newName
+                        );
+                      } else if (selectedEventsBasedObject) {
+                        this._onObjectPropertyRenamed(
+                          selectedEventsBasedObject,
+                          oldName,
+                          newName
+                        );
+                      }
+                    }}
+                    // TODO Scroll to the property
+                    onOpenProperty={() => {}}
                   />
                 ) : (
                   <EmptyMessage>

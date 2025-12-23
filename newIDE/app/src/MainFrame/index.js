@@ -3906,6 +3906,7 @@ const MainFrame = (props: Props) => {
     ]
   );
 
+  const saveWithBackgroundSerializer = preferences.values.useBackgroundSerializerForSaving;
   const saveProject = React.useCallback(
     async () => {
       if (!currentProject) return;
@@ -3958,7 +3959,9 @@ const MainFrame = (props: Props) => {
         // store their values in variables now.
         const storageProviderInternalName = getStorageProvider().internalName;
 
-        const saveOptions: SaveProjectOptions = {};
+        const saveOptions: SaveProjectOptions = {
+          useBackgroundSerializer: saveWithBackgroundSerializer,
+        };
         if (cloudProjectRecoveryOpenedVersionId) {
           saveOptions.previousVersion = cloudProjectRecoveryOpenedVersionId;
         } else {
@@ -4043,6 +4046,7 @@ const MainFrame = (props: Props) => {
       }
     },
     [
+      saveWithBackgroundSerializer,
       isSavingProject,
       currentProject,
       currentProjectRef,

@@ -208,6 +208,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setHasSeenInGameEditorWarning: this._setHasSeenInGameEditorWarning.bind(
       this
     ),
+    setUseBackgroundSerializerForSaving: this._setUseBackgroundSerializerForSaving.bind(
+      this
+    ),
   };
 
   componentDidMount() {
@@ -1005,6 +1008,15 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           ...state.values,
           hasSeenInGameEditorWarning: newValue,
         },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setUseBackgroundSerializerForSaving(newValue: boolean) {
+    this.setState(
+      state => ({
+        values: { ...state.values, useBackgroundSerializerForSaving: newValue },
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );

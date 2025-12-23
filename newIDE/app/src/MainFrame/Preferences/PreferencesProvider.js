@@ -163,6 +163,12 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     getOpenDiagnosticReportAutomatically: this._getOpenDiagnosticReportAutomatically.bind(
       this
     ),
+    setBlockPreviewAndExportOnDiagnosticErrors: this._setBlockPreviewAndExportOnDiagnosticErrors.bind(
+      this
+    ),
+    getBlockPreviewAndExportOnDiagnosticErrors: this._getBlockPreviewAndExportOnDiagnosticErrors.bind(
+      this
+    ),
     setShowDeprecatedInstructionWarning: this._setShowDeprecatedInstructionWarning.bind(
       this
     ),
@@ -490,6 +496,24 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _getOpenDiagnosticReportAutomatically() {
     return this.state.values.openDiagnosticReportAutomatically;
+  }
+
+  _setBlockPreviewAndExportOnDiagnosticErrors(
+    blockPreviewAndExportOnDiagnosticErrors: boolean
+  ) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          blockPreviewAndExportOnDiagnosticErrors,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getBlockPreviewAndExportOnDiagnosticErrors() {
+    return this.state.values.blockPreviewAndExportOnDiagnosticErrors;
   }
 
   _setShowDeprecatedInstructionWarning(

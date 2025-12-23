@@ -73,6 +73,7 @@ const PreferencesDialog = ({
     setShowExperimentalExtensions,
     setShowInAppTutorialDeveloperMode,
     setOpenDiagnosticReportAutomatically,
+    setBlockPreviewAndExportOnDiagnosticErrors,
     setShowDeprecatedInstructionWarning,
     setUse3DEditor,
     setShowBasicProfilingCounters,
@@ -442,6 +443,15 @@ const PreferencesDialog = ({
                   checked={values.openDiagnosticReportAutomatically}
                   label={i18n._(
                     t`Automatically open the diagnostic report at preview`
+                  )}
+                />
+                <CompactToggleField
+                  labelColor="primary"
+                  hideTooltip
+                  onCheck={setBlockPreviewAndExportOnDiagnosticErrors}
+                  checked={values.blockPreviewAndExportOnDiagnosticErrors}
+                  label={i18n._(
+                    t`Block preview and export when diagnostic errors are found`
                   )}
                 />
                 <CompactToggleField

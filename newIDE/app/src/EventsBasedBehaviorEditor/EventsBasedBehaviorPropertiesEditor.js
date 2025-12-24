@@ -19,13 +19,9 @@ import ChoicesEditor, { type Choice } from '../ChoicesEditor';
 import ColorField from '../UI/ColorField';
 import BehaviorTypeSelector from '../BehaviorTypeSelector';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
-import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
 import { getMeasurementUnitShortLabel } from '../PropertiesEditor/PropertiesMapToSchema';
 import Add from '../UI/CustomSvgIcons/Add';
-import { DragHandleIcon } from '../UI/DragHandle';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
-import DropIndicator from '../UI/SortableVirtualizedItemList/DropIndicator';
-import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import Clipboard from '../Utils/Clipboard';
 import { SafeExtractor } from '../Utils/SafeExtractor';
@@ -37,7 +33,6 @@ import PasteIcon from '../UI/CustomSvgIcons/Clipboard';
 import ResponsiveFlatButton from '../UI/ResponsiveFlatButton';
 import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
-import SearchBar from '../UI/SearchBar';
 import ResourceTypeSelectField from '../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/ResourceTypeSelectField';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
@@ -87,7 +82,8 @@ type Props = {|
   project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   extension: gdEventsFunctionsExtension,
-  eventsBasedBehavior: gdEventsBasedBehavior,
+  eventsBasedBehavior?: ?gdEventsBasedBehavior,
+  eventsBasedObject?: ?gdEventsBasedObject,
   properties: gdPropertiesContainer,
   isSceneProperties?: boolean,
   onPropertiesUpdated: () => void,
@@ -95,7 +91,7 @@ type Props = {|
   onRenameProperty: (oldName: string, newName: string) => void,
   onPropertyTypeChanged: (propertyName: string) => void,
   onEventsFunctionsAdded: () => void,
-  behaviorObjectType?: string,
+  behaviorObjectType: string,
 |};
 
 // Those names are used internally by GDevelop.
@@ -143,6 +139,7 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
       projectScopedContainersAccessor,
       extension,
       eventsBasedBehavior,
+      eventsBasedObject,
       properties,
       isSceneProperties,
       onPropertiesUpdated,
@@ -518,16 +515,26 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                   value="Color"
                                   label={t`Color (text)`}
                                 />
-                                <SelectOption
-                                  key="property-type-object-animation-name"
-                                  value="ObjectAnimationName"
-                                  label={t`Object animation (text)`}
-                                />
-                                <SelectOption
-                                  key="property-type-keyboard-key"
-                                  value="KeyboardKey"
-                                  label={t`Keyboard key (text)`}
-                                />
+                                {eventsBasedObject && (
+                                  <SelectOption
+                                    value="LeaderboardId"
+                                    label={t`Leaderboard (text)`}
+                                  />
+                                )}
+                                {eventsBasedBehavior && !isSceneProperties && (
+                                  <SelectOption
+                                    key="property-type-object-animation-name"
+                                    value="ObjectAnimationName"
+                                    label={t`Object animation (text)`}
+                                  />
+                                )}
+                                {eventsBasedBehavior && !isSceneProperties && (
+                                  <SelectOption
+                                    key="property-type-keyboard-key"
+                                    value="KeyboardKey"
+                                    label={t`Keyboard key (text)`}
+                                  />
+                                )}
                                 <SelectOption
                                   key="property-type-text-area"
                                   value="MultilineString"
@@ -538,7 +545,7 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                   value="Resource"
                                   label={t`Resource`}
                                 />
-                                {!isSceneProperties && (
+                                {eventsBasedBehavior && !isSceneProperties && (
                                   <SelectOption
                                     key="property-type-behavior"
                                     value="Behavior"
@@ -845,7 +852,11 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                 <EmptyPlaceholder
                   title={<Trans>Add your first property</Trans>}
                   description={
-                    <Trans>Properties store data inside behaviors.</Trans>
+                    eventsBasedObject ? (
+                      <Trans>Properties store data inside objects.</Trans>
+                    ) : (
+                      <Trans>Properties store data inside behaviors.</Trans>
+                    )
                   }
                   actionLabel={<Trans>Add a property</Trans>}
                   helpPagePath={'/behaviors/events-based-behaviors'}

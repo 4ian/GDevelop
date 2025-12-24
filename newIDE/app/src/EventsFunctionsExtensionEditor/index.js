@@ -23,7 +23,6 @@ import {
   EventsBasedBehaviorEditorPanel,
   type EventsBasedBehaviorEditorPanelInterface,
 } from '../EventsBasedBehaviorEditor/EventsBasedBehaviorEditorPanel';
-import EventsBasedObjectEditorPanel from '../EventsBasedObjectEditor/EventsBasedObjectEditorPanel';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import BehaviorMethodSelectorDialog from './BehaviorMethodSelectorDialog';
 import ObjectMethodSelectorDialog from './ObjectMethodSelectorDialog';
@@ -158,6 +157,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   editor: ?EventsSheetInterface;
   eventsFunctionList: ?EventsFunctionsListInterface;
   eventsBasedBehaviorEditorPanel: ?EventsBasedBehaviorEditorPanelInterface;
+  eventsBasedObjectEditorPanel: ?EventsBasedBehaviorEditorPanelInterface;
   propertyListEditor: ?PropertyListEditorInterface;
   _editorMosaic: ?EditorMosaicInterface;
   _editorNavigator: ?EditorNavigatorInterface;
@@ -1441,6 +1441,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       if (this.eventsBasedBehaviorEditorPanel) {
                         this.eventsBasedBehaviorEditorPanel.forceUpdateProperties();
                       }
+                      if (this.eventsBasedObjectEditorPanel) {
+                        this.eventsBasedObjectEditorPanel.forceUpdateProperties();
+                      }
                     }}
                     onRenameProperty={(oldName, newName) => {
                       if (selectedEventsBasedBehavior) {
@@ -1460,6 +1463,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     onOpenProperty={propertyName => {
                       if (this.eventsBasedBehaviorEditorPanel) {
                         this.eventsBasedBehaviorEditorPanel.scrollToProperty(
+                          propertyName
+                        );
+                      }
+                      if (this.eventsBasedObjectEditorPanel) {
+                        this.eventsBasedObjectEditorPanel.scrollToProperty(
                           propertyName
                         );
                       }
@@ -1585,10 +1593,13 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 }
               }}
               onConfigurationUpdated={this._onConfigurationUpdated}
+              onOpenCustomObjectEditor={() => {}}
+              onEventsBasedObjectChildrenEdited={() => {}}
             />
           ) : selectedEventsBasedObject &&
             this._projectScopedContainersAccessor ? (
-            <EventsBasedObjectEditorPanel
+            <EventsBasedBehaviorEditorPanel
+              ref={ref => (this.eventsBasedObjectEditorPanel = ref)}
               project={project}
               projectScopedContainersAccessor={
                 this._projectScopedContainersAccessor
@@ -1603,6 +1614,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   newName
                 )
               }
+              onRenameSharedProperty={() => {}}
               onPropertyTypeChanged={propertyName => {
                 gd.WholeProjectRefactorer.changeEventsBasedObjectPropertyType(
                   project,
@@ -1610,6 +1622,16 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   selectedEventsBasedObject,
                   propertyName
                 );
+              }}
+              onPropertiesUpdated={() => {
+                if (this.propertyListEditor) {
+                  this.propertyListEditor.forceUpdateList();
+                }
+              }}
+              onFocusProperty={propertyName => {
+                if (this.propertyListEditor) {
+                  this.propertyListEditor.setSelectedProperty(propertyName);
+                }
               }}
               onEventsFunctionsAdded={() => {
                 if (this.eventsFunctionList) {

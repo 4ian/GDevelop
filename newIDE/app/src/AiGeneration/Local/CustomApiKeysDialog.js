@@ -67,6 +67,7 @@ const CustomApiKeysDialog = ({ onClose, onSave, open, savedApiKeys }: Props) => 
 
   const handleSave = () => {
     const configs: Array<ApiKeyConfig> = Object.entries(apiKeys)
+      // $FlowFixMe - Object.entries returns mixed values
       .filter(([_, key]) => key && key.trim() !== '')
       .map(([provider, apiKey]) => ({
         provider,

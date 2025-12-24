@@ -286,8 +286,12 @@ export const makeDirectApiCall = async (
     };
   }
 
-  // Extract options without provider for passing to call functions
-  const {provider: _, ...callOpts} = opts;
+  // Extract options for passing to call functions
+  const callOpts = {
+    model: opts.model,
+    temperature: opts.temperature,
+    maxTokens: opts.maxTokens,
+  };
 
   switch (provider) {
     case 'openai':

@@ -52,17 +52,19 @@ describe('AiConfiguration - Local Models', () => {
         },
       });
 
-      const mockLimits = {
+      const mockLimits: any = {
         capabilities: {
           ai: {
             availablePresets: [
               {
                 mode: 'chat',
+                name: 'Default',
                 id: 'default',
                 disabled: false,
               },
             ],
           },
+          versionHistory: {},
         },
         quotas: {},
         credits: {

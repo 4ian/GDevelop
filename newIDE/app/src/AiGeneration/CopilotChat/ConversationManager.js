@@ -187,10 +187,15 @@ class ConversationManager {
     const history = this.getConversationHistory(threadId, 5);
     
     // Merge thread context with additional context
-    const context: AgentContext = ({
-      ...(thread?.context || {}),
-      ...(additionalContext || {}),
-    }: any);
+    const baseContext = thread?.context;
+    const extraContext = additionalContext;
+    
+    // Build context by merging (suppress exponential spread warning)
+    const context: AgentContext = (Object.assign(
+      {},
+      baseContext,
+      extraContext
+    ): any);
     
     // Extract variables from context
     const variables = {};

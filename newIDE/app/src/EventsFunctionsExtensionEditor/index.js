@@ -22,7 +22,7 @@ import OptionsEditorDialog from './OptionsEditorDialog';
 import {
   EventsBasedBehaviorEditorPanel,
   type EventsBasedBehaviorEditorPanelInterface,
-} from '../EventsBasedBehaviorEditor/EventsBasedBehaviorEditorPanel';
+} from '../EventsBasedBehaviorOrObjectEditor';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import BehaviorMethodSelectorDialog from './BehaviorMethodSelectorDialog';
 import ObjectMethodSelectorDialog from './ObjectMethodSelectorDialog';

@@ -38,7 +38,6 @@ import ResponsiveFlatButton from '../UI/ResponsiveFlatButton';
 import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import SearchBar from '../UI/SearchBar';
-import { renderQuickCustomizationMenuItems } from '../QuickCustomization/QuickCustomizationMenuItems';
 import ResourceTypeSelectField from '../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/ResourceTypeSelectField';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
@@ -164,55 +163,9 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
       },
     }));
 
-    const draggedProperty = React.useRef<?gdNamedPropertyDescriptor>(null);
-
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
     const showPropertyOverridingConfirmation = usePropertyOverridingAlertDialog();
-
-    const [searchText, setSearchText] = React.useState<string>('');
-    const [
-      searchMatchingPropertyNames,
-      setSearchMatchingPropertyNames,
-    ] = React.useState<Array<string>>([]);
-
-    const triggerSearch = React.useCallback(
-      () => {
-        const matchingPropertyNames = mapVector(
-          properties,
-          (property: gdNamedPropertyDescriptor, i: number) => {
-            const lowerCaseSearchText = searchText.toLowerCase();
-            return property
-              .getName()
-              .toLowerCase()
-              .includes(lowerCaseSearchText) ||
-              property
-                .getLabel()
-                .toLowerCase()
-                .includes(lowerCaseSearchText) ||
-              property
-                .getGroup()
-                .toLowerCase()
-                .includes(lowerCaseSearchText)
-              ? property.getName()
-              : null;
-          }
-        ).filter(Boolean);
-        setSearchMatchingPropertyNames(matchingPropertyNames);
-      },
-      [properties, searchText]
-    );
-
-    React.useEffect(
-      () => {
-        if (searchText) {
-          triggerSearch();
-        } else {
-          setSearchMatchingPropertyNames([]);
-        }
-      },
-      [searchText, triggerSearch]
-    );
 
     const addPropertyAt = React.useCallback(
       (index: number) => {
@@ -224,7 +177,6 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
         forceUpdate();
         onPropertiesUpdated && onPropertiesUpdated();
         //setJustAddedPropertyName(newName);
-        setSearchText('');
       },
       [forceUpdate, onPropertiesUpdated, properties]
     );
@@ -234,44 +186,6 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
         addPropertyAt(properties.getCount());
       },
       [addPropertyAt, properties]
-    );
-
-    const removeProperty = React.useCallback(
-      (name: string) => {
-        properties.remove(name);
-        forceUpdate();
-        onPropertiesUpdated && onPropertiesUpdated();
-      },
-      [forceUpdate, onPropertiesUpdated, properties]
-    );
-
-    const copyProperty = React.useCallback(
-      (property: gdNamedPropertyDescriptor) => {
-        Clipboard.set(PROPERTIES_CLIPBOARD_KIND, [
-          {
-            name: property.getName(),
-            serializedProperty: serializeToJSObject(property),
-          },
-        ]);
-        forceUpdate();
-      },
-      [forceUpdate]
-    );
-
-    const duplicateProperty = React.useCallback(
-      (property: gdNamedPropertyDescriptor, index: number) => {
-        const newName = newNameGenerator(property.getName(), name =>
-          properties.has(name)
-        );
-
-        const newProperty = properties.insertNew(newName, index);
-
-        unserializeFromJSObject(newProperty, serializeToJSObject(property));
-        newProperty.setName(newName);
-
-        forceUpdate();
-      },
-      [forceUpdate, properties]
     );
 
     const pasteProperties = React.useCallback(
@@ -335,7 +249,6 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
           }
         }
 
-        setSearchText('');
         forceUpdate();
         if (firstAddedPropertyName) {
           //setJustAddedPropertyName(firstAddedPropertyName);
@@ -366,33 +279,6 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
         await pasteProperties(properties.getPosition(property));
       },
       [properties, pasteProperties]
-    );
-
-    const moveProperty = React.useCallback(
-      (oldIndex: number, newIndex: number) => {
-        properties.move(oldIndex, newIndex);
-        forceUpdate();
-        onPropertiesUpdated && onPropertiesUpdated();
-      },
-      [forceUpdate, onPropertiesUpdated, properties]
-    );
-
-    const movePropertyBefore = React.useCallback(
-      (targetProperty: gdNamedPropertyDescriptor) => {
-        const { current } = draggedProperty;
-        if (!current) return;
-
-        const draggedIndex = properties.getPosition(current);
-        const targetIndex = properties.getPosition(targetProperty);
-
-        properties.move(
-          draggedIndex,
-          targetIndex > draggedIndex ? targetIndex - 1 : targetIndex
-        );
-        forceUpdate();
-        onPropertiesUpdated && onPropertiesUpdated();
-      },
-      [properties, forceUpdate, onPropertiesUpdated]
     );
 
     const setChoices = React.useCallback(
@@ -470,13 +356,6 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                 {mapVector(
                   properties,
                   (property: gdNamedPropertyDescriptor, i: number) => {
-                    if (
-                      searchText &&
-                      !searchMatchingPropertyNames.includes(property.getName())
-                    ) {
-                      return null;
-                    }
-
                     return (
                       <React.Fragment>
                         <div
@@ -489,8 +368,8 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                               gdevelopTheme.list.itemsBackgroundColor,
                           }}
                         >
-                          <ResponsiveLineStackLayout expand noMargin>
-                            <Column expand>
+                          <Column expand>
+                            <ResponsiveLineStackLayout expand>
                               <Line noMargin expand alignItems="center">
                                 <SemiControlledTextField
                                   margin="none"
@@ -522,114 +401,74 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                   fullWidth
                                 />
                               </Line>
-                            </Column>
-                            <Line
-                              noMargin
-                              alignItems="center"
-                              justifyContent="flex-end"
-                            >
-                              <SelectField
-                                margin="none"
-                                disabled={
-                                  property.getType() === 'Behavior' &&
-                                  !property.isHidden()
-                                }
-                                value={
-                                  property.isHidden()
-                                    ? 'Hidden'
-                                    : property.isDeprecated()
-                                    ? 'Deprecated'
-                                    : property.isAdvanced()
-                                    ? 'Advanced'
-                                    : 'Visible'
-                                }
-                                onChange={(e, i, value: string) => {
-                                  if (value === 'Hidden') {
-                                    setHidden(property, true);
-                                    setDeprecated(property, false);
-                                    setAdvanced(property, false);
-                                  } else if (value === 'Deprecated') {
-                                    setHidden(property, false);
-                                    setDeprecated(property, true);
-                                    setAdvanced(property, false);
-                                  } else if (value === 'Advanced') {
-                                    setHidden(property, false);
-                                    setDeprecated(property, false);
-                                    setAdvanced(property, true);
-                                  } else if (value === 'Visible') {
-                                    setHidden(property, false);
-                                    setDeprecated(property, false);
-                                    setAdvanced(property, false);
-                                  }
-                                }}
-                                onFocus={() =>
-                                  onFocusProperty(property.getName())
-                                }
-                                fullWidth
+                              <Line
+                                noMargin
+                                alignItems="center"
+                                justifyContent="flex-end"
                               >
-                                <SelectOption
-                                  key="visibility-visible"
-                                  value="Visible"
-                                  label={t`Visible in editor`}
-                                />
-                                <SelectOption
-                                  key="visibility-advanced"
-                                  value="Advanced"
-                                  label={t`Advanced`}
-                                />
-                                <SelectOption
-                                  key="visibility-deprecated"
-                                  value="Deprecated"
-                                  label={t`Deprecated`}
-                                />
-                                <SelectOption
-                                  key="visibility-hidden"
-                                  value="Hidden"
-                                  label={t`Hidden`}
-                                />
-                              </SelectField>
-                            </Line>
-                          </ResponsiveLineStackLayout>
-                          <ElementWithMenu
-                            element={
-                              <IconButton size="small">
-                                <ThreeDotsMenu />
-                              </IconButton>
-                            }
-                            buildMenuTemplate={(i18n: I18nType) => [
-                              {
-                                label: i18n._(
-                                  t`Generate expression and action`
-                                ),
-                                click: () => {
-                                  gd.PropertyFunctionGenerator.generateBehaviorGetterAndSetter(
-                                    project,
-                                    extension,
-                                    eventsBasedBehavior,
-                                    property,
-                                    !!isSceneProperties
-                                  );
-                                  onEventsFunctionsAdded();
-                                },
-                                enabled: gd.PropertyFunctionGenerator.canGenerateGetterAndSetter(
-                                  eventsBasedBehavior,
-                                  property
-                                ),
-                              },
-                              ...renderQuickCustomizationMenuItems({
-                                i18n,
-                                visibility: property.getQuickCustomizationVisibility(),
-                                onChangeVisibility: visibility => {
-                                  property.setQuickCustomizationVisibility(
-                                    visibility
-                                  );
-                                  forceUpdate();
-                                  onPropertiesUpdated && onPropertiesUpdated();
-                                },
-                              }),
-                            ]}
-                          />
-                          <Spacer />
+                                <SelectField
+                                  margin="none"
+                                  disabled={
+                                    property.getType() === 'Behavior' &&
+                                    !property.isHidden()
+                                  }
+                                  value={
+                                    property.isHidden()
+                                      ? 'Hidden'
+                                      : property.isDeprecated()
+                                      ? 'Deprecated'
+                                      : property.isAdvanced()
+                                      ? 'Advanced'
+                                      : 'Visible'
+                                  }
+                                  onChange={(e, i, value: string) => {
+                                    if (value === 'Hidden') {
+                                      setHidden(property, true);
+                                      setDeprecated(property, false);
+                                      setAdvanced(property, false);
+                                    } else if (value === 'Deprecated') {
+                                      setHidden(property, false);
+                                      setDeprecated(property, true);
+                                      setAdvanced(property, false);
+                                    } else if (value === 'Advanced') {
+                                      setHidden(property, false);
+                                      setDeprecated(property, false);
+                                      setAdvanced(property, true);
+                                    } else if (value === 'Visible') {
+                                      setHidden(property, false);
+                                      setDeprecated(property, false);
+                                      setAdvanced(property, false);
+                                    }
+                                  }}
+                                  onFocus={() =>
+                                    onFocusProperty(property.getName())
+                                  }
+                                  fullWidth
+                                >
+                                  <SelectOption
+                                    key="visibility-visible"
+                                    value="Visible"
+                                    label={t`Visible in editor`}
+                                  />
+                                  <SelectOption
+                                    key="visibility-advanced"
+                                    value="Advanced"
+                                    label={t`Advanced`}
+                                  />
+                                  <SelectOption
+                                    key="visibility-deprecated"
+                                    value="Deprecated"
+                                    label={t`Deprecated`}
+                                  />
+                                  <SelectOption
+                                    key="visibility-hidden"
+                                    value="Hidden"
+                                    label={t`Hidden`}
+                                  />
+                                </SelectField>
+                              </Line>
+                            </ResponsiveLineStackLayout>
+                          </Column>
                         </div>
                         <Line expand>
                           <ColumnStackLayout expand>

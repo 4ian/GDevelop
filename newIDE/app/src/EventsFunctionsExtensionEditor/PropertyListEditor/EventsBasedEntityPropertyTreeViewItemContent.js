@@ -15,6 +15,9 @@ import { TreeViewItemContent, type TreeItemProps, scenesRootFolderId } from '.';
 import Tooltip from '@material-ui/core/Tooltip';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import VisibilityOffIcon from '../../UI/CustomSvgIcons/VisibilityOff';
+import { renderQuickCustomizationMenuItems } from '../../QuickCustomization/QuickCustomizationMenuItems';
+
+const gd: libGDevelop = global.gd;
 
 const PROPERTIES_CLIPBOARD_KIND = 'Properties';
 
@@ -24,13 +27,20 @@ const styles = {
 
 export type EventsBasedEntityPropertyTreeViewItemProps = {|
   ...TreeItemProps,
+  project: gdProject,
+  extension: gdEventsFunctionsExtension,
+  eventsBasedEntity: gdAbstractEventsBasedEntity,
+  eventsBasedBehavior: ?gdEventsBasedBehavior,
+  eventsBasedObject: ?gdEventsBasedObject,
   properties: gdPropertiesContainer,
+  isSceneProperties: boolean,
   onOpenProperty: (name: string) => void,
   onRenameProperty: (newName: string, oldName: string) => void,
   showPropertyOverridingConfirmation: (
     existingPropertyNames: string[]
   ) => Promise<boolean>,
   onPropertiesUpdated: () => void,
+  onEventsFunctionsAdded: () => void,
 |};
 
 export const getEventsBasedEntityPropertyTreeViewItemId = (
@@ -144,6 +154,52 @@ export class EventsBasedEntityPropertyTreeViewItemContent
         label: i18n._(t`Duplicate`),
         click: () => this._duplicate(),
       },
+      {
+        type: 'separator',
+      },
+      {
+        label: i18n._(t`Generate expression and action`),
+        click: () => {
+          const {
+            project,
+            extension,
+            eventsBasedBehavior,
+            eventsBasedObject,
+            isSceneProperties,
+            onEventsFunctionsAdded,
+          } = this.props;
+          if (eventsBasedBehavior) {
+            gd.PropertyFunctionGenerator.generateBehaviorGetterAndSetter(
+              project,
+              extension,
+              eventsBasedBehavior,
+              this.property,
+              isSceneProperties
+            );
+          } else if (eventsBasedObject) {
+            gd.PropertyFunctionGenerator.generateObjectGetterAndSetter(
+              project,
+              extension,
+              eventsBasedObject,
+              this.property
+            );
+          }
+          onEventsFunctionsAdded();
+        },
+        enabled: gd.PropertyFunctionGenerator.canGenerateGetterAndSetter(
+          this.props.eventsBasedEntity,
+          this.property
+        ),
+      },
+      ...renderQuickCustomizationMenuItems({
+        i18n,
+        visibility: this.property.getQuickCustomizationVisibility(),
+        onChangeVisibility: visibility => {
+          this.property.setQuickCustomizationVisibility(visibility);
+          this.props.forceUpdate();
+          this.props.onPropertiesUpdated();
+        },
+      }),
     ];
   }
 

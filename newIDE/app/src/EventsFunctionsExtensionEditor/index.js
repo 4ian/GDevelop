@@ -1433,6 +1433,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 ) : selectedEventsBasedObject || selectedEventsBasedBehavior ? (
                   <PropertyListEditor
                     ref={ref => (this.propertyListEditor = ref)}
+                    project={project}
+                    extension={eventsFunctionsExtension}
                     eventsBasedBehavior={selectedEventsBasedBehavior}
                     eventsBasedObject={selectedEventsBasedObject}
                     onPropertiesUpdated={() => {
@@ -1460,6 +1462,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                         this.eventsBasedBehaviorEditorPanel.scrollToProperty(
                           propertyName
                         );
+                      }
+                    }}
+                    onEventsFunctionsAdded={() => {
+                      if (this.eventsFunctionList) {
+                        this.eventsFunctionList.forceUpdateList();
                       }
                     }}
                   />

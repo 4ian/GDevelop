@@ -373,21 +373,27 @@ export type PropertyListEditorInterface = {|
 |};
 
 type Props = {|
+  project: gdProject,
+  extension: gdEventsFunctionsExtension,
   eventsBasedBehavior: ?gdEventsBasedBehavior,
   eventsBasedObject: ?gdEventsBasedObject,
   onPropertiesUpdated: () => void,
   onRenameProperty: (oldName: string, newName: string) => void,
   onOpenProperty: (name: string) => void,
+  onEventsFunctionsAdded: () => void,
 |};
 
 const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
   (
     {
+      project,
+      extension,
       eventsBasedBehavior,
       eventsBasedObject,
       onPropertiesUpdated,
       onRenameProperty,
       onOpenProperty,
+      onEventsFunctionsAdded,
     },
     ref
   ) => {
@@ -453,7 +459,7 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
       [isMobile]
     );
 
-    const addNewScene = React.useCallback(
+    const addProperty = React.useCallback(
       (index: number, i18n: I18nType) => {
         if (!properties) return;
 
@@ -548,7 +554,7 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
 
     const propertiesTreeViewItemProps = React.useMemo<?EventsBasedEntityPropertyTreeViewItemProps>(
       () =>
-        properties
+        properties && eventsBasedEntity
           ? {
               unsavedChanges,
               preferences,
@@ -559,13 +565,22 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
               showPropertyOverridingConfirmation,
               editName,
               scrollToItem,
+              project,
+              extension,
+              eventsBasedEntity,
+              eventsBasedBehavior,
+              eventsBasedObject,
               properties,
+              isSceneProperties: false,
               onOpenProperty,
               onPropertiesUpdated,
               onRenameProperty,
+              onEventsFunctionsAdded,
             }
           : null,
       [
+        properties,
+        eventsBasedEntity,
         unsavedChanges,
         preferences,
         gdevelopTheme,
@@ -575,10 +590,14 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
         showPropertyOverridingConfirmation,
         editName,
         scrollToItem,
-        properties,
+        project,
+        extension,
+        eventsBasedBehavior,
+        eventsBasedObject,
         onOpenProperty,
         onPropertiesUpdated,
         onRenameProperty,
+        onEventsFunctionsAdded,
       ]
     );
 
@@ -620,9 +639,7 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
                     icon: <Add />,
                     label: i18n._(t`Add a property`),
                     click: () => {
-                      // TODO Add after selected scene?
-                      const index = properties.getCount() - 1;
-                      addNewScene(index, i18n);
+                      addProperty(0, i18n);
                     },
                     id: 'add-property',
                   }
@@ -643,7 +660,7 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
               },
             ];
       },
-      [addNewScene, createPropertyItem, properties, propertiesTreeViewItemProps]
+      [addProperty, createPropertyItem, properties, propertiesTreeViewItemProps]
     );
 
     React.useImperativeHandle(ref, () => ({

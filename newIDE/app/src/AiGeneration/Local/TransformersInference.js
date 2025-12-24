@@ -72,7 +72,11 @@ const loadTransformersFromCDN = (): Promise<void> => {
       reject(new Error('Failed to load transformers.js from CDN'));
     };
     
-    document.head.appendChild(script);
+    if (document.head) {
+      document.head.appendChild(script);
+    } else {
+      reject(new Error('document.head is not available'));
+    }
   });
 };
 
@@ -104,6 +108,12 @@ class TextGenerationPipeline {
       }
 
       console.log(`Loading model from: ${modelPath}`);
+      
+      // Ensure transformers module is loaded
+      if (!transformersModule) {
+        console.error('Transformers module not initialized');
+        return false;
+      }
       
       // Initialize pipeline with WebGPU if available
       const device = await this.getBestDevice();
@@ -140,8 +150,10 @@ class TextGenerationPipeline {
 
   async getBestDevice(): Promise<string> {
     // Check for WebGPU support
+    // $FlowFixMe - navigator.gpu is not in Flow's Navigator type
     if (navigator.gpu) {
       try {
+        // $FlowFixMe - navigator.gpu is not in Flow's Navigator type
         const adapter = await navigator.gpu.requestAdapter();
         if (adapter) {
           console.log('WebGPU available, using GPU acceleration');
@@ -159,13 +171,14 @@ class TextGenerationPipeline {
 
   async generate(
     prompt: string,
-    options: {|
+    options?: {|
       maxTokens?: number,
       temperature?: number,
       topP?: number,
       onToken?: (token: string) => void,
-    |} = {}
+    |}
   ): Promise<?string> {
+    const opts = options || {};
     if (!this.model || !this.tokenizer) {
       console.error('Model not loaded');
       return null;
@@ -177,7 +190,7 @@ class TextGenerationPipeline {
         temperature = 0.7,
         topP = 0.9,
         onToken,
-      } = options;
+      } = opts;
 
       // Tokenize input
       const inputs = await this.tokenizer(prompt, { return_tensors: 'pt' });
@@ -224,6 +237,11 @@ class TextGenerationPipeline {
     |}
   ): Promise<?string> {
     const { maxTokens, temperature, topP, onToken } = options;
+    
+    if (!transformersModule) {
+      console.error('Transformers module not initialized');
+      return null;
+    }
     
     let fullText = '';
     
@@ -299,12 +317,12 @@ export const loadModel = async (
 export const generateText = async (
   modelId: string,
   prompt: string,
-  options: {|
+  options?: {|
     maxTokens?: number,
     temperature?: number,
     topP?: number,
     onToken?: (token: string) => void,
-  |} = {}
+  |}
 ): Promise<?string> => {
   const pipeline = modelCache.get(modelId);
   
@@ -339,9 +357,12 @@ export const isTransformersAvailable = async (): Promise<boolean> => {
  * Get memory usage estimate
  */
 export const getMemoryUsage = (): {| used: number, total: number |} => {
+  // $FlowFixMe - performance.memory is not in Flow's Performance type
   if (performance.memory) {
     return {
+      // $FlowFixMe - performance.memory is not in Flow's Performance type
       used: performance.memory.usedJSHeapSize / (1024 * 1024 * 1024), // GB
+      // $FlowFixMe - performance.memory is not in Flow's Performance type
       total: performance.memory.totalJSHeapSize / (1024 * 1024 * 1024), // GB
     };
   }
@@ -353,9 +374,11 @@ export const getMemoryUsage = (): {| used: number, total: number |} => {
  * Check WebGPU availability
  */
 export const isWebGPUAvailable = async (): Promise<boolean> => {
+  // $FlowFixMe - navigator.gpu is not in Flow's Navigator type
   if (!navigator.gpu) return false;
   
   try {
+    // $FlowFixMe - navigator.gpu is not in Flow's Navigator type
     const adapter = await navigator.gpu.requestAdapter();
     return !!adapter;
   } catch (e) {

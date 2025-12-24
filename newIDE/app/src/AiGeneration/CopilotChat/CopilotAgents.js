@@ -148,17 +148,18 @@ const bugDetectionAgent: CopilotAgent = {
     // Analyze code for common issues
     const issues: Array<string> = [];
     
-    if (context.selectedCode) {
+    const selectedCode = context.selectedCode;
+    if (selectedCode) {
       // Simple pattern matching for common issues
-      if (context.selectedCode.includes('==') && !context.selectedCode.includes('===')) {
+      if (selectedCode.includes('==') && !selectedCode.includes('===')) {
         issues.push('Consider using === instead of == for strict equality');
       }
       
-      if (context.selectedCode.includes('var ')) {
+      if (selectedCode.includes('var ')) {
         issues.push('Consider using const or let instead of var');
       }
       
-      if (context.selectedCode.match(/catch\s*\(\s*\w+\s*\)\s*\{\s*\}/)) {
+      if (selectedCode.match(/catch\s*\(\s*\w+\s*\)\s*\{\s*\}/)) {
         issues.push('Empty catch block - consider adding error handling');
       }
     }

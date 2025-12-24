@@ -93,7 +93,7 @@ const CopilotChatPanel = ({ onSuggestionApply, editorContext }: Props) => {
       const request = conversationManager.buildContextualRequest(
         activeThread.id,
         prompt,
-        command,
+        command || undefined,
         editorContext
       );
 
@@ -161,12 +161,15 @@ const CopilotChatPanel = ({ onSuggestionApply, editorContext }: Props) => {
             </Text>
             
             {message.suggestions && message.suggestions.length > 0 && (
-              <Column noMargin style={{ marginTop: 8 }}>
-                {message.suggestions.map((suggestion, idx) => (
+              <div style={{ marginTop: 8 }}>
+                <Column noMargin>
+                  {message.suggestions.map((suggestion, idx) => (
                   <Paper key={idx} background="dark" style={{ padding: 8, marginTop: 4 }}>
-                    <Text size="body-small" style={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}>
-                      {suggestion.code}
-                    </Text>
+                    <div style={{ fontFamily: 'monospace' }}>
+                      <Text size="body-small" style={{ whiteSpace: 'pre-wrap' }}>
+                        {suggestion.code}
+                      </Text>
+                    </div>
                     <Line justifyContent="space-between" alignItems="center">
                       <Text size="body-small" color="secondary">
                         {suggestion.description}
@@ -180,6 +183,7 @@ const CopilotChatPanel = ({ onSuggestionApply, editorContext }: Props) => {
                   </Paper>
                 ))}
               </Column>
+              </div>
             )}
             
             <Text size="body-small" color="secondary">
@@ -224,9 +228,7 @@ const CopilotChatPanel = ({ onSuggestionApply, editorContext }: Props) => {
           </Line>
 
           {/* Messages */}
-          <Column
-            expand
-            noMargin
+          <div
             style={{
               overflowY: 'auto',
               padding: 8,
@@ -234,9 +236,11 @@ const CopilotChatPanel = ({ onSuggestionApply, editorContext }: Props) => {
               maxHeight: 500,
             }}
           >
-            {activeThread?.messages.map(renderMessage)}
-            <div ref={messagesEndRef} />
-          </Column>
+            <Column expand noMargin>
+              {activeThread?.messages.map(renderMessage)}
+              <div ref={messagesEndRef} />
+            </Column>
+          </div>
 
           {/* Input */}
           <Line noMargin>
@@ -249,7 +253,7 @@ const CopilotChatPanel = ({ onSuggestionApply, editorContext }: Props) => {
                   handleSendMessage();
                 }
               }}
-              placeholder={i18n._(
+              hintText={i18n._(
                 t`Ask Copilot... (use /command for specific actions)`
               )}
               fullWidth

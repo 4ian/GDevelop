@@ -13,19 +13,28 @@ export {
   getAllSprites,
   convertCostume,
   convertSound,
-  type ScratchSprite,
-  type ScratchProject,
+} from './ScratchParser';
+
+export type {
+  ScratchSprite,
+  ScratchProject,
 } from './ScratchParser';
 
 export {
   convertScratchBlocks,
   getTopLevelBlocks,
-  type ConvertedEvent,
+} from './BlockConverter';
+
+export type {
+  ConvertedEvent,
 } from './BlockConverter';
 
 export {
   convertScratchToGDevelop,
   exportGDevelopProjectJSON,
   validateScratchFile,
-  type GDevelopProject,
+} from './ScratchConverter';
+
+export type {
+  GDevelopProject,
 } from './ScratchConverter';

@@ -27,3 +27,4 @@
 [options]
 module.ignore_non_literal_requires=true
 sharedmemory.hash_table_pow=22
+esproposal.optional_chaining=enable

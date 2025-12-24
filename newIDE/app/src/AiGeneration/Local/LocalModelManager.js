@@ -138,10 +138,13 @@ export const deleteModel = async (
         const stat = fs.statSync(filePath);
         if (stat.isDirectory()) {
           // Use recursive option for better compatibility
+          // $FlowFixMe - rmSync not in Flow's fs type
           if (fs.rmSync) {
+            // $FlowFixMe - rmSync not in Flow's fs type
             fs.rmSync(filePath, { recursive: true, force: true });
           } else {
             // Fallback for older Node versions
+            // $FlowFixMe - rmdirSync recursive option not in Flow's fs type
             fs.rmdirSync(filePath, { recursive: true });
           }
         } else {

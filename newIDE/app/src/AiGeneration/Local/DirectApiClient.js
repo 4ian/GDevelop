@@ -25,28 +25,29 @@ export type DirectApiResponse = {|
  */
 const callOpenAI = async (
   messages: Array<DirectApiMessage>,
-  options: {|
+  options?: {|
     model?: string,
     temperature?: number,
     maxTokens?: number,
-  |} = {}
+  |}
 ): Promise<DirectApiResponse> => {
   const apiKey = getApiKeyForProvider('openai');
   if (!apiKey) {
     return { success: false, error: 'OpenAI API key not configured' };
   }
 
+  const opts = options || {};
   try {
     const response = await axios.post(
       'https://api.openai.com/v1/chat/completions',
       {
-        model: options.model || 'gpt-4',
+        model: opts.model || 'gpt-4',
         messages: messages.map(msg => ({
           role: msg.role,
           content: msg.content,
         })),
-        temperature: options.temperature ?? 0.7,
-        max_tokens: options.maxTokens ?? 2000,
+        temperature: opts.temperature ?? 0.7,
+        max_tokens: opts.maxTokens ?? 2000,
       },
       {
         headers: {
@@ -81,17 +82,18 @@ const callOpenAI = async (
  */
 const callAnthropic = async (
   messages: Array<DirectApiMessage>,
-  options: {|
+  options?: {|
     model?: string,
     temperature?: number,
     maxTokens?: number,
-  |} = {}
+  |}
 ): Promise<DirectApiResponse> => {
   const apiKey = getApiKeyForProvider('anthropic');
   if (!apiKey) {
     return { success: false, error: 'Anthropic API key not configured' };
   }
 
+  const opts = options || {};
   try {
     // Anthropic requires system messages to be separate
     const systemMessage = messages.find(m => m.role === 'system');
@@ -100,14 +102,14 @@ const callAnthropic = async (
     const response = await axios.post(
       'https://api.anthropic.com/v1/messages',
       {
-        model: options.model || 'claude-3-opus-20240229',
+        model: opts.model || 'claude-3-opus-20240229',
         messages: userMessages.map(msg => ({
           role: msg.role,
           content: msg.content,
         })),
         system: systemMessage?.content,
-        temperature: options.temperature ?? 0.7,
-        max_tokens: options.maxTokens ?? 2000,
+        temperature: opts.temperature ?? 0.7,
+        max_tokens: opts.maxTokens ?? 2000,
       },
       {
         headers: {
@@ -143,19 +145,20 @@ const callAnthropic = async (
  */
 const callGoogleAI = async (
   messages: Array<DirectApiMessage>,
-  options: {|
+  options?: {|
     model?: string,
     temperature?: number,
     maxTokens?: number,
-  |} = {}
+  |}
 ): Promise<DirectApiResponse> => {
   const apiKey = getApiKeyForProvider('google');
   if (!apiKey) {
     return { success: false, error: 'Google AI API key not configured' };
   }
 
+  const opts = options || {};
   try {
-    const model = options.model || 'gemini-pro';
+    const model = opts.model || 'gemini-pro';
     
     // Convert messages to Gemini format
     const contents = messages
@@ -170,8 +173,8 @@ const callGoogleAI = async (
       {
         contents,
         generationConfig: {
-          temperature: options.temperature ?? 0.7,
-          maxOutputTokens: options.maxTokens ?? 2000,
+          temperature: opts.temperature ?? 0.7,
+          maxOutputTokens: opts.maxTokens ?? 2000,
         },
       },
       {
@@ -206,19 +209,20 @@ const callGoogleAI = async (
  */
 const callHuggingFace = async (
   messages: Array<DirectApiMessage>,
-  options: {|
+  options?: {|
     model?: string,
     temperature?: number,
     maxTokens?: number,
-  |} = {}
+  |}
 ): Promise<DirectApiResponse> => {
   const apiKey = getApiKeyForProvider('huggingface');
   if (!apiKey) {
     return { success: false, error: 'HuggingFace API key not configured' };
   }
 
+  const opts = options || {};
   try {
-    const model = options.model || 'meta-llama/Llama-2-70b-chat-hf';
+    const model = opts.model || 'meta-llama/Llama-2-70b-chat-hf';
     
     // Combine messages into a single prompt
     const prompt = messages.map(m => `${m.role}: ${m.content}`).join('\n\n');
@@ -228,8 +232,8 @@ const callHuggingFace = async (
       {
         inputs: prompt,
         parameters: {
-          temperature: options.temperature ?? 0.7,
-          max_new_tokens: options.maxTokens ?? 2000,
+          temperature: opts.temperature ?? 0.7,
+          max_new_tokens: opts.maxTokens ?? 2000,
           return_full_text: false,
         },
       },
@@ -265,14 +269,15 @@ const callHuggingFace = async (
  */
 export const makeDirectApiCall = async (
   messages: Array<DirectApiMessage>,
-  options: {|
+  options?: {|
     provider?: 'openai' | 'anthropic' | 'google' | 'huggingface',
     model?: string,
     temperature?: number,
     maxTokens?: number,
-  |} = {}
+  |}
 ): Promise<DirectApiResponse> => {
-  const provider = options.provider || getFirstAvailableProvider();
+  const opts = options || {};
+  const provider = opts.provider || getFirstAvailableProvider();
   
   if (!provider) {
     return {
@@ -281,15 +286,18 @@ export const makeDirectApiCall = async (
     };
   }
 
+  // Extract options without provider for passing to call functions
+  const {provider: _, ...callOpts} = opts;
+
   switch (provider) {
     case 'openai':
-      return callOpenAI(messages, options);
+      return callOpenAI(messages, callOpts);
     case 'anthropic':
-      return callAnthropic(messages, options);
+      return callAnthropic(messages, callOpts);
     case 'google':
-      return callGoogleAI(messages, options);
+      return callGoogleAI(messages, callOpts);
     case 'huggingface':
-      return callHuggingFace(messages, options);
+      return callHuggingFace(messages, callOpts);
     default:
       return { success: false, error: `Unknown provider: ${provider}` };
   }

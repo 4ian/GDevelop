@@ -181,16 +181,16 @@ class ConversationManager {
     threadId: string,
     prompt: string,
     command?: string,
-    additionalContext?: Partial<AgentContext>
+    additionalContext?: $Shape<AgentContext>
   ): AgentRequest {
     const thread = this.threads.get(threadId);
     const history = this.getConversationHistory(threadId, 5);
     
     // Merge thread context with additional context
-    const context: AgentContext = {
+    const context: AgentContext = ({
       ...(thread?.context || {}),
       ...(additionalContext || {}),
-    };
+    }: any);
     
     // Extract variables from context
     const variables = {};

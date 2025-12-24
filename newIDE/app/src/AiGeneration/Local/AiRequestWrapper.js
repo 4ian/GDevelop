@@ -63,15 +63,6 @@ export const createAiRequestWithCustomKeys = async (
   return gdCreateAiRequest(getAuthorizationHeader, params);
 };
 
-  if (isUsingCustomKeys && !isLocal) {
-    // Use direct API call with custom keys
-    return createDirectAiRequest(params);
-  }
-
-  // Use GDevelop's backend (default)
-  return gdCreateAiRequest(getAuthorizationHeader, params);
-};
-
 /**
  * Add message to AI request - routes to GDevelop backend, direct API, or local inference
  */

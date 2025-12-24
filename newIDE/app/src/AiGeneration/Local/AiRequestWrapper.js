@@ -63,15 +63,6 @@ export const createAiRequestWithCustomKeys = async (
   return gdCreateAiRequest(getAuthorizationHeader, params);
 };
 
-  if (isUsingCustomKeys && !isLocal) {
-    // Use direct API call with custom keys
-    return createDirectAiRequest(params);
-  }
-
-  // Use GDevelop's backend (default)
-  return gdCreateAiRequest(getAuthorizationHeader, params);
-};
-
 /**
  * Add message to AI request - routes to GDevelop backend, direct API, or local inference
  */
@@ -118,7 +109,8 @@ const createDirectAiRequest = async (params: any): Promise<AiRequest> => {
   const messages: Array<DirectApiMessage> = [
     {
       role: 'system',
-      content: 'You are a helpful AI assistant for game development with GDevelop.',
+      content:
+        'You are a helpful AI assistant for game development with GDevelop.',
     },
     {
       role: 'user',
@@ -186,18 +178,21 @@ const createDirectAiRequest = async (params: any): Promise<AiRequest> => {
 const createLocalAiRequest = async (params: any): Promise<AiRequest> => {
   // Extract model ID from preset
   const modelId = params.aiConfiguration.presetId.replace('local-', '');
-  
-  const systemPrompt = 'You are a helpful AI assistant for game development with GDevelop.';
-  const fullPrompt = `${systemPrompt}\n\nUser: ${params.userRequest}\n\nAssistant:`;
-  
+
+  const systemPrompt =
+    'You are a helpful AI assistant for game development with GDevelop.';
+  const fullPrompt = `${systemPrompt}\n\nUser: ${
+    params.userRequest
+  }\n\nAssistant:`;
+
   const startTime = Date.now();
-  
+
   const response = await runLocalInference({
     modelId,
     prompt: fullPrompt,
     temperature: 0.7,
     maxTokens: 2000,
-    onProgress: (text) => {
+    onProgress: text => {
       console.log('Inference progress:', text);
     },
   });

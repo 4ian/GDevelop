@@ -2,9 +2,7 @@
 import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import { AiRequestChat, type AiRequestChatInterface } from './AiRequestChat';
-import {
-  type AiRequest,
-} from '../Utils/GDevelopServices/Generation';
+import { type AiRequest } from '../Utils/GDevelopServices/Generation';
 import {
   createAiRequestWithCustomKeys,
   addMessageToAiRequestWithCustomKeys,
@@ -280,20 +278,23 @@ export const AskAiStandAloneForm = ({
             projectSpecificExtensionsSummaryJson: null,
           });
 
-          const aiRequest = await createAiRequestWithCustomKeys(getAuthorizationHeader, {
-            userRequest: userRequest,
-            userId: profile.id,
-            ...preparedAiUserContent,
-            payWithCredits,
-            gameId: null, // No game associated when starting from the standalone form.
-            fileMetadata: null, // No file metadata when starting from the standalone form.
-            storageProviderName,
-            mode: aiRequestModeForForm,
-            toolsVersion: AI_AGENT_TOOLS_VERSION,
-            aiConfiguration: {
-              presetId: aiConfigurationPresetId,
-            },
-          });
+          const aiRequest = await createAiRequestWithCustomKeys(
+            getAuthorizationHeader,
+            {
+              userRequest: userRequest,
+              userId: profile.id,
+              ...preparedAiUserContent,
+              payWithCredits,
+              gameId: null, // No game associated when starting from the standalone form.
+              fileMetadata: null, // No file metadata when starting from the standalone form.
+              storageProviderName,
+              mode: aiRequestModeForForm,
+              toolsVersion: AI_AGENT_TOOLS_VERSION,
+              aiConfiguration: {
+                presetId: aiConfigurationPresetId,
+              },
+            }
+          );
 
           console.info('Successfully created a new AI request:', aiRequest);
           setSendingAiRequest(null, false);

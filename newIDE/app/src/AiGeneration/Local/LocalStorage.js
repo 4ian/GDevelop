@@ -6,6 +6,9 @@
 
 import { type ApiKeyConfig } from './CustomApiKeysDialog';
 
+// Re-export ApiKeyConfig type for convenience
+export type { ApiKeyConfig };
+
 const API_KEYS_STORAGE_KEY = 'gdevelop_custom_api_keys';
 const ACTIVE_LOCAL_MODEL_KEY = 'gdevelop_active_local_model';
 const USE_LOCAL_MODEL_KEY = 'gdevelop_use_local_model';
@@ -76,7 +79,7 @@ export const setActiveLocalModel = (modelId: string | null): void => {
  */
 export const getActiveLocalModel = (): string | null => {
   try {
-    return localStorage.getItem(ACTIVE_LOCAL_MODEL_KEY);
+    return localStorage.getItem(ACTIVE_LOCAL_MODEL_KEY) || null;
   } catch (error) {
     console.error('Failed to get active local model:', error);
     return null;

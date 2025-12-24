@@ -13,17 +13,23 @@ export {
   getAgentByCommand,
   getDefaultAgent,
   parseCommand,
-  type CopilotAgent,
-  type AgentRequest,
-  type AgentContext,
-  type AgentResponse,
-  type CodeSuggestion,
+} from './CopilotAgents';
+
+export type {
+  CopilotAgent,
+  AgentRequest,
+  AgentContext,
+  AgentResponse,
+  CodeSuggestion,
 } from './CopilotAgents';
 
 export {
   conversationManager,
   getCurrentEditorContext,
   updateContextWithEditor,
-  type ConversationMessage,
-  type ConversationThread,
+} from './ConversationManager';
+
+export type {
+  ConversationMessage,
+  ConversationThread,
 } from './ConversationManager';

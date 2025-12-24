@@ -34,19 +34,22 @@ const LocalModelDialog = ({ onClose, open }: Props) => {
   }>({});
   const [error, setError] = React.useState<?string>(null);
 
-  React.useEffect(() => {
-    // Check which models are already downloaded
-    const checkDownloadedModels = async () => {
-      const downloaded = {};
-      AVAILABLE_LOCAL_MODELS.forEach(model => {
-        downloaded[model.id] = isModelDownloaded(model.id);
-      });
-      setDownloadedModels(downloaded);
-    };
-    if (open) {
-      checkDownloadedModels();
-    }
-  }, [open]);
+  React.useEffect(
+    () => {
+      // Check which models are already downloaded
+      const checkDownloadedModels = async () => {
+        const downloaded = {};
+        AVAILABLE_LOCAL_MODELS.forEach(model => {
+          downloaded[model.id] = isModelDownloaded(model.id);
+        });
+        setDownloadedModels(downloaded);
+      };
+      if (open) {
+        checkDownloadedModels();
+      }
+    },
+    [open]
+  );
 
   const handleDownload = async (modelId: string) => {
     setDownloadingModels({ ...downloadingModels, [modelId]: true });
@@ -96,16 +99,12 @@ const LocalModelDialog = ({ onClose, open }: Props) => {
           <Column noMargin>
             <Text>
               <Trans>
-                Download AI models to run locally with unlimited requests.
-                Local models do not require internet connection and don't count
+                Download AI models to run locally with unlimited requests. Local
+                models do not require internet connection and don't count
                 against usage limits.
               </Trans>
             </Text>
-            {error && (
-              <AlertMessage kind="error">
-                {error}
-              </AlertMessage>
-            )}
+            {error && <AlertMessage kind="error">{error}</AlertMessage>}
             {AVAILABLE_LOCAL_MODELS.map((model: LocalModel) => {
               const isDownloading = downloadingModels[model.id];
               const isDownloaded = downloadedModels[model.id];
@@ -122,9 +121,7 @@ const LocalModelDialog = ({ onClose, open }: Props) => {
                     {isDownloading && (
                       <LinearProgress
                         value={progress}
-                        variant={
-                          progress > 0 ? 'determinate' : 'indeterminate'
-                        }
+                        variant={progress > 0 ? 'determinate' : 'indeterminate'}
                       />
                     )}
                   </Column>

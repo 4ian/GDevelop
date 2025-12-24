@@ -56,7 +56,11 @@ import CompactSelectField from '../../UI/CompactSelectField';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import LocalModelDialog from '../Local/LocalModelDialog';
 import CustomApiKeysDialog from '../Local/CustomApiKeysDialog';
-import { saveApiKeys, loadApiKeys, type ApiKeyConfig } from '../Local/LocalStorage';
+import {
+  saveApiKeys,
+  loadApiKeys,
+  type ApiKeyConfig,
+} from '../Local/LocalStorage';
 
 const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 15;
 const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 20;
@@ -116,7 +120,7 @@ const getPriceAndRequestsTextAndTooltip = ({
       </LineStackLayout>
     );
   }
-  
+
   if (!quota || !price) {
     // Placeholder to avoid layout shift.
     return <div style={{ height: 29 }} />;
@@ -388,8 +392,14 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       aiConfigurationPresetId,
       setAiConfigurationPresetId,
     ] = React.useState<string | null>(null);
-    const [isLocalModelDialogOpen, setIsLocalModelDialogOpen] = React.useState<boolean>(false);
-    const [isCustomApiKeysDialogOpen, setIsCustomApiKeysDialogOpen] = React.useState<boolean>(false);
+    const [
+      isLocalModelDialogOpen,
+      setIsLocalModelDialogOpen,
+    ] = React.useState<boolean>(false);
+    const [
+      isCustomApiKeysDialogOpen,
+      setIsCustomApiKeysDialogOpen,
+    ] = React.useState<boolean>(false);
 
     React.useEffect(
       () => {
@@ -530,7 +540,9 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       );
 
     // Check if using a local model (which has unlimited requests)
-    const isUsingLocalModel = isLocalModelPreset(chosenOrDefaultAiConfigurationPresetId);
+    const isUsingLocalModel = isLocalModelPreset(
+      chosenOrDefaultAiConfigurationPresetId
+    );
 
     const priceAndRequestsText = getPriceAndRequestsTextAndTooltip({
       quota,
@@ -567,7 +579,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
 
     const doesNotHaveEnoughCreditsToContinue =
       !!price && availableCredits < price.priceInCredits;
-    
+
     const cannotContinue =
       !isUsingLocalModel && // Local models have unlimited requests
       !!quota &&

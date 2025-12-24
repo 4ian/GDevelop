@@ -35,12 +35,12 @@ jobs:
 
       # Only upload on Crowdin for the master branch
       - name: Install Crowdin CLI
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/master' && secrets.CROWDIN_PROJECT_ID != ''
         run: npm i -g @crowdin/cli
 
       - name: Upload translations to Crowdin
         run: crowdin upload sources
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/master' && secrets.CROWDIN_PROJECT_ID != ''
         env:
           CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
           CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}

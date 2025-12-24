@@ -71,9 +71,7 @@ describe('LocalStorage', () => {
     });
 
     it('should clear all API keys', () => {
-      const apiKeys = [
-        { provider: 'openai', apiKey: 'sk-test123' },
-      ];
+      const apiKeys = [{ provider: 'openai', apiKey: 'sk-test123' }];
 
       saveApiKeys(apiKeys);
       expect(loadApiKeys()).toEqual(apiKeys);

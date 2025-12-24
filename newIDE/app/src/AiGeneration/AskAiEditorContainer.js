@@ -420,20 +420,23 @@ export const AskAiEditor = React.memo<Props>(
                 projectSpecificExtensionsSummaryJson,
               });
 
-              const aiRequest = await createAiRequestWithCustomKeys(getAuthorizationHeader, {
-                userRequest: userRequest,
-                userId: profile.id,
-                ...preparedAiUserContent,
-                payWithCredits,
-                gameId: project ? project.getProjectUuid() : null,
-                fileMetadata,
-                storageProviderName,
-                mode,
-                toolsVersion: AI_CHAT_TOOLS_VERSION,
-                aiConfiguration: {
-                  presetId: aiConfigurationPresetId,
-                },
-              });
+              const aiRequest = await createAiRequestWithCustomKeys(
+                getAuthorizationHeader,
+                {
+                  userRequest: userRequest,
+                  userId: profile.id,
+                  ...preparedAiUserContent,
+                  payWithCredits,
+                  gameId: project ? project.getProjectUuid() : null,
+                  fileMetadata,
+                  storageProviderName,
+                  mode,
+                  toolsVersion: AI_CHAT_TOOLS_VERSION,
+                  aiConfiguration: {
+                    presetId: aiConfigurationPresetId,
+                  },
+                }
+              );
 
               console.info('Successfully created a new AI request:', aiRequest);
               setSendingAiRequest(null, false);

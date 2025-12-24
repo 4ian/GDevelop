@@ -40,7 +40,7 @@ class ConversationManager {
     this.activeThreadId = null;
     this.maxThreads = 50;
     this.maxMessagesPerThread = 100;
-    
+
     this.loadFromStorage();
   }
 
@@ -48,8 +48,10 @@ class ConversationManager {
    * Create a new conversation thread
    */
   createThread(context: AgentContext, title?: string): string {
-    const threadId = `thread-${Date.now()}-${Math.random().toString(36).substring(7)}`;
-    
+    const threadId = `thread-${Date.now()}-${Math.random()
+      .toString(36)
+      .substring(7)}`;
+
     const thread: ConversationThread = {
       id: threadId,
       title: title || 'New Conversation',
@@ -58,15 +60,15 @@ class ConversationManager {
       updatedAt: Date.now(),
       context,
     };
-    
+
     this.threads.set(threadId, thread);
     this.activeThreadId = threadId;
-    
+
     // Cleanup old threads if exceeding limit
     if (this.threads.size > this.maxThreads) {
       this.cleanupOldThreads();
     }
-    
+
     this.saveToStorage();
     return threadId;
   }
@@ -85,7 +87,9 @@ class ConversationManager {
     if (!thread) return;
 
     const message: ConversationMessage = {
-      id: `msg-${Date.now()}-${Math.random().toString(36).substring(7)}`,
+      id: `msg-${Date.now()}-${Math.random()
+        .toString(36)
+        .substring(7)}`,
       role,
       content,
       timestamp: Date.now(),
@@ -98,7 +102,8 @@ class ConversationManager {
 
     // Update thread title from first user message
     if (thread.messages.length === 1 && role === 'user') {
-      thread.title = content.substring(0, 50) + (content.length > 50 ? '...' : '');
+      thread.title =
+        content.substring(0, 50) + (content.length > 50 ? '...' : '');
     }
 
     // Cleanup old messages if exceeding limit
@@ -138,7 +143,9 @@ class ConversationManager {
    * Get all threads
    */
   getAllThreads(): Array<ConversationThread> {
-    return Array.from(this.threads.values()).sort((a, b) => b.updatedAt - a.updatedAt);
+    return Array.from(this.threads.values()).sort(
+      (a, b) => b.updatedAt - a.updatedAt
+    );
   }
 
   /**
@@ -146,12 +153,12 @@ class ConversationManager {
    */
   deleteThread(threadId: string): void {
     this.threads.delete(threadId);
-    
+
     if (this.activeThreadId === threadId) {
       const remaining = this.getAllThreads();
       this.activeThreadId = remaining.length > 0 ? remaining[0].id : null;
     }
-    
+
     this.saveToStorage();
   }
 
@@ -167,10 +174,13 @@ class ConversationManager {
   /**
    * Get conversation history for context
    */
-  getConversationHistory(threadId: string, limit: number = 10): Array<ConversationMessage> {
+  getConversationHistory(
+    threadId: string,
+    limit: number = 10
+  ): Array<ConversationMessage> {
     const thread = this.threads.get(threadId);
     if (!thread) return [];
-    
+
     return thread.messages.slice(-limit);
   }
 
@@ -181,28 +191,33 @@ class ConversationManager {
     threadId: string,
     prompt: string,
     command?: string,
-    additionalContext?: Partial<AgentContext>
+    additionalContext?: $Shape<AgentContext>
   ): AgentRequest {
     const thread = this.threads.get(threadId);
     const history = this.getConversationHistory(threadId, 5);
-    
+
     // Merge thread context with additional context
-    const context: AgentContext = {
-      ...(thread?.context || {}),
-      ...(additionalContext || {}),
-    };
-    
+    const baseContext = thread?.context;
+    const extraContext = additionalContext;
+
+    // Build context by merging (suppress exponential spread warning)
+    const context: AgentContext = (Object.assign(
+      {},
+      baseContext,
+      extraContext
+    ): any);
+
     // Extract variables from context
     const variables = {};
-    
+
     if (context.selectedCode) {
       variables.selectedCode = context.selectedCode;
     }
-    
+
     if (context.currentFile) {
       variables.currentFile = context.currentFile;
     }
-    
+
     // Add conversation history as context
     if (history.length > 0) {
       variables.previousMessages = history.map(m => ({
@@ -210,7 +225,7 @@ class ConversationManager {
         content: m.content,
       }));
     }
-    
+
     return {
       prompt,
       command,
@@ -224,10 +239,10 @@ class ConversationManager {
    */
   cleanupOldThreads(): void {
     const threads = this.getAllThreads();
-    
+
     // Keep only the most recent threads
     const toDelete = threads.slice(this.maxThreads);
-    
+
     toDelete.forEach(thread => {
       this.threads.delete(thread.id);
     });
@@ -242,7 +257,7 @@ class ConversationManager {
         threads: Array.from(this.threads.entries()),
         activeThreadId: this.activeThreadId,
       };
-      
+
       localStorage.setItem('copilot-conversations', JSON.stringify(data));
     } catch (error) {
       console.error('Failed to save conversations:', error);
@@ -255,14 +270,14 @@ class ConversationManager {
   loadFromStorage(): void {
     try {
       const data = localStorage.getItem('copilot-conversations');
-      
+
       if (data) {
         const parsed = JSON.parse(data);
-        
+
         if (parsed.threads) {
           this.threads = new Map(parsed.threads);
         }
-        
+
         if (parsed.activeThreadId) {
           this.activeThreadId = parsed.activeThreadId;
         }
@@ -280,7 +295,7 @@ class ConversationManager {
       threads: this.getAllThreads(),
       exportedAt: Date.now(),
     };
-    
+
     return JSON.stringify(data, null, 2);
   }
 
@@ -290,16 +305,16 @@ class ConversationManager {
   importConversations(jsonData: string): boolean {
     try {
       const data = JSON.parse(jsonData);
-      
+
       if (data.threads && Array.isArray(data.threads)) {
         data.threads.forEach(thread => {
           this.threads.set(thread.id, thread);
         });
-        
+
         this.saveToStorage();
         return true;
       }
-      
+
       return false;
     } catch (error) {
       console.error('Failed to import conversations:', error);

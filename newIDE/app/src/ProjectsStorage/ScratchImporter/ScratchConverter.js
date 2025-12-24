@@ -42,10 +42,10 @@ export const convertScratchToGDevelop = async (
       console.error('Failed to parse Scratch project');
       return null;
     }
-    
+
     // Extract assets
     const assets = await extractScratchAssets(file, scratchProject);
-    
+
     // Create GDevelop project structure
     const gdProject: GDevelopProject = {
       name: 'Scratch Project Import',
@@ -55,19 +55,19 @@ export const convertScratchToGDevelop = async (
       resources: [],
       variables: [],
     };
-    
+
     // Convert stage (background)
     const stage = getStage(scratchProject);
     if (stage) {
       convertStageToScene(gdProject, stage, assets);
     }
-    
+
     // Convert sprites to objects
     const sprites = getAllSprites(scratchProject);
     for (const sprite of sprites) {
       convertSpriteToObject(gdProject, sprite, assets);
     }
-    
+
     console.log('Converted GDevelop project:', gdProject);
     return gdProject;
   } catch (error) {
@@ -102,14 +102,14 @@ const convertStageToScene = (
     ],
     behaviorsSharedData: [],
   };
-  
+
   // Convert stage blocks to events
   if (stage.blocks) {
     const topLevelBlocks = getTopLevelBlocks(stage.blocks);
     const events = convertScratchBlocks(stage.blocks, topLevelBlocks);
     scene.events = events;
   }
-  
+
   // Add background costumes as scene resources
   for (const costume of stage.costumes) {
     const gdCostume = convertCostume(costume);
@@ -120,7 +120,7 @@ const convertStageToScene = (
       metadata: '',
     });
   }
-  
+
   gdProject.scenes.push(scene);
 };
 
@@ -140,7 +140,7 @@ const convertSpriteToObject = (
     behaviors: [],
     animations: [],
   };
-  
+
   // Convert costumes to animations
   const animation = {
     name: 'Default',
@@ -151,7 +151,7 @@ const convertSpriteToObject = (
         timeBetweenFrames: 0.08,
         sprites: sprite.costumes.map(costume => {
           const gdCostume = convertCostume(costume);
-          
+
           // Add to resources
           gdProject.resources.push({
             kind: 'image',
@@ -159,7 +159,7 @@ const convertSpriteToObject = (
             file: gdCostume.imageUrl,
             metadata: '',
           });
-          
+
           return {
             hasCustomCollisionMask: false,
             image: gdCostume.name,
@@ -181,9 +181,9 @@ const convertSpriteToObject = (
       },
     ],
   };
-  
+
   gdObject.animations.push(animation);
-  
+
   // Add sounds to resources
   for (const sound of sprite.sounds) {
     const gdSound = convertSound(sound);
@@ -194,11 +194,15 @@ const convertSpriteToObject = (
       metadata: '',
     });
   }
-  
+
   gdProject.objects.push(gdObject);
-  
+
   // Add sprite instance to first scene if it exists
-  if (gdProject.scenes.length > 0 && sprite.x !== undefined && sprite.y !== undefined) {
+  if (
+    gdProject.scenes.length > 0 &&
+    sprite.x !== undefined &&
+    sprite.y !== undefined
+  ) {
     gdProject.scenes[0].instances.push({
       persistentUuid: '',
       name: sprite.name,
@@ -214,12 +218,12 @@ const convertSpriteToObject = (
       sealed: false,
     });
   }
-  
+
   // Convert sprite blocks to object events
   if (sprite.blocks) {
     const topLevelBlocks = getTopLevelBlocks(sprite.blocks);
     const events = convertScratchBlocks(sprite.blocks, topLevelBlocks);
-    
+
     // Add events to the scene with object-specific conditions
     if (gdProject.scenes.length > 0) {
       gdProject.scenes[0].events.push(...events);
@@ -230,11 +234,11 @@ const convertSpriteToObject = (
 /**
  * Convert Scratch variables to GDevelop variables
  */
-const convertVariables = (
-  scratchVars: { [key: string]: any }
-): Array<{| name: string, value: any |}> => {
+const convertVariables = (scratchVars: {
+  [key: string]: any,
+}): Array<{| name: string, value: any |}> => {
   const variables: Array<{| name: string, value: any |}> = [];
-  
+
   Object.keys(scratchVars).forEach(varId => {
     const varData = scratchVars[varId];
     variables.push({
@@ -242,7 +246,7 @@ const convertVariables = (
       value: varData[1], // Variable value
     });
   });
-  
+
   return variables;
 };
 
@@ -262,12 +266,12 @@ export const validateScratchFile = (file: File): boolean => {
     console.error('Invalid file type. Expected .sb3 or .sb2');
     return false;
   }
-  
+
   // Check file size (max 100MB)
   if (file.size > 100 * 1024 * 1024) {
     console.error('File too large. Maximum size is 100MB');
     return false;
   }
-  
+
   return true;
 };

@@ -3,7 +3,7 @@
  * Scratch Project Parser
  * Based on concepts from leopard-js (https://github.com/leopard-js/leopard)
  * Adapted for GDevelop's project structure
- * 
+ *
  * This parser reads Scratch .sb3 files and converts them to GDevelop-compatible format
  */
 
@@ -57,21 +57,23 @@ export type ScratchProject = {|
 /**
  * Parse a Scratch .sb3 file
  */
-export const parseScratchProject = async (file: File): Promise<?ScratchProject> => {
+export const parseScratchProject = async (
+  file: File
+): Promise<?ScratchProject> => {
   try {
     const zip = new JSZip();
     const contents = await zip.loadAsync(file);
-    
+
     // Read project.json
     const projectJsonFile = contents.file('project.json');
     if (!projectJsonFile) {
       console.error('project.json not found in Scratch file');
       return null;
     }
-    
+
     const projectJsonText = await projectJsonFile.async('text');
     const project: ScratchProject = JSON.parse(projectJsonText);
-    
+
     console.log('Parsed Scratch project:', project);
     return project;
   } catch (error) {
@@ -88,11 +90,11 @@ export const extractScratchAssets = async (
   project: ScratchProject
 ): Promise<Map<string, Blob>> => {
   const assets = new Map();
-  
+
   try {
     const zip = new JSZip();
     const contents = await zip.loadAsync(file);
-    
+
     // Extract all costume and sound files
     for (const target of project.targets) {
       // Extract costumes
@@ -103,7 +105,7 @@ export const extractScratchAssets = async (
           assets.set(costume.md5ext, blob);
         }
       }
-      
+
       // Extract sounds
       for (const sound of target.sounds) {
         const assetFile = contents.file(sound.md5ext);
@@ -113,7 +115,7 @@ export const extractScratchAssets = async (
         }
       }
     }
-    
+
     console.log(`Extracted ${assets.size} assets from Scratch project`);
     return assets;
   } catch (error) {
@@ -129,7 +131,9 @@ export const getSpriteByName = (
   project: ScratchProject,
   name: string
 ): ?ScratchSprite => {
-  return project.targets.find(target => target.name === name && !target.isStage);
+  return project.targets.find(
+    target => target.name === name && !target.isStage
+  );
 };
 
 /**
@@ -142,14 +146,18 @@ export const getStage = (project: ScratchProject): ?ScratchSprite => {
 /**
  * Get all sprites (excluding stage)
  */
-export const getAllSprites = (project: ScratchProject): Array<ScratchSprite> => {
+export const getAllSprites = (
+  project: ScratchProject
+): Array<ScratchSprite> => {
   return project.targets.filter(target => !target.isStage);
 };
 
 /**
  * Convert Scratch costume to GDevelop-compatible format
  */
-export const convertCostume = (costume: any): {|
+export const convertCostume = (
+  costume: any
+): {|
   name: string,
   imageUrl: string,
   centerX: number,
@@ -166,7 +174,9 @@ export const convertCostume = (costume: any): {|
 /**
  * Convert Scratch sound to GDevelop-compatible format
  */
-export const convertSound = (sound: any): {|
+export const convertSound = (
+  sound: any
+): {|
   name: string,
   soundUrl: string,
 |} => {

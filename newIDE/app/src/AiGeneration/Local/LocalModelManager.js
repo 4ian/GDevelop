@@ -48,7 +48,7 @@ const MODEL_BASE_PATH = (() => {
   }
   // In production, use a configurable path
   if (typeof process !== 'undefined' && process.env.NODE_ENV === 'production') {
-    return process.env.GDEVELOP_RESOURCES_PATH 
+    return process.env.GDEVELOP_RESOURCES_PATH
       ? `${process.env.GDEVELOP_RESOURCES_PATH}/AiGeneration/Local`
       : '/app/resources/AiGeneration/Local';
   }
@@ -64,12 +64,12 @@ export const isModelDownloaded = (modelId: string): boolean => {
     const fs = require('fs');
     const path = require('path');
     const modelPath = path.join(MODEL_BASE_PATH, modelId);
-    
+
     // Check if the model directory exists and has files beyond model_info.json
     if (!fs.existsSync(modelPath)) {
       return false;
     }
-    
+
     const files = fs.readdirSync(modelPath);
     // A downloaded model should have more than just model_info.json
     return files.length > 1 && files.some(f => f !== 'model_info.json');
@@ -90,10 +90,10 @@ export const downloadModel = async (
   try {
     const path = require('path');
     const downloadScript = path.join(__dirname, 'download_models.py');
-    
+
     // Find the model index
     const modelIndex = AVAILABLE_LOCAL_MODELS.findIndex(m => m.id === modelId);
-    
+
     if (modelIndex === -1) {
       return {
         success: false,
@@ -125,11 +125,11 @@ export const deleteModel = async (
     const fs = require('fs');
     const path = require('path');
     const modelPath = path.join(MODEL_BASE_PATH, modelId);
-    
+
     if (!fs.existsSync(modelPath)) {
       return { success: true }; // Already deleted
     }
-    
+
     // Remove the directory recursively (except model_info.json)
     const files = fs.readdirSync(modelPath);
     files.forEach(file => {
@@ -138,10 +138,13 @@ export const deleteModel = async (
         const stat = fs.statSync(filePath);
         if (stat.isDirectory()) {
           // Use recursive option for better compatibility
+          // $FlowFixMe - rmSync not in Flow's fs type
           if (fs.rmSync) {
+            // $FlowFixMe - rmSync not in Flow's fs type
             fs.rmSync(filePath, { recursive: true, force: true });
           } else {
             // Fallback for older Node versions
+            // $FlowFixMe - rmdirSync recursive option not in Flow's fs type
             fs.rmdirSync(filePath, { recursive: true });
           }
         } else {
@@ -149,7 +152,7 @@ export const deleteModel = async (
         }
       }
     });
-    
+
     return { success: true };
   } catch (error) {
     return {
@@ -165,20 +168,18 @@ export const deleteModel = async (
 export const getModelPath = (modelId: string): string | null => {
   const path = require('path');
   const modelPath = path.join(MODEL_BASE_PATH, modelId);
-  
+
   if (isModelDownloaded(modelId)) {
     return modelPath;
   }
-  
+
   return null;
 };
 
 /**
  * Check if the system has enough space for a model
  */
-export const hasEnoughSpace = async (
-  modelId: string
-): Promise<boolean> => {
+export const hasEnoughSpace = async (modelId: string): Promise<boolean> => {
   // TODO: Implement actual space check using disk utilities
   // This would check available disk space vs model size
   return true;

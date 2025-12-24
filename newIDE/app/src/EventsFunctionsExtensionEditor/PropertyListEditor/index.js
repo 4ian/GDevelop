@@ -369,6 +369,7 @@ export const usePropertyOverridingAlertDialog = () => {
 export type PropertyListEditorInterface = {|
   forceUpdateList: () => void,
   focusSearchBar: () => void,
+  setSelectedProperty: (propertyName: string) => void,
 |};
 
 type Props = {|
@@ -423,16 +424,6 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
     }, []);
 
     const searchBarRef = React.useRef<?SearchBarInterface>(null);
-
-    React.useImperativeHandle(ref, () => ({
-      forceUpdateList: () => {
-        forceUpdate();
-        if (treeViewRef.current) treeViewRef.current.forceUpdateList();
-      },
-      focusSearchBar: () => {
-        if (searchBarRef.current) searchBarRef.current.focus();
-      },
-    }));
 
     const onProjectItemModified = React.useCallback(
       () => {
@@ -591,6 +582,21 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
       ]
     );
 
+    const createPropertyItem = React.useCallback(
+      (property: gdNamedPropertyDescriptor) => {
+        if (!propertiesTreeViewItemProps) {
+          return null;
+        }
+        return new LeafTreeViewItem(
+          new EventsBasedEntityPropertyTreeViewItemContent(
+            property,
+            propertiesTreeViewItemProps
+          )
+        );
+      },
+      [propertiesTreeViewItemProps]
+    );
+
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
         return !properties || !propertiesTreeViewItemProps
@@ -630,23 +636,44 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
                       ),
                     ];
                   }
-                  return mapFor(
-                    0,
-                    properties.getCount(),
-                    i =>
-                      new LeafTreeViewItem(
-                        new EventsBasedEntityPropertyTreeViewItemContent(
-                          properties.getAt(i),
-                          propertiesTreeViewItemProps
-                        )
-                      )
-                  );
+                  return mapFor(0, properties.getCount(), i =>
+                    createPropertyItem(properties.getAt(i))
+                  ).filter(Boolean);
                 },
               },
             ];
       },
-      [addNewScene, properties, propertiesTreeViewItemProps]
+      [addNewScene, createPropertyItem, properties, propertiesTreeViewItemProps]
     );
+
+    React.useImperativeHandle(ref, () => ({
+      forceUpdateList: () => {
+        forceUpdate();
+        if (treeViewRef.current) treeViewRef.current.forceUpdateList();
+      },
+      focusSearchBar: () => {
+        if (searchBarRef.current) searchBarRef.current.focus();
+      },
+      setSelectedProperty: (propertyName: string) => {
+        if (!properties || !properties.has(propertyName)) {
+          return;
+        }
+        const property = properties.get(propertyName);
+        const propertyItemId = getEventsBasedEntityPropertyTreeViewItemId(
+          property
+        );
+        setSelectedItems(selectedItems => {
+          if (
+            selectedItems.length === 1 &&
+            selectedItems[0].content.getId() === propertyItemId
+          ) {
+            return selectedItems;
+          }
+          return [createPropertyItem(property)].filter(Boolean);
+        });
+        scrollToItem(propertyItemId);
+      },
+    }));
 
     const canMoveSelectionTo = React.useCallback(
       (destinationItem: TreeViewItem, where: 'before' | 'inside' | 'after') =>

@@ -46,7 +46,9 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import GlobalAndSceneVariablesDialog from '../VariablesList/GlobalAndSceneVariablesDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
-import PropertyListEditor from './PropertyListEditor';
+import PropertyListEditor, {
+  type PropertyListEditorInterface,
+} from './PropertyListEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -156,6 +158,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   editor: ?EventsSheetInterface;
   eventsFunctionList: ?EventsFunctionsListInterface;
   eventsBasedBehaviorEditorPanel: ?EventsBasedBehaviorEditorPanelInterface;
+  propertyListEditor: ?PropertyListEditorInterface;
   _editorMosaic: ?EditorMosaicInterface;
   _editorNavigator: ?EditorNavigatorInterface;
   // Create an empty "context" of objects.
@@ -1429,10 +1432,14 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   />
                 ) : selectedEventsBasedObject || selectedEventsBasedBehavior ? (
                   <PropertyListEditor
+                    ref={ref => (this.propertyListEditor = ref)}
                     eventsBasedBehavior={selectedEventsBasedBehavior}
                     eventsBasedObject={selectedEventsBasedObject}
-                    // TODO Force update the other view
-                    onPropertiesUpdated={() => {}}
+                    onPropertiesUpdated={() => {
+                      if (this.eventsBasedBehaviorEditorPanel) {
+                        this.eventsBasedBehaviorEditorPanel.forceUpdateProperties();
+                      }
+                    }}
                     onRenameProperty={(oldName, newName) => {
                       if (selectedEventsBasedBehavior) {
                         this._onBehaviorPropertyRenamed(
@@ -1554,6 +1561,16 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   selectedEventsBasedBehavior,
                   propertyName
                 );
+              }}
+              onPropertiesUpdated={() => {
+                if (this.propertyListEditor) {
+                  this.propertyListEditor.forceUpdateList();
+                }
+              }}
+              onFocusProperty={propertyName => {
+                if (this.propertyListEditor) {
+                  this.propertyListEditor.setSelectedProperty(propertyName);
+                }
               }}
               onEventsFunctionsAdded={() => {
                 if (this.eventsFunctionList) {

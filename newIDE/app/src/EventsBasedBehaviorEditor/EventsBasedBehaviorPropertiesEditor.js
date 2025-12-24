@@ -91,7 +91,8 @@ type Props = {|
   eventsBasedBehavior: gdEventsBasedBehavior,
   properties: gdPropertiesContainer,
   isSceneProperties?: boolean,
-  onPropertiesUpdated?: () => void,
+  onPropertiesUpdated: () => void,
+  onFocusProperty: (propertyName: string) => void,
   onRenameProperty: (oldName: string, newName: string) => void,
   onPropertyTypeChanged: (propertyName: string) => void,
   onEventsFunctionsAdded: () => void,
@@ -129,6 +130,7 @@ const getChoicesArray = (
 };
 
 export type EventsBasedBehaviorPropertiesEditorInterface = {|
+  forceUpdate: () => void,
   getPropertyEditorRef: (propertyName: string) => React.ElementRef<any>,
 |};
 
@@ -145,6 +147,7 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
       properties,
       isSceneProperties,
       onPropertiesUpdated,
+      onFocusProperty,
       onRenameProperty,
       onPropertyTypeChanged,
       onEventsFunctionsAdded,
@@ -152,8 +155,10 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
     }: Props,
     ref
   ) => {
+    const forceUpdate = useForceUpdate();
     const propertyRefs = React.useRef(new Map<string, React.ElementRef<any>>());
     React.useImperativeHandle(ref, () => ({
+      forceUpdate,
       getPropertyEditorRef: (propertyName: string) => {
         return propertyRefs ? propertyRefs.current.get(propertyName) : null;
       },
@@ -164,8 +169,6 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
     const showPropertyOverridingConfirmation = usePropertyOverridingAlertDialog();
-
-    const forceUpdate = useForceUpdate();
 
     const [searchText, setSearchText] = React.useState<string>('');
     const [
@@ -513,6 +516,9 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                     onPropertiesUpdated &&
                                       onPropertiesUpdated();
                                   }}
+                                  onFocus={() =>
+                                    onFocusProperty(property.getName())
+                                  }
                                   fullWidth
                                 />
                               </Line>
@@ -556,6 +562,9 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                     setAdvanced(property, false);
                                   }
                                 }}
+                                onFocus={() =>
+                                  onFocusProperty(property.getName())
+                                }
                                 fullWidth
                               >
                                 <SelectOption
@@ -640,6 +649,9 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                   onPropertyTypeChanged(property.getName());
                                   onPropertiesUpdated && onPropertiesUpdated();
                                 }}
+                                onFocus={() =>
+                                  onFocusProperty(property.getName())
+                                }
                                 fullWidth
                               >
                                 <SelectOption
@@ -713,6 +725,9 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                     onPropertiesUpdated &&
                                       onPropertiesUpdated();
                                   }}
+                                  onFocus={() =>
+                                    onFocusProperty(property.getName())
+                                  }
                                   fullWidth
                                 >
                                   {mapFor(
@@ -766,6 +781,9 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                     onPropertiesUpdated &&
                                       onPropertiesUpdated();
                                   }}
+                                  onFocus={() =>
+                                    onFocusProperty(property.getName())
+                                  }
                                   multiline={
                                     property.getType() === 'MultilineString'
                                   }
@@ -788,6 +806,9 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                     onPropertiesUpdated &&
                                       onPropertiesUpdated();
                                   }}
+                                  onFocus={() =>
+                                    onFocusProperty(property.getName())
+                                  }
                                   fullWidth
                                 >
                                   <SelectOption
@@ -838,6 +859,9 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                     onPropertiesUpdated &&
                                       onPropertiesUpdated();
                                   }}
+                                  onFocus={() =>
+                                    onFocusProperty(property.getName())
+                                  }
                                   disabled={false}
                                 />
                               )}
@@ -870,6 +894,9 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                     onPropertiesUpdated &&
                                       onPropertiesUpdated();
                                   }}
+                                  onFocus={() =>
+                                    onFocusProperty(property.getName())
+                                  }
                                   fullWidth
                                 />
                               )}
@@ -885,6 +912,9 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                     onPropertiesUpdated &&
                                       onPropertiesUpdated();
                                   }}
+                                  onFocus={() =>
+                                    onFocusProperty(property.getName())
+                                  }
                                   fullWidth
                                 >
                                   {getChoicesArray(property).map(
@@ -922,6 +952,9 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                   property.setLabel(text);
                                   forceUpdate();
                                 }}
+                                onFocus={() =>
+                                  onFocusProperty(property.getName())
+                                }
                                 fullWidth
                               />
                               <SemiControlledAutoComplete
@@ -934,6 +967,9 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                   forceUpdate();
                                   onPropertiesUpdated && onPropertiesUpdated();
                                 }}
+                                onFocus={() =>
+                                  onFocusProperty(property.getName())
+                                }
                                 dataSource={getPropertyGroupNames().map(
                                   name => ({
                                     text: name,
@@ -953,6 +989,9 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                 property.setDescription(text);
                                 forceUpdate();
                               }}
+                              onFocus={() =>
+                                onFocusProperty(property.getName())
+                              }
                               fullWidth
                             />
                           </ColumnStackLayout>

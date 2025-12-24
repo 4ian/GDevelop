@@ -55,6 +55,7 @@ type Props = {|
   id?: ?string,
   onBlur?: (event: SyntheticFocusEvent<HTMLInputElement>) => void,
   onClick?: (event: SyntheticPointerEvent<HTMLInputElement>) => void,
+  onFocus?: (event: SyntheticFocusEvent<HTMLInputElement>) => void,
   commitOnInputChange?: boolean,
   onRequestClose?: () => void,
   onApply?: () => void,
@@ -314,6 +315,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
               setInputValue(null);
               setIsMenuOpen(false);
             }}
+            onFocus={props.onFocus}
             open={isMenuOpen}
             style={{
               ...props.style,

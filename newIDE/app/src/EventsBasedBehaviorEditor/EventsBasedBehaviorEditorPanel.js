@@ -7,7 +7,6 @@ import {
   type EventsBasedBehaviorPropertiesEditorInterface,
 } from './EventsBasedBehaviorPropertiesEditor';
 import Background from '../UI/Background';
-import { Column, Line } from '../UI/Grid';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type ExtensionItemConfigurationAttribute } from '../EventsFunctionsExtensionEditor';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
@@ -23,12 +22,15 @@ type Props = {|
   onRenameProperty: (oldName: string, newName: string) => void,
   onRenameSharedProperty: (oldName: string, newName: string) => void,
   onPropertyTypeChanged: (propertyName: string) => void,
+  onFocusProperty: (propertyName: string) => void,
+  onPropertiesUpdated: () => void,
   onEventsFunctionsAdded: () => void,
   unsavedChanges?: ?UnsavedChanges,
   onConfigurationUpdated?: (?ExtensionItemConfigurationAttribute) => void,
 |};
 
 export type EventsBasedBehaviorEditorPanelInterface = {|
+  forceUpdateProperties: () => void,
   scrollToProperty: (propertyName: string) => void,
 |};
 
@@ -48,16 +50,19 @@ export const EventsBasedBehaviorEditorPanel = React.forwardRef<
       unsavedChanges,
       onEventsFunctionsAdded,
       onConfigurationUpdated,
+      onPropertiesUpdated,
+      onFocusProperty,
     }: Props,
     ref
   ) => {
-    const onPropertiesUpdated = React.useCallback(
+    const _onPropertiesUpdated = React.useCallback(
       () => {
         if (unsavedChanges) {
           unsavedChanges.triggerUnsavedChanges();
         }
+        onPropertiesUpdated();
       },
-      [unsavedChanges]
+      [onPropertiesUpdated, unsavedChanges]
     );
 
     const scrollView = React.useRef<?ScrollViewInterface>(null);
@@ -74,6 +79,11 @@ export const EventsBasedBehaviorEditorPanel = React.forwardRef<
     }, []);
 
     React.useImperativeHandle(ref, () => ({
+      forceUpdateProperties: () => {
+        if (propertiesEditor.current) {
+          propertiesEditor.current.forceUpdate();
+        }
+      },
       scrollToProperty,
     }));
 
@@ -103,7 +113,8 @@ export const EventsBasedBehaviorEditorPanel = React.forwardRef<
               properties={eventsBasedBehavior.getPropertyDescriptors()}
               onRenameProperty={onRenameProperty}
               behaviorObjectType={eventsBasedBehavior.getObjectType()}
-              onPropertiesUpdated={onPropertiesUpdated}
+              onPropertiesUpdated={_onPropertiesUpdated}
+              onFocusProperty={onFocusProperty}
               onPropertyTypeChanged={onPropertyTypeChanged}
               onEventsFunctionsAdded={onEventsFunctionsAdded}
             />
@@ -118,7 +129,8 @@ export const EventsBasedBehaviorEditorPanel = React.forwardRef<
               eventsBasedBehavior={eventsBasedBehavior}
               properties={eventsBasedBehavior.getSharedPropertyDescriptors()}
               onRenameProperty={onRenameSharedProperty}
-              onPropertiesUpdated={onPropertiesUpdated}
+              onPropertiesUpdated={_onPropertiesUpdated}
+              onFocusProperty={onFocusProperty}
               onPropertyTypeChanged={onPropertyTypeChanged}
               onEventsFunctionsAdded={onEventsFunctionsAdded}
             />

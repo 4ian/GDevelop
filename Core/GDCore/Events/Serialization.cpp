@@ -359,21 +359,57 @@ void gd::EventsListSerialization::SerializeInstructionsTo(
     // Parameters
     SerializerElement& parameters = instruction.AddChild("parameters");
     parameters.ConsiderAsArrayOf("parameter");
-    for (std::size_t l = 0; l < list[k].GetParameters().size(); l++) {
-      if (l > 20000) {
-        // Even more than 100 parameters is suspicious but JS engines usually
-        // support up to 65k parameters. Stop at a fraction of that as we've seen
-        // in the wild some probable memory corruption that lead to serializing 2M
-        // parameters.
-        gd::LogError(
-            "Suspiciously very high number of parameters in an instruction. "
-            "Clamping at 20k. This might indicate a memory corruption.");
-        break;
+    // Remove this BooleanVariable logic when setDefaultValue is honored
+    if(list[k].GetType() == "BooleanVariable") {
+      bool b = false;
+      if(1 < list[k].GetParameters().size()) {
+        gd:String plainString = list[k].GetParameter(1).GetPlainString();
+        if(plainString == "True" || plainString == "False") {
+          b = true;
+        }
       }
 
-      parameters.AddChild("parameter")
-          .SetValue(list[k].GetParameter(l).GetPlainString());
-    }
+      if(b == true) {
+        for (std::size_t l = 0; l < list[k].GetParameters().size(); l++) {
+          if (l > 20000) {
+            // Even more than 100 parameters is suspicious but JS engines usually
+            // support up to 65k parameters. Stop at a fraction of that as we've seen
+            // in the wild some probable memory corruption that lead to serializing 2M
+            // parameters.
+            gd::LogError(
+                "Suspiciously very high number of parameters in an instruction. "
+                "Clamping at 20k. This might indicate a memory corruption.");
+            break;
+          }
+
+          parameters.AddChild("parameter")
+              .SetValue(list[k].GetParameter(l).GetPlainString());
+        }
+      } else {
+        if(0 < list[k].GetParameters().size()) {
+            parameters.AddChild("parameter").SetValue(list[k].GetParameter(0).GetPlainString());
+            gd::String falseGDString = "False";
+            parameters.AddChild("parameter").SetValue(falseGDString);
+        }
+      }
+      
+    } else {
+      for (std::size_t l = 0; l < list[k].GetParameters().size(); l++) {
+        if (l > 20000) {
+          // Even more than 100 parameters is suspicious but JS engines usually
+          // support up to 65k parameters. Stop at a fraction of that as we've seen
+          // in the wild some probable memory corruption that lead to serializing 2M
+          // parameters.
+          gd::LogError(
+              "Suspiciously very high number of parameters in an instruction. "
+              "Clamping at 20k. This might indicate a memory corruption.");
+          break;
+        }
+
+        parameters.AddChild("parameter")
+            .SetValue(list[k].GetParameter(l).GetPlainString());
+      }
+    }    
 
     // Sub instructions
     if (!list[k].GetSubInstructions().empty()) {

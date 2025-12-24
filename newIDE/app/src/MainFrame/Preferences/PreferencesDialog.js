@@ -87,6 +87,7 @@ const PreferencesDialog = ({
     setAutomaticallyUseCreditsForAiRequests,
     setShowCreateSectionByDefault,
     setHasSeenInGameEditorWarning,
+    setUseBackgroundSerializerForSaving,
   } = React.useContext(PreferencesContext);
 
   const initialUse3DEditor = React.useRef<boolean>(values.use3DEditor);
@@ -588,6 +589,15 @@ const PreferencesDialog = ({
                   checked={values.showDeprecatedInstructionWarning}
                   label={i18n._(
                     t`Show a warning on deprecated actions and conditions`
+                  )}
+                />
+                <CompactToggleField
+                  labelColor="primary"
+                  hideTooltip
+                  onCheck={setUseBackgroundSerializerForSaving}
+                  checked={values.useBackgroundSerializerForSaving}
+                  label={i18n._(
+                    t`Use experimental background serializer for saving projects`
                   )}
                 />
                 {!!electron && (

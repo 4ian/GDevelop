@@ -298,12 +298,14 @@ export const createCloudProject = async (
 export const commitVersion = async ({
   authenticatedUser,
   cloudProjectId,
+  presignedUrl,
   zippedProject,
   previousVersion,
   restoredFromVersionId,
 }: {
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string,
+  presignedUrl: string,
   zippedProject: Blob,
   previousVersion?: ?string,
   restoredFromVersionId?: ?string,
@@ -313,12 +315,7 @@ export const commitVersion = async ({
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  // Get a presigned url to upload a new version (the URL will contain the new version id).
-  const presignedUrl = await getPresignedUrlForVersionUpload(
-    authenticatedUser,
-    cloudProjectId
-  );
-  if (!presignedUrl) return;
+
   const newVersion = getVersionIdFromPath(presignedUrl);
   // Upload zipped project.
   await refetchCredentialsForProjectAndRetryIfUnauthorized(
@@ -552,7 +549,7 @@ export const deleteCloudProject = async (
   });
 };
 
-const getPresignedUrlForVersionUpload = async (
+export const getPresignedUrlForVersionUpload = async (
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string
 ): Promise<?string> => {

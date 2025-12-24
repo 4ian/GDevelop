@@ -231,6 +231,7 @@ export type PreferencesValues = {|
   aiState: {| aiRequestId: string | null |},
   automaticallyUseCreditsForAiRequests: boolean,
   hasSeenInGameEditorWarning: boolean,
+  useBackgroundSerializerForSaving: boolean,
 |};
 
 /**
@@ -343,6 +344,7 @@ export type Preferences = {|
   |}) => void,
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => void,
   setHasSeenInGameEditorWarning: (enabled: boolean) => void,
+  setUseBackgroundSerializerForSaving: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -405,6 +407,7 @@ export const initialPreferences = {
     aiState: { aiRequestId: null },
     automaticallyUseCreditsForAiRequests: false,
     hasSeenInGameEditorWarning: false,
+    useBackgroundSerializerForSaving: false,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -485,6 +488,7 @@ export const initialPreferences = {
   setAiState: ({ aiRequestId }: {| aiRequestId: string | null |}) => {},
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => {},
   setHasSeenInGameEditorWarning: (enabled: boolean) => {},
+  setUseBackgroundSerializerForSaving: (enabled: boolean) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

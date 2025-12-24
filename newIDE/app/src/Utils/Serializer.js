@@ -1,5 +1,4 @@
 // @flow
-
 const gd: libGDevelop = global.gd;
 
 /**
@@ -19,6 +18,7 @@ export function serializeToJSObject(
 
   // JSON.parse + toJSON is 30% faster than gd.Serializer.toJSObject.
   const json = gd.Serializer.toJSON(serializedElement);
+
   try {
     const object = JSON.parse(json);
 

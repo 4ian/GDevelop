@@ -15,19 +15,11 @@ export {
   convertSound,
 } from './ScratchParser';
 
-export type {
-  ScratchSprite,
-  ScratchProject,
-} from './ScratchParser';
+export type { ScratchSprite, ScratchProject } from './ScratchParser';
 
-export {
-  convertScratchBlocks,
-  getTopLevelBlocks,
-} from './BlockConverter';
+export { convertScratchBlocks, getTopLevelBlocks } from './BlockConverter';
 
-export type {
-  ConvertedEvent,
-} from './BlockConverter';
+export type { ConvertedEvent } from './BlockConverter';
 
 export {
   convertScratchToGDevelop,
@@ -35,6 +27,4 @@ export {
   validateScratchFile,
 } from './ScratchConverter';
 
-export type {
-  GDevelopProject,
-} from './ScratchConverter';
+export type { GDevelopProject } from './ScratchConverter';

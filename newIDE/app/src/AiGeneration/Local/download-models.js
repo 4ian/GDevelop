@@ -146,13 +146,17 @@ function main() {
     let successCount = 0;
     MODELS.forEach((model, i) => {
       console.log(`\n[${i + 1}/${MODELS.length}]`);
-      if (downloadModel(pythonCmd, model.id, model.localDir, model.description)) {
+      if (
+        downloadModel(pythonCmd, model.id, model.localDir, model.description)
+      ) {
         successCount++;
       }
     });
 
     console.log('\n' + '='.repeat(50));
-    console.log(`Downloaded ${successCount}/${MODELS.length} models successfully`);
+    console.log(
+      `Downloaded ${successCount}/${MODELS.length} models successfully`
+    );
   }
 }
 

@@ -36,7 +36,9 @@ type Props = {|
 
 const CopilotChatPanel = ({ onSuggestionApply, editorContext }: Props) => {
   const [input, setInput] = React.useState('');
-  const [activeThread, setActiveThread] = React.useState<?ConversationThread>(null);
+  const [activeThread, setActiveThread] = React.useState<?ConversationThread>(
+    null
+  );
   const [isProcessing, setIsProcessing] = React.useState(false);
   const [selectedAgent, setSelectedAgent] = React.useState<?CopilotAgent>(null);
   const messagesEndRef = React.useRef<?HTMLDivElement>(null);
@@ -44,22 +46,28 @@ const CopilotChatPanel = ({ onSuggestionApply, editorContext }: Props) => {
   // Initialize or get active thread
   React.useEffect(() => {
     let thread = conversationManager.getActiveThread();
-    
+
     if (!thread) {
       const context = getCurrentEditorContext();
-      const threadId = conversationManager.createThread(context, 'Copilot Chat');
+      const threadId = conversationManager.createThread(
+        context,
+        'Copilot Chat'
+      );
       thread = conversationManager.getThread(threadId);
     }
-    
+
     setActiveThread(thread);
   }, []);
 
   // Scroll to bottom on new messages
-  React.useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [activeThread?.messages.length]);
+  React.useEffect(
+    () => {
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    },
+    [activeThread?.messages.length]
+  );
 
   const handleSendMessage = async () => {
     if (!input.trim() || !activeThread) return;
@@ -82,7 +90,7 @@ const CopilotChatPanel = ({ onSuggestionApply, editorContext }: Props) => {
 
       // Get appropriate agent
       let agent = selectedAgent;
-      
+
       if (command) {
         agent = getAgentByCommand(command) || getDefaultAgent();
       } else if (!agent) {
@@ -140,7 +148,7 @@ const CopilotChatPanel = ({ onSuggestionApply, editorContext }: Props) => {
 
   const renderMessage = (message: ConversationMessage) => {
     const isUser = message.role === 'user';
-    
+
     return (
       <Line
         key={message.id}
@@ -156,36 +164,41 @@ const CopilotChatPanel = ({ onSuggestionApply, editorContext }: Props) => {
           }}
         >
           <Column noMargin>
-            <Text size="body">
-              {message.content}
-            </Text>
-            
+            <Text size="body">{message.content}</Text>
+
             {message.suggestions && message.suggestions.length > 0 && (
               <div style={{ marginTop: 8 }}>
                 <Column noMargin>
                   {message.suggestions.map((suggestion, idx) => (
-                  <Paper key={idx} background="dark" style={{ padding: 8, marginTop: 4 }}>
-                    <div style={{ fontFamily: 'monospace' }}>
-                      <Text size="body-small" style={{ whiteSpace: 'pre-wrap' }}>
-                        {suggestion.code}
-                      </Text>
-                    </div>
-                    <Line justifyContent="space-between" alignItems="center">
-                      <Text size="body-small" color="secondary">
-                        {suggestion.description}
-                      </Text>
-                      <FlatButton
-                        label={<Trans>Apply</Trans>}
-                        onClick={() => handleApplySuggestion(suggestion.code)}
-                        primary
-                      />
-                    </Line>
-                  </Paper>
-                ))}
-              </Column>
+                    <Paper
+                      key={idx}
+                      background="dark"
+                      style={{ padding: 8, marginTop: 4 }}
+                    >
+                      <div style={{ fontFamily: 'monospace' }}>
+                        <Text
+                          size="body-small"
+                          style={{ whiteSpace: 'pre-wrap' }}
+                        >
+                          {suggestion.code}
+                        </Text>
+                      </div>
+                      <Line justifyContent="space-between" alignItems="center">
+                        <Text size="body-small" color="secondary">
+                          {suggestion.description}
+                        </Text>
+                        <FlatButton
+                          label={<Trans>Apply</Trans>}
+                          onClick={() => handleApplySuggestion(suggestion.code)}
+                          primary
+                        />
+                      </Line>
+                    </Paper>
+                  ))}
+                </Column>
               </div>
             )}
-            
+
             <Text size="body-small" color="secondary">
               {new Date(message.timestamp).toLocaleTimeString()}
             </Text>
@@ -247,7 +260,7 @@ const CopilotChatPanel = ({ onSuggestionApply, editorContext }: Props) => {
             <TextField
               value={input}
               onChange={(e, value) => setInput(value)}
-              onKeyPress={(e) => {
+              onKeyPress={e => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
                   handleSendMessage();

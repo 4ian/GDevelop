@@ -37,7 +37,7 @@ const ScratchImportDialog = ({ onClose, onProjectImported, open }: Props) => {
     const files = event.currentTarget.files;
     if (files && files.length > 0) {
       const file = files[0];
-      
+
       if (validateScratchFile(file)) {
         setSelectedFile(file);
         setError(null);
@@ -57,21 +57,21 @@ const ScratchImportDialog = ({ onClose, onProjectImported, open }: Props) => {
 
     try {
       setProgress(0.1);
-      
+
       // Convert Scratch project
       const gdProject = await convertScratchToGDevelop(selectedFile);
-      
+
       setProgress(0.8);
-      
+
       if (!gdProject) {
         throw new Error('Failed to convert Scratch project');
       }
 
       setProgress(1.0);
-      
+
       // Call the callback with converted project
       onProjectImported(gdProject);
-      
+
       // Reset and close
       setSelectedFile(null);
       setIsImporting(false);
@@ -116,16 +116,13 @@ const ScratchImportDialog = ({ onClose, onProjectImported, open }: Props) => {
           <Column noMargin>
             <Text>
               <Trans>
-                Import a Scratch project (.sb3 or .sb2) and convert it to a GDevelop project.
-                Sprites, costumes, sounds, and blocks will be converted to GDevelop objects and events.
+                Import a Scratch project (.sb3 or .sb2) and convert it to a
+                GDevelop project. Sprites, costumes, sounds, and blocks will be
+                converted to GDevelop objects and events.
               </Trans>
             </Text>
 
-            {error && (
-              <AlertMessage kind="error">
-                {error}
-              </AlertMessage>
-            )}
+            {error && <AlertMessage kind="error">{error}</AlertMessage>}
 
             <Line justifyContent="center" alignItems="center">
               <input
@@ -168,8 +165,9 @@ const ScratchImportDialog = ({ onClose, onProjectImported, open }: Props) => {
 
             <AlertMessage kind="info">
               <Trans>
-                Note: Not all Scratch features may be fully supported. 
-                Complex blocks and custom extensions may need manual adjustment after import.
+                Note: Not all Scratch features may be fully supported. Complex
+                blocks and custom extensions may need manual adjustment after
+                import.
               </Trans>
             </AlertMessage>
           </Column>

@@ -87,9 +87,7 @@ describe('AiConfiguration - Local Models', () => {
       expect(localPresets.length).toBe(3);
 
       // Check that local presets have correct properties
-      const aprielPreset = localPresets.find(p =>
-        p.id.includes('apriel')
-      );
+      const aprielPreset = localPresets.find(p => p.id.includes('apriel'));
       expect(aprielPreset).toBeDefined();
       expect(aprielPreset?.disabled).toBe(false);
       expect(aprielPreset?.isLocalModel).toBe(true);

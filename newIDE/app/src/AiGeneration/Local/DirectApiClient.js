@@ -51,7 +51,7 @@ const callOpenAI = async (
       },
       {
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
+          Authorization: `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
         },
       }
@@ -128,7 +128,8 @@ const callAnthropic = async (
     return {
       success: true,
       content: content.text || '',
-      tokensUsed: response.data.usage?.input_tokens + response.data.usage?.output_tokens,
+      tokensUsed:
+        response.data.usage?.input_tokens + response.data.usage?.output_tokens,
     };
   } catch (error) {
     console.error('Anthropic API error:', error);
@@ -159,7 +160,7 @@ const callGoogleAI = async (
   const opts = options || {};
   try {
     const model = opts.model || 'gemini-pro';
-    
+
     // Convert messages to Gemini format
     const contents = messages
       .filter(m => m.role !== 'system')
@@ -223,7 +224,7 @@ const callHuggingFace = async (
   const opts = options || {};
   try {
     const model = opts.model || 'meta-llama/Llama-2-70b-chat-hf';
-    
+
     // Combine messages into a single prompt
     const prompt = messages.map(m => `${m.role}: ${m.content}`).join('\n\n');
 
@@ -239,7 +240,7 @@ const callHuggingFace = async (
       },
       {
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
+          Authorization: `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
         },
       }
@@ -278,11 +279,12 @@ export const makeDirectApiCall = async (
 ): Promise<DirectApiResponse> => {
   const opts = options || {};
   const provider = opts.provider || getFirstAvailableProvider();
-  
+
   if (!provider) {
     return {
       success: false,
-      error: 'No API keys configured. Please add an API key in the Custom API Keys dialog.',
+      error:
+        'No API keys configured. Please add an API key in the Custom API Keys dialog.',
     };
   }
 

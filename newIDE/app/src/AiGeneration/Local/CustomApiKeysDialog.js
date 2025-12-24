@@ -49,21 +49,29 @@ const SUPPORTED_PROVIDERS = [
   },
 ];
 
-const CustomApiKeysDialog = ({ onClose, onSave, open, savedApiKeys }: Props) => {
+const CustomApiKeysDialog = ({
+  onClose,
+  onSave,
+  open,
+  savedApiKeys,
+}: Props) => {
   const [apiKeys, setApiKeys] = React.useState<{
     [provider: string]: string,
   }>({});
   const [showSuccess, setShowSuccess] = React.useState(false);
 
-  React.useEffect(() => {
-    if (open && savedApiKeys) {
-      const keyMap = {};
-      savedApiKeys.forEach(config => {
-        keyMap[config.provider] = config.apiKey;
-      });
-      setApiKeys(keyMap);
-    }
-  }, [open, savedApiKeys]);
+  React.useEffect(
+    () => {
+      if (open && savedApiKeys) {
+        const keyMap = {};
+        savedApiKeys.forEach(config => {
+          keyMap[config.provider] = config.apiKey;
+        });
+        setApiKeys(keyMap);
+      }
+    },
+    [open, savedApiKeys]
+  );
 
   const handleSave = () => {
     const configs: Array<ApiKeyConfig> = Object.entries(apiKeys)
@@ -115,8 +123,8 @@ const CustomApiKeysDialog = ({ onClose, onSave, open, savedApiKeys }: Props) => 
           <Column noMargin>
             <Text>
               <Trans>
-                Configure your own API keys to use online AI models.
-                API keys are stored locally and never sent to GDevelop servers.
+                Configure your own API keys to use online AI models. API keys
+                are stored locally and never sent to GDevelop servers.
               </Trans>
             </Text>
             {showSuccess && (

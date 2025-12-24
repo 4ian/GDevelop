@@ -62,18 +62,20 @@ const codeGenerationAgent: CopilotAgent = {
   supportedCommands: ['/generate', '/create', '/write'],
   invoke: async (request: AgentRequest): Promise<AgentResponse> => {
     const { prompt, context } = request;
-    
+
     // Build context-aware prompt
     let enhancedPrompt = prompt;
-    
+
     if (context.currentFile) {
       enhancedPrompt = `In file ${context.currentFile}:\n${prompt}`;
     }
-    
+
     if (context.selectedCode) {
-      enhancedPrompt = `Given this code:\n\`\`\`\n${context.selectedCode}\n\`\`\`\n\n${prompt}`;
+      enhancedPrompt = `Given this code:\n\`\`\`\n${
+        context.selectedCode
+      }\n\`\`\`\n\n${prompt}`;
     }
-    
+
     // This would connect to the AI backend
     return {
       success: true,
@@ -105,7 +107,7 @@ const codeExplanationAgent: CopilotAgent = {
   supportedCommands: ['/explain', '/describe', '/what'],
   invoke: async (request: AgentRequest): Promise<AgentResponse> => {
     const { prompt, context } = request;
-    
+
     if (!context.selectedCode) {
       return {
         success: false,
@@ -113,10 +115,13 @@ const codeExplanationAgent: CopilotAgent = {
         content: '',
       };
     }
-    
+
     return {
       success: true,
-      content: `Explanation of the selected code:\n\nThis code ${context.selectedCode.substring(0, 50)}...`,
+      content: `Explanation of the selected code:\n\nThis code ${context.selectedCode.substring(
+        0,
+        50
+      )}...`,
       followUp: [
         'Would you like a more detailed explanation?',
         'Should I explain any specific part?',
@@ -136,7 +141,7 @@ const bugDetectionAgent: CopilotAgent = {
   supportedCommands: ['/fix', '/debug', '/bugs'],
   invoke: async (request: AgentRequest): Promise<AgentResponse> => {
     const { context } = request;
-    
+
     if (!context.selectedCode && !context.currentFile) {
       return {
         success: false,
@@ -144,40 +149,51 @@ const bugDetectionAgent: CopilotAgent = {
         content: '',
       };
     }
-    
+
     // Analyze code for common issues
     const issues: Array<string> = [];
-    
+
     const selectedCode = context.selectedCode;
     if (selectedCode) {
       // Simple pattern matching for common issues
       if (selectedCode.includes('==') && !selectedCode.includes('===')) {
         issues.push('Consider using === instead of == for strict equality');
       }
-      
+
       if (selectedCode.includes('var ')) {
         issues.push('Consider using const or let instead of var');
       }
-      
+
       if (selectedCode.match(/catch\s*\(\s*\w+\s*\)\s*\{\s*\}/)) {
         issues.push('Empty catch block - consider adding error handling');
       }
     }
-    
+
     return {
       success: true,
-      content: issues.length > 0
-        ? `Found ${issues.length} potential issue(s):\n\n${issues.map((i, idx) => `${idx + 1}. ${i}`).join('\n')}`
-        : 'No obvious issues detected. Code looks good!',
-      suggestions: issues.length > 0 ? [{
-        code: '// Fixed code would appear here',
-        description: 'Suggested fix',
-        language: 'javascript',
-      }] : undefined,
-      followUp: issues.length > 0 ? [
-        'Would you like me to fix these issues?',
-        'Should I explain why these are problems?',
-      ] : undefined,
+      content:
+        issues.length > 0
+          ? `Found ${issues.length} potential issue(s):\n\n${issues
+              .map((i, idx) => `${idx + 1}. ${i}`)
+              .join('\n')}`
+          : 'No obvious issues detected. Code looks good!',
+      suggestions:
+        issues.length > 0
+          ? [
+              {
+                code: '// Fixed code would appear here',
+                description: 'Suggested fix',
+                language: 'javascript',
+              },
+            ]
+          : undefined,
+      followUp:
+        issues.length > 0
+          ? [
+              'Would you like me to fix these issues?',
+              'Should I explain why these are problems?',
+            ]
+          : undefined,
     };
   },
 };
@@ -193,7 +209,7 @@ const testGenerationAgent: CopilotAgent = {
   supportedCommands: ['/test', '/tests', '/unittest'],
   invoke: async (request: AgentRequest): Promise<AgentResponse> => {
     const { context } = request;
-    
+
     if (!context.selectedCode) {
       return {
         success: false,
@@ -201,7 +217,7 @@ const testGenerationAgent: CopilotAgent = {
         content: '',
       };
     }
-    
+
     return {
       success: true,
       content: 'Generated test suite for your code:',
@@ -240,7 +256,7 @@ const refactoringAgent: CopilotAgent = {
   supportedCommands: ['/refactor', '/improve', '/optimize'],
   invoke: async (request: AgentRequest): Promise<AgentResponse> => {
     const { context } = request;
-    
+
     if (!context.selectedCode) {
       return {
         success: false,
@@ -248,28 +264,38 @@ const refactoringAgent: CopilotAgent = {
         content: '',
       };
     }
-    
+
     const suggestions: Array<string> = [];
-    
+
     // Analyze for refactoring opportunities
     if (context.selectedCode.length > 100) {
       suggestions.push('Consider extracting parts into smaller functions');
     }
-    
+
     if ((context.selectedCode.match(/if\s*\(/g) || []).length > 3) {
-      suggestions.push('Complex conditional logic - consider using a switch or lookup table');
+      suggestions.push(
+        'Complex conditional logic - consider using a switch or lookup table'
+      );
     }
-    
+
     return {
       success: true,
-      content: suggestions.length > 0
-        ? `Refactoring suggestions:\n\n${suggestions.map((s, idx) => `${idx + 1}. ${s}`).join('\n')}`
-        : 'Code looks well-structured!',
-      suggestions: suggestions.length > 0 ? [{
-        code: '// Refactored code would appear here',
-        description: 'Refactored version',
-        language: 'javascript',
-      }] : undefined,
+      content:
+        suggestions.length > 0
+          ? `Refactoring suggestions:\n\n${suggestions
+              .map((s, idx) => `${idx + 1}. ${s}`)
+              .join('\n')}`
+          : 'Code looks well-structured!',
+      suggestions:
+        suggestions.length > 0
+          ? [
+              {
+                code: '// Refactored code would appear here',
+                description: 'Refactored version',
+                language: 'javascript',
+              },
+            ]
+          : undefined,
       followUp: [
         'Would you like me to show the refactored code?',
         'Should I explain the benefits?',
@@ -289,7 +315,7 @@ const documentationAgent: CopilotAgent = {
   supportedCommands: ['/doc', '/docs', '/comment'],
   invoke: async (request: AgentRequest): Promise<AgentResponse> => {
     const { context } = request;
-    
+
     if (!context.selectedCode) {
       return {
         success: false,
@@ -297,7 +323,7 @@ const documentationAgent: CopilotAgent = {
         content: '',
       };
     }
-    
+
     return {
       success: true,
       content: 'Generated documentation:',
@@ -358,16 +384,18 @@ export const getDefaultAgent = (): CopilotAgent => {
 /**
  * Parse command from user input
  */
-export const parseCommand = (input: string): {| command: ?string, prompt: string |} => {
+export const parseCommand = (
+  input: string
+): {| command: ?string, prompt: string |} => {
   const match = input.match(/^(\/\w+)\s+(.+)$/);
-  
+
   if (match) {
     return {
       command: match[1],
       prompt: match[2],
     };
   }
-  
+
   return {
     command: null,
     prompt: input,

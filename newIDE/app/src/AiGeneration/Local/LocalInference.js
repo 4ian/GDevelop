@@ -37,10 +37,10 @@ export type InferenceResult = {|
 export const runLocalInference = async (
   options: InferenceOptions
 ): Promise<InferenceResult> => {
-  const { 
-    modelId, 
-    prompt, 
-    temperature = 0.7, 
+  const {
+    modelId,
+    prompt,
+    temperature = 0.7,
     maxTokens = 2000,
     onProgress,
     onToken,
@@ -52,7 +52,8 @@ export const runLocalInference = async (
   if (!isModelDownloaded(modelId)) {
     return {
       success: false,
-      error: 'Model not downloaded. Please download the model first using the Local Models dialog.',
+      error:
+        'Model not downloaded. Please download the model first using the Local Models dialog.',
     };
   }
 
@@ -69,37 +70,43 @@ export const runLocalInference = async (
   if (!transformersReady) {
     return {
       success: false,
-      error: 'Transformers.js library not available. Please ensure you have an internet connection for the first load.',
+      error:
+        'Transformers.js library not available. Please ensure you have an internet connection for the first load.',
     };
   }
 
   try {
     // Load model if not already loaded
     onProgress?.('Loading model...');
-    const loaded = await loadModel(modelId, (progress) => {
+    const loaded = await loadModel(modelId, progress => {
       onProgress?.(`Loading model: ${Math.round(progress * 100)}%`);
     });
 
     if (!loaded) {
       return {
         success: false,
-        error: 'Failed to load model. The model may be corrupted or incompatible.',
+        error:
+          'Failed to load model. The model may be corrupted or incompatible.',
       };
     }
 
     // Check memory before generation
     const memBefore = getMemoryUsage();
-    console.log(`Memory before inference: ${memBefore.used.toFixed(2)}GB / ${memBefore.total.toFixed(2)}GB`);
+    console.log(
+      `Memory before inference: ${memBefore.used.toFixed(
+        2
+      )}GB / ${memBefore.total.toFixed(2)}GB`
+    );
 
     // Generate text
     onProgress?.('Generating...');
     let tokenCount = 0;
-    
+
     const generatedText = await generateText(modelId, prompt, {
       temperature,
       maxTokens,
       topP: 0.9,
-      onToken: (token) => {
+      onToken: token => {
         tokenCount++;
         onToken?.(token);
       },
@@ -116,8 +123,14 @@ export const runLocalInference = async (
 
     // Check memory after generation
     const memAfter = getMemoryUsage();
-    console.log(`Memory after inference: ${memAfter.used.toFixed(2)}GB / ${memAfter.total.toFixed(2)}GB`);
-    console.log(`Inference completed in ${inferenceTime}ms, generated ${tokenCount} tokens`);
+    console.log(
+      `Memory after inference: ${memAfter.used.toFixed(
+        2
+      )}GB / ${memAfter.total.toFixed(2)}GB`
+    );
+    console.log(
+      `Inference completed in ${inferenceTime}ms, generated ${tokenCount} tokens`
+    );
 
     return {
       success: true,
@@ -153,9 +166,9 @@ export const isGPUAccelerationAvailable = async (): Promise<boolean> => {
 export const getSupportedFormats = (): Array<string> => {
   return [
     'safetensors', // Preferred format
-    'onnx',        // ONNX Runtime support
-    'pytorch',     // PyTorch models
-    'tensorflow',  // TensorFlow models
+    'onnx', // ONNX Runtime support
+    'pytorch', // PyTorch models
+    'tensorflow', // TensorFlow models
   ];
 };
 
@@ -169,7 +182,7 @@ export const estimateMemoryRequirement = (modelId: string): number => {
     'gpt-oss-20b': 40,
     'qwen3-vl-32b-instruct': 64,
   };
-  
+
   return estimates[modelId] || 0;
 };
 

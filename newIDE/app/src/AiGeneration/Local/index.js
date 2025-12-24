@@ -15,9 +15,7 @@ export {
   hasEnoughSpace,
 } from './LocalModelManager';
 
-export type {
-  LocalModel,
-} from './LocalModelManager';
+export type { LocalModel } from './LocalModelManager';
 export {
   saveApiKeys,
   loadApiKeys,
@@ -29,9 +27,7 @@ export {
   shouldUseLocalModel,
 } from './LocalStorage';
 
-export type {
-  ApiKeyConfig,
-} from './LocalStorage';
+export type { ApiKeyConfig } from './LocalStorage';
 export {
   runLocalInference,
   isLocalInferenceAvailable,
@@ -42,20 +38,14 @@ export {
   getCurrentMemoryUsage,
 } from './LocalInference';
 
-export type {
-  InferenceOptions,
-  InferenceResult,
-} from './LocalInference';
+export type { InferenceOptions, InferenceResult } from './LocalInference';
 export {
   makeDirectApiCall,
   hasCustomApiKeys,
   getConfiguredProviders,
 } from './DirectApiClient';
 
-export type {
-  DirectApiMessage,
-  DirectApiResponse,
-} from './DirectApiClient';
+export type { DirectApiMessage, DirectApiResponse } from './DirectApiClient';
 export {
   createAiRequestWithCustomKeys,
   addMessageToAiRequestWithCustomKeys,

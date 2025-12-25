@@ -6,13 +6,13 @@ import {
   EventsBasedBehaviorPropertiesEditor,
   type EventsBasedBehaviorPropertiesEditorInterface,
 } from './EventsBasedBehaviorOrObjectPropertiesEditor';
-import Background from '../UI/Background';
-import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
-import { type ExtensionItemConfigurationAttribute } from '../EventsFunctionsExtensionEditor';
-import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
-import Text from '../UI/Text';
-import { ColumnStackLayout } from '../UI/Layout';
-import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
+import Background from '../../UI/Background';
+import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
+import { type ExtensionItemConfigurationAttribute } from '../../EventsFunctionsExtensionEditor';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import Text from '../../UI/Text';
+import { ColumnStackLayout } from '../../UI/Layout';
+import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import EventsBasedObjectEditor from './EventsBasedObjectEditor';
 
 type Props = {|

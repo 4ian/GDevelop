@@ -4,21 +4,21 @@ import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 
 import * as React from 'react';
-import TextField from '../UI/TextField';
-import SemiControlledTextField from '../UI/SemiControlledTextField';
-import ObjectTypeSelector from '../ObjectTypeSelector';
-import DismissableAlertMessage from '../UI/DismissableAlertMessage';
-import AlertMessage from '../UI/AlertMessage';
-import { ColumnStackLayout } from '../UI/Layout';
-import useForceUpdate from '../Utils/UseForceUpdate';
-import HelpButton from '../UI/HelpButton';
-import { Line } from '../UI/Grid';
-import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
-import Checkbox from '../UI/Checkbox';
-import { type ExtensionItemConfigurationAttribute } from '../EventsFunctionsExtensionEditor';
-import SelectField from '../UI/SelectField';
-import SelectOption from '../UI/SelectOption';
-import Window from '../Utils/Window';
+import TextField from '../../UI/TextField';
+import SemiControlledTextField from '../../UI/SemiControlledTextField';
+import ObjectTypeSelector from '../../ObjectTypeSelector';
+import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
+import AlertMessage from '../../UI/AlertMessage';
+import { ColumnStackLayout } from '../../UI/Layout';
+import useForceUpdate from '../../Utils/UseForceUpdate';
+import HelpButton from '../../UI/HelpButton';
+import { Line } from '../../UI/Grid';
+import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
+import Checkbox from '../../UI/Checkbox';
+import { type ExtensionItemConfigurationAttribute } from '../../EventsFunctionsExtensionEditor';
+import SelectField from '../../UI/SelectField';
+import SelectOption from '../../UI/SelectOption';
+import Window from '../../Utils/Window';
 
 const gd: libGDevelop = global.gd;
 

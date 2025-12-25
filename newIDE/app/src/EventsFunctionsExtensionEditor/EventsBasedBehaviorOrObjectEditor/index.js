@@ -24,7 +24,7 @@ type Props = {|
   onRenameProperty: (oldName: string, newName: string) => void,
   onRenameSharedProperty: (oldName: string, newName: string) => void,
   onPropertyTypeChanged: (propertyName: string) => void,
-  onFocusProperty: (propertyName: string) => void,
+  onFocusProperty: (propertyName: string, isSharedProperties: boolean) => void,
   onPropertiesUpdated: () => void,
   onEventsFunctionsAdded: () => void,
   unsavedChanges?: ?UnsavedChanges,
@@ -37,7 +37,8 @@ type Props = {|
 
 export type EventsBasedBehaviorOrObjectEditorInterface = {|
   forceUpdateProperties: () => void,
-  scrollToProperty: (propertyName: string) => void,
+  scrollToConfiguration: () => void,
+  scrollToProperty: (propertyName: string, isSharedProperties: boolean) => void,
 |};
 
 export const EventsBasedBehaviorOrObjectEditor = React.forwardRef<
@@ -78,14 +79,9 @@ export const EventsBasedBehaviorOrObjectEditor = React.forwardRef<
     const propertiesEditor = React.useRef<?EventsBasedBehaviorPropertiesEditorInterface>(
       null
     );
-
-    const scrollToProperty = React.useCallback((propertyName: string) => {
-      if (scrollView.current && propertiesEditor.current) {
-        scrollView.current.scrollTo(
-          propertiesEditor.current.getPropertyEditorRef(propertyName)
-        );
-      }
-    }, []);
+    const scenePropertiesEditor = React.useRef<?EventsBasedBehaviorPropertiesEditorInterface>(
+      null
+    );
 
     React.useImperativeHandle(ref, () => ({
       forceUpdateProperties: () => {
@@ -93,7 +89,29 @@ export const EventsBasedBehaviorOrObjectEditor = React.forwardRef<
           propertiesEditor.current.forceUpdate();
         }
       },
-      scrollToProperty,
+      scrollToConfiguration: () => {
+        if (scrollView.current) {
+          scrollView.current.scrollToPosition(0);
+        }
+      },
+      scrollToProperty: (propertyName: string, isSharedProperties: boolean) => {
+        if (!scrollView.current) {
+          return;
+        }
+        if (isSharedProperties) {
+          if (scenePropertiesEditor.current) {
+            scrollView.current.scrollTo(
+              scenePropertiesEditor.current.getPropertyEditorRef(propertyName)
+            );
+          }
+        } else {
+          if (propertiesEditor.current) {
+            scrollView.current.scrollTo(
+              propertiesEditor.current.getPropertyEditorRef(propertyName)
+            );
+          }
+        }
+      },
     }));
 
     const eventsBasedEntity = eventsBasedBehavior || eventsBasedObject;
@@ -143,7 +161,9 @@ export const EventsBasedBehaviorOrObjectEditor = React.forwardRef<
                 }
                 onRenameProperty={onRenameProperty}
                 onPropertiesUpdated={_onPropertiesUpdated}
-                onFocusProperty={onFocusProperty}
+                onFocusProperty={propertyName =>
+                  onFocusProperty(propertyName, false)
+                }
                 onPropertyTypeChanged={onPropertyTypeChanged}
                 onEventsFunctionsAdded={onEventsFunctionsAdded}
               />
@@ -155,7 +175,8 @@ export const EventsBasedBehaviorOrObjectEditor = React.forwardRef<
             )}
             {eventsBasedBehavior && (
               <EventsBasedBehaviorPropertiesEditor
-                isSceneProperties
+                ref={scenePropertiesEditor}
+                isSharedProperties
                 project={project}
                 projectScopedContainersAccessor={
                   projectScopedContainersAccessor
@@ -168,7 +189,9 @@ export const EventsBasedBehaviorOrObjectEditor = React.forwardRef<
                 }
                 onRenameProperty={onRenameSharedProperty}
                 onPropertiesUpdated={_onPropertiesUpdated}
-                onFocusProperty={onFocusProperty}
+                onFocusProperty={propertyName =>
+                  onFocusProperty(propertyName, true)
+                }
                 onPropertyTypeChanged={onPropertyTypeChanged}
                 onEventsFunctionsAdded={onEventsFunctionsAdded}
               />

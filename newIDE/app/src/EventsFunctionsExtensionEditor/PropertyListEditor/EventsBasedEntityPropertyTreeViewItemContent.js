@@ -11,7 +11,12 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../../Utils/Serializer';
-import { TreeViewItemContent, type TreeItemProps, scenesRootFolderId } from '.';
+import {
+  TreeViewItemContent,
+  type TreeItemProps,
+  propertiesRootFolderId,
+  sharedPropertiesRootFolderId,
+} from '.';
 import Tooltip from '@material-ui/core/Tooltip';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import VisibilityOffIcon from '../../UI/CustomSvgIcons/VisibilityOff';
@@ -56,8 +61,8 @@ export type EventsBasedEntityPropertyTreeViewItemProps = {|
   eventsBasedBehavior: ?gdEventsBasedBehavior,
   eventsBasedObject: ?gdEventsBasedObject,
   properties: gdPropertiesContainer,
-  isSceneProperties: boolean,
-  onOpenProperty: (name: string) => void,
+  isSharedProperties: boolean,
+  onOpenProperty: (name: string, isSharedProperties: boolean) => void,
   onRenameProperty: (newName: string, oldName: string) => void,
   showPropertyOverridingConfirmation: (
     existingPropertyNames: string[]
@@ -67,11 +72,14 @@ export type EventsBasedEntityPropertyTreeViewItemProps = {|
 |};
 
 export const getEventsBasedEntityPropertyTreeViewItemId = (
-  property: gdNamedPropertyDescriptor
+  property: gdNamedPropertyDescriptor,
+  isSharedProperties: boolean
 ): string => {
   // Pointers are used because they stay the same even when the names are
   // changed.
-  return `property-${property.ptr}`;
+  return `${isSharedProperties ? 'shared-property' : 'property'}-${
+    property.ptr
+  }`;
 };
 
 export class EventsBasedEntityPropertyTreeViewItemContent
@@ -88,11 +96,13 @@ export class EventsBasedEntityPropertyTreeViewItemContent
   }
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
-    return itemContent.getId() === scenesRootFolderId;
+    return itemContent.getId() === this.getRootId();
   }
 
   getRootId(): string {
-    return scenesRootFolderId;
+    return this.props.isSharedProperties
+      ? sharedPropertiesRootFolderId
+      : propertiesRootFolderId;
   }
 
   getName(): string | React.Node {
@@ -100,16 +110,22 @@ export class EventsBasedEntityPropertyTreeViewItemContent
   }
 
   getId(): string {
-    return getEventsBasedEntityPropertyTreeViewItemId(this.property);
+    return getEventsBasedEntityPropertyTreeViewItemId(
+      this.property,
+      this.props.isSharedProperties
+    );
   }
 
   getHtmlId(index: number): ?string {
-    return `property-item-${index}`;
+    return `${
+      this.props.isSharedProperties ? 'shared-property' : 'property'
+    }-item-${index}`;
   }
 
   getDataSet(): ?HTMLDataset {
     return {
       property: this.property.getName(),
+      isSharedProperties: this.props.isSharedProperties ? 'true' : 'false',
     };
   }
 
@@ -127,7 +143,10 @@ export class EventsBasedEntityPropertyTreeViewItemContent
   }
 
   onClick(): void {
-    this.props.onOpenProperty(this.property.getName());
+    this.props.onOpenProperty(
+      this.property.getName(),
+      this.props.isSharedProperties
+    );
   }
 
   rename(newName: string): void {
@@ -199,7 +218,7 @@ export class EventsBasedEntityPropertyTreeViewItemContent
             extension,
             eventsBasedBehavior,
             eventsBasedObject,
-            isSceneProperties,
+            isSharedProperties,
             onEventsFunctionsAdded,
           } = this.props;
           if (eventsBasedBehavior) {
@@ -208,7 +227,7 @@ export class EventsBasedEntityPropertyTreeViewItemContent
               extension,
               eventsBasedBehavior,
               this.property,
-              isSceneProperties
+              isSharedProperties
             );
           } else if (eventsBasedObject) {
             gd.PropertyFunctionGenerator.generateObjectGetterAndSetter(
@@ -371,7 +390,10 @@ export class EventsBasedEntityPropertyTreeViewItemContent
 
     this._onProjectItemModified();
     this.props.editName(
-      getEventsBasedEntityPropertyTreeViewItemId(newProperty)
+      getEventsBasedEntityPropertyTreeViewItemId(
+        newProperty,
+        this.props.isSharedProperties
+      )
     );
   }
 

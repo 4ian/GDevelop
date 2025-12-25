@@ -29,7 +29,9 @@ export const Default = () => (
       onEventsFunctionsAdded={action('functions added')}
       onFocusProperty={action('onFocusProperty')}
       onPropertiesUpdated={action('onPropertiesUpdated')}
-      onEventsBasedObjectChildrenEdited={action('onEventsBasedObjectChildrenEdited')}
+      onEventsBasedObjectChildrenEdited={action(
+        'onEventsBasedObjectChildrenEdited'
+      )}
       onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
     />
   </DragAndDropContextProvider>
@@ -50,7 +52,9 @@ export const WithoutFunction = () => (
       onEventsFunctionsAdded={action('functions added')}
       onFocusProperty={action('onFocusProperty')}
       onPropertiesUpdated={action('onPropertiesUpdated')}
-      onEventsBasedObjectChildrenEdited={action('onEventsBasedObjectChildrenEdited')}
+      onEventsBasedObjectChildrenEdited={action(
+        'onEventsBasedObjectChildrenEdited'
+      )}
       onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
     />
   </DragAndDropContextProvider>

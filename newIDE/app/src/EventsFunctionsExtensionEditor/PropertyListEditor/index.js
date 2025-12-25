@@ -47,18 +47,16 @@ import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/E
 export const getProjectManagerItemId = (identifier: string) =>
   `project-manager-tab-${identifier}`;
 
-const gameSettingsRootFolderId = getProjectManagerItemId('game-settings');
-const gamePropertiesItemId = getProjectManagerItemId('game-properties');
-export const scenesRootFolderId = getProjectManagerItemId('scenes');
-export const extensionsRootFolderId = getProjectManagerItemId('extensions');
-export const externalEventsRootFolderId = getProjectManagerItemId(
-  'external-events'
+const configurationItemId = getProjectManagerItemId(
+  'events-based-entity-configuration'
 );
-export const externalLayoutsRootFolderId = getProjectManagerItemId(
-  'external-layout'
+export const propertiesRootFolderId = getProjectManagerItemId('properties');
+export const sharedPropertiesRootFolderId = getProjectManagerItemId(
+  'properties'
 );
 
-const scenesEmptyPlaceholderId = 'scenes-placeholder';
+const propertiesEmptyPlaceholderId = 'properties-placeholder';
+const sharedPropertiesEmptyPlaceholderId = 'shared-properties-placeholder';
 
 const styles = {
   listContainer: {
@@ -370,7 +368,10 @@ export const usePropertyOverridingAlertDialog = () => {
 export type PropertyListEditorInterface = {|
   forceUpdateList: () => void,
   focusSearchBar: () => void,
-  setSelectedProperty: (propertyName: string) => void,
+  setSelectedProperty: (
+    propertyName: string,
+    isSharedProperties: boolean
+  ) => void,
 |};
 
 type Props = {|
@@ -381,7 +382,8 @@ type Props = {|
   eventsBasedObject: ?gdEventsBasedObject,
   onPropertiesUpdated: () => void,
   onRenameProperty: (oldName: string, newName: string) => void,
-  onOpenProperty: (name: string) => void,
+  onOpenConfiguration: () => void,
+  onOpenProperty: (name: string, isSharedProperties: boolean) => void,
   onEventsFunctionsAdded: () => void,
 |};
 
@@ -395,6 +397,7 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
       eventsBasedObject,
       onPropertiesUpdated,
       onRenameProperty,
+      onOpenConfiguration,
       onOpenProperty,
       onEventsFunctionsAdded,
     },
@@ -446,6 +449,9 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
     const properties = eventsBasedEntity
       ? eventsBasedEntity.getPropertyDescriptors()
       : null;
+    const sharedProperties = eventsBasedBehavior
+      ? eventsBasedBehavior.getSharedPropertyDescriptors()
+      : null;
 
     const editName = React.useCallback(
       (itemId: string) => {
@@ -463,7 +469,12 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
     );
 
     const addProperty = React.useCallback(
-      (index: number, i18n: I18nType) => {
+      (
+        properties: gdPropertiesContainer,
+        isSharedProperties: boolean,
+        index: number,
+        i18n: I18nType
+      ) => {
         if (!properties) return;
 
         const newName = newNameGenerator(i18n._(t`Property`), name =>
@@ -477,29 +488,36 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
         onProjectItemModified();
         setSearchText('');
 
-        const sceneItemId = getEventsBasedEntityPropertyTreeViewItemId(
-          property
+        const propertyItemId = getEventsBasedEntityPropertyTreeViewItemId(
+          property,
+          isSharedProperties
         );
         if (treeViewRef.current) {
-          treeViewRef.current.openItems([sceneItemId, scenesRootFolderId]);
+          treeViewRef.current.openItems([
+            propertyItemId,
+            isSharedProperties
+              ? sharedPropertiesRootFolderId
+              : propertiesRootFolderId,
+          ]);
         }
         // Scroll to the new behavior.
         // Ideally, we'd wait for the list to be updated to scroll, but
         // to simplify the code, we just wait a few ms for a new render
         // to be done.
         setTimeout(() => {
-          scrollToItem(sceneItemId);
+          scrollToItem(propertyItemId);
+          onOpenProperty(newName, isSharedProperties);
         }, 100); // A few ms is enough for a new render to be done.
 
         // We focus it so the user can edit the name directly.
-        editName(sceneItemId);
+        editName(propertyItemId);
       },
       [
-        properties,
         onPropertiesUpdated,
         onProjectItemModified,
         editName,
         scrollToItem,
+        onOpenProperty,
       ]
     );
 
@@ -575,7 +593,7 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
               eventsBasedBehavior,
               eventsBasedObject,
               properties,
-              isSceneProperties: false,
+              isSharedProperties: false,
               onOpenProperty,
               onPropertiesUpdated,
               onRenameProperty,
@@ -606,19 +624,34 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
       ]
     );
 
+    const sharedPropertiesTreeViewItemProps = React.useMemo<?EventsBasedEntityPropertyTreeViewItemProps>(
+      () =>
+        sharedProperties && propertiesTreeViewItemProps
+          ? {
+              ...propertiesTreeViewItemProps,
+              properties: sharedProperties,
+              isSharedProperties: true,
+            }
+          : null,
+      [propertiesTreeViewItemProps, sharedProperties]
+    );
+
     const createPropertyItem = React.useCallback(
-      (property: gdNamedPropertyDescriptor) => {
-        if (!propertiesTreeViewItemProps) {
+      (property: gdNamedPropertyDescriptor, isSharedProperties: boolean) => {
+        const treeViewItemProps = isSharedProperties
+          ? sharedPropertiesTreeViewItemProps
+          : propertiesTreeViewItemProps;
+        if (!treeViewItemProps) {
           return null;
         }
         return new LeafTreeViewItem(
           new EventsBasedEntityPropertyTreeViewItemContent(
             property,
-            propertiesTreeViewItemProps
+            treeViewItemProps
           )
         );
       },
-      [propertiesTreeViewItemProps]
+      [propertiesTreeViewItemProps, sharedPropertiesTreeViewItemProps]
     );
 
     const getTreeViewData = React.useCallback(
@@ -628,23 +661,24 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
           : [
               new LeafTreeViewItem(
                 new ActionTreeViewItemContent(
-                  gamePropertiesItemId,
+                  configurationItemId,
                   i18n._(t`Configuration`),
-                  // TODO Scroll to the configuration
-                  () => {},
+                  onOpenConfiguration,
                   'res/icons_default/properties_black.svg'
                 )
               ),
               {
                 isRoot: true,
                 content: new LabelTreeViewItemContent(
-                  scenesRootFolderId,
-                  i18n._(t`Behavior properties`),
+                  propertiesRootFolderId,
+                  eventsBasedObject
+                    ? i18n._(t`Object properties`)
+                    : i18n._(t`Behavior properties`),
                   {
                     icon: <Add />,
                     label: i18n._(t`Add a property`),
                     click: () => {
-                      addProperty(0, i18n);
+                      addProperty(properties, false, 0, i18n);
                     },
                     id: 'add-property',
                   }
@@ -653,19 +687,57 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
                   if (properties.getCount() === 0) {
                     return [
                       new PlaceHolderTreeViewItem(
-                        scenesEmptyPlaceholderId,
+                        propertiesEmptyPlaceholderId,
                         i18n._(t`Start by adding a new property.`)
                       ),
                     ];
                   }
                   return mapFor(0, properties.getCount(), i =>
-                    createPropertyItem(properties.getAt(i))
+                    createPropertyItem(properties.getAt(i), false)
                   ).filter(Boolean);
                 },
               },
-            ];
+              sharedProperties
+                ? {
+                    isRoot: true,
+                    content: new LabelTreeViewItemContent(
+                      sharedPropertiesRootFolderId,
+                      i18n._(t`Scene properties`),
+                      {
+                        icon: <Add />,
+                        label: i18n._(t`Add a property`),
+                        click: () => {
+                          addProperty(sharedProperties, true, 0, i18n);
+                        },
+                        id: 'add-shared-property',
+                      }
+                    ),
+                    getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+                      if (sharedProperties.getCount() === 0) {
+                        return [
+                          new PlaceHolderTreeViewItem(
+                            sharedPropertiesEmptyPlaceholderId,
+                            i18n._(t`Start by adding a new property.`)
+                          ),
+                        ];
+                      }
+                      return mapFor(0, sharedProperties.getCount(), i =>
+                        createPropertyItem(sharedProperties.getAt(i), true)
+                      ).filter(Boolean);
+                    },
+                  }
+                : null,
+            ].filter(Boolean);
       },
-      [addProperty, createPropertyItem, properties, propertiesTreeViewItemProps]
+      [
+        addProperty,
+        createPropertyItem,
+        eventsBasedObject,
+        onOpenConfiguration,
+        properties,
+        propertiesTreeViewItemProps,
+        sharedProperties,
+      ]
     );
 
     React.useImperativeHandle(ref, () => ({
@@ -676,13 +748,20 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
       focusSearchBar: () => {
         if (searchBarRef.current) searchBarRef.current.focus();
       },
-      setSelectedProperty: (propertyName: string) => {
-        if (!properties || !properties.has(propertyName)) {
+      setSelectedProperty: (
+        propertyName: string,
+        isSharedProperties: boolean
+      ) => {
+        const propertiesContainer = isSharedProperties
+          ? sharedProperties
+          : properties;
+        if (!propertiesContainer || !propertiesContainer.has(propertyName)) {
           return;
         }
-        const property = properties.get(propertyName);
+        const property = propertiesContainer.get(propertyName);
         const propertyItemId = getEventsBasedEntityPropertyTreeViewItemId(
-          property
+          property,
+          isSharedProperties
         );
         setSelectedItems(selectedItems => {
           if (
@@ -691,7 +770,9 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
           ) {
             return selectedItems;
           }
-          return [createPropertyItem(property)].filter(Boolean);
+          return [createPropertyItem(property, isSharedProperties)].filter(
+            Boolean
+          );
         });
         scrollToItem(propertyItemId);
       },
@@ -750,11 +831,8 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
       ? eventsBasedEntity.ptr
       : 'no-eventsBasedEntity';
     const initiallyOpenedNodeIds = [
-      gameSettingsRootFolderId,
-      scenesRootFolderId,
-      extensionsRootFolderId,
-      externalEventsRootFolderId,
-      externalLayoutsRootFolderId,
+      propertiesRootFolderId,
+      sharedPropertiesRootFolderId,
     ];
 
     return (

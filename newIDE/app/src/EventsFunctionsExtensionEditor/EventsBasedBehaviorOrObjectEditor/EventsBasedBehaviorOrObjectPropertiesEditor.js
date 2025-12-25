@@ -85,7 +85,7 @@ type Props = {|
   eventsBasedBehavior?: ?gdEventsBasedBehavior,
   eventsBasedObject?: ?gdEventsBasedObject,
   properties: gdPropertiesContainer,
-  isSceneProperties?: boolean,
+  isSharedProperties?: boolean,
   onPropertiesUpdated: () => void,
   onFocusProperty: (propertyName: string) => void,
   onRenameProperty: (oldName: string, newName: string) => void,
@@ -141,7 +141,7 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
       eventsBasedBehavior,
       eventsBasedObject,
       properties,
-      isSceneProperties,
+      isSharedProperties,
       onPropertiesUpdated,
       onFocusProperty,
       onRenameProperty,
@@ -521,14 +521,14 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                     label={t`Leaderboard (text)`}
                                   />
                                 )}
-                                {eventsBasedBehavior && !isSceneProperties && (
+                                {eventsBasedBehavior && !isSharedProperties && (
                                   <SelectOption
                                     key="property-type-object-animation-name"
                                     value="ObjectAnimationName"
                                     label={t`Object animation (text)`}
                                   />
                                 )}
-                                {eventsBasedBehavior && !isSceneProperties && (
+                                {eventsBasedBehavior && !isSharedProperties && (
                                   <SelectOption
                                     key="property-type-keyboard-key"
                                     value="KeyboardKey"
@@ -545,7 +545,7 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                   value="Resource"
                                   label={t`Resource`}
                                 />
-                                {eventsBasedBehavior && !isSceneProperties && (
+                                {eventsBasedBehavior && !isSharedProperties && (
                                   <SelectOption
                                     key="property-type-behavior"
                                     value="Behavior"

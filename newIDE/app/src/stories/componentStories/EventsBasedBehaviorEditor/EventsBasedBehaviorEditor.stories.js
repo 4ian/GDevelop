@@ -7,7 +7,7 @@ import { action } from '@storybook/addon-actions';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
 import paperDecorator from '../../PaperDecorator';
-import EventsBasedBehaviorEditor from '../../../EventsBasedBehaviorEditor/';
+import EventsBasedBehaviorEditor from '../../../EventsFunctionsExtensionEditor/EventsBasedBehaviorOrObjectEditor/EventsBasedBehaviorEditor';
 
 export default {
   title: 'EventsBasedBehaviorEditor/index',

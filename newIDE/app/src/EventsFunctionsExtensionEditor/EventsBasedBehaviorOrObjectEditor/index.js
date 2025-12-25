@@ -35,14 +35,14 @@ type Props = {|
   ) => void,
 |};
 
-export type EventsBasedBehaviorEditorPanelInterface = {|
+export type EventsBasedBehaviorOrObjectEditorInterface = {|
   forceUpdateProperties: () => void,
   scrollToProperty: (propertyName: string) => void,
 |};
 
-export const EventsBasedBehaviorEditorPanel = React.forwardRef<
+export const EventsBasedBehaviorOrObjectEditor = React.forwardRef<
   Props,
-  EventsBasedBehaviorEditorPanelInterface
+  EventsBasedBehaviorOrObjectEditorInterface
 >(
   (
     {
@@ -102,9 +102,6 @@ export const EventsBasedBehaviorEditorPanel = React.forwardRef<
       <Background>
         <ScrollView ref={scrollView}>
           <ColumnStackLayout expand useFullHeight noOverflowParent>
-            <Text size="block-title">
-              <Trans>Configuration</Trans>
-            </Text>
             {eventsBasedBehavior ? (
               <EventsBasedBehaviorEditor
                 project={project}
@@ -125,7 +122,11 @@ export const EventsBasedBehaviorEditorPanel = React.forwardRef<
               />
             ) : null}
             <Text size="block-title">
-              <Trans>Behavior properties</Trans>
+              {eventsBasedObject ? (
+                <Trans>Object properties</Trans>
+              ) : (
+                <Trans>Behavior properties</Trans>
+              )}
             </Text>
             {eventsBasedEntity && (
               <EventsBasedBehaviorPropertiesEditor

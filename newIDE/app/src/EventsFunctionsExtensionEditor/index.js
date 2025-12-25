@@ -20,8 +20,8 @@ import { type EventsBasedObjectCreationParameters } from '../EventsFunctionsList
 import Background from '../UI/Background';
 import OptionsEditorDialog from './OptionsEditorDialog';
 import {
-  EventsBasedBehaviorEditorPanel,
-  type EventsBasedBehaviorEditorPanelInterface,
+  EventsBasedBehaviorOrObjectEditor,
+  type EventsBasedBehaviorOrObjectEditorInterface,
 } from './EventsBasedBehaviorOrObjectEditor';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import BehaviorMethodSelectorDialog from './BehaviorMethodSelectorDialog';
@@ -156,8 +156,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   };
   editor: ?EventsSheetInterface;
   eventsFunctionList: ?EventsFunctionsListInterface;
-  eventsBasedBehaviorEditorPanel: ?EventsBasedBehaviorEditorPanelInterface;
-  eventsBasedObjectEditorPanel: ?EventsBasedBehaviorEditorPanelInterface;
+  eventsBasedBehaviorEditorPanel: ?EventsBasedBehaviorOrObjectEditorInterface;
+  eventsBasedObjectEditorPanel: ?EventsBasedBehaviorOrObjectEditorInterface;
   propertyListEditor: ?PropertyListEditorInterface;
   _editorMosaic: ?EditorMosaicInterface;
   _editorNavigator: ?EditorNavigatorInterface;
@@ -1551,7 +1551,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             </Background>
           ) : selectedEventsBasedBehavior &&
             this._projectScopedContainersAccessor ? (
-            <EventsBasedBehaviorEditorPanel
+            <EventsBasedBehaviorOrObjectEditor
               ref={ref => (this.eventsBasedBehaviorEditorPanel = ref)}
               project={project}
               projectScopedContainersAccessor={
@@ -1603,7 +1603,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             />
           ) : selectedEventsBasedObject &&
             this._projectScopedContainersAccessor ? (
-            <EventsBasedBehaviorEditorPanel
+            <EventsBasedBehaviorOrObjectEditor
               ref={ref => (this.eventsBasedObjectEditorPanel = ref)}
               project={project}
               projectScopedContainersAccessor={

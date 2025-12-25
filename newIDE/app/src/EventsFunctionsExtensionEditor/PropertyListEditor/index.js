@@ -42,6 +42,7 @@ import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import EmptyMessage from '../../UI/EmptyMessage';
 import { ColumnStackLayout } from '../../UI/Layout';
 import { useShouldAutofocusInput } from '../../UI/Responsive/ScreenTypeMeasurer';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 
 export const getProjectManagerItemId = (identifier: string) =>
   `project-manager-tab-${identifier}`;
@@ -374,6 +375,7 @@ export type PropertyListEditorInterface = {|
 
 type Props = {|
   project: gdProject,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   extension: gdEventsFunctionsExtension,
   eventsBasedBehavior: ?gdEventsBasedBehavior,
   eventsBasedObject: ?gdEventsBasedObject,
@@ -387,6 +389,7 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
   (
     {
       project,
+      projectScopedContainersAccessor,
       extension,
       eventsBasedBehavior,
       eventsBasedObject,
@@ -566,6 +569,7 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
               editName,
               scrollToItem,
               project,
+              projectScopedContainersAccessor,
               extension,
               eventsBasedEntity,
               eventsBasedBehavior,
@@ -591,6 +595,7 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
         editName,
         scrollToItem,
         project,
+        projectScopedContainersAccessor,
         extension,
         eventsBasedBehavior,
         eventsBasedObject,

@@ -16,6 +16,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import VisibilityOffIcon from '../../UI/CustomSvgIcons/VisibilityOff';
 import { renderQuickCustomizationMenuItems } from '../../QuickCustomization/QuickCustomizationMenuItems';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
 
@@ -25,9 +26,31 @@ const styles = {
   tooltip: { marginRight: 5, verticalAlign: 'bottom' },
 };
 
+// Those names are used internally by GDevelop.
+const PROTECTED_PROPERTY_NAMES = ['name', 'type'];
+
+const getValidatedPropertyName = (
+  properties: gdPropertiesContainer,
+  projectScopedContainers: gdProjectScopedContainers,
+  newName: string
+): string => {
+  const variablesContainersList = projectScopedContainers.getVariablesContainersList();
+  const objectsContainersList = projectScopedContainers.getObjectsContainersList();
+  const safeAndUniqueNewName = newNameGenerator(
+    gd.Project.getSafeName(newName),
+    tentativeNewName =>
+      properties.has(tentativeNewName) ||
+      variablesContainersList.has(tentativeNewName) ||
+      objectsContainersList.hasObjectNamed(tentativeNewName) ||
+      PROTECTED_PROPERTY_NAMES.includes(tentativeNewName)
+  );
+  return safeAndUniqueNewName;
+};
+
 export type EventsBasedEntityPropertyTreeViewItemProps = {|
   ...TreeItemProps,
   project: gdProject,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   extension: gdEventsFunctionsExtension,
   eventsBasedEntity: gdAbstractEventsBasedEntity,
   eventsBasedBehavior: ?gdEventsBasedBehavior,
@@ -113,6 +136,17 @@ export class EventsBasedEntityPropertyTreeViewItemContent
       return;
     }
     this.props.onRenameProperty(oldName, newName);
+
+    const projectScopedContainers = this.props.projectScopedContainersAccessor.get();
+    const validatedNewName = getValidatedPropertyName(
+      this.props.properties,
+      projectScopedContainers,
+      newName
+    );
+    this.props.onRenameProperty(oldName, validatedNewName);
+    this.property.setName(validatedNewName);
+
+    this._onProjectItemModified();
   }
 
   edit(): void {

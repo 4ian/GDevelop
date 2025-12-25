@@ -1430,10 +1430,15 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     unsavedChanges={this.props.unsavedChanges}
                     getFunctionGroupNames={this._getFunctionGroupNames}
                   />
-                ) : selectedEventsBasedObject || selectedEventsBasedBehavior ? (
+                ) : (selectedEventsBasedObject ||
+                    selectedEventsBasedBehavior) &&
+                  this._projectScopedContainersAccessor ? (
                   <PropertyListEditor
                     ref={ref => (this.propertyListEditor = ref)}
                     project={project}
+                    projectScopedContainersAccessor={
+                      this._projectScopedContainersAccessor
+                    }
                     extension={eventsFunctionsExtension}
                     eventsBasedBehavior={selectedEventsBasedBehavior}
                     eventsBasedObject={selectedEventsBasedObject}

@@ -135,7 +135,8 @@ const EventsBasedObjectScenePropertiesDialog = ({
       maxWidth="sm"
       secondaryActions={[
         <RaisedButton
-          key="edit-scene-variables"
+          key="fit-area-to-content"
+          id="fit-area-to-content"
           label={<Trans>Fit to content</Trans>}
           fullWidth
           onClick={() => {

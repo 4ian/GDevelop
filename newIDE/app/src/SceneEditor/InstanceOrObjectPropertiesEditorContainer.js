@@ -14,6 +14,8 @@ import { CompactObjectPropertiesEditor } from '../ObjectEditor/CompactObjectProp
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { CompactLayerPropertiesEditor } from '../LayersList/CompactLayerPropertiesEditor';
+import { CompactEventsBasedObjectVariantPropertiesEditor } from '../SceneEditor/CompactEventsBasedObjectVariantPropertiesEditor';
+import Rectangle from '../Utils/Rectangle';
 
 export const styles = {
   paper: {
@@ -32,8 +34,6 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
   i18n: I18nType,
   lastSelectionType: 'instance' | 'object' | 'layer',
-
-  // For objects or instances:
   historyHandler?: HistoryHandler,
   isVariableListLocked: boolean,
   layout?: ?gdLayout,
@@ -75,6 +75,14 @@ type Props = {|
   onEditLayer: (layer: gdLayer) => void,
   onEditLayerEffects: (layer: gdLayer) => void,
   onLayersModified: (layers: Array<gdLayer>) => void,
+
+  // For variants:
+  eventsBasedObject: gdEventsBasedObject | null,
+  eventsBasedObjectVariant: gdEventsBasedObjectVariant | null,
+  getContentAABB: () => Rectangle | null,
+  onEventsBasedObjectChildrenEdited: (
+    eventsBasedObject: gdEventsBasedObject
+  ) => void,
 |};
 
 export type InstanceOrObjectPropertiesEditorInterface = {|
@@ -98,6 +106,11 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
   }));
 
   const {
+    project,
+    layersContainer,
+    projectScopedContainersAccessor,
+    unsavedChanges,
+    i18n,
     lastSelectionType,
 
     // For objects:
@@ -129,14 +142,18 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
     onEditLayerEffects,
     onLayersModified,
 
+    // For variants
+    eventsBasedObject,
+    eventsBasedObjectVariant,
+    getContentAABB,
+    onEventsBasedObjectChildrenEdited,
+
     // For objects or instances:
     historyHandler,
     isVariableListLocked,
     layout,
     objectsContainer,
     globalObjectsContainer,
-
-    ...commonProps
   } = props;
 
   return (
@@ -155,7 +172,11 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
           layout={layout}
           objectsContainer={objectsContainer}
           globalObjectsContainer={globalObjectsContainer}
-          {...commonProps}
+          layersContainer={layersContainer}
+          project={project}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
+          unsavedChanges={unsavedChanges}
+          i18n={i18n}
         />
       ) : !!objects.length && lastSelectionType === 'object' ? (
         <CompactObjectPropertiesEditor
@@ -178,7 +199,11 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
           layout={layout}
           objectsContainer={objectsContainer}
           globalObjectsContainer={globalObjectsContainer}
-          {...commonProps}
+          layersContainer={layersContainer}
+          project={project}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
+          unsavedChanges={unsavedChanges}
+          i18n={i18n}
         />
       ) : layer && lastSelectionType === 'layer' ? (
         <CompactLayerPropertiesEditor
@@ -188,7 +213,22 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
           onLayersModified={onLayersModified}
           onEffectAdded={onEffectAdded}
           resourceManagementProps={resourceManagementProps}
-          {...commonProps}
+          layersContainer={layersContainer}
+          project={project}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
+          unsavedChanges={unsavedChanges}
+          i18n={i18n}
+        />
+      ) : eventsBasedObject && eventsBasedObjectVariant ? (
+        <CompactEventsBasedObjectVariantPropertiesEditor
+          eventsBasedObject={eventsBasedObject}
+          eventsBasedObjectVariant={eventsBasedObjectVariant}
+          getContentAABB={getContentAABB}
+          onEventsBasedObjectChildrenEdited={() =>
+            onEventsBasedObjectChildrenEdited(eventsBasedObject)
+          }
+          unsavedChanges={unsavedChanges}
+          i18n={i18n}
         />
       ) : (
         <EmptyMessage>

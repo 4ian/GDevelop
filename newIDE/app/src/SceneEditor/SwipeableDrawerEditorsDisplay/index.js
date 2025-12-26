@@ -482,6 +482,16 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       onEditLayerEffects={props.editLayerEffects}
                       onEditLayer={props.editLayer}
                       onLayersModified={props.onLayersModified}
+                      eventsBasedObject={props.eventsBasedObject}
+                      eventsBasedObjectVariant={props.eventsBasedObjectVariant}
+                      getContentAABB={
+                        editorRef.current
+                          ? editorRef.current.getContentAABB
+                          : () => null
+                      }
+                      onEventsBasedObjectChildrenEdited={
+                        props.onEventsBasedObjectChildrenEdited
+                      }
                     />
                   )}
                 </I18n>

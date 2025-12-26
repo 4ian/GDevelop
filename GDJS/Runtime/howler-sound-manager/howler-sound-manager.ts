@@ -292,8 +292,13 @@ namespace gdjs {
      * @returns A float from 0 to 1.
      */
     getVolume(): float {
-      if (this._id === null) return this._initialVolume;
-      return this._howl.volume(this._id);
+      try {
+        if (this._id === null) return this._initialVolume;
+        return this._howl.volume(this._id);
+      } catch (error) {
+        handleHowlerSoundMethodError(error, 'getVolume');
+      }
+      return this._initialVolume;
     }
 
     /**
@@ -1031,9 +1036,11 @@ namespace gdjs {
         try {
           await this._preloadAudioFile(resource, /* isMusic= */ true);
         } catch (error) {
+          delete this._availableResources[resource.name];
           logger.warn(
             'There was an error while preloading an audio file: ' + error
           );
+          throw error;
         }
       }
 
@@ -1041,9 +1048,11 @@ namespace gdjs {
         try {
           await this._preloadAudioFile(resource, /* isMusic= */ false);
         } catch (error) {
+          delete this._availableResources[resource.name];
           logger.warn(
             'There was an error while preloading an audio file: ' + error
           );
+          throw error;
         }
       } else if (
         resource.preloadInCache ||
@@ -1061,7 +1070,15 @@ namespace gdjs {
             const sound = new XMLHttpRequest();
             sound.withCredentials =
               this._resourceLoader.checkIfCredentialsRequired(file);
-            sound.addEventListener('load', resolve);
+            sound.addEventListener('load', () => {
+              if (sound.status >= 200 && sound.status < 300) {
+                resolve(undefined);
+              } else {
+                reject(
+                  `HTTP error while preloading audio file in cache. Status is ${sound.status}.`
+                );
+              }
+            });
             sound.addEventListener('error', (_) =>
               reject('XHR error: ' + file)
             );
@@ -1072,9 +1089,11 @@ namespace gdjs {
             sound.send();
           });
         } catch (error) {
+          delete this._availableResources[resource.name];
           logger.warn(
             'There was an error while preloading an audio file: ' + error
           );
+          throw error;
         }
       }
     }

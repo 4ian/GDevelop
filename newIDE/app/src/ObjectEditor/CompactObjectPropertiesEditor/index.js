@@ -496,6 +496,7 @@ export const CompactObjectPropertiesEditor = ({
           objectConfiguration.getProperties(),
         onUpdateProperty: ({ objectConfiguration }, name, value) => {
           objectConfiguration.updateProperty(name, value);
+          onObjectsModified([object]);
         },
         object,
         visibility: 'All',
@@ -506,6 +507,7 @@ export const CompactObjectPropertiesEditor = ({
       objectConfigurationAsGd,
       object,
       customObjectEventsBasedObject,
+      onObjectsModified,
     ]
   );
 

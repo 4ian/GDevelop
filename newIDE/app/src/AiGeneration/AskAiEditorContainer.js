@@ -13,11 +13,13 @@ import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import Paper from '../UI/Paper';
 import { AiRequestChat, type AiRequestChatInterface } from './AiRequestChat';
 import {
-  addMessageToAiRequest,
-  createAiRequest,
   sendAiRequestFeedback,
   type AiRequest,
 } from '../Utils/GDevelopServices/Generation';
+import {
+  createAiRequestWithCustomKeys,
+  addMessageToAiRequestWithCustomKeys,
+} from './Local/AiRequestWrapper';
 import { delay } from '../Utils/Delay';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { Toolbar } from './Toolbar';
@@ -418,20 +420,23 @@ export const AskAiEditor = React.memo<Props>(
                 projectSpecificExtensionsSummaryJson,
               });
 
-              const aiRequest = await createAiRequest(getAuthorizationHeader, {
-                userRequest: userRequest,
-                userId: profile.id,
-                ...preparedAiUserContent,
-                payWithCredits,
-                gameId: project ? project.getProjectUuid() : null,
-                fileMetadata,
-                storageProviderName,
-                mode,
-                toolsVersion: AI_CHAT_TOOLS_VERSION,
-                aiConfiguration: {
-                  presetId: aiConfigurationPresetId,
-                },
-              });
+              const aiRequest = await createAiRequestWithCustomKeys(
+                getAuthorizationHeader,
+                {
+                  userRequest: userRequest,
+                  userId: profile.id,
+                  ...preparedAiUserContent,
+                  payWithCredits,
+                  gameId: project ? project.getProjectUuid() : null,
+                  fileMetadata,
+                  storageProviderName,
+                  mode,
+                  toolsVersion: AI_CHAT_TOOLS_VERSION,
+                  aiConfiguration: {
+                    presetId: aiConfigurationPresetId,
+                  },
+                }
+              );
 
               console.info('Successfully created a new AI request:', aiRequest);
               setSendingAiRequest(null, false);
@@ -604,7 +609,7 @@ export const AskAiEditor = React.memo<Props>(
               );
 
             const aiRequest: AiRequest = await retryIfFailed({ times: 2 }, () =>
-              addMessageToAiRequest(getAuthorizationHeader, {
+              addMessageToAiRequestWithCustomKeys(getAuthorizationHeader, {
                 userId: profile.id,
                 aiRequestId: selectedAiRequestId,
                 functionCallOutputs,

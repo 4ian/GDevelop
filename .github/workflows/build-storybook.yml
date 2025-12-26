@@ -32,6 +32,7 @@ jobs:
           cache-dependency-path: "newIDE/app/package-lock.json"
 
       - name: Configure AWS Credentials
+        if: ${{ secrets.BUILD_STORYBOOK_AWS_ACCESS_KEY_ID != '' }}
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.BUILD_STORYBOOK_AWS_ACCESS_KEY_ID }}
@@ -48,14 +49,17 @@ jobs:
 
       # Publish on S3 to allow quick testing of components.
       - name: Publish Storybook to S3 bucket (specific commit)
+        if: ${{ secrets.BUILD_STORYBOOK_AWS_ACCESS_KEY_ID != '' }}
         run: aws s3 sync ./build-storybook/ s3://gdevelop-storybook/$(git rev-parse --abbrev-ref HEAD)/commit/$(git rev-parse HEAD)/ --delete
         working-directory: newIDE/app
 
       - name: Publish Storybook to S3 bucket (latest)
+        if: ${{ secrets.BUILD_STORYBOOK_AWS_ACCESS_KEY_ID != '' }}
         run: aws s3 sync ./build-storybook/ s3://gdevelop-storybook/$(git rev-parse --abbrev-ref HEAD)/latest/ --delete
         working-directory: newIDE/app
 
       - name: Log urls to the Storybook
+        if: ${{ secrets.BUILD_STORYBOOK_AWS_ACCESS_KEY_ID != '' }}
         run: |
           echo "Find the latest Storybook for this branch on https://gdevelop-storybook.s3.amazonaws.com/$(git rev-parse --abbrev-ref HEAD)/latest/index.html"
           echo "Find the Storybook for this commit on https://gdevelop-storybook.s3.amazonaws.com/$(git rev-parse --abbrev-ref HEAD)/commit/$(git rev-parse HEAD)/index.html"

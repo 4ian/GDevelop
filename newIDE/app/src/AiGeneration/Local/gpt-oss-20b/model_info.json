@@ -1,0 +1,11 @@
+{
+  "model_id": "openai/gpt-oss-20b",
+  "name": "GPT-OSS 20B",
+  "description": "OpenAI's open source language model",
+  "source": "https://huggingface.co/openai/gpt-oss-20b",
+  "estimated_size": "~40GB",
+  "type": "text-generation",
+  "parameters": "20B",
+  "downloaded": false,
+  "instructions": "Run download_models.py or download_models.sh to download this model"
+}

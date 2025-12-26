@@ -4,11 +4,14 @@ import {
   type AiConfigurationPreset,
   type AiSettings,
 } from '../Utils/GDevelopServices/Generation';
+import { AVAILABLE_LOCAL_MODELS } from './Local/LocalModelManager';
+import { shouldUseLocalModel, getActiveLocalModel } from './Local/LocalStorage';
 
 export type AiConfigurationPresetWithAvailability = {|
   ...AiConfigurationPreset,
   disabled: boolean,
   enableWith: 'higher-tier-plan' | null,
+  isLocalModel?: boolean,
 |};
 
 export const getAiConfigurationPresetsWithAvailability = ({
@@ -31,7 +34,7 @@ export const getAiConfigurationPresetsWithAvailability = ({
     }));
   }
 
-  return aiSettings.aiRequest.presets.map(preset => {
+  const onlinePresets = aiSettings.aiRequest.presets.map(preset => {
     const presetAvailability = limits.capabilities.ai.availablePresets.find(
       presetAvailability =>
         presetAvailability.id === preset.id &&
@@ -45,8 +48,26 @@ export const getAiConfigurationPresetsWithAvailability = ({
           ? presetAvailability.disabled
           : preset.disabled,
       enableWith: (presetAvailability && presetAvailability.enableWith) || null,
+      isLocalModel: false,
     };
   });
+
+  // Add local model presets
+  const localModelPresets: Array<AiConfigurationPresetWithAvailability> = AVAILABLE_LOCAL_MODELS.map(
+    model => ({
+      mode: 'chat',
+      id: `local-${model.id}`,
+      nameByLocale: {
+        en: `${model.name} (Local)`,
+      },
+      disabled: false,
+      isDefault: false,
+      enableWith: null,
+      isLocalModel: true,
+    })
+  );
+
+  return [...onlinePresets, ...localModelPresets];
 };
 
 export const getDefaultAiConfigurationPresetId = (
@@ -61,4 +82,19 @@ export const getDefaultAiConfigurationPresetId = (
     (defaultPresetWithAvailability && defaultPresetWithAvailability.id) ||
     'default'
   );
+};
+
+/**
+ * Check if a preset is a local model
+ */
+export const isLocalModelPreset = (presetId: string): boolean => {
+  return presetId.startsWith('local-');
+};
+
+/**
+ * Check if the current configuration uses unlimited requests
+ * (local models or custom API keys)
+ */
+export const hasUnlimitedRequests = (presetId: string): boolean => {
+  return isLocalModelPreset(presetId);
 };

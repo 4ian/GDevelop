@@ -1,0 +1,11 @@
+{
+  "model_id": "ServiceNow-AI/Apriel-1.5-15b-Thinker",
+  "name": "Apriel 1.5 15B Thinker",
+  "description": "ServiceNow AI's advanced reasoning model for complex problem solving",
+  "source": "https://huggingface.co/ServiceNow-AI/Apriel-1.5-15b-Thinker",
+  "estimated_size": "~30GB",
+  "type": "text-generation",
+  "parameters": "15B",
+  "downloaded": false,
+  "instructions": "Run download_models.py or download_models.sh to download this model"
+}

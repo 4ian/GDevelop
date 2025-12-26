@@ -1,0 +1,60 @@
+# GitHub Action to download local AI models for GDevelop
+# This is a manual workflow due to the large size of the models (~134GB total)
+
+name: Download Local AI Models
+
+on:
+  # Only allow manual triggering to avoid automatic downloads
+  workflow_dispatch:
+    inputs:
+      model:
+        description: 'Which model to download (0=Apriel, 1=GPT-OSS, 2=Qwen, all=All models)'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - '0'
+          - '1'
+          - '2'
+
+jobs:
+  download-models:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install Python dependencies
+        run: |
+          pip install huggingface_hub
+
+      - name: Download AI Models
+        run: |
+          cd newIDE/app/src/AiGeneration/Local
+          if [ "${{ github.event.inputs.model }}" = "all" ]; then
+            python3 download_models.py
+          else
+            python3 download_models.py ${{ github.event.inputs.model }}
+          fi
+
+      - name: Create model archive
+        run: |
+          cd newIDE/app/src/AiGeneration/Local
+          tar -czf ai-models.tar.gz apriel-1.5-15b-thinker gpt-oss-20b qwen3-vl-32b-instruct
+
+      - name: Upload models as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: gdevelop-ai-models
+          path: newIDE/app/src/AiGeneration/Local/ai-models.tar.gz
+          retention-days: 7
+
+      - name: Log completion
+        run: |
+          echo "AI models have been downloaded and archived."
+          echo "Download the artifact from the Actions tab to use these models locally."

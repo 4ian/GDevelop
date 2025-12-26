@@ -2,11 +2,11 @@
 import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import { AiRequestChat, type AiRequestChatInterface } from './AiRequestChat';
+import { type AiRequest } from '../Utils/GDevelopServices/Generation';
 import {
-  addMessageToAiRequest,
-  createAiRequest,
-  type AiRequest,
-} from '../Utils/GDevelopServices/Generation';
+  createAiRequestWithCustomKeys,
+  addMessageToAiRequestWithCustomKeys,
+} from './Local/AiRequestWrapper';
 import { delay } from '../Utils/Delay';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { makeSimplifiedProjectBuilder } from '../EditorFunctions/SimplifiedProject/SimplifiedProject';
@@ -278,20 +278,23 @@ export const AskAiStandAloneForm = ({
             projectSpecificExtensionsSummaryJson: null,
           });
 
-          const aiRequest = await createAiRequest(getAuthorizationHeader, {
-            userRequest: userRequest,
-            userId: profile.id,
-            ...preparedAiUserContent,
-            payWithCredits,
-            gameId: null, // No game associated when starting from the standalone form.
-            fileMetadata: null, // No file metadata when starting from the standalone form.
-            storageProviderName,
-            mode: aiRequestModeForForm,
-            toolsVersion: AI_AGENT_TOOLS_VERSION,
-            aiConfiguration: {
-              presetId: aiConfigurationPresetId,
-            },
-          });
+          const aiRequest = await createAiRequestWithCustomKeys(
+            getAuthorizationHeader,
+            {
+              userRequest: userRequest,
+              userId: profile.id,
+              ...preparedAiUserContent,
+              payWithCredits,
+              gameId: null, // No game associated when starting from the standalone form.
+              fileMetadata: null, // No file metadata when starting from the standalone form.
+              storageProviderName,
+              mode: aiRequestModeForForm,
+              toolsVersion: AI_AGENT_TOOLS_VERSION,
+              aiConfiguration: {
+                presetId: aiConfigurationPresetId,
+              },
+            }
+          );
 
           console.info('Successfully created a new AI request:', aiRequest);
           setSendingAiRequest(null, false);
@@ -437,7 +440,7 @@ export const AskAiStandAloneForm = ({
           );
 
         const aiRequest: AiRequest = await retryIfFailed({ times: 2 }, () =>
-          addMessageToAiRequest(getAuthorizationHeader, {
+          addMessageToAiRequestWithCustomKeys(getAuthorizationHeader, {
             userId: profile.id,
             aiRequestId: aiRequestIdForForm,
             functionCallOutputs,

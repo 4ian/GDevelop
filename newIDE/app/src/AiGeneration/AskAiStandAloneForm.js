@@ -276,12 +276,19 @@ export const AskAiStandAloneForm = ({
             userId: profile.id,
             simplifiedProjectJson: null,
             projectSpecificExtensionsSummaryJson: null,
+            eventsJson: null,
           });
 
           const aiRequest = await createAiRequest(getAuthorizationHeader, {
             userRequest: userRequest,
             userId: profile.id,
-            ...preparedAiUserContent,
+            gameProjectJsonUserRelativeKey:
+              preparedAiUserContent.gameProjectJsonUserRelativeKey,
+            gameProjectJson: preparedAiUserContent.gameProjectJson,
+            projectSpecificExtensionsSummaryJsonUserRelativeKey:
+              preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
+            projectSpecificExtensionsSummaryJson:
+              preparedAiUserContent.projectSpecificExtensionsSummaryJson,
             payWithCredits,
             gameId: null, // No game associated when starting from the standalone form.
             fileMetadata: null, // No file metadata when starting from the standalone form.
@@ -426,6 +433,7 @@ export const AskAiStandAloneForm = ({
           userId: profile.id,
           simplifiedProjectJson,
           projectSpecificExtensionsSummaryJson,
+          eventsJson: null,
         });
 
         // If we're updating the request, following a function call to initialize the project,
@@ -441,7 +449,13 @@ export const AskAiStandAloneForm = ({
             userId: profile.id,
             aiRequestId: aiRequestIdForForm,
             functionCallOutputs,
-            ...preparedAiUserContent,
+            gameProjectJsonUserRelativeKey:
+              preparedAiUserContent.gameProjectJsonUserRelativeKey,
+            gameProjectJson: preparedAiUserContent.gameProjectJson,
+            projectSpecificExtensionsSummaryJsonUserRelativeKey:
+              preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
+            projectSpecificExtensionsSummaryJson:
+              preparedAiUserContent.projectSpecificExtensionsSummaryJson,
             gameId: upToDateProject
               ? upToDateProject.getProjectUuid()
               : undefined,

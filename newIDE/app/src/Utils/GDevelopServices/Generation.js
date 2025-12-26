@@ -82,6 +82,11 @@ export type AiConfiguration = {
   presetId: string,
 };
 
+type AiRequestToolOptions = {
+  includeEventsJson?: boolean,
+  watchPollingIntervalInMs?: number,
+};
+
 export type AiRequest = {
   id: string,
   createdAt: string,
@@ -93,6 +98,7 @@ export type AiRequest = {
   mode?: 'chat' | 'agent',
   aiConfiguration?: AiConfiguration,
   toolsVersion?: string,
+  toolOptions?: AiRequestToolOptions | null,
 
   error: {
     code: string,
@@ -158,6 +164,8 @@ export type AiGeneratedEvent = {
   extensionNamesList: string,
   objectsList: string,
   existingEventsAsText: string,
+  existingEventsJson: string | null,
+  existingEventsJsonUserRelativeKey: string | null,
 
   resultMessage: string | null,
   changes: Array<AiGeneratedEventChange> | null,
@@ -207,6 +215,38 @@ export const getAiRequest = async (
     {
       params: {
         userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+  return ensureObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/ai-request/{id} of Generation API',
+  });
+};
+
+export const getPartialAiRequest = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    aiRequestId,
+    include,
+  }: {|
+    userId: string,
+    aiRequestId: string,
+    include: string,
+  |}
+): Promise<$Shape<AiRequest>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.get(
+    `${GDevelopGenerationApi.baseUrl}/ai-request/${aiRequestId}`,
+    {
+      params: {
+        userId,
+        include,
       },
       headers: {
         Authorization: authorizationHeader,
@@ -507,6 +547,8 @@ export const createAiGeneratedEvent = async (
     extensionNamesList,
     objectsList,
     existingEventsAsText,
+    existingEventsJson,
+    existingEventsJsonUserRelativeKey,
     placementHint,
     relatedAiRequestId,
   }: {|
@@ -520,6 +562,8 @@ export const createAiGeneratedEvent = async (
     extensionNamesList: string,
     objectsList: string,
     existingEventsAsText: string,
+    existingEventsJson: string | null,
+    existingEventsJsonUserRelativeKey: string | null,
     placementHint: string | null,
     relatedAiRequestId: string,
   |}
@@ -538,6 +582,8 @@ export const createAiGeneratedEvent = async (
       extensionNamesList,
       objectsList,
       existingEventsAsText,
+      existingEventsJson,
+      existingEventsJsonUserRelativeKey,
       placementHint,
       relatedAiRequestId,
     },
@@ -654,6 +700,8 @@ export type AiUserContentPresignedUrlsResult = {
   gameProjectJsonUserRelativeKey?: string,
   projectSpecificExtensionsSummaryJsonSignedUrl?: string,
   projectSpecificExtensionsSummaryJsonUserRelativeKey?: string,
+  eventsJsonSignedUrl?: string,
+  eventsJsonUserRelativeKey?: string,
 };
 
 export const createAiUserContentPresignedUrls = async (
@@ -662,10 +710,12 @@ export const createAiUserContentPresignedUrls = async (
     userId,
     gameProjectJsonHash,
     projectSpecificExtensionsSummaryJsonHash,
+    eventsJsonHash,
   }: {|
     userId: string,
     gameProjectJsonHash: string | null,
     projectSpecificExtensionsSummaryJsonHash: string | null,
+    eventsJsonHash: string | null,
   |}
 ): Promise<AiUserContentPresignedUrlsResult> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -675,6 +725,7 @@ export const createAiUserContentPresignedUrls = async (
       gdevelopVersionWithHash: getIDEVersionWithHash(),
       gameProjectJsonHash,
       projectSpecificExtensionsSummaryJsonHash,
+      eventsJsonHash,
     },
     {
       params: {

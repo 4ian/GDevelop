@@ -16,6 +16,7 @@ import {
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
+  type ToolOptions,
 } from '.';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
 
@@ -40,6 +41,7 @@ export type ProcessEditorFunctionCallsOptions = {|
   functionCalls: Array<EditorFunctionCall>,
   i18n: I18nType,
   editorCallbacks: EditorCallbacks,
+  toolOptions: ToolOptions | null,
   ignore: boolean,
   generateEvents: (
     options: EventsGenerationOptions
@@ -71,6 +73,7 @@ export const processEditorFunctionCalls = async ({
   project,
   i18n,
   editorCallbacks,
+  toolOptions,
   generateEvents,
   onSceneEventsModifiedOutsideEditor,
   onInstancesModifiedOutsideEditor,
@@ -172,6 +175,7 @@ export const processEditorFunctionCalls = async ({
       const argumentsWithoutProject = {
         args,
         i18n,
+        toolOptions,
         editorCallbacks,
         generateEvents,
         onSceneEventsModifiedOutsideEditor,

@@ -9,6 +9,7 @@ import {
 } from '../MainFrame/EditorContainers/BaseEditor';
 import {
   getAiRequest,
+  getPartialAiRequest,
   getAiRequestSuggestions,
   type AiRequest,
   type AiRequestMessageAssistantFunctionCall,
@@ -33,6 +34,7 @@ import { useInterval } from '../Utils/UseInterval';
 import { makeSimplifiedProjectBuilder } from '../EditorFunctions/SimplifiedProject/SimplifiedProject';
 import { prepareAiUserContent } from './PrepareAiUserContent';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
+import { retryIfFailed } from '../Utils/RetryIfFailed';
 
 const gd: libGDevelop = global.gd;
 
@@ -149,6 +151,7 @@ export const useProcessFunctionCalls = ({
       } = await processEditorFunctionCalls({
         project,
         editorCallbacks,
+        toolOptions: selectedAiRequest.toolOptions || null,
         i18n,
         functionCalls: functionCalls.map(functionCall => ({
           name: functionCall.name,
@@ -273,19 +276,53 @@ export const useAiRequestState = ({ project }: {| project: ?gdProject |}) => {
     if (!profile) return;
     if (!selectedAiRequestId || !status || status !== 'working') return;
 
-    const aiRequest = await getAiRequest(getAuthorizationHeader, {
-      userId: profile.id,
-      aiRequestId: selectedAiRequestId,
-    });
+    try {
+      // Use partial request to only fetch the status
+      const partialAiRequest = await getPartialAiRequest(
+        getAuthorizationHeader,
+        {
+          userId: profile.id,
+          aiRequestId: selectedAiRequestId,
+          include: 'status',
+        }
+      );
 
-    updateAiRequest(selectedAiRequestId, aiRequest);
+      if (partialAiRequest.status === 'working') {
+        updateAiRequest(selectedAiRequestId, {
+          ...aiRequests[selectedAiRequestId],
+          ...partialAiRequest,
+        });
+      } else {
+        // The request is not "working" anymore, refresh it entirely.
+        // Note: if this fails, the request will be refreshed again on the next interval
+        // (because no call to updateAiRequest is made).
+        const aiRequest = await retryIfFailed({ times: 2 }, () =>
+          getAiRequest(getAuthorizationHeader, {
+            userId: profile.id,
+            aiRequestId: selectedAiRequestId,
+          })
+        );
+
+        updateAiRequest(selectedAiRequestId, aiRequest);
+      }
+    } catch (error) {
+      console.warn(
+        'Error while watching AI request. Ignoring and will retry on the next interval.',
+        error
+      );
+    }
   };
 
+  const watchPollingIntervalInMs =
+    (selectedAiRequest &&
+      selectedAiRequest.toolOptions &&
+      selectedAiRequest.toolOptions.watchPollingIntervalInMs) ||
+    1400;
   useInterval(
     () => {
       onWatch();
     },
-    shouldWatchRequest ? 1000 : null
+    shouldWatchRequest ? watchPollingIntervalInMs : null
   );
 
   React.useEffect(
@@ -358,6 +395,7 @@ export const useAiRequestState = ({ project }: {| project: ?gdProject |}) => {
           userId: profile.id,
           simplifiedProjectJson,
           projectSpecificExtensionsSummaryJson,
+          eventsJson: null,
         });
 
         const isLastMessageFunctionCallOutputProjectInitialization =
@@ -374,7 +412,13 @@ export const useAiRequestState = ({ project }: {| project: ?gdProject |}) => {
               suggestionsType: isLastMessageFunctionCallOutputProjectInitialization
                 ? 'list-with-explanations'
                 : 'simple-list',
-              ...preparedAiUserContent,
+              gameProjectJsonUserRelativeKey:
+                preparedAiUserContent.gameProjectJsonUserRelativeKey,
+              gameProjectJson: preparedAiUserContent.gameProjectJson,
+              projectSpecificExtensionsSummaryJsonUserRelativeKey:
+                preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
+              projectSpecificExtensionsSummaryJson:
+                preparedAiUserContent.projectSpecificExtensionsSummaryJson,
             }
           );
 

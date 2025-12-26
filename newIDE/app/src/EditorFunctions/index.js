@@ -5,6 +5,7 @@ import { mapFor, mapVector } from '../Utils/MapFor';
 import { SafeExtractor } from '../Utils/SafeExtractor';
 import {
   serializeToJSObject,
+  serializeToJSON,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { type AiGeneratedEvent } from '../Utils/GDevelopServices/Generation';
@@ -111,6 +112,7 @@ export type EventsGenerationOptions = {|
   extensionNamesList: string,
   objectsList: string,
   existingEventsAsText: string,
+  existingEventsJson: string | null,
   placementHint: string,
 |};
 
@@ -170,6 +172,10 @@ export type ObjectGroupsOutsideEditorChanges = {|
   scene: gdLayout,
 |};
 
+export type ToolOptions = {
+  includeEventsJson?: boolean,
+};
+
 type RenderForEditorOptions = {|
   project: ?gdProject,
   args: any,
@@ -180,6 +186,7 @@ type RenderForEditorOptions = {|
 type LaunchFunctionOptionsWithoutProject = {|
   args: any,
   editorCallbacks: EditorCallbacks,
+  toolOptions: ToolOptions | null,
   i18n: I18nType,
   generateEvents: (
     options: EventsGenerationOptions
@@ -3237,6 +3244,7 @@ const addSceneEvents: EditorFunction = {
   launchFunction: async ({
     project,
     args,
+    toolOptions,
     generateEvents,
     onSceneEventsModifiedOutsideEditor,
     ensureExtensionInstalled,
@@ -3266,6 +3274,10 @@ const addSceneEvents: EditorFunction = {
     const existingEventsAsText = renderNonTranslatedEventsAsText({
       eventsList: currentSceneEvents,
     });
+    const existingEventsJson =
+      toolOptions && toolOptions.includeEventsJson
+        ? serializeToJSON(currentSceneEvents)
+        : null;
 
     try {
       const eventsGenerationResult: EventsGenerationResult = await generateEvents(
@@ -3275,6 +3287,7 @@ const addSceneEvents: EditorFunction = {
           extensionNamesList,
           objectsList,
           existingEventsAsText,
+          existingEventsJson,
           placementHint,
         }
       );

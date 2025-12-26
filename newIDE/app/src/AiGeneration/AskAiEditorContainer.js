@@ -416,12 +416,19 @@ export const AskAiEditor = React.memo<Props>(
                 userId: profile.id,
                 simplifiedProjectJson,
                 projectSpecificExtensionsSummaryJson,
+                eventsJson: null,
               });
 
               const aiRequest = await createAiRequest(getAuthorizationHeader, {
                 userRequest: userRequest,
                 userId: profile.id,
-                ...preparedAiUserContent,
+                gameProjectJsonUserRelativeKey:
+                  preparedAiUserContent.gameProjectJsonUserRelativeKey,
+                gameProjectJson: preparedAiUserContent.gameProjectJson,
+                projectSpecificExtensionsSummaryJsonUserRelativeKey:
+                  preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
+                projectSpecificExtensionsSummaryJson:
+                  preparedAiUserContent.projectSpecificExtensionsSummaryJson,
                 payWithCredits,
                 gameId: project ? project.getProjectUuid() : null,
                 fileMetadata,
@@ -593,6 +600,7 @@ export const AskAiEditor = React.memo<Props>(
               userId: profile.id,
               simplifiedProjectJson,
               projectSpecificExtensionsSummaryJson,
+              eventsJson: null,
             });
 
             // If we're updating the request, following a function call to initialize the project,
@@ -608,7 +616,13 @@ export const AskAiEditor = React.memo<Props>(
                 userId: profile.id,
                 aiRequestId: selectedAiRequestId,
                 functionCallOutputs,
-                ...preparedAiUserContent,
+                gameProjectJsonUserRelativeKey:
+                  preparedAiUserContent.gameProjectJsonUserRelativeKey,
+                gameProjectJson: preparedAiUserContent.gameProjectJson,
+                projectSpecificExtensionsSummaryJsonUserRelativeKey:
+                  preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
+                projectSpecificExtensionsSummaryJson:
+                  preparedAiUserContent.projectSpecificExtensionsSummaryJson,
                 gameId: upToDateProject
                   ? upToDateProject.getProjectUuid()
                   : undefined,

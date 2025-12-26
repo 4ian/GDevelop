@@ -60,7 +60,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "res/conditions/var.png")
       .AddParameter("variableOrPropertyOrParameter", _("Variable"))
       .AddParameter("trueorfalse", _("Check if the value is"))
-      .SetDefaultValue("true")
+      .SetDefaultValue("False")
       // This parameter allows to keep the operand expression
       // when the editor switch between variable instructions.
       .AddCodeOnlyParameter("trueorfalse", "");

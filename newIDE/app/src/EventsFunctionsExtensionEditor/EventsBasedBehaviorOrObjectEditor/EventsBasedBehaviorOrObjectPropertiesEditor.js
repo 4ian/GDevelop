@@ -155,9 +155,8 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
     const propertyRefs = React.useRef(new Map<string, React.ElementRef<any>>());
     React.useImperativeHandle(ref, () => ({
       forceUpdate,
-      getPropertyEditorRef: (propertyName: string) => {
-        return propertyRefs ? propertyRefs.current.get(propertyName) : null;
-      },
+      getPropertyEditorRef: (propertyName: string) =>
+        propertyRefs ? propertyRefs.current.get(propertyName) : null,
     }));
 
     const gdevelopTheme = React.useContext(GDevelopThemeContext);

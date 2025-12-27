@@ -44,16 +44,9 @@ import { ColumnStackLayout } from '../../UI/Layout';
 import { useShouldAutofocusInput } from '../../UI/Responsive/ScreenTypeMeasurer';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 
-export const getProjectManagerItemId = (identifier: string) =>
-  `project-manager-tab-${identifier}`;
-
-const configurationItemId = getProjectManagerItemId(
-  'events-based-entity-configuration'
-);
-export const propertiesRootFolderId = getProjectManagerItemId('properties');
-export const sharedPropertiesRootFolderId = getProjectManagerItemId(
-  'properties'
-);
+const configurationItemId = 'events-based-entity-configuration';
+export const propertiesRootFolderId = 'properties';
+export const sharedPropertiesRootFolderId = 'shared-properties';
 
 const propertiesEmptyPlaceholderId = 'properties-placeholder';
 const sharedPropertiesEmptyPlaceholderId = 'shared-properties-placeholder';

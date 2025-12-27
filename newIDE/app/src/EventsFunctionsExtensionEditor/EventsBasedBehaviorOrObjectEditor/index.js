@@ -88,6 +88,9 @@ export const EventsBasedBehaviorOrObjectEditor = React.forwardRef<
         if (propertiesEditor.current) {
           propertiesEditor.current.forceUpdate();
         }
+        if (scenePropertiesEditor.current) {
+          scenePropertiesEditor.current.forceUpdate();
+        }
       },
       scrollToConfiguration: () => {
         if (scrollView.current) {

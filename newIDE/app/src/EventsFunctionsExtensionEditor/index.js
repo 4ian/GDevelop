@@ -1747,7 +1747,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 transitions={{
                   'events-sheet': {
                     nextIcon: <Tune />,
-                    nextLabel: <Trans>Parameters</Trans>,
+                    nextLabel: selectedEventsFunction ? (
+                      <Trans>Parameters</Trans>
+                    ) : (
+                      <Trans>Property list</Trans>
+                    ),
                     nextEditor: 'parameters',
                     previousEditor: () => {
                       this._selectEventsFunction(null, null, null);
@@ -1756,8 +1760,39 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   },
                   parameters: {
                     nextIcon: <Mark />,
-                    nextLabel: <Trans>Validate these parameters</Trans>,
-                    nextEditor: 'events-sheet',
+                    nextLabel: selectedEventsFunction ? (
+                      <Trans>Validate these parameters</Trans>
+                    ) : null,
+                    nextEditor: selectedEventsFunction ? 'events-sheet' : null,
+                    previousEditor: selectedEventsFunction
+                      ? null
+                      : () => {
+                          if (this.propertyListEditor) {
+                            const selection = this.propertyListEditor.getSelectedProperty();
+                            if (selection) {
+                              const {
+                                propertyName,
+                                isSharedProperties,
+                              } = selection;
+                              // Scroll to the selected property.
+                              // Ideally, we'd wait for the list to be updated to scroll, but
+                              // to simplify the code, we just wait a few ms for a new render
+                              // to be done.
+                              setTimeout(() => {
+                                const eventsBasedEntityEditor =
+                                  this.eventsBasedBehaviorEditor ||
+                                  this.eventsBasedObjectEditor;
+                                if (eventsBasedEntityEditor) {
+                                  eventsBasedEntityEditor.scrollToProperty(
+                                    propertyName,
+                                    isSharedProperties
+                                  );
+                                }
+                              }, 100); // A few ms is enough for a new render to be done.
+                            }
+                          }
+                          return 'events-sheet';
+                        },
                   },
                 }}
                 onEditorChanged={

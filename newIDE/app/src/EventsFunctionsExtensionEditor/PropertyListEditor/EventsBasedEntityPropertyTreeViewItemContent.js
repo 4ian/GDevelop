@@ -124,7 +124,7 @@ export class EventsBasedEntityPropertyTreeViewItemContent
 
   getDataSet(): ?HTMLDataset {
     return {
-      property: this.property.getName(),
+      propertyName: this.property.getName(),
       isSharedProperties: this.props.isSharedProperties ? 'true' : 'false',
     };
   }

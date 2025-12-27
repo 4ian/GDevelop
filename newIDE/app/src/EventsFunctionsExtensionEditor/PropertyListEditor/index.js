@@ -365,6 +365,10 @@ export type PropertyListEditorInterface = {|
     propertyName: string,
     isSharedProperties: boolean
   ) => void,
+  getSelectedProperty: () => {|
+    propertyName: string,
+    isSharedProperties: boolean,
+  |} | null,
 |};
 
 type Props = {|
@@ -493,7 +497,7 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
               : propertiesRootFolderId,
           ]);
         }
-        // Scroll to the new behavior.
+        // Scroll to the new property.
         // Ideally, we'd wait for the list to be updated to scroll, but
         // to simplify the code, we just wait a few ms for a new render
         // to be done.
@@ -768,6 +772,20 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
           );
         });
         scrollToItem(propertyItemId);
+      },
+      getSelectedProperty: () => {
+        const selectedItem = selectedItems[0];
+        if (!selectedItem) {
+          return null;
+        }
+        const dataset = selectedItem.content.getDataSet();
+        if (!dataset || !dataset.propertyName || !dataset.isSharedProperties) {
+          return null;
+        }
+        return {
+          propertyName: dataset.propertyName,
+          isSharedProperties: dataset.isSharedProperties === 'true',
+        };
       },
     }));
 

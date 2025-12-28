@@ -12,8 +12,14 @@ import { type ExtensionItemConfigurationAttribute } from '../../EventsFunctionsE
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import Text from '../../UI/Text';
 import { ColumnStackLayout } from '../../UI/Layout';
+import { Column, Line } from '../../UI/Grid';
 import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import EventsBasedObjectEditor from './EventsBasedObjectEditor';
+import RaisedButton from '../../UI/RaisedButton';
+import AddIcon from '../../UI/CustomSvgIcons/Add';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
+import useForceUpdate from '../../Utils/UseForceUpdate';
+import newNameGenerator from '../../Utils/NewNameGenerator';
 
 type Props = {|
   project: gdProject,
@@ -65,6 +71,8 @@ export const EventsBasedBehaviorOrObjectEditor = React.forwardRef<
     }: Props,
     ref
   ) => {
+    const forceUpdate = useForceUpdate();
+
     const _onPropertiesUpdated = React.useCallback(
       () => {
         if (unsavedChanges) {
@@ -83,21 +91,8 @@ export const EventsBasedBehaviorOrObjectEditor = React.forwardRef<
       null
     );
 
-    React.useImperativeHandle(ref, () => ({
-      forceUpdateProperties: () => {
-        if (propertiesEditor.current) {
-          propertiesEditor.current.forceUpdate();
-        }
-        if (scenePropertiesEditor.current) {
-          scenePropertiesEditor.current.forceUpdate();
-        }
-      },
-      scrollToConfiguration: () => {
-        if (scrollView.current) {
-          scrollView.current.scrollToPosition(0);
-        }
-      },
-      scrollToProperty: (propertyName: string, isSharedProperties: boolean) => {
+    const scrollToProperty = React.useCallback(
+      (propertyName: string, isSharedProperties: boolean) => {
         if (!scrollView.current) {
           return;
         }
@@ -115,9 +110,54 @@ export const EventsBasedBehaviorOrObjectEditor = React.forwardRef<
           }
         }
       },
+      []
+    );
+
+    React.useImperativeHandle(ref, () => ({
+      forceUpdateProperties: () => {
+        if (propertiesEditor.current) {
+          propertiesEditor.current.forceUpdate();
+        }
+        if (scenePropertiesEditor.current) {
+          scenePropertiesEditor.current.forceUpdate();
+        }
+      },
+      scrollToConfiguration: () => {
+        if (scrollView.current) {
+          scrollView.current.scrollToPosition(0);
+        }
+      },
+      scrollToProperty,
     }));
 
     const eventsBasedEntity = eventsBasedBehavior || eventsBasedObject;
+
+    const addProperty = React.useCallback(
+      () => {
+        if (!eventsBasedEntity) {
+          return;
+        }
+        const properties = eventsBasedEntity.getPropertyDescriptors();
+        const newName = newNameGenerator('Property', name =>
+          properties.has(name)
+        );
+        const property = properties.insertNew(newName, properties.getCount());
+        property.setType('Number');
+        forceUpdate();
+        onPropertiesUpdated && onPropertiesUpdated();
+
+        // Scroll to the selected property.
+        // Ideally, we'd wait for the list to be updated to scroll, but
+        // to simplify the code, we just wait a few ms for a new render
+        // to be done.
+        setTimeout(() => {
+          scrollToProperty(newName, false);
+        }, 100); // A few ms is enough for a new render to be done.
+      },
+      [eventsBasedEntity, forceUpdate, onPropertiesUpdated, scrollToProperty]
+    );
+
+    const { windowSize } = useResponsiveWindowSize();
 
     return (
       <Background>
@@ -201,6 +241,18 @@ export const EventsBasedBehaviorOrObjectEditor = React.forwardRef<
             )}
           </ColumnStackLayout>
         </ScrollView>
+        {windowSize === 'small' && (
+          <Column>
+            <Line noMargin justifyContent="flex-end" expand>
+              <RaisedButton
+                primary
+                label={<Trans>Add a property</Trans>}
+                onClick={addProperty}
+                icon={<AddIcon />}
+              />
+            </Line>
+          </Column>
+        )}
       </Background>
     );
   }

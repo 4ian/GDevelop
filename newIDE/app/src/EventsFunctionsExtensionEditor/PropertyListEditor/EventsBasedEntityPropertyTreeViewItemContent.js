@@ -52,6 +52,73 @@ const getValidatedPropertyName = (
   return safeAndUniqueNewName;
 };
 
+export const pasteProperties = async (
+  properties: gdPropertiesContainer,
+  insertionIndex: number,
+  showPropertyOverridingConfirmation: (
+    existingPropertyNames: string[]
+  ) => Promise<boolean>
+): Promise<boolean> => {
+  if (!Clipboard.has(PROPERTIES_CLIPBOARD_KIND)) return false;
+
+  const clipboardContent = Clipboard.get(PROPERTIES_CLIPBOARD_KIND);
+  const propertyContents = SafeExtractor.extractArray(clipboardContent);
+  if (!propertyContents) return false;
+
+  const newNamedProperties: Array<{
+    name: string,
+    serializedProperty: string,
+  }> = [];
+  const existingNamedProperties: Array<{
+    name: string,
+    serializedProperty: string,
+  }> = [];
+  propertyContents.forEach(propertyContent => {
+    const name = SafeExtractor.extractStringProperty(propertyContent, 'name');
+    const serializedProperty = SafeExtractor.extractObjectProperty(
+      propertyContent,
+      'serializedProperty'
+    );
+    if (!name || !serializedProperty) {
+      return false;
+    }
+
+    if (properties.has(name)) {
+      existingNamedProperties.push({ name, serializedProperty });
+    } else {
+      newNamedProperties.push({ name, serializedProperty });
+    }
+  });
+
+  let firstAddedPropertyName: string | null = null;
+  let index = insertionIndex;
+  newNamedProperties.forEach(({ name, serializedProperty }) => {
+    const property = properties.insertNew(name, index);
+    index++;
+    unserializeFromJSObject(property, serializedProperty);
+    if (!firstAddedPropertyName) {
+      firstAddedPropertyName = name;
+    }
+  });
+
+  let shouldOverrideProperties = false;
+  if (existingNamedProperties.length > 0) {
+    shouldOverrideProperties = await showPropertyOverridingConfirmation(
+      existingNamedProperties.map(namedProperty => namedProperty.name)
+    );
+
+    if (shouldOverrideProperties) {
+      existingNamedProperties.forEach(({ name, serializedProperty }) => {
+        if (properties.has(name)) {
+          const property = properties.get(name);
+          unserializeFromJSObject(property, serializedProperty);
+        }
+      });
+    }
+  }
+  return true;
+};
+
 export type EventsBasedEntityPropertyTreeViewItemProps = {|
   ...TreeItemProps,
   project: gdProject,
@@ -317,65 +384,14 @@ export class EventsBasedEntityPropertyTreeViewItemContent
   }
 
   async pasteAsync(): Promise<void> {
-    if (!Clipboard.has(PROPERTIES_CLIPBOARD_KIND)) return;
-
-    const clipboardContent = Clipboard.get(PROPERTIES_CLIPBOARD_KIND);
-    const propertyContents = SafeExtractor.extractArray(clipboardContent);
-    if (!propertyContents) return;
-
-    const newNamedProperties: Array<{
-      name: string,
-      serializedProperty: string,
-    }> = [];
-    const existingNamedProperties: Array<{
-      name: string,
-      serializedProperty: string,
-    }> = [];
-    propertyContents.forEach(propertyContent => {
-      const name = SafeExtractor.extractStringProperty(propertyContent, 'name');
-      const serializedProperty = SafeExtractor.extractObjectProperty(
-        propertyContent,
-        'serializedProperty'
-      );
-      if (!name || !serializedProperty) {
-        return;
-      }
-
-      if (this.props.properties.has(name)) {
-        existingNamedProperties.push({ name, serializedProperty });
-      } else {
-        newNamedProperties.push({ name, serializedProperty });
-      }
-    });
-
-    let firstAddedPropertyName: string | null = null;
-    let index = this.getIndex() + 1;
-    newNamedProperties.forEach(({ name, serializedProperty }) => {
-      const property = this.props.properties.insertNew(name, index);
-      index++;
-      unserializeFromJSObject(property, serializedProperty);
-      if (!firstAddedPropertyName) {
-        firstAddedPropertyName = name;
-      }
-    });
-
-    let shouldOverrideProperties = false;
-    if (existingNamedProperties.length > 0) {
-      shouldOverrideProperties = await this.props.showPropertyOverridingConfirmation(
-        existingNamedProperties.map(namedProperty => namedProperty.name)
-      );
-
-      if (shouldOverrideProperties) {
-        existingNamedProperties.forEach(({ name, serializedProperty }) => {
-          if (this.props.properties.has(name)) {
-            const property = this.props.properties.get(name);
-            unserializeFromJSObject(property, serializedProperty);
-          }
-        });
-      }
+    const hasPasteAnyProperty = await pasteProperties(
+      this.props.properties,
+      this.getIndex() + 1,
+      this.props.showPropertyOverridingConfirmation
+    );
+    if (hasPasteAnyProperty) {
+      this._onProjectItemModified();
     }
-
-    this._onProjectItemModified();
   }
 
   _duplicate(): void {

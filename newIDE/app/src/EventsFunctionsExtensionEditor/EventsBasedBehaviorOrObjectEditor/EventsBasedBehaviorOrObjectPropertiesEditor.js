@@ -18,15 +18,12 @@ import { getMeasurementUnitShortLabel } from '../../PropertiesEditor/PropertiesM
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import Clipboard from '../../Utils/Clipboard';
-import { SafeExtractor } from '../../Utils/SafeExtractor';
-import {
-  unserializeFromJSObject,
-} from '../../Utils/Serializer';
 import PasteIcon from '../../UI/CustomSvgIcons/Clipboard';
 import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import ResourceTypeSelectField from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/ResourceTypeSelectField';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import { pasteProperties } from '../PropertyListEditor/EventsBasedEntityPropertyTreeViewItemContent';
 
 const gd: libGDevelop = global.gd;
 
@@ -176,90 +173,15 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
       [addPropertyAt, properties]
     );
 
-    const pasteProperties = React.useCallback(
-      async propertyInsertionIndex => {
-        const clipboardContent = Clipboard.get(PROPERTIES_CLIPBOARD_KIND);
-        const propertyContents = SafeExtractor.extractArray(clipboardContent);
-        if (!propertyContents) return;
-
-        const newNamedProperties: Array<{
-          name: string,
-          serializedProperty: string,
-        }> = [];
-        const existingNamedProperties: Array<{
-          name: string,
-          serializedProperty: string,
-        }> = [];
-        propertyContents.forEach(propertyContent => {
-          const name = SafeExtractor.extractStringProperty(
-            propertyContent,
-            'name'
-          );
-          const serializedProperty = SafeExtractor.extractObjectProperty(
-            propertyContent,
-            'serializedProperty'
-          );
-          if (!name || !serializedProperty) {
-            return;
-          }
-
-          if (properties.has(name)) {
-            existingNamedProperties.push({ name, serializedProperty });
-          } else {
-            newNamedProperties.push({ name, serializedProperty });
-          }
-        });
-
-        let firstAddedPropertyName: string | null = null;
-        let index = propertyInsertionIndex;
-        newNamedProperties.forEach(({ name, serializedProperty }) => {
-          const property = properties.insertNew(name, index);
-          index++;
-          unserializeFromJSObject(property, serializedProperty);
-          if (!firstAddedPropertyName) {
-            firstAddedPropertyName = name;
-          }
-        });
-
-        let shouldOverrideProperties = false;
-        if (existingNamedProperties.length > 0) {
-          shouldOverrideProperties = await showPropertyOverridingConfirmation(
-            existingNamedProperties.map(namedProperty => namedProperty.name)
-          );
-
-          if (shouldOverrideProperties) {
-            existingNamedProperties.forEach(({ name, serializedProperty }) => {
-              if (properties.has(name)) {
-                const property = properties.get(name);
-                unserializeFromJSObject(property, serializedProperty);
-              }
-            });
-          }
-        }
-
-        forceUpdate();
-        if (firstAddedPropertyName) {
-          //setJustAddedPropertyName(firstAddedPropertyName);
-        } else if (existingNamedProperties.length === 1) {
-          //setJustAddedPropertyName(existingNamedProperties[0].name);
-        }
-        if (firstAddedPropertyName || shouldOverrideProperties) {
-          if (onPropertiesUpdated) onPropertiesUpdated();
-        }
-      },
-      [
-        forceUpdate,
-        properties,
-        showPropertyOverridingConfirmation,
-        onPropertiesUpdated,
-      ]
-    );
-
     const pastePropertiesAtTheEnd = React.useCallback(
       async () => {
-        await pasteProperties(properties.getCount());
+        await pasteProperties(
+          properties,
+          properties.getCount(),
+          showPropertyOverridingConfirmation
+        );
       },
-      [properties, pasteProperties]
+      [properties, showPropertyOverridingConfirmation]
     );
 
     const setChoices = React.useCallback(

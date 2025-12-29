@@ -4,8 +4,60 @@ import {
   convertToProjectSettings,
   VALID_PREFERENCE_KEYS,
 } from './ProjectSettingsReader';
+import ini from 'ini';
 
 describe('ProjectSettingsReader', () => {
+  describe('ini library parsing', () => {
+    test('parses true/false as native booleans', () => {
+      const content = `
+key1 = true
+key2 = false
+`;
+      const parsed = ini.parse(content);
+      expect(parsed.key1).toBe(true);
+      expect(parsed.key2).toBe(false);
+      expect(typeof parsed.key1).toBe('boolean');
+      expect(typeof parsed.key2).toBe('boolean');
+    });
+
+    test('parses yes/no as strings', () => {
+      const content = `
+key1 = yes
+key2 = no
+`;
+      const parsed = ini.parse(content);
+      expect(parsed.key1).toBe('yes');
+      expect(parsed.key2).toBe('no');
+      expect(typeof parsed.key1).toBe('string');
+      expect(typeof parsed.key2).toBe('string');
+    });
+
+    test('parses 1/0 as strings', () => {
+      const content = `
+key1 = 1
+key2 = 0
+`;
+      const parsed = ini.parse(content);
+      expect(parsed.key1).toBe('1');
+      expect(parsed.key2).toBe('0');
+      expect(typeof parsed.key1).toBe('string');
+      expect(typeof parsed.key2).toBe('string');
+    });
+
+    test('parses sections correctly', () => {
+      const content = `
+[Section1]
+key1 = true
+
+[Section2]
+key2 = false
+`;
+      const parsed = ini.parse(content);
+      expect(parsed.Section1.key1).toBe(true);
+      expect(parsed.Section2.key2).toBe(false);
+    });
+  });
+
   describe('flattenIniObject', () => {
     test('returns empty object for empty input', () => {
       expect(flattenIniObject({})).toEqual({});
@@ -68,6 +120,46 @@ describe('ProjectSettingsReader', () => {
       expect(flattenIniObject(parsed)).toEqual({
         someNumber: 42,
       });
+    });
+
+    test('warns on duplicate keys across sections', () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const parsed = {
+        Section1: {
+          duplicateKey: true,
+        },
+        Section2: {
+          duplicateKey: false,
+        },
+      };
+      const result = flattenIniObject(parsed);
+
+      expect(result).toEqual({ duplicateKey: false });
+      expect(warnSpy).toHaveBeenCalledWith(
+        '[ProjectSettingsReader] Duplicate key "duplicateKey" found, overwriting previous value'
+      );
+
+      warnSpy.mockRestore();
+    });
+
+    test('warns on duplicate keys between root and section', () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const parsed = {
+        myKey: true,
+        Section: {
+          myKey: false,
+        },
+      };
+      const result = flattenIniObject(parsed);
+
+      expect(result).toEqual({ myKey: false });
+      expect(warnSpy).toHaveBeenCalledWith(
+        '[ProjectSettingsReader] Duplicate key "myKey" found, overwriting previous value'
+      );
+
+      warnSpy.mockRestore();
     });
   });
 

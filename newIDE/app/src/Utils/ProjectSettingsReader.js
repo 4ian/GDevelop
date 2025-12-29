@@ -49,6 +49,7 @@ const SETTINGS_FILE_NAME = 'settings.ini';
 /**
  * Flattens a parsed INI object (which may have sections) into a flat key-value object.
  * Section keys are ignored, only the values within sections are extracted.
+ * Warns if duplicate keys are found across sections.
  */
 export const flattenIniObject = (parsed: {
   [string]: mixed,
@@ -59,9 +60,19 @@ export const flattenIniObject = (parsed: {
     if (typeof value === 'object' && value !== null) {
       // This is a section - extract its values
       for (const [subKey, subValue] of Object.entries(value)) {
+        if (result.hasOwnProperty(subKey)) {
+          console.warn(
+            `[ProjectSettingsReader] Duplicate key "${subKey}" found, overwriting previous value`
+          );
+        }
         result[subKey] = subValue;
       }
     } else {
+      if (result.hasOwnProperty(key)) {
+        console.warn(
+          `[ProjectSettingsReader] Duplicate key "${key}" found, overwriting previous value`
+        );
+      }
       result[key] = value;
     }
   }

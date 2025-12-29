@@ -44,9 +44,11 @@ showBasicProfilingCounters = false
 ### Boolean Values
 
 Settings accept boolean values:
-- `true`, `false` ✅ Recommended
+- `true`, `false` ✅ **(lowercase only)**
 
-**Not supported:** `yes`, `no`, `1`, `0` (parsed as strings by the INI library and will be ignored)
+**Not supported:**
+- `True`, `TRUE`, `False`, `FALSE` (case variations are parsed as strings)
+- `yes`, `no`, `1`, `0` (parsed as strings)
 
 ## Available Settings
 

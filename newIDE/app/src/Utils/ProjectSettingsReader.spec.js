@@ -56,6 +56,25 @@ key2 = false
       expect(parsed.Section1.key1).toBe(true);
       expect(parsed.Section2.key2).toBe(false);
     });
+
+    test('parses case variations as strings (not booleans)', () => {
+      const content = `
+key1 = True
+key2 = TRUE
+key3 = False
+key4 = FALSE
+key5 = fAlSe
+`;
+      const parsed = ini.parse(content);
+      // ini library only recognizes lowercase true/false as booleans
+      // All case variations are parsed as strings
+      expect(parsed.key1).toBe('True');
+      expect(parsed.key2).toBe('TRUE');
+      expect(parsed.key3).toBe('False');
+      expect(parsed.key4).toBe('FALSE');
+      expect(parsed.key5).toBe('fAlSe');
+      expect(typeof parsed.key1).toBe('string');
+    });
   });
 
   describe('flattenIniObject', () => {

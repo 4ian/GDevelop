@@ -198,6 +198,8 @@ import { QuickCustomizationDialog } from '../QuickCustomization/QuickCustomizati
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
+import { readProjectSettings } from '../Utils/ProjectSettingsReader';
+import { applyProjectSettings } from '../Utils/ApplyProjectSettings';
 import {
   EmbeddedGameFrame,
   setEditorHotReloadNeeded,
@@ -1094,6 +1096,21 @@ const MainFrame = (props: Props) => {
           storageProviderOperations,
           authenticatedUser,
         }));
+
+        // Read and apply project-specific preferences from settings.ini if it exists
+        try {
+          const projectSettings = await readProjectSettings(
+            updatedFileMetadata.fileIdentifier
+          );
+          if (projectSettings) {
+            applyProjectSettings(projectSettings, preferences);
+          }
+        } catch (error) {
+          console.warn(
+            '[MainFrame] Failed to read project settings:',
+            error.message
+          );
+        }
 
         setIsProjectClosedSoAvoidReloadingExtensions(false);
       }

@@ -481,8 +481,12 @@ const MainFrame = (props: Props) => {
             title: t`Diagnostic errors found`,
             message:
               actionType === 'preview'
-                ? t`Your project has ${validationErrors.length} diagnostic error(s). Please fix them before launching a preview. Press F7 to open the diagnostic report.`
-                : t`Your project has ${validationErrors.length} diagnostic error(s). Please fix them before exporting. Press F7 to open the diagnostic report.`,
+                ? t`Your project has ${
+                    validationErrors.length
+                  } diagnostic error(s). Please fix them before launching a preview. Press F7 to open the diagnostic report.`
+                : t`Your project has ${
+                    validationErrors.length
+                  } diagnostic error(s). Please fix them before exporting. Press F7 to open the diagnostic report.`,
           });
           return true;
         }
@@ -574,6 +578,7 @@ const MainFrame = (props: Props) => {
   |}>(null);
 
   // Handle pending event navigation after editor is opened
+  const EDITOR_MOUNT_DELAY_MS = 300;
   React.useEffect(
     () => {
       if (!pendingEventNavigation) return;
@@ -584,25 +589,28 @@ const MainFrame = (props: Props) => {
         const editorKind =
           locationType === 'layout' ? 'layout events' : 'external events';
 
-        // Find the events editor tab
-        for (const paneIdentifier in state.editorTabs.panes) {
-          const pane = state.editorTabs.panes[paneIdentifier];
-          for (const editor of pane.editors) {
-            if (
-              editor.kind === editorKind &&
-              editor.projectItemName === name &&
-              editor.editorRef &&
-              editor.editorRef.scrollToEventPath
-            ) {
-              editor.editorRef.scrollToEventPath(eventPath);
-              break;
+        // Find the events editor tab and scroll to event path
+        const scrollToEditor = () => {
+          for (const paneIdentifier in state.editorTabs.panes) {
+            const pane = state.editorTabs.panes[paneIdentifier];
+            for (const editor of pane.editors) {
+              if (
+                editor.kind === editorKind &&
+                editor.projectItemName === name &&
+                editor.editorRef &&
+                editor.editorRef.scrollToEventPath
+              ) {
+                editor.editorRef.scrollToEventPath(eventPath);
+                return;
+              }
             }
           }
-        }
+        };
+        scrollToEditor();
 
         // Clear the pending navigation
         setPendingEventNavigation(null);
-      }, 300); // Wait for editor to mount
+      }, EDITOR_MOUNT_DELAY_MS);
 
       return () => clearTimeout(timeoutId);
     },

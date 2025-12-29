@@ -95,15 +95,32 @@ const InvalidParameterRow = ({
   const textRef = React.useRef<HTMLDivElement | null>(null);
   const typeLabel = error.isCondition ? 'Condition' : 'Action';
 
+  // Check truncation only when collapsed and on initial render or content change
   React.useEffect(
     () => {
       const element = textRef.current;
-      if (element) {
-        // Check if text is truncated by comparing scrollWidth with clientWidth
-        setIsTruncated(element.scrollWidth > element.clientWidth);
-      }
+      if (!element || isExpanded) return;
+
+      // Use requestAnimationFrame to avoid ResizeObserver loop issues
+      let rafId: AnimationFrameID;
+      const checkTruncation = () => {
+        rafId = requestAnimationFrame(() => {
+          const nowTruncated = element.scrollWidth > element.clientWidth;
+          setIsTruncated(prev => (prev !== nowTruncated ? nowTruncated : prev));
+        });
+      };
+
+      checkTruncation();
+
+      const resizeObserver = new ResizeObserver(checkTruncation);
+      resizeObserver.observe(element);
+
+      return () => {
+        resizeObserver.disconnect();
+        cancelAnimationFrame(rafId);
+      };
     },
-    [error.instructionSentence]
+    [error.instructionSentence, isExpanded]
   );
 
   const handleTextClick = React.useCallback(
@@ -200,9 +217,11 @@ const InvalidParametersSection = ({
         <TableBody>
           {validationErrors
             .filter(error => error.type !== 'missing-instruction')
-            .map((error, index) => (
+            .map(error => (
               <InvalidParameterRow
-                key={`invalid-param-${index}`}
+                key={`${error.locationName}-${error.eventPath.join('-')}-${
+                  error.instructionType
+                }-${error.parameterIndex ?? ''}`}
                 error={error}
                 navigateToError={navigateToError}
                 backgroundColor={gdevelopTheme.list.itemsBackgroundColor}

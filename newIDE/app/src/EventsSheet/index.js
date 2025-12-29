@@ -120,6 +120,7 @@ import LocalVariablesDialog from '../VariablesList/LocalVariablesDialog';
 import GlobalAndSceneVariablesDialog from '../VariablesList/GlobalAndSceneVariablesDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { useHighlightedAiGeneratedEvent } from './UseHighlightedAiGeneratedEvent';
+import { findEventByPath } from '../Utils/EventsValidationScanner';
 
 const gd: libGDevelop = global.gd;
 
@@ -388,7 +389,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     if (!eventsTree || eventPath.length === 0) return;
 
     // Find the event at the path
-    const { findEventByPath } = require('../Utils/EventsValidationScanner');
     const event = findEventByPath(this.props.events, eventPath);
     if (!event) return;
 

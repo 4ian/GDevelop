@@ -111,6 +111,210 @@ describe('EventsValidationScanner', () => {
         expect(targetError.eventPath[0]).toBe(0); // First event
       }
     });
+
+    describe('external events scanning', () => {
+      it('detects errors in external events', () => {
+        const { project, testExternalEvents1 } = makeTestProject(gd);
+        const events = testExternalEvents1.getEvents();
+
+        // Add an event with an invalid action
+        const event = events.insertNewEvent(
+          project,
+          'BuiltinCommonInstructions::Standard',
+          0
+        );
+        const standardEvent = gd.asStandardEvent(event);
+        const actions = standardEvent.getActions();
+        const invalidAction = new gd.Instruction();
+        invalidAction.setType('External::InvalidAction');
+        actions.insert(invalidAction, 0);
+        invalidAction.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        const targetError = errors.find(
+          e => e.instructionType === 'External::InvalidAction'
+        );
+        expect(targetError).toBeDefined();
+        if (targetError) {
+          expect(targetError.locationType).toBe('external-events');
+          expect(targetError.locationName).toBe(testExternalEvents1.getName());
+          expect(targetError.type).toBe('missing-instruction');
+        }
+      });
+
+      it('scans external events with associated layout context', () => {
+        const { project, testExternalEvents1, testLayout } = makeTestProject(
+          gd
+        );
+        // Associate external events with a layout
+        testExternalEvents1.setAssociatedLayout(testLayout.getName());
+
+        const events = testExternalEvents1.getEvents();
+        const event = events.insertNewEvent(
+          project,
+          'BuiltinCommonInstructions::Standard',
+          0
+        );
+        const standardEvent = gd.asStandardEvent(event);
+        const actions = standardEvent.getActions();
+        const invalidAction = new gd.Instruction();
+        invalidAction.setType('AssociatedLayout::InvalidAction');
+        actions.insert(invalidAction, 0);
+        invalidAction.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        const targetError = errors.find(
+          e => e.instructionType === 'AssociatedLayout::InvalidAction'
+        );
+        expect(targetError).toBeDefined();
+        if (targetError) {
+          expect(targetError.locationType).toBe('external-events');
+        }
+      });
+    });
+
+    describe('WhileEvent scanning', () => {
+      it('detects errors in WhileEvent conditions', () => {
+        const { project, testLayout } = makeTestProject(gd);
+        const events = testLayout.getEvents();
+
+        const event = events.insertNewEvent(
+          project,
+          'BuiltinCommonInstructions::While',
+          0
+        );
+        const whileEvent = gd.asWhileEvent(event);
+        const conditions = whileEvent.getConditions();
+        const invalidCondition = new gd.Instruction();
+        invalidCondition.setType('While::InvalidCondition');
+        conditions.insert(invalidCondition, 0);
+        invalidCondition.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        const targetError = errors.find(
+          e => e.instructionType === 'While::InvalidCondition'
+        );
+        expect(targetError).toBeDefined();
+        if (targetError) {
+          expect(targetError.isCondition).toBe(true);
+          expect(targetError.type).toBe('missing-instruction');
+        }
+      });
+
+      it('detects errors in WhileEvent while-conditions', () => {
+        const { project, testLayout } = makeTestProject(gd);
+        const events = testLayout.getEvents();
+
+        const event = events.insertNewEvent(
+          project,
+          'BuiltinCommonInstructions::While',
+          0
+        );
+        const whileEvent = gd.asWhileEvent(event);
+        const whileConditions = whileEvent.getWhileConditions();
+        const invalidCondition = new gd.Instruction();
+        invalidCondition.setType('While::InvalidWhileCondition');
+        whileConditions.insert(invalidCondition, 0);
+        invalidCondition.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        const targetError = errors.find(
+          e => e.instructionType === 'While::InvalidWhileCondition'
+        );
+        expect(targetError).toBeDefined();
+        if (targetError) {
+          expect(targetError.isCondition).toBe(true);
+        }
+      });
+
+      it('detects errors in WhileEvent actions', () => {
+        const { project, testLayout } = makeTestProject(gd);
+        const events = testLayout.getEvents();
+
+        const event = events.insertNewEvent(
+          project,
+          'BuiltinCommonInstructions::While',
+          0
+        );
+        const whileEvent = gd.asWhileEvent(event);
+        const actions = whileEvent.getActions();
+        const invalidAction = new gd.Instruction();
+        invalidAction.setType('While::InvalidAction');
+        actions.insert(invalidAction, 0);
+        invalidAction.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        const targetError = errors.find(
+          e => e.instructionType === 'While::InvalidAction'
+        );
+        expect(targetError).toBeDefined();
+        if (targetError) {
+          expect(targetError.isCondition).toBe(false);
+        }
+      });
+    });
+
+    describe('ForEachEvent scanning', () => {
+      it('detects errors in ForEachEvent conditions', () => {
+        const { project, testLayout } = makeTestProject(gd);
+        const events = testLayout.getEvents();
+
+        const event = events.insertNewEvent(
+          project,
+          'BuiltinCommonInstructions::ForEach',
+          0
+        );
+        const forEachEvent = gd.asForEachEvent(event);
+        const conditions = forEachEvent.getConditions();
+        const invalidCondition = new gd.Instruction();
+        invalidCondition.setType('ForEach::InvalidCondition');
+        conditions.insert(invalidCondition, 0);
+        invalidCondition.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        const targetError = errors.find(
+          e => e.instructionType === 'ForEach::InvalidCondition'
+        );
+        expect(targetError).toBeDefined();
+        if (targetError) {
+          expect(targetError.isCondition).toBe(true);
+          expect(targetError.type).toBe('missing-instruction');
+        }
+      });
+
+      it('detects errors in ForEachEvent actions', () => {
+        const { project, testLayout } = makeTestProject(gd);
+        const events = testLayout.getEvents();
+
+        const event = events.insertNewEvent(
+          project,
+          'BuiltinCommonInstructions::ForEach',
+          0
+        );
+        const forEachEvent = gd.asForEachEvent(event);
+        const actions = forEachEvent.getActions();
+        const invalidAction = new gd.Instruction();
+        invalidAction.setType('ForEach::InvalidAction');
+        actions.insert(invalidAction, 0);
+        invalidAction.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        const targetError = errors.find(
+          e => e.instructionType === 'ForEach::InvalidAction'
+        );
+        expect(targetError).toBeDefined();
+        if (targetError) {
+          expect(targetError.isCondition).toBe(false);
+        }
+      });
+    });
   });
 
   describe('groupValidationErrors', () => {

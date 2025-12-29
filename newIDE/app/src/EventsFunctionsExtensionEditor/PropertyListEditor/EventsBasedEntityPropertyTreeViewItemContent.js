@@ -299,10 +299,12 @@ export class EventsBasedEntityPropertyTreeViewItemContent
   }
 
   copy(): void {
-    Clipboard.set(PROPERTIES_CLIPBOARD_KIND, {
-      layout: serializeToJSObject(this.property),
-      name: this.property.getName(),
-    });
+    Clipboard.set(PROPERTIES_CLIPBOARD_KIND, [
+      {
+        name: this.property.getName(),
+        serializedProperty: serializeToJSObject(this.property),
+      },
+    ]);
   }
 
   cut(): void {

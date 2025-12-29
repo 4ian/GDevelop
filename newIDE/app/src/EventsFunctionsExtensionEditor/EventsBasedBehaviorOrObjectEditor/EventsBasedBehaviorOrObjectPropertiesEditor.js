@@ -2,16 +2,11 @@
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
-import { Column, Line, Spacer } from '../../UI/Grid';
-import { LineStackLayout } from '../../UI/Layout';
+import { Column, Line } from '../../UI/Grid';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 import { mapFor, mapVector } from '../../Utils/MapFor';
-import RaisedButton from '../../UI/RaisedButton';
-import IconButton from '../../UI/IconButton';
-import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import newNameGenerator from '../../Utils/NewNameGenerator';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../../UI/Layout';
@@ -20,17 +15,14 @@ import ColorField from '../../UI/ColorField';
 import BehaviorTypeSelector from '../../BehaviorTypeSelector';
 import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
 import { getMeasurementUnitShortLabel } from '../../PropertiesEditor/PropertiesMapToSchema';
-import Add from '../../UI/CustomSvgIcons/Add';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import Clipboard from '../../Utils/Clipboard';
 import { SafeExtractor } from '../../Utils/SafeExtractor';
 import {
-  serializeToJSObject,
   unserializeFromJSObject,
 } from '../../Utils/Serializer';
 import PasteIcon from '../../UI/CustomSvgIcons/Clipboard';
-import ResponsiveFlatButton from '../../UI/ResponsiveFlatButton';
 import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import ResourceTypeSelectField from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/ResourceTypeSelectField';
@@ -270,13 +262,6 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
       [properties, pasteProperties]
     );
 
-    const pastePropertiesBefore = React.useCallback(
-      async (property: gdNamedPropertyDescriptor) => {
-        await pasteProperties(properties.getPosition(property));
-      },
-      [properties, pasteProperties]
-    );
-
     const setChoices = React.useCallback(
       (property: gdNamedPropertyDescriptor) => {
         return (choices: Array<Choice>) => {
@@ -353,7 +338,7 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                   properties,
                   (property: gdNamedPropertyDescriptor, i: number) => {
                     return (
-                      <React.Fragment>
+                      <React.Fragment key={property.ptr}>
                         <div
                           ref={ref => {
                             propertyRefs.current.set(property.getName(), ref);

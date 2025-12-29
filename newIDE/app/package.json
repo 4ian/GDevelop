@@ -61,6 +61,7 @@
     "firebase": "9.0.0-beta.2",
     "fontfaceobserver": "2.0.13",
     "fuse.js": "^6.5.3",
+    "ini": "~6.0.0",
     "js-worker-search": "^1.4.1",
     "jss-rtl": "^0.3.0",
     "lodash": "4.17.4",

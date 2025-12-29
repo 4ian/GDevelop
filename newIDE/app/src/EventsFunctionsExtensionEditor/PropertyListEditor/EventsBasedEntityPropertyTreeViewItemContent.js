@@ -25,7 +25,7 @@ import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/E
 
 const gd: libGDevelop = global.gd;
 
-const PROPERTIES_CLIPBOARD_KIND = 'Properties';
+export const PROPERTIES_CLIPBOARD_KIND = 'Properties';
 
 const styles = {
   tooltip: { marginRight: 5, verticalAlign: 'bottom' },

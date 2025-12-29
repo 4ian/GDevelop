@@ -39,9 +39,7 @@ import { type ShowConfirmDeleteDialogOptions } from '../../UI/Alert/AlertContext
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { type GDevelopTheme } from '../../UI/Theme';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
-import EmptyMessage from '../../UI/EmptyMessage';
 import { ColumnStackLayout } from '../../UI/Layout';
-import { useShouldAutofocusInput } from '../../UI/Responsive/ScreenTypeMeasurer';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 
 const configurationItemId = 'events-based-entity-configuration';

@@ -20,14 +20,15 @@ import useForceUpdate from '../../Utils/UseForceUpdate';
 import Clipboard from '../../Utils/Clipboard';
 import PasteIcon from '../../UI/CustomSvgIcons/Clipboard';
 import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
-import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import ResourceTypeSelectField from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/ResourceTypeSelectField';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
-import { pasteProperties } from '../PropertyListEditor/EventsBasedEntityPropertyTreeViewItemContent';
+import {
+  pasteProperties,
+  PROPERTIES_CLIPBOARD_KIND,
+} from '../PropertyListEditor/EventsBasedEntityPropertyTreeViewItemContent';
+import { usePropertyOverridingAlertDialog } from '../PropertyListEditor';
 
 const gd: libGDevelop = global.gd;
-
-const PROPERTIES_CLIPBOARD_KIND = 'Properties';
 
 const styles = {
   rowContainer: {
@@ -41,20 +42,6 @@ const styles = {
     alignItems: 'center',
     padding: '8px 0px',
   },
-};
-
-export const usePropertyOverridingAlertDialog = () => {
-  const { showConfirmation } = useAlertDialog();
-  return async (existingPropertyNames: Array<string>): Promise<boolean> => {
-    return await showConfirmation({
-      title: t`Existing properties`,
-      message: t`These properties already exist:${'\n\n - ' +
-        existingPropertyNames.join('\n\n - ') +
-        '\n\n'}Do you want to replace them?`,
-      confirmButtonLabel: t`Replace`,
-      dismissButtonLabel: t`Omit`,
-    });
-  };
 };
 
 const setExtraInfoString = (

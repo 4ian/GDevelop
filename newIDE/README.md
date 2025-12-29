@@ -76,6 +76,10 @@ npm run format # or yarn format
 
 It's pretty easy to create new themes. Check the [README about themes](./README-themes.md)
 
+### Project-specific Settings
+
+Projects can override editor preferences by placing a `settings.ini` file in the project root directory. See the [Project Settings documentation](./docs/Project-Settings.md) for details.
+
 ### Development of the game engine or extensions
 
 - If you want to create/modify _extensions_, check the [README about extensions](./README-extensions.md) for step-by-step explanations to get started in 5 minutes.

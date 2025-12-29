@@ -76,6 +76,10 @@ npm run format # or yarn format
 
 It's pretty easy to create new themes. Check the [README about themes](./README-themes.md)
 
+### Diagnostic Report
+
+The Diagnostic Report helps identify issues in your project (missing instructions, invalid parameters). Press **F7** to open it. Check the [Diagnostic Report documentation](./docs/Diagnostic-Report.md) for more details.
+
 ### Development of the game engine or extensions
 
 - If you want to create/modify _extensions_, check the [README about extensions](./README-extensions.md) for step-by-step explanations to get started in 5 minutes.

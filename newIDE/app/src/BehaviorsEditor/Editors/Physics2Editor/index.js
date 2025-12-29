@@ -1,5 +1,4 @@
 // @flow
-import { t } from '@lingui/macro';
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
@@ -28,6 +27,7 @@ import ButtonGroup from '@material-ui/core/ButtonGroup';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import Tooltip from '@material-ui/core/Tooltip';
 import CircledInfo from '../../../UI/CustomSvgIcons/SmallCircledInfo';
+import { mapVector } from '../../../Utils/MapFor';
 
 type Props = BehaviorEditorProps;
 
@@ -43,7 +43,7 @@ export const NumericProperty = (props: {|
 
   return (
     <SemiControlledTextField
-      id={id}
+      id={id || propertyName}
       fullWidth
       value={property.getValue()}
       key={propertyName}
@@ -53,6 +53,42 @@ export const NumericProperty = (props: {|
       type="number"
       endAdornment={<UnitAdornment property={property} />}
     />
+  );
+};
+
+export const ChoiceProperty = (props: {|
+  id?: string,
+  properties: gdMapStringPropertyDescriptor,
+  propertyName: string,
+  value?: string,
+  onUpdate: (
+    event: {| target: {| value: string |} |},
+    index: number,
+    text: string // Note that even for number values, a string is returned
+  ) => void,
+  disabled?: boolean,
+|}) => {
+  const { properties, propertyName, onUpdate, id, value, disabled } = props;
+  const property = properties.get(propertyName);
+
+  return (
+    <SelectField
+      id={id || propertyName}
+      key={propertyName}
+      fullWidth
+      floatingLabelText={property.getLabel()}
+      value={value === undefined ? property.getValue() : value}
+      onChange={onUpdate}
+      disabled={disabled}
+    >
+      {mapVector(property.getChoices(), choice => (
+        <SelectOption
+          key={choice.getValue().toLowerCase()}
+          value={choice.getValue()}
+          label={choice.getLabel()}
+        />
+      ))}
+    </SelectField>
   );
 };
 
@@ -151,30 +187,14 @@ const Physics2Editor = (props: Props) => {
       noOverflowParent
     >
       <Line>
-        <SelectField
+        <ChoiceProperty
           id="physics2-parameter-body-type"
-          key={'bodyType'}
-          fullWidth
-          floatingLabelText={properties.get('bodyType').getLabel()}
-          value={properties.get('bodyType').getValue()}
-          onChange={(e, i, newValue: string) =>
+          properties={properties}
+          propertyName={'bodyType'}
+          onUpdate={(e, i, newValue: string) =>
             updateBehaviorProperty('bodyType', newValue)
           }
-        >
-          {[
-            <SelectOption
-              key={'dynamic'}
-              value={'Dynamic'}
-              label={t`Dynamic`}
-            />,
-            <SelectOption key={'static'} value={'Static'} label={t`Static`} />,
-            <SelectOption
-              key={'kinematic'}
-              value={'Kinematic'}
-              label={t`Kinematic`}
-            />,
-          ]}
-        </SelectField>
+        />
       </Line>
       <ResponsiveLineStackLayout>
         <Checkbox
@@ -214,20 +234,14 @@ const Physics2Editor = (props: Props) => {
         </DismissableAlertMessage>
       </Line>
       <Line>
-        <SelectField
+        <ChoiceProperty
           id="physics2-parameter-shape"
-          fullWidth
-          floatingLabelText={properties.get('shape').getLabel()}
-          value={properties.get('shape').getValue()}
-          onChange={(e, i, newValue: string) =>
+          properties={properties}
+          propertyName={'shape'}
+          onUpdate={(e, i, newValue: string) =>
             updateBehaviorProperty('shape', newValue)
           }
-        >
-          <SelectOption key={'box'} value={'Box'} label={t`Box`} />
-          <SelectOption key={'circle'} value={'Circle'} label={t`Circle`} />
-          <SelectOption key={'edge'} value={'Edge'} label={t`Edge`} />
-          <SelectOption key={'polygon'} value={'Polygon'} label={t`Polygon`} />
-        </SelectField>
+        />
       </Line>
       <ResponsiveLineStackLayout>
         {shape !== 'Polygon' && (
@@ -273,32 +287,13 @@ const Physics2Editor = (props: Props) => {
           />
         )}
         {shape === 'Polygon' && (
-          <SelectField
-            fullWidth
-            floatingLabelText={properties.get('polygonOrigin').getLabel()}
-            value={properties.get('polygonOrigin').getValue()}
-            onChange={(e, i, newValue: string) =>
+          <ChoiceProperty
+            properties={properties}
+            propertyName={'polygonOrigin'}
+            onUpdate={(e, i, newValue: string) =>
               updateBehaviorProperty('polygonOrigin', newValue)
             }
-          >
-            {[
-              <SelectOption
-                key={'center'}
-                value={'Center'}
-                label={t`Center`}
-              />,
-              <SelectOption
-                key={'origin'}
-                value={'Origin'}
-                label={t`Origin`}
-              />,
-              <SelectOption
-                key={'topLeft'}
-                value={'TopLeft'}
-                label={t`Top-Left`}
-              />,
-            ]}
-          </SelectField>
+          />
         )}
         <NumericProperty
           properties={properties}

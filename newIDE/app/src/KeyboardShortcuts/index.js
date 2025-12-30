@@ -7,7 +7,9 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import commandsList, { type CommandName } from '../CommandPalette/CommandsList';
 import isUserTyping from './IsUserTyping';
 import defaultShortcuts, { type ShortcutMap } from './DefaultShortcuts';
+import { type PreviewDebuggerServer } from '../ExportAndShare/PreviewLauncher.flow';
 import optionalRequire from '../Utils/OptionalRequire';
+import { SafeExtractor } from '../Utils/SafeExtractor';
 const electron = optionalRequire('electron');
 
 // Valid action keys
@@ -19,7 +21,13 @@ type KeyType =
   | 'numrow-arith' // Numrow-, Numrow=
   | 'other'; // Tab, Space
 
-const eventWhichToCode = {
+/**
+ * Map deprecated (but still used in the runtime) key codes to their new "code"
+ * as defined by browsers (and user friendly enough to be shown to the user
+ * and used to store shortcuts as strings).
+ */
+const eventKeyCodeToCode = {
+  // Digits
   '48': 'Digit0',
   '49': 'Digit1',
   '50': 'Digit2',
@@ -30,6 +38,8 @@ const eventWhichToCode = {
   '55': 'Digit7',
   '56': 'Digit8',
   '57': 'Digit9',
+
+  // Letters
   '65': 'KeyA',
   '66': 'KeyB',
   '67': 'KeyC',
@@ -56,6 +66,8 @@ const eventWhichToCode = {
   '88': 'KeyX',
   '89': 'KeyY',
   '90': 'KeyZ',
+
+  // Function keys
   '112': 'F1',
   '113': 'F2',
   '114': 'F3',
@@ -68,14 +80,87 @@ const eventWhichToCode = {
   '121': 'F10',
   '122': 'F11',
   '123': 'F12',
+
+  // Punctuation and symbols
+  '186': 'Semicolon',
+  '187': 'Equal',
   '188': 'Comma',
+  '189': 'Minus',
+  '190': 'Period',
+  '191': 'Slash',
+  '192': 'Backquote',
+  '219': 'BracketLeft',
+  '220': 'Backslash',
+  '221': 'BracketRight',
+  '222': 'Quote',
+
+  // Navigation and editing keys
+  '8': 'Backspace',
+  '9': 'Tab',
+  '13': 'Enter',
+  '16': 'Shift',
+  '17': 'Control',
+  '18': 'Alt',
+  '20': 'CapsLock',
+  '27': 'Escape',
+  '32': 'Space',
+  '33': 'PageUp',
+  '34': 'PageDown',
+  '35': 'End',
+  '36': 'Home',
+  '37': 'ArrowLeft',
+  '38': 'ArrowUp',
+  '39': 'ArrowRight',
+  '40': 'ArrowDown',
+  '45': 'Insert',
+  '46': 'Delete',
+
+  // Numpad
+  '96': 'Numpad0',
+  '97': 'Numpad1',
+  '98': 'Numpad2',
+  '99': 'Numpad3',
+  '100': 'Numpad4',
+  '101': 'Numpad5',
+  '102': 'Numpad6',
+  '103': 'Numpad7',
+  '104': 'Numpad8',
+  '105': 'Numpad9',
+  '106': 'NumpadMultiply',
+  '107': 'NumpadAdd',
+  '109': 'NumpadSubtract',
+  '110': 'NumpadDecimal',
+  '111': 'NumpadDivide',
+
+  // Other
+  '91': 'MetaLeft',
+  '92': 'MetaRight',
+  '93': 'ContextMenu',
+  '144': 'NumLock',
+  '145': 'ScrollLock',
 };
 
-const getCodeFromEvent = (e: KeyboardEvent): string => {
-  // Somehow `which` was sometimes reported to be undefined.
-  if (typeof e.which === 'number' && e.which.toString() in eventWhichToCode)
-    return eventWhichToCode[e.which.toString()];
-  return e.code || ''; // Somehow `code` was sometimes reported to be undefined.
+type KeyEventLike = {
+  +keyCode?: number,
+  +which?: any,
+  +code?: string,
+  +metaKey: boolean,
+  +ctrlKey: boolean,
+  +altKey: boolean,
+  +shiftKey: boolean,
+};
+
+const getCodeFromEvent = (e: KeyEventLike): string => {
+  if (
+    typeof e.keyCode === 'number' &&
+    e.keyCode.toString() in eventKeyCodeToCode
+  )
+    return eventKeyCodeToCode[e.keyCode.toString()];
+  if (typeof e.which === 'number' && e.which.toString() in eventKeyCodeToCode)
+    return eventKeyCodeToCode[e.which.toString()];
+
+  if (e.code) return e.code;
+  return '';
 };
 
 /**
@@ -96,7 +181,7 @@ const getKeyTypeFromCode = (code: string): KeyType | null => {
 /**
  * Returns possibly partial shortcut string corresponding to given event object
  */
-export const getShortcutStringFromEvent = (e: KeyboardEvent): string => {
+export const getShortcutStringFromEvent = (e: KeyEventLike): string => {
   let shortcutString = '';
   if (e.ctrlKey || e.metaKey) shortcutString += 'CmdOrCtrl+';
   if (e.shiftKey) shortcutString += 'Shift+';
@@ -112,7 +197,7 @@ export const getShortcutStringFromEvent = (e: KeyboardEvent): string => {
  * Checks if the given event corresponds to a valid shortcut press.
  * Does not check if shortcut is reserved or not.
  */
-export const isValidShortcutEvent = (e: KeyboardEvent): boolean => {
+export const isValidShortcutEvent = (e: KeyEventLike): boolean => {
   // Check if action key is a shortcut supported key
   const code = getCodeFromEvent(e);
   const keyType = getKeyTypeFromCode(code);
@@ -134,7 +219,7 @@ export const isValidShortcutEvent = (e: KeyboardEvent): boolean => {
  * Extracts shortcut-related information from given event object
  */
 export const getShortcutMetadataFromEvent = (
-  e: KeyboardEvent
+  e: KeyEventLike
 ): {| shortcutString: string, isValid: boolean |} => {
   const shortcutString = getShortcutStringFromEvent(e);
   const isValidKey = isValidShortcutEvent(e);
@@ -152,11 +237,19 @@ export const useShortcutMap = (): ShortcutMap => {
   return { ...defaultShortcuts, ...userShortcutMap };
 };
 
+type UseKeyboardShortcutsProps = {|
+  onRunCommand: (commandName: CommandName) => void,
+  previewDebuggerServer: ?PreviewDebuggerServer,
+|};
+
 /**
  * Listens for keyboard shortcuts and launches
  * callback with corresponding command
  */
-export const useKeyboardShortcuts = (onRunCommand: CommandName => void) => {
+export const useKeyboardShortcuts = ({
+  onRunCommand,
+  previewDebuggerServer,
+}: UseKeyboardShortcutsProps) => {
   const shortcutMap = useShortcutMap();
 
   React.useEffect(
@@ -173,7 +266,12 @@ export const useKeyboardShortcuts = (onRunCommand: CommandName => void) => {
         if (!commandName) return;
 
         // On desktop app, ignore shortcuts that are handled by Electron
-        if (electron && commandsList[commandName].handledByElectron) return;
+        if (electron && commandsList[commandName].handledByElectron) {
+          // console.info(
+          //   `Command ${commandName} triggered from KeyboardEvent but handled by Electron.`
+          // );
+          return;
+        }
 
         // e.preventDefault tends to block user from typing,
         // so do it only if user is not typing.
@@ -183,6 +281,7 @@ export const useKeyboardShortcuts = (onRunCommand: CommandName => void) => {
         // Discard shortcut presses if a dialog is open
         if (isDialogOpen()) return;
 
+        // console.info(`Command ${commandName} triggered from KeyboardEvent.`);
         onRunCommand(commandName);
       };
 
@@ -190,6 +289,82 @@ export const useKeyboardShortcuts = (onRunCommand: CommandName => void) => {
       return () => document.removeEventListener('keydown', handler);
     },
     [onRunCommand, shortcutMap]
+  );
+
+  React.useEffect(
+    () => {
+      if (!previewDebuggerServer) return;
+
+      const unregister = previewDebuggerServer.registerCallbacks({
+        onErrorReceived: () => {},
+        onServerStateChanged: () => {},
+        onConnectionClosed: () => {},
+        onConnectionOpened: () => {},
+        onConnectionErrored: () => {},
+        onHandleParsedMessage: ({ id, parsedMessage }) => {
+          if (
+            parsedMessage.command !== 'handleKeyboardShortcutFromInGameEditor'
+          ) {
+            return;
+          }
+
+          const keyEventLike = parsedMessage.payload;
+          const metaKey =
+            SafeExtractor.extractBooleanProperty(keyEventLike, 'metaKey') ||
+            false;
+          const ctrlKey =
+            SafeExtractor.extractBooleanProperty(keyEventLike, 'ctrlKey') ||
+            false;
+          const altKey =
+            SafeExtractor.extractBooleanProperty(keyEventLike, 'altKey') ||
+            false;
+          const shiftKey =
+            SafeExtractor.extractBooleanProperty(keyEventLike, 'shiftKey') ||
+            false;
+          const keyCode = SafeExtractor.extractNumberProperty(
+            keyEventLike,
+            'keyCode'
+          );
+
+          if (!keyCode) return;
+
+          const shortcutData = getShortcutMetadataFromEvent({
+            keyCode,
+            metaKey,
+            ctrlKey,
+            altKey,
+            shiftKey,
+          });
+          if (!shortcutData.isValid) return;
+
+          // Get corresponding command, if it exists
+          const commandName = Object.keys(shortcutMap).find(
+            name => shortcutMap[name] === shortcutData.shortcutString
+          );
+          if (!commandName) return;
+
+          const command = commandsList[commandName];
+          if (!command) return;
+
+          if (isUserTyping() || isDialogOpen()) {
+            console.warn(
+              'Shortcut received from the in-game editor, despite the user having a dialog opened or being typing. Ignoring. Still double check why this shortcut was received.'
+            );
+            return;
+          }
+
+          // console.info(
+          //   `Command ${commandName} triggered from a in-game editor shortcut.`
+          // );
+          onRunCommand(commandName);
+        },
+      });
+
+      return () => {
+        unregister();
+      };
+    },
+    [previewDebuggerServer, shortcutMap, onRunCommand]
   );
 };
 

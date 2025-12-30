@@ -20,4 +20,13 @@ void BehaviorDefaultFlagClearer::DoVisitBehavior(gd::Behavior& behavior) {
 
 BehaviorDefaultFlagClearer::~BehaviorDefaultFlagClearer() {}
 
+void BehaviorDefaultFlagClearer::SerializeObjectWithCleanDefaultBehaviorFlags(
+    const gd::Object &object, SerializerElement &serializerElement) {
+  gd::Object clonedObject(object);
+  for (const auto &behaviorName : clonedObject.GetAllBehaviorNames()) {
+    clonedObject.GetBehavior(behaviorName).SetDefaultBehavior(false);
+  }
+  clonedObject.SerializeTo(serializerElement);
+}
+
 }  // namespace gd

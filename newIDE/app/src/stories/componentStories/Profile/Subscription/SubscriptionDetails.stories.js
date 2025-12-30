@@ -17,18 +17,15 @@ import {
   fakeAuthenticatedUserWithLegacyProSubscription,
   fakeGoldWithPurchaselyAuthenticatedUser,
 } from '../../../../fixtures/GDevelopServicesTestData';
-import subscriptionSuggestionDecorator from '../../../SubscriptionSuggestionDecorator';
 import SubscriptionDetails from '../../../../Profile/Subscription/SubscriptionDetails';
 import AlertProvider from '../../../../UI/Alert/AlertProvider';
 import LoaderModal from '../../../../UI/LoaderModal';
-import useSubscriptionPlans, {
-  filterAvailableSubscriptionPlansWithPrices,
-} from '../../../../Utils/UseSubscriptionPlans';
+import { SubscriptionContext } from '../../../../Profile/Subscription/SubscriptionContext';
 
 export default {
   title: 'Subscription/SubscriptionDetails',
   component: SubscriptionDetails,
-  decorators: [subscriptionSuggestionDecorator, paperDecorator],
+  decorators: [paperDecorator],
   argTypes: {
     authenticated: {
       options: ['no', 'loading', 'yes'],
@@ -184,18 +181,17 @@ export const Default = ({
   }
 
   const { subscription: userSubscription } = authenticatedUser;
-  const { getSubscriptionPlansWithPricingSystems } = useSubscriptionPlans({
-    includeLegacy: true,
-    authenticatedUser,
-  });
-  const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
+  const {
+    getSubscriptionPlansWithPricingSystemsIncludingLegacy,
+  } = React.useContext(SubscriptionContext);
+  const subscriptionPlansWithPricingSystemsIncludingLegacy = getSubscriptionPlansWithPricingSystemsIncludingLegacy();
 
-  return subscriptionPlansWithPricingSystems ? (
+  return subscriptionPlansWithPricingSystemsIncludingLegacy ? (
     <AlertProvider>
       <SubscriptionDetails
-        subscriptionPlansWithPricingSystems={filterAvailableSubscriptionPlansWithPrices(
-          subscriptionPlansWithPricingSystems
-        )}
+        subscriptionPlansWithPricingSystems={
+          subscriptionPlansWithPricingSystemsIncludingLegacy
+        }
         subscription={userSubscription}
         onManageSubscription={action('manage subscription')}
         isManageSubscriptionLoading={!!loading}
@@ -203,6 +199,6 @@ export const Default = ({
       />
     </AlertProvider>
   ) : (
-    <LoaderModal show />
+    <LoaderModal showImmediately />
   );
 };

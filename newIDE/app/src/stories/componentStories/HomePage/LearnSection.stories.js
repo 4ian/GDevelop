@@ -75,7 +75,6 @@ export const Default = () => (
             'onSelectPrivateGameTemplateListingData'
           )}
           onSelectExampleShortHeader={action('onSelectExampleShortHeader')}
-          getSubscriptionPlansWithPricingSystems={() => null}
           initialBundleCategory={null}
           initialBundleUserFriendlySlug={null}
           clearInitialBundleValues={() => {}}
@@ -125,7 +124,6 @@ export const NotAuthenticated = () => (
             'onSelectPrivateGameTemplateListingData'
           )}
           onSelectExampleShortHeader={action('onSelectExampleShortHeader')}
-          getSubscriptionPlansWithPricingSystems={() => null}
           initialBundleCategory={null}
           initialBundleUserFriendlySlug={null}
           clearInitialBundleValues={() => {}}
@@ -177,7 +175,6 @@ export const EducationSubscriber = () => (
             'onSelectPrivateGameTemplateListingData'
           )}
           onSelectExampleShortHeader={action('onSelectExampleShortHeader')}
-          getSubscriptionPlansWithPricingSystems={() => null}
           initialBundleCategory={null}
           initialBundleUserFriendlySlug={null}
           clearInitialBundleValues={() => {}}
@@ -229,7 +226,6 @@ export const EducationTeacher = () => (
             'onSelectPrivateGameTemplateListingData'
           )}
           onSelectExampleShortHeader={action('onSelectExampleShortHeader')}
-          getSubscriptionPlansWithPricingSystems={() => null}
           initialBundleCategory={null}
           initialBundleUserFriendlySlug={null}
           clearInitialBundleValues={() => {}}
@@ -275,7 +271,6 @@ export const LoadingTutorials = () => (
           'onSelectPrivateGameTemplateListingData'
         )}
         onSelectExampleShortHeader={action('onSelectExampleShortHeader')}
-        getSubscriptionPlansWithPricingSystems={() => null}
         initialBundleCategory={null}
         initialBundleUserFriendlySlug={null}
         clearInitialBundleValues={() => {}}
@@ -320,7 +315,6 @@ export const LoadingCourses = () => (
           'onSelectPrivateGameTemplateListingData'
         )}
         onSelectExampleShortHeader={action('onSelectExampleShortHeader')}
-        getSubscriptionPlansWithPricingSystems={() => null}
         initialBundleCategory={null}
         initialBundleUserFriendlySlug={null}
         clearInitialBundleValues={() => {}}

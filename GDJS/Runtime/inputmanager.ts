@@ -9,6 +9,7 @@ namespace gdjs {
   /**
    * Store input made on a canvas: mouse position, key pressed
    * and touches states.
+   * @category Core Engine > Input
    */
   export class InputManager {
     static MOUSE_LEFT_BUTTON: integer = 0;
@@ -33,24 +34,38 @@ namespace gdjs {
     /**
      * The cursor X position (moved by mouse and touch events).
      */
-    _cursorX: float = 0;
+    private _cursorX: float = 0;
     /**
      * The cursor Y position (moved by mouse and touch events).
      */
-    _cursorY: float = 0;
+    private _cursorY: float = 0;
+
     /**
      * The mouse X position (only moved by mouse events).
      */
-    _mouseX: float = 0;
+    private _mouseX: float = 0;
     /**
      * The mouse Y position (only moved by mouse events).
      */
-    _mouseY: float = 0;
-    _isMouseInsideCanvas: boolean = true;
-    _mouseWheelDelta: float = 0;
+    private _mouseY: float = 0;
+    private _isMouseInsideCanvas: boolean = true;
+    private _wheelDeltaX: float = 0;
+    private _wheelDeltaY: float = 0;
+    private _wheelDeltaZ: float = 0;
+
+    /**
+     * The mouse movement X (only moved by mouse events).
+     */
+    private _mouseMovementX: float = 0;
+    /**
+     * The mouse movement Y (only moved by mouse events).
+     */
+    private _mouseMovementY: float = 0;
+
     // TODO Remove _touches when there is no longer SpritePanelButton 1.2.0
     // extension in the wild.
-    _touches = {
+    // @ts-ignore
+    private _touches = {
       firstKey: (): string | number | null => {
         for (const key in this._mouseOrTouches.items) {
           // Exclude mouse key.
@@ -61,22 +76,23 @@ namespace gdjs {
         return null;
       },
     };
-    _mouseOrTouches: Hashtable<Touch>;
+
+    private _mouseOrTouches: Hashtable<Touch>;
     //Identifiers of the touches that started during/before the frame.
-    _startedTouches: Array<integer> = [];
+    private _startedTouches: Array<integer> = [];
 
     //Identifiers of the touches that ended during/before the frame.
-    _endedTouches: Array<integer> = [];
-    _touchSimulateMouse: boolean = true;
+    private _endedTouches: Array<integer> = [];
+    private _touchSimulateMouse: boolean = true;
 
     /**
      * @deprecated
      */
-    _lastStartedTouchIndex = 0;
+    private _lastStartedTouchIndex = 0;
     /**
      * @deprecated
      */
-    _lastEndedTouchIndex = 0;
+    private _lastEndedTouchIndex = 0;
 
     constructor() {
       this._pressedKeys = new Hashtable();
@@ -96,7 +112,7 @@ namespace gdjs {
      * @param keyCode The raw key code
      * @param location The location
      */
-    _getLocationAwareKeyCode(
+    static getLocationAwareKeyCode(
       keyCode: number,
       location: number | null | undefined
     ): integer {
@@ -121,7 +137,7 @@ namespace gdjs {
      * @param location The location of the event.
      */
     onKeyPressed(keyCode: number, location?: number): void {
-      const locationAwareKeyCode = this._getLocationAwareKeyCode(
+      const locationAwareKeyCode = InputManager.getLocationAwareKeyCode(
         keyCode,
         location
       );
@@ -138,7 +154,7 @@ namespace gdjs {
      * @param location The location of the event.
      */
     onKeyReleased(keyCode: number, location?: number): void {
-      const locationAwareKeyCode = this._getLocationAwareKeyCode(
+      const locationAwareKeyCode = InputManager.getLocationAwareKeyCode(
         keyCode,
         location
       );
@@ -234,18 +250,42 @@ namespace gdjs {
       return false;
     }
 
+    exceptionallyGetAllJustPressedKeys(): number[] {
+      const result: string[] = [];
+      this._justPressedKeys.keys(result);
+      return result.map((locationAwareKeyCode) =>
+        parseInt(locationAwareKeyCode, 10)
+      );
+    }
+
     /**
      * Should be called when the mouse is moved.
+     * Some browsers or environments may call this function multiple times during a single frame.
      *
      * Please note that the coordinates must be expressed relative to the view position.
      *
      * @param x The mouse new X position
      * @param y The mouse new Y position
+     * @param options An object containing the mouse movement X and Y if available.
      */
-    onMouseMove(x: float, y: float): void {
+    onMouseMove(
+      x: float,
+      y: float,
+      options?: { movementX: float; movementY: float }
+    ): void {
       this._setCursorPosition(x, y);
       this._mouseX = x;
       this._mouseY = y;
+
+      if (options) {
+        // Mouse movement can be accumulated over multiple calls to onMouseMove during a single frame.
+        // This is the case with Firefox which calls onMouseMove multiple times, including with
+        // values being 0 (so we can't just rely on the last one).
+        const { movementX, movementY } = options;
+        if (movementX !== undefined) this._mouseMovementX += movementX;
+        if (movementY !== undefined) this._mouseMovementY += movementY;
+      }
+
       if (this.isMouseButtonPressed(InputManager.MOUSE_LEFT_BUTTON)) {
         this._moveTouch(
           InputManager.MOUSE_TOUCH_ID,
@@ -299,6 +339,24 @@ namespace gdjs {
     }
 
     /**
+     * Get the mouse movement on X axis.
+     *
+     * @return the mouse movement X.
+     */
+    getMouseMovementX(): float {
+      return this._mouseMovementX;
+    }
+
+    /**
+     * Get the mouse movement on Y axis.
+     *
+     * @return the mouse movement Y.
+     */
+    getMouseMovementY(): float {
+      return this._mouseMovementY;
+    }
+
+    /**
      * Should be called when the mouse leave the canvas.
      */
     onMouseLeave(): void {
@@ -333,6 +391,19 @@ namespace gdjs {
           this.getCursorY()
         );
       }
+    }
+
+    /**
+     * Return true if any mouse button is pressed.
+     * @return true if any mouse button is pressed.
+     */
+    anyMouseButtonPressed(): boolean {
+      for (const buttonCode in this._pressedMouseButtons) {
+        if (this._pressedMouseButtons[buttonCode]) {
+          return true;
+        }
+      }
+      return false;
     }
 
     _setMouseButtonPressed(buttonCode: number): void {
@@ -380,17 +451,37 @@ namespace gdjs {
 
     /**
      * Should be called whenever the mouse wheel is used
-     * @param wheelDelta The mouse wheel delta
+     * @param wheelDeltaY The mouse wheel delta
      */
-    onMouseWheel(wheelDelta: number): void {
-      this._mouseWheelDelta = wheelDelta;
+    onMouseWheel(
+      wheelDeltaY: number,
+      wheelDeltaX: number,
+      wheelDeltaZ: number
+    ): void {
+      this._wheelDeltaY = wheelDeltaY;
+      if (wheelDeltaX !== undefined) this._wheelDeltaX = wheelDeltaX;
+      if (wheelDeltaZ !== undefined) this._wheelDeltaZ = wheelDeltaZ;
     }
 
     /**
-     * Return the mouse wheel delta
+     * Return the mouse wheel delta on Y axis.
      */
     getMouseWheelDelta(): float {
-      return this._mouseWheelDelta;
+      return this._wheelDeltaY;
+    }
+
+    /**
+     * Return the mouse wheel delta on X axis.
+     */
+    getMouseWheelDeltaX(): float {
+      return this._wheelDeltaX;
+    }
+
+    /**
+     * Return the mouse wheel delta on Z axis.
+     */
+    getMouseWheelDeltaZ(): float {
+      return this._wheelDeltaZ;
     }
 
     /**
@@ -578,7 +669,11 @@ namespace gdjs {
       this._releasedKeys.clear();
       this._justPressedKeys.clear();
       this._releasedMouseButtons.length = 0;
-      this._mouseWheelDelta = 0;
+      this._wheelDeltaX = 0;
+      this._wheelDeltaY = 0;
+      this._wheelDeltaZ = 0;
+      this._mouseMovementX = 0;
+      this._mouseMovementY = 0;
       this._lastStartedTouchIndex = 0;
       this._lastEndedTouchIndex = 0;
     }

@@ -36,7 +36,10 @@ namespace gdjs {
     return 'left';
   };
 
-  /** Base parameters for {@link gdjs.TextInputRuntimeObject} */
+  /**
+   * Base parameters for {@link gdjs.TextInputRuntimeObject}
+   * @category Objects > Text Input
+   */
   export interface TextInputObjectData extends ObjectData {
     /** The base parameters of the TextInput */
     content: {
@@ -63,6 +66,9 @@ namespace gdjs {
     };
   }
 
+  /**
+   * @category Objects > Text Input
+   */
   export type TextInputNetworkSyncDataType = {
     opa: float;
     txt: string;
@@ -81,6 +87,9 @@ namespace gdjs {
     sc: boolean;
   };
 
+  /**
+   * @category Objects > Text Input
+   */
   export type TextInputNetworkSyncData = ObjectNetworkSyncData &
     TextInputNetworkSyncDataType;
 
@@ -93,6 +102,7 @@ namespace gdjs {
 
   /**
    * Shows a text input on the screen the player can type text into.
+   * @category Objects > Text Input
    */
   export class TextInputRuntimeObject
     extends gdjs.RuntimeObject
@@ -141,7 +151,9 @@ namespace gdjs {
       );
       this._borderOpacity = objectData.content.borderOpacity;
       this._borderWidth = objectData.content.borderWidth;
-      this._disabled = objectData.content.disabled;
+      this._disabled = instanceContainer.getGame().isInGameEdition()
+        ? true
+        : objectData.content.disabled;
       this._readOnly = objectData.content.readOnly;
       this._spellCheck =
         objectData.content.spellCheck !== undefined
@@ -334,9 +346,11 @@ namespace gdjs {
         this.setHeight(initialInstanceData.height);
         this._renderer.updatePadding();
       }
-      if (initialInstanceData.opacity !== undefined) {
-        this.setOpacity(initialInstanceData.opacity);
-      }
+      this.setOpacity(
+        initialInstanceData.opacity === undefined
+          ? 255
+          : initialInstanceData.opacity
+      );
     }
 
     onScenePaused(runtimeScene: gdjs.RuntimeScene): void {
@@ -566,6 +580,9 @@ namespace gdjs {
     }
 
     setDisabled(value: boolean) {
+      if (this.getInstanceContainer().getGame().isInGameEdition()) {
+        return;
+      }
       this._disabled = value;
       this._renderer.updateDisabled();
     }

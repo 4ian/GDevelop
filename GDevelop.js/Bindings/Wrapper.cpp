@@ -23,8 +23,11 @@
 #include <GDCore/Extensions/Metadata/ParameterOptions.h>
 #include <GDCore/Extensions/Platform.h>
 #include <GDCore/IDE/AbstractFileSystem.h>
+#include <GDCore/IDE/BehaviorParameterFiller.h>
+#include <GDCore/IDE/InstructionValidator.h>
 #include <GDCore/IDE/Dialogs/LayoutEditorCanvas/EditorSettings.h>
 #include <GDCore/IDE/Events/ArbitraryEventsWorker.h>
+#include <GDCore/IDE/Events/BehaviorDefaultFlagClearer.h>
 #include <GDCore/IDE/Events/EventsContextAnalyzer.h>
 #include <GDCore/IDE/Events/EventsFunctionSelfCallChecker.h>
 #include <GDCore/IDE/Events/EventsIdentifiersFinder.h>
@@ -44,6 +47,7 @@
 #include <GDCore/IDE/Events/InstructionsTypeRenamer.h>
 #include <GDCore/IDE/Events/TextFormatting.h>
 #include <GDCore/IDE/Events/UsedExtensionsFinder.h>
+#include <GDCore/IDE/Events/UsedObjectTypeFinder.h>
 #include <GDCore/IDE/Events/ExampleExtensionUsagesFinder.h>
 #include <GDCore/IDE/EventsFunctionTools.h>
 #include <GDCore/IDE/ObjectVariableHelper.h>
@@ -87,12 +91,15 @@
 #include <GDCore/Project/PropertiesContainer.h>
 #include <GDCore/Project/PropertiesContainersList.h>
 #include <GDCore/Project/PropertyDescriptor.h>
+#include <GDCore/Project/ResourcesContainer.h>
+#include <GDCore/Project/ResourcesContainersList.h>
 #include <GDCore/Project/Variable.h>
 #include <GDCore/Project/VariablesContainer.h>
 #include <GDCore/Project/VariablesContainersList.h>
 #include <GDCore/Project/QuickCustomization.h>
 #include <GDCore/Serialization/Serializer.h>
 #include <GDCore/Serialization/SerializerElement.h>
+#include <GDCore/Serialization/BinarySerializer.h>
 #include <GDCore/IDE/ObjectAssetSerializer.h>
 #include <GDJS/Events/Builtin/JsCodeEvent.h>
 #include <GDJS/Events/CodeGeneration/BehaviorCodeGenerator.h>
@@ -130,7 +137,7 @@
  */
 class ArbitraryResourceWorkerJS : public ArbitraryResourceWorker {
  public:
-   ArbitraryResourceWorkerJS(gd::ResourcesManager &resourcesManager)
+   ArbitraryResourceWorkerJS(gd::ResourcesContainer &resourcesManager)
       : ArbitraryResourceWorker(resourcesManager){};
 
   void ExposeImage(gd::String &arg0) {
@@ -437,6 +444,7 @@ typedef EventsFunctionsContainer::FunctionOwner
     EventsFunctionsContainer_FunctionOwner;
 typedef std::unique_ptr<gd::Object> UniquePtrObject;
 typedef std::unique_ptr<gd::ObjectConfiguration> UniquePtrObjectConfiguration;
+typedef std::unique_ptr<gd::Behavior> UniquePtrBehavior;
 typedef std::unique_ptr<ExpressionNode> UniquePtrExpressionNode;
 typedef std::vector<gd::ExpressionParserError *>
     VectorExpressionParserError;
@@ -455,6 +463,7 @@ typedef std::map<gd::String, std::map<gd::String, gd::PropertyDescriptor>>
 typedef gd::Variable::Type Variable_Type;
 typedef gd::VariablesContainer::SourceType VariablesContainer_SourceType;
 typedef gd::ObjectsContainer::SourceType ObjectsContainer_SourceType;
+typedef gd::ResourcesContainer::SourceType ResourcesContainer_SourceType;
 typedef std::map<gd::String, gd::SerializerValue> MapStringSerializerValue;
 typedef std::vector<std::pair<gd::String, std::shared_ptr<SerializerElement>>>
     VectorPairStringSharedPtrSerializerElement;
@@ -564,8 +573,6 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
   MakeNewProjectScopedContainersForProjectAndLayout
 #define STATIC_MakeNewProjectScopedContainersForProject \
   MakeNewProjectScopedContainersForProject
-#define STATIC_MakeNewProjectScopedContainersFor \
-  MakeNewProjectScopedContainersFor
 #define STATIC_MakeNewProjectScopedContainersForEventsFunctionsExtension \
   MakeNewProjectScopedContainersForEventsFunctionsExtension
 #define STATIC_MakeNewProjectScopedContainersForFreeEventsFunction \
@@ -629,6 +636,7 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_GetObjectStrExpressionMetadata GetObjectStrExpressionMetadata
 #define STATIC_GetBehaviorStrExpressionMetadata GetBehaviorStrExpressionMetadata
 #define STATIC_IsPrimitive IsPrimitive
+#define STATIC_TypeAsString TypeAsString
 
 #define STATIC_Major Major
 #define STATIC_Minor Minor
@@ -666,6 +674,8 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
   FindInvalidRequiredBehaviorProperties
 #define STATIC_GetBehaviorsWithType GetBehaviorsWithType
 #define STATIC_IsBehaviorCompatibleWithObject IsBehaviorCompatibleWithObject
+#define STATIC_FillBehaviorParameters FillBehaviorParameters
+#define STATIC_IsParameterValid IsParameterValid
 #define STATIC_FixInvalidRequiredBehaviorProperties \
   FixInvalidRequiredBehaviorProperties
 #define STATIC_RemoveLayerInScene RemoveLayerInScene
@@ -825,7 +835,11 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_GetNodeAtPosition GetNodeAtPosition
 
 #define STATIC_ScanProject ScanProject
+#define STATIC_ScanEventsFunctionsExtension ScanEventsFunctionsExtension
+#define STATIC_FindExtensionsDependentOn FindExtensionsDependentOn
 #define STATIC_GetUsedExtensions GetUsedExtensions
+#define STATIC_SerializeProjectData SerializeProjectData
+#define STATIC_SerializeObjectWithCleanDefaultBehaviorFlags SerializeObjectWithCleanDefaultBehaviorFlags
 
 #define STATIC_ApplyTranslation ApplyTranslation
 #define STATIC_GetUndefined GetUndefined
@@ -842,6 +856,10 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_GetDefaultMeasurementUnitByName GetDefaultMeasurementUnitByName
 #define STATIC_HasDefaultMeasurementUnitNamed HasDefaultMeasurementUnitNamed
 #define STATIC_GetEdgeAnchorFromString GetEdgeAnchorFromString
+#define STATIC_CreateBinarySnapshot CreateBinarySnapshot
+#define STATIC_GetLastBinarySnapshotSize GetLastBinarySnapshotSize
+#define STATIC_FreeBinarySnapshot FreeBinarySnapshot
+#define STATIC_DeserializeBinarySnapshot DeserializeBinarySnapshot
 
 // We postfix some methods with "At" as Javascript does not support overloading
 #define GetLayoutAt GetLayout

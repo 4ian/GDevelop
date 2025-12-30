@@ -4,7 +4,6 @@ import * as React from 'react';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 
-import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import EditorMosaic, {
   type EditorMosaicInterface,
@@ -33,6 +32,8 @@ import {
   type InstanceOrObjectPropertiesEditorInterface,
 } from '../../SceneEditor/InstanceOrObjectPropertiesEditorContainer';
 import { useDoNowOrAfterRender } from '../../Utils/UseDoNowOrAfterRender';
+import { preventGameFramePointerEvents } from '../../EmbeddedGame/EmbeddedGameFrame';
+import { EmbeddedGameFrameHole } from '../../EmbeddedGame/EmbeddedGameFrameHole';
 
 const initialMosaicEditorNodes = {
   direction: 'row',
@@ -50,29 +51,19 @@ const noop = () => {};
 
 const defaultPanelConfigByEditor = {
   'objects-list': {
-    position: 'end',
-    splitPercentage: 75,
-    direction: 'column',
+    position: 'right',
   },
   properties: {
-    position: 'start',
-    splitPercentage: 25,
-    direction: 'column',
+    position: 'left',
   },
   'object-groups-list': {
-    position: 'end',
-    splitPercentage: 75,
-    direction: 'column',
+    position: 'right',
   },
   'instances-list': {
-    position: 'end',
-    splitPercentage: 75,
-    direction: 'row',
+    position: 'bottom',
   },
   'layers-list': {
-    position: 'end',
-    splitPercentage: 75,
-    direction: 'row',
+    position: 'right',
   },
 };
 
@@ -82,6 +73,7 @@ const MosaicEditorsDisplay = React.forwardRef<
   SceneEditorsDisplayInterface
 >((props, ref) => {
   const {
+    gameEditorMode,
     project,
     resourceManagementProps,
     layout,
@@ -94,11 +86,16 @@ const MosaicEditorsDisplay = React.forwardRef<
     objectsContainer,
     projectScopedContainersAccessor,
     initialInstances,
+    chosenLayer,
     selectedLayer,
     onSelectInstances,
+    onInstancesModified,
+    onWillInstallExtension,
     onExtensionInstalled,
+    isActive,
+    onRestartInGameEditor,
+    showRestartInGameEditorAfterErrorButton,
   } = props;
-  const { isMobile } = useResponsiveWindowSize();
   const {
     getDefaultEditorMosaicNode,
     setDefaultEditorMosaicNode,
@@ -139,27 +136,41 @@ const MosaicEditorsDisplay = React.forwardRef<
     []
   );
   const forceUpdateLayersList = React.useCallback(() => {
-    if (layersListRef.current) layersListRef.current.forceUpdate();
+    if (layersListRef.current) layersListRef.current.forceUpdateList();
   }, []);
   const getInstanceSize = React.useCallback((instance: gdInitialInstance) => {
-    if (!editorRef.current) return [0, 0, 0];
-
-    return editorRef.current.getInstanceSize(instance);
+    return editorRef.current
+      ? editorRef.current.getInstanceSize(instance)
+      : [
+          instance.getDefaultWidth(),
+          instance.getDefaultHeight(),
+          instance.getDefaultDepth(),
+        ];
   }, []);
+  const _onInstancesModified = React.useCallback(
+    instances => {
+      if (onInstancesModified) onInstancesModified(instances);
+      forceUpdateInstancesList();
+    },
+    [onInstancesModified, forceUpdateInstancesList]
+  );
   const toggleEditorView = React.useCallback((editorId: EditorId) => {
     if (!editorMosaicRef.current) return;
     const config = defaultPanelConfigByEditor[editorId];
-    editorMosaicRef.current.toggleEditor(
-      editorId,
-      config.position,
-      config.splitPercentage,
-      config.direction
-    );
+    editorMosaicRef.current.toggleEditor(editorId, config.position);
   }, []);
   const isEditorVisible = React.useCallback((editorId: EditorId) => {
     if (!editorMosaicRef.current) return false;
     return editorMosaicRef.current.getOpenedEditorNames().includes(editorId);
   }, []);
+  const ensureEditorVisible = React.useCallback(
+    (editorId: EditorId) => {
+      if (!isEditorVisible(editorId)) {
+        toggleEditorView(editorId);
+      }
+    },
+    [isEditorVisible, toggleEditorView]
+  );
 
   const startSceneRendering = React.useCallback((start: boolean) => {
     const editor = editorRef.current;
@@ -196,6 +207,7 @@ const MosaicEditorsDisplay = React.forwardRef<
       openNewObjectDialog,
       toggleEditorView,
       isEditorVisible,
+      ensureEditorVisible,
       startSceneRendering,
       viewControls: {
         zoomBy: editor ? editor.zoomBy : noop,
@@ -279,10 +291,13 @@ const MosaicEditorsDisplay = React.forwardRef<
               projectScopedContainersAccessor={projectScopedContainersAccessor}
               instances={selectedInstances}
               objects={selectedObjects}
+              layer={selectedLayer}
               editInstanceVariables={props.editInstanceVariables}
               editObjectInPropertiesPanel={props.editObjectInPropertiesPanel}
               onEditObject={props.onEditObject}
-              onInstancesModified={forceUpdateInstancesList}
+              onObjectsModified={props.onObjectsModified}
+              onEffectAdded={props.onEffectAdded}
+              onInstancesModified={_onInstancesModified}
               onGetInstanceSize={getInstanceSize}
               ref={instanceOrObjectPropertiesEditorRef}
               unsavedChanges={props.unsavedChanges}
@@ -290,6 +305,7 @@ const MosaicEditorsDisplay = React.forwardRef<
               tileMapTileSelection={props.tileMapTileSelection}
               onSelectTileMapTile={props.onSelectTileMapTile}
               lastSelectionType={props.lastSelectionType}
+              onWillInstallExtension={props.onWillInstallExtension}
               onExtensionInstalled={props.onExtensionInstalled}
               onOpenEventBasedObjectVariantEditor={
                 props.onOpenEventBasedObjectVariantEditor
@@ -299,6 +315,9 @@ const MosaicEditorsDisplay = React.forwardRef<
               }
               isVariableListLocked={isCustomVariant}
               isBehaviorListLocked={isCustomVariant}
+              onEditLayerEffects={props.editLayerEffects}
+              onEditLayer={props.editLayer}
+              onLayersModified={props.onLayersModified}
             />
           )}
         </I18n>
@@ -313,17 +332,23 @@ const MosaicEditorsDisplay = React.forwardRef<
           layout={layout}
           eventsFunctionsExtension={eventsFunctionsExtension}
           eventsBasedObject={eventsBasedObject}
-          selectedLayer={selectedLayer}
+          chosenLayer={chosenLayer}
+          onChooseLayer={props.onChooseLayer}
           onSelectLayer={props.onSelectLayer}
           onEditLayerEffects={props.editLayerEffects}
           onEditLayer={props.editLayer}
+          onLayersModified={props.onLayersModified}
+          onLayersVisibilityInEditorChanged={
+            props.onLayersVisibilityInEditorChanged
+          }
           onRemoveLayer={props.onRemoveLayer}
           onLayerRenamed={props.onLayerRenamed}
           onCreateLayer={forceUpdatePropertiesEditor}
           layersContainer={layersContainer}
-          unsavedChanges={props.unsavedChanges}
           ref={layersListRef}
           hotReloadPreviewButtonProps={props.hotReloadPreviewButtonProps}
+          onBackgroundColorChanged={props.onBackgroundColorChanged}
+          gameEditorMode={props.gameEditorMode}
         />
       ),
     },
@@ -335,51 +360,69 @@ const MosaicEditorsDisplay = React.forwardRef<
           instances={initialInstances}
           selectedInstances={selectedInstances}
           onSelectInstances={selectInstances}
+          onInstancesModified={onInstancesModified || noop}
           ref={instancesListRef}
         />
       ),
     },
-    'instances-editor': {
-      type: 'primary',
-      noTitleBar: true,
-      noSoftKeyboardAvoidance: true,
-      renderEditor: () => (
-        <FullSizeInstancesEditorWithScrollbars
-          project={project}
-          layout={layout}
-          eventsBasedObject={eventsBasedObject}
-          eventsBasedObjectVariant={eventsBasedObjectVariant}
-          globalObjectsContainer={globalObjectsContainer}
-          objectsContainer={objectsContainer}
-          layersContainer={layersContainer}
-          selectedLayer={selectedLayer}
-          initialInstances={initialInstances}
-          instancesEditorSettings={props.instancesEditorSettings}
-          onInstancesEditorSettingsMutated={
-            props.onInstancesEditorSettingsMutated
+    'instances-editor':
+      gameEditorMode === 'embedded-game'
+        ? {
+            type: 'primary',
+            noTitleBar: true,
+            noSoftKeyboardAvoidance: true,
+            renderEditor: () => (
+              <EmbeddedGameFrameHole
+                isActive={isActive}
+                onRestartInGameEditor={onRestartInGameEditor}
+                showRestartInGameEditorAfterErrorButton={
+                  showRestartInGameEditorAfterErrorButton
+                }
+              />
+            ),
           }
-          instancesSelection={props.instancesSelection}
-          onInstancesAdded={props.onInstancesAdded}
-          onInstancesSelected={props.onInstancesSelected}
-          onInstanceDoubleClicked={props.onInstanceDoubleClicked}
-          onInstancesMoved={props.onInstancesMoved}
-          onInstancesResized={props.onInstancesResized}
-          onInstancesRotated={props.onInstancesRotated}
-          selectedObjectNames={selectedObjectNames}
-          onContextMenu={props.onContextMenu}
-          isInstanceOf3DObject={props.isInstanceOf3DObject}
-          instancesEditorShortcutsCallbacks={
-            props.instancesEditorShortcutsCallbacks
-          }
-          wrappedEditorRef={editor => {
-            editorRef.current = editor;
-          }}
-          pauseRendering={!props.isActive}
-          tileMapTileSelection={props.tileMapTileSelection}
-          onSelectTileMapTile={props.onSelectTileMapTile}
-        />
-      ),
-    },
+        : {
+            type: 'primary',
+            noTitleBar: true,
+            noSoftKeyboardAvoidance: true,
+            renderEditor: () => (
+              <FullSizeInstancesEditorWithScrollbars
+                project={project}
+                layout={layout}
+                eventsBasedObject={eventsBasedObject}
+                eventsBasedObjectVariant={eventsBasedObjectVariant}
+                globalObjectsContainer={globalObjectsContainer}
+                objectsContainer={objectsContainer}
+                layersContainer={layersContainer}
+                chosenLayer={chosenLayer}
+                initialInstances={initialInstances}
+                instancesEditorSettings={props.instancesEditorSettings}
+                onInstancesEditorSettingsMutated={
+                  props.onInstancesEditorSettingsMutated
+                }
+                instancesSelection={props.instancesSelection}
+                onInstancesAdded={props.onInstancesAdded}
+                onInstancesSelected={props.onInstancesSelected}
+                onInstanceDoubleClicked={props.onInstanceDoubleClicked}
+                onInstancesMoved={props.onInstancesMoved}
+                onInstancesResized={props.onInstancesResized}
+                onInstancesRotated={props.onInstancesRotated}
+                selectedObjectNames={selectedObjectNames}
+                onContextMenu={props.onContextMenu}
+                isInstanceOf3DObject={props.isInstanceOf3DObject}
+                instancesEditorShortcutsCallbacks={
+                  props.instancesEditorShortcutsCallbacks
+                }
+                wrappedEditorRef={editor => {
+                  editorRef.current = editor;
+                }}
+                pauseRendering={!props.isActive}
+                tileMapTileSelection={props.tileMapTileSelection}
+                onSelectTileMapTile={props.onSelectTileMapTile}
+                editorViewPosition2D={props.editorViewPosition2D}
+              />
+            ),
+          },
     'objects-list': {
       type: 'secondary',
       title: t`Objects`,
@@ -430,10 +473,12 @@ const MosaicEditorsDisplay = React.forwardRef<
               beforeSetAsGlobalObject={objectName =>
                 props.canObjectOrGroupBeGlobal(i18n, objectName)
               }
+              onSetAsGlobalObject={props.onSetAsGlobalObject}
               ref={objectsListRef}
               unsavedChanges={props.unsavedChanges}
               hotReloadPreviewButtonProps={props.hotReloadPreviewButtonProps}
               isListLocked={isCustomVariant}
+              onWillInstallExtension={onWillInstallExtension}
               onExtensionInstalled={onExtensionInstalled}
             />
           )}
@@ -472,13 +517,21 @@ const MosaicEditorsDisplay = React.forwardRef<
       ),
     },
   };
+
   return (
     <EditorMosaic
       editors={editors}
-      limitToOneSecondaryEditor={isMobile}
+      centralNodeId="instances-editor"
       initialNodes={
         getDefaultEditorMosaicNode('scene-editor') || initialMosaicEditorNodes
       }
+      isTransparent={gameEditorMode === 'embedded-game'}
+      onDragOrResizedStarted={() => {
+        preventGameFramePointerEvents(true);
+      }}
+      onDragOrResizedEnded={() => {
+        preventGameFramePointerEvents(false);
+      }}
       onOpenedEditorsChanged={props.onOpenedEditorsChanged}
       onPersistNodes={node => setDefaultEditorMosaicNode('scene-editor', node)}
       ref={editorMosaicRef}

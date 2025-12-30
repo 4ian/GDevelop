@@ -1,5 +1,7 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Player Authentication');
+
+  /** @category Other extensions > Player Authentication */
   export namespace playerAuthenticationComponents {
     const getPlayerLoginMessages = ({
       platform,

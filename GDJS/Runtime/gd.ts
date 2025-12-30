@@ -16,15 +16,18 @@ namespace gdjs {
   /**
    * Contains functions used by events (this is a convention only, functions can actually
    * be anywhere).
-   * @namespace
    * @memberOf gdjs
+   * @category Core Engine > Events interfacing
    */
   export namespace evtTools {
     // @ts-ignore - This variable is unused on purpose.
     const thisIsUnusedButEnsureTheNamespaceIsDeclared = true;
   }
 
+  /** @internal */
   export const objectsTypes = new Hashtable<typeof gdjs.RuntimeObject>();
+
+  /** @internal */
   export const behaviorsTypes = new Hashtable<typeof gdjs.RuntimeBehavior>();
 
   type RuntimeSceneCallback = (runtimeScene: gdjs.RuntimeScene) => void;
@@ -43,24 +46,48 @@ namespace gdjs {
     options: UpdateFromNetworkSyncDataOptions
   ) => void;
 
+  /** @internal */
   export const callbacksFirstRuntimeSceneLoaded: Array<RuntimeSceneCallback> =
     [];
+
+  /** @internal */
   export const callbacksRuntimeSceneLoaded: Array<RuntimeSceneCallback> = [];
+
+  /** @internal */
   export const callbacksRuntimeScenePreEvents: Array<RuntimeSceneCallback> = [];
+
+  /** @internal */
   export const callbacksRuntimeScenePostEvents: Array<RuntimeSceneCallback> =
     [];
+
+  /** @internal */
   export const callbacksRuntimeScenePaused: Array<RuntimeSceneCallback> = [];
+
+  /** @internal */
   export const callbacksRuntimeSceneResumed: Array<RuntimeSceneCallback> = [];
+
+  /** @internal */
   export const callbacksRuntimeSceneUnloading: Array<RuntimeSceneCallback> = [];
+
+  /** @internal */
   export const callbacksRuntimeSceneUnloaded: Array<RuntimeSceneCallback> = [];
+
+  /** @internal */
   export const callbacksObjectDeletedFromScene: Array<RuntimeSceneRuntimeObjectCallback> =
     [];
+
+  /** @internal */
   export const callbacksRuntimeSceneGetSyncData: Array<RuntimeSceneGetSyncDataCallback> =
     [];
+
+  /** @internal */
   export const callbacksRuntimeSceneUpdateFromSyncData: Array<RuntimeSceneUpdateFromSyncData> =
     [];
 
-  /** Base64 encoded logo of GDevelop for the splash screen. */
+  /**
+   * Base64 encoded logo of GDevelop for the splash screen.
+   * @internal
+   */
   export let gdevelopLogo: string = '';
 
   /**
@@ -70,6 +97,7 @@ namespace gdjs {
    * @param r Red
    * @param g Green
    * @param b Blue
+   * @category Utils > Color
    */
   export const rgbToHex = function (
     r: integer,
@@ -83,6 +111,7 @@ namespace gdjs {
    * Convert a Hex string (#124FE4) to an RGB color array [r, g, b], where each component is in the range [0, 255].
    *
    * @param {string} hex Color hexadecimal
+   * @category Utils > Color
    */
   export const hexToRGBColor = function (
     hexString: string
@@ -97,6 +126,7 @@ namespace gdjs {
    * Convert a shorthand Hex string (#1F4) to an RGB color array [r, g, b], where each component is in the range [0, 255].
    *
    * @param {string} hex Color hexadecimal
+   * @category Utils > Color
    */
   export const shorthandHexToRGBColor = function (
     hexString: string
@@ -114,6 +144,7 @@ namespace gdjs {
   /**
    * Convert a RGB string ("rrr;ggg;bbb") or a Hex string ("#rrggbb") to a RGB color array ([r,g,b] with each component going from 0 to 255).
    * @param value The color as a RGB string or Hex string
+   * @category Utils > Color
    */
   export const rgbOrHexToRGBColor = function (
     value: string
@@ -145,6 +176,7 @@ namespace gdjs {
   /**
    * Convert a RGB string ("rrr;ggg;bbb") or a Hex string ("#rrggbb") to a RGB color number.
    * @param rgbOrHexString The color as a RGB string or Hex string
+   * @category Utils > Color
    */
   export const rgbOrHexStringToNumber = (rgbOrHexString: string): integer => {
     const components = gdjs.rgbOrHexToRGBColor(rgbOrHexString);
@@ -156,6 +188,7 @@ namespace gdjs {
    * @param r Red
    * @param g Green
    * @param b Blue
+   * @category Utils > Color
    */
   export const rgbToHexNumber = function (
     r: float,
@@ -168,6 +201,7 @@ namespace gdjs {
   /**
    * Convert a Hex number to a RGB color object ({r,g,b,a} with each component going from 0 to 255 and alpha set to 255).
    * @param hex Hex color
+   * @category Utils > Color
    */
   export const hexNumberToRGB = (
     hexNumber: number
@@ -183,6 +217,7 @@ namespace gdjs {
   /**
    * Convert a Hex number to a RGB color array([r,g,b] with each component going from 0 to 255).
    * @param hex Hex color
+   * @category Utils > Color
    */
   export const hexNumberToRGBArray = (
     hexNumber: number
@@ -194,11 +229,14 @@ namespace gdjs {
     ];
   };
 
+  /** @internal */
   export const extractHexString = (str: string): string | null => {
     const matches = str.match(hexStringRegex);
     if (!matches) return null;
     return matches[0];
   };
+
+  /** @internal */
   export const extractShorthandHexString = (str: string): string | null => {
     const matches = str.match(shorthandHexStringRegex);
     if (!matches) return null;
@@ -208,6 +246,7 @@ namespace gdjs {
   /**
    * Get a random integer between 0 and max.
    * @param max The maximum value (inclusive).
+   * @category Utils > Math
    */
   export const random = function (max: float): float {
     if (max <= 0) return 0;
@@ -215,11 +254,11 @@ namespace gdjs {
   };
 
   /**
- * Get a random integer between min and max.
- * @param min The minimum value (inclusive).
- * @param max The maximum value (inclusive).
-
- */
+   * Get a random integer between min and max.
+   * @param min The minimum value (inclusive).
+   * @param max The maximum value (inclusive).
+   * @category Utils > Math
+   */
   export const randomInRange = function (min: float, max: float): float {
     return min + gdjs.random(max - min); // return min if min >= max
   };
@@ -227,6 +266,7 @@ namespace gdjs {
   /**
    * Get a random float in the range 0 to less than max (inclusive of 0, but not max).
    * @param max The maximum value (exclusive).
+   * @category Utils > Math
    */
   export const randomFloat = function (max: float): float {
     if (max <= 0) return 0;
@@ -238,6 +278,7 @@ namespace gdjs {
    * @param min The minimum value (inclusive).
    * @param max The maximum value (exclusive).
    * @returns {number}
+   * @category Utils > Math
    */
   export const randomFloatInRange = function (min: float, max: float): float {
     return min + gdjs.randomFloat(max - min); // return min if min >= max
@@ -249,6 +290,7 @@ namespace gdjs {
    * @param max The maximum value (inclusive).
    * @param step The interval between each value.
    * @returns {number}
+   * @category Utils > Math
    */
   export const randomWithStep = function (
     min: float,
@@ -262,6 +304,7 @@ namespace gdjs {
   /**
    * Convert an angle in degrees to radians.
    * @param angleInDegrees The angle in degrees.
+   * @category Utils > Math
    */
   export const toRad = function (angleInDegrees: float): float {
     return (angleInDegrees / 180) * Math.PI;
@@ -270,6 +313,7 @@ namespace gdjs {
   /**
    * Convert an angle in radians to degrees.
    * @param angleInRadians The angle in radians.
+   * @category Utils > Math
    */
   export const toDegrees = function (angleInRadians: float): float {
     return (angleInRadians * 180) / Math.PI;
@@ -284,6 +328,7 @@ namespace gdjs {
    *
    * @param objectTypeName The name of the type of the Object.
    * @param Ctor The constructor of the Object.
+   * @category Core Engine > Object
    */
   export const registerObject = function (
     objectTypeName: string,
@@ -302,6 +347,7 @@ namespace gdjs {
    *
    * @param behaviorTypeName The name of the type of the behavior.
    * @param Ctor The constructor of the Object.
+   * @category Core Engine > Behavior
    */
   export const registerBehavior = function (
     behaviorTypeName: string,
@@ -315,6 +361,7 @@ namespace gdjs {
    * resources loading is done. This can be considered as the "start of the game".
    *
    * @param callback The function to be called.
+   * @category Core Engine > Scene
    */
   export const registerFirstRuntimeSceneLoadedCallback = function (
     callback: RuntimeSceneCallback
@@ -325,6 +372,7 @@ namespace gdjs {
   /**
    * Register a function to be called when a scene is loaded.
    * @param callback The function to be called.
+   * @category Core Engine > Scene
    */
   export const registerRuntimeSceneLoadedCallback = function (
     callback: RuntimeSceneCallback
@@ -335,7 +383,10 @@ namespace gdjs {
   /**
    * Register a function to be called each time a scene is stepped (i.e: at every frame),
    * before events are run.
+   *
+   * @see {@link gdjs.registerRuntimeScenePostEventsCallback}
    * @param callback The function to be called.
+   * @category Core Engine > Scene
    */
   export const registerRuntimeScenePreEventsCallback = function (
     callback: RuntimeSceneCallback
@@ -346,7 +397,50 @@ namespace gdjs {
   /**
    * Register a function to be called each time a scene is stepped (i.e: at every frame),
    * after events are run and before rendering.
-   * @param callback The function to be called.
+   *
+   * This is the recommended way to synchronize state changes with GDevelop's game loop,
+   * rather than using browser APIs like `requestAnimationFrame`. The game engine owns
+   * the game loop and controls the order of execution, so browser APIs may not sync
+   * reliably with frame timing.
+   *
+   * ## Use case: Implementing trigger-like conditions
+   *
+   * When creating conditions that should act as "triggers" (true for one frame, then
+   * automatically false), use this callback to reset flags at frame end. This ensures
+   * the flag will:
+   * 1. Remain true throughout the current frame (so conditions can detect it)
+   * 2. Be reset to false before the next frame begins
+   *
+   * ### Why this works reliably
+   *
+   * JavaScript is single-threaded, and asynchronous operations (promises, setTimeout,
+   * etc.) only execute between frames, never during frame execution. This means:
+   * - A frame runs completely (behaviors update → events run → this callback → render)
+   * - Async operations (like Promise resolutions) run after the frame completes
+   * - If an async operation sets a flag to true, it stays true until this callback
+   *   resets it at the end of the next frame
+   *
+   * ### Example usage
+   * ```js
+   * // In your extension initialization. Only do this once.
+   * gdjs.registerRuntimeScenePostEventsCallback((runtimeScene) => {
+   *   // Reset trigger flags after events have been processed
+   *   myExtension._dataRequestCompleted = false;
+   * });
+   *
+   * // When some async operation completes (probably in an action or somewhere else):
+   * doSomething().then((data) => {
+   *   myExtension._dataRequestCompleted = true; // Will be true for one frame
+   * });
+   *
+   * // or using await:
+   * const data = await doSomething();
+   * myExtension._dataRequestCompleted = true; // Will be true for one frame
+   * ```
+   *
+   * @param callback The function to be called after events and before rendering each frame.
+   *                 Receives the RuntimeScene as parameter.
+   * @category Core Engine > Scene
    */
   export const registerRuntimeScenePostEventsCallback = function (
     callback: RuntimeSceneCallback
@@ -357,6 +451,7 @@ namespace gdjs {
   /**
    * Register a function to be called when a scene is paused.
    * @param callback The function to be called.
+   * @category Core Engine > Scene
    */
   export const registerRuntimeScenePausedCallback = function (
     callback: RuntimeSceneCallback
@@ -367,6 +462,7 @@ namespace gdjs {
   /**
    * Register a function to be called when a scene is resumed.
    * @param callback The function to be called.
+   * @category Core Engine > Scene
    */
   export const registerRuntimeSceneResumedCallback = function (
     callback: RuntimeSceneCallback
@@ -381,6 +477,7 @@ namespace gdjs {
    * callbacks might do operations on objects or the scene.
    *
    * @param callback The function to be called.
+   * @category Core Engine > Scene
    */
   export const registerRuntimeSceneUnloadingCallback = function (
     callback: RuntimeSceneCallback
@@ -394,6 +491,7 @@ namespace gdjs {
    * from releasing resources.
    *
    * @param callback The function to be called.
+   * @category Core Engine > Scene
    */
   export const registerRuntimeSceneUnloadedCallback = function (
     callback: RuntimeSceneCallback
@@ -404,6 +502,7 @@ namespace gdjs {
   /**
    * Register a function to be called when an object is deleted from a scene.
    * @param callback The function to be called.
+   * @category Core Engine > Object
    */
   export const registerObjectDeletedFromSceneCallback = function (
     callback: RuntimeSceneRuntimeObjectCallback
@@ -415,6 +514,7 @@ namespace gdjs {
    * Register a function to be called each time a scene is getting its sync
    * data retrieved (via getNetworkSyncData).
    * @param callback The function to be called.
+   * @category Core Engine > Scene
    */
   export const registerRuntimeSceneGetSyncDataCallback = function (
     callback: RuntimeSceneGetSyncDataCallback
@@ -426,6 +526,7 @@ namespace gdjs {
    * Register a function to be called each time a scene is getting its sync
    * data updated (via updateFromNetworkSyncData).
    * @param callback The function to be called.
+   * @category Core Engine > Scene
    */
   export const registerRuntimeSceneUpdateFromSyncDataCallback = function (
     callback: RuntimeSceneUpdateFromSyncData
@@ -478,6 +579,7 @@ namespace gdjs {
    * Get the constructor of an object.
    *
    * @param name The name of the type of the object.
+   * @category Core Engine > Object
    */
   export const getObjectConstructor = function (
     name: string
@@ -493,6 +595,7 @@ namespace gdjs {
    * Get the constructor of a behavior.
    *
    * @param name The name of the type of the behavior.
+   * @category Core Engine > Behavior
    */
   export const getBehaviorConstructor = function (
     name: string
@@ -507,6 +610,7 @@ namespace gdjs {
   /**
    * Create a static array that won't need a new allocation each time it's used.
    * @param owner The owner of the Array.
+   * @category Utils > JavaScript
    */
   export const staticArray = function (owner: any): Array<any> {
     owner._staticArray = owner._staticArray || [];
@@ -516,6 +620,7 @@ namespace gdjs {
   /**
    * Create a second static array that won't need a new allocation each time it's used.
    * @param owner The owner of the Array.
+   * @category Utils > JavaScript
    */
   export const staticArray2 = function (owner: any): Array<any> {
     owner._staticArray2 = owner._staticArray2 || [];
@@ -525,6 +630,7 @@ namespace gdjs {
   /**
    * Create a static object that won't need a new allocation each time it's used.
    * @param owner The owner of the Array.
+   * @category Utils > JavaScript
    */
   export const staticObject = function (owner: any): Object {
     owner._staticObject = owner._staticObject || {};
@@ -536,6 +642,7 @@ namespace gdjs {
    * as parameters.
    * @param objectsLists
    * @returns {Array}
+   * @category Utils > JavaScript
    */
   export const objectsListsToArray = function (
     objectsLists: Hashtable<RuntimeObject>
@@ -558,6 +665,7 @@ namespace gdjs {
    * both array contains the same elements.
    * @param src The source array
    * @param dst The destination array
+   * @category Utils > JavaScript
    */
   export const copyArray = function <T>(src: Array<T>, dst: Array<T>): void {
     var len = src.length;
@@ -575,6 +683,7 @@ namespace gdjs {
   /**
    * Generate a UUID v4.
    * @returns The generated UUID.
+   * @category Utils > JavaScript
    */
   export const makeUuid = <MakeUUID>function (): string {
     // Fallback to non cryptographically secure UUIDs if not supported
@@ -634,6 +743,7 @@ namespace gdjs {
    * @param b
    * @param epsilon the relative margin error
    * @returns true when a and b are within a relative margin error.
+   * @category Utils > JavaScript
    */
   export const nearlyEqual = (a: float, b: float, epsilon: float): boolean => {
     const absA = Math.abs(a);
@@ -660,6 +770,7 @@ namespace gdjs {
    * finished loading (and is required to load before launching the game).
    *
    * This method must be called by any library that loads asynchronously.
+   * @category Core Engine > Game
    */
   export const registerAsynchronouslyLoadingLibraryPromise = (
     promise: Promise<any>
@@ -671,6 +782,7 @@ namespace gdjs {
    * @returns a promise resolved when all all third party libraries, which need
    * to be loaded before the game startup, are loaded. If a library fails
    * loading, this will be rejected.
+   * @internal
    */
   export const getAllAsynchronouslyLoadingLibraryPromise = (): Promise<
     any[]

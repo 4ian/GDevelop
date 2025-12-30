@@ -3,11 +3,11 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_BEHAVIOR_H
-#define GDCORE_BEHAVIOR_H
+#pragma once
 
 #include "GDCore/String.h"
 #include "GDCore/Project/BehaviorConfigurationContainer.h"
+#include "GDCore/Tools/MakeUnique.h"
 
 namespace gd {
 
@@ -28,7 +28,9 @@ class GD_CORE_API Behavior: public BehaviorConfigurationContainer {
       : BehaviorConfigurationContainer(name_, type_),
       isDefaultBehavior(false) {};
   virtual ~Behavior();
-  virtual Behavior* Clone() const override { return new Behavior(*this); }
+  virtual std::unique_ptr<gd::Behavior> Clone() const {
+    return gd::make_unique<gd::Behavior>(*this);
+  }
 
   bool IsDefaultBehavior() const {
     return isDefaultBehavior;
@@ -43,5 +45,3 @@ class GD_CORE_API Behavior: public BehaviorConfigurationContainer {
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_BEHAVIOR_H

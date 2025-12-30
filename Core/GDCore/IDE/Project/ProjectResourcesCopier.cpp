@@ -7,7 +7,6 @@
 #include <map>
 #include "GDCore/CommonTools.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
-#include "GDCore/IDE/Project/ResourcesAbsolutePathChecker.h"
 #include "GDCore/IDE/Project/ResourcesMergingHelper.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Tools/Localization.h"
@@ -26,42 +25,37 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(
     bool preserveAbsoluteFilenames,
     bool preserveDirectoryStructure) {
   if (updateOriginalProject) {
-    gd::ProjectResourcesCopier::CopyAllResourcesTo(
-        originalProject, originalProject, fs, destinationDirectory,
-        preserveAbsoluteFilenames, preserveDirectoryStructure);
+    gd::ProjectResourcesCopier::AdaptFilePathsAndCopyAllResourcesTo(
+        originalProject, fs, destinationDirectory, preserveAbsoluteFilenames,
+        preserveDirectoryStructure);
   } else {
     gd::Project clonedProject = originalProject;
-    gd::ProjectResourcesCopier::CopyAllResourcesTo(
-        originalProject, clonedProject, fs, destinationDirectory,
-        preserveAbsoluteFilenames, preserveDirectoryStructure);
+    gd::ProjectResourcesCopier::AdaptFilePathsAndCopyAllResourcesTo(
+        clonedProject, fs, destinationDirectory, preserveAbsoluteFilenames,
+        preserveDirectoryStructure);
   }
   return true;
 }
 
-bool ProjectResourcesCopier::CopyAllResourcesTo(
-    gd::Project& originalProject,
-    gd::Project& clonedProject,
+bool ProjectResourcesCopier::AdaptFilePathsAndCopyAllResourcesTo(
+    gd::Project& project,
     AbstractFileSystem& fs,
     gd::String destinationDirectory,
     bool preserveAbsoluteFilenames,
     bool preserveDirectoryStructure) {
 
-  // Check if there are some resources with absolute filenames
-  gd::ResourcesAbsolutePathChecker absolutePathChecker(originalProject.GetResourcesManager(), fs);
-  gd::ResourceExposer::ExposeWholeProjectResources(originalProject, absolutePathChecker);
-
-  auto projectDirectory = fs.DirNameFrom(originalProject.GetProjectFile());
+  auto projectDirectory = fs.DirNameFrom(project.GetProjectFile());
   std::cout << "Copying all resources from " << projectDirectory << " to "
             << destinationDirectory << "..." << std::endl;
 
   // Get the resources to be copied
   gd::ResourcesMergingHelper resourcesMergingHelper(
-      clonedProject.GetResourcesManager(), fs);
+      project.GetResourcesManager(), fs);
   resourcesMergingHelper.SetBaseDirectory(projectDirectory);
   resourcesMergingHelper.PreserveDirectoriesStructure(
       preserveDirectoryStructure);
   resourcesMergingHelper.PreserveAbsoluteFilenames(preserveAbsoluteFilenames);
-  gd::ResourceExposer::ExposeWholeProjectResources(clonedProject,
+  gd::ResourceExposer::ExposeWholeProjectResources(project,
                                                     resourcesMergingHelper);
 
   // Copy resources

@@ -18,7 +18,7 @@ export default {
 
 const eventsTreeTutorials: Array<Tutorial> = [
   {
-    id: 'intro-event-system',
+    id: 'the-events',
     titleByLocale: { en: 'Event system' },
     descriptionByLocale: { en: 'Description 1' },
     thumbnailUrlByLocale: {

@@ -1,5 +1,8 @@
 /// <reference path="helper/TileMapHelper.d.ts" />
 namespace gdjs {
+  /**
+   * @category Objects > Tile Map
+   */
   export type SimpleTileMapObjectDataType = {
     content: {
       atlasImage: string;
@@ -10,19 +13,29 @@ namespace gdjs {
     };
   };
 
+  /**
+   * @category Objects > Tile Map
+   */
   export type SimpleTileMapObjectData = ObjectData &
     SimpleTileMapObjectDataType;
 
+  /**
+   * @category Objects > Tile Map
+   */
   export type SimpleTileMapNetworkSyncDataType = {
     op: number;
     tm?: TileMapHelper.EditableTileMapAsJsObject;
   };
 
+  /**
+   * @category Objects > Tile Map
+   */
   export type SimpleTileMapNetworkSyncData = ObjectNetworkSyncData &
     SimpleTileMapNetworkSyncDataType;
 
   /**
    * Displays a SimpleTileMap object.
+   * @category Objects > Tile Map
    */
   export class SimpleTileMapRuntimeObject
     extends gdjs.RuntimeObject
@@ -240,9 +253,11 @@ namespace gdjs {
             this.setWidth(initialInstanceData.width);
             this.setHeight(initialInstanceData.height);
           }
-          if (initialInstanceData.opacity !== undefined) {
-            this.setOpacity(initialInstanceData.opacity);
-          }
+          this.setOpacity(
+            initialInstanceData.opacity === undefined
+              ? 255
+              : initialInstanceData.opacity
+          );
 
           // 4. Update position (calculations based on renderer's dimensions).
           this._renderer.updatePosition();
@@ -451,6 +466,14 @@ namespace gdjs {
 
     getHeight(): float {
       return this._renderer.getHeight();
+    }
+
+    override getOriginalWidth(): float {
+      return this.getTileMapWidth();
+    }
+
+    override getOriginalHeight(): float {
+      return this.getTileMapHeight();
     }
 
     getScaleX(): float {

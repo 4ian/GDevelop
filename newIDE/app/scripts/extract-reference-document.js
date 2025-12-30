@@ -82,7 +82,11 @@ const generateAllExtensionReferences = gd => {
   /** @type {Array<ExtensionReference>} */
   const extensionReferences = mapVector(
     platformExtensions,
-    generateExtensionReference
+    (platformExtension) => generateExtensionReference({
+      platform: gd.JsPlatform.get(),
+      extension: platformExtension,
+      eventsFunctionsExtension: null,
+    })
   );
 
   return extensionReferences;
@@ -157,7 +161,7 @@ const generateExtensionFooterText = ({ extension }) => {
     text:
       `\n\n---\n\n` +
       generateBuiltInExtensionNote({ extension }) +
-      `*This page is an auto-generated reference page about the **${extension.getFullName()}** feature of [GDevelop, the open-source, cross-platform game engine designed for everyone](https://gdevelop.io/).*` +
+      `*This page is an auto-generated reference page about the **${extension.getFullName()}** feature of [GDevelop, the open-source, AI-powered, cross-platform game engine designed for everyone](https://gdevelop.io/).*` +
       ' ' +
       'Learn more about [all GDevelop features here](/gdevelop5/all-features).',
   };

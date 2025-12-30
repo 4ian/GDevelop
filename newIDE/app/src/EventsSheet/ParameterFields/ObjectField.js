@@ -92,6 +92,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       parameterIndex,
       instructionMetadata,
       expressionMetadata,
+      instruction,
+      projectScopedContainersAccessor,
     } = props;
 
     const description = parameterMetadata
@@ -136,12 +138,33 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [expressionMetadata, instructionMetadata, parameterIndex, project]
     );
 
+    const onChange = React.useCallback(
+      (value: string) => {
+        props.onChange(value);
+        if (project && instructionMetadata && instruction) {
+          gd.BehaviorParameterFiller.fillBehaviorParameters(
+            project.getCurrentPlatform(),
+            projectScopedContainersAccessor.get(),
+            instructionMetadata,
+            instruction
+          );
+        }
+      },
+      [
+        project,
+        projectScopedContainersAccessor,
+        instructionMetadata,
+        instruction,
+        props,
+      ]
+    );
+
     return (
       <ObjectSelector
         margin={props.isInline ? 'none' : 'dense'}
         project={project}
         value={props.value}
-        onChange={props.onChange}
+        onChange={onChange}
         onRequestClose={props.onRequestClose}
         onApply={props.onApply}
         // Some instructions apply to all objects BUT not some objects
@@ -149,7 +172,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         allowedObjectType={allowedObjectType}
         requiredCapabilitiesBehaviorTypes={requiredCapabilitiesBehaviorTypes}
         requiredVisibleBehaviorTypes={requiredVisibleBehaviorTypes}
-        projectScopedContainersAccessor={props.projectScopedContainersAccessor}
+        projectScopedContainersAccessor={projectScopedContainersAccessor}
         floatingLabelText={description}
         helperMarkdownText={longDescription}
         id={

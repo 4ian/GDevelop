@@ -4,7 +4,10 @@ import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 
-import { type Schema, type SectionTitle } from '../../CompactPropertiesEditor';
+import {
+  type Schema,
+  type SectionTitle,
+} from '../../PropertiesEditor/PropertiesEditorSchema';
 import enumerateLayers from '../../LayersList/EnumerateLayers';
 import { styles } from '.';
 
@@ -695,7 +698,7 @@ export const reorderInstanceSchemaForCustomProperties = (
   const contentSectionTitle: SectionTitle = {
     nonFieldType: 'sectionTitle',
     name: 'Content',
-    title: 'Content',
+    title: i18n._(t`Content`),
     getValue: undefined,
   };
   if (animationFieldIndex === -1) {

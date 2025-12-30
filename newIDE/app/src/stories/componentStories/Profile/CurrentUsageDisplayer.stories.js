@@ -3,7 +3,6 @@ import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 import paperDecorator from '../../PaperDecorator';
 import CurrentUsageDisplayer from '../../../Profile/CurrentUsageDisplayer';
-import subscriptionSuggestionDecorator from '../../SubscriptionSuggestionDecorator';
 import {
   limitsReached,
   noSubscription,
@@ -16,7 +15,7 @@ import {
 export default {
   title: 'Profile/CurrentUsageDisplayer',
   component: CurrentUsageDisplayer,
-  decorators: [subscriptionSuggestionDecorator, paperDecorator],
+  decorators: [paperDecorator],
 };
 
 export const WithSubscriptionLimitNotReached = () => (

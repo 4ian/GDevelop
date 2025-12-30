@@ -4,6 +4,14 @@ import { GDevelopPlayApi } from './ApiConfigs';
 
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { rgbOrHexToRGBString } from '../ColorTransformer';
+import {
+  ensureIsArray,
+  ensureIsArrayOrNull,
+  ensureIsNullOrObjectHasProperty,
+  ensureObjectHasProperty,
+  ensureIsString,
+  ensureIsObjectWithPropertyOfType,
+} from '../DataValidator';
 
 export type LeaderboardSortOption = 'ASC' | 'DESC';
 export type LeaderboardVisibilityOption = 'HIDDEN' | 'PUBLIC';
@@ -115,7 +123,10 @@ export const listGameActiveLeaderboards = async (
     headers: { Authorization: authorizationHeader },
     params: { userId, deleted: 'false' },
   });
-  return response.data;
+  return ensureIsArrayOrNull({
+    data: response.data,
+    endpointName: '/game/{id}/leaderboard of Play API',
+  });
 };
 
 export const extractNextPageUriFromLinkHeader = (
@@ -159,7 +170,10 @@ export const listLeaderboardEntries = async (
     ? extractNextPageUriFromLinkHeader(response.headers.link)
     : null;
   return {
-    entries: response.data,
+    entries: ensureIsArray({
+      data: response.data,
+      endpointName: '/game/{id}/leaderboard/{id}/entry of Play API',
+    }),
     nextPageUri,
   };
 };
@@ -185,7 +199,11 @@ export const createLeaderboard = async (
       params: { userId },
     }
   );
-  return response.data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/game/{id}/leaderboard of Play API',
+  });
 };
 
 type LeaderboardDuplicationPayload = {|
@@ -211,7 +229,11 @@ export const duplicateLeaderboard = async (
       params: { userId },
     }
   );
-  return response.data;
+  return ensureObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/game/{id}/leaderboard/action/copy of Play API',
+  });
 };
 
 export const updateLeaderboard = async (
@@ -233,7 +255,11 @@ export const updateLeaderboard = async (
       params: { userId },
     }
   );
-  return response.data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/game/{id}/leaderboard/{id} of Play API',
+  });
 };
 
 export const resetLeaderboard = async (
@@ -254,7 +280,11 @@ export const resetLeaderboard = async (
       params: { userId },
     }
   );
-  return response.data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/game/{id}/leaderboard/{id}/reset of Play API',
+  });
 };
 
 export const deleteLeaderboard = async (
@@ -274,7 +304,11 @@ export const deleteLeaderboard = async (
       params: { userId },
     }
   );
-  return response.data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/game/{id}/leaderboard/{id} of Play API',
+  });
 };
 
 export const deleteLeaderboardEntry = async (
@@ -295,7 +329,11 @@ export const deleteLeaderboardEntry = async (
       params: { userId },
     }
   );
-  return response.data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/game/{id}/leaderboard/{id}/entry/{id} of Play API',
+  });
 };
 
 // 2 types of comments. Feedback is private, Review is public.
@@ -350,7 +388,12 @@ export const listComments = async (
         },
       })
     )
-    .then(response => response.data);
+    .then(response =>
+      ensureIsArray({
+        data: response.data,
+        endpointName: '/game/{id}/comment of Play API',
+      })
+    );
 };
 
 export const canCommentBeRatedByOwner = (comment: Comment): boolean => {
@@ -387,7 +430,13 @@ export const updateComment = async (
         }
       )
     )
-    .then(response => response.data);
+    .then(response =>
+      ensureIsNullOrObjectHasProperty({
+        data: response.data,
+        propertyName: 'id',
+        endpointName: '/game/{id}/comment/{id} of Play API',
+      })
+    );
 };
 
 export const canUserCustomizeLeaderboardTheme = (
@@ -465,7 +514,12 @@ export const getLobbyConfiguration = async (
       Authorization: authorizationHeader,
     },
   });
-  return response.data;
+  return ensureIsObjectWithPropertyOfType({
+    data: response.data,
+    propertyName: 'maxPlayers',
+    propertyType: 'number',
+    endpointName: '/game/{id}/lobby-configuration of Play API',
+  });
 };
 
 export const updateLobbyConfiguration = async (
@@ -494,7 +548,12 @@ export const updateLobbyConfiguration = async (
       },
     }
   );
-  return response.data;
+  return ensureIsObjectWithPropertyOfType({
+    data: response.data,
+    propertyName: 'maxPlayers',
+    propertyType: 'number',
+    endpointName: '/game/{id}/lobby-configuration of Play API',
+  });
 };
 
 export const duplicateLobbyConfiguration = async ({
@@ -517,7 +576,12 @@ export const duplicateLobbyConfiguration = async ({
       params: { userId },
     }
   );
-  return response.data;
+  return ensureIsObjectWithPropertyOfType({
+    data: response.data,
+    propertyName: 'maxPlayers',
+    propertyType: 'number',
+    endpointName: '/game/{id}/lobby-configuration/action/copy of Play API',
+  });
 };
 
 export const getPlayerToken = async ({
@@ -542,5 +606,8 @@ export const getPlayerToken = async ({
       },
     }
   );
-  return response.data;
+  return ensureIsString({
+    data: response.data,
+    endpointName: '/game/{id}/player-token of Play API',
+  });
 };

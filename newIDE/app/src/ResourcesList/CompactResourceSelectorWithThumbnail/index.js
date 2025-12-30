@@ -79,6 +79,19 @@ export const CompactResourceSelectorWithThumbnail = ({
     callback: () => {},
   });
 
+  const _onChange = React.useCallback(
+    (value: string) => {
+      if (value === resourceName) {
+        return;
+      }
+      onChange(value);
+      if (resourceManagementProps.onResourceUsageChanged) {
+        resourceManagementProps.onResourceUsageChanged();
+      }
+    },
+    [resourceName, onChange, resourceManagementProps]
+  );
+
   // TODO: move in a hook?
   const addFrom = React.useCallback(
     async (initialResourceSource: ResourceSource) => {
@@ -109,17 +122,22 @@ export const CompactResourceSelectorWithThumbnail = ({
 
           // addResource will check if a resource with the same name exists, and if it is
           // the case, no new resource will be added.
-          project.getResourcesManager().addResource(resource);
+          const hasCreatedAnyResource = project
+            .getResourcesManager()
+            .addResource(resource);
 
           // Important, we are responsible for deleting the resources that were given to us.
           // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
           selectedResources.forEach(resource => resource.delete());
 
-          await resourceManagementProps.onFetchNewlyAddedResources();
+          if (hasCreatedAnyResource) {
+            await resourceManagementProps.onFetchNewlyAddedResources();
+            resourceManagementProps.onNewResourcesAdded();
+          }
           triggerResourcesHaveChanged();
         }
 
-        onChange(resourceName);
+        _onChange(resourceName);
       } catch (err) {
         // Should never happen, errors should be shown in the interface.
         console.error('Unable to choose a resource', err);
@@ -129,7 +147,7 @@ export const CompactResourceSelectorWithThumbnail = ({
       project,
       resourceManagementProps,
       resourceKind,
-      onChange,
+      _onChange,
       triggerResourcesHaveChanged,
       resourceSources,
     ]
@@ -174,7 +192,7 @@ export const CompactResourceSelectorWithThumbnail = ({
           resources[0].name,
         ]);
 
-        onChange(resources[0].name);
+        _onChange(resources[0].name);
         triggerResourcesHaveChanged();
         forceUpdate();
       } catch (error) {
@@ -198,7 +216,7 @@ export const CompactResourceSelectorWithThumbnail = ({
     [
       defaultNewResourceName,
       forceUpdate,
-      onChange,
+      _onChange,
       project,
       resourceManagementProps,
       resourceName,
@@ -263,7 +281,7 @@ export const CompactResourceSelectorWithThumbnail = ({
             type="text"
             spellCheck={false}
             value={resourceName}
-            onChange={e => onChange(e.currentTarget.value)}
+            onChange={e => _onChange(e.currentTarget.value)}
           />
         </div>
       </div>

@@ -108,6 +108,9 @@ namespace gdjs {
     }
   };
 
+  /**
+   * @category Multiplayer
+   */
   export namespace multiplayer {
     /** Set to true in testing to avoid relying on the multiplayer extension. */
     export let disableMultiplayerForTesting = false;
@@ -1841,6 +1844,9 @@ namespace gdjs {
       displayLoader: boolean,
       openLobbiesPageIfFailure: boolean
     ) => {
+      if (runtimeScene.getGame().isInGameEdition()) {
+        return;
+      }
       if (isQuickJoiningTooFast()) {
         return;
       }
@@ -1860,6 +1866,9 @@ namespace gdjs {
       displayLoader: boolean,
       openLobbiesPageIfFailure: boolean
     ) => {
+      if (runtimeScene.getGame().isInGameEdition()) {
+        return;
+      }
       if (isQuickJoiningTooFast()) {
         return;
       }
@@ -1893,6 +1902,9 @@ namespace gdjs {
     export const openLobbiesWindow = async (
       runtimeScene: gdjs.RuntimeScene
     ) => {
+      if (runtimeScene.getGame().isInGameEdition()) {
+        return;
+      }
       if (
         isLobbiesWindowOpen(runtimeScene) ||
         gdjs.playerAuthentication.isAuthenticationWindowOpen()

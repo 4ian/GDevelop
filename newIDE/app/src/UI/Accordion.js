@@ -13,8 +13,8 @@ import ChevronArrowRight from './CustomSvgIcons/ChevronArrowRight';
 const useStylesForExpandIcon = () =>
   makeStyles(theme => ({
     root: {
-      '& .MuiAccordionSummary-expandIcon.Mui-expanded': {
-        transform: 'rotate(90deg)',
+      '& .Mui-expanded svg': {
+        transform: 'rotate(-90deg)',
       },
     },
   }))();

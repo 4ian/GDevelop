@@ -1,6 +1,10 @@
 // @flow
 import axios from 'axios';
 import { GDevelopAnalyticsApi } from './ApiConfigs';
+import {
+  ensureIsNullOrObjectHasProperty,
+  ensureIsArrayOrNull,
+} from '../DataValidator';
 
 export type GameMetrics = {
   date: string,
@@ -70,7 +74,11 @@ export const getGameMetrics = async (
   });
 
   if (response.status === 404) return null;
-  return response.data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'date',
+    endpointName: '/game-metrics of Analytics API',
+  });
 };
 
 export const getGameMetricsFrom = async (
@@ -94,5 +102,8 @@ export const getGameMetricsFrom = async (
   });
 
   if (response.status === 404) return null;
-  return response.data;
+  return ensureIsArrayOrNull({
+    data: response.data,
+    endpointName: '/game-metrics of Analytics API',
+  });
 };

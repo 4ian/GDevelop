@@ -21,9 +21,35 @@ import {
   AccordionHeader,
   AccordionBody,
 } from '../../../UI/Accordion';
-import { areAdvancedPropertiesModified } from '../BehaviorPropertiesEditor';
+import { mapFor } from '../../../Utils/MapFor';
+
+const gd: libGDevelop = global.gd;
 
 type Props = BehaviorEditorProps;
+
+const areAdvancedPropertiesModified = (
+  propertiesValues: gdMapStringPropertyDescriptor,
+  getPropertyDefaultValue: (propertyName: string) => string
+) => {
+  const propertyNames = propertiesValues.keys();
+  let hasFoundModifiedAdvancedProperty = false;
+  mapFor(0, propertyNames.size(), i => {
+    const name = propertyNames.at(i);
+    const property = propertiesValues.get(name);
+    const currentValue = property.getValue();
+    const defaultValue = getPropertyDefaultValue(name);
+
+    // Some boolean properties can be set to an empty string to mean false.
+    const hasDefaultValue =
+      property.getType().toLowerCase() === 'boolean'
+        ? (currentValue === 'true') === (defaultValue === 'true')
+        : currentValue === defaultValue;
+    if (property.isAdvanced() && !hasDefaultValue) {
+      hasFoundModifiedAdvancedProperty = true;
+    }
+  });
+  return hasFoundModifiedAdvancedProperty;
+};
 
 const BitGroupEditor = (props: {|
   bits: Array<boolean>,
@@ -64,7 +90,21 @@ const Physics3DEditor = (props: Props) => {
   const forceUpdate = useForceUpdate();
 
   const areAdvancedPropertiesExpandedByDefault = React.useMemo(
-    () => areAdvancedPropertiesModified(behavior),
+    () => {
+      const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+        gd.JsPlatform.get(),
+        behavior.getTypeName()
+      );
+      return areAdvancedPropertiesModified(
+        behavior.getProperties(),
+        propertyName => {
+          const properties = behaviorMetadata.getProperties();
+          return properties.has(propertyName)
+            ? properties.get(propertyName).getValue()
+            : '';
+        }
+      );
+    },
     [behavior]
   );
 

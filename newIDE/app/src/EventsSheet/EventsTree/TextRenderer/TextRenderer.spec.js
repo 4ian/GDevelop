@@ -34,6 +34,64 @@ describe('EventsTree/TextRenderer', () => {
           events: [
             {
               type: 'BuiltinCommonInstructions::Standard',
+              variables: [
+                {
+                  name: 'MyVariable',
+                  type: 'number',
+                  value: '1',
+                },
+                {
+                  name: 'MyArray',
+                  type: 'array',
+                  children: [
+                    {
+                      type: 'number',
+                      value: '-0.1',
+                    },
+                    {
+                      type: 'number',
+                      value: '2.3',
+                    },
+                    {
+                      type: 'string',
+                      value: 'three',
+                    },
+                  ],
+                },
+                {
+                  name: 'MyStructure',
+                  type: 'structure',
+                  children: [
+                    {
+                      name: 'MyChild',
+                      type: 'number',
+                      value: '1',
+                    },
+                    {
+                      name: 'MyChild2',
+                      type: 'array',
+                      children: [
+                        {
+                          type: 'number',
+                          value: '1',
+                        },
+                        {
+                          type: 'number',
+                          value: '2',
+                        },
+                        {
+                          type: 'string',
+                          value: 'three',
+                        },
+                        {
+                          type: 'boolean',
+                          value: 'true',
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
               conditions: [
                 {
                   type: {
@@ -199,6 +257,10 @@ describe('EventsTree/TextRenderer', () => {
          - Show GroupOfObjects
          Sub-events:
           <event-0.0>
+           - Declare local variable \\"MyVariable\\" of type \\"number\\" with value \`1\`
+           - Declare local variable \\"MyArray\\" of type \\"array\\" with value \`[-0.1,2.3,\\"three\\"]\`
+           - Declare local variable \\"MyStructure\\" of type \\"structure\\" with value \`{\\"MyChild\\":1,\\"MyChild2\\":[1,2,\\"three\\",true]}\`
+
            Conditions:
            - If all of these conditions are true:
              - (inverted) GroupOfSpriteObjectsWithBehaviors is falling

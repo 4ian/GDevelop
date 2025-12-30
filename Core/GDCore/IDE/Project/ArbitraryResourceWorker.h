@@ -25,7 +25,7 @@ namespace gd {
 class Resource;
 }
 namespace gd {
-class ResourcesManager;
+class ResourcesContainer;
 }
 
 namespace gd {
@@ -43,7 +43,7 @@ namespace gd {
  */
 class GD_CORE_API ArbitraryResourceWorker {
 public:
-  ArbitraryResourceWorker(gd::ResourcesManager &resourcesManager_)
+  ArbitraryResourceWorker(gd::ResourcesContainer &resourcesManager_)
       : resourcesManager(&resourcesManager_){};
   virtual ~ArbitraryResourceWorker();
 
@@ -139,7 +139,7 @@ public:
   virtual void ExposeEmbeddeds(gd::String &resourceName);
 
 protected:
-  gd::ResourcesManager * resourcesManager;
+  gd::ResourcesContainer * resourcesManager;
 
  private:
   /**

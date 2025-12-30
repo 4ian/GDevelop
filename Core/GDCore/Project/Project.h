@@ -15,7 +15,7 @@
 #include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/PlatformSpecificAssets.h"
-#include "GDCore/Project/ResourcesManager.h"
+#include "GDCore/Project/ResourcesContainer.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/Project/Watermark.h"
 #include "GDCore/String.h"
@@ -23,7 +23,7 @@ namespace gd {
 class Platform;
 class Layout;
 class ExternalEvents;
-class ResourcesManager;
+class ResourcesContainer;
 class ExternalLayout;
 class EventsFunctionsExtension;
 class EventsBasedObject;
@@ -506,6 +506,20 @@ class GD_CORE_API Project {
    */
   void SetCurrentPlatform(const gd::String& platformName);
 
+  /**
+   * Check if the effects are shown.
+   */
+  bool AreEffectsHiddenInEditor() const { return areEffectsHiddenInEditor; }
+
+  /**
+   * Define the project as playable on a mobile.
+   * \param enable True When false effects are not shown and a default light is
+   * used for 3D layers.
+   */
+  void SetEffectsHiddenInEditor(bool enable = true) {
+    areEffectsHiddenInEditor = enable;
+  }
+
   ///@}
 
   /** \name Factory method
@@ -951,18 +965,18 @@ class GD_CORE_API Project {
    */
   ///@{
   /**
-   * \brief Provide access to the ResourceManager member containing the list of
+   * \brief Provide access to the ResourcesContainer member containing the list of
    * the resources.
    */
-  const ResourcesManager& GetResourcesManager() const {
-    return resourcesManager;
+  const ResourcesContainer& GetResourcesManager() const {
+    return resourcesContainer;
   }
 
   /**
-   * \brief Provide access to the ResourceManager member containing the list of
+   * \brief Provide access to the ResourcesContainer member containing the list of
    * the resources.
    */
-  ResourcesManager& GetResourcesManager() { return resourcesManager; }
+  ResourcesContainer& GetResourcesManager() { return resourcesContainer; }
 
   /**
    * Set when the scenes must preload their resources: `at-startup`, `never`
@@ -1116,8 +1130,8 @@ class GD_CORE_API Project {
       externalLayouts;  ///< List of all externals layouts
   std::vector<std::unique_ptr<gd::EventsFunctionsExtension> >
       eventsFunctionsExtensions;
-  gd::ResourcesManager
-      resourcesManager;  ///< Contains all resources used by the project
+  gd::ResourcesContainer
+      resourcesContainer;  ///< Contains all resources used by the project
   std::vector<gd::Platform*>
       platforms;  ///< Pointers to the platforms this project supports.
   gd::String firstLayout;
@@ -1165,6 +1179,9 @@ class GD_CORE_API Project {
   mutable unsigned int gdBuildVersion =
       0;  ///< The GD build version used the last
           ///< time the project was saved.
+  bool areEffectsHiddenInEditor =
+      false; ///< When false effects are not shown and a default light is used
+             ///< for 3D layers.
 };
 
 }  // namespace gd

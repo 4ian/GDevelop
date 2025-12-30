@@ -94,6 +94,7 @@ namespace gdjs {
     }
   };
 
+  /** @category Multiplayer */
   export type MultiplayerMessageManager = ReturnType<
     typeof makeMultiplayerMessageManager
   >;
@@ -103,7 +104,7 @@ namespace gdjs {
    *
    * In most cases, you should use the default `gdjs.multiplayerMessageManager` instead.
    *
-   * @returns
+   * @category Multiplayer
    */
   export const makeMultiplayerMessageManager = () => {
     // For testing purposes, you can simulate network latency and packet loss.
@@ -2544,6 +2545,7 @@ namespace gdjs {
 
   /**
    * The MultiplayerMessageManager used by the game.
+   * @category Multiplayer
    */
   export let multiplayerMessageManager = makeMultiplayerMessageManager();
 }

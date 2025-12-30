@@ -21,6 +21,7 @@
 #include "GDCore/Events/CodeGeneration/EffectsCodeGenerator.h"
 #include "GDCore/Extensions/Metadata/DependencyMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
+#include "GDCore/Extensions/Metadata/InGameEditorResourceMetadata.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
@@ -28,10 +29,13 @@
 #include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #include "GDCore/IDE/ExportedDependencyResolver.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
+#include "GDCore/IDE/Project/ResourcesMergingHelper.h"
 #include "GDCore/IDE/Project/SceneResourcesFinder.h"
 #include "GDCore/IDE/ProjectStripper.h"
+#include "GDCore/IDE/ResourceExposer.h"
 #include "GDCore/IDE/SceneNameMangler.h"
 #include "GDCore/Project/EventsBasedObject.h"
+#include "GDCore/Project/EventsBasedObjectVariant.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
@@ -58,7 +62,6 @@ double GetTimeSpent(double previousTime) { return GetTimeNow() - previousTime; }
 double LogTimeSpent(const gd::String &name, double previousTime) {
   gd::LogStatus(name + " took " + gd::String::From(GetTimeSpent(previousTime)) +
                 "ms");
-  std::cout << std::endl;
   return GetTimeNow();
 }
 }  // namespace
@@ -104,128 +107,325 @@ ExporterHelper::ExporterHelper(gd::AbstractFileSystem &fileSystem,
     : fs(fileSystem), gdjsRoot(gdjsRoot_), codeOutputDir(codeOutputDir_) {};
 
 bool ExporterHelper::ExportProjectForPixiPreview(
-    const PreviewExportOptions &options) {
+    const PreviewExportOptions &options,
+    std::vector<gd::String> &includesFiles) {
+
+  if (options.isInGameEdition && !options.shouldReloadProjectData &&
+      !options.shouldReloadLibraries && !options.shouldGenerateScenesEventsCode &&
+      !options.shouldClearExportFolder) {
+    gd::LogStatus("Skip project export entirely");
+    return "";
+  }
+
   double previousTime = GetTimeNow();
   fs.MkDir(options.exportPath);
-  fs.ClearDir(options.exportPath);
-  std::vector<gd::String> includesFiles;
+  if (options.shouldClearExportFolder) {
+    fs.ClearDir(options.exportPath);
+  }
+  includesFiles.clear();
   std::vector<gd::String> resourcesFiles;
+
+  std::vector<gd::InGameEditorResourceMetadata> inGameEditorResources;
 
   // TODO Try to remove side effects to avoid the copy
   // that destroys the AST in cache.
   gd::Project exportedProject = options.project;
-  const gd::Project &immutableProject = exportedProject;
+  const gd::Project &immutableProject = options.project;
+  previousTime = LogTimeSpent("Project cloning", previousTime);
 
-  if (options.fullLoadingScreen) {
-    // Use project properties fallback to set empty properties
-    if (exportedProject.GetAuthorIds().empty() &&
-        !options.fallbackAuthorId.empty()) {
-      exportedProject.GetAuthorIds().push_back(options.fallbackAuthorId);
+  if (options.isInGameEdition) {
+    if (options.shouldReloadProjectData ||
+        options.shouldGenerateScenesEventsCode ||
+        options.shouldClearExportFolder) {
+      auto projectDirectory = fs.DirNameFrom(exportedProject.GetProjectFile());
+      gd::ResourcesMergingHelper resourcesMergingHelper(
+          exportedProject.GetResourcesManager(), fs);
+      resourcesMergingHelper.SetBaseDirectory(projectDirectory);
+      resourcesMergingHelper.SetShouldUseOriginalAbsoluteFilenames();
+      gd::ResourceExposer::ExposeWholeProjectResources(exportedProject,
+                                                        resourcesMergingHelper);
+
+      previousTime = LogTimeSpent("Resource path resolving", previousTime);
     }
-    if (exportedProject.GetAuthorUsernames().empty() &&
-        !options.fallbackAuthorUsername.empty()) {
-      exportedProject.GetAuthorUsernames().push_back(
-          options.fallbackAuthorUsername);
-    }
+    gd::LogStatus("Resource export is skipped");
   } else {
-    // Most of the time, we skip the logo and minimum duration so that
-    // the preview start as soon as possible.
-    exportedProject.GetLoadingScreen()
-        .ShowGDevelopLogoDuringLoadingScreen(false)
-        .SetMinDuration(0);
-    exportedProject.GetWatermark().ShowGDevelopWatermark(false);
+    // Export resources (*before* generating events as some resources filenames
+    // may be updated)
+    ExportResources(fs, exportedProject, options.exportPath);
+
+    previousTime = LogTimeSpent("Resource export", previousTime);
   }
 
-  // Export resources (*before* generating events as some resources filenames
-  // may be updated)
-  ExportResources(fs, exportedProject, options.exportPath);
-
-  previousTime = LogTimeSpent("Resource export", previousTime);
-
-  // Compatibility with GD <= 5.0-beta56
-  // Stay compatible with text objects declaring their font as just a filename
-  // without a font resource - by manually adding these resources.
-  AddDeprecatedFontFilesToFontResources(
-      fs, exportedProject.GetResourcesManager(), options.exportPath);
-  // end of compatibility code
-
-  auto usedExtensionsResult =
-      gd::UsedExtensionsFinder::ScanProject(exportedProject);
-
-  // Export engine libraries
-  AddLibsInclude(/*pixiRenderers=*/true,
-                 usedExtensionsResult.Has3DObjects(),
-                 /*includeWebsocketDebuggerClient=*/
-                 !options.websocketDebuggerServerAddress.empty(),
-                 /*includeWindowMessageDebuggerClient=*/
-                 options.useWindowMessageDebuggerClient,
-                 /*includeMinimalDebuggerClient=*/
-                 options.useMinimalDebuggerClient,
-                 /*includeCaptureManager=*/
-                 !options.captureOptions.IsEmpty(),
-                 /*includeInAppTutorialMessage*/
-                 !options.inAppTutorialMessageInPreview.empty(),
-                 immutableProject.GetLoadingScreen().GetGDevelopLogoStyle(),
-                 includesFiles);
-
-  // Export files for free function, object and behaviors
-  for (const auto &includeFile : usedExtensionsResult.GetUsedIncludeFiles()) {
-    InsertUnique(includesFiles, includeFile);
-  }
-  for (const auto &requiredFile : usedExtensionsResult.GetUsedRequiredFiles()) {
-    InsertUnique(resourcesFiles, requiredFile);
+  if (options.shouldReloadProjectData ||
+      options.shouldGenerateScenesEventsCode ||
+      options.shouldClearExportFolder) {
+    // Compatibility with GD <= 5.0-beta56
+    // Stay compatible with text objects declaring their font as just a filename
+    // without a font resource - by manually adding these resources.
+    AddDeprecatedFontFilesToFontResources(
+        fs, exportedProject.GetResourcesManager(), options.exportPath);
+    // end of compatibility code
   }
 
-  // Export effects (after engine libraries as they auto-register themselves to
-  // the engine)
-  ExportEffectIncludes(exportedProject, includesFiles);
+  std::vector<gd::SourceFileMetadata> noUsedSourceFiles;
+  std::vector<gd::SourceFileMetadata> &usedSourceFiles = noUsedSourceFiles;
+  if (options.shouldReloadLibraries || options.shouldClearExportFolder) {
+    auto usedExtensionsResult =
+        gd::UsedExtensionsFinder::ScanProject(exportedProject);
+    usedSourceFiles = usedExtensionsResult.GetUsedSourceFiles();
 
-  previousTime = LogTimeSpent("Include files export", previousTime);
+    // Export engine libraries
+    AddLibsInclude(/*pixiRenderers=*/true,
+                  /*pixiInThreeRenderers=*/
+                  usedExtensionsResult.Has3DObjects(),
+                  /*isInGameEdition=*/
+                  options.isInGameEdition,
+                  /*includeWebsocketDebuggerClient=*/
+                  !options.websocketDebuggerServerAddress.empty(),
+                  /*includeWindowMessageDebuggerClient=*/
+                  options.useWindowMessageDebuggerClient,
+                  /*includeMinimalDebuggerClient=*/
+                  options.useMinimalDebuggerClient,
+                  /*includeCaptureManager=*/
+                  !options.captureOptions.IsEmpty(),
+                  /*includeInAppTutorialMessage*/
+                  !options.inAppTutorialMessageInPreview.empty(),
+                  immutableProject.GetLoadingScreen().GetGDevelopLogoStyle(),
+                  includesFiles);
 
-  if (!options.projectDataOnlyExport) {
+    // Export files for free function, object and behaviors
+    for (const auto &includeFile : usedExtensionsResult.GetUsedIncludeFiles()) {
+      InsertUnique(includesFiles, includeFile);
+    }
+    for (const auto &requiredFile : usedExtensionsResult.GetUsedRequiredFiles()) {
+      InsertUnique(resourcesFiles, requiredFile);
+    }
+
+    if (options.isInGameEdition) {
+      // List the in-game editor resources used by the project, so they can
+      // be later included in the exported project resources.
+      for (const auto &inGameEditorResource : usedExtensionsResult.GetUsedInGameEditorResources()) {
+        inGameEditorResources.push_back(inGameEditorResource);
+
+        // Always use absolute paths for in-game editor resources.
+        // There are not copied and instead directly refer to the file in the Runtime folder.
+        gd::String resourceFile = inGameEditorResource.GetFilePath();
+        if (!fs.IsAbsolute(resourceFile)) {
+          fs.MakeAbsolute(resourceFile, gdjsRoot + "/Runtime");
+        }
+        inGameEditorResources.back().SetFilePath(resourceFile);
+      }
+
+      // TODO Scan the objects and events of event-based objects
+      // (it could be an alternative method ScanProjectAndEventsBasedObjects in
+      // UsedExtensionsFinder).
+      // This is already done by UsedExtensionsFinder, but maybe it shouldn't.
+
+      // Export all event-based objects because they can be edited even if they
+      // are not used yet.
+      for (std::size_t e = 0;
+           e < exportedProject.GetEventsFunctionsExtensionsCount(); e++) {
+        auto &eventsFunctionsExtension =
+            exportedProject.GetEventsFunctionsExtension(e);
+
+        for (auto &&eventsBasedObjectUniquePtr :
+             eventsFunctionsExtension.GetEventsBasedObjects()
+                 .GetInternalVector()) {
+          auto eventsBasedObject = eventsBasedObjectUniquePtr.get();
+
+          auto metadata = gd::MetadataProvider::GetExtensionAndObjectMetadata(
+              exportedProject.GetCurrentPlatform(),
+              gd::PlatformExtension::GetObjectFullType(
+                  eventsFunctionsExtension.GetName(),
+                  eventsBasedObject->GetName()));
+          for (auto &&includeFile : metadata.GetMetadata().includeFiles) {
+            InsertUnique(includesFiles, includeFile);
+          }
+          for (auto &behaviorType :
+               metadata.GetMetadata().GetDefaultBehaviors()) {
+            auto behaviorMetadata =
+                gd::MetadataProvider::GetExtensionAndBehaviorMetadata(
+                    exportedProject.GetCurrentPlatform(), behaviorType);
+            for (auto &&includeFile :
+                 behaviorMetadata.GetMetadata().includeFiles) {
+              InsertUnique(includesFiles, includeFile);
+            }
+          }
+        }
+      }
+    }
+
+    // Export effects (after engine libraries as they auto-register themselves to
+    // the engine)
+    ExportEffectIncludes(exportedProject, includesFiles);
+
+    previousTime = LogTimeSpent("Include files export", previousTime);
+  }
+  else {
+    gd::LogStatus("Include files export is skipped");
+  }
+
+  if (options.shouldGenerateScenesEventsCode) {
     gd::WholeProjectDiagnosticReport &wholeProjectDiagnosticReport =
         options.project.GetWholeProjectDiagnosticReport();
     wholeProjectDiagnosticReport.Clear();
 
     // Generate events code
-    if (!ExportEventsCode(immutableProject,
+    if (!ExportScenesEventsCode(immutableProject,
                           codeOutputDir,
                           includesFiles,
                           wholeProjectDiagnosticReport,
                           true)) {
       return false;
     }
-
     previousTime = LogTimeSpent("Events code export", previousTime);
   }
-
-  auto projectUsedResources =
-      gd::SceneResourcesFinder::FindProjectResources(exportedProject);
-  std::unordered_map<gd::String, std::set<gd::String>> scenesUsedResources;
-  for (std::size_t layoutIndex = 0;
-       layoutIndex < exportedProject.GetLayoutsCount();
-       layoutIndex++) {
-    auto &layout = exportedProject.GetLayout(layoutIndex);
-    scenesUsedResources[layout.GetName()] =
-        gd::SceneResourcesFinder::FindSceneResources(exportedProject, layout);
+  else {
+    gd::LogStatus("Events code export is skipped");
   }
 
-  // Strip the project (*after* generating events as the events may use stripped
-  // things (objects groups...))
-  gd::ProjectStripper::StripProjectForExport(exportedProject);
-  exportedProject.SetFirstLayout(options.layoutName);
+  if (options.shouldReloadProjectData || options.shouldClearExportFolder) {
 
-  previousTime = LogTimeSpent("Data stripping", previousTime);
+    if (options.fullLoadingScreen) {
+      // Use project properties fallback to set empty properties
+      if (exportedProject.GetAuthorIds().empty() &&
+          !options.fallbackAuthorId.empty()) {
+        exportedProject.GetAuthorIds().push_back(options.fallbackAuthorId);
+      }
+      if (exportedProject.GetAuthorUsernames().empty() &&
+          !options.fallbackAuthorUsername.empty()) {
+        exportedProject.GetAuthorUsernames().push_back(
+            options.fallbackAuthorUsername);
+      }
+    } else {
+      // Most of the time, we skip the logo and minimum duration so that
+      // the preview start as soon as possible.
+      exportedProject.GetLoadingScreen()
+          .ShowGDevelopLogoDuringLoadingScreen(false)
+          .SetMinDuration(0);
+      exportedProject.GetWatermark().ShowGDevelopWatermark(false);
+    }
 
+    gd::SerializerElement runtimeGameOptions;
+    ExporterHelper::SerializeRuntimeGameOptions(fs, gdjsRoot, options,
+                                                    includesFiles, runtimeGameOptions);
+    ExportProjectData(fs, exportedProject, codeOutputDir + "/data.js",
+                      runtimeGameOptions, options.isInGameEdition,
+                      inGameEditorResources);
+    includesFiles.push_back(codeOutputDir + "/data.js");
+
+    previousTime = LogTimeSpent("Project data export", previousTime);
+  }
+  else {
+    gd::LogStatus("Project data export is skipped");
+  }
+
+  if (options.shouldReloadLibraries || options.shouldClearExportFolder) {
+    // Copy all the dependencies and their source maps
+    ExportIncludesAndLibs(includesFiles, options.exportPath, true);
+    ExportIncludesAndLibs(resourcesFiles, options.exportPath, true);
+
+    // TODO Build a full includesFiles list without actually doing export or
+    // generation.
+    if (options.shouldGenerateScenesEventsCode || options.shouldClearExportFolder) {
+      // Create the index file
+      if (!ExportIndexFile(exportedProject, gdjsRoot + "/Runtime/index.html",
+                           options.exportPath, includesFiles, usedSourceFiles,
+                           options.nonRuntimeScriptsCacheBurst,
+                           "gdjs.runtimeGameOptions")) {
+        return false;
+      }
+    }
+    previousTime = LogTimeSpent("Include and libs export", previousTime);
+  } else {
+    gd::LogStatus("Include and libs export is skipped");
+  }
+
+  return true;
+}
+
+gd::String ExporterHelper::ExportProjectData(
+    gd::AbstractFileSystem &fs, gd::Project &project, gd::String filename,
+    const gd::SerializerElement &runtimeGameOptions, bool isInGameEdition,
+    const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources) {
+  fs.MkDir(fs.DirNameFrom(filename));
+
+  gd::SerializerElement projectDataElement;
+  ExporterHelper::StripAndSerializeProjectData(project, projectDataElement,
+                                                isInGameEdition,
+                                                inGameEditorResources);
+
+  // Save the project to JSON
+  gd::String output =
+      "gdjs.projectData = " + gd::Serializer::ToJSON(projectDataElement) +
+      ";\ngdjs.runtimeGameOptions = " + gd::Serializer::ToJSON(runtimeGameOptions) +
+      ";\n";
+
+  if (!fs.WriteToFile(filename, output))
+    return "Unable to write " + filename;
+
+  return "";
+}
+
+void ExporterHelper::SerializeRuntimeGameOptions(
+    gd::AbstractFileSystem &fs, const gd::String &gdjsRoot,
+    const PreviewExportOptions &options, std::vector<gd::String> &includesFiles,
+    gd::SerializerElement &runtimeGameOptions) {
   // Create the setup options passed to the gdjs.RuntimeGame
-  gd::SerializerElement runtimeGameOptions;
   runtimeGameOptions.AddChild("isPreview").SetBoolValue(true);
-  if (!options.externalLayoutName.empty()) {
-    runtimeGameOptions.AddChild("injectExternalLayout")
-        .SetValue(options.externalLayoutName);
+
+  auto &initialRuntimeGameStatus =
+      runtimeGameOptions.AddChild("initialRuntimeGameStatus");
+  initialRuntimeGameStatus.AddChild("sceneName")
+      .SetStringValue(options.layoutName);
+  if (options.isInGameEdition) {
+    initialRuntimeGameStatus.AddChild("isInGameEdition").SetBoolValue(true);
+    initialRuntimeGameStatus.AddChild("editorId").SetValue(options.editorId);
+    if (!options.editorCamera3DCameraMode.empty()) {
+      auto &editorCamera3D =
+          initialRuntimeGameStatus.AddChild("editorCamera3D");
+      editorCamera3D.AddChild("cameraMode").SetStringValue(
+          options.editorCamera3DCameraMode);
+      editorCamera3D.AddChild("positionX")
+          .SetDoubleValue(options.editorCamera3DPositionX);
+      editorCamera3D.AddChild("positionY")
+          .SetDoubleValue(options.editorCamera3DPositionY);
+      editorCamera3D.AddChild("positionZ")
+          .SetDoubleValue(options.editorCamera3DPositionZ);
+      editorCamera3D.AddChild("rotationAngle")
+          .SetDoubleValue(options.editorCamera3DRotationAngle);
+      editorCamera3D.AddChild("elevationAngle")
+          .SetDoubleValue(options.editorCamera3DElevationAngle);
+      editorCamera3D.AddChild("distance")
+          .SetDoubleValue(options.editorCamera3DDistance);
+    }
   }
-  runtimeGameOptions.AddChild("projectDataOnlyExport")
-      .SetBoolValue(options.projectDataOnlyExport);
+  if (!options.externalLayoutName.empty()) {
+    initialRuntimeGameStatus.AddChild("injectedExternalLayoutName")
+        .SetValue(options.externalLayoutName);
+
+    if (options.isInGameEdition) {
+      initialRuntimeGameStatus.AddChild("skipCreatingInstancesFromScene")
+          .SetBoolValue(true);
+    }
+  }
+  if (!options.eventsBasedObjectType.empty()) {
+    initialRuntimeGameStatus.AddChild("eventsBasedObjectType")
+        .SetValue(options.eventsBasedObjectType);
+    initialRuntimeGameStatus.AddChild("eventsBasedObjectVariantName")
+        .SetValue(options.eventsBasedObjectVariantName);
+  }
+
+  if (!options.inGameEditorSettingsJson.empty()) {
+    runtimeGameOptions.AddChild("inGameEditorSettings") =
+        gd::Serializer::FromJSON(options.inGameEditorSettingsJson);
+  }
+
+  runtimeGameOptions.AddChild("shouldReloadLibraries")
+      .SetBoolValue(options.shouldReloadLibraries);
+  runtimeGameOptions.AddChild("shouldGenerateScenesEventsCode")
+      .SetBoolValue(options.shouldGenerateScenesEventsCode);
+
   runtimeGameOptions.AddChild("nativeMobileApp")
       .SetBoolValue(options.nativeMobileApp);
   runtimeGameOptions.AddChild("websocketDebuggerServerAddress")
@@ -292,76 +492,153 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   }
 
   // Pass in the options the list of scripts files - useful for hot-reloading.
-  auto &scriptFilesElement = runtimeGameOptions.AddChild("scriptFiles");
-  scriptFilesElement.ConsiderAsArrayOf("scriptFile");
+  // If includeFiles is empty, it means that the include files have not been
+  // generated, so do not even add them to the runtime game options, so the
+  // hot-reloader will not try to reload them.
+  if (!includesFiles.empty()) {
+    auto &scriptFilesElement = runtimeGameOptions.AddChild("scriptFiles");
+    scriptFilesElement.ConsiderAsArrayOf("scriptFile");
 
-  for (const auto &includeFile : includesFiles) {
-    auto hashIt = options.includeFileHashes.find(includeFile);
-    gd::String scriptSrc = GetExportedIncludeFilename(includeFile);
-    scriptFilesElement.AddChild("scriptFile")
-        .SetStringAttribute("path", scriptSrc)
-        .SetIntAttribute(
-            "hash",
-            hashIt != options.includeFileHashes.end() ? hashIt->second : 0);
+    for (const auto &includeFile : includesFiles) {
+      auto hashIt = options.includeFileHashes.find(includeFile);
+      gd::String scriptSrc = GetExportedIncludeFilename(fs, gdjsRoot, includeFile);
+      scriptFilesElement.AddChild("scriptFile")
+          .SetStringAttribute("path", scriptSrc)
+          .SetIntAttribute(
+              "hash",
+              hashIt != options.includeFileHashes.end() ? hashIt->second : 0);
+    }
   }
-
-  // Export the project
-  ExportProjectData(fs,
-                    exportedProject,
-                    codeOutputDir + "/data.js",
-                    runtimeGameOptions,
-                    projectUsedResources,
-                    scenesUsedResources);
-  includesFiles.push_back(codeOutputDir + "/data.js");
-
-  previousTime = LogTimeSpent("Project data export", previousTime);
-
-  // Copy all the dependencies and their source maps
-  ExportIncludesAndLibs(includesFiles, options.exportPath, true);
-  ExportIncludesAndLibs(resourcesFiles, options.exportPath, true);
-
-  // Create the index file
-  if (!ExportIndexFile(exportedProject,
-                           gdjsRoot + "/Runtime/index.html",
-                           options.exportPath,
-                           includesFiles,
-                           usedExtensionsResult.GetUsedSourceFiles(),
-                           options.nonRuntimeScriptsCacheBurst,
-                           "gdjs.runtimeGameOptions"))
-    return false;
-
-  previousTime = LogTimeSpent("Include and libs export", previousTime);
-  return true;
 }
 
-gd::String ExporterHelper::ExportProjectData(
-    gd::AbstractFileSystem &fs,
+void ExporterHelper::AddInGameEditorResources(
     gd::Project &project,
-    gd::String filename,
-    const gd::SerializerElement &runtimeGameOptions,
     std::set<gd::String> &projectUsedResources,
-    std::unordered_map<gd::String, std::set<gd::String>> &scenesUsedResources) {
-  fs.MkDir(fs.DirNameFrom(filename));
+    const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources) {
+  for (const auto &inGameEditorResource : inGameEditorResources) {
+    project.GetResourcesManager().AddResource(
+        inGameEditorResource.GetResourceName(),
+        inGameEditorResource.GetFilePath(),
+        inGameEditorResource.GetKind());
+    projectUsedResources.insert(inGameEditorResource.GetResourceName());
+  }
+}
 
-  // Save the project to JSON
-  gd::SerializerElement rootElement;
+void ExporterHelper::SerializeProjectData(gd::AbstractFileSystem &fs,
+                                          const gd::Project &project,
+                                          const PreviewExportOptions &options,
+                                          gd::SerializerElement &rootElement,
+                                          const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources) {
+  gd::Project clonedProject = project;
+
+  // Replace all resource file paths with the one used in exported projects.
+  auto projectDirectory = fs.DirNameFrom(project.GetProjectFile());
+  gd::ResourcesMergingHelper resourcesMergingHelper(
+      clonedProject.GetResourcesManager(), fs);
+  resourcesMergingHelper.SetBaseDirectory(projectDirectory);
+  if (options.isInGameEdition) {
+    resourcesMergingHelper.SetShouldUseOriginalAbsoluteFilenames();
+  } else {
+    resourcesMergingHelper.PreserveDirectoriesStructure(false);
+    resourcesMergingHelper.PreserveAbsoluteFilenames(false);
+  }
+
+  if (!options.fullLoadingScreen) {
+    // Most of the time, we skip the logo and minimum duration so that
+    // the preview start as soon as possible.
+    clonedProject.GetLoadingScreen()
+        .ShowGDevelopLogoDuringLoadingScreen(false)
+        .SetMinDuration(0);
+    clonedProject.GetWatermark().ShowGDevelopWatermark(false);
+  }
+
+  gd::ResourceExposer::ExposeWholeProjectResources(clonedProject,
+                                                   resourcesMergingHelper);
+
+  ExporterHelper::StripAndSerializeProjectData(clonedProject, rootElement,
+                                                options.isInGameEdition,
+                                                inGameEditorResources);
+}
+
+void ExporterHelper::StripAndSerializeProjectData(
+    gd::Project &project, gd::SerializerElement &rootElement,
+    bool isInGameEdition,
+    const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources) {
+  auto projectUsedResources =
+      gd::SceneResourcesFinder::FindProjectResources(project);
+
+  if (isInGameEdition) {
+    // All used in-game editor resources must be always loaded and available.
+    ExporterHelper::AddInGameEditorResources(
+        project, projectUsedResources, inGameEditorResources);
+  }
+
+  std::unordered_map<gd::String, std::set<gd::String>> scenesUsedResources;
+  for (std::size_t layoutIndex = 0;
+       layoutIndex < project.GetLayoutsCount(); layoutIndex++) {
+    auto &layout = project.GetLayout(layoutIndex);
+    scenesUsedResources[layout.GetName()] =
+        gd::SceneResourcesFinder::FindSceneResources(project, layout);
+  }
+
+  std::unordered_map<gd::String, std::set<gd::String>>
+      eventsBasedObjectVariantsUsedResources;
+  for (std::size_t extensionIndex = 0;
+       extensionIndex < project.GetEventsFunctionsExtensionsCount();
+       extensionIndex++) {
+    auto &eventsFunctionsExtension =
+        project.GetEventsFunctionsExtension(extensionIndex);
+    for (auto &&eventsBasedObject :
+         eventsFunctionsExtension.GetEventsBasedObjects().GetInternalVector()) {
+
+      auto eventsBasedObjectType = gd::PlatformExtension::GetObjectFullType(
+          eventsFunctionsExtension.GetName(), eventsBasedObject->GetName());
+      eventsBasedObjectVariantsUsedResources[eventsBasedObjectType] =
+          gd::SceneResourcesFinder::FindEventsBasedObjectVariantResources(
+              project, eventsBasedObject->GetDefaultVariant());
+
+      for (auto &&eventsBasedObjectVariant :
+           eventsBasedObject->GetVariants().GetInternalVector()) {
+
+        auto variantType = gd::PlatformExtension::GetVariantFullType(
+            eventsFunctionsExtension.GetName(), eventsBasedObject->GetName(),
+            eventsBasedObjectVariant->GetName());
+        eventsBasedObjectVariantsUsedResources[variantType] =
+            gd::SceneResourcesFinder::FindEventsBasedObjectVariantResources(
+                project, *eventsBasedObjectVariant);
+      }
+    }
+  }
+
+  // Strip the project (*after* generating events as the events may use stripped
+  // things (objects groups...))
+  gd::ProjectStripper::StripProjectForExport(project);
+
   project.SerializeTo(rootElement);
-  SerializeUsedResources(
-      rootElement, projectUsedResources, scenesUsedResources);
-  gd::String output =
-      "gdjs.projectData = " + gd::Serializer::ToJSON(rootElement) + ";\n" +
-      "gdjs.runtimeGameOptions = " +
-      gd::Serializer::ToJSON(runtimeGameOptions) + ";\n";
-
-  if (!fs.WriteToFile(filename, output)) return "Unable to write " + filename;
-
-  return "";
+  SerializeUsedResources(rootElement, projectUsedResources, scenesUsedResources,
+                         eventsBasedObjectVariantsUsedResources);
+  if (isInGameEdition) {
+    auto &behaviorsElement = rootElement.AddChild("activatedByDefaultInEditorBehaviors");
+    behaviorsElement.ConsiderAsArrayOf("resourceReference");
+    auto &platform = project.GetCurrentPlatform();
+    for (auto &extension : platform.GetAllPlatformExtensions()) {
+      for (auto &behaviorType : extension->GetBehaviorsTypes()) {
+        auto &behaviorMetadata = extension->GetBehaviorMetadata(behaviorType);
+        if (behaviorMetadata.IsActivatedByDefaultInEditor()) {
+          behaviorsElement.AddChild("resourceReference")
+              .SetStringValue(behaviorType);
+        }
+      }
+    }
+  }
 }
 
 void ExporterHelper::SerializeUsedResources(
     gd::SerializerElement &rootElement,
     std::set<gd::String> &projectUsedResources,
-    std::unordered_map<gd::String, std::set<gd::String>> &scenesUsedResources) {
+    std::unordered_map<gd::String, std::set<gd::String>> &scenesUsedResources,
+    std::unordered_map<gd::String, std::set<gd::String>>
+        &eventsBasedObjectVariantsUsedResources) {
   auto serializeUsedResources =
       [](gd::SerializerElement &element,
          std::set<gd::String> &usedResources) -> void {
@@ -384,6 +661,41 @@ void ExporterHelper::SerializeUsedResources(
 
     auto &layoutUsedResources = scenesUsedResources[layoutName];
     serializeUsedResources(layoutElement, layoutUsedResources);
+  }
+
+  auto &extensionsElement = rootElement.GetChild("eventsFunctionsExtensions");
+  for (std::size_t extensionIndex = 0;
+       extensionIndex < extensionsElement.GetChildrenCount();
+       extensionIndex++) {
+    auto &extensionElement = extensionsElement.GetChild(extensionIndex);
+    const auto extensionName = extensionElement.GetStringAttribute("name");
+
+    auto &objectsElement = extensionElement.GetChild("eventsBasedObjects");
+
+    for (std::size_t objectIndex = 0;
+         objectIndex < objectsElement.GetChildrenCount(); objectIndex++) {
+      auto &objectElement = objectsElement.GetChild(objectIndex);
+      const auto objectName = objectElement.GetStringAttribute("name");
+
+      auto eventsBasedObjectType =
+          gd::PlatformExtension::GetObjectFullType(extensionName, objectName);
+      auto &objectUsedResources =
+          eventsBasedObjectVariantsUsedResources[eventsBasedObjectType];
+      serializeUsedResources(objectElement, objectUsedResources);
+
+      auto &variantsElement = objectElement.GetChild("variants");
+      for (std::size_t variantIndex = 0;
+           variantIndex < variantsElement.GetChildrenCount(); variantIndex++) {
+        auto &variantElement = variantsElement.GetChild(variantIndex);
+        const auto variantName = variantElement.GetStringAttribute("name");
+
+        auto variantType = gd::PlatformExtension::GetVariantFullType(
+            extensionName, objectName, variantName);
+        auto &variantUsedResources =
+            eventsBasedObjectVariantsUsedResources[variantType];
+        serializeUsedResources(variantElement, variantUsedResources);
+      }
+    }
   }
 }
 
@@ -775,7 +1087,7 @@ bool ExporterHelper::CompleteIndexFile(
   gd::String codeFilesIncludes;
   for (auto &include : includesFiles) {
     gd::String scriptSrc =
-        GetExportedIncludeFilename(include, nonRuntimeScriptsCacheBurst);
+        GetExportedIncludeFilename(fs, gdjsRoot, include, nonRuntimeScriptsCacheBurst);
 
     // Sanity check if the file exists - if not skip it to avoid
     // including it in the list of scripts.
@@ -801,6 +1113,7 @@ bool ExporterHelper::CompleteIndexFile(
 
 void ExporterHelper::AddLibsInclude(bool pixiRenderers,
                                     bool pixiInThreeRenderers,
+                                    bool isInGameEdition,
                                     bool includeWebsocketDebuggerClient,
                                     bool includeWindowMessageDebuggerClient,
                                     bool includeMinimalDebuggerClient,
@@ -890,14 +1203,21 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     InsertUnique(includesFiles, "debugger-client/minimal-debugger-client.js");
   }
 
-  if (pixiInThreeRenderers) {
+  if (pixiInThreeRenderers || isInGameEdition) {
     InsertUnique(includesFiles, "pixi-renderers/three.js");
     InsertUnique(includesFiles, "pixi-renderers/ThreeAddons.js");
     InsertUnique(includesFiles, "pixi-renderers/draco/gltf/draco_decoder.wasm");
     InsertUnique(includesFiles,
                  "pixi-renderers/draco/gltf/draco_wasm_wrapper.js");
+    // Extensions in JS may use it.
+    InsertUnique(includesFiles, "Extensions/3D/Scene3DTools.js");
+    InsertUnique(includesFiles, "Extensions/3D/A_RuntimeObject3D.js");
+    InsertUnique(includesFiles, "Extensions/3D/A_RuntimeObject3DRenderer.js");
+    InsertUnique(includesFiles, "Extensions/3D/CustomRuntimeObject3D.js");
+    InsertUnique(includesFiles,
+                 "Extensions/3D/CustomRuntimeObject3DRenderer.js");
   }
-  if (pixiRenderers) {
+  if (pixiRenderers || isInGameEdition) {
     InsertUnique(includesFiles, "pixi-renderers/pixi.js");
     InsertUnique(includesFiles, "pixi-renderers/pixi-filters-tools.js");
     InsertUnique(includesFiles, "pixi-renderers/runtimegame-pixi-renderer.js");
@@ -921,12 +1241,11 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
         includesFiles,
         "fontfaceobserver-font-manager/fontfaceobserver-font-manager.js");
   }
-  if (pixiInThreeRenderers) {
-    InsertUnique(includesFiles, "Extensions/3D/A_RuntimeObject3D.js");
-    InsertUnique(includesFiles, "Extensions/3D/A_RuntimeObject3DRenderer.js");
-    InsertUnique(includesFiles, "Extensions/3D/CustomRuntimeObject3D.js");
-    InsertUnique(includesFiles,
-                 "Extensions/3D/CustomRuntimeObject3DRenderer.js");
+  if (isInGameEdition) {
+    // `InGameEditor` uses the `is3D` function.
+    InsertUnique(includesFiles, "Extensions/3D/Base3DBehavior.js");
+    InsertUnique(includesFiles, "Extensions/3D/HemisphereLight.js");
+    InsertUnique(includesFiles, "InGameEditor/InGameEditor.js");
   }
   if (includeCaptureManager) {
     InsertUnique(includesFiles, "capturemanager.js");
@@ -959,7 +1278,7 @@ bool ExporterHelper::ExportEffectIncludes(
   return true;
 }
 
-bool ExporterHelper::ExportEventsCode(
+bool ExporterHelper::ExportScenesEventsCode(
     const gd::Project &project,
     gd::String outputDir,
     std::vector<gd::String> &includesFiles,
@@ -995,6 +1314,7 @@ bool ExporterHelper::ExportEventsCode(
 }
 
 gd::String ExporterHelper::GetExportedIncludeFilename(
+    gd::AbstractFileSystem &fs, const gd::String &gdjsRoot,
     const gd::String &include, unsigned int nonRuntimeScriptsCacheBurst) {
   auto addSearchParameterToUrl = [](const gd::String &url,
                                     const gd::String &urlEncodedParameterName,
@@ -1081,7 +1401,7 @@ void ExporterHelper::ExportResources(gd::AbstractFileSystem &fs,
 
 void ExporterHelper::AddDeprecatedFontFilesToFontResources(
     gd::AbstractFileSystem &fs,
-    gd::ResourcesManager &resourcesManager,
+    gd::ResourcesContainer &resourcesManager,
     const gd::String &exportDir,
     gd::String urlPrefix) {
   // Compatibility with GD <= 5.0-beta56

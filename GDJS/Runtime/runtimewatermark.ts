@@ -1,4 +1,7 @@
 namespace gdjs {
+  /**
+   * @category Core Engine > Loading Screen
+   */
   export namespace watermark {
     export class RuntimeWatermark {
       _gameRenderer: RuntimeGameRenderer;

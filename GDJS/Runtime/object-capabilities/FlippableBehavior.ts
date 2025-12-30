@@ -4,6 +4,7 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  /** @category Behaviors > Default behaviors */
   export interface Flippable {
     flipX(enable: boolean): void;
 
@@ -16,6 +17,7 @@ namespace gdjs {
 
   /**
    * A behavior that forwards the Flippable interface to its object.
+   * @category Behaviors > Default behaviors
    */
   export class FlippableBehavior
     extends gdjs.RuntimeBehavior

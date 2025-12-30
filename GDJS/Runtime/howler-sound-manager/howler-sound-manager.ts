@@ -68,6 +68,7 @@ namespace gdjs {
    *
    * @memberof gdjs
    * @class HowlerSound
+   * @category Audio > Sound Manager
    */
   export class HowlerSound {
     /**
@@ -464,6 +465,7 @@ namespace gdjs {
    *
    * It is basically a container to associate channels to sounds and keep a list
    * of all sounds being played.
+   * @category Audio > Sound Manager
    */
   export class HowlerSoundManager implements gdjs.ResourceManager {
     _loadedMusics = new gdjs.ResourceCache<Howl>();
@@ -475,6 +477,8 @@ namespace gdjs {
     _musics: Record<integer, HowlerSound> = {};
     _freeSounds: HowlerSound[] = []; // Sounds without an assigned channel.
     _freeMusics: HowlerSound[] = []; // Musics without an assigned channel.
+
+    _muteEverythingReasons: Set<string> = new Set();
 
     /** Paused sounds or musics that should be played once the game is resumed.  */
     _pausedSounds: HowlerSound[] = [];
@@ -960,6 +964,16 @@ namespace gdjs {
       this._cachedSpatialPosition = {};
     }
 
+    muteEverything(reason: string): void {
+      this._muteEverythingReasons.add(reason);
+      this._updateGlobalVolume();
+    }
+
+    unmuteEverything(reason: string): void {
+      this._muteEverythingReasons.delete(reason);
+      this._updateGlobalVolume();
+    }
+
     setGlobalVolume(volume: float): void {
       this._globalVolume = volume;
       if (this._globalVolume > 100) {
@@ -968,11 +982,19 @@ namespace gdjs {
       if (this._globalVolume < 0) {
         this._globalVolume = 0;
       }
-      Howler.volume(this._globalVolume / 100);
+      this._updateGlobalVolume();
     }
 
     getGlobalVolume(): float {
       return this._globalVolume;
+    }
+
+    private _updateGlobalVolume(): void {
+      if (this._muteEverythingReasons.size > 0) {
+        Howler.volume(0);
+      } else {
+        Howler.volume(this._globalVolume / 100);
+      }
     }
 
     clearAll() {
@@ -1157,12 +1179,12 @@ namespace gdjs {
     }
 
     unloadResource(resourceData: ResourceData): void {
-      const musicRes = this._loadedMusics.get(resourceData);
+      const musicRes = this._loadedMusics.getFromName(resourceData.name);
       if (musicRes) {
         this.unloadAudio(resourceData.name, true);
       }
 
-      const soundRes = this._loadedSounds.get(resourceData);
+      const soundRes = this._loadedSounds.getFromName(resourceData.name);
       if (soundRes) {
         this.unloadAudio(resourceData.name, false);
       }
@@ -1170,6 +1192,12 @@ namespace gdjs {
   }
 
   // Register the class to let the engine use it.
+  /**
+   * @category Audio > Sound Manager
+   */
   export const SoundManager = HowlerSoundManager;
+  /**
+   * @category Audio > Sound Manager
+   */
   export type SoundManager = HowlerSoundManager;
 }

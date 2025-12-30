@@ -9,6 +9,7 @@ var process = require('process');
 var path = require('path');
 const { hashElement } = require('folder-hash');
 const { downloadLocalFile } = require('./lib/DownloadLocalFile');
+const { retryIfFailed } = require('./lib/RetryIfFailed');
 
 const editor = process.argv[2];
 const gitRelease = process.argv[3];
@@ -38,7 +39,9 @@ const editorHasCorrectHash = () =>
     }
   );
 
-editorHasCorrectHash().then(({ isHashCorrect }) => {
+(async () => {
+  const { isHashCorrect } = await editorHasCorrectHash();
+
   if (isHashCorrect) {
     //Nothing to do
     shell.echo(
@@ -59,65 +62,72 @@ editorHasCorrectHash().then(({ isHashCorrect }) => {
       ' (be patient)...'
   );
 
-  downloadLocalFile(
-    gitUrl + '/releases/download/v' + gitRelease + '/' + editor + '-editor.zip',
-    zipFilePath
-  ).then(
-    () => {
+  try {
+    await retryIfFailed(
+      { times: 3, backoff: { initialDelay: 400, factor: 2 } },
+      () =>
+        downloadLocalFile(
+          gitUrl +
+            '/releases/download/v' +
+            gitRelease +
+            '/' +
+            editor +
+            '-editor.zip',
+          zipFilePath
+        )
+    );
+    shell.echo(
+      '📂 Extracting ' +
+        editor +
+        '-editor.zip to public/external/' +
+        editor +
+        ' folder'
+    );
+
+    try {
+      const zip = new AdmZip(zipFilePath);
+      zip.extractAllTo(
+        path.join('../public/external/', editor),
+        /*overwrite=*/ true
+      );
+
       shell.echo(
-        '📂 Extracting ' +
+        '✅ Extracted ' +
           editor +
           '-editor.zip to public/external/' +
           editor +
           ' folder'
       );
+      shell.rm(zipFilePath);
+      const { isHashCorrect, actualFolderHash } = await editorHasCorrectHash();
 
-      try {
-        const zip = new AdmZip(zipFilePath);
-        zip.extractAllTo(
-          path.join('../public/external/', editor),
-          /*overwrite=*/ true
-        );
-
+      if (!isHashCorrect) {
         shell.echo(
-          '✅ Extracted ' +
+          "❌ Can't verify that " +
             editor +
-            '-editor.zip to public/external/' +
-            editor +
-            ' folder'
+            '-editor hash is correct. Be careful about potential tampering of the third party editor! 💣'
         );
-        shell.rm(zipFilePath);
-        editorHasCorrectHash().then(({ isHashCorrect, actualFolderHash }) => {
-          if (!isHashCorrect) {
-            shell.echo(
-              "❌ Can't verify that " +
-                editor +
-                '-editor hash is correct. Be careful about potential tampering of the third party editor! 💣'
-            );
-            shell.echo(
-              `ℹ️ Expected folder hash was "${expectedFolderHash}" while actual folder hash that is computed is "${actualFolderHash}".`
-            );
-          }
-        });
-      } catch (e) {
         shell.echo(
-          '❌ Error while extracting ' +
-            editor +
-            '-editor.zip to public/external/' +
-            editor +
-            ' folder:',
-          e.message
+          `ℹ️ Expected folder hash was "${expectedFolderHash}" while actual folder hash that is computed is "${actualFolderHash}".`
         );
       }
-    },
-    e => {
+    } catch (e) {
       shell.echo(
-        `❌ Can't download ` +
+        '❌ Error while extracting ' +
           editor +
-          `-editor.zip (${e}), please check your internet connection`
+          '-editor.zip to public/external/' +
+          editor +
+          ' folder:',
+        e.message
       );
-      shell.exit(1);
-      return;
     }
-  );
-});
+  } catch (e) {
+    shell.echo(
+      `❌ Can't download ` +
+        editor +
+        `-editor.zip (${e}), please check your internet connection`
+    );
+    shell.exit(1);
+    return;
+  }
+})();

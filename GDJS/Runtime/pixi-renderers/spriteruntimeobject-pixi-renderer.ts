@@ -3,7 +3,8 @@ namespace gdjs {
     _pixiAnimationFrameTextureManager: PixiAnimationFrameTextureManager;
   }
   /**
-   * The renderer for a gdjs.SpriteRuntimeObject using Pixi.js.
+   * The renderer for a gdjs.SpriteRuntimeObject using PixiJS.
+   * @category Renderers > Sprite
    */
   export class SpriteRuntimeObjectPixiRenderer {
     _object: gdjs.SpriteRuntimeObject;
@@ -57,35 +58,50 @@ namespace gdjs {
      */
     _updatePIXISprite() {
       const animationFrame = this._object._animator.getCurrentFrame();
-      if (animationFrame !== null) {
-        const scaleX = this._object._scaleX * this._object._preScale;
-        const scaleY = this._object._scaleY * this._object._preScale;
-        this._sprite.anchor.x =
-          animationFrame.center.x / this._sprite.texture.frame.width;
-        this._sprite.anchor.y =
-          animationFrame.center.y / this._sprite.texture.frame.height;
-        this._sprite.position.x =
-          this._object.x +
-          (animationFrame.center.x - animationFrame.origin.x) *
-            Math.abs(scaleX);
-        this._sprite.position.y =
-          this._object.y +
-          (animationFrame.center.y - animationFrame.origin.y) *
-            Math.abs(scaleY);
-        this._sprite.rotation = gdjs.toRad(this._object.angle);
-        this._sprite.visible = !this._object.hidden;
-        this._sprite.blendMode = this._object._blendMode;
-        this._sprite.alpha = this._object.opacity / 255;
-        this._sprite.scale.x = scaleX;
-        this._sprite.scale.y = scaleY;
-        this._cachedWidth = Math.abs(this._sprite.width);
-        this._cachedHeight = Math.abs(this._sprite.height);
-      } else {
+      if (
+        animationFrame === null &&
+        !this._object.getInstanceContainer().getGame().isInGameEdition()
+      ) {
+        // Sprites without any animation are hidden at runtime.
         this._sprite.visible = false;
         this._sprite.alpha = 0;
         this._cachedWidth = 0;
         this._cachedHeight = 0;
+        this._spriteDirty = false;
+        return;
       }
+      let centerX = 0;
+      let centerY = 0;
+      let originX = 0;
+      let originY = 0;
+      if (animationFrame) {
+        centerX = animationFrame.center.x;
+        centerY = animationFrame.center.y;
+        originX = animationFrame.origin.x;
+        originY = animationFrame.origin.y;
+      } else {
+        centerX = this._sprite.texture.frame.width / 2;
+        centerY = this._sprite.texture.frame.height / 2;
+        originX = 0;
+        originY = 0;
+      }
+      const scaleX = this._object._scaleX * this._object._preScale;
+      const scaleY = this._object._scaleY * this._object._preScale;
+      this._sprite.anchor.x = centerX / this._sprite.texture.frame.width;
+      this._sprite.anchor.y = centerY / this._sprite.texture.frame.height;
+      this._sprite.position.x =
+        this._object.x + (centerX - originX) * Math.abs(scaleX);
+      this._sprite.position.y =
+        this._object.y + (centerY - originY) * Math.abs(scaleY);
+      this._sprite.rotation = gdjs.toRad(this._object.angle);
+      this._sprite.visible = !this._object.hidden;
+      this._sprite.blendMode = this._object._blendMode;
+      this._sprite.alpha = this._object.opacity / 255;
+      this._sprite.scale.x = scaleX;
+      this._sprite.scale.y = scaleY;
+      this._cachedWidth = Math.abs(this._sprite.width);
+      this._cachedHeight = Math.abs(this._sprite.height);
+
       this._spriteDirty = false;
     }
 
@@ -112,19 +128,25 @@ namespace gdjs {
 
     updateX(): void {
       const animationFrame =
-        this._object._animator.getCurrentFrame() as SpriteAnimationFrame<PIXI.Texture>;
+        this._object._animator.getCurrentFrame() as SpriteAnimationFrame<PIXI.Texture> | null;
+      const originToCenter = animationFrame
+        ? animationFrame.center.x - animationFrame.origin.x
+        : this.getUnscaledWidth() / 2;
       this._sprite.position.x =
         this._object.x +
-        (animationFrame.center.x - animationFrame.origin.x) *
+        originToCenter *
           Math.abs(this._object._scaleX * this._object._preScale);
     }
 
     updateY(): void {
       const animationFrame =
-        this._object._animator.getCurrentFrame() as SpriteAnimationFrame<PIXI.Texture>;
+        this._object._animator.getCurrentFrame() as SpriteAnimationFrame<PIXI.Texture> | null;
+      const originToCenter = animationFrame
+        ? animationFrame.center.y - animationFrame.origin.y
+        : this.getUnscaledHeight() / 2;
       this._sprite.position.y =
         this._object.y +
-        (animationFrame.center.y - animationFrame.origin.y) *
+        originToCenter *
           Math.abs(this._object._scaleY * this._object._preScale);
     }
 
@@ -188,6 +210,9 @@ namespace gdjs {
     }
   }
 
+  /**
+   * @category Renderers > Sprite
+   */
   class PixiAnimationFrameTextureManager
     implements gdjs.AnimationFrameTextureManager<PIXI.Texture>
   {
@@ -211,6 +236,12 @@ namespace gdjs {
   }
 
   // Register the class to let the engine use it.
+  /**
+   * @category Renderers > Sprite
+   */
   export const SpriteRuntimeObjectRenderer = SpriteRuntimeObjectPixiRenderer;
+  /**
+   * @category Renderers > Sprite
+   */
   export type SpriteRuntimeObjectRenderer = SpriteRuntimeObjectPixiRenderer;
 }

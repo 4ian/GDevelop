@@ -1,8 +1,8 @@
-#ifndef GD_CORE_POLYMORPHICCLONE_H
-#define GD_CORE_POLYMORPHICCLONE_H
+#pragma once
 
 #include <memory>
 #include <vector>
+#include <map>
 
 namespace gd {
 
@@ -20,6 +20,15 @@ std::vector<std::unique_ptr<T>> Clone(
   return copy;
 }
 
-}  // namespace gd
+template <class K, class T>
+std::map<K, std::unique_ptr<T>>
+Clone(const std::map<K, std::unique_ptr<T>> &map) {
+  std::map<K, std::unique_ptr<T>> copy;
 
-#endif
+  for (const auto &it : map) {
+    copy[it.first] = gd::Clone(it.second);
+  }
+  return copy;
+}
+
+}  // namespace gd

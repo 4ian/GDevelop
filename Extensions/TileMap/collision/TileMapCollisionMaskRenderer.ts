@@ -1,4 +1,7 @@
 namespace gdjs {
+  /**
+   * @category Objects > Tile Map
+   */
   export namespace TileMap {
     /**
      * This render is only useful for debugging purposes.

@@ -1,4 +1,5 @@
 namespace gdjs {
+  /** @category Behaviors > 2D Pathfinding */
   export namespace pathfinding {
     /**
      * Simplify a path according to an allowed gap.

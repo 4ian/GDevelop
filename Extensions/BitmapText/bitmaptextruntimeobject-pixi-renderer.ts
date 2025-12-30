@@ -1,6 +1,7 @@
 namespace gdjs {
   /**
    * The PIXI.js renderer for the Bitmap Text runtime object.
+   * @category Renderers > Bitmap Text
    */
   export class BitmapTextRuntimeObjectPixiRenderer {
     _object: gdjs.BitmapTextRuntimeObject;
@@ -194,6 +195,10 @@ namespace gdjs {
       return this._pixiObject.textHeight * this.getScale();
     }
   }
+
+  /**
+   * @category Renderers > Bitmap Text
+   */
   export const BitmapTextRuntimeObjectRenderer =
     BitmapTextRuntimeObjectPixiRenderer;
 }

@@ -750,7 +750,7 @@ export default function EventsBasedObjectPropertiesEditor({
                                         <SelectOption
                                           key="property-type-resource"
                                           value="Resource"
-                                          label={t`Resource (JavaScript only)`}
+                                          label={t`Resource`}
                                         />
                                       </SelectField>
                                       {property.getType() === 'Number' && (

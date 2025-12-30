@@ -89,6 +89,8 @@ type Props = {|
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     name: string
   ) => void,
+  onEventBasedObjectTypeChanged: () => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
@@ -169,6 +171,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   _propertyVariablesContainer: gdVariablesContainer = new gd.VariablesContainer(
     gd.VariablesContainer.Properties
   );
+  _parameterResourcesContainer: gdResourcesContainer = new gd.ResourcesContainer(
+    gd.ResourcesContainer.Parameters
+  );
+  _propertyResourcesContainer: gdResourcesContainer = new gd.ResourcesContainer(
+    gd.ResourcesContainer.Properties
+  );
   _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = null;
 
   componentDidMount() {
@@ -190,6 +198,14 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   componentWillUnmount() {
     if (this._globalObjectsContainer) this._globalObjectsContainer.delete();
     if (this._objectsContainer) this._objectsContainer.delete();
+    if (this._parameterVariablesContainer)
+      this._parameterVariablesContainer.delete();
+    if (this._propertyVariablesContainer)
+      this._propertyVariablesContainer.delete();
+    if (this._parameterResourcesContainer)
+      this._parameterResourcesContainer.delete();
+    if (this._propertyResourcesContainer)
+      this._propertyResourcesContainer.delete();
   }
 
   _updateProjectScopedContainer = () => {
@@ -222,7 +238,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       scope,
       this._objectsContainer,
       this._parameterVariablesContainer,
-      this._propertyVariablesContainer
+      this._propertyVariablesContainer,
+      this._parameterResourcesContainer,
+      this._propertyResourcesContainer
     );
   };
 
@@ -817,6 +835,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     // It can happen when an event-based object is deleted and another one is
     // renamed to replace it.
     this.props.onEventsBasedObjectChildrenEdited(eventsBasedObject);
+    this.props.onEventBasedObjectTypeChanged();
   };
 
   _onDeleteEventsBasedBehavior = (
@@ -1463,6 +1482,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 hotReloadPreviewButtonProps={
                   this.props.hotReloadPreviewButtonProps
                 }
+                onWillInstallExtension={this.props.onWillInstallExtension}
                 onExtensionInstalled={this.props.onExtensionInstalled}
               />
             </Background>
@@ -1602,6 +1622,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 }
                 onSelectExtensionSceneVariables={() => this._editVariables()}
                 onOpenCustomObjectEditor={this.props.onOpenCustomObjectEditor}
+                onEventBasedObjectTypeChanged={
+                  this.props.onEventBasedObjectTypeChanged
+                }
               />
             )}
           </I18n>
@@ -1653,6 +1676,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   <EditorMosaic
                     ref={editorMosaic => (this._editorMosaic = editorMosaic)}
                     editors={editors}
+                    centralNodeId="events-sheet"
                     onPersistNodes={node =>
                       setDefaultEditorMosaicNode(
                         'events-functions-extension-editor',

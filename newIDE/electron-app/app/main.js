@@ -12,7 +12,11 @@ const autoUpdater = require('electron-updater').autoUpdater;
 const log = require('electron-log');
 const { uploadLocalFile } = require('./LocalFileUploader');
 const { serveFolder, stopServer } = require('./ServeFolder');
-const { startDebuggerServer, sendMessage } = require('./DebuggerServer');
+const {
+  startDebuggerServer,
+  sendMessage,
+  closeAllConnections,
+} = require('./DebuggerServer');
 const {
   buildElectronMenuFromDeclarativeTemplate,
   buildPlaceholderMainMenu,
@@ -26,10 +30,15 @@ const {
   downloadLocalFile,
   saveLocalFileFromArrayBuffer,
 } = require('./LocalFileDownloader');
-const { openPreviewWindow, closePreviewWindow } = require('./PreviewWindow');
+const {
+  openPreviewWindow,
+  closePreviewWindow,
+  closeAllPreviewWindows,
+} = require('./PreviewWindow');
 const {
   setupLocalGDJSDevelopmentWatcher,
   closeLocalGDJSDevelopmentWatcher,
+  onLocalGDJSDevelopmentWatcherRuntimeUpdated,
 } = require('./LocalGDJSDevelopmentWatcher');
 const { setupWatcher, disableWatcher } = require('./LocalFilesystemWatcher');
 
@@ -189,6 +198,10 @@ app.on('ready', function() {
     return closePreviewWindow(options.windowId);
   });
 
+  ipcMain.handle('preview-close-all', async () => {
+    return closeAllPreviewWindows();
+  });
+
   // Piskel image editor
   ipcMain.handle('piskel-load', (event, externalEditorInput) => {
     return loadExternalEditorWindow({
@@ -257,6 +270,17 @@ app.on('ready', function() {
         mainWindow.setBackgroundColor(overlayOptions.color);
     }
   );
+
+  // Window maximize toggle (for double-click on titlebar):
+  ipcMain.handle('window-maximize-toggle', async () => {
+    if (!mainWindow) return;
+
+    if (mainWindow.isMaximized()) {
+      mainWindow.unmaximize();
+    } else {
+      mainWindow.maximize();
+    }
+  });
 
   // LocalFileDownloader events:
   ipcMain.handle('local-file-download', async (event, url, outputPath) => {
@@ -328,6 +352,14 @@ app.on('ready', function() {
     closeLocalGDJSDevelopmentWatcher();
   });
 
+  onLocalGDJSDevelopmentWatcherRuntimeUpdated(() => {
+    log.info('Notifying the editor that the GDJS runtime has been updated.');
+    mainWindow.webContents.send(
+      'local-gdjs-development-watcher-runtime-updated',
+      null
+    );
+  });
+
   // DebuggerServer events:
   ipcMain.on('debugger-start-server', (event, options) => {
     log.info('Received event to start debugger server with options=', options);
@@ -351,6 +383,10 @@ app.on('ready', function() {
     sendMessage(message, err =>
       event.sender.send('debugger-send-message-done', err)
     );
+  });
+
+  ipcMain.on('debugger-close-all-connections', () => {
+    closeAllConnections();
   });
 
   ipcMain.on('updates-check-and-download', event => {

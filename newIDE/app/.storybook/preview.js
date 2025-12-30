@@ -33,9 +33,6 @@ export const parameters = {
   // that we don't use.
   controls: { hideNoControlsWarning: true },
   docs: { disable: true },
-  mockAddonConfigs: {
-    globalMockData: [],
-  },
 };
 
 export const decorators = [

@@ -9,6 +9,7 @@ namespace gdjs {
 
   /**
    * A scene being played, containing instances of objects rendered on screen.
+   * @category Core Engine > Scene
    */
   export class RuntimeScene extends gdjs.RuntimeInstanceContainer {
     _eventsFunction: null | ((runtimeScene: RuntimeScene) => void) = null;
@@ -65,7 +66,7 @@ namespace gdjs {
      * @param runtimeGame The game associated to this scene.
      */
     constructor(runtimeGame: gdjs.RuntimeGame) {
-      super();
+      super(runtimeGame);
       this._runtimeGame = runtimeGame;
       this._variables = new gdjs.VariablesContainer();
       this._variablesByExtensionName = new Map<
@@ -128,7 +129,8 @@ namespace gdjs {
 
     /**
      * Load the runtime scene from the given scene.
-     * @param sceneAndExtensionsData An object containing the scene data.
+     * @param sceneAndExtensionsData The data of the scene and extension variables to be loaded.
+     * @param options Options to change what is loaded.
      * @see gdjs.RuntimeGame#getSceneAndExtensionsData
      */
     loadFromScene(
@@ -136,6 +138,7 @@ namespace gdjs {
       options?: {
         excludedObjectNames?: Set<string>;
         skipStoppingSoundsOnStartup?: boolean;
+        skipCreatingInstances?: boolean;
       }
     ) {
       if (!sceneAndExtensionsData) {
@@ -196,17 +199,19 @@ namespace gdjs {
       }
 
       // Create initial instances of objects.
-      this.createObjectsFrom(
-        sceneData.instances,
-        0,
-        0,
-        0,
-        /*trackByPersistentUuid=*/
-        true,
-        {
-          excludedObjectNames: options?.excludedObjectNames,
-        }
-      );
+      if (!options || !options.skipCreatingInstances) {
+        this.createObjectsFrom(
+          sceneData.instances,
+          0,
+          0,
+          0,
+          /*trackByPersistentUuid=*/
+          true,
+          {
+            excludedObjectNames: options?.excludedObjectNames,
+          }
+        );
+      }
 
       // Set up the default z order (for objects created from events)
       this._setLayerDefaultZOrders();
@@ -379,7 +384,7 @@ namespace gdjs {
     }
 
     /**
-     * Step and render the scene.
+     * Step (execute the game logic) and render the scene.
      * @param elapsedTime In milliseconds
      * @return true if the game loop should continue, false if a scene change/push/pop
      * or a game stop was requested.
@@ -439,6 +444,21 @@ namespace gdjs {
       if (this._profiler) {
         this._profiler.end('callbacks and extensions (post-events)');
       }
+
+      this.render();
+      this._isJustResumed = false;
+      if (this._profiler) {
+        this._profiler.end('render');
+      }
+      if (this._profiler) {
+        this._profiler.endFrame();
+      }
+      return !!this.getRequestedChange();
+    }
+    /**
+     * Render the scene (but do not execute the game logic).
+     */
+    render() {
       if (this._profiler) {
         this._profiler.begin('objects (pre-render, effects update)');
       }
@@ -468,21 +488,6 @@ namespace gdjs {
         );
       }
 
-      this._isJustResumed = false;
-      this.render();
-      if (this._profiler) {
-        this._profiler.end('render');
-      }
-      if (this._profiler) {
-        this._profiler.endFrame();
-      }
-      return !!this.getRequestedChange();
-    }
-
-    /**
-     * Render the PIXI container associated to the runtimeScene.
-     */
-    render() {
       this._renderer.render();
     }
 
@@ -962,7 +967,10 @@ namespace gdjs {
     }
   }
 
-  //The flags to describe the change request by a scene:
+  /**
+   * The flags to describe the change request by a scene.
+   * @category Core Engine > Scene
+   */
   export enum SceneChangeRequest {
     CONTINUE,
     PUSH_SCENE,

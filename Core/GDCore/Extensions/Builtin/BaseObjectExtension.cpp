@@ -40,6 +40,31 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   extension.AddInstructionOrExpressionGroupMetadata(_("Size")).SetIcon(
       "res/actions/scale24_black.png");
 
+  extension.AddInGameEditorResource()
+      .SetResourceName("InGameEditor-MoveIcon")
+      .SetFilePath("InGameEditor/MoveIcon.svg")
+      .SetKind("internal-in-game-editor-only-svg");
+  extension.AddInGameEditorResource()
+      .SetResourceName("InGameEditor-RotateIcon")
+      .SetFilePath("InGameEditor/RotateIcon.svg")
+      .SetKind("internal-in-game-editor-only-svg");
+  extension.AddInGameEditorResource()
+      .SetResourceName("InGameEditor-ResizeIcon")
+      .SetFilePath("InGameEditor/ResizeIcon.svg")
+      .SetKind("internal-in-game-editor-only-svg");
+  extension.AddInGameEditorResource()
+      .SetResourceName("InGameEditor-FocusIcon")
+      .SetFilePath("InGameEditor/FocusIcon.svg")
+      .SetKind("internal-in-game-editor-only-svg");
+  extension.AddInGameEditorResource()
+      .SetResourceName("InGameEditor-FreeCameraIcon")
+      .SetFilePath("InGameEditor/FreeCameraIcon.svg")
+      .SetKind("internal-in-game-editor-only-svg");
+  extension.AddInGameEditorResource()
+      .SetResourceName("InGameEditor-OrbitCameraIcon")
+      .SetFilePath("InGameEditor/OrbitCameraIcon.svg")
+      .SetKind("internal-in-game-editor-only-svg");
+
   gd::ObjectMetadata& obj = extension.AddObject<gd::ObjectConfiguration>(
       "", _("Base object"), _("Base object"), "res/objeticon24.png");
 

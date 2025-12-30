@@ -183,6 +183,7 @@ export type PreferencesValues = {|
   hiddenAlertMessages: { [AlertMessageIdentifier]: boolean },
   hiddenTutorialHints: { [string]: boolean },
   hiddenAnnouncements: { [string]: boolean },
+  hiddenAskAiStandAloneForms: { [string]: boolean },
   autoDisplayChangelog: boolean,
   lastLaunchedVersion: ?string,
   eventsSheetShowObjectThumbnails: boolean,
@@ -227,7 +228,10 @@ export type PreferencesValues = {|
   gamesDashboardOrderBy: GamesDashboardOrderBy,
   takeScreenshotOnPreview: boolean,
   showAiAskButtonInTitleBar: boolean,
-  aiState: {| aiRequestId: string | null, mode: 'chat' | 'agent' |},
+  aiState: {| aiRequestId: string | null |},
+  automaticallyUseCreditsForAiRequests: boolean,
+  hasSeenInGameEditorWarning: boolean,
+  useBackgroundSerializerForSaving: boolean,
 |};
 
 /**
@@ -247,6 +251,8 @@ export type Preferences = {|
   showAllTutorialHints: () => void,
   showAnnouncement: (identifier: string, show: boolean) => void,
   showAllAnnouncements: () => void,
+  showAskAiStandAloneForm: (identifier: string, show: boolean) => void,
+  showAllAskAiStandAloneForms: () => void,
   verifyIfIsNewVersion: () => boolean,
   setEventsSheetShowObjectThumbnails: (enabled: boolean) => void,
   setAutosaveOnPreview: (enabled: boolean) => void,
@@ -335,8 +341,10 @@ export type Preferences = {|
   setShowAiAskButtonInTitleBar: (enabled: boolean) => void,
   setAiState: ({|
     aiRequestId: string | null,
-    mode: 'chat' | 'agent',
   |}) => void,
+  setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => void,
+  setHasSeenInGameEditorWarning: (enabled: boolean) => void,
+  setUseBackgroundSerializerForSaving: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -353,6 +361,7 @@ export const initialPreferences = {
     hiddenAlertMessages: {},
     hiddenTutorialHints: {},
     hiddenAnnouncements: {},
+    hiddenAskAiStandAloneForms: {},
     autoDisplayChangelog: true,
     lastLaunchedVersion: undefined,
     eventsSheetShowObjectThumbnails: true,
@@ -395,7 +404,10 @@ export const initialPreferences = {
     gamesDashboardOrderBy: 'lastModifiedAt',
     takeScreenshotOnPreview: true,
     showAiAskButtonInTitleBar: true,
-    aiState: { aiRequestId: null, mode: 'agent' },
+    aiState: { aiRequestId: null },
+    automaticallyUseCreditsForAiRequests: false,
+    hasSeenInGameEditorWarning: false,
+    useBackgroundSerializerForSaving: false,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -409,6 +421,8 @@ export const initialPreferences = {
   showAllTutorialHints: () => {},
   showAnnouncement: (identifier: string, show: boolean) => {},
   showAllAnnouncements: () => {},
+  showAskAiStandAloneForm: (identifier: string, show: boolean) => {},
+  showAllAskAiStandAloneForms: () => {},
   verifyIfIsNewVersion: () => false,
   setEventsSheetShowObjectThumbnails: () => {},
   setAutosaveOnPreview: () => {},
@@ -471,13 +485,10 @@ export const initialPreferences = {
   ) => {},
   setTakeScreenshotOnPreview: (enabled: boolean) => {},
   setShowAiAskButtonInTitleBar: (enabled: boolean) => {},
-  setAiState: ({
-    aiRequestId,
-    mode,
-  }: {|
-    aiRequestId: string | null,
-    mode: 'chat' | 'agent',
-  |}) => {},
+  setAiState: ({ aiRequestId }: {| aiRequestId: string | null |}) => {},
+  setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => {},
+  setHasSeenInGameEditorWarning: (enabled: boolean) => {},
+  setUseBackgroundSerializerForSaving: (enabled: boolean) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

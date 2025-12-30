@@ -80,10 +80,7 @@ const CreditsStatusBanner = ({
                 onClick={() =>
                   openCreditsPackageDialog({ showCalloutTip: true })
                 }
-                style={{
-                  color: gdevelopTheme.credits.color,
-                  borderColor: gdevelopTheme.credits.color,
-                }}
+                noBackground
               />
             </Column>
           )}
@@ -92,10 +89,7 @@ const CreditsStatusBanner = ({
               <FlatButton
                 label={actionButtonLabel}
                 onClick={onActionButtonClick}
-                style={{
-                  color: gdevelopTheme.credits.color,
-                  borderColor: gdevelopTheme.credits.color,
-                }}
+                noBackground
               />
             </Column>
           )}

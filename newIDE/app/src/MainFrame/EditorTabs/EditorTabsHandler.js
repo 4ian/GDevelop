@@ -31,7 +31,21 @@ type EditorRef =
 
 type TabOptions = {| data?: HTMLDataset |};
 
+export type EditorKind =
+  | 'layout'
+  | 'layout events'
+  | 'external layout'
+  | 'external events'
+  | 'events functions extension'
+  | 'custom object'
+  | 'debugger'
+  | 'resources'
+  | 'ask-ai'
+  | 'start page';
+
 export type EditorTab = {|
+  /** The kind of editor. */
+  kind: EditorKind,
   /** The function to render the tab editor. */
   renderEditorContainer: RenderEditorContainerPropsWithRef => React.Node,
   /** A reference to the editor. */
@@ -61,19 +75,7 @@ export type EditorTabsState = {|
   },
 |};
 
-export type EditorKind =
-  | 'layout'
-  | 'layout events'
-  | 'external layout'
-  | 'external events'
-  | 'events functions extension'
-  | 'custom object'
-  | 'debugger'
-  | 'resources'
-  | 'ask-ai'
-  | 'start page';
-
-type EditorTabMetadata = {|
+type EditorTabPersistedState = {|
   /** The name of the layout/external layout/external events/extension. */
   projectItemName: ?string,
   /** The editor kind. */
@@ -81,11 +83,12 @@ type EditorTabMetadata = {|
 |};
 
 export type EditorTabsPersistedState = {|
-  editors: Array<EditorTabMetadata>,
+  editors: Array<EditorTabPersistedState>,
   currentTab: number,
 |};
 
 export type EditorOpeningOptions = {|
+  kind: EditorKind,
   paneIdentifier: string,
   label?: string,
   icon?: React.Node,
@@ -100,34 +103,6 @@ export type EditorOpeningOptions = {|
   dontFocusTab?: boolean,
   closable?: boolean,
 |};
-
-export const getEditorTabMetadata = (
-  editorTab: EditorTab
-): EditorTabMetadata => {
-  return {
-    projectItemName: editorTab.projectItemName,
-    editorKind:
-      editorTab.editorRef instanceof SceneEditorContainer
-        ? 'layout'
-        : editorTab.editorRef instanceof ExternalEventsEditorContainer
-        ? 'external events'
-        : editorTab.editorRef instanceof ExternalLayoutEditorContainer
-        ? 'external layout'
-        : editorTab.editorRef instanceof ResourcesEditorContainer
-        ? 'resources'
-        : editorTab.editorRef instanceof EventsEditorContainer
-        ? 'layout events'
-        : editorTab.editorRef instanceof EventsFunctionsExtensionEditorContainer
-        ? 'events functions extension'
-        : editorTab.editorRef instanceof CustomObjectEditorContainer
-        ? 'custom object'
-        : editorTab.editorRef instanceof DebuggerEditorContainer
-        ? 'debugger'
-        : editorTab.key === 'ask-ai'
-        ? 'ask-ai'
-        : 'start page',
-  };
-};
 
 export const getEditorTabsInitialState = (): EditorTabsState => {
   return {
@@ -156,6 +131,7 @@ export const openEditorTab = (
     renderCustomIcon,
     projectItemName,
     tabOptions,
+    kind,
     renderEditorContainer,
     key,
     extraEditorProps,
@@ -179,6 +155,7 @@ export const openEditorTab = (
   }
 
   const editorTab: EditorTab = {
+    kind,
     label,
     icon,
     renderCustomIcon,

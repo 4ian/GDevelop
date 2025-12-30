@@ -72,6 +72,10 @@ export type ObjectTreeViewItemProps = {|
   initialInstances?: gdInitialInstancesContainer,
   editName: (itemId: string) => void,
   onObjectModified: (shouldForceUpdateList: boolean) => void,
+  onObjectCreated: (
+    objects: Array<gdObject>,
+    isTheFirstOfItsTypeInProject: boolean
+  ) => void,
   onMovedObjectFolderOrObjectToAnotherFolderInSameContainer: (
     objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext
   ) => void,
@@ -203,6 +207,14 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     return this._isGlobal;
   }
 
+  is3D(): boolean {
+    const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+      this.props.project.getCurrentPlatform(),
+      this.object.getObject().getType()
+    );
+    return objectMetadata.isRenderedIn3D();
+  }
+
   getName(): string | React.Node {
     return this.object.getObject().getName();
   }
@@ -229,7 +241,12 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     );
   }
 
-  onClick(): void {}
+  onClick(): void {
+    this.props.selectObjectFolderOrObjectWithContext({
+      objectFolderOrObject: this.object,
+      global: this._isGlobal,
+    });
+  }
 
   rename(newName: string): void {
     if (this.getName() === newName) {
@@ -568,7 +585,13 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       objectsContainer,
       onObjectPasted,
       onObjectModified,
+      onObjectCreated,
     } = this.props;
+
+    const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
+      project,
+      objectType
+    );
 
     const newObjectWithContext = addSerializedObjectToObjectsContainer({
       project,
@@ -586,6 +609,10 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
 
     onObjectModified(false);
     if (onObjectPasted) onObjectPasted(newObjectWithContext.object);
+    onObjectCreated(
+      [newObjectWithContext.object],
+      isTheFirstOfItsTypeInProject
+    );
   }
 
   duplicate(): void {
@@ -596,10 +623,16 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       forceUpdateList,
       editName,
       selectObjectFolderOrObjectWithContext,
+      onObjectCreated,
     } = this.props;
 
     const object = this.object.getObject();
     const serializedObject = serializeToJSObject(object);
+
+    const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
+      project,
+      object.getType()
+    );
 
     const newObjectWithContext = addSerializedObjectToObjectsContainer({
       project,
@@ -620,6 +653,11 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
         .getObjectChild(newObjectWithContext.object.getName()),
       global: this._isGlobal,
     };
+
+    onObjectCreated(
+      [newObjectWithContext.object],
+      isTheFirstOfItsTypeInProject
+    );
 
     forceUpdateList();
     editName(getObjectTreeViewItemId(newObjectWithContext.object));

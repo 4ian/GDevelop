@@ -27,6 +27,7 @@ namespace gdjs {
 
       /**
        * The data bound to an event that got triggered.
+       * @category Other extensions > P2P
        */
       export class EventData implements IEventData {
         constructor(data: string, sender: string) {
@@ -57,6 +58,7 @@ namespace gdjs {
 
       /**
        * An event that can be listened to.
+       * @category Other extensions > P2P
        */
       export class Event implements IEvent {
         private readonly data: IEventData[] = [];

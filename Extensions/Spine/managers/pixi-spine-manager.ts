@@ -10,6 +10,7 @@ namespace gdjs {
 
   /**
    * SpineManager manages pixi spine skeleton data.
+   * @category Resources > Spine
    */
   export class SpineManager implements gdjs.ResourceManager {
     private _spineAtlasManager: SpineAtlasManager;

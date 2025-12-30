@@ -2,7 +2,12 @@
 declare class libGDevelop {
   getPointer(gdEmscriptenObject): number;
   castObject<T>(gdEmscriptenObject, Class<T>): T;
+  wrapPointer<T>(ptr: number, objectClass: Class<T>): T;
   compare(gdEmscriptenObject, gdEmscriptenObject): boolean;
+
+  _malloc(size: number): number;
+  _free(ptr: number): void;
+  HEAPU8: Uint8Array;
 
   getTypeOfObject(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, searchInGroups: boolean): string;
   getTypeOfBehavior(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, searchInGroups: boolean): string;
@@ -87,6 +92,7 @@ declare class libGDevelop {
   ObjectsContainersList: Class<gdObjectsContainersList>;
   ProjectScopedContainers: Class<gdProjectScopedContainers>;
   ExtensionProperties: Class<gdExtensionProperties>;
+  BehaviorDefaultFlagClearer: Class<gdBehaviorDefaultFlagClearer>;
   Behavior: Class<gdBehavior>;
   BehaviorJsImplementation: Class<gdBehaviorJsImplementation>;
   BehaviorsSharedData: Class<gdBehaviorsSharedData>;
@@ -115,7 +121,9 @@ declare class libGDevelop {
   MapStringSerializerValue: Class<gdMapStringSerializerValue>;
   VectorPairStringSharedPtrSerializerElement: Class<gdVectorPairStringSharedPtrSerializerElement>;
   Resource: Class<gdResource>;
-  ResourcesManager: Class<gdResourcesManager>;
+  ResourcesContainer_SourceType: Class<ResourcesContainer_SourceType>;
+  ResourcesContainer: Class<gdResourcesContainer>;
+  ResourcesContainersList: Class<gdResourcesContainersList>;
   ImageResource: Class<gdImageResource>;
   AudioResource: Class<gdAudioResource>;
   FontResource: Class<gdFontResource>;
@@ -138,6 +146,7 @@ declare class libGDevelop {
   SerializerElement: Class<gdSerializerElement>;
   SharedPtrSerializerElement: Class<gdSharedPtrSerializerElement>;
   Serializer: Class<gdSerializer>;
+  BinarySerializer: Class<gdBinarySerializer>;
   ObjectAssetSerializer: Class<gdObjectAssetSerializer>;
   InstructionsList: Class<gdInstructionsList>;
   Instruction: Class<gdInstruction>;
@@ -157,6 +166,7 @@ declare class libGDevelop {
   ParameterMetadataContainer: Class<gdParameterMetadataContainer>;
   ParameterMetadataTools: Class<gdParameterMetadataTools>;
   ObjectMetadata: Class<gdObjectMetadata>;
+  InGameEditorResourceMetadata: Class<gdInGameEditorResourceMetadata>;
   QuickCustomization_Visibility: Class<QuickCustomization_Visibility>;
   QuickCustomization: Class<gdQuickCustomization>;
   QuickCustomizationVisibilitiesContainer: Class<gdQuickCustomizationVisibilitiesContainer>;
@@ -187,11 +197,14 @@ declare class libGDevelop {
   ResourceExposer: Class<gdResourceExposer>;
   VariablesChangeset: Class<gdVariablesChangeset>;
   WholeProjectRefactorer: Class<gdWholeProjectRefactorer>;
+  BehaviorParameterFiller: Class<gdBehaviorParameterFiller>;
+  InstructionValidator: Class<gdInstructionValidator>;
   ObjectTools: Class<gdObjectTools>;
   EventsBasedObjectDependencyFinder: Class<gdEventsBasedObjectDependencyFinder>;
   PropertyFunctionGenerator: Class<gdPropertyFunctionGenerator>;
   UsedExtensionsResult: Class<gdUsedExtensionsResult>;
   UsedExtensionsFinder: Class<gdUsedExtensionsFinder>;
+  UsedObjectTypeFinder: Class<gdUsedObjectTypeFinder>;
   ExampleExtensionUsagesFinder: Class<gdExampleExtensionUsagesFinder>;
   InstructionsCountEvaluator: Class<gdInstructionsCountEvaluator>;
   ExtensionAndBehaviorMetadata: Class<gdExtensionAndBehaviorMetadata>;

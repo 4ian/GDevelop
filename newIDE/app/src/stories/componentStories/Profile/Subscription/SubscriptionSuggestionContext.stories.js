@@ -10,22 +10,20 @@ import {
   fakeGoldWithPurchaselyAuthenticatedUser,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import {
-  SubscriptionSuggestionContext,
-  SubscriptionSuggestionProvider,
-} from '../../../../Profile/Subscription/SubscriptionSuggestionContext';
+  SubscriptionContext,
+  SubscriptionProvider,
+} from '../../../../Profile/Subscription/SubscriptionContext';
 import AlertProvider from '../../../../UI/Alert/AlertProvider';
 import Text from '../../../../UI/Text';
 
 export default {
-  title: 'Subscription/SubscriptionSuggestionContext',
-  component: SubscriptionSuggestionContext,
+  title: 'Subscription/SubscriptionContext',
+  component: SubscriptionContext,
   decorators: [paperDecorator],
 };
 
 const SubscriptionDialogTestOpener = ({ label }: {| label: string |}) => {
-  const { openSubscriptionDialog } = React.useContext(
-    SubscriptionSuggestionContext
-  );
+  const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
   React.useEffect(
     () => {
       openSubscriptionDialog({
@@ -46,11 +44,11 @@ export const NotAuthenticated = () => {
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
-        <SubscriptionSuggestionProvider>
+        <SubscriptionProvider>
           <SubscriptionDialogTestOpener
             label={'SubscriptionDialog should be shown.'}
           />
-        </SubscriptionSuggestionProvider>
+        </SubscriptionProvider>
       </AuthenticatedUserContext.Provider>
     </AlertProvider>
   );
@@ -61,11 +59,11 @@ export const NoSubscriptionUser = () => {
       <AuthenticatedUserContext.Provider
         value={fakeAuthenticatedUserWithNoSubscription}
       >
-        <SubscriptionSuggestionProvider>
+        <SubscriptionProvider>
           <SubscriptionDialogTestOpener
             label={'SubscriptionDialog should be shown.'}
           />
-        </SubscriptionSuggestionProvider>
+        </SubscriptionProvider>
       </AuthenticatedUserContext.Provider>
     </AlertProvider>
   );
@@ -74,11 +72,11 @@ export const GoldSubscribedUser = () => {
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider value={fakeGoldAuthenticatedUser}>
-        <SubscriptionSuggestionProvider>
+        <SubscriptionProvider>
           <SubscriptionDialogTestOpener
             label={'SubscriptionDialog should be shown.'}
           />
-        </SubscriptionSuggestionProvider>
+        </SubscriptionProvider>
       </AuthenticatedUserContext.Provider>
     </AlertProvider>
   );
@@ -89,9 +87,9 @@ export const GoldWithPurchaselySubscribedUser = () => {
       <AuthenticatedUserContext.Provider
         value={fakeGoldWithPurchaselyAuthenticatedUser}
       >
-        <SubscriptionSuggestionProvider>
+        <SubscriptionProvider>
           <SubscriptionDialogTestOpener label={'Alert should be shown.'} />
-        </SubscriptionSuggestionProvider>
+        </SubscriptionProvider>
       </AuthenticatedUserContext.Provider>
     </AlertProvider>
   );
@@ -101,13 +99,13 @@ export const NotAuthenticatedOnMobile = () => {
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
-        <SubscriptionSuggestionProvider simulateMobileApp>
+        <SubscriptionProvider simulateMobileApp>
           <SubscriptionDialogTestOpener
             label={
               '`presentAppStorePresentationForPlacement` should be called.'
             }
           />
-        </SubscriptionSuggestionProvider>
+        </SubscriptionProvider>
       </AuthenticatedUserContext.Provider>
     </AlertProvider>
   );
@@ -118,13 +116,13 @@ export const NoSubscriptionUserOnMobile = () => {
       <AuthenticatedUserContext.Provider
         value={fakeAuthenticatedUserWithNoSubscription}
       >
-        <SubscriptionSuggestionProvider simulateMobileApp>
+        <SubscriptionProvider simulateMobileApp>
           <SubscriptionDialogTestOpener
             label={
               '`presentAppStorePresentationForPlacement` should be called.'
             }
           />
-        </SubscriptionSuggestionProvider>
+        </SubscriptionProvider>
       </AuthenticatedUserContext.Provider>
     </AlertProvider>
   );
@@ -133,9 +131,9 @@ export const GoldSubscribedUserOnMobile = () => {
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider value={fakeGoldAuthenticatedUser}>
-        <SubscriptionSuggestionProvider simulateMobileApp>
+        <SubscriptionProvider simulateMobileApp>
           <SubscriptionDialogTestOpener label={'Alert should be shown.'} />
-        </SubscriptionSuggestionProvider>
+        </SubscriptionProvider>
       </AuthenticatedUserContext.Provider>
     </AlertProvider>
   );
@@ -146,13 +144,13 @@ export const GoldWithPurchaselySubscribedUserOnMobile = () => {
       <AuthenticatedUserContext.Provider
         value={fakeGoldWithPurchaselyAuthenticatedUser}
       >
-        <SubscriptionSuggestionProvider simulateMobileApp>
+        <SubscriptionProvider simulateMobileApp>
           <SubscriptionDialogTestOpener
             label={
               '`presentAppStorePresentationForPlacement` should be called.'
             }
           />
-        </SubscriptionSuggestionProvider>
+        </SubscriptionProvider>
       </AuthenticatedUserContext.Provider>
     </AlertProvider>
   );

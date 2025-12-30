@@ -770,7 +770,7 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                         <SelectOption
                                           key="property-type-resource"
                                           value="Resource"
-                                          label={t`Resource (JavaScript only)`}
+                                          label={t`Resource`}
                                         />
                                         {!isSceneProperties && (
                                           <SelectOption
@@ -908,6 +908,20 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                             } else {
                                               extraInfo.set(0, newValue);
                                             }
+                                            const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+                                              project.getCurrentPlatform(),
+                                              newValue
+                                            );
+                                            const projectScopedContainers = projectScopedContainersAccessor.get();
+                                            const validatedNewName = getValidatedPropertyName(
+                                              properties,
+                                              projectScopedContainers,
+                                              behaviorMetadata.getDefaultName()
+                                            );
+                                            property.setName(validatedNewName);
+                                            property.setLabel(
+                                              behaviorMetadata.getFullName()
+                                            );
                                             forceUpdate();
                                             onPropertiesUpdated &&
                                               onPropertiesUpdated();

@@ -23,6 +23,7 @@ import BlockingLayerWithHoles from './BlockingLayerWithHoles';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
 import { instancesEditorId } from '../InstancesEditor';
 import { swipeableDrawerContainerId } from '../SceneEditor/SwipeableDrawerEditorsDisplay';
+import { embeddedGameFrameHoleId } from '../EmbeddedGame/EmbeddedGameFrameHole';
 
 const styles = {
   avatarContainer: {
@@ -330,8 +331,13 @@ function InAppTutorialStepDisplayer({
       ? assistantImage
       : elementToHighlight || null
     : null;
-  const activeCanvas = document.querySelector(
+
+  // Check if the "classic" or "3D" editor are shown:
+  const activeInstancesEditorCanvas = document.querySelector(
     `#scene-editor[data-active=true] #${instancesEditorId}`
+  );
+  const activeEmbeddedGameFrameHole = document.querySelector(
+    `#scene-editor[data-active=true] #${embeddedGameFrameHoleId}`
   );
   const swipeableDrawerContainer = document.querySelector(
     `#${swipeableDrawerContainerId}`
@@ -354,13 +360,21 @@ function InAppTutorialStepDisplayer({
           if (tooltip && tooltip.standalone && assistantImage) {
             holes.push(assistantImage);
           }
-          if (interactsWithCanvas && activeCanvas) {
+          if (
+            interactsWithCanvas &&
+            (activeInstancesEditorCanvas || activeEmbeddedGameFrameHole)
+          ) {
             // If the swipeable drawer exists, we are on mobile and as the drawers are on top
             // of the canvas, let's avoid creating holes as it will produce the opposite effect.
             if (swipeableDrawerContainer) {
               holes = [];
             } else {
-              holes.push(activeCanvas);
+              if (activeInstancesEditorCanvas) {
+                holes.push(activeInstancesEditorCanvas);
+              }
+              if (activeEmbeddedGameFrameHole) {
+                holes.push(activeEmbeddedGameFrameHole);
+              }
             }
           }
         }
@@ -372,13 +386,14 @@ function InAppTutorialStepDisplayer({
       anchorElement,
       expectedEditor,
       hideBehindPriorityElement,
-      activeCanvas,
+      activeInstancesEditorCanvas,
       interactsWithCanvas,
       disableBlockingLayer,
       elementToHighlight,
       assistantImage,
       tooltip,
       swipeableDrawerContainer,
+      activeEmbeddedGameFrameHole,
     ]
   );
 

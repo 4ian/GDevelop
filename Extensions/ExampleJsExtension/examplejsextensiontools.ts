@@ -8,6 +8,7 @@ namespace gdjs {
      * with the extension name in `gdjs.evtTools`.
      *
      * Functions are being passed the arguments that were declared in the extension.
+     * @internal This is an example extension.
      */
     export namespace exampleJsExtension {
       export const myConditionFunction = function (number, text) {

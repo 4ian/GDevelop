@@ -3,8 +3,7 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef RESOURCESMERGINGHELPER_H
-#define RESOURCESMERGINGHELPER_H
+#pragma once
 
 #include <map>
 #include <memory>
@@ -29,7 +28,7 @@ namespace gd {
  */
 class GD_CORE_API ResourcesMergingHelper : public ArbitraryResourceWorker {
 public:
-  ResourcesMergingHelper(gd::ResourcesManager &resourcesManager,
+  ResourcesMergingHelper(gd::ResourcesContainer &resourcesManager,
                          gd::AbstractFileSystem &fileSystem)
       : ArbitraryResourceWorker(resourcesManager),
         preserveDirectoriesStructure(false), preserveAbsoluteFilenames(false),
@@ -56,6 +55,15 @@ public:
    */
   void PreserveAbsoluteFilenames(bool preserveAbsoluteFilenames_ = true) {
     preserveAbsoluteFilenames = preserveAbsoluteFilenames_;
+  };
+
+  /**
+   * \brief Set if the absolute filenames of original files must be used for
+   * any resource.
+   */
+  void SetShouldUseOriginalAbsoluteFilenames(
+      bool shouldUseOriginalAbsoluteFilenames_ = true) {
+    shouldUseOriginalAbsoluteFilenames = shouldUseOriginalAbsoluteFilenames_;
   };
 
   /**
@@ -93,10 +101,13 @@ public:
                                    ///< absolute (C:\MyFile.png  will not be
                                    ///< transformed into a relative filename
                                    ///< (MyFile.png).
+  /**
+   * Set to true if the absolute filenames of original files must be used for
+   * any resource.
+   */
+  bool shouldUseOriginalAbsoluteFilenames = false;
   gd::AbstractFileSystem&
       fs;  ///< The gd::AbstractFileSystem used to manipulate files.
 };
 
 }  // namespace gd
-
-#endif  // RESOURCESMERGINGHELPER_H

@@ -82,8 +82,31 @@ namespace gdjs {
     }
   }
 
+  class InternalInGameEditorOnlySvgManager implements gdjs.ResourceManager {
+    async loadResource(resourceName: string): Promise<void> {
+      // Nothing to do.
+    }
+
+    async processResource(resourceName: string): Promise<void> {
+      // Nothing to do.
+    }
+
+    getResourceKinds(): Array<ResourceKind> {
+      return ['internal-in-game-editor-only-svg'];
+    }
+
+    unloadResource(resourceData: ResourceData): void {
+      // Nothing to do.
+    }
+
+    dispose(): void {
+      // Nothing to do.
+    }
+  }
+
   /**
    * Pre-load resources of any kind needed for a game or a scene.
+   * @category Resources
    */
   export class ResourceLoader {
     _runtimeGame: RuntimeGame;
@@ -124,6 +147,7 @@ namespace gdjs {
     private _bitmapFontManager: BitmapFontManager;
     private _spineAtlasManager: SpineAtlasManager | null = null;
     private _spineManager: SpineManager | null = null;
+    private _svgManager: InternalInGameEditorOnlySvgManager;
 
     /**
      * The name of the scene for which resources are currently being loaded.
@@ -169,6 +193,7 @@ namespace gdjs {
         this._imageManager
       );
       this._model3DManager = new gdjs.Model3DManager(this);
+      this._svgManager = new InternalInGameEditorOnlySvgManager();
 
       // add spine related managers only if spine extension is used
       if (gdjs.SpineAtlasManager && gdjs.SpineManager) {
@@ -189,6 +214,7 @@ namespace gdjs {
         this._jsonManager,
         this._bitmapFontManager,
         this._model3DManager,
+        this._svgManager,
       ];
 
       if (this._spineAtlasManager)
@@ -280,6 +306,27 @@ namespace gdjs {
       for (const sceneLoadingState of this._sceneLoadingStates.values()) {
         sceneLoadingState.status = 'ready';
       }
+    }
+
+    async loadResources(
+      resourceNames: Array<string>,
+      onProgress: (loadingCount: integer, totalCount: integer) => void
+    ): Promise<void> {
+      let loadedCount = 0;
+      await processAndRetryIfNeededWithPromisePool(
+        resourceNames,
+        maxForegroundConcurrency,
+        maxAttempt,
+        async (resourceName) => {
+          const resource = this._resources.get(resourceName);
+          if (resource) {
+            await this._loadResource(resource);
+            await this._processResource(resource);
+          }
+          loadedCount++;
+          onProgress(loadedCount, this._resources.size);
+        }
+      );
     }
 
     /**
@@ -552,6 +599,23 @@ namespace gdjs {
     }
 
     /**
+     * To be called when hot-reloading resources.
+     */
+    unloadAllResources(): void {
+      debugLogger.log(`Unloading of all resources was requested.`);
+      for (const resource of this._resources.values()) {
+        const resourceManager = this._resourceManagersMap.get(resource.kind);
+        if (resourceManager) {
+          resourceManager.unloadResource(resource);
+        }
+      }
+      for (const sceneLoadingState of this._sceneLoadingStates.values()) {
+        sceneLoadingState.status = 'not-loaded';
+      }
+      debugLogger.log(`Unloading of all resources finished.`);
+    }
+
+    /**
      * Put a given scene at the end of the queue.
      *
      * When the scene that is currently loading in background is done,
@@ -652,6 +716,13 @@ namespace gdjs {
      * the resource (this can be for example a token needed to access the resource).
      */
     getFullUrl(url: string) {
+      if (this._runtimeGame.isInGameEdition()) {
+        // Avoid adding cache burst to URLs which are assumed to be immutable files,
+        // to avoid costly useless requests each time the game is hot-reloaded.
+        if (url.startsWith('file://')) {
+          url = addSearchParameterToUrl(url, 'cache', '' + Date.now());
+        }
+      }
       const { gdevelopResourceToken } = this._runtimeGame._options;
       if (!gdevelopResourceToken) return url;
 

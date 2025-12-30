@@ -3,6 +3,7 @@ import axios from 'axios';
 import { GDevelopAssetApi } from './ApiConfigs';
 import { type Capabilities } from './Usage';
 import { type MessageByLocale } from '../i18n/MessageByLocale';
+import { ensureIsArray } from '../DataValidator';
 
 export type TutorialCategory =
   | 'game-mechanic'
@@ -61,12 +62,21 @@ export const canAccessTutorial = (
   return false;
 };
 
+export const client = axios.create({
+  baseURL: GDevelopAssetApi.baseUrl,
+});
+
 export const listAllTutorials = (): Promise<Array<Tutorial>> => {
-  return axios
-    .get(`${GDevelopAssetApi.baseUrl}/tutorial`, {
+  return client
+    .get(`/tutorial`, {
       params: { include: 'upcoming' },
     })
-    .then(response => response.data);
+    .then(response =>
+      ensureIsArray({
+        data: response.data,
+        endpointName: '/tutorial of Asset API',
+      })
+    );
 };
 
 export const getObjectTutorialIds = (type: string): Array<string> => {

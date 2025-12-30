@@ -219,6 +219,13 @@ class GD_CORE_API InitialInstance {
   double GetCustomDepth() const { return depth; }
   void SetCustomDepth(double depth_) { depth = depth_; }
 
+  double GetDefaultWidth() const { return defaultWidth; }
+  double GetDefaultHeight() const { return defaultHeight; }
+  double GetDefaultDepth() const { return defaultDepth; }
+  void SetDefaultWidth(double width_) { defaultWidth = width_; }
+  void SetDefaultHeight(double height_) { defaultHeight = height_; }
+  void SetDefaultDepth(double depth_) { defaultDepth = depth_; }
+
   /**
    * \brief Return true if the instance is locked and cannot be moved in the
    * IDE.
@@ -366,6 +373,10 @@ class GD_CORE_API InitialInstance {
    */
   InitialInstance& ResetPersistentUuid();
 
+  /**
+   * \brief Reset the persistent UUID used to recognize
+   * the same initial instance between serialization.
+   */
   const gd::String& GetPersistentUuid() const { return persistentUuid; }
   ///@}
 
@@ -395,6 +406,9 @@ class GD_CORE_API InitialInstance {
   double width;           ///< Instance custom width
   double height;          ///< Instance custom height
   double depth;           ///< Instance custom depth
+  double defaultWidth = 0;  ///< Instance default width as reported by InGameEditor
+  double defaultHeight = 0; ///< Instance default height as reported by InGameEditor
+  double defaultDepth = 0;  ///< Instance default depth as reported by InGameEditor
   gd::VariablesContainer initialVariables;  ///< Instance specific variables
   bool locked;                              ///< True if the instance is locked
   bool sealed;                              ///< True if the instance is sealed

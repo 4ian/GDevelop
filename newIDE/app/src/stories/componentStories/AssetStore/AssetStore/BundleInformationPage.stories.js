@@ -36,7 +36,7 @@ import {
   initialAssetStoreState,
 } from '../../../../AssetStore/AssetStoreContext';
 import { ProductLicenseStoreStateProvider } from '../../../../AssetStore/ProductLicense/ProductLicenseStoreContext';
-import { SubscriptionSuggestionProvider } from '../../../../Profile/Subscription/SubscriptionSuggestionContext';
+import { SubscriptionProvider } from '../../../../Profile/Subscription/SubscriptionContext';
 import { type AuthenticatedUser } from '../../../../Profile/AuthenticatedUserContext';
 import CourseStoreContext, {
   initialCourseStoreState,
@@ -174,7 +174,7 @@ const BundleInformationPageStory = ({
                   creditsPackageListingDatas: [],
                 }}
               >
-                <SubscriptionSuggestionProvider>
+                <SubscriptionProvider>
                   <ProductLicenseStoreStateProvider>
                     <BundleInformationPage
                       bundleListingData={bundleListingDataToDisplay}
@@ -182,12 +182,11 @@ const BundleInformationPageStory = ({
                       onGameTemplateOpen={() => action('open game template')()}
                       onBundleOpen={() => action('open bundle')()}
                       onCourseOpen={() => action('open course')()}
-                      getSubscriptionPlansWithPricingSystems={() => []}
                       courses={mockCourses}
                       getCourseCompletion={() => null}
                     />
                   </ProductLicenseStoreStateProvider>
-                </SubscriptionSuggestionProvider>
+                </SubscriptionProvider>
               </CreditsPackageStoreContext.Provider>
             </CourseStoreContext.Provider>
           </AuthenticatedUserContext.Provider>

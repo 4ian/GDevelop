@@ -22,6 +22,10 @@ export const Default = () => (
     onApply={() => action('Apply changes')}
     onEditVariables={() => action('Edit variables')}
     resourceManagementProps={fakeResourceManagementProps}
+    projectScopedContainersAccessor={
+      testProject.testSceneProjectScopedContainersAccessor
+    }
+    onBackgroundColorChanged={() => action('onBackgroundColorChanged')}
   />
 );
 
@@ -35,5 +39,9 @@ export const MoreSettings = () => (
     onEditVariables={() => action('Edit variables')}
     onOpenMoreSettings={() => action('Open more settings')}
     resourceManagementProps={fakeResourceManagementProps}
+    projectScopedContainersAccessor={
+      testProject.testSceneProjectScopedContainersAccessor
+    }
+    onBackgroundColorChanged={() => action('onBackgroundColorChanged')}
   />
 );

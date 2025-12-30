@@ -34,6 +34,11 @@ class GD_CORE_API Effect {
   void SetFolded(bool fold = true) { folded = fold; }
   bool IsFolded() const { return folded; }
 
+  void SetEnabled(bool isEnabled_) {
+    isEnabled = isEnabled_;
+  }
+  bool IsEnabled() const { return isEnabled; }
+
   void SetDoubleParameter(const gd::String &name, double value) {
     doubleParameters[name] = value;
   }
@@ -105,6 +110,7 @@ class GD_CORE_API Effect {
   bool folded;
   gd::String name;        ///< The name of the layer.
   gd::String effectType;  ///< The name of the effect to apply.
+  bool isEnabled = true; ///< Enable the effect at the beginning of the scene, at its object creation or in the editor.
   std::map<gd::String, double> doubleParameters; ///< Values of parameters being doubles, keyed by names.
   std::map<gd::String, gd::String> stringParameters; ///< Values of parameters being strings, keyed by names.
   std::map<gd::String, bool> booleanParameters; ///< Values of parameters being booleans, keyed by names.

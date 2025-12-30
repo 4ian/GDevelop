@@ -7,6 +7,7 @@ namespace gdjs {
   /**
    * A cache of resources that helps ensuring that files are only downloaded
    * once.
+   * @category Resources
    */
   export class ResourceCache<C> {
     private _nameToContent = new Map<string, C>();

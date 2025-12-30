@@ -3,8 +3,24 @@ import * as React from 'react';
 import { I18n } from '@lingui/react';
 import paperDecorator from '../../../PaperDecorator';
 import { AiRequestChat } from '../../../../AiGeneration/AiRequestChat';
+import { type AiRequest } from '../../../../Utils/GDevelopServices/Generation';
 import FixedHeightFlexContainer from '../../../FixedHeightFlexContainer';
 import { action } from '@storybook/addon-actions';
+import {
+  defaultAuthenticatedUserWithNoSubscription,
+  fakeSilverAuthenticatedUser,
+  fakeStartupAuthenticatedUser,
+  limitsForNoSubscriptionUser,
+  limitsForSilverUser,
+  limitsForStartupUser,
+} from '../../../../fixtures/GDevelopServicesTestData';
+import FixedWidthFlexContainer from '../../../FixedWidthFlexContainer';
+import PreferencesContext, {
+  initialPreferences,
+} from '../../../../MainFrame/Preferences/PreferencesContext';
+import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
+import { SubscriptionProvider } from '../../../../Profile/Subscription/SubscriptionContext';
+import { CreditsPackageStoreStateProvider } from '../../../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 
 export default {
   title: 'EventsFunctionsExtensionEditor/AiRequestChat/Chat',
@@ -58,18 +74,25 @@ const commonProps = {
   quota: {
     limitReached: false,
     current: 0,
-    max: 2,
-    period: '1day',
+    max: 20,
+    resetsAt: Date.now() + 1000 * 60 * 60 * 24 * 2,
+    period: '7days',
   },
-  onStartNewAiRequest: () => {},
-  onSendMessage: async () => {},
+  onStartNewAiRequest: action('onStartNewAiRequest'),
+  onSendUserMessage: action('onSendUserMessage'),
   isSending: false,
   price: {
-    priceInCredits: 5,
+    priceInCredits: 3,
     variablePrice: {
       agent: {
         default: {
-          minimumPriceInCredits: 4,
+          minimumPriceInCredits: 3,
+          maximumPriceInCredits: 20,
+        },
+      },
+      chat: {
+        default: {
+          minimumPriceInCredits: 3,
           maximumPriceInCredits: 20,
         },
       },
@@ -85,129 +108,8 @@ const commonProps = {
   setAutoProcessFunctionCalls: () => {},
   isAutoProcessingFunctionCalls: false,
   onStartOrOpenChat: () => {},
+  aiRequestMode: 'chat',
 };
-
-export const NewAiRequest = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat i18n={i18n} aiRequest={null} {...commonProps} />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
-);
-
-export const NewAiRequestAlreadyUsedOneInThePast = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={null}
-          {...commonProps}
-          quota={{
-            limitReached: false,
-            current: 1,
-            max: 2,
-            period: '1day',
-          }}
-          increaseQuotaOffering="upgrade"
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
-);
-
-export const ErrorLaunchingNewAiRequest = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={null}
-          {...commonProps}
-          lastSendError={new Error('Fake error while sending request')}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
-);
-
-export const NewAiRequestQuotaLimitReachedAndNoCredits = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={null}
-          {...commonProps}
-          quota={{
-            limitReached: true,
-            current: 2,
-            max: 2,
-          }}
-          availableCredits={0}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
-);
-
-export const NewAiRequestQuotaLimitReachedAndSomeCredits = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={null}
-          {...commonProps}
-          quota={{
-            limitReached: true,
-            current: 2,
-            max: 2,
-          }}
-          availableCredits={400}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
-);
-
-export const NewAiRequestQuotaLimitReachedAndUpgrade = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={null}
-          {...commonProps}
-          quota={{
-            limitReached: true,
-            current: 2,
-            max: 2,
-          }}
-          increaseQuotaOffering="upgrade"
-          availableCredits={400}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
-);
-
-export const LaunchingNewAiRequest = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          {...commonProps}
-          aiRequest={null}
-          isSending={true}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
-);
 
 const fakeOutputWithUserRequestOnly = [
   {
@@ -224,51 +126,16 @@ const fakeOutputWithUserRequestOnly = [
   },
 ];
 
-export const ErroredNewAiRequest = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={{
-            createdAt: '',
-            updatedAt: '',
-            id: 'fake-working-new-ai-request',
-            status: 'error',
-            userId: 'fake-user-id',
-            gameProjectJson: 'FAKE DATA',
-            output: fakeOutputWithUserRequestOnly,
-            error: { code: 'internal-error', message: 'Some error happened' },
-          }}
-          {...commonProps}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
-);
-
-export const WorkingNewAiRequest = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={{
-            createdAt: '',
-            updatedAt: '',
-            id: 'fake-working-new-ai-request',
-            status: 'working',
-            userId: 'fake-user-id',
-            gameProjectJson: 'FAKE DATA',
-            output: fakeOutputWithUserRequestOnly,
-            error: null,
-          }}
-          {...commonProps}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
-);
+const fakeAiRequest: AiRequest = {
+  createdAt: '',
+  updatedAt: '',
+  id: 'fake-working-new-ai-request',
+  status: 'ready',
+  userId: 'fake-user-id',
+  gameProjectJson: 'FAKE DATA',
+  output: fakeOutputWithUserRequestOnly,
+  error: null,
+};
 
 const fakeOutputWithAiResponses = [
   ...fakeOutputWithUserRequestOnly,
@@ -287,6 +154,10 @@ const fakeOutputWithAiResponses = [
     ],
   },
 ];
+const aiRequestWithAiResponses: AiRequest = {
+  ...fakeAiRequest,
+  output: fakeOutputWithAiResponses,
+};
 
 const fakeOutputWithMoreAiResponses = [
   ...fakeOutputWithUserRequestOnly,
@@ -320,6 +191,10 @@ const fakeOutputWithMoreAiResponses = [
     ])
     .flat(),
 ];
+const aiRequestWithMoreAiResponses: AiRequest = {
+  ...fakeAiRequest,
+  output: fakeOutputWithMoreAiResponses,
+};
 
 const fakeOutputWithEvenMoreAiResponses = [
   ...fakeOutputWithUserRequestOnly,
@@ -353,265 +228,423 @@ const fakeOutputWithEvenMoreAiResponses = [
     ])
     .flat(),
 ];
+const aiRequestWithEvenMoreAiResponses: AiRequest = {
+  ...fakeAiRequest,
+  output: fakeOutputWithEvenMoreAiResponses,
+};
+
+const WrappedChatComponent = (allProps: any) => {
+  const {
+    authenticatedUser,
+    automaticallyUseCreditsForAiRequests,
+    ...chatProps
+  } = allProps;
+  const authenticatedUserToUse =
+    authenticatedUser || fakeSilverAuthenticatedUser;
+  const [automaticallyUseCredits, setAutomaticallyUseCredits] = React.useState(
+    automaticallyUseCreditsForAiRequests || false
+  );
+  return (
+    <FixedHeightFlexContainer height={800}>
+      <FixedWidthFlexContainer width={600}>
+        <PreferencesContext.Provider
+          value={{
+            ...initialPreferences,
+            values: {
+              ...initialPreferences.values,
+              automaticallyUseCreditsForAiRequests: automaticallyUseCredits,
+            },
+            setAutomaticallyUseCreditsForAiRequests: (value: boolean) => {
+              setAutomaticallyUseCredits(value);
+            },
+          }}
+        >
+          <AuthenticatedUserContext.Provider value={authenticatedUserToUse}>
+            <SubscriptionProvider>
+              <CreditsPackageStoreStateProvider>
+                <I18n>
+                  {({ i18n }) => (
+                    <AiRequestChat
+                      i18n={i18n}
+                      {...commonProps}
+                      {...chatProps}
+                    />
+                  )}
+                </I18n>
+              </CreditsPackageStoreStateProvider>
+            </SubscriptionProvider>
+          </AuthenticatedUserContext.Provider>
+        </PreferencesContext.Provider>
+      </FixedWidthFlexContainer>
+    </FixedHeightFlexContainer>
+  );
+};
 
 export const ReadyAiRequest = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={{
-            createdAt: '',
-            updatedAt: '',
-            id: 'fake-working-new-ai-request',
-            status: 'ready',
-            userId: 'fake-user-id',
-            gameProjectJson: 'FAKE DATA',
-            output: fakeOutputWithAiResponses,
-            error: null,
-          }}
-          {...commonProps}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
+  <WrappedChatComponent
+    aiRequest={fakeAiRequest}
+    quota={{
+      limitReached: false,
+      current: 10,
+      max: 50,
+      resetsAt: Date.now() + 1000 * 60 * 60 * 24 * 2,
+      period: '7days',
+    }}
+  />
 );
 
-export const ReadyAiRequestWithMoreMessages = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={{
-            createdAt: '',
-            updatedAt: '',
-            id: 'fake-working-new-ai-request',
-            status: 'ready',
-            userId: 'fake-user-id',
-            gameProjectJson: 'FAKE DATA',
-            output: fakeOutputWithMoreAiResponses,
-            error: null,
-          }}
-          {...commonProps}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
+export const ReadyAiRequestWithAiResponses = () => (
+  <WrappedChatComponent
+    aiRequest={aiRequestWithAiResponses}
+    quota={{
+      limitReached: false,
+      current: 10,
+      max: 50,
+      resetsAt: Date.now() + 1000 * 60 * 60 * 24 * 2,
+      period: '7days',
+    }}
+  />
 );
 
-export const ReadyAiRequestWithEvenMoreMessages = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={{
-            createdAt: '',
-            updatedAt: '',
-            id: 'fake-working-new-ai-request',
-            status: 'ready',
-            userId: 'fake-user-id',
-            gameProjectJson: 'FAKE DATA',
-            output: fakeOutputWithEvenMoreAiResponses,
-            error: null,
-          }}
-          {...commonProps}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
+export const ReadyAiRequestWithMoreAiResponses = () => (
+  <WrappedChatComponent
+    aiRequest={aiRequestWithMoreAiResponses}
+    quota={{
+      limitReached: false,
+      current: 10,
+      max: 50,
+      resetsAt: Date.now() + 1000 * 60 * 60 * 24 * 2,
+      period: '7days',
+    }}
+  />
 );
 
-export const ReadyAiRequestAndAlreadyUsedOneInThePast = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={{
-            createdAt: '',
-            updatedAt: '',
-            id: 'fake-working-new-ai-request',
-            status: 'ready',
-            userId: 'fake-user-id',
-            gameProjectJson: 'FAKE DATA',
-            output: fakeOutputWithAiResponses,
-            error: null,
-          }}
-          {...commonProps}
-          increaseQuotaOffering="upgrade"
-          quota={{
-            limitReached: false,
-            current: 1,
-            max: 30,
-            period: '1day',
-          }}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
-);
-
-export const ErrorLaunchingFollowupAiRequest = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={{
-            createdAt: '',
-            updatedAt: '',
-            id: 'fake-working-new-ai-request',
-            status: 'ready',
-            userId: 'fake-user-id',
-            gameProjectJson: 'FAKE DATA',
-            output: fakeOutputWithAiResponses,
-            error: null,
-          }}
-          {...commonProps}
-          lastSendError={new Error('fake error while sending request')}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
+export const ReadyAiRequestWithEvenMoreAiResponses = () => (
+  <WrappedChatComponent
+    aiRequest={aiRequestWithEvenMoreAiResponses}
+    quota={{
+      limitReached: false,
+      current: 10,
+      max: 50,
+      resetsAt: Date.now() + 1000 * 60 * 60 * 24 * 2,
+      period: '7days',
+    }}
+  />
 );
 
 export const LaunchingFollowupAiRequest = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={{
-            createdAt: '',
-            updatedAt: '',
-            id: 'fake-working-new-ai-request',
-            status: 'ready',
-            userId: 'fake-user-id',
-            gameProjectJson: 'FAKE DATA',
-            output: fakeOutputWithAiResponses,
-            error: null,
-          }}
-          {...commonProps}
-          isSending={true}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
+  <WrappedChatComponent aiRequest={aiRequestWithAiResponses} isSending={true} />
 );
 
-export const QuotaLimitReached = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={{
-            createdAt: '',
-            updatedAt: '',
-            id: 'fake-working-new-ai-request',
-            status: 'ready',
-            userId: 'fake-user-id',
-            gameProjectJson: 'FAKE DATA',
-            output: fakeOutputWithAiResponses,
-            error: null,
-          }}
-          {...commonProps}
-          quota={{
-            limitReached: true,
-            current: 2,
-            max: 2,
-          }}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
+export const ErrorLaunchingFollowupAiRequest = () => (
+  <WrappedChatComponent
+    aiRequest={aiRequestWithAiResponses}
+    lastSendError={new Error('fake error while sending request')}
+  />
 );
 
-export const QuotaLimitReachedAndUpgrade = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={{
-            createdAt: '',
-            updatedAt: '',
-            id: 'fake-working-new-ai-request',
-            status: 'ready',
-            userId: 'fake-user-id',
-            gameProjectJson: 'FAKE DATA',
-            output: fakeOutputWithAiResponses,
-            error: null,
-          }}
-          {...commonProps}
-          quota={{
-            limitReached: true,
-            current: 2,
-            max: 2,
-          }}
-          increaseQuotaOffering="upgrade"
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
-);
+export const QuotaLimitsReachedAndAutomaticallyUsingCredits = () => {
+  const quota = {
+    limitReached: true,
+    current: 100,
+    max: 100,
+    resetsAt: Date.now() + 1000 * 60 * 60 * 24 * 2,
+    period: '7days',
+  };
 
-export const QuotaLimitReachedAndNoUpgrade = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={{
-            createdAt: '',
-            updatedAt: '',
-            id: 'fake-working-new-ai-request',
-            status: 'ready',
-            userId: 'fake-user-id',
-            gameProjectJson: 'FAKE DATA',
-            output: fakeOutputWithAiResponses,
-            error: null,
-          }}
-          {...commonProps}
-          quota={{
-            limitReached: true,
-            current: 2,
-            max: 2,
-          }}
-          increaseQuotaOffering="none"
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
-);
-export const QuotaLimitReachedAndNoCredits = () => (
-  <FixedHeightFlexContainer height={500}>
-    <I18n>
-      {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={{
-            createdAt: '',
-            updatedAt: '',
-            id: 'fake-working-new-ai-request',
-            status: 'ready',
-            userId: 'fake-user-id',
-            gameProjectJson: 'FAKE DATA',
-            output: fakeOutputWithAiResponses,
-            error: null,
-          }}
-          {...commonProps}
-          quota={{
-            limitReached: true,
-            current: 2,
-            max: 2,
-          }}
-          increaseQuotaOffering="none"
-          availableCredits={0}
-        />
-      )}
-    </I18n>
-  </FixedHeightFlexContainer>
-);
+  return (
+    <WrappedChatComponent
+      aiRequest={aiRequestWithAiResponses}
+      quota={quota}
+      isAutoProcessingFunctionCalls={true}
+      authenticatedUser={{
+        ...defaultAuthenticatedUserWithNoSubscription,
+        limits: {
+          ...limitsForNoSubscriptionUser,
+          credits: {
+            userBalance: {
+              amount: 400,
+            },
+          },
+          quotas: {
+            'consumed-ai-credits': quota,
+          },
+        },
+      }}
+      automaticallyUseCreditsForAiRequests={true}
+      availableCredits={400}
+    />
+  );
+};
+
+export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeft = () => {
+  const quota = {
+    limitReached: true,
+    current: 100,
+    max: 100,
+    resetsAt: Date.now() + 1000 * 60 * 60 * 24 * 2,
+    period: '7days',
+  };
+
+  return (
+    <WrappedChatComponent
+      aiRequest={aiRequestWithAiResponses}
+      quota={quota}
+      isAutoProcessingFunctionCalls={true}
+      authenticatedUser={{
+        ...defaultAuthenticatedUserWithNoSubscription,
+        limits: {
+          ...limitsForNoSubscriptionUser,
+          credits: {
+            userBalance: {
+              amount: 0,
+            },
+          },
+          quotas: {
+            'consumed-ai-credits': quota,
+          },
+        },
+      }}
+      automaticallyUseCreditsForAiRequests={true}
+      availableCredits={0}
+    />
+  );
+};
+
+export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = () => {
+  const quota = {
+    limitReached: true,
+    current: 100,
+    max: 100,
+    resetsAt: Date.now() + 1000 * 60 * 60 * 24 * 2,
+    period: '7days',
+  };
+
+  return (
+    <WrappedChatComponent
+      aiRequest={aiRequestWithAiResponses}
+      quota={quota}
+      isAutoProcessingFunctionCalls={true}
+      authenticatedUser={{
+        ...fakeSilverAuthenticatedUser,
+        limits: {
+          ...limitsForSilverUser,
+          credits: {
+            userBalance: {
+              amount: 0,
+            },
+          },
+          quotas: {
+            'consumed-ai-credits': quota,
+          },
+        },
+      }}
+      automaticallyUseCreditsForAiRequests={true}
+      availableCredits={0}
+    />
+  );
+};
+
+export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = () => {
+  const quota = {
+    limitReached: true,
+    current: 100,
+    max: 100,
+    resetsAt: Date.now() + 1000 * 60 * 60 * 24 * 2,
+    period: '7days',
+  };
+
+  return (
+    <WrappedChatComponent
+      aiRequest={aiRequestWithAiResponses}
+      quota={quota}
+      isAutoProcessingFunctionCalls={true}
+      authenticatedUser={{
+        ...fakeStartupAuthenticatedUser,
+        limits: {
+          ...limitsForStartupUser,
+          credits: {
+            userBalance: {
+              amount: 0,
+            },
+          },
+          quotas: {
+            'consumed-ai-credits': quota,
+          },
+        },
+      }}
+      automaticallyUseCreditsForAiRequests={true}
+      availableCredits={0}
+    />
+  );
+};
+
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCredits = () => {
+  const quota = {
+    limitReached: true,
+    current: 100,
+    max: 100,
+    resetsAt: Date.now() + 1000 * 60 * 60 * 24 * 2,
+    period: '7days',
+  };
+
+  return (
+    <WrappedChatComponent
+      aiRequest={aiRequestWithAiResponses}
+      quota={quota}
+      isAutoProcessingFunctionCalls={true}
+      authenticatedUser={{
+        ...defaultAuthenticatedUserWithNoSubscription,
+        limits: {
+          ...limitsForNoSubscriptionUser,
+          credits: {
+            userBalance: {
+              amount: 400,
+            },
+          },
+          quotas: {
+            'consumed-ai-credits': quota,
+          },
+        },
+      }}
+      automaticallyUseCreditsForAiRequests={false}
+      availableCredits={400}
+    />
+  );
+};
+
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeft = () => {
+  const quota = {
+    limitReached: true,
+    current: 100,
+    max: 100,
+    resetsAt: Date.now() + 1000 * 60 * 60 * 24 * 2,
+    period: '7days',
+  };
+
+  return (
+    <WrappedChatComponent
+      aiRequest={aiRequestWithAiResponses}
+      quota={quota}
+      isAutoProcessingFunctionCalls={true}
+      authenticatedUser={{
+        ...defaultAuthenticatedUserWithNoSubscription,
+        limits: {
+          ...limitsForNoSubscriptionUser,
+          credits: {
+            userBalance: {
+              amount: 0,
+            },
+          },
+          quotas: {
+            'consumed-ai-credits': quota,
+          },
+        },
+      }}
+      automaticallyUseCreditsForAiRequests={false}
+      availableCredits={0}
+    />
+  );
+};
+
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubscription = () => {
+  const quota = {
+    limitReached: true,
+    current: 100,
+    max: 100,
+    resetsAt: Date.now() + 1000 * 60 * 60 * 24 * 2,
+    period: '7days',
+  };
+
+  return (
+    <WrappedChatComponent
+      aiRequest={aiRequestWithAiResponses}
+      quota={quota}
+      isAutoProcessingFunctionCalls={true}
+      authenticatedUser={{
+        ...defaultAuthenticatedUserWithNoSubscription,
+        limits: {
+          ...limitsForNoSubscriptionUser,
+          credits: {
+            userBalance: {
+              amount: 0,
+            },
+          },
+          quotas: {
+            'consumed-ai-credits': quota,
+          },
+        },
+      }}
+      automaticallyUseCreditsForAiRequests={false}
+      availableCredits={0}
+    />
+  );
+};
+
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = () => {
+  const quota = {
+    limitReached: true,
+    current: 100,
+    max: 100,
+    resetsAt: Date.now() + 1000 * 60 * 60 * 24 * 2,
+    period: '7days',
+  };
+
+  return (
+    <WrappedChatComponent
+      aiRequest={aiRequestWithAiResponses}
+      quota={quota}
+      isAutoProcessingFunctionCalls={true}
+      authenticatedUser={{
+        ...fakeSilverAuthenticatedUser,
+        limits: {
+          ...limitsForSilverUser,
+          credits: {
+            userBalance: {
+              amount: 0,
+            },
+          },
+          quotas: {
+            'consumed-ai-credits': quota,
+          },
+        },
+      }}
+      automaticallyUseCreditsForAiRequests={false}
+      availableCredits={0}
+    />
+  );
+};
+
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = () => {
+  const quota = {
+    limitReached: true,
+    current: 100,
+    max: 100,
+    resetsAt: Date.now() + 1000 * 60 * 60 * 24 * 2,
+    period: '7days',
+  };
+
+  return (
+    <WrappedChatComponent
+      aiRequest={aiRequestWithAiResponses}
+      quota={quota}
+      isAutoProcessingFunctionCalls={true}
+      authenticatedUser={{
+        ...fakeStartupAuthenticatedUser,
+        limits: {
+          ...limitsForStartupUser,
+          credits: {
+            userBalance: {
+              amount: 0,
+            },
+          },
+          quotas: {
+            'consumed-ai-credits': quota,
+          },
+        },
+      }}
+      automaticallyUseCreditsForAiRequests={false}
+      availableCredits={0}
+    />
+  );
+};

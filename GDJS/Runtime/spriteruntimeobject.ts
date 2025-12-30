@@ -4,7 +4,10 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
-  /** Represents the data of a {@link gdjs.SpriteRuntimeObject}. */
+  /**
+   * Represents the data of a {@link gdjs.SpriteRuntimeObject}.
+   * @category Objects > Sprite
+   */
   export type SpriteObjectDataType = {
     /** Update the object even if he is not visible?. */
     updateIfNotVisible: boolean;
@@ -14,8 +17,14 @@ namespace gdjs {
     animations: Array<SpriteAnimationData>;
   };
 
+  /**
+   * @category Objects > Sprite
+   */
   export type SpriteObjectData = ObjectData & SpriteObjectDataType;
 
+  /**
+   * @category Objects > Sprite
+   */
   export type SpriteNetworkSyncDataType = {
     anim: SpriteAnimatorNetworkSyncData;
     ifx: boolean;
@@ -26,11 +35,15 @@ namespace gdjs {
     color: string;
   };
 
+  /**
+   * @category Objects > Sprite
+   */
   export type SpriteNetworkSyncData = ObjectNetworkSyncData &
     SpriteNetworkSyncDataType;
 
   /**
    * The SpriteRuntimeObject represents an object that can display images.
+   * @category Objects > Sprite
    */
   export class SpriteRuntimeObject
     extends gdjs.RuntimeObject
@@ -190,15 +203,13 @@ namespace gdjs {
         this.setWidth(initialInstanceData.width);
         this.setHeight(initialInstanceData.height);
       }
-      if (initialInstanceData.opacity !== undefined) {
-        this.setOpacity(initialInstanceData.opacity);
-      }
-      if (initialInstanceData.flippedX) {
-        this.flipX(initialInstanceData.flippedX);
-      }
-      if (initialInstanceData.flippedY) {
-        this.flipY(initialInstanceData.flippedY);
-      }
+      this.setOpacity(
+        initialInstanceData.opacity === undefined
+          ? 255
+          : initialInstanceData.opacity
+      );
+      this.flipX(!!initialInstanceData.flippedX);
+      this.flipY(!!initialInstanceData.flippedY);
     }
 
     /**
@@ -628,17 +639,15 @@ namespace gdjs {
      */
     getCenterX(): float {
       const animationFrame = this._animator.getCurrentFrame();
-      if (animationFrame === null) {
-        return 0;
-      }
+      const centerX = animationFrame
+        ? animationFrame.center.x
+        : this._renderer.getUnscaledWidth() / 2;
       if (!this._flippedX) {
         //Just need to multiply by the scale as it is the center.
-        return (
-          animationFrame.center.x * Math.abs(this._scaleX * this._preScale)
-        );
+        return centerX * Math.abs(this._scaleX * this._preScale);
       } else {
         return (
-          (this._renderer.getUnscaledWidth() - animationFrame.center.x) *
+          (this._renderer.getUnscaledWidth() - centerX) *
           Math.abs(this._scaleX * this._preScale)
         );
       }
@@ -650,17 +659,15 @@ namespace gdjs {
      */
     getCenterY(): float {
       const animationFrame = this._animator.getCurrentFrame();
-      if (animationFrame === null) {
-        return 0;
-      }
+      const centerY = animationFrame
+        ? animationFrame.center.y
+        : this._renderer.getUnscaledHeight() / 2;
       if (!this._flippedY) {
         //Just need to multiply by the scale as it is the center.
-        return (
-          animationFrame.center.y * Math.abs(this._scaleY * this._preScale)
-        );
+        return centerY * Math.abs(this._scaleY * this._preScale);
       } else {
         return (
-          (this._renderer.getUnscaledHeight() - animationFrame.center.y) *
+          (this._renderer.getUnscaledHeight() - centerY) *
           Math.abs(this._scaleY * this._preScale)
         );
       }
@@ -675,11 +682,8 @@ namespace gdjs {
         return;
       }
       this.x = x;
-      const animationFrame = this._animator.getCurrentFrame();
-      if (animationFrame !== null) {
-        this.invalidateHitboxes();
-        this._renderer.updateX();
-      }
+      this.invalidateHitboxes();
+      this._renderer.updateX();
     }
 
     /**
@@ -691,11 +695,8 @@ namespace gdjs {
         return;
       }
       this.y = y;
-      const animationFrame = this._animator.getCurrentFrame();
-      if (animationFrame !== null) {
-        this.invalidateHitboxes();
-        this._renderer.updateY();
-      }
+      this.invalidateHitboxes();
+      this._renderer.updateY();
     }
 
     /**
@@ -851,6 +852,14 @@ namespace gdjs {
     setSize(newWidth: float, newHeight: float): void {
       this.setWidth(newWidth);
       this.setHeight(newHeight);
+    }
+
+    override getOriginalWidth(): float {
+      return this._renderer.getUnscaledWidth() * this._preScale;
+    }
+
+    override getOriginalHeight(): float {
+      return this._renderer.getUnscaledHeight() * this._preScale;
     }
 
     /**

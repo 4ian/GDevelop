@@ -172,6 +172,10 @@ export default class BrowserSWFileSystem {
     if (!this.isAbsolute(baseDirectory))
       baseDirectory = path.resolve(baseDirectory);
 
+    if (isURL(baseDirectory)) {
+      return baseDirectory + '/' + filename;
+    }
+
     return path.resolve(baseDirectory, path.normalize(filename));
   };
 

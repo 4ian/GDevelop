@@ -18,6 +18,7 @@ const styles = {
     overflowY: 'hidden',
     paddingLeft: 8,
     paddingRight: 8,
+    alignItems: 'center',
     position: 'relative', // to ensure it is displayed above any global iframe.
   },
 };

@@ -22,6 +22,19 @@ describe('gdjs.ResourceLoader', () => {
       title: '',
       variables: [],
       usedResources,
+      uiSettings: {
+        grid: false,
+        gridType: 'rectangular',
+        gridWidth: 10,
+        gridHeight: 10,
+        gridDepth: 10,
+        gridOffsetX: 0,
+        gridOffsetY: 0,
+        gridOffsetZ: 0,
+        gridColor: 0,
+        gridAlpha: 1,
+        snap: false,
+      }
     };
   };
 

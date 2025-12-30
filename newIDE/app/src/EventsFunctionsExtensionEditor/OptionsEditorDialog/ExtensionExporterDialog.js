@@ -11,11 +11,33 @@ import EventsFunctionsExtensionsContext, {
 } from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import Window from '../../Utils/Window';
 import Upload from '../../UI/CustomSvgIcons/Upload';
+import { serializeToJSObject } from '../../Utils/Serializer';
+
+const gd: libGDevelop = global.gd;
 
 const exportExtension = async (
-  eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
-  eventsFunctionsExtension: gdEventsFunctionsExtension
+  project: gdProject,
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
+  eventsFunctionsExtensionsState: EventsFunctionsExtensionsState
 ) => {
+  const requiredExtensions = gd.UsedExtensionsFinder.scanEventsFunctionsExtension(
+    project,
+    eventsFunctionsExtension
+  )
+    .getUsedExtensions()
+    .toNewVectorString()
+    .toJSArray()
+    .filter(
+      extensionName =>
+        extensionName !== eventsFunctionsExtension.getName() &&
+        project.hasEventsFunctionsExtensionNamed(extensionName)
+    )
+    .map(extensionName => ({
+      extensionName,
+      extensionVersion: project
+        .getEventsFunctionsExtension(extensionName)
+        .getVersion(),
+    }));
   const eventsFunctionsExtensionWriter = eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
   if (!eventsFunctionsExtensionWriter) {
     // This won't happen in practice because this view can't be reached from the web-app.
@@ -29,19 +51,28 @@ const exportExtension = async (
 
   if (!pathOrUrl) return;
 
-  await eventsFunctionsExtensionWriter.writeEventsFunctionsExtension(
+  const serializedObject = serializeToJSObject(
     eventsFunctionsExtension,
+    'serializeToExternal'
+  );
+  if (requiredExtensions.length > 0) {
+    serializedObject.requiredExtensions = requiredExtensions;
+  }
+  await eventsFunctionsExtensionWriter.writeSerializedObject(
+    serializedObject,
     pathOrUrl
   );
 };
 
-const openGitHubIssue = () => {
+const openGitHubIssue = (isFromTheStore: boolean) => {
   Window.openExternalURL(
-    'https://github.com/GDevelopApp/GDevelop-extensions/issues/new?assignees=&labels=%E2%9C%A8+New+extension&template=new-extension.yml&title=New+extension%3A+%3Ctitle%3E'
+    'https://github.com/GDevelopApp/GDevelop-extensions/issues/new?template=' +
+      (isFromTheStore ? 'extension-update.yml' : 'new-extension.yml')
   );
 };
 
 type Props = {|
+  project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   onClose: () => void,
 |};
@@ -51,14 +82,24 @@ const ExtensionExporterDialog = (props: Props) => {
     EventsFunctionsExtensionsContext
   );
 
+  const isFromTheStore =
+    props.eventsFunctionsExtension.getOriginName() ===
+    'gdevelop-extension-store';
+
   return (
     <Dialog
       title={<Trans>Export extension</Trans>}
       secondaryActions={[
         <HelpButton key="help" helpPagePath="/extensions/share-extension/" />,
         <FlatButton
-          label={<Trans>Submit to the community</Trans>}
-          onClick={openGitHubIssue}
+          label={
+            isFromTheStore ? (
+              <Trans>Submit an update</Trans>
+            ) : (
+              <Trans>Submit to the community</Trans>
+            )
+          }
+          onClick={() => openGitHubIssue(isFromTheStore)}
         />,
       ]}
       actions={[
@@ -77,8 +118,9 @@ const ExtensionExporterDialog = (props: Props) => {
           label={<Trans>Export to a file</Trans>}
           onClick={() => {
             exportExtension(
-              eventsFunctionsExtensionsState,
-              props.eventsFunctionsExtension
+              props.project,
+              props.eventsFunctionsExtension,
+              eventsFunctionsExtensionsState
             );
           }}
         />,

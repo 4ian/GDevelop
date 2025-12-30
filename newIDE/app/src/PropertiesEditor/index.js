@@ -35,23 +35,11 @@ import {
   type SectionTitle,
   type ResourceField,
   type LeaderboardIdField,
-} from '../CompactPropertiesEditor';
+  type Instances,
+} from './PropertiesEditorSchema';
 import LeaderboardIdPropertyField from './LeaderboardIdPropertyField';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
-
-// Re-export the types.
-export type {
-  Schema,
-  ValueField,
-  ActionButton,
-  SectionTitle,
-  ResourceField,
-  Field,
-} from '../CompactPropertiesEditor';
-
-// An "instance" here is the objects for which properties are shown
-export type Instance = Object; // This could be improved using generics.
-export type Instances = Array<Instance>;
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 type Props = {|
   onInstancesModified?: Instances => void,
@@ -66,6 +54,7 @@ type Props = {|
 
   // Optional context:
   project?: ?gdProject,
+  projectScopedContainersAccessor?: ProjectScopedContainersAccessor,
   resourceManagementProps?: ?ResourceManagementProps,
 |};
 
@@ -166,6 +155,7 @@ const PropertiesEditor = ({
   renderExtraDescriptionText,
   unsavedChanges,
   project,
+  projectScopedContainersAccessor,
   resourceManagementProps,
 }: Props) => {
   const forceUpdate = useForceUpdate();
@@ -507,7 +497,11 @@ const PropertiesEditor = ({
   );
 
   const renderResourceField = (field: ResourceField) => {
-    if (!project || !resourceManagementProps) {
+    if (
+      !project ||
+      !resourceManagementProps ||
+      !projectScopedContainersAccessor
+    ) {
       console.error(
         'You tried to display a resource field in a PropertiesEditor that does not support display resources. If you need to display resources, pass additional props (project, resourceManagementProps).'
       );
@@ -519,6 +513,7 @@ const PropertiesEditor = ({
       <ResourceSelectorWithThumbnail
         key={field.name}
         project={project}
+        projectScopedContainersAccessor={projectScopedContainersAccessor}
         resourceManagementProps={resourceManagementProps}
         resourceKind={field.resourceKind}
         resourceName={getFieldValue({
@@ -601,6 +596,9 @@ const PropertiesEditor = ({
                 <PropertiesEditor
                   project={project}
                   resourceManagementProps={resourceManagementProps}
+                  projectScopedContainersAccessor={
+                    projectScopedContainersAccessor
+                  }
                   schema={field.children}
                   instances={instances}
                   mode="row"
@@ -629,6 +627,9 @@ const PropertiesEditor = ({
                 <PropertiesEditor
                   project={project}
                   resourceManagementProps={resourceManagementProps}
+                  projectScopedContainersAccessor={
+                    projectScopedContainersAccessor
+                  }
                   schema={field.children}
                   instances={instances}
                   mode="column"

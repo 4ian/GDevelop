@@ -376,7 +376,7 @@ export const limitsForNoSubscriptionUser: Limits = {
       maxPlayersPerLobby: 4,
       themeCustomizationCapabilities: 'NONE',
     },
-    versionHistory: { enabled: false },
+    versionHistory: { enabled: false, retentionDays: 0 },
     ai: {
       availablePresets: [],
     },
@@ -386,16 +386,19 @@ export const limitsForNoSubscriptionUser: Limits = {
       current: 0,
       max: 2,
       limitReached: false,
+      period: '30days',
     },
     'ai-project-generation': {
       current: 0,
       max: 3,
       limitReached: false,
+      period: '30days',
     },
     'ask-question': {
       current: 1,
       max: 3,
       limitReached: false,
+      period: '30days',
     },
   },
   credits: {
@@ -434,7 +437,7 @@ export const limitsForSilverUser: Limits = {
       maxPlayersPerLobby: 8,
       themeCustomizationCapabilities: 'BASIC',
     },
-    versionHistory: { enabled: false },
+    versionHistory: { enabled: false, retentionDays: 2 },
     ai: {
       availablePresets: [],
     },
@@ -444,16 +447,19 @@ export const limitsForSilverUser: Limits = {
       current: 2,
       max: 10,
       limitReached: false,
+      period: '30days',
     },
     'ai-project-generation': {
       current: 3,
       max: 1000,
       limitReached: false,
+      period: '30days',
     },
     'ask-question': {
       current: 1,
       max: 10,
       limitReached: false,
+      period: '30days',
     },
   },
   credits: {
@@ -492,7 +498,7 @@ export const limitsForGoldUser: Limits = {
       maxPlayersPerLobby: 8,
       themeCustomizationCapabilities: 'BASIC',
     },
-    versionHistory: { enabled: false },
+    versionHistory: { enabled: false, retentionDays: 5 },
     ai: {
       availablePresets: [],
     },
@@ -502,16 +508,19 @@ export const limitsForGoldUser: Limits = {
       current: 2,
       max: 70,
       limitReached: false,
+      period: '30days',
     },
     'ai-project-generation': {
       current: 3,
       max: 1000,
       limitReached: false,
+      period: '30days',
     },
     'ask-question': {
       current: 1,
       max: 3,
       limitReached: false,
+      period: '30days',
     },
   },
   credits: {
@@ -562,7 +571,7 @@ export const limitsForTeacherUser: Limits = {
       maxPlayersPerLobby: 8,
       themeCustomizationCapabilities: 'BASIC',
     },
-    versionHistory: { enabled: true },
+    versionHistory: { enabled: true, retentionDays: -1 },
     ai: {
       availablePresets: [],
     },
@@ -572,16 +581,19 @@ export const limitsForTeacherUser: Limits = {
       current: 2,
       max: 70,
       limitReached: false,
+      period: '30days',
     },
     'ai-project-generation': {
       current: 3,
       max: 1000,
       limitReached: false,
+      period: '30days',
     },
     'ask-question': {
       current: 1,
       max: 3,
       limitReached: false,
+      period: '30days',
     },
   },
   credits: {
@@ -629,7 +641,7 @@ export const limitsForStudentUser: Limits = {
       maxPlayersPerLobby: 8,
       themeCustomizationCapabilities: 'BASIC',
     },
-    versionHistory: { enabled: true },
+    versionHistory: { enabled: true, retentionDays: -1 },
     ai: {
       availablePresets: [],
     },
@@ -639,16 +651,19 @@ export const limitsForStudentUser: Limits = {
       current: 2,
       max: 70,
       limitReached: false,
+      period: '30days',
     },
     'ai-project-generation': {
       current: 3,
       max: 1000,
       limitReached: false,
+      period: '30days',
     },
     'ask-question': {
       current: 1,
       max: 3,
       limitReached: false,
+      period: '30days',
     },
   },
   credits: {
@@ -687,7 +702,7 @@ export const limitsForStartupUser: Limits = {
       maxPlayersPerLobby: 8,
       themeCustomizationCapabilities: 'FULL',
     },
-    versionHistory: { enabled: true },
+    versionHistory: { enabled: true, retentionDays: -1 },
     ai: {
       availablePresets: [],
     },
@@ -697,16 +712,19 @@ export const limitsForStartupUser: Limits = {
       current: 2,
       max: 1000,
       limitReached: false,
+      period: '30days',
     },
     'ai-project-generation': {
       current: 3,
       max: 1000,
       limitReached: false,
+      period: '30days',
     },
     'ask-question': {
       current: 1,
       max: 3,
       limitReached: false,
+      period: '30days',
     },
   },
   credits: {
@@ -745,7 +763,7 @@ export const limitsReached: Limits = {
       maxPlayersPerLobby: 8,
       themeCustomizationCapabilities: 'BASIC',
     },
-    versionHistory: { enabled: false },
+    versionHistory: { enabled: false, retentionDays: 0 },
     ai: {
       availablePresets: [],
     },
@@ -755,11 +773,13 @@ export const limitsReached: Limits = {
       current: 10,
       max: 10,
       limitReached: true,
+      period: '30days',
     },
     'ai-project-generation': {
       current: 3,
       max: 3,
       limitReached: true,
+      period: '30days',
     },
   },
   credits: {
@@ -798,7 +818,7 @@ export const limitsForNoSubscriptionUserWithCredits: Limits = {
       maxPlayersPerLobby: 4,
       themeCustomizationCapabilities: 'NONE',
     },
-    versionHistory: { enabled: false },
+    versionHistory: { enabled: false, retentionDays: 0 },
     ai: {
       availablePresets: [],
     },
@@ -808,11 +828,13 @@ export const limitsForNoSubscriptionUserWithCredits: Limits = {
       current: 0,
       max: 2,
       limitReached: false,
+      period: '30days',
     },
     'ai-project-generation': {
       current: 0,
       max: 3,
       limitReached: false,
+      period: '30days',
     },
   },
   credits: {

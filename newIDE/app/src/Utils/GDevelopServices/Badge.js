@@ -6,6 +6,10 @@ import { type MessageByLocale } from '../i18n/MessageByLocale';
 
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { extractGDevelopApiErrorStatusAndCode } from './Errors';
+import {
+  ensureIsArray,
+  ensureIsNullOrObjectHasProperty,
+} from '../DataValidator';
 
 export const TRIVIAL_FIRST_EVENT = 'trivial_first-event';
 export const TRIVIAL_FIRST_BEHAVIOR = 'trivial_first-behavior';
@@ -84,7 +88,11 @@ export const createOrEnsureBadgeForUser = async (
       }
     );
     onBadgesChanged();
-    return response.data;
+    return ensureIsNullOrObjectHasProperty({
+      data: response.data,
+      propertyName: 'achievementId',
+      endpointName: '/user/{id}/badge of User API',
+    });
   } catch (error) {
     const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(error);
     if (extractedStatusAndCode && extractedStatusAndCode.status === 409) {
@@ -126,12 +134,10 @@ export const addCreateBadgePreHookIfNotClaimed = <
 export const getAchievements = async (): Promise<Array<Achievement>> => {
   const response = await axios.get(`${GDevelopUserApi.baseUrl}/achievement`);
 
-  const achievements = response.data;
-  if (!Array.isArray(achievements)) {
-    throw new Error('Invalid response from the achievements API');
-  }
-
-  return achievements;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/achievement of User API',
+  });
 };
 
 export const markBadgesAsSeen = async (
@@ -167,7 +173,9 @@ export const markBadgesAsSeen = async (
       }
     );
     onBadgesChanged();
-    return response.data;
+    const data = response.data;
+    // Note: response.data might be undefined for PATCH requests, so we don't validate it
+    return data;
   } catch (err) {
     console.error(`Couldn't mark badges as seen: ${err}`);
   }

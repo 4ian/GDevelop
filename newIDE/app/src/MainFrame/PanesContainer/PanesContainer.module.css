@@ -52,6 +52,14 @@
   animation: slide-in-left 0.15s ease-out;
 }
 
+.rightResizer:not(.hidden) {
+  animation: slide-in-right 0.15s ease-out;
+}
+
+.leftResizer:not(.hidden) {
+  animation: slide-in-left 0.15s ease-out;
+}
+
 /* Pane as drawer */
 .pane.drawer {
   width: min(calc(100vw - 82px), 320px);
@@ -85,6 +93,7 @@
 
 .centerPane {
   flex: 1;
+  pointer-events: none; /* Let the pointer events go through, and the pane itself is responsible for setting them back when necessary. */
 }
 
 .hidden {
@@ -93,9 +102,9 @@
 
 .resizer {
   z-index: 1; /* To allow the shadow to be visible. */
-  width: 2px;
+  width: 3px;
   cursor: ew-resize;
-  background-color: transparent;
+  background-color: var(--theme-surface-window-background-color);
   flex-shrink: 0;
   pointer-events: all;
 }

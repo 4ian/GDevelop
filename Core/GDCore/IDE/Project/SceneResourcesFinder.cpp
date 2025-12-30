@@ -6,6 +6,7 @@
 #include "SceneResourcesFinder.h"
 
 #include "GDCore/IDE/ResourceExposer.h"
+#include "GDCore/Project/EventsBasedObjectVariant.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Serialization/SerializerElement.h"
@@ -27,8 +28,18 @@ std::set<gd::String> SceneResourcesFinder::FindSceneResources(gd::Project &proje
   return resourceWorker.resourceNames;
 }
 
+std::set<gd::String> SceneResourcesFinder::FindEventsBasedObjectVariantResources(gd::Project &project,
+    gd::EventsBasedObjectVariant &variant) {
+  gd::SceneResourcesFinder resourceWorker(project.GetResourcesManager());
+
+  gd::ResourceExposer::ExposeEventsBasedObjectVariantResources(project, variant, resourceWorker);
+  return resourceWorker.resourceNames;
+}
+
 void SceneResourcesFinder::AddUsedResource(gd::String &resourceName) {
-  if (resourceName.empty()) {
+  if (resourceName.empty() ||
+      // It avoids to list resource parameters and properties.
+      !resourcesManager->HasResource(resourceName)) {
     return;
   }
   resourceNames.insert(resourceName);

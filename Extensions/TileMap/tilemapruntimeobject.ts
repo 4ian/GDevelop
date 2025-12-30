@@ -1,5 +1,8 @@
 /// <reference path="helper/TileMapHelper.d.ts" />
 namespace gdjs {
+  /**
+   * @category Objects > Tile Map
+   */
   export type TilemapObjectDataType = {
     content: {
       tilemapJsonFile: string;
@@ -13,8 +16,14 @@ namespace gdjs {
     };
   };
 
+  /**
+   * @category Objects > Tile Map
+   */
   export type TilemapObjectData = ObjectData & TilemapObjectDataType;
 
+  /**
+   * @category Objects > Tile Map
+   */
   export type TilemapNetworkSyncDataType = {
     op: number;
     tmjf: string;
@@ -26,11 +35,15 @@ namespace gdjs {
     asps: number;
   };
 
+  /**
+   * @category Objects > Tile Map
+   */
   export type TilemapNetworkSyncData = ObjectNetworkSyncData &
     TilemapNetworkSyncDataType;
 
   /**
    * Displays a Tilemap object (LDtk and Tiled).
+   * @category Objects > Tile Map
    */
   export class TileMapRuntimeObject
     extends gdjs.RuntimeObject
@@ -197,9 +210,11 @@ namespace gdjs {
         this.setWidth(initialInstanceData.width);
         this.setHeight(initialInstanceData.height);
       }
-      if (initialInstanceData.opacity !== undefined) {
-        this.setOpacity(initialInstanceData.opacity);
-      }
+      this.setOpacity(
+        initialInstanceData.opacity === undefined
+          ? 255
+          : initialInstanceData.opacity
+      );
     }
 
     updateTileMap(): void {
@@ -341,6 +356,14 @@ namespace gdjs {
     setSize(newWidth: float, newHeight: float): void {
       this.setWidth(newWidth);
       this.setHeight(newHeight);
+    }
+
+    override getOriginalWidth(): float {
+      return this.getTileMapWidth();
+    }
+
+    override getOriginalHeight(): float {
+      return this.getTileMapHeight();
     }
 
     /**

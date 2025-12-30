@@ -182,6 +182,8 @@ class GD_CORE_API Layer {
   }
   double GetCamera3DFieldOfView() const { return camera3DFieldOfView; }
   void SetCamera3DFieldOfView(double angle) { camera3DFieldOfView = angle; }
+  double GetCamera2DPlaneMaxDrawingDistance() const { return camera2DPlaneMaxDrawingDistance; }
+  void SetCamera2DPlaneMaxDrawingDistance(double distance) { camera2DPlaneMaxDrawingDistance = distance; }
   ///@}
 
   /** \name Cameras
@@ -292,6 +294,7 @@ class GD_CORE_API Layer {
   double camera3DNearPlaneDistance;  ///< 3D camera frustum near plan distance
   double camera3DFarPlaneDistance;   ///< 3D camera frustum far plan distance
   double camera3DFieldOfView;        ///< 3D camera field of view (fov) in degrees
+  double camera2DPlaneMaxDrawingDistance;  ///< Max drawing distance of the 2D plane when in the 3D world
   unsigned int ambientLightColorR;   ///< Ambient light color Red component
   unsigned int ambientLightColorG;   ///< Ambient light color Green component
   unsigned int ambientLightColorB;   ///< Ambient light color Blue component

@@ -383,9 +383,20 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
     ).filter(Boolean);
 
     const extensionsSummary: ProjectSpecificExtensionsSummary = {
-      extensionSummaries: projectSpecificExtensions.map(extension =>
-        buildExtensionSummary({ gd, extension })
-      ),
+      extensionSummaries: projectSpecificExtensions.map(extension => {
+        const extensionName = extension.getName();
+        const eventsFunctionsExtension = project.hasEventsFunctionsExtensionNamed(
+          extensionName
+        )
+          ? project.getEventsFunctionsExtension(extensionName)
+          : null;
+
+        return buildExtensionSummary({
+          gd,
+          eventsFunctionsExtension,
+          extension,
+        });
+      }),
     };
 
     const duration = Date.now() - startTime;

@@ -51,8 +51,7 @@ type Props = {|
     options: {
       openAllScenes: boolean,
       openQuickCustomizationDialog: boolean,
-      dontOpenAnySceneOrProjectManager: boolean,
-      dontRepositionAskAiEditor: boolean,
+      forceOpenAskAiEditor: boolean,
     },
   |}) => Promise<void>,
   onError: () => void,
@@ -275,8 +274,7 @@ const useCreateProject = ({
           options: {
             openAllScenes: !!options && options.openAllScenes,
             openQuickCustomizationDialog: !!newProjectSetup.openQuickCustomizationDialog,
-            dontOpenAnySceneOrProjectManager: !!newProjectSetup.dontOpenAnySceneOrProjectManager,
-            dontRepositionAskAiEditor: !!newProjectSetup.dontRepositionAskAiEditor,
+            forceOpenAskAiEditor: !!newProjectSetup.forceOpenAskAiEditor,
           },
         });
 

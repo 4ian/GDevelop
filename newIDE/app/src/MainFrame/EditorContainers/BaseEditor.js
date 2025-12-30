@@ -20,7 +20,7 @@ import { type GamesList } from '../../GameDashboard/UseGamesList';
 import { type GamesPlatformFrameTools } from './HomePage/PlaySection/UseGamesPlatformFrame';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import { type CreateProjectResult } from '../../Utils/UseCreateProject';
-import { type OpenAskAiOptions } from '../../AiGeneration/AskAiEditorContainer';
+import { type OpenAskAiOptions } from '../../AiGeneration/Utils';
 
 export type EditorContainerExtraProps = {|
   // Events function extension editor
@@ -46,6 +46,7 @@ export type InstancesOutsideEditorChanges = {|
 
 export type ObjectsOutsideEditorChanges = {|
   scene: gdLayout,
+  isNewObjectTypeUsed: boolean,
 |};
 
 export type ObjectGroupsOutsideEditorChanges = {|
@@ -54,7 +55,10 @@ export type ObjectGroupsOutsideEditorChanges = {|
 
 export type RenderEditorContainerProps = {|
   isActive: boolean,
+  gameEditorMode: 'embedded-game' | 'instances-editor',
+  setGameEditorMode: ('embedded-game' | 'instances-editor') => void,
   projectItemName: ?string,
+  editorId: string,
   project: ?gdProject,
   fileMetadata: ?FileMetadata,
   storageProvider: StorageProvider,
@@ -70,12 +74,16 @@ export type RenderEditorContainerProps = {|
   unsavedChanges: ?UnsavedChanges,
 
   // Preview:
-  setPreviewedLayout: (
-    layoutName: ?string,
-    externalLayoutName?: ?string
-  ) => void,
+  setPreviewedLayout: ({|
+    layoutName: string | null,
+    externalLayoutName: string | null,
+    eventsBasedObjectType: string | null,
+    eventsBasedObjectVariantName: string | null,
+  |}) => void,
   previewDebuggerServer: ?PreviewDebuggerServer,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
+  onRestartInGameEditor: (reason: string) => void,
+  showRestartInGameEditorAfterErrorButton: boolean,
 
   // Opening other editors:
   onOpenExternalEvents: string => void,
@@ -103,9 +111,12 @@ export type RenderEditorContainerProps = {|
   ) => void,
   openObjectEvents: (extensionName: string, objectName: string) => void,
   onOpenAskAi: (?OpenAskAiOptions) => void,
+  onCloseAskAi: () => void,
 
   // Events function management:
-  onLoadEventsFunctionsExtensions: () => Promise<void>,
+  onLoadEventsFunctionsExtensions: ({|
+    shouldHotReloadEditor: boolean,
+  |}) => Promise<void>,
   onReloadEventsFunctionsExtensionMetadata: (
     extension: gdEventsFunctionsExtension
   ) => void,
@@ -188,6 +199,7 @@ export type RenderEditorContainerProps = {|
     objectWithContext: ObjectWithContext
   ) => void,
   onSceneObjectsDeleted: (scene: gdLayout) => void,
+  triggerHotReloadInGameEditorIfNeeded: () => void,
 
   onInstancesModifiedOutsideEditor: (
     changes: InstancesOutsideEditorChanges
@@ -208,6 +220,7 @@ export type RenderEditorContainerProps = {|
     extensionName: string,
     eventsBasedObjectName: string
   ) => void,
+  onEventBasedObjectTypeChanged: () => void,
   onOpenEventBasedObjectEditor: (
     extensionName: string,
     eventsBasedObjectName: string
@@ -217,12 +230,16 @@ export type RenderEditorContainerProps = {|
     eventsBasedObjectName: string,
     variantName: string
   ) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onDeleteEventsBasedObjectVariant: (
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     eventBasedObject: gdEventsBasedObject,
     variant: gdEventsBasedObjectVariant
   ) => void,
+  onEffectAdded: () => void,
+  onObjectListsModified: ({ isNewObjectTypeUsed: boolean }) => void,
+  onExternalLayoutAssociationChanged: () => void,
 |};
 
 export type RenderEditorContainerPropsWithRef = {|

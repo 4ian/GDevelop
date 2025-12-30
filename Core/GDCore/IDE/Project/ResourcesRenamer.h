@@ -27,7 +27,7 @@ class ResourcesRenamer : public gd::ArbitraryResourceWorker {
     * @param oldToNewNames_ A map associating to a resource name the new name to
     * use.
     */
-   ResourcesRenamer(gd::ResourcesManager &resourcesManager,
+   ResourcesRenamer(gd::ResourcesContainer &resourcesManager,
                     const std::map<gd::String, gd::String> &oldToNewNames_)
        : gd::ArbitraryResourceWorker(resourcesManager),
          oldToNewNames(oldToNewNames_){};

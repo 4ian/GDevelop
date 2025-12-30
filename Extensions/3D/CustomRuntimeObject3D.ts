@@ -13,6 +13,7 @@ namespace gdjs {
 
   /**
    * Base class for 3D custom objects.
+   * @category Objects > Custom Object 3D
    */
   export class CustomRuntimeObject3D
     extends gdjs.CustomRuntimeObject
@@ -78,15 +79,9 @@ namespace gdjs {
       if (initialInstanceData.depth !== undefined) {
         this.setDepth(initialInstanceData.depth);
       }
-      if (initialInstanceData.flippedX) {
-        this.flipX(initialInstanceData.flippedX);
-      }
-      if (initialInstanceData.flippedY) {
-        this.flipY(initialInstanceData.flippedY);
-      }
-      if (initialInstanceData.flippedZ) {
-        this.flipZ(initialInstanceData.flippedZ);
-      }
+      this.flipX(!!initialInstanceData.flippedX);
+      this.flipY(!!initialInstanceData.flippedY);
+      this.flipZ(!!initialInstanceData.flippedZ);
     }
 
     getNetworkSyncData(
@@ -323,6 +318,10 @@ namespace gdjs {
         this._updateUntransformedHitBoxes();
       }
       return this._maxZ - this._minZ;
+    }
+
+    getOriginalDepth(): float {
+      return this._instanceContainer._getInitialInnerAreaDepth();
     }
 
     override _updateUntransformedHitBoxes(): void {

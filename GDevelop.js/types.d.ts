@@ -155,6 +155,11 @@ export class VectorObjectFolderOrObject extends EmscriptenObject {
   at(index: number): ObjectFolderOrObject;
 }
 
+export class VectorPropertyFolderOrProperty extends EmscriptenObject {
+  size(): number;
+  at(index: number): PropertyFolderOrProperty;
+}
+
 export class VectorScreenshot extends EmscriptenObject {
   size(): number;
   at(index: number): Screenshot;
@@ -2450,6 +2455,28 @@ export class EventsBasedObjectsList extends EmscriptenObject {
   at(index: number): EventsBasedObject;
 }
 
+export class PropertyFolderOrProperty extends EmscriptenObject {
+  constructor();
+  isFolder(): boolean;
+  isRootFolder(): boolean;
+  getProperty(): NamedPropertyDescriptor;
+  getFolderName(): string;
+  setFolderName(name: string): void;
+  hasPropertyNamed(name: string): boolean;
+  getPropertyNamed(name: string): PropertyFolderOrProperty;
+  getChildrenCount(): number;
+  getChildAt(pos: number): PropertyFolderOrProperty;
+  getPropertyChild(name: string): PropertyFolderOrProperty;
+  getOrCreateChildFolder(name: string): PropertyFolderOrProperty;
+  getChildPosition(child: PropertyFolderOrProperty): number;
+  getParent(): PropertyFolderOrProperty;
+  insertNewFolder(name: string, newPosition: number): PropertyFolderOrProperty;
+  movePropertyFolderOrPropertyToAnotherFolder(propertyFolderOrProperty: PropertyFolderOrProperty, newParentFolder: PropertyFolderOrProperty, newPosition: number): void;
+  moveChild(oldIndex: number, newIndex: number): void;
+  removeFolderChild(childToRemove: PropertyFolderOrProperty): void;
+  isADescendantOf(otherPropertyFolderOrProperty: PropertyFolderOrProperty): boolean;
+}
+
 export class PropertiesContainer extends EmscriptenObject {
   constructor(owner: EventsFunctionsContainer_FunctionOwner);
   insertNew(name: string, pos: number): NamedPropertyDescriptor;
@@ -2463,6 +2490,10 @@ export class PropertiesContainer extends EmscriptenObject {
   getPosition(item: NamedPropertyDescriptor): number;
   size(): number;
   at(index: number): NamedPropertyDescriptor;
+  insertNewPropertyInFolder(name: string, folder: PropertyFolderOrProperty, pos: number): NamedPropertyDescriptor;
+  getRootFolder(): PropertyFolderOrProperty;
+  getAllPropertyFolderOrProperty(): VectorPropertyFolderOrProperty;
+  addMissingPropertiesInRootFolder(): void;
 }
 
 export class EventsFunctionsExtension extends EmscriptenObject {

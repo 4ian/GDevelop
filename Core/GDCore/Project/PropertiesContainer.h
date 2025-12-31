@@ -2,6 +2,7 @@
 #include "EventsFunctionsContainer.h"
 #include "GDCore/Tools/SerializableWithNameList.h"
 #include "NamedPropertyDescriptor.h"
+#include "GDCore/Project/PropertyFolderOrProperty.h"
 
 namespace gd {
 
@@ -16,20 +17,11 @@ namespace gd {
 class PropertiesContainer
     : public SerializableWithNameList<NamedPropertyDescriptor> {
  public:
-  PropertiesContainer(EventsFunctionsContainer::FunctionOwner owner)
-      : SerializableWithNameList<NamedPropertyDescriptor>(), owner(owner) {}
+  PropertiesContainer(EventsFunctionsContainer::FunctionOwner owner);
 
-  PropertiesContainer(const PropertiesContainer& other)
-      : SerializableWithNameList<NamedPropertyDescriptor>(other),
-        owner(other.owner) {}
+  PropertiesContainer(const PropertiesContainer& other);
 
-  PropertiesContainer& operator=(const PropertiesContainer& other) {
-    if (this != &other) {
-      SerializableWithNameList<NamedPropertyDescriptor>::operator=(other);
-      owner = other.owner;
-    }
-    return *this;
-  }
+  PropertiesContainer& operator=(const PropertiesContainer& other);
 
   void ForEachPropertyMatchingSearch(
       const gd::String& search,
@@ -43,8 +35,44 @@ class PropertiesContainer
 
   EventsFunctionsContainer::FunctionOwner GetOwner() const { return owner; }
 
+  /**
+   * \brief Add a new empty property called \a name in the
+   * given folder at the specified position.<br>
+   *
+   * \return A reference to the property in the list.
+   */
+  gd::NamedPropertyDescriptor& InsertNewPropertyInFolder(
+      const gd::String& name,
+      gd::PropertyFolderOrProperty& propertyFolderOrProperty,
+      std::size_t position);
+
+  /**
+   * Returns a vector containing all object and folders in this container.
+   * Only use this for checking if you hold a valid `PropertyFolderOrProperty` -
+   * don't use this for rendering or anything else.
+   */
+  std::vector<const PropertyFolderOrProperty*> GetAllPropertyFolderOrProperty() const;
+
+  gd::PropertyFolderOrProperty& GetRootFolder() {
+      return *rootFolder;
+  }
+
+  void AddMissingPropertiesInRootFolder();
+
+  /**
+   * \brief Serialize folder structure.
+   */
+  void SerializeFoldersTo(SerializerElement& element) const;
+
+  /**
+   * \brief Unserialize folder structure.
+   */
+  void UnserializeFoldersFrom(gd::Project& project,
+                              const SerializerElement& element);
+
  private:
   EventsFunctionsContainer::FunctionOwner owner;
+  std::unique_ptr<gd::PropertyFolderOrProperty> rootFolder;
 };
 
 }  // namespace gd

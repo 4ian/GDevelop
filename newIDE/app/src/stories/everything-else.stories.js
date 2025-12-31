@@ -72,6 +72,7 @@ import InstructionEditorMenu from '../EventsSheet/InstructionEditor/InstructionE
 import { PopoverButton } from './PopoverButton';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
 import { Column, Line } from '../UI/Grid';
+import { ListItem } from '../UI/List';
 import DragAndDropTestBed from './DragAndDropTestBed';
 import EditorMosaic from '../UI/EditorMosaic';
 import FlatButton from '../UI/FlatButton';
@@ -918,7 +919,17 @@ storiesOf('UI Building Blocks/HelpIcon', module)
   .add('absolute URL (custom help)', () => (
     <HelpIcon helpPagePath="https://example.com/custom-help" />
   ))
-  .add('small size', () => <HelpIcon helpPagePath="/test" size="small" />);
+  .add('small size', () => <HelpIcon helpPagePath="/test" size="small" />)
+  .add('in ListItem context', () => (
+    <ListItem
+      primaryText={
+        <Line noMargin alignItems="center">
+          <span>My Custom Action</span>
+          <HelpIcon size="small" helpPagePath="https://example.com/help" />
+        </Line>
+      }
+    />
+  ));
 
 storiesOf('PropertiesEditor', module)
   .addDecorator(paperDecorator)

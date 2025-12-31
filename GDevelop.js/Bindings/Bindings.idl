@@ -3180,6 +3180,8 @@ interface EventsFunction {
     boolean IsPrivate();
     [Ref] EventsFunction SetAsync(boolean isAsync);
     boolean IsAsync();
+    [Ref] EventsFunction SetHelpUrl([Const] DOMString helpUrl);
+    [Const, Ref] DOMString GetHelpUrl();
     boolean IsAction();
     boolean IsExpression();
     boolean IsCondition();

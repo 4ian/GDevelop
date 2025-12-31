@@ -4579,6 +4579,15 @@ describe('libGD.js', function () {
       expect(eventsFunction.getDescription()).toBe('My description');
       eventsFunction.delete();
     });
+    it('can have a help URL', function () {
+      const eventsFunction = new gd.EventsFunction();
+      expect(eventsFunction.getHelpUrl()).toBe('');
+      eventsFunction.setHelpUrl('https://example.com/help');
+      expect(eventsFunction.getHelpUrl()).toBe('https://example.com/help');
+      eventsFunction.setHelpUrl('');
+      expect(eventsFunction.getHelpUrl()).toBe('');
+      eventsFunction.delete();
+    });
   });
 
   describe('gd.EventsFunctionsExtension', () => {

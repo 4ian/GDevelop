@@ -33,6 +33,12 @@ import {
   getEventsBasedEntityPropertyTreeViewItemId,
   type EventsBasedEntityPropertyTreeViewItemProps,
 } from './EventsBasedEntityPropertyTreeViewItemContent';
+import {
+  EventsBasedEntityPropertyFolderTreeViewItemContent,
+  getEventsBasedEntityPropertyFolderTreeViewItemId,
+  expandAllSubfolders,
+  type EventsBasedEntityPropertyFolderTreeViewItemProps,
+} from './EventsBasedEntityPropertyFolderTreeViewItemContent';
 import { type MenuItemTemplate } from '../../UI/Menu/Menu.flow';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { type ShowConfirmDeleteDialogOptions } from '../../UI/Alert/AlertContext';
@@ -41,6 +47,7 @@ import { type GDevelopTheme } from '../../UI/Theme';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import { ColumnStackLayout } from '../../UI/Layout';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import { getFoldersAscendanceWithoutRootFolder } from './EnumeratePropertyFolderOrProperty';
 
 const configurationItemId = 'events-based-entity-configuration';
 export const propertiesRootFolderId = 'properties';
@@ -62,6 +69,18 @@ const styles = {
 
 const extensionItemReactDndType = 'GD_EXTENSION_ITEM';
 
+export const getTreeViewItemIdFromPropertyFolderOrProperty = (
+  propertyFolderOrObject: gdPropertyFolderOrProperty,
+  isSharedProperties: boolean
+): string => {
+  return propertyFolderOrObject.isFolder()
+    ? getEventsBasedEntityPropertyFolderTreeViewItemId(propertyFolderOrObject)
+    : getEventsBasedEntityPropertyTreeViewItemId(
+        propertyFolderOrObject.getProperty(),
+        isSharedProperties
+      );
+};
+
 export interface TreeViewItemContent {
   getName(): string | React.Node;
   getId(): string;
@@ -79,9 +98,10 @@ export interface TreeViewItemContent {
   paste(): void;
   cut(): void;
   getIndex(): number;
-  moveAt(destinationIndex: number): void;
   isDescendantOf(itemContent: TreeViewItemContent): boolean;
+  isSibling(itemContent: TreeViewItemContent): boolean;
   getRootId(): string;
+  getPropertyFolderOrProperty(): gdPropertyFolderOrProperty | null;
 }
 
 interface TreeViewItem {
@@ -129,6 +149,83 @@ class PlaceHolderTreeViewItem implements TreeViewItem {
   }
 }
 
+const createTreeViewItem = ({
+  propertyFolderOrProperty,
+  propertyFolderTreeViewItemProps,
+  propertyTreeViewItemProps,
+}: {|
+  propertyFolderOrProperty: gdPropertyFolderOrProperty,
+  propertyFolderTreeViewItemProps: EventsBasedEntityPropertyFolderTreeViewItemProps,
+  propertyTreeViewItemProps: EventsBasedEntityPropertyTreeViewItemProps,
+|}): TreeViewItem => {
+  if (propertyFolderOrProperty.isFolder()) {
+    return new PropertyFolderTreeViewItem({
+      propertyFolderOrProperty: propertyFolderOrProperty,
+      isRoot: false,
+      propertyFolderTreeViewItemProps,
+      propertyTreeViewItemProps,
+      content: new EventsBasedEntityPropertyFolderTreeViewItemContent(
+        propertyFolderOrProperty,
+        propertyFolderTreeViewItemProps
+      ),
+    });
+  } else {
+    return new LeafTreeViewItem(
+      new EventsBasedEntityPropertyTreeViewItemContent(
+        propertyFolderOrProperty,
+        propertyTreeViewItemProps
+      )
+    );
+  }
+};
+
+class PropertyFolderTreeViewItem implements TreeViewItem {
+  isRoot: boolean;
+  isPlaceholder = false;
+  content: TreeViewItemContent;
+  propertyFolderOrProperty: gdPropertyFolderOrProperty;
+  placeholder: ?PlaceHolderTreeViewItem;
+  propertyFolderTreeViewItemProps: EventsBasedEntityPropertyFolderTreeViewItemProps;
+  propertyTreeViewItemProps: EventsBasedEntityPropertyTreeViewItemProps;
+
+  constructor({
+    propertyFolderOrProperty,
+    isRoot,
+    content,
+    placeholder,
+    propertyFolderTreeViewItemProps,
+    propertyTreeViewItemProps,
+  }: {|
+    propertyFolderOrProperty: gdPropertyFolderOrProperty,
+    isRoot: boolean,
+    content: TreeViewItemContent,
+    placeholder?: PlaceHolderTreeViewItem,
+    propertyFolderTreeViewItemProps: EventsBasedEntityPropertyFolderTreeViewItemProps,
+    propertyTreeViewItemProps: EventsBasedEntityPropertyTreeViewItemProps,
+  |}) {
+    this.isRoot = isRoot;
+    this.content = content;
+    this.propertyFolderOrProperty = propertyFolderOrProperty;
+    this.placeholder = placeholder;
+    this.propertyFolderTreeViewItemProps = propertyFolderTreeViewItemProps;
+    this.propertyTreeViewItemProps = propertyTreeViewItemProps;
+  }
+
+  getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+    if (this.propertyFolderOrProperty.getChildrenCount() === 0) {
+      return this.placeholder ? [this.placeholder] : [];
+    }
+    return mapFor(0, this.propertyFolderOrProperty.getChildrenCount(), i => {
+      const child = this.propertyFolderOrProperty.getChildAt(i);
+      return createTreeViewItem({
+        propertyFolderOrProperty: child,
+        propertyFolderTreeViewItemProps: this.propertyFolderTreeViewItemProps,
+        propertyTreeViewItemProps: this.propertyTreeViewItemProps,
+      });
+    });
+  }
+}
+
 class LabelTreeViewItemContent implements TreeViewItemContent {
   id: string;
   label: string | React.Node;
@@ -142,20 +239,23 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
   constructor(
     id: string,
     label: string | React.Node,
-    rightButton?: MenuButton
+    rightButton?: MenuButton,
+    buildMenuTemplateFunction?: () => Array<MenuItemTemplate>
   ) {
     this.id = id;
     this.label = label;
     this.buildMenuTemplateFunction = (i18n: I18nType, index: number) =>
-      rightButton
-        ? [
-            {
+      [
+        rightButton
+          ? {
               id: rightButton.id,
-              label: rightButton.label,
+              label: i18n._(rightButton.label),
               click: rightButton.click,
-            },
-          ]
-        : [];
+              enabled: rightButton.enabled,
+            }
+          : null,
+        ...(buildMenuTemplateFunction ? buildMenuTemplateFunction() : []),
+      ].filter(Boolean);
     this.rightButton = rightButton;
   }
 
@@ -209,14 +309,20 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
     return 0;
   }
 
-  moveAt(destinationIndex: number): void {}
-
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
+    return false;
+  }
+
+  isSibling(treeViewItemContent: TreeViewItemContent): boolean {
     return false;
   }
 
   getRootId(): string {
     return '';
+  }
+
+  getPropertyFolderOrProperty(): gdPropertyFolderOrProperty | null {
+    return null;
   }
 }
 
@@ -299,14 +405,20 @@ class ActionTreeViewItemContent implements TreeViewItemContent {
     return 0;
   }
 
-  moveAt(destinationIndex: number): void {}
-
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
+    return false;
+  }
+
+  isSibling(treeViewItemContent: TreeViewItemContent): boolean {
     return false;
   }
 
   getRootId(): string {
     return '';
+  }
+
+  getPropertyFolderOrProperty(): gdPropertyFolderOrProperty | null {
+    return null;
   }
 }
 
@@ -401,6 +513,14 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
     const [selectedItems, setSelectedItems] = React.useState<
       Array<TreeViewItem>
     >([]);
+
+    const setSelectedPropertyFolderOrProperty = React.useRef<
+      (
+        propertyFolderOrProperty: gdPropertyFolderOrProperty | null,
+        isSharedProperties: boolean
+      ) => void
+    >((propertyFolderOrProperty, isSharedProperties) => {});
+
     const unsavedChanges = React.useContext(UnsavedChangesContext);
     const { triggerUnsavedChanges } = unsavedChanges;
     const preferences = React.useContext(PreferencesContext);
@@ -467,15 +587,19 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
       (
         properties: gdPropertiesContainer,
         isSharedProperties: boolean,
-        index: number,
-        i18n: I18nType
+        parentFolder: gdPropertyFolderOrProperty,
+        index: number
       ) => {
         if (!properties) return;
 
-        const newName = newNameGenerator(i18n._(t`Property`), name =>
+        const newName = newNameGenerator('Property', name =>
           properties.has(name)
         );
-        const property = properties.insertNew(newName, index);
+        const property = properties.insertNewPropertyInFolder(
+          newName,
+          parentFolder,
+          index
+        );
         property.setType('Number');
 
         onPropertiesUpdated();
@@ -568,6 +692,143 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
       [editName, selectedItems]
     );
 
+    const getClosestVisibleParentId = (
+      propertyFolderOrProperty: gdPropertyFolderOrProperty,
+      isSharedProperties: boolean
+    ): ?string => {
+      const treeView = treeViewRef.current;
+      if (!treeView) return null;
+      const topToBottomAscendanceId = getFoldersAscendanceWithoutRootFolder(
+        propertyFolderOrProperty
+      )
+        .reverse()
+        .map(parent =>
+          getEventsBasedEntityPropertyFolderTreeViewItemId(
+            propertyFolderOrProperty
+          )
+        );
+      const topToBottomAscendanceOpenness = treeView.areItemsOpenFromId(
+        topToBottomAscendanceId
+      );
+      const firstClosedFolderIndex = topToBottomAscendanceOpenness.indexOf(
+        false
+      );
+      if (firstClosedFolderIndex === -1) {
+        // If all parents are open, return the propertyFolderOrProperty given as input.
+        return getTreeViewItemIdFromPropertyFolderOrProperty(
+          propertyFolderOrProperty,
+          isSharedProperties
+        );
+      }
+      // $FlowFixMe - We are confident this TreeView item is in fact a PropertyFolderOrPropertyWithContext
+      return topToBottomAscendanceId[firstClosedFolderIndex];
+    };
+
+    const addFolder = React.useCallback(
+      (
+        items: Array<gdPropertyFolderOrProperty>,
+        isSharedProperties: boolean
+      ) => {
+        let newPropertyFolderOrProperty;
+        if (items.length === 1) {
+          const selectedPropertyFolderOrProperty = items[0];
+          if (selectedPropertyFolderOrProperty.isFolder()) {
+            const newFolder = selectedPropertyFolderOrProperty.insertNewFolder(
+              'NewFolder',
+              0
+            );
+            newPropertyFolderOrProperty = newFolder;
+            if (treeViewRef.current) {
+              treeViewRef.current.openItems([
+                getEventsBasedEntityPropertyFolderTreeViewItemId(items[0]),
+              ]);
+            }
+          } else {
+            const parentFolder = selectedPropertyFolderOrProperty.getParent();
+            const newFolder = parentFolder.insertNewFolder(
+              'NewFolder',
+              parentFolder.getChildPosition(selectedPropertyFolderOrProperty) +
+                1
+            );
+            newPropertyFolderOrProperty = newFolder;
+          }
+        } else {
+          const rootFolder = isSharedProperties
+            ? sharedProperties && sharedProperties.getRootFolder()
+            : properties && properties.getRootFolder();
+          if (!rootFolder) {
+            return;
+          }
+          const newFolder = rootFolder.insertNewFolder('NewFolder', 0);
+          newPropertyFolderOrProperty = newFolder;
+        }
+        setSelectedPropertyFolderOrProperty.current(
+          newPropertyFolderOrProperty,
+          isSharedProperties
+        );
+        const itemsToOpen = getFoldersAscendanceWithoutRootFolder(
+          newPropertyFolderOrProperty
+        ).map(folder =>
+          getEventsBasedEntityPropertyFolderTreeViewItemId(folder)
+        );
+        itemsToOpen.push(
+          isSharedProperties
+            ? sharedPropertiesRootFolderId
+            : propertiesRootFolderId
+        );
+        if (treeViewRef.current) treeViewRef.current.openItems(itemsToOpen);
+
+        editName(
+          getEventsBasedEntityPropertyFolderTreeViewItemId(
+            newPropertyFolderOrProperty
+          )
+        );
+        forceUpdateList();
+      },
+      [
+        setSelectedPropertyFolderOrProperty,
+        editName,
+        forceUpdateList,
+        sharedProperties,
+        properties,
+      ]
+    );
+
+    const onMovedPropertyFolderOrPropertyToAnotherFolderInSameContainer = React.useCallback(
+      (
+        propertyFolderOrProperty: gdPropertyFolderOrProperty,
+        isSharedProperties: boolean
+      ) => {
+        const treeView = treeViewRef.current;
+        if (treeView) {
+          const closestVisibleParentId = getClosestVisibleParentId(
+            propertyFolderOrProperty,
+            isSharedProperties
+          );
+          if (closestVisibleParentId) {
+            treeView.animateItemFromId(closestVisibleParentId);
+          }
+        }
+        onTreeModified(true);
+      },
+      [onTreeModified]
+    );
+
+    const expandFolders = React.useCallback(
+      (propertyFolderOrPropertyList: Array<gdPropertyFolderOrProperty>) => {
+        if (treeViewRef.current) {
+          treeViewRef.current.openItems(
+            propertyFolderOrPropertyList.map(propertyFolderOrProperty =>
+              getEventsBasedEntityPropertyFolderTreeViewItemId(
+                propertyFolderOrProperty
+              )
+            )
+          );
+        }
+      },
+      []
+    );
+
     const propertiesTreeViewItemProps = React.useMemo<?EventsBasedEntityPropertyTreeViewItemProps>(
       () =>
         properties && eventsBasedEntity
@@ -631,27 +892,74 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
       [propertiesTreeViewItemProps, sharedProperties]
     );
 
-    const createPropertyItem = React.useCallback(
-      (property: gdNamedPropertyDescriptor, isSharedProperties: boolean) => {
-        const treeViewItemProps = isSharedProperties
-          ? sharedPropertiesTreeViewItemProps
-          : propertiesTreeViewItemProps;
-        if (!treeViewItemProps) {
-          return null;
-        }
-        return new LeafTreeViewItem(
-          new EventsBasedEntityPropertyTreeViewItemContent(
-            property,
-            treeViewItemProps
-          )
-        );
-      },
-      [propertiesTreeViewItemProps, sharedPropertiesTreeViewItemProps]
+    const propertyFolderTreeViewItemProps = React.useMemo<?EventsBasedEntityPropertyFolderTreeViewItemProps>(
+      () =>
+        properties
+          ? {
+              unsavedChanges,
+              preferences,
+              gdevelopTheme,
+              forceUpdate,
+              forceUpdateList,
+              showDeleteConfirmation,
+              showPropertyOverridingConfirmation,
+              editName,
+              scrollToItem,
+              project,
+              properties,
+              isSharedProperties: false,
+              onPropertiesUpdated,
+              expandFolders,
+              addFolder,
+              addProperty,
+              onMovedPropertyFolderOrPropertyToAnotherFolderInSameContainer,
+              setSelectedPropertyFolderOrProperty: (
+                propertyFolderOrProperty,
+                isSharedProperties
+              ) =>
+                setSelectedPropertyFolderOrProperty.current(
+                  propertyFolderOrProperty,
+                  isSharedProperties
+                ),
+            }
+          : null,
+      [
+        properties,
+        unsavedChanges,
+        preferences,
+        gdevelopTheme,
+        forceUpdate,
+        forceUpdateList,
+        showDeleteConfirmation,
+        showPropertyOverridingConfirmation,
+        editName,
+        scrollToItem,
+        project,
+        onPropertiesUpdated,
+        expandFolders,
+        addFolder,
+        addProperty,
+        onMovedPropertyFolderOrPropertyToAnotherFolderInSameContainer,
+      ]
+    );
+
+    const sharedPropertyFolderTreeViewItemProps = React.useMemo<?EventsBasedEntityPropertyFolderTreeViewItemProps>(
+      () =>
+        sharedProperties && propertyFolderTreeViewItemProps
+          ? {
+              ...propertyFolderTreeViewItemProps,
+              properties: sharedProperties,
+              isSharedProperties: true,
+            }
+          : null,
+      [propertyFolderTreeViewItemProps, sharedProperties]
     );
 
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
-        return !properties || !propertiesTreeViewItemProps
+        return !properties ||
+          !propertiesTreeViewItemProps ||
+          !propertyFolderTreeViewItemProps
           ? []
           : [
               new LeafTreeViewItem(
@@ -662,7 +970,8 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
                   'res/icons_default/properties_black.svg'
                 )
               ),
-              {
+              new PropertyFolderTreeViewItem({
+                propertyFolderOrProperty: properties.getRootFolder(),
                 isRoot: true,
                 content: new LabelTreeViewItemContent(
                   propertiesRootFolderId,
@@ -673,27 +982,44 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
                     icon: <Add />,
                     label: i18n._(t`Add a property`),
                     click: () => {
-                      addProperty(properties, false, 0, i18n);
+                      addProperty(
+                        properties,
+                        false,
+                        properties.getRootFolder(),
+                        0
+                      );
                     },
                     id: 'add-property',
-                  }
+                  },
+                  () => [
+                    {
+                      label: i18n._(t`Add a folder`),
+                      click: () =>
+                        addFolder([properties.getRootFolder()], false),
+                    },
+                    { type: 'separator' },
+                    {
+                      label: i18n._(t`Expand all sub folders`),
+                      click: () =>
+                        expandAllSubfolders(
+                          properties.getRootFolder(),
+                          expandFolders
+                        ),
+                    },
+                  ]
                 ),
-                getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-                  if (properties.getCount() === 0) {
-                    return [
-                      new PlaceHolderTreeViewItem(
-                        propertiesEmptyPlaceholderId,
-                        i18n._(t`Start by adding a new property.`)
-                      ),
-                    ];
-                  }
-                  return mapFor(0, properties.getCount(), i =>
-                    createPropertyItem(properties.getAt(i), false)
-                  ).filter(Boolean);
-                },
-              },
-              sharedProperties
-                ? {
+                placeholder: new PlaceHolderTreeViewItem(
+                  propertiesEmptyPlaceholderId,
+                  i18n._(t`Start by adding a new property.`)
+                ),
+                propertyTreeViewItemProps: propertiesTreeViewItemProps,
+                propertyFolderTreeViewItemProps,
+              }),
+              sharedProperties &&
+              sharedPropertiesTreeViewItemProps &&
+              sharedPropertyFolderTreeViewItemProps
+                ? new PropertyFolderTreeViewItem({
+                    propertyFolderOrProperty: sharedProperties.getRootFolder(),
                     isRoot: true,
                     content: new LabelTreeViewItemContent(
                       sharedPropertiesRootFolderId,
@@ -702,37 +1028,121 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
                         icon: <Add />,
                         label: i18n._(t`Add a property`),
                         click: () => {
-                          addProperty(sharedProperties, true, 0, i18n);
+                          addProperty(
+                            sharedProperties,
+                            true,
+                            sharedProperties.getRootFolder(),
+                            0
+                          );
                         },
                         id: 'add-shared-property',
-                      }
+                      },
+                      () => [
+                        {
+                          label: i18n._(t`Add a folder`),
+                          click: () =>
+                            addFolder([sharedProperties.getRootFolder()], true),
+                        },
+                        { type: 'separator' },
+                        {
+                          label: i18n._(t`Expand all sub folders`),
+                          click: () =>
+                            expandAllSubfolders(
+                              sharedProperties.getRootFolder(),
+                              expandFolders
+                            ),
+                        },
+                      ]
                     ),
-                    getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-                      if (sharedProperties.getCount() === 0) {
-                        return [
-                          new PlaceHolderTreeViewItem(
-                            sharedPropertiesEmptyPlaceholderId,
-                            i18n._(t`Start by adding a new property.`)
-                          ),
-                        ];
-                      }
-                      return mapFor(0, sharedProperties.getCount(), i =>
-                        createPropertyItem(sharedProperties.getAt(i), true)
-                      ).filter(Boolean);
-                    },
-                  }
+                    placeholder: new PlaceHolderTreeViewItem(
+                      sharedPropertiesEmptyPlaceholderId,
+                      i18n._(t`Start by adding a new property.`)
+                    ),
+                    propertyTreeViewItemProps: sharedPropertiesTreeViewItemProps,
+                    propertyFolderTreeViewItemProps: sharedPropertyFolderTreeViewItemProps,
+                  })
                 : null,
             ].filter(Boolean);
       },
       [
+        addFolder,
         addProperty,
-        createPropertyItem,
         eventsBasedObject,
+        expandFolders,
         onOpenConfiguration,
         properties,
         propertiesTreeViewItemProps,
+        propertyFolderTreeViewItemProps,
         sharedProperties,
+        sharedPropertiesTreeViewItemProps,
+        sharedPropertyFolderTreeViewItemProps,
       ]
+    );
+
+    // Avoid a circular dependency with propertiesTreeViewItemProps
+    React.useEffect(
+      () => {
+        setSelectedPropertyFolderOrProperty.current = (
+          propertyFolderOrProperty: gdPropertyFolderOrProperty | null,
+          isSharedProperties: boolean
+        ) => {
+          if (!propertyFolderOrProperty) {
+            setSelectedItems([]);
+            return;
+          }
+          const propertyItemId = getTreeViewItemIdFromPropertyFolderOrProperty(
+            propertyFolderOrProperty,
+            isSharedProperties
+          );
+          setSelectedItems(selectedItems => {
+            if (
+              selectedItems.length === 1 &&
+              selectedItems[0].content.getId() === propertyItemId
+            ) {
+              return selectedItems;
+            }
+            const treeViewItemProps = isSharedProperties
+              ? sharedPropertiesTreeViewItemProps
+              : propertiesTreeViewItemProps;
+            if (!treeViewItemProps || !propertyFolderTreeViewItemProps) {
+              return [];
+            }
+            return [
+              createTreeViewItem({
+                propertyFolderOrProperty,
+                propertyFolderTreeViewItemProps,
+                propertyTreeViewItemProps: treeViewItemProps,
+              }),
+            ].filter(Boolean);
+          });
+          scrollToItem(propertyItemId);
+        };
+      },
+      [
+        propertiesTreeViewItemProps,
+        propertyFolderTreeViewItemProps,
+        scrollToItem,
+        sharedPropertiesTreeViewItemProps,
+      ]
+    );
+
+    const setSelectedProperty = React.useCallback(
+      (propertyName: string, isSharedProperties: boolean) => {
+        const propertiesContainer = isSharedProperties
+          ? sharedProperties
+          : properties;
+        if (!propertiesContainer || !propertiesContainer.has(propertyName)) {
+          return;
+        }
+        const property = propertiesContainer.get(propertyName);
+        setSelectedPropertyFolderOrProperty.current(
+          propertiesContainer
+            .getRootFolder()
+            .getPropertyNamed(property.getName()),
+          isSharedProperties
+        );
+      },
+      [properties, sharedProperties]
     );
 
     React.useImperativeHandle(ref, () => ({
@@ -743,34 +1153,7 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
       focusSearchBar: () => {
         if (searchBarRef.current) searchBarRef.current.focus();
       },
-      setSelectedProperty: (
-        propertyName: string,
-        isSharedProperties: boolean
-      ) => {
-        const propertiesContainer = isSharedProperties
-          ? sharedProperties
-          : properties;
-        if (!propertiesContainer || !propertiesContainer.has(propertyName)) {
-          return;
-        }
-        const property = propertiesContainer.get(propertyName);
-        const propertyItemId = getEventsBasedEntityPropertyTreeViewItemId(
-          property,
-          isSharedProperties
-        );
-        setSelectedItems(selectedItems => {
-          if (
-            selectedItems.length === 1 &&
-            selectedItems[0].content.getId() === propertyItemId
-          ) {
-            return selectedItems;
-          }
-          return [createPropertyItem(property, isSharedProperties)].filter(
-            Boolean
-          );
-        });
-        scrollToItem(propertyItemId);
-      },
+      setSelectedProperty,
       getSelectedProperty: () => {
         const selectedItem = selectedItems[0];
         if (!selectedItem) {
@@ -805,13 +1188,76 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
         destinationItem: TreeViewItem,
         where: 'before' | 'inside' | 'after'
       ) => {
-        if (selectedItems.length === 0) {
+        if (destinationItem.isRoot || selectedItems.length !== 1) {
           return;
         }
         const selectedItem = selectedItems[0];
-        selectedItem.content.moveAt(
-          destinationItem.content.getIndex() + (where === 'after' ? 1 : 0)
-        );
+        const selectedPropertyFolderOrProperty = selectedItem.content.getPropertyFolderOrProperty();
+
+        if (
+          !selectedPropertyFolderOrProperty ||
+          destinationItem.content.getId() === selectedItem.content.getId()
+        ) {
+          return;
+        }
+
+        if (destinationItem.isPlaceholder) {
+          return;
+        }
+
+        const destinationPropertyFolderOrProperty = destinationItem.content.getPropertyFolderOrProperty();
+        if (!destinationPropertyFolderOrProperty) {
+          return;
+        }
+        if (
+          selectedItem.content.getRootId() !==
+          destinationItem.content.getRootId()
+        ) {
+          return;
+        }
+        // At this point, the move is done from within the same container.
+        let parent;
+        if (
+          where === 'inside' &&
+          destinationPropertyFolderOrProperty.isFolder()
+        ) {
+          parent = destinationPropertyFolderOrProperty;
+        } else {
+          parent = destinationPropertyFolderOrProperty.getParent();
+        }
+        const selectedPropertyFolderOrPropertyParent = selectedPropertyFolderOrProperty.getParent();
+        if (parent === selectedPropertyFolderOrPropertyParent) {
+          const fromIndex = selectedItem.content.getIndex();
+          let toIndex = destinationItem.content.getIndex();
+          if (toIndex > fromIndex) toIndex -= 1;
+          if (where === 'after') toIndex += 1;
+          selectedPropertyFolderOrPropertyParent.moveChild(fromIndex, toIndex);
+        } else {
+          if (destinationItem.content.isDescendantOf(selectedItem.content)) {
+            return;
+          }
+          const position =
+            where === 'inside'
+              ? 0
+              : destinationItem.content.getIndex() +
+                (where === 'after' ? 1 : 0);
+          selectedPropertyFolderOrPropertyParent.movePropertyFolderOrPropertyToAnotherFolder(
+            selectedPropertyFolderOrProperty,
+            parent,
+            position
+          );
+          const treeView = treeViewRef.current;
+          if (treeView) {
+            const closestVisibleParentId = getClosestVisibleParentId(
+              parent,
+              destinationItem.content.getRootId() ===
+                sharedPropertiesRootFolderId
+            );
+            if (closestVisibleParentId) {
+              treeView.animateItemFromId(closestVisibleParentId);
+            }
+          }
+        }
         onTreeModified(true);
       },
       [onTreeModified, selectedItems]

@@ -54,6 +54,7 @@ const getValidatedPropertyName = (
 
 export const pasteProperties = async (
   properties: gdPropertiesContainer,
+  parentFolder: gdPropertyFolderOrProperty,
   insertionIndex: number,
   showPropertyOverridingConfirmation: (
     existingPropertyNames: string[]
@@ -151,19 +152,39 @@ export const getEventsBasedEntityPropertyTreeViewItemId = (
 
 export class EventsBasedEntityPropertyTreeViewItemContent
   implements TreeViewItemContent {
-  property: gdNamedPropertyDescriptor;
+  property: gdPropertyFolderOrProperty;
   props: EventsBasedEntityPropertyTreeViewItemProps;
 
   constructor(
-    property: gdNamedPropertyDescriptor,
+    property: gdPropertyFolderOrProperty,
     props: EventsBasedEntityPropertyTreeViewItemProps
   ) {
     this.property = property;
     this.props = props;
   }
 
-  isDescendantOf(itemContent: TreeViewItemContent): boolean {
-    return itemContent.getId() === this.getRootId();
+  getPropertyFolderOrProperty(): gdPropertyFolderOrProperty | null {
+    return this.property;
+  }
+
+  isDescendantOf(treeViewItemContent: TreeViewItemContent): boolean {
+    const propertyFolderOrProperty = treeViewItemContent.getPropertyFolderOrProperty();
+    return (
+      !!propertyFolderOrProperty &&
+      this.property.isADescendantOf(propertyFolderOrProperty)
+    );
+  }
+
+  isSibling(treeViewItemContent: TreeViewItemContent): boolean {
+    const propertyFolderOrProperty = treeViewItemContent.getPropertyFolderOrProperty();
+    return (
+      !!propertyFolderOrProperty &&
+      this.property.getParent() === propertyFolderOrProperty.getParent()
+    );
+  }
+
+  getIndex(): number {
+    return this.property.getParent().getChildPosition(this.property);
   }
 
   getRootId(): string {
@@ -173,12 +194,12 @@ export class EventsBasedEntityPropertyTreeViewItemContent
   }
 
   getName(): string | React.Node {
-    return this.property.getName();
+    return this.property.getProperty().getName();
   }
 
   getId(): string {
     return getEventsBasedEntityPropertyTreeViewItemId(
-      this.property,
+      this.property.getProperty(),
       this.props.isSharedProperties
     );
   }
@@ -191,13 +212,13 @@ export class EventsBasedEntityPropertyTreeViewItemContent
 
   getDataSet(): ?HTMLDataset {
     return {
-      propertyName: this.property.getName(),
+      propertyName: this.property.getProperty().getName(),
       isSharedProperties: this.props.isSharedProperties ? 'true' : 'false',
     };
   }
 
   getThumbnail(): ?string {
-    switch (this.property.getType()) {
+    switch (this.property.getProperty().getType()) {
       case 'Number':
         return 'res/functions/number_black.svg';
       case 'Boolean':
@@ -211,13 +232,13 @@ export class EventsBasedEntityPropertyTreeViewItemContent
 
   onClick(): void {
     this.props.onOpenProperty(
-      this.property.getName(),
+      this.property.getProperty().getName(),
       this.props.isSharedProperties
     );
   }
 
   rename(newName: string): void {
-    const oldName = this.property.getName();
+    const oldName = this.property.getProperty().getName();
     if (oldName === newName) {
       return;
     }
@@ -230,7 +251,7 @@ export class EventsBasedEntityPropertyTreeViewItemContent
       newName
     );
     this.props.onRenameProperty(oldName, validatedNewName);
-    this.property.setName(validatedNewName);
+    this.property.getProperty().setName(validatedNewName);
 
     this._onProjectItemModified();
   }
@@ -240,6 +261,7 @@ export class EventsBasedEntityPropertyTreeViewItemContent
   }
 
   buildMenuTemplate(i18n: I18nType, index: number) {
+    const property = this.property.getProperty();
     return [
       {
         label: i18n._(t`Rename`),
@@ -293,7 +315,7 @@ export class EventsBasedEntityPropertyTreeViewItemContent
               project,
               extension,
               eventsBasedBehavior,
-              this.property,
+              property,
               isSharedProperties
             );
           } else if (eventsBasedObject) {
@@ -301,21 +323,21 @@ export class EventsBasedEntityPropertyTreeViewItemContent
               project,
               extension,
               eventsBasedObject,
-              this.property
+              property
             );
           }
           onEventsFunctionsAdded();
         },
         enabled: gd.PropertyFunctionGenerator.canGenerateGetterAndSetter(
           this.props.eventsBasedEntity,
-          this.property
+          property
         ),
       },
       ...renderQuickCustomizationMenuItems({
         i18n,
-        visibility: this.property.getQuickCustomizationVisibility(),
+        visibility: property.getQuickCustomizationVisibility(),
         onChangeVisibility: visibility => {
-          this.property.setQuickCustomizationVisibility(visibility);
+          property.setQuickCustomizationVisibility(visibility);
           this.props.forceUpdate();
           this.props.onPropertiesUpdated();
         },
@@ -325,7 +347,7 @@ export class EventsBasedEntityPropertyTreeViewItemContent
 
   renderRightComponent(i18n: I18nType): ?React.Node {
     const icons = [];
-    if (this.property.isHidden()) {
+    if (this.property.getProperty().isHidden()) {
       icons.push(
         <Tooltip
           key="visibility"
@@ -345,30 +367,14 @@ export class EventsBasedEntityPropertyTreeViewItemContent
   }
 
   delete(): void {
-    this.props.properties.remove(this.property.getName());
+    this.props.properties.remove(this.property.getProperty().getName());
     this._onProjectItemModified();
-  }
-
-  getIndex(): number {
-    return this.props.properties.getPosition(this.property);
-  }
-
-  moveAt(destinationIndex: number): void {
-    const originIndex = this.getIndex();
-    if (destinationIndex !== originIndex) {
-      this.props.properties.move(
-        originIndex,
-        // When moving the item down, it must not be counted.
-        destinationIndex + (destinationIndex <= originIndex ? 0 : -1)
-      );
-      this._onProjectItemModified();
-    }
   }
 
   copy(): void {
     Clipboard.set(PROPERTIES_CLIPBOARD_KIND, [
       {
-        name: this.property.getName(),
+        name: this.property.getProperty().getName(),
         serializedProperty: serializeToJSObject(this.property),
       },
     ]);
@@ -386,6 +392,7 @@ export class EventsBasedEntityPropertyTreeViewItemContent
   async pasteAsync(): Promise<void> {
     const hasPasteAnyProperty = await pasteProperties(
       this.props.properties,
+      this.property.getParent(),
       this.getIndex() + 1,
       this.props.showPropertyOverridingConfirmation
     );
@@ -395,8 +402,9 @@ export class EventsBasedEntityPropertyTreeViewItemContent
   }
 
   _duplicate(): void {
-    const newName = newNameGenerator(this.property.getName(), name =>
-      this.props.properties.has(name)
+    const newName = newNameGenerator(
+      this.property.getProperty().getName(),
+      name => this.props.properties.has(name)
     );
     const newProperty = this.props.properties.insertNew(
       newName,

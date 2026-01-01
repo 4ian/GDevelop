@@ -164,6 +164,7 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
       async () => {
         await pasteProperties(
           properties,
+          properties.getRootFolder(),
           properties.getCount(),
           showPropertyOverridingConfirmation
         );

@@ -206,6 +206,8 @@ class GD_CORE_API PropertyFolderOrProperty {
   ///@}
 
  private:
+  void SetGroupNameOfAllProperties(const gd::String& groupName);
+
   static gd::PropertyFolderOrProperty badPropertyFolderOrProperty;
 
   gd::PropertyFolderOrProperty*

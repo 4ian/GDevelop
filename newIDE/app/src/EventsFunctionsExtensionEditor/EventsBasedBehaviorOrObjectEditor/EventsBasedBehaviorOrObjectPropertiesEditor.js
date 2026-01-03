@@ -27,6 +27,7 @@ import {
   PROPERTIES_CLIPBOARD_KIND,
 } from '../PropertyListEditor/EventsBasedEntityPropertyTreeViewItemContent';
 import { usePropertyOverridingAlertDialog } from '../PropertyListEditor';
+import Text from '../../UI/Text';
 
 const gd: libGDevelop = global.gd;
 
@@ -245,223 +246,153 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
             {properties.getCount() > 0 ? (
               <Column noMargin expand>
                 {mapVector(
-                  properties,
-                  (property: gdNamedPropertyDescriptor, i: number) => {
-                    return (
-                      <React.Fragment key={property.ptr}>
-                        <div
-                          ref={ref => {
-                            propertyRefs.current.set(property.getName(), ref);
-                          }}
-                          style={{
-                            ...styles.rowContent,
-                            backgroundColor:
-                              gdevelopTheme.list.itemsBackgroundColor,
-                          }}
+                  properties.getAllPropertyFolderOrProperty(),
+                  (
+                    propertyFolderOrProperty: gdPropertyFolderOrProperty,
+                    i: number
+                  ) => {
+                    if (propertyFolderOrProperty.isFolder()) {
+                      return (
+                        <Text
+                          size="sub-title"
+                          key={propertyFolderOrProperty.ptr}
                         >
-                          <Column expand>
-                            <ResponsiveLineStackLayout expand>
-                              <Line noMargin expand alignItems="center">
-                                <SemiControlledTextField
-                                  margin="none"
-                                  commitOnBlur
-                                  translatableHintText={t`Enter the property name`}
-                                  value={property.getName()}
-                                  onChange={newName => {
-                                    if (newName === property.getName()) return;
+                          {propertyFolderOrProperty.getFolderName()}
+                        </Text>
+                      );
+                    } else {
+                      const property = propertyFolderOrProperty.getProperty();
+                      return (
+                        <React.Fragment key={property.ptr}>
+                          <div
+                            ref={ref => {
+                              propertyRefs.current.set(property.getName(), ref);
+                            }}
+                            style={{
+                              ...styles.rowContent,
+                              backgroundColor:
+                                gdevelopTheme.list.itemsBackgroundColor,
+                            }}
+                          >
+                            <Column expand>
+                              <ResponsiveLineStackLayout expand>
+                                <Line noMargin expand alignItems="center">
+                                  <SemiControlledTextField
+                                    margin="none"
+                                    commitOnBlur
+                                    translatableHintText={t`Enter the property name`}
+                                    value={property.getName()}
+                                    onChange={newName => {
+                                      if (newName === property.getName())
+                                        return;
 
-                                    const projectScopedContainers = projectScopedContainersAccessor.get();
-                                    const validatedNewName = getValidatedPropertyName(
-                                      properties,
-                                      projectScopedContainers,
-                                      newName
-                                    );
-                                    onRenameProperty(
-                                      property.getName(),
-                                      validatedNewName
-                                    );
-                                    property.setName(validatedNewName);
+                                      const projectScopedContainers = projectScopedContainersAccessor.get();
+                                      const validatedNewName = getValidatedPropertyName(
+                                        properties,
+                                        projectScopedContainers,
+                                        newName
+                                      );
+                                      onRenameProperty(
+                                        property.getName(),
+                                        validatedNewName
+                                      );
+                                      property.setName(validatedNewName);
 
-                                    forceUpdate();
-                                    onPropertiesUpdated &&
-                                      onPropertiesUpdated();
-                                  }}
-                                  onFocus={() =>
-                                    onFocusProperty(property.getName())
-                                  }
-                                  fullWidth
-                                />
-                              </Line>
-                              <Line
-                                noMargin
-                                alignItems="center"
-                                justifyContent="flex-end"
-                              >
-                                <SelectField
-                                  margin="none"
-                                  disabled={
-                                    property.getType() === 'Behavior' &&
-                                    !property.isHidden()
-                                  }
-                                  value={
-                                    property.isHidden()
-                                      ? 'Hidden'
-                                      : property.isDeprecated()
-                                      ? 'Deprecated'
-                                      : property.isAdvanced()
-                                      ? 'Advanced'
-                                      : 'Visible'
-                                  }
-                                  onChange={(e, i, value: string) => {
-                                    if (value === 'Hidden') {
-                                      setHidden(property, true);
-                                      setDeprecated(property, false);
-                                      setAdvanced(property, false);
-                                    } else if (value === 'Deprecated') {
-                                      setHidden(property, false);
-                                      setDeprecated(property, true);
-                                      setAdvanced(property, false);
-                                    } else if (value === 'Advanced') {
-                                      setHidden(property, false);
-                                      setDeprecated(property, false);
-                                      setAdvanced(property, true);
-                                    } else if (value === 'Visible') {
-                                      setHidden(property, false);
-                                      setDeprecated(property, false);
-                                      setAdvanced(property, false);
+                                      forceUpdate();
+                                      onPropertiesUpdated &&
+                                        onPropertiesUpdated();
+                                    }}
+                                    onFocus={() =>
+                                      onFocusProperty(property.getName())
                                     }
-                                  }}
-                                  onFocus={() =>
-                                    onFocusProperty(property.getName())
-                                  }
-                                  fullWidth
+                                    fullWidth
+                                  />
+                                </Line>
+                                <Line
+                                  noMargin
+                                  alignItems="center"
+                                  justifyContent="flex-end"
                                 >
-                                  <SelectOption
-                                    key="visibility-visible"
-                                    value="Visible"
-                                    label={t`Visible in editor`}
-                                  />
-                                  <SelectOption
-                                    key="visibility-advanced"
-                                    value="Advanced"
-                                    label={t`Advanced`}
-                                  />
-                                  <SelectOption
-                                    key="visibility-deprecated"
-                                    value="Deprecated"
-                                    label={t`Deprecated`}
-                                  />
-                                  <SelectOption
-                                    key="visibility-hidden"
-                                    value="Hidden"
-                                    label={t`Hidden`}
-                                  />
-                                </SelectField>
-                              </Line>
-                            </ResponsiveLineStackLayout>
-                          </Column>
-                        </div>
-                        <Line expand>
-                          <ColumnStackLayout expand>
-                            <ResponsiveLineStackLayout noMargin>
-                              <SelectField
-                                floatingLabelText={<Trans>Type</Trans>}
-                                value={property.getType()}
-                                onChange={(e, i, value: string) => {
-                                  property.setType(value);
-                                  if (value === 'Behavior') {
-                                    property.setHidden(false);
-                                  }
-                                  if (value === 'Resource') {
-                                    setExtraInfoString(property, 'json');
-                                  }
-                                  forceUpdate();
-                                  onPropertyTypeChanged(property.getName());
-                                  onPropertiesUpdated && onPropertiesUpdated();
-                                }}
-                                onFocus={() =>
-                                  onFocusProperty(property.getName())
-                                }
-                                fullWidth
-                              >
-                                <SelectOption
-                                  key="property-type-number"
-                                  value="Number"
-                                  label={t`Number`}
-                                />
-                                <SelectOption
-                                  key="property-type-string"
-                                  value="String"
-                                  label={t`String`}
-                                />
-                                <SelectOption
-                                  key="property-type-boolean"
-                                  value="Boolean"
-                                  label={t`Boolean (checkbox)`}
-                                />
-                                <SelectOption
-                                  key="property-type-choice"
-                                  value="Choice"
-                                  label={t`String from a list of options (text)`}
-                                />
-                                <SelectOption
-                                  key="property-type-color"
-                                  value="Color"
-                                  label={t`Color (text)`}
-                                />
-                                {eventsBasedObject && (
-                                  <SelectOption
-                                    value="LeaderboardId"
-                                    label={t`Leaderboard (text)`}
-                                  />
-                                )}
-                                {eventsBasedBehavior && !isSharedProperties && (
-                                  <SelectOption
-                                    key="property-type-object-animation-name"
-                                    value="ObjectAnimationName"
-                                    label={t`Object animation (text)`}
-                                  />
-                                )}
-                                {eventsBasedBehavior && !isSharedProperties && (
-                                  <SelectOption
-                                    key="property-type-keyboard-key"
-                                    value="KeyboardKey"
-                                    label={t`Keyboard key (text)`}
-                                  />
-                                )}
-                                <SelectOption
-                                  key="property-type-text-area"
-                                  value="MultilineString"
-                                  label={t`Multiline text`}
-                                />
-                                <SelectOption
-                                  key="property-type-resource"
-                                  value="Resource"
-                                  label={t`Resource`}
-                                />
-                                {eventsBasedBehavior && !isSharedProperties && (
-                                  <SelectOption
-                                    key="property-type-behavior"
-                                    value="Behavior"
-                                    label={t`Required behavior`}
-                                  />
-                                )}
-                              </SelectField>
-                              {property.getType() === 'Number' && (
+                                  <SelectField
+                                    margin="none"
+                                    disabled={
+                                      property.getType() === 'Behavior' &&
+                                      !property.isHidden()
+                                    }
+                                    value={
+                                      property.isHidden()
+                                        ? 'Hidden'
+                                        : property.isDeprecated()
+                                        ? 'Deprecated'
+                                        : property.isAdvanced()
+                                        ? 'Advanced'
+                                        : 'Visible'
+                                    }
+                                    onChange={(e, i, value: string) => {
+                                      if (value === 'Hidden') {
+                                        setHidden(property, true);
+                                        setDeprecated(property, false);
+                                        setAdvanced(property, false);
+                                      } else if (value === 'Deprecated') {
+                                        setHidden(property, false);
+                                        setDeprecated(property, true);
+                                        setAdvanced(property, false);
+                                      } else if (value === 'Advanced') {
+                                        setHidden(property, false);
+                                        setDeprecated(property, false);
+                                        setAdvanced(property, true);
+                                      } else if (value === 'Visible') {
+                                        setHidden(property, false);
+                                        setDeprecated(property, false);
+                                        setAdvanced(property, false);
+                                      }
+                                    }}
+                                    onFocus={() =>
+                                      onFocusProperty(property.getName())
+                                    }
+                                    fullWidth
+                                  >
+                                    <SelectOption
+                                      key="visibility-visible"
+                                      value="Visible"
+                                      label={t`Visible in editor`}
+                                    />
+                                    <SelectOption
+                                      key="visibility-advanced"
+                                      value="Advanced"
+                                      label={t`Advanced`}
+                                    />
+                                    <SelectOption
+                                      key="visibility-deprecated"
+                                      value="Deprecated"
+                                      label={t`Deprecated`}
+                                    />
+                                    <SelectOption
+                                      key="visibility-hidden"
+                                      value="Hidden"
+                                      label={t`Hidden`}
+                                    />
+                                  </SelectField>
+                                </Line>
+                              </ResponsiveLineStackLayout>
+                            </Column>
+                          </div>
+                          <Line expand>
+                            <ColumnStackLayout expand>
+                              <ResponsiveLineStackLayout noMargin>
                                 <SelectField
-                                  floatingLabelText={
-                                    <Trans>Measurement unit</Trans>
-                                  }
-                                  value={property
-                                    .getMeasurementUnit()
-                                    .getName()}
+                                  floatingLabelText={<Trans>Type</Trans>}
+                                  value={property.getType()}
                                   onChange={(e, i, value: string) => {
-                                    property.setMeasurementUnit(
-                                      gd.MeasurementUnit.getDefaultMeasurementUnitByName(
-                                        value
-                                      )
-                                    );
+                                    property.setType(value);
+                                    if (value === 'Behavior') {
+                                      property.setHidden(false);
+                                    }
+                                    if (value === 'Resource') {
+                                      setExtraInfoString(property, 'json');
+                                    }
                                     forceUpdate();
+                                    onPropertyTypeChanged(property.getName());
                                     onPropertiesUpdated &&
                                       onPropertiesUpdated();
                                   }}
@@ -470,226 +401,354 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                   }
                                   fullWidth
                                 >
-                                  {mapFor(
-                                    0,
-                                    gd.MeasurementUnit.getDefaultMeasurementUnitsCount(),
-                                    i => {
-                                      const measurementUnit = gd.MeasurementUnit.getDefaultMeasurementUnitAtIndex(
-                                        i
-                                      );
-                                      const unitShortLabel = getMeasurementUnitShortLabel(
-                                        measurementUnit
-                                      );
-                                      const label =
-                                        measurementUnit.getLabel() +
-                                        (unitShortLabel.length > 0
-                                          ? ' — ' + unitShortLabel
-                                          : '');
-                                      return (
-                                        <SelectOption
-                                          key={
-                                            'measurement-unit-' +
-                                            measurementUnit.getName()
-                                          }
-                                          value={measurementUnit.getName()}
-                                          label={label}
-                                        />
-                                      );
-                                    }
+                                  <SelectOption
+                                    key="property-type-number"
+                                    value="Number"
+                                    label={t`Number`}
+                                  />
+                                  <SelectOption
+                                    key="property-type-string"
+                                    value="String"
+                                    label={t`String`}
+                                  />
+                                  <SelectOption
+                                    key="property-type-boolean"
+                                    value="Boolean"
+                                    label={t`Boolean (checkbox)`}
+                                  />
+                                  <SelectOption
+                                    key="property-type-choice"
+                                    value="Choice"
+                                    label={t`String from a list of options (text)`}
+                                  />
+                                  <SelectOption
+                                    key="property-type-color"
+                                    value="Color"
+                                    label={t`Color (text)`}
+                                  />
+                                  {eventsBasedObject && (
+                                    <SelectOption
+                                      value="LeaderboardId"
+                                      label={t`Leaderboard (text)`}
+                                    />
                                   )}
-                                </SelectField>
-                              )}
-                              {(property.getType() === 'String' ||
-                                property.getType() === 'Number' ||
-                                property.getType() === 'ObjectAnimationName' ||
-                                property.getType() === 'KeyboardKey' ||
-                                property.getType() === 'MultilineString') && (
-                                <SemiControlledTextField
-                                  commitOnBlur
-                                  floatingLabelText={
-                                    <Trans>Default value</Trans>
-                                  }
-                                  hintText={
-                                    property.getType() === 'Number'
-                                      ? '123'
-                                      : 'ABC'
-                                  }
-                                  value={property.getValue()}
-                                  onChange={newValue => {
-                                    property.setValue(newValue);
-                                    forceUpdate();
-                                    onPropertiesUpdated &&
-                                      onPropertiesUpdated();
-                                  }}
-                                  onFocus={() =>
-                                    onFocusProperty(property.getName())
-                                  }
-                                  multiline={
-                                    property.getType() === 'MultilineString'
-                                  }
-                                  fullWidth
-                                />
-                              )}
-                              {property.getType() === 'Boolean' && (
-                                <SelectField
-                                  floatingLabelText={
-                                    <Trans>Default value</Trans>
-                                  }
-                                  value={
-                                    property.getValue() === 'true'
-                                      ? 'true'
-                                      : 'false'
-                                  }
-                                  onChange={(e, i, value) => {
-                                    property.setValue(value);
-                                    forceUpdate();
-                                    onPropertiesUpdated &&
-                                      onPropertiesUpdated();
-                                  }}
-                                  onFocus={() =>
-                                    onFocusProperty(property.getName())
-                                  }
-                                  fullWidth
-                                >
-                                  <SelectOption
-                                    key="boolean-true"
-                                    value="true"
-                                    label={t`True (checked)`}
-                                  />
-                                  <SelectOption
-                                    key="boolean-false"
-                                    value="false"
-                                    label={t`False (not checked)`}
-                                  />
-                                </SelectField>
-                              )}
-                              {property.getType() === 'Behavior' && (
-                                <BehaviorTypeSelector
-                                  project={project}
-                                  eventsFunctionsExtension={extension}
-                                  objectType={behaviorObjectType || ''}
-                                  value={
-                                    property.getExtraInfo().size() === 0
-                                      ? ''
-                                      : property.getExtraInfo().at(0)
-                                  }
-                                  onChange={(newValue: string) => {
-                                    // Change the type of the required behavior.
-                                    const extraInfo = property.getExtraInfo();
-                                    if (extraInfo.size() === 0) {
-                                      extraInfo.push_back(newValue);
-                                    } else {
-                                      extraInfo.set(0, newValue);
-                                    }
-                                    const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
-                                      project.getCurrentPlatform(),
-                                      newValue
-                                    );
-                                    const projectScopedContainers = projectScopedContainersAccessor.get();
-                                    const validatedNewName = getValidatedPropertyName(
-                                      properties,
-                                      projectScopedContainers,
-                                      behaviorMetadata.getDefaultName()
-                                    );
-                                    property.setName(validatedNewName);
-                                    property.setLabel(
-                                      behaviorMetadata.getFullName()
-                                    );
-                                    forceUpdate();
-                                    onPropertiesUpdated &&
-                                      onPropertiesUpdated();
-                                  }}
-                                  onFocus={() =>
-                                    onFocusProperty(property.getName())
-                                  }
-                                  disabled={false}
-                                />
-                              )}
-                              {property.getType() === 'Color' && (
-                                <ColorField
-                                  floatingLabelText={
-                                    <Trans>Default value</Trans>
-                                  }
-                                  disableAlpha
-                                  fullWidth
-                                  color={property.getValue()}
-                                  onChange={color => {
-                                    property.setValue(color);
-                                    forceUpdate();
-                                    onPropertiesUpdated &&
-                                      onPropertiesUpdated();
-                                  }}
-                                />
-                              )}
-                              {property.getType() === 'Resource' && (
-                                <ResourceTypeSelectField
-                                  value={
-                                    property.getExtraInfo().size() > 0
-                                      ? property.getExtraInfo().at(0)
-                                      : ''
-                                  }
-                                  onChange={(e, i, value) => {
-                                    setExtraInfoString(property, value);
-                                    forceUpdate();
-                                    onPropertiesUpdated &&
-                                      onPropertiesUpdated();
-                                  }}
-                                  onFocus={() =>
-                                    onFocusProperty(property.getName())
-                                  }
-                                  fullWidth
-                                />
-                              )}
-                              {property.getType() === 'Choice' && (
-                                <SelectField
-                                  floatingLabelText={
-                                    <Trans>Default value</Trans>
-                                  }
-                                  value={property.getValue()}
-                                  onChange={(e, i, value) => {
-                                    property.setValue(value);
-                                    forceUpdate();
-                                    onPropertiesUpdated &&
-                                      onPropertiesUpdated();
-                                  }}
-                                  onFocus={() =>
-                                    onFocusProperty(property.getName())
-                                  }
-                                  fullWidth
-                                >
-                                  {getChoicesArray(property).map(
-                                    (choice, index) => (
+                                  {eventsBasedBehavior &&
+                                    !isSharedProperties && (
                                       <SelectOption
-                                        key={index}
-                                        value={choice.value}
-                                        label={
-                                          choice.value +
-                                          (choice.label &&
-                                          choice.label !== choice.value
-                                            ? ` — ${choice.label}`
-                                            : '')
-                                        }
+                                        key="property-type-object-animation-name"
+                                        value="ObjectAnimationName"
+                                        label={t`Object animation (text)`}
                                       />
-                                    )
-                                  )}
+                                    )}
+                                  {eventsBasedBehavior &&
+                                    !isSharedProperties && (
+                                      <SelectOption
+                                        key="property-type-keyboard-key"
+                                        value="KeyboardKey"
+                                        label={t`Keyboard key (text)`}
+                                      />
+                                    )}
+                                  <SelectOption
+                                    key="property-type-text-area"
+                                    value="MultilineString"
+                                    label={t`Multiline text`}
+                                  />
+                                  <SelectOption
+                                    key="property-type-resource"
+                                    value="Resource"
+                                    label={t`Resource`}
+                                  />
+                                  {eventsBasedBehavior &&
+                                    !isSharedProperties && (
+                                      <SelectOption
+                                        key="property-type-behavior"
+                                        value="Behavior"
+                                        label={t`Required behavior`}
+                                      />
+                                    )}
                                 </SelectField>
+                                {property.getType() === 'Number' && (
+                                  <SelectField
+                                    floatingLabelText={
+                                      <Trans>Measurement unit</Trans>
+                                    }
+                                    value={property
+                                      .getMeasurementUnit()
+                                      .getName()}
+                                    onChange={(e, i, value: string) => {
+                                      property.setMeasurementUnit(
+                                        gd.MeasurementUnit.getDefaultMeasurementUnitByName(
+                                          value
+                                        )
+                                      );
+                                      forceUpdate();
+                                      onPropertiesUpdated &&
+                                        onPropertiesUpdated();
+                                    }}
+                                    onFocus={() =>
+                                      onFocusProperty(property.getName())
+                                    }
+                                    fullWidth
+                                  >
+                                    {mapFor(
+                                      0,
+                                      gd.MeasurementUnit.getDefaultMeasurementUnitsCount(),
+                                      i => {
+                                        const measurementUnit = gd.MeasurementUnit.getDefaultMeasurementUnitAtIndex(
+                                          i
+                                        );
+                                        const unitShortLabel = getMeasurementUnitShortLabel(
+                                          measurementUnit
+                                        );
+                                        const label =
+                                          measurementUnit.getLabel() +
+                                          (unitShortLabel.length > 0
+                                            ? ' — ' + unitShortLabel
+                                            : '');
+                                        return (
+                                          <SelectOption
+                                            key={
+                                              'measurement-unit-' +
+                                              measurementUnit.getName()
+                                            }
+                                            value={measurementUnit.getName()}
+                                            label={label}
+                                          />
+                                        );
+                                      }
+                                    )}
+                                  </SelectField>
+                                )}
+                                {(property.getType() === 'String' ||
+                                  property.getType() === 'Number' ||
+                                  property.getType() ===
+                                    'ObjectAnimationName' ||
+                                  property.getType() === 'KeyboardKey' ||
+                                  property.getType() === 'MultilineString') && (
+                                  <SemiControlledTextField
+                                    commitOnBlur
+                                    floatingLabelText={
+                                      <Trans>Default value</Trans>
+                                    }
+                                    hintText={
+                                      property.getType() === 'Number'
+                                        ? '123'
+                                        : 'ABC'
+                                    }
+                                    value={property.getValue()}
+                                    onChange={newValue => {
+                                      property.setValue(newValue);
+                                      forceUpdate();
+                                      onPropertiesUpdated &&
+                                        onPropertiesUpdated();
+                                    }}
+                                    onFocus={() =>
+                                      onFocusProperty(property.getName())
+                                    }
+                                    multiline={
+                                      property.getType() === 'MultilineString'
+                                    }
+                                    fullWidth
+                                  />
+                                )}
+                                {property.getType() === 'Boolean' && (
+                                  <SelectField
+                                    floatingLabelText={
+                                      <Trans>Default value</Trans>
+                                    }
+                                    value={
+                                      property.getValue() === 'true'
+                                        ? 'true'
+                                        : 'false'
+                                    }
+                                    onChange={(e, i, value) => {
+                                      property.setValue(value);
+                                      forceUpdate();
+                                      onPropertiesUpdated &&
+                                        onPropertiesUpdated();
+                                    }}
+                                    onFocus={() =>
+                                      onFocusProperty(property.getName())
+                                    }
+                                    fullWidth
+                                  >
+                                    <SelectOption
+                                      key="boolean-true"
+                                      value="true"
+                                      label={t`True (checked)`}
+                                    />
+                                    <SelectOption
+                                      key="boolean-false"
+                                      value="false"
+                                      label={t`False (not checked)`}
+                                    />
+                                  </SelectField>
+                                )}
+                                {property.getType() === 'Behavior' && (
+                                  <BehaviorTypeSelector
+                                    project={project}
+                                    eventsFunctionsExtension={extension}
+                                    objectType={behaviorObjectType || ''}
+                                    value={
+                                      property.getExtraInfo().size() === 0
+                                        ? ''
+                                        : property.getExtraInfo().at(0)
+                                    }
+                                    onChange={(newValue: string) => {
+                                      // Change the type of the required behavior.
+                                      const extraInfo = property.getExtraInfo();
+                                      if (extraInfo.size() === 0) {
+                                        extraInfo.push_back(newValue);
+                                      } else {
+                                        extraInfo.set(0, newValue);
+                                      }
+                                      const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+                                        project.getCurrentPlatform(),
+                                        newValue
+                                      );
+                                      const projectScopedContainers = projectScopedContainersAccessor.get();
+                                      const validatedNewName = getValidatedPropertyName(
+                                        properties,
+                                        projectScopedContainers,
+                                        behaviorMetadata.getDefaultName()
+                                      );
+                                      property.setName(validatedNewName);
+                                      property.setLabel(
+                                        behaviorMetadata.getFullName()
+                                      );
+                                      forceUpdate();
+                                      onPropertiesUpdated &&
+                                        onPropertiesUpdated();
+                                    }}
+                                    onFocus={() =>
+                                      onFocusProperty(property.getName())
+                                    }
+                                    disabled={false}
+                                  />
+                                )}
+                                {property.getType() === 'Color' && (
+                                  <ColorField
+                                    floatingLabelText={
+                                      <Trans>Default value</Trans>
+                                    }
+                                    disableAlpha
+                                    fullWidth
+                                    color={property.getValue()}
+                                    onChange={color => {
+                                      property.setValue(color);
+                                      forceUpdate();
+                                      onPropertiesUpdated &&
+                                        onPropertiesUpdated();
+                                    }}
+                                  />
+                                )}
+                                {property.getType() === 'Resource' && (
+                                  <ResourceTypeSelectField
+                                    value={
+                                      property.getExtraInfo().size() > 0
+                                        ? property.getExtraInfo().at(0)
+                                        : ''
+                                    }
+                                    onChange={(e, i, value) => {
+                                      setExtraInfoString(property, value);
+                                      forceUpdate();
+                                      onPropertiesUpdated &&
+                                        onPropertiesUpdated();
+                                    }}
+                                    onFocus={() =>
+                                      onFocusProperty(property.getName())
+                                    }
+                                    fullWidth
+                                  />
+                                )}
+                                {property.getType() === 'Choice' && (
+                                  <SelectField
+                                    floatingLabelText={
+                                      <Trans>Default value</Trans>
+                                    }
+                                    value={property.getValue()}
+                                    onChange={(e, i, value) => {
+                                      property.setValue(value);
+                                      forceUpdate();
+                                      onPropertiesUpdated &&
+                                        onPropertiesUpdated();
+                                    }}
+                                    onFocus={() =>
+                                      onFocusProperty(property.getName())
+                                    }
+                                    fullWidth
+                                  >
+                                    {getChoicesArray(property).map(
+                                      (choice, index) => (
+                                        <SelectOption
+                                          key={index}
+                                          value={choice.value}
+                                          label={
+                                            choice.value +
+                                            (choice.label &&
+                                            choice.label !== choice.value
+                                              ? ` — ${choice.label}`
+                                              : '')
+                                          }
+                                        />
+                                      )
+                                    )}
+                                  </SelectField>
+                                )}
+                              </ResponsiveLineStackLayout>
+                              {property.getType() === 'Choice' && (
+                                <ChoicesEditor
+                                  choices={getChoicesArray(property)}
+                                  setChoices={setChoices(property)}
+                                />
                               )}
-                            </ResponsiveLineStackLayout>
-                            {property.getType() === 'Choice' && (
-                              <ChoicesEditor
-                                choices={getChoicesArray(property)}
-                                setChoices={setChoices(property)}
-                              />
-                            )}
-                            <ResponsiveLineStackLayout noMargin>
+                              <ResponsiveLineStackLayout noMargin>
+                                <SemiControlledTextField
+                                  commitOnBlur
+                                  floatingLabelText={<Trans>Short label</Trans>}
+                                  translatableHintText={t`Make the purpose of the property easy to understand`}
+                                  floatingLabelFixed
+                                  value={property.getLabel()}
+                                  onChange={text => {
+                                    property.setLabel(text);
+                                    forceUpdate();
+                                  }}
+                                  onFocus={() =>
+                                    onFocusProperty(property.getName())
+                                  }
+                                  fullWidth
+                                />
+                                <SemiControlledAutoComplete
+                                  floatingLabelText={<Trans>Group name</Trans>}
+                                  hintText={t`Leave it empty to use the default group`}
+                                  fullWidth
+                                  value={property.getGroup()}
+                                  onChange={text => {
+                                    property.setGroup(text);
+                                    forceUpdate();
+                                    onPropertiesUpdated &&
+                                      onPropertiesUpdated();
+                                  }}
+                                  onFocus={() =>
+                                    onFocusProperty(property.getName())
+                                  }
+                                  dataSource={getPropertyGroupNames().map(
+                                    name => ({
+                                      text: name,
+                                      value: name,
+                                    })
+                                  )}
+                                  openOnFocus={true}
+                                />
+                              </ResponsiveLineStackLayout>
                               <SemiControlledTextField
                                 commitOnBlur
-                                floatingLabelText={<Trans>Short label</Trans>}
-                                translatableHintText={t`Make the purpose of the property easy to understand`}
+                                floatingLabelText={<Trans>Description</Trans>}
+                                translatableHintText={t`Optionally, explain the purpose of the property in more details`}
                                 floatingLabelFixed
-                                value={property.getLabel()}
+                                value={property.getDescription()}
                                 onChange={text => {
-                                  property.setLabel(text);
+                                  property.setDescription(text);
                                   forceUpdate();
                                 }}
                                 onFocus={() =>
@@ -697,47 +756,11 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                 }
                                 fullWidth
                               />
-                              <SemiControlledAutoComplete
-                                floatingLabelText={<Trans>Group name</Trans>}
-                                hintText={t`Leave it empty to use the default group`}
-                                fullWidth
-                                value={property.getGroup()}
-                                onChange={text => {
-                                  property.setGroup(text);
-                                  forceUpdate();
-                                  onPropertiesUpdated && onPropertiesUpdated();
-                                }}
-                                onFocus={() =>
-                                  onFocusProperty(property.getName())
-                                }
-                                dataSource={getPropertyGroupNames().map(
-                                  name => ({
-                                    text: name,
-                                    value: name,
-                                  })
-                                )}
-                                openOnFocus={true}
-                              />
-                            </ResponsiveLineStackLayout>
-                            <SemiControlledTextField
-                              commitOnBlur
-                              floatingLabelText={<Trans>Description</Trans>}
-                              translatableHintText={t`Optionally, explain the purpose of the property in more details`}
-                              floatingLabelFixed
-                              value={property.getDescription()}
-                              onChange={text => {
-                                property.setDescription(text);
-                                forceUpdate();
-                              }}
-                              onFocus={() =>
-                                onFocusProperty(property.getName())
-                              }
-                              fullWidth
-                            />
-                          </ColumnStackLayout>
-                        </Line>
-                      </React.Fragment>
-                    );
+                            </ColumnStackLayout>
+                          </Line>
+                        </React.Fragment>
+                      );
+                    }
                   }
                 )}
               </Column>

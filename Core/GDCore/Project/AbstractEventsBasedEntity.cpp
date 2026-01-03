@@ -32,6 +32,8 @@ void AbstractEventsBasedEntity::SerializeTo(SerializerElement& element) const {
   eventsFunctionsContainer.SerializeEventsFunctionsTo(eventsFunctionsElement);
   propertyDescriptors.SerializeElementsTo(
       "propertyDescriptor", element.AddChild("propertyDescriptors"));
+  propertyDescriptors.SerializeFoldersTo(
+      element.AddChild("propertyFolderStructure"));
 }
 
 void AbstractEventsBasedEntity::UnserializeFrom(
@@ -47,6 +49,11 @@ void AbstractEventsBasedEntity::UnserializeFrom(
       project, eventsFunctionsElement);
   propertyDescriptors.UnserializeElementsFrom(
       "propertyDescriptor", element.GetChild("propertyDescriptors"));
+  if (element.HasChild("propertiesFolderStructure")) {
+    propertyDescriptors.UnserializeFoldersFrom(
+        project, element.GetChild("propertiesFolderStructure", 0));
+  }
+  propertyDescriptors.AddMissingPropertiesInRootFolder();
 }
 
 }  // namespace gd

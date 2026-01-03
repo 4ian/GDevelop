@@ -91,6 +91,7 @@
 #include <GDCore/Project/PropertiesContainer.h>
 #include <GDCore/Project/PropertiesContainersList.h>
 #include <GDCore/Project/PropertyDescriptor.h>
+#include <GDCore/Project/PropertyFolderOrProperty.h>
 #include <GDCore/Project/ResourcesContainer.h>
 #include <GDCore/Project/ResourcesContainersList.h>
 #include <GDCore/Project/Variable.h>
@@ -471,6 +472,7 @@ typedef std::shared_ptr<SerializerElement> SharedPtrSerializerElement;
 typedef std::vector<UnfilledRequiredBehaviorPropertyProblem>
     VectorUnfilledRequiredBehaviorPropertyProblem;
 typedef std::vector<const gd::ObjectFolderOrObject*> VectorObjectFolderOrObject;
+typedef std::vector<const gd::PropertyFolderOrProperty*> VectorPropertyFolderOrProperty;
 typedef std::vector<gd::Screenshot> VectorScreenshot;
 typedef QuickCustomization::Visibility
     QuickCustomization_Visibility;

@@ -14,12 +14,14 @@ type Props = {|
     index: number,
     text: string
   ) => void,
+  onFocus?: (event: SyntheticFocusEvent<HTMLInputElement>) => void,
   fullWidth?: boolean,
 |};
 
 export default function ResourceTypeSelectField({
   value,
   onChange,
+  onFocus,
   fullWidth,
 }: Props) {
   return (
@@ -29,6 +31,7 @@ export default function ResourceTypeSelectField({
           floatingLabelText={<Trans>Resource type</Trans>}
           value={value}
           onChange={onChange}
+          onFocus={onFocus}
           fullWidth={fullWidth}
         >
           {allResourceKindsAndMetadata.map(({ kind, displayName }) => (

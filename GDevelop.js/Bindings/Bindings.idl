@@ -59,6 +59,11 @@ interface VectorObjectFolderOrObject {
     [Const] ObjectFolderOrObject at(unsigned long index);
 };
 
+interface VectorPropertyFolderOrProperty {
+    unsigned long size();
+    [Const] PropertyFolderOrProperty at(unsigned long index);
+};
+
 interface VectorScreenshot {
     unsigned long size();
     [Const, Ref] Screenshot at(unsigned long index);
@@ -3373,6 +3378,28 @@ interface EventsBasedObjectsList {
     [Ref] EventsBasedObject at(unsigned long index);
 };
 
+interface PropertyFolderOrProperty {
+    void PropertyFolderOrProperty();
+    boolean IsFolder();
+    boolean IsRootFolder();
+    [Ref] NamedPropertyDescriptor GetProperty();
+    [Const, Ref] DOMString GetFolderName();
+    void SetFolderName([Const] DOMString name);
+    boolean HasPropertyNamed([Const] DOMString name);
+    [Ref] PropertyFolderOrProperty GetPropertyNamed([Const] DOMString name);
+    unsigned long GetChildrenCount();
+    [Ref] PropertyFolderOrProperty GetChildAt(unsigned long pos);
+    [Ref] PropertyFolderOrProperty GetPropertyChild([Const] DOMString name);
+    [Ref] PropertyFolderOrProperty GetOrCreateChildFolder([Const] DOMString name);
+    unsigned long GetChildPosition([Const, Ref] PropertyFolderOrProperty child);
+    [Ref] PropertyFolderOrProperty GetParent();
+    [Ref] PropertyFolderOrProperty InsertNewFolder([Const] DOMString name, unsigned long newPosition);
+    void MovePropertyFolderOrPropertyToAnotherFolder([Ref] PropertyFolderOrProperty propertyFolderOrProperty, [Ref] PropertyFolderOrProperty newParentFolder, unsigned long newPosition);
+    void MoveChild(unsigned long oldIndex, unsigned long newIndex);
+    void RemoveFolderChild([Const, Ref] PropertyFolderOrProperty childToRemove);
+    boolean IsADescendantOf([Const, Ref] PropertyFolderOrProperty otherPropertyFolderOrProperty);
+};
+
 interface PropertiesContainer {
     void PropertiesContainer(EventsFunctionsContainer_FunctionOwner owner);
 
@@ -3388,6 +3415,14 @@ interface PropertiesContainer {
 
     unsigned long size();
     [Ref] NamedPropertyDescriptor at(unsigned long index);
+
+    [Ref] NamedPropertyDescriptor InsertNewPropertyInFolder(
+        [Const] DOMString name,
+        [Ref] PropertyFolderOrProperty folder,
+        unsigned long pos);
+    [Ref] PropertyFolderOrProperty GetRootFolder();
+    [Value] VectorPropertyFolderOrProperty GetAllPropertyFolderOrProperty();
+    void AddMissingPropertiesInRootFolder();
 };
 
 interface EventsFunctionsExtension {

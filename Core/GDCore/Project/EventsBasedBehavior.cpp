@@ -21,8 +21,12 @@ EventsBasedBehavior::EventsBasedBehavior()
 void EventsBasedBehavior::SerializeTo(SerializerElement& element) const {
   AbstractEventsBasedEntity::SerializeTo(element);
   element.SetAttribute("objectType", objectType);
-  sharedPropertyDescriptors.SerializeElementsTo(
-      "propertyDescriptor", element.AddChild("sharedPropertyDescriptors"));
+  if (!sharedPropertyDescriptors.empty()) {
+    sharedPropertyDescriptors.SerializeElementsTo(
+        "propertyDescriptor", element.AddChild("sharedPropertyDescriptors"));
+    sharedPropertyDescriptors.SerializeFoldersTo(
+        element.AddChild("sharedPropertyFolderStructure"));
+  }
   if (quickCustomizationVisibility != QuickCustomization::Visibility::Default) {
     element.SetStringAttribute(
         "quickCustomizationVisibility",
@@ -38,6 +42,11 @@ void EventsBasedBehavior::UnserializeFrom(gd::Project& project,
   objectType = element.GetStringAttribute("objectType");
   sharedPropertyDescriptors.UnserializeElementsFrom(
       "propertyDescriptor", element.GetChild("sharedPropertyDescriptors"));
+  if (element.HasChild("sharedPropertiesFolderStructure")) {
+    sharedPropertyDescriptors.UnserializeFoldersFrom(
+        project, element.GetChild("sharedPropertiesFolderStructure", 0));
+  }
+  sharedPropertyDescriptors.AddMissingPropertiesInRootFolder();
   if (element.HasChild("quickCustomizationVisibility")) {
     quickCustomizationVisibility =
         element.GetStringAttribute("quickCustomizationVisibility") == "visible"

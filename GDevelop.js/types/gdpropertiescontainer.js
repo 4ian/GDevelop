@@ -12,6 +12,10 @@ declare class gdPropertiesContainer {
   getPosition(item: gdNamedPropertyDescriptor): number;
   size(): number;
   at(index: number): gdNamedPropertyDescriptor;
+  insertNewPropertyInFolder(name: string, folder: gdPropertyFolderOrProperty, pos: number): gdNamedPropertyDescriptor;
+  getRootFolder(): gdPropertyFolderOrProperty;
+  getAllPropertyFolderOrProperty(): gdVectorPropertyFolderOrProperty;
+  addMissingPropertiesInRootFolder(): void;
   delete(): void;
   ptr: number;
 };

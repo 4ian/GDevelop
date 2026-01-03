@@ -27,10 +27,10 @@ type Props = {|
   },
   transitions: {
     [string]: {|
-      nextEditor?: string | (() => string),
-      nextLabel?: React.Node,
-      nextIcon?: React.Node,
-      previousEditor?: string | (() => string),
+      nextEditor?: string | (() => string) | null,
+      nextLabel?: React.Node | null,
+      nextIcon?: React.Node | null,
+      previousEditor?: string | (() => string) | null,
     |},
   },
   onEditorChanged: (editorName: string) => void,

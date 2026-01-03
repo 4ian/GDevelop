@@ -43,6 +43,7 @@ type Props = {|
   children: React.Node,
   disabled?: boolean,
   stopPropagationOnClick?: boolean,
+  onFocus?: (event: SyntheticFocusEvent<HTMLInputElement>) => void,
 
   id?: ?string,
   style?: {
@@ -128,6 +129,7 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
                   }
                 : undefined
             }
+            onFocus={props.onFocus}
             InputProps={{
               style: props.inputStyle,
               disableUnderline: !!props.disableUnderline,

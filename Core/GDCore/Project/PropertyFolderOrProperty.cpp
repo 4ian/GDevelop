@@ -17,6 +17,7 @@ using namespace std;
 namespace gd {
 
 PropertyFolderOrProperty PropertyFolderOrProperty::badPropertyFolderOrProperty;
+gd::String PropertyFolderOrProperty::emptyGroupName;
 
 PropertyFolderOrProperty::PropertyFolderOrProperty()
     : folderName("__NULL"), property(nullptr) {}
@@ -93,6 +94,19 @@ void PropertyFolderOrProperty::SetGroupNameOfAllProperties(
   }
 }
 
+const gd::String &PropertyFolderOrProperty::GetGroupName() {
+  auto *groupFolder = this;
+  auto *rootFolder = parent;
+  if (!rootFolder) {
+    return gd::PropertyFolderOrProperty::emptyGroupName;
+  }
+  while (rootFolder->parent) {
+    groupFolder = rootFolder;
+    rootFolder = rootFolder->parent;
+  }
+  return groupFolder->GetFolderName();
+}
+
 PropertyFolderOrProperty &
 PropertyFolderOrProperty::GetChildAt(std::size_t index) {
   if (index >= children.size())
@@ -120,6 +134,7 @@ void PropertyFolderOrProperty::InsertProperty(
     gd::NamedPropertyDescriptor *insertedProperty, std::size_t position) {
   auto propertyFolderOrProperty =
       gd::make_unique<PropertyFolderOrProperty>(insertedProperty, this);
+  propertyFolderOrProperty->GetProperty().SetGroup(GetGroupName());
   if (position < children.size()) {
     children.insert(children.begin() + position,
                     std::move(propertyFolderOrProperty));
@@ -240,6 +255,8 @@ void PropertyFolderOrProperty::MovePropertyFolderOrPropertyToAnotherFolder(
   children.erase(it);
 
   propertyFolderOrPropertyPtr->parent = &newParentFolder;
+  propertyFolderOrPropertyPtr->SetGroupNameOfAllProperties(
+      newParentFolder.GetGroupName());
   newParentFolder.children.insert(newPosition < newParentFolder.children.size()
                                       ? newParentFolder.children.begin() +
                                             newPosition

@@ -643,11 +643,12 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
     const onTreeModified = React.useCallback(
       (shouldForceUpdateList: boolean) => {
         triggerUnsavedChanges();
+        onPropertiesUpdated();
 
         if (shouldForceUpdateList) forceUpdateList();
         else forceUpdate();
       },
-      [forceUpdate, forceUpdateList, triggerUnsavedChanges]
+      [forceUpdate, forceUpdateList, onPropertiesUpdated, triggerUnsavedChanges]
     );
 
     // Initialize keyboard shortcuts as empty.

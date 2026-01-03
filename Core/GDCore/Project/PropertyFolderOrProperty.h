@@ -207,8 +207,10 @@ class GD_CORE_API PropertyFolderOrProperty {
 
  private:
   void SetGroupNameOfAllProperties(const gd::String& groupName);
+  const gd::String &GetGroupName();
 
   static gd::PropertyFolderOrProperty badPropertyFolderOrProperty;
+  static gd::String emptyGroupName;
 
   gd::PropertyFolderOrProperty*
       parent = nullptr;  // nullptr if root folder, points to the parent folder otherwise.

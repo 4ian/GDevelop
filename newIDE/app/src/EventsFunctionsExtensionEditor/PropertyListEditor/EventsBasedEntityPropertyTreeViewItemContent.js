@@ -375,7 +375,7 @@ export class EventsBasedEntityPropertyTreeViewItemContent
     Clipboard.set(PROPERTIES_CLIPBOARD_KIND, [
       {
         name: this.property.getProperty().getName(),
-        serializedProperty: serializeToJSObject(this.property),
+        serializedProperty: serializeToJSObject(this.property.getProperty()),
       },
     ]);
   }

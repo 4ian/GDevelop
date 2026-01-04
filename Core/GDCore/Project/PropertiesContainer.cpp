@@ -71,8 +71,8 @@ const NamedPropertyDescriptor &PropertiesContainer::Get(size_t index) const {
 }
 
 void PropertiesContainer::Remove(const gd::String &name) {
-  properties.Remove(name);
   rootFolder->RemoveRecursivelyPropertyNamed(name);
+  properties.Remove(name);
 }
 
 void PropertiesContainer::Move(std::size_t oldIndex, std::size_t newIndex) {

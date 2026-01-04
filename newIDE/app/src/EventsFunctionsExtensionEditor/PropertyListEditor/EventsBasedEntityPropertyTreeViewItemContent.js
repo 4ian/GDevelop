@@ -94,9 +94,15 @@ export const pasteProperties = async (
   let firstAddedPropertyName: string | null = null;
   let index = insertionIndex;
   newNamedProperties.forEach(({ name, serializedProperty }) => {
-    const property = properties.insertNew(name, index);
+    const property = properties.insertNewPropertyInFolder(
+      name,
+      parentFolder,
+      index
+    );
     index++;
+    const groupName = property.getGroup();
     unserializeFromJSObject(property, serializedProperty);
+    property.setGroup(groupName);
     if (!firstAddedPropertyName) {
       firstAddedPropertyName = name;
     }
@@ -113,6 +119,21 @@ export const pasteProperties = async (
         if (properties.has(name)) {
           const property = properties.get(name);
           unserializeFromJSObject(property, serializedProperty);
+          // Move the property in the current folder
+          const rootFolder = properties.getRootFolder();
+          if (rootFolder.hasPropertyNamed(name)) {
+            const originalPropertyFolderOrProperty = rootFolder.getPropertyNamed(
+              name
+            );
+            originalPropertyFolderOrProperty
+              .getParent()
+              .movePropertyFolderOrPropertyToAnotherFolder(
+                originalPropertyFolderOrProperty,
+                parentFolder,
+                index
+              );
+            index++;
+          }
         }
       });
     }
@@ -406,12 +427,16 @@ export class EventsBasedEntityPropertyTreeViewItemContent
       this.property.getProperty().getName(),
       name => this.props.properties.has(name)
     );
-    const newProperty = this.props.properties.insertNew(
+    const newProperty = this.props.properties.insertNewPropertyInFolder(
       newName,
+      this.property.getParent(),
       this.getIndex() + 1
     );
 
-    unserializeFromJSObject(newProperty, serializeToJSObject(this.property));
+    unserializeFromJSObject(
+      newProperty,
+      serializeToJSObject(this.property.getProperty())
+    );
     newProperty.setName(newName);
 
     this._onProjectItemModified();

@@ -144,9 +144,9 @@ PropertyFolderOrProperty::GetPropertyChild(const gd::String &name) {
 
 void PropertyFolderOrProperty::InsertProperty(
     gd::NamedPropertyDescriptor *insertedProperty, std::size_t position) {
+  insertedProperty->SetGroup(GetGroupName());
   auto propertyFolderOrProperty =
       gd::make_unique<PropertyFolderOrProperty>(insertedProperty, this);
-  propertyFolderOrProperty->GetProperty().SetGroup(GetGroupName());
   if (position < children.size()) {
     children.insert(children.begin() + position,
                     std::move(propertyFolderOrProperty));

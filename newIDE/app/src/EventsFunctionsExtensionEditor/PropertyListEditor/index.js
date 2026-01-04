@@ -738,7 +738,7 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
           const selectedPropertyFolderOrProperty = items[0];
           if (selectedPropertyFolderOrProperty.isFolder()) {
             const newFolder = selectedPropertyFolderOrProperty.insertNewFolder(
-              'NewFolder',
+              'New folder',
               0
             );
             newPropertyFolderOrProperty = newFolder;
@@ -750,7 +750,7 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
           } else {
             const parentFolder = selectedPropertyFolderOrProperty.getParent();
             const newFolder = parentFolder.insertNewFolder(
-              'NewFolder',
+              'New folder',
               parentFolder.getChildPosition(selectedPropertyFolderOrProperty) +
                 1
             );
@@ -763,7 +763,7 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
           if (!rootFolder) {
             return;
           }
-          const newFolder = rootFolder.insertNewFolder('NewFolder', 0);
+          const newFolder = rootFolder.insertNewFolder('New folder', 0);
           newPropertyFolderOrProperty = newFolder;
         }
         setSelectedPropertyFolderOrProperty.current(

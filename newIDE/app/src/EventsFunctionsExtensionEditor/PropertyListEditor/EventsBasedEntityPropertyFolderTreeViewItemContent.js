@@ -294,7 +294,7 @@ export class EventsBasedEntityPropertyFolderTreeViewItemContent
       message = t`Are you sure you want to remove this folder and with it the property ${propertiesToDelete[0].getName()}? This can't be undone.`;
       title = t`Remove folder and property`;
     } else {
-      message = t`Are you sure you want to remove this folder and all its content (properties ${propertiesToDelete
+      message = t`Are you sure you want to remove this folder and all its properties (${propertiesToDelete
         .map(property => property.getName())
         .join(', ')})? This can't be undone.`;
       title = t`Remove folder and properties`;

@@ -53,7 +53,9 @@ void AbstractEventsBasedEntity::UnserializeFrom(
     propertyDescriptors.UnserializeFoldersFrom(
         project, element.GetChild("propertiesFolderStructure", 0));
   }
+  // Compatibility with GD <= 5.6.251
   propertyDescriptors.AddMissingPropertiesInRootFolder();
+  // end of compatibility code
 }
 
 }  // namespace gd

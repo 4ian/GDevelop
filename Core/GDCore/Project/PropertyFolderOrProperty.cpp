@@ -107,6 +107,18 @@ const gd::String &PropertyFolderOrProperty::GetGroupName() {
   return groupFolder->GetFolderName();
 }
 
+void PropertyFolderOrProperty::UpdateGroupNameOfAllProperties() {
+  if (parent) {
+    SetGroupNameOfAllProperties(GetGroupName());
+  }
+  else {
+    // This is a root folder, the group is not the same for all children.
+    for (auto &&child : children) {
+      child->SetGroupNameOfAllProperties(child->GetGroupName());
+    }
+  }
+}
+
 PropertyFolderOrProperty &
 PropertyFolderOrProperty::GetChildAt(std::size_t index) {
   if (index >= children.size())

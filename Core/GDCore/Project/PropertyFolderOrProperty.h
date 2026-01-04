@@ -205,6 +205,8 @@ class GD_CORE_API PropertyFolderOrProperty {
                        PropertiesContainer& propertiesContainer);
   ///@}
 
+  void UpdateGroupNameOfAllProperties();
+
  private:
   void SetGroupNameOfAllProperties(const gd::String& groupName);
   const gd::String &GetGroupName();

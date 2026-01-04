@@ -46,7 +46,9 @@ void EventsBasedBehavior::UnserializeFrom(gd::Project& project,
     sharedPropertyDescriptors.UnserializeFoldersFrom(
         project, element.GetChild("sharedPropertiesFolderStructure", 0));
   }
+  // Compatibility with GD <= 5.6.251
   sharedPropertyDescriptors.AddMissingPropertiesInRootFolder();
+  // end of compatibility code
   if (element.HasChild("quickCustomizationVisibility")) {
     quickCustomizationVisibility =
         element.GetStringAttribute("quickCustomizationVisibility") == "visible"

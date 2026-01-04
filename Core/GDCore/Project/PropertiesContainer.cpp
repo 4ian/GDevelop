@@ -158,6 +158,7 @@ void PropertiesContainer::SerializeFoldersTo(SerializerElement &element) const {
 void PropertiesContainer::UnserializeFoldersFrom(
     gd::Project &project, const SerializerElement &element) {
   rootFolder->UnserializeFrom(project, element, *this);
+  rootFolder->UpdateGroupNameOfAllProperties();
 }
 
 } // namespace gd

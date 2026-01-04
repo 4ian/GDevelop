@@ -718,28 +718,6 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                   }
                                   fullWidth
                                 />
-                                <SemiControlledAutoComplete
-                                  floatingLabelText={<Trans>Group name</Trans>}
-                                  hintText={t`Leave it empty to use the default group`}
-                                  fullWidth
-                                  value={property.getGroup()}
-                                  onChange={text => {
-                                    property.setGroup(text);
-                                    forceUpdate();
-                                    onPropertiesUpdated &&
-                                      onPropertiesUpdated();
-                                  }}
-                                  onFocus={() =>
-                                    onFocusProperty(property.getName())
-                                  }
-                                  dataSource={getPropertyGroupNames().map(
-                                    name => ({
-                                      text: name,
-                                      value: name,
-                                    })
-                                  )}
-                                  openOnFocus={true}
-                                />
                               </ResponsiveLineStackLayout>
                               <SemiControlledTextField
                                 commitOnBlur

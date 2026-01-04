@@ -47,7 +47,10 @@ import { type GDevelopTheme } from '../../UI/Theme';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import { ColumnStackLayout } from '../../UI/Layout';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
-import { getFoldersAscendanceWithoutRootFolder } from './EnumeratePropertyFolderOrProperty';
+import {
+  getFoldersAscendanceWithoutRootFolder,
+  enumerateFoldersInContainer,
+} from './EnumeratePropertyFolderOrProperty';
 
 const configurationItemId = 'events-based-entity-configuration';
 export const propertiesRootFolderId = 'properties';
@@ -1289,6 +1292,16 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
     const initiallyOpenedNodeIds = [
       propertiesRootFolderId,
       sharedPropertiesRootFolderId,
+      ...(properties
+        ? enumerateFoldersInContainer(properties).map(({ folder }) =>
+            getEventsBasedEntityPropertyFolderTreeViewItemId(folder)
+          )
+        : []),
+      ...(sharedProperties
+        ? enumerateFoldersInContainer(sharedProperties).map(({ folder }) =>
+            getEventsBasedEntityPropertyFolderTreeViewItemId(folder)
+          )
+        : []),
     ];
 
     return (

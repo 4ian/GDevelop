@@ -240,7 +240,7 @@ namespace gdjs {
      */
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      objectData: ObjectData & any
+      objectData: ObjectData
     ) {
       this.name = objectData.name || '';
       this.type = objectData.type || '';
@@ -261,7 +261,7 @@ namespace gdjs {
           .getEffectsManager()
           .initializeEffect(effectData, this._rendererEffects, this);
         this.updateAllEffectParameters(effectData);
-        if (effectData.isDisabled) {
+        if (effectData.disabled) {
           this.enableEffect(effectData.name, false);
         }
       }

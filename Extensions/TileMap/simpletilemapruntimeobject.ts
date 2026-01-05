@@ -71,7 +71,7 @@ namespace gdjs {
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      objectData: SimpleTileMapObjectDataType
+      objectData: ObjectData & SimpleTileMapObjectDataType
     ) {
       super(instanceContainer, objectData);
       this._atlasImage = objectData.content.atlasImage;

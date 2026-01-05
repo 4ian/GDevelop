@@ -334,6 +334,7 @@ const MosaicEditorsDisplay = React.forwardRef<
           eventsBasedObject={eventsBasedObject}
           chosenLayer={chosenLayer}
           onChooseLayer={props.onChooseLayer}
+          selectedLayer={selectedLayer}
           onSelectLayer={props.onSelectLayer}
           onEditLayerEffects={props.editLayerEffects}
           onEditLayer={props.editLayer}

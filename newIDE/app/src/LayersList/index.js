@@ -495,6 +495,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
         }
         // We focus it so the user can edit the name directly.
         editName(layerItemId);
+        onSelectLayer(newLayer);
 
         forceUpdateList();
       },
@@ -504,6 +505,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
         layersContainer,
         onCreateLayer,
         onLayerModified,
+        onSelectLayer,
       ]
     );
 

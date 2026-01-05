@@ -240,7 +240,7 @@ namespace gdjs {
      */
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      objectData: ObjectData & any
+      objectData: ObjectData
     ) {
       this.name = objectData.name || '';
       this.type = objectData.type || '';
@@ -256,12 +256,13 @@ namespace gdjs {
       this._behaviorsTable = new Hashtable();
       for (let i = 0; i < objectData.effects.length; ++i) {
         const effectData = objectData.effects[i];
+        console.log(effectData);
         this._runtimeScene
           .getGame()
           .getEffectsManager()
           .initializeEffect(effectData, this._rendererEffects, this);
         this.updateAllEffectParameters(effectData);
-        if (effectData.isDisabled) {
+        if (effectData.disabled) {
           this.enableEffect(effectData.name, false);
         }
       }

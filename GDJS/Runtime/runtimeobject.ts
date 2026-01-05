@@ -256,7 +256,6 @@ namespace gdjs {
       this._behaviorsTable = new Hashtable();
       for (let i = 0; i < objectData.effects.length; ++i) {
         const effectData = objectData.effects[i];
-        console.log(effectData);
         this._runtimeScene
           .getGame()
           .getEffectsManager()

@@ -191,7 +191,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
                   /*includeInAppTutorialMessage*/
                   !options.inAppTutorialMessageInPreview.empty(),
                   immutableProject.GetLoadingScreen().GetGDevelopLogoStyle(),
-                  includesFiles);
+                  includesFiles,
+                  resourcesFiles);
 
     // Export files for free function, object and behaviors
     for (const auto &includeFile : usedExtensionsResult.GetUsedIncludeFiles()) {
@@ -321,6 +322,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
   if (options.shouldReloadLibraries || options.shouldClearExportFolder) {
     includesFiles.push_back(codeOutputDir + "/data.js");
+    includesFiles.push_back("gdjs-bootstrap.js");
     // Copy all the dependencies and their source maps
     ExportIncludesAndLibs(includesFiles, options.exportPath, true);
     ExportIncludesAndLibs(resourcesFiles, options.exportPath, true);
@@ -1100,7 +1102,7 @@ bool ExporterHelper::CompleteIndexFile(
     }
 
     codeFilesIncludes += "\t<script src=\"" + scriptSrc +
-                         "\" crossorigin=\"anonymous\"></script>\n";
+                         "\" crossorigin=\"anonymous\" defer></script>\n";
   }
 
   str = str.FindAndReplace("/* GDJS_CUSTOM_STYLE */", "")
@@ -1120,7 +1122,8 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
                                     bool includeCaptureManager,
                                     bool includeInAppTutorialMessage,
                                     gd::String gdevelopLogoStyle,
-                                    std::vector<gd::String> &includesFiles) {
+                                    std::vector<gd::String> &includesFiles,
+                                    std::vector<gd::String> &requiredFiles) {
   // First, do not forget common includes (they must be included before events
   // generated code files).
   InsertUnique(includesFiles, "libs/jshashtable.js");
@@ -1204,7 +1207,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   }
 
   if (pixiInThreeRenderers || isInGameEdition) {
-    InsertUnique(includesFiles, "pixi-renderers/three.js");
+    InsertUnique(requiredFiles, "pixi-renderers/three.js");
     InsertUnique(includesFiles, "pixi-renderers/ThreeAddons.js");
     InsertUnique(includesFiles, "pixi-renderers/draco/gltf/draco_decoder.wasm");
     InsertUnique(includesFiles,

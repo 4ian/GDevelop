@@ -555,7 +555,8 @@ class ExporterHelper {
                       bool includeCaptureManager,
                       bool includeInAppTutorialMessage,
                       gd::String gdevelopLogoStyle,
-                      std::vector<gd::String> &includesFiles);
+                      std::vector<gd::String> &includesFiles,
+                      std::vector<gd::String> &requiredFiles);
 
   /**
    * \brief Remove include files that are Pixi renderers.

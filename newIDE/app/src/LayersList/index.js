@@ -252,6 +252,7 @@ type Props = {|
   project: gdProject,
   chosenLayer: string,
   onChooseLayer: (layerName: string) => void,
+  selectedLayer: gdLayer | null,
   onSelectLayer: (layer: gdLayer | null) => void,
   layout: gdLayout | null,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
@@ -281,6 +282,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
       project,
       chosenLayer,
       onChooseLayer,
+      selectedLayer,
       onSelectLayer,
       layout,
       eventsFunctionsExtension,
@@ -299,9 +301,6 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
     },
     ref
   ) => {
-    const [selectedItems, setSelectedItems] = React.useState<
-      Array<TreeViewItem>
-    >([]);
     const unsavedChanges = React.useContext(UnsavedChangesContext);
     const { triggerUnsavedChanges } = unsavedChanges;
     const preferences = React.useContext(PreferencesContext);
@@ -358,33 +357,6 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
         else forceUpdate();
       },
       [forceUpdate, forceUpdateList, triggerUnsavedChanges]
-    );
-
-    // Initialize keyboard shortcuts as empty.
-    // onDelete callback is set outside because it deletes the selected
-    // item (that is a props). As it is stored in a ref, the keyboard shortcut
-    // instance does not update with selectedItems changes.
-    const keyboardShortcutsRef = React.useRef<KeyboardShortcuts>(
-      new KeyboardShortcuts({
-        shortcutCallbacks: {},
-      })
-    );
-    React.useEffect(
-      () => {
-        if (keyboardShortcutsRef.current) {
-          keyboardShortcutsRef.current.setShortcutCallback('onDelete', () => {
-            if (selectedItems.length > 0) {
-              deleteItem(selectedItems[0]);
-            }
-          });
-          keyboardShortcutsRef.current.setShortcutCallback('onRename', () => {
-            if (selectedItems.length > 0) {
-              editName(selectedItems[0].content.getId());
-            }
-          });
-        }
-      },
-      [editName, selectedItems]
     );
 
     const triggerOnLayersModified = React.useCallback(
@@ -523,6 +495,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
         }
         // We focus it so the user can edit the name directly.
         editName(layerItemId);
+        onSelectLayer(newLayer);
 
         forceUpdateList();
       },
@@ -532,6 +505,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
         layersContainer,
         onCreateLayer,
         onLayerModified,
+        onSelectLayer,
       ]
     );
 
@@ -553,6 +527,54 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
     );
 
     const isLightingLayerPresent = hasLightingLayer(layersContainer);
+
+    const createLayerItem = React.useCallback(
+      (layer: gdLayer) =>
+        layerTreeViewItemProps
+          ? new LeafTreeViewItem(
+              new LayerTreeViewItemContent(layer, layerTreeViewItemProps)
+            )
+          : null,
+      [layerTreeViewItemProps]
+    );
+
+    const selectedItems = React.useMemo<Array<TreeViewItem>>(
+      () => {
+        const selectedItem = selectedLayer
+          ? createLayerItem(selectedLayer)
+          : null;
+        return selectedItem ? [selectedItem] : [];
+      },
+      [createLayerItem, selectedLayer]
+    );
+
+    // Initialize keyboard shortcuts as empty.
+    // onDelete callback is set outside because it deletes the selected
+    // item (that is a props). As it is stored in a ref, the keyboard shortcut
+    // instance does not update with selectedItems changes.
+    const keyboardShortcutsRef = React.useRef<KeyboardShortcuts>(
+      new KeyboardShortcuts({
+        shortcutCallbacks: {},
+      })
+    );
+
+    React.useEffect(
+      () => {
+        if (keyboardShortcutsRef.current) {
+          keyboardShortcutsRef.current.setShortcutCallback('onDelete', () => {
+            if (selectedItems.length > 0) {
+              deleteItem(selectedItems[0]);
+            }
+          });
+          keyboardShortcutsRef.current.setShortcutCallback('onRename', () => {
+            if (selectedItems.length > 0) {
+              editName(selectedItems[0].content.getId());
+            }
+          });
+        }
+      },
+      [editName, selectedItems]
+    );
 
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
@@ -703,10 +725,10 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
           return;
         }
         if (selectedItems[0].content.isDescendantOf(item.content)) {
-          setSelectedItems([]);
+          onSelectLayer(null);
         }
       },
-      [selectedItems]
+      [onSelectLayer, selectedItems]
     );
 
     // Force List component to be mounted again if project
@@ -746,12 +768,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
                     onEditItem={editItem}
                     onCollapseItem={onCollapseItem}
                     selectedItems={selectedItems}
-                    onSelectItems={items => {
-                      const itemToSelect = items[0];
-                      if (!itemToSelect) return;
-                      if (itemToSelect.isRoot) return;
-                      setSelectedItems(items);
-                    }}
+                    onSelectItems={items => onClickItem(items[0])}
                     onClickItem={onClickItem}
                     onRenameItem={renameItem}
                     buildMenuTemplate={buildMenuTemplate(i18n)}

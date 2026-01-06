@@ -195,6 +195,7 @@ namespace gdjs {
             '): ' +
             (error.message || 'Unknown error')
         );
+        throw error;
       }
     }
 

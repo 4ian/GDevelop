@@ -127,6 +127,7 @@ namespace gdjs {
         logger.error(
           "Can't fetch the 3D model file " + resource.file + ', error: ' + error
         );
+        throw error;
       }
     }
 

@@ -798,7 +798,7 @@ const createOrReplaceObject: EditorFunction = {
             isNewObjectTypeUsed: false, // The object type was not changed.
           });
           return makeGenericSuccess(
-            `Replaced object "${existingObject.getName()}" by an object from the asset store fitting the search.`
+            `Replaced object "${existingObject.getName()}" by an object from the asset store fitting the search, with the same type ("${existingObject.getType()}").`
           );
         } else {
           // No asset found.

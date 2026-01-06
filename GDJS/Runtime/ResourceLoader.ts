@@ -111,7 +111,6 @@ namespace gdjs {
    * Pre-load resources of any kind needed for a game or a scene.
    */
   export class ResourceLoader {
-
     static maxForegroundConcurrency = 20;
     static maxBackgroundConcurrency = 5;
     static maxAttempt = 3;

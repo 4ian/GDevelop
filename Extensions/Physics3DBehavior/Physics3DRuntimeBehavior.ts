@@ -929,10 +929,20 @@ namespace gdjs {
 
       threeObject.updateMatrixWorld();
 
+      // For indexed triangles
       const vector3 = new THREE.Vector3();
-      const triangleList = new Jolt.TriangleList();
+      const float3 = new Jolt.Float3(0, 0, 0);
       const vertexList = new Jolt.VertexList();
+      const indexedTriangle = new Jolt.IndexedTriangle();
       const indexedTriangleList = new Jolt.IndexedTriangleList();
+      const physicsMaterialList = new Jolt.PhysicsMaterialList();
+
+      // For non-indexed triangles
+      const triangleList = new Jolt.TriangleList();
+      const a = new Jolt.Vec3();
+      const b = new Jolt.Vec3();
+      const c = new Jolt.Vec3();
+
       threeObject.traverse((object3d) => {
         const mesh = object3d as THREE.Mesh;
         if (!mesh.isMesh) {
@@ -947,22 +957,26 @@ namespace gdjs {
           for (let i = 0; i < positionAttribute.count; i++) {
             vector3.fromBufferAttribute(positionAttribute, i);
             object3d.localToWorld(vector3);
-            vertexList.push_back(
-              new Jolt.Float3(vector3.x, vector3.y, vector3.z)
-            );
+            float3.x = vector3.x;
+            float3.y = vector3.y;
+            float3.z = vector3.z;
+            // The list create a copy of the Float3.
+            vertexList.push_back(float3);
           }
           indexedTriangleList.clear();
           for (let i = 0; i < index.count; i += 3) {
-            indexedTriangleList.push_back(
-              new Jolt.IndexedTriangle(
-                index.getX(shouldTrianglesBeFlipped ? i + 1 : i),
-                index.getX(shouldTrianglesBeFlipped ? i : i + 1),
-                index.getX(i + 2),
-                0
-              )
+            indexedTriangle.set_mIdx(
+              0,
+              index.getX(shouldTrianglesBeFlipped ? i + 1 : i)
             );
+            indexedTriangle.set_mIdx(
+              1,
+              index.getX(shouldTrianglesBeFlipped ? i : i + 1)
+            );
+            indexedTriangle.set_mIdx(2, index.getX(i + 2));
+            // The list create a copy of the IndexedTriangle.
+            indexedTriangleList.push_back(indexedTriangle);
           }
-          const physicsMaterialList = new Jolt.PhysicsMaterialList();
           // Parameters passed to `MeshShapeSettings` are copied,
           // we need to destroy them later when unused.
           meshes.push(
@@ -977,32 +991,41 @@ namespace gdjs {
           for (let i = 0; i < positionAttribute.count; i += 3) {
             vector3.fromBufferAttribute(positionAttribute, i);
             object3d.localToWorld(vector3);
-            const a = new Jolt.Vec3(vector3.x, vector3.y, vector3.z);
+            a.Set(vector3.x, vector3.y, vector3.z);
 
             vector3.fromBufferAttribute(positionAttribute, i + 1);
             object3d.localToWorld(vector3);
-            const b = new Jolt.Vec3(vector3.x, vector3.y, vector3.z);
+            b.Set(vector3.x, vector3.y, vector3.z);
 
             vector3.fromBufferAttribute(positionAttribute, i + 2);
             object3d.localToWorld(vector3);
-            const c = new Jolt.Vec3(vector3.x, vector3.y, vector3.z);
+            c.Set(vector3.x, vector3.y, vector3.z);
 
-            triangleList.push_back(
-              new Jolt.Triangle(
-                shouldTrianglesBeFlipped ? b : a,
-                shouldTrianglesBeFlipped ? a : b,
-                c
-              )
+            // The triangle's setter is not easy to use so we create new instances.
+            const triangle = new Jolt.Triangle(
+              shouldTrianglesBeFlipped ? b : a,
+              shouldTrianglesBeFlipped ? a : b,
+              c
             );
+            // The list create a copy of the Triangle.
+            triangleList.push_back(triangle);
+            Jolt.destroy(triangle);
           }
           // `MeshShapeSettings` creates a copy when it indexes the triangle,
           // we need to destroy them.
           meshes.push(new Jolt.MeshShapeSettings(triangleList));
         }
       });
-      Jolt.destroy(triangleList);
+      Jolt.destroy(float3);
       Jolt.destroy(vertexList);
+      Jolt.destroy(indexedTriangle);
       Jolt.destroy(indexedTriangleList);
+      Jolt.destroy(physicsMaterialList);
+
+      Jolt.destroy(triangleList);
+      Jolt.destroy(a);
+      Jolt.destroy(b);
+      Jolt.destroy(c);
     }
 
     private _getShapeOrientationQuat(): Jolt.Quat {

@@ -6,6 +6,7 @@ export type ParameterSummary = {|
   name?: string,
   type: string,
   description?: string,
+  longDescription?: string,
   isOptional?: boolean,
   extraInfo?: string,
 |};
@@ -121,6 +122,9 @@ const getParameterSummary = (
   };
   if (parameterMetadata.getDescription()) {
     parameterSummary.description = parameterMetadata.getDescription();
+  }
+  if (parameterMetadata.getLongDescription()) {
+    parameterSummary.longDescription = parameterMetadata.getLongDescription();
   }
   if (parameterMetadata.getName()) {
     parameterSummary.name = parameterMetadata.getName();

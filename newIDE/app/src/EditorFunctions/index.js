@@ -1416,6 +1416,15 @@ const addBehavior: EditorFunction = {
       );
     }
 
+    if (
+      behaviorMetadata.getObjectType() &&
+      behaviorMetadata.getObjectType() !== object.getType()
+    ) {
+      return makeGenericFailure(
+        `Behavior "${behaviorName}" of type "${behavior_type}" cannot be added to object "${object_name}" because the object is not of type "${behaviorMetadata.getObjectType()}".`
+      );
+    }
+
     // Add the behavior
     gd.WholeProjectRefactorer.addBehaviorAndRequiredBehaviors(
       project,

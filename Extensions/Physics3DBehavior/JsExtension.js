@@ -308,7 +308,7 @@ module.exports = {
           .addChoice('Box', _('Box'))
           .addChoice('Capsule', _('Capsule'))
           .addChoice('Sphere', _('Sphere'))
-          .addChoice('Mesh', _('Mesh (static only)'));
+          .addChoice('Mesh', _('Mesh (works for Static only)'));
         behaviorProperties
           .getOrCreate('meshShapeResourceName')
           .setValue(

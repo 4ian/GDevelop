@@ -291,6 +291,51 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
   }
 }
 
+class ScenesRootFolderContent extends LabelTreeViewItemContent {
+  project: gdProject;
+  onAddScene: (index: number, i18n: I18nType) => void;
+  onAddFolder: (i18n: I18nType) => void;
+
+  constructor(
+    id: string,
+    label: string | React.Node,
+    project: gdProject,
+    onAddScene: (index: number, i18n: I18nType) => void,
+    onAddFolder: (i18n: I18nType) => void
+  ) {
+    super(id, label);
+    this.project = project;
+    this.onAddScene = onAddScene;
+    this.onAddFolder = onAddFolder;
+  }
+
+  getRightButton(i18n: I18nType): ?MenuButton {
+    return {
+      icon: <Add />,
+      label: i18n._(t`Add`),
+      id: 'add-scene-or-folder-button',
+    };
+  }
+
+  buildMenuTemplate(i18n: I18nType, index: number): Array<MenuItemTemplate> {
+    return [
+      {
+        label: i18n._(t`Add a scene`),
+        click: () => {
+          this.onAddScene(this.project.getLayoutsCount() - 1, i18n);
+        },
+      },
+      {
+        label: i18n._(t`Add a folder`),
+        click: () => {
+          this.onAddFolder(i18n);
+        },
+      },
+    ];
+  }
+}
+
+
 class ActionTreeViewItemContent implements TreeViewItemContent {
   id: string;
   label: string | React.Node;
@@ -724,6 +769,18 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         }
       },
       [isMobile]
+    );
+
+    const addNewFolder = React.useCallback(
+      (i18n: I18nType) => {
+        if (!project) return;
+
+        console.log('Add new folder clicked - Backend implementation needed');
+        // TODO: Später mit project.getLayoutsRootFolder().insertNewFolder()
+        
+        alert(i18n._(t`Folder functionality will be available soon!`));
+      },
+      [project]
     );
 
     const addNewScene = React.useCallback(
@@ -1220,8 +1277,14 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               {
                 isRoot: true,
                 content: new LabelTreeViewItemContent(
-                  gameSettingsRootFolderId,
-                  i18n._(t`Game settings`)
+                  scenesRootFolderId,
+                  i18n._(t`Scenes`),
+                  {
+                    icon: <Add />,
+                    label: i18n._(t`Add`), // Kürzerer Text
+                    click: () => {}, // Wird nicht direkt verwendet
+                    id: 'add-new-scene-button',
+                  }
                 ),
                 getChildren(i18n: I18nType): ?Array<TreeViewItem> {
                   return [
@@ -1262,54 +1325,33 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               },
               {
                 isRoot: true,
-                content: new LabelTreeViewItemContent(
+                content: new ScenesRootFolderContent(
                   scenesRootFolderId,
                   i18n._(t`Scenes`),
-                  {
-                    icon: <Add />,
-                    label: i18n._(t`Add a scene`),
-                    click: () => {
-                      //const rootFolder = project.getLayoutsRootFolder();
-                      const rootFolder = null;
-                      addNewScene(-1, i18n); // Will add to root
-                    },
-                    id: 'add-new-scene-button',
-                  }
+                  project,
+                  addNewScene,
+                  addNewFolder // Diese Funktion musst du noch erstellen
                 ),
                 getChildren(i18n: I18nType): ?Array<TreeViewItem> {
                   //const rootFolder = project.getLayoutsRootFolder();
-                  const rootFolder = null;
-                  if (
-                    rootFolder.getLayoutsCount() === 0 &&
-                    rootFolder.getFoldersCount() === 0
-                  ) {
-                    return [
-                      new PlaceHolderTreeViewItem(
-                        scenesEmptyPlaceholderId,
-                        i18n._(t`Start by adding a new scene.`)
-                      ),
-                    ];
-                  }
-                  
-                  const children = [];
-                  
-                  // Add folders first
-                  for (let i = 0; i < rootFolder.getFoldersCount(); i++) {
-                    const folder = rootFolder.getFolderAt(i);
-                    children.push(buildSceneFolderTree(folder, combinedSceneProps));
-                  }
-                  
-                  // Add root level scenes
-                  for (let i = 0; i < rootFolder.getLayoutsCount(); i++) {
-                    const scene = rootFolder.getLayoutAt(i);
-                    children.push(
-                      new LeafTreeViewItem(
-                        new SceneTreeViewItemContent(scene, combinedSceneProps)
-                      )
-                    );
-                  }
-                  
-                  return children;
+                  if (project.getLayoutsCount() === 0) {
+                  return [
+                    new PlaceHolderTreeViewItem(
+                      scenesEmptyPlaceholderId,
+                      i18n._(t`Start by adding a new scene.`)
+                    ),
+                  ];
+                }
+                
+                // Alle Szenen als flache Liste
+                return mapFor(0, project.getLayoutsCount(), i =>
+                  new LeafTreeViewItem(
+                    new SceneTreeViewItemContent(
+                      project.getLayoutAt(i),
+                      sceneTreeViewItemProps
+                    )
+                  )
+                );
                 },
               },
               {

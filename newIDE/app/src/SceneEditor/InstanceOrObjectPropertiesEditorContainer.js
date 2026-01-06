@@ -76,7 +76,7 @@ type Props = {|
   onEditLayerEffects: (layer: gdLayer) => void,
   onLayersModified: (layers: Array<gdLayer>) => void,
 
-  // For variants:
+  // For event-based object variants:
   eventsBasedObject: gdEventsBasedObject | null,
   eventsBasedObjectVariant: gdEventsBasedObjectVariant | null,
   getContentAABB: () => Rectangle | null,
@@ -142,7 +142,7 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
     onEditLayerEffects,
     onLayersModified,
 
-    // For variants
+    // For event-based object variants
     eventsBasedObject,
     eventsBasedObjectVariant,
     getContentAABB,

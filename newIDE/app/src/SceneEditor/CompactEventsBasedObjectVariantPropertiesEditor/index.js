@@ -69,7 +69,7 @@ export const CompactEventsBasedObjectVariantPropertiesEditor = ({
 
   return (
     <ErrorBoundary
-      componentTitle={<Trans>Variant properties</Trans>}
+      componentTitle={<Trans>Custom object variant properties</Trans>}
       scope="scene-editor-events-based-object-variant-properties"
     >
       <ScrollView

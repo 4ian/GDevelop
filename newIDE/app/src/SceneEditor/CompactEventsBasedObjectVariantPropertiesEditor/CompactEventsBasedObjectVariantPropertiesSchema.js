@@ -58,7 +58,7 @@ const getTitleRow = ({
   eventsBasedObject: gdEventsBasedObject,
 |}) => ({
   name: 'Variant',
-  title: i18n._(t`Variant`),
+  title: i18n._(t`Custom object variant`),
   renderLeftIcon: className =>
     eventsBasedObject.isRenderedIn3D() ? (
       <Object3d className={className} style={styles.icon} />

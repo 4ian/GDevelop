@@ -1,7 +1,5 @@
 
-    console.log("bootstrap");
 (function () {
-    console.log("bootstrap");
   //Initialization
   var game = new gdjs.RuntimeGame(
     gdjs.projectData,

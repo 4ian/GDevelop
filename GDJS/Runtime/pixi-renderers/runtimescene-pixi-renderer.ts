@@ -115,14 +115,21 @@ namespace gdjs {
           const runtimeLayerRenderer = runtimeLayer.getRenderer();
           const runtimeLayerRenderingType = runtimeLayer.getRenderingType();
           const layerHas3DObjectsToRender = runtimeLayerRenderer.has3DObjects();
+          const layerCameraIsRotatedIn3D =
+            runtimeLayerRenderingType !==
+              gdjs.RuntimeLayerRenderingType.TWO_D &&
+            runtimeLayerRenderer.isCameraRotatedIn3D();
           if (
             !this._runtimeScene.getGame().isInGameEdition() &&
             (runtimeLayerRenderingType ===
               gdjs.RuntimeLayerRenderingType.TWO_D ||
-              !layerHas3DObjectsToRender)
+              (!layerHas3DObjectsToRender && !layerCameraIsRotatedIn3D))
           ) {
             // Render a layer with 2D rendering (PixiJS) only if layer is configured as is
             // or if there is no 3D object to render.
+            //
+            // Note: if the layer camera is rotated in 3D (rotation X/Y), it must be rendered
+            // through the 3D pipeline so that the 2D plane projection remains consistent.
 
             if (lastRenderWas3D) {
               // Ensure the state is clean for PixiJS to render.

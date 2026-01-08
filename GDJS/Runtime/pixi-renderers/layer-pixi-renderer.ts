@@ -893,7 +893,35 @@ namespace gdjs {
       // 2D only (no 3D rendering and so no 2D plane in the 3D world):
       // Update the 2D Pixi container position, size and rotation.
       if (!this._threeCamera || !this._threePlaneMesh) {
-        effectivePixiZoom = this._layer.getCameraZoom();
+        const cameraZoom = this._layer.getCameraZoom();
+
+        // When the camera is rotated, the axis-aligned bounding box of the rotated
+        // viewport expands. To maintain consistent visible world dimensions (matching
+        // the behavior of 3D layers), we need to adjust the effective zoom.
+        // For a W×H viewport rotated by angle θ, the bounding box becomes:
+        //   boxW = W * |cos(θ)| + H * |sin(θ)|
+        //   boxH = W * |sin(θ)| + H * |cos(θ)|
+        const layerWidth = this._layer.getWidth();
+        const layerHeight = this._layer.getHeight();
+        const absCosTerm = Math.abs(angleCosValue);
+        const absSinTerm = Math.abs(angleSinValue);
+
+        let boxW = layerWidth * absCosTerm + layerHeight * absSinTerm;
+        let boxH = layerWidth * absSinTerm + layerHeight * absCosTerm;
+
+        // Maintain aspect ratio (same as _get2DPlaneSize does for 3D layers).
+        const targetAspect = layerWidth / layerHeight;
+        const boxAspect = boxW / boxH;
+        if (boxAspect < targetAspect) {
+          boxW = targetAspect * boxH;
+        } else {
+          boxH = boxW / targetAspect;
+        }
+
+        // The effective zoom is adjusted by the bounding box expansion factor.
+        // This ensures the visible world area matches what a 3D layer would show.
+        effectivePixiZoom = cameraZoom * (layerWidth / boxW);
+
         this._pixiContainer.rotation = angle;
         this._pixiContainer.scale.x = effectivePixiZoom;
         this._pixiContainer.scale.y = effectivePixiZoom;

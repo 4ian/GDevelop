@@ -623,6 +623,7 @@ class ExporterHelper {
                        const std::vector<gd::String> &includesFiles,
                        const std::vector<gd::SourceFileMetadata> &sourceFiles,
                        unsigned int nonRuntimeScriptsCacheBurst,
+                       bool has3DObjects,
                        gd::String additionalSpec = "");
 
   /**
@@ -645,6 +646,7 @@ class ExporterHelper {
                          gd::String exportDir,
                          const std::vector<gd::String> &includesFiles,
                          unsigned int nonRuntimeScriptsCacheBurst,
+                         bool has3DObjects,
                          gd::String additionalSpec);
 
   /**

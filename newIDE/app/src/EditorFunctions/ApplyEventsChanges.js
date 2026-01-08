@@ -619,9 +619,10 @@ export const applyEventsChanges = (
       } else if (op.type === 'insertActionsConditionsAtEnd') {
         // Copy actions/conditions from generated event(s) to target event at end
         const targetEvent = getEventByPath(sceneEvents, op.path);
-        if (op.eventsToInsert && !op.eventsToInsert.isEmpty()) {
-          for (let i = 0; i < op.eventsToInsert.getEventsCount(); i++) {
-            const sourceEvent = op.eventsToInsert.getEventAt(i);
+        const eventsToInsert = op.eventsToInsert;
+        if (eventsToInsert && !eventsToInsert.isEmpty()) {
+          for (let i = 0; i < eventsToInsert.getEventsCount(); i++) {
+            const sourceEvent = eventsToInsert.getEventAt(i);
 
             // Copy conditions
             const sourceConditions = getEventConditions(sourceEvent);
@@ -660,10 +661,11 @@ export const applyEventsChanges = (
       } else if (op.type === 'insertActionsConditionsAtStart') {
         // Copy actions/conditions from generated event(s) to target event at start
         const targetEvent = getEventByPath(sceneEvents, op.path);
-        if (op.eventsToInsert && !op.eventsToInsert.isEmpty()) {
+        const eventsToInsert = op.eventsToInsert;
+        if (eventsToInsert && !eventsToInsert.isEmpty()) {
           // Process in reverse order so that insertion at start maintains order
-          for (let i = op.eventsToInsert.getEventsCount() - 1; i >= 0; i--) {
-            const sourceEvent = op.eventsToInsert.getEventAt(i);
+          for (let i = eventsToInsert.getEventsCount() - 1; i >= 0; i--) {
+            const sourceEvent = eventsToInsert.getEventAt(i);
 
             // Copy conditions at start
             const sourceConditions = getEventConditions(sourceEvent);
@@ -693,9 +695,10 @@ export const applyEventsChanges = (
         const targetActions = getEventActions(targetEvent);
         if (targetActions) {
           targetActions.clear();
-          if (op.eventsToInsert && !op.eventsToInsert.isEmpty()) {
-            for (let i = 0; i < op.eventsToInsert.getEventsCount(); i++) {
-              const sourceEvent = op.eventsToInsert.getEventAt(i);
+          const eventsToInsert = op.eventsToInsert;
+          if (eventsToInsert && !eventsToInsert.isEmpty()) {
+            for (let i = 0; i < eventsToInsert.getEventsCount(); i++) {
+              const sourceEvent = eventsToInsert.getEventAt(i);
               const sourceActions = getEventActions(sourceEvent);
               if (sourceActions) {
                 copyInstructions(
@@ -710,12 +713,13 @@ export const applyEventsChanges = (
       } else if (op.type === 'replaceAllConditions') {
         // Clear target event conditions and replace with generated event(s) conditions
         const targetEvent = getEventByPath(sceneEvents, op.path);
+        const eventsToInsert = op.eventsToInsert;
         const targetConditions = getEventConditions(targetEvent);
         if (targetConditions) {
           targetConditions.clear();
-          if (op.eventsToInsert && !op.eventsToInsert.isEmpty()) {
-            for (let i = 0; i < op.eventsToInsert.getEventsCount(); i++) {
-              const sourceEvent = op.eventsToInsert.getEventAt(i);
+          if (eventsToInsert && !eventsToInsert.isEmpty()) {
+            for (let i = 0; i < eventsToInsert.getEventsCount(); i++) {
+              const sourceEvent = eventsToInsert.getEventAt(i);
               const sourceConditions = getEventConditions(sourceEvent);
               if (sourceConditions) {
                 copyInstructions(
@@ -732,9 +736,9 @@ export const applyEventsChanges = (
         const targetWhileConditions = getEventWhileConditions(targetEvent);
         if (targetWhileConditions) {
           targetWhileConditions.clear();
-          if (op.eventsToInsert && !op.eventsToInsert.isEmpty()) {
-            for (let i = 0; i < op.eventsToInsert.getEventsCount(); i++) {
-              const sourceEvent = op.eventsToInsert.getEventAt(i);
+          if (eventsToInsert && !eventsToInsert.isEmpty()) {
+            for (let i = 0; i < eventsToInsert.getEventsCount(); i++) {
+              const sourceEvent = eventsToInsert.getEventAt(i);
               const sourceWhileConditions = getEventWhileConditions(
                 sourceEvent
               );

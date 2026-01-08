@@ -49,6 +49,12 @@ module.exports = {
 
         if (propertyName === 'bodyType') {
           behaviorContent.getChild('bodyType').setStringValue(newValue);
+          if (
+            newValue !== 'Static' &&
+            behaviorContent.getChild('shape').getStringValue() === 'Mesh'
+          ) {
+            behaviorContent.getChild('shape').setStringValue('Box');
+          }
           return true;
         }
 
@@ -66,6 +72,16 @@ module.exports = {
 
         if (propertyName === 'shape') {
           behaviorContent.getChild('shape').setStringValue(newValue);
+          if (newValue === 'Mesh') {
+            behaviorContent.getChild('bodyType').setStringValue('Static');
+          }
+          return true;
+        }
+
+        if (propertyName === 'meshShapeResourceName') {
+          behaviorContent
+            .getChild('meshShapeResourceName')
+            .setStringValue(newValue);
           return true;
         }
 
@@ -243,14 +259,15 @@ module.exports = {
           .setType('Choice')
           .setLabel('Type')
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .addExtraInfo('Static')
-          .addExtraInfo('Dynamic')
-          .addExtraInfo('Kinematic')
+          .addChoice('Static', _('Static'))
+          .addChoice('Dynamic', _('Dynamic'))
+          .addChoice('Kinematic', _('Kinematic'))
           .setDescription(
             _(
               "A static object won't move (perfect for obstacles). Dynamic objects can move. Kinematic will move according to forces applied to it only (useful for characters or specific mechanisms)."
             )
-          );
+          )
+          .setHasImpactOnOtherProperties(true);
         behaviorProperties
           .getOrCreate('bullet')
           .setValue(
@@ -288,10 +305,21 @@ module.exports = {
           .setType('Choice')
           .setLabel('Shape')
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .addExtraInfo('Box')
-          .addExtraInfo('Capsule')
-          .addExtraInfo('Cylinder')
-          .addExtraInfo('Sphere');
+          .addChoice('Box', _('Box'))
+          .addChoice('Capsule', _('Capsule'))
+          .addChoice('Sphere', _('Sphere'))
+          .addChoice('Mesh', _('Mesh (works for Static only)'));
+        behaviorProperties
+          .getOrCreate('meshShapeResourceName')
+          .setValue(
+            behaviorContent.getChild('meshShapeResourceName').getStringValue()
+          )
+          .setType('resource')
+          .addExtraInfo('model3D')
+          .setLabel(_("Simplified 3D model (leave empty to use object's one)"))
+          // Hidden as required to be changed in the full editor.
+          .setHidden(true)
+          .setHasImpactOnOtherProperties(true);
         behaviorProperties
           .getOrCreate('shapeOrientation')
           .setValue(
@@ -300,9 +328,9 @@ module.exports = {
           .setType('Choice')
           .setLabel('Shape orientation')
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .addExtraInfo('Z')
-          .addExtraInfo('Y')
-          .addExtraInfo('X');
+          .addChoice('Z', _('Z'))
+          .addChoice('Y', _('Y'))
+          .addChoice('X', _('X'));
         behaviorProperties
           .getOrCreate('shapeDimensionA')
           .setValue(
@@ -580,6 +608,7 @@ module.exports = {
         behaviorContent.addChild('bullet').setBoolValue(false);
         behaviorContent.addChild('fixedRotation').setBoolValue(false);
         behaviorContent.addChild('shape').setStringValue('Box');
+        behaviorContent.addChild('meshShapeResourceName').setStringValue('');
         behaviorContent.addChild('shapeOrientation').setStringValue('Z');
         behaviorContent.addChild('shapeDimensionA').setDoubleValue(0);
         behaviorContent.addChild('shapeDimensionB').setDoubleValue(0);

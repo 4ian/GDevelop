@@ -7,6 +7,7 @@ import * as React from 'react';
 import { AutoSizer } from 'react-virtualized';
 import Background from '../UI/Background';
 import SearchBar from '../UI/SearchBar';
+import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { filterResourcesList } from './EnumerateResources';
 import { getResourceFilePathStatus } from './ResourceUtils';
@@ -26,6 +27,7 @@ import SortableVirtualizedItemList from '../UI/SortableVirtualizedItemList';
 const styles = {
   listContainer: {
     flex: 1,
+    outline: 'none',
   },
 };
 
@@ -57,6 +59,7 @@ export const getDefaultResourceThumbnail = (resource: gdResource) => {
 export type ResourcesListInterface = {|
   forceUpdateList: () => void,
   checkMissingPaths: () => void,
+  focus: () => void,
 |};
 
 type Props = {|
@@ -69,6 +72,7 @@ type Props = {|
     newName: string,
     cb: (boolean) => void
   ) => void,
+  onResourceRenamed?: () => void,
   fileMetadata: ?FileMetadata,
   onRemoveUnusedResources: ResourceKind => void,
   onRemoveAllResourcesWithInvalidPath: () => void,
@@ -84,6 +88,7 @@ const ResourcesList = React.memo<Props, ResourcesListInterface>(
         onSelectResource,
         onDeleteResource,
         onRenameResource,
+        onResourceRenamed,
         fileMetadata,
         onRemoveUnusedResources,
         getResourceActionsSpecificToStorageProvider,
@@ -96,6 +101,7 @@ const ResourcesList = React.memo<Props, ResourcesListInterface>(
       const [resourcesWithErrors, setResourcesWithErrors] = React.useState({});
       const [infoBarContent, setInfoBarContent] = React.useState(null);
       const sortableListRef = React.useRef(null);
+      const listContainerRef = React.useRef(null);
 
       const deleteResource = React.useCallback(
         (resource: gdResource) => {
@@ -153,9 +159,10 @@ const ResourcesList = React.memo<Props, ResourcesListInterface>(
             resource.setName(newName);
             // Force re-render
             forceUpdateList();
+            if (onResourceRenamed) onResourceRenamed();
           });
         },
-        [project, onRenameResource, forceUpdateList]
+        [project, onRenameResource, forceUpdateList, onResourceRenamed]
       );
 
       const moveSelectionTo = React.useCallback(
@@ -257,9 +264,32 @@ const ResourcesList = React.memo<Props, ResourcesListInterface>(
         [project, forceUpdateList]
       );
 
+      const keyboardShortcutsRef = React.useRef<KeyboardShortcuts>(
+        new KeyboardShortcuts({
+          shortcutCallbacks: {},
+        })
+      );
+
+      React.useEffect(
+        () => {
+          if (!keyboardShortcutsRef.current) return;
+          if (!selectedResource) return;
+          keyboardShortcutsRef.current.setShortcutCallback('onDelete', () => {
+            deleteResource(selectedResource);
+          });
+          keyboardShortcutsRef.current.setShortcutCallback('onRename', () => {
+            editName(selectedResource);
+          });
+        },
+        [selectedResource, deleteResource, editName]
+      );
+
       React.useImperativeHandle(ref, () => ({
         forceUpdateList,
         checkMissingPaths,
+        focus: () => {
+          if (listContainerRef.current) listContainerRef.current.focus();
+        },
       }));
 
       // Check missing paths on mount and when project changes.
@@ -294,7 +324,12 @@ const ResourcesList = React.memo<Props, ResourcesListInterface>(
               />
             </Column>
           </Line>
-          <div style={styles.listContainer}>
+          <div
+            ref={listContainerRef}
+            style={styles.listContainer}
+            tabIndex={0}
+            onKeyDown={event => keyboardShortcutsRef.current.onKeyDown(event)}
+          >
             <AutoSizer>
               {({ height, width }) => (
                 <I18n>

@@ -4,7 +4,7 @@ import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 
-import { type Schema } from '../../CompactPropertiesEditor';
+import { type Schema } from '../../PropertiesEditor/PropertiesEditorSchema';
 import { styles } from '.';
 import Rectangle from '../../Utils/Rectangle';
 

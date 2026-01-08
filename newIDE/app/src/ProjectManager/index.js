@@ -439,6 +439,95 @@ class FolderTreeViewItem implements TreeViewItem {
   }
 }
 
+class MockFolderTreeViewItemContent extends LabelTreeViewItemContent {
+  folderId: string;
+  folderName: string;
+  mockFolders: Array<{id: string, name: string}>;
+  setMockFolders: (folders: Array<{id: string, name: string}>) => void;
+  onProjectItemModified: () => void;
+  showDeleteConfirmation: (options: any) => Promise<boolean>;
+  editNameCallback: (itemId: string) => void;
+
+  constructor(
+    id: string,
+    name: string,
+    mockFolders: Array<{id: string, name: string}>,
+    setMockFolders: (folders: Array<{id: string, name: string}>) => void,
+    onProjectItemModified: () => void,
+    showDeleteConfirmation: (options: any) => Promise<boolean>,
+    editNameCallback: (itemId: string) => void
+  ) {
+    super(id, name);
+    this.folderId = id;
+    this.folderName = name;
+    this.mockFolders = mockFolders;
+    this.setMockFolders = setMockFolders;
+    this.onProjectItemModified = onProjectItemModified;
+    this.showDeleteConfirmation = showDeleteConfirmation;
+    this.editNameCallback = editNameCallback;
+  }
+
+  getName(): string | React.Node {
+    return this.folderName;
+  }
+
+  getThumbnail(): ?string {
+    return null;
+  }
+
+  rename(newName: string): void {
+    if (this.folderName === newName) return;
+    
+    this.setMockFolders(
+      this.mockFolders.map(folder =>
+        folder.id === this.folderId ? { ...folder, name: newName } : folder
+      )
+    );
+    this.onProjectItemModified();
+  }
+
+  edit(): void {
+    this.editNameCallback(this.getId());
+  }
+
+  delete(): void {
+    this.showDeleteConfirmation({
+      title: t`Remove folder`,
+      message: t`Are you sure you want to remove this folder?`,
+    }).then(answer => {
+      if (!answer) return;
+      
+      this.setMockFolders(
+        this.mockFolders.filter(folder => folder.id !== this.folderId)
+      );
+      this.onProjectItemModified();
+    });
+  }
+
+  buildMenuTemplate(i18n: I18nType, index: number): Array<MenuItemTemplate> {
+    return [
+      {
+        label: i18n._(t`Rename`),
+        click: () => this.edit(),
+        accelerator: 'F2',
+      },
+      {
+        label: i18n._(t`Delete`),
+        click: () => this.delete(),
+        accelerator: 'Backspace',
+      },
+    ];
+  }
+
+  getRootId(): string {
+    return scenesRootFolderId;
+  }
+
+  isDescendantOf(itemContent: TreeViewItemContent): boolean {
+    return itemContent.getId() === scenesRootFolderId;
+  }
+}
+
 const getTreeViewItemName = (item: TreeViewItem) => item.content.getName();
 const getTreeViewItemId = (item: TreeViewItem) => item.content.getId();
 const getTreeViewItemHtmlId = (item: TreeViewItem, index: number) =>
@@ -771,16 +860,27 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       [isMobile]
     );
 
+    const [mockFolders, setMockFolders] = React.useState<Array<{id: string, name: string}>>([]);
+
     const addNewFolder = React.useCallback(
       (i18n: I18nType) => {
         if (!project) return;
 
-        console.log('Add new folder clicked - Backend implementation needed');
-        // TODO: Später mit project.getLayoutsRootFolder().insertNewFolder()
+        const newFolderName = newNameGenerator(i18n._(t`Untitled folder`), name =>
+          mockFolders.some(f => f.name === name)
+        );
         
-        alert(i18n._(t`Folder functionality will be available soon!`));
+        const newFolder = {
+          id: `mock-folder-${Date.now()}`,
+          name: newFolderName
+        };
+        
+        setMockFolders(prev => [...prev, newFolder]);
+        onProjectItemModified();
+        
+        console.log('Mock folder created:', newFolder);
       },
-      [project]
+      [project, mockFolders, onProjectItemModified]
     );
 
     const addNewScene = React.useCallback(
@@ -1333,25 +1433,48 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                   addNewFolder // Diese Funktion musst du noch erstellen
                 ),
                 getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-                  //const rootFolder = project.getLayoutsRootFolder();
-                  if (project.getLayoutsCount() === 0) {
-                  return [
-                    new PlaceHolderTreeViewItem(
-                      scenesEmptyPlaceholderId,
-                      i18n._(t`Start by adding a new scene.`)
-                    ),
-                  ];
-                }
-                
-                // Alle Szenen als flache Liste
-                return mapFor(0, project.getLayoutsCount(), i =>
-                  new LeafTreeViewItem(
-                    new SceneTreeViewItemContent(
-                      project.getLayoutAt(i),
-                      sceneTreeViewItemProps
-                    )
-                  )
-                );
+                  if (project.getLayoutsCount() === 0 && mockFolders.length === 0) {
+                    return [
+                      new PlaceHolderTreeViewItem(
+                        scenesEmptyPlaceholderId,
+                        i18n._(t`Start by adding a new scene.`)
+                      ),
+                    ];
+                  }
+                  
+                  const children = [];
+                  
+                  // Mock folders first
+                  mockFolders.forEach(folder => {
+                    children.push(
+                      new FolderTreeViewItem(
+                        new MockFolderTreeViewItemContent(
+                          folder.id,
+                          folder.name,
+                          mockFolders,
+                          setMockFolders,
+                          onProjectItemModified,
+                          showDeleteConfirmation,
+                          editName
+                        ),
+                        () => [] // Leerer Ordner
+                      )
+                    );
+                  });
+                  
+                  // Then scenes
+                  for (let i = 0; i < project.getLayoutsCount(); i++) {
+                    children.push(
+                      new LeafTreeViewItem(
+                        new SceneTreeViewItemContent(
+                          project.getLayoutAt(i),
+                          sceneTreeViewItemProps
+                        )
+                      )
+                    );
+                  }
+                  
+                  return children;
                 },
               },
               {
@@ -1787,10 +1910,8 @@ const MemoizedProjectManager = React.memo<Props, ProjectManagerInterface>(
   arePropsEqual
 );
 
-const ProjectManagerWithErrorBoundary = React.forwardRef<
-  Props,
-  ProjectManagerInterface
->((props, outerRef) => {
+const ProjectManagerWithErrorBoundary = React.forwardRef<Props,ProjectManagerInterface>(
+  (props, outerRef) => {
   const projectManagerRef = React.useRef<?ProjectManagerInterface>(null);
   const shouldAutofocusInput = useShouldAutofocusInput();
 

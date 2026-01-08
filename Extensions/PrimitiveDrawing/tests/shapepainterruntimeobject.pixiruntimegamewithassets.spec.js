@@ -69,7 +69,7 @@ describe('gdjs.ShapePainterRuntimeObject (using a PixiJS RuntimeGame with assets
   };
 
   it('properly computes bounds of the object (basics)', async () => {
-    const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
+    const runtimeGame = await gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
     loadScene(runtimeScene);
 
@@ -127,7 +127,7 @@ describe('gdjs.ShapePainterRuntimeObject (using a PixiJS RuntimeGame with assets
   });
 
   it('properly computes bounds of the object (custom center)', async () => {
-    const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
+    const runtimeGame = await gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
     loadScene(runtimeScene);
 
@@ -202,7 +202,7 @@ describe('gdjs.ShapePainterRuntimeObject (using a PixiJS RuntimeGame with assets
   });
 
   it('can transform points', async () => {
-    const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
+    const runtimeGame = await gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
     loadScene(runtimeScene);
 

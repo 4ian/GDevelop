@@ -99,6 +99,7 @@ module.exports = function (config) {
 
         //Extensions:
         './newIDE/app/resources/GDJS/Runtime/Extensions/**/*.js',
+        './newIDE/app/resources/GDJS/Runtime/Extensions/**/*.wasm',
 
         // Test extensions:
         './GDJS/tests/tests/Extensions/**.js',

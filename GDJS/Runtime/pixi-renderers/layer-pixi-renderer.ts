@@ -850,6 +850,13 @@ namespace gdjs {
       const angleCosValue = Math.cos(angle);
       const angleSinValue = Math.sin(angle);
 
+      // Determine if this layer will actually render in 3D mode.
+      // A layer configured for 3D (has _threeCamera and _threePlaneMesh) but with no
+      // 3D objects will be rendered directly in 2D mode, so it should use 2D-style
+      // pixi container setup to avoid a zoom mismatch.
+      const willRenderIn3DMode =
+        this._threeCamera && this._threePlaneMesh && this.has3DObjects();
+
       // Update the 2D plane in the 3D world position, size and rotation,
       // and update the 2D Pixi container position, size and rotation.
       if (this._threeCamera && this._threePlaneMesh) {
@@ -869,59 +876,37 @@ namespace gdjs {
           this._threePlaneMesh.position.set(cx, -cy, 0);
           this._threePlaneMesh.rotation.set(0, 0, -angle);
 
-          // Update the 2D Pixi container size and rotation to match the "zoom" (which comes from the 2D plane size)
-          // rotation and position.
-          effectivePixiZoom = this._layer.getWidth() / boxW; // == height/boxH
-          this._pixiContainer.scale.set(effectivePixiZoom, effectivePixiZoom);
-          this._pixiContainer.rotation = angle;
+          // Only update the pixi container with 3D-style transforms if we're actually
+          // rendering in 3D mode. Otherwise, let the 2D path below handle it.
+          if (willRenderIn3DMode) {
+            // Update the 2D Pixi container size and rotation to match the "zoom" (which comes from the 2D plane size)
+            // rotation and position.
+            effectivePixiZoom = this._layer.getWidth() / boxW; // == height/boxH
+            this._pixiContainer.scale.set(effectivePixiZoom, effectivePixiZoom);
+            this._pixiContainer.rotation = angle;
 
-          const followX = cx;
-          const followY = -cy;
-          const centerX2d =
-            followX * effectivePixiZoom * angleCosValue -
-            followY * effectivePixiZoom * angleSinValue;
-          const centerY2d =
-            followX * effectivePixiZoom * angleSinValue +
-            followY * effectivePixiZoom * angleCosValue;
-          this._pixiContainer.position.x =
-            this._layer.getWidth() / 2 - centerX2d;
-          this._pixiContainer.position.y =
-            this._layer.getHeight() / 2 - centerY2d;
+            const followX = cx;
+            const followY = -cy;
+            const centerX2d =
+              followX * effectivePixiZoom * angleCosValue -
+              followY * effectivePixiZoom * angleSinValue;
+            const centerY2d =
+              followX * effectivePixiZoom * angleSinValue +
+              followY * effectivePixiZoom * angleCosValue;
+            this._pixiContainer.position.x =
+              this._layer.getWidth() / 2 - centerX2d;
+            this._pixiContainer.position.y =
+              this._layer.getHeight() / 2 - centerY2d;
+          }
         }
       }
 
       // 2D only (no 3D rendering and so no 2D plane in the 3D world):
       // Update the 2D Pixi container position, size and rotation.
-      if (!this._threeCamera || !this._threePlaneMesh) {
-        const cameraZoom = this._layer.getCameraZoom();
-
-        // When the camera is rotated, the axis-aligned bounding box of the rotated
-        // viewport expands. To maintain consistent visible world dimensions (matching
-        // the behavior of 3D layers), we need to adjust the effective zoom.
-        // For a W×H viewport rotated by angle θ, the bounding box becomes:
-        //   boxW = W * |cos(θ)| + H * |sin(θ)|
-        //   boxH = W * |sin(θ)| + H * |cos(θ)|
-        const layerWidth = this._layer.getWidth();
-        const layerHeight = this._layer.getHeight();
-        const absCosTerm = Math.abs(angleCosValue);
-        const absSinTerm = Math.abs(angleSinValue);
-
-        let boxW = layerWidth * absCosTerm + layerHeight * absSinTerm;
-        let boxH = layerWidth * absSinTerm + layerHeight * absCosTerm;
-
-        // Maintain aspect ratio (same as _get2DPlaneSize does for 3D layers).
-        const targetAspect = layerWidth / layerHeight;
-        const boxAspect = boxW / boxH;
-        if (boxAspect < targetAspect) {
-          boxW = targetAspect * boxH;
-        } else {
-          boxH = boxW / targetAspect;
-        }
-
-        // The effective zoom is adjusted by the bounding box expansion factor.
-        // This ensures the visible world area matches what a 3D layer would show.
-        effectivePixiZoom = cameraZoom * (layerWidth / boxW);
-
+      // This also applies to layers configured for 3D but with no 3D objects,
+      // since they will be rendered directly in 2D mode.
+      if (!willRenderIn3DMode) {
+        effectivePixiZoom = this._layer.getCameraZoom();
         this._pixiContainer.rotation = angle;
         this._pixiContainer.scale.x = effectivePixiZoom;
         this._pixiContainer.scale.y = effectivePixiZoom;

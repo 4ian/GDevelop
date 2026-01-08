@@ -167,17 +167,22 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     // end of compatibility code
   }
 
+  bool hasScanProjectForExtension = false;
+  bool has3DObjects = false;
+
   std::vector<gd::SourceFileMetadata> noUsedSourceFiles;
   std::vector<gd::SourceFileMetadata> &usedSourceFiles = noUsedSourceFiles;
   if (options.shouldReloadLibraries || options.shouldClearExportFolder) {
     auto usedExtensionsResult =
         gd::UsedExtensionsFinder::ScanProject(exportedProject);
     usedSourceFiles = usedExtensionsResult.GetUsedSourceFiles();
+    hasScanProjectForExtension = true;
+    has3DObjects = usedExtensionsResult.Has3DObjects();
 
     // Export engine libraries
     AddLibsInclude(/*pixiRenderers=*/true,
                   /*pixiInThreeRenderers=*/
-                  usedExtensionsResult.Has3DObjects(),
+                  has3DObjects,
                   /*isInGameEdition=*/
                   options.isInGameEdition,
                   /*includeWebsocketDebuggerClient=*/
@@ -330,11 +335,18 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     // TODO Build a full includesFiles list without actually doing export or
     // generation.
     if (options.shouldGenerateScenesEventsCode || options.shouldClearExportFolder) {
+      if (!hasScanProjectForExtension) {
+        auto usedExtensionsResult =
+            gd::UsedExtensionsFinder::ScanProject(exportedProject);
+        usedSourceFiles = usedExtensionsResult.GetUsedSourceFiles();
+        hasScanProjectForExtension = true;
+        has3DObjects = usedExtensionsResult.Has3DObjects();
+      }
       // Create the index file
       if (!ExportIndexFile(exportedProject, gdjsRoot + "/Runtime/index.html",
                            options.exportPath, includesFiles, usedSourceFiles,
                            options.nonRuntimeScriptsCacheBurst,
-                           "gdjs.runtimeGameOptions")) {
+                           has3DObjects, "gdjs.runtimeGameOptions")) {
         return false;
       }
     }
@@ -708,6 +720,7 @@ bool ExporterHelper::ExportIndexFile(
     const std::vector<gd::String> &includesFiles,
     const std::vector<gd::SourceFileMetadata> &sourceFiles,
     unsigned int nonRuntimeScriptsCacheBurst,
+    bool has3DObjects,
     gd::String additionalSpec) {
   gd::String str = fs.ReadFile(source);
 
@@ -736,6 +749,7 @@ bool ExporterHelper::ExportIndexFile(
                          exportDir,
                          finalIncludesFiles,
                          nonRuntimeScriptsCacheBurst,
+                         has3DObjects,
                          additionalSpec))
     return false;
 
@@ -1083,6 +1097,7 @@ bool ExporterHelper::CompleteIndexFile(
     gd::String exportDir,
     const std::vector<gd::String> &includesFiles,
     unsigned int nonRuntimeScriptsCacheBurst,
+    bool has3DObjects,
     gd::String additionalSpec) {
   if (additionalSpec.empty()) additionalSpec = "{}";
 
@@ -1104,11 +1119,19 @@ bool ExporterHelper::CompleteIndexFile(
     codeFilesIncludes += "\t<script src=\"" + scriptSrc +
                          "\" crossorigin=\"anonymous\" defer></script>\n";
   }
-
-  str = str.FindAndReplace("/* GDJS_CUSTOM_STYLE */", "")
-            .FindAndReplace("<!-- GDJS_CUSTOM_HTML -->", "")
-            .FindAndReplace("<!-- GDJS_CODE_FILES -->", codeFilesIncludes)
-            .FindAndReplace("{}/*GDJS_ADDITIONAL_SPEC*/", additionalSpec);
+  str =
+      str.FindAndReplace("/* GDJS_CUSTOM_STYLE */", "")
+          .FindAndReplace(
+              "<!-- 3D_LIBRARY_SCRIPT -->",
+              has3DObjects
+                  ? "<script type=\"module\">\n"
+                    "    import * as THREE from './pixi-renderers/three.js';\n"
+                    "    globalThis.THREE = THREE;\n"
+                    "</script>\n"
+                  : "")
+          .FindAndReplace("<!-- GDJS_CUSTOM_HTML -->", "")
+          .FindAndReplace("<!-- GDJS_CODE_FILES -->", codeFilesIncludes)
+          .FindAndReplace("{}/*GDJS_ADDITIONAL_SPEC*/", additionalSpec);
 
   return true;
 }

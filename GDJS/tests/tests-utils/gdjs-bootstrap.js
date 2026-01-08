@@ -80,6 +80,7 @@ const scriptPaths = [
   '/base/newIDE/app/resources/GDJS/Runtime/Extensions/Physics2Behavior/physics2runtimebehavior.js',
   '/base/newIDE/app/resources/GDJS/Runtime/Extensions/Physics2Behavior/physics2tools.js',
   '/base/newIDE/app/resources/GDJS/Runtime/Extensions/Leaderboards/leaderboardstools.js',
+  '/base/newIDE/app/resources/GDJS/Runtime/Extensions/PlayerAuthentication/playerauthenticationtools.js',
   '/base/newIDE/app/resources/GDJS/Runtime/Extensions/Multiplayer/messageManager.js',
   '/base/newIDE/app/resources/GDJS/Runtime/Extensions/Multiplayer/multiplayerVariablesManager.js',
   '/base/newIDE/app/resources/GDJS/Runtime/Extensions/Multiplayer/multiplayertools.js',
@@ -167,7 +168,6 @@ const loadScript = (src) =>
   });
 
 for (const scriptPath of scriptPaths) {
-console.log("Load script:", scriptPath);
   await loadScript(scriptPath);
 }
 
@@ -175,7 +175,6 @@ const TEST_REGEXP = /(spec|test)\.js$/i;
 
 // Get a list of all the test files to include
 for (const file of Object.keys(window.__karma__.files)) {
-    console.log(file);
   if (TEST_REGEXP.test(file)) {
     await loadScript(file);
   }

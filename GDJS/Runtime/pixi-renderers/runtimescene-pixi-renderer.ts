@@ -119,7 +119,13 @@ namespace gdjs {
             !this._runtimeScene.getGame().isInGameEdition() &&
             (runtimeLayerRenderingType ===
               gdjs.RuntimeLayerRenderingType.TWO_D ||
-              !layerHas3DObjectsToRender)
+              (!layerHas3DObjectsToRender &&
+                runtimeLayerRenderingType !==
+                  gdjs.RuntimeLayerRenderingType.TWO_D_PLUS_THREE_D))
+            // We must render 2D+3D layers through the 3D pipeline (even if they have no 3D objects)
+            // because their 2D content is projected on a 3D plane, and the transforms calculated
+            // in LayerPixiRenderer assume this projection. Rendering them as simple 2D would
+            // cause incorrect scaling/positioning (e.g. appearing zoomed out when rotated).
           ) {
             // Render a layer with 2D rendering (PixiJS) only if layer is configured as is
             // or if there is no 3D object to render.

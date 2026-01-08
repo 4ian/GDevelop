@@ -11,6 +11,8 @@ module.exports = function (config) {
   ];
 
   config.set({
+    customContextFile: './GDJS/tests/bootstrap/context.html',
+
     frameworks: ['mocha', 'sinon'],
     browserNoActivityTimeout: 400000,
     browsers: ['ChromeHeadless', 'EdgeHeadless', 'Chrome', 'Edge', 'Firefox'],
@@ -34,7 +36,7 @@ module.exports = function (config) {
     files: [
       './GDJS/tests/node_modules/expect.js/index.js',
       {
-        pattern: './GDJS/tests/tests-utils/gdjs-bootstrap.js',
+        pattern: './GDJS/tests/bootstrap/gdjs-bootstrap.js',
         type: 'module',
         watched: true,
         included: true,

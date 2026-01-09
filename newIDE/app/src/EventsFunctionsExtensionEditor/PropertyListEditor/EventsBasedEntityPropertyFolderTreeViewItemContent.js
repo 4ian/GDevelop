@@ -23,8 +23,6 @@ import {
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 
-const gd: libGDevelop = global.gd;
-
 export const expandAllSubfolders = (
   propertyFolder: gdPropertyFolderOrProperty,
   expandFolders: (

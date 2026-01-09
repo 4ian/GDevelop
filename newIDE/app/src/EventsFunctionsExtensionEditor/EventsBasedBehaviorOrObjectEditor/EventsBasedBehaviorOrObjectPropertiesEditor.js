@@ -13,7 +13,6 @@ import { ResponsiveLineStackLayout, ColumnStackLayout } from '../../UI/Layout';
 import ChoicesEditor, { type Choice } from '../../ChoicesEditor';
 import ColorField from '../../UI/ColorField';
 import BehaviorTypeSelector from '../../BehaviorTypeSelector';
-import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
 import { getMeasurementUnitShortLabel } from '../../PropertiesEditor/PropertiesMapToSchema';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import useForceUpdate from '../../Utils/UseForceUpdate';
@@ -191,19 +190,6 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
         };
       },
       [forceUpdate]
-    );
-
-    const getPropertyGroupNames = React.useCallback(
-      (): Array<string> => {
-        const groupNames = new Set<string>();
-        for (let i = 0; i < properties.size(); i++) {
-          const property = properties.at(i);
-          const group = property.getGroup() || '';
-          groupNames.add(group);
-        }
-        return [...groupNames].sort((a, b) => a.localeCompare(b));
-      },
-      [properties]
     );
 
     const setHidden = React.useCallback(

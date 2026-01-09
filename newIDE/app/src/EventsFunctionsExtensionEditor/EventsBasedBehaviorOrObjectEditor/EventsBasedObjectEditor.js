@@ -3,19 +3,19 @@ import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import TextField from '../UI/TextField';
-import SemiControlledTextField from '../UI/SemiControlledTextField';
-import DismissableAlertMessage from '../UI/DismissableAlertMessage';
-import AlertMessage from '../UI/AlertMessage';
-import { ColumnStackLayout } from '../UI/Layout';
-import useForceUpdate from '../Utils/UseForceUpdate';
-import Checkbox from '../UI/Checkbox';
-import HelpButton from '../UI/HelpButton';
-import { Line } from '../UI/Grid';
-import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
-import RaisedButton from '../UI/RaisedButton';
-import Window from '../Utils/Window';
-import ScrollView from '../UI/ScrollView';
+import TextField from '../../UI/TextField';
+import SemiControlledTextField from '../../UI/SemiControlledTextField';
+import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
+import AlertMessage from '../../UI/AlertMessage';
+import { ColumnStackLayout } from '../../UI/Layout';
+import useForceUpdate from '../../Utils/UseForceUpdate';
+import Checkbox from '../../UI/Checkbox';
+import HelpButton from '../../UI/HelpButton';
+import { Line } from '../../UI/Grid';
+import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
+import RaisedButton from '../../UI/RaisedButton';
+import Window from '../../Utils/Window';
+import ScrollView from '../../UI/ScrollView';
 
 const gd: libGDevelop = global.gd;
 

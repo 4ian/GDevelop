@@ -6,17 +6,17 @@ import { action } from '@storybook/addon-actions';
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
-import EventsBasedBehaviorEditorPanel from '../../../EventsBasedBehaviorEditor/EventsBasedBehaviorEditorPanel';
+import { EventsBasedBehaviorOrObjectEditor } from '../../../EventsFunctionsExtensionEditor/EventsBasedBehaviorOrObjectEditor';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 
 export default {
   title: 'EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog',
-  component: EventsBasedBehaviorEditorPanel,
+  component: EventsBasedBehaviorOrObjectEditor,
 };
 
 export const Default = () => (
   <DragAndDropContextProvider>
-    <EventsBasedBehaviorEditorPanel
+    <EventsBasedBehaviorOrObjectEditor
       project={testProject.project}
       projectScopedContainersAccessor={
         testProject.testEventsBasedBehaviorProjectScopedContainersAccessor
@@ -27,13 +27,19 @@ export const Default = () => (
       onPropertyTypeChanged={action('onPropertyTypeChanged')}
       onRenameSharedProperty={action('shared property rename')}
       onEventsFunctionsAdded={action('functions added')}
+      onFocusProperty={action('onFocusProperty')}
+      onPropertiesUpdated={action('onPropertiesUpdated')}
+      onEventsBasedObjectChildrenEdited={action(
+        'onEventsBasedObjectChildrenEdited'
+      )}
+      onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
     />
   </DragAndDropContextProvider>
 );
 
 export const WithoutFunction = () => (
   <DragAndDropContextProvider>
-    <EventsBasedBehaviorEditorPanel
+    <EventsBasedBehaviorOrObjectEditor
       project={testProject.project}
       projectScopedContainersAccessor={
         testProject.testEventsBasedBehaviorProjectScopedContainersAccessor
@@ -44,6 +50,12 @@ export const WithoutFunction = () => (
       onPropertyTypeChanged={action('onPropertyTypeChanged')}
       onRenameSharedProperty={action('shared property rename')}
       onEventsFunctionsAdded={action('functions added')}
+      onFocusProperty={action('onFocusProperty')}
+      onPropertiesUpdated={action('onPropertiesUpdated')}
+      onEventsBasedObjectChildrenEdited={action(
+        'onEventsBasedObjectChildrenEdited'
+      )}
+      onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
     />
   </DragAndDropContextProvider>
 );

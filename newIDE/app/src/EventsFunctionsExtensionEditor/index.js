@@ -19,8 +19,10 @@ import { type EventsFunctionCreationParameters } from '../EventsFunctionsList/Ev
 import { type EventsBasedObjectCreationParameters } from '../EventsFunctionsList/EventsBasedObjectTreeViewItemContent';
 import Background from '../UI/Background';
 import OptionsEditorDialog from './OptionsEditorDialog';
-import EventsBasedBehaviorEditorPanel from '../EventsBasedBehaviorEditor/EventsBasedBehaviorEditorPanel';
-import EventsBasedObjectEditorPanel from '../EventsBasedObjectEditor/EventsBasedObjectEditorPanel';
+import {
+  EventsBasedBehaviorOrObjectEditor,
+  type EventsBasedBehaviorOrObjectEditorInterface,
+} from './EventsBasedBehaviorOrObjectEditor';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import BehaviorMethodSelectorDialog from './BehaviorMethodSelectorDialog';
 import ObjectMethodSelectorDialog from './ObjectMethodSelectorDialog';
@@ -43,6 +45,9 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import GlobalAndSceneVariablesDialog from '../VariablesList/GlobalAndSceneVariablesDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
+import PropertyListEditor, {
+  type PropertyListEditorInterface,
+} from './PropertyListEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -151,6 +156,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   };
   editor: ?EventsSheetInterface;
   eventsFunctionList: ?EventsFunctionsListInterface;
+  eventsBasedBehaviorEditor: ?EventsBasedBehaviorOrObjectEditorInterface;
+  eventsBasedObjectEditor: ?EventsBasedBehaviorOrObjectEditorInterface;
+  propertyListEditor: ?PropertyListEditorInterface;
   _editorMosaic: ?EditorMosaicInterface;
   _editorNavigator: ?EditorNavigatorInterface;
   // Create an empty "context" of objects.
@@ -350,9 +358,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       () => {
         this.updateToolbar();
 
-        if (this._editorMosaic) {
-          this._editorMosaic.uncollapseEditor('parameters', 25);
-        }
         if (this._editorNavigator) {
           // Open the parameters of the function if it's a new, empty function.
           if (
@@ -640,9 +645,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       () => {
         this.updateToolbar();
         if (selectedEventsBasedBehavior) {
-          if (this._editorMosaic) {
-            this._editorMosaic.collapseEditor('parameters');
-          }
           if (this._editorNavigator) {
             this._editorNavigator.openEditor('events-sheet');
           }
@@ -667,9 +669,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       () => {
         this.updateToolbar();
         if (selectedEventsBasedObject) {
-          if (this._editorMosaic) {
-            this._editorMosaic.collapseEditor('parameters');
-          }
           if (this._editorNavigator)
             this._editorNavigator.openEditor('events-sheet');
         }
@@ -1361,7 +1360,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     const editors = {
       parameters: {
         type: 'primary',
-        title: t`Function Configuration`,
+        title: selectedEventsFunction
+          ? t`Function Configuration`
+          : t`Properties`,
         toolbarControls: [],
         renderEditor: () => (
           <I18n>
@@ -1419,6 +1420,66 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     }
                     unsavedChanges={this.props.unsavedChanges}
                     getFunctionGroupNames={this._getFunctionGroupNames}
+                  />
+                ) : (selectedEventsBasedObject ||
+                    selectedEventsBasedBehavior) &&
+                  this._projectScopedContainersAccessor ? (
+                  <PropertyListEditor
+                    ref={ref => (this.propertyListEditor = ref)}
+                    project={project}
+                    projectScopedContainersAccessor={
+                      this._projectScopedContainersAccessor
+                    }
+                    extension={eventsFunctionsExtension}
+                    eventsBasedBehavior={selectedEventsBasedBehavior}
+                    eventsBasedObject={selectedEventsBasedObject}
+                    onRenameProperty={(oldName, newName) => {
+                      if (selectedEventsBasedBehavior) {
+                        this._onBehaviorPropertyRenamed(
+                          selectedEventsBasedBehavior,
+                          oldName,
+                          newName
+                        );
+                      } else if (selectedEventsBasedObject) {
+                        this._onObjectPropertyRenamed(
+                          selectedEventsBasedObject,
+                          oldName,
+                          newName
+                        );
+                      }
+                    }}
+                    onPropertiesUpdated={() => {
+                      const eventsBasedEntityEditor =
+                        this.eventsBasedBehaviorEditor ||
+                        this.eventsBasedObjectEditor;
+                      if (eventsBasedEntityEditor) {
+                        eventsBasedEntityEditor.forceUpdateProperties();
+                      }
+                    }}
+                    onOpenConfiguration={propertyName => {
+                      const eventsBasedEntityEditor =
+                        this.eventsBasedBehaviorEditor ||
+                        this.eventsBasedObjectEditor;
+                      if (eventsBasedEntityEditor) {
+                        eventsBasedEntityEditor.scrollToConfiguration();
+                      }
+                    }}
+                    onOpenProperty={(propertyName, isSharedProperties) => {
+                      const eventsBasedEntityEditor =
+                        this.eventsBasedBehaviorEditor ||
+                        this.eventsBasedObjectEditor;
+                      if (eventsBasedEntityEditor) {
+                        eventsBasedEntityEditor.scrollToProperty(
+                          propertyName,
+                          isSharedProperties
+                        );
+                      }
+                    }}
+                    onEventsFunctionsAdded={() => {
+                      if (this.eventsFunctionList) {
+                        this.eventsFunctionList.forceUpdateList();
+                      }
+                    }}
                   />
                 ) : (
                   <EmptyMessage>
@@ -1488,7 +1549,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             </Background>
           ) : selectedEventsBasedBehavior &&
             this._projectScopedContainersAccessor ? (
-            <EventsBasedBehaviorEditorPanel
+            <EventsBasedBehaviorOrObjectEditor
+              ref={ref => (this.eventsBasedBehaviorEditor = ref)}
               project={project}
               projectScopedContainersAccessor={
                 this._projectScopedContainersAccessor
@@ -1518,16 +1580,32 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   propertyName
                 );
               }}
+              onPropertiesUpdated={() => {
+                if (this.propertyListEditor) {
+                  this.propertyListEditor.forceUpdateList();
+                }
+              }}
+              onFocusProperty={(propertyName, isSharedProperties) => {
+                if (this.propertyListEditor) {
+                  this.propertyListEditor.setSelectedProperty(
+                    propertyName,
+                    isSharedProperties
+                  );
+                }
+              }}
               onEventsFunctionsAdded={() => {
                 if (this.eventsFunctionList) {
                   this.eventsFunctionList.forceUpdateList();
                 }
               }}
               onConfigurationUpdated={this._onConfigurationUpdated}
+              onOpenCustomObjectEditor={() => {}}
+              onEventsBasedObjectChildrenEdited={() => {}}
             />
           ) : selectedEventsBasedObject &&
             this._projectScopedContainersAccessor ? (
-            <EventsBasedObjectEditorPanel
+            <EventsBasedBehaviorOrObjectEditor
+              ref={ref => (this.eventsBasedObjectEditor = ref)}
               project={project}
               projectScopedContainersAccessor={
                 this._projectScopedContainersAccessor
@@ -1542,6 +1620,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   newName
                 )
               }
+              onRenameSharedProperty={() => {}}
               onPropertyTypeChanged={propertyName => {
                 gd.WholeProjectRefactorer.changeEventsBasedObjectPropertyType(
                   project,
@@ -1549,6 +1628,19 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   selectedEventsBasedObject,
                   propertyName
                 );
+              }}
+              onPropertiesUpdated={() => {
+                if (this.propertyListEditor) {
+                  this.propertyListEditor.forceUpdateList();
+                }
+              }}
+              onFocusProperty={(propertyName, isSharedProperties) => {
+                if (this.propertyListEditor) {
+                  this.propertyListEditor.setSelectedProperty(
+                    propertyName,
+                    isSharedProperties
+                  );
+                }
               }}
               onEventsFunctionsAdded={() => {
                 if (this.eventsFunctionList) {
@@ -1646,7 +1738,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 transitions={{
                   'events-sheet': {
                     nextIcon: <Tune />,
-                    nextLabel: <Trans>Parameters</Trans>,
+                    nextLabel: selectedEventsFunction ? (
+                      <Trans>Parameters</Trans>
+                    ) : (
+                      <Trans>Property list</Trans>
+                    ),
                     nextEditor: 'parameters',
                     previousEditor: () => {
                       this._selectEventsFunction(null, null, null);
@@ -1655,8 +1751,39 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   },
                   parameters: {
                     nextIcon: <Mark />,
-                    nextLabel: <Trans>Validate these parameters</Trans>,
-                    nextEditor: 'events-sheet',
+                    nextLabel: selectedEventsFunction ? (
+                      <Trans>Validate these parameters</Trans>
+                    ) : null,
+                    nextEditor: selectedEventsFunction ? 'events-sheet' : null,
+                    previousEditor: selectedEventsFunction
+                      ? null
+                      : () => {
+                          if (this.propertyListEditor) {
+                            const selection = this.propertyListEditor.getSelectedProperty();
+                            if (selection) {
+                              const {
+                                propertyName,
+                                isSharedProperties,
+                              } = selection;
+                              // Scroll to the selected property.
+                              // Ideally, we'd wait for the list to be updated to scroll, but
+                              // to simplify the code, we just wait a few ms for a new render
+                              // to be done.
+                              setTimeout(() => {
+                                const eventsBasedEntityEditor =
+                                  this.eventsBasedBehaviorEditor ||
+                                  this.eventsBasedObjectEditor;
+                                if (eventsBasedEntityEditor) {
+                                  eventsBasedEntityEditor.scrollToProperty(
+                                    propertyName,
+                                    isSharedProperties
+                                  );
+                                }
+                              }, 100); // A few ms is enough for a new render to be done.
+                            }
+                          }
+                          return 'events-sheet';
+                        },
                   },
                 }}
                 onEditorChanged={

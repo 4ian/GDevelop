@@ -59,6 +59,7 @@ type ErrorBoundaryScope =
   | 'debugger'
   | 'resources'
   | 'extension-editor'
+  | 'property-list-editor'
   | 'extensions-search-dialog'
   | 'external-events-editor'
   | 'external-layout-editor'

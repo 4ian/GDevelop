@@ -99,10 +99,6 @@ void AbstractReadOnlyArbitraryEventsWorker::VisitEventList(const gd::EventsList&
       break;
     }
     events[i].AcceptVisitor(*this);
-
-    if (events[i].CanHaveSubEvents()) {
-      VisitEventList(events[i].GetSubEvents());
-    }
   }
 }
 
@@ -124,6 +120,12 @@ void AbstractReadOnlyArbitraryEventsWorker::VisitEvent(const gd::BaseEvent& even
       break;
     }
     VisitInstructionList(*actionsVectors[j], false);
+  }
+
+  // Visit sub-events inside VisitEvent to ensure local variables remain in scope
+  // when using ReadOnlyArbitraryEventsWorkerWithContext
+  if (!shouldStopIteration && event.CanHaveSubEvents()) {
+    VisitEventList(event.GetSubEvents());
   }
 }
 

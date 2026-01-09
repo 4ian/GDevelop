@@ -47,6 +47,7 @@ type CommandHandlers = {|
   onLaunchNetworkPreview: () => Promise<void>,
   onHotReloadPreview: () => Promise<void>,
   onLaunchPreviewWithDiagnosticReport: () => Promise<void>,
+  onOpenDiagnosticReport: () => void,
   allowNetworkPreview: boolean,
   onOpenHomePage: () => void,
   onCreateProject: () => void,
@@ -110,6 +111,10 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
       handler: handlers.onLaunchPreviewWithDiagnosticReport,
     }
   );
+
+  useCommand('OPEN_DIAGNOSTIC_REPORT', !!handlers.project, {
+    handler: handlers.onOpenDiagnosticReport,
+  });
 
   useCommand('OPEN_HOME_PAGE', true, {
     handler: handlers.onOpenHomePage,

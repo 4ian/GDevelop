@@ -345,7 +345,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
         has3DObjects = usedExtensionsResult.Has3DObjects();
       }
       // Create the index file
-      if (!ExportIndexFile(exportedProject, gdjsRoot + "/Runtime/index.html",
+      if (!ExportIndexFile(exportedProject, gdjsRoot + "/Runtime/",
                            options.exportPath, includesFiles, usedSourceFiles,
                            options.nonRuntimeScriptsCacheBurst,
                            has3DObjects, "gdjs.runtimeGameOptions")) {
@@ -749,14 +749,14 @@ void ExporterHelper::SerializeUsedResourcesForInGameEditor(
 
 bool ExporterHelper::ExportIndexFile(
     const gd::Project &project,
-    gd::String source,
+    gd::String sourceDir,
     gd::String exportDir,
     const std::vector<gd::String> &includesFiles,
     const std::vector<gd::SourceFileMetadata> &sourceFiles,
     unsigned int nonRuntimeScriptsCacheBurst,
     bool has3DObjects,
     gd::String additionalSpec) {
-  gd::String str = fs.ReadFile(source);
+  gd::String str = fs.ReadFile(sourceDir + "/index.html");
 
   // Add a reference to all files to include, as weel as the source files
   // required by the project.
@@ -783,8 +783,7 @@ bool ExporterHelper::ExportIndexFile(
                          exportDir,
                          finalIncludesFiles,
                          nonRuntimeScriptsCacheBurst,
-                         has3DObjects,
-                         additionalSpec))
+                         has3DObjects))
     return false;
 
   // Write the index.html file
@@ -793,6 +792,14 @@ bool ExporterHelper::ExportIndexFile(
     return false;
   }
 
+  gd::String bootstrapScript = fs.ReadFile(sourceDir + "/bootscrap.js");
+  bootstrapScript.FindAndReplace("{} /*GDJS_ADDITIONAL_SPEC*/",
+                                 additionalSpec.empty() ? "{}"
+                                                        : additionalSpec);
+  if (!fs.WriteToFile(exportDir + "/bootscrap.js", str)) {
+    lastError = "Unable to write index file.";
+    return false;
+  }
   return true;
 }
 
@@ -1131,10 +1138,7 @@ bool ExporterHelper::CompleteIndexFile(
     gd::String exportDir,
     const std::vector<gd::String> &includesFiles,
     unsigned int nonRuntimeScriptsCacheBurst,
-    bool has3DObjects,
-    gd::String additionalSpec) {
-  if (additionalSpec.empty()) additionalSpec = "{}";
-
+    bool has3DObjects) {
   gd::String codeFilesIncludes;
   for (auto &include : includesFiles) {
     gd::String scriptSrc =
@@ -1164,8 +1168,7 @@ bool ExporterHelper::CompleteIndexFile(
                     "</script>\n"
                   : "")
           .FindAndReplace("<!-- GDJS_CUSTOM_HTML -->", "")
-          .FindAndReplace("<!-- GDJS_CODE_FILES -->", codeFilesIncludes)
-          .FindAndReplace("{}/*GDJS_ADDITIONAL_SPEC*/", additionalSpec);
+          .FindAndReplace("<!-- GDJS_CODE_FILES -->", codeFilesIncludes);
 
   return true;
 }

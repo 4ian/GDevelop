@@ -85,52 +85,18 @@ type InvalidParameterRowProps = {|
   backgroundColor: string,
 |};
 
+// Threshold for assuming text might be truncated in the table cell
+const TRUNCATION_THRESHOLD_CHARS = 60;
+
 const InvalidParameterRow = ({
   error,
   navigateToError,
   backgroundColor,
 }: InvalidParameterRowProps) => {
   const [isExpanded, setIsExpanded] = React.useState(false);
-  const [isTruncated, setIsTruncated] = React.useState(false);
-  const textRef = React.useRef<HTMLDivElement | null>(null);
   const typeLabel = error.isCondition ? 'Condition' : 'Action';
-
-  // Check truncation only when collapsed and on initial render or content change
-  React.useEffect(
-    () => {
-      const element = textRef.current;
-      if (!element || isExpanded) return;
-
-      // Use requestAnimationFrame to avoid ResizeObserver loop issues
-      let rafId: AnimationFrameID;
-      const checkTruncation = () => {
-        rafId = requestAnimationFrame(() => {
-          const nowTruncated = element.scrollWidth > element.clientWidth;
-          setIsTruncated(prev => (prev !== nowTruncated ? nowTruncated : prev));
-        });
-      };
-
-      checkTruncation();
-
-      const resizeObserver = new ResizeObserver(checkTruncation);
-      resizeObserver.observe(element);
-
-      return () => {
-        resizeObserver.disconnect();
-        cancelAnimationFrame(rafId);
-      };
-    },
-    [error.instructionSentence, isExpanded]
-  );
-
-  const handleTextClick = React.useCallback(
-    () => {
-      if (isTruncated || isExpanded) {
-        setIsExpanded(!isExpanded);
-      }
-    },
-    [isTruncated, isExpanded]
-  );
+  const couldBeTruncated =
+    error.instructionSentence.length > TRUNCATION_THRESHOLD_CHARS;
 
   return (
     <TableRow
@@ -149,22 +115,23 @@ const InvalidParameterRow = ({
       <TableRowColumn style={styles.instructionCell}>
         <div style={styles.instructionContent}>
           <div
-            ref={textRef}
             style={{
               ...(isExpanded
                 ? styles.instructionTextExpanded
                 : styles.instructionTextCollapsed),
-              cursor: isTruncated || isExpanded ? 'pointer' : 'default',
+              cursor: couldBeTruncated ? 'pointer' : 'default',
             }}
-            onClick={handleTextClick}
+            onClick={couldBeTruncated ? () => setIsExpanded(!isExpanded) : undefined}
             title={
-              isTruncated && !isExpanded ? error.instructionSentence : undefined
+              couldBeTruncated && !isExpanded
+                ? error.instructionSentence
+                : undefined
             }
           >
             <span style={styles.typeLabel}>{typeLabel}</span>{' '}
             {error.instructionSentence}
           </div>
-          {(isTruncated || isExpanded) && (
+          {couldBeTruncated && (
             <IconButton
               size="small"
               style={styles.expandButton}

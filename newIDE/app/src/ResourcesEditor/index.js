@@ -83,25 +83,15 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
       this.onResourceExternallyChanged.bind(this)
     );
-    window.addEventListener('keydown', this._onKeyDown);
   }
 
   componentWillUnmount() {
     unregisterOnResourceExternallyChangedCallback(
       this.resourceExternallyChangedCallbackId
     );
-    window.removeEventListener('keydown', this._onKeyDown);
   }
 
   _onKeyDown = (event: KeyboardEvent) => {
-    if (
-      event.target instanceof HTMLInputElement ||
-      event.target instanceof HTMLTextAreaElement ||
-      (event.target instanceof HTMLElement && event.target.isContentEditable)
-    ) {
-      return;
-    }
-
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
       this._moveSelection(event.key === 'ArrowDown' ? 1 : -1);
       event.preventDefault();
@@ -334,27 +324,32 @@ export default class ResourcesEditor extends React.Component<Props, State> {
         type: 'primary',
         noTitleBar: true,
         renderEditor: () => (
-          <ResourcesList
-            project={project}
-            fileMetadata={fileMetadata}
-            onDeleteResource={this.deleteResource}
-            onRenameResource={onRenameResource}
-            onSelectResource={this._onResourceSelected}
-            selectedResource={selectedResource}
-            ref={resourcesList => (this._resourcesList = resourcesList)}
-            onRemoveUnusedResources={this._removeUnusedResources}
-            onRemoveAllResourcesWithInvalidPath={
-              this._removeAllResourcesWithInvalidPath
-            }
-            getResourceActionsSpecificToStorageProvider={
-              resourcesActionsMenuBuilder
-            }
-            onResourceRenamed={() => {
-              if (this._propertiesEditor) {
-                this._propertiesEditor.forceUpdate();
+          <div
+            style={styles.container}
+            onKeyDown={this._onKeyDown}
+          >
+            <ResourcesList
+              project={project}
+              fileMetadata={fileMetadata}
+              onDeleteResource={this.deleteResource}
+              onRenameResource={onRenameResource}
+              onSelectResource={this._onResourceSelected}
+              selectedResource={selectedResource}
+              ref={resourcesList => (this._resourcesList = resourcesList)}
+              onRemoveUnusedResources={this._removeUnusedResources}
+              onRemoveAllResourcesWithInvalidPath={
+                this._removeAllResourcesWithInvalidPath
               }
-            }}
-          />
+              getResourceActionsSpecificToStorageProvider={
+                resourcesActionsMenuBuilder
+              }
+              onResourceRenamed={() => {
+                if (this._propertiesEditor) {
+                  this._propertiesEditor.forceUpdate();
+                }
+              }}
+            />
+          </div>
         ),
       },
     };

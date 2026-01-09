@@ -25,6 +25,13 @@ describe('libGD.js - GDJS related tests', function () {
   </body>
   </head>
 </html>`;
+const fakeBootscrapContent = `
+(function () {
+  const game = new gdjs.RuntimeGame(
+    gdjs.projectData,
+    {} /*GDJS_ADDITIONAL_SPEC*/
+  );
+})();`;
     const fakeConfigXmlContent = `
 <widget id="GDJS_PACKAGENAME" version="GDJS_PROJECTVERSION">
   <name>GDJS_PROJECTNAME</name>
@@ -57,6 +64,7 @@ describe('libGD.js - GDJS related tests', function () {
       // Prepare a fake file system
       var fs = makeFakeAbstractFileSystem(gd, {
         '/fake-gdjs-root/Runtime/index.html': fakeIndexHtmlContent,
+        '/fake-gdjs-root/Runtime/gdjs-bootscrap.js': fakeBootscrapContent,
         '/fake-gdjs-root/Runtime/Electron/LICENSE.GDevelop.txt': '',
       });
 
@@ -79,13 +87,15 @@ describe('libGD.js - GDJS related tests', function () {
         'pixi-renderers/runtimescene-pixi-renderer.js'
       );
       expect(fs.writeToFile.mock.calls[1][1]).toContain('data.js');
-
-      // Check the webmanifest was properly generated.
       expect(fs.writeToFile.mock.calls[2][0]).toBe(
+        '/fake-export-dir/gdjs-bootscrap.js'
+      );
+      // Check the webmanifest was properly generated.
+      expect(fs.writeToFile.mock.calls[3][0]).toBe(
         '/fake-export-dir/manifest.webmanifest'
       );
-      expect(() => JSON.parse(fs.writeToFile.mock.calls[2][1])).not.toThrow();
-      expect(JSON.parse(fs.writeToFile.mock.calls[2][1])).toEqual({
+      expect(() => JSON.parse(fs.writeToFile.mock.calls[3][1])).not.toThrow();
+      expect(JSON.parse(fs.writeToFile.mock.calls[3][1])).toEqual({
         name: 'My great project with spaces and "quotes"!',
         short_name: 'My great project with spaces and "quotes"!',
         id: 'com.example.gamename',
@@ -109,6 +119,7 @@ describe('libGD.js - GDJS related tests', function () {
       // Prepare a fake file system
       var fs = makeFakeAbstractFileSystem(gd, {
         '/fake-gdjs-root/Runtime/Cordova/www/index.html': fakeIndexHtmlContent,
+        '/fake-gdjs-root/Runtime/Cordova/www/gdjs-bootscrap.js': fakeBootscrapContent,
         '/fake-gdjs-root/Runtime/Cordova/config.xml': fakeConfigXmlContent,
         '/fake-gdjs-root/Runtime/Cordova/package.json': fakePackageJsonContent,
         '/fake-gdjs-root/Runtime/Cordova/www/LICENSE.GDevelop.txt': '',
@@ -167,6 +178,7 @@ describe('libGD.js - GDJS related tests', function () {
       // Prepare a fake file system
       var fs = makeFakeAbstractFileSystem(gd, {
         '/fake-gdjs-root/Runtime/Cordova/www/index.html': fakeIndexHtmlContent,
+        '/fake-gdjs-root/Runtime/Cordova/www/gdjs-bootscrap.js': fakeBootscrapContent,
         '/fake-gdjs-root/Runtime/Cordova/config.xml': fakeConfigXmlContent,
         '/fake-gdjs-root/Runtime/Cordova/package.json': fakePackageJsonContent,
         '/fake-gdjs-root/Runtime/Cordova/www/LICENSE.GDevelop.txt': '',

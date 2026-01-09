@@ -1,6 +1,6 @@
 (function () {
   //Initialization
-  var game = new gdjs.RuntimeGame(
+  const game = new gdjs.RuntimeGame(
     gdjs.projectData,
     {} /*GDJS_ADDITIONAL_SPEC*/
   );

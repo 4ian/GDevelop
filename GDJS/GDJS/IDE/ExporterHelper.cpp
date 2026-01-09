@@ -758,11 +758,11 @@ bool ExporterHelper::ExportIndexFile(
     return false;
   }
 
-  gd::String bootstrapScript = fs.ReadFile(sourceDir + "/bootscrap.js");
+  gd::String bootstrapScript = fs.ReadFile(sourceDir + "/gdjs-bootscrap.js");
   bootstrapScript.FindAndReplace("{} /*GDJS_ADDITIONAL_SPEC*/",
                                  additionalSpec.empty() ? "{}"
                                                         : additionalSpec);
-  if (!fs.WriteToFile(exportDir + "/bootscrap.js", str)) {
+  if (!fs.WriteToFile(exportDir + "/gdjs-bootscrap.js", str)) {
     lastError = "Unable to write index file.";
     return false;
   }

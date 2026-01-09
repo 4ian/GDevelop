@@ -122,7 +122,11 @@ import {
 } from './MainMenu';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
-import { useKeyboardShortcuts, useShortcutMap } from '../KeyboardShortcuts';
+import {
+  getShortcutDisplayName,
+  useKeyboardShortcuts,
+  useShortcutMap,
+} from '../KeyboardShortcuts';
 import useMainFrameCommands from './MainFrameCommands';
 import {
   CommandPaletteWithAlgoliaSearch,
@@ -457,6 +461,7 @@ const MainFrame = (props: Props) => {
   const preferences = React.useContext(PreferencesContext);
   const { setHasProjectOpened } = preferences;
   const { previewLoadingRef, setPreviewLoading } = usePreviewLoadingState();
+  const shortcutMap = useShortcutMap();
 
   /**
    * Checks for diagnostic errors in the project if blocking is enabled.
@@ -477,16 +482,19 @@ const MainFrame = (props: Props) => {
       try {
         const validationErrors = scanProjectForValidationErrors(project);
         if (validationErrors.length > 0) {
+          const shortcut = getShortcutDisplayName(
+            shortcutMap['OPEN_DIAGNOSTIC_REPORT']
+          );
           await showAlert({
             title: t`Diagnostic errors found`,
             message:
               actionType === 'preview'
                 ? t`Your project has ${
                     validationErrors.length
-                  } diagnostic error(s). Please fix them before launching a preview. Press F7 to open the diagnostic report.`
+                  } diagnostic error(s). Please fix them before launching a preview. Press ${shortcut} to open the diagnostic report.`
                 : t`Your project has ${
                     validationErrors.length
-                  } diagnostic error(s). Please fix them before exporting. Press F7 to open the diagnostic report.`,
+                  } diagnostic error(s). Please fix them before exporting. Press ${shortcut} to open the diagnostic report.`,
           });
           return true;
         }
@@ -496,7 +504,7 @@ const MainFrame = (props: Props) => {
 
       return false;
     },
-    [preferences, showAlert]
+    [preferences, shortcutMap, showAlert]
   );
   const [previewState, setPreviewState] = React.useState(initialPreviewState);
   const commandPaletteRef = React.useRef((null: ?CommandPaletteInterface));
@@ -4767,7 +4775,6 @@ const MainFrame = (props: Props) => {
     previewLoading === 'hot-reload-for-in-game-edition';
   const showLoaderImmediately =
     isProjectOpening || isLoadingProject || previewLoading === 'preview';
-  const shortcutMap = useShortcutMap();
 
   const buildMainMenuProps = {
     i18n: i18n,

@@ -403,7 +403,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       if (row !== -1) {
         eventsTree.scrollToRow(row);
       }
-    }, 100);
+    }, 100 /* Give some time for the events sheet to render before scrolling */);
 
     // Clear the highlight after a few seconds
     setTimeout(() => {

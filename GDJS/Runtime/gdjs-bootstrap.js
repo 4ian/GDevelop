@@ -1,4 +1,3 @@
-
 (function () {
   //Initialization
   var game = new gdjs.RuntimeGame(

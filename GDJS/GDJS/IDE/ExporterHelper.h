@@ -607,7 +607,8 @@ class ExporterHelper {
    * The includes files must be relative to the export directory.
    *
    * \param project The project with layouts to be exported.
-   * \param source The file to be used as a template for the final file.
+   * \param sourceDir The directory containing the files to be used as a
+   * template for the final file.
    * \param exportDir The directory where the preview must be created.
    * \param includesFiles The JS files to be included in the HTML file. Order is
    * important.
@@ -618,7 +619,7 @@ class ExporterHelper {
    * gdjs.RuntimeGame object.
    */
   bool ExportIndexFile(const gd::Project &project,
-                       gd::String source,
+                       gd::String sourceDir,
                        gd::String exportDir,
                        const std::vector<gd::String> &includesFiles,
                        const std::vector<gd::SourceFileMetadata> &sourceFiles,

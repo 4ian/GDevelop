@@ -33,7 +33,7 @@ void AbstractEventsBasedEntity::SerializeTo(SerializerElement& element) const {
   propertyDescriptors.SerializeElementsTo(
       "propertyDescriptor", element.AddChild("propertyDescriptors"));
   propertyDescriptors.SerializeFoldersTo(
-      element.AddChild("propertyFolderStructure"));
+      element.AddChild("propertiesFolderStructure"));
 }
 
 void AbstractEventsBasedEntity::UnserializeFrom(

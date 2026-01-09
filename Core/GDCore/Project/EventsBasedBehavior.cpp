@@ -25,7 +25,7 @@ void EventsBasedBehavior::SerializeTo(SerializerElement& element) const {
     sharedPropertyDescriptors.SerializeElementsTo(
         "propertyDescriptor", element.AddChild("sharedPropertyDescriptors"));
     sharedPropertyDescriptors.SerializeFoldersTo(
-        element.AddChild("sharedPropertyFolderStructure"));
+        element.AddChild("sharedPropertiesFolderStructure"));
   }
   if (quickCustomizationVisibility != QuickCustomization::Visibility::Default) {
     element.SetStringAttribute(

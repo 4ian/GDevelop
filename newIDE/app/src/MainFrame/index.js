@@ -209,6 +209,7 @@ import {
   isEditorHotReloadNeeded,
 } from '../EmbeddedGame/EmbeddedGameFrame';
 import useHomePageSwitch from './useHomePageSwitch';
+import { useNavigationToEvent } from './UseNavigationToEvent';
 import RobotIcon from '../ProjectCreation/RobotIcon';
 import PublicProfileContext from '../Profile/PublicProfileContext';
 import { useGamesPlatformFrame } from './EditorContainers/HomePage/PlaySection/UseGamesPlatformFrame';
@@ -579,51 +580,9 @@ const MainFrame = (props: Props) => {
     diagnosticReportDialogOpen,
     setDiagnosticReportDialogOpen,
   ] = React.useState<boolean>(false);
-  const [pendingEventNavigation, setPendingEventNavigation] = React.useState<?{|
-    name: string,
-    locationType: 'layout' | 'external-events',
-    eventPath: Array<number>,
-  |}>(null);
-
-  // Handle pending event navigation after editor is opened
-  const EDITOR_MOUNT_DELAY_MS = 300;
-  React.useEffect(
-    () => {
-      if (!pendingEventNavigation) return;
-
-      // Wait for the editor to be mounted and ready
-      const timeoutId = setTimeout(() => {
-        const { name, locationType, eventPath } = pendingEventNavigation;
-        const editorKind =
-          locationType === 'layout' ? 'layout events' : 'external events';
-
-        // Find the events editor tab and scroll to event path
-        const scrollToEditor = () => {
-          for (const paneIdentifier in state.editorTabs.panes) {
-            const pane = state.editorTabs.panes[paneIdentifier];
-            for (const editor of pane.editors) {
-              if (
-                editor.kind === editorKind &&
-                editor.projectItemName === name &&
-                editor.editorRef &&
-                editor.editorRef.scrollToEventPath
-              ) {
-                editor.editorRef.scrollToEventPath(eventPath);
-                return;
-              }
-            }
-          }
-        };
-        scrollToEditor();
-
-        // Clear the pending navigation
-        setPendingEventNavigation(null);
-      }, EDITOR_MOUNT_DELAY_MS);
-
-      return () => clearTimeout(timeoutId);
-    },
-    [pendingEventNavigation, state.editorTabs]
-  );
+  const { setPendingEventNavigation } = useNavigationToEvent({
+    editorTabs: state.editorTabs,
+  });
   const [
     fileMetadataOpeningProgress,
     setFileMetadataOpeningProgress,

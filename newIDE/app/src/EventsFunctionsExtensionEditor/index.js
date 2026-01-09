@@ -358,16 +358,13 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       () => {
         this.updateToolbar();
 
-        if (this._editorMosaic) {
-          this._editorMosaic.uncollapseEditor('parameters', 25);
-        }
         if (this._editorNavigator) {
           // Open the parameters of the function if it's a new, empty function.
           if (
             selectedEventsFunction &&
             !selectedEventsFunction.getEvents().getEventsCount()
           ) {
-            //this._editorNavigator.openEditor('parameters');
+            this._editorNavigator.openEditor('parameters');
           } else {
             this._editorNavigator.openEditor('events-sheet');
           }
@@ -648,9 +645,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       () => {
         this.updateToolbar();
         if (selectedEventsBasedBehavior) {
-          if (this._editorMosaic) {
-            //this._editorMosaic.collapseEditor('parameters');
-          }
           if (this._editorNavigator) {
             this._editorNavigator.openEditor('events-sheet');
           }
@@ -675,9 +669,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       () => {
         this.updateToolbar();
         if (selectedEventsBasedObject) {
-          if (this._editorMosaic) {
-            //this._editorMosaic.collapseEditor('parameters');
-          }
           if (this._editorNavigator)
             this._editorNavigator.openEditor('events-sheet');
         }

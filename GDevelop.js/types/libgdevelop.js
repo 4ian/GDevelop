@@ -248,6 +248,8 @@ declare class libGDevelop {
   InstructionsTypeRenamer: Class<gdInstructionsTypeRenamer>;
   EventsContext: Class<gdEventsContext>;
   EventsContextAnalyzer: Class<gdEventsContextAnalyzer>;
+  ReadOnlyArbitraryEventsWorkerWithContext: Class<gdReadOnlyArbitraryEventsWorkerWithContext>;
+  ReadOnlyArbitraryEventsWorkerWithContextJS: Class<gdReadOnlyArbitraryEventsWorkerWithContextJS>;
   ArbitraryResourceWorker: Class<gdArbitraryResourceWorker>;
   ArbitraryResourceWorkerJS: Class<gdArbitraryResourceWorkerJS>;
   ResourcesMergingHelper: Class<gdResourcesMergingHelper>;

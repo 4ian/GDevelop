@@ -8,11 +8,11 @@ export type EventNavigationTarget = {|
   eventPath: Array<number>,
 |};
 
-type UseEventNavigationProps = {|
+type UseNavigationToEventProps = {|
   editorTabs: EditorTabsState,
 |};
 
-type UseEventNavigationResult = {|
+type UseNavigationToEventResult = {|
   setPendingEventNavigation: (target: EventNavigationTarget | null) => void,
 |};
 
@@ -24,7 +24,7 @@ const EDITOR_MOUNT_DELAY_MS = 300;
  */
 export const useNavigationToEvent = ({
   editorTabs,
-}: UseEventNavigationProps): UseEventNavigationResult => {
+}: UseNavigationToEventProps): UseNavigationToEventResult => {
   const [
     pendingEventNavigation,
     setPendingEventNavigation,

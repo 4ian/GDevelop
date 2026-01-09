@@ -19,15 +19,7 @@ export type ValidationError = {|
   parameterValue?: string,
   locationName: string,
   locationType: 'scene' | 'external-events' | 'extension',
-  eventPath: Array<number>, // Path from root to the event (array of indices)
-|};
-
-type ScanContext = {|
-  projectScopedContainers: gdProjectScopedContainers,
-  locationName: string,
-  locationType: 'scene' | 'external-events' | 'extension',
-  eventPath: Array<number>, // Current path from root
-  errors: Array<ValidationError>,
+  eventPath: Array<number>,
 |};
 
 const getInstructionSentence = (
@@ -43,245 +35,158 @@ const getInstructionSentence = (
   return sentence.trim() || instruction.getType();
 };
 
-const scanInstruction = (
-  platform: gdPlatform,
-  instruction: gdInstruction,
-  isCondition: boolean,
-  context: ScanContext
-): void => {
-  const type = instruction.getType();
-
-  // Skip empty instruction types
-  if (!type || type.trim() === '') {
-    return;
-  }
-
-  // Get metadata
-  const metadata = isCondition
-    ? gd.MetadataProvider.getConditionMetadata(gd.JsPlatform.get(), type)
-    : gd.MetadataProvider.getActionMetadata(gd.JsPlatform.get(), type);
-
-  const isBad = gd.MetadataProvider.isBadInstructionMetadata(metadata);
-
-  // Check if instruction is missing (from uninstalled extension)
-  if (isBad) {
-    context.errors.push({
-      type: 'missing-instruction',
-      isCondition,
-      instructionType: type,
-      instructionSentence: type,
-      locationName: context.locationName,
-      locationType: context.locationType,
-      eventPath: [...context.eventPath],
-    });
-    return;
-  }
-
-  const instructionSentence = getInstructionSentence(instruction, metadata);
-
-  // Validate parameters
-  const parametersCount = metadata.getParametersCount();
-  mapFor(0, parametersCount, parameterIndex => {
-    const parameterMetadata = metadata.getParameter(parameterIndex);
-    const parameterType = parameterMetadata.getType();
-    const value = instruction.getParameter(parameterIndex).getPlainString();
-
-    // Skip validation for layer parameter with empty value (default layer)
-    if (parameterType === 'layer' && value === '') {
-      return;
-    }
-
-    // Skip codeOnly parameters
-    if (parameterMetadata.isCodeOnly()) {
-      return;
-    }
-
-    // Skip optional parameters with empty values (they will use defaults)
-    if (value === '' && parameterMetadata.isOptional()) {
-      return;
-    }
-
-    // Skip parameters with empty values that have default values
-    if (value === '' && parameterMetadata.getDefaultValue() !== '') {
-      return;
-    }
-
-    // Skip yesorno parameters with empty values (they default to "no")
-    if (parameterType === 'yesorno' && value === '') {
-      return;
-    }
-
-    // Check if parameter is valid
-    const isValid = gd.InstructionValidator.isParameterValid(
-      platform,
-      context.projectScopedContainers,
-      instruction,
-      metadata,
-      parameterIndex,
-      value
-    );
-
-    if (!isValid) {
-      context.errors.push({
-        type: value === '' ? 'missing-parameter' : 'invalid-parameter',
-        isCondition,
-        instructionType: type,
-        instructionSentence,
-        parameterIndex,
-        parameterValue: value,
-        locationName: context.locationName,
-        locationType: context.locationType,
-        eventPath: [...context.eventPath],
-      });
-    }
-  });
-};
-
-const scanInstructionsList = (
-  platform: gdPlatform,
-  instructionsList: gdInstructionsList,
-  isCondition: boolean,
-  context: ScanContext
-): void => {
-  mapFor(0, instructionsList.size(), index => {
-    const instruction = instructionsList.get(index);
-    scanInstruction(platform, instruction, isCondition, context);
-
-    // Scan sub-instructions if any
-    if (instruction.getSubInstructions().size() > 0) {
-      scanInstructionsList(
-        platform,
-        instruction.getSubInstructions(),
-        isCondition,
-        context
-      );
-    }
-  });
-};
-
-const scanEventsList = (
-  platform: gdPlatform,
+/**
+ * Build a map from event pointer to its path in the events list.
+ * This allows us to track event paths when using the C++ worker.
+ */
+const buildEventPtrToPathMap = (
   eventsList: gdEventsList,
-  context: ScanContext
-): void => {
+  parentPath: Array<number> = []
+): Map<number, Array<number>> => {
+  const map = new Map<number, Array<number>>();
   mapFor(0, eventsList.getEventsCount(), index => {
     const event = eventsList.getEventAt(index);
-    // Build the event path by appending current index to parent path
-    const currentEventPath = [...context.eventPath, index];
-    const eventContext = { ...context, eventPath: currentEventPath };
+    const currentPath = [...parentPath, index];
+    // $FlowFixMe - ptr is a number identifying the C++ object
+    map.set(event.ptr, currentPath);
 
-    // Skip disabled events
-    if (event.isDisabled()) {
+    if (event.canHaveSubEvents()) {
+      const subEventsMap = buildEventPtrToPathMap(
+        event.getSubEvents(),
+        currentPath
+      );
+      subEventsMap.forEach((path, ptr) => map.set(ptr, path));
+    }
+  });
+  return map;
+};
+
+/**
+ * Create a validation worker that uses C++ event traversal.
+ * This leverages ReadOnlyArbitraryEventsWorkerWithContext which properly
+ * handles local variable scoping as it traverses the event tree.
+ */
+const createValidationWorker = (
+  platform: gdPlatform,
+  locationName: string,
+  locationType: 'scene' | 'external-events' | 'extension',
+  eventPtrToPathMap: Map<number, Array<number>>,
+  errors: Array<ValidationError>
+): gdReadOnlyArbitraryEventsWorkerWithContextJS => {
+  const worker = new gd.ReadOnlyArbitraryEventsWorkerWithContextJS();
+
+  let currentEventPath: Array<number> = [];
+
+  worker.doVisitEvent = (eventPtr: number) => {
+    const path = eventPtrToPathMap.get(eventPtr);
+    if (path) {
+      currentEventPath = path;
+    }
+  };
+
+  worker.doVisitInstruction = (
+    instructionPtr: number,
+    isConditionInt: number,
+    projectScopedContainersPtr: number
+  ) => {
+    const instruction = gd.wrapPointer(instructionPtr, gd.Instruction);
+    const projectScopedContainers = gd.wrapPointer(
+      projectScopedContainersPtr,
+      gd.ProjectScopedContainers
+    );
+    // C++ passes boolean as 0/1 through EM_ASM
+    const isCondition: boolean = !!isConditionInt;
+
+    const type = instruction.getType();
+
+    // Skip empty instruction types
+    if (!type || type.trim() === '') {
       return;
     }
 
-    // Update projectScopedContainers for events with local variables
-    if (event.canHaveVariables()) {
-      eventContext.projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersWithLocalVariables(
-        context.projectScopedContainers,
-        event
+    // Get metadata
+    const metadata = isCondition
+      ? gd.MetadataProvider.getConditionMetadata(gd.JsPlatform.get(), type)
+      : gd.MetadataProvider.getActionMetadata(gd.JsPlatform.get(), type);
+
+    const isBad = gd.MetadataProvider.isBadInstructionMetadata(metadata);
+
+    // Check if instruction is missing (from uninstalled extension)
+    if (isBad) {
+      errors.push({
+        type: 'missing-instruction',
+        isCondition,
+        instructionType: type,
+        instructionSentence: type,
+        locationName,
+        locationType,
+        eventPath: [...currentEventPath],
+      });
+      return;
+    }
+
+    const instructionSentence = getInstructionSentence(instruction, metadata);
+
+    // Validate parameters
+    const parametersCount = metadata.getParametersCount();
+    mapFor(0, parametersCount, parameterIndex => {
+      const parameterMetadata = metadata.getParameter(parameterIndex);
+      const parameterType = parameterMetadata.getType();
+      const value = instruction.getParameter(parameterIndex).getPlainString();
+
+      // Skip validation for layer parameter with empty value (default layer)
+      if (parameterType === 'layer' && value === '') {
+        return;
+      }
+
+      // Skip codeOnly parameters
+      if (parameterMetadata.isCodeOnly()) {
+        return;
+      }
+
+      // Skip optional parameters with empty values (they will use defaults)
+      if (value === '' && parameterMetadata.isOptional()) {
+        return;
+      }
+
+      // Skip parameters with empty values that have default values
+      if (value === '' && parameterMetadata.getDefaultValue() !== '') {
+        return;
+      }
+
+      // Skip yesorno parameters with empty values (they default to "no")
+      if (parameterType === 'yesorno' && value === '') {
+        return;
+      }
+
+      // Check if parameter is valid using the projectScopedContainers
+      // passed from C++, which includes local variables in scope
+      const isValid = gd.InstructionValidator.isParameterValid(
+        platform,
+        projectScopedContainers,
+        instruction,
+        metadata,
+        parameterIndex,
+        value
       );
-    }
 
-    // Get event type and handle accordingly (mutually exclusive checks)
-    const eventType = event.getType();
+      if (!isValid) {
+        errors.push({
+          type: value === '' ? 'missing-parameter' : 'invalid-parameter',
+          isCondition,
+          instructionType: type,
+          instructionSentence,
+          parameterIndex,
+          parameterValue: value,
+          locationName,
+          locationType,
+          eventPath: [...currentEventPath],
+        });
+      }
+    });
+  };
 
-    if (eventType === 'BuiltinCommonInstructions::Standard') {
-      const standardEvent = gd.asStandardEvent(event);
-      if (standardEvent) {
-        scanInstructionsList(
-          platform,
-          standardEvent.getConditions(),
-          true,
-          eventContext
-        );
-        scanInstructionsList(
-          platform,
-          standardEvent.getActions(),
-          false,
-          eventContext
-        );
-      }
-    } else if (eventType === 'BuiltinCommonInstructions::Repeat') {
-      const repeatEvent = gd.asRepeatEvent(event);
-      if (repeatEvent) {
-        scanInstructionsList(
-          platform,
-          repeatEvent.getConditions(),
-          true,
-          eventContext
-        );
-        scanInstructionsList(
-          platform,
-          repeatEvent.getActions(),
-          false,
-          eventContext
-        );
-      }
-    } else if (eventType === 'BuiltinCommonInstructions::While') {
-      const whileEvent = gd.asWhileEvent(event);
-      if (whileEvent) {
-        scanInstructionsList(
-          platform,
-          whileEvent.getConditions(),
-          true,
-          eventContext
-        );
-        scanInstructionsList(
-          platform,
-          whileEvent.getWhileConditions(),
-          true,
-          eventContext
-        );
-        scanInstructionsList(
-          platform,
-          whileEvent.getActions(),
-          false,
-          eventContext
-        );
-      }
-    } else if (eventType === 'BuiltinCommonInstructions::ForEach') {
-      const forEachEvent = gd.asForEachEvent(event);
-      if (forEachEvent) {
-        scanInstructionsList(
-          platform,
-          forEachEvent.getConditions(),
-          true,
-          eventContext
-        );
-        scanInstructionsList(
-          platform,
-          forEachEvent.getActions(),
-          false,
-          eventContext
-        );
-      }
-    } else if (
-      eventType === 'BuiltinCommonInstructions::ForEachChildVariable'
-    ) {
-      const forEachChildVariableEvent = gd.asForEachChildVariableEvent(event);
-      if (forEachChildVariableEvent) {
-        scanInstructionsList(
-          platform,
-          forEachChildVariableEvent.getConditions(),
-          true,
-          eventContext
-        );
-        scanInstructionsList(
-          platform,
-          forEachChildVariableEvent.getActions(),
-          false,
-          eventContext
-        );
-      }
-    }
-    // Skip other event types (comments, groups, links, etc.)
-
-    // Scan sub-events recursively
-    if (event.canHaveSubEvents()) {
-      scanEventsList(platform, event.getSubEvents(), eventContext);
-    }
-  });
+  return worker;
 };
 
 /**
@@ -305,15 +210,16 @@ export const scanProjectForValidationErrors = (
       layout
     );
 
-    const context: ScanContext = {
-      projectScopedContainers,
+    const eventPtrToPathMap = buildEventPtrToPathMap(layout.getEvents());
+    const worker = createValidationWorker(
+      platform,
       locationName,
-      locationType: 'scene',
-      eventPath: [], // Start with empty path
-      errors,
-    };
-
-    scanEventsList(platform, layout.getEvents(), context);
+      'scene',
+      eventPtrToPathMap,
+      errors
+    );
+    worker.launch(layout.getEvents(), projectScopedContainers);
+    worker.delete();
   });
 
   // Scan all external events
@@ -336,15 +242,18 @@ export const scanProjectForValidationErrors = (
       );
     }
 
-    const context: ScanContext = {
-      projectScopedContainers,
+    const eventPtrToPathMap = buildEventPtrToPathMap(
+      externalEvents.getEvents()
+    );
+    const worker = createValidationWorker(
+      platform,
       locationName,
-      locationType: 'external-events',
-      eventPath: [], // Start with empty path
-      errors,
-    };
-
-    scanEventsList(platform, externalEvents.getEvents(), context);
+      'external-events',
+      eventPtrToPathMap,
+      errors
+    );
+    worker.launch(externalEvents.getEvents(), projectScopedContainers);
+    worker.delete();
   });
 
   return errors;

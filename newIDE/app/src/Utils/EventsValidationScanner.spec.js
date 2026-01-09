@@ -327,7 +327,6 @@ describe('EventsValidationScanner', () => {
           instructionSentence: 'Action 1',
           locationName: 'Scene1',
           locationType: 'scene',
-          eventPath: [0],
         },
         {
           type: 'missing-instruction',
@@ -336,7 +335,6 @@ describe('EventsValidationScanner', () => {
           instructionSentence: 'Condition 1',
           locationName: 'Scene1',
           locationType: 'scene',
-          eventPath: [1],
         },
         {
           type: 'missing-instruction',
@@ -345,7 +343,6 @@ describe('EventsValidationScanner', () => {
           instructionSentence: 'Action B',
           locationName: 'Scene2',
           locationType: 'scene',
-          eventPath: [0],
         },
       ];
 
@@ -367,7 +364,6 @@ describe('EventsValidationScanner', () => {
           parameterValue: '',
           locationName: 'Scene1',
           locationType: 'scene',
-          eventPath: [0],
         },
         {
           type: 'invalid-parameter',
@@ -378,7 +374,6 @@ describe('EventsValidationScanner', () => {
           parameterValue: '',
           locationName: 'Scene1',
           locationType: 'scene',
-          eventPath: [1],
         },
         {
           type: 'invalid-parameter',
@@ -389,7 +384,6 @@ describe('EventsValidationScanner', () => {
           parameterValue: '',
           locationName: 'Events1',
           locationType: 'external-events',
-          eventPath: [0],
         },
       ];
 

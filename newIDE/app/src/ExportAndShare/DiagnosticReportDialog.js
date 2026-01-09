@@ -121,7 +121,9 @@ const InvalidParameterRow = ({
                 : styles.instructionTextCollapsed),
               cursor: couldBeTruncated ? 'pointer' : 'default',
             }}
-            onClick={couldBeTruncated ? () => setIsExpanded(!isExpanded) : undefined}
+            onClick={
+              couldBeTruncated ? () => setIsExpanded(!isExpanded) : undefined
+            }
             title={
               couldBeTruncated && !isExpanded
                 ? error.instructionSentence
@@ -184,11 +186,11 @@ const InvalidParametersSection = ({
         <TableBody>
           {validationErrors
             .filter(error => error.type !== 'missing-instruction')
-            .map(error => (
+            .map((error, index) => (
               <InvalidParameterRow
                 key={`${error.locationName}-${error.eventPath.join('-')}-${
                   error.instructionType
-                }-${error.parameterIndex ?? ''}`}
+                }-${error.parameterIndex ?? ''}-${index}`}
                 error={error}
                 navigateToError={navigateToError}
                 backgroundColor={gdevelopTheme.list.itemsBackgroundColor}

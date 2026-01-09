@@ -54,7 +54,14 @@ function ListIcon(props: Props) {
   const paddingRight = iconWidth > 40 ? 16 : 0;
 
   const isBlackIcon =
-    src.startsWith('data:image/svg+xml') || src.includes('_black');
+    src.startsWith('data:image/svg+xml') ||
+    src.startsWith(
+      'https://asset-resources.gdevelop.io/public-resources/Icons/'
+    ) ||
+    src.startsWith(
+      'https://resources.gdevelop-app.com/assets/Icons/'
+    ) ||
+    src.includes('_black');
   const shouldInvertGrayScale = paletteType === 'dark' && isBlackIcon;
 
   let filter = undefined;

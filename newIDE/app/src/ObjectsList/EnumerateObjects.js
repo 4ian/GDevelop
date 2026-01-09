@@ -8,15 +8,17 @@ const gd: libGDevelop = global.gd;
 export type EnumeratedObjectMetadata = {|
   extension: gdPlatformExtension,
   objectMetadata: gdObjectMetadata,
+  type: string,
   name: string,
   fullName: string,
   description: string,
   iconFilename: string,
-  categoryFullName: string,
+  category: string,
   isRenderedIn3D: boolean,
   assetStorePackTag?: string,
   requiredExtensions?: Array<ExtensionDependency>,
   isDependentWithParent?: boolean,
+  tags: Array<string>,
 |};
 
 export type ObjectWithContext = {|
@@ -131,7 +133,8 @@ export const enumerateObjects = (
 };
 
 export const enumerateObjectTypes = (
-  project: gdProject
+  project: gdProject,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null
 ): Array<EnumeratedObjectMetadata> => {
   const platform = project.getCurrentPlatform();
   const extensionsList = platform.getAllPlatformExtensions();
@@ -143,21 +146,28 @@ export const enumerateObjectTypes = (
       return extension
         .getExtensionObjectsTypes()
         .toJSArray()
-        .map(objectType => extension.getObjectMetadata(objectType))
+        .map(objectType => {
+          const objectMetadata = extension.getObjectMetadata(objectType);
+          return {
+            extension,
+            objectMetadata,
+            type: objectType,
+            name: objectMetadata.getName(),
+            fullName: objectMetadata.getFullName(),
+            description: objectMetadata.getDescription(),
+            iconFilename: objectMetadata.getIconFilename(),
+            category: objectMetadata.getCategoryFullName(),
+            isRenderedIn3D: objectMetadata.isRenderedIn3D(),
+            tags: extension.getTags().toJSArray(),
+          };
+        })
         .filter(
-          objectMetadata =>
-            !objectMetadata.isHidden() && !objectMetadata.isPrivate()
-        )
-        .map(objectMetadata => ({
-          extension,
-          objectMetadata,
-          name: objectMetadata.getName(),
-          fullName: objectMetadata.getFullName(),
-          description: objectMetadata.getDescription(),
-          iconFilename: objectMetadata.getIconFilename(),
-          categoryFullName: objectMetadata.getCategoryFullName(),
-          isRenderedIn3D: objectMetadata.isRenderedIn3D(),
-        }));
+          ({ objectMetadata }) =>
+            !objectMetadata.isHidden() &&
+            (!objectMetadata.isPrivate() ||
+              (eventsFunctionsExtension &&
+                extension.getName() === eventsFunctionsExtension.getName()))
+        );
     })
   );
 };

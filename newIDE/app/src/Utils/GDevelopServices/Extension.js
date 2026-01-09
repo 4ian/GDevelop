@@ -108,6 +108,11 @@ export type ObjectShortHeader = {
   ...ExtensionRegistryItemHeader,
   description: string,
   extensionName: string,
+  assetStorePackTag: ?string,
+  /** This attribute is calculated.
+   * @see adaptObjectHeader
+   */
+  type: string,
 };
 
 /**
@@ -140,6 +145,16 @@ export type BehaviorsRegistry = {
   views: {
     default: {
       firstIds: Array<{ extensionName: string, behaviorName: string }>,
+    },
+  },
+};
+
+export type ObjectsRegistry = {
+  headers: Array<ObjectShortHeader>,
+  views: {
+    default: {
+      firstIds: Array<{ extensionName: string, objectName: string }>,
+      secondIds: Array<{ extensionName: string, objectName: string }>,
     },
   },
 };
@@ -265,8 +280,47 @@ const adaptBehaviorHeader = (
   return header;
 };
 
+export const getObjectsRegistry = async (): Promise<ObjectsRegistry> => {
+  const response = await client.get(`/object`, {
+    params: {
+      // Could be changed according to the editor environment, but keep
+      // reading from the "live" data for now.
+      environment: 'live',
+    },
+  });
+  const { databaseUrl } = response.data;
+
+  const objectsRegistry: ObjectsRegistry = await retryIfFailed(
+    { times: 2 },
+    async () => (await cdnClient.get(databaseUrl)).data
+  );
+
+  if (!objectsRegistry) {
+    throw new Error('Unexpected response from the objects endpoint.');
+  }
+  return {
+    ...objectsRegistry,
+    headers: objectsRegistry.headers.map(adaptObjectHeader),
+  };
+};
+
+const adaptObjectHeader = (header: ObjectShortHeader): ObjectShortHeader => {
+  header.type = gd.PlatformExtension.getObjectFullType(
+    header.extensionNamespace || header.extensionName,
+    header.name
+  );
+  header = transformTagsAsStringToTagsAsArray(header);
+  if ((header.tier: string) === 'community') {
+    header.tier = 'experimental';
+  }
+  return header;
+};
+
 export const getExtensionHeader = (
-  extensionShortHeader: ExtensionShortHeader | BehaviorShortHeader
+  extensionShortHeader:
+    | ExtensionShortHeader
+    | BehaviorShortHeader
+    | ObjectShortHeader
 ): Promise<ExtensionHeader> => {
   return cdnClient.get(extensionShortHeader.headerUrl).then(response => {
     const data: ExtensionHeaderWithTagsAsString = response.data;

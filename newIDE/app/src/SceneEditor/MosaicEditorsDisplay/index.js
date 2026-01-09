@@ -447,6 +447,7 @@ const MosaicEditorsDisplay = React.forwardRef<
               )}
               project={project}
               layout={layout}
+              eventsFunctionsExtension={eventsFunctionsExtension}
               eventsBasedObject={eventsBasedObject}
               projectScopedContainersAccessor={projectScopedContainersAccessor}
               globalObjectsContainer={globalObjectsContainer}

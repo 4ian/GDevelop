@@ -4,6 +4,7 @@ import semverGreaterThan from 'semver/functions/gt';
 import {
   type ExtensionShortHeader,
   type BehaviorShortHeader,
+  type ObjectShortHeader,
 } from '../GDevelopServices/Extension';
 
 export type ExtensionChange = { version: string, changes: string };
@@ -23,7 +24,7 @@ export const isCompatibleWithGDevelopVersion = (
 
 export const getBreakingChanges = (
   installedVersion: string,
-  extension: ExtensionShortHeader | BehaviorShortHeader
+  extension: ExtensionShortHeader | BehaviorShortHeader | ObjectShortHeader
 ): Array<ExtensionChange> => {
   if (!extension.changelog) {
     return [];
@@ -64,7 +65,7 @@ const formatChange = (change: string, indentation) =>
 
 export const formatOldBreakingChanges = (
   installedVersion: string,
-  extension: ExtensionShortHeader | BehaviorShortHeader
+  extension: ExtensionShortHeader | BehaviorShortHeader | ObjectShortHeader
 ): string => {
   if (!extension.changelog) {
     return '';

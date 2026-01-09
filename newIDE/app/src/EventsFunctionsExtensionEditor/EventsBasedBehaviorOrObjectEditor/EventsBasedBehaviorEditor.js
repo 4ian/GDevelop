@@ -114,6 +114,7 @@ export default function EventsBasedBehaviorEditor({
               <Trans>Object on which this behavior can be used</Trans>
             }
             project={project}
+            eventsFunctionsExtension={eventsFunctionsExtension}
             value={eventsBasedBehavior.getObjectType()}
             onChange={(objectType: string) => {
               eventsBasedBehavior.setObjectType(objectType);

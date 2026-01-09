@@ -16,6 +16,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import CircledInfo from '../../UI/CustomSvgIcons/SmallCircledInfo';
 import IconButton from '../../UI/IconButton';
 import { getIDEVersion } from '../../Version';
+import ListIcon from '../../UI/ListIcon';
 
 const gd: libGDevelop = global.gd;
 
@@ -140,13 +141,11 @@ export const BehaviorListItem = ({
         ref={containerRef}
       >
         <LineStackLayout>
-          <div style={iconStyle}>
-            <IconContainer
-              alt={behaviorShortHeader.fullName}
-              src={behaviorShortHeader.previewIconUrl}
-              size={32}
-            />
-          </div>
+          <ListIcon
+            src={behaviorShortHeader.previewIconUrl}
+            iconSize={40}
+            useExactIconSize
+          />
           <Column expand>
             <LineStackLayout noMargin alignItems="center">
               <Text

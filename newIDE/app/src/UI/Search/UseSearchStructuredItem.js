@@ -4,16 +4,20 @@ import { type ChosenCategory } from './FiltersChooser';
 import {
   type ExtensionShortHeader,
   type BehaviorShortHeader,
+  type ObjectShortHeader,
 } from '../../Utils/GDevelopServices/Extension';
 import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import shuffle from 'lodash/shuffle';
 import Fuse from 'fuse.js';
+import { type ObjectCategory } from '../../AssetStore/ObjectStoreContext';
 
 type SearchableItem =
   | ExtensionShortHeader
   | ExampleShortHeader
   | BehaviorShortHeader
+  | ObjectShortHeader
+  | ObjectCategory
   | PrivateGameTemplateListingData;
 
 export type SearchMatch = {|

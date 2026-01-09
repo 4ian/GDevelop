@@ -343,7 +343,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
         has3DObjects = usedExtensionsResult.Has3DObjects();
       }
       // Create the index file
-      if (!ExportIndexFile(exportedProject, gdjsRoot + "/Runtime/",
+      if (!ExportIndexFile(exportedProject, gdjsRoot + "/Runtime",
                            options.exportPath, includesFiles, usedSourceFiles,
                            options.nonRuntimeScriptsCacheBurst,
                            has3DObjects, "gdjs.runtimeGameOptions")) {

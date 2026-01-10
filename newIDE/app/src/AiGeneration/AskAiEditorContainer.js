@@ -13,11 +13,13 @@ import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import Paper from '../UI/Paper';
 import { AiRequestChat, type AiRequestChatInterface } from './AiRequestChat';
 import {
-  addMessageToAiRequest,
-  createAiRequest,
   sendAiRequestFeedback,
   type AiRequest,
 } from '../Utils/GDevelopServices/Generation';
+import {
+  createAiRequestRouted as createAiRequest,
+  addMessageToAiRequestRouted as addMessageToAiRequest,
+} from './AiGenerationRouter';
 import { delay } from '../Utils/Delay';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { Toolbar } from './Toolbar';

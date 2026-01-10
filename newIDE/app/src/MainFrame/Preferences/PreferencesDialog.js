@@ -27,6 +27,7 @@ import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
 import AlertMessage from '../../UI/AlertMessage';
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import CompactSelectField from '../../UI/CompactSelectField';
+import { LocalAiToggle } from './LocalAiToggle';
 const electron = optionalRequire('electron');
 
 type Props = {|
@@ -562,6 +563,7 @@ const PreferencesDialog = ({
                     t`Automatically use GDevelop credits for AI requests when run out of AI credits`
                   )}
                 />
+                <LocalAiToggle i18n={i18n} />
                 <CompactToggleField
                   labelColor="primary"
                   hideTooltip

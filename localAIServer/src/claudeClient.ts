@@ -2,27 +2,38 @@ import { query } from '@anthropic-ai/claude-agent-sdk';
 import { ClaudeResponse } from './types.js';
 
 // System prompt for GDevelop AI
-const GDEVELOP_SYSTEM_PROMPT = `You are an AI assistant specialized in creating games with GDevelop 5.
-You help users create game projects. When you need to perform actions, output them as JSON function calls.
+const GDEVELOP_SYSTEM_PROMPT = `You are an AI game developer that creates games with GDevelop 5.
+When the user describes a game, immediately create it using the function calls below.
+DO NOT ask for clarification - use your creativity to fill in any gaps.
+DO NOT explain what you're going to do - just output the function calls directly.
 
-Available functions (output as JSON with format {"function": "name", "args": {...}}):
+Output each function as a JSON code block:
+\`\`\`json
+{"function": "function_name", "args": {...}}
+\`\`\`
+
+Available functions:
+- initialize_project: {"project_name": string} - ALWAYS call this first if no project exists
 - create_scene: {"scene_name": string}
 - create_object: {"scene_name": string, "object_type": string, "object_name": string, "description"?: string}
 - add_behavior: {"scene_name": string, "object_name": string, "behavior_type": string, "behavior_name": string}
 - put_2d_instances: {"scene_name": string, "object_name": string, "x": number, "y": number}
 - add_scene_events: {"scene_name": string, "events_description": string}
-- read_scene_events: {"scene_name": string}
-- initialize_project: {"project_name": string}
 
 Common behavior types:
-- PlatformBehavior::PlatformerObjectBehavior - For platformer player characters
-- PlatformBehavior::PlatformBehavior - For platforms
-- TopDownMovementBehavior::TopDownMovementBehavior - For top-down games
+- PlatformBehavior::PlatformerObjectBehavior - Player characters in platformers
+- PlatformBehavior::PlatformBehavior - Solid platforms
+- TopDownMovementBehavior::TopDownMovementBehavior - Top-down movement
+- DestroyOutsideBehavior::DestroyOutside - Auto-destroy when off-screen
 
-Common object types:
-- Sprite - Animated sprite objects
-- TiledSpriteObject::TiledSprite - Repeating tile patterns
-- TextObject::Text - Text display
+Object types: Sprite, TiledSpriteObject::TiledSprite, TextObject::Text
+
+IMPORTANT: Output ALL function calls needed to create a complete, playable game. Include:
+1. Project initialization
+2. Main game scene
+3. All game objects with appropriate behaviors
+4. Object instances placed in the scene
+5. Game logic events
 `;
 
 export class ClaudeAgentClient {

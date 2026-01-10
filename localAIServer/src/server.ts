@@ -102,13 +102,14 @@ app.post('/ai-request/:id/action/add-message', async (req: Request, res: Respons
     aiRequest.updatedAt = new Date().toISOString();
 
     // Continue processing
-    continueAiRequest(req.params.id, gameProjectJson, mode || aiRequest.mode).catch(err => {
+    const requestId = req.params.id;
+    continueAiRequest(requestId, gameProjectJson, mode || aiRequest.mode).catch(err => {
       console.error('Error continuing AI request:', err);
-      const req = aiRequests.get(req.params.id);
-      if (req) {
-        req.status = 'error';
-        req.error = { code: 'processing_error', message: err.message };
-        req.updatedAt = new Date().toISOString();
+      const request = aiRequests.get(requestId);
+      if (request) {
+        request.status = 'error';
+        request.error = { code: 'processing_error', message: err.message };
+        request.updatedAt = new Date().toISOString();
       }
     });
 

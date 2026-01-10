@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { AssetStoreContext } from '../AssetStore/AssetStoreContext';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
-import { CorsAwareImage } from '../UI/CorsAwareImage';
+import ObjectThumbnailImage from '../ObjectsRendering/ObjectThumbnailImage';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
 import Text from '../UI/Text';
 import { AssetPreviewImage } from '../AssetStore/AssetPreviewImage';
@@ -66,17 +66,13 @@ export const ObjectPreview = ({ project, object }: Props) => {
             maxSize={128}
           />
         ) : (
-          <CorsAwareImage
-            alt=""
-            src={ObjectsRenderingService.getThumbnail(
+          <ObjectThumbnailImage
+            thumbnail={ObjectsRenderingService.getThumbnail(
               project,
               object.getConfiguration()
             )}
-            style={{
-              ...styles.previewImage,
-              maxWidth: 128 - 2 * paddingSize,
-              maxHeight: 128 - 2 * paddingSize,
-            }}
+            size={128 - 2 * paddingSize}
+            style={styles.previewImage}
           />
         )}
       </div>

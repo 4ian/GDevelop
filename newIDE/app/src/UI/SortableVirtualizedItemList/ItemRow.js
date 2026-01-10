@@ -15,6 +15,7 @@ import {
 import { textEllipsisStyle } from '../TextEllipsis';
 import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 import Text from '../Text';
+import { type ObjectThumbnail } from '../../ObjectsRendering/Thumbnail';
 
 const styles = {
   textField: {
@@ -33,7 +34,7 @@ type Props<Item> = {|
   isBold: boolean,
   onRename: string => void,
   editingName: boolean,
-  getThumbnail?: () => string,
+  getThumbnail?: () => ObjectThumbnail,
   renderItemLabel?: () => React.Node,
   selected: boolean,
   onItemSelected: (?Item) => void,

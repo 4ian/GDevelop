@@ -6,6 +6,10 @@ import { CorsAwareImage } from '../../UI/CorsAwareImage';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { useLongTouch } from '../../Utils/UseLongTouch';
 import CheckeredBackground from '../CheckeredBackground';
+import {
+  getSpritesheetFrameImageStyle,
+  useSpritesheetFrameData,
+} from '../../ObjectsRendering/Thumbnail';
 
 const styles = {
   spriteThumbnail: {
@@ -35,6 +39,8 @@ type Props = {|
   project: gdProject,
   resourceName: string,
   resourcesLoader: typeof ResourcesLoader,
+  spritesheetResourceName?: string,
+  spritesheetFrameName?: string,
   style?: any,
   selectable?: boolean,
   selected?: boolean,
@@ -44,9 +50,21 @@ type Props = {|
 |};
 
 const ImageThumbnail = (props: Props) => {
-  const { onContextMenu, resourcesLoader, resourceName, project } = props;
+  const {
+    onContextMenu,
+    resourcesLoader,
+    resourceName,
+    project,
+    spritesheetResourceName,
+    spritesheetFrameName,
+  } = props;
   const theme = React.useContext(GDevelopThemeContext);
   const [error, setError] = React.useState(false);
+  const spritesheetFrameData = useSpritesheetFrameData(
+    project,
+    spritesheetResourceName,
+    spritesheetFrameName
+  );
 
   // Allow a long press to show the context menu
   const longTouchForContextMenuProps = useLongTouch(
@@ -71,12 +89,25 @@ const ImageThumbnail = (props: Props) => {
     height: props.size || 100,
     border: `1px solid ${borderColor}`,
     borderRadius: 4,
+    overflow: 'hidden',
     ...props.style,
   };
 
+  const displayName = spritesheetFrameName || resourceName;
+  const thumbnailSource = spritesheetFrameData
+    ? spritesheetFrameData.imageSrc
+    : resourcesLoader.getResourceFullUrl(project, resourceName, {});
+  const frameStyle = spritesheetFrameData
+    ? getSpritesheetFrameImageStyle(
+        spritesheetFrameData,
+        props.size || 100,
+        props.size || 100
+      )
+    : null;
+
   return (
     <div
-      title={resourceName}
+      title={displayName}
       style={containerStyle}
       onContextMenu={e => {
         e.stopPropagation();
@@ -88,12 +119,14 @@ const ImageThumbnail = (props: Props) => {
       <CorsAwareImage
         style={{
           ...styles.spriteThumbnailImage,
-          maxWidth: props.size || 100,
-          maxHeight: props.size || 100,
+          ...(frameStyle || {
+            maxWidth: props.size || 100,
+            maxHeight: props.size || 100,
+          }),
           display: error ? 'none' : undefined,
         }}
-        alt={resourceName}
-        src={resourcesLoader.getResourceFullUrl(project, resourceName, {})}
+        alt={displayName}
+        src={thumbnailSource}
         onError={error => {
           setError(error);
         }}

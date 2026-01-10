@@ -81,6 +81,12 @@ type Props = {|
   resourceName: string,
   imageResourceSource: string,
   isImageResourceSmooth: boolean,
+  imageFrame?: ?{|
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+  |},
   displaySpacedView?: boolean,
   fixedHeight?: number,
   fixedWidth?: number,
@@ -135,6 +141,7 @@ const ImagePreview = ({
   isImagePrivate,
   onImageLoaded,
   hideLoader,
+  imageFrame,
 }: Props) => {
   const [errored, setErrored] = React.useState<boolean>(false);
   const [imageWidth, setImageWidth] = React.useState<?number>(null);
@@ -410,18 +417,39 @@ const ImagePreview = ({
     (e: any) => {
       const imgElement = e.target;
 
-      const newImageWidth = imgElement
+      const loadedImageWidth = imgElement
         ? imgElement.naturalWidth || imgElement.clientWidth
         : 0;
-      const newImageHeight = imgElement
+      const loadedImageHeight = imgElement
         ? imgElement.naturalHeight || imgElement.clientHeight
         : 0;
+      const newImageWidth = imageFrame
+        ? imageFrame.width
+        : loadedImageWidth;
+      const newImageHeight = imageFrame
+        ? imageFrame.height
+        : loadedImageHeight;
       setImageHeight(newImageHeight);
       setImageWidth(newImageWidth);
       if (onImageSize) onImageSize([newImageWidth, newImageHeight]);
       if (onImageLoaded) onImageLoaded();
     },
-    [onImageLoaded, onImageSize]
+    [imageFrame, onImageLoaded, onImageSize]
+  );
+
+  React.useEffect(
+    () => {
+      if (!imageFrame || !imageWidth || !imageHeight) return;
+      if (
+        imageWidth !== imageFrame.width ||
+        imageHeight !== imageFrame.height
+      ) {
+        setImageWidth(imageFrame.width);
+        setImageHeight(imageFrame.height);
+        if (onImageSize) onImageSize([imageFrame.width, imageFrame.height]);
+      }
+    },
+    [imageFrame, imageHeight, imageWidth, onImageSize]
   );
 
   const onTouchEnd = React.useCallback((event: TouchEvent) => {
@@ -506,6 +534,7 @@ const ImagePreview = ({
     width: imageWidth != null ? imageWidth * imageZoomFactor : null,
     height: imageHeight != null ? imageHeight * imageZoomFactor : null,
     transformOrigin: '0 0',
+    overflow: imageFrame ? 'hidden' : undefined,
   };
 
   const imageContainerStyle = {
@@ -521,6 +550,12 @@ const ImagePreview = ({
     visibility,
     ...(!isImageResourceSmooth ? styles.previewImagePixelated : undefined),
     cursor: forcedCursor,
+    ...(imageFrame
+      ? {
+          transform: `translate(-${imageFrame.x}px, -${imageFrame.y}px)`,
+          transformOrigin: 'top left',
+        }
+      : undefined),
   };
 
   const overlayStyle = {

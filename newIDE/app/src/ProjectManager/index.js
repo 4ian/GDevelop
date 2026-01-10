@@ -84,6 +84,7 @@ import { isMacLike } from '../Utils/Platform';
 import optionalRequire from '../Utils/OptionalRequire';
 import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import { type ObjectThumbnail } from '../ObjectsRendering/Thumbnail';
 
 const electron = optionalRequire('electron');
 
@@ -127,7 +128,7 @@ export interface TreeViewItemContent {
   getId(): string;
   getHtmlId(index: number): ?string;
   getDataSet(): ?HTMLDataset;
-  getThumbnail(): ?string;
+  getThumbnail(): ?ObjectThumbnail;
   onClick(): void;
   buildMenuTemplate(i18n: I18nType, index: number): Array<MenuItemTemplate>;
   getRightButton(i18n: I18nType): ?MenuButton;
@@ -240,7 +241,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
     return null;
   }
 
-  getThumbnail(): ?string {
+  getThumbnail(): ?ObjectThumbnail {
     return null;
   }
 
@@ -328,8 +329,8 @@ class ActionTreeViewItemContent implements TreeViewItemContent {
     return null;
   }
 
-  getThumbnail(): ?string {
-    return this.thumbnail;
+  getThumbnail(): ?ObjectThumbnail {
+    return this.thumbnail ? { thumbnailSrc: this.thumbnail } : null;
   }
 
   onClick(): void {

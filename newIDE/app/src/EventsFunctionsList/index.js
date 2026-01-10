@@ -53,6 +53,7 @@ import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { type ShowConfirmDeleteDialogOptions } from '../UI/Alert/AlertContext';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { type GDevelopTheme } from '../UI/Theme';
+import { type ObjectThumbnail } from '../ObjectsRendering/Thumbnail';
 
 const gd: libGDevelop = global.gd;
 
@@ -84,7 +85,7 @@ export interface TreeViewItemContent {
   getName(): string | React.Node;
   getId(): string;
   getHtmlId(index: number): ?string;
-  getThumbnail(): ?string;
+  getThumbnail(): ?ObjectThumbnail;
   getDataset(): ?HTMLDataset;
   onSelect(): void;
   onClick(): void;
@@ -307,7 +308,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
     return null;
   }
 
-  getThumbnail(): ?string {
+  getThumbnail(): ?ObjectThumbnail {
     return null;
   }
 
@@ -417,8 +418,8 @@ class ActionTreeViewItemContent implements TreeViewItemContent {
 
   onSelect(): void {}
 
-  getThumbnail(): ?string {
-    return this.thumbnail;
+  getThumbnail(): ?ObjectThumbnail {
+    return this.thumbnail ? { thumbnailSrc: this.thumbnail } : null;
   }
 
   onClick(): void {

@@ -18,6 +18,7 @@ import {
   extensionObjectsRootFolderId,
 } from '.';
 import Tooltip from '@material-ui/core/Tooltip';
+import { type ObjectThumbnail } from '../ObjectsRendering/Thumbnail';
 import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
 import Add from '../UI/CustomSvgIcons/Add';
 
@@ -120,10 +121,12 @@ export class EventsBasedObjectTreeViewItemContent
     return null;
   }
 
-  getThumbnail(): ?string {
-    return this.eventsBasedObject.isRenderedIn3D()
-      ? 'res/functions/object3d_black.svg'
-      : 'res/functions/object2d_black.svg';
+  getThumbnail(): ?ObjectThumbnail {
+    return {
+      thumbnailSrc: this.eventsBasedObject.isRenderedIn3D()
+        ? 'res/functions/object3d_black.svg'
+        : 'res/functions/object2d_black.svg',
+    };
   }
 
   getDataset(): ?HTMLDataset {

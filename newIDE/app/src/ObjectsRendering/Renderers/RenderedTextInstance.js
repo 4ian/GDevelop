@@ -2,6 +2,7 @@
 import RenderedInstance from './RenderedInstance';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
+import { type ObjectThumbnail } from '../Thumbnail';
 import { rgbStringToHexNumber } from '../../Utils/ColorTransformer';
 import * as PIXI from 'pixi.js-legacy';
 const gd: libGDevelop = global.gd;
@@ -79,8 +80,11 @@ export default class RenderedTextInstance extends RenderedInstance {
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ) {
-    return 'CppPlatform/Extensions/texticon24.png';
+  ): ObjectThumbnail {
+    return {
+      project,
+      thumbnailSrc: 'CppPlatform/Extensions/texticon24.png',
+    };
   }
 
   update() {

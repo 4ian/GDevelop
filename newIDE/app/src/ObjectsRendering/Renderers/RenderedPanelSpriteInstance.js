@@ -2,6 +2,7 @@
 import RenderedInstance from './RenderedInstance';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
+import { type ObjectThumbnail } from '../Thumbnail';
 import * as PIXI from 'pixi.js-legacy';
 const gd: libGDevelop = global.gd;
 
@@ -487,13 +488,16 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ) {
+  ): ObjectThumbnail {
     const panelSprite = gd.asPanelSpriteConfiguration(objectConfiguration);
 
-    return ResourcesLoader.getResourceFullUrl(
+    return {
       project,
-      panelSprite.getTexture(),
-      {}
-    );
+      thumbnailSrc: ResourcesLoader.getResourceFullUrl(
+        project,
+        panelSprite.getTexture(),
+        {}
+      ),
+    };
   }
 }

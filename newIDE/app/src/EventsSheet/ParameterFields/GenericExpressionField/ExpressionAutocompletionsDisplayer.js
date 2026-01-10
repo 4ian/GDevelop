@@ -13,6 +13,8 @@ import { type ParameterRenderingServiceType } from '../ParameterFieldCommons';
 import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { Column, Line } from '../../../UI/Grid';
 import ObjectsRenderingService from '../../../ObjectsRendering/ObjectsRenderingService';
+import ObjectThumbnailImage from '../../../ObjectsRendering/ObjectThumbnailImage';
+import { type ObjectThumbnail } from '../../../ObjectsRendering/Thumbnail';
 import Paper from '../../../UI/Paper';
 import { mapFor } from '../../../Utils/MapFor';
 import { Trans } from '@lingui/macro';
@@ -47,25 +49,36 @@ const getTypeToIcon = (type: string) => {
   }
 };
 
-const AutocompletionIcon = React.memo(({ src }) => {
-  const {
-    palette: { type: paletteType },
-  } = React.useContext(GDevelopThemeContext);
+const AutocompletionIcon = React.memo(
+  ({ src }: {| src: string | ObjectThumbnail |}) => {
+    const {
+      palette: { type: paletteType },
+    } = React.useContext(GDevelopThemeContext);
 
-  const shouldInvertGrayScale =
-    paletteType === 'dark' &&
-    (src.startsWith('data:image/svg+xml') || src.includes('_black'));
-  return (
-    <img
-      src={src}
-      alt=""
-      style={{
-        ...autocompletionIconSizeStyle,
-        filter: shouldInvertGrayScale ? 'grayscale(1) invert(1)' : undefined,
-      }}
-    />
-  );
-});
+    if (typeof src !== 'string') {
+      return (
+        <ObjectThumbnailImage
+          thumbnail={src}
+          size={autocompletionIconSizeStyle.maxWidth || 16}
+        />
+      );
+    }
+
+    const shouldInvertGrayScale =
+      paletteType === 'dark' &&
+      (src.startsWith('data:image/svg+xml') || src.includes('_black'));
+    return (
+      <img
+        src={src}
+        alt=""
+        style={{
+          ...autocompletionIconSizeStyle,
+          filter: shouldInvertGrayScale ? 'grayscale(1) invert(1)' : undefined,
+        }}
+      />
+    );
+  }
+);
 
 const formatParameterTypesString = (
   parameterRenderingService: ParameterRenderingServiceType,
@@ -95,7 +108,7 @@ const AutocompletionRow = React.forwardRef(
       onClick,
     }: {|
       icon: React.Node | null,
-      iconSrc: string | null,
+      iconSrc: string | ObjectThumbnail | null,
       secondaryIcon: React.Node | null,
       label: string,
       parametersLabel: string | null,

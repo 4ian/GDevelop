@@ -2,6 +2,7 @@
 import { type Node } from 'react';
 import { type CommandName } from './CommandsList';
 import { type AlgoliaSearchHit } from '../Utils/AlgoliaSearch';
+import { type ObjectThumbnail } from '../ObjectsRendering/Thumbnail';
 type CommandHandler = () => void | Promise<void>;
 
 export type SimpleCommand = {|
@@ -12,7 +13,7 @@ export type SimpleCommand = {|
 export type CommandOption = {|
   handler: CommandHandler,
   text: string,
-  iconSrc?: string,
+  iconSrc?: string | ObjectThumbnail,
 |};
 
 export type CommandWithOptions = {|

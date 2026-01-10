@@ -24,6 +24,7 @@ import {
   rgbOrHexToHexNumber,
   hexNumberToRGBArray,
 } from '../Utils/ColorTransformer';
+import { type ObjectThumbnail } from './Thumbnail';
 
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
@@ -56,7 +57,7 @@ const ObjectsRenderingService = {
   getThumbnail: function(
     project: gdProject,
     objectConfiguration: gdObjectConfiguration
-  ) {
+  ): ObjectThumbnail {
     const objectType = objectConfiguration.getType();
     if (this.renderers.hasOwnProperty(objectType))
       return this.renderers[objectType].getThumbnail(

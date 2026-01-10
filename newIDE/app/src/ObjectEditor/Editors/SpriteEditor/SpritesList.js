@@ -73,7 +73,21 @@ const SortableSpriteThumbnail = SortableElement(
       selected={selected}
       onSelect={onSelect}
       onContextMenu={onContextMenu}
-      resourceName={sprite.getImageName()}
+      resourceName={
+        sprite.usesSpritesheetFrame()
+          ? sprite.getSpritesheetFrameName()
+          : sprite.getImageName()
+      }
+      spritesheetResourceName={
+        sprite.usesSpritesheetFrame()
+          ? sprite.getSpritesheetResourceName()
+          : undefined
+      }
+      spritesheetFrameName={
+        sprite.usesSpritesheetFrame()
+          ? sprite.getSpritesheetFrameName()
+          : undefined
+      }
       resourcesLoader={resourcesLoader}
       project={project}
       style={isFirst ? {} : styles.thumbnailExtraStyle}
@@ -119,7 +133,21 @@ const SortableList = SortableContainer(
                 selected={!!selectedSprites[sprite.ptr]}
                 onSelect={selected => onSelectSprite(sprite, selected)}
                 onContextMenu={(x, y) => onOpenSpriteContextMenu(x, y, sprite)}
-                resourceName={sprite.getImageName()}
+                resourceName={
+                  sprite.usesSpritesheetFrame()
+                    ? sprite.getSpritesheetFrameName()
+                    : sprite.getImageName()
+                }
+                spritesheetResourceName={
+                  sprite.usesSpritesheetFrame()
+                    ? sprite.getSpritesheetResourceName()
+                    : undefined
+                }
+                spritesheetFrameName={
+                  sprite.usesSpritesheetFrame()
+                    ? sprite.getSpritesheetFrameName()
+                    : undefined
+                }
                 resourcesLoader={resourcesLoader}
                 project={project}
                 size={SPRITE_SIZE}
@@ -552,15 +580,7 @@ const SpritesList = ({
           }
         }
 
-        // TODO: show a dialog allowing the user to select the animation of one/more frames of the spritesheet to add.
-        // And then create the sprites:
         setSelectedSpritesheetResourceName(resourceName);
-
-        // if (selectedResources.length && onSpriteUpdated) onSpriteUpdated();
-        // if (directionSpritesCountBeforeAdding === 0 && onFirstSpriteUpdated) {
-        //   // If there was no sprites before, we can assume the first sprite was added.
-        //   onFirstSpriteUpdated();
-        // }
       } catch (err) {
         // Should never happen, errors should be shown in the interface.
         console.error('Unable to choose a resource', err);

@@ -18,6 +18,7 @@ import {
 } from './ObjectTreeViewItemContent';
 import { renderQuickCustomizationMenuItems } from '../QuickCustomization/QuickCustomizationMenuItems';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import { type ObjectThumbnail } from '../ObjectsRendering/Thumbnail';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 
@@ -157,8 +158,10 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     };
   }
 
-  getThumbnail(): ?string {
-    return 'FOLDER';
+  getThumbnail(): ?ObjectThumbnail {
+    return {
+      thumbnailSrc: 'FOLDER',
+    };
   }
 
   onClick(): void {}

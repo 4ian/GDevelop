@@ -22,6 +22,7 @@ import {
 import Tooltip from '@material-ui/core/Tooltip';
 import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
 import AsyncIcon from '@material-ui/icons/SyncAlt';
+import { type ObjectThumbnail } from '../ObjectsRendering/Thumbnail';
 
 const gd: libGDevelop = global.gd;
 
@@ -151,48 +152,63 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
     return `function-item-${index}`;
   }
 
-  getThumbnail(): ?string {
+  getThumbnail(): ?ObjectThumbnail {
+    let thumbnailSrc = 'res/functions/function.svg';
     switch (this.eventsFunction.getFunctionType()) {
       default:
-        return 'res/functions/function.svg';
+        thumbnailSrc = 'res/functions/function.svg';
+        break;
       case gd.EventsFunction.Action:
       case gd.EventsFunction.ActionWithOperator:
         switch (this.eventsFunction.getName()) {
           default:
-            return 'res/functions/action.svg';
+            thumbnailSrc = 'res/functions/action.svg';
+            break;
 
           case 'onSceneUnloading':
           case 'onDestroy':
-            return 'res/functions/destroy.svg';
+            thumbnailSrc = 'res/functions/destroy.svg';
+            break;
 
           case 'onSceneResumed':
           case 'onActivate':
-            return 'res/functions/activate.svg';
+            thumbnailSrc = 'res/functions/activate.svg';
+            break;
 
           case 'onScenePaused':
           case 'onDeActivate':
-            return 'res/functions/deactivate.svg';
+            thumbnailSrc = 'res/functions/deactivate.svg';
+            break;
 
           case 'onScenePreEvents':
           case 'onScenePostEvents':
           case 'doStepPreEvents':
           case 'doStepPostEvents':
-            return 'res/functions/step.svg';
+            thumbnailSrc = 'res/functions/step.svg';
+            break;
 
           case 'onSceneLoaded':
           case 'onFirstSceneLoaded':
           case 'onCreated':
-            return 'res/functions/create.svg';
+            thumbnailSrc = 'res/functions/create.svg';
+            break;
 
           case 'onHotReloading':
-            return 'res/functions/reload.svg';
+            thumbnailSrc = 'res/functions/reload.svg';
+            break;
         }
+        break;
       case gd.EventsFunction.Condition:
-        return 'res/functions/condition.svg';
+        thumbnailSrc = 'res/functions/condition.svg';
+        break;
       case gd.EventsFunction.Expression:
       case gd.EventsFunction.ExpressionAndCondition:
-        return 'res/functions/expression.svg';
+        thumbnailSrc = 'res/functions/expression.svg';
+        break;
     }
+    return {
+      thumbnailSrc,
+    };
   }
 
   getDataset(): ?HTMLDataset {

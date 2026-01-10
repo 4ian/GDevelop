@@ -16,6 +16,7 @@ import {
   externalEventsRootFolderId,
 } from '.';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
+import { type ObjectThumbnail } from '../ObjectsRendering/Thumbnail';
 
 const EXTERNAL_EVENTS_CLIPBOARD_KIND = 'External events';
 
@@ -81,8 +82,10 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
     };
   }
 
-  getThumbnail(): ?string {
-    return 'res/icons_default/external_events_black.svg';
+  getThumbnail(): ?ObjectThumbnail {
+    return {
+      thumbnailSrc: 'res/icons_default/external_events_black.svg',
+    };
   }
 
   onClick(): void {

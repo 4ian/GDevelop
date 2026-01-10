@@ -17,6 +17,7 @@ import {
 } from '.';
 import { isExtensionNameTaken } from './EventFunctionExtensionNameVerifier';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
+import { type ObjectThumbnail } from '../ObjectsRendering/Thumbnail';
 
 const EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND = 'Events Functions Extension';
 
@@ -86,11 +87,12 @@ export class ExtensionTreeViewItemContent implements TreeViewItemContent {
     };
   }
 
-  getThumbnail(): ?string {
-    return (
-      this.eventsFunctionsExtension.getIconUrl() ||
-      'res/functions/extension_black.svg'
-    );
+  getThumbnail(): ?ObjectThumbnail {
+    return {
+      thumbnailSrc:
+        this.eventsFunctionsExtension.getIconUrl() ||
+        'res/functions/extension_black.svg',
+    };
   }
 
   onClick(): void {

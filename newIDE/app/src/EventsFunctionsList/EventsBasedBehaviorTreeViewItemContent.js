@@ -18,6 +18,7 @@ import {
   extensionBehaviorsRootFolderId,
 } from '.';
 import Tooltip from '@material-ui/core/Tooltip';
+import { type ObjectThumbnail } from '../ObjectsRendering/Thumbnail';
 import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
 import Add from '../UI/CustomSvgIcons/Add';
 
@@ -115,8 +116,10 @@ export class EventsBasedBehaviorTreeViewItemContent
     return `behavior-item-${index}`;
   }
 
-  getThumbnail(): ?string {
-    return 'res/functions/behavior_black.svg';
+  getThumbnail(): ?ObjectThumbnail {
+    return {
+      thumbnailSrc: 'res/functions/behavior_black.svg',
+    };
   }
 
   getDataset(): ?HTMLDataset {

@@ -73,6 +73,16 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   }
 
   const displayAsFolder = node.canHaveChildren;
+  const thumbnailValue = node.thumbnailSrc;
+  const thumbnailSrc =
+    typeof thumbnailValue === 'string'
+      ? thumbnailValue
+      : thumbnailValue
+      ? thumbnailValue.thumbnailSrc
+      : null;
+  const shouldShowThumbnail =
+    !!thumbnailSrc && thumbnailSrc !== 'FOLDER' && thumbnailSrc !== 'NONE';
+  const isFolderThumbnail = thumbnailSrc === 'FOLDER';
 
   return (
     <div style={style} ref={containerRef}>
@@ -123,21 +133,19 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                         />
                       )}
                     </IconButton>
-                    {!node.thumbnailSrc ||
-                    node.thumbnailSrc === 'NONE' ? null : node.thumbnailSrc !==
-                      'FOLDER' ? (
-                      <div className={classes.thumbnail}>
-                        <ListIcon iconSize={iconSize} src={node.thumbnailSrc} />
-                      </div>
-                    ) : (
+                    {!thumbnailSrc || thumbnailSrc === 'NONE' ? null : isFolderThumbnail ? (
                       !node.item.isRoot && (
                         <Folder className={classes.folderIcon} />
                       )
+                    ) : (
+                      <div className={classes.thumbnail}>
+                        <ListIcon iconSize={iconSize} src={thumbnailValue} />
+                      </div>
                     )}
                   </>
-                ) : node.thumbnailSrc ? (
+                ) : shouldShowThumbnail ? (
                   <div className={classes.thumbnail}>
-                    <ListIcon iconSize={iconSize} src={node.thumbnailSrc} />
+                    <ListIcon iconSize={iconSize} src={thumbnailValue} />
                   </div>
                 ) : null}
                 <div className={classNames(classes.itemTextContainer)}>

@@ -4,6 +4,10 @@ import Rendered3DInstance from './Rendered3DInstance';
 import PixiResourcesLoader from '../PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
 import ObjectsRenderingService from '../ObjectsRenderingService';
+import {
+  type ObjectThumbnail,
+  getSpritesheetImageResourceName,
+} from '../Thumbnail';
 import RenderedTextInstance from './RenderedTextInstance';
 import { mapReverseFor } from '../../Utils/MapFor';
 import {
@@ -202,7 +206,7 @@ export default class LegacyRenderedCustomObjectInstance
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ) {
+  ): ObjectThumbnail {
     const customObjectConfiguration = gd.asCustomObjectConfiguration(
       objectConfiguration
     );
@@ -212,8 +216,12 @@ export default class LegacyRenderedCustomObjectInstance
     )
       ? project.getEventsBasedObject(customObjectConfiguration.getType())
       : null;
+    const baseThumbnail = {
+      project,
+      thumbnailSrc: 'res/unknown32.png',
+    };
     if (!eventBasedObject) {
-      return 'res/unknown32.png';
+      return baseThumbnail;
     }
     if (eventBasedObject.isAnimatable()) {
       const animations = customObjectConfiguration.getAnimations();
@@ -226,14 +234,39 @@ export default class LegacyRenderedCustomObjectInstance
           .getDirection(0)
           .getSpritesCount() > 0
       ) {
-        const imageName = animations
+        const sprite = animations
           .getAnimation(0)
           .getDirection(0)
-          .getSprite(0)
-          .getImageName();
-        return resourcesLoader.getResourceFullUrl(project, imageName, {});
+          .getSprite(0);
+        if (sprite.usesSpritesheetFrame()) {
+          const spritesheetImageResourceName = getSpritesheetImageResourceName(
+            project,
+            sprite.getSpritesheetResourceName()
+          );
+          return {
+            ...baseThumbnail,
+            thumbnailSrc: spritesheetImageResourceName
+              ? resourcesLoader.getResourceFullUrl(
+                  project,
+                  spritesheetImageResourceName,
+                  {}
+                )
+              : baseThumbnail.thumbnailSrc,
+            spritesheetResourceName: sprite.getSpritesheetResourceName(),
+            spritesheetFrameName: sprite.getSpritesheetFrameName(),
+          };
+        }
+        const imageName = sprite.getImageName();
+        return {
+          ...baseThumbnail,
+          thumbnailSrc: resourcesLoader.getResourceFullUrl(
+            project,
+            imageName,
+            {}
+          ),
+        };
       }
-      return 'res/unknown32.png';
+      return baseThumbnail;
     }
     const childObjects = eventBasedObject.getObjects();
     for (let i = 0; i < childObjects.getObjectsCount(); i++) {
@@ -255,7 +288,7 @@ export default class LegacyRenderedCustomObjectInstance
         if (thumbnail) return thumbnail;
       }
     }
-    return 'res/unknown32.png';
+    return baseThumbnail;
   }
 
   _updatePixiObjectsZOrder() {

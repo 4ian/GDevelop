@@ -3,6 +3,10 @@ import RenderedInstance from './RenderedInstance';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
 import * as PIXI from 'pixi.js-legacy';
+import {
+  type ObjectThumbnail,
+  getSpritesheetImageResourceName,
+} from '../Thumbnail';
 const gd: libGDevelop = global.gd;
 
 /**
@@ -68,9 +72,13 @@ export default class RenderedSpriteInstance extends RenderedInstance {
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ): string {
+  ): ObjectThumbnail {
     const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
     const animations = spriteConfiguration.getAnimations();
+    const baseThumbnail = {
+      project,
+      thumbnailSrc: 'res/unknown32.png',
+    };
 
     if (
       animations.getAnimationsCount() > 0 &&
@@ -80,15 +88,36 @@ export default class RenderedSpriteInstance extends RenderedInstance {
         .getDirection(0)
         .getSpritesCount() > 0
     ) {
-      const imageName = animations
+      const sprite = animations
         .getAnimation(0)
         .getDirection(0)
-        .getSprite(0)
-        .getImageName();
-      return resourcesLoader.getResourceFullUrl(project, imageName, {});
+        .getSprite(0);
+      if (sprite.usesSpritesheetFrame()) {
+        const spritesheetImageResourceName = getSpritesheetImageResourceName(
+          project,
+          sprite.getSpritesheetResourceName()
+        );
+        return {
+          ...baseThumbnail,
+          thumbnailSrc: spritesheetImageResourceName
+            ? resourcesLoader.getResourceFullUrl(
+                project,
+                spritesheetImageResourceName,
+                {}
+              )
+            : baseThumbnail.thumbnailSrc,
+          spritesheetResourceName: sprite.getSpritesheetResourceName(),
+          spritesheetFrameName: sprite.getSpritesheetFrameName(),
+        };
+      }
+      const imageName = sprite.getImageName();
+      return {
+        ...baseThumbnail,
+        thumbnailSrc: resourcesLoader.getResourceFullUrl(project, imageName, {}),
+      };
     }
 
-    return 'res/unknown32.png';
+    return baseThumbnail;
   }
 
   updatePIXISprite(): void {

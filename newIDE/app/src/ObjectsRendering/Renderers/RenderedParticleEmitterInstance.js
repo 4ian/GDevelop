@@ -4,6 +4,7 @@ import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
 import * as PIXI from 'pixi.js-legacy';
 import { rgbOrHexToHexNumber } from '../../Utils/ColorTransformer';
+import { type ObjectThumbnail } from '../Thumbnail';
 const gd: libGDevelop = global.gd;
 
 /**
@@ -37,8 +38,11 @@ export default class RenderedParticleEmitterInstance extends RenderedInstance {
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ) {
-    return 'CppPlatform/Extensions/particleSystemicon.png';
+  ): ObjectThumbnail {
+    return {
+      project,
+      thumbnailSrc: 'CppPlatform/Extensions/particleSystemicon.png',
+    };
   }
 
   update() {

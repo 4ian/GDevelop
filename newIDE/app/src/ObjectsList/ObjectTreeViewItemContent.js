@@ -21,6 +21,7 @@ import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { isVariantEditable } from '../ObjectEditor/Editors/CustomObjectPropertiesEditor';
+import { type ObjectThumbnail } from '../ObjectsRendering/Thumbnail';
 
 const gd: libGDevelop = global.gd;
 
@@ -60,7 +61,7 @@ export type ObjectTreeViewItemCallbacks = {|
   getThumbnail: (
     project: gdProject,
     objectConfiguration: gdObjectConfiguration
-  ) => string,
+  ) => ObjectThumbnail,
 |};
 
 export type ObjectTreeViewItemProps = {|
@@ -234,7 +235,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     };
   }
 
-  getThumbnail(): ?string {
+  getThumbnail(): ?ObjectThumbnail {
     return this.props.getThumbnail(
       this.props.project,
       this.object.getObject().getConfiguration()

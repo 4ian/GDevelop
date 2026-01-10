@@ -9,6 +9,7 @@ import PointsPreview from './PointsPreview';
 import ImagePreview, {
   isProjectImageResourceSmooth,
 } from '../../../../ResourcesList/ResourcePreview/ImagePreview';
+import { useSpritesheetFrameData } from '../../../../ObjectsRendering/Thumbnail';
 import {
   getCurrentElements,
   allAnimationSpritesHaveSamePointsAs,
@@ -203,7 +204,24 @@ const PointsEditor = ({
   const editorNodes = isMobile ? verticalMosaicNodes : horizontalMosaicNodes;
 
   if (!animations.getAnimationsCount()) return null;
-  const resourceName = sprite ? sprite.getImageName() : '';
+  const resourceName = sprite
+    ? sprite.usesSpritesheetFrame()
+      ? sprite.getSpritesheetFrameName()
+      : sprite.getImageName()
+    : '';
+  const fallbackImageSource =
+    sprite && sprite.usesSpritesheetFrame()
+      ? 'res/unknown32.png'
+      : resourcesLoader.getResourceFullUrl(project, resourceName, {});
+  const spritesheetFrameData = useSpritesheetFrameData(
+    project,
+    sprite && sprite.usesSpritesheetFrame()
+      ? sprite.getSpritesheetResourceName()
+      : null,
+    sprite && sprite.usesSpritesheetFrame()
+      ? sprite.getSpritesheetFrameName()
+      : null
+  );
 
   const editors: { [string]: Editor | null } = {
     preview: {
@@ -215,15 +233,21 @@ const PointsEditor = ({
           <Column noMargin expand useFullHeight>
             <ImagePreview
               resourceName={resourceName}
-              imageResourceSource={resourcesLoader.getResourceFullUrl(
-                project,
-                resourceName,
-                {}
-              )}
-              isImageResourceSmooth={isProjectImageResourceSmooth(
-                project,
-                resourceName
-              )}
+              imageResourceSource={
+                spritesheetFrameData
+                  ? spritesheetFrameData.imageSrc
+                  : fallbackImageSource
+              }
+              isImageResourceSmooth={
+                spritesheetFrameData
+                  ? spritesheetFrameData.isSmooth
+                  : sprite && sprite.usesSpritesheetFrame()
+                  ? true
+                  : isProjectImageResourceSmooth(project, resourceName)
+              }
+              imageFrame={
+                spritesheetFrameData ? spritesheetFrameData.frame : null
+              }
               onImageSize={setCurrentSpriteSize}
               renderOverlay={overlayProps =>
                 sprite && (

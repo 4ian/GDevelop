@@ -11,6 +11,7 @@ import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTar
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
+import { type ObjectThumbnail } from '../../ObjectsRendering/Thumbnail';
 
 export const navigationKeys = [
   'ArrowDown',
@@ -49,7 +50,7 @@ type FlattenedNode<Item> = {|
   collapsed: boolean,
   selected: boolean,
   disableCollapse: boolean,
-  thumbnailSrc?: ?string,
+  thumbnailSrc?: ?(string | ObjectThumbnail),
   item: Item,
 |};
 

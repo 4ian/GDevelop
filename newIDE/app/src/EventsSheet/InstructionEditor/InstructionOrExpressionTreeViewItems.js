@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
+import { type ObjectThumbnail } from '../../ObjectsRendering/Thumbnail';
 import { type EnumeratedInstructionMetadata } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { type InstructionOrExpressionTreeNode } from '../../InstructionOrExpression/CreateTree';
 
@@ -14,7 +15,7 @@ export interface TreeViewItemContent {
   getId(): string;
   getHtmlId(index: number): ?string;
   getDataSet(): ?HTMLDataset;
-  getThumbnail(): ?string;
+  getThumbnail(): ?ObjectThumbnail;
 }
 
 export interface TreeViewItem {
@@ -157,9 +158,14 @@ export class InstructionGroupTreeViewItemContent
     };
   }
   getThumbnail() {
-    return !this.props.parentId
+    const thumbnailSrc = !this.props.parentId
       ? 'NONE'
-      : this.props.getGroupIconSrc(this.name) || this.props.parentGroupIconSrc;
+      : this.props.getGroupIconSrc(this.name) ||
+        this.props.parentGroupIconSrc ||
+        'NONE';
+    return {
+      thumbnailSrc,
+    };
   }
 }
 
@@ -200,7 +206,9 @@ export class InstructionTreeViewItemContent implements TreeViewItemContent {
     };
   }
   getThumbnail() {
-    return this.instructionMetadata.iconFilename;
+    return {
+      thumbnailSrc: this.instructionMetadata.iconFilename,
+    };
   }
 }
 

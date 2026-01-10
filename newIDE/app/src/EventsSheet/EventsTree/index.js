@@ -30,6 +30,7 @@ import {
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import getObjectByName from '../../Utils/GetObjectByName';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
+import ObjectThumbnailImage from '../../ObjectsRendering/ObjectThumbnailImage';
 import { type ScreenType } from '../../UI/Responsive/ScreenTypeMeasurer';
 import { type WindowSizeType } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 
@@ -38,7 +39,6 @@ import 'react-sortable-tree/style.css';
 import './style.css';
 import BottomButtons from './BottomButtons';
 import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
-import { CorsAwareImage } from '../../UI/CorsAwareImage';
 import { Line } from '../../UI/Grid';
 import { type Preferences } from '../../MainFrame/Preferences/PreferencesContext';
 import { type Tutorial } from '../../Utils/GDevelopServices/Tutorial';
@@ -606,17 +606,24 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
         );
         if (!object) return null;
 
+        const iconSize = Math.round((props.fontSize || 14) * 1.14);
         return (
-          <CorsAwareImage
+          <ObjectThumbnailImage
             className={classNames({
               [icon]: true,
             })}
-            alt=""
-            src={getThumbnail(project, object.getConfiguration())}
+            thumbnail={getThumbnail(project, object.getConfiguration())}
+            size={iconSize}
           />
         );
       },
-      [project, globalObjectsContainer, objectsContainer, showObjectThumbnails]
+      [
+        project,
+        globalObjectsContainer,
+        objectsContainer,
+        showObjectThumbnails,
+        props.fontSize,
+      ]
     );
 
     const { onEventMoved } = props;

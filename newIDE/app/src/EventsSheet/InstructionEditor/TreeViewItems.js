@@ -4,6 +4,7 @@ import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import { mapFor } from '../../Utils/MapFor';
 import getObjectByName from '../../Utils/GetObjectByName';
 import { type EnumeratedInstructionMetadata } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
+import { type ObjectThumbnail } from '../../ObjectsRendering/Thumbnail';
 
 export interface TreeViewItemContent {
   applySearch: boolean;
@@ -12,7 +13,7 @@ export interface TreeViewItemContent {
   getId(): string;
   getHtmlId(index: number): ?string;
   getDataSet(): ?HTMLDataset;
-  getThumbnail(): ?string;
+  getThumbnail(): ?ObjectThumbnail;
 }
 
 export interface TreeViewItem {
@@ -27,7 +28,7 @@ export type ObjectTreeViewItemProps = {|
   getThumbnail: (
     project: gdProject,
     objectConfiguration: gdObjectConfiguration
-  ) => string,
+  ) => ObjectThumbnail,
   project: gdProject,
 |};
 
@@ -119,8 +120,10 @@ export class ObjectGroupTreeViewItemContent implements TreeViewItemContent {
     };
   }
 
-  getThumbnail(): ?string {
-    return 'res/ribbon_default/objectsgroups64.png';
+  getThumbnail(): ?ObjectThumbnail {
+    return {
+      thumbnailSrc: 'res/ribbon_default/objectsgroups64.png',
+    };
   }
 }
 
@@ -166,7 +169,7 @@ export class ObjectGroupObjectTreeViewItemContent
     };
   }
 
-  getThumbnail(): ?string {
+  getThumbnail(): ?ObjectThumbnail {
     return this.props.getThumbnail(
       this.props.project,
       this.object.getConfiguration()
@@ -314,7 +317,9 @@ export class InstructionTreeViewItemContent implements TreeViewItemContent {
     };
   }
   getThumbnail() {
-    return this.instructionMetadata.iconFilename;
+    return {
+      thumbnailSrc: this.instructionMetadata.iconFilename,
+    };
   }
 }
 
@@ -348,7 +353,7 @@ export class LabelTreeViewItemContent implements TreeViewItemContent {
     return {};
   }
 
-  getThumbnail(): ?string {
+  getThumbnail(): ?ObjectThumbnail {
     return null;
   }
 
@@ -442,7 +447,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     };
   }
 
-  getThumbnail(): ?string {
+  getThumbnail(): ?ObjectThumbnail {
     return this.props.getThumbnail(
       this.props.project,
       this.object.getObject().getConfiguration()
@@ -486,7 +491,9 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     return { folderName: this.objectFolder.getFolderName() };
   }
 
-  getThumbnail(): ?string {
-    return 'FOLDER';
+  getThumbnail(): ?ObjectThumbnail {
+    return {
+      thumbnailSrc: 'FOLDER',
+    };
   }
 }

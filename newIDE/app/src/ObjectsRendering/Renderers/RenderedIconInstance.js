@@ -3,6 +3,7 @@ import RenderedInstance from './RenderedInstance';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
 import * as PIXI from 'pixi.js-legacy';
+import { type ObjectThumbnail } from '../Thumbnail';
 
 /**
  * Create a renderer for an type of object displayed as an icon
@@ -47,8 +48,11 @@ export default function makeRenderer(iconPath: string) {
       project: gdProject,
       resourcesLoader: Class<ResourcesLoader>,
       objectConfiguration: gdObjectConfiguration
-    ) {
-      return iconPath;
+    ): ObjectThumbnail {
+      return {
+        project,
+        thumbnailSrc: iconPath,
+      };
     }
   }
 

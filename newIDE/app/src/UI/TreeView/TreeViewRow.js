@@ -245,6 +245,15 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   }, []);
 
   const displayAsFolder = node.canHaveChildren;
+  const thumbnailValue = node.thumbnailSrc;
+  const thumbnailSrc =
+    typeof thumbnailValue === 'string'
+      ? thumbnailValue
+      : thumbnailValue
+      ? thumbnailValue.thumbnailSrc
+      : null;
+  const shouldShowThumbnail =
+    !!thumbnailSrc && thumbnailSrc !== 'FOLDER' && thumbnailSrc !== 'NONE';
 
   // Create an empty pixel image once to override the default drag preview of all items.
   const emptyImage = new Image();
@@ -266,7 +275,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
           if (typeof node.name === 'string' && !displayAsFolder) {
             const draggedItem: DraggedItem = {
               name: node.name,
-              thumbnail: node.thumbnailSrc || undefined,
+              thumbnail: shouldShowThumbnail ? thumbnailSrc : undefined,
               is3D:
                 // $FlowFixMe
                 !!node.item.content &&
@@ -373,19 +382,20 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                       />
                     )}
                   </IconButton>
-                  {node.thumbnailSrc && node.thumbnailSrc !== 'FOLDER' ? (
+                  {shouldShowThumbnail ? (
                     <div className={classes.thumbnail}>
-                      <ListIcon iconSize={20} src={node.thumbnailSrc} />
+                      <ListIcon iconSize={20} src={thumbnailValue} />
                     </div>
                   ) : (
-                    !node.item.isRoot && (
+                    !node.item.isRoot &&
+                    thumbnailSrc !== 'NONE' && (
                       <Folder className={classes.folderIcon} />
                     )
                   )}
                 </>
-              ) : node.thumbnailSrc ? (
+              ) : shouldShowThumbnail ? (
                 <div className={classes.thumbnail}>
-                  <ListIcon iconSize={20} src={node.thumbnailSrc} />
+                  <ListIcon iconSize={20} src={thumbnailValue} />
                 </div>
               ) : null}
               {renamedItemId === node.id && typeof node.name === 'string' ? (

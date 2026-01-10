@@ -3,6 +3,7 @@ import RenderedInstance from './RenderedInstance';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
 import * as PIXI from 'pixi.js-legacy';
+import { type ObjectThumbnail } from '../Thumbnail';
 
 /**
  * Objects with an unknown type are rendered with a placeholder rectangle.
@@ -40,8 +41,11 @@ export default class RenderedUnknownInstance extends RenderedInstance {
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ) {
-    return 'res/unknown32.png';
+  ): ObjectThumbnail {
+    return {
+      project,
+      thumbnailSrc: 'res/unknown32.png',
+    };
   }
 
   update() {

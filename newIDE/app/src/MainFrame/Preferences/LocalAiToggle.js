@@ -5,7 +5,7 @@ import { type I18n } from '@lingui/core';
 import { CompactToggleField } from '../../UI/CompactToggleField';
 import { LocalAiApi } from '../../Utils/GDevelopServices/ApiConfigs';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
-import { Column, Line } from '../../UI/Grid';
+import { Column } from '../../UI/Grid';
 import Text from '../../UI/Text';
 import CompactTextField from '../../UI/CompactTextField';
 import AlertMessage from '../../UI/AlertMessage';

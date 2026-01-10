@@ -108,17 +108,44 @@ export class ClaudeAgentClient {
   private extractFunctionCalls(text: string): Array<{ call_id: string; name: string; arguments: string }> {
     const calls: Array<{ call_id: string; name: string; arguments: string }> = [];
 
-    // Look for JSON function calls in the text
-    const jsonRegex = /\{"function"\s*:\s*"([^"]+)"\s*,\s*"args"\s*:\s*(\{[^}]+\})\}/g;
+    // Extract JSON from code blocks first, then try inline
+    const codeBlockRegex = /```(?:json)?\s*(\{[\s\S]*?\})\s*```/g;
     let match;
 
-    while ((match = jsonRegex.exec(text)) !== null) {
-      const [, funcName, argsJson] = match;
-      calls.push({
-        call_id: `tool_${this.toolCallCounter++}_${funcName}`,
-        name: funcName,
-        arguments: argsJson,
-      });
+    // Try code blocks first
+    while ((match = codeBlockRegex.exec(text)) !== null) {
+      try {
+        const json = JSON.parse(match[1]);
+        if (json.function && json.args) {
+          calls.push({
+            call_id: `tool_${this.toolCallCounter++}_${json.function}`,
+            name: json.function,
+            arguments: JSON.stringify(json.args),
+          });
+        }
+      } catch {
+        // Not valid JSON, skip
+      }
+    }
+
+    // Also try inline JSON (without code blocks)
+    // Match {"function": "...", "args": {...}} with proper brace matching
+    const inlineRegex = /\{"function"\s*:\s*"([^"]+)"\s*,\s*"args"\s*:\s*(\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\})\}/g;
+    while ((match = inlineRegex.exec(text)) !== null) {
+      const [fullMatch, funcName, argsJson] = match;
+      // Skip if already found in code block
+      if (!calls.some(c => c.name === funcName && c.arguments === argsJson)) {
+        try {
+          JSON.parse(argsJson); // Validate it's valid JSON
+          calls.push({
+            call_id: `tool_${this.toolCallCounter++}_${funcName}`,
+            name: funcName,
+            arguments: argsJson,
+          });
+        } catch {
+          // Invalid JSON args, skip
+        }
+      }
     }
 
     return calls;

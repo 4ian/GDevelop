@@ -58,8 +58,8 @@ type Props = {|
   project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   extension: gdEventsFunctionsExtension,
-  eventsBasedBehavior?: ?gdEventsBasedBehavior,
-  eventsBasedObject?: ?gdEventsBasedObject,
+  eventsBasedBehavior: ?gdEventsBasedBehavior,
+  eventsBasedObject: ?gdEventsBasedObject,
   properties: gdPropertiesContainer,
   isSharedProperties?: boolean,
   onPropertiesUpdated: () => void,
@@ -249,7 +249,7 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                     } else {
                       const property = propertyFolderOrProperty.getProperty();
                       return (
-                        <React.Fragment key={property.ptr}>
+                        <div key={property.ptr} style={styles.rowContainer}>
                           <div
                             ref={ref => {
                               propertyRefs.current.set(property.getName(), ref);
@@ -722,7 +722,7 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                               />
                             </ColumnStackLayout>
                           </Line>
-                        </React.Fragment>
+                        </div>
                       );
                     }
                   }

@@ -24,14 +24,8 @@ import {
 } from '../Utils/GDevelopServices/LocalGeneration';
 import { isLocalAiPreset } from './AiConfiguration';
 
-// Store the last used preset to determine routing for subsequent calls
-let lastUsedPresetId: string | null = null;
 // Map request IDs to whether they are local
 const localRequestIds = new Set<string>();
-
-export const setLastUsedPresetId = (presetId: string) => {
-  lastUsedPresetId = presetId;
-};
 
 const isLocalRequest = (aiRequestId: string): boolean => {
   return localRequestIds.has(aiRequestId);
@@ -61,7 +55,6 @@ export const createAiRequestRouted = async (
   |}
 ): Promise<AiRequest> => {
   const presetId = params.aiConfiguration.presetId;
-  setLastUsedPresetId(presetId);
 
   // Check if this should use local AI
   if (isLocalAiPreset(presetId)) {

@@ -121,6 +121,35 @@ export const GDevelopAiCdn = {
   },
 };
 
+// Local AI Server Configuration (Claude Agent SDK)
+export const LocalAiApi = {
+  // Default URL for local Claude AI server
+  defaultBaseUrl: 'http://localhost:3030',
+  // Get current URL from localStorage or use default
+  getBaseUrl: () => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      return window.localStorage.getItem('localAiBaseUrl') || LocalAiApi.defaultBaseUrl;
+    }
+    return LocalAiApi.defaultBaseUrl;
+  },
+  setBaseUrl: (url: string) => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.setItem('localAiBaseUrl', url);
+    }
+  },
+  isEnabled: () => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      return window.localStorage.getItem('useLocalAi') === 'true';
+    }
+    return false;
+  },
+  setEnabled: (enabled: boolean) => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.setItem('useLocalAi', enabled ? 'true' : 'false');
+    }
+  },
+};
+
 export const GDevelopProjectResourcesStorage = {
   baseUrl: isDev
     ? 'https://project-resources-dev.gdevelop.io'

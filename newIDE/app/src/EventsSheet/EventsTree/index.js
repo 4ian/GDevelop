@@ -17,7 +17,6 @@ import {
   eventsTreeWithSearchResults,
   handle,
   aiGeneratedEventHandle,
-  icon,
 } from './ClassNames';
 import {
   type SelectionState,
@@ -38,7 +37,7 @@ import 'react-sortable-tree/style.css';
 import './style.css';
 import BottomButtons from './BottomButtons';
 import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
-import { CorsAwareImage } from '../../UI/CorsAwareImage';
+import ThumbnailImage from '../../UI/ThumbnailImage';
 import { Line } from '../../UI/Grid';
 import { type Preferences } from '../../MainFrame/Preferences/PreferencesContext';
 import { type Tutorial } from '../../Utils/GDevelopServices/Tutorial';
@@ -606,13 +605,21 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
         );
         if (!object) return null;
 
+        const thumbnail = getThumbnail(project, object.getConfiguration());
         return (
-          <CorsAwareImage
-            className={classNames({
-              [icon]: true,
-            })}
+          <ThumbnailImage
+            project={project}
+            thumbnail={thumbnail}
             alt=""
-            src={getThumbnail(project, object.getConfiguration()).thumbnailSrc}
+            style={{
+              // Match the icon class styles
+              maxWidth: 16,
+              maxHeight: 16,
+              verticalAlign: 'text-bottom',
+              margin: '0 2px',
+            }}
+            maxWidth={16}
+            maxHeight={16}
           />
         );
       },

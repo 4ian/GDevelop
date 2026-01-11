@@ -17,6 +17,86 @@ export type Thumbnail = {|
 |};
 
 /**
+ * Data needed to render a spritesheet frame, extracted from PIXI texture.
+ */
+export type SpritesheetFrameData = {|
+  /** The source URL of the spritesheet image */
+  imageSrc: string,
+  /** The frame rectangle in the spritesheet (x, y, width, height) */
+  frame: {| x: number, y: number, width: number, height: number |},
+  /** The original size of the frame (for trimmed sprites, this is the untrimmed size) */
+  originalSize: {| width: number, height: number |},
+  /** Whether the image should be rendered smooth or pixelated */
+  isSmooth: boolean,
+|};
+
+/**
+ * Calculates the CSS styles needed to display a spritesheet frame.
+ * Uses a div container with overflow:hidden and transforms to crop/scale the image.
+ */
+export const getSpritesheetFrameStyles = (
+  frameData: SpritesheetFrameData,
+  maxWidth: ?number,
+  maxHeight: ?number
+): {|
+  containerStyle: {|
+    position: 'relative',
+    overflow: 'hidden',
+    width: number,
+    height: number,
+    display: 'inline-block',
+    lineHeight: 0,
+  |},
+  imageStyle: {|
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    display: 'block',
+    transformOrigin: 'top left',
+    transform: string,
+    imageRendering: 'auto' | 'pixelated',
+    maxWidth: 'none',
+    maxHeight: 'none',
+  |},
+|} => {
+  const { frame } = frameData;
+
+  const baseW = frame.width;
+  const baseH = frame.height;
+
+  const scale =
+    maxWidth != null && maxHeight != null
+      ? Math.min(maxWidth / baseW, maxHeight / baseH, 1)
+      : 1;
+
+  // Calculate the offset to position the frame at (0,0) in the container
+  const offsetX = frame.x * scale;
+  const offsetY = frame.y * scale;
+
+  return {
+    containerStyle: {
+      position: 'relative',
+      overflow: 'hidden',
+      width: Math.round(baseW * scale),
+      height: Math.round(baseH * scale),
+      display: 'inline-block',
+      lineHeight: 0,
+    },
+    imageStyle: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      display: 'block',
+      transformOrigin: 'top left',
+      transform: `translate(${-offsetX}px, ${-offsetY}px) scale(${scale})`,
+      imageRendering: frameData.isSmooth ? 'auto' : 'pixelated',
+      maxWidth: 'none',
+      maxHeight: 'none',
+    },
+  };
+};
+
+/**
  * Gets the image URL and optional spritesheet frame info from a sprite.
  * This is a helper to extract thumbnail information from a gdSprite.
  */

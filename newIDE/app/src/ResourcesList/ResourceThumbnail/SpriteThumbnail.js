@@ -6,9 +6,11 @@ import { CorsAwareImage } from '../../UI/CorsAwareImage';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { useLongTouch } from '../../Utils/UseLongTouch';
 import CheckeredBackground from '../CheckeredBackground';
-import PixiResourcesLoader, {
-  type SpritesheetOrLoadingError,
-} from '../../ObjectsRendering/PixiResourcesLoader';
+import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
+import {
+  getSpritesheetFrameStyles,
+  type SpritesheetFrameData,
+} from '../../ObjectsRendering/Thumbnail';
 
 const styles = {
   spriteThumbnail: {
@@ -56,10 +58,7 @@ const SpriteThumbnail = (props: Props) => {
   const [error, setError] = React.useState(false);
 
   // State for spritesheet frame support
-  const [
-    spritesheetData,
-    setSpritesheetData,
-  ] = React.useState<SpritesheetOrLoadingError | null>(null);
+  const [frameData, setFrameData] = React.useState<?SpritesheetFrameData>(null);
   const [isLoading, setIsLoading] = React.useState(false);
 
   const usesSpritesheetFrame = sprite.usesSpritesheetFrame();
@@ -73,7 +72,7 @@ const SpriteThumbnail = (props: Props) => {
   React.useEffect(
     () => {
       if (!usesSpritesheetFrame) {
-        setSpritesheetData(null);
+        setFrameData(null);
         return;
       }
 
@@ -81,12 +80,59 @@ const SpriteThumbnail = (props: Props) => {
       setIsLoading(true);
 
       (async () => {
-        const result = await PixiResourcesLoader.getSpritesheet(
+        const spritesheetOrLoadingError = await PixiResourcesLoader.getSpritesheet(
           project,
           spritesheetResourceName
         );
         if (cancelled) return;
-        setSpritesheetData(result);
+
+        const spritesheet = spritesheetOrLoadingError.spritesheet;
+        if (!spritesheet) {
+          setFrameData(null);
+          setIsLoading(false);
+          return;
+        }
+
+        const texture = spritesheet.textures[frameName];
+        if (!texture || !texture.frame || !texture.orig) {
+          setFrameData(null);
+          setIsLoading(false);
+          return;
+        }
+
+        // Get the image source from the base texture
+        let imageSrc = '';
+        if (
+          texture.baseTexture &&
+          texture.baseTexture.resource &&
+          texture.baseTexture.resource.source instanceof HTMLImageElement
+        ) {
+          imageSrc = texture.baseTexture.resource.source.src;
+        }
+
+        if (!imageSrc) {
+          setFrameData(null);
+          setIsLoading(false);
+          return;
+        }
+
+        // Spritesheets are typically pixel art, so default to not smooth
+        const isSmooth = false;
+
+        setFrameData({
+          imageSrc,
+          frame: {
+            x: texture.frame.x,
+            y: texture.frame.y,
+            width: texture.frame.width,
+            height: texture.frame.height,
+          },
+          originalSize: {
+            width: texture.orig.width,
+            height: texture.orig.height,
+          },
+          isSmooth,
+        });
         setIsLoading(false);
       })();
 
@@ -94,7 +140,7 @@ const SpriteThumbnail = (props: Props) => {
         cancelled = true;
       };
     },
-    [project, usesSpritesheetFrame, spritesheetResourceName]
+    [project, usesSpritesheetFrame, spritesheetResourceName, frameName]
   );
 
   // Allow a long press to show the context menu
@@ -149,62 +195,35 @@ const SpriteThumbnail = (props: Props) => {
     );
   };
 
-  // Render spritesheet frame thumbnail
+  // Render spritesheet frame thumbnail using shared utility
   const renderSpritesheetFrame = () => {
-    if (isLoading || !spritesheetData || !spritesheetData.spritesheet) {
+    if (isLoading || !frameData) {
       return null;
     }
 
-    const spritesheet = spritesheetData.spritesheet;
-    const texture = spritesheet.textures[frameName];
-    if (!texture || !texture.frame || !texture.orig) {
-      return null;
-    }
-
-    // Get the image source from the base texture
-    let imageSrc = '';
-    if (
-      texture.baseTexture &&
-      texture.baseTexture.resource &&
-      texture.baseTexture.resource.source instanceof HTMLImageElement
-    ) {
-      imageSrc = texture.baseTexture.resource.source.src;
-    }
-
-    if (!imageSrc) {
-      return null;
-    }
-
-    const frame = texture.frame;
-    const orig = texture.orig;
-
-    // Calculate the scale to fit the frame within the thumbnail size
-    const scale = Math.min(size / orig.width, size / orig.height, 1);
-
-    const frameStyle = {
-      ...styles.spriteThumbnailImage,
-      objectFit: 'none',
-      objectPosition: `-${frame.x}px -${frame.y}px`,
-      width: orig.width,
-      height: orig.height,
-      maxWidth: 'none',
-      maxHeight: 'none',
-      transform: `scale(${scale})`,
-      display: error ? 'none' : undefined,
-    };
+    const { containerStyle: frameContainerStyle, imageStyle } = getSpritesheetFrameStyles(
+      frameData,
+      size,
+      size
+    );
 
     return (
-      <CorsAwareImage
-        style={frameStyle}
-        alt={displayName}
-        src={imageSrc}
-        onError={() => {
-          setError(true);
-        }}
-        onLoad={() => {
-          setError(false);
-        }}
-      />
+      <div style={frameContainerStyle}>
+        <CorsAwareImage
+          style={{
+            ...imageStyle,
+            display: error ? 'none' : undefined,
+          }}
+          alt={displayName}
+          src={frameData.imageSrc}
+          onError={() => {
+            setError(true);
+          }}
+          onLoad={() => {
+            setError(false);
+          }}
+        />
+      </div>
     );
   };
 

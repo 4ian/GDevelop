@@ -68,10 +68,12 @@ export const ObjectPreview = ({ project, object }: Props) => {
         ) : (
           <CorsAwareImage
             alt=""
-            src={ObjectsRenderingService.getThumbnail(
-              project,
-              object.getConfiguration()
-            )}
+            src={
+              ObjectsRenderingService.getThumbnail(
+                project,
+                object.getConfiguration()
+              ).thumbnailSrc
+            }
             style={{
               ...styles.previewImage,
               maxWidth: 128 - 2 * paddingSize,

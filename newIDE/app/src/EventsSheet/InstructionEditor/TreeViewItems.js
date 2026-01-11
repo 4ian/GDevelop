@@ -4,6 +4,7 @@ import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import { mapFor } from '../../Utils/MapFor';
 import getObjectByName from '../../Utils/GetObjectByName';
 import { type EnumeratedInstructionMetadata } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
+import { type Thumbnail } from '../../ObjectsRendering/Thumbnail';
 
 export interface TreeViewItemContent {
   applySearch: boolean;
@@ -27,7 +28,7 @@ export type ObjectTreeViewItemProps = {|
   getThumbnail: (
     project: gdProject,
     objectConfiguration: gdObjectConfiguration
-  ) => string,
+  ) => Thumbnail,
   project: gdProject,
 |};
 
@@ -170,7 +171,7 @@ export class ObjectGroupObjectTreeViewItemContent
     return this.props.getThumbnail(
       this.props.project,
       this.object.getConfiguration()
-    );
+    ).thumbnailSrc;
   }
 }
 
@@ -446,7 +447,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     return this.props.getThumbnail(
       this.props.project,
       this.object.getObject().getConfiguration()
-    );
+    ).thumbnailSrc;
   }
 }
 

@@ -4,6 +4,7 @@ import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
 import { rgbStringToHexNumber } from '../../Utils/ColorTransformer';
 import * as PIXI from 'pixi.js-legacy';
+import { type Thumbnail, makeThumbnailFromUrl } from '../Thumbnail';
 const gd: libGDevelop = global.gd;
 
 /**
@@ -73,14 +74,14 @@ export default class RenderedTextInstance extends RenderedInstance {
   }
 
   /**
-   * Return a URL for thumbnail of the specified object.
+   * Return a Thumbnail for the specified object.
    */
   static getThumbnail(
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ) {
-    return 'CppPlatform/Extensions/texticon24.png';
+  ): Thumbnail {
+    return makeThumbnailFromUrl('CppPlatform/Extensions/texticon24.png');
   }
 
   update() {

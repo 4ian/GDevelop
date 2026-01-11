@@ -56,10 +56,12 @@ export const renderObjectListItem = ({
       leftIcon={
         <ListIcon
           iconSize={iconSize}
-          src={ObjectsRenderingService.getThumbnail(
-            project,
-            objectWithContext.object.getConfiguration()
-          )}
+          src={
+            ObjectsRenderingService.getThumbnail(
+              project,
+              objectWithContext.object.getConfiguration()
+            ).thumbnailSrc
+          }
         />
       }
       onClick={onClick}

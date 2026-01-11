@@ -18,10 +18,10 @@ const generateLayoutObjectsOptions = (
   ).containerObjectsList.map(item => ({
     text: item.object.getName(),
     handler: () => onChoose(item.object, onChooseArg),
-    iconSrc: ObjectsRenderingService.getThumbnail.bind(ObjectsRenderingService)(
+    iconSrc: ObjectsRenderingService.getThumbnail(
       project,
       item.object.getConfiguration()
-    ),
+    ).thumbnailSrc,
   }));
 };
 

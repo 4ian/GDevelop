@@ -17,6 +17,7 @@ import GDevelopJsInitializerDecorator, {
 import { type HotReloadPreviewButtonProps } from '../../HotReload/HotReloadPreviewButton';
 import Home from '../../UI/CustomSvgIcons/Home';
 import fakeResourceManagementProps from '../FakeResourceManagement';
+import { makeThumbnailFromUrl } from '../../ObjectsRendering/Thumbnail';
 
 export default {
   title: 'UI Building Blocks/ClosableTabs',
@@ -296,7 +297,7 @@ export const WithObjectsList = () => (
             {
               <TabContentContainer active={value === 1}>
                 <ObjectsList
-                  getThumbnail={() => 'res/unknown32.png'}
+                  getThumbnail={() => makeThumbnailFromUrl('res/unknown32.png')}
                   project={testProject.project}
                   layout={testProject.testLayout}
                   eventsBasedObject={null}

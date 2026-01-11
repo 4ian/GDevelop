@@ -813,7 +813,6 @@ const CustomObjectPropertiesEditor = (props: Props) => {
             >
               <PointsEditor
                 animations={animations}
-                resourcesLoader={ResourcesLoader}
                 project={project}
                 onPointsUpdated={onObjectUpdated}
                 onRenamedPoint={(oldName, newName) => {
@@ -867,7 +866,6 @@ const CustomObjectPropertiesEditor = (props: Props) => {
             >
               <CollisionMasksEditor
                 animations={animations}
-                resourcesLoader={ResourcesLoader}
                 project={project}
                 onMasksUpdated={onObjectUpdated}
                 onCreateMatchingSpriteCollisionMask={

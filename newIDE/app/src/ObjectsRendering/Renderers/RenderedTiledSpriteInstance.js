@@ -3,6 +3,7 @@ import RenderedInstance from './RenderedInstance';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
 import * as PIXI from 'pixi.js-legacy';
+import { type Thumbnail, makeThumbnailFromUrl } from '../Thumbnail';
 const gd: libGDevelop = global.gd;
 
 /**
@@ -48,19 +49,17 @@ export default class RenderedTiledSpriteInstance extends RenderedInstance {
   }
 
   /**
-   * Return a URL for thumbnail of the specified object.
+   * Return a Thumbnail for the specified object.
    */
   static getThumbnail(
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ) {
+  ): Thumbnail {
     const tiledSprite = gd.asTiledSpriteConfiguration(objectConfiguration);
 
-    return ResourcesLoader.getResourceFullUrl(
-      project,
-      tiledSprite.getTexture(),
-      {}
+    return makeThumbnailFromUrl(
+      ResourcesLoader.getResourceFullUrl(project, tiledSprite.getTexture(), {})
     );
   }
 

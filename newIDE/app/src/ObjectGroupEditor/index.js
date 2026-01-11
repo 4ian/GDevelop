@@ -107,10 +107,12 @@ const ObjectGroupEditor = ({
             project && object ? (
               <ListIcon
                 iconSize={24}
-                src={ObjectsRenderingService.getThumbnail(
-                  project,
-                  object.getConfiguration()
-                )}
+                src={
+                  ObjectsRenderingService.getThumbnail(
+                    project,
+                    object.getConfiguration()
+                  ).thumbnailSrc
+                }
               />
             ) : null;
           return isObjectListLocked ? (

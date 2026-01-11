@@ -303,7 +303,7 @@ export default function ExpressionAutocompletionsDisplayer({
                         ? ObjectsRenderingService.getThumbnail(
                             project,
                             expressionAutocompletion.objectConfiguration
-                          )
+                          ).thumbnailSrc
                         : 'res/types/object.png'
                       : expressionAutocompletion.kind === 'Behavior'
                       ? project && expressionAutocompletion.behaviorType

@@ -612,7 +612,7 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
               [icon]: true,
             })}
             alt=""
-            src={getThumbnail(project, object.getConfiguration())}
+            src={getThumbnail(project, object.getConfiguration()).thumbnailSrc}
           />
         );
       },

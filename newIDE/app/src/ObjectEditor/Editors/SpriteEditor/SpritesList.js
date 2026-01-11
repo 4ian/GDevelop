@@ -5,6 +5,7 @@ import * as React from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { mapFor } from '../../../Utils/MapFor';
 import DirectionTools from './DirectionTools';
+import SpriteThumbnail from '../../../ResourcesList/ResourceThumbnail/SpriteThumbnail';
 import ImageThumbnail from '../../../ResourcesList/ResourceThumbnail/ImageThumbnail';
 import {
   copySpritePoints,
@@ -68,12 +69,12 @@ const SortableSpriteThumbnail = SortableElement(
     onContextMenu,
     isFirst,
   }) => (
-    <ImageThumbnail
+    <SpriteThumbnail
       selectable
       selected={selected}
       onSelect={onSelect}
       onContextMenu={onContextMenu}
-      resourceName={sprite.getImageName()}
+      sprite={sprite}
       resourcesLoader={resourcesLoader}
       project={project}
       style={isFirst ? {} : styles.thumbnailExtraStyle}
@@ -113,13 +114,13 @@ const SortableList = SortableContainer(
               />
             ) : (
               // If there is only one sprite, don't make it draggable.
-              <ImageThumbnail
+              <SpriteThumbnail
                 key={sprite.ptr}
                 selectable
                 selected={!!selectedSprites[sprite.ptr]}
                 onSelect={selected => onSelectSprite(sprite, selected)}
                 onContextMenu={(x, y) => onOpenSpriteContextMenu(x, y, sprite)}
-                resourceName={sprite.getImageName()}
+                sprite={sprite}
                 resourcesLoader={resourcesLoader}
                 project={project}
                 size={SPRITE_SIZE}
@@ -552,15 +553,9 @@ const SpritesList = ({
           }
         }
 
-        // TODO: show a dialog allowing the user to select the animation of one/more frames of the spritesheet to add.
-        // And then create the sprites:
+        // Open the spritesheet frames selector dialog to allow the user
+        // to select one or more frames from the spritesheet.
         setSelectedSpritesheetResourceName(resourceName);
-
-        // if (selectedResources.length && onSpriteUpdated) onSpriteUpdated();
-        // if (directionSpritesCountBeforeAdding === 0 && onFirstSpriteUpdated) {
-        //   // If there was no sprites before, we can assume the first sprite was added.
-        //   onFirstSpriteUpdated();
-        // }
       } catch (err) {
         // Should never happen, errors should be shown in the interface.
         console.error('Unable to choose a resource', err);

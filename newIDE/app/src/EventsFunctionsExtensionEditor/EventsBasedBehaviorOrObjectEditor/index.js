@@ -198,6 +198,7 @@ export const EventsBasedBehaviorOrObjectEditor = React.forwardRef<
                 }
                 extension={eventsFunctionsExtension}
                 eventsBasedBehavior={eventsBasedBehavior}
+                eventsBasedObject={eventsBasedObject}
                 properties={eventsBasedEntity.getPropertyDescriptors()}
                 behaviorObjectType={
                   eventsBasedBehavior ? eventsBasedBehavior.getObjectType() : ''
@@ -226,6 +227,7 @@ export const EventsBasedBehaviorOrObjectEditor = React.forwardRef<
                 }
                 extension={eventsFunctionsExtension}
                 eventsBasedBehavior={eventsBasedBehavior}
+                eventsBasedObject={null}
                 properties={eventsBasedBehavior.getSharedPropertyDescriptors()}
                 behaviorObjectType={
                   eventsBasedBehavior ? eventsBasedBehavior.getObjectType() : ''

@@ -10,7 +10,7 @@
 #include <set>
 #include "GDCore/String.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
-#include "GDCore/Project/ObjectFolderOrObject.h"
+#include "GDCore/Project/FolderOrItem.h"  // NEU: statt ObjectFolderOrObject.h
 namespace gd {
 class Object;
 class Project;
@@ -34,6 +34,10 @@ namespace gd {
  *
  * \ingroup PlatformDefinition
  */
+
+template <typename T> class FolderOrItem;
+using ObjectFolderOrObject = FolderOrItem<gd::Object>;
+
 class GD_CORE_API ObjectsContainer {
  public:
   enum SourceType {
@@ -124,7 +128,7 @@ class GD_CORE_API ObjectsContainer {
       const gd::Project& project,
       const gd::String& objectType,
       const gd::String& name,
-      gd::ObjectFolderOrObject& objectFolderOrObject,
+      gd::FolderOrItem<gd::Object>& folderOrItem,  // GEÄNDERT
       std::size_t position);
 
   /**
@@ -161,9 +165,9 @@ class GD_CORE_API ObjectsContainer {
    * moved in memory, as referenced by smart pointers internally).
    */
   void MoveObjectFolderOrObjectToAnotherContainerInFolder(
-      gd::ObjectFolderOrObject& objectFolderOrObject,
+      gd::FolderOrItem<gd::Object>& folderOrItem,  // GEÄNDERT
       gd::ObjectsContainer& newContainer,
-      gd::ObjectFolderOrObject& newParentFolder,
+      gd::FolderOrItem<gd::Object>& newParentFolder,  // GEÄNDERT
       std::size_t newPosition);
 
   /**
@@ -190,12 +194,12 @@ class GD_CORE_API ObjectsContainer {
 
   /**
    * Returns a vector containing all object and folders in this container.
-   * Only use this for checking if you hold a valid `ObjectFolderOrObject` -
+   * Only use this for checking if you hold a valid `FolderOrItem` -
    * don't use this for rendering or anything else.
    */
-  std::vector<const ObjectFolderOrObject*> GetAllObjectFolderOrObjects() const;
+  std::vector<const FolderOrItem<gd::Object>*> GetAllObjectFolderOrObjects() const;  // GEÄNDERT
 
-  gd::ObjectFolderOrObject& GetRootFolder() {
+  gd::FolderOrItem<gd::Object>& GetRootFolder() {  // GEÄNDERT
       return *rootFolder;
   }
 
@@ -251,7 +255,7 @@ class GD_CORE_API ObjectsContainer {
 
  private:
   SourceType sourceType = Unknown;
-  std::unique_ptr<gd::ObjectFolderOrObject> rootFolder;
+  std::unique_ptr<gd::FolderOrItem<gd::Object>> rootFolder;  // GEÄNDERT: Template statt konkrete Klasse
 
   /**
    * Initialize from another variables container, copying elements. Used by

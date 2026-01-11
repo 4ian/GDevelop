@@ -84,7 +84,7 @@
 #include <GDCore/Project/NamedPropertyDescriptor.h>
 #include <GDCore/Project/Object.h>
 #include <GDCore/Project/ObjectTools.h>
-#include <GDCore/Project/ObjectFolderOrObject.h>
+#include <GDCore/Project/ObjectsContainer.h>
 #include <GDCore/Project/ObjectConfiguration.h>
 #include <GDCore/Project/Project.h>
 #include <GDCore/Project/ProjectScopedContainers.h>

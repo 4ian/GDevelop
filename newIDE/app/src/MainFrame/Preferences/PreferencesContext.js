@@ -234,10 +234,16 @@ export type PreferencesValues = {|
 |};
 
 /**
+ * Partial PreferencesValues that can be overridden per-project via preferences block in settings.yaml.
+ */
+export type ProjectSpecificPreferencesValues = $Shape<PreferencesValues>;
+
+/**
  * Type containing all the preferences of GDevelop and their setters.
  */
 export type Preferences = {|
   values: PreferencesValues,
+  setMultipleValues: (updates: ProjectSpecificPreferencesValues) => void,
   setLanguage: (language: string) => void,
   setThemeName: (themeName: string) => void,
   setCodeEditorThemeName: (codeEditorThemeName: string) => void,
@@ -406,6 +412,7 @@ export const initialPreferences = {
     automaticallyUseCreditsForAiRequests: false,
     hasSeenInGameEditorWarning: false,
   },
+  setMultipleValues: () => {},
   setLanguage: () => {},
   setThemeName: () => {},
   setCodeEditorThemeName: () => {},

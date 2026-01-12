@@ -1097,13 +1097,13 @@ const MainFrame = (props: Props) => {
           authenticatedUser,
         }));
 
-        // Read and apply project-specific preferences from settings.ini if it exists
+        // Read and apply project settings from settings.yaml if it exists
         try {
-          const projectSettings = await readProjectSettings(
+          const rawSettings = await readProjectSettings(
             updatedFileMetadata.fileIdentifier
           );
-          if (projectSettings) {
-            applyProjectSettings(projectSettings, preferences);
+          if (rawSettings) {
+            applyProjectSettings(rawSettings, preferences);
           }
         } catch (error) {
           console.warn(

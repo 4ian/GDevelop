@@ -2,6 +2,7 @@
 import * as React from 'react';
 import PixiResourcesLoader from './PixiResourcesLoader';
 import { type Thumbnail, type SpritesheetFrameData } from './Thumbnail';
+import { isProjectImageResourceSmooth } from '../ResourcesList/ResourcePreview/ImagePreview';
 
 export type ThumbnailResult = {|
   /** Whether the thumbnail is currently loading */
@@ -81,8 +82,10 @@ export const useThumbnail = (
           return;
         }
 
-        // Spritesheets are typically pixel art, so default to not smooth
-        const isSmooth = false;
+        const isSmooth = isProjectImageResourceSmooth(
+          project,
+          spritesheetResourceName
+        );
 
         setFrameData({
           imageSrc,

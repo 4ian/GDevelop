@@ -14,6 +14,7 @@ import sample from 'lodash/sample';
 import Toggle from '../../../UI/Toggle';
 import Text from '../../../UI/Text';
 import { ResponsiveLineStackLayout } from '../../../UI/Layout';
+import { makeThumbnailFromUrl } from '../../../ObjectsRendering/Thumbnail';
 
 export default {
   title: 'UI Building Blocks/TreeView',
@@ -495,16 +496,16 @@ export const Default = () => {
                     selectedItems={selectedItems}
                     onSelectItems={onSelectItems}
                     onRenameItem={action('Rename item')}
-                    getItemThumbnail={node =>
-                      node.children
-                        ? null
-                        : sample([
-                            'res/unknown32.png',
-                            'res/view24.png',
-                            'res/bug24.png',
-                            'res/save_all24.png',
-                          ])
-                    }
+                    getItemThumbnail={node => {
+                      if (node.children) return null;
+                      const src = sample([
+                        'res/unknown32.png',
+                        'res/view24.png',
+                        'res/bug24.png',
+                        'res/save_all24.png',
+                      ]);
+                      return src ? makeThumbnailFromUrl(src) : null;
+                    }}
                     // $FlowIgnore
                     getItemChildren={node => node.children}
                     buildMenuTemplate={() => [{ label: 'salut' }]}

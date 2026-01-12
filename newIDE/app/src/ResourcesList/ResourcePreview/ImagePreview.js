@@ -77,6 +77,20 @@ const styles = {
   },
 };
 
+/**
+ * Spritesheet frame data for displaying a specific frame from a spritesheet.
+ */
+export type SpritesheetFrameForPreview = {|
+  /** X position of the frame in the spritesheet */
+  x: number,
+  /** Y position of the frame in the spritesheet */
+  y: number,
+  /** Width of the frame */
+  width: number,
+  /** Height of the frame */
+  height: number,
+|};
+
 type Props = {|
   resourceName: string,
   imageResourceSource: string,
@@ -99,6 +113,11 @@ type Props = {|
   isImagePrivate?: boolean,
   onImageLoaded?: () => void,
   hideLoader?: boolean,
+  /**
+   * If provided, only the specified frame region of the image will be displayed.
+   * Used for spritesheet support - the image is clipped to show only this frame.
+   */
+  spritesheetFrame?: ?SpritesheetFrameForPreview,
 |};
 
 export const isProjectImageResourceSmooth = (
@@ -135,6 +154,7 @@ const ImagePreview = ({
   isImagePrivate,
   onImageLoaded,
   hideLoader,
+  spritesheetFrame,
 }: Props) => {
   const [errored, setErrored] = React.useState<boolean>(false);
   const [imageWidth, setImageWidth] = React.useState<?number>(null);
@@ -410,18 +430,25 @@ const ImagePreview = ({
     (e: any) => {
       const imgElement = e.target;
 
-      const newImageWidth = imgElement
-        ? imgElement.naturalWidth || imgElement.clientWidth
-        : 0;
-      const newImageHeight = imgElement
-        ? imgElement.naturalHeight || imgElement.clientHeight
-        : 0;
+      // For spritesheet frames, use the frame dimensions instead of full image
+      let newImageWidth, newImageHeight;
+      if (spritesheetFrame) {
+        newImageWidth = spritesheetFrame.width;
+        newImageHeight = spritesheetFrame.height;
+      } else {
+        newImageWidth = imgElement
+          ? imgElement.naturalWidth || imgElement.clientWidth
+          : 0;
+        newImageHeight = imgElement
+          ? imgElement.naturalHeight || imgElement.clientHeight
+          : 0;
+      }
       setImageHeight(newImageHeight);
       setImageWidth(newImageWidth);
       if (onImageSize) onImageSize([newImageWidth, newImageHeight]);
       if (onImageLoaded) onImageLoaded();
     },
-    [onImageLoaded, onImageSize]
+    [onImageLoaded, onImageSize, spritesheetFrame]
   );
 
   const onTouchEnd = React.useCallback((event: TouchEvent) => {
@@ -508,20 +535,52 @@ const ImagePreview = ({
     transformOrigin: '0 0',
   };
 
-  const imageContainerStyle = {
-    transform: `scale(${imageZoomFactor})`,
-    width: imageWidth,
-    height: imageHeight,
-    transformOrigin: '0 0',
-    display: 'flex',
-  };
+  // For spritesheet frames, we need to clip the image to show only the frame.
+  // The approach:
+  // - The inner container (imageContainerStyle) has overflow:hidden and the frame size
+  // - The image inside is positioned using transform to offset to the frame position
+  // - The scale is applied to the inner container
+  const imageContainerStyle = spritesheetFrame
+    ? {
+        // For spritesheet frames: use overflow hidden to clip, and scale
+        position: 'relative',
+        overflow: 'hidden',
+        width: imageWidth,
+        height: imageHeight,
+        transform: `scale(${imageZoomFactor})`,
+        transformOrigin: '0 0',
+      }
+    : {
+        transform: `scale(${imageZoomFactor})`,
+        width: imageWidth,
+        height: imageHeight,
+        transformOrigin: '0 0',
+        display: 'flex',
+      };
 
-  const imageStyle = {
-    ...styles.spriteThumbnailImage,
-    visibility,
-    ...(!isImageResourceSmooth ? styles.previewImagePixelated : undefined),
-    cursor: forcedCursor,
-  };
+  // For spritesheet frames, position the image to show only the frame
+  const imageStyle = spritesheetFrame
+    ? {
+        ...styles.spriteThumbnailImage,
+        visibility,
+        ...(!isImageResourceSmooth ? styles.previewImagePixelated : undefined),
+        cursor: forcedCursor,
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        // Apply the frame offset to show only the frame
+        transform: `translate(${-spritesheetFrame.x}px, ${-spritesheetFrame.y}px)`,
+        transformOrigin: '0 0',
+        // Don't limit the size - let the image be full size
+        maxWidth: 'none',
+        maxHeight: 'none',
+      }
+    : {
+        ...styles.spriteThumbnailImage,
+        visibility,
+        ...(!isImageResourceSmooth ? styles.previewImagePixelated : undefined),
+        cursor: forcedCursor,
+      };
 
   const overlayStyle = {
     position: 'absolute',

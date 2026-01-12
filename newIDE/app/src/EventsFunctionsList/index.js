@@ -48,6 +48,10 @@ import {
   type EventsBasedObjectCreationParameters,
 } from './EventsBasedObjectTreeViewItemContent';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
+import {
+  makeThumbnailFromUrl,
+  type Thumbnail,
+} from '../ObjectsRendering/Thumbnail';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { type ShowConfirmDeleteDialogOptions } from '../UI/Alert/AlertContext';
@@ -84,7 +88,7 @@ export interface TreeViewItemContent {
   getName(): string | React.Node;
   getId(): string;
   getHtmlId(index: number): ?string;
-  getThumbnail(): ?string;
+  getThumbnail(): ?Thumbnail;
   getDataset(): ?HTMLDataset;
   onSelect(): void;
   onClick(): void;
@@ -307,7 +311,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
     return null;
   }
 
-  getThumbnail(): ?string {
+  getThumbnail(): ?Thumbnail {
     return null;
   }
 
@@ -363,19 +367,19 @@ class ActionTreeViewItemContent implements TreeViewItemContent {
     i18n: I18nType,
     index: number
   ) => Array<MenuItemTemplate>;
-  thumbnail: ?string;
+  thumbnail: ?Thumbnail;
   onClickCallback: () => void;
 
   constructor(
     id: string,
     label: string | React.Node,
     onClickCallback: () => void,
-    thumbnail?: string
+    thumbnailSrc?: ?string
   ) {
     this.id = id;
     this.label = label;
     this.onClickCallback = onClickCallback;
-    this.thumbnail = thumbnail;
+    this.thumbnail = thumbnailSrc ? makeThumbnailFromUrl(thumbnailSrc) : null;
     this.buildMenuTemplateFunction = (i18n: I18nType, index: number) => [];
   }
 
@@ -417,7 +421,7 @@ class ActionTreeViewItemContent implements TreeViewItemContent {
 
   onSelect(): void {}
 
-  getThumbnail(): ?string {
+  getThumbnail(): ?Thumbnail {
     return this.thumbnail;
   }
 

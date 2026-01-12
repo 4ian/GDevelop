@@ -4,7 +4,10 @@ import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import { mapFor } from '../../Utils/MapFor';
 import getObjectByName from '../../Utils/GetObjectByName';
 import { type EnumeratedInstructionMetadata } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
-import { type Thumbnail } from '../../ObjectsRendering/Thumbnail';
+import {
+  makeThumbnailFromUrl,
+  type Thumbnail,
+} from '../../ObjectsRendering/Thumbnail';
 
 export interface TreeViewItemContent {
   applySearch: boolean;
@@ -13,7 +16,7 @@ export interface TreeViewItemContent {
   getId(): string;
   getHtmlId(index: number): ?string;
   getDataSet(): ?HTMLDataset;
-  getThumbnail(): ?string;
+  getThumbnail(): ?Thumbnail;
 }
 
 export interface TreeViewItem {
@@ -120,8 +123,8 @@ export class ObjectGroupTreeViewItemContent implements TreeViewItemContent {
     };
   }
 
-  getThumbnail(): ?string {
-    return 'res/ribbon_default/objectsgroups64.png';
+  getThumbnail(): ?Thumbnail {
+    return makeThumbnailFromUrl('res/ribbon_default/objectsgroups64.png');
   }
 }
 
@@ -167,11 +170,11 @@ export class ObjectGroupObjectTreeViewItemContent
     };
   }
 
-  getThumbnail(): ?string {
+  getThumbnail(): ?Thumbnail {
     return this.props.getThumbnail(
       this.props.project,
       this.object.getConfiguration()
-    ).thumbnailSrc;
+    );
   }
 }
 
@@ -273,7 +276,7 @@ export class MoreResultsTreeViewItemContent implements TreeViewItemContent {
   getDataSet() {
     return {};
   }
-  getThumbnail() {
+  getThumbnail(): ?Thumbnail {
     return null;
   }
 }
@@ -314,8 +317,9 @@ export class InstructionTreeViewItemContent implements TreeViewItemContent {
         : undefined,
     };
   }
-  getThumbnail() {
-    return this.instructionMetadata.iconFilename;
+  getThumbnail(): ?Thumbnail {
+    const src = this.instructionMetadata.iconFilename;
+    return src ? makeThumbnailFromUrl(src) : null;
   }
 }
 
@@ -349,7 +353,7 @@ export class LabelTreeViewItemContent implements TreeViewItemContent {
     return {};
   }
 
-  getThumbnail(): ?string {
+  getThumbnail(): ?Thumbnail {
     return null;
   }
 
@@ -443,11 +447,11 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     };
   }
 
-  getThumbnail(): ?string {
+  getThumbnail(): ?Thumbnail {
     return this.props.getThumbnail(
       this.props.project,
       this.object.getObject().getConfiguration()
-    ).thumbnailSrc;
+    );
   }
 }
 
@@ -487,7 +491,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     return { folderName: this.objectFolder.getFolderName() };
   }
 
-  getThumbnail(): ?string {
-    return 'FOLDER';
+  getThumbnail(): ?Thumbnail {
+    return makeThumbnailFromUrl('FOLDER');
   }
 }

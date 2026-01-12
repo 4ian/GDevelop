@@ -11,6 +11,7 @@ import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTar
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
+import { type Thumbnail } from '../../ObjectsRendering/Thumbnail';
 
 export const navigationKeys = [
   'ArrowDown',
@@ -49,6 +50,9 @@ type FlattenedNode<Item> = {|
   collapsed: boolean,
   selected: boolean,
   disableCollapse: boolean,
+  /** Thumbnail for the item. Can be a Thumbnail object (for spritesheet support) or a string URL. */
+  thumbnail?: ?Thumbnail,
+  /** @deprecated Use thumbnail instead. Kept for dragging preview compatibility. */
   thumbnailSrc?: ?string,
   item: Item,
 |};
@@ -75,6 +79,8 @@ export type ItemData<Item> = {|
   getItemHtmlId?: (Item, index: number) => ?string,
   forceDefaultDraggingPreview?: boolean,
   shouldSelectUponContextMenuOpening?: boolean,
+  /** Used for loading object thumbnails */
+  project?: ?gdProject,
 |};
 
 const getItemProps = memoizeOne(
@@ -102,7 +108,8 @@ const getItemProps = memoizeOne(
     DragSourceAndDropTarget: any => React.Node,
     getItemHtmlId?: (Item, index: number) => ?string,
     forceDefaultDraggingPreview?: boolean,
-    shouldSelectUponContextMenuOpening?: boolean
+    shouldSelectUponContextMenuOpening?: boolean,
+    project?: ?gdProject
   ): ItemData<Item> => ({
     onOpen,
     onClick,
@@ -120,6 +127,7 @@ const getItemProps = memoizeOne(
     getItemHtmlId,
     forceDefaultDraggingPreview,
     shouldSelectUponContextMenuOpening,
+    project,
   })
 );
 
@@ -145,7 +153,8 @@ type Props<Item> = {|
   getItemId: Item => string,
   getItemHtmlId?: (Item, index: number) => ?string,
   getItemChildren: Item => ?(Item[]),
-  getItemThumbnail?: Item => ?string,
+  /** Returns a Thumbnail for the item, or null if no thumbnail. */
+  getItemThumbnail?: Item => ?Thumbnail,
   getItemDataset?: Item => ?HTMLDataset,
   onEditItem?: Item => void,
   buildMenuTemplate: (Item, index: number) => any,
@@ -179,6 +188,8 @@ type Props<Item> = {|
   forceDefaultDraggingPreview?: boolean,
   shouldSelectUponContextMenuOpening?: boolean,
   shouldHideMenuIcon?: (item: Item) => boolean,
+  /** Used for loading object thumbnails */
+  project?: ?gdProject,
 |};
 
 const InnerTreeView = <Item: ItemBaseAttributes>(
@@ -212,6 +223,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
     forceDefaultDraggingPreview,
     shouldSelectUponContextMenuOpening,
     shouldHideMenuIcon,
+    project,
   }: Props<Item>,
   ref: TreeViewInterface<Item>
 ) => {
@@ -287,7 +299,9 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
         (typeof name === 'string' && name.toLowerCase().includes(searchText)) ||
         flattenedChildren.length > 0
       ) {
-        const thumbnailSrc = getItemThumbnail ? getItemThumbnail(item) : null;
+        const thumbnail = getItemThumbnail ? getItemThumbnail(item) : null;
+        // Keep thumbnailSrc for backwards compatibility (used in drag preview)
+        const thumbnailSrc = thumbnail ? thumbnail.thumbnailSrc : null;
         const selected = selectedNodeIds.includes(id);
         return [
           {
@@ -302,6 +316,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
             canHaveChildren,
             depth,
             selected,
+            thumbnail,
             thumbnailSrc,
             dataset,
             item,
@@ -599,7 +614,8 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
     DragSourceAndDropTarget,
     getItemHtmlId,
     forceDefaultDraggingPreview,
-    shouldSelectUponContextMenuOpening
+    shouldSelectUponContextMenuOpening,
+    project
   );
 
   // Reset opened nodes during search when user stops searching

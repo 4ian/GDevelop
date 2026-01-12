@@ -17,6 +17,10 @@ import {
 } from '.';
 import { isExtensionNameTaken } from './EventFunctionExtensionNameVerifier';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
+import {
+  makeThumbnailFromUrl,
+  type Thumbnail,
+} from '../ObjectsRendering/Thumbnail';
 
 const EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND = 'Events Functions Extension';
 
@@ -86,10 +90,10 @@ export class ExtensionTreeViewItemContent implements TreeViewItemContent {
     };
   }
 
-  getThumbnail(): ?string {
-    return (
+  getThumbnail(): ?Thumbnail {
+    return makeThumbnailFromUrl(
       this.eventsFunctionsExtension.getIconUrl() ||
-      'res/functions/extension_black.svg'
+        'res/functions/extension_black.svg'
     );
   }
 

@@ -371,10 +371,8 @@ const getTreeViewItemHtmlId = (item: TreeViewItem, index: number) =>
   item.content.getHtmlId(index);
 const getTreeViewItemChildren = (i18n: I18nType) => (item: TreeViewItem) =>
   item.getChildren(i18n);
-const getTreeViewItemThumbnail = (item: TreeViewItem) => {
-  const thumbnail = item.content.getThumbnail();
-  return thumbnail ? thumbnail.thumbnailSrc : null;
-};
+const getTreeViewItemThumbnail = (item: TreeViewItem) =>
+  item.content.getThumbnail();
 const getTreeViewItemDataSet = (item: TreeViewItem) =>
   item.content.getDataSet();
 const buildMenuTemplate = (i18n: I18nType) => (
@@ -1574,6 +1572,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       getItemThumbnail={getTreeViewItemThumbnail}
                       getItemChildren={getTreeViewItemChildren(i18n)}
                       multiSelect={false}
+                      project={project}
                       getItemId={getTreeViewItemId}
                       getItemHtmlId={getTreeViewItemHtmlId}
                       getItemDataset={getTreeViewItemDataSet}

@@ -8,6 +8,7 @@ import { useResponsiveWindowSize } from '../Responsive/ResponsiveWindowMeasurer'
 import ReadOnlyTreeViewRow from './ReadOnlyTreeViewRow';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import useForceUpdate from '../../Utils/UseForceUpdate';
+import { type Thumbnail } from '../../ObjectsRendering/Thumbnail';
 
 export const navigationKeys = [
   'ArrowDown',
@@ -54,6 +55,9 @@ type FlattenedNode<Item> = {|
   collapsed: boolean,
   selected: boolean,
   disableCollapse: boolean,
+  /** Thumbnail for the item. Can be a Thumbnail object (for spritesheet support). */
+  thumbnail?: ?Thumbnail,
+  /** @deprecated Use thumbnail instead. Kept for backwards compatibility. */
   thumbnailSrc?: ?string,
   item: Item,
 |};
@@ -121,7 +125,8 @@ type Props<Item> = {|
   getItemId: Item => string,
   getItemHtmlId?: (Item, index: number) => ?string,
   getItemChildren: Item => ?(Item[]),
-  getItemThumbnail?: Item => ?string,
+  /** Returns a Thumbnail for the item, or null if no thumbnail. */
+  getItemThumbnail?: Item => ?Thumbnail,
   getItemDataset?: Item => ?HTMLDataset,
   /**
    * Callback called when a folder is collapsed (folded).
@@ -241,7 +246,8 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
         (!applySearch || doesMatchSearch(name, searchText)) ||
         flattenedChildren.length > 0
       ) {
-        const thumbnailSrc = getItemThumbnail ? getItemThumbnail(item) : null;
+        const thumbnail = getItemThumbnail ? getItemThumbnail(item) : null;
+        const thumbnailSrc = thumbnail ? thumbnail.thumbnailSrc : null;
         const selected = selectedNodeIds.includes(id);
         return [
           {
@@ -252,6 +258,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
             canHaveChildren,
             depth,
             selected,
+            thumbnail,
             thumbnailSrc,
             dataset,
             item,

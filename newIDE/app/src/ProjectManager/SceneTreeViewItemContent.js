@@ -14,6 +14,10 @@ import { TreeViewItemContent, type TreeItemProps, scenesRootFolderId } from '.';
 import Tooltip from '@material-ui/core/Tooltip';
 import Flag from '@material-ui/icons/Flag';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
+import {
+  makeThumbnailFromUrl,
+  type Thumbnail,
+} from '../ObjectsRendering/Thumbnail';
 
 const SCENE_CLIPBOARD_KIND = 'Layout';
 
@@ -91,8 +95,8 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     };
   }
 
-  getThumbnail(): ?string {
-    return 'res/icons_default/scene_black.svg';
+  getThumbnail(): ?Thumbnail {
+    return makeThumbnailFromUrl('res/icons_default/scene_black.svg');
   }
 
   onClick(): void {

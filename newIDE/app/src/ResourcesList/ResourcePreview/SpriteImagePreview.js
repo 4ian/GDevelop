@@ -1,6 +1,9 @@
 // @flow
 import * as React from 'react';
-import ImagePreview, { isProjectImageResourceSmooth } from './ImagePreview';
+import ImagePreview, {
+  isProjectImageResourceSmooth,
+  type SpritesheetFrameForPreview,
+} from './ImagePreview';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
 
@@ -22,8 +25,8 @@ type Props = {|
 /**
  * A component that displays a sprite image, handling both regular images
  * and spritesheet frames. For regular images, it uses ImagePreview directly.
- * For spritesheet frames, it loads the spritesheet and displays the
- * specific frame.
+ * For spritesheet frames, it loads the spritesheet and uses ImagePreview's
+ * spritesheetFrame prop to display only the specific frame.
  */
 const SpriteImagePreview = ({
   project,
@@ -31,11 +34,13 @@ const SpriteImagePreview = ({
   onImageSize,
   renderOverlay,
 }: Props) => {
-  const [imageSource, setImageSource] = React.useState<string>('');
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [frameSize, setFrameSize] = React.useState<[number, number] | null>(
+  const [spritesheetFrame, setSpritesheetFrame] = React.useState<?SpritesheetFrameForPreview>(
     null
   );
+  const [spritesheetImageSrc, setSpritesheetImageSrc] = React.useState<string>(
+    ''
+  );
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
   const usesSpritesheetFrame = sprite.usesSpritesheetFrame();
   const spritesheetResourceName = usesSpritesheetFrame
@@ -48,8 +53,8 @@ const SpriteImagePreview = ({
   React.useEffect(
     () => {
       if (!usesSpritesheetFrame) {
-        setImageSource('');
-        setFrameSize(null);
+        setSpritesheetFrame(null);
+        setSpritesheetImageSrc('');
         return;
       }
 
@@ -57,26 +62,52 @@ const SpriteImagePreview = ({
       setIsLoading(true);
 
       (async () => {
-        const spritesheetData = await PixiResourcesLoader.getSpritesheet(
+        const spritesheetOrLoadingError = await PixiResourcesLoader.getSpritesheet(
           project,
           spritesheetResourceName
         );
         if (cancelled) return;
 
-        if (spritesheetData && spritesheetData.spritesheet) {
-          const texture = spritesheetData.spritesheet.textures[frameName];
-          if (texture && texture.frame && texture.orig) {
-            // Get the image source from the base texture
-            if (
-              texture.baseTexture &&
-              texture.baseTexture.resource &&
-              texture.baseTexture.resource.source instanceof HTMLImageElement
-            ) {
-              setImageSource(texture.baseTexture.resource.source.src);
-              setFrameSize([texture.orig.width, texture.orig.height]);
-            }
-          }
+        const spritesheet = spritesheetOrLoadingError.spritesheet;
+        if (!spritesheet) {
+          setSpritesheetFrame(null);
+          setSpritesheetImageSrc('');
+          setIsLoading(false);
+          return;
         }
+
+        const texture = spritesheet.textures[frameName];
+        if (!texture || !texture.frame) {
+          setSpritesheetFrame(null);
+          setSpritesheetImageSrc('');
+          setIsLoading(false);
+          return;
+        }
+
+        // Get the image source from the base texture
+        let imageSrc = '';
+        if (
+          texture.baseTexture &&
+          texture.baseTexture.resource &&
+          texture.baseTexture.resource.source instanceof HTMLImageElement
+        ) {
+          imageSrc = texture.baseTexture.resource.source.src;
+        }
+
+        if (!imageSrc) {
+          setSpritesheetFrame(null);
+          setSpritesheetImageSrc('');
+          setIsLoading(false);
+          return;
+        }
+
+        setSpritesheetImageSrc(imageSrc);
+        setSpritesheetFrame({
+          x: texture.frame.x,
+          y: texture.frame.y,
+          width: texture.frame.width,
+          height: texture.frame.height,
+        });
         setIsLoading(false);
       })();
 
@@ -87,37 +118,7 @@ const SpriteImagePreview = ({
     [project, usesSpritesheetFrame, spritesheetResourceName, frameName]
   );
 
-  // Handle the image size callback to return the frame size for spritesheet frames
-  const handleImageSize = React.useCallback(
-    (size: [number, number]) => {
-      // For spritesheet frames, the actual size is the frame size
-      if (usesSpritesheetFrame && onImageSize && frameSize) {
-        onImageSize(frameSize);
-      } else if (onImageSize) {
-        onImageSize(size);
-      }
-    },
-    [onImageSize, frameSize, usesSpritesheetFrame]
-  );
-
-  // Create a wrapper for the overlay that uses the frame dimensions for spritesheet frames
-  const renderOverlayWithFrameSize = React.useCallback(
-    overlayProps => {
-      if (!renderOverlay) return null;
-
-      if (usesSpritesheetFrame && frameSize) {
-        return renderOverlay({
-          ...overlayProps,
-          imageWidth: frameSize[0],
-          imageHeight: frameSize[1],
-        });
-      }
-      return renderOverlay(overlayProps);
-    },
-    [renderOverlay, frameSize, usesSpritesheetFrame]
-  );
-
-  // For regular images
+  // For regular images, use ImagePreview directly
   if (!usesSpritesheetFrame) {
     const imageResourceSource = ResourcesLoader.getResourceFullUrl(
       project,
@@ -137,8 +138,8 @@ const SpriteImagePreview = ({
     );
   }
 
-  // For spritesheet frames - loading state
-  if (isLoading || !imageSource) {
+  // For spritesheet frames - loading state or missing data
+  if (isLoading || !spritesheetFrame || !spritesheetImageSrc) {
     return (
       <ImagePreview
         resourceName=""
@@ -150,14 +151,18 @@ const SpriteImagePreview = ({
     );
   }
 
-  // For spritesheet frames - loaded
+  // Get the isSmooth setting from the spritesheet resource
+  const isSmooth = isProjectImageResourceSmooth(project, spritesheetResourceName);
+
+  // For spritesheet frames - use ImagePreview with spritesheetFrame prop
   return (
     <ImagePreview
       resourceName={`${spritesheetResourceName}:${frameName}`}
-      imageResourceSource={imageSource}
-      isImageResourceSmooth={false}
-      onImageSize={handleImageSize}
-      renderOverlay={renderOverlayWithFrameSize}
+      imageResourceSource={spritesheetImageSrc}
+      isImageResourceSmooth={isSmooth}
+      onImageSize={onImageSize}
+      renderOverlay={renderOverlay}
+      spritesheetFrame={spritesheetFrame}
     />
   );
 };

@@ -13,6 +13,10 @@ import {
 } from '../Utils/Serializer';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import {
+  makeThumbnailFromUrl,
+  type Thumbnail,
+} from '../ObjectsRendering/Thumbnail';
+import {
   TreeViewItemContent,
   type TreeItemProps,
   extensionObjectsRootFolderId,
@@ -120,10 +124,12 @@ export class EventsBasedObjectTreeViewItemContent
     return null;
   }
 
-  getThumbnail(): ?string {
-    return this.eventsBasedObject.isRenderedIn3D()
-      ? 'res/functions/object3d_black.svg'
-      : 'res/functions/object2d_black.svg';
+  getThumbnail(): ?Thumbnail {
+    return makeThumbnailFromUrl(
+      this.eventsBasedObject.isRenderedIn3D()
+        ? 'res/functions/object3d_black.svg'
+        : 'res/functions/object2d_black.svg'
+    );
   }
 
   getDataset(): ?HTMLDataset {

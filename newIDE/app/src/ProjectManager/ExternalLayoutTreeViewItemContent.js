@@ -16,6 +16,10 @@ import {
   externalLayoutsRootFolderId,
 } from '.';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
+import {
+  makeThumbnailFromUrl,
+  type Thumbnail,
+} from '../ObjectsRendering/Thumbnail';
 
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
 
@@ -81,8 +85,8 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
     };
   }
 
-  getThumbnail(): ?string {
-    return 'res/icons_default/external_layout_black.svg';
+  getThumbnail(): ?Thumbnail {
+    return makeThumbnailFromUrl('res/icons_default/external_layout_black.svg');
   }
 
   onClick(): void {

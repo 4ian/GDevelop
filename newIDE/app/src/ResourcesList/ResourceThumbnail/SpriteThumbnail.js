@@ -11,6 +11,9 @@ import {
   getSpritesheetFrameStyles,
   type SpritesheetFrameData,
 } from '../../ObjectsRendering/Thumbnail';
+import { isProjectImageResourceSmooth } from '../ResourcePreview/ImagePreview';
+
+const gd: libGDevelop = global.gd;
 
 const styles = {
   spriteThumbnail: {
@@ -116,8 +119,11 @@ const SpriteThumbnail = (props: Props) => {
           return;
         }
 
-        // Spritesheets are typically pixel art, so default to not smooth
-        const isSmooth = false;
+        // Get the isSmooth setting from the spritesheet resource
+        const isSmooth = isProjectImageResourceSmooth(
+          project,
+          spritesheetResourceName
+        );
 
         setFrameData({
           imageSrc,

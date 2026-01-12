@@ -1,7 +1,10 @@
 // @flow
 import * as React from 'react';
 import { CorsAwareImage } from './CorsAwareImage';
-import { type Thumbnail, getSpritesheetFrameStyles } from '../ObjectsRendering/Thumbnail';
+import {
+  type Thumbnail,
+  getSpritesheetFrameStyles,
+} from '../ObjectsRendering/Thumbnail';
 import { useThumbnail } from '../ObjectsRendering/useThumbnail';
 
 type Props = {|
@@ -59,11 +62,10 @@ const ThumbnailImage = ({
       return null;
     }
 
-    const { containerStyle, imageStyle: frameImageStyle } = getSpritesheetFrameStyles(
-      frameData,
-      maxWidth,
-      maxHeight
-    );
+    const {
+      containerStyle,
+      imageStyle: frameImageStyle,
+    } = getSpritesheetFrameStyles(frameData, maxWidth, maxHeight);
 
     return (
       <div style={{ ...containerStyle, ...style }} title={title}>

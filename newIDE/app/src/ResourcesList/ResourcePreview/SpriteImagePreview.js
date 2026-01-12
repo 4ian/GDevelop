@@ -34,9 +34,10 @@ const SpriteImagePreview = ({
   onImageSize,
   renderOverlay,
 }: Props) => {
-  const [spritesheetFrame, setSpritesheetFrame] = React.useState<?SpritesheetFrameForPreview>(
-    null
-  );
+  const [
+    spritesheetFrame,
+    setSpritesheetFrame,
+  ] = React.useState<?SpritesheetFrameForPreview>(null);
   const [spritesheetImageSrc, setSpritesheetImageSrc] = React.useState<string>(
     ''
   );
@@ -46,7 +47,9 @@ const SpriteImagePreview = ({
   const spritesheetResourceName = usesSpritesheetFrame
     ? sprite.getSpritesheetResourceName()
     : '';
-  const frameName = usesSpritesheetFrame ? sprite.getSpritesheetFrameName() : '';
+  const frameName = usesSpritesheetFrame
+    ? sprite.getSpritesheetFrameName()
+    : '';
   const resourceName = usesSpritesheetFrame ? '' : sprite.getImageName();
 
   // Load spritesheet data if this is a spritesheet frame
@@ -152,7 +155,10 @@ const SpriteImagePreview = ({
   }
 
   // Get the isSmooth setting from the spritesheet resource
-  const isSmooth = isProjectImageResourceSmooth(project, spritesheetResourceName);
+  const isSmooth = isProjectImageResourceSmooth(
+    project,
+    spritesheetResourceName
+  );
 
   // For spritesheet frames - use ImagePreview with spritesheetFrame prop
   return (

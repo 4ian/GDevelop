@@ -103,7 +103,11 @@ export const getSpritesheetFrameStyles = (
 export const getThumbnailFromSprite = (
   sprite: gdSprite,
   resourcesLoader: {
-    +getResourceFullUrl: (project: gdProject, resourceName: string, options: any) => string,
+    +getResourceFullUrl: (
+      project: gdProject,
+      resourceName: string,
+      options: any
+    ) => string,
     ...
   },
   project: gdProject

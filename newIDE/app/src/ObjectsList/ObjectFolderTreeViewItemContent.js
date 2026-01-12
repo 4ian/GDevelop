@@ -20,7 +20,10 @@ import { renderQuickCustomizationMenuItems } from '../QuickCustomization/QuickCu
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
-import { type Thumbnail, makeThumbnailFromUrl } from '../ObjectsRendering/Thumbnail';
+import {
+  type Thumbnail,
+  makeThumbnailFromUrl,
+} from '../ObjectsRendering/Thumbnail';
 
 const gd: libGDevelop = global.gd;
 

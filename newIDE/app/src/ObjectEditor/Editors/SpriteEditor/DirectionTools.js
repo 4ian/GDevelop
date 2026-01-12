@@ -78,7 +78,10 @@ const DirectionTools = ({
 
   // State for caching loaded spritesheet frame data
   const [spritesheetFrameCache, setSpritesheetFrameCache] = React.useState<{
-    [key: string]: {| frameData: SpritesheetFrameForPreview, imageSrc: string |},
+    [key: string]: {|
+      frameData: SpritesheetFrameForPreview,
+      imageSrc: string,
+    |},
   }>({});
 
   // Build sprite info for the animation preview
@@ -171,7 +174,10 @@ const DirectionTools = ({
         }
 
         if (!cancelled) {
-          setSpritesheetFrameCache(prevCache => ({ ...prevCache, ...newCache }));
+          setSpritesheetFrameCache(prevCache => ({
+            ...prevCache,
+            ...newCache,
+          }));
         }
       })();
 

@@ -68,7 +68,9 @@ const SpriteThumbnail = (props: Props) => {
   const spritesheetResourceName = usesSpritesheetFrame
     ? sprite.getSpritesheetResourceName()
     : '';
-  const frameName = usesSpritesheetFrame ? sprite.getSpritesheetFrameName() : '';
+  const frameName = usesSpritesheetFrame
+    ? sprite.getSpritesheetFrameName()
+    : '';
   const resourceName = usesSpritesheetFrame ? '' : sprite.getImageName();
 
   // Load spritesheet data if this is a spritesheet frame
@@ -207,11 +209,10 @@ const SpriteThumbnail = (props: Props) => {
       return null;
     }
 
-    const { containerStyle: frameContainerStyle, imageStyle } = getSpritesheetFrameStyles(
-      frameData,
-      size,
-      size
-    );
+    const {
+      containerStyle: frameContainerStyle,
+      imageStyle,
+    } = getSpritesheetFrameStyles(frameData, size, size);
 
     return (
       <div style={frameContainerStyle}>

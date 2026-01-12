@@ -39,7 +39,9 @@ export default class RenderedParticleEmitterInstance extends RenderedInstance {
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
   ): Thumbnail {
-    return makeThumbnailFromUrl('CppPlatform/Extensions/particleSystemicon.png');
+    return makeThumbnailFromUrl(
+      'CppPlatform/Extensions/particleSystemicon.png'
+    );
   }
 
   update() {

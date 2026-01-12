@@ -36,6 +36,7 @@ class Behavior;
 class BehaviorsSharedData;
 class BaseEvent;
 class SerializerElement;
+template<class T> class FolderOrItem;
 }  // namespace gd
 #undef GetObject  // Disable an annoying macro
 #undef CreateEvent
@@ -1079,6 +1080,20 @@ class GD_CORE_API Project {
   static std::vector<gd::String> GetUnserializingOrderExtensionNames(
       const gd::SerializerElement& eventsFunctionsExtensionsElement);
 
+  /**
+  * \brief Get the root folder for layouts.
+  */
+  gd::FolderOrItem<gd::Layout>& GetLayoutsRootFolder() {
+    return *layoutsRootFolder;
+  }
+
+  /**
+  * \brief Get the root folder for layouts (const).
+  */
+  const gd::FolderOrItem<gd::Layout>& GetLayoutsRootFolder() const {
+    return *layoutsRootFolder;
+  }
+
  private:
   /**
    * Initialize from another game. Used by copy-ctor and assign-op.
@@ -1123,7 +1138,8 @@ class GD_CORE_API Project {
               ///< instead of the highest Z order
               ///< found on the layer at the scene
               ///< startup.
-  std::vector<std::unique_ptr<gd::Layout> > scenes;  ///< List of all scenes
+  std::vector<std::unique_ptr<gd::Layout>> scenes;
+  std::unique_ptr<gd::FolderOrItem<gd::Layout>> layoutsRootFolder;
   gd::VariablesContainer variables;  ///< Initial global variables
   gd::ObjectsContainer objectsContainer;
   std::vector<std::unique_ptr<gd::ExternalLayout> >

@@ -27,17 +27,17 @@ export type ExternalLayoutFolderTreeViewItemProps = {|
 |};
 
 export const getExternalLayoutFolderTreeViewItemId = (
-  folder: gdExternalLayoutFolder
+  folder: gdExternalLayoutFolderOrLayout
 ): string => {
   return `external-layout-folder-${folder.ptr}`;
 };
 
 export class ExternalLayoutFolderTreeViewItemContent implements TreeViewItemContent {
-  folder: gdExternalLayoutFolder;
+  folder: gdExternalLayoutFolderOrLayout;
   props: ExternalLayoutFolderTreeViewItemProps;
 
   constructor(
-    folder: gdExternalLayoutFolder,
+    folder: gdExternalLayoutFolderOrLayout,
     props: ExternalLayoutFolderTreeViewItemProps
   ) {
     this.folder = folder;
@@ -65,7 +65,7 @@ export class ExternalLayoutFolderTreeViewItemContent implements TreeViewItemCont
   }
 
   getName(): string | React.Node {
-    return this.folder.getName();
+    return this.folder.getFolderName();
   }
 
   getId(): string {
@@ -78,7 +78,7 @@ export class ExternalLayoutFolderTreeViewItemContent implements TreeViewItemCont
 
   getDataSet(): ?HTMLDataset {
     return {
-      'external-layout-folder': this.folder.getName(),
+      'external-layout-folder': this.folder.getFolderName(),
     };
   }
 
@@ -89,8 +89,8 @@ export class ExternalLayoutFolderTreeViewItemContent implements TreeViewItemCont
   onClick(): void {}
 
   rename(newName: string): void {
-    if (this.folder.getName() === newName) return;
-    this.folder.setName(newName);
+    if (this.folder.getFolderName() === newName) return;
+    this.folder.setFolderName(newName);
     this.props.onProjectItemModified();
   }
 
@@ -163,7 +163,7 @@ export class ExternalLayoutFolderTreeViewItemContent implements TreeViewItemCont
       const parent = this.folder.getParent();
       if (!parent) return;
 
-      parent.removeFolder(this.folder.getName());
+      parent.removeFolderChild(this.folder);
       onProjectItemModified();
     });
   }
@@ -171,7 +171,7 @@ export class ExternalLayoutFolderTreeViewItemContent implements TreeViewItemCont
   getIndex(): number {
     const parent = this.folder.getParent();
     if (!parent) return 0;
-    return parent.getFolderPosition(this.folder.getName());
+    return parent.getChildPosition(this.folder);
   }
 
   moveAt(destinationIndex: number): void {
@@ -179,7 +179,7 @@ export class ExternalLayoutFolderTreeViewItemContent implements TreeViewItemCont
     if (destinationIndex !== originIndex) {
       const parent = this.folder.getParent();
       if (parent) {
-        parent.moveFolder(
+        parent.moveChild(
           originIndex,
           destinationIndex + (destinationIndex <= originIndex ? 0 : -1)
         );
@@ -191,7 +191,7 @@ export class ExternalLayoutFolderTreeViewItemContent implements TreeViewItemCont
   copy(): void {
     Clipboard.set(EXTERNAL_LAYOUT_FOLDER_CLIPBOARD_KIND, {
       folder: serializeToJSObject(this.folder),
-      name: this.folder.getName(),
+      name: this.folder.getFolderName(),
     });
   }
 
@@ -217,7 +217,7 @@ export class ExternalLayoutFolderTreeViewItemContent implements TreeViewItemCont
 
     const newFolder = this.folder.insertNewFolder(newName, 0);
     unserializeFromJSObject(newFolder, copiedFolder);
-    newFolder.setName(newName);
+    newFolder.setFolderName(newName);
 
     this.props.onProjectItemModified();
     this.props.editName(getExternalLayoutFolderTreeViewItemId(newFolder));
@@ -231,8 +231,15 @@ export class ExternalLayoutFolderTreeViewItemContent implements TreeViewItemCont
       name => project.hasExternalLayoutNamed(name)
     );
     
-    const newExternalLayout = this.folder.insertNewExternalLayout(newName, 0);
+    // Zuerst das ExternalLayout im Project erstellen
+    const newExternalLayout = project.insertNewExternalLayout(
+      newName, 
+      project.getExternalLayoutsCount()
+    );
     newExternalLayout.setName(newName);
+
+    // Dann als Item in den Folder einfügen
+    this.folder.insertItem(newExternalLayout, 0);
 
     onProjectItemModified();
     
@@ -244,16 +251,34 @@ export class ExternalLayoutFolderTreeViewItemContent implements TreeViewItemCont
   }
 
   _addFolder(): void {
-    const newFolder = this.folder.insertNewFolder('NewFolder', 0);
-    this.props.onProjectItemModified();
-    this.props.expandFolders([this.getId()]);
-    this.props.editName(getExternalLayoutFolderTreeViewItemId(newFolder));
+    const { onProjectItemModified, editName, expandFolders } = this.props;
+    
+    const newFolderName = newNameGenerator(
+      'NewFolder',
+      name => this._hasFolderNamed(name)
+    );
+    
+    const newFolder = this.folder.insertNewFolder(newFolderName, 0);
+    
+    onProjectItemModified();
+    expandFolders([this.getId()]);
+    editName(getExternalLayoutFolderTreeViewItemId(newFolder));
   }
 
   _hasFolderNamed(name: string): boolean {
-    for (let i = 0; i < this.folder.getFoldersCount(); i++) {
-      if (this.folder.getFolderAt(i).getName() === name) return true;
+    const childrenCount = this.folder.getChildrenCount 
+      ? this.folder.getChildrenCount() 
+      : 0;
+    
+    for (let i = 0; i < childrenCount; i++) {
+      const child = this.folder.getChildAt(i);
+      if (child && child.isFolder && child.isFolder()) {
+        if (child.getFolderName && child.getFolderName() === name) {
+          return true;
+        }
+      }
     }
+    
     return false;
   }
 }

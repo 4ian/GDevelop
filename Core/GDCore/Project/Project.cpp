@@ -77,7 +77,8 @@ Project::Project()
       objectsContainer(gd::ObjectsContainer::SourceType::Global),
       resourcesContainer(gd::ResourcesContainer::SourceType::Global),
       sceneResourcesPreloading("at-startup"),
-      sceneResourcesUnloading("never") {}
+      sceneResourcesUnloading("never"),
+      layoutsRootFolder(gd::make_unique<gd::FolderOrItem<gd::Layout>>("__ROOT")) {}
 
 Project::~Project() {}
 
@@ -890,6 +891,24 @@ void Project::UnserializeFrom(const SerializerElement& element) {
     layout.UnserializeFrom(*this, layoutElement);
   }
   SetFirstLayout(element.GetChild("firstLayout").GetStringValue());
+  if (element.HasChild("layoutsFolderStructure")) {
+    layoutsRootFolder->UnserializeFrom(
+        *this,
+        element.GetChild("layoutsFolderStructure"),
+        *this,
+        [](Project& project, const gd::String& name) -> gd::Layout* {
+          if (project.HasLayoutNamed(name)) {
+            return &project.GetLayout(name);
+          }
+          return nullptr;
+        });
+  }
+  for (std::size_t i = 0; i < scenes.size(); ++i) {
+    if (!layoutsRootFolder->HasItemNamed(scenes[i]->GetName(), 
+        [](const gd::Layout& layout) { return layout.GetName(); })) {
+      layoutsRootFolder->InsertItem(scenes[i].get());
+    }
+  }
 
   externalEvents.clear();
   const SerializerElement& externalEventsElement =
@@ -1191,10 +1210,15 @@ void Project::SerializeTo(SerializerElement& element) const {
   GetVariables().SerializeTo(element.AddChild("variables"));
 
   element.SetAttribute("firstLayout", firstLayout);
-  gd::SerializerElement& layoutsElement = element.AddChild("layouts");
-  layoutsElement.ConsiderAsArrayOf("layout");
-  for (std::size_t i = 0; i < GetLayoutsCount(); i++)
-    GetLayout(i).SerializeTo(layoutsElement.AddChild("layout"));
+    gd::SerializerElement& layoutsElement = element.AddChild("layouts");
+    layoutsElement.ConsiderAsArrayOf("layout");
+    for (std::size_t i = 0; i < GetLayoutsCount(); i++)
+      GetLayout(i).SerializeTo(layoutsElement.AddChild("layout"));
+  
+  // NEU: Layout-Folder-Struktur serialisieren
+  layoutsRootFolder->SerializeTo(
+      element.AddChild("layoutsFolderStructure"),
+      [](const gd::Layout& layout) { return layout.GetName(); });
 
   SerializerElement& externalEventsElement = element.AddChild("externalEvents");
   externalEventsElement.ConsiderAsArrayOf("externalEvents");
@@ -1317,6 +1341,8 @@ void Project::Init(const gd::Project& game) {
   objectsContainer = game.objectsContainer;
 
   scenes = gd::Clone(game.scenes);
+
+  layoutsRootFolder = gd::make_unique<gd::FolderOrItem<gd::Layout>>("__ROOT");
 
   externalEvents = gd::Clone(game.externalEvents);
 

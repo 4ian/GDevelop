@@ -83,6 +83,7 @@ declare class libGDevelop {
   ObjectsContainer_SourceType: Class<ObjectsContainer_SourceType>;
   ObjectsContainer: Class<gdObjectsContainer>;
   Project: Class<gdProject>;
+  LayoutFolderOrLayout: Class<gdLayoutFolderOrLayout>;
   ObjectsContainersList_VariableExistence: Class<ObjectsContainersList_VariableExistence>;
   ObjectsContainersList: Class<gdObjectsContainersList>;
   ProjectScopedContainers: Class<gdProjectScopedContainers>;

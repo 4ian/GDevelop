@@ -322,7 +322,7 @@ class ScenesRootFolderContent extends LabelTreeViewItemContent {
       {
         label: i18n._(t`Add a scene`),
         click: () => {
-          this.onAddScene(this.project.getLayoutsCount() - 1, i18n);
+          this.onAddScene(this.project.getLayoutsCount(), i18n);
         },
       },
       {
@@ -599,7 +599,7 @@ type Props = {|
 |};
 
 const buildSceneFolderTree = (
-  folder: gdLayoutFolder,
+  folder: gdLayoutFolderOrLayout,  // WICHTIG: Typ anpassen
   props: SceneTreeViewItemProps & SceneFolderTreeViewItemProps
 ): TreeViewItem => {
   return new FolderTreeViewItem(
@@ -607,20 +607,31 @@ const buildSceneFolderTree = (
     (i18n: I18nType) => {
       const children = [];
       
-      // Add folders first
-      for (let i = 0; i < folder.getFoldersCount(); i++) {
-        const childFolder = folder.getFolderAt(i);
-        children.push(buildSceneFolderTree(childFolder, props));
-      }
+      // Hole die Anzahl der Kinder
+      const childrenCount = folder.getChildrenCount 
+        ? folder.getChildrenCount() 
+        : 0;
       
-      // Add scenes
-      for (let i = 0; i < folder.getLayoutsCount(); i++) {
-        const scene = folder.getLayoutAt(i);
-        children.push(
-          new LeafTreeViewItem(
-            new SceneTreeViewItemContent(scene, props)
-          )
-        );
+      // Iteriere durch alle Kinder
+      for (let i = 0; i < childrenCount; i++) {
+        const child = folder.getChildAt(i);
+        
+        if (!child) continue;
+        
+        if (child.isFolder && child.isFolder()) {
+          // Es ist ein Folder - rekursiv
+          children.push(buildSceneFolderTree(child, props));
+        } else {
+          // Es ist ein Layout/Scene
+          const layout = child.getItem();
+          if (layout) {
+            children.push(
+              new LeafTreeViewItem(
+                new SceneTreeViewItemContent(layout, props)
+              )
+            );
+          }
+        }
       }
       
       return children;
@@ -629,7 +640,7 @@ const buildSceneFolderTree = (
 };
 
 const buildExternalLayoutFolderTree = (
-  folder: gdExternalLayoutFolder,
+  folder: gdExternalLayoutFolderOrLayout,  // KORRIGIERT: Typ angepasst
   props: ExternalLayoutTreeViewItemProps & ExternalLayoutFolderTreeViewItemProps
 ): TreeViewItem => {
   return new FolderTreeViewItem(
@@ -637,20 +648,31 @@ const buildExternalLayoutFolderTree = (
     (i18n: I18nType) => {
       const children = [];
       
-      // Add folders first
-      for (let i = 0; i < folder.getFoldersCount(); i++) {
-        const childFolder = folder.getFolderAt(i);
-        children.push(buildExternalLayoutFolderTree(childFolder, props));
-      }
+      // Hole die Anzahl der Kinder
+      const childrenCount = folder.getChildrenCount 
+        ? folder.getChildrenCount() 
+        : 0;
       
-      // Add external layouts
-      for (let i = 0; i < folder.getExternalLayoutsCount(); i++) {
-        const externalLayout = folder.getExternalLayoutAt(i);
-        children.push(
-          new LeafTreeViewItem(
-            new ExternalLayoutTreeViewItemContent(externalLayout, props)
-          )
-        );
+      // Iteriere durch alle Kinder
+      for (let i = 0; i < childrenCount; i++) {
+        const child = folder.getChildAt(i);
+        
+        if (!child) continue;
+        
+        if (child.isFolder && child.isFolder()) {
+          // Es ist ein Folder - rekursiv
+          children.push(buildExternalLayoutFolderTree(child, props));
+        } else {
+          // Es ist ein ExternalLayout
+          const externalLayout = child.getItem();
+          if (externalLayout) {
+            children.push(
+              new LeafTreeViewItem(
+                new ExternalLayoutTreeViewItemContent(externalLayout, props)
+              )
+            );
+          }
+        }
       }
       
       return children;
@@ -860,27 +882,49 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       [isMobile]
     );
 
-    const [mockFolders, setMockFolders] = React.useState<Array<{id: string, name: string}>>([]);
-
     const addNewFolder = React.useCallback(
       (i18n: I18nType) => {
         if (!project) return;
 
-        const newFolderName = newNameGenerator(i18n._(t`Untitled folder`), name =>
-          mockFolders.some(f => f.name === name)
+        const layoutsRootFolder = project.getLayoutsRootFolder();
+        
+        if (!layoutsRootFolder) {
+          console.error('getLayoutsRootFolder() returned null');
+          return;
+        }
+
+        // KORRIGIERT: Prüfe ob Folder-Name bereits existiert
+        // Im C++ gibt es keine hasFolder() Methode, daher müssen wir durch die Kinder iterieren
+        const newFolderName = newNameGenerator(
+          i18n._(t`Untitled folder`), 
+          name => {
+            // Prüfe alle Kinder ob ein Folder mit diesem Namen existiert
+            const childrenCount = layoutsRootFolder.getChildrenCount();
+            for (let i = 0; i < childrenCount; i++) {
+              const child = layoutsRootFolder.getChildAt(i);
+              if (child && child.isFolder && child.isFolder() && 
+                  child.getFolderName && child.getFolderName() === name) {
+                return true; // Name existiert bereits
+              }
+            }
+            return false; // Name ist verfügbar
+          }
         );
         
-        const newFolder = {
-          id: `mock-folder-${Date.now()}`,
-          name: newFolderName
-        };
+        // Erstelle neuen Folder
+        const newFolder = layoutsRootFolder.insertNewFolder(
+          newFolderName,
+          layoutsRootFolder.getChildrenCount()
+        );
         
-        setMockFolders(prev => [...prev, newFolder]);
         onProjectItemModified();
         
-        console.log('Mock folder created:', newFolder);
+        // Scrolle zum neuen Folder und aktiviere Rename-Modus
+        const folderItemId = getSceneFolderTreeViewItemId(newFolder);
+        scrollToItem(folderItemId);
+        editName(folderItemId);
       },
-      [project, mockFolders, onProjectItemModified]
+      [project, onProjectItemModified, editName, scrollToItem]
     );
 
     const addNewScene = React.useCallback(
@@ -1020,21 +1064,10 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     );
 
     const buildSceneTree = (project: gdProject, props: SceneTreeViewItemProps): Array<TreeViewItem> => {
-  const allScenes = [];
-  
-  // Da project.getLayouts() fehlschlägt, nutzen wir die klassische Methode:
-      for (let i = 0; i < project.getLayoutsCount(); i++) {
-        const scene = project.getLayoutAt(i);
-        allScenes.push(
-          new LeafTreeViewItem(
-            new SceneTreeViewItemContent(scene, props)
-          )
-        );
-      }
-
-      // Wenn du später echte Ordner-Metadaten hast, würdest du hier 
-      // die allScenes-Liste in FolderTreeViewItems einsortieren.
-      return allScenes;
+      if (!project) return [];
+      
+      const layoutsRootFolder = project.getLayoutsRootFolder();
+      return buildSceneFolderTree(layoutsRootFolder, props);
     };
 
     const addExternalLayout = React.useCallback(
@@ -1363,6 +1396,35 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       [externalLayoutTreeViewItemProps, externalLayoutFolderTreeViewItemProps]
     );
 
+    function buildFlatLayoutList(i18n: I18nType): Array<TreeViewItem> {
+      if (!project) return [];
+      
+      const layoutsCount = project.getLayoutsCount();
+      
+      if (layoutsCount === 0) {
+        return [
+          new PlaceHolderTreeViewItem(
+            scenesEmptyPlaceholderId,
+            i18n._(t`Start by adding a new scene.`)
+          )
+        ];
+      }
+      
+      const children = [];
+      for (let i = 0; i < layoutsCount; i++) {
+        children.push(
+          new LeafTreeViewItem(
+            new SceneTreeViewItemContent(
+              project.getLayoutAt(i),
+              sceneTreeViewItemProps
+            )
+          )
+        );
+      }
+      
+      return children;
+    }
+
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
         return !project ||
@@ -1430,51 +1492,86 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                   i18n._(t`Scenes`),
                   project,
                   addNewScene,
-                  addNewFolder // Diese Funktion musst du noch erstellen
+                  addNewFolder
                 ),
                 getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-                  if (project.getLayoutsCount() === 0 && mockFolders.length === 0) {
-                    return [
-                      new PlaceHolderTreeViewItem(
-                        scenesEmptyPlaceholderId,
-                        i18n._(t`Start by adding a new scene.`)
-                      ),
-                    ];
-                  }
+                  if (!project) return [];
                   
-                  const children = [];
-                  
-                  // Mock folders first
-                  mockFolders.forEach(folder => {
-                    children.push(
-                      new FolderTreeViewItem(
-                        new MockFolderTreeViewItemContent(
-                          folder.id,
-                          folder.name,
-                          mockFolders,
-                          setMockFolders,
-                          onProjectItemModified,
-                          showDeleteConfirmation,
-                          editName
-                        ),
-                        () => [] // Leerer Ordner
-                      )
-                    );
-                  });
-                  
-                  // Then scenes
-                  for (let i = 0; i < project.getLayoutsCount(); i++) {
-                    children.push(
-                      new LeafTreeViewItem(
-                        new SceneTreeViewItemContent(
-                          project.getLayoutAt(i),
-                          sceneTreeViewItemProps
+                  try {
+                    const layoutsRootFolder = project.getLayoutsRootFolder();
+                    
+                    if (!layoutsRootFolder) {
+                      console.warn('getLayoutsRootFolder() returned null');
+                      return buildFlatLayoutList(i18n);
+                    }
+                    
+                    // WICHTIG: Emscripten bindet C++ Methoden mit lowercase
+                    // GetChildrenCount() wird zu getChildrenCount()
+                    const childrenCount = layoutsRootFolder.getChildrenCount 
+                      ? layoutsRootFolder.getChildrenCount() 
+                      : 0;
+                    
+                    console.log('Layout root folder has', childrenCount, 'children');
+                    
+                    // Wenn keine Kinder, prüfe ob überhaupt Layouts existieren
+                    if (childrenCount === 0 && project.getLayoutsCount() === 0) {
+                      return [
+                        new PlaceHolderTreeViewItem(
+                          scenesEmptyPlaceholderId,
+                          i18n._(t`Start by adding a new scene.`)
                         )
-                      )
-                    );
+                      ];
+                    }
+                    
+                    const children = [];
+                    
+                    // Iteriere durch alle Kinder des Root-Folders
+                    for (let i = 0; i < childrenCount; i++) {
+                      const child = layoutsRootFolder.getChildAt(i);
+                      
+                      if (!child) {
+                        console.warn('getChildAt(' + i + ') returned null');
+                        continue;
+                      }
+                      
+                      // WICHTIG: isFolder() prüft ob es ein Folder ist
+                      // Im C++: bool IsFolder() const { return !folderName.empty(); }
+                      if (child.isFolder && child.isFolder()) {
+                        // Es ist ein Folder - baue rekursiv den Folder-Baum
+                        children.push(buildSceneFolderTree(child, combinedSceneProps));
+                      } else {
+                        // Es ist ein Layout/Scene
+                        // WICHTIG: getItem() gibt das Layout zurück
+                        // Im C++: T& GetItem() const { return *item; }
+                        const layout = child.getItem();
+                        if (layout) {
+                          children.push(
+                            new LeafTreeViewItem(
+                              new SceneTreeViewItemContent(layout, sceneTreeViewItemProps)
+                            )
+                          );
+                        }
+                      }
+                    }
+                    
+                    // Wenn keine Kinder gefunden wurden, zeige Placeholder
+                    if (children.length === 0) {
+                      return [
+                        new PlaceHolderTreeViewItem(
+                          scenesEmptyPlaceholderId,
+                          i18n._(t`Start by adding a new scene.`)
+                        )
+                      ];
+                    }
+                    
+                    return children;
+                    
+                  } catch (error) {
+                    console.error('Error accessing folder structure:', error);
+                    console.error('Error stack:', error.stack);
+                    // Fallback zur flachen Liste
+                    return buildFlatLayoutList(i18n);
                   }
-                  
-                  return children;
                 },
               },
               {

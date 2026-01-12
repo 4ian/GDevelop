@@ -11,12 +11,8 @@ import {
 import { TreeViewItemContent, scenesRootFolderId } from '.';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import {
-  SceneTreeViewItemContent,
-  getSceneTreeViewItemId,
-  type SceneTreeViewItemProps,
-  type SceneTreeViewItemCallbacks,
-} from './SceneTreeViewItemContent';
+import { getSceneTreeViewItemId } from './SceneTreeViewItemContent';
+import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 
 const SCENE_FOLDER_CLIPBOARD_KIND = 'SceneFolder';
 
@@ -32,16 +28,19 @@ export type SceneFolderTreeViewItemProps = {|
 |};
 
 export const getSceneFolderTreeViewItemId = (
-  folder: gdLayoutFolder
+  folder: gdLayoutFolderOrLayout
 ): string => {
   return `scene-folder-${folder.ptr}`;
 };
 
 export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
-  folder: gdLayoutFolder;
+  folder: gdLayoutFolderOrLayout;
   props: SceneFolderTreeViewItemProps;
 
-  constructor(folder: gdLayoutFolder, props: SceneFolderTreeViewItemProps) {
+  constructor(
+    folder: gdLayoutFolderOrLayout,
+    props: SceneFolderTreeViewItemProps
+  ) {
     this.folder = folder;
     this.props = props;
   }
@@ -51,7 +50,10 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
     
     let currentParent = this.folder.getParent();
     while (currentParent && !currentParent.isRootFolder()) {
-      if (getSceneFolderTreeViewItemId(currentParent) === itemContent.getId()) {
+      if (
+        getSceneFolderTreeViewItemId(currentParent) ===
+        itemContent.getId()
+      ) {
         return true;
       }
       currentParent = currentParent.getParent();
@@ -64,7 +66,7 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
   }
 
   getName(): string | React.Node {
-    return this.folder.getName();
+    return this.folder.getFolderName();
   }
 
   getId(): string {
@@ -77,7 +79,7 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
 
   getDataSet(): ?HTMLDataset {
     return {
-      'scene-folder': this.folder.getName(),
+      'scene-folder': this.folder.getFolderName(),
     };
   }
 
@@ -88,8 +90,8 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
   onClick(): void {}
 
   rename(newName: string): void {
-    if (this.folder.getName() === newName) return;
-    this.folder.setName(newName);
+    if (this.folder.getFolderName() === newName) return;
+    this.folder.setFolderName(newName);
     this.props.onProjectItemModified();
   }
 
@@ -151,7 +153,7 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
   }
 
   delete(): void {
-    const { project, showDeleteConfirmation, onProjectItemModified } = this.props;
+    const { showDeleteConfirmation, onProjectItemModified } = this.props;
     
     showDeleteConfirmation({
       title: t`Remove folder`,
@@ -162,7 +164,7 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
       const parent = this.folder.getParent();
       if (!parent) return;
 
-      parent.removeFolder(this.folder.getName());
+      parent.removeFolderChild(this.folder);
       onProjectItemModified();
     });
   }
@@ -170,7 +172,7 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
   getIndex(): number {
     const parent = this.folder.getParent();
     if (!parent) return 0;
-    return parent.getFolderPosition(this.folder.getName());
+    return parent.getChildPosition(this.folder);
   }
 
   moveAt(destinationIndex: number): void {
@@ -178,7 +180,7 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
     if (destinationIndex !== originIndex) {
       const parent = this.folder.getParent();
       if (parent) {
-        parent.moveFolder(
+        parent.moveChild(
           originIndex,
           destinationIndex + (destinationIndex <= originIndex ? 0 : -1)
         );
@@ -190,7 +192,7 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
   copy(): void {
     Clipboard.set(SCENE_FOLDER_CLIPBOARD_KIND, {
       folder: serializeToJSObject(this.folder),
-      name: this.folder.getName(),
+      name: this.folder.getFolderName(),
     });
   }
 
@@ -216,7 +218,7 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
 
     const newFolder = this.folder.insertNewFolder(newName, 0);
     unserializeFromJSObject(newFolder, copiedFolder);
-    newFolder.setName(newName);
+    newFolder.setFolderName(newName);
 
     this.props.onProjectItemModified();
     this.props.editName(getSceneFolderTreeViewItemId(newFolder));
@@ -225,13 +227,22 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
   _addScene(i18n: I18nType): void {
     const { project, onProjectItemModified, editName, scrollToItem } = this.props;
     
-    const newName = newNameGenerator(i18n._(t`Untitled scene`), name =>
-      project.hasLayoutNamed(name)
+    const newName = newNameGenerator(
+      i18n._(t`Untitled scene`),
+      name => project.hasLayoutNamed(name)
     );
     
-    const newScene = this.folder.insertNewLayout(newName, 0);
+    // Zuerst Scene im Project erstellen
+    const newScene = project.insertNewLayout(
+      newName, 
+      project.getLayoutsCount()
+    );
     newScene.setName(newName);
     newScene.updateBehaviorsSharedData(project);
+    addDefaultLightToAllLayers(newScene);
+
+    // Dann als Item in den Folder einfügen
+    this.folder.insertItem(newScene, 0);
 
     onProjectItemModified();
     
@@ -243,16 +254,34 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
   }
 
   _addFolder(): void {
-    const newFolder = this.folder.insertNewFolder('NewFolder', 0);
-    this.props.onProjectItemModified();
-    this.props.expandFolders([this.getId()]);
-    this.props.editName(getSceneFolderTreeViewItemId(newFolder));
+    const { onProjectItemModified, editName, expandFolders } = this.props;
+    
+    const newFolderName = newNameGenerator(
+      'NewFolder',
+      name => this._hasFolderNamed(name)
+    );
+    
+    const newFolder = this.folder.insertNewFolder(newFolderName, 0);
+    
+    onProjectItemModified();
+    expandFolders([this.getId()]);
+    editName(getSceneFolderTreeViewItemId(newFolder));
   }
 
   _hasFolderNamed(name: string): boolean {
-    for (let i = 0; i < this.folder.getFoldersCount(); i++) {
-      if (this.folder.getFolderAt(i).getName() === name) return true;
+    const childrenCount = this.folder.getChildrenCount 
+      ? this.folder.getChildrenCount() 
+      : 0;
+    
+    for (let i = 0; i < childrenCount; i++) {
+      const child = this.folder.getChildAt(i);
+      if (child && child.isFolder && child.isFolder()) {
+        if (child.getFolderName && child.getFolderName() === name) {
+          return true;
+        }
+      }
     }
+    
     return false;
   }
 }

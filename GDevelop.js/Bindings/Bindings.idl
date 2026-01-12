@@ -672,6 +672,45 @@ interface Project {
 
     boolean STATIC_IsNameSafe([Const] DOMString name);
     [Const, Value] DOMString STATIC_GetSafeName([Const] DOMString name);
+
+    [Ref] LayoutFolderOrLayout GetLayoutsRootFolder();
+};
+
+interface LayoutFolderOrLayout {
+  void LayoutFolderOrLayout();
+  
+  boolean IsFolder();
+  boolean IsRootFolder();
+  
+  [Ref] Layout GetItem();
+  [Const, Ref] DOMString GetFolderName();
+  void SetFolderName([Const] DOMString name);
+  
+  unsigned long GetChildrenCount();
+  [Ref] LayoutFolderOrLayout GetChildAt(unsigned long pos);
+  [Ref] LayoutFolderOrLayout GetParent();
+  
+  // Neu: Item (Szene) einfügen
+  void InsertObject(Layout ptr, unsigned long position);
+  
+  [Ref] LayoutFolderOrLayout InsertNewFolder([Const] DOMString name, unsigned long newPosition);
+  unsigned long GetChildPosition([Const, Ref] LayoutFolderOrLayout child);
+  
+  // Namensbasierte Suche (sehr nützlich für JS)
+  boolean HasObjectNamed([Const] DOMString name);
+  [Ref] LayoutFolderOrLayout GetObjectNamed([Const] DOMString name);
+
+  void MoveObjectFolderOrObjectToAnotherFolder([Ref] LayoutFolderOrLayout folderOrItem, [Ref] LayoutFolderOrLayout newParentFolder, unsigned long newPosition);
+
+  void MoveChild(unsigned long oldIndex, unsigned long newIndex);
+  void RemoveFolderChild([Const, Ref] LayoutFolderOrLayout childToRemove);
+  
+  // Neu: Rekursives Löschen eines Items nach Name
+  void RemoveRecursivelyObjectNamed([Const] DOMString name);
+  
+  boolean IsADescendantOf([Const, Ref] LayoutFolderOrLayout otherLayoutFolderOrLayout);
+
+  void Clear();
 };
 
 enum ObjectsContainersList_VariableExistence {

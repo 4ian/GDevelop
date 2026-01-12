@@ -470,6 +470,7 @@ typedef std::shared_ptr<SerializerElement> SharedPtrSerializerElement;
 typedef std::vector<UnfilledRequiredBehaviorPropertyProblem>
     VectorUnfilledRequiredBehaviorPropertyProblem;
 typedef std::vector<const gd::ObjectFolderOrObject*> VectorObjectFolderOrObject;
+typedef gd::FolderOrItem<gd::Layout> LayoutFolderOrLayout;
 typedef std::vector<gd::Screenshot> VectorScreenshot;
 typedef QuickCustomization::Visibility
     QuickCustomization_Visibility;

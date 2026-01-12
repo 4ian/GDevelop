@@ -24,7 +24,7 @@ export interface TreeViewItem {
   +content: TreeViewItemContent;
   openIfSearchMatches?: boolean;
   openWithSingleClick?: boolean;
-  getChildren(searchText: string): ?Array<TreeViewItem>;
+  getChildren(searchText?: string): ?Array<TreeViewItem>;
 }
 
 export type ObjectTreeViewItemProps = {|
@@ -211,7 +211,7 @@ export class GroupTreeViewItem implements TreeViewItem {
     this.objectTreeViewItemProps = objectTreeViewItemProps;
   }
 
-  getChildren(searchText: string): ?Array<TreeViewItem> {
+  getChildren(searchText?: string): ?Array<TreeViewItem> {
     if (!searchText) return null;
     const allObjectNames = this.group.getAllObjectsNames();
     return allObjectNames

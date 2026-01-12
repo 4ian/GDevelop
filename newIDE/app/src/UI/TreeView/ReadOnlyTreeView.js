@@ -111,7 +111,7 @@ type Props<Item> = {|
   height: number,
   width?: number,
   items: Item[],
-  estimatedItemSize: number,
+  estimatedItemSize?: number,
   getItemHeight: Item => number,
   /**
    * Return false if the item should be displayed even if a search text is given
@@ -121,7 +121,7 @@ type Props<Item> = {|
    */
   shouldApplySearchToItem: Item => boolean,
   getItemName: Item => string | React.Node,
-  getItemDescription?: Item => string,
+  getItemDescription?: Item => string | null,
   getItemId: Item => string,
   getItemHtmlId?: (Item, index: number) => ?string,
   getItemChildren: Item => ?(Item[]),
@@ -224,7 +224,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
 
       const name = getItemName(item);
       const description = getItemDescription
-        ? getItemDescription(item)
+        ? getItemDescription(item) || undefined
         : undefined;
       const dataset = getItemDataset ? getItemDataset(item) : undefined;
       const extraClass =

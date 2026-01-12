@@ -13,6 +13,10 @@ import {
 } from '../Utils/Serializer';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import {
+  makeThumbnailFromUrl,
+  type Thumbnail,
+} from '../ObjectsRendering/Thumbnail';
+import {
   TreeViewItemContent,
   type TreeItemProps,
   extensionFunctionsRootFolderId,
@@ -151,48 +155,55 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
     return `function-item-${index}`;
   }
 
-  getThumbnail(): ?string {
+  getThumbnail(): ?Thumbnail {
+    let src: string;
     switch (this.eventsFunction.getFunctionType()) {
       default:
-        return 'res/functions/function.svg';
+        src = 'res/functions/function.svg';
+        break;
       case gd.EventsFunction.Action:
       case gd.EventsFunction.ActionWithOperator:
         switch (this.eventsFunction.getName()) {
           default:
-            return 'res/functions/action.svg';
-
+            src = 'res/functions/action.svg';
+            break;
           case 'onSceneUnloading':
           case 'onDestroy':
-            return 'res/functions/destroy.svg';
-
+            src = 'res/functions/destroy.svg';
+            break;
           case 'onSceneResumed':
           case 'onActivate':
-            return 'res/functions/activate.svg';
-
+            src = 'res/functions/activate.svg';
+            break;
           case 'onScenePaused':
           case 'onDeActivate':
-            return 'res/functions/deactivate.svg';
-
+            src = 'res/functions/deactivate.svg';
+            break;
           case 'onScenePreEvents':
           case 'onScenePostEvents':
           case 'doStepPreEvents':
           case 'doStepPostEvents':
-            return 'res/functions/step.svg';
-
+            src = 'res/functions/step.svg';
+            break;
           case 'onSceneLoaded':
           case 'onFirstSceneLoaded':
           case 'onCreated':
-            return 'res/functions/create.svg';
-
+            src = 'res/functions/create.svg';
+            break;
           case 'onHotReloading':
-            return 'res/functions/reload.svg';
+            src = 'res/functions/reload.svg';
+            break;
         }
+        break;
       case gd.EventsFunction.Condition:
-        return 'res/functions/condition.svg';
+        src = 'res/functions/condition.svg';
+        break;
       case gd.EventsFunction.Expression:
       case gd.EventsFunction.ExpressionAndCondition:
-        return 'res/functions/expression.svg';
+        src = 'res/functions/expression.svg';
+        break;
     }
+    return makeThumbnailFromUrl(src);
   }
 
   getDataset(): ?HTMLDataset {

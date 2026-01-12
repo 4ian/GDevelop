@@ -3,6 +3,7 @@ import RenderedInstance from './RenderedInstance';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
 import * as PIXI from 'pixi.js-legacy';
+import { type Thumbnail, makeThumbnailFromUrl } from '../Thumbnail';
 const gd: libGDevelop = global.gd;
 
 type StretchedSprite = PIXI.Sprite | PIXI.TilingSprite;
@@ -481,19 +482,17 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
   }
 
   /**
-   * Return a URL for thumbnail of the specified object.
+   * Return a Thumbnail for the specified object.
    */
   static getThumbnail(
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ) {
+  ): Thumbnail {
     const panelSprite = gd.asPanelSpriteConfiguration(objectConfiguration);
 
-    return ResourcesLoader.getResourceFullUrl(
-      project,
-      panelSprite.getTexture(),
-      {}
+    return makeThumbnailFromUrl(
+      ResourcesLoader.getResourceFullUrl(project, panelSprite.getTexture(), {})
     );
   }
 }

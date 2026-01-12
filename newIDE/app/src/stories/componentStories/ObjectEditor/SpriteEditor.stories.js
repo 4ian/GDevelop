@@ -12,7 +12,6 @@ import CollisionMasksEditor from '../../../ObjectEditor/Editors/SpriteEditor/Col
 import SerializedObjectDisplay from '../../SerializedObjectDisplay';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
-import ResourcesLoader from '../../../ResourcesLoader';
 import PointsEditor from '../../../ObjectEditor/Editors/SpriteEditor/PointsEditor';
 import fakeResourceManagementProps from '../../FakeResourceManagement';
 
@@ -96,7 +95,6 @@ export const Points = () => (
         <PointsEditor
           animations={testProject.spriteObjectConfiguration.getAnimations()}
           project={testProject.project}
-          resourcesLoader={ResourcesLoader}
           onRenamedPoint={action('Renamed a point')}
         />
       </FixedHeightFlexContainer>
@@ -111,7 +109,6 @@ export const CollisionMasks = () => (
         <CollisionMasksEditor
           animations={testProject.spriteObjectConfiguration.getAnimations()}
           project={testProject.project}
-          resourcesLoader={ResourcesLoader}
           onCreateMatchingSpriteCollisionMask={action(
             'Created a matching sprite collision mask'
           )}

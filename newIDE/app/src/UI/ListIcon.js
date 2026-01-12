@@ -2,6 +2,8 @@
 import React from 'react';
 import { CorsAwareImage } from './CorsAwareImage';
 import GDevelopThemeContext from './Theme/GDevelopThemeContext';
+import ThumbnailImage from './ThumbnailImage';
+import { type Thumbnail } from '../ObjectsRendering/Thumbnail';
 // No i18n in this file
 
 type SizeProps =
@@ -15,6 +17,10 @@ type SizeProps =
 
 type Props = {|
   src: string,
+  /** Optional thumbnail data for spritesheet frame support. If provided with a project, will render spritesheet frames correctly. */
+  thumbnail?: ?Thumbnail,
+  /** Project is required for spritesheet frame display */
+  project?: ?gdProject,
   brightness?: ?number,
   tooltip?: string,
   disabled?: boolean,
@@ -29,6 +35,7 @@ type Props = {|
 
 /**
  * An icon that can be used as the leftIcon of a ListItem.
+ * Supports spritesheet frames when thumbnail and project are provided.
  */
 function ListIcon(props: Props) {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -36,6 +43,8 @@ function ListIcon(props: Props) {
 
   const {
     src,
+    thumbnail,
+    project,
     tooltip,
     disabled,
     isGDevelopIcon,
@@ -77,16 +86,37 @@ function ListIcon(props: Props) {
     filter,
   };
 
+  const containerStyle = {
+    width: iconWidth,
+    height: iconHeight,
+    lineHeight: `${iconHeight}px`, // Vertical centering
+    textAlign: 'center', // Horizontal centering
+    paddingRight,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  };
+
+  // If thumbnail with spritesheet frame is provided and we have a project, use ThumbnailImage
+  if (thumbnail && thumbnail.spritesheetFrame && project) {
+    return (
+      <div style={containerStyle}>
+        <ThumbnailImage
+          project={project}
+          thumbnail={thumbnail}
+          alt={tooltip}
+          title={tooltip}
+          maxWidth={iconWidth}
+          maxHeight={iconHeight}
+          filter={filter}
+        />
+      </div>
+    );
+  }
+
+  // For regular images, use the existing approach
   return (
-    <div
-      style={{
-        width: iconWidth,
-        height: iconHeight,
-        lineHeight: `${iconHeight}px`, // Vertical centering
-        textAlign: 'center', // Horizontal centering
-        paddingRight,
-      }}
-    >
+    <div style={containerStyle}>
       {isGDevelopIcon ? (
         <img title={tooltip} alt={tooltip} src={src} style={style} />
       ) : (

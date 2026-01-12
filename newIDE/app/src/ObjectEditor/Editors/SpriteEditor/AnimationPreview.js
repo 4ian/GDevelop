@@ -4,7 +4,9 @@ import { Trans } from '@lingui/macro';
 import React from 'react';
 import { Column } from '../../../UI/Grid';
 import { LineStackLayout, ResponsiveLineStackLayout } from '../../../UI/Layout';
-import ImagePreview from '../../../ResourcesList/ResourcePreview/ImagePreview';
+import ImagePreview, {
+  type SpritesheetFrameForPreview,
+} from '../../../ResourcesList/ResourcePreview/ImagePreview';
 import Replay from '@material-ui/icons/Replay';
 import Timer from '@material-ui/icons/Timer';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
@@ -54,6 +56,12 @@ type Props = {|
   fixedWidth?: number,
   isAssetPrivate?: boolean,
   hideAnimationLoader?: boolean,
+  /**
+   * Optional: For spritesheet frames, returns the frame data for clipping.
+   * If provided, the resourceName is used as a key and this function
+   * provides the actual spritesheet frame information.
+   */
+  getSpritesheetFrame?: (resourceName: string) => ?SpritesheetFrameForPreview,
 |};
 
 const AnimationPreview = ({
@@ -71,6 +79,7 @@ const AnimationPreview = ({
   fixedWidth,
   isAssetPrivate,
   hideAnimationLoader,
+  getSpritesheetFrame,
 }: Props) => {
   const forceUpdate = useForceUpdate();
 
@@ -230,6 +239,11 @@ const AnimationPreview = ({
 
   const resourceName = resourceNames[currentFrameIndexRef.current];
 
+  // Get the spritesheet frame data if available
+  const spritesheetFrame = getSpritesheetFrame
+    ? getSpritesheetFrame(resourceName)
+    : null;
+
   return (
     <Column expand noOverflowParent noMargin>
       <div style={styles.imageContainer}>
@@ -245,6 +259,7 @@ const AnimationPreview = ({
           onImageLoaded={onImageLoaded}
           isImagePrivate={isAssetPrivate}
           hideLoader // Handled by the animation preview, important to let the browser cache the image.
+          spritesheetFrame={spritesheetFrame}
         />
         {!hideAnimationLoader && isStillLoadingResources && (
           <div style={styles.loaderContainer}>

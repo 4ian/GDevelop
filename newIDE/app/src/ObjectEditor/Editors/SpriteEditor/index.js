@@ -288,7 +288,6 @@ export default function SpriteEditor({
             >
               <PointsEditor
                 animations={animations}
-                resourcesLoader={ResourcesLoader}
                 project={project}
                 onPointsUpdated={onObjectUpdated}
                 onRenamedPoint={(oldName, newName) => {
@@ -342,7 +341,6 @@ export default function SpriteEditor({
             >
               <CollisionMasksEditor
                 animations={animations}
-                resourcesLoader={ResourcesLoader}
                 project={project}
                 onMasksUpdated={onObjectUpdated}
                 onCreateMatchingSpriteCollisionMask={

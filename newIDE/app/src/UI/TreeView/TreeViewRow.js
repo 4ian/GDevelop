@@ -136,6 +136,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     getItemHtmlId,
     forceDefaultDraggingPreview,
     shouldSelectUponContextMenuOpening,
+    project,
   } = data;
   const node = flattenedData[index];
   const left = node.depth * 16;
@@ -375,7 +376,12 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                   </IconButton>
                   {node.thumbnailSrc && node.thumbnailSrc !== 'FOLDER' ? (
                     <div className={classes.thumbnail}>
-                      <ListIcon iconSize={20} src={node.thumbnailSrc} />
+                      <ListIcon
+                        iconSize={20}
+                        src={node.thumbnailSrc}
+                        thumbnail={node.thumbnail}
+                        project={project}
+                      />
                     </div>
                   ) : (
                     !node.item.isRoot && (
@@ -383,9 +389,14 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                     )
                   )}
                 </>
-              ) : node.thumbnailSrc ? (
+              ) : node.thumbnail || node.thumbnailSrc ? (
                 <div className={classes.thumbnail}>
-                  <ListIcon iconSize={20} src={node.thumbnailSrc} />
+                  <ListIcon
+                    iconSize={20}
+                    src={node.thumbnailSrc || ''}
+                    thumbnail={node.thumbnail}
+                    project={project}
+                  />
                 </div>
               ) : null}
               {renamedItemId === node.id && typeof node.name === 'string' ? (

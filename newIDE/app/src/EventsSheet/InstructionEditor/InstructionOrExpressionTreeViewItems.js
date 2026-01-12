@@ -3,6 +3,10 @@ import * as React from 'react';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import { type EnumeratedInstructionMetadata } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { type InstructionOrExpressionTreeNode } from '../../InstructionOrExpression/CreateTree';
+import {
+  makeThumbnailFromUrl,
+  type Thumbnail,
+} from '../../ObjectsRendering/Thumbnail';
 
 export const getInstructionGroupId = (groupName: string, parentId?: ?string) =>
   `${parentId ? `${parentId}-` : ''}instruction-group-${groupName}`;
@@ -14,7 +18,7 @@ export interface TreeViewItemContent {
   getId(): string;
   getHtmlId(index: number): ?string;
   getDataSet(): ?HTMLDataset;
-  getThumbnail(): ?string;
+  getThumbnail(): ?Thumbnail;
 }
 
 export interface TreeViewItem {
@@ -156,10 +160,11 @@ export class InstructionGroupTreeViewItemContent
       group: this.name,
     };
   }
-  getThumbnail() {
-    return !this.props.parentId
+  getThumbnail(): ?Thumbnail {
+    const src = !this.props.parentId
       ? 'NONE'
       : this.props.getGroupIconSrc(this.name) || this.props.parentGroupIconSrc;
+    return src ? makeThumbnailFromUrl(src) : null;
   }
 }
 
@@ -199,8 +204,9 @@ export class InstructionTreeViewItemContent implements TreeViewItemContent {
         : undefined,
     };
   }
-  getThumbnail() {
-    return this.instructionMetadata.iconFilename;
+  getThumbnail(): ?Thumbnail {
+    const src = this.instructionMetadata.iconFilename;
+    return src ? makeThumbnailFromUrl(src) : null;
   }
 }
 
@@ -230,7 +236,7 @@ export class MoreResultsTreeViewItemContent implements TreeViewItemContent {
   getDataSet() {
     return {};
   }
-  getThumbnail() {
+  getThumbnail(): ?Thumbnail {
     return null;
   }
 }

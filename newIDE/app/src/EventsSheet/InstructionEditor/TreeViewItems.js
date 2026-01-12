@@ -4,6 +4,10 @@ import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import { mapFor } from '../../Utils/MapFor';
 import getObjectByName from '../../Utils/GetObjectByName';
 import { type EnumeratedInstructionMetadata } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
+import {
+  makeThumbnailFromUrl,
+  type Thumbnail,
+} from '../../ObjectsRendering/Thumbnail';
 
 export interface TreeViewItemContent {
   applySearch: boolean;
@@ -12,7 +16,7 @@ export interface TreeViewItemContent {
   getId(): string;
   getHtmlId(index: number): ?string;
   getDataSet(): ?HTMLDataset;
-  getThumbnail(): ?string;
+  getThumbnail(): ?Thumbnail;
 }
 
 export interface TreeViewItem {
@@ -20,14 +24,14 @@ export interface TreeViewItem {
   +content: TreeViewItemContent;
   openIfSearchMatches?: boolean;
   openWithSingleClick?: boolean;
-  getChildren(searchText: string): ?Array<TreeViewItem>;
+  getChildren(searchText?: string): ?Array<TreeViewItem>;
 }
 
 export type ObjectTreeViewItemProps = {|
   getThumbnail: (
     project: gdProject,
     objectConfiguration: gdObjectConfiguration
-  ) => string,
+  ) => Thumbnail,
   project: gdProject,
 |};
 
@@ -119,8 +123,8 @@ export class ObjectGroupTreeViewItemContent implements TreeViewItemContent {
     };
   }
 
-  getThumbnail(): ?string {
-    return 'res/ribbon_default/objectsgroups64.png';
+  getThumbnail(): ?Thumbnail {
+    return makeThumbnailFromUrl('res/ribbon_default/objectsgroups64.png');
   }
 }
 
@@ -166,7 +170,7 @@ export class ObjectGroupObjectTreeViewItemContent
     };
   }
 
-  getThumbnail(): ?string {
+  getThumbnail(): ?Thumbnail {
     return this.props.getThumbnail(
       this.props.project,
       this.object.getConfiguration()
@@ -207,7 +211,7 @@ export class GroupTreeViewItem implements TreeViewItem {
     this.objectTreeViewItemProps = objectTreeViewItemProps;
   }
 
-  getChildren(searchText: string): ?Array<TreeViewItem> {
+  getChildren(searchText?: string): ?Array<TreeViewItem> {
     if (!searchText) return null;
     const allObjectNames = this.group.getAllObjectsNames();
     return allObjectNames
@@ -272,7 +276,7 @@ export class MoreResultsTreeViewItemContent implements TreeViewItemContent {
   getDataSet() {
     return {};
   }
-  getThumbnail() {
+  getThumbnail(): ?Thumbnail {
     return null;
   }
 }
@@ -313,8 +317,9 @@ export class InstructionTreeViewItemContent implements TreeViewItemContent {
         : undefined,
     };
   }
-  getThumbnail() {
-    return this.instructionMetadata.iconFilename;
+  getThumbnail(): ?Thumbnail {
+    const src = this.instructionMetadata.iconFilename;
+    return src ? makeThumbnailFromUrl(src) : null;
   }
 }
 
@@ -348,7 +353,7 @@ export class LabelTreeViewItemContent implements TreeViewItemContent {
     return {};
   }
 
-  getThumbnail(): ?string {
+  getThumbnail(): ?Thumbnail {
     return null;
   }
 
@@ -442,7 +447,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     };
   }
 
-  getThumbnail(): ?string {
+  getThumbnail(): ?Thumbnail {
     return this.props.getThumbnail(
       this.props.project,
       this.object.getObject().getConfiguration()
@@ -486,7 +491,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     return { folderName: this.objectFolder.getFolderName() };
   }
 
-  getThumbnail(): ?string {
-    return 'FOLDER';
+  getThumbnail(): ?Thumbnail {
+    return makeThumbnailFromUrl('FOLDER');
   }
 }

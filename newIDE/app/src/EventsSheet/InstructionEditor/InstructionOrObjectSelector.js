@@ -559,14 +559,17 @@ const InstructionOrObjectSelector = React.forwardRef<
 
     const labels = React.useMemo(() => getLabelsForContainers(scope), [scope]);
 
-    const getFreeInstructionsTreeViewItems = i18n =>
+    const getFreeInstructionsTreeViewItems = (
+      i18n: I18nType
+    ): Array<TreeViewItem> =>
       [
         ...createFreeInstructionTreeViewItem({
           instructionOrGroup: freeInstructionsInfoTreeRef.current,
           freeInstructionProps: { getGroupIconSrc: getInstructionIconSrc },
         }),
         onClickMore
-          ? new InstructionLeafTreeViewItem(
+          ? // $FlowFixMe - InstructionLeafTreeViewItem is not properly recognized as a TreeViewItem, despite implementing the TreeViewItem interface.
+            new InstructionLeafTreeViewItem(
               new MoreInstructionsTreeViewItemContent(
                 isCondition ? (
                   <Trans>Search for new conditions in extensions</Trans>
@@ -771,6 +774,7 @@ const InstructionOrObjectSelector = React.forwardRef<
           <AutoSizer style={styles.treeViewAutoSizer} disableWidth>
             {({ height }) => (
               <ReadOnlyTreeView
+                project={project}
                 key="objects-and-search-results"
                 ref={treeViewRef}
                 height={height}
@@ -860,6 +864,7 @@ const InstructionOrObjectSelector = React.forwardRef<
           <AutoSizer style={styles.treeViewAutoSizer} disableWidth>
             {({ height }) => (
               <ReadOnlyTreeView
+                project={project}
                 key="free-instructions"
                 ref={freeInstructionTreeViewRef}
                 height={height}

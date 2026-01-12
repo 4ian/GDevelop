@@ -13,6 +13,8 @@ import { type ParameterRenderingServiceType } from '../ParameterFieldCommons';
 import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { Column, Line } from '../../../UI/Grid';
 import ObjectsRenderingService from '../../../ObjectsRendering/ObjectsRenderingService';
+import { type Thumbnail } from '../../../ObjectsRendering/Thumbnail';
+import ThumbnailImage from '../../../UI/ThumbnailImage';
 import Paper from '../../../UI/Paper';
 import { mapFor } from '../../../Utils/MapFor';
 import { Trans } from '@lingui/macro';
@@ -88,6 +90,8 @@ const AutocompletionRow = React.forwardRef(
     {
       icon,
       iconSrc,
+      thumbnail,
+      project,
       secondaryIcon,
       label,
       parametersLabel,
@@ -96,6 +100,8 @@ const AutocompletionRow = React.forwardRef(
     }: {|
       icon: React.Node | null,
       iconSrc: string | null,
+      thumbnail: ?Thumbnail,
+      project: ?gdProject,
       secondaryIcon: React.Node | null,
       label: string,
       parametersLabel: string | null,
@@ -105,6 +111,25 @@ const AutocompletionRow = React.forwardRef(
     ref
   ) => {
     const trimmedLabel = label.length > 46 ? label.substr(0, 46) + '…' : label;
+
+    // Determine which icon to render
+    const renderIcon = () => {
+      if (icon) return icon;
+      if (thumbnail && thumbnail.spritesheetFrame && project) {
+        return (
+          <ThumbnailImage
+            project={project}
+            thumbnail={thumbnail}
+            alt=""
+            maxWidth={16}
+            maxHeight={16}
+            style={autocompletionIconSizeStyle}
+          />
+        );
+      }
+      if (iconSrc) return <AutocompletionIcon src={iconSrc} />;
+      return null;
+    };
 
     return (
       <ButtonBase
@@ -118,7 +143,7 @@ const AutocompletionRow = React.forwardRef(
         ref={ref}
       >
         <LineStackLayout noMargin expand>
-          {icon || (iconSrc ? <AutocompletionIcon src={iconSrc} /> : null)}
+          {renderIcon()}
           {secondaryIcon}
           <Text style={defaultTextStyle} noMargin align="left">
             {isSelected ? <b>{trimmedLabel}</b> : trimmedLabel}
@@ -294,16 +319,25 @@ export default function ExpressionAutocompletionsDisplayer({
                     : null;
 
                   const label = expressionAutocompletion.completion;
+
+                  // Get thumbnail for Object autocompletions
+                  const thumbnail: ?Thumbnail =
+                    expressionAutocompletion.kind === 'Object' &&
+                    project &&
+                    expressionAutocompletion.objectConfiguration
+                      ? ObjectsRenderingService.getThumbnail(
+                          project,
+                          expressionAutocompletion.objectConfiguration
+                        )
+                      : null;
+
                   const iconSrc =
                     expressionAutocompletion.kind === 'Expression'
                       ? expressionAutocompletion.enumeratedExpressionMetadata
                           .iconFilename
                       : expressionAutocompletion.kind === 'Object'
-                      ? project && expressionAutocompletion.objectConfiguration
-                        ? ObjectsRenderingService.getThumbnail(
-                            project,
-                            expressionAutocompletion.objectConfiguration
-                          )
+                      ? thumbnail
+                        ? thumbnail.thumbnailSrc
                         : 'res/types/object.png'
                       : expressionAutocompletion.kind === 'Behavior'
                       ? project && expressionAutocompletion.behaviorType
@@ -367,6 +401,8 @@ export default function ExpressionAutocompletionsDisplayer({
                       key={index}
                       icon={icon}
                       iconSrc={iconSrc}
+                      thumbnail={thumbnail}
+                      project={project}
                       secondaryIcon={secondaryIcon}
                       label={label}
                       parametersLabel={parametersLabel}

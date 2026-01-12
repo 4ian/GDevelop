@@ -53,15 +53,20 @@ export const renderObjectListItem = ({
           matchesCoordinates={matchesCoordinates}
         />
       }
-      leftIcon={
-        <ListIcon
-          iconSize={iconSize}
-          src={ObjectsRenderingService.getThumbnail(
-            project,
-            objectWithContext.object.getConfiguration()
-          )}
-        />
-      }
+      leftIcon={(() => {
+        const thumbnail = ObjectsRenderingService.getThumbnail(
+          project,
+          objectWithContext.object.getConfiguration()
+        );
+        return (
+          <ListIcon
+            iconSize={iconSize}
+            src={thumbnail.thumbnailSrc}
+            thumbnail={thumbnail}
+            project={project}
+          />
+        );
+      })()}
       onClick={onClick}
       disableAutoTranslate
     />

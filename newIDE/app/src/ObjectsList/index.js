@@ -56,6 +56,7 @@ import { type HTMLDataset } from '../Utils/HTMLDataset';
 import type { MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import type { EventsScope } from '../InstructionOrExpression/EventsScope';
 import { type InstallAssetOutput } from '../AssetStore/InstallAsset';
+import { type Thumbnail } from '../ObjectsRendering/Thumbnail';
 
 const gd: libGDevelop = global.gd;
 
@@ -119,7 +120,7 @@ export interface TreeViewItemContent {
   getId(): string;
   getHtmlId(index: number): ?string;
   getDataSet(): ?HTMLDataset;
-  getThumbnail(): ?string;
+  getThumbnail(): ?Thumbnail;
   onClick(): void;
   buildMenuTemplate(i18n: I18nType, index: number): Array<MenuItemTemplate>;
   getRightButton(i18n: I18nType): ?MenuButton;
@@ -311,7 +312,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
     return {};
   }
 
-  getThumbnail(): ?string {
+  getThumbnail(): ?Thumbnail {
     return null;
   }
 
@@ -498,7 +499,7 @@ type Props = {|
   getThumbnail: (
     project: gdProject,
     objectConfiguration: gdObjectConfiguration
-  ) => string,
+  ) => Thumbnail,
   unsavedChanges?: ?UnsavedChanges,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
   isListLocked: boolean,
@@ -1571,6 +1572,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       getItemThumbnail={getTreeViewItemThumbnail}
                       getItemChildren={getTreeViewItemChildren(i18n)}
                       multiSelect={false}
+                      project={project}
                       getItemId={getTreeViewItemId}
                       getItemHtmlId={getTreeViewItemHtmlId}
                       getItemDataset={getTreeViewItemDataSet}

@@ -72,6 +72,10 @@ import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { type GDevelopTheme } from '../UI/Theme';
 import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
+import {
+  makeThumbnailFromUrl,
+  type Thumbnail,
+} from '../ObjectsRendering/Thumbnail';
 import RouterContext from '../MainFrame/RouterContext';
 import {
   type MainMenuCallbacks,
@@ -127,7 +131,7 @@ export interface TreeViewItemContent {
   getId(): string;
   getHtmlId(index: number): ?string;
   getDataSet(): ?HTMLDataset;
-  getThumbnail(): ?string;
+  getThumbnail(): ?Thumbnail;
   onClick(): void;
   buildMenuTemplate(i18n: I18nType, index: number): Array<MenuItemTemplate>;
   getRightButton(i18n: I18nType): ?MenuButton;
@@ -240,7 +244,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
     return null;
   }
 
-  getThumbnail(): ?string {
+  getThumbnail(): ?Thumbnail {
     return null;
   }
 
@@ -288,19 +292,19 @@ class ActionTreeViewItemContent implements TreeViewItemContent {
     i18n: I18nType,
     index: number
   ) => Array<MenuItemTemplate>;
-  thumbnail: ?string;
+  thumbnail: ?Thumbnail;
   onClickCallback: () => void;
 
   constructor(
     id: string,
     label: string | React.Node,
     onClickCallback: () => void,
-    thumbnail?: string
+    thumbnailSrc?: ?string
   ) {
     this.id = id;
     this.label = label;
     this.onClickCallback = onClickCallback;
-    this.thumbnail = thumbnail;
+    this.thumbnail = thumbnailSrc ? makeThumbnailFromUrl(thumbnailSrc) : null;
     this.buildMenuTemplateFunction = (i18n: I18nType, index: number) => [];
   }
 
@@ -328,7 +332,7 @@ class ActionTreeViewItemContent implements TreeViewItemContent {
     return null;
   }
 
-  getThumbnail(): ?string {
+  getThumbnail(): ?Thumbnail {
     return this.thumbnail;
   }
 

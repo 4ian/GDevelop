@@ -80,20 +80,23 @@ const getObjectsAndGroupsDataSource = ({
     requiredCapabilitiesBehaviorTypes || []
   );
   const objects = allObjectsList.map(({ object }) => {
+    const thumbnail = project
+      ? ObjectsRenderingService.getThumbnail(project, object.getConfiguration())
+      : null;
     return {
       text: object.getName(),
       value: object.getName(),
-      renderIcon: project
-        ? () => (
-            <ListIcon
-              iconSize={iconSize}
-              src={ObjectsRenderingService.getThumbnail(
-                project,
-                object.getConfiguration()
-              )}
-            />
-          )
-        : undefined,
+      renderIcon:
+        project && thumbnail
+          ? () => (
+              <ListIcon
+                iconSize={iconSize}
+                src={thumbnail.thumbnailSrc}
+                thumbnail={thumbnail}
+                project={project}
+              />
+            )
+          : undefined,
     };
   });
   const groups = noGroups

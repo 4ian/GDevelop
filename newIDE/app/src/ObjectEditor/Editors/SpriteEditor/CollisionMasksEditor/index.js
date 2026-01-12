@@ -7,9 +7,7 @@ import { Line, Column } from '../../../../UI/Grid';
 import { mapFor } from '../../../../Utils/MapFor';
 import PolygonsList from './PolygonsList';
 import CollisionMasksPreview from './CollisionMasksPreview';
-import ImagePreview, {
-  isProjectImageResourceSmooth,
-} from '../../../../ResourcesList/ResourcePreview/ImagePreview';
+import SpriteImagePreview from '../../../../ResourcesList/ResourcePreview/SpriteImagePreview';
 import {
   getCurrentElements,
   allAnimationSpritesHaveSameCollisionMasksAs,
@@ -17,7 +15,6 @@ import {
   allObjectSpritesHaveSameCollisionMaskAs,
 } from '../Utils/SpriteObjectHelper';
 import SpriteSelector from '../Utils/SpriteSelector';
-import ResourcesLoader from '../../../../ResourcesLoader';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
 import EditorMosaic, {
   type Editor,
@@ -58,7 +55,6 @@ const verticalMosaicNodes: EditorMosaicNode = {
 
 type Props = {|
   animations: gdSpriteAnimationList,
-  resourcesLoader: typeof ResourcesLoader,
   project: gdProject,
   onMasksUpdated?: () => void,
   onCreateMatchingSpriteCollisionMask: () => Promise<void>,
@@ -66,7 +62,6 @@ type Props = {|
 
 const CollisionMasksEditor = ({
   animations,
-  resourcesLoader,
   project,
   onMasksUpdated,
   onCreateMatchingSpriteCollisionMask,
@@ -305,7 +300,6 @@ const CollisionMasksEditor = ({
   const editorNodes = isMobile ? verticalMosaicNodes : horizontalMosaicNodes;
 
   if (!animations.getAnimationsCount()) return null;
-  const resourceName = sprite ? sprite.getImageName() : '';
 
   const editors: { [string]: Editor | null } = {
     preview: {
@@ -315,20 +309,12 @@ const CollisionMasksEditor = ({
       renderEditor: () => (
         <Paper background="medium" style={styles.leftContainer} square>
           <Column expand noMargin useFullHeight>
-            <ImagePreview
-              resourceName={resourceName}
-              imageResourceSource={resourcesLoader.getResourceFullUrl(
-                project,
-                resourceName,
-                {}
-              )}
-              isImageResourceSmooth={isProjectImageResourceSmooth(
-                project,
-                resourceName
-              )}
-              onImageSize={setCurrentSpriteSize}
-              renderOverlay={overlayProps =>
-                sprite && (
+            {sprite && (
+              <SpriteImagePreview
+                project={project}
+                sprite={sprite}
+                onImageSize={setCurrentSpriteSize}
+                renderOverlay={overlayProps => (
                   <CollisionMasksPreview
                     {...overlayProps}
                     isDefaultBoundingBox={sprite.isFullImageCollisionMask()}
@@ -339,9 +325,9 @@ const CollisionMasksEditor = ({
                     selectedVerticePtr={selectedVerticePtr}
                     onClickVertice={setSelectedVerticePtr}
                   />
-                )
-              }
-            />
+                )}
+              />
+            )}
           </Column>
         </Paper>
       ),

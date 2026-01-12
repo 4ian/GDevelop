@@ -8,6 +8,7 @@ import { useResponsiveWindowSize } from '../Responsive/ResponsiveWindowMeasurer'
 import ReadOnlyTreeViewRow from './ReadOnlyTreeViewRow';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import useForceUpdate from '../../Utils/UseForceUpdate';
+import { type Thumbnail } from '../../ObjectsRendering/Thumbnail';
 
 export const navigationKeys = [
   'ArrowDown',
@@ -54,8 +55,12 @@ type FlattenedNode<Item> = {|
   collapsed: boolean,
   selected: boolean,
   disableCollapse: boolean,
+  /** Thumbnail for the item. Can be a Thumbnail object (for spritesheet support). */
+  thumbnail?: ?Thumbnail,
+  /** @deprecated Use thumbnail instead. Kept for backwards compatibility. */
   thumbnailSrc?: ?string,
   item: Item,
+  project?: ?gdProject,
 |};
 
 export type ItemData<Item> = {|
@@ -65,6 +70,8 @@ export type ItemData<Item> = {|
   flattenedData: FlattenedNode<Item>[],
   isMobile: boolean,
   getItemHtmlId?: (Item, index: number) => ?string,
+  /** Used for loading object thumbnails */
+  project?: ?gdProject,
 |};
 
 const getItemProps = memoizeOne(
@@ -74,7 +81,8 @@ const getItemProps = memoizeOne(
     onClick: (FlattenedNode<Item>) => void,
     onSelect: ({| node: FlattenedNode<Item>, exclusive?: boolean |}) => void,
     isMobile: boolean,
-    getItemHtmlId?: (Item, index: number) => ?string
+    getItemHtmlId?: (Item, index: number) => ?string,
+    project?: ?gdProject
   ): ItemData<Item> => ({
     onOpen,
     onClick,
@@ -82,6 +90,7 @@ const getItemProps = memoizeOne(
     flattenedData,
     isMobile,
     getItemHtmlId,
+    project,
   })
 );
 
@@ -107,7 +116,7 @@ type Props<Item> = {|
   height: number,
   width?: number,
   items: Item[],
-  estimatedItemSize: number,
+  estimatedItemSize?: number,
   getItemHeight: Item => number,
   /**
    * Return false if the item should be displayed even if a search text is given
@@ -117,11 +126,12 @@ type Props<Item> = {|
    */
   shouldApplySearchToItem: Item => boolean,
   getItemName: Item => string | React.Node,
-  getItemDescription?: Item => string,
+  getItemDescription?: Item => string | null,
   getItemId: Item => string,
   getItemHtmlId?: (Item, index: number) => ?string,
   getItemChildren: Item => ?(Item[]),
-  getItemThumbnail?: Item => ?string,
+  /** Returns a Thumbnail for the item, or null if no thumbnail. */
+  getItemThumbnail?: Item => ?Thumbnail,
   getItemDataset?: Item => ?HTMLDataset,
   /**
    * Callback called when a folder is collapsed (folded).
@@ -138,6 +148,8 @@ type Props<Item> = {|
     onGetItemInside: (item: Item) => ?Item,
     onGetItemOutside: (item: Item) => ?Item,
   |},
+  /** Used for loading object thumbnails */
+  project?: ?gdProject,
 |};
 
 const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
@@ -164,6 +176,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     forceAllOpened,
     initiallyOpenedNodeIds,
     arrowKeyNavigationProps,
+    project,
   }: Props<Item>,
   ref: ReadOnlyTreeViewInterface<Item>
 ) => {
@@ -219,7 +232,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
 
       const name = getItemName(item);
       const description = getItemDescription
-        ? getItemDescription(item)
+        ? getItemDescription(item) || undefined
         : undefined;
       const dataset = getItemDataset ? getItemDataset(item) : undefined;
       const extraClass =
@@ -241,7 +254,8 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
         (!applySearch || doesMatchSearch(name, searchText)) ||
         flattenedChildren.length > 0
       ) {
-        const thumbnailSrc = getItemThumbnail ? getItemThumbnail(item) : null;
+        const thumbnail = getItemThumbnail ? getItemThumbnail(item) : null;
+        const thumbnailSrc = thumbnail ? thumbnail.thumbnailSrc : null;
         const selected = selectedNodeIds.includes(id);
         return [
           {
@@ -252,6 +266,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
             canHaveChildren,
             depth,
             selected,
+            thumbnail,
             thumbnailSrc,
             dataset,
             item,
@@ -540,7 +555,8 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     onClick,
     onSelect,
     isMobile,
-    getItemHtmlId
+    getItemHtmlId,
+    project
   );
 
   React.useEffect(

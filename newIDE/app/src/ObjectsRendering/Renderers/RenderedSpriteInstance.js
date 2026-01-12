@@ -3,6 +3,11 @@ import RenderedInstance from './RenderedInstance';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
 import * as PIXI from 'pixi.js-legacy';
+import {
+  type Thumbnail,
+  getThumbnailFromSprite,
+  makeThumbnailFromUrl,
+} from '../Thumbnail';
 const gd: libGDevelop = global.gd;
 
 /**
@@ -62,13 +67,13 @@ export default class RenderedSpriteInstance extends RenderedInstance {
   }
 
   /**
-   * Return a URL for thumbnail of the specified object.
+   * Return a Thumbnail for the specified object.
    */
   static getThumbnail(
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ): string {
+  ): Thumbnail {
     const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
     const animations = spriteConfiguration.getAnimations();
 
@@ -80,15 +85,14 @@ export default class RenderedSpriteInstance extends RenderedInstance {
         .getDirection(0)
         .getSpritesCount() > 0
     ) {
-      const imageName = animations
+      const sprite = animations
         .getAnimation(0)
         .getDirection(0)
-        .getSprite(0)
-        .getImageName();
-      return resourcesLoader.getResourceFullUrl(project, imageName, {});
+        .getSprite(0);
+      return getThumbnailFromSprite(sprite, resourcesLoader, project);
     }
 
-    return 'res/unknown32.png';
+    return makeThumbnailFromUrl('res/unknown32.png');
   }
 
   updatePIXISprite(): void {

@@ -13,6 +13,10 @@ import {
 } from '../Utils/Serializer';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import {
+  makeThumbnailFromUrl,
+  type Thumbnail,
+} from '../ObjectsRendering/Thumbnail';
+import {
   TreeViewItemContent,
   type TreeItemProps,
   extensionBehaviorsRootFolderId,
@@ -115,8 +119,8 @@ export class EventsBasedBehaviorTreeViewItemContent
     return `behavior-item-${index}`;
   }
 
-  getThumbnail(): ?string {
-    return 'res/functions/behavior_black.svg';
+  getThumbnail(): ?Thumbnail {
+    return makeThumbnailFromUrl('res/functions/behavior_black.svg');
   }
 
   getDataset(): ?HTMLDataset {

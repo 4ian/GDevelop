@@ -11,6 +11,7 @@ import paperDecorator from '../../PaperDecorator';
 import alertDecorator from '../../AlertDecorator';
 import ObjectsList from '../../../ObjectsList';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
+import { makeThumbnailFromUrl } from '../../../ObjectsRendering/Thumbnail';
 import SerializedObjectDisplay from '../../SerializedObjectDisplay';
 import fakeResourceManagementProps from '../../FakeResourceManagement';
 
@@ -24,7 +25,7 @@ export const Default = () => (
   <DragAndDropContextProvider>
     <div style={{ height: 400 }}>
       <ObjectsList
-        getThumbnail={() => 'res/unknown32.png'}
+        getThumbnail={() => makeThumbnailFromUrl('res/unknown32.png')}
         project={testProject.project}
         layout={testProject.testLayout}
         eventsBasedObject={null}
@@ -65,7 +66,7 @@ export const WithSerializedObjectView = () => (
     <SerializedObjectDisplay object={testProject.testLayout}>
       <div style={{ height: 250 }}>
         <ObjectsList
-          getThumbnail={() => 'res/unknown32.png'}
+          getThumbnail={() => makeThumbnailFromUrl('res/unknown32.png')}
           project={testProject.project}
           layout={testProject.testLayout}
           eventsBasedObject={null}
@@ -106,7 +107,7 @@ export const Locked = () => (
   <DragAndDropContextProvider>
     <div style={{ height: 400 }}>
       <ObjectsList
-        getThumbnail={() => 'res/unknown32.png'}
+        getThumbnail={() => makeThumbnailFromUrl('res/unknown32.png')}
         project={testProject.project}
         layout={testProject.testLayout}
         eventsBasedObject={null}

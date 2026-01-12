@@ -13,6 +13,11 @@ import {
 import { mapVector } from '../../Utils/MapFor';
 import * as PIXI from 'pixi.js-legacy';
 import * as THREE from 'three';
+import {
+  type Thumbnail,
+  getThumbnailFromSprite,
+  makeThumbnailFromUrl,
+} from '../Thumbnail';
 
 const gd: libGDevelop = global.gd;
 
@@ -361,13 +366,13 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
   }
 
   /**
-   * Return a URL for thumbnail of the specified object.
+   * Return a Thumbnail for the specified object.
    */
   static getThumbnail(
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ) {
+  ): Thumbnail {
     const customObjectConfiguration = gd.asCustomObjectConfiguration(
       objectConfiguration
     );
@@ -376,7 +381,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       customObjectConfiguration
     );
     if (!eventBasedObject) {
-      return 'res/unknown32.png';
+      return makeThumbnailFromUrl('res/unknown32.png');
     }
     if (eventBasedObject.isAnimatable()) {
       const animations = customObjectConfiguration.getAnimations();
@@ -389,14 +394,13 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
           .getDirection(0)
           .getSpritesCount() > 0
       ) {
-        const imageName = animations
+        const sprite = animations
           .getAnimation(0)
           .getDirection(0)
-          .getSprite(0)
-          .getImageName();
-        return resourcesLoader.getResourceFullUrl(project, imageName, {});
+          .getSprite(0);
+        return getThumbnailFromSprite(sprite, resourcesLoader, project);
       }
-      return 'res/unknown32.png';
+      return makeThumbnailFromUrl('res/unknown32.png');
     }
     const variant = getVariant(eventBasedObject, customObjectConfiguration);
     const childObjects = variant.getObjects();
@@ -426,7 +430,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
         if (thumbnail) return thumbnail;
       }
     }
-    return 'res/unknown32.png';
+    return makeThumbnailFromUrl('res/unknown32.png');
   }
 
   _updatePixiObjectsZOrder() {

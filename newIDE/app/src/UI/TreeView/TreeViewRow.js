@@ -9,7 +9,6 @@ import ChevronArrowBottom from '../CustomSvgIcons/ChevronArrowBottom';
 import ChevronArrowRight from '../CustomSvgIcons/ChevronArrowRight';
 import Folder from '../CustomSvgIcons/Folder';
 import ListIcon from '../ListIcon';
-import { makeThumbnailFromUrl } from '../../ObjectsRendering/Thumbnail';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import classes from './TreeView.module.css';
 import {

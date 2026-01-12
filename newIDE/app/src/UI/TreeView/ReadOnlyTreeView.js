@@ -60,6 +60,7 @@ type FlattenedNode<Item> = {|
   /** @deprecated Use thumbnail instead. Kept for backwards compatibility. */
   thumbnailSrc?: ?string,
   item: Item,
+  project?: ?gdProject,
 |};
 
 export type ItemData<Item> = {|
@@ -69,6 +70,8 @@ export type ItemData<Item> = {|
   flattenedData: FlattenedNode<Item>[],
   isMobile: boolean,
   getItemHtmlId?: (Item, index: number) => ?string,
+  /** Used for loading object thumbnails */
+  project?: ?gdProject,
 |};
 
 const getItemProps = memoizeOne(
@@ -78,7 +81,8 @@ const getItemProps = memoizeOne(
     onClick: (FlattenedNode<Item>) => void,
     onSelect: ({| node: FlattenedNode<Item>, exclusive?: boolean |}) => void,
     isMobile: boolean,
-    getItemHtmlId?: (Item, index: number) => ?string
+    getItemHtmlId?: (Item, index: number) => ?string,
+    project?: ?gdProject
   ): ItemData<Item> => ({
     onOpen,
     onClick,
@@ -86,6 +90,7 @@ const getItemProps = memoizeOne(
     flattenedData,
     isMobile,
     getItemHtmlId,
+    project,
   })
 );
 
@@ -143,6 +148,8 @@ type Props<Item> = {|
     onGetItemInside: (item: Item) => ?Item,
     onGetItemOutside: (item: Item) => ?Item,
   |},
+  /** Used for loading object thumbnails */
+  project?: ?gdProject,
 |};
 
 const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
@@ -169,6 +176,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     forceAllOpened,
     initiallyOpenedNodeIds,
     arrowKeyNavigationProps,
+    project,
   }: Props<Item>,
   ref: ReadOnlyTreeViewInterface<Item>
 ) => {
@@ -547,7 +555,8 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     onClick,
     onSelect,
     isMobile,
-    getItemHtmlId
+    getItemHtmlId,
+    project
   );
 
   React.useEffect(

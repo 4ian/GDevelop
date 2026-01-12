@@ -26,7 +26,14 @@ type Props<Item> = {|
 
 const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   const { data, index, style } = props;
-  const { flattenedData, onOpen, onClick, onSelect, getItemHtmlId } = data;
+  const {
+    flattenedData,
+    onOpen,
+    onClick,
+    onSelect,
+    getItemHtmlId,
+    project,
+  } = data;
   const node = flattenedData[index];
   const left = node.depth * 16;
   const containerRef = React.useRef<?HTMLDivElement>(null);
@@ -127,7 +134,12 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                     node.thumbnailSrc === 'NONE' ? null : node.thumbnailSrc !==
                       'FOLDER' ? (
                       <div className={classes.thumbnail}>
-                        <ListIcon iconSize={iconSize} src={node.thumbnailSrc} />
+                        <ListIcon
+                          iconSize={iconSize}
+                          thumbnail={node.thumbnail}
+                          src={node.thumbnailSrc}
+                          project={project}
+                        />
                       </div>
                     ) : (
                       !node.item.isRoot && (
@@ -135,9 +147,14 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                       )
                     )}
                   </>
-                ) : node.thumbnailSrc ? (
+                ) : node.thumbnail || node.thumbnailSrc ? (
                   <div className={classes.thumbnail}>
-                    <ListIcon iconSize={iconSize} src={node.thumbnailSrc} />
+                    <ListIcon
+                      iconSize={iconSize}
+                      src={node.thumbnailSrc || ''}
+                      thumbnail={node.thumbnail}
+                      project={project}
+                    />
                   </div>
                 ) : null}
                 <div className={classNames(classes.itemTextContainer)}>

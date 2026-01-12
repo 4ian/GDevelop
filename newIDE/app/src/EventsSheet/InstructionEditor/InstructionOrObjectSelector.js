@@ -774,6 +774,7 @@ const InstructionOrObjectSelector = React.forwardRef<
           <AutoSizer style={styles.treeViewAutoSizer} disableWidth>
             {({ height }) => (
               <ReadOnlyTreeView
+                project={project}
                 key="objects-and-search-results"
                 ref={treeViewRef}
                 height={height}
@@ -863,6 +864,7 @@ const InstructionOrObjectSelector = React.forwardRef<
           <AutoSizer style={styles.treeViewAutoSizer} disableWidth>
             {({ height }) => (
               <ReadOnlyTreeView
+                project={project}
                 key="free-instructions"
                 ref={freeInstructionTreeViewRef}
                 height={height}

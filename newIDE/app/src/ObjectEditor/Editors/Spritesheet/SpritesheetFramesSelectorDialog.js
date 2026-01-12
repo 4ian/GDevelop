@@ -15,6 +15,11 @@ import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import CheckeredBackground from '../../../ResourcesList/CheckeredBackground';
 import ScrollView from '../../../UI/ScrollView';
 import { List, ListItem } from '../../../UI/List';
+import {
+  getSpritesheetFrameStyles,
+  type SpritesheetFrameData,
+} from '../../../ObjectsRendering/Thumbnail';
+import { isProjectImageResourceSmooth } from '../../../ResourcesList/ResourcePreview/ImagePreview';
 
 const FRAME_SIZE = 80;
 
@@ -72,6 +77,7 @@ type FrameThumbnailProps = {|
   frameName: string,
   texture: any, // PIXI.Texture
   selected: boolean,
+  isSmooth: boolean,
   onSelect: (selected: boolean) => void,
 |};
 
@@ -79,6 +85,7 @@ const FrameThumbnail = ({
   frameName,
   texture,
   selected,
+  isSmooth,
   onSelect,
 }: FrameThumbnailProps) => {
   const theme = React.useContext(GDevelopThemeContext);
@@ -101,29 +108,35 @@ const FrameThumbnail = ({
     [texture]
   );
 
-  // Calculate the crop for this frame
-  const frameStyle = React.useMemo(
+  const frameData = React.useMemo<?SpritesheetFrameData>(
     () => {
-      if (!texture || !texture.frame) {
-        return {};
+      if (!texture || !texture.frame || !texture.orig || !imageSrc) {
+        return null;
       }
-      const frame = texture.frame;
-      const orig = texture.orig;
       return {
-        objectFit: 'none',
-        objectPosition: `-${frame.x}px -${frame.y}px`,
-        width: orig.width,
-        height: orig.height,
-        maxWidth: 'none',
-        maxHeight: 'none',
-        transform: `scale(${Math.min(
-          FRAME_SIZE / orig.width,
-          FRAME_SIZE / orig.height,
-          1
-        )})`,
+        imageSrc,
+        frame: {
+          x: texture.frame.x,
+          y: texture.frame.y,
+          width: texture.frame.width,
+          height: texture.frame.height,
+        },
+        originalSize: {
+          width: texture.orig.width,
+          height: texture.orig.height,
+        },
+        isSmooth,
       };
     },
-    [texture]
+    [texture, imageSrc, isSmooth]
+  );
+
+  const frameStyles = React.useMemo(
+    () =>
+      frameData
+        ? getSpritesheetFrameStyles(frameData, FRAME_SIZE, FRAME_SIZE)
+        : null,
+    [frameData]
   );
 
   return (
@@ -139,12 +152,14 @@ const FrameThumbnail = ({
         }}
       >
         <CheckeredBackground borderRadius={4} />
-        {imageSrc && (
-          <CorsAwareImage
-            style={{ ...styles.frameImage, ...frameStyle }}
-            alt={frameName}
-            src={imageSrc}
-          />
+        {frameStyles && (
+          <div style={frameStyles.containerStyle}>
+            <CorsAwareImage
+              style={{ ...styles.frameImage, ...frameStyles.imageStyle }}
+              alt={frameName}
+              src={imageSrc}
+            />
+          </div>
         )}
         <div
           style={styles.checkboxContainer}
@@ -268,6 +283,10 @@ const SpritesheetFramesSelectorDialog = ({
 
   const frameNames = Object.keys(frames);
   const animationNames = Object.keys(animations);
+  const isSmooth = React.useMemo(
+    () => isProjectImageResourceSmooth(project, spritesheetResourceName),
+    [project, spritesheetResourceName]
+  );
 
   const renderError = () => {
     if (!spritesheetData) return null;
@@ -390,6 +409,7 @@ const SpritesheetFramesSelectorDialog = ({
                         frameName={frameName}
                         texture={frames[frameName]}
                         selected={selectedFrames.includes(frameName)}
+                        isSmooth={isSmooth}
                         onSelect={selected =>
                           handleFrameSelect(frameName, selected)
                         }

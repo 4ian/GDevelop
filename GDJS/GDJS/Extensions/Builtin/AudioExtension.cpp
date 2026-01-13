@@ -81,7 +81,7 @@ AudioExtension::AudioExtension() {
   GetAllConditions()["SoundStopped"].SetFunctionName(
       "gdjs.evtTools.sound.isSoundOnChannelStopped");
 
-  GetAllActions()["ModGlobalVolume"]
+  GetAllActions()["SetGlobalVolume"]
       .SetFunctionName("gdjs.evtTools.sound.setGlobalVolume")
       .SetGetter("gdjs.evtTools.sound.getGlobalVolume");
   GetAllConditions()["GlobalVolume"].SetFunctionName(
@@ -89,6 +89,43 @@ AudioExtension::AudioExtension() {
   GetAllExpressions()["GlobalVolume"].SetFunctionName(
       "gdjs.evtTools.sound.getGlobalVolume");
 
+  GetAllActions()["SetSoundChannelVolume"]
+      .SetFunctionName("gdjs.evtTools.sound.setSoundOnChannelVolume")
+      .SetGetter("gdjs.evtTools.sound.getSoundOnChannelVolume");
+  GetAllActions()["SetMusicChannelVolume"]
+      .SetFunctionName("gdjs.evtTools.sound.setMusicOnChannelVolume")
+      .SetGetter("gdjs.evtTools.sound.getMusicOnChannelVolume");
+  GetAllConditions()["SoundChannelVolume"].SetFunctionName(
+      "gdjs.evtTools.sound.getSoundOnChannelVolume");
+  GetAllConditions()["MusicChannelVolume"].SetFunctionName(
+      "gdjs.evtTools.sound.getMusicOnChannelVolume");
+
+  GetAllActions()["SetSoundChannelPlayingOffset"]
+      .SetFunctionName("gdjs.evtTools.sound.setSoundOnChannelPlayingOffset")
+      .SetGetter("gdjs.evtTools.sound.getSoundOnChannelPlayingOffset");
+  GetAllActions()["SetMusicChannelPlayingOffset"]
+      .SetFunctionName("gdjs.evtTools.sound.setMusicOnChannelPlayingOffset")
+      .SetGetter("gdjs.evtTools.sound.getMusicOnChannelPlayingOffset");
+  GetAllConditions()["SoundChannelPlayingOffset"].SetFunctionName(
+      "gdjs.evtTools.sound.getSoundOnChannelPlayingOffset");
+  GetAllConditions()["MusicChannelPlayingOffset"].SetFunctionName(
+      "gdjs.evtTools.sound.getMusicOnChannelPlayingOffset");
+
+  GetAllActions()["SetSoundChannelPitch"]
+      .SetFunctionName("gdjs.evtTools.sound.setSoundOnChannelPitch")
+      .SetGetter("gdjs.evtTools.sound.getSoundOnChannelPitch");
+  GetAllActions()["SetMusicChannelPitch"]
+      .SetFunctionName("gdjs.evtTools.sound.setMusicOnChannelPitch")
+      .SetGetter("gdjs.evtTools.sound.getMusicOnChannelPitch");
+  GetAllConditions()["SoundChannelPitch"].SetFunctionName(
+      "gdjs.evtTools.sound.getSoundOnChannelPitch");
+  GetAllConditions()["MusicChannelPitch"].SetFunctionName(
+      "gdjs.evtTools.sound.getMusicOnChannelPitch");
+
+  // Compatibility with GD <= 5.6.251
+  GetAllActions()["ModGlobalVolume"]
+      .SetFunctionName("gdjs.evtTools.sound.setGlobalVolume")
+      .SetGetter("gdjs.evtTools.sound.getGlobalVolume");
   GetAllActions()["ModVolumeSoundCanal"]
       .SetFunctionName("gdjs.evtTools.sound.setSoundOnChannelVolume")
       .SetGetter("gdjs.evtTools.sound.getSoundOnChannelVolume");
@@ -99,28 +136,19 @@ AudioExtension::AudioExtension() {
       "gdjs.evtTools.sound.getSoundOnChannelVolume");
   GetAllConditions()["MusicCanalVolume"].SetFunctionName(
       "gdjs.evtTools.sound.getMusicOnChannelVolume");
-
   GetAllActions()["ModPlayingOffsetSoundChannel"]
       .SetFunctionName("gdjs.evtTools.sound.setSoundOnChannelPlayingOffset")
       .SetGetter("gdjs.evtTools.sound.getSoundOnChannelPlayingOffset");
   GetAllActions()["ModPlayingOffsetMusicChannel"]
       .SetFunctionName("gdjs.evtTools.sound.setMusicOnChannelPlayingOffset")
       .SetGetter("gdjs.evtTools.sound.getMusicOnChannelPlayingOffset");
-  GetAllConditions()["SoundChannelPlayingOffset"].SetFunctionName(
-      "gdjs.evtTools.sound.getSoundOnChannelPlayingOffset");
-  GetAllConditions()["MusicChannelPlayingOffset"].SetFunctionName(
-      "gdjs.evtTools.sound.getMusicOnChannelPlayingOffset");
-
   GetAllActions()["ModPitchSoundChannel"]
       .SetFunctionName("gdjs.evtTools.sound.setSoundOnChannelPitch")
       .SetGetter("gdjs.evtTools.sound.getSoundOnChannelPitch");
   GetAllActions()["ModPitchMusicChannel"]
       .SetFunctionName("gdjs.evtTools.sound.setMusicOnChannelPitch")
       .SetGetter("gdjs.evtTools.sound.getMusicOnChannelPitch");
-  GetAllConditions()["SoundChannelPitch"].SetFunctionName(
-      "gdjs.evtTools.sound.getSoundOnChannelPitch");
-  GetAllConditions()["MusicChannelPitch"].SetFunctionName(
-      "gdjs.evtTools.sound.getMusicOnChannelPitch");
+  // End of compatibility code
 
   GetAllExpressions()["SoundChannelVolume"].SetFunctionName(
       "gdjs.evtTools.sound.getSoundOnChannelVolume");

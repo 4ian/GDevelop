@@ -185,7 +185,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
   // End of compatibility code
 
   extension
-      .AddAction("ModVolumeSoundCanal",
+      .AddAction("SetSoundChannelVolume",
                  _("Volume of the sound on a channel"),
                  _("This action modifies the volume of the sound on the "
                    "specified channel."),
@@ -201,8 +201,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
               _("Volume (0-100)")))
       .MarkAsAdvanced();
 
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedAction("ModVolumeSoundCanal", "SetSoundChannelVolume")
+      .SetHidden();
+  // End of compatibility code
+
   extension
-      .AddAction("ModVolumeMusicCanal",
+      .AddAction("SetMusicChannelVolume",
                  _("Volume of the music on a channel"),
                  _("This action modifies the volume of the music on the "
                    "specified channel."),
@@ -218,8 +223,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
               _("Volume (0-100)")))
       .MarkAsAdvanced();
 
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedAction("ModVolumeMusicCanal", "SetMusicChannelVolume")
+      .SetHidden();
+  // End of compatibility code
+
   extension
-      .AddAction("ModGlobalVolume",
+      .AddAction("SetGlobalVolume",
                  _("Game global volume"),
                  _("This action modifies the global volume of the game."),
                  _("the global sound level"),
@@ -233,8 +243,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
               _("Volume (0-100)")))
       .MarkAsSimple();
 
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedAction("ModGlobalVolume", "SetGlobalVolume")
+      .SetHidden();
+  // End of compatibility code
+
   extension
-      .AddAction("ModPitchSoundChannel",
+      .AddAction("SetSoundChannelPitch",
                  _("Pitch of the sound of a channel"),
                  _("This action modifies the pitch (speed) of the sound on a "
                    "channel."),
@@ -250,8 +265,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
               _("Pitch (1 by default)")))
       .MarkAsAdvanced();
 
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedAction("ModPitchSoundChannel", "SetSoundChannelPitch")
+      .SetHidden();
+  // End of compatibility code
+
   extension
-      .AddAction("ModPitchMusicChannel",
+      .AddAction("SetMusicChannelPitch",
                  _("Pitch of the music on a channel"),
                  _("This action modifies the pitch of the music on the "
                    "specified channel."),
@@ -267,8 +287,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
               _("Pitch (1 by default)")))
       .MarkAsAdvanced();
 
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedAction("ModPitchMusicChannel", "SetMusicChannelPitch")
+      .SetHidden();
+  // End of compatibility code
+
   extension
-      .AddAction("ModPlayingOffsetSoundChannel",
+      .AddAction("SetSoundChannelPlayingOffset",
                  _("Playing offset of the sound on a channel"),
                  _("This action modifies the playing offset of the sound on a "
                    "channel"),
@@ -284,8 +309,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
               _("Position (in seconds)")))
       .MarkAsAdvanced();
 
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedAction("ModPlayingOffsetSoundChannel", "SetSoundChannelPlayingOffset")
+      .SetHidden();
+  // End of compatibility code
+
   extension
-      .AddAction("ModPlayingOffsetMusicChannel",
+      .AddAction("SetMusicChannelPlayingOffset",
                  _("Playing offset of the music on a channel"),
                  _("This action modifies the playing offset of the music on "
                    "the specified channel"),
@@ -300,6 +330,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
           ParameterOptions::MakeNewOptions().SetDescription(
               _("Position (in seconds)")))
       .MarkAsAdvanced();
+
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedAction("ModPlayingOffsetMusicChannel", "SetMusicChannelPlayingOffset")
+      .SetHidden();
+  // End of compatibility code
 
   extension
       .AddAction("PlaySound",
@@ -508,7 +543,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
 
   extension
       .AddCondition(
-          "SoundCanalVolume",
+          "SoundChannelVolume",
           _("Volume of the sound on a channel"),
           _("Test the volume of the sound on the specified channel."),
           _("the volume of the sound on channel _PARAM1_"),
@@ -523,9 +558,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
               _("Volume to compare to (0-100)")))
       .MarkAsAdvanced();
 
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedCondition("SoundCanalVolume", "SoundChannelVolume")
+      .SetHidden();
+  // End of compatibility code
+
   extension
       .AddCondition(
-          "MusicCanalVolume",
+          "MusicChannelVolume",
           _("Volume of the music on a channel"),
           _("Test the volume of the music on a specified channel. The volume "
             "is between 0 and 100."),
@@ -540,6 +580,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
           ParameterOptions::MakeNewOptions().SetDescription(
               _("Volume to compare to (0-100)")))
       .MarkAsAdvanced();
+
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedCondition("MusicCanalVolume", "MusicChannelVolume")
+      .SetHidden();
+  // End of compatibility code
 
   extension
       .AddCondition(

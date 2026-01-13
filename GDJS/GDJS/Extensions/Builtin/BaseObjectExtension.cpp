@@ -248,7 +248,7 @@ BaseObjectExtension::BaseObjectExtension() {
       "gdjs.evtTools.object.turnedTowardTest");
   GetAllConditions()["IsTurnedTowardObject"].SetFunctionName(
       "gdjs.evtTools.object.isTurnedTowardObject");
-  GetAllConditions()["CursorOnObject"].SetFunctionName(
+  GetAllConditions()["IsCursorOnObject"].SetFunctionName(
       "gdjs.evtTools.input.cursorOnObject");
   // Compatibility with GD <= 5.6.251
   GetAllConditions()["SourisSurObjet"].SetFunctionName(

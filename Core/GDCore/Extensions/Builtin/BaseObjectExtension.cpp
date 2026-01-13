@@ -1243,7 +1243,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsSimple();
 
   extension
-      .AddCondition("CursorOnObject",
+      .AddCondition("IsCursorOnObject",
                     _("The cursor/touch is on an object"),
                     _("Test if the cursor is over an object, or if the object "
                       "is being touched."),
@@ -1260,7 +1260,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsSimple();
 
   // Compatibility with GD <= 5.6.251
-  extension.AddDuplicatedCondition("SourisSurObjet", "CursorOnObject")
+  extension.AddDuplicatedCondition("SourisSurObjet", "IsCursorOnObject")
       .SetHidden();
   // End of compatibility code
 

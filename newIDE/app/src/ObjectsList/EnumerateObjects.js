@@ -156,7 +156,7 @@ export const enumerateObjectTypes = (
             fullName: objectMetadata.getFullName(),
             description: objectMetadata.getDescription(),
             iconFilename: objectMetadata.getIconFilename(),
-            category: objectMetadata.getCategoryFullName(),
+            category: extension.getCategory() || 'General',
             assetStoreTag: objectMetadata.getAssetStoreTag(),
             isRenderedIn3D: objectMetadata.isRenderedIn3D(),
             tags: extension.getTags().toJSArray(),

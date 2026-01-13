@@ -14,6 +14,7 @@ import {
 } from '../UI/Search/UseSearchStructuredItem';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { OBJECTS_FETCH_TIMEOUT } from '../Utils/GlobalFetchTimeouts';
+import { translateExtensionCategory } from '../Utils/Extension/ExtensionCategories';
 
 const gd: libGDevelop = global.gd;
 
@@ -444,7 +445,17 @@ export const ObjectStoreStateProvider = ({
         const categoryId = getCategoryId(categoryName);
         const objectCategory: ObjectCategory = {
           categoryId,
-          name: categoryName,
+          name: translateExtensionCategory(categoryName, i18n),
+          tags: [],
+          tier: '',
+        };
+        allTranslatedObjectsAndCategories[categoryId] = objectCategory;
+      }
+      {
+        const categoryId = getCategoryId('Explore');
+        const objectCategory: ObjectCategory = {
+          categoryId,
+          name: i18n._('Explore'),
           tags: [],
           tier: '',
         };
@@ -452,7 +463,7 @@ export const ObjectStoreStateProvider = ({
       }
       return allTranslatedObjectsAndCategories;
     },
-    [firstObjectIds, installedObjectMetadataList, allTranslatedObjects]
+    [firstObjectIds, installedObjectMetadataList, allTranslatedObjects, i18n]
   );
 
   const defaultFirstSearchItemIds = React.useMemo(

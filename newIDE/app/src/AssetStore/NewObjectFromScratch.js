@@ -13,7 +13,6 @@ import { sendNewObjectCreated } from '../Utils/Analytics/EventSender';
 import ScrollView from '../UI/ScrollView';
 import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
 import { AssetStoreContext } from './AssetStoreContext';
-import { translateExtensionCategory } from '../Utils/Extension/ExtensionCategories';
 import { type ChosenCategory } from '../UI/Search/FiltersChooser';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import TextButton from '../UI/TextButton';

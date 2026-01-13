@@ -27,7 +27,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
       .SetIcon("res/actions/son24.png");
 
   extension
-      .AddAction("PlaySoundCanal",
+      .AddAction("PlaySoundOnChannel",
                  _("Play a sound on a channel"),
                  _("Play a sound (small audio file) on a specific channel,\nso "
                    "you'll be able to manipulate it."),
@@ -49,8 +49,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
       .SetDefaultValue("1")
       .MarkAsAdvanced();
 
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedAction("PlaySoundCanal", "PlaySoundOnChannel")
+      .SetHidden();
+  // End of compatibility code
+
   extension
-      .AddAction("StopSoundCanal",
+      .AddAction("StopSoundChannel",
                  _("Stop the sound of a channel"),
                  _("Stop the sound on the specified channel."),
                  _("Stop the sound of channel _PARAM1_"),
@@ -61,8 +66,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
       .AddParameter("expression", _("Channel identifier"))
       .MarkAsAdvanced();
 
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedAction("StopSoundCanal", "StopSoundChannel")
+      .SetHidden();
+  // End of compatibility code
+
   extension
-      .AddAction("PauseSoundCanal",
+      .AddAction("PauseSoundChannel",
                  _("Pause the sound of a channel"),
                  _("Pause the sound played on the specified channel."),
                  _("Pause the sound of channel _PARAM1_"),
@@ -73,8 +83,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
       .AddParameter("expression", _("Channel identifier"))
       .MarkAsAdvanced();
 
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedAction("PauseSoundCanal", "PauseSoundChannel")
+      .SetHidden();
+  // End of compatibility code
+
   extension
-      .AddAction("RePlaySoundCanal",
+      .AddAction("ResumeSoundChannel",
                  _("Resume playing a sound on a channel"),
                  _("Resume playing a sound on a channel that was paused."),
                  _("Resume the sound of channel _PARAM1_"),
@@ -85,8 +100,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
       .AddParameter("expression", _("Channel identifier"))
       .MarkAsAdvanced();
 
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedAction("RePlaySoundCanal", "ResumeSoundChannel")
+      .SetHidden();
+  // End of compatibility code
+
   extension
-      .AddAction("PlayMusicCanal",
+      .AddAction("PlayMusicOnChannel",
                  _("Play a music file on a channel"),
                  _("Play a music file on a specific channel,\nso you'll be "
                    "able to interact with it later."),
@@ -108,8 +128,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
       .SetDefaultValue("1")
       .MarkAsAdvanced();
 
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedAction("PlayMusicCanal", "PlayMusicOnChannel")
+      .SetHidden();
+  // End of compatibility code
+
   extension
-      .AddAction("StopMusicCanal",
+      .AddAction("StopMusicChannel",
                  _("Stop the music on a channel"),
                  _("Stop the music on the specified channel"),
                  _("Stop the music of channel _PARAM1_"),
@@ -120,8 +145,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
       .AddParameter("expression", _("Channel identifier"))
       .MarkAsAdvanced();
 
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedAction("StopMusicCanal", "StopMusicChannel")
+      .SetHidden();
+  // End of compatibility code
+
   extension
-      .AddAction("PauseMusicCanal",
+      .AddAction("PauseMusicChannel",
                  _("Pause the music of a channel"),
                  _("Pause the music on the specified channel."),
                  _("Pause the music of channel _PARAM1_"),
@@ -132,8 +162,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
       .AddParameter("expression", _("Channel identifier"))
       .MarkAsAdvanced();
 
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedAction("PauseMusicCanal", "PauseMusicChannel")
+      .SetHidden();
+  // End of compatibility code
+
   extension
-      .AddAction("RePlayMusicCanal",
+      .AddAction("ResumeMusicChannel",
                  _("Resume playing a music on a channel"),
                  _("Resume playing a music on a channel that was paused."),
                  _("Resume the music of channel _PARAM1_"),
@@ -143,6 +178,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Channel identifier"))
       .MarkAsAdvanced();
+
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedAction("RePlayMusicCanal", "ResumeMusicChannel")
+      .SetHidden();
+  // End of compatibility code
 
   extension
       .AddAction("ModVolumeSoundCanal",

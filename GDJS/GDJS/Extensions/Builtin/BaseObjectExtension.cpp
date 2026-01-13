@@ -27,8 +27,12 @@ BaseObjectExtension::BaseObjectExtension() {
   std::map<gd::String, gd::ExpressionMetadata> &objectStrExpressions =
       GetAllStrExpressionsForObject("");
 
+  objectActions["SetX"].SetFunctionName("setX").SetGetter("getX");
+  objectActions["SetY"].SetFunctionName("setY").SetGetter("getY");
+  // Compatibility with GD <= 5.6.251
   objectActions["MettreX"].SetFunctionName("setX").SetGetter("getX");
   objectActions["MettreY"].SetFunctionName("setY").SetGetter("getY");
+  // End of compatibility code
   objectConditions["PosX"].SetFunctionName("getX").SetIncludeFile(
       "runtimeobject.js");
   objectConditions["PosY"].SetFunctionName("getY").SetIncludeFile(
@@ -59,17 +63,30 @@ BaseObjectExtension::BaseObjectExtension() {
   objectActions["ChangePlan"]
       .SetFunctionName("setZOrder")
       .SetGetter("getZOrder");
+  objectConditions["ZOrder"].SetFunctionName("getZOrder");
+  // Compatibility with GD <= 5.6.251
   objectConditions["Plan"].SetFunctionName("getZOrder");
+  // End of compatibility code
+  objectActions["Hide"].SetFunctionName("hide").SetIncludeFile(
+      "runtimeobject.js");
+  objectActions["Show"].SetFunctionName("hide").SetIncludeFile(
+      "runtimeobject.js");
+  // Compatibility with GD <= 5.6.251
   objectActions["Cache"].SetFunctionName("hide").SetIncludeFile(
       "runtimeobject.js");
   objectActions["Montre"].SetFunctionName("hide").SetIncludeFile(
       "runtimeobject.js");
+  // End of compatibility code
   objectConditions["Visible"].SetFunctionName("isVisible");
   objectConditions["Invisible"].SetFunctionName("isHidden");
   objectConditions["IsEffectEnabled"].SetFunctionName("isEffectEnabled");
   objectActions["Delete"].SetFunctionName("deleteFromScene");
+  objectActions["PutAroundPosition"].SetFunctionName("putAround");
+  objectActions["PutAroundObject"].SetFunctionName("putAroundObject");
+  // Compatibility with GD <= 5.6.251
   objectActions["MettreAutourPos"].SetFunctionName("putAround");
   objectActions["MettreAutour"].SetFunctionName("putAroundObject");
+  // End of compatibility code
   objectConditions["VarObjet"].SetFunctionName("getVariableNumber");
   objectConditions["VarObjetTxt"].SetFunctionName("getVariableString");
   objectConditions["ObjectVariableAsBoolean"].SetFunctionName(
@@ -79,9 +96,14 @@ BaseObjectExtension::BaseObjectExtension() {
   objectActions["AddForceAL"].SetFunctionName("addPolarForce");
   objectActions["AddForceVersPos"].SetFunctionName("addForceTowardPosition");
   objectActions["AddForceVers"].SetFunctionName("addForceTowardObject");
+  objectActions["StopForces"].SetFunctionName("clearForces");
+  objectConditions["IsStopped"].SetFunctionName("hasNoForces");
+  objectConditions["Speed"].SetFunctionName("getAverageForce().getLength");
+  // Compatibility with GD <= 5.6.251
   objectActions["Arreter"].SetFunctionName("clearForces");
   objectConditions["Arret"].SetFunctionName("hasNoForces");
   objectConditions["Vitesse"].SetFunctionName("getAverageForce().getLength");
+  // End of compatibility code
   objectConditions["AngleOfDisplacement"].SetFunctionName(
       "averageForceAngleIs");
   objectConditions["IsTotalForceAngleAround"].SetFunctionName(
@@ -219,9 +241,22 @@ BaseObjectExtension::BaseObjectExtension() {
       "gdjs.evtTools.object.turnedTowardTest");
   GetAllConditions()["IsTurnedTowardObject"].SetFunctionName(
       "gdjs.evtTools.object.isTurnedTowardObject");
+  GetAllConditions()["CursorOnObject"].SetFunctionName(
+      "gdjs.evtTools.input.cursorOnObject");
+  // Compatibility with GD <= 5.6.251
   GetAllConditions()["SourisSurObjet"].SetFunctionName(
       "gdjs.evtTools.input.cursorOnObject");
+  // End of compatibility code
 
+  GetAllActions()["PickAllInstances"].SetFunctionName(
+      "gdjs.evtTools.object.pickAllObjects");
+  GetAllConditions()["PickAllInstances"].SetFunctionName(
+      "gdjs.evtTools.object.pickAllObjects");
+  GetAllActions()["PickRandomInstance"].SetFunctionName(
+      "gdjs.evtTools.object.pickRandomObject");
+  GetAllConditions()["PickRandomInstance"].SetFunctionName(
+      "gdjs.evtTools.object.pickRandomObject");
+  // Compatibility with GD <= 5.6.251
   GetAllActions()["AjoutObjConcern"].SetFunctionName(
       "gdjs.evtTools.object.pickAllObjects");
   GetAllConditions()["AjoutObjConcern"].SetFunctionName(
@@ -230,6 +265,7 @@ BaseObjectExtension::BaseObjectExtension() {
       "gdjs.evtTools.object.pickRandomObject");
   GetAllConditions()["AjoutHasard"].SetFunctionName(
       "gdjs.evtTools.object.pickRandomObject");
+  // End of compatibility code
   GetAllActions()["PickNearest"].SetFunctionName(
       "gdjs.evtTools.object.pickNearestObject");
   GetAllConditions()["PickNearest"].SetFunctionName(
@@ -310,7 +346,7 @@ BaseObjectExtension::BaseObjectExtension() {
     return op == "/" || op == "*" || op == "-" || op == "+";
   };
 
-  objectActions["MettreXY"].SetCustomCodeGenerator(
+  objectActions["SetXY"].SetCustomCodeGenerator(
       [&](gd::Instruction &instruction,
           gd::EventsCodeGenerator &codeGenerator,
           gd::EventsCodeGenerationContext &context) -> gd::String {
@@ -366,6 +402,11 @@ BaseObjectExtension::BaseObjectExtension() {
 
         return outputCode;
       });
+
+  // Compatibility with GD <= 5.6.251
+  objectActions["MettreXY"].codeExtraInformation =
+      objectActions["SetXY"].codeExtraInformation;
+  // End of compatibility code
 
   objectActions["SetCenter"].SetCustomCodeGenerator(
       [&](gd::Instruction &instruction,

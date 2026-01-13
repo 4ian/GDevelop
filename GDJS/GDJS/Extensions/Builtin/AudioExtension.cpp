@@ -16,9 +16,26 @@ AudioExtension::AudioExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsAudioExtension(*this);
 
   GetAllActions()["PlaySound"].SetFunctionName("gdjs.evtTools.sound.playSound");
-  GetAllActions()["PlaySoundCanal"].SetFunctionName(
+  GetAllActions()["PlaySoundOnChannel"].SetFunctionName(
       "gdjs.evtTools.sound.playSoundOnChannel");
   GetAllActions()["PlayMusic"].SetFunctionName("gdjs.evtTools.sound.playMusic");
+  GetAllActions()["PlayMusicOnChannel"].SetFunctionName(
+      "gdjs.evtTools.sound.playMusicOnChannel");
+  GetAllActions()["StopSoundChannel"].SetFunctionName(
+      "gdjs.evtTools.sound.stopSoundOnChannel");
+  GetAllActions()["PauseSoundChannel"].SetFunctionName(
+      "gdjs.evtTools.sound.pauseSoundOnChannel");
+  GetAllActions()["ResumeSoundChannel"].SetFunctionName(
+      "gdjs.evtTools.sound.continueSoundOnChannel");
+  GetAllActions()["StopMusicChannel"].SetFunctionName(
+      "gdjs.evtTools.sound.stopMusicOnChannel");
+  GetAllActions()["PauseMusicChannel"].SetFunctionName(
+      "gdjs.evtTools.sound.pauseMusicOnChannel");
+  GetAllActions()["ResumeMusicChannel"].SetFunctionName(
+      "gdjs.evtTools.sound.continueMusicOnChannel");
+  // Compatibility with GD <= 5.6.251
+  GetAllActions()["PlaySoundCanal"].SetFunctionName(
+      "gdjs.evtTools.sound.playSoundOnChannel");
   GetAllActions()["PlayMusicCanal"].SetFunctionName(
       "gdjs.evtTools.sound.playMusicOnChannel");
   GetAllActions()["StopSoundCanal"].SetFunctionName(
@@ -33,6 +50,7 @@ AudioExtension::AudioExtension() {
       "gdjs.evtTools.sound.pauseMusicOnChannel");
   GetAllActions()["RePlayMusicCanal"].SetFunctionName(
       "gdjs.evtTools.sound.continueMusicOnChannel");
+  // End of compatibility code
         GetAllActions()["FadeMusicVolume"].SetFunctionName(
       "gdjs.evtTools.sound.fadeMusicVolume");
 

@@ -36,7 +36,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddCodeOnlyParameter("currentScene", "");
 
   extension
-      .AddCondition("DepartScene",
+      .AddCondition("AtSceneStart",
                     _("At the beginning of the scene"),
                     _("Is true only when scene just begins."),
                     _("At the beginning of the scene"),
@@ -46,6 +46,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .SetHelpPath("/interface/scene-editor/events")
       .AddCodeOnlyParameter("currentScene", "")
       .MarkAsSimple();
+
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedCondition("DepartScene", "AtSceneStart").SetHidden();
+  // End of compatibility code
 
   extension
       .AddCondition("SceneJustResumed",

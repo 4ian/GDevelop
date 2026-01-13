@@ -409,7 +409,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddAction("CentreCamera",
+      .AddAction("CenterCameraOnObject",
                  _("Center the camera on an object"),
                  _("Center the camera on the specified object."),
                  _("Center camera on _PARAM1_ (layer: _PARAM3_)"),
@@ -428,6 +428,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
       .SetDefaultValue("0")
       .MarkAsSimple();
+
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedAction("CentreCamera", "CenterCameraOnObject")
+      .SetHidden();
+  // End of compatibility code
 
   extension
       .AddAction("ShowLayer",

@@ -58,9 +58,7 @@ function ListIcon(props: Props) {
     src.startsWith(
       'https://asset-resources.gdevelop.io/public-resources/Icons/'
     ) ||
-    src.startsWith(
-      'https://resources.gdevelop-app.com/assets/Icons/'
-    ) ||
+    src.startsWith('https://resources.gdevelop-app.com/assets/Icons/') ||
     src.includes('_black');
   const shouldInvertGrayScale = paletteType === 'dark' && isBlackIcon;
 

@@ -77,6 +77,10 @@ const getItemIdsGroupedByCategory = (
     }
   }
   const objectsByCategory = new Map<string, Array<ObjectShortHeader>>();
+  // Ensure order for categories without any built-in object.
+  for (const builtInObjectCategory of builtInObjectCategories) {
+    objectsByCategory.set(builtInObjectCategory, []);
+  }
   for (const objectShortHeader of sortedInstalledObjectShortHeaders) {
     const category = objectShortHeader.category;
     let categoryObjects = objectsByCategory.get(category);
@@ -88,12 +92,27 @@ const getItemIdsGroupedByCategory = (
   }
   const itemIdsGroupedByCategory = [];
   for (const [category, objectShortHeaders] of objectsByCategory) {
+    if (objectShortHeaders.length === 0) {
+      continue;
+    }
     itemIdsGroupedByCategory.push(getCategoryId(category));
     for (const objectShortHeader of objectShortHeaders) {
       itemIdsGroupedByCategory.push(objectShortHeader.type);
     }
   }
   return itemIdsGroupedByCategory;
+};
+
+const getCategories = (
+  objectShortHeaders: Array<ObjectShortHeader>
+): Array<string> => {
+  const categories: Set<string> = new Set();
+  for (const objectShortHeader of objectShortHeaders) {
+    if (objectShortHeader.category) {
+      categories.add(objectShortHeader.category);
+    }
+  }
+  return [...categories];
 };
 
 type ObjectStoreState = {|
@@ -407,7 +426,21 @@ export const ObjectStoreStateProvider = ({
           translatedObjects.type
         ] = translatedObjects;
       }
-      for (const categoryName of [...allCategories, 'Explore']) {
+      const allCategorizedObjects = [
+        ...[...builtInObjectTypes, ...firstObjectIds]
+          .map(type => {
+            const objectOrCategory: ObjectShortHeader =
+              //$FlowFixMe It can't be an ObjectCategory
+              allTranslatedObjectsAndCategories[type];
+            return objectOrCategory;
+          })
+          .filter(Boolean),
+        ...installedObjectMetadataList,
+      ];
+      for (const categoryName of [
+        ...getCategories(allCategorizedObjects),
+        'Explore',
+      ]) {
         const categoryId = getCategoryId(categoryName);
         const objectCategory: ObjectCategory = {
           categoryId,
@@ -419,7 +452,7 @@ export const ObjectStoreStateProvider = ({
       }
       return allTranslatedObjectsAndCategories;
     },
-    [allTranslatedObjects, allCategories]
+    [firstObjectIds, installedObjectMetadataList, allTranslatedObjects]
   );
 
   const defaultFirstSearchItemIds = React.useMemo(

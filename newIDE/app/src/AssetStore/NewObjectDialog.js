@@ -575,9 +575,7 @@ function NewObjectDialog({
               (selectedCustomObjectEnumeratedMetadata &&
               selectedCustomObjectEnumeratedMetadata.assetStoreTag ? (
                 <CustomObjectPackResults
-                  packTag={
-                    selectedCustomObjectEnumeratedMetadata.assetStoreTag
-                  }
+                  packTag={selectedCustomObjectEnumeratedMetadata.assetStoreTag}
                   onAssetSelect={async assetShortHeader => {
                     const result = await onInstallAsset(assetShortHeader);
                     if (result) {

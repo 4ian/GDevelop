@@ -106,6 +106,60 @@ module.exports = {
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('getPointAttachmentY');
 
+    object
+      .addExpressionAndCondition(
+        'number',
+        'PointAttachmentScaleX',
+        _('Point attachment scale X position'),
+        _('x position of spine point attachment scale'),
+        _('x position of spine _PARAM1_ point attachment for _PARAM2_ slot'),
+        _('Animations and images'),
+        'JsPlatform/Extensions/spine.svg'
+      )
+      .addParameter('object', _('Spine'), 'SpineObject')
+      .addParameter('string', _('Attachment name'))
+      .addParameter('string', _('Slot name (use "" if names are the same)'))
+      .addParameter('expression', _('World scaleX? (0=no, 1=yes)'), '', true)
+      .setDefaultValue('0')
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('getPointAttachmentScaleX');
+
+    object
+      .addExpressionAndCondition(
+        'number',
+        'PointAttachmentScaleY',
+        _('Point attachment scale Y position'),
+        _('y position of spine point attachment scale'),
+        _('y position of spine _PARAM1_ point attachment for _PARAM2_ slot'),
+        _('Animations and images'),
+        'JsPlatform/Extensions/spine.svg'
+      )
+      .addParameter('object', _('Spine'), 'SpineObject')
+      .addParameter('string', _('Attachment name'))
+      .addParameter('string', _('Slot name (use "" if names are the same)'))
+      .addParameter('expression', _('World scaleY? (0=no, 1=yes)'), '', true)
+      .setDefaultValue('0')
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('getPointAttachmentScaleY');
+
+    object
+      .addExpressionAndCondition(
+        'number',
+        'PointAttachmentRotation',
+        _('Point attachment rotation'),
+        _('rotation of spine point attachment'),
+        _('rotation of spine _PARAM1_ point attachment for _PARAM2_ slot'),
+        _('Animations and images'),
+        'JsPlatform/Extensions/spine.svg'
+      )
+      .addParameter('object', _('Spine'), 'SpineObject')
+      .addParameter('string', _('Attachment name'))
+      .addParameter('string', _('Slot name (use "" if names are the same)'))
+      .addParameter('expression', _('World rotation? (0=no, 1=yes)'), '', true)
+      .setDefaultValue('0')
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('getPointAttachmentRotation');
+
     return extension;
   },
 

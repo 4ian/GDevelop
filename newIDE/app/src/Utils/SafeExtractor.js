@@ -97,4 +97,24 @@ export class SafeExtractor {
 
     return anything;
   }
+
+  static extractNumberOrStringOrBooleanProperty(
+    anything: any,
+    propertyName: string
+  ): number | string | boolean | null {
+    const object = this.extractObject(anything);
+    if (!object) return null;
+
+    const property = anything[propertyName];
+
+    if (
+      typeof property === 'number' ||
+      typeof property === 'string' ||
+      typeof property === 'boolean'
+    ) {
+      return property;
+    }
+
+    return null;
+  }
 }

@@ -101,7 +101,8 @@
     "three": "0.160.0",
     "url-search-params": "^1.0.2",
     "wavesurfer.js": "^7.8.6",
-    "xxhashjs": "^0.2.2"
+    "xxhashjs": "^0.2.2",
+    "yaml": "^2.8.2"
   },
   "overrides": {
     "pixi-spine": {

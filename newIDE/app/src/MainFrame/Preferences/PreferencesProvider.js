@@ -11,6 +11,7 @@ import { getIDEVersion } from '../../Version';
 import {
   type PreferencesValues,
   type EditorMosaicName,
+  type ProjectSpecificPreferencesValues,
 } from './PreferencesContext';
 import type {
   ResourceKind,
@@ -94,6 +95,7 @@ const getPreferences = (): PreferencesValues => {
 export default class PreferencesProvider extends React.Component<Props, State> {
   state = {
     values: getPreferences(),
+    setMultipleValues: this._setMultipleValues.bind(this),
     setLanguage: this._setLanguage.bind(this),
     setThemeName: this._setThemeName.bind(this),
     setCodeEditorThemeName: this._setCodeEditorThemeName.bind(this),
@@ -215,6 +217,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   componentDidMount() {
     setTimeout(() => this._checkUpdates(), CHECK_APP_UPDATES_TIMEOUT);
+  }
+
+  _setMultipleValues(updates: ProjectSpecificPreferencesValues) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          ...updates,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
   }
 
   _setLanguage(language: string) {

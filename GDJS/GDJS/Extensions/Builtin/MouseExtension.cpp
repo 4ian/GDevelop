@@ -43,10 +43,18 @@ MouseExtension::MouseExtension() {
       "gdjs.evtTools.input.isMouseButtonPressed");
   GetAllConditions()["MouseButtonFromTextReleased"].SetFunctionName(
       "gdjs.evtTools.input.isMouseButtonReleased");
+  GetAllActions()["HideCursor"].SetFunctionName(
+      "gdjs.evtTools.input.hideCursor");
+  GetAllActions()["ShowCursor"].SetFunctionName(
+      "gdjs.evtTools.input.showCursor");
+  // Compatibility with GD <= 5.6.251
   GetAllActions()["CacheSouris"].SetFunctionName(
       "gdjs.evtTools.input.hideCursor");
   GetAllActions()["MontreSouris"].SetFunctionName(
       "gdjs.evtTools.input.showCursor");
+  // End of compatibility code
+  // Note: CenterCursorHorizontally, CenterCursorVertically, SetCursorPosition,
+  // CenterCursor are not implemented (cannot set cursor position in browsers)
   GetAllActions()["TouchSimulateMouse"].SetFunctionName(
       "gdjs.evtTools.input.touchSimulateMouse");
 

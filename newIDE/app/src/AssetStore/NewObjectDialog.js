@@ -501,7 +501,7 @@ function NewObjectDialog({
 
   const onObjectTypeSelected = React.useCallback(
     (enumeratedObjectMetadata: ObjectShortHeader) => {
-      if (enumeratedObjectMetadata.assetStorePackTag) {
+      if (enumeratedObjectMetadata.assetStoreTag) {
         // When the object is from an asset store, display the objects from the pack
         // so that the user can either pick a similar object or skip to create a new one.
         setSelectedCustomObjectEnumeratedMetadata(enumeratedObjectMetadata);
@@ -573,10 +573,10 @@ function NewObjectDialog({
             )}
             {currentTab === 'new-object' &&
               (selectedCustomObjectEnumeratedMetadata &&
-              selectedCustomObjectEnumeratedMetadata.assetStorePackTag ? (
+              selectedCustomObjectEnumeratedMetadata.assetStoreTag ? (
                 <CustomObjectPackResults
                   packTag={
-                    selectedCustomObjectEnumeratedMetadata.assetStorePackTag
+                    selectedCustomObjectEnumeratedMetadata.assetStoreTag
                   }
                   onAssetSelect={async assetShortHeader => {
                     const result = await onInstallAsset(assetShortHeader);

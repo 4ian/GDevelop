@@ -104,6 +104,18 @@ export default function EventsBasedObjectEditor({
           }}
           fullWidth
         />
+        {isDev && (
+          <SemiControlledTextField
+            commitOnBlur
+            floatingLabelText={<Trans>Asset store tag</Trans>}
+            value={eventsBasedObject.getAssetStoreTag()}
+            onChange={value => {
+              eventsBasedObject.setAssetStoreTag(value);
+              onChange();
+            }}
+            fullWidth
+          />
+        )}
         <Checkbox
           label={<Trans>Use 3D rendering</Trans>}
           checked={eventsBasedObject.isRenderedIn3D()}

@@ -197,9 +197,7 @@ export default function NewObjectFromScratch({
             extensionName: gd.PlatformExtension.getExtensionFromFullObjectType(
               object.type
             ),
-
-            // TODO Declare it on 2D particle emitter
-            assetStorePackTag: '',
+            assetStoreTag: object.assetStoreTag,
 
             isInstalled: true,
             // The tier will be overridden with repository data.

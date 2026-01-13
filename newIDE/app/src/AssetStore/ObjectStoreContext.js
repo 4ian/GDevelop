@@ -324,9 +324,9 @@ export const ObjectStoreStateProvider = ({
 
               // Attributes switching between both
 
-              assetStorePackTag:
-                repositoryObjectMetadata.assetStorePackTag ||
-                installedObjectMetadata.assetStorePackTag,
+              assetStoreTag:
+                repositoryObjectMetadata.assetStoreTag ||
+                installedObjectMetadata.assetStoreTag,
 
               // Translations may not be relevant for the installed version.
               // We use the translation only if the not translated texts match.

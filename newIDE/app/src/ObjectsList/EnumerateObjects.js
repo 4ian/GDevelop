@@ -15,7 +15,7 @@ export type EnumeratedObjectMetadata = {|
   iconFilename: string,
   category: string,
   isRenderedIn3D: boolean,
-  assetStorePackTag?: string,
+  assetStoreTag?: string,
   requiredExtensions?: Array<ExtensionDependency>,
   isDependentWithParent?: boolean,
   tags: Array<string>,
@@ -157,6 +157,7 @@ export const enumerateObjectTypes = (
             description: objectMetadata.getDescription(),
             iconFilename: objectMetadata.getIconFilename(),
             category: objectMetadata.getCategoryFullName(),
+            assetStoreTag: objectMetadata.getAssetStoreTag(),
             isRenderedIn3D: objectMetadata.isRenderedIn3D(),
             tags: extension.getTags().toJSArray(),
           };

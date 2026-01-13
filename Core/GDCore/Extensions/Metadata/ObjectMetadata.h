@@ -230,6 +230,21 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
   }
 
   /**
+   * \brief Get the tag from which to choose assets from when creating a new
+   * object.
+   */
+  const gd::String& GetAssetStoreTag() const { return assetStoreTag; }
+
+  /**
+   * \brief Set the tag from which to choose assets from when creating a new
+   * object.
+   */
+  ObjectMetadata &SetAssetStoreTag(const gd::String& assetStoreTag_) {
+    assetStoreTag = assetStoreTag_;
+    return *this;
+  }
+
+  /**
    * \brief The "capabilities" that are offered by through behaviors.
    */
   const std::set<gd::String>& GetDefaultBehaviors() const {
@@ -389,6 +404,7 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
   gd::String description;
   gd::String iconFilename;
   gd::String categoryFullName;
+  gd::String assetStoreTag;
   std::set<gd::String> defaultBehaviorTypes;
   bool isPrivate = false;
   bool hidden = false;

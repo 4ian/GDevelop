@@ -108,7 +108,7 @@ export type ObjectShortHeader = {
   ...ExtensionRegistryItemHeader,
   description: string,
   extensionName: string,
-  assetStorePackTag: ?string,
+  assetStoreTag: ?string,
   /** This attribute is calculated.
    * @see adaptObjectHeader
    */

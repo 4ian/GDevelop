@@ -570,6 +570,7 @@ declare namespace Jolt {
     sReplicate(inV: number): Vec4;
     sMin(inLHS: Vec4, inRHS: Vec4): Vec4;
     sMax(inLHS: Vec4, inRHS: Vec4): Vec4;
+    sClamp(inValue: Vec4, inMin: Vec4, inMax: Vec4): Vec4;
     sFusedMultiplyAdd(inMul1: Vec4, inMul2: Vec4, inAdd: Vec4): Vec4;
     sOr(inV1: Vec4, inV2: Vec4): Vec4;
     sXor(inV1: Vec4, inV2: Vec4): Vec4;
@@ -585,7 +586,10 @@ declare namespace Jolt {
     Set(inX: number, inY: number, inZ: number, inW: number): void;
     GetComponent(inCoordinate: number): number;
     IsClose(inV: Vec4, inMaxDistSq?: number): boolean;
+    IsNearZero(inMaxDistSq?: number): boolean;
     IsNormalized(inTolerance?: number): boolean;
+    GetLowestComponentIndex(): number;
+    GetHighestComponentIndex(): number;
     Add(inV: Vec4): Vec4;
     Sub(inV: Vec4): Vec4;
     Mul(inV: number): Vec4;
@@ -644,6 +648,7 @@ declare namespace Jolt {
     SetZ(inZ: number): void;
     SetW(inW: number): void;
     Set(inX: number, inY: number, inZ: number, inW: number): void;
+    sMultiplyImaginary(inLHS: Vec3, inRHS: Quat): Quat;
     InverseRotate(inV: Vec3): Vec3;
     RotateAxisX(): Vec3;
     RotateAxisY(): Vec3;
@@ -1328,6 +1333,18 @@ declare namespace Jolt {
       inShape: ShapeSettings,
       inUserData: number
     ): void;
+    AddShapeShapeSettings(
+      inPosition: Vec3,
+      inRotation: Quat,
+      inShape: ShapeSettings,
+      inUserData: number
+    ): void;
+    AddShapeShape(
+      inPosition: Vec3,
+      inRotation: Quat,
+      inShape: Shape,
+      inUserData: number
+    ): void;
   }
   class CompoundShapeSubShape {
     GetPositionCOM(): Vec3;
@@ -1781,6 +1798,7 @@ declare namespace Jolt {
     GetTargetAngularVelocity(): number;
     SetTargetAngle(inAngle: number): void;
     GetTargetAngle(): number;
+    SetTargetOrientationBS(inOrientation: Quat): void;
     SetLimits(inLimitsMin: number, inLimitsMax: number): void;
     GetLimitsMin(): number;
     GetLimitsMax(): number;
@@ -2539,8 +2557,14 @@ declare namespace Jolt {
     GetFriction(inBodyID: BodyID): number;
     SetGravityFactor(inBodyID: BodyID, inFactor: number): void;
     GetGravityFactor(inBodyID: BodyID): number;
+    SetMaxLinearVelocity(inBodyID: BodyID, inLinearVelocity: number): void;
+    GetMaxLinearVelocity(inBodyID: BodyID): number;
+    SetMaxAngularVelocity(inBodyID: BodyID, inAngularVelocity: number): void;
+    GetMaxAngularVelocity(inBodyID: BodyID): number;
     SetUseManifoldReduction(inBodyID: BodyID, inUseReduction: boolean): void;
     GetUseManifoldReduction(inBodyID: BodyID): boolean;
+    SetIsSensor(inBodyID: BodyID, inIsSensor: boolean): void;
+    IsSensor(inBodyID: BodyID): boolean;
     SetCollisionGroup(inBodyID: BodyID, inCollisionGroup: CollisionGroup): void;
     GetCollisionGroup(inBodyID: BodyID): CollisionGroup;
     AddForce(
@@ -3340,7 +3364,8 @@ declare namespace Jolt {
     OnStep(inContext: number): void;
   }
   class BodyActivationListener {}
-  class BodyActivationListenerJS extends BodyActivationListener {
+  class BodyActivationListenerEm extends BodyActivationListener {}
+  class BodyActivationListenerJS extends BodyActivationListenerEm {
     constructor();
     OnBodyActivated(inBodyID: number, inBodyUserData: number): void;
     OnBodyDeactivated(inBodyID: number, inBodyUserData: number): void;
@@ -3641,6 +3666,36 @@ declare namespace Jolt {
     set_mMaxDistance(mMaxDistance: number): void;
     mMaxDistance: number;
   }
+  class SoftBodySharedSettingsRodStretchShear {
+    constructor(inVertex1: number, inVertex2: number, inCompliance: number);
+    get_mVertex(index: number): number;
+    set_mVertex(index: number, mVertex: number): void;
+    mVertex: number;
+    get_mLength(): number;
+    set_mLength(mLength: number): void;
+    mLength: number;
+    get_mInvMass(): number;
+    set_mInvMass(mInvMass: number): void;
+    mInvMass: number;
+    get_mCompliance(): number;
+    set_mCompliance(mCompliance: number): void;
+    mCompliance: number;
+    get_mBishop(): Quat;
+    set_mBishop(mBishop: Quat): void;
+    mBishop: Quat;
+  }
+  class SoftBodySharedSettingsRodBendTwist {
+    constructor(inRod1: number, inRod2: number, inCompliance: number);
+    get_mRod(index: number): number;
+    set_mRod(index: number, mRod: number): void;
+    mRod: number;
+    get_mCompliance(): number;
+    set_mCompliance(mCompliance: number): void;
+    mCompliance: number;
+    get_mOmega0(): Quat;
+    set_mOmega0(mOmega0: Quat): void;
+    mOmega0: Quat;
+  }
   class ArraySoftBodySharedSettingsVertex {
     constructor();
     empty(): boolean;
@@ -3721,6 +3776,26 @@ declare namespace Jolt {
     resize(inSize: number): void;
     clear(): void;
   }
+  class ArraySoftBodySharedSettingsRodStretchShear {
+    constructor();
+    empty(): boolean;
+    size(): number;
+    at(inIndex: number): SoftBodySharedSettingsRodStretchShear;
+    push_back(inValue: SoftBodySharedSettingsRodStretchShear): void;
+    reserve(inSize: number): void;
+    resize(inSize: number): void;
+    clear(): void;
+  }
+  class ArraySoftBodySharedSettingsRodBendTwist {
+    constructor();
+    empty(): boolean;
+    size(): number;
+    at(inIndex: number): SoftBodySharedSettingsRodBendTwist;
+    push_back(inValue: SoftBodySharedSettingsRodBendTwist): void;
+    reserve(inSize: number): void;
+    resize(inSize: number): void;
+    clear(): void;
+  }
   class SoftBodySharedSettingsVertexAttributes {
     constructor();
     get_mCompliance(): number;
@@ -3763,6 +3838,7 @@ declare namespace Jolt {
     ): void;
     AddFace(inFace: SoftBodySharedSettingsFace): void;
     CalculateEdgeLengths(): void;
+    CalculateRodProperties(): void;
     CalculateLRALengths(): void;
     CalculateBendConstraintConstants(): void;
     CalculateVolumeConstraintVolumes(): void;
@@ -3803,12 +3879,19 @@ declare namespace Jolt {
     get_mLRAConstraints(): ArraySoftBodySharedSettingsLRA;
     set_mLRAConstraints(mLRAConstraints: ArraySoftBodySharedSettingsLRA): void;
     mLRAConstraints: ArraySoftBodySharedSettingsLRA;
+    get_mRodStretchShearConstraints(): ArraySoftBodySharedSettingsRodStretchShear;
+    set_mRodStretchShearConstraints(
+      mRodStretchShearConstraints: ArraySoftBodySharedSettingsRodStretchShear
+    ): void;
+    mRodStretchShearConstraints: ArraySoftBodySharedSettingsRodStretchShear;
+    get_mRodBendTwistConstraints(): ArraySoftBodySharedSettingsRodBendTwist;
+    set_mRodBendTwistConstraints(
+      mRodBendTwistConstraints: ArraySoftBodySharedSettingsRodBendTwist
+    ): void;
+    mRodBendTwistConstraints: ArraySoftBodySharedSettingsRodBendTwist;
     get_mMaterials(): PhysicsMaterialList;
     set_mMaterials(mMaterials: PhysicsMaterialList): void;
     mMaterials: PhysicsMaterialList;
-    get_mVertexRadius(): number;
-    set_mVertexRadius(mVertexRadius: number): void;
-    mVertexRadius: number;
   }
   class SoftBodyCreationSettings {
     constructor(
@@ -3853,6 +3936,9 @@ declare namespace Jolt {
     get_mGravityFactor(): number;
     set_mGravityFactor(mGravityFactor: number): void;
     mGravityFactor: number;
+    get_mVertexRadius(): number;
+    set_mVertexRadius(mVertexRadius: number): void;
+    mVertexRadius: number;
     get_mUpdatePosition(): boolean;
     set_mUpdatePosition(mUpdatePosition: boolean): void;
     mUpdatePosition: boolean;
@@ -3862,6 +3948,9 @@ declare namespace Jolt {
     get_mAllowSleeping(): boolean;
     set_mAllowSleeping(mAllowSleeping: boolean): void;
     mAllowSleeping: boolean;
+    get_mFacesDoubleSided(): boolean;
+    set_mFacesDoubleSided(mFacesDoubleSided: boolean): void;
+    mFacesDoubleSided: boolean;
   }
   class SoftBodyVertex {
     get_mPreviousPosition(): Vec3;
@@ -3902,6 +3991,8 @@ declare namespace Jolt {
     GetSettings(): SoftBodySharedSettings;
     GetVertices(): ArraySoftBodyVertex;
     GetVertex(inIndex: number): SoftBodyVertex;
+    GetRodRotation(inIndex: number): Quat;
+    GetRodAngularVelocity(inIndex: number): Vec3;
     GetMaterials(): PhysicsMaterialList;
     GetFaces(): ArraySoftBodySharedSettingsFace;
     GetFace(inIndex: number): SoftBodySharedSettingsFace;
@@ -3917,6 +4008,8 @@ declare namespace Jolt {
     SetSkinnedMaxDistanceMultiplier(
       inSkinnedMaxDistanceMultiplier: number
     ): void;
+    GetVertexRadius(): number;
+    SetVertexRadius(inVertexRadius: number): void;
     GetLocalBounds(): AABox;
     CustomUpdate(
       inDeltaTime: number,
@@ -4523,7 +4616,9 @@ declare namespace Jolt {
   class VehicleConstraint extends Constraint {
     constructor(inVehicleBody: Body, inSettings: VehicleConstraintSettings);
     SetMaxPitchRollAngle(inMaxPitchRollAngle: number): void;
+    GetMaxPitchRollAngle(): number;
     SetVehicleCollisionTester(inTester: VehicleCollisionTester): void;
+    GetVehicleCollisionTester(): VehicleCollisionTester;
     OverrideGravity(inGravity: Vec3): void;
     IsGravityOverridden(): boolean;
     GetGravityOverride(): Vec3;

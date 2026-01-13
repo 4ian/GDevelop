@@ -6,6 +6,8 @@ namespace Jolt {
   }
 }
 
+const epsilon = 1 / (1 << 16);
+
 namespace gdjs {
   const loadJolt = async () => {
     try {
@@ -16,6 +18,7 @@ namespace gdjs {
       }
 
       const Jolt = await initializeJoltPhysics();
+      //@ts-ignore
       window.Jolt = Jolt;
     } catch (err) {
       console.error('Unable to load Jolt physics library.', err);
@@ -50,6 +53,13 @@ namespace gdjs {
   export interface Physics3DNetworkSyncData extends BehaviorNetworkSyncData {
     props: Physics3DNetworkSyncDataType;
   }
+
+  const isModel3D = (
+    object: gdjs.RuntimeObject
+  ): object is gdjs.Model3DRuntimeObject => {
+    //@ts-ignore We are checking if the methods are present.
+    return object._modelResourceName;
+  };
 
   /** @category Behaviors > Physics 3D */
   export class Physics3DSharedData {
@@ -305,7 +315,8 @@ namespace gdjs {
     bodyType: string;
     bullet: boolean;
     fixedRotation: boolean;
-    private shape: string;
+    _shape: string;
+    private meshShapeResourceName: string;
     private shapeOrientation: string;
     private shapeDimensionA: float;
     private shapeDimensionB: float;
@@ -401,7 +412,8 @@ namespace gdjs {
       this.bodyType = behaviorData.bodyType;
       this.bullet = behaviorData.bullet;
       this.fixedRotation = behaviorData.fixedRotation;
-      this.shape = behaviorData.shape;
+      this._shape = behaviorData.shape;
+      this.meshShapeResourceName = behaviorData.meshShapeResourceName || '';
       this.shapeOrientation =
         behaviorData.shape === 'Box' ? 'Z' : behaviorData.shapeOrientation;
       this.shapeDimensionA = behaviorData.shapeDimensionA;
@@ -723,94 +735,147 @@ namespace gdjs {
 
       const onePixel = this._sharedData.worldInvScale;
 
-      let shapeSettings: Jolt.ConvexShapeSettings;
+      let shapeSettings: Jolt.ShapeSettings;
       /** This is fine only because no other Quat is used locally. */
       let quat: Jolt.Quat;
-      if (this.shape === 'Box') {
-        const boxWidth =
-          shapeDimensionA > 0 ? shapeDimensionA : width > 0 ? width : onePixel;
-        const boxHeight =
-          shapeDimensionB > 0
-            ? shapeDimensionB
-            : height > 0
-              ? height
-              : onePixel;
-        const boxDepth =
-          shapeDimensionC > 0 ? shapeDimensionC : depth > 0 ? depth : onePixel;
-        // The convex radius should not eat up the whole volume.
-        const convexRadius = Math.min(
-          onePixel,
-          Math.min(boxWidth, boxHeight, boxDepth) / 4
+      if (
+        this._shape === 'Mesh' &&
+        this.bodyType === 'Static' &&
+        isModel3D(this.owner)
+      ) {
+        const meshShapeSettings: Array<Jolt.MeshShapeSettings> =
+          gdjs.staticArray(
+            Physics3DRuntimeBehavior.prototype
+              ._createNewShapeSettingsWithoutMassCenterOffset
+          );
+        this.getMeshShapeSettings(
+          this.owner,
+          width,
+          height,
+          depth,
+          meshShapeSettings
         );
-        shapeSettings = new Jolt.BoxShapeSettings(
-          this.getVec3(boxWidth / 2, boxHeight / 2, boxDepth / 2),
-          convexRadius
-        );
+        if (meshShapeSettings.length === 1) {
+          shapeSettings = meshShapeSettings[0];
+        } else {
+          const compoundShapeSettings = new Jolt.StaticCompoundShapeSettings();
+          for (let index = 0; index < meshShapeSettings.length; index++) {
+            compoundShapeSettings.AddShapeShapeSettings(
+              this.getVec3(0, 0, 0),
+              this.getQuat(0, 0, 0, 1),
+              meshShapeSettings[index],
+              index
+            );
+          }
+          shapeSettings = compoundShapeSettings;
+        }
+        meshShapeSettings.length = 0;
         quat = this.getQuat(0, 0, 0, 1);
-        this._shapeHalfWidth = boxWidth / 2;
-        this._shapeHalfHeight = boxHeight / 2;
-        this._shapeHalfDepth = boxDepth / 2;
-      } else if (this.shape === 'Capsule') {
-        const radius =
-          shapeDimensionA > 0
-            ? shapeDimensionA
-            : width > 0
-              ? Math.sqrt(width * height) / 2
-              : onePixel;
-        const capsuleDepth =
-          shapeDimensionB > 0 ? shapeDimensionB : depth > 0 ? depth : onePixel;
-        shapeSettings = new Jolt.CapsuleShapeSettings(
-          Math.max(0, capsuleDepth / 2 - radius),
-          radius
-        );
-        quat = this._getShapeOrientationQuat();
-        this._shapeHalfWidth =
-          this.shapeOrientation === 'X' ? capsuleDepth / 2 : radius;
-        this._shapeHalfHeight =
-          this.shapeOrientation === 'Y' ? capsuleDepth / 2 : radius;
-        this._shapeHalfDepth =
-          this.shapeOrientation === 'Z' ? capsuleDepth / 2 : radius;
-      } else if (this.shape === 'Cylinder') {
-        const radius =
-          shapeDimensionA > 0
-            ? shapeDimensionA
-            : width > 0
-              ? Math.sqrt(width * height) / 2
-              : onePixel;
-        const cylinderDepth =
-          shapeDimensionB > 0 ? shapeDimensionB : depth > 0 ? depth : onePixel;
-        // The convex radius should not eat up the whole volume.
-        const convexRadius = Math.min(
-          onePixel,
-          Math.min(cylinderDepth, radius) / 4
-        );
-        shapeSettings = new Jolt.CylinderShapeSettings(
-          cylinderDepth / 2,
-          radius,
-          convexRadius
-        );
-        quat = this._getShapeOrientationQuat();
-        this._shapeHalfWidth =
-          this.shapeOrientation === 'X' ? cylinderDepth / 2 : radius;
-        this._shapeHalfHeight =
-          this.shapeOrientation === 'Y' ? cylinderDepth / 2 : radius;
-        this._shapeHalfDepth =
-          this.shapeOrientation === 'Z' ? cylinderDepth / 2 : radius;
       } else {
-        // Create a 'Sphere' by default.
-        const radius =
-          shapeDimensionA > 0
-            ? shapeDimensionA
-            : width > 0
-              ? Math.pow(width * height * depth, 1 / 3) / 2
-              : onePixel;
-        shapeSettings = new Jolt.SphereShapeSettings(radius);
-        quat = this.getQuat(0, 0, 0, 1);
-        this._shapeHalfWidth = radius;
-        this._shapeHalfHeight = radius;
-        this._shapeHalfDepth = radius;
+        let convexShapeSettings: Jolt.ConvexShapeSettings;
+        if (this._shape === 'Box') {
+          const boxWidth =
+            shapeDimensionA > 0
+              ? shapeDimensionA
+              : width > 0
+                ? width
+                : onePixel;
+          const boxHeight =
+            shapeDimensionB > 0
+              ? shapeDimensionB
+              : height > 0
+                ? height
+                : onePixel;
+          const boxDepth =
+            shapeDimensionC > 0
+              ? shapeDimensionC
+              : depth > 0
+                ? depth
+                : onePixel;
+          // The convex radius should not eat up the whole volume.
+          const convexRadius = Math.min(
+            onePixel,
+            Math.min(boxWidth, boxHeight, boxDepth) / 4
+          );
+          convexShapeSettings = new Jolt.BoxShapeSettings(
+            this.getVec3(boxWidth / 2, boxHeight / 2, boxDepth / 2),
+            convexRadius
+          );
+          quat = this.getQuat(0, 0, 0, 1);
+          this._shapeHalfWidth = boxWidth / 2;
+          this._shapeHalfHeight = boxHeight / 2;
+          this._shapeHalfDepth = boxDepth / 2;
+        } else if (this._shape === 'Capsule') {
+          const radius =
+            shapeDimensionA > 0
+              ? shapeDimensionA
+              : width > 0
+                ? Math.sqrt(width * height) / 2
+                : onePixel;
+          const capsuleDepth =
+            shapeDimensionB > 0
+              ? shapeDimensionB
+              : depth > 0
+                ? depth
+                : onePixel;
+          convexShapeSettings = new Jolt.CapsuleShapeSettings(
+            Math.max(0, capsuleDepth / 2 - radius),
+            radius
+          );
+          quat = this._getShapeOrientationQuat();
+          this._shapeHalfWidth =
+            this.shapeOrientation === 'X' ? capsuleDepth / 2 : radius;
+          this._shapeHalfHeight =
+            this.shapeOrientation === 'Y' ? capsuleDepth / 2 : radius;
+          this._shapeHalfDepth =
+            this.shapeOrientation === 'Z' ? capsuleDepth / 2 : radius;
+        } else if (this._shape === 'Cylinder') {
+          const radius =
+            shapeDimensionA > 0
+              ? shapeDimensionA
+              : width > 0
+                ? Math.sqrt(width * height) / 2
+                : onePixel;
+          const cylinderDepth =
+            shapeDimensionB > 0
+              ? shapeDimensionB
+              : depth > 0
+                ? depth
+                : onePixel;
+          // The convex radius should not eat up the whole volume.
+          const convexRadius = Math.min(
+            onePixel,
+            Math.min(cylinderDepth, radius) / 4
+          );
+          convexShapeSettings = new Jolt.CylinderShapeSettings(
+            cylinderDepth / 2,
+            radius,
+            convexRadius
+          );
+          quat = this._getShapeOrientationQuat();
+          this._shapeHalfWidth =
+            this.shapeOrientation === 'X' ? cylinderDepth / 2 : radius;
+          this._shapeHalfHeight =
+            this.shapeOrientation === 'Y' ? cylinderDepth / 2 : radius;
+          this._shapeHalfDepth =
+            this.shapeOrientation === 'Z' ? cylinderDepth / 2 : radius;
+        } else {
+          // Create a 'Sphere' by default.
+          const radius =
+            shapeDimensionA > 0
+              ? shapeDimensionA
+              : width > 0
+                ? Math.pow(width * height * depth, 1 / 3) / 2
+                : onePixel;
+          convexShapeSettings = new Jolt.SphereShapeSettings(radius);
+          quat = this.getQuat(0, 0, 0, 1);
+          this._shapeHalfWidth = radius;
+          this._shapeHalfHeight = radius;
+          this._shapeHalfDepth = radius;
+        }
+        convexShapeSettings.mDensity = this.density;
+        shapeSettings = convexShapeSettings;
       }
-      shapeSettings.mDensity = this.density;
       return new Jolt.RotatedTranslatedShapeSettings(
         this.getVec3(
           this.shapeOffsetX * shapeScale,
@@ -820,6 +885,147 @@ namespace gdjs {
         quat,
         shapeSettings
       );
+    }
+
+    private getMeshShapeSettings(
+      model3DRuntimeObject: gdjs.Model3DRuntimeObject,
+      width: float,
+      height: float,
+      depth: float,
+      meshes: Array<Jolt.MeshShapeSettings>
+    ): void {
+      const originalModel = this.owner
+        .getInstanceContainer()
+        .getGame()
+        .getModel3DManager()
+        .getModel(
+          this.meshShapeResourceName ||
+            model3DRuntimeObject._modelResourceName ||
+            ''
+        );
+
+      const modelInCube = new THREE.Group();
+      modelInCube.rotation.order = 'ZYX';
+      const root = THREE_ADDONS.SkeletonUtils.clone(originalModel.scene);
+      modelInCube.add(root);
+
+      const data = model3DRuntimeObject._data.content;
+      model3DRuntimeObject._renderer.stretchModelIntoUnitaryCube(
+        modelInCube,
+        data.rotationX,
+        data.rotationY,
+        data.rotationZ
+      );
+
+      const threeObject = new THREE.Group();
+      threeObject.rotation.order = 'ZYX';
+      threeObject.add(modelInCube);
+      const object = this.owner3D;
+      threeObject.scale.set(
+        object.isFlippedX() ? -width : width,
+        object.isFlippedY() ? -height : height,
+        object.isFlippedZ() ? -depth : depth
+      );
+
+      threeObject.updateMatrixWorld();
+
+      // For indexed triangles
+      const vector3 = new THREE.Vector3();
+      const float3 = new Jolt.Float3(0, 0, 0);
+      const vertexList = new Jolt.VertexList();
+      const indexedTriangle = new Jolt.IndexedTriangle();
+      const indexedTriangleList = new Jolt.IndexedTriangleList();
+      const physicsMaterialList = new Jolt.PhysicsMaterialList();
+
+      // For non-indexed triangles
+      const triangleList = new Jolt.TriangleList();
+      const a = new Jolt.Vec3();
+      const b = new Jolt.Vec3();
+      const c = new Jolt.Vec3();
+
+      threeObject.traverse((object3d) => {
+        const mesh = object3d as THREE.Mesh;
+        if (!mesh.isMesh) {
+          return;
+        }
+        const positionAttribute = mesh.geometry.getAttribute('position');
+        object3d.getWorldScale(vector3);
+        const shouldTrianglesBeFlipped = vector3.x * vector3.y * vector3.z < 0;
+        const index = mesh.geometry.getIndex();
+        if (index) {
+          vertexList.clear();
+          for (let i = 0; i < positionAttribute.count; i++) {
+            vector3.fromBufferAttribute(positionAttribute, i);
+            object3d.localToWorld(vector3);
+            float3.x = vector3.x;
+            float3.y = vector3.y;
+            float3.z = vector3.z;
+            // The list create a copy of the Float3.
+            vertexList.push_back(float3);
+          }
+          indexedTriangleList.clear();
+          for (let i = 0; i < index.count; i += 3) {
+            indexedTriangle.set_mIdx(
+              0,
+              index.getX(shouldTrianglesBeFlipped ? i + 1 : i)
+            );
+            indexedTriangle.set_mIdx(
+              1,
+              index.getX(shouldTrianglesBeFlipped ? i : i + 1)
+            );
+            indexedTriangle.set_mIdx(2, index.getX(i + 2));
+            // The list create a copy of the IndexedTriangle.
+            indexedTriangleList.push_back(indexedTriangle);
+          }
+          // Parameters passed to `MeshShapeSettings` are copied,
+          // we need to destroy them later when unused.
+          meshes.push(
+            new Jolt.MeshShapeSettings(
+              vertexList,
+              indexedTriangleList,
+              physicsMaterialList
+            )
+          );
+        } else {
+          triangleList.clear();
+          for (let i = 0; i < positionAttribute.count; i += 3) {
+            vector3.fromBufferAttribute(positionAttribute, i);
+            object3d.localToWorld(vector3);
+            a.Set(vector3.x, vector3.y, vector3.z);
+
+            vector3.fromBufferAttribute(positionAttribute, i + 1);
+            object3d.localToWorld(vector3);
+            b.Set(vector3.x, vector3.y, vector3.z);
+
+            vector3.fromBufferAttribute(positionAttribute, i + 2);
+            object3d.localToWorld(vector3);
+            c.Set(vector3.x, vector3.y, vector3.z);
+
+            // The triangle's setter is not easy to use so we create new instances.
+            const triangle = new Jolt.Triangle(
+              shouldTrianglesBeFlipped ? b : a,
+              shouldTrianglesBeFlipped ? a : b,
+              c
+            );
+            // The list create a copy of the Triangle.
+            triangleList.push_back(triangle);
+            Jolt.destroy(triangle);
+          }
+          // `MeshShapeSettings` creates a copy when it indexes the triangle,
+          // we need to destroy them.
+          meshes.push(new Jolt.MeshShapeSettings(triangleList));
+        }
+      });
+      Jolt.destroy(float3);
+      Jolt.destroy(vertexList);
+      Jolt.destroy(indexedTriangle);
+      Jolt.destroy(indexedTriangleList);
+      Jolt.destroy(physicsMaterialList);
+
+      Jolt.destroy(triangleList);
+      Jolt.destroy(a);
+      Jolt.destroy(b);
+      Jolt.destroy(c);
     }
 
     private _getShapeOrientationQuat(): Jolt.Quat {

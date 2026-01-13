@@ -850,6 +850,14 @@ namespace gdjs {
       const angleCosValue = Math.cos(angle);
       const angleSinValue = Math.sin(angle);
 
+      // Determine if this layer will actually render in 3D mode.
+      // A layer configured for 3D (has _threeCamera and _threePlaneMesh) but with no
+      // 3D objects will be rendered directly in 2D mode, so it should use 2D-style
+      // pixi container setup to avoid a zoom mismatch.
+      // See also: `layerHas3DObjectsToRender` in `runtimescene-pixi-renderer.ts`.
+      const willRenderIn3DMode =
+        this._threeCamera && this._threePlaneMesh && this.has3DObjects();
+
       // Update the 2D plane in the 3D world position, size and rotation,
       // and update the 2D Pixi container position, size and rotation.
       if (this._threeCamera && this._threePlaneMesh) {
@@ -869,31 +877,36 @@ namespace gdjs {
           this._threePlaneMesh.position.set(cx, -cy, 0);
           this._threePlaneMesh.rotation.set(0, 0, -angle);
 
-          // Update the 2D Pixi container size and rotation to match the "zoom" (which comes from the 2D plane size)
-          // rotation and position.
-          effectivePixiZoom = this._layer.getWidth() / boxW; // == height/boxH
-          this._pixiContainer.scale.set(effectivePixiZoom, effectivePixiZoom);
-          this._pixiContainer.rotation = angle;
+          if (willRenderIn3DMode) {
+            // Update the 2D Pixi container size and rotation to match the "zoom" (which comes from the 2D plane size)
+            // rotation and position.
+            effectivePixiZoom = this._layer.getWidth() / boxW; // == height/boxH
+            this._pixiContainer.scale.set(effectivePixiZoom, effectivePixiZoom);
+            this._pixiContainer.rotation = angle;
 
-          const followX = cx;
-          const followY = -cy;
-          const centerX2d =
-            followX * effectivePixiZoom * angleCosValue -
-            followY * effectivePixiZoom * angleSinValue;
-          const centerY2d =
-            followX * effectivePixiZoom * angleSinValue +
-            followY * effectivePixiZoom * angleCosValue;
-          this._pixiContainer.position.x =
-            this._layer.getWidth() / 2 - centerX2d;
-          this._pixiContainer.position.y =
-            this._layer.getHeight() / 2 - centerY2d;
+            const followX = cx;
+            const followY = -cy;
+            const centerX2d =
+              followX * effectivePixiZoom * angleCosValue -
+              followY * effectivePixiZoom * angleSinValue;
+            const centerY2d =
+              followX * effectivePixiZoom * angleSinValue +
+              followY * effectivePixiZoom * angleCosValue;
+            this._pixiContainer.position.x =
+              this._layer.getWidth() / 2 - centerX2d;
+            this._pixiContainer.position.y =
+              this._layer.getHeight() / 2 - centerY2d;
+          }
         }
       }
 
       // 2D only (no 3D rendering and so no 2D plane in the 3D world):
       // Update the 2D Pixi container position, size and rotation.
-      if (!this._threeCamera || !this._threePlaneMesh) {
+      // This also applies to layers configured for 3D but with no 3D objects,
+      // since they will be rendered directly in 2D mode.
+      if (!willRenderIn3DMode) {
         effectivePixiZoom = this._layer.getCameraZoom();
+
         this._pixiContainer.rotation = angle;
         this._pixiContainer.scale.x = effectivePixiZoom;
         this._pixiContainer.scale.y = effectivePixiZoom;

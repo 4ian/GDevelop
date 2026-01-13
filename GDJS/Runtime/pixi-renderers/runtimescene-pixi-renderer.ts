@@ -123,6 +123,7 @@ namespace gdjs {
           ) {
             // Render a layer with 2D rendering (PixiJS) only if layer is configured as is
             // or if there is no 3D object to render.
+            // See also: `willRenderIn3DMode` in `layer-pixi-renderer.ts`.
 
             if (lastRenderWas3D) {
               // Ensure the state is clean for PixiJS to render.

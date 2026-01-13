@@ -29,6 +29,7 @@ import {
 } from '../../Utils/Extension/ExtensionCompatibilityChecker.js';
 import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 import PromisePool from '@supercharge/promise-pool';
+import { retryIfFailed } from '../../Utils/RetryIfFailed';
 
 const gd: libGDevelop = global.gd;
 
@@ -407,7 +408,7 @@ export const installRequiredExtensions = async ({
 
   const downloadedSerializedExtensions = await Promise.all(
     neededExtensions.map(extensionShortHeader =>
-      getExtension(extensionShortHeader)
+      retryIfFailed({ times: 3 }, () => getExtension(extensionShortHeader))
     )
   );
 

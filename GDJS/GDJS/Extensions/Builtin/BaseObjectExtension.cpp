@@ -94,12 +94,15 @@ BaseObjectExtension::BaseObjectExtension() {
   objectConditions["VarObjetDef"].SetFunctionName("hasVariable");
   objectActions["AddForceXY"].SetFunctionName("addForce");
   objectActions["AddForceAL"].SetFunctionName("addPolarForce");
-  objectActions["AddForceVersPos"].SetFunctionName("addForceTowardPosition");
-  objectActions["AddForceVers"].SetFunctionName("addForceTowardObject");
-  objectActions["StopForces"].SetFunctionName("clearForces");
-  objectConditions["IsStopped"].SetFunctionName("hasNoForces");
+  objectActions["AddForceTowardPosition"].SetFunctionName(
+      "addForceTowardPosition");
+  objectActions["AddForceTowardObject"].SetFunctionName("addForceTowardObject");
+  objectActions["ClearForces"].SetFunctionName("clearForces");
+  objectConditions["HasNoForces"].SetFunctionName("hasNoForces");
   objectConditions["Speed"].SetFunctionName("getAverageForce().getLength");
   // Compatibility with GD <= 5.6.251
+  objectActions["AddForceVersPos"].SetFunctionName("addForceTowardPosition");
+  objectActions["AddForceVers"].SetFunctionName("addForceTowardObject");
   objectActions["Arreter"].SetFunctionName("clearForces");
   objectConditions["Arret"].SetFunctionName("hasNoForces");
   objectConditions["Vitesse"].SetFunctionName("getAverageForce().getLength");
@@ -235,8 +238,12 @@ BaseObjectExtension::BaseObjectExtension() {
       "gdjs.evtTools.object.raycastObjectToPosition");
   GetAllConditions()["Distance"].SetFunctionName(
       "gdjs.evtTools.object.distanceTest");
+  GetAllConditions()["IsTotalForceAngleTowardObject"].SetFunctionName(
+      "gdjs.evtTools.object.movesTowardTest");
+  // Compatibility with GD <= 5.6.251
   GetAllConditions()["SeDirige"].SetFunctionName(
       "gdjs.evtTools.object.movesTowardTest");
+  // End of compatibility code
   GetAllConditions()["EstTourne"].SetFunctionName(
       "gdjs.evtTools.object.turnedTowardTest");
   GetAllConditions()["IsTurnedTowardObject"].SetFunctionName(

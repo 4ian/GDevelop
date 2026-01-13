@@ -389,7 +389,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   obj.AddAction(
-         "AddForceVersPos",
+         "AddForceTowardPosition",
          _("Add a force to move toward a position"),
          _("Add a force to an object to make it move toward a position."),
          _("Move _PARAM0_ toward _PARAM1_;_PARAM2_ with _PARAM4_ force of "
@@ -406,6 +406,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetDefaultValue("0")
       .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
+
+  // Compatibility with GD <= 5.6.251
+  obj.AddDuplicatedAction("AddForceVersPos", "AddForceTowardPosition")
+      .SetHidden();
+  // End of compatibility code
 
   obj.AddAction(
          "AddForceTournePos",
@@ -428,7 +433,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetHelpPath("/tutorials/how-to-move-objects/")
       .SetHidden();
 
-  obj.AddAction("StopForces",
+  obj.AddAction("ClearForces",
                 _("Stop the object"),
                 _("Stop the object by deleting all of its forces."),
                 _("Stop _PARAM0_ (remove all forces)"),
@@ -440,7 +445,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   // Compatibility with GD <= 5.6.251
-  obj.AddDuplicatedAction("Arreter", "StopForces").SetHidden();
+  obj.AddDuplicatedAction("Arreter", "ClearForces").SetHidden();
   // End of compatibility code
 
   obj.AddAction("Delete",
@@ -773,7 +778,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .SetHidden();  // Inverted "Visible" condition  does the same thing.
 
-  obj.AddCondition("IsStopped",
+  obj.AddCondition("HasNoForces",
                    _("Object is stopped (no forces applied on it)"),
                    _("Check if an object is not moving"),
                    _("_PARAM0_ is stopped"),
@@ -785,7 +790,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   // Compatibility with GD <= 5.6.251
-  obj.AddDuplicatedCondition("Arret", "IsStopped").SetHidden();
+  obj.AddDuplicatedCondition("Arret", "HasNoForces").SetHidden();
   // End of compatibility code
 
   obj.AddCondition("Speed",
@@ -1116,7 +1121,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("yesorno", _("Activate?"))
       .MarkAsAdvanced();
 
-  obj.AddAction("AddForceVers",
+  obj.AddAction("AddForceTowardObject",
                 _("Add a force to move toward an object"),
                 _("Add a force to an object to make it move toward another."),
                 _("Move _PARAM0_ toward _PARAM1_ with _PARAM3_ force of "
@@ -1131,6 +1136,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetDefaultValue("0")
       .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
+
+  // Compatibility with GD <= 5.6.251
+  obj.AddDuplicatedAction("AddForceVers", "AddForceTowardObject").SetHidden();
+  // End of compatibility code
 
   obj.AddAction(
          "AddForceTourne",
@@ -1776,7 +1785,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddCondition("SeDirige",
+      .AddCondition("IsTotalForceAngleTowardObject",
                     _("An object is moving toward another (using forces)"),
                     _("Check if an object moves toward another.\nThe first "
                       "object must move."),
@@ -1790,6 +1799,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddCodeOnlyParameter("conditionInverted", "")
       .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
+
+  // Compatibility with GD <= 5.6.251
+  extension
+      .AddDuplicatedCondition("SeDirige", "IsTotalForceAngleTowardObject")
+      .SetHidden();
+  // End of compatibility code
 
   extension
       .AddCondition("Distance",

@@ -1,14 +1,11 @@
 // @flow
 import optionalRequire from './OptionalRequire';
 import YAML from 'yaml';
+import { SafeExtractor } from './SafeExtractor';
 
-const fs = optionalRequire('node:fs');
+const fs = optionalRequire('fs');
 const fsPromises = fs ? fs.promises : null;
-const path = optionalRequire('node:path');
-
-export type RawProjectSettings = {
-  preferences?: { [string]: mixed },
-};
+const path = optionalRequire('path');
 
 export type ParsedProjectSettings = {
   preferences: { [string]: boolean | string | number },
@@ -16,9 +13,6 @@ export type ParsedProjectSettings = {
 
 const SETTINGS_FILE_NAME = 'gdevelop-settings.yaml';
 
-/**
- * Gets the directory path from a project file path.
- */
 const getProjectDirectory = (projectFilePath: string): string | null => {
   if (!path) return null;
   return path.dirname(projectFilePath);
@@ -30,9 +24,6 @@ const getProjectDirectory = (projectFilePath: string): string | null => {
  * - The file doesn't exist
  * - The file system is not available (running in browser)
  * - The project path is not a local file path
- *
- * @param projectFilePath - The full path to the project's main JSON file
- * @returns Parsed project settings or null
  */
 export const readProjectSettings = async (
   projectFilePath: string
@@ -58,10 +49,12 @@ export const readProjectSettings = async (
     const content = await fsPromises.readFile(settingsFilePath, {
       encoding: 'utf8',
     });
-    const raw: RawProjectSettings = YAML.parse(content) || {};
 
-    const rawPreferences = raw.preferences;
-    if (!rawPreferences || typeof rawPreferences !== 'object') {
+    const rawPreferences = SafeExtractor.extractObjectProperty(
+      YAML.parse(content),
+      'preferences'
+    );
+    if (!rawPreferences) {
       console.info(
         `[ProjectSettingsReader] Loaded settings from: ${settingsFilePath} (no preferences section)`
       );
@@ -70,12 +63,12 @@ export const readProjectSettings = async (
 
     // Filter to only include primitive types (boolean, string, number)
     const preferences: { [string]: boolean | string | number } = {};
-    for (const [key, value] of Object.entries(rawPreferences)) {
-      if (
-        typeof value === 'boolean' ||
-        typeof value === 'string' ||
-        typeof value === 'number'
-      ) {
+    for (const key of Object.keys(rawPreferences)) {
+      const value = SafeExtractor.extractNumberOrStringOrBooleanProperty(
+        rawPreferences,
+        key
+      );
+      if (value !== null) {
         preferences[key] = value;
       }
     }
@@ -90,7 +83,9 @@ export const readProjectSettings = async (
     return { preferences };
   } catch (error) {
     console.error(
-      `[ProjectSettingsReader] Error reading gdevelop-settings.yaml: ${error.message}`
+      `[ProjectSettingsReader] Error reading gdevelop-settings.yaml: ${
+        error.message
+      }`
     );
     return null;
   }

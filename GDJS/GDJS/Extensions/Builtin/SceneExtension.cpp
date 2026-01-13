@@ -20,7 +20,7 @@ SceneExtension::SceneExtension() {
   GetAllStrExpressions()["CurrentSceneName"].SetFunctionName(
       "gdjs.evtTools.runtimeScene.getSceneName");
 
-  GetAllConditions()["AtSceneStart"].SetFunctionName(
+  GetAllConditions()["SceneJustBegins"].SetFunctionName(
       "gdjs.evtTools.runtimeScene.sceneJustBegins");
   // Compatibility with GD <= 5.6.251
   GetAllConditions()["DepartScene"].SetFunctionName(

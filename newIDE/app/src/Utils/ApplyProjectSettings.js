@@ -69,7 +69,7 @@ export const filterAllowedPreferences = (parsedPreferences: {
 };
 
 /**
- * Applies project-specific settings from a settings.yaml file to the editor.
+ * Applies project-specific settings from a gdevelop-settings.yaml file to the editor.
  *
  * @param parsedSettings - The parsed settings read from settings.yaml
  * @param preferences - The preferences context

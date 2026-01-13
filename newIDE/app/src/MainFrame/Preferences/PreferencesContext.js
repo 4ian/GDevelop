@@ -234,7 +234,7 @@ export type PreferencesValues = {|
 |};
 
 /**
- * Partial PreferencesValues that can be overridden per-project via preferences block in settings.yaml.
+ * Partial PreferencesValues that can be overridden per-project via preferences block in gdevelop-settings.yaml.
  */
 export type ProjectSpecificPreferencesValues = $Shape<PreferencesValues>;
 

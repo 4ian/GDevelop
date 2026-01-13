@@ -1097,7 +1097,7 @@ const MainFrame = (props: Props) => {
           authenticatedUser,
         }));
 
-        // Read and apply project settings from settings.yaml if it exists
+        // Read and apply project settings from gdevelop-settings.yaml if it exists
         try {
           const rawSettings = await readProjectSettings(
             updatedFileMetadata.fileIdentifier

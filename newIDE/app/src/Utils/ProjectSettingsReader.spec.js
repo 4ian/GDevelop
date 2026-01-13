@@ -7,7 +7,7 @@ import YAML from 'yaml';
 
 describe('ProjectSettingsReader', () => {
   describe('end-to-end: YAML content applied to preferences', () => {
-    test('settings.yaml content is properly parsed, filtered, and applied to preferences', () => {
+    test('gdevelop-settings.yaml content is properly parsed, filtered, and applied to preferences', () => {
       const yamlContent = `
 # Project settings
 preferences:

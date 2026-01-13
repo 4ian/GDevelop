@@ -14,7 +14,7 @@ export type ParsedProjectSettings = {
   preferences: { [string]: boolean | string | number },
 };
 
-const SETTINGS_FILE_NAME = 'settings.yaml';
+const SETTINGS_FILE_NAME = 'gdevelop-settings.yaml';
 
 /**
  * Gets the directory path from a project file path.
@@ -25,7 +25,7 @@ const getProjectDirectory = (projectFilePath: string): string | null => {
 };
 
 /**
- * Reads and parses the settings.yaml file from a project's root directory.
+ * Reads and parses the gdevelop-settings.yaml file from a project's root directory.
  * Returns null if:
  * - The file doesn't exist
  * - The file system is not available (running in browser)
@@ -90,7 +90,7 @@ export const readProjectSettings = async (
     return { preferences };
   } catch (error) {
     console.error(
-      `[ProjectSettingsReader] Error reading settings.yaml: ${error.message}`
+      `[ProjectSettingsReader] Error reading gdevelop-settings.yaml: ${error.message}`
     );
     return null;
   }

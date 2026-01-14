@@ -187,6 +187,8 @@ export default function NewObjectFromScratch({
             // The tier will be overridden with repository data.
             // Only the built-in and user extensions will keep this value.
             tier: 'installed',
+            // It will be will be overridden with repository data.
+            requiredExtensions: [],
             // Not relevant for `installed` extensions
             version: '',
             url: '',

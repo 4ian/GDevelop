@@ -379,7 +379,7 @@ function NewObjectDialog({
         if (!wasExtensionsInstalled) {
           return;
         }
-        onCreateNewObject(enumeratedObjectMetadata.name);
+        onCreateNewObject(enumeratedObjectMetadata.type);
       } catch (error) {
         console.error('Error while creating the object:', error);
         showAlert({

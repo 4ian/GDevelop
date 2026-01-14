@@ -1,7 +1,6 @@
 // @flow
 import { mapFor } from '../Utils/MapFor';
 import flatten from 'lodash/flatten';
-import { type ExtensionDependency } from '../Utils/GDevelopServices/Extension';
 
 const gd: libGDevelop = global.gd;
 
@@ -16,7 +15,6 @@ export type EnumeratedObjectMetadata = {|
   category: string,
   isRenderedIn3D: boolean,
   assetStoreTag?: string,
-  requiredExtensions?: Array<ExtensionDependency>,
   isDependentWithParent?: boolean,
   tags: Array<string>,
 |};

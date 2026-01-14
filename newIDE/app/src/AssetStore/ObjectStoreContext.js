@@ -6,6 +6,7 @@ import {
   getObjectsRegistry,
   type ObjectsRegistry,
   type ObjectShortHeader,
+  type ExtensionDependency,
 } from '../Utils/GDevelopServices/Extension';
 import { type Filters } from '../Utils/GDevelopServices/Filters';
 import {
@@ -304,12 +305,36 @@ export const ObjectStoreStateProvider = ({
     ]
   );
 
-  const allTranslatedObjects = React.useMemo(
+  const allTranslatedObjects = React.useMemo<{
+    [name: string]: ObjectShortHeader,
+  }>(
     () => {
-      const allTranslatedObjects: Array<ObjectShortHeader> = [];
+      const allTranslatedObjects: {
+        [name: string]: ObjectShortHeader,
+      } = {};
+      for (const type in translatedObjectShortHeadersByType) {
+        const objectShortHeader: any = {
+          ...translatedObjectShortHeadersByType[type],
+        };
+        delete objectShortHeader.englishFullName;
+        delete objectShortHeader.englishDescription;
+
+        const objectExtension: ExtensionDependency = {
+          extensionName: objectShortHeader.extensionName,
+          extensionVersion: objectShortHeader.version,
+        };
+        // In the repository, `requiredExtensions` doesn't includes its own extension.
+        // We add it because we need it to check for updates.
+        objectShortHeader.requiredExtensions = objectShortHeader.requiredExtensions
+          ? [objectExtension, ...objectShortHeader.requiredExtensions]
+          : [objectExtension];
+
+        allTranslatedObjects[type] = objectShortHeader;
+      }
       for (const installedObjectMetadata of installedObjectMetadataList) {
         const repositoryObjectMetadata =
           translatedObjectShortHeadersByType[installedObjectMetadata.type];
+
         const objectMetadata = repositoryObjectMetadata
           ? {
               // Attributes from the extension repository
@@ -326,6 +351,7 @@ export const ObjectStoreStateProvider = ({
               authors: repositoryObjectMetadata.authors,
               // It's empty and not used.
               extensionNamespace: repositoryObjectMetadata.extensionNamespace,
+              requiredExtensions: repositoryObjectMetadata.requiredExtensions,
 
               // Attributes from the installed extension
 
@@ -362,15 +388,7 @@ export const ObjectStoreStateProvider = ({
                   : installedObjectMetadata.description,
             }
           : installedObjectMetadata;
-        allTranslatedObjects.push(objectMetadata);
-      }
-      for (const type in translatedObjectShortHeadersByType) {
-        const objectShortHeader: any = {
-          ...translatedObjectShortHeadersByType[type],
-        };
-        delete objectShortHeader.englishFullName;
-        delete objectShortHeader.englishDescription;
-        allTranslatedObjects.push(objectShortHeader);
+        allTranslatedObjects[installedObjectMetadata.type] = objectMetadata;
       }
       return allTranslatedObjects;
     },
@@ -380,8 +398,8 @@ export const ObjectStoreStateProvider = ({
   const allCategories = React.useMemo(
     () => {
       const categoriesSet = new Set();
-      for (const object of allTranslatedObjects) {
-        categoriesSet.add(object.category);
+      for (const type in allTranslatedObjects) {
+        categoriesSet.add(allTranslatedObjects[type].category);
       }
       const sortedCategories = [...categoriesSet].sort((tag1, tag2) =>
         tag1.toLowerCase().localeCompare(tag2.toLowerCase())
@@ -394,7 +412,8 @@ export const ObjectStoreStateProvider = ({
   const filters = React.useMemo(
     () => {
       const tagsSet = new Set();
-      for (const object of allTranslatedObjects) {
+      for (const type in allTranslatedObjects) {
+        const object = allTranslatedObjects[type];
         object.tags.forEach(tag => {
           if (
             showExperimentalExtensions ||
@@ -422,10 +441,8 @@ export const ObjectStoreStateProvider = ({
       const allTranslatedObjectsAndCategories: {
         [name: string]: ObjectShortHeader | ObjectCategory,
       } = {};
-      for (const translatedObjects of allTranslatedObjects) {
-        allTranslatedObjectsAndCategories[
-          translatedObjects.type
-        ] = translatedObjects;
+      for (const type in allTranslatedObjects) {
+        allTranslatedObjectsAndCategories[type] = allTranslatedObjects[type];
       }
       const allCategorizedObjects = [
         ...[...builtInObjectTypes, ...firstObjectIds]
@@ -461,6 +478,7 @@ export const ObjectStoreStateProvider = ({
         };
         allTranslatedObjectsAndCategories[categoryId] = objectCategory;
       }
+      console.log(allTranslatedObjectsAndCategories);
       return allTranslatedObjectsAndCategories;
     },
     [firstObjectIds, installedObjectMetadataList, allTranslatedObjects, i18n]

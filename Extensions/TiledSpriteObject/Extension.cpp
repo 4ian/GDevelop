@@ -280,7 +280,6 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                 "res/imageicon24.png",
                 "res/imageicon.png")
       .AddParameter("object", _("Object"), "TiledSprite")
-      .AddParameter("imageResource", _("Image file (or image resource name)"))
-      .AddCodeOnlyParameter("currentScene", "0")
-      .SetFunctionName("SetTexture");
+      .AddParameter("imageResource", _("Image resource"))
+      .AddCodeOnlyParameter("currentScene", "");
 }

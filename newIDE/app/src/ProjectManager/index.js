@@ -140,6 +140,7 @@ const styles = {
 };
 
 const extensionItemReactDndType = 'GD_EXTENSION_ITEM';
+const sceneItemReactDndType = 'GD_SCENE';
 
 export interface TreeViewItemContent {
   getName(): string | React.Node;
@@ -1383,14 +1384,24 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     );
 
     const canMoveSelectionTo = React.useCallback(
-      (destinationItem: TreeViewItem, where: 'before' | 'inside' | 'after') =>
-        selectedItems.every(item => {
+      (destinationItem: TreeViewItem, where: 'before' | 'inside' | 'after') => {
+        console.log('🎯 canMoveSelectionTo called!');  // ✅ RICHTIG - innerhalb!
+        console.log('  Selected items:', selectedItems.length);
+        console.log('  Destination root ID:', destinationItem.content.getRootId());
+        
+        return selectedItems.every(item => {
+          const sourceRootId = item.content.getRootId();
+          const destRootId = destinationItem.content.getRootId();
+          
+          console.log(`  Checking: ${sourceRootId} -> ${destRootId}`);
+          
           return (
             // Project and game settings children `getRootId` return an empty string.
-            item.content.getRootId().length > 0 &&
-            item.content.getRootId() === destinationItem.content.getRootId()
+            sourceRootId.length > 0 &&
+            sourceRootId === destRootId
           );
-        }),
+        });
+      },
       [selectedItems]
     );
 

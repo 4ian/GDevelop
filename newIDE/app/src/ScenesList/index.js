@@ -336,6 +336,7 @@ export function ScenesList(props: ScenesListProps) {
 
   const treeViewRef = React.useRef<?TreeViewInterface<TreeViewItem>>(null);
   const [renderKey, setRenderKey] = React.useState(0);
+  const [selectedItems, setSelectedItems] = React.useState<Array<TreeViewItem>>([]);
 
   const sceneTreeViewItemProps = React.useMemo(
     () => ({
@@ -592,6 +593,7 @@ export function ScenesList(props: ScenesListProps) {
   const getTreeViewItemThumbnail = (item: TreeViewItem) =>
     item.content.getThumbnail();
   const getTreeViewItemDataSet = (item: TreeViewItem) => item.content.getDataSet();
+  //const moveSelectionToItem = 
   const buildMenuTemplate = (item: TreeViewItem, index: number) =>
     item.content.buildMenuTemplate(i18n, index);
   const renderTreeViewItemRightComponent = (item: TreeViewItem) =>
@@ -607,6 +609,35 @@ export function ScenesList(props: ScenesListProps) {
   };
   const getTreeViewItemRightButton = (item: TreeViewItem) =>
     item.content.getRightButton(i18n);
+
+  const canMoveSelectionTo = React.useCallback(
+    (destinationItem: TreeViewItem, where: 'before' | 'inside' | 'after') => {
+      console.log('🎯 ScenesList canMoveSelectionTo called!');
+      console.log('  Destination:', destinationItem.content.getName());
+      console.log('  Where:', where);
+      
+      // Szenen können nur zu anderen Szenen verschoben werden
+      // (nicht zu Extensions, External Events, etc.)
+      return true; // Erstmal alles erlauben innerhalb von Scenes
+    },
+    []
+  );
+
+  const moveSelectionTo = React.useCallback(
+    (destinationItem: TreeViewItem, where: 'before' | 'inside' | 'after') => {
+      console.log('🚀 ScenesList moveSelectionTo called!');
+      console.log('  Destination:', destinationItem.content.getName());
+      console.log('  Where:', where);
+      
+      // Hier die eigentliche Verschiebe-Logik
+      const targetIndex = destinationItem.content.getIndex() + (where === 'after' ? 1 : 0);
+      console.log('  Target index:', targetIndex);
+      
+      // Rufe moveAt auf dem ausgewählten Item auf
+      // (wird automatisch von TreeView gemacht, wenn wir die Props richtig setzen)
+    },
+    []
+  );
 
   return (
     <div style={styles.listContainer}>
@@ -627,16 +658,50 @@ export function ScenesList(props: ScenesListProps) {
               getItemHtmlId={getTreeViewItemHtmlId}
               getItemDataset={getTreeViewItemDataSet}
               onEditItem={editItem}
-              selectedItems={[]} // TODO: Implement selection
-              onSelectItems={() => {}} // TODO: Implement selection
-              onClickItem={onClickItem}
+              selectedItems={selectedItems}
+              onSelectItems={(items) => {
+                console.log('🎯 ScenesList onSelectItems called!', items.length);
+                items.forEach(item => console.log('  -', item.content.getName()));
+                setSelectedItems(items);
+              }}
+              onClickItem={(item) => {
+                console.log('👆 ScenesList onClickItem called!', item.content.getName());
+                onClickItem(item);
+              }}
               onRenameItem={renameItem}
               buildMenuTemplate={buildMenuTemplate}
               getItemRightButton={getTreeViewItemRightButton}
               renderRightComponent={renderTreeViewItemRightComponent}
-              initiallyOpenedNodeIds={[scenesRootFolderId]} // ← FIX: Scenes root automatisch öffnen
+              onMoveSelectionToItem={(destinationItem, where) => {
+                console.log('🚀 onMoveSelectionToItem CALLED!');
+                console.log('  selectedItems:', selectedItems.length);
+                
+                if (selectedItems.length === 0) {
+                  console.log('  ❌ No items selected!');
+                  return;
+                }
+                
+                const selectedItem = selectedItems[0];
+                console.log('  📦 Moving:', selectedItem.content.getName());
+                console.log('  📍 To:', destinationItem.content.getName());
+                console.log('  ⬆️⬇️ Where:', where);
+                
+                selectedItem.content.moveAt(
+                  destinationItem.content.getIndex() + (where === 'after' ? 1 : 0)
+                );
+                
+                forceUpdateList();
+                onProjectItemModified();
+              }}
+              canMoveSelectionToItem={(destinationItem, where) => {
+                console.log('🎯 ScenesList canMoveSelectionTo called!');
+                console.log('  selectedItems:', selectedItems.length);
+                console.log('  Destination:', destinationItem.content.getName());
+                return true;
+              }}
+              initiallyOpenedNodeIds={[scenesRootFolderId]}
               reactDndType="GD_SCENE"
-              forceAllOpened={false} // ← Damit nur Scenes root offen ist
+              forceAllOpened={false}
             />
           )}
         </AutoSizer>

@@ -327,10 +327,17 @@ export const BehaviorStoreStateProvider = ({
   );
 
   const defaultFirstSearchItemIds = React.useMemo(
-    () => [
-      ...installedBehaviorMetadataList.map(behavior => behavior.type),
-      ...firstBehaviorIds,
-    ],
+    () => {
+      const defaultFirstSearchItemIds = installedBehaviorMetadataList.map(
+        behavior => behavior.type
+      );
+      for (const firstBehaviorId of firstBehaviorIds) {
+        if (!defaultFirstSearchItemIds.includes(firstBehaviorId)) {
+          defaultFirstSearchItemIds.push(firstBehaviorId);
+        }
+      }
+      return defaultFirstSearchItemIds;
+    },
     [firstBehaviorIds, installedBehaviorMetadataList]
   );
 

@@ -74,7 +74,12 @@ const getItemIdsGroupedByCategory = (
 ): Array<string> => {
   const sortedInstalledObjectShortHeaders = [...firstObjectShortHeaders];
   for (const installedObjectShortHeader of installedObjectShortHeaders) {
-    if (!firstObjectShortHeaders.includes(installedObjectShortHeader)) {
+    if (
+      !firstObjectShortHeaders.some(
+        firstObjectShortHeader =>
+          firstObjectShortHeader.type === installedObjectShortHeader.type
+      )
+    ) {
       sortedInstalledObjectShortHeaders.push(installedObjectShortHeader);
     }
   }
@@ -478,7 +483,6 @@ export const ObjectStoreStateProvider = ({
         };
         allTranslatedObjectsAndCategories[categoryId] = objectCategory;
       }
-      console.log(allTranslatedObjectsAndCategories);
       return allTranslatedObjectsAndCategories;
     },
     [firstObjectIds, installedObjectMetadataList, allTranslatedObjects, i18n]

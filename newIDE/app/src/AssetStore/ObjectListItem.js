@@ -6,7 +6,6 @@ import ButtonBase from '@material-ui/core/ButtonBase';
 import Text from '../UI/Text';
 import { Trans } from '@lingui/macro';
 import { Line, Column } from '../UI/Grid';
-import { IconContainer } from '../UI/IconContainer';
 import HighlightedText from '../UI/Search/HighlightedText';
 import { type SearchMatch } from '../UI/Search/UseSearchStructuredItem';
 import Chip from '../UI/Chip';
@@ -17,6 +16,7 @@ import CircledInfo from '../UI/CustomSvgIcons/SmallCircledInfo';
 import IconButton from '../UI/IconButton';
 import { getIDEVersion } from '../Version';
 import ListIcon from '../UI/ListIcon';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 
 const styles = {
   button: { width: '100%' },
@@ -48,6 +48,8 @@ export const ObjectListItem = ({
   onHeightComputed,
   platform,
 }: Props) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+
   const isEngineCompatible = isCompatibleWithGDevelopVersion(
     getIDEVersion(),
     objectShortHeader.gdevelopVersion
@@ -86,12 +88,7 @@ export const ObjectListItem = ({
     [isEnabled, onChoose]
   );
 
-  const hasChip =
-    !isEngineCompatible || objectShortHeader.tier === 'experimental';
-  const hasInfoButton = objectShortHeader.authors || false;
-  const iconStyle = {
-    paddingTop: hasInfoButton ? 10 : hasChip ? 6 : 4,
-  };
+  const [hover, setHover] = React.useState(false);
 
   return (
     <ButtonBase
@@ -102,8 +99,14 @@ export const ObjectListItem = ({
     >
       <div
         style={
-          isEnabled ? styles.container : { ...styles.container, opacity: 0.384 }
+          isEnabled
+            ? hover
+              ? { ...styles.container, ...gdevelopTheme.list.hover }
+              : styles.container
+            : { ...styles.container, opacity: 0.384 }
         }
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
         ref={containerRef}
       >
         <LineStackLayout>
@@ -166,6 +169,7 @@ export const ObjectListItem = ({
               size="body2"
               allowBrowserAutoTranslate={false}
               displayInlineAsSpan // Important to avoid the text to use a "p" which causes crashes with automatic translation tools with the highlighted text.
+              color={'secondary'}
             >
               {renderField('description')}
             </Text>

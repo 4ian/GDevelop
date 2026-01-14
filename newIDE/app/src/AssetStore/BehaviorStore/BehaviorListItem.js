@@ -17,6 +17,7 @@ import CircledInfo from '../../UI/CustomSvgIcons/SmallCircledInfo';
 import IconButton from '../../UI/IconButton';
 import { getIDEVersion } from '../../Version';
 import ListIcon from '../../UI/ListIcon';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -55,6 +56,8 @@ export const BehaviorListItem = ({
   onHeightComputed,
   platform,
 }: Props) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+
   const alreadyAdded = objectBehaviorsTypes.includes(behaviorShortHeader.type);
 
   const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
@@ -116,16 +119,7 @@ export const BehaviorListItem = ({
     [isEnabled, onChoose]
   );
 
-  const hasChip =
-    alreadyAdded ||
-    !isObjectCompatible ||
-    !isEngineCompatible ||
-    behaviorShortHeader.tier === 'experimental' ||
-    (behaviorShortHeader.isDeprecated || false);
-  const hasInfoButton = behaviorShortHeader.authors || false;
-  const iconStyle = {
-    paddingTop: hasInfoButton ? 10 : hasChip ? 6 : 4,
-  };
+  const [hover, setHover] = React.useState(false);
 
   return (
     <ButtonBase
@@ -136,8 +130,14 @@ export const BehaviorListItem = ({
     >
       <div
         style={
-          isEnabled ? styles.container : { ...styles.container, opacity: 0.384 }
+          isEnabled
+            ? hover
+              ? { ...styles.container, ...gdevelopTheme.list.hover }
+              : styles.container
+            : { ...styles.container, opacity: 0.384 }
         }
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
         ref={containerRef}
       >
         <LineStackLayout>
@@ -231,6 +231,7 @@ export const BehaviorListItem = ({
               size="body2"
               allowBrowserAutoTranslate={false}
               displayInlineAsSpan // Important to avoid the text to use a "p" which causes crashes with automatic translation tools with the highlighted text.
+              color={'secondary'}
             >
               {renderField('description')}
             </Text>

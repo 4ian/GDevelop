@@ -5,7 +5,6 @@ import ButtonBase from '@material-ui/core/ButtonBase';
 import Text from '../../UI/Text';
 import { Trans } from '@lingui/macro';
 import { Column, Line } from '../../UI/Grid';
-import { IconContainer } from '../../UI/IconContainer';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
 import HighlightedText from '../../UI/Search/HighlightedText';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
@@ -15,6 +14,7 @@ import ListIcon from '../../UI/ListIcon';
 import Tooltip from '@material-ui/core/Tooltip';
 import CircledInfo from '../../UI/CustomSvgIcons/SmallCircledInfo';
 import IconButton from '../../UI/IconButton';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 
 const styles = {
   button: { width: '100%' },
@@ -43,6 +43,8 @@ export const ExtensionListItem = ({
   onChoose,
   onHeightComputed,
 }: Props) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+
   const alreadyInstalled = project.hasEventsFunctionsExtensionNamed(
     extensionShortHeader.name
   );
@@ -76,9 +78,20 @@ export const ExtensionListItem = ({
     );
   };
 
+  const [hover, setHover] = React.useState(false);
+
   return (
     <ButtonBase id={id} onClick={onChoose} focusRipple style={styles.button}>
-      <div style={styles.container} ref={containerRef}>
+      <div
+        style={
+          hover
+            ? { ...styles.container, ...gdevelopTheme.list.hover }
+            : styles.container
+        }
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+        ref={containerRef}
+      >
         <LineStackLayout>
           <ListIcon
             src={extensionShortHeader.previewIconUrl}
@@ -147,6 +160,7 @@ export const ExtensionListItem = ({
               size="body2"
               allowBrowserAutoTranslate={false}
               displayInlineAsSpan // Important to avoid the text to use a "p" which causes crashes with automatic translation tools with the highlighted text.
+              color={'secondary'}
             >
               {renderExtensionField('shortDescription')}
             </Text>

@@ -41,10 +41,6 @@ import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import { mapFor } from '../Utils/MapFor';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
-import { 
-  buildScenesTreeItems,
-  scenesRootFolderId as SCENES_ROOT_ID,
-} from '../ScenesList';
 import {
   ExtensionTreeViewItemContent,
   getExtensionTreeViewItemId,
@@ -89,12 +85,17 @@ import {
   type ExternalLayoutFolderTreeViewItemProps,
 } from './ExternalLayoutFolderTreeViewItemContent';
 import {
+  SceneTreeViewItemContent,
   getSceneTreeViewItemId,
-} from '../ProjectManager/SceneTreeViewItemContent';
+} from './SceneTreeViewItemContent';
 import {
+  SceneFolderTreeViewItemContent,
   getSceneFolderTreeViewItemId,
 } from '../ProjectManager/SceneFolderTreeViewItemContent';
 import {
+  isFolder,
+  getItem,
+  forEachChild,
   hasFolderNamed,
   insertNewFolder,
   getChildrenCount,
@@ -296,7 +297,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
   }
 
   getRootId(): string {
-    return '';
+    return scenesRootFolderId;
   }
 }
 
@@ -402,6 +403,175 @@ class FolderTreeViewItem implements TreeViewItem {
   getChildren(i18n: I18nType): ?Array<TreeViewItem> {
     return this.getChildrenFunc(i18n);
   }
+}
+
+const buildSceneFolderTree = (
+  folder: gdLayoutFolderOrLayout,
+  props: any
+): TreeViewItem => {
+  return new FolderTreeViewItem(
+    new SceneFolderTreeViewItemContent(folder, props),
+    (i18n: I18nType) => {
+      const children = [];
+      
+      // Verwende FolderHelpers statt manuelle Implementierung
+      forEachChild(folder, (child) => {
+        if (isFolder(child)) {
+          // Rekursiv für Folder
+          children.push(buildSceneFolderTree(child, props));
+        } else {
+          // Leaf für Scene
+          const layout = getItem(child);
+          if (layout) {
+            children.push(
+              new LeafTreeViewItem(new SceneTreeViewItemContent(layout, props))
+            );
+          }
+        }
+      });
+
+      return children;
+    }
+  );
+};
+
+export function buildScenesTreeItems(
+  project: gdProject,
+  i18n: I18nType,
+  props: any,
+  rootId?: string 
+): Array<TreeViewItem> {
+  console.log('📦 buildScenesTreeItems called!');
+  const layoutsRootFolder = project.getLayoutsRootFolder();
+  console.log('📁 Root folder:', layoutsRootFolder);
+  console.log('📊 Layouts in project:', project.getLayoutsCount());
+  
+  const { addNewScene, addNewFolder } = props;
+  const usedRootId = rootId || scenesRootFolderId;
+
+  // Placeholder wenn keine Layouts
+  const scenesEmptyPlaceholderId = 'scenes-empty-placeholder';
+
+  class LabelTreeViewItemContentWithMenu implements TreeViewItemContent {
+    id: string;
+    label: string | React.Node;
+    rightButton: ?MenuButton;
+    buildMenuTemplateFunction: (i18n: I18nType, index: number) => Array<MenuItemTemplate>;
+    onAddSceneCallback: ?(() => void);
+    onAddFolderCallback: ?(() => void);
+
+    constructor(
+      id: string,
+      label: string | React.Node,
+      rightButton?: MenuButton,
+      onAddScene?: () => void,
+      onAddFolder?: () => void
+    ) {
+      this.id = id;
+      this.label = label;
+      this.rightButton = rightButton;
+      this.onAddSceneCallback = onAddScene;
+      this.onAddFolderCallback = onAddFolder;
+      
+      this.buildMenuTemplateFunction = (i18n: I18nType, index: number) => {
+        const menuItems = [];
+        
+        if (rightButton) {
+          menuItems.push({
+            id: rightButton.id,
+            label: rightButton.label,
+            click: rightButton.click,
+          });
+        }
+        
+        if (this.id === usedRootId) {
+          if (this.onAddSceneCallback) {
+            menuItems.push({
+              label: i18n._(t`Add a scene`),
+              click: this.onAddSceneCallback,
+            });
+          }
+          if (this.onAddFolderCallback) {
+            menuItems.push({
+              label: i18n._(t`Add a folder`),
+              click: this.onAddFolderCallback,
+            });
+          }
+        }
+        
+        return menuItems;
+      };
+    }
+
+    getName(): string | React.Node { return this.label; }
+    getId(): string { return this.id; }
+    getRightButton(i18n: I18nType): ?MenuButton { return this.rightButton; }
+    getHtmlId(index: number): ?string { return this.id; }
+    getDataSet(): ?HTMLDataset { return null; }
+    getThumbnail(): ?string { return null; }
+    onClick(): void {}
+    buildMenuTemplate(i18n: I18nType, index: number): Array<MenuItemTemplate> {
+      return this.buildMenuTemplateFunction(i18n, index);
+    }
+    renderRightComponent(i18n: I18nType): ?React.Node { return null; }
+    rename(newName: string): void {}
+    edit(): void {}
+    delete(): void {}
+    copy(): void {}
+    paste(): void {}
+    cut(): void {}
+    getIndex(): number { return 0; }
+    moveAt(destinationIndex: number): void {}
+    isDescendantOf(itemContent: TreeViewItemContent): boolean { return false; }
+    getRootId(): string { return ''; }
+  }
+
+  return [
+    {
+      isRoot: true,
+      content: new LabelTreeViewItemContentWithMenu(
+        usedRootId,
+        i18n._(t`Scenes`),
+        {
+          icon: <Add />,
+          label: i18n._(t`Add`),
+          click: addNewScene,
+          id: 'add-new-scene-button',
+        },
+        addNewScene,
+        addNewFolder
+      ),
+      getChildren: (i18n: I18nType) => {
+        console.log('🔍 getChildren CALLED in buildScenesTreeItems!');
+        
+        if (!layoutsRootFolder || project.getLayoutsCount() === 0) {
+          return [
+            new PlaceHolderTreeViewItem(
+              scenesEmptyPlaceholderId,
+              i18n._(t`Start by adding a new scene.`)
+            ),
+          ];
+        }
+
+        const children = [];
+        forEachChild(layoutsRootFolder, (child) => {
+          if (isFolder(child)) {
+            children.push(buildSceneFolderTree(child, props));
+          } else {
+            const layout = getItem(child);
+            if (layout) {
+              children.push(
+                new LeafTreeViewItem(new SceneTreeViewItemContent(layout, props))
+              );
+            }
+          }
+        });
+        
+        console.log('✅ Built children:', children.length);
+        return children;
+      },
+    },
+  ];
 }
 
 const getTreeViewItemName = (item: TreeViewItem) => item.content.getName();
@@ -1146,11 +1316,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
 
           const sceneItemId = getSceneTreeViewItemId(newScene);
           if (treeViewRef.current) {
-            treeViewRef.current.openItems([SCENES_ROOT_ID]);
-          }
-
-          if (treeViewRef.current) {
-            treeViewRef.current.openItems([SCENES_ROOT_ID]); // ⭐ Beide IDs!
+            treeViewRef.current.openItems([scenesRootFolderId]);
           }
 
           setTimeout(() => {
@@ -1191,6 +1357,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         // Props mit Callbacks erweitern
         const sceneTreeViewItemPropsWithCallbacks = {
           ...sceneTreeViewItemProps,
+          rootId: scenesRootFolderId,
           addNewScene: handleAddNewScene,
           addNewFolder: handleAddNewFolder,
         };
@@ -1247,9 +1414,12 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                   ];
                 },
               },
-              // ⭐ Verwende die erweiterten Props!
-              ...buildScenesTreeItems(project, i18n, sceneTreeViewItemPropsWithCallbacks),
-              // ... rest bleibt gleich (Extensions, External Events, External Layouts)
+              ...buildScenesTreeItems(
+                project, 
+                i18n, 
+                sceneTreeViewItemPropsWithCallbacks,
+                scenesRootFolderId  // ← Die korrekte Root ID!
+              ),
               {
                 isRoot: true,
                 content: new LabelTreeViewItemContent(
@@ -1411,6 +1581,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         destinationItem: TreeViewItem,
         where: 'before' | 'inside' | 'after'
       ) => {
+        console.log("Move Selection!");
         if (selectedItems.length === 0) {
           return;
         }
@@ -1445,8 +1616,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     const listKey = project ? project.ptr : 'no-project';
     const initiallyOpenedNodeIds = [
       gameSettingsRootFolderId,
-      //scenesRootFolderId,
-      SCENES_ROOT_ID,
+      scenesRootFolderId,
       extensionsRootFolderId,
       externalEventsRootFolderId,
       externalLayoutsRootFolderId,

@@ -46,6 +46,8 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
   }
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
+    console.log("ITEM CONTENT:");
+    console.log(itemContent);
     if (itemContent.getId() === scenesRootFolderId) return true;
     
     let currentParent = this.folder.getParent();

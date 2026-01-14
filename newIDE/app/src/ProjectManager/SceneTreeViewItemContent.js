@@ -71,7 +71,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   }
 
   getRootId(): string {
-    return scenesRootFolderId;
+    return this.props.rootId;
   }
 
   getName(): string | React.Node {

@@ -82,7 +82,8 @@ export const ExtensionListItem = ({
         <LineStackLayout>
           <ListIcon
             src={extensionShortHeader.previewIconUrl}
-            iconSize={40}
+            iconSize={32}
+            padding={4}
             useExactIconSize
           />
           <Column expand>

@@ -109,11 +109,12 @@ export const ObjectListItem = ({
         <LineStackLayout>
           <ListIcon
             src={objectShortHeader.previewIconUrl}
-            iconSize={40}
+            iconSize={32}
+            padding={4}
             useExactIconSize
           />
           <Column expand>
-            <LineStackLayout noMargin alignItems="center">
+            <LineStackLayout noMargin expand alignItems="center">
               <Text
                 noMargin
                 allowBrowserAutoTranslate={false}

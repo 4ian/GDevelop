@@ -24,6 +24,7 @@ type Props = {|
    */
   isGDevelopIcon?: boolean,
   useExactIconSize?: boolean,
+  padding?: ?number,
   ...SizeProps,
 |};
 
@@ -42,6 +43,8 @@ function ListIcon(props: Props) {
     useExactIconSize,
     brightness,
   } = props;
+
+  const padding = props.padding || 0;
 
   const iconWidth =
     props.iconWidth !== undefined ? props.iconWidth : props.iconSize;
@@ -85,11 +88,14 @@ function ListIcon(props: Props) {
   return (
     <div
       style={{
-        width: iconWidth,
-        height: iconHeight,
-        lineHeight: `${iconHeight}px`, // Vertical centering
+        width: iconWidth + 2 * padding,
+        height: iconHeight + 2 * padding,
+        lineHeight: `${iconHeight + 2 * padding}px`, // Vertical centering
         textAlign: 'center', // Horizontal centering
-        paddingRight,
+        paddingRight: padding + paddingRight,
+        paddingLeft: padding,
+        paddingTop: padding,
+        paddingBottom: padding,
       }}
     >
       {isGDevelopIcon ? (

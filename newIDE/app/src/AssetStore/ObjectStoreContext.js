@@ -489,8 +489,8 @@ export const ObjectStoreStateProvider = ({
   );
 
   const defaultFirstSearchItemIds = React.useMemo(
-    () => [
-      ...getItemIdsGroupedByCategory(
+    () => {
+      const defaultFirstSearchItemIds = getItemIdsGroupedByCategory(
         [...builtInObjectTypes, ...firstObjectIds]
           .map(type => {
             const objectOrCategory: ObjectShortHeader =
@@ -500,10 +500,15 @@ export const ObjectStoreStateProvider = ({
           })
           .filter(Boolean),
         installedObjectMetadataList
-      ),
-      getCategoryId('Explore'),
-      ...secondObjectIds,
-    ],
+      );
+      defaultFirstSearchItemIds.push(getCategoryId('Explore'));
+      for (const secondObjectId of secondObjectIds) {
+        if (!defaultFirstSearchItemIds.includes(secondObjectId)) {
+          defaultFirstSearchItemIds.push(secondObjectId);
+        }
+      }
+      return defaultFirstSearchItemIds;
+    },
     [
       installedObjectMetadataList,
       firstObjectIds,

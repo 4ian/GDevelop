@@ -532,6 +532,10 @@ const createOrReplaceObject: EditorFunction = {
       args,
       'duplicated_object_name'
     );
+    const duplicatedObjectScene = SafeExtractor.extractStringProperty(
+      args,
+      'duplicated_object_scene'
+    );
     const description = SafeExtractor.extractStringProperty(
       args,
       'description'
@@ -816,34 +820,48 @@ const createOrReplaceObject: EditorFunction = {
       );
     };
 
-    const duplicateExistingObject = (duplicatedObjectName: string) => {
-      let isSourceObjectGlobal = false;
-      let sourceObject: gdObject | null = null;
+    const duplicateExistingObject = (
+      duplicatedObjectName: string,
+      duplicatedObjectSceneName: string | null
+    ) => {
+      if (
+        duplicatedObjectSceneName &&
+        !project.hasLayoutNamed(duplicatedObjectSceneName)
+      ) {
+        return makeGenericFailure(
+          `Scene not found: "${duplicatedObjectSceneName}". Nothing was duplicated.`
+        );
+      }
 
-      if (layoutObjects.hasObjectNamed(duplicatedObjectName)) {
-        sourceObject = layoutObjects.getObject(duplicatedObjectName);
+      const duplicatedObjectScene = duplicatedObjectSceneName
+        ? project.getLayout(duplicatedObjectSceneName)
+        : layout;
+      const duplicatedObjectSceneObjects = duplicatedObjectScene.getObjects();
+
+      let isDuplicatedObjectGlobal = false;
+      let duplicatedObject: gdObject | null = null;
+      if (duplicatedObjectSceneObjects.hasObjectNamed(duplicatedObjectName)) {
+        duplicatedObject = duplicatedObjectSceneObjects.getObject(
+          duplicatedObjectName
+        );
       } else if (globalObjects.hasObjectNamed(duplicatedObjectName)) {
-        sourceObject = globalObjects.getObject(duplicatedObjectName);
-        isSourceObjectGlobal = true;
+        duplicatedObject = globalObjects.getObject(duplicatedObjectName);
+        isDuplicatedObjectGlobal = true;
       }
 
-      if (!sourceObject) {
-        // No existing object to duplicate, create a new one.
-        return createNewObject();
+      if (!duplicatedObject) {
+        return makeGenericFailure(
+          `Object not found: "${duplicatedObjectName}" in scene "${duplicatedObjectScene.getName()}" or as a global object. Nothing was duplicated.`
+        );
       }
 
-      const objectsContainerWhereObjectWasFound = isSourceObjectGlobal
-        ? globalObjects
-        : layoutObjects;
       const targetObjectsContainer =
-        target_object_scope === 'global'
-          ? globalObjects
-          : objectsContainerWhereObjectWasFound;
+        target_object_scope === 'global' ? globalObjects : layoutObjects;
 
-      const serializedObject = serializeToJSObject(sourceObject);
+      const serializedObject = serializeToJSObject(duplicatedObject);
       const newObject = targetObjectsContainer.insertNewObject(
         project,
-        sourceObject.getType(),
+        duplicatedObject.getType(),
         targetObjectName,
         targetObjectsContainer.getObjectsCount()
       );
@@ -861,8 +879,16 @@ const createOrReplaceObject: EditorFunction = {
         scene: layout,
         isNewObjectTypeUsed: false, // The object type can't be new because it is duplicated.
       });
+
+      const fromText = isDuplicatedObjectGlobal
+        ? 'the global objects'
+        : `scene "${duplicatedObjectScene.getName()}"`;
+      const toText =
+        target_object_scope === 'global'
+          ? 'the global objects'
+          : `scene "${scene_name}"`;
       return makeGenericSuccess(
-        `Duplicated object "${duplicatedObjectName}" as "${newObject.getName()}". The new object "${newObject.getName()}" has the same type, behaviors, properties and effects as the one it was duplicated from.`
+        `Duplicated object "${duplicatedObjectName}" (from ${fromText}) as "${newObject.getName()}" (to ${toText}). The new object "${newObject.getName()}" has the same type, behaviors, properties and effects as the one it was duplicated from.`
       );
     };
 
@@ -920,7 +946,10 @@ const createOrReplaceObject: EditorFunction = {
     } else if (shouldReplaceExistingObject) {
       return replaceExistingObject();
     } else if (duplicatedObjectName) {
-      return duplicateExistingObject(duplicatedObjectName);
+      return duplicateExistingObject(
+        duplicatedObjectName,
+        duplicatedObjectScene
+      );
     } else {
       return createNewObject();
     }

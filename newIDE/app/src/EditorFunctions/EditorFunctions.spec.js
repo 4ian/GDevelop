@@ -193,7 +193,7 @@ describe('editorFunctions', () => {
       expect(testScene.getObjects().hasObjectNamed('TheNewPlayer')).toBe(true);
       expect(result.success).toBe(true);
       expect(result.message).toMatchInlineSnapshot(
-        `"Duplicated object \\"Player\\" as \\"TheNewPlayer\\". The new object \\"TheNewPlayer\\" has the same type, behaviors, properties and effects as the one it was duplicated from."`
+        `"Duplicated object \\"Player\\" (from scene \\"TestScene\\") as \\"TheNewPlayer\\" (to scene \\"TestScene\\"). The new object \\"TheNewPlayer\\" has the same type, behaviors, properties and effects as the one it was duplicated from."`
       );
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
         scene: testScene,
@@ -222,12 +222,106 @@ describe('editorFunctions', () => {
       expect(testScene.getObjects().hasObjectNamed('TheNewPlayer')).toBe(false);
       expect(result.success).toBe(true);
       expect(result.message).toMatchInlineSnapshot(
-        `"Duplicated object \\"Player\\" as \\"TheNewPlayer\\". The new object \\"TheNewPlayer\\" has the same type, behaviors, properties and effects as the one it was duplicated from."`
+        `"Duplicated object \\"Player\\" (from scene \\"TestScene\\") as \\"TheNewPlayer\\" (to the global objects). The new object \\"TheNewPlayer\\" has the same type, behaviors, properties and effects as the one it was duplicated from."`
       );
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
         scene: testScene,
         isNewObjectTypeUsed: false,
       });
+    });
+
+    it('returns success when duplicating an existing object (from another scene)', async () => {
+      const onObjectsModifiedOutsideEditor = jest.fn();
+      const otherScene = project.insertNewLayout('OtherScene', 1);
+      const otherSceneObjects = otherScene.getObjects();
+      otherSceneObjects.insertNewObject(
+        project,
+        'Sprite',
+        'OtherScenePlayer',
+        otherSceneObjects.getObjectsCount()
+      );
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(),
+          args: {
+            scene_name: 'TestScene',
+            object_type: 'Sprite',
+            object_name: 'TheNewPlayer',
+            duplicated_object_name: 'OtherScenePlayer',
+            duplicated_object_scene: 'OtherScene',
+            target_object_scope: 'scene',
+          },
+          onObjectsModifiedOutsideEditor,
+        }
+      );
+
+      expect(project.getObjects().hasObjectNamed('TheNewPlayer')).toBe(false);
+      expect(project.getObjects().hasObjectNamed('OtherScenePlayer')).toBe(
+        false
+      );
+      expect(testScene.getObjects().hasObjectNamed('TheNewPlayer')).toBe(true);
+      expect(testScene.getObjects().hasObjectNamed('OtherScenePlayer')).toBe(
+        false
+      );
+      expect(otherScene.getObjects().hasObjectNamed('TheNewPlayer')).toBe(
+        false
+      );
+      expect(otherScene.getObjects().hasObjectNamed('OtherScenePlayer')).toBe(
+        true
+      );
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Duplicated object \\"OtherScenePlayer\\" (from scene \\"OtherScene\\") as \\"TheNewPlayer\\" (to scene \\"TestScene\\"). The new object \\"TheNewPlayer\\" has the same type, behaviors, properties and effects as the one it was duplicated from."`
+      );
+      expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
+        scene: testScene,
+        isNewObjectTypeUsed: false,
+      });
+    });
+
+    it('fails when duplicating an object not existing in another scene', async () => {
+      project.insertNewLayout('OtherScene', 1);
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(),
+          args: {
+            scene_name: 'TestScene',
+            object_type: 'Sprite',
+            object_name: 'TheNewPlayer',
+            duplicated_object_name: 'DoesNotExist',
+            duplicated_object_scene: 'OtherScene',
+            target_object_scope: 'scene',
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Object not found: \\"DoesNotExist\\" in scene \\"OtherScene\\" or as a global object. Nothing was duplicated."`
+      );
+    });
+
+    it('fails when duplicating an object not existing (in the same scene)', async () => {
+      project.insertNewLayout('OtherScene', 1);
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(),
+          args: {
+            scene_name: 'TestScene',
+            object_type: 'Sprite',
+            object_name: 'TheNewPlayer',
+            duplicated_object_name: 'DoesNotExist',
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Object not found: \\"DoesNotExist\\" in scene \\"TestScene\\" or as a global object. Nothing was duplicated."`
+      );
     });
 
     it('returns success when replacing an existing object', async () => {

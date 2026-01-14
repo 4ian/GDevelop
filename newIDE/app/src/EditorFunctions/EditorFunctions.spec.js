@@ -1,4 +1,5 @@
 // @flow
+import { fakeAssetShortHeader1 } from '../fixtures/GDevelopServicesTestData';
 import { PixiResourcesLoaderMock } from '../fixtures/TestPixiResourcesLoader';
 import {
   editorFunctions,
@@ -29,6 +30,14 @@ describe('editorFunctions', () => {
         'Sprite',
         'Player',
         testSceneObjects.getObjectsCount()
+      );
+
+      const globalObjects = project.getObjects();
+      globalObjects.insertNewObject(
+        project,
+        'Sprite',
+        'GlobalObjectPlayer',
+        globalObjects.getObjectsCount()
       );
     });
 
@@ -68,7 +77,7 @@ describe('editorFunctions', () => {
           status: 'asset-installed',
           message: 'Object installed',
           createdObjects: [object],
-          assetShortHeader: null,
+          assetShortHeader: fakeAssetShortHeader1,
         });
       },
       onObjectsModifiedOutsideEditor: jest.fn(),
@@ -77,7 +86,7 @@ describe('editorFunctions', () => {
       PixiResourcesLoader: PixiResourcesLoaderMock,
     });
 
-    it('should create a new object (from the asset store)', async () => {
+    it('creates a new object (from the asset store)', async () => {
       const onObjectsModifiedOutsideEditor = jest.fn();
 
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
@@ -102,7 +111,7 @@ describe('editorFunctions', () => {
       });
     });
 
-    it('should create a new object (from scratch if not found in the asset store)', async () => {
+    it('creates a new object (from scratch if not found in the asset store)', async () => {
       const onObjectsModifiedOutsideEditor = jest.fn();
 
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
@@ -139,7 +148,7 @@ describe('editorFunctions', () => {
       });
     });
 
-    it('should return success without creating when object already exists with same type', async () => {
+    it('returns success without creating when object already exists with same type', async () => {
       const onObjectsModifiedOutsideEditor = jest.fn();
 
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
@@ -164,7 +173,7 @@ describe('editorFunctions', () => {
       });
     });
 
-    it('should return success when duplicating an existing object (same scene)', async () => {
+    it('returns success when duplicating an existing object (same scene)', async () => {
       const onObjectsModifiedOutsideEditor = jest.fn();
 
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
@@ -192,7 +201,7 @@ describe('editorFunctions', () => {
       });
     });
 
-    it('should return success when duplicating an existing object (and making it global)', async () => {
+    it('returns success when duplicating an existing object (and making it global)', async () => {
       const onObjectsModifiedOutsideEditor = jest.fn();
 
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
@@ -221,7 +230,144 @@ describe('editorFunctions', () => {
       });
     });
 
-    it('should return failure when scene does not exist', async () => {
+    it('returns success when replacing an existing object', async () => {
+      const onObjectsModifiedOutsideEditor = jest.fn();
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(),
+          args: {
+            scene_name: 'TestScene',
+            object_type: 'Sprite',
+            object_name: 'Player',
+            replace_existing_object: true,
+            search_terms: 'Spaceship, Blue',
+          },
+          onObjectsModifiedOutsideEditor,
+        }
+      );
+
+      expect(project.getObjects().hasObjectNamed('PlayerReplacement')).toBe(
+        false
+      );
+      expect(project.getObjects().hasObjectNamed('Player')).toBe(false);
+      expect(testScene.getObjects().hasObjectNamed('PlayerReplacement')).toBe(
+        false
+      );
+      expect(testScene.getObjects().hasObjectNamed('Player')).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Replaced object \\"Player\\" by an object from the asset store fitting the search, with the same type (\\"Sprite\\")."`
+      );
+      expect(result.success).toBe(true);
+      expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
+        scene: testScene,
+        isNewObjectTypeUsed: false,
+      });
+    });
+
+    it('returns success when moving an existing object to the global objects', async () => {
+      const onObjectsModifiedOutsideEditor = jest.fn();
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(),
+          args: {
+            scene_name: 'TestScene',
+            object_type: 'Sprite',
+            object_name: 'Player',
+            replace_existing_object: true, // This has no impact.
+            target_object_scope: 'global',
+            search_terms: '', // This has no impact.
+          },
+          onObjectsModifiedOutsideEditor,
+        }
+      );
+
+      expect(project.getObjects().hasObjectNamed('PlayerReplacement')).toBe(
+        false
+      );
+      expect(project.getObjects().hasObjectNamed('Player')).toBe(true);
+      expect(testScene.getObjects().hasObjectNamed('PlayerReplacement')).toBe(
+        false
+      );
+      expect(testScene.getObjects().hasObjectNamed('Player')).toBe(false);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Moved object \\"Player\\" to the global objects. Its type, behaviors, properties and effects are unchanged."`
+      );
+      expect(result.success).toBe(true);
+      expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
+        scene: testScene,
+        isNewObjectTypeUsed: false,
+      });
+    });
+
+    it('fails when moving a scene object to a global object when there is one already', async () => {
+      // Add an object, with the same name as the global object, in the scene
+      // so we can try then to move it.
+      testScene
+        .getObjects()
+        .insertNewObject(
+          project,
+          'Sprite',
+          'GlobalObjectPlayer',
+          testScene.getObjects().getObjectsCount()
+        );
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(),
+          args: {
+            scene_name: 'TestScene',
+            object_type: 'Sprite',
+            object_name: 'GlobalObjectPlayer',
+            target_object_scope: 'global',
+            search_terms: '', // This has no impact.
+          },
+        }
+      );
+
+      expect(result.message).toMatchInlineSnapshot(
+        `"Object \\"GlobalObjectPlayer\\" already exists in the global objects. Nothing was changed."`
+      );
+      expect(project.getObjects().hasObjectNamed('GlobalObjectPlayer')).toBe(
+        true
+      );
+      expect(testScene.getObjects().hasObjectNamed('GlobalObjectPlayer')).toBe(
+        true
+      );
+      expect(result.success).toBe(false);
+    });
+
+    it('fails when moving an existing global object to a scene', async () => {
+      const onObjectsModifiedOutsideEditor = jest.fn();
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(),
+          args: {
+            scene_name: 'TestScene',
+            object_type: 'Sprite',
+            object_name: 'GlobalObjectPlayer',
+            target_object_scope: 'scene',
+            search_terms: '', // This has no impact.
+          },
+          onObjectsModifiedOutsideEditor,
+        }
+      );
+
+      expect(result.message).toMatchInlineSnapshot(
+        `"Object \\"GlobalObjectPlayer\\" is a global object. Global objects can't be moved, so it cannot be moved to the scene \\"TestScene\\"."`
+      );
+      expect(project.getObjects().hasObjectNamed('GlobalObjectPlayer')).toBe(
+        true
+      );
+      expect(testScene.getObjects().hasObjectNamed('GlobalObjectPlayer')).toBe(
+        false
+      );
+      expect(result.success).toBe(false);
+    });
+
+    it('fails when scene does not exist', async () => {
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
         {
           ...makeFakeLaunchFunctionOptionsWithProject(),

@@ -38,6 +38,7 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import { swapAsset } from '../AssetStore/AssetSwapper';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
+import { getObjectFolderOrObjectWithContextFromObjectName } from '../SceneEditor/ObjectFolderOrObjectsSelection';
 
 const gd: libGDevelop = global.gd;
 
@@ -518,7 +519,7 @@ const createOrReplaceObject: EditorFunction = {
   }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_type = extractRequiredString(args, 'object_type');
-    const object_name = extractRequiredString(args, 'object_name');
+    const targetObjectName = extractRequiredString(args, 'object_name');
     const target_object_scope = SafeExtractor.extractStringProperty(
       args,
       'target_object_scope'
@@ -574,32 +575,42 @@ const createOrReplaceObject: EditorFunction = {
       return propertiesText;
     };
 
+    // Check if target object already exists.
+    let existingTargetObject: gdObject | null = null;
+    let isTargetObjectGlobal = false;
+
+    if (layoutObjects.hasObjectNamed(targetObjectName)) {
+      existingTargetObject = layoutObjects.getObject(targetObjectName);
+    } else if (globalObjects.hasObjectNamed(targetObjectName)) {
+      existingTargetObject = globalObjects.getObject(targetObjectName);
+      isTargetObjectGlobal = true;
+    }
+
+    let existingObjectShouldBeMoved = false;
+    if (existingTargetObject) {
+      if (target_object_scope === 'global' && !isTargetObjectGlobal) {
+        existingObjectShouldBeMoved = true;
+      } else if (target_object_scope === 'scene' && isTargetObjectGlobal) {
+        existingObjectShouldBeMoved = true;
+      }
+    }
+
     const createNewObject = async () => {
       const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
         project,
         object_type
       );
 
-      // Check if object already exists.
-      let existingObject: gdObject | null = null;
-      let isGlobalObject = false;
-
-      if (layoutObjects.hasObjectNamed(object_name)) {
-        existingObject = layoutObjects.getObject(object_name);
-      } else if (globalObjects.hasObjectNamed(object_name)) {
-        existingObject = globalObjects.getObject(object_name);
-        isGlobalObject = true;
-      }
-      if (existingObject) {
-        if (existingObject.getType() !== object_type) {
-          if (isGlobalObject) {
+      if (existingTargetObject) {
+        if (existingTargetObject.getType() !== object_type) {
+          if (isTargetObjectGlobal) {
             return makeGenericFailure(
-              `Object with name "${object_name}" already exists globally but with a different type ("${object_type}").`
+              `Object with name "${targetObjectName}" already exists globally but with a different type ("${object_type}").`
             );
           }
 
           return makeGenericFailure(
-            `Object with name "${object_name}" already exists in scene "${scene_name}" but with a different type ("${object_type}").`
+            `Object with name "${targetObjectName}" already exists in scene "${scene_name}" but with a different type ("${object_type}").`
           );
         }
 
@@ -610,7 +621,7 @@ const createOrReplaceObject: EditorFunction = {
           isNewObjectTypeUsed: false, // No object was actually added.
         });
         return makeGenericSuccess(
-          `Object with name "${object_name}" already exists, no need to re-create it.`
+          `Object with name "${targetObjectName}" already exists, no need to re-create it.`
         );
       }
 
@@ -622,7 +633,7 @@ const createOrReplaceObject: EditorFunction = {
         const { status, message, createdObjects } = await searchAndInstallAsset(
           {
             objectsContainer: targetObjectsContainer,
-            objectName: object_name,
+            objectName: targetObjectName,
             objectType: object_type,
             searchTerms: search_terms || '',
             description: description || '',
@@ -706,7 +717,7 @@ const createOrReplaceObject: EditorFunction = {
       const object = targetObjectsContainer.insertNewObject(
         project,
         object_type,
-        object_name,
+        targetObjectName,
         targetObjectsContainer.getObjectsCount()
       );
       // /!\ Tell the editor that some objects have potentially been modified (and even removed).
@@ -718,29 +729,19 @@ const createOrReplaceObject: EditorFunction = {
 
       return makeGenericSuccess(
         [
-          `Created a new object (from scratch) called "${object_name}" of type "${object_type}" in scene "${scene_name}".`,
+          `Created a new object (from scratch) called "${targetObjectName}" of type "${object_type}" in scene "${scene_name}".`,
           getPropertiesText(object),
         ].join(' ')
       );
     };
 
     const replaceExistingObject = async () => {
-      let isGlobalObject = false;
-      let existingObject: gdObject | null = null;
-
-      if (layoutObjects.hasObjectNamed(object_name)) {
-        existingObject = layoutObjects.getObject(object_name);
-      } else if (globalObjects.hasObjectNamed(object_name)) {
-        existingObject = globalObjects.getObject(object_name);
-        isGlobalObject = true;
-      }
-
-      if (!existingObject) {
+      if (!existingTargetObject) {
         // No existing object to replace, create a new one.
         return createNewObject();
       }
 
-      const objectsContainerWhereObjectWasFound = isGlobalObject
+      const objectsContainerWhereObjectWasFound = isTargetObjectGlobal
         ? globalObjects
         : layoutObjects;
       const targetObjectsContainer =
@@ -751,7 +752,7 @@ const createOrReplaceObject: EditorFunction = {
       // First try to search and install an object from the asset store.
       try {
         const replacementObjectName = newNameGenerator(
-          object_name + 'Replacement',
+          targetObjectName + 'Replacement',
           name => targetObjectsContainer.hasObjectNamed(name)
         );
         const {
@@ -781,15 +782,13 @@ const createOrReplaceObject: EditorFunction = {
           swapAsset(
             project,
             PixiResourcesLoader,
-            existingObject,
+            existingTargetObject,
             createdObjects[0],
             assetShortHeader
           );
 
           for (const createdObject of createdObjects) {
-            objectsContainerWhereObjectWasFound.removeObject(
-              createdObject.getName()
-            );
+            targetObjectsContainer.removeObject(createdObject.getName());
           }
 
           // /!\ Tell the editor that some objects have potentially been modified (and even removed).
@@ -799,7 +798,7 @@ const createOrReplaceObject: EditorFunction = {
             isNewObjectTypeUsed: false, // The object type was not changed.
           });
           return makeGenericSuccess(
-            `Replaced object "${existingObject.getName()}" by an object from the asset store fitting the search, with the same type ("${existingObject.getType()}").`
+            `Replaced object "${existingTargetObject.getName()}" by an object from the asset store fitting the search, with the same type ("${existingTargetObject.getType()}").`
           );
         } else {
           // No asset found.
@@ -813,28 +812,27 @@ const createOrReplaceObject: EditorFunction = {
       }
 
       return makeGenericFailure(
-        `Could not find an object in the asset store to replace "${object_name}" in scene "${scene_name}". Instead, inspect properties of the object and modify it until it matches what you want it to be.`
+        `Could not find an object in the asset store to replace "${targetObjectName}" in scene "${scene_name}". Instead, inspect properties of the object and modify it until it matches what you want it to be.`
       );
     };
 
     const duplicateExistingObject = (duplicatedObjectName: string) => {
-      // TODO: factor this.
-      let isGlobalObject = false;
-      let existingObject: gdObject | null = null;
+      let isSourceObjectGlobal = false;
+      let sourceObject: gdObject | null = null;
 
       if (layoutObjects.hasObjectNamed(duplicatedObjectName)) {
-        existingObject = layoutObjects.getObject(duplicatedObjectName);
+        sourceObject = layoutObjects.getObject(duplicatedObjectName);
       } else if (globalObjects.hasObjectNamed(duplicatedObjectName)) {
-        existingObject = globalObjects.getObject(duplicatedObjectName);
-        isGlobalObject = true;
+        sourceObject = globalObjects.getObject(duplicatedObjectName);
+        isSourceObjectGlobal = true;
       }
 
-      if (!existingObject) {
+      if (!sourceObject) {
         // No existing object to duplicate, create a new one.
         return createNewObject();
       }
 
-      const objectsContainerWhereObjectWasFound = isGlobalObject
+      const objectsContainerWhereObjectWasFound = isSourceObjectGlobal
         ? globalObjects
         : layoutObjects;
       const targetObjectsContainer =
@@ -842,11 +840,11 @@ const createOrReplaceObject: EditorFunction = {
           ? globalObjects
           : objectsContainerWhereObjectWasFound;
 
-      const serializedObject = serializeToJSObject(existingObject);
+      const serializedObject = serializeToJSObject(sourceObject);
       const newObject = targetObjectsContainer.insertNewObject(
         project,
-        existingObject.getType(),
-        object_name,
+        sourceObject.getType(),
+        targetObjectName,
         targetObjectsContainer.getObjectsCount()
       );
       unserializeFromJSObject(
@@ -855,7 +853,7 @@ const createOrReplaceObject: EditorFunction = {
         'unserializeFrom',
         project
       );
-      newObject.setName(object_name); // Unserialization has overwritten the name.
+      newObject.setName(targetObjectName); // Unserialization has overwritten the name.
 
       // /!\ Tell the editor that some objects have potentially been modified (and even removed).
       // This will force the objects panel to refresh.
@@ -868,7 +866,58 @@ const createOrReplaceObject: EditorFunction = {
       );
     };
 
-    if (shouldReplaceExistingObject) {
+    const moveExistingObject = () => {
+      const existingTargetObjectFolderOrObject = getObjectFolderOrObjectWithContextFromObjectName(
+        globalObjects,
+        layoutObjects,
+        existingTargetObject ? existingTargetObject.getName() : ''
+      );
+      if (!existingTargetObjectFolderOrObject || !existingTargetObject) {
+        throw new Error(
+          "Internal error: can't locate the existing object to be moved."
+        );
+      }
+
+      if (target_object_scope === 'global' && !isTargetObjectGlobal) {
+        if (globalObjects.hasObjectNamed(existingTargetObject.getName())) {
+          return makeGenericFailure(
+            `Object "${existingTargetObject.getName()}" already exists in the global objects. Nothing was changed.`
+          );
+        }
+
+        layoutObjects.moveObjectFolderOrObjectToAnotherContainerInFolder(
+          existingTargetObjectFolderOrObject.objectFolderOrObject,
+          globalObjects,
+          globalObjects.getRootFolder(),
+          0
+        );
+
+        gd.WholeProjectRefactorer.updateBehaviorsSharedData(project);
+
+        // /!\ Tell the editor that some objects have potentially been modified (and even removed).
+        // This will force the objects panel to refresh.
+        onObjectsModifiedOutsideEditor({
+          scene: layout,
+          isNewObjectTypeUsed: false, // The object type was not changed.
+        });
+
+        return makeGenericSuccess(
+          `Moved object "${existingTargetObject.getName()}" to the global objects. Its type, behaviors, properties and effects are unchanged.`
+        );
+      } else if (target_object_scope === 'scene' && isTargetObjectGlobal) {
+        return makeGenericFailure(
+          `Object "${existingTargetObject.getName()}" is a global object. Global objects can't be moved, so it cannot be moved to the scene "${scene_name}".`
+        );
+      }
+
+      return makeGenericFailure(
+        `Unrecognized move requested - the object "${existingTargetObject.getName()}" was not changed and nothing was done.`
+      );
+    };
+
+    if (existingObjectShouldBeMoved) {
+      return moveExistingObject();
+    } else if (shouldReplaceExistingObject) {
       return replaceExistingObject();
     } else if (duplicatedObjectName) {
       return duplicateExistingObject(duplicatedObjectName);

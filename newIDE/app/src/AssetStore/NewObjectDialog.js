@@ -13,7 +13,6 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import RaisedButton from '../UI/RaisedButton';
 import { AssetStoreContext } from './AssetStoreContext';
 import AssetPackInstallDialog from './AssetPackInstallDialog';
-import { type EnumeratedObjectMetadata } from '../ObjectsList/EnumerateObjects';
 import {
   installPublicAsset,
   checkRequiredExtensionsUpdateForAssets,

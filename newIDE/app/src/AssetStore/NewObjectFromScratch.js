@@ -1,16 +1,10 @@
 // @flow
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
-import ListIcon from '../UI/ListIcon';
 import Subheader from '../UI/Subheader';
-import { List, ListItem } from '../UI/List';
-import {
-  enumerateObjectTypes,
-  type EnumeratedObjectMetadata,
-} from '../ObjectsList/EnumerateObjects';
+import { enumerateObjectTypes } from '../ObjectsList/EnumerateObjects';
 import { Column, Line } from '../UI/Grid';
 import { sendNewObjectCreated } from '../Utils/Analytics/EventSender';
-import ScrollView from '../UI/ScrollView';
 import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
 import { AssetStoreContext } from './AssetStoreContext';
 import { type ChosenCategory } from '../UI/Search/FiltersChooser';
@@ -19,18 +13,12 @@ import TextButton from '../UI/TextButton';
 import { t, Trans } from '@lingui/macro';
 import ChevronArrowLeft from '../UI/CustomSvgIcons/ChevronArrowLeft';
 import AssetsList from './AssetsList';
-import semverGreaterThan from 'semver/functions/gt';
 import SearchBar from '../UI/SearchBar';
-import {
-  getBreakingChanges,
-  isCompatibleWithGDevelopVersion,
-} from '../Utils/Extension/ExtensionCompatibilityChecker.js';
 import { type ObjectShortHeader } from '../Utils/GDevelopServices/Extension';
 import { ObjectStoreContext, type ObjectCategory } from './ObjectStoreContext';
 import { ListSearchResults } from '../UI/Search/ListSearchResults';
 import { ObjectListItem } from './ObjectListItem';
 import { type SearchMatch } from '../UI/Search/UseSearchStructuredItem';
-import { sendExtensionAddedToProject } from '../Utils/Analytics/EventSender';
 import { ColumnStackLayout } from '../UI/Layout';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
@@ -39,10 +27,7 @@ import SelectOption from '../UI/SelectOption';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import IconButton from '../UI/IconButton';
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
-import useAlertDialog from '../UI/Alert/useAlertDialog';
 import ExtensionInstallDialog from './ExtensionStore/ExtensionInstallDialog';
-import { getIDEVersion } from '../Version';
-import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 
 const gd: libGDevelop = global.gd;
 

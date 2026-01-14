@@ -46,7 +46,6 @@ const builtInObjectTypes = [
   'Video::VideoObject',
   'Lighting::LightObject',
   'ParticleSystem::ParticleEmitter',
-  'ParticleEmitter3D::ParticleEmitter3D',
   'TileMap::TileMap',
   'TileMap::CollisionMask',
   'PrimitiveDrawing::Drawer',

@@ -18,6 +18,7 @@ import {
   type ObjectGroupsOutsideEditorChanges,
   type ToolOptions,
 } from '.';
+import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
 
 export type EditorFunctionCallResult =
@@ -186,6 +187,7 @@ export const processEditorFunctionCalls = async ({
         onWillInstallExtension,
         onExtensionInstalled,
         searchAndInstallAsset,
+        PixiResourcesLoader,
       };
 
       // Execute the function

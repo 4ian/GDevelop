@@ -36,7 +36,6 @@ import {
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
-import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import { swapAsset } from '../AssetStore/AssetSwapper';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
 
@@ -184,6 +183,7 @@ type RenderForEditorOptions = {|
 |};
 
 type LaunchFunctionOptionsWithoutProject = {|
+  PixiResourcesLoader: any,
   args: any,
   editorCallbacks: EditorCallbacks,
   toolOptions: ToolOptions | null,
@@ -213,7 +213,7 @@ type LaunchFunctionOptionsWithoutProject = {|
   ) => Promise<AssetSearchAndInstallResult>,
 |};
 
-type LaunchFunctionOptionsWithProject = {|
+export type LaunchFunctionOptionsWithProject = {|
   ...LaunchFunctionOptionsWithoutProject,
   project: gdProject,
 |};
@@ -514,6 +514,7 @@ const createOrReplaceObject: EditorFunction = {
     onObjectsModifiedOutsideEditor,
     onWillInstallExtension,
     onExtensionInstalled,
+    PixiResourcesLoader,
   }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_type = extractRequiredString(args, 'object_type');
@@ -817,6 +818,7 @@ const createOrReplaceObject: EditorFunction = {
     };
 
     const duplicateExistingObject = (duplicatedObjectName: string) => {
+      // TODO: factor this.
       let isGlobalObject = false;
       let existingObject: gdObject | null = null;
 

@@ -262,7 +262,7 @@ export default function NewObjectFromScratch({
     <React.Fragment>
       <ColumnStackLayout expand noMargin useFullHeight>
         <ColumnStackLayout noMargin>
-          <ResponsiveLineStackLayout noMargin>
+          <ResponsiveLineStackLayout>
             <SearchBarSelectField
               value={chosenCategory}
               onChange={(e, i, value: string) => {

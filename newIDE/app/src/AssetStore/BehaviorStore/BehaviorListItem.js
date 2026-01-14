@@ -6,7 +6,6 @@ import ButtonBase from '@material-ui/core/ButtonBase';
 import Text from '../../UI/Text';
 import { Trans } from '@lingui/macro';
 import { Line, Column } from '../../UI/Grid';
-import { IconContainer } from '../../UI/IconContainer';
 import HighlightedText from '../../UI/Search/HighlightedText';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 import Chip from '../../UI/Chip';

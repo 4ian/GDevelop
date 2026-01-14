@@ -39,7 +39,7 @@ import { getHelpLink } from '../Utils/HelpLink';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import ErrorBoundary from '../UI/ErrorBoundary';
-import { getInsertionParentAndPositionFromSelection } from '../Utils/ObjectFolders';
+import { getInsertionParentAndPosition } from '../Utils/FolderHelpers';
 import {
   ObjectTreeViewItemContent,
   getObjectTreeViewItemId,
@@ -634,7 +634,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           const {
             folder: parentFolder,
             position,
-          } = getInsertionParentAndPositionFromSelection(selectedItem);
+          } = getInsertionParentAndPosition(selectedItem);
 
           object = objectsContainer.insertNewObjectInFolder(
             project,

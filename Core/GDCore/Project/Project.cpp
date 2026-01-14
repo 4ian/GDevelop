@@ -346,6 +346,10 @@ gd::Layout& Project::InsertNewLayout(const gd::String& name,
   newlyInsertedLayout.SetName(name);
   newlyInsertedLayout.UpdateBehaviorsSharedData(*this);
 
+  // FEHLENDE ZEILE? Fügen Sie hinzu:
+  layoutsRootFolder->InsertItem(&newlyInsertedLayout);
+  gd::LogMessage("InsertNewLayout: Added '" + name + "' to layoutsRootFolder");
+
   return newlyInsertedLayout;
 }
 
@@ -904,10 +908,15 @@ void Project::UnserializeFrom(const SerializerElement& element) {
         });
   }
   for (std::size_t i = 0; i < scenes.size(); ++i) {
-    if (!layoutsRootFolder->HasItemNamed(scenes[i]->GetName(), 
-        [](const gd::Layout& layout) { return layout.GetName(); })) {
-      layoutsRootFolder->InsertItem(scenes[i].get());
-    }
+      gd::LogMessage("Scene in vector: " + scenes[i]->GetName());
+      
+      if (!layoutsRootFolder->HasItemNamed(scenes[i]->GetName(), 
+          [](const gd::Layout& layout) { return layout.GetName(); })) {
+        layoutsRootFolder->InsertItem(scenes[i].get());
+        gd::LogMessage("  -> Added to layoutsRootFolder: " + scenes[i]->GetName());
+      } else {
+        gd::LogMessage("  -> Already in layoutsRootFolder: " + scenes[i]->GetName());
+      }
   }
 
   externalEvents.clear();

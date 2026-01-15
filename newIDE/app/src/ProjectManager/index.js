@@ -142,6 +142,7 @@ const styles = {
 
 const extensionItemReactDndType = 'GD_EXTENSION_ITEM';
 const sceneItemReactDndType = 'GD_SCENE';
+const projectItemReactDndType = 'GD_PROJECT_ITEM';
 
 export interface TreeViewItemContent {
   getName(): string | React.Node;
@@ -1555,40 +1556,56 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
 
     const canMoveSelectionTo = React.useCallback(
       (destinationItem: TreeViewItem, where: 'before' | 'inside' | 'after') => {
-        console.log('🎯 canMoveSelectionTo called!');  // ✅ RICHTIG - innerhalb!
-        console.log('  Selected items:', selectedItems.length);
-        console.log('  Destination root ID:', destinationItem.content.getRootId());
+        console.log('🔍 canMoveSelectionTo called!');
+        console.log('  - selectedItems:', selectedItems.length);
         
-        return selectedItems.every(item => {
+        if (selectedItems.length === 0) {
+          console.log('  ❌ No items selected, returning false');
+          return false;
+        }
+        
+        const result = selectedItems.every(item => {
           const sourceRootId = item.content.getRootId();
           const destRootId = destinationItem.content.getRootId();
           
-          console.log(`  Checking: ${sourceRootId} -> ${destRootId}`);
+          console.log(`  - Checking: ${sourceRootId} -> ${destRootId}`);
           
-          return (
-            // Project and game settings children `getRootId` return an empty string.
-            sourceRootId.length > 0 &&
-            sourceRootId === destRootId
-          );
+          const canMove = sourceRootId.length > 0 && sourceRootId === destRootId;
+          console.log(`  - Can move: ${canMove}`);
+          
+          return canMove;
         });
+        
+        console.log(`  ✅ Final result: ${result}`);
+        return result;
       },
       [selectedItems]
     );
-
     const moveSelectionTo = React.useCallback(
       (
         i18n: I18nType,
         destinationItem: TreeViewItem,
         where: 'before' | 'inside' | 'after'
       ) => {
-        console.log("Move Selection!");
+        console.log("🎯 moveSelectionTo CALLED!");
+        console.log("  - selectedItems:", selectedItems.length);
+        console.log("  - where:", where);
+        console.log("  - destinationIndex:", destinationItem.content.getIndex());
+        
         if (selectedItems.length === 0) {
+          console.log("  ❌ No items selected!");
           return;
         }
+        
         const selectedItem = selectedItems[0];
+        console.log("  - selectedItem ID:", selectedItem.content.getId());
+        console.log("  - Calling moveAt with:", destinationItem.content.getIndex() + (where === 'after' ? 1 : 0));
+        
         selectedItem.content.moveAt(
           destinationItem.content.getIndex() + (where === 'after' ? 1 : 0)
         );
+        
+        console.log("  ✅ moveAt called, now triggering onTreeModified");
         onTreeModified(true);
       },
       [onTreeModified, selectedItems]
@@ -1715,7 +1732,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                               moveSelectionTo(i18n, destinationItem, where)
                             }
                             canMoveSelectionToItem={canMoveSelectionTo}
-                            reactDndType={extensionItemReactDndType}
+                            reactDndType={projectItemReactDndType}
                             initiallyOpenedNodeIds={initiallyOpenedNodeIds}
                             forceDefaultDraggingPreview
                             shouldHideMenuIcon={item => !item.content.getRootId()}

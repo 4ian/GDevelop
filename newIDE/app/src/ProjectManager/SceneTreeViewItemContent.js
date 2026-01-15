@@ -71,7 +71,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   }
 
   getRootId(): string {
-    return this.props.rootId;
+    return scenesRootFolderId;
   }
 
   getName(): string | React.Node {
@@ -225,20 +225,68 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     this.props.onDeleteLayout(this.scene);
   }
 
+  _findParentFolder(folder: any, scenePtr: number): ?any {
+    for (let i = 0; i < folder.getChildrenCount(); i++) {
+      const child = folder.getChildAt(i);
+      
+      if (child.isFolder()) {
+        // Rekursiv in Unterordner suchen
+        const found = this._findParentFolder(child, scenePtr);
+        if (found) return found;
+      } else {
+        const layout = child.getItem();
+        if (layout && layout.ptr === scenePtr) {
+          return folder; // ✅ Parent gefunden!
+        }
+      }
+    }
+    return null;
+  }
+
+  // Neue Hilfsmethode: Finde Index innerhalb des Parent-Folders
+  _getIndexInParent(parentFolder: any, scenePtr: number): number {
+    for (let i = 0; i < parentFolder.getChildrenCount(); i++) {
+      const child = parentFolder.getChildAt(i);
+      if (!child.isFolder()) {
+        const layout = child.getItem();
+        if (layout && layout.ptr === scenePtr) {
+          return i;
+        }
+      }
+    }
+    return 0;
+  }
+
   getIndex(): number {
-    return this.props.project.getLayoutPosition(this.scene.getName());
+    const { project } = this.props;
+    const layoutsRootFolder = project.getLayoutsRootFolder();
+    if (!layoutsRootFolder) return 0;
+    
+    const parentFolder = this._findParentFolder(layoutsRootFolder, this.scene.ptr);
+    if (!parentFolder) return 0;
+    
+    return this._getIndexInParent(parentFolder, this.scene.ptr);
   }
 
   moveAt(destinationIndex: number): void {
-    const originIndex = this.getIndex();
-    if (destinationIndex !== originIndex) {
-      this.props.project.moveLayout(
-        originIndex,
-        // When moving the item down, it must not be counted.
-        destinationIndex + (destinationIndex <= originIndex ? 0 : -1)
-      );
-      this._onProjectItemModified();
-    }
+    console.log("MOveatcalled!");
+    const { project } = this.props;
+    const layoutsRootFolder = project.getLayoutsRootFolder();
+    if (!layoutsRootFolder) return;
+    
+    // ✅ Finde den Parent-Folder
+    const parentFolder = this._findParentFolder(layoutsRootFolder, this.scene.ptr);
+    if (!parentFolder) return;
+    
+    const originIndex = this._getIndexInParent(parentFolder, this.scene.ptr);
+    if (destinationIndex === originIndex) return;
+    
+    console.log(`🎯 Moving from ${originIndex} to ${destinationIndex} in folder:`, parentFolder.getFolderName());
+    
+    // ✅ Verschiebe innerhalb des PARENT-Folders!
+    parentFolder.moveChild(originIndex, destinationIndex);
+    
+    this._onProjectItemModified();
   }
 
   copy(): void {

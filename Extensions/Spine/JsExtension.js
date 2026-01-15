@@ -112,7 +112,9 @@ module.exports = {
         'PointAttachmentScaleXWorld',
         _('Point attachment scale world X position'),
         _('world x position of spine point attachment scale'),
-        _('world x position of spine _PARAM1_ point attachment for _PARAM2_ slot'),
+        _(
+          'world x position of spine _PARAM1_ point attachment for _PARAM2_ slot'
+        ),
         _('Animations and images'),
         'JsPlatform/Extensions/spine.svg'
       )
@@ -128,7 +130,9 @@ module.exports = {
         'PointAttachmentScaleXLocal',
         _('Point attachment scale local X position'),
         _('local x position of spine point attachment scale'),
-        _('local x position of spine _PARAM1_ point attachment for _PARAM2_ slot'),
+        _(
+          'local x position of spine _PARAM1_ point attachment for _PARAM2_ slot'
+        ),
         _('Animations and images'),
         'JsPlatform/Extensions/spine.svg'
       )

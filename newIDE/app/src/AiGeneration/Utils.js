@@ -38,8 +38,8 @@ import { retryIfFailed } from '../Utils/RetryIfFailed';
 
 const gd: libGDevelop = global.gd;
 
-export const AI_AGENT_TOOLS_VERSION = 'v7';
-export const AI_CHAT_TOOLS_VERSION = 'v7';
+export const AI_AGENT_TOOLS_VERSION = 'v8';
+export const AI_CHAT_TOOLS_VERSION = 'v8';
 
 export const useProcessFunctionCalls = ({
   i18n,

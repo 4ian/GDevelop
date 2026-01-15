@@ -64,7 +64,6 @@ export type ObjectCategory = {
   tier: '',
 };
 
-// TODO Check that it works with translation
 const getCategoryId = (name: string) => `category-${name}`;
 
 const getItemIdsGroupedByCategory = (

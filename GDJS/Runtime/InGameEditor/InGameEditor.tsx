@@ -4486,7 +4486,7 @@ namespace gdjs {
             if (dy3 !== 0) {
               const tiltSpeed = 0.2;
               this.elevationAngle += dy3 * tiltSpeed;
-              if (this.elevationAngle < 5) this.elevationAngle = 5;
+              if (this.elevationAngle < -45) this.elevationAngle = -45;
               if (this.elevationAngle > 175) this.elevationAngle = 175;
               this._editorCamera.onHasCameraChanged();
             }

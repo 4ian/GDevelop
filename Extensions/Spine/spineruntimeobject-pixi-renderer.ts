@@ -246,7 +246,7 @@ namespace gdjs {
     getPointAttachmentRotation(
       attachmentName: string,
       slotName?: string,
-      isWorld?: number
+      isWorld?: boolean
     ): number {
       if (!slotName) {
         slotName = attachmentName;
@@ -277,7 +277,7 @@ namespace gdjs {
     getPointAttachmentScale(
       attachmentName: string,
       slotName?: string,
-      isWorld?: number
+      isWorld?: boolean
     ): pixi_spine.Vector2 {
       if (!slotName) {
         slotName = attachmentName;
@@ -342,7 +342,6 @@ namespace gdjs {
       slotName: string,
       renderObject: pixi_spine.Spine
     ): { slot: pixi_spine.ISlot; attachment: IPointAttachment } {
-
       const slot = renderObject.skeleton.findSlot(slotName);
       if (!slot) {
         throw new Error(

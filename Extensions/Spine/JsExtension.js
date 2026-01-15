@@ -109,56 +109,106 @@ module.exports = {
     object
       .addExpressionAndCondition(
         'number',
-        'PointAttachmentScaleX',
-        _('Point attachment scale X position'),
-        _('x position of spine point attachment scale'),
-        _('x position of spine _PARAM1_ point attachment for _PARAM2_ slot'),
+        'PointAttachmentScaleXWorld',
+        _('Point attachment scale world X position'),
+        _('world x position of spine point attachment scale'),
+        _('world x position of spine _PARAM1_ point attachment for _PARAM2_ slot'),
         _('Animations and images'),
         'JsPlatform/Extensions/spine.svg'
       )
       .addParameter('object', _('Spine'), 'SpineObject')
       .addParameter('string', _('Attachment name'))
       .addParameter('string', _('Slot name (use "" if names are the same)'))
-      .addParameter('expression', _('World scaleX? (0=no, 1=yes)'), '', true)
-      .setDefaultValue('0')
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
-      .setFunctionName('getPointAttachmentScaleX');
+      .setFunctionName('getPointAttachmentScaleXWorld');
 
     object
       .addExpressionAndCondition(
         'number',
-        'PointAttachmentScaleY',
-        _('Point attachment scale Y position'),
-        _('y position of spine point attachment scale'),
-        _('y position of spine _PARAM1_ point attachment for _PARAM2_ slot'),
+        'PointAttachmentScaleXLocal',
+        _('Point attachment scale local X position'),
+        _('local x position of spine point attachment scale'),
+        _('local x position of spine _PARAM1_ point attachment for _PARAM2_ slot'),
         _('Animations and images'),
         'JsPlatform/Extensions/spine.svg'
       )
       .addParameter('object', _('Spine'), 'SpineObject')
       .addParameter('string', _('Attachment name'))
       .addParameter('string', _('Slot name (use "" if names are the same)'))
-      .addParameter('expression', _('World scaleY? (0=no, 1=yes)'), '', true)
-      .setDefaultValue('0')
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
-      .setFunctionName('getPointAttachmentScaleY');
+      .setFunctionName('getPointAttachmentScaleXLocal');
 
     object
       .addExpressionAndCondition(
         'number',
-        'PointAttachmentRotation',
-        _('Point attachment rotation'),
-        _('rotation of spine point attachment'),
-        _('rotation of spine _PARAM1_ point attachment for _PARAM2_ slot'),
+        'PointAttachmentScaleYWorld',
+        _('Point attachment scale world Y position'),
+        _('world y position of spine point attachment scale'),
+        _(
+          'world y position of spine _PARAM1_ point attachment for _PARAM2_ slot'
+        ),
         _('Animations and images'),
         'JsPlatform/Extensions/spine.svg'
       )
       .addParameter('object', _('Spine'), 'SpineObject')
       .addParameter('string', _('Attachment name'))
       .addParameter('string', _('Slot name (use "" if names are the same)'))
-      .addParameter('expression', _('World rotation? (0=no, 1=yes)'), '', true)
-      .setDefaultValue('0')
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
-      .setFunctionName('getPointAttachmentRotation');
+      .setFunctionName('getPointAttachmentScaleYWorld');
+
+    object
+      .addExpressionAndCondition(
+        'number',
+        'PointAttachmentScaleYLocal',
+        _('Point attachment scale local Y position'),
+        _('local y position of spine point attachment scale'),
+        _(
+          'local y position of spine _PARAM1_ point attachment for _PARAM2_ slot'
+        ),
+        _('Animations and images'),
+        'JsPlatform/Extensions/spine.svg'
+      )
+      .addParameter('object', _('Spine'), 'SpineObject')
+      .addParameter('string', _('Attachment name'))
+      .addParameter('string', _('Slot name (use "" if names are the same)'))
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('getPointAttachmentScaleYLocal');
+
+    object
+      .addExpressionAndCondition(
+        'number',
+        'PointAttachmentRotationWorld',
+        _('Point attachment world rotation'),
+        _('world rotation of spine point attachment'),
+        _(
+          'world rotation of spine _PARAM1_ point attachment for _PARAM2_ slot'
+        ),
+        _('Animations and images'),
+        'JsPlatform/Extensions/spine.svg'
+      )
+      .addParameter('object', _('Spine'), 'SpineObject')
+      .addParameter('string', _('Attachment name'))
+      .addParameter('string', _('Slot name (use "" if names are the same)'))
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('getPointAttachmentRotationWorld');
+
+    object
+      .addExpressionAndCondition(
+        'number',
+        'PointAttachmentRotationLocal',
+        _('Point attachment local rotation'),
+        _('local rotation of spine point attachment'),
+        _(
+          'local rotation of spine _PARAM1_ point attachment for _PARAM2_ slot'
+        ),
+        _('Animations and images'),
+        'JsPlatform/Extensions/spine.svg'
+      )
+      .addParameter('object', _('Spine'), 'SpineObject')
+      .addParameter('string', _('Attachment name'))
+      .addParameter('string', _('Slot name (use "" if names are the same)'))
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('getPointAttachmentRotationLocal');
 
     return extension;
   },

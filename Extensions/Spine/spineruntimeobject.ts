@@ -534,35 +534,69 @@ namespace gdjs {
         .y;
     }
 
-    getPointAttachmentScaleX(
+    getPointAttachmentScaleXWorld(
       attachmentName: string,
-      slotName?: string,
-      isWorld?: number
-    ): number {
-      return this._renderer.getPointAttachmentScale(attachmentName, slotName, isWorld).x;
-    }
-
-    getPointAttachmentScaleY(
-      attachmentName: string,
-      slotName?: string,
-      isWorld?: number
+      slotName?: string
     ): number {
       return this._renderer.getPointAttachmentScale(
         attachmentName,
         slotName,
-        isWorld
+        true
+      ).x;
+    }
+
+    getPointAttachmentScaleXLocal(
+      attachmentName: string,
+      slotName?: string
+    ): number {
+      return this._renderer.getPointAttachmentScale(
+        attachmentName,
+        slotName,
+        false
+      ).x;
+    }
+
+    getPointAttachmentScaleYWorld(
+      attachmentName: string,
+      slotName?: string
+    ): number {
+      return this._renderer.getPointAttachmentScale(
+        attachmentName,
+        slotName,
+        true
       ).y;
     }
 
-    getPointAttachmentRotation(
+    getPointAttachmentScaleYLocal(
       attachmentName: string,
-      slotName?: string,
-      isWorld?: number
+      slotName?: string
+    ): number {
+      return this._renderer.getPointAttachmentScale(
+        attachmentName,
+        slotName,
+        false
+      ).y;
+    }
+
+    getPointAttachmentRotationWorld(
+      attachmentName: string,
+      slotName?: string
     ): number {
       return this._renderer.getPointAttachmentRotation(
         attachmentName,
         slotName,
-        isWorld
+        true
+      );
+    }
+
+    getPointAttachmentRotationLocal(
+      attachmentName: string,
+      slotName?: string
+    ): number {
+      return this._renderer.getPointAttachmentRotation(
+        attachmentName,
+        slotName,
+        false
       );
     }
 

@@ -140,9 +140,7 @@ module.exports = {
       .addObject(
         'BitmapTextObject',
         _('Bitmap Text'),
-        _(
-          'Image-based text.'
-        ),
+        _('Image-based text.'),
         'JsPlatform/Extensions/bitmapfont32.png',
         bitmapTextObject
       )

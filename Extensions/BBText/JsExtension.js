@@ -138,9 +138,7 @@ module.exports = {
       .addObject(
         'BBText',
         _('BBText'),
-        _(
-          'Text allowing to mix styles.'
-        ),
+        _('Text allowing to mix styles.'),
         'JsPlatform/Extensions/bbcode32.png',
         objectBBText
       )

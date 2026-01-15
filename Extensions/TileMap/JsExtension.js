@@ -172,9 +172,7 @@ const defineTileMap = function (extension, _, gd) {
     .addObject(
       'TileMap',
       _('External Tilemap (Tiled/LDtk)'),
-      _(
-        'Tilemap imported from external editors like LDtk or Tiled.'
-      ),
+      _('Tilemap imported from external editors like LDtk or Tiled.'),
       'JsPlatform/Extensions/tile_map.svg',
       objectTileMap
     )

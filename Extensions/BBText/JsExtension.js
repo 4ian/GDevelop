@@ -139,7 +139,7 @@ module.exports = {
         'BBText',
         _('BBText'),
         _(
-          'Displays a rich text label using BBCode markup (allowing to set parts of the text as bold, italic, use different colors and shadows).'
+          'Text allowing to mix styles.'
         ),
         'JsPlatform/Extensions/bbcode32.png',
         objectBBText

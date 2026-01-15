@@ -173,7 +173,7 @@ const defineTileMap = function (extension, _, gd) {
       'TileMap',
       _('External Tilemap (Tiled/LDtk)'),
       _(
-        'Displays a tiled-based map, made with the Tiled editor (https://www.mapeditor.org/) or the LDtk editor (https://ldtk.io/).'
+        'Tilemap imported from external editors like LDtk or Tiled.'
       ),
       'JsPlatform/Extensions/tile_map.svg',
       objectTileMap
@@ -720,9 +720,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
     .addObject(
       'SimpleTileMap',
       _('Tile map'),
-      _(
-        'Displays a tile-based map. Recommended for most games that need to use static tiles.'
-      ),
+      _('Grid-based map built from reusable tiles.'),
       'JsPlatform/Extensions/tile_map.svg',
       objectSimpleTileMap
     )

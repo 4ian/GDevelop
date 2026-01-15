@@ -1389,17 +1389,19 @@ const MainFrame = (props: Props) => {
     [openProjectManager]
   );
 
-  const deleteLayout = (layout: gdLayout) => {
+  const deleteLayout = (layout: gdLayout, skipConfirmation: boolean = false) => {
     const { currentProject } = state;
     const { i18n } = props;
     if (!currentProject) return;
 
-    const answer = Window.showConfirmDialog(
-      i18n._(
-        t`Are you sure you want to remove this scene? This can't be undone.`
-      )
-    );
-    if (!answer) return;
+    if (!skipConfirmation) {
+      const answer = Window.showConfirmDialog(
+        i18n._(
+          t`Are you sure you want to remove this scene? This can't be undone.`
+        )
+      );
+      if (!answer) return;
+    }
 
     setState(state => ({
       ...state,

@@ -45,7 +45,7 @@ const collectFoldersAndPaths = (
 
 export type SceneTreeViewItemCallbacks = {|
   onSceneAdded: () => void,
-  onDeleteLayout: gdLayout => void,
+  onDeleteLayout: (gdLayout, skipConfirmation?: boolean) => void,
   onRenameLayout: (string, string) => void,
   onOpenLayout: (
     name: string,
@@ -279,11 +279,12 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     return icons.length > 0 ? icons : null;
   }
 
-  delete(): void {
+  delete(skipConfirmation: boolean = false): void {
     const { project } = this.props;
     const layoutsRootFolder = project.getLayoutsRootFolder();
     
-    this.props.onDeleteLayout(this.scene);
+    // ✅ Übergebe skipConfirmation an onDeleteLayout
+    this.props.onDeleteLayout(this.scene, skipConfirmation);
     
     if (layoutsRootFolder) {
       const sceneName = this.scene.getName();

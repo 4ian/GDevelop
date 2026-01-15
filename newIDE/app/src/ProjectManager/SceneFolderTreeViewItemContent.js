@@ -29,7 +29,7 @@ export type SceneFolderTreeViewItemProps = {|
   onProjectItemModified: () => void,
   showDeleteConfirmation: (options: any) => Promise<boolean>,
   expandFolders: (folderIds: string[]) => void,
-  onDeleteLayout: gdLayout => void,
+  onDeleteLayout: (layout: gdLayout, skipConfirmation?: boolean) => void,
 |};
 
 export const getSceneFolderTreeViewItemId = (
@@ -204,8 +204,8 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
     }).then(answer => {
       if (!answer) return;
 
-      // ✅ Lösche rekursiv mit dem Callback
-      this._deleteRecursively(this.folder);
+      // ✅ Lösche rekursiv mit skipConfirmation=true
+      this._deleteRecursively(this.folder, true);
       
       const parent = this.folder.getParent();
       if (parent) {
@@ -216,20 +216,21 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
     });
   }
 
-  _deleteRecursively(folder: gdLayoutFolderOrLayout): void {
+  _deleteRecursively(folder: gdLayoutFolderOrLayout, skipConfirmation: boolean = false): void {
     const childrenToDelete = [];
     for (let i = 0; i < folder.getChildrenCount(); i++) {
       childrenToDelete.push(folder.getChildAt(i));
     }
     childrenToDelete.forEach(child => {
       if (child.isFolder()) {
-        this._deleteRecursively(child);
+        this._deleteRecursively(child, skipConfirmation);
         folder.removeFolderChild(child);
       } else {
         const layout = child.getItem();
         if (layout) {
           const layoutName = layout.getName();
-          this.props.onDeleteLayout(layout);
+          // ✅ Übergebe skipConfirmation an onDeleteLayout
+          this.props.onDeleteLayout(layout, skipConfirmation);
           folder.removeRecursivelyObjectNamed(layoutName);
         }
       }

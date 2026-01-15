@@ -442,15 +442,11 @@ export function buildScenesTreeItems(
   props: any,
   rootId?: string 
 ): Array<TreeViewItem> {
-  console.log('📦 buildScenesTreeItems called!');
   const layoutsRootFolder = project.getLayoutsRootFolder();
-  console.log('📁 Root folder:', layoutsRootFolder);
-  console.log('📊 Layouts in project:', project.getLayoutsCount());
   
   const { addNewScene, addNewFolder } = props;
   const usedRootId = rootId || scenesRootFolderId;
 
-  // Placeholder wenn keine Layouts
   const scenesEmptyPlaceholderId = 'scenes-empty-placeholder';
 
   class LabelTreeViewItemContentWithMenu implements TreeViewItemContent {
@@ -534,9 +530,7 @@ export function buildScenesTreeItems(
         addNewScene,
         addNewFolder
       ),
-      getChildren: (i18n: I18nType) => {
-        console.log('🔍 getChildren CALLED in buildScenesTreeItems!');
-        
+      getChildren: (i18n: I18nType) => {       
         if (!layoutsRootFolder || project.getLayoutsCount() === 0) {
           return [
             new PlaceHolderTreeViewItem(
@@ -559,8 +553,6 @@ export function buildScenesTreeItems(
             }
           }
         });
-        
-        console.log('✅ Built children:', children.length);
         return children;
       },
     },
@@ -1281,19 +1273,14 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
 
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
-        console.log('🔄 getTreeViewData CALLED! treeRenderKey:', treeRenderKey);
         const handleAddNewScene = () => {
-          console.log('🎬 handleAddNewScene in ProjectManager called!');
           if (!project) return;
 
           const newName = newNameGenerator(i18n._(t`Untitled scene`), name =>
             project.hasLayoutNamed(name)
           );
-          console.log('📝 Generated name:', newName);
           
           const newScene = project.insertNewLayout(newName, project.getLayoutsCount());
-          console.log('✅ Scene created:', newScene);
-          console.log('📊 Total layouts now:', project.getLayoutsCount());
           
           newScene.setName(newName);
           newScene.updateBehaviorsSharedData(project);
@@ -1303,9 +1290,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           onProjectItemModified();
           forceUpdateList();
           
-          // ⭐ NEU: Trigger Tree Re-Render
           setTreeRenderKey(prev => prev + 1);
-          console.log('  - setTreeRenderKey triggered ✓');
 
           const sceneItemId = getSceneTreeViewItemId(newScene);
           if (treeViewRef.current) {
@@ -1548,11 +1533,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
 
     const canMoveSelectionTo = React.useCallback(
       (destinationItem: TreeViewItem, where: 'before' | 'inside' | 'after') => {
-        console.log('🔍 canMoveSelectionTo called!');
-        console.log('  - selectedItems:', selectedItems.length);
         
         if (selectedItems.length === 0) {
-          console.log('  ❌ No items selected, returning false');
           return false;
         }
         
@@ -1560,15 +1542,10 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           const sourceRootId = item.content.getRootId();
           const destRootId = destinationItem.content.getRootId();
           
-          console.log(`  - Checking: ${sourceRootId} -> ${destRootId}`);
-          
           const canMove = sourceRootId.length > 0 && sourceRootId === destRootId;
-          console.log(`  - Can move: ${canMove}`);
           
           return canMove;
         });
-        
-        console.log(`  ✅ Final result: ${result}`);
         return result;
       },
       [selectedItems]
@@ -1579,65 +1556,44 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         destinationItem: TreeViewItem,
         where: 'before' | 'inside' | 'after'
       ) => {
-        console.log("🎯 moveSelectionTo CALLED!");
         
         if (selectedItems.length === 0) {
-          console.log("  ❌ No items selected!");
           return;
         }
         
         const selectedItem = selectedItems[0];
         const destinationContent = destinationItem.content;
         
-        // ✅ Hole den Zielordner und Index
         let targetFolder = null;
         let targetIndex = destinationContent.getIndex();
         
         if (where === 'inside') {
-          console.log("  📂 Drop INSIDE folder");
           
-          // ✅ NEUE LOGIK: Prüfe, ob es ein Folder ist
           if (typeof destinationContent.getFolder === 'function') {
-            // Es ist ein SceneFolderTreeViewItemContent
             targetFolder = destinationContent.getFolder();
             targetIndex = 0;
-            console.log("  ✅ Found scene folder (via getFolder):", targetFolder?.getFolderName?.() || 'unknown');
           } else if (typeof destinationContent.getLayoutFolderOrLayout === 'function') {
-            // Es ist ein SceneTreeViewItemContent
             const layoutFolderOrLayout = destinationContent.getLayoutFolderOrLayout();
             if (layoutFolderOrLayout && layoutFolderOrLayout.isFolder()) {
               targetFolder = layoutFolderOrLayout;
               targetIndex = 0;
-              console.log("  ✅ Found scene folder (via getLayoutFolderOrLayout):", targetFolder.getFolderName());
             }
           }
         } else {
-          console.log("  📍 Drop BESIDE element (before/after)");
-          
-          // ✅ NEUE LOGIK: Prüfe beide Fälle
           if (typeof destinationContent.getFolder === 'function') {
-            // Es ist ein Folder - hole seinen Parent
             const folder = destinationContent.getFolder();
             if (folder) {
               targetFolder = folder.getParent();
               targetIndex = destinationContent.getIndex() + (where === 'after' ? 1 : 0);
-              console.log("  ✅ Found parent of folder:", targetFolder?.getFolderName?.() || 'ROOT');
             }
           } else if (typeof destinationContent.getLayoutFolderOrLayout === 'function') {
-            // Es ist eine Scene
             const layoutFolderOrLayout = destinationContent.getLayoutFolderOrLayout();
             if (layoutFolderOrLayout) {
               targetFolder = layoutFolderOrLayout.getParent();
               targetIndex = destinationContent.getIndex() + (where === 'after' ? 1 : 0);
-              console.log("  ✅ Found parent of scene:", targetFolder?.getFolderName?.() || 'ROOT');
             }
           }
         }
-        
-        console.log("  - targetFolder:", targetFolder?.getFolderName?.() || 'ROOT');
-        console.log("  - targetIndex:", targetIndex);
-        
-        // ✅ Rufe moveAt mit targetFolder auf
         selectedItem.content.moveAt(targetIndex, targetFolder);
         
         onTreeModified(true);
@@ -1657,16 +1613,10 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         if (selectedItems[0].content.isDescendantOf(item.content)) {
           setSelectedItems([]);
         }
-        
-        // ✅ NEU: Force Update nach Collapse
         forceUpdateList();
       },
       [selectedItems, forceUpdateList]
     );
-
-    // Force List component to be mounted again if project
-    // has been changed. Avoid accessing to invalid objects that could
-    // crash the app.
     const listKey = project ? project.ptr : 'no-project';
     const initiallyOpenedNodeIds = [
       gameSettingsRootFolderId,

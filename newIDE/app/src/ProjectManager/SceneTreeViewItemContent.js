@@ -74,8 +74,6 @@ export type SceneTreeViewItemProps = {|
 |};
 
 export const getSceneTreeViewItemId = (scene: gdLayout): string => {
-  // Pointers are used because they stay the same even when the names are
-  // changed.
   return `scene-${scene.ptr}`;
 };
 
@@ -290,20 +288,18 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
       const child = folder.getChildAt(i);
       
       if (child.isFolder()) {
-        // Rekursiv in Unterordner suchen
         const found = this._findParentFolder(child, scenePtr);
         if (found) return found;
       } else {
         const layout = child.getItem();
         if (layout && layout.ptr === scenePtr) {
-          return folder; // ✅ Parent gefunden!
+          return folder;
         }
       }
     }
     return null;
   }
 
-  // Neue Hilfsmethode: Finde Index innerhalb des Parent-Folders
   _getIndexInParent(parentFolder: any, scenePtr: number): number {
     for (let i = 0; i < parentFolder.getChildrenCount(); i++) {
       const child = parentFolder.getChildAt(i);
@@ -333,14 +329,12 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
       const child = folder.getChildAt(i);
       
       if (child.isFolder()) {
-        // Rekursiv in Unterordner suchen
         const found = this._findLayoutFolderOrLayoutForScene(child, scenePtr);
         if (found) return found;
       } else {
-        // Es ist ein LayoutFolderOrLayout Item
         const layout = child.getItem();
         if (layout && layout.ptr === scenePtr) {
-          return child; // ✅ Das LayoutFolderOrLayout-Objekt gefunden!
+          return child;
         }
       }
     }
@@ -369,37 +363,27 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   }
 
   moveAt(destinationIndex: number, targetFolder?: gdLayoutFolderOrLayout): void {
-    console.log("MOveatcalled!");
     const { project } = this.props;
     const layoutsRootFolder = project.getLayoutsRootFolder();
     if (!layoutsRootFolder) return;
     
-    // ✅ Finde das LayoutFolderOrLayout für diese Scene
     const sceneLayoutFolderOrLayout = this._findLayoutFolderOrLayoutForScene(
       layoutsRootFolder, 
       this.scene.ptr
     );
     if (!sceneLayoutFolderOrLayout) return;
     
-    // ✅ Finde den aktuellen Parent-Folder
     const currentParentFolder = sceneLayoutFolderOrLayout.getParent();
     if (!currentParentFolder) return;
     
     const originIndex = this._getIndexInParent(currentParentFolder, this.scene.ptr);
     
-    // ✅ Verwende targetFolder, wenn angegeben, sonst aktuellen Parent
     const destinationFolder = targetFolder || currentParentFolder;
     
-    console.log(`🎯 Moving scene from ${originIndex} to ${destinationIndex}`);
-    console.log(`   From folder: ${currentParentFolder.getFolderName()}`);
-    console.log(`   To folder: ${destinationFolder.getFolderName()}`);
-    
     if (destinationFolder === currentParentFolder) {
-      // Verschieben innerhalb desselben Folders
       if (destinationIndex === originIndex) return;
       currentParentFolder.moveChild(originIndex, destinationIndex);
     } else {
-      // ✅ Verschieben in einen anderen Folder
       currentParentFolder.moveObjectFolderOrObjectToAnotherFolder(
         sceneLayoutFolderOrLayout,
         destinationFolder,
@@ -464,7 +448,6 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
       'unserializeFrom',
       project
     );
-    // Unserialization has overwritten the name.
     newScene.setName(newName);
     newScene.updateBehaviorsSharedData(project);
 

@@ -50,8 +50,6 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
   }
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
-    console.log("ITEM CONTENT:");
-    console.log(itemContent);
     if (itemContent.getId() === scenesRootFolderId) return true;
     
     let currentParent = this.folder.getParent();
@@ -201,10 +199,6 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
     if (!currentParent) return;
     
     const destinationFolder = targetFolder || currentParent;
-    
-    console.log(`🎯 Moving folder from ${originIndex} to ${destinationIndex}`);
-    console.log(`   From folder: ${currentParent.getFolderName()}`);
-    console.log(`   To folder: ${destinationFolder.getFolderName()}`);
     
     if (destinationFolder === currentParent) {
       if (destinationIndex !== originIndex) {

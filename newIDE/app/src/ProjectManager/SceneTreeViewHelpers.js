@@ -1,4 +1,3 @@
-// SceneTreeViewHelpers.js
 import { t } from '@lingui/macro';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { getSceneFolderTreeViewItemId } from './SceneFolderTreeViewItemContent';
@@ -45,7 +44,6 @@ export const buildMoveToFolderSubmenu = (
     },
     ...foldersAndPaths
       .filter(({ folder }) => {
-        // Für Ordner: nicht sich selbst oder Descendants
         if (itemToMove.isFolder && itemToMove.isFolder()) {
           return folder !== itemToMove && !folder.isADescendantOf(itemToMove);
         }
@@ -86,7 +84,6 @@ export const createNewFolderAndMoveItem = (
   
   const newFolder = layoutsRootFolder.insertNewFolder(newFolderName, 0);
   
-  // Verschiebe das Item
   const currentParent = itemToMove.getParent();
   if (currentParent) {
     currentParent.moveObjectFolderOrObjectToAnotherFolder(

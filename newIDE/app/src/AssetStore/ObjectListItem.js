@@ -105,8 +105,8 @@ export const ObjectListItem = ({
               : styles.container
             : { ...styles.container, opacity: 0.384 }
         }
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
+        onPointerEnter={() => setHover(true)}
+        onPointerLeave={() => setHover(false)}
         ref={containerRef}
       >
         <LineStackLayout>

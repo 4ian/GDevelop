@@ -268,7 +268,7 @@ export default function NewObjectFromScratch({
             <Line expand noMargin>
               <Column expand noMargin>
                 <SearchBar
-                  id="extension-search-bar"
+                  id="object-type-search-bar"
                   value={searchText}
                   onChange={setSearchText}
                   onRequestSearch={() => {}}
@@ -348,8 +348,9 @@ export default function NewObjectFromScratch({
       {!!selectedObjectShortHeader && (
         <ExtensionInstallDialog
           project={project}
+          // The dialog is only used to display additional info about the extension.
+          // It doesn't allow to install the extension (`onInstall` is not set).
           isInstalling={false}
-          // TODO isInstalling={isInstalling}
           extensionShortHeader={selectedObjectShortHeader}
           onClose={() => setSelectedObjectShortHeader(null)}
         />

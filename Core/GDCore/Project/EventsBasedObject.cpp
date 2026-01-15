@@ -26,7 +26,7 @@ EventsBasedObject::~EventsBasedObject() {}
 void EventsBasedObject::SerializeToExternal(SerializerElement& element) const {
   element.SetAttribute("defaultName", defaultName);
   if (!assetStoreTag.empty()) {
-  element.SetAttribute("assetStoreTag", assetStoreTag);
+    element.SetAttribute("assetStoreTag", assetStoreTag);
   }
   if (isRenderedIn3D) {
     element.SetBoolAttribute("is3D", true);

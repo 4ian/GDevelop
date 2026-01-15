@@ -88,8 +88,8 @@ export const ExtensionListItem = ({
             ? { ...styles.container, ...gdevelopTheme.list.hover }
             : styles.container
         }
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
+        onPointerEnter={() => setHover(true)}
+        onPointerLeave={() => setHover(false)}
         ref={containerRef}
       >
         <LineStackLayout>

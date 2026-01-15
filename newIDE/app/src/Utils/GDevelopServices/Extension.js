@@ -94,7 +94,7 @@ export type BehaviorShortHeader = {
    * All required behaviors including transitive ones.
    */
   allRequiredBehaviorTypes: Array<string>,
-  /** This attribute is calculated.
+  /** This attribute is computed.
    * @see adaptBehaviorHeader
    */
   type: string,
@@ -109,7 +109,7 @@ export type ObjectShortHeader = {
   description: string,
   extensionName: string,
   assetStoreTag: ?string,
-  /** This attribute is calculated.
+  /** This attribute is computed.
    * @see adaptObjectHeader
    */
   type: string,

@@ -534,6 +534,72 @@ namespace gdjs {
         .y;
     }
 
+    getPointAttachmentScaleXWorld(
+      attachmentName: string,
+      slotName?: string
+    ): number {
+      return this._renderer.getPointAttachmentScale(
+        attachmentName,
+        slotName,
+        true
+      ).x;
+    }
+
+    getPointAttachmentScaleXLocal(
+      attachmentName: string,
+      slotName?: string
+    ): number {
+      return this._renderer.getPointAttachmentScale(
+        attachmentName,
+        slotName,
+        false
+      ).x;
+    }
+
+    getPointAttachmentScaleYWorld(
+      attachmentName: string,
+      slotName?: string
+    ): number {
+      return this._renderer.getPointAttachmentScale(
+        attachmentName,
+        slotName,
+        true
+      ).y;
+    }
+
+    getPointAttachmentScaleYLocal(
+      attachmentName: string,
+      slotName?: string
+    ): number {
+      return this._renderer.getPointAttachmentScale(
+        attachmentName,
+        slotName,
+        false
+      ).y;
+    }
+
+    getPointAttachmentRotationWorld(
+      attachmentName: string,
+      slotName?: string
+    ): number {
+      return this._renderer.getPointAttachmentRotation(
+        attachmentName,
+        slotName,
+        true
+      );
+    }
+
+    getPointAttachmentRotationLocal(
+      attachmentName: string,
+      slotName?: string
+    ): number {
+      return this._renderer.getPointAttachmentRotation(
+        attachmentName,
+        slotName,
+        false
+      );
+    }
+
     getAnimationDuration(): number {
       if (this._animations.length === 0) {
         return 0;

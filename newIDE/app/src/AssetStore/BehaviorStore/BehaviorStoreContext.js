@@ -336,9 +336,12 @@ export const BehaviorStoreStateProvider = ({
           defaultFirstSearchItemIds.push(firstBehaviorId);
         }
       }
-      return defaultFirstSearchItemIds;
+      // An unknown id would make useSearchStructuredItem crash.
+      return defaultFirstSearchItemIds.filter(
+        itemId => allTranslatedBehaviors[itemId]
+      );
     },
-    [firstBehaviorIds, installedBehaviorMetadataList]
+    [allTranslatedBehaviors, firstBehaviorIds, installedBehaviorMetadataList]
   );
 
   const searchResults: ?Array<

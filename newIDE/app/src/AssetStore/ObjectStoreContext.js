@@ -459,10 +459,7 @@ export const ObjectStoreStateProvider = ({
           .filter(Boolean),
         ...installedObjectMetadataList,
       ];
-      for (const categoryName of [
-        ...getCategories(allCategorizedObjects),
-        'Explore',
-      ]) {
+      for (const categoryName of getCategories(allCategorizedObjects)) {
         const categoryId = getCategoryId(categoryName);
         const objectCategory: ObjectCategory = {
           categoryId,
@@ -472,7 +469,13 @@ export const ObjectStoreStateProvider = ({
         };
         allTranslatedObjectsAndCategories[categoryId] = objectCategory;
       }
-      {
+      let isRegistryEmpty = true;
+      // eslint-disable-next-line no-unused-vars
+      for (const key in translatedObjectShortHeadersByType) {
+        isRegistryEmpty = false;
+        break;
+      }
+      if (!isRegistryEmpty) {
         const categoryId = getCategoryId('Explore');
         const objectCategory: ObjectCategory = {
           categoryId,
@@ -484,7 +487,13 @@ export const ObjectStoreStateProvider = ({
       }
       return allTranslatedObjectsAndCategories;
     },
-    [firstObjectIds, installedObjectMetadataList, allTranslatedObjects, i18n]
+    [
+      firstObjectIds,
+      installedObjectMetadataList,
+      allTranslatedObjects,
+      i18n,
+      translatedObjectShortHeadersByType,
+    ]
   );
 
   const defaultFirstSearchItemIds = React.useMemo(
@@ -506,7 +515,10 @@ export const ObjectStoreStateProvider = ({
           defaultFirstSearchItemIds.push(secondObjectId);
         }
       }
-      return defaultFirstSearchItemIds;
+      // An unknown id would make useSearchStructuredItem crash.
+      return defaultFirstSearchItemIds.filter(
+        itemId => allTranslatedObjectsAndCategories[itemId]
+      );
     },
     [
       installedObjectMetadataList,

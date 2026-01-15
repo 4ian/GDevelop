@@ -13,6 +13,10 @@ import { type HTMLDataset } from '../Utils/HTMLDataset';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { getSceneTreeViewItemId } from './SceneTreeViewItemContent';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
+import { 
+  buildMoveToFolderSubmenu, 
+  createNewFolderAndMoveItem 
+} from './SceneTreeViewHelpers';
 
 const SCENE_FOLDER_CLIPBOARD_KIND = 'SceneFolder';
 
@@ -128,46 +132,23 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
       },
       {
         label: i18n._(t`Move to folder`),
-        submenu: [
-          {
-            label: i18n._(t`Root`),
-            enabled: layoutsRootFolder && currentParent !== layoutsRootFolder,
-            click: () => {
-              if (layoutsRootFolder && currentParent && !currentParent.isRootFolder()) {
-                currentParent.moveObjectFolderOrObjectToAnotherFolder(
-                  this.folder,
-                  layoutsRootFolder,
-                  0
-                );
-                this.props.onProjectItemModified();
-              }
-            },
+        submenu: buildMoveToFolderSubmenu(
+          i18n,
+          project,
+          currentParent,
+          this.folder,
+          (targetFolder) => {
+            if (currentParent) {
+              currentParent.moveObjectFolderOrObjectToAnotherFolder(
+                this.folder,
+                targetFolder,
+                0
+              );
+              this.props.onProjectItemModified();
+            }
           },
-          ...foldersAndPaths
-            .filter(({ folder }) => 
-              folder !== this.folder && 
-              !folder.isADescendantOf(this.folder)
-            )
-            .map(({ folder, path }) => ({
-              label: path,
-              enabled: folder !== currentParent,
-              click: () => {
-                if (currentParent) {
-                  currentParent.moveObjectFolderOrObjectToAnotherFolder(
-                    this.folder,
-                    folder,
-                    0
-                  );
-                  this.props.onProjectItemModified();
-                }
-              },
-            })),
-          { type: 'separator' },
-          {
-            label: i18n._(t`Create new folder...`),
-            click: () => this._createNewFolderAndMove(i18n),
-          },
-        ],
+          () => this._createNewFolderAndMove(i18n)
+        ),
       },
       {
         type: 'separator',
@@ -361,43 +342,14 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
   return result;
 }
 
-// Erstelle neuen Ordner und verschiebe diesen Ordner hinein
-_createNewFolderAndMove(i18n: I18nType): void {
-  const { project, onProjectItemModified, editName, expandFolders } = this.props;
-  const layoutsRootFolder = project.getLayoutsRootFolder();
-  if (!layoutsRootFolder) return;
-  
-  const newFolderName = newNameGenerator('NewFolder', name => {
-    for (let i = 0; i < layoutsRootFolder.getChildrenCount(); i++) {
-      const child = layoutsRootFolder.getChildAt(i);
-      if (child.isFolder() && child.getFolderName() === name) {
-        return true;
-      }
-    }
-    return false;
-  });
-  
-  const newFolder = layoutsRootFolder.insertNewFolder(newFolderName, 0);
-  
-  // Verschiebe diesen Ordner in den neuen Ordner
-  const currentParent = this.folder.getParent();
-  if (currentParent) {
-    currentParent.moveObjectFolderOrObjectToAnotherFolder(
+  // Erstelle neuen Ordner und verschiebe diesen Ordner hinein
+  _createNewFolderAndMove(i18n: I18nType): void {
+    createNewFolderAndMoveItem(
+      this.props.project,
       this.folder,
-      newFolder,
-      0
+      this.props.onProjectItemModified,
+      this.props.expandFolders,
+      this.props.editName
     );
   }
-  
-  onProjectItemModified();
-  
-  if (expandFolders) {
-    expandFolders([getSceneFolderTreeViewItemId(newFolder)]);
-  }
-  if (editName) {
-    setTimeout(() => {
-      editName(getSceneFolderTreeViewItemId(newFolder));
-    }, 100);
-  }
-}
 }

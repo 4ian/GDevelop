@@ -15,6 +15,10 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Flag from '@material-ui/icons/Flag';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { getSceneFolderTreeViewItemId } from './SceneFolderTreeViewItemContent';
+import { 
+  buildMoveToFolderSubmenu, 
+  createNewFolderAndMoveItem 
+} from './SceneTreeViewHelpers';
 
 const SCENE_CLIPBOARD_KIND = 'Layout';
 
@@ -192,47 +196,25 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
       {
         type: 'separator',
       },
-      // ✅ NEU: Move to folder mit Submenu
       {
         label: i18n._(t`Move to folder`),
-        submenu: [
-          // Root-Ordner Option
-          {
-            label: i18n._(t`Root`),
-            enabled: layoutsRootFolder && currentParent !== layoutsRootFolder,
-            click: () => {
-              if (layoutsRootFolder && currentLayoutFolderOrLayout && currentParent) {
-                currentParent.moveObjectFolderOrObjectToAnotherFolder(
-                  currentLayoutFolderOrLayout,
-                  layoutsRootFolder,
-                  0
-                );
-                this._onProjectItemModified();
-              }
-            },
+        submenu: buildMoveToFolderSubmenu(
+          i18n,
+          project,
+          currentParent,
+          currentLayoutFolderOrLayout,
+          (targetFolder) => {
+            if (currentLayoutFolderOrLayout && currentParent) {
+              currentParent.moveObjectFolderOrObjectToAnotherFolder(
+                currentLayoutFolderOrLayout,
+                targetFolder,
+                0
+              );
+              this._onProjectItemModified();
+            }
           },
-          // Alle anderen Ordner
-          ...foldersAndPaths.map(({ folder, path }) => ({
-            label: path,
-            enabled: folder !== currentParent,
-            click: () => {
-              if (currentLayoutFolderOrLayout && currentParent) {
-                currentParent.moveObjectFolderOrObjectToAnotherFolder(
-                  currentLayoutFolderOrLayout,
-                  folder,
-                  0
-                );
-                this._onProjectItemModified();
-              }
-            },
-          })),
-          { type: 'separator' },
-          // Neuen Ordner erstellen
-          {
-            label: i18n._(t`Create new folder...`),
-            click: () => this._createNewFolderAndMove(i18n),
-          },
-        ],
+          () => this._createNewFolderAndMove(i18n)
+        ),
       },
       {
         type: 'separator',
@@ -366,50 +348,16 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   }
 
   _createNewFolderAndMove(i18n: I18nType): void {
-    const { project } = this.props;
-    const layoutsRootFolder = project.getLayoutsRootFolder();
-    if (!layoutsRootFolder) return;
+    const layoutFolderOrLayout = this.getLayoutFolderOrLayout();
+    if (!layoutFolderOrLayout) return;
     
-    const newFolderName = newNameGenerator('NewFolder', name => {
-      // Prüfe ob Ordner mit diesem Namen existiert
-      for (let i = 0; i < layoutsRootFolder.getChildrenCount(); i++) {
-        const child = layoutsRootFolder.getChildAt(i);
-        if (child.isFolder() && child.getFolderName() === name) {
-          return true;
-        }
-      }
-      return false;
-    });
-    
-    const newFolder = layoutsRootFolder.insertNewFolder(newFolderName, 0);
-    
-    // Verschiebe die Szene in den neuen Ordner
-    const currentLayoutFolderOrLayout = this._findLayoutFolderOrLayoutForScene(
-      layoutsRootFolder,
-      this.scene.ptr
+    createNewFolderAndMoveItem(
+      this.props.project,
+      layoutFolderOrLayout,
+      () => this._onProjectItemModified(),
+      this.props.expandFolders,
+      this.props.editName
     );
-    if (currentLayoutFolderOrLayout) {
-      const currentParent = currentLayoutFolderOrLayout.getParent();
-      if (currentParent) {
-        currentParent.moveObjectFolderOrObjectToAnotherFolder(
-          currentLayoutFolderOrLayout,
-          newFolder,
-          0
-        );
-      }
-    }
-    
-    this._onProjectItemModified();
-    
-    // Öffne den neuen Ordner und fokussiere ihn zum Umbenennen
-    if (this.props.expandFolders) {
-      this.props.expandFolders([getSceneFolderTreeViewItemId(newFolder)]);
-    }
-    if (this.props.editName) {
-      setTimeout(() => {
-        this.props.editName(getSceneFolderTreeViewItemId(newFolder));
-      }, 100);
-    }
   }
 
   getLayoutFolderOrLayout(): gdLayoutFolderOrLayout | null {

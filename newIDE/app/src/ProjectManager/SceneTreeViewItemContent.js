@@ -280,7 +280,17 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   }
 
   delete(): void {
+    const { project } = this.props;
+    const layoutsRootFolder = project.getLayoutsRootFolder();
+    
     this.props.onDeleteLayout(this.scene);
+    
+    if (layoutsRootFolder) {
+      const sceneName = this.scene.getName();
+      layoutsRootFolder.removeRecursivelyObjectNamed(sceneName);
+    }
+    
+    this._onProjectItemModified();
   }
 
   _findParentFolder(folder: any, scenePtr: number): ?any {

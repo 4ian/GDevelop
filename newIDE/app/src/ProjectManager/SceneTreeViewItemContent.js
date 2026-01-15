@@ -268,23 +268,71 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     return this._getIndexInParent(parentFolder, this.scene.ptr);
   }
 
-  moveAt(destinationIndex: number): void {
+  _findLayoutFolderOrLayoutForScene(folder: any, scenePtr: number): ?any {
+    for (let i = 0; i < folder.getChildrenCount(); i++) {
+      const child = folder.getChildAt(i);
+      
+      if (child.isFolder()) {
+        // Rekursiv in Unterordner suchen
+        const found = this._findLayoutFolderOrLayoutForScene(child, scenePtr);
+        if (found) return found;
+      } else {
+        // Es ist ein LayoutFolderOrLayout Item
+        const layout = child.getItem();
+        if (layout && layout.ptr === scenePtr) {
+          return child; // ✅ Das LayoutFolderOrLayout-Objekt gefunden!
+        }
+      }
+    }
+    return null;
+  }
+
+  getLayoutFolderOrLayout(): gdLayoutFolderOrLayout | null {
+    const { project } = this.props;
+    const layoutsRootFolder = project.getLayoutsRootFolder();
+    if (!layoutsRootFolder) return null;
+    
+    return this._findLayoutFolderOrLayoutForScene(layoutsRootFolder, this.scene.ptr);
+  }
+
+  moveAt(destinationIndex: number, targetFolder?: gdLayoutFolderOrLayout): void {
     console.log("MOveatcalled!");
     const { project } = this.props;
     const layoutsRootFolder = project.getLayoutsRootFolder();
     if (!layoutsRootFolder) return;
     
-    // ✅ Finde den Parent-Folder
-    const parentFolder = this._findParentFolder(layoutsRootFolder, this.scene.ptr);
-    if (!parentFolder) return;
+    // ✅ Finde das LayoutFolderOrLayout für diese Scene
+    const sceneLayoutFolderOrLayout = this._findLayoutFolderOrLayoutForScene(
+      layoutsRootFolder, 
+      this.scene.ptr
+    );
+    if (!sceneLayoutFolderOrLayout) return;
     
-    const originIndex = this._getIndexInParent(parentFolder, this.scene.ptr);
-    if (destinationIndex === originIndex) return;
+    // ✅ Finde den aktuellen Parent-Folder
+    const currentParentFolder = sceneLayoutFolderOrLayout.getParent();
+    if (!currentParentFolder) return;
     
-    console.log(`🎯 Moving from ${originIndex} to ${destinationIndex} in folder:`, parentFolder.getFolderName());
+    const originIndex = this._getIndexInParent(currentParentFolder, this.scene.ptr);
     
-    // ✅ Verschiebe innerhalb des PARENT-Folders!
-    parentFolder.moveChild(originIndex, destinationIndex);
+    // ✅ Verwende targetFolder, wenn angegeben, sonst aktuellen Parent
+    const destinationFolder = targetFolder || currentParentFolder;
+    
+    console.log(`🎯 Moving scene from ${originIndex} to ${destinationIndex}`);
+    console.log(`   From folder: ${currentParentFolder.getFolderName()}`);
+    console.log(`   To folder: ${destinationFolder.getFolderName()}`);
+    
+    if (destinationFolder === currentParentFolder) {
+      // Verschieben innerhalb desselben Folders
+      if (destinationIndex === originIndex) return;
+      currentParentFolder.moveChild(originIndex, destinationIndex);
+    } else {
+      // ✅ Verschieben in einen anderen Folder
+      currentParentFolder.moveObjectFolderOrObjectToAnotherFolder(
+        sceneLayoutFolderOrLayout,
+        destinationFolder,
+        destinationIndex
+      );
+    }
     
     this._onProjectItemModified();
   }

@@ -1588,9 +1588,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         where: 'before' | 'inside' | 'after'
       ) => {
         console.log("🎯 moveSelectionTo CALLED!");
-        console.log("  - selectedItems:", selectedItems.length);
-        console.log("  - where:", where);
-        console.log("  - destinationIndex:", destinationItem.content.getIndex());
         
         if (selectedItems.length === 0) {
           console.log("  ❌ No items selected!");
@@ -1598,14 +1595,59 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         }
         
         const selectedItem = selectedItems[0];
-        console.log("  - selectedItem ID:", selectedItem.content.getId());
-        console.log("  - Calling moveAt with:", destinationItem.content.getIndex() + (where === 'after' ? 1 : 0));
+        const destinationContent = destinationItem.content;
         
-        selectedItem.content.moveAt(
-          destinationItem.content.getIndex() + (where === 'after' ? 1 : 0)
-        );
+        // ✅ Hole den Zielordner und Index
+        let targetFolder = null;
+        let targetIndex = destinationContent.getIndex();
         
-        console.log("  ✅ moveAt called, now triggering onTreeModified");
+        if (where === 'inside') {
+          console.log("  📂 Drop INSIDE folder");
+          
+          // ✅ NEUE LOGIK: Prüfe, ob es ein Folder ist
+          if (typeof destinationContent.getFolder === 'function') {
+            // Es ist ein SceneFolderTreeViewItemContent
+            targetFolder = destinationContent.getFolder();
+            targetIndex = 0;
+            console.log("  ✅ Found scene folder (via getFolder):", targetFolder?.getFolderName?.() || 'unknown');
+          } else if (typeof destinationContent.getLayoutFolderOrLayout === 'function') {
+            // Es ist ein SceneTreeViewItemContent
+            const layoutFolderOrLayout = destinationContent.getLayoutFolderOrLayout();
+            if (layoutFolderOrLayout && layoutFolderOrLayout.isFolder()) {
+              targetFolder = layoutFolderOrLayout;
+              targetIndex = 0;
+              console.log("  ✅ Found scene folder (via getLayoutFolderOrLayout):", targetFolder.getFolderName());
+            }
+          }
+        } else {
+          console.log("  📍 Drop BESIDE element (before/after)");
+          
+          // ✅ NEUE LOGIK: Prüfe beide Fälle
+          if (typeof destinationContent.getFolder === 'function') {
+            // Es ist ein Folder - hole seinen Parent
+            const folder = destinationContent.getFolder();
+            if (folder) {
+              targetFolder = folder.getParent();
+              targetIndex = destinationContent.getIndex() + (where === 'after' ? 1 : 0);
+              console.log("  ✅ Found parent of folder:", targetFolder?.getFolderName?.() || 'ROOT');
+            }
+          } else if (typeof destinationContent.getLayoutFolderOrLayout === 'function') {
+            // Es ist eine Scene
+            const layoutFolderOrLayout = destinationContent.getLayoutFolderOrLayout();
+            if (layoutFolderOrLayout) {
+              targetFolder = layoutFolderOrLayout.getParent();
+              targetIndex = destinationContent.getIndex() + (where === 'after' ? 1 : 0);
+              console.log("  ✅ Found parent of scene:", targetFolder?.getFolderName?.() || 'ROOT');
+            }
+          }
+        }
+        
+        console.log("  - targetFolder:", targetFolder?.getFolderName?.() || 'ROOT');
+        console.log("  - targetIndex:", targetIndex);
+        
+        // ✅ Rufe moveAt mit targetFolder auf
+        selectedItem.content.moveAt(targetIndex, targetFolder);
+        
         onTreeModified(true);
       },
       [onTreeModified, selectedItems]

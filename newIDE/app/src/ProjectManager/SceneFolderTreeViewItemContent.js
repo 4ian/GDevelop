@@ -85,6 +85,10 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
     };
   }
 
+  getFolder(): gdLayoutFolderOrLayout {
+    return this.folder; // oder wie auch immer du den Folder speicherst
+  }
+
   getThumbnail(): ?string {
     return 'res/icons_default/folder_black.svg';
   }
@@ -177,17 +181,32 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
     return parent.getChildPosition(this.folder);
   }
 
-  moveAt(destinationIndex: number): void {
+  moveAt(destinationIndex: number, targetFolder?: gdLayoutFolderOrLayout): void {
     const originIndex = this.getIndex();
-    if (destinationIndex !== originIndex) {
-      const parent = this.folder.getParent();
-      if (parent) {
-        parent.moveChild(
-          originIndex,
-          destinationIndex + (destinationIndex <= originIndex ? 0 : -1)
-        );
+    const currentParent = this.folder.getParent();
+    if (!currentParent) return;
+    
+    // ✅ Verwende targetFolder, wenn angegeben
+    const destinationFolder = targetFolder || currentParent;
+    
+    console.log(`🎯 Moving folder from ${originIndex} to ${destinationIndex}`);
+    console.log(`   From folder: ${currentParent.getFolderName()}`);
+    console.log(`   To folder: ${destinationFolder.getFolderName()}`);
+    
+    if (destinationFolder === currentParent) {
+      // Verschieben innerhalb desselben Folders
+      if (destinationIndex !== originIndex) {
+        currentParent.moveChild(originIndex, destinationIndex);
         this.props.onProjectItemModified();
       }
+    } else {
+      // ✅ Verschieben in einen anderen Folder
+      currentParent.moveObjectFolderOrObjectToAnotherFolder(
+        this.folder,
+        destinationFolder,
+        destinationIndex
+      );
+      this.props.onProjectItemModified();
     }
   }
 

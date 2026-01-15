@@ -29,6 +29,7 @@ export type SceneFolderTreeViewItemProps = {|
   onProjectItemModified: () => void,
   showDeleteConfirmation: (options: any) => Promise<boolean>,
   expandFolders: (folderIds: string[]) => void,
+  onDeleteLayout: gdLayout => void,
 |};
 
 export const getSceneFolderTreeViewItemId = (
@@ -173,18 +174,108 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
   delete(): void {
     const { showDeleteConfirmation, onProjectItemModified } = this.props;
     
+    const contentCount = this._countFolderContents();
+    const hasStartScene = this._containsStartScene();
+    
+    let message;
+    let confirmLabel = t`Delete`;
+    
+    if (contentCount.scenes === 0 && contentCount.folders === 0) {
+      message = t`Are you sure you want to remove this empty folder?`;
+    } else {
+      message = t`⚠️ This will permanently delete:
+  - ${contentCount.scenes} scene(s)
+  - ${contentCount.folders} subfolder(s)
+
+  This action cannot be undone.`;
+      confirmLabel = t`Delete permanently`;
+      
+      if (hasStartScene) {
+        message += t`
+
+  ⚠️ Warning: This includes your start scene. Another scene will be set as the new start scene.`;
+      }
+    }
+    
     showDeleteConfirmation({
       title: t`Remove folder`,
-      message: t`Are you sure you want to remove this folder? Scenes inside will be moved to the parent folder.`,
+      message: message,
+      confirmButtonLabel: confirmLabel,
     }).then(answer => {
       if (!answer) return;
 
+      // ✅ Lösche rekursiv mit dem Callback
+      this._deleteRecursively(this.folder);
+      
       const parent = this.folder.getParent();
-      if (!parent) return;
-
-      parent.removeFolderChild(this.folder);
+      if (parent) {
+        parent.removeFolderChild(this.folder);
+      }
+      
       onProjectItemModified();
     });
+  }
+
+  _deleteRecursively(folder: gdLayoutFolderOrLayout): void {
+    const childrenToDelete = [];
+    for (let i = 0; i < folder.getChildrenCount(); i++) {
+      childrenToDelete.push(folder.getChildAt(i));
+    }
+    childrenToDelete.forEach(child => {
+      if (child.isFolder()) {
+        this._deleteRecursively(child);
+        folder.removeFolderChild(child);
+      } else {
+        const layout = child.getItem();
+        if (layout) {
+          const layoutName = layout.getName();
+          this.props.onDeleteLayout(layout);
+          folder.removeRecursivelyObjectNamed(layoutName);
+        }
+      }
+    });
+  }
+
+  _countFolderContents(): { scenes: number, folders: number } {
+    let scenes = 0;
+    let folders = 0;
+    
+    const countRecursive = (folder: gdLayoutFolderOrLayout) => {
+      for (let i = 0; i < folder.getChildrenCount(); i++) {
+        const child = folder.getChildAt(i);
+        if (child.isFolder()) {
+          folders++;
+          countRecursive(child);
+        } else {
+          scenes++;
+        }
+      }
+    };
+    
+    countRecursive(this.folder);
+    return { scenes, folders };
+  }
+
+  _containsStartScene(): boolean {
+    const { project } = this.props;
+    const firstLayout = project.getFirstLayout();
+    
+    const checkRecursive = (folder: gdLayoutFolderOrLayout): boolean => {
+      for (let i = 0; i < folder.getChildrenCount(); i++) {
+        const child = folder.getChildAt(i);
+        if (child.isFolder()) {
+          if (checkRecursive(child)) return true;
+        } else {
+          const layout = child.getItem();
+          if (layout && layout.getName() === firstLayout) {
+            return true;
+          }
+        }
+      }
+      return false;
+    };
+    
+    return checkRecursive(this.folder);
   }
 
   getIndex(): number {

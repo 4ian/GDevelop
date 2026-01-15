@@ -14,11 +14,29 @@ import { TreeViewItemContent, type TreeItemProps, scenesRootFolderId } from '.';
 import Tooltip from '@material-ui/core/Tooltip';
 import Flag from '@material-ui/icons/Flag';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
+import { getSceneFolderTreeViewItemId } from './SceneFolderTreeViewItemContent';
 
 const SCENE_CLIPBOARD_KIND = 'Layout';
 
 const styles = {
   tooltip: { marginRight: 5, verticalAlign: 'bottom' },
+};
+
+const collectFoldersAndPaths = (
+  folder: any,
+  parentPath: string = '',
+  result: Array<{ folder: any, path: string }> = []
+): Array<{ folder: any, path: string }> => {
+  for (let i = 0; i < folder.getChildrenCount(); i++) {
+    const child = folder.getChildAt(i);
+    if (child.isFolder()) {
+      const folderName = child.getFolderName();
+      const path = parentPath ? `${parentPath}/${folderName}` : folderName;
+      result.push({ folder: child, path });
+      collectFoldersAndPaths(child, path, result);
+    }
+  }
+  return result;
 };
 
 export type SceneTreeViewItemCallbacks = {|
@@ -118,6 +136,20 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   }
 
   buildMenuTemplate(i18n: I18nType, index: number) {
+    const { project } = this.props;
+    const layoutsRootFolder = project.getLayoutsRootFolder();
+    
+    // Sammle alle Ordner mit ihren Pfaden
+    const foldersAndPaths = layoutsRootFolder 
+      ? collectFoldersAndPaths(layoutsRootFolder)
+      : [];
+    
+    // Finde den aktuellen Parent
+    const currentLayoutFolderOrLayout = layoutsRootFolder 
+      ? this._findLayoutFolderOrLayoutForScene(layoutsRootFolder, this.scene.ptr)
+      : null;
+    const currentParent = currentLayoutFolderOrLayout?.getParent();
+
     return [
       {
         label: i18n._(t`Open scene editor`),
@@ -156,6 +188,51 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
         label: i18n._(t`Set as start scene`),
         enabled: !this._isFirstScene(),
         click: () => this._setProjectFirstScene(this.scene.getName()),
+      },
+      {
+        type: 'separator',
+      },
+      // ✅ NEU: Move to folder mit Submenu
+      {
+        label: i18n._(t`Move to folder`),
+        submenu: [
+          // Root-Ordner Option
+          {
+            label: i18n._(t`Root`),
+            enabled: layoutsRootFolder && currentParent !== layoutsRootFolder,
+            click: () => {
+              if (layoutsRootFolder && currentLayoutFolderOrLayout && currentParent) {
+                currentParent.moveObjectFolderOrObjectToAnotherFolder(
+                  currentLayoutFolderOrLayout,
+                  layoutsRootFolder,
+                  0
+                );
+                this._onProjectItemModified();
+              }
+            },
+          },
+          // Alle anderen Ordner
+          ...foldersAndPaths.map(({ folder, path }) => ({
+            label: path,
+            enabled: folder !== currentParent,
+            click: () => {
+              if (currentLayoutFolderOrLayout && currentParent) {
+                currentParent.moveObjectFolderOrObjectToAnotherFolder(
+                  currentLayoutFolderOrLayout,
+                  folder,
+                  0
+                );
+                this._onProjectItemModified();
+              }
+            },
+          })),
+          { type: 'separator' },
+          // Neuen Ordner erstellen
+          {
+            label: i18n._(t`Create new folder...`),
+            click: () => this._createNewFolderAndMove(i18n),
+          },
+        ],
       },
       {
         type: 'separator',
@@ -286,6 +363,53 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
       }
     }
     return null;
+  }
+
+  _createNewFolderAndMove(i18n: I18nType): void {
+    const { project } = this.props;
+    const layoutsRootFolder = project.getLayoutsRootFolder();
+    if (!layoutsRootFolder) return;
+    
+    const newFolderName = newNameGenerator('NewFolder', name => {
+      // Prüfe ob Ordner mit diesem Namen existiert
+      for (let i = 0; i < layoutsRootFolder.getChildrenCount(); i++) {
+        const child = layoutsRootFolder.getChildAt(i);
+        if (child.isFolder() && child.getFolderName() === name) {
+          return true;
+        }
+      }
+      return false;
+    });
+    
+    const newFolder = layoutsRootFolder.insertNewFolder(newFolderName, 0);
+    
+    // Verschiebe die Szene in den neuen Ordner
+    const currentLayoutFolderOrLayout = this._findLayoutFolderOrLayoutForScene(
+      layoutsRootFolder,
+      this.scene.ptr
+    );
+    if (currentLayoutFolderOrLayout) {
+      const currentParent = currentLayoutFolderOrLayout.getParent();
+      if (currentParent) {
+        currentParent.moveObjectFolderOrObjectToAnotherFolder(
+          currentLayoutFolderOrLayout,
+          newFolder,
+          0
+        );
+      }
+    }
+    
+    this._onProjectItemModified();
+    
+    // Öffne den neuen Ordner und fokussiere ihn zum Umbenennen
+    if (this.props.expandFolders) {
+      this.props.expandFolders([getSceneFolderTreeViewItemId(newFolder)]);
+    }
+    if (this.props.editName) {
+      setTimeout(() => {
+        this.props.editName(getSceneFolderTreeViewItemId(newFolder));
+      }, 100);
+    }
   }
 
   getLayoutFolderOrLayout(): gdLayoutFolderOrLayout | null {

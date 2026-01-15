@@ -477,14 +477,6 @@ export function buildScenesTreeItems(
       this.buildMenuTemplateFunction = (i18n: I18nType, index: number) => {
         const menuItems = [];
         
-        if (rightButton) {
-          menuItems.push({
-            id: rightButton.id,
-            label: rightButton.label,
-            click: rightButton.click,
-          });
-        }
-        
         if (this.id === usedRootId) {
           if (this.onAddSceneCallback) {
             menuItems.push({

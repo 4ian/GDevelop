@@ -86,11 +86,11 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
   }
 
   getFolder(): gdLayoutFolderOrLayout {
-    return this.folder; // oder wie auch immer du den Folder speicherst
+    return this.folder;
   }
 
   getThumbnail(): ?string {
-    return 'res/icons_default/folder_black.svg';
+    return 'FOLDER';
   }
 
   onClick(): void {}
@@ -106,18 +106,16 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
   }
 
   buildMenuTemplate(i18n: I18nType, index: number) {
+    const { project } = this.props;
+    const layoutsRootFolder = project.getLayoutsRootFolder();
+    
+    const foldersAndPaths = layoutsRootFolder 
+      ? this._collectFoldersAndPaths(layoutsRootFolder)
+      : [];
+    
+    const currentParent = this.folder.getParent();
+
     return [
-      {
-        label: i18n._(t`Add scene`),
-        click: () => this._addScene(i18n),
-      },
-      {
-        label: i18n._(t`Add folder`),
-        click: () => this._addFolder(),
-      },
-      {
-        type: 'separator',
-      },
       {
         label: i18n._(t`Rename`),
         click: () => this.edit(),
@@ -129,23 +127,58 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
         accelerator: 'Backspace',
       },
       {
+        label: i18n._(t`Move to folder`),
+        submenu: [
+          {
+            label: i18n._(t`Root`),
+            enabled: layoutsRootFolder && currentParent !== layoutsRootFolder,
+            click: () => {
+              if (layoutsRootFolder && currentParent && !currentParent.isRootFolder()) {
+                currentParent.moveObjectFolderOrObjectToAnotherFolder(
+                  this.folder,
+                  layoutsRootFolder,
+                  0
+                );
+                this.props.onProjectItemModified();
+              }
+            },
+          },
+          ...foldersAndPaths
+            .filter(({ folder }) => 
+              folder !== this.folder && 
+              !folder.isADescendantOf(this.folder)
+            )
+            .map(({ folder, path }) => ({
+              label: path,
+              enabled: folder !== currentParent,
+              click: () => {
+                if (currentParent) {
+                  currentParent.moveObjectFolderOrObjectToAnotherFolder(
+                    this.folder,
+                    folder,
+                    0
+                  );
+                  this.props.onProjectItemModified();
+                }
+              },
+            })),
+          { type: 'separator' },
+          {
+            label: i18n._(t`Create new folder...`),
+            click: () => this._createNewFolderAndMove(i18n),
+          },
+        ],
+      },
+      {
         type: 'separator',
       },
       {
-        label: i18n._(t`Copy`),
-        click: () => this.copy(),
-        accelerator: 'CmdOrCtrl+C',
+        label: i18n._(t`Add a scene`),
+        click: () => this._addScene(i18n),
       },
       {
-        label: i18n._(t`Cut`),
-        click: () => this.cut(),
-        accelerator: 'CmdOrCtrl+X',
-      },
-      {
-        label: i18n._(t`Paste`),
-        enabled: Clipboard.has(SCENE_FOLDER_CLIPBOARD_KIND),
-        click: () => this.paste(),
-        accelerator: 'CmdOrCtrl+V',
+        label: i18n._(t`Add a folder`),
+        click: () => this._addFolder(),
       },
     ];
   }
@@ -186,7 +219,6 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
     const currentParent = this.folder.getParent();
     if (!currentParent) return;
     
-    // ✅ Verwende targetFolder, wenn angegeben
     const destinationFolder = targetFolder || currentParent;
     
     console.log(`🎯 Moving folder from ${originIndex} to ${destinationIndex}`);
@@ -194,13 +226,11 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
     console.log(`   To folder: ${destinationFolder.getFolderName()}`);
     
     if (destinationFolder === currentParent) {
-      // Verschieben innerhalb desselben Folders
       if (destinationIndex !== originIndex) {
         currentParent.moveChild(originIndex, destinationIndex);
         this.props.onProjectItemModified();
       }
     } else {
-      // ✅ Verschieben in einen anderen Folder
       currentParent.moveObjectFolderOrObjectToAnotherFolder(
         this.folder,
         destinationFolder,
@@ -253,7 +283,6 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
       name => project.hasLayoutNamed(name)
     );
     
-    // Zuerst Scene im Project erstellen (wird automatisch in Root eingefügt)
     const newScene = project.insertNewLayout(
       newName, 
       project.getLayoutsCount()
@@ -262,13 +291,10 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
     newScene.updateBehaviorsSharedData(project);
     addDefaultLightToAllLayers(newScene);
 
-    // ✅ NEU: Aus Root entfernen und in Folder verschieben
     const layoutsRootFolder = project.getLayoutsRootFolder();
     if (layoutsRootFolder) {
-      // Finde das LayoutFolderOrLayout-Objekt für die neue Scene
       const sceneInRoot = layoutsRootFolder.getObjectNamed(newName);
       if (sceneInRoot) {
-        // Verschiebe von Root in den Zielordner
         layoutsRootFolder.moveObjectFolderOrObjectToAnotherFolder(
           sceneInRoot,
           this.folder,
@@ -317,4 +343,61 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
     
     return false;
   }
+
+  _collectFoldersAndPaths(
+  folder: any,
+  parentPath: string = '',
+  result: Array<{ folder: any, path: string }> = []
+): Array<{ folder: any, path: string }> {
+  for (let i = 0; i < folder.getChildrenCount(); i++) {
+    const child = folder.getChildAt(i);
+    if (child.isFolder()) {
+      const folderName = child.getFolderName();
+      const path = parentPath ? `${parentPath}/${folderName}` : folderName;
+      result.push({ folder: child, path });
+      this._collectFoldersAndPaths(child, path, result);
+    }
+  }
+  return result;
+}
+
+// Erstelle neuen Ordner und verschiebe diesen Ordner hinein
+_createNewFolderAndMove(i18n: I18nType): void {
+  const { project, onProjectItemModified, editName, expandFolders } = this.props;
+  const layoutsRootFolder = project.getLayoutsRootFolder();
+  if (!layoutsRootFolder) return;
+  
+  const newFolderName = newNameGenerator('NewFolder', name => {
+    for (let i = 0; i < layoutsRootFolder.getChildrenCount(); i++) {
+      const child = layoutsRootFolder.getChildAt(i);
+      if (child.isFolder() && child.getFolderName() === name) {
+        return true;
+      }
+    }
+    return false;
+  });
+  
+  const newFolder = layoutsRootFolder.insertNewFolder(newFolderName, 0);
+  
+  // Verschiebe diesen Ordner in den neuen Ordner
+  const currentParent = this.folder.getParent();
+  if (currentParent) {
+    currentParent.moveObjectFolderOrObjectToAnotherFolder(
+      this.folder,
+      newFolder,
+      0
+    );
+  }
+  
+  onProjectItemModified();
+  
+  if (expandFolders) {
+    expandFolders([getSceneFolderTreeViewItemId(newFolder)]);
+  }
+  if (editName) {
+    setTimeout(() => {
+      editName(getSceneFolderTreeViewItemId(newFolder));
+    }, 100);
+  }
+}
 }

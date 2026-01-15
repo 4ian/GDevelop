@@ -18,7 +18,7 @@
 namespace gd {
 class Project;
 class SerializerElement;
-}  // namespace gd
+}
 
 namespace gd {
 
@@ -278,15 +278,12 @@ class GD_CORE_API FolderOrItem {
   FolderOrItem<T>* parent = nullptr;
   QuickCustomization::Visibility quickCustomizationVisibility;
 
-  // Representing an item:
-  T* item;  // nullptr if folderName is set.
+  T* item;
 
-  // or representing a folder:
-  gd::String folderName;  // Empty if item is set.
+  gd::String folderName;
   std::vector<std::unique_ptr<FolderOrItem<T>>> children;
 };
 
-// Template implementations must be in header file
 
 template <typename T>
 FolderOrItem<T>& FolderOrItem<T>::GetBadFolderOrItem() {
@@ -530,7 +527,6 @@ void FolderOrItem<T>::UnserializeFrom(
   gd::String potentialFolderName = element.GetStringAttribute("folderName", "");
 
   if (!potentialFolderName.empty()) {
-    // Dies ist ein Folder
     item = nullptr;
     folderName = potentialFolderName;
 
@@ -544,7 +540,6 @@ void FolderOrItem<T>::UnserializeFrom(
             project, childrenElements.GetChild(i), itemContainer, getItem);
         childFolderOrItem->parent = this;
         
-        // Nur gültige Children hinzufügen (nicht die mit __INVALID__)
         if (childFolderOrItem->folderName != "__INVALID__") {
           children.push_back(std::move(childFolderOrItem));
         }
@@ -552,15 +547,12 @@ void FolderOrItem<T>::UnserializeFrom(
     }
 } else {
     folderName = "";
-    // WICHTIG: Für Kompatibilität beide Attribute-Namen prüfen!
     gd::String itemName = element.GetStringAttribute("itemName", "");
     if (itemName.empty()) {
-        // Fallback für alte Projekte mit "objectName"
         itemName = element.GetStringAttribute("objectName", "");
     }
     
     if (itemName.empty()) {
-        gd::LogWarning("Empty item name in folder structure, skipping.");
         folderName = "__INVALID__";
         return;
     }
@@ -568,7 +560,6 @@ void FolderOrItem<T>::UnserializeFrom(
     item = getItem(itemContainer, itemName);
     
     if (item == nullptr) {
-        gd::LogWarning("Item '" + itemName + "' not found, skipping folder entry.");
         folderName = "__INVALID__";
         return;
     }
@@ -584,6 +575,6 @@ void FolderOrItem<T>::UnserializeFrom(
   }
 }
 
-}  // namespace gd
+}
 
-#endif  // GDCORE_FOLDERORITEM_H
+#endif

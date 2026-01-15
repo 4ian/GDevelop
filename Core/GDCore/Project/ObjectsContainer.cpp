@@ -9,20 +9,19 @@
 
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Project/Object.h"
-#include "GDCore/Project/FolderOrItem.h"  // GEÄNDERT: statt ObjectFolderOrObject.h
+#include "GDCore/Project/FolderOrItem.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/PolymorphicClone.h"
 
 namespace gd {
 
-// Lambda für GetName - wird mehrfach verwendet
 static auto GetObjectName = [](const gd::Object& obj) { return obj.GetName(); };
 
 ObjectsContainer::ObjectsContainer(
     const ObjectsContainer::SourceType sourceType_)
     : sourceType(sourceType_) {
-  rootFolder = gd::make_unique<gd::FolderOrItem<gd::Object>>("__ROOT");  // GEÄNDERT
+  rootFolder = gd::make_unique<gd::FolderOrItem<gd::Object>>("__ROOT");
 }
 
 ObjectsContainer::~ObjectsContainer() {}
@@ -41,9 +40,7 @@ void ObjectsContainer::Init(const gd::ObjectsContainer& other) {
   sourceType = other.sourceType;
   initialObjects = gd::Clone(other.initialObjects);
   objectGroups = other.objectGroups;
-  // The objects folders are not copied.
-  // It's not an issue because the UI uses the serialization for duplication.
-  rootFolder = gd::make_unique<gd::FolderOrItem<gd::Object>>("__ROOT");  // GEÄNDERT
+  rootFolder = gd::make_unique<gd::FolderOrItem<gd::Object>>("__ROOT");
 }
 
 void ObjectsContainer::SerializeObjectsTo(SerializerElement& element) const {
@@ -54,12 +51,11 @@ void ObjectsContainer::SerializeObjectsTo(SerializerElement& element) const {
 }
 
 void ObjectsContainer::SerializeFoldersTo(SerializerElement& element) const {
-  rootFolder->SerializeTo(element, GetObjectName);  // GEÄNDERT: Lambda hinzugefügt
+  rootFolder->SerializeTo(element, GetObjectName);
 }
 
 void ObjectsContainer::UnserializeFoldersFrom(
     gd::Project& project, const SerializerElement& element) {
-  // GEÄNDERT: Template-Methode mit Lambdas
   rootFolder->UnserializeFrom(
       project,
       element,
@@ -74,23 +70,15 @@ void ObjectsContainer::UnserializeFoldersFrom(
 }
 
 void ObjectsContainer::AddMissingObjectsInRootFolder() {
-  std::cout << "=== AddMissingObjectsInRootFolder ===" << std::endl;
-  std::cout << "  Total objects: " << initialObjects.size() << std::endl;
-  std::cout << "  RootFolder children: " << rootFolder->GetChildrenCount() << std::endl;
   
   for (std::size_t i = 0; i < initialObjects.size(); ++i) {
     const gd::String& objectName = initialObjects[i]->GetName();
-    std::cout << "  Checking object " << i << ": '" << objectName << "'" << std::endl;
     
     if (!rootFolder->HasItemNamed(objectName, GetObjectName)) {
-      std::cout << "    -> Adding to root folder" << std::endl;
       rootFolder->InsertItem(&(*initialObjects[i]));
     } else {
-      std::cout << "    -> Already in root folder" << std::endl;
     }
   }
-  
-  std::cout << "  After adding, RootFolder children: " << rootFolder->GetChildrenCount() << std::endl;
 }
 
 void ObjectsContainer::UnserializeObjectsFrom(
@@ -98,29 +86,20 @@ void ObjectsContainer::UnserializeObjectsFrom(
   Clear();
   element.ConsiderAsArrayOf("object", "Objet");
   
-  std::cout << "=== UnserializeObjectsFrom: " << element.GetChildrenCount() << " objects ===" << std::endl;
-  
   for (std::size_t i = 0; i < element.GetChildrenCount(); ++i) {
     const SerializerElement& objectElement = element.GetChild(i);
 
     gd::String type = objectElement.GetStringAttribute("type");
     gd::String name = objectElement.GetStringAttribute("name", "", "nom");
-    
-    std::cout << "  Object " << i << ": name='" << name << "', type='" << type << "'" << std::endl;
 
     std::unique_ptr<gd::Object> newObject = project.CreateObject(type, name);
 
     if (newObject) {
-      std::cout << "    Created object, name='" << newObject->GetName() << "'" << std::endl;
       newObject->UnserializeFrom(project, objectElement);
-      std::cout << "    After unserialize, name='" << newObject->GetName() << "'" << std::endl;
       initialObjects.push_back(std::move(newObject));
     } else {
-      std::cout << "WARNING: Unknown object type \"" << type << "\"" << std::endl;
     }
   }
-  
-  std::cout << "=== Total objects loaded: " << initialObjects.size() << " ===" << std::endl;
 }
 
 bool ObjectsContainer::HasObjectNamed(const gd::String& name) const {
@@ -175,7 +154,7 @@ gd::Object& ObjectsContainer::InsertNewObject(const gd::Project& project,
                                        : initialObjects.end(),
       project.CreateObject(objectType, name))));
 
-  rootFolder->InsertItem(&newlyCreatedObject);  // GEÄNDERT: InsertObject -> InsertItem
+  rootFolder->InsertItem(&newlyCreatedObject);
 
   return newlyCreatedObject;
 }
@@ -184,12 +163,12 @@ gd::Object& ObjectsContainer::InsertNewObjectInFolder(
     const gd::Project& project,
     const gd::String& objectType,
     const gd::String& name,
-    gd::FolderOrItem<gd::Object>& folderOrItem,  // GEÄNDERT: Typ
+    gd::FolderOrItem<gd::Object>& folderOrItem,
     std::size_t position) {
   gd::Object& newlyCreatedObject = *(*(initialObjects.insert(
       initialObjects.end(), project.CreateObject(objectType, name))));
 
-  folderOrItem.InsertItem(&newlyCreatedObject, position);  // GEÄNDERT: InsertObject -> InsertItem
+  folderOrItem.InsertItem(&newlyCreatedObject, position);
 
   return newlyCreatedObject;
 }
@@ -222,7 +201,7 @@ void ObjectsContainer::RemoveObject(const gd::String& name) {
               });
   if (objectIt == initialObjects.end()) return;
 
-  rootFolder->RemoveRecursivelyItemNamed(name, GetObjectName);  // GEÄNDERT: mit Lambda
+  rootFolder->RemoveRecursivelyItemNamed(name, GetObjectName);
 
   initialObjects.erase(objectIt);
 }
@@ -233,9 +212,9 @@ void ObjectsContainer::Clear() {
 }
 
 void ObjectsContainer::MoveObjectFolderOrObjectToAnotherContainerInFolder(
-    gd::FolderOrItem<gd::Object>& folderOrItem,  // GEÄNDERT: Typ
+    gd::FolderOrItem<gd::Object>& folderOrItem,
     gd::ObjectsContainer& newContainer,
-    gd::FolderOrItem<gd::Object>& newParentFolder,  // GEÄNDERT: Typ
+    gd::FolderOrItem<gd::Object>& newParentFolder,
     std::size_t newPosition) {
   if (folderOrItem.IsFolder() || !newParentFolder.IsFolder()) return;
 
@@ -243,7 +222,7 @@ void ObjectsContainer::MoveObjectFolderOrObjectToAnotherContainerInFolder(
       initialObjects.begin(),
       initialObjects.end(),
       [&folderOrItem](std::unique_ptr<gd::Object>& object) {
-        return object->GetName() == folderOrItem.GetItem().GetName();  // GEÄNDERT: GetObject -> GetItem
+        return object->GetName() == folderOrItem.GetItem().GetName();
       });
   if (objectIt == initialObjects.end()) return;
 
@@ -252,7 +231,7 @@ void ObjectsContainer::MoveObjectFolderOrObjectToAnotherContainerInFolder(
 
   newContainer.initialObjects.push_back(std::move(object));
 
-  folderOrItem.GetParent().MoveFolderOrItemToAnotherFolder(  // GEÄNDERT: Methodenname
+  folderOrItem.GetParent().MoveFolderOrItemToAnotherFolder(
       folderOrItem, newParentFolder, newPosition);
 }
 
@@ -264,12 +243,12 @@ std::set<gd::String> ObjectsContainer::GetAllObjectNames() const {
   return names;
 }
 
-std::vector<const FolderOrItem<gd::Object>*>  // GEÄNDERT: Rückgabetyp
+std::vector<const FolderOrItem<gd::Object>*> 
 ObjectsContainer::GetAllObjectFolderOrObjects() const {
-  std::vector<const FolderOrItem<gd::Object>*> results;  // GEÄNDERT: Typ
+  std::vector<const FolderOrItem<gd::Object>*> results;
 
-  std::function<void(const FolderOrItem<gd::Object>& folder)> addChildrenOfFolder =  // GEÄNDERT: Typ
-      [&](const FolderOrItem<gd::Object>& folder) {  // GEÄNDERT: Typ
+  std::function<void(const FolderOrItem<gd::Object>& folder)> addChildrenOfFolder =
+      [&](const FolderOrItem<gd::Object>& folder) {
         for (size_t i = 0; i < folder.GetChildrenCount(); ++i) {
           const auto& child = folder.GetChildAt(i);
           results.push_back(&child);
@@ -285,4 +264,4 @@ ObjectsContainer::GetAllObjectFolderOrObjects() const {
   return results;
 }
 
-}  // namespace gd
+}

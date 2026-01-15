@@ -263,7 +263,7 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
     addDefaultLightToAllLayers(newScene);
 
     // Dann als Item in den Folder einfügen
-    this.folder.insertItem(newScene, 0);
+    this.folder.insertObject(newScene, 0);
 
     onProjectItemModified();
     

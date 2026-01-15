@@ -1665,8 +1665,11 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         if (selectedItems[0].content.isDescendantOf(item.content)) {
           setSelectedItems([]);
         }
+        
+        // ✅ NEU: Force Update nach Collapse
+        forceUpdateList();
       },
-      [selectedItems]
+      [selectedItems, forceUpdateList]
     );
 
     // Force List component to be mounted again if project

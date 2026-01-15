@@ -110,6 +110,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
       return;
     }
     this.props.onRenameLayout(oldName, newName);
+    this.props.forceUpdateList();
   }
 
   edit(): void {

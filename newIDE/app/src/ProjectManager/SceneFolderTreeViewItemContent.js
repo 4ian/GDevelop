@@ -253,7 +253,7 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
       name => project.hasLayoutNamed(name)
     );
     
-    // Zuerst Scene im Project erstellen
+    // Zuerst Scene im Project erstellen (wird automatisch in Root eingefügt)
     const newScene = project.insertNewLayout(
       newName, 
       project.getLayoutsCount()
@@ -262,8 +262,20 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
     newScene.updateBehaviorsSharedData(project);
     addDefaultLightToAllLayers(newScene);
 
-    // Dann als Item in den Folder einfügen
-    this.folder.insertObject(newScene, 0);
+    // ✅ NEU: Aus Root entfernen und in Folder verschieben
+    const layoutsRootFolder = project.getLayoutsRootFolder();
+    if (layoutsRootFolder) {
+      // Finde das LayoutFolderOrLayout-Objekt für die neue Scene
+      const sceneInRoot = layoutsRootFolder.getObjectNamed(newName);
+      if (sceneInRoot) {
+        // Verschiebe von Root in den Zielordner
+        layoutsRootFolder.moveObjectFolderOrObjectToAnotherFolder(
+          sceneInRoot,
+          this.folder,
+          0
+        );
+      }
+    }
 
     onProjectItemModified();
     

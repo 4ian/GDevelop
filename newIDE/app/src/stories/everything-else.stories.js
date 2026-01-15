@@ -2286,6 +2286,7 @@ storiesOf('ObjectTypeSelector', module)
   .add('default (Sprite selected)', () => (
     <ObjectTypeSelector
       project={testProject.project}
+      eventsFunctionsExtension={null}
       value={'Sprite'}
       onChange={action('change')}
     />
@@ -2293,6 +2294,7 @@ storiesOf('ObjectTypeSelector', module)
   .add('custom label (Sprite selected)', () => (
     <ObjectTypeSelector
       project={testProject.project}
+      eventsFunctionsExtension={null}
       value={'Sprite'}
       floatingLabelText="Choose the object type to use"
       onChange={action('change')}

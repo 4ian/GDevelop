@@ -1,20 +1,22 @@
 // @flow
 import * as React from 'react';
-import { type ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
+import { type ObjectShortHeader } from '../Utils/GDevelopServices/Extension';
+import { isCompatibleWithGDevelopVersion } from '../Utils/Extension/ExtensionCompatibilityChecker.js';
 import ButtonBase from '@material-ui/core/ButtonBase';
-import Text from '../../UI/Text';
+import Text from '../UI/Text';
 import { Trans } from '@lingui/macro';
-import { Column, Line } from '../../UI/Grid';
-import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
-import HighlightedText from '../../UI/Search/HighlightedText';
-import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
-import Chip from '../../UI/Chip';
-import { LineStackLayout } from '../../UI/Layout';
-import ListIcon from '../../UI/ListIcon';
+import { Line, Column } from '../UI/Grid';
+import HighlightedText from '../UI/Search/HighlightedText';
+import { type SearchMatch } from '../UI/Search/UseSearchStructuredItem';
+import Chip from '../UI/Chip';
+import { LineStackLayout } from '../UI/Layout';
+import { UserPublicProfileChip } from '../UI/User/UserPublicProfileChip';
 import Tooltip from '@material-ui/core/Tooltip';
-import CircledInfo from '../../UI/CustomSvgIcons/SmallCircledInfo';
-import IconButton from '../../UI/IconButton';
-import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
+import CircledInfo from '../UI/CustomSvgIcons/SmallCircledInfo';
+import IconButton from '../UI/IconButton';
+import { getIDEVersion } from '../Version';
+import ListIcon from '../UI/ListIcon';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 
 const styles = {
   button: { width: '100%' },
@@ -23,38 +25,35 @@ const styles = {
     textAlign: 'left',
     overflow: 'hidden',
     width: '100%',
+    paddingLeft: 16,
   },
 };
 
 type Props = {|
   id?: string,
-  project: gdProject,
-  extensionShortHeader: ExtensionShortHeader,
+  objectShortHeader: ObjectShortHeader,
   matches: ?Array<SearchMatch>,
   onChoose: () => void,
+  onShowDetails: () => void,
   onHeightComputed: number => void,
+  platform: gdPlatform,
 |};
 
-export const ExtensionListItem = ({
+export const ObjectListItem = ({
   id,
-  project,
-  extensionShortHeader,
+  objectShortHeader,
   matches,
   onChoose,
+  onShowDetails,
   onHeightComputed,
+  platform,
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
-  const alreadyInstalled = project.hasEventsFunctionsExtensionNamed(
-    extensionShortHeader.name
+  const isEngineCompatible = isCompatibleWithGDevelopVersion(
+    getIDEVersion(),
+    objectShortHeader.gdevelopVersion
   );
-
-  // Test if the local extension comes from the Asset Store
-  const fromStore = alreadyInstalled
-    ? project
-        .getEventsFunctionsExtension(extensionShortHeader.name)
-        .getOriginName() === 'gdevelop-extension-store'
-    : false;
 
   // Report the height of the item once it's known.
   const containerRef = React.useRef<?HTMLDivElement>(null);
@@ -63,8 +62,8 @@ export const ExtensionListItem = ({
       onHeightComputed(containerRef.current.getBoundingClientRect().height);
   });
 
-  const renderExtensionField = (field: 'shortDescription' | 'fullName') => {
-    const originalField = extensionShortHeader[field];
+  const renderField = (field: 'description' | 'fullName') => {
+    const originalField = objectShortHeader[field];
 
     if (!matches) return originalField;
     const nameMatches = matches.filter(match => match.key === field);
@@ -78,15 +77,33 @@ export const ExtensionListItem = ({
     );
   };
 
+  const isEnabled = isEngineCompatible;
+
+  const chooseObject = React.useCallback(
+    () => {
+      if (isEnabled) {
+        onChoose();
+      }
+    },
+    [isEnabled, onChoose]
+  );
+
   const [hover, setHover] = React.useState(false);
 
   return (
-    <ButtonBase id={id} onClick={onChoose} focusRipple style={styles.button}>
+    <ButtonBase
+      id={id}
+      onClick={chooseObject}
+      focusRipple
+      style={styles.button}
+    >
       <div
         style={
-          hover
-            ? { ...styles.container, ...gdevelopTheme.list.hover }
-            : styles.container
+          isEnabled
+            ? hover
+              ? { ...styles.container, ...gdevelopTheme.list.hover }
+              : styles.container
+            : { ...styles.container, opacity: 0.384 }
         }
         onPointerEnter={() => setHover(true)}
         onPointerLeave={() => setHover(false)}
@@ -94,48 +111,34 @@ export const ExtensionListItem = ({
       >
         <LineStackLayout>
           <ListIcon
-            src={extensionShortHeader.previewIconUrl}
+            src={objectShortHeader.previewIconUrl}
             iconSize={32}
             padding={4}
             useExactIconSize
           />
           <Column expand>
-            <LineStackLayout noMargin alignItems="center">
+            <LineStackLayout noMargin expand alignItems="center">
               <Text
                 noMargin
                 allowBrowserAutoTranslate={false}
                 displayInlineAsSpan // Important to avoid the text to use a "p" which causes crashes with automatic translation tools with the highlighted text.
               >
-                {renderExtensionField('fullName')}
+                {renderField('fullName')}
               </Text>
-              {alreadyInstalled && (
+              {objectShortHeader.tier === 'experimental' && (
                 <Chip
                   size="small"
-                  label={
-                    fromStore ? (
-                      <Trans>Already installed</Trans>
-                    ) : (
-                      <Trans>Already in project</Trans>
-                    )
-                  }
-                  color="secondary"
-                  variant="outlined"
-                />
-              )}
-              {extensionShortHeader.tier === 'experimental' && (
-                <Chip
-                  size="small"
-                  label={<Trans>Experimental extension</Trans>}
+                  label={<Trans>Experimental</Trans>}
                   color="primary"
                 />
               )}
-              {extensionShortHeader.authors && (
+              {objectShortHeader.authors && (
                 <Tooltip
                   title={
-                    extensionShortHeader.authors.length > 0 ? (
+                    objectShortHeader.authors.length > 0 ? (
                       <Line>
                         <div style={{ flexWrap: 'wrap' }}>
-                          {extensionShortHeader.authors.map(author => (
+                          {objectShortHeader.authors.map(author => (
                             <UserPublicProfileChip
                               user={author}
                               key={author.id}
@@ -149,7 +152,13 @@ export const ExtensionListItem = ({
                     )
                   }
                 >
-                  <IconButton size="small">
+                  <IconButton
+                    size="small"
+                    onClick={e => {
+                      e.stopPropagation();
+                      onShowDetails();
+                    }}
+                  >
                     <CircledInfo />
                   </IconButton>
                 </Tooltip>
@@ -162,7 +171,7 @@ export const ExtensionListItem = ({
               displayInlineAsSpan // Important to avoid the text to use a "p" which causes crashes with automatic translation tools with the highlighted text.
               color={'secondary'}
             >
-              {renderExtensionField('shortDescription')}
+              {renderField('description')}
             </Text>
           </Column>
         </LineStackLayout>

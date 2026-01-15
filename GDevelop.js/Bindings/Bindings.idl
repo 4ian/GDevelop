@@ -1976,8 +1976,10 @@ interface ObjectMetadata {
     [Const, Ref] DOMString GetIconFilename();
     [Const, Ref] DOMString GetHelpPath();
     [Const, Ref] DOMString GetCategoryFullName();
+    [Const, Ref] DOMString GetAssetStoreTag();
 
     [Ref] ObjectMetadata SetCategoryFullName([Const] DOMString categoryFullName);
+    [Ref] ObjectMetadata SetAssetStoreTag([Const] DOMString assetStoreTag);
     [Ref] InGameEditorResourceMetadata AddInGameEditorResource();
 
     [Const, Ref] InstructionMetadata AddScopedCondition([Const] DOMString name,
@@ -3280,8 +3282,11 @@ interface EventsBasedObject {
     [Ref] EventsBasedObject SetDescription([Const] DOMString description);
     [Ref] EventsBasedObject SetPrivate(boolean isPrivate);
 
+
     [Ref] EventsBasedObject SetDefaultName([Const] DOMString defaultName);
+    [Ref] EventsBasedObject SetAssetStoreTag([Const] DOMString assetStoreTag);
     [Const, Ref] DOMString GetDefaultName();
+    [Const, Ref] DOMString GetAssetStoreTag();
     [Ref] EventsBasedObject MarkAsRenderedIn3D(boolean isRenderedIn3D);
     boolean IsRenderedIn3D();
     [Ref] EventsBasedObject MarkAsAnimatable(boolean isAnimatable);

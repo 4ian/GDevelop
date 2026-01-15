@@ -24,6 +24,7 @@ type Props = {|
    */
   isGDevelopIcon?: boolean,
   useExactIconSize?: boolean,
+  padding?: ?number,
   ...SizeProps,
 |};
 
@@ -43,6 +44,8 @@ function ListIcon(props: Props) {
     brightness,
   } = props;
 
+  const padding = props.padding || 0;
+
   const iconWidth =
     props.iconWidth !== undefined ? props.iconWidth : props.iconSize;
   const iconHeight =
@@ -54,7 +57,12 @@ function ListIcon(props: Props) {
   const paddingRight = iconWidth > 40 ? 16 : 0;
 
   const isBlackIcon =
-    src.startsWith('data:image/svg+xml') || src.includes('_black');
+    src.startsWith('data:image/svg+xml') ||
+    src.startsWith(
+      'https://asset-resources.gdevelop.io/public-resources/Icons/'
+    ) ||
+    src.startsWith('https://resources.gdevelop-app.com/assets/Icons/') ||
+    src.includes('_black');
   const shouldInvertGrayScale = paletteType === 'dark' && isBlackIcon;
 
   let filter = undefined;
@@ -80,11 +88,14 @@ function ListIcon(props: Props) {
   return (
     <div
       style={{
-        width: iconWidth,
-        height: iconHeight,
-        lineHeight: `${iconHeight}px`, // Vertical centering
+        width: iconWidth + 2 * padding,
+        height: iconHeight + 2 * padding,
+        lineHeight: `${iconHeight + 2 * padding}px`, // Vertical centering
         textAlign: 'center', // Horizontal centering
-        paddingRight,
+        paddingRight: padding + paddingRight,
+        paddingLeft: padding,
+        paddingTop: padding,
+        paddingBottom: padding,
       }}
     >
       {isGDevelopIcon ? (

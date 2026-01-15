@@ -841,7 +841,7 @@ gd::String PlatformExtension::GetObjectNameFromFullObjectType(
 }
 
 PlatformExtension::PlatformExtension()
-    : deprecated(false), category(_("General")) {}
+    : deprecated(false), category("General") {}
 
 PlatformExtension::~PlatformExtension() {}
 

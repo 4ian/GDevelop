@@ -327,11 +327,21 @@ export const BehaviorStoreStateProvider = ({
   );
 
   const defaultFirstSearchItemIds = React.useMemo(
-    () => [
-      ...installedBehaviorMetadataList.map(behavior => behavior.type),
-      ...firstBehaviorIds,
-    ],
-    [firstBehaviorIds, installedBehaviorMetadataList]
+    () => {
+      const defaultFirstSearchItemIds = installedBehaviorMetadataList.map(
+        behavior => behavior.type
+      );
+      for (const firstBehaviorId of firstBehaviorIds) {
+        if (!defaultFirstSearchItemIds.includes(firstBehaviorId)) {
+          defaultFirstSearchItemIds.push(firstBehaviorId);
+        }
+      }
+      // An unknown id would make useSearchStructuredItem crash.
+      return defaultFirstSearchItemIds.filter(
+        itemId => allTranslatedBehaviors[itemId]
+      );
+    },
+    [allTranslatedBehaviors, firstBehaviorIds, installedBehaviorMetadataList]
   );
 
   const searchResults: ?Array<

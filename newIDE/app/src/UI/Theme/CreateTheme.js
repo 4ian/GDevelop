@@ -577,6 +577,9 @@ export function createGdevelopTheme({
       list: {
         itemsBackgroundColor:
           styles['ThemeSurfaceAlternateCanvasLightBackgroundColor'],
+        hover: {
+          backgroundColor: styles['ThemeListItemHoverBackgroundColor'],
+        },
       },
       searchBar: {
         backgroundColor: {

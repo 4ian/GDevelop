@@ -1623,7 +1623,9 @@ export class ObjectMetadata extends EmscriptenObject {
   getIconFilename(): string;
   getHelpPath(): string;
   getCategoryFullName(): string;
+  getAssetStoreTag(): string;
   setCategoryFullName(categoryFullName: string): ObjectMetadata;
+  setAssetStoreTag(assetStoreTag: string): ObjectMetadata;
   addInGameEditorResource(): InGameEditorResourceMetadata;
   addScopedCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
   addScopedAction(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
@@ -2367,7 +2369,9 @@ export class EventsBasedObject extends AbstractEventsBasedEntity {
   setDescription(description: string): EventsBasedObject;
   setPrivate(isPrivate: boolean): EventsBasedObject;
   setDefaultName(defaultName: string): EventsBasedObject;
+  setAssetStoreTag(assetStoreTag: string): EventsBasedObject;
   getDefaultName(): string;
+  getAssetStoreTag(): string;
   markAsRenderedIn3D(isRenderedIn3D: boolean): EventsBasedObject;
   isRenderedIn3D(): boolean;
   markAsAnimatable(isAnimatable: boolean): EventsBasedObject;

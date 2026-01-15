@@ -181,6 +181,7 @@ export default function ValueTypeEditor({
             {valueTypeMetadata.isObject() && (
               <ObjectTypeSelector
                 project={project}
+                eventsFunctionsExtension={eventsFunctionsExtension}
                 value={valueTypeMetadata.getExtraInfo()}
                 onChange={(value: string) => {
                   valueTypeMetadata.setExtraInfo(value);

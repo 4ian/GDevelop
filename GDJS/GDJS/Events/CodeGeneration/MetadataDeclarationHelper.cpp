@@ -135,6 +135,7 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
           // Note: EventsFunctionsExtension should be used instead of
           // PlatformExtension but this line will be removed soon.
           .SetCategoryFullName(extension.GetCategory())
+          .SetAssetStoreTag(eventsBasedObject.GetAssetStoreTag())
           .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
           .AddDefaultBehavior("FlippableCapability::FlippableBehavior");
   if (!eventsBasedObject.IsInnerAreaFollowingParentSize()) {

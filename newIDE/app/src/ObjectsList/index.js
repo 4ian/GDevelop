@@ -432,6 +432,7 @@ export type ObjectsListInterface = {|
 type Props = {|
   project: gdProject,
   layout: ?gdLayout,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   eventsBasedObject: gdEventsBasedObject | null,
   initialInstances?: gdInitialInstancesContainer,
   /** The objects retrieved from ProjectScopedContainers must never be kept in a
@@ -512,6 +513,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     {
       project,
       layout,
+      eventsFunctionsExtension,
       eventsBasedObject,
       initialInstances,
       projectScopedContainersAccessor,
@@ -1625,6 +1627,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             onObjectsAddedFromAssets={onObjectsAddedFromAssets}
             project={project}
             layout={layout}
+            eventsFunctionsExtension={eventsFunctionsExtension}
             eventsBasedObject={eventsBasedObject}
             objectsContainer={objectsContainer}
             resourceManagementProps={resourceManagementProps}

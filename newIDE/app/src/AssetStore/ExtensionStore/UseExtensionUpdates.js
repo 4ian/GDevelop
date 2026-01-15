@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import type {
   ExtensionShortHeader,
   BehaviorShortHeader,
+  ObjectShortHeader,
 } from '../../Utils/GDevelopServices/Extension';
 
 type UpdateType = 'patch' | 'minor' | 'major';
@@ -46,7 +47,7 @@ const getUpdateMetadataFromVersions = (
 
 export const useExtensionUpdate = (
   project: gdProject,
-  extension: ExtensionShortHeader | BehaviorShortHeader
+  extension: ExtensionShortHeader | BehaviorShortHeader | ObjectShortHeader
 ): UpdateMetadata | null => {
   return useMemo<UpdateMetadata | null>(
     () => {

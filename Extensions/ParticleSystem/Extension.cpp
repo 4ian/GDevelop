@@ -42,6 +42,7 @@ void DeclareParticleSystemExtension(gd::PlatformExtension& extension) {
                   "visual effects in a 2D game or user interface."),
                 "CppPlatform/Extensions/particleSystemicon.png")
             .SetCategoryFullName(_("Visual effect"))
+            .SetAssetStoreTag("particles emitter")
             .AddDefaultBehavior("EffectCapability::EffectBehavior");
 
     // Declaration is too big to be compiled by GCC in one file, unless you have

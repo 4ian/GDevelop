@@ -13,7 +13,6 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import RaisedButton from '../UI/RaisedButton';
 import { AssetStoreContext } from './AssetStoreContext';
 import AssetPackInstallDialog from './AssetPackInstallDialog';
-import { type EnumeratedObjectMetadata } from '../ObjectsList/EnumerateObjects';
 import {
   installPublicAsset,
   checkRequiredExtensionsUpdateForAssets,
@@ -44,6 +43,7 @@ import { AssetStoreNavigatorContext } from './AssetStoreNavigator';
 import uniq from 'lodash/uniq';
 import { useInstallExtension } from './ExtensionStore/InstallExtension';
 import { ExtensionStoreContext } from './ExtensionStore/ExtensionStoreContext';
+import { type ObjectShortHeader } from '../Utils/GDevelopServices/Extension';
 
 const gd: libGDevelop = global.gd;
 
@@ -249,6 +249,7 @@ export const useInstallAsset = ({
 type Props = {|
   project: gdProject,
   layout: ?gdLayout,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   eventsBasedObject: gdEventsBasedObject | null,
   objectsContainer: gdObjectsContainer,
   resourceManagementProps: ResourceManagementProps,
@@ -263,6 +264,7 @@ type Props = {|
 function NewObjectDialog({
   project,
   layout,
+  eventsFunctionsExtension,
   eventsBasedObject,
   objectsContainer,
   resourceManagementProps,
@@ -315,7 +317,7 @@ function NewObjectDialog({
   const [
     selectedCustomObjectEnumeratedMetadata,
     setSelectedCustomObjectEnumeratedMetadata,
-  ] = React.useState<?EnumeratedObjectMetadata>(null);
+  ] = React.useState<?ObjectShortHeader>(null);
   const isAssetAddedToScene =
     openedAssetShortHeader &&
     existingAssetStoreIds.has(openedAssetShortHeader.id);
@@ -351,7 +353,7 @@ function NewObjectDialog({
   );
 
   const onInstallEmptyCustomObject = React.useCallback(
-    async (enumeratedObjectMetadata: EnumeratedObjectMetadata) => {
+    async (enumeratedObjectMetadata: ObjectShortHeader) => {
       const { requiredExtensions } = enumeratedObjectMetadata;
       if (!requiredExtensions) return;
       try {
@@ -377,7 +379,7 @@ function NewObjectDialog({
         if (!wasExtensionsInstalled) {
           return;
         }
-        onCreateNewObject(enumeratedObjectMetadata.name);
+        onCreateNewObject(enumeratedObjectMetadata.type);
       } catch (error) {
         console.error('Error while creating the object:', error);
         showAlert({
@@ -497,8 +499,8 @@ function NewObjectDialog({
   );
 
   const onObjectTypeSelected = React.useCallback(
-    (enumeratedObjectMetadata: EnumeratedObjectMetadata) => {
-      if (enumeratedObjectMetadata.assetStorePackTag) {
+    (enumeratedObjectMetadata: ObjectShortHeader) => {
+      if (enumeratedObjectMetadata.assetStoreTag) {
         // When the object is from an asset store, display the objects from the pack
         // so that the user can either pick a similar object or skip to create a new one.
         setSelectedCustomObjectEnumeratedMetadata(enumeratedObjectMetadata);
@@ -570,11 +572,9 @@ function NewObjectDialog({
             )}
             {currentTab === 'new-object' &&
               (selectedCustomObjectEnumeratedMetadata &&
-              selectedCustomObjectEnumeratedMetadata.assetStorePackTag ? (
+              selectedCustomObjectEnumeratedMetadata.assetStoreTag ? (
                 <CustomObjectPackResults
-                  packTag={
-                    selectedCustomObjectEnumeratedMetadata.assetStorePackTag
-                  }
+                  packTag={selectedCustomObjectEnumeratedMetadata.assetStoreTag}
                   onAssetSelect={async assetShortHeader => {
                     const result = await onInstallAsset(assetShortHeader);
                     if (result) {
@@ -587,6 +587,7 @@ function NewObjectDialog({
               ) : (
                 <NewObjectFromScratch
                   project={project}
+                  eventsFunctionsExtension={eventsFunctionsExtension}
                   eventsBasedObject={eventsBasedObject}
                   onObjectTypeSelected={onObjectTypeSelected}
                   i18n={i18n}

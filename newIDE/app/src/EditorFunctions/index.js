@@ -1306,11 +1306,41 @@ const changeObjectProperty: EditorFunction = {
         name: propertyName,
       });
 
-      if (!foundPropertyName) {
+      if (!foundPropertyName || !foundProperty) {
         warnings.push(
           `Property not found: ${propertyName} on object ${object_name}.`
         );
         return;
+      }
+
+      const sanitizedNewValue = sanitizePropertyNewValue(
+        foundProperty,
+        newValue
+      );
+
+      if (foundProperty.getType() === 'resource') {
+        if (!project.getResourcesManager().hasResource(sanitizedNewValue)) {
+          warnings.push(
+            `Could not change property "${foundPropertyName}" of object "${object_name}" to "${newValue}" because the resource "${sanitizedNewValue}" does not exist in the project. New resources can't be added just by setting a new name that does not exist. Instead, use \`create_or_replace_object\` to replace the assets of an existing object by new one(s) that will be searched and imported from the asset store (this will keep the object properties, behaviors, events, etc. unchanged).`
+          );
+          return;
+        }
+        const resource = project
+          .getResourcesManager()
+          .getResource(sanitizedNewValue);
+
+        // Check the new resource is of the expected kind.
+        const extraInfos = foundProperty.getExtraInfo().toJSArray();
+        const expectedResourceKind = (extraInfos[0] || '').toLowerCase();
+        if (
+          expectedResourceKind &&
+          resource.getKind().toLowerCase() !== expectedResourceKind
+        ) {
+          warnings.push(
+            `Could not change property "${foundPropertyName}" of object "${object_name}" to "${newValue}" because the resource "${sanitizedNewValue}" exists in project but has type "${resource.getKind()}", which is not the expected type "${expectedResourceKind}".`
+          );
+          return;
+        }
       }
 
       if (

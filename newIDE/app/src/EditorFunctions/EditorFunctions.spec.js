@@ -16,6 +16,49 @@ const makeFakeI18n = (fakeI18n): I18nType => ({
 });
 
 describe('editorFunctions', () => {
+  const makeFakeLaunchFunctionOptionsWithProject = (
+    project: gdProject
+  ): LaunchFunctionOptionsWithProject => ({
+    project,
+    args: {},
+    i18n: makeFakeI18n(),
+    editorCallbacks: {
+      onOpenLayout: jest.fn(),
+      onCreateProject: jest.fn(),
+    },
+    generateEvents: jest.fn(),
+    onInstancesModifiedOutsideEditor: jest.fn(),
+    onObjectGroupsModifiedOutsideEditor: jest.fn(),
+    onSceneEventsModifiedOutsideEditor: jest.fn(),
+    toolOptions: {
+      includeEventsJson: true,
+    },
+    ensureExtensionInstalled: jest.fn(),
+    searchAndInstallAsset: async ({
+      objectsContainer,
+      objectName,
+      objectType,
+    }) => {
+      const object = objectsContainer.insertNewObject(
+        project,
+        objectType,
+        objectName,
+        objectsContainer.getObjectsCount()
+      );
+
+      return Promise.resolve({
+        status: 'asset-installed',
+        message: 'Object installed',
+        createdObjects: [object],
+        assetShortHeader: fakeAssetShortHeader1,
+      });
+    },
+    onObjectsModifiedOutsideEditor: jest.fn(),
+    onWillInstallExtension: jest.fn(),
+    onExtensionInstalled: jest.fn(),
+    PixiResourcesLoader: PixiResourcesLoaderMock,
+  });
+
   describe('create_or_replace_object', () => {
     let project: gdProject;
     let testScene: gdLayout;
@@ -45,53 +88,12 @@ describe('editorFunctions', () => {
       project.delete();
     });
 
-    const makeFakeLaunchFunctionOptionsWithProject = (): LaunchFunctionOptionsWithProject => ({
-      project,
-      args: {},
-      i18n: makeFakeI18n(),
-      editorCallbacks: {
-        onOpenLayout: jest.fn(),
-        onCreateProject: jest.fn(),
-      },
-      generateEvents: jest.fn(),
-      onInstancesModifiedOutsideEditor: jest.fn(),
-      onObjectGroupsModifiedOutsideEditor: jest.fn(),
-      onSceneEventsModifiedOutsideEditor: jest.fn(),
-      toolOptions: {
-        includeEventsJson: true,
-      },
-      ensureExtensionInstalled: jest.fn(),
-      searchAndInstallAsset: async ({
-        objectsContainer,
-        objectName,
-        objectType,
-      }) => {
-        const object = objectsContainer.insertNewObject(
-          project,
-          objectType,
-          objectName,
-          objectsContainer.getObjectsCount()
-        );
-
-        return Promise.resolve({
-          status: 'asset-installed',
-          message: 'Object installed',
-          createdObjects: [object],
-          assetShortHeader: fakeAssetShortHeader1,
-        });
-      },
-      onObjectsModifiedOutsideEditor: jest.fn(),
-      onWillInstallExtension: jest.fn(),
-      onExtensionInstalled: jest.fn(),
-      PixiResourcesLoader: PixiResourcesLoaderMock,
-    });
-
     it('creates a new object (from the asset store)', async () => {
       const onObjectsModifiedOutsideEditor = jest.fn();
 
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
         {
-          ...makeFakeLaunchFunctionOptionsWithProject(),
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
           args: {
             scene_name: 'TestScene',
             object_type: 'TextObject::Text',
@@ -116,7 +118,7 @@ describe('editorFunctions', () => {
 
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
         {
-          ...makeFakeLaunchFunctionOptionsWithProject(),
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
           searchAndInstallAsset: async ({
             objectsContainer,
             objectName,
@@ -153,7 +155,7 @@ describe('editorFunctions', () => {
 
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
         {
-          ...makeFakeLaunchFunctionOptionsWithProject(),
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
           args: {
             scene_name: 'TestScene',
             object_type: 'Sprite',
@@ -178,7 +180,7 @@ describe('editorFunctions', () => {
 
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
         {
-          ...makeFakeLaunchFunctionOptionsWithProject(),
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
           args: {
             scene_name: 'TestScene',
             object_type: 'Sprite',
@@ -206,7 +208,7 @@ describe('editorFunctions', () => {
 
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
         {
-          ...makeFakeLaunchFunctionOptionsWithProject(),
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
           args: {
             scene_name: 'TestScene',
             object_type: 'Sprite',
@@ -243,7 +245,7 @@ describe('editorFunctions', () => {
 
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
         {
-          ...makeFakeLaunchFunctionOptionsWithProject(),
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
           args: {
             scene_name: 'TestScene',
             object_type: 'Sprite',
@@ -285,7 +287,7 @@ describe('editorFunctions', () => {
 
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
         {
-          ...makeFakeLaunchFunctionOptionsWithProject(),
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
           args: {
             scene_name: 'TestScene',
             object_type: 'Sprite',
@@ -308,7 +310,7 @@ describe('editorFunctions', () => {
 
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
         {
-          ...makeFakeLaunchFunctionOptionsWithProject(),
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
           args: {
             scene_name: 'TestScene',
             object_type: 'Sprite',
@@ -329,7 +331,7 @@ describe('editorFunctions', () => {
 
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
         {
-          ...makeFakeLaunchFunctionOptionsWithProject(),
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
           args: {
             scene_name: 'TestScene',
             object_type: 'Sprite',
@@ -364,7 +366,7 @@ describe('editorFunctions', () => {
 
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
         {
-          ...makeFakeLaunchFunctionOptionsWithProject(),
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
           args: {
             scene_name: 'TestScene',
             object_type: 'Sprite',
@@ -409,7 +411,7 @@ describe('editorFunctions', () => {
 
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
         {
-          ...makeFakeLaunchFunctionOptionsWithProject(),
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
           args: {
             scene_name: 'TestScene',
             object_type: 'Sprite',
@@ -437,7 +439,7 @@ describe('editorFunctions', () => {
 
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
         {
-          ...makeFakeLaunchFunctionOptionsWithProject(),
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
           args: {
             scene_name: 'TestScene',
             object_type: 'Sprite',
@@ -464,7 +466,7 @@ describe('editorFunctions', () => {
     it('fails when scene does not exist', async () => {
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
         {
-          ...makeFakeLaunchFunctionOptionsWithProject(),
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
           args: {
             scene_name: 'NonExistentScene',
             object_type: 'Sprite',
@@ -477,6 +479,141 @@ describe('editorFunctions', () => {
       expect(result.message).toMatchInlineSnapshot(
         `"Scene not found: \\"NonExistentScene\\"."`
       );
+    });
+  });
+
+  describe('change_object_property', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+
+      // Add font resources to the project
+      const fontResource1 = new gd.FontResource();
+      fontResource1.setName('font1.ttf');
+      fontResource1.setFile('font1.ttf');
+      const fontResource2 = new gd.FontResource();
+      fontResource2.setName('font2.ttf');
+      fontResource2.setFile('font2.ttf');
+      project.getResourcesManager().addResource(fontResource1);
+      project.getResourcesManager().addResource(fontResource2);
+      const audioResource1 = new gd.AudioResource();
+      audioResource1.setName('audio1.aac');
+      audioResource1.setFile('audio1.aac');
+      project.getResourcesManager().addResource(audioResource1);
+
+      // Create a TextObject with a font property (resource type)
+      const testSceneObjects = testScene.getObjects();
+      const textObject = testSceneObjects.insertNewObject(
+        project,
+        'TextObject::Text',
+        'MyTextObject',
+        testSceneObjects.getObjectsCount()
+      );
+      // Set the font property to an existing resource
+      textObject.getConfiguration().updateProperty('font', 'font1.ttf');
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('successfully changes a resource property from one existing resource to another', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_object_property.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MyTextObject',
+            changed_properties: [
+              {
+                property_name: 'font',
+                new_value: 'font2.ttf',
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(`
+        "Successfully done the changes.
+        Changed property \\"font\\" of object \\"MyTextObject\\" to \\"font2.ttf\\"."
+      `);
+
+      // Verify the property was actually changed
+      const textObject = testScene.getObjects().getObject('MyTextObject');
+      const fontProperty = textObject
+        .getConfiguration()
+        .getProperties()
+        .get('font');
+      expect(fontProperty.getValue()).toBe('font2.ttf');
+    });
+
+    it('fails when changing a resource property to a non-existing resource', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_object_property.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MyTextObject',
+            changed_properties: [
+              {
+                property_name: 'font',
+                new_value: 'non-existing-font.ttf',
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toMatchInlineSnapshot(`
+        "No changes were made because of these issues:
+        Could not change property \\"font\\" of object \\"MyTextObject\\" to \\"non-existing-font.ttf\\" because the resource \\"non-existing-font.ttf\\" does not exist in the project. New resources can't be added just by setting a new name that does not exist. Instead, use \`create_or_replace_object\` to replace the assets of an existing object by new one(s) that will be searched and imported from the asset store (this will keep the object properties, behaviors, events, etc. unchanged)."
+      `);
+
+      // Verify the property was NOT changed (still the original value)
+      const textObject = testScene.getObjects().getObject('MyTextObject');
+      const fontProperty = textObject
+        .getConfiguration()
+        .getProperties()
+        .get('font');
+      expect(fontProperty.getValue()).toBe('font1.ttf');
+    });
+
+    it('fails when changing a resource property to one with a different type', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_object_property.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MyTextObject',
+            changed_properties: [
+              {
+                property_name: 'font',
+                new_value: 'audio1.aac',
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toMatchInlineSnapshot(`
+        "No changes were made because of these issues:
+        Could not change property \\"font\\" of object \\"MyTextObject\\" to \\"audio1.aac\\" because the resource \\"audio1.aac\\" exists in project but has type \\"audio\\", which is not the expected type \\"font\\"."
+      `);
+
+      // Verify the property was NOT changed (still the original value)
+      const textObject = testScene.getObjects().getObject('MyTextObject');
+      const fontProperty = textObject
+        .getConfiguration()
+        .getProperties()
+        .get('font');
+      expect(fontProperty.getValue()).toBe('font1.ttf');
     });
   });
 });

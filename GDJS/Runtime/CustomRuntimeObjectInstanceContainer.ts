@@ -433,7 +433,7 @@ namespace gdjs {
      * in milliseconds, for objects on the layer.
      */
     getElapsedTime(): float {
-      return this._parent.getElapsedTime();
+      return this._customObject.getElapsedTime();
     }
   }
 }

@@ -13,11 +13,14 @@ import type { OpenedVersionStatus } from '../../VersionHistory';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { getStatusColor } from '../../VersionHistory/Utils';
 import SaveProjectIcon from '../SaveProjectIcon';
+import { type FileMetadata } from '../../ProjectsStorage';
 
 export type MainFrameToolbarProps = {|
   showProjectButtons: boolean,
   openShareDialog: () => void,
-  onSave: () => Promise<void>,
+  onSave: (options?: {|
+    skipNewVersionWarning: boolean,
+  |}) => Promise<?FileMetadata>,
   canSave: boolean,
   onOpenVersionHistory: () => void,
   checkedOutVersionStatus?: ?OpenedVersionStatus,
@@ -33,7 +36,9 @@ export type ToolbarInterface = {|
 |};
 
 type LeftButtonsToolbarGroupProps = {|
-  onSave: () => Promise<void>,
+  onSave: (options?: {|
+    skipNewVersionWarning: boolean,
+  |}) => Promise<?FileMetadata>,
   onOpenVersionHistory: () => void,
   checkedOutVersionStatus?: ?OpenedVersionStatus,
   onQuitVersionHistory: () => Promise<void>,

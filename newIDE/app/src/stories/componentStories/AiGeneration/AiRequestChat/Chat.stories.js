@@ -109,6 +109,8 @@ const commonProps = {
   isAutoProcessingFunctionCalls: false,
   onStartOrOpenChat: () => {},
   aiRequestMode: 'chat',
+  saveProject: async () => {},
+  onRestore: async () => {},
 };
 
 const fakeOutputWithUserRequestOnly = [

@@ -11,6 +11,7 @@ import {
   enumerateExternalLayouts,
   enumerateEventsFunctionsExtensions,
 } from '../ProjectManager/EnumerateProjectItems';
+import { type FileMetadata } from '../ProjectsStorage';
 
 type Item =
   | gdLayout
@@ -51,7 +52,7 @@ type CommandHandlers = {|
   onOpenHomePage: () => void,
   onCreateProject: () => void,
   onOpenProject: () => void,
-  onSaveProject: () => Promise<void>,
+  onSaveProject: () => Promise<?FileMetadata>,
   onSaveProjectAs: () => void,
   onCloseApp: () => void,
   onCloseProject: () => Promise<void>,
@@ -123,8 +124,14 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
     handler: handlers.onOpenProject,
   });
 
+  const onSaveProject = handlers.onSaveProject;
   useCommand('SAVE_PROJECT', !!handlers.project, {
-    handler: handlers.onSaveProject,
+    handler: React.useCallback(
+      () => {
+        onSaveProject();
+      },
+      [onSaveProject]
+    ),
   });
 
   useCommand('SAVE_PROJECT_AS', !!handlers.project, {

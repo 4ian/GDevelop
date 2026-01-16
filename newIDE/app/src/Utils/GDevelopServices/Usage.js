@@ -68,6 +68,7 @@ type AiCapability = {
     disabled?: boolean,
     enableWith?: 'higher-tier-plan',
   }>,
+  versionHistory?: { retentionDays: number },
 };
 
 /**
@@ -692,6 +693,10 @@ export const shouldHideClassroomTab = (limits: ?Limits) =>
 export const getCloudProjectHistoryRetentionDays = (limits: ?Limits): number =>
   limits && limits.capabilities.versionHistory.enabled
     ? limits.capabilities.versionHistory.retentionDays
+    : 0;
+export const getAiVersionHistoryRetentionDays = (limits: ?Limits): number =>
+  limits && limits.capabilities.ai.versionHistory
+    ? limits.capabilities.ai.versionHistory.retentionDays
     : 0;
 
 export function getSummarizedSubscriptionPlanFeatures(

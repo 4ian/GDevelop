@@ -576,6 +576,7 @@ export const limitsForNoSubscriptionUser: Limits = {
     versionHistory: { enabled: false, retentionDays: 0 },
     ai: {
       availablePresets: [],
+      versionHistory: { retentionDays: 1 },
     },
   },
   quotas: {
@@ -963,6 +964,7 @@ export const limitsReached: Limits = {
     versionHistory: { enabled: false, retentionDays: 0 },
     ai: {
       availablePresets: [],
+      versionHistory: { retentionDays: 1 },
     },
   },
   quotas: {
@@ -1018,6 +1020,7 @@ export const limitsForNoSubscriptionUserWithCredits: Limits = {
     versionHistory: { enabled: false, retentionDays: 0 },
     ai: {
       availablePresets: [],
+      versionHistory: { retentionDays: 1 },
     },
   },
   quotas: {

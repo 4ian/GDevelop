@@ -149,6 +149,7 @@ module.exports = {
         'Extensions/BitmapText/bitmaptextruntimeobject-pixi-renderer.js'
       )
       .setCategoryFullName(_('Text'))
+      .setAssetStoreTag('bitmap texts')
       .addDefaultBehavior('TextContainerCapability::TextContainerBehavior')
       .addDefaultBehavior('EffectCapability::EffectBehavior')
       .addDefaultBehavior('OpacityCapability::OpacityBehavior')

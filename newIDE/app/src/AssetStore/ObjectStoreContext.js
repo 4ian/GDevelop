@@ -230,6 +230,17 @@ export const ObjectStoreStateProvider = ({
               englishFullName: objectShortHeader.fullName,
               englishDescription: objectShortHeader.description,
             };
+
+            const objectExtension: ExtensionDependency = {
+              extensionName: objectShortHeader.extensionName,
+              extensionVersion: objectShortHeader.version,
+            };
+            // In the repository, `requiredExtensions` doesn't includes its own extension.
+            // We add it because we need it to check for updates.
+            translatedObjectShortHeader.requiredExtensions = objectShortHeader.requiredExtensions
+              ? [objectExtension, ...objectShortHeader.requiredExtensions]
+              : [objectExtension];
+
             translatedObjectShortHeadersByType[
               objectShortHeader.type
             ] = translatedObjectShortHeader;
@@ -321,16 +332,6 @@ export const ObjectStoreStateProvider = ({
         };
         delete objectShortHeader.englishFullName;
         delete objectShortHeader.englishDescription;
-
-        const objectExtension: ExtensionDependency = {
-          extensionName: objectShortHeader.extensionName,
-          extensionVersion: objectShortHeader.version,
-        };
-        // In the repository, `requiredExtensions` doesn't includes its own extension.
-        // We add it because we need it to check for updates.
-        objectShortHeader.requiredExtensions = objectShortHeader.requiredExtensions
-          ? [objectExtension, ...objectShortHeader.requiredExtensions]
-          : [objectExtension];
 
         allTranslatedObjects[type] = objectShortHeader;
       }

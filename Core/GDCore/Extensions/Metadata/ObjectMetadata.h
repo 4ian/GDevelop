@@ -221,11 +221,11 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
   }
 
   /**
-   * \brief Set the (user friendly) name of the group this object must
-   * be categorised in.
+   * \brief Set the name of the group identifier this object must
+   * be categorized in.
    */
-  ObjectMetadata& SetCategoryFullName(const gd::String& categoryFullName_) {
-    categoryFullName = categoryFullName_;
+  ObjectMetadata& SetCategory(const gd::String& category_) {
+    category = category_;
     return *this;
   }
 
@@ -274,7 +274,7 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
 
   const gd::String& GetName() const override { return name; }
   const gd::String& GetFullName() const override { return fullname; }
-  const gd::String& GetCategoryFullName() const { return categoryFullName; }
+  const gd::String& GetCategory() const { return category; }
   const gd::String& GetHelpUrl() const { return helpUrl; }
   const gd::String& GetDescription() const override { return description; }
   const gd::String& GetIconFilename() const override { return iconFilename; }
@@ -403,7 +403,7 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
   gd::String fullname;
   gd::String description;
   gd::String iconFilename;
-  gd::String categoryFullName;
+  gd::String category;
   gd::String assetStoreTag;
   std::set<gd::String> defaultBehaviorTypes;
   bool isPrivate = false;

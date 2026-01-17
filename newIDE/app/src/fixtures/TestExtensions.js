@@ -387,7 +387,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
         'JsPlatform/Extensions/3d_box.svg',
         Cube3DObject
       )
-      .setCategoryFullName('General')
+      .setCategory('General')
       .markAsRenderedIn3D();
     platform.addNewExtension(extension);
     extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
@@ -464,7 +464,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
         'JsPlatform/Extensions/text_input.svg',
         textInputObject
       )
-      .setCategoryFullName('User interface');
+      .setCategory('User interface');
 
     platform.addNewExtension(extension);
     extension.delete(); // Release the extension as it was copied inside gd.JsPlatform

@@ -329,7 +329,7 @@ module.exports = {
         'JsPlatform/Extensions/text_input.svg',
         textInputObject
       )
-      .setCategoryFullName(_('User interface'))
+      .setCategory('User interface')
       // Effects are unsupported because the object is not rendered with PIXI.
       .setIncludeFile('Extensions/TextInput/textinputruntimeobject.js')
       .addIncludeFile(

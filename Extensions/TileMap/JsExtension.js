@@ -176,7 +176,7 @@ const defineTileMap = function (extension, _, gd) {
       'JsPlatform/Extensions/tile_map.svg',
       objectTileMap
     )
-    .setCategoryFullName(_('Advanced'))
+    .setCategory('Advanced')
     .addDefaultBehavior('ResizableCapability::ResizableBehavior')
     .addDefaultBehavior('ScalableCapability::ScalableBehavior')
     .addDefaultBehavior('OpacityCapability::OpacityBehavior')
@@ -722,7 +722,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       'JsPlatform/Extensions/tile_map.svg',
       objectSimpleTileMap
     )
-    .setCategoryFullName(_('General'))
+    .setCategory('General')
     .setOpenFullEditorLabel(_('Edit tileset and collisions'))
     .addDefaultBehavior('ResizableCapability::ResizableBehavior')
     .addDefaultBehavior('ScalableCapability::ScalableBehavior')
@@ -1271,7 +1271,7 @@ const defineCollisionMask = function (extension, _, gd) {
       'JsPlatform/Extensions/tile_map_collision_mask32.svg',
       collisionMaskObject
     )
-    .setCategoryFullName(_('Advanced'))
+    .setCategory('Advanced')
     .addDefaultBehavior('ResizableCapability::ResizableBehavior')
     .addDefaultBehavior('ScalableCapability::ScalableBehavior')
     .setIncludeFile('Extensions/TileMap/tilemapcollisionmaskruntimeobject.js')

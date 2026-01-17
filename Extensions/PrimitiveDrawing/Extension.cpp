@@ -19,7 +19,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
             "on the screen using events."),
           "Florian Rival and Aurélien Vivet",
           "Open source (MIT License)")
-      .SetExtensionHelpPath("/objects/shape_painter");
+      .SetExtensionHelpPath("/objects/shape_painter")
+      .SetCategory("Advanced");
   extension.AddInstructionOrExpressionGroupMetadata(_("Shape painter"))
       .SetIcon("CppPlatform/Extensions/primitivedrawingicon.png");
 
@@ -30,7 +31,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
               _("Shape painter"),
               _("Draw basic 2D shapes using events."),
               "CppPlatform/Extensions/primitivedrawingicon.png")
-          .SetCategoryFullName(_("Advanced"))
+          .SetCategory("Advanced")
           .AddDefaultBehavior("EffectCapability::EffectBehavior")
           .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
           .AddDefaultBehavior("ScalableCapability::ScalableBehavior")

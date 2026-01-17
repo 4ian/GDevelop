@@ -5,9 +5,9 @@ declare class gdObjectMetadata {
   getDescription(): string;
   getIconFilename(): string;
   getHelpPath(): string;
-  getCategoryFullName(): string;
+  getCategory(): string;
   getAssetStoreTag(): string;
-  setCategoryFullName(categoryFullName: string): gdObjectMetadata;
+  setCategory(categoryFullName: string): gdObjectMetadata;
   setAssetStoreTag(assetStoreTag: string): gdObjectMetadata;
   addInGameEditorResource(): gdInGameEditorResourceMetadata;
   addScopedCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): gdInstructionMetadata;

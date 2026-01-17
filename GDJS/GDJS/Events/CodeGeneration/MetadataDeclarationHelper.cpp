@@ -134,7 +134,7 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
           // several categories, we can assume it"s not scoped correctly.
           // Note: EventsFunctionsExtension should be used instead of
           // PlatformExtension but this line will be removed soon.
-          .SetCategoryFullName(extension.GetCategory())
+          .SetCategory(extension.GetCategory())
           .SetAssetStoreTag(eventsBasedObject.GetAssetStoreTag())
           .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
           .AddDefaultBehavior("FlippableCapability::FlippableBehavior");

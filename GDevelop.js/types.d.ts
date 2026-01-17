@@ -1622,9 +1622,9 @@ export class ObjectMetadata extends EmscriptenObject {
   getDescription(): string;
   getIconFilename(): string;
   getHelpPath(): string;
-  getCategoryFullName(): string;
+  getCategory(): string;
   getAssetStoreTag(): string;
-  setCategoryFullName(categoryFullName: string): ObjectMetadata;
+  setCategory(categoryFullName: string): ObjectMetadata;
   setAssetStoreTag(assetStoreTag: string): ObjectMetadata;
   addInGameEditorResource(): InGameEditorResourceMetadata;
   addScopedCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;

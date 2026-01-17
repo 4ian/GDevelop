@@ -256,7 +256,7 @@ module.exports = {
           'JsPlatform/Extensions/3d_model.svg',
           new gd.Model3DObjectConfiguration()
         )
-        .setCategoryFullName(_('General'))
+        .setCategory('General')
         // Effects are unsupported because the object is not rendered with PIXI.
         .addDefaultBehavior('ResizableCapability::ResizableBehavior')
         .addDefaultBehavior('ScalableCapability::ScalableBehavior')
@@ -1183,7 +1183,7 @@ module.exports = {
         'JsPlatform/Extensions/3d_box.svg',
         Cube3DObject
       )
-      .setCategoryFullName(_('General'))
+      .setCategory('General')
       // Effects are unsupported because the object is not rendered with PIXI.
       .addDefaultBehavior('ResizableCapability::ResizableBehavior')
       .addDefaultBehavior('ScalableCapability::ScalableBehavior')

@@ -37,7 +37,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
           .AddDefaultBehavior("EffectCapability::EffectBehavior")
           .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
           .AddDefaultBehavior("OpacityCapability::OpacityBehavior")
-          .SetCategoryFullName(_("General"));
+          .SetCategory("General");
 
   // Deprecated
   obj.AddCondition("Opacity",

@@ -54,7 +54,7 @@ module.exports = {
       .addIncludeFile('Extensions/Spine/pixi-spine/pixi-spine.js')
       .addIncludeFile('Extensions/Spine/managers/pixi-spine-atlas-manager.js')
       .addIncludeFile('Extensions/Spine/managers/pixi-spine-manager.js')
-      .setCategoryFullName(_('Advanced'))
+      .setCategory('Advanced')
       .setOpenFullEditorLabel(_('Edit animations'));
 
     object

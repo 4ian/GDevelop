@@ -40,7 +40,7 @@ void DeclareParticleSystemExtension(gd::PlatformExtension& extension) {
                 _("2D particles emitter"),
                 _("2D effects like smoke, fire or sparks."),
                 "CppPlatform/Extensions/particleSystemicon.png")
-            .SetCategoryFullName(_("Visual effect"))
+            .SetCategory("Visual effect")
             .SetAssetStoreTag("particles emitter")
             .AddDefaultBehavior("EffectCapability::EffectBehavior");
 

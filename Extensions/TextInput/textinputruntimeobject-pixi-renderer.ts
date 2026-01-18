@@ -190,6 +190,72 @@ namespace gdjs {
       const runtimeGame = this._instanceContainer.getGame();
       const runtimeGameRenderer = runtimeGame.getRenderer();
       const layer = this._instanceContainer.getLayer(this._object.getLayer());
+      const layerRenderer = layer.getRenderer();
+
+      // Check if we're rendering in 3D mode and should use 3D positioning.
+      if (layerRenderer.isRenderingIn3DWithPlane()) {
+        const transform3D = layerRenderer.computeDOMElementTransformIn3D(
+          this._object.x,
+          this._object.y,
+          this._object.getWidth(),
+          this._object.getHeight(),
+          this._object.getAngle()
+        );
+
+        if (transform3D) {
+          // Convert center position from canvas to DOM container coordinates.
+          workingPoint[0] = transform3D.centerX;
+          workingPoint[1] = transform3D.centerY;
+          runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
+            workingPoint,
+            workingPoint
+          );
+          const domCenterX = workingPoint[0];
+          const domCenterY = workingPoint[1];
+
+          // Scale width and height to DOM container space.
+          const domScale =
+            runtimeGameRenderer.getCanvasToDomElementContainerHeightScale();
+          const domWidth = transform3D.width * domScale;
+          const domHeight = transform3D.height * domScale;
+
+          // Position the element so its center is at the projected center.
+          const domLeft = domCenterX - domWidth / 2;
+          const domTop = domCenterY - domHeight / 2;
+
+          // Apply the 3D positioning to the DOM element.
+          this._form.style.left = domLeft + 'px';
+          this._form.style.top = domTop + 'px';
+          this._form.style.width = domWidth + 'px';
+          this._form.style.height = domHeight + 'px';
+          this._form.style.transformOrigin = 'center center';
+          this._form.style.transform = `rotate(${transform3D.rotationDeg}deg)`;
+          this._form.style.textAlign = this._object.getTextAlign();
+
+          // Adjust padding proportionally to the projected scale.
+          const paddingScale = transform3D.scaleForText * domScale;
+          this._input.style.padding = `${(
+            this._object.getPaddingY() * paddingScale
+          ).toFixed(2)}px ${(this._object.getPaddingX() * paddingScale).toFixed(
+            2
+          )}px`;
+
+          // Automatically adjust the font size to follow the 3D scale.
+          this._input.style.fontSize =
+            this._object.getFontSize() * transform3D.scaleForText * domScale +
+            'px';
+
+          // Display after the object is positioned.
+          this._form.style.display = 'initial';
+          return;
+        }
+        // If 3D transform computation failed (e.g., object behind camera),
+        // hide the element.
+        this._form.style.display = 'none';
+        return;
+      }
+
+      // Standard 2D positioning (no 3D camera rotation).
       const topLeftCanvasCoordinates = layer.convertInverseCoords(
         this._object.x,
         this._object.y,
@@ -245,6 +311,7 @@ namespace gdjs {
       this._form.style.top = pageTop + 'px';
       this._form.style.width = widthInContainer + 'px';
       this._form.style.height = heightInContainer + 'px';
+      this._form.style.transformOrigin = 'center center';
       this._form.style.transform =
         'rotate3d(0,0,1,' + (this._object.getAngle() % 360) + 'deg)';
       this._form.style.textAlign = this._object.getTextAlign();

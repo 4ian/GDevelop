@@ -1064,6 +1064,229 @@ namespace gdjs {
       return result;
     }
 
+    /**
+     * Check if the layer is rendering in 3D mode with a 2D plane
+     * (i.e., has a 3D camera and a plane mesh for 2D content).
+     */
+    isRenderingIn3DWithPlane(): boolean {
+      return !!(this._threeCamera && this._threePlaneMesh && this.has3DObjects());
+    }
+
+    /**
+     * Project a point from 3D world coordinates (with Y flipped, as used in Three.js scene)
+     * to canvas coordinates.
+     *
+     * @param worldX The X position in 3D world coordinates.
+     * @param worldY The Y position in 3D world coordinates (already flipped for Three.js).
+     * @param worldZ The Z position in 3D world coordinates.
+     * @param result The point instance that is used to return the result.
+     * @returns The canvas coordinates, or null if the point is behind the camera.
+     */
+    projectWorldToCanvas(
+      worldX: float,
+      worldY: float,
+      worldZ: float,
+      result: FloatPoint
+    ): FloatPoint | null {
+      const camera = this._threeCamera;
+      if (!camera) {
+        return null;
+      }
+
+      let vector = LayerPixiRenderer.vectorForProjections;
+      if (!vector) {
+        vector = new THREE.Vector3();
+        LayerPixiRenderer.vectorForProjections = vector;
+      }
+
+      vector.set(worldX, worldY, worldZ);
+
+      camera.updateMatrixWorld();
+
+      // Project the point to normalized device coordinates (-1 to 1).
+      vector.project(camera);
+
+      // Check if the point is behind the camera (z > 1 means behind).
+      if (vector.z > 1) {
+        return null;
+      }
+
+      // Convert from NDC (-1 to 1) to canvas coordinates.
+      const width = this._layer.getWidth();
+      const height = this._layer.getHeight();
+      result[0] = ((vector.x + 1) / 2) * width;
+      result[1] = ((-vector.y + 1) / 2) * height;
+
+      return result;
+    }
+
+    /**
+     * Get the 2D plane's current transformation data for DOM element positioning.
+     * Returns null if not rendering in 3D mode with a 2D plane.
+     *
+     * @returns Object containing plane position, size, and rotation, or null.
+     */
+    get2DPlaneTransformData(): {
+      centerX: float;
+      centerY: float;
+      width: float;
+      height: float;
+      rotationZ: float;
+    } | null {
+      if (!this._threePlaneMesh || !this._threeCamera) {
+        return null;
+      }
+
+      const [boxW, boxH] = this._get2DPlaneSize();
+      if (boxW === 0 || boxH === 0) {
+        return null;
+      }
+
+      const [cx, cy] = this._get2DPlanePosition(boxH);
+
+      return {
+        centerX: cx,
+        centerY: cy,
+        width: boxW,
+        height: boxH,
+        rotationZ: -gdjs.toRad(this._layer.getCameraRotation()),
+      };
+    }
+
+    /**
+     * Compute the CSS transform properties for a DOM element to appear
+     * on the 2D plane in 3D space.
+     *
+     * This computes position, size, and rotation based on the projected corners
+     * of the object, preserving text readability while approximating the 3D position.
+     * All returned coordinates are in canvas space.
+     *
+     * @param objectX The object X position in scene coordinates.
+     * @param objectY The object Y position in scene coordinates.
+     * @param objectWidth The object width.
+     * @param objectHeight The object height.
+     * @param objectAngle The object angle in degrees.
+     * @returns Object with CSS transform data in canvas coordinates, or null if not in 3D mode or not visible.
+     */
+    computeDOMElementTransformIn3D(
+      objectX: float,
+      objectY: float,
+      objectWidth: float,
+      objectHeight: float,
+      objectAngle: float
+    ): {
+      rotationDeg: float;
+      centerX: float;
+      centerY: float;
+      width: float;
+      height: float;
+      scaleForText: float;
+    } | null {
+      const camera = this._threeCamera;
+      const planeMesh = this._threePlaneMesh;
+      if (!camera || !planeMesh || !this.has3DObjects()) {
+        return null;
+      }
+
+      const workingPoint: FloatPoint = [0, 0];
+
+      // Calculate the object's center in scene coordinates.
+      const objectCenterX = objectX + objectWidth / 2;
+      const objectCenterY = objectY + objectHeight / 2;
+
+      // Get the 4 corners of the object in scene coordinates.
+      const angleRad = gdjs.toRad(objectAngle);
+      const cos = Math.cos(angleRad);
+      const sin = Math.sin(angleRad);
+      const hw = objectWidth / 2;
+      const hh = objectHeight / 2;
+
+      // Corners relative to center, then rotated and translated.
+      // Order: top-left, top-right, bottom-right, bottom-left
+      const corners: Array<[float, float]> = [
+        [-hw, -hh],
+        [hw, -hh],
+        [hw, hh],
+        [-hw, hh],
+      ];
+
+      const projectedCorners: Array<[float, float]> = [];
+
+      for (const [dx, dy] of corners) {
+        // Rotate the corner offset.
+        const rx = dx * cos - dy * sin;
+        const ry = dx * sin + dy * cos;
+
+        // World position (Y flipped for Three.js).
+        const worldX = objectCenterX + rx;
+        const worldY = -(objectCenterY + ry);
+        const worldZ = 0;
+
+        const projected = this.projectWorldToCanvas(
+          worldX,
+          worldY,
+          worldZ,
+          workingPoint
+        );
+        if (!projected) {
+          // Point is behind the camera, can't render.
+          return null;
+        }
+        projectedCorners.push([projected[0], projected[1]]);
+      }
+
+      const [tl, tr, br, bl] = projectedCorners;
+
+      // Check if any corner is outside the canvas bounds (with some margin).
+      const canvasWidth = this._layer.getWidth();
+      const canvasHeight = this._layer.getHeight();
+      const margin = Math.max(canvasWidth, canvasHeight) * 2;
+      for (const corner of projectedCorners) {
+        if (
+          corner[0] < -margin ||
+          corner[0] > canvasWidth + margin ||
+          corner[1] < -margin ||
+          corner[1] > canvasHeight + margin
+        ) {
+          return null;
+        }
+      }
+
+      // Calculate the center of the projected quadrilateral (in canvas coordinates).
+      const projCenterX = (tl[0] + tr[0] + br[0] + bl[0]) / 4;
+      const projCenterY = (tl[1] + tr[1] + br[1] + bl[1]) / 4;
+
+      // Calculate the projected width and height (in canvas pixels).
+      // Width: average of top and bottom edge lengths.
+      const topEdgeLength = Math.hypot(tr[0] - tl[0], tr[1] - tl[1]);
+      const bottomEdgeLength = Math.hypot(br[0] - bl[0], br[1] - bl[1]);
+      const projWidth = (topEdgeLength + bottomEdgeLength) / 2;
+
+      // Height: average of left and right edge lengths.
+      const leftEdgeLength = Math.hypot(bl[0] - tl[0], bl[1] - tl[1]);
+      const rightEdgeLength = Math.hypot(br[0] - tr[0], br[1] - tr[1]);
+      const projHeight = (leftEdgeLength + rightEdgeLength) / 2;
+
+      // Calculate the rotation from the projected top edge (in radians).
+      const projAngleRad = Math.atan2(tr[1] - tl[1], tr[0] - tl[0]);
+      const projAngleDeg = (projAngleRad * 180) / Math.PI;
+
+      // Calculate scale factor for text (relative to original object size).
+      // This is the average of width and height scales.
+      const scaleX = projWidth / objectWidth;
+      const scaleY = projHeight / objectHeight;
+      const scaleForText = (scaleX + scaleY) / 2;
+
+      return {
+        rotationDeg: projAngleDeg,
+        centerX: projCenterX,
+        centerY: projCenterY,
+        width: projWidth,
+        height: projHeight,
+        scaleForText,
+      };
+    }
+
     updateVisibility(visible: boolean): void {
       this._pixiContainer.visible = !!visible;
       if (this._threeGroup) this._threeGroup.visible = !!visible;

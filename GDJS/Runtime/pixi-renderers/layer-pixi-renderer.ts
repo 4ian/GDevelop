@@ -1117,6 +1117,77 @@ namespace gdjs {
       return !!this._threeGroup && this._threeGroup.children.length > 0;
     }
 
+    /**
+     * Check if the layer is currently rendered in 3D mode.
+     * This means the 2D content is rendered on a texture, which is displayed on a 3D plane.
+     */
+    willRenderIn3D(): boolean {
+      return !!(
+        this._threeCamera &&
+        this._threePlaneMesh &&
+        this.has3DObjects()
+      );
+    }
+
+    /**
+     * Project a point from the 2D layer (texture) coordinates to the 2D screen coordinates,
+     * accounting for the 3D positioning of the layer.
+     *
+     * @param textureX The X coordinate on the layer (which is the texture in 3D mode).
+     * @param textureY The Y coordinate on the layer (which is the texture in 3D mode).
+     * @param result The array to store the result (Screen X, Screen Y).
+     * @returns The result array.
+     */
+    projectTextureCoordsToScreen(
+      textureX: float,
+      textureY: float,
+      result: FloatPoint
+    ): FloatPoint {
+      if (!this._threeCamera || !this._threePlaneMesh) {
+        result[0] = 0;
+        result[1] = 0;
+        return result;
+      }
+
+      const width = this._layer.getWidth();
+      const height = this._layer.getHeight();
+
+      // 1. Normalized Texture Coordinates (0..1)
+      const u = textureX / width;
+      const v = textureY / height;
+
+      // 2. Local Plane Coordinates
+      const boxW = this._threePlaneMesh.scale.x;
+      const boxH = this._threePlaneMesh.scale.y;
+
+      const localX = (u - 0.5) * boxW;
+      const localY = (0.5 - v) * boxH;
+
+      // 3. World Coordinates
+      // Note: We assume _threePlaneMesh.matrixWorld is up to date or we force update it.
+      this._threePlaneMesh.updateMatrixWorld(true);
+
+      const vector = new THREE.Vector3(localX, localY, 0);
+      vector.applyMatrix4(this._threePlaneMesh.matrixWorld);
+
+      // 4. Scene Y-Mirror (The scene has scale.y = -1)
+      vector.y = -vector.y;
+
+      // 5. Project to Screen
+      this._threeCamera.updateMatrixWorld(true);
+      vector.project(this._threeCamera);
+
+      // vector is now NDC (-1..1)
+      const game = this._layer.getRuntimeScene().getGame();
+      const screenWidth = game.getGameResolutionWidth();
+      const screenHeight = game.getGameResolutionHeight();
+
+      result[0] = (vector.x + 1) * 0.5 * screenWidth;
+      result[1] = (-vector.y + 1) * 0.5 * screenHeight;
+
+      return result;
+    }
+
     has2DObjects(): boolean {
       return this._pixiContainer.children.length > 0;
     }

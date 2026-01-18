@@ -190,63 +190,192 @@ namespace gdjs {
       const runtimeGame = this._instanceContainer.getGame();
       const runtimeGameRenderer = runtimeGame.getRenderer();
       const layer = this._instanceContainer.getLayer(this._object.getLayer());
-      const topLeftCanvasCoordinates = layer.convertInverseCoords(
-        this._object.x,
-        this._object.y,
-        0,
-        workingPoint
-      );
-      const canvasLeft = topLeftCanvasCoordinates[0];
-      const canvasTop = topLeftCanvasCoordinates[1];
+      
+      const layerRenderer = layer.getRenderer();
+      const is3D =
+        layerRenderer instanceof gdjs.LayerPixiRenderer &&
+        layerRenderer.willRenderIn3D();
 
-      const bottomRightCanvasCoordinates = layer.convertInverseCoords(
-        this._object.x + this._object.getWidth(),
-        this._object.y + this._object.getHeight(),
-        0,
-        workingPoint
-      );
-      const canvasRight = bottomRightCanvasCoordinates[0];
-      const canvasBottom = bottomRightCanvasCoordinates[1];
+      let pageLeft = 0;
+      let pageTop = 0;
+      let widthInContainer = 0;
+      let heightInContainer = 0;
+      let rotation = 0;
 
-      // Hide the input entirely if not visible at all.
-      const isOutsideCanvas =
-        canvasRight < 0 ||
-        canvasBottom < 0 ||
-        canvasLeft > runtimeGame.getGameResolutionWidth() ||
-        canvasTop > runtimeGame.getGameResolutionHeight();
-      if (isOutsideCanvas) {
-        this._form.style.display = 'none';
-        return;
+      if (is3D) {
+        // 3D Rendering:
+        // The layer is rendered on a texture, which is projected on a 3D plane.
+        // We need to calculate the screen coordinates of the projected object.
+        const pixiLayerRenderer = layerRenderer as gdjs.LayerPixiRenderer;
+
+        // 1. Get Texture Coordinates for corners and center
+        // Note: convertInverseCoords returns coordinates on the target (Texture in 3D mode).
+        
+        // Top-Left
+        layer.convertInverseCoords(
+          this._object.x,
+          this._object.y,
+          0,
+          workingPoint
+        );
+        const tTLx = workingPoint[0];
+        const tTLy = workingPoint[1];
+        
+        // Top-Right
+        layer.convertInverseCoords(
+          this._object.x + this._object.getWidth(),
+          this._object.y,
+          0,
+          workingPoint
+        );
+        const tTRx = workingPoint[0];
+        const tTRy = workingPoint[1];
+
+        // Bottom-Left
+        layer.convertInverseCoords(
+          this._object.x,
+          this._object.y + this._object.getHeight(),
+          0,
+          workingPoint
+        );
+        const tBLx = workingPoint[0];
+        const tBLy = workingPoint[1];
+
+        // Center
+        layer.convertInverseCoords(
+          this._object.x + this._object.getWidth() / 2,
+          this._object.y + this._object.getHeight() / 2,
+          0,
+          workingPoint
+        );
+        const tCx = workingPoint[0];
+        const tCy = workingPoint[1];
+
+        // 2. Project Texture Coordinates to Screen Coordinates
+        
+        pixiLayerRenderer.projectTextureCoordsToScreen(tTLx, tTLy, workingPoint);
+        const sTLx = workingPoint[0];
+        const sTLy = workingPoint[1];
+
+        pixiLayerRenderer.projectTextureCoordsToScreen(tTRx, tTRy, workingPoint);
+        const sTRx = workingPoint[0];
+        const sTRy = workingPoint[1];
+        
+        pixiLayerRenderer.projectTextureCoordsToScreen(tBLx, tBLy, workingPoint);
+        const sBLx = workingPoint[0];
+        const sBLy = workingPoint[1];
+
+        pixiLayerRenderer.projectTextureCoordsToScreen(tCx, tCy, workingPoint);
+        const sCx = workingPoint[0];
+        const sCy = workingPoint[1];
+
+        // 3. Convert Screen Coordinates to DOM Container Coordinates
+        // Helper to convert in place
+        const toDom = (x: number, y: number, out: FloatPoint) => {
+          out[0] = x;
+          out[1] = y;
+          runtimeGameRenderer.convertCanvasToDomElementContainerCoords(out, out);
+        };
+
+        toDom(sTLx, sTLy, workingPoint);
+        const dTLx = workingPoint[0];
+        const dTLy = workingPoint[1];
+
+        toDom(sTRx, sTRy, workingPoint);
+        const dTRx = workingPoint[0];
+        const dTRy = workingPoint[1];
+
+        toDom(sBLx, sBLy, workingPoint);
+        const dBLx = workingPoint[0];
+        const dBLy = workingPoint[1];
+
+        toDom(sCx, sCy, workingPoint);
+        const dCx = workingPoint[0];
+        const dCy = workingPoint[1];
+
+        // 4. Calculate Style Properties
+        widthInContainer = Math.hypot(dTRx - dTLx, dTRy - dTLy);
+        heightInContainer = Math.hypot(dBLx - dTLx, dBLy - dTLy);
+        
+        pageLeft = dCx - widthInContainer / 2;
+        pageTop = dCy - heightInContainer / 2;
+        
+        rotation = Math.atan2(dTRy - dTLy, dTRx - dTLx) * (180 / Math.PI);
+
+        // Visibility Check (simple center check or bounds check)
+        const isOutsideCanvas =
+           sCx < 0 ||
+           sCy < 0 ||
+           sCx > runtimeGame.getGameResolutionWidth() ||
+           sCy > runtimeGame.getGameResolutionHeight();
+        
+        if (isOutsideCanvas) {
+            this._form.style.display = 'none';
+            return;
+        }
+
+      } else {
+        // 2D Rendering (Standard)
+        const topLeftCanvasCoordinates = layer.convertInverseCoords(
+          this._object.x,
+          this._object.y,
+          0,
+          workingPoint
+        );
+        const canvasLeft = topLeftCanvasCoordinates[0];
+        const canvasTop = topLeftCanvasCoordinates[1];
+
+        const bottomRightCanvasCoordinates = layer.convertInverseCoords(
+          this._object.x + this._object.getWidth(),
+          this._object.y + this._object.getHeight(),
+          0,
+          workingPoint
+        );
+        const canvasRight = bottomRightCanvasCoordinates[0];
+        const canvasBottom = bottomRightCanvasCoordinates[1];
+
+        // Hide the input entirely if not visible at all.
+        const isOutsideCanvas =
+          canvasRight < 0 ||
+          canvasBottom < 0 ||
+          canvasLeft > runtimeGame.getGameResolutionWidth() ||
+          canvasTop > runtimeGame.getGameResolutionHeight();
+        if (isOutsideCanvas) {
+          this._form.style.display = 'none';
+          return;
+        }
+
+        // Position the input on the container on top of the canvas.
+        workingPoint[0] = canvasLeft;
+        workingPoint[1] = canvasTop;
+        runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
+          workingPoint,
+          workingPoint
+        );
+        pageLeft = workingPoint[0];
+        pageTop = workingPoint[1];
+
+        workingPoint[0] = canvasRight;
+        workingPoint[1] = canvasBottom;
+        runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
+          workingPoint,
+          workingPoint
+        );
+        const pageRight = workingPoint[0];
+        const pageBottom = workingPoint[1];
+
+        widthInContainer = pageRight - pageLeft;
+        heightInContainer = pageBottom - pageTop;
+        
+        rotation = this._object.getAngle();
       }
-
-      // Position the input on the container on top of the canvas.
-      workingPoint[0] = canvasLeft;
-      workingPoint[1] = canvasTop;
-      runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
-        workingPoint,
-        workingPoint
-      );
-      const pageLeft = workingPoint[0];
-      const pageTop = workingPoint[1];
-
-      workingPoint[0] = canvasRight;
-      workingPoint[1] = canvasBottom;
-      runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
-        workingPoint,
-        workingPoint
-      );
-      const pageRight = workingPoint[0];
-      const pageBottom = workingPoint[1];
-
-      const widthInContainer = pageRight - pageLeft;
-      const heightInContainer = pageBottom - pageTop;
 
       this._form.style.left = pageLeft + 'px';
       this._form.style.top = pageTop + 'px';
       this._form.style.width = widthInContainer + 'px';
       this._form.style.height = heightInContainer + 'px';
       this._form.style.transform =
-        'rotate3d(0,0,1,' + (this._object.getAngle() % 360) + 'deg)';
+        'rotate3d(0,0,1,' + (rotation % 360) + 'deg)';
       this._form.style.textAlign = this._object.getTextAlign();
 
       this._input.style.padding = `${this._object
@@ -254,10 +383,21 @@ namespace gdjs {
         .toFixed(2)}px ${this._object.getPaddingX().toFixed(2)}px`;
 
       // Automatically adjust the font size to follow the game scale.
-      this._input.style.fontSize =
-        this._object.getFontSize() *
-          runtimeGameRenderer.getCanvasToDomElementContainerHeightScale() +
-        'px';
+      // Note: for 3D, heightInContainer already includes scale, but getCanvasToDomElementContainerHeightScale 
+      // might not match the 3D projection scale.
+      // We should derive scale from heightInContainer vs object height?
+      
+      let fontSize = 0;
+      if (is3D) {
+          // Approximate scale based on height ratio
+          const scale = heightInContainer / this._object.getHeight();
+          fontSize = this._object.getFontSize() * scale;
+      } else {
+          fontSize = this._object.getFontSize() *
+          runtimeGameRenderer.getCanvasToDomElementContainerHeightScale();
+      }
+
+      this._input.style.fontSize = fontSize + 'px';
 
       // Display after the object is positioned.
       this._form.style.display = 'initial';

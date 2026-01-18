@@ -230,6 +230,7 @@ namespace gdjs {
     private static readonly zeroZOrderForPixi = Math.pow(2, -24);
 
     private static vectorForProjections: THREE.Vector3 | null = null;
+    private static vectorFor3DPlaneProjection: THREE.Vector3 | null = null;
 
     /**
      * @param layer The layer
@@ -1061,6 +1062,88 @@ namespace gdjs {
 
       result[0] = vector.x;
       result[1] = -vector.y;
+      return result;
+    }
+
+    /**
+     * Project a point from layer coordinates to canvas coordinates,
+     * using the 2D plane rendered in the 3D world.
+     *
+     * Returns null if the layer is not currently rendered in 3D.
+     */
+    projectLayerPointToCanvas(
+      layerX: float,
+      layerY: float,
+      result: FloatPoint
+    ): FloatPoint | null {
+      const camera = this._threeCamera;
+      const plane = this._threePlaneMesh;
+      if (!camera || !plane || !this.has3DObjects()) {
+        return null;
+      }
+      if (!plane.visible || plane.scale.x === 0 || plane.scale.y === 0) {
+        return null;
+      }
+
+      const layerWidth = this._layer.getWidth();
+      const layerHeight = this._layer.getHeight();
+      if (layerWidth === 0 || layerHeight === 0) {
+        return null;
+      }
+
+      const effectivePixiZoom = layerWidth / plane.scale.x;
+      if (!Number.isFinite(effectivePixiZoom) || effectivePixiZoom === 0) {
+        return null;
+      }
+
+      const angle = this._pixiContainer.rotation;
+      const cosValue = Math.cos(angle);
+      const sinValue = Math.sin(angle);
+      const followX = plane.position.x;
+      const followY = plane.position.y;
+
+      const centerX2d =
+        (followX * cosValue - followY * sinValue) * effectivePixiZoom;
+      const centerY2d =
+        (followX * sinValue + followY * cosValue) * effectivePixiZoom;
+
+      const positionX = layerWidth / 2 - centerX2d;
+      const positionY = layerHeight / 2 - centerY2d;
+
+      const renderX =
+        (layerX * cosValue - layerY * sinValue) * effectivePixiZoom +
+        positionX;
+      const renderY =
+        (layerX * sinValue + layerY * cosValue) * effectivePixiZoom +
+        positionY;
+
+      const u = renderX / layerWidth;
+      const v = renderY / layerHeight;
+
+      let vector = LayerPixiRenderer.vectorFor3DPlaneProjection;
+      if (!vector) {
+        vector = new THREE.Vector3();
+        LayerPixiRenderer.vectorFor3DPlaneProjection = vector;
+      }
+
+      plane.updateMatrixWorld(true);
+      camera.updateMatrixWorld(true);
+
+      vector.set(u - 0.5, 0.5 - v, 0);
+      plane.localToWorld(vector);
+      vector.project(camera);
+
+      if (
+        !Number.isFinite(vector.x) ||
+        !Number.isFinite(vector.y) ||
+        !Number.isFinite(vector.z)
+      ) {
+        return null;
+      }
+
+      const game = this._layer.getRuntimeScene().getGame();
+      result[0] = (vector.x + 1) * 0.5 * game.getGameResolutionWidth();
+      result[1] = (1 - vector.y) * 0.5 * game.getGameResolutionHeight();
       return result;
     }
 

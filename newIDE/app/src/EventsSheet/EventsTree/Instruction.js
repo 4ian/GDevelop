@@ -463,7 +463,8 @@ const Instruction = (props: Props) => {
                   [selectedArea]: props.selected,
                   [warningInstruction]:
                     showDeprecatedInstructionWarning &&
-                    !isInstructionVisible(scope, metadata),
+                    (!isInstructionVisible(scope, metadata) ||
+                      metadata.isHidden()),
                 })}
                 onClick={e => {
                   e.stopPropagation();

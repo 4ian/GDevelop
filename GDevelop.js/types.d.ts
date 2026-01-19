@@ -2291,6 +2291,8 @@ export class EventsFunction extends EmscriptenObject {
   isPrivate(): boolean;
   setAsync(isAsync: boolean): EventsFunction;
   isAsync(): boolean;
+  setDeprecated(isDeprecated: boolean): EventsFunction;
+  isDeprecated(): boolean;
   isAction(): boolean;
   isExpression(): boolean;
   isCondition(): boolean;

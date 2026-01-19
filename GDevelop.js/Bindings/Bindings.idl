@@ -3187,6 +3187,8 @@ interface EventsFunction {
     boolean IsPrivate();
     [Ref] EventsFunction SetAsync(boolean isAsync);
     boolean IsAsync();
+    [Ref] EventsFunction SetDeprecated(boolean isDeprecated);
+    boolean IsDeprecated();
     boolean IsAction();
     boolean IsExpression();
     boolean IsCondition();

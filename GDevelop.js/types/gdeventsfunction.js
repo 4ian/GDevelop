@@ -25,6 +25,8 @@ declare class gdEventsFunction {
   isPrivate(): boolean;
   setAsync(isAsync: boolean): gdEventsFunction;
   isAsync(): boolean;
+  setDeprecated(isDeprecated: boolean): gdEventsFunction;
+  isDeprecated(): boolean;
   isAction(): boolean;
   isExpression(): boolean;
   isCondition(): boolean;

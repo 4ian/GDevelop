@@ -552,6 +552,29 @@ export const EventsFunctionPropertiesEditor = ({
                       forceUpdate();
                     }}
                   />
+                  <Checkbox
+                    label={<Trans>Deprecated</Trans>}
+                    checked={eventsFunction.isDeprecated()}
+                    onCheck={(e, checked) => {
+                      eventsFunction.setDeprecated(checked);
+                      if (onConfigurationUpdated)
+                        onConfigurationUpdated('isDeprecated');
+                      forceUpdate();
+                    }}
+                    tooltipOrHelperText={
+                      eventsFunction.isDeprecated() ? (
+                        <Trans>
+                          This function is marked as deprecated. It will be
+                          displayed with a warning in the events editor.
+                        </Trans>
+                      ) : (
+                        <Trans>
+                          Mark this function as deprecated to discourage its
+                          use.
+                        </Trans>
+                      )
+                    }
+                  />
                   {eventsFunction.isAsync() && (
                     <AlertMessage
                       kind="info"

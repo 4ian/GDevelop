@@ -2308,6 +2308,8 @@ export class EventsFunction extends EmscriptenObject {
   isAsync(): boolean;
   setHelpUrl(helpUrl: string): EventsFunction;
   getHelpUrl(): string;
+  setDeprecated(isDeprecated: boolean): EventsFunction;
+  isDeprecated(): boolean;
   isAction(): boolean;
   isExpression(): boolean;
   isCondition(): boolean;

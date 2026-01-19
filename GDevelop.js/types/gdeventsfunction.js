@@ -27,6 +27,8 @@ declare class gdEventsFunction {
   isAsync(): boolean;
   setHelpUrl(helpUrl: string): gdEventsFunction;
   getHelpUrl(): string;
+  setDeprecated(isDeprecated: boolean): gdEventsFunction;
+  isDeprecated(): boolean;
   isAction(): boolean;
   isExpression(): boolean;
   isCondition(): boolean;

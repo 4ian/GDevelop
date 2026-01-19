@@ -1611,6 +1611,9 @@ MetadataDeclarationHelper::GenerateFreeFunctionMetadata(
   if (eventsFunction.IsPrivate())
     instructionOrExpression.SetPrivate();
 
+  if (eventsFunction.IsDeprecated())
+    instructionOrExpression.SetHidden();
+
   return instructionOrExpression;
 };
 
@@ -1648,6 +1651,9 @@ gd::BehaviorMetadata &MetadataDeclarationHelper::GenerateBehaviorMetadata(
 
     if (eventsFunction.IsPrivate())
       instructionOrExpression.SetPrivate();
+
+    if (eventsFunction.IsDeprecated())
+      instructionOrExpression.SetHidden();
   }
 
   return behaviorMetadata;
@@ -1687,6 +1693,9 @@ gd::ObjectMetadata &MetadataDeclarationHelper::GenerateObjectMetadata(
 
     if (eventsFunction.IsPrivate())
       instructionOrExpression.SetPrivate();
+
+    if (eventsFunction.IsDeprecated())
+      instructionOrExpression.SetHidden();
   }
 
   UpdateCustomObjectDefaultBehaviors(project, objectMetadata);

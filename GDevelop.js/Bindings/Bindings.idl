@@ -3208,6 +3208,8 @@ interface EventsFunction {
     boolean IsAsync();
     [Ref] EventsFunction SetHelpUrl([Const] DOMString helpUrl);
     [Const, Ref] DOMString GetHelpUrl();
+    [Ref] EventsFunction SetDeprecated(boolean isDeprecated);
+    boolean IsDeprecated();
     boolean IsAction();
     boolean IsExpression();
     boolean IsCondition();

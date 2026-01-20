@@ -502,7 +502,17 @@ const Instruction = (props: Props) => {
                 {showDeprecatedInstructionWarning && metadata.isHidden() ? (
                   <Tooltip
                     title={
-                      props.isCondition ? (
+                      metadata.getDeprecationMessage() ? (
+                        <>
+                          {props.isCondition ? (
+                            <Trans>Deprecated condition</Trans>
+                          ) : (
+                            <Trans>Deprecated action</Trans>
+                          )}
+                          {': '}
+                          {metadata.getDeprecationMessage()}
+                        </>
+                      ) : props.isCondition ? (
                         <Trans>Deprecated condition</Trans>
                       ) : (
                         <Trans>Deprecated action</Trans>

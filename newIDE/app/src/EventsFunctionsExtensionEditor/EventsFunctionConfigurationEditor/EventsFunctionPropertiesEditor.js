@@ -575,6 +575,23 @@ export const EventsFunctionPropertiesEditor = ({
                       )
                     }
                   />
+                  {eventsFunction.isDeprecated() && (
+                    <SemiControlledTextField
+                      commitOnBlur
+                      floatingLabelText={
+                        <Trans>Deprecation message</Trans>
+                      }
+                      translatableHintText={t`Example: Use "New Action Name" instead.`}
+                      fullWidth
+                      multiline
+                      value={eventsFunction.getDeprecationMessage()}
+                      onChange={text => {
+                        eventsFunction.setDeprecationMessage(text);
+                        if (onConfigurationUpdated) onConfigurationUpdated();
+                        forceUpdate();
+                      }}
+                    />
+                  )}
                   {eventsFunction.isAsync() && (
                     <AlertMessage
                       kind="info"

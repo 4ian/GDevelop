@@ -14,6 +14,7 @@ declare class gdInstructionMetadata extends gdAbstractFunctionMetadata {
   getParameters(): gdParameterMetadataContainer;
   getUsageComplexity(): number;
   isHidden(): boolean;
+  getDeprecationMessage(): string;
   isPrivate(): boolean;
   isAsync(): boolean;
   isOptionallyAsync(): boolean;

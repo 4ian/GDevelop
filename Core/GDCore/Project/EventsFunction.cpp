@@ -78,6 +78,9 @@ void EventsFunction::SerializeTo(SerializerElement& element) const {
   if (isDeprecated) {
     element.SetBoolAttribute("deprecated", isDeprecated);
   }
+  if (!deprecationMessage.empty()) {
+    element.SetAttribute("deprecationMessage", deprecationMessage);
+  }
   events.SerializeTo(element.AddChild("events"));
 
   gd::String functionTypeStr = "Action";
@@ -120,6 +123,7 @@ void EventsFunction::UnserializeFrom(gd::Project& project,
   isPrivate = element.GetBoolAttribute("private");
   isAsync = element.GetBoolAttribute("async");
   isDeprecated = element.GetBoolAttribute("deprecated");
+  deprecationMessage = element.GetStringAttribute("deprecationMessage");
   events.UnserializeFrom(project, element.GetChild("events"));
 
   gd::String functionTypeStr = element.GetStringAttribute("functionType");

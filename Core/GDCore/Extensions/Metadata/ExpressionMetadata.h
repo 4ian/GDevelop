@@ -73,6 +73,21 @@ class GD_CORE_API ExpressionMetadata : public gd::AbstractFunctionMetadata {
   ExpressionMetadata& SetHidden() override;
 
   /**
+   * \brief Set the deprecation message that explains why the expression
+   * is deprecated and what to use instead.
+   */
+  ExpressionMetadata& SetDeprecationMessage(const gd::String& message) override {
+    deprecationMessage = message;
+    return *this;
+  }
+
+  /**
+   * \brief Get the deprecation message that explains why the expression
+   * is deprecated and what to use instead.
+   */
+  const gd::String& GetDeprecationMessage() const { return deprecationMessage; }
+
+  /**
    * \brief Set the group of the instruction in the IDE.
    */
   ExpressionMetadata& SetGroup(const gd::String& str) {
@@ -369,6 +384,7 @@ class GD_CORE_API ExpressionMetadata : public gd::AbstractFunctionMetadata {
   bool isPrivate;
   gd::String requiredBaseObjectCapability;
   gd::String relevantContext;
+  gd::String deprecationMessage;
 
   gd::ParameterMetadataContainer parameters;
 };

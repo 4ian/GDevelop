@@ -114,6 +114,18 @@ class GD_CORE_API MultipleInstructionMetadata : public AbstractFunctionMetadata 
   };
 
   /**
+   * \brief Set the deprecation message that explains why the instruction
+   * is deprecated and what to use instead.
+   */
+  MultipleInstructionMetadata &SetDeprecationMessage(
+      const gd::String &message) override {
+    if (expression) expression->SetDeprecationMessage(message);
+    if (condition) condition->SetDeprecationMessage(message);
+    if (action) action->SetDeprecationMessage(message);
+    return *this;
+  }
+
+  /**
    * \see gd::InstructionMetadata::SetRequiresBaseObjectCapability
    */
   MultipleInstructionMetadata &SetRequiresBaseObjectCapability(

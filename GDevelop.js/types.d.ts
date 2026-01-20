@@ -1427,6 +1427,7 @@ export class InstructionMetadata extends AbstractFunctionMetadata {
   getParameters(): ParameterMetadataContainer;
   getUsageComplexity(): number;
   isHidden(): boolean;
+  getDeprecationMessage(): string;
   isPrivate(): boolean;
   isAsync(): boolean;
   isOptionallyAsync(): boolean;
@@ -2293,6 +2294,8 @@ export class EventsFunction extends EmscriptenObject {
   isAsync(): boolean;
   setDeprecated(isDeprecated: boolean): EventsFunction;
   isDeprecated(): boolean;
+  setDeprecationMessage(message: string): EventsFunction;
+  getDeprecationMessage(): string;
   isAction(): boolean;
   isExpression(): boolean;
   isCondition(): boolean;

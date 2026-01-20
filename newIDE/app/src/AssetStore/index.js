@@ -151,8 +151,11 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     const assetSwappedObjectPtr = React.useRef<number | null>(null);
     React.useEffect(
       () => {
-        if (assetSwappedObject) {
-          if (assetSwappedObjectPtr.current !== assetSwappedObject.ptr) {
+        const newAssetSwappedObjectPtr = assetSwappedObject
+          ? assetSwappedObject.ptr
+          : 0;
+        if (assetSwappedObjectPtr.current !== newAssetSwappedObjectPtr) {
+          if (assetSwappedObject) {
             shopNavigationState.openAssetSwapping();
             setAssetStoreSearchText('');
             clearAllAssetStoreFilters();
@@ -170,8 +173,12 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               assetsListInterface.scrollToPosition(0);
               assetsListInterface.setPageBreakIndex(0);
             }
+          } else {
+            assetFiltersState.setAssetSwappingFilter(
+              new AssetSwappingAssetStoreSearchFilter()
+            );
           }
-          assetSwappedObjectPtr.current = assetSwappedObject.ptr;
+          assetSwappedObjectPtr.current = newAssetSwappedObjectPtr;
         }
       },
       [

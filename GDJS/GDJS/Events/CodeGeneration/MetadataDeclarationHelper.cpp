@@ -462,6 +462,14 @@ gd::String MetadataDeclarationHelper::GetFullName(const gd::EventsFunction &even
   return GetTranslation(eventsFunction.GetFullName()) || eventsFunction.GetName();
 };
 
+gd::String GetFullNameWithDeprecatedPrefix(const gd::EventsFunction &eventsFunction) {
+  gd::String fullName = GetTranslation(eventsFunction.GetFullName()) || eventsFunction.GetName();
+  if (eventsFunction.IsDeprecated()) {
+    fullName = "[DEPRECATED] " + fullName;
+  }
+  return fullName;
+};
+
 gd::String MetadataDeclarationHelper::GetDefaultSentence(
     const gd::EventsFunction &eventsFunction, const int firstParameterIndex,
     const int parameterIndexOffset) {
@@ -486,27 +494,39 @@ gd::String MetadataDeclarationHelper::GetDefaultSentence(
 };
 
 gd::String MetadataDeclarationHelper::GetFreeFunctionSentence(const gd::EventsFunction &eventsFunction) {
-  return GetTranslation(eventsFunction.GetSentence()).empty()
+  gd::String sentence = GetTranslation(eventsFunction.GetSentence()).empty()
              ? GetDefaultSentence(eventsFunction, 0, 1)
              : GetTranslation(eventsFunction.GetSentence());
+  if (eventsFunction.IsDeprecated()) {
+    sentence = "[DEPRECATED] " + sentence;
+  }
+  return sentence;
 };
 
 gd::String MetadataDeclarationHelper::GetBehaviorFunctionSentence(
     const gd::EventsFunction &eventsFunction,
     const bool excludeObjectParameter) {
-  return GetTranslation(eventsFunction.GetSentence()).empty()
+  gd::String sentence = GetTranslation(eventsFunction.GetSentence()).empty()
              ? GetDefaultSentence(eventsFunction,
                                   excludeObjectParameter ? 2 : 0, 0)
              : GetTranslation(eventsFunction.GetSentence());
+  if (eventsFunction.IsDeprecated()) {
+    sentence = "[DEPRECATED] " + sentence;
+  }
+  return sentence;
 };
 
 gd::String MetadataDeclarationHelper::GetObjectFunctionSentence(
     const gd::EventsFunction &eventsFunction,
     const bool excludeObjectParameter) {
-  return GetTranslation(eventsFunction.GetSentence()).empty()
+  gd::String sentence = GetTranslation(eventsFunction.GetSentence()).empty()
              ? GetDefaultSentence(eventsFunction,
                                   excludeObjectParameter ? 1 : 0, 0)
              : GetTranslation(eventsFunction.GetSentence());
+  if (eventsFunction.IsDeprecated()) {
+    sentence = "[DEPRECATED] " + sentence;
+  }
+  return sentence;
 };
 
 /**
@@ -542,13 +562,13 @@ MetadataDeclarationHelper::DeclareExpressionMetadata(
         eventsFunction.GetExpressionType().IsNumber()
             ? extension.AddExpression(
                   eventsFunction.GetName(),
-                  GetFullName(eventsFunction),
+                  GetFullNameWithDeprecatedPrefix(eventsFunction),
                   eventsFunction.GetDescription() ||
                       GetFullName(eventsFunction),
                   eventsFunction.GetGroup(), GetExtensionIconUrl(extension))
             : extension.AddStrExpression(
                   eventsFunction.GetName(),
-                  GetFullName(eventsFunction),
+                  GetFullNameWithDeprecatedPrefix(eventsFunction),
                   eventsFunction.GetDescription() ||
                       GetFullName(eventsFunction),
                   eventsFunction.GetGroup(), GetExtensionIconUrl(extension));
@@ -733,7 +753,7 @@ MetadataDeclarationHelper::DeclareBehaviorExpressionMetadata(
         (eventsFunction.GetExpressionType().IsNumber())
             ? behaviorMetadata.AddExpression(
                   eventsFunction.GetName(),
-                  GetFullName(eventsFunction),
+                  GetFullNameWithDeprecatedPrefix(eventsFunction),
                   eventsFunction.GetDescription() ||
                       GetFullName(eventsFunction),
                   eventsFunction.GetGroup() ||
@@ -742,7 +762,7 @@ MetadataDeclarationHelper::DeclareBehaviorExpressionMetadata(
                   GetExtensionIconUrl(extension))
             : behaviorMetadata.AddStrExpression(
                   eventsFunction.GetName(),
-                  GetFullName(eventsFunction),
+                  GetFullNameWithDeprecatedPrefix(eventsFunction),
                   eventsFunction.GetDescription() ||
                       GetFullName(eventsFunction),
                   eventsFunction.GetGroup() ||
@@ -907,7 +927,7 @@ MetadataDeclarationHelper::DeclareObjectExpressionMetadata(
         (eventsFunction.GetExpressionType().IsNumber())
             ? objectMetadata.AddExpression(
                   eventsFunction.GetName(),
-                  GetFullName(eventsFunction),
+                  GetFullNameWithDeprecatedPrefix(eventsFunction),
                   eventsFunction.GetDescription() ||
                       GetFullName(eventsFunction),
                   eventsFunction.GetGroup() ||
@@ -916,7 +936,7 @@ MetadataDeclarationHelper::DeclareObjectExpressionMetadata(
                   GetExtensionIconUrl(extension))
             : objectMetadata.AddStrExpression(
                   eventsFunction.GetName(),
-                  GetFullName(eventsFunction),
+                  GetFullNameWithDeprecatedPrefix(eventsFunction),
                   eventsFunction.GetDescription() ||
                       GetFullName(eventsFunction),
                   eventsFunction.GetGroup() ||

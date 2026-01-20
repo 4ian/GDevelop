@@ -91,36 +91,6 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     );
   }
 
-  _onKeyDown = (event: KeyboardEvent) => {
-    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-      this._moveSelection(event.key === 'ArrowDown' ? 1 : -1);
-      event.preventDefault();
-    }
-  };
-
-  _moveSelection = (delta: number) => {
-    const { project } = this.props;
-    const { selectedResource } = this.state;
-    const resourcesManager = project.getResourcesManager();
-    const allNames = resourcesManager.getAllResourceNames().toJSArray();
-
-    if (allNames.length === 0) return;
-
-    let nextIndex = 0;
-    if (selectedResource) {
-      const currentIndex = allNames.indexOf(selectedResource.getName());
-      nextIndex = Math.max(
-        0,
-        Math.min(allNames.length - 1, currentIndex + delta)
-      );
-    }
-
-    const nextResource = resourcesManager.getResource(allNames[nextIndex]);
-    if (nextResource !== selectedResource) {
-      this._onResourceSelected(nextResource);
-    }
-  };
-
   refreshResourcesList() {
     if (this._resourcesList) this._resourcesList.forceUpdateList();
   }
@@ -324,32 +294,27 @@ export default class ResourcesEditor extends React.Component<Props, State> {
         type: 'primary',
         noTitleBar: true,
         renderEditor: () => (
-          <div
-            style={styles.container}
-            onKeyDown={this._onKeyDown}
-          >
-            <ResourcesList
-              project={project}
-              fileMetadata={fileMetadata}
-              onDeleteResource={this.deleteResource}
-              onRenameResource={onRenameResource}
-              onSelectResource={this._onResourceSelected}
-              selectedResource={selectedResource}
-              ref={resourcesList => (this._resourcesList = resourcesList)}
-              onRemoveUnusedResources={this._removeUnusedResources}
-              onRemoveAllResourcesWithInvalidPath={
-                this._removeAllResourcesWithInvalidPath
+          <ResourcesList
+            project={project}
+            fileMetadata={fileMetadata}
+            onDeleteResource={this.deleteResource}
+            onRenameResource={onRenameResource}
+            onSelectResource={this._onResourceSelected}
+            selectedResource={selectedResource}
+            ref={resourcesList => (this._resourcesList = resourcesList)}
+            onRemoveUnusedResources={this._removeUnusedResources}
+            onRemoveAllResourcesWithInvalidPath={
+              this._removeAllResourcesWithInvalidPath
+            }
+            getResourceActionsSpecificToStorageProvider={
+              resourcesActionsMenuBuilder
+            }
+            onResourceRenamed={() => {
+              if (this._propertiesEditor) {
+                this._propertiesEditor.forceUpdate();
               }
-              getResourceActionsSpecificToStorageProvider={
-                resourcesActionsMenuBuilder
-              }
-              onResourceRenamed={() => {
-                if (this._propertiesEditor) {
-                  this._propertiesEditor.forceUpdate();
-                }
-              }}
-            />
-          </div>
+            }}
+          />
         ),
       },
     };

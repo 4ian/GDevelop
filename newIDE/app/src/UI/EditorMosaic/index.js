@@ -69,6 +69,21 @@ export const mosaicContainsNode = (
   );
 };
 
+/**
+ * Fill missing `splitPercentage` with `50`.
+ */
+const fillMissingSplitPercentage = (
+  currentNode: EditorMosaicNode) => {
+  if (typeof currentNode === 'string') {
+    return;
+  }
+  if (currentNode.splitPercentage === undefined) {
+    currentNode.splitPercentage = 50;
+  }
+  fillMissingSplitPercentage(currentNode.first);
+  fillMissingSplitPercentage(currentNode.second);
+}
+
 const resizeNode = (
   currentNode: EditorMosaicNode,
   resizedNode: EditorMosaicNode,
@@ -180,10 +195,16 @@ const toggleNodeVisibility = (
   const { first, second } = currentNode;
   if (first === leafName) {
     currentNode.firstHidden = !currentNode.firstHidden;
+    if (!currentNode.firstHidden && currentNode.splitPercentage === 0) {
+      currentNode.splitPercentage = 20;
+    }
     return;
   }
   if (second === leafName) {
     currentNode.secondHidden = !currentNode.secondHidden;
+    if (!currentNode.secondHidden && currentNode.splitPercentage === 100) {
+      currentNode.splitPercentage = 80;
+    }
     return;
   }
   toggleNodeVisibility(first, leafName);
@@ -308,13 +329,12 @@ const EditorMosaic = React.forwardRef<Props, EditorMosaicInterface>(
     );
     const setMosaicNode = React.useCallback(
       (newMosaicNode: EditorMosaicNode) => {
+        fillMissingSplitPercentage(newMosaicNode);
         if (!mosaicNode || !haveSameBranches(newMosaicNode, mosaicNode)) {
           setHidableMosaicNode(newMosaicNode);
         } else {
           updateSourceSplit(newMosaicNode);
-          setHidableMosaicNode(hidableMosaicNode =>
-            shallowClone(hidableMosaicNode)
-          );
+          setHidableMosaicNode(newMosaicNode);
         }
       },
       [mosaicNode]

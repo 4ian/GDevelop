@@ -165,6 +165,42 @@ const ResourcesList = React.memo<Props, ResourcesListInterface>(
         [project, onRenameResource, forceUpdateList, onResourceRenamed]
       );
 
+      const moveSelection = React.useCallback(
+        (delta: number) => {
+          const resourcesManager = project.getResourcesManager();
+          const resourceCount = resourcesManager.count();
+
+          if (resourceCount === 0) return;
+
+          let nextIndex = 0;
+          if (selectedResource) {
+            const currentIndex = resourcesManager.getResourcePosition(
+              selectedResource.getName()
+            );
+            nextIndex = Math.max(
+              0,
+              Math.min(resourceCount - 1, currentIndex + delta)
+            );
+          }
+
+          const nextResource = resourcesManager.getResourceAt(nextIndex);
+          onSelectResource(nextResource);
+        },
+        [project, selectedResource, onSelectResource]
+      );
+
+      const handleKeyDown = React.useCallback(
+        (event: KeyboardEvent) => {
+          if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+            moveSelection(event.key === 'ArrowDown' ? 1 : -1);
+            event.preventDefault();
+          } else {
+            keyboardShortcutsRef.current.onKeyDown(event);
+          }
+        },
+        [moveSelection]
+      );
+
       const moveSelectionTo = React.useCallback(
         (destinationResource: gdResource) => {
           if (!selectedResource) return;
@@ -264,6 +300,9 @@ const ResourcesList = React.memo<Props, ResourcesListInterface>(
         [project, forceUpdateList]
       );
 
+      // KeyboardShortcuts callbacks are set dynamically in useEffect below
+      // instead of here, because they depend on selectedResource which can change.
+      // This ensures the callbacks always use the current selectedResource.
       const keyboardShortcutsRef = React.useRef<KeyboardShortcuts>(
         new KeyboardShortcuts({
           shortcutCallbacks: {},
@@ -328,7 +367,7 @@ const ResourcesList = React.memo<Props, ResourcesListInterface>(
             ref={listContainerRef}
             style={styles.listContainer}
             tabIndex={0}
-            onKeyDown={event => keyboardShortcutsRef.current.onKeyDown(event)}
+            onKeyDown={handleKeyDown}
           >
             <AutoSizer>
               {({ height, width }) => (

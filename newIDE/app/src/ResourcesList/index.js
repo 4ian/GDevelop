@@ -161,6 +161,9 @@ const ResourcesList = React.memo<Props, ResourcesListInterface>(
             forceUpdateList();
             if (onResourceRenamed) onResourceRenamed();
           });
+
+          // Refocus the list container to allow keyboard shortcuts
+          if (listContainerRef.current) listContainerRef.current.focus();
         },
         [project, onRenameResource, forceUpdateList, onResourceRenamed]
       );

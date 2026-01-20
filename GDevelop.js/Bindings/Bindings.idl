@@ -1793,6 +1793,8 @@ interface ExpressionMetadata {
     [Const, Ref] DOMString GetHelpPath();
     boolean IsShown();
     boolean IsPrivate();
+    boolean IsDeprecated();
+    [Const, Ref] DOMString GetDeprecationMessage();
     boolean IsRelevantForLayoutEvents();
     boolean IsRelevantForFunctionEvents();
     boolean IsRelevantForAsynchronousFunctionEvents();
@@ -2931,6 +2933,13 @@ interface InstructionValidator {
     [Const, Ref] InstructionMetadata metadata,
     long parameterIndex,
     [Const] DOMString value);
+  boolean STATIC_HasDeprecationWarnings(
+    [Const, Ref] Platform platform,
+    [Const, Ref] ProjectScopedContainers projectScopedContainers,
+    [Const, Ref] Instruction instruction,
+    [Const, Ref] InstructionMetadata metadata,
+    long parameterIndex,
+    [Const] DOMString value);
 };
 
 interface ObjectTools {
@@ -3066,7 +3075,26 @@ interface WholeProjectDiagnosticReport {
     boolean HasAnyIssue();
 };
 
+enum ExpressionParserError_ErrorType {
+    "ExpressionParserError::SyntaxError",
+    "ExpressionParserError::InvalidOperator",
+    "ExpressionParserError::MismatchedType",
+    "ExpressionParserError::UndeclaredVariable",
+    "ExpressionParserError::UnknownIdentifier",
+    "ExpressionParserError::BracketsNotAllowedForObjects",
+    "ExpressionParserError::TooFewParameters",
+    "ExpressionParserError::TooManyParameters",
+    "ExpressionParserError::InvalidFunctionName",
+    "ExpressionParserError::MalformedVariableParameter",
+    "ExpressionParserError::MalformedObjectParameter",
+    "ExpressionParserError::UnknownParameterType",
+    "ExpressionParserError::MissingBehavior",
+    "ExpressionParserError::VariableNameCollision",
+    "ExpressionParserError::DeprecatedExpression"
+};
+
 interface ExpressionParserError {
+    ExpressionParserError_ErrorType GetType();
     [Const, Ref] DOMString GetMessage();
     unsigned long GetStartPosition();
     unsigned long GetEndPosition();

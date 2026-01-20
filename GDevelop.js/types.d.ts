@@ -84,6 +84,24 @@ export enum ProjectDiagnostic_ErrorType {
   MismatchedObjectType = 3,
 }
 
+export enum ExpressionParserError_ErrorType {
+  SyntaxError = 0,
+  InvalidOperator = 1,
+  MismatchedType = 2,
+  UndeclaredVariable = 3,
+  UnknownIdentifier = 4,
+  BracketsNotAllowedForObjects = 5,
+  TooFewParameters = 6,
+  TooManyParameters = 7,
+  InvalidFunctionName = 8,
+  MalformedVariableParameter = 9,
+  MalformedObjectParameter = 10,
+  UnknownParameterType = 11,
+  MissingBehavior = 12,
+  VariableNameCollision = 13,
+  DeprecatedExpression = 14,
+}
+
 export enum ExpressionCompletionDescription_CompletionKind {
   Object = 0,
   BehaviorWithPrefix = 1,
@@ -1476,6 +1494,8 @@ export class ExpressionMetadata extends AbstractFunctionMetadata {
   getHelpPath(): string;
   isShown(): boolean;
   isPrivate(): boolean;
+  isDeprecated(): boolean;
+  getDeprecationMessage(): string;
   isRelevantForLayoutEvents(): boolean;
   isRelevantForFunctionEvents(): boolean;
   isRelevantForAsynchronousFunctionEvents(): boolean;
@@ -2087,6 +2107,7 @@ export class BehaviorParameterFiller extends EmscriptenObject {
 
 export class InstructionValidator extends EmscriptenObject {
   static isParameterValid(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction, metadata: InstructionMetadata, parameterIndex: number, value: string): boolean;
+  static hasDeprecationWarnings(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction, metadata: InstructionMetadata, parameterIndex: number, value: string): boolean;
 }
 
 export class ObjectTools extends EmscriptenObject {
@@ -2203,6 +2224,7 @@ export class WholeProjectDiagnosticReport extends EmscriptenObject {
 }
 
 export class ExpressionParserError extends EmscriptenObject {
+  getType(): ExpressionParserError_ErrorType;
   getMessage(): string;
   getStartPosition(): number;
   getEndPosition(): number;

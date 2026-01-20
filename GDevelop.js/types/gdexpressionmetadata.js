@@ -9,6 +9,8 @@ declare class gdExpressionMetadata extends gdAbstractFunctionMetadata {
   getHelpPath(): string;
   isShown(): boolean;
   isPrivate(): boolean;
+  isDeprecated(): boolean;
+  getDeprecationMessage(): string;
   isRelevantForLayoutEvents(): boolean;
   isRelevantForFunctionEvents(): boolean;
   isRelevantForAsynchronousFunctionEvents(): boolean;

@@ -5,6 +5,7 @@
  */
 #include "InstructionValidator.h"
 
+#include "GDCore/Events/Parsers/ExpressionParser2Node.h"
 #include "GDCore/Extensions/Metadata/AbstractFunctionMetadata.h"
 #include "GDCore/Extensions/Metadata/BehaviorMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
@@ -52,7 +53,9 @@ bool InstructionValidator::IsParameterValid(
                                             parameterType,
                                             parameterMetadata.GetExtraInfo());
     expressionNode.Visit(expressionValidator);
-    if (!expressionValidator.GetAllErrors().empty()) {
+    // Use GetFatalErrors() instead of GetAllErrors() to allow non-fatal
+    // warnings (like deprecation) to pass validation.
+    if (!expressionValidator.GetFatalErrors().empty()) {
       return false;
     }
     // New object variable instructions require the variable to be
@@ -106,6 +109,42 @@ gd::String InstructionValidator::GetRootVariableName(const gd::String &name) {
                             ? dotPosition
                             : squareBracketPosition);
 };
+
+bool InstructionValidator::HasDeprecationWarnings(
+    const gd::Platform &platform,
+    const gd::ProjectScopedContainers projectScopedContainers,
+    const gd::Instruction &instruction, const InstructionMetadata &metadata,
+    std::size_t parameterIndex, const gd::String &value) {
+  if (parameterIndex >= instruction.GetParametersCount() ||
+      parameterIndex >= metadata.GetParametersCount()) {
+    return false;
+  }
+  const auto &parameterMetadata = metadata.GetParameter(parameterIndex);
+  const auto &parameterType = parameterMetadata.GetType() == "expression"
+                                  ? "number"
+                                  : parameterMetadata.GetType();
+
+  if (gd::ParameterMetadata::IsExpression("number", parameterType) ||
+      gd::ParameterMetadata::IsExpression("string", parameterType) ||
+      gd::ParameterMetadata::IsExpression("variable", parameterType)) {
+    auto &expressionNode =
+        *instruction.GetParameter(parameterIndex).GetRootNode();
+    ExpressionValidator expressionValidator(platform, projectScopedContainers,
+                                            parameterType,
+                                            parameterMetadata.GetExtraInfo());
+    expressionNode.Visit(expressionValidator);
+
+    // Check if there are any deprecation warnings
+    const auto &allErrors = expressionValidator.GetAllErrors();
+    for (const auto *error : allErrors) {
+      if (error->GetType() ==
+          gd::ExpressionParserError::ErrorType::DeprecatedExpression) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
 
 bool InstructionValidator::HasRequiredBehaviors(
     const gd::Instruction &instruction,

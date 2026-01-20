@@ -27,6 +27,16 @@ public:
                    const InstructionMetadata &metadata,
                    std::size_t parameterIndex, const gd::String &value);
 
+  /**
+   * \brief Check if a parameter expression has deprecation warnings.
+   */
+  static bool
+  HasDeprecationWarnings(const gd::Platform &platform,
+                         const gd::ProjectScopedContainers projectScopedContainers,
+                         const gd::Instruction &instruction,
+                         const InstructionMetadata &metadata,
+                         std::size_t parameterIndex, const gd::String &value);
+
   static gd::String GetRootVariableName(const gd::String &name);
 
 private:

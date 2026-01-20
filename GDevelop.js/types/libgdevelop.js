@@ -218,6 +218,7 @@ declare class libGDevelop {
   ProjectDiagnostic: Class<gdProjectDiagnostic>;
   DiagnosticReport: Class<gdDiagnosticReport>;
   WholeProjectDiagnosticReport: Class<gdWholeProjectDiagnosticReport>;
+  ExpressionParserError_ErrorType: Class<ExpressionParserError_ErrorType>;
   ExpressionParserError: Class<gdExpressionParserError>;
   VectorExpressionParserError: Class<gdVectorExpressionParserError>;
   ExpressionParser2NodeWorker: Class<gdExpressionParser2NodeWorker>;

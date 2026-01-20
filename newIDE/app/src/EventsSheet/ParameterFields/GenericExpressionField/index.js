@@ -92,6 +92,9 @@ const styles = {
     paddingLeft: 0,
     paddingRight: 0,
   },
+  warningText: {
+    color: '#ff9800', // Orange color for warnings
+  },
 };
 
 type State = {|
@@ -101,6 +104,7 @@ type State = {|
   validatedValue: string,
   errorText: ?string,
   errorHighlights: Array<Highlight>,
+  isOnlyWarning: boolean,
   autocompletions: AutocompletionsState,
 |};
 
@@ -134,6 +138,7 @@ const extractErrors = (
 ): {|
   errorText: ?string,
   errorHighlights: Array<Highlight>,
+  isOnlyWarning: boolean,
 |} => {
   const expressionValidator = new gd.ExpressionValidator(
     gd.JsPlatform.get(),
@@ -143,13 +148,20 @@ const extractErrors = (
   );
   expressionNode.visit(expressionValidator);
   const errors = expressionValidator.getAllErrors();
+  const fatalErrors = expressionValidator.getFatalErrors();
+  const hasFatalErrors = fatalErrors.size() > 0;
 
-  const errorHighlights: Array<Highlight> = mapVector(errors, error => ({
-    begin: error.getStartPosition(),
-    end: error.getEndPosition() + 1,
-    message: error.getMessage(),
-    type: 'error',
-  }));
+  const errorHighlights: Array<Highlight> = mapVector(errors, error => {
+    const errorType = error.getType();
+    const isDeprecated =
+      errorType === gd.ExpressionParserError.DeprecatedExpression;
+    return {
+      begin: error.getStartPosition(),
+      end: error.getEndPosition() + 1,
+      message: error.getMessage(),
+      type: isDeprecated ? 'deprecated' : 'error',
+    };
+  });
   const otherErrorsCount = Math.max(
     0,
     errorHighlights.length - MAX_ERRORS_COUNT
@@ -168,9 +180,12 @@ const extractErrors = (
     )
     .join(' ');
 
+  // If there are warnings but no fatal errors, it's only a warning
+  const isOnlyWarning = errors.size() > 0 && !hasFatalErrors;
+
   expressionValidator.delete();
 
-  return { errorText, errorHighlights };
+  return { errorText, errorHighlights, isOnlyWarning };
 };
 
 export default class ExpressionField extends React.Component<Props, State> {
@@ -186,6 +201,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     validatedValue: this.props.value,
     errorText: null,
     errorHighlights: [],
+    isOnlyWarning: false,
     autocompletions: getAutocompletionsInitialState(),
   };
 
@@ -443,7 +459,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     const parser = new gd.ExpressionParser2();
     const expressionNode = parser.parseExpression(expression).get();
 
-    const { errorText, errorHighlights } = extractErrors(
+    const { errorText, errorHighlights, isOnlyWarning } = extractErrors(
       gd.JsPlatform.get(),
       project,
       projectScopedContainersAccessor,
@@ -467,6 +483,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       this.setState(state => ({
         errorText: formattedErrorText,
         errorHighlights,
+        isOnlyWarning,
         autocompletions: getAutocompletionsInitialState(),
       }));
       return;
@@ -504,6 +521,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     this.setState(state => ({
       errorText: formattedErrorText,
       errorHighlights,
+      isOnlyWarning,
       autocompletions: setNewAutocompletions(
         state.autocompletions,
         allNewAutocompletions
@@ -583,7 +601,17 @@ export default class ExpressionField extends React.Component<Props, State> {
                       onBlur={this._handleBlurEvent}
                       ref={field => (this._field = field)}
                       onFocus={this._handleFocus}
-                      errorText={this.state.errorText}
+                      errorText={
+                        this.state.errorText ? (
+                          this.state.isOnlyWarning ? (
+                            <span style={styles.warningText}>
+                              {this.state.errorText}
+                            </span>
+                          ) : (
+                            this.state.errorText
+                          )
+                        ) : null
+                      }
                       onClick={() => this._enqueueValidation()}
                       onKeyDown={event => {
                         const autocompletions = handleAutocompletionsKeyDown(

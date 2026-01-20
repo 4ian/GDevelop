@@ -311,6 +311,20 @@ const InstructionParametersEditor = React.forwardRef<
                   </Text>
                 </Column>
               </Line>
+              {instructionMetadata.isHidden() && (
+                <Line>
+                  <AlertMessage kind="warning">
+                    {instructionMetadata.getDeprecationMessage() ? (
+                      <>
+                        <Trans>Deprecated:</Trans>{' '}
+                        {instructionMetadata.getDeprecationMessage()}
+                      </>
+                    ) : (
+                      <Trans>Deprecated</Trans>
+                    )}
+                  </AlertMessage>
+                </Line>
+              )}
               {instructionExtraInformation && (
                 <Line>
                   {instructionExtraInformation.identifier === undefined ? (

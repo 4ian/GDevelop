@@ -88,6 +88,11 @@ class GD_CORE_API ExpressionMetadata : public gd::AbstractFunctionMetadata {
   const gd::String& GetDeprecationMessage() const { return deprecationMessage; }
 
   /**
+   * \brief Check if the expression is deprecated.
+   */
+  bool IsDeprecated() const { return !deprecationMessage.empty(); }
+
+  /**
    * \brief Set the group of the instruction in the IDE.
    */
   ExpressionMetadata& SetGroup(const gd::String& str) {

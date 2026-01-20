@@ -450,6 +450,8 @@ typedef std::unique_ptr<gd::Behavior> UniquePtrBehavior;
 typedef std::unique_ptr<ExpressionNode> UniquePtrExpressionNode;
 typedef std::vector<gd::ExpressionParserError *>
     VectorExpressionParserError;
+typedef gd::ExpressionParserError::ErrorType
+    ExpressionParserError_ErrorType;
 typedef gd::SerializableWithNameList<gd::EventsBasedBehavior>
     EventsBasedBehaviorsList;
 typedef gd::SerializableWithNameList<gd::EventsBasedObject>
@@ -679,6 +681,7 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_IsBehaviorCompatibleWithObject IsBehaviorCompatibleWithObject
 #define STATIC_FillBehaviorParameters FillBehaviorParameters
 #define STATIC_IsParameterValid IsParameterValid
+#define STATIC_HasDeprecationWarnings HasDeprecationWarnings
 #define STATIC_FixInvalidRequiredBehaviorProperties \
   FixInvalidRequiredBehaviorProperties
 #define STATIC_RemoveLayerInScene RemoveLayerInScene

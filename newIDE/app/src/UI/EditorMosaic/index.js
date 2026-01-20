@@ -72,8 +72,7 @@ export const mosaicContainsNode = (
 /**
  * Fill missing `splitPercentage` with `50`.
  */
-const fillMissingSplitPercentage = (
-  currentNode: EditorMosaicNode) => {
+const fillMissingSplitPercentage = (currentNode: EditorMosaicNode) => {
   if (typeof currentNode === 'string') {
     return;
   }
@@ -82,7 +81,7 @@ const fillMissingSplitPercentage = (
   }
   fillMissingSplitPercentage(currentNode.first);
   fillMissingSplitPercentage(currentNode.second);
-}
+};
 
 const resizeNode = (
   currentNode: EditorMosaicNode,

@@ -29,6 +29,8 @@ declare class gdEventsFunction {
   getHelpUrl(): string;
   setDeprecated(isDeprecated: boolean): gdEventsFunction;
   isDeprecated(): boolean;
+  setDeprecationMessage(message: string): gdEventsFunction;
+  getDeprecationMessage(): string;
   isAction(): boolean;
   isExpression(): boolean;
   isCondition(): boolean;

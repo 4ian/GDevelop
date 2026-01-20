@@ -1737,6 +1737,7 @@ interface InstructionMetadata {
     [Const, Ref] ParameterMetadataContainer GetParameters();
     long GetUsageComplexity();
     boolean IsHidden();
+    [Const, Ref] DOMString GetDeprecationMessage();
     boolean IsPrivate();
     boolean IsAsync();
     boolean IsOptionallyAsync();
@@ -3210,6 +3211,8 @@ interface EventsFunction {
     [Const, Ref] DOMString GetHelpUrl();
     [Ref] EventsFunction SetDeprecated(boolean isDeprecated);
     boolean IsDeprecated();
+    [Ref] EventsFunction SetDeprecationMessage([Const] DOMString message);
+    [Const, Ref] DOMString GetDeprecationMessage();
     boolean IsAction();
     boolean IsExpression();
     boolean IsCondition();

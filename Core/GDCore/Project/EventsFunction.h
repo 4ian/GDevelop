@@ -250,6 +250,21 @@ class GD_CORE_API EventsFunction {
   }
 
   /**
+   * \brief Get the deprecation message that explains why the function is
+   * deprecated and what to use instead.
+   */
+  const gd::String& GetDeprecationMessage() const { return deprecationMessage; }
+
+  /**
+   * \brief Set the deprecation message that explains why the function is
+   * deprecated and what to use instead.
+   */
+  EventsFunction& SetDeprecationMessage(const gd::String& message) {
+    deprecationMessage = message;
+    return *this;
+  }
+
+  /**
    * \brief Return the events.
    */
   const gd::EventsList& GetEvents() const { return events; };
@@ -332,6 +347,7 @@ class GD_CORE_API EventsFunction {
   bool isAsync = false;
   gd::String helpUrl;
   bool isDeprecated = false;
+  gd::String deprecationMessage;
 };
 
 }  // namespace gd

@@ -30,6 +30,7 @@ import {
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { type EditorCallbacks } from '../EditorFunctions';
 import {
+  getFunctionCallNameByCallId,
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
 } from './AiRequestUtils';
@@ -611,7 +612,11 @@ export const AskAiEditor = React.memo<Props>(
             const paused =
               functionCallOutputs.length > 0 &&
               functionCallOutputs.some(
-                output => output.call_id.indexOf('initialize_project') !== -1
+                output =>
+                  getFunctionCallNameByCallId({
+                    aiRequest: selectedAiRequest,
+                    callId: output.call_id,
+                  }) === 'initialize_project'
               );
 
             const aiRequest: AiRequest = await retryIfFailed({ times: 2 }, () =>

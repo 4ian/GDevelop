@@ -21,6 +21,7 @@ import {
 } from '../EditorFunctions/EditorFunctionCallRunner';
 import { type EditorCallbacks } from '../EditorFunctions';
 import {
+  getFunctionCallNameByCallId,
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
 } from './AiRequestUtils';
@@ -400,7 +401,10 @@ export const useAiRequestState = ({ project }: {| project: ?gdProject |}) => {
 
         const isLastMessageFunctionCallOutputProjectInitialization =
           lastMessage.type === 'function_call_output' &&
-          lastMessage.call_id.indexOf('initialize_project') !== -1;
+          getFunctionCallNameByCallId({
+            aiRequest: selectedAiRequest,
+            callId: lastMessage.call_id,
+          }) === 'initialize_project';
 
         try {
           // The request will switch from "ready" to "working" while suggestions are generated.

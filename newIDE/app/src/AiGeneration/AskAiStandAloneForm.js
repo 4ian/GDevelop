@@ -18,6 +18,7 @@ import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { CreditsPackageStoreContext } from '../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import { type EditorCallbacks } from '../EditorFunctions';
 import {
+  getFunctionCallNameByCallId,
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
 } from './AiRequestUtils';
@@ -441,7 +442,11 @@ export const AskAiStandAloneForm = ({
         const paused =
           functionCallOutputs.length > 0 &&
           functionCallOutputs.some(
-            output => output.call_id.indexOf('initialize_project') !== -1
+            output =>
+              getFunctionCallNameByCallId({
+                aiRequest: aiRequestForForm,
+                callId: output.call_id,
+              }) === 'initialize_project'
           );
 
         const aiRequest: AiRequest = await retryIfFailed({ times: 2 }, () =>

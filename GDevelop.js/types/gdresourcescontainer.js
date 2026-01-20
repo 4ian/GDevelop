@@ -10,12 +10,14 @@ declare class gdResourcesContainer {
   findFilesNotInResources(filesToCheck: gdVectorString): gdVectorString;
   hasResource(name: string): boolean;
   getResource(name: string): gdResource;
+  getResourceAt(index: number): gdResource;
   getResourceNameWithOrigin(originName: string, originIdentifier: string): string;
   getResourceNameWithFile(file: string): string;
   addResource(res: gdResource): boolean;
   removeResource(name: string): void;
   renameResource(oldName: string, name: string): void;
   getResourcePosition(name: string): number;
+  count(): number;
   moveResourceUpInList(oldName: string): boolean;
   moveResourceDownInList(oldName: string): boolean;
   moveResource(oldIndex: number, newIndex: number): void;

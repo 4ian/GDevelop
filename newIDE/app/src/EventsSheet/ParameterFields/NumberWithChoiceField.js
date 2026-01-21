@@ -43,9 +43,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     // another component without this one to know.
     const choices = getParameterChoiceValues(parameterMetadata);
 
-    const isCurrentValueInList = choices.some(
-      choice => `"${choice}"` === value
-    );
+    const isCurrentValueInList = choices.includes(value);
 
     // If the current value is not in the list, display an expression field.
     const [isExpressionField, setIsExpressionField] = React.useState(

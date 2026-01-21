@@ -280,7 +280,13 @@ const Instruction = (props: Props) => {
                 />
               );
             }
-            return <span key={i}>{value}</span>;
+            // Add [DEPRECATED] prefix for the first text segment if the preference is enabled
+            // and the instruction is deprecated (hidden)
+            const deprecatedPrefix =
+              i === 0 && showDeprecatedInstructionWarning && metadata.isHidden()
+                ? '[DEPRECATED] '
+                : '';
+            return <span key={i}>{deprecatedPrefix + value}</span>;
           }
 
           const parameterMetadata = metadata.getParameter(parameterIndex);
@@ -301,15 +307,17 @@ const Instruction = (props: Props) => {
               parameterIndex,
               value
             );
-            // Check for deprecation warnings
-            hasDeprecationWarning = gd.InstructionValidator.hasDeprecationWarnings(
-              platform,
-              projectScopedContainers,
-              instruction,
-              metadata,
-              parameterIndex,
-              value
-            );
+            // Check for deprecation warnings (only if the preference is enabled)
+            if (showDeprecatedInstructionWarning) {
+              hasDeprecationWarning = gd.InstructionValidator.hasDeprecationWarnings(
+                platform,
+                projectScopedContainers,
+                instruction,
+                metadata,
+                parameterIndex,
+                value
+              );
+            }
             // TODO Move this code inside `InstructionValidator.isParameterValid`
             if (
               expressionIsValid &&

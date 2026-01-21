@@ -49,6 +49,7 @@ import {
 } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 import Paper from '../../../UI/Paper';
 import { ProjectScopedContainersAccessor } from '../../../InstructionOrExpression/EventsScope';
+import PreferencesContext from '../../../MainFrame/Preferences/PreferencesContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -134,7 +135,8 @@ const extractErrors = (
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   expressionType: string,
   parameterMetadata: ?gdParameterMetadata,
-  expressionNode: gdExpressionNode
+  expressionNode: gdExpressionNode,
+  showDeprecatedInstructionWarning: boolean
 ): {|
   errorText: ?string,
   errorHighlights: Array<Highlight>,
@@ -155,13 +157,17 @@ const extractErrors = (
     const errorType = error.getType();
     const isDeprecated =
       errorType === gd.ExpressionParserError.DeprecatedExpression;
+    // Skip deprecation warnings if the preference is disabled
+    if (isDeprecated && !showDeprecatedInstructionWarning) {
+      return null;
+    }
     return {
       begin: error.getStartPosition(),
       end: error.getEndPosition() + 1,
       message: error.getMessage(),
       type: isDeprecated ? 'deprecated' : 'error',
     };
-  });
+  }).filter(Boolean);
   const otherErrorsCount = Math.max(
     0,
     errorHighlights.length - MAX_ERRORS_COUNT
@@ -189,6 +195,8 @@ const extractErrors = (
 };
 
 export default class ExpressionField extends React.Component<Props, State> {
+  static contextType = PreferencesContext;
+
   _field: ?SemiControlledTextFieldInterface = null;
   _fieldElementWidth: ?number = null;
   _inputElement: ?HTMLInputElement = null;
@@ -459,13 +467,18 @@ export default class ExpressionField extends React.Component<Props, State> {
     const parser = new gd.ExpressionParser2();
     const expressionNode = parser.parseExpression(expression).get();
 
+    const showDeprecatedInstructionWarning = this.context
+      ? this.context.values.showDeprecatedInstructionWarning
+      : true;
+
     const { errorText, errorHighlights, isOnlyWarning } = extractErrors(
       gd.JsPlatform.get(),
       project,
       projectScopedContainersAccessor,
       expressionType,
       parameterMetadata,
-      expressionNode
+      expressionNode,
+      showDeprecatedInstructionWarning
     );
     const extraErrorText = onExtractAdditionalErrors
       ? onExtractAdditionalErrors(expression, expressionNode)

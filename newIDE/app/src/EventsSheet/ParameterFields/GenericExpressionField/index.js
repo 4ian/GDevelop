@@ -94,7 +94,7 @@ const styles = {
     paddingRight: 0,
   },
   warningText: {
-    color: '#ff9800', // Orange color for warnings
+    color: '#ff9800',
   },
 };
 

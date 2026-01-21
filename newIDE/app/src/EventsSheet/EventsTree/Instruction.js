@@ -299,7 +299,8 @@ const Instruction = (props: Props) => {
           let expressionIsValid = true;
           let hasDeprecationWarning = false;
           if (!shouldNotBeValidated({ value, parameterType })) {
-            expressionIsValid = gd.InstructionValidator.isParameterValid(
+            // Use validateParameter for combined validation (single pass)
+            const validationResult = gd.InstructionValidator.validateParameter(
               platform,
               projectScopedContainers,
               instruction,
@@ -307,17 +308,12 @@ const Instruction = (props: Props) => {
               parameterIndex,
               value
             );
+            expressionIsValid = validationResult.isValid();
             // Check for deprecation warnings (only if the preference is enabled)
             if (showDeprecatedInstructionWarning) {
-              hasDeprecationWarning = gd.InstructionValidator.hasDeprecationWarnings(
-                platform,
-                projectScopedContainers,
-                instruction,
-                metadata,
-                parameterIndex,
-                value
-              );
+              hasDeprecationWarning = validationResult.hasDeprecationWarning();
             }
+            validationResult.delete();
             // TODO Move this code inside `InstructionValidator.isParameterValid`
             if (
               expressionIsValid &&

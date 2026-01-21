@@ -2105,7 +2105,13 @@ export class BehaviorParameterFiller extends EmscriptenObject {
   static fillBehaviorParameters(platform: Platform, projectScopedContainers: ProjectScopedContainers, instructionMetadata: InstructionMetadata, instruction: Instruction): boolean;
 }
 
+export class ParameterValidationResult extends EmscriptenObject {
+  isValid(): boolean;
+  hasDeprecationWarning(): boolean;
+}
+
 export class InstructionValidator extends EmscriptenObject {
+  static validateParameter(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction, metadata: InstructionMetadata, parameterIndex: number, value: string): ParameterValidationResult;
   static isParameterValid(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction, metadata: InstructionMetadata, parameterIndex: number, value: string): boolean;
   static hasDeprecationWarnings(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction, metadata: InstructionMetadata, parameterIndex: number, value: string): boolean;
 }

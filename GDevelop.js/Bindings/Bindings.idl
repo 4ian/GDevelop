@@ -2925,7 +2925,19 @@ interface BehaviorParameterFiller {
         [Ref] Instruction instruction);
 };
 
+interface ParameterValidationResult {
+  boolean IsValid();
+  boolean HasDeprecationWarning();
+};
+
 interface InstructionValidator {
+  [Value] ParameterValidationResult STATIC_ValidateParameter(
+    [Const, Ref] Platform platform,
+    [Const, Ref] ProjectScopedContainers projectScopedContainers,
+    [Const, Ref] Instruction instruction,
+    [Const, Ref] InstructionMetadata metadata,
+    long parameterIndex,
+    [Const] DOMString value);
   boolean STATIC_IsParameterValid(
     [Const, Ref] Platform platform,
     [Const, Ref] ProjectScopedContainers projectScopedContainers,

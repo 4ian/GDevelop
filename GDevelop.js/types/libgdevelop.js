@@ -199,6 +199,7 @@ declare class libGDevelop {
   VariablesChangeset: Class<gdVariablesChangeset>;
   WholeProjectRefactorer: Class<gdWholeProjectRefactorer>;
   BehaviorParameterFiller: Class<gdBehaviorParameterFiller>;
+  ParameterValidationResult: Class<gdParameterValidationResult>;
   InstructionValidator: Class<gdInstructionValidator>;
   ObjectTools: Class<gdObjectTools>;
   EventsBasedObjectDependencyFinder: Class<gdEventsBasedObjectDependencyFinder>;

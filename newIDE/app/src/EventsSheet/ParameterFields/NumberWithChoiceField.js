@@ -55,7 +55,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     React.useEffect(
       () => {
         if (!isExpressionField && !value && choices.length > 0) {
-          onChange(`${choices[0]}`);
+          onChange(choices[0]);
         }
       },
       [choices, isExpressionField, onChange, value]
@@ -77,7 +77,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       return (
         <SelectOption
           key={choice}
-          value={`${choice}`}
+          value={choice}
           label={choice}
           shouldNotTranslate={true}
         />

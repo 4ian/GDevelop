@@ -4,8 +4,8 @@
  * reserved. This project is released under the MIT License.
  */
 
-#ifndef VALUE_TYPE_METADATA_H
-#define VALUE_TYPE_METADATA_H
+#pragma once
+
 #include <map>
 #include <memory>
 
@@ -216,7 +216,8 @@ class GD_CORE_API ValueTypeMetadata {
                            const gd::String &parameterType) {
     if (type == "number") {
       return parameterType == "number" || parameterType == "expression" ||
-             parameterType == "camera" || parameterType == "forceMultiplier";
+             parameterType == "camera" || parameterType == "forceMultiplier" ||
+             parameterType == "numberWithChoice";
     } else if (type == "string") {
       // "key" and "mouse" are not mapped her, see GetPrimitiveValueType.
       return parameterType == "string" || parameterType == "layer" ||
@@ -346,6 +347,7 @@ class GD_CORE_API ValueTypeMetadata {
   static const gd::String stringValueType;
   static const gd::String colorValueType;
   static const gd::String choiceValueType;
+  static const gd::String numberWithChoiceValueType;
   static const gd::String behaviorValueType;
   static const gd::String leaderboardIdValueType;
   static const gd::String objectAnimationNameValueType;
@@ -353,5 +355,3 @@ class GD_CORE_API ValueTypeMetadata {
 };
 
 }  // namespace gd
-
-#endif  // VALUE_TYPE_METADATA_H

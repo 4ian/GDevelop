@@ -408,6 +408,11 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                     label={t`String from a list of options (text)`}
                                   />
                                   <SelectOption
+                                    key="property-type-number-with-choice"
+                                    value="NumberWithChoice"
+                                    label={t`Number from a list of options (number)`}
+                                  />
+                                  <SelectOption
                                     key="property-type-color"
                                     value="Color"
                                     label={t`Color (text)`}
@@ -453,7 +458,9 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                       />
                                     )}
                                 </SelectField>
-                                {property.getType() === 'Number' && (
+                                {(property.getType() === 'Number' ||
+                                  property.getType() ===
+                                    'NumberWithChoice') && (
                                   <SelectField
                                     floatingLabelText={
                                       <Trans>Measurement unit</Trans>
@@ -647,7 +654,9 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                     fullWidth
                                   />
                                 )}
-                                {property.getType() === 'Choice' && (
+                                {(property.getType() === 'Choice' ||
+                                  property.getType() ===
+                                    'NumberWithChoice') && (
                                   <SelectField
                                     floatingLabelText={
                                       <Trans>Default value</Trans>
@@ -682,10 +691,14 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                   </SelectField>
                                 )}
                               </ResponsiveLineStackLayout>
-                              {property.getType() === 'Choice' && (
+                              {(property.getType() === 'Choice' ||
+                                property.getType() === 'NumberWithChoice') && (
                                 <ChoicesEditor
                                   choices={getChoicesArray(property)}
                                   setChoices={setChoices(property)}
+                                  isNumber={
+                                    property.getType() === 'NumberWithChoice'
+                                  }
                                 />
                               )}
                               <ResponsiveLineStackLayout noMargin>

@@ -215,6 +215,12 @@
     underline wavy;
 }
 
+.gd-events-sheet .instruction-parameter .instruction-deprecated-parameter {
+  color: var(--event-sheet-instruction-parameter-warning-color);
+  text-decoration: var(--event-sheet-instruction-parameter-warning-color)
+    underline wavy;
+}
+
 .gd-events-sheet .instruction-parameter .instruction-missing-parameter {
   display: inline-flex;
   background-color: var(

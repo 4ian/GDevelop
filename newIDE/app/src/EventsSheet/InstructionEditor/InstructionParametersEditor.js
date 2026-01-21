@@ -28,6 +28,7 @@ import ScrollView from '../../UI/ScrollView';
 import { getInstructionTutorialIds } from '../../Utils/GDevelopServices/Tutorial';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
+import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import FlatButton from '../../UI/FlatButton';
 import {
   type ParameterFieldInterface,
@@ -139,6 +140,9 @@ const InstructionParametersEditor = React.forwardRef<
     const {
       palette: { type: paletteType },
     } = React.useContext(GDevelopThemeContext);
+    const preferences = React.useContext(PreferencesContext);
+    const showDeprecatedInstructionWarning =
+      preferences.values.showDeprecatedInstructionWarning;
 
     const forceUpdate = useForceUpdate();
 
@@ -311,7 +315,7 @@ const InstructionParametersEditor = React.forwardRef<
                   </Text>
                 </Column>
               </Line>
-              {instructionMetadata.isHidden() && (
+              {showDeprecatedInstructionWarning && instructionMetadata.isHidden() && (
                 <Line>
                   <AlertMessage kind="warning">
                     {instructionMetadata.getDeprecationMessage() ? (

@@ -858,7 +858,7 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
                       justifyContent="flex-start"
                       expand
                     >
-                      <div style={{ width: 20 }} />
+                      <Spacer />
                       <Text size="body-small" noMargin color="secondary">
                         <Trans>Restored</Trans> ↳{' '}
                         <Link
@@ -928,7 +928,7 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
               size="body-small"
               color="inherit"
             >
-              <Trans>Suggesting...</Trans>
+              <Trans>Thinking...</Trans>
             </Text>
           </div>
         </Line>
@@ -958,7 +958,13 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
               size="body-small"
               color="inherit"
             >
-              {isPaused ? <Trans>Paused</Trans> : <Trans>Thinking...</Trans>}
+              {isPaused ? (
+                <Trans>Paused</Trans>
+              ) : aiRequest.mode === 'chat' ? (
+                <Trans>Thinking...</Trans>
+              ) : (
+                <Trans>Working...</Trans>
+              )}
             </Text>
           </div>
         </Line>

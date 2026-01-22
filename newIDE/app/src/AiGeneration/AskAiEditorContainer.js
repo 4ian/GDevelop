@@ -1148,13 +1148,14 @@ export const AskAiEditor = React.memo<Props>(
               } else {
                 // Fork the AI request to create a new conversation
                 try {
-                  const forkedAiRequest = await forkAiRequest(
-                    getAuthorizationHeader,
-                    {
-                      userId: profile.id,
-                      aiRequestId: aiRequest.id,
-                      upToMessageId: forkToMessageId,
-                    }
+                  const forkedAiRequest: AiRequest = await retryIfFailed(
+                    { times: 2 },
+                    () =>
+                      forkAiRequest(getAuthorizationHeader, {
+                        userId: profile.id,
+                        aiRequestId: aiRequest.id,
+                        upToMessageId: forkToMessageId || undefined,
+                      })
                   );
                   updateAiRequest(forkedAiRequest.id, () => forkedAiRequest);
 

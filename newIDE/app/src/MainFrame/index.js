@@ -3659,6 +3659,8 @@ const MainFrame = (props: Props) => {
         createdProject?: gdProject,
       |}
     ): Promise<?FileMetadata> => {
+      // In some cases (ex: when a project is created by the AI), the project in
+      // the mainframe state is not updated yet, so we use the provided one.
       const upToDateProject =
         options && options.createdProject
           ? options.createdProject

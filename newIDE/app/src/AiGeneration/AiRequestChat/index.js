@@ -44,6 +44,7 @@ import {
 import { AiConfigurationPresetSelector } from './AiConfigurationPresetSelector';
 import { AiRequestContext } from '../AiRequestContext';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
+import { useStickyVisibility } from './UseStickyVisibility';
 import CircledInfo from '../../UI/CustomSvgIcons/CircledInfo';
 import Coin from '../../Credits/Icons/Coin';
 import FlatButton from '../../UI/FlatButton';
@@ -662,10 +663,28 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       ]
     );
 
-    // Use a ref to track the last time the banner should be shown
-    // to prevent flickering during rapid state changes
-    const lastShouldShowTimeRef = React.useRef<number>(0);
-    const stableShowBannerRef = React.useRef<boolean>(false);
+    // Calculate feedback banner visibility for sticky behavior
+    // (must be before conditional returns to follow React hooks rules)
+    const allFunctionCallsToProcess =
+      aiRequest && editorFunctionCallResults
+        ? getFunctionCallsToProcess({
+            aiRequest,
+            editorFunctionCallResults,
+          })
+        : [];
+    const isPausedAndHasFunctionCallsToProcess =
+      !isAutoProcessingFunctionCalls && allFunctionCallsToProcess.length > 0;
+    const shouldDisplayFeedbackBannerNow =
+      !hasWorkingFunctionCalls &&
+      !isPausedAndHasFunctionCallsToProcess &&
+      !isSending &&
+      !!aiRequest &&
+      aiRequest.status === 'ready' &&
+      aiRequest.mode === 'agent';
+    const shouldDisplayFeedbackBanner = useStickyVisibility(
+      shouldDisplayFeedbackBannerNow,
+      300
+    );
 
     if (!aiRequest || standAloneForm) {
       return (
@@ -917,31 +936,6 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     const userMessagesCount = aiRequest.output.filter(
       message => message.type === 'message' && message.role === 'user'
     ).length;
-    const allFunctionCallsToProcess = getFunctionCallsToProcess({
-      aiRequest,
-      editorFunctionCallResults,
-    });
-    const isPausedAndHasFunctionCallsToProcess =
-      !isAutoProcessingFunctionCalls && allFunctionCallsToProcess.length > 0;
-
-    // Calculate if feedback banner should be shown based on current conditions
-    const shouldDisplayFeedbackBannerNow =
-      !hasWorkingFunctionCalls &&
-      !isPausedAndHasFunctionCallsToProcess &&
-      !isSending &&
-      aiRequest.status === 'ready' &&
-      aiRequest.mode === 'agent';
-    // Update the stable value:
-    // - If it should show now, always update to true and track the time
-    // - If it should hide now, only hide if it's been hidden for at least 300ms
-    if (shouldDisplayFeedbackBannerNow) {
-      lastShouldShowTimeRef.current = Date.now();
-      stableShowBannerRef.current = true;
-    } else if (Date.now() - lastShouldShowTimeRef.current > 300) {
-      stableShowBannerRef.current = false;
-    }
-
-    const shouldDisplayFeedbackBanner = stableShowBannerRef.current;
 
     const isForAnotherProjectText = isForAnotherProject ? (
       <Text size="body-small" color="secondary" align="center">

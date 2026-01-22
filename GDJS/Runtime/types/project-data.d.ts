@@ -450,6 +450,7 @@ declare interface InstanceData extends InstancePersistentUuidData {
   numberProperties: InstanceNumberProperty[];
   stringProperties: InstanceStringProperty[];
   initialVariables: RootVariableData[];
+  behaviorOverridings?: BehaviorData[];
 }
 
 declare interface InstanceNumberProperty {

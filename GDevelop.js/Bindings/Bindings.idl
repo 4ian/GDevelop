@@ -1055,7 +1055,7 @@ interface ExternalLayout {
     [Ref] EditorSettings GetAssociatedEditorSettings();
 
     void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Const, Ref] SerializerElement element);
+    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
 
 interface Effect {
@@ -1492,8 +1492,14 @@ interface InitialInstance {
 
     [Ref] VariablesContainer GetVariables();
 
+    boolean HasBehaviorOverridingNamed([Const] DOMString name);
+    Behavior AddNewBehaviorOverriding([Ref] Project project, [Const] DOMString type, [Const] DOMString name);
+    [Ref] Behavior GetBehaviorOverriding([Const] DOMString name);
+    void RemoveBehaviorOverriding([Const] DOMString name);
+    boolean RenameBehaviorOverriding([Const] DOMString oldName, [Const] DOMString name);
+
     void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Const, Ref] SerializerElement element);
+    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
 
 interface InitialInstancesContainer {
@@ -1518,7 +1524,7 @@ interface InitialInstancesContainer {
     [Ref] InitialInstance InsertInitialInstance([Const, Ref] InitialInstance inst);
 
     void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Const, Ref] SerializerElement element);
+    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
 
 interface HighestZOrderFinder {

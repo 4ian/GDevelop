@@ -186,7 +186,7 @@ const translateTypeToHumanReadableDescription = type => {
   if (caseInsensitiveCheck(type, 'number')) return '🔢 Number';
   if (caseInsensitiveCheck(type, 'expression')) return '🔢 Number';
   if (caseInsensitiveCheck(type, 'camera')) return '🔢 Camera index (Number)';
-  if (caseInsensitiveCheck(type, 'numberWithChoice')) return '🔢 Number';
+  if (caseInsensitiveCheck(type, 'numberWithChoices')) return '🔢 Number';
 
   if (caseInsensitiveCheck(type, 'object')) return '👾 Object';
   if (caseInsensitiveCheck(type, 'objectList')) return '👾 Object';
@@ -248,7 +248,7 @@ const translateTypeToHumanReadableType = type => {
   if (caseInsensitiveCheck(type, 'number')) return 'number';
   if (caseInsensitiveCheck(type, 'expression')) return 'number';
   if (caseInsensitiveCheck(type, 'camera')) return 'number';
-  if (caseInsensitiveCheck(type, 'numberWithChoice')) return 'number';
+  if (caseInsensitiveCheck(type, 'numberWithChoices')) return 'number';
 
   if (caseInsensitiveCheck(type, 'objectList')) return 'object';
   if (caseInsensitiveCheck(type, 'objectPtr')) return 'object';
@@ -365,7 +365,7 @@ const getSimplifiedParameterDescription = (type, sanitizedDescription) => {
 const getParameterExtraInfoDescription = parameterMetadata => {
   if (
     parameterMetadata.getType() === 'stringWithSelector' ||
-    parameterMetadata.getType() === 'numberWithChoice'
+    parameterMetadata.getType() === 'numberWithChoices'
   ) {
     const rawExtraInfo = parameterMetadata.getExtraInfo();
     try {

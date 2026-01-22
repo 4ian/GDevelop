@@ -241,7 +241,7 @@ export class EventsBasedEntityPropertyTreeViewItemContent
   getThumbnail(): ?string {
     switch (this.property.getProperty().getType()) {
       case 'Number':
-      case 'NumberWithChoice':
+      case 'NumberWithChoices':
         return 'res/functions/number_black.svg';
       case 'Boolean':
         return 'res/functions/boolean_black.svg';

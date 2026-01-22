@@ -409,7 +409,7 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                   />
                                   <SelectOption
                                     key="property-type-number-with-choice"
-                                    value="NumberWithChoice"
+                                    value="NumberWithChoices"
                                     label={t`Number from a list of options (number)`}
                                   />
                                   <SelectOption
@@ -460,7 +460,7 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                 </SelectField>
                                 {(property.getType() === 'Number' ||
                                   property.getType() ===
-                                    'NumberWithChoice') && (
+                                    'NumberWithChoices') && (
                                   <SelectField
                                     floatingLabelText={
                                       <Trans>Measurement unit</Trans>
@@ -656,7 +656,7 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                 )}
                                 {(property.getType() === 'Choice' ||
                                   property.getType() ===
-                                    'NumberWithChoice') && (
+                                    'NumberWithChoices') && (
                                   <SelectField
                                     floatingLabelText={
                                       <Trans>Default value</Trans>
@@ -692,12 +692,12 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                 )}
                               </ResponsiveLineStackLayout>
                               {(property.getType() === 'Choice' ||
-                                property.getType() === 'NumberWithChoice') && (
+                                property.getType() === 'NumberWithChoices') && (
                                 <ChoicesEditor
                                   choices={getChoicesArray(property)}
                                   setChoices={setChoices(property)}
                                   isNumber={
-                                    property.getType() === 'NumberWithChoice'
+                                    property.getType() === 'NumberWithChoices'
                                   }
                                 />
                               )}

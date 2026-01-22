@@ -32,7 +32,7 @@ import TrueFalseField, {
 import ExpressionField from './ParameterFields/ExpressionField';
 import StringField from './ParameterFields/StringField';
 import StringWithSelectorField from './ParameterFields/StringWithSelectorField';
-import NumberWithChoiceField from './ParameterFields/NumberWithChoiceField';
+import NumberWithChoicesField from './ParameterFields/NumberWithChoicesField';
 import BehaviorField from './ParameterFields/BehaviorField';
 import AnyVariableField, {
   renderInlineAnyVariable,
@@ -98,7 +98,7 @@ const components = {
   expression: ExpressionField,
   string: StringField,
   stringWithSelector: StringWithSelectorField,
-  numberWithChoice: NumberWithChoiceField,
+  numberWithChoices: NumberWithChoicesField,
   behavior: BehaviorField,
   variable: AnyVariableField,
   variableOrProperty: AnyVariableOrPropertyField,
@@ -169,7 +169,7 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   number: t`Number`,
   string: t`String`,
   stringWithSelector: t`String`,
-  numberWithChoice: t`Number`,
+  numberWithChoices: t`Number`,
   behavior: t`Behavior`,
   anyvar: t`Variable`,
   scenevar: t`Scene variable`,

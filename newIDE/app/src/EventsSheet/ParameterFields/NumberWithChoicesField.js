@@ -18,7 +18,7 @@ import TypeCursorSelect from '../../UI/CustomSvgIcons/TypeCursorSelect';
 import { getParameterChoiceValues } from './ParameterMetadataTools';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
-  function NumberWithChoiceField(props: ParameterFieldProps, ref) {
+  function NumberWithChoicesField(props: ParameterFieldProps, ref) {
     const {
       value,
       onChange,

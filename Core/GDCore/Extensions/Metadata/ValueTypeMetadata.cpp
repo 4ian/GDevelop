@@ -118,7 +118,7 @@ const gd::String ValueTypeMetadata::booleanValueType = "boolean";
 const gd::String ValueTypeMetadata::stringValueType = "string";
 const gd::String ValueTypeMetadata::colorValueType = "color";
 const gd::String ValueTypeMetadata::choiceValueType = "stringWithSelector";
-const gd::String ValueTypeMetadata::numberWithChoiceValueType = "numberWithChoice";
+const gd::String ValueTypeMetadata::numberWithChoicesValueType = "numberWithChoices";
 const gd::String ValueTypeMetadata::behaviorValueType = "behavior";
 const gd::String ValueTypeMetadata::leaderboardIdValueType = "leaderboardId";
 const gd::String ValueTypeMetadata::objectAnimationNameValueType = "objectAnimationName";
@@ -134,8 +134,8 @@ const gd::String &ValueTypeMetadata::ConvertPropertyTypeToValueType(
     return colorValueType;
   } else if (propertyType == "Choice") {
     return choiceValueType;
-  } else if (propertyType == "NumberWithChoice") {
-    return numberWithChoiceValueType;
+  } else if (propertyType == "NumberWithChoices") {
+    return numberWithChoicesValueType;
   } else if (propertyType == "Behavior") {
     return behaviorValueType;
   } else if (propertyType == "LeaderboardId") {

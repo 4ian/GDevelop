@@ -217,7 +217,7 @@ class GD_CORE_API ValueTypeMetadata {
     if (type == "number") {
       return parameterType == "number" || parameterType == "expression" ||
              parameterType == "camera" || parameterType == "forceMultiplier" ||
-             parameterType == "numberWithChoice";
+             parameterType == "numberWithChoices";
     } else if (type == "string") {
       // "key" and "mouse" are not mapped her, see GetPrimitiveValueType.
       return parameterType == "string" || parameterType == "layer" ||
@@ -347,7 +347,7 @@ class GD_CORE_API ValueTypeMetadata {
   static const gd::String stringValueType;
   static const gd::String colorValueType;
   static const gd::String choiceValueType;
-  static const gd::String numberWithChoiceValueType;
+  static const gd::String numberWithChoicesValueType;
   static const gd::String behaviorValueType;
   static const gd::String leaderboardIdValueType;
   static const gd::String objectAnimationNameValueType;

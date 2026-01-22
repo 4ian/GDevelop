@@ -99,7 +99,7 @@ export default function ValueTypeEditor({
                   label={t`String from a list of options (text)`}
                 />
                 <SelectOption
-                  value="numberWithChoice"
+                  value="numberWithChoices"
                   label={t`Number from a list of options (number)`}
                 />
                 <SelectOption
@@ -297,7 +297,7 @@ export default function ValueTypeEditor({
             )}
           </ResponsiveLineStackLayout>
           {(valueTypeMetadata.getName() === 'stringWithSelector' ||
-            valueTypeMetadata.getName() === 'numberWithChoice') && (
+            valueTypeMetadata.getName() === 'numberWithChoices') && (
             <ChoicesEditor
               disabled={disabled}
               choices={getExtraInfoArray(valueTypeMetadata).map(value => ({
@@ -313,7 +313,7 @@ export default function ValueTypeEditor({
                 forceUpdate();
                 onTypeUpdated();
               }}
-              isNumber={valueTypeMetadata.getName() === 'numberWithChoice'}
+              isNumber={valueTypeMetadata.getName() === 'numberWithChoices'}
             />
           )}
         </ColumnStackLayout>

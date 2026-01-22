@@ -1015,7 +1015,7 @@ MetadataDeclarationHelper::DeclareObjectInstructionMetadata(
 gd::String MetadataDeclarationHelper::GetStringifiedExtraInfo(
     const gd::PropertyDescriptor &property) {
   if (property.GetType() != "Choice" &&
-      property.GetType() != "NumberWithChoice") {
+      property.GetType() != "NumberWithChoices") {
     return "";
   }
   SerializerElement element;

@@ -122,7 +122,7 @@ const createField = (
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
     };
-  } else if (valueType === 'choice') {
+  } else if (valueType === 'choice' || valueType === 'numberwithchoices') {
     // Choice is a "string" (with a selector for the user in the UI)
     const choices = mapVector(property.getChoices(), choice => ({
       value: choice.getValue(),

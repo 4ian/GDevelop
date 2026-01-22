@@ -17,7 +17,7 @@ declare class gdInitialInstancesContainer {
   insertNewInitialInstance(): gdInitialInstance;
   insertInitialInstance(inst: gdInitialInstance): gdInitialInstance;
   serializeTo(element: gdSerializerElement): void;
-  unserializeFrom(element: gdSerializerElement): void;
+  unserializeFrom(project: gdProject, element: gdSerializerElement): void;
   delete(): void;
   ptr: number;
 };

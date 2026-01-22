@@ -58,8 +58,13 @@ declare class gdInitialInstance {
   setRawDoubleProperty(name: string, value: number): void;
   setRawStringProperty(name: string, value: string): void;
   getVariables(): gdVariablesContainer;
+  hasBehaviorOverridingNamed(name: string): boolean;
+  addNewBehaviorOverriding(project: gdProject, type: string, name: string): gdBehavior;
+  getBehaviorOverriding(name: string): gdBehavior;
+  removeBehaviorOverriding(name: string): void;
+  renameBehaviorOverriding(oldName: string, name: string): boolean;
   serializeTo(element: gdSerializerElement): void;
-  unserializeFrom(element: gdSerializerElement): void;
+  unserializeFrom(project: gdProject, element: gdSerializerElement): void;
   delete(): void;
   ptr: number;
 };

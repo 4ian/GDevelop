@@ -207,7 +207,7 @@ CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME = class RUNTIME_BEHAVIOR_CLASSNAME ext
   }
 
   // Hot-reload:
-  updateFromBehaviorData(oldBehaviorData, newBehaviorData) {
+  applyBehaviorOverriding(behaviorOverriding) {
     UPDATE_FROM_BEHAVIOR_DATA_CODE
 
     return true;
@@ -396,8 +396,8 @@ gd::String BehaviorCodeGenerator::GenerateUpdatePropertyFromBehaviorDataCode(
     const gd::EventsBasedBehavior& eventsBasedBehavior,
     const gd::NamedPropertyDescriptor& property) {
   return gd::String(R"jscode_template(
-    if (oldBehaviorData.PROPERTY_NAME !== newBehaviorData.PROPERTY_NAME)
-      this._behaviorData.PROPERTY_NAME = newBehaviorData.PROPERTY_NAME;)jscode_template")
+    if (behaviorOverriding.PROPERTY_NAME !== undefined)
+      this._behaviorData.PROPERTY_NAME = behaviorOverriding.PROPERTY_NAME;)jscode_template")
       .FindAndReplace("PROPERTY_NAME", property.GetName());
 }
 

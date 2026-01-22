@@ -866,7 +866,7 @@ export class ExternalLayout extends EmscriptenObject {
   getInitialInstances(): InitialInstancesContainer;
   getAssociatedEditorSettings(): EditorSettings;
   serializeTo(element: SerializerElement): void;
-  unserializeFrom(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class Effect extends EmscriptenObject {
@@ -1233,8 +1233,13 @@ export class InitialInstance extends EmscriptenObject {
   setRawDoubleProperty(name: string, value: number): void;
   setRawStringProperty(name: string, value: string): void;
   getVariables(): VariablesContainer;
+  hasBehaviorOverridingNamed(name: string): boolean;
+  addNewBehaviorOverriding(project: Project, type: string, name: string): Behavior;
+  getBehaviorOverriding(name: string): Behavior;
+  removeBehaviorOverriding(name: string): void;
+  renameBehaviorOverriding(oldName: string, name: string): boolean;
   serializeTo(element: SerializerElement): void;
-  unserializeFrom(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class InitialInstancesContainer extends EmscriptenObject {
@@ -1255,7 +1260,7 @@ export class InitialInstancesContainer extends EmscriptenObject {
   insertNewInitialInstance(): InitialInstance;
   insertInitialInstance(inst: InitialInstance): InitialInstance;
   serializeTo(element: SerializerElement): void;
-  unserializeFrom(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class HighestZOrderFinder extends EmscriptenObject {

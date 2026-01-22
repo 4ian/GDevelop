@@ -96,7 +96,7 @@ type TitleBarButton = {|
   onClick?: () => void,
 |};
 
-const CollapsibleSubPanel = ({
+export const CollapsibleSubPanel = ({
   renderContent,
   isFolded,
   toggleFolded,
@@ -157,7 +157,7 @@ const CollapsibleSubPanel = ({
   </Paper>
 );
 
-const TopLevelCollapsibleSection = ({
+export const TopLevelCollapsibleSection = ({
   title,
   isFolded,
   toggleFolded,
@@ -749,6 +749,8 @@ export const CompactObjectPropertiesEditor = ({
                           project={project}
                           behaviorMetadata={behaviorMetadata}
                           behavior={behavior}
+                          behaviorOverriding={null}
+                          initialInstance={null}
                           object={object}
                           onBehaviorUpdated={() => {}}
                           resourceManagementProps={resourceManagementProps}

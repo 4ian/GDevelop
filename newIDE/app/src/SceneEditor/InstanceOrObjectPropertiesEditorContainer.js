@@ -162,6 +162,7 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
         <CompactInstancePropertiesEditor
           instances={instances}
           editObjectInPropertiesPanel={editObjectInPropertiesPanel}
+          onEditObject={onEditObject}
           onInstancesModified={onInstancesModified}
           onGetInstanceSize={onGetInstanceSize}
           editInstanceVariables={editInstanceVariables}
@@ -175,6 +176,7 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
           layersContainer={layersContainer}
           project={project}
           projectScopedContainersAccessor={projectScopedContainersAccessor}
+          resourceManagementProps={resourceManagementProps}
           unsavedChanges={unsavedChanges}
           i18n={i18n}
         />

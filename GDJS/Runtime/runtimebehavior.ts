@@ -79,6 +79,22 @@ namespace gdjs {
       oldBehaviorData: BehaviorData,
       newBehaviorData: BehaviorData
     ): boolean {
+      const diffBehaviorData = {
+        name: newBehaviorData.name,
+        type: newBehaviorData.type,
+      };
+      for (const key in diffBehaviorData) {
+        const oldValue = oldBehaviorData[key];
+        const newValue = newBehaviorData[key];
+        if (newValue !== oldValue) {
+          diffBehaviorData[key] = newValue;
+        }
+      }
+      // If not redefined, mark by default the hot-reload as failed.
+      return this.applyBehaviorOverriding(diffBehaviorData);
+    }
+
+    applyBehaviorOverriding(behaviorOverriding: BehaviorData): boolean {
       // If not redefined, mark by default the hot-reload as failed.
       return false;
     }

@@ -31,6 +31,18 @@ import TileSetVisualizer, {
   type TileMapTileSelection,
 } from '../TileSetVisualizer';
 import Add from '../../UI/CustomSvgIcons/Add';
+import {
+  TopLevelCollapsibleSection,
+  CollapsibleSubPanel,
+} from '../../ObjectEditor/CompactObjectPropertiesEditor';
+import { ColumnStackLayout } from '../../UI/Layout';
+import Link from '../../UI/Link';
+import { CompactBehaviorPropertiesEditor } from '../../ObjectEditor/CompactObjectPropertiesEditor/CompactBehaviorPropertiesEditor';
+import { IconContainer } from '../../UI/IconContainer';
+import { getHelpLink } from '../../Utils/HelpLink';
+import Window from '../../Utils/Window';
+import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
+import { type ObjectEditorTab } from '../../ObjectEditor/ObjectEditorDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -41,6 +53,8 @@ export const styles = {
   scrollView: { paddingTop: marginsSize },
 };
 
+const behaviorsHelpLink = getHelpLink('/behaviors');
+
 const noRefreshOfAllFields = () => {
   console.warn(
     "An instance tried to refresh all fields, but the editor doesn't support it."
@@ -49,6 +63,7 @@ const noRefreshOfAllFields = () => {
 
 type Props = {|
   project: gdProject,
+  resourceManagementProps: ResourceManagementProps,
   layout?: ?gdLayout,
   objectsContainer: gdObjectsContainer,
   globalObjectsContainer: gdObjectsContainer | null,
@@ -56,6 +71,7 @@ type Props = {|
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   instances: Array<gdInitialInstance>,
   editObjectInPropertiesPanel: string => void,
+  onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onInstancesModified?: (Array<gdInitialInstance>) => void,
   onGetInstanceSize: gdInitialInstance => [number, number, number],
   editInstanceVariables: gdInitialInstance => void,
@@ -71,6 +87,7 @@ export const CompactInstancePropertiesEditor = ({
   instances,
   i18n,
   project,
+  resourceManagementProps,
   layout,
   objectsContainer,
   globalObjectsContainer,
@@ -78,6 +95,7 @@ export const CompactInstancePropertiesEditor = ({
   unsavedChanges,
   historyHandler,
   editObjectInPropertiesPanel,
+  onEditObject,
   onGetInstanceSize,
   editInstanceVariables,
   onInstancesModified,
@@ -87,6 +105,7 @@ export const CompactInstancePropertiesEditor = ({
   isVariableListLocked,
 }: Props) => {
   const forceUpdate = useForceUpdate();
+  const [isBehaviorsFolded, setIsBehaviorsFolded] = React.useState(false);
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
 
   const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
@@ -105,12 +124,18 @@ export const CompactInstancePropertiesEditor = ({
     }
   }, []);
 
-  const { object, instanceSchema } = React.useMemo<{|
+  const { object, instanceSchema, allVisibleBehaviors } = React.useMemo<{|
     object?: gdObject,
     instanceSchema?: Schema,
+    allVisibleBehaviors: Array<gdBehavior>,
   |}>(
     () => {
-      if (!instance) return { object: undefined, instanceSchema: undefined };
+      if (!instance)
+        return {
+          object: undefined,
+          instanceSchema: undefined,
+          allVisibleBehaviors: [],
+        };
 
       const associatedObjectName = instance.getObjectName();
       const object = getObjectByName(
@@ -122,7 +147,18 @@ export const CompactInstancePropertiesEditor = ({
         globalObjectsContainer || objectsContainer,
         objectsContainer
       );
-      if (!object) return { object: undefined, instanceSchema: undefined };
+      if (!object)
+        return {
+          object: undefined,
+          instanceSchema: undefined,
+          allVisibleBehaviors: [],
+        };
+
+      const allVisibleBehaviors = object
+        .getAllBehaviorNames()
+        .toJSArray()
+        .map(behaviorName => object.getBehavior(behaviorName))
+        .filter(behavior => !behavior.isDefaultBehavior());
 
       const objectMetadata = gd.MetadataProvider.getObjectMetadata(
         project.getCurrentPlatform(),
@@ -174,6 +210,7 @@ export const CompactInstancePropertiesEditor = ({
       return {
         object,
         instanceSchema,
+        allVisibleBehaviors,
       };
     },
     [
@@ -263,6 +300,85 @@ export const CompactInstancePropertiesEditor = ({
               </Column>
             </>
           )}
+          {object ? (
+            <TopLevelCollapsibleSection
+              title={<Trans>Behaviors</Trans>}
+              isFolded={isBehaviorsFolded}
+              toggleFolded={() => setIsBehaviorsFolded(!isBehaviorsFolded)}
+              onOpenFullEditor={() => onEditObject(object, 'behaviors')}
+              renderContent={() => (
+                <ColumnStackLayout noMargin>
+                  {!allVisibleBehaviors.length && (
+                    <Text size="body2" align="center" color="secondary">
+                      <Trans>
+                        There are no{' '}
+                        <Link
+                          href={behaviorsHelpLink}
+                          onClick={() =>
+                            Window.openExternalURL(behaviorsHelpLink)
+                          }
+                        >
+                          behaviors
+                        </Link>{' '}
+                        on this object instance.
+                      </Trans>
+                    </Text>
+                  )}
+                  {allVisibleBehaviors.map(behavior => {
+                    const behaviorTypeName = behavior.getTypeName();
+                    const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+                      gd.JsPlatform.get(),
+                      behaviorTypeName
+                    );
+                    const behaviorName = behavior.getName();
+                    const behaviorOverriding = instance.hasBehaviorOverridingNamed(
+                      behaviorName
+                    )
+                      ? instance.getBehaviorOverriding(behaviorName)
+                      : null;
+
+                    const iconUrl = behaviorMetadata.getIconFilename();
+
+                    return (
+                      <CollapsibleSubPanel
+                        key={behavior.ptr}
+                        renderContent={() => (
+                          <CompactBehaviorPropertiesEditor
+                            project={project}
+                            behaviorMetadata={behaviorMetadata}
+                            behavior={behavior}
+                            behaviorOverriding={behaviorOverriding}
+                            object={object}
+                            initialInstance={instance}
+                            onBehaviorUpdated={() => {}}
+                            resourceManagementProps={resourceManagementProps}
+                            onOpenFullEditor={() =>
+                              onEditObject(object, 'behaviors')
+                            }
+                          />
+                        )}
+                        isFolded={behavior.isFolded()}
+                        toggleFolded={() => {
+                          behavior.setFolded(!behavior.isFolded());
+                          forceUpdate();
+                        }}
+                        titleIcon={
+                          iconUrl ? (
+                            <IconContainer
+                              src={iconUrl}
+                              alt={behaviorMetadata.getFullName()}
+                              size={16}
+                            />
+                          ) : null
+                        }
+                        title={behavior.getName()}
+                      />
+                    );
+                  })}
+                </ColumnStackLayout>
+              )}
+            />
+          ) : null}
           {object && shouldDisplayVariablesList ? (
             <>
               <Separator />

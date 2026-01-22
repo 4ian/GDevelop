@@ -32,7 +32,7 @@ export type ValueFieldCommonProperties = {|
 export type PrimitiveValueField =
   | {|
       valueType: 'number',
-      getValue: Instance => number,
+      getValue: Instance => number | null,
       setValue: (instance: Instance, newValue: number) => void,
       /** Only supported on non compact property editors. */
       getEndAdornment?: Instance => {|
@@ -46,7 +46,7 @@ export type PrimitiveValueField =
     |}
   | {|
       valueType: 'string',
-      getValue: Instance => string,
+      getValue: Instance => string | null,
       setValue: (instance: Instance, newValue: string) => void,
       getChoices?: ?() => Array<{|
         value: string,
@@ -63,7 +63,7 @@ export type PrimitiveValueField =
     |}
   | {|
       valueType: 'boolean',
-      getValue: Instance => boolean,
+      getValue: Instance => boolean | null,
       setValue: (instance: Instance, newValue: boolean) => void,
       ...ValueFieldCommonProperties,
     |}

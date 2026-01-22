@@ -25,13 +25,13 @@ std::size_t InitialInstancesContainer::GetInstancesCount() const {
 }
 
 void InitialInstancesContainer::UnserializeFrom(
-    const SerializerElement& element) {
+    gd::Project &project, const SerializerElement &element) {
   initialInstances.clear();
 
   element.ConsiderAsArrayOf("instance", "Objet");
   for (std::size_t i = 0; i < element.GetChildrenCount(); ++i) {
     gd::InitialInstance instance;
-    instance.UnserializeFrom(element.GetChild(i));
+    instance.UnserializeFrom(project, element.GetChild(i));
     initialInstances.push_back(instance);
   }
 }

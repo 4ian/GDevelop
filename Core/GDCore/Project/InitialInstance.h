@@ -9,6 +9,7 @@
 #include <map>
 
 #include "GDCore/Project/VariablesContainer.h"
+#include "GDCore/Project/Behavior.h"
 #include "GDCore/String.h"
 namespace gd {
 class PropertyDescriptor;
@@ -30,6 +31,22 @@ class GD_CORE_API InitialInstance {
    */
   InitialInstance();
   virtual ~InitialInstance() {};
+
+  /**
+   * Copy constructor. Calls Init().
+   */
+  InitialInstance(const gd::InitialInstance &initialInstance) {
+    Init(initialInstance);
+  };
+
+  /**
+   * Assignment operator. Calls Init().
+   */
+  InitialInstance &operator=(const gd::InitialInstance &initialInstance) {
+    if ((this) != &initialInstance)
+      Init(initialInstance);
+    return *this;
+  }
 
   /**
    * Must return a pointer to a copy of the object. A such method is needed to
@@ -286,6 +303,55 @@ class GD_CORE_API InitialInstance {
   gd::VariablesContainer& GetVariables() { return initialVariables; }
   ///@}
 
+  /** \name Behavior management
+   * Members functions related to behavior overridings management.
+   */
+  ///@{
+
+  /**
+   * \brief Return a reference to the content of the overriding of of the
+   * behavior called \a name.
+   */
+  Behavior &GetBehaviorOverriding(const gd::String &name);
+
+  /**
+   * \brief Return a reference to the content of the overriding of the behavior
+   * called \a name.
+   */
+  const Behavior &GetBehaviorOverriding(const gd::String &name) const;
+
+  /**
+   * \brief Return true if the object instance overrides the object behavior
+   * called \a name.
+   */
+  bool HasBehaviorOverridingNamed(const gd::String &name) const;
+
+  /**
+   * \brief Remove the behavior overrides for the behavior called \a name
+   */
+  void RemoveBehaviorOverriding(const gd::String &name);
+
+  /**
+   * \brief Change the name of behavior called name to newName.
+   * \return true if name was successfully changed
+   */
+  bool RenameBehaviorOverriding(const gd::String &name,
+                                const gd::String &newName);
+
+  /**
+   * \brief Add the behavior of the specified \a type with the specified \a
+   * name.
+   *
+   * The project's current platform is used to initialize the content.
+   *
+   * \return A pointer to the newly added behavior content. NULL if the creation
+   * failed.
+   */
+  gd::Behavior *AddNewBehaviorOverriding(const gd::Project &project,
+                                         const gd::String &type,
+                                         const gd::String &name);
+  ///@}
+
   /** \name Others properties management
    * Members functions related to exposing others properties of the instance.
    *
@@ -365,7 +431,8 @@ class GD_CORE_API InitialInstance {
   /**
    * \brief Unserialize the instances container.
    */
-  virtual void UnserializeFrom(const SerializerElement& element);
+  virtual void UnserializeFrom(gd::Project &project,
+                               const SerializerElement &element);
 
   /**
    * \brief Reset the persistent UUID used to recognize
@@ -381,6 +448,15 @@ class GD_CORE_API InitialInstance {
   ///@}
 
  private:
+  /**
+   * Initialize instance using another instance. Used by copy-ctor and assign-op.
+   * Don't forget to update me if members were changed!
+   *
+   * It's needed because there is no default copy for a map of unique_ptr like
+   * behaviors and it must be a deep copy.
+   */
+  void Init(const gd::InitialInstance& initialInstance);
+
   // More properties can be stored in numberProperties and stringProperties.
   // These properties are then managed by the Object class.
   std::map<gd::String, double>
@@ -410,6 +486,10 @@ class GD_CORE_API InitialInstance {
   double defaultHeight = 0; ///< Instance default height as reported by InGameEditor
   double defaultDepth = 0;  ///< Instance default depth as reported by InGameEditor
   gd::VariablesContainer initialVariables;  ///< Instance specific variables
+  std::map<gd::String, std::unique_ptr<gd::Behavior>>
+      behaviorOverridings; ///< Contains all behavior property overriding for
+                           ///< the instance. Behavior contents are the
+                           ///< ownership of the instance.
   bool locked;                              ///< True if the instance is locked
   bool sealed;                              ///< True if the instance is sealed
   bool keepRatio;                     ///< True if the instance's dimensions

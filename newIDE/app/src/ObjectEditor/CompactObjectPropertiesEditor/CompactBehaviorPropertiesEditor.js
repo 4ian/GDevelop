@@ -59,6 +59,8 @@ export const CompactBehaviorPropertiesEditor = ({
   behaviorMetadata,
   behavior,
   object,
+  behaviorOverriding,
+  initialInstance,
   onOpenFullEditor,
   onBehaviorUpdated,
   resourceManagementProps,
@@ -67,6 +69,8 @@ export const CompactBehaviorPropertiesEditor = ({
   behaviorMetadata: gdBehaviorMetadata,
   behavior: gdBehavior,
   object: gdObject,
+  behaviorOverriding: gdBehavior | null,
+  initialInstance: gdInitialInstance | null,
   onOpenFullEditor: () => void,
   onBehaviorUpdated: () => void,
   resourceManagementProps: ResourceManagementProps,
@@ -79,6 +83,36 @@ export const CompactBehaviorPropertiesEditor = ({
     () => {
       if (schemaRecomputeTrigger) {
         // schemaRecomputeTrigger allows to invalidate the schema when required.
+      }
+      if (initialInstance) {
+        return propertiesMapToSchema({
+          properties: behavior.getProperties(),
+          defaultValueProperties: behavior.getProperties(),
+          getProperties: instance => {
+            const behaviorName = behavior.getName();
+            if (initialInstance.hasBehaviorOverridingNamed(behaviorName)) {
+              return initialInstance
+                .getBehaviorOverriding(behaviorName)
+                .getProperties();
+            }
+            return behavior.getProperties();
+          },
+          onUpdateProperty: (instance, name, value) => {
+            const behaviorName = behavior.getName();
+            const behaviorOverriding = initialInstance.hasBehaviorOverridingNamed(
+              behaviorName
+            )
+              ? initialInstance.getBehaviorOverriding(behaviorName)
+              : initialInstance.addNewBehaviorOverriding(
+                  project,
+                  behavior.getTypeName(),
+                  behaviorName
+                );
+            behaviorOverriding.updateProperty(name, value);
+          },
+          object,
+          visibility: 'All',
+        });
       }
       return propertiesMapToSchema({
         properties: behavior.getProperties(),

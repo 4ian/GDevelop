@@ -379,6 +379,15 @@ namespace gdjs {
           newObject
             .getVariables()
             .initFrom(instanceData.initialVariables, true);
+          if (instanceData.behaviorOverridings) {
+            for (const behaviorOverriding of instanceData.behaviorOverridings) {
+              const behavior = newObject.getBehavior(behaviorOverriding.name);
+              if (!behavior) {
+                continue;
+              }
+              behavior.applyBehaviorOverriding(behaviorOverriding);
+            }
+          }
           newObject.extraInitializationFromInitialInstance(instanceData);
         }
       }

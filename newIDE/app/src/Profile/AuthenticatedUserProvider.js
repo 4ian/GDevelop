@@ -4,6 +4,7 @@ import * as React from 'react';
 import {
   getUserUsages,
   getUserSubscription,
+  getSubscriptionPlanPricingSystem,
   getUserLimits,
   getUserEarningsBalance,
 } from '../Utils/GDevelopServices/Usage';
@@ -412,13 +413,39 @@ export default class AuthenticatedUserProvider extends React.Component<
       authentication.getAuthorizationHeader,
       firebaseUser.uid
     ).then(
-      subscription =>
+      subscription => {
         this.setState(({ authenticatedUser }) => ({
           authenticatedUser: {
             ...authenticatedUser,
             subscription,
           },
-        })),
+        }));
+        if (
+          subscription &&
+          !!subscription.pricingSystemId &&
+          !['REDEMPTION_CODE', 'MANUALLY_ADDED', 'TEAM_MEMBER'].includes(
+            subscription.pricingSystemId
+          )
+        ) {
+          getSubscriptionPlanPricingSystem(subscription.pricingSystemId).then(
+            subscriptionPricingSystem => {
+              this.setState(({ authenticatedUser }) => ({
+                authenticatedUser: {
+                  ...authenticatedUser,
+                  subscriptionPricingSystem,
+                },
+              }));
+            }
+          );
+        } else {
+          this.setState(({ authenticatedUser }) => ({
+            authenticatedUser: {
+              ...authenticatedUser,
+              subscriptionPricingSystem: null,
+            },
+          }));
+        }
+      },
       error => {
         console.error('Error while loading user subscriptions:', error);
       }
@@ -695,6 +722,23 @@ export default class AuthenticatedUserProvider extends React.Component<
           subscription,
         },
       }));
+      if (
+        subscription &&
+        !!subscription.pricingSystemId &&
+        !['REDEMPTION_CODE', 'MANUALLY_ADDED', 'TEAM_MEMBER'].includes(
+          subscription.pricingSystemId
+        )
+      ) {
+        const subscriptionPricingSystem = await getSubscriptionPlanPricingSystem(
+          subscription.pricingSystemId
+        );
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            subscriptionPricingSystem,
+          },
+        }));
+      }
     } catch (error) {
       console.error('Error while loading user subscriptions:', error);
     }

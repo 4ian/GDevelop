@@ -468,7 +468,7 @@ const useVersionHistory = ({
                   <GetSubscriptionCard
                     subscriptionDialogOpeningReason="Version history"
                     forceColumnLayout
-                    recommendedPlanIdIfNoSubscription="gdevelop_gold"
+                    recommendedPlanId="gdevelop_gold"
                     placementId="version-history"
                   >
                     <Text>

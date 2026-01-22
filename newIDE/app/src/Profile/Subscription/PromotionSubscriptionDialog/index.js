@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
@@ -9,32 +9,111 @@ import {
   getRedirectToCheckoutUrl,
   type SubscriptionPlanWithPricingSystems,
   type SubscriptionPlanPricingSystem,
+  changeUserSubscription,
+  hasValidSubscriptionPlan,
+  hasSubscriptionBeenManuallyAdded,
+  isSubscriptionComingFromTeam,
+  hasMobileAppStoreSubscriptionPlan,
+  canUpgradeSubscription,
 } from '../../../Utils/GDevelopServices/Usage';
-import { sendChoosePlanClicked } from '../../../Utils/Analytics/EventSender';
+import {
+  sendCancelSubscriptionToChange,
+  sendChoosePlanClicked,
+} from '../../../Utils/Analytics/EventSender';
 import Window from '../../../Utils/Window';
 import Text from '../../../UI/Text';
 import { ColumnStackLayout, LineStackLayout } from '../../../UI/Layout';
 import RedeemCodeDialog from '../../RedeemCodeDialog';
 import PlaceholderLoader from '../../../UI/PlaceholderLoader';
-import { Column, Line } from '../../../UI/Grid';
+import { Column, Line, Spacer } from '../../../UI/Grid';
 import SubscriptionOptions from './SubscriptionOptions';
 import PromotionSubscriptionPlan from './PromotionSubscriptionPlan';
-import { getPlanSpecificRequirements } from '../SubscriptionDialog';
 import AlertMessage from '../../../UI/AlertMessage';
+import useAlertDialog from '../../../UI/Alert/useAlertDialog';
+import Paper from '../../../UI/Paper';
+import { formatPriceWithCurrency, getPlanIcon } from '../PlanSmallCard';
+import { selectMessageByLocale } from '../../../Utils/i18n/MessageByLocale';
+import FlatButton from '../../../UI/FlatButton';
+import CancelReasonDialog from '../CancelReasonDialog';
+import { uniq } from 'lodash';
+
+const styles = {
+  currentPlanPaper: {
+    padding: '8px 12px',
+  },
+};
+
+const cancelConfirmationTexts = {
+  level: 'normal',
+  dialogTexts: {
+    title: t`Cancel your subscription?`,
+    message: t`By canceling your subscription, you will lose all your premium features at the end of the period you already paid for. Continue?`,
+    confirmButtonLabel: t`Continue`,
+    dismissButtonLabel: t`Keep subscription`,
+    maxWidth: 'sm',
+  },
+};
+const cancelAndChangeConfirmationTexts = {
+  level: 'normal',
+  dialogTexts: {
+    title: t`Update your subscription`,
+    message: t`To get this new subscription, we need to stop your existing one before you can pay for the new one. This is immediate but your payment will NOT be pro-rated (you will pay the full price for the new subscription). You won't lose any project, game or other data.`,
+    confirmButtonLabel: t`Cancel and change my subscription`,
+    dismissButtonLabel: t`Go back`,
+    maxWidth: 'sm',
+  },
+};
+const cancelAndChangeWithValidRedeemedCodeConfirmationTexts = {
+  level: 'danger',
+  dialogTexts: {
+    title: t`Update your subscription`,
+    message: t`To buy this new subscription, we need to stop your existing one before you can pay for the new one. This means the redemption code you're currently used won't be usable anymore.`,
+    confirmButtonLabel: t`Forfeit my redeemed subscription and continue`,
+    dismissButtonLabel: t`Go back`,
+    maxWidth: 'sm',
+  },
+};
+
+export const getPlanSpecificRequirements = (
+  i18n: I18nType,
+  subscriptionPlansWithPricingSystems: ?Array<SubscriptionPlanWithPricingSystems>
+): Array<string> => {
+  const planSpecificRequirements = subscriptionPlansWithPricingSystems
+    ? uniq(
+        subscriptionPlansWithPricingSystems
+          .map(subscriptionPlanWithPricingSystems => {
+            if (!subscriptionPlanWithPricingSystems.specificRequirementByLocale)
+              return null;
+            return selectMessageByLocale(
+              i18n,
+              subscriptionPlanWithPricingSystems.specificRequirementByLocale
+            );
+          })
+          .filter(Boolean)
+      )
+    : [];
+
+  return planSpecificRequirements;
+};
 
 type Props = {|
   onClose: Function,
   availableSubscriptionPlansWithPrices: ?(SubscriptionPlanWithPricingSystems[]),
-  recommendedPlanId: string,
+  userSubscriptionPlanEvenIfLegacy: ?SubscriptionPlanWithPricingSystems,
+  recommendedPlanId: ?string,
   onOpenPendingDialog: (open: boolean) => void,
 |};
 
 export default function PromotionSubscriptionDialog({
   onClose,
   availableSubscriptionPlansWithPrices,
+  userSubscriptionPlanEvenIfLegacy,
   recommendedPlanId,
   onOpenPendingDialog,
 }: Props) {
+  const [isChangingSubscription, setIsChangingSubscription] = React.useState(
+    false
+  );
   const [isRefreshing, setIsRefreshing] = React.useState(false);
   const [
     educationPlanSeatsCount,
@@ -42,47 +121,162 @@ export default function PromotionSubscriptionDialog({
   ] = React.useState<number>(20);
   const [redeemCodeDialogOpen, setRedeemCodeDialogOpen] = React.useState(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const {
+    getAuthorizationHeader,
+    subscription,
+    profile,
+    subscriptionPricingSystem,
+  } = authenticatedUser;
 
   const [
     availableRecommendedPlanId,
     setAvailableRecommendedPlanId,
-  ] = React.useState(recommendedPlanId);
-  const [selectedPlanId, setSelectedPlanId] = React.useState(recommendedPlanId);
+  ] = React.useState(null);
+  const [selectedPlanId, setSelectedPlanId] = React.useState(null);
 
-  const buyPlan = async (
+  const {
+    showAlert,
+    showConfirmation,
+    showDeleteConfirmation,
+  } = useAlertDialog();
+  const [cancelReasonDialogOpen, setCancelReasonDialogOpen] = React.useState(
+    false
+  );
+
+  const buyUpdateOrCancelPlan = async (
     i18n: I18nType,
-    subscriptionPlanPricingSystem: SubscriptionPlanPricingSystem
+    subscriptionPlanPricingSystem: SubscriptionPlanPricingSystem | null
   ) => {
-    const { subscription, profile } = authenticatedUser;
     if (!profile || !subscription) return;
-    if (subscription.planId) {
-      // User already has a subscription, this dialog should not be opened.
+    if (subscriptionPlanPricingSystem) {
+      sendChoosePlanClicked({
+        planId: subscriptionPlanPricingSystem.planId,
+        pricingSystemId: subscriptionPlanPricingSystem.id,
+      });
+    }
+
+    // Subscribing from an account without a subscription
+    if (!subscription.planId && subscriptionPlanPricingSystem) {
+      onOpenPendingDialog(true);
+      const isEducationPlan =
+        subscriptionPlanPricingSystem &&
+        subscriptionPlanPricingSystem.planId === 'gdevelop_education';
+      const quantity = isEducationPlan ? educationPlanSeatsCount : undefined;
+      Window.openExternalURL(
+        getRedirectToCheckoutUrl({
+          pricingSystemId: subscriptionPlanPricingSystem.id,
+          userId: profile.id,
+          userEmail: profile.email,
+          quantity,
+        })
+      );
       return;
     }
 
-    sendChoosePlanClicked({
+    if (!subscriptionPlanPricingSystem) {
+      // Cancelling the existing subscription.
+      const answer = await showConfirmation(
+        cancelConfirmationTexts.dialogTexts
+      );
+      if (!answer) return;
+
+      setCancelReasonDialogOpen(true);
+      return;
+    }
+
+    const hasValidRedeemedSubscription =
+      !!subscription.redemptionCodeValidUntil &&
+      subscription.redemptionCodeValidUntil > Date.now();
+    const hasExpiredRedeemedSubscription =
+      !!subscription.redemptionCodeValidUntil &&
+      subscription.redemptionCodeValidUntil < Date.now();
+
+    // Changing the existing subscription.
+    const confirmDialogTexts = hasExpiredRedeemedSubscription
+      ? null // We don't show an alert if the redeemed code is expired.
+      : hasValidRedeemedSubscription
+      ? cancelAndChangeWithValidRedeemedCodeConfirmationTexts
+      : cancelAndChangeConfirmationTexts;
+
+    if (confirmDialogTexts) {
+      const { level, dialogTexts } = confirmDialogTexts;
+
+      const answer =
+        level === 'danger'
+          ? await showDeleteConfirmation({
+              title: dialogTexts.title,
+              message: dialogTexts.message,
+              confirmButtonLabel: dialogTexts.confirmButtonLabel,
+              dismissButtonLabel: dialogTexts.dismissButtonLabel,
+            })
+          : await showConfirmation(dialogTexts);
+      if (!answer) return;
+    }
+
+    // Changing the existing subscription by cancelling first.
+    setIsChangingSubscription(true);
+    await sendCancelSubscriptionToChange({
       planId: subscriptionPlanPricingSystem.planId,
       pricingSystemId: subscriptionPlanPricingSystem.id,
     });
+    try {
+      await changeUserSubscription(
+        getAuthorizationHeader,
+        profile.id,
+        {
+          planId: null,
+        },
+        {
+          cancelImmediately: true,
+          cancelReasons: {
+            'changing-subscription': true,
+          },
+        }
+      );
+      await authenticatedUser.onRefreshSubscription();
+    } catch (rawError) {
+      showAlert({
+        title: t`Could not change subscription`,
+        message: t`Something went wrong while changing your subscription. Please try again.`,
+      });
+      console.error('Error while changing subscription:', rawError);
+      return;
+    } finally {
+      setIsChangingSubscription(false);
+    }
+
+    // Then redirect as if a new subscription is being chosen.
     onOpenPendingDialog(true);
-    const isEducationPlan =
-      subscriptionPlanPricingSystem &&
-      subscriptionPlanPricingSystem.planId === 'gdevelop_education';
-    const quantity = isEducationPlan ? educationPlanSeatsCount : undefined;
     Window.openExternalURL(
       getRedirectToCheckoutUrl({
         pricingSystemId: subscriptionPlanPricingSystem.id,
         userId: profile.id,
         userEmail: profile.email,
-        quantity,
       })
     );
   };
 
+  const isLoading =
+    authenticatedUser.loginState === 'loggingIn' ||
+    isChangingSubscription ||
+    isRefreshing;
+
+  const isPlanValid = hasValidSubscriptionPlan(authenticatedUser.subscription);
+
+  const willCancelAtPeriodEnd =
+    !!authenticatedUser.subscription &&
+    !!authenticatedUser.subscription.cancelAtPeriodEnd;
+  const userPlanId = authenticatedUser.subscription
+    ? authenticatedUser.subscription.planId
+    : null;
+  const userPricingSystemId = authenticatedUser.subscription
+    ? authenticatedUser.subscription.pricingSystemId
+    : null;
+
   const purchasablePlansWithPricingSystems = React.useMemo(
     () =>
       availableSubscriptionPlansWithPrices
-        ? availableSubscriptionPlansWithPrices.filter(
+        ? [...availableSubscriptionPlansWithPrices].filter(Boolean).filter(
             subscriptionPlanWithPricingSystems =>
               // Hide free plan
               subscriptionPlanWithPricingSystems.pricingSystems.length > 0
@@ -91,23 +285,39 @@ export default function PromotionSubscriptionDialog({
     [availableSubscriptionPlansWithPrices]
   );
 
-  // If the recommended plan is not available, select the first plan.
   React.useEffect(
     () => {
       if (purchasablePlansWithPricingSystems) {
+        // We recommend a planId only if the user doesn't have a plan yet,
+        // or has a plan that can be upgraded.
+        let planIdToRecommend = null;
         if (
-          !purchasablePlansWithPricingSystems.find(
-            purchasablePlanWithPricingSystems =>
-              purchasablePlanWithPricingSystems.id === recommendedPlanId
-          )
+          !authenticatedUser.subscription ||
+          canUpgradeSubscription(authenticatedUser.subscription)
         ) {
+          planIdToRecommend = recommendedPlanId;
+        }
+        const planIdToSelect = planIdToRecommend || userPlanId;
+        const foundPlanPricingSystem = purchasablePlansWithPricingSystems.find(
+          purchasablePlanWithPricingSystems =>
+            purchasablePlanWithPricingSystems.id === planIdToSelect
+        );
+        if (foundPlanPricingSystem) {
+          setSelectedPlanId(planIdToSelect);
+          setAvailableRecommendedPlanId(planIdToRecommend);
+        } else {
           const firstPlanId = purchasablePlansWithPricingSystems[0].id;
           setSelectedPlanId(firstPlanId);
           setAvailableRecommendedPlanId(firstPlanId);
         }
       }
     },
-    [purchasablePlansWithPricingSystems, recommendedPlanId]
+    [
+      purchasablePlansWithPricingSystems,
+      recommendedPlanId,
+      userPlanId,
+      authenticatedUser.subscription,
+    ]
   );
 
   const displayedPlan = React.useMemo(
@@ -120,8 +330,6 @@ export default function PromotionSubscriptionDialog({
         : null,
     [purchasablePlansWithPricingSystems, selectedPlanId]
   );
-
-  const isLoading = isRefreshing;
 
   return (
     <I18n>
@@ -141,8 +349,128 @@ export default function PromotionSubscriptionDialog({
             flexColumnBody
             topBackgroundSrc={'res/premium/premium_dialog_background.png'}
           >
+            {isPlanValid && userSubscriptionPlanEvenIfLegacy && (
+              <Column noMargin>
+                <Text>
+                  <Trans>Your plan:</Trans>
+                </Text>
+                <Paper
+                  background="medium"
+                  variant="outlined"
+                  style={styles.currentPlanPaper}
+                >
+                  <Line
+                    justifyContent="space-between"
+                    alignItems="center"
+                    noMargin
+                  >
+                    <Line alignItems="center" noMargin>
+                      {getPlanIcon({
+                        planId: userSubscriptionPlanEvenIfLegacy.id,
+                        logoSize: 20,
+                      })}
+                      <Text size="block-title">
+                        {selectMessageByLocale(
+                          i18n,
+                          userSubscriptionPlanEvenIfLegacy.nameByLocale
+                        )}
+                      </Text>
+                      <Spacer />
+                      {subscriptionPricingSystem && (
+                        <Text color="secondary" size="sub-title">
+                          (
+                          {subscriptionPricingSystem.period === 'year' ? (
+                            !subscriptionPricingSystem.isPerUser ? (
+                              <Trans>
+                                Yearly,
+                                {formatPriceWithCurrency(
+                                  subscriptionPricingSystem.amountInCents,
+                                  subscriptionPricingSystem.currency
+                                )}
+                              </Trans>
+                            ) : (
+                              <Trans>
+                                Yearly,
+                                {formatPriceWithCurrency(
+                                  subscriptionPricingSystem.amountInCents,
+                                  subscriptionPricingSystem.currency
+                                )}{' '}
+                                per seat
+                              </Trans>
+                            )
+                          ) : subscriptionPricingSystem.period === 'month' ? (
+                            !subscriptionPricingSystem.isPerUser ? (
+                              <Trans>
+                                Monthly,
+                                {formatPriceWithCurrency(
+                                  subscriptionPricingSystem.amountInCents,
+                                  subscriptionPricingSystem.currency
+                                )}
+                              </Trans>
+                            ) : (
+                              <Trans>
+                                Monthly,
+                                {formatPriceWithCurrency(
+                                  subscriptionPricingSystem.amountInCents,
+                                  subscriptionPricingSystem.currency
+                                )}{' '}
+                                per seat
+                              </Trans>
+                            )
+                          ) : (
+                            formatPriceWithCurrency(
+                              subscriptionPricingSystem.amountInCents,
+                              subscriptionPricingSystem.currency
+                            )
+                          )}
+                          )
+                        </Text>
+                      )}
+                    </Line>
+                    {!hasSubscriptionBeenManuallyAdded(
+                      authenticatedUser.subscription
+                    ) &&
+                      !isSubscriptionComingFromTeam(
+                        authenticatedUser.subscription
+                      ) &&
+                      !willCancelAtPeriodEnd &&
+                      userPricingSystemId !== 'REDEMPTION_CODE' && (
+                        <FlatButton
+                          primary
+                          label={<Trans>Cancel subscription</Trans>}
+                          onClick={() => buyUpdateOrCancelPlan(i18n, null)}
+                        />
+                      )}
+                    {authenticatedUser.subscription &&
+                      authenticatedUser.subscription.pricingSystemId ===
+                        'REDEMPTION_CODE' &&
+                      authenticatedUser.subscription
+                        .redemptionCodeValidUntil && (
+                        <Text color="secondary">
+                          <Trans>
+                            Redeemed code valid until{' '}
+                            {new Date(
+                              authenticatedUser.subscription.redemptionCodeValidUntil
+                            ).toLocaleDateString()}
+                            .
+                          </Trans>
+                        </Text>
+                      )}
+                    {willCancelAtPeriodEnd && (
+                      <Text color="secondary">
+                        <Trans>
+                          Cancelled - Your subscription will end at the end of
+                          the paid period.
+                        </Trans>
+                      </Text>
+                    )}
+                  </Line>
+                </Paper>
+              </Column>
+            )}
             {!purchasablePlansWithPricingSystems ||
             !displayedPlan ||
+            !selectedPlanId ||
             authenticatedUser.loginState === 'loggingIn' ? (
               <PlaceholderLoader />
             ) : (
@@ -160,7 +488,7 @@ export default function PromotionSubscriptionDialog({
                       if (!authenticatedUser.authenticated) {
                         authenticatedUser.onOpenCreateAccountDialog();
                       } else {
-                        await buyPlan(i18n, pricingSystem);
+                        await buyUpdateOrCancelPlan(i18n, pricingSystem);
                       }
                     }}
                     seatsCount={educationPlanSeatsCount}
@@ -170,6 +498,7 @@ export default function PromotionSubscriptionDialog({
                     subscriptionPlansWithPricingSystems={
                       purchasablePlansWithPricingSystems
                     }
+                    ownedPlanId={userPlanId}
                     selectedPlanId={selectedPlanId}
                     recommendedPlanId={availableRecommendedPlanId}
                     onClick={setSelectedPlanId}
@@ -212,6 +541,50 @@ export default function PromotionSubscriptionDialog({
               </ColumnStackLayout>
             )}
           </Dialog>
+          {hasMobileAppStoreSubscriptionPlan(
+            authenticatedUser.subscription
+          ) && (
+            <Dialog
+              open
+              title={
+                <Trans>
+                  Subscription with the Apple App store or Google Play store
+                </Trans>
+              }
+              maxWidth="sm"
+              cannotBeDismissed
+              actions={[
+                <FlatButton
+                  key="close"
+                  label={
+                    <Trans>
+                      Understood, I'll check my Apple or Google account
+                    </Trans>
+                  }
+                  onClick={onClose}
+                />,
+              ]}
+            >
+              <Text>
+                <Trans>
+                  The subscription of this account was done using Apple or
+                  Google Play. Connect on your account on your Apple or Google
+                  device to manage it.
+                </Trans>
+              </Text>
+            </Dialog>
+          )}
+          {cancelReasonDialogOpen && (
+            <CancelReasonDialog
+              onClose={() => {
+                setCancelReasonDialogOpen(false);
+              }}
+              onCloseAfterSuccess={() => {
+                setCancelReasonDialogOpen(false);
+                onClose();
+              }}
+            />
+          )}
           {redeemCodeDialogOpen && (
             <RedeemCodeDialog
               authenticatedUser={authenticatedUser}

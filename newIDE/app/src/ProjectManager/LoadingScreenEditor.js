@@ -240,7 +240,7 @@ export const LoadingScreenEditor = ({
             {!hasValidSubscription && (
               <GetSubscriptionCard
                 subscriptionDialogOpeningReason="Disable GDevelop splash at startup"
-                recommendedPlanIdIfNoSubscription="gdevelop_silver"
+                recommendedPlanId="gdevelop_silver"
                 placementId="gdevelop-branding"
               >
                 <Text>

@@ -44,7 +44,7 @@ const PromotionSubscriptionPlan = ({
   disabled?: boolean,
   onClickRedeemCode: () => void,
   onClickChoosePlan: (
-    pricingSystem: SubscriptionPlanPricingSystem
+    pricingSystem: SubscriptionPlanPricingSystem | null
   ) => Promise<void>,
   seatsCount: number,
   setSeatsCount: (seatsCount: number) => void,

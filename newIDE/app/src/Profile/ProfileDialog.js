@@ -35,11 +35,9 @@ const ProfileDialog = ({ onClose }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const badgesSeenNotificationTimeoutRef = React.useRef<?TimeoutID>(null);
   const badgesSeenNotificationSentRef = React.useRef<boolean>(false);
-  const {
-    getSubscriptionPlansWithPricingSystems,
-    openSubscriptionPendingDialog,
-  } = React.useContext(SubscriptionContext);
-  const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
+  const { openSubscriptionPendingDialog } = React.useContext(
+    SubscriptionContext
+  );
   const { isMobile } = useResponsiveWindowSize();
   const [redeemCodeDialogOpen, setRedeemCodeDialogOpen] = React.useState(false);
 
@@ -202,10 +200,6 @@ const ProfileDialog = ({ onClose }: Props) => {
             />
             {isStudentAccount ? null : (
               <SubscriptionDetails
-                subscription={authenticatedUser.subscription}
-                subscriptionPlansWithPricingSystems={
-                  subscriptionPlansWithPricingSystems
-                }
                 onManageSubscription={onManageSubscription}
                 isManageSubscriptionLoading={isManageSubscriptionLoading}
               />

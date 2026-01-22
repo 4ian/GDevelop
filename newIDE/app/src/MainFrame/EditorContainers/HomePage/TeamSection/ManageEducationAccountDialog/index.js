@@ -50,7 +50,7 @@ import Window from '../../../../../Utils/Window';
 import useAlertDialog from '../../../../../UI/Alert/useAlertDialog';
 import { delay } from '../../../../../Utils/Delay';
 import Check from '../../../../../UI/CustomSvgIcons/Check';
-import { getPlanIcon } from '../../../../../Profile/Subscription/PlanCard';
+import { getPlanIcon } from '../../../../../Profile/Subscription/PlanSmallCard';
 import { selectMessageByLocale } from '../../../../../Utils/i18n/MessageByLocale';
 import TextButton from '../../../../../UI/TextButton';
 import Chip from '../../../../../UI/Chip';
@@ -653,7 +653,6 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
                               recommendedPlanId: 'gdevelop_education',
                               placementId: 'education',
                             },
-                            filter: 'education',
                           })
                         }
                       />

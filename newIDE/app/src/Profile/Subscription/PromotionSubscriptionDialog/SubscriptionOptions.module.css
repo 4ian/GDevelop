@@ -35,16 +35,22 @@
     background: linear-gradient(90deg, var(--theme-premium-teal) 0%, var(--theme-premium-orange) 100%);
 }
 
-.recommendedBadge {
+.badge {
     position: absolute;
     top: -8px;
     right: 10px;
-    background: var(--theme-message-hot-background-color);
-    color: var(--theme-message-hot-color);
     padding: 2px 8px;
     border-radius: 16px;
     z-index: 2;
 }
-.recommendedBadge.mobile {
+.badge.mobile {
     top: -5px;
+}
+.badge.recommended {
+    background: var(--theme-message-hot-background-color);
+    color: var(--theme-message-hot-color);
+}
+.badge.owned {
+    background: var(--theme-success-color);
+    color: var(--theme-success-text-contrast-color);
 }

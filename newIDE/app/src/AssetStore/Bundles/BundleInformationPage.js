@@ -34,7 +34,7 @@ import {
 } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import Text from '../../UI/Text';
 import CourseStoreContext from '../../Course/CourseStoreContext';
-import { planIdSortingFunction } from '../../Profile/Subscription/PlanCard';
+import { planIdSortingFunction } from '../../Profile/Subscription/PlanSmallCard';
 import { SubscriptionContext } from '../../Profile/Subscription/SubscriptionContext';
 import SubscriptionPlanPricingSummary from '../../Profile/Subscription/PromotionSubscriptionDialog/SubscriptionPlanPricingSummary';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';

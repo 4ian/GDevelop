@@ -2,11 +2,11 @@
 import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import { AiRequestChat, type AiRequestChatInterface } from './AiRequestChat';
+import { type AiRequest } from '../Utils/GDevelopServices/Generation';
 import {
-  addMessageToAiRequest,
-  createAiRequest,
-  type AiRequest,
-} from '../Utils/GDevelopServices/Generation';
+  createAiRequestRouted as createAiRequest,
+  addMessageToAiRequestRouted as addMessageToAiRequest,
+} from './AiGenerationRouter';
 import { delay } from '../Utils/Delay';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { makeSimplifiedProjectBuilder } from '../EditorFunctions/SimplifiedProject/SimplifiedProject';

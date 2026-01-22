@@ -8,12 +8,14 @@ import {
   type ObjectGroupsOutsideEditorChanges,
 } from '../MainFrame/EditorContainers/BaseEditor';
 import {
-  getAiRequest,
-  getPartialAiRequest,
-  getAiRequestSuggestions,
   type AiRequest,
   type AiRequestMessageAssistantFunctionCall,
 } from '../Utils/GDevelopServices/Generation';
+import {
+  getAiRequestRouted as getAiRequest,
+  getPartialAiRequestRouted as getPartialAiRequest,
+  getAiRequestSuggestionsRouted as getAiRequestSuggestions,
+} from './AiGenerationRouter';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import {
   processEditorFunctionCalls,

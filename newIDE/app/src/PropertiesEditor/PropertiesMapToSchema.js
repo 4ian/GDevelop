@@ -68,26 +68,6 @@ const createField = (
       ),
     };
   };
-  const defaultValueNumber = defaultValue
-    ? parseFloat(defaultValue) || 0
-    : null;
-  const getValue = (instance: Instance): number =>
-    getNumberValue(instance, name);
-  const getEndAdornmentIcon = defaultValueNumber
-    ? (instance: gdInitialInstance) => {
-        return getValue(instance) === defaultValueNumber
-          ? null
-          : className => <Restore className={className} />;
-      }
-    : undefined;
-  const setValue = (instance: Instance, newValue: number) => {
-    setNumberValue(instance, name, newValue);
-  };
-  const onClickEndAdornment = defaultValueNumber
-    ? (instance: gdInitialInstance) => {
-        setValue(instance, defaultValueNumber);
-      }
-    : undefined;
   const visibility: FieldVisibility = property.isDeprecated()
     ? 'deprecated'
     : property.isAdvanced()
@@ -96,6 +76,27 @@ const createField = (
 
   const valueType = property.getType().toLowerCase();
   if (valueType === 'number') {
+    const defaultValueNumber =
+      defaultValue !== null ? parseFloat(defaultValue) || 0 : null;
+    const getValue = (instance: Instance): number =>
+      getNumberValue(instance, name);
+    const getEndAdornmentIcon =
+      defaultValueNumber !== null
+        ? (instance: gdInitialInstance) => {
+            return getValue(instance) === defaultValueNumber
+              ? null
+              : className => <Restore className={className} />;
+          }
+        : undefined;
+    const setValue = (instance: Instance, newValue: number) => {
+      setNumberValue(instance, name, newValue);
+    };
+    const onClickEndAdornment =
+      defaultValueNumber !== null
+        ? (instance: gdInitialInstance) => {
+            setValue(instance, defaultValueNumber);
+          }
+        : undefined;
     return {
       name,
       valueType,

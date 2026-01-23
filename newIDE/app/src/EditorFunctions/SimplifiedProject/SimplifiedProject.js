@@ -49,6 +49,13 @@ type SimplifiedScene = {|
   instancesOnSceneDescription: string,
 |};
 
+type SimplifiedResource = {|
+  name: string,
+  type: string,
+  file: string,
+  metadata?: string,
+|};
+
 type SimplifiedProject = {|
   properties: {|
     gameResolutionWidth: number,
@@ -58,6 +65,7 @@ type SimplifiedProject = {|
   globalObjectGroups: Array<SimplifiedObjectGroup>,
   scenes: Array<SimplifiedScene>,
   globalVariables: Array<SimplifiedVariable>,
+  resources: Array<SimplifiedResource>,
 |};
 
 type ProjectSpecificExtensionsSummary = {|
@@ -253,6 +261,20 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
     });
   };
 
+  const getSimplifiedResourcesJson = (
+    resources: gdResourcesContainer
+  ): Array<SimplifiedResource> => {
+    return resources.getAllResourceNames().toJSArray().map(resourceName => {
+      const resource = resources.getResource(resourceName);
+      return {
+        name: resourceName,
+        type: resource.getKind(),
+        file: resource.getFile(),
+        metadata: resource.getMetadata() ? resource.getMetadata() : undefined,
+      };
+    });
+  };
+
   const getSimplifiedLayers = (
     layers: gdLayersContainer
   ): Array<SimplifiedLayer> => {
@@ -365,6 +387,7 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
         gameResolutionWidth: project.getGameResolutionWidth(),
         gameResolutionHeight: project.getGameResolutionHeight(),
       },
+      resources: getSimplifiedResourcesJson(project.getResourcesManager()),
       globalObjects,
       globalObjectGroups: getSimplifiedObjectGroups(
         project.getObjects().getObjectGroups(),

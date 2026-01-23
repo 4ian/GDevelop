@@ -138,7 +138,7 @@ namespace gdjs {
      * Checks whether the id exists in howl._sounds[]
      */
     private isActualId(): boolean {
-      return !!this._howl._soundById(this._id)
+      return !!this._howl._soundById(this._id);
     }
 
     /**
@@ -286,7 +286,8 @@ namespace gdjs {
       try {
         this._loop = loop;
         // If the sound has already started playing, then change the value directly.
-        if (this._id !== null && this.isActualId()) this._howl.loop(loop, this._id);
+        if (this._id !== null && this.isActualId())
+          this._howl.loop(loop, this._id);
       } catch (error) {
         handleHowlerSoundMethodError(error, 'loop');
       }
@@ -318,7 +319,8 @@ namespace gdjs {
         this._initialVolume = clampVolume(volume);
 
         // If the sound has already started playing, then change the value directly.
-        if (this._id !== null && this.isActualId()) this._howl.volume(this._initialVolume, this._id);
+        if (this._id !== null && this.isActualId())
+          this._howl.volume(this._initialVolume, this._id);
       } catch (error) {
         handleHowlerSoundMethodError(error, 'volume');
       }
@@ -339,7 +341,8 @@ namespace gdjs {
      */
     setMute(mute: boolean): this {
       try {
-        if (this._id !== null && this.isActualId()) this._howl.mute(mute, this._id);
+        if (this._id !== null && this.isActualId())
+          this._howl.mute(mute, this._id);
       } catch (error) {
         handleHowlerSoundMethodError(error, 'mute');
       }
@@ -360,7 +363,8 @@ namespace gdjs {
      */
     setSeek(seek: float): this {
       try {
-        if (this._id !== null && this.isActualId()) this._howl.seek(seek, this._id);
+        if (this._id !== null && this.isActualId())
+          this._howl.seek(seek, this._id);
       } catch (error) {
         handleHowlerSoundMethodError(error, 'seek');
       }
@@ -380,7 +384,8 @@ namespace gdjs {
      * @returns The current instance for chaining.
      */
     setSpatialPosition(x: float, y: float, z: float): this {
-      if (this._id !== null && this.isActualId()) this._howl.pos(x, y, z, this._id);
+      if (this._id !== null && this.isActualId())
+        this._howl.pos(x, y, z, this._id);
       return this;
     }
 

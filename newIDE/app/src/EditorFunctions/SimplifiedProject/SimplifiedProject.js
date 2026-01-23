@@ -264,15 +264,18 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
   const getSimplifiedResourcesJson = (
     resources: gdResourcesContainer
   ): Array<SimplifiedResource> => {
-    return resources.getAllResourceNames().toJSArray().map(resourceName => {
-      const resource = resources.getResource(resourceName);
-      return {
-        name: resourceName,
-        type: resource.getKind(),
-        file: resource.getFile(),
-        metadata: resource.getMetadata() ? resource.getMetadata() : undefined,
-      };
-    });
+    return resources
+      .getAllResourceNames()
+      .toJSArray()
+      .map(resourceName => {
+        const resource = resources.getResource(resourceName);
+        return {
+          name: resourceName,
+          type: resource.getKind(),
+          file: resource.getFile(),
+          metadata: resource.getMetadata() ? resource.getMetadata() : undefined,
+        };
+      });
   };
 
   const getSimplifiedLayers = (

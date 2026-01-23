@@ -100,7 +100,7 @@ const createField = (
     return {
       name,
       valueType,
-      getValue: (instance: Instance): number => getNumberValue(instance, name),
+      getValue,
       setValue,
       defaultValue: defaultValueNumber,
       getLabel,

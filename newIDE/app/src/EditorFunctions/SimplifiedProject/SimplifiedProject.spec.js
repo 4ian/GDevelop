@@ -75,6 +75,23 @@ describe('SimplifiedProject', () => {
         - 1 MySpriteObject
 
       Inspect instances on the scene to get more details if needed.",
+            "layers": Array [
+              Object {
+                "isBaseLayer": undefined,
+                "layerName": "GUI",
+                "position": 0,
+              },
+              Object {
+                "isBaseLayer": undefined,
+                "layerName": "OtherLayer",
+                "position": 1,
+              },
+              Object {
+                "isBaseLayer": true,
+                "layerName": "",
+                "position": 2,
+              },
+            ],
             "objectGroups": Array [
               Object {
                 "behaviors": Array [
@@ -887,6 +904,13 @@ describe('SimplifiedProject', () => {
           },
           Object {
             "instancesOnSceneDescription": "There are no instances of objects placed on the scene - the scene is empty.",
+            "layers": Array [
+              Object {
+                "isBaseLayer": true,
+                "layerName": "",
+                "position": 0,
+              },
+            ],
             "objectGroups": Array [],
             "objects": Array [],
             "sceneName": "EmptyLayout",
@@ -894,6 +918,13 @@ describe('SimplifiedProject', () => {
           },
           Object {
             "instancesOnSceneDescription": "There are no instances of objects placed on the scene - the scene is empty.",
+            "layers": Array [
+              Object {
+                "isBaseLayer": true,
+                "layerName": "",
+                "position": 0,
+              },
+            ],
             "objectGroups": Array [],
             "objects": Array [],
             "sceneName": "Layout with a very looooooooong naaaaame to test in the project manager",

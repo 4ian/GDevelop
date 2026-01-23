@@ -34,11 +34,18 @@ type SimplifiedObjectGroup = {|
   variables?: Array<SimplifiedVariable>,
 |};
 
+type SimplifiedLayer = {|
+  layerName: string,
+  position: number,
+  isBaseLayer?: boolean,
+|};
+
 type SimplifiedScene = {|
   sceneName: string,
   objects: Array<SimplifiedObject>,
   objectGroups: Array<SimplifiedObjectGroup>,
   sceneVariables: Array<SimplifiedVariable>,
+  layers: Array<SimplifiedLayer>,
   instancesOnSceneDescription: string,
 |};
 
@@ -246,6 +253,19 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
     });
   };
 
+  const getSimplifiedLayers = (
+    layers: gdLayersContainer
+  ): Array<SimplifiedLayer> => {
+    return mapFor(0, layers.getLayersCount(), i => {
+      const layer = layers.getLayerAt(i);
+      return {
+        layerName: layer.getName(),
+        position: i,
+        isBaseLayer: layer.getName() === '' ? true : undefined,
+      };
+    });
+  };
+
   const getInstancesDescription = (scene: gdLayout): string => {
     let isEmpty = true;
     const instancesCountPerLayer: { [string]: { [string]: number } } = {};
@@ -316,6 +336,7 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
         projectScopedContainers.getObjectsContainersList()
       ),
       sceneVariables: getSimplifiedVariablesContainerJson(scene.getVariables()),
+      layers: getSimplifiedLayers(scene.getLayers()),
       instancesOnSceneDescription: getInstancesDescription(scene),
     };
   };

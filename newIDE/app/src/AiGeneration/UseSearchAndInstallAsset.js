@@ -43,11 +43,13 @@ export const useSearchAndInstallAsset = ({
       }: AssetSearchAndInstallOptions): Promise<AssetSearchAndInstallResult> => {
         if (!profile) throw new Error('User should be authenticated.');
 
-        const assetSearch: AssetSearch = await retryIfFailed({ times: 2 }, () =>
-          createAssetSearch(getAuthorizationHeader, {
-            userId: profile.id,
-            ...assetSearchOptions,
-          })
+        const assetSearch: AssetSearch = await retryIfFailed(
+          { times: 3, backoff: { initialDelay: 300, factor: 2 } },
+          () =>
+            createAssetSearch(getAuthorizationHeader, {
+              userId: profile.id,
+              ...assetSearchOptions,
+            })
         );
         if (!assetSearch.results || assetSearch.results.length === 0) {
           return {

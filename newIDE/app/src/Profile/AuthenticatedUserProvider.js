@@ -738,6 +738,13 @@ export default class AuthenticatedUserProvider extends React.Component<
             subscriptionPricingSystem,
           },
         }));
+      } else {
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            subscriptionPricingSystem: null,
+          },
+        }));
       }
     } catch (error) {
       console.error('Error while loading user subscriptions:', error);

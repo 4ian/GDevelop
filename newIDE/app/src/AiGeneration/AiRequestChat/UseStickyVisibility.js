@@ -22,23 +22,26 @@ export const useStickyVisibility = ({
 }): boolean => {
   const [isVisible, setIsVisible] = React.useState(false);
 
-  React.useEffect(() => {
-    if (shouldShow) {
-      // Schedule showing after delay
-      const showTimer = setTimeout(() => {
-        setIsVisible(true);
-      }, showDelayMs);
+  React.useEffect(
+    () => {
+      if (shouldShow) {
+        // Schedule showing after delay
+        const showTimer = setTimeout(() => {
+          setIsVisible(true);
+        }, showDelayMs);
 
-      return () => clearTimeout(showTimer);
-    } else {
-      // Schedule hiding after delay
-      const hideTimer = setTimeout(() => {
-        setIsVisible(false);
-      }, hideDelayMs);
+        return () => clearTimeout(showTimer);
+      } else {
+        // Schedule hiding after delay
+        const hideTimer = setTimeout(() => {
+          setIsVisible(false);
+        }, hideDelayMs);
 
-      return () => clearTimeout(hideTimer);
-    }
-  }, [shouldShow, showDelayMs, hideDelayMs]);
+        return () => clearTimeout(hideTimer);
+      }
+    },
+    [shouldShow, showDelayMs, hideDelayMs]
+  );
 
   return isVisible;
 };

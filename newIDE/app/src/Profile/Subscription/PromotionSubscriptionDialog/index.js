@@ -40,6 +40,7 @@ import { uniq } from 'lodash';
 const styles = {
   currentPlanPaper: {
     padding: '8px 12px',
+    marginBottom: 8,
   },
 };
 

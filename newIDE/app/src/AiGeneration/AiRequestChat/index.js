@@ -681,10 +681,11 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       !!aiRequest &&
       aiRequest.status === 'ready' &&
       aiRequest.mode === 'agent';
-    const shouldDisplayFeedbackBanner = useStickyVisibility(
-      shouldDisplayFeedbackBannerNow,
-      300
-    );
+    const shouldDisplayFeedbackBanner = useStickyVisibility({
+      shouldShow: shouldDisplayFeedbackBannerNow,
+      showDelayMs: 1000,
+      hideDelayMs: 300,
+    });
 
     if (!aiRequest || standAloneForm) {
       return (

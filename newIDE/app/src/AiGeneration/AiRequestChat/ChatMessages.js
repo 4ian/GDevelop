@@ -33,7 +33,6 @@ import {
   ResponsiveLineStackLayout,
 } from '../../UI/Layout';
 import FlatButton from '../../UI/FlatButton';
-import { FeedbackBanner } from './FeedbackBanner';
 import Pause from '../../UI/CustomSvgIcons/Pause';
 import Paper, { getBackgroundColor } from '../../UI/Paper';
 import Play from '../../UI/CustomSvgIcons/Play';
@@ -323,26 +322,6 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
       isPaused,
       onScrollToBottom,
     ]
-  );
-
-  const lastMessageIndex = aiRequest.output.length - 1;
-  const lastMessageFeedbackBanner = shouldDisplayFeedbackBanner && (
-    <FeedbackBanner
-      onSendFeedback={(
-        feedback: 'like' | 'dislike',
-        reason?: string,
-        freeFormDetails?: string
-      ) => {
-        onSendFeedback(
-          aiRequest.id,
-          lastMessageIndex,
-          feedback,
-          reason,
-          freeFormDetails
-        );
-      }}
-      key={`feedback-banner-${aiRequest.id}-${lastMessageIndex}`}
-    />
   );
 
   const isWorking = !!shouldBeWorkingIfNotPaused && !isPaused;
@@ -693,58 +672,75 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
                     role="assistant"
                     feedbackButtons={
                       <div className={classes.feedbackButtonsContainer}>
-                        <IconButton
-                          size="small"
-                          tooltip={t`Copy`}
-                          onClick={() => {
-                            navigator.clipboard.writeText(messageContent.text);
-                          }}
+                        {isLastMessage && shouldDisplayFeedbackBanner && (
+                          <Text size="body-small" color="secondary" noMargin>
+                            <Trans>Did it work?</Trans>
+                          </Text>
+                        )}
+                        <LineStackLayout
+                          expand
+                          noMargin
+                          justifyContent="flex-end"
                         >
-                          <Copy fontSize="small" />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          tooltip={t`This was helpful`}
-                          onClick={() => {
-                            setMessageFeedbacks({
-                              ...messageFeedbacks,
-                              [feedbackKey]: 'like',
-                            });
-                            onSendFeedback(aiRequest.id, messageIndex, 'like');
-                          }}
-                        >
-                          <Like
-                            fontSize="small"
-                            htmlColor={
-                              currentFeedback === 'like'
-                                ? theme.message.valid
-                                : undefined
-                            }
-                          />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          tooltip={t`This needs improvement`}
-                          onClick={() => {
-                            setMessageFeedbacks({
-                              ...messageFeedbacks,
-                              [feedbackKey]: 'dislike',
-                            });
-                            setDislikeFeedbackDialogOpenedFor({
-                              aiRequestId: aiRequest.id,
-                              messageIndex,
-                            });
-                          }}
-                        >
-                          <Dislike
-                            fontSize="small"
-                            htmlColor={
-                              currentFeedback === 'dislike'
-                                ? theme.message.warning
-                                : undefined
-                            }
-                          />
-                        </IconButton>
+                          <IconButton
+                            size="small"
+                            tooltip={t`Copy`}
+                            onClick={() => {
+                              navigator.clipboard.writeText(
+                                messageContent.text
+                              );
+                            }}
+                          >
+                            <Copy fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            tooltip={t`This was helpful`}
+                            onClick={() => {
+                              setMessageFeedbacks({
+                                ...messageFeedbacks,
+                                [feedbackKey]: 'like',
+                              });
+                              onSendFeedback(
+                                aiRequest.id,
+                                messageIndex,
+                                'like'
+                              );
+                            }}
+                          >
+                            <Like
+                              fontSize="small"
+                              htmlColor={
+                                currentFeedback === 'like'
+                                  ? theme.message.valid
+                                  : undefined
+                              }
+                            />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            tooltip={t`This needs improvement`}
+                            onClick={() => {
+                              setMessageFeedbacks({
+                                ...messageFeedbacks,
+                                [feedbackKey]: 'dislike',
+                              });
+                              setDislikeFeedbackDialogOpenedFor({
+                                aiRequestId: aiRequest.id,
+                                messageIndex,
+                              });
+                            }}
+                          >
+                            <Dislike
+                              fontSize="small"
+                              htmlColor={
+                                currentFeedback === 'dislike'
+                                  ? theme.message.warning
+                                  : undefined
+                              }
+                            />
+                          </IconButton>
+                        </LineStackLayout>
                       </div>
                     }
                   >
@@ -779,7 +775,6 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
                     </Column>
                   </ChatBubble>
                 </Line>,
-                isLastMessage ? lastMessageFeedbackBanner : null,
               ];
             }
 
@@ -838,17 +833,25 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
                       />
                       <Text size="body-small" noMargin color="secondary">
                         <Trans>Project saved</Trans>
+                        {hasVersionToRestore && (
+                          <>
+                            {' '}
+                            <Link
+                              onClick={() => {
+                                onRestoreVersion({
+                                  message,
+                                  aiRequest,
+                                });
+                              }}
+                              href="#"
+                              color="secondary"
+                              disabled={disabled}
+                            >
+                              <Trans>Restore version</Trans>
+                            </Link>
+                          </>
+                        )}
                       </Text>
-                      <FlatButton
-                        onClick={() => {
-                          onRestoreVersion({
-                            message,
-                            aiRequest,
-                          });
-                        }}
-                        label={<Trans>Restore version</Trans>}
-                        disabled={disabled || !hasVersionToRestore}
-                      />
                     </LineStackLayout>
                   )}
                   {isRestored && !isForking && forkedFromAiRequestId && (

@@ -2,30 +2,43 @@
 import * as React from 'react';
 
 /**
- * A hook that makes visibility changes "sticky" - it shows immediately when
- * the condition becomes true, but waits for a delay before hiding when the
- * condition becomes false. This prevents flickering during rapid state changes.
+ * A hook that makes visibility changes "sticky" - it waits for a delay before
+ * showing when the condition becomes true, and waits for a delay before hiding
+ * when the condition becomes false. This prevents flickering during rapid state changes.
  *
- * @param shouldShow - The current condition for whether the element should be visible
- * @param hideDelayMs - How long to wait before hiding after shouldShow becomes false (default: 300ms)
+ * @param params.shouldShow - The current condition for whether the element should be visible
+ * @param params.showDelayMs - How long to wait before showing after shouldShow becomes true (default: 0ms)
+ * @param params.hideDelayMs - How long to wait before hiding after shouldShow becomes false (default: 300ms)
  * @returns A stable boolean indicating whether to show the element
  */
-export const useStickyVisibility = (
+export const useStickyVisibility = ({
+  shouldShow,
+  showDelayMs = 0,
+  hideDelayMs = 300,
+}: {
   shouldShow: boolean,
-  hideDelayMs: number = 300
-): boolean => {
-  const lastShouldShowTimeRef = React.useRef<number>(0);
-  const stableShowRef = React.useRef<boolean>(false);
+  showDelayMs?: number,
+  hideDelayMs?: number,
+}): boolean => {
+  const [isVisible, setIsVisible] = React.useState(false);
 
-  // Update the stable value:
-  // - If it should show now, always update to true and track the time
-  // - If it should hide now, only hide if it's been hidden for at least hideDelayMs
-  if (shouldShow) {
-    lastShouldShowTimeRef.current = Date.now();
-    stableShowRef.current = true;
-  } else if (Date.now() - lastShouldShowTimeRef.current > hideDelayMs) {
-    stableShowRef.current = false;
-  }
+  React.useEffect(() => {
+    if (shouldShow) {
+      // Schedule showing after delay
+      const showTimer = setTimeout(() => {
+        setIsVisible(true);
+      }, showDelayMs);
 
-  return stableShowRef.current;
+      return () => clearTimeout(showTimer);
+    } else {
+      // Schedule hiding after delay
+      const hideTimer = setTimeout(() => {
+        setIsVisible(false);
+      }, hideDelayMs);
+
+      return () => clearTimeout(hideTimer);
+    }
+  }, [shouldShow, showDelayMs, hideDelayMs]);
+
+  return isVisible;
 };

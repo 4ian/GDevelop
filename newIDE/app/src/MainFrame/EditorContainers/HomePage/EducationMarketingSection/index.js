@@ -235,7 +235,6 @@ const EducationMarketingSection = ({
   const onClickSubscribe = React.useCallback(
     () => {
       openSubscriptionDialog({
-        filter: 'education',
         analyticsMetadata: {
           reason: 'Callout in Classroom tab',
           recommendedPlanId: 'gdevelop_education',

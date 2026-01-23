@@ -7,7 +7,7 @@ import Text from '../../../UI/Text';
 import { Column } from '../../../UI/Grid';
 import { type SubscriptionPlanWithPricingSystems } from '../../../Utils/GDevelopServices/Usage';
 import { selectMessageByLocale } from '../../../Utils/i18n/MessageByLocale';
-import { getPlanIcon } from '../PlanCard';
+import { getPlanIcon } from '../PlanSmallCard';
 import { LineStackLayout, ResponsiveLineStackLayout } from '../../../UI/Layout';
 import classes from './SubscriptionOptions.module.css';
 import classNames from 'classnames';
@@ -32,6 +32,7 @@ type Props = {|
   children: React.Node,
   onClick: () => void,
   selected: boolean,
+  owned: boolean,
   recommended: boolean,
   disabled?: boolean,
 |};
@@ -40,6 +41,7 @@ const SubscriptionOptionButton = ({
   children,
   onClick,
   selected,
+  owned,
   recommended,
   disabled,
 }: Props) => {
@@ -48,10 +50,11 @@ const SubscriptionOptionButton = ({
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <div className={classes.optionAndBadgeContainer}>
-      {recommended && (
+      {recommended && !owned && (
         <div
           className={classNames({
-            [classes.recommendedBadge]: true,
+            [classes.badge]: true,
+            [classes.recommended]: true,
             [classes.mobile]: isMobile,
           })}
         >
@@ -61,6 +64,19 @@ const SubscriptionOptionButton = ({
             ) : (
               <Trans>Recommended for you</Trans>
             )}
+          </Text>
+        </div>
+      )}
+      {owned && (
+        <div
+          className={classNames({
+            [classes.badge]: true,
+            [classes.owned]: true,
+            [classes.mobile]: isMobile,
+          })}
+        >
+          <Text color="inherit" noMargin>
+            <Trans>Current plan</Trans>
           </Text>
         </div>
       )}
@@ -97,14 +113,16 @@ const SubscriptionOptionButton = ({
 
 const SubscriptionOptions = ({
   subscriptionPlansWithPricingSystems,
+  ownedPlanId,
   selectedPlanId,
   recommendedPlanId,
   onClick,
   disabled,
 }: {|
   subscriptionPlansWithPricingSystems: SubscriptionPlanWithPricingSystems[],
+  ownedPlanId: ?string,
   selectedPlanId: string,
-  recommendedPlanId: string,
+  recommendedPlanId: ?string,
   onClick: string => void,
   disabled?: boolean,
 |}) => {
@@ -114,6 +132,8 @@ const SubscriptionOptions = ({
         <ResponsiveLineStackLayout noMargin>
           {subscriptionPlansWithPricingSystems.map(
             (subscriptionPlanWithPricingSystems, index) => {
+              const isOwned =
+                ownedPlanId === subscriptionPlanWithPricingSystems.id;
               const isSelected =
                 selectedPlanId === subscriptionPlanWithPricingSystems.id;
               const isRecommended =
@@ -129,6 +149,7 @@ const SubscriptionOptions = ({
                       onClick(subscriptionPlanWithPricingSystems.id)
                     }
                     selected={isSelected}
+                    owned={isOwned}
                     recommended={isRecommended}
                     disabled={disabled}
                   >

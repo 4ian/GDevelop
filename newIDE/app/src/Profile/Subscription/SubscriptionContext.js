@@ -1,7 +1,6 @@
 // @flow
 import { t } from '@lingui/macro';
 import * as React from 'react';
-import SubscriptionDialog from './SubscriptionDialog';
 import {
   sendSubscriptionDialogShown,
   type SubscriptionDialogDisplayReason,
@@ -84,25 +83,21 @@ type SubscriptionState = {|
     | SubscriptionPlanWithPricingSystems[]
     | null,
   /**
-   * Returns subscription plans with pricing systems including legacy plans, or null if not yet fetched.
-   * Calling this function will trigger a fetch in the background if not already loaded.
+   * Returns subscription plan of the user, even if it's a legacy plan, or null if not found or no subscription.
    */
-  getSubscriptionPlansWithPricingSystemsIncludingLegacy: () =>
-    | SubscriptionPlanWithPricingSystems[]
-    | null,
+  getUserSubscriptionPlanEvenIfLegacy: () => SubscriptionPlanWithPricingSystems | null,
   /**
    * Call this when a subscription or subscription upgrade is required.
    */
   openSubscriptionDialog: ({|
     analyticsMetadata: SubscriptionAnalyticsMetadata,
-    filter?: SubscriptionType,
   |}) => void,
   openSubscriptionPendingDialog: () => void,
 |};
 
 export const SubscriptionContext = React.createContext<SubscriptionState>({
   getSubscriptionPlansWithPricingSystems: () => null,
-  getSubscriptionPlansWithPricingSystemsIncludingLegacy: () => null,
+  getUserSubscriptionPlanEvenIfLegacy: () => null,
   openSubscriptionDialog: () => {},
   openSubscriptionPendingDialog: () => {},
 });
@@ -123,9 +118,6 @@ export const SubscriptionProvider = ({
   const recommendedPlanId = analyticsMetadata
     ? analyticsMetadata.recommendedPlanId
     : null;
-  const [filter, setFilter] = React.useState<
-    'individual' | 'team' | 'education' | null
-  >(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { showAlert } = useAlertDialog();
   const [
@@ -212,7 +204,7 @@ export const SubscriptionProvider = ({
   const closeSubscriptionDialog = () => setAnalyticsMetadata(null);
 
   const openSubscriptionDialog = React.useCallback(
-    ({ analyticsMetadata: metadata, filter: subscriptionsFilter }) => {
+    ({ analyticsMetadata: metadata }) => {
       if (isNativeMobileApp() || simulateMobileApp) {
         if (hasValidSubscriptionPlan(authenticatedUser.subscription)) {
           if (
@@ -228,56 +220,43 @@ export const SubscriptionProvider = ({
 
         // Would present App Store screen.
       } else {
-        setFilter(subscriptionsFilter || null);
         setAnalyticsMetadata(metadata);
       }
     },
     [authenticatedUser.subscription, showAlert, simulateMobileApp]
   );
 
-  const getUserLegacySubscriptionPlanWithPricingSystem = React.useCallback(
+  const getUserSubscriptionPlanEvenIfLegacy = React.useCallback(
     () => {
-      const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
+      const subscriptionPlansWithPricingSystemsIncludingLegacy = getSubscriptionPlansWithPricingSystemsIncludingLegacy();
       if (
-        !authenticatedUser.subscription ||
-        !authenticatedUser.subscription.planId ||
-        !authenticatedUser.subscription.pricingSystemId ||
-        !subscriptionPlansWithPricingSystems
-      ) {
+        !subscriptionPlansWithPricingSystemsIncludingLegacy ||
+        !authenticatedUser.subscription
+      )
         return null;
-      }
-      const {
-        planId: userPlanId,
-        pricingSystemId: userPricingSystemId,
-      } = authenticatedUser.subscription;
-      const userPlanWithPricingSystems = subscriptionPlansWithPricingSystems.find(
-        planWithPricingSystems => planWithPricingSystems.id === userPlanId
+
+      const userSubscriptionPlanId = authenticatedUser.subscription.planId;
+      const userSubscriptionPlan = subscriptionPlansWithPricingSystemsIncludingLegacy.find(
+        plan => plan.id === userSubscriptionPlanId
       );
-      if (!userPlanWithPricingSystems || !userPlanWithPricingSystems.isLegacy) {
-        return null;
-      }
-      const userPricingSystem = userPlanWithPricingSystems.pricingSystems.find(
-        pricingSystem => pricingSystem.id === userPricingSystemId
-      );
-      if (!userPricingSystem) return null;
-      return {
-        ...userPlanWithPricingSystems,
-        pricingSystems: [userPricingSystem],
-      };
+      return userSubscriptionPlan || null;
     },
-    [getSubscriptionPlansWithPricingSystems, authenticatedUser.subscription]
+    [
+      authenticatedUser.subscription,
+      getSubscriptionPlansWithPricingSystemsIncludingLegacy,
+    ]
   );
 
   const value = React.useMemo(
     () => ({
       getSubscriptionPlansWithPricingSystems,
-      getSubscriptionPlansWithPricingSystemsIncludingLegacy,
+      getUserSubscriptionPlanEvenIfLegacy,
       openSubscriptionDialog,
       openSubscriptionPendingDialog,
     }),
     [
       getSubscriptionPlansWithPricingSystems,
-      getSubscriptionPlansWithPricingSystemsIncludingLegacy,
+      getUserSubscriptionPlanEvenIfLegacy,
       openSubscriptionDialog,
       openSubscriptionPendingDialog,
     ]
@@ -309,22 +288,12 @@ export const SubscriptionProvider = ({
       {analyticsMetadata ? (
         authenticatedUser.loginState === 'loggingIn' ? (
           <LoaderModal showImmediately />
-        ) : !hasValidSubscriptionPlan(authenticatedUser.subscription) &&
-          recommendedPlanId ? (
+        ) : (
           <PromotionSubscriptionDialog
             availableSubscriptionPlansWithPrices={getSubscriptionPlansWithPricingSystems()}
+            userSubscriptionPlanEvenIfLegacy={getUserSubscriptionPlanEvenIfLegacy()}
             onClose={closeSubscriptionDialog}
             recommendedPlanId={recommendedPlanId}
-            onOpenPendingDialog={(open: boolean) =>
-              setSubscriptionPendingDialogOpen(open)
-            }
-          />
-        ) : (
-          <SubscriptionDialog
-            availableSubscriptionPlansWithPrices={getSubscriptionPlansWithPricingSystems()}
-            userLegacySubscriptionPlanWithPricingSystem={getUserLegacySubscriptionPlanWithPricingSystem()}
-            onClose={closeSubscriptionDialog}
-            filter={filter}
             onOpenPendingDialog={(open: boolean) =>
               setSubscriptionPendingDialogOpen(open)
             }

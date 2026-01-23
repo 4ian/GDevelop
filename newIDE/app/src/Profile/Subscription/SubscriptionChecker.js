@@ -130,7 +130,7 @@ const SubscriptionChecker = React.forwardRef<
               if (onChangeSubscription) onChangeSubscription();
               setDialogOpen(false);
             }}
-            recommendedPlanIdIfNoSubscription="gdevelop_silver"
+            recommendedPlanId="gdevelop_silver"
             placementId={placementId}
           >
             <Column noMargin expand>

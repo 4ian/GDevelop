@@ -1,15 +1,10 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
-import { I18n } from '@lingui/react';
 import * as React from 'react';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import {
-  type SubscriptionPlanWithPricingSystems,
-  type Subscription,
   hasMobileAppStoreSubscriptionPlan,
   hasSubscriptionBeenManuallyAdded,
-  getSubscriptionPlanPricingSystem,
-  canPriceBeFoundInGDevelopPrices,
   isSubscriptionComingFromTeam,
 } from '../../Utils/GDevelopServices/Usage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
@@ -30,15 +25,14 @@ import Paper from '../../UI/Paper';
 import PlanSmallCard from './PlanSmallCard';
 import { isNativeMobileApp } from '../../Utils/Platform';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
-import AlertMessage from '../../UI/AlertMessage';
 import IndividualPlans from './Icons/IndividualPlans';
 import TeamPlans from './Icons/TeamPlans';
 import EducationPlans from './Icons/EducationPlans';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import PlaceholderError from '../../UI/PlaceholderError';
 import Link from '../../UI/Link';
 import Window from '../../Utils/Window';
 import GetSubscriptionCard from './GetSubscriptionCard';
+import AuthenticatedUserContext from '../AuthenticatedUserContext';
 
 const styles = {
   diamondIcon: {
@@ -88,8 +82,6 @@ const subscriptionOptions: {
 };
 
 type Props = {
-  subscription: ?Subscription,
-  subscriptionPlansWithPricingSystems: ?(SubscriptionPlanWithPricingSystems[]),
   onManageSubscription: () => void | Promise<void>,
   isManageSubscriptionLoading: boolean,
   simulateNativeMobileApp?: boolean,
@@ -109,98 +101,22 @@ type Props = {
  *    We will need to cancel the current expired subscription, but don't show a warning.
  */
 const SubscriptionDetails = ({
-  subscription,
-  subscriptionPlansWithPricingSystems,
   isManageSubscriptionLoading,
   onManageSubscription,
   simulateNativeMobileApp,
 }: Props) => {
-  const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
+  const {
+    openSubscriptionDialog,
+    getUserSubscriptionPlanEvenIfLegacy,
+    getSubscriptionPlansWithPricingSystems,
+  } = React.useContext(SubscriptionContext);
+  const { subscription, subscriptionPricingSystem } = React.useContext(
+    AuthenticatedUserContext
+  );
+  const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
+  const userSubscriptionPlanWithPricingSystems = getUserSubscriptionPlanEvenIfLegacy();
   const { showAlert } = useAlertDialog();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const [
-    userSubscriptionPlanWithPricingSystems,
-    setUserSubscriptionPlanWithPricingSystems,
-  ] = React.useState<?SubscriptionPlanWithPricingSystems>(null);
-  const [error, setError] = React.useState<?React.Node>(null);
-  const [isLoadingUserPrice, setIsLoadingUserPrice] = React.useState<boolean>(
-    false
-  );
-
-  React.useEffect(
-    () => {
-      (async () => {
-        setError(null);
-        setIsLoadingUserPrice(true);
-        try {
-          if (!subscription || !subscriptionPlansWithPricingSystems) {
-            setUserSubscriptionPlanWithPricingSystems(null);
-            return;
-          }
-
-          const { planId, pricingSystemId } = subscription;
-          if (!planId || !pricingSystemId) {
-            setUserSubscriptionPlanWithPricingSystems(null);
-            return;
-          }
-
-          const matchingSubscriptionPlanWithPrices = subscriptionPlansWithPricingSystems.find(
-            plan => subscription.planId === plan.id
-          );
-          if (!matchingSubscriptionPlanWithPrices) {
-            setError(
-              <Trans>
-                Couldn't find a subscription matching your account. Please get
-                in touch with us to fix this issue.
-              </Trans>
-            );
-            setUserSubscriptionPlanWithPricingSystems(null);
-            return;
-          }
-
-          const {
-            pricingSystems,
-            ...subscriptionPlan
-          } = matchingSubscriptionPlanWithPrices;
-
-          if (!canPriceBeFoundInGDevelopPrices(pricingSystemId)) {
-            setUserSubscriptionPlanWithPricingSystems({
-              ...subscriptionPlan,
-              pricingSystems: [],
-            });
-            return;
-          }
-
-          let pricingSystem = pricingSystems.find(
-            price => price.id === subscription.pricingSystemId
-          );
-          if (!pricingSystem) {
-            pricingSystem = await getSubscriptionPlanPricingSystem(
-              pricingSystemId
-            );
-          }
-          if (!pricingSystem) {
-            setError(
-              <Trans>
-                Couldn't find a subscription price matching your account. Please
-                get in touch with us to fix this issue.
-              </Trans>
-            );
-            setUserSubscriptionPlanWithPricingSystems(null);
-            return;
-          }
-
-          setUserSubscriptionPlanWithPricingSystems({
-            ...subscriptionPlan,
-            pricingSystems: [pricingSystem],
-          });
-        } finally {
-          setIsLoadingUserPrice(false);
-        }
-      })();
-    },
-    [subscription, subscriptionPlansWithPricingSystems]
-  );
 
   const redemptionCodeExpirationDate =
     subscription && subscription.redemptionCodeValidUntil;
@@ -235,19 +151,7 @@ const SubscriptionDetails = ({
     </Line>
   );
 
-  if (error) {
-    return (
-      <Column noMargin>
-        {header}
-        <PlaceholderError>{error}</PlaceholderError>
-      </Column>
-    );
-  }
-  if (
-    !subscription ||
-    !subscriptionPlansWithPricingSystems ||
-    isLoadingUserPrice
-  ) {
+  if (!subscription || !subscriptionPlansWithPricingSystems) {
     return (
       <Column noMargin>
         {header}
@@ -310,6 +214,9 @@ const SubscriptionDetails = ({
               subscriptionPlanWithPricingSystems={
                 userSubscriptionPlanWithPricingSystems
               }
+              subscriptionPricingSystem={subscriptionPricingSystem}
+              cancelAtPeriodEnd={subscription.cancelAtPeriodEnd}
+              redemptionCodeExpirationDate={redemptionCodeExpirationDate}
               hidePrice={
                 // A redemption code means the price does not really reflect what was paid, so we hide it.
                 !!redemptionCodeExpirationDate ||
@@ -352,38 +259,6 @@ const SubscriptionDetails = ({
               isHighlighted
               background="medium"
             />
-            {subscription.cancelAtPeriodEnd && (
-              <AlertMessage kind="warning">
-                <Trans>
-                  Your subscription is being cancelled: you will lose the
-                  benefits at the end of the period you already paid for.
-                </Trans>
-              </AlertMessage>
-            )}
-            {!!redemptionCodeExpirationDate && (
-              <I18n>
-                {({ i18n }) => (
-                  <Paper background="dark" variant="outlined">
-                    <LineStackLayout alignItems="center" noMargin>
-                      <img
-                        src="res/diamond.svg"
-                        style={styles.diamondIcon}
-                        alt="diamond"
-                      />
-                      <Column>
-                        <Text>
-                          <Trans>
-                            Thanks to the redemption code you've used, you have
-                            this subscription enabled until{' '}
-                            {i18n.date(subscription.redemptionCodeValidUntil)}.
-                          </Trans>
-                        </Text>
-                      </Column>
-                    </LineStackLayout>
-                  </Paper>
-                )}
-              </I18n>
-            )}
           </ColumnStackLayout>
         )
       ) : !isSubscriptionExpired ? (
@@ -446,7 +321,6 @@ const SubscriptionDetails = ({
                             reason: 'Consult profile',
                             placementId: 'profile',
                           },
-                          filter: key,
                         })
                       }
                       label={<Trans>See plans</Trans>}
@@ -462,7 +336,7 @@ const SubscriptionDetails = ({
         <GetSubscriptionCard
           label={<Trans>Choose a subscription</Trans>}
           subscriptionDialogOpeningReason="Consult profile"
-          recommendedPlanIdIfNoSubscription="gdevelop_silver"
+          recommendedPlanId="gdevelop_silver"
           placementId="profile"
         >
           <Text noMargin>

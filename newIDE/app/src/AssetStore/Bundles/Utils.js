@@ -18,7 +18,7 @@ import { LineStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import {
   getPlanIcon,
   getPlanInferredNameFromId,
-} from '../../Profile/Subscription/PlanCard';
+} from '../../Profile/Subscription/PlanSmallCard';
 import Coin from '../../Credits/Icons/Coin';
 import { formatDurationOfRedemptionCode } from '../../RedemptionCode/Utils';
 import School from '../../UI/CustomSvgIcons/School';

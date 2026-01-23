@@ -704,7 +704,6 @@ const PrivateAssetPackInformationPage = ({
                                             recommendedPlanId: 'gdevelop_gold',
                                             placementId: 'claim-asset-pack',
                                           },
-                                          filter: 'individual',
                                         })
                                 }
                               />

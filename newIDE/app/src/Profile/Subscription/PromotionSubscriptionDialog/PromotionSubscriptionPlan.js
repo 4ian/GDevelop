@@ -44,7 +44,7 @@ const PromotionSubscriptionPlan = ({
   disabled?: boolean,
   onClickRedeemCode: () => void,
   onClickChoosePlan: (
-    pricingSystem: SubscriptionPlanPricingSystem
+    pricingSystem: SubscriptionPlanPricingSystem | null
   ) => Promise<void>,
   seatsCount: number,
   setSeatsCount: (seatsCount: number) => void,
@@ -56,7 +56,12 @@ const PromotionSubscriptionPlan = ({
   return (
     <I18n>
       {({ i18n }) => (
-        <ResponsiveLineStackLayout expand noColumnMargin>
+        <ResponsiveLineStackLayout
+          noMargin
+          expand
+          noColumnMargin
+          noResponsiveLandscape
+        >
           <div
             style={
               isLargeScreen
@@ -71,7 +76,7 @@ const PromotionSubscriptionPlan = ({
             />
           </div>
           <div style={styles.simpleSizeContainer}>
-            <ColumnStackLayout expand noMargin>
+            <ColumnStackLayout noMargin>
               <SubscriptionPlanPricingSummary
                 subscriptionPlanWithPricingSystems={
                   subscriptionPlanWithPricingSystems

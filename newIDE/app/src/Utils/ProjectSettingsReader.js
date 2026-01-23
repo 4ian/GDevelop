@@ -2,13 +2,16 @@
 import optionalRequire from './OptionalRequire';
 import YAML from 'yaml';
 import { SafeExtractor } from './SafeExtractor';
+import { type ToolbarButtonConfig } from '../MainFrame/CustomToolbarButton';
 
 const fs = optionalRequire('fs');
 const fsPromises = fs ? fs.promises : null;
 const path = optionalRequire('path');
 
 export type ParsedProjectSettings = {
-  preferences: { [string]: boolean | string | number },
+  preferences?: { [string]: boolean | string | number },
+  toolbarButtons?: Array<ToolbarButtonConfig>,
+  projectPath: string,
 };
 
 const SETTINGS_FILE_NAME = 'gdevelop-settings.yaml';
@@ -50,37 +53,55 @@ export const readProjectSettings = async (
       encoding: 'utf8',
     });
 
+    const parsed = YAML.parse(content);
+
+    // Parse preferences section
     const rawPreferences = SafeExtractor.extractObjectProperty(
-      YAML.parse(content),
+      parsed,
       'preferences'
     );
-    if (!rawPreferences) {
-      console.info(
-        `[ProjectSettingsReader] Loaded settings from: ${settingsFilePath} (no preferences section)`
-      );
-      return null;
-    }
-
-    // Filter to only include primitive types (boolean, string, number)
     const preferences: { [string]: boolean | string | number } = {};
-    for (const key of Object.keys(rawPreferences)) {
-      const value = SafeExtractor.extractNumberOrStringOrBooleanProperty(
-        rawPreferences,
-        key
-      );
-      if (value !== null) {
-        preferences[key] = value;
+    if (rawPreferences) {
+      for (const key of Object.keys(rawPreferences)) {
+        const value = SafeExtractor.extractNumberOrStringOrBooleanProperty(
+          rawPreferences,
+          key
+        );
+        if (value !== null) {
+          preferences[key] = value;
+        }
       }
     }
 
-    const preferencesEntries = Object.entries(preferences)
-      .map(([key, value]) => `  ${key}: ${String(value)}`)
-      .join('\n');
+    // Parse toolbarButtons section
+    const rawToolbarButtons = SafeExtractor.extractArrayProperty(
+      parsed,
+      'toolbarButtons'
+    );
+    const toolbarButtons: Array<ToolbarButtonConfig> = [];
+    if (rawToolbarButtons) {
+      for (const rawButton of rawToolbarButtons) {
+        const name = SafeExtractor.extractStringProperty(rawButton, 'name');
+        const icon = SafeExtractor.extractStringProperty(rawButton, 'icon');
+        const command = SafeExtractor.extractStringProperty(rawButton, 'command');
+        if (name && icon && command) {
+          toolbarButtons.push({ name, icon, command });
+        }
+      }
+    }
+
     console.info(
-      `[ProjectSettingsReader] Loaded settings from: ${settingsFilePath}\n${preferencesEntries}`
+      `[ProjectSettingsReader] Loaded: ${Object.keys(preferences).length} preferences, ${toolbarButtons.length} buttons`
     );
 
-    return { preferences };
+    const result: ParsedProjectSettings = { projectPath: projectDirectory };
+    if (Object.keys(preferences).length > 0) {
+      result.preferences = preferences;
+    }
+    if (toolbarButtons.length > 0) {
+      result.toolbarButtons = toolbarButtons;
+    }
+    return result;
   } catch (error) {
     console.error(
       `[ProjectSettingsReader] Error reading gdevelop-settings.yaml: ${

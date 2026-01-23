@@ -32,7 +32,6 @@ import {
   type Schema,
   type ValueField,
   type ActionButton,
-  type SectionTitle,
   type Title,
   type ResourceField,
   type LeaderboardIdField,
@@ -42,6 +41,7 @@ import {
   type ToggleButtons,
   type Field,
 } from '../PropertiesEditor/PropertiesEditorSchema';
+import { getFieldValue, hasMixedValues } from '../PropertiesEditor';
 
 type Props = {|
   onInstancesModified?: Instances => void,
@@ -123,44 +123,6 @@ const getDisabled = ({
   instances: Instances,
   field: ValueField,
 |}): boolean => (field.disabled ? field.disabled(instances) : false);
-
-/**
- * Get the value for the given field across all instances.
- * If one of the instances doesn't share the same value, returns the default value.
- * If there is no instances, returns the default value.
- * If the field does not have a `getValue` method, returns `null`.
- */
-const getFieldValue = ({
-  instances,
-  field,
-  defaultValue,
-}: {|
-  instances: Instances,
-  field: ValueField | ActionButton | SectionTitle | Title,
-  defaultValue?: any,
-|}): any => {
-  if (!instances[0]) {
-    console.warn(
-      'getFieldValue was called with an empty list of instances (or containing undefined). This is a bug that should be fixed.'
-    );
-    return defaultValue;
-  }
-
-  const { getValue } = field;
-  if (!getValue) return null;
-
-  let value = getValue(instances[0]);
-  if (typeof defaultValue !== 'undefined') {
-    for (var i = 1; i < instances.length; ++i) {
-      if (value !== getValue(instances[i])) {
-        value = defaultValue;
-        break;
-      }
-    }
-  }
-
-  return value;
-};
 
 const getFieldEndAdornmentIcon = ({
   instances,
@@ -426,7 +388,7 @@ const CompactPropertiesEditor = ({
           value: getFieldValue({
             instances,
             field,
-            defaultValue: '(Multiple values)',
+            mixedValueFallback: '(Multiple values)',
           }),
           onChange: newValue => {
             instances.forEach(i => setValue(i, newValue || ''));
@@ -517,7 +479,7 @@ const CompactPropertiesEditor = ({
             value={getFieldValue({
               instances,
               field,
-              defaultValue: '(Multiple values)',
+              mixedValueFallback: '(Multiple values)',
             })}
             id={field.name}
             onChange={(newValue: string) => {
@@ -555,13 +517,10 @@ const CompactPropertiesEditor = ({
     (field: ActionButton) => {
       let disabled = false;
       if (field.disabled === 'onValuesDifferent') {
-        const DIFFERENT_VALUES = 'DIFFERENT_VALUES';
-        disabled =
-          getFieldValue({
-            instances,
-            field,
-            defaultValue: DIFFERENT_VALUES,
-          }) === DIFFERENT_VALUES;
+        disabled = hasMixedValues({
+          instances,
+          field,
+        });
       }
       return (
         <FlatButton
@@ -649,7 +608,7 @@ const CompactPropertiesEditor = ({
             resourceName={getFieldValue({
               instances,
               field,
-              defaultValue: '(Multiple values)',
+              mixedValueFallback: '(Multiple values)',
             })}
             onChange={newValue => {
               instances.forEach(i => setValue(i, newValue));
@@ -682,7 +641,7 @@ const CompactPropertiesEditor = ({
             value={getFieldValue({
               instances,
               field,
-              defaultValue: '(Multiple values)',
+              mixedValueFallback: '(Multiple values)',
             })}
             onChange={newValue => {
               instances.forEach(i => setValue(i, newValue));
@@ -747,7 +706,7 @@ const CompactPropertiesEditor = ({
         let selectedInstancesValue = getFieldValue({
           instances,
           field,
-          defaultValue: field.defaultValue || 'Multiple Values',
+          mixedValueFallback: field.defaultValue || 'Multiple Values',
         });
         if (!!selectedInstancesValue) additionalText = selectedInstancesValue;
       }

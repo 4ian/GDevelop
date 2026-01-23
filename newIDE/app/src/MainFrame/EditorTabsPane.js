@@ -59,6 +59,7 @@ import DrawerTopBar from '../UI/DrawerTopBar';
 import { type FloatingPaneState } from './PanesContainer';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
 import { type OpenAskAiOptions } from '../AiGeneration/Utils';
+import { type ToolbarButtonConfig } from './CustomToolbarButton';
 
 const styles = {
   container: {
@@ -100,6 +101,8 @@ export type EditorTabsPaneCommonProps = {|
   gamesPlatformFrameTools: GamesPlatformFrameTools,
   gameEditorMode: 'embedded-game' | 'instances-editor',
   setGameEditorMode: ('embedded-game' | 'instances-editor') => void,
+  toolbarButtons: Array<ToolbarButtonConfig>,
+  projectPath: ?string,
 
   // Callbacks from MainFrame
   toggleProjectManager: () => void,
@@ -373,6 +376,8 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
     setGameEditorMode,
     onRestartInGameEditor,
     showRestartInGameEditorAfterErrorButton,
+    toolbarButtons,
+    projectPath,
   } = props;
 
   const toolbarRef = React.useRef<?ToolbarInterface>(null);
@@ -610,6 +615,8 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
         checkedOutVersionStatus={checkedOutVersionStatus}
         onQuitVersionHistory={onQuitVersionHistory}
         canQuitVersionHistory={!isSavingProject}
+        toolbarButtons={toolbarButtons}
+        projectPath={projectPath}
       />
       <SpecificDimensionsWindowSizeProvider
         innerWidth={paneWidth}

@@ -1,5 +1,6 @@
 const electron = require('electron');
 const path = require('path');
+const child_process = require('child_process');
 const app = electron.app; // Module to control application life.
 const BrowserWindow = electron.BrowserWindow; // Module to create native browser window.
 const Menu = electron.Menu;
@@ -460,4 +461,56 @@ app.on('ready', function() {
   });
 
   setUpDiscordRichPresence(ipcMain);
+
+  // Shell command execution in external terminal (cross-platform)
+  ipcMain.on('run-shell-command', (event, { projectPath, command }) => {
+    log.info(`Running shell command in ${projectPath}: ${command}`);
+
+    const platform = process.platform;
+
+    try {
+      if (platform === 'win32') {
+        // Windows: open cmd window that stays open after command
+        child_process.spawn('cmd.exe', ['/c', 'start', 'cmd.exe', '/k', `cd ${projectPath} && ${command}`], {
+          detached: true,
+          stdio: 'ignore',
+        }).unref();
+      } else if (platform === 'darwin') {
+        const escapedPath = projectPath.replace(/'/g, "'\\''");
+        const escapedCommand = command.replace(/'/g, "'\\''");
+        const script = `tell application "Terminal" to do script "cd '${escapedPath}' && ${escapedCommand}"`;
+        child_process.spawn('osascript', ['-e', script], {
+          detached: true,
+          stdio: 'ignore',
+        });
+      } else {
+        // Linux: try common terminal emulators
+        const bashCommand = `cd "${projectPath}" && ${command}; exec bash`;
+        const terminals = [
+          { cmd: 'x-terminal-emulator', args: ['-e', 'bash', '-c', bashCommand] },
+          { cmd: 'gnome-terminal', args: ['--', 'bash', '-c', bashCommand] },
+          { cmd: 'konsole', args: ['-e', 'bash', '-c', bashCommand] },
+          { cmd: 'xterm', args: ['-e', 'bash', '-c', bashCommand] },
+        ];
+
+        const tryTerminal = (index) => {
+          if (index >= terminals.length) {
+            log.error('No terminal emulator found');
+            return;
+          }
+          const terminal = terminals[index];
+          const proc = child_process.spawn(terminal.cmd, terminal.args, {
+            detached: true,
+            stdio: 'ignore',
+          });
+          proc.on('error', () => tryTerminal(index + 1));
+          proc.unref();
+        };
+
+        tryTerminal(0);
+      }
+    } catch (err) {
+      log.error('Failed to run shell command:', err);
+    }
+  });
 });

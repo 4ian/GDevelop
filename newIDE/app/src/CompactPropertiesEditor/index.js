@@ -146,6 +146,23 @@ const getFieldEndAdornmentIcon = ({
   return null;
 };
 
+const isFieldShowcased = ({
+  instances,
+  field,
+}: {|
+  instances: Instances,
+  field: ValueField,
+|}): any => {
+  if (!instances[0]) {
+    console.warn(
+      'isFieldShowcased was called with an empty list of instances (or containing undefined). This is a bug that should be fixed.'
+    );
+    return false;
+  }
+
+  return field.isShowcased ? field.isShowcased(instances[0]) : false;
+};
+
 const getFieldLabel = ({
   instances,
   field,
@@ -306,6 +323,7 @@ const CompactPropertiesEditor = ({
                   {...otherCommonProps}
                 />
               }
+              isShowcased={isFieldShowcased({ instances, field })}
             />
           );
         }
@@ -332,6 +350,7 @@ const CompactPropertiesEditor = ({
                 }}
               />
             }
+            isShowcased={isFieldShowcased({ instances, field })}
           />
         );
       } else if (field.valueType === 'enumIcon') {
@@ -426,12 +445,13 @@ const CompactPropertiesEditor = ({
               label={getFieldLabel({ instances, field })}
               markdownDescription={getFieldDescription(field)}
               field={<CompactSemiControlledTextField {...otherCommonProps} />}
+              isShowcased={isFieldShowcased({ instances, field })}
             />
           );
         }
       }
     },
-    [instances, onFieldChanged, getFieldDescription]
+    [instances, getFieldDescription, onFieldChanged]
   );
 
   const renderSelectField = React.useCallback(
@@ -466,7 +486,7 @@ const CompactPropertiesEditor = ({
                 hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
               });
             }}
-            disabled={field.disabled}
+            disabled={getDisabled({ instances, field })}
           >
             {children}
           </CompactSelectField>
@@ -507,10 +527,11 @@ const CompactPropertiesEditor = ({
           label={getFieldLabel({ instances, field })}
           markdownDescription={getFieldDescription(field)}
           field={compactSelectField}
+          isShowcased={isFieldShowcased({ instances, field })}
         />
       );
     },
-    [instances, onFieldChanged, getFieldDescription]
+    [instances, getFieldDescription, onFieldChanged]
   );
 
   const renderButton = React.useCallback(
@@ -619,6 +640,7 @@ const CompactPropertiesEditor = ({
             }}
           />
         }
+        isShowcased={isFieldShowcased({ instances, field })}
       />
     );
   };
@@ -652,6 +674,7 @@ const CompactPropertiesEditor = ({
             }}
           />
         }
+        isShowcased={isFieldShowcased({ instances, field })}
       />
     );
   };

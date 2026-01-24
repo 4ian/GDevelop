@@ -119,6 +119,7 @@ export const CompactBehaviorPropertiesEditor = ({
           },
           object,
           visibility: 'All',
+          showcaseNonDefaultValues: true,
         });
       }
       return propertiesMapToSchema({

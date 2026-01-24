@@ -22,6 +22,7 @@ type Props = {|
   label: string,
   markdownDescription?: ?string,
   field: React.Node,
+  isShowcased: boolean,
 |};
 
 const CompactPropertiesEditorRowField = (props: Props) => {
@@ -52,7 +53,12 @@ const CompactPropertiesEditorRowField = (props: Props) => {
             },
           }}
         >
-          <Text noMargin style={styles.label}>
+          <Text
+            noMargin
+            style={
+              props.isShowcased ? { ...styles.label, opacity: 1 } : styles.label
+            }
+          >
             {props.label}
           </Text>
         </Tooltip>

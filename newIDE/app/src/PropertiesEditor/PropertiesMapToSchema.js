@@ -37,7 +37,8 @@ const createField = (
   ) => void,
   defaultValue: string | null,
   getProperties: (instance: Instance) => any,
-  object: ?gdObject
+  object: ?gdObject,
+  showcaseNonDefaultValues: boolean
 ): ?Field => {
   const propertyDescription = property.getDescription();
   const getLabel = (instance: Instance) => {
@@ -74,16 +75,30 @@ const createField = (
     ? 'advanced'
     : 'basic';
 
+  const getValueForString = (instance: Instance): string =>
+    getStringValue(instance, name);
+  const getValueForNumber = (instance: Instance): number =>
+    getNumberValue(instance, name);
+  const defaultValueNumber =
+    defaultValue !== null ? parseFloat(defaultValue) || 0 : null;
+  const isShowcasedForNumber = (instance: gdInitialInstance) => {
+    return (
+      showcaseNonDefaultValues &&
+      getValueForNumber(instance) !== defaultValueNumber
+    );
+  };
+  const isShowcasedForString = (instance: gdInitialInstance) => {
+    return (
+      showcaseNonDefaultValues && getValueForString(instance) !== defaultValue
+    );
+  };
+
   const valueType = property.getType().toLowerCase();
   if (valueType === 'number') {
-    const defaultValueNumber =
-      defaultValue !== null ? parseFloat(defaultValue) || 0 : null;
-    const getValue = (instance: Instance): number =>
-      getNumberValue(instance, name);
     const getEndAdornmentIcon =
       defaultValueNumber !== null
         ? (instance: gdInitialInstance) => {
-            return getValue(instance) === defaultValueNumber
+            return getValueForNumber(instance) === defaultValueNumber
               ? null
               : className => <Restore className={className} />;
           }
@@ -100,7 +115,7 @@ const createField = (
     return {
       name,
       valueType,
-      getValue,
+      getValue: getValueForNumber,
       setValue,
       defaultValue: defaultValueNumber,
       getLabel,
@@ -114,12 +129,13 @@ const createField = (
       getEndAdornmentIcon,
       onClickEndAdornment,
       visibility,
+      isShowcased: isShowcasedForNumber,
     };
   } else if (valueType === 'string' || valueType === '') {
     return {
       name,
       valueType: 'string',
-      getValue: (instance: Instance): string => getStringValue(instance, name),
+      getValue: getValueForString,
       setValue: (instance: Instance, newValue: string) => {
         setStringValue(instance, name, newValue);
       },
@@ -128,21 +144,25 @@ const createField = (
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
+      isShowcased: isShowcasedForString,
     };
   } else if (valueType === 'boolean') {
+    const defaultValueBoolean = defaultValue ? defaultValue === 'true' : null;
+    const getValue = (instance: Instance): boolean =>
+      getBooleanValue(instance, name);
     return {
       name,
       valueType,
-      getValue: (instance: Instance): boolean =>
-        getBooleanValue(instance, name),
+      getValue,
       setValue: (instance: Instance, newValue: boolean) => {
         setBooleanValue(instance, name, newValue);
       },
-      defaultValue: defaultValue ? defaultValue === 'true' : null,
+      defaultValue: defaultValueBoolean,
       getLabel,
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
+      isShowcased: isShowcasedForString,
     };
   } else if (valueType === 'choice' || valueType === 'numberwithchoices') {
     // Choice is a "string" (with a selector for the user in the UI)
@@ -160,19 +180,35 @@ const createField = (
       .toJSArray()
       .map(value => ({ value, label: value }));
 
-    return {
-      name,
-      valueType: 'string',
-      getChoices: () => [...choices, ...deprecatedChoices],
-      getValue: (instance: Instance): string => getStringValue(instance, name),
-      setValue: (instance: Instance, newValue: string) => {
-        setStringValue(instance, name, newValue);
-      },
-      getLabel,
-      getDescription,
-      hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
-      visibility,
-    };
+    return valueType === 'numberwithchoices'
+      ? {
+          name,
+          valueType: 'number',
+          getChoices: () => [...choices, ...deprecatedChoices],
+          getValue: getValueForNumber,
+          setValue: (instance: Instance, newValue: number) => {
+            setNumberValue(instance, name, newValue);
+          },
+          getLabel,
+          getDescription,
+          hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
+          visibility,
+          isShowcased: isShowcasedForNumber,
+        }
+      : {
+          name,
+          valueType: 'string',
+          getChoices: () => [...choices, ...deprecatedChoices],
+          getValue: getValueForString,
+          setValue: (instance: Instance, newValue: string) => {
+            setStringValue(instance, name, newValue);
+          },
+          getLabel,
+          getDescription,
+          hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
+          visibility,
+          isShowcased: isShowcasedForString,
+        };
   } else if (valueType === 'behavior') {
     const behaviorType =
       property.getExtraInfo().size() > 0 ? property.getExtraInfo().at(0) : '';
@@ -202,13 +238,14 @@ const createField = (
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
+      isShowcased: isShowcasedForString,
     };
   } else if (valueType === 'leaderboardid') {
     // LeaderboardId is a "string" (with a selector in the UI)
     return {
       name,
       valueType: 'leaderboardId',
-      getValue: (instance: Instance): string => getStringValue(instance, name),
+      getValue: getValueForString,
       setValue: (instance: Instance, newValue: string) => {
         setStringValue(instance, name, newValue);
       },
@@ -216,6 +253,7 @@ const createField = (
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
+      isShowcased: isShowcasedForString,
     };
   } else if (valueType === 'resource') {
     // Resource is a "string" (with a selector in the UI)
@@ -226,7 +264,7 @@ const createField = (
       name,
       valueType: 'resource',
       resourceKind: kind,
-      getValue: (instance: Instance): string => getStringValue(instance, name),
+      getValue: getValueForString,
       setValue: (instance: Instance, newValue: string) => {
         setStringValue(instance, name, newValue);
       },
@@ -234,12 +272,13 @@ const createField = (
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
+      isShowcased: isShowcasedForString,
     };
   } else if (valueType === 'color') {
     return {
       name,
       valueType: 'color',
-      getValue: (instance: Instance): string => getStringValue(instance, name),
+      getValue: getValueForString,
       setValue: (instance: Instance, newValue: string) => {
         setStringValue(instance, name, newValue);
       },
@@ -247,12 +286,13 @@ const createField = (
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
+      isShowcased: isShowcasedForString,
     };
   } else if (valueType === 'multilinestring') {
     return {
       name,
       valueType: 'multilinestring',
-      getValue: (instance: Instance): string => getStringValue(instance, name),
+      getValue: getValueForString,
       setValue: (instance: Instance, newValue: string) => {
         setStringValue(instance, name, newValue);
       },
@@ -260,6 +300,7 @@ const createField = (
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
+      isShowcased: isShowcasedForString,
     };
   } else if (valueType === 'objectanimationname') {
     return {
@@ -285,13 +326,14 @@ const createField = (
       },
       name,
       valueType: 'string',
-      getValue: (instance: Instance): string => getStringValue(instance, name),
+      getValue: getValueForString,
       setValue: (instance: Instance, newValue: string) => {
         setStringValue(instance, name, newValue);
       },
       getLabel,
       getDescription,
       visibility,
+      isShowcased: isShowcasedForString,
     };
   } else if (valueType === 'keyboardkey') {
     return {
@@ -305,13 +347,14 @@ const createField = (
       },
       name,
       valueType: 'string',
-      getValue: (instance: Instance): string => getStringValue(instance, name),
+      getValue: getValueForString,
       setValue: (instance: Instance, newValue: string) => {
         setStringValue(instance, name, newValue);
       },
       getLabel,
       getDescription,
       visibility,
+      isShowcased: isShowcasedForString,
     };
   } else {
     console.error(
@@ -430,6 +473,7 @@ type CommonProps = {|
   object?: ?gdObject,
   visibility?: 'All' | 'Basic' | 'Advanced' | 'Deprecated' | 'Basic-Quick',
   quickCustomizationVisibilities?: gdQuickCustomizationVisibilitiesContainer,
+  showcaseNonDefaultValues?: boolean,
 |};
 
 export const effectPropertiesMapToSchema = ({
@@ -438,6 +482,7 @@ export const effectPropertiesMapToSchema = ({
   object,
   visibility = 'All',
   quickCustomizationVisibilities,
+  showcaseNonDefaultValues,
 }: {
   ...CommonProps,
   defaultValueProperties: gdMapStringPropertyDescriptor,
@@ -449,6 +494,7 @@ export const effectPropertiesMapToSchema = ({
     object,
     visibility,
     quickCustomizationVisibilities,
+    showcaseNonDefaultValues,
     getNumberValue: (instance: Instance, propertyName: string): number =>
       instance.hasDoubleParameter(propertyName)
         ? instance.getDoubleParameter(propertyName)
@@ -498,6 +544,7 @@ const propertiesMapToSchema = ({
   object,
   visibility = 'All',
   quickCustomizationVisibilities,
+  showcaseNonDefaultValues,
 }: {
   ...CommonProps,
   properties: gdMapStringPropertyDescriptor,
@@ -514,6 +561,7 @@ const propertiesMapToSchema = ({
     object,
     visibility,
     quickCustomizationVisibilities,
+    showcaseNonDefaultValues,
     getNumberValue: (instance: Instance, propertyName: string): number => {
       return (
         parseFloat(
@@ -554,6 +602,7 @@ const adaptablePropertiesMapToSchema = ({
   object,
   visibility = 'All',
   quickCustomizationVisibilities,
+  showcaseNonDefaultValues,
   getNumberValue,
   getStringValue,
   getBooleanValue,
@@ -685,7 +734,8 @@ const adaptablePropertiesMapToSchema = ({
               setBooleanValue,
               rowPropertyDefaultValue,
               getProperties,
-              object
+              object,
+              !!showcaseNonDefaultValues
             );
 
             if (field) {
@@ -721,7 +771,8 @@ const adaptablePropertiesMapToSchema = ({
             : ''
           : null,
         getProperties,
-        object
+        object,
+        !!showcaseNonDefaultValues
       );
     }
     if (field) {

@@ -827,6 +827,8 @@ namespace gdjs {
     }
 
     updatePosition(): void {
+      const runtimeGame = this._layer.getRuntimeScene().getGame();
+
       // Update the 3D camera position and rotation.
       if (this._threeCamera) {
         const angle = -gdjs.toRad(this._layer.getCameraRotation());
@@ -854,9 +856,10 @@ namespace gdjs {
       // A layer configured for 3D (has _threeCamera and _threePlaneMesh) but with no
       // 3D objects will be rendered directly in 2D mode, so it should use 2D-style
       // pixi container setup to avoid a zoom mismatch.
-      // See also: `layerHas3DObjectsToRender` in `runtimescene-pixi-renderer.ts`.
-      const willRenderIn3DMode =
-        this._threeCamera && this._threePlaneMesh && this.has3DObjects();
+      // Keep in sync with: `shouldRenderLayerIn3D` in `runtimescene-pixi-renderer.ts`.
+      const shouldRenderLayerIn3D =
+        runtimeGame.isInGameEdition() ||
+        (this._threeCamera && this._threePlaneMesh && this.has3DObjects());
 
       // Update the 2D plane in the 3D world position, size and rotation,
       // and update the 2D Pixi container position, size and rotation.
@@ -877,7 +880,7 @@ namespace gdjs {
           this._threePlaneMesh.position.set(cx, -cy, 0);
           this._threePlaneMesh.rotation.set(0, 0, -angle);
 
-          if (willRenderIn3DMode) {
+          if (shouldRenderLayerIn3D) {
             // Update the 2D Pixi container size and rotation to match the "zoom" (which comes from the 2D plane size)
             // rotation and position.
             effectivePixiZoom = this._layer.getWidth() / boxW; // == height/boxH
@@ -904,7 +907,7 @@ namespace gdjs {
       // Update the 2D Pixi container position, size and rotation.
       // This also applies to layers configured for 3D but with no 3D objects,
       // since they will be rendered directly in 2D mode.
-      if (!willRenderIn3DMode) {
+      if (!shouldRenderLayerIn3D) {
         effectivePixiZoom = this._layer.getCameraZoom();
 
         this._pixiContainer.rotation = angle;
@@ -923,7 +926,7 @@ namespace gdjs {
       // Pixel rounding for the Pixi rendering (be it for 2D only
       // or for the 2D rendering shown in the 2D plane in the 3D world).
       if (
-        this._layer.getRuntimeScene().getGame().getPixelsRounding() &&
+        runtimeGame.getPixelsRounding() &&
         (angleCosValue === 0 || angleSinValue === 0) &&
         Number.isInteger(effectivePixiZoom)
       ) {

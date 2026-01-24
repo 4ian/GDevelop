@@ -81,10 +81,17 @@ class GD_CORE_API BehaviorConfigurationContainer {
    * behavior
    *
    * \return false if the new value cannot be set
-   * \see gd::InitialInstance
    */
   bool UpdateProperty(const gd::String& name, const gd::String& value) {
     return UpdateProperty(content, name, value);
+  };
+
+  /**
+   * \brief Called when the IDE wants to remove a custom property from the
+   * behavior
+   */
+  void RemoveProperty(const gd::String &name) {
+    content.RemoveChild(name);
   };
 
   /**
@@ -191,7 +198,6 @@ class GD_CORE_API BehaviorConfigurationContainer {
    * behavior
    *
    * \return false if the new value cannot be set
-   * \see gd::InitialInstance
    */
   virtual bool UpdateProperty(gd::SerializerElement& behaviorContent,
                               const gd::String& name,

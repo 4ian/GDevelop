@@ -692,6 +692,7 @@ export class Behavior extends EmscriptenObject {
   getTypeName(): string;
   getProperties(): MapStringPropertyDescriptor;
   updateProperty(name: string, value: string): boolean;
+  removeProperty(name: string): void;
   initializeContent(): void;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;

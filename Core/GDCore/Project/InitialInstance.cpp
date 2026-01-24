@@ -232,22 +232,29 @@ void InitialInstance::SerializeTo(SerializerElement& element) const {
   GetVariables().SerializeTo(element.AddChild("initialVariables"));
 
   if (!behaviorOverridings.empty()) {
-    SerializerElement& behaviorsElement = element.AddChild("behaviorOverridings");
+    SerializerElement &behaviorsElement =
+        element.AddChild("behaviorOverridings");
     behaviorsElement.ConsiderAsArrayOf("behaviorOverriding");
-    for (auto& it : behaviorOverridings) {
-      const auto& name = it.first;
-      const auto& behavior = it.second;
+    for (auto &it : behaviorOverridings) {
+      const auto &name = it.first;
+      const auto &behavior = it.second;
 
       // Default behaviors are added at the object creation according to
       // metadata. They don't need to be serialized.
       if (behavior->IsDefaultBehavior()) {
         continue;
       }
-      SerializerElement& behaviorElement = behaviorsElement.AddChild("behaviorOverriding");
+      // Empty behavior overridings are only removed at serialization to avoid
+      // to destroy them while they may still be used.
+      if (behavior->GetProperties().empty()) {
+        continue;
+      }
+      SerializerElement &behaviorElement =
+          behaviorsElement.AddChild("behaviorOverriding");
 
       behavior->SerializeTo(behaviorElement);
-      behaviorElement.RemoveChild("type");  // The content can contain type or
-                                            // name properties, remove them.
+      // The content can contain type or name properties, remove them.
+      behaviorElement.RemoveChild("type");
       behaviorElement.RemoveChild("name");
       behaviorElement.RemoveChild("isFolded");
       behaviorElement.SetAttribute("type", behavior->GetTypeName());

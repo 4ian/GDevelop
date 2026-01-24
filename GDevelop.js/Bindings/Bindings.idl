@@ -805,6 +805,7 @@ interface Behavior {
 
     [Value] MapStringPropertyDescriptor GetProperties();
     boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
+    void RemoveProperty([Const] DOMString name);
     void InitializeContent();
 
     void SerializeTo([Ref] SerializerElement element);

@@ -34,8 +34,7 @@ namespace gdjs {
   }
 
   /** @category Behaviors > Physics 3D */
-  export interface PhysicsCharacter3DNetworkSyncData
-    extends BehaviorNetworkSyncData {
+  export interface PhysicsCharacter3DNetworkSyncData extends BehaviorNetworkSyncData {
     props: PhysicsCharacter3DNetworkSyncDataType;
   }
 
@@ -263,61 +262,44 @@ namespace gdjs {
       return this._physics3D;
     }
 
-    override updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
-      if (oldBehaviorData.gravity !== newBehaviorData.gravity) {
-        this.setGravity(newBehaviorData.gravity);
+    override applyBehaviorOverriding(behaviorData): boolean {
+      if (behaviorData.gravity !== undefined) {
+        this.setGravity(behaviorData.gravity);
       }
-      if (oldBehaviorData.maxFallingSpeed !== newBehaviorData.maxFallingSpeed) {
-        this.setMaxFallingSpeed(newBehaviorData.maxFallingSpeed);
+      if (behaviorData.maxFallingSpeed !== undefined) {
+        this.setMaxFallingSpeed(behaviorData.maxFallingSpeed);
       }
-      if (
-        oldBehaviorData.forwardAcceleration !==
-        newBehaviorData.forwardAcceleration
-      ) {
-        this.setForwardAcceleration(newBehaviorData.forwardAcceleration);
+      if (behaviorData.forwardAcceleration !== undefined) {
+        this.setForwardAcceleration(behaviorData.forwardAcceleration);
       }
-      if (
-        oldBehaviorData.forwardDeceleration !==
-        newBehaviorData.forwardDeceleration
-      ) {
-        this.setForwardDeceleration(newBehaviorData.forwardDeceleration);
+      if (behaviorData.forwardDeceleration !== undefined) {
+        this.setForwardDeceleration(behaviorData.forwardDeceleration);
       }
-      if (oldBehaviorData.forwardSpeedMax !== newBehaviorData.forwardSpeedMax) {
-        this.setForwardSpeedMax(newBehaviorData.forwardSpeedMax);
+      if (behaviorData.forwardSpeedMax !== undefined) {
+        this.setForwardSpeedMax(behaviorData.forwardSpeedMax);
       }
-      if (
-        oldBehaviorData.sidewaysAcceleration !==
-        newBehaviorData.sidewaysAcceleration
-      ) {
-        this.setSidewaysAcceleration(newBehaviorData.sidewaysAcceleration);
+      if (behaviorData.sidewaysAcceleration !== undefined) {
+        this.setSidewaysAcceleration(behaviorData.sidewaysAcceleration);
       }
-      if (
-        oldBehaviorData.sidewaysDeceleration !==
-        newBehaviorData.sidewaysDeceleration
-      ) {
-        this.setSidewaysDeceleration(newBehaviorData.sidewaysDeceleration);
+      if (behaviorData.sidewaysDeceleration !== undefined) {
+        this.setSidewaysDeceleration(behaviorData.sidewaysDeceleration);
       }
-      if (
-        oldBehaviorData.sidewaysSpeedMax !== newBehaviorData.sidewaysSpeedMax
-      ) {
-        this.setSidewaysSpeedMax(newBehaviorData.sidewaysSpeedMax);
+      if (behaviorData.sidewaysSpeedMax !== undefined) {
+        this.setSidewaysSpeedMax(behaviorData.sidewaysSpeedMax);
       }
-      if (oldBehaviorData.jumpSustainTime !== newBehaviorData.jumpSustainTime) {
-        this.setJumpSustainTime(newBehaviorData.jumpSustainTime);
+      if (behaviorData.jumpSustainTime !== undefined) {
+        this.setJumpSustainTime(behaviorData.jumpSustainTime);
       }
-      if (oldBehaviorData.jumpHeight !== newBehaviorData.jumpHeight) {
-        this.setJumpSpeed(this.getJumpSpeedToReach(newBehaviorData.jumpHeight));
+      if (behaviorData.jumpHeight !== undefined) {
+        this.setJumpSpeed(this.getJumpSpeedToReach(behaviorData.jumpHeight));
       }
-      if (
-        oldBehaviorData.shouldBindObjectAndForwardAngle !==
-        newBehaviorData.shouldBindObjectAndForwardAngle
-      ) {
+      if (behaviorData.shouldBindObjectAndForwardAngle !== undefined) {
         this.setShouldBindObjectAndForwardAngle(
-          newBehaviorData.shouldBindObjectAndForwardAngle
+          behaviorData.shouldBindObjectAndForwardAngle
         );
       }
-      if (oldBehaviorData.stairHeightMax !== newBehaviorData.stairHeightMax) {
-        this.setStairHeightMax(newBehaviorData.stairHeightMax);
+      if (behaviorData.stairHeightMax !== undefined) {
+        this.setStairHeightMax(behaviorData.stairHeightMax);
       }
       return true;
     }

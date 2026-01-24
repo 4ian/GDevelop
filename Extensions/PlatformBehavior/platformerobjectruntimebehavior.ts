@@ -62,8 +62,7 @@ namespace gdjs {
   }
 
   /** @category Behaviors > Platform */
-  export interface PlatformerObjectNetworkSyncData
-    extends BehaviorNetworkSyncData {
+  export interface PlatformerObjectNetworkSyncData extends BehaviorNetworkSyncData {
     props: PlatformerObjectNetworkSyncDataType;
   }
 
@@ -368,56 +367,45 @@ namespace gdjs {
       this._ignoreDefaultControlsAsSyncedByNetwork = !options.keepControl;
     }
 
-    updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
-      if (oldBehaviorData.gravity !== newBehaviorData.gravity) {
-        this.setGravity(newBehaviorData.gravity);
+    override applyBehaviorOverriding(behaviorData): boolean {
+      if (behaviorData.gravity !== undefined) {
+        this.setGravity(behaviorData.gravity);
       }
-      if (oldBehaviorData.maxFallingSpeed !== newBehaviorData.maxFallingSpeed) {
-        this.setMaxFallingSpeed(newBehaviorData.maxFallingSpeed);
+      if (behaviorData.maxFallingSpeed !== undefined) {
+        this.setMaxFallingSpeed(behaviorData.maxFallingSpeed);
       }
-      if (oldBehaviorData.acceleration !== newBehaviorData.acceleration) {
-        this.setAcceleration(newBehaviorData.acceleration);
+      if (behaviorData.acceleration !== undefined) {
+        this.setAcceleration(behaviorData.acceleration);
       }
-      if (oldBehaviorData.deceleration !== newBehaviorData.deceleration) {
-        this.setDeceleration(newBehaviorData.deceleration);
+      if (behaviorData.deceleration !== undefined) {
+        this.setDeceleration(behaviorData.deceleration);
       }
-      if (oldBehaviorData.maxSpeed !== newBehaviorData.maxSpeed) {
-        this.setMaxSpeed(newBehaviorData.maxSpeed);
+      if (behaviorData.maxSpeed !== undefined) {
+        this.setMaxSpeed(behaviorData.maxSpeed);
       }
-      if (oldBehaviorData.jumpSpeed !== newBehaviorData.jumpSpeed) {
-        this.setJumpSpeed(newBehaviorData.jumpSpeed);
+      if (behaviorData.jumpSpeed !== undefined) {
+        this.setJumpSpeed(behaviorData.jumpSpeed);
       }
-      if (
-        oldBehaviorData.canGrabPlatforms !== newBehaviorData.canGrabPlatforms
-      ) {
-        this.setCanGrabPlatforms(newBehaviorData.canGrabPlatforms);
+      if (behaviorData.canGrabPlatforms !== undefined) {
+        this.setCanGrabPlatforms(behaviorData.canGrabPlatforms);
       }
-      if (
-        oldBehaviorData.canGrabWithoutMoving !==
-        newBehaviorData.canGrabWithoutMoving
-      ) {
-        this._canGrabWithoutMoving = newBehaviorData.canGrabWithoutMoving;
+      if (behaviorData.canGrabWithoutMoving !== undefined) {
+        this._canGrabWithoutMoving = behaviorData.canGrabWithoutMoving;
       }
-      if (oldBehaviorData.yGrabOffset !== newBehaviorData.yGrabOffset) {
-        this._yGrabOffset = newBehaviorData.yGrabOffset;
+      if (behaviorData.yGrabOffset !== undefined) {
+        this._yGrabOffset = behaviorData.yGrabOffset;
       }
-      if (oldBehaviorData.xGrabTolerance !== newBehaviorData.xGrabTolerance) {
-        this._xGrabTolerance = newBehaviorData.xGrabTolerance;
+      if (behaviorData.xGrabTolerance !== undefined) {
+        this._xGrabTolerance = behaviorData.xGrabTolerance;
       }
-      if (oldBehaviorData.jumpSustainTime !== newBehaviorData.jumpSustainTime) {
-        this.setJumpSustainTime(newBehaviorData.jumpSustainTime);
+      if (behaviorData.jumpSustainTime !== undefined) {
+        this.setJumpSustainTime(behaviorData.jumpSustainTime);
       }
-      if (
-        oldBehaviorData.useLegacyTrajectory !==
-        newBehaviorData.useLegacyTrajectory
-      ) {
-        this._useLegacyTrajectory = newBehaviorData.useLegacyTrajectory;
+      if (behaviorData.useLegacyTrajectory !== undefined) {
+        this._useLegacyTrajectory = behaviorData.useLegacyTrajectory;
       }
-      if (
-        oldBehaviorData.canGoDownFromJumpthru !==
-        newBehaviorData.canGoDownFromJumpthru
-      ) {
-        this._canGoDownFromJumpthru = newBehaviorData.canGoDownFromJumpthru;
+      if (behaviorData.canGoDownFromJumpthru !== undefined) {
+        this._canGoDownFromJumpthru = behaviorData.canGoDownFromJumpthru;
       }
       return true;
     }

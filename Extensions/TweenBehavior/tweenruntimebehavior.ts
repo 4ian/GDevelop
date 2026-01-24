@@ -11,8 +11,7 @@ namespace gdjs {
   /**
    * @category Behaviors > Tween
    */
-  export interface TweenBehaviorNetworkSyncData
-    extends BehaviorNetworkSyncData {
+  export interface TweenBehaviorNetworkSyncData extends BehaviorNetworkSyncData {
     props: TweenBehaviorNetworkSyncDataType;
   }
 
@@ -390,10 +389,7 @@ namespace gdjs {
       super(instanceContainer, behaviorData, owner);
     }
 
-    updateFromBehaviorData(
-      oldBehaviorData: BehaviorData,
-      newBehaviorData: BehaviorData
-    ): boolean {
+    override applyBehaviorOverriding(behaviorData: BehaviorData): boolean {
       // Nothing to update.
       return true;
     }

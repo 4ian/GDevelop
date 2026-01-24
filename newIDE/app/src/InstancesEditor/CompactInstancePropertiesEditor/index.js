@@ -105,11 +105,13 @@ export const CompactInstancePropertiesEditor = ({
   isVariableListLocked,
 }: Props) => {
   const forceUpdate = useForceUpdate();
-  const [isBehaviorsFolded, setIsBehaviorsFolded] = React.useState(false);
+  const instance = instances[0];
+  const [isBehaviorsFolded, setIsBehaviorsFolded] = React.useState(
+    !instance.hasAnyBehaviorOverriding()
+  );
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
 
   const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
-  const instance = instances[0];
   /**
    * TODO: multiple instances support for variables list. Expected behavior should be:
    * - if instances of different objects, do not show

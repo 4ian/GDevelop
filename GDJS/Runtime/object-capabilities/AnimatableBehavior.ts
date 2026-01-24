@@ -91,7 +91,7 @@ namespace gdjs {
       return false;
     }
 
-    updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
+    override applyBehaviorOverriding(behaviorData): boolean {
       // Nothing to update.
       return true;
     }

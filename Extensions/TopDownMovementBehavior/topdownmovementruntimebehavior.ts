@@ -19,8 +19,7 @@ namespace gdjs {
   }
 
   /** @category Behaviors > Top-down movement */
-  export interface TopDownMovementNetworkSyncData
-    extends BehaviorNetworkSyncData {
+  export interface TopDownMovementNetworkSyncData extends BehaviorNetworkSyncData {
     props: TopDownMovementNetworkSyncDataType;
   }
   /**
@@ -184,49 +183,42 @@ namespace gdjs {
       this._ignoreDefaultControlsAsSyncedByNetwork = !options.keepControl;
     }
 
-    updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
-      if (oldBehaviorData.allowDiagonals !== newBehaviorData.allowDiagonals) {
-        this._allowDiagonals = newBehaviorData.allowDiagonals;
+    override applyBehaviorOverriding(behaviorData): boolean {
+      if (behaviorData.allowDiagonals !== undefined) {
+        this._allowDiagonals = behaviorData.allowDiagonals;
       }
-      if (oldBehaviorData.acceleration !== newBehaviorData.acceleration) {
-        this._acceleration = newBehaviorData.acceleration;
+      if (behaviorData.acceleration !== undefined) {
+        this._acceleration = behaviorData.acceleration;
       }
-      if (oldBehaviorData.deceleration !== newBehaviorData.deceleration) {
-        this._deceleration = newBehaviorData.deceleration;
+      if (behaviorData.deceleration !== undefined) {
+        this._deceleration = behaviorData.deceleration;
       }
-      if (oldBehaviorData.maxSpeed !== newBehaviorData.maxSpeed) {
-        this._maxSpeed = newBehaviorData.maxSpeed;
+      if (behaviorData.maxSpeed !== undefined) {
+        this._maxSpeed = behaviorData.maxSpeed;
       }
-      if (oldBehaviorData.angularMaxSpeed !== newBehaviorData.angularMaxSpeed) {
-        this._angularMaxSpeed = newBehaviorData.angularMaxSpeed;
+      if (behaviorData.angularMaxSpeed !== undefined) {
+        this._angularMaxSpeed = behaviorData.angularMaxSpeed;
       }
-      if (oldBehaviorData.rotateObject !== newBehaviorData.rotateObject) {
-        this._rotateObject = newBehaviorData.rotateObject;
+      if (behaviorData.rotateObject !== undefined) {
+        this._rotateObject = behaviorData.rotateObject;
       }
-      if (oldBehaviorData.angleOffset !== newBehaviorData.angleOffset) {
-        this._angleOffset = newBehaviorData.angleOffset;
+      if (behaviorData.angleOffset !== undefined) {
+        this._angleOffset = behaviorData.angleOffset;
       }
-      if (
-        oldBehaviorData.ignoreDefaultControls !==
-        newBehaviorData.ignoreDefaultControls
-      ) {
-        this._ignoreDefaultControls = newBehaviorData.ignoreDefaultControls;
+      if (behaviorData.ignoreDefaultControls !== undefined) {
+        this._ignoreDefaultControls = behaviorData.ignoreDefaultControls;
       }
       if (
-        oldBehaviorData.platformType !== newBehaviorData.platformType ||
-        oldBehaviorData.customIsometryAngle !==
-          newBehaviorData.customIsometryAngle
+        behaviorData.platformType !== undefined ||
+        behaviorData.customIsometryAngle !== undefined
       ) {
         this.setViewpoint(
-          newBehaviorData.platformType,
-          newBehaviorData.customIsometryAngle
+          behaviorData.platformType,
+          behaviorData.customIsometryAngle
         );
       }
-      if (
-        oldBehaviorData.movementAngleOffset !==
-        newBehaviorData.movementAngleOffset
-      ) {
-        this._movementAngleOffset = newBehaviorData.movementAngleOffset;
+      if (behaviorData.movementAngleOffset !== undefined) {
+        this._movementAngleOffset = behaviorData.movementAngleOffset;
       }
       return true;
     }

@@ -108,7 +108,14 @@ export const CompactBehaviorPropertiesEditor = ({
                   behavior.getTypeName(),
                   behaviorName
                 );
-            behaviorOverriding.updateProperty(name, value);
+            const inheritedValue = behavior.getProperties().has(name)
+              ? behavior.getProperties().get(name)
+              : null;
+            if (inheritedValue === value) {
+              behaviorOverriding.removeProperty(name);
+            } else {
+              behaviorOverriding.updateProperty(name, value);
+            }
           },
           object,
           visibility: 'All',
@@ -125,7 +132,14 @@ export const CompactBehaviorPropertiesEditor = ({
         visibility: 'All',
       });
     },
-    [schemaRecomputeTrigger, behavior, behaviorMetadata, object]
+    [
+      schemaRecomputeTrigger,
+      initialInstance,
+      behavior,
+      behaviorMetadata,
+      object,
+      project,
+    ]
   );
 
   return (

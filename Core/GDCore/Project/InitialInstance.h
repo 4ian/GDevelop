@@ -308,6 +308,8 @@ class GD_CORE_API InitialInstance {
    */
   ///@{
 
+  bool HasAnyBehaviorOverriding();
+
   /**
    * \brief Return a reference to the content of the overriding of of the
    * behavior called \a name.

@@ -326,6 +326,17 @@ void InitialInstance::SetRawStringProperty(const gd::String& name,
   stringProperties[name] = value;
 }
 
+bool InitialInstance::HasAnyBehaviorOverriding() {
+  for (auto &pair : behaviorOverridings) {
+    auto &behaviorOverriding = pair.second;
+    if (!behaviorOverriding->GetProperties().empty()) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 gd::Behavior &InitialInstance::GetBehaviorOverriding(const gd::String &name) {
   return *behaviorOverridings.find(name)->second;
 }

@@ -1493,6 +1493,7 @@ interface InitialInstance {
 
     [Ref] VariablesContainer GetVariables();
 
+    boolean HasAnyBehaviorOverriding();
     boolean HasBehaviorOverridingNamed([Const] DOMString name);
     Behavior AddNewBehaviorOverriding([Ref] Project project, [Const] DOMString type, [Const] DOMString name);
     [Ref] Behavior GetBehaviorOverriding([Const] DOMString name);

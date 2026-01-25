@@ -8,7 +8,10 @@ import {
   serializeToJSON,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
-import { type AiGeneratedEvent } from '../Utils/GDevelopServices/Generation';
+import {
+  type AiGeneratedEvent,
+  type AiGeneratedEventMissingResource,
+} from '../Utils/GDevelopServices/Generation';
 import { renderNonTranslatedEventsAsText } from '../EventsSheet/EventsTree/TextRenderer';
 import {
   addMissingObjectBehaviors,
@@ -83,6 +86,7 @@ export type EditorFunctionGenericOutput = {|
   generatedEventsErrorDiagnostics?: string,
   aiGeneratedEventId?: string,
   warnings?: string,
+  newlyAddedResources?: Array<string>,
 
   initializedProject?: boolean,
   initializedFromTemplateSlug?: string,
@@ -130,6 +134,16 @@ export type AssetSearchAndInstallOptions = {|
   searchTerms: string,
   description: string,
   twoDimensionalViewKind: string,
+|};
+
+export type ResourceSearchAndInstallResult = {|
+  status: 'resources-installed' | 'nothing-found' | 'error',
+  message: string,
+  newlyAddedResources: Array<string>,
+|};
+
+export type ResourceSearchAndInstallOptions = {|
+  missingResources: Array<AiGeneratedEventMissingResource>,
 |};
 
 export type EditorCallbacks = {|
@@ -181,6 +195,7 @@ type RenderForEditorOptions = {|
   args: any,
   editorCallbacks: EditorCallbacks,
   shouldShowDetails: boolean,
+  editorFunctionCallResult?: ?EditorFunctionCallResult,
 |};
 
 type LaunchFunctionOptionsWithoutProject = {|
@@ -212,6 +227,9 @@ type LaunchFunctionOptionsWithoutProject = {|
   searchAndInstallAsset: (
     options: AssetSearchAndInstallOptions
   ) => Promise<AssetSearchAndInstallResult>,
+  searchAndInstallResource: (
+    options: ResourceSearchAndInstallOptions
+  ) => Promise<ResourceSearchAndInstallResult>,
 |};
 
 export type LaunchFunctionOptionsWithProject = {|
@@ -3234,7 +3252,12 @@ const readSceneEvents: EditorFunction = {
  * Adds a new event to a scene's event sheet
  */
 const addSceneEvents: EditorFunction = {
-  renderForEditor: ({ args, shouldShowDetails, editorCallbacks }) => {
+  renderForEditor: ({
+    args,
+    shouldShowDetails,
+    editorCallbacks,
+    editorFunctionCallResult,
+  }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const eventsDescription = extractRequiredString(args, 'events_description');
     const objectsListArgument = SafeExtractor.extractStringProperty(
@@ -3244,6 +3267,17 @@ const addSceneEvents: EditorFunction = {
     const objectsList = objectsListArgument === null ? '' : objectsListArgument;
     const placementHint =
       SafeExtractor.extractStringProperty(args, 'placement_hint') || '';
+    const newlyAddedResources =
+      editorFunctionCallResult &&
+      editorFunctionCallResult.status === 'finished'
+        ? SafeExtractor.extractArrayProperty(
+            editorFunctionCallResult.output,
+            'newlyAddedResources'
+          )
+        : null;
+    const newlyAddedResourcesList = (newlyAddedResources || []).filter(
+      resourceName => typeof resourceName === 'string'
+    );
 
     const details = shouldShowDetails ? (
       <ColumnStackLayout noMargin>
@@ -3284,6 +3318,19 @@ const addSceneEvents: EditorFunction = {
               <Trans>Related objects</Trans>
             </b>
             : {objectsList}
+          </Text>
+        )}
+        {newlyAddedResourcesList.length > 0 && (
+          <Text
+            noMargin
+            allowSelection
+            color="secondary"
+            style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
+          >
+            <b>
+              <Trans>Newly added resources</Trans>
+            </b>
+            : {newlyAddedResourcesList.join(', ')}
           </Text>
         )}
       </ColumnStackLayout>
@@ -3369,6 +3416,7 @@ const addSceneEvents: EditorFunction = {
     ensureExtensionInstalled,
     onWillInstallExtension,
     onExtensionInstalled,
+    searchAndInstallResource,
   }) => {
     const sceneName = extractRequiredString(args, 'scene_name');
     const eventsDescription = extractRequiredString(args, 'events_description');
@@ -3538,6 +3586,35 @@ const addSceneEvents: EditorFunction = {
           newOrChangedAiGeneratedEventIds: new Set([aiGeneratedEvent.id]),
         });
 
+        let newlyAddedResources = [];
+        let resourceInstallationWarning = '';
+        if (searchAndInstallResource) {
+          try {
+            const missingResources = changes.flatMap(
+              change => change.missingResources || []
+            );
+            if (missingResources.length > 0) {
+              const resourceSearchResult = await searchAndInstallResource({
+                missingResources,
+              });
+              newlyAddedResources = resourceSearchResult.newlyAddedResources;
+              if (resourceSearchResult.status === 'error') {
+                resourceInstallationWarning =
+                  resourceSearchResult.message ||
+                  'Unable to install missing resources.';
+              }
+            }
+          } catch (error) {
+            console.error(
+              `Unexpected error while installing missing resources for AI Generated Event (id: ${
+                aiGeneratedEvent.id
+              }):`,
+              error
+            );
+            resourceInstallationWarning = `Unable to install missing resources: ${error.message}`;
+          }
+        }
+
         const resultMessage =
           aiGeneratedEvent.resultMessage ||
           'Properly modified or added new event(s).';
@@ -3545,6 +3622,8 @@ const addSceneEvents: EditorFunction = {
           success: true,
           message: resultMessage,
           aiGeneratedEventId: aiGeneratedEvent.id,
+          newlyAddedResources,
+          warnings: resourceInstallationWarning || undefined,
         };
       } catch (error) {
         console.error(

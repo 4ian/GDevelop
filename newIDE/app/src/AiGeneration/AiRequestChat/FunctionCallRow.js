@@ -69,6 +69,20 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
     existingParsedOutput = null;
   }
 
+  const editorFunctionCallResultForRender =
+    editorFunctionCallResult ||
+    (existingParsedOutput
+      ? {
+          status: 'finished',
+          call_id: functionCall.call_id,
+          success:
+            typeof existingParsedOutput.success === 'boolean'
+              ? existingParsedOutput.success
+              : true,
+          output: existingParsedOutput,
+        }
+      : null);
+
   const isIgnored =
     (!!editorFunctionCallResult &&
       editorFunctionCallResult.status === 'ignored') ||
@@ -109,6 +123,7 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
         args: JSON.parse(functionCall.arguments),
         editorCallbacks,
         shouldShowDetails: showDetails,
+        editorFunctionCallResult: editorFunctionCallResultForRender,
       });
 
       text = result.text;

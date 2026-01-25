@@ -53,6 +53,13 @@ describe('editorFunctions', () => {
         assetShortHeader: fakeAssetShortHeader1,
       });
     },
+    searchAndInstallResource: async ({ missingResources }) => {
+      return Promise.resolve({
+        status: 'nothing-found',
+        message: 'No resources found',
+        newlyAddedResources: [],
+      });
+    },
     onObjectsModifiedOutsideEditor: jest.fn(),
     onWillInstallExtension: jest.fn(),
     onExtensionInstalled: jest.fn(),

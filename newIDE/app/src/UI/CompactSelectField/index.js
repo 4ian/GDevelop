@@ -14,6 +14,8 @@ type Props = {|
   children: React.Node,
   renderLeftIcon?: (className: string) => React.Node,
   leftIconTooltip?: React.Node,
+  renderOptionIcon?: (className: string) => React.Node,
+  rounded?: boolean,
 |};
 
 const CompactSelectField = ({
@@ -24,7 +26,9 @@ const CompactSelectField = ({
   errored,
   children,
   renderLeftIcon,
+  renderOptionIcon,
   leftIconTooltip,
+  rounded,
 }: Props) => {
   return (
     <div
@@ -32,6 +36,7 @@ const CompactSelectField = ({
         [classes.container]: true,
         [classes.disabled]: disabled,
         [classes.errored]: errored,
+        [classes.rounded]: rounded,
       })}
     >
       {renderLeftIcon && (
@@ -60,8 +65,14 @@ const CompactSelectField = ({
       <div
         className={classNames({
           [classes.compactSelectField]: true,
+          [classes.withOptionIcon]: !!renderOptionIcon,
         })}
       >
+        {renderOptionIcon && (
+          <div className={classes.optionIconContainer}>
+            {renderOptionIcon(classes.optionIcon)}
+          </div>
+        )}
         <select
           id={id}
           disabled={disabled}

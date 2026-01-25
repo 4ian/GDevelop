@@ -64,6 +64,7 @@ const SpineEditor = ({
   onSizeUpdated,
   onObjectUpdated,
   resourceManagementProps,
+  projectScopedContainersAccessor,
   renderObjectNameField,
 }: EditorProps) => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
@@ -347,6 +348,7 @@ const SpineEditor = ({
           propertyName="spineResourceName"
           project={project}
           resourceManagementProps={resourceManagementProps}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
           onChange={onChangeSpineResourceName}
         />
         {!spineData.skeleton && spineData.loadingErrorReason ? (

@@ -21,7 +21,7 @@ import { type HTMLDataset } from '../Utils/HTMLDataset';
 const EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND = 'Events Functions Extension';
 
 export type ExtensionTreeViewItemCallbacks = {|
-  onDeleteEventsFunctionsExtension: gdEventsFunctionsExtension => void,
+  onDeleteEventsFunctionsExtension: gdEventsFunctionsExtension => Promise<void>,
   onRenameEventsFunctionsExtension: (string, string) => void,
   onOpenEventsFunctionsExtension: string => void,
   onReloadEventsFunctionsExtensions: () => void,

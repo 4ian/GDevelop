@@ -258,7 +258,10 @@ export default function DiagnosticReportDialog({
           const diagnosticReport = wholeProjectDiagnosticReport.get(index);
           return (
             diagnosticReport.count() > 0 && (
-              <ColumnStackLayout noMargin>
+              <ColumnStackLayout
+                noMargin
+                key={`diagnostic-report-${diagnosticReport.getSceneName()}`}
+              >
                 <Text size="block-title">
                   {diagnosticReport.getSceneName()}
                 </Text>

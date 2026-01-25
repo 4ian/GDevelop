@@ -414,7 +414,7 @@ namespace gdjs {
         objectsLists: ObjectsLists,
         x: float,
         y: float,
-        inverted?: boolean | undefined
+        inverted: boolean = false
       ) {
         let bestObject = null;
         let best = 0;
@@ -426,7 +426,7 @@ namespace gdjs {
           for (let j = 0; j < list.length; ++j) {
             const object = list[j];
             const distance = object.getSqDistanceToPosition(x, y);
-            if (first || distance < best !== inverted) {
+            if (first || distance < best !== !!inverted) {
               best = distance;
               bestObject = object;
             }
@@ -627,6 +627,9 @@ namespace gdjs {
   }
 
   const logger = new gdjs.Logger('LongLivedObjectsLists');
+  /**
+   * @category Core Engine > Object
+   */
   export type LongLivedObjectsListNetworkSyncData = {
     objectsLists: {
       [objectName: string]: Array<string>;
@@ -637,6 +640,7 @@ namespace gdjs {
   /**
    * A container for objects lists that should last more than the current frame.
    * It automatically removes objects that were destroyed from the objects lists.
+   * @category Core Engine > Object
    */
   export class LongLivedObjectsList {
     private objectsLists = new Map<string, Array<RuntimeObject>>();

@@ -23,8 +23,13 @@ void PropertyDescriptor::SerializeTo(SerializerElement& element) const {
   element.AddChild("label").SetStringValue(label);
   if (!description.empty())
     element.AddChild("description").SetStringValue(description);
-  if (!group.empty()) element.AddChild("group").SetStringValue(group);
-
+  // Compatibility with GD <= 5.6.251
+  // The group is now persisted in the `propertiesFolderStructure` node.
+  // TODO Stop persisting the group name after a few releases when users are
+  // unlikely to go back to 5.6.251 to avoid redundancy.
+  if (!group.empty())
+    element.AddChild("group").SetStringValue(group);
+  // end of compatibility code
   if (!extraInformation.empty()) {
     SerializerElement& extraInformationElement =
         element.AddChild("extraInformation");
@@ -70,7 +75,9 @@ void PropertyDescriptor::UnserializeFrom(const SerializerElement& element) {
   currentValue = element.GetChild("value").GetStringValue();
   type = element.GetChild("type").GetStringValue();
   if (type == "Number") {
-    gd::String unitName = element.GetChild("unit").GetStringValue();
+    gd::String unitName = element.HasChild("unit")
+                              ? element.GetChild("unit").GetStringValue()
+                              : "";
     measurementUnit =
         gd::MeasurementUnit::HasDefaultMeasurementUnitNamed(unitName)
             ? measurementUnit =
@@ -81,9 +88,11 @@ void PropertyDescriptor::UnserializeFrom(const SerializerElement& element) {
   description = element.HasChild("description")
                     ? element.GetChild("description").GetStringValue()
                     : "";
+  // Compatibility with GD <= 5.6.251
+  // The group is now persisted in the `propertiesFolderStructure` node.
   group = element.HasChild("group") ? element.GetChild("group").GetStringValue()
                                     : "";
-
+  // end of compatibility code
   extraInformation.clear();
   if (element.HasChild("extraInformation")) {
     const SerializerElement& extraInformationElement =

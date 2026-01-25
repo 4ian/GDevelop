@@ -26,8 +26,8 @@ class BehaviorWithRequiredBehaviorProperty : public gd::Behavior {
       const gd::String& name, const gd::String& type)
       : Behavior(name, type) {};
   virtual ~BehaviorWithRequiredBehaviorProperty(){};
-  virtual Behavior* Clone() const override {
-    return new BehaviorWithRequiredBehaviorProperty(*this);
+  virtual std::unique_ptr<gd::Behavior> Clone() const override {
+    return gd::make_unique<BehaviorWithRequiredBehaviorProperty>(*this);
   }
 
   virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(
@@ -74,8 +74,8 @@ class BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior
       const gd::String& name, const gd::String& type)
       : Behavior(name, type) {};
   virtual ~BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior(){};
-  virtual Behavior* Clone() const override {
-    return new BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior(
+  virtual std::unique_ptr<gd::Behavior> Clone() const override {
+    return gd::make_unique<BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior>(
         *this);
   }
 

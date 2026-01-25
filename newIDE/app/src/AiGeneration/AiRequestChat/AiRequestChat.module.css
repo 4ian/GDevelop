@@ -57,3 +57,8 @@
   gap: 4px;
   margin-top: 4px;
 }
+
+.creditOrSubscriptionPromptContainer {
+  background: linear-gradient(90deg, rgb(153, 121, 241) 0%, rgb(255, 188, 87) 100%);
+  border-radius: 8px;
+}

@@ -24,8 +24,10 @@
 
 .chatBubbleContainer {
   display: flex;
+  flex-direction: column;
   animation: chat-bubble-appear 0.3s;
   min-width: 0; /** Prevents horizontal overflow */
+  gap: 4px;
 }
 
 .chatBubbleContent {

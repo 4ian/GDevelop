@@ -99,6 +99,10 @@ export default function ValueTypeEditor({
                   label={t`String from a list of options (text)`}
                 />
                 <SelectOption
+                  value="numberWithChoices"
+                  label={t`Number from a list of options (number)`}
+                />
+                <SelectOption
                   value="keyboardKey"
                   label={t`Keyboard Key (text)`}
                 />
@@ -174,16 +178,14 @@ export default function ValueTypeEditor({
                   />
                 )}
                 {!isExpressionType && (
-                  <SelectOption
-                    value="jsonResource"
-                    label={t`Resource (JavaScript only)`}
-                  />
+                  <SelectOption value="jsonResource" label={t`Resource`} />
                 )}
               </SelectField>
             )}
             {valueTypeMetadata.isObject() && (
               <ObjectTypeSelector
                 project={project}
+                eventsFunctionsExtension={eventsFunctionsExtension}
                 value={valueTypeMetadata.getExtraInfo()}
                 onChange={(value: string) => {
                   valueTypeMetadata.setExtraInfo(value);
@@ -294,7 +296,8 @@ export default function ValueTypeEditor({
               />
             )}
           </ResponsiveLineStackLayout>
-          {valueTypeMetadata.getName() === 'stringWithSelector' && (
+          {(valueTypeMetadata.getName() === 'stringWithSelector' ||
+            valueTypeMetadata.getName() === 'numberWithChoices') && (
             <ChoicesEditor
               disabled={disabled}
               choices={getExtraInfoArray(valueTypeMetadata).map(value => ({
@@ -310,6 +313,7 @@ export default function ValueTypeEditor({
                 forceUpdate();
                 onTypeUpdated();
               }}
+              isNumber={valueTypeMetadata.getName() === 'numberWithChoices'}
             />
           )}
         </ColumnStackLayout>

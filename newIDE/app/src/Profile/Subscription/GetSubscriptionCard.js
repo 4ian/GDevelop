@@ -7,7 +7,7 @@ import {
   type SubscriptionDialogDisplayReason,
   type SubscriptionPlacementId,
 } from '../../Utils/Analytics/EventSender';
-import { SubscriptionSuggestionContext } from './SubscriptionSuggestionContext';
+import { SubscriptionContext } from './SubscriptionContext';
 import RaisedButton from '../../UI/RaisedButton';
 import FlatButton from '../../UI/FlatButton';
 import Coin from '../../Credits/Icons/Coin';
@@ -15,8 +15,6 @@ import classes from './GetSubscriptionCard.module.css';
 import Paper from '../../UI/Paper';
 import CrownShining from '../../UI/CustomSvgIcons/CrownShining';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
-import AuthenticatedUserContext from '../AuthenticatedUserContext';
-import { hasValidSubscriptionPlan } from '../../Utils/GDevelopServices/Usage';
 import IconButton from '../../UI/IconButton';
 import Cross from '../../UI/CustomSvgIcons/Cross';
 
@@ -50,7 +48,7 @@ type Props = {|
   onUpgrade?: () => void,
   forceColumnLayout?: boolean,
   filter?: 'individual' | 'team' | 'education',
-  recommendedPlanIdIfNoSubscription?:
+  recommendedPlanId?:
     | 'gdevelop_silver'
     | 'gdevelop_gold'
     | 'gdevelop_startup'
@@ -67,20 +65,12 @@ const GetSubscriptionCard = ({
   payWithCreditsOptions,
   onUpgrade,
   forceColumnLayout,
-  filter,
-  recommendedPlanIdIfNoSubscription,
+  recommendedPlanId,
   canHide,
   placementId,
 }: Props) => {
   const [isHidden, setIsHidden] = React.useState(false);
-  const { subscription } = React.useContext(AuthenticatedUserContext);
-  const actualPlanIdToRecommend = hasValidSubscriptionPlan(subscription)
-    ? // If the user already has a subscription, show the original subscription dialog.
-      undefined
-    : recommendedPlanIdIfNoSubscription;
-  const { openSubscriptionDialog } = React.useContext(
-    SubscriptionSuggestionContext
-  );
+  const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
   const { isMobile } = useResponsiveWindowSize();
   const columnLayout = forceColumnLayout || isMobile;
 
@@ -120,10 +110,9 @@ const GetSubscriptionCard = ({
                     openSubscriptionDialog({
                       analyticsMetadata: {
                         reason: subscriptionDialogOpeningReason,
-                        recommendedPlanId: actualPlanIdToRecommend,
+                        recommendedPlanId,
                         placementId,
                       },
-                      filter,
                     });
                   }}
                   icon={<CrownShining fontSize="small" />}

@@ -56,6 +56,7 @@ type Props = {|
   i18n: I18nType,
   canPasteInstructions: boolean, // Unused
   onPasteInstructions: () => void, // Unused
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
@@ -131,8 +132,8 @@ const InstructionEditorMenu = ({
     });
     if (instructionMetadata) {
       setupInstructionParameters(
-        globalObjectsContainer,
-        objectsContainer,
+        project,
+        projectScopedContainersAccessor,
         instruction,
         instructionMetadata,
         chosenObjectName

@@ -36,6 +36,7 @@ export const Default = () => (
         onEventsBasedObjectPasted={action('object pasted')}
         onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
         onAddEventsBasedObject={cb => cb({ isRenderedIn3D: false })}
+        onEventBasedObjectTypeChanged={action('onEventBasedObjectTypeChanged')}
         // Behaviors
         onSelectEventsBasedBehavior={action('behavior selected')}
         onDeleteEventsBasedBehavior={action('behavior deleted')}

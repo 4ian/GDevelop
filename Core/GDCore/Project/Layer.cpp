@@ -23,6 +23,7 @@ Layer::Layer()
       camera3DNearPlaneDistance(3),
       camera3DFarPlaneDistance(10000),
       camera3DFieldOfView(45),
+      camera2DPlaneMaxDrawingDistance(5000),
       ambientLightColorR(200),
       ambientLightColorG(200),
       ambientLightColorB(200) {}
@@ -56,6 +57,8 @@ void Layer::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("camera3DFarPlaneDistance",
                        GetCamera3DFarPlaneDistance());
   element.SetAttribute("camera3DFieldOfView", GetCamera3DFieldOfView());
+  element.SetAttribute("camera2DPlaneMaxDrawingDistance",
+                       GetCamera2DPlaneMaxDrawingDistance());
 
   SerializerElement& camerasElement = element.AddChild("cameras");
   camerasElement.ConsiderAsArrayOf("camera");
@@ -99,6 +102,8 @@ void Layer::UnserializeFrom(const SerializerElement& element) {
       "camera3DFarPlaneDistance", 10000, "threeDFarPlaneDistance"));
   SetCamera3DFieldOfView(element.GetDoubleAttribute(
       "camera3DFieldOfView", 45, "threeDFieldOfView"));
+  SetCamera2DPlaneMaxDrawingDistance(element.GetDoubleAttribute(
+      "camera2DPlaneMaxDrawingDistance", 5000));
 
   cameras.clear();
   SerializerElement& camerasElement = element.GetChild("cameras");

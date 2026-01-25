@@ -19,6 +19,13 @@ import { type Badge } from './Badge';
 import { type Profile } from './Authentication';
 import { type UserCourseProgress } from './Asset';
 import { extractGDevelopApiErrorStatusAndCode } from './Errors';
+import {
+  ensureIsArray,
+  ensureIsObject,
+  ensureIsNullOrObjectHasProperty,
+  ensureIsObjectWithPropertyOfType,
+  ensureObjectHasProperty,
+} from '../DataValidator';
 
 export type BatchCreationResultUser = {|
   email: string,
@@ -208,18 +215,20 @@ export const searchCreatorPublicProfilesByUsername = (
         type: 'creator',
       },
     })
-    .then(response => response.data);
+    .then(response =>
+      ensureIsArray({
+        data: response.data,
+        endpointName: '/user-public-profile/search of User API',
+      })
+    );
 };
 
 export const getUserBadges = async (id: string): Promise<Array<Badge>> => {
   const response = await client.get(`/user/${id}/badge`);
-  const badges = response.data;
-
-  if (!Array.isArray(badges)) {
-    throw new Error('Invalid response from the badges API');
-  }
-
-  return badges;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/user/{id}/badge of User API',
+  });
 };
 
 export const listUserTeams = async (
@@ -231,7 +240,10 @@ export const listUserTeams = async (
     headers: { Authorization: authorizationHeader },
     params: { userId, role: 'admin' },
   });
-  return response.data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/team of User API',
+  });
 };
 
 export const listTeamMembers = async (
@@ -249,7 +261,10 @@ export const listTeamMembers = async (
       include: 'decryptedPassword',
     },
   });
-  return response.data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/user of User API',
+  });
 };
 
 export const listTeamAdmins = async (
@@ -262,7 +277,10 @@ export const listTeamAdmins = async (
     headers: { Authorization: authorizationHeader },
     params: { userId, teamId, memberType: 'admin' },
   });
-  return response.data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/user of User API',
+  });
 };
 
 export const listTeamMemberships = async (
@@ -275,7 +293,10 @@ export const listTeamMemberships = async (
     headers: { Authorization: authorizationHeader },
     params: { userId, teamId },
   });
-  return response.data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/team-membership of User API',
+  });
 };
 
 export const listTeamGroups = async (
@@ -288,7 +309,10 @@ export const listTeamGroups = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  return response.data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/team/{id}/group of User API',
+  });
 };
 
 export const updateGroup = async (
@@ -307,7 +331,11 @@ export const updateGroup = async (
       params: { userId },
     }
   );
-  return response.data;
+  return ensureObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/team/{id}/group/{id} of User API',
+  });
 };
 
 export const createGroup = async (
@@ -321,7 +349,11 @@ export const createGroup = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  return response.data;
+  return ensureObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/team/{id}/group of User API',
+  });
 };
 
 export const deleteGroup = async (
@@ -329,13 +361,12 @@ export const deleteGroup = async (
   userId: string,
   teamId: string,
   groupId: string
-): Promise<Array<TeamGroup>> => {
+): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await client.delete(`/team/${teamId}/group/${groupId}`, {
+  await client.delete(`/team/${teamId}/group/${groupId}`, {
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  return response.data;
 };
 
 export const listRecommendations = async (
@@ -347,14 +378,20 @@ export const listRecommendations = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  return response.data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/recommendation of User API',
+  });
 };
 
 export const listDefaultRecommendations = async (): Promise<
   Array<Recommendation>
 > => {
   const response = await client.get(`/recommendation`);
-  return response.data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/recommendation of User API',
+  });
 };
 
 export const updateUserGroup = async (
@@ -373,7 +410,10 @@ export const updateUserGroup = async (
       params: { userId: adminUserId },
     }
   );
-  return response.data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/team/{id}/action/update-members of User API',
+  });
 };
 
 export const getUserPublicProfilesByIds = async (
@@ -386,7 +426,10 @@ export const getUserPublicProfilesByIds = async (
       id: ids.join(','),
     },
   });
-  return response.data;
+  return ensureIsObject({
+    data: response.data,
+    endpointName: '/user-public-profile of User API',
+  });
 };
 
 export const getUserPublicProfile = async (
@@ -394,7 +437,11 @@ export const getUserPublicProfile = async (
 ): Promise<UserPublicProfile> => {
   const response = await client.get(`/user-public-profile/${id}`);
 
-  return response.data;
+  return ensureObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/user-public-profile/{id} of User API',
+  });
 };
 
 export const changeTeamMemberPassword = async (
@@ -475,7 +522,10 @@ export const createTeamMembers = async (
       headers: { Authorization: authorizationHeader },
     }
   );
-  return response.data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/team/{id}/action/batch-create-users of User API',
+  });
 };
 
 export const setUserAsAdmin = async (
@@ -510,7 +560,12 @@ export const getUsernameAvailability = async (
   username: string
 ): Promise<UsernameAvailability> => {
   const response = await client.get(`/username-availability/${username}`);
-  return response.data;
+  return ensureIsObjectWithPropertyOfType({
+    data: response.data,
+    propertyName: 'isAvailable',
+    propertyType: 'boolean',
+    endpointName: '/username-availability/{username} of User API',
+  });
 };
 
 export const syncDiscordUsername = async (
@@ -535,11 +590,10 @@ export const getUserCommentQualityRatingsLeaderboards = async (): Promise<
     '/user-comment-quality-ratings-leaderboard?leaderboardRegionName=global'
   );
 
-  if (!Array.isArray(response.data)) {
-    throw new Error('Invalid response from the user leaderboard API');
-  }
-
-  return response.data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/user-comment-quality-ratings-leaderboard of User API',
+  });
 };
 
 export const registerUserInterest = async (
@@ -776,7 +830,11 @@ export const fetchUserCourseProgress = async (
       params: { userId },
     });
 
-    return response.data;
+    return ensureIsNullOrObjectHasProperty({
+      data: response.data,
+      propertyName: 'userId',
+      endpointName: '/course/{id}/progress of User API',
+    });
   } catch (error) {
     const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(error);
     if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
@@ -814,7 +872,13 @@ export const generateCustomAuthToken = async (
       params: { userId },
     }
   );
-  return response.data.customAuthToken;
+  const data = ensureIsObjectWithPropertyOfType({
+    data: response.data,
+    propertyName: 'customAuthToken',
+    propertyType: 'string',
+    endpointName: '/user/action/generate-custom-auth-token of User API',
+  });
+  return data.customAuthToken;
 };
 
 export const editUser = async (
@@ -835,5 +899,9 @@ export const editUser = async (
     params: { userId },
   });
 
-  return response.data;
+  return ensureObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/user/{id} of User API',
+  });
 };

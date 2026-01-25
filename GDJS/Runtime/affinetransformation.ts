@@ -1,6 +1,7 @@
 namespace gdjs {
   /**
    * An affine transformation that can transform points.
+   * @category Utils > Geometry
    */
   export class AffineTransformation {
     private matrix: Float32Array;

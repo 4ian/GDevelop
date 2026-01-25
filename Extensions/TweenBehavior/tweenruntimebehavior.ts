@@ -8,6 +8,9 @@ namespace gdjs {
   interface TweenBehaviorNetworkSyncDataType {
     tweenManager: TweenManagerNetworkSyncData;
   }
+  /**
+   * @category Behaviors > Tween
+   */
   export interface TweenBehaviorNetworkSyncData
     extends BehaviorNetworkSyncData {
     props: TweenBehaviorNetworkSyncDataType;
@@ -367,6 +370,9 @@ namespace gdjs {
       return () => {};
     };
 
+  /**
+   * @category Behaviors > Tween
+   */
   export class TweenRuntimeBehavior extends gdjs.RuntimeBehavior {
     private _tweens = new gdjs.evtTools.tween.TweenManager();
     private _isActive: boolean = true;

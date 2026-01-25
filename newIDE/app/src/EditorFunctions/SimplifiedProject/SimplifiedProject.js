@@ -34,12 +34,26 @@ type SimplifiedObjectGroup = {|
   variables?: Array<SimplifiedVariable>,
 |};
 
+type SimplifiedLayer = {|
+  layerName: string,
+  position: number,
+  isBaseLayer?: boolean,
+|};
+
 type SimplifiedScene = {|
   sceneName: string,
   objects: Array<SimplifiedObject>,
   objectGroups: Array<SimplifiedObjectGroup>,
   sceneVariables: Array<SimplifiedVariable>,
+  layers: Array<SimplifiedLayer>,
   instancesOnSceneDescription: string,
+|};
+
+type SimplifiedResource = {|
+  name: string,
+  type: string,
+  file: string,
+  metadata?: string,
 |};
 
 type SimplifiedProject = {|
@@ -51,6 +65,7 @@ type SimplifiedProject = {|
   globalObjectGroups: Array<SimplifiedObjectGroup>,
   scenes: Array<SimplifiedScene>,
   globalVariables: Array<SimplifiedVariable>,
+  resources: Array<SimplifiedResource>,
 |};
 
 type ProjectSpecificExtensionsSummary = {|
@@ -246,6 +261,36 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
     });
   };
 
+  const getSimplifiedResourcesJson = (
+    resources: gdResourcesContainer
+  ): Array<SimplifiedResource> => {
+    return resources
+      .getAllResourceNames()
+      .toJSArray()
+      .map(resourceName => {
+        const resource = resources.getResource(resourceName);
+        return {
+          name: resourceName,
+          type: resource.getKind(),
+          file: resource.getFile(),
+          metadata: resource.getMetadata() ? resource.getMetadata() : undefined,
+        };
+      });
+  };
+
+  const getSimplifiedLayers = (
+    layers: gdLayersContainer
+  ): Array<SimplifiedLayer> => {
+    return mapFor(0, layers.getLayersCount(), i => {
+      const layer = layers.getLayerAt(i);
+      return {
+        layerName: layer.getName(),
+        position: i,
+        isBaseLayer: layer.getName() === '' ? true : undefined,
+      };
+    });
+  };
+
   const getInstancesDescription = (scene: gdLayout): string => {
     let isEmpty = true;
     const instancesCountPerLayer: { [string]: { [string]: number } } = {};
@@ -316,6 +361,7 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
         projectScopedContainers.getObjectsContainersList()
       ),
       sceneVariables: getSimplifiedVariablesContainerJson(scene.getVariables()),
+      layers: getSimplifiedLayers(scene.getLayers()),
       instancesOnSceneDescription: getInstancesDescription(scene),
     };
   };
@@ -344,6 +390,7 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
         gameResolutionWidth: project.getGameResolutionWidth(),
         gameResolutionHeight: project.getGameResolutionHeight(),
       },
+      resources: getSimplifiedResourcesJson(project.getResourcesManager()),
       globalObjects,
       globalObjectGroups: getSimplifiedObjectGroups(
         project.getObjects().getObjectGroups(),
@@ -383,9 +430,20 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
     ).filter(Boolean);
 
     const extensionsSummary: ProjectSpecificExtensionsSummary = {
-      extensionSummaries: projectSpecificExtensions.map(extension =>
-        buildExtensionSummary({ gd, extension })
-      ),
+      extensionSummaries: projectSpecificExtensions.map(extension => {
+        const extensionName = extension.getName();
+        const eventsFunctionsExtension = project.hasEventsFunctionsExtensionNamed(
+          extensionName
+        )
+          ? project.getEventsFunctionsExtension(extensionName)
+          : null;
+
+        return buildExtensionSummary({
+          gd,
+          eventsFunctionsExtension,
+          extension,
+        });
+      }),
     };
 
     const duration = Date.now() - startTime;

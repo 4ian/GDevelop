@@ -13,6 +13,7 @@ import { getMeasurementUnitShortLabel } from '../../PropertiesEditor/PropertiesM
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import ResourcesLoader from '../../ResourcesLoader';
 import { Column, Line } from '../../UI/Grid';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
 
@@ -116,6 +117,7 @@ type PropertyResourceSelectorProps = {|
   objectConfiguration: gdObjectConfiguration,
   propertyName: string,
   project: gd.Project,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   resourceManagementProps: ResourceManagementProps,
   onChange: (value: string) => void,
 |};
@@ -124,6 +126,7 @@ export const PropertyResourceSelector = ({
   objectConfiguration,
   propertyName,
   project,
+  projectScopedContainersAccessor,
   resourceManagementProps,
   onChange,
 }: PropertyResourceSelectorProps) => {
@@ -149,6 +152,7 @@ export const PropertyResourceSelector = ({
   return (
     <ResourceSelector
       project={project}
+      projectScopedContainersAccessor={projectScopedContainersAccessor}
       // $FlowExpectedError
       resourceKind={extraInfos.size() > 0 ? extraInfos.at(0) : ''}
       floatingLabelText={label}

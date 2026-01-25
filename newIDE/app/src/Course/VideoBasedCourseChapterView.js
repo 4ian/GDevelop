@@ -121,6 +121,20 @@ const VideoBasedCourseChapterView = React.forwardRef<Props, HTMLDivElement>(
                 'en'
               }&hl=${userLanguage2LetterCode}`}
               frameBorder="0"
+              referrerPolicy={
+                // https://developers.google.com/youtube/terms/required-minimum-functionality#embedded-player-api-client-identity
+                'strict-origin-when-cross-origin'
+              }
+              credentialless={
+                // See https://developer.chrome.com/blog/iframe-credentialless
+                // It's in case we start using "COEP" or "CORP" in the future.
+                true
+              }
+              credentialLess={
+                // See https://developer.chrome.com/blog/iframe-credentialless
+                // It's in case we start using "COEP" or "CORP" in the future.
+                true
+              }
             />
           </div>
         ) : (

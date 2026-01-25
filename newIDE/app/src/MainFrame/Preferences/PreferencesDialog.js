@@ -53,6 +53,7 @@ const PreferencesDialog = ({
     showAllAlertMessages,
     showAllTutorialHints,
     showAllAnnouncements,
+    showAllAskAiStandAloneForms,
     setAutoDisplayChangelog,
     setEventsSheetShowObjectThumbnails,
     setAutosaveOnPreview,
@@ -83,7 +84,10 @@ const PreferencesDialog = ({
     setPreviewCrashReportUploadLevel,
     setTakeScreenshotOnPreview,
     setShowAiAskButtonInTitleBar,
+    setAutomaticallyUseCreditsForAiRequests,
     setShowCreateSectionByDefault,
+    setHasSeenInGameEditorWarning,
+    setUseBackgroundSerializerForSaving,
   } = React.useContext(PreferencesContext);
 
   const initialUse3DEditor = React.useRef<boolean>(values.use3DEditor);
@@ -535,12 +539,28 @@ const PreferencesDialog = ({
                 <Trans>Other</Trans>
               </Text>
               <ColumnStackLayout>
+                <FlatButton
+                  label={<Trans>Reset hidden Ask AI text inputs</Trans>}
+                  onClick={() => showAllAskAiStandAloneForms()}
+                  disabled={
+                    !Object.keys(values.hiddenAskAiStandAloneForms).length
+                  }
+                />
                 <CompactToggleField
                   labelColor="primary"
                   hideTooltip
                   onCheck={setShowAiAskButtonInTitleBar}
                   checked={values.showAiAskButtonInTitleBar}
                   label={i18n._(t`Show "Ask AI" button in the title bar`)}
+                />
+                <CompactToggleField
+                  labelColor="primary"
+                  hideTooltip
+                  onCheck={setAutomaticallyUseCreditsForAiRequests}
+                  checked={values.automaticallyUseCreditsForAiRequests}
+                  label={i18n._(
+                    t`Automatically use GDevelop credits for AI requests when run out of AI credits`
+                  )}
                 />
                 <CompactToggleField
                   labelColor="primary"
@@ -569,6 +589,15 @@ const PreferencesDialog = ({
                   checked={values.showDeprecatedInstructionWarning}
                   label={i18n._(
                     t`Show a warning on deprecated actions and conditions`
+                  )}
+                />
+                <CompactToggleField
+                  labelColor="primary"
+                  hideTooltip
+                  onCheck={setUseBackgroundSerializerForSaving}
+                  checked={values.useBackgroundSerializerForSaving}
+                  label={i18n._(
+                    t`Use experimental background serializer for saving projects`
                   )}
                 />
                 {!!electron && (
@@ -623,6 +652,12 @@ const PreferencesDialog = ({
                     fullWidth
                     onClick={onOpenQuickCustomizationDialog}
                     label={<Trans>Open quick customization</Trans>}
+                  />
+                  <FlatButton
+                    fullWidth
+                    label={<Trans>Show again in-game editor warning</Trans>}
+                    onClick={() => setHasSeenInGameEditorWarning(false)}
+                    disabled={!values.hasSeenInGameEditorWarning}
                   />
                 </ColumnStackLayout>
               </ColumnStackLayout>

@@ -6,7 +6,10 @@
 namespace gdjs {
   const logger = new gdjs.Logger('JSON Manager');
 
-  /** The callback called when a json that was requested is loaded (or an error occurred). */
+  /**
+   * The callback called when a json that was requested is loaded (or an error occurred).
+   * @category Resources > JSON
+   */
   export type JsonManagerRequestCallback = (
     error: Error | null,
     content: Object | null
@@ -20,6 +23,7 @@ namespace gdjs {
    * Contrary to audio/fonts, json files are loaded asynchronously, when requested.
    * You should properly handle errors, and give the developer/player a way to know
    * that loading failed.
+   * @category Resources > JSON
    */
   export class JsonManager implements gdjs.ResourceManager {
     _resourceLoader: ResourceLoader;
@@ -61,6 +65,7 @@ namespace gdjs {
           `Error while preloading json resource ${resource.name}:`,
           error
         );
+        throw error;
       }
     }
 
@@ -210,12 +215,12 @@ namespace gdjs {
     }
 
     unloadResource(resourceData: ResourceData): void {
-      const loadedJson = this._loadedJsons.get(resourceData);
+      const loadedJson = this._loadedJsons.getFromName(resourceData.name);
       if (loadedJson) {
         this._loadedJsons.delete(resourceData);
       }
 
-      const callback = this._callbacks.get(resourceData);
+      const callback = this._callbacks.getFromName(resourceData.name);
       if (callback) {
         this._callbacks.delete(resourceData);
       }

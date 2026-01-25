@@ -1,12 +1,7 @@
 // @flow
-import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import SelectOption from '../UI/SelectOption';
-import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
-import {
-  type ResourceKind,
-  type ResourceManagementProps,
-} from '../ResourcesList/ResourceSource';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import {
   ResponsiveLineStackLayout,
   ColumnStackLayout,
@@ -33,181 +28,20 @@ import { CompactColorField } from '../UI/CompactColorField';
 import { rgbOrHexToRGBString } from '../Utils/ColorTransformer';
 import { CompactResourceSelectorWithThumbnail } from '../ResourcesList/CompactResourceSelectorWithThumbnail';
 import CompactLeaderboardIdPropertyField from './CompactLeaderboardIdPropertyField';
-
-// An "instance" here is the objects for which properties are shown
-export type Instance = Object; // This could be improved using generics.
-export type Instances = Array<Instance>;
-
-// "Value" fields are fields displayed in the properties.
-export type ValueFieldCommonProperties = {|
-  name: string,
-  getLabel?: Instance => string,
-  getDescription?: Instance => string,
-  hideLabel?: boolean,
-  getExtraDescription?: Instance => string,
-  hasImpactOnAllOtherFields?: boolean,
-  canBeUnlimitedUsingMinus1?: boolean,
-  disabled?: (instances: Array<gdInitialInstance>) => boolean,
-  onEditButtonBuildMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
-  onEditButtonClick?: () => void,
-  getValueFromDisplayedValue?: string => string,
-  getDisplayedValueFromValue?: string => string,
-
-  // Only used for effects for now:
-  advanced?: boolean,
-  defaultValue?: string | number | boolean,
-|};
-
-// "Primitive" value fields are "simple" fields.
-export type PrimitiveValueField =
-  | {|
-      valueType: 'number',
-      getValue: Instance => number,
-      setValue: (instance: Instance, newValue: number) => void,
-      /** Only supported on non compact property editors. */
-      getEndAdornment?: Instance => {|
-        label: string,
-        tooltipContent: React.Node,
-      |},
-      getEndAdornmentIcon?: Instance => ?(className: string) => React.Node,
-      onClickEndAdornment?: Instance => void,
-      renderLeftIcon?: (className?: string) => React.Node,
-      ...ValueFieldCommonProperties,
-    |}
-  | {|
-      valueType: 'string',
-      getValue: Instance => string,
-      setValue: (instance: Instance, newValue: string) => void,
-      getChoices?: ?() => Array<{|
-        value: string,
-        label: string,
-        labelIsUserDefined?: boolean,
-      |}>,
-      isHiddenWhenOnlyOneChoice?: boolean,
-      isAutocompleted?: boolean,
-      isAllowingAnyValue?: boolean,
-      getEndAdornmentIcon?: Instance => ?(className: string) => React.Node,
-      onClickEndAdornment?: Instance => void,
-      renderLeftIcon?: (className?: string) => React.Node,
-      ...ValueFieldCommonProperties,
-    |}
-  | {|
-      valueType: 'boolean',
-      getValue: Instance => boolean,
-      setValue: (instance: Instance, newValue: boolean) => void,
-      ...ValueFieldCommonProperties,
-    |}
-  | {|
-      /** Only supported on compact property editors. */
-      valueType: 'enumIcon',
-      renderIcon: (value: any) => React.Node,
-      getValue: Instance => any,
-      isHighlighted: (value: any) => boolean,
-      setValue: (instance: Instance, newValue: any) => void,
-      getNextValue: (currentValue: any) => any,
-      ...ValueFieldCommonProperties,
-    |}
-  | {|
-      valueType: 'color',
-      getValue: Instance => string,
-      setValue: (instance: Instance, newValue: string) => void,
-      ...ValueFieldCommonProperties,
-    |}
-  | {|
-      valueType: 'multilinestring',
-      getValue: Instance => string,
-      setValue: (instance: Instance, newValue: string) => void,
-      ...ValueFieldCommonProperties,
-    |};
-
-// "Resource" fields are showing a resource selector.
-export type ResourceField = {|
-  valueType: 'resource',
-  resourceKind: ResourceKind,
-  getValue: Instance => string,
-  setValue: (instance: Instance, newValue: string) => void,
-  renderLeftIcon?: (className?: string) => React.Node,
-  ...ValueFieldCommonProperties,
-|};
-
-export type LeaderboardIdField = {|
-  valueType: 'leaderboardId',
-  getValue: Instance => string,
-  setValue: (instance: Instance, newValue: string) => void,
-  ...ValueFieldCommonProperties,
-|};
-
-export type Title = {|
-  name: string,
-  title: string,
-  renderLeftIcon: (className?: string) => React.Node,
-  getValue?: Instance => string,
-  nonFieldType: 'title',
-  defaultValue?: string,
-|};
-
-export type SectionTitle = {|
-  name: string,
-  title: string,
-  nonFieldType: 'sectionTitle',
-  getValue: typeof undefined,
-|};
-
-type VerticalCenterWithBar = {|
-  name: string,
-  nonFieldType: 'verticalCenterWithBar',
-  child: PrimitiveValueField,
-|};
-
-export type ActionButton = {|
-  label: string,
-  disabled: 'onValuesDifferent',
-  getValue: Instance => string,
-  nonFieldType: 'button',
-  getIcon?: ({| fontSize: string |}) => React.Node,
-  showRightIcon?: boolean,
-  onClick: (instance: Instance) => void,
-|};
-
-type ToggleButtons = {|
-  nonFieldType: 'toggleButtons',
-  buttons: Array<{|
-    name: string,
-    renderIcon: (className?: string) => React.Node,
-    tooltip: React.Node,
-    getValue: Instance => boolean,
-    setValue: (instance: Instance, newValue: boolean) => void,
-  |}>,
-  ...ValueFieldCommonProperties,
-|};
-
-// A value field is a primitive or a resource.
-export type ValueField =
-  | PrimitiveValueField
-  | ResourceField
-  | LeaderboardIdField;
-
-// A field can be a primitive, a resource or a list of fields
-export type Field =
-  | PrimitiveValueField
-  | ResourceField
-  | LeaderboardIdField
-  | SectionTitle
-  | Title
-  | ActionButton
-  | ToggleButtons
-  | VerticalCenterWithBar
-  | {|
-      name: string,
-      type: 'row' | 'column',
-      preventWrap?: boolean,
-      removeSpacers?: boolean,
-      title?: ?string,
-      children: Array<Field>,
-    |};
-
-// The schema is the tree of all fields.
-export type Schema = Array<Field>;
+import {
+  type Schema,
+  type ValueField,
+  type ActionButton,
+  type Title,
+  type ResourceField,
+  type LeaderboardIdField,
+  type Instance,
+  type Instances,
+  type PrimitiveValueField,
+  type ToggleButtons,
+  type Field,
+} from '../PropertiesEditor/PropertiesEditorSchema';
+import { getFieldValue, hasMixedValues } from '../PropertiesEditor';
 
 type Props = {|
   onInstancesModified?: Instances => void,
@@ -217,6 +51,7 @@ type Props = {|
   mode?: 'column' | 'row',
   preventWrap?: boolean,
   removeSpacers?: boolean,
+  isHidden?: (Array<Instance>) => boolean,
 
   // If set, render the "extra" description content from fields
   // (see getExtraDescription).
@@ -289,44 +124,6 @@ const getDisabled = ({
   field: ValueField,
 |}): boolean => (field.disabled ? field.disabled(instances) : false);
 
-/**
- * Get the value for the given field across all instances.
- * If one of the instances doesn't share the same value, returns the default value.
- * If there is no instances, returns the default value.
- * If the field does not have a `getValue` method, returns `null`.
- */
-const getFieldValue = ({
-  instances,
-  field,
-  defaultValue,
-}: {|
-  instances: Instances,
-  field: ValueField | ActionButton | SectionTitle | Title,
-  defaultValue?: any,
-|}): any => {
-  if (!instances[0]) {
-    console.warn(
-      'getFieldValue was called with an empty list of instances (or containing undefined). This is a bug that should be fixed.'
-    );
-    return defaultValue;
-  }
-
-  const { getValue } = field;
-  if (!getValue) return null;
-
-  let value = getValue(instances[0]);
-  if (typeof defaultValue !== 'undefined') {
-    for (var i = 1; i < instances.length; ++i) {
-      if (value !== getValue(instances[i])) {
-        value = defaultValue;
-        break;
-      }
-    }
-  }
-
-  return value;
-};
-
 const getFieldEndAdornmentIcon = ({
   instances,
   field,
@@ -380,6 +177,7 @@ const CompactPropertiesEditor = ({
   resourceManagementProps,
   preventWrap,
   removeSpacers,
+  isHidden,
 }: Props) => {
   const forceUpdate = useForceUpdate();
 
@@ -590,7 +388,7 @@ const CompactPropertiesEditor = ({
           value: getFieldValue({
             instances,
             field,
-            defaultValue: '(Multiple values)',
+            mixedValueFallback: '(Multiple values)',
           }),
           onChange: newValue => {
             instances.forEach(i => setValue(i, newValue || ''));
@@ -681,7 +479,7 @@ const CompactPropertiesEditor = ({
             value={getFieldValue({
               instances,
               field,
-              defaultValue: '(Multiple values)',
+              mixedValueFallback: '(Multiple values)',
             })}
             id={field.name}
             onChange={(newValue: string) => {
@@ -719,13 +517,10 @@ const CompactPropertiesEditor = ({
     (field: ActionButton) => {
       let disabled = false;
       if (field.disabled === 'onValuesDifferent') {
-        const DIFFERENT_VALUES = 'DIFFERENT_VALUES';
-        disabled =
-          getFieldValue({
-            instances,
-            field,
-            defaultValue: DIFFERENT_VALUES,
-          }) === DIFFERENT_VALUES;
+        disabled = hasMixedValues({
+          instances,
+          field,
+        });
       }
       return (
         <FlatButton
@@ -784,7 +579,7 @@ const CompactPropertiesEditor = ({
 
       return (
         <React.Fragment key={`toggle-buttons-${field.name}`}>
-          <CompactToggleButtons id={field.name} buttons={buttons} />
+          <CompactToggleButtons id={field.name} buttons={buttons} expand />
         </React.Fragment>
       );
     },
@@ -813,7 +608,7 @@ const CompactPropertiesEditor = ({
             resourceName={getFieldValue({
               instances,
               field,
-              defaultValue: '(Multiple values)',
+              mixedValueFallback: '(Multiple values)',
             })}
             onChange={newValue => {
               instances.forEach(i => setValue(i, newValue));
@@ -846,7 +641,7 @@ const CompactPropertiesEditor = ({
             value={getFieldValue({
               instances,
               field,
-              defaultValue: '(Multiple values)',
+              mixedValueFallback: '(Multiple values)',
             })}
             onChange={newValue => {
               instances.forEach(i => setValue(i, newValue));
@@ -871,7 +666,9 @@ const CompactPropertiesEditor = ({
     );
 
   const renderContainer =
-    mode === 'row'
+    isHidden && isHidden(instances)
+      ? (fields: React.Node) => null
+      : mode === 'row'
       ? (fields: React.Node) =>
           preventWrap ? (
             removeSpacers ? (
@@ -909,7 +706,7 @@ const CompactPropertiesEditor = ({
         let selectedInstancesValue = getFieldValue({
           instances,
           field,
-          defaultValue: field.defaultValue || 'Multiple Values',
+          mixedValueFallback: field.defaultValue || 'Multiple Values',
         });
         if (!!selectedInstancesValue) additionalText = selectedInstancesValue;
       }
@@ -1018,6 +815,7 @@ const CompactPropertiesEditor = ({
               onRefreshAllFields={onRefreshAllFields}
               preventWrap={field.preventWrap}
               removeSpacers={field.removeSpacers}
+              isHidden={field.isHidden}
             />
           ) : (
             <div key={field.name} style={styles.container}>
@@ -1032,6 +830,7 @@ const CompactPropertiesEditor = ({
                 onRefreshAllFields={onRefreshAllFields}
                 preventWrap={field.preventWrap}
                 removeSpacers={field.removeSpacers}
+                isHidden={field.isHidden}
               />
             </div>
           );

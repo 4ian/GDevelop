@@ -9,7 +9,7 @@ import * as PIXI from 'pixi.js-legacy';
 import * as THREE from 'three';
 import { shouldBeHandledByPinch } from '../PinchHandler';
 import { makeDoubleClickable } from './PixiDoubleClickEvent';
-import Rectangle from '../../Utils/Rectangle'; // TODO (3D): add support for zMin/zMax/depth.
+import Rectangle from '../../Utils/Rectangle';
 import {
   flipPolygon,
   rotatePolygon,
@@ -412,18 +412,26 @@ export default class LayerRenderer {
         this.objectsContainer,
         associatedObjectName
       );
-      if (!associatedObject) return null;
-
       //...so let's create a renderer.
-      renderedInstance = this.renderedInstances[
-        instance.ptr
-      ] = ObjectsRenderingService.createNewInstanceRenderer(
-        this.project,
-        instance,
-        associatedObject.getConfiguration(),
-        this.pixiContainer,
-        this._threeGroup
-      );
+      if (associatedObject) {
+        renderedInstance = this.renderedInstances[
+          instance.ptr
+        ] = ObjectsRenderingService.createNewInstanceRenderer(
+          this.project,
+          instance,
+          associatedObject.getConfiguration(),
+          this.pixiContainer,
+          this._threeGroup
+        );
+      } else {
+        renderedInstance = this.renderedInstances[
+          instance.ptr
+        ] = ObjectsRenderingService.createNewUnknownInstanceRenderer(
+          this.project,
+          instance,
+          this.pixiContainer
+        );
+      }
 
       renderedInstance._pixiObject.eventMode = 'static';
       panable(renderedInstance._pixiObject);

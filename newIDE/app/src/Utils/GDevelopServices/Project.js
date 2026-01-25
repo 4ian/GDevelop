@@ -11,6 +11,10 @@ import { isNativeMobileApp } from '../Platform';
 import { unzipFirstEntryOfBlob } from '../Zip.js/Utils';
 import { extractGDevelopApiErrorStatusAndCode } from './Errors';
 import { extractNextPageUriFromLinkHeader } from './Play';
+import {
+  ensureIsArray,
+  ensureIsNullOrObjectHasProperty,
+} from '../DataValidator';
 
 export const CLOUD_PROJECT_NAME_MAX_LENGTH = 60;
 export const CLOUD_PROJECT_VERSION_LABEL_MAX_LENGTH = 50;
@@ -212,13 +216,10 @@ export const getLastVersionsOfProject = async (
     },
     params: { userId },
   });
-  const projectVersions = response.data;
-
-  if (!Array.isArray(projectVersions)) {
-    throw new Error('Invalid response from the project versions API');
-  }
-
-  return projectVersions;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/project/{id}/version of Project API',
+  });
 };
 
 export const getCredentialsForCloudProject = async (
@@ -280,7 +281,11 @@ export const createCloudProject = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  return response.data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/project of Project API',
+  });
 };
 
 /**
@@ -293,12 +298,14 @@ export const createCloudProject = async (
 export const commitVersion = async ({
   authenticatedUser,
   cloudProjectId,
+  presignedUrl,
   zippedProject,
   previousVersion,
   restoredFromVersionId,
 }: {
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string,
+  presignedUrl: string,
   zippedProject: Blob,
   previousVersion?: ?string,
   restoredFromVersionId?: ?string,
@@ -308,12 +315,7 @@ export const commitVersion = async ({
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  // Get a presigned url to upload a new version (the URL will contain the new version id).
-  const presignedUrl = await getPresignedUrlForVersionUpload(
-    authenticatedUser,
-    cloudProjectId
-  );
-  if (!presignedUrl) return;
+
   const newVersion = getVersionIdFromPath(presignedUrl);
   // Upload zipped project.
   await refetchCredentialsForProjectAndRetryIfUnauthorized(
@@ -421,13 +423,10 @@ export const listUserCloudProjects = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  const cloudProjects = response.data;
-
-  if (!Array.isArray(cloudProjects)) {
-    throw new Error('Invalid response from the projects API');
-  }
-
-  return cloudProjects;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/project of Project API',
+  });
 };
 
 export const listOtherUserCloudProjects = async (
@@ -440,13 +439,10 @@ export const listOtherUserCloudProjects = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  const cloudProjects = response.data;
-
-  if (!Array.isArray(cloudProjects)) {
-    throw new Error('Invalid response from the projects API');
-  }
-
-  return cloudProjects;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/user/{id}/project of Project API',
+  });
 };
 
 export const getCloudProject = async (
@@ -464,7 +460,11 @@ export const getCloudProject = async (
     },
     params: { userId },
   });
-  return response.data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/project/{id} of Project API',
+  });
 };
 
 export const getOtherUserCloudProject = async (
@@ -486,7 +486,11 @@ export const getOtherUserCloudProject = async (
       params: { userId },
     }
   );
-  return response.data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/user/{id}/project/{id} of Project API',
+  });
 };
 
 export const updateCloudProject = async (
@@ -516,7 +520,11 @@ export const updateCloudProject = async (
       params: { userId },
     }
   );
-  return response.data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/project/{id} of Project API',
+  });
 };
 
 export const deleteCloudProject = async (
@@ -534,10 +542,14 @@ export const deleteCloudProject = async (
     },
     params: { userId },
   });
-  return response.data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/project/{id} of Project API',
+  });
 };
 
-const getPresignedUrlForVersionUpload = async (
+export const getPresignedUrlForVersionUpload = async (
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string
 ): Promise<?string> => {
@@ -682,7 +694,11 @@ export const createProjectUserAcl = async (
       params: { userId: currentUserId },
     }
   );
-  return response.data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'projectId',
+    endpointName: '/project-user-acl of Project API',
+  });
 };
 
 export const deleteProjectUserAcl = async (
@@ -700,6 +716,7 @@ export const deleteProjectUserAcl = async (
     },
     params: { userId: currentUserId, projectId, feature, targetUserId: userId },
   });
+  // Note: deleteProjectUserAcl returns void, so no validation needed
   return response.data;
 };
 
@@ -718,13 +735,10 @@ export const listProjectUserAcls = async (
     },
     params: { userId: currentUserId, projectId },
   });
-  const projectUserAcls = response.data;
-
-  if (!Array.isArray(projectUserAcls)) {
-    throw new Error('Invalid response from the project user acls API');
-  }
-
-  return projectUserAcls;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/project-user-acl of Project API',
+  });
 };
 
 export const updateCloudProjectVersion = async (
@@ -756,7 +770,11 @@ export const updateCloudProjectVersion = async (
       params: { userId },
     }
   );
-  return response.data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/project/{id}/version/{id} of Project API',
+  });
 };
 
 /**
@@ -790,13 +808,11 @@ export const listVersionsOfProject = async (
   const nextPageUri = response.headers.link
     ? extractNextPageUriFromLinkHeader(response.headers.link)
     : null;
-  const projectVersions = response.data;
-
-  if (!Array.isArray(projectVersions)) {
-    throw new Error('Invalid response from the project versions API');
-  }
   return {
-    versions: projectVersions,
+    versions: ensureIsArray({
+      data: response.data,
+      endpointName: '/project/{id}/version of Project API',
+    }),
     nextPageUri,
   };
 };

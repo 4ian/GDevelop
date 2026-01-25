@@ -138,9 +138,7 @@ module.exports = {
       .addObject(
         'BBText',
         _('BBText'),
-        _(
-          'Displays a rich text label using BBCode markup (allowing to set parts of the text as bold, italic, use different colors and shadows).'
-        ),
+        _('Formatted text allowing to mix styles using BBCode markup.'),
         'JsPlatform/Extensions/bbcode32.png',
         objectBBText
       )
@@ -149,7 +147,7 @@ module.exports = {
       .addIncludeFile(
         'Extensions/BBText/pixi-multistyle-text/dist/pixi-multistyle-text.umd.js'
       )
-      .setCategoryFullName(_('Text'))
+      .setCategory('Text')
       .addDefaultBehavior('EffectCapability::EffectBehavior')
       .addDefaultBehavior('OpacityCapability::OpacityBehavior');
 

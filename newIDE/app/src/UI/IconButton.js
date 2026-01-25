@@ -38,6 +38,10 @@ type Props = {|
 
   className?: string,
   style?: {|
+    backgroundColor?: string,
+    position?: string,
+    top?: number,
+    right?: number,
     padding?: number | string,
     width?: number,
     height?: number,

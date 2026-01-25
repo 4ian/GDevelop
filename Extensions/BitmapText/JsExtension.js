@@ -140,9 +140,7 @@ module.exports = {
       .addObject(
         'BitmapTextObject',
         _('Bitmap Text'),
-        _(
-          'Displays a text using a "Bitmap Font" (an image representing characters). This is more performant than a traditional Text object and it allows for complete control on the characters aesthetic.'
-        ),
+        _('Image-based text.'),
         'JsPlatform/Extensions/bitmapfont32.png',
         bitmapTextObject
       )
@@ -150,7 +148,8 @@ module.exports = {
       .addIncludeFile(
         'Extensions/BitmapText/bitmaptextruntimeobject-pixi-renderer.js'
       )
-      .setCategoryFullName(_('Text'))
+      .setCategory('Text')
+      .setAssetStoreTag('bitmap texts')
       .addDefaultBehavior('TextContainerCapability::TextContainerBehavior')
       .addDefaultBehavior('EffectCapability::EffectBehavior')
       .addDefaultBehavior('OpacityCapability::OpacityBehavior')

@@ -1,5 +1,8 @@
 /// <reference path="helper/TileMapHelper.d.ts" />
 namespace gdjs {
+  /**
+   * @category Objects > Tile Map
+   */
   export type SimpleTileMapObjectDataType = {
     content: {
       atlasImage: string;
@@ -10,19 +13,29 @@ namespace gdjs {
     };
   };
 
+  /**
+   * @category Objects > Tile Map
+   */
   export type SimpleTileMapObjectData = ObjectData &
     SimpleTileMapObjectDataType;
 
+  /**
+   * @category Objects > Tile Map
+   */
   export type SimpleTileMapNetworkSyncDataType = {
     op: number;
     tm?: TileMapHelper.EditableTileMapAsJsObject;
   };
 
+  /**
+   * @category Objects > Tile Map
+   */
   export type SimpleTileMapNetworkSyncData = ObjectNetworkSyncData &
     SimpleTileMapNetworkSyncDataType;
 
   /**
    * Displays a SimpleTileMap object.
+   * @category Objects > Tile Map
    */
   export class SimpleTileMapRuntimeObject
     extends gdjs.RuntimeObject
@@ -58,7 +71,7 @@ namespace gdjs {
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      objectData: SimpleTileMapObjectDataType
+      objectData: ObjectData & SimpleTileMapObjectDataType
     ) {
       super(instanceContainer, objectData);
       this._atlasImage = objectData.content.atlasImage;
@@ -107,42 +120,46 @@ namespace gdjs {
       return this._renderer.getRendererObject();
     }
 
+    updateTileMap(): void {
+      let shouldContinue = true;
+      this._tileMapManager.getOrLoadSimpleTileMapTextureCache(
+        (textureName) => {
+          return this.getInstanceContainer()
+            .getGame()
+            .getImageManager()
+            .getPIXITexture(
+              textureName
+            ) as unknown as PIXI.BaseTexture<PIXI.Resource>;
+        },
+        this._atlasImage,
+        this._tileSize,
+        this._columnCount,
+        this._rowCount,
+        (textureCache: TileMapHelper.TileTextureCache | null) => {
+          if (!textureCache) {
+            // getOrLoadTextureCache already log warns and errors.
+            return;
+          }
+          this._renderer.refreshPixiTileMap(textureCache);
+        },
+        (error) => {
+          shouldContinue = false;
+          console.error(
+            `Could not load texture cache for atlas ${this._atlasImage} during prerender. The tilemap might be badly configured or an issues happened with the loaded atlas image:`,
+            error
+          );
+        }
+      );
+      if (!shouldContinue) return;
+      if (this._collisionTileMap) {
+        if (this._tileMap)
+          this._collisionTileMap.updateFromTileMap(this._tileMap);
+      }
+    }
+
     updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       if (this._isTileMapDirty) {
-        let shouldContinue = true;
-        this._tileMapManager.getOrLoadSimpleTileMapTextureCache(
-          (textureName) => {
-            return this.getInstanceContainer()
-              .getGame()
-              .getImageManager()
-              .getPIXITexture(
-                textureName
-              ) as unknown as PIXI.BaseTexture<PIXI.Resource>;
-          },
-          this._atlasImage,
-          this._tileSize,
-          this._columnCount,
-          this._rowCount,
-          (textureCache: TileMapHelper.TileTextureCache | null) => {
-            if (!textureCache) {
-              // getOrLoadTextureCache already log warns and errors.
-              return;
-            }
-            this._renderer.refreshPixiTileMap(textureCache);
-          },
-          (error) => {
-            shouldContinue = false;
-            console.error(
-              `Could not load texture cache for atlas ${this._atlasImage} during prerender. The tilemap might be badly configured or an issues happened with the loaded atlas image:`,
-              error
-            );
-          }
-        );
-        if (!shouldContinue) return;
-        if (this._collisionTileMap) {
-          if (this._tileMap)
-            this._collisionTileMap.updateFromTileMap(this._tileMap);
-        }
+        this.updateTileMap();
         this._isTileMapDirty = false;
       }
     }
@@ -236,9 +253,11 @@ namespace gdjs {
             this.setWidth(initialInstanceData.width);
             this.setHeight(initialInstanceData.height);
           }
-          if (initialInstanceData.opacity !== undefined) {
-            this.setOpacity(initialInstanceData.opacity);
-          }
+          this.setOpacity(
+            initialInstanceData.opacity === undefined
+              ? 255
+              : initialInstanceData.opacity
+          );
 
           // 4. Update position (calculations based on renderer's dimensions).
           this._renderer.updatePosition();
@@ -447,6 +466,14 @@ namespace gdjs {
 
     getHeight(): float {
       return this._renderer.getHeight();
+    }
+
+    override getOriginalWidth(): float {
+      return this.getTileMapWidth();
+    }
+
+    override getOriginalHeight(): float {
+      return this.getTileMapHeight();
     }
 
     getScaleX(): float {

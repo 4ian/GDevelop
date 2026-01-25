@@ -9,7 +9,7 @@ import PreferencesContext from './Preferences/PreferencesContext';
 import GDI18nProvider from '../Utils/i18n/GDI18nProvider';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
-import EventsFunctionsExtensionsProvider from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsProvider';
+import { EventsFunctionsExtensionsProvider } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsProvider';
 import {
   type EventsFunctionCodeWriter,
   type EventsFunctionCodeWriterCallbacks,
@@ -27,12 +27,13 @@ import { PrivateGameTemplateStoreStateProvider } from '../AssetStore/PrivateGame
 import { BundleStoreStateProvider } from '../AssetStore/Bundles/BundleStoreContext';
 import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { BehaviorStoreStateProvider } from '../AssetStore/BehaviorStore/BehaviorStoreContext';
+import { ObjectStoreStateProvider } from '../AssetStore/ObjectStoreContext';
 import { TutorialStateProvider } from '../Tutorial/TutorialContext';
 import AlertProvider from '../UI/Alert/AlertProvider';
 import { AnnouncementsFeedStateProvider } from '../AnnouncementsFeed/AnnouncementsFeedContext';
 import PrivateAssetsAuthorizationProvider from '../AssetStore/PrivateAssets/PrivateAssetsAuthorizationProvider';
 import InAppTutorialProvider from '../InAppTutorial/InAppTutorialProvider';
-import { SubscriptionSuggestionProvider } from '../Profile/Subscription/SubscriptionSuggestionContext';
+import { SubscriptionProvider } from '../Profile/Subscription/SubscriptionContext';
 import { RouterContextProvider } from './RouterContext';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import { FullThemeProvider } from '../UI/Theme/FullThemeProvider';
@@ -102,7 +103,7 @@ const Providers = ({
                                       eventsFunctionsExtensionOpener
                                     }
                                   >
-                                    <SubscriptionSuggestionProvider>
+                                    <SubscriptionProvider>
                                       <CommandsContextProvider>
                                         <AssetStoreNavigatorStateProvider>
                                           <AssetStoreStateProvider>
@@ -120,21 +121,25 @@ const Providers = ({
                                                               <BehaviorStoreStateProvider
                                                                 i18n={i18n}
                                                               >
-                                                                <TutorialStateProvider>
-                                                                  <AnnouncementsFeedStateProvider>
-                                                                    <PrivateAssetsAuthorizationProvider>
-                                                                      <Resource3DPreviewProvider>
-                                                                        <AiRequestProvider>
-                                                                          {children(
-                                                                            {
-                                                                              i18n,
-                                                                            }
-                                                                          )}
-                                                                        </AiRequestProvider>
-                                                                      </Resource3DPreviewProvider>
-                                                                    </PrivateAssetsAuthorizationProvider>
-                                                                  </AnnouncementsFeedStateProvider>
-                                                                </TutorialStateProvider>
+                                                                <ObjectStoreStateProvider
+                                                                  i18n={i18n}
+                                                                >
+                                                                  <TutorialStateProvider>
+                                                                    <AnnouncementsFeedStateProvider>
+                                                                      <PrivateAssetsAuthorizationProvider>
+                                                                        <Resource3DPreviewProvider>
+                                                                          <AiRequestProvider>
+                                                                            {children(
+                                                                              {
+                                                                                i18n,
+                                                                              }
+                                                                            )}
+                                                                          </AiRequestProvider>
+                                                                        </Resource3DPreviewProvider>
+                                                                      </PrivateAssetsAuthorizationProvider>
+                                                                    </AnnouncementsFeedStateProvider>
+                                                                  </TutorialStateProvider>
+                                                                </ObjectStoreStateProvider>
                                                               </BehaviorStoreStateProvider>
                                                             </ExtensionStoreStateProvider>
                                                           </MarketingPlansStoreStateProvider>
@@ -148,7 +153,7 @@ const Providers = ({
                                           </AssetStoreStateProvider>
                                         </AssetStoreNavigatorStateProvider>
                                       </CommandsContextProvider>
-                                    </SubscriptionSuggestionProvider>
+                                    </SubscriptionProvider>
                                   </EventsFunctionsExtensionsProvider>
                                 )}
                               </I18n>

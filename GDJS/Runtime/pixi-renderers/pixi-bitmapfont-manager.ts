@@ -39,6 +39,7 @@ namespace gdjs {
    * PixiBitmapFontManager loads fnt/xml files (using `fetch`), from the "bitmapFont" resources of the game.
    *
    * It installs the "BitmapFont" with PixiJS to be used with PIXI.BitmapText.
+   * @category Resources > Bitmap Fonts
    */
   export class PixiBitmapFontManager implements gdjs.ResourceManager {
     private _imageManager: gdjs.PixiImageManager;
@@ -278,6 +279,12 @@ namespace gdjs {
                 'same-origin',
           }
         );
+        if (!response.ok) {
+          throw new Error(
+            `HTTP error while loading bitmap font. Status is ${response.status}.`
+          );
+        }
+
         const fontDataRaw = await response.text();
 
         // Sanitize: remove lines starting with # (acting as comments)
@@ -294,6 +301,8 @@ namespace gdjs {
             ', error: ' +
             error
         );
+        this._loadedFontsData.delete(resource);
+        throw error;
       }
     }
 
@@ -316,24 +325,34 @@ namespace gdjs {
     }
 
     unloadResource(resourceData: ResourceData): void {
-      const loadedFont = this._loadedFontsData.get(resourceData);
-      if (loadedFont) {
-        this._loadedFontsData.delete(resourceData);
-      }
+      this._loadedFontsData.delete(resourceData);
 
       for (const bitmapFontInstallKey in this._pixiBitmapFontsInUse) {
-        if (bitmapFontInstallKey.endsWith(resourceData.file))
+        if (bitmapFontInstallKey.startsWith(resourceData.name + '@')) {
           PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
+          delete this._pixiBitmapFontsInUse[bitmapFontInstallKey];
+        }
       }
 
-      for (const bitmapFontInstallKey of this._pixiBitmapFontsToUninstall) {
-        if (bitmapFontInstallKey.endsWith(resourceData.file))
+      for (
+        let index = 0;
+        index < this._pixiBitmapFontsToUninstall.length;
+        index++
+      ) {
+        const bitmapFontInstallKey = this._pixiBitmapFontsToUninstall[index];
+
+        if (bitmapFontInstallKey.startsWith(resourceData.name + '@')) {
           PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
+          this._pixiBitmapFontsToUninstall.splice(index, 1);
+          index--;
+        }
       }
     }
   }
 
   // Register the class to let the engine use it.
+  /** @category Resources > Bitmap Fonts */
   export const BitmapFontManager = gdjs.PixiBitmapFontManager;
+  /** @category Resources > Bitmap Fonts */
   export type BitmapFontManager = gdjs.PixiBitmapFontManager;
 }

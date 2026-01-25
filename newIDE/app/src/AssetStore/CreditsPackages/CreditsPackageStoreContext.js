@@ -124,8 +124,6 @@ export const CreditsPackageStoreStateProvider = ({
 
   const openCreditsPackageDialog = React.useCallback(
     (options: ?CreditsPackageDialogOpeningOptions) => {
-      if (!creditsPackageListingDatas) return;
-
       setMissingCredits(
         options && options.missingCredits ? options.missingCredits : 0
       );
@@ -134,7 +132,7 @@ export const CreditsPackageStoreStateProvider = ({
       );
       setIsCreditsPackageDialogOpen(true);
     },
-    [creditsPackageListingDatas]
+    []
   );
 
   const suggestedPackage: ?CreditsPackageListingData = React.useMemo(

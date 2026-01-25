@@ -46,9 +46,6 @@ class GD_CORE_API BehaviorConfigurationContainer {
         quickCustomizationVisibility(QuickCustomization::Visibility::Default),
         propertiesQuickCustomizationVisibilities() {};
   virtual ~BehaviorConfigurationContainer();
-  virtual BehaviorConfigurationContainer* Clone() const {
-    return new BehaviorConfigurationContainer(*this);
-  }
 
   /**
    * \brief Return the name identifying the behavior

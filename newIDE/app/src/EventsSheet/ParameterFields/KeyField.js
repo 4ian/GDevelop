@@ -10,7 +10,7 @@ import {
 import SemiControlledAutoComplete, {
   type SemiControlledAutoCompleteInterface,
 } from '../../UI/SemiControlledAutoComplete';
-import { keyNames } from './KeyboardKeyField';
+import { keyNames } from '../../Utils/KeyboardKeyNames';
 
 const isKeyValid = (key: string) => keyNames.indexOf(key) !== -1;
 

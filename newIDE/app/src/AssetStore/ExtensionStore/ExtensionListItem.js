@@ -5,12 +5,16 @@ import ButtonBase from '@material-ui/core/ButtonBase';
 import Text from '../../UI/Text';
 import { Trans } from '@lingui/macro';
 import { Column, Line } from '../../UI/Grid';
-import { IconContainer } from '../../UI/IconContainer';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
 import HighlightedText from '../../UI/Search/HighlightedText';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 import Chip from '../../UI/Chip';
 import { LineStackLayout } from '../../UI/Layout';
+import ListIcon from '../../UI/ListIcon';
+import Tooltip from '@material-ui/core/Tooltip';
+import CircledInfo from '../../UI/CustomSvgIcons/SmallCircledInfo';
+import IconButton from '../../UI/IconButton';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 
 const styles = {
   button: { width: '100%' },
@@ -18,7 +22,6 @@ const styles = {
     display: 'flex',
     textAlign: 'left',
     overflow: 'hidden',
-    padding: 8,
     width: '100%',
   },
 };
@@ -40,6 +43,8 @@ export const ExtensionListItem = ({
   onChoose,
   onHeightComputed,
 }: Props) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+
   const alreadyInstalled = project.hasEventsFunctionsExtensionNamed(
     extensionShortHeader.name
   );
@@ -73,17 +78,29 @@ export const ExtensionListItem = ({
     );
   };
 
+  const [hover, setHover] = React.useState(false);
+
   return (
     <ButtonBase id={id} onClick={onChoose} focusRipple style={styles.button}>
-      <div style={styles.container} ref={containerRef}>
+      <div
+        style={
+          hover
+            ? { ...styles.container, ...gdevelopTheme.list.hover }
+            : styles.container
+        }
+        onPointerEnter={() => setHover(true)}
+        onPointerLeave={() => setHover(false)}
+        ref={containerRef}
+      >
         <LineStackLayout>
-          <IconContainer
-            alt={extensionShortHeader.fullName}
+          <ListIcon
             src={extensionShortHeader.previewIconUrl}
-            size={64}
+            iconSize={32}
+            padding={4}
+            useExactIconSize
           />
           <Column expand>
-            <LineStackLayout noMargin alignItems="baseline">
+            <LineStackLayout noMargin alignItems="center">
               <Text
                 noMargin
                 allowBrowserAutoTranslate={false}
@@ -112,21 +129,38 @@ export const ExtensionListItem = ({
                   color="primary"
                 />
               )}
+              {extensionShortHeader.authors && (
+                <Tooltip
+                  title={
+                    extensionShortHeader.authors.length > 0 ? (
+                      <Line>
+                        <div style={{ flexWrap: 'wrap' }}>
+                          {extensionShortHeader.authors.map(author => (
+                            <UserPublicProfileChip
+                              user={author}
+                              key={author.id}
+                              variant="outlined"
+                            />
+                          ))}
+                        </div>
+                      </Line>
+                    ) : (
+                      ''
+                    )
+                  }
+                >
+                  <IconButton size="small">
+                    <CircledInfo />
+                  </IconButton>
+                </Tooltip>
+              )}
             </LineStackLayout>
-            {extensionShortHeader.authors && (
-              <Line>
-                <div style={{ flexWrap: 'wrap' }}>
-                  {extensionShortHeader.authors.map(author => (
-                    <UserPublicProfileChip user={author} key={author.id} />
-                  ))}
-                </div>
-              </Line>
-            )}
             <Text
               noMargin
               size="body2"
               allowBrowserAutoTranslate={false}
               displayInlineAsSpan // Important to avoid the text to use a "p" which causes crashes with automatic translation tools with the highlighted text.
+              color={'secondary'}
             >
               {renderExtensionField('shortDescription')}
             </Text>

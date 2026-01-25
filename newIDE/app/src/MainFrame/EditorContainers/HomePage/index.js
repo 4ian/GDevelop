@@ -36,17 +36,26 @@ import { type GameDetailsTab } from '../../../GameDashboard';
 import { canUseClassroomFeature } from '../../../Utils/GDevelopServices/Usage';
 import EducationMarketingSection from './EducationMarketingSection';
 import useEducationForm from './UseEducationForm';
-import { type ExampleProjectSetup } from '../../../ProjectCreation/NewProjectSetupDialog';
+import {
+  type ExampleProjectSetup,
+  type NewProjectSetup,
+} from '../../../ProjectCreation/NewProjectSetupDialog';
 import { type ObjectWithContext } from '../../../ObjectsList/EnumerateObjects';
 import { type GamesList } from '../../../GameDashboard/UseGamesList';
 import { type GamesPlatformFrameTools } from './PlaySection/UseGamesPlatformFrame';
 import { type CourseChapter } from '../../../Utils/GDevelopServices/Asset';
 import useCourses from './UseCourses';
 import PreferencesContext from '../../Preferences/PreferencesContext';
-import useSubscriptionPlans from '../../../Utils/UseSubscriptionPlans';
 import { BundleStoreContext } from '../../../AssetStore/Bundles/BundleStoreContext';
+import {
+  setEditorHotReloadNeeded,
+  type HotReloadSteps,
+} from '../../../EmbeddedGame/EmbeddedGameFrame';
 import { type CreateProjectResult } from '../../../Utils/UseCreateProject';
 import { CreditsPackageStoreContext } from '../../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
+import { type OpenAskAiOptions } from '../../../AiGeneration/Utils';
+
+const noop = () => {};
 
 const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
   if (
@@ -113,6 +122,7 @@ type Props = {|
   setToolbar: (?React.Node) => void,
   setGamesPlatformFrameShown: ({| shown: boolean, isMobile: boolean |}) => void,
   storageProviders: Array<StorageProvider>,
+  storageProvider: ?StorageProvider,
 
   // Games
   gamesList: GamesList,
@@ -139,11 +149,8 @@ type Props = {|
   selectInAppTutorial: (tutorialId: string) => void,
   onOpenPreferences: () => void,
   onOpenAbout: () => void,
-  onOpenAskAi: ({|
-    mode: 'chat' | 'agent',
-    aiRequestId: string | null,
-    paneIdentifier: 'left' | 'center' | 'right' | null,
-  |}) => void,
+  onOpenAskAi: (?OpenAskAiOptions) => void,
+  onCloseAskAi: () => void,
 
   // Project creation
   onOpenNewProjectSetupDialog: () => void,
@@ -155,8 +162,12 @@ type Props = {|
     CourseChapter,
     templateId?: string
   ) => Promise<void>,
+  onCreateEmptyProject: (
+    newProjectSetup: NewProjectSetup
+  ) => Promise<CreateProjectResult>,
 
   // Asset store
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 
   // Project save
@@ -164,6 +175,20 @@ type Props = {|
   canSave: boolean,
 
   resourceManagementProps: ResourceManagementProps,
+  onOpenLayout: (
+    sceneName: string,
+    options: {|
+      openEventsEditor: boolean,
+      openSceneEditor: boolean,
+      focusWhenOpened:
+        | 'scene-or-events-otherwise'
+        | 'scene'
+        | 'events'
+        | 'none',
+    |}
+  ) => void,
+
+  gameEditorMode: 'embedded-game' | 'instances-editor',
 |};
 
 export type HomePageEditorInterface = {|
@@ -179,6 +204,8 @@ export type HomePageEditorInterface = {|
   onSceneEventsModifiedOutsideEditor: (
     scene: SceneEventsOutsideEditorChanges
   ) => void,
+  notifyChangesToInGameEditor: (hotReloadSteps: HotReloadSteps) => void,
+  switchInGameEditorIfNoHotReloadIsNeeded: () => void,
   onInstancesModifiedOutsideEditor: (
     changes: InstancesOutsideEditorChanges
   ) => void,
@@ -207,14 +234,18 @@ export const HomePage = React.memo<Props>(
         onOpenLanguageDialog,
         onOpenProfile,
         onCreateProjectFromExample,
+        onCreateEmptyProject,
         setToolbar,
         setGamesPlatformFrameShown,
         selectInAppTutorial,
         onOpenPreferences,
         onOpenAbout,
         onOpenAskAi,
+        onCloseAskAi,
+        onOpenLayout,
         isActive,
         storageProviders,
+        storageProvider,
         onSave,
         canSave,
         resourceManagementProps,
@@ -224,7 +255,9 @@ export const HomePage = React.memo<Props>(
         onOpenTemplateFromCourseChapter,
         gamesList,
         gamesPlatformFrameTools,
+        onWillInstallExtension,
         onExtensionInstalled,
+        gameEditorMode,
       }: Props,
       ref
     ) => {
@@ -288,10 +321,6 @@ export const HomePage = React.memo<Props>(
       const [learnCategory, setLearnCategory] = React.useState<LearnCategory>(
         null
       );
-      const { getSubscriptionPlansWithPricingSystems } = useSubscriptionPlans({
-        authenticatedUser,
-        includeLegacy: false,
-      });
 
       const { isMobile } = useResponsiveWindowSize();
       const {
@@ -508,64 +537,19 @@ export const HomePage = React.memo<Props>(
         [updateToolbar, activeTab, setGamesPlatformFrameShown, isMobile]
       );
 
-      const forceUpdateEditor = React.useCallback(() => {
-        // No updates to be done
-      }, []);
-
-      const onEventsBasedObjectChildrenEdited = React.useCallback(() => {
-        // No thing to be done
-      }, []);
-
-      const onSceneObjectEdited = React.useCallback(
-        (scene: gdLayout, objectWithContext: ObjectWithContext) => {
-          // No thing to be done
-        },
-        []
-      );
-
-      const onSceneObjectsDeleted = React.useCallback((scene: gdLayout) => {
-        // No thing to be done.
-      }, []);
-
-      const onSceneEventsModifiedOutsideEditor = React.useCallback(
-        (changes: SceneEventsOutsideEditorChanges) => {
-          // No thing to be done.
-        },
-        []
-      );
-
-      const onInstancesModifiedOutsideEditor = React.useCallback(
-        (changes: InstancesOutsideEditorChanges) => {
-          // No thing to be done.
-        },
-        []
-      );
-
-      const onObjectsModifiedOutsideEditor = React.useCallback(
-        (changes: ObjectsOutsideEditorChanges) => {
-          // No thing to be done.
-        },
-        []
-      );
-
-      const onObjectGroupsModifiedOutsideEditor = React.useCallback(
-        (changes: ObjectGroupsOutsideEditorChanges) => {
-          // No thing to be done.
-        },
-        []
-      );
-
       React.useImperativeHandle(ref, () => ({
         getProject,
         updateToolbar,
-        forceUpdateEditor,
-        onEventsBasedObjectChildrenEdited,
-        onSceneObjectEdited,
-        onSceneObjectsDeleted,
-        onSceneEventsModifiedOutsideEditor,
-        onInstancesModifiedOutsideEditor,
-        onObjectsModifiedOutsideEditor,
-        onObjectGroupsModifiedOutsideEditor,
+        forceUpdateEditor: noop,
+        onEventsBasedObjectChildrenEdited: noop,
+        onSceneObjectEdited: noop,
+        onSceneObjectsDeleted: noop,
+        onSceneEventsModifiedOutsideEditor: noop,
+        notifyChangesToInGameEditor: setEditorHotReloadNeeded,
+        switchInGameEditorIfNoHotReloadIsNeeded: noop,
+        onInstancesModifiedOutsideEditor: noop,
+        onObjectsModifiedOutsideEditor: noop,
+        onObjectGroupsModifiedOutsideEditor: noop,
       }));
 
       // As the homepage is never unmounted, we need to ensure the games platform
@@ -613,6 +597,13 @@ export const HomePage = React.memo<Props>(
                       currentFileMetadata={fileMetadata}
                       onOpenProject={onOpenRecentFile}
                       storageProviders={storageProviders}
+                      storageProvider={storageProvider}
+                      resourceManagementProps={resourceManagementProps}
+                      onCreateEmptyProject={onCreateEmptyProject}
+                      onOpenLayout={onOpenLayout}
+                      onWillInstallExtension={onWillInstallExtension}
+                      onExtensionInstalled={onExtensionInstalled}
+                      onCloseAskAi={onCloseAskAi}
                       closeProject={closeProject}
                       games={games}
                       onRefreshGames={fetchGames}
@@ -667,9 +658,6 @@ export const HomePage = React.memo<Props>(
                         onSelectPrivateGameTemplateListingData
                       }
                       onSelectExampleShortHeader={onSelectExampleShortHeader}
-                      getSubscriptionPlansWithPricingSystems={
-                        getSubscriptionPlansWithPricingSystems
-                      }
                       clearInitialBundleValues={() => {
                         setInitialBundleUserFriendlySlugForLearn(null);
                         setInitialBundleCategoryForLearn(null);
@@ -693,6 +681,7 @@ export const HomePage = React.memo<Props>(
                         onOpenPrivateGameTemplateListingData
                       }
                       onOpenProfile={onOpenProfile}
+                      onWillInstallExtension={onWillInstallExtension}
                       onExtensionInstalled={onExtensionInstalled}
                       onCourseOpen={(courseId: string) => {
                         onSelectCourse(courseId);
@@ -700,9 +689,6 @@ export const HomePage = React.memo<Props>(
                       }}
                       courses={courses}
                       getCourseCompletion={getCourseCompletion}
-                      getSubscriptionPlansWithPricingSystems={
-                        getSubscriptionPlansWithPricingSystems
-                      }
                     />
                   )}
                   {activeTab === 'team-view' &&
@@ -775,20 +761,26 @@ export const renderHomePageContainer = (
     onOpenLanguageDialog={props.onOpenLanguageDialog}
     onOpenProfile={props.onOpenProfile}
     onCreateProjectFromExample={props.onCreateProjectFromExample}
+    onCreateEmptyProject={props.onCreateEmptyProject}
     askToCloseProject={props.askToCloseProject}
     closeProject={props.closeProject}
     selectInAppTutorial={props.selectInAppTutorial}
     onOpenPreferences={props.onOpenPreferences}
     onOpenAbout={props.onOpenAbout}
     onOpenAskAi={props.onOpenAskAi}
+    onCloseAskAi={props.onCloseAskAi}
+    onOpenLayout={props.onOpenLayout}
     storageProviders={
       (props.extraEditorProps && props.extraEditorProps.storageProviders) || []
     }
+    storageProvider={props.storageProvider}
     onSave={props.onSave}
     canSave={props.canSave}
     resourceManagementProps={props.resourceManagementProps}
     gamesList={props.gamesList}
     gamesPlatformFrameTools={props.gamesPlatformFrameTools}
+    onWillInstallExtension={props.onWillInstallExtension}
     onExtensionInstalled={props.onExtensionInstalled}
+    gameEditorMode={props.gameEditorMode}
   />
 );

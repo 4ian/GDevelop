@@ -23,7 +23,7 @@ import {
 import {
   getPlanIcon,
   getPlanInferredNameFromId,
-} from '../Profile/Subscription/PlanCard';
+} from '../Profile/Subscription/PlanSmallCard';
 import AlertMessage from '../UI/AlertMessage';
 import { formatDurationOfRedemptionCode } from './Utils';
 

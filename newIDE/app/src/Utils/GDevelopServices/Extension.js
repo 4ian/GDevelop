@@ -3,6 +3,7 @@ import axios from 'axios';
 import { GDevelopAssetApi } from './ApiConfigs';
 import { type UserPublicProfile } from './User';
 import { retryIfFailed } from '../RetryIfFailed';
+import { ensureIsArray } from '../DataValidator';
 
 // This file is mocked by tests.
 // Don't put any function that is not calling services.
@@ -11,7 +12,12 @@ const gd: libGDevelop = global.gd;
 
 type ExtensionTier = 'experimental' | 'reviewed' | 'installed';
 
-export type ExtensionRegistryItemHeader = {|
+export type ExtensionDependency = {
+  extensionName: string,
+  extensionVersion: string,
+};
+
+export type ExtensionRegistryItemHeader = {
   tier: ExtensionTier,
   authorIds: Array<string>,
   authors?: Array<UserPublicProfile>,
@@ -26,9 +32,10 @@ export type ExtensionRegistryItemHeader = {|
   category: string,
   previewIconUrl: string,
   changelog?: Array<{ version: string, breaking?: string }>,
+  requiredExtensions?: Array<ExtensionDependency>,
   // Added by the editor.
   isInstalled?: boolean,
-|};
+};
 
 export type EventsFunctionInsideExtensionShortHeader = {
   description: string,
@@ -78,7 +85,7 @@ export type ExtensionHeader = {
   iconUrl: string,
 };
 
-export type BehaviorShortHeader = {|
+export type BehaviorShortHeader = {
   ...ExtensionRegistryItemHeader,
   description: string,
   extensionName: string,
@@ -87,7 +94,7 @@ export type BehaviorShortHeader = {|
    * All required behaviors including transitive ones.
    */
   allRequiredBehaviorTypes: Array<string>,
-  /** This attribute is calculated.
+  /** This attribute is computed.
    * @see adaptBehaviorHeader
    */
   type: string,
@@ -95,13 +102,18 @@ export type BehaviorShortHeader = {|
    * Can only be true for `installed` extensions.
    */
   isDeprecated?: boolean,
-|};
+};
 
-export type ObjectShortHeader = {|
+export type ObjectShortHeader = {
   ...ExtensionRegistryItemHeader,
   description: string,
   extensionName: string,
-|};
+  assetStoreTag: ?string,
+  /** This attribute is computed.
+   * @see adaptObjectHeader
+   */
+  type: string,
+};
 
 /**
  * This represents a serialized `gdEventsFunctionsExtension`.
@@ -114,7 +126,7 @@ export type ObjectShortHeader = {|
  */
 export type SerializedExtension = {
   name: string,
-
+  requiredExtensions?: Array<ExtensionDependency>,
   // This type is inexact because the typing is not complete.
 };
 
@@ -133,6 +145,16 @@ export type BehaviorsRegistry = {
   views: {
     default: {
       firstIds: Array<{ extensionName: string, behaviorName: string }>,
+    },
+  },
+};
+
+export type ObjectsRegistry = {
+  headers: Array<ObjectShortHeader>,
+  views: {
+    default: {
+      firstIds: Array<{ extensionName: string, objectName: string }>,
+      secondIds: Array<{ extensionName: string, objectName: string }>,
     },
   },
 };
@@ -178,8 +200,13 @@ const transformTagsAsStringToTagsAsArray = <
   };
 };
 
+export const client = axios.create({
+  baseURL: GDevelopAssetApi.baseUrl,
+});
+export const cdnClient = axios.create();
+
 export const getExtensionsRegistry = async (): Promise<ExtensionsRegistry> => {
-  const response = await axios.get(`${GDevelopAssetApi.baseUrl}/extension`, {
+  const response = await client.get(`/extension`, {
     params: {
       // Could be changed according to the editor environment, but keep
       // reading from the "live" data for now.
@@ -190,7 +217,7 @@ export const getExtensionsRegistry = async (): Promise<ExtensionsRegistry> => {
 
   const extensionsRegistry: ExtensionsRegistry = await retryIfFailed(
     { times: 2 },
-    async () => (await axios.get(databaseUrl)).data
+    async () => (await cdnClient.get(databaseUrl)).data
   );
 
   if (!extensionsRegistry) {
@@ -216,7 +243,7 @@ export const getExtensionsRegistry = async (): Promise<ExtensionsRegistry> => {
 };
 
 export const getBehaviorsRegistry = async (): Promise<BehaviorsRegistry> => {
-  const response = await axios.get(`${GDevelopAssetApi.baseUrl}/behavior`, {
+  const response = await client.get(`/behavior`, {
     params: {
       // Could be changed according to the editor environment, but keep
       // reading from the "live" data for now.
@@ -227,7 +254,7 @@ export const getBehaviorsRegistry = async (): Promise<BehaviorsRegistry> => {
 
   const behaviorsRegistry: BehaviorsRegistry = await retryIfFailed(
     { times: 2 },
-    async () => (await axios.get(databaseUrl)).data
+    async () => (await cdnClient.get(databaseUrl)).data
   );
 
   if (!behaviorsRegistry) {
@@ -253,10 +280,49 @@ const adaptBehaviorHeader = (
   return header;
 };
 
+export const getObjectsRegistry = async (): Promise<ObjectsRegistry> => {
+  const response = await client.get(`/object`, {
+    params: {
+      // Could be changed according to the editor environment, but keep
+      // reading from the "live" data for now.
+      environment: 'live',
+    },
+  });
+  const { databaseUrl } = response.data;
+
+  const objectsRegistry: ObjectsRegistry = await retryIfFailed(
+    { times: 2 },
+    async () => (await cdnClient.get(databaseUrl)).data
+  );
+
+  if (!objectsRegistry) {
+    throw new Error('Unexpected response from the objects endpoint.');
+  }
+  return {
+    ...objectsRegistry,
+    headers: objectsRegistry.headers.map(adaptObjectHeader),
+  };
+};
+
+const adaptObjectHeader = (header: ObjectShortHeader): ObjectShortHeader => {
+  header.type = gd.PlatformExtension.getObjectFullType(
+    header.extensionNamespace || header.extensionName,
+    header.name
+  );
+  header = transformTagsAsStringToTagsAsArray(header);
+  if ((header.tier: string) === 'community') {
+    header.tier = 'experimental';
+  }
+  return header;
+};
+
 export const getExtensionHeader = (
-  extensionShortHeader: ExtensionShortHeader | BehaviorShortHeader
+  extensionShortHeader:
+    | ExtensionShortHeader
+    | BehaviorShortHeader
+    | ObjectShortHeader
 ): Promise<ExtensionHeader> => {
-  return axios.get(extensionShortHeader.headerUrl).then(response => {
+  return cdnClient.get(extensionShortHeader.headerUrl).then(response => {
     const data: ExtensionHeaderWithTagsAsString = response.data;
     const transformedData: ExtensionHeader = transformTagsAsStringToTagsAsArray(
       data
@@ -271,7 +337,7 @@ export const getExtensionHeader = (
 export const getExtension = (
   extensionHeader: ExtensionShortHeader | BehaviorShortHeader
 ): Promise<SerializedExtension> => {
-  return axios.get(extensionHeader.url).then(response => {
+  return cdnClient.get(extensionHeader.url).then(response => {
     const data: SerializedExtensionWithTagsAsString = response.data;
     const transformedData: SerializedExtension = transformTagsAsStringToTagsAsArray(
       data
@@ -283,17 +349,17 @@ export const getExtension = (
 export const getUserExtensionShortHeaders = async (
   authorId: string
 ): Promise<Array<ExtensionShortHeader>> => {
-  const response = await axios.get(
-    `${GDevelopAssetApi.baseUrl}/extension-short-header`,
-    {
-      params: {
-        authorId,
-        // Could be changed according to the editor environment, but keep
-        // reading from the "live" data for now.
-        environment: 'live',
-      },
-    }
-  );
+  const response = await client.get(`/extension-short-header`, {
+    params: {
+      authorId,
+      // Could be changed according to the editor environment, but keep
+      // reading from the "live" data for now.
+      environment: 'live',
+    },
+  });
 
-  return response.data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/extension-short-header of Asset API',
+  });
 };

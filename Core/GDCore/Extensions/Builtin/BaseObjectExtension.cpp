@@ -40,6 +40,31 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   extension.AddInstructionOrExpressionGroupMetadata(_("Size")).SetIcon(
       "res/actions/scale24_black.png");
 
+  extension.AddInGameEditorResource()
+      .SetResourceName("InGameEditor-MoveIcon")
+      .SetFilePath("InGameEditor/MoveIcon.svg")
+      .SetKind("internal-in-game-editor-only-svg");
+  extension.AddInGameEditorResource()
+      .SetResourceName("InGameEditor-RotateIcon")
+      .SetFilePath("InGameEditor/RotateIcon.svg")
+      .SetKind("internal-in-game-editor-only-svg");
+  extension.AddInGameEditorResource()
+      .SetResourceName("InGameEditor-ResizeIcon")
+      .SetFilePath("InGameEditor/ResizeIcon.svg")
+      .SetKind("internal-in-game-editor-only-svg");
+  extension.AddInGameEditorResource()
+      .SetResourceName("InGameEditor-FocusIcon")
+      .SetFilePath("InGameEditor/FocusIcon.svg")
+      .SetKind("internal-in-game-editor-only-svg");
+  extension.AddInGameEditorResource()
+      .SetResourceName("InGameEditor-FreeCameraIcon")
+      .SetFilePath("InGameEditor/FreeCameraIcon.svg")
+      .SetKind("internal-in-game-editor-only-svg");
+  extension.AddInGameEditorResource()
+      .SetResourceName("InGameEditor-OrbitCameraIcon")
+      .SetFilePath("InGameEditor/OrbitCameraIcon.svg")
+      .SetKind("internal-in-game-editor-only-svg");
+
   gd::ObjectMetadata& obj = extension.AddObject<gd::ObjectConfiguration>(
       "", _("Base object"), _("Base object"), "res/objeticon24.png");
 
@@ -56,7 +81,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           "number", ParameterOptions::MakeNewOptions())
       .MarkAsSimple();
 
-  obj.AddAction("MettreX",
+  obj.AddAction("SetX",
                 _("X position"),
                 _("Change the X position of an object."),
                 _("the X position"),
@@ -68,6 +93,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .UseStandardOperatorParameters("number",
                                      ParameterOptions::MakeNewOptions())
       .MarkAsSimple();
+
+  // Compatibility with GD <= 5.6.251
+  obj.AddDuplicatedAction("MettreX", "SetX").SetHidden();
+  // End of compatibility code
 
   obj.AddCondition("PosY",
                    _("Y position"),
@@ -82,7 +111,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           "number", ParameterOptions::MakeNewOptions())
       .MarkAsSimple();
 
-  obj.AddAction("MettreY",
+  obj.AddAction("SetY",
                 _("Y position"),
                 _("Change the Y position of an object."),
                 _("the Y position"),
@@ -95,7 +124,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                                      ParameterOptions::MakeNewOptions())
       .MarkAsSimple();
 
-  obj.AddAction("MettreXY",
+  // Compatibility with GD <= 5.6.251
+  obj.AddDuplicatedAction("MettreY", "SetY").SetHidden();
+  // End of compatibility code
+
+  obj.AddAction("SetXY",
                 _("Position"),
                 _("Change the position of an object."),
                 _("Change the position of _PARAM0_: _PARAM1_ _PARAM2_ (x "
@@ -110,6 +143,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("operator", _("Modification's sign"), "number")
       .AddParameter("expression", _("Y position"))
       .MarkAsSimple();
+
+  // Compatibility with GD <= 5.6.251
+  obj.AddDuplicatedAction("MettreXY", "SetXY").SetHidden();
+  // End of compatibility code
 
   obj.AddAction("SetCenter",
                 _("Center position"),
@@ -215,7 +252,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number", ParameterOptions::MakeNewOptions());
 
-  obj.AddAction("MettreAutourPos",
+  obj.AddAction("PutAroundPosition",
                 _("Put around a position"),
                 _("Position the center of the given object around a position, "
                   "using the specified angle "
@@ -232,6 +269,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Distance"))
       .AddParameter("expression", _("Angle, in degrees"))
       .MarkAsAdvanced();
+
+  // Compatibility with GD <= 5.6.251
+  obj.AddDuplicatedAction("MettreAutourPos", "PutAroundPosition").SetHidden();
+  // End of compatibility code
 
   obj.AddAction("SetAngle",
                 _("Angle"),
@@ -348,7 +389,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   obj.AddAction(
-         "AddForceVersPos",
+         "AddForceTowardPosition",
          _("Add a force to move toward a position"),
          _("Add a force to an object to make it move toward a position."),
          _("Move _PARAM0_ toward _PARAM1_;_PARAM2_ with _PARAM4_ force of "
@@ -365,6 +406,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetDefaultValue("0")
       .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
+
+  // Compatibility with GD <= 5.6.251
+  obj.AddDuplicatedAction("AddForceVersPos", "AddForceTowardPosition")
+      .SetHidden();
+  // End of compatibility code
 
   obj.AddAction(
          "AddForceTournePos",
@@ -387,7 +433,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetHelpPath("/tutorials/how-to-move-objects/")
       .SetHidden();
 
-  obj.AddAction("Arreter",
+  obj.AddAction("ClearForces",
                 _("Stop the object"),
                 _("Stop the object by deleting all of its forces."),
                 _("Stop _PARAM0_ (remove all forces)"),
@@ -397,6 +443,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
+
+  // Compatibility with GD <= 5.6.251
+  obj.AddDuplicatedAction("Arreter", "ClearForces").SetHidden();
+  // End of compatibility code
 
   obj.AddAction("Delete",
                 _("Delete the object"),
@@ -630,7 +680,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced();
 
-  obj.AddAction("Cache",
+  obj.AddAction("Hide",
                 _("Hide"),
                 _("Hide the specified object."),
                 _("Hide _PARAM0_"),
@@ -641,7 +691,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .MarkAsSimple();
 
-  obj.AddAction("Montre",
+  // Compatibility with GD <= 5.6.251
+  obj.AddDuplicatedAction("Cache", "Hide").SetHidden();
+  // End of compatibility code
+
+  obj.AddAction("Show",
                 _("Show"),
                 _("Show the specified object."),
                 _("Show _PARAM0_"),
@@ -652,6 +706,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddCodeOnlyParameter("inlineCode", "false")
       .MarkAsSimple();
+
+  // Compatibility with GD <= 5.6.251
+  obj.AddDuplicatedAction("Montre", "Show").SetHidden();
+  // End of compatibility code
 
   obj.AddCondition("Angle",
                    _("Angle"),
@@ -669,7 +727,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
               _("Angle to compare to (in degrees)")))
       .MarkAsAdvanced();
 
-  obj.AddCondition("Plan",
+  obj.AddCondition("ZOrder",
                    _("Z-order"),
                    _("Compare the Z-order of the specified object."),
                    _("the Z-order"),
@@ -681,6 +739,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .UseStandardRelationalOperatorParameters(
           "number", ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
+
+  // Compatibility with GD <= 5.6.251
+  obj.AddDuplicatedCondition("Plan", "ZOrder").SetHidden();
+  // End of compatibility code
 
   obj.AddCondition("Layer",
                    _("Current layer"),
@@ -716,7 +778,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .SetHidden();  // Inverted "Visible" condition  does the same thing.
 
-  obj.AddCondition("Arret",
+  obj.AddCondition("HasNoForces",
                    _("Object is stopped (no forces applied on it)"),
                    _("Check if an object is not moving"),
                    _("_PARAM0_ is stopped"),
@@ -727,7 +789,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
 
-  obj.AddCondition("Vitesse",
+  // Compatibility with GD <= 5.6.251
+  obj.AddDuplicatedCondition("Arret", "HasNoForces").SetHidden();
+  // End of compatibility code
+
+  obj.AddCondition("Speed",
                    _("Speed (from forces)"),
                    _("Compare the overall speed of an object"),
                    _("the overall speed"),
@@ -739,6 +805,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           "number", ParameterOptions::MakeNewOptions())
       .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
+
+  // Compatibility with GD <= 5.6.251
+  obj.AddDuplicatedCondition("Vitesse", "Speed").SetHidden();
+  // End of compatibility code
 
   // Deprecated
   obj.AddCondition("AngleOfDisplacement",
@@ -1051,7 +1121,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("yesorno", _("Activate?"))
       .MarkAsAdvanced();
 
-  obj.AddAction("AddForceVers",
+  obj.AddAction("AddForceTowardObject",
                 _("Add a force to move toward an object"),
                 _("Add a force to an object to make it move toward another."),
                 _("Move _PARAM0_ toward _PARAM1_ with _PARAM3_ force of "
@@ -1066,6 +1136,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetDefaultValue("0")
       .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
+
+  // Compatibility with GD <= 5.6.251
+  obj.AddDuplicatedAction("AddForceVers", "AddForceTowardObject").SetHidden();
+  // End of compatibility code
 
   obj.AddAction(
          "AddForceTourne",
@@ -1088,7 +1162,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
 
-  obj.AddAction("MettreAutour",
+  obj.AddAction("PutAroundObject",
                 _("Put the object around another"),
                 _("Position an object around another, with the specified angle "
                   "and distance. The center of the objects are used for "
@@ -1104,6 +1178,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Distance"))
       .AddParameter("expression", _("Angle, in degrees"))
       .MarkAsAdvanced();
+
+  // Compatibility with GD <= 5.6.251
+  obj.AddDuplicatedAction("MettreAutour", "PutAroundObject").SetHidden();
+  // End of compatibility code
 
   // Deprecated action
   obj.AddAction("Rebondir",
@@ -1165,7 +1243,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsSimple();
 
   extension
-      .AddCondition("SourisSurObjet",
+      .AddCondition("IsCursorOnObject",
                     _("The cursor/touch is on an object"),
                     _("Test if the cursor is over an object, or if the object "
                       "is being touched."),
@@ -1180,6 +1258,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetDefaultValue("yes")
       .AddCodeOnlyParameter("conditionInverted", "")
       .MarkAsSimple();
+
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedCondition("SourisSurObjet", "IsCursorOnObject")
+      .SetHidden();
+  // End of compatibility code
 
   // Deprecated and replaced by CompareObjectTimer
   obj.AddCondition(
@@ -1635,7 +1718,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddAction("AjoutObjConcern",
+      .AddAction("PickAllInstances",
                  _("Pick all object instances"),
                  _("Pick all instances of the specified object(s). When you "
                    "pick all instances, "
@@ -1649,8 +1732,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectList", _("Object"))
       .MarkAsAdvanced();
 
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedAction("AjoutObjConcern", "PickAllInstances")
+      .SetHidden();
+  // End of compatibility code
+
   extension
-      .AddAction("AjoutHasard",
+      .AddAction("PickRandomInstance",
                  _("Pick a random object"),
                  _("Pick one instance from all the specified objects. When an "
                    "instance is picked, the next conditions and actions of "
@@ -1662,6 +1750,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddCodeOnlyParameter("objectsContext", "")
       .AddParameter("objectList", _("Object"))
       .MarkAsSimple();
+
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedAction("AjoutHasard", "PickRandomInstance").SetHidden();
+  // End of compatibility code
 
   extension
       .AddAction(
@@ -1693,7 +1785,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddCondition("SeDirige",
+      .AddCondition("IsTotalForceAngleTowardObject",
                     _("An object is moving toward another (using forces)"),
                     _("Check if an object moves toward another.\nThe first "
                       "object must move."),
@@ -1707,6 +1799,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddCodeOnlyParameter("conditionInverted", "")
       .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
+
+  // Compatibility with GD <= 5.6.251
+  extension
+      .AddDuplicatedCondition("SeDirige", "IsTotalForceAngleTowardObject")
+      .SetHidden();
+  // End of compatibility code
 
   extension
       .AddCondition("Distance",
@@ -1726,7 +1824,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   extension
       .AddCondition(
-          "AjoutObjConcern",
+          "PickAllInstances",
           _("Pick all object instances"),
           _("Pick all instances of the specified object(s). When you "
             "pick all instances, "
@@ -1740,8 +1838,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectList", _("Object"))
       .MarkAsAdvanced();
 
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedCondition("AjoutObjConcern", "PickAllInstances")
+      .SetHidden();
+  // End of compatibility code
+
   extension
-      .AddCondition("AjoutHasard",
+      .AddCondition("PickRandomInstance",
                     _("Pick a random object"),
                     _("Pick one instance from all the specified objects. When "
                       "an instance is picked, the next conditions and actions "
@@ -1753,6 +1856,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddCodeOnlyParameter("objectsContext", "")
       .AddParameter("objectList", _("Object"))
       .MarkAsSimple();
+
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedCondition("AjoutHasard", "PickRandomInstance")
+      .SetHidden();
+  // End of compatibility code
 
   extension
       .AddCondition(

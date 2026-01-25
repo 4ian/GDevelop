@@ -10,7 +10,7 @@ import {
   ResponsiveLineStackLayout,
 } from '../../../../UI/Layout';
 import RaisedButton from '../../../../UI/RaisedButton';
-import { SubscriptionSuggestionContext } from '../../../../Profile/Subscription/SubscriptionSuggestionContext';
+import { SubscriptionContext } from '../../../../Profile/Subscription/SubscriptionContext';
 import Form from '../../../../UI/Form';
 import TextField from '../../../../UI/TextField';
 import { Line, Spacer } from '../../../../UI/Grid';
@@ -90,9 +90,7 @@ const EducationMarketingSection = ({
   const { limits } = React.useContext(AuthenticatedUserContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const [isEmailValid, setIsEmailValid] = React.useState<boolean>(true);
-  const { openSubscriptionDialog } = React.useContext(
-    SubscriptionSuggestionContext
-  );
+  const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
   const { tutorials } = React.useContext(TutorialContext);
   const educationTutorials = React.useMemo(
     () =>
@@ -237,7 +235,6 @@ const EducationMarketingSection = ({
   const onClickSubscribe = React.useCallback(
     () => {
       openSubscriptionDialog({
-        filter: 'education',
         analyticsMetadata: {
           reason: 'Callout in Classroom tab',
           recommendedPlanId: 'gdevelop_education',

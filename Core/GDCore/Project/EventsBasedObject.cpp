@@ -25,6 +25,9 @@ EventsBasedObject::~EventsBasedObject() {}
 
 void EventsBasedObject::SerializeToExternal(SerializerElement& element) const {
   element.SetAttribute("defaultName", defaultName);
+  if (!assetStoreTag.empty()) {
+    element.SetAttribute("assetStoreTag", assetStoreTag);
+  }
   if (isRenderedIn3D) {
     element.SetBoolAttribute("is3D", true);
   }
@@ -53,6 +56,7 @@ void EventsBasedObject::SerializeTo(SerializerElement& element) const {
 void EventsBasedObject::UnserializeFrom(gd::Project& project,
                                         const SerializerElement& element) {
   defaultName = element.GetStringAttribute("defaultName");
+  assetStoreTag = element.GetStringAttribute("assetStoreTag", "");
   isRenderedIn3D = element.GetBoolAttribute("is3D", false);
   isAnimatable = element.GetBoolAttribute("isAnimatable", false);
   isTextContainer = element.GetBoolAttribute("isTextContainer", false);

@@ -129,8 +129,8 @@ const InlineParameterEditor = ({
           instructionMetadata
         );
         setupInstructionParameters(
-          globalObjectsContainer,
-          objectsContainer,
+          project,
+          projectScopedContainersAccessor,
           instruction,
           instructionMetadata,
           objectParameterIndex !== -1
@@ -145,8 +145,8 @@ const InlineParameterEditor = ({
       instruction,
       instructionMetadata,
       onApply,
-      objectsContainer,
-      globalObjectsContainer,
+      project,
+      projectScopedContainersAccessor,
     ]
   );
 

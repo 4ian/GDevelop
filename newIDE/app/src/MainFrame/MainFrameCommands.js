@@ -63,6 +63,7 @@ type CommandHandlers = {|
   onOpenEventsFunctionsExtension: string => void,
   onOpenCommandPalette: () => void,
   onOpenProfile: () => void,
+  onRestartInGameEditor: (reason: string) => void,
 |};
 
 const useMainFrameCommands = (handlers: CommandHandlers) => {
@@ -144,6 +145,14 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
 
   useCommand('OPEN_COMMAND_PALETTE', true, {
     handler: handlers.onOpenCommandPalette,
+  });
+
+  const onRestartInGameEditor = handlers.onRestartInGameEditor;
+  useCommand('RESTART_IN_GAME_EDITOR', true, {
+    handler: React.useCallback(
+      () => onRestartInGameEditor('relaunched-manually'),
+      [onRestartInGameEditor]
+    ),
   });
 
   useCommandWithOptions('OPEN_LAYOUT', !!handlers.project, {

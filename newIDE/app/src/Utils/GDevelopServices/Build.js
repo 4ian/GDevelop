@@ -3,6 +3,11 @@ import axios from 'axios';
 import { makeTimestampedId } from '../../Utils/TimestampedId';
 import { GDevelopBuildApi, GDevelopGamesPlatform } from './ApiConfigs';
 import { getSignedUrl } from './Usage';
+import {
+  ensureIsArray,
+  ensureObjectHasProperty,
+  ensureIsObject,
+} from '../DataValidator';
 
 export type TargetName =
   | 'winExe'
@@ -205,7 +210,13 @@ export const buildElectron = (
         },
       })
     )
-    .then(response => response.data);
+    .then(response =>
+      ensureObjectHasProperty({
+        data: response.data,
+        propertyName: 'id',
+        endpointName: '/build of Build API',
+      })
+    );
 };
 
 export const buildWeb = (
@@ -235,7 +246,13 @@ export const buildWeb = (
         },
       })
     )
-    .then(response => response.data);
+    .then(response =>
+      ensureObjectHasProperty({
+        data: response.data,
+        propertyName: 'id',
+        endpointName: '/build of Build API',
+      })
+    );
 };
 
 export const buildCordovaAndroid = (
@@ -276,7 +293,13 @@ export const buildCordovaAndroid = (
         }
       )
     )
-    .then(response => response.data);
+    .then(response =>
+      ensureObjectHasProperty({
+        data: response.data,
+        propertyName: 'id',
+        endpointName: '/build of Build API',
+      })
+    );
 };
 
 export const buildCordovaIos = (
@@ -315,7 +338,13 @@ export const buildCordovaIos = (
         }
       )
     )
-    .then(response => response.data);
+    .then(response =>
+      ensureObjectHasProperty({
+        data: response.data,
+        propertyName: 'id',
+        endpointName: '/build of Build API',
+      })
+    );
 };
 
 export const getBuild = (
@@ -334,7 +363,13 @@ export const getBuild = (
         },
       })
     )
-    .then(response => response.data);
+    .then(response =>
+      ensureObjectHasProperty({
+        data: response.data,
+        propertyName: 'id',
+        endpointName: '/build/{id} of Build API',
+      })
+    );
 };
 
 export const getBuilds = (
@@ -354,7 +389,12 @@ export const getBuilds = (
         },
       })
     )
-    .then(response => response.data);
+    .then(response =>
+      ensureIsArray({
+        data: response.data,
+        endpointName: '/build of Build API',
+      })
+    );
 };
 
 export const updateBuild = (
@@ -378,26 +418,30 @@ export const updateBuild = (
         }
       )
     )
-    .then(response => response.data);
+    .then(response =>
+      ensureObjectHasProperty({
+        data: response.data,
+        propertyName: 'id',
+        endpointName: '/build/{id} of Build API',
+      })
+    );
 };
 
-export const deleteBuild = (
+export const deleteBuild = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
   buildId: string
-): Promise<Build> => {
-  return getAuthorizationHeader()
-    .then(authorizationHeader =>
-      client.delete(`/build/${buildId}`, {
-        params: {
-          userId,
-        },
-        headers: {
-          Authorization: authorizationHeader,
-        },
-      })
-    )
-    .then(response => response.data);
+): Promise<void> => {
+  const authorizationHeader = await getAuthorizationHeader();
+
+  await client.delete(`/build/${buildId}`, {
+    params: {
+      userId,
+    },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+  });
 };
 
 export const getUserSigningCredentials = async (
@@ -415,10 +459,10 @@ export const getUserSigningCredentials = async (
     },
   });
 
-  if (!response.data || !Array.isArray(response.data))
-    throw new Error('Unexpected data returned by the endpoint.');
-
-  return response.data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/signing-credential of Build API',
+  });
 };
 
 export const signingCredentialApi = {
@@ -447,7 +491,10 @@ export const signingCredentialApi = {
       }
     );
 
-    return response.data;
+    return ensureIsObject({
+      data: response.data,
+      endpointName: '/signing-credential/action/create-csr of Build API',
+    });
   },
   uploadCertificate: async (
     getAuthorizationHeader: () => Promise<string>,
@@ -475,7 +522,10 @@ export const signingCredentialApi = {
       }
     );
 
-    return response.data;
+    return ensureIsObject({
+      data: response.data,
+      endpointName: '/signing-credential/action/create-csr of Build API',
+    });
   },
   createCertificateP12: async (
     getAuthorizationHeader: () => Promise<string>,
@@ -505,7 +555,10 @@ export const signingCredentialApi = {
       }
     );
 
-    return response.data;
+    return ensureIsObject({
+      data: response.data,
+      endpointName: '/signing-credential/action/create-csr of Build API',
+    });
   },
   uploadMobileProvision: async (
     getAuthorizationHeader: () => Promise<string>,
@@ -533,7 +586,10 @@ export const signingCredentialApi = {
       }
     );
 
-    return response.data;
+    return ensureIsObject({
+      data: response.data,
+      endpointName: '/signing-credential/action/create-csr of Build API',
+    });
   },
   uploadAuthKey: async (
     getAuthorizationHeader: () => Promise<string>,
@@ -562,7 +618,10 @@ export const signingCredentialApi = {
       }
     );
 
-    return response.data;
+    return ensureIsObject({
+      data: response.data,
+      endpointName: '/signing-credential/action/create-csr of Build API',
+    });
   },
   deleteSigningCredential: async (
     getAuthorizationHeader: () => Promise<string>,
@@ -576,7 +635,7 @@ export const signingCredentialApi = {
   ): Promise<void> => {
     const authorizationHeader = await getAuthorizationHeader();
 
-    const response = await client.delete(`/signing-credential`, {
+    await client.delete(`/signing-credential`, {
       params: {
         userId,
         ...options,
@@ -585,7 +644,5 @@ export const signingCredentialApi = {
         Authorization: authorizationHeader,
       },
     });
-
-    return response.data;
   },
 };

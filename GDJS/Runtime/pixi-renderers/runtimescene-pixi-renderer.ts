@@ -1,6 +1,7 @@
 namespace gdjs {
   /**
    * The renderer for a gdjs.RuntimeScene using Pixi.js.
+   * @category Renderers > Scene
    */
   export class RuntimeScenePixiRenderer
     implements gdjs.RuntimeInstanceContainerPixiRenderer
@@ -113,14 +114,17 @@ namespace gdjs {
 
           const runtimeLayerRenderer = runtimeLayer.getRenderer();
           const runtimeLayerRenderingType = runtimeLayer.getRenderingType();
-          const layerHas3DObjectsToRender = runtimeLayerRenderer.has3DObjects();
-          if (
-            runtimeLayerRenderingType ===
-              gdjs.RuntimeLayerRenderingType.TWO_D ||
-            !layerHas3DObjectsToRender
-          ) {
-            // Render a layer with 2D rendering (PixiJS) only if layer is configured as is
-            // or if there is no 3D object to render.
+
+          // Determine if this layer will actually render in 3D mode.
+          // Keep in sync with: `shouldRenderLayerIn3D` in `layer-pixi-renderer.ts`.
+          const shouldRenderLayerIn3D =
+            this._runtimeScene.getGame().isInGameEdition() ||
+            (runtimeLayerRenderingType !==
+              gdjs.RuntimeLayerRenderingType.TWO_D &&
+              runtimeLayerRenderer.has3DObjects());
+
+          if (!shouldRenderLayerIn3D) {
+            // Render a layer with 2D rendering (PixiJS).
 
             if (lastRenderWas3D) {
               // Ensure the state is clean for PixiJS to render.
@@ -445,6 +449,8 @@ namespace gdjs {
   }
 
   // Register the class to let the engine use it.
+  /** @category Renderers > Scene */
   export type RuntimeSceneRenderer = gdjs.RuntimeScenePixiRenderer;
+  /** @category Renderers > Scene */
   export const RuntimeSceneRenderer = gdjs.RuntimeScenePixiRenderer;
 }

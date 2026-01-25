@@ -2,6 +2,9 @@ namespace gdjs {
   export interface RuntimeGame {
     inventories: { [name: string]: gdjs.Inventory };
   }
+  /**
+   * @category Other extensions > Inventory
+   */
   export class InventoryManager {
     static get(
       instanceContainer: gdjs.RuntimeInstanceContainer,

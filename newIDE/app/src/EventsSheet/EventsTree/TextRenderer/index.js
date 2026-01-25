@@ -1,6 +1,5 @@
 // @flow
-
-import { mapFor } from '../../../Utils/MapFor';
+import { mapFor, mapVector } from '../../../Utils/MapFor';
 
 const gd: libGDevelop = global.gd;
 
@@ -190,6 +189,47 @@ ${padding}${actions}`;
   },
 };
 
+const convertVariableToJsObject = (variable: gdVariable) => {
+  if (variable.getType() === gd.Variable.String) {
+    return variable.getString();
+  } else if (variable.getType() === gd.Variable.Number) {
+    return variable.getValue();
+  } else if (variable.getType() === gd.Variable.Boolean) {
+    return variable.getBool();
+  } else if (variable.getType() === gd.Variable.Structure) {
+    const childrenNames = variable.getAllChildrenNames().toJSArray();
+    const object = {};
+    childrenNames.forEach(childName => {
+      object[childName] = convertVariableToJsObject(
+        variable.getChild(childName)
+      );
+    });
+    return object;
+  } else if (variable.getType() === gd.Variable.Array) {
+    const children = variable.getAllChildrenArray();
+    return mapVector(children, child => convertVariableToJsObject(child));
+  }
+
+  // Should not happen:
+  return variable.getValue();
+};
+
+const renderLocalVariablesAsText = ({
+  variables,
+  padding,
+}: {|
+  variables: gdVariablesContainer,
+  padding: string,
+|}) => {
+  return mapFor(0, variables.count(), i => {
+    const variable = variables.getAt(i);
+    const variableName = variables.getNameAt(i);
+    return `${padding}- Declare local variable "${variableName}" of type "${gd.Variable.typeAsString(
+      variable.getType()
+    )}" with value \`${JSON.stringify(convertVariableToJsObject(variable))}\``;
+  }).join('\n');
+};
+
 const renderEventAsText = ({
   event,
   padding,
@@ -202,9 +242,19 @@ const renderEventAsText = ({
   const isDisabled = event.isDisabled();
   if (isDisabled) return `${padding}(This event is disabled - ignored)`;
 
+  const localVariablesText =
+    event.canHaveVariables() && event.hasVariables()
+      ? renderLocalVariablesAsText({
+          variables: event.getVariables(),
+          padding: padding,
+        })
+      : '';
+
   const textRenderer = eventsTextRenderers[event.getType()];
   const eventText = textRenderer
-    ? textRenderer({ event, padding })
+    ? [localVariablesText, textRenderer({ event, padding })]
+        .filter(Boolean)
+        .join('\n\n')
     : `${padding}(This event is unknown/unsupported - ignored)`;
 
   let subEvents = '';

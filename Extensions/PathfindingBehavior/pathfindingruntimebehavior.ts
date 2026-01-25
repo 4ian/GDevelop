@@ -18,6 +18,7 @@ namespace gdjs {
     dos: number;
   }
 
+  /** @category Behaviors > 2D Pathfinding */
   export interface PathfindingNetworkSyncData extends BehaviorNetworkSyncData {
     props: PathfindingNetworkSyncDataType;
   }
@@ -25,6 +26,7 @@ namespace gdjs {
   /**
    * PathfindingRuntimeBehavior represents a behavior allowing objects to
    * follow a path computed to avoid obstacles.
+   * @category Behaviors > 2D Pathfinding
    */
   export class PathfindingRuntimeBehavior extends gdjs.RuntimeBehavior {
     _path: Array<FloatPoint> = [];
@@ -592,6 +594,7 @@ namespace gdjs {
     gdjs.PathfindingRuntimeBehavior
   );
 
+  /** @category Behaviors > 2D Pathfinding */
   export namespace PathfindingRuntimeBehavior {
     /**
      * Internal tool class representing a node when looking for a path
@@ -623,6 +626,7 @@ namespace gdjs {
      * Internal tool class containing the structures used by A* and members functions related
      * to them.
      * @ignore
+     * @category Behaviors > 2D Pathfinding
      */
     export class SearchContext {
       _obstacles: PathfindingObstaclesManager;

@@ -16,7 +16,10 @@ namespace gdjs {
   type Model3DObjectNetworkSyncData = Object3DNetworkSyncData &
     Model3DObjectNetworkSyncDataType;
 
-  /** Base parameters for {@link gdjs.Cube3DRuntimeObject} */
+  /**
+   * Base parameters for {@link gdjs.Model3DRuntimeObject}
+   * @category Objects > 3D Model
+   */
   export interface Model3DObjectData extends Object3DData {
     /** The base parameters of the Model3D object */
     content: Object3DDataContent & {
@@ -65,6 +68,7 @@ namespace gdjs {
 
   /**
    * A 3D object which displays a 3D model.
+   * @category Objects > 3D Model
    */
   export class Model3DRuntimeObject
     extends gdjs.RuntimeObject3D
@@ -106,12 +110,14 @@ namespace gdjs {
     _crossfadeDuration: float = 0;
     _isCastingShadow: boolean = true;
     _isReceivingShadow: boolean = true;
+    _data: Model3DObjectData;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
       objectData: Model3DObjectData
     ) {
       super(instanceContainer, objectData);
+      this._data = objectData;
       this._modelResourceName = objectData.content.modelResourceName;
       this._animations = objectData.content.animations;
       this._originPoint = getPointForLocation(
@@ -127,12 +133,11 @@ namespace gdjs {
       this._materialType = this._convertMaterialType(
         objectData.content.materialType
       );
+      this._crossfadeDuration = objectData.content.crossfadeDuration || 0;
 
       this.setIsCastingShadow(objectData.content.isCastingShadow);
       this.setIsReceivingShadow(objectData.content.isReceivingShadow);
       this.onModelChanged(objectData);
-
-      this._crossfadeDuration = objectData.content.crossfadeDuration || 0;
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -143,12 +148,13 @@ namespace gdjs {
      * - After the renderer was instantiated
      * - After reloading the model
      */
-    private onModelChanged(objectData) {
+    private onModelChanged(objectData: Model3DObjectData) {
       this._updateModel(objectData);
       if (this._animations.length > 0) {
         this._renderer.playAnimation(
           this._animations[0].source,
-          this._animations[0].loop
+          this._animations[0].loop,
+          true
         );
       }
     }
@@ -198,7 +204,7 @@ namespace gdjs {
         this._centerPoint = getPointForLocation(
           newObjectData.content.centerLocation
         );
-        this._updateModel(newObjectData);
+        this.onModelChanged(newObjectData);
       }
       if (
         oldObjectData.content.originLocation !==
@@ -220,6 +226,23 @@ namespace gdjs {
         newObjectData.content.isReceivingShadow
       ) {
         this.setIsReceivingShadow(newObjectData.content.isReceivingShadow);
+      }
+      if (this.getInstanceContainer().getGame().isInGameEdition()) {
+        const oldDefaultAnimationSource =
+          this._animations.length > 0 ? this._animations[0].source : null;
+        this._animations = newObjectData.content.animations;
+        const newDefaultAnimationSource =
+          this._animations.length > 0 ? this._animations[0].source : null;
+        if (
+          newDefaultAnimationSource &&
+          oldDefaultAnimationSource !== newDefaultAnimationSource
+        ) {
+          this._renderer.playAnimation(
+            newDefaultAnimationSource,
+            this._animations[0].loop,
+            true
+          );
+        }
       }
       return true;
     }
@@ -480,6 +503,7 @@ namespace gdjs {
     }
   }
 
+  /** @category Objects > 3D Model */
   export namespace Model3DRuntimeObject {
     export enum MaterialType {
       Basic,

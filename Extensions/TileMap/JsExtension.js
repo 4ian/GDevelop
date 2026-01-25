@@ -172,13 +172,11 @@ const defineTileMap = function (extension, _, gd) {
     .addObject(
       'TileMap',
       _('External Tilemap (Tiled/LDtk)'),
-      _(
-        'Displays a tiled-based map, made with the Tiled editor (https://www.mapeditor.org/) or the LDtk editor (https://ldtk.io/).'
-      ),
+      _('Tilemap imported from external editors like LDtk or Tiled.'),
       'JsPlatform/Extensions/tile_map.svg',
       objectTileMap
     )
-    .setCategoryFullName(_('Advanced'))
+    .setCategory('Advanced')
     .addDefaultBehavior('ResizableCapability::ResizableBehavior')
     .addDefaultBehavior('ScalableCapability::ScalableBehavior')
     .addDefaultBehavior('OpacityCapability::OpacityBehavior')
@@ -720,13 +718,11 @@ const defineSimpleTileMap = function (extension, _, gd) {
     .addObject(
       'SimpleTileMap',
       _('Tile map'),
-      _(
-        'Displays a tile-based map. Recommended for most games that need to use static tiles.'
-      ),
+      _('Grid-based map built from reusable tiles.'),
       'JsPlatform/Extensions/tile_map.svg',
       objectSimpleTileMap
     )
-    .setCategoryFullName(_('General'))
+    .setCategory('General')
     .setOpenFullEditorLabel(_('Edit tileset and collisions'))
     .addDefaultBehavior('ResizableCapability::ResizableBehavior')
     .addDefaultBehavior('ScalableCapability::ScalableBehavior')
@@ -1275,7 +1271,7 @@ const defineCollisionMask = function (extension, _, gd) {
       'JsPlatform/Extensions/tile_map_collision_mask32.svg',
       collisionMaskObject
     )
-    .setCategoryFullName(_('Advanced'))
+    .setCategory('Advanced')
     .addDefaultBehavior('ResizableCapability::ResizableBehavior')
     .addDefaultBehavior('ScalableCapability::ScalableBehavior')
     .setIncludeFile('Extensions/TileMap/tilemapcollisionmaskruntimeobject.js')
@@ -1995,7 +1991,13 @@ module.exports = {
         ) {
           this._pixiObject.alpha = alphaForDisplay;
           for (const layer of this._editableTileMap.getLayers()) {
-            // Only update layers that are of type TileMapHelper.EditableTileMapLayer.
+            const isLayerHidden =
+              (displayMode === 'index' && layerIndex !== layer.id) ||
+              (displayMode === 'visible' && !layer.isVisible());
+
+            // Only set alpha on editable layers that are not hidden,
+            // as others are not rendered.
+            if (isLayerHidden) continue;
             // @ts-ignore - only this type of layer has setAlpha.
             if (layer.setAlpha) {
               const editableLayer =

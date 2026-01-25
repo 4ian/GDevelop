@@ -11,6 +11,38 @@ import { isBehaviorDefaultCapability } from '../BehaviorsEditor/EnumerateBehavio
 const gd: libGDevelop = global.gd;
 
 /**
+ * Recursively searches for an event with the given aiGeneratedEventId in the events list.
+ * Returns the path to the event as an array of indices, or null if not found.
+ */
+const findEventPathByAiGeneratedEventId = (
+  eventsList: gdEventsList,
+  targetId: string,
+  currentPath: Array<number> = []
+): Array<number> | null => {
+  for (let i = 0; i < eventsList.getEventsCount(); i++) {
+    const event = eventsList.getEventAt(i);
+    const eventPath = [...currentPath, i];
+
+    if (event.getAiGeneratedEventId() === targetId) {
+      return eventPath;
+    }
+
+    if (event.canHaveSubEvents()) {
+      const subEvents = event.getSubEvents();
+      const foundPath = findEventPathByAiGeneratedEventId(
+        subEvents,
+        targetId,
+        eventPath
+      );
+      if (foundPath) {
+        return foundPath;
+      }
+    }
+  }
+  return null;
+};
+
+/**
  * Parses an event path string (e.g., "event-0.1.2") into an array of 0-based indices (e.g., [0, 1, 2]).
  * Throws an error for invalid formats or non-positive indices.
  */
@@ -135,12 +167,81 @@ const getEventByPath = (
   return parentList.getEventAt(eventIndexInParentList);
 };
 
-type EventOperationType = 'delete' | 'insert' | 'insertAsSub';
+type EventOperationType =
+  | 'delete'
+  | 'insert'
+  | 'insertAsSub'
+  | 'replaceKeepSubEvents'
+  | 'insertActionsConditionsAtEnd'
+  | 'insertActionsConditionsAtStart'
+  | 'replaceAllActions'
+  | 'replaceAllConditions';
 type EventOperation = {|
   type: EventOperationType,
   path: Array<number>,
   eventsToInsert?: gdEventsList,
 |};
+
+/**
+ * Copy instructions from source list to target list at the specified position.
+ */
+const copyInstructions = (
+  source: gdInstructionsList,
+  target: gdInstructionsList,
+  position: number
+): void => {
+  target.insertInstructions(source, 0, source.size(), position);
+};
+
+/**
+ * Helper to get conditions from an event if it supports them.
+ */
+const getEventConditions = (event: gdBaseEvent): gdInstructionsList | null => {
+  const eventType = event.getType();
+  if (eventType === 'BuiltinCommonInstructions::Standard') {
+    return gd.asStandardEvent(event).getConditions();
+  } else if (eventType === 'BuiltinCommonInstructions::While') {
+    return gd.asWhileEvent(event).getConditions();
+  } else if (eventType === 'BuiltinCommonInstructions::Repeat') {
+    return gd.asRepeatEvent(event).getConditions();
+  } else if (eventType === 'BuiltinCommonInstructions::ForEach') {
+    return gd.asForEachEvent(event).getConditions();
+  } else if (eventType === 'BuiltinCommonInstructions::ForEachChildVariable') {
+    return gd.asForEachChildVariableEvent(event).getConditions();
+  }
+  return null;
+};
+
+/**
+ * Helper to get actions from an event if it supports them.
+ */
+const getEventActions = (event: gdBaseEvent): gdInstructionsList | null => {
+  const eventType = event.getType();
+  if (eventType === 'BuiltinCommonInstructions::Standard') {
+    return gd.asStandardEvent(event).getActions();
+  } else if (eventType === 'BuiltinCommonInstructions::While') {
+    return gd.asWhileEvent(event).getActions();
+  } else if (eventType === 'BuiltinCommonInstructions::Repeat') {
+    return gd.asRepeatEvent(event).getActions();
+  } else if (eventType === 'BuiltinCommonInstructions::ForEach') {
+    return gd.asForEachEvent(event).getActions();
+  } else if (eventType === 'BuiltinCommonInstructions::ForEachChildVariable') {
+    return gd.asForEachChildVariableEvent(event).getActions();
+  }
+  return null;
+};
+
+/**
+ * Helper to get while conditions from a While event.
+ */
+const getEventWhileConditions = (
+  event: gdBaseEvent
+): gdInstructionsList | null => {
+  if (event.getType() === 'BuiltinCommonInstructions::While') {
+    return gd.asWhileEvent(event).getWhileConditions();
+  }
+  return null;
+};
 
 const comparePathsReverseLexicographically = (
   p1: Array<number>,
@@ -171,7 +272,22 @@ export const applyEventsChanges = (
 
     try {
       if (operationTargetEvent) {
-        parsedPath = parseEventPath(operationTargetEvent);
+        // First, try to parse as a path string (e.g., "event-0.1.2" or "0.1.2")
+        try {
+          parsedPath = parseEventPath(operationTargetEvent);
+        } catch (pathParseError) {
+          // If parsing as path fails, treat it as an aiGeneratedEventId
+          parsedPath = findEventPathByAiGeneratedEventId(
+            sceneEvents,
+            operationTargetEvent
+          );
+          if (!parsedPath) {
+            console.warn(
+              `Could not find event with aiGeneratedEventId "${operationTargetEvent}" and could not parse as path. Skipping operation "${operationName}".`
+            );
+            return;
+          }
+        }
       } else if (operationName !== 'insert_at_end') {
         // Path is generally required, except for 'insert_at_end'.
         console.warn(
@@ -205,9 +321,10 @@ export const applyEventsChanges = (
 
       switch (operationName) {
         case 'insert_and_replace_event':
+        case 'replace_entire_event_and_sub_events':
           if (!parsedPath) {
             console.warn(
-              `Skipping "insert_and_replace_event" due to missing or invalid path.`
+              `Skipping "${operationName}" due to missing or invalid path.`
             );
             if (localEventsToInsert) localEventsToInsert.delete();
             return;
@@ -220,6 +337,20 @@ export const applyEventsChanges = (
           });
           // localEventsToInsert is now "owned" by the 'insert' operation,
           // it should not be deleted here in the switch case.
+          break;
+        case 'replace_event_but_keep_existing_sub_events':
+          if (!parsedPath) {
+            console.warn(
+              `Skipping "replace_event_but_keep_existing_sub_events" due to missing or invalid path.`
+            );
+            if (localEventsToInsert) localEventsToInsert.delete();
+            return;
+          }
+          operations.push({
+            type: 'replaceKeepSubEvents',
+            path: parsedPath,
+            eventsToInsert: localEventsToInsert || undefined,
+          });
           break;
         case 'insert_before_event':
           if (!parsedPath) {
@@ -235,6 +366,23 @@ export const applyEventsChanges = (
             eventsToInsert: localEventsToInsert || undefined,
           });
           break;
+        case 'insert_after_event':
+          if (!parsedPath) {
+            console.warn(
+              `Skipping "insert_after_event" due to missing or invalid path.`
+            );
+            if (localEventsToInsert) localEventsToInsert.delete();
+            return;
+          }
+          // Insert after means we insert at path[last] + 1
+          const insertAfterPath = [...parsedPath];
+          insertAfterPath[insertAfterPath.length - 1] += 1;
+          operations.push({
+            type: 'insert',
+            path: insertAfterPath,
+            eventsToInsert: localEventsToInsert || undefined,
+          });
+          break;
         case 'insert_as_sub_event':
           if (!parsedPath) {
             console.warn(
@@ -246,6 +394,62 @@ export const applyEventsChanges = (
           operations.push({
             type: 'insertAsSub',
             path: parsedPath, // This path is to the parent event
+            eventsToInsert: localEventsToInsert || undefined,
+          });
+          break;
+        case 'insert_actions_conditions_at_end':
+          if (!parsedPath) {
+            console.warn(
+              `Skipping "insert_actions_conditions_at_end" due to missing or invalid path.`
+            );
+            if (localEventsToInsert) localEventsToInsert.delete();
+            return;
+          }
+          operations.push({
+            type: 'insertActionsConditionsAtEnd',
+            path: parsedPath,
+            eventsToInsert: localEventsToInsert || undefined,
+          });
+          break;
+        case 'insert_actions_conditions_at_start':
+          if (!parsedPath) {
+            console.warn(
+              `Skipping "insert_actions_conditions_at_start" due to missing or invalid path.`
+            );
+            if (localEventsToInsert) localEventsToInsert.delete();
+            return;
+          }
+          operations.push({
+            type: 'insertActionsConditionsAtStart',
+            path: parsedPath,
+            eventsToInsert: localEventsToInsert || undefined,
+          });
+          break;
+        case 'replace_all_actions':
+          if (!parsedPath) {
+            console.warn(
+              `Skipping "replace_all_actions" due to missing or invalid path.`
+            );
+            if (localEventsToInsert) localEventsToInsert.delete();
+            return;
+          }
+          operations.push({
+            type: 'replaceAllActions',
+            path: parsedPath,
+            eventsToInsert: localEventsToInsert || undefined,
+          });
+          break;
+        case 'replace_all_conditions':
+          if (!parsedPath) {
+            console.warn(
+              `Skipping "replace_all_conditions" due to missing or invalid path.`
+            );
+            if (localEventsToInsert) localEventsToInsert.delete();
+            return;
+          }
+          operations.push({
+            type: 'replaceAllConditions',
+            path: parsedPath,
             eventsToInsert: localEventsToInsert || undefined,
           });
           break;
@@ -358,6 +562,195 @@ export const applyEventsChanges = (
           console.warn(
             `InsertAsSub operation for parent path [${pathForLog}] skipped: no events to insert or events list is empty.`
           );
+        }
+      } else if (op.type === 'replaceKeepSubEvents') {
+        // Replace the event but keep existing sub-events
+        const { parentList, eventIndexInParentList } = getParentListAndIndex(
+          sceneEvents,
+          op.path,
+          'access'
+        );
+        const targetEvent = parentList.getEventAt(eventIndexInParentList);
+
+        // Get existing sub-events from target event before replacement
+        let existingSubEvents: gdEventsList | null = null;
+        if (targetEvent.canHaveSubEvents()) {
+          existingSubEvents = new gd.EventsList();
+          const targetSubEvents = targetEvent.getSubEvents();
+          existingSubEvents.insertEvents(
+            targetSubEvents,
+            0,
+            targetSubEvents.getEventsCount(),
+            0
+          );
+        }
+
+        // Delete the target event
+        parentList.removeEventAt(eventIndexInParentList);
+
+        // Insert new events from generated events
+        if (op.eventsToInsert && !op.eventsToInsert.isEmpty()) {
+          parentList.insertEvents(
+            op.eventsToInsert,
+            0,
+            op.eventsToInsert.getEventsCount(),
+            eventIndexInParentList
+          );
+
+          // If there were existing sub-events, add them to the first new event
+          if (existingSubEvents && existingSubEvents.getEventsCount() > 0) {
+            const firstNewEvent = parentList.getEventAt(eventIndexInParentList);
+            if (firstNewEvent.canHaveSubEvents()) {
+              const newSubEvents = firstNewEvent.getSubEvents();
+              // Insert existing sub-events at the beginning
+              newSubEvents.insertEvents(
+                existingSubEvents,
+                0,
+                existingSubEvents.getEventsCount(),
+                0
+              );
+            }
+          }
+        }
+
+        if (existingSubEvents) {
+          existingSubEvents.delete();
+        }
+      } else if (op.type === 'insertActionsConditionsAtEnd') {
+        // Copy actions/conditions from generated event(s) to target event at end
+        const targetEvent = getEventByPath(sceneEvents, op.path);
+        const eventsToInsert = op.eventsToInsert;
+        if (eventsToInsert && !eventsToInsert.isEmpty()) {
+          for (let i = 0; i < eventsToInsert.getEventsCount(); i++) {
+            const sourceEvent = eventsToInsert.getEventAt(i);
+
+            // Copy conditions
+            const sourceConditions = getEventConditions(sourceEvent);
+            const targetConditions = getEventConditions(targetEvent);
+            if (sourceConditions && targetConditions) {
+              copyInstructions(
+                sourceConditions,
+                targetConditions,
+                targetConditions.size()
+              );
+            }
+
+            // Copy actions
+            const sourceActions = getEventActions(sourceEvent);
+            const targetActions = getEventActions(targetEvent);
+            if (sourceActions && targetActions) {
+              copyInstructions(
+                sourceActions,
+                targetActions,
+                targetActions.size()
+              );
+            }
+
+            // Copy while conditions if both are While events
+            const sourceWhileConditions = getEventWhileConditions(sourceEvent);
+            const targetWhileConditions = getEventWhileConditions(targetEvent);
+            if (sourceWhileConditions && targetWhileConditions) {
+              copyInstructions(
+                sourceWhileConditions,
+                targetWhileConditions,
+                targetWhileConditions.size()
+              );
+            }
+          }
+        }
+      } else if (op.type === 'insertActionsConditionsAtStart') {
+        // Copy actions/conditions from generated event(s) to target event at start
+        const targetEvent = getEventByPath(sceneEvents, op.path);
+        const eventsToInsert = op.eventsToInsert;
+        if (eventsToInsert && !eventsToInsert.isEmpty()) {
+          // Process in reverse order so that insertion at start maintains order
+          for (let i = eventsToInsert.getEventsCount() - 1; i >= 0; i--) {
+            const sourceEvent = eventsToInsert.getEventAt(i);
+
+            // Copy conditions at start
+            const sourceConditions = getEventConditions(sourceEvent);
+            const targetConditions = getEventConditions(targetEvent);
+            if (sourceConditions && targetConditions) {
+              copyInstructions(sourceConditions, targetConditions, 0);
+            }
+
+            // Copy actions at start
+            const sourceActions = getEventActions(sourceEvent);
+            const targetActions = getEventActions(targetEvent);
+            if (sourceActions && targetActions) {
+              copyInstructions(sourceActions, targetActions, 0);
+            }
+
+            // Copy while conditions at start if both are While events
+            const sourceWhileConditions = getEventWhileConditions(sourceEvent);
+            const targetWhileConditions = getEventWhileConditions(targetEvent);
+            if (sourceWhileConditions && targetWhileConditions) {
+              copyInstructions(sourceWhileConditions, targetWhileConditions, 0);
+            }
+          }
+        }
+      } else if (op.type === 'replaceAllActions') {
+        // Clear target event actions and replace with generated event(s) actions
+        const targetEvent = getEventByPath(sceneEvents, op.path);
+        const targetActions = getEventActions(targetEvent);
+        if (targetActions) {
+          targetActions.clear();
+          const eventsToInsert = op.eventsToInsert;
+          if (eventsToInsert && !eventsToInsert.isEmpty()) {
+            for (let i = 0; i < eventsToInsert.getEventsCount(); i++) {
+              const sourceEvent = eventsToInsert.getEventAt(i);
+              const sourceActions = getEventActions(sourceEvent);
+              if (sourceActions) {
+                copyInstructions(
+                  sourceActions,
+                  targetActions,
+                  targetActions.size()
+                );
+              }
+            }
+          }
+        }
+      } else if (op.type === 'replaceAllConditions') {
+        // Clear target event conditions and replace with generated event(s) conditions
+        const targetEvent = getEventByPath(sceneEvents, op.path);
+        const eventsToInsert = op.eventsToInsert;
+        const targetConditions = getEventConditions(targetEvent);
+        if (targetConditions) {
+          targetConditions.clear();
+          if (eventsToInsert && !eventsToInsert.isEmpty()) {
+            for (let i = 0; i < eventsToInsert.getEventsCount(); i++) {
+              const sourceEvent = eventsToInsert.getEventAt(i);
+              const sourceConditions = getEventConditions(sourceEvent);
+              if (sourceConditions) {
+                copyInstructions(
+                  sourceConditions,
+                  targetConditions,
+                  targetConditions.size()
+                );
+              }
+            }
+          }
+        }
+
+        // Also replace while conditions if both are While events
+        const targetWhileConditions = getEventWhileConditions(targetEvent);
+        if (targetWhileConditions) {
+          targetWhileConditions.clear();
+          if (eventsToInsert && !eventsToInsert.isEmpty()) {
+            for (let i = 0; i < eventsToInsert.getEventsCount(); i++) {
+              const sourceEvent = eventsToInsert.getEventAt(i);
+              const sourceWhileConditions = getEventWhileConditions(
+                sourceEvent
+              );
+              if (sourceWhileConditions) {
+                copyInstructions(
+                  sourceWhileConditions,
+                  targetWhileConditions,
+                  targetWhileConditions.size()
+                );
+              }
+            }
+          }
         }
       }
     } catch (error) {

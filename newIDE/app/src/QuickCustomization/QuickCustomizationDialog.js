@@ -31,6 +31,7 @@ type Props = {|
   sourceGameId: string,
   gameScreenshotUrls: Array<string>,
   onScreenshotsClaimed: () => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
@@ -47,6 +48,7 @@ export const QuickCustomizationDialog = ({
   sourceGameId,
   gameScreenshotUrls,
   onScreenshotsClaimed,
+  onWillInstallExtension,
   onExtensionInstalled,
 }: Props) => {
   const { triggerUnsavedChanges } = React.useContext(UnsavedChangesContext);
@@ -77,6 +79,7 @@ export const QuickCustomizationDialog = ({
     onContinueQuickCustomization,
     gameScreenshotUrls,
     onScreenshotsClaimed,
+    onWillInstallExtension,
     onExtensionInstalled,
   });
 

@@ -3,7 +3,10 @@
  *  2013-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 namespace gdjs {
-  /** Base parameters for gdjs.TextRuntimeObject */
+  /**
+   * Base parameters for gdjs.TextRuntimeObject
+   * @category Objects > Text
+   */
   export type TextObjectDataType = {
     content: {
       /** The size of the characters */
@@ -39,8 +42,14 @@ namespace gdjs {
     };
   };
 
+  /**
+   * @category Objects > Text
+   */
   export type TextObjectData = ObjectData & TextObjectDataType;
 
+  /**
+   * @category Objects > Text
+   */
   export type TextObjectNetworkSyncDataType = {
     str: string;
     o: float;
@@ -68,11 +77,15 @@ namespace gdjs {
     lh: float;
   };
 
+  /**
+   * @category Objects > Text
+   */
   export type TextObjectNetworkSyncData = ObjectNetworkSyncData &
     TextObjectNetworkSyncDataType;
 
   /**
    * Displays a text.
+   * @category Objects > Text
    */
   export class TextRuntimeObject
     extends gdjs.RuntimeObject
@@ -340,7 +353,9 @@ namespace gdjs {
       return this._renderer.getRendererObject();
     }
 
-    override update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+    override updatePreRender(
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ): void {
       this._renderer.ensureUpToDate();
     }
 
@@ -358,9 +373,11 @@ namespace gdjs {
       } else {
         this.setWrapping(false);
       }
-      if (initialInstanceData.opacity !== undefined) {
-        this.setOpacity(initialInstanceData.opacity);
-      }
+      this.setOpacity(
+        initialInstanceData.opacity === undefined
+          ? 255
+          : initialInstanceData.opacity
+      );
     }
 
     /**

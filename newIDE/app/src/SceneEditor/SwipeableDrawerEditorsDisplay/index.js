@@ -33,6 +33,7 @@ import {
   type InstanceOrObjectPropertiesEditorInterface,
 } from '../InstanceOrObjectPropertiesEditorContainer';
 import { useDoNowOrAfterRender } from '../../Utils/UseDoNowOrAfterRender';
+import { EmbeddedGameFrameHole } from '../../EmbeddedGame/EmbeddedGameFrameHole';
 
 export const swipeableDrawerContainerId = 'swipeable-drawer-container';
 
@@ -48,7 +49,13 @@ const noop = () => {};
 
 const styles = {
   container: { width: '100%' },
-  bottomContainer: { position: 'absolute', bottom: 0, width: '100%' },
+  bottomContainer: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    // Restore pointer events that are removed when using the EmbeddedGameFrame.
+    pointerEvents: 'all',
+  },
   instancesListContainer: { display: 'flex', flex: 1 },
 };
 
@@ -58,6 +65,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
   SceneEditorsDisplayInterface
 >((props, ref) => {
   const {
+    gameEditorMode,
     project,
     resourceManagementProps,
     layout,
@@ -70,9 +78,16 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     objectsContainer,
     projectScopedContainersAccessor,
     initialInstances,
+    chosenLayer,
     selectedLayer,
     onSelectInstances,
+    onInstancesModified,
+
+    onWillInstallExtension,
     onExtensionInstalled,
+    isActive,
+    onRestartInGameEditor,
+    showRestartInGameEditorAfterErrorButton,
   } = props;
   const selectedInstances = props.instancesSelection.getSelectedInstances();
   const { values } = React.useContext(PreferencesContext);
@@ -89,6 +104,8 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
   const objectsListDoNowOrAfterRender = useDoNowOrAfterRender<?ObjectsListInterface>(
     objectsListRef
   );
+  const bottomContainerRef = React.useRef<?HTMLDivElement>(null);
+  const [bottomContainerHeight, setBottomContainerHeight] = React.useState(0);
 
   const [selectedEditorId, setSelectedEditorId] = React.useState<?EditorId>(
     null
@@ -135,18 +152,30 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     []
   );
   const forceUpdateLayersList = React.useCallback(() => {
-    if (layersListRef.current) layersListRef.current.forceUpdate();
+    if (layersListRef.current) layersListRef.current.forceUpdateList();
   }, []);
   const getInstanceSize = React.useCallback((instance: gdInitialInstance) => {
-    if (!editorRef.current) return [0, 0, 0];
-
-    return editorRef.current.getInstanceSize(instance);
+    return editorRef.current
+      ? editorRef.current.getInstanceSize(instance)
+      : [
+          instance.getDefaultWidth(),
+          instance.getDefaultHeight(),
+          instance.getDefaultDepth(),
+        ];
   }, []);
   const isEditorVisible = React.useCallback(
     (editorId: EditorId) => {
       return editorId === selectedEditorId && drawerOpeningState !== 'closed';
     },
     [selectedEditorId, drawerOpeningState]
+  );
+  const ensureEditorVisible = React.useCallback(
+    (editorId: EditorId) => {
+      if (!isEditorVisible(editorId)) {
+        halfOpenOrCloseDrawerOnEditor(editorId);
+      }
+    },
+    [halfOpenOrCloseDrawerOnEditor, isEditorVisible]
   );
   const openNewObjectDialog = React.useCallback(
     () => {
@@ -175,6 +204,15 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     else editor.pauseSceneRendering();
   }, []);
 
+  React.useLayoutEffect(
+    () => {
+      if (bottomContainerRef.current) {
+        setBottomContainerHeight(bottomContainerRef.current.clientHeight || 0);
+      }
+    },
+    [drawerOpeningState]
+  );
+
   React.useImperativeHandle(ref, () => {
     const { current: editor } = editorRef;
 
@@ -189,6 +227,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
       openNewObjectDialog,
       toggleEditorView: halfOpenOrCloseDrawerOnEditor,
       isEditorVisible,
+      ensureEditorVisible,
       startSceneRendering,
       viewControls: {
         zoomBy: editor ? editor.zoomBy : noop,
@@ -267,45 +306,61 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
             componentTitle={<Trans>Instances editor.</Trans>}
             scope="scene-editor-canvas"
           >
-            <InstancesEditor
-              ref={editorRef}
-              height={height}
-              width={width}
-              project={project}
-              layout={layout}
-              eventsBasedObject={eventsBasedObject}
-              eventsBasedObjectVariant={eventsBasedObjectVariant}
-              globalObjectsContainer={globalObjectsContainer}
-              objectsContainer={objectsContainer}
-              layersContainer={layersContainer}
-              selectedLayer={selectedLayer}
-              screenType={screenType}
-              initialInstances={initialInstances}
-              instancesEditorSettings={props.instancesEditorSettings}
-              onInstancesEditorSettingsMutated={
-                props.onInstancesEditorSettingsMutated
-              }
-              instancesSelection={props.instancesSelection}
-              onInstancesAdded={props.onInstancesAdded}
-              onInstancesSelected={props.onInstancesSelected}
-              onInstanceDoubleClicked={props.onInstanceDoubleClicked}
-              onInstancesMoved={props.onInstancesMoved}
-              onInstancesResized={props.onInstancesResized}
-              onInstancesRotated={props.onInstancesRotated}
-              selectedObjectNames={selectedObjectNames}
-              onContextMenu={props.onContextMenu}
-              isInstanceOf3DObject={props.isInstanceOf3DObject}
-              instancesEditorShortcutsCallbacks={
-                props.instancesEditorShortcutsCallbacks
-              }
-              pauseRendering={!props.isActive}
-              showObjectInstancesIn3D={values.use3DEditor}
-              showBasicProfilingCounters={values.showBasicProfilingCounters}
-              tileMapTileSelection={props.tileMapTileSelection}
-              onSelectTileMapTile={props.onSelectTileMapTile}
-            />
+            {gameEditorMode === 'embedded-game' ? (
+              <EmbeddedGameFrameHole
+                marginBottom={bottomContainerHeight}
+                isActive={isActive}
+                onRestartInGameEditor={onRestartInGameEditor}
+                showRestartInGameEditorAfterErrorButton={
+                  showRestartInGameEditorAfterErrorButton
+                }
+              />
+            ) : (
+              <InstancesEditor
+                ref={editorRef}
+                height={height}
+                width={width}
+                project={project}
+                layout={layout}
+                eventsBasedObject={eventsBasedObject}
+                eventsBasedObjectVariant={eventsBasedObjectVariant}
+                globalObjectsContainer={globalObjectsContainer}
+                objectsContainer={objectsContainer}
+                layersContainer={layersContainer}
+                chosenLayer={chosenLayer}
+                screenType={screenType}
+                initialInstances={initialInstances}
+                instancesEditorSettings={props.instancesEditorSettings}
+                onInstancesEditorSettingsMutated={
+                  props.onInstancesEditorSettingsMutated
+                }
+                instancesSelection={props.instancesSelection}
+                onInstancesAdded={props.onInstancesAdded}
+                onInstancesSelected={props.onInstancesSelected}
+                onInstanceDoubleClicked={props.onInstanceDoubleClicked}
+                onInstancesMoved={props.onInstancesMoved}
+                onInstancesResized={props.onInstancesResized}
+                onInstancesRotated={props.onInstancesRotated}
+                selectedObjectNames={selectedObjectNames}
+                onContextMenu={props.onContextMenu}
+                isInstanceOf3DObject={props.isInstanceOf3DObject}
+                instancesEditorShortcutsCallbacks={
+                  props.instancesEditorShortcutsCallbacks
+                }
+                pauseRendering={!props.isActive}
+                showObjectInstancesIn3D={values.use3DEditor}
+                showBasicProfilingCounters={values.showBasicProfilingCounters}
+                tileMapTileSelection={props.tileMapTileSelection}
+                onSelectTileMapTile={props.onSelectTileMapTile}
+                editorViewPosition2D={props.editorViewPosition2D}
+              />
+            )}
           </ErrorBoundary>
-          <div style={styles.bottomContainer} id={swipeableDrawerContainerId}>
+          <div
+            style={styles.bottomContainer}
+            id={swipeableDrawerContainerId}
+            ref={bottomContainerRef}
+          >
             <SwipeableDrawer
               maxHeight={height}
               title={title}
@@ -326,6 +381,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       globalObjectsContainer={globalObjectsContainer}
                       objectsContainer={objectsContainer}
                       layout={layout}
+                      eventsFunctionsExtension={eventsFunctionsExtension}
                       eventsBasedObject={eventsBasedObject}
                       initialInstances={initialInstances}
                       onSelectAllInstancesOfObjectInLayout={
@@ -368,12 +424,14 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       beforeSetAsGlobalObject={objectName =>
                         props.canObjectOrGroupBeGlobal(i18n, objectName)
                       }
+                      onSetAsGlobalObject={props.onSetAsGlobalObject}
                       ref={objectsListRef}
                       unsavedChanges={props.unsavedChanges}
                       hotReloadPreviewButtonProps={
                         props.hotReloadPreviewButtonProps
                       }
                       isListLocked={isCustomVariant}
+                      onWillInstallExtension={onWillInstallExtension}
                       onExtensionInstalled={onExtensionInstalled}
                     />
                   )}
@@ -397,19 +455,22 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       }
                       objects={selectedObjects}
                       instances={selectedInstances}
+                      layer={selectedLayer}
                       editInstanceVariables={props.editInstanceVariables}
                       editObjectInPropertiesPanel={
                         props.editObjectInPropertiesPanel
                       }
                       onEditObject={props.onEditObject}
+                      onObjectsModified={props.onObjectsModified}
+                      onEffectAdded={props.onEffectAdded}
                       onInstancesModified={forceUpdateInstancesList}
                       onGetInstanceSize={getInstanceSize}
                       ref={instanceOrObjectPropertiesEditorRef}
-                      unsavedChanges={props.unsavedChanges}
                       historyHandler={props.historyHandler}
                       tileMapTileSelection={props.tileMapTileSelection}
                       onSelectTileMapTile={props.onSelectTileMapTile}
                       lastSelectionType={props.lastSelectionType}
+                      onWillInstallExtension={props.onWillInstallExtension}
                       onExtensionInstalled={props.onExtensionInstalled}
                       onOpenEventBasedObjectVariantEditor={
                         props.onOpenEventBasedObjectVariantEditor
@@ -419,6 +480,19 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       }
                       isVariableListLocked={isCustomVariant}
                       isBehaviorListLocked={isCustomVariant}
+                      onEditLayerEffects={props.editLayerEffects}
+                      onEditLayer={props.editLayer}
+                      onLayersModified={props.onLayersModified}
+                      eventsBasedObject={props.eventsBasedObject}
+                      eventsBasedObjectVariant={props.eventsBasedObjectVariant}
+                      getContentAABB={
+                        editorRef.current
+                          ? editorRef.current.getContentAABB
+                          : () => null
+                      }
+                      onEventsBasedObjectChildrenEdited={
+                        props.onEventsBasedObjectChildrenEdited
+                      }
                     />
                   )}
                 </I18n>
@@ -466,6 +540,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                     instances={initialInstances}
                     selectedInstances={selectedInstances}
                     onSelectInstances={selectInstances}
+                    onInstancesModified={onInstancesModified || noop}
                     ref={instancesListRef}
                   />
                 </Paper>
@@ -476,19 +551,26 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                   layout={layout}
                   eventsFunctionsExtension={eventsFunctionsExtension}
                   eventsBasedObject={eventsBasedObject}
+                  chosenLayer={chosenLayer}
+                  onChooseLayer={props.onChooseLayer}
                   selectedLayer={selectedLayer}
                   onSelectLayer={props.onSelectLayer}
                   onEditLayerEffects={props.editLayerEffects}
+                  onLayersModified={props.onLayersModified}
+                  onLayersVisibilityInEditorChanged={
+                    props.onLayersVisibilityInEditorChanged
+                  }
                   onEditLayer={props.editLayer}
                   onRemoveLayer={props.onRemoveLayer}
                   onLayerRenamed={props.onLayerRenamed}
                   onCreateLayer={forceUpdatePropertiesEditor}
                   layersContainer={layersContainer}
-                  unsavedChanges={props.unsavedChanges}
                   ref={layersListRef}
                   hotReloadPreviewButtonProps={
                     props.hotReloadPreviewButtonProps
                   }
+                  onBackgroundColorChanged={props.onBackgroundColorChanged}
+                  gameEditorMode={props.gameEditorMode}
                 />
               )}
             </SwipeableDrawer>

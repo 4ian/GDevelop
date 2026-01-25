@@ -406,4 +406,10 @@ export default class Window {
     const browserWindow = remote.getCurrentWindow();
     return browserWindow.isFullScreen();
   }
+
+  static toggleMaximize() {
+    if (!ipcRenderer) return;
+
+    ipcRenderer.invoke('window-maximize-toggle');
+  }
 }

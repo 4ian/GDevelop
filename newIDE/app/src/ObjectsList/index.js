@@ -55,6 +55,7 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import type { MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import type { EventsScope } from '../InstructionOrExpression/EventsScope';
+import { type InstallAssetOutput } from '../AssetStore/InstallAsset';
 
 const gd: libGDevelop = global.gd;
 
@@ -134,6 +135,7 @@ export interface TreeViewItemContent {
   isDescendantOf(treeViewItemContent: TreeViewItemContent): boolean;
   isSibling(treeViewItemContent: TreeViewItemContent): boolean;
   isGlobal(): boolean;
+  is3D(): boolean;
   getObjectFolderOrObject(): gdObjectFolderOrObject | null;
 }
 
@@ -353,6 +355,10 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
     return false;
   }
 
+  is3D(): boolean {
+    return false;
+  }
+
   getObjectFolderOrObject(): gdObjectFolderOrObject | null {
     return null;
   }
@@ -377,6 +383,9 @@ const renderTreeViewItemRightComponent = (i18n: I18nType) => (
 ) => item.content.renderRightComponent(i18n);
 const renameItem = (item: TreeViewItem, newName: string) => {
   item.content.rename(newName);
+};
+const onClickItem = (item: TreeViewItem) => {
+  item.content.onClick();
 };
 const editItem = (item: TreeViewItem) => {
   item.content.edit();
@@ -423,6 +432,7 @@ export type ObjectsListInterface = {|
 type Props = {|
   project: gdProject,
   layout: ?gdLayout,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   eventsBasedObject: gdEventsBasedObject | null,
   initialInstances?: gdInitialInstancesContainer,
   /** The objects retrieved from ProjectScopedContainers must never be kept in a
@@ -457,8 +467,9 @@ type Props = {|
   ) => void,
   selectedObjectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext>,
 
-  beforeSetAsGlobalObject?: (groupName: string) => boolean,
+  beforeSetAsGlobalObject?: (objectName: string) => boolean,
   canSetAsGlobalObject?: boolean,
+  onSetAsGlobalObject: (object: gdObject) => void,
 
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onOpenEventBasedObjectEditor: (
@@ -471,14 +482,21 @@ type Props = {|
     variantName: string
   ) => void,
   onExportAssets: () => void,
-  onObjectCreated: gdObject => void,
-  onObjectEdited: ObjectWithContext => void,
+  onObjectCreated: (
+    objects: Array<gdObject>,
+    isTheFirstOfItsTypeInProject: boolean
+  ) => void,
+  onObjectEdited: (
+    objectWithContext: ObjectWithContext,
+    hasResourceChanged: boolean
+  ) => void,
   onObjectFolderOrObjectWithContextSelected: (
     ?ObjectFolderOrObjectWithContext
   ) => void,
   onObjectPasted?: gdObject => void,
   getValidatedObjectOrGroupName: (newName: string, global: boolean) => string,
   onAddObjectInstance: (objectName: string) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 
   getThumbnail: (
@@ -495,6 +513,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     {
       project,
       layout,
+      eventsFunctionsExtension,
       eventsBasedObject,
       initialInstances,
       projectScopedContainersAccessor,
@@ -508,6 +527,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
       beforeSetAsGlobalObject,
       canSetAsGlobalObject,
+      onSetAsGlobalObject,
 
       onEditObject,
       onOpenEventBasedObjectEditor,
@@ -519,6 +539,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       onObjectPasted,
       getValidatedObjectOrGroupName,
       onAddObjectInstance,
+      onWillInstallExtension,
       onExtensionInstalled,
 
       getThumbnail,
@@ -598,6 +619,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               globalObjectsContainer.hasObjectNamed(name))
         );
 
+        const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
+          project,
+          objectType
+        );
+
         let object;
         let objectFolderOrObjectWithContext;
         if (
@@ -659,11 +685,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         // TODO Should it be called later?
         if (onEditObject) {
           onEditObject(object);
-          onObjectCreated(object);
           onObjectFolderOrObjectWithContextSelected(
             objectFolderOrObjectWithContext
           );
         }
+        onObjectCreated([object], isTheFirstOfItsTypeInProject);
       },
       [
         project,
@@ -678,12 +704,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
 
     const onObjectsAddedFromAssets = React.useCallback(
-      (objects: Array<gdObject>) => {
+      ({
+        createdObjects: objects,
+        isTheFirstOfItsTypeInProject,
+      }: InstallAssetOutput) => {
         if (objects.length === 0) return;
 
-        objects.forEach(object => {
-          onObjectCreated(object);
-        });
+        onObjectCreated(objects, isTheFirstOfItsTypeInProject);
 
         // Here, the last object in the array might not be the last object
         // in the tree view, given the fact that assets are added in parallel
@@ -851,6 +878,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         );
         gd.WholeProjectRefactorer.updateBehaviorsSharedData(project);
         onObjectModified(true);
+        onSetAsGlobalObject(object);
 
         const newObjectFolderOrObjectWithContext = {
           objectFolderOrObject,
@@ -873,6 +901,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         globalObjectsContainer,
         objectsContainer,
         beforeSetAsGlobalObject,
+        onSetAsGlobalObject,
         onObjectModified,
         selectObjectFolderOrObjectWithContext,
         scrollToItem,
@@ -999,6 +1028,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         getValidatedObjectOrGroupName,
         onRenameObjectFolderOrObjectWithContextFinish,
         onObjectModified,
+        onObjectCreated,
         swapObjectAsset,
         onMovedObjectFolderOrObjectToAnotherFolderInSameContainer,
         canSetAsGlobalObject,
@@ -1027,6 +1057,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         getValidatedObjectOrGroupName,
         onRenameObjectFolderOrObjectWithContextFinish,
         onObjectModified,
+        onObjectCreated,
         swapObjectAsset,
         onMovedObjectFolderOrObjectToAnotherFolderInSameContainer,
         canSetAsGlobalObject,
@@ -1048,6 +1079,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         objectsContainer,
         onObjectPasted,
         onObjectModified,
+        onObjectCreated,
         editName,
         expandFolders,
         addFolder,
@@ -1067,6 +1099,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         objectsContainer,
         onObjectPasted,
         onObjectModified,
+        onObjectCreated,
         editName,
         expandFolders,
         addFolder,
@@ -1531,7 +1564,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                     <TreeView
                       key={listKey}
                       ref={treeViewRef}
-                      items={getTreeViewData(i18n)}
+                      items={
+                        // TreeView typing has issues, so we use any for now.
+                        // Search for "treeview typing issues" in the codebase.
+                        (getTreeViewData(i18n): any)
+                      }
                       height={height}
                       forceAllOpened={!!currentlyRunningInAppTutorial}
                       searchText={searchText}
@@ -1543,6 +1580,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       getItemHtmlId={getTreeViewItemHtmlId}
                       getItemDataset={getTreeViewItemDataSet}
                       onEditItem={editItem}
+                      onClickItem={onClickItem}
                       onCollapseItem={onCollapseItem}
                       selectedItems={selectedItems}
                       onSelectItems={items => {
@@ -1589,10 +1627,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             onObjectsAddedFromAssets={onObjectsAddedFromAssets}
             project={project}
             layout={layout}
+            eventsFunctionsExtension={eventsFunctionsExtension}
             eventsBasedObject={eventsBasedObject}
             objectsContainer={objectsContainer}
             resourceManagementProps={resourceManagementProps}
             targetObjectFolderOrObjectWithContext={newObjectDialogOpen.from}
+            onWillInstallExtension={onWillInstallExtension}
             onExtensionInstalled={onExtensionInstalled}
           />
         )}
@@ -1601,7 +1641,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             onClose={({ swappingDone }) => {
               setObjectAssetSwappingDialogOpen(null);
               if (swappingDone)
-                onObjectEdited(objectAssetSwappingDialogOpen.objectWithContext);
+                onObjectEdited(
+                  objectAssetSwappingDialogOpen.objectWithContext,
+                  true
+                );
             }}
             project={project}
             layout={layout}
@@ -1609,6 +1652,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             objectsContainer={objectsContainer}
             object={objectAssetSwappingDialogOpen.objectWithContext.object}
             resourceManagementProps={resourceManagementProps}
+            onWillInstallExtension={onWillInstallExtension}
             onExtensionInstalled={onExtensionInstalled}
           />
         )}

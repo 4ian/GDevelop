@@ -18,6 +18,8 @@ const fakeResourceManagementProps: ResourceManagementProps = {
   resourceExternalEditors: fakeResourceExternalEditors,
   getStorageProviderResourceOperations: () => null,
   canInstallPrivateAsset: () => false,
+  onNewResourcesAdded: () => {},
+  onResourceUsageChanged: () => {},
 };
 
 export default fakeResourceManagementProps;

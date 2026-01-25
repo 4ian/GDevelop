@@ -309,6 +309,13 @@ const editWithBrowserExternalEditor = async ({
       : null,
   });
 
+  const hasCreatedAnyResource = externalEditorOutput.resources.some(
+    resource => !resource.name
+  );
+  if (hasCreatedAnyResource) {
+    resourceManagementProps.onNewResourcesAdded();
+  }
+
   // Some editors (Piskel) need to have resource names persisted.
   patchExternalEditorMetadataWithResourcesNamesIfNecessary(
     modifiedResources.map(({ resource }) => resource.getName()),

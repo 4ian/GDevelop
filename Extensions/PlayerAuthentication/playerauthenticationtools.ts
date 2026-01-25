@@ -5,6 +5,7 @@ namespace gdjs {
   const logger = new gdjs.Logger('Player Authentication');
   const authComponents = gdjs.playerAuthenticationComponents;
 
+  /** @category Other extensions > Player Authentication */
   export type PlayerAuthenticationPlatform =
     | 'electron'
     | 'cordova-websocket'
@@ -13,6 +14,7 @@ namespace gdjs {
     | 'games-platform';
 
   // TODO EBO Replace runtimeScene to instanceContainer.
+  /** @category Other extensions > Player Authentication */
   export namespace playerAuthentication {
     // Authentication information.
     let _username: string | null = null;
@@ -647,6 +649,9 @@ namespace gdjs {
     export const displayAuthenticationBanner = function (
       runtimeScene: gdjs.RuntimeScene
     ) {
+      if (runtimeScene.getGame().isInGameEdition()) {
+        return;
+      }
       if (_authenticationBanner) {
         // Banner already displayed, ensure it's visible.
         _authenticationBanner.style.opacity = '1';
@@ -1042,6 +1047,10 @@ namespace gdjs {
     ): gdjs.PromiseTask<{ status: 'logged' | 'errored' | 'dismissed' }> =>
       new gdjs.PromiseTask(
         new Promise((resolve) => {
+          if (runtimeScene.getGame().isInGameEdition()) {
+            resolve({ status: 'dismissed' });
+          }
+
           // Create the authentication container for the player to wait.
           const domElementContainer = runtimeScene
             .getGame()

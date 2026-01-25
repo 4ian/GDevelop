@@ -8,6 +8,7 @@ declare class gdPlatform {
   isExtensionLoaded(name: string): boolean;
   removeExtension(name: string): void;
   reloadBuiltinExtensions(): void;
+  createObjectConfiguration(type: string): gdUniquePtrObjectConfiguration;
   getAllPlatformExtensions(): gdVectorPlatformExtension;
   delete(): void;
   ptr: number;

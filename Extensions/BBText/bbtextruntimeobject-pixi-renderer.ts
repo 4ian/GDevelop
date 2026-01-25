@@ -1,6 +1,7 @@
 namespace gdjs {
   /**
    * The PIXI.js renderer for the BBCode Text runtime object.
+   * @category Renderers > BBText
    */
   export class BBTextRuntimeObjectPixiRenderer {
     _object: gdjs.BBTextRuntimeObject;
@@ -158,6 +159,12 @@ namespace gdjs {
     }
   }
 
+  /**
+   * @category Renderers > BBText
+   */
   export const BBTextRuntimeObjectRenderer = BBTextRuntimeObjectPixiRenderer;
+  /**
+   * @category Renderers > BBText
+   */
   export type BBTextRuntimeObjectRenderer = BBTextRuntimeObjectPixiRenderer;
 }

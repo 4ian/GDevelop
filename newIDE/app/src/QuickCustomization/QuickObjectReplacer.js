@@ -14,6 +14,7 @@ import TipCard from './TipCard';
 type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
@@ -30,6 +31,7 @@ const styles = {
 export const QuickObjectReplacer = ({
   project,
   resourceManagementProps,
+  onWillInstallExtension,
   onExtensionInstalled,
 }: Props) => {
   const [selectedObjectToSwap, setSelectedObjectToSwap] = React.useState(null);
@@ -98,6 +100,7 @@ export const QuickObjectReplacer = ({
             setSelectedObjectToSwap(null);
           }}
           minimalUI
+          onWillInstallExtension={onWillInstallExtension}
           onExtensionInstalled={onExtensionInstalled}
         />
       )}

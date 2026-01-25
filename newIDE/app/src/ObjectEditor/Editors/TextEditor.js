@@ -53,6 +53,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
     const {
       objectConfiguration,
       project,
+      projectScopedContainersAccessor,
       resourceManagementProps,
       renderObjectNameField,
     } = this.props;
@@ -205,6 +206,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
         </ResponsiveLineStackLayout>
         <ResourceSelector
           project={project}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
           resourceManagementProps={resourceManagementProps}
           resourcesLoader={ResourcesLoader}
           resourceKind="font"

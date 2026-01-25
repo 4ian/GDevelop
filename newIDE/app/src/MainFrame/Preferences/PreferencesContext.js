@@ -183,6 +183,7 @@ export type PreferencesValues = {|
   hiddenAlertMessages: { [AlertMessageIdentifier]: boolean },
   hiddenTutorialHints: { [string]: boolean },
   hiddenAnnouncements: { [string]: boolean },
+  hiddenAskAiStandAloneForms: { [string]: boolean },
   autoDisplayChangelog: boolean,
   lastLaunchedVersion: ?string,
   eventsSheetShowObjectThumbnails: boolean,
@@ -227,13 +228,23 @@ export type PreferencesValues = {|
   gamesDashboardOrderBy: GamesDashboardOrderBy,
   takeScreenshotOnPreview: boolean,
   showAiAskButtonInTitleBar: boolean,
+  aiState: {| aiRequestId: string | null |},
+  automaticallyUseCreditsForAiRequests: boolean,
+  hasSeenInGameEditorWarning: boolean,
+  useBackgroundSerializerForSaving: boolean,
 |};
+
+/**
+ * Partial PreferencesValues that can be overridden per-project via preferences block in gdevelop-settings.yaml.
+ */
+export type ProjectSpecificPreferencesValues = $Shape<PreferencesValues>;
 
 /**
  * Type containing all the preferences of GDevelop and their setters.
  */
 export type Preferences = {|
   values: PreferencesValues,
+  setMultipleValues: (updates: ProjectSpecificPreferencesValues) => void,
   setLanguage: (language: string) => void,
   setThemeName: (themeName: string) => void,
   setCodeEditorThemeName: (codeEditorThemeName: string) => void,
@@ -246,6 +257,8 @@ export type Preferences = {|
   showAllTutorialHints: () => void,
   showAnnouncement: (identifier: string, show: boolean) => void,
   showAllAnnouncements: () => void,
+  showAskAiStandAloneForm: (identifier: string, show: boolean) => void,
+  showAllAskAiStandAloneForms: () => void,
   verifyIfIsNewVersion: () => boolean,
   setEventsSheetShowObjectThumbnails: (enabled: boolean) => void,
   setAutosaveOnPreview: (enabled: boolean) => void,
@@ -332,6 +345,12 @@ export type Preferences = {|
   ) => void,
   setTakeScreenshotOnPreview: (enabled: boolean) => void,
   setShowAiAskButtonInTitleBar: (enabled: boolean) => void,
+  setAiState: ({|
+    aiRequestId: string | null,
+  |}) => void,
+  setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => void,
+  setHasSeenInGameEditorWarning: (enabled: boolean) => void,
+  setUseBackgroundSerializerForSaving: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -348,6 +367,7 @@ export const initialPreferences = {
     hiddenAlertMessages: {},
     hiddenTutorialHints: {},
     hiddenAnnouncements: {},
+    hiddenAskAiStandAloneForms: {},
     autoDisplayChangelog: true,
     lastLaunchedVersion: undefined,
     eventsSheetShowObjectThumbnails: true,
@@ -390,7 +410,12 @@ export const initialPreferences = {
     gamesDashboardOrderBy: 'lastModifiedAt',
     takeScreenshotOnPreview: true,
     showAiAskButtonInTitleBar: true,
+    aiState: { aiRequestId: null },
+    automaticallyUseCreditsForAiRequests: false,
+    hasSeenInGameEditorWarning: false,
+    useBackgroundSerializerForSaving: false,
   },
+  setMultipleValues: () => {},
   setLanguage: () => {},
   setThemeName: () => {},
   setCodeEditorThemeName: () => {},
@@ -403,6 +428,8 @@ export const initialPreferences = {
   showAllTutorialHints: () => {},
   showAnnouncement: (identifier: string, show: boolean) => {},
   showAllAnnouncements: () => {},
+  showAskAiStandAloneForm: (identifier: string, show: boolean) => {},
+  showAllAskAiStandAloneForms: () => {},
   verifyIfIsNewVersion: () => false,
   setEventsSheetShowObjectThumbnails: () => {},
   setAutosaveOnPreview: () => {},
@@ -465,6 +492,10 @@ export const initialPreferences = {
   ) => {},
   setTakeScreenshotOnPreview: (enabled: boolean) => {},
   setShowAiAskButtonInTitleBar: (enabled: boolean) => {},
+  setAiState: ({ aiRequestId }: {| aiRequestId: string | null |}) => {},
+  setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => {},
+  setHasSeenInGameEditorWarning: (enabled: boolean) => {},
+  setUseBackgroundSerializerForSaving: (enabled: boolean) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

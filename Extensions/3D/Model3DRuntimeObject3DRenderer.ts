@@ -137,16 +137,20 @@ namespace gdjs {
       return this._model3DRuntimeObject._centerPoint || this._modelOriginPoint;
     }
 
-    private _updateDefaultTransformation(
+    /**
+     * Transform `threeObject` to fit in a 1x1x1 cube.
+     *
+     * When the object change of size, rotation or position,
+     * the transformation is done on the parent of `threeObject`.
+     *
+     * This function doesn't mutate anything outside of `threeObject`.
+     */
+    stretchModelIntoUnitaryCube(
       threeObject: THREE.Object3D,
       rotationX: float,
       rotationY: float,
-      rotationZ: float,
-      originalWidth: float,
-      originalHeight: float,
-      originalDepth: float,
-      keepAspectRatio: boolean
-    ) {
+      rotationZ: float
+    ): THREE.Box3 {
       // These formulas are also used in:
       // - Model3DEditor.modelSize
       // - Model3DRendered2DInstance
@@ -166,19 +170,9 @@ namespace gdjs {
         // It also avoids to have the origin outside of the object box.
         boundingBox.expandByPoint(new THREE.Vector3(0, 0, 0));
       }
-
       const modelWidth = boundingBox.max.x - boundingBox.min.x;
       const modelHeight = boundingBox.max.y - boundingBox.min.y;
       const modelDepth = boundingBox.max.z - boundingBox.min.z;
-      this._modelOriginPoint[0] =
-        modelWidth < epsilon ? 0 : -boundingBox.min.x / modelWidth;
-      this._modelOriginPoint[1] =
-        modelHeight < epsilon ? 0 : -boundingBox.min.y / modelHeight;
-      this._modelOriginPoint[2] =
-        modelDepth < epsilon ? 0 : -boundingBox.min.z / modelDepth;
-
-      // The model is flipped on Y axis.
-      this._modelOriginPoint[1] = 1 - this._modelOriginPoint[1];
 
       // Center the model.
       const centerPoint = this._model3DRuntimeObject._centerPoint;
@@ -210,6 +204,39 @@ namespace gdjs {
       scaleMatrix.makeScale(scaleX, -scaleY, scaleZ);
       threeObject.updateMatrix();
       threeObject.applyMatrix4(scaleMatrix);
+
+      return boundingBox;
+    }
+
+    private _updateDefaultTransformation(
+      threeObject: THREE.Object3D,
+      rotationX: float,
+      rotationY: float,
+      rotationZ: float,
+      originalWidth: float,
+      originalHeight: float,
+      originalDepth: float,
+      keepAspectRatio: boolean
+    ) {
+      const boundingBox = this.stretchModelIntoUnitaryCube(
+        threeObject,
+        rotationX,
+        rotationY,
+        rotationZ
+      );
+      const modelWidth = boundingBox.max.x - boundingBox.min.x;
+      const modelHeight = boundingBox.max.y - boundingBox.min.y;
+      const modelDepth = boundingBox.max.z - boundingBox.min.z;
+
+      this._modelOriginPoint[0] =
+        modelWidth < epsilon ? 0 : -boundingBox.min.x / modelWidth;
+      this._modelOriginPoint[1] =
+        modelHeight < epsilon ? 0 : -boundingBox.min.y / modelHeight;
+      this._modelOriginPoint[2] =
+        modelDepth < epsilon ? 0 : -boundingBox.min.z / modelDepth;
+
+      // The model is flipped on Y axis.
+      this._modelOriginPoint[1] = 1 - this._modelOriginPoint[1];
 
       if (keepAspectRatio) {
         // Reduce the object dimensions to keep aspect ratio.
@@ -371,7 +398,11 @@ namespace gdjs {
       this._action.paused = false;
     }
 
-    playAnimation(animationName: string, shouldLoop: boolean) {
+    playAnimation(
+      animationName: string,
+      shouldLoop: boolean,
+      ignoreCrossFade: boolean = false
+    ) {
       const clip = THREE.AnimationClip.findByName(
         this._originalModel.animations,
         animationName
@@ -396,7 +427,11 @@ namespace gdjs {
       this._action.timeScale =
         this._model3DRuntimeObject.getAnimationSpeedScale();
 
-      if (previousAction && previousAction !== this._action) {
+      if (
+        previousAction &&
+        previousAction !== this._action &&
+        !ignoreCrossFade
+      ) {
         this._action.crossFadeFrom(
           previousAction,
           this._model3DRuntimeObject._crossfadeDuration,
@@ -433,6 +468,8 @@ namespace gdjs {
     }
   }
 
+  /** @category Renderers > 3D Model */
   export const Model3DRuntimeObjectRenderer = Model3DRuntimeObject3DRenderer;
+  /** @category Renderers > 3D Model */
   export type Model3DRuntimeObjectRenderer = Model3DRuntimeObject3DRenderer;
 }

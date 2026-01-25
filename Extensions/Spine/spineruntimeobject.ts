@@ -1,6 +1,7 @@
 namespace gdjs {
   type SpineAnimation = { name: string; source: string; loop: boolean };
 
+  /** @category Objects > Spine */
   export type SpineObjectDataType = {
     content: {
       opacity: float;
@@ -10,8 +11,10 @@ namespace gdjs {
       animations: SpineAnimation[];
     };
   };
+  /** @category Objects > Spine */
   export type SpineObjectData = ObjectData & SpineObjectDataType;
 
+  /** @category Objects > Spine */
   export type SpineNetworkSyncDataType = {
     opa: float;
     scaX: float;
@@ -25,9 +28,13 @@ namespace gdjs {
     anet: number;
   };
 
+  /** @category Objects > Spine */
   export type SpineNetworkSyncData = ObjectNetworkSyncData &
     SpineNetworkSyncDataType;
 
+  /**
+   * @category Objects > Spine
+   */
   export class SpineRuntimeObject
     extends gdjs.RuntimeObject
     implements
@@ -218,15 +225,13 @@ namespace gdjs {
         this.setSize(initialInstanceData.width, initialInstanceData.height);
         this.invalidateHitboxes();
       }
-      if (initialInstanceData.opacity !== undefined) {
-        this.setOpacity(initialInstanceData.opacity);
-      }
-      if (initialInstanceData.flippedX) {
-        this.flipX(initialInstanceData.flippedX);
-      }
-      if (initialInstanceData.flippedY) {
-        this.flipY(initialInstanceData.flippedY);
-      }
+      this.setOpacity(
+        initialInstanceData.opacity === undefined
+          ? 255
+          : initialInstanceData.opacity
+      );
+      this.flipX(!!initialInstanceData.flippedX);
+      this.flipY(!!initialInstanceData.flippedY);
     }
 
     getDrawableX(): number {
@@ -527,6 +532,72 @@ namespace gdjs {
     getPointAttachmentY(attachmentName: string, slotName?: string): number {
       return this._renderer.getPointAttachmentPosition(attachmentName, slotName)
         .y;
+    }
+
+    getPointAttachmentScaleXWorld(
+      attachmentName: string,
+      slotName?: string
+    ): number {
+      return this._renderer.getPointAttachmentScale(
+        attachmentName,
+        slotName,
+        true
+      ).x;
+    }
+
+    getPointAttachmentScaleXLocal(
+      attachmentName: string,
+      slotName?: string
+    ): number {
+      return this._renderer.getPointAttachmentScale(
+        attachmentName,
+        slotName,
+        false
+      ).x;
+    }
+
+    getPointAttachmentScaleYWorld(
+      attachmentName: string,
+      slotName?: string
+    ): number {
+      return this._renderer.getPointAttachmentScale(
+        attachmentName,
+        slotName,
+        true
+      ).y;
+    }
+
+    getPointAttachmentScaleYLocal(
+      attachmentName: string,
+      slotName?: string
+    ): number {
+      return this._renderer.getPointAttachmentScale(
+        attachmentName,
+        slotName,
+        false
+      ).y;
+    }
+
+    getPointAttachmentRotationWorld(
+      attachmentName: string,
+      slotName?: string
+    ): number {
+      return this._renderer.getPointAttachmentRotation(
+        attachmentName,
+        slotName,
+        true
+      );
+    }
+
+    getPointAttachmentRotationLocal(
+      attachmentName: string,
+      slotName?: string
+    ): number {
+      return this._renderer.getPointAttachmentRotation(
+        attachmentName,
+        slotName,
+        false
+      );
     }
 
     getAnimationDuration(): number {

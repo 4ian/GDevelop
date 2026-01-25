@@ -1,4 +1,5 @@
 namespace gdjs {
+  /** @category Renderers > Shape Painter */
   class ShapePainterRuntimeObjectPixiRenderer {
     _object: gdjs.ShapePainterRuntimeObject;
     _graphics: PIXI.Graphics;
@@ -19,6 +20,8 @@ namespace gdjs {
     _transformationIsUpToDate = false;
 
     _antialiasingFilter: null | PIXI.Filter = null;
+
+    _placeholder: PIXI.Sprite | null = null;
 
     private static readonly _positionForTransformation: PIXI.IPointData = {
       x: 0,
@@ -405,6 +408,24 @@ namespace gdjs {
 
     updatePreRender(): void {
       this.updatePositionIfNeeded();
+
+      const game = this._object.getRuntimeScene().getGame();
+      if (
+        game.isInGameEdition() &&
+        this._graphics.geometry.graphicsData.length === 0
+      ) {
+        if (!this._placeholder) {
+          const texture = game
+            .getImageManager()
+            .getPIXITexture('InGameEditor-ShapePainterIcon');
+          this._placeholder = new PIXI.Sprite(texture);
+          this._graphics.addChild(this._placeholder);
+        }
+      } else if (this._placeholder) {
+        this._placeholder.removeFromParent();
+        this._placeholder.destroy();
+        this._placeholder = null;
+      }
     }
 
     updatePositionX(): void {
@@ -613,11 +634,18 @@ namespace gdjs {
 
     destroy(): void {
       this._graphics.destroy();
+      if (this._placeholder) {
+        this._placeholder.removeFromParent();
+        this._placeholder.destroy();
+        this._placeholder = null;
+      }
     }
   }
 
+  /** @category Renderers > Shape Painter */
   export const ShapePainterRuntimeObjectRenderer =
     ShapePainterRuntimeObjectPixiRenderer;
+  /** @category Renderers > Shape Painter */
   export type ShapePainterRuntimeObjectRenderer =
     ShapePainterRuntimeObjectPixiRenderer;
 }

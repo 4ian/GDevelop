@@ -43,7 +43,7 @@ import {
 import {
   getPlanIcon,
   getPlanInferredNameFromId,
-} from '../../Profile/Subscription/PlanCard';
+} from '../../Profile/Subscription/PlanSmallCard';
 import Store from '../../UI/CustomSvgIcons/Store';
 import Hammer from '../../UI/CustomSvgIcons/Hammer';
 import School from '../../UI/CustomSvgIcons/School';

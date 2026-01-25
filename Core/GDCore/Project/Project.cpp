@@ -29,7 +29,7 @@
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/ObjectConfiguration.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
-#include "GDCore/Project/ResourcesManager.h"
+#include "GDCore/Project/ResourcesContainer.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
@@ -75,6 +75,7 @@ Project::Project()
       gdBuildVersion(gd::VersionWrapper::Build()),
       variables(gd::VariablesContainer::SourceType::Global),
       objectsContainer(gd::ObjectsContainer::SourceType::Global),
+      resourcesContainer(gd::ResourcesContainer::SourceType::Global),
       sceneResourcesPreloading("at-startup"),
       sceneResourcesUnloading("never") {}
 
@@ -730,6 +731,8 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   SetPackageName(propElement.GetStringAttribute("packageName"));
   SetTemplateSlug(propElement.GetStringAttribute("templateSlug"));
   SetOrientation(propElement.GetStringAttribute("orientation", "default"));
+  SetEffectsHiddenInEditor(
+      propElement.GetBoolAttribute("areEffectsHiddenInEditor", false));
   SetFolderProject(propElement.GetBoolAttribute("folderProject"));
   SetLastCompilationDirectory(propElement
                                   .GetChild("latestCompilationDirectory",
@@ -865,7 +868,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
 
   objectsContainer.GetObjectGroups().UnserializeFrom(
       element.GetChild("objectsGroups", 0, "ObjectGroups"));
-  resourcesManager.UnserializeFrom(
+  resourcesContainer.UnserializeFrom(
       element.GetChild("resources", 0, "Resources"));
   objectsContainer.UnserializeObjectsFrom(*this, element.GetChild("objects", 0, "Objects"));
   if (element.HasChild("objectsFolderStructure")) {
@@ -1109,6 +1112,10 @@ void Project::SerializeTo(SerializerElement& element) const {
   propElement.SetAttribute("packageName", packageName);
   propElement.SetAttribute("templateSlug", templateSlug);
   propElement.SetAttribute("orientation", orientation);
+  if (areEffectsHiddenInEditor) {
+    propElement.SetBoolAttribute("areEffectsHiddenInEditor",
+                                 areEffectsHiddenInEditor);
+  }
   platformSpecificAssets.SerializeTo(
       propElement.AddChild("platformSpecificAssets"));
   loadingScreen.SerializeTo(propElement.AddChild("loadingScreen"));
@@ -1150,6 +1157,8 @@ void Project::SerializeTo(SerializerElement& element) const {
   // end of compatibility code
 
   extensionProperties.SerializeTo(propElement.AddChild("extensionProperties"));
+  
+  playableDevicesElement.AddChild("").SetStringValue("mobile");
 
   SerializerElement& platformsElement = propElement.AddChild("platforms");
   platformsElement.ConsiderAsArrayOf("platform");
@@ -1175,7 +1184,7 @@ void Project::SerializeTo(SerializerElement& element) const {
     propElement.SetAttribute("sceneResourcesUnloading", sceneResourcesUnloading);
   }
 
-  resourcesManager.SerializeTo(element.AddChild("resources"));
+  resourcesContainer.SerializeTo(element.AddChild("resources"));
   objectsContainer.SerializeObjectsTo(element.AddChild("objects"));
   objectsContainer.SerializeFoldersTo(element.AddChild("objectsFolderStructure"));
   objectsContainer.GetObjectGroups().SerializeTo(element.AddChild("objectsGroups"));
@@ -1248,7 +1257,8 @@ gd::String Project::GetSafeName(const gd::String& name) {
 }
 
 Project::Project(const Project &other)
-    : objectsContainer(gd::ObjectsContainer::SourceType::Global) {
+    : objectsContainer(gd::ObjectsContainer::SourceType::Global),
+      resourcesContainer(gd::ResourcesContainer::SourceType::Global) {
   Init(other);
 }
 
@@ -1302,7 +1312,7 @@ void Project::Init(const gd::Project& game) {
   currentPlatform = game.currentPlatform;
   platforms = game.platforms;
 
-  resourcesManager = game.resourcesManager;
+  resourcesContainer = game.resourcesContainer;
 
   objectsContainer = game.objectsContainer;
 
@@ -1319,6 +1329,8 @@ void Project::Init(const gd::Project& game) {
 
   sceneResourcesPreloading = game.sceneResourcesPreloading;
   sceneResourcesUnloading = game.sceneResourcesUnloading;
+
+  areEffectsHiddenInEditor = game.areEffectsHiddenInEditor;
 }
 
 }  // namespace gd

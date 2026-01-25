@@ -69,7 +69,7 @@ export class TabContentContainer extends React.Component<TabContentContainerProp
         style={{
           ...styles.tabContentContainer,
           ...(active ? undefined : { display: 'none' }),
-          pointerEvents: this.props.removePointerEvents ? 'none' : undefined,
+          pointerEvents: this.props.removePointerEvents ? 'none' : 'all',
         }}
       >
         {children}

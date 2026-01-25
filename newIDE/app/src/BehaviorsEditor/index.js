@@ -47,6 +47,7 @@ import ResponsiveFlatButton from '../UI/ResponsiveFlatButton';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import QuickCustomizationPropertiesVisibilityDialog from '../QuickCustomization/QuickCustomizationPropertiesVisibilityDialog';
 import Text from '../UI/Text';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
 
@@ -73,6 +74,7 @@ type BehaviorConfigurationEditorProps = {|
   behavior: gdBehavior,
   isChildObject: boolean,
   resourceManagementProps: ResourceManagementProps,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   onBehaviorsUpdated: () => void,
   onChangeBehaviorName: (behavior: gdBehavior, newName: string) => void,
   onRemoveBehavior: (behaviorName: string) => void,
@@ -97,6 +99,7 @@ const BehaviorConfigurationEditor = React.forwardRef<
       behavior,
       isChildObject,
       resourceManagementProps,
+      projectScopedContainersAccessor,
       onBehaviorsUpdated,
       onChangeBehaviorName,
       onRemoveBehavior,
@@ -282,6 +285,9 @@ const BehaviorConfigurationEditor = React.forwardRef<
                 project={project}
                 object={object}
                 resourceManagementProps={resourceManagementProps}
+                projectScopedContainersAccessor={
+                  projectScopedContainersAccessor
+                }
                 onBehaviorUpdated={onBehaviorsUpdated}
               />
             </Line>
@@ -319,6 +325,7 @@ export const useManageObjectBehaviors = ({
   onSizeUpdated,
   onBehaviorsUpdated,
   onUpdateBehaviorsSharedData,
+  onWillInstallExtension,
   onExtensionInstalled,
 }: {
   project: gdProject,
@@ -329,6 +336,7 @@ export const useManageObjectBehaviors = ({
   onSizeUpdated?: ?() => void,
   onBehaviorsUpdated?: ?() => void,
   onUpdateBehaviorsSharedData: () => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 }): UseManageBehaviorsState => {
   const [
@@ -595,6 +603,7 @@ export const useManageObjectBehaviors = ({
       onChoose={addBehavior}
       project={project}
       eventsFunctionsExtension={eventsFunctionsExtension}
+      onWillInstallExtension={onWillInstallExtension}
       onExtensionInstalled={onExtensionInstalled}
     />
   );
@@ -624,11 +633,13 @@ type Props = {|
   onUpdateBehaviorsSharedData: () => void,
   onSizeUpdated?: ?() => void,
   resourceManagementProps: ResourceManagementProps,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   onBehaviorsUpdated: () => void,
   openBehaviorEvents: (
     extensionName: string,
     behaviorName: string
   ) => Promise<void>,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   isListLocked: boolean,
 |};
@@ -649,6 +660,7 @@ const BehaviorsEditor = (props: Props) => {
     onBehaviorsUpdated,
     onUpdateBehaviorsSharedData,
     openBehaviorEvents,
+    onWillInstallExtension,
     onExtensionInstalled,
     isListLocked,
   } = props;
@@ -678,6 +690,7 @@ const BehaviorsEditor = (props: Props) => {
     onSizeUpdated,
     onBehaviorsUpdated,
     onUpdateBehaviorsSharedData,
+    onWillInstallExtension,
     onExtensionInstalled,
   });
 
@@ -806,6 +819,9 @@ const BehaviorsEditor = (props: Props) => {
                   canPasteBehaviors={isClipboardContainingBehaviors}
                   pasteBehaviors={pasteBehaviors}
                   resourceManagementProps={props.resourceManagementProps}
+                  projectScopedContainersAccessor={
+                    props.projectScopedContainersAccessor
+                  }
                   isListLocked={isListLocked}
                 />
               );

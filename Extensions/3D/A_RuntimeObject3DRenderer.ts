@@ -1,4 +1,5 @@
 namespace gdjs {
+  /** @category Renderers */
   export abstract class RuntimeObject3DRenderer {
     protected _object: gdjs.RuntimeObject3D;
     private _threeObject3D: THREE.Object3D;
@@ -11,6 +12,8 @@ namespace gdjs {
       this._object = runtimeObject;
       this._threeObject3D = threeObject3D;
       this._threeObject3D.rotation.order = 'ZYX';
+      //@ts-ignore
+      this._threeObject3D.gdjsRuntimeObject = runtimeObject;
 
       instanceContainer
         .getLayer('')

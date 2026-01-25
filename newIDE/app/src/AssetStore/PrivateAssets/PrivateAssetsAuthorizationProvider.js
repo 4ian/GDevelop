@@ -10,7 +10,7 @@ import {
 } from '../../Utils/GDevelopServices/Asset';
 import {
   addAssetToProject,
-  type InstallAssetOutput,
+  type AddAssetOutput,
   type InstallAssetArgs,
 } from '../InstallAsset';
 import {
@@ -116,7 +116,7 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
     objectsContainer,
     requestedObjectName,
     targetObjectFolderOrObject,
-  }: InstallAssetArgs): Promise<?InstallAssetOutput> => {
+  }: InstallAssetArgs): Promise<?AddAssetOutput> => {
     if (!profile) {
       throw new Error(
         'Unable to install the asset because no profile was found.'

@@ -33,6 +33,33 @@ import {
   TitleBarRightSafeMargins,
 } from './TitleBarSafeMargins';
 
+let openedDialogsCount = 0;
+
+export type OpenedDialogsCountCallback = ({
+  openedDialogsCount: number,
+}) => void;
+
+let openedDialogsCountCallbacks: OpenedDialogsCountCallback[] = [];
+export const registerOpenedDialogsCountCallback = (
+  callback: OpenedDialogsCountCallback
+) => {
+  openedDialogsCountCallbacks.push(callback);
+  callback({ openedDialogsCount }); // Ensure the callback is called with the current count.
+
+  return () => {
+    openedDialogsCountCallbacks.splice(
+      openedDialogsCountCallbacks.indexOf(callback),
+      1
+    );
+  };
+};
+
+const notifyOpenedDialogsCountCallbacks = () => {
+  openedDialogsCountCallbacks.forEach(callback =>
+    callback({ openedDialogsCount })
+  );
+};
+
 // Default.
 const dialogPaddingX = 24;
 const dialogTitlePadding = 16;
@@ -382,6 +409,21 @@ const DialogWithoutWindowSizeProvider = ({
       paperMinHeight,
       softKeyboardBottomOffset,
     ]
+  );
+
+  React.useEffect(
+    () => {
+      if (open) {
+        openedDialogsCount++;
+        notifyOpenedDialogsCountCallbacks();
+
+        return () => {
+          openedDialogsCount--;
+          notifyOpenedDialogsCountCallbacks();
+        };
+      }
+    },
+    [open]
   );
 
   return (

@@ -48,16 +48,20 @@ export const setupResourcesWatcher =
           // never ending.
           debouncedCallback(path);
         });
+
+        // Note: this ignore list is not a list of glob. Any file that matches a string in this list will be ignored.
+        // This could be improved to separate this in a list of paths, filenames, etc.
         const ignore = [
-          '**/.DS_Store', // macOS folder attributes file
-          '**/.git/**', // For projects using git as a versioning tool.
+          path.sep + '.DS_Store', // macOS folder attributes file
+          path.sep + '.git', // For projects using git as a versioning tool.
+          path.sep + 'node_modules', // For projects using npm (node_modules has way too many files and would crash the watcher on macOS)
           path.join(folderPath, gameFile),
           path.join(folderPath, autosaveFile),
         ];
         if (options && options.isProjectSplitInMultipleFiles) {
           ignore.push(
             ...splittedProjectFolderNames.map(folderName =>
-              path.join(folderPath, folderName, '*.json')
+              path.join(folderPath, folderName)
             )
           );
         }

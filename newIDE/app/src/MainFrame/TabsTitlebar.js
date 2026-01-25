@@ -17,6 +17,8 @@ import TextButton from '../UI/TextButton';
 import { useInterval } from '../Utils/UseInterval';
 import { useIsMounted } from '../Utils/UseIsMounted';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import Window from '../Utils/Window';
+import { isMacLike } from '../Utils/Platform';
 
 const WINDOW_DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
 const WINDOW_NON_DRAGGABLE_PART_CLASS_NAME = 'title-bar-non-draggable-part';
@@ -26,7 +28,7 @@ const styles = {
     display: 'flex',
     flexShrink: 0,
     alignItems: 'flex-end',
-    position: 'relative', // to ensure it is displayed above any global iframe.
+    position: 'relative', // to ensure it is displayed above any global iframe
   },
   menuIcon: {
     marginLeft: 4,
@@ -189,6 +191,13 @@ export default function TabsTitlebar({
     preferences.values.showAiAskButtonInTitleBar && displayAskAi && !hideAskAi;
   const isAskAiIconAnimated = useIsAskAiIconAnimated(shouldDisplayAskAi);
 
+  const handleDoubleClick = React.useCallback(() => {
+    // On macOS, double-clicking the title bar should maximize/restore the window
+    if (isMacLike()) {
+      Window.toggleMaximize();
+    }
+  }, []);
+
   return (
     <div
       style={{
@@ -199,6 +208,7 @@ export default function TabsTitlebar({
         pointerEvents: hidden ? undefined : 'all',
       }}
       className={WINDOW_DRAGGABLE_PART_CLASS_NAME}
+      onDoubleClick={handleDoubleClick}
     >
       {isLeftMostPane && <TitleBarLeftSafeMargins />}
       {displayMenuIcon && (

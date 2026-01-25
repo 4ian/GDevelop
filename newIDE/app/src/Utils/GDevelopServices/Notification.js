@@ -1,6 +1,7 @@
 // @flow
 import Axios from 'axios';
 import { GDevelopUserApi } from './ApiConfigs';
+import { ensureIsArray } from '../DataValidator';
 
 export const client = Axios.create({
   baseURL: GDevelopUserApi.baseUrl,
@@ -101,7 +102,10 @@ export const listNotifications = async (
     headers: { Authorization: authorizationHeader },
     params: { userId, perPage: 25 },
   });
-  return response.data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/notification of User API',
+  });
 };
 
 export const markNotificationsAsSeen = async (

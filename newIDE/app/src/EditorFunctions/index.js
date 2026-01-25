@@ -8,7 +8,10 @@ import {
   serializeToJSON,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
-import { type AiGeneratedEvent } from '../Utils/GDevelopServices/Generation';
+import {
+  type AiGeneratedEvent,
+  type AiGeneratedEventMissingResource,
+} from '../Utils/GDevelopServices/Generation';
 import { renderNonTranslatedEventsAsText } from '../EventsSheet/EventsTree/TextRenderer';
 import {
   addMissingObjectBehaviors,
@@ -94,6 +97,9 @@ export type EditorFunctionGenericOutput = {|
   instancesOnlyForObjectsNamed?: string, // Must be combined with `instancesForSceneNamed`.
   propertiesLayersEffectsForSceneNamed?: string,
   objectPropertiesDeduplicationKey?: string,
+
+  // Newly added resources from automatic resource installation:
+  newlyAddedResources?: string[],
 |};
 
 export type EventsGenerationResult =
@@ -131,6 +137,10 @@ export type AssetSearchAndInstallOptions = {|
   description: string,
   twoDimensionalViewKind: string,
 |};
+
+export type MissingResourcesSearchAndInstallFunction = (
+  missingResources: AiGeneratedEventMissingResource[]
+) => Promise<string[]>;
 
 export type EditorCallbacks = {|
   onOpenLayout: (
@@ -181,6 +191,7 @@ type RenderForEditorOptions = {|
   args: any,
   editorCallbacks: EditorCallbacks,
   shouldShowDetails: boolean,
+  editorFunctionCallResultOutput: any,
 |};
 
 type LaunchFunctionOptionsWithoutProject = {|
@@ -212,6 +223,7 @@ type LaunchFunctionOptionsWithoutProject = {|
   searchAndInstallAsset: (
     options: AssetSearchAndInstallOptions
   ) => Promise<AssetSearchAndInstallResult>,
+  searchAndInstallMissingResources: MissingResourcesSearchAndInstallFunction,
 |};
 
 export type LaunchFunctionOptionsWithProject = {|
@@ -3234,7 +3246,12 @@ const readSceneEvents: EditorFunction = {
  * Adds a new event to a scene's event sheet
  */
 const addSceneEvents: EditorFunction = {
-  renderForEditor: ({ args, shouldShowDetails, editorCallbacks }) => {
+  renderForEditor: ({
+    args,
+    shouldShowDetails,
+    editorCallbacks,
+    editorFunctionCallResultOutput,
+  }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const eventsDescription = extractRequiredString(args, 'events_description');
     const objectsListArgument = SafeExtractor.extractStringProperty(
@@ -3244,6 +3261,17 @@ const addSceneEvents: EditorFunction = {
     const objectsList = objectsListArgument === null ? '' : objectsListArgument;
     const placementHint =
       SafeExtractor.extractStringProperty(args, 'placement_hint') || '';
+
+    // Extract newly added resources from the output if available
+    const newlyAddedResourcesRaw = SafeExtractor.extractArrayProperty(
+      editorFunctionCallResultOutput,
+      'newlyAddedResources'
+    );
+    const newlyAddedResources: string[] = newlyAddedResourcesRaw
+      ? newlyAddedResourcesRaw.filter(
+          (item): boolean => typeof item === 'string'
+        )
+      : [];
 
     const details = shouldShowDetails ? (
       <ColumnStackLayout noMargin>
@@ -3286,28 +3314,53 @@ const addSceneEvents: EditorFunction = {
             : {objectsList}
           </Text>
         )}
+        {newlyAddedResources.length > 0 && (
+          <Text
+            noMargin
+            allowSelection
+            color="secondary"
+            style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
+          >
+            <b>
+              <Trans>Newly added resources</Trans>
+            </b>
+            : {newlyAddedResources.join(', ')}
+          </Text>
+        )}
       </ColumnStackLayout>
     ) : null;
+
+    const hasNewlyAddedResources = newlyAddedResources.length > 0;
 
     if (eventsDescription) {
       return {
         text: (
-          <Trans>
-            Add or rework{' '}
-            <Link
-              href="#"
-              onClick={() =>
-                editorCallbacks.onOpenLayout(scene_name, {
-                  openEventsEditor: true,
-                  openSceneEditor: true,
-                  focusWhenOpened: 'events',
-                })
-              }
-            >
-              events of scene {scene_name}
-            </Link>
-            .
-          </Trans>
+          <>
+            <Trans>
+              Add or rework{' '}
+              <Link
+                href="#"
+                onClick={() =>
+                  editorCallbacks.onOpenLayout(scene_name, {
+                    openEventsEditor: true,
+                    openSceneEditor: true,
+                    focusWhenOpened: 'events',
+                  })
+                }
+              >
+                events of scene {scene_name}
+              </Link>
+              .
+            </Trans>
+            {hasNewlyAddedResources && (
+              <>
+                {' '}
+                <Trans>
+                  Added resources: {newlyAddedResources.join(', ')}.
+                </Trans>
+              </>
+            )}
+          </>
         ),
         details,
         hasDetailsToShow: true,
@@ -3315,22 +3368,32 @@ const addSceneEvents: EditorFunction = {
     } else if (placementHint) {
       return {
         text: (
-          <Trans>
-            Adapt{' '}
-            <Link
-              href="#"
-              onClick={() =>
-                editorCallbacks.onOpenLayout(scene_name, {
-                  openEventsEditor: true,
-                  openSceneEditor: true,
-                  focusWhenOpened: 'events',
-                })
-              }
-            >
-              events of scene {scene_name}
-            </Link>{' '}
-            ("{placementHint}").
-          </Trans>
+          <>
+            <Trans>
+              Adapt{' '}
+              <Link
+                href="#"
+                onClick={() =>
+                  editorCallbacks.onOpenLayout(scene_name, {
+                    openEventsEditor: true,
+                    openSceneEditor: true,
+                    focusWhenOpened: 'events',
+                  })
+                }
+              >
+                events of scene {scene_name}
+              </Link>{' '}
+              ("{placementHint}").
+            </Trans>
+            {hasNewlyAddedResources && (
+              <>
+                {' '}
+                <Trans>
+                  Added resources: {newlyAddedResources.join(', ')}.
+                </Trans>
+              </>
+            )}
+          </>
         ),
         details,
         hasDetailsToShow: true,
@@ -3338,22 +3401,32 @@ const addSceneEvents: EditorFunction = {
     } else {
       return {
         text: (
-          <Trans>
-            Modify{' '}
-            <Link
-              href="#"
-              onClick={() =>
-                editorCallbacks.onOpenLayout(scene_name, {
-                  openEventsEditor: true,
-                  openSceneEditor: true,
-                  focusWhenOpened: 'events',
-                })
-              }
-            >
-              events of scene {scene_name}
-            </Link>
-            .
-          </Trans>
+          <>
+            <Trans>
+              Modify{' '}
+              <Link
+                href="#"
+                onClick={() =>
+                  editorCallbacks.onOpenLayout(scene_name, {
+                    openEventsEditor: true,
+                    openSceneEditor: true,
+                    focusWhenOpened: 'events',
+                  })
+                }
+              >
+                events of scene {scene_name}
+              </Link>
+              .
+            </Trans>
+            {hasNewlyAddedResources && (
+              <>
+                {' '}
+                <Trans>
+                  Added resources: {newlyAddedResources.join(', ')}.
+                </Trans>
+              </>
+            )}
+          </>
         ),
         details,
         hasDetailsToShow: true,
@@ -3369,6 +3442,7 @@ const addSceneEvents: EditorFunction = {
     ensureExtensionInstalled,
     onWillInstallExtension,
     onExtensionInstalled,
+    searchAndInstallMissingResources,
   }) => {
     const sceneName = extractRequiredString(args, 'scene_name');
     const eventsDescription = extractRequiredString(args, 'events_description');
@@ -3538,6 +3612,14 @@ const addSceneEvents: EditorFunction = {
           newOrChangedAiGeneratedEventIds: new Set([aiGeneratedEvent.id]),
         });
 
+        // Search and install missing resources if any
+        const allMissingResources = changes.flatMap(
+          change => change.missingResources || []
+        );
+        const newlyAddedResources = await searchAndInstallMissingResources(
+          allMissingResources
+        );
+
         const resultMessage =
           aiGeneratedEvent.resultMessage ||
           'Properly modified or added new event(s).';
@@ -3545,6 +3627,7 @@ const addSceneEvents: EditorFunction = {
           success: true,
           message: resultMessage,
           aiGeneratedEventId: aiGeneratedEvent.id,
+          newlyAddedResources,
         };
       } catch (error) {
         console.error(

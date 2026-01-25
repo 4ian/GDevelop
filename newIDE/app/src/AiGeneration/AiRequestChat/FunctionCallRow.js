@@ -104,11 +104,23 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
     );
   } else {
     try {
+      // Get the output from either the existing function call output or the current result
+      let editorFunctionCallResultOutput = null;
+      if (existingParsedOutput) {
+        editorFunctionCallResultOutput = existingParsedOutput;
+      } else if (
+        editorFunctionCallResult &&
+        editorFunctionCallResult.status === 'finished'
+      ) {
+        editorFunctionCallResultOutput = editorFunctionCallResult.output;
+      }
+
       const result = editorFunction.renderForEditor({
         project,
         args: JSON.parse(functionCall.arguments),
         editorCallbacks,
         shouldShowDetails: showDetails,
+        editorFunctionCallResultOutput,
       });
 
       text = result.text;

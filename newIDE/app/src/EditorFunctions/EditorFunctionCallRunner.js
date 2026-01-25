@@ -12,6 +12,7 @@ import {
   type EventsGenerationOptions,
   type AssetSearchAndInstallOptions,
   type AssetSearchAndInstallResult,
+  type MissingResourcesSearchAndInstallFunction,
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
@@ -67,6 +68,7 @@ export type ProcessEditorFunctionCallsOptions = {|
   searchAndInstallAsset: (
     options: AssetSearchAndInstallOptions
   ) => Promise<AssetSearchAndInstallResult>,
+  searchAndInstallMissingResources: MissingResourcesSearchAndInstallFunction,
 |};
 
 export const processEditorFunctionCalls = async ({
@@ -85,6 +87,7 @@ export const processEditorFunctionCalls = async ({
   onWillInstallExtension,
   onExtensionInstalled,
   searchAndInstallAsset,
+  searchAndInstallMissingResources,
 }: ProcessEditorFunctionCallsOptions): Promise<{|
   results: Array<EditorFunctionCallResult>,
   createdSceneNames: Array<string>,
@@ -187,6 +190,7 @@ export const processEditorFunctionCalls = async ({
         onWillInstallExtension,
         onExtensionInstalled,
         searchAndInstallAsset,
+        searchAndInstallMissingResources,
         PixiResourcesLoader,
       };
 

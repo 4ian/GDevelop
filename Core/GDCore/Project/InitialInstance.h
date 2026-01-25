@@ -16,6 +16,7 @@ class PropertyDescriptor;
 class Project;
 class Layout;
 class ObjectsContainer;
+class Object;
 }  // namespace gd
 
 namespace gd {
@@ -308,7 +309,17 @@ class GD_CORE_API InitialInstance {
    */
   ///@{
 
-  bool HasAnyBehaviorOverriding();
+  /**
+   * \brief Return `true` if any property from the overriding has a different
+   * value from any behavior.
+   */
+  bool HasAnyOverriddenProperty(const gd::Object &object);
+
+  /**
+   * \brief Return `true` if any property from the overriding has a different
+   * value from the given behavior.
+   */
+  bool HasAnyOverriddenPropertyForBehavior(const gd::Behavior &behavior);
 
   /**
    * \brief Return a reference to the content of the overriding of of the

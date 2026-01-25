@@ -34,6 +34,7 @@ import Add from '../../UI/CustomSvgIcons/Add';
 import {
   TopLevelCollapsibleSection,
   CollapsibleSubPanel,
+  type TitleBarButton,
 } from '../../ObjectEditor/CompactObjectPropertiesEditor';
 import { ColumnStackLayout } from '../../UI/Layout';
 import Link from '../../UI/Link';
@@ -58,6 +59,43 @@ const behaviorsHelpLink = getHelpLink('/behaviors');
 const noRefreshOfAllFields = () => {
   console.warn(
     "An instance tried to refresh all fields, but the editor doesn't support it."
+  );
+};
+
+export const StatefulCollapsibleSubPanel = ({
+  renderContent,
+  isInitiallyFolded,
+  toggleFolded,
+  title,
+  titleIcon,
+  titleBarButtons,
+}: {|
+  renderContent: () => React.Node,
+  isInitiallyFolded: boolean,
+  toggleFolded: () => void,
+  titleIcon?: ?React.Node,
+  title: string,
+  titleBarButtons?: Array<TitleBarButton>,
+|}) => {
+  const [isFolded, setIsFolded] = React.useState(isInitiallyFolded);
+
+  const onToggleFolded = React.useCallback(
+    () => {
+      setIsFolded(isFolded => !isFolded);
+      toggleFolded();
+    },
+    [toggleFolded]
+  );
+
+  return (
+    <CollapsibleSubPanel
+      renderContent={renderContent}
+      isFolded={isFolded}
+      toggleFolded={onToggleFolded}
+      title={title}
+      titleIcon={titleIcon}
+      titleBarButtons={titleBarButtons}
+    />
   );
 };
 
@@ -106,9 +144,6 @@ export const CompactInstancePropertiesEditor = ({
 }: Props) => {
   const forceUpdate = useForceUpdate();
   const instance = instances[0];
-  const [isBehaviorsFolded, setIsBehaviorsFolded] = React.useState(
-    !instance.hasAnyBehaviorOverriding()
-  );
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
 
   const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
@@ -228,6 +263,10 @@ export const CompactInstancePropertiesEditor = ({
     ]
   );
 
+  const [isBehaviorsFolded, setIsBehaviorsFolded] = React.useState(
+    object ? !instance.hasAnyOverriddenProperty(object) : true
+  );
+
   const shouldDisplayTileSetVisualizer =
     !!object && object.getType() === 'TileMap::SimpleTileMap';
 
@@ -342,7 +381,7 @@ export const CompactInstancePropertiesEditor = ({
                     const iconUrl = behaviorMetadata.getIconFilename();
 
                     return (
-                      <CollapsibleSubPanel
+                      <StatefulCollapsibleSubPanel
                         key={behavior.ptr}
                         renderContent={() => (
                           <CompactBehaviorPropertiesEditor
@@ -359,7 +398,11 @@ export const CompactInstancePropertiesEditor = ({
                             }
                           />
                         )}
-                        isFolded={behavior.isFolded()}
+                        isInitiallyFolded={
+                          !instance.hasAnyOverriddenPropertyForBehavior(
+                            behavior
+                          )
+                        }
                         toggleFolded={() => {
                           behavior.setFolded(!behavior.isFolded());
                           forceUpdate();

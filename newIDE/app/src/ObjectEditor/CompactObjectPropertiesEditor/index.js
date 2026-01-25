@@ -89,7 +89,7 @@ const objectVariablesHelpLink = getHelpLink(
   '/all-features/variables/object-variables'
 );
 
-type TitleBarButton = {|
+export type TitleBarButton = {|
   id: string,
   icon: any,
   label?: MessageDescriptor,

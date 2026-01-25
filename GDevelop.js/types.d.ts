@@ -1234,7 +1234,8 @@ export class InitialInstance extends EmscriptenObject {
   setRawDoubleProperty(name: string, value: number): void;
   setRawStringProperty(name: string, value: string): void;
   getVariables(): VariablesContainer;
-  hasAnyBehaviorOverriding(): boolean;
+  hasAnyOverriddenProperty(obj: gdObject): boolean;
+  hasAnyOverriddenPropertyForBehavior(behavior: Behavior): boolean;
   hasBehaviorOverridingNamed(name: string): boolean;
   addNewBehaviorOverriding(project: Project, type: string, name: string): Behavior;
   getBehaviorOverriding(name: string): Behavior;

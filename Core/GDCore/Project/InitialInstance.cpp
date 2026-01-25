@@ -326,14 +326,47 @@ void InitialInstance::SetRawStringProperty(const gd::String& name,
   stringProperties[name] = value;
 }
 
-bool InitialInstance::HasAnyBehaviorOverriding() {
-  for (auto &pair : behaviorOverridings) {
-    auto &behaviorOverriding = pair.second;
-    if (!behaviorOverriding->GetProperties().empty()) {
+bool InitialInstance::HasAnyOverriddenProperty(const gd::Object &object) {
+  for (auto &behaviorOverridingPair : behaviorOverridings) {
+    auto &behaviorName = behaviorOverridingPair.first;
+    auto &behaviorOverriding = behaviorOverridingPair.second;
+    if (behaviorOverriding->GetProperties().empty() ||
+        !object.HasBehaviorNamed(behaviorName)) {
+      continue;
+    }
+    const auto &behaviorProperties =
+        object.GetBehavior(behaviorName).GetProperties();
+    if (HasAnyOverriddenPropertyForBehavior(object.GetBehavior(behaviorName))) {
       return true;
     }
   }
+  return false;
+}
 
+bool InitialInstance::HasAnyOverriddenPropertyForBehavior(
+    const gd::Behavior &behavior) {
+  auto &behaviorName = behavior.GetName();
+  if (!HasBehaviorOverridingNamed(behaviorName)) {
+    return false;
+  }
+  auto &behaviorOverriding = GetBehaviorOverriding(behaviorName);
+  if (behaviorOverriding.GetProperties().empty()) {
+    return false;
+  }
+  const auto &behaviorProperties = behavior.GetProperties();
+  for (auto &overridingPropertyPair : behaviorOverriding.GetProperties()) {
+    auto &overridingPropertyName = overridingPropertyPair.first;
+    auto &overridingProperty = overridingPropertyPair.second;
+
+    if (behaviorProperties.find(overridingPropertyName) ==
+        behaviorProperties.end()) {
+      continue;
+    }
+    if (overridingProperty.GetValue() !=
+        behaviorProperties.at(overridingPropertyName).GetValue()) {
+      return true;
+    }
+  }
   return false;
 }
 

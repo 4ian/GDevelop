@@ -58,7 +58,8 @@ declare class gdInitialInstance {
   setRawDoubleProperty(name: string, value: number): void;
   setRawStringProperty(name: string, value: string): void;
   getVariables(): gdVariablesContainer;
-  hasAnyBehaviorOverriding(): boolean;
+  hasAnyOverriddenProperty(obj: gdObject): boolean;
+  hasAnyOverriddenPropertyForBehavior(behavior: gdBehavior): boolean;
   hasBehaviorOverridingNamed(name: string): boolean;
   addNewBehaviorOverriding(project: gdProject, type: string, name: string): gdBehavior;
   getBehaviorOverriding(name: string): gdBehavior;

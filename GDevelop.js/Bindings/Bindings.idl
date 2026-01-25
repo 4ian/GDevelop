@@ -1493,7 +1493,9 @@ interface InitialInstance {
 
     [Ref] VariablesContainer GetVariables();
 
-    boolean HasAnyBehaviorOverriding();
+    boolean HasAnyOverriddenProperty([Const, Ref] gdObject obj);
+    boolean HasAnyOverriddenPropertyForBehavior([Const, Ref] Behavior behavior);
+    
     boolean HasBehaviorOverridingNamed([Const] DOMString name);
     Behavior AddNewBehaviorOverriding([Ref] Project project, [Const] DOMString type, [Const] DOMString name);
     [Ref] Behavior GetBehaviorOverriding([Const] DOMString name);

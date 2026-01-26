@@ -117,7 +117,7 @@ export type EditorFunctionGenericOutput = {|
   propertiesLayersEffectsForSceneNamed?: string,
   objectPropertiesDeduplicationKey?: string,
 
-  // Newly added resources from automatic resource installation:
+  // Used when new resources are added by a function call:
   newlyAddedResources?: Array<SingleResourceSearchAndInstallResult>,
 |};
 

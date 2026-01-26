@@ -88,9 +88,10 @@ namespace gdjs {
      */
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      objectData: BitmapTextObjectData
+      objectData: BitmapTextObjectData,
+      instanceData?: InstanceData
     ) {
-      super(instanceContainer, objectData);
+      super(instanceContainer, objectData, instanceData);
 
       this._opacity = objectData.content.opacity;
       this._text = objectData.content.text;

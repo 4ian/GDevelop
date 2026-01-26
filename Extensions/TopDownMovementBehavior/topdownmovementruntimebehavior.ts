@@ -19,7 +19,8 @@ namespace gdjs {
   }
 
   /** @category Behaviors > Top-down movement */
-  export interface TopDownMovementNetworkSyncData extends BehaviorNetworkSyncData {
+  export interface TopDownMovementNetworkSyncData
+    extends BehaviorNetworkSyncData {
     props: TopDownMovementNetworkSyncDataType;
   }
   /**

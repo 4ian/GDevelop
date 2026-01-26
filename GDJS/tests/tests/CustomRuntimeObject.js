@@ -61,7 +61,7 @@ describe('gdjs.CustomRuntimeObject', function () {
             },
           ],
         },
-      },
+      }
     });
     instanceContainer.addObject(customObject);
     return customObject;

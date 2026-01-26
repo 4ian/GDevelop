@@ -71,9 +71,10 @@ namespace gdjs {
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      objectData: ObjectData & SimpleTileMapObjectDataType
+      objectData: ObjectData & SimpleTileMapObjectDataType,
+      instanceData?: InstanceData
     ) {
-      super(instanceContainer, objectData);
+      super(instanceContainer, objectData, instanceData);
       this._atlasImage = objectData.content.atlasImage;
       this._rowCount = objectData.content.rowCount;
       this._columnCount = objectData.content.columnCount;

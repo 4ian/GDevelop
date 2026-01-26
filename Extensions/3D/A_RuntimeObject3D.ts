@@ -70,9 +70,10 @@ namespace gdjs {
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      objectData: gdjs.Object3DData
+      objectData: gdjs.Object3DData,
+      instanceData: InstanceData | undefined
     ) {
-      super(instanceContainer, objectData);
+      super(instanceContainer, objectData, instanceData);
       // TODO Should 0 be replaced by 0.01 instead of using the default value?
       this._width = this._originalWidth = getValidDimensionValue(
         objectData.content.width

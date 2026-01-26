@@ -24,8 +24,9 @@ BehaviorsContainer::~BehaviorsContainer() {}
 BehaviorsContainer::BehaviorsContainer(bool isOverriding_)
     : isOverriding(isOverriding_) {}
 
-void BehaviorsContainer::Init(const gd::BehaviorsContainer &object) {
-  behaviors = gd::Clone(object.behaviors);
+void BehaviorsContainer::Init(const gd::BehaviorsContainer &behaviorsContainer) {
+  isOverriding = behaviorsContainer.isOverriding;
+  behaviors = gd::Clone(behaviorsContainer.behaviors);
 }
 
 std::vector<gd::String> BehaviorsContainer::GetAllBehaviorNames() const {

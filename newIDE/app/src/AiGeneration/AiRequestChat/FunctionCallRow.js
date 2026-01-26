@@ -92,7 +92,7 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
     editorFunctionCallResult.status === 'working';
 
   // Get the output from either the existing function call output or the current result
-  let editorFunctionCallResultOutput = existingParsedOutput
+  const editorFunctionCallResultOutput = existingParsedOutput
     ? existingParsedOutput
     : editorFunctionCallResult && editorFunctionCallResult.status === 'finished'
     ? editorFunctionCallResult.output

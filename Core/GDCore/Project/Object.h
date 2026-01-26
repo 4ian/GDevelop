@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "GDCore/Project/Behavior.h"
+#include "GDCore/Project/BehaviorsContainer.h"
 #include "GDCore/Project/EffectsContainer.h"
 #include "GDCore/Project/ObjectConfiguration.h"
 #include "GDCore/Project/VariablesContainer.h"
@@ -180,7 +181,7 @@ class GD_CORE_API Object {
    */
   const std::map<gd::String, std::unique_ptr<gd::Behavior>>&
   GetAllBehaviorContents() const {
-    return behaviors;
+    return behaviors.GetAllBehaviorContents();
   };
   ///@}
 
@@ -253,10 +254,10 @@ class GD_CORE_API Object {
   gd::String assetStoreId;  ///< The ID of the asset if the object comes from
                             ///< the store.
   std::unique_ptr<gd::ObjectConfiguration> configuration;
-  std::map<gd::String, std::unique_ptr<gd::Behavior>>
-      behaviors;  ///< Contains all behaviors and their properties for the
-                  ///< object. Behavior contents are the ownership of the
-                  ///< object.
+  gd::BehaviorsContainer
+      behaviors; ///< Contains all behaviors and their properties for the
+                 ///< object. Behavior contents are the ownership of the
+                 ///< object.
   gd::VariablesContainer
       objectVariables;  ///< List of the variables of the object
   gd::EffectsContainer

@@ -255,7 +255,7 @@ type Props = {|
   onChooseProject: () => void,
   closeProject: () => Promise<void>,
   askToCloseProject: () => Promise<boolean>,
-  onSaveProject: () => Promise<void>,
+  onSaveProject: () => Promise<?FileMetadata>,
   canSaveProject: boolean,
   onDeleteCloudProject: (
     i18n: I18nType,

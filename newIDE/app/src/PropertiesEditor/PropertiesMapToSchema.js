@@ -10,6 +10,7 @@ import {
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
 import MeasurementUnitDocumentation from '../PropertiesEditor/MeasurementUnitDocumentation';
 import { keyNames } from '../Utils/KeyboardKeyNames';
+import Restore from '../UI/CustomSvgIcons/Restore';
 
 const gd: libGDevelop = global.gd;
 
@@ -75,14 +76,33 @@ const createField = (
 
   const valueType = property.getType().toLowerCase();
   if (valueType === 'number') {
+    const defaultValueNumber =
+      defaultValue !== null ? parseFloat(defaultValue) || 0 : null;
+    const getValue = (instance: Instance): number =>
+      getNumberValue(instance, name);
+    const getEndAdornmentIcon =
+      defaultValueNumber !== null
+        ? (instance: gdInitialInstance) => {
+            return getValue(instance) === defaultValueNumber
+              ? null
+              : className => <Restore className={className} />;
+          }
+        : undefined;
+    const setValue = (instance: Instance, newValue: number) => {
+      setNumberValue(instance, name, newValue);
+    };
+    const onClickEndAdornment =
+      defaultValueNumber !== null
+        ? (instance: gdInitialInstance) => {
+            setValue(instance, defaultValueNumber);
+          }
+        : undefined;
     return {
       name,
       valueType,
-      getValue: (instance: Instance): number => getNumberValue(instance, name),
-      setValue: (instance: Instance, newValue: number) => {
-        setNumberValue(instance, name, newValue);
-      },
-      defaultValue: defaultValue ? parseFloat(defaultValue) || 0 : null,
+      getValue,
+      setValue,
+      defaultValue: defaultValueNumber,
       getLabel,
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
@@ -91,6 +111,8 @@ const createField = (
         .toJSArray()
         .includes('canBeUnlimitedUsingMinus1'),
       getEndAdornment,
+      getEndAdornmentIcon,
+      onClickEndAdornment,
       visibility,
     };
   } else if (valueType === 'string' || valueType === '') {

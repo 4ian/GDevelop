@@ -2,6 +2,7 @@
 import {
   type Usages,
   type Subscription,
+  type SubscriptionPlanPricingSystem,
   type Limits,
 } from '../../Utils/GDevelopServices/Usage';
 import { User as FirebaseUser } from 'firebase/auth';
@@ -252,6 +253,202 @@ export const subscriptionForGoldUser: Subscription = {
   pricingSystemId: 'gold_1month_999EUR',
 };
 
+// Silver pricing systems
+export const silverYearlyPricingSystemOld: SubscriptionPlanPricingSystem = {
+  amountInCents: 3599,
+  currency: 'EUR',
+  id: 'silver_1year_3599EUR',
+  period: 'year',
+  periodCount: 1,
+  planId: 'gdevelop_silver',
+  region: 'eurozone',
+  status: 'inactive',
+};
+
+export const silverYearlyPricingSystem: SubscriptionPlanPricingSystem = {
+  amountInCents: 4799,
+  currency: 'EUR',
+  id: 'silver_1year_4799EUR_eurozone',
+  period: 'year',
+  periodCount: 1,
+  planId: 'gdevelop_silver',
+  region: 'eurozone',
+  status: 'active',
+};
+
+export const silverMonthlyPricingSystemOld: SubscriptionPlanPricingSystem = {
+  amountInCents: 499,
+  currency: 'EUR',
+  id: 'silver_1month_499EUR',
+  period: 'month',
+  periodCount: 1,
+  planId: 'gdevelop_silver',
+  region: 'eurozone',
+  status: 'inactive',
+};
+
+export const silverMonthlyPricingSystem: SubscriptionPlanPricingSystem = {
+  amountInCents: 699,
+  currency: 'EUR',
+  id: 'silver_1month_699EUR_eurozone',
+  period: 'month',
+  periodCount: 1,
+  planId: 'gdevelop_silver',
+  region: 'eurozone',
+  status: 'active',
+};
+
+// Gold pricing systems
+export const goldYearlyPricingSystemOld: SubscriptionPlanPricingSystem = {
+  amountInCents: 7199,
+  currency: 'EUR',
+  id: 'gold_1year_7199EUR',
+  period: 'year',
+  periodCount: 1,
+  planId: 'gdevelop_gold',
+  region: 'eurozone',
+  status: 'inactive',
+};
+
+export const goldYearlyPricingSystem: SubscriptionPlanPricingSystem = {
+  amountInCents: 8999,
+  currency: 'EUR',
+  id: 'gold_1year_8999EUR_eurozone',
+  period: 'year',
+  periodCount: 1,
+  planId: 'gdevelop_gold',
+  region: 'eurozone',
+  status: 'active',
+};
+
+export const goldMonthlyPricingSystemOld: SubscriptionPlanPricingSystem = {
+  amountInCents: 999,
+  currency: 'EUR',
+  id: 'gold_1month_999EUR',
+  period: 'month',
+  periodCount: 1,
+  planId: 'gdevelop_gold',
+  region: 'eurozone',
+  status: 'inactive',
+};
+
+export const goldMonthlyPricingSystem: SubscriptionPlanPricingSystem = {
+  amountInCents: 1299,
+  currency: 'EUR',
+  id: 'gold_1month_1299EUR_eurozone',
+  period: 'month',
+  periodCount: 1,
+  planId: 'gdevelop_gold',
+  region: 'eurozone',
+  status: 'active',
+};
+
+// Startup pricing systems
+export const startupYearlyPricingSystemOld: SubscriptionPlanPricingSystem = {
+  amountInCents: 30900,
+  currency: 'EUR',
+  id: 'startup_1year_30900EUR',
+  period: 'year',
+  periodCount: 1,
+  planId: 'gdevelop_startup',
+  region: 'eurozone',
+  status: 'inactive',
+};
+
+export const startupYearlyPricingSystem: SubscriptionPlanPricingSystem = {
+  amountInCents: 34999,
+  currency: 'EUR',
+  id: 'startup_1year_34999EUR_eurozone',
+  period: 'year',
+  periodCount: 1,
+  planId: 'gdevelop_startup',
+  region: 'eurozone',
+  status: 'active',
+};
+
+export const startupMonthlyPricingSystemOld: SubscriptionPlanPricingSystem = {
+  amountInCents: 3000,
+  currency: 'EUR',
+  id: 'startup_1month_3000EUR',
+  period: 'month',
+  periodCount: 1,
+  planId: 'gdevelop_startup',
+  region: 'eurozone',
+  status: 'inactive',
+};
+
+export const startupMonthlyPricingSystem: SubscriptionPlanPricingSystem = {
+  amountInCents: 3599,
+  currency: 'EUR',
+  id: 'startup_1month_3599EUR_eurozone',
+  period: 'month',
+  periodCount: 1,
+  planId: 'gdevelop_startup',
+  region: 'eurozone',
+  status: 'active',
+};
+
+// Education pricing systems
+export const educationYearlyPricingSystemOld: SubscriptionPlanPricingSystem = {
+  amountInCents: 2999,
+  currency: 'EUR',
+  id: 'education_1year_2999EUR',
+  period: 'year',
+  periodCount: 1,
+  planId: 'gdevelop_education',
+  region: 'eurozone',
+  status: 'inactive',
+  isPerUser: true,
+};
+
+export const educationYearlyPricingSystem: SubscriptionPlanPricingSystem = {
+  amountInCents: 1799,
+  currency: 'EUR',
+  id: 'education_1year_1799EUR',
+  period: 'year',
+  periodCount: 1,
+  planId: 'gdevelop_education',
+  region: 'eurozone',
+  status: 'active',
+  isPerUser: true,
+};
+
+export const educationMonthlyPricingSystem: SubscriptionPlanPricingSystem = {
+  amountInCents: 299,
+  currency: 'EUR',
+  id: 'education_1month_299EUR',
+  period: 'month',
+  periodCount: 1,
+  planId: 'gdevelop_education',
+  region: 'eurozone',
+  status: 'active',
+  isPerUser: true,
+};
+
+// Indie pricing system
+export const indieMonthlyPricingSystem: SubscriptionPlanPricingSystem = {
+  amountInCents: 200,
+  currency: 'EUR',
+  id: 'indie_1month',
+  period: 'month',
+  periodCount: 1,
+  planId: 'gdevelop_indie',
+  region: 'default',
+  status: 'inactive',
+};
+
+// Pro pricing system
+export const proMonthlyPricingSystem: SubscriptionPlanPricingSystem = {
+  amountInCents: 700,
+  currency: 'EUR',
+  id: 'pro_1month',
+  period: 'month',
+  periodCount: 1,
+  planId: 'gdevelop_pro',
+  region: 'default',
+  status: 'inactive',
+};
+
 export const subscriptionForStartupUser: Subscription = {
   planId: 'gdevelop_startup',
   createdAt: 1515084011000,
@@ -379,6 +576,7 @@ export const limitsForNoSubscriptionUser: Limits = {
     versionHistory: { enabled: false, retentionDays: 0 },
     ai: {
       availablePresets: [],
+      versionHistory: { retentionDays: 1 },
     },
   },
   quotas: {
@@ -766,6 +964,7 @@ export const limitsReached: Limits = {
     versionHistory: { enabled: false, retentionDays: 0 },
     ai: {
       availablePresets: [],
+      versionHistory: { retentionDays: 1 },
     },
   },
   quotas: {
@@ -821,6 +1020,7 @@ export const limitsForNoSubscriptionUserWithCredits: Limits = {
     versionHistory: { enabled: false, retentionDays: 0 },
     ai: {
       availablePresets: [],
+      versionHistory: { retentionDays: 1 },
     },
   },
   quotas: {
@@ -889,6 +1089,7 @@ export const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   cloudProjectsFetchingErrorLabel: null,
   firebaseUser: indieFirebaseUser,
   subscription: noSubscription,
+  subscriptionPricingSystem: null,
   usages: usagesForIndieUser,
   limits: limitsForNoSubscriptionUser,
   receivedAssetPacks: [
@@ -976,48 +1177,57 @@ export const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
 export const fakeSilverAuthenticatedUser: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
   subscription: subscriptionForSilverUser,
+  subscriptionPricingSystem: silverMonthlyPricingSystem,
   limits: limitsForSilverUser,
 };
 export const fakeSilverButCancelAtPeriodEndAuthenticatedUser: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
   subscription: silverSubscriptionButCancelAtPeriodEnd,
+  subscriptionPricingSystem: silverMonthlyPricingSystem,
   limits: limitsForSilverUser,
 };
 export const fakeSilverAuthenticatedUserWithCloudProjects: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
   subscription: subscriptionForSilverUser,
+  subscriptionPricingSystem: silverMonthlyPricingSystem,
   cloudProjects: tenCloudProjects,
 };
 
 export const fakeGoldAuthenticatedUser: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: subscriptionForGoldUser,
+  subscriptionPricingSystem: goldMonthlyPricingSystem,
   limits: limitsForGoldUser,
 };
 export const fakeStartupAuthenticatedUser: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: subscriptionForStartupUser,
+  subscriptionPricingSystem: startupMonthlyPricingSystem,
   limits: limitsForStartupUser,
 };
 export const fakeAuthenticatedUserWithEducationPlan: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: subscriptionForEducationPlan,
+  subscriptionPricingSystem: educationMonthlyPricingSystem,
   limits: limitsForTeacherUser,
 };
 export const fakeAuthenticatedStudentFromEducationPlan: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: subscriptionForGoldUserFromEducationPlan,
+  subscriptionPricingSystem: goldMonthlyPricingSystem,
   limits: limitsForStudentUser,
 };
 export const fakeAuthenticatedTeacherFromEducationPlan: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: subscriptionForGoldUserFromEducationPlan,
+  subscriptionPricingSystem: goldMonthlyPricingSystem,
   limits: limitsForTeacherUser,
 };
 
 export const fakeGoldWithPurchaselyAuthenticatedUser: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: purchaselyGoldSubscription,
+  subscriptionPricingSystem: goldMonthlyPricingSystem,
   limits: limitsForGoldUser,
 };
 
@@ -1042,12 +1252,14 @@ export const fakeAuthenticatedUserWithExpiredSilverRedemptionCode: Authenticated
 export const fakeAuthenticatedUserWithLegacyIndieSubscription = {
   ...fakeSilverAuthenticatedUser,
   subscription: subscriptionForIndieUser,
+  subscriptionPricingSystem: indieMonthlyPricingSystem,
   limits: limitsForSilverUser,
 };
 
 export const fakeAuthenticatedUserWithLegacyProSubscription = {
   ...fakeSilverAuthenticatedUser,
   subscription: subscriptionForProUser,
+  subscriptionPricingSystem: proMonthlyPricingSystem,
   limits: limitsForGoldUser,
 };
 

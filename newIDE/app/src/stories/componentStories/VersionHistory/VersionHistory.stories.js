@@ -163,12 +163,13 @@ export const Default = () => {
     async (version: ExpandedCloudProjectVersion) => {
       if (version.id === latestVersion.id) {
         setOpenedVersionStatus(null);
-        return;
+        return true;
       }
       setOpenedVersionStatus({
         version,
         status: 'opened',
       });
+      return true;
     },
     [latestVersion.id]
   );

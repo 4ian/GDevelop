@@ -6,9 +6,10 @@ import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import LeftLoader from '../UI/LeftLoader';
 import Text from '../UI/Text';
+import { type FileMetadata } from '../ProjectsStorage';
 
 type Props = {|
-  onSaveProject: () => Promise<void>,
+  onSaveProject: () => Promise<?FileMetadata>,
   canEndTutorial: boolean,
   endTutorial: ({| reason: 'completed' | 'user-early-exit' |}) => void,
   onClose: () => void,

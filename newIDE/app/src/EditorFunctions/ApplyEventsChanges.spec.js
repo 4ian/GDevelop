@@ -54,6 +54,7 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
     applyEventsChanges(
@@ -97,6 +98,7 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
     applyEventsChanges(
@@ -134,6 +136,7 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
     applyEventsChanges(
@@ -169,6 +172,7 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
     applyEventsChanges(
@@ -205,6 +209,7 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
     applyEventsChanges(
@@ -240,6 +245,7 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
     applyEventsChanges(
@@ -279,6 +285,7 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
       {
         operationName: 'insert_before_event',
@@ -291,6 +298,7 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
     applyEventsChanges(
@@ -330,6 +338,7 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
 
@@ -366,6 +375,7 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
     applyEventsChanges(
@@ -402,6 +412,7 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
     applyEventsChanges(
@@ -449,6 +460,7 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
     applyEventsChanges(
@@ -504,6 +516,7 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
     applyEventsChanges(
@@ -549,6 +562,7 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
     applyEventsChanges(
@@ -585,6 +599,7 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
     applyEventsChanges(
@@ -636,6 +651,7 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
     applyEventsChanges(
@@ -704,6 +720,7 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
     applyEventsChanges(
@@ -762,6 +779,7 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
     applyEventsChanges(
@@ -834,6 +852,7 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
     applyEventsChanges(
@@ -886,6 +905,7 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
     applyEventsChanges(
@@ -934,6 +954,7 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
     applyEventsChanges(
@@ -981,6 +1002,7 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
     applyEventsChanges(
@@ -1028,6 +1050,7 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
     applyEventsChanges(
@@ -1066,6 +1089,7 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
     applyEventsChanges(

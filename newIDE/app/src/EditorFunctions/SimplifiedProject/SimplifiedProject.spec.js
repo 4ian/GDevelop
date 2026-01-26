@@ -62,6 +62,86 @@ describe('SimplifiedProject', () => {
           "gameResolutionHeight": 600,
           "gameResolutionWidth": 800,
         },
+        "resources": Array [
+          Object {
+            "file": "fake-image1.png",
+            "metadata": undefined,
+            "name": "fake-image1.png",
+            "type": "image",
+          },
+          Object {
+            "file": "fake-image2.png",
+            "metadata": undefined,
+            "name": "fake-image2.png",
+            "type": "image",
+          },
+          Object {
+            "file": "res/icon128.png",
+            "metadata": undefined,
+            "name": "icon128.png",
+            "type": "image",
+          },
+          Object {
+            "file": "res/powered-pixijs.png",
+            "metadata": undefined,
+            "name": "pixi",
+            "type": "image",
+          },
+          Object {
+            "file": "fake-audio1.mp3",
+            "metadata": undefined,
+            "name": "fake-audio1.mp3",
+            "type": "audio",
+          },
+          Object {
+            "file": "fake-video1.mp4",
+            "metadata": undefined,
+            "name": "fake-video1.mp4",
+            "type": "video",
+          },
+          Object {
+            "file": "fake-video2.mp4",
+            "metadata": undefined,
+            "name": "fake-video2.mp4",
+            "type": "video",
+          },
+          Object {
+            "file": "font.ttf",
+            "metadata": undefined,
+            "name": "font.ttf",
+            "type": "font",
+          },
+          Object {
+            "file": "bmfont.xml",
+            "metadata": undefined,
+            "name": "bmfont.xml",
+            "type": "bitmapFont",
+          },
+          Object {
+            "file": "super-font.fnt",
+            "metadata": undefined,
+            "name": "super-font.fnt",
+            "type": "bitmapFont",
+          },
+          Object {
+            "file": "levelData.json",
+            "metadata": undefined,
+            "name": "levelData.json",
+            "type": "json",
+          },
+          Object {
+            "file": "InventoryData.json",
+            "metadata": undefined,
+            "name": "InventoryData.json",
+            "type": "json",
+          },
+          Object {
+            "file": "text-data.json",
+            "metadata": undefined,
+            "name": "text-data.json",
+            "type": "json",
+          },
+        ],
         "scenes": Array [
           Object {
             "instancesOnSceneDescription": "On the scene, there are:

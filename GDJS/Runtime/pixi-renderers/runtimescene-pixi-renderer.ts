@@ -114,16 +114,17 @@ namespace gdjs {
 
           const runtimeLayerRenderer = runtimeLayer.getRenderer();
           const runtimeLayerRenderingType = runtimeLayer.getRenderingType();
-          const layerHas3DObjectsToRender = runtimeLayerRenderer.has3DObjects();
-          if (
-            !this._runtimeScene.getGame().isInGameEdition() &&
-            (runtimeLayerRenderingType ===
-              gdjs.RuntimeLayerRenderingType.TWO_D ||
-              !layerHas3DObjectsToRender)
-          ) {
-            // Render a layer with 2D rendering (PixiJS) only if layer is configured as is
-            // or if there is no 3D object to render.
-            // See also: `willRenderIn3DMode` in `layer-pixi-renderer.ts`.
+
+          // Determine if this layer will actually render in 3D mode.
+          // Keep in sync with: `shouldRenderLayerIn3D` in `layer-pixi-renderer.ts`.
+          const shouldRenderLayerIn3D =
+            this._runtimeScene.getGame().isInGameEdition() ||
+            (runtimeLayerRenderingType !==
+              gdjs.RuntimeLayerRenderingType.TWO_D &&
+              runtimeLayerRenderer.has3DObjects());
+
+          if (!shouldRenderLayerIn3D) {
+            // Render a layer with 2D rendering (PixiJS).
 
             if (lastRenderWas3D) {
               // Ensure the state is clean for PixiJS to render.

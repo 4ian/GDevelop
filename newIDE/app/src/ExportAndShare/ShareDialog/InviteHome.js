@@ -330,7 +330,7 @@ const InviteHome = ({ cloudProjectId }: Props) => {
           fetchError !== 'project-not-owned' && (
             <GetSubscriptionCard
               subscriptionDialogOpeningReason="Add collaborators on project"
-              recommendedPlanIdIfNoSubscription="gdevelop_startup"
+              recommendedPlanId="gdevelop_startup"
               placementId="invite-collaborators"
             >
               <Text>

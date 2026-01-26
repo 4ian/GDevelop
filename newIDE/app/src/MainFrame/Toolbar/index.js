@@ -17,11 +17,14 @@ import CustomToolbarButton, {
   type ToolbarButtonConfig,
 } from '../CustomToolbarButton';
 import { runShellCommand } from '../../Utils/ShellExecutor';
+import { type FileMetadata } from '../../ProjectsStorage';
 
 export type MainFrameToolbarProps = {|
   showProjectButtons: boolean,
   openShareDialog: () => void,
-  onSave: () => Promise<void>,
+  onSave: (options?: {|
+    skipNewVersionWarning: boolean,
+  |}) => Promise<?FileMetadata>,
   canSave: boolean,
   onOpenVersionHistory: () => void,
   checkedOutVersionStatus?: ?OpenedVersionStatus,
@@ -39,7 +42,9 @@ export type ToolbarInterface = {|
 |};
 
 type LeftButtonsToolbarGroupProps = {|
-  onSave: () => Promise<void>,
+  onSave: (options?: {|
+    skipNewVersionWarning: boolean,
+  |}) => Promise<?FileMetadata>,
   onOpenVersionHistory: () => void,
   checkedOutVersionStatus?: ?OpenedVersionStatus,
   onQuitVersionHistory: () => Promise<void>,

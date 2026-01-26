@@ -30,6 +30,7 @@ import {
 import { useEnsureExtensionInstalled } from './UseEnsureExtensionInstalled';
 import { useGenerateEvents } from './UseGenerateEvents';
 import { useSearchAndInstallAsset } from './UseSearchAndInstallAsset';
+import { useSearchAndInstallResource } from './UseSearchAndInstallResource';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { AiRequestContext } from './AiRequestContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
@@ -112,6 +113,10 @@ export const useProcessFunctionCalls = ({
     onWillInstallExtension,
     onExtensionInstalled,
   });
+  const { searchAndInstallResources } = useSearchAndInstallResource({
+    project,
+    resourceManagementProps,
+  });
   const { generateEvents } = useGenerateEvents({ project });
 
   const [
@@ -184,6 +189,7 @@ export const useProcessFunctionCalls = ({
         onWillInstallExtension,
         onExtensionInstalled,
         searchAndInstallAsset,
+        searchAndInstallResources,
       });
 
       const newResults = addEditorFunctionCallResults(
@@ -213,6 +219,7 @@ export const useProcessFunctionCalls = ({
       onWillInstallExtension,
       onExtensionInstalled,
       searchAndInstallAsset,
+      searchAndInstallResources,
       generateEvents,
       onSendEditorFunctionCallResults,
     ]

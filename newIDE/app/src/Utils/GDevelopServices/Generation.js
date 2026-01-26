@@ -144,6 +144,24 @@ export type AiGeneratedEventMissingObjectBehavior = {
   type: string,
 };
 
+export type AiGeneratedEventMissingResource = {
+  resourceName: string,
+  resourceKind:
+    | 'image'
+    | 'audio'
+    | 'font'
+    | 'video'
+    | 'json'
+    | 'tilemap'
+    | 'tileset'
+    | 'model3D'
+    | 'atlas'
+    | 'spine'
+    | 'spritesheet'
+    | 'bitmapFont'
+    | string,
+};
+
 export type AiGeneratedEventChange = {
   operationName: string,
   operationTargetEvent: string | null,
@@ -159,6 +177,7 @@ export type AiGeneratedEventChange = {
   missingObjectBehaviors: {
     [objectName: string]: AiGeneratedEventMissingObjectBehavior[],
   },
+  missingResources: AiGeneratedEventMissingResource[],
 };
 
 export type AiGeneratedEvent = {
@@ -201,6 +220,24 @@ export type AssetSearch = {
   results: Array<{
     score: number,
     asset: any,
+  }> | null,
+};
+
+export type ResourceSearch = {
+  id: string,
+  userId: string,
+  createdAt: string,
+  query: {
+    searchTerms: string[],
+    resourceKind: string,
+  },
+  status: 'completed' | 'failed',
+  results: Array<{
+    score: number,
+    resource: {
+      name: string,
+      url: string,
+    },
   }> | null,
 };
 
@@ -741,6 +778,42 @@ export const createAssetSearch = async (
     data: response.data,
     propertyName: 'id',
     endpointName: '/asset-search of Generation API',
+  });
+};
+
+export const createResourceSearch = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    searchTerms,
+    resourceKind,
+  }: {|
+    userId: string,
+    searchTerms: string,
+    resourceKind: string,
+  |}
+): Promise<ResourceSearch> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.post(
+    `/resource-search`,
+    {
+      gdevelopVersionWithHash: getIDEVersionWithHash(),
+      searchTerms,
+      resourceKind,
+    },
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+  return ensureObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/resource-search of Generation API',
   });
 };
 

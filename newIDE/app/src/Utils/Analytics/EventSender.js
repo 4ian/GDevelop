@@ -536,7 +536,8 @@ export type SubscriptionDialogDisplayReason =
   | 'Unlock course chapter'
   | 'Account get premium'
   | 'AI requests (subscribe)'
-  | 'AI requests (upgrade)';
+  | 'AI requests (upgrade)'
+  | 'AI requests history';
 
 export type SubscriptionPlacementId =
   | 'builds'

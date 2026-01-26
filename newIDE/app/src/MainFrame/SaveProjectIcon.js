@@ -9,9 +9,12 @@ import UnsavedChangesContext from './UnsavedChangesContext';
 import { getUnsavedChangesAmount } from './UseSaveReminder';
 import { useInterval } from '../Utils/UseInterval';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import type { FileMetadata } from '../ProjectsStorage';
 
 type Props = {|
-  onSave: () => Promise<void>,
+  onSave: (options?: {|
+    skipNewVersionWarning: boolean,
+  |}) => Promise<?FileMetadata>,
   canSave: boolean,
   id: string,
 |};
@@ -29,7 +32,9 @@ const SaveProjectIcon = (props: Props) => {
     <IconButton
       size="small"
       id={props.id}
-      onClick={props.onSave}
+      onClick={() => {
+        props.onSave();
+      }}
       tooltip={t`Save project`}
       color="default"
       disabled={!props.canSave}

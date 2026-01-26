@@ -54,6 +54,7 @@ export type SaveProjectOptions = {|
   previousVersion?: string,
   restoredFromVersionId?: string,
   useBackgroundSerializer?: boolean,
+  skipNewVersionWarning?: boolean,
 |};
 
 export type SaveAsOptions = {|

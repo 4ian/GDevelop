@@ -113,6 +113,8 @@ export const commonProps = {
   isAutoProcessingFunctionCalls: false,
   onStartOrOpenChat: () => {},
   aiRequestMode: 'agent',
+  saveProject: async () => {},
+  onRestore: async () => {},
 };
 
 const WrappedChatComponent = (allProps: any) => {

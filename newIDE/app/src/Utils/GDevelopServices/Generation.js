@@ -37,6 +37,8 @@ export type AiRequestFunctionCallOutput = {
   call_id: string,
   output: string,
   suggestions?: AiRequestSuggestions,
+  messageId?: string,
+  projectVersionIdAfterMessage?: string,
 };
 export type AiRequestAssistantMessage = {
   type: 'message',
@@ -60,6 +62,8 @@ export type AiRequestAssistantMessage = {
     | AiRequestMessageAssistantFunctionCall
   >,
   suggestions?: AiRequestSuggestions,
+  messageId?: string,
+  projectVersionIdAfterMessage?: string,
 };
 
 export type AiRequestUserMessage = {
@@ -71,6 +75,8 @@ export type AiRequestUserMessage = {
     status: 'completed',
     text: string,
   }>,
+  messageId?: string,
+  projectVersionIdBeforeMessage?: string,
 };
 
 export type AiRequestMessage =
@@ -99,6 +105,9 @@ export type AiRequest = {
   aiConfiguration?: AiConfiguration,
   toolsVersion?: string,
   toolOptions?: AiRequestToolOptions | null,
+  forkedFromAiRequestId?: string | null,
+  forkedAfterOriginalMessageId?: string | null,
+  forkedAfterNewMessageId?: string | null,
 
   error: {
     code: string,
@@ -345,6 +354,7 @@ export const createAiRequest = async (
     mode,
     aiConfiguration,
     gameId,
+    projectVersionIdBeforeMessage,
     fileMetadata,
     storageProviderName,
     toolsVersion,
@@ -359,6 +369,7 @@ export const createAiRequest = async (
     mode: 'chat' | 'agent',
     aiConfiguration: AiConfiguration,
     gameId: string | null,
+    projectVersionIdBeforeMessage?: string | null,
     fileMetadata: ?{
       fileIdentifier: string,
       version?: string,
@@ -384,6 +395,7 @@ export const createAiRequest = async (
       mode,
       aiConfiguration,
       gameId,
+      projectVersionIdBeforeMessage,
       fileMetadata,
       storageProviderName,
       toolsVersion,
@@ -412,6 +424,7 @@ export const addMessageToAiRequest = async (
     functionCallOutputs,
     userMessage,
     gameId,
+    projectVersionIdBeforeMessage,
     payWithCredits,
     gameProjectJson,
     gameProjectJsonUserRelativeKey,
@@ -425,6 +438,7 @@ export const addMessageToAiRequest = async (
     aiRequestId: string,
     userMessage: string,
     gameId?: string,
+    projectVersionIdBeforeMessage?: string | null,
     functionCallOutputs: Array<AiRequestFunctionCallOutput>,
     payWithCredits: boolean,
     gameProjectJson: string | null,
@@ -444,6 +458,7 @@ export const addMessageToAiRequest = async (
       functionCallOutputs,
       userMessage,
       gameId,
+      projectVersionIdBeforeMessage,
       payWithCredits: !!payWithCredits,
       payWithAiCredits: !payWithCredits,
       gameProjectJson,
@@ -468,6 +483,40 @@ export const addMessageToAiRequest = async (
     propertyName: 'id',
     endpointName: '/ai-request/{id}/action/add-message of Generation API',
   });
+};
+
+export const updateAiRequestMessage = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    aiRequestId,
+    aiRequestMessageId,
+    projectVersionIdBeforeMessage,
+    projectVersionIdAfterMessage,
+  }: {|
+    userId: string,
+    aiRequestId: string,
+    aiRequestMessageId: string,
+    projectVersionIdBeforeMessage?: ?string,
+    projectVersionIdAfterMessage?: ?string,
+  |}
+): Promise<void> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  await apiClient.patch(
+    `/ai-request/${aiRequestId}/message/${aiRequestMessageId}`,
+    {
+      projectVersionIdBeforeMessage,
+      projectVersionIdAfterMessage,
+    },
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
 };
 
 export const sendAiRequestFeedback = async (
@@ -828,6 +877,40 @@ export type AiSettings = {
   aiRequest: {
     presets: Array<AiConfigurationPreset>,
   },
+};
+
+export const forkAiRequest = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    aiRequestId,
+    upToMessageId,
+  }: {|
+    userId: string,
+    aiRequestId: string,
+    upToMessageId?: string,
+  |}
+): Promise<AiRequest> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.post(
+    `/ai-request/${aiRequestId}/action/fork`,
+    {
+      upToMessageId,
+    },
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+  return ensureObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/ai-request/{id}/action/fork of Generation API',
+  });
 };
 
 export const fetchAiSettings = async ({

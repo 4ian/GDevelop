@@ -13,6 +13,10 @@ import type { OpenedVersionStatus } from '../../VersionHistory';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { getStatusColor } from '../../VersionHistory/Utils';
 import SaveProjectIcon from '../SaveProjectIcon';
+import CustomToolbarButton, {
+  type ToolbarButtonConfig,
+} from '../CustomToolbarButton';
+import { runShellCommand } from '../../Utils/ShellExecutor';
 import { type FileMetadata } from '../../ProjectsStorage';
 
 export type MainFrameToolbarProps = {|
@@ -27,6 +31,8 @@ export type MainFrameToolbarProps = {|
   onQuitVersionHistory: () => Promise<void>,
   canQuitVersionHistory: boolean,
   hidden: boolean,
+  toolbarButtons: Array<ToolbarButtonConfig>,
+  projectPath: ?string,
 
   ...PreviewAndShareButtonsProps,
 |};
@@ -44,10 +50,21 @@ type LeftButtonsToolbarGroupProps = {|
   onQuitVersionHistory: () => Promise<void>,
   canQuitVersionHistory: boolean,
   canSave: boolean,
+  toolbarButtons: Array<ToolbarButtonConfig>,
+  projectPath: ?string,
 |};
 
 const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
   function LeftButtonsToolbarGroup(props) {
+    const handleCustomButtonClick = React.useCallback(
+      (command: string) => {
+        if (props.projectPath) {
+          runShellCommand(props.projectPath, command);
+        }
+      },
+      [props.projectPath]
+    );
+
     return (
       <ToolbarGroup firstChild>
         <IconButton
@@ -64,6 +81,14 @@ const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
           onSave={props.onSave}
           canSave={props.canSave}
         />
+        {props.toolbarButtons.map((button, index) => (
+          <CustomToolbarButton
+            key={index}
+            name={button.name}
+            icon={button.icon}
+            onClick={() => handleCustomButtonClick(button.command)}
+          />
+        ))}
         {props.checkedOutVersionStatus && (
           <div
             style={{
@@ -116,6 +141,8 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
               checkedOutVersionStatus={props.checkedOutVersionStatus}
               onQuitVersionHistory={props.onQuitVersionHistory}
               canQuitVersionHistory={props.canQuitVersionHistory}
+              toolbarButtons={props.toolbarButtons}
+              projectPath={props.projectPath}
             />
             <ToolbarGroup>
               <Spacer />

@@ -54,7 +54,7 @@ namespace gdjs {
           // Protect against NaN.
           if (this._value !== this._value) this._value = 0;
         } else if (this._type === 'string') {
-          this._str = '' + varData.value || '0';
+          this._str = '' + varData.value;
         } else if (this._type === 'boolean') {
           this._bool = !!varData.value;
         } else if (this._type === 'structure') {

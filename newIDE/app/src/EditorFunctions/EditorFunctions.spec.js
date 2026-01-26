@@ -627,4 +627,121 @@ describe('editorFunctions', () => {
       expect(fontProperty.getValue()).toBe('font1.ttf');
     });
   });
+
+  describe('add_scene_events', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('adds events to a scene and installs missing resources', async () => {
+      const onSceneEventsModifiedOutsideEditor = jest.fn();
+      const searchAndInstallResources = jest.fn().mockResolvedValue({
+        results: [
+          {
+            resourceName: 'explosion.png',
+            resourceKind: 'image',
+            status: 'resource-installed',
+          },
+          {
+            resourceName: 'explosion.wav',
+            resourceKind: 'audio',
+            status: 'resource-installed',
+          },
+        ],
+      });
+      const ensureExtensionInstalled = jest.fn().mockResolvedValue(undefined);
+
+      const result = await editorFunctions.add_scene_events.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          events_description:
+            'When the player presses space, play an explosion sound and show an explosion effect',
+          extension_names_list: '',
+          objects_list: 'Player',
+        },
+        generateEvents: jest.fn().mockResolvedValue({
+          generationCompleted: true,
+          aiGeneratedEvent: {
+            id: 'test-ai-event-id',
+            createdAt: '2024-01-01T00:00:00Z',
+            updatedAt: '2024-01-01T00:00:00Z',
+            userId: 'test-user',
+            status: 'ready',
+            partialGameProjectJson: '{}',
+            eventsDescription:
+              'When the player presses space, play an explosion sound and show an explosion effect',
+            extensionNamesList: '',
+            objectsList: 'Player',
+            existingEventsAsText: '',
+            existingEventsJson: null,
+            existingEventsJsonUserRelativeKey: null,
+            resultMessage: 'Successfully added explosion events.',
+            changes: [
+              {
+                operationName: 'add',
+                operationTargetEvent: null,
+                isEventsJsonValid: true,
+                generatedEvents: JSON.stringify([
+                  {
+                    type: 'BuiltinCommonInstructions::Standard',
+                    conditions: [],
+                    actions: [],
+                  },
+                ]),
+                areEventsValid: true,
+                extensionNames: [],
+                diagnosticLines: [],
+                undeclaredVariables: [],
+                undeclaredObjectVariables: {},
+                missingObjectBehaviors: {},
+                missingResources: [
+                  { resourceName: 'explosion.png', resourceKind: 'image' },
+                  { resourceName: 'explosion.wav', resourceKind: 'audio' },
+                ],
+              },
+            ],
+            error: null,
+            stats: null,
+          },
+        }),
+        onSceneEventsModifiedOutsideEditor,
+        ensureExtensionInstalled,
+        searchAndInstallResources,
+      });
+
+      expect(result).toMatchInlineSnapshot(`
+        Object {
+          "aiGeneratedEventId": "test-ai-event-id",
+          "message": "Successfully added explosion events.",
+          "newlyAddedResources": Array [
+            Object {
+              "resourceKind": "image",
+              "resourceName": "explosion.png",
+              "status": "resource-installed",
+            },
+            Object {
+              "resourceKind": "audio",
+              "resourceName": "explosion.wav",
+              "status": "resource-installed",
+            },
+          ],
+          "success": true,
+        }
+      `);
+
+      expect(onSceneEventsModifiedOutsideEditor).toHaveBeenCalledWith({
+        scene: testScene,
+        newOrChangedAiGeneratedEventIds: new Set(['test-ai-event-id']),
+      });
+    });
+  });
 });

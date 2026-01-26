@@ -1,5 +1,8 @@
 // @flow
-import { applyEventsChanges } from './ApplyEventsChanges';
+import {
+  applyEventsChanges,
+  addMissingObjectBehaviors,
+} from './ApplyEventsChanges';
 import { type AiGeneratedEventChange } from '../Utils/GDevelopServices/Generation';
 
 const gd: libGDevelop = global.gd;
@@ -1104,5 +1107,104 @@ describe('applyEventsChanges', () => {
       expect.stringContaining('Could not find event with aiGeneratedEventId')
     );
     consoleWarnSpy.mockRestore();
+  });
+});
+
+describe('addMissingObjectBehaviors', () => {
+  let project: gdProject;
+  let testScene: gdLayout;
+
+  beforeEach(() => {
+    project = new gd.ProjectHelper.createNewGDJSProject();
+    testScene = project.insertNewLayout('TestScene', 0);
+  });
+
+  afterEach(() => {
+    project.delete();
+  });
+
+  it('should add a PlatformerObjectBehavior to an object', () => {
+    // Create a Sprite object in the scene
+    const testSceneObjects = testScene.getObjects();
+    const playerObject = testSceneObjects.insertNewObject(
+      project,
+      'Sprite',
+      'Player',
+      testSceneObjects.getObjectsCount()
+    );
+
+    // Verify the object does not have the behavior initially
+    expect(playerObject.hasBehaviorNamed('PlatformerObject')).toBe(false);
+
+    // Add the PlatformerObjectBehavior
+    addMissingObjectBehaviors({
+      project,
+      scene: testScene,
+      objectName: 'Player',
+      missingBehaviors: [
+        {
+          objectName: 'Player',
+          name: 'PlatformerObject',
+          type: 'PlatformBehavior::PlatformerObjectBehavior',
+        },
+      ],
+    });
+
+    // Verify the behavior was added
+    expect(playerObject.hasBehaviorNamed('PlatformerObject')).toBe(true);
+    expect(playerObject.getBehavior('PlatformerObject').getTypeName()).toBe(
+      'PlatformBehavior::PlatformerObjectBehavior'
+    );
+  });
+
+  it('should add a PlatformerObjectBehavior to all objects in an object group', () => {
+    // Create multiple Sprite objects in the scene
+    const testSceneObjects = testScene.getObjects();
+    const player1 = testSceneObjects.insertNewObject(
+      project,
+      'Sprite',
+      'Player1',
+      testSceneObjects.getObjectsCount()
+    );
+    const player2 = testSceneObjects.insertNewObject(
+      project,
+      'Sprite',
+      'Player2',
+      testSceneObjects.getObjectsCount()
+    );
+
+    // Create an object group containing both players
+    const objectGroups = testSceneObjects.getObjectGroups();
+    const playersGroup = objectGroups.insertNew('Players', 0);
+    playersGroup.addObject('Player1');
+    playersGroup.addObject('Player2');
+
+    // Verify the objects do not have the behavior initially
+    expect(player1.hasBehaviorNamed('PlatformerObject')).toBe(false);
+    expect(player2.hasBehaviorNamed('PlatformerObject')).toBe(false);
+
+    // Add the PlatformerObjectBehavior to the group
+    addMissingObjectBehaviors({
+      project,
+      scene: testScene,
+      objectName: 'Players',
+      missingBehaviors: [
+        {
+          objectName: 'Players',
+          name: 'PlatformerObject',
+          type: 'PlatformBehavior::PlatformerObjectBehavior',
+        },
+      ],
+    });
+
+    // Verify the behavior was added to all objects in the group
+    expect(player1.hasBehaviorNamed('PlatformerObject')).toBe(true);
+    expect(player1.getBehavior('PlatformerObject').getTypeName()).toBe(
+      'PlatformBehavior::PlatformerObjectBehavior'
+    );
+    expect(player2.hasBehaviorNamed('PlatformerObject')).toBe(true);
+    expect(player2.getBehavior('PlatformerObject').getTypeName()).toBe(
+      'PlatformBehavior::PlatformerObjectBehavior'
+    );
   });
 });

@@ -359,6 +359,16 @@ export default class SceneEditor extends React.Component<Props, State> {
   }
 
   componentDidMount() {
+    // Sync the saved gameEditorMode from instancesEditorSettings to MainFrame.
+    if (
+      this.props.isActive &&
+      this.state.instancesEditorSettings.gameEditorMode
+    ) {
+      this.props.setGameEditorMode(
+        this.state.instancesEditorSettings.gameEditorMode
+      );
+    }
+
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
       this.onResourceExternallyChanged.bind(this)
     );
@@ -655,8 +665,8 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (editorDisplay.getName() === 'mosaic') {
       this.props.setToolbar(
         <MosaicEditorsDisplayToolbar
-          gameEditorMode={this.props.gameEditorMode}
-          setGameEditorMode={this.props.setGameEditorMode}
+          gameEditorMode={this.state.instancesEditorSettings.gameEditorMode}
+          setGameEditorMode={this.setGameEditorMode}
           selectedInstancesCount={
             this.instancesSelection.getSelectedInstances().length
           }
@@ -735,6 +745,14 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.openSceneProperties(false);
     }
     if (!this.props.isActive && nextProps.isActive) {
+      // Sync the saved gameEditorMode from instancesEditorSettings to mainframe
+      // when the editor becomes active again
+      if (this.state.instancesEditorSettings.gameEditorMode) {
+        this.props.setGameEditorMode(
+          this.state.instancesEditorSettings.gameEditorMode
+        );
+      }
+
       // When the scene is refocused, the selections are cleaned
       // to avoid cases where we hold references to instances or objects
       // deleted by something outside of the scene (for example,
@@ -790,6 +808,16 @@ export default class SceneEditor extends React.Component<Props, State> {
       grid: !this.state.instancesEditorSettings.grid,
       snap: !this.state.instancesEditorSettings.grid,
     });
+  };
+
+  setGameEditorMode = (newMode: 'instances-editor' | 'embedded-game') => {
+    this.setInstancesEditorSettings({
+      ...this.state.instancesEditorSettings,
+      gameEditorMode: newMode,
+    });
+
+    // Call the setGameEditorMode from mainframe so it can make some global changes. (ex: hot reload)
+    this.props.setGameEditorMode(newMode);
   };
 
   openSetupGrid = (open: boolean = true) => {

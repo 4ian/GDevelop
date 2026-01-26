@@ -32,7 +32,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-const commonProps = {
+export const commonProps = {
   aiConfigurationPresetsWithAvailability: [
     {
       id: 'default',

@@ -15,9 +15,9 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Flag from '@material-ui/icons/Flag';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { getSceneFolderTreeViewItemId } from './SceneFolderTreeViewItemContent';
-import { 
-  buildMoveToFolderSubmenu, 
-  createNewFolderAndMoveItem 
+import {
+  buildMoveToFolderSubmenu,
+  createNewFolderAndMoveItem,
 } from './SceneTreeViewHelpers';
 
 const SCENE_CLIPBOARD_KIND = 'Layout';
@@ -74,6 +74,8 @@ export type SceneTreeViewItemProps = {|
 |};
 
 export const getSceneTreeViewItemId = (scene: gdLayout): string => {
+  // Pointers are used because they stay the same even when the names are
+  // changed.
   return `scene-${scene.ptr}`;
 };
 
@@ -140,15 +142,16 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   buildMenuTemplate(i18n: I18nType, index: number) {
     const { project } = this.props;
     const layoutsRootFolder = project.getLayoutsRootFolder();
-    
-    // Sammle alle Ordner mit ihren Pfaden
-    const foldersAndPaths = layoutsRootFolder 
+
+    const foldersAndPaths = layoutsRootFolder
       ? collectFoldersAndPaths(layoutsRootFolder)
       : [];
-    
-    // Finde den aktuellen Parent
-    const currentLayoutFolderOrLayout = layoutsRootFolder 
-      ? this._findLayoutFolderOrLayoutForScene(layoutsRootFolder, this.scene.ptr)
+
+    const currentLayoutFolderOrLayout = layoutsRootFolder
+      ? this._findLayoutFolderOrLayoutForScene(
+          layoutsRootFolder,
+          this.scene.ptr
+        )
       : null;
     const currentParent = currentLayoutFolderOrLayout?.getParent();
 
@@ -201,7 +204,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
           project,
           currentParent,
           currentLayoutFolderOrLayout,
-          (targetFolder) => {
+          targetFolder => {
             if (currentLayoutFolderOrLayout && currentParent) {
               currentParent.moveObjectFolderOrObjectToAnotherFolder(
                 currentLayoutFolderOrLayout,
@@ -282,22 +285,21 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   delete(skipConfirmation: boolean = false): void {
     const { project } = this.props;
     const layoutsRootFolder = project.getLayoutsRootFolder();
-    
-    // ✅ Übergebe skipConfirmation an onDeleteLayout
+
     this.props.onDeleteLayout(this.scene, skipConfirmation);
-    
+
     if (layoutsRootFolder) {
       const sceneName = this.scene.getName();
       layoutsRootFolder.removeRecursivelyObjectNamed(sceneName);
     }
-    
+
     this._onProjectItemModified();
   }
 
   _findParentFolder(folder: any, scenePtr: number): ?any {
     for (let i = 0; i < folder.getChildrenCount(); i++) {
       const child = folder.getChildAt(i);
-      
+
       if (child.isFolder()) {
         const found = this._findParentFolder(child, scenePtr);
         if (found) return found;
@@ -328,17 +330,20 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     const { project } = this.props;
     const layoutsRootFolder = project.getLayoutsRootFolder();
     if (!layoutsRootFolder) return 0;
-    
-    const parentFolder = this._findParentFolder(layoutsRootFolder, this.scene.ptr);
+
+    const parentFolder = this._findParentFolder(
+      layoutsRootFolder,
+      this.scene.ptr
+    );
     if (!parentFolder) return 0;
-    
+
     return this._getIndexInParent(parentFolder, this.scene.ptr);
   }
 
   _findLayoutFolderOrLayoutForScene(folder: any, scenePtr: number): ?any {
     for (let i = 0; i < folder.getChildrenCount(); i++) {
       const child = folder.getChildAt(i);
-      
+
       if (child.isFolder()) {
         const found = this._findLayoutFolderOrLayoutForScene(child, scenePtr);
         if (found) return found;
@@ -355,7 +360,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   _createNewFolderAndMove(i18n: I18nType): void {
     const layoutFolderOrLayout = this.getLayoutFolderOrLayout();
     if (!layoutFolderOrLayout) return;
-    
+
     createNewFolderAndMoveItem(
       this.props.project,
       layoutFolderOrLayout,
@@ -369,31 +374,44 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     const { project } = this.props;
     const layoutsRootFolder = project.getLayoutsRootFolder();
     if (!layoutsRootFolder) return null;
-    
-    return this._findLayoutFolderOrLayoutForScene(layoutsRootFolder, this.scene.ptr);
+
+    return this._findLayoutFolderOrLayoutForScene(
+      layoutsRootFolder,
+      this.scene.ptr
+    );
   }
 
-  moveAt(destinationIndex: number, targetFolder?: gdLayoutFolderOrLayout): void {
+  moveAt(
+    destinationIndex: number,
+    targetFolder?: gdLayoutFolderOrLayout
+  ): void {
     const { project } = this.props;
     const layoutsRootFolder = project.getLayoutsRootFolder();
     if (!layoutsRootFolder) return;
-    
+
     const sceneLayoutFolderOrLayout = this._findLayoutFolderOrLayoutForScene(
-      layoutsRootFolder, 
+      layoutsRootFolder,
       this.scene.ptr
     );
     if (!sceneLayoutFolderOrLayout) return;
-    
+
     const currentParentFolder = sceneLayoutFolderOrLayout.getParent();
     if (!currentParentFolder) return;
-    
-    const originIndex = this._getIndexInParent(currentParentFolder, this.scene.ptr);
-    
+
+    const originIndex = this._getIndexInParent(
+      currentParentFolder,
+      this.scene.ptr
+    );
+
     const destinationFolder = targetFolder || currentParentFolder;
-    
+
     if (destinationFolder === currentParentFolder) {
       if (destinationIndex === originIndex) return;
-      currentParentFolder.moveChild(originIndex, destinationIndex);
+      currentParentFolder.moveChild(
+        originIndex,
+        // When moving the item down, it must not be counted.
+        destinationIndex
+      );
     } else {
       currentParentFolder.moveObjectFolderOrObjectToAnotherFolder(
         sceneLayoutFolderOrLayout,
@@ -401,7 +419,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
         destinationIndex
       );
     }
-    
+
     this._onProjectItemModified();
   }
 
@@ -459,6 +477,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
       'unserializeFrom',
       project
     );
+    // Unserialization has overwritten the name.
     newScene.setName(newName);
     newScene.updateBehaviorsSharedData(project);
 

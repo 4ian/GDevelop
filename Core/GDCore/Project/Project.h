@@ -36,7 +36,8 @@ class Behavior;
 class BehaviorsSharedData;
 class BaseEvent;
 class SerializerElement;
-template<class T> class FolderOrItem;
+template <class T>
+class FolderOrItem;
 }  // namespace gd
 #undef GetObject  // Disable an annoying macro
 #undef CreateEvent
@@ -910,9 +911,11 @@ class GD_CORE_API Project {
   /**
    * \brief Unserialize and insert in the project the extensions.
    *
-   * Unserialization is done in two passe to allow dependencies between extensions.
+   * Unserialization is done in two passe to allow dependencies between
+   * extensions.
    *
-   * \note If an extension with the same name already exists, it will be overwritten.
+   * \note If an extension with the same name already exists, it will be
+   * overwritten.
    */
   void UnserializeAndInsertExtensionsFrom(
       const gd::SerializerElement& eventsFunctionsExtensionsElement);
@@ -966,16 +969,16 @@ class GD_CORE_API Project {
    */
   ///@{
   /**
-   * \brief Provide access to the ResourcesContainer member containing the list of
-   * the resources.
+   * \brief Provide access to the ResourcesContainer member containing the list
+   * of the resources.
    */
   const ResourcesContainer& GetResourcesManager() const {
     return resourcesContainer;
   }
 
   /**
-   * \brief Provide access to the ResourcesContainer member containing the list of
-   * the resources.
+   * \brief Provide access to the ResourcesContainer member containing the list
+   * of the resources.
    */
   ResourcesContainer& GetResourcesManager() { return resourcesContainer; }
 
@@ -1081,15 +1084,15 @@ class GD_CORE_API Project {
       const gd::SerializerElement& eventsFunctionsExtensionsElement);
 
   /**
-  * \brief Get the root folder for layouts.
-  */
+   * \brief Get the root folder for layouts.
+   */
   gd::FolderOrItem<gd::Layout>& GetLayoutsRootFolder() {
     return *layoutsRootFolder;
   }
 
   /**
-  * \brief Get the root folder for layouts (const).
-  */
+   * \brief Get the root folder for layouts (const).
+   */
   const gd::FolderOrItem<gd::Layout>& GetLayoutsRootFolder() const {
     return *layoutsRootFolder;
   }
@@ -1138,20 +1141,20 @@ class GD_CORE_API Project {
               ///< instead of the highest Z order
               ///< found on the layer at the scene
               ///< startup.
-  std::vector<std::unique_ptr<gd::Layout>> scenes;
+  std::vector<std::unique_ptr<gd::Layout>> scenes;  //< List of all scenes
   std::unique_ptr<gd::FolderOrItem<gd::Layout>> layoutsRootFolder;
   gd::VariablesContainer variables;  ///< Initial global variables
   gd::ObjectsContainer objectsContainer;
-  std::vector<std::unique_ptr<gd::ExternalLayout> >
+  std::vector<std::unique_ptr<gd::ExternalLayout>>
       externalLayouts;  ///< List of all externals layouts
-  std::vector<std::unique_ptr<gd::EventsFunctionsExtension> >
+  std::vector<std::unique_ptr<gd::EventsFunctionsExtension>>
       eventsFunctionsExtensions;
   gd::ResourcesContainer
       resourcesContainer;  ///< Contains all resources used by the project
   std::vector<gd::Platform*>
       platforms;  ///< Pointers to the platforms this project supports.
   gd::String firstLayout;
-  gd::String author;        ///< Game author name, for publishing purpose.
+  gd::String author;  ///< Game author name, for publishing purpose.
   std::vector<gd::String>
       authorIds;  ///< Game author ids, from GDevelop users DB.
   std::vector<gd::String>
@@ -1177,7 +1180,7 @@ class GD_CORE_API Project {
   gd::PlatformSpecificAssets platformSpecificAssets;
   gd::LoadingScreen loadingScreen;
   gd::Watermark watermark;
-  std::vector<std::unique_ptr<gd::ExternalEvents> >
+  std::vector<std::unique_ptr<gd::ExternalEvents>>
       externalEvents;  ///< List of all externals events
   ExtensionProperties
       extensionProperties;  ///< The properties of the extensions.
@@ -1196,8 +1199,8 @@ class GD_CORE_API Project {
       0;  ///< The GD build version used the last
           ///< time the project was saved.
   bool areEffectsHiddenInEditor =
-      false; ///< When false effects are not shown and a default light is used
-             ///< for 3D layers.
+      false;  ///< When false effects are not shown and a default light is used
+              ///< for 3D layers.
 };
 
 }  // namespace gd

@@ -6,11 +6,12 @@
 #pragma once
 
 #include <memory>
-#include <vector>
 #include <set>
-#include "GDCore/String.h"
+#include <vector>
+
+#include "GDCore/Project/FolderOrItem.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
-#include "GDCore/Project/FolderOrItem.h"  // NEU: statt ObjectFolderOrObject.h
+#include "GDCore/String.h"
 namespace gd {
 class Object;
 class Project;
@@ -35,17 +36,18 @@ namespace gd {
  * \ingroup PlatformDefinition
  */
 
-template <typename T> class FolderOrItem;
+template <typename T>
+class FolderOrItem;
 using ObjectFolderOrObject = FolderOrItem<gd::Object>;
 
 class GD_CORE_API ObjectsContainer {
  public:
   enum SourceType {
-      Unknown,
-      Global,
-      Scene,
-      Object,
-      Function,
+    Unknown,
+    Global,
+    Scene,
+    Object,
+    Function,
   };
 
   /**
@@ -128,7 +130,7 @@ class GD_CORE_API ObjectsContainer {
       const gd::Project& project,
       const gd::String& objectType,
       const gd::String& name,
-      gd::FolderOrItem<gd::Object>& folderOrItem,  // GEÄNDERT
+      gd::FolderOrItem<gd::Object>& folderOrItem,
       std::size_t position);
 
   /**
@@ -165,9 +167,9 @@ class GD_CORE_API ObjectsContainer {
    * moved in memory, as referenced by smart pointers internally).
    */
   void MoveObjectFolderOrObjectToAnotherContainerInFolder(
-      gd::FolderOrItem<gd::Object>& folderOrItem,  // GEÄNDERT
+      gd::FolderOrItem<gd::Object>& folderOrItem,
       gd::ObjectsContainer& newContainer,
-      gd::FolderOrItem<gd::Object>& newParentFolder,  // GEÄNDERT
+      gd::FolderOrItem<gd::Object>& newParentFolder,
       std::size_t newPosition);
 
   /**
@@ -178,14 +180,14 @@ class GD_CORE_API ObjectsContainer {
   /**
    * Provide a raw access to the vector containing the objects
    */
-  std::vector<std::unique_ptr<gd::Object> >& GetObjects() {
+  std::vector<std::unique_ptr<gd::Object>>& GetObjects() {
     return initialObjects;
   }
 
   /**
    * Provide a raw access to the vector containing the objects
    */
-  const std::vector<std::unique_ptr<gd::Object> >& GetObjects() const {
+  const std::vector<std::unique_ptr<gd::Object>>& GetObjects() const {
     return initialObjects;
   }
 
@@ -197,11 +199,10 @@ class GD_CORE_API ObjectsContainer {
    * Only use this for checking if you hold a valid `FolderOrItem` -
    * don't use this for rendering or anything else.
    */
-  std::vector<const FolderOrItem<gd::Object>*> GetAllObjectFolderOrObjects() const;  // GEÄNDERT
+  std::vector<const FolderOrItem<gd::Object>*> GetAllObjectFolderOrObjects()
+      const;
 
-  gd::FolderOrItem<gd::Object>& GetRootFolder() {  // GEÄNDERT
-      return *rootFolder;
-  }
+  gd::FolderOrItem<gd::Object>& GetRootFolder() { return *rootFolder; }
 
   void AddMissingObjectsInRootFolder();
 
@@ -249,13 +250,13 @@ class GD_CORE_API ObjectsContainer {
   ///@}
 
  protected:
-  std::vector<std::unique_ptr<gd::Object> >
+  std::vector<std::unique_ptr<gd::Object>>
       initialObjects;  ///< Objects contained.
   gd::ObjectGroupsContainer objectGroups;
 
  private:
   SourceType sourceType = Unknown;
-  std::unique_ptr<gd::FolderOrItem<gd::Object>> rootFolder;  // GEÄNDERT: Template statt konkrete Klasse
+  std::unique_ptr<gd::FolderOrItem<gd::Object>> rootFolder;
 
   /**
    * Initialize from another variables container, copying elements. Used by

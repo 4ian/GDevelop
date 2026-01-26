@@ -78,7 +78,8 @@ Project::Project()
       resourcesContainer(gd::ResourcesContainer::SourceType::Global),
       sceneResourcesPreloading("at-startup"),
       sceneResourcesUnloading("never"),
-      layoutsRootFolder(gd::make_unique<gd::FolderOrItem<gd::Layout>>("__ROOT")) {}
+      layoutsRootFolder(
+          gd::make_unique<gd::FolderOrItem<gd::Layout>>("__ROOT")) {}
 
 Project::~Project() {}
 
@@ -101,33 +102,36 @@ void Project::EnsureObjectDefaultBehaviors(gd::Object& object) const {
 
     const gd::String& behaviorName = behaviorMetadata.GetDefaultName();
 
-    // Check if we can keep a behavior that would have been already set up on the object.
+    // Check if we can keep a behavior that would have been already set up on
+    // the object.
     if (object.HasBehaviorNamed(behaviorName)) {
       const auto& behavior = object.GetBehavior(behaviorName);
 
-      if (!behavior.IsDefaultBehavior() || behavior.GetTypeName() != behaviorType) {
+      if (!behavior.IsDefaultBehavior() ||
+          behavior.GetTypeName() != behaviorType) {
         // Behavior type has changed, remove it so it is re-created.
         object.RemoveBehavior(behaviorName);
       }
     }
 
     if (!object.HasBehaviorNamed(behaviorName)) {
-      auto* behavior = object.AddNewBehavior(
-          project, behaviorType, behaviorName);
+      auto* behavior =
+          object.AddNewBehavior(project, behaviorType, behaviorName);
       behavior->SetDefaultBehavior(true);
     }
   };
 
-  auto &objectMetadata =
+  auto& objectMetadata =
       gd::MetadataProvider::GetObjectMetadata(platform, objectType);
   if (!MetadataProvider::IsBadObjectMetadata(objectMetadata)) {
     // Add all default behaviors.
     const auto& defaultBehaviorTypes = objectMetadata.GetDefaultBehaviors();
-    for (auto &behaviorType : defaultBehaviorTypes) {
+    for (auto& behaviorType : defaultBehaviorTypes) {
       addDefaultBehavior(behaviorType);
     }
 
-    // Ensure there are no default behaviors that would not be required left on the object.
+    // Ensure there are no default behaviors that would not be required left on
+    // the object.
     for (const auto& behaviorName : object.GetAllBehaviorNames()) {
       auto& behavior = object.GetBehavior(behaviorName);
       if (!behavior.IsDefaultBehavior()) {
@@ -135,7 +139,8 @@ void Project::EnsureObjectDefaultBehaviors(gd::Object& object) const {
         continue;
       }
 
-      if (defaultBehaviorTypes.find(behavior.GetTypeName()) == defaultBehaviorTypes.end()) {
+      if (defaultBehaviorTypes.find(behavior.GetTypeName()) ==
+          defaultBehaviorTypes.end()) {
         object.RemoveBehavior(behaviorName);
       }
     }
@@ -308,16 +313,18 @@ bool Project::HasLayoutNamed(const gd::String& name) const {
                   }) != scenes.end());
 }
 gd::Layout& Project::GetLayout(const gd::String& name) {
-  return *(*find_if(
-      scenes.begin(), scenes.end(), [&name](const std::unique_ptr<gd::Layout>& layout) {
-        return layout->GetName() == name;
-      }));
+  return *(*find_if(scenes.begin(),
+                    scenes.end(),
+                    [&name](const std::unique_ptr<gd::Layout>& layout) {
+                      return layout->GetName() == name;
+                    }));
 }
 const gd::Layout& Project::GetLayout(const gd::String& name) const {
-  return *(*find_if(
-      scenes.begin(), scenes.end(), [&name](const std::unique_ptr<gd::Layout>& layout) {
-        return layout->GetName() == name;
-      }));
+  return *(*find_if(scenes.begin(),
+                    scenes.end(),
+                    [&name](const std::unique_ptr<gd::Layout>& layout) {
+                      return layout->GetName() == name;
+                    }));
 }
 gd::Layout& Project::GetLayout(std::size_t index) { return *scenes[index]; }
 const gd::Layout& Project::GetLayout(std::size_t index) const {
@@ -363,36 +370,42 @@ gd::Layout& Project::InsertLayout(const gd::Layout& layout,
 }
 
 void Project::RemoveLayout(const gd::String& name) {
-  std::vector<std::unique_ptr<gd::Layout> >::iterator scene =
-      find_if(scenes.begin(), scenes.end(), [&name](const std::unique_ptr<gd::Layout>& layout) {
-        return layout->GetName() == name;
-      });
+  std::vector<std::unique_ptr<gd::Layout>>::iterator scene =
+      find_if(scenes.begin(),
+              scenes.end(),
+              [&name](const std::unique_ptr<gd::Layout>& layout) {
+                return layout->GetName() == name;
+              });
   if (scene == scenes.end()) return;
 
   scenes.erase(scene);
 }
 
 bool Project::HasExternalEventsNamed(const gd::String& name) const {
-  return (find_if(externalEvents.begin(),
-                  externalEvents.end(),
-                  [&name](const std::unique_ptr<gd::ExternalEvents>& externalEvents) {
-                    return externalEvents->GetName() == name;
-                  }) != externalEvents.end());
+  return (
+      find_if(
+          externalEvents.begin(),
+          externalEvents.end(),
+          [&name](const std::unique_ptr<gd::ExternalEvents>& externalEvents) {
+            return externalEvents->GetName() == name;
+          }) != externalEvents.end());
 }
 gd::ExternalEvents& Project::GetExternalEvents(const gd::String& name) {
-  return *(*find_if(externalEvents.begin(),
-                    externalEvents.end(),
-                    [&name](const std::unique_ptr<gd::ExternalEvents>& externalEvents) {
-                      return externalEvents->GetName() == name;
-                    }));
+  return *(*find_if(
+      externalEvents.begin(),
+      externalEvents.end(),
+      [&name](const std::unique_ptr<gd::ExternalEvents>& externalEvents) {
+        return externalEvents->GetName() == name;
+      }));
 }
 const gd::ExternalEvents& Project::GetExternalEvents(
     const gd::String& name) const {
-  return *(*find_if(externalEvents.begin(),
-                    externalEvents.end(),
-                    [&name](const std::unique_ptr<gd::ExternalEvents>& externalEvents) {
-                      return externalEvents->GetName() == name;
-                    }));
+  return *(*find_if(
+      externalEvents.begin(),
+      externalEvents.end(),
+      [&name](const std::unique_ptr<gd::ExternalEvents>& externalEvents) {
+        return externalEvents->GetName() == name;
+      }));
 }
 gd::ExternalEvents& Project::GetExternalEvents(std::size_t index) {
   return *externalEvents[index];
@@ -433,12 +446,12 @@ gd::ExternalEvents& Project::InsertExternalEvents(
 }
 
 void Project::RemoveExternalEvents(const gd::String& name) {
-  std::vector<std::unique_ptr<gd::ExternalEvents> >::iterator events =
-      find_if(externalEvents.begin(),
-              externalEvents.end(),
-              [&name](const std::unique_ptr<gd::ExternalEvents>& externalEvents) {
-                return externalEvents->GetName() == name;
-              });
+  std::vector<std::unique_ptr<gd::ExternalEvents>>::iterator events = find_if(
+      externalEvents.begin(),
+      externalEvents.end(),
+      [&name](const std::unique_ptr<gd::ExternalEvents>& externalEvents) {
+        return externalEvents->GetName() == name;
+      });
   if (events == externalEvents.end()) return;
 
   externalEvents.erase(events);
@@ -502,26 +515,30 @@ void Project::SwapExternalLayouts(std::size_t first, std::size_t second) {
                  externalLayouts.begin() + second);
 }
 bool Project::HasExternalLayoutNamed(const gd::String& name) const {
-  return (find_if(externalLayouts.begin(),
-                  externalLayouts.end(),
-                  [&name](const std::unique_ptr<gd::ExternalLayout>& externalLayout) {
-                    return externalLayout->GetName() == name;
-                  }) != externalLayouts.end());
+  return (
+      find_if(
+          externalLayouts.begin(),
+          externalLayouts.end(),
+          [&name](const std::unique_ptr<gd::ExternalLayout>& externalLayout) {
+            return externalLayout->GetName() == name;
+          }) != externalLayouts.end());
 }
 gd::ExternalLayout& Project::GetExternalLayout(const gd::String& name) {
-  return *(*find_if(externalLayouts.begin(),
-                    externalLayouts.end(),
-                    [&name](const std::unique_ptr<gd::ExternalLayout>& externalLayout) {
-                      return externalLayout->GetName() == name;
-                    }));
+  return *(*find_if(
+      externalLayouts.begin(),
+      externalLayouts.end(),
+      [&name](const std::unique_ptr<gd::ExternalLayout>& externalLayout) {
+        return externalLayout->GetName() == name;
+      }));
 }
 const gd::ExternalLayout& Project::GetExternalLayout(
     const gd::String& name) const {
-  return *(*find_if(externalLayouts.begin(),
-                    externalLayouts.end(),
-                    [&name](const std::unique_ptr<gd::ExternalLayout>& externalLayout) {
-                      return externalLayout->GetName() == name;
-                    }));
+  return *(*find_if(
+      externalLayouts.begin(),
+      externalLayouts.end(),
+      [&name](const std::unique_ptr<gd::ExternalLayout>& externalLayout) {
+        return externalLayout->GetName() == name;
+      }));
 }
 gd::ExternalLayout& Project::GetExternalLayout(std::size_t index) {
   return *externalLayouts[index];
@@ -562,12 +579,13 @@ gd::ExternalLayout& Project::InsertExternalLayout(
 }
 
 void Project::RemoveExternalLayout(const gd::String& name) {
-  std::vector<std::unique_ptr<gd::ExternalLayout> >::iterator externalLayout =
-      find_if(externalLayouts.begin(),
-              externalLayouts.end(),
-              [&name](const std::unique_ptr<gd::ExternalLayout>& externalLayout) {
-                return externalLayout->GetName() == name;
-              });
+  std::vector<std::unique_ptr<gd::ExternalLayout>>::iterator externalLayout =
+      find_if(
+          externalLayouts.begin(),
+          externalLayouts.end(),
+          [&name](const std::unique_ptr<gd::ExternalLayout>& externalLayout) {
+            return externalLayout->GetName() == name;
+          });
   if (externalLayout == externalLayouts.end()) return;
 
   externalLayouts.erase(externalLayout);
@@ -656,7 +674,7 @@ gd::EventsFunctionsExtension& Project::InsertEventsFunctionsExtension(
 }
 
 void Project::RemoveEventsFunctionsExtension(const gd::String& name) {
-  std::vector<std::unique_ptr<gd::EventsFunctionsExtension> >::iterator
+  std::vector<std::unique_ptr<gd::EventsFunctionsExtension>>::iterator
       eventsFunctionExtension = find_if(
           eventsFunctionsExtensions.begin(),
           eventsFunctionsExtensions.end(),
@@ -873,9 +891,11 @@ void Project::UnserializeFrom(const SerializerElement& element) {
       element.GetChild("objectsGroups", 0, "ObjectGroups"));
   resourcesContainer.UnserializeFrom(
       element.GetChild("resources", 0, "Resources"));
-  objectsContainer.UnserializeObjectsFrom(*this, element.GetChild("objects", 0, "Objects"));
+  objectsContainer.UnserializeObjectsFrom(
+      *this, element.GetChild("objects", 0, "Objects"));
   if (element.HasChild("objectsFolderStructure")) {
-    objectsContainer.UnserializeFoldersFrom(*this, element.GetChild("objectsFolderStructure", 0));
+    objectsContainer.UnserializeFoldersFrom(
+        *this, element.GetChild("objectsFolderStructure", 0));
   }
   objectsContainer.AddMissingObjectsInRootFolder();
 
@@ -906,12 +926,11 @@ void Project::UnserializeFrom(const SerializerElement& element) {
         });
   }
   for (std::size_t i = 0; i < scenes.size(); ++i) {
-      
-      if (!layoutsRootFolder->HasItemNamed(scenes[i]->GetName(), 
-          [](const gd::Layout& layout) { return layout.GetName(); })) {
-        layoutsRootFolder->InsertItem(scenes[i].get());
-      } else {
-      }
+    if (!layoutsRootFolder->HasItemNamed(
+            scenes[i]->GetName(),
+            [](const gd::Layout& layout) { return layout.GetName(); })) {
+      layoutsRootFolder->InsertItem(scenes[i].get());
+    }
   }
 
   externalEvents.clear();
@@ -943,7 +962,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
 }
 
 void Project::UnserializeAndInsertExtensionsFrom(
-  const gd::SerializerElement &eventsFunctionsExtensionsElement) {
+    const gd::SerializerElement& eventsFunctionsExtensionsElement) {
   eventsFunctionsExtensionsElement.ConsiderAsArrayOf(
       "eventsFunctionsExtension");
 
@@ -959,7 +978,8 @@ void Project::UnserializeAndInsertExtensionsFrom(
        ++i) {
     const SerializerElement& eventsFunctionsExtensionElement =
         eventsFunctionsExtensionsElement.GetChild(i);
-    const gd::String& name = eventsFunctionsExtensionElement.GetStringAttribute("name");
+    const gd::String& name =
+        eventsFunctionsExtensionElement.GetStringAttribute("name");
     extensionNameToElementIndex[name] = i;
 
     gd::EventsFunctionsExtension& eventsFunctionsExtension =
@@ -969,7 +989,7 @@ void Project::UnserializeAndInsertExtensionsFrom(
                   name, GetEventsFunctionsExtensionsCount());
 
     // Backup the events-based object variants
-    for (auto &eventsBasedObject :
+    for (auto& eventsBasedObject :
          eventsFunctionsExtension.GetEventsBasedObjects().GetInternalVector()) {
       gd::SerializerElement variantsElement;
       eventsBasedObject->GetVariants().SerializeVariantsTo(variantsElement);
@@ -982,35 +1002,38 @@ void Project::UnserializeAndInsertExtensionsFrom(
   }
 
   // Then unserialize functions, behaviors and objects content.
-  for (gd::String &extensionName :
+  for (gd::String& extensionName :
        GetUnserializingOrderExtensionNames(eventsFunctionsExtensionsElement)) {
-
     size_t extensionIndex = GetEventsFunctionsExtensionPosition(extensionName);
     if (extensionIndex == gd::String::npos) {
       // Should never happen because the extension was added in the first pass.
-      gd::LogError("Can't find extension " + extensionName + " in the list of extensions in second pass of unserialization.");
+      gd::LogError(
+          "Can't find extension " + extensionName +
+          " in the list of extensions in second pass of unserialization.");
       continue;
     }
-    auto& partiallyLoadedExtension = eventsFunctionsExtensions.at(extensionIndex);
+    auto& partiallyLoadedExtension =
+        eventsFunctionsExtensions.at(extensionIndex);
 
-    if (extensionNameToElementIndex.find(extensionName) == extensionNameToElementIndex.end()) {
+    if (extensionNameToElementIndex.find(extensionName) ==
+        extensionNameToElementIndex.end()) {
       // Should never happen because the extension element is present.
-      gd::LogError("Can't find extension element to unserialize for " + extensionName + " in second pass of unserialization.");
+      gd::LogError("Can't find extension element to unserialize for " +
+                   extensionName + " in second pass of unserialization.");
       continue;
     }
     size_t elementIndex = extensionNameToElementIndex[extensionName];
-    const SerializerElement &eventsFunctionsExtensionElement =
+    const SerializerElement& eventsFunctionsExtensionElement =
         eventsFunctionsExtensionsElement.GetChild(elementIndex);
 
-    partiallyLoadedExtension
-        ->UnserializeExtensionImplementationFrom(
-            *this, eventsFunctionsExtensionElement);
+    partiallyLoadedExtension->UnserializeExtensionImplementationFrom(
+        *this, eventsFunctionsExtensionElement);
 
-    for (auto &pair : objectTypeToVariantsElement) {
-      auto &objectType = pair.first;
-      auto &variantsElement = pair.second;
+    for (auto& pair : objectTypeToVariantsElement) {
+      auto& objectType = pair.first;
+      auto& variantsElement = pair.second;
 
-      auto &eventsBasedObject = GetEventsBasedObject(objectType);
+      auto& eventsBasedObject = GetEventsBasedObject(objectType);
       eventsBasedObject.GetVariants().UnserializeVariantsFrom(*this,
                                                               variantsElement);
     }
@@ -1018,22 +1041,26 @@ void Project::UnserializeAndInsertExtensionsFrom(
 }
 
 std::vector<gd::String> Project::GetUnserializingOrderExtensionNames(
-    const gd::SerializerElement &eventsFunctionsExtensionsElement) {
+    const gd::SerializerElement& eventsFunctionsExtensionsElement) {
   eventsFunctionsExtensionsElement.ConsiderAsArrayOf(
       "eventsFunctionsExtension");
 
-  // Some extension have custom objects, which have child objects coming from other extension.
-  // These child objects must be loaded completely before the parent custom obejct can be unserialized.
-  // This implies: an order on the extension unserialization (and no cycles).
+  // Some extension have custom objects, which have child objects coming from
+  // other extension. These child objects must be loaded completely before the
+  // parent custom obejct can be unserialized. This implies: an order on the
+  // extension unserialization (and no cycles).
 
   // At the beginning, everything is yet to be loaded.
   std::map<gd::String, size_t> extensionNameToElementIndex;
   std::vector<gd::String> remainingExtensionNames(
       eventsFunctionsExtensionsElement.GetChildrenCount());
-  for (std::size_t i = 0; i < eventsFunctionsExtensionsElement.GetChildrenCount(); ++i) {
+  for (std::size_t i = 0;
+       i < eventsFunctionsExtensionsElement.GetChildrenCount();
+       ++i) {
     const SerializerElement& eventsFunctionsExtensionElement =
         eventsFunctionsExtensionsElement.GetChild(i);
-    const gd::String& name = eventsFunctionsExtensionElement.GetStringAttribute("name");
+    const gd::String& name =
+        eventsFunctionsExtensionElement.GetStringAttribute("name");
 
     remainingExtensionNames[i] = name;
     extensionNameToElementIndex[name] = i;
@@ -1043,28 +1070,30 @@ std::vector<gd::String> Project::GetUnserializingOrderExtensionNames(
   // at least one other object from another extension that is not loaded yet.
   auto isDependentFromRemainingExtensions =
       [&remainingExtensionNames](
-          const gd::SerializerElement &eventsFunctionsExtensionElement) {
-        auto &eventsBasedObjectsElement =
+          const gd::SerializerElement& eventsFunctionsExtensionElement) {
+        auto& eventsBasedObjectsElement =
             eventsFunctionsExtensionElement.GetChild("eventsBasedObjects");
         eventsBasedObjectsElement.ConsiderAsArrayOf("eventsBasedObject");
         for (std::size_t eventsBasedObjectsIndex = 0;
              eventsBasedObjectsIndex <
              eventsBasedObjectsElement.GetChildrenCount();
              ++eventsBasedObjectsIndex) {
-          auto &objectsElement =
+          auto& objectsElement =
               eventsBasedObjectsElement.GetChild(eventsBasedObjectsIndex)
                   .GetChild("objects");
           objectsElement.ConsiderAsArrayOf("object");
 
           for (std::size_t objectIndex = 0;
-               objectIndex < objectsElement.GetChildrenCount(); ++objectIndex) {
-            const gd::String &objectType =
+               objectIndex < objectsElement.GetChildrenCount();
+               ++objectIndex) {
+            const gd::String& objectType =
                 objectsElement.GetChild(objectIndex).GetStringAttribute("type");
 
             gd::String extensionName =
                 eventsFunctionsExtensionElement.GetStringAttribute("name");
             gd::String usedExtensionName =
-                gd::PlatformExtension::GetExtensionFromFullObjectType(objectType);
+                gd::PlatformExtension::GetExtensionFromFullObjectType(
+                    objectType);
 
             if (usedExtensionName != extensionName &&
                 std::find(remainingExtensionNames.begin(),
@@ -1077,8 +1106,8 @@ std::vector<gd::String> Project::GetUnserializingOrderExtensionNames(
         return false;
       };
 
-  // Find the order of loading so that the extensions are loaded when all the other
-  // extensions they depend on are already loaded.
+  // Find the order of loading so that the extensions are loaded when all the
+  // other extensions they depend on are already loaded.
   std::vector<gd::String> loadOrderExtensionNames;
   bool foundAnyExtension = true;
   while (foundAnyExtension) {
@@ -1087,7 +1116,7 @@ std::vector<gd::String> Project::GetUnserializingOrderExtensionNames(
       auto extensionName = remainingExtensionNames[i];
 
       size_t elementIndex = extensionNameToElementIndex[extensionName];
-      const SerializerElement &eventsFunctionsExtensionElement =
+      const SerializerElement& eventsFunctionsExtensionElement =
           eventsFunctionsExtensionsElement.GetChild(elementIndex);
 
       if (!isDependentFromRemainingExtensions(
@@ -1180,7 +1209,7 @@ void Project::SerializeTo(SerializerElement& element) const {
   // end of compatibility code
 
   extensionProperties.SerializeTo(propElement.AddChild("extensionProperties"));
-  
+
   playableDevicesElement.AddChild("").SetStringValue("mobile");
 
   SerializerElement& platformsElement = propElement.AddChild("platforms");
@@ -1201,25 +1230,28 @@ void Project::SerializeTo(SerializerElement& element) const {
     std::cout << "ERROR: The project current platform is NULL.";
 
   if (sceneResourcesPreloading != "at-startup") {
-    propElement.SetAttribute("sceneResourcesPreloading", sceneResourcesPreloading);
+    propElement.SetAttribute("sceneResourcesPreloading",
+                             sceneResourcesPreloading);
   }
   if (sceneResourcesUnloading != "never") {
-    propElement.SetAttribute("sceneResourcesUnloading", sceneResourcesUnloading);
+    propElement.SetAttribute("sceneResourcesUnloading",
+                             sceneResourcesUnloading);
   }
 
   resourcesContainer.SerializeTo(element.AddChild("resources"));
   objectsContainer.SerializeObjectsTo(element.AddChild("objects"));
-  objectsContainer.SerializeFoldersTo(element.AddChild("objectsFolderStructure"));
-  objectsContainer.GetObjectGroups().SerializeTo(element.AddChild("objectsGroups"));
+  objectsContainer.SerializeFoldersTo(
+      element.AddChild("objectsFolderStructure"));
+  objectsContainer.GetObjectGroups().SerializeTo(
+      element.AddChild("objectsGroups"));
   GetVariables().SerializeTo(element.AddChild("variables"));
 
   element.SetAttribute("firstLayout", firstLayout);
-    gd::SerializerElement& layoutsElement = element.AddChild("layouts");
-    layoutsElement.ConsiderAsArrayOf("layout");
-    for (std::size_t i = 0; i < GetLayoutsCount(); i++)
-      GetLayout(i).SerializeTo(layoutsElement.AddChild("layout"));
-  
-  // NEU: Layout-Folder-Struktur serialisieren
+  gd::SerializerElement& layoutsElement = element.AddChild("layouts");
+  layoutsElement.ConsiderAsArrayOf("layout");
+  for (std::size_t i = 0; i < GetLayoutsCount(); i++)
+    GetLayout(i).SerializeTo(layoutsElement.AddChild("layout"));
+
   layoutsRootFolder->SerializeTo(
       element.AddChild("layoutsFolderStructure"),
       [](const gd::Layout& layout) { return layout.GetName(); });
@@ -1284,7 +1316,7 @@ gd::String Project::GetSafeName(const gd::String& name) {
   return newName;
 }
 
-Project::Project(const Project &other)
+Project::Project(const Project& other)
     : objectsContainer(gd::ObjectsContainer::SourceType::Global),
       resourcesContainer(gd::ResourcesContainer::SourceType::Global) {
   Init(other);

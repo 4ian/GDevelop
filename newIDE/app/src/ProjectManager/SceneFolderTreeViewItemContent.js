@@ -13,9 +13,9 @@ import { type HTMLDataset } from '../Utils/HTMLDataset';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { getSceneTreeViewItemId } from './SceneTreeViewItemContent';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
-import { 
-  buildMoveToFolderSubmenu, 
-  createNewFolderAndMoveItem 
+import {
+  buildMoveToFolderSubmenu,
+  createNewFolderAndMoveItem,
 } from './SceneTreeViewHelpers';
 
 const SCENE_FOLDER_CLIPBOARD_KIND = 'SceneFolder';
@@ -52,13 +52,10 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
     if (itemContent.getId() === scenesRootFolderId) return true;
-    
+
     let currentParent = this.folder.getParent();
     while (currentParent && !currentParent.isRootFolder()) {
-      if (
-        getSceneFolderTreeViewItemId(currentParent) ===
-        itemContent.getId()
-      ) {
+      if (getSceneFolderTreeViewItemId(currentParent) === itemContent.getId()) {
         return true;
       }
       currentParent = currentParent.getParent();
@@ -111,11 +108,11 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
   buildMenuTemplate(i18n: I18nType, index: number) {
     const { project } = this.props;
     const layoutsRootFolder = project.getLayoutsRootFolder();
-    
-    const foldersAndPaths = layoutsRootFolder 
+
+    const foldersAndPaths = layoutsRootFolder
       ? this._collectFoldersAndPaths(layoutsRootFolder)
       : [];
-    
+
     const currentParent = this.folder.getParent();
 
     return [
@@ -136,7 +133,7 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
           project,
           currentParent,
           this.folder,
-          (targetFolder) => {
+          targetFolder => {
             if (currentParent) {
               currentParent.moveObjectFolderOrObjectToAnotherFolder(
                 this.folder,
@@ -173,13 +170,13 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
 
   delete(): void {
     const { showDeleteConfirmation, onProjectItemModified } = this.props;
-    
+
     const contentCount = this._countFolderContents();
     const hasStartScene = this._containsStartScene();
-    
+
     let message;
     let confirmLabel = t`Delete`;
-    
+
     if (contentCount.scenes === 0 && contentCount.folders === 0) {
       message = t`Are you sure you want to remove this empty folder?`;
     } else {
@@ -189,14 +186,14 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
 
   This action cannot be undone.`;
       confirmLabel = t`Delete permanently`;
-      
+
       if (hasStartScene) {
         message += t`
 
   ⚠️ Warning: This includes your start scene. Another scene will be set as the new start scene.`;
       }
     }
-    
+
     showDeleteConfirmation({
       title: t`Remove folder`,
       message: message,
@@ -204,19 +201,21 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
     }).then(answer => {
       if (!answer) return;
 
-      // ✅ Lösche rekursiv mit skipConfirmation=true
       this._deleteRecursively(this.folder, true);
-      
+
       const parent = this.folder.getParent();
       if (parent) {
         parent.removeFolderChild(this.folder);
       }
-      
+
       onProjectItemModified();
     });
   }
 
-  _deleteRecursively(folder: gdLayoutFolderOrLayout, skipConfirmation: boolean = false): void {
+  _deleteRecursively(
+    folder: gdLayoutFolderOrLayout,
+    skipConfirmation: boolean = false
+  ): void {
     const childrenToDelete = [];
     for (let i = 0; i < folder.getChildrenCount(); i++) {
       childrenToDelete.push(folder.getChildAt(i));
@@ -229,7 +228,6 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
         const layout = child.getItem();
         if (layout) {
           const layoutName = layout.getName();
-          // ✅ Übergebe skipConfirmation an onDeleteLayout
           this.props.onDeleteLayout(layout, skipConfirmation);
           folder.removeRecursivelyObjectNamed(layoutName);
         }
@@ -240,7 +238,7 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
   _countFolderContents(): { scenes: number, folders: number } {
     let scenes = 0;
     let folders = 0;
-    
+
     const countRecursive = (folder: gdLayoutFolderOrLayout) => {
       for (let i = 0; i < folder.getChildrenCount(); i++) {
         const child = folder.getChildAt(i);
@@ -252,7 +250,7 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
         }
       }
     };
-    
+
     countRecursive(this.folder);
     return { scenes, folders };
   }
@@ -260,7 +258,7 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
   _containsStartScene(): boolean {
     const { project } = this.props;
     const firstLayout = project.getFirstLayout();
-    
+
     const checkRecursive = (folder: gdLayoutFolderOrLayout): boolean => {
       for (let i = 0; i < folder.getChildrenCount(); i++) {
         const child = folder.getChildAt(i);
@@ -275,7 +273,7 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
       }
       return false;
     };
-    
+
     return checkRecursive(this.folder);
   }
 
@@ -285,13 +283,16 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
     return parent.getChildPosition(this.folder);
   }
 
-  moveAt(destinationIndex: number, targetFolder?: gdLayoutFolderOrLayout): void {
+  moveAt(
+    destinationIndex: number,
+    targetFolder?: gdLayoutFolderOrLayout
+  ): void {
     const originIndex = this.getIndex();
     const currentParent = this.folder.getParent();
     if (!currentParent) return;
-    
+
     const destinationFolder = targetFolder || currentParent;
-    
+
     if (destinationFolder === currentParent) {
       if (destinationIndex !== originIndex) {
         currentParent.moveChild(originIndex, destinationIndex);
@@ -330,9 +331,7 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
     const name = SafeExtractor.extractStringProperty(clipboardContent, 'name');
     if (!name || !copiedFolder) return;
 
-    const newName = newNameGenerator(name, name =>
-      this._hasFolderNamed(name)
-    );
+    const newName = newNameGenerator(name, name => this._hasFolderNamed(name));
 
     const newFolder = this.folder.insertNewFolder(newName, 0);
     unserializeFromJSObject(newFolder, copiedFolder);
@@ -343,15 +342,19 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
   }
 
   _addScene(i18n: I18nType): void {
-    const { project, onProjectItemModified, editName, scrollToItem } = this.props;
-    
-    const newName = newNameGenerator(
-      i18n._(t`Untitled scene`),
-      name => project.hasLayoutNamed(name)
+    const {
+      project,
+      onProjectItemModified,
+      editName,
+      scrollToItem,
+    } = this.props;
+
+    const newName = newNameGenerator(i18n._(t`Untitled scene`), name =>
+      project.hasLayoutNamed(name)
     );
-    
+
     const newScene = project.insertNewLayout(
-      newName, 
+      newName,
       project.getLayoutsCount()
     );
     newScene.setName(newName);
@@ -371,9 +374,9 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
     }
 
     onProjectItemModified();
-    
+
     this.props.expandFolders([this.getId()]);
-    
+
     setTimeout(() => {
       scrollToItem(getSceneTreeViewItemId(newScene));
     }, 100);
@@ -381,24 +384,23 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
 
   _addFolder(): void {
     const { onProjectItemModified, editName, expandFolders } = this.props;
-    
-    const newFolderName = newNameGenerator(
-      'NewFolder',
-      name => this._hasFolderNamed(name)
+
+    const newFolderName = newNameGenerator('NewFolder', name =>
+      this._hasFolderNamed(name)
     );
-    
+
     const newFolder = this.folder.insertNewFolder(newFolderName, 0);
-    
+
     onProjectItemModified();
     expandFolders([this.getId()]);
     editName(getSceneFolderTreeViewItemId(newFolder));
   }
 
   _hasFolderNamed(name: string): boolean {
-    const childrenCount = this.folder.getChildrenCount 
-      ? this.folder.getChildrenCount() 
+    const childrenCount = this.folder.getChildrenCount
+      ? this.folder.getChildrenCount()
       : 0;
-    
+
     for (let i = 0; i < childrenCount; i++) {
       const child = this.folder.getChildAt(i);
       if (child && child.isFolder && child.isFolder()) {
@@ -407,28 +409,27 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
         }
       }
     }
-    
+
     return false;
   }
 
   _collectFoldersAndPaths(
-  folder: any,
-  parentPath: string = '',
-  result: Array<{ folder: any, path: string }> = []
-): Array<{ folder: any, path: string }> {
-  for (let i = 0; i < folder.getChildrenCount(); i++) {
-    const child = folder.getChildAt(i);
-    if (child.isFolder()) {
-      const folderName = child.getFolderName();
-      const path = parentPath ? `${parentPath}/${folderName}` : folderName;
-      result.push({ folder: child, path });
-      this._collectFoldersAndPaths(child, path, result);
+    folder: any,
+    parentPath: string = '',
+    result: Array<{ folder: any, path: string }> = []
+  ): Array<{ folder: any, path: string }> {
+    for (let i = 0; i < folder.getChildrenCount(); i++) {
+      const child = folder.getChildAt(i);
+      if (child.isFolder()) {
+        const folderName = child.getFolderName();
+        const path = parentPath ? `${parentPath}/${folderName}` : folderName;
+        result.push({ folder: child, path });
+        this._collectFoldersAndPaths(child, path, result);
+      }
     }
+    return result;
   }
-  return result;
-}
 
-  // Erstelle neuen Ordner und verschiebe diesen Ordner hinein
   _createNewFolderAndMove(i18n: I18nType): void {
     createNewFolderAndMoveItem(
       this.props.project,

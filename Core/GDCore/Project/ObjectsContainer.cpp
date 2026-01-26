@@ -8,8 +8,8 @@
 #include <algorithm>
 
 #include "GDCore/Extensions/Platform.h"
-#include "GDCore/Project/Object.h"
 #include "GDCore/Project/FolderOrItem.h"
+#include "GDCore/Project/Object.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/PolymorphicClone.h"
@@ -70,13 +70,11 @@ void ObjectsContainer::UnserializeFoldersFrom(
 }
 
 void ObjectsContainer::AddMissingObjectsInRootFolder() {
-  
   for (std::size_t i = 0; i < initialObjects.size(); ++i) {
     const gd::String& objectName = initialObjects[i]->GetName();
-    
+
     if (!rootFolder->HasItemNamed(objectName, GetObjectName)) {
       rootFolder->InsertItem(&(*initialObjects[i]));
-    } else {
     }
   }
 }
@@ -85,7 +83,7 @@ void ObjectsContainer::UnserializeObjectsFrom(
     gd::Project& project, const SerializerElement& element) {
   Clear();
   element.ConsiderAsArrayOf("object", "Objet");
-  
+
   for (std::size_t i = 0; i < element.GetChildrenCount(); ++i) {
     const SerializerElement& objectElement = element.GetChild(i);
 
@@ -97,7 +95,6 @@ void ObjectsContainer::UnserializeObjectsFrom(
     if (newObject) {
       newObject->UnserializeFrom(project, objectElement);
       initialObjects.push_back(std::move(newObject));
-    } else {
     }
   }
 }
@@ -218,12 +215,12 @@ void ObjectsContainer::MoveObjectFolderOrObjectToAnotherContainerInFolder(
     std::size_t newPosition) {
   if (folderOrItem.IsFolder() || !newParentFolder.IsFolder()) return;
 
-  std::vector<std::unique_ptr<gd::Object>>::iterator objectIt = find_if(
-      initialObjects.begin(),
-      initialObjects.end(),
-      [&folderOrItem](std::unique_ptr<gd::Object>& object) {
-        return object->GetName() == folderOrItem.GetItem().GetName();
-      });
+  std::vector<std::unique_ptr<gd::Object>>::iterator objectIt =
+      find_if(initialObjects.begin(),
+              initialObjects.end(),
+              [&folderOrItem](std::unique_ptr<gd::Object>& object) {
+                return object->GetName() == folderOrItem.GetItem().GetName();
+              });
   if (objectIt == initialObjects.end()) return;
 
   std::unique_ptr<gd::Object> object = std::move(*objectIt);
@@ -243,12 +240,12 @@ std::set<gd::String> ObjectsContainer::GetAllObjectNames() const {
   return names;
 }
 
-std::vector<const FolderOrItem<gd::Object>*> 
+std::vector<const FolderOrItem<gd::Object>*>
 ObjectsContainer::GetAllObjectFolderOrObjects() const {
   std::vector<const FolderOrItem<gd::Object>*> results;
 
-  std::function<void(const FolderOrItem<gd::Object>& folder)> addChildrenOfFolder =
-      [&](const FolderOrItem<gd::Object>& folder) {
+  std::function<void(const FolderOrItem<gd::Object>& folder)>
+      addChildrenOfFolder = [&](const FolderOrItem<gd::Object>& folder) {
         for (size_t i = 0; i < folder.GetChildrenCount(); ++i) {
           const auto& child = folder.GetChildAt(i);
           results.push_back(&child);
@@ -264,4 +261,4 @@ ObjectsContainer::GetAllObjectFolderOrObjects() const {
   return results;
 }
 
-}
+}  // namespace gd

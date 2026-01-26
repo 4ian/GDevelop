@@ -28,7 +28,7 @@ export const buildMoveToFolderSubmenu = (
   onCreateNewFolder: () => void
 ) => {
   const layoutsRootFolder = project.getLayoutsRootFolder();
-  const foldersAndPaths = layoutsRootFolder 
+  const foldersAndPaths = layoutsRootFolder
     ? collectFoldersAndPaths(layoutsRootFolder)
     : [];
 
@@ -71,7 +71,7 @@ export const createNewFolderAndMoveItem = (
 ): void => {
   const layoutsRootFolder = project.getLayoutsRootFolder();
   if (!layoutsRootFolder) return;
-  
+
   const newFolderName = newNameGenerator('NewFolder', name => {
     for (let i = 0; i < layoutsRootFolder.getChildrenCount(); i++) {
       const child = layoutsRootFolder.getChildAt(i);
@@ -81,9 +81,9 @@ export const createNewFolderAndMoveItem = (
     }
     return false;
   });
-  
+
   const newFolder = layoutsRootFolder.insertNewFolder(newFolderName, 0);
-  
+
   const currentParent = itemToMove.getParent();
   if (currentParent) {
     currentParent.moveObjectFolderOrObjectToAnotherFolder(
@@ -92,9 +92,9 @@ export const createNewFolderAndMoveItem = (
       0
     );
   }
-  
+
   onProjectItemModified();
-  
+
   if (expandFolders) {
     expandFolders([getSceneFolderTreeViewItemId(newFolder)]);
   }

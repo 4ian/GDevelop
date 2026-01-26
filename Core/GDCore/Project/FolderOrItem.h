@@ -5,20 +5,20 @@
  */
 #ifndef GDCORE_FOLDERORITEM_H
 #define GDCORE_FOLDERORITEM_H
+#include <algorithm>
 #include <memory>
 #include <vector>
-#include <algorithm>
 
+#include "GDCore/Project/QuickCustomization.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
-#include "GDCore/Project/QuickCustomization.h"
-#include "GDCore/Tools/MakeUnique.h"
 #include "GDCore/Tools/Log.h"
+#include "GDCore/Tools/MakeUnique.h"
 
 namespace gd {
 class Project;
 class SerializerElement;
-}
+}  // namespace gd
 
 namespace gd {
 
@@ -39,12 +39,12 @@ class GD_CORE_API FolderOrItem {
    */
   FolderOrItem();
   virtual ~FolderOrItem();
-  
+
   /**
    * \brief Constructor for creating an instance representing a folder.
    */
   FolderOrItem(gd::String folderName_, FolderOrItem<T>* parent_ = nullptr);
-  
+
   /**
    * \brief Constructor for creating an instance representing an item.
    */
@@ -59,7 +59,7 @@ class GD_CORE_API FolderOrItem {
    * \brief Returns true if the instance represents a folder.
    */
   bool IsFolder() const { return !folderName.empty(); }
-  
+
   /**
    * \brief Returns the name of the folder.
    */
@@ -77,7 +77,7 @@ class GD_CORE_API FolderOrItem {
    */
   template <typename GetNameFunc>
   bool HasItemNamed(const gd::String& name, GetNameFunc getName);
-  
+
   /**
    * \brief Returns the child instance holding the item with the given name
    * (recursive search).
@@ -93,17 +93,17 @@ class GD_CORE_API FolderOrItem {
     if (IsFolder()) return children.size();
     return 0;
   }
-  
+
   /**
    * \brief Returns the child FolderOrItem at the given index.
    */
   FolderOrItem<T>& GetChildAt(std::size_t index);
-  
+
   /**
    * \brief Returns the child FolderOrItem at the given index.
    */
   const FolderOrItem<T>& GetChildAt(std::size_t index) const;
-  
+
   /**
    * \brief Returns the child FolderOrItem that represents the item
    * with the given name. To use only if sure that the instance holds the item
@@ -133,20 +133,20 @@ class GD_CORE_API FolderOrItem {
    * \brief Moves a child from a position to a new one.
    */
   void MoveChild(std::size_t oldIndex, std::size_t newIndex);
-  
+
   /**
    * \brief Removes the given child from the instance's children. If the given
    * child contains children of its own, does nothing.
    */
   void RemoveFolderChild(const FolderOrItem<T>& childToRemove);
-  
+
   /**
    * \brief Removes the child representing the item with the given name from
    * the instance children and recursively does it for every folder children.
    */
   template <typename GetNameFunc>
   void RemoveRecursivelyItemNamed(const gd::String& name, GetNameFunc getName);
-  
+
   /**
    * \brief Clears all children
    */
@@ -157,14 +157,14 @@ class GD_CORE_API FolderOrItem {
    * position.
    */
   void InsertItem(T* insertedItem, std::size_t position = (size_t)-1);
-  
+
   /**
    * \brief Inserts an instance representing a folder with the given name at the
    * given position.
    */
   FolderOrItem<T>& InsertNewFolder(const gd::String& newFolderName,
                                    std::size_t position);
-  
+
   /**
    * \brief Returns true if the instance is a descendant of the given instance
    * of FolderOrItem.
@@ -176,21 +176,21 @@ class GD_CORE_API FolderOrItem {
    * in the instance's children.
    */
   std::size_t GetChildPosition(const FolderOrItem<T>& child) const;
-  
+
   /**
    * \brief Moves the given child FolderOrItem to the given folder at
    * the given position.
    */
-  void MoveFolderOrItemToAnotherFolder(
-      FolderOrItem<T>& folderOrItem,
-      FolderOrItem<T>& newParentFolder,
-      std::size_t newPosition);
+  void MoveFolderOrItemToAnotherFolder(FolderOrItem<T>& folderOrItem,
+                                       FolderOrItem<T>& newParentFolder,
+                                       std::size_t newPosition);
 
-  QuickCustomization::Visibility GetQuickCustomizationVisibility() const { 
-    return quickCustomizationVisibility; 
+  QuickCustomization::Visibility GetQuickCustomizationVisibility() const {
+    return quickCustomizationVisibility;
   }
-  
-  void SetQuickCustomizationVisibility(QuickCustomization::Visibility visibility) {
+
+  void SetQuickCustomizationVisibility(
+      QuickCustomization::Visibility visibility) {
     quickCustomizationVisibility = visibility;
   }
 
@@ -214,61 +214,55 @@ class GD_CORE_API FolderOrItem {
                        GetItemFunc getItem);
   ///@}
 
-    /**
+  /**
    * \brief Compatibility wrapper: GetObject() -> GetItem()
    */
   T& GetObject() const { return GetItem(); }
-  
+
   /**
    * \brief Compatibility wrapper: HasObjectNamed() -> HasItemNamed()
    */
   bool HasObjectNamed(const gd::String& name) {
-    return HasItemNamed(name, [](const T& item) {
-      return item.GetName();
-    });
+    return HasItemNamed(name, [](const T& item) { return item.GetName(); });
   }
-  
+
   /**
    * \brief Compatibility wrapper: GetObjectNamed() -> GetItemNamed()
    */
   FolderOrItem<T>& GetObjectNamed(const gd::String& name) {
-    return GetItemNamed(name, [](const T& item) {
-      return item.GetName();
-    });
+    return GetItemNamed(name, [](const T& item) { return item.GetName(); });
   }
-  
+
   /**
    * \brief Compatibility wrapper: GetObjectChild() -> GetItemChild()
    */
   FolderOrItem<T>& GetObjectChild(const gd::String& name) {
-    return GetItemChild(name, [](const T& item) {
-      return item.GetName();
-    });
+    return GetItemChild(name, [](const T& item) { return item.GetName(); });
   }
-  
+
   /**
    * \brief Compatibility wrapper: InsertObject() -> InsertItem()
    */
   void InsertObject(T* insertedItem, std::size_t position = (size_t)-1) {
     InsertItem(insertedItem, position);
   }
-  
+
   /**
-   * \brief Compatibility wrapper: RemoveRecursivelyObjectNamed() -> RemoveRecursivelyItemNamed()
+   * \brief Compatibility wrapper: RemoveRecursivelyObjectNamed() ->
+   * RemoveRecursivelyItemNamed()
    */
   void RemoveRecursivelyObjectNamed(const gd::String& name) {
-    RemoveRecursivelyItemNamed(name, [](const T& item) {
-      return item.GetName();
-    });
+    RemoveRecursivelyItemNamed(name,
+                               [](const T& item) { return item.GetName(); });
   }
-  
+
   /**
-   * \brief Compatibility wrapper: MoveObjectFolderOrObjectToAnotherFolder() -> MoveFolderOrItemToAnotherFolder()
+   * \brief Compatibility wrapper: MoveObjectFolderOrObjectToAnotherFolder() ->
+   * MoveFolderOrItemToAnotherFolder()
    */
-  void MoveObjectFolderOrObjectToAnotherFolder(
-      FolderOrItem<T>& folderOrItem,
-      FolderOrItem<T>& newParentFolder,
-      std::size_t newPosition) {
+  void MoveObjectFolderOrObjectToAnotherFolder(FolderOrItem<T>& folderOrItem,
+                                               FolderOrItem<T>& newParentFolder,
+                                               std::size_t newPosition) {
     MoveFolderOrItemToAnotherFolder(folderOrItem, newParentFolder, newPosition);
   }
 
@@ -283,7 +277,6 @@ class GD_CORE_API FolderOrItem {
   gd::String folderName;
   std::vector<std::unique_ptr<FolderOrItem<T>>> children;
 };
-
 
 template <typename T>
 FolderOrItem<T>& FolderOrItem<T>::GetBadFolderOrItem() {
@@ -315,7 +308,8 @@ FolderOrItem<T>::~FolderOrItem() {}
 
 template <typename T>
 template <typename GetNameFunc>
-bool FolderOrItem<T>::HasItemNamed(const gd::String& name, GetNameFunc getName) {
+bool FolderOrItem<T>::HasItemNamed(const gd::String& name,
+                                   GetNameFunc getName) {
   if (IsFolder()) {
     return std::any_of(
         children.begin(),
@@ -330,7 +324,8 @@ bool FolderOrItem<T>::HasItemNamed(const gd::String& name, GetNameFunc getName) 
 
 template <typename T>
 template <typename GetNameFunc>
-FolderOrItem<T>& FolderOrItem<T>::GetItemNamed(const gd::String& name, GetNameFunc getName) {
+FolderOrItem<T>& FolderOrItem<T>::GetItemNamed(const gd::String& name,
+                                               GetNameFunc getName) {
   if (item && getName(*item) == name) {
     return *this;
   }
@@ -365,7 +360,8 @@ const FolderOrItem<T>& FolderOrItem<T>::GetChildAt(std::size_t index) const {
 
 template <typename T>
 template <typename GetNameFunc>
-FolderOrItem<T>& FolderOrItem<T>::GetItemChild(const gd::String& name, GetNameFunc getName) {
+FolderOrItem<T>& FolderOrItem<T>::GetItemChild(const gd::String& name,
+                                               GetNameFunc getName) {
   for (std::size_t j = 0; j < children.size(); j++) {
     if (!children[j]->IsFolder()) {
       if (getName(children[j]->GetItem()) == name) return *children[j];
@@ -385,7 +381,8 @@ void FolderOrItem<T>::InsertItem(T* insertedItem, std::size_t position) {
 }
 
 template <typename T>
-std::size_t FolderOrItem<T>::GetChildPosition(const FolderOrItem<T>& child) const {
+std::size_t FolderOrItem<T>::GetChildPosition(
+    const FolderOrItem<T>& child) const {
   for (std::size_t j = 0; j < children.size(); j++) {
     if (children[j].get() == &child) return j;
   }
@@ -393,8 +390,8 @@ std::size_t FolderOrItem<T>::GetChildPosition(const FolderOrItem<T>& child) cons
 }
 
 template <typename T>
-FolderOrItem<T>& FolderOrItem<T>::InsertNewFolder(const gd::String& newFolderName,
-                                                   std::size_t position) {
+FolderOrItem<T>& FolderOrItem<T>::InsertNewFolder(
+    const gd::String& newFolderName, std::size_t position) {
   auto newFolderPtr = gd::make_unique<FolderOrItem<T>>(newFolderName, this);
   FolderOrItem<T>& newFolder = *(*(children.insert(
       position < children.size() ? children.begin() + position : children.end(),
@@ -404,15 +401,17 @@ FolderOrItem<T>& FolderOrItem<T>::InsertNewFolder(const gd::String& newFolderNam
 
 template <typename T>
 template <typename GetNameFunc>
-void FolderOrItem<T>::RemoveRecursivelyItemNamed(const gd::String& name, GetNameFunc getName) {
+void FolderOrItem<T>::RemoveRecursivelyItemNamed(const gd::String& name,
+                                                 GetNameFunc getName) {
   if (IsFolder()) {
     children.erase(
-        std::remove_if(children.begin(),
-                       children.end(),
-                       [&name, &getName](std::unique_ptr<FolderOrItem<T>>& folderOrItem) {
-                         return !folderOrItem->IsFolder() &&
-                                getName(folderOrItem->GetItem()) == name;
-                       }),
+        std::remove_if(
+            children.begin(),
+            children.end(),
+            [&name, &getName](std::unique_ptr<FolderOrItem<T>>& folderOrItem) {
+              return !folderOrItem->IsFolder() &&
+                     getName(folderOrItem->GetItem()) == name;
+            }),
         children.end());
     for (auto& it : children) {
       it->RemoveRecursivelyItemNamed(name, getName);
@@ -431,7 +430,8 @@ void FolderOrItem<T>::Clear() {
 }
 
 template <typename T>
-bool FolderOrItem<T>::IsADescendantOf(const FolderOrItem<T>& otherFolderOrItem) {
+bool FolderOrItem<T>::IsADescendantOf(
+    const FolderOrItem<T>& otherFolderOrItem) {
   if (parent == nullptr) return false;
   if (&(*parent) == &otherFolderOrItem) return true;
   return parent->IsADescendantOf(otherFolderOrItem);
@@ -453,12 +453,12 @@ void FolderOrItem<T>::RemoveFolderChild(const FolderOrItem<T>& childToRemove) {
       childToRemove.GetChildrenCount() > 0) {
     return;
   }
-  auto it = std::find_if(
-      children.begin(),
-      children.end(),
-      [&childToRemove](std::unique_ptr<FolderOrItem<T>>& child) {
-        return child.get() == &childToRemove;
-      });
+  auto it =
+      std::find_if(children.begin(),
+                   children.end(),
+                   [&childToRemove](std::unique_ptr<FolderOrItem<T>>& child) {
+                     return child.get() == &childToRemove;
+                   });
   if (it == children.end()) return;
 
   children.erase(it);
@@ -493,14 +493,16 @@ void FolderOrItem<T>::MoveFolderOrItemToAnotherFolder(
 
 template <typename T>
 template <typename GetNameFunc>
-void FolderOrItem<T>::SerializeTo(SerializerElement& element, GetNameFunc getName) const {
+void FolderOrItem<T>::SerializeTo(SerializerElement& element,
+                                  GetNameFunc getName) const {
   if (IsFolder()) {
     element.SetAttribute("folderName", GetFolderName());
     if (children.size() > 0) {
       SerializerElement& childrenElement = element.AddChild("children");
       childrenElement.ConsiderAsArrayOf("folderOrItem");
       for (std::size_t j = 0; j < children.size(); j++) {
-        children[j]->SerializeTo(childrenElement.AddChild("folderOrItem"), getName);
+        children[j]->SerializeTo(childrenElement.AddChild("folderOrItem"),
+                                 getName);
       }
     }
   } else {
@@ -518,11 +520,10 @@ void FolderOrItem<T>::SerializeTo(SerializerElement& element, GetNameFunc getNam
 
 template <typename T>
 template <typename ItemContainerType, typename GetItemFunc>
-void FolderOrItem<T>::UnserializeFrom(
-    gd::Project& project,
-    const SerializerElement& element,
-    ItemContainerType& itemContainer,
-    GetItemFunc getItem) {
+void FolderOrItem<T>::UnserializeFrom(gd::Project& project,
+                                      const SerializerElement& element,
+                                      ItemContainerType& itemContainer,
+                                      GetItemFunc getItem) {
   children.clear();
   gd::String potentialFolderName = element.GetStringAttribute("folderName", "");
 
@@ -531,7 +532,8 @@ void FolderOrItem<T>::UnserializeFrom(
     folderName = potentialFolderName;
 
     if (element.HasChild("children")) {
-      const SerializerElement& childrenElements = element.GetChild("children", 0);
+      const SerializerElement& childrenElements =
+          element.GetChild("children", 0);
       childrenElements.ConsiderAsArrayOf("folderOrItem");
       for (std::size_t i = 0; i < childrenElements.GetChildrenCount(); ++i) {
         std::unique_ptr<FolderOrItem<T>> childFolderOrItem =
@@ -539,31 +541,31 @@ void FolderOrItem<T>::UnserializeFrom(
         childFolderOrItem->UnserializeFrom(
             project, childrenElements.GetChild(i), itemContainer, getItem);
         childFolderOrItem->parent = this;
-        
+
         if (childFolderOrItem->folderName != "__INVALID__") {
           children.push_back(std::move(childFolderOrItem));
         }
       }
     }
-} else {
+  } else {
     folderName = "";
     gd::String itemName = element.GetStringAttribute("itemName", "");
     if (itemName.empty()) {
-        itemName = element.GetStringAttribute("objectName", "");
+      itemName = element.GetStringAttribute("objectName", "");
     }
-    
+
     if (itemName.empty()) {
-        folderName = "__INVALID__";
-        return;
+      folderName = "__INVALID__";
+      return;
     }
-    
+
     item = getItem(itemContainer, itemName);
-    
+
     if (item == nullptr) {
-        folderName = "__INVALID__";
-        return;
+      folderName = "__INVALID__";
+      return;
     }
-}
+  }
 
   if (element.HasChild("quickCustomizationVisibility")) {
     quickCustomizationVisibility =
@@ -575,6 +577,6 @@ void FolderOrItem<T>::UnserializeFrom(
   }
 }
 
-}
+}  // namespace gd
 
 #endif

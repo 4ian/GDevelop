@@ -73,9 +73,10 @@ namespace gdjs {
      */
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      spriteObjectData: ObjectData & SpriteObjectDataType
+      spriteObjectData: ObjectData & SpriteObjectDataType,
+      instanceData?: InstanceData
     ) {
-      super(instanceContainer, spriteObjectData);
+      super(instanceContainer, spriteObjectData, instanceData);
       this._updateIfNotVisible = !!spriteObjectData.updateIfNotVisible;
       this._preScale = spriteObjectData.preScale || 1;
       this._renderer = new gdjs.SpriteRuntimeObjectRenderer(

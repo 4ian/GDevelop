@@ -62,7 +62,8 @@ namespace gdjs {
   }
 
   /** @category Behaviors > Platform */
-  export interface PlatformerObjectNetworkSyncData extends BehaviorNetworkSyncData {
+  export interface PlatformerObjectNetworkSyncData
+    extends BehaviorNetworkSyncData {
     props: PlatformerObjectNetworkSyncDataType;
   }
 

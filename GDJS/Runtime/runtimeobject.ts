@@ -240,7 +240,8 @@ namespace gdjs {
      */
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      objectData: ObjectData
+      objectData: ObjectData,
+      instanceData: InstanceData | undefined
     ) {
       this.name = objectData.name || '';
       this.type = objectData.type || '';
@@ -274,6 +275,15 @@ namespace gdjs {
           this._behaviors.push(behavior);
         }
         this._behaviorsTable.put(autoData.name, behavior);
+      }
+      if (instanceData && instanceData.behaviorOverridings) {
+        for (const behaviorOverriding of instanceData.behaviorOverridings) {
+          const behavior = this.getBehavior(behaviorOverriding.name);
+          if (!behavior) {
+            continue;
+          }
+          behavior.applyBehaviorOverriding(behaviorOverriding);
+        }
       }
       this._timers = new Hashtable();
     }

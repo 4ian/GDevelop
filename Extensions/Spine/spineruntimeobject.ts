@@ -68,9 +68,10 @@ namespace gdjs {
      */
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      objectData: SpineObjectData
+      objectData: SpineObjectData,
+      instanceData?: InstanceData
     ) {
-      super(instanceContainer, objectData);
+      super(instanceContainer, objectData, instanceData);
 
       this._animations = objectData.content.animations;
       this._originalScale = objectData.content.scale;

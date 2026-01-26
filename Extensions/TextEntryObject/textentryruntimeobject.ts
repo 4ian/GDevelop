@@ -19,9 +19,10 @@ namespace gdjs {
      */
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      textEntryObjectData: ObjectData
+      textEntryObjectData: ObjectData,
+      instanceData?: InstanceData
     ) {
-      super(instanceContainer, textEntryObjectData);
+      super(instanceContainer, textEntryObjectData, instanceData);
       this._renderer = new gdjs.TextEntryRuntimeObjectRenderer(this);
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.

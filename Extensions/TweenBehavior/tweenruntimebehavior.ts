@@ -11,7 +11,8 @@ namespace gdjs {
   /**
    * @category Behaviors > Tween
    */
-  export interface TweenBehaviorNetworkSyncData extends BehaviorNetworkSyncData {
+  export interface TweenBehaviorNetworkSyncData
+    extends BehaviorNetworkSyncData {
     props: TweenBehaviorNetworkSyncDataType;
   }
 

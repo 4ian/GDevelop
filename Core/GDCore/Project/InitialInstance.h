@@ -9,7 +9,7 @@
 #include <map>
 
 #include "GDCore/Project/VariablesContainer.h"
-#include "GDCore/Project/Behavior.h"
+#include "GDCore/Project/BehaviorsContainer.h"
 #include "GDCore/String.h"
 namespace gd {
 class PropertyDescriptor;
@@ -17,6 +17,7 @@ class Project;
 class Layout;
 class ObjectsContainer;
 class Object;
+class Behavior;
 }  // namespace gd
 
 namespace gd {
@@ -32,22 +33,6 @@ class GD_CORE_API InitialInstance {
    */
   InitialInstance();
   virtual ~InitialInstance() {};
-
-  /**
-   * Copy constructor. Calls Init().
-   */
-  InitialInstance(const gd::InitialInstance &initialInstance) {
-    Init(initialInstance);
-  };
-
-  /**
-   * Assignment operator. Calls Init().
-   */
-  InitialInstance &operator=(const gd::InitialInstance &initialInstance) {
-    if ((this) != &initialInstance)
-      Init(initialInstance);
-    return *this;
-  }
 
   /**
    * Must return a pointer to a copy of the object. A such method is needed to
@@ -461,15 +446,6 @@ class GD_CORE_API InitialInstance {
   ///@}
 
  private:
-  /**
-   * Initialize instance using another instance. Used by copy-ctor and assign-op.
-   * Don't forget to update me if members were changed!
-   *
-   * It's needed because there is no default copy for a map of unique_ptr like
-   * behaviors and it must be a deep copy.
-   */
-  void Init(const gd::InitialInstance& initialInstance);
-
   // More properties can be stored in numberProperties and stringProperties.
   // These properties are then managed by the Object class.
   std::map<gd::String, double>
@@ -477,36 +453,36 @@ class GD_CORE_API InitialInstance {
   std::map<gd::String, gd::String>
       stringProperties;  ///< More data which can be used by the object
 
-  gd::String objectName;  ///< Object name
-  double x;               ///< Instance X position
-  double y;               ///< Instance Y position
-  double z;               ///< Instance Z position (for a 3D object)
-  double angle;           ///< Instance angle on Z axis
-  double rotationX;       ///< Instance angle on X axis (for a 3D object)
-  double rotationY;       ///< Instance angle on Y axis (for a 3D object)
-  int zOrder;             ///< Instance Z order (for a 2D object)
-  int opacity;            ///< Instance opacity
-  bool flippedX;          ///< True if the instance is flipped on X axis
-  bool flippedY;          ///< True if the instance is flipped on Y axis
-  bool flippedZ;          ///< True if the instance is flipped on Z axis
-  gd::String layer;       ///< Instance layer
-  bool customSize;        ///< True if object has a custom width and height
-  bool customDepth;       ///< True if object has a custom depth
-  double width;           ///< Instance custom width
-  double height;          ///< Instance custom height
-  double depth;           ///< Instance custom depth
+  gd::String objectName;    ///< Object name
+  double x = 0;             ///< Instance X position
+  double y = 0;             ///< Instance Y position
+  double z = 0;             ///< Instance Z position (for a 3D object)
+  double angle = 0;         ///< Instance angle on Z axis
+  double rotationX = 0;     ///< Instance angle on X axis (for a 3D object)
+  double rotationY = 0;     ///< Instance angle on Y axis (for a 3D object)
+  int zOrder = 0;           ///< Instance Z order (for a 2D object)
+  int opacity = 255;        ///< Instance opacity
+  bool flippedX = false;    ///< True if the instance is flipped on X axis
+  bool flippedY = false;    ///< True if the instance is flipped on Y axis
+  bool flippedZ = false;    ///< True if the instance is flipped on Z axis
+  gd::String layer;         ///< Instance layer
+  bool customSize = false;  ///< True if object has a custom width and height
+  bool customDepth = false; ///< True if object has a custom depth
+  double width = 0;         ///< Instance custom width
+  double height = 0;        ///< Instance custom height
+  double depth = 0;         ///< Instance custom depth
   double defaultWidth = 0;  ///< Instance default width as reported by InGameEditor
   double defaultHeight = 0; ///< Instance default height as reported by InGameEditor
   double defaultDepth = 0;  ///< Instance default depth as reported by InGameEditor
   gd::VariablesContainer initialVariables;  ///< Instance specific variables
-  std::map<gd::String, std::unique_ptr<gd::Behavior>>
+  gd::BehaviorsContainer
       behaviorOverridings; ///< Contains all behavior property overriding for
                            ///< the instance. Behavior contents are the
                            ///< ownership of the instance.
-  bool locked;                              ///< True if the instance is locked
-  bool sealed;                              ///< True if the instance is sealed
-  bool keepRatio;                     ///< True if the instance's dimensions
-                                      ///  should keep the same ratio.
+  bool locked = false;     ///< True if the instance is locked
+  bool sealed = false;     ///< True if the instance is sealed
+  bool keepRatio = true;   ///< True if the instance's dimensions
+                           ///  should keep the same ratio.
   mutable gd::String persistentUuid;  ///< A persistent random version 4 UUID,
                                       ///  useful for hot reloading.
 

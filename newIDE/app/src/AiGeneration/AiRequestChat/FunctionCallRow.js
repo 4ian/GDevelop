@@ -183,7 +183,7 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
           {text || <Trans>Working...</Trans>}
         </Text>
       </LineStackLayout>
-      {newlyAddedResourcesNames && (
+      {newlyAddedResourcesNames && newlyAddedResourcesNames.length > 0 && (
         <div className={classes.addedResourcesContainer}>
           <LineStackLayout noMargin alignItems="center">
             <CircledAdd fontSize="small" />

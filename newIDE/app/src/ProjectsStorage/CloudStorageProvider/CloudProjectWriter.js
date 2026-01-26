@@ -180,7 +180,12 @@ export const generateOnSaveProject = (
   const [canBeSafelySaved, { presignedUrl, zippedProject }] = await Promise.all(
     [
       // Check (with a network call) if the project can be safely saved (not modified by someone else).
-      canFileMetadataBeSafelySaved(authenticatedUser, fileMetadata, actions),
+      canFileMetadataBeSafelySaved(
+        authenticatedUser,
+        fileMetadata,
+        options,
+        actions
+      ),
       // At the same time, serialize & zip the project and also get (with a network call) a presigned url to upload the project version.
       zipAndPrepareProjectVersionForCommit({
         authenticatedUser,
@@ -474,6 +479,7 @@ export const generateOnAutoSaveProject = (
 const canFileMetadataBeSafelySaved = async (
   authenticatedUser: AuthenticatedUser,
   fileMetadata: FileMetadata,
+  options: ?SaveProjectOptions,
   actions: {|
     showAlert: ShowAlertFunction,
     showConfirmation: ShowConfirmFunction,
@@ -496,27 +502,40 @@ const canFileMetadataBeSafelySaved = async (
     });
     return false;
   }
+
+  const shouldSkipNewVersionWarning = options && options.skipNewVersionWarning;
   const { currentVersion, committedAt } = cloudProject;
   if (
     openedProjectVersion &&
     currentVersion && // should always be defined.
     committedAt && // should always be defined.
-    currentVersion !== openedProjectVersion
+    currentVersion !== openedProjectVersion &&
+    !shouldSkipNewVersionWarning
   ) {
+    let currentUserWasLastToModifyProject = false;
     let lastUsernameWhoModifiedProject = null;
     const committedAtDate = new Date(committedAt);
     const formattedDate = format(committedAtDate, 'dd-MM-yyyy');
     const formattedTime = format(committedAtDate, 'HH:mm:ss');
     const lastCommittedBy = cloudProject.lastCommittedBy;
     if (lastCommittedBy) {
-      const lastUser = await getUserPublicProfile(lastCommittedBy);
-      if (lastUser) {
-        lastUsernameWhoModifiedProject = lastUser.username;
+      if (
+        authenticatedUser.profile &&
+        lastCommittedBy === authenticatedUser.profile.id
+      ) {
+        currentUserWasLastToModifyProject = true;
+      } else {
+        const lastUser = await getUserPublicProfile(lastCommittedBy);
+        if (lastUser) {
+          lastUsernameWhoModifiedProject = lastUser.username;
+        }
       }
     }
     const answer = await actions.showConfirmation({
       title: t`Project was modified`,
-      message: lastUsernameWhoModifiedProject
+      message: currentUserWasLastToModifyProject
+        ? t`You modified this project on the ${formattedDate} at ${formattedTime}. Do you want to overwrite your changes?`
+        : lastUsernameWhoModifiedProject
         ? t`This project was modified by ${lastUsernameWhoModifiedProject} on the ${formattedDate} at ${formattedTime}. Do you want to overwrite their changes?`
         : t`This project was modified by someone else on the ${formattedDate} at ${formattedTime}. Do you want to overwrite their changes?`,
       level: 'warning',

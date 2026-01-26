@@ -12,7 +12,9 @@ import {
   getPartialAiRequest,
   getAiRequestSuggestions,
   type AiRequest,
+  type AiRequestMessage,
   type AiRequestMessageAssistantFunctionCall,
+  updateAiRequestMessage,
 } from '../Utils/GDevelopServices/Generation';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import {
@@ -36,6 +38,14 @@ import { makeSimplifiedProjectBuilder } from '../EditorFunctions/SimplifiedProje
 import { prepareAiUserContent } from './PrepareAiUserContent';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
+import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
+import {
+  type FileMetadata,
+  type StorageProvider,
+  type SaveAsLocation,
+} from '../ProjectsStorage';
+import CloudStorageProvider from '../ProjectsStorage/CloudStorageProvider';
+import { checkIfHasTooManyCloudProjects } from '../MainFrame/EditorContainers/HomePage/CreateSection/MaxProjectCountAlertMessage';
 
 const gd: libGDevelop = global.gd;
 
@@ -250,10 +260,29 @@ export const useProcessFunctionCalls = ({
   };
 };
 
-export const useAiRequestState = ({ project }: {| project: ?gdProject |}) => {
-  const { profile, getAuthorizationHeader } = React.useContext(
-    AuthenticatedUserContext
-  );
+export const useAiRequestState = ({
+  project,
+  fileMetadata,
+  storageProviderName,
+  onSave,
+  onSaveProjectAsWithStorageProvider,
+}: {|
+  project: ?gdProject,
+  fileMetadata?: ?FileMetadata,
+  storageProviderName?: ?string,
+  onSave?: (options?: {|
+    skipNewVersionWarning: boolean,
+  |}) => Promise<?FileMetadata>,
+  onSaveProjectAsWithStorageProvider?: (
+    options: ?{|
+      requestedStorageProvider?: StorageProvider,
+      forcedSavedAsLocation?: SaveAsLocation,
+      createdProject?: gdProject,
+    |}
+  ) => Promise<?FileMetadata>,
+|}) => {
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const { profile, getAuthorizationHeader } = authenticatedUser;
   const {
     aiRequestStorage,
     editorFunctionCallResultsStorage,
@@ -270,6 +299,25 @@ export const useAiRequestState = ({ project }: {| project: ?gdProject |}) => {
   const [shouldWatchRequest, setShouldWatchRequest] = React.useState<boolean>(
     false
   );
+  const [
+    isFetchingSuggestions,
+    setIsFetchingSuggestions,
+  ] = React.useState<boolean>(false);
+  const [
+    savingProjectForMessageId,
+    setSavingProjectForMessageId,
+  ] = React.useState<?string>(null);
+
+  const { hasUnsavedChanges } = React.useContext(UnsavedChangesContext);
+  const isCloudProjectsMaximumReached = checkIfHasTooManyCloudProjects(
+    authenticatedUser
+  );
+  const isSavingRef = React.useRef<boolean>(false);
+
+  const currentlyOpenedCloudProjectVersionId =
+    fileMetadata && storageProviderName === CloudStorageProvider.internalName
+      ? fileMetadata.version
+      : null;
 
   // If the selected AI request is in a "working" state, watch it until it's finished.
   const status = selectedAiRequest ? selectedAiRequest.status : null;
@@ -289,10 +337,10 @@ export const useAiRequestState = ({ project }: {| project: ?gdProject |}) => {
       );
 
       if (partialAiRequest.status === 'working') {
-        updateAiRequest(selectedAiRequestId, {
-          ...aiRequests[selectedAiRequestId],
+        updateAiRequest(selectedAiRequestId, prevRequest => ({
+          ...(prevRequest || {}),
           ...partialAiRequest,
-        });
+        }));
       } else {
         // The request is not "working" anymore, refresh it entirely.
         // Note: if this fails, the request will be refreshed again on the next interval
@@ -304,7 +352,26 @@ export const useAiRequestState = ({ project }: {| project: ?gdProject |}) => {
           })
         );
 
-        updateAiRequest(selectedAiRequestId, aiRequest);
+        updateAiRequest(selectedAiRequestId, () => aiRequest);
+
+        // If we were fetching suggestions and the request is now ready, or if suggestions
+        // are present in the last message, clear the flag
+        if (isFetchingSuggestions) {
+          const lastMessage =
+            aiRequest.output.length > 0
+              ? aiRequest.output[aiRequest.output.length - 1]
+              : null;
+          const hasSuggestions =
+            lastMessage &&
+            ((lastMessage.type === 'message' &&
+              lastMessage.role === 'assistant') ||
+              lastMessage.type === 'function_call_output') &&
+            lastMessage.suggestions;
+
+          if (aiRequest.status === 'ready' || hasSuggestions) {
+            setIsFetchingSuggestions(false);
+          }
+        }
       }
     } catch (error) {
       console.warn(
@@ -343,7 +410,8 @@ export const useAiRequestState = ({ project }: {| project: ?gdProject |}) => {
           isSendingAiRequest(selectedAiRequest.id) ||
           selectedAiRequest.output.length === 0 ||
           selectedAiRequest.status !== 'ready' ||
-          !profile
+          !profile ||
+          isFetchingSuggestions
         )
           return;
 
@@ -408,7 +476,9 @@ export const useAiRequestState = ({ project }: {| project: ?gdProject |}) => {
 
         try {
           // The request will switch from "ready" to "working" while suggestions are generated.
-          const aiRequestWithSuggestions = await getAiRequestSuggestions(
+          // It will be watched and eventually return to "ready" with suggestions.
+          setIsFetchingSuggestions(true);
+          const aiRequestWorkingForSuggestions = await getAiRequestSuggestions(
             getAuthorizationHeader,
             {
               userId: profile.id,
@@ -426,7 +496,17 @@ export const useAiRequestState = ({ project }: {| project: ?gdProject |}) => {
             }
           );
 
-          updateAiRequest(selectedAiRequest.id, aiRequestWithSuggestions);
+          // Merge with the latest state to preserve any concurrent updates (e.g., projectVersionId)
+          updateAiRequest(selectedAiRequest.id, prevRequest => ({
+            ...(prevRequest || {}),
+            ...aiRequestWorkingForSuggestions,
+          }));
+
+          // If the request is already ready with suggestions, clear the flag immediately
+          // Otherwise, it will be watched and cleared when it becomes ready
+          if (aiRequestWorkingForSuggestions.status === 'ready') {
+            setIsFetchingSuggestions(false);
+          }
         } catch (error) {
           const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
             error
@@ -440,6 +520,7 @@ export const useAiRequestState = ({ project }: {| project: ?gdProject |}) => {
             return;
           }
 
+          setIsFetchingSuggestions(false);
           console.error('Error getting AI request suggestions:', error);
           // Do not block updating the request if suggestions fetching fails.
         }
@@ -460,6 +541,276 @@ export const useAiRequestState = ({ project }: {| project: ?gdProject |}) => {
       getEditorFunctionCallResults,
       updateAiRequest,
       isSendingAiRequest,
+      isFetchingSuggestions,
+    ]
+  );
+
+  React.useEffect(
+    () => {
+      async function updateAiRequestWithProjectVersion({
+        lastMessageId,
+        version,
+        shouldSaveVersionBeforeMessage,
+        shouldSaveVersionAfterMessage,
+      }: {|
+        lastMessageId: string,
+        version: string,
+        shouldSaveVersionBeforeMessage: boolean,
+        shouldSaveVersionAfterMessage: boolean,
+      |}) {
+        if (!selectedAiRequest || !profile) return;
+
+        const projectVersionIdBeforeMessage = shouldSaveVersionBeforeMessage
+          ? version
+          : undefined;
+        const projectVersionIdAfterMessage = shouldSaveVersionAfterMessage
+          ? version
+          : undefined;
+
+        await updateAiRequestMessage(getAuthorizationHeader, {
+          userId: profile.id,
+          aiRequestId: selectedAiRequest.id,
+          aiRequestMessageId: lastMessageId,
+          projectVersionIdBeforeMessage,
+          projectVersionIdAfterMessage,
+        });
+        // Update the request with the project version, merging with the latest state
+        updateAiRequest(selectedAiRequest.id, prevRequest => {
+          if (!prevRequest) {
+            console.error(
+              'Attempting to update project version on non-existent request'
+            );
+            return selectedAiRequest;
+          }
+          return {
+            ...prevRequest,
+            output: prevRequest.output.map((message: AiRequestMessage) => {
+              if (
+                message.messageId === lastMessageId &&
+                message.role !== 'user'
+              ) {
+                // $FlowFixMe - Flow is not able to understand this is the right type.
+                return {
+                  ...message,
+                  projectVersionIdAfterMessage,
+                };
+              }
+              if (
+                message.messageId === lastMessageId &&
+                message.role === 'user'
+              ) {
+                // $FlowFixMe - Flow is not able to understand this is the right type.
+                return {
+                  ...message,
+                  projectVersionIdBeforeMessage,
+                };
+              }
+              return message;
+            }),
+          };
+        });
+      }
+
+      async function saveCloudProjectAndStoreOnMessageIfNeeded() {
+        // If the request :
+        // - is an agent request,
+        // - is not sending a new message right now,
+        // - has a few messages already (not an empty request),
+        // Then we check depending on the type of the last message if we need to save the project
+        // and link the project version to it,
+        // to allow the user to restore the project to that state later.
+        if (
+          !selectedAiRequest ||
+          selectedAiRequest.mode !== 'agent' ||
+          isSendingAiRequest(selectedAiRequest.id) ||
+          selectedAiRequest.output.length === 0 ||
+          !profile ||
+          !project ||
+          !onSave ||
+          !onSaveProjectAsWithStorageProvider ||
+          !storageProviderName ||
+          isSavingRef.current
+        ) {
+          return;
+        }
+
+        const lastMessage =
+          selectedAiRequest.output.length > 0
+            ? selectedAiRequest.output[selectedAiRequest.output.length - 1]
+            : null;
+        const lastMessageId = lastMessage ? lastMessage.messageId : null;
+        if (!lastMessage || !lastMessageId) {
+          return;
+        }
+
+        const hasFunctionsCallsToProcess =
+          getFunctionCallsToProcess({
+            aiRequest: selectedAiRequest,
+            editorFunctionCallResults: getEditorFunctionCallResults(
+              selectedAiRequest.id
+            ),
+          }).length > 0;
+        const {
+          hasUnfinishedResult,
+        } = getFunctionCallOutputsFromEditorFunctionCallResults(
+          getEditorFunctionCallResults(selectedAiRequest.id)
+        );
+
+        const shouldSaveVersionBeforeMessage =
+          lastMessage.type === 'message' &&
+          lastMessage.role === 'user' &&
+          !lastMessage.projectVersionIdBeforeMessage;
+        const shouldSaveVersionAfterMessage =
+          selectedAiRequest.status === 'ready' &&
+          (lastMessage.role === 'assistant' ||
+            lastMessage.type === 'function_call_output') &&
+          !lastMessage.projectVersionIdAfterMessage &&
+          !hasFunctionsCallsToProcess &&
+          !hasUnfinishedResult;
+        if (!shouldSaveVersionBeforeMessage && !shouldSaveVersionAfterMessage) {
+          return;
+        }
+
+        const hasJustInitializedProject =
+          lastMessage.type === 'function_call_output' &&
+          lastMessage.call_id.indexOf('initialize_project') !== -1;
+
+        const shouldSaveProjectAsAfterInitialization =
+          hasJustInitializedProject &&
+          !currentlyOpenedCloudProjectVersionId &&
+          !isCloudProjectsMaximumReached;
+        try {
+          if (shouldSaveProjectAsAfterInitialization) {
+            console.info(
+              'Saving project after initialization from AI Request...'
+            );
+            // Try to save the project in the cloud, giving the ability
+            // to restore to previous versions.
+            isSavingRef.current = true;
+            setSavingProjectForMessageId(lastMessageId);
+            onSaveProjectAsWithStorageProvider({
+              requestedStorageProvider: CloudStorageProvider,
+              forcedSavedAsLocation: {
+                name: project ? project.getName() : 'Untitled game',
+              },
+              createdProject: project,
+            }).then(async (newFileMetadata: ?FileMetadata) => {
+              console.info(
+                'Updating AI request message with latest project version after save...'
+              );
+              const newVersion = newFileMetadata
+                ? newFileMetadata.version
+                : null;
+              if (!newVersion) {
+                isSavingRef.current = false;
+                setSavingProjectForMessageId(null);
+                return;
+              }
+
+              try {
+                await updateAiRequestWithProjectVersion({
+                  lastMessageId,
+                  version: newVersion,
+                  shouldSaveVersionBeforeMessage,
+                  shouldSaveVersionAfterMessage,
+                });
+              } catch (error) {
+                console.error(
+                  'Error updating AI request message with latest project version:',
+                  error
+                );
+              }
+              isSavingRef.current = false;
+              setSavingProjectForMessageId(null);
+            });
+            return;
+          }
+
+          if (!currentlyOpenedCloudProjectVersionId) {
+            // AI Request on a project not saved in the cloud, do not force saving it.
+            return;
+          }
+
+          if (!hasUnsavedChanges) {
+            console.info(
+              'Updating AI request message with current project version...'
+            );
+            // No unsaved changes, just update the last message with the version opened.
+            await updateAiRequestWithProjectVersion({
+              lastMessageId,
+              version: currentlyOpenedCloudProjectVersionId,
+              shouldSaveVersionBeforeMessage,
+              shouldSaveVersionAfterMessage,
+            });
+            return;
+          }
+
+          isSavingRef.current = true;
+          setSavingProjectForMessageId(lastMessageId);
+          console.info('Saving project as part of AI request...');
+          // Trigger a save, and then update the last message with the new versionId.
+          onSave({ skipNewVersionWarning: true }).then(
+            async (newFileMetadata: ?FileMetadata) => {
+              console.info(
+                'Updating AI request message with latest project version after save...'
+              );
+              const newVersion = newFileMetadata
+                ? newFileMetadata.version
+                : null;
+              if (!newVersion) {
+                isSavingRef.current = false;
+                setSavingProjectForMessageId(null);
+                return;
+              }
+
+              try {
+                await updateAiRequestWithProjectVersion({
+                  lastMessageId,
+                  version: newVersion,
+                  shouldSaveVersionBeforeMessage,
+                  shouldSaveVersionAfterMessage,
+                });
+              } catch (error) {
+                console.error(
+                  'Error updating AI request message with latest project version:',
+                  error
+                );
+              }
+              isSavingRef.current = false;
+              setSavingProjectForMessageId(null);
+            }
+          );
+        } catch (error) {
+          console.error(
+            'Error saving cloud project version after AI message:',
+            error
+          );
+          // Do not block updating the request if save fails.
+        }
+      }
+
+      // Debounce the call to avoid too many requests in a short period.
+      const timeoutId = setTimeout(() => {
+        saveCloudProjectAndStoreOnMessageIfNeeded();
+      }, 300);
+
+      return () => clearTimeout(timeoutId);
+    },
+    [
+      selectedAiRequest,
+      profile,
+      getAuthorizationHeader,
+      project,
+      getEditorFunctionCallResults,
+      updateAiRequest,
+      isSendingAiRequest,
+      currentlyOpenedCloudProjectVersionId,
+      hasUnsavedChanges,
+      onSave,
+      onSaveProjectAsWithStorageProvider,
+      isCloudProjectsMaximumReached,
+      fileMetadata,
+      storageProviderName,
     ]
   );
 
@@ -497,22 +848,46 @@ export const useAiRequestState = ({ project }: {| project: ?gdProject |}) => {
 
   React.useEffect(
     () => {
-      // Reset selected request if the request cannot be found.
-      // This can happen if it's saved in the state, but not loaded yet,
-      // so it's best to reset it and avoid a flickering effect.
-      if (selectedAiRequestId && !selectedAiRequest) {
-        setAiState({
-          aiRequestId: null,
-        });
+      // If a request ID is selected but not in storage, try to fetch it directly
+      // This can happen when navigating to a request that hasn't been loaded yet (pagination)
+      if (selectedAiRequestId && !selectedAiRequest && profile) {
+        (async () => {
+          try {
+            const fetchedRequest = await getAiRequest(getAuthorizationHeader, {
+              userId: profile.id,
+              aiRequestId: selectedAiRequestId,
+            });
+            // Add it to the storage
+            updateAiRequest(selectedAiRequestId, () => fetchedRequest);
+          } catch (error) {
+            console.error(
+              'Error fetching AI request that is not in storage:',
+              error
+            );
+            // If fetch fails, reset the selected request to avoid staying stuck
+            setAiState({
+              aiRequestId: null,
+            });
+          }
+        })();
       }
     },
-    [selectedAiRequestId, selectedAiRequest, setAiState]
+    [
+      selectedAiRequestId,
+      selectedAiRequest,
+      profile,
+      getAuthorizationHeader,
+      updateAiRequest,
+      setAiState,
+    ]
   );
 
   return {
     selectedAiRequest,
     selectedAiRequestId,
     setAiState,
+    isFetchingSuggestions,
+    savingProjectForMessageId,
   };
 };
 

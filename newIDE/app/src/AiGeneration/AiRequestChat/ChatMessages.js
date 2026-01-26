@@ -17,6 +17,7 @@ import {
   type AiRequestMessageAssistantFunctionCall,
   type AiRequestAssistantMessage,
   type AiRequestFunctionCallOutput,
+  type AiRequestMessage,
 } from '../../Utils/GDevelopServices/Generation';
 import {
   type EditorFunctionCallResult,
@@ -26,12 +27,16 @@ import classes from './ChatMessages.module.css';
 import { DislikeFeedbackDialog } from './DislikeFeedbackDialog';
 import Text from '../../UI/Text';
 import AlertMessage from '../../UI/AlertMessage';
-import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
+import {
+  ColumnStackLayout,
+  LineStackLayout,
+  ResponsiveLineStackLayout,
+} from '../../UI/Layout';
 import FlatButton from '../../UI/FlatButton';
-import { FeedbackBanner } from './FeedbackBanner';
 import Pause from '../../UI/CustomSvgIcons/Pause';
 import Paper, { getBackgroundColor } from '../../UI/Paper';
 import Play from '../../UI/CustomSvgIcons/Play';
+import Floppy from '../../UI/CustomSvgIcons/Floppy';
 import SubscriptionPlanTableSummary from '../../Profile/Subscription/PromotionSubscriptionDialog/SubscriptionPlanTableSummary';
 import { SubscriptionContext } from '../../Profile/Subscription/SubscriptionContext';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
@@ -41,6 +46,10 @@ import Coin from '../../Credits/Icons/Coin';
 import { CreditsPackageStoreContext } from '../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import RobotIcon from '../../ProjectCreation/RobotIcon';
 import { Divider } from '@material-ui/core';
+import CheckCircle from '@material-ui/icons/CheckCircle';
+import Link from '../../UI/Link';
+import { type FileMetadata } from '../../ProjectsStorage';
+import UnsavedChangesContext from '../../MainFrame/UnsavedChangesContext';
 
 const styles = {
   subscriptionPaper: {
@@ -190,6 +199,7 @@ type Props = {|
   ) => Promise<void>,
   editorCallbacks: EditorCallbacks,
   project: ?gdProject,
+  fileMetadata: ?FileMetadata,
   onUserRequestTextChange: (
     userRequestText: string,
     aiRequestIdToChange: string
@@ -202,6 +212,15 @@ type Props = {|
   onScrollToBottom: () => void,
   hasStartedRequestButCannotContinue: boolean,
   onSwitchedToGDevelopCredits: () => void,
+
+  onStartOrOpenChat: (options: ?{| aiRequestId: string | null |}) => void,
+  isFetchingSuggestions: boolean,
+  savingProjectForMessageId: ?string,
+  forkingState: ?{| aiRequestId: string, messageId: string |},
+  onRestore: ({|
+    message: AiRequestMessage,
+    aiRequest: AiRequest,
+  |}) => Promise<void>,
 |};
 
 export const ChatMessages = React.memo<Props>(function ChatMessages({
@@ -211,6 +230,7 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
   onProcessFunctionCalls,
   editorCallbacks,
   project,
+  fileMetadata,
   onUserRequestTextChange,
   shouldBeWorkingIfNotPaused,
   isPaused,
@@ -220,6 +240,11 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
   onScrollToBottom,
   hasStartedRequestButCannotContinue,
   onSwitchedToGDevelopCredits,
+  onStartOrOpenChat,
+  isFetchingSuggestions,
+  savingProjectForMessageId,
+  forkingState,
+  onRestore,
 }: Props) {
   const theme = React.useContext(GDevelopThemeContext);
   const isLightTheme = theme.palette.type === 'light';
@@ -233,6 +258,7 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
   const quota =
     (limits && limits.quotas && limits.quotas['consumed-ai-credits']) || null;
   const hasReachedLimit = !!quota && quota.limitReached;
+  const { hasUnsavedChanges } = React.useContext(UnsavedChangesContext);
 
   const {
     values: { automaticallyUseCreditsForAiRequests },
@@ -281,38 +307,44 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
 
   React.useEffect(
     () => {
-      if (shouldShowCreditsOrSubscriptionPrompt) {
+      if (
+        shouldShowCreditsOrSubscriptionPrompt ||
+        isFetchingSuggestions ||
+        (shouldBeWorkingIfNotPaused && !isPaused)
+      ) {
         onScrollToBottom();
       }
     },
-    [shouldShowCreditsOrSubscriptionPrompt, onScrollToBottom]
+    [
+      shouldShowCreditsOrSubscriptionPrompt,
+      isFetchingSuggestions,
+      shouldBeWorkingIfNotPaused,
+      isPaused,
+      onScrollToBottom,
+    ]
   );
 
-  const lastMessageIndex = aiRequest.output.length - 1;
-  const lastMessageFeedbackBanner = shouldDisplayFeedbackBanner && (
-    <FeedbackBanner
-      onSendFeedback={(
-        feedback: 'like' | 'dislike',
-        reason?: string,
-        freeFormDetails?: string
-      ) => {
-        onSendFeedback(
-          aiRequest.id,
-          lastMessageIndex,
-          feedback,
-          reason,
-          freeFormDetails
-        );
-      }}
-      key={`feedback-banner-${aiRequest.id}-${lastMessageIndex}`}
-    />
-  );
+  const isWorking = !!shouldBeWorkingIfNotPaused && !isPaused;
+  const [isRestoring, setIsRestoring] = React.useState(false);
+  const disabled = isWorking || isForAnotherProject || isRestoring;
 
   const [messageFeedbacks, setMessageFeedbacks] = React.useState({});
   const [
     dislikeFeedbackDialogOpenedFor,
     setDislikeFeedbackDialogOpenedFor,
   ] = React.useState(null);
+
+  const onRestoreVersion = React.useCallback(
+    async (params: {| message: AiRequestMessage, aiRequest: AiRequest |}) => {
+      setIsRestoring(true);
+      try {
+        await onRestore(params);
+      } finally {
+        setIsRestoring(false);
+      }
+    },
+    [onRestore]
+  );
 
   const functionCallToFunctionCallOutput = React.useMemo(
     () =>
@@ -329,6 +361,7 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
     () => {
       const items = [];
       let currentFunctionCallItems = [];
+      const forkedAfterNewMessageId = aiRequest.forkedAfterNewMessageId;
 
       const flushFunctionCallGroup = () => {
         if (currentFunctionCallItems.length > 0) {
@@ -398,6 +431,31 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
           });
         }
 
+        // Add save item for assistant messages or function call outputs with project version saves
+        // or when a save is in progress for this message
+        const isSavingProjectForThisMessage =
+          savingProjectForMessageId &&
+          message.messageId === savingProjectForMessageId;
+        if (
+          (message.type === 'function_call_output' ||
+            (message.type === 'message' && message.role === 'assistant')) &&
+          (message.projectVersionIdAfterMessage ||
+            isSavingProjectForThisMessage)
+        ) {
+          flushFunctionCallGroup();
+          items.push({
+            type: 'save',
+            messageIndex: messageIndex,
+            message: message,
+            isRestored:
+              forkedAfterNewMessageId &&
+              message.messageId === forkedAfterNewMessageId,
+            isSaving:
+              isSavingProjectForThisMessage &&
+              !message.projectVersionIdAfterMessage,
+          });
+        }
+
         if (
           (message.type === 'function_call_output' ||
             (message.type === 'message' && message.role === 'assistant')) &&
@@ -433,21 +491,121 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
 
       return items;
     },
-    [aiRequest, editorFunctionCallResults, functionCallToFunctionCallOutput]
+    [
+      aiRequest,
+      editorFunctionCallResults,
+      functionCallToFunctionCallOutput,
+      savingProjectForMessageId,
+    ]
   );
 
-  const isWorking = !!shouldBeWorkingIfNotPaused && !isPaused;
-  const disabled = isWorking || isForAnotherProject;
+  const filteredRenderItems = React.useMemo(
+    () => {
+      if (!forkingState || forkingState.aiRequestId !== aiRequest.id) {
+        return renderItems;
+      }
+
+      const forkSaveIndex = renderItems.findIndex(
+        item =>
+          item.type === 'save' &&
+          item.message &&
+          item.message.messageId === forkingState.messageId
+      );
+
+      if (forkSaveIndex === -1) return renderItems;
+
+      // Only show items up to and including the save item.
+      // The save item itself will show "Restoring..." state.
+      return renderItems.slice(0, forkSaveIndex + 1);
+    },
+    [renderItems, forkingState, aiRequest.id]
+  );
+
+  // Scroll to bottom when suggestions are added.
+  const hasSuggestions = React.useMemo(
+    () => filteredRenderItems.some(item => item.type === 'suggestions'),
+    [filteredRenderItems]
+  );
+
+  React.useEffect(
+    () => {
+      let timeoutId;
+      if (hasSuggestions) {
+        timeoutId = setTimeout(() => {
+          onScrollToBottom();
+        }, 100); // Delay to ensure rendering is done.
+      }
+
+      return () => {
+        if (timeoutId) clearTimeout(timeoutId);
+      };
+    },
+    [hasSuggestions, onScrollToBottom]
+  );
+
+  const forkedFromAiRequestId = aiRequest.forkedFromAiRequestId;
 
   return (
     <>
-      {renderItems
+      {filteredRenderItems
         .flatMap((item, itemIndex) => {
           if (item.type === 'user_message') {
             const { messageIndex, message } = item;
+
+            const currentVersionOpened = fileMetadata
+              ? fileMetadata.version
+              : null;
+            const hasVersionToRestore = !!message.projectVersionIdBeforeMessage;
+
+            const previousMessage =
+              messageIndex > 0 ? aiRequest.output[messageIndex - 1] : null;
+            const previousMessageHasSameVersionId =
+              previousMessage &&
+              hasVersionToRestore &&
+              ((previousMessage.type === 'message' &&
+                previousMessage.role === 'user' &&
+                previousMessage.projectVersionIdBeforeMessage ===
+                  message.projectVersionIdBeforeMessage) ||
+                (previousMessage.type === 'function_call_output' &&
+                  previousMessage.projectVersionIdAfterMessage ===
+                    message.projectVersionIdBeforeMessage) ||
+                (previousMessage.type === 'message' &&
+                  previousMessage.role === 'assistant' &&
+                  previousMessage.projectVersionIdAfterMessage ===
+                    message.projectVersionIdBeforeMessage));
+
+            const shouldShowRestore =
+              project &&
+              project.getProjectUuid() === aiRequest.gameId &&
+              hasVersionToRestore &&
+              !previousMessageHasSameVersionId;
+
+            const shouldDisableRestore =
+              disabled ||
+              (!currentVersionOpened ||
+                // Disable if the version before the message is the current opened version and there is no unsaved changes.
+                (message.projectVersionIdBeforeMessage ===
+                  currentVersionOpened &&
+                  !hasUnsavedChanges));
+
             return [
               <Line key={messageIndex} justifyContent="flex-end">
-                <ChatBubble role="user">
+                <ChatBubble
+                  role="user"
+                  restoreProps={
+                    shouldShowRestore
+                      ? {
+                          onRestore: () => {
+                            onRestoreVersion({
+                              message,
+                              aiRequest,
+                            });
+                          },
+                          disabled: shouldDisableRestore,
+                        }
+                      : undefined
+                  }
+                >
                   <ChatMarkdownText
                     source={message.content
                       .map(messageContent => messageContent.text)
@@ -514,58 +672,75 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
                     role="assistant"
                     feedbackButtons={
                       <div className={classes.feedbackButtonsContainer}>
-                        <IconButton
-                          size="small"
-                          tooltip={t`Copy`}
-                          onClick={() => {
-                            navigator.clipboard.writeText(messageContent.text);
-                          }}
+                        {isLastMessage && shouldDisplayFeedbackBanner && (
+                          <Text size="body-small" color="secondary" noMargin>
+                            <Trans>Did it work?</Trans>
+                          </Text>
+                        )}
+                        <LineStackLayout
+                          expand
+                          noMargin
+                          justifyContent="flex-end"
                         >
-                          <Copy fontSize="small" />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          tooltip={t`This was helpful`}
-                          onClick={() => {
-                            setMessageFeedbacks({
-                              ...messageFeedbacks,
-                              [feedbackKey]: 'like',
-                            });
-                            onSendFeedback(aiRequest.id, messageIndex, 'like');
-                          }}
-                        >
-                          <Like
-                            fontSize="small"
-                            htmlColor={
-                              currentFeedback === 'like'
-                                ? theme.message.valid
-                                : undefined
-                            }
-                          />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          tooltip={t`This needs improvement`}
-                          onClick={() => {
-                            setMessageFeedbacks({
-                              ...messageFeedbacks,
-                              [feedbackKey]: 'dislike',
-                            });
-                            setDislikeFeedbackDialogOpenedFor({
-                              aiRequestId: aiRequest.id,
-                              messageIndex,
-                            });
-                          }}
-                        >
-                          <Dislike
-                            fontSize="small"
-                            htmlColor={
-                              currentFeedback === 'dislike'
-                                ? theme.message.warning
-                                : undefined
-                            }
-                          />
-                        </IconButton>
+                          <IconButton
+                            size="small"
+                            tooltip={t`Copy`}
+                            onClick={() => {
+                              navigator.clipboard.writeText(
+                                messageContent.text
+                              );
+                            }}
+                          >
+                            <Copy fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            tooltip={t`This was helpful`}
+                            onClick={() => {
+                              setMessageFeedbacks({
+                                ...messageFeedbacks,
+                                [feedbackKey]: 'like',
+                              });
+                              onSendFeedback(
+                                aiRequest.id,
+                                messageIndex,
+                                'like'
+                              );
+                            }}
+                          >
+                            <Like
+                              fontSize="small"
+                              htmlColor={
+                                currentFeedback === 'like'
+                                  ? theme.message.valid
+                                  : undefined
+                              }
+                            />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            tooltip={t`This needs improvement`}
+                            onClick={() => {
+                              setMessageFeedbacks({
+                                ...messageFeedbacks,
+                                [feedbackKey]: 'dislike',
+                              });
+                              setDislikeFeedbackDialogOpenedFor({
+                                aiRequestId: aiRequest.id,
+                                messageIndex,
+                              });
+                            }}
+                          >
+                            <Dislike
+                              fontSize="small"
+                              htmlColor={
+                                currentFeedback === 'dislike'
+                                  ? theme.message.warning
+                                  : undefined
+                              }
+                            />
+                          </IconButton>
+                        </LineStackLayout>
                       </div>
                     }
                   >
@@ -600,7 +775,6 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
                     </Column>
                   </ChatBubble>
                 </Line>,
-                isLastMessage ? lastMessageFeedbackBanner : null,
               ];
             }
 
@@ -615,6 +789,99 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
             }
 
             return null;
+          }
+
+          if (item.type === 'save') {
+            const { messageIndex, message, isRestored, isSaving } = item;
+            const isForking =
+              forkingState &&
+              forkingState.aiRequestId === aiRequest.id &&
+              forkingState.messageId === message.messageId;
+            const currentVersionOpened = fileMetadata
+              ? fileMetadata.version
+              : null;
+            const messageVersionIdToRestore =
+              message.projectVersionIdAfterMessage;
+            const hasVersionToRestore =
+              (!!messageVersionIdToRestore &&
+                !!currentVersionOpened &&
+                messageVersionIdToRestore !== currentVersionOpened) ||
+              hasUnsavedChanges;
+
+            return [
+              <Line key={`save-${messageIndex}`} justifyContent="flex-start">
+                <ColumnStackLayout noMargin>
+                  {isForking ? (
+                    <LineStackLayout noMargin alignItems="center">
+                      <RobotIcon rotating size={14} />
+                      <Text size="body-small" noMargin color="secondary">
+                        <Trans>Restoring...</Trans>
+                      </Text>
+                    </LineStackLayout>
+                  ) : isSaving ? (
+                    <LineStackLayout noMargin alignItems="center">
+                      <Floppy fontSize="small" />
+                      <Text size="body-small" noMargin color="secondary">
+                        <Trans>Saving...</Trans>
+                      </Text>
+                    </LineStackLayout>
+                  ) : (
+                    <LineStackLayout noMargin alignItems="center">
+                      <CheckCircle
+                        style={{ color: theme.message.valid }}
+                        fontSize="small"
+                      />
+                      <Text size="body-small" noMargin color="secondary">
+                        <Trans>Project saved</Trans>
+                        {hasVersionToRestore && (
+                          <>
+                            {' '}
+                            <Link
+                              onClick={() => {
+                                onRestoreVersion({
+                                  message,
+                                  aiRequest,
+                                });
+                              }}
+                              href="#"
+                              color="secondary"
+                              disabled={disabled}
+                            >
+                              <Trans>Restore version</Trans>
+                            </Link>
+                          </>
+                        )}
+                      </Text>
+                    </LineStackLayout>
+                  )}
+                  {isRestored && !isForking && forkedFromAiRequestId && (
+                    <LineStackLayout
+                      noMargin
+                      alignItems="center"
+                      justifyContent="flex-start"
+                      expand
+                    >
+                      <Spacer />
+                      <Text size="body-small" noMargin color="secondary">
+                        <Trans>Restored</Trans> ↳{' '}
+                        <Link
+                          onClick={() => {
+                            onStartOrOpenChat({
+                              aiRequestId: forkedFromAiRequestId,
+                            });
+                          }}
+                          href="#"
+                          color="secondary"
+                          disabled={disabled}
+                        >
+                          <Trans>View original chat</Trans>
+                        </Link>
+                      </Text>
+                    </LineStackLayout>
+                  )}
+                </ColumnStackLayout>
+              </Line>,
+            ];
           }
 
           if (item.type === 'suggestions') {
@@ -653,6 +920,21 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
             </Trans>
           </AlertMessage>
         </Line>
+      ) : isFetchingSuggestions ? (
+        <Line justifyContent="flex-start">
+          <div className={classes.thinkingText}>
+            <RobotIcon rotating size={14} />
+            <Spacer />
+            <Text
+              noMargin
+              displayInlineAsSpan
+              size="body-small"
+              color="inherit"
+            >
+              <Trans>Thinking...</Trans>
+            </Text>
+          </div>
+        </Line>
       ) : shouldBeWorkingIfNotPaused ? (
         <Line justifyContent="flex-start">
           <div className={classes.thinkingText}>
@@ -679,7 +961,13 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
               size="body-small"
               color="inherit"
             >
-              {isPaused ? <Trans>Paused</Trans> : <Trans>Thinking...</Trans>}
+              {isPaused ? (
+                <Trans>Paused</Trans>
+              ) : aiRequest.mode === 'chat' ? (
+                <Trans>Thinking...</Trans>
+              ) : (
+                <Trans>Working...</Trans>
+              )}
             </Text>
           </div>
         </Line>

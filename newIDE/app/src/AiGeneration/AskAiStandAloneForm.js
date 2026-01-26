@@ -303,7 +303,7 @@ export const AskAiStandAloneForm = ({
 
           console.info('Successfully created a new AI request:', aiRequest);
           setSendingAiRequest(null, false);
-          updateAiRequest(aiRequest.id, aiRequest);
+          updateAiRequest(aiRequest.id, () => aiRequest);
 
           // Select the new AI request just created - unless the user switched to another one
           // in the meantime.
@@ -471,7 +471,7 @@ export const AskAiStandAloneForm = ({
             toolsVersion: AI_AGENT_TOOLS_VERSION,
           })
         );
-        updateAiRequest(aiRequest.id, aiRequest);
+        updateAiRequest(aiRequest.id, () => aiRequest);
         setSendingAiRequest(aiRequest.id, false);
         clearEditorFunctionCallResults(aiRequest.id);
       } catch (error) {
@@ -596,6 +596,7 @@ export const AskAiStandAloneForm = ({
           { limits, getAiSettings }
         )}
         project={project}
+        fileMetadata={fileMetadata}
         ref={aiRequestChatRef}
         aiRequest={aiRequestForForm}
         onStartNewAiRequest={startNewAiRequest}
@@ -647,6 +648,11 @@ export const AskAiStandAloneForm = ({
         editorCallbacks={editorCallbacks}
         onStartOrOpenChat={() => {}}
         standAloneForm
+        // Restoring project version not relevant to standalone form.
+        isFetchingSuggestions={false}
+        savingProjectForMessageId={null}
+        forkingState={null}
+        onRestore={async () => {}}
       />
     </Column>
   );

@@ -1,35 +1,7 @@
-@keyframes function-call-appear {
-  0% {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  /* Start after the bubble container and when the bubble content is almost finished animating. */
-  60% {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0px);
-  }
-}
-
 .functionCallContainer {
-  animation: function-call-appear 0.3s;
   display: flex;
   flex-direction: column;
   gap: 4px;
-}
-
-@keyframes details-paper-appear {
-  0% {
-    transform: scaleY(0.9);
-    opacity: 0.8;
-  }
-  100% {
-    opacity: 1;
-    transform: scaleY(1);
-  }
 }
 
 .detailsButtonContainer {
@@ -54,6 +26,5 @@
 
 .detailsPaperContainer {
   transform-origin: top left;
-  animation: details-paper-appear 0.1s;
   padding-left: 20px;
 }

@@ -186,6 +186,7 @@ export const onSaveProject = async (
 |}> => {
   const canBeSafelySaved = await canFileMetadataBeSafelySaved(
     fileMetadata,
+    saveOptions,
     actions
   );
   if (!canBeSafelySaved) {
@@ -450,6 +451,7 @@ const isTryingToSaveInForbiddenPath = (filePath: string): boolean => {
 
 export const canFileMetadataBeSafelySaved = async (
   fileMetadata: FileMetadata,
+  saveOptions: ?SaveProjectOptions,
   actions: {|
     showAlert: ShowAlertFunction,
     showConfirmation: ShowConfirmFunction,

@@ -1,20 +1,4 @@
-@keyframes group-appear {
-  0% {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  60% {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0px);
-  }
-}
-
 .container {
-  animation: group-appear 0.3s;
   display: flex;
   flex-direction: column;
   gap: 2px;

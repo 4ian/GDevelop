@@ -3630,6 +3630,8 @@ const MainFrame = (props: Props) => {
     openVersionHistoryPanel,
     checkedOutVersionStatus,
     onQuitVersionHistory,
+    onCheckoutVersion,
+    getOrLoadProjectVersion,
   } = useVersionHistory({
     getStorageProvider,
     isSavingProject,
@@ -3654,9 +3656,16 @@ const MainFrame = (props: Props) => {
       options: ?{|
         requestedStorageProvider?: StorageProvider,
         forcedSavedAsLocation?: SaveAsLocation,
+        createdProject?: gdProject,
       |}
-    ) => {
-      if (!currentProject) return;
+    ): Promise<?FileMetadata> => {
+      // In some cases (ex: when a project is created by the AI), the project in
+      // the mainframe state is not updated yet, so we use the provided one.
+      const upToDateProject =
+        options && options.createdProject
+          ? options.createdProject
+          : currentProject;
+      if (!upToDateProject) return;
       // Prevent saving if there are errors in the extension modules, as
       // this can lead to corrupted projects.
       if (hasExtensionLoadErrors) return;
@@ -3711,7 +3720,7 @@ const MainFrame = (props: Props) => {
             saveAsLocation,
             saveAsOptions,
           } = await onChooseSaveProjectAsLocation({
-            project: currentProject,
+            project: upToDateProject,
             fileMetadata: currentFileMetadata,
             displayOptionToGenerateNewProjectUuid:
               // No need to display the option if current file metadata doesn't have
@@ -3748,8 +3757,8 @@ const MainFrame = (props: Props) => {
 
         let originalProjectUuid = null;
         if (newSaveAsOptions && newSaveAsOptions.generateNewProjectUuid) {
-          originalProjectUuid = currentProject.getProjectUuid();
-          currentProject.resetProjectUuid();
+          originalProjectUuid = upToDateProject.getProjectUuid();
+          upToDateProject.resetProjectUuid();
         }
         let originalProjectName = null;
         const newProjectName =
@@ -3757,12 +3766,12 @@ const MainFrame = (props: Props) => {
             ? newSaveAsLocation.name
             : null;
         if (newProjectName) {
-          originalProjectName = currentProject.getName();
-          currentProject.setName(newProjectName);
+          originalProjectName = upToDateProject.getName();
+          upToDateProject.setName(newProjectName);
         }
 
         const { wasSaved, fileMetadata } = await onSaveProjectAs(
-          currentProject,
+          upToDateProject,
           newSaveAsLocation,
           {
             onStartSaving: () =>
@@ -3770,7 +3779,7 @@ const MainFrame = (props: Props) => {
             onMoveResources: async ({ newFileMetadata }) => {
               if (currentFileMetadata)
                 await ensureResourcesAreMoved({
-                  project: currentProject,
+                  project: upToDateProject,
                   newFileMetadata,
                   newStorageProvider,
                   newStorageProviderOperations,
@@ -3785,9 +3794,9 @@ const MainFrame = (props: Props) => {
 
         if (!wasSaved) {
           _replaceSnackMessage(i18n._(t`An error occurred. Please try again.`));
-          if (originalProjectName) currentProject.setName(originalProjectName);
+          if (originalProjectName) upToDateProject.setName(originalProjectName);
           if (originalProjectUuid)
-            currentProject.setProjectUuid(originalProjectUuid);
+            upToDateProject.setProjectUuid(originalProjectUuid);
           return;
         }
 
@@ -3835,7 +3844,7 @@ const MainFrame = (props: Props) => {
         // Ensure resources are re-loaded from their new location.
         ResourcesLoader.burstAllUrlsCache();
 
-        if (isCurrentProjectFresh(currentProjectRef, currentProject)) {
+        if (isCurrentProjectFresh(currentProjectRef, upToDateProject)) {
           // We do not want to change the current file metadata if the
           // project has changed since the beginning of the save, which
           // can happen if another project was loaded in the meantime.
@@ -3844,6 +3853,8 @@ const MainFrame = (props: Props) => {
             currentFileMetadata: fileMetadata,
           }));
         }
+
+        return fileMetadata;
       } catch (rawError) {
         _closeSnackMessage();
         const errorMessage = getWriteErrorMessage
@@ -3926,7 +3937,9 @@ const MainFrame = (props: Props) => {
   const saveWithBackgroundSerializer =
     preferences.values.useBackgroundSerializerForSaving;
   const saveProject = React.useCallback(
-    async () => {
+    async (options?: {|
+      skipNewVersionWarning: boolean,
+    |}): Promise<?FileMetadata> => {
       if (!currentProject) return;
       // Prevent saving if there are errors in the extension modules, as
       // this can lead to corrupted projects.
@@ -3979,6 +3992,9 @@ const MainFrame = (props: Props) => {
 
         const saveOptions: SaveProjectOptions = {
           useBackgroundSerializer: saveWithBackgroundSerializer,
+          skipNewVersionWarning:
+            !!checkedOutVersionStatus ||
+            (options && options.skipNewVersionWarning),
         };
         if (cloudProjectRecoveryOpenedVersionId) {
           saveOptions.previousVersion = cloudProjectRecoveryOpenedVersionId;
@@ -4045,6 +4061,10 @@ const MainFrame = (props: Props) => {
 
           sealUnsavedChanges();
           _replaceSnackMessage(i18n._(t`Project properly saved`));
+
+          // Return the new file metadata, to allow further operations,
+          // without having to wait for the state to be updated.
+          return fileMetadata;
         }
       } catch (error) {
         const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
@@ -4747,6 +4767,9 @@ const MainFrame = (props: Props) => {
     toggleProjectManager: toggleProjectManager,
     setEditorTabs: setEditorTabs,
     saveProject: saveProject,
+    saveProjectAsWithStorageProvider: saveProjectAsWithStorageProvider,
+    onCheckoutVersion: onCheckoutVersion,
+    getOrLoadProjectVersion: getOrLoadProjectVersion,
     openShareDialog: openShareDialog,
     launchDebuggerAndPreview: launchDebuggerAndPreview,
     launchNewPreview: launchNewPreview,

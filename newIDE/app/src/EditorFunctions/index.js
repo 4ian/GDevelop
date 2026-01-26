@@ -3326,24 +3326,22 @@ const addSceneEvents: EditorFunction = {
     if (eventsDescription) {
       return {
         text: (
-          <>
-            <Trans>
-              Add or rework{' '}
-              <Link
-                href="#"
-                onClick={() =>
-                  editorCallbacks.onOpenLayout(scene_name, {
-                    openEventsEditor: true,
-                    openSceneEditor: true,
-                    focusWhenOpened: 'events',
-                  })
-                }
-              >
-                events of scene {scene_name}
-              </Link>
-              .
-            </Trans>
-          </>
+          <Trans>
+            Add or rework{' '}
+            <Link
+              href="#"
+              onClick={() =>
+                editorCallbacks.onOpenLayout(scene_name, {
+                  openEventsEditor: true,
+                  openSceneEditor: true,
+                  focusWhenOpened: 'events',
+                })
+              }
+            >
+              events of scene {scene_name}
+            </Link>
+            .
+          </Trans>
         ),
         details,
         hasDetailsToShow: true,
@@ -3351,24 +3349,22 @@ const addSceneEvents: EditorFunction = {
     } else if (placementHint) {
       return {
         text: (
-          <>
-            <Trans>
-              Adapt{' '}
-              <Link
-                href="#"
-                onClick={() =>
-                  editorCallbacks.onOpenLayout(scene_name, {
-                    openEventsEditor: true,
-                    openSceneEditor: true,
-                    focusWhenOpened: 'events',
-                  })
-                }
-              >
-                events of scene {scene_name}
-              </Link>{' '}
-              ("{placementHint}").
-            </Trans>
-          </>
+          <Trans>
+            Adapt{' '}
+            <Link
+              href="#"
+              onClick={() =>
+                editorCallbacks.onOpenLayout(scene_name, {
+                  openEventsEditor: true,
+                  openSceneEditor: true,
+                  focusWhenOpened: 'events',
+                })
+              }
+            >
+              events of scene {scene_name}
+            </Link>{' '}
+            ("{placementHint}").
+          </Trans>
         ),
         details,
         hasDetailsToShow: true,
@@ -3376,24 +3372,22 @@ const addSceneEvents: EditorFunction = {
     } else {
       return {
         text: (
-          <>
-            <Trans>
-              Modify{' '}
-              <Link
-                href="#"
-                onClick={() =>
-                  editorCallbacks.onOpenLayout(scene_name, {
-                    openEventsEditor: true,
-                    openSceneEditor: true,
-                    focusWhenOpened: 'events',
-                  })
-                }
-              >
-                events of scene {scene_name}
-              </Link>
-              .
-            </Trans>
-          </>
+          <Trans>
+            Modify{' '}
+            <Link
+              href="#"
+              onClick={() =>
+                editorCallbacks.onOpenLayout(scene_name, {
+                  openEventsEditor: true,
+                  openSceneEditor: true,
+                  focusWhenOpened: 'events',
+                })
+              }
+            >
+              events of scene {scene_name}
+            </Link>
+            .
+          </Trans>
         ),
         details,
         hasDetailsToShow: true,

@@ -357,7 +357,7 @@ namespace gdjs {
           continue;
         }
 
-        const newObject = this.createObject(objectName);
+        const newObject = this.createObject(objectName, instanceData);
         if (newObject !== null) {
           if (shouldTrackByPersistentUuid) {
             // Give the object the same persistentUuid as the instance, so that
@@ -379,15 +379,6 @@ namespace gdjs {
           newObject
             .getVariables()
             .initFrom(instanceData.initialVariables, true);
-          if (instanceData.behaviorOverridings) {
-            for (const behaviorOverriding of instanceData.behaviorOverridings) {
-              const behavior = newObject.getBehavior(behaviorOverriding.name);
-              if (!behavior) {
-                continue;
-              }
-              behavior.applyBehaviorOverriding(behaviorOverriding);
-            }
-          }
           newObject.extraInitializationFromInitialInstance(instanceData);
         }
       }
@@ -669,7 +660,10 @@ namespace gdjs {
      * @param objectName The name of the object to be created
      * @return The created object
      */
-    createObject(objectName: string): gdjs.RuntimeObject | null {
+    createObject(
+      objectName: string,
+      instanceData?: InstanceData
+    ): gdjs.RuntimeObject | null {
       if (
         !this._objectsCtor.containsKey(objectName) ||
         !this._objects.containsKey(objectName)
@@ -694,7 +688,7 @@ namespace gdjs {
       const ctor = this._objectsCtor.get(objectName);
       let obj;
       if (!cache || cache.length === 0) {
-        obj = new ctor(this, objectData);
+        obj = new ctor(this, objectData, instanceData);
       } else {
         // Reuse an objet destroyed before. If there is an object in the cache,
         // then it means it does support reinitialization.

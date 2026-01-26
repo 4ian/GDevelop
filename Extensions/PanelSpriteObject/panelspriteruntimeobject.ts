@@ -74,9 +74,10 @@ namespace gdjs {
      */
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      panelSpriteObjectData: PanelSpriteObjectData
+      panelSpriteObjectData: PanelSpriteObjectData,
+      instanceData?: InstanceData
     ) {
-      super(instanceContainer, panelSpriteObjectData);
+      super(instanceContainer, panelSpriteObjectData, instanceData);
       this._objectData = panelSpriteObjectData;
       this._rBorder = panelSpriteObjectData.rightMargin;
       this._lBorder = panelSpriteObjectData.leftMargin;

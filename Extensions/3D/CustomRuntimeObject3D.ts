@@ -44,9 +44,10 @@ namespace gdjs {
 
     constructor(
       parent: gdjs.RuntimeInstanceContainer,
-      objectData: gdjs.Object3DData & gdjs.CustomObjectConfiguration
+      objectData: gdjs.Object3DData & gdjs.CustomObjectConfiguration,
+      instanceData?: InstanceData
     ) {
-      super(parent, objectData);
+      super(parent, objectData, instanceData);
     }
 
     protected override _createRender() {

@@ -134,9 +134,10 @@ namespace gdjs {
      */
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      textObjectData: TextObjectData
+      textObjectData: TextObjectData,
+      instanceData?: InstanceData
     ) {
-      super(instanceContainer, textObjectData);
+      super(instanceContainer, textObjectData, instanceData);
       const content = textObjectData.content;
       this._characterSize = Math.max(1, content.characterSize);
       this._fontName = content.font;

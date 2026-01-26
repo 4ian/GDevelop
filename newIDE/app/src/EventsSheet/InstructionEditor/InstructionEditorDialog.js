@@ -16,6 +16,7 @@ import InstructionOrObjectSelector, {
 } from './InstructionOrObjectSelector';
 import InstructionOrExpressionSelector from './InstructionOrExpressionSelector';
 import HelpButton from '../../UI/HelpButton';
+import { isRelativePathToDocumentationRoot } from '../../Utils/HelpLink';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import { SelectColumns } from '../../UI/Responsive/SelectColumns';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
@@ -338,9 +339,15 @@ const InstructionEditorDialog = ({
           ) : null,
           <HelpButton
             key="help"
-            helpPagePath={instructionHelpPage || '/events'}
+            helpPagePath={
+              instructionHelpPage &&
+              isRelativePathToDocumentationRoot(instructionHelpPage)
+                ? instructionHelpPage
+                : '/events'
+            }
             label={
               !instructionHelpPage ||
+              !isRelativePathToDocumentationRoot(instructionHelpPage) ||
               (isMobile || step === 'object-or-free-instructions') ? (
                 <Trans>Help</Trans>
               ) : isCondition ? (

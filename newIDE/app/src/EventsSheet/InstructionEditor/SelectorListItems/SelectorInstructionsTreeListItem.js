@@ -2,11 +2,13 @@
 import * as React from 'react';
 import { ListItem, type ListItemRefType } from '../../../UI/List';
 import ListIcon from '../../../UI/ListIcon';
+import HelpIcon from '../../../UI/HelpIcon';
 import { type InstructionOrExpressionTreeNode } from '../../../InstructionOrExpression/CreateTree';
 import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import Subheader from '../../../UI/Subheader';
 import flatten from 'lodash/flatten';
 import { getSubheaderListItemKey, getInstructionListItemValue } from './Keys';
+import { isDocumentationAbsoluteUrl } from '../../../Utils/HelpLink';
 
 type Props<T> = {|
   instructionTreeNode: InstructionOrExpressionTreeNode,
@@ -53,10 +55,21 @@ export const renderInstructionOrExpressionTree = <
         const instructionMetadata: T = instructionOrGroup;
         const value = getInstructionListItemValue(instructionOrGroup.type);
         const selected = selectedValue === value;
+        const helpPath = instructionMetadata.metadata.getHelpPath();
+        const hasCustomHelpUrl = helpPath && isDocumentationAbsoluteUrl(helpPath);
         return (
           <ListItem
             key={value}
-            primaryText={instructionMetadata.displayedName}
+            primaryText={
+              hasCustomHelpUrl ? (
+                <span style={{ display: 'flex', alignItems: 'center' }}>
+                  {instructionMetadata.displayedName}
+                  <HelpIcon size="small" helpPagePath={helpPath} />
+                </span>
+              ) : (
+                instructionMetadata.displayedName
+              )
+            }
             selected={selected}
             id={
               // TODO: This id is used by in app tutorials. When in app tutorials

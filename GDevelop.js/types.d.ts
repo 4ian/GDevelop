@@ -2291,6 +2291,8 @@ export class EventsFunction extends EmscriptenObject {
   isPrivate(): boolean;
   setAsync(isAsync: boolean): EventsFunction;
   isAsync(): boolean;
+  setHelpUrl(helpUrl: string): EventsFunction;
+  getHelpUrl(): string;
   isAction(): boolean;
   isExpression(): boolean;
   isCondition(): boolean;

@@ -3,11 +3,118 @@ import { fakeAssetShortHeader1 } from '../fixtures/GDevelopServicesTestData';
 import { PixiResourcesLoaderMock } from '../fixtures/TestPixiResourcesLoader';
 import {
   editorFunctions,
+  parseDimensionValue,
   type EditorFunctionGenericOutput,
   type LaunchFunctionOptionsWithProject,
 } from './index';
 
 const gd: libGDevelop = global.gd;
+
+describe('parseDimensionValue', () => {
+  it('parses comma-separated 2D values', () => {
+    expect(parseDimensionValue('100,200')).toEqual({
+      width: '100',
+      height: '200',
+    });
+    expect(parseDimensionValue('100, 200')).toEqual({
+      width: '100',
+      height: '200',
+    });
+    expect(parseDimensionValue(' 100 , 200 ')).toEqual({
+      width: '100',
+      height: '200',
+    });
+  });
+
+  it('parses semicolon-separated 2D values', () => {
+    expect(parseDimensionValue('100;200')).toEqual({
+      width: '100',
+      height: '200',
+    });
+    expect(parseDimensionValue('100; 200')).toEqual({
+      width: '100',
+      height: '200',
+    });
+  });
+
+  it('parses x-separated 2D values', () => {
+    expect(parseDimensionValue('100x200')).toEqual({
+      width: '100',
+      height: '200',
+    });
+    expect(parseDimensionValue('100x 200')).toEqual({
+      width: '100',
+      height: '200',
+    });
+  });
+
+  it('parses comma-separated 3D values', () => {
+    expect(parseDimensionValue('100,200,300')).toEqual({
+      width: '100',
+      height: '200',
+      depth: '300',
+    });
+    expect(parseDimensionValue('100, 200, 300')).toEqual({
+      width: '100',
+      height: '200',
+      depth: '300',
+    });
+  });
+
+  it('parses semicolon-separated 3D values', () => {
+    expect(parseDimensionValue('100;200;300')).toEqual({
+      width: '100',
+      height: '200',
+      depth: '300',
+    });
+  });
+
+  it('parses x-separated 3D values', () => {
+    expect(parseDimensionValue('100x200x300')).toEqual({
+      width: '100',
+      height: '200',
+      depth: '300',
+    });
+  });
+
+  it('returns null for single values', () => {
+    expect(parseDimensionValue('100')).toBeNull();
+    expect(parseDimensionValue('abc')).toBeNull();
+  });
+
+  it('returns null for invalid formats', () => {
+    expect(parseDimensionValue('100,abc')).toBeNull();
+    expect(parseDimensionValue('abc,200')).toBeNull();
+    expect(parseDimensionValue('100,200,abc')).toBeNull();
+    expect(parseDimensionValue('')).toBeNull();
+    expect(parseDimensionValue(',')).toBeNull();
+    expect(parseDimensionValue('100,')).toBeNull();
+  });
+
+  it('handles decimal values', () => {
+    expect(parseDimensionValue('100.5,200.5')).toEqual({
+      width: '100.5',
+      height: '200.5',
+    });
+    expect(parseDimensionValue('100.5x200.5x300.5')).toEqual({
+      width: '100.5',
+      height: '200.5',
+      depth: '300.5',
+    });
+  });
+
+  it('handles negative values', () => {
+    expect(parseDimensionValue('-100,200')).toEqual({
+      width: '-100',
+      height: '200',
+    });
+    expect(parseDimensionValue('100,-200,-300')).toEqual({
+      width: '100',
+      height: '-200',
+      depth: '-300',
+    });
+  });
+});
 
 // $FlowExpectedError
 const makeFakeI18n = (fakeI18n): I18nType => ({

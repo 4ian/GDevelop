@@ -404,6 +404,198 @@ const sanitizePropertyNewValue = (
   return newValue;
 };
 
+/**
+ * Parses a dimension value that may contain multiple components.
+ * Supports formats like "100,200", "100;200", "100x200", "100,200,300", etc.
+ * Returns null if the value doesn't match the expected format.
+ */
+export const parseDimensionValue = (
+  value: string
+): { width: string, height: string, depth?: string } | null => {
+  const trimmedValue = value.trim();
+
+  // Try different delimiters: comma, semicolon, or 'x'
+  const delimiters = [',', ';', 'x'];
+
+  for (const delimiter of delimiters) {
+    const parts = trimmedValue.split(delimiter).map(part => part.trim());
+
+    if (parts.length === 2) {
+      // Validate that both parts look like numbers
+      if (parts[0] !== '' && parts[1] !== '' && !isNaN(Number(parts[0])) && !isNaN(Number(parts[1]))) {
+        return { width: parts[0], height: parts[1] };
+      }
+    } else if (parts.length === 3) {
+      // Validate that all three parts look like numbers
+      if (
+        parts[0] !== '' &&
+        parts[1] !== '' &&
+        parts[2] !== '' &&
+        !isNaN(Number(parts[0])) &&
+        !isNaN(Number(parts[1])) &&
+        !isNaN(Number(parts[2]))
+      ) {
+        return { width: parts[0], height: parts[1], depth: parts[2] };
+      }
+    }
+  }
+
+  return null;
+};
+
+/**
+ * Type definition for a property change.
+ */
+type PropertyChange = {|
+  property_name: string,
+  new_value: string,
+|};
+
+/**
+ * Checks if a property name is one of the dimension properties.
+ */
+const isDimensionProperty = (propertyName: string): boolean => {
+  const lowerName = propertyName.toLowerCase();
+  return lowerName === 'width' || lowerName === 'height' || lowerName === 'depth';
+};
+
+/**
+ * Expands dimension property changes if needed.
+ * If only "width" or "height" is specified with a value like "100,200",
+ * it expands to set both width and height (and depth if 3 components).
+ *
+ * Returns an object with the expanded changes and information about whether
+ * the expansion happened.
+ */
+export const expandDimensionPropertyChanges = (
+  changedProperties: Array<PropertyChange>,
+  findProperty: (name: string) => {|
+    foundProperty: gdPropertyDescriptor | null,
+    foundPropertyName: string | null,
+  |}
+): {|
+  expandedChanges: Array<PropertyChange>,
+  expansionInfo: {|
+    wasExpanded: boolean,
+    originalPropertyName: string | null,
+    expandedTo: Array<string>,
+  |} | null,
+|} => {
+  // Check if width, height, or depth are already specified
+  const hasWidth = changedProperties.some(
+    p => p.property_name.toLowerCase() === 'width'
+  );
+  const hasHeight = changedProperties.some(
+    p => p.property_name.toLowerCase() === 'height'
+  );
+  const hasDepth = changedProperties.some(
+    p => p.property_name.toLowerCase() === 'depth'
+  );
+
+  // If both width and height are specified, don't expand
+  if (hasWidth && hasHeight) {
+    return { expandedChanges: changedProperties, expansionInfo: null };
+  }
+
+  // If depth is specified, don't expand
+  if (hasDepth) {
+    return { expandedChanges: changedProperties, expansionInfo: null };
+  }
+
+  // Find the dimension property that might need expansion (only one of width/height should be present)
+  const dimensionPropertyIndex = changedProperties.findIndex(p => {
+    const lowerName = p.property_name.toLowerCase();
+    return lowerName === 'width' || lowerName === 'height';
+  });
+
+  if (dimensionPropertyIndex === -1) {
+    return { expandedChanges: changedProperties, expansionInfo: null };
+  }
+
+  const dimensionProperty = changedProperties[dimensionPropertyIndex];
+  const parsedValue = parseDimensionValue(dimensionProperty.new_value);
+
+  if (!parsedValue) {
+    // Value doesn't look like a dimension format, keep as is
+    return { expandedChanges: changedProperties, expansionInfo: null };
+  }
+
+  // Verify that the target properties exist
+  const widthSearch = findProperty('width');
+  const heightSearch = findProperty('height');
+  const depthSearch = parsedValue.depth ? findProperty('depth') : null;
+
+  if (!widthSearch.foundPropertyName || !heightSearch.foundPropertyName) {
+    // Can't expand if width/height properties don't exist
+    return { expandedChanges: changedProperties, expansionInfo: null };
+  }
+
+  if (parsedValue.depth && (!depthSearch || !depthSearch.foundPropertyName)) {
+    // Can't expand depth if depth property doesn't exist
+    return { expandedChanges: changedProperties, expansionInfo: null };
+  }
+
+  // Build expanded changes
+  const expandedChanges: Array<PropertyChange> = changedProperties.filter(
+    (_, index) => index !== dimensionPropertyIndex
+  );
+
+  const expandedTo: Array<string> = [];
+
+  expandedChanges.push({
+    property_name: widthSearch.foundPropertyName,
+    new_value: parsedValue.width,
+  });
+  expandedTo.push('width');
+
+  expandedChanges.push({
+    property_name: heightSearch.foundPropertyName,
+    new_value: parsedValue.height,
+  });
+  expandedTo.push('height');
+
+  if (parsedValue.depth && depthSearch && depthSearch.foundPropertyName) {
+    expandedChanges.push({
+      property_name: depthSearch.foundPropertyName,
+      new_value: parsedValue.depth,
+    });
+    expandedTo.push('depth');
+  }
+
+  return {
+    expandedChanges,
+    expansionInfo: {
+      wasExpanded: true,
+      originalPropertyName: dimensionProperty.property_name,
+      expandedTo,
+    },
+  };
+};
+
+/**
+ * Gets the current value of a property by name.
+ * This is useful to read the actual value after it's been set, in case
+ * the property has been modified or the value was sanitized.
+ */
+export const getPropertyValue = ({
+  properties,
+  propertyName,
+}: {|
+  properties: gdMapStringPropertyDescriptor | null,
+  propertyName: string,
+|}): string | null => {
+  if (!properties) return null;
+
+  const { foundProperty } = findPropertyByName({
+    properties,
+    name: propertyName,
+  });
+
+  if (!foundProperty) return null;
+
+  return foundProperty.getValue();
+};
+
 const makeShortTextForNamedProperty = (
   name: string,
   property: gdPropertyDescriptor
@@ -1104,6 +1296,23 @@ const isPropertyForChangingObjectName = (propertyName: string): boolean => {
 };
 
 /**
+ * Checks if a property name is trying to change "size" (which doesn't exist
+ * but should be expanded to width/height/depth).
+ */
+const isPropertyForChangingSize = (propertyName: string): boolean => {
+  return propertyName.toLowerCase() === 'size';
+};
+
+/**
+ * Type for tracking expanded property changes from "size" or dimension properties.
+ */
+type SizeExpansionResult = {|
+  wasExpanded: boolean,
+  originalPropertyName: string,
+  expandedTo: Array<string>,
+|};
+
+/**
  * Changes a property of a specific object (global or in a scene)
  */
 const changeObjectProperty: EditorFunction = {
@@ -1254,12 +1463,13 @@ const changeObjectProperty: EditorFunction = {
       );
     }
 
-    const warnings = [];
-    const changes = [];
+    const warnings: Array<string> = [];
+    const changes: Array<string> = [];
+    const sizeExpansions: Array<SizeExpansionResult> = [];
 
+    // Pre-process changed_properties to extract valid property changes
+    const propertyChanges: Array<PropertyChange> = [];
     changed_properties.forEach(changed_property => {
-      if (!object) return;
-
       const propertyName = SafeExtractor.extractStringProperty(
         changed_property,
         'property_name'
@@ -1276,6 +1486,38 @@ const changeObjectProperty: EditorFunction = {
         );
         return;
       }
+      propertyChanges.push({ property_name: propertyName, new_value: newValue });
+    });
+
+    // Helper to find property by name using objectConfiguration
+    const objectConfiguration = object.getConfiguration();
+    const findPropertyInObject = (name: string) => {
+      const objectProperties = objectConfiguration.getProperties();
+      return findPropertyByName({
+        properties: objectProperties,
+        name,
+      });
+    };
+
+    // Expand dimension properties (width/height with "x,y" format)
+    const { expandedChanges, expansionInfo } = expandDimensionPropertyChanges(
+      propertyChanges,
+      findPropertyInObject
+    );
+
+    if (expansionInfo && expansionInfo.wasExpanded) {
+      sizeExpansions.push({
+        wasExpanded: true,
+        originalPropertyName: expansionInfo.originalPropertyName || '',
+        expandedTo: expansionInfo.expandedTo,
+      });
+    }
+
+    // Process each property change
+    expandedChanges.forEach(propertyChange => {
+      if (!object) return;
+
+      const { property_name: propertyName, new_value: newValue } = propertyChange;
 
       // Renaming an object is a special case by using a property called "name".
       if (isPropertyForChangingObjectName(propertyName)) {
@@ -1326,8 +1568,140 @@ const changeObjectProperty: EditorFunction = {
         return;
       }
 
+      // Handle "size" property: try to expand to width/height/depth
+      if (isPropertyForChangingSize(propertyName)) {
+        const parsedDimensions = parseDimensionValue(newValue);
+        if (parsedDimensions) {
+          const currentObjectProperties = objectConfiguration.getProperties();
+          const widthSearch = findPropertyByName({
+            properties: currentObjectProperties,
+            name: 'width',
+          });
+          const heightSearch = findPropertyByName({
+            properties: currentObjectProperties,
+            name: 'height',
+          });
+          const depthSearch = parsedDimensions.depth
+            ? findPropertyByName({
+                properties: currentObjectProperties,
+                name: 'depth',
+              })
+            : null;
+
+          if (widthSearch.foundPropertyName && heightSearch.foundPropertyName) {
+            const expandedTo: Array<string> = [];
+            let allSucceeded = true;
+
+            // Apply width
+            const widthSanitized = sanitizePropertyNewValue(
+              widthSearch.foundProperty,
+              parsedDimensions.width
+            );
+            if (
+              objectConfiguration.updateProperty(
+                widthSearch.foundPropertyName,
+                widthSanitized
+              )
+            ) {
+              expandedTo.push('width');
+            } else {
+              allSucceeded = false;
+            }
+
+            // Apply height
+            const heightSanitized = sanitizePropertyNewValue(
+              heightSearch.foundProperty,
+              parsedDimensions.height
+            );
+            if (
+              objectConfiguration.updateProperty(
+                heightSearch.foundPropertyName,
+                heightSanitized
+              )
+            ) {
+              expandedTo.push('height');
+            } else {
+              allSucceeded = false;
+            }
+
+            // Apply depth if present
+            if (
+              parsedDimensions.depth &&
+              depthSearch &&
+              depthSearch.foundPropertyName
+            ) {
+              const depthSanitized = sanitizePropertyNewValue(
+                depthSearch.foundProperty,
+                parsedDimensions.depth
+              );
+              if (
+                objectConfiguration.updateProperty(
+                  depthSearch.foundPropertyName,
+                  depthSanitized
+                )
+              ) {
+                expandedTo.push('depth');
+              } else {
+                allSucceeded = false;
+              }
+            }
+
+            if (expandedTo.length > 0) {
+              sizeExpansions.push({
+                wasExpanded: true,
+                originalPropertyName: 'size',
+                expandedTo,
+              });
+
+              // Read back actual values
+              const updatedProperties = objectConfiguration.getProperties();
+              const actualWidth = getPropertyValue({
+                properties: updatedProperties,
+                propertyName: 'width',
+              });
+              const actualHeight = getPropertyValue({
+                properties: updatedProperties,
+                propertyName: 'height',
+              });
+              const actualDepth = parsedDimensions.depth
+                ? getPropertyValue({
+                    properties: updatedProperties,
+                    propertyName: 'depth',
+                  })
+                : null;
+
+              const changedParts = [];
+              if (expandedTo.includes('width') && actualWidth !== null) {
+                changedParts.push(`width to "${actualWidth}"`);
+              }
+              if (expandedTo.includes('height') && actualHeight !== null) {
+                changedParts.push(`height to "${actualHeight}"`);
+              }
+              if (expandedTo.includes('depth') && actualDepth !== null) {
+                changedParts.push(`depth to "${actualDepth}"`);
+              }
+
+              changes.push(
+                `Property "size" was parsed and ${changedParts.join(', ')} were changed on object "${object_name}".`
+              );
+
+              if (!allSucceeded) {
+                warnings.push(
+                  `Some dimension properties could not be fully updated when expanding "size" on object "${object_name}".`
+                );
+              }
+            }
+            return;
+          }
+        }
+        // If we couldn't parse or apply, fall through to warn about unknown property
+        warnings.push(
+          `Property "size" not found on object "${object_name}". Try using "width", "height", or "depth" properties instead with individual values.`
+        );
+        return;
+      }
+
       // Changing a "usual" property of an object:
-      const objectConfiguration = object.getConfiguration();
       const objectProperties = objectConfiguration.getProperties();
 
       const { foundPropertyName, foundProperty } = findPropertyByName({
@@ -1384,8 +1758,15 @@ const changeObjectProperty: EditorFunction = {
         return;
       }
 
+      // Read back the actual value from the property
+      const updatedProperties = objectConfiguration.getProperties();
+      const actualValue = getPropertyValue({
+        properties: updatedProperties,
+        propertyName: foundPropertyName,
+      });
+
       changes.push(
-        `Changed property "${foundPropertyName}" of object "${object_name}" to "${newValue}".`
+        `Changed property "${foundPropertyName}" of object "${object_name}" to "${actualValue !== null ? actualValue : newValue}".`
       );
     });
 
@@ -1959,22 +2340,22 @@ const changeBehaviorProperty: EditorFunction = {
     }
 
     const behavior = object.getBehavior(behavior_name);
-    const behaviorProperties = behavior.getProperties();
 
     const allBehaviorSharedDataNames = layout
       .getAllBehaviorSharedDataNames()
       .toJSArray();
 
     let behaviorSharedData = null;
-    let behaviorSharedDataProperties = null;
     if (allBehaviorSharedDataNames.includes(behavior_name)) {
       behaviorSharedData = layout.getBehaviorSharedData(behavior_name);
-      behaviorSharedDataProperties = behaviorSharedData.getProperties();
     }
 
-    const warnings = [];
-    const changes = [];
+    const warnings: Array<string> = [];
+    const changes: Array<string> = [];
+    const sizeExpansions: Array<SizeExpansionResult> = [];
 
+    // Pre-process changed_properties to extract valid property changes
+    const propertyChanges: Array<PropertyChange> = [];
     changedProperties.forEach(changed_property => {
       const propertyName = SafeExtractor.extractStringProperty(
         changed_property,
@@ -1992,6 +2373,212 @@ const changeBehaviorProperty: EditorFunction = {
         );
         return;
       }
+      propertyChanges.push({ property_name: propertyName, new_value: newValue });
+    });
+
+    // Helper to find property by name in behavior or shared data properties
+    const findPropertyInBehavior = (name: string) => {
+      const behaviorProperties = behavior.getProperties();
+      const behaviorSharedDataProperties = behaviorSharedData
+        ? behaviorSharedData.getProperties()
+        : null;
+
+      const behaviorSearch = findPropertyByName({
+        properties: behaviorProperties,
+        name,
+      });
+      if (behaviorSearch.foundPropertyName) {
+        return behaviorSearch;
+      }
+
+      return findPropertyByName({
+        properties: behaviorSharedDataProperties,
+        name,
+      });
+    };
+
+    // Expand dimension properties (width/height with "x,y" format)
+    const { expandedChanges, expansionInfo } = expandDimensionPropertyChanges(
+      propertyChanges,
+      findPropertyInBehavior
+    );
+
+    if (expansionInfo && expansionInfo.wasExpanded) {
+      sizeExpansions.push({
+        wasExpanded: true,
+        originalPropertyName: expansionInfo.originalPropertyName || '',
+        expandedTo: expansionInfo.expandedTo,
+      });
+    }
+
+    // Process each property change
+    expandedChanges.forEach(propertyChange => {
+      const { property_name: propertyName, new_value: newValue } = propertyChange;
+
+      // Handle "size" property: try to expand to width/height/depth
+      if (isPropertyForChangingSize(propertyName)) {
+        const parsedDimensions = parseDimensionValue(newValue);
+        if (parsedDimensions) {
+          const behaviorProperties = behavior.getProperties();
+          const behaviorSharedDataProperties = behaviorSharedData
+            ? behaviorSharedData.getProperties()
+            : null;
+
+          // Search for width/height/depth in behavior properties first, then shared data
+          const findDimensionProperty = (dimName: string) => {
+            const behaviorSearch = findPropertyByName({
+              properties: behaviorProperties,
+              name: dimName,
+            });
+            if (behaviorSearch.foundPropertyName) {
+              return { ...behaviorSearch, isShared: false };
+            }
+            const sharedSearch = findPropertyByName({
+              properties: behaviorSharedDataProperties,
+              name: dimName,
+            });
+            return { ...sharedSearch, isShared: true };
+          };
+
+          const widthSearch = findDimensionProperty('width');
+          const heightSearch = findDimensionProperty('height');
+          const depthSearch = parsedDimensions.depth
+            ? findDimensionProperty('depth')
+            : null;
+
+          if (widthSearch.foundPropertyName && heightSearch.foundPropertyName) {
+            const expandedTo: Array<string> = [];
+            let allSucceeded = true;
+
+            // Apply width
+            const widthSanitized = sanitizePropertyNewValue(
+              widthSearch.foundProperty,
+              parsedDimensions.width
+            );
+            const widthUpdater = widthSearch.isShared && behaviorSharedData
+              ? behaviorSharedData
+              : behavior;
+            if (
+              widthUpdater.updateProperty(
+                widthSearch.foundPropertyName,
+                widthSanitized
+              )
+            ) {
+              expandedTo.push('width');
+            } else {
+              allSucceeded = false;
+            }
+
+            // Apply height
+            const heightSanitized = sanitizePropertyNewValue(
+              heightSearch.foundProperty,
+              parsedDimensions.height
+            );
+            const heightUpdater = heightSearch.isShared && behaviorSharedData
+              ? behaviorSharedData
+              : behavior;
+            if (
+              heightUpdater.updateProperty(
+                heightSearch.foundPropertyName,
+                heightSanitized
+              )
+            ) {
+              expandedTo.push('height');
+            } else {
+              allSucceeded = false;
+            }
+
+            // Apply depth if present
+            if (
+              parsedDimensions.depth &&
+              depthSearch &&
+              depthSearch.foundPropertyName
+            ) {
+              const depthSanitized = sanitizePropertyNewValue(
+                depthSearch.foundProperty,
+                parsedDimensions.depth
+              );
+              const depthUpdater = depthSearch.isShared && behaviorSharedData
+                ? behaviorSharedData
+                : behavior;
+              if (
+                depthUpdater.updateProperty(
+                  depthSearch.foundPropertyName,
+                  depthSanitized
+                )
+              ) {
+                expandedTo.push('depth');
+              } else {
+                allSucceeded = false;
+              }
+            }
+
+            if (expandedTo.length > 0) {
+              sizeExpansions.push({
+                wasExpanded: true,
+                originalPropertyName: 'size',
+                expandedTo,
+              });
+
+              // Read back actual values
+              const updatedBehaviorProperties = behavior.getProperties();
+              const updatedSharedProperties = behaviorSharedData
+                ? behaviorSharedData.getProperties()
+                : null;
+
+              const getActualValue = (dimName: string, isShared: boolean) => {
+                return getPropertyValue({
+                  properties: isShared
+                    ? updatedSharedProperties
+                    : updatedBehaviorProperties,
+                  propertyName: dimName,
+                });
+              };
+
+              const changedParts = [];
+              if (expandedTo.includes('width')) {
+                const actualWidth = getActualValue('width', widthSearch.isShared);
+                if (actualWidth !== null) {
+                  changedParts.push(`width to "${actualWidth}"`);
+                }
+              }
+              if (expandedTo.includes('height')) {
+                const actualHeight = getActualValue('height', heightSearch.isShared);
+                if (actualHeight !== null) {
+                  changedParts.push(`height to "${actualHeight}"`);
+                }
+              }
+              if (expandedTo.includes('depth') && depthSearch) {
+                const actualDepth = getActualValue('depth', depthSearch.isShared);
+                if (actualDepth !== null) {
+                  changedParts.push(`depth to "${actualDepth}"`);
+                }
+              }
+
+              changes.push(
+                `Property "size" was parsed and ${changedParts.join(', ')} were changed on behavior "${behavior_name}" of object "${object_name}".`
+              );
+
+              if (!allSucceeded) {
+                warnings.push(
+                  `Some dimension properties could not be fully updated when expanding "size" on behavior "${behavior_name}".`
+                );
+              }
+            }
+            return;
+          }
+        }
+        // If we couldn't parse or apply, fall through to warn about unknown property
+        warnings.push(
+          `Property "size" not found on behavior "${behavior_name}". Try using "width", "height", or "depth" properties instead with individual values.`
+        );
+        return;
+      }
+
+      const behaviorProperties = behavior.getProperties();
+      const behaviorSharedDataProperties = behaviorSharedData
+        ? behaviorSharedData.getProperties()
+        : null;
 
       const behaviorPropertySearch = findPropertyByName({
         properties: behaviorProperties,
@@ -2017,8 +2604,15 @@ const changeBehaviorProperty: EditorFunction = {
           return;
         }
 
+        // Read back the actual value from the property
+        const updatedBehaviorProperties = behavior.getProperties();
+        const actualValue = getPropertyValue({
+          properties: updatedBehaviorProperties,
+          propertyName: foundPropertyName,
+        });
+
         changes.push(
-          `Changed property "${foundPropertyName}" of behavior "${behavior_name}" to "${newValue}".`
+          `Changed property "${foundPropertyName}" of behavior "${behavior_name}" to "${actualValue !== null ? actualValue : newValue}".`
         );
       } else if (
         behaviorSharedData &&
@@ -2040,8 +2634,15 @@ const changeBehaviorProperty: EditorFunction = {
           return;
         }
 
+        // Read back the actual value from the property
+        const updatedSharedProperties = behaviorSharedData.getProperties();
+        const actualValue = getPropertyValue({
+          properties: updatedSharedProperties,
+          propertyName: foundPropertyName,
+        });
+
         changes.push(
-          `Changed property "${foundPropertyName}" of behavior "${behavior_name}" (shared between all objects having this behavior) to "${newValue}".`
+          `Changed property "${foundPropertyName}" of behavior "${behavior_name}" (shared between all objects having this behavior) to "${actualValue !== null ? actualValue : newValue}".`
         );
       } else {
         warnings.push(

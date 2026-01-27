@@ -807,6 +807,7 @@ interface Behavior {
     boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
     void RemoveProperty([Const] DOMString name);
     void InitializeContent();
+    boolean HasPropertyValue([Const] DOMString name);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);

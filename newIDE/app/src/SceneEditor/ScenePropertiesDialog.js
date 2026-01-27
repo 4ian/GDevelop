@@ -164,7 +164,11 @@ const ScenePropertiesDialog = ({
         defaultValueProperties: behaviorMetadata
           ? behaviorMetadata.getSharedProperties()
           : null,
-        getProperties: sharedDataContent => behaviorSharedData.getProperties(),
+        getPropertyValue: (sharedDataContent, name) =>
+          behaviorSharedData
+            .getProperties()
+            .get(name)
+            .getValue(),
         onUpdateProperty: (sharedDataContent, name, value) => {
           behaviorSharedData.updateProperty(name, value);
         },

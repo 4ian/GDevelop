@@ -100,10 +100,22 @@ class GD_CORE_API BehaviorConfigurationContainer {
   /**
    * \brief Called when the IDE wants to remove a custom property from the
    * behavior
+   *
+   * \see gd::InitialInstance
    */
   void RemoveProperty(const gd::String &name) {
     content.RemoveChild(name);
+    content.RemoveAttribute(name);
   };
+
+  /**
+   * \brief Called to check if a property is overriden.
+   *
+   * \see gd::InitialInstance
+   */
+  bool HasPropertyValue(const gd::String name) const {
+    return content.HasChild(name) || content.HasAttribute(name);
+  }
 
   /**
    * \brief Called to initialize the content with the default properties

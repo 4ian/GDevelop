@@ -15,14 +15,13 @@ const styles = {
     textOverflow: 'ellipsis',
     lineHeight: '17px',
     maxHeight: 34, // 2 * lineHeight to limit to 2 lines.
-    opacity: 0.7,
   },
 };
 type Props = {|
   label: string,
   markdownDescription?: ?string,
   field: React.Node,
-  isShowcased: boolean,
+  labelColor?: 'primary' | 'secondary',
 |};
 
 const CompactPropertiesEditorRowField = (props: Props) => {
@@ -55,9 +54,8 @@ const CompactPropertiesEditorRowField = (props: Props) => {
         >
           <Text
             noMargin
-            style={
-              props.isShowcased ? { ...styles.label, opacity: 1 } : styles.label
-            }
+            style={styles.label}
+            color={props.labelColor === 'primary' ? 'primary' : 'secondary'}
           >
             {props.label}
           </Text>

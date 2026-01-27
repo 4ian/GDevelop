@@ -14,7 +14,9 @@
     "test:chrome": "karma start --browsers Chrome --single-run",
     "test:chrome:watch": "karma start --browsers Chrome",
     "test:edge": "karma start --browsers EdgeHeadless --single-run",
-    "test:edge:watch": "karma start --browsers EdgeHeadless"
+    "test:edge:watch": "karma start --browsers EdgeHeadless",
+    "test:chromium": "karma start --browsers ChromiumHeadless --single-run",
+    "test:chromium:watch": "karma start --browsers ChromiumHeadless"
   },
   "keywords": [
     "HTML5",

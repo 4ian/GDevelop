@@ -42,6 +42,7 @@ export type Tutorial = {|
   templateUrl?: string,
 
   courseId?: string,
+  examUrl?: string,
 |};
 
 export const canAccessTutorial = (

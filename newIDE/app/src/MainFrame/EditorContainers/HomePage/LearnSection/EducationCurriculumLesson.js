@@ -122,7 +122,7 @@ const EducationCurriculumLesson = ({
         })}`
       )
     : null;
-  const { gameLink, courseId } = tutorial;
+  const { gameLink, courseId, examUrl } = tutorial;
 
   const title = (
     <LineStackLayout noMargin alignItems="center">
@@ -229,6 +229,14 @@ const EducationCurriculumLesson = ({
                         fullWidth={isMobile && !isLandscape}
                         label={<Trans>Open project</Trans>}
                         onClick={onOpenTemplateFromTutorial}
+                      />
+                    )}
+                    {examUrl && (
+                      <FlatButton
+                        primary
+                        fullWidth={isMobile && !isLandscape}
+                        label={<Trans>Open exam</Trans>}
+                        onClick={() => Window.openExternalURL(examUrl)}
                       />
                     )}
                     {courseId ? (

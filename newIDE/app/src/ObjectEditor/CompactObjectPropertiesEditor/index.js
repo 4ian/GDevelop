@@ -492,8 +492,11 @@ export const CompactObjectPropertiesEditor = ({
           ? customObjectEventsBasedObject.getPropertyDescriptors()
           : // We can't access default values for built-in objects.
             null,
-        getProperties: ({ objectConfiguration }) =>
-          objectConfiguration.getProperties(),
+        getPropertyValue: ({ objectConfiguration }, name) =>
+          objectConfiguration
+            .getProperties()
+            .get(name)
+            .getValue(),
         onUpdateProperty: ({ objectConfiguration }, name, value) => {
           objectConfiguration.updateProperty(name, value);
           onObjectsModified([object]);

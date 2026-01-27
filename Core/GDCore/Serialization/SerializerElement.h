@@ -330,6 +330,12 @@ class GD_CORE_API SerializerElement {
   bool HasAttribute(const gd::String &name) const;
 
   /**
+   * \brief Remove the attribute with the specified name
+   * \param name The name of the attribute to remove.
+   */
+  void RemoveAttribute(const gd::String& name);
+
+  /**
    * \brief Return all the attributes of the element.
    */
   const std::map<gd::String, SerializerValue> &GetAllAttributes() const {

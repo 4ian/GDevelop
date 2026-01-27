@@ -14,8 +14,8 @@ BehaviorConfigurationContainer::~BehaviorConfigurationContainer(){};
 
 
 std::map<gd::String, gd::PropertyDescriptor> BehaviorConfigurationContainer::GetProperties() const {
-    return GetProperties(content);
-  };
+  return GetProperties(content);
+}
 
 std::map<gd::String, gd::PropertyDescriptor> BehaviorConfigurationContainer::GetProperties(
     const gd::SerializerElement& behaviorContent) const {

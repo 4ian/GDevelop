@@ -59,6 +59,7 @@ struct GD_CORE_API ExpressionParserError {
     UnknownParameterType,
     MissingBehavior,
     VariableNameCollision,
+    DeprecatedExpression,
   };
 
   ExpressionParserError(gd::ExpressionParserError::ErrorType type_,
@@ -78,7 +79,7 @@ struct GD_CORE_API ExpressionParserError {
         location(startPosition_, endPosition_){};
   virtual ~ExpressionParserError(){};
 
-  gd::ExpressionParserError::ErrorType GetType() { return type; }
+  gd::ExpressionParserError::ErrorType GetType() const { return type; }
   const gd::String &GetMessage() { return message; }
   const gd::String &GetObjectName() { return objectName; }
   const gd::String &GetActualValue() { return actualValue; }

@@ -1726,6 +1726,7 @@ interface InstructionMetadata {
     [Const, Ref] ParameterMetadataContainer GetParameters();
     long GetUsageComplexity();
     boolean IsHidden();
+    [Const, Ref] DOMString GetDeprecationMessage();
     boolean IsPrivate();
     boolean IsAsync();
     boolean IsOptionallyAsync();
@@ -1792,6 +1793,8 @@ interface ExpressionMetadata {
     [Const, Ref] DOMString GetHelpPath();
     boolean IsShown();
     boolean IsPrivate();
+    boolean IsDeprecated();
+    [Const, Ref] DOMString GetDeprecationMessage();
     boolean IsRelevantForLayoutEvents();
     boolean IsRelevantForFunctionEvents();
     boolean IsRelevantForAsynchronousFunctionEvents();
@@ -2922,8 +2925,27 @@ interface BehaviorParameterFiller {
         [Ref] Instruction instruction);
 };
 
+interface ParameterValidationResult {
+  boolean IsValid();
+  boolean HasDeprecationWarning();
+};
+
 interface InstructionValidator {
+  [Value] ParameterValidationResult STATIC_ValidateParameter(
+    [Const, Ref] Platform platform,
+    [Const, Ref] ProjectScopedContainers projectScopedContainers,
+    [Const, Ref] Instruction instruction,
+    [Const, Ref] InstructionMetadata metadata,
+    long parameterIndex,
+    [Const] DOMString value);
   boolean STATIC_IsParameterValid(
+    [Const, Ref] Platform platform,
+    [Const, Ref] ProjectScopedContainers projectScopedContainers,
+    [Const, Ref] Instruction instruction,
+    [Const, Ref] InstructionMetadata metadata,
+    long parameterIndex,
+    [Const] DOMString value);
+  boolean STATIC_HasDeprecationWarnings(
     [Const, Ref] Platform platform,
     [Const, Ref] ProjectScopedContainers projectScopedContainers,
     [Const, Ref] Instruction instruction,
@@ -3065,7 +3087,26 @@ interface WholeProjectDiagnosticReport {
     boolean HasAnyIssue();
 };
 
+enum ExpressionParserError_ErrorType {
+    "ExpressionParserError::SyntaxError",
+    "ExpressionParserError::InvalidOperator",
+    "ExpressionParserError::MismatchedType",
+    "ExpressionParserError::UndeclaredVariable",
+    "ExpressionParserError::UnknownIdentifier",
+    "ExpressionParserError::BracketsNotAllowedForObjects",
+    "ExpressionParserError::TooFewParameters",
+    "ExpressionParserError::TooManyParameters",
+    "ExpressionParserError::InvalidFunctionName",
+    "ExpressionParserError::MalformedVariableParameter",
+    "ExpressionParserError::MalformedObjectParameter",
+    "ExpressionParserError::UnknownParameterType",
+    "ExpressionParserError::MissingBehavior",
+    "ExpressionParserError::VariableNameCollision",
+    "ExpressionParserError::DeprecatedExpression"
+};
+
 interface ExpressionParserError {
+    ExpressionParserError_ErrorType GetType();
     [Const, Ref] DOMString GetMessage();
     unsigned long GetStartPosition();
     unsigned long GetEndPosition();
@@ -3187,6 +3228,10 @@ interface EventsFunction {
     boolean IsPrivate();
     [Ref] EventsFunction SetAsync(boolean isAsync);
     boolean IsAsync();
+    [Ref] EventsFunction SetDeprecated(boolean isDeprecated);
+    boolean IsDeprecated();
+    [Ref] EventsFunction SetDeprecationMessage([Const] DOMString message);
+    [Const, Ref] DOMString GetDeprecationMessage();
     boolean IsAction();
     boolean IsExpression();
     boolean IsCondition();

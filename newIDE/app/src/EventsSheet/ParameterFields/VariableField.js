@@ -509,7 +509,9 @@ export const renderVariableWithIcon = (
     value,
     parameterMetadata,
     expressionIsValid,
+    hasDeprecationWarning,
     InvalidParameterValue,
+    DeprecatedParameterValue,
     MissingParameterValue,
     projectScopedContainersAccessor,
   }: ParameterInlineRendererProps,
@@ -529,9 +531,14 @@ export const renderVariableWithIcon = (
     )
   );
 
-  const IconAndNameContainer = expressionIsValid
-    ? React.Fragment
-    : InvalidParameterValue;
+  let IconAndNameContainer;
+  if (!expressionIsValid) {
+    IconAndNameContainer = InvalidParameterValue;
+  } else if (hasDeprecationWarning) {
+    IconAndNameContainer = DeprecatedParameterValue;
+  } else {
+    IconAndNameContainer = React.Fragment;
+  }
 
   return (
     <span

@@ -552,6 +552,46 @@ export const EventsFunctionPropertiesEditor = ({
                       forceUpdate();
                     }}
                   />
+                  <Checkbox
+                    label={<Trans>Deprecated</Trans>}
+                    checked={eventsFunction.isDeprecated()}
+                    onCheck={(e, checked) => {
+                      eventsFunction.setDeprecated(checked);
+                      if (onConfigurationUpdated)
+                        onConfigurationUpdated('isDeprecated');
+                      forceUpdate();
+                    }}
+                    tooltipOrHelperText={
+                      eventsFunction.isDeprecated() ? (
+                        <Trans>
+                          This function is marked as deprecated. It will be
+                          displayed with a warning in the events editor.
+                        </Trans>
+                      ) : (
+                        <Trans>
+                          Mark this function as deprecated to discourage its
+                          use.
+                        </Trans>
+                      )
+                    }
+                  />
+                  {eventsFunction.isDeprecated() && (
+                    <SemiControlledTextField
+                      commitOnBlur
+                      floatingLabelText={
+                        <Trans>Deprecation message</Trans>
+                      }
+                      translatableHintText={t`Example: Use "New Action Name" instead.`}
+                      fullWidth
+                      multiline
+                      value={eventsFunction.getDeprecationMessage()}
+                      onChange={text => {
+                        eventsFunction.setDeprecationMessage(text);
+                        if (onConfigurationUpdated) onConfigurationUpdated();
+                        forceUpdate();
+                      }}
+                    />
+                  )}
                   {eventsFunction.isAsync() && (
                     <AlertMessage
                       kind="info"

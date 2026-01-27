@@ -8,6 +8,10 @@ export type InvalidParameterValueProps = {|
   isEmpty?: boolean,
 |};
 
+export type DeprecatedParameterValueProps = {|
+  children: React.Node,
+|};
+
 /**
  * The props expected by a function that renders a parameter in the events sheet
  */
@@ -17,8 +21,10 @@ export type ParameterInlineRendererProps = {|
   parameterMetadata: gdParameterMetadata,
   value: string,
   expressionIsValid: boolean,
+  hasDeprecationWarning: boolean,
   renderObjectThumbnail: string => React.Node,
   InvalidParameterValue: InvalidParameterValueProps => React.Node,
+  DeprecatedParameterValue: DeprecatedParameterValueProps => React.Node,
   MissingParameterValue: () => React.Node,
   useAssignmentOperators: boolean,
 |};

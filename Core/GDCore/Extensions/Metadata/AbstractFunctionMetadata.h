@@ -77,6 +77,13 @@ public:
   virtual AbstractFunctionMetadata &SetHidden() = 0;
 
   /**
+   * \brief Set the deprecation message that explains why the function
+   * is deprecated and what to use instead.
+   */
+  virtual AbstractFunctionMetadata &
+  SetDeprecationMessage(const gd::String &message) = 0;
+
+  /**
    * Set that the instruction is private - it can't be used outside of the
    * object/ behavior that it is attached too.
    */

@@ -694,6 +694,7 @@ export class Behavior extends EmscriptenObject {
   updateProperty(name: string, value: string): boolean;
   removeProperty(name: string): void;
   initializeContent(): void;
+  hasPropertyValue(name: string): boolean;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
   isFolded(): boolean;

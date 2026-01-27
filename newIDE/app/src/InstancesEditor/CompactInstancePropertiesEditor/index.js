@@ -215,11 +215,14 @@ export const CompactInstancePropertiesEditor = ({
         properties,
         // We can't access default values for instance custom properties.
         defaultValueProperties: null,
-        getProperties: (instance: gdInitialInstance) =>
-          instance.getCustomProperties(
-            globalObjectsContainer || objectsContainer,
-            objectsContainer
-          ),
+        getPropertyValue: (instance: gdInitialInstance, name: string) =>
+          instance
+            .getCustomProperties(
+              globalObjectsContainer || objectsContainer,
+              objectsContainer
+            )
+            .get(name)
+            .getValue(),
         onUpdateProperty: (instance: gdInitialInstance, name, value) =>
           instance.updateCustomProperty(
             name,

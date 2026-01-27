@@ -283,6 +283,10 @@ void SerializerElement::RemoveChild(const gd::String& name) {
   }
 }
 
+void SerializerElement::RemoveAttribute(const gd::String& name) {
+  attributes.erase(name);
+}
+
 void SerializerElement::Init(const gd::SerializerElement& other) {
   valueUndefined = other.valueUndefined;
   elementValue = other.elementValue;

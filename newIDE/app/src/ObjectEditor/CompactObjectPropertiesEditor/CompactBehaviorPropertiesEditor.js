@@ -88,14 +88,26 @@ export const CompactBehaviorPropertiesEditor = ({
         return propertiesMapToSchema({
           properties: behavior.getProperties(),
           defaultValueProperties: behavior.getProperties(),
-          getProperties: instance => {
+          getPropertyValue: (instance, propertyName) => {
             const behaviorName = behavior.getName();
-            if (initialInstance.hasBehaviorOverridingNamed(behaviorName)) {
-              return initialInstance
+            if (
+              initialInstance.hasBehaviorOverridingNamed(behaviorName) &&
+              initialInstance
                 .getBehaviorOverriding(behaviorName)
-                .getProperties();
+                .hasPropertyValue(propertyName)
+            ) {
+              const behaviorOverriding = initialInstance.getBehaviorOverriding(
+                behaviorName
+              );
+              return behaviorOverriding
+                .getProperties()
+                .get(propertyName)
+                .getValue();
             }
-            return behavior.getProperties();
+            return behavior
+              .getProperties()
+              .get(propertyName)
+              .getValue();
           },
           onUpdateProperty: (instance, name, value) => {
             const behaviorName = behavior.getName();
@@ -108,8 +120,9 @@ export const CompactBehaviorPropertiesEditor = ({
                   behavior.getTypeName(),
                   behaviorName
                 );
-            const inheritedValue = behavior.getProperties().has(name)
-              ? behavior.getProperties().get(name)
+            const behaviorProperties = behavior.getProperties();
+            const inheritedValue = behaviorProperties.has(name)
+              ? behaviorProperties.get(name).getValue()
               : null;
             if (inheritedValue === value) {
               behaviorOverriding.removeProperty(name);
@@ -125,7 +138,11 @@ export const CompactBehaviorPropertiesEditor = ({
       return propertiesMapToSchema({
         properties: behavior.getProperties(),
         defaultValueProperties: behaviorMetadata.getProperties(),
-        getProperties: instance => instance.getProperties(),
+        getPropertyValue: (instance, name) =>
+          instance
+            .getProperties()
+            .get(name)
+            .getValue(),
         onUpdateProperty: (instance, name, value) => {
           instance.updateProperty(name, value);
         },

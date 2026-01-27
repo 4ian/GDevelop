@@ -36,15 +36,11 @@ const createField = (
     value: boolean
   ) => void,
   defaultValue: string | null,
-  getProperties: (instance: Instance) => any,
   object: ?gdObject,
   showcaseNonDefaultValues: boolean
 ): ?Field => {
-  const propertyDescription = property.getDescription();
+  const propertyName = property.getLabel();
   const getLabel = (instance: Instance) => {
-    const propertyName = getProperties(instance)
-      .get(name)
-      .getLabel();
     if (propertyName) return propertyName;
     return (
       name.charAt(0).toUpperCase() +
@@ -54,10 +50,10 @@ const createField = (
         .join(' ')
     );
   };
+  const propertyDescription = property.getDescription();
   const getDescription = () => propertyDescription;
+  const measurementUnit = property.getMeasurementUnit();
   const getEndAdornment = (instance: Instance) => {
-    const property = getProperties(instance).get(name);
-    const measurementUnit = property.getMeasurementUnit();
     return {
       label: getMeasurementUnitShortLabel(measurementUnit),
       tooltipContent: (
@@ -469,7 +465,6 @@ type CommonProps = {|
     | gdPropertiesContainer
     | gdMapStringPropertyDescriptor
     | null,
-  getProperties: (instance: Instance) => any,
   object?: ?gdObject,
   visibility?: 'All' | 'Basic' | 'Advanced' | 'Deprecated' | 'Basic-Quick',
   quickCustomizationVisibilities?: gdQuickCustomizationVisibilitiesContainer,
@@ -478,7 +473,6 @@ type CommonProps = {|
 
 export const effectPropertiesMapToSchema = ({
   defaultValueProperties,
-  getProperties,
   object,
   visibility = 'All',
   quickCustomizationVisibilities,
@@ -490,7 +484,6 @@ export const effectPropertiesMapToSchema = ({
   return adaptablePropertiesMapToSchema({
     properties: defaultValueProperties,
     defaultValueProperties,
-    getProperties,
     object,
     visibility,
     quickCustomizationVisibilities,
@@ -539,7 +532,7 @@ export const effectPropertiesMapToSchema = ({
 const propertiesMapToSchema = ({
   properties,
   defaultValueProperties,
-  getProperties,
+  getPropertyValue,
   onUpdateProperty,
   object,
   visibility = 'All',
@@ -547,6 +540,7 @@ const propertiesMapToSchema = ({
   showcaseNonDefaultValues,
 }: {
   ...CommonProps,
+  getPropertyValue: (instance: Instance, propertyName: string) => string,
   properties: gdMapStringPropertyDescriptor,
   onUpdateProperty: (
     instance: Instance,
@@ -557,31 +551,19 @@ const propertiesMapToSchema = ({
   return adaptablePropertiesMapToSchema({
     properties,
     defaultValueProperties,
-    getProperties,
     object,
     visibility,
     quickCustomizationVisibilities,
     showcaseNonDefaultValues,
     getNumberValue: (instance: Instance, propertyName: string): number => {
-      return (
-        parseFloat(
-          getProperties(instance)
-            .get(propertyName)
-            .getValue()
-        ) || 0
-      ); // Consider a missing value as 0 to avoid propagating NaN.
+      // Consider a missing value as 0 to avoid propagating NaN.
+      return parseFloat(getPropertyValue(instance, propertyName)) || 0;
     },
     getStringValue: (instance: Instance, propertyName: string): string => {
-      return getProperties(instance)
-        .get(propertyName)
-        .getValue();
+      return getPropertyValue(instance, propertyName);
     },
     getBooleanValue: (instance: Instance, propertyName: string): boolean => {
-      return (
-        getProperties(instance)
-          .get(propertyName)
-          .getValue() === 'true'
-      );
+      return getPropertyValue(instance, propertyName) === 'true';
     },
     setNumberValue: (instance: Instance, propertyName: string, value: number) =>
       onUpdateProperty(instance, propertyName, '' + value),
@@ -598,7 +580,6 @@ const propertiesMapToSchema = ({
 const adaptablePropertiesMapToSchema = ({
   properties,
   defaultValueProperties,
-  getProperties,
   object,
   visibility = 'All',
   quickCustomizationVisibilities,
@@ -733,7 +714,6 @@ const adaptablePropertiesMapToSchema = ({
               setStringValue,
               setBooleanValue,
               rowPropertyDefaultValue,
-              getProperties,
               object,
               !!showcaseNonDefaultValues
             );
@@ -770,7 +750,6 @@ const adaptablePropertiesMapToSchema = ({
             ? defaultValueProperties.get(name).getValue()
             : ''
           : null,
-        getProperties,
         object,
         !!showcaseNonDefaultValues
       );

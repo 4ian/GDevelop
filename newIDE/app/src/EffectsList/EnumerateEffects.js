@@ -40,7 +40,6 @@ export const enumerateEffectsMetadata = (
           // Convert the effect type properties to a PropertiesEditor Schema.
           const parametersSchema: Schema = effectPropertiesMapToSchema({
             defaultValueProperties: effectMetadata.getProperties(),
-            getProperties: instance => effectMetadata.getProperties(),
           });
           return {
             extension,

@@ -80,7 +80,7 @@ describe('gdjs.TextInputRuntimeObject (using a PixiJS RuntimeGame with DOM eleme
   };
 
   const setupObjectAndGetDomElementContainer = async () => {
-    const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
+    const runtimeGame = await gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
     loadScene(runtimeScene);
 

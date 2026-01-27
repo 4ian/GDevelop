@@ -167,17 +167,22 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     // end of compatibility code
   }
 
+  bool hasScanProjectForExtension = false;
+  bool has3DObjects = false;
+
   std::vector<gd::SourceFileMetadata> noUsedSourceFiles;
   std::vector<gd::SourceFileMetadata> &usedSourceFiles = noUsedSourceFiles;
   if (options.shouldReloadLibraries || options.shouldClearExportFolder) {
     auto usedExtensionsResult =
         gd::UsedExtensionsFinder::ScanProject(exportedProject);
     usedSourceFiles = usedExtensionsResult.GetUsedSourceFiles();
+    hasScanProjectForExtension = true;
+    has3DObjects = usedExtensionsResult.Has3DObjects();
 
     // Export engine libraries
     AddLibsInclude(/*pixiRenderers=*/true,
                   /*pixiInThreeRenderers=*/
-                  usedExtensionsResult.Has3DObjects(),
+                  has3DObjects,
                   /*isInGameEdition=*/
                   options.isInGameEdition,
                   /*includeWebsocketDebuggerClient=*/
@@ -191,7 +196,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
                   /*includeInAppTutorialMessage*/
                   !options.inAppTutorialMessageInPreview.empty(),
                   immutableProject.GetLoadingScreen().GetGDevelopLogoStyle(),
-                  includesFiles);
+                  includesFiles,
+                  resourcesFiles);
 
     // Export files for free function, object and behaviors
     for (const auto &includeFile : usedExtensionsResult.GetUsedIncludeFiles()) {
@@ -321,6 +327,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
   if (options.shouldReloadLibraries || options.shouldClearExportFolder) {
     includesFiles.push_back(codeOutputDir + "/data.js");
+    includesFiles.push_back("gdjs-bootstrap.js");
     // Copy all the dependencies and their source maps
     ExportIncludesAndLibs(includesFiles, options.exportPath, true);
     ExportIncludesAndLibs(resourcesFiles, options.exportPath, true);
@@ -328,11 +335,18 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     // TODO Build a full includesFiles list without actually doing export or
     // generation.
     if (options.shouldGenerateScenesEventsCode || options.shouldClearExportFolder) {
+      if (!hasScanProjectForExtension) {
+        auto usedExtensionsResult =
+            gd::UsedExtensionsFinder::ScanProject(exportedProject);
+        usedSourceFiles = usedExtensionsResult.GetUsedSourceFiles();
+        hasScanProjectForExtension = true;
+        has3DObjects = usedExtensionsResult.Has3DObjects();
+      }
       // Create the index file
-      if (!ExportIndexFile(exportedProject, gdjsRoot + "/Runtime/index.html",
+      if (!ExportIndexFile(exportedProject, gdjsRoot + "/Runtime",
                            options.exportPath, includesFiles, usedSourceFiles,
                            options.nonRuntimeScriptsCacheBurst,
-                           "gdjs.runtimeGameOptions")) {
+                           has3DObjects, "gdjs.runtimeGameOptions")) {
         return false;
       }
     }
@@ -701,13 +715,14 @@ void ExporterHelper::SerializeUsedResources(
 
 bool ExporterHelper::ExportIndexFile(
     const gd::Project &project,
-    gd::String source,
+    gd::String sourceDir,
     gd::String exportDir,
     const std::vector<gd::String> &includesFiles,
     const std::vector<gd::SourceFileMetadata> &sourceFiles,
     unsigned int nonRuntimeScriptsCacheBurst,
+    bool has3DObjects,
     gd::String additionalSpec) {
-  gd::String str = fs.ReadFile(source);
+  gd::String str = fs.ReadFile(sourceDir + "/index.html");
 
   // Add a reference to all files to include, as weel as the source files
   // required by the project.
@@ -734,7 +749,7 @@ bool ExporterHelper::ExportIndexFile(
                          exportDir,
                          finalIncludesFiles,
                          nonRuntimeScriptsCacheBurst,
-                         additionalSpec))
+                         has3DObjects))
     return false;
 
   // Write the index.html file
@@ -743,6 +758,14 @@ bool ExporterHelper::ExportIndexFile(
     return false;
   }
 
+  gd::String bootstrapScript = fs.ReadFile(sourceDir + "/gdjs-bootscrap.js");
+  bootstrapScript.FindAndReplace("{} /*GDJS_ADDITIONAL_SPEC*/",
+                                 additionalSpec.empty() ? "{}"
+                                                        : additionalSpec);
+  if (!fs.WriteToFile(exportDir + "/gdjs-bootscrap.js", str)) {
+    lastError = "Unable to write index file.";
+    return false;
+  }
   return true;
 }
 
@@ -1081,9 +1104,7 @@ bool ExporterHelper::CompleteIndexFile(
     gd::String exportDir,
     const std::vector<gd::String> &includesFiles,
     unsigned int nonRuntimeScriptsCacheBurst,
-    gd::String additionalSpec) {
-  if (additionalSpec.empty()) additionalSpec = "{}";
-
+    bool has3DObjects) {
   gd::String codeFilesIncludes;
   for (auto &include : includesFiles) {
     gd::String scriptSrc =
@@ -1100,13 +1121,20 @@ bool ExporterHelper::CompleteIndexFile(
     }
 
     codeFilesIncludes += "\t<script src=\"" + scriptSrc +
-                         "\" crossorigin=\"anonymous\"></script>\n";
+                         "\" crossorigin=\"anonymous\" defer></script>\n";
   }
-
-  str = str.FindAndReplace("/* GDJS_CUSTOM_STYLE */", "")
-            .FindAndReplace("<!-- GDJS_CUSTOM_HTML -->", "")
-            .FindAndReplace("<!-- GDJS_CODE_FILES -->", codeFilesIncludes)
-            .FindAndReplace("{}/*GDJS_ADDITIONAL_SPEC*/", additionalSpec);
+  str =
+      str.FindAndReplace("/* GDJS_CUSTOM_STYLE */", "")
+          .FindAndReplace(
+              "<!-- 3D_LIBRARY_SCRIPT -->",
+              has3DObjects
+                  ? "<script type=\"module\">\n"
+                    "    import * as THREE from './pixi-renderers/three.js';\n"
+                    "    globalThis.THREE = THREE;\n"
+                    "</script>\n"
+                  : "")
+          .FindAndReplace("<!-- GDJS_CUSTOM_HTML -->", "")
+          .FindAndReplace("<!-- GDJS_CODE_FILES -->", codeFilesIncludes);
 
   return true;
 }
@@ -1120,7 +1148,8 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
                                     bool includeCaptureManager,
                                     bool includeInAppTutorialMessage,
                                     gd::String gdevelopLogoStyle,
-                                    std::vector<gd::String> &includesFiles) {
+                                    std::vector<gd::String> &includesFiles,
+                                    std::vector<gd::String> &requiredFiles) {
   // First, do not forget common includes (they must be included before events
   // generated code files).
   InsertUnique(includesFiles, "libs/jshashtable.js");
@@ -1204,7 +1233,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   }
 
   if (pixiInThreeRenderers || isInGameEdition) {
-    InsertUnique(includesFiles, "pixi-renderers/three.js");
+    InsertUnique(requiredFiles, "pixi-renderers/three.js");
     InsertUnique(includesFiles, "pixi-renderers/ThreeAddons.js");
     InsertUnique(includesFiles, "pixi-renderers/draco/gltf/draco_decoder.wasm");
     InsertUnique(includesFiles,

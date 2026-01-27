@@ -809,7 +809,7 @@ describe('libGD.js', function () {
       let initialInstance2 = layout
         .getInitialInstances()
         .insertNewInitialInstance();
-      initialInstance2.unserializeFrom(element);
+      initialInstance2.unserializeFrom(project, element);
       expect(initialInstance2.getObjectName()).toBe('MySpriteObject');
       expect(initialInstance2.getX()).toBe(150);
       expect(initialInstance2.getY()).toBe(140);
@@ -863,7 +863,7 @@ describe('libGD.js', function () {
       const migratedInstance = layout
         .getInitialInstances()
         .insertNewInitialInstance();
-      migratedInstance.unserializeFrom(element);
+      migratedInstance.unserializeFrom(project, element);
 
       element.delete();
       expect(migratedInstance.getX()).toBe(-100);
@@ -902,7 +902,7 @@ describe('libGD.js', function () {
       const instanceWithJustDepth = layout
         .getInitialInstances()
         .insertNewInitialInstance();
-      instanceWithJustDepth.unserializeFrom(element);
+      instanceWithJustDepth.unserializeFrom(project, element);
 
       element.delete();
       expect(instanceWithJustDepth.getX()).toBe(-100);
@@ -950,7 +950,7 @@ describe('libGD.js', function () {
       const initialInstance2 = layout
         .getInitialInstances()
         .insertNewInitialInstance();
-      initialInstance2.unserializeFrom(element);
+      initialInstance2.unserializeFrom(project, element);
       expect(initialInstance2.getX()).toBe(40);
       expect(initialInstance2.getY()).toBe(41);
       expect(initialInstance2.getZ()).toBe(42);
@@ -975,7 +975,7 @@ describe('libGD.js', function () {
 
       // The UUID must persist across serializations.
       const initialInstance2 = new gd.InitialInstance();
-      initialInstance2.unserializeFrom(element);
+      initialInstance2.unserializeFrom(project, element);
 
       let element2 = new gd.SerializerElement();
       initialInstance.serializeTo(element2);

@@ -264,6 +264,9 @@ const CompactPropertiesEditor = ({
             }}
             disabled={getDisabled({ instances, field })}
             fullWidth
+            labelColor={
+              isFieldShowcased({ instances, field }) ? 'primary' : 'secondary'
+            }
           />
         );
       } else if (field.valueType === 'number') {
@@ -323,7 +326,9 @@ const CompactPropertiesEditor = ({
                   {...otherCommonProps}
                 />
               }
-              isShowcased={isFieldShowcased({ instances, field })}
+              labelColor={
+                isFieldShowcased({ instances, field }) ? 'primary' : 'secondary'
+              }
             />
           );
         }
@@ -350,7 +355,9 @@ const CompactPropertiesEditor = ({
                 }}
               />
             }
-            isShowcased={isFieldShowcased({ instances, field })}
+            labelColor={
+              isFieldShowcased({ instances, field }) ? 'primary' : 'secondary'
+            }
           />
         );
       } else if (field.valueType === 'enumIcon') {
@@ -391,6 +398,9 @@ const CompactPropertiesEditor = ({
             value={getFieldValue({ instances, field })}
             label={getFieldLabel({ instances, field })}
             markdownDescription={getFieldDescription(field)}
+            labelColor={
+              isFieldShowcased({ instances, field }) ? 'primary' : 'secondary'
+            }
           />
         );
       } else {
@@ -445,7 +455,9 @@ const CompactPropertiesEditor = ({
               label={getFieldLabel({ instances, field })}
               markdownDescription={getFieldDescription(field)}
               field={<CompactSemiControlledTextField {...otherCommonProps} />}
-              isShowcased={isFieldShowcased({ instances, field })}
+              labelColor={
+                isFieldShowcased({ instances, field }) ? 'primary' : 'secondary'
+              }
             />
           );
         }
@@ -527,7 +539,9 @@ const CompactPropertiesEditor = ({
           label={getFieldLabel({ instances, field })}
           markdownDescription={getFieldDescription(field)}
           field={compactSelectField}
-          isShowcased={isFieldShowcased({ instances, field })}
+          labelColor={
+            isFieldShowcased({ instances, field }) ? 'primary' : 'secondary'
+          }
         />
       );
     },
@@ -640,7 +654,9 @@ const CompactPropertiesEditor = ({
             }}
           />
         }
-        isShowcased={isFieldShowcased({ instances, field })}
+        labelColor={
+          isFieldShowcased({ instances, field }) ? 'primary' : 'secondary'
+        }
       />
     );
   };
@@ -674,7 +690,9 @@ const CompactPropertiesEditor = ({
             }}
           />
         }
-        isShowcased={isFieldShowcased({ instances, field })}
+        labelColor={
+          isFieldShowcased({ instances, field }) ? 'primary' : 'secondary'
+        }
       />
     );
   };

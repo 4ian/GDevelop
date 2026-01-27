@@ -404,6 +404,162 @@ const sanitizePropertyNewValue = (
   return newValue;
 };
 
+const normalizePropertyName = (propertyName: string): string =>
+  propertyName.trim().toLowerCase();
+
+const getPropertyValue = ({
+  properties,
+  name,
+}: {|
+  properties: gdMapStringPropertyDescriptor | null,
+  name: string,
+|}): string | null => {
+  const { foundProperty } = findPropertyByName({ properties, name });
+  return foundProperty ? foundProperty.getValue() : null;
+};
+
+const getChangedPropertyNames = (
+  changedProperties: Array<any>
+): Set<string> => {
+  const propertyNames = new Set();
+  changedProperties.forEach(changedProperty => {
+    const propertyName = SafeExtractor.extractStringProperty(
+      changedProperty,
+      'property_name'
+    );
+    if (propertyName) {
+      propertyNames.add(normalizePropertyName(propertyName));
+    }
+  });
+  return propertyNames;
+};
+
+const canAttemptSizeParsing = (changedPropertyNames: Set<string>): boolean => {
+  const hasWidth = changedPropertyNames.has('width');
+  const hasHeight = changedPropertyNames.has('height');
+  const hasDepth = changedPropertyNames.has('depth');
+  return !hasDepth && !(hasWidth && hasHeight);
+};
+
+const parseSizeValue = (
+  value: string
+): null | {|
+  width: string,
+  height: string,
+  depth: string | null,
+|} => {
+  const trimmedValue = value.trim();
+  if (!trimmedValue) return null;
+
+  const componentPattern = '[+-]?(?:\\d+\\.?\\d*|\\d*\\.\\d+)';
+  const delimiters = [',', ';', 'x'];
+
+  for (const delimiter of delimiters) {
+    const delimiterPattern = delimiter === 'x' ? '[xX]' : delimiter;
+    const sizeRegex = new RegExp(
+      `^\\s*(${componentPattern})\\s*${delimiterPattern}\\s*(${componentPattern})\\s*(?:${delimiterPattern}\\s*(${componentPattern})\\s*)?$`
+    );
+    const match = trimmedValue.match(sizeRegex);
+    if (match) {
+      const [, width, height, depth] = match;
+      return {
+        width: width.trim(),
+        height: height.trim(),
+        depth: depth ? depth.trim() : null,
+      };
+    }
+  }
+
+  return null;
+};
+
+const getSizePropertyChanges = ({
+  newValue,
+  changedPropertyNames,
+}: {|
+  newValue: string,
+  changedPropertyNames: Set<string>,
+|}): null | Array<{| propertyName: string, newValue: string |}> => {
+  if (!canAttemptSizeParsing(changedPropertyNames)) return null;
+
+  const parsedSize = parseSizeValue(newValue);
+  if (!parsedSize) return null;
+
+  const propertyChanges = [
+    { propertyName: 'width', newValue: parsedSize.width },
+    { propertyName: 'height', newValue: parsedSize.height },
+  ];
+
+  if (parsedSize.depth !== null) {
+    propertyChanges.push({ propertyName: 'depth', newValue: parsedSize.depth });
+  }
+
+  return propertyChanges;
+};
+
+const applyPropertyChanges = (
+  propertyChanges: Array<{| propertyName: string, newValue: string |}>,
+  updateProperty: ({
+    propertyName: string,
+    newValue: string,
+  }) => {
+    success: boolean,
+    foundPropertyName: string | null,
+    updatedValue: string | null,
+    isSharedData?: boolean,
+  }
+): Array<{|
+  propertyName: string,
+  updatedValue: string,
+  isSharedData?: boolean,
+|}> => {
+  return propertyChanges
+    .map(({ propertyName, newValue }) => {
+      const updateResult = updateProperty({ propertyName, newValue });
+      if (!updateResult.success || !updateResult.foundPropertyName) return null;
+
+      return {
+        propertyName: updateResult.foundPropertyName,
+        updatedValue:
+          updateResult.updatedValue !== null
+            ? updateResult.updatedValue
+            : newValue,
+        isSharedData: updateResult.isSharedData,
+      };
+    })
+    .filter(Boolean);
+};
+
+const formatSizeParsedChangeMessage = ({
+  targetLabel,
+  appliedChanges,
+}: {|
+  targetLabel: string,
+  appliedChanges: Array<{| propertyName: string, updatedValue: string |}>,
+|}): string | null => {
+  const getChange = (propertyName: string) =>
+    appliedChanges.find(
+      change => normalizePropertyName(change.propertyName) === propertyName
+    );
+
+  const widthChange = getChange('width');
+  const heightChange = getChange('height');
+  if (!widthChange || !heightChange) return null;
+
+  const depthChange = getChange('depth');
+  const propertyNames = ['width', 'height']
+    .concat(depthChange ? ['depth'] : [])
+    .join('/');
+
+  const values = [
+    `width: ${widthChange.updatedValue}`,
+    `height: ${heightChange.updatedValue}`,
+    ...(depthChange ? [`depth: ${depthChange.updatedValue}`] : []),
+  ].join(', ');
+
+  return `Size was parsed and ${propertyNames} of ${targetLabel} were changed instead (${values}).`;
+};
+
 const makeShortTextForNamedProperty = (
   name: string,
   property: gdPropertyDescriptor
@@ -1256,6 +1412,108 @@ const changeObjectProperty: EditorFunction = {
 
     const warnings = [];
     const changes = [];
+    const changedPropertyNames = getChangedPropertyNames(changed_properties);
+    const objectConfiguration = object.getConfiguration();
+
+    const updateObjectPropertyWithValue = ({
+      propertyName,
+      newValue,
+      suppressWarnings = false,
+    }: {|
+      propertyName: string,
+      newValue: string,
+      suppressWarnings?: boolean,
+    |}): {|
+      success: boolean,
+      foundPropertyName: string | null,
+      updatedValue: string | null,
+      failureMessage: string | null,
+    |} => {
+      const objectProperties = objectConfiguration.getProperties();
+      const { foundPropertyName, foundProperty } = findPropertyByName({
+        properties: objectProperties,
+        name: propertyName,
+      });
+
+      if (!foundPropertyName || !foundProperty) {
+        const message = `Property not found: ${propertyName} on object ${object_name}.`;
+        if (!suppressWarnings) warnings.push(message);
+        return {
+          success: false,
+          foundPropertyName: null,
+          updatedValue: null,
+          failureMessage: message,
+        };
+      }
+
+      const sanitizedNewValue = sanitizePropertyNewValue(
+        foundProperty,
+        newValue
+      );
+
+      if (foundProperty.getType() === 'resource') {
+        if (!project.getResourcesManager().hasResource(sanitizedNewValue)) {
+          const message = `Could not change property "${foundPropertyName}" of object "${object_name}" to "${newValue}" because the resource "${sanitizedNewValue}" does not exist in the project. New resources can't be added just by setting a new name that does not exist. Instead, use \`create_or_replace_object\` to replace the assets of an existing object by new one(s) that will be searched and imported from the asset store (this will keep the object properties, behaviors, events, etc. unchanged).`;
+          if (!suppressWarnings) warnings.push(message);
+          return {
+            success: false,
+            foundPropertyName,
+            updatedValue: null,
+            failureMessage: message,
+          };
+        }
+        const resource = project
+          .getResourcesManager()
+          .getResource(sanitizedNewValue);
+
+        // Check the new resource is of the expected kind.
+        const extraInfos = foundProperty.getExtraInfo().toJSArray();
+        const expectedResourceKind = (extraInfos[0] || '').toLowerCase();
+        if (
+          expectedResourceKind &&
+          resource.getKind().toLowerCase() !== expectedResourceKind
+        ) {
+          const message = `Could not change property "${foundPropertyName}" of object "${object_name}" to "${newValue}" because the resource "${sanitizedNewValue}" exists in project but has type "${resource.getKind()}", which is not the expected type "${expectedResourceKind}".`;
+          if (!suppressWarnings) warnings.push(message);
+          return {
+            success: false,
+            foundPropertyName,
+            updatedValue: null,
+            failureMessage: message,
+          };
+        }
+      }
+
+      if (!objectConfiguration.updateProperty(foundPropertyName, sanitizedNewValue)) {
+        const message = `Could not change property "${foundPropertyName}" of object "${object_name}". The value might be invalid, of the wrong type or not allowed.`;
+        if (!suppressWarnings) warnings.push(message);
+        return {
+          success: false,
+          foundPropertyName,
+          updatedValue: null,
+          failureMessage: message,
+        };
+      }
+
+      const updatedValue = getPropertyValue({
+        properties: objectConfiguration.getProperties(),
+        name: foundPropertyName,
+      });
+
+      return {
+        success: true,
+        foundPropertyName,
+        updatedValue,
+        failureMessage: null,
+      };
+    };
+
+    const applyObjectPropertyChanges = (
+      propertyChanges: Array<{| propertyName: string, newValue: string |}>
+    ) =>
+      applyPropertyChanges(propertyChanges, ({ propertyName, newValue }) =>
+        updateObjectPropertyWithValue({ propertyName, newValue })
+      );
 
     changed_properties.forEach(changed_property => {
       if (!object) return;
@@ -1276,6 +1534,8 @@ const changeObjectProperty: EditorFunction = {
         );
         return;
       }
+
+      const normalizedPropertyName = normalizePropertyName(propertyName);
 
       // Renaming an object is a special case by using a property called "name".
       if (isPropertyForChangingObjectName(propertyName)) {
@@ -1326,67 +1586,70 @@ const changeObjectProperty: EditorFunction = {
         return;
       }
 
-      // Changing a "usual" property of an object:
-      const objectConfiguration = object.getConfiguration();
-      const objectProperties = objectConfiguration.getProperties();
+      const sizePropertyChanges =
+        normalizedPropertyName === 'width' ||
+        normalizedPropertyName === 'height'
+          ? getSizePropertyChanges({ newValue, changedPropertyNames })
+          : null;
 
-      const { foundPropertyName, foundProperty } = findPropertyByName({
-        properties: objectProperties,
-        name: propertyName,
+      if (sizePropertyChanges) {
+        const appliedChanges = applyObjectPropertyChanges(sizePropertyChanges);
+        appliedChanges.forEach(change => {
+          changes.push(
+            `Changed property "${change.propertyName}" of object "${object_name}" to "${change.updatedValue}".`
+          );
+        });
+        return;
+      }
+
+      const updateResult = updateObjectPropertyWithValue({
+        propertyName,
+        newValue,
+        suppressWarnings: normalizedPropertyName === 'size',
       });
 
-      if (!foundPropertyName || !foundProperty) {
-        warnings.push(
-          `Property not found: ${propertyName} on object ${object_name}.`
+      if (updateResult.success && updateResult.foundPropertyName) {
+        const updatedValueText =
+          updateResult.updatedValue !== null
+            ? updateResult.updatedValue
+            : newValue;
+        changes.push(
+          `Changed property "${updateResult.foundPropertyName}" of object "${object_name}" to "${updatedValueText}".`
         );
         return;
       }
 
-      const sanitizedNewValue = sanitizePropertyNewValue(
-        foundProperty,
-        newValue
-      );
-
-      if (foundProperty.getType() === 'resource') {
-        if (!project.getResourcesManager().hasResource(sanitizedNewValue)) {
-          warnings.push(
-            `Could not change property "${foundPropertyName}" of object "${object_name}" to "${newValue}" because the resource "${sanitizedNewValue}" does not exist in the project. New resources can't be added just by setting a new name that does not exist. Instead, use \`create_or_replace_object\` to replace the assets of an existing object by new one(s) that will be searched and imported from the asset store (this will keep the object properties, behaviors, events, etc. unchanged).`
+      if (normalizedPropertyName === 'size') {
+        const sizeChangesFromSize = getSizePropertyChanges({
+          newValue,
+          changedPropertyNames,
+        });
+        if (sizeChangesFromSize) {
+          const appliedChanges = applyObjectPropertyChanges(
+            sizeChangesFromSize
           );
-          return;
+          appliedChanges.forEach(change => {
+            changes.push(
+              `Changed property "${change.propertyName}" of object "${object_name}" to "${change.updatedValue}".`
+            );
+          });
+          if (appliedChanges.length) {
+            const sizeParsedMessage = formatSizeParsedChangeMessage({
+              targetLabel: `object "${object_name}"`,
+              appliedChanges,
+            });
+            if (sizeParsedMessage) {
+              changes.push(sizeParsedMessage);
+            }
+            return;
+          }
         }
-        const resource = project
-          .getResourcesManager()
-          .getResource(sanitizedNewValue);
 
-        // Check the new resource is of the expected kind.
-        const extraInfos = foundProperty.getExtraInfo().toJSArray();
-        const expectedResourceKind = (extraInfos[0] || '').toLowerCase();
-        if (
-          expectedResourceKind &&
-          resource.getKind().toLowerCase() !== expectedResourceKind
-        ) {
-          warnings.push(
-            `Could not change property "${foundPropertyName}" of object "${object_name}" to "${newValue}" because the resource "${sanitizedNewValue}" exists in project but has type "${resource.getKind()}", which is not the expected type "${expectedResourceKind}".`
-          );
-          return;
+        if (updateResult.failureMessage) {
+          warnings.push(updateResult.failureMessage);
         }
-      }
-
-      if (
-        !objectConfiguration.updateProperty(
-          foundPropertyName,
-          sanitizePropertyNewValue(foundProperty, newValue)
-        )
-      ) {
-        warnings.push(
-          `Could not change property "${foundPropertyName}" of object "${object_name}". The value might be invalid, of the wrong type or not allowed.`
-        );
         return;
       }
-
-      changes.push(
-        `Changed property "${foundPropertyName}" of object "${object_name}" to "${newValue}".`
-      );
     });
 
     return makeMultipleChangesOutput(changes, warnings);
@@ -1974,6 +2237,119 @@ const changeBehaviorProperty: EditorFunction = {
 
     const warnings = [];
     const changes = [];
+    const changedPropertyNames = getChangedPropertyNames(changedProperties);
+
+    const updateBehaviorPropertyWithValue = ({
+      propertyName,
+      newValue,
+      suppressWarnings = false,
+    }: {|
+      propertyName: string,
+      newValue: string,
+      suppressWarnings?: boolean,
+    |}): {|
+      success: boolean,
+      foundPropertyName: string | null,
+      updatedValue: string | null,
+      failureMessage: string | null,
+      isSharedData: boolean,
+    |} => {
+      const behaviorPropertySearch = findPropertyByName({
+        properties: behaviorProperties,
+        name: propertyName,
+      });
+
+      if (behaviorPropertySearch.foundPropertyName) {
+        const { foundPropertyName, foundProperty } = behaviorPropertySearch;
+        if (
+          !behavior.updateProperty(
+            foundPropertyName,
+            sanitizePropertyNewValue(foundProperty, newValue)
+          )
+        ) {
+          const message = `Could not change property "${foundPropertyName}" of behavior "${behavior_name}". The value might be invalid, of the wrong type or not allowed.`;
+          if (!suppressWarnings) warnings.push(message);
+          return {
+            success: false,
+            foundPropertyName,
+            updatedValue: null,
+            failureMessage: message,
+            isSharedData: false,
+          };
+        }
+
+        const updatedValue = getPropertyValue({
+          properties: behavior.getProperties(),
+          name: foundPropertyName,
+        });
+        return {
+          success: true,
+          foundPropertyName,
+          updatedValue,
+          failureMessage: null,
+          isSharedData: false,
+        };
+      }
+
+      const behaviorSharedDataPropertySearch = findPropertyByName({
+        properties: behaviorSharedDataProperties,
+        name: propertyName,
+      });
+      if (
+        behaviorSharedData &&
+        behaviorSharedDataPropertySearch.foundPropertyName
+      ) {
+        const {
+          foundPropertyName,
+          foundProperty,
+        } = behaviorSharedDataPropertySearch;
+        if (
+          !behaviorSharedData.updateProperty(
+            foundPropertyName,
+            sanitizePropertyNewValue(foundProperty, newValue)
+          )
+        ) {
+          const message = `Could not change shared property "${foundPropertyName}" of behavior "${behavior_name}". The value might be invalid, of the wrong type or not allowed.`;
+          if (!suppressWarnings) warnings.push(message);
+          return {
+            success: false,
+            foundPropertyName,
+            updatedValue: null,
+            failureMessage: message,
+            isSharedData: true,
+          };
+        }
+
+        const updatedValue = getPropertyValue({
+          properties: behaviorSharedData.getProperties(),
+          name: foundPropertyName,
+        });
+        return {
+          success: true,
+          foundPropertyName,
+          updatedValue,
+          failureMessage: null,
+          isSharedData: true,
+        };
+      }
+
+      const message = `Property "${propertyName}" not found on behavior "${behavior_name}" of object "${object_name}".`;
+      if (!suppressWarnings) warnings.push(message);
+      return {
+        success: false,
+        foundPropertyName: null,
+        updatedValue: null,
+        failureMessage: message,
+        isSharedData: false,
+      };
+    };
+
+    const applyBehaviorPropertyChanges = (
+      propertyChanges: Array<{| propertyName: string, newValue: string |}>
+    ) =>
+      applyPropertyChanges(propertyChanges, ({ propertyName, newValue }) =>
+        updateBehaviorPropertyWithValue({ propertyName, newValue })
+      );
 
     changedProperties.forEach(changed_property => {
       const propertyName = SafeExtractor.extractStringProperty(
@@ -1993,60 +2369,79 @@ const changeBehaviorProperty: EditorFunction = {
         return;
       }
 
-      const behaviorPropertySearch = findPropertyByName({
-        properties: behaviorProperties,
-        name: propertyName,
+      const normalizedPropertyName = normalizePropertyName(propertyName);
+
+      const sizePropertyChanges =
+        normalizedPropertyName === 'width' ||
+        normalizedPropertyName === 'height'
+          ? getSizePropertyChanges({ newValue, changedPropertyNames })
+          : null;
+
+      if (sizePropertyChanges) {
+        const appliedChanges = applyBehaviorPropertyChanges(sizePropertyChanges);
+        appliedChanges.forEach(change => {
+          changes.push(
+            change.isSharedData
+              ? `Changed property "${change.propertyName}" of behavior "${behavior_name}" (shared between all objects having this behavior) to "${change.updatedValue}".`
+              : `Changed property "${change.propertyName}" of behavior "${behavior_name}" to "${change.updatedValue}".`
+          );
+        });
+        return;
+      }
+
+      const updateResult = updateBehaviorPropertyWithValue({
+        propertyName,
+        newValue,
+        suppressWarnings: normalizedPropertyName === 'size',
       });
 
-      const behaviorSharedDataPropertySearch = findPropertyByName({
-        properties: behaviorSharedDataProperties,
-        name: propertyName,
-      });
+      if (updateResult.success && updateResult.foundPropertyName) {
+        const updatedValueText =
+          updateResult.updatedValue !== null
+            ? updateResult.updatedValue
+            : newValue;
+        changes.push(
+          updateResult.isSharedData
+            ? `Changed property "${updateResult.foundPropertyName}" of behavior "${behavior_name}" (shared between all objects having this behavior) to "${updatedValueText}".`
+            : `Changed property "${updateResult.foundPropertyName}" of behavior "${behavior_name}" to "${updatedValueText}".`
+        );
+        return;
+      }
 
-      if (behaviorPropertySearch.foundPropertyName) {
-        const { foundPropertyName, foundProperty } = behaviorPropertySearch;
-        if (
-          !behavior.updateProperty(
-            foundPropertyName,
-            sanitizePropertyNewValue(foundProperty, newValue)
-          )
-        ) {
-          warnings.push(
-            `Could not change property "${foundPropertyName}" of behavior "${behavior_name}". The value might be invalid, of the wrong type or not allowed.`
+      if (normalizedPropertyName === 'size') {
+        const sizeChangesFromSize = getSizePropertyChanges({
+          newValue,
+          changedPropertyNames,
+        });
+        if (sizeChangesFromSize) {
+          const appliedChanges = applyBehaviorPropertyChanges(
+            sizeChangesFromSize
           );
-          return;
+          appliedChanges.forEach(change => {
+            changes.push(
+              change.isSharedData
+                ? `Changed property "${change.propertyName}" of behavior "${behavior_name}" (shared between all objects having this behavior) to "${change.updatedValue}".`
+                : `Changed property "${change.propertyName}" of behavior "${behavior_name}" to "${change.updatedValue}".`
+            );
+          });
+          if (appliedChanges.length) {
+            const sizeParsedMessage = formatSizeParsedChangeMessage({
+              targetLabel: appliedChanges.every(change => change.isSharedData)
+                ? `behavior "${behavior_name}" (shared between all objects having this behavior)`
+                : `behavior "${behavior_name}"`,
+              appliedChanges,
+            });
+            if (sizeParsedMessage) {
+              changes.push(sizeParsedMessage);
+            }
+            return;
+          }
         }
 
-        changes.push(
-          `Changed property "${foundPropertyName}" of behavior "${behavior_name}" to "${newValue}".`
-        );
-      } else if (
-        behaviorSharedData &&
-        behaviorSharedDataPropertySearch.foundPropertyName
-      ) {
-        const {
-          foundPropertyName,
-          foundProperty,
-        } = behaviorSharedDataPropertySearch;
-        if (
-          !behaviorSharedData.updateProperty(
-            foundPropertyName,
-            sanitizePropertyNewValue(foundProperty, newValue)
-          )
-        ) {
-          warnings.push(
-            `Could not change shared property "${foundPropertyName}" of behavior "${behavior_name}". The value might be invalid, of the wrong type or not allowed.`
-          );
-          return;
+        if (updateResult.failureMessage) {
+          warnings.push(updateResult.failureMessage);
         }
-
-        changes.push(
-          `Changed property "${foundPropertyName}" of behavior "${behavior_name}" (shared between all objects having this behavior) to "${newValue}".`
-        );
-      } else {
-        warnings.push(
-          `Property "${propertyName}" not found on behavior "${behavior_name}" of object "${object_name}".`
-        );
+        return;
       }
     });
 

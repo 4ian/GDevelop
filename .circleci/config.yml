@@ -198,7 +198,7 @@ jobs:
 
       - run:
           name: Install Python3 dependencies for Emscripten
-          command: sudo apt install python-is-python3 setuptools -y
+          command: sudo apt install python-is-python3 -y && pip install setuptools
 
       - run:
           name: Install Emscripten (for GDevelop.js)
@@ -261,7 +261,7 @@ jobs:
 
       - run:
           name: Install Python3 dependencies for Emscripten
-          command: sudo apt install python-is-python3 setuptools -y
+          command: sudo apt install python-is-python3 -y && pip install setuptools
 
       - run:
           name: Install Emscripten (for GDevelop.js)

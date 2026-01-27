@@ -7,8 +7,10 @@ export type InstancesEditorSettings = {|
   gridType: 'isometric' | 'rectangular',
   gridWidth: number,
   gridHeight: number,
+  gridDepth: number,
   gridOffsetX: number,
   gridOffsetY: number,
+  gridOffsetZ: number,
   gridColor: number,
   gridAlpha: number,
 
@@ -23,6 +25,8 @@ export type InstancesEditorSettings = {|
 
   /** The name of the layer selected to place instances on. */
   selectedLayer: string,
+
+  gameEditorMode: 'embedded-game' | 'instances-editor',
 |};
 
 export const getRecommendedInitialZoomFactor = (
@@ -43,8 +47,10 @@ export const prepareInstancesEditorSettings = (
     gridType: object.gridType || 'rectangular',
     gridWidth: object.gridWidth || 32,
     gridHeight: object.gridHeight || 32,
+    gridDepth: object.gridDepth || 32,
     gridOffsetX: object.gridOffsetX || 0,
     gridOffsetY: object.gridOffsetY || 0,
+    gridOffsetZ: object.gridOffsetZ || 0,
     gridColor:
       object.gridColor !== undefined
         ? object.gridColor
@@ -58,6 +64,7 @@ export const prepareInstancesEditorSettings = (
     ),
     windowMask: object.windowMask || false,
     selectedLayer: object.selectedLayer || '',
+    gameEditorMode: object.gameEditorMode || 'instances-editor',
   };
 };
 

@@ -39,6 +39,19 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
           objects: [],
           instances: [],
           usedResources: [],
+          uiSettings: {
+            grid: false,
+            gridType: 'rectangular',
+            gridWidth: 10,
+            gridHeight: 10,
+            gridDepth: 10,
+            gridOffsetX: 0,
+            gridOffsetY: 0,
+            gridOffsetZ: 0,
+            gridColor: 0,
+            gridAlpha: 1,
+            snap: false,
+          },
         },
         usedExtensionsWithVariablesData: [],
       });
@@ -74,6 +87,7 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
           },
         ],
         effects: [],
+        variables: [],
       });
       player.getWidth = function () {
         return 90;
@@ -98,6 +112,7 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
           },
         ],
         effects: [],
+        variables: [],
       });
       obstacle.getWidth = function () {
         return 100;

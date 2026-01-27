@@ -1,11 +1,12 @@
 // @flow
-import { mapFor } from '../../Utils/MapFor';
+import { mapFor, mapVector } from '../../Utils/MapFor';
 
 export type ParameterSummary = {|
   isCodeOnly?: boolean,
   name?: string,
   type: string,
   description?: string,
+  longDescription?: string,
   isOptional?: boolean,
   extraInfo?: string,
 |};
@@ -36,12 +37,27 @@ export type PropertySummary = {|
   name: string,
   description: string,
   type: string,
+
+  label?: string,
+  measurementUnit?: {
+    name: string,
+  },
+  extraInfo?: Array<string>,
+  group?: string,
+  choices?: Array<{
+    value: string,
+    label: string,
+  }>,
+  hidden?: boolean,
+  deprecated?: boolean,
+  advanced?: boolean,
 |};
 
 export type ObjectSummary = {|
   name: string,
   fullName: string,
   description: string,
+  properties?: Array<PropertySummary>,
   actions: Array<InstructionSummary>,
   conditions: Array<InstructionSummary>,
   expressions: Array<ExpressionSummary>,
@@ -52,6 +68,8 @@ export type BehaviorSummary = {|
   fullName: string,
   description: string,
   objectType?: string,
+  properties: Array<PropertySummary>,
+  sharedProperties: Array<PropertySummary>,
   actions: Array<InstructionSummary>,
   conditions: Array<InstructionSummary>,
   expressions: Array<ExpressionSummary>,
@@ -105,6 +123,9 @@ const getParameterSummary = (
   if (parameterMetadata.getDescription()) {
     parameterSummary.description = parameterMetadata.getDescription();
   }
+  if (parameterMetadata.getLongDescription()) {
+    parameterSummary.longDescription = parameterMetadata.getLongDescription();
+  }
   if (parameterMetadata.getName()) {
     parameterSummary.name = parameterMetadata.getName();
   }
@@ -122,32 +143,79 @@ const getParameterSummary = (
 
 const getPropertySummary = (
   propertyName: string,
-  property: gdPropertyDescriptor
-) => {
-  return {
+  property: gdPropertyDescriptor | gdNamedPropertyDescriptor
+): PropertySummary => {
+  const propertySummary: PropertySummary = {
     name: propertyName,
     description: property.getDescription(),
     type: property.getType(),
   };
+
+  if (property.getLabel()) {
+    propertySummary.label = property.getLabel();
+  }
+  if (property.getGroup()) {
+    propertySummary.group = property.getGroup();
+  }
+  if (!property.getMeasurementUnit().isUndefined()) {
+    propertySummary.measurementUnit = {
+      name: property.getMeasurementUnit().getName(),
+    };
+  }
+  if (property.getChoices().size() > 0) {
+    propertySummary.choices = mapVector(property.getChoices(), choice => ({
+      value: choice.getValue(),
+      label: choice.getLabel(),
+    }));
+  }
+  if (property.isHidden()) {
+    propertySummary.hidden = true;
+  }
+  if (property.isDeprecated()) {
+    propertySummary.deprecated = true;
+  }
+  if (property.isAdvanced()) {
+    propertySummary.advanced = true;
+  }
+  const extraInfo = property.getExtraInfo().toJSArray();
+  if (extraInfo.length > 0) {
+    propertySummary.extraInfo = extraInfo;
+  }
+
+  return propertySummary;
 };
 
-const getPropertiesSummary = (
-  propertiesMetadata: gdMapStringPropertyDescriptor
-) => {
-  return propertiesMetadata
-    .keys()
-    .toJSArray()
-    .map(propertyName => {
-      const property = propertiesMetadata.get(propertyName);
-      return getPropertySummary(propertyName, property);
+const getPropertiesSummary = ({
+  propertiesMetadata,
+  propertiesContainer,
+}: {|
+  propertiesMetadata?: gdMapStringPropertyDescriptor,
+  propertiesContainer?: gdPropertiesContainer,
+|}) => {
+  if (propertiesMetadata)
+    return propertiesMetadata
+      .keys()
+      .toJSArray()
+      .map(propertyName => {
+        const property = propertiesMetadata.get(propertyName);
+        return getPropertySummary(propertyName, property);
+      });
+
+  if (propertiesContainer)
+    return mapVector(propertiesContainer, namedProperty => {
+      return getPropertySummary(namedProperty.getName(), namedProperty);
     });
+
+  return [];
 };
 
 export const buildExtensionSummary = ({
   gd,
+  eventsFunctionsExtension,
   extension,
 }: {
   gd: libGDevelop,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   extension: gdPlatformExtension,
 }): ExtensionSummary => {
   const objects: { [string]: ObjectSummary } = {};
@@ -238,10 +306,27 @@ export const buildExtensionSummary = ({
         return;
       }
 
+      const objectName =
+        objectType.split('::').pop() || 'Unrecognized object type format';
+
+      const eventsBasedObjects = eventsFunctionsExtension
+        ? eventsFunctionsExtension.getEventsBasedObjects()
+        : null;
+
+      const eventsBasedObject =
+        eventsBasedObjects && eventsBasedObjects.has(objectName)
+          ? eventsBasedObjects.get(objectName)
+          : null;
+
       objects[objectType] = {
         name: objectMetadata.getName(),
         fullName: objectMetadata.getFullName(),
         description: objectMetadata.getDescription(),
+        properties: eventsBasedObject
+          ? getPropertiesSummary({
+              propertiesContainer: eventsBasedObject.getPropertyDescriptors(),
+            })
+          : undefined,
         actions: generateInstructionsSummaries({
           instructionsMetadata: objectMetadata.getAllActions(),
         }),
@@ -274,6 +359,12 @@ export const buildExtensionSummary = ({
         name: behaviorMetadata.getName(),
         fullName: behaviorMetadata.getFullName(),
         description: behaviorMetadata.getDescription(),
+        properties: getPropertiesSummary({
+          propertiesMetadata: behaviorMetadata.getProperties(),
+        }),
+        sharedProperties: getPropertiesSummary({
+          propertiesMetadata: behaviorMetadata.getSharedProperties(),
+        }),
         actions: generateInstructionsSummaries({
           instructionsMetadata: behaviorMetadata.getAllActions(),
         }),
@@ -312,7 +403,9 @@ export const buildExtensionSummary = ({
         onlyWorkingFor2D: effectMetadata.isMarkedAsOnlyWorkingFor2D(),
         onlyWorkingFor3D: effectMetadata.isMarkedAsOnlyWorkingFor3D(),
         unique: effectMetadata.isMarkedAsUnique(),
-        properties: getPropertiesSummary(effectMetadata.getProperties()),
+        properties: getPropertiesSummary({
+          propertiesMetadata: effectMetadata.getProperties(),
+        }),
       };
 
       effects[effectType] = effectSummary;

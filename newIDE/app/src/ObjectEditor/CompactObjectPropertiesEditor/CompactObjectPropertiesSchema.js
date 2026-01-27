@@ -1,6 +1,9 @@
 // @flow
 import * as React from 'react';
-import { type Schema, type ActionButton } from '../../CompactPropertiesEditor';
+import {
+  type Schema,
+  type ActionButton,
+} from '../../PropertiesEditor/PropertiesEditorSchema';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 
 export const getSchemaWithOpenFullEditorButton = ({

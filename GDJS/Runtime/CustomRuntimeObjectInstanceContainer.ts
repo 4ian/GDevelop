@@ -8,6 +8,7 @@ namespace gdjs {
    * The instance container of a custom object, containing instances of objects rendered on screen.
    *
    * @see gdjs.CustomRuntimeObject
+   * @category Core Engine > Instance Container
    */
   export class CustomRuntimeObjectInstanceContainer extends gdjs.RuntimeInstanceContainer {
     _debuggerRenderer: gdjs.DebuggerRenderer;
@@ -16,6 +17,7 @@ namespace gdjs {
     _parent: gdjs.RuntimeInstanceContainer;
     /** The object that is built with the instances of this container. */
     _customObject: gdjs.CustomRuntimeObject;
+    // TODO Remove this attribute
     _isLoaded: boolean = false;
     /**
      * The default size defined by users in the custom object initial instances editor.
@@ -39,20 +41,33 @@ namespace gdjs {
       parent: gdjs.RuntimeInstanceContainer,
       customObject: gdjs.CustomRuntimeObject
     ) {
-      super();
+      super(parent.getGame());
       this._parent = parent;
       this._customObject = customObject;
       this._runtimeScene = parent.getScene();
       this._debuggerRenderer = new gdjs.DebuggerRenderer(this);
     }
 
+    // TODO `_layers` and `_orderedLayers` should not be used directly.
+
     addLayer(layerData: LayerData) {
       if (this._layers.containsKey(layerData.name)) {
         return;
       }
+      // This code is duplicated with `RuntimeScene.addLayer` because it avoids
+      // to expose a method to build a layer.
       const layer = new gdjs.RuntimeCustomObjectLayer(layerData, this);
       this._layers.put(layerData.name, layer);
       this._orderedLayers.push(layer);
+    }
+
+    _unloadContent() {
+      this.onDeletedFromScene(this._parent);
+      // At this point, layer renderers are already removed by
+      // `CustomRuntimeObject._reinitializeRenderer`.
+      // It's not great to do this here, but it allows to keep it private.
+      this._layers.clear();
+      this._orderedLayers.length = 0;
     }
 
     createObject(objectName: string): gdjs.RuntimeObject | null {
@@ -63,21 +78,14 @@ namespace gdjs {
 
     /**
      * Load the container from the given initial configuration.
-     * @param customObjectData An object containing the container data.
+     * @param customObjectData An object containing the parent object data.
+     * @param eventsBasedObjectVariantData An object containing the container data.
      * @see gdjs.RuntimeGame#getSceneAndExtensionsData
      */
     loadFrom(
       customObjectData: ObjectData & CustomObjectConfiguration,
       eventsBasedObjectVariantData: EventsBasedObjectVariantData
     ) {
-      if (this._isLoaded) {
-        this.onDeletedFromScene(this._parent);
-      }
-
-      const isForcedToOverrideEventsBasedObjectChildrenConfiguration =
-        !eventsBasedObjectVariantData.name &&
-        eventsBasedObjectVariantData.instances.length == 0;
-
       this._setOriginalInnerArea(eventsBasedObjectVariantData);
 
       // Registering objects
@@ -87,19 +95,21 @@ namespace gdjs {
         ++i
       ) {
         const childObjectData = eventsBasedObjectVariantData.objects[i];
-        // The children configuration override only applies to the default variant.
         if (
           customObjectData.childrenContent &&
-          (!eventsBasedObjectVariantData.name ||
-            isForcedToOverrideEventsBasedObjectChildrenConfiguration)
+          gdjs.CustomRuntimeObjectInstanceContainer.hasChildrenConfigurationOverriding(
+            customObjectData,
+            eventsBasedObjectVariantData
+          )
         ) {
           this.registerObject({
             ...childObjectData,
-            // The custom object overrides its events-based object configuration.
+            // The custom object overrides its variant configuration with
+            // a legacy children configuration.
             ...customObjectData.childrenContent[childObjectData.name],
           });
         } else {
-          // The custom object follows its events-based object configuration.
+          // The custom object follows its variant configuration.
           this.registerObject(childObjectData);
         }
       }
@@ -155,13 +165,38 @@ namespace gdjs {
     }
 
     /**
+     * Check if the custom object has a children configuration overriding that
+     * should be used instead of the variant's objects configurations.
+     * @param customObjectData An object containing the parent object data.
+     * @param eventsBasedObjectVariantData An object containing the container data.
+     * @returns
+     */
+    static hasChildrenConfigurationOverriding(
+      customObjectData: CustomObjectConfiguration,
+      eventsBasedObjectVariantData: EventsBasedObjectVariantData
+    ): boolean {
+      const isForcedToOverrideEventsBasedObjectChildrenConfiguration =
+        !eventsBasedObjectVariantData.name &&
+        eventsBasedObjectVariantData.instances.length == 0;
+
+      // The children configuration override only applies to the default variant.
+      return customObjectData.childrenContent
+        ? !eventsBasedObjectVariantData.name ||
+            isForcedToOverrideEventsBasedObjectChildrenConfiguration
+        : false;
+    }
+
+    /**
      * Initialize `_initialInnerArea` if it doesn't exist.
      * `_initialInnerArea` is shared by every instance to save memory.
      */
     private _setOriginalInnerArea(
       eventsBasedObjectData: EventsBasedObjectVariantData
     ) {
-      if (eventsBasedObjectData.instances.length > 0) {
+      if (
+        eventsBasedObjectData.instances.length > 0 ||
+        this.getGame().isInGameEdition()
+      ) {
         if (!eventsBasedObjectData._initialInnerArea) {
           eventsBasedObjectData._initialInnerArea = {
             min: [
@@ -341,6 +376,12 @@ namespace gdjs {
       return this._initialInnerArea ? this._initialInnerArea.max[1] : 0;
     }
 
+    _getInitialInnerAreaDepth(): float {
+      return this._initialInnerArea
+        ? this._initialInnerArea.max[2] - this._initialInnerArea.min[2]
+        : 0;
+    }
+
     getViewportWidth(): float {
       return this._customObject.getUnscaledWidth();
     }
@@ -392,7 +433,7 @@ namespace gdjs {
      * in milliseconds, for objects on the layer.
      */
     getElapsedTime(): float {
-      return this._parent.getElapsedTime();
+      return this._customObject.getElapsedTime();
     }
   }
 }

@@ -6,8 +6,8 @@ import { type I18n as I18nType } from '@lingui/core';
 import CompactPropertiesEditor, {
   Separator,
 } from '../../CompactPropertiesEditor';
-import propertiesMapToSchema from '../../CompactPropertiesEditor/PropertiesMapToCompactSchema';
-import { type Schema } from '../../CompactPropertiesEditor';
+import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
+import { type Schema } from '../../PropertiesEditor/PropertiesEditorSchema';
 import getObjectByName from '../../Utils/GetObjectByName';
 import IconButton from '../../UI/IconButton';
 import { Line, Column, Spacer, marginsSize } from '../../UI/Grid';
@@ -140,6 +140,8 @@ export const CompactInstancePropertiesEditor = ({
       );
       const instanceSchemaForCustomProperties = propertiesMapToSchema({
         properties,
+        // We can't access default values for instance custom properties.
+        defaultValueProperties: null,
         getProperties: (instance: gdInitialInstance) =>
           instance.getCustomProperties(
             globalObjectsContainer || objectsContainer,

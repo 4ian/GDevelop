@@ -9,6 +9,7 @@ import { AssetStoreStateProvider } from '../../../AssetStore/AssetStoreContext';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 import fakeResourceManagementProps from '../../FakeResourceManagement';
 import { AssetStoreNavigatorStateProvider } from '../../../AssetStore/AssetStoreNavigator';
+import { ObjectStoreStateProvider } from '../../../AssetStore/ObjectStoreContext';
 
 export default {
   title: 'AssetStore/NewObjectDialog',
@@ -22,17 +23,21 @@ export const Default = () => {
       <AssetStoreStateProvider>
         <I18n>
           {({ i18n }) => (
-            <NewObjectDialog
-              project={testProject.project}
-              layout={testProject.testLayout}
-              eventsBasedObject={null}
-              onClose={action('onClose')}
-              onCreateNewObject={action('onCreateNewObject')}
-              onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
-              objectsContainer={testProject.testLayout.getObjects()}
-              resourceManagementProps={fakeResourceManagementProps}
-              onExtensionInstalled={action('onExtensionInstalled')}
-            />
+            <ObjectStoreStateProvider i18n={i18n}>
+              <NewObjectDialog
+                project={testProject.project}
+                layout={testProject.testLayout}
+                eventsFunctionsExtension={null}
+                eventsBasedObject={null}
+                onClose={action('onClose')}
+                onCreateNewObject={action('onCreateNewObject')}
+                onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
+                objectsContainer={testProject.testLayout.getObjects()}
+                resourceManagementProps={fakeResourceManagementProps}
+                onWillInstallExtension={action('extension will be installed')}
+                onExtensionInstalled={action('onExtensionInstalled')}
+              />
+            </ObjectStoreStateProvider>
           )}
         </I18n>
       </AssetStoreStateProvider>

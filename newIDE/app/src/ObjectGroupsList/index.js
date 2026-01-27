@@ -48,14 +48,18 @@ type EmptyPlaceholder = {|
   +id: string,
 |};
 
-type RootFolder = {|
-  +label: string,
-  +children: GroupWithContextList | Array<EmptyPlaceholder>,
-  +isRoot: true,
-  +id: string,
-|};
+// TreeView typing has issues, so we use any for now.
+// Search for "treeview typing issues" in the codebase.
+// type RootFolder = {|
+//   +label: string,
+//   +children: GroupWithContextList | Array<EmptyPlaceholder>,
+//   +isRoot: true,
+//   +id: string,
+// |};
 
-type TreeViewItem = GroupWithContext | RootFolder | EmptyPlaceholder;
+// type TreeViewItem = GroupWithContext | RootFolder | EmptyPlaceholder;
+
+type TreeViewItem = any;
 
 const getGlobalGroupsEmptyPlaceholder = (i18n: I18nType): EmptyPlaceholder => ({
   label: i18n._(t`There is no global group yet.`),
@@ -393,8 +397,8 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
       async (
         destinationItem: TreeViewItem,
         where: 'before' | 'inside' | 'after'
-      ) => {
-        if (destinationItem.isRoot) return false;
+      ): Promise<void> => {
+        if (destinationItem.isRoot) return;
         if (!selectedGroupWithContext) return;
 
         if (destinationItem.isPlaceholder) {

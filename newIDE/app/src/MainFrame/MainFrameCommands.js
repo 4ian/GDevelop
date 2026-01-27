@@ -11,6 +11,7 @@ import {
   enumerateExternalLayouts,
   enumerateEventsFunctionsExtensions,
 } from '../ProjectManager/EnumerateProjectItems';
+import { type FileMetadata } from '../ProjectsStorage';
 
 type Item =
   | gdLayout
@@ -51,7 +52,7 @@ type CommandHandlers = {|
   onOpenHomePage: () => void,
   onCreateProject: () => void,
   onOpenProject: () => void,
-  onSaveProject: () => Promise<void>,
+  onSaveProject: () => Promise<?FileMetadata>,
   onSaveProjectAs: () => void,
   onCloseApp: () => void,
   onCloseProject: () => Promise<void>,
@@ -63,6 +64,7 @@ type CommandHandlers = {|
   onOpenEventsFunctionsExtension: string => void,
   onOpenCommandPalette: () => void,
   onOpenProfile: () => void,
+  onRestartInGameEditor: (reason: string) => void,
 |};
 
 const useMainFrameCommands = (handlers: CommandHandlers) => {
@@ -122,8 +124,14 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
     handler: handlers.onOpenProject,
   });
 
+  const onSaveProject = handlers.onSaveProject;
   useCommand('SAVE_PROJECT', !!handlers.project, {
-    handler: handlers.onSaveProject,
+    handler: React.useCallback(
+      () => {
+        onSaveProject();
+      },
+      [onSaveProject]
+    ),
   });
 
   useCommand('SAVE_PROJECT_AS', !!handlers.project, {
@@ -144,6 +152,14 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
 
   useCommand('OPEN_COMMAND_PALETTE', true, {
     handler: handlers.onOpenCommandPalette,
+  });
+
+  const onRestartInGameEditor = handlers.onRestartInGameEditor;
+  useCommand('RESTART_IN_GAME_EDITOR', true, {
+    handler: React.useCallback(
+      () => onRestartInGameEditor('relaunched-manually'),
+      [onRestartInGameEditor]
+    ),
   });
 
   useCommandWithOptions('OPEN_LAYOUT', !!handlers.project, {

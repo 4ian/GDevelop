@@ -299,6 +299,7 @@ export const WithObjectsList = () => (
                   getThumbnail={() => 'res/unknown32.png'}
                   project={testProject.project}
                   layout={testProject.testLayout}
+                  eventsFunctionsExtension={null}
                   eventsBasedObject={null}
                   projectScopedContainersAccessor={
                     testProject.testSceneProjectScopedContainersAccessor
@@ -324,8 +325,10 @@ export const WithObjectsList = () => (
                   onObjectCreated={() => {}}
                   onObjectEdited={() => {}}
                   onObjectFolderOrObjectWithContextSelected={() => {}}
+                  onSetAsGlobalObject={action('onSetAsGlobalObject')}
                   hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
                   isListLocked={false}
+                  onWillInstallExtension={action('extension will be installed')}
                   onExtensionInstalled={action('onExtensionInstalled')}
                 />
               </TabContentContainer>

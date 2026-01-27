@@ -4,6 +4,9 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  /**
+   * @category Core Engine > Layers
+   */
   export enum RuntimeLayerRenderingType {
     TWO_D,
     THREE_D,
@@ -19,6 +22,9 @@ namespace gdjs {
         ? RuntimeLayerRenderingType.TWO_D_PLUS_THREE_D
         : RuntimeLayerRenderingType.TWO_D;
 
+  /**
+   * @category Core Engine > Layers
+   */
   export enum RuntimeLayerCameraType {
     PERSPECTIVE,
     ORTHOGRAPHIC,
@@ -30,6 +36,9 @@ namespace gdjs {
       ? RuntimeLayerCameraType.ORTHOGRAPHIC
       : RuntimeLayerCameraType.PERSPECTIVE;
 
+  /**
+   * @category Core Engine > Layers
+   */
   export enum RuntimeLayerDefaultCameraBehavior {
     DO_NOTHING,
     TOP_LEFT_ANCHORED_IF_NEVER_MOVED,
@@ -46,6 +55,7 @@ namespace gdjs {
    * Represents a layer of a "container", used to display objects.
    * The container can be a scene (see gdjs.Layer)
    * or a custom object (see gdjs.RuntimeCustomObjectLayer).
+   * @category Core Engine > Layers
    */
   export abstract class RuntimeLayer implements EffectsTarget {
     _name: string;
@@ -55,13 +65,14 @@ namespace gdjs {
     _timeScale: float = 1;
     _defaultZOrder: integer = 0;
     _hidden: boolean;
-    _initialEffectsData: Array<EffectData>;
+    _initialLayerData: LayerData;
 
     // TODO EBO Don't store scene layer related data in layers used by custom objects.
     // (both these 3D settings and the lighting layer properties below).
     _initialCamera3DFieldOfView: float;
     _initialCamera3DFarPlaneDistance: float;
     _initialCamera3DNearPlaneDistance: float;
+    _initialCamera2DPlaneMaxDrawingDistance: float;
 
     _runtimeScene: gdjs.RuntimeInstanceContainer;
     _effectsManager: gdjs.EffectsManager;
@@ -94,7 +105,9 @@ namespace gdjs {
         layerData.camera3DNearPlaneDistance || 0.1;
       this._initialCamera3DFarPlaneDistance =
         layerData.camera3DFarPlaneDistance || 2000;
-      this._initialEffectsData = layerData.effects || [];
+      this._initialCamera2DPlaneMaxDrawingDistance =
+        layerData.camera2DPlaneMaxDrawingDistance || 5000;
+      this._initialLayerData = layerData;
       this._runtimeScene = instanceContainer;
       this._effectsManager = instanceContainer.getGame().getEffectsManager();
       this._isLightingLayer = layerData.isLightingLayer;
@@ -112,7 +125,11 @@ namespace gdjs {
       );
       this.show(!this._hidden);
       for (let i = 0; i < layerData.effects.length; ++i) {
-        this.addEffect(layerData.effects[i]);
+        const effectData = layerData.effects[i];
+        this.addEffect(effectData);
+        if (effectData.disabled) {
+          this.enableEffect(effectData.name, false);
+        }
       }
     }
 
@@ -482,14 +499,87 @@ namespace gdjs {
       return this._runtimeScene.getViewportHeight();
     }
 
+    /**
+     * Get the camera 3D field of view when the layer was created.
+     */
     getInitialCamera3DFieldOfView(): float {
       return this._initialCamera3DFieldOfView;
     }
+
+    /**
+     * Get the camera 3D near plane distance when the layer was created.
+     */
     getInitialCamera3DNearPlaneDistance(): float {
       return this._initialCamera3DNearPlaneDistance;
     }
+
+    /**
+     * Get the camera 3D far plane distance when the layer was created.
+     */
     getInitialCamera3DFarPlaneDistance(): float {
       return this._initialCamera3DFarPlaneDistance;
+    }
+
+    /**
+     * Get the camera 2D plane max drawing distance when the layer was created.
+     */
+    getInitialCamera2DPlaneMaxDrawingDistance(): float {
+      return this._initialCamera2DPlaneMaxDrawingDistance;
+    }
+
+    /**
+     * Set the camera 3D field of view.
+     */
+    setCamera3DFieldOfView(fieldOfView: float): void {
+      this._renderer.setCamera3DFieldOfView(fieldOfView);
+    }
+
+    /**
+     * Set the camera 3D near plane distance.
+     */
+    setCamera3DNearPlaneDistance(nearPlaneDistance: float): void {
+      this._renderer.setCamera3DNearPlaneDistance(nearPlaneDistance);
+    }
+
+    /**
+     * Set the camera 3D far plane distance.
+     */
+    setCamera3DFarPlaneDistance(farPlaneDistance: float): void {
+      this._renderer.setCamera3DFarPlaneDistance(farPlaneDistance);
+    }
+
+    /**
+     * Set the camera 2D plane max drawing distance.
+     */
+    setCamera2DPlaneMaxDrawingDistance(maxDrawingDistance: float): void {
+      this._renderer.set2DPlaneMaxDrawingDistance(maxDrawingDistance);
+    }
+
+    /**
+     * Get the camera 3D near plane distance.
+     */
+    getCamera3DNearPlaneDistance(): float {
+      return this._renderer.getCamera3DNearPlaneDistance();
+    }
+    /**
+     * Get the camera 3D far plane distance.
+     */
+    getCamera3DFarPlaneDistance(): float {
+      return this._renderer.getCamera3DFarPlaneDistance();
+    }
+
+    /**
+     * Get the camera 3D field of view.
+     */
+    getCamera3DFieldOfView(): float {
+      return this._renderer.getCamera3DFieldOfView();
+    }
+
+    /**
+     * Get the camera 2D plane max drawing distance.
+     */
+    getCamera2DPlaneMaxDrawingDistance(): float {
+      return this._renderer.get2DPlaneMaxDrawingDistance();
     }
 
     /**
@@ -498,7 +588,7 @@ namespace gdjs {
      * @deprecated
      */
     getInitialEffectsData(): EffectData[] {
-      return this._initialEffectsData;
+      return this._initialLayerData.effects || [];
     }
 
     /**
@@ -696,7 +786,9 @@ namespace gdjs {
      * @return true if it is a lighting layer, false otherwise.
      */
     isLightingLayer(): boolean {
-      return this._isLightingLayer;
+      return (
+        this._isLightingLayer && !this._runtimeScene.getGame().isInGameEdition()
+      );
     }
   }
 }

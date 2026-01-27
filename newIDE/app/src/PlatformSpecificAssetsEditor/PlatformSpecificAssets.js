@@ -14,6 +14,7 @@ import ErrorBoundary from '../UI/ErrorBoundary';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import RaisedButton from '../UI/RaisedButton';
 import AlertMessage from '../UI/AlertMessage';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
 
@@ -50,6 +51,7 @@ export const iosIconSizes = [
 type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   desktopIconResourceNames: Array<string>,
   onDesktopIconResourceNamesChanged: (Array<string>) => void,
   androidIconResourceNames: Array<string>,
@@ -63,6 +65,7 @@ type Props = {|
 const PlatformSpecificAssets = ({
   project,
   resourceManagementProps,
+  projectScopedContainersAccessor,
   desktopIconResourceNames,
   onDesktopIconResourceNamesChanged,
   androidIconResourceNames,
@@ -151,6 +154,7 @@ const PlatformSpecificAssets = ({
       });
 
       await resourceManagementProps.onFetchNewlyAddedResources();
+      resourceManagementProps.onNewResourcesAdded();
 
       // Make sure the resources are (re)loaded.
       ResourcesLoader.burstUrlsCacheForResources(
@@ -221,6 +225,7 @@ const PlatformSpecificAssets = ({
           floatingLabelText={`Desktop icon (${size}x${size} px)`}
           project={project}
           resourceManagementProps={resourceManagementProps}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
           resourceKind="image"
           resourceName={desktopIconResourceNames[index]}
           defaultNewResourceName={'DesktopIcon' + size}
@@ -241,6 +246,7 @@ const PlatformSpecificAssets = ({
             floatingLabelText={`Android 12+ splashscreen icon (576x576 px)`}
             project={project}
             resourceManagementProps={resourceManagementProps}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
             resourceKind="image"
             resourceName={androidWindowSplashScreenAnimatedIconResourceName}
             defaultNewResourceName={'AndroidSplashscreenIcon'}
@@ -262,6 +268,7 @@ const PlatformSpecificAssets = ({
           floatingLabelText={`Android icon (${size}x${size} px)`}
           project={project}
           resourceManagementProps={resourceManagementProps}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
           resourceKind="image"
           resourceName={androidIconResourceNames[index]}
           defaultNewResourceName={'AndroidIcon' + size}
@@ -282,6 +289,7 @@ const PlatformSpecificAssets = ({
           floatingLabelText={`iOS icon (${size}x${size} px)`}
           project={project}
           resourceManagementProps={resourceManagementProps}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
           resourceKind="image"
           resourceName={iosIconResourceNames[index]}
           defaultNewResourceName={'IosIcon' + size}

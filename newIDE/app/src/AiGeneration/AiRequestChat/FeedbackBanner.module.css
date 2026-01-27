@@ -1,11 +1,16 @@
+.feedbackBannerContainer {
+  display: flex;
+  flex-direction: column;
+}
+
 .textAndButtonsContainer {
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   gap: 8px;
-  padding-left: 8px;
-  padding-right: 2px;
+  padding-left: 4px;
+  padding-right: 4px;
   color: var(--theme-text-secondary-color);
   opacity: 0.9;
   min-width: 0;

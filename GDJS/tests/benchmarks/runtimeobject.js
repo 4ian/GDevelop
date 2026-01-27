@@ -1,6 +1,7 @@
 describe('gdjs.RuntimeObject', function() {
-    const runtimeScene = new gdjs.RuntimeScene(null);
-    
+    const runtimeGame = gdjs.getPixiRuntimeGame();
+    const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+
 	it('benchmark getAABB of rotated vs non rotated objects', function(){
     this.timeout(20000);
 		var object = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: [], effects: []});
@@ -21,7 +22,7 @@ describe('gdjs.RuntimeObject', function() {
             object.setX(i);
             object.getAABB();
           });
-    
+
         console.log(benchmarkSuite.run());
 	});
 
@@ -49,7 +50,7 @@ describe('gdjs.RuntimeObject', function() {
             object.setX(i);
             object.getAABB();
           });
-    
+
         console.log(benchmarkSuite.run());
     });
 });

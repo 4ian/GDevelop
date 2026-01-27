@@ -1,6 +1,8 @@
 /// <reference path="peerjs.d.ts" />
 namespace gdjs {
   const logger = new gdjs.Logger('Multiplayer');
+
+  /** @category Multiplayer */
   export namespace multiplayerPeerJsHelper {
     /**
      * The type of the data that is sent across peerjs.
@@ -15,6 +17,7 @@ namespace gdjs {
       onPeerUnavailable?: () => void;
     };
 
+    /** @category Multiplayer */
     export type CompressionMethod = 'none' | 'cs:gzip' | 'cs:deflate';
 
     /**
@@ -36,6 +39,7 @@ namespace gdjs {
     }
     /**
      * The data bound to a message name.
+     * @category Multiplayer
      */
     export class MessageData implements IMessageData {
       public readonly data: any;
@@ -57,6 +61,7 @@ namespace gdjs {
       getMessages(): IMessageData[];
       pushMessage(data: object, sender: string): void;
     }
+    /** @category Multiplayer */
     export class MessagesList implements IMessagesList {
       private readonly data: IMessageData[] = [];
       private readonly messageName: string;

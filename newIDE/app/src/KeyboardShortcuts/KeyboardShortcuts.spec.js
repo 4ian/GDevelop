@@ -15,10 +15,10 @@ const makeKeyEvent = (
   shiftKey,
   altKey,
   code,
-  which
+  keyCode
 ): KeyboardEvent => {
   // $FlowIgnore - create fake KeyboardEvent object
-  return { ctrlKey, shiftKey, altKey, code, which };
+  return { ctrlKey, shiftKey, altKey, code, keyCode };
 };
 
 // Action key, with various modifiers, when code corresponds to key

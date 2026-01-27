@@ -7,6 +7,7 @@
 
 #include "GDCore/CommonTools.h"
 #include "GDCore/Serialization/SerializerElement.h"
+#include "GDCore/Project/ResourcesContainer.h"
 
 namespace gd {
 
@@ -72,11 +73,52 @@ ValueTypeMetadata::GetPrimitiveValueType(const gd::String &parameterType) {
   return parameterType;
 }
 
+const gd::String &
+ValueTypeMetadata::GetResourceType(const gd::String &parameterType) {
+  if (parameterType == "fontResource") {
+    return gd::Resource::fontType;
+  }
+  if (parameterType == "audioResource" ||
+      // Deprecated, old parameter types:
+      parameterType == "soundfile" || parameterType == "musicfile") {
+    return gd::Resource::audioType;
+  }
+  if (parameterType == "videoResource") {
+    return gd::Resource::videoType;
+  }
+  if (parameterType == "bitmapFontResource") {
+    return gd::Resource::bitmapType;
+  }
+  if (parameterType == "imageResource") {
+    return gd::Resource::imageType;
+  }
+  if (parameterType == "jsonResource") {
+    return gd::Resource::jsonType;
+  }
+  if (parameterType == "tilemapResource") {
+    return gd::Resource::tileMapType;
+  }
+  if (parameterType == "tilesetResource") {
+    return gd::Resource::tileSetType;
+  }
+  if (parameterType == "model3DResource") {
+    return gd::Resource::model3DType;
+  }
+  if (parameterType == "atlasResource") {
+    return gd::Resource::atlasType;
+  }
+  if (parameterType == "spineResource") {
+    return gd::Resource::spineType;
+  }
+  return parameterType;
+}
+
 const gd::String ValueTypeMetadata::numberValueType = "number";
 const gd::String ValueTypeMetadata::booleanValueType = "boolean";
 const gd::String ValueTypeMetadata::stringValueType = "string";
 const gd::String ValueTypeMetadata::colorValueType = "color";
 const gd::String ValueTypeMetadata::choiceValueType = "stringWithSelector";
+const gd::String ValueTypeMetadata::numberWithChoicesValueType = "numberWithChoices";
 const gd::String ValueTypeMetadata::behaviorValueType = "behavior";
 const gd::String ValueTypeMetadata::leaderboardIdValueType = "leaderboardId";
 const gd::String ValueTypeMetadata::objectAnimationNameValueType = "objectAnimationName";
@@ -92,6 +134,8 @@ const gd::String &ValueTypeMetadata::ConvertPropertyTypeToValueType(
     return colorValueType;
   } else if (propertyType == "Choice") {
     return choiceValueType;
+  } else if (propertyType == "NumberWithChoices") {
+    return numberWithChoicesValueType;
   } else if (propertyType == "Behavior") {
     return behaviorValueType;
   } else if (propertyType == "LeaderboardId") {

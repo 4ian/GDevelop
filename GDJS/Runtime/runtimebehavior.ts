@@ -10,6 +10,7 @@ namespace gdjs {
    * stays the same even if the underlying object is moved
    * (in which case the behavior is responsible for removing/adding
    * back/updating this BehaviorRBushAABB).
+   * @category Core Engine > Behavior
    */
   export class BehaviorRBushAABB<T extends RuntimeBehavior> {
     minX: float = 0;
@@ -33,12 +34,13 @@ namespace gdjs {
 
   /**
    * RuntimeBehavior represents a behavior being used by a RuntimeObject.
+   * @category Core Engine > Behavior
    */
   export class RuntimeBehavior {
     name: string;
     type: string;
     _nameId: integer;
-    _activated: boolean = true;
+    _activated: boolean;
 
     // When synchronised over the network, a behavior is always owned by the player owning the object,
     // and always synced. If set to false, the behavior properties will not be synced to others.
@@ -57,6 +59,10 @@ namespace gdjs {
       this.name = behaviorData.name || '';
       this.type = behaviorData.type || '';
       this._nameId = gdjs.RuntimeObject.getNameIdentifier(this.name);
+      const game = instanceContainer.getGame();
+      this._activated =
+        !game.isInGameEdition() ||
+        !!game.isBehaviorActivatedByDefaultInEditor(this.type);
     }
 
     /**

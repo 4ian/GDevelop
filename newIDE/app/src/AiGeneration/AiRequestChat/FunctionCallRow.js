@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { t } from '@lingui/macro';
 import {
   type AiRequestMessageAssistantFunctionCall,
   type AiRequestFunctionCallOutput,
@@ -9,9 +8,7 @@ import { type EditorFunctionCallResult } from '../../EditorFunctions/EditorFunct
 import CircularProgress from '../../UI/CircularProgress';
 import { Tooltip } from '@material-ui/core';
 import Text from '../../UI/Text';
-import RaisedButton from '../../UI/RaisedButton';
 import { Trans } from '@lingui/macro';
-import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
 import Check from '../../UI/CustomSvgIcons/Check';
 import Error from '../../UI/CustomSvgIcons/Error';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
@@ -23,15 +20,23 @@ import {
   type EditorFunctionWithoutProject,
   type EditorCallbacks,
 } from '../../EditorFunctions';
-import Link from '../../UI/Link';
-import { LineStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
+import { LineStackLayout } from '../../UI/Layout';
 import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
 import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
 import Paper from '../../UI/Paper';
 import { Line, Column } from '../../UI/Grid';
+import { SafeExtractor } from '../../Utils/SafeExtractor';
+import CircledAdd from '../../UI/CustomSvgIcons/CircledAdd';
+
+const styles = {
+  functionCallText: {
+    // Anywhere because behavior names can be long and have no spaces.
+    overflowWrap: 'anywhere',
+  },
+};
 
 type Props = {|
-  project: gdProject | null,
+  project: ?gdProject,
   functionCall: AiRequestMessageAssistantFunctionCall,
   editorFunctionCallResult: ?EditorFunctionCallResult,
   existingFunctionCallOutput: ?AiRequestFunctionCallOutput,
@@ -86,6 +91,26 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
     !!editorFunctionCallResult &&
     editorFunctionCallResult.status === 'working';
 
+  // Get the output from either the existing function call output or the current result
+  const editorFunctionCallResultOutput = existingParsedOutput
+    ? existingParsedOutput
+    : editorFunctionCallResult && editorFunctionCallResult.status === 'finished'
+    ? editorFunctionCallResult.output
+    : null;
+
+  const newlyAddedResources = SafeExtractor.extractArrayProperty(
+    editorFunctionCallResultOutput,
+    'newlyAddedResources'
+  );
+  const newlyAddedResourcesNames = newlyAddedResources
+    ? newlyAddedResources.map(addedResource => {
+        return SafeExtractor.extractStringProperty(
+          addedResource,
+          'resourceName'
+        );
+      })
+    : null;
+
   const editorFunction: EditorFunction | EditorFunctionWithoutProject | null =
     editorFunctions[functionCall.name] ||
     editorFunctionsWithoutProject[functionCall.name] ||
@@ -106,6 +131,7 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
         args: JSON.parse(functionCall.arguments),
         editorCallbacks,
         shouldShowDetails: showDetails,
+        editorFunctionCallResultOutput,
       });
 
       text = result.text;
@@ -130,90 +156,70 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
             existingFunctionCallOutput || editorFunctionCallResult
           )}
         >
-          <div>
+          <span style={{ width: 16 }}>
             {hasErrored ? (
-              <Error htmlColor={gdevelopTheme.message.error} />
+              <Error htmlColor={gdevelopTheme.message.error} fontSize="small" />
             ) : isIgnored ? (
-              <Check htmlColor={gdevelopTheme.text.color.disabled} />
+              <Check
+                htmlColor={gdevelopTheme.text.color.disabled}
+                fontSize="small"
+              />
             ) : isFinished ? (
-              <Check htmlColor={gdevelopTheme.message.valid} />
+              <Check htmlColor={gdevelopTheme.message.valid} fontSize="small" />
             ) : (
               <CircularProgress
-                size={24}
+                size={16}
                 value={100}
                 variant={isWorking ? 'indeterminate' : 'determinate'}
               />
             )}
-          </div>
+          </span>
         </Tooltip>
-        <ResponsiveLineStackLayout
-          justifyContent="space-between"
-          expand
-          noOverflowParent
+        <Text
+          size="body-small"
+          color="secondary"
+          style={styles.functionCallText}
         >
-          <LineStackLayout noMargin alignItems="baseline">
-            <Text>{text || 'Working...'}</Text>
-            {hasDetailsToShow && (
-              <Text size="body-small" color="secondary">
-                <Link
-                  color="inherit"
-                  href={'#'}
-                  onClick={() => setShowDetails(!showDetails)}
-                >
-                  <Trans>Details</Trans>
-                  {details ? (
-                    <ChevronArrowBottom
-                      fontSize="small"
-                      style={{
-                        verticalAlign: 'middle',
-                      }}
-                    />
-                  ) : (
-                    <ChevronArrowRight
-                      fontSize="small"
-                      style={{
-                        verticalAlign: 'middle',
-                      }}
-                    />
-                  )}
-                </Link>
-              </Text>
-            )}
-          </LineStackLayout>
-          <LineStackLayout
-            noMargin
-            alignItems="baseline"
-            justifyContent="flex-end"
-            neverShrink
-          >
-            {!isFinished && !isWorking && (
-              <FlatButtonWithSplitMenu
-                primary
-                style={{ flexShrink: 0 }}
-                onClick={() => onProcessFunctionCalls([functionCall])}
-                label={<Trans>Execute this action</Trans>}
-                buildMenuTemplate={i18n => [
-                  {
-                    label: i18n._(t`Ignore this`),
-                    click: () => {
-                      onProcessFunctionCalls([functionCall], {
-                        ignore: true,
-                      });
-                    },
-                  },
-                ]}
-              />
-            )}
-            {functionCallResultIsErrored && (
-              <RaisedButton
-                color="primary"
-                onClick={() => onProcessFunctionCalls([functionCall])}
-                label={<Trans>Retry</Trans>}
-              />
-            )}
-          </LineStackLayout>
-        </ResponsiveLineStackLayout>
+          {text || <Trans>Working...</Trans>}
+        </Text>
       </LineStackLayout>
+      {newlyAddedResourcesNames && newlyAddedResourcesNames.length > 0 && (
+        <div className={classes.addedResourcesContainer}>
+          <LineStackLayout noMargin alignItems="center">
+            <CircledAdd fontSize="small" />
+            <Text noMargin size="body-small" color="secondary">
+              <Trans>
+                Resources added: {newlyAddedResourcesNames.join(', ')}
+              </Trans>
+            </Text>
+          </LineStackLayout>
+        </div>
+      )}
+      {hasDetailsToShow && (
+        <div
+          className={classes.detailsButtonContainer}
+          onClick={() => setShowDetails(!showDetails)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setShowDetails(!showDetails);
+            }
+          }}
+        >
+          <LineStackLayout noMargin alignItems="center">
+            {showDetails ? (
+              <ChevronArrowBottom fontSize="small" />
+            ) : (
+              <ChevronArrowRight fontSize="small" />
+            )}
+            <Text noMargin size="body-small" color="secondary">
+              <Trans>Details</Trans>
+            </Text>
+          </LineStackLayout>
+        </div>
+      )}
       {details && (
         <div className={classes.detailsPaperContainer}>
           <Paper background="medium" elevation={0} square variant="outlined">

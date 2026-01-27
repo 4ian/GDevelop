@@ -17,14 +17,17 @@ const instancesEditorSettings: InstancesEditorSettings = {
   gridType: 'isometric',
   gridWidth: 1200,
   gridHeight: 600,
+  gridDepth: 200,
   gridOffsetX: 0,
   gridOffsetY: 0,
+  gridOffsetZ: 0,
   gridColor: 0,
   gridAlpha: 0,
   snap: false,
   zoomFactor: 1,
   windowMask: false,
   selectedLayer: '',
+  gameEditorMode: 'instances-editor',
 };
 
 export default {
@@ -44,7 +47,7 @@ export const Default = () => (
         layersContainer={testProject.testLayout.getLayers()}
         globalObjectsContainer={testProject.project.getObjects()}
         objectsContainer={testProject.testLayout.getObjects()}
-        selectedLayer={''}
+        chosenLayer={''}
         initialInstances={testProject.testLayout.getInitialInstances()}
         instancesEditorSettings={instancesEditorSettings}
         onInstancesEditorSettingsMutated={() => {}}
@@ -76,6 +79,7 @@ export const Default = () => (
         pauseRendering={false}
         tileMapTileSelection={null}
         onSelectTileMapTile={() => {}}
+        editorViewPosition2D={{ viewX: null, viewY: null }}
       />
     </DragAndDropContextProvider>
   </FixedHeightFlexContainer>

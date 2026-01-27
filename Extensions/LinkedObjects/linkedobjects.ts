@@ -6,6 +6,7 @@ namespace gdjs {
   const logger = new gdjs.Logger('LinkedObjects');
   /**
    * Manages the links between objects.
+   * @category Other extensions > Linked Objects
    */
   export class LinksManager {
     private _links = new Map<integer, IterableLinkedObjects>();

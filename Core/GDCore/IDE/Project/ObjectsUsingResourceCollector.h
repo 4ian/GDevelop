@@ -21,7 +21,7 @@ namespace gd {
 class GD_CORE_API ObjectsUsingResourceCollector
     : public ArbitraryObjectsWorker {
 public:
-  ObjectsUsingResourceCollector(gd::ResourcesManager &resourcesManager_,
+  ObjectsUsingResourceCollector(gd::ResourcesContainer &resourcesManager_,
                                 const gd::String &resourceName_)
       : resourcesManager(&resourcesManager_), resourceName(resourceName_){};
   virtual ~ObjectsUsingResourceCollector();
@@ -33,12 +33,12 @@ public:
 
   std::vector<gd::String> objectNames;
   gd::String resourceName;
-  gd::ResourcesManager *resourcesManager;
+  gd::ResourcesContainer *resourcesManager;
 };
 
 class GD_CORE_API ResourceNameMatcher : public ArbitraryResourceWorker {
 public:
-  ResourceNameMatcher(gd::ResourcesManager &resourcesManager,
+  ResourceNameMatcher(gd::ResourcesContainer &resourcesManager,
                       const gd::String &resourceName_)
       : resourceName(resourceName_),
         matchesResourceName(false), gd::ArbitraryResourceWorker(

@@ -75,8 +75,16 @@ namespace gdjs {
     }
   }
 
+  /**
+   * @category Renderers > Text Entry
+   * @deprecated
+   */
   export const TextEntryRuntimeObjectRenderer =
     TextEntryRuntimeObjectPixiRenderer;
+  /**
+   * @category Renderers > Text Entry
+   * @deprecated
+   */
   export type TextEntryRuntimeObjectRenderer =
     TextEntryRuntimeObjectPixiRenderer;
 }

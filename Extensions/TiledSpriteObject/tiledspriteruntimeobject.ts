@@ -3,7 +3,10 @@
  *  2013 Florian Rival (Florian.Rival@gmail.com)
  */
 namespace gdjs {
-  /** Initial properties for a Tiled Sprite object */
+  /**
+   * Initial properties for a Tiled Sprite object
+   * @category Objects > Tiled Sprite
+   */
   export type TiledSpriteObjectDataType = {
     /** Default width of the object, if the instance has no custom width. */
     width: number;
@@ -12,8 +15,14 @@ namespace gdjs {
     texture: string;
   };
 
+  /**
+   * @category Objects > Tiled Sprite
+   */
   export type TiledSpriteObjectData = ObjectData & TiledSpriteObjectDataType;
 
+  /**
+   * @category Objects > Tiled Sprite
+   */
   export type TiledSpriteNetworkSyncDataType = {
     xo: number;
     yo: number;
@@ -21,11 +30,15 @@ namespace gdjs {
     color: string;
   };
 
+  /**
+   * @category Objects > Tiled Sprite
+   */
   export type TiledSpriteNetworkSyncData = ObjectNetworkSyncData &
     TiledSpriteNetworkSyncDataType;
 
   /**
    * The TiledSpriteRuntimeObject displays a tiled texture.
+   * @category Objects > Tiled Sprite
    */
   export class TiledSpriteRuntimeObject
     extends gdjs.RuntimeObject
@@ -42,6 +55,8 @@ namespace gdjs {
 
     _renderer: gdjs.TiledSpriteRuntimeObjectRenderer;
 
+    _objectData: TiledSpriteObjectData;
+
     /**
      * @param instanceContainer The container the object belongs to.
      * @param tiledSpriteObjectData The initial properties of the object
@@ -51,6 +66,7 @@ namespace gdjs {
       tiledSpriteObjectData: TiledSpriteObjectData
     ) {
       super(instanceContainer, tiledSpriteObjectData);
+      this._objectData = tiledSpriteObjectData;
       this._renderer = new gdjs.TiledSpriteRuntimeObjectRenderer(
         this,
         instanceContainer,
@@ -66,6 +82,7 @@ namespace gdjs {
     }
 
     updateFromObjectData(oldObjectData, newObjectData): boolean {
+      this._objectData = newObjectData;
       if (oldObjectData.texture !== newObjectData.texture) {
         this.setTexture(newObjectData.texture, this.getRuntimeScene());
       }
@@ -129,9 +146,11 @@ namespace gdjs {
         this.setWidth(initialInstanceData.width);
         this.setHeight(initialInstanceData.height);
       }
-      if (initialInstanceData.opacity !== undefined) {
-        this.setOpacity(initialInstanceData.opacity);
-      }
+      this.setOpacity(
+        initialInstanceData.opacity === undefined
+          ? 255
+          : initialInstanceData.opacity
+      );
     }
 
     /**
@@ -221,6 +240,14 @@ namespace gdjs {
     setSize(width: float, height: float): void {
       this.setWidth(width);
       this.setHeight(height);
+    }
+
+    override getOriginalWidth(): float {
+      return this._objectData.width;
+    }
+
+    override getOriginalHeight(): float {
+      return this._objectData.height;
     }
 
     /**

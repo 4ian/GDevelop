@@ -1,4 +1,5 @@
 // @flow
+import { type I18n as I18nType } from '@lingui/core';
 import { type EventsGenerationResult } from '.';
 import {
   editorFunctions,
@@ -11,11 +12,16 @@ import {
   type EventsGenerationOptions,
   type AssetSearchAndInstallOptions,
   type AssetSearchAndInstallResult,
+  type ResourceSearchAndInstallOptions,
+  type ResourceSearchAndInstallResult,
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
+  type ToolOptions,
 } from '.';
+import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
+import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
 
 export type EditorFunctionCallResult =
   | {|
@@ -34,9 +40,11 @@ export type EditorFunctionCallResult =
     |};
 
 export type ProcessEditorFunctionCallsOptions = {|
-  project: gdProject | null,
+  project: ?gdProject,
   functionCalls: Array<EditorFunctionCall>,
+  i18n: I18nType,
   editorCallbacks: EditorCallbacks,
+  toolOptions: ToolOptions | null,
   ignore: boolean,
   generateEvents: (
     options: EventsGenerationOptions
@@ -53,18 +61,25 @@ export type ProcessEditorFunctionCallsOptions = {|
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
-  ensureExtensionInstalled: (options: {|
-    extensionName: string,
-  |}) => Promise<void>,
+  ensureExtensionInstalled: (
+    options: EnsureExtensionInstalledOptions
+  ) => Promise<void>,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
   searchAndInstallAsset: (
     options: AssetSearchAndInstallOptions
   ) => Promise<AssetSearchAndInstallResult>,
+  searchAndInstallResources: (
+    options: ResourceSearchAndInstallOptions
+  ) => Promise<ResourceSearchAndInstallResult>,
 |};
 
 export const processEditorFunctionCalls = async ({
   functionCalls,
   project,
+  i18n,
   editorCallbacks,
+  toolOptions,
   generateEvents,
   onSceneEventsModifiedOutsideEditor,
   onInstancesModifiedOutsideEditor,
@@ -72,13 +87,18 @@ export const processEditorFunctionCalls = async ({
   onObjectGroupsModifiedOutsideEditor,
   ignore,
   ensureExtensionInstalled,
+  onWillInstallExtension,
+  onExtensionInstalled,
   searchAndInstallAsset,
+  searchAndInstallResources,
 }: ProcessEditorFunctionCallsOptions): Promise<{|
   results: Array<EditorFunctionCallResult>,
   createdSceneNames: Array<string>,
+  createdProject: ?gdProject,
 |}> => {
   const results: Array<EditorFunctionCallResult> = [];
   const createdSceneNames: Array<string> = [];
+  let createdProject: ?gdProject = null;
 
   for (const functionCall of functionCalls) {
     const call_id = functionCall.call_id;
@@ -161,6 +181,8 @@ export const processEditorFunctionCalls = async ({
 
       const argumentsWithoutProject = {
         args,
+        i18n,
+        toolOptions,
         editorCallbacks,
         generateEvents,
         onSceneEventsModifiedOutsideEditor,
@@ -168,7 +190,11 @@ export const processEditorFunctionCalls = async ({
         onObjectsModifiedOutsideEditor,
         onObjectGroupsModifiedOutsideEditor,
         ensureExtensionInstalled,
+        onWillInstallExtension,
+        onExtensionInstalled,
         searchAndInstallAsset,
+        searchAndInstallResources,
+        PixiResourcesLoader,
       };
 
       // Execute the function
@@ -207,6 +233,9 @@ export const processEditorFunctionCalls = async ({
       if (meta && meta.newSceneNames) {
         createdSceneNames.push(...meta.newSceneNames);
       }
+      if (meta && meta.createdProject) {
+        createdProject = meta.createdProject;
+      }
     } catch (error) {
       results.push({
         status: 'finished',
@@ -217,5 +246,5 @@ export const processEditorFunctionCalls = async ({
     }
   }
 
-  return { results, createdSceneNames };
+  return { results, createdSceneNames, createdProject };
 };

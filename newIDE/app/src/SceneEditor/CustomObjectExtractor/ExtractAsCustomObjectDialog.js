@@ -30,7 +30,7 @@ type Props = {|
     isNewExtension: boolean,
     eventsBasedObjectName: string,
     shouldRemoveSceneObjectsWhenNoMoreInstance: boolean
-  ) => void,
+  ) => Promise<void>,
   onCancel: () => void,
 |};
 

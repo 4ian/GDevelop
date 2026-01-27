@@ -15,6 +15,10 @@ import SubscriptionChecker, {
   type SubscriptionCheckerInterface,
 } from '../../Profile/Subscription/SubscriptionChecker';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
+import {
+  setEditorHotReloadNeeded,
+  type HotReloadSteps,
+} from '../../EmbeddedGame/EmbeddedGameFrame';
 
 type State = {|
   subscriptionChecked: boolean,
@@ -68,6 +72,12 @@ export class DebuggerEditorContainer extends React.Component<
   onSceneEventsModifiedOutsideEditor(changes: SceneEventsOutsideEditorChanges) {
     // No thing to be done.
   }
+
+  notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {
+    setEditorHotReloadNeeded(hotReloadSteps);
+  }
+
+  switchInGameEditorIfNoHotReloadIsNeeded() {}
 
   onInstancesModifiedOutsideEditor(changes: InstancesOutsideEditorChanges) {
     // No thing to be done.

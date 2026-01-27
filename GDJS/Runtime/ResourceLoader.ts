@@ -28,10 +28,6 @@ namespace gdjs {
     );
   };
 
-  const maxForegroundConcurrency = 20;
-  const maxBackgroundConcurrency = 5;
-  const maxAttempt = 3;
-
   /**
    * A task of pre-loading resources used by a scene.
    *
@@ -82,10 +78,44 @@ namespace gdjs {
     }
   }
 
+  class InternalInGameEditorOnlySvgManager implements gdjs.ResourceManager {
+    async loadResource(resourceName: string): Promise<void> {
+      // Nothing to do.
+    }
+
+    async processResource(resourceName: string): Promise<void> {
+      // Nothing to do.
+    }
+
+    getResourceKinds(): Array<ResourceKind> {
+      return ['internal-in-game-editor-only-svg'];
+    }
+
+    unloadResource(resourceData: ResourceData): void {
+      // Nothing to do.
+    }
+
+    dispose(): void {
+      // Nothing to do.
+    }
+  }
+
+  type PromiseError<T> = { item: T; error: Error };
+
+  type PromisePoolOutput<T, U> = {
+    results: Array<U>;
+    errors: Array<PromiseError<T>>;
+  };
+
   /**
    * Pre-load resources of any kind needed for a game or a scene.
+   * @category Resources
    */
   export class ResourceLoader {
+    static maxForegroundConcurrency = 20;
+    static maxBackgroundConcurrency = 5;
+    static maxAttempt = 3;
+
     _runtimeGame: RuntimeGame;
     /**
      * All the resource of a game by resource name.
@@ -124,6 +154,7 @@ namespace gdjs {
     private _bitmapFontManager: BitmapFontManager;
     private _spineAtlasManager: SpineAtlasManager | null = null;
     private _spineManager: SpineManager | null = null;
+    private _svgManager: InternalInGameEditorOnlySvgManager;
 
     /**
      * The name of the scene for which resources are currently being loaded.
@@ -169,6 +200,7 @@ namespace gdjs {
         this._imageManager
       );
       this._model3DManager = new gdjs.Model3DManager(this);
+      this._svgManager = new InternalInGameEditorOnlySvgManager();
 
       // add spine related managers only if spine extension is used
       if (gdjs.SpineAtlasManager && gdjs.SpineManager) {
@@ -189,6 +221,7 @@ namespace gdjs {
         this._jsonManager,
         this._bitmapFontManager,
         this._model3DManager,
+        this._svgManager,
       ];
 
       if (this._spineAtlasManager)
@@ -265,10 +298,10 @@ namespace gdjs {
       onProgress: (loadingCount: integer, totalCount: integer) => void
     ): Promise<void> {
       let loadedCount = 0;
-      await processAndRetryIfNeededWithPromisePool(
+      await ResourceLoader.processAndRetryIfNeededWithPromisePool(
         [...this._resources.values()],
-        maxForegroundConcurrency,
-        maxAttempt,
+        ResourceLoader.maxForegroundConcurrency,
+        ResourceLoader.maxAttempt,
         async (resource) => {
           await this._loadResource(resource);
           await this._processResource(resource);
@@ -280,6 +313,27 @@ namespace gdjs {
       for (const sceneLoadingState of this._sceneLoadingStates.values()) {
         sceneLoadingState.status = 'ready';
       }
+    }
+
+    async loadResources(
+      resourceNames: Array<string>,
+      onProgress: (loadingCount: integer, totalCount: integer) => void
+    ): Promise<void> {
+      let loadedCount = 0;
+      await ResourceLoader.processAndRetryIfNeededWithPromisePool(
+        resourceNames,
+        ResourceLoader.maxForegroundConcurrency,
+        ResourceLoader.maxAttempt,
+        async (resourceName) => {
+          const resource = this._resources.get(resourceName);
+          if (resource) {
+            await this._loadResource(resource);
+            await this._processResource(resource);
+          }
+          loadedCount++;
+          onProgress(loadedCount, this._resources.size);
+        }
+      );
     }
 
     /**
@@ -302,10 +356,10 @@ namespace gdjs {
         ...this._globalResources,
         ...firstSceneState.resourceNames,
       ];
-      await processAndRetryIfNeededWithPromisePool(
+      await ResourceLoader.processAndRetryIfNeededWithPromisePool(
         resourceNames,
-        maxForegroundConcurrency,
-        maxAttempt,
+        ResourceLoader.maxForegroundConcurrency,
+        ResourceLoader.maxAttempt,
         async (resourceName) => {
           const resource = this._resources.get(resourceName);
           if (!resource) {
@@ -383,12 +437,12 @@ namespace gdjs {
       }
 
       let loadedCount = 0;
-      await processAndRetryIfNeededWithPromisePool(
+      await ResourceLoader.processAndRetryIfNeededWithPromisePool(
         sceneState.resourceNames,
         this._isLoadingInForeground
-          ? maxForegroundConcurrency
-          : maxBackgroundConcurrency,
-        maxAttempt,
+          ? ResourceLoader.maxForegroundConcurrency
+          : ResourceLoader.maxBackgroundConcurrency,
+        ResourceLoader.maxAttempt,
         async (resourceName) => {
           const resource = this._resources.get(resourceName);
           if (!resource) {
@@ -552,6 +606,23 @@ namespace gdjs {
     }
 
     /**
+     * To be called when hot-reloading resources.
+     */
+    unloadAllResources(): void {
+      debugLogger.log(`Unloading of all resources was requested.`);
+      for (const resource of this._resources.values()) {
+        const resourceManager = this._resourceManagersMap.get(resource.kind);
+        if (resourceManager) {
+          resourceManager.unloadResource(resource);
+        }
+      }
+      for (const sceneLoadingState of this._sceneLoadingStates.values()) {
+        sceneLoadingState.status = 'not-loaded';
+      }
+      debugLogger.log(`Unloading of all resources finished.`);
+    }
+
+    /**
      * Put a given scene at the end of the queue.
      *
      * When the scene that is currently loading in background is done,
@@ -652,6 +723,13 @@ namespace gdjs {
      * the resource (this can be for example a token needed to access the resource).
      */
     getFullUrl(url: string) {
+      if (this._runtimeGame.isInGameEdition()) {
+        // Avoid adding cache burst to URLs which are assumed to be immutable files,
+        // to avoid costly useless requests each time the game is hot-reloaded.
+        if (url.startsWith('file://')) {
+          url = addSearchParameterToUrl(url, 'cache', '' + Date.now());
+        }
+      }
       const { gdevelopResourceToken } = this._runtimeGame._options;
       if (!gdevelopResourceToken) return url;
 
@@ -811,80 +889,73 @@ namespace gdjs {
 
       return result;
     }
-  }
 
-  type PromiseError<T> = { item: T; error: Error };
+    static processWithPromisePool<T, U>(
+      items: Array<T>,
+      maxConcurrency: number,
+      asyncFunction: (item: T) => Promise<U>
+    ): Promise<PromisePoolOutput<T, U>> {
+      const results: Array<U> = [];
+      const errors: Array<PromiseError<T>> = [];
+      let activePromises = 0;
+      let index = 0;
 
-  type PromisePoolOutput<T, U> = {
-    results: Array<U>;
-    errors: Array<PromiseError<T>>;
-  };
+      return new Promise((resolve, reject) => {
+        const executeNext = () => {
+          if (items.length === 0) {
+            resolve({ results, errors });
+            return;
+          }
+          while (activePromises < maxConcurrency && index < items.length) {
+            const item = items[index++];
+            activePromises++;
 
-  const processWithPromisePool = <T, U>(
-    items: Array<T>,
-    maxConcurrency: number,
-    asyncFunction: (item: T) => Promise<U>
-  ): Promise<PromisePoolOutput<T, U>> => {
-    const results: Array<U> = [];
-    const errors: Array<PromiseError<T>> = [];
-    let activePromises = 0;
-    let index = 0;
+            asyncFunction(item)
+              .then((result) => results.push(result))
+              .catch((error) => errors.push({ item, error }))
+              .finally(() => {
+                activePromises--;
+                if (index === items.length && activePromises === 0) {
+                  resolve({ results, errors });
+                } else {
+                  executeNext();
+                }
+              });
+          }
+        };
 
-    return new Promise((resolve, reject) => {
-      const executeNext = () => {
-        if (items.length === 0) {
-          resolve({ results, errors });
-          return;
-        }
-        while (activePromises < maxConcurrency && index < items.length) {
-          const item = items[index++];
-          activePromises++;
-
-          asyncFunction(item)
-            .then((result) => results.push(result))
-            .catch((error) => errors.push({ item, error }))
-            .finally(() => {
-              activePromises--;
-              if (index === items.length && activePromises === 0) {
-                resolve({ results, errors });
-              } else {
-                executeNext();
-              }
-            });
-        }
-      };
-
-      executeNext();
-    });
-  };
-
-  const processAndRetryIfNeededWithPromisePool = async <T, U>(
-    items: Array<T>,
-    maxConcurrency: number,
-    maxAttempt: number,
-    asyncFunction: (item: T) => Promise<U>
-  ): Promise<PromisePoolOutput<T, U>> => {
-    const output = await processWithPromisePool<T, U>(
-      items,
-      maxConcurrency,
-      asyncFunction
-    );
-    if (output.errors.length !== 0) {
-      logger.warn("Some assets couldn't be downloaded. Trying again now.");
+        executeNext();
+      });
     }
-    for (
-      let attempt = 1;
-      attempt < maxAttempt && output.errors.length !== 0;
-      attempt++
-    ) {
-      const retryOutput = await processWithPromisePool<T, U>(
+
+    static async processAndRetryIfNeededWithPromisePool<T, U>(
+      items: Array<T>,
+      maxConcurrency: number,
+      maxAttempt: number,
+      asyncFunction: (item: T) => Promise<U>
+    ): Promise<PromisePoolOutput<T, U>> {
+      const output = await ResourceLoader.processWithPromisePool<T, U>(
         items,
         maxConcurrency,
         asyncFunction
       );
-      output.results.push.apply(output.results, retryOutput.results);
-      output.errors = retryOutput.errors;
+      if (output.errors.length !== 0) {
+        logger.warn("Some assets couldn't be downloaded. Trying again now.");
+      }
+      for (
+        let attempt = 1;
+        attempt < maxAttempt && output.errors.length !== 0;
+        attempt++
+      ) {
+        const retryOutput = await ResourceLoader.processWithPromisePool<T, U>(
+          items,
+          maxConcurrency,
+          asyncFunction
+        );
+        output.results.push.apply(output.results, retryOutput.results);
+        output.errors = retryOutput.errors;
+      }
+      return output;
     }
-    return output;
-  };
+  }
 }

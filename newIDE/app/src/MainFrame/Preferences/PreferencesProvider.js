@@ -11,6 +11,7 @@ import { getIDEVersion } from '../../Version';
 import {
   type PreferencesValues,
   type EditorMosaicName,
+  type ProjectSpecificPreferencesValues,
 } from './PreferencesContext';
 import type {
   ResourceKind,
@@ -94,6 +95,7 @@ const getPreferences = (): PreferencesValues => {
 export default class PreferencesProvider extends React.Component<Props, State> {
   state = {
     values: getPreferences(),
+    setMultipleValues: this._setMultipleValues.bind(this),
     setLanguage: this._setLanguage.bind(this),
     setThemeName: this._setThemeName.bind(this),
     setCodeEditorThemeName: this._setCodeEditorThemeName.bind(this),
@@ -106,6 +108,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     showAllTutorialHints: this._showAllTutorialHints.bind(this),
     showAnnouncement: this._showAnnouncement.bind(this),
     showAllAnnouncements: this._showAllAnnouncements.bind(this),
+    showAskAiStandAloneForm: this._showAskAiStandAloneForm.bind(this),
+    showAllAskAiStandAloneForms: this._showAllAskAiStandAloneForms.bind(this),
     verifyIfIsNewVersion: this._verifyIfIsNewVersion.bind(this),
     setEventsSheetShowObjectThumbnails: this._setEventsSheetShowObjectThumbnails.bind(
       this
@@ -199,10 +203,32 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setGamesDashboardOrderBy: this._setGamesDashboardOrderBy.bind(this),
     setTakeScreenshotOnPreview: this._setTakeScreenshotOnPreview.bind(this),
     setShowAiAskButtonInTitleBar: this._setShowAiAskButtonInTitleBar.bind(this),
+    setAiState: this._setAiState.bind(this),
+    setAutomaticallyUseCreditsForAiRequests: this._setAutomaticallyUseCreditsForAiRequests.bind(
+      this
+    ),
+    setHasSeenInGameEditorWarning: this._setHasSeenInGameEditorWarning.bind(
+      this
+    ),
+    setUseBackgroundSerializerForSaving: this._setUseBackgroundSerializerForSaving.bind(
+      this
+    ),
   };
 
   componentDidMount() {
     setTimeout(() => this._checkUpdates(), CHECK_APP_UPDATES_TIMEOUT);
+  }
+
+  _setMultipleValues(updates: ProjectSpecificPreferencesValues) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          ...updates,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
   }
 
   _setLanguage(language: string) {
@@ -653,6 +679,33 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
+  _showAskAiStandAloneForm(identifier: string, show: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          hiddenAskAiStandAloneForms: {
+            ...state.values.hiddenAskAiStandAloneForms,
+            [identifier]: !show,
+          },
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _showAllAskAiStandAloneForms() {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          hiddenAskAiStandAloneForms: {},
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
   _persistValuesToLocalStorage(preferences: Preferences) {
     try {
       localStorage.setItem(
@@ -962,6 +1015,27 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
+  _setHasSeenInGameEditorWarning(newValue: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          hasSeenInGameEditorWarning: newValue,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setUseBackgroundSerializerForSaving(newValue: boolean) {
+    this.setState(
+      state => ({
+        values: { ...state.values, useBackgroundSerializerForSaving: newValue },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
   _getEditorStateForProject(projectId: string) {
     return this.state.values.editorStateByProject[projectId];
   }
@@ -1038,6 +1112,33 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           showAiAskButtonInTitleBar: newValue,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setAiState(newValue: {| aiRequestId: string | null |}) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          aiState: {
+            ...state.values.aiState,
+            ...newValue,
+          },
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setAutomaticallyUseCreditsForAiRequests(newValue: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          automaticallyUseCreditsForAiRequests: newValue,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

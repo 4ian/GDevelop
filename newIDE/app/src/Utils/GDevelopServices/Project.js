@@ -11,6 +11,12 @@ import { isNativeMobileApp } from '../Platform';
 import { unzipFirstEntryOfBlob } from '../Zip.js/Utils';
 import { extractGDevelopApiErrorStatusAndCode } from './Errors';
 import { extractNextPageUriFromLinkHeader } from './Play';
+import {
+  ensureIsArray,
+  ensureIsNullOrObjectHasProperty,
+} from '../DataValidator';
+import { type FileMetadata } from '../../ProjectsStorage';
+import CloudStorageProvider from '../../ProjectsStorage/CloudStorageProvider';
 
 export const CLOUD_PROJECT_NAME_MAX_LENGTH = 60;
 export const CLOUD_PROJECT_VERSION_LABEL_MAX_LENGTH = 50;
@@ -212,13 +218,10 @@ export const getLastVersionsOfProject = async (
     },
     params: { userId },
   });
-  const projectVersions = response.data;
-
-  if (!Array.isArray(projectVersions)) {
-    throw new Error('Invalid response from the project versions API');
-  }
-
-  return projectVersions;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/project/{id}/version of Project API',
+  });
 };
 
 export const getCredentialsForCloudProject = async (
@@ -259,6 +262,27 @@ export const clearCloudProjectCredentials = async (): Promise<void> => {
   }
 };
 
+export const getCloudProjectFileMetadataIdentifier = (
+  storageProviderInternalName: string,
+  fileMetadata: ?FileMetadata
+) => {
+  if (
+    !fileMetadata ||
+    !(storageProviderInternalName === CloudStorageProvider.internalName)
+  )
+    return null;
+  if (fileMetadata.fileIdentifier.startsWith('http')) {
+    // When creating a cloud project from an example, there might be a moment where
+    // the used Storage Provider is the cloud one but the file identifier is the url
+    // to the example such as `https://ressources.gdevelop-app.com/...`.
+    // A cloud project identifier is a uuid at the moment, so it does not contain the
+    // 3 letters h t and p so there should be no risk af having a cloud project
+    // uuid starting with http.
+    return null;
+  }
+  return fileMetadata.fileIdentifier;
+};
+
 export const createCloudProject = async (
   authenticatedUser: AuthenticatedUser,
   cloudProjectCreationPayload: {| name: string, gameId: string |}
@@ -280,7 +304,11 @@ export const createCloudProject = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  return response.data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/project of Project API',
+  });
 };
 
 /**
@@ -293,12 +321,14 @@ export const createCloudProject = async (
 export const commitVersion = async ({
   authenticatedUser,
   cloudProjectId,
+  presignedUrl,
   zippedProject,
   previousVersion,
   restoredFromVersionId,
 }: {
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string,
+  presignedUrl: string,
   zippedProject: Blob,
   previousVersion?: ?string,
   restoredFromVersionId?: ?string,
@@ -308,12 +338,7 @@ export const commitVersion = async ({
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  // Get a presigned url to upload a new version (the URL will contain the new version id).
-  const presignedUrl = await getPresignedUrlForVersionUpload(
-    authenticatedUser,
-    cloudProjectId
-  );
-  if (!presignedUrl) return;
+
   const newVersion = getVersionIdFromPath(presignedUrl);
   // Upload zipped project.
   await refetchCredentialsForProjectAndRetryIfUnauthorized(
@@ -421,13 +446,10 @@ export const listUserCloudProjects = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  const cloudProjects = response.data;
-
-  if (!Array.isArray(cloudProjects)) {
-    throw new Error('Invalid response from the projects API');
-  }
-
-  return cloudProjects;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/project of Project API',
+  });
 };
 
 export const listOtherUserCloudProjects = async (
@@ -440,13 +462,10 @@ export const listOtherUserCloudProjects = async (
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
-  const cloudProjects = response.data;
-
-  if (!Array.isArray(cloudProjects)) {
-    throw new Error('Invalid response from the projects API');
-  }
-
-  return cloudProjects;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/user/{id}/project of Project API',
+  });
 };
 
 export const getCloudProject = async (
@@ -464,7 +483,11 @@ export const getCloudProject = async (
     },
     params: { userId },
   });
-  return response.data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/project/{id} of Project API',
+  });
 };
 
 export const getOtherUserCloudProject = async (
@@ -486,7 +509,11 @@ export const getOtherUserCloudProject = async (
       params: { userId },
     }
   );
-  return response.data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/user/{id}/project/{id} of Project API',
+  });
 };
 
 export const updateCloudProject = async (
@@ -516,7 +543,11 @@ export const updateCloudProject = async (
       params: { userId },
     }
   );
-  return response.data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/project/{id} of Project API',
+  });
 };
 
 export const deleteCloudProject = async (
@@ -534,10 +565,14 @@ export const deleteCloudProject = async (
     },
     params: { userId },
   });
-  return response.data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/project/{id} of Project API',
+  });
 };
 
-const getPresignedUrlForVersionUpload = async (
+export const getPresignedUrlForVersionUpload = async (
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string
 ): Promise<?string> => {
@@ -682,7 +717,11 @@ export const createProjectUserAcl = async (
       params: { userId: currentUserId },
     }
   );
-  return response.data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'projectId',
+    endpointName: '/project-user-acl of Project API',
+  });
 };
 
 export const deleteProjectUserAcl = async (
@@ -700,6 +739,7 @@ export const deleteProjectUserAcl = async (
     },
     params: { userId: currentUserId, projectId, feature, targetUserId: userId },
   });
+  // Note: deleteProjectUserAcl returns void, so no validation needed
   return response.data;
 };
 
@@ -718,13 +758,10 @@ export const listProjectUserAcls = async (
     },
     params: { userId: currentUserId, projectId },
   });
-  const projectUserAcls = response.data;
-
-  if (!Array.isArray(projectUserAcls)) {
-    throw new Error('Invalid response from the project user acls API');
-  }
-
-  return projectUserAcls;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/project-user-acl of Project API',
+  });
 };
 
 export const updateCloudProjectVersion = async (
@@ -756,7 +793,11 @@ export const updateCloudProjectVersion = async (
       params: { userId },
     }
   );
-  return response.data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/project/{id}/version/{id} of Project API',
+  });
 };
 
 /**
@@ -790,13 +831,36 @@ export const listVersionsOfProject = async (
   const nextPageUri = response.headers.link
     ? extractNextPageUriFromLinkHeader(response.headers.link)
     : null;
-  const projectVersions = response.data;
-
-  if (!Array.isArray(projectVersions)) {
-    throw new Error('Invalid response from the project versions API');
-  }
   return {
-    versions: projectVersions,
+    versions: ensureIsArray({
+      data: response.data,
+      endpointName: '/project/{id}/version of Project API',
+    }),
     nextPageUri,
   };
+};
+
+export const getCloudProjectVersion = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    cloudProjectId,
+    versionId,
+  }: {| userId: string, cloudProjectId: string, versionId: string |}
+): Promise<?ExpandedCloudProjectVersion> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.get(
+    `/project/${cloudProjectId}/version/${versionId}`,
+    {
+      headers: {
+        Authorization: authorizationHeader,
+      },
+      params: { userId },
+    }
+  );
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/project/{id}/version/{id} of Project API',
+  });
 };

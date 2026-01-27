@@ -20,12 +20,11 @@ import PlaceholderLoader from '../UI/PlaceholderLoader';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
 import { markBadgesAsSeen as doMarkBadgesAsSeen } from '../Utils/GDevelopServices/Badge';
 import ErrorBoundary from '../UI/ErrorBoundary';
-import useSubscriptionPlans from '../Utils/UseSubscriptionPlans';
 import Text from '../UI/Text';
 import Link from '../UI/Link';
 import CreditsStatusBanner from '../Credits/CreditsStatusBanner';
 import RedeemCodeDialog from './RedeemCodeDialog';
-import { SubscriptionSuggestionContext } from './Subscription/SubscriptionSuggestionContext';
+import { SubscriptionContext } from './Subscription/SubscriptionContext';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 
 type Props = {|
@@ -36,15 +35,11 @@ const ProfileDialog = ({ onClose }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const badgesSeenNotificationTimeoutRef = React.useRef<?TimeoutID>(null);
   const badgesSeenNotificationSentRef = React.useRef<boolean>(false);
-  const { getSubscriptionPlansWithPricingSystems } = useSubscriptionPlans({
-    includeLegacy: true,
-    authenticatedUser,
-  });
+  const { openSubscriptionPendingDialog } = React.useContext(
+    SubscriptionContext
+  );
   const { isMobile } = useResponsiveWindowSize();
   const [redeemCodeDialogOpen, setRedeemCodeDialogOpen] = React.useState(false);
-  const { openSubscriptionPendingDialog } = React.useContext(
-    SubscriptionSuggestionContext
-  );
 
   const isUserLoading = authenticatedUser.loginState !== 'done';
   const userAchievementsContainerRef = React.useRef<?HTMLDivElement>(null);
@@ -205,8 +200,6 @@ const ProfileDialog = ({ onClose }: Props) => {
             />
             {isStudentAccount ? null : (
               <SubscriptionDetails
-                subscription={authenticatedUser.subscription}
-                subscriptionPlansWithPricingSystems={getSubscriptionPlansWithPricingSystems()}
                 onManageSubscription={onManageSubscription}
                 isManageSubscriptionLoading={isManageSubscriptionLoading}
               />

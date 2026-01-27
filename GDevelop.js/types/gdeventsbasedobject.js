@@ -6,7 +6,9 @@ declare class gdEventsBasedObject extends gdAbstractEventsBasedEntity {
   setDescription(description: string): gdEventsBasedObject;
   setPrivate(isPrivate: boolean): gdEventsBasedObject;
   setDefaultName(defaultName: string): gdEventsBasedObject;
+  setAssetStoreTag(assetStoreTag: string): gdEventsBasedObject;
   getDefaultName(): string;
+  getAssetStoreTag(): string;
   markAsRenderedIn3D(isRenderedIn3D: boolean): gdEventsBasedObject;
   isRenderedIn3D(): boolean;
   markAsAnimatable(isAnimatable: boolean): gdEventsBasedObject;

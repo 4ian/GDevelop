@@ -11,6 +11,7 @@ namespace gdjs {
   /**
    * Load GLB files (using `Three.js`), using the "model3D" resources
    * registered in the game resources.
+   * @category Resources > 3D Models
    */
   export class Model3DManager implements gdjs.ResourceManager {
     /**
@@ -126,6 +127,7 @@ namespace gdjs {
         logger.error(
           "Can't fetch the 3D model file " + resource.file + ', error: ' + error
         );
+        throw error;
       }
     }
 
@@ -164,14 +166,17 @@ namespace gdjs {
     }
 
     unloadResource(resourceData: ResourceData): void {
-      const loadedThreeModel = this._loadedThreeModels.get(resourceData);
+      const loadedThreeModel = this._loadedThreeModels.getFromName(
+        resourceData.name
+      );
       if (loadedThreeModel) {
         loadedThreeModel.scene.clear();
         this._loadedThreeModels.delete(resourceData);
       }
 
-      const downloadedArrayBuffer =
-        this._downloadedArrayBuffers.get(resourceData);
+      const downloadedArrayBuffer = this._downloadedArrayBuffers.getFromName(
+        resourceData.name
+      );
       if (downloadedArrayBuffer) {
         this._downloadedArrayBuffers.delete(resourceData);
       }

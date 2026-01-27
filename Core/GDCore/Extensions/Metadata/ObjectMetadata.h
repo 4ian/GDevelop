@@ -14,6 +14,7 @@
 
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
+#include "GDCore/Extensions/Metadata/InGameEditorResourceMetadata.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/ObjectConfiguration.h"
 #include "GDCore/String.h"
@@ -220,11 +221,26 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
   }
 
   /**
-   * \brief Set the (user friendly) name of the group this object must
-   * be categorised in.
+   * \brief Set the name of the group identifier this object must
+   * be categorized in.
    */
-  ObjectMetadata& SetCategoryFullName(const gd::String& categoryFullName_) {
-    categoryFullName = categoryFullName_;
+  ObjectMetadata& SetCategory(const gd::String& category_) {
+    category = category_;
+    return *this;
+  }
+
+  /**
+   * \brief Get the tag from which to choose assets from when creating a new
+   * object.
+   */
+  const gd::String& GetAssetStoreTag() const { return assetStoreTag; }
+
+  /**
+   * \brief Set the tag from which to choose assets from when creating a new
+   * object.
+   */
+  ObjectMetadata &SetAssetStoreTag(const gd::String& assetStoreTag_) {
+    assetStoreTag = assetStoreTag_;
     return *this;
   }
 
@@ -258,7 +274,7 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
 
   const gd::String& GetName() const override { return name; }
   const gd::String& GetFullName() const override { return fullname; }
-  const gd::String& GetCategoryFullName() const { return categoryFullName; }
+  const gd::String& GetCategory() const { return category; }
   const gd::String& GetHelpUrl() const { return helpUrl; }
   const gd::String& GetDescription() const override { return description; }
   const gd::String& GetIconFilename() const override { return iconFilename; }
@@ -304,7 +320,6 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
    * \see gd::PlatformExtension::GetAllActions
    */
   std::map<gd::String, gd::ExpressionMetadata>& GetAllStrExpressions() override { return strExpressionsInfos; };
-
 
   /**
    * Check if the behavior is private - it can't be used outside of its
@@ -358,6 +373,19 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
     return openFullEditorLabel;
   }
 
+  /**
+   * \brief Declare a new resource to be used in the in-game editor.
+   */
+  InGameEditorResourceMetadata& AddInGameEditorResource() {
+    InGameEditorResourceMetadata newInGameEditorResource;
+    inGameEditorResources.push_back(newInGameEditorResource);
+    return inGameEditorResources.back();
+  }
+
+  const std::vector<gd::InGameEditorResourceMetadata>& GetInGameEditorResources() const {
+    return inGameEditorResources;
+  }
+
   std::map<gd::String, gd::InstructionMetadata> conditionsInfos;
   std::map<gd::String, gd::InstructionMetadata> actionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> expressionsInfos;
@@ -375,12 +403,14 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
   gd::String fullname;
   gd::String description;
   gd::String iconFilename;
-  gd::String categoryFullName;
+  gd::String category;
+  gd::String assetStoreTag;
   std::set<gd::String> defaultBehaviorTypes;
   bool isPrivate = false;
   bool hidden = false;
   bool isRenderedIn3D = false;
   gd::String openFullEditorLabel;
+  std::vector<gd::InGameEditorResourceMetadata> inGameEditorResources;
 
   std::shared_ptr<gd::ObjectConfiguration>
       blueprintObject;  ///< The "blueprint" object to be copied when a new

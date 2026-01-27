@@ -27,6 +27,7 @@ export const Default = () => (
         getThumbnail={() => 'res/unknown32.png'}
         project={testProject.project}
         layout={testProject.testLayout}
+        eventsFunctionsExtension={null}
         eventsBasedObject={null}
         projectScopedContainersAccessor={
           testProject.testSceneProjectScopedContainersAccessor
@@ -50,8 +51,10 @@ export const Default = () => (
           cb
         ) => cb(true)}
         onObjectFolderOrObjectWithContextSelected={() => {}}
+        onSetAsGlobalObject={action('onSetAsGlobalObject')}
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
         isListLocked={false}
+        onWillInstallExtension={action('extension will be installed')}
         onExtensionInstalled={action('onExtensionInstalled')}
       />
     </div>
@@ -66,6 +69,7 @@ export const WithSerializedObjectView = () => (
           getThumbnail={() => 'res/unknown32.png'}
           project={testProject.project}
           layout={testProject.testLayout}
+          eventsFunctionsExtension={null}
           eventsBasedObject={null}
           projectScopedContainersAccessor={
             testProject.testSceneProjectScopedContainersAccessor
@@ -89,8 +93,10 @@ export const WithSerializedObjectView = () => (
             cb
           ) => cb(true)}
           onObjectFolderOrObjectWithContextSelected={() => {}}
+          onSetAsGlobalObject={action('onSetAsGlobalObject')}
           hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
           isListLocked={false}
+          onWillInstallExtension={action('extension will be installed')}
           onExtensionInstalled={action('onExtensionInstalled')}
         />
       </div>
@@ -105,6 +111,7 @@ export const Locked = () => (
         getThumbnail={() => 'res/unknown32.png'}
         project={testProject.project}
         layout={testProject.testLayout}
+        eventsFunctionsExtension={null}
         eventsBasedObject={null}
         projectScopedContainersAccessor={
           testProject.testSceneProjectScopedContainersAccessor
@@ -128,8 +135,10 @@ export const Locked = () => (
           cb
         ) => cb(true)}
         onObjectFolderOrObjectWithContextSelected={() => {}}
+        onSetAsGlobalObject={action('onSetAsGlobalObject')}
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
         isListLocked={true}
+        onWillInstallExtension={action('extension will be installed')}
         onExtensionInstalled={action('onExtensionInstalled')}
       />
     </div>

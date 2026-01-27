@@ -1,4 +1,5 @@
 namespace gdjs {
+  /** @category Other extensions > Device Vibration */
   export namespace deviceVibration {
     /**
      * Vibrate the mobile device.

@@ -1,0 +1,30 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.header {
+  user-select: none;
+  padding: 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  outline: none;
+}
+
+.header:hover {
+  opacity: 0.7;
+}
+
+.header:focus-visible {
+  outline: 2px solid;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  padding-left: 20px;
+}

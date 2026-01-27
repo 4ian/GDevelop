@@ -16,6 +16,7 @@ namespace gdjs {
     _wasRendered: boolean = false;
     _textureWidth = 0;
     _textureHeight = 0;
+    _cachedWorldAlpha = 255;
 
     constructor(
       runtimeObject: gdjs.PanelSpriteRuntimeObject,
@@ -82,11 +83,19 @@ namespace gdjs {
           this._centerSprite.texture.baseTexture.scaleMode !==
           PIXI.SCALE_MODES.NEAREST
         ) {
+          // This allows to detect opacity changes of a parent custom object.
+          if (this._cachedWorldAlpha !== this._spritesContainer.worldAlpha) {
+            // When the opacity is updated, the cache must be invalidated, otherwise
+            // there is a risk of the panel sprite has been cached previously with a
+            // different opacity (and cannot be updated anymore).
+            this._spritesContainer.cacheAsBitmap = false;
+          }
           // Cache the rendered sprites as a bitmap to speed up rendering when
           // lots of panel sprites are on the scene.
           // Sadly, because of this, we need a wrapper container to workaround
           // a PixiJS issue with alpha (see updateOpacity).
           this._spritesContainer.cacheAsBitmap = true;
+          this._cachedWorldAlpha = this._spritesContainer.worldAlpha;
         }
       }
       this._wasRendered = true;
@@ -97,10 +106,6 @@ namespace gdjs {
       // in Pixi will create a flicker when cacheAsBitmap is set to true.
       // (see https://github.com/pixijs/pixijs/issues/4610)
       this._wrapperContainer.alpha = this._object.opacity / 255;
-      // When the opacity is updated, the cache must be invalidated, otherwise
-      // there is a risk of the panel sprite has been cached previously with a
-      // different opacity (and cannot be updated anymore).
-      this._spritesContainer.cacheAsBitmap = false;
     }
 
     updateAngle(): void {
@@ -435,8 +440,10 @@ namespace gdjs {
     }
   }
 
+  /** @category Renderers > Panel Sprite */
   export const PanelSpriteRuntimeObjectRenderer =
     PanelSpriteRuntimeObjectPixiRenderer;
+  /** @category Renderers > Panel Sprite */
   export type PanelSpriteRuntimeObjectRenderer =
     PanelSpriteRuntimeObjectPixiRenderer;
 }

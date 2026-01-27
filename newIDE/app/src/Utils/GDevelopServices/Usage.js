@@ -9,6 +9,12 @@ import {
 } from '../i18n/MessageByLocale';
 import { extractGDevelopApiErrorStatusAndCode } from './Errors';
 import { isNativeMobileApp } from '../Platform';
+import {
+  ensureIsArray,
+  ensureIsObjectOrNull,
+  ensureObjectHasProperty,
+  ensureIsObjectWithPropertyOfType,
+} from '../DataValidator';
 
 export type Usage = {
   id: string,
@@ -62,6 +68,7 @@ type AiCapability = {
     disabled?: boolean,
     enableWith?: 'higher-tier-plan',
   }>,
+  versionHistory?: { retentionDays: number },
 };
 
 /**
@@ -104,7 +111,10 @@ export type Capabilities = {|
     maxPlayersPerLobby: number,
     themeCustomizationCapabilities: 'NONE' | 'BASIC' | 'FULL',
   |},
-  versionHistory: {| enabled: boolean |},
+  versionHistory: {|
+    enabled: boolean,
+    retentionDays: number,
+  |},
   ai: AiCapability,
 |};
 
@@ -142,7 +152,8 @@ export type Quota = {|
   limitReached: boolean,
   current: number,
   max: number,
-  period?: '1day' | '30days',
+  period: '1day' | '30days' | '7days',
+  resetsAt?: number,
 |};
 
 export type Quotas = {
@@ -227,6 +238,7 @@ export interface UserEarningsBalance {
 }
 
 export type SummarizedPlanFeature = {|
+  featureName: string,
   displayedFeatureName: string,
   description?: string,
   tooltip?: string,
@@ -287,12 +299,17 @@ export const listSubscriptionPlans = async (options: {|
         Authorization: authorizationHeader,
       },
     });
-    return response.data;
+    return ensureIsArray({
+      data: response.data,
+      endpointName: '/subscription-plan of Usage API',
+    });
   }
-  const response = await apiClient.get('/subscription-plan', {
-    params: { includeLegacy: options.includeLegacy ? 'true' : 'false' },
+  return ensureIsArray({
+    data: (await apiClient.get('/subscription-plan', {
+      params: { includeLegacy: options.includeLegacy ? 'true' : 'false' },
+    })).data,
+    endpointName: '/subscription-plan of Usage API',
   });
-  return response.data;
 };
 
 export const getSubscriptionPlanPricingSystem = async (
@@ -302,7 +319,10 @@ export const getSubscriptionPlanPricingSystem = async (
     const response = await apiClient.get(
       `/subscription-plan-pricing-system/${pricingSystemId}`
     );
-    return response.data;
+    return ensureIsObjectOrNull({
+      data: response.data,
+      endpointName: '/subscription-plan-pricing-system/{id} of Usage API',
+    });
   } catch (error) {
     const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(error);
     if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
@@ -337,13 +357,18 @@ export const listSubscriptionPlanPricingSystems = async (options: {|
         Authorization: authorizationHeader,
       },
     });
-    return response.data;
+    return ensureIsArray({
+      data: response.data,
+      endpointName: '/subscription-plan-pricing-system of Usage API',
+    });
   }
 
-  const response = await apiClient.get('/subscription-plan-pricing-system', {
-    params,
+  return ensureIsArray({
+    data: (await apiClient.get('/subscription-plan-pricing-system', {
+      params,
+    })).data,
+    endpointName: '/subscription-plan-pricing-system of Usage API',
   });
-  return response.data;
 };
 
 export const getUserUsages = async (
@@ -360,7 +385,10 @@ export const getUserUsages = async (
       Authorization: authorizationHeader,
     },
   });
-  return response.data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/usage of Usage API',
+  });
 };
 
 export const getUserEarningsBalance = async (
@@ -377,10 +405,10 @@ export const getUserEarningsBalance = async (
       Authorization: authorizationHeader,
     },
   });
-  const userEarningsBalances = response.data;
-  if (!Array.isArray(userEarningsBalances)) {
-    throw new Error('Invalid response from the user earnings API');
-  }
+  const userEarningsBalances = ensureIsArray({
+    data: response.data,
+    endpointName: '/user-earnings-balance of Usage API',
+  });
 
   if (userEarningsBalances.length === 0) {
     throw new Error('No user earnings balance found');
@@ -430,7 +458,11 @@ export const getUserLimits = async (
       Authorization: authorizationHeader,
     },
   });
-  return response.data;
+  return ensureObjectHasProperty({
+    data: response.data,
+    propertyName: 'capabilities',
+    endpointName: '/limits of Usage API',
+  });
 };
 
 export const getUserSubscription = async (
@@ -447,7 +479,11 @@ export const getUserSubscription = async (
       Authorization: authorizationHeader,
     },
   });
-  return response.data;
+  return ensureObjectHasProperty({
+    data: response.data,
+    propertyName: 'userId',
+    endpointName: '/subscription-v2 of Usage API',
+  });
 };
 
 export const changeUserSubscription = async (
@@ -475,18 +511,11 @@ export const changeUserSubscription = async (
     }
   );
 
-  return response.data;
-};
-
-export const canSeamlesslyChangeSubscription = (
-  subscription: Subscription,
-  planId: string
-) => {
-  // Bringing prices with different currencies prevents subscriptions to be changed seamlessly
-  // on Stripe.
-  // TODO: When the backend allows it, make it possible to seamlessly change subscription
-  // if the currencies of the current and requested subscriptions match.
-  return false;
+  return ensureObjectHasProperty({
+    data: response.data,
+    propertyName: 'userId',
+    endpointName: '/subscription-v2 of Usage API',
+  });
 };
 
 export const hasMobileAppStoreSubscriptionPlan = (
@@ -532,7 +561,12 @@ export const getSignedUrl = async (params: {|
   signedUrl: string,
 }> => {
   const response = await apiClient.post('/upload-options/signed-url', params);
-  return response.data;
+  return ensureIsObjectWithPropertyOfType({
+    data: response.data,
+    propertyName: 'signedUrl',
+    propertyType: 'string',
+    endpointName: '/upload-options/signed-url of Usage API',
+  });
 };
 
 export const getSignedUrls = async (params: {|
@@ -545,7 +579,12 @@ export const getSignedUrls = async (params: {|
   signedUrls: Array<string>,
 }> => {
   const response = await apiClient.post('/upload-options/signed-url', params);
-  return response.data;
+  return ensureIsObjectWithPropertyOfType({
+    data: response.data,
+    propertyName: 'signedUrls',
+    propertyType: 'array',
+    endpointName: '/upload-options/signed-url of Usage API',
+  });
 };
 
 export const getRedirectToSubscriptionPortalUrl = async (
@@ -567,11 +606,13 @@ export const getRedirectToSubscriptionPortalUrl = async (
     }
   );
 
-  const { sessionPortalUrl } = response.data;
-  if (!sessionPortalUrl || typeof sessionPortalUrl !== 'string')
-    throw new Error('Could not find the session portal url.');
-
-  return sessionPortalUrl;
+  const data = ensureIsObjectWithPropertyOfType({
+    data: response.data,
+    propertyName: 'sessionPortalUrl',
+    propertyType: 'string',
+    endpointName: '/subscription-v2/action/redirect-to-portal of Usage API',
+  });
+  return data.sessionPortalUrl;
 };
 
 export const getRedirectToCheckoutUrl = ({
@@ -649,8 +690,14 @@ export const shouldHideClassroomTab = (limits: ?Limits) =>
     ? false
     : true;
 
-export const canUseCloudProjectHistory = (limits: ?Limits): boolean =>
-  limits && limits.capabilities.versionHistory.enabled ? true : false;
+export const getCloudProjectHistoryRetentionDays = (limits: ?Limits): number =>
+  limits && limits.capabilities.versionHistory.enabled
+    ? limits.capabilities.versionHistory.retentionDays
+    : 0;
+export const getAiVersionHistoryRetentionDays = (limits: ?Limits): number =>
+  limits && limits.capabilities.ai.versionHistory
+    ? limits.capabilities.ai.versionHistory.retentionDays
+    : 0;
 
 export function getSummarizedSubscriptionPlanFeatures(
   i18n: I18nType,
@@ -672,6 +719,7 @@ export function getSummarizedSubscriptionPlanFeatures(
     }
 
     planFeature = {
+      featureName: feature.featureName,
       displayedFeatureName: selectMessageByLocale(i18n, featureNameByLocale),
     };
 
@@ -715,5 +763,8 @@ export const getRedemptionCodes = async (
     },
   });
 
-  return response.data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/redemption-code of Usage API',
+  });
 };

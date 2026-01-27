@@ -17,6 +17,8 @@
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/PropertiesContainer.h"
+#include "GDCore/Project/ResourcesContainer.h"
+#include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/String.h"
@@ -180,14 +182,15 @@ void ProjectBrowserHelper::ExposeEventsFunctionsExtensionEvents(
          eventsFunctionsExtension.GetEventsFunctions().GetInternalVector()) {
       gd::ObjectsContainer parameterObjectsContainer(
           gd::ObjectsContainer::SourceType::Function);
-    gd::VariablesContainer parameterVariablesContainer(
-        gd::VariablesContainer::SourceType::Parameters);
-    gd::VariablesContainer propertyVariablesContainer(
-        gd::VariablesContainer::SourceType::Properties);
+      gd::VariablesContainer parameterVariablesContainer(
+          gd::VariablesContainer::SourceType::Parameters);
+      gd::ResourcesContainer parameterResourcesContainer(
+          gd::ResourcesContainer::SourceType::Parameters);
       auto projectScopedContainers = gd::ProjectScopedContainers::
           MakeNewProjectScopedContainersForFreeEventsFunction(
               project, eventsFunctionsExtension, *eventsFunction,
-              parameterObjectsContainer, parameterVariablesContainer);
+              parameterObjectsContainer, parameterVariablesContainer,
+              parameterResourcesContainer);
 
       worker.Launch(eventsFunction->GetEvents(), projectScopedContainers);
     }
@@ -240,11 +243,16 @@ void ProjectBrowserHelper::ExposeEventsBasedBehaviorEvents(
         gd::ObjectsContainer::SourceType::Function);
     gd::VariablesContainer parameterVariablesContainer(
         gd::VariablesContainer::SourceType::Parameters);
+    gd::ResourcesContainer parameterResourcesContainer(
+        gd::ResourcesContainer::SourceType::Parameters);
+    gd::ResourcesContainer propertyResourcesContainer(
+        gd::ResourcesContainer::SourceType::Properties);
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForBehaviorEventsFunction(
             project, eventsFunctionsExtension, eventsBasedBehavior,
             *eventsFunction, parameterObjectsContainers,
-            parameterVariablesContainer, propertyVariablesContainer);
+            parameterVariablesContainer, propertyVariablesContainer,
+            parameterResourcesContainer, propertyResourcesContainer);
 
     worker.Launch(eventsFunction->GetEvents(), projectScopedContainers);
   }
@@ -284,11 +292,16 @@ void ProjectBrowserHelper::ExposeEventsBasedObjectEvents(
         gd::ObjectsContainer::SourceType::Function);
     gd::VariablesContainer parameterVariablesContainer(
         gd::VariablesContainer::SourceType::Parameters);
+    gd::ResourcesContainer parameterResourcesContainer(
+        gd::ResourcesContainer::SourceType::Parameters);
+    gd::ResourcesContainer propertyResourcesContainer(
+        gd::ResourcesContainer::SourceType::Properties);
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForObjectEventsFunction(
             project, eventsFunctionsExtension, eventsBasedObject,
             *eventsFunction, parameterObjectsContainers,
-            parameterVariablesContainer, propertyVariablesContainer);
+            parameterVariablesContainer, propertyVariablesContainer,
+            parameterResourcesContainer, propertyResourcesContainer);
 
     worker.Launch(eventsFunction->GetEvents(), projectScopedContainers);
   }
@@ -330,6 +343,12 @@ void ProjectBrowserHelper::ExposeLayoutObjects(gd::Layout &layout,
 
   // Layout objects
   worker.Launch(layout.GetObjects());
+}
+
+void ProjectBrowserHelper::ExposeEventsBasedObjectVariantObjects(
+    gd::EventsBasedObjectVariant &eventsBasedObjectVariant,
+    gd::ArbitraryObjectsWorker &worker) {
+  worker.Launch(eventsBasedObjectVariant.GetObjects());
 }
 
 void ProjectBrowserHelper::ExposeProjectFunctions(

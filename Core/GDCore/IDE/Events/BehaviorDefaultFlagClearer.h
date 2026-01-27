@@ -13,6 +13,7 @@
 namespace gd {
 class Object;
 class Behavior;
+class SerializerElement;
 }  // namespace gd
 
 namespace gd {
@@ -26,7 +27,10 @@ class GD_CORE_API BehaviorDefaultFlagClearer : public ArbitraryObjectsWorker {
   BehaviorDefaultFlagClearer() {};
   virtual ~BehaviorDefaultFlagClearer();
 
- private:
+  static void SerializeObjectWithCleanDefaultBehaviorFlags(
+      const gd::Object &object, SerializerElement &serializerElement);
+
+private:
   void DoVisitObject(gd::Object& object) override;
   void DoVisitBehavior(gd::Behavior& behavior) override;
 };

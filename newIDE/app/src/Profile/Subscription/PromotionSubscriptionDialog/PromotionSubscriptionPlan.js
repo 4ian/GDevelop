@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import Text from '../../../UI/Text';
 import {
   type SubscriptionPlanWithPricingSystems,
   type SubscriptionPlanPricingSystem,
@@ -9,17 +8,14 @@ import {
 import RedemptionCodeIcon from '../../../UI/CustomSvgIcons/RedemptionCode';
 import {
   ColumnStackLayout,
-  LineStackLayout,
   ResponsiveLineStackLayout,
 } from '../../../UI/Layout';
 import { Trans } from '@lingui/macro';
 import FlatButton from '../../../UI/FlatButton';
-import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
-import ShieldChecked from '../../../UI/CustomSvgIcons/ShieldChecked';
-import ThumbsUp from '../../../UI/CustomSvgIcons/ThumbsUp';
 import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import SubscriptionPlanTableSummary from './SubscriptionPlanTableSummary';
 import SubscriptionPlanPricingSummary from './SubscriptionPlanPricingSummary';
+import SecureCheckout from '../../../AssetStore/SecureCheckout/SecureCheckout';
 
 const styles = {
   simpleSizeContainer: {
@@ -48,20 +44,24 @@ const PromotionSubscriptionPlan = ({
   disabled?: boolean,
   onClickRedeemCode: () => void,
   onClickChoosePlan: (
-    pricingSystem: SubscriptionPlanPricingSystem
+    pricingSystem: SubscriptionPlanPricingSystem | null
   ) => Promise<void>,
   seatsCount: number,
   setSeatsCount: (seatsCount: number) => void,
 |}) => {
   const { windowSize } = useResponsiveWindowSize();
   const isLargeScreen = windowSize === 'large' || windowSize === 'xlarge';
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const [period, setPeriod] = React.useState<'year' | 'month'>('year');
 
   return (
     <I18n>
       {({ i18n }) => (
-        <ResponsiveLineStackLayout expand noColumnMargin>
+        <ResponsiveLineStackLayout
+          noMargin
+          expand
+          noColumnMargin
+          noResponsiveLandscape
+        >
           <div
             style={
               isLargeScreen
@@ -76,7 +76,7 @@ const PromotionSubscriptionPlan = ({
             />
           </div>
           <div style={styles.simpleSizeContainer}>
-            <ColumnStackLayout expand noMargin>
+            <ColumnStackLayout noMargin>
               <SubscriptionPlanPricingSummary
                 subscriptionPlanWithPricingSystems={
                   subscriptionPlanWithPricingSystems
@@ -88,26 +88,7 @@ const PromotionSubscriptionPlan = ({
                 period={period}
                 setPeriod={setPeriod}
               />
-              <LineStackLayout justifyContent="center" alignItems="center">
-                <ShieldChecked style={{ color: gdevelopTheme.message.valid }} />
-                <Text color="secondary">
-                  <Trans>Paypal secure</Trans>
-                </Text>
-                <ShieldChecked style={{ color: gdevelopTheme.message.valid }} />
-                <Text color="secondary">
-                  <Trans>Stripe secure</Trans>
-                </Text>
-                <ThumbsUp
-                  style={{
-                    color: gdevelopTheme.message.valid,
-                    width: 20,
-                    height: 20,
-                  }}
-                />
-                <Text color="secondary">
-                  <Trans>Cancel anytime</Trans>
-                </Text>
-              </LineStackLayout>
+              <SecureCheckout includeCancelInformation />
               <FlatButton
                 leftIcon={<RedemptionCodeIcon />}
                 label={<Trans>Redeem a code</Trans>}

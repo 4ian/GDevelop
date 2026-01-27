@@ -15,6 +15,7 @@ namespace gd {
 class Project;
 class Layout;
 class SerializerElement;
+class EventsBasedObjectVariant;
 } // namespace gd
 
 namespace gd {
@@ -27,7 +28,7 @@ namespace gd {
 class SceneResourcesFinder : private gd::ArbitraryResourceWorker {
 public:
   /**
-   * @brief Find resource usages in a given scenes.
+   * @brief Find resource usages in a given scene.
    *
    * It doesn't include resources used globally.
    */
@@ -41,10 +42,17 @@ public:
    */
   static std::set<gd::String> FindProjectResources(gd::Project &project);
 
+  /**
+   * @brief Find resource usages in a given events-based object variant.
+   */
+  static std::set<gd::String>
+  FindEventsBasedObjectVariantResources(gd::Project &project,
+                                        gd::EventsBasedObjectVariant &variant);
+
   virtual ~SceneResourcesFinder(){};
 
 private:
-  SceneResourcesFinder(gd::ResourcesManager &resourcesManager)
+  SceneResourcesFinder(gd::ResourcesContainer &resourcesManager)
       : gd::ArbitraryResourceWorker(resourcesManager){};
 
   void AddUsedResource(gd::String &resourceName);

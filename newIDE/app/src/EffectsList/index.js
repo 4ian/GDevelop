@@ -14,7 +14,6 @@ import IconButton from '../UI/IconButton';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import PropertiesEditor from '../PropertiesEditor';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import AlertMessage from '../UI/AlertMessage';
 import BackgroundText from '../UI/BackgroundText';
@@ -53,8 +52,11 @@ import PasteIcon from '../UI/CustomSvgIcons/Clipboard';
 import CopyIcon from '../UI/CustomSvgIcons/Copy';
 import { type ConnectDragSource } from 'react-dnd';
 import ResponsiveFlatButton from '../UI/ResponsiveFlatButton';
-import { Accordion, AccordionHeader, AccordionBody } from '../UI/Accordion';
-import { type Field } from '../CompactPropertiesEditor';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import InlineCheckbox from '../UI/InlineCheckbox';
+import VisibilityIcon from '../UI/CustomSvgIcons/Visibility';
+import VisibilityOffIcon from '../UI/CustomSvgIcons/VisibilityOff';
+import PropertiesEditorByVisibility from '../PropertiesEditor/PropertiesEditorByVisibility';
 
 const gd: libGDevelop = global.gd;
 
@@ -101,6 +103,7 @@ const Effect = React.forwardRef(
       target,
       project,
       resourceManagementProps,
+      projectScopedContainersAccessor,
       effectsContainer,
       effect,
       removeEffect,
@@ -118,6 +121,7 @@ const Effect = React.forwardRef(
       target: 'object' | 'layer',
       project: gdProject,
       resourceManagementProps: ResourceManagementProps,
+      projectScopedContainersAccessor: ProjectScopedContainersAccessor,
       effectsContainer: gdEffectsContainer,
       effect: gdEffect,
       onEffectsUpdated: () => void,
@@ -190,51 +194,6 @@ const Effect = React.forwardRef(
       effectType
     );
 
-    const parametersSchema = effectMetadata && effectMetadata.parametersSchema;
-    const basicPropertiesSchema = React.useMemo(
-      () =>
-        parametersSchema
-          ? parametersSchema.filter(param => param.valueType && !param.advanced)
-          : [],
-      [parametersSchema]
-    );
-    const advancedPropertiesSchema = React.useMemo(
-      () =>
-        parametersSchema
-          ? parametersSchema.filter(param => param.valueType && param.advanced)
-          : [],
-      [parametersSchema]
-    );
-
-    const areAdvancedPropertiesModified = React.useMemo(
-      () => {
-        return advancedPropertiesSchema.some((field: Field) => {
-          const name = field.valueType ? field.name : null;
-          if (!name) return false;
-          if (
-            field.valueType === 'number'
-              ? !effect.hasDoubleParameter(name)
-              : field.valueType === 'boolean'
-              ? !effect.hasBooleanParameter(name)
-              : !effect.hasStringParameter(name)
-          ) {
-            return false;
-          }
-
-          const current =
-            field.valueType === 'number'
-              ? effect.getDoubleParameter(name)
-              : field.valueType === 'boolean'
-              ? effect.getBooleanParameter(name)
-              : effect.getStringParameter(name);
-
-          const defaultValue = field.valueType ? field.defaultValue : null;
-          return current !== defaultValue;
-        });
-      },
-      [advancedPropertiesSchema, effect]
-    );
-
     return (
       <I18n>
         {({ i18n }) => (
@@ -299,6 +258,24 @@ const Effect = React.forwardRef(
                   </SelectField>
                 </Line>
               </ResponsiveLineStackLayout>
+              <InlineCheckbox
+                id="effect-visibility"
+                paddingSize="small"
+                checkedIcon={<VisibilityIcon />}
+                uncheckedIcon={<VisibilityOffIcon />}
+                checked={effect.isEnabled()}
+                onCheck={(e, checked) => {
+                  effect.setEnabled(checked);
+                  forceUpdate();
+                }}
+                tooltipOrHelperText={
+                  effect.isEnabled() ? (
+                    <Trans>Hide effect</Trans>
+                  ) : (
+                    <Trans>Show effect</Trans>
+                  )
+                }
+              />
               <ElementWithMenu
                 element={
                   <IconButton size="small">
@@ -339,12 +316,14 @@ const Effect = React.forwardRef(
                       <MarkdownText source={effectMetadata.description} />
                     </BackgroundText>
                   </Line>
-                  <PropertiesEditor
-                    key={effect.getEffectType() + '-basic'}
-                    instances={[effect]}
-                    schema={basicPropertiesSchema}
+                  <PropertiesEditorByVisibility
                     project={project}
+                    schema={effectMetadata.parametersSchema}
+                    instances={[effect]}
                     resourceManagementProps={resourceManagementProps}
+                    projectScopedContainersAccessor={
+                      projectScopedContainersAccessor
+                    }
                     renderExtraDescriptionText={
                       showEffectParameterNames
                         ? parameterName =>
@@ -353,40 +332,12 @@ const Effect = React.forwardRef(
                             )
                         : undefined
                     }
+                    placeholder={
+                      <Trans>
+                        There is nothing to configure for this effect.
+                      </Trans>
+                    }
                   />
-                  {advancedPropertiesSchema.length > 0 && (
-                    <Accordion
-                      defaultExpanded={areAdvancedPropertiesModified}
-                      noMargin
-                    >
-                      <AccordionHeader noMargin>
-                        <Text size="sub-title">
-                          <Trans>Advanced properties</Trans>
-                        </Text>
-                      </AccordionHeader>
-                      <AccordionBody disableGutters>
-                        <Column expand noMargin>
-                          <PropertiesEditor
-                            key={effect.getEffectType() + '-advanced'}
-                            instances={[effect]}
-                            schema={advancedPropertiesSchema}
-                            project={project}
-                            resourceManagementProps={resourceManagementProps}
-                            renderExtraDescriptionText={
-                              showEffectParameterNames
-                                ? parameterName =>
-                                    i18n._(
-                                      t`Property name in events: \`${parameterName}\` `
-                                    )
-                                : undefined
-                            }
-                          />
-                        </Column>
-                      </AccordionBody>
-                    </Accordion>
-                  )}
-
-                  <Spacer />
                 </Column>
               </Line>
             )}
@@ -396,16 +347,6 @@ const Effect = React.forwardRef(
     );
   }
 );
-
-type Props = {|
-  project: gdProject,
-  resourceManagementProps: ResourceManagementProps,
-  effectsContainer: gdEffectsContainer,
-  onEffectsUpdated: () => void,
-  onEffectsRenamed: (oldName: string, newName: string) => void,
-  target: 'object' | 'layer',
-  layerRenderingType: string,
-|};
 
 export const getEnumeratedEffectMetadata = (
   allEffectDescriptions: Array<EnumeratedEffectMetadata>,
@@ -477,12 +418,14 @@ export const useManageEffects = ({
   effectsContainer,
   project,
   onEffectsUpdated,
+  onEffectAdded,
   onUpdate,
   target,
 }: {|
   effectsContainer: gdEffectsContainer,
   project: gdProject,
   onEffectsUpdated: () => void,
+  onEffectAdded: () => void,
   onUpdate: () => void,
   target: 'object' | 'layer',
 |}): UseManageEffectsState => {
@@ -544,8 +487,11 @@ export const useManageEffects = ({
 
       onUpdate();
       onEffectsUpdated();
+      // Changing the type is like adding a new effect.
+      // TODO Make a new effect dialog like for objects or behaviors to make this clearer.
+      onEffectAdded();
     },
-    [allEffectMetadata, onUpdate, onEffectsUpdated]
+    [allEffectMetadata, onUpdate, onEffectsUpdated, onEffectAdded]
   );
 
   const _addEffect = React.useCallback(
@@ -809,6 +755,18 @@ export const useManageEffects = ({
   };
 };
 
+type Props = {|
+  project: gdProject,
+  resourceManagementProps: ResourceManagementProps,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
+  effectsContainer: gdEffectsContainer,
+  onEffectsUpdated: () => void,
+  onEffectsRenamed: (oldName: string, newName: string) => void,
+  onEffectAdded: () => void,
+  target: 'object' | 'layer',
+  layerRenderingType: string,
+|};
+
 /**
  * Display a list of effects and allow to add/remove/edit them.
  *
@@ -819,6 +777,7 @@ export default function EffectsList(props: Props) {
     effectsContainer,
     onEffectsUpdated,
     onEffectsRenamed,
+    onEffectAdded,
     project,
     target,
   } = props;
@@ -847,6 +806,7 @@ export default function EffectsList(props: Props) {
     effectsContainer,
     project,
     onEffectsUpdated,
+    onEffectAdded,
     onUpdate: forceUpdate,
     target,
   });
@@ -982,6 +942,9 @@ export default function EffectsList(props: Props) {
                                         layerRenderingType={'3d'}
                                         target={target}
                                         project={project}
+                                        projectScopedContainersAccessor={
+                                          props.projectScopedContainersAccessor
+                                        }
                                         resourceManagementProps={
                                           props.resourceManagementProps
                                         }
@@ -1075,6 +1038,9 @@ export default function EffectsList(props: Props) {
                                         project={project}
                                         resourceManagementProps={
                                           props.resourceManagementProps
+                                        }
+                                        projectScopedContainersAccessor={
+                                          props.projectScopedContainersAccessor
                                         }
                                         effectsContainer={effectsContainer}
                                         effect={effect}

@@ -16,10 +16,12 @@ import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 export const useSearchAndInstallAsset = ({
   project,
   resourceManagementProps,
+  onWillInstallExtension,
   onExtensionInstalled,
 }: {|
-  project: gdProject | null,
+  project: ?gdProject,
   resourceManagementProps: ResourceManagementProps,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |}) => {
   const { profile, getAuthorizationHeader } = React.useContext(
@@ -28,23 +30,26 @@ export const useSearchAndInstallAsset = ({
   const installAsset = useInstallAsset({
     project,
     resourceManagementProps,
+    onWillInstallExtension,
     onExtensionInstalled,
   });
 
   return {
     searchAndInstallAsset: React.useCallback(
       async ({
-        scene,
+        objectsContainer,
         objectName,
         ...assetSearchOptions
       }: AssetSearchAndInstallOptions): Promise<AssetSearchAndInstallResult> => {
         if (!profile) throw new Error('User should be authenticated.');
 
-        const assetSearch: AssetSearch = await retryIfFailed({ times: 2 }, () =>
-          createAssetSearch(getAuthorizationHeader, {
-            userId: profile.id,
-            ...assetSearchOptions,
-          })
+        const assetSearch: AssetSearch = await retryIfFailed(
+          { times: 3, backoff: { initialDelay: 300, factor: 2 } },
+          () =>
+            createAssetSearch(getAuthorizationHeader, {
+              userId: profile.id,
+              ...assetSearchOptions,
+            })
         );
         if (!assetSearch.results || assetSearch.results.length === 0) {
           return {
@@ -63,8 +68,9 @@ export const useSearchAndInstallAsset = ({
 
         const installOutput = await installAsset({
           assetShortHeader,
-          objectsContainer: scene.getObjects(),
+          objectsContainer,
           requestedObjectName: objectName,
+          setIsAssetBeingInstalled: () => {},
         });
 
         if (!installOutput) {

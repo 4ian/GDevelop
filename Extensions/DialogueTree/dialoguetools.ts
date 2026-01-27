@@ -1,4 +1,5 @@
 namespace gdjs {
+  /** @category Other extensions > Dialogue Tree */
   export namespace dialogueTree {
     const logger = new gdjs.Logger('Dialogue tree');
 

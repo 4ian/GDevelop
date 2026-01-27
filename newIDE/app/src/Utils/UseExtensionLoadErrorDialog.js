@@ -113,7 +113,7 @@ export const ExtensionLoadErrorDialog = ({
                     style={{ width: '40%', wordBreak: 'break-word' }}
                   >
                     {rawError && (
-                      <Text>
+                      <Text style={{ whiteSpace: 'pre-wrap' }}>
                         {rawError.toString()}
                         <br />
                         {rawError.stack}

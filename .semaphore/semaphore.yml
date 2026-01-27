@@ -8,6 +8,7 @@ auto_cancel:
   running:
     when: "true"
 blocks:
+  # Note: `git checkout package-lock.json` is done on GDJS to ensure no changes was made by newIDE post-install tasks.
   - name: Install
     task:
       jobs:
@@ -16,28 +17,65 @@ blocks:
             - checkout
             - node -v && npm -v
             - |-
-              if ! cache has_key newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json); then
-                cd newIDE/app
-                npm ci
-                cd ../..
-                cache store newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json) newIDE/app/node_modules
+              can_use_cache() {
+                [ "${SEMAPHORE_GIT_REF_TYPE}" != "pull-request" ] || \
+                [ "${SEMAPHORE_GIT_PR_SLUG}" = "${SEMAPHORE_GIT_REPO_SLUG}" ]
+              }
+
+              NEWIDE_KEY="newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json)"
+              if can_use_cache && cache has_key "${NEWIDE_KEY}"; then
+                echo "Cache hit: ${NEWIDE_KEY}"
+              else
+                if can_use_cache; then
+                  cd newIDE/app
+                  npm ci
+                  cd ../..
+                  cache store "${NEWIDE_KEY}" newIDE/app/node_modules
+                else
+                  echo "Fork PR: skipping cache store for ${NEWIDE_KEY}"
+                fi
               fi
             - |-
-              if ! cache has_key GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json); then
-                cd GDJS
-                git checkout package-lock.json # Ensure no changes was made by newIDE post-install tasks.
-                npm ci
-                cd ..
-                cache store GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json) GDJS/node_modules
+              can_use_cache() {
+                [ "${SEMAPHORE_GIT_REF_TYPE}" != "pull-request" ] || \
+                [ "${SEMAPHORE_GIT_PR_SLUG}" = "${SEMAPHORE_GIT_REPO_SLUG}" ]
+              }
+
+              GDJS_KEY="GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)"
+              if can_use_cache && cache has_key "${GDJS_KEY}"; then
+                echo "Cache hit: ${GDJS_KEY}"
+              else
+                if can_use_cache; then
+                  cd GDJS
+                  git checkout package-lock.json # Ensure no changes was made by newIDE post-install tasks.
+                  npm ci
+                  cd ..
+                  cache store "${GDJS_KEY}" GDJS/node_modules
+                else
+                  echo "Fork PR: skipping cache store for ${GDJS_KEY}"
+                fi
               fi
             - |-
-              if ! cache has_key GDJS-tests-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json); then
-                cd GDJS/tests
-                npm ci
-                cd ../..
-                cache store GDJS-tests-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json) GDJS/tests/node_modules
+              can_use_cache() {
+                [ "${SEMAPHORE_GIT_REF_TYPE}" != "pull-request" ] || \
+                [ "${SEMAPHORE_GIT_PR_SLUG}" = "${SEMAPHORE_GIT_REPO_SLUG}" ]
+              }
+
+              GDJS_TESTS_KEY="GDJS-tests-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json)"
+              if can_use_cache && cache has_key "${GDJS_TESTS_KEY}"; then
+                echo "Cache hit: ${GDJS_TESTS_KEY}"
+              else
+                if can_use_cache; then
+                  cd GDJS/tests
+                  npm ci
+                  cd ../..
+                  cache store "${GDJS_TESTS_KEY}" GDJS/tests/node_modules
+                else
+                  echo "Fork PR: skipping cache store for ${GDJS_TESTS_KEY}"
+                fi
               fi
     dependencies: []
+
   - name: Type checks
     dependencies:
       - Install
@@ -46,22 +84,55 @@ blocks:
         - name: newIDE typing
           commands:
             - checkout
-            - cache restore newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json)
-            - cache restore GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)
+            - |-
+              can_use_cache() {
+                [ "${SEMAPHORE_GIT_REF_TYPE}" != "pull-request" ] || \
+                [ "${SEMAPHORE_GIT_PR_SLUG}" = "${SEMAPHORE_GIT_REPO_SLUG}" ]
+              }
+
+              NEWIDE_KEY="newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json)"
+              GDJS_KEY="GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)"
+
+              if can_use_cache; then
+                cache restore "${NEWIDE_KEY}"
+                cache restore "${GDJS_KEY}"
+              else
+                echo "Fork PR: skipping cache restore"
+                (cd newIDE/app && npm ci)
+                (cd GDJS && git checkout package-lock.json && npm ci)
+              fi
             - cd newIDE/app
             - npm run postinstall
             - npm run flow
             - npm run check-script-types
-            - cd ../..
+
         - name: GDJS typing and documentation generation
           commands:
             - checkout
-            - cache restore newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json)
-            - cache restore GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)
-            - cache restore GDJS-tests-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json)
+            - |-
+              can_use_cache() {
+                [ "${SEMAPHORE_GIT_REF_TYPE}" != "pull-request" ] || \
+                [ "${SEMAPHORE_GIT_PR_SLUG}" = "${SEMAPHORE_GIT_REPO_SLUG}" ]
+              }
+
+              NEWIDE_KEY="newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json)"
+              GDJS_KEY="GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)"
+              GDJS_TESTS_KEY="GDJS-tests-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json)"
+
+              if can_use_cache; then
+                cache restore "${NEWIDE_KEY}"
+                cache restore "${GDJS_KEY}"
+                cache restore "${GDJS_TESTS_KEY}"
+              else
+                echo "Fork PR: skipping cache restore"
+                (cd newIDE/app && npm ci)
+                (cd GDJS && git checkout package-lock.json && npm ci)
+                (cd GDJS/tests && npm ci)
+              fi
             - cd GDJS
             - npm run check-types
             - npm run generate-doc
+
   - name: Auto formatting
     dependencies:
       - Install
@@ -70,19 +141,47 @@ blocks:
         - name: newIDE auto-formatting
           commands:
             - checkout
-            - cache restore newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json)
-            - cache restore GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)
+            - |-
+              can_use_cache() {
+                [ "${SEMAPHORE_GIT_REF_TYPE}" != "pull-request" ] || \
+                [ "${SEMAPHORE_GIT_PR_SLUG}" = "${SEMAPHORE_GIT_REPO_SLUG}" ]
+              }
+
+              NEWIDE_KEY="newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json)"
+              GDJS_KEY="GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)"
+
+              if can_use_cache; then
+                cache restore "${NEWIDE_KEY}"
+                cache restore "${GDJS_KEY}"
+              else
+                echo "Fork PR: skipping cache restore"
+                (cd newIDE/app && npm ci)
+                (cd GDJS && git checkout package-lock.json && npm ci)
+              fi
             - cd newIDE/app
             - npm run postinstall
             - npm run check-format
-            - cd ../..
+
         - name: GDJS auto-formatting
           commands:
             - checkout
-            - cache restore GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)
+            - |-
+              can_use_cache() {
+                [ "${SEMAPHORE_GIT_REF_TYPE}" != "pull-request" ] || \
+                [ "${SEMAPHORE_GIT_PR_SLUG}" = "${SEMAPHORE_GIT_REPO_SLUG}" ]
+              }
+
+              GDJS_KEY="GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)"
+
+              if can_use_cache; then
+                cache restore "${GDJS_KEY}"
+              else
+                echo "Fork PR: skipping cache restore"
+                (cd GDJS && git checkout package-lock.json && npm ci)
+              fi
             - cd GDJS
             - npm run check-format
-            - cd ..
+
   - name: Tests
     dependencies:
       - Install
@@ -91,18 +190,47 @@ blocks:
         - name: newIDE tests
           commands:
             - checkout
-            - cache restore newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json)
-            - cache restore GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)
+            - |-
+              can_use_cache() {
+                [ "${SEMAPHORE_GIT_REF_TYPE}" != "pull-request" ] || \
+                [ "${SEMAPHORE_GIT_PR_SLUG}" = "${SEMAPHORE_GIT_REPO_SLUG}" ]
+              }
+
+              NEWIDE_KEY="newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json)"
+              GDJS_KEY="GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)"
+
+              if can_use_cache; then
+                cache restore "${NEWIDE_KEY}"
+                cache restore "${GDJS_KEY}"
+              else
+                echo "Fork PR: skipping cache restore"
+                (cd newIDE/app && npm ci)
+                (cd GDJS && git checkout package-lock.json && npm ci)
+              fi
             - cd newIDE/app
             - npm run postinstall
             - npm run analyze-test-coverage
-            - cd ../..
+
         - name: GDJS tests
           commands:
             - checkout
-            - cache restore GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)
-            - cache restore GDJS-tests-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json)
+            - |-
+              can_use_cache() {
+                [ "${SEMAPHORE_GIT_REF_TYPE}" != "pull-request" ] || \
+                [ "${SEMAPHORE_GIT_PR_SLUG}" = "${SEMAPHORE_GIT_REPO_SLUG}" ]
+              }
+
+              GDJS_KEY="GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)"
+              GDJS_TESTS_KEY="GDJS-tests-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json)"
+
+              if can_use_cache; then
+                cache restore "${GDJS_KEY}"
+                cache restore "${GDJS_TESTS_KEY}"
+              else
+                echo "Fork PR: skipping cache restore"
+                (cd GDJS && git checkout package-lock.json && npm ci)
+                (cd GDJS/tests && npm ci)
+              fi
             - cd GDJS
             - npm run build
             - npm run test
-            - cd ../..

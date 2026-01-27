@@ -6,6 +6,9 @@
 namespace gdjs {
   type RendererEffects = Record<string, gdjs.PixiFiltersTools.Filter>;
 
+  /**
+   * @category Core Engine > Effects
+   */
   export interface EffectsTarget {
     getRuntimeScene: () => gdjs.RuntimeInstanceContainer;
     getElapsedTime: (
@@ -276,6 +279,12 @@ namespace gdjs {
   }
 
   // Expose the effect manager to the game engine.
+  /**
+   * @category Core Engine > Effects
+   */
   export const EffectsManager = PixiEffectsManager;
+  /**
+   * @category Core Engine > Effects
+   */
   export type EffectsManager = PixiEffectsManager;
 }

@@ -19,8 +19,10 @@ import { type EventsFunctionCreationParameters } from '../EventsFunctionsList/Ev
 import { type EventsBasedObjectCreationParameters } from '../EventsFunctionsList/EventsBasedObjectTreeViewItemContent';
 import Background from '../UI/Background';
 import OptionsEditorDialog from './OptionsEditorDialog';
-import EventsBasedBehaviorEditorPanel from '../EventsBasedBehaviorEditor/EventsBasedBehaviorEditorPanel';
-import EventsBasedObjectEditorPanel from '../EventsBasedObjectEditor/EventsBasedObjectEditorPanel';
+import {
+  EventsBasedBehaviorOrObjectEditor,
+  type EventsBasedBehaviorOrObjectEditorInterface,
+} from './EventsBasedBehaviorOrObjectEditor';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import BehaviorMethodSelectorDialog from './BehaviorMethodSelectorDialog';
 import ObjectMethodSelectorDialog from './ObjectMethodSelectorDialog';
@@ -43,6 +45,9 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import GlobalAndSceneVariablesDialog from '../VariablesList/GlobalAndSceneVariablesDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
+import PropertyListEditor, {
+  type PropertyListEditorInterface,
+} from './PropertyListEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -89,6 +94,8 @@ type Props = {|
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     name: string
   ) => void,
+  onEventBasedObjectTypeChanged: () => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
@@ -149,6 +156,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   };
   editor: ?EventsSheetInterface;
   eventsFunctionList: ?EventsFunctionsListInterface;
+  eventsBasedBehaviorEditor: ?EventsBasedBehaviorOrObjectEditorInterface;
+  eventsBasedObjectEditor: ?EventsBasedBehaviorOrObjectEditorInterface;
+  propertyListEditor: ?PropertyListEditorInterface;
   _editorMosaic: ?EditorMosaicInterface;
   _editorNavigator: ?EditorNavigatorInterface;
   // Create an empty "context" of objects.
@@ -168,6 +178,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   );
   _propertyVariablesContainer: gdVariablesContainer = new gd.VariablesContainer(
     gd.VariablesContainer.Properties
+  );
+  _parameterResourcesContainer: gdResourcesContainer = new gd.ResourcesContainer(
+    gd.ResourcesContainer.Parameters
+  );
+  _propertyResourcesContainer: gdResourcesContainer = new gd.ResourcesContainer(
+    gd.ResourcesContainer.Properties
   );
   _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = null;
 
@@ -190,6 +206,14 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   componentWillUnmount() {
     if (this._globalObjectsContainer) this._globalObjectsContainer.delete();
     if (this._objectsContainer) this._objectsContainer.delete();
+    if (this._parameterVariablesContainer)
+      this._parameterVariablesContainer.delete();
+    if (this._propertyVariablesContainer)
+      this._propertyVariablesContainer.delete();
+    if (this._parameterResourcesContainer)
+      this._parameterResourcesContainer.delete();
+    if (this._propertyResourcesContainer)
+      this._propertyResourcesContainer.delete();
   }
 
   _updateProjectScopedContainer = () => {
@@ -222,7 +246,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       scope,
       this._objectsContainer,
       this._parameterVariablesContainer,
-      this._propertyVariablesContainer
+      this._propertyVariablesContainer,
+      this._parameterResourcesContainer,
+      this._propertyResourcesContainer
     );
   };
 
@@ -333,6 +359,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         this.updateToolbar();
 
         if (this._editorMosaic) {
+          // The `parameters` side panel may have been collapsed from
+          // a previous release.
           this._editorMosaic.uncollapseEditor('parameters', 25);
         }
         if (this._editorNavigator) {
@@ -621,10 +649,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       },
       () => {
         this.updateToolbar();
+        if (this._editorMosaic) {
+          // The `parameters` side panel may have been collapsed from
+          // a previous release.
+          this._editorMosaic.uncollapseEditor('parameters', 25);
+        }
         if (selectedEventsBasedBehavior) {
-          if (this._editorMosaic) {
-            this._editorMosaic.collapseEditor('parameters');
-          }
           if (this._editorNavigator) {
             this._editorNavigator.openEditor('events-sheet');
           }
@@ -648,10 +678,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       },
       () => {
         this.updateToolbar();
+        if (this._editorMosaic) {
+          // The `parameters` side panel may have been collapsed from
+          // a previous release.
+          this._editorMosaic.uncollapseEditor('parameters', 25);
+        }
         if (selectedEventsBasedObject) {
-          if (this._editorMosaic) {
-            this._editorMosaic.collapseEditor('parameters');
-          }
           if (this._editorNavigator)
             this._editorNavigator.openEditor('events-sheet');
         }
@@ -817,6 +849,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     // It can happen when an event-based object is deleted and another one is
     // renamed to replace it.
     this.props.onEventsBasedObjectChildrenEdited(eventsBasedObject);
+    this.props.onEventBasedObjectTypeChanged();
   };
 
   _onDeleteEventsBasedBehavior = (
@@ -1342,7 +1375,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     const editors = {
       parameters: {
         type: 'primary',
-        title: t`Function Configuration`,
+        title: selectedEventsFunction
+          ? t`Function Configuration`
+          : t`Properties`,
         toolbarControls: [],
         renderEditor: () => (
           <I18n>
@@ -1400,6 +1435,66 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     }
                     unsavedChanges={this.props.unsavedChanges}
                     getFunctionGroupNames={this._getFunctionGroupNames}
+                  />
+                ) : (selectedEventsBasedObject ||
+                    selectedEventsBasedBehavior) &&
+                  this._projectScopedContainersAccessor ? (
+                  <PropertyListEditor
+                    ref={ref => (this.propertyListEditor = ref)}
+                    project={project}
+                    projectScopedContainersAccessor={
+                      this._projectScopedContainersAccessor
+                    }
+                    extension={eventsFunctionsExtension}
+                    eventsBasedBehavior={selectedEventsBasedBehavior}
+                    eventsBasedObject={selectedEventsBasedObject}
+                    onRenameProperty={(oldName, newName) => {
+                      if (selectedEventsBasedBehavior) {
+                        this._onBehaviorPropertyRenamed(
+                          selectedEventsBasedBehavior,
+                          oldName,
+                          newName
+                        );
+                      } else if (selectedEventsBasedObject) {
+                        this._onObjectPropertyRenamed(
+                          selectedEventsBasedObject,
+                          oldName,
+                          newName
+                        );
+                      }
+                    }}
+                    onPropertiesUpdated={() => {
+                      const eventsBasedEntityEditor =
+                        this.eventsBasedBehaviorEditor ||
+                        this.eventsBasedObjectEditor;
+                      if (eventsBasedEntityEditor) {
+                        eventsBasedEntityEditor.forceUpdateProperties();
+                      }
+                    }}
+                    onOpenConfiguration={propertyName => {
+                      const eventsBasedEntityEditor =
+                        this.eventsBasedBehaviorEditor ||
+                        this.eventsBasedObjectEditor;
+                      if (eventsBasedEntityEditor) {
+                        eventsBasedEntityEditor.scrollToConfiguration();
+                      }
+                    }}
+                    onOpenProperty={(propertyName, isSharedProperties) => {
+                      const eventsBasedEntityEditor =
+                        this.eventsBasedBehaviorEditor ||
+                        this.eventsBasedObjectEditor;
+                      if (eventsBasedEntityEditor) {
+                        eventsBasedEntityEditor.scrollToProperty(
+                          propertyName,
+                          isSharedProperties
+                        );
+                      }
+                    }}
+                    onEventsFunctionsAdded={() => {
+                      if (this.eventsFunctionList) {
+                        this.eventsFunctionList.forceUpdateList();
+                      }
+                    }}
                   />
                 ) : (
                   <EmptyMessage>
@@ -1463,12 +1558,14 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 hotReloadPreviewButtonProps={
                   this.props.hotReloadPreviewButtonProps
                 }
+                onWillInstallExtension={this.props.onWillInstallExtension}
                 onExtensionInstalled={this.props.onExtensionInstalled}
               />
             </Background>
           ) : selectedEventsBasedBehavior &&
             this._projectScopedContainersAccessor ? (
-            <EventsBasedBehaviorEditorPanel
+            <EventsBasedBehaviorOrObjectEditor
+              ref={ref => (this.eventsBasedBehaviorEditor = ref)}
               project={project}
               projectScopedContainersAccessor={
                 this._projectScopedContainersAccessor
@@ -1498,16 +1595,32 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   propertyName
                 );
               }}
+              onPropertiesUpdated={() => {
+                if (this.propertyListEditor) {
+                  this.propertyListEditor.forceUpdateList();
+                }
+              }}
+              onFocusProperty={(propertyName, isSharedProperties) => {
+                if (this.propertyListEditor) {
+                  this.propertyListEditor.setSelectedProperty(
+                    propertyName,
+                    isSharedProperties
+                  );
+                }
+              }}
               onEventsFunctionsAdded={() => {
                 if (this.eventsFunctionList) {
                   this.eventsFunctionList.forceUpdateList();
                 }
               }}
               onConfigurationUpdated={this._onConfigurationUpdated}
+              onOpenCustomObjectEditor={() => {}}
+              onEventsBasedObjectChildrenEdited={() => {}}
             />
           ) : selectedEventsBasedObject &&
             this._projectScopedContainersAccessor ? (
-            <EventsBasedObjectEditorPanel
+            <EventsBasedBehaviorOrObjectEditor
+              ref={ref => (this.eventsBasedObjectEditor = ref)}
               project={project}
               projectScopedContainersAccessor={
                 this._projectScopedContainersAccessor
@@ -1522,6 +1635,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   newName
                 )
               }
+              onRenameSharedProperty={() => {}}
               onPropertyTypeChanged={propertyName => {
                 gd.WholeProjectRefactorer.changeEventsBasedObjectPropertyType(
                   project,
@@ -1529,6 +1643,19 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   selectedEventsBasedObject,
                   propertyName
                 );
+              }}
+              onPropertiesUpdated={() => {
+                if (this.propertyListEditor) {
+                  this.propertyListEditor.forceUpdateList();
+                }
+              }}
+              onFocusProperty={(propertyName, isSharedProperties) => {
+                if (this.propertyListEditor) {
+                  this.propertyListEditor.setSelectedProperty(
+                    propertyName,
+                    isSharedProperties
+                  );
+                }
               }}
               onEventsFunctionsAdded={() => {
                 if (this.eventsFunctionList) {
@@ -1602,6 +1729,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 }
                 onSelectExtensionSceneVariables={() => this._editVariables()}
                 onOpenCustomObjectEditor={this.props.onOpenCustomObjectEditor}
+                onEventBasedObjectTypeChanged={
+                  this.props.onEventBasedObjectTypeChanged
+                }
               />
             )}
           </I18n>
@@ -1623,7 +1753,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 transitions={{
                   'events-sheet': {
                     nextIcon: <Tune />,
-                    nextLabel: <Trans>Parameters</Trans>,
+                    nextLabel: selectedEventsFunction ? (
+                      <Trans>Parameters</Trans>
+                    ) : (
+                      <Trans>Property list</Trans>
+                    ),
                     nextEditor: 'parameters',
                     previousEditor: () => {
                       this._selectEventsFunction(null, null, null);
@@ -1632,8 +1766,39 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   },
                   parameters: {
                     nextIcon: <Mark />,
-                    nextLabel: <Trans>Validate these parameters</Trans>,
-                    nextEditor: 'events-sheet',
+                    nextLabel: selectedEventsFunction ? (
+                      <Trans>Validate these parameters</Trans>
+                    ) : null,
+                    nextEditor: selectedEventsFunction ? 'events-sheet' : null,
+                    previousEditor: selectedEventsFunction
+                      ? null
+                      : () => {
+                          if (this.propertyListEditor) {
+                            const selection = this.propertyListEditor.getSelectedProperty();
+                            if (selection) {
+                              const {
+                                propertyName,
+                                isSharedProperties,
+                              } = selection;
+                              // Scroll to the selected property.
+                              // Ideally, we'd wait for the list to be updated to scroll, but
+                              // to simplify the code, we just wait a few ms for a new render
+                              // to be done.
+                              setTimeout(() => {
+                                const eventsBasedEntityEditor =
+                                  this.eventsBasedBehaviorEditor ||
+                                  this.eventsBasedObjectEditor;
+                                if (eventsBasedEntityEditor) {
+                                  eventsBasedEntityEditor.scrollToProperty(
+                                    propertyName,
+                                    isSharedProperties
+                                  );
+                                }
+                              }, 100); // A few ms is enough for a new render to be done.
+                            }
+                          }
+                          return 'events-sheet';
+                        },
                   },
                 }}
                 onEditorChanged={
@@ -1653,6 +1818,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   <EditorMosaic
                     ref={editorMosaic => (this._editorMosaic = editorMosaic)}
                     editors={editors}
+                    centralNodeId="events-sheet"
                     onPersistNodes={node =>
                       setDefaultEditorMosaicNode(
                         'events-functions-extension-editor',

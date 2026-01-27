@@ -459,9 +459,13 @@ const AnimationList = React.forwardRef<
         if (!selectedResourceSource) return;
 
         if (selectedResourceSource.shouldCreateResource) {
+          let hasCreatedAnyResource = false;
           selectedResources.forEach(resource => {
             applyResourceDefaults(project, resource);
-            project.getResourcesManager().addResource(resource);
+            const hasCreatedResource = project
+              .getResourcesManager()
+              .addResource(resource);
+            hasCreatedAnyResource = hasCreatedAnyResource || hasCreatedResource;
           });
 
           const resourcesByAnimation = selectedResourceSource.shouldGuessAnimationsFromName
@@ -473,7 +477,10 @@ const AnimationList = React.forwardRef<
           // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
           selectedResources.forEach(resource => resource.delete());
 
-          await resourceManagementProps.onFetchNewlyAddedResources();
+          if (hasCreatedAnyResource) {
+            await resourceManagementProps.onFetchNewlyAddedResources();
+            resourceManagementProps.onNewResourcesAdded();
+          }
         } else {
           const resourcesByAnimation = new Map<string, Array<gdResource>>();
           resourcesByAnimation.set('default', selectedResources);

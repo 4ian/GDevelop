@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react';
+import { action } from '@storybook/addon-actions';
 
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
@@ -22,6 +23,9 @@ export const Default = () => (
   >
     <PanelSpriteEditor
       objectConfiguration={testProject.panelSpriteObject.getConfiguration()}
+      projectScopedContainersAccessor={
+        testProject.testSceneProjectScopedContainersAccessor
+      }
       project={testProject.project}
       layout={testProject.testLayout}
       eventsFunctionsExtension={null}

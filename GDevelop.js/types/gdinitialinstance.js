@@ -43,6 +43,12 @@ declare class gdInitialInstance {
   getCustomHeight(): number;
   setCustomDepth(depth: number): void;
   getCustomDepth(): number;
+  getDefaultWidth(): number;
+  getDefaultHeight(): number;
+  getDefaultDepth(): number;
+  setDefaultWidth(width: number): void;
+  setDefaultHeight(height: number): void;
+  setDefaultDepth(depth: number): void;
   resetPersistentUuid(): gdInitialInstance;
   getPersistentUuid(): string;
   updateCustomProperty(name: string, value: string, globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer): void;

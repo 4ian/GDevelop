@@ -10,24 +10,20 @@ import { type ProjectScopedContainersAccessor } from '../../InstructionOrExpress
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import ScrollView from '../../UI/ScrollView';
 import { Column, Line, Spacer, marginsSize } from '../../UI/Grid';
-import CompactPropertiesEditor, {
-  Separator,
-} from '../../CompactPropertiesEditor';
+import { Separator } from '../../CompactPropertiesEditor';
 import Text from '../../UI/Text';
 import { Trans, t } from '@lingui/macro';
 import IconButton from '../../UI/IconButton';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
-import propertiesMapToSchema from '../../CompactPropertiesEditor/PropertiesMapToCompactSchema';
 import { type ObjectEditorTab } from '../../ObjectEditor/ObjectEditorDialog';
 import { CompactBehaviorPropertiesEditor } from './CompactBehaviorPropertiesEditor';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import Paper from '../../UI/Paper';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import { IconContainer } from '../../UI/IconContainer';
-import Remove from '../../UI/CustomSvgIcons/Remove';
-import useForceUpdate, { useForceRecompute } from '../../Utils/UseForceUpdate';
-import ChevronArrowTop from '../../UI/CustomSvgIcons/ChevronArrowTop';
+import RemoveIcon from '../../UI/CustomSvgIcons/Remove';
+import useForceUpdate from '../../Utils/UseForceUpdate';
 import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
 import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
 import ChevronArrowDownWithRoundedBorder from '../../UI/CustomSvgIcons/ChevronArrowDownWithRoundedBorder';
@@ -38,17 +34,11 @@ import Edit from '../../UI/CustomSvgIcons/ShareExternal';
 import { useManageObjectBehaviors } from '../../BehaviorsEditor';
 import Object3d from '../../UI/CustomSvgIcons/Object3d';
 import Object2d from '../../UI/CustomSvgIcons/Object2d';
-import { CompactEffectPropertiesEditor } from '../../EffectsList/CompactEffectPropertiesEditor';
 import { mapFor } from '../../Utils/MapFor';
-import {
-  getEnumeratedEffectMetadata,
-  useManageEffects,
-} from '../../EffectsList';
 import CompactSelectField from '../../UI/CompactSelectField';
 import SelectOption from '../../UI/SelectOption';
 import { ChildObjectPropertiesEditor } from './ChildObjectPropertiesEditor';
 import { getSchemaWithOpenFullEditorButton } from './CompactObjectPropertiesSchema';
-import FlatButton from '../../UI/FlatButton';
 import Help from '../../UI/CustomSvgIcons/Help';
 import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
@@ -64,6 +54,11 @@ import {
 } from '../Editors/CustomObjectPropertiesEditor';
 import NewVariantDialog from '../Editors/CustomObjectPropertiesEditor/NewVariantDialog';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
+import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
+import { CompactEffectsListEditor } from '../../LayersList/CompactLayerPropertiesEditor/CompactEffectsListEditor';
+import { CompactPropertiesEditorByVisibility } from '../../CompactPropertiesEditor/CompactPropertiesEditorByVisibility';
+import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
+import { useForceRecompute } from '../../Utils/UseForceUpdate';
 
 const gd: libGDevelop = global.gd;
 
@@ -90,10 +85,16 @@ export const styles = {
 };
 
 const behaviorsHelpLink = getHelpLink('/behaviors');
-const effectsHelpLink = getHelpLink('/objects/effects');
 const objectVariablesHelpLink = getHelpLink(
   '/all-features/variables/object-variables'
 );
+
+type TitleBarButton = {|
+  id: string,
+  icon: any,
+  label?: MessageDescriptor,
+  onClick?: () => void,
+|};
 
 const CollapsibleSubPanel = ({
   renderContent,
@@ -101,14 +102,14 @@ const CollapsibleSubPanel = ({
   toggleFolded,
   title,
   titleIcon,
-  onRemove,
+  titleBarButtons,
 }: {|
   renderContent: () => React.Node,
   isFolded: boolean,
   toggleFolded: () => void,
   titleIcon?: ?React.Node,
   title: string,
-  onRemove?: () => void,
+  titleBarButtons?: Array<TitleBarButton>,
 |}) => (
   <Paper background="medium">
     <Line expand>
@@ -129,19 +130,24 @@ const CollapsibleSubPanel = ({
               {title}
             </Text>
           </Line>
-
-          {onRemove ? (
-            <Line noMargin>
-              <IconButton
-                tooltip={t`Remove behavior`}
-                onClick={onRemove}
-                size="small"
-              >
-                <Remove style={styles.icon} />
-              </IconButton>
-              <Spacer />
-            </Line>
-          ) : null}
+          <Line noMargin>
+            {titleBarButtons &&
+              titleBarButtons.map(button => {
+                const Icon = button.icon;
+                return (
+                  <IconButton
+                    key={button.id}
+                    id={button.id}
+                    tooltip={button.label}
+                    onClick={button.onClick}
+                    size="small"
+                  >
+                    <Icon style={styles.icon} />
+                  </IconButton>
+                );
+              })}
+            <Spacer />
+          </Line>
         </LineStackLayout>
         {isFolded ? null : (
           <div style={styles.subPanelContentContainer}>{renderContent()}</div>
@@ -226,6 +232,8 @@ type Props = {|
 
   objects: Array<gdObject>,
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
+  onObjectsModified: (objects: Array<gdObject>) => void,
+  onEffectAdded: () => void,
   onOpenEventBasedObjectVariantEditor: (
     extensionName: string,
     eventsBasedObjectName: string,
@@ -236,6 +244,7 @@ type Props = {|
     eventBasedObject: gdEventsBasedObject,
     variant: gdEventsBasedObjectVariant
   ) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   isVariableListLocked: boolean,
   isBehaviorListLocked: boolean,
@@ -256,27 +265,24 @@ export const CompactObjectPropertiesEditor = ({
   historyHandler,
   objects,
   onEditObject,
+  onObjectsModified,
+  onEffectAdded,
   onOpenEventBasedObjectVariantEditor,
   onDeleteEventsBasedObjectVariant,
+  onWillInstallExtension,
   onExtensionInstalled,
   isVariableListLocked,
   isBehaviorListLocked,
 }: Props) => {
   const forceUpdate = useForceUpdate();
-  const [
-    showObjectAdvancedOptions,
-    setShowObjectAdvancedOptions,
-  ] = React.useState(false);
   const [isPropertiesFolded, setIsPropertiesFolded] = React.useState(false);
   const [isBehaviorsFolded, setIsBehaviorsFolded] = React.useState(false);
   const [isVariablesFolded, setIsVariablesFolded] = React.useState(false);
-  const [isEffectsFolded, setIsEffectsFolded] = React.useState(false);
   const [newVariantDialogOpen, setNewVariantDialogOpen] = React.useState(false);
   const [
     duplicateAndEditVariantDialogOpen,
     setDuplicateAndEditVariantDialogOpen,
   ] = React.useState(false);
-  const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
   const { showDeleteConfirmation } = useAlertDialog();
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
   const object = objects[0];
@@ -304,60 +310,6 @@ export const CompactObjectPropertiesEditor = ({
     gd.ObjectConfiguration
   );
 
-  // Properties:
-  const objectBasicPropertiesSchema = React.useMemo(
-    () => {
-      if (schemaRecomputeTrigger) {
-        // schemaRecomputeTrigger allows to invalidate the schema when required.
-      }
-
-      const properties = objectConfigurationAsGd.getProperties();
-      const objectBasicPropertiesSchema = propertiesMapToSchema({
-        properties,
-        getProperties: ({ object, objectConfiguration }) =>
-          objectConfiguration.getProperties(),
-        onUpdateProperty: ({ object, objectConfiguration }, name, value) =>
-          objectConfiguration.updateProperty(name, value),
-        visibility: 'Basic',
-      });
-
-      return getSchemaWithOpenFullEditorButton({
-        schema: objectBasicPropertiesSchema,
-        fullEditorLabel,
-        object,
-        onEditObject,
-      });
-    },
-    [
-      objectConfigurationAsGd,
-      schemaRecomputeTrigger,
-      fullEditorLabel,
-      object,
-      onEditObject,
-    ]
-  );
-  const objectAdvancedPropertiesSchema = React.useMemo(
-    () => {
-      if (schemaRecomputeTrigger) {
-        // schemaRecomputeTrigger allows to invalidate the schema when required.
-      }
-
-      const properties = objectConfigurationAsGd.getProperties();
-      return propertiesMapToSchema({
-        properties,
-        getProperties: ({ object, objectConfiguration }) =>
-          objectConfiguration.getProperties(),
-        onUpdateProperty: ({ object, objectConfiguration }, name, value) =>
-          objectConfiguration.updateProperty(name, value),
-        visibility: 'Advanced',
-      });
-    },
-    [objectConfigurationAsGd, schemaRecomputeTrigger]
-  );
-  const hasObjectAdvancedProperties = objectAdvancedPropertiesSchema.length > 0;
-  const hasSomeObjectProperties =
-    objectBasicPropertiesSchema.length > 0 || hasObjectAdvancedProperties;
-
   // Behaviors:
   const {
     openNewBehaviorDialog,
@@ -371,6 +323,7 @@ export const CompactObjectPropertiesEditor = ({
     onUpdate: forceUpdate,
     onBehaviorsUpdated: forceUpdate,
     onUpdateBehaviorsSharedData,
+    onWillInstallExtension,
     onExtensionInstalled,
   });
 
@@ -379,22 +332,6 @@ export const CompactObjectPropertiesEditor = ({
     .toJSArray()
     .map(behaviorName => object.getBehavior(behaviorName))
     .filter(behavior => !behavior.isDefaultBehavior());
-
-  // Effects:
-  const effectsContainer = object.getEffects();
-  const {
-    allEffectMetadata,
-    all2DEffectMetadata,
-    addEffect,
-    removeEffect,
-    chooseEffectType,
-  } = useManageEffects({
-    effectsContainer,
-    project,
-    onEffectsUpdated: forceUpdate,
-    onUpdate: forceUpdate,
-    target: 'object',
-  });
 
   // Events based object children:
   const customObjectEventsBasedObject = project.hasEventsBasedObject(
@@ -541,6 +478,39 @@ export const CompactObjectPropertiesEditor = ({
     ]
   );
 
+  const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
+
+  const propertiesSchema = React.useMemo(
+    () => {
+      if (schemaRecomputeTrigger) {
+        // schemaRecomputeTrigger allows to invalidate the schema when required.
+      }
+      const properties = objectConfigurationAsGd.getProperties();
+      return propertiesMapToSchema({
+        properties,
+        defaultValueProperties: customObjectEventsBasedObject
+          ? customObjectEventsBasedObject.getPropertyDescriptors()
+          : // We can't access default values for built-in objects.
+            null,
+        getProperties: ({ objectConfiguration }) =>
+          objectConfiguration.getProperties(),
+        onUpdateProperty: ({ objectConfiguration }, name, value) => {
+          objectConfiguration.updateProperty(name, value);
+          onObjectsModified([object]);
+        },
+        object,
+        visibility: 'All',
+      });
+    },
+    [
+      schemaRecomputeTrigger,
+      objectConfigurationAsGd,
+      object,
+      customObjectEventsBasedObject,
+      onObjectsModified,
+    ]
+  );
+
   return (
     <ErrorBoundary
       componentTitle={<Trans>Object properties</Trans>}
@@ -592,63 +562,28 @@ export const CompactObjectPropertiesEditor = ({
             onOpenFullEditor={openFullEditor}
             renderContent={() => (
               <ColumnStackLayout noMargin noOverflowParent>
-                {!hasSomeObjectProperties && (
-                  <Text size="body2" align="center" color="secondary">
-                    <Trans>This object has no properties.</Trans>
-                  </Text>
-                )}
-                {hasSomeObjectProperties && (
-                  <CompactPropertiesEditor
-                    project={project}
-                    resourceManagementProps={resourceManagementProps}
-                    unsavedChanges={unsavedChanges}
-                    schema={objectBasicPropertiesSchema}
-                    instances={[
-                      { object, objectConfiguration: objectConfigurationAsGd },
-                    ]}
-                    onInstancesModified={() => {
-                      // TODO: undo/redo?
-                    }}
-                    onRefreshAllFields={forceRecomputeSchema}
-                  />
-                )}
-                {!showObjectAdvancedOptions && hasObjectAdvancedProperties && (
-                  <FlatButton
-                    fullWidth
-                    primary
-                    leftIcon={<ChevronArrowRight style={styles.icon} />}
-                    label={<Trans>Show more</Trans>}
-                    onClick={() => {
-                      setShowObjectAdvancedOptions(true);
-                    }}
-                  />
-                )}
-                {showObjectAdvancedOptions && hasObjectAdvancedProperties && (
-                  <CompactPropertiesEditor
-                    project={project}
-                    resourceManagementProps={resourceManagementProps}
-                    unsavedChanges={unsavedChanges}
-                    schema={objectAdvancedPropertiesSchema}
-                    instances={[
-                      { object, objectConfiguration: objectConfigurationAsGd },
-                    ]}
-                    onInstancesModified={() => {
-                      // TODO: undo/redo?
-                    }}
-                    onRefreshAllFields={forceRecomputeSchema}
-                  />
-                )}
-                {showObjectAdvancedOptions && hasObjectAdvancedProperties && (
-                  <FlatButton
-                    fullWidth
-                    primary
-                    leftIcon={<ChevronArrowTop style={styles.icon} />}
-                    label={<Trans>Show less</Trans>}
-                    onClick={() => {
-                      setShowObjectAdvancedOptions(false);
-                    }}
-                  />
-                )}
+                <CompactPropertiesEditorByVisibility
+                  project={project}
+                  object={object}
+                  schema={propertiesSchema}
+                  instances={[
+                    { object, objectConfiguration: objectConfigurationAsGd },
+                  ]}
+                  onInstancesModified={() => {
+                    // TODO: undo/redo?
+                  }}
+                  resourceManagementProps={resourceManagementProps}
+                  placeholder={<Trans>This object has no properties.</Trans>}
+                  customizeBasicSchema={schema =>
+                    getSchemaWithOpenFullEditorButton({
+                      schema,
+                      fullEditorLabel,
+                      object,
+                      onEditObject,
+                    })
+                  }
+                  onRefreshAllFields={forceRecomputeSchema}
+                />
                 {shouldDisplayVariant && (
                   <ColumnStackLayout noMargin noOverflowParent>
                     <LineStackLayout noMargin justifyContent="space-between">
@@ -686,6 +621,7 @@ export const CompactObjectPropertiesEditor = ({
                       onChange={(newValue: string) => {
                         customObjectConfiguration &&
                           customObjectConfiguration.setVariantName(newValue);
+                        onObjectsModified([object]);
                         forceUpdate();
                       }}
                     >
@@ -753,7 +689,6 @@ export const CompactObjectPropertiesEditor = ({
                                 customObjectConfiguration
                               }
                               childObject={childObject}
-                              onRefreshAllFields={forceRecomputeSchema}
                               onEditObject={openFullEditor}
                             />
                           )}
@@ -837,9 +772,16 @@ export const CompactObjectPropertiesEditor = ({
                         ) : null
                       }
                       title={behavior.getName()}
-                      onRemove={() => {
-                        removeBehavior(behavior.getName());
-                      }}
+                      titleBarButtons={[
+                        {
+                          id: 'remove-behavior',
+                          icon: RemoveIcon,
+                          label: t`Remove behavior`,
+                          onClick: () => {
+                            removeBehavior(behavior.getName());
+                          },
+                        },
+                      ]}
                     />
                   );
                 })}
@@ -909,94 +851,20 @@ export const CompactObjectPropertiesEditor = ({
             objectMetadata.hasDefaultBehavior(
               'EffectCapability::EffectBehavior'
             ) && (
-              <TopLevelCollapsibleSection
-                title={<Trans>Effects</Trans>}
-                isFolded={isEffectsFolded}
-                toggleFolded={() => setIsEffectsFolded(!isEffectsFolded)}
+              <CompactEffectsListEditor
+                layerRenderingType={'2d'}
+                target={'layer'}
+                project={project}
+                resourceManagementProps={resourceManagementProps}
+                projectScopedContainersAccessor={
+                  projectScopedContainersAccessor
+                }
+                unsavedChanges={unsavedChanges}
+                i18n={i18n}
+                effectsContainer={object.getEffects()}
+                onEffectsUpdated={() => onObjectsModified([object])}
                 onOpenFullEditor={() => onEditObject(object, 'effects')}
-                onAdd={() => addEffect(false)}
-                renderContent={() => (
-                  <ColumnStackLayout noMargin>
-                    {effectsContainer.getEffectsCount() === 0 && (
-                      <Text size="body2" align="center" color="secondary">
-                        <Trans>
-                          There are no{' '}
-                          <Link
-                            href={effectsHelpLink}
-                            onClick={() =>
-                              Window.openExternalURL(effectsHelpLink)
-                            }
-                          >
-                            effects
-                          </Link>{' '}
-                          on this object.
-                        </Trans>
-                      </Text>
-                    )}
-                    {mapFor(
-                      0,
-                      effectsContainer.getEffectsCount(),
-                      (index: number) => {
-                        const effect: gdEffect = effectsContainer.getEffectAt(
-                          index
-                        );
-                        const effectType = effect.getEffectType();
-                        const effectMetadata = getEnumeratedEffectMetadata(
-                          allEffectMetadata,
-                          effectType
-                        );
-
-                        return (
-                          <CollapsibleSubPanel
-                            key={effect.ptr}
-                            renderContent={() => (
-                              <ColumnStackLayout
-                                noMargin
-                                expand
-                                noOverflowParent
-                              >
-                                <CompactSelectField
-                                  value={effectType}
-                                  onChange={type =>
-                                    chooseEffectType(effect, type)
-                                  }
-                                >
-                                  {all2DEffectMetadata.map(effectMetadata => (
-                                    <SelectOption
-                                      key={effectMetadata.type}
-                                      value={effectMetadata.type}
-                                      label={effectMetadata.fullName}
-                                      disabled={
-                                        effectMetadata.isMarkedAsNotWorkingForObjects
-                                      }
-                                    />
-                                  ))}
-                                </CompactSelectField>
-                                <CompactEffectPropertiesEditor
-                                  project={project}
-                                  effect={effect}
-                                  effectMetadata={effectMetadata}
-                                  resourceManagementProps={
-                                    resourceManagementProps
-                                  }
-                                />
-                              </ColumnStackLayout>
-                            )}
-                            isFolded={effect.isFolded()}
-                            toggleFolded={() => {
-                              effect.setFolded(!effect.isFolded());
-                              forceUpdate();
-                            }}
-                            title={effect.getName()}
-                            onRemove={() => {
-                              removeEffect(effect);
-                            }}
-                          />
-                        );
-                      }
-                    )}
-                  </ColumnStackLayout>
-                )}
+                onEffectAdded={onEffectAdded}
               />
             )}
         </Column>

@@ -12,6 +12,7 @@ import {
 
 type Props = {|
   project: gdProject,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   floatingLabelText?: React.Node,
   value: string,
   onChange: string => void,
@@ -24,7 +25,10 @@ type State = {|
 
 export default class ObjectTypeSelector extends React.Component<Props, State> {
   state = {
-    objectMetadata: enumerateObjectTypes(this.props.project),
+    objectMetadata: enumerateObjectTypes(
+      this.props.project,
+      this.props.eventsFunctionsExtension
+    ),
   };
 
   render() {

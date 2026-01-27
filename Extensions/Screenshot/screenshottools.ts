@@ -1,4 +1,5 @@
 namespace gdjs {
+  /** @category Other extensions > Screenshot */
   export namespace screenshot {
     const logger = new gdjs.Logger('Screenshot');
 

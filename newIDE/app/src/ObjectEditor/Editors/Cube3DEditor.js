@@ -80,6 +80,7 @@ const Cube3DEditor = ({
   project,
   layout,
   resourceManagementProps,
+  projectScopedContainersAccessor,
   objectName,
   renderObjectNameField,
 }: EditorProps) => {
@@ -293,6 +294,7 @@ const Cube3DEditor = ({
                 .get(faceProperty.resourceNameProperty)
                 .getLabel()}
               resourceManagementProps={resourceManagementProps}
+              projectScopedContainersAccessor={projectScopedContainersAccessor}
               resourceName={properties
                 .get(faceProperty.resourceNameProperty)
                 .getValue()}

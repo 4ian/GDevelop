@@ -15,6 +15,9 @@ namespace gdjs {
     es: float;
   }
 
+  /**
+   * @category Behaviors > Physics 3D
+   */
   export interface PhysicsCar3DNetworkSyncData extends BehaviorNetworkSyncData {
     props: PhysicsCar3DNetworkSyncDataType;
   }
@@ -23,6 +26,9 @@ namespace gdjs {
     behavior: gdjs.Physics3DRuntimeBehavior;
   };
 
+  /**
+   * @category Behaviors > Physics 3D
+   */
   export class PhysicsCar3DRuntimeBehavior
     extends gdjs.RuntimeBehavior
     implements gdjs.Physics3DRuntimeBehavior.Physics3DHook
@@ -158,7 +164,9 @@ namespace gdjs {
       if (!behavior.activated()) {
         return null;
       }
-
+      if (behavior._shape === 'Mesh') {
+        behavior._shape = 'Box';
+      }
       const sharedData = behavior._sharedData;
 
       this._physics3D = {
@@ -954,6 +962,7 @@ namespace gdjs {
     gdjs.PhysicsCar3DRuntimeBehavior
   );
 
+  /** @category Behaviors > Physics 3D */
   export namespace PhysicsCar3DRuntimeBehavior {
     export class VehicleBodyUpdater
       implements gdjs.Physics3DRuntimeBehavior.BodyUpdater

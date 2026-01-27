@@ -1,6 +1,7 @@
 namespace gdjs {
   /**
    * Base class for 2D custom objects.
+   * @category Objects > Custom Object
    */
   export class CustomRuntimeObject2D extends gdjs.CustomRuntimeObject {
     constructor(

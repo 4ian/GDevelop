@@ -9,6 +9,7 @@ import { ColumnStackLayout } from '../../../UI/Layout';
 import Layers from '../../../UI/CustomSvgIcons/Layers';
 import ElementHighlighterProvider from '../../ElementHighlighterProvider';
 import Text from '../../../UI/Text';
+import { Line } from '../../../UI/Grid';
 
 export default {
   title: 'UI Building Blocks/CompactToggleButtons',
@@ -34,6 +35,7 @@ export const Default = () => {
       <ColumnStackLayout expand>
         <Text size="sub-title">One item</Text>
         <CompactToggleButtons
+          expand
           id="one-item"
           buttons={[
             {
@@ -49,6 +51,7 @@ export const Default = () => {
         />
         <Text size="sub-title">Two items</Text>
         <CompactToggleButtons
+          expand
           id="two-items"
           buttons={[
             {
@@ -73,6 +76,7 @@ export const Default = () => {
         />
         <Text size="sub-title">Three items</Text>
         <CompactToggleButtons
+          expand
           id="three-items"
           buttons={[
             {
@@ -104,6 +108,44 @@ export const Default = () => {
             },
           ]}
         />
+        <Text size="sub-title">
+          Three items, not expanded and no separators
+        </Text>
+        <Line expand noMargin>
+          <CompactToggleButtons
+            noSeparator
+            id="three-items"
+            buttons={[
+              {
+                id: 'button1',
+                renderIcon: className => <Layers className={className} />,
+                tooltip: 'Layer',
+                onClick: () => {
+                  setValue3(!value3);
+                },
+                isActive: value3,
+              },
+              {
+                id: 'button2',
+                renderIcon: className => <Layers className={className} />,
+                tooltip: 'Layer',
+                onClick: () => {
+                  setValue4(!value4);
+                },
+                isActive: value4,
+              },
+              {
+                id: 'button3',
+                renderIcon: className => <Layers className={className} />,
+                tooltip: 'Layer',
+                onClick: () => {
+                  setValue5(!value5);
+                },
+                isActive: value5,
+              },
+            ]}
+          />
+        </Line>
       </ColumnStackLayout>
     </ElementHighlighterProvider>
   );

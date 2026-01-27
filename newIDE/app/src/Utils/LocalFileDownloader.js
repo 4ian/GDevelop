@@ -44,11 +44,14 @@ export const downloadUrlsToLocalFiles = async <
         };
         return result;
       } catch (error) {
-        console.error(`Error while downloading file ${url}:`, error);
-        firstError = error;
+        const enhancedError = new Error(
+          `Failed to download file from ${url}: ${error.message}`
+        );
+        console.error(`Error while downloading file ${url}:`, enhancedError);
+        firstError = enhancedError;
         const result: ItemResult<Item> = {
           item: urlContainer,
-          error,
+          error: enhancedError,
         };
         return result;
       } finally {

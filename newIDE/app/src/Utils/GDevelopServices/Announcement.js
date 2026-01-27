@@ -2,6 +2,7 @@
 import axios from 'axios';
 import { GDevelopReleaseApi } from './ApiConfigs';
 import { type MessageByLocale } from '../i18n/MessageByLocale';
+import { ensureIsArray } from '../DataValidator';
 
 export type Announcement = {
   id: string,
@@ -34,20 +35,16 @@ export const listAllAnnouncements = async (): Promise<Array<Announcement>> => {
   const response = await axios.get(
     `${GDevelopReleaseApi.baseUrl}/announcement`
   );
-  const announcements = response.data;
-  if (!Array.isArray(announcements)) {
-    throw new Error('Invalid response from the announcements API');
-  }
-
-  return announcements;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/announcement of Release API',
+  });
 };
 
 export const listAllPromotions = async (): Promise<Array<Promotion>> => {
   const response = await axios.get(`${GDevelopReleaseApi.baseUrl}/promotion`);
-  const promotions = response.data;
-  if (!Array.isArray(promotions)) {
-    throw new Error('Invalid response from the promotions API');
-  }
-
-  return promotions;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/promotion of Release API',
+  });
 };

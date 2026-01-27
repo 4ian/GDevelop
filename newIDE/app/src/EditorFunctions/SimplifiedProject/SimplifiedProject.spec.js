@@ -62,6 +62,86 @@ describe('SimplifiedProject', () => {
           "gameResolutionHeight": 600,
           "gameResolutionWidth": 800,
         },
+        "resources": Array [
+          Object {
+            "file": "fake-image1.png",
+            "metadata": undefined,
+            "name": "fake-image1.png",
+            "type": "image",
+          },
+          Object {
+            "file": "fake-image2.png",
+            "metadata": undefined,
+            "name": "fake-image2.png",
+            "type": "image",
+          },
+          Object {
+            "file": "res/icon128.png",
+            "metadata": undefined,
+            "name": "icon128.png",
+            "type": "image",
+          },
+          Object {
+            "file": "res/powered-pixijs.png",
+            "metadata": undefined,
+            "name": "pixi",
+            "type": "image",
+          },
+          Object {
+            "file": "fake-audio1.mp3",
+            "metadata": undefined,
+            "name": "fake-audio1.mp3",
+            "type": "audio",
+          },
+          Object {
+            "file": "fake-video1.mp4",
+            "metadata": undefined,
+            "name": "fake-video1.mp4",
+            "type": "video",
+          },
+          Object {
+            "file": "fake-video2.mp4",
+            "metadata": undefined,
+            "name": "fake-video2.mp4",
+            "type": "video",
+          },
+          Object {
+            "file": "font.ttf",
+            "metadata": undefined,
+            "name": "font.ttf",
+            "type": "font",
+          },
+          Object {
+            "file": "bmfont.xml",
+            "metadata": undefined,
+            "name": "bmfont.xml",
+            "type": "bitmapFont",
+          },
+          Object {
+            "file": "super-font.fnt",
+            "metadata": undefined,
+            "name": "super-font.fnt",
+            "type": "bitmapFont",
+          },
+          Object {
+            "file": "levelData.json",
+            "metadata": undefined,
+            "name": "levelData.json",
+            "type": "json",
+          },
+          Object {
+            "file": "InventoryData.json",
+            "metadata": undefined,
+            "name": "InventoryData.json",
+            "type": "json",
+          },
+          Object {
+            "file": "text-data.json",
+            "metadata": undefined,
+            "name": "text-data.json",
+            "type": "json",
+          },
+        ],
         "scenes": Array [
           Object {
             "instancesOnSceneDescription": "On the scene, there are:
@@ -75,6 +155,23 @@ describe('SimplifiedProject', () => {
         - 1 MySpriteObject
 
       Inspect instances on the scene to get more details if needed.",
+            "layers": Array [
+              Object {
+                "isBaseLayer": undefined,
+                "layerName": "GUI",
+                "position": 0,
+              },
+              Object {
+                "isBaseLayer": undefined,
+                "layerName": "OtherLayer",
+                "position": 1,
+              },
+              Object {
+                "isBaseLayer": true,
+                "layerName": "",
+                "position": 2,
+              },
+            ],
             "objectGroups": Array [
               Object {
                 "behaviors": Array [
@@ -887,6 +984,13 @@ describe('SimplifiedProject', () => {
           },
           Object {
             "instancesOnSceneDescription": "There are no instances of objects placed on the scene - the scene is empty.",
+            "layers": Array [
+              Object {
+                "isBaseLayer": true,
+                "layerName": "",
+                "position": 0,
+              },
+            ],
             "objectGroups": Array [],
             "objects": Array [],
             "sceneName": "EmptyLayout",
@@ -894,6 +998,13 @@ describe('SimplifiedProject', () => {
           },
           Object {
             "instancesOnSceneDescription": "There are no instances of objects placed on the scene - the scene is empty.",
+            "layers": Array [
+              Object {
+                "isBaseLayer": true,
+                "layerName": "",
+                "position": 0,
+              },
+            ],
             "objectGroups": Array [],
             "objects": Array [],
             "sceneName": "Layout with a very looooooooong naaaaame to test in the project manager",
@@ -949,6 +1060,20 @@ describe('SimplifiedProject', () => {
                 ],
                 "fullName": "Fake behavior with two properties",
                 "name": "FakeBehavior::FakeBehavior",
+                "properties": Array [
+                  Object {
+                    "description": "",
+                    "label": "Property 1",
+                    "name": "property1",
+                    "type": "",
+                  },
+                  Object {
+                    "description": "A description for property 2",
+                    "name": "property2",
+                    "type": "Boolean",
+                  },
+                ],
+                "sharedProperties": Array [],
               },
             },
             "description": "A fake extension with a fake behavior containing 2 properties.",
@@ -961,6 +1086,85 @@ describe('SimplifiedProject', () => {
             "objects": Object {},
           },
         ],
+      }
+    `);
+
+    project.delete();
+  });
+
+  it('should include summaries of project specific extensions with events based objects', async () => {
+    const gd = await initializeGDevelopJs();
+    makeTestExtensions(gd);
+
+    const { project } = makeTestProject(gd);
+
+    const projectSpecificExtensionsSummary = makeSimplifiedProjectBuilder(
+      gd
+    ).getProjectSpecificExtensionsSummary(project);
+
+    const buttonExtensionSummary = projectSpecificExtensionsSummary.extensionSummaries.find(
+      extensionSummary => extensionSummary.extensionName === 'Button'
+    );
+
+    expect(buttonExtensionSummary).toMatchInlineSnapshot(`
+      Object {
+        "behaviors": Object {},
+        "description": "Fake event-based object",
+        "effects": Object {},
+        "extensionFullName": "Fake event-based object",
+        "extensionName": "Button",
+        "freeActions": Array [],
+        "freeConditions": Array [],
+        "freeExpressions": Array [],
+        "objects": Object {
+          "Button::PanelSpriteButton": Object {
+            "actions": Array [],
+            "conditions": Array [],
+            "description": "A fake button made with a panel sprite and events.",
+            "expressions": Array [],
+            "fullName": "PanelSpriteButton",
+            "name": "Button::PanelSpriteButton",
+            "properties": Array [
+              Object {
+                "description": "",
+                "label": "Label offset on Y axis when pressed",
+                "name": "PressedLabelOffsetY",
+                "type": "number",
+              },
+              Object {
+                "description": "The left padding of the button",
+                "group": "Padding",
+                "label": "Left padding",
+                "measurementUnit": Object {
+                  "name": "Pixel",
+                },
+                "name": "LeftPadding",
+                "type": "number",
+              },
+              Object {
+                "description": "",
+                "group": "Padding",
+                "label": "Right padding",
+                "name": "RightPadding",
+                "type": "number",
+              },
+              Object {
+                "description": "",
+                "group": "Padding",
+                "label": "Top padding",
+                "name": "TopPadding",
+                "type": "number",
+              },
+              Object {
+                "description": "",
+                "group": "Padding",
+                "label": "Down padding",
+                "name": "DownPadding",
+                "type": "number",
+              },
+            ],
+          },
+        },
       }
     `);
 

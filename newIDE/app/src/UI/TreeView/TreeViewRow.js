@@ -267,6 +267,12 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
             const draggedItem: DraggedItem = {
               name: node.name,
               thumbnail: node.thumbnailSrc || undefined,
+              is3D:
+                // $FlowFixMe
+                !!node.item.content &&
+                !!node.item.content.is3D &&
+                // $FlowFixMe
+                node.item.content.is3D(),
             };
             return draggedItem;
           }
@@ -414,12 +420,16 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
             itemRow = connectDragPreview(itemRow);
           }
 
-          const rightButton = node.rightButton;
+          const rightButtons = Array.isArray(node.rightButton)
+            ? node.rightButton
+            : node.rightButton
+            ? [node.rightButton]
+            : [];
 
           const shouldDisplayMenu =
             !node.shouldHideMenuIcon &&
             !isMobile &&
-            !node.item.isRoot &&
+            (!node.item.isRoot || node.shouldHideMenuIcon !== null) &&
             !node.item.isPlaceholder;
 
           const dragSource = connectDragSource(
@@ -440,7 +450,9 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                 {...longTouchForContextMenuProps}
               >
                 {itemRow}
-                {(node.rightComponent || rightButton || shouldDisplayMenu) && (
+                {(node.rightComponent ||
+                  rightButtons.length > 0 ||
+                  shouldDisplayMenu) && (
                   <div
                     className={classNames(
                       classes.rowContentSide,
@@ -448,10 +460,11 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                     )}
                   >
                     {node.rightComponent}
-                    {rightButton &&
-                      (rightButton.primary ? (
+                    {rightButtons.map(rightButton =>
+                      rightButton.primary ? (
                         <TreeViewRightPrimaryButton
                           id={rightButton.id}
+                          key={rightButton.id}
                           onClick={e => {
                             e.stopPropagation();
                             if (rightButton.click) {
@@ -473,6 +486,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                       ) : (
                         <IconButton
                           id={rightButton.id}
+                          key={rightButton.id}
                           size="small"
                           onClick={e => {
                             e.stopPropagation();
@@ -489,7 +503,8 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                         >
                           {rightButton.icon}
                         </IconButton>
-                      ))}
+                      )
+                    )}
                     {shouldDisplayMenu && (
                       <IconButton
                         size="small"

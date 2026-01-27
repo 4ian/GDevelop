@@ -1,7 +1,9 @@
 namespace gdjs {
+  /** @internal - should not have been exported? */
   export interface LightNightFilterExtra {
     o: number;
   }
+  /** @internal - should not have been exported? */
   export class LightNightPixiFilter extends PIXI.Filter {
     constructor() {
       const vertexShader = undefined;

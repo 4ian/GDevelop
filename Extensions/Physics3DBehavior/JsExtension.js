@@ -49,6 +49,12 @@ module.exports = {
 
         if (propertyName === 'bodyType') {
           behaviorContent.getChild('bodyType').setStringValue(newValue);
+          if (
+            newValue !== 'Static' &&
+            behaviorContent.getChild('shape').getStringValue() === 'Mesh'
+          ) {
+            behaviorContent.getChild('shape').setStringValue('Box');
+          }
           return true;
         }
 
@@ -66,6 +72,16 @@ module.exports = {
 
         if (propertyName === 'shape') {
           behaviorContent.getChild('shape').setStringValue(newValue);
+          if (newValue === 'Mesh') {
+            behaviorContent.getChild('bodyType').setStringValue('Static');
+          }
+          return true;
+        }
+
+        if (propertyName === 'meshShapeResourceName') {
+          behaviorContent
+            .getChild('meshShapeResourceName')
+            .setStringValue(newValue);
           return true;
         }
 
@@ -243,14 +259,15 @@ module.exports = {
           .setType('Choice')
           .setLabel('Type')
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .addExtraInfo('Static')
-          .addExtraInfo('Dynamic')
-          .addExtraInfo('Kinematic')
+          .addChoice('Static', _('Static'))
+          .addChoice('Dynamic', _('Dynamic'))
+          .addChoice('Kinematic', _('Kinematic'))
           .setDescription(
             _(
               "A static object won't move (perfect for obstacles). Dynamic objects can move. Kinematic will move according to forces applied to it only (useful for characters or specific mechanisms)."
             )
-          );
+          )
+          .setHasImpactOnOtherProperties(true);
         behaviorProperties
           .getOrCreate('bullet')
           .setValue(
@@ -288,10 +305,22 @@ module.exports = {
           .setType('Choice')
           .setLabel('Shape')
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .addExtraInfo('Box')
-          .addExtraInfo('Capsule')
-          .addExtraInfo('Cylinder')
-          .addExtraInfo('Sphere');
+          .addChoice('Box', _('Box'))
+          .addChoice('Capsule', _('Capsule'))
+          .addChoice('Sphere', _('Sphere'))
+          .addChoice('Cylinder', _('Cylinder'))
+          .addChoice('Mesh', _('Mesh (works for Static only)'));
+        behaviorProperties
+          .getOrCreate('meshShapeResourceName')
+          .setValue(
+            behaviorContent.getChild('meshShapeResourceName').getStringValue()
+          )
+          .setType('resource')
+          .addExtraInfo('model3D')
+          .setLabel(_("Simplified 3D model (leave empty to use object's one)"))
+          // Hidden as required to be changed in the full editor.
+          .setHidden(true)
+          .setHasImpactOnOtherProperties(true);
         behaviorProperties
           .getOrCreate('shapeOrientation')
           .setValue(
@@ -300,9 +329,9 @@ module.exports = {
           .setType('Choice')
           .setLabel('Shape orientation')
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .addExtraInfo('Z')
-          .addExtraInfo('Y')
-          .addExtraInfo('X');
+          .addChoice('Z', _('Z'))
+          .addChoice('Y', _('Y'))
+          .addChoice('X', _('X'));
         behaviorProperties
           .getOrCreate('shapeDimensionA')
           .setValue(
@@ -509,6 +538,11 @@ module.exports = {
           )
           .setType('Number')
           .setLabel(_('Linear Damping'))
+          .setDescription(
+            _(
+              "Linear damping reduces an object's movement speed over time, making its motion slow down smoothly."
+            )
+          )
           .setGroup(_('Movement'));
 
         behaviorProperties
@@ -521,6 +555,11 @@ module.exports = {
           )
           .setType('Number')
           .setLabel(_('Angular Damping'))
+          .setDescription(
+            _(
+              "Angular damping reduces an object's rotational speed over time, making its spins slow down smoothly."
+            )
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setGroup(_('Movement'));
         behaviorProperties
@@ -533,6 +572,12 @@ module.exports = {
           )
           .setType('Number')
           .setLabel('Gravity Scale')
+          .setDescription(
+            _(
+              "Gravity Scale multiplies the world's gravity for a specific body, making it experience stronger or weaker gravitational force than normal."
+            )
+          )
+
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setGroup(_('Gravity'))
           .setAdvanced(true);
@@ -564,6 +609,7 @@ module.exports = {
         behaviorContent.addChild('bullet').setBoolValue(false);
         behaviorContent.addChild('fixedRotation').setBoolValue(false);
         behaviorContent.addChild('shape').setStringValue('Box');
+        behaviorContent.addChild('meshShapeResourceName').setStringValue('');
         behaviorContent.addChild('shapeOrientation').setStringValue('Z');
         behaviorContent.addChild('shapeDimensionA').setDoubleValue(0);
         behaviorContent.addChild('shapeDimensionB').setDoubleValue(0);
@@ -2553,7 +2599,7 @@ module.exports = {
           'CurrentFallSpeed',
           _('Current falling speed'),
           _(
-            'Compare the current falling speed of the object. Its value is always positive.'
+            'the current falling speed of the object. Its value is always positive.'
           ),
           _('the current falling speed'),
           _('Character state'),
@@ -2577,7 +2623,7 @@ module.exports = {
           'CurrentJumpSpeed',
           _('Current jump speed'),
           _(
-            'Compare the current jump speed of the object. Its value is always positive.'
+            'the current jump speed of the object. Its value is always positive.'
           ),
           _('the current jump speed'),
           _('Character state'),

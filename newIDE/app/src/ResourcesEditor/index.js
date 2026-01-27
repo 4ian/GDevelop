@@ -215,7 +215,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
 
   toggleProperties = () => {
     if (!this.editorMosaic) return;
-    this.editorMosaic.toggleEditor('properties', 'start', 66, 'column');
+    this.editorMosaic.toggleEditor('properties', 'left');
   };
 
   _onResourceSelected = (selectedResource: ?gdResource) => {
@@ -299,6 +299,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
           {({ getDefaultEditorMosaicNode, setDefaultEditorMosaicNode }) => (
             <EditorMosaic
               editors={editors}
+              centralNodeId="resources-list"
               ref={editorMosaic => (this.editorMosaic = editorMosaic)}
               initialNodes={
                 getDefaultEditorMosaicNode('resources-editor') ||

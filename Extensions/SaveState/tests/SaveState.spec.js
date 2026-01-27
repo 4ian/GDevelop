@@ -71,6 +71,17 @@ describe('SaveState', () => {
     instances: instances || [],
     variables: [],
     usedResources: [],
+    uiSettings: {
+      grid: false,
+      gridType: 'rectangular',
+      gridWidth: 0,
+      gridHeight: 0,
+      gridOffsetX: 0,
+      gridOffsetY: 0,
+      gridColor: 0,
+      gridAlpha: 0,
+      snap: false,
+    },
   });
 
   describe('Save State Basics', () => {

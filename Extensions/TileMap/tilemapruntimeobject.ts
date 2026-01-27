@@ -1,5 +1,8 @@
 /// <reference path="helper/TileMapHelper.d.ts" />
 namespace gdjs {
+  /**
+   * @category Objects > Tile Map
+   */
   export type TilemapObjectDataType = {
     content: {
       tilemapJsonFile: string;
@@ -13,8 +16,14 @@ namespace gdjs {
     };
   };
 
+  /**
+   * @category Objects > Tile Map
+   */
   export type TilemapObjectData = ObjectData & TilemapObjectDataType;
 
+  /**
+   * @category Objects > Tile Map
+   */
   export type TilemapNetworkSyncDataType = {
     op: number;
     tmjf: string;
@@ -26,11 +35,15 @@ namespace gdjs {
     asps: number;
   };
 
+  /**
+   * @category Objects > Tile Map
+   */
   export type TilemapNetworkSyncData = ObjectNetworkSyncData &
     TilemapNetworkSyncDataType;
 
   /**
    * Displays a Tilemap object (LDtk and Tiled).
+   * @category Objects > Tile Map
    */
   export class TileMapRuntimeObject
     extends gdjs.RuntimeObject
@@ -69,7 +82,7 @@ namespace gdjs {
         this,
         instanceContainer
       );
-      this._updateTileMap();
+      this.updateTileMap();
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -197,12 +210,14 @@ namespace gdjs {
         this.setWidth(initialInstanceData.width);
         this.setHeight(initialInstanceData.height);
       }
-      if (initialInstanceData.opacity !== undefined) {
-        this.setOpacity(initialInstanceData.opacity);
-      }
+      this.setOpacity(
+        initialInstanceData.opacity === undefined
+          ? 255
+          : initialInstanceData.opacity
+      );
     }
 
-    private _updateTileMap(): void {
+    updateTileMap(): void {
       this._tileMapManager.getOrLoadTileMap(
         this._tilemapJsonFile,
         this._tilesetJsonFile,
@@ -253,7 +268,7 @@ namespace gdjs {
      */
     setTilemapJsonFile(tilemapJsonFile: string): void {
       this._tilemapJsonFile = tilemapJsonFile;
-      this._updateTileMap();
+      this.updateTileMap();
     }
 
     getTilemapJsonFile(): string {
@@ -266,7 +281,7 @@ namespace gdjs {
 
     setTilesetJsonFile(tilesetJsonFile: string): void {
       this._tilesetJsonFile = tilesetJsonFile;
-      this._updateTileMap();
+      this.updateTileMap();
     }
 
     getTilesetJsonFile(): string {
@@ -291,7 +306,7 @@ namespace gdjs {
 
     setDisplayMode(displayMode: string): void {
       this._displayMode = displayMode;
-      this._updateTileMap();
+      this.updateTileMap();
     }
 
     getDisplayMode(): string {
@@ -300,7 +315,7 @@ namespace gdjs {
 
     setLayerIndex(layerIndex): void {
       this._layerIndex = layerIndex;
-      this._updateTileMap();
+      this.updateTileMap();
     }
 
     getLayerIndex(): integer {
@@ -309,7 +324,7 @@ namespace gdjs {
 
     setLevelIndex(levelIndex): void {
       this._levelIndex = levelIndex;
-      this._updateTileMap();
+      this.updateTileMap();
     }
 
     getLevelIndex() {
@@ -341,6 +356,14 @@ namespace gdjs {
     setSize(newWidth: float, newHeight: float): void {
       this.setWidth(newWidth);
       this.setHeight(newHeight);
+    }
+
+    override getOriginalWidth(): float {
+      return this.getTileMapWidth();
+    }
+
+    override getOriginalHeight(): float {
+      return this.getTileMapHeight();
     }
 
     /**

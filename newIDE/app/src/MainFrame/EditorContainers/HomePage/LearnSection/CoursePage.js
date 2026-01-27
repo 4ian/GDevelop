@@ -38,6 +38,7 @@ import Window from '../../../../Utils/Window';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import { RatingBanner } from './RatingBanner';
 import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
+import { type OpenAskAiOptions } from '../../../../AiGeneration/Utils';
 
 const styles = {
   desktopContainer: { display: 'flex', gap: 16 },
@@ -116,11 +117,7 @@ type Props = {|
   purchasingCourseListingData: ?CourseListingData,
   setPurchasingCourseListingData: (CourseListingData | null) => void,
   simulateAppStoreProduct?: boolean,
-  onOpenAskAi: ({|
-    mode: 'chat' | 'agent',
-    aiRequestId: string | null,
-    paneIdentifier: 'left' | 'center' | 'right' | null,
-  |}) => void,
+  onOpenAskAi: (?OpenAskAiOptions) => void,
 |};
 
 const CoursePage = ({
@@ -460,9 +457,7 @@ const CoursePage = ({
                           label={<Trans>Ask the AI</Trans>}
                           onClick={() =>
                             onOpenAskAi({
-                              mode: 'chat',
                               aiRequestId: null,
-                              paneIdentifier: 'right',
                             })
                           }
                         />

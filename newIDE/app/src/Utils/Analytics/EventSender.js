@@ -10,7 +10,7 @@ import {
 import { getIDEVersion, getIDEVersionWithHash } from '../../Version';
 import { loadPreferencesFromLocalStorage } from '../../MainFrame/Preferences/PreferencesProvider';
 import { getBrowserLanguageOrLocale } from '../Language';
-import { type SubscriptionAnalyticsMetadata } from '../../Profile/Subscription/SubscriptionSuggestionContext';
+import { type SubscriptionAnalyticsMetadata } from '../../Profile/Subscription/SubscriptionContext';
 import optionalRequire from '../OptionalRequire';
 import Window from '../Window';
 import { isMobile, isNativeMobileApp } from '../Platform';
@@ -536,7 +536,8 @@ export type SubscriptionDialogDisplayReason =
   | 'Unlock course chapter'
   | 'Account get premium'
   | 'AI requests (subscribe)'
-  | 'AI requests (upgrade)';
+  | 'AI requests (upgrade)'
+  | 'AI requests history';
 
 export type SubscriptionPlacementId =
   | 'builds'

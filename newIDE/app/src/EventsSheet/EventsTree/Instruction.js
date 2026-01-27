@@ -45,10 +45,7 @@ import {
 import { enumerateParametersUsableInExpressions } from '../ParameterFields/EnumerateFunctionParameters';
 import { getFunctionNameFromType } from '../../EventsFunctionsExtensionsLoader';
 import { ExtensionStoreContext } from '../../AssetStore/ExtensionStore/ExtensionStoreContext';
-import { getAllRequiredBehaviorTypes } from '../ParameterFields/ObjectField';
-import { checkHasRequiredBehaviors } from '../../ObjectsList/ObjectSelector';
 import Warning from '../../UI/CustomSvgIcons/Warning';
-import { getRootVariableName } from '../../EventsSheet/ParameterFields/VariableField';
 
 const gd: libGDevelop = global.gd;
 
@@ -105,7 +102,7 @@ type Props = {|
   windowSize: WindowSizeType,
 
   scope: EventsScope,
-  resourcesManager: gdResourcesManager,
+  resourcesManager: gdResourcesContainer,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
@@ -216,7 +213,6 @@ const Instruction = (props: Props) => {
     onMoveToInstruction,
     onContextMenu,
     id,
-    resourcesManager,
     scope,
   } = props;
   const instrFormatter = React.useMemo(
@@ -287,7 +283,7 @@ const Instruction = (props: Props) => {
           }
 
           const parameterMetadata = metadata.getParameter(parameterIndex);
-          // TODO Remove the ternary when any parameter declaration uses
+          // TODO Remove the ternary when all parameter declarations use
           // 'number' instead of 'expression'.
           const parameterType: string =
             parameterMetadata.getType() === 'expression'
@@ -295,78 +291,15 @@ const Instruction = (props: Props) => {
               : parameterMetadata.getType();
           let expressionIsValid = true;
           if (!shouldNotBeValidated({ value, parameterType })) {
-            if (
-              gd.ParameterMetadata.isExpression('number', parameterType) ||
-              gd.ParameterMetadata.isExpression('string', parameterType) ||
-              gd.ParameterMetadata.isExpression('variable', parameterType)
-            ) {
-              const expressionNode = instruction
-                .getParameter(parameterIndex)
-                .getRootNode();
-              const expressionValidator = new gd.ExpressionValidator(
-                gd.JsPlatform.get(),
-                projectScopedContainers,
-                parameterType,
-                parameterMetadata.getExtraInfo()
-              );
-              expressionNode.visit(expressionValidator);
-              expressionIsValid =
-                expressionValidator.getAllErrors().size() === 0;
-              expressionValidator.delete();
-
-              // New object variable instructions require the variable to be
-              // declared while legacy ones don't.
-              // This is why it's done here instead of in the parser directly.
-              if (
-                parameterType === 'objectvar' &&
-                gd.VariableInstructionSwitcher.isSwitchableVariableInstruction(
-                  instruction.getType()
-                )
-              ) {
-                // Check at least the name of the root variable, it's the best we can do.
-                const objectsContainersList = projectScopedContainers.getObjectsContainersList();
-                const objectName = instruction.getParameter(0).getPlainString();
-                const variableName = instruction
-                  .getParameter(parameterIndex)
-                  .getPlainString();
-                if (
-                  objectsContainersList.hasObjectOrGroupWithVariableNamed(
-                    objectName,
-                    getRootVariableName(variableName)
-                  ) === gd.ObjectsContainersList.DoesNotExist
-                ) {
-                  expressionIsValid = false;
-                }
-              }
-            } else if (gd.ParameterMetadata.isObject(parameterType)) {
-              const objectOrGroupName = instruction
-                .getParameter(parameterIndex)
-                .getPlainString();
-              const objectsContainersList = projectScopedContainers.getObjectsContainersList();
-              expressionIsValid =
-                objectsContainersList.hasObjectOrGroupNamed(
-                  objectOrGroupName
-                ) &&
-                (!parameterMetadata.getExtraInfo() ||
-                  objectsContainersList.getTypeOfObject(objectOrGroupName) ===
-                    parameterMetadata.getExtraInfo()) &&
-                checkHasRequiredBehaviors({
-                  objectsContainersList,
-                  objectName: objectOrGroupName,
-                  requiredBehaviorTypes: getAllRequiredBehaviorTypes(
-                    platform,
-                    metadata,
-                    parameterIndex
-                  ),
-                });
-            } else if (
-              gd.ParameterMetadata.isExpression('resource', parameterType)
-            ) {
-              const resourceName = instruction
-                .getParameter(parameterIndex)
-                .getPlainString();
-              expressionIsValid = resourcesManager.hasResource(resourceName);
-            }
+            expressionIsValid = gd.InstructionValidator.isParameterValid(
+              platform,
+              projectScopedContainers,
+              instruction,
+              metadata,
+              parameterIndex,
+              value
+            );
+            // TODO Move this code inside `InstructionValidator.isParameterValid`
             if (
               expressionIsValid &&
               parameterType === 'functionParameterName'

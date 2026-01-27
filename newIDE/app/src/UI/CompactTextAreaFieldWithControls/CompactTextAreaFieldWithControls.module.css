@@ -96,9 +96,9 @@
 .neonCorner {
   background: var(--theme-text-field-default-background-color);
   border-radius: 4px;
-  padding: 2px;
   position: relative;
   overflow: hidden;
+  padding: 2px;
 }
 
 .neonCorner textarea {

@@ -249,13 +249,13 @@ type Props = {|
   onRegisterProject: (
     file: FileMetadataAndStorageProviderName
   ) => Promise<?Game>,
-  isUpdatingGame: boolean,
+  disabled: boolean,
   canOpen: boolean,
   onOpenNewProjectSetupDialog: () => void,
   onChooseProject: () => void,
   closeProject: () => Promise<void>,
   askToCloseProject: () => Promise<boolean>,
-  onSaveProject: () => Promise<void>,
+  onSaveProject: () => Promise<?FileMetadata>,
   canSaveProject: boolean,
   onDeleteCloudProject: (
     i18n: I18nType,
@@ -279,7 +279,7 @@ const GamesList = ({
   onUnregisterGame,
   onRegisterProject,
   onDeleteCloudProject,
-  isUpdatingGame,
+  disabled,
   storageProviders,
   canOpen,
   onOpenNewProjectSetupDialog,
@@ -513,7 +513,7 @@ const GamesList = ({
                 onClick={onOpenNewProjectSetupDialog}
                 icon={<Add fontSize="small" />}
                 id="home-create-project-button"
-                disabled={isUpdatingGame}
+                disabled={disabled}
               />
               {shouldShowOpenProject && (
                 <TextButton
@@ -525,7 +525,7 @@ const GamesList = ({
                     )
                   }
                   onClick={onChooseProject}
-                  disabled={isUpdatingGame}
+                  disabled={disabled}
                 />
               )}
             </LineStackLayout>
@@ -660,7 +660,7 @@ const GamesList = ({
                       });
                     }}
                     onRegisterProject={onRegisterProject}
-                    disabled={isUpdatingGame}
+                    disabled={disabled}
                     canSaveProject={canSaveProject}
                     askToCloseProject={askToCloseProject}
                     closeProject={closeProject}

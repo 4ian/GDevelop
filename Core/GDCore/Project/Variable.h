@@ -382,12 +382,12 @@ class GD_CORE_API Variable {
   const gd::String& GetPersistentUuid() const { return persistentUuid; };
   ///@}
 
- private:
   /**
    * \brief Converts a Type to a string.
    */
   static gd::String TypeAsString(Type t);
 
+private:
   /**
    * \brief Converts a string to a Type.
    */

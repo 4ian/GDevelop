@@ -7,6 +7,8 @@ const process = require('process');
 const path = require('path');
 const log = require('electron-log');
 
+let onRuntimeUpdatedCallback = () => {};
+
 /**
  * Returns the folder corresponding to newIDE/app in **development**.
  * @returns {string}
@@ -24,6 +26,7 @@ const onWatchEvent = debounce(
   (event, filename) => {
     // Nothing to do for now.
     log.info(`GDJS watcher found a change.`);
+    onRuntimeUpdatedCallback();
   },
   100 /* Avoid running the script too much in case multiple changes are fired at the same time. */
 );
@@ -61,7 +64,12 @@ const closeLocalGDJSDevelopmentWatcher = () => {
   watcher = null;
 };
 
+const onLocalGDJSDevelopmentWatcherRuntimeUpdated = cb => {
+  onRuntimeUpdatedCallback = cb;
+};
+
 module.exports = {
   setupLocalGDJSDevelopmentWatcher,
   closeLocalGDJSDevelopmentWatcher,
+  onLocalGDJSDevelopmentWatcherRuntimeUpdated,
 };

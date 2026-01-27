@@ -23,6 +23,8 @@ declare class gdLayer {
   setCamera3DFarPlaneDistance(distance: number): void;
   getCamera3DFieldOfView(): number;
   setCamera3DFieldOfView(angle: number): void;
+  getCamera2DPlaneMaxDrawingDistance(): number;
+  setCamera2DPlaneMaxDrawingDistance(distance: number): void;
   setAmbientLightColor(r: number, g: number, b: number): void;
   getAmbientLightColorRed(): number;
   getAmbientLightColorGreen(): number;

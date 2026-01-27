@@ -50,9 +50,9 @@ Layout& Layout::operator=(const Layout& other) {
 Layout::~Layout() {};
 
 Layout::Layout()
-    : backgroundColorR(209),
-      backgroundColorG(209),
-      backgroundColorB(209),
+    : backgroundColorR(247),
+      backgroundColorG(249),
+      backgroundColorB(255),
       stopSoundsOnStartup(true),
       resourcesPreloading("inherit"),
       resourcesUnloading("inherit"),

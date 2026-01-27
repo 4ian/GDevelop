@@ -4,7 +4,10 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
-  /** An axis-aligned bounding box. Used to represents a box around an object for example. */
+  /**
+   * An axis-aligned bounding box. Used to represents a box around an object for example.
+   * @category Core Engine > Object
+   */
   export type AABB = {
     /** The [x,y] coordinates of the top left point */
     min: FloatPoint;
@@ -12,6 +15,9 @@ namespace gdjs {
     max: FloatPoint;
   };
 
+  /**
+   * @category Core Engine > Object
+   */
   export type RendererObjectInterface = {
     visible: boolean;
   };
@@ -152,6 +158,7 @@ namespace gdjs {
    *
    * A `gdjs.RuntimeObject` should not be instantiated directly, always a child class
    * (because gdjs.RuntimeObject don't call onCreated at the end of its constructor).
+   * @category Core Engine > Object
    */
   export class RuntimeObject implements EffectsTarget, gdjs.EffectHandler {
     name: string;
@@ -233,7 +240,7 @@ namespace gdjs {
      */
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      objectData: ObjectData & any
+      objectData: ObjectData
     ) {
       this.name = objectData.name || '';
       this.type = objectData.type || '';
@@ -248,11 +255,15 @@ namespace gdjs {
       this._totalForce = new gdjs.Force(0, 0, 0);
       this._behaviorsTable = new Hashtable();
       for (let i = 0; i < objectData.effects.length; ++i) {
+        const effectData = objectData.effects[i];
         this._runtimeScene
           .getGame()
           .getEffectsManager()
-          .initializeEffect(objectData.effects[i], this._rendererEffects, this);
-        this.updateAllEffectParameters(objectData.effects[i]);
+          .initializeEffect(effectData, this._rendererEffects, this);
+        this.updateAllEffectParameters(effectData);
+        if (effectData.disabled) {
+          this.enableEffect(effectData.name, false);
+        }
       }
       //Also contains the behaviors: Used when a behavior is accessed by its name ( see getBehavior ).
       for (let i = 0, len = objectData.behaviors.length; i < len; ++i) {
@@ -360,11 +371,15 @@ namespace gdjs {
 
       // Reinitialize effects.
       for (let i = 0; i < objectData.effects.length; ++i) {
+        const effectData = objectData.effects[i];
         this._runtimeScene
           .getGame()
           .getEffectsManager()
-          .initializeEffect(objectData.effects[i], this._rendererEffects, this);
-        this.updateAllEffectParameters(objectData.effects[i]);
+          .initializeEffect(effectData, this._rendererEffects, this);
+        this.updateAllEffectParameters(effectData);
+        if (effectData.disabled) {
+          this.enableEffect(effectData.name, false);
+        }
       }
 
       // Make sure to delete existing timers.
@@ -1435,6 +1450,22 @@ namespace gdjs {
      */
     isHidden(): boolean {
       return this.hidden;
+    }
+
+    /**
+     * Return the width of the object before any custom size is applied.
+     * @return The width of the object
+     */
+    getOriginalWidth(): float {
+      return this.getWidth();
+    }
+
+    /**
+     * Return the width of the object before any custom size is applied.
+     * @return The width of the object
+     */
+    getOriginalHeight(): float {
+      return this.getHeight();
     }
 
     /**

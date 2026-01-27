@@ -4,6 +4,7 @@ import * as React from 'react';
 import {
   getUserUsages,
   getUserSubscription,
+  getSubscriptionPlanPricingSystem,
   getUserLimits,
   getUserEarningsBalance,
 } from '../Utils/GDevelopServices/Usage';
@@ -152,6 +153,11 @@ export default class AuthenticatedUserProvider extends React.Component<
   >(listUserCloudProjects);
 
   async componentDidMount() {
+    // Wait for Firebase to complete its initial auth check before doing anything.
+    // This prevents a race condition where we check auth state before Firebase
+    // has finished initializing, causing us to incorrectly think the user is logged out.
+    await this.props.authentication.waitForInitialAuthCheck();
+
     this._initializeAuthenticatedUser();
 
     // Those callbacks are added a bit too late (after the authentication `hasAuthChanged` has already been triggered)
@@ -185,8 +191,9 @@ export default class AuthenticatedUserProvider extends React.Component<
       }
     });
 
-    // At startup, if the provider has mounted too late and the user is already logged in with Firebase,
-    // we fetch the user profile.
+    // At startup, check if the user is already logged in with Firebase.
+    // Note: We can now safely check this synchronously because we've waited for
+    // Firebase's initial auth check to complete above.
     if (this.props.authentication.getFirebaseUserSync()) {
       // The user is logged already: fetch its user profile (because the "user update"
       // won't trigger, as registered too late).
@@ -308,34 +315,20 @@ export default class AuthenticatedUserProvider extends React.Component<
     try {
       const firebaseUser = await authentication.getFirebaseUser();
       if (!firebaseUser) {
-        if (this._notificationPollingIntervalId) {
-          clearInterval(this._notificationPollingIntervalId);
-          this._notificationPollingIntervalId = null;
-        }
-        this.setState(({ authenticatedUser }) => ({
-          authenticatedUser: {
-            ...authenticatedUser,
-            authenticated: false,
-            profile: null,
-            usages: null,
-            userEarningsBalance: null,
-            limits: null,
-            subscription: null,
-          },
-        }));
+        this._markAuthenticatedUserAsLoggedOut();
         return null;
       }
 
       this.setState(({ authenticatedUser }) => ({
         authenticatedUser: {
           ...authenticatedUser,
-          authenticated: true,
           firebaseUser,
         },
       }));
       return firebaseUser;
     } catch (error) {
       console.error('Unable to fetch the authenticated Firebase user:', error);
+      this._markAuthenticatedUserAsLoggedOut();
       throw error;
     }
   };
@@ -394,12 +387,10 @@ export default class AuthenticatedUserProvider extends React.Component<
       firebaseUser = await this._reloadFirebaseProfile();
       if (!firebaseUser) {
         console.info('User is not authenticated.');
-        this._markAuthenticatedUserAsLoggedOut();
         return;
       }
     } catch (error) {
       console.error('Unable to fetch the authenticated Firebase user:', error);
-      this._markAuthenticatedUserAsLoggedOut();
       throw error;
     }
 
@@ -422,13 +413,39 @@ export default class AuthenticatedUserProvider extends React.Component<
       authentication.getAuthorizationHeader,
       firebaseUser.uid
     ).then(
-      subscription =>
+      subscription => {
         this.setState(({ authenticatedUser }) => ({
           authenticatedUser: {
             ...authenticatedUser,
             subscription,
           },
-        })),
+        }));
+        if (
+          subscription &&
+          !!subscription.pricingSystemId &&
+          !['REDEMPTION_CODE', 'MANUALLY_ADDED', 'TEAM_MEMBER'].includes(
+            subscription.pricingSystemId
+          )
+        ) {
+          getSubscriptionPlanPricingSystem(subscription.pricingSystemId).then(
+            subscriptionPricingSystem => {
+              this.setState(({ authenticatedUser }) => ({
+                authenticatedUser: {
+                  ...authenticatedUser,
+                  subscriptionPricingSystem,
+                },
+              }));
+            }
+          );
+        } else {
+          this.setState(({ authenticatedUser }) => ({
+            authenticatedUser: {
+              ...authenticatedUser,
+              subscriptionPricingSystem: null,
+            },
+          }));
+        }
+      },
       error => {
         console.error('Error while loading user subscriptions:', error);
       }
@@ -672,7 +689,10 @@ export default class AuthenticatedUserProvider extends React.Component<
         authenticatedUser: {
           ...authenticatedUser,
           profile: userProfile,
+          // Make sure we set loginState and authenticated at the same time,
+          // in case we read both values from the state in the app.
           loginState: 'done',
+          authenticated: true,
         },
       }),
       () => {
@@ -702,6 +722,30 @@ export default class AuthenticatedUserProvider extends React.Component<
           subscription,
         },
       }));
+      if (
+        subscription &&
+        !!subscription.pricingSystemId &&
+        !['REDEMPTION_CODE', 'MANUALLY_ADDED', 'TEAM_MEMBER'].includes(
+          subscription.pricingSystemId
+        )
+      ) {
+        const subscriptionPricingSystem = await getSubscriptionPlanPricingSystem(
+          subscription.pricingSystemId
+        );
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            subscriptionPricingSystem,
+          },
+        }));
+      } else {
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            subscriptionPricingSystem: null,
+          },
+        }));
+      }
     } catch (error) {
       console.error('Error while loading user subscriptions:', error);
     }

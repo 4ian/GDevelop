@@ -1,38 +1,40 @@
-@keyframes function-call-appear {
-  0% {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  /* Start after the bubble container and when the bubble content is almost finished animating. */
-  60% {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0px);
-  }
-}
-
 .functionCallContainer {
-  animation: function-call-appear 0.5s;
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-@keyframes details-paper-appear {
-  0% {
-    transform: scaleY(0.9);
-    opacity: 0.8;
-  }
-  100% {
-    opacity: 1;
-    transform: scaleY(1);
-  }
+.addedResourcesContainer {
+  padding-left: 20px;
+  user-select: all;
+  padding-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  outline: none;
+}
+
+.detailsButtonContainer {
+  padding-left: 20px;
+  user-select: none;
+  padding-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  outline: none;
+}
+
+.detailsButtonContainer:hover {
+  opacity: 0.7;
+}
+
+.detailsButtonContainer:focus-visible {
+  outline: 2px solid;
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 .detailsPaperContainer {
   transform-origin: top left;
-  animation: details-paper-appear 0.1s;
+  padding-left: 20px;
 }

@@ -116,6 +116,34 @@ void ResourceExposer::ExposeLayoutResources(
       project, layout, eventWorker);
 }
 
+void ResourceExposer::ExposeEventsBasedObjectVariantResources(
+    gd::Project &project,
+    gd::EventsBasedObjectVariant &eventsBasedObjectVariant,
+    gd::ArbitraryResourceWorker &worker) {
+  // Expose object configuration resources
+  auto objectWorker = gd::GetResourceWorkerOnObjects(project, worker);
+  gd::ProjectBrowserHelper::ExposeEventsBasedObjectVariantObjects(
+      eventsBasedObjectVariant, objectWorker);
+
+  // Expose layer effect resources
+  auto &layers = eventsBasedObjectVariant.GetLayers();
+  for (std::size_t layerIndex = 0; layerIndex < layers.GetLayersCount();
+       layerIndex++) {
+    auto &layer = layers.GetLayer(layerIndex);
+
+    auto &effects = layer.GetEffects();
+    for (size_t effectIndex = 0; effectIndex < effects.GetEffectsCount();
+         effectIndex++) {
+      auto &effect = effects.GetEffect(effectIndex);
+      gd::ResourceExposer::ExposeEffectResources(project.GetCurrentPlatform(),
+                                                 effect, worker);
+    }
+  }
+  // We don't check the events because it would cost too much to do it for every
+  // variant. Resource usage in events-based object events and their
+  // dependencies should be rare.
+}
+
 void ResourceExposer::ExposeEffectResources(
     gd::Platform &platform,
     gd::Effect &effect,

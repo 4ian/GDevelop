@@ -2,6 +2,7 @@
 import * as React from 'react';
 import RobotFace from '../UI/CustomSvgIcons/RobotFace';
 import { makeStyles } from '@material-ui/core';
+import RobotFaceSad from '../UI/CustomSvgIcons/RobotFaceSad';
 
 const useClasses = (rotating, size) =>
   makeStyles(theme => ({
@@ -43,21 +44,30 @@ const useClasses = (rotating, size) =>
     },
   }))();
 
-type Props = {| rotating?: boolean, size?: number |};
+type Props = {| rotating?: boolean, size?: number, sad?: boolean |};
 
-export default function RobotIcon({ rotating, size }: Props) {
+export default function RobotIcon({ rotating, size, sad }: Props) {
   const sizeOrDefaultSize = size || 34;
 
   const classes = useClasses(rotating, sizeOrDefaultSize);
   return (
     <div className={classes.container}>
       <div className={classes.svgContainer}>
-        <RobotFace
-          style={{
-            width: Math.floor(sizeOrDefaultSize / 2.42),
-            height: Math.floor(sizeOrDefaultSize / 2.42),
-          }}
-        />
+        {sad ? (
+          <RobotFaceSad
+            style={{
+              width: Math.floor(sizeOrDefaultSize / 2.42),
+              height: Math.floor(sizeOrDefaultSize / 2.42),
+            }}
+          />
+        ) : (
+          <RobotFace
+            style={{
+              width: Math.floor(sizeOrDefaultSize / 2.42),
+              height: Math.floor(sizeOrDefaultSize / 2.42),
+            }}
+          />
+        )}
       </div>
     </div>
   );

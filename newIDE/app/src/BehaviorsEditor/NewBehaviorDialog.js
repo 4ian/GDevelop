@@ -11,9 +11,14 @@ import { showMessageBox } from '../UI/Messages/MessageBox';
 import { getDeprecatedBehaviorsInformation } from '../Hints';
 import { enumerateBehaviorsMetadata } from './EnumerateBehaviorsMetadata';
 import { BehaviorStore } from '../AssetStore/BehaviorStore';
+import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { type BehaviorShortHeader } from '../Utils/GDevelopServices/Extension';
-import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
-import { installExtension } from '../AssetStore/ExtensionStore/InstallExtension';
+import {
+  checkRequiredExtensionsUpdate,
+  getRequiredExtensions,
+  useInstallExtension,
+  getExtensionHeader,
+} from '../AssetStore/ExtensionStore/InstallExtension';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import {
   addCreateBadgePreHookIfNotClaimed,
@@ -33,6 +38,7 @@ type Props = {|
   open: boolean,
   onClose: () => void,
   onChoose: (type: string, defaultName: string) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
@@ -45,18 +51,20 @@ export default function NewBehaviorDialog({
   objectType,
   objectBehaviorsTypes,
   isChildObject,
+  onWillInstallExtension,
   onExtensionInstalled,
 }: Props) {
   const [isInstalling, setIsInstalling] = React.useState(false);
-  const eventsFunctionsExtensionsState = React.useContext(
-    EventsFunctionsExtensionsContext
-  );
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const {
+    translatedExtensionShortHeadersByName: extensionShortHeadersByName,
+  } = React.useContext(ExtensionStoreContext);
+  const installExtension = useInstallExtension();
 
-  const installDisplayedExtension = addCreateBadgePreHookIfNotClaimed(
+  const createBadgeFirstExtension = addCreateBadgePreHookIfNotClaimed(
     authenticatedUser,
     TRIVIAL_FIRST_EXTENSION,
-    installExtension
+    () => {}
   );
 
   const deprecatedBehaviorsInformation = React.useMemo(
@@ -185,14 +193,45 @@ export default function NewBehaviorDialog({
   ) => {
     setIsInstalling(true);
     try {
-      const wasExtensionInstalled = await installDisplayedExtension(
-        i18n,
-        project,
-        eventsFunctionsExtensionsState,
-        behaviorShortHeader
+      const behaviorShortHeaders: Array<BehaviorShortHeader> = [
+        behaviorShortHeader,
+      ];
+      const requiredExtensions = getRequiredExtensions(behaviorShortHeaders);
+      const requiredExtensionInstallation = await checkRequiredExtensionsUpdate(
+        {
+          requiredExtensions,
+          project,
+          extensionShortHeadersByName,
+        }
       );
+      const extensionShortHeader = getExtensionHeader(
+        extensionShortHeadersByName,
+        behaviorShortHeader.extensionName
+      );
+      if (
+        !requiredExtensionInstallation.missingExtensionShortHeaders.includes(
+          extensionShortHeader
+        )
+      ) {
+        // The behavior's extension is not part of `requiredExtensions` but
+        // should always be installed. Indeed, at this point, either:
+        // - the extension is missing
+        // - the user choses to update it (see `useExtensionUpdateAlertDialog`)
+        requiredExtensionInstallation.missingExtensionShortHeaders.push(
+          extensionShortHeader
+        );
+      }
+      const wasExtensionInstalled = await installExtension({
+        project,
+        requiredExtensionInstallation,
+        importedSerializedExtensions: [],
+        onWillInstallExtension,
+        onExtensionInstalled,
+        updateMode: 'all',
+        reason: 'behavior',
+      });
       if (wasExtensionInstalled) {
-        onExtensionInstalled([behaviorShortHeader.extensionName]);
+        createBadgeFirstExtension();
       }
       return wasExtensionInstalled;
     } finally {
@@ -228,9 +267,7 @@ export default function NewBehaviorDialog({
             objectBehaviorsTypes={objectBehaviorsTypes}
             isChildObject={isChildObject}
             isInstalling={isInstalling}
-            onInstall={async shortHeader =>
-              onInstallExtension(i18n, shortHeader)
-            }
+            onInstall={shortHeader => onInstallExtension(i18n, shortHeader)}
             onChoose={behaviorType => chooseBehavior(i18n, behaviorType)}
             installedBehaviorMetadataList={installedBehaviorMetadataList}
             deprecatedBehaviorMetadataList={deprecatedBehaviorMetadataList}

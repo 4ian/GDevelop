@@ -623,10 +623,46 @@ Zv();a.b2Manifold.e_faceA=$v();a.b2Manifold.e_faceB=aw();a.b2_staticBody=bw();a.
 })();
 
 gdjs.registerAsynchronouslyLoadingLibraryPromise(initializeBox2D({locateFile: function(path, prefix) {
-  return location.protocol === 'file:' ?
-      // This is needed to run on Electron.
-      prefix + "Extensions/Physics2Behavior/" + path :
-      prefix + path;
+  // Path should always be "Box2D_v2.3.1_min.wasm.wasm" (and if it's not, we should probably hardcode it).
+  if (path !== 'Box2D_v2.3.1_min.wasm.wasm') {
+    console.warn("'path' argument sent to locateFile in Box2D_v2.3.1_min.wasm.js is not the expected string 'Box2D_v2.3.1_min.wasm.wasm'. Loading may fail.")
+  }
+
+  // Prefix is typically:
+  // Games ("exported", standalone game):
+  // - Web game: "https://games.gdevelop-app.com/[...]/Extensions/Physics2Behavior/"
+  // - Cordova Android: "https://localhost/Extensions/Physics2Behavior/".
+  // - Cordova iOS: "ionic://localhost/Extensions/Physics2Behavior/".
+  // - Electron macOS: "/private/var/[...]/Contents/Resources/app.asar/app/" (notice the missing folder).
+  // - Electron Windows: "C:\Users\[...]\AppData\Local\[...]\resources\app.asar\app/" (notice the missing folder).
+  // Preview (in the editor):
+  // - Web app preview (dev editor): "http://localhost:5002/Runtime/Extensions/Physics2Behavior/"
+  // - Web app preview (production editor): "https://resources.gdevelop-app.com/[...]/Runtime/Extensions/Physics2Behavior/"
+  // - Electron app preview (dev editor): "/var/[...]/preview/" (notice the missing folder).
+  // - Electron app preview (production editor): "/var/[...]/preview/" (notice the missing folder).
+  // In-game editor:
+  // - Web app (dev editor): "http://localhost:5002/Runtime/Extensions/Physics2Behavior/"
+  // - Web app (production editor): "https://resources.gdevelop-app.com/[...]/Runtime/Extensions/Physics2Behavior/"
+  // - Electron app (dev editor): "file:///var/[...]/in-game-editor-preview/Extensions/Physics2Behavior/"
+  // - Electron app (production editor): "file:///var/[...]/in-game-editor-preview/Extensions/Physics2Behavior/"
+
+  // If the prefix is a full URL, it's a full URL to the folder containing this JS file.
+  // Sill consider the case where the folder could have been missing.
+  let url;
+  if (prefix.startsWith('http:') || prefix.startsWith('https:')) {
+    url = prefix.endsWith('Extensions/Physics2Behavior/') ?
+      prefix + path :
+      prefix + 'Extensions/Physics2Behavior/' + path;
+  } else {
+    // Electron or Cordova iOS will fall in this case.
+    // We can't use this simple solution for http/https because
+    // on the web-app, the runtime is not necessarily hosted
+    // on the same domain as where the game generated files are served (so "prefix" is needed).
+    url = "Extensions/Physics2Behavior/" + path;
+  }
+
+  console.info(`Box2D wasm file is being loaded from path "${path}" with prefix "${prefix}". Resolved URL: "${url}".`);
+  return url;
 }}).then(box2d => {
   window.Box2D = box2d;
 }));

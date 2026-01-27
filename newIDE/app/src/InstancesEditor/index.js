@@ -72,6 +72,11 @@ const styles = {
 
 const DropTarget = makeDropTarget<{||}>(objectWithContextReactDndType);
 
+export type EditorViewPosition2D = {|
+  viewX: number | null,
+  viewY: number | null,
+|};
+
 export type InstancesEditorShortcutsCallbacks = {|
   onDelete: () => void,
   onCopy: () => void,
@@ -95,7 +100,7 @@ export type InstancesEditorPropsWithoutSizeAndScroll = {|
   layersContainer: gdLayersContainer,
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
-  selectedLayer: string,
+  chosenLayer: string,
   initialInstances: gdInitialInstancesContainer,
   instancesEditorSettings: InstancesEditorSettings,
   isInstanceOf3DObject: gdInitialInstance => boolean,
@@ -119,6 +124,7 @@ export type InstancesEditorPropsWithoutSizeAndScroll = {|
   instancesEditorShortcutsCallbacks: InstancesEditorShortcutsCallbacks,
   tileMapTileSelection: ?TileMapTileSelection,
   onSelectTileMapTile: (?TileMapTileSelection) => void,
+  editorViewPosition2D: EditorViewPosition2D,
 |};
 
 type Props = {|
@@ -393,8 +399,14 @@ export default class InstancesEditor extends Component<Props, State> {
 
     const areaRectangle = this._getAreaRectangle();
     this.viewPosition = new ViewPosition({
-      initialViewX: areaRectangle.centerX(),
-      initialViewY: areaRectangle.centerY(),
+      initialViewX:
+        this.props.editorViewPosition2D.viewX === null
+          ? areaRectangle.centerX()
+          : this.props.editorViewPosition2D.viewX,
+      initialViewY:
+        this.props.editorViewPosition2D.viewY === null
+          ? areaRectangle.centerY()
+          : this.props.editorViewPosition2D.viewY,
       width: this.props.width,
       height: this.props.height,
       instancesEditorSettings: this.props.instancesEditorSettings,
@@ -1598,6 +1610,13 @@ export default class InstancesEditor extends Component<Props, State> {
           this.backgroundPixiContainer
         );
       }
+
+      // Modify the content directly to avoid to trigger rendering
+      // and to avoid to send callbacks.
+      const { editorViewPosition2D } = this.props;
+      editorViewPosition2D.viewX = this.viewPosition.viewX;
+      editorViewPosition2D.viewY = this.viewPosition.viewY;
+
       this.nextFrame = requestAnimationFrame(this._renderScene);
     } catch (error) {
       console.error('Exception caught while doing the rendering:', error);
@@ -1667,7 +1686,7 @@ export default class InstancesEditor extends Component<Props, State> {
           _instancesAdder.createOrUpdateTemporaryInstancesFromObjectNames(
             pos,
             this.props.selectedObjectNames,
-            this.props.selectedLayer
+            this.props.chosenLayer
           );
         }}
         drop={monitor => {

@@ -1,4 +1,5 @@
 namespace gdjs {
+  /** @category Other extensions > Steamworks */
   export namespace steamworks {
     const logger = new gdjs.Logger('Steamworks');
     export let steamAPI: import('steamworks.js').Client | null = null;

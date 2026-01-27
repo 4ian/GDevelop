@@ -17,6 +17,7 @@ export default class TiledSpriteEditor extends React.Component<
       objectConfiguration,
       project,
       resourceManagementProps,
+      projectScopedContainersAccessor,
       objectName,
       renderObjectNameField,
     } = this.props;
@@ -30,6 +31,7 @@ export default class TiledSpriteEditor extends React.Component<
         <ResourceSelectorWithThumbnail
           project={project}
           resourceManagementProps={resourceManagementProps}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
           resourceKind="image"
           resourceName={tiledSpriteConfiguration.getTexture()}
           defaultNewResourceName={objectName}

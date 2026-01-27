@@ -130,6 +130,11 @@ class TiledSpriteObjectJsExtension : public gd::PlatformExtension {
         .SetFunctionName("getYOffset")
         .SetIncludeFile(
             "Extensions/TiledSpriteObject/tiledspriteruntimeobject.js");
+    GetAllActionsForObject(
+        "TiledSpriteObject::TiledSprite")["TiledSpriteObject::SetImageFromResource"]
+        .SetFunctionName("setTexture")
+        .SetIncludeFile(
+            "Extensions/TiledSpriteObject/tiledspriteruntimeobject.js");
 
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
   };

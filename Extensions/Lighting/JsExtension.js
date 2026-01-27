@@ -172,8 +172,14 @@ module.exports = {
       .setIncludeFile('Extensions/Lighting/lightruntimeobject.js')
       .addIncludeFile('Extensions/Lighting/lightruntimeobject-pixi-renderer.js')
       .addIncludeFile('Extensions/Lighting/lightobstacleruntimebehavior.js')
-      .setCategoryFullName(_('Visual effect'))
+      .setCategory('Visual effect')
       .addDefaultBehavior('EffectCapability::EffectBehavior');
+
+    object
+      .addInGameEditorResource()
+      .setResourceName('InGameEditor-LightIcon')
+      .setFilePath('Extensions/Lighting/InGameEditor/LightIcon.png')
+      .setKind('image');
 
     object
       .addAction(
@@ -338,11 +344,11 @@ module.exports = {
       }
 
       getOriginX() {
-        return this._radius;
+        return (this._radius / this.getDefaultWidth()) * this.getWidth();
       }
 
       getOriginY() {
-        return this._radius;
+        return (this._radius / this.getDefaultHeight()) * this.getHeight();
       }
     }
 

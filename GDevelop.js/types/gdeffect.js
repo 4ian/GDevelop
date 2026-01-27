@@ -7,6 +7,8 @@ declare class gdEffect {
   getEffectType(): string;
   setFolded(val: boolean): void;
   isFolded(): boolean;
+  setEnabled(val: boolean): void;
+  isEnabled(): boolean;
   setDoubleParameter(name: string, value: number): void;
   getDoubleParameter(name: string): number;
   hasDoubleParameter(name: string): boolean;

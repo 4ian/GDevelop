@@ -17,6 +17,7 @@ import type { LoginProvider } from '../../LoginProvider';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { type CommunityLinks, type UserSurvey } from './User';
 import { userCancellationErrorName } from '../../LoginProvider/Utils';
+import { ensureIsObject, ensureObjectHasProperty } from '../DataValidator';
 
 export type Profile = {|
   id: string,
@@ -125,11 +126,28 @@ export default class Authentication {
   _onUserLogoutCallbacks: Array<() => void | Promise<void>> = [];
   _onUserUpdateCallbacks: Array<() => void | Promise<void>> = [];
   loginProvider: ?LoginProvider;
+  _initialAuthCheckPromise: Promise<void>;
 
   constructor() {
     const app = initializeApp(GDevelopFirebaseConfig);
     this.auth = getAuth(app);
+
+    // Create a promise that resolves when Firebase completes its initial auth check.
+    // This prevents race conditions where components check auth state before Firebase
+    // has finished initializing.
+    let resolveInitialCheck;
+    this._initialAuthCheckPromise = new Promise(resolve => {
+      resolveInitialCheck = resolve;
+    });
+
+    let isFirstCall = true;
     onAuthStateChanged(this.auth, user => {
+      if (isFirstCall) {
+        // First call - Firebase has completed initial auth check
+        isFirstCall = false;
+        resolveInitialCheck();
+      }
+
       if (user) {
         // User has logged in or changed.
         this._onUserUpdateCallbacks.forEach(cb => cb());
@@ -357,7 +375,13 @@ export default class Authentication {
           },
         });
       })
-      .then(response => response.data)
+      .then(response =>
+        ensureObjectHasProperty({
+          data: response.data,
+          propertyName: 'id',
+          endpointName: '/user/{id} of User API',
+        })
+      )
       .catch(error => {
         console.error('Error while fetching user:', error);
         throw error;
@@ -382,7 +406,11 @@ export default class Authentication {
       }
     );
 
-    return response.data;
+    return ensureObjectHasProperty({
+      data: response.data,
+      propertyName: 'code',
+      endpointName: '/user/{id}/action/update-github-star of User API',
+    });
   };
 
   updateTiktokFollow = async (
@@ -403,7 +431,11 @@ export default class Authentication {
       }
     );
 
-    return response.data;
+    return ensureObjectHasProperty({
+      data: response.data,
+      propertyName: 'code',
+      endpointName: '/user/{id}/action/update-tiktok-follow of User API',
+    });
   };
 
   updateTwitterFollow = async (
@@ -426,7 +458,11 @@ export default class Authentication {
       }
     );
 
-    return response.data;
+    return ensureObjectHasProperty({
+      data: response.data,
+      propertyName: 'code',
+      endpointName: '/user/{id}/action/update-twitter-follow of User API',
+    });
   };
 
   updateYoutubeSubscription = async (
@@ -451,7 +487,11 @@ export default class Authentication {
       }
     );
 
-    return response.data;
+    return ensureObjectHasProperty({
+      data: response.data,
+      propertyName: 'code',
+      endpointName: '/user/{id}/action/update-youtube-subscription of User API',
+    });
   };
 
   acceptGameStatsEmail = async (
@@ -475,7 +515,12 @@ export default class Authentication {
           }
         );
       })
-      .then(response => response.data)
+      .then(response =>
+        ensureIsObject({
+          data: response.data,
+          endpointName: '/user/{id} of User API',
+        })
+      )
       .catch(error => {
         console.error('Error while accepting game stats email:', error);
         throw error;
@@ -529,5 +574,9 @@ export default class Authentication {
 
   isAuthenticated = (): boolean => {
     return !!this.auth.currentUser;
+  };
+
+  waitForInitialAuthCheck = (): Promise<void> => {
+    return this._initialAuthCheckPromise;
   };
 }

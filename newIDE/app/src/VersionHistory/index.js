@@ -26,7 +26,6 @@ const anonymousAvatars = [
 
 const styles = {
   scrollView: {
-    flex: 1,
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
@@ -81,7 +80,10 @@ type Props = {|
   openedVersionStatus: ?OpenedVersionStatus,
   onLoadMore: () => Promise<void>,
   canLoadMore: boolean,
-  onCheckoutVersion: ExpandedCloudProjectVersion => Promise<void>,
+  onCheckoutVersion: (
+    version: ExpandedCloudProjectVersion,
+    options?: {| dontSaveCheckedOutVersionStatus?: boolean |}
+  ) => Promise<boolean>,
   isVisible: boolean,
 |};
 

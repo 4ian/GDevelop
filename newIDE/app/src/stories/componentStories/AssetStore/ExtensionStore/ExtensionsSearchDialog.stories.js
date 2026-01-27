@@ -1,15 +1,19 @@
 // @flow
 import * as React from 'react';
+import MockAdapter from 'axios-mock-adapter';
 import { action } from '@storybook/addon-actions';
 
 import paperDecorator from '../../../PaperDecorator';
 import ExtensionsSearchDialog from '../../../../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 import { I18n } from '@lingui/react';
-import EventsFunctionsExtensionsProvider from '../../../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsProvider';
+import { EventsFunctionsExtensionsProvider } from '../../../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsProvider';
 import { ExtensionStoreStateProvider } from '../../../../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { testProject } from '../../../GDevelopJsInitializerDecorator';
-import { GDevelopAssetApi } from '../../../../Utils/GDevelopServices/ApiConfigs';
 import { fakeExtensionsRegistry } from '../../../../fixtures/GDevelopServicesTestData/FakeExtensionsRegistry';
+import {
+  client as extensionClient,
+  cdnClient,
+} from '../../../../Utils/GDevelopServices/Extension';
 
 export default {
   title: 'AssetStore/ExtensionStore/ExtensionSearchDialog',
@@ -17,80 +21,107 @@ export default {
   decorators: [paperDecorator],
 };
 
-const apiDataServerSideError = {
-  mockData: [
-    {
-      url: `${GDevelopAssetApi.baseUrl}/extension?environment=live`,
-      method: 'GET',
-      status: 500,
-      response: { data: 'status' },
+export const Default = () => {
+  const extensionApiMock = React.useMemo(() => {
+    const mock = new MockAdapter(extensionClient, {
+      delayResponse: 250,
+    });
+
+    mock.onGet('/extension', { params: { environment: 'live' } }).reply(200, {
+      databaseUrl: 'https://fake-cdn.com/extensions-database-v2.json',
+    });
+
+    return mock;
+  }, []);
+
+  const extensionCdnMock = React.useMemo(() => {
+    const mock = new MockAdapter(cdnClient, {
+      delayResponse: 250,
+    });
+
+    mock
+      .onGet('https://fake-cdn.com/extensions-database-v2.json')
+      .reply(200, fakeExtensionsRegistry);
+
+    return mock;
+  }, []);
+
+  React.useEffect(
+    () => {
+      return () => {
+        extensionApiMock.restore();
+        extensionCdnMock.restore();
+      };
     },
-  ],
+    [extensionApiMock, extensionCdnMock]
+  );
+
+  return (
+    <I18n>
+      {({ i18n }) => (
+        <EventsFunctionsExtensionsProvider
+          i18n={i18n}
+          makeEventsFunctionCodeWriter={() => null}
+          eventsFunctionsExtensionWriter={null}
+          eventsFunctionsExtensionOpener={null}
+        >
+          <ExtensionStoreStateProvider i18n={i18n}>
+            <ExtensionsSearchDialog
+              project={testProject.project}
+              onClose={action('onClose')}
+              onCreateNew={action('onCreateNew')}
+              onWillInstallExtension={action('extension will be installed')}
+              onExtensionInstalled={action('onExtensionInstalled')}
+            />
+          </ExtensionStoreStateProvider>
+        </EventsFunctionsExtensionsProvider>
+      )}
+    </I18n>
+  );
 };
 
-const apiDataFakeExtensions = {
-  mockData: [
-    {
-      url: `${GDevelopAssetApi.baseUrl}/extension?environment=live`,
-      method: 'GET',
-      status: 200,
-      response: {
-        databaseUrl: 'https://fake-cdn.com/extensions-database-v2.json',
-      },
+export const WithServerSideError = () => {
+  const extensionApiMock = React.useMemo(() => {
+    const mock = new MockAdapter(extensionClient, {
+      delayResponse: 250,
+    });
+
+    mock
+      .onGet('/extension', { params: { environment: 'live' } })
+      .reply(500, { data: 'status' });
+
+    return mock;
+  }, []);
+
+  React.useEffect(
+    () => {
+      return () => {
+        extensionApiMock.restore();
+      };
     },
-    {
-      url: `https://fake-cdn.com/extensions-database-v2.json`,
-      method: 'GET',
-      status: 200,
-      response: fakeExtensionsRegistry,
-    },
-  ],
+    [extensionApiMock]
+  );
+
+  return (
+    <I18n>
+      {({ i18n }) => (
+        <EventsFunctionsExtensionsProvider
+          i18n={i18n}
+          makeEventsFunctionCodeWriter={() => null}
+          eventsFunctionsExtensionWriter={null}
+          eventsFunctionsExtensionOpener={null}
+        >
+          <ExtensionStoreStateProvider i18n={i18n}>
+            <ExtensionsSearchDialog
+              project={testProject.project}
+              onClose={action('onClose')}
+              onCreateNew={action('onCreateNew')}
+              onWillInstallExtension={action('extension will be installed')}
+              onExtensionInstalled={action('onExtensionInstalled')}
+            />
+          </ExtensionStoreStateProvider>
+        </EventsFunctionsExtensionsProvider>
+      )}
+    </I18n>
+  );
 };
-
-export const Default = () => (
-  <I18n>
-    {({ i18n }) => (
-      <EventsFunctionsExtensionsProvider
-        i18n={i18n}
-        makeEventsFunctionCodeWriter={() => null}
-        eventsFunctionsExtensionWriter={null}
-        eventsFunctionsExtensionOpener={null}
-      >
-        <ExtensionStoreStateProvider i18n={i18n}>
-          <ExtensionsSearchDialog
-            project={testProject.project}
-            onClose={action('onClose')}
-            onInstallExtension={action('onInstallExtension')}
-            onCreateNew={action('onCreateNew')}
-            onExtensionInstalled={action('onExtensionInstalled')}
-          />
-        </ExtensionStoreStateProvider>
-      </EventsFunctionsExtensionsProvider>
-    )}
-  </I18n>
-);
-Default.parameters = apiDataFakeExtensions;
-
-export const WithServerSideError = () => (
-  <I18n>
-    {({ i18n }) => (
-      <EventsFunctionsExtensionsProvider
-        i18n={i18n}
-        makeEventsFunctionCodeWriter={() => null}
-        eventsFunctionsExtensionWriter={null}
-        eventsFunctionsExtensionOpener={null}
-      >
-        <ExtensionStoreStateProvider i18n={i18n}>
-          <ExtensionsSearchDialog
-            project={testProject.project}
-            onClose={action('onClose')}
-            onInstallExtension={action('onInstallExtension')}
-            onCreateNew={action('onCreateNew')}
-            onExtensionInstalled={action('onExtensionInstalled')}
-          />
-        </ExtensionStoreStateProvider>
-      </EventsFunctionsExtensionsProvider>
-    )}
-  </I18n>
-);
-WithServerSideError.parameters = apiDataServerSideError;

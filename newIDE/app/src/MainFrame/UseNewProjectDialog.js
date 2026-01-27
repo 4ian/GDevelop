@@ -13,11 +13,15 @@ import NewProjectSetupDialog, {
   type NewProjectSetup,
   type ExampleProjectSetup,
 } from '../ProjectCreation/NewProjectSetupDialog';
-import { type StorageProvider } from '../ProjectsStorage';
+import { type FileMetadata, type StorageProvider } from '../ProjectsStorage';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import RouterContext from './RouterContext';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
 
 type Props = {|
+  project: ?gdProject,
+  fileMetadata: ?FileMetadata,
+  resourceManagementProps: ResourceManagementProps,
   isProjectOpening: boolean,
   newProjectSetupDialogOpen: boolean,
   setNewProjectSetupDialogOpen: boolean => void,
@@ -29,23 +33,41 @@ type Props = {|
     privateGameTemplateListingData: PrivateGameTemplateListingData,
     newProjectSetup: NewProjectSetup
   ) => Promise<CreateProjectResult>,
-  openAskAi: ({|
-    mode: 'chat' | 'agent',
-    aiRequestId: string | null,
-    paneIdentifier: 'left' | 'center' | 'right' | null,
-  |}) => void,
+  closeAskAi: () => void,
   storageProviders: Array<StorageProvider>,
+  storageProvider: ?StorageProvider,
+  onOpenLayout: (
+    sceneName: string,
+    options: {|
+      openEventsEditor: boolean,
+      openSceneEditor: boolean,
+      focusWhenOpened:
+        | 'scene-or-events-otherwise'
+        | 'scene'
+        | 'events'
+        | 'none',
+    |}
+  ) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
 const useNewProjectDialog = ({
+  project,
+  fileMetadata,
+  resourceManagementProps,
   isProjectOpening,
   newProjectSetupDialogOpen,
   setNewProjectSetupDialogOpen,
   createEmptyProject,
   createProjectFromExample,
   createProjectFromPrivateGameTemplate,
-  openAskAi,
+  closeAskAi,
   storageProviders,
+  storageProvider,
+  onOpenLayout,
+  onWillInstallExtension,
+  onExtensionInstalled,
 }: Props) => {
   const [isFetchingExample, setIsFetchingExample] = React.useState(false);
   const [
@@ -179,24 +201,15 @@ const useNewProjectDialog = ({
     [onSelectExampleShortHeader, removeRouteArguments]
   );
 
-  const onOpenAskAi = React.useCallback(
-    () => {
-      closeNewProjectDialog();
-      openAskAi({
-        mode: 'agent',
-        aiRequestId: null,
-        paneIdentifier: 'center',
-      });
-    },
-    [closeNewProjectDialog, openAskAi]
-  );
-
   const renderNewProjectDialog = () => {
     return (
       <>
-        {isFetchingExample && <LoaderModal show />}
+        {isFetchingExample && <LoaderModal showImmediately />}
         {newProjectSetupDialogOpen && (
           <NewProjectSetupDialog
+            project={project}
+            fileMetadata={fileMetadata}
+            resourceManagementProps={resourceManagementProps}
             isProjectOpening={isProjectOpening}
             onClose={closeNewProjectDialog}
             onCreateEmptyProject={createEmptyProject}
@@ -204,8 +217,9 @@ const useNewProjectDialog = ({
             onCreateProjectFromPrivateGameTemplate={
               createProjectFromPrivateGameTemplate
             }
-            onOpenAskAi={onOpenAskAi}
+            onCloseAskAi={closeAskAi}
             storageProviders={storageProviders}
+            storageProvider={storageProvider}
             selectedExampleShortHeader={selectedExampleShortHeader}
             onSelectExampleShortHeader={exampleShortHeader =>
               onSelectExampleShortHeader({
@@ -226,6 +240,9 @@ const useNewProjectDialog = ({
               privateGameTemplateListingDatasFromSameCreator
             }
             preventBackHome={preventBackHome}
+            onOpenLayout={onOpenLayout}
+            onWillInstallExtension={onWillInstallExtension}
+            onExtensionInstalled={onExtensionInstalled}
           />
         )}
       </>

@@ -149,6 +149,7 @@ type Props = {|
   onContinueQuickCustomization: () => void,
   gameScreenshotUrls: Array<string>,
   onScreenshotsClaimed: () => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
@@ -166,6 +167,7 @@ export const renderQuickCustomization = ({
   onContinueQuickCustomization,
   gameScreenshotUrls,
   onScreenshotsClaimed,
+  onWillInstallExtension,
   onExtensionInstalled,
 }: Props) => {
   return {
@@ -176,6 +178,7 @@ export const renderQuickCustomization = ({
           <QuickObjectReplacer
             project={project}
             resourceManagementProps={resourceManagementProps}
+            onWillInstallExtension={onWillInstallExtension}
             onExtensionInstalled={onExtensionInstalled}
           />
         ) : quickCustomizationState.step.name === 'tweak-behaviors' ? (

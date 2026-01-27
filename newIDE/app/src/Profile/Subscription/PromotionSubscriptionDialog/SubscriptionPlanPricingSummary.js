@@ -8,9 +8,10 @@ import {
   type SubscriptionPlanPricingSystem,
   EDUCATION_PLAN_MAX_SEATS,
   EDUCATION_PLAN_MIN_SEATS,
+  hasValidSubscriptionPlan,
 } from '../../../Utils/GDevelopServices/Usage';
 import { selectMessageByLocale } from '../../../Utils/i18n/MessageByLocale';
-import { getPlanIcon } from '../PlanCard';
+import { getPlanIcon } from '../PlanSmallCard';
 import { ColumnStackLayout } from '../../../UI/Layout';
 import { t, Trans } from '@lingui/macro';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
@@ -22,6 +23,7 @@ import { FormControlLabel, Radio, RadioGroup } from '@material-ui/core';
 import DiscountFlame from '../../../UI/HotMessage/DiscountFlame';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import Chip from '../../../UI/Chip';
+import AuthenticatedUserContext from '../../AuthenticatedUserContext';
 
 const styles = {
   paper: {
@@ -32,7 +34,7 @@ const styles = {
     padding: 16,
   },
   descriptionContainer: { minHeight: 70 }, // Keep height the same for 1 or 2 lines.
-  discountContainer: {
+  discountOrOwnedContainer: {
     padding: '4px 8px',
     borderRadius: 4,
     display: 'flex',
@@ -86,7 +88,7 @@ const SubscriptionPlanPricingSummary = ({
   subscriptionPlanWithPricingSystems: SubscriptionPlanWithPricingSystems,
   disabled?: boolean,
   onClickChoosePlan: (
-    pricingSystem: SubscriptionPlanPricingSystem
+    pricingSystem: SubscriptionPlanPricingSystem | null
   ) => Promise<void>,
   seatsCount: number,
   setSeatsCount: (seatsCount: number) => void,
@@ -95,21 +97,38 @@ const SubscriptionPlanPricingSummary = ({
   onlyShowDiscountedPrice?: boolean,
 |}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-
-  const planIcon = getPlanIcon({
-    planId: subscriptionPlanWithPricingSystems.id,
-    logoSize: 12,
-  });
-
   const selectedPricingSystem = subscriptionPlanWithPricingSystems.pricingSystems.find(
     pricingSystem => pricingSystem.period === period
   );
+
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const isPlanValid = hasValidSubscriptionPlan(authenticatedUser.subscription);
+  const willCancelAtPeriodEnd =
+    !!authenticatedUser.subscription &&
+    !!authenticatedUser.subscription.cancelAtPeriodEnd;
+  const userPlanId = authenticatedUser.subscription
+    ? authenticatedUser.subscription.planId
+    : null;
+  const isUserCurrentOrLegacyPlan =
+    userPlanId === subscriptionPlanWithPricingSystems.id;
+  const userPricingSystem = authenticatedUser.subscriptionPricingSystem;
+
+  const isSimilarToUserCurrentPricingSystemEvenIfLegacy =
+    !!userPricingSystem &&
+    userPricingSystem.planId === subscriptionPlanWithPricingSystems.id &&
+    userPricingSystem.period === period;
+
   const yearlyPlanPrice = subscriptionPlanWithPricingSystems.pricingSystems.find(
     price => price.period === 'year'
   );
   const monthlyPlanPrice = subscriptionPlanWithPricingSystems.pricingSystems.find(
     price => price.period === 'month'
   );
+
+  const planIcon = getPlanIcon({
+    planId: subscriptionPlanWithPricingSystems.id,
+    logoSize: 12,
+  });
 
   if (!selectedPricingSystem || !yearlyPlanPrice || !monthlyPlanPrice) {
     console.error(
@@ -166,6 +185,7 @@ const SubscriptionPlanPricingSummary = ({
                       floatingLabelText={<Trans>Number of seats</Trans>}
                       commitOnBlur
                       type="number"
+                      disabled={isUserCurrentOrLegacyPlan}
                       onChange={value => {
                         const newValue = parseInt(value);
                         setSeatsCount(
@@ -183,140 +203,232 @@ const SubscriptionPlanPricingSummary = ({
                       min={EDUCATION_PLAN_MIN_SEATS}
                       max={EDUCATION_PLAN_MAX_SEATS}
                       step={1}
-                      helperMarkdownText={i18n._(
-                        t`As a teacher, you will use one seat in the plan so make sure to include yourself!`
-                      )}
+                      helperMarkdownText={
+                        !isUserCurrentOrLegacyPlan
+                          ? i18n._(
+                              t`As a teacher, you will use one seat in the plan so make sure to include yourself!`
+                            )
+                          : i18n._(t`Contact us at education@gdevelop.io if you want to update
+                      your plan`)
+                      }
                     />
                   </ColumnStackLayout>
                 )}
-              {!onlyShowDiscountedPrice && (
-                <Line noMargin expand>
-                  <RadioGroup
-                    value={period}
-                    onChange={event => {
-                      setPeriod(event.target.value);
-                    }}
-                    style={styles.radioGroup}
-                  >
-                    <FormControlLabel
-                      style={{
-                        ...styles.formControlLabel,
-                        backgroundColor:
-                          period === 'year'
-                            ? gdevelopTheme.paper.backgroundColor.light
-                            : gdevelopTheme.paper.backgroundColor.medium,
+              {!onlyShowDiscountedPrice &&
+                !(
+                  subscriptionPlanWithPricingSystems.id ===
+                    'gdevelop_education' && isUserCurrentOrLegacyPlan
+                ) && (
+                  <Line noMargin expand>
+                    <RadioGroup
+                      value={period}
+                      onChange={event => {
+                        setPeriod(event.target.value);
                       }}
-                      value="year"
-                      control={<Radio color="secondary" disabled={disabled} />}
-                      label={
-                        <Line>
-                          <Column>
-                            <Text noMargin color="inherit" size="sub-title">
-                              {!yearlyPlanPrice.isPerUser ? (
-                                <Trans>
-                                  Yearly,
-                                  {formatPriceWithCurrency(
-                                    yearlyPlanPrice.amountInCents,
-                                    yearlyPlanPrice.currency
-                                  )}
-                                </Trans>
-                              ) : (
-                                <Trans>
-                                  Yearly,
-                                  {formatPriceWithCurrency(
-                                    yearlyPlanPrice.amountInCents,
-                                    yearlyPlanPrice.currency
-                                  )}{' '}
-                                  per seat
-                                </Trans>
-                              )}
-                            </Text>
-                            <Text color="secondary" noMargin>
-                              <Trans>
-                                Instead of{' '}
-                                <span style={styles.discountedPrice}>
-                                  {formatPriceWithCurrency(
-                                    yearlyPriceInCentsWithMonthlyPlan,
-                                    yearlyPlanPrice.currency
-                                  )}
-                                </span>
-                              </Trans>
-                            </Text>
-                          </Column>
-                          <Column alignItems="center" justifyContent="center">
-                            <span
-                              style={{
-                                ...styles.discountContainer,
-                                backgroundColor:
-                                  gdevelopTheme.message.hot.backgroundColor,
-                                color: gdevelopTheme.message.hot.color,
-                              }}
-                            >
-                              <DiscountFlame fontSize="small" />
-                              <Spacer />
-                              <Text color="inherit" noMargin>
-                                {yearlyDiscountDisplayText}
+                      style={styles.radioGroup}
+                    >
+                      <FormControlLabel
+                        style={{
+                          ...styles.formControlLabel,
+                          backgroundColor:
+                            period === 'year'
+                              ? gdevelopTheme.paper.backgroundColor.light
+                              : gdevelopTheme.paper.backgroundColor.medium,
+                        }}
+                        value="year"
+                        control={
+                          <Radio color="secondary" disabled={disabled} />
+                        }
+                        label={
+                          <Line>
+                            <Column>
+                              <Text noMargin color="inherit" size="sub-title">
+                                {!yearlyPlanPrice.isPerUser ? (
+                                  <Trans>
+                                    Yearly,
+                                    {formatPriceWithCurrency(
+                                      yearlyPlanPrice.amountInCents,
+                                      yearlyPlanPrice.currency
+                                    )}
+                                  </Trans>
+                                ) : (
+                                  <Trans>
+                                    Yearly,
+                                    {formatPriceWithCurrency(
+                                      yearlyPlanPrice.amountInCents,
+                                      yearlyPlanPrice.currency
+                                    )}{' '}
+                                    per seat
+                                  </Trans>
+                                )}
                               </Text>
-                            </span>
-                          </Column>
-                        </Line>
-                      }
-                    />
-                    <Spacer />
-                    <FormControlLabel
-                      style={{
-                        ...styles.formControlLabel,
-                        backgroundColor:
-                          period === 'month'
-                            ? gdevelopTheme.paper.backgroundColor.light
-                            : gdevelopTheme.paper.backgroundColor.medium,
-                      }}
-                      value="month"
-                      control={<Radio color="secondary" disabled={disabled} />}
-                      label={
-                        <Line>
-                          <Column>
-                            <Text noMargin size="sub-title" color="inherit">
-                              {!monthlyPlanPrice.isPerUser ? (
+                              <Text color="secondary" noMargin>
                                 <Trans>
-                                  Monthly,
-                                  {formatPriceWithCurrency(
-                                    monthlyPlanPrice.amountInCents,
-                                    monthlyPlanPrice.currency
-                                  )}
+                                  Instead of{' '}
+                                  <span style={styles.discountedPrice}>
+                                    {formatPriceWithCurrency(
+                                      yearlyPriceInCentsWithMonthlyPlan,
+                                      yearlyPlanPrice.currency
+                                    )}
+                                  </span>
                                 </Trans>
+                              </Text>
+                            </Column>
+                            <Column alignItems="center" justifyContent="center">
+                              {isUserCurrentOrLegacyPlan &&
+                              isPlanValid &&
+                              userPricingSystem &&
+                              userPricingSystem.period === 'year' ? (
+                                <span
+                                  style={{
+                                    ...styles.discountOrOwnedContainer,
+                                    backgroundColor:
+                                      gdevelopTheme.message.valid,
+                                    color: 'black',
+                                  }}
+                                >
+                                  <Text color="inherit" noMargin>
+                                    <Trans>Owned</Trans>
+                                  </Text>
+                                </span>
                               ) : (
-                                <Trans>
-                                  Monthly,
-                                  {formatPriceWithCurrency(
-                                    monthlyPlanPrice.amountInCents,
-                                    monthlyPlanPrice.currency
-                                  )}{' '}
-                                  per seat
-                                </Trans>
+                                <span
+                                  style={{
+                                    ...styles.discountOrOwnedContainer,
+                                    backgroundColor:
+                                      gdevelopTheme.message.hot.backgroundColor,
+                                    color: gdevelopTheme.message.hot.color,
+                                  }}
+                                >
+                                  <DiscountFlame fontSize="small" />
+                                  <Spacer />
+                                  <Text color="inherit" noMargin>
+                                    {yearlyDiscountDisplayText}
+                                  </Text>
+                                </span>
                               )}
-                            </Text>
-                          </Column>
-                        </Line>
-                      }
-                    />
-                  </RadioGroup>
-                </Line>
-              )}
+                            </Column>
+                          </Line>
+                        }
+                      />
+                      <Spacer />
+                      <FormControlLabel
+                        style={{
+                          ...styles.formControlLabel,
+                          backgroundColor:
+                            period === 'month'
+                              ? gdevelopTheme.paper.backgroundColor.light
+                              : gdevelopTheme.paper.backgroundColor.medium,
+                        }}
+                        value="month"
+                        control={
+                          <Radio color="secondary" disabled={disabled} />
+                        }
+                        label={
+                          <Line>
+                            <Column>
+                              <Text noMargin size="sub-title" color="inherit">
+                                {!monthlyPlanPrice.isPerUser ? (
+                                  <Trans>
+                                    Monthly,
+                                    {formatPriceWithCurrency(
+                                      monthlyPlanPrice.amountInCents,
+                                      monthlyPlanPrice.currency
+                                    )}
+                                  </Trans>
+                                ) : (
+                                  <Trans>
+                                    Monthly,
+                                    {formatPriceWithCurrency(
+                                      monthlyPlanPrice.amountInCents,
+                                      monthlyPlanPrice.currency
+                                    )}{' '}
+                                    per seat
+                                  </Trans>
+                                )}
+                              </Text>
+                            </Column>
+                            <Column alignItems="center" justifyContent="center">
+                              {isUserCurrentOrLegacyPlan &&
+                                isPlanValid &&
+                                userPricingSystem &&
+                                userPricingSystem.period === 'month' && (
+                                  <span
+                                    style={{
+                                      ...styles.discountOrOwnedContainer,
+                                      backgroundColor:
+                                        gdevelopTheme.message.valid,
+                                      color: 'black',
+                                    }}
+                                  >
+                                    <Text color="inherit" noMargin>
+                                      <Trans>Owned</Trans>
+                                    </Text>
+                                  </span>
+                                )}
+                            </Column>
+                          </Line>
+                        }
+                      />
+                    </RadioGroup>
+                  </Line>
+                )}
               {!onlyShowDiscountedPrice && (
                 <Line alignItems="center" justifyContent="center">
                   <RaisedButton
-                    color="premium"
-                    key="upgrade"
-                    disabled={disabled}
-                    label={
-                      <LeftLoader isLoading={disabled}>
-                        <Text size="block-title" color="inherit">
-                          <Trans>Choose this plan</Trans>
-                        </Text>
-                      </LeftLoader>
+                    color={
+                      isSimilarToUserCurrentPricingSystemEvenIfLegacy
+                        ? 'danger'
+                        : 'premium'
                     }
-                    onClick={() => onClickChoosePlan(selectedPricingSystem)}
+                    key="upgrade"
+                    disabled={
+                      disabled ||
+                      (isSimilarToUserCurrentPricingSystemEvenIfLegacy &&
+                        isPlanValid &&
+                        willCancelAtPeriodEnd)
+                    }
+                    label={
+                      isUserCurrentOrLegacyPlan && isPlanValid ? (
+                        isSimilarToUserCurrentPricingSystemEvenIfLegacy ? (
+                          willCancelAtPeriodEnd ? (
+                            <Text size="block-title" color="inherit">
+                              <Trans>Already cancelled</Trans>
+                            </Text>
+                          ) : (
+                            <LeftLoader isLoading={disabled}>
+                              <Text size="block-title" color="inherit">
+                                <Trans>Cancel your subscription</Trans>
+                              </Text>
+                            </LeftLoader>
+                          )
+                        ) : (
+                          <LeftLoader isLoading={disabled}>
+                            <Text size="block-title" color="inherit">
+                              {period === 'year' ? (
+                                <Trans>Switch to yearly pricing</Trans>
+                              ) : (
+                                <Trans>Switch to monthly pricing</Trans>
+                              )}
+                            </Text>
+                          </LeftLoader>
+                        )
+                      ) : (
+                        <LeftLoader isLoading={disabled}>
+                          <Text size="block-title" color="inherit">
+                            <Trans>Choose this plan</Trans>
+                          </Text>
+                        </LeftLoader>
+                      )
+                    }
+                    onClick={() => {
+                      if (isSimilarToUserCurrentPricingSystemEvenIfLegacy) {
+                        onClickChoosePlan(null);
+                        return;
+                      }
+
+                      onClickChoosePlan(selectedPricingSystem);
+                    }}
                     size="large"
                     fullWidth
                   />

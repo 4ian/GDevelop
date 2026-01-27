@@ -302,7 +302,7 @@ const getAutocompletionsForText = function(
         autocompletionTexts.push(`"${project.getLayoutAt(index).getName()}"`);
       }
     }
-  } else if (type === 'stringWithSelector') {
+  } else if (type === 'stringWithSelector' || type === 'numberWithChoices') {
     autocompletionTexts = getParameterChoiceAutocompletions(
       completionDescription.getParameterMetadata()
     ).map(autocompletion => autocompletion.completion);

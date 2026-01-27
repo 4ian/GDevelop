@@ -13,6 +13,12 @@ import {
   type PrivateAssetPack,
   type PrivateGameTemplate,
 } from '../../Utils/GDevelopServices/Asset';
+import {
+  ensureIsArray,
+  ensureIsNullOrObjectHasProperty,
+  ensureObjectHasProperty,
+  ensureIsString,
+} from '../DataValidator';
 
 export const client = axios.create({
   baseURL: GDevelopShopApi.baseUrl,
@@ -249,72 +255,60 @@ export const listListedPrivateAssetPacks = async (): Promise<
   Array<PrivateAssetPackListingData>
 > => {
   const response = await client.get('/asset-pack');
-  const assetPacks = response.data;
-  if (!Array.isArray(assetPacks)) {
-    throw new Error('Invalid response from the asset packs API');
-  }
-
-  return assetPacks;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/asset-pack of Shop API',
+  });
 };
 
 export const listListedPrivateGameTemplates = async (): Promise<
   Array<PrivateGameTemplateListingData>
 > => {
   const response = await client.get('/game-template');
-  const gameTemplates = response.data;
-  if (!Array.isArray(gameTemplates)) {
-    throw new Error('Invalid response from the game templates API');
-  }
-
-  return gameTemplates;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/game-template of Shop API',
+  });
 };
 
 export const listListedCreditsPackages = async (): Promise<
   Array<CreditsPackageListingData>
 > => {
   const response = await client.get('/credits-package');
-  const creditsPackages = response.data;
-  if (!Array.isArray(creditsPackages)) {
-    throw new Error('Invalid response from the credits packages API');
-  }
-
-  return creditsPackages;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/credits-package of Shop API',
+  });
 };
 
 export const listListedCourseChapters = async (): Promise<
   Array<CourseChapterListingData>
 > => {
   const response = await client.get('/course-chapter');
-  const courseChapters = response.data;
-  if (!Array.isArray(courseChapters)) {
-    throw new Error('Invalid response from the course chapters API');
-  }
-
-  return courseChapters;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/course-chapter of Shop API',
+  });
 };
 
 export const listListedCourses = async (): Promise<
   Array<CourseListingData>
 > => {
   const response = await client.get('/course');
-  const courses = response.data;
-  if (!Array.isArray(courses)) {
-    throw new Error('Invalid response from the courses API');
-  }
-
-  return courses;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/course of Shop API',
+  });
 };
 
 export const listListedBundles = async (): Promise<
   Array<BundleListingData>
 > => {
   const response = await client.get('/bundle');
-  const bundles = response.data;
-  if (!Array.isArray(bundles)) {
-    throw new Error('Invalid response from the bundles API');
-  }
-
-  return bundles;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/bundle of Shop API',
+  });
 };
 
 export const getListedBundle = async ({
@@ -330,7 +324,11 @@ export const getListedBundle = async ({
     },
   });
 
-  return response.data;
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/bundle/{id} of Shop API',
+  });
 };
 
 export const listSellerAssetPacks = async ({
@@ -388,7 +386,10 @@ export const listUserPurchases = async (
       Authorization: authorizationHeader,
     },
   });
-  return response.data;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/purchase of Shop API',
+  });
 };
 
 export const getAuthorizationTokenForPrivateAssets = async (
@@ -408,7 +409,10 @@ export const getAuthorizationTokenForPrivateAssets = async (
       params: { userId },
     }
   );
-  return response.data;
+  return ensureIsString({
+    data: response.data,
+    endpointName: '/asset-pack/action/authorize of Shop API',
+  });
 };
 
 export const getAuthorizationTokenForPrivateGameTemplates = async (
@@ -428,7 +432,10 @@ export const getAuthorizationTokenForPrivateGameTemplates = async (
       params: { userId },
     }
   );
-  return response.data;
+  return ensureIsString({
+    data: response.data,
+    endpointName: '/game-template/action/authorize of Shop API',
+  });
 };
 
 export const createProductAuthorizedUrl = (
@@ -559,13 +566,10 @@ export const listProductLicenses = async ({
       productType,
     },
   });
-  const productLicenses = response.data;
-
-  if (!Array.isArray(productLicenses)) {
-    throw new Error('Invalid response from the product licenses API');
-  }
-
-  return productLicenses;
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/product-license of Shop API',
+  });
 };
 
 export const buyProductWithCredits = async (
@@ -773,5 +777,9 @@ export const claimPurchase = async ({
     }
   );
 
-  return result.data;
+  return ensureObjectHasProperty({
+    data: result.data,
+    propertyName: 'id',
+    endpointName: '/purchase/{id}/action/claim of Shop API',
+  });
 };

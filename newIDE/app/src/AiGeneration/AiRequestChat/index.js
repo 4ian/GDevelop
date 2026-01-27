@@ -6,19 +6,18 @@ import Text from '../../UI/Text';
 import { Trans, t } from '@lingui/macro';
 import {
   type AiRequest,
+  type AiRequestMessage,
   type AiRequestMessageAssistantFunctionCall,
 } from '../../Utils/GDevelopServices/Generation';
 import RaisedButton from '../../UI/RaisedButton';
 import { CompactTextAreaFieldWithControls } from '../../UI/CompactTextAreaFieldWithControls';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import Tooltip from '@material-ui/core/Tooltip';
-import Paper from '../../UI/Paper';
 import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import AlertMessage from '../../UI/AlertMessage';
 import classes from './AiRequestChat.module.css';
 import RobotIcon from '../../ProjectCreation/RobotIcon';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
-import GetSubscriptionCard from '../../Profile/Subscription/GetSubscriptionCard';
 import {
   type Quota,
   type UsagePrice,
@@ -29,14 +28,14 @@ import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
 import { type EditorFunctionCallResult } from '../../EditorFunctions/EditorFunctionCallRunner';
 import { type EditorCallbacks } from '../../EditorFunctions';
-import { getFunctionCallsToProcess } from '../AiRequestUtils';
-import CircularProgress from '../../UI/CircularProgress';
-import TwoStatesButton from '../../UI/TwoStatesButton';
-import Help from '../../UI/CustomSvgIcons/Help';
+import {
+  getFunctionCallOutputsFromEditorFunctionCallResults,
+  getFunctionCallsToProcess,
+} from '../AiRequestUtils';
+import HelpQuestion from '../../UI/CustomSvgIcons/HelpQuestion';
 import Hammer from '../../UI/CustomSvgIcons/Hammer';
 import { ChatMessages } from './ChatMessages';
 import Send from '../../UI/CustomSvgIcons/Send';
-import { FeedbackBanner } from './FeedbackBanner';
 import classNames from 'classnames';
 import {
   type AiConfigurationPresetWithAvailability,
@@ -44,9 +43,22 @@ import {
 } from '../AiConfiguration';
 import { AiConfigurationPresetSelector } from './AiConfigurationPresetSelector';
 import { AiRequestContext } from '../AiRequestContext';
+import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
+import { useStickyVisibility } from './UseStickyVisibility';
+import CircledInfo from '../../UI/CustomSvgIcons/CircledInfo';
+import Coin from '../../Credits/Icons/Coin';
+import FlatButton from '../../UI/FlatButton';
+import GoldCompact from '../../Profile/Subscription/Icons/GoldCompact';
+import { SubscriptionContext } from '../../Profile/Subscription/SubscriptionContext';
+import { CreditsPackageStoreContext } from '../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
+import Paper from '../../UI/Paper';
+import SelectOption from '../../UI/SelectOption';
+import CompactSelectField from '../../UI/CompactSelectField';
+import useAlertDialog from '../../UI/Alert/useAlertDialog';
+import { type FileMetadata } from '../../ProjectsStorage';
 
-const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 5;
-const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 10;
+const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 15;
+const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 20;
 
 const styles = {
   chatScrollView: {
@@ -60,22 +72,215 @@ const styles = {
     maskSize: '100% 100%',
     maskRepeat: 'no-repeat',
   },
+  creditOrSubscriptionPaper: {
+    margin: 2,
+    display: 'flex',
+    alignItems: 'center',
+  },
 };
 
-type Props = {
-  project: gdProject | null,
+const getRowsAndHeight = ({
+  standAloneForm,
+}: {|
+  standAloneForm?: boolean,
+|}) => {
+  const rows = standAloneForm ? 2 : 5;
+  // Matching height to avoid layout shifts when showing subscription/credits prompt.
+  const height = standAloneForm ? 93 : 153;
+  return { rows, height };
+};
+
+const getPriceAndRequestsTextAndTooltip = ({
+  quota,
+  price,
+  availableCredits,
+  selectedMode,
+  automaticallyUseCreditsForAiRequests,
+}: {|
+  quota: Quota | null,
+  price: UsagePrice | null,
+  availableCredits: number,
+  selectedMode: 'chat' | 'agent',
+  automaticallyUseCreditsForAiRequests: boolean,
+|}): React.Node => {
+  if (!quota || !price) {
+    // Placeholder to avoid layout shift.
+    return <div style={{ height: 29 }} />;
+  }
+
+  const aiCreditsAvailable = Math.max(0, quota.max - quota.current);
+
+  const currentQuotaText = (
+    <Trans>{aiCreditsAvailable} AI credits available</Trans>
+  );
+  const creditsText = (
+    <Trans>{Math.max(0, availableCredits)} credits available</Trans>
+  );
+
+  const timeForReset = quota.resetsAt ? new Date(quota.resetsAt) : null;
+  const now = new Date();
+  let summarySentence =
+    quota.period === '7days' ? (
+      <Trans>Your credits reset every week.</Trans>
+    ) : quota.period === '30days' ? (
+      <Trans>Your credits reset every month.</Trans>
+    ) : (
+      <Trans>Your credits reset every day.</Trans>
+    );
+  if (timeForReset) {
+    const timeDiff = timeForReset.getTime() - now.getTime();
+    // Date to look like 'Nov 30th'
+    const dateString = timeForReset.toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+    });
+    // Time to look like '14:05'
+    const timeString = timeForReset.toLocaleTimeString(undefined, {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+    if (timeDiff <= 0) {
+      summarySentence = <Trans>Your credits will reset soon.</Trans>;
+    } else {
+      summarySentence = (
+        <Trans>
+          You need to wait until {dateString} at {timeString} to reset to
+          {quota.max} AI credits.
+        </Trans>
+      );
+    }
+  }
+
+  const tooltipText = (
+    <ColumnStackLayout noMargin>
+      {summarySentence && <Line noMargin>{summarySentence}</Line>}
+      <Line noMargin>
+        <Link
+          href={getHelpLink('/interface/ai/', 'cost-of-ai-requests')}
+          color="secondary"
+          onClick={() =>
+            Window.openExternalURL(
+              getHelpLink('/interface/ai/', 'cost-of-ai-requests')
+            )
+          }
+        >
+          Learn more
+        </Link>
+      </Line>
+    </ColumnStackLayout>
+  );
+
+  const shouldShowCredits =
+    quota.limitReached && automaticallyUseCreditsForAiRequests;
+
+  return (
+    <LineStackLayout alignItems="center" noMargin>
+      {shouldShowCredits && <Coin fontSize="small" />}
+      <Text size="body-small" color="secondary" noMargin>
+        {shouldShowCredits ? creditsText : currentQuotaText}
+        <span
+          style={{
+            verticalAlign: 'middle',
+            display: 'inline-block',
+            marginRight: -3,
+            marginTop: 1,
+          }}
+        >
+          <Tooltip title={tooltipText} placement="top" interactive>
+            <CircledInfo color="inherit" />
+          </Tooltip>
+        </span>
+      </Text>
+    </LineStackLayout>
+  );
+};
+
+const getSendButtonLabelAndIcon = ({
+  aiRequest,
+  selectedMode,
+  isWorking,
+  isMobile,
+  hasOpenedProject,
+  standAloneForm,
+}: {|
+  aiRequest: AiRequest | null,
+  selectedMode?: 'chat' | 'agent',
+  isWorking: boolean,
+  isMobile: boolean,
+  hasOpenedProject: boolean,
+  standAloneForm?: boolean,
+|}): { label: React.Node, icon: React.Node } => {
+  if (aiRequest && !standAloneForm) {
+    // We're in a running chat, that is not standalone,
+    // hide label.
+    return { label: null, icon: <Send fontSize="small" /> };
+  }
+
+  return selectedMode === 'agent'
+    ? isWorking
+      ? { label: <Trans>Building...</Trans>, icon: <Send fontSize="small" /> }
+      : isMobile
+      ? { label: <Trans>Build</Trans>, icon: <Send fontSize="small" /> }
+      : hasOpenedProject && !standAloneForm
+      ? {
+          label: <Trans>Build this on my game</Trans>,
+          icon: <Send fontSize="small" />,
+        }
+      : {
+          label: <Trans>Start building the game</Trans>,
+          icon: <Send fontSize="small" />,
+        }
+    : isWorking
+    ? { label: <Trans>Sending...</Trans>, icon: <Send fontSize="small" /> }
+    : { label: <Trans>Send</Trans>, icon: <Send fontSize="small" /> };
+};
+
+const actionsOnExistingProject = [
+  t`Add solid rocks that falls from the sky at a random position around the player every 0.5 seconds`,
+  t`Add a score and display it on the screen`,
+  t`Create a 3D explosion when the player is hit`,
+];
+
+const actionsToCreateAProject = [
+  t`Start a simple platformer with a player that can move and jump`,
+  t`Begin a top-down adventure with one controllable character.`,
+  t`Start a game where a ball can bounce around the screen`,
+  t`Start a quizz game with a question and 4 answers`,
+  t`Make a minimal 3D shooter`,
+  t`Start a simple endless runner game`,
+  t`Begin a driving game with a controllable car`,
+  t`Create a simple flying game with obstacles to avoid`,
+];
+
+const generalQuestions = [
+  t`How to add a leaderboard?`,
+  t`How to display the health of my player?`,
+  t`How to add an explosion when an enemy is destroyed?`,
+  t`How to create a main menu for my game?`,
+];
+
+const questionsOnExistingProject = [
+  t`What would you add to my game?`,
+  t`How to make my game more fun?`,
+  t`What is a good GDevelop feature I could use in my game?`,
+];
+
+type Props = {|
+  project: ?gdProject,
+  fileMetadata: ?FileMetadata,
   i18n: I18nType,
   aiRequest: AiRequest | null,
 
   isSending: boolean,
-  onStartNewAiRequest: (options: {|
-    userRequest: string,
+  onStartNewAiRequest: ({|
     mode: 'chat' | 'agent',
+    userRequest: string,
     aiConfigurationPresetId: string,
   |}) => void,
-  onSendMessage: (options: {|
+  onSendUserMessage: ({|
     userMessage: string,
-    createdSceneNames?: Array<string>,
+    mode: 'chat' | 'agent',
   |}) => Promise<void>,
   onSendFeedback: (
     aiRequestId: string,
@@ -87,11 +292,11 @@ type Props = {
   hasOpenedProject: boolean,
   isAutoProcessingFunctionCalls: boolean,
   setAutoProcessFunctionCalls: boolean => void,
-  onStartOrOpenChat: ({|
-    mode: 'chat' | 'agent',
-    aiRequestId: string | null,
-  |}) => void,
-  initialMode?: 'chat' | 'agent',
+  onStartOrOpenChat: (
+    ?{|
+      aiRequestId: string | null,
+    |}
+  ) => void,
   aiConfigurationPresetsWithAvailability: Array<AiConfigurationPresetWithAvailability>,
 
   onProcessFunctionCalls: (
@@ -108,166 +313,34 @@ type Props = {
   increaseQuotaOffering: 'subscribe' | 'upgrade' | 'none',
   price: UsagePrice | null,
   availableCredits: number,
-};
+
+  standAloneForm?: boolean,
+
+  isFetchingSuggestions: boolean,
+  savingProjectForMessageId: ?string,
+  forkingState: ?{| aiRequestId: string, messageId: string |},
+  onRestore: ({|
+    message: AiRequestMessage,
+    aiRequest: AiRequest,
+  |}) => Promise<void>,
+|};
 
 export type AiRequestChatInterface = {|
   resetUserInput: (aiRequestId: string | null) => void,
 |};
-
-const getQuotaOrCreditsText = ({
-  quota,
-  increaseQuotaOffering,
-  price,
-  availableCredits,
-  isMobile,
-}: {|
-  quota: Quota | null,
-  increaseQuotaOffering: 'subscribe' | 'upgrade' | 'none',
-  price: UsagePrice | null,
-  availableCredits: number,
-  isMobile: boolean,
-|}) => {
-  if (!quota) return null;
-
-  const quotaOrCreditsText = !quota.limitReached ? (
-    <Tooltip
-      title={
-        <>
-          {increaseQuotaOffering === 'subscribe' ? (
-            <Trans>
-              Get GDevelop premium to get more free requests every day.
-            </Trans>
-          ) : quota.period === '30days' ? (
-            <Trans>
-              These are parts of your GDevelop premium membership ({quota.max}{' '}
-              free requests per month).
-            </Trans>
-          ) : (
-            <Trans>
-              These are parts of your GDevelop premium membership ({quota.max}{' '}
-              free requests per day).
-            </Trans>
-          )}{' '}
-          <Trans>Free requests do not consume credits on your account.</Trans>
-        </>
-      }
-    >
-      <div>
-        {isMobile ? (
-          increaseQuotaOffering === 'subscribe' ? (
-            <Trans>{quota.max - quota.current} trial requests left</Trans>
-          ) : (
-            <Trans>{quota.max - quota.current} free requests left</Trans>
-          )
-        ) : quota.period === '30days' ? (
-          increaseQuotaOffering === 'subscribe' ? (
-            <Trans>
-              {quota.max - quota.current} free trial requests left this month
-            </Trans>
-          ) : (
-            <Trans>
-              {quota.max - quota.current} of {quota.max} free requests left this
-              month
-            </Trans>
-          )
-        ) : quota.period === '1day' ? (
-          <Trans>{quota.max - quota.current} free requests left today</Trans>
-        ) : (
-          <Trans>{quota.max - quota.current} free requests left</Trans>
-        )}
-      </div>
-    </Tooltip>
-  ) : (
-    <Trans>{Math.max(0, availableCredits)} credits available</Trans>
-  );
-
-  return quotaOrCreditsText;
-};
-
-const getPriceText = ({
-  aiRequestMode,
-  price,
-  lastUserMessagePriceInCredits,
-}: {|
-  aiRequestMode: 'chat' | 'agent',
-  price: UsagePrice | null,
-  lastUserMessagePriceInCredits: number | null,
-|}) => {
-  if (!price) return null;
-
-  const priceInCredits = price.priceInCredits;
-  const maximumPriceInCredits =
-    (price.variablePrice &&
-      price.variablePrice[aiRequestMode] &&
-      price.variablePrice[aiRequestMode]['default'] &&
-      price.variablePrice[aiRequestMode]['default'].maximumPriceInCredits) ||
-    null;
-  const minimumPriceInCredits =
-    (price.variablePrice &&
-      price.variablePrice[aiRequestMode] &&
-      price.variablePrice[aiRequestMode]['default'] &&
-      price.variablePrice[aiRequestMode]['default'].minimumPriceInCredits) ||
-    null;
-
-  const priceText = maximumPriceInCredits ? (
-    <Trans>
-      {minimumPriceInCredits || priceInCredits} to {maximumPriceInCredits}
-    </Trans>
-  ) : (
-    <Trans>{minimumPriceInCredits || priceInCredits}</Trans>
-  );
-
-  return (
-    <Tooltip
-      title={
-        aiRequestMode === 'agent' ? (
-          <>
-            <Trans>
-              Each request to the AI agent costs {priceText} credits. It depends
-              on the amount of work the agent will do and the number of times it
-              generates events.
-            </Trans>{' '}
-            {lastUserMessagePriceInCredits ? (
-              <Trans>
-                The last request used {lastUserMessagePriceInCredits} credits.
-              </Trans>
-            ) : null}
-          </>
-        ) : (
-          <Trans>Each answer from the AI costs {priceText} credits.</Trans>
-        )
-      }
-    >
-      <div>
-        <LineStackLayout alignItems="center" noMargin>
-          {aiRequestMode === 'agent' ? (
-            <Hammer fontSize="small" />
-          ) : (
-            <Help fontSize="small" />
-          )}
-          {aiRequestMode === 'agent' ? (
-            <Trans>{priceText} credits/request</Trans>
-          ) : (
-            <Trans>{priceText} credits/answer</Trans>
-          )}
-        </LineStackLayout>
-      </div>
-    </Tooltip>
-  );
-};
 
 export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
   (
     {
       aiConfigurationPresetsWithAvailability,
       project,
+      fileMetadata,
       aiRequest,
       isSending,
       onStartNewAiRequest,
-      onSendMessage,
+      onSendUserMessage,
       onSendFeedback,
       onStartOrOpenChat,
-      initialMode,
       quota,
       increaseQuotaOffering,
       lastSendError,
@@ -280,28 +353,37 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       setAutoProcessFunctionCalls,
       i18n,
       editorCallbacks,
+      standAloneForm,
+      isFetchingSuggestions,
+      savingProjectForMessageId,
+      forkingState,
+      onRestore,
     }: Props,
     ref
   ) => {
     const {
       aiRequestHistory: { handleNavigateHistory, resetNavigation },
     } = React.useContext(AiRequestContext);
-
-    // TODO: store the default mode in the user preferences?
-    const [newAiRequestMode, setNewAiRequestMode] = React.useState<
-      'chat' | 'agent'
-    >(initialMode || 'agent');
-
-    // Update the mode when initialMode changes
-    React.useEffect(
-      () => {
-        if (initialMode) {
-          setNewAiRequestMode(initialMode);
-        }
-      },
-      [initialMode]
+    const [selectedMode, setSelectedMode] = React.useState<'chat' | 'agent'>(
+      (aiRequest && aiRequest.mode) || (hasOpenedProject ? 'chat' : 'agent')
     );
-
+    const {
+      values: { automaticallyUseCreditsForAiRequests },
+      setAutomaticallyUseCreditsForAiRequests,
+    } = React.useContext(PreferencesContext);
+    const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
+    const { openCreditsPackageDialog } = React.useContext(
+      CreditsPackageStoreContext
+    );
+    const [
+      hasStartedRequestButCannotContinue,
+      setHasStartedRequestButCannotContinue,
+    ] = React.useState<boolean>(false);
+    const [
+      hasSwitchedToGDevelopCreditsMidChat,
+      setHasSwitchedToGDevelopCreditsMidChat,
+    ] = React.useState<boolean>(false);
+    const { showConfirmation } = useAlertDialog();
     const [
       aiConfigurationPresetId,
       setAiConfigurationPresetId,
@@ -317,7 +399,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
           aiConfigurationPresetsWithAvailability.find(
             preset =>
               preset.id === aiConfigurationPresetId &&
-              preset.mode === newAiRequestMode
+              preset.mode === selectedMode
           )
         ) {
           return;
@@ -330,7 +412,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         setAiConfigurationPresetId(null);
       },
       [
-        newAiRequestMode,
+        selectedMode,
         aiConfigurationPresetsWithAvailability,
         aiConfigurationPresetId,
       ]
@@ -348,16 +430,24 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     );
     const requiredGameId = (aiRequest && aiRequest.gameId) || null;
 
-    // Auto-scroll to bottom when content changes, if user is at the bottom
+    const scrollToBottom = React.useCallback(() => {
+      if (scrollViewRef.current) {
+        scrollViewRef.current.scrollToBottom({ behavior: 'smooth' });
+      }
+    }, []);
+
+    // Auto-scroll to bottom when content changes, if user is at the bottom.
     React.useEffect(
       () => {
-        if (shouldAutoScroll && scrollViewRef.current) {
-          scrollViewRef.current.scrollToBottom({
-            behavior: 'smooth',
-          });
-        }
+        if (shouldAutoScroll) scrollToBottom();
       },
-      [aiRequest, editorFunctionCallResults, lastSendError, shouldAutoScroll]
+      [
+        scrollToBottom,
+        aiRequest,
+        editorFunctionCallResults,
+        lastSendError,
+        shouldAutoScroll,
+      ]
     );
 
     const onScroll = React.useCallback(
@@ -372,37 +462,19 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     const newChatPlaceholder = React.useMemo(
       () => {
         const newChatPlaceholders: Array<MessageDescriptor> =
-          newAiRequestMode === 'agent'
-            ? hasOpenedProject
-              ? [
-                  t`Add solid rocks that falls from the sky at a random position around the player every 0.5 seconds`,
-                  t`Add a score and display it on the screen`,
-                  t`Create a 3D explosion when the player is hit`,
-                ]
-              : [
-                  t`Build a platformer game with a score and coins to collect`,
-                  t`Make a quizz game with a question and 4 answers`,
-                  t`Make a game where the player must avoid obstacles`,
-                ]
-            : [
-                t`How to add a leaderboard?`,
-                t`How to display the health of my player?`,
-                t`How to add an explosion when an enemy is destroyed?`,
-                t`How to create a main menu for my game?`,
-                ...(hasOpenedProject
-                  ? [
-                      t`What would you add to my game?`,
-                      t`How to make my game more fun?`,
-                      t`What is a good GDevelop feature I could use in my game?`,
-                    ]
-                  : []),
-              ];
+          selectedMode === 'agent'
+            ? hasOpenedProject && !standAloneForm
+              ? actionsOnExistingProject
+              : actionsToCreateAProject
+            : hasOpenedProject && !standAloneForm
+            ? [...questionsOnExistingProject, ...generalQuestions]
+            : generalQuestions;
 
         return newChatPlaceholders[
           Math.floor(Math.random() * newChatPlaceholders.length)
         ];
       },
-      [newAiRequestMode, hasOpenedProject]
+      [selectedMode, hasOpenedProject, standAloneForm]
     );
 
     const onUserRequestTextChange = React.useCallback(
@@ -434,95 +506,188 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         const aiRequestIdToReset: string = aiRequestId || '';
         onUserRequestTextChange('', aiRequestIdToReset);
 
-        if (scrollViewRef.current) {
-          scrollViewRef.current.scrollToBottom({
-            behavior: 'smooth',
-          });
-        }
+        scrollToBottom();
       },
     }));
 
     const { isMobile } = useResponsiveWindowSize();
 
-    const priceText = (
-      <Text size="body-small" color="secondary" noMargin>
-        {getPriceText({
-          aiRequestMode: aiRequest
-            ? aiRequest.mode || 'chat'
-            : newAiRequestMode,
-          price,
-          lastUserMessagePriceInCredits:
-            (aiRequest && aiRequest.lastUserMessagePriceInCredits) || null,
-        }) || '\u00A0'}
-      </Text>
-    );
-
-    const subscriptionBanner =
-      quota && quota.limitReached && increaseQuotaOffering !== 'none' ? (
-        <GetSubscriptionCard
-          placementId="ai-requests"
-          subscriptionDialogOpeningReason={
-            increaseQuotaOffering === 'subscribe'
-              ? 'AI requests (subscribe)'
-              : 'AI requests (upgrade)'
-          }
-          label={
-            increaseQuotaOffering === 'subscribe' ? (
-              <Trans>Get GDevelop premium</Trans>
-            ) : (
-              <Trans>Upgrade</Trans>
-            )
-          }
-          recommendedPlanIdIfNoSubscription="gdevelop_gold"
-          canHide
-        >
-          <Line>
-            <Column noMargin>
-              <Text noMargin>
-                {increaseQuotaOffering === 'subscribe' ? (
-                  <Trans>
-                    Unlock AI requests included with a GDevelop premium plan.
-                  </Trans>
-                ) : (
-                  <Trans>
-                    Get even more AI requests included with a higher premium
-                    plan.
-                  </Trans>
-                )}
-              </Text>
-            </Column>
-          </Line>
-        </GetSubscriptionCard>
-      ) : null;
-
     const errorText = lastSendError ? (
-      <Text size="body-small" color="error" noMargin>
+      <Text size="body-small" color="error">
         <Trans>
           An error happened when sending your request, please try again.
         </Trans>
       </Text>
     ) : null;
 
-    const quotaOrCreditsText = (
-      <Text size="body-small" color="secondary" noMargin>
-        {getQuotaOrCreditsText({
-          quota,
-          increaseQuotaOffering,
-          price,
-          availableCredits,
-          isMobile,
-        })}
-      </Text>
-    );
+    const priceAndRequestsText = getPriceAndRequestsTextAndTooltip({
+      quota,
+      price,
+      availableCredits,
+      selectedMode,
+      automaticallyUseCreditsForAiRequests,
+    });
 
     const chosenOrDefaultAiConfigurationPresetId =
       aiConfigurationPresetId ||
       getDefaultAiConfigurationPresetId(
-        newAiRequestMode,
+        selectedMode,
         aiConfigurationPresetsWithAvailability
       );
+    const hasFunctionsCallsToProcess =
+      aiRequest &&
+      getFunctionCallsToProcess({
+        aiRequest: aiRequest,
+        editorFunctionCallResults,
+      }).length > 0;
+    const hasWorkingFunctionCalls =
+      editorFunctionCallResults &&
+      editorFunctionCallResults.some(
+        functionCallOutput => functionCallOutput.status === 'working'
+      );
+    const hasUnfinishedResult =
+      aiRequest &&
+      getFunctionCallOutputsFromEditorFunctionCallResults(
+        editorFunctionCallResults
+      ).hasUnfinishedResult;
+    const hasWorkToProcess =
+      hasUnfinishedResult ||
+      !!hasWorkingFunctionCalls ||
+      !!hasFunctionsCallsToProcess ||
+      (!!aiRequest && aiRequest.status === 'working');
+    const isPaused = !!aiRequest && !isAutoProcessingFunctionCalls;
+    const isWorking = isSending || (hasWorkToProcess && !isPaused);
 
-    if (!aiRequest) {
+    const doesNotHaveEnoughCreditsToContinue =
+      !!price && availableCredits < price.priceInCredits;
+    const cannotContinue =
+      !!quota &&
+      quota.limitReached &&
+      (!automaticallyUseCreditsForAiRequests ||
+        doesNotHaveEnoughCreditsToContinue);
+
+    const isForAnotherProject =
+      !!requiredGameId &&
+      (!project || requiredGameId !== project.getProjectUuid());
+    const isForking =
+      forkingState && aiRequest && forkingState.aiRequestId === aiRequest.id;
+    const shouldDisableButton =
+      (hasStartedRequestButCannotContinue &&
+        !hasSwitchedToGDevelopCreditsMidChat) ||
+      isWorking ||
+      isForking ||
+      !userRequestTextPerAiRequestId[aiRequestId];
+    const shouldReplaceFormWithCreditsOrSubscriptionPrompt =
+      // Cannot continue because either no AI credits or has not
+      // automatically switched to GDevelop credits.
+      hasStartedRequestButCannotContinue &&
+      // If the user accepts to switch to GDevelop credits, then we hide it,
+      // except if they still cannot continue because they don't have enough GDevelop credits.
+      (!hasSwitchedToGDevelopCreditsMidChat ||
+        doesNotHaveEnoughCreditsToContinue) &&
+      // We only replace the form if no Ai Request exists yet (Editor or StandAlone form),
+      // If a request is ongoing, the ChatMessages.js will show the prompt instead.
+      !aiRequest;
+
+    const {
+      label: sendButtonLabel,
+      icon: sendButtonIcon,
+    } = getSendButtonLabelAndIcon({
+      aiRequest,
+      selectedMode,
+      isWorking,
+      isMobile,
+      hasOpenedProject,
+      standAloneForm,
+    });
+
+    const onSubmitForNewChat = React.useCallback(
+      async () => {
+        scrollToBottom();
+
+        setHasStartedRequestButCannotContinue(cannotContinue);
+        if (cannotContinue) return;
+
+        if (hasOpenedProject && standAloneForm) {
+          const response = await showConfirmation({
+            title: t`Start a new game?`,
+            message: t`This will close your current project. Unsaved changes will be lost.`,
+            confirmButtonLabel: t`Continue`,
+          });
+
+          if (!response) {
+            return;
+          }
+        }
+
+        onStartNewAiRequest({
+          userRequest: userRequestTextPerAiRequestId[''],
+          aiConfigurationPresetId: chosenOrDefaultAiConfigurationPresetId,
+          mode: selectedMode,
+        });
+      },
+      [
+        onStartNewAiRequest,
+        userRequestTextPerAiRequestId,
+        chosenOrDefaultAiConfigurationPresetId,
+        scrollToBottom,
+        cannotContinue,
+        hasOpenedProject,
+        showConfirmation,
+        selectedMode,
+        standAloneForm,
+      ]
+    );
+
+    const onSubmitForExistingChat = React.useCallback(
+      () => {
+        scrollToBottom();
+
+        setHasStartedRequestButCannotContinue(cannotContinue);
+        if (cannotContinue) return;
+
+        setAutoProcessFunctionCalls(true);
+        onSendUserMessage({
+          userMessage: userRequestTextPerAiRequestId[aiRequestId] || '',
+          mode: selectedMode,
+        });
+      },
+      [
+        aiRequestId,
+        onSendUserMessage,
+        userRequestTextPerAiRequestId,
+        scrollToBottom,
+        setAutoProcessFunctionCalls,
+        cannotContinue,
+        selectedMode,
+      ]
+    );
+
+    // Calculate feedback banner visibility for sticky behavior
+    // (must be before conditional returns to follow React hooks rules)
+    const allFunctionCallsToProcess =
+      aiRequest && editorFunctionCallResults
+        ? getFunctionCallsToProcess({
+            aiRequest,
+            editorFunctionCallResults,
+          })
+        : [];
+    const isPausedAndHasFunctionCallsToProcess =
+      !isAutoProcessingFunctionCalls && allFunctionCallsToProcess.length > 0;
+    const shouldDisplayFeedbackBannerNow =
+      !hasWorkingFunctionCalls &&
+      !isPausedAndHasFunctionCallsToProcess &&
+      !isSending &&
+      !!aiRequest &&
+      aiRequest.status === 'ready' &&
+      aiRequest.mode === 'agent';
+    const shouldDisplayFeedbackBanner = useStickyVisibility({
+      shouldShow: shouldDisplayFeedbackBannerNow,
+      showDelayMs: 1000,
+      hideDelayMs: 300,
+    });
+
+    if (!aiRequest || standAloneForm) {
       return (
         <div
           className={classNames({
@@ -531,76 +696,48 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             'avoid-soft-keyboard': true,
           })}
         >
-          <ColumnStackLayout justifyContent="center" expand>
-            <Line noMargin justifyContent="center">
-              <RobotIcon rotating size={40} />
-            </Line>
-            <Column noMargin alignItems="center">
-              <Text size="bold-title" align="center">
-                {newAiRequestMode === 'agent' ? (
+          <ColumnStackLayout justifyContent="center" expand noMargin>
+            {!standAloneForm && (
+              <Line noMargin justifyContent="center">
+                <RobotIcon rotating size={40} />
+              </Line>
+            )}
+            {!standAloneForm && (
+              <Column noMargin alignItems="center">
+                <Text size="bold-title" align="center">
                   <Trans>What do you want to make?</Trans>
-                ) : (
-                  <Trans>Ask any gamedev question</Trans>
-                )}
-              </Text>
-            </Column>
-            <Line noMargin justifyContent="center">
-              <TwoStatesButton
-                value={newAiRequestMode}
-                leftButton={{
-                  icon: <Hammer fontSize="small" />,
-                  label: <Trans>Build for me</Trans>,
-                  value: 'agent',
-                }}
-                rightButton={{
-                  icon: <Help fontSize="small" />,
-                  label: <Trans>Ask a question</Trans>,
-                  value: 'chat',
-                }}
-                onChange={value => {
-                  if (value !== 'chat' && value !== 'agent') {
-                    return;
-                  }
-                  setNewAiRequestMode(value);
-                }}
-              />
-            </Line>
-            <form
-              onSubmit={() => {
-                onStartNewAiRequest({
-                  mode: newAiRequestMode,
-                  userRequest: userRequestTextPerAiRequestId[''],
-                  aiConfigurationPresetId: chosenOrDefaultAiConfigurationPresetId,
-                });
-              }}
-            >
-              <ColumnStackLayout justifyContent="center" noMargin>
-                <Column noMargin alignItems="stretch" justifyContent="stretch">
-                  <Spacer />
+                </Text>
+              </Column>
+            )}
+            <form onSubmit={onSubmitForNewChat}>
+              <ColumnStackLayout
+                noMargin
+                alignItems="stretch"
+                justifyContent="stretch"
+              >
+                {!shouldReplaceFormWithCreditsOrSubscriptionPrompt ? (
                   <CompactTextAreaFieldWithControls
                     maxLength={6000}
                     value={userRequestTextPerAiRequestId[''] || ''}
-                    disabled={isSending}
-                    hasNeonCorner
-                    hasAnimatedNeonCorner={isSending}
+                    disabled={isWorking}
+                    neonCorner
+                    hasAnimatedNeonCorner={isWorking}
                     errored={!!lastSendError}
                     onChange={userRequestText => {
                       onUserRequestTextChange(userRequestText, '');
                     }}
                     onNavigateHistory={handleNavigateHistory}
-                    onSubmit={() => {
-                      onStartNewAiRequest({
-                        mode: newAiRequestMode,
-                        userRequest: userRequestTextPerAiRequestId[''],
-                        aiConfigurationPresetId: chosenOrDefaultAiConfigurationPresetId,
-                      });
-                    }}
-                    placeholder={newChatPlaceholder}
-                    rows={5}
+                    onSubmit={onSubmitForNewChat}
+                    placeholder={
+                      isWorking
+                        ? t`Thinking about your request...`
+                        : newChatPlaceholder
+                    }
+                    rows={getRowsAndHeight({ standAloneForm }).rows}
                     controls={
                       <Column>
                         <LineStackLayout
-                          alignItems="center"
+                          alignItems="flex-end"
                           justifyContent="space-between"
                         >
                           <AiConfigurationPresetSelector
@@ -613,66 +750,167 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                             aiConfigurationPresetsWithAvailability={
                               aiConfigurationPresetsWithAvailability
                             }
-                            aiRequestMode={newAiRequestMode}
+                            aiRequestMode={selectedMode}
+                            disabled={isWorking}
                           />
                           <RaisedButton
                             color="primary"
-                            icon={<Send />}
-                            label={
-                              newAiRequestMode === 'agent' ? (
-                                hasOpenedProject ? (
-                                  <Trans>Build this on my game</Trans>
-                                ) : (
-                                  <Trans>Start building the game</Trans>
-                                )
-                              ) : (
-                                <Trans>Send question</Trans>
-                              )
-                            }
+                            icon={sendButtonIcon}
+                            label={sendButtonLabel}
                             style={{ flexShrink: 0 }}
-                            disabled={
-                              isSending ||
-                              !userRequestTextPerAiRequestId[aiRequestId]
-                            }
-                            onClick={() => {
-                              onStartNewAiRequest({
-                                mode: newAiRequestMode,
-                                userRequest: userRequestTextPerAiRequestId[''],
-                                aiConfigurationPresetId: chosenOrDefaultAiConfigurationPresetId,
-                              });
-                            }}
+                            disabled={shouldDisableButton}
+                            onClick={onSubmitForNewChat}
                           />
                         </LineStackLayout>
                       </Column>
                     }
                   />
-                </Column>
-                <Line noMargin>
-                  <LineStackLayout
-                    noMargin
-                    alignItems="center"
-                    justifyContent="space-between"
-                    expand
+                ) : (
+                  <div
+                    className={classNames({
+                      [classes.creditOrSubscriptionPromptContainer]: true,
+                    })}
                   >
-                    {errorText || priceText}
-                    {errorText ? null : quotaOrCreditsText}
-                  </LineStackLayout>
+                    <Paper
+                      background="light"
+                      style={{
+                        ...styles.creditOrSubscriptionPaper,
+                        minHeight: getRowsAndHeight({ standAloneForm }).height,
+                      }}
+                    >
+                      <Column expand>
+                        <LineStackLayout
+                          alignItems="center"
+                          justifyContent="space-between"
+                        >
+                          <LineStackLayout alignItems="center" noMargin>
+                            <RobotIcon size={24} sad />
+                            <Column noMargin>
+                              <Text>
+                                {!automaticallyUseCreditsForAiRequests ? (
+                                  <Trans>
+                                    You've ran out of free AI requests.
+                                  </Trans>
+                                ) : (
+                                  <Trans>
+                                    You've ran out of GDevelop Credits.
+                                  </Trans>
+                                )}
+                              </Text>
+                              <Text>
+                                {!automaticallyUseCreditsForAiRequests ? (
+                                  <Trans>
+                                    Switch to GDevelop credits or keep building
+                                    with AI.
+                                  </Trans>
+                                ) : increaseQuotaOffering === 'subscribe' ? (
+                                  <Trans>
+                                    Get a subscription to keep building with AI.
+                                  </Trans>
+                                ) : increaseQuotaOffering === 'upgrade' ? (
+                                  <Trans>
+                                    Upgrade your subscription to keep building
+                                    with AI.
+                                  </Trans>
+                                ) : (
+                                  <Trans>
+                                    Get more GDevelop credits to keep building
+                                    with AI.
+                                  </Trans>
+                                )}
+                              </Text>
+                            </Column>
+                          </LineStackLayout>
+                          {!automaticallyUseCreditsForAiRequests ? (
+                            <FlatButton
+                              leftIcon={<Coin fontSize="small" />}
+                              primary
+                              onClick={() => {
+                                setAutomaticallyUseCreditsForAiRequests(true);
+                                setHasSwitchedToGDevelopCreditsMidChat(true);
+                              }}
+                              label={<Trans>Use GDevelop Credits</Trans>}
+                              noBackground
+                            />
+                          ) : increaseQuotaOffering !== 'none' ? (
+                            <RaisedButton
+                              icon={<GoldCompact fontSize="small" />}
+                              primary
+                              onClick={() => {
+                                openSubscriptionDialog({
+                                  analyticsMetadata: {
+                                    reason: 'AI requests (subscribe)',
+                                    recommendedPlanId: 'gdevelop_gold',
+                                    placementId: 'ai-requests',
+                                  },
+                                });
+                              }}
+                              label={
+                                increaseQuotaOffering === 'subscribe' ? (
+                                  <Trans>Get subscription</Trans>
+                                ) : (
+                                  <Trans>Upgrade subscription</Trans>
+                                )
+                              }
+                            />
+                          ) : (
+                            <RaisedButton
+                              icon={<Coin fontSize="small" />}
+                              primary
+                              onClick={() => openCreditsPackageDialog()}
+                              label={<Trans>Get more credits</Trans>}
+                            />
+                          )}
+                        </LineStackLayout>
+                      </Column>
+                    </Paper>
+                  </div>
+                )}
+                <Line
+                  noMargin
+                  expand
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <Column noMargin>
+                    {!standAloneForm && (
+                      <CompactSelectField
+                        disabled={isWorking}
+                        value={selectedMode}
+                        onChange={value => {
+                          if (value !== 'chat' && value !== 'agent') {
+                            return;
+                          }
+                          setSelectedMode(value);
+                        }}
+                        renderOptionIcon={className =>
+                          selectedMode === 'chat' ? (
+                            <HelpQuestion className={className} />
+                          ) : (
+                            <Hammer className={className} />
+                          )
+                        }
+                        rounded
+                      >
+                        <SelectOption key="chat" value="chat" label={t`Ask`} />
+                        <SelectOption
+                          key="agent"
+                          value="agent"
+                          label={t`Build`}
+                        />
+                      </CompactSelectField>
+                    )}
+                  </Column>
+                  <Column noMargin>{errorText || priceAndRequestsText}</Column>
                 </Line>
               </ColumnStackLayout>
             </form>
-            {subscriptionBanner ? (
-              <>
-                <Spacer />
-                {subscriptionBanner}
-              </>
-            ) : null}
           </ColumnStackLayout>
-          <Spacer />
-          <Column justifyContent="center">
-            {newAiRequestMode === 'agent' ? (
+          {!standAloneForm && (
+            <Column justifyContent="center">
               <Text size="body-small" color="secondary" align="center" noMargin>
                 <Trans>
-                  The AI agent will build simple games or features for you.{' '}
+                  The AI is experimental and still being improved.{' '}
                   <Link
                     href={getHelpLink('/interface/ai')}
                     color="secondary"
@@ -684,34 +922,14 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                   </Link>
                 </Trans>
               </Text>
-            ) : (
               <Text size="body-small" color="secondary" align="center" noMargin>
                 <Trans>
-                  The AI chat is experimental and still being improved.{' '}
-                  <Link
-                    href={getHelpLink('/interface/ai')}
-                    color="secondary"
-                    onClick={() =>
-                      Window.openExternalURL(getHelpLink('/interface/ai'))
-                    }
-                  >
-                    It has access to your game objects but not events.
-                  </Link>
+                  Changes and answers may have mistakes: experiment and use it
+                  for learning.
                 </Trans>
               </Text>
-            )}
-            {newAiRequestMode === 'agent' ? (
-              <Text size="body-small" color="secondary" align="center" noMargin>
-                <Trans>
-                  Results may vary: experiment and use it for learning.
-                </Trans>
-              </Text>
-            ) : (
-              <Text size="body-small" color="secondary" align="center" noMargin>
-                <Trans>Answers may have mistakes: always verify them.</Trans>
-              </Text>
-            )}
-          </Column>
+            </Column>
+          )}
         </div>
       );
     }
@@ -720,58 +938,14 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       message => message.type === 'message' && message.role === 'user'
     ).length;
 
-    const hasWorkingFunctionCalls =
-      editorFunctionCallResults &&
-      editorFunctionCallResults.some(
-        functionCallOutput => functionCallOutput.status === 'working'
-      );
-    const allFunctionCallsToProcess = getFunctionCallsToProcess({
-      aiRequest,
-      editorFunctionCallResults,
-    });
-    const isPausedAndHasFunctionCallsToProcess =
-      !isAutoProcessingFunctionCalls && allFunctionCallsToProcess.length > 0;
-
-    const lastMessageIndex = aiRequest.output.length - 1;
-    const lastMessage = aiRequest.output[lastMessageIndex];
-    const shouldDisplayFeedbackBanner =
-      !hasWorkingFunctionCalls &&
-      !isPausedAndHasFunctionCallsToProcess &&
-      !isSending &&
-      aiRequest.status === 'ready' &&
-      aiRequest.mode === 'agent' &&
-      lastMessage.type === 'message' &&
-      lastMessage.role === 'assistant';
-    const lastMessageFeedbackBanner = shouldDisplayFeedbackBanner && (
-      <FeedbackBanner
-        onSendFeedback={(
-          feedback: 'like' | 'dislike',
-          reason?: string,
-          freeFormDetails?: string
-        ) => {
-          onSendFeedback(
-            aiRequestId,
-            lastMessageIndex,
-            feedback,
-            reason,
-            freeFormDetails
-          );
-        }}
-      />
-    );
-
-    const isForAnotherProject =
-      !!requiredGameId &&
-      (!project || requiredGameId !== project.getProjectUuid());
     const isForAnotherProjectText = isForAnotherProject ? (
-      <Text size="body-small" color="secondary" align="center" noMargin>
+      <Text size="body-small" color="secondary" align="center">
         <Trans>
           This request is for another project.{' '}
           <Link
             href="#"
             onClick={() =>
               onStartOrOpenChat({
-                mode: aiRequest.mode || 'chat',
                 aiRequestId: null,
               })
             }
@@ -800,11 +974,29 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             editorFunctionCallResults={editorFunctionCallResults}
             editorCallbacks={editorCallbacks}
             project={project}
+            fileMetadata={fileMetadata}
             onProcessFunctionCalls={onProcessFunctionCalls}
+            onUserRequestTextChange={onUserRequestTextChange}
+            isPaused={isPaused}
+            shouldBeWorkingIfNotPaused={hasWorkToProcess || isWorking}
+            isForAnotherProject={isForAnotherProject}
+            shouldDisplayFeedbackBanner={shouldDisplayFeedbackBanner}
+            onPause={(pause: boolean) => setAutoProcessFunctionCalls(!pause)}
+            onScrollToBottom={scrollToBottom}
+            hasStartedRequestButCannotContinue={
+              hasStartedRequestButCannotContinue
+            }
+            onSwitchedToGDevelopCredits={() =>
+              setHasSwitchedToGDevelopCreditsMidChat(true)
+            }
+            onStartOrOpenChat={onStartOrOpenChat}
+            isFetchingSuggestions={isFetchingSuggestions}
+            savingProjectForMessageId={savingProjectForMessageId}
+            forkingState={forkingState}
+            onRestore={onRestore}
           />
           <Spacer />
           <ColumnStackLayout noMargin>
-            {lastMessageFeedbackBanner}
             {userMessagesCount >= TOO_MANY_USER_MESSAGES_WARNING_COUNT ? (
               <AlertMessage
                 kind={
@@ -819,17 +1011,11 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                   request in a new chat.
                 </Trans>
               </AlertMessage>
-            ) : (
-              subscriptionBanner
-            )}
+            ) : null}
           </ColumnStackLayout>
         </ScrollView>
         <form
-          onSubmit={() => {
-            onSendMessage({
-              userMessage: userRequestTextPerAiRequestId[aiRequestId] || '',
-            });
-          }}
+          onSubmit={onSubmitForExistingChat}
           className={classNames({
             // Move the form up when the soft keyboard is open:
             'avoid-soft-keyboard': true,
@@ -840,129 +1026,81 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             alignItems="stretch"
             noMargin
           >
-            {aiRequest.mode === 'agent' &&
-            isAutoProcessingFunctionCalls &&
-            (hasWorkingFunctionCalls ||
-              isSending ||
-              aiRequest.status === 'working') ? (
-              <Paper background="dark" variant="outlined">
-                <Column>
-                  <LineStackLayout
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <LineStackLayout alignItems="center" noMargin>
-                      <CircularProgress variant="indeterminate" size={12} />
-                      <Text size="body" color="secondary" noMargin>
-                        <Trans>The AI is building your request.</Trans>
-                      </Text>
+            {!standAloneForm && (
+              <CompactTextAreaFieldWithControls
+                maxLength={6000}
+                value={userRequestTextPerAiRequestId[aiRequestId] || ''}
+                disabled={isWorking || isForAnotherProject}
+                errored={!!lastSendError}
+                neonCorner
+                hasAnimatedNeonCorner={isWorking}
+                onChange={userRequestText =>
+                  onUserRequestTextChange(userRequestText, aiRequestId)
+                }
+                onNavigateHistory={handleNavigateHistory}
+                placeholder={
+                  aiRequest.mode === 'agent'
+                    ? isForAnotherProject
+                      ? t`You must re-open the project to continue this chat.`
+                      : isWorking
+                      ? t`Thinking about your request...`
+                      : t`Specify something more to the AI to build`
+                    : t`Ask a follow up question`
+                }
+                rows={2}
+                maxRows={6}
+                onSubmit={onSubmitForExistingChat}
+                controls={
+                  <Column>
+                    <LineStackLayout
+                      alignItems="center"
+                      justifyContent="flex-end"
+                    >
+                      <RaisedButton
+                        color="primary"
+                        disabled={shouldDisableButton}
+                        icon={sendButtonIcon}
+                        label={sendButtonLabel}
+                        onClick={onSubmitForExistingChat}
+                      />
                     </LineStackLayout>
-                    <Text size="body" noMargin>
-                      <Link
-                        href={'#'}
-                        color="secondary"
-                        onClick={() => {
-                          setAutoProcessFunctionCalls(false);
-                        }}
-                      >
-                        <Trans>Pause</Trans>
-                      </Link>
-                    </Text>
-                  </LineStackLayout>
-                </Column>
-              </Paper>
-            ) : aiRequest.mode === 'agent' &&
-              isPausedAndHasFunctionCallsToProcess ? (
-              <Paper background="dark" variant="outlined">
-                <Column>
-                  <LineStackLayout
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <LineStackLayout alignItems="center" noMargin>
-                      <Text size="body" color="secondary" noMargin>
-                        <Trans>The AI agent is paused.</Trans>
-                      </Text>
-                    </LineStackLayout>
-                    <Text size="body" noMargin>
-                      <Link
-                        href={'#'}
-                        color="secondary"
-                        onClick={() => {
-                          setAutoProcessFunctionCalls(true);
-                          onProcessFunctionCalls(allFunctionCallsToProcess);
-                        }}
-                      >
-                        <Trans>Resume all</Trans>
-                      </Link>
-                    </Text>
-                  </LineStackLayout>
-                </Column>
-              </Paper>
-            ) : null}
-            <CompactTextAreaFieldWithControls
-              maxLength={6000}
-              value={userRequestTextPerAiRequestId[aiRequestId] || ''}
-              disabled={isSending || isForAnotherProject}
-              errored={!!lastSendError}
-              hasNeonCorner
-              hasAnimatedNeonCorner={isSending}
-              onChange={userRequestText =>
-                onUserRequestTextChange(userRequestText, aiRequestId)
-              }
-              onNavigateHistory={handleNavigateHistory}
-              placeholder={
-                aiRequest.mode === 'agent'
-                  ? isForAnotherProject
-                    ? t`You must re-open the project to continue this chat.`
-                    : t`Specify something more to the AI to build`
-                  : t`Ask a follow up question`
-              }
-              rows={2}
-              onSubmit={() => {
-                onSendMessage({
-                  userMessage: userRequestTextPerAiRequestId[aiRequestId] || '',
-                });
-              }}
-              controls={
-                <Column>
-                  <LineStackLayout
-                    alignItems="center"
-                    justifyContent="flex-end"
-                  >
-                    <RaisedButton
-                      color="primary"
-                      disabled={
-                        aiRequest.status === 'working' ||
-                        isSending ||
-                        isForAnotherProject ||
-                        !userRequestTextPerAiRequestId[aiRequestId]
-                      }
-                      icon={<Send />}
-                      onClick={() => {
-                        onSendMessage({
-                          userMessage:
-                            userRequestTextPerAiRequestId[aiRequestId] || '',
-                        });
-                      }}
-                    />
-                  </LineStackLayout>
-                </Column>
-              }
-            />
-            <Column noMargin alignItems="stretch">
-              <LineStackLayout
-                expand
-                noMargin
-                alignItems="center"
-                justifyContent="space-between"
-              >
-                {isForAnotherProjectText || errorText || priceText}
-                {errorText || isForAnotherProjectText
-                  ? null
-                  : quotaOrCreditsText}
-              </LineStackLayout>
-            </Column>
+                  </Column>
+                }
+              />
+            )}
+            <Line
+              noMargin
+              expand
+              alignItems="center"
+              justifyContent="space-between"
+            >
+              <Column noMargin>
+                <CompactSelectField
+                  disabled={isWorking}
+                  value={selectedMode}
+                  onChange={value => {
+                    if (value !== 'chat' && value !== 'agent') {
+                      return;
+                    }
+                    setSelectedMode(value);
+                  }}
+                  renderOptionIcon={className =>
+                    selectedMode === 'chat' ? (
+                      <HelpQuestion className={className} />
+                    ) : (
+                      <Hammer className={className} />
+                    )
+                  }
+                  rounded
+                >
+                  <SelectOption key="chat" value="chat" label={t`Ask`} />
+                  <SelectOption key="agent" value="agent" label={t`Build`} />
+                </CompactSelectField>
+              </Column>
+              <Column noMargin>
+                {isForAnotherProjectText || errorText || priceAndRequestsText}
+              </Column>
+            </Line>
           </ColumnStackLayout>
         </form>
       </div>

@@ -1,35 +1,8 @@
-@keyframes new-chat-appear {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes thinking-appear {
-  0% {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  /* Start after the bubble container and when the bubble content is almost finished animating. */
-  60% {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0px);
-  }
-}
-
 .newChatContainer {
   display: flex;
   flex-direction: column;
   flex: 1;
   justify-content: center;
-
-  animation: new-chat-appear 0.5s;
 
   margin-bottom: var(--safe-area-inset-bottom);
 }
@@ -47,13 +20,14 @@
   margin-bottom: var(--safe-area-inset-bottom);
 }
 
-.thinkingText {
-  animation: thinking-appear 1s;
-}
-
 .feedbackButtonsContainer {
   display: flex;
   justify-content: flex-end;
   gap: 4px;
   margin-top: 4px;
+}
+
+.creditOrSubscriptionPromptContainer {
+  background: linear-gradient(90deg, rgb(153, 121, 241) 0%, rgb(255, 188, 87) 100%);
+  border-radius: 8px;
 }

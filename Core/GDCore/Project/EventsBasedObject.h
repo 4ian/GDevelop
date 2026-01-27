@@ -75,6 +75,21 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
   }
 
   /**
+   * \brief Get the tag from which to choose assets from when creating a new
+   * object.
+   */
+  const gd::String& GetAssetStoreTag() const { return assetStoreTag; }
+
+  /**
+   * \brief Set the tag from which to choose assets from when creating a new
+   * object.
+   */
+  EventsBasedObject &SetAssetStoreTag(const gd::String& assetStoreTag_) {
+    assetStoreTag = assetStoreTag_;
+    return *this;
+  }
+
+  /**
    * \brief Set that the object is private - it can't be used outside of its
    * extension.
    */
@@ -355,6 +370,7 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
 
  private:
   gd::String defaultName;
+  gd::String assetStoreTag;
   bool isRenderedIn3D;
   bool isAnimatable;
   bool isTextContainer;

@@ -4,6 +4,7 @@ namespace gdjs {
   }
   /**
    * The renderer for a {@link gdjs.CustomRuntimeObject3D} using Three.js.
+   * @category Renderers > Custom Object 3D
    */
   export class CustomRuntimeObject3DRenderer
     implements gdjs.RuntimeInstanceContainerRenderer
@@ -23,6 +24,8 @@ namespace gdjs {
 
       this._threeGroup = new THREE.Group();
       this._threeGroup.rotation.order = 'ZYX';
+      //@ts-ignore
+      this._threeGroup.gdjsRuntimeObject = object;
 
       const layer = parent.getLayer('');
       if (layer) {

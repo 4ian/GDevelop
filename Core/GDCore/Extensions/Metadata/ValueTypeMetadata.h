@@ -4,8 +4,8 @@
  * reserved. This project is released under the MIT License.
  */
 
-#ifndef VALUE_TYPE_METADATA_H
-#define VALUE_TYPE_METADATA_H
+#pragma once
+
 #include <map>
 #include <memory>
 
@@ -198,6 +198,13 @@ class GD_CORE_API ValueTypeMetadata {
   }
 
   /**
+   * \brief Return true if the type is a resource.
+   */
+  bool IsResource() const {
+    return gd::ValueTypeMetadata::IsTypeValue("resource", name);
+  }
+
+  /**
    * \brief Return true if the type is an expression of the given type from the
    * caller point of view.
    *
@@ -209,7 +216,8 @@ class GD_CORE_API ValueTypeMetadata {
                            const gd::String &parameterType) {
     if (type == "number") {
       return parameterType == "number" || parameterType == "expression" ||
-             parameterType == "camera" || parameterType == "forceMultiplier";
+             parameterType == "camera" || parameterType == "forceMultiplier" ||
+             parameterType == "numberWithChoices";
     } else if (type == "string") {
       // "key" and "mouse" are not mapped her, see GetPrimitiveValueType.
       return parameterType == "string" || parameterType == "layer" ||
@@ -253,7 +261,8 @@ class GD_CORE_API ValueTypeMetadata {
              parameterType == "spineResource" ||
              // Deprecated, old parameter types:
              parameterType == "soundfile" ||
-             parameterType == "musicfile";
+             parameterType == "musicfile" ||
+             parameterType == "password";
     }
     return false;
   }
@@ -306,6 +315,12 @@ class GD_CORE_API ValueTypeMetadata {
    */
   static const gd::String &ConvertPropertyTypeToValueType(const gd::String &propertyType);
 
+  /**
+   * \brief Return the resource type for a parameter type.
+   * \see gd::Resource
+   */
+  static const gd::String &GetResourceType(const gd::String &parameterType);
+
   /** \name Serialization
    */
   ///@{
@@ -332,6 +347,7 @@ class GD_CORE_API ValueTypeMetadata {
   static const gd::String stringValueType;
   static const gd::String colorValueType;
   static const gd::String choiceValueType;
+  static const gd::String numberWithChoicesValueType;
   static const gd::String behaviorValueType;
   static const gd::String leaderboardIdValueType;
   static const gd::String objectAnimationNameValueType;
@@ -339,5 +355,3 @@ class GD_CORE_API ValueTypeMetadata {
 };
 
 }  // namespace gd
-
-#endif  // VALUE_TYPE_METADATA_H

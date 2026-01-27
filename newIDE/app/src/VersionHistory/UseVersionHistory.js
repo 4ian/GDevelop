@@ -10,10 +10,15 @@ import {
   listVersionsOfProject,
   type ExpandedCloudProjectVersion,
   updateCloudProjectVersion,
+  getCloudProjectFileMetadataIdentifier,
+  getCloudProjectVersion,
 } from '../Utils/GDevelopServices/Project';
 import type { FileMetadata, StorageProvider } from '../ProjectsStorage';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import { canUseCloudProjectHistory } from '../Utils/GDevelopServices/Usage';
+import {
+  getAiVersionHistoryRetentionDays,
+  getCloudProjectHistoryRetentionDays,
+} from '../Utils/GDevelopServices/Usage';
 import { Column, Line } from '../UI/Grid';
 import VersionHistory, { type OpenedVersionStatus } from '.';
 import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
@@ -25,27 +30,7 @@ import PlaceholderError from '../UI/PlaceholderError';
 import CloudStorageProvider from '../ProjectsStorage/CloudStorageProvider';
 import GetSubscriptionCard from '../Profile/Subscription/GetSubscriptionCard';
 import Text from '../UI/Text';
-
-const getCloudProjectFileMetadataIdentifier = (
-  storageProviderInternalName: string,
-  fileMetadata: ?FileMetadata
-) => {
-  if (
-    !fileMetadata ||
-    !(storageProviderInternalName === CloudStorageProvider.internalName)
-  )
-    return null;
-  if (fileMetadata.fileIdentifier.startsWith('http')) {
-    // When creating a cloud project from an example, there might be a moment where
-    // the used Storage Provider is the cloud one but the file identifier is the url
-    // to the example such as `https://ressources.gdevelop-app.com/...`.
-    // A cloud project identifier is a uuid at the moment, so it does not contain the
-    // 3 letters h t and p so there should be no risk af having a cloud project
-    // uuid starting with http.
-    return null;
-  }
-  return fileMetadata.fileIdentifier;
-};
+import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 
 const styles = {
   drawerContent: {
@@ -60,11 +45,22 @@ const mergeVersionsLists = (
   list1: ExpandedCloudProjectVersion[],
   list2: ExpandedCloudProjectVersion[]
 ) => {
-  const mostRecentVersionDateInList2 = Date.parse(list2[0].createdAt);
-  const moreRecentVersionsInList1 = list1.filter(
-    version => Date.parse(version.createdAt) > mostRecentVersionDateInList2
+  if (list2.length === 0) return list1;
+  if (list1.length === 0) return list2;
+
+  // Create a map of version IDs from list2 to detect duplicates
+  const list2ById = new Map(list2.map(version => [version.id, version]));
+
+  // Add versions from list1 that are not already in list2
+  const uniqueVersionsFromList1 = list1.filter(
+    version => !list2ById.has(version.id)
   );
-  return [...moreRecentVersionsInList1, ...list2];
+
+  // Combine and sort by date (most recent first)
+  const combined = [...uniqueVersionsFromList1, ...list2];
+  combined.sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
+
+  return combined;
 };
 
 type PaginationState = {|
@@ -85,6 +81,7 @@ type Props = {|
     fileMetadata: FileMetadata,
     versionId: string,
     ignoreUnsavedChanges: boolean,
+    ignoreAutoSave: boolean,
     openingMessage: MessageDescriptor,
   |}) => Promise<void>,
 |};
@@ -94,7 +91,19 @@ const useVersionHistory = ({
   isSavingProject,
   getStorageProvider,
   onOpenCloudProjectOnSpecificVersion,
-}: Props) => {
+}: Props): {|
+  checkedOutVersionStatus: ?OpenedVersionStatus,
+  openVersionHistoryPanel: () => void,
+  renderVersionHistoryPanel: () => React.Node,
+  onQuitVersionHistory: () => Promise<void>,
+  onCheckoutVersion: (
+    version: ExpandedCloudProjectVersion,
+    options?: {| dontSaveCheckedOutVersionStatus?: boolean |}
+  ) => Promise<boolean>,
+  getOrLoadProjectVersion: (
+    versionId: string
+  ) => Promise<ExpandedCloudProjectVersion>,
+|} => {
   const { hasUnsavedChanges } = React.useContext(UnsavedChangesContext);
   const { showAlert } = useAlertDialog();
   const [
@@ -120,7 +129,8 @@ const useVersionHistory = ({
   const storageProviderInternalName = storageProvider.internalName;
   const isCloudProject =
     storageProviderInternalName === CloudStorageProvider.internalName;
-  const isUserAllowedToSeeVersionHistory = canUseCloudProjectHistory(limits);
+  const historyRetentionDays = getCloudProjectHistoryRetentionDays(limits);
+  const aiHistoryRetentionDays = getAiVersionHistoryRetentionDays(limits);
   const [cloudProjectId, setCloudProjectId] = React.useState<?string>(
     getCloudProjectFileMetadataIdentifier(
       storageProviderInternalName,
@@ -134,7 +144,8 @@ const useVersionHistory = ({
     isCloudProject && fileMetadata ? fileMetadata.lastModifiedDate : null
   );
   const shouldFetchVersions =
-    isCloudProject && isUserAllowedToSeeVersionHistory;
+    isCloudProject &&
+    (historyRetentionDays !== 0 || aiHistoryRetentionDays !== 0);
   const latestVersionId =
     state.versions && state.versions[0] ? state.versions[0].id : null;
   const authenticatedUserId = profile ? profile.id : null;
@@ -196,8 +207,8 @@ const useVersionHistory = ({
             // the user maybe spent time to load.
             return {
               versions: mergeVersionsLists(
-                listing.versions,
-                currentState.versions
+                currentState.versions,
+                listing.versions
               ),
               // Do not change next page URI.
               nextPageUri: currentState.nextPageUri,
@@ -208,6 +219,18 @@ const useVersionHistory = ({
             'An error occurred while fetching project versions:',
             error
           );
+          const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+            error
+          );
+          if (extractedStatusAndCode && extractedStatusAndCode.status === 403) {
+            setVersionsFetchingError(
+              <Trans>
+                You don't have the rights to access the version history of this
+                project. Are you connected with the right account?
+              </Trans>
+            );
+            return;
+          }
           setVersionsFetchingError(
             <Trans>
               Could not load the project versions. Verify your internet
@@ -224,6 +247,7 @@ const useVersionHistory = ({
       cloudProjectId,
       shouldFetchVersions,
       cloudProjectLastModifiedDate,
+      limits,
     ]
   );
 
@@ -297,8 +321,13 @@ const useVersionHistory = ({
           { forceUri: state.nextPageUri }
         );
         if (!listing) return;
+
+        const newVersions = mergeVersionsLists(
+          state.versions || [],
+          listing.versions
+        );
         setState({
-          versions: [...(state.versions || []), ...listing.versions],
+          versions: newVersions,
           nextPageUri: listing.nextPageUri,
         });
       } catch (error) {
@@ -331,6 +360,7 @@ const useVersionHistory = ({
           fileMetadata,
           versionId: latestVersionId,
           ignoreUnsavedChanges: true,
+          ignoreAutoSave: true,
           openingMessage: t`Opening latest save...`,
         });
         setCheckedOutVersionStatus(null);
@@ -348,19 +378,28 @@ const useVersionHistory = ({
   );
 
   const onCheckoutVersion = React.useCallback(
-    async (version: ExpandedCloudProjectVersion) => {
-      if (!fileMetadata) return;
-      if (!checkedOutVersionStatus && hasUnsavedChanges) {
+    async (
+      version: ExpandedCloudProjectVersion,
+      options?: {| dontSaveCheckedOutVersionStatus?: boolean |}
+    ): Promise<boolean> => {
+      const shouldSaveCheckedOutVersionStatus =
+        !options || !options.dontSaveCheckedOutVersionStatus;
+      if (!fileMetadata) return false;
+      if (
+        !checkedOutVersionStatus &&
+        shouldSaveCheckedOutVersionStatus &&
+        hasUnsavedChanges
+      ) {
         await showAlert({
           title: t`There are unsaved changes`,
           message: t`Save your project before using the version history.`,
         });
-        return;
+        return false;
       }
       if (checkedOutVersionStatus && version.id === latestVersionId) {
         await onQuitVersionHistory();
         setVersionHistoryPanelOpen(false);
-        return;
+        return true;
       }
       freezeWhileLoadingSpecificVersionRef.current = true;
       ignoreFileMetadataChangesRef.current = true;
@@ -369,9 +408,16 @@ const useVersionHistory = ({
           fileMetadata,
           versionId: version.id,
           ignoreUnsavedChanges: true,
+          ignoreAutoSave: true,
           openingMessage: t`Opening older version...`,
         });
-        setCheckedOutVersionStatus({ version, status: 'opened' });
+        if (shouldSaveCheckedOutVersionStatus) {
+          setCheckedOutVersionStatus({ version, status: 'opened' });
+        }
+        return true;
+      } catch (error) {
+        console.error('Error checking out version:', error);
+        return false;
       } finally {
         freezeWhileLoadingSpecificVersionRef.current = false;
         ignoreFileMetadataChangesRef.current = false;
@@ -416,6 +462,71 @@ const useVersionHistory = ({
     [authenticatedUser, cloudProjectId]
   );
 
+  const addVersionToList = React.useCallback(
+    (version: ExpandedCloudProjectVersion) => {
+      setState(currentState => {
+        if (!currentState.versions) {
+          // If no versions exist, create a new list with this version
+          return {
+            versions: [version],
+            nextPageUri: currentState.nextPageUri,
+          };
+        }
+        // Merge the new version with existing ones using our merge function
+        return {
+          versions: mergeVersionsLists(currentState.versions, [version]),
+          nextPageUri: currentState.nextPageUri,
+        };
+      });
+    },
+    []
+  );
+
+  const getOrLoadProjectVersion = React.useCallback(
+    async (versionId: string): Promise<ExpandedCloudProjectVersion> => {
+      // First, check if the version is already in the loaded list
+      if (state.versions) {
+        const existingVersion = state.versions.find(
+          version => version.id === versionId
+        );
+        if (existingVersion) {
+          return existingVersion;
+        }
+      }
+
+      // Version not found in the list, try to fetch it
+      if (!cloudProjectId || !authenticatedUserId) {
+        throw new Error('No cloud project ID or user ID available');
+      }
+
+      const fetchedVersion = await getCloudProjectVersion(
+        getAuthorizationHeader,
+        {
+          userId: authenticatedUserId,
+          cloudProjectId,
+          versionId,
+        }
+      );
+
+      if (!fetchedVersion) {
+        // This should not happen, as an error would be thrown if the version is not found.
+        throw new Error('Version not found');
+      }
+
+      // Add it to the list of loaded versions
+      addVersionToList(fetchedVersion);
+
+      return fetchedVersion;
+    },
+    [
+      state.versions,
+      cloudProjectId,
+      authenticatedUserId,
+      getAuthorizationHeader,
+      addVersionToList,
+    ]
+  );
+
   const renderVersionHistoryPanel = () => {
     return (
       <I18n>
@@ -438,7 +549,7 @@ const useVersionHistory = ({
               id="version-history-drawer"
             />
             {!cloudProjectId ? (
-              <Line expand>
+              <Line>
                 <Column expand>
                   <AlertMessage kind="info">
                     <Trans>
@@ -447,14 +558,13 @@ const useVersionHistory = ({
                   </AlertMessage>
                 </Column>
               </Line>
-            ) : !isUserAllowedToSeeVersionHistory ? (
-              <Line expand>
+            ) : historyRetentionDays === 0 ? (
+              <Line>
                 <Column expand>
                   <GetSubscriptionCard
                     subscriptionDialogOpeningReason="Version history"
                     forceColumnLayout
-                    filter="team"
-                    recommendedPlanIdIfNoSubscription="gdevelop_startup"
+                    recommendedPlanId="gdevelop_gold"
                     placementId="version-history"
                   >
                     <Text>
@@ -462,14 +572,14 @@ const useVersionHistory = ({
                         Access project history, name saves, restore older
                         versions.
                         <br />
-                        Upgrade to a Pro plan to get started!
+                        Get a subscription to enable this feature.
                       </Trans>
                     </Text>
                   </GetSubscriptionCard>
                 </Column>
               </Line>
             ) : !state.versions && versionsFetchingError ? (
-              <Line expand>
+              <Line>
                 <Column expand>
                   <PlaceholderError onRetry={onLoadMoreVersions}>
                     {versionsFetchingError}
@@ -477,19 +587,44 @@ const useVersionHistory = ({
                 </Column>
               </Line>
             ) : state.versions ? (
-              <VersionHistory
-                authenticatedUserId={
-                  authenticatedUser.profile ? authenticatedUser.profile.id : ''
-                }
-                isVisible={versionHistoryPanelOpen}
-                projectId={fileMetadata ? fileMetadata.fileIdentifier : ''}
-                canLoadMore={!!state.nextPageUri}
-                onCheckoutVersion={onCheckoutVersion}
-                onLoadMore={onLoadMoreVersions}
-                onRenameVersion={onRenameVersion}
-                openedVersionStatus={checkedOutVersionStatus}
-                versions={state.versions}
-              />
+              <Column>
+                {historyRetentionDays !== -1 && (
+                  <Line>
+                    <Column expand>
+                      <GetSubscriptionCard
+                        subscriptionDialogOpeningReason="Version history"
+                        forceColumnLayout
+                        filter="team"
+                        placementId="version-history"
+                      >
+                        <Text>
+                          <Trans>
+                            Your current subscription plan allows restoring
+                            versions from the last {historyRetentionDays} days.
+                            <br />
+                            Get a higher plan to access older versions.
+                          </Trans>
+                        </Text>
+                      </GetSubscriptionCard>
+                    </Column>
+                  </Line>
+                )}
+                <VersionHistory
+                  authenticatedUserId={
+                    authenticatedUser.profile
+                      ? authenticatedUser.profile.id
+                      : ''
+                  }
+                  isVisible={versionHistoryPanelOpen}
+                  projectId={fileMetadata ? fileMetadata.fileIdentifier : ''}
+                  canLoadMore={!!state.nextPageUri}
+                  onCheckoutVersion={onCheckoutVersion}
+                  onLoadMore={onLoadMoreVersions}
+                  onRenameVersion={onRenameVersion}
+                  openedVersionStatus={checkedOutVersionStatus}
+                  versions={state.versions}
+                />
+              </Column>
             ) : (
               <PlaceholderLoader />
             )}
@@ -504,6 +639,8 @@ const useVersionHistory = ({
     openVersionHistoryPanel,
     renderVersionHistoryPanel,
     onQuitVersionHistory,
+    onCheckoutVersion,
+    getOrLoadProjectVersion,
   };
 };
 

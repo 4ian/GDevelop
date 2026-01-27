@@ -4,12 +4,14 @@
  * reserved. This project is released under the MIT License.
  */
 
-#ifndef GDCORE_USED_EXTENSIONS_FINDER_H
-#define GDCORE_USED_EXTENSIONS_FINDER_H
+#pragma once
+
 #include <set>
+#include <vector>
 
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
 #include "GDCore/Extensions/Metadata/SourceFileMetadata.h"
+#include "GDCore/Extensions/Metadata/InGameEditorResourceMetadata.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
 #include "GDCore/IDE/Project/ArbitraryObjectsWorker.h"
@@ -50,6 +52,10 @@ public:
     return usedSourceFiles;
   }
 
+  const std::vector<gd::InGameEditorResourceMetadata>& GetUsedInGameEditorResources() const {
+    return usedInGameEditorResources;
+  }
+
   /**
    * \brief Return true when at least 1 object uses the 3D renderer.
    */
@@ -58,9 +64,12 @@ public:
   }
 
   void AddUsedExtension(const gd::PlatformExtension& extension);
-  void AddUsedBuiltinExtension(const gd::String& extensionName);
+  void AddUsedBuiltinExtension(const gd::Project& project, const gd::String& extensionName);
   void AddUsedIncludeFiles(const gd::String& includeFile) { usedIncludeFiles.insert(includeFile); }
   void AddUsedRequiredFiles(const gd::String& requiredFile) { usedRequiredFiles.insert(requiredFile); }
+  void AddUsedInGameEditorResource(const gd::InGameEditorResourceMetadata& inGameEditorResource) {
+    usedInGameEditorResources.push_back(inGameEditorResource);
+  }
 
   void MarkAsHaving3DObjects() {
     has3DObjects = true;
@@ -71,6 +80,7 @@ private:
   std::set<gd::String> usedIncludeFiles;
   std::set<gd::String> usedRequiredFiles;
   std::vector<gd::SourceFileMetadata> usedSourceFiles;
+  std::vector<gd::InGameEditorResourceMetadata> usedInGameEditorResources;
   bool has3DObjects = false;
 };
 
@@ -80,8 +90,14 @@ class GD_CORE_API UsedExtensionsFinder
       public ExpressionParser2NodeWorker {
  public:
   static const UsedExtensionsResult ScanProject(gd::Project& project);
+  static const UsedExtensionsResult ScanEventsFunctionsExtension(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension);
+  static const std::vector<gd::String> FindExtensionsDependentOn(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension);
 
- private:
+private:
   UsedExtensionsFinder(gd::Project& project_) : project(project_){};
   gd::Project& project;
   gd::String rootType;
@@ -114,5 +130,3 @@ class GD_CORE_API UsedExtensionsFinder
 };
 
 };  // namespace gd
-
-#endif

@@ -13,8 +13,22 @@ namespace gdjs {
     40, // ArrowDown
   ];
 
+  // Workaround for a macOS issue where "keyup" is not triggered when a key
+  // is released while meta key is pressed.
+  const keysPressedWithMetaPressedByCode = new Map<
+    string,
+    { keyCode: number; location: number }
+  >();
+
+  const isMacLike =
+    typeof navigator !== 'undefined' &&
+    navigator.platform.match(/(Mac|iPhone|iPod|iPad)/i)
+      ? true
+      : false;
+
   /**
    * The renderer for a gdjs.RuntimeGame using Pixi.js.
+   * @category Renderers > Game
    */
   export class RuntimeGamePixiRenderer {
     _game: gdjs.RuntimeGame;
@@ -25,6 +39,8 @@ namespace gdjs {
 
     //Used to track if the window is displayed as fullscreen (see setFullscreen method).
     _forceFullscreen: any;
+
+    private _pointerLockReasons: Set<string> = new Set();
 
     _pixiRenderer: PIXI.Renderer | null = null;
     private _threeRenderer: THREE.WebGLRenderer | null = null;
@@ -101,6 +117,7 @@ namespace gdjs {
         this._threeRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this._threeRenderer.useLegacyLights = true;
         this._threeRenderer.autoClear = false;
+        this._threeRenderer.pixelRatio = window.devicePixelRatio;
         this._threeRenderer.setSize(
           this._game.getGameResolutionWidth(),
           this._game.getGameResolutionHeight()
@@ -510,6 +527,57 @@ namespace gdjs {
     }
 
     /**
+     * Request pointer lock for the game.
+     * Mouse cursor will disappear and its movement will be captured by the game,
+     * and can be read with the input manager of the game.
+     *
+     * @param reason The reason (arbitrary string) for the pointer lock request.
+     * This allows multiple parts of the game to request pointer lock for different reasons.
+     * @returns true if the request was initiated, false otherwise.
+     */
+    requestPointerLock(reason: string): boolean {
+      if (!this._gameCanvas) {
+        return false;
+      }
+
+      // Ensure we don't request pointer lock in a loop for the same reason.
+      if (this._pointerLockReasons.has(reason)) {
+        return false;
+      }
+
+      this._pointerLockReasons.add(reason);
+      try {
+        this._gameCanvas.requestPointerLock();
+        return true;
+      } catch (error) {
+        logger.error('Failed to request pointer lock:', error);
+        return false;
+      }
+    }
+
+    /**
+     * Exit pointer lock.
+     * Pointer lock will be dismissed if no other part of the game is requesting it.
+     *
+     * @param reason The reason (arbitrary string) to dismiss.
+     */
+    exitPointerLock(reason: string): void {
+      this._pointerLockReasons.delete(reason);
+      if (document.pointerLockElement && this._pointerLockReasons.size === 0) {
+        document.exitPointerLock();
+      }
+    }
+
+    /**
+     * Check if pointer is currently locked.
+     *
+     * @returns true if pointer is locked, false otherwise.
+     */
+    isPointerLocked(): boolean {
+      return document.pointerLockElement === this._gameCanvas;
+    }
+
+    /**
      * Convert a point from the canvas coordinates to the dom element container coordinates.
      *
      * @param canvasCoords The point in the canvas coordinates.
@@ -643,7 +711,7 @@ namespace gdjs {
           return false;
         return true;
       };
-      document.onkeydown = function (e) {
+      document.onkeydown = (e) => {
         if (isFocusingDomElement()) {
           // Bail out if the game canvas is not focused. For example,
           // an `<input>` element can be focused, and needs to receive
@@ -651,9 +719,29 @@ namespace gdjs {
           return;
         }
 
+        // See reason for this workaround in the "keyup" event handler.
+        if (isMacLike) {
+          if (e.code !== 'MetaLeft' && e.code !== 'MetaRight') {
+            if (e.metaKey) {
+              keysPressedWithMetaPressedByCode.set(e.code, {
+                keyCode: e.keyCode,
+                location: e.location,
+              });
+            } else {
+              keysPressedWithMetaPressedByCode.delete(e.code);
+            }
+          }
+        }
+
         if (defaultPreventedKeyCodes.includes(e.keyCode)) {
           // Some keys are "default prevented" to avoid scrolling when the game
           // is integrated in a page as an iframe.
+          e.preventDefault();
+        }
+
+        if (this._game.isInGameEdition()) {
+          // When in in-game edition, prevent all the keys to have their default behavior
+          // so that the shortcuts are all handled by the editor (apart from OS-level shortcuts).
           e.preventDefault();
         }
 
@@ -667,12 +755,35 @@ namespace gdjs {
 
         manager.onKeyPressed(e.keyCode, e.location);
       };
-      document.onkeyup = function (e) {
+      document.onkeyup = (e) => {
         if (isFocusingDomElement()) {
           // Bail out if the game canvas is not focused. For example,
           // an `<input>` element can be focused, and needs to receive
           // arrow keys events.
           return;
+        }
+
+        if (isMacLike) {
+          if (e.code === 'MetaLeft' || e.code === 'MetaRight') {
+            // Meta key is released. On macOS, a key pressed in combination with meta key, and
+            // which has been released while meta is pressed, will not trigger a "keyup" event.
+            // This means the key would be considered as "stuck" from the game's perspective
+            // it would never be released unless it's pressed and released again (without meta).
+            // Out of caution, we simulate a release of the key that were pressed with meta key.
+            for (const {
+              location,
+              keyCode,
+            } of keysPressedWithMetaPressedByCode.values()) {
+              manager.onKeyReleased(keyCode, location);
+            }
+            keysPressedWithMetaPressedByCode.clear();
+          }
+        }
+
+        if (this._game.isInGameEdition()) {
+          // When in in-game edition, prevent all the keys to have their default behavior
+          // so that the shortcuts are all handled by the editor (apart from OS-level shortcuts).
+          e.preventDefault();
         }
 
         if (defaultPreventedKeyCodes.includes(e.keyCode)) {
@@ -700,7 +811,10 @@ namespace gdjs {
       }
       canvas.onmousemove = (e) => {
         const pos = this.convertPageToGameCoords(e.pageX, e.pageY);
-        manager.onMouseMove(pos[0], pos[1]);
+        manager.onMouseMove(pos[0], pos[1], {
+          movementX: e.movementX,
+          movementY: e.movementY,
+        });
       };
       canvas.onmousedown = (e) => {
         const pos = this.convertPageToGameCoords(e.pageX, e.pageY);
@@ -761,7 +875,7 @@ namespace gdjs {
       };
       // @ts-ignore
       canvas.onwheel = function (event) {
-        manager.onMouseWheel(-event.deltaY);
+        manager.onMouseWheel(-event.deltaY, event.deltaX, event.deltaZ);
       };
 
       // Touches:
@@ -783,6 +897,7 @@ namespace gdjs {
                 touch.pageX,
                 touch.pageY
               );
+              manager.onTouchMove(touch.identifier, pos[0], pos[1]);
               manager.onTouchMove(touch.identifier, pos[0], pos[1]);
               // This works because touch events are sent
               // when they continue outside of the canvas.
@@ -1071,6 +1186,8 @@ namespace gdjs {
   }
 
   //Register the class to let the engine use it.
+  /** @category Renderers > Game */
   export type RuntimeGameRenderer = RuntimeGamePixiRenderer;
+  /** @category Renderers > Game */
   export const RuntimeGameRenderer = RuntimeGamePixiRenderer;
 }

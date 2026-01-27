@@ -2,15 +2,6 @@
 declare class gdJsPlatform extends gdPlatform {
   static get(): gdJsPlatform;
   addNewExtension(extension: gdPlatformExtension): void;
-  getName(): string;
-  getFullName(): string;
-  getSubtitle(): string;
-  getDescription(): string;
-  getInstructionOrExpressionGroupMetadata(name: string): gdInstructionOrExpressionGroupMetadata;
-  isExtensionLoaded(name: string): boolean;
-  removeExtension(name: string): void;
-  reloadBuiltinExtensions(): void;
-  getAllPlatformExtensions(): gdVectorPlatformExtension;
   delete(): void;
   ptr: number;
 };

@@ -74,6 +74,9 @@ const projectSpecificExtensionsSummaryUploadCache = makeUploadCache({
 const gameProjectJsonUploadCache = makeUploadCache({
   minimalContentLength: 10 * 1000, // Roughly 10KB.
 });
+const eventsJsonUploadCache = makeUploadCache({
+  minimalContentLength: 9 * 1000, // Roughly 9KB.
+});
 
 const computeSha256 = (payload: string): string => {
   const shaObj = new jsSHA('SHA-256', 'TEXT', { encoding: 'UTF8' });
@@ -92,11 +95,13 @@ export const prepareAiUserContent = async ({
   userId,
   simplifiedProjectJson,
   projectSpecificExtensionsSummaryJson,
+  eventsJson,
 }: {|
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
   simplifiedProjectJson: string | null,
   projectSpecificExtensionsSummaryJson: string | null,
+  eventsJson?: string | null,
 |}) => {
   // Hash the contents, if provided, to then upload it only once (as long as the hash stays
   // the same, no need to re-upload it for a while).
@@ -108,6 +113,7 @@ export const prepareAiUserContent = async ({
   const projectSpecificExtensionsSummaryJsonHash = projectSpecificExtensionsSummaryJson
     ? computeSha256(projectSpecificExtensionsSummaryJson)
     : null;
+  const eventsJsonHash = eventsJson ? computeSha256(eventsJson) : null;
   const endTime = Date.now();
   console.info(
     `Hash of simplified project json and project specific extensions summary json took ${(
@@ -129,9 +135,15 @@ export const prepareAiUserContent = async ({
     contentLength: simplifiedProjectJson ? simplifiedProjectJson.length : 0,
   });
 
+  const shouldUploadEventsJson = eventsJsonUploadCache.shouldUpload({
+    hash: eventsJsonHash,
+    contentLength: eventsJson ? eventsJson.length : 0,
+  });
+
   if (
     shouldUploadGameProjectJson ||
-    shouldUploadProjectSpecificExtensionsSummary
+    shouldUploadProjectSpecificExtensionsSummary ||
+    shouldUploadEventsJson
   ) {
     const startTime = Date.now();
     const {
@@ -139,6 +151,8 @@ export const prepareAiUserContent = async ({
       gameProjectJsonUserRelativeKey,
       projectSpecificExtensionsSummaryJsonSignedUrl,
       projectSpecificExtensionsSummaryJsonUserRelativeKey,
+      eventsJsonSignedUrl,
+      eventsJsonUserRelativeKey,
     }: AiUserContentPresignedUrlsResult = await retryIfFailed(
       { times: 3 },
       () =>
@@ -150,6 +164,7 @@ export const prepareAiUserContent = async ({
           projectSpecificExtensionsSummaryJsonHash: shouldUploadProjectSpecificExtensionsSummary
             ? projectSpecificExtensionsSummaryJsonHash
             : null,
+          eventsJsonHash: shouldUploadEventsJson ? eventsJsonHash : null,
         })
     );
 
@@ -196,6 +211,20 @@ export const prepareAiUserContent = async ({
             );
           })
         : null,
+      eventsJsonSignedUrl
+        ? retryIfFailed({ times: 3 }, () =>
+            axios.put(eventsJsonSignedUrl, eventsJson, {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            })
+          ).then(() => {
+            eventsJsonUploadCache.storeUpload(eventsJsonHash, {
+              uploadedAt,
+              userRelativeKey: eventsJsonUserRelativeKey || null,
+            });
+          })
+        : null,
     ]);
 
     const endTime = Date.now();
@@ -205,6 +234,7 @@ export const prepareAiUserContent = async ({
         shouldUploadProjectSpecificExtensionsSummary
           ? 'project specific extensions summary'
           : null,
+        shouldUploadEventsJson ? 'existing events' : null,
       ]
         .filter(Boolean)
         .join(' and ')} took ${(endTime - startTime).toFixed(2)}ms`
@@ -219,7 +249,9 @@ export const prepareAiUserContent = async ({
   const projectSpecificExtensionsSummaryJsonUserRelativeKey = projectSpecificExtensionsSummaryUploadCache.getUserRelativeKey(
     projectSpecificExtensionsSummaryJsonHash
   );
-
+  const eventsJsonUserRelativeKey = eventsJsonUploadCache.getUserRelativeKey(
+    eventsJsonHash
+  );
   return {
     gameProjectJsonUserRelativeKey,
     gameProjectJson: gameProjectJsonUserRelativeKey
@@ -229,5 +261,7 @@ export const prepareAiUserContent = async ({
     projectSpecificExtensionsSummaryJson: projectSpecificExtensionsSummaryJsonUserRelativeKey
       ? null
       : projectSpecificExtensionsSummaryJson,
+    eventsJsonUserRelativeKey,
+    eventsJson: eventsJsonUserRelativeKey ? null : eventsJson || null,
   };
 };

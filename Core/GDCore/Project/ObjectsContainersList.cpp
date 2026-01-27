@@ -561,6 +561,29 @@ std::vector<gd::String> ObjectsContainersList::GetBehaviorNamesInObjectOrGroup(
       *objectsContainers[0], *objectsContainers[1], objectOrGroupName, behaviorType, searchInGroups);
 }
 
+bool ObjectsContainersList::IsDefaultBehavior(
+    const gd::String &objectOrGroupName, const gd::String &behaviorType, bool searchInGroups) const {
+  if (objectsContainers.size() > 2) {
+    // TODO: rework forwarded methods so they can work with any number of
+    // containers.
+    gd::LogFatalError(
+        "ObjectsContainersList::IsDefaultBehavior called with objectsContainers "
+        "not being exactly 2. This is a logical error and will crash.");
+  }
+  if (objectsContainers.size() == 0) {
+    return false;
+  }
+  if (objectsContainers.size() == 1) {
+    gd::ObjectsContainer emptyObjectsContainer(
+        gd::ObjectsContainer::SourceType::Unknown);
+    return gd::IsDefaultBehavior(emptyObjectsContainer,
+                                    *objectsContainers[0], objectOrGroupName, behaviorType,
+                                    searchInGroups);
+  }
+  return gd::IsDefaultBehavior(
+      *objectsContainers[0], *objectsContainers[1], objectOrGroupName, behaviorType, searchInGroups);
+}
+
 
 std::vector<gd::String> ObjectsContainersList::GetAnimationNamesOfObject(
     const gd::String &objectOrGroupName) const {

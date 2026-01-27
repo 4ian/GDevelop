@@ -603,7 +603,7 @@ namespace gdjs {
         return (
           this.x +
           (-animationFrame.origin.x -
-            this._renderer.getUnscaledWidth() +
+            this.getCurrentFrameWidth() +
             2 * animationFrame.center.x) *
             absScaleX
         );
@@ -626,7 +626,7 @@ namespace gdjs {
         return (
           this.y +
           (-animationFrame.origin.y -
-            this._renderer.getUnscaledHeight() +
+            this.getCurrentFrameHeight() +
             2 * animationFrame.center.y) *
             absScaleY
         );
@@ -639,17 +639,13 @@ namespace gdjs {
      */
     getCenterX(): float {
       const animationFrame = this._animator.getCurrentFrame();
-      const centerX = animationFrame
-        ? animationFrame.center.x
-        : this._renderer.getUnscaledWidth() / 2;
+      const frameWidth = this.getCurrentFrameWidth();
+      const centerX = animationFrame ? animationFrame.center.x : frameWidth / 2;
       if (!this._flippedX) {
         //Just need to multiply by the scale as it is the center.
         return centerX * Math.abs(this._scaleX * this._preScale);
       } else {
-        return (
-          (this._renderer.getUnscaledWidth() - centerX) *
-          Math.abs(this._scaleX * this._preScale)
-        );
+        return (frameWidth - centerX) * Math.abs(this._scaleX * this._preScale);
       }
     }
 
@@ -659,16 +655,16 @@ namespace gdjs {
      */
     getCenterY(): float {
       const animationFrame = this._animator.getCurrentFrame();
+      const frameHeight = this.getCurrentFrameHeight();
       const centerY = animationFrame
         ? animationFrame.center.y
-        : this._renderer.getUnscaledHeight() / 2;
+        : frameHeight / 2;
       if (!this._flippedY) {
         //Just need to multiply by the scale as it is the center.
         return centerY * Math.abs(this._scaleY * this._preScale);
       } else {
         return (
-          (this._renderer.getUnscaledHeight() - centerY) *
-          Math.abs(this._scaleY * this._preScale)
+          (frameHeight - centerY) * Math.abs(this._scaleY * this._preScale)
         );
       }
     }
@@ -833,19 +829,16 @@ namespace gdjs {
       if (this._animationFrameDirty) {
         this._updateAnimationFrame();
       }
-      const unscaledWidth = this._renderer.getUnscaledWidth();
-      if (unscaledWidth !== 0) {
-        this.setScaleX(newWidth / (unscaledWidth * this._preScale));
+      const originalHeight = this.getOriginalHeight();
+      if (originalHeight !== 0) {
+        this.setScaleX(newWidth / originalHeight);
       }
     }
 
     setHeight(newHeight: float): void {
-      if (this._animationFrameDirty) {
-        this._updateAnimationFrame();
-      }
-      const unscaledHeight = this._renderer.getUnscaledHeight();
-      if (unscaledHeight !== 0) {
-        this.setScaleY(newHeight / (unscaledHeight * this._preScale));
+      const originalWidth = this.getOriginalWidth();
+      if (originalWidth !== 0) {
+        this.setScaleY(newHeight / originalWidth);
       }
     }
 
@@ -855,11 +848,25 @@ namespace gdjs {
     }
 
     override getOriginalWidth(): float {
-      return this._renderer.getUnscaledWidth() * this._preScale;
+      return this.getCurrentFrameWidth() * this._preScale;
     }
 
     override getOriginalHeight(): float {
-      return this._renderer.getUnscaledHeight() * this._preScale;
+      return this.getCurrentFrameHeight() * this._preScale;
+    }
+
+    private getCurrentFrameWidth(): float {
+      if (this._animationFrameDirty) {
+        this._updateAnimationFrame();
+      }
+      return this._renderer.getUnscaledWidth();
+    }
+
+    private getCurrentFrameHeight(): float {
+      if (this._animationFrameDirty) {
+        this._updateAnimationFrame();
+      }
+      return this._renderer.getUnscaledHeight();
     }
 
     /**

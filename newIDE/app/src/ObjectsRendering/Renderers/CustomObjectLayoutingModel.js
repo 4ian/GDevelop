@@ -39,10 +39,15 @@ export type ObjectAnchor = {
 };
 
 const getPropertyValue = (
+  name: string,
   properties: gdMapStringPropertyDescriptor,
-  name: string
+  overridingProperties: gdMapStringPropertyDescriptor | null
 ): CustomObjectConfiguration_EdgeAnchor =>
-  properties.has(name)
+  overridingProperties && overridingProperties.has(name)
+    ? gd.CustomObjectConfiguration.getEdgeAnchorFromString(
+        overridingProperties.get(name).getValue()
+      )
+    : properties.has(name)
     ? gd.CustomObjectConfiguration.getEdgeAnchorFromString(
         properties.get(name).getValue()
       )
@@ -64,7 +69,8 @@ const getDefaultAnchor = () => ({
  */
 export const getObjectAnchor = (
   eventBasedObjectVariant: gdEventsBasedObjectVariant,
-  objectName: string
+  objectName: string,
+  initialInstance: gdInitialInstance
 ): ObjectAnchor => {
   const objects = eventBasedObjectVariant.getObjects();
   if (!objects.hasObjectNamed(objectName)) {
@@ -75,10 +81,31 @@ export const getObjectAnchor = (
     return getDefaultAnchor();
   }
   const properties = childObject.getBehavior('Anchor').getProperties();
-  const leftEdgeAnchor = getPropertyValue(properties, 'leftEdgeAnchor');
-  const topEdgeAnchor = getPropertyValue(properties, 'topEdgeAnchor');
-  const rightEdgeAnchor = getPropertyValue(properties, 'rightEdgeAnchor');
-  const bottomEdgeAnchor = getPropertyValue(properties, 'bottomEdgeAnchor');
+  const overridingProperties = initialInstance.hasBehaviorOverridingNamed(
+    'Anchor'
+  )
+    ? initialInstance.getBehaviorOverriding('Anchor').getProperties()
+    : null;
+  const leftEdgeAnchor = getPropertyValue(
+    'leftEdgeAnchor',
+    properties,
+    overridingProperties
+  );
+  const topEdgeAnchor = getPropertyValue(
+    'topEdgeAnchor',
+    properties,
+    overridingProperties
+  );
+  const rightEdgeAnchor = getPropertyValue(
+    'rightEdgeAnchor',
+    properties,
+    overridingProperties
+  );
+  const bottomEdgeAnchor = getPropertyValue(
+    'bottomEdgeAnchor',
+    properties,
+    overridingProperties
+  );
   return { leftEdgeAnchor, topEdgeAnchor, rightEdgeAnchor, bottomEdgeAnchor };
 };
 
@@ -274,6 +301,14 @@ export class LayoutedInstance {
     return [];
   }
 
+  hasBehaviorOverridingNamed(name: string): boolean {
+    return this.instance.hasBehaviorOverridingNamed(name);
+  }
+
+  getBehaviorOverriding(name: string): gdBehavior {
+    return this.instance.getBehaviorOverriding(name);
+  }
+
   serializeTo(element: gdSerializerElement) {}
 
   unserializeFrom(element: gdSerializerElement) {}
@@ -337,7 +372,8 @@ export const getLayoutedRenderedInstance = <T: ChildRenderedInstance>(
 
   const objectAnchor = getObjectAnchor(
     eventBasedObjectVariant,
-    layoutedInstance.getObjectName()
+    layoutedInstance.getObjectName(),
+    initialInstance
   );
   const leftEdgeAnchor = objectAnchor
     ? objectAnchor.leftEdgeAnchor

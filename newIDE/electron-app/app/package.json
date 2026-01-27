@@ -8,7 +8,7 @@
   "homepage": "https://gdevelop.io",
   "main": "main.js",
   "dependencies": {
-    "@electron/remote": "^2.1.2",
+    "@electron/remote": "2.1.2",
     "archiver": "^2.1.1",
     "async": "^2.6.0",
     "axios": "^0.19.1",
@@ -18,7 +18,7 @@
     "electron-editor-context-menu": "^1.1.1",
     "electron-is-dev": "^2.0.0",
     "electron-log": "^4.1.1",
-    "electron-updater": "4.2.0",
+    "electron-updater": "6.3.9",
     "fs-extra": "^3.0.1",
     "live-server": "^1.2.0",
     "lodash.debounce": "^4.0.8",

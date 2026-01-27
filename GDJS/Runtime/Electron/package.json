@@ -7,7 +7,7 @@
   "version": "GDJS_GAME_VERSION",
   "dependencies": {
     "GDJS_EXTENSION_NPM_DEPENDENCY": "0",
-    "@electron/remote": "^2.1.2"
+    "@electron/remote": "2.1.2"
   },
   "scripts": {
     "start": "electron main.js",
@@ -15,8 +15,8 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "devDependencies": {
-    "electron": "32-x-y",
-    "electron-builder": "^26.0.12"
+    "electron": "32.3.3",
+    "electron-builder": "26.4.0"
   },
   "build": {
     "appId": "GDJS_GAME_PACKAGE_NAME",

@@ -88,6 +88,80 @@ describe('gdjs.SpriteRuntimeObject (using a PixiJS RuntimeGame with assets)', fu
     expect(object.getHeight()).to.be(64);
   });
 
+  it('returns correct dimensions immediately after changing animation', async () => {
+    const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
+    const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+
+    const object = new gdjs.SpriteRuntimeObject(runtimeScene, {
+      name: 'obj1',
+      type: 'Sprite',
+      updateIfNotVisible: false,
+      variables: [],
+      behaviors: [],
+      effects: [],
+      animations: [
+        {
+          name: 'smallAnimation',
+          useMultipleDirections: false,
+          directions: [
+            {
+              looping: false,
+              timeBetweenFrames: 1,
+              sprites: [
+                {
+                  hasCustomCollisionMask: false,
+                  image: 'base/tests-utils/assets/64x64.jpg',
+                  points: [],
+                  originPoint: { name: 'Origin', x: 11, y: 12 },
+                  centerPoint: { automatic: true, name: 'Center', x: 0, y: 0 },
+                  customCollisionMask: [],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          name: 'largeAnimation',
+          useMultipleDirections: false,
+          directions: [
+            {
+              looping: false,
+              timeBetweenFrames: 1,
+              sprites: [
+                {
+                  hasCustomCollisionMask: false,
+                  image: 'base/tests-utils/assets/128x128.jpg',
+                  points: [],
+                  originPoint: { name: 'Origin', x: 13, y: 14 },
+                  centerPoint: { automatic: true, name: 'Center', x: 0, y: 0 },
+                  customCollisionMask: [],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+
+    // Get initial dimensions and frame related properties.
+    expect(object.getOriginalWidth()).to.be(64);
+    expect(object.getOriginalHeight()).to.be(64);
+    expect(object.getCenterX()).to.be(32);
+    expect(object.getCenterY()).to.be(32);
+    expect(object.getDrawableX()).to.be(-11);
+    expect(object.getDrawableY()).to.be(-12);
+
+    // Change animation without rendering - dimensions and any other frame related properties should update immediately.
+    object.setAnimation(1);
+
+    expect(object.getOriginalWidth()).to.be(128);
+    expect(object.getOriginalHeight()).to.be(128);
+    expect(object.getCenterX()).to.be(64);
+    expect(object.getCenterY()).to.be(64);
+    expect(object.getDrawableX()).to.be(-13);
+    expect(object.getDrawableY()).to.be(-14);
+  });
+
   it('returns the object drawable X/Y', async () => {
     const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);

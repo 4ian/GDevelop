@@ -121,7 +121,18 @@ class GD_CORE_API BehaviorConfigurationContainer {
    * \brief Called to initialize the content with the default properties
    * for the behavior.
    */
-  virtual void InitializeContent() { InitializeContent(content); };
+  virtual void InitializeContent() {
+    InitializeContent(content);
+  };
+
+  /**
+   * \brief Called to remove all properties values for the behavior.
+   * 
+   * \see gd::InitialInstance
+   */
+  void ClearContent() {
+    content.Clear();
+  };
 
   /**
    * \brief Serialize the behavior content.

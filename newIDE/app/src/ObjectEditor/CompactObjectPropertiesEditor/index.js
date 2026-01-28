@@ -173,7 +173,7 @@ export const TopLevelCollapsibleSection = ({
   renderContent: () => React.Node,
   renderContentAsHiddenWhenFolded?: boolean,
   noContentMargin?: boolean,
-  onOpenFullEditor: () => void,
+  onOpenFullEditor?: () => void,
   onAdd?: (() => void) | null,
 |}) => (
   <>
@@ -193,9 +193,11 @@ export const TopLevelCollapsibleSection = ({
           </Text>
         </LineStackLayout>
         <Line alignItems="center" noMargin>
-          <IconButton size="small" onClick={onOpenFullEditor}>
-            <ShareExternal style={styles.icon} />
-          </IconButton>
+          {onOpenFullEditor && (
+            <IconButton size="small" onClick={onOpenFullEditor}>
+              <ShareExternal style={styles.icon} />
+            </IconButton>
+          )}
           {onAdd && (
             <IconButton size="small" onClick={onAdd}>
               <Add style={styles.icon} />

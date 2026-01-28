@@ -722,6 +722,7 @@ describe('editorFunctions', () => {
       expect(result.message).toMatchInlineSnapshot(`
         "Successfully done some changes but some issues were found - see the warnings.
         Changed property \\"characterSize\\" of object \\"MyTextObject\\" to \\"56\\".
+        Changed property \\"verticalTextAlignment\\" of object \\"MyTextObject\\" to \\"bottom\\".
         Changed property \\"bold\\" of object \\"MyTextObject\\" to \\"true\\".
         Changed property \\"isShadowEnabled\\" of object \\"MyTextObject\\" to \\"true\\".
         Changed property \\"italic\\" of object \\"MyTextObject\\" to \\"false\\".
@@ -729,6 +730,7 @@ describe('editorFunctions', () => {
         Changed property \\"shadowDistance\\" of object \\"MyTextObject\\" to \\"0\\".
         Changed property \\"shadowBlurRadius\\" of object \\"MyTextObject\\" to \\"20.41\\".
         Warnings:
+        Could not change property \\"textAlignment\\" of object \\"MyTextObject\\". The value might be invalid, of the wrong type or not allowed.
         Property not found: nonExistingProperty on object MyTextObject.
         Property \\"shadowAngle\\" of object \\"MyTextObject\\" was changed to 20 - but the original requested value (20,40 , 50) looks like a size with multiple dimensions. This is not supported, only a number is allowed here.
         Property \\"shadowDistance\\" of object \\"MyTextObject\\" was changed to 0 - but the original requested value (20X   40 X 50) looks like a size with multiple dimensions. This is not supported, only a number is allowed here.

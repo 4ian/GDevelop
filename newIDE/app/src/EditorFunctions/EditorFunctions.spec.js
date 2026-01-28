@@ -666,9 +666,9 @@ describe('editorFunctions', () => {
             scene_name: 'TestScene',
             object_name: 'MyTextObject',
             changed_properties: [
-              // Change font to a valid resource
+              // Valid change but a property name with a typo
               {
-                property_name: 'characterSize',
+                property_name: 'Character-size_',
                 new_value: '56',
               },
               // Change a choice
@@ -745,6 +745,108 @@ describe('editorFunctions', () => {
       expect(properties.get('bold').getValue()).toBe('true');
       expect(properties.get('italic').getValue()).toBe('false');
       expect(properties.get('shadowAngle').getValue()).toBe('20');
+    });
+  });
+
+  describe('change_behavior_property', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+
+      // Create a Sprite object and add a PlatformerObject behavior to it
+      const testSceneObjects = testScene.getObjects();
+      const spriteObject = testSceneObjects.insertNewObject(
+        project,
+        'Sprite',
+        'MySprite',
+        testSceneObjects.getObjectsCount()
+      );
+
+      // Add PlatformerObject behavior
+      spriteObject.addNewBehavior(
+        project,
+        'PlatformBehavior::PlatformerObjectBehavior',
+        'PlatformerObject'
+      );
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('changes behavior properties with warnings for invalid values', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_behavior_property.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            behavior_name: 'PlatformerObject',
+            changed_properties: [
+              // Change number properties
+              {
+                property_name: 'GRAVITY',
+                new_value: '1500',
+              },
+              {
+                property_name: 'JumpSpeed',
+                new_value: '800',
+              },
+              {
+                property_name: 'Max_speed',
+                new_value: '300 x 20',
+              },
+              // Change a boolean property with "true"
+              {
+                property_name: 'CanGrabPlatforms',
+                new_value: 'true',
+              },
+              // Change a boolean property with "FALSE"
+              {
+                property_name: 'IgnoreDefaultControls',
+                new_value: 'FALSE',
+              },
+              // Try to change a non-existing property
+              {
+                property_name: 'nonExistingProperty',
+                new_value: 'someValue',
+              },
+            ],
+          },
+        }
+      );
+
+      // The operation should succeed overall (some changes were made)
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(`
+        "Successfully done some changes but some issues were found - see the warnings.
+        Changed property \\"Gravity\\" of behavior \\"PlatformerObject\\" to \\"1500\\".
+        Changed property \\"JumpSpeed\\" of behavior \\"PlatformerObject\\" to \\"800\\".
+        Changed property \\"MaxSpeed\\" of behavior \\"PlatformerObject\\" to \\"300\\".
+        Changed property \\"CanGrabPlatforms\\" of behavior \\"PlatformerObject\\" to \\"true\\".
+        Changed property \\"IgnoreDefaultControls\\" of behavior \\"PlatformerObject\\" to \\"false\\".
+        Warnings:
+        Property \\"MaxSpeed\\" of behavior \\"PlatformerObject\\" was changed to 300 - but the original requested value (300 x 20) looks like a size with multiple dimensions. This is not supported, only a number is allowed here.
+        Property \\"nonExistingProperty\\" not found on behavior \\"PlatformerObject\\" of object \\"MySprite\\"."
+      `);
+
+      // Verify the behavior properties were actually changed
+      const spriteObject = testScene.getObjects().getObject('MySprite');
+      const behavior = spriteObject.getBehavior('PlatformerObject');
+      const behaviorProperties = behavior.getProperties();
+
+      expect(behaviorProperties.get('Gravity').getValue()).toBe('1500');
+      expect(behaviorProperties.get('JumpSpeed').getValue()).toBe('800');
+      expect(behaviorProperties.get('MaxSpeed').getValue()).toBe('300');
+      expect(behaviorProperties.get('CanGrabPlatforms').getValue()).toBe(
+        'true'
+      );
+      expect(behaviorProperties.get('IgnoreDefaultControls').getValue()).toBe(
+        'false'
+      );
     });
   });
 

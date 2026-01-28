@@ -375,10 +375,14 @@ const findPropertyByName = ({
       foundPropertyName: null,
     };
 
+  const normalizeName = name => name.toLowerCase().replace(/\s|_|-/g, '');
+  const normalizedName = normalizeName(name);
+
   const propertyNames = properties.keys().toJSArray();
   const foundPropertyName =
     propertyNames.find(
-      propertyName => propertyName.toLowerCase() === name.toLowerCase()
+      propertyName =>
+        normalizeName(propertyName.toLowerCase()) === normalizedName
     ) || null;
   const foundProperty = foundPropertyName
     ? properties.get(foundPropertyName)
@@ -2117,21 +2121,25 @@ const changeBehaviorProperty: EditorFunction = {
 
       if (behaviorPropertySearch.foundPropertyName) {
         const { foundPropertyName, foundProperty } = behaviorPropertySearch;
-        if (
-          !behavior.updateProperty(
-            foundPropertyName,
-            sanitizePropertyNewValue(foundProperty, newValue)
-          )
-        ) {
+        const sanitizedNewValue = sanitizePropertyNewValue(
+          foundProperty,
+          newValue
+        );
+        if (!behavior.updateProperty(foundPropertyName, sanitizedNewValue)) {
           warnings.push(
             `Could not change property "${foundPropertyName}" of behavior "${behavior_name}". The value might be invalid, of the wrong type or not allowed.`
           );
           return;
         }
 
-        changes.push(
-          `Changed property "${foundPropertyName}" of behavior "${behavior_name}" to "${newValue}".`
-        );
+        const { propertyWarnings, propertyChanges } = verifyPropertyChange({
+          propertyNameWithLocation: `property "${foundPropertyName}" of behavior "${behavior_name}"`,
+          newProperties: behavior.getProperties(),
+          propertyName: foundPropertyName,
+          requestedNewValue: sanitizedNewValue,
+        });
+        warnings.push(...propertyWarnings);
+        changes.push(...propertyChanges);
       } else if (
         behaviorSharedData &&
         behaviorSharedDataPropertySearch.foundPropertyName
@@ -2140,10 +2148,14 @@ const changeBehaviorProperty: EditorFunction = {
           foundPropertyName,
           foundProperty,
         } = behaviorSharedDataPropertySearch;
+        const sanitizedNewValue = sanitizePropertyNewValue(
+          foundProperty,
+          newValue
+        );
         if (
           !behaviorSharedData.updateProperty(
             foundPropertyName,
-            sanitizePropertyNewValue(foundProperty, newValue)
+            sanitizedNewValue
           )
         ) {
           warnings.push(
@@ -2152,9 +2164,14 @@ const changeBehaviorProperty: EditorFunction = {
           return;
         }
 
-        changes.push(
-          `Changed property "${foundPropertyName}" of behavior "${behavior_name}" (shared between all objects having this behavior) to "${newValue}".`
-        );
+        const { propertyWarnings, propertyChanges } = verifyPropertyChange({
+          propertyNameWithLocation: `property "${foundPropertyName}" of behavior "${behavior_name}" (shared between all objects having this behavior)`,
+          newProperties: behavior.getProperties(),
+          propertyName: foundPropertyName,
+          requestedNewValue: sanitizedNewValue,
+        });
+        warnings.push(...propertyWarnings);
+        changes.push(...propertyChanges);
       } else {
         warnings.push(
           `Property "${propertyName}" not found on behavior "${behavior_name}" of object "${object_name}".`

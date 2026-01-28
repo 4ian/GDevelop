@@ -2615,6 +2615,16 @@ export class EventsContextAnalyzer extends EmscriptenObject {
   launch(events: EventsList, projectScopedContainers: ProjectScopedContainers): void;
 }
 
+export class ReadOnlyArbitraryEventsWorkerWithContext extends EmscriptenObject {
+  launch(events: EventsList, projectScopedContainers: ProjectScopedContainers): void;
+}
+
+export class ReadOnlyArbitraryEventsWorkerWithContextJS extends ReadOnlyArbitraryEventsWorkerWithContext {
+  constructor();
+  doVisitEvent(event: BaseEvent): void;
+  doVisitInstruction(instruction: Instruction, isCondition: boolean, projectScopedContainers: ProjectScopedContainers): void;
+}
+
 export class ArbitraryResourceWorker extends EmscriptenObject {}
 
 export class ArbitraryResourceWorkerJS extends ArbitraryResourceWorker {

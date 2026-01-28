@@ -3568,6 +3568,21 @@ interface EventsContextAnalyzer {
     void Launch([Ref] EventsList events, [Const, Ref] ProjectScopedContainers projectScopedContainers);
 };
 
+interface ReadOnlyArbitraryEventsWorkerWithContext {
+    void Launch([Const, Ref] EventsList events, [Const, Ref] ProjectScopedContainers projectScopedContainers);
+};
+[JSImplementation=ReadOnlyArbitraryEventsWorkerWithContext]
+interface ReadOnlyArbitraryEventsWorkerWithContextJS {
+    void ReadOnlyArbitraryEventsWorkerWithContextJS();
+
+    // Called for each event visited
+    void DoVisitEvent([Const, Ref] BaseEvent event);
+
+    // Called for each instruction visited, with the current scoped containers (includes local variables)
+    void DoVisitInstruction([Const, Ref] Instruction instruction, boolean isCondition, [Const, Ref] ProjectScopedContainers projectScopedContainers);
+};
+ReadOnlyArbitraryEventsWorkerWithContextJS implements ReadOnlyArbitraryEventsWorkerWithContext;
+
 interface ArbitraryResourceWorker {
 };
 [JSImplementation=ArbitraryResourceWorker]

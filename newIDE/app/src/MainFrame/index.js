@@ -123,7 +123,11 @@ import {
 } from './MainMenu';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
-import { useKeyboardShortcuts, useShortcutMap } from '../KeyboardShortcuts';
+import {
+  getShortcutDisplayName,
+  useKeyboardShortcuts,
+  useShortcutMap,
+} from '../KeyboardShortcuts';
 import useMainFrameCommands from './MainFrameCommands';
 import {
   CommandPaletteWithAlgoliaSearch,
@@ -191,6 +195,7 @@ import { type CourseChapter } from '../Utils/GDevelopServices/Asset';
 import useVersionHistory from '../VersionHistory/UseVersionHistory';
 import { ProjectManagerDrawer } from '../ProjectManager/ProjectManagerDrawer';
 import DiagnosticReportDialog from '../ExportAndShare/DiagnosticReportDialog';
+import { scanProjectForValidationErrors } from '../Utils/EventsValidationScanner';
 import useSaveReminder from './UseSaveReminder';
 import { useMultiplayerLobbyConfigurator } from './UseMultiplayerLobbyConfigurator';
 import { useAuthenticatedPlayer } from './UseAuthenticatedPlayer';
@@ -207,6 +212,7 @@ import {
   isEditorHotReloadNeeded,
 } from '../EmbeddedGame/EmbeddedGameFrame';
 import useHomePageSwitch from './useHomePageSwitch';
+import { useNavigationToEvent } from './UseNavigationToEvent';
 import RobotIcon from '../ProjectCreation/RobotIcon';
 import PublicProfileContext from '../Profile/PublicProfileContext';
 import { useGamesPlatformFrame } from './EditorContainers/HomePage/PlaySection/UseGamesPlatformFrame';
@@ -459,6 +465,51 @@ const MainFrame = (props: Props) => {
   const preferences = React.useContext(PreferencesContext);
   const { setHasProjectOpened } = preferences;
   const { previewLoadingRef, setPreviewLoading } = usePreviewLoadingState();
+  const shortcutMap = useShortcutMap();
+
+  /**
+   * Checks for diagnostic errors in the project if blocking is enabled.
+   * Returns true if there are errors and the action should be blocked.
+   */
+  const checkDiagnosticErrorsAndBlock = React.useCallback(
+    async (
+      project: ?gdProject,
+      actionType: 'preview' | 'export'
+    ): Promise<boolean> => {
+      if (
+        !project ||
+        !preferences.getBlockPreviewAndExportOnDiagnosticErrors()
+      ) {
+        return false;
+      }
+
+      try {
+        const validationErrors = scanProjectForValidationErrors(project);
+        if (validationErrors.length > 0) {
+          const shortcut = getShortcutDisplayName(
+            shortcutMap['OPEN_DIAGNOSTIC_REPORT']
+          );
+          await showAlert({
+            title: t`Diagnostic errors found`,
+            message:
+              actionType === 'preview'
+                ? t`Your project has ${
+                    validationErrors.length
+                  } diagnostic error(s). Please fix them before launching a preview. Press ${shortcut} to open the diagnostic report.`
+                : t`Your project has ${
+                    validationErrors.length
+                  } diagnostic error(s). Please fix them before exporting. Press ${shortcut} to open the diagnostic report.`,
+          });
+          return true;
+        }
+      } catch (error) {
+        console.error('Error scanning project for validation errors:', error);
+      }
+
+      return false;
+    },
+    [preferences, shortcutMap, showAlert]
+  );
   const [previewState, setPreviewState] = React.useState(initialPreviewState);
   const commandPaletteRef = React.useRef((null: ?CommandPaletteInterface));
   const inAppTutorialOrchestratorRef = React.useRef<?InAppTutorialOrchestratorInterface>(
@@ -532,6 +583,9 @@ const MainFrame = (props: Props) => {
     diagnosticReportDialogOpen,
     setDiagnosticReportDialogOpen,
   ] = React.useState<boolean>(false);
+  const { setPendingEventNavigation } = useNavigationToEvent({
+    editorTabs: state.editorTabs,
+  });
   const [
     fileMetadataOpeningProgress,
     setFileMetadataOpeningProgress,
@@ -800,13 +854,17 @@ const MainFrame = (props: Props) => {
   );
 
   const openShareDialog = React.useCallback(
-    (initialTab?: ShareTab) => {
+    async (initialTab?: ShareTab) => {
+      if (await checkDiagnosticErrorsAndBlock(currentProject, 'export')) {
+        return;
+      }
+
       notifyPreviewOrExportWillStart(state.editorTabs);
 
       setShareDialogInitialTab(initialTab || null);
       setShareDialogOpen(true);
     },
-    [state.editorTabs]
+    [state.editorTabs, currentProject, checkDiagnosticErrorsAndBlock]
   );
 
   const closeShareDialog = React.useCallback(
@@ -2171,6 +2229,10 @@ const MainFrame = (props: Props) => {
       if (!currentProject) return;
       if (currentProject.getLayoutsCount() === 0) return;
 
+      if (await checkDiagnosticErrorsAndBlock(currentProject, 'preview')) {
+        return;
+      }
+
       console.info(
         `Launching a new ${
           isForInGameEdition ? 'in-game edition preview' : 'preview'
@@ -2388,6 +2450,7 @@ const MainFrame = (props: Props) => {
       inGameEditorSettings,
       previewLoadingRef,
       setPreviewLoading,
+      checkDiagnosticErrorsAndBlock,
     ]
   );
 
@@ -4630,6 +4693,7 @@ const MainFrame = (props: Props) => {
     onLaunchDebugPreview: launchDebuggerAndPreview,
     onLaunchNetworkPreview: launchNetworkPreview,
     onLaunchPreviewWithDiagnosticReport: launchPreviewWithDiagnosticReport,
+    onOpenDiagnosticReport: () => setDiagnosticReportDialogOpen(true),
     onOpenHomePage: openHomePage,
     onCreateProject: () => setNewProjectSetupDialogOpen(true),
     onOpenProject: () => openOpenFromStorageProviderDialog(),
@@ -4723,7 +4787,6 @@ const MainFrame = (props: Props) => {
     previewLoading === 'hot-reload-for-in-game-edition';
   const showLoaderImmediately =
     isProjectOpening || isLoadingProject || previewLoading === 'preview';
-  const shortcutMap = useShortcutMap();
 
   const buildMainMenuProps = {
     i18n: i18n,
@@ -5238,8 +5301,29 @@ const MainFrame = (props: Props) => {
       )}
       {diagnosticReportDialogOpen && currentProject && (
         <DiagnosticReportDialog
+          project={currentProject}
           wholeProjectDiagnosticReport={currentProject.getWholeProjectDiagnosticReport()}
           onClose={() => setDiagnosticReportDialogOpen(false)}
+          onNavigateToLayoutEvent={(layoutName, eventPath) => {
+            setPendingEventNavigation({
+              name: layoutName,
+              locationType: 'layout',
+              eventPath,
+            });
+            openLayout(layoutName, {
+              openEventsEditor: true,
+              openSceneEditor: false,
+              focusWhenOpened: 'events',
+            });
+          }}
+          onNavigateToExternalEventsEvent={(externalEventsName, eventPath) => {
+            setPendingEventNavigation({
+              name: externalEventsName,
+              locationType: 'external-events',
+              eventPath,
+            });
+            openExternalEvents(externalEventsName);
+          }}
         />
       )}
       {standaloneDialogOpen && (

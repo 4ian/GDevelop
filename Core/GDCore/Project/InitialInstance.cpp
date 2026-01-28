@@ -13,6 +13,10 @@
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/UUID/UUID.h"
+#include "GDCore/Extensions/Metadata/BehaviorMetadata.h"
+#include "GDCore/Extensions/Metadata/MetadataProvider.h"
+#include "GDCore/Project/CustomBehavior.h"
+#include "GDCore/Tools/Log.h"
 
 namespace gd {
 
@@ -20,29 +24,12 @@ gd::String* InitialInstance::badStringPropertyValue = NULL;
 
 InitialInstance::InitialInstance()
     : objectName(""),
-      x(0),
-      y(0),
-      z(0),
-      angle(0),
-      rotationX(0),
-      rotationY(0),
-      zOrder(0),
-      opacity(255),
       layer(""),
-      flippedX(false),
-      flippedY(false),
-      flippedZ(false),
-      customSize(false),
-      customDepth(false),
-      width(0),
-      height(0),
-      depth(0),
-      locked(false),
-      sealed(false),
-      keepRatio(true),
-      persistentUuid(UUID::MakeUuid4()) {}
+      persistentUuid(UUID::MakeUuid4()),
+      behaviorOverridings(true) {}
 
-void InitialInstance::UnserializeFrom(const SerializerElement& element) {
+void InitialInstance::UnserializeFrom(gd::Project &project,
+                                      const SerializerElement &element) {
   SetObjectName(element.GetStringAttribute("name", "", "nom"));
   SetX(element.GetDoubleAttribute("x"));
   SetY(element.GetDoubleAttribute("y"));
@@ -131,6 +118,11 @@ void InitialInstance::UnserializeFrom(const SerializerElement& element) {
     GetVariables().UnserializeFrom(
         element.GetChild("initialVariables", 0, "InitialVariables"));
   }
+
+  if (element.HasChild("behaviorOverridings")) {
+    behaviorOverridings.UnserializeFrom(
+        project, element.GetChild("behaviorOverridings"));
+  }
 }
 
 void InitialInstance::SerializeTo(SerializerElement& element) const {
@@ -178,6 +170,11 @@ void InitialInstance::SerializeTo(SerializerElement& element) const {
   }
 
   GetVariables().SerializeTo(element.AddChild("initialVariables"));
+
+  // TODO Don't serialize empty overridings
+  if (!behaviorOverridings.GetAllBehaviorContents().empty()) {
+    behaviorOverridings.SerializeTo(element.AddChild("behaviorOverridings"));
+  }
 }
 
 InitialInstance& InitialInstance::ResetPersistentUuid() {
@@ -241,6 +238,79 @@ void InitialInstance::SetRawDoubleProperty(const gd::String& name,
 void InitialInstance::SetRawStringProperty(const gd::String& name,
                                            const gd::String& value) {
   stringProperties[name] = value;
+}
+
+bool InitialInstance::HasAnyOverriddenProperty(const gd::Object &object) {
+  for (auto &behaviorOverridingPair : behaviorOverridings.GetAllBehaviorContents()) {
+    auto &behaviorName = behaviorOverridingPair.first;
+    auto &behaviorOverriding = behaviorOverridingPair.second;
+    if (behaviorOverriding->GetProperties().empty() ||
+        !object.HasBehaviorNamed(behaviorName)) {
+      continue;
+    }
+    const auto &behaviorProperties =
+        object.GetBehavior(behaviorName).GetProperties();
+    if (HasAnyOverriddenPropertyForBehavior(object.GetBehavior(behaviorName))) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool InitialInstance::HasAnyOverriddenPropertyForBehavior(
+    const gd::Behavior &behavior) {
+  auto &behaviorName = behavior.GetName();
+  if (!HasBehaviorOverridingNamed(behaviorName)) {
+    return false;
+  }
+  auto &behaviorOverriding = GetBehaviorOverriding(behaviorName);
+  if (behaviorOverriding.GetProperties().empty()) {
+    return false;
+  }
+  const auto &behaviorProperties = behavior.GetProperties();
+  for (auto &overridingPropertyPair : behaviorOverriding.GetProperties()) {
+    auto &overridingPropertyName = overridingPropertyPair.first;
+    auto &overridingProperty = overridingPropertyPair.second;
+
+    if (behaviorProperties.find(overridingPropertyName) ==
+        behaviorProperties.end()) {
+      continue;
+    }
+    if (overridingProperty.GetValue() !=
+        behaviorProperties.at(overridingPropertyName).GetValue()) {
+      return true;
+    }
+  }
+  return false;
+}
+
+gd::Behavior &InitialInstance::GetBehaviorOverriding(const gd::String &name) {
+  return behaviorOverridings.GetBehavior(name);
+}
+
+const gd::Behavior &
+InitialInstance::GetBehaviorOverriding(const gd::String &name) const {
+  return behaviorOverridings.GetBehavior(name);
+}
+
+bool InitialInstance::HasBehaviorOverridingNamed(const gd::String &name) const {
+  return behaviorOverridings.HasBehaviorNamed(name);
+}
+
+void InitialInstance::RemoveBehaviorOverriding(const gd::String &name) {
+  behaviorOverridings.RemoveBehavior(name);
+}
+
+bool InitialInstance::RenameBehaviorOverriding(const gd::String &name,
+                                               const gd::String &newName) {
+  return behaviorOverridings.RenameBehavior(name, newName);
+}
+
+gd::Behavior *
+InitialInstance::AddNewBehaviorOverriding(const gd::Project &project,
+                                          const gd::String &type,
+                                          const gd::String &name) {
+  return behaviorOverridings.AddNewBehavior(project, type, name);
 }
 
 }  // namespace gd

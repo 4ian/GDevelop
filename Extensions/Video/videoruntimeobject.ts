@@ -70,9 +70,10 @@ namespace gdjs {
      */
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      videoObjectData: VideoObjectData
+      videoObjectData: VideoObjectData,
+      instanceData?: InstanceData
     ) {
-      super(instanceContainer, videoObjectData);
+      super(instanceContainer, videoObjectData, instanceData);
       this._opacity = videoObjectData.content.opacity;
       this._loop = videoObjectData.content.loop;
       this._volume = videoObjectData.content.volume;

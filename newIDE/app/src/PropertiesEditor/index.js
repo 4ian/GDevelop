@@ -416,7 +416,7 @@ const PropertiesEditor = ({
               _onInstancesModified(instances);
             }}
             style={styles.field}
-            disabled={field.disabled}
+            disabled={getDisabled({ instances, field })}
           >
             {children}
           </SelectField>

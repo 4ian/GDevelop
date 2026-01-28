@@ -146,6 +146,23 @@ const getFieldEndAdornmentIcon = ({
   return null;
 };
 
+const isFieldShowcased = ({
+  instances,
+  field,
+}: {|
+  instances: Instances,
+  field: ValueField,
+|}): any => {
+  if (!instances[0]) {
+    console.warn(
+      'isFieldShowcased was called with an empty list of instances (or containing undefined). This is a bug that should be fixed.'
+    );
+    return false;
+  }
+
+  return field.isShowcased ? field.isShowcased(instances[0]) : false;
+};
+
 const getFieldLabel = ({
   instances,
   field,
@@ -247,6 +264,9 @@ const CompactPropertiesEditor = ({
             }}
             disabled={getDisabled({ instances, field })}
             fullWidth
+            labelColor={
+              isFieldShowcased({ instances, field }) ? 'primary' : 'secondary'
+            }
           />
         );
       } else if (field.valueType === 'number') {
@@ -306,6 +326,9 @@ const CompactPropertiesEditor = ({
                   {...otherCommonProps}
                 />
               }
+              labelColor={
+                isFieldShowcased({ instances, field }) ? 'primary' : 'secondary'
+              }
             />
           );
         }
@@ -331,6 +354,9 @@ const CompactPropertiesEditor = ({
                   });
                 }}
               />
+            }
+            labelColor={
+              isFieldShowcased({ instances, field }) ? 'primary' : 'secondary'
             }
           />
         );
@@ -372,6 +398,9 @@ const CompactPropertiesEditor = ({
             value={getFieldValue({ instances, field })}
             label={getFieldLabel({ instances, field })}
             markdownDescription={getFieldDescription(field)}
+            labelColor={
+              isFieldShowcased({ instances, field }) ? 'primary' : 'secondary'
+            }
           />
         );
       } else {
@@ -426,12 +455,15 @@ const CompactPropertiesEditor = ({
               label={getFieldLabel({ instances, field })}
               markdownDescription={getFieldDescription(field)}
               field={<CompactSemiControlledTextField {...otherCommonProps} />}
+              labelColor={
+                isFieldShowcased({ instances, field }) ? 'primary' : 'secondary'
+              }
             />
           );
         }
       }
     },
-    [instances, onFieldChanged, getFieldDescription]
+    [instances, getFieldDescription, onFieldChanged]
   );
 
   const renderSelectField = React.useCallback(
@@ -466,7 +498,7 @@ const CompactPropertiesEditor = ({
                 hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
               });
             }}
-            disabled={field.disabled}
+            disabled={getDisabled({ instances, field })}
           >
             {children}
           </CompactSelectField>
@@ -507,10 +539,13 @@ const CompactPropertiesEditor = ({
           label={getFieldLabel({ instances, field })}
           markdownDescription={getFieldDescription(field)}
           field={compactSelectField}
+          labelColor={
+            isFieldShowcased({ instances, field }) ? 'primary' : 'secondary'
+          }
         />
       );
     },
-    [instances, onFieldChanged, getFieldDescription]
+    [instances, getFieldDescription, onFieldChanged]
   );
 
   const renderButton = React.useCallback(
@@ -619,6 +654,9 @@ const CompactPropertiesEditor = ({
             }}
           />
         }
+        labelColor={
+          isFieldShowcased({ instances, field }) ? 'primary' : 'secondary'
+        }
       />
     );
   };
@@ -651,6 +689,9 @@ const CompactPropertiesEditor = ({
               });
             }}
           />
+        }
+        labelColor={
+          isFieldShowcased({ instances, field }) ? 'primary' : 'secondary'
         }
       />
     );

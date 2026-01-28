@@ -15,9 +15,13 @@ namespace gdjs {
     // @ts-expect-error ts-migrate(2564) FIXME: Property 'opacity' has no initializer and is not d... Remove this comment to see the full error message
     opacity: float;
 
-    constructor(instanceContainer: gdjs.RuntimeInstanceContainer, objectData) {
+    constructor(
+      instanceContainer: gdjs.RuntimeInstanceContainer,
+      objectData,
+      instanceData?: InstanceData
+    ) {
       // *ALWAYS* call the base gdjs.RuntimeObject constructor.
-      super(instanceContainer, objectData);
+      super(instanceContainer, objectData, instanceData);
       this._property1 = objectData.content.property1;
       this._renderer = new gdjs.DummyRuntimeObjectRenderer(
         this,

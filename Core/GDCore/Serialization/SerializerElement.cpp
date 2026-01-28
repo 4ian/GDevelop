@@ -283,6 +283,15 @@ void SerializerElement::RemoveChild(const gd::String& name) {
   }
 }
 
+void SerializerElement::Clear() {
+  children.clear();
+  attributes.clear();
+}
+
+void SerializerElement::RemoveAttribute(const gd::String& name) {
+  attributes.erase(name);
+}
+
 void SerializerElement::Init(const gd::SerializerElement& other) {
   valueUndefined = other.valueUndefined;
   elementValue = other.elementValue;

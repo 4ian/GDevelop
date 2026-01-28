@@ -9,12 +9,15 @@
 #include <map>
 
 #include "GDCore/Project/VariablesContainer.h"
+#include "GDCore/Project/BehaviorsContainer.h"
 #include "GDCore/String.h"
 namespace gd {
 class PropertyDescriptor;
 class Project;
 class Layout;
 class ObjectsContainer;
+class Object;
+class Behavior;
 }  // namespace gd
 
 namespace gd {
@@ -286,6 +289,67 @@ class GD_CORE_API InitialInstance {
   gd::VariablesContainer& GetVariables() { return initialVariables; }
   ///@}
 
+  /** \name Behavior management
+   * Members functions related to behavior overridings management.
+   */
+  ///@{
+
+  /**
+   * \brief Return `true` if any property from the overriding has a different
+   * value from any behavior.
+   */
+  bool HasAnyOverriddenProperty(const gd::Object &object);
+
+  /**
+   * \brief Return `true` if any property from the overriding has a different
+   * value from the given behavior.
+   */
+  bool HasAnyOverriddenPropertyForBehavior(const gd::Behavior &behavior);
+
+  /**
+   * \brief Return a reference to the content of the overriding of of the
+   * behavior called \a name.
+   */
+  Behavior &GetBehaviorOverriding(const gd::String &name);
+
+  /**
+   * \brief Return a reference to the content of the overriding of the behavior
+   * called \a name.
+   */
+  const Behavior &GetBehaviorOverriding(const gd::String &name) const;
+
+  /**
+   * \brief Return true if the object instance overrides the object behavior
+   * called \a name.
+   */
+  bool HasBehaviorOverridingNamed(const gd::String &name) const;
+
+  /**
+   * \brief Remove the behavior overrides for the behavior called \a name
+   */
+  void RemoveBehaviorOverriding(const gd::String &name);
+
+  /**
+   * \brief Change the name of behavior called name to newName.
+   * \return true if name was successfully changed
+   */
+  bool RenameBehaviorOverriding(const gd::String &name,
+                                const gd::String &newName);
+
+  /**
+   * \brief Add the behavior of the specified \a type with the specified \a
+   * name.
+   *
+   * The project's current platform is used to initialize the content.
+   *
+   * \return A pointer to the newly added behavior content. NULL if the creation
+   * failed.
+   */
+  gd::Behavior *AddNewBehaviorOverriding(const gd::Project &project,
+                                         const gd::String &type,
+                                         const gd::String &name);
+  ///@}
+
   /** \name Others properties management
    * Members functions related to exposing others properties of the instance.
    *
@@ -365,7 +429,8 @@ class GD_CORE_API InitialInstance {
   /**
    * \brief Unserialize the instances container.
    */
-  virtual void UnserializeFrom(const SerializerElement& element);
+  virtual void UnserializeFrom(gd::Project &project,
+                               const SerializerElement &element);
 
   /**
    * \brief Reset the persistent UUID used to recognize
@@ -388,32 +453,36 @@ class GD_CORE_API InitialInstance {
   std::map<gd::String, gd::String>
       stringProperties;  ///< More data which can be used by the object
 
-  gd::String objectName;  ///< Object name
-  double x;               ///< Instance X position
-  double y;               ///< Instance Y position
-  double z;               ///< Instance Z position (for a 3D object)
-  double angle;           ///< Instance angle on Z axis
-  double rotationX;       ///< Instance angle on X axis (for a 3D object)
-  double rotationY;       ///< Instance angle on Y axis (for a 3D object)
-  int zOrder;             ///< Instance Z order (for a 2D object)
-  int opacity;            ///< Instance opacity
-  bool flippedX;          ///< True if the instance is flipped on X axis
-  bool flippedY;          ///< True if the instance is flipped on Y axis
-  bool flippedZ;          ///< True if the instance is flipped on Z axis
-  gd::String layer;       ///< Instance layer
-  bool customSize;        ///< True if object has a custom width and height
-  bool customDepth;       ///< True if object has a custom depth
-  double width;           ///< Instance custom width
-  double height;          ///< Instance custom height
-  double depth;           ///< Instance custom depth
+  gd::String objectName;    ///< Object name
+  double x = 0;             ///< Instance X position
+  double y = 0;             ///< Instance Y position
+  double z = 0;             ///< Instance Z position (for a 3D object)
+  double angle = 0;         ///< Instance angle on Z axis
+  double rotationX = 0;     ///< Instance angle on X axis (for a 3D object)
+  double rotationY = 0;     ///< Instance angle on Y axis (for a 3D object)
+  int zOrder = 0;           ///< Instance Z order (for a 2D object)
+  int opacity = 255;        ///< Instance opacity
+  bool flippedX = false;    ///< True if the instance is flipped on X axis
+  bool flippedY = false;    ///< True if the instance is flipped on Y axis
+  bool flippedZ = false;    ///< True if the instance is flipped on Z axis
+  gd::String layer;         ///< Instance layer
+  bool customSize = false;  ///< True if object has a custom width and height
+  bool customDepth = false; ///< True if object has a custom depth
+  double width = 0;         ///< Instance custom width
+  double height = 0;        ///< Instance custom height
+  double depth = 0;         ///< Instance custom depth
   double defaultWidth = 0;  ///< Instance default width as reported by InGameEditor
   double defaultHeight = 0; ///< Instance default height as reported by InGameEditor
   double defaultDepth = 0;  ///< Instance default depth as reported by InGameEditor
   gd::VariablesContainer initialVariables;  ///< Instance specific variables
-  bool locked;                              ///< True if the instance is locked
-  bool sealed;                              ///< True if the instance is sealed
-  bool keepRatio;                     ///< True if the instance's dimensions
-                                      ///  should keep the same ratio.
+  gd::BehaviorsContainer
+      behaviorOverridings; ///< Contains all behavior property overriding for
+                           ///< the instance. Behavior contents are the
+                           ///< ownership of the instance.
+  bool locked = false;     ///< True if the instance is locked
+  bool sealed = false;     ///< True if the instance is sealed
+  bool keepRatio = true;   ///< True if the instance's dimensions
+                           ///  should keep the same ratio.
   mutable gd::String persistentUuid;  ///< A persistent random version 4 UUID,
                                       ///  useful for hot reloading.
 

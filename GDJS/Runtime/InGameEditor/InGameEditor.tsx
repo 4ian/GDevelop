@@ -5060,9 +5060,10 @@ namespace gdjs {
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      objectData: gdjs.Object3DData
+      objectData: gdjs.Object3DData,
+      instanceData?: InstanceData
     ) {
-      super(instanceContainer, objectData);
+      super(instanceContainer, objectData, instanceData);
       this._renderer = new UnknownRuntimeObjectRenderer(
         this,
         instanceContainer

@@ -187,10 +187,11 @@ class GD_CORE_API InitialInstancesContainer {
   /**
    * \brief Unserialize the instances container.
    */
-  virtual void UnserializeFrom(const SerializerElement &element);
+  virtual void UnserializeFrom(gd::Project &project,
+                               const SerializerElement &element);
   ///@}
 
- private:
+private:
   void RemoveInstanceIf(
       std::function<bool(const gd::InitialInstance &)> predicate);
 

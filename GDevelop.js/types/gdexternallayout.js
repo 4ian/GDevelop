@@ -8,7 +8,7 @@ declare class gdExternalLayout {
   getInitialInstances(): gdInitialInstancesContainer;
   getAssociatedEditorSettings(): gdEditorSettings;
   serializeTo(element: gdSerializerElement): void;
-  unserializeFrom(element: gdSerializerElement): void;
+  unserializeFrom(project: gdProject, element: gdSerializerElement): void;
   delete(): void;
   ptr: number;
 };

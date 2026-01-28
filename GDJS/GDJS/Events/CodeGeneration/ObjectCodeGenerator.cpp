@@ -204,8 +204,8 @@ CODE_NAMESPACE = CODE_NAMESPACE || {};
  * Object generated from OBJECT_FULL_NAME
  */
 CODE_NAMESPACE.RUNTIME_OBJECT_CLASSNAME = class RUNTIME_OBJECT_CLASSNAME extends RUNTIME_OBJECT_BASE_CLASS_NAME {
-  constructor(parentInstanceContainer, objectData) {
-    super(parentInstanceContainer, objectData);
+  constructor(parentInstanceContainer, objectData, instanceData) {
+    super(parentInstanceContainer, objectData, instanceData);
     this._parentInstanceContainer = parentInstanceContainer;
 
     this._onceTriggers = new gdjs.OnceTriggers();

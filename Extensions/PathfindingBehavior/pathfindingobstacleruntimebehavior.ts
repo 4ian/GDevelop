@@ -126,12 +126,12 @@ namespace gdjs {
       //The owner is not yet fully constructed.
     }
 
-    updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
-      if (oldBehaviorData.impassable !== newBehaviorData.impassable) {
-        this.setImpassable(newBehaviorData.impassable);
+    override applyBehaviorOverriding(behaviorData): boolean {
+      if (behaviorData.impassable !== undefined) {
+        this.setImpassable(behaviorData.impassable);
       }
-      if (oldBehaviorData.cost !== newBehaviorData.cost) {
-        this.setCost(newBehaviorData.cost);
+      if (behaviorData.cost !== undefined) {
+        this.setCost(behaviorData.cost);
       }
       return true;
     }

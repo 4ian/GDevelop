@@ -44,6 +44,7 @@ const config = {
       arch: ['universal'],
     },
     mergeASARs: false,
+    x64ArchFiles: 'Contents/Resources/app.asar.unpacked/node_modules/steamworks.js/dist/osx/steamworksjs.darwin-x64.node',
   },
   win: {
     executableName: 'GDevelop',

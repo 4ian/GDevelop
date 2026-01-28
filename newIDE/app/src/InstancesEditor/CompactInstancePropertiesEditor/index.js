@@ -44,8 +44,15 @@ import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import { type ObjectEditorTab } from '../../ObjectEditor/ObjectEditorDialog';
+import EmptyMessage from '../../UI/EmptyMessage';
 
 const gd: libGDevelop = global.gd;
+
+const notOverridableBehaviorTypes = [
+  'Physics2::Physics2Behavior',
+  'Physics3D::Physics3DBehavior',
+  'PhysicsBehavior::PhysicsBehavior',
+];
 
 export const styles = {
   icon: {
@@ -386,21 +393,37 @@ export const CompactInstancePropertiesEditor = ({
                     return (
                       <StatefulCollapsibleSubPanel
                         key={behavior.ptr}
-                        renderContent={() => (
-                          <CompactBehaviorPropertiesEditor
-                            project={project}
-                            behaviorMetadata={behaviorMetadata}
-                            behavior={behavior}
-                            behaviorOverriding={behaviorOverriding}
-                            object={object}
-                            initialInstance={instance}
-                            onBehaviorUpdated={() => {}}
-                            resourceManagementProps={resourceManagementProps}
-                            onOpenFullEditor={() =>
-                              onEditObject(object, 'behaviors')
-                            }
-                          />
-                        )}
+                        renderContent={
+                          notOverridableBehaviorTypes.includes(
+                            behavior.getTypeName()
+                          )
+                            ? () => (
+                                <Column expand>
+                                  <EmptyMessage>
+                                    <Trans>
+                                      This behavior can't be setup per instance.
+                                    </Trans>
+                                  </EmptyMessage>
+                                </Column>
+                              )
+                            : () => (
+                                <CompactBehaviorPropertiesEditor
+                                  project={project}
+                                  behaviorMetadata={behaviorMetadata}
+                                  behavior={behavior}
+                                  behaviorOverriding={behaviorOverriding}
+                                  object={object}
+                                  initialInstance={instance}
+                                  onBehaviorUpdated={() => {}}
+                                  resourceManagementProps={
+                                    resourceManagementProps
+                                  }
+                                  onOpenFullEditor={() =>
+                                    onEditObject(object, 'behaviors')
+                                  }
+                                />
+                              )
+                        }
                         isInitiallyFolded={
                           !instance.hasAnyOverriddenPropertyForBehavior(
                             behavior

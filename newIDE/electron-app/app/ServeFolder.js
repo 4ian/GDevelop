@@ -1,8 +1,8 @@
-const liveServer = require('live-server');
+const liveServer = require('five-server');
 const httpsConfiguration = require('./Utils/DevServerHttpsConfiguration.js');
 const { getAvailablePort } = require('./Utils/AvailablePortFinder');
 
-/** @type {import("live-server").LiveServerParams} */
+/** @type {import("five-server").LiveServerParams} */
 let currentServerParams = null;
 
 module.exports = {

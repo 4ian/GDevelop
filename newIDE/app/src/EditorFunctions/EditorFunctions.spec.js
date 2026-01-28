@@ -628,6 +628,124 @@ describe('editorFunctions', () => {
     });
   });
 
+  describe('change_object_property', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+
+      // Add font resources to the project
+      const fontResource1 = new gd.FontResource();
+      fontResource1.setName('font1.ttf');
+      fontResource1.setFile('font1.ttf');
+      project.getResourcesManager().addResource(fontResource1);
+
+      // Create a TextObject with a font property (resource type)
+      const testSceneObjects = testScene.getObjects();
+      const textObject = testSceneObjects.insertNewObject(
+        project,
+        'TextObject::Text',
+        'MyTextObject',
+        testSceneObjects.getObjectsCount()
+      );
+      // Set the font property to an existing resource
+      textObject.getConfiguration().updateProperty('font', 'font1.ttf');
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('handles various property types: resource, non-existing, boolean, and number with sanitization warning', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_object_property.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MyTextObject',
+            changed_properties: [
+              // Change font to a valid resource
+              {
+                property_name: 'characterSize',
+                new_value: '56',
+              },
+              // Change a choice
+              {
+                property_name: 'textAlignment',
+                new_value: 'INVALID_CHOICE',
+              },
+              {
+                property_name: 'verticalTextAlignment',
+                new_value: 'BoTTOm',
+              },
+              // Try to change a non-existing property
+              {
+                property_name: 'nonExistingProperty',
+                new_value: 'someValue',
+              },
+              // Change a boolean property with "true"
+              {
+                property_name: 'bold',
+                new_value: 'YES',
+              },
+              {
+                property_name: 'isShadowEnabled',
+                new_value: '1',
+              },
+              // Change a boolean property with "FALSE"
+              {
+                property_name: 'italic',
+                new_value: 'FALSE',
+              },
+              // Change a number property with a value that will be sanitized
+              {
+                property_name: 'shadowAngle',
+                new_value: '20,40 , 50',
+              },
+              {
+                property_name: 'shadowDistance',
+                new_value: '20X   40 X 50',
+              },
+              {
+                property_name: 'shadowBlurRadius',
+                new_value: '20.41 × 50',
+              },
+            ],
+          },
+        }
+      );
+
+      // The operation should succeed overall (some changes were made)
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(`
+        "Successfully done some changes but some issues were found - see the warnings.
+        Changed property \\"characterSize\\" of object \\"MyTextObject\\" to \\"56\\".
+        Changed property \\"bold\\" of object \\"MyTextObject\\" to \\"true\\".
+        Changed property \\"isShadowEnabled\\" of object \\"MyTextObject\\" to \\"true\\".
+        Changed property \\"italic\\" of object \\"MyTextObject\\" to \\"false\\".
+        Changed property \\"shadowAngle\\" of object \\"MyTextObject\\" to \\"20\\".
+        Changed property \\"shadowDistance\\" of object \\"MyTextObject\\" to \\"0\\".
+        Changed property \\"shadowBlurRadius\\" of object \\"MyTextObject\\" to \\"20.41\\".
+        Warnings:
+        Property not found: nonExistingProperty on object MyTextObject.
+        Property \\"shadowAngle\\" of object \\"MyTextObject\\" was changed to 20 - but the original requested value (20,40 , 50) looks like a size with multiple dimensions. This is not supported, only a number is allowed here.
+        Property \\"shadowDistance\\" of object \\"MyTextObject\\" was changed to 0 - but the original requested value (20X   40 X 50) looks like a size with multiple dimensions. This is not supported, only a number is allowed here.
+        Property \\"shadowBlurRadius\\" of object \\"MyTextObject\\" was changed to 20.41 - but the original requested value (20.41 × 50) looks like a size with multiple dimensions. This is not supported, only a number is allowed here."
+      `);
+
+      // Verify the properties were actually changed
+      const textObject = testScene.getObjects().getObject('MyTextObject');
+      const properties = textObject.getConfiguration().getProperties();
+
+      expect(properties.get('characterSize').getValue()).toBe('56');
+      expect(properties.get('bold').getValue()).toBe('true');
+      expect(properties.get('italic').getValue()).toBe('false');
+      expect(properties.get('shadowAngle').getValue()).toBe('20');
+    });
+  });
+
   describe('add_scene_events', () => {
     let project: gdProject;
     let testScene: gdLayout;

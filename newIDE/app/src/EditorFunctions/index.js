@@ -332,6 +332,7 @@ const makeMultipleChangesOutput = (
     message: [
       'Successfully done some changes but some issues were found - see the warnings.',
       ...changes,
+      'Warnings:',
       ...warnings,
     ].join('\n'),
   };
@@ -402,6 +403,112 @@ const sanitizePropertyNewValue = (
       : '0';
   }
   return newValue;
+};
+
+export const getPropertyValue = ({
+  properties,
+  propertyName,
+}: {|
+  properties: gdMapStringPropertyDescriptor | null,
+  propertyName: string,
+|}): string | null => {
+  if (!properties) return null;
+
+  const { foundProperty } = findPropertyByName({
+    properties,
+    name: propertyName,
+  });
+
+  if (!foundProperty) return null;
+
+  return foundProperty.getValue();
+};
+
+const capitalizeFirstLetter = (str: string) => {
+  if (!str) return str;
+  return str[0].toUpperCase() + str.slice(1);
+};
+
+const verifyPropertyChange = ({
+  propertyNameWithLocation,
+  newProperties,
+  propertyName,
+  requestedNewValue,
+}: {|
+  propertyNameWithLocation: string,
+  newProperties: gdMapStringPropertyDescriptor,
+  propertyName: string,
+  requestedNewValue: string,
+|}): {|
+  propertyWarnings: Array<string>,
+  propertyChanges: Array<string>,
+|} => {
+  const { foundProperty } = findPropertyByName({
+    properties: newProperties,
+    name: propertyName,
+  });
+
+  if (!foundProperty) {
+    return {
+      propertyWarnings: [],
+      propertyChanges: [
+        `Changed property "${propertyName}" but it was then not found in the new properties - double check if necessary the value of all properties.`,
+      ],
+    };
+  }
+
+  const propertyWarnings = [];
+  const propertyChanges = [];
+
+  const actualNewValue = foundProperty.getValue();
+
+  if (foundProperty.getType().toLowerCase() === 'boolean') {
+    // Like in sanitizePropertyNewValue, we need to handle the boolean values in an usual "0" or "1" format.
+    const requestedNewValueAsBooleanString =
+      requestedNewValue === '1'
+        ? 'true'
+        : requestedNewValue === '0'
+        ? 'false'
+        : requestedNewValue;
+    if (requestedNewValueAsBooleanString !== actualNewValue) {
+      propertyWarnings.push(
+        capitalizeFirstLetter(
+          `${propertyNameWithLocation} was changed - but the new value (${actualNewValue}) is different from the requested value (${requestedNewValueAsBooleanString}).`
+        )
+      );
+    }
+  } else {
+    if (
+      actualNewValue.toLowerCase().trim() !==
+      requestedNewValue.toLowerCase().trim()
+    ) {
+      if (foundProperty.getType().toLowerCase() === 'number') {
+        const sizeLikeRegex = /^\s*([+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?)\s*([,;xX*×])\s*([+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?)\s*(?:\2\s*([+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?)\s*)?$/;
+        if (sizeLikeRegex.test(requestedNewValue)) {
+          propertyWarnings.push(
+            capitalizeFirstLetter(
+              `${propertyNameWithLocation} was changed to ${actualNewValue} - but the original requested value (${requestedNewValue}) looks like a size with multiple dimensions. This is not supported, only a number is allowed here.`
+            )
+          );
+        }
+      } else {
+        propertyWarnings.push(
+          capitalizeFirstLetter(
+            `${propertyNameWithLocation} was changed - but the new value (${actualNewValue}) is different from the requested value (${requestedNewValue}).`
+          )
+        );
+      }
+    }
+  }
+
+  propertyChanges.push(
+    `Changed ${propertyNameWithLocation} to "${actualNewValue}".`
+  );
+
+  return {
+    propertyWarnings,
+    propertyChanges,
+  };
 };
 
 const makeShortTextForNamedProperty = (
@@ -1375,7 +1482,7 @@ const changeObjectProperty: EditorFunction = {
       if (
         !objectConfiguration.updateProperty(
           foundPropertyName,
-          sanitizePropertyNewValue(foundProperty, newValue)
+          sanitizedNewValue
         )
       ) {
         warnings.push(
@@ -1384,9 +1491,14 @@ const changeObjectProperty: EditorFunction = {
         return;
       }
 
-      changes.push(
-        `Changed property "${foundPropertyName}" of object "${object_name}" to "${newValue}".`
-      );
+      const { propertyWarnings, propertyChanges } = verifyPropertyChange({
+        propertyNameWithLocation: `property "${foundPropertyName}" of object "${object_name}"`,
+        newProperties: objectConfiguration.getProperties(),
+        propertyName: foundPropertyName,
+        requestedNewValue: sanitizedNewValue,
+      });
+      warnings.push(...propertyWarnings);
+      changes.push(...propertyChanges);
     });
 
     return makeMultipleChangesOutput(changes, warnings);

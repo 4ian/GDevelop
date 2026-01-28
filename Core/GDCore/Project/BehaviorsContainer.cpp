@@ -74,9 +74,12 @@ gd::Behavior *BehaviorsContainer::AddNewBehavior(const gd::Project &project,
                                                  const gd::String &name) {
   auto initializeAndAdd = [this,
                            &name](std::unique_ptr<gd::Behavior> behavior) {
-    // We don't call the Initialize method for behavior overridings because they
-    // should have no property value initially.
-    if (!isOverriding) {
+    if (isOverriding) {
+      // We don't call the Initialize method for behavior overridings because they
+      // should have no property value initially.
+      behavior->ClearContent();
+    }
+    else {
       behavior->InitializeContent();
     }
     this->behaviors[name] = std::move(behavior);

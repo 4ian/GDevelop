@@ -445,6 +445,11 @@ class GD_CORE_API SerializerElement {
   void RemoveChild(const gd::String &name);
 
   /**
+   * \brief Remove all children and attributes.
+   */
+  void Clear();
+
+  /**
    * \brief Return all the children of the element.
    */
   const std::vector<std::pair<gd::String, std::shared_ptr<SerializerElement> > >

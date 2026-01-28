@@ -15,7 +15,7 @@ module.exports = function(ipc) {
   // Set-up Discord Rich Presence event:
   ipc.on('update-discord-rich-presence', (event, config) => {
     if (discordClient.user) {
-      discordClient.setActivity(config).catch(() => {
+      discordClient.user.setActivity(config).catch(() => {
         // Ignore errors silently
       });
     }

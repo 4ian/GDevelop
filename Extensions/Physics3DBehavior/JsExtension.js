@@ -48,10 +48,18 @@ module.exports = {
         }
 
         if (propertyName === 'bodyType') {
-          behaviorContent.getChild('bodyType').setStringValue(newValue);
+          const normalizedValue = newValue.toLowerCase();
+          let bodyTypeValue = '';
+          if (normalizedValue === 'static') bodyTypeValue = 'Static';
+          else if (normalizedValue === 'dynamic') bodyTypeValue = 'Dynamic';
+          else if (normalizedValue === 'kinematic') bodyTypeValue = 'Kinematic';
+          else return false;
+
+          behaviorContent.getChild('bodyType').setStringValue(bodyTypeValue);
           if (
-            newValue !== 'Static' &&
-            behaviorContent.getChild('shape').getStringValue() === 'Mesh'
+            bodyTypeValue !== 'Static' &&
+            behaviorContent.getChild('shape').getStringValue().toLowerCase() ===
+              'mesh'
           ) {
             behaviorContent.getChild('shape').setStringValue('Box');
           }
@@ -71,8 +79,17 @@ module.exports = {
         }
 
         if (propertyName === 'shape') {
-          behaviorContent.getChild('shape').setStringValue(newValue);
-          if (newValue === 'Mesh') {
+          const normalizedValue = newValue.toLowerCase();
+          let shapeValue = '';
+          if (normalizedValue === 'box') shapeValue = 'Box';
+          else if (normalizedValue === 'capsule') shapeValue = 'Capsule';
+          else if (normalizedValue === 'sphere') shapeValue = 'Sphere';
+          else if (normalizedValue === 'cylinder') shapeValue = 'Cylinder';
+          else if (normalizedValue === 'mesh') shapeValue = 'Mesh';
+          else return false;
+
+          behaviorContent.getChild('shape').setStringValue(shapeValue);
+          if (shapeValue === 'Mesh') {
             behaviorContent.getChild('bodyType').setStringValue('Static');
           }
           return true;
@@ -86,7 +103,16 @@ module.exports = {
         }
 
         if (propertyName === 'shapeOrientation') {
-          behaviorContent.getChild('shapeOrientation').setStringValue(newValue);
+          const normalizedValue = newValue.toLowerCase();
+          let orientationValue = '';
+          if (normalizedValue === 'x') orientationValue = 'X';
+          else if (normalizedValue === 'y') orientationValue = 'Y';
+          else if (normalizedValue === 'z') orientationValue = 'Z';
+          else return false;
+
+          behaviorContent
+            .getChild('shapeOrientation')
+            .setStringValue(orientationValue);
           return true;
         }
 

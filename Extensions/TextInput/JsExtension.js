@@ -46,8 +46,21 @@ module.exports = {
         objectContent.fontSize = Math.max(1, parseFloat(newValue));
         return true;
       } else if (propertyName === 'inputType') {
-        objectContent.inputType = newValue;
-        return true;
+        const normalizedValue = newValue.toLowerCase();
+        if (
+          normalizedValue === 'text' ||
+          normalizedValue === 'text area' ||
+          normalizedValue === 'email' ||
+          normalizedValue === 'password' ||
+          normalizedValue === 'number' ||
+          normalizedValue === 'telephone number' ||
+          normalizedValue === 'url' ||
+          normalizedValue === 'search'
+        ) {
+          objectContent.inputType = normalizedValue;
+          return true;
+        }
+        return false;
       } else if (propertyName === 'textColor') {
         objectContent.textColor = newValue;
         return true;
@@ -91,8 +104,16 @@ module.exports = {
         objectContent.paddingY = Math.max(0, parseFloat(newValue));
         return true;
       } else if (propertyName === 'textAlign') {
-        objectContent.textAlign = newValue;
-        return true;
+        const normalizedValue = newValue.toLowerCase();
+        if (
+          normalizedValue === 'left' ||
+          normalizedValue === 'center' ||
+          normalizedValue === 'right'
+        ) {
+          objectContent.textAlign = normalizedValue;
+          return true;
+        }
+        return false;
       }
 
       return false;

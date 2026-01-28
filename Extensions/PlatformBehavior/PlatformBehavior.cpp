@@ -69,8 +69,10 @@ bool PlatformBehavior::UpdateProperty(gd::SerializerElement& behaviorContent,
       behaviorContent.SetAttribute("platformType", "Jumpthru");
     else if (value == _("Ladder"))
       behaviorContent.SetAttribute("platformType", "Ladder");
-    else
+    else if (value == _("Platform"))
       behaviorContent.SetAttribute("platformType", "NormalPlatform");
+    else
+      return false;
   } else if (name == "YGrabOffset")
     behaviorContent.SetAttribute("yGrabOffset", value.To<double>());
   else

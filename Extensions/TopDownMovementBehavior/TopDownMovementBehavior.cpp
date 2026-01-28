@@ -192,8 +192,10 @@ bool TopDownMovementBehavior::UpdateProperty(
       behaviorContent.SetAttribute("viewpoint", "TrueIsometry");
     else if (value == _("Custom Isometry"))
       behaviorContent.SetAttribute("viewpoint", "CustomIsometry");
-    else
+    else if (value == _("Top-Down"))
       behaviorContent.SetAttribute("viewpoint", "TopDown");
+    else
+      return false;
     return true;
   }
   if (name == "MovementAngleOffset") {

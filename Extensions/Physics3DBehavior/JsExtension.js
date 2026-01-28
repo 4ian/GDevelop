@@ -48,9 +48,20 @@ module.exports = {
         }
 
         if (propertyName === 'bodyType') {
-          behaviorContent.getChild('bodyType').setStringValue(newValue);
+          const lowerValue = newValue.toLowerCase();
+          let normalizedValue;
+          if (lowerValue === 'static') {
+            normalizedValue = 'Static';
+          } else if (lowerValue === 'dynamic') {
+            normalizedValue = 'Dynamic';
+          } else if (lowerValue === 'kinematic') {
+            normalizedValue = 'Kinematic';
+          } else {
+            return false;
+          }
+          behaviorContent.getChild('bodyType').setStringValue(normalizedValue);
           if (
-            newValue !== 'Static' &&
+            normalizedValue !== 'Static' &&
             behaviorContent.getChild('shape').getStringValue() === 'Mesh'
           ) {
             behaviorContent.getChild('shape').setStringValue('Box');
@@ -71,8 +82,23 @@ module.exports = {
         }
 
         if (propertyName === 'shape') {
-          behaviorContent.getChild('shape').setStringValue(newValue);
-          if (newValue === 'Mesh') {
+          const lowerValue = newValue.toLowerCase();
+          let normalizedValue;
+          if (lowerValue === 'box') {
+            normalizedValue = 'Box';
+          } else if (lowerValue === 'capsule') {
+            normalizedValue = 'Capsule';
+          } else if (lowerValue === 'sphere') {
+            normalizedValue = 'Sphere';
+          } else if (lowerValue === 'cylinder') {
+            normalizedValue = 'Cylinder';
+          } else if (lowerValue === 'mesh') {
+            normalizedValue = 'Mesh';
+          } else {
+            return false;
+          }
+          behaviorContent.getChild('shape').setStringValue(normalizedValue);
+          if (normalizedValue === 'Mesh') {
             behaviorContent.getChild('bodyType').setStringValue('Static');
           }
           return true;
@@ -86,7 +112,18 @@ module.exports = {
         }
 
         if (propertyName === 'shapeOrientation') {
-          behaviorContent.getChild('shapeOrientation').setStringValue(newValue);
+          const lowerValue = newValue.toLowerCase();
+          let normalizedValue;
+          if (lowerValue === 'z') {
+            normalizedValue = 'Z';
+          } else if (lowerValue === 'y') {
+            normalizedValue = 'Y';
+          } else if (lowerValue === 'x') {
+            normalizedValue = 'X';
+          } else {
+            return false;
+          }
+          behaviorContent.getChild('shapeOrientation').setStringValue(normalizedValue);
           return true;
         }
 

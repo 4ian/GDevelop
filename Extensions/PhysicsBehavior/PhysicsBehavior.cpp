@@ -95,35 +95,46 @@ bool PhysicsBehavior::UpdateProperty(gd::SerializerElement &behaviorContent,
       behaviorContent.SetAttribute("shapeType", "Circle");
     else if (value == _("Custom polygon"))
       behaviorContent.SetAttribute("shapeType", "CustomPolygon");
+    else
+      return false;
+    return true;
   }
   if (name == _("Dynamic object")) {
     behaviorContent.SetAttribute("dynamic", (value != "0"));
+    return true;
   }
   if (name == _("Fixed rotation")) {
     behaviorContent.SetAttribute("fixedRotation", (value != "0"));
+    return true;
   }
   if (name == _("Consider as bullet (better collision handling)")) {
     behaviorContent.SetAttribute("isBullet", (value != "0"));
+    return true;
   }
   if (name == _("Mass density")) {
     behaviorContent.SetAttribute("massDensity", value.To<float>());
+    return true;
   }
   if (name == _("Friction")) {
     behaviorContent.SetAttribute("averageFriction", value.To<float>());
+    return true;
   }
   if (name == _("Restitution (elasticity)")) {
     behaviorContent.SetAttribute("averageRestitution", value.To<float>());
+    return true;
   }
   if (name == _("Linear Damping")) {
     if (value.To<float>() < 0) return false;
     behaviorContent.SetAttribute("linearDamping", value.To<float>());
+    return true;
   }
   if (name == _("Angular Damping")) {
     if (value.To<float>() < 0) return false;
     behaviorContent.SetAttribute("angularDamping", value.To<float>());
+    return true;
   }
 
-  return true;
+  return false;
 }
 #endif
 

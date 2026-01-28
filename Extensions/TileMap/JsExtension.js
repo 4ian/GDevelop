@@ -37,8 +37,16 @@ const defineTileMap = function (extension, _, gd) {
       return true;
     }
     if (propertyName === 'displayMode') {
-      objectContent.displayMode = newValue;
-      return true;
+      const lowerValue = newValue.toLowerCase();
+      if (
+        lowerValue === 'visible' ||
+        lowerValue === 'all' ||
+        lowerValue === 'index'
+      ) {
+        objectContent.displayMode = lowerValue;
+        return true;
+      }
+      return false;
     }
     if (propertyName === 'layerIndex') {
       objectContent.layerIndex = parseFloat(newValue);

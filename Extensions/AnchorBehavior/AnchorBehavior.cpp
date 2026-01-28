@@ -130,32 +130,46 @@ std::map<gd::String, gd::PropertyDescriptor> AnchorBehavior::GetProperties(
 }
 
 namespace {
-AnchorBehavior::HorizontalAnchor GetHorizontalAnchorFromString(
-    const gd::String& value) {
-  if (value == _("Window left"))
-    return AnchorBehavior::ANCHOR_HORIZONTAL_WINDOW_LEFT;
-  else if (value == _("Window right"))
-    return AnchorBehavior::ANCHOR_HORIZONTAL_WINDOW_RIGHT;
-  else if (value == _("Proportional"))
-    return AnchorBehavior::ANCHOR_HORIZONTAL_PROPORTIONAL;
-  else if (value == _("Window center"))
-    return AnchorBehavior::ANCHOR_HORIZONTAL_WINDOW_CENTER;
-  else
-    return AnchorBehavior::ANCHOR_HORIZONTAL_NONE;
+bool GetHorizontalAnchorFromString(
+    const gd::String& value, AnchorBehavior::HorizontalAnchor& anchor) {
+  if (value == _("Window left")) {
+    anchor = AnchorBehavior::ANCHOR_HORIZONTAL_WINDOW_LEFT;
+    return true;
+  } else if (value == _("Window right")) {
+    anchor = AnchorBehavior::ANCHOR_HORIZONTAL_WINDOW_RIGHT;
+    return true;
+  } else if (value == _("Proportional")) {
+    anchor = AnchorBehavior::ANCHOR_HORIZONTAL_PROPORTIONAL;
+    return true;
+  } else if (value == _("Window center")) {
+    anchor = AnchorBehavior::ANCHOR_HORIZONTAL_WINDOW_CENTER;
+    return true;
+  } else if (value == _("No anchor")) {
+    anchor = AnchorBehavior::ANCHOR_HORIZONTAL_NONE;
+    return true;
+  }
+  return false;
 }
 
-AnchorBehavior::VerticalAnchor GetVerticalAnchorFromString(
-    const gd::String& value) {
-  if (value == _("Window top"))
-    return AnchorBehavior::ANCHOR_VERTICAL_WINDOW_TOP;
-  else if (value == _("Window bottom"))
-    return AnchorBehavior::ANCHOR_VERTICAL_WINDOW_BOTTOM;
-  else if (value == _("Proportional"))
-    return AnchorBehavior::ANCHOR_VERTICAL_PROPORTIONAL;
-  else if (value == _("Window center"))
-    return AnchorBehavior::ANCHOR_VERTICAL_WINDOW_CENTER;
-  else
-    return AnchorBehavior::ANCHOR_VERTICAL_NONE;
+bool GetVerticalAnchorFromString(
+    const gd::String& value, AnchorBehavior::VerticalAnchor& anchor) {
+  if (value == _("Window top")) {
+    anchor = AnchorBehavior::ANCHOR_VERTICAL_WINDOW_TOP;
+    return true;
+  } else if (value == _("Window bottom")) {
+    anchor = AnchorBehavior::ANCHOR_VERTICAL_WINDOW_BOTTOM;
+    return true;
+  } else if (value == _("Proportional")) {
+    anchor = AnchorBehavior::ANCHOR_VERTICAL_PROPORTIONAL;
+    return true;
+  } else if (value == _("Window center")) {
+    anchor = AnchorBehavior::ANCHOR_VERTICAL_WINDOW_CENTER;
+    return true;
+  } else if (value == _("No anchor")) {
+    anchor = AnchorBehavior::ANCHOR_VERTICAL_NONE;
+    return true;
+  }
+  return false;
 }
 }  // namespace
 
@@ -164,22 +178,23 @@ bool AnchorBehavior::UpdateProperty(gd::SerializerElement& behaviorContent,
                                     const gd::String& value) {
   if (name == "relativeToOriginalWindowSize")
     behaviorContent.SetAttribute("relativeToOriginalWindowSize", value == "1");
-  else if (name == "leftEdgeAnchor")
-    behaviorContent.SetAttribute(
-        "leftEdgeAnchor",
-        static_cast<int>(GetHorizontalAnchorFromString(value)));
-  else if (name == "rightEdgeAnchor")
-    behaviorContent.SetAttribute(
-        "rightEdgeAnchor",
-        static_cast<int>(GetHorizontalAnchorFromString(value)));
-  else if (name == "topEdgeAnchor")
-    behaviorContent.SetAttribute(
-        "topEdgeAnchor", static_cast<int>(GetVerticalAnchorFromString(value)));
-  else if (name == "bottomEdgeAnchor")
-    behaviorContent.SetAttribute(
-        "bottomEdgeAnchor",
-        static_cast<int>(GetVerticalAnchorFromString(value)));
-  else if (name == "useLegacyBottomAndRightAnchors")
+  else if (name == "leftEdgeAnchor") {
+    HorizontalAnchor anchor;
+    if (!GetHorizontalAnchorFromString(value, anchor)) return false;
+    behaviorContent.SetAttribute("leftEdgeAnchor", static_cast<int>(anchor));
+  } else if (name == "rightEdgeAnchor") {
+    HorizontalAnchor anchor;
+    if (!GetHorizontalAnchorFromString(value, anchor)) return false;
+    behaviorContent.SetAttribute("rightEdgeAnchor", static_cast<int>(anchor));
+  } else if (name == "topEdgeAnchor") {
+    VerticalAnchor anchor;
+    if (!GetVerticalAnchorFromString(value, anchor)) return false;
+    behaviorContent.SetAttribute("topEdgeAnchor", static_cast<int>(anchor));
+  } else if (name == "bottomEdgeAnchor") {
+    VerticalAnchor anchor;
+    if (!GetVerticalAnchorFromString(value, anchor)) return false;
+    behaviorContent.SetAttribute("bottomEdgeAnchor", static_cast<int>(anchor));
+  } else if (name == "useLegacyBottomAndRightAnchors")
     behaviorContent.SetAttribute("useLegacyBottomAndRightAnchors",
                                  (value == "1"));
   else

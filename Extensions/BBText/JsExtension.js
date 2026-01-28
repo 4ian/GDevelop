@@ -36,6 +36,26 @@ module.exports = {
     var objectBBText = new gd.ObjectJsImplementation();
     objectBBText.updateProperty = function (propertyName, newValue) {
       const objectContent = this.content;
+
+      // Validate choice properties
+      if (propertyName === 'align') {
+        const lowerValue = newValue.toLowerCase();
+        if (lowerValue === 'left' || lowerValue === 'center' || lowerValue === 'right') {
+          objectContent.align = lowerValue;
+          return true;
+        }
+        return false;
+      }
+
+      if (propertyName === 'verticalTextAlignment') {
+        const lowerValue = newValue.toLowerCase();
+        if (lowerValue === 'top' || lowerValue === 'center' || lowerValue === 'bottom') {
+          objectContent.verticalTextAlignment = lowerValue;
+          return true;
+        }
+        return false;
+      }
+
       if (propertyName in objectContent) {
         if (typeof objectContent[propertyName] === 'boolean')
           objectContent[propertyName] = newValue === '1';

@@ -43,7 +43,16 @@ module.exports = {
       newValue
     ) {
       if (propertyName === 'bodyType') {
-        behaviorContent.getChild('bodyType').setStringValue(newValue);
+        const lowerValue = newValue.toLowerCase();
+        if (lowerValue === 'static') {
+          behaviorContent.getChild('bodyType').setStringValue('Static');
+        } else if (lowerValue === 'dynamic') {
+          behaviorContent.getChild('bodyType').setStringValue('Dynamic');
+        } else if (lowerValue === 'kinematic') {
+          behaviorContent.getChild('bodyType').setStringValue('Kinematic');
+        } else {
+          return false;
+        }
         return true;
       }
 
@@ -65,7 +74,18 @@ module.exports = {
       }
 
       if (propertyName === 'shape') {
-        behaviorContent.getChild('shape').setStringValue(newValue);
+        const lowerValue = newValue.toLowerCase();
+        if (lowerValue === 'box') {
+          behaviorContent.getChild('shape').setStringValue('Box');
+        } else if (lowerValue === 'circle') {
+          behaviorContent.getChild('shape').setStringValue('Circle');
+        } else if (lowerValue === 'edge') {
+          behaviorContent.getChild('shape').setStringValue('Edge');
+        } else if (lowerValue === 'polygon') {
+          behaviorContent.getChild('shape').setStringValue('Polygon');
+        } else {
+          return false;
+        }
         return true;
       }
 
@@ -106,7 +126,16 @@ module.exports = {
       }
 
       if (propertyName === 'polygonOrigin') {
-        behaviorContent.addChild('polygonOrigin').setStringValue(newValue);
+        const lowerValue = newValue.toLowerCase();
+        if (lowerValue === 'center') {
+          behaviorContent.addChild('polygonOrigin').setStringValue('Center');
+        } else if (lowerValue === 'origin') {
+          behaviorContent.addChild('polygonOrigin').setStringValue('Origin');
+        } else if (lowerValue === 'topleft') {
+          behaviorContent.addChild('polygonOrigin').setStringValue('TopLeft');
+        } else {
+          return false;
+        }
         return true;
       }
 

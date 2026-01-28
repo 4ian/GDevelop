@@ -187,7 +187,17 @@ bool ShapePainterObject::UpdateProperty(const gd::String& propertyName,
   }
 
   if (propertyName == "antialiasing") {
-    SetAntialiasing(newValue);
+    if (newValue.LowerCase() == "none") {
+      SetAntialiasing("none");
+    } else if (newValue.LowerCase() == "low") {
+      SetAntialiasing("low");
+    } else if (newValue.LowerCase() == "medium") {
+      SetAntialiasing("medium");
+    } else if (newValue.LowerCase() == "high") {
+      SetAntialiasing("high");
+    } else {
+      return false;
+    }
     return true;
   }
 

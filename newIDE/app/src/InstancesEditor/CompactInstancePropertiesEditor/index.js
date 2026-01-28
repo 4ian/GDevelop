@@ -43,7 +43,6 @@ import { IconContainer } from '../../UI/IconContainer';
 import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
-import { type ObjectEditorTab } from '../../ObjectEditor/ObjectEditorDialog';
 import EmptyMessage from '../../UI/EmptyMessage';
 
 const gd: libGDevelop = global.gd;
@@ -116,7 +115,6 @@ type Props = {|
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   instances: Array<gdInitialInstance>,
   editObjectInPropertiesPanel: string => void,
-  onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onInstancesModified?: (Array<gdInitialInstance>) => void,
   onGetInstanceSize: gdInitialInstance => [number, number, number],
   editInstanceVariables: gdInitialInstance => void,
@@ -141,7 +139,6 @@ export const CompactInstancePropertiesEditor = ({
   unsavedChanges,
   historyHandler,
   editObjectInPropertiesPanel,
-  onEditObject,
   onGetInstanceSize,
   editInstanceVariables,
   onInstancesModified,
@@ -358,7 +355,6 @@ export const CompactInstancePropertiesEditor = ({
               title={<Trans>Behaviors</Trans>}
               isFolded={isBehaviorsFolded}
               toggleFolded={() => setIsBehaviorsFolded(!isBehaviorsFolded)}
-              onOpenFullEditor={() => onEditObject(object, 'behaviors')}
               renderContent={() => (
                 <ColumnStackLayout noMargin>
                   {!allVisibleBehaviors.length && (
@@ -419,9 +415,6 @@ export const CompactInstancePropertiesEditor = ({
                                   onBehaviorUpdated={() => {}}
                                   resourceManagementProps={
                                     resourceManagementProps
-                                  }
-                                  onOpenFullEditor={() =>
-                                    onEditObject(object, 'behaviors')
                                   }
                                 />
                               )

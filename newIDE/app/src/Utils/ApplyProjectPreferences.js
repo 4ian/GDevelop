@@ -1,5 +1,4 @@
 // @flow
-import { type ParsedProjectSettings } from './ProjectSettingsReader';
 import {
   type Preferences,
   type ProjectSpecificPreferencesValues,
@@ -69,17 +68,14 @@ export const filterAllowedPreferences = (parsedPreferences: {
 };
 
 /**
- * Applies project-specific settings from a gdevelop-settings.yaml file to the editor.
- *
- * @param parsedSettings - The parsed settings read from settings.yaml
- * @param preferences - The preferences context
+ * Applies project-specific preferences from a gdevelop-settings.yaml file to the editor.
  */
-export const applyProjectSettings = (
-  parsedSettings: ParsedProjectSettings,
+export const applyProjectPreferences = (
+  rawPreferences: ?{ [string]: boolean | string | number },
   preferences: Preferences
 ): void => {
-  const filteredPreferences = filterAllowedPreferences(
-    parsedSettings.preferences
-  );
-  preferences.setMultipleValues(filteredPreferences);
+  if (rawPreferences) {
+    const filtered = filterAllowedPreferences(rawPreferences);
+    preferences.setMultipleValues(filtered);
+  }
 };

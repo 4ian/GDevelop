@@ -85,9 +85,10 @@ export const CompactBehaviorPropertiesEditor = ({
         // schemaRecomputeTrigger allows to invalidate the schema when required.
       }
       if (initialInstance) {
+        const behaviorProperties = behavior.getProperties();
         return propertiesMapToSchema({
-          properties: behavior.getProperties(),
-          defaultValueProperties: behavior.getProperties(),
+          properties: behaviorProperties,
+          defaultValueProperties: behaviorProperties,
           getPropertyValue: (instance, propertyName) => {
             const behaviorName = behavior.getName();
             if (
@@ -135,9 +136,10 @@ export const CompactBehaviorPropertiesEditor = ({
           showcaseNonDefaultValues: true,
         });
       }
+      const behaviorMetadataProperties = behaviorMetadata.getProperties();
       return propertiesMapToSchema({
-        properties: behavior.getProperties(),
-        defaultValueProperties: behaviorMetadata.getProperties(),
+        properties: behaviorMetadataProperties,
+        defaultValueProperties: behaviorMetadataProperties,
         getPropertyValue: (instance, name) =>
           instance
             .getProperties()

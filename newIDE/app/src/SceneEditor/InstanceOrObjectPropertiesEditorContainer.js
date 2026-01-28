@@ -162,7 +162,6 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
         <CompactInstancePropertiesEditor
           instances={instances}
           editObjectInPropertiesPanel={editObjectInPropertiesPanel}
-          onEditObject={onEditObject}
           onInstancesModified={onInstancesModified}
           onGetInstanceSize={onGetInstanceSize}
           editInstanceVariables={editInstanceVariables}

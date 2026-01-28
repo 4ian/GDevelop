@@ -71,7 +71,7 @@ export const CompactBehaviorPropertiesEditor = ({
   object: gdObject,
   behaviorOverriding: gdBehavior | null,
   initialInstance: gdInitialInstance | null,
-  onOpenFullEditor: () => void,
+  onOpenFullEditor?: () => void,
   onBehaviorUpdated: () => void,
   resourceManagementProps: ResourceManagementProps,
 |}) => {
@@ -172,13 +172,16 @@ export const CompactBehaviorPropertiesEditor = ({
         onInstancesModified={onBehaviorUpdated}
         resourceManagementProps={resourceManagementProps}
         placeholder={<Trans>Nothing to configure for this behavior.</Trans>}
-        customizeBasicSchema={schema =>
-          getSchemaWithOpenFullEditorButton({
-            schema,
-            fullEditorLabel,
-            behavior,
-            onOpenFullEditor,
-          })
+        customizeBasicSchema={
+          onOpenFullEditor
+            ? schema =>
+                getSchemaWithOpenFullEditorButton({
+                  schema,
+                  fullEditorLabel,
+                  behavior,
+                  onOpenFullEditor,
+                })
+            : null
         }
         onRefreshAllFields={forceRecomputeSchema}
       />

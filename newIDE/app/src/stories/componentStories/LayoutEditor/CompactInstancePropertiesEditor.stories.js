@@ -40,10 +40,10 @@ export const InstanceSprite2d = () => (
             editObjectInPropertiesPanel={action(
               'edit object in property panel'
             )}
-            onEditObject={action('onEditObject')}
             tileMapTileSelection={null}
             onSelectTileMapTile={() => {}}
             isVariableListLocked={false}
+            canOverrideBehaviors={true}
             resourceManagementProps={fakeResourceManagementProps}
           />
         </SerializedObjectDisplay>
@@ -73,10 +73,10 @@ export const InstanceCube3d = () => (
             editObjectInPropertiesPanel={action(
               'edit object in property panel'
             )}
-            onEditObject={action('onEditObject')}
             tileMapTileSelection={null}
             onSelectTileMapTile={() => {}}
             isVariableListLocked={false}
+            canOverrideBehaviors={true}
             resourceManagementProps={fakeResourceManagementProps}
           />
         </SerializedObjectDisplay>
@@ -106,10 +106,10 @@ export const InstanceTextInput = () => (
             editObjectInPropertiesPanel={action(
               'edit object in property panel'
             )}
-            onEditObject={action('onEditObject')}
             tileMapTileSelection={null}
             onSelectTileMapTile={() => {}}
             isVariableListLocked={false}
+            canOverrideBehaviors={true}
             resourceManagementProps={fakeResourceManagementProps}
           />
         </SerializedObjectDisplay>

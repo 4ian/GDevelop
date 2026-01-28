@@ -11,10 +11,6 @@ const config = {
   },
   extraResources: [
     {
-      from: '../app/resources/in-app-tutorials',
-      to: 'in-app-tutorials',
-    },
-    {
       from: '../app/resources/GDJS',
       to: 'GDJS',
     },
@@ -47,6 +43,7 @@ const config = {
       target: 'default',
       arch: ['universal'],
     },
+    mergeASARs: false,
   },
   win: {
     executableName: 'GDevelop',

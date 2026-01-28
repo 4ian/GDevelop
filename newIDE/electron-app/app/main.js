@@ -11,11 +11,13 @@ const ipcMain = electron.ipcMain;
 const autoUpdater = require('electron-updater').autoUpdater;
 const log = require('electron-log');
 const { uploadLocalFile } = require('./LocalFileUploader');
-const { serveFolder, stopServer } = require('./ServeFolder');
+const { serveFolder, stopServer, stopAllServers } = require('./ServeFolder');
 const {
   startDebuggerServer,
   sendMessage,
   closeAllConnections,
+  closeServer: closeDebuggerServer,
+  stopAllServers: stopAllDebuggerServers,
 } = require('./DebuggerServer');
 const {
   buildElectronMenuFromDeclarativeTemplate,
@@ -33,6 +35,7 @@ const {
 const {
   openPreviewWindow,
   closePreviewWindow,
+  closePreviewWindowsForParent,
   closeAllPreviewWindows,
 } = require('./PreviewWindow');
 const {
@@ -55,9 +58,11 @@ autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
 autoUpdater.autoDownload = false;
 
-// Keep a global reference of the window object, if you don't, the window will
+// Keep a global reference of the window objects, if you don't, the windows will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow = null;
+let mainWindows = new Set();
+let mainWindow = null; // Primary window reference for backwards compatibility
+let windowCounter = 0; // Counter for creating unique session partitions
 
 // Parse arguments (knowing that in dev, we run electron with an argument,
 // so have to ignore one more).
@@ -76,29 +81,64 @@ if (process.platform === 'win32') {
   app.setAppUserModelId('gdevelop.ide');
 }
 
+// Single instance lock - prevents multiple Electron processes
+// This solves Firebase IndexedDB locking issues while still allowing multiple windows
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+  // Second instance attempted - quit immediately
+  app.quit();
+} else {
+  // First instance - handle second-instance events by creating new windows
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    // User tried to launch app again - create a new window instead
+    const secondInstanceArgs = parseArgs(commandLine.slice(isDev ? 2 : 1), {
+      boolean: ['dev-tools', 'disable-update-check'],
+      string: '_',
+    });
+
+    // Create a new window in the existing process
+    createNewWindow(secondInstanceArgs);
+  });
+}
+
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
+  // Best-effort cleanup - ignore any errors to prevent crashes during shutdown
+  try {
+    stopAllServers();
+  } catch (e) {
+    // Ignore errors during shutdown
+  }
+  try {
+    stopAllDebuggerServers();
+  } catch (e) {
+    // Ignore errors during shutdown
+  }
+  // Close all remaining preview windows
+  try {
+    closeAllPreviewWindows();
+  } catch (e) {
+    // Ignore errors during shutdown
+  }
   app.quit();
 });
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-app.on('ready', function() {
-  const isIntegrated = args.mode === 'integrated';
-  const devTools = !!args['dev-tools'];
+// Function to create a new GDevelop window
+function createNewWindow(windowArgs = args) {
+  const isIntegrated = windowArgs.mode === 'integrated';
+  const devTools = !!windowArgs['dev-tools'];
 
   if (isIntegrated && app.dock) {
     app.dock.hide();
   }
 
-  registerGdideProtocol({ isDev });
-
   // Create the browser window.
   const options = {
-    width: args.width || 800,
-    height: args.height || 600,
-    x: args.x,
-    y: args.y,
+    width: windowArgs.width || 800,
+    height: windowArgs.height || 600,
+    x: windowArgs.x,
+    y: windowArgs.y,
     titleBarStyle: 'hidden',
     titleBarOverlay: {
       color: '#000000',
@@ -116,6 +156,25 @@ app.on('ready', function() {
     backgroundColor: '#000',
   };
 
+  // First window (windowCounter === 0) uses default storage for backwards compatibility
+  // Additional windows get unique partitions for independent auth AND separate renderer processes
+  const windowNumber = windowCounter;
+  if (windowCounter > 0) {
+    // Create a unique partition for this window so it has independent auth state
+    // Each partition gets its own storage (IndexedDB, localStorage, cookies, etc.)
+    options.webPreferences.partition = `persist:gdevelop-window-${windowCounter}`;
+    // Force separate renderer process to prevent shared module state (e.g., LocalPreviewDebuggerServer)
+    options.webPreferences.affinity = `gdevelop-window-${windowCounter}`;
+    log.info(
+      `Creating window #${windowCounter} with partition: persist:gdevelop-window-${windowCounter}, affinity: gdevelop-window-${windowCounter}`
+    );
+  } else {
+    log.info(
+      `Creating window #${windowCounter} with default partition (backwards compatibility)`
+    );
+  }
+  windowCounter++;
+
   if (isIntegrated) {
     options.acceptFirstMouse = true;
     options.skipTaskbar = true;
@@ -128,47 +187,74 @@ app.on('ready', function() {
     options.show = false;
   }
 
-  mainWindow = new BrowserWindow(options);
-  if (!isIntegrated) mainWindow.maximize();
+  const newWindow = new BrowserWindow(options);
+  if (!isIntegrated) newWindow.maximize();
+
+  // Capture window ID and whether this is the primary window before it can be destroyed
+  const windowId = newWindow.id;
+  const isPrimaryWindow = windowNumber === 0;
+  log.info(
+    `Created window with Electron ID: ${windowId}, window number: ${windowNumber}, isPrimary: ${isPrimaryWindow}`
+  );
+
+  // Track this window
+  mainWindows.add(newWindow);
+
+  // Set as primary window if this is the first one
+  if (isPrimaryWindow) {
+    mainWindow = newWindow;
+  }
 
   // Enable `@electron/remote` module for renderer process
-  require('@electron/remote/main').enable(mainWindow.webContents);
+  require('@electron/remote/main').enable(newWindow.webContents);
+
+  // Log process ID to verify separate renderer processes
+  newWindow.webContents.once('did-finish-load', () => {
+    newWindow.webContents
+      .executeJavaScript('process.pid')
+      .then(pid => {
+        log.info(
+          `Window ${windowId} (window number ${windowNumber}) is running in renderer process PID: ${pid}`
+        );
+      })
+      .catch(err => {
+        log.warn('Could not get renderer process PID:', err);
+      });
+  });
 
   if (isDev)
-    mainWindow.webContents.session.loadExtension(
+    newWindow.webContents.session.loadExtension(
       path.join(__dirname, 'extensions/ReactDeveloperTools/4.24.3_0/')
     );
 
-  // Expose program arguments (to be accessed by mainWindow)
-  global['args'] = args;
-
   // Load the index.html of the app.
   load({
-    window: mainWindow,
+    window: newWindow,
     isDev,
     path: '/index.html',
     devTools,
   });
 
-  Menu.setApplicationMenu(buildPlaceholderMainMenu());
+  newWindow.on('closed', function() {
+    // Remove from tracked windows
+    mainWindows.delete(newWindow);
 
-  mainWindow.on('closed', function() {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    mainWindow = null;
-    stopServer(() => {});
+    // If this was the primary window, set a new primary
+    if (isPrimaryWindow) {
+      mainWindow = mainWindows.values().next().value || null;
+    }
+
+    // Close preview windows belonging to this window
+    closePreviewWindowsForParent(windowId);
+
+    // Stop the server and debugger for this window
+    stopServer(windowId, () => {});
+    closeDebuggerServer(windowId);
   });
 
-  ipcMain.on('set-main-menu', (event, mainMenuTemplate) => {
-    Menu.setApplicationMenu(
-      buildElectronMenuFromDeclarativeTemplate(mainWindow, mainMenuTemplate)
-    );
-  });
-
-  //Prevent any navigation inside the main window.
-  mainWindow.webContents.on('will-navigate', (e, url) => {
-    if (url !== mainWindow.webContents.getURL()) {
+  // Prevent any navigation inside the window
+  newWindow.webContents.on('will-navigate', (e, url) => {
+    if (url !== newWindow.webContents.getURL()) {
       console.info('Opening in browser (because of will-navigate):', url);
       e.preventDefault();
       electron.shell.openExternal(url);
@@ -176,15 +262,42 @@ app.on('ready', function() {
   });
 
   // Prevent opening any website or url inside Electron
-  mainWindow.webContents.setWindowOpenHandler(details => {
+  newWindow.webContents.setWindowOpenHandler(details => {
     console.info('Opening in browser (because of new window): ', details.url);
     electron.shell.openExternal(details.url);
     return { action: 'deny' };
   });
 
+  return newWindow;
+}
+
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+app.on('ready', function() {
+  registerGdideProtocol({ isDev });
+
+  // Create the first window
+  createNewWindow(args);
+
+  // Expose program arguments (to be accessed by windows)
+  global['args'] = args;
+
+  Menu.setApplicationMenu(buildPlaceholderMainMenu());
+
+  ipcMain.on('set-main-menu', (event, mainMenuTemplate) => {
+    const window = BrowserWindow.fromWebContents(event.sender);
+    Menu.setApplicationMenu(
+      buildElectronMenuFromDeclarativeTemplate(
+        window || mainWindow,
+        mainMenuTemplate
+      )
+    );
+  });
+
   ipcMain.handle('preview-open', async (event, options) => {
+    const parentWindow = BrowserWindow.fromWebContents(event.sender);
     return openPreviewWindow({
-      parentWindow: mainWindow,
+      parentWindow: parentWindow,
       previewBrowserWindowOptions: options.previewBrowserWindowOptions,
       previewGameIndexHtmlPath: options.previewGameIndexHtmlPath,
       alwaysOnTop: options.alwaysOnTop,
@@ -204,8 +317,9 @@ app.on('ready', function() {
 
   // Piskel image editor
   ipcMain.handle('piskel-load', (event, externalEditorInput) => {
+    const parentWindow = BrowserWindow.fromWebContents(event.sender);
     return loadExternalEditorWindow({
-      parentWindow: mainWindow,
+      parentWindow: parentWindow,
       devTools,
       indexSubPath: 'piskel/piskel-electron-index.html',
       externalEditorInput,
@@ -214,8 +328,9 @@ app.on('ready', function() {
 
   // JFXR sound effect generator
   ipcMain.handle('jfxr-load', (event, externalEditorInput) => {
+    const parentWindow = BrowserWindow.fromWebContents(event.sender);
     return loadExternalEditorWindow({
-      parentWindow: mainWindow,
+      parentWindow: parentWindow,
       devTools,
       indexSubPath: 'jfxr/jfxr-electron-index.html',
       externalEditorInput,
@@ -224,8 +339,9 @@ app.on('ready', function() {
 
   // Yarn Dialogue Tree Editor
   ipcMain.handle('yarn-load', (event, externalEditorInput) => {
+    const parentWindow = BrowserWindow.fromWebContents(event.sender);
     return loadExternalEditorWindow({
-      parentWindow: mainWindow,
+      parentWindow: parentWindow,
       devTools,
       indexSubPath: 'yarn/yarn-electron-index.html',
       externalEditorInput,
@@ -261,24 +377,25 @@ app.on('ready', function() {
   ipcMain.handle(
     'titlebar-set-overlay-options',
     async (event, overlayOptions) => {
-      if (!mainWindow) return;
+      const window = BrowserWindow.fromWebContents(event.sender);
+      if (!window) return;
 
       // setTitleBarOverlay seems not defined on macOS.
-      if (mainWindow.setTitleBarOverlay)
-        mainWindow.setTitleBarOverlay(overlayOptions);
-      if (mainWindow.setBackgroundColor)
-        mainWindow.setBackgroundColor(overlayOptions.color);
+      if (window.setTitleBarOverlay) window.setTitleBarOverlay(overlayOptions);
+      if (window.setBackgroundColor)
+        window.setBackgroundColor(overlayOptions.color);
     }
   );
 
   // Window maximize toggle (for double-click on titlebar):
-  ipcMain.handle('window-maximize-toggle', async () => {
-    if (!mainWindow) return;
+  ipcMain.handle('window-maximize-toggle', async event => {
+    const window = BrowserWindow.fromWebContents(event.sender);
+    if (!window) return;
 
-    if (mainWindow.isMaximized()) {
-      mainWindow.unmaximize();
+    if (window.isMaximized()) {
+      window.unmaximize();
     } else {
-      mainWindow.maximize();
+      window.maximize();
     }
   });
 
@@ -321,9 +438,16 @@ app.on('ready', function() {
 
   // ServeFolder events:
   ipcMain.on('serve-folder', (event, options) => {
-    log.info('Received event to server folder with options=', options);
+    const window = BrowserWindow.fromWebContents(event.sender);
+    const windowId = window ? window.id : 'unknown';
+    log.info(
+      'Received event to server folder with options=',
+      options,
+      'for window',
+      windowId
+    );
 
-    serveFolder(options, (err, serverParams) => {
+    serveFolder({ ...options, windowId }, (err, serverParams) => {
       // Using JSON to copy the config strips unserializable properties
       // (like middleware functions) automatically.
       const configCopy = JSON.parse(JSON.stringify(serverParams));
@@ -332,9 +456,11 @@ app.on('ready', function() {
   });
 
   ipcMain.on('stop-server', event => {
-    log.info('Received event to stop server');
+    const window = BrowserWindow.fromWebContents(event.sender);
+    const windowId = window ? window.id : 'unknown';
+    log.info('Received event to stop server for window', windowId);
 
-    stopServer(err => {
+    stopServer(windowId, err => {
       event.sender.send('stop-server-done', err);
     });
   });
@@ -353,40 +479,79 @@ app.on('ready', function() {
   });
 
   onLocalGDJSDevelopmentWatcherRuntimeUpdated(() => {
-    log.info('Notifying the editor that the GDJS runtime has been updated.');
-    mainWindow.webContents.send(
-      'local-gdjs-development-watcher-runtime-updated',
-      null
+    log.info(
+      'Notifying all editor windows that the GDJS runtime has been updated.'
     );
+    mainWindows.forEach(window => {
+      window.webContents.send(
+        'local-gdjs-development-watcher-runtime-updated',
+        null
+      );
+    });
   });
 
   // DebuggerServer events:
   ipcMain.on('debugger-start-server', (event, options) => {
-    log.info('Received event to start debugger server with options=', options);
+    const window = BrowserWindow.fromWebContents(event.sender);
+    const windowId = window ? window.id : 'unknown';
+    log.info(
+      'Received event to start debugger server with options=',
+      options,
+      'for window',
+      windowId
+    );
 
-    startDebuggerServer({
-      onMessage: ({ id, message }) =>
-        event.sender.send('debugger-message-received', { id, message }),
-      onError: error => event.sender.send('debugger-error-received', error),
-      onConnectionClose: ({ id }) =>
-        event.sender.send('debugger-connection-closed', { id }),
-      onConnectionOpen: ({ id }) =>
-        event.sender.send('debugger-connection-opened', { id }),
-      onConnectionError: ({ id, errorMessage }) =>
-        event.sender.send('debugger-connection-errored', { id, errorMessage }),
-      onListening: ({ address }) =>
-        event.sender.send('debugger-start-server-done', { address }),
+    startDebuggerServer(windowId, {
+      onMessage: ({ id, message }) => {
+        if (!event.sender.isDestroyed()) {
+          event.sender.send('debugger-message-received', { id, message });
+        }
+      },
+      onError: error => {
+        if (!event.sender.isDestroyed()) {
+          event.sender.send('debugger-error-received', error);
+        }
+      },
+      onConnectionClose: ({ id }) => {
+        if (!event.sender.isDestroyed()) {
+          event.sender.send('debugger-connection-closed', { id });
+        }
+      },
+      onConnectionOpen: ({ id }) => {
+        if (!event.sender.isDestroyed()) {
+          event.sender.send('debugger-connection-opened', { id });
+        }
+      },
+      onConnectionError: ({ id, errorMessage }) => {
+        if (!event.sender.isDestroyed()) {
+          event.sender.send('debugger-connection-errored', {
+            id,
+            errorMessage,
+          });
+        }
+      },
+      onListening: ({ address }) => {
+        if (!event.sender.isDestroyed()) {
+          event.sender.send('debugger-start-server-done', { address });
+        }
+      },
     });
   });
 
   ipcMain.on('debugger-send-message', (event, message) => {
-    sendMessage(message, err =>
-      event.sender.send('debugger-send-message-done', err)
-    );
+    const window = BrowserWindow.fromWebContents(event.sender);
+    const windowId = window ? window.id : 'unknown';
+    sendMessage(windowId, message, err => {
+      if (!event.sender.isDestroyed()) {
+        event.sender.send('debugger-send-message-done', err);
+      }
+    });
   });
 
-  ipcMain.on('debugger-close-all-connections', () => {
-    closeAllConnections();
+  ipcMain.on('debugger-close-all-connections', event => {
+    const window = BrowserWindow.fromWebContents(event.sender);
+    const windowId = window ? window.id : 'unknown';
+    closeAllConnections(windowId);
   });
 
   ipcMain.on('updates-check-and-download', event => {
@@ -405,7 +570,9 @@ app.on('ready', function() {
 
   function sendUpdateStatus(status) {
     log.info(status);
-    if (mainWindow) mainWindow.webContents.send('update-status', status);
+    mainWindows.forEach(window => {
+      window.webContents.send('update-status', status);
+    });
   }
   autoUpdater.on('checking-for-update', () => {
     sendUpdateStatus({

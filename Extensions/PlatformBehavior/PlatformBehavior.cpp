@@ -30,19 +30,14 @@ std::map<gd::String, gd::PropertyDescriptor> PlatformBehavior::GetProperties(
   std::map<gd::String, gd::PropertyDescriptor> properties;
 
   gd::String platformType = behaviorContent.GetStringAttribute("platformType");
-  gd::String platformTypeStr = _("Platform");
-  if (platformType == "Ladder")
-    platformTypeStr = _("Ladder");
-  else if (platformType == "Jumpthru")
-    platformTypeStr = _("Jumpthru platform");
 
   properties["PlatformType"]
       .SetLabel(_("Type"))
-      .SetValue(platformTypeStr)
+      .SetValue(platformType.empty() ? "NormalPlatform" : platformType)
       .SetType("Choice")
-      .AddExtraInfo(_("Platform"))
-      .AddExtraInfo(_("Jumpthru platform"))
-      .AddExtraInfo(_("Ladder"));
+      .AddChoice("NormalPlatform", _("Platform"))
+      .AddChoice("Jumpthru", _("Jumpthru platform"))
+      .AddChoice("Ladder", _("Ladder"));
   properties["CanBeGrabbed"]
       .SetLabel(_("Ledges can be grabbed"))
       .SetGroup(_("Ledge"))
@@ -65,9 +60,10 @@ bool PlatformBehavior::UpdateProperty(gd::SerializerElement& behaviorContent,
   if (name == "CanBeGrabbed")
     behaviorContent.SetAttribute("canBeGrabbed", (value == "1"));
   else if (name == "PlatformType") {
-    if (value == _("Jumpthru platform"))
+    auto normalizedValue = value.LowerCase();
+    if (normalizedValue == "jumpthru")
       behaviorContent.SetAttribute("platformType", "Jumpthru");
-    else if (value == _("Ladder"))
+    else if (normalizedValue == "ladder")
       behaviorContent.SetAttribute("platformType", "Ladder");
     else
       behaviorContent.SetAttribute("platformType", "NormalPlatform");

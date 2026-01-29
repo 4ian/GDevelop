@@ -135,11 +135,9 @@ export default function NewObjectFromScratch({
     setSelectedObjectShortHeader,
   ] = React.useState<?ObjectShortHeader>(null);
   const {
-    filters,
     searchResults,
     error,
     fetchObjects,
-    filtersState,
     searchText,
     setSearchText,
     allCategories,
@@ -218,15 +216,6 @@ export default function NewObjectFromScratch({
 
   const filteredSearchResults = searchResults ? searchResults : null;
 
-  const tagsHandler = React.useMemo(
-    () => ({
-      add: filtersState.addFilter,
-      remove: filtersState.removeFilter,
-      chosenTags: filtersState.chosenFilters,
-    }),
-    [filtersState]
-  );
-
   const getExtensionsMatches = React.useCallback(
     (extensionShortHeader: ObjectShortHeader): SearchMatch[] => {
       if (!searchResults) return [];
@@ -272,8 +261,6 @@ export default function NewObjectFromScratch({
                   value={searchText}
                   onChange={setSearchText}
                   onRequestSearch={() => {}}
-                  tagsHandler={tagsHandler}
-                  tags={filters && filters.allTags}
                   placeholder={t`Search objects`}
                   autoFocus="desktop"
                 />

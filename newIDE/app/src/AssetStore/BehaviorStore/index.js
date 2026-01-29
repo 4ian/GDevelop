@@ -89,11 +89,9 @@ export const BehaviorStore = ({
     setSelectedBehaviorShortHeader,
   ] = React.useState<?BehaviorShortHeader>(null);
   const {
-    filters,
     searchResults,
     error,
     fetchBehaviors,
-    filtersState,
     searchText,
     setSearchText,
     allCategories,
@@ -131,15 +129,6 @@ export const BehaviorStore = ({
   );
 
   const filteredSearchResults = searchResults ? searchResults : null;
-
-  const tagsHandler = React.useMemo(
-    () => ({
-      add: filtersState.addFilter,
-      remove: filtersState.removeFilter,
-      chosenTags: filtersState.chosenFilters,
-    }),
-    [filtersState]
-  );
 
   const getExtensionsMatches = React.useCallback(
     (extensionShortHeader: BehaviorShortHeader): SearchMatch[] => {
@@ -255,8 +244,6 @@ export const BehaviorStore = ({
                   value={searchText}
                   onChange={setSearchText}
                   onRequestSearch={() => {}}
-                  tagsHandler={tagsHandler}
-                  tags={filters && filters.allTags}
                   placeholder={t`Search behaviors`}
                   autoFocus="desktop"
                 />

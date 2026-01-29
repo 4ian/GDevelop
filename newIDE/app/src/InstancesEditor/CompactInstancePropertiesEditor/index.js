@@ -417,7 +417,23 @@ export const CompactInstancePropertiesEditor = ({
                                   behaviorOverriding={behaviorOverriding}
                                   object={object}
                                   initialInstance={instance}
-                                  onBehaviorUpdated={() => {}}
+                                  onBehaviorUpdated={() => {
+                                    if (
+                                      instance.hasBehaviorOverridingNamed(
+                                        behaviorName
+                                      ) &&
+                                      !instance.hasAnyOverriddenPropertyForBehavior(
+                                        behavior
+                                      )
+                                    ) {
+                                      instance.removeBehaviorOverriding(
+                                        behaviorName
+                                      );
+                                      // Update the view to stop using
+                                      // the removed behavior overriding.
+                                      forceUpdate();
+                                    }
+                                  }}
                                   resourceManagementProps={
                                     resourceManagementProps
                                   }

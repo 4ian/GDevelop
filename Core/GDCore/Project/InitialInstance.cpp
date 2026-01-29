@@ -272,12 +272,12 @@ bool InitialInstance::HasAnyOverriddenPropertyForBehavior(
     auto &overridingPropertyName = overridingPropertyPair.first;
     auto &overridingProperty = overridingPropertyPair.second;
 
-    if (behaviorProperties.find(overridingPropertyName) ==
-        behaviorProperties.end()) {
-      continue;
-    }
-    if (overridingProperty.GetValue() !=
-        behaviorProperties.at(overridingPropertyName).GetValue()) {
+    if (overridingProperty.GetType() != "Behavior" &&
+        behaviorOverriding.HasPropertyValue(overridingPropertyName) &&
+        behaviorProperties.find(overridingPropertyName) !=
+            behaviorProperties.end() &&
+        overridingProperty.GetValue() !=
+            behaviorProperties.at(overridingPropertyName).GetValue()) {
       return true;
     }
   }

@@ -18,29 +18,13 @@ import { getSceneFolderTreeViewItemId } from './SceneFolderTreeViewItemContent';
 import {
   buildMoveToFolderSubmenu,
   createNewFolderAndMoveItem,
+  collectFoldersAndPaths,
 } from './SceneTreeViewHelpers';
 
 const SCENE_CLIPBOARD_KIND = 'Layout';
 
 const styles = {
   tooltip: { marginRight: 5, verticalAlign: 'bottom' },
-};
-
-const collectFoldersAndPaths = (
-  folder: any,
-  parentPath: string = '',
-  result: Array<{ folder: any, path: string }> = []
-): Array<{ folder: any, path: string }> => {
-  for (let i = 0; i < folder.getChildrenCount(); i++) {
-    const child = folder.getChildAt(i);
-    if (child.isFolder()) {
-      const folderName = child.getFolderName();
-      const path = parentPath ? `${parentPath}/${folderName}` : folderName;
-      result.push({ folder: child, path });
-      collectFoldersAndPaths(child, path, result);
-    }
-  }
-  return result;
 };
 
 export type SceneTreeViewItemCallbacks = {|
@@ -214,7 +198,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
               this._onProjectItemModified();
             }
           },
-          () => this._createNewFolderAndMove(i18n)
+          () => this.createNewFolderAndMoveItem(i18n)
         ),
       },
       {
@@ -355,19 +339,6 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
       }
     }
     return null;
-  }
-
-  _createNewFolderAndMove(i18n: I18nType): void {
-    const layoutFolderOrLayout = this.getLayoutFolderOrLayout();
-    if (!layoutFolderOrLayout) return;
-
-    createNewFolderAndMoveItem(
-      this.props.project,
-      layoutFolderOrLayout,
-      () => this._onProjectItemModified(),
-      this.props.expandFolders,
-      this.props.editName
-    );
   }
 
   getLayoutFolderOrLayout(): gdLayoutFolderOrLayout | null {

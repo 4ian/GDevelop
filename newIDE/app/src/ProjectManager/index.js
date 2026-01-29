@@ -1312,11 +1312,14 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           if (treeViewRef.current) {
             treeViewRef.current.openItems([scenesRootFolderId]);
           }
-
+          // Scroll to the new behavior.
+          // Ideally, we'd wait for the list to be updated to scroll, but
+          // to simplify the code, we just wait a few ms for a new render
+          // to be done.
           setTimeout(() => {
             scrollToItem(sceneItemId);
             editName(sceneItemId);
-          }, 100);
+          }, 100); // A few ms is enough for a new render to be done.
         };
 
         const handleAddNewFolder = () => {
@@ -1868,7 +1871,19 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
   }
 );
 
-const MemoizedProjectManager = ProjectManager;
+const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
+  // The component is costly to render, so avoid any re-rendering as much
+  // as possible.
+  // We make the assumption that no changes to the tree is made outside
+  // from the component.
+  // If a change is made, the component won't notice it: you have to manually
+  // call forceUpdate.
+  !nextProps.isOpen;
+
+const MemoizedProjectManager = React.memo<Props, ProjectManagerInterface>(
+  ProjectManager,
+  arePropsEqual
+);
 
 const ProjectManagerWithErrorBoundary = React.forwardRef<
   Props,

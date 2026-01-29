@@ -16,6 +16,8 @@ import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 import {
   buildMoveToFolderSubmenu,
   createNewFolderAndMoveItem,
+  hasFolderNamed,
+  collectFoldersAndPaths,
 } from './SceneTreeViewHelpers';
 
 const SCENE_FOLDER_CLIPBOARD_KIND = 'SceneFolder';
@@ -411,23 +413,6 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
     }
 
     return false;
-  }
-
-  _collectFoldersAndPaths(
-    folder: any,
-    parentPath: string = '',
-    result: Array<{ folder: any, path: string }> = []
-  ): Array<{ folder: any, path: string }> {
-    for (let i = 0; i < folder.getChildrenCount(); i++) {
-      const child = folder.getChildAt(i);
-      if (child.isFolder()) {
-        const folderName = child.getFolderName();
-        const path = parentPath ? `${parentPath}/${folderName}` : folderName;
-        result.push({ folder: child, path });
-        this._collectFoldersAndPaths(child, path, result);
-      }
-    }
-    return result;
   }
 
   _createNewFolderAndMove(i18n: I18nType): void {

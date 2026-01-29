@@ -3,10 +3,10 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import { getSceneFolderTreeViewItemId } from './SceneFolderTreeViewItemContent';
 
 export const collectFoldersAndPaths = (
-  folder: any,
+  folder: gdLayoutFolderOrLayout,
   parentPath: string = '',
-  result: Array<{ folder: any, path: string }> = []
-): Array<{ folder: any, path: string }> => {
+  result: Array<{ folder: gdLayoutFolderOrLayout, path: string }> = []
+): Array<{ folder: gdLayoutFolderOrLayout, path: string }> => {
   for (let i = 0; i < folder.getChildrenCount(); i++) {
     const child = folder.getChildAt(i);
     if (child.isFolder()) {
@@ -17,6 +17,26 @@ export const collectFoldersAndPaths = (
     }
   }
   return result;
+};
+
+export const hasFolderNamed = (
+  parentFolder: gdLayoutFolderOrLayout,
+  name: string
+): boolean => {
+  const childrenCount = parentFolder.getChildrenCount
+    ? parentFolder.getChildrenCount()
+    : 0;
+
+  for (let i = 0; i < childrenCount; i++) {
+    const child = parentFolder.getChildAt(i);
+    if (child && child.isFolder && child.isFolder()) {
+      if (child.getFolderName && child.getFolderName() === name) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 };
 
 export const buildMoveToFolderSubmenu = (

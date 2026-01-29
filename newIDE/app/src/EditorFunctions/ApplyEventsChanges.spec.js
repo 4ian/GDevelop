@@ -4,6 +4,10 @@ import {
   addMissingObjectBehaviors,
 } from './ApplyEventsChanges';
 import { type AiGeneratedEventChange } from '../Utils/GDevelopServices/Generation';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
 
 const gd: libGDevelop = global.gd;
 
@@ -119,6 +123,136 @@ describe('applyEventsChanges', () => {
         .getEventAt(0)
         .getType()
     ).toBe('BuiltinCommonInstructions::Comment');
+  });
+
+  it('should delete an event by aiGeneratedEventId', () => {
+    sceneEventsList.clear();
+    unserializeFromJSObject(
+      sceneEventsList,
+      [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [{ type: { value: 'Hide' }, parameters: ['Box_Collider1'] }],
+        },
+        {
+          aiGeneratedEventId: '01KG391494T5Y99ZN04G8MNABN',
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [{ type: { value: 'Hide' }, parameters: ['Box_Collider2'] }],
+        },
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [{ type: { value: 'Hide' }, parameters: ['Box_Collider3'] }],
+          events: [
+            {
+              aiGeneratedEventId: '01KG391494T5Y99ZN04G8MNAB3',
+              type: 'BuiltinCommonInstructions::Standard',
+              conditions: [],
+              actions: [
+                { type: { value: 'Hide' }, parameters: ['Box_Collider4'] },
+              ],
+            },
+            {
+              aiGeneratedEventId: '01KG391494T5Y99ZN04G8MNAB2',
+              type: 'BuiltinCommonInstructions::Standard',
+              conditions: [],
+              actions: [
+                { type: { value: 'Hide' }, parameters: ['Box_Collider5'] },
+              ],
+            },
+          ],
+        },
+      ],
+      'unserializeFrom',
+      project
+    );
+
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationTargetEvent: '01KG391494T5Y99ZN04G8MNABN',
+        undeclaredObjectVariables: {},
+        generatedEvents: null,
+        diagnosticLines: [],
+        extensionNames: null,
+        undeclaredVariables: [],
+        isEventsJsonValid: true,
+        operationName: 'delete_event',
+        missingResources: [],
+        areEventsValid: true,
+        missingObjectBehaviors: {},
+      },
+      {
+        operationTargetEvent: '01KG391494T5Y99ZN04G8MNAB2',
+        undeclaredObjectVariables: {},
+        generatedEvents: null,
+        diagnosticLines: [],
+        extensionNames: null,
+        undeclaredVariables: [],
+        isEventsJsonValid: true,
+        operationName: 'delete_event',
+        missingResources: [],
+        areEventsValid: true,
+        missingObjectBehaviors: {},
+      },
+    ];
+    applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    expect(serializeToJSObject(sceneEventsList)).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "actions": Array [
+            Object {
+              "parameters": Array [
+                "Box_Collider1",
+              ],
+              "type": Object {
+                "value": "Hide",
+              },
+            },
+          ],
+          "conditions": Array [],
+          "type": "BuiltinCommonInstructions::Standard",
+        },
+        Object {
+          "actions": Array [
+            Object {
+              "parameters": Array [
+                "Box_Collider3",
+              ],
+              "type": Object {
+                "value": "Hide",
+              },
+            },
+          ],
+          "conditions": Array [],
+          "events": Array [
+            Object {
+              "actions": Array [
+                Object {
+                  "parameters": Array [
+                    "Box_Collider4",
+                  ],
+                  "type": Object {
+                    "value": "Hide",
+                  },
+                },
+              ],
+              "aiGeneratedEventId": "01KG391494T5Y99ZN04G8MNAB3",
+              "conditions": Array [],
+              "type": "BuiltinCommonInstructions::Standard",
+            },
+          ],
+          "type": "BuiltinCommonInstructions::Standard",
+        },
+      ]
+    `);
   });
 
   it('should insert events before a specified path', () => {

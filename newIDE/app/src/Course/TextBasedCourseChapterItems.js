@@ -8,6 +8,7 @@ import type {
   TextBasedCourseChapterVideoItem as TextBasedCourseChapterVideoItemType,
   TextBasedCourseChapterCodeItem as TextBasedCourseChapterCodeItemType,
   TextBasedCourseChapterTableItem as TextBasedCourseChapterTableItemType,
+  TextBasedCourseChapterCalloutItem as TextBasedCourseChapterCalloutItemType,
 } from '../Utils/GDevelopServices/Asset';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { MarkdownText } from '../UI/MarkdownText';
@@ -16,6 +17,7 @@ import TextBasedCourseChapterTaskItem from './TextBasedCourseChapterTaskItem';
 import { ColumnStackLayout } from '../UI/Layout';
 import { Column, Line } from '../UI/Grid';
 import TextBasedCourseChapterCodeBlock from './TextBasedCourseChapterCodeBlock';
+import TextBasedCourseChapterCalloutBlock from './TextBasedCourseChapterCalloutBlock';
 import TextBasedCourseChapterTable from './TextBasedCourseChapterTable';
 
 const styles = {
@@ -34,6 +36,7 @@ type Props = {|
         | TextBasedCourseChapterImageItemType
         | TextBasedCourseChapterVideoItemType
         | TextBasedCourseChapterCodeItemType
+        | TextBasedCourseChapterCalloutItemType
         | TextBasedCourseChapterTableItemType
       >
     | Array<
@@ -41,6 +44,7 @@ type Props = {|
         | TextBasedCourseChapterImageItemType
         | TextBasedCourseChapterVideoItemType
         | TextBasedCourseChapterCodeItemType
+        | TextBasedCourseChapterCalloutItemType
         | TextBasedCourseChapterTableItemType
       >,
 |};
@@ -106,6 +110,15 @@ const TextBasedCourseChapterItems = ({
                 key={itemIndex.toString()}
                 code={item.code}
                 language={item.language}
+              />
+            );
+          }
+          if (item.type === 'callout') {
+            return (
+              <TextBasedCourseChapterCalloutBlock
+                key={itemIndex.toString()}
+                kind={item.kind}
+                text={item.text}
               />
             );
           }

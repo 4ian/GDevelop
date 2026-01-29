@@ -64,6 +64,18 @@ const makeMarkdownCustomComponents = (
   },
   // eslint-disable-next-line jsx-a11y/alt-text
   img: ({ node, ...props }) => <img style={{ display: 'flex' }} {...props} />,
+  code: ({ node, ...props }) => (
+    <code
+      style={{
+        backgroundColor: 'rgba(179, 179, 179, 0.24)',
+        border: '1px solid rgba(145, 145, 145, 0.46)',
+        padding: '2px 4px',
+        borderRadius: 4,
+        fontFamily: 'Monaco, "Courier New", monospace',
+      }}
+      {...props}
+    />
+  ),
 });
 
 type Props = {|

@@ -71,33 +71,35 @@ const noRefreshOfAllFields = () => {
 export const StatefulCollapsibleSubPanel = ({
   renderContent,
   isInitiallyFolded,
-  toggleFolded,
+  onToggleFolded,
   title,
   titleIcon,
   titleBarButtons,
 }: {|
   renderContent: () => React.Node,
   isInitiallyFolded: boolean,
-  toggleFolded: () => void,
+  onToggleFolded?: () => void,
   titleIcon?: ?React.Node,
   title: string,
   titleBarButtons?: Array<TitleBarButton>,
 |}) => {
   const [isFolded, setIsFolded] = React.useState(isInitiallyFolded);
 
-  const onToggleFolded = React.useCallback(
+  const toggleFolded = React.useCallback(
     () => {
       setIsFolded(isFolded => !isFolded);
-      toggleFolded();
+      if (onToggleFolded) {
+        onToggleFolded();
+      }
     },
-    [toggleFolded]
+    [onToggleFolded]
   );
 
   return (
     <CollapsibleSubPanel
       renderContent={renderContent}
       isFolded={isFolded}
-      toggleFolded={onToggleFolded}
+      toggleFolded={toggleFolded}
       title={title}
       titleIcon={titleIcon}
       titleBarButtons={titleBarButtons}
@@ -427,10 +429,6 @@ export const CompactInstancePropertiesEditor = ({
                             behavior
                           )
                         }
-                        toggleFolded={() => {
-                          behavior.setFolded(!behavior.isFolded());
-                          forceUpdate();
-                        }}
                         titleIcon={
                           iconUrl ? (
                             <IconContainer

@@ -170,7 +170,7 @@ export const CompactInstancePropertiesEditor = ({
   const { object, instanceSchema, allVisibleBehaviors } = React.useMemo<{|
     object?: gdObject,
     instanceSchema?: Schema,
-    allVisibleBehaviors: Array<gdBehavior>,
+    allVisibleBehaviors: Array<string>,
   |}>(
     () => {
       if (!instance)
@@ -201,7 +201,10 @@ export const CompactInstancePropertiesEditor = ({
         .getAllBehaviorNames()
         .toJSArray()
         .map(behaviorName => object.getBehavior(behaviorName))
-        .filter(behavior => !behavior.isDefaultBehavior());
+        .filter(behavior => !behavior.isDefaultBehavior())
+        // We don't keep the behaviors directly because they may be destroyed
+        // if the object is rebuilt from a serialization.
+        .map(behavior => behavior.getName());
 
       const objectMetadata = gd.MetadataProvider.getObjectMetadata(
         project.getCurrentPlatform(),
@@ -373,13 +376,13 @@ export const CompactInstancePropertiesEditor = ({
                       </Trans>
                     </Text>
                   )}
-                  {allVisibleBehaviors.map(behavior => {
+                  {allVisibleBehaviors.map(behaviorName => {
+                    const behavior = object.getBehavior(behaviorName);
                     const behaviorTypeName = behavior.getTypeName();
                     const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
                       gd.JsPlatform.get(),
                       behaviorTypeName
                     );
-                    const behaviorName = behavior.getName();
                     const behaviorOverriding = instance.hasBehaviorOverridingNamed(
                       behaviorName
                     )

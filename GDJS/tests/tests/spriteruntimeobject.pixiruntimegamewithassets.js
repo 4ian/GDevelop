@@ -130,7 +130,7 @@ describe('gdjs.SpriteRuntimeObject (using a PixiJS RuntimeGame with assets)', fu
               sprites: [
                 {
                   hasCustomCollisionMask: false,
-                  image: 'base/tests-utils/assets/128x128.jpg',
+                  image: 'base/tests-utils/assets/32x128.jpg',
                   points: [],
                   originPoint: { name: 'Origin', x: 13, y: 14 },
                   centerPoint: { automatic: true, name: 'Center', x: 0, y: 0 },
@@ -151,15 +151,69 @@ describe('gdjs.SpriteRuntimeObject (using a PixiJS RuntimeGame with assets)', fu
     expect(object.getDrawableX()).to.be(-11);
     expect(object.getDrawableY()).to.be(-12);
 
+    expect(object.getScaleX()).to.be(1);
+    expect(object.getScaleY()).to.be(1);
+    expect(object.getWidth()).to.be(64);
+    expect(object.getHeight()).to.be(64);
+
+    object.setWidth(100);
+    object.setHeight(50);
+    expect(object.getScaleX()).to.be(100 / 64);
+    expect(object.getScaleY()).to.be(50 / 64);
+    expect(object.getWidth()).to.be(100);
+    expect(object.getHeight()).to.be(50);
+
+    object.setScale(1);
+    expect(object.getScaleX()).to.be(1);
+    expect(object.getScaleY()).to.be(1);
+    expect(object.getWidth()).to.be(64);
+    expect(object.getHeight()).to.be(64);
+
     // Change animation without rendering - dimensions and any other frame related properties should update immediately.
     object.setAnimation(1);
 
-    expect(object.getOriginalWidth()).to.be(128);
+    expect(object.getOriginalWidth()).to.be(32);
     expect(object.getOriginalHeight()).to.be(128);
-    expect(object.getCenterX()).to.be(64);
+    expect(object.getCenterX()).to.be(16);
     expect(object.getCenterY()).to.be(64);
     expect(object.getDrawableX()).to.be(-13);
     expect(object.getDrawableY()).to.be(-14);
+    expect(object.getScaleX()).to.be(1);
+    expect(object.getScaleY()).to.be(1);
+    expect(object.getWidth()).to.be(32);
+    expect(object.getHeight()).to.be(128);
+
+    object.setWidth(100);
+    object.setHeight(50);
+    expect(object.getScaleX()).to.be(100 / 32);
+    expect(object.getScaleY()).to.be(50 / 128);
+    expect(object.getWidth()).to.be(100);
+    expect(object.getHeight()).to.be(50);
+
+    object.setScale(1);
+    expect(object.getScaleX()).to.be(1);
+    expect(object.getScaleY()).to.be(1);
+    expect(object.getWidth()).to.be(32);
+    expect(object.getHeight()).to.be(128);
+
+
+    // Change animation without rendering again,
+    // change the width/height and change the animation again without rendering,
+    // checking the new animation has the same scale and the widht/height is updated accordingly.
+    object.setAnimation(0);
+
+    object.setWidth(100);
+    object.setHeight(50);
+    expect(object.getScaleX()).to.be(100 / 64);
+    expect(object.getScaleY()).to.be(50 / 64);
+    expect(object.getWidth()).to.be(100);
+    expect(object.getHeight()).to.be(50);
+
+    object.setAnimation(1);
+    expect(object.getScaleX()).to.be(100 / 64);
+    expect(object.getScaleY()).to.be(50 / 64);
+    expect(object.getWidth()).to.be(50);
+    expect(object.getHeight()).to.be(100);
   });
 
   it('returns the object drawable X/Y', async () => {
@@ -492,7 +546,7 @@ describe('gdjs.SpriteRuntimeObject (using a PixiJS RuntimeGame with assets)', fu
     // Move the layer camera.
     defaultLayer.setCameraX(2000);
     defaultLayer.setCameraY(4000);
-    
+
     // The object hitboxes and positions stay the same.
     expect(object.getHitBoxes()[0].vertices[0]).to.eql([12.5 - originPointX, 1 - originPointY]);
     expect(object.getHitBoxes()[0].vertices[1]).to.eql([41.5 - originPointX, 2 - originPointY]);

@@ -78,21 +78,12 @@ describe('gdjs.SpriteRuntimeObject (using a PixiJS RuntimeGame with assets)', fu
       ],
     });
 
-  it('returns the size of the object from the texture', async () => {
-    const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
-    const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-
-    const object = makeSpriteRuntimeObjectWithCustomHitBox(runtimeScene);
-
-    expect(object.getWidth()).to.be(64);
-    expect(object.getHeight()).to.be(64);
-  });
-
-  it('returns correct dimensions immediately after changing animation', async () => {
-    const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
-    const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-
-    const object = new gdjs.SpriteRuntimeObject(runtimeScene, {
+  /**
+   * Create a SpriteRuntimeObject using a 64x64 and a 32x128 image with custom origin.
+   * @param {gdjs.RuntimeScene} runtimeScene
+   */
+  const makeSpriteRuntimeObjectWithAnimationOfDifferentSize = runtimeScene =>
+    new gdjs.SpriteRuntimeObject(runtimeScene, {
       name: 'obj1',
       type: 'Sprite',
       updateIfNotVisible: false,
@@ -143,6 +134,47 @@ describe('gdjs.SpriteRuntimeObject (using a PixiJS RuntimeGame with assets)', fu
       ],
     });
 
+  it('returns the size of the object from the texture', async () => {
+    const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
+    const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+
+    const object = makeSpriteRuntimeObjectWithCustomHitBox(runtimeScene);
+
+    expect(object.getWidth()).to.be(64);
+    expect(object.getHeight()).to.be(64);
+  });
+
+  it('can rectangular sprites be resized', async () => {
+    const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
+    const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+    const object = makeSpriteRuntimeObjectWithAnimationOfDifferentSize(runtimeScene);
+    // Use the 32x128 image.
+    object.setAnimation(1);
+
+    expect(object.getScaleX()).to.be(1);
+    expect(object.getScaleY()).to.be(1);
+    expect(object.getWidth()).to.be(32);
+    expect(object.getHeight()).to.be(128);
+
+    object.setWidth(100);
+    object.setHeight(50);
+    expect(object.getScaleX()).to.be(100 / 32);
+    expect(object.getScaleY()).to.be(50 / 128);
+    expect(object.getWidth()).to.be(100);
+    expect(object.getHeight()).to.be(50);
+
+    object.setScale(1);
+    expect(object.getScaleX()).to.be(1);
+    expect(object.getScaleY()).to.be(1);
+    expect(object.getWidth()).to.be(32);
+    expect(object.getHeight()).to.be(128);
+  });
+
+  it('returns correct dimensions immediately after changing animation', async () => {
+    const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
+    const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+    const object = makeSpriteRuntimeObjectWithAnimationOfDifferentSize(runtimeScene);
+
     // Get initial dimensions and frame related properties.
     expect(object.getOriginalWidth()).to.be(64);
     expect(object.getOriginalHeight()).to.be(64);
@@ -150,20 +182,6 @@ describe('gdjs.SpriteRuntimeObject (using a PixiJS RuntimeGame with assets)', fu
     expect(object.getCenterY()).to.be(32);
     expect(object.getDrawableX()).to.be(-11);
     expect(object.getDrawableY()).to.be(-12);
-
-    expect(object.getScaleX()).to.be(1);
-    expect(object.getScaleY()).to.be(1);
-    expect(object.getWidth()).to.be(64);
-    expect(object.getHeight()).to.be(64);
-
-    object.setWidth(100);
-    object.setHeight(50);
-    expect(object.getScaleX()).to.be(100 / 64);
-    expect(object.getScaleY()).to.be(50 / 64);
-    expect(object.getWidth()).to.be(100);
-    expect(object.getHeight()).to.be(50);
-
-    object.setScale(1);
     expect(object.getScaleX()).to.be(1);
     expect(object.getScaleY()).to.be(1);
     expect(object.getWidth()).to.be(64);
@@ -185,35 +203,32 @@ describe('gdjs.SpriteRuntimeObject (using a PixiJS RuntimeGame with assets)', fu
 
     object.setWidth(100);
     object.setHeight(50);
+    // Change animation without rendering again with a custom size
+    object.setAnimation(0);
+
+    expect(object.getOriginalWidth()).to.be(64);
+    expect(object.getOriginalHeight()).to.be(64);
+    expect(object.getCenterX()).to.be(100);
+    expect(object.getCenterY()).to.be(12.5);
+    expect(object.getDrawableX()).to.be(-11 * 100 / 32);
+    expect(object.getDrawableY()).to.be(-12 * 50 / 128);
+    expect(object.getScaleX()).to.be(100 / 32);
+    expect(object.getScaleY()).to.be(50 / 128);
+    expect(object.getWidth()).to.be(200);
+    expect(object.getHeight()).to.be(25);
+
+    object.setAnimation(1);
+
+    expect(object.getOriginalWidth()).to.be(32);
+    expect(object.getOriginalHeight()).to.be(128);
+    expect(object.getCenterX()).to.be(50);
+    expect(object.getCenterY()).to.be(25);
+    expect(object.getDrawableX()).to.be(-13 * 100 / 32);
+    expect(object.getDrawableY()).to.be(-14 * 50 / 128);
     expect(object.getScaleX()).to.be(100 / 32);
     expect(object.getScaleY()).to.be(50 / 128);
     expect(object.getWidth()).to.be(100);
     expect(object.getHeight()).to.be(50);
-
-    object.setScale(1);
-    expect(object.getScaleX()).to.be(1);
-    expect(object.getScaleY()).to.be(1);
-    expect(object.getWidth()).to.be(32);
-    expect(object.getHeight()).to.be(128);
-
-
-    // Change animation without rendering again,
-    // change the width/height and change the animation again without rendering,
-    // checking the new animation has the same scale and the widht/height is updated accordingly.
-    object.setAnimation(0);
-
-    object.setWidth(100);
-    object.setHeight(50);
-    expect(object.getScaleX()).to.be(100 / 64);
-    expect(object.getScaleY()).to.be(50 / 64);
-    expect(object.getWidth()).to.be(100);
-    expect(object.getHeight()).to.be(50);
-
-    object.setAnimation(1);
-    expect(object.getScaleX()).to.be(100 / 64);
-    expect(object.getScaleY()).to.be(50 / 64);
-    expect(object.getWidth()).to.be(50);
-    expect(object.getHeight()).to.be(100);
   });
 
   it('returns the object drawable X/Y', async () => {
@@ -558,24 +573,5 @@ describe('gdjs.SpriteRuntimeObject (using a PixiJS RuntimeGame with assets)', fu
 
     expect(object.getPointX("Origin")).to.be(0);
     expect(object.getPointY("Origin")).to.be(0);
-  });
-
-  it('can change of size', async () => {
-    const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
-    const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-    const object = makeSpriteRuntimeObjectWithCustomHitBox(runtimeScene);
-
-    expect(object.getWidth()).to.be(64);
-    expect(object.getHeight()).to.be(64);
-    expect(object.getScaleX()).to.be(1);
-    expect(object.getScaleY()).to.be(1);
-
-    object.setWidth(128);
-    object.setHeight(192);
-
-    expect(object.getWidth()).to.be(128);
-    expect(object.getHeight()).to.be(192);
-    expect(object.getScaleX()).to.be(2);
-    expect(object.getScaleY()).to.be(3);
   });
 });

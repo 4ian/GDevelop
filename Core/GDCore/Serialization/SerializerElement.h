@@ -449,6 +449,8 @@ class GD_CORE_API SerializerElement {
    */
   void Clear();
 
+  bool IsEmpty();
+
   /**
    * \brief Return all the children of the element.
    */

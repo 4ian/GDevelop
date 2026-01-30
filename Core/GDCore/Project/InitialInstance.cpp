@@ -243,13 +243,6 @@ void InitialInstance::SetRawStringProperty(const gd::String& name,
 bool InitialInstance::HasAnyOverriddenProperty(const gd::Object &object) {
   for (auto &behaviorOverridingPair : behaviorOverridings.GetAllBehaviorContents()) {
     auto &behaviorName = behaviorOverridingPair.first;
-    auto &behaviorOverriding = behaviorOverridingPair.second;
-    if (behaviorOverriding->GetProperties().empty() ||
-        !object.HasBehaviorNamed(behaviorName)) {
-      continue;
-    }
-    const auto &behaviorProperties =
-        object.GetBehavior(behaviorName).GetProperties();
     if (HasAnyOverriddenPropertyForBehavior(object.GetBehavior(behaviorName))) {
       return true;
     }
@@ -264,20 +257,20 @@ bool InitialInstance::HasAnyOverriddenPropertyForBehavior(
     return false;
   }
   auto &behaviorOverriding = GetBehaviorOverriding(behaviorName);
-  if (behaviorOverriding.GetProperties().empty()) {
+  if (behaviorOverriding.GetContent().IsEmpty()) {
     return false;
   }
-  const auto &behaviorProperties = behavior.GetProperties();
-  for (auto &overridingPropertyPair : behaviorOverriding.GetProperties()) {
-    auto &overridingPropertyName = overridingPropertyPair.first;
-    auto &overridingProperty = overridingPropertyPair.second;
+  const auto &overridingProperties = behaviorOverriding.GetProperties();
+  for (auto &propertyPair : behavior.GetProperties()) {
+    auto &propertyName = propertyPair.first;
+    auto &behaviorProperty = propertyPair.second;
 
-    if (overridingProperty.GetType() != "Behavior" &&
-        behaviorOverriding.HasPropertyValue(overridingPropertyName) &&
-        behaviorProperties.find(overridingPropertyName) !=
-            behaviorProperties.end() &&
-        overridingProperty.GetValue() !=
-            behaviorProperties.at(overridingPropertyName).GetValue()) {
+    if (behaviorProperty.GetType() != "Behavior" &&
+        behaviorOverriding.HasPropertyValue(propertyName) &&
+        overridingProperties.find(propertyName) !=
+            overridingProperties.end() &&
+        overridingProperties.at(propertyName).GetValue() !=
+            behaviorProperty.GetValue()) {
       return true;
     }
   }

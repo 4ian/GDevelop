@@ -19,6 +19,62 @@
 #include "GDCore/Extensions/Metadata/ParameterOptions.h"
 #include "catch.hpp"
 
+class BehaviorWithProperties : public gd::Behavior {
+ public:
+  BehaviorWithProperties(
+      const gd::String& name, const gd::String& type)
+      : Behavior(name, type) {};
+  virtual ~BehaviorWithProperties(){};
+  virtual std::unique_ptr<gd::Behavior> Clone() const override {
+    return gd::make_unique<BehaviorWithProperties>(*this);
+  }
+
+  virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(
+      const gd::SerializerElement& behaviorContent) const override {
+    std::map<gd::String, gd::PropertyDescriptor> properties;
+    properties["numberProperty"]
+        .SetLabel("Number property")
+        .SetValue(
+            gd::String::From(behaviorContent.GetChild("numberProperty").GetDoubleValue()))
+        .SetType("Number");
+    properties["stringProperty"]
+        .SetLabel("String property")
+        .SetValue(
+            behaviorContent.GetChild("stringProperty").GetStringValue())
+        .SetType("String");
+    properties["booleanProperty"]
+        .SetLabel("Boolean property")
+        .SetValue(
+            behaviorContent.GetChild("booleanProperty").GetBoolValue() ? "true" : "false")
+        .SetType("Boolean");
+    return properties;
+  }
+  virtual bool UpdateProperty(gd::SerializerElement& behaviorContent,
+                              const gd::String& name,
+                              const gd::String& value) override {
+    auto &element = behaviorContent.AddChild(name);
+    if (name == "numberProperty") {
+      element.SetDoubleValue(value.To<double>());
+      return true;
+    }
+    if (name == "stringProperty") {
+      element.SetStringValue(value);
+      return true;
+    }
+    if (name == "booleanProperty") {
+      element.SetBoolValue(value == "1");
+      return true;
+    }
+    return false;
+  }
+  virtual void InitializeContent(
+      gd::SerializerElement& behaviorContent) override {
+   behaviorContent.AddChild("numberProperty").SetDoubleValue(123);
+   behaviorContent.AddChild("stringProperty").SetStringValue("ABC");
+   behaviorContent.AddChild("booleanProperty").SetBoolValue(true);
+  }
+};
+
 // TODO Remove these 2 classes and write the test with events based behaviors.
 class BehaviorWithRequiredBehaviorProperty : public gd::Behavior {
  public:
@@ -562,7 +618,7 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
                                "Group",
                                "Icon.png",
                                "MyBehavior",
-                               gd::make_unique<gd::Behavior>(
+                               gd::make_unique<BehaviorWithProperties>(
                                   "Behavior", "MyExtension::MyBehavior"),
                                gd::make_unique<gd::BehaviorsSharedData>());
     behavior

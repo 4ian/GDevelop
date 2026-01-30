@@ -505,4 +505,23 @@ describe('gdjs.SpriteRuntimeObject (using a PixiJS RuntimeGame with assets)', fu
     expect(object.getPointX("Origin")).to.be(0);
     expect(object.getPointY("Origin")).to.be(0);
   });
+
+  it('can change of size', async () => {
+    const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
+    const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+    const object = makeSpriteRuntimeObjectWithCustomHitBox(runtimeScene);
+
+    expect(object.getWidth()).to.be(64);
+    expect(object.getHeight()).to.be(64);
+    expect(object.getScaleX()).to.be(1);
+    expect(object.getScaleY()).to.be(1);
+
+    object.setWidth(128);
+    object.setHeight(192);
+
+    expect(object.getWidth()).to.be(128);
+    expect(object.getHeight()).to.be(192);
+    expect(object.getScaleX()).to.be(2);
+    expect(object.getScaleY()).to.be(3);
+  });
 });

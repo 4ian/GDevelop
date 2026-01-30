@@ -47,7 +47,7 @@ void PropertyDescriptor::SerializeTo(SerializerElement& element) const {
     SerializerElement &choicesElement = element.AddChild("choices");
     choicesElement.ConsiderAsArrayOf("choice");
     for (const auto &choice : choices) {
-      auto &choiceElement = choicesElement.AddChild("Choice");
+      auto &choiceElement = choicesElement.AddChild("choice");
       choiceElement.SetStringAttribute("value", choice.GetValue());
       choiceElement.SetStringAttribute("label", choice.GetLabel());
     }

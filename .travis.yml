@@ -22,11 +22,10 @@ addons:
       # Build dependencies:
       - cmake
       - p7zip-full
+      # Install newer libstdc++ for clang 18 compatibility (requires CXXABI_1.3.11+)
+      - g++-9
 
 before_install:
-  # This workaround is required to avoid libstdc++ errors (Emscripten and clang require a recent version of libstdc++)
-  - wget -q -O libstdc++6 http://archive.ubuntu.com/ubuntu/pool/main/g/gcc-9/libstdc++6_9.4.0-1ubuntu1~16.04_amd64.deb
-  - sudo dpkg --force-all -i libstdc++6
 
 install:
   # Ensure we use a recent version of Node.js (and npm).

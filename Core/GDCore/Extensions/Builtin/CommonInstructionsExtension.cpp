@@ -101,14 +101,20 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddCondition("Once",
-                    _("Trigger once while true"),
-                    _("Run actions only once, for each time the conditions "
-                      "have been met."),
-                    _("Trigger once"),
-                    "",
-                    "res/conditions/once24.png",
-                    "res/conditions/once.png")
+      .AddCondition(
+          "Once",
+          _("Trigger once while true"),
+          _("Run the actions once when the previous conditions are true. If "
+            "they become false and later true again, the actions will run "
+            "again.\nThis condition is always last in the list.\n\nNote: "
+            "internally, this uses a global trigger state; it's not "
+            "tracked per object instance. Be careful if you use this in a loop "
+            "or For Each event (consider using object variables instead if "
+            "needed)."),
+          _("Trigger once"),
+          "",
+          "res/conditions/once24.png",
+          "res/conditions/once.png")
       .SetHelpPath("/all-features/advanced-conditions/trigger-once");
 
   extension

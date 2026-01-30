@@ -826,19 +826,16 @@ namespace gdjs {
     }
 
     setWidth(newWidth: float): void {
-      if (this._animationFrameDirty) {
-        this._updateAnimationFrame();
-      }
-      const originalHeight = this.getOriginalHeight();
-      if (originalHeight !== 0) {
-        this.setScaleX(newWidth / originalHeight);
+      const originalWidth = this.getOriginalWidth();
+      if (originalWidth !== 0) {
+        this.setScaleX(newWidth / originalWidth);
       }
     }
 
     setHeight(newHeight: float): void {
-      const originalWidth = this.getOriginalWidth();
-      if (originalWidth !== 0) {
-        this.setScaleY(newHeight / originalWidth);
+      const originalHeight = this.getOriginalHeight();
+      if (originalHeight !== 0) {
+        this.setScaleY(newHeight / originalHeight);
       }
     }
 

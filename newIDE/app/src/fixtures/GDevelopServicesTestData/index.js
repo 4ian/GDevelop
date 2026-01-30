@@ -3458,6 +3458,26 @@ export const textBasedCourseChapter: TextBasedCourseChapter = {
   shortTitle: 'Introduction',
 };
 
+export const textBasedCourseChapterWithCallout: TextBasedCourseChapter = {
+  title: 'test',
+  templates: [],
+  items: [
+    {
+      type: 'text',
+      text:
+        "Let's explore how JavaScript events can control objects in your game.",
+    },
+    {
+      type: 'callout',
+      kind: 'info',
+      text:
+        '3 Ceci est un encaddré **informatif**. Il utilise les couleurs `blue` par défaut. Il est parfait pour fournir des détails supplémentaires ou des précisions techniques. Les blocs de `code` sont également bien formatés.',
+    },
+  ],
+  id: 'callout javascript',
+  shortTitle: 'callout javascript',
+};
+
 export const textBasedCourseChapterWithCode: TextBasedCourseChapter = {
   title: 'Scripting Basics',
   templates: [],
@@ -3504,10 +3524,18 @@ export const textBasedCourseChapterWithTables: TextBasedCourseChapter = {
       type: 'table',
       header: ['Stat', 'Enemy', 'Player'],
       rows: [
+        ['>', '>=', 'right bugged'],
+        ['\\>', '\\>=', 'right escaped'],
+        ['<', '<=', 'left ok'],
+        ['\\<', '\\<=', 'left escaped'],
+        ['`code1`', '``code2``', '```code3```'],
         ['Health', '120', '100'],
-        ['Damage', '12', '18'],
         ['Move speed', '160 px/s', '200 px/s'],
       ],
+    },
+    {
+      type: 'text',
+      text: ' `window`,  ``console.log("hello");``, ```const test = 1;``` ',
     },
     {
       type: 'text',

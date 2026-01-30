@@ -9,6 +9,7 @@ import {
   textBasedCourseChapter,
   textBasedCourseChapterWithCode,
   textBasedCourseChapterWithTables,
+  textBasedCourseChapterWithCallout,
 } from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
@@ -57,6 +58,21 @@ export const Chapter3 = () => {
       isTaskCompleted={action('isTaskCompleted')}
       getChapterCompletion={action('getChapterCompletion')}
       chapterIndex={2}
+      onClickUnlock={() => action('onClickUnlock')()}
+    />
+  );
+};
+
+export const Chapter4 = () => {
+  return (
+    <TextBasedCourseChapterView
+      course={premiumCourse}
+      courseChapter={textBasedCourseChapterWithCallout}
+      onOpenTemplate={action('open template')}
+      onCompleteTask={action('onCompleteTask')}
+      isTaskCompleted={action('isTaskCompleted')}
+      getChapterCompletion={action('getChapterCompletion')}
+      chapterIndex={3}
       onClickUnlock={() => action('onClickUnlock')()}
     />
   );

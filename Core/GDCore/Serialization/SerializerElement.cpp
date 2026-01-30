@@ -288,6 +288,10 @@ void SerializerElement::Clear() {
   attributes.clear();
 }
 
+bool SerializerElement::IsEmpty() {
+  return children.empty() && attributes.empty();
+}
+
 void SerializerElement::RemoveAttribute(const gd::String& name) {
   attributes.erase(name);
 }

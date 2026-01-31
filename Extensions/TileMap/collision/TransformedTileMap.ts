@@ -651,7 +651,7 @@ namespace gdjs {
        */
       readonly y: integer;
       private readonly hitBoxes: gdjs.Polygon[];
-      private affineTransformationUpToDateCount: integer = 0;
+      private affineTransformationUpToDateCount: integer = -1;
 
       /**
        * An reusable AffineTransformation to avoid allocations.
@@ -673,31 +673,7 @@ namespace gdjs {
         this.layer = layer;
         this.x = x;
         this.y = y;
-        const definition = this.getDefinition();
         this.hitBoxes = [];
-        if (definition) {
-          const tag = this.layer.tileMap.tag;
-          const definitionHitboxes = definition.getHitBoxes(tag);
-          if (definitionHitboxes) {
-            this.hitBoxes.length = definitionHitboxes.length;
-            for (
-              let polygonIndex = 0;
-              polygonIndex < this.hitBoxes.length;
-              polygonIndex++
-            ) {
-              const polygon = new gdjs.Polygon();
-              this.hitBoxes[polygonIndex] = polygon;
-              polygon.vertices.length = definitionHitboxes[polygonIndex].length;
-              for (
-                let vertexIndex = 0;
-                vertexIndex < polygon.vertices.length;
-                vertexIndex++
-              ) {
-                polygon.vertices[vertexIndex] = [0, 0];
-              }
-            }
-          }
-        }
       }
 
       /**

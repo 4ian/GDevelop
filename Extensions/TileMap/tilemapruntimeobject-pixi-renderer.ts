@@ -13,6 +13,10 @@ namespace gdjs {
       | gdjs.SimpleTileMapRuntimeObject;
 
     private _pixiObject: PIXI.tilemap.CompositeTilemap;
+    private _lastCullingLeftBound = 0;
+    private _lastCullingRightBound = 0;
+    private _lastCullingTopBound = 0;
+    private _lastCullingBottomBound = 0;
 
     /**
      * @param runtimeObject The object to render
@@ -85,7 +89,7 @@ namespace gdjs {
       }
 
       // Changing the alpha requires a full re-render of the tile map.
-      this._object.updateTileMap();
+      this._object.updateTileMap(true);
     }
 
     setWidth(width: float): void {
@@ -126,17 +130,80 @@ namespace gdjs {
       return this._pixiObject.scale.y;
     }
 
-    refreshPixiTileMap(textureCache: TileMapHelper.TileTextureCache) {
-      const tileMap = this._object.getTileMap();
+    refreshPixiTileMap(
+      textureCache: TileMapHelper.TileTextureCache,
+      forceRefresh: boolean
+    ) {
+      const object = this._object;
+      const tileMap = object.getTileMap();
       if (!tileMap) return;
-      TileMapHelper.PixiTileMapHelper.updatePixiTileMap(
-        this._pixiObject,
-        tileMap,
-        textureCache,
-        // @ts-ignore
-        this._object._displayMode,
-        this._object._layerIndex
-      );
+      const dimX = tileMap.getDimensionX();
+      const dimY = tileMap.getDimensionY();
+
+      let leftBound = 0;
+      let rightBound = dimX;
+      let topBound = 0;
+      let bottomBound = dimY;
+
+      const instanceContainer = this._object.getInstanceContainer();
+      const scene = instanceContainer.getScene();
+      const layerName = this._object.getLayer();
+      const layer = this._object.getInstanceContainer().getLayer(layerName);
+      if (
+        // Don't cull small maps or chunks.
+        dimX + dimY > 100 &&
+        // TODO Handle culling for TileMapRuntimeObject.
+        isSimpleTileMap(object) &&
+        instanceContainer === scene &&
+        (!gdjs.scene3d ||
+          (gdjs.scene3d.camera.getCameraRotationX(scene, layerName, 0) === 0 &&
+            gdjs.scene3d.camera.getCameraRotationY(scene, layerName, 0) === 0))
+      ) {
+        const cameraX = layer.getCameraX();
+        const cameraY = layer.getCameraY();
+        const cameraHalfWidth = layer.getCameraWidth() / 2;
+        const cameraHalfHeight = layer.getCameraHeight() / 2;
+        const [cameraLeftTile, cameraTopTile] =
+          object.getGridCoordinatesFromSceneCoordinates(
+            cameraX - cameraHalfWidth,
+            cameraY - cameraHalfHeight
+          );
+        const [cameraRightTile, cameraBottomTile] =
+          object.getGridCoordinatesFromSceneCoordinates(
+            cameraX + cameraHalfWidth,
+            cameraY + cameraHalfHeight
+          );
+        leftBound = Math.min(cameraLeftTile, cameraRightTile);
+        rightBound = Math.max(cameraLeftTile, cameraRightTile) + 1;
+        topBound = Math.min(cameraTopTile, cameraBottomTile);
+        bottomBound = Math.max(cameraTopTile, cameraBottomTile) + 1;
+      }
+
+      if (
+        forceRefresh ||
+        this._lastCullingLeftBound !== leftBound ||
+        this._lastCullingRightBound !== rightBound ||
+        this._lastCullingTopBound !== topBound ||
+        this._lastCullingBottomBound !== bottomBound
+      ) {
+        this._lastCullingLeftBound = leftBound;
+        this._lastCullingRightBound = rightBound;
+        this._lastCullingTopBound = topBound;
+        this._lastCullingBottomBound = bottomBound;
+
+        TileMapHelper.PixiTileMapHelper.updatePixiTileMap(
+          this._pixiObject,
+          tileMap,
+          textureCache,
+          // @ts-ignore
+          this._object._displayMode,
+          this._object._layerIndex,
+          leftBound,
+          rightBound,
+          topBound,
+          bottomBound
+        );
+      }
     }
 
     destroy(): void {
@@ -144,6 +211,14 @@ namespace gdjs {
       this._pixiObject.destroy(false);
     }
   }
+
+  function isSimpleTileMap(
+    object: gdjs.SimpleTileMapRuntimeObject | gdjs.TileMapRuntimeObject
+  ): object is gdjs.SimpleTileMapRuntimeObject {
+    //@ts-ignore We are checking if the methods are present.
+    return object.getGridCoordinatesFromSceneCoordinates;
+  }
+
   /**
    * @category Renderers > Tile Map
    */

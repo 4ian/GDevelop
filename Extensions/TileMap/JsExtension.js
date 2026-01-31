@@ -1804,7 +1804,11 @@ module.exports = {
                     this._editableTileMap,
                     textureCache,
                     displayMode,
-                    layerIndex
+                    layerIndex,
+                    0,
+                    this._editableTileMap.getDimensionX(),
+                    0,
+                    this._editableTileMap.getDimensionY(),
                   );
                 }
               );
@@ -1880,7 +1884,11 @@ module.exports = {
               this._editableTileMap,
               textureCache,
               displayMode,
-              layerIndex
+              layerIndex,
+              0,
+              this._editableTileMap.getDimensionX(),
+              0,
+              this._editableTileMap.getDimensionY(),
             );
           }
         );
@@ -2259,7 +2267,11 @@ module.exports = {
                       this._editableTileMap,
                       textureCache,
                       'all', // No notion of visibility on simple tile maps.
-                      0 // Only one layer is used on simple tile maps.
+                      0, // Only one layer is used on simple tile maps.
+                      0,
+                      this._editableTileMap.getDimensionX(),
+                      0,
+                      this._editableTileMap.getDimensionY(),
                     );
                   }
                 );
@@ -2324,7 +2336,11 @@ module.exports = {
               this._editableTileMap,
               textureCache,
               'all',
-              0
+              0,
+              0,
+              this._editableTileMap.getDimensionX(),
+              0,
+              this._editableTileMap.getDimensionY(),
             );
           }
         );

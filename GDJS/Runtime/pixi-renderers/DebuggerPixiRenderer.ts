@@ -179,13 +179,25 @@ namespace gdjs {
         const renderedObjectPoints = this._debugDrawRenderedObjectsPoints[id];
         renderedObjectPoints.wasRendered = true;
 
+        const cameraX = layer.getCameraX();
+        const cameraY = layer.getCameraY();
+        let cameraHalfWidth = layer.getCameraWidth() / 2;
+        let cameraHalfHeight = layer.getCameraHeight() / 2;
+        if (layer.getCameraRotation() !== 0) {
+          const hypot = cameraHalfWidth + cameraHalfHeight;
+          cameraHalfWidth = hypot;
+          cameraHalfHeight = hypot;
+        }
         // Draw hitboxes (sub-optimal performance)
-        const hitboxes = object.getHitBoxes();
-        for (let j = 0; j < hitboxes.length; j++) {
+        for (const hitBox of object.getHitBoxesAround(
+            cameraX - cameraHalfWidth,
+            cameraY - cameraHalfHeight,
+            cameraX + cameraHalfWidth,
+            cameraY + cameraHalfHeight)) {
           // Note that this conversion is sub-optimal, but we don't care
           // as this is for debug draw.
           const polygon: float[] = [];
-          hitboxes[j].vertices.forEach((point) => {
+          hitBox.vertices.forEach((point) => {
             point = layer.applyLayerTransformation(
               point[0],
               point[1],

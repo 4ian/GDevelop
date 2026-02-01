@@ -810,8 +810,8 @@ namespace gdjs {
           ) {
             const defPolygon = definitionHitboxes[polygonIndex];
             if (polygonIndex >= this.hitBoxes.length) {
-              // This can't happen in practice as only the simple tile map can be
-              // modify and it only contains full hit boxes.
+              // This only happens the first time (since only the simple tile
+              // map can be modified and it only contains full hit boxes).
               this.hitBoxes[polygonIndex] = gdjs.Polygon.createRectangle(0, 0);
             }
             const polygon = this.hitBoxes[polygonIndex];

@@ -161,8 +161,13 @@ namespace gdjs {
       ) {
         const cameraX = layer.getCameraX();
         const cameraY = layer.getCameraY();
-        const cameraHalfWidth = layer.getCameraWidth() / 2;
-        const cameraHalfHeight = layer.getCameraHeight() / 2;
+        let cameraHalfWidth = layer.getCameraWidth() / 2;
+        let cameraHalfHeight = layer.getCameraHeight() / 2;
+        if (layer.getCameraRotation() !== 0) {
+          const hypot = cameraHalfWidth + cameraHalfHeight;
+          cameraHalfWidth = hypot;
+          cameraHalfHeight = hypot;
+        }
         const [cameraLeftTile, cameraTopTile] =
           object.getGridCoordinatesFromSceneCoordinates(
             cameraX - cameraHalfWidth,

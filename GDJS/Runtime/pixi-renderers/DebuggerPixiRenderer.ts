@@ -190,10 +190,11 @@ namespace gdjs {
         }
         // Draw hitboxes (sub-optimal performance)
         for (const hitBox of object.getHitBoxesAround(
-            cameraX - cameraHalfWidth,
-            cameraY - cameraHalfHeight,
-            cameraX + cameraHalfWidth,
-            cameraY + cameraHalfHeight)) {
+          cameraX - cameraHalfWidth,
+          cameraY - cameraHalfHeight,
+          cameraX + cameraHalfWidth,
+          cameraY + cameraHalfHeight
+        )) {
           // Note that this conversion is sub-optimal, but we don't care
           // as this is for debug draw.
           const polygon: float[] = [];

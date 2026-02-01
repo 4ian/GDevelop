@@ -1808,7 +1808,7 @@ module.exports = {
                     0,
                     this._editableTileMap.getDimensionX(),
                     0,
-                    this._editableTileMap.getDimensionY(),
+                    this._editableTileMap.getDimensionY()
                   );
                 }
               );
@@ -1888,7 +1888,7 @@ module.exports = {
               0,
               this._editableTileMap.getDimensionX(),
               0,
-              this._editableTileMap.getDimensionY(),
+              this._editableTileMap.getDimensionY()
             );
           }
         );
@@ -2271,7 +2271,7 @@ module.exports = {
                       0,
                       this._editableTileMap.getDimensionX(),
                       0,
-                      this._editableTileMap.getDimensionY(),
+                      this._editableTileMap.getDimensionY()
                     );
                   }
                 );
@@ -2340,7 +2340,7 @@ module.exports = {
               0,
               this._editableTileMap.getDimensionX(),
               0,
-              this._editableTileMap.getDimensionY(),
+              this._editableTileMap.getDimensionY()
             );
           }
         );

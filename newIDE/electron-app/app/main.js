@@ -462,30 +462,30 @@ app.on('ready', function() {
 
   setUpDiscordRichPresence(ipcMain);
 
-  // Shell command execution in external terminal (cross-platform)
-  ipcMain.on('run-shell-command', (event, { projectPath, command }) => {
-    log.info(`Running shell command in ${projectPath}: ${command}`);
+  // npm script execution in external terminal (cross-platform)
+  ipcMain.on('run-npm-script', (event, { projectPath, npmScript }) => {
+    log.info(`Running npm script "${npmScript}" in ${projectPath}`);
 
     const platform = process.platform;
+    const npmCommand = `npm run ${npmScript}`;
 
     try {
       if (platform === 'win32') {
-        // Windows: open cmd window that stays open after command
-        child_process.spawn('cmd.exe', ['/c', 'start', 'cmd.exe', '/k', `cd ${projectPath} && ${command}`], {
+        // Windows: open cmd window that stays open after npm command
+        child_process.spawn('cmd.exe', ['/c', 'start', 'cmd.exe', '/k', `cd ${projectPath} && ${npmCommand}`], {
           detached: true,
           stdio: 'ignore',
         }).unref();
       } else if (platform === 'darwin') {
         const escapedPath = projectPath.replace(/'/g, "'\\''");
-        const escapedCommand = command.replace(/'/g, "'\\''");
-        const script = `tell application "Terminal" to do script "cd '${escapedPath}' && ${escapedCommand}"`;
+        const script = `tell application "Terminal" to do script "cd '${escapedPath}' && ${npmCommand}"`;
         child_process.spawn('osascript', ['-e', script], {
           detached: true,
           stdio: 'ignore',
         });
       } else {
         // Linux: try common terminal emulators
-        const bashCommand = `cd "${projectPath}" && ${command}; exec bash`;
+        const bashCommand = `cd "${projectPath}" && ${npmCommand}; exec bash`;
         const terminals = [
           { cmd: 'x-terminal-emulator', args: ['-e', 'bash', '-c', bashCommand] },
           { cmd: 'gnome-terminal', args: ['--', 'bash', '-c', bashCommand] },
@@ -510,7 +510,7 @@ app.on('ready', function() {
         tryTerminal(0);
       }
     } catch (err) {
-      log.error('Failed to run shell command:', err);
+      log.error('Failed to run npm script:', err);
     }
   });
 });

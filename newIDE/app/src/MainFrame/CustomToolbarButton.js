@@ -7,7 +7,7 @@ import { tooltipEnterDelay } from '../UI/Tooltip';
 export type ToolbarButtonConfig = {|
   name: string,
   icon: string,
-  command: string,
+  npmScript: string,
 |};
 
 type Props = {|
@@ -26,21 +26,10 @@ const iconContainerStyle = {
 };
 
 const CustomToolbarButton = ({ name, icon, onClick }: Props) => {
-  const isSvg = icon.trim().startsWith('<');
-
-  const iconElement = isSvg ? (
-    <span
-      style={iconContainerStyle}
-      dangerouslySetInnerHTML={{ __html: icon }}
-    />
-  ) : (
-    <span style={iconContainerStyle}>{icon}</span>
-  );
-
   return (
     <Tooltip title={name} placement="bottom" enterDelay={tooltipEnterDelay}>
       <IconButton size="small" onClick={onClick} color="default">
-        {iconElement}
+        <span style={iconContainerStyle}>{icon}</span>
       </IconButton>
     </Tooltip>
   );

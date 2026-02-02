@@ -232,6 +232,7 @@ export type PreferencesValues = {|
   automaticallyUseCreditsForAiRequests: boolean,
   hasSeenInGameEditorWarning: boolean,
   useBackgroundSerializerForSaving: boolean,
+  disableNpmScriptConfirmation: boolean,
 |};
 
 /**
@@ -314,6 +315,7 @@ export type Preferences = {|
   setUse3DEditor: (enabled: boolean) => void,
   getUse3DEditor: () => boolean,
   setShowBasicProfilingCounters: (enabled: boolean) => void,
+  setDisableNpmScriptConfirmation: (enabled: boolean) => void,
   setNewProjectsDefaultStorageProviderName: (name: string) => void,
   saveTutorialProgress: ({|
     tutorialId: string,
@@ -414,6 +416,7 @@ export const initialPreferences = {
     automaticallyUseCreditsForAiRequests: false,
     hasSeenInGameEditorWarning: false,
     useBackgroundSerializerForSaving: false,
+    disableNpmScriptConfirmation: false,
   },
   setMultipleValues: () => {},
   setLanguage: () => {},
@@ -475,6 +478,7 @@ export const initialPreferences = {
   setUse3DEditor: (enabled: boolean) => {},
   getUse3DEditor: () => false,
   setShowBasicProfilingCounters: (enabled: boolean) => {},
+  setDisableNpmScriptConfirmation: (enabled: boolean) => {},
   saveTutorialProgress: () => {},
   getTutorialProgress: () => {},
   setNewProjectsDefaultFolder: () => {},

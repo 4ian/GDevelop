@@ -16,6 +16,9 @@ export type ParsedProjectSettings = {
 
 const SETTINGS_FILE_NAME = 'gdevelop-settings.yaml';
 
+// Only allow safe characters in npm script names to prevent command injection
+const SAFE_SCRIPT_NAME_PATTERN = /^[a-zA-Z0-9_:-]+$/;
+
 const getProjectDirectory = (projectFilePath: string): string | null => {
   if (!path) return null;
   return path.dirname(projectFilePath);
@@ -73,19 +76,50 @@ export const readProjectSettings = async (
       }
     }
 
-    // Parse toolbarButtons section
+    // Parse toolbarButtons section - requires package.json to exist
     const rawToolbarButtons = SafeExtractor.extractArrayProperty(
       parsed,
       'toolbarButtons'
     );
-    const toolbarButtons: Array<ToolbarButtonConfig> = [];
-    if (rawToolbarButtons) {
-      for (const rawButton of rawToolbarButtons) {
-        const name = SafeExtractor.extractStringProperty(rawButton, 'name');
-        const icon = SafeExtractor.extractStringProperty(rawButton, 'icon');
-        const command = SafeExtractor.extractStringProperty(rawButton, 'command');
-        if (name && icon && command) {
-          toolbarButtons.push({ name, icon, command });
+    let toolbarButtons: Array<ToolbarButtonConfig> = [];
+
+    if (rawToolbarButtons && rawToolbarButtons.length > 0) {
+      const packageJsonPath = path.join(projectDirectory, 'package.json');
+      let availableScripts: { [string]: string } = {};
+
+      try {
+        const packageJsonContent = await fsPromises.readFile(packageJsonPath, {
+          encoding: 'utf8',
+        });
+        const packageJson = JSON.parse(packageJsonContent);
+        availableScripts = packageJson.scripts || {};
+      } catch {
+        console.info(
+          '[ProjectSettingsReader] No package.json found - toolbar buttons disabled'
+        );
+      }
+
+      // Only process buttons if we have a valid package.json with scripts
+      if (Object.keys(availableScripts).length > 0) {
+        for (const rawButton of rawToolbarButtons) {
+          const name = SafeExtractor.extractStringProperty(rawButton, 'name');
+          const icon = SafeExtractor.extractStringProperty(rawButton, 'icon');
+          const npmScript = SafeExtractor.extractStringProperty(rawButton, 'npmScript');
+          if (name && icon && npmScript) {
+            if (!SAFE_SCRIPT_NAME_PATTERN.test(npmScript)) {
+              console.warn(
+                `[ProjectSettingsReader] Skipping button "${name}": invalid script name "${npmScript}"`
+              );
+              continue;
+            }
+            if (!availableScripts[npmScript]) {
+              console.warn(
+                `[ProjectSettingsReader] Skipping button "${name}": script "${npmScript}" not found in package.json`
+              );
+              continue;
+            }
+            toolbarButtons.push({ name, icon, npmScript });
+          }
         }
       }
     }

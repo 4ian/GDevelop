@@ -207,9 +207,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setAutomaticallyUseCreditsForAiRequests: this._setAutomaticallyUseCreditsForAiRequests.bind(
       this
     ),
-    setHasSeenInGameEditorWarning: this._setHasSeenInGameEditorWarning.bind(
-      this
-    ),
     setUseBackgroundSerializerForSaving: this._setUseBackgroundSerializerForSaving.bind(
       this
     ),
@@ -1009,18 +1006,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           displaySaveReminder: newValue,
-        },
-      }),
-      () => this._persistValuesToLocalStorage(this.state)
-    );
-  }
-
-  _setHasSeenInGameEditorWarning(newValue: boolean) {
-    this.setState(
-      state => ({
-        values: {
-          ...state.values,
-          hasSeenInGameEditorWarning: newValue,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

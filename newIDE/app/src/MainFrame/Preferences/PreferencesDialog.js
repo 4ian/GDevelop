@@ -86,7 +86,6 @@ const PreferencesDialog = ({
     setShowAiAskButtonInTitleBar,
     setAutomaticallyUseCreditsForAiRequests,
     setShowCreateSectionByDefault,
-    setHasSeenInGameEditorWarning,
     setUseBackgroundSerializerForSaving,
   } = React.useContext(PreferencesContext);
 
@@ -652,12 +651,6 @@ const PreferencesDialog = ({
                     fullWidth
                     onClick={onOpenQuickCustomizationDialog}
                     label={<Trans>Open quick customization</Trans>}
-                  />
-                  <FlatButton
-                    fullWidth
-                    label={<Trans>Show again in-game editor warning</Trans>}
-                    onClick={() => setHasSeenInGameEditorWarning(false)}
-                    disabled={!values.hasSeenInGameEditorWarning}
                   />
                 </ColumnStackLayout>
               </ColumnStackLayout>

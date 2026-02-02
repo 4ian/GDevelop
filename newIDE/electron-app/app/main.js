@@ -282,6 +282,33 @@ app.on('ready', function() {
 
   Menu.setApplicationMenu(buildPlaceholderMainMenu());
 
+  // Set up dock menu (macOS) for creating new windows
+  if (app.dock) {
+    const dockMenu = Menu.buildFromTemplate([
+      {
+        label: 'New window',
+        click: () => {
+          createNewWindow(args);
+        },
+      },
+    ]);
+    app.dock.setMenu(dockMenu);
+  }
+
+  // Set up jump list tasks (Windows) for creating new windows
+  if (process.platform === 'win32') {
+    app.setUserTasks([
+      {
+        program: process.execPath,
+        arguments: '',
+        iconPath: process.execPath,
+        iconIndex: 0,
+        title: 'New window',
+        description: 'Open a new GDevelop window',
+      },
+    ]);
+  }
+
   ipcMain.on('set-main-menu', (event, mainMenuTemplate) => {
     const window = BrowserWindow.fromWebContents(event.sender);
     Menu.setApplicationMenu(

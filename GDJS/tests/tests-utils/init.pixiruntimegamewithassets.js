@@ -7,12 +7,15 @@
  * @param props {?{customObjectInstances?: Array<InstanceData>}}
  * @returns {Promise<gdjs.RuntimeGame>} A promise resolving with the game with loaded assets.
  */
-gdjs.getPixiRuntimeGameWithAssets = (props) => {
-  if (gdjs.getPixiRuntimeGameWithAssets._pixiRuntimeGameWithAssetsPromise) {
+gdjs.getPixiRuntimeGameWithAssets = (props = null) => {
+  if (
+    gdjs.getPixiRuntimeGameWithAssets._pixiRuntimeGameWithAssetsPromise &&
+    !props
+  ) {
     return gdjs.getPixiRuntimeGameWithAssets._pixiRuntimeGameWithAssetsPromise;
   }
 
-  var runtimeGame = new gdjs.RuntimeGame({
+  const runtimeGame = new gdjs.RuntimeGame({
     variables: [],
     properties: {
       adaptGameResolutionAtRuntime: true,
@@ -243,20 +246,23 @@ gdjs.getPixiRuntimeGameWithAssets = (props) => {
     ],
   });
 
-  gdjs.getPixiRuntimeGameWithAssets._pixiRuntimeGameWithAssetsPromise =
-    new Promise((resolve) => {
-      runtimeGame.loadAllAssets(
-        () => {
-          console.info('Done loading assets for test game');
+  const pixiRuntimeGameWithAssetsPromise = new Promise((resolve) => {
+    runtimeGame.loadAllAssets(
+      () => {
+        console.info('Done loading assets for test game');
 
-          resolve(runtimeGame);
-        },
-        () => {
-          /* Ignore progress */
-        }
-      );
-    });
-  return gdjs.getPixiRuntimeGameWithAssets._pixiRuntimeGameWithAssetsPromise;
+        resolve(runtimeGame);
+      },
+      () => {
+        /* Ignore progress */
+      }
+    );
+  });
+  if (!props) {
+    gdjs.getPixiRuntimeGameWithAssets._pixiRuntimeGameWithAssetsPromise =
+      pixiRuntimeGameWithAssetsPromise;
+  }
+  return pixiRuntimeGameWithAssetsPromise;
 };
 
 /**

@@ -230,7 +230,6 @@ export type PreferencesValues = {|
   showAiAskButtonInTitleBar: boolean,
   aiState: {| aiRequestId: string | null |},
   automaticallyUseCreditsForAiRequests: boolean,
-  hasSeenInGameEditorWarning: boolean,
   useBackgroundSerializerForSaving: boolean,
 |};
 
@@ -349,7 +348,6 @@ export type Preferences = {|
     aiRequestId: string | null,
   |}) => void,
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => void,
-  setHasSeenInGameEditorWarning: (enabled: boolean) => void,
   setUseBackgroundSerializerForSaving: (enabled: boolean) => void,
 |};
 
@@ -412,7 +410,6 @@ export const initialPreferences = {
     showAiAskButtonInTitleBar: true,
     aiState: { aiRequestId: null },
     automaticallyUseCreditsForAiRequests: false,
-    hasSeenInGameEditorWarning: false,
     useBackgroundSerializerForSaving: false,
   },
   setMultipleValues: () => {},
@@ -494,7 +491,6 @@ export const initialPreferences = {
   setShowAiAskButtonInTitleBar: (enabled: boolean) => {},
   setAiState: ({ aiRequestId }: {| aiRequestId: string | null |}) => {},
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => {},
-  setHasSeenInGameEditorWarning: (enabled: boolean) => {},
   setUseBackgroundSerializerForSaving: (enabled: boolean) => {},
 };
 

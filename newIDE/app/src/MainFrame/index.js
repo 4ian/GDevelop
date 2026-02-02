@@ -3949,8 +3949,10 @@ const MainFrame = (props: Props) => {
     ]
   );
 
-  const saveWithBackgroundSerializer =
-    preferences.values.useBackgroundSerializerForSaving;
+  // const saveWithBackgroundSerializer =
+  //   preferences.values.useBackgroundSerializerForSaving;
+  // Hardcode to false for now as libGD.js is not loaded properly by the worker in production (file:// protocol).
+  const saveWithBackgroundSerializer = false;
   const saveProject = React.useCallback(
     async (options?: {|
       skipNewVersionWarning: boolean,

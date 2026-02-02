@@ -196,10 +196,6 @@ jobs:
           name: Install dependencies for Emscripten
           command: sudo apt-get update && sudo apt install cmake
 
-      # - run:
-      #     name: Install Python3 dependencies for Emscripten
-      #     command: pip3 install setuptools
-
       - run:
           name: Install Emscripten (for GDevelop.js)
           command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 3.1.21 && ./emsdk activate 3.1.21 && cd ..
@@ -258,10 +254,6 @@ jobs:
       - run:
           name: Install dependencies for clang-tidy v19
           command: wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh 19 && sudo apt install clang-tidy-19
-
-      # - run:
-      #     name: Install Python3 dependencies for Emscripten
-      #     command: pip3 install setuptools
 
       - run:
           name: Install Emscripten (for GDevelop.js)

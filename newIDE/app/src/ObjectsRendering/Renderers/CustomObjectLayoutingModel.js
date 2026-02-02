@@ -41,11 +41,14 @@ export type ObjectAnchor = {
 const getPropertyValue = (
   name: string,
   properties: gdMapStringPropertyDescriptor,
-  overridingProperties: gdMapStringPropertyDescriptor | null
+  behaviorOverriding: gdBehavior | null
 ): CustomObjectConfiguration_EdgeAnchor =>
-  overridingProperties && overridingProperties.has(name)
+  behaviorOverriding && behaviorOverriding.hasPropertyValue(name)
     ? gd.CustomObjectConfiguration.getEdgeAnchorFromString(
-        overridingProperties.get(name).getValue()
+        behaviorOverriding
+          .getProperties()
+          .get(name)
+          .getValue()
       )
     : properties.has(name)
     ? gd.CustomObjectConfiguration.getEdgeAnchorFromString(
@@ -81,30 +84,30 @@ export const getObjectAnchor = (
     return getDefaultAnchor();
   }
   const properties = childObject.getBehavior('Anchor').getProperties();
-  const overridingProperties = initialInstance.hasBehaviorOverridingNamed(
+  const behaviorOverriding = initialInstance.hasBehaviorOverridingNamed(
     'Anchor'
   )
-    ? initialInstance.getBehaviorOverriding('Anchor').getProperties()
+    ? initialInstance.getBehaviorOverriding('Anchor')
     : null;
   const leftEdgeAnchor = getPropertyValue(
     'leftEdgeAnchor',
     properties,
-    overridingProperties
+    behaviorOverriding
   );
   const topEdgeAnchor = getPropertyValue(
     'topEdgeAnchor',
     properties,
-    overridingProperties
+    behaviorOverriding
   );
   const rightEdgeAnchor = getPropertyValue(
     'rightEdgeAnchor',
     properties,
-    overridingProperties
+    behaviorOverriding
   );
   const bottomEdgeAnchor = getPropertyValue(
     'bottomEdgeAnchor',
     properties,
-    overridingProperties
+    behaviorOverriding
   );
   return { leftEdgeAnchor, topEdgeAnchor, rightEdgeAnchor, bottomEdgeAnchor };
 };

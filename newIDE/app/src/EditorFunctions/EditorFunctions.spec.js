@@ -628,6 +628,228 @@ describe('editorFunctions', () => {
     });
   });
 
+  describe('change_object_property', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+
+      // Add font resources to the project
+      const fontResource1 = new gd.FontResource();
+      fontResource1.setName('font1.ttf');
+      fontResource1.setFile('font1.ttf');
+      project.getResourcesManager().addResource(fontResource1);
+
+      // Create a TextObject with a font property (resource type)
+      const testSceneObjects = testScene.getObjects();
+      const textObject = testSceneObjects.insertNewObject(
+        project,
+        'TextObject::Text',
+        'MyTextObject',
+        testSceneObjects.getObjectsCount()
+      );
+      // Set the font property to an existing resource
+      textObject.getConfiguration().updateProperty('font', 'font1.ttf');
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('handles various property types: resource, non-existing, boolean, and number with sanitization warning', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_object_property.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MyTextObject',
+            changed_properties: [
+              // Valid change but a property name with a typo
+              {
+                property_name: 'Character-size_',
+                new_value: '56',
+              },
+              // Change a choice
+              {
+                property_name: 'textAlignment',
+                new_value: 'INVALID_CHOICE',
+              },
+              {
+                property_name: 'verticalTextAlignment',
+                new_value: 'BoTTOm',
+              },
+              // Try to change a non-existing property
+              {
+                property_name: 'nonExistingProperty',
+                new_value: 'someValue',
+              },
+              // Change a boolean property with "true"
+              {
+                property_name: 'bold',
+                new_value: 'YES',
+              },
+              {
+                property_name: 'isShadowEnabled',
+                new_value: '1',
+              },
+              // Change a boolean property with "FALSE"
+              {
+                property_name: 'italic',
+                new_value: 'FALSE',
+              },
+              // Change a number property with a value that will be sanitized
+              {
+                property_name: 'shadowAngle',
+                new_value: '20,40 , 50',
+              },
+              {
+                property_name: 'shadowDistance',
+                new_value: '20X   40 X 50',
+              },
+              {
+                property_name: 'shadowBlurRadius',
+                new_value: '20.41 × 50',
+              },
+            ],
+          },
+        }
+      );
+
+      // The operation should succeed overall (some changes were made)
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(`
+        "Successfully done some changes but some issues were found - see the warnings.
+        Changed property \\"characterSize\\" of object \\"MyTextObject\\" to \\"56\\".
+        Changed property \\"verticalTextAlignment\\" of object \\"MyTextObject\\" to \\"bottom\\".
+        Changed property \\"bold\\" of object \\"MyTextObject\\" to \\"true\\".
+        Changed property \\"isShadowEnabled\\" of object \\"MyTextObject\\" to \\"true\\".
+        Changed property \\"italic\\" of object \\"MyTextObject\\" to \\"false\\".
+        Changed property \\"shadowAngle\\" of object \\"MyTextObject\\" to \\"20\\".
+        Changed property \\"shadowDistance\\" of object \\"MyTextObject\\" to \\"0\\".
+        Changed property \\"shadowBlurRadius\\" of object \\"MyTextObject\\" to \\"20.41\\".
+        Warnings:
+        Could not change property \\"textAlignment\\" of object \\"MyTextObject\\". The value might be invalid, of the wrong type or not allowed.
+        Property not found: nonExistingProperty on object MyTextObject.
+        Property \\"shadowAngle\\" of object \\"MyTextObject\\" was changed to 20 - but the original requested value (20,40 , 50) looks like a size with multiple dimensions. This is not supported, only a number is allowed here.
+        Property \\"shadowDistance\\" of object \\"MyTextObject\\" was changed to 0 - but the original requested value (20X   40 X 50) looks like a size with multiple dimensions. This is not supported, only a number is allowed here.
+        Property \\"shadowBlurRadius\\" of object \\"MyTextObject\\" was changed to 20.41 - but the original requested value (20.41 × 50) looks like a size with multiple dimensions. This is not supported, only a number is allowed here."
+      `);
+
+      // Verify the properties were actually changed
+      const textObject = testScene.getObjects().getObject('MyTextObject');
+      const properties = textObject.getConfiguration().getProperties();
+
+      expect(properties.get('characterSize').getValue()).toBe('56');
+      expect(properties.get('bold').getValue()).toBe('true');
+      expect(properties.get('italic').getValue()).toBe('false');
+      expect(properties.get('shadowAngle').getValue()).toBe('20');
+    });
+  });
+
+  describe('change_behavior_property', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+
+      // Create a Sprite object and add a PlatformerObject behavior to it
+      const testSceneObjects = testScene.getObjects();
+      const spriteObject = testSceneObjects.insertNewObject(
+        project,
+        'Sprite',
+        'MySprite',
+        testSceneObjects.getObjectsCount()
+      );
+
+      // Add PlatformerObject behavior
+      spriteObject.addNewBehavior(
+        project,
+        'PlatformBehavior::PlatformerObjectBehavior',
+        'PlatformerObject'
+      );
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('changes behavior properties with warnings for invalid values', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_behavior_property.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            behavior_name: 'PlatformerObject',
+            changed_properties: [
+              // Change number properties
+              {
+                property_name: 'GRAVITY',
+                new_value: '1500',
+              },
+              {
+                property_name: 'JumpSpeed',
+                new_value: '800',
+              },
+              {
+                property_name: 'Max_speed',
+                new_value: '300 x 20',
+              },
+              // Change a boolean property with "true"
+              {
+                property_name: 'CanGrabPlatforms',
+                new_value: 'true',
+              },
+              // Change a boolean property with "FALSE"
+              {
+                property_name: 'IgnoreDefaultControls',
+                new_value: 'FALSE',
+              },
+              // Try to change a non-existing property
+              {
+                property_name: 'nonExistingProperty',
+                new_value: 'someValue',
+              },
+            ],
+          },
+        }
+      );
+
+      // The operation should succeed overall (some changes were made)
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(`
+        "Successfully done some changes but some issues were found - see the warnings.
+        Changed property \\"Gravity\\" of behavior \\"PlatformerObject\\" to \\"1500\\".
+        Changed property \\"JumpSpeed\\" of behavior \\"PlatformerObject\\" to \\"800\\".
+        Changed property \\"MaxSpeed\\" of behavior \\"PlatformerObject\\" to \\"300\\".
+        Changed property \\"CanGrabPlatforms\\" of behavior \\"PlatformerObject\\" to \\"true\\".
+        Changed property \\"IgnoreDefaultControls\\" of behavior \\"PlatformerObject\\" to \\"false\\".
+        Warnings:
+        Property \\"MaxSpeed\\" of behavior \\"PlatformerObject\\" was changed to 300 - but the original requested value (300 x 20) looks like a size with multiple dimensions. This is not supported, only a number is allowed here.
+        Property \\"nonExistingProperty\\" not found on behavior \\"PlatformerObject\\" of object \\"MySprite\\"."
+      `);
+
+      // Verify the behavior properties were actually changed
+      const spriteObject = testScene.getObjects().getObject('MySprite');
+      const behavior = spriteObject.getBehavior('PlatformerObject');
+      const behaviorProperties = behavior.getProperties();
+
+      expect(behaviorProperties.get('Gravity').getValue()).toBe('1500');
+      expect(behaviorProperties.get('JumpSpeed').getValue()).toBe('800');
+      expect(behaviorProperties.get('MaxSpeed').getValue()).toBe('300');
+      expect(behaviorProperties.get('CanGrabPlatforms').getValue()).toBe(
+        'true'
+      );
+      expect(behaviorProperties.get('IgnoreDefaultControls').getValue()).toBe(
+        'false'
+      );
+    });
+  });
+
   describe('add_scene_events', () => {
     let project: gdProject;
     let testScene: gdLayout;

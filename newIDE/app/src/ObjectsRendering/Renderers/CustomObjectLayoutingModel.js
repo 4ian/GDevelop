@@ -252,15 +252,18 @@ export class LayoutedInstance {
     globalObjectsContainer: gdObjectsContainer,
     objectsContainer: gdObjectsContainer
   ) {
-    return null;
+    return this.instance.getCustomProperties(
+      globalObjectsContainer,
+      objectsContainer
+    );
   }
 
   getRawDoubleProperty(name: string) {
-    return 0;
+    return this.instance.getRawDoubleProperty(name);
   }
 
   getRawStringProperty(name: string) {
-    return '';
+    return this.instance.getRawStringProperty(name);
   }
 
   setRawDoubleProperty(name: string, value: number) {}

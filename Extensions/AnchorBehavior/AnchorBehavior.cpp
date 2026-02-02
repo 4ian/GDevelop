@@ -26,30 +26,30 @@ void AnchorBehavior::InitializeContent(gd::SerializerElement& content) {
 }
 
 namespace {
-gd::String GetAnchorAsString(AnchorBehavior::HorizontalAnchor anchor) {
+gd::String GetHorizontalAnchorAsString(AnchorBehavior::HorizontalAnchor anchor) {
   if (anchor == AnchorBehavior::ANCHOR_HORIZONTAL_WINDOW_LEFT)
-    return _("Window left");
+    return "WindowLeft";
   else if (anchor == AnchorBehavior::ANCHOR_HORIZONTAL_WINDOW_RIGHT)
-    return _("Window right");
+    return "WindowRight";
   else if (anchor == AnchorBehavior::ANCHOR_HORIZONTAL_PROPORTIONAL)
-    return _("Proportional");
+    return "Proportional";
   else if (anchor == AnchorBehavior::ANCHOR_HORIZONTAL_WINDOW_CENTER)
-    return _("Window center");
+    return "WindowCenter";
   else
-    return _("No anchor");
+    return "None";
 }
 
-gd::String GetAnchorAsString(AnchorBehavior::VerticalAnchor anchor) {
+gd::String GetVerticalAnchorAsString(AnchorBehavior::VerticalAnchor anchor) {
   if (anchor == AnchorBehavior::ANCHOR_VERTICAL_WINDOW_TOP)
-    return _("Window top");
+    return "WindowTop";
   else if (anchor == AnchorBehavior::ANCHOR_VERTICAL_WINDOW_BOTTOM)
-    return _("Window bottom");
+    return "WindowBottom";
   else if (anchor == AnchorBehavior::ANCHOR_VERTICAL_PROPORTIONAL)
-    return _("Proportional");
+    return "Proportional";
   else if (anchor == AnchorBehavior::ANCHOR_VERTICAL_WINDOW_CENTER)
-    return _("Window center");
+    return "WindowCenter";
   else
-    return _("No anchor");
+    return "None";
 }
 }  // namespace
 
@@ -67,50 +67,50 @@ std::map<gd::String, gd::PropertyDescriptor> AnchorBehavior::GetProperties(
                         "window size when the object is created."));
 
   properties["leftEdgeAnchor"]
-      .SetValue(GetAnchorAsString(static_cast<HorizontalAnchor>(
+      .SetValue(GetHorizontalAnchorAsString(static_cast<HorizontalAnchor>(
           behaviorContent.GetIntAttribute("leftEdgeAnchor"))))
       .SetType("Choice")
-      .AddExtraInfo(_("No anchor"))
-      .AddExtraInfo(_("Window left"))
-      .AddExtraInfo(_("Window center"))
-      .AddExtraInfo(_("Window right"))
-      .AddExtraInfo(_("Proportional"))
+      .AddChoice("None", _("No anchor"))
+      .AddChoice("WindowLeft", _("Window left"))
+      .AddChoice("WindowCenter", _("Window center"))
+      .AddChoice("WindowRight", _("Window right"))
+      .AddChoice("Proportional", _("Proportional"))
       .SetLabel(_("Left edge"))
       .SetDescription(_("Anchor the left edge of the object on X axis."));
 
   properties["rightEdgeAnchor"]
-      .SetValue(GetAnchorAsString(static_cast<HorizontalAnchor>(
+      .SetValue(GetHorizontalAnchorAsString(static_cast<HorizontalAnchor>(
           behaviorContent.GetIntAttribute("rightEdgeAnchor"))))
       .SetType("Choice")
-      .AddExtraInfo(_("No anchor"))
-      .AddExtraInfo(_("Window left"))
-      .AddExtraInfo(_("Window center"))
-      .AddExtraInfo(_("Window right"))
-      .AddExtraInfo(_("Proportional"))
+      .AddChoice("None", _("No anchor"))
+      .AddChoice("WindowLeft", _("Window left"))
+      .AddChoice("WindowCenter", _("Window center"))
+      .AddChoice("WindowRight", _("Window right"))
+      .AddChoice("Proportional", _("Proportional"))
       .SetLabel(_("Right edge"))
       .SetDescription(_("Anchor the right edge of the object on X axis."));
 
   properties["topEdgeAnchor"]
-      .SetValue(GetAnchorAsString(static_cast<VerticalAnchor>(
+      .SetValue(GetVerticalAnchorAsString(static_cast<VerticalAnchor>(
           behaviorContent.GetIntAttribute("topEdgeAnchor"))))
       .SetType("Choice")
-      .AddExtraInfo(_("No anchor"))
-      .AddExtraInfo(_("Window top"))
-      .AddExtraInfo(_("Window center"))
-      .AddExtraInfo(_("Window bottom"))
-      .AddExtraInfo(_("Proportional"))
+      .AddChoice("None", _("No anchor"))
+      .AddChoice("WindowTop", _("Window top"))
+      .AddChoice("WindowCenter", _("Window center"))
+      .AddChoice("WindowBottom", _("Window bottom"))
+      .AddChoice("Proportional", _("Proportional"))
       .SetLabel(_("Top edge"))
       .SetDescription(_("Anchor the top edge of the object on Y axis."));
 
   properties["bottomEdgeAnchor"]
-      .SetValue(GetAnchorAsString(static_cast<VerticalAnchor>(
+      .SetValue(GetVerticalAnchorAsString(static_cast<VerticalAnchor>(
           behaviorContent.GetIntAttribute("bottomEdgeAnchor"))))
       .SetType("Choice")
-      .AddExtraInfo(_("No anchor"))
-      .AddExtraInfo(_("Window top"))
-      .AddExtraInfo(_("Window center"))
-      .AddExtraInfo(_("Window bottom"))
-      .AddExtraInfo(_("Proportional"))
+      .AddChoice("None", _("No anchor"))
+      .AddChoice("WindowTop", _("Window top"))
+      .AddChoice("WindowCenter", _("Window center"))
+      .AddChoice("WindowBottom", _("Window bottom"))
+      .AddChoice("Proportional", _("Proportional"))
       .SetLabel(_("Bottom edge"))
       .SetDescription(_("Anchor the bottom edge of the object on Y axis."));
 
@@ -132,13 +132,14 @@ std::map<gd::String, gd::PropertyDescriptor> AnchorBehavior::GetProperties(
 namespace {
 AnchorBehavior::HorizontalAnchor GetHorizontalAnchorFromString(
     const gd::String& value) {
-  if (value == _("Window left"))
+  auto normalizedValue = value.LowerCase();
+  if (normalizedValue == "windowleft")
     return AnchorBehavior::ANCHOR_HORIZONTAL_WINDOW_LEFT;
-  else if (value == _("Window right"))
+  else if (normalizedValue == "windowright")
     return AnchorBehavior::ANCHOR_HORIZONTAL_WINDOW_RIGHT;
-  else if (value == _("Proportional"))
+  else if (normalizedValue == "proportional")
     return AnchorBehavior::ANCHOR_HORIZONTAL_PROPORTIONAL;
-  else if (value == _("Window center"))
+  else if (normalizedValue == "windowcenter")
     return AnchorBehavior::ANCHOR_HORIZONTAL_WINDOW_CENTER;
   else
     return AnchorBehavior::ANCHOR_HORIZONTAL_NONE;
@@ -146,13 +147,14 @@ AnchorBehavior::HorizontalAnchor GetHorizontalAnchorFromString(
 
 AnchorBehavior::VerticalAnchor GetVerticalAnchorFromString(
     const gd::String& value) {
-  if (value == _("Window top"))
+  auto normalizedValue = value.LowerCase();
+  if (normalizedValue == "windowtop")
     return AnchorBehavior::ANCHOR_VERTICAL_WINDOW_TOP;
-  else if (value == _("Window bottom"))
+  else if (normalizedValue == "windowbottom")
     return AnchorBehavior::ANCHOR_VERTICAL_WINDOW_BOTTOM;
-  else if (value == _("Proportional"))
+  else if (normalizedValue == "proportional")
     return AnchorBehavior::ANCHOR_VERTICAL_PROPORTIONAL;
-  else if (value == _("Window center"))
+  else if (normalizedValue == "windowcenter")
     return AnchorBehavior::ANCHOR_VERTICAL_WINDOW_CENTER;
   else
     return AnchorBehavior::ANCHOR_VERTICAL_NONE;

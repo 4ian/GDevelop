@@ -536,7 +536,7 @@ export const useImportExtension = () => {
       );
 
       if (
-        importedExtensionNames.includes(extensionName =>
+        importedExtensionNames.some(extensionName =>
           project.hasEventsFunctionsExtensionNamed(extensionName)
         )
       ) {

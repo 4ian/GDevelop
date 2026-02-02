@@ -43,7 +43,14 @@ module.exports = {
       newValue
     ) {
       if (propertyName === 'bodyType') {
-        behaviorContent.getChild('bodyType').setStringValue(newValue);
+        const normalizedValue = newValue.toLowerCase();
+        let bodyTypeValue = '';
+        if (normalizedValue === 'static') bodyTypeValue = 'Static';
+        else if (normalizedValue === 'dynamic') bodyTypeValue = 'Dynamic';
+        else if (normalizedValue === 'kinematic') bodyTypeValue = 'Kinematic';
+        else return false;
+
+        behaviorContent.getChild('bodyType').setStringValue(bodyTypeValue);
         return true;
       }
 
@@ -65,7 +72,15 @@ module.exports = {
       }
 
       if (propertyName === 'shape') {
-        behaviorContent.getChild('shape').setStringValue(newValue);
+        const normalizedValue = newValue.toLowerCase();
+        let shapeValue = '';
+        if (normalizedValue === 'box') shapeValue = 'Box';
+        else if (normalizedValue === 'circle') shapeValue = 'Circle';
+        else if (normalizedValue === 'edge') shapeValue = 'Edge';
+        else if (normalizedValue === 'polygon') shapeValue = 'Polygon';
+        else return false;
+
+        behaviorContent.getChild('shape').setStringValue(shapeValue);
         return true;
       }
 
@@ -106,7 +121,14 @@ module.exports = {
       }
 
       if (propertyName === 'polygonOrigin') {
-        behaviorContent.addChild('polygonOrigin').setStringValue(newValue);
+        const normalizedValue = newValue.toLowerCase();
+        let originValue = '';
+        if (normalizedValue === 'center') originValue = 'Center';
+        else if (normalizedValue === 'origin') originValue = 'Origin';
+        else if (normalizedValue === 'topleft') originValue = 'TopLeft';
+        else return false;
+
+        behaviorContent.addChild('polygonOrigin').setStringValue(originValue);
         return true;
       }
 

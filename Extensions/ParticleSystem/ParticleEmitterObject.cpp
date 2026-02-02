@@ -60,9 +60,17 @@ bool ParticleEmitterObject::UpdateProperty(const gd::String& propertyName,
     return true;
   }
   if (propertyName == "rendererType") {
-    auto newRendererType = newValue == "Circle" ? Point
-                           : newValue == "Line" ? Line
-                                                : Quad;
+    auto normalizedValue = newValue.LowerCase();
+    auto newRendererType = Point;
+    if (normalizedValue == "circle") {
+      newRendererType = Point;
+    } else if (normalizedValue == "line") {
+      newRendererType = Line;
+    } else if (normalizedValue == "image") {
+      newRendererType = Quad;
+    } else {
+      return false;
+    }
     SetRendererType(newRendererType);
     if (newRendererType != Quad) {
       SetParticleTexture("");

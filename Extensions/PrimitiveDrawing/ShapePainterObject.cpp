@@ -187,8 +187,13 @@ bool ShapePainterObject::UpdateProperty(const gd::String& propertyName,
   }
 
   if (propertyName == "antialiasing") {
-    SetAntialiasing(newValue);
-    return true;
+    auto normalizedValue = newValue.LowerCase();
+    if (normalizedValue == "none" || normalizedValue == "low" ||
+        normalizedValue == "medium" || normalizedValue == "high") {
+      SetAntialiasing(normalizedValue);
+      return true;
+    }
+    return false;
   }
 
   return false;

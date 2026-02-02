@@ -406,7 +406,7 @@ const PropertiesEditor = ({
         const { setValue } = field;
         return (
           <SelectField
-            value={getFieldValue({ instances, field })}
+            value={'' + getFieldValue({ instances, field })}
             key={field.name}
             id={field.name}
             floatingLabelText={getFieldLabel({ instances, field })}

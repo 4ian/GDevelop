@@ -489,7 +489,7 @@ const CompactPropertiesEditor = ({
         compactSelectField = (
           <CompactSelectField
             key={field.name}
-            value={getFieldValue({ instances, field })}
+            value={'' + getFieldValue({ instances, field })}
             id={field.name}
             onChange={(newValue: string) => {
               instances.forEach(i => setValue(i, parseFloat(newValue) || 0));

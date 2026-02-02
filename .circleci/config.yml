@@ -88,7 +88,6 @@ jobs:
       - store_artifacts:
           path: newIDE/electron-app/dist
 
-
       # Upload artifacts (AWS)
       - run:
           name: Deploy to S3 (specific commit)
@@ -123,7 +122,7 @@ jobs:
     # CircleCI docker workers are failing if they don't have enough memory (no swap)
     resource_class: xlarge
     docker:
-      - image: cimg/node:18.20.8
+      - image: cimg/node:24.13.0
 
     working_directory: ~/GDevelop
 
@@ -184,7 +183,7 @@ jobs:
   build-gdevelop_js-wasm-only:
     resource_class: medium+ # Compilation time decrease linearly with the number of CPUs, but not linking (so "large" does not speedup total build time).
     docker:
-      - image: cimg/node:16.13
+      - image: cimg/node:24.13.0
 
     working_directory: ~/GDevelop
 
@@ -196,10 +195,6 @@ jobs:
       - run:
           name: Install dependencies for Emscripten
           command: sudo apt-get update && sudo apt install cmake
-
-      - run:
-          name: Install Python3 dependencies for Emscripten
-          command: sudo apt install python-is-python3 python3-distutils -y
 
       - run:
           name: Install Emscripten (for GDevelop.js)
@@ -243,7 +238,7 @@ jobs:
   build-gdevelop_js-debug-sanitizers-and-extra-checks:
     resource_class: xlarge # Total time decrease linearly with the number of CPUs.
     docker:
-      - image: cimg/node:16.13
+      - image: cimg/node:24.13.0
 
     working_directory: ~/GDevelop
 
@@ -259,10 +254,6 @@ jobs:
       - run:
           name: Install dependencies for clang-tidy v19
           command: wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh 19 && sudo apt install clang-tidy-19
-
-      - run:
-          name: Install Python3 dependencies for Emscripten
-          command: sudo apt install python-is-python3 python3-distutils -y
 
       - run:
           name: Install Emscripten (for GDevelop.js)
@@ -304,7 +295,7 @@ jobs:
   # Trigger AppVeyor build, which also does a Windows build (keep it for redundancy).
   trigger-appveyor-windows-build:
     docker:
-      - image: cimg/node:16.13
+      - image: cimg/base:current
     steps:
       - run:
           name: Trigger AppVeyor Windows build

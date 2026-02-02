@@ -81,6 +81,7 @@ type Props = {|
     fileMetadata: FileMetadata,
     versionId: string,
     ignoreUnsavedChanges: boolean,
+    ignoreAutoSave: boolean,
     openingMessage: MessageDescriptor,
   |}) => Promise<void>,
 |};
@@ -359,6 +360,7 @@ const useVersionHistory = ({
           fileMetadata,
           versionId: latestVersionId,
           ignoreUnsavedChanges: true,
+          ignoreAutoSave: true,
           openingMessage: t`Opening latest save...`,
         });
         setCheckedOutVersionStatus(null);
@@ -406,6 +408,7 @@ const useVersionHistory = ({
           fileMetadata,
           versionId: version.id,
           ignoreUnsavedChanges: true,
+          ignoreAutoSave: true,
           openingMessage: t`Opening older version...`,
         });
         if (shouldSaveCheckedOutVersionStatus) {

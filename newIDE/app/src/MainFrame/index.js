@@ -1169,7 +1169,10 @@ const MainFrame = (props: Props) => {
   const openFromFileMetadata = React.useCallback(
     async (
       fileMetadata: FileMetadata,
-      options?: {| openingMessage?: ?MessageDescriptor |}
+      options?: {|
+        openingMessage?: ?MessageDescriptor,
+        ignoreAutoSave?: boolean,
+      |}
     ): Promise<?State> => {
       const storageProviderOperations = getStorageProviderOperations();
 
@@ -1190,7 +1193,11 @@ const MainFrame = (props: Props) => {
       }
 
       const checkForAutosave = async (): Promise<FileMetadata> => {
-        if (!getAutoSaveCreationDate || !onGetAutoSave) {
+        if (
+          !getAutoSaveCreationDate ||
+          !onGetAutoSave ||
+          (options && options.ignoreAutoSave)
+        ) {
           return fileMetadata;
         }
 
@@ -1215,7 +1222,11 @@ const MainFrame = (props: Props) => {
       };
 
       const checkForAutosaveAfterFailure = async (): Promise<?FileMetadata> => {
-        if (!getAutoSaveCreationDate || !onGetAutoSave) {
+        if (
+          !getAutoSaveCreationDate ||
+          !onGetAutoSave ||
+          (options && options.ignoreAutoSave)
+        ) {
           return null;
         }
 
@@ -3518,6 +3529,7 @@ const MainFrame = (props: Props) => {
       options: ?{|
         openAllScenes?: boolean,
         ignoreUnsavedChanges?: boolean,
+        ignoreAutoSave?: boolean,
         openingMessage?: ?MessageDescriptor,
       |}
     ): Promise<void> => {
@@ -3542,6 +3554,7 @@ const MainFrame = (props: Props) => {
       getStorageProviderOperations(storageProvider);
       await openFromFileMetadata(fileMetadata, {
         openingMessage: (options && options.openingMessage) || null,
+        ignoreAutoSave: (options && options.ignoreAutoSave) || false,
       })
         .then(state => {
           if (state) {
@@ -3616,11 +3629,13 @@ const MainFrame = (props: Props) => {
       fileMetadata,
       versionId,
       ignoreUnsavedChanges,
+      ignoreAutoSave,
       openingMessage,
     }: {|
       fileMetadata: FileMetadata,
       versionId: string,
       ignoreUnsavedChanges: boolean,
+      ignoreAutoSave: boolean,
       openingMessage: MessageDescriptor,
     |}): Promise<void> => {
       return openFromFileMetadataWithStorageProvider(
@@ -3631,7 +3646,7 @@ const MainFrame = (props: Props) => {
             version: versionId,
           },
         },
-        { ignoreUnsavedChanges, openingMessage }
+        { ignoreUnsavedChanges, ignoreAutoSave, openingMessage }
       );
     },
     [openFromFileMetadataWithStorageProvider]
@@ -3946,8 +3961,10 @@ const MainFrame = (props: Props) => {
     ]
   );
 
-  const saveWithBackgroundSerializer =
-    preferences.values.useBackgroundSerializerForSaving;
+  // const saveWithBackgroundSerializer =
+  //   preferences.values.useBackgroundSerializerForSaving;
+  // Hardcode to false for now as libGD.js is not loaded properly by the worker in production (file:// protocol).
+  const saveWithBackgroundSerializer = false;
   const saveProject = React.useCallback(
     async (options?: {|
       skipNewVersionWarning: boolean,
@@ -4227,6 +4244,7 @@ const MainFrame = (props: Props) => {
         fileMetadata: cloudProjectFileMetadataToRecover,
         versionId,
         ignoreUnsavedChanges: false,
+        ignoreAutoSave: true,
         openingMessage: t`Recovering older version...`,
       });
       setCloudProjectFileMetadataToRecover(null);

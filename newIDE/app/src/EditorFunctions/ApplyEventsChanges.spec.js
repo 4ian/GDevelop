@@ -1,6 +1,13 @@
 // @flow
-import { applyEventsChanges } from './ApplyEventsChanges';
+import {
+  applyEventsChanges,
+  addMissingObjectBehaviors,
+} from './ApplyEventsChanges';
 import { type AiGeneratedEventChange } from '../Utils/GDevelopServices/Generation';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
 
 const gd: libGDevelop = global.gd;
 
@@ -116,6 +123,136 @@ describe('applyEventsChanges', () => {
         .getEventAt(0)
         .getType()
     ).toBe('BuiltinCommonInstructions::Comment');
+  });
+
+  it('should delete an event by aiGeneratedEventId', () => {
+    sceneEventsList.clear();
+    unserializeFromJSObject(
+      sceneEventsList,
+      [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [{ type: { value: 'Hide' }, parameters: ['Box_Collider1'] }],
+        },
+        {
+          aiGeneratedEventId: '01KG391494T5Y99ZN04G8MNABN',
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [{ type: { value: 'Hide' }, parameters: ['Box_Collider2'] }],
+        },
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [{ type: { value: 'Hide' }, parameters: ['Box_Collider3'] }],
+          events: [
+            {
+              aiGeneratedEventId: '01KG391494T5Y99ZN04G8MNAB3',
+              type: 'BuiltinCommonInstructions::Standard',
+              conditions: [],
+              actions: [
+                { type: { value: 'Hide' }, parameters: ['Box_Collider4'] },
+              ],
+            },
+            {
+              aiGeneratedEventId: '01KG391494T5Y99ZN04G8MNAB2',
+              type: 'BuiltinCommonInstructions::Standard',
+              conditions: [],
+              actions: [
+                { type: { value: 'Hide' }, parameters: ['Box_Collider5'] },
+              ],
+            },
+          ],
+        },
+      ],
+      'unserializeFrom',
+      project
+    );
+
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationTargetEvent: '01KG391494T5Y99ZN04G8MNABN',
+        undeclaredObjectVariables: {},
+        generatedEvents: null,
+        diagnosticLines: [],
+        extensionNames: null,
+        undeclaredVariables: [],
+        isEventsJsonValid: true,
+        operationName: 'delete_event',
+        missingResources: [],
+        areEventsValid: true,
+        missingObjectBehaviors: {},
+      },
+      {
+        operationTargetEvent: '01KG391494T5Y99ZN04G8MNAB2',
+        undeclaredObjectVariables: {},
+        generatedEvents: null,
+        diagnosticLines: [],
+        extensionNames: null,
+        undeclaredVariables: [],
+        isEventsJsonValid: true,
+        operationName: 'delete_event',
+        missingResources: [],
+        areEventsValid: true,
+        missingObjectBehaviors: {},
+      },
+    ];
+    applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    expect(serializeToJSObject(sceneEventsList)).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "actions": Array [
+            Object {
+              "parameters": Array [
+                "Box_Collider1",
+              ],
+              "type": Object {
+                "value": "Hide",
+              },
+            },
+          ],
+          "conditions": Array [],
+          "type": "BuiltinCommonInstructions::Standard",
+        },
+        Object {
+          "actions": Array [
+            Object {
+              "parameters": Array [
+                "Box_Collider3",
+              ],
+              "type": Object {
+                "value": "Hide",
+              },
+            },
+          ],
+          "conditions": Array [],
+          "events": Array [
+            Object {
+              "actions": Array [
+                Object {
+                  "parameters": Array [
+                    "Box_Collider4",
+                  ],
+                  "type": Object {
+                    "value": "Hide",
+                  },
+                },
+              ],
+              "aiGeneratedEventId": "01KG391494T5Y99ZN04G8MNAB3",
+              "conditions": Array [],
+              "type": "BuiltinCommonInstructions::Standard",
+            },
+          ],
+          "type": "BuiltinCommonInstructions::Standard",
+        },
+      ]
+    `);
   });
 
   it('should insert events before a specified path', () => {
@@ -1104,5 +1241,104 @@ describe('applyEventsChanges', () => {
       expect.stringContaining('Could not find event with aiGeneratedEventId')
     );
     consoleWarnSpy.mockRestore();
+  });
+});
+
+describe('addMissingObjectBehaviors', () => {
+  let project: gdProject;
+  let testScene: gdLayout;
+
+  beforeEach(() => {
+    project = new gd.ProjectHelper.createNewGDJSProject();
+    testScene = project.insertNewLayout('TestScene', 0);
+  });
+
+  afterEach(() => {
+    project.delete();
+  });
+
+  it('should add a PlatformerObjectBehavior to an object', () => {
+    // Create a Sprite object in the scene
+    const testSceneObjects = testScene.getObjects();
+    const playerObject = testSceneObjects.insertNewObject(
+      project,
+      'Sprite',
+      'Player',
+      testSceneObjects.getObjectsCount()
+    );
+
+    // Verify the object does not have the behavior initially
+    expect(playerObject.hasBehaviorNamed('PlatformerObject')).toBe(false);
+
+    // Add the PlatformerObjectBehavior
+    addMissingObjectBehaviors({
+      project,
+      scene: testScene,
+      objectName: 'Player',
+      missingBehaviors: [
+        {
+          objectName: 'Player',
+          name: 'PlatformerObject',
+          type: 'PlatformBehavior::PlatformerObjectBehavior',
+        },
+      ],
+    });
+
+    // Verify the behavior was added
+    expect(playerObject.hasBehaviorNamed('PlatformerObject')).toBe(true);
+    expect(playerObject.getBehavior('PlatformerObject').getTypeName()).toBe(
+      'PlatformBehavior::PlatformerObjectBehavior'
+    );
+  });
+
+  it('should add a PlatformerObjectBehavior to all objects in an object group', () => {
+    // Create multiple Sprite objects in the scene
+    const testSceneObjects = testScene.getObjects();
+    const player1 = testSceneObjects.insertNewObject(
+      project,
+      'Sprite',
+      'Player1',
+      testSceneObjects.getObjectsCount()
+    );
+    const player2 = testSceneObjects.insertNewObject(
+      project,
+      'Sprite',
+      'Player2',
+      testSceneObjects.getObjectsCount()
+    );
+
+    // Create an object group containing both players
+    const objectGroups = testSceneObjects.getObjectGroups();
+    const playersGroup = objectGroups.insertNew('Players', 0);
+    playersGroup.addObject('Player1');
+    playersGroup.addObject('Player2');
+
+    // Verify the objects do not have the behavior initially
+    expect(player1.hasBehaviorNamed('PlatformerObject')).toBe(false);
+    expect(player2.hasBehaviorNamed('PlatformerObject')).toBe(false);
+
+    // Add the PlatformerObjectBehavior to the group
+    addMissingObjectBehaviors({
+      project,
+      scene: testScene,
+      objectName: 'Players',
+      missingBehaviors: [
+        {
+          objectName: 'Players',
+          name: 'PlatformerObject',
+          type: 'PlatformBehavior::PlatformerObjectBehavior',
+        },
+      ],
+    });
+
+    // Verify the behavior was added to all objects in the group
+    expect(player1.hasBehaviorNamed('PlatformerObject')).toBe(true);
+    expect(player1.getBehavior('PlatformerObject').getTypeName()).toBe(
+      'PlatformBehavior::PlatformerObjectBehavior'
+    );
+    expect(player2.hasBehaviorNamed('PlatformerObject')).toBe(true);
+    expect(player2.getBehavior('PlatformerObject').getTypeName()).toBe(
+      'PlatformBehavior::PlatformerObjectBehavior'
+    );
   });
 });

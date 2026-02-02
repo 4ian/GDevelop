@@ -44,11 +44,9 @@ export const ExtensionStore = ({
     setSelectedExtensionShortHeader,
   ] = React.useState<?ExtensionShortHeader>(null);
   const {
-    filters,
     searchResults,
     error,
     fetchExtensionsAndFilters,
-    filtersState,
     searchText,
     setSearchText,
     allCategories,
@@ -70,15 +68,6 @@ export const ExtensionStore = ({
           extensionShortHeader.eventsBasedBehaviorsCount > 0
       )
     : null;
-
-  const tagsHandler = React.useMemo(
-    () => ({
-      add: filtersState.addFilter,
-      remove: filtersState.removeFilter,
-      chosenTags: filtersState.chosenFilters,
-    }),
-    [filtersState]
-  );
 
   const getExtensionsMatches = (
     extensionShortHeader: ExtensionShortHeader
@@ -120,8 +109,6 @@ export const ExtensionStore = ({
                 value={searchText}
                 onChange={setSearchText}
                 onRequestSearch={() => {}}
-                tagsHandler={tagsHandler}
-                tags={filters && filters.allTags}
                 placeholder={t`Search extensions`}
                 autoFocus="desktop"
               />

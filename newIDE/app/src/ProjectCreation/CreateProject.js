@@ -9,6 +9,7 @@ import {
   type ExampleProjectSetup,
   type NewProjectCreationSource,
 } from './NewProjectSetupDialog';
+import { retryIfFailed } from '../Utils/RetryIfFailed';
 const gd: libGDevelop = global.gd;
 
 export type NewProjectSource = {|
@@ -151,7 +152,9 @@ export const createNewProjectFromExampleShortHeader = async ({
   newProjectSetup,
 }: ExampleProjectSetup): Promise<?NewProjectSource> => {
   try {
-    const example = await getExample(exampleShortHeader);
+    const example = await retryIfFailed({ times: 3 }, () =>
+      getExample(exampleShortHeader)
+    );
     const creationSource = newProjectSetup.creationSource;
 
     sendNewGameCreated({

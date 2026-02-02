@@ -531,22 +531,22 @@ const getHorizontalAnchorFor = (
   anchor: ?CustomObjectConfiguration_EdgeAnchor
 ) =>
   anchor === gd.CustomObjectConfiguration.MinEdge
-    ? 'Window left'
+    ? 'WindowLeft'
     : anchor === gd.CustomObjectConfiguration.MaxEdge
-    ? 'Window right'
+    ? 'WindowRight'
     : anchor === gd.CustomObjectConfiguration.Center
-    ? 'Window center'
+    ? 'WindowCenter'
     : anchor === gd.CustomObjectConfiguration.Proportional
     ? 'Proportional'
     : 'None';
 
 const getVerticalAnchorFor = (anchor: ?CustomObjectConfiguration_EdgeAnchor) =>
   anchor === gd.CustomObjectConfiguration.MinEdge
-    ? 'Window top'
+    ? 'WindowTop'
     : anchor === gd.CustomObjectConfiguration.MaxEdge
-    ? 'Window bottom'
+    ? 'WindowBottom'
     : anchor === gd.CustomObjectConfiguration.Center
-    ? 'Window center'
+    ? 'WindowCenter'
     : anchor === gd.CustomObjectConfiguration.Proportional
     ? 'Proportional'
     : 'None';

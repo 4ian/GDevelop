@@ -851,6 +851,34 @@ module.exports = {
         objectContent[propertyName] = parseFloat(newValue);
         return true;
       }
+      if (propertyName === 'facesOrientation') {
+        const normalizedValue = newValue.toUpperCase();
+        if (normalizedValue === 'Y' || normalizedValue === 'Z') {
+          objectContent.facesOrientation = normalizedValue;
+          return true;
+        }
+        return false;
+      }
+      if (propertyName === 'backFaceUpThroughWhichAxisRotation') {
+        const normalizedValue = newValue.toUpperCase();
+        if (normalizedValue === 'X' || normalizedValue === 'Y') {
+          objectContent.backFaceUpThroughWhichAxisRotation = normalizedValue;
+          return true;
+        }
+        return false;
+      }
+      if (propertyName === 'materialType') {
+        const normalizedValue = newValue.toLowerCase();
+        if (normalizedValue === 'basic') {
+          objectContent.materialType = 'Basic';
+          return true;
+        }
+        if (normalizedValue === 'standardwithoutmetalness') {
+          objectContent.materialType = 'StandardWithoutMetalness';
+          return true;
+        }
+        return false;
+      }
       if (
         propertyName === 'frontFaceResourceName' ||
         propertyName === 'backFaceResourceName' ||
@@ -858,9 +886,6 @@ module.exports = {
         propertyName === 'rightFaceResourceName' ||
         propertyName === 'topFaceResourceName' ||
         propertyName === 'bottomFaceResourceName' ||
-        propertyName === 'backFaceUpThroughWhichAxisRotation' ||
-        propertyName === 'facesOrientation' ||
-        propertyName === 'materialType' ||
         propertyName === 'tint'
       ) {
         objectContent[propertyName] = newValue;

@@ -1,8 +1,10 @@
-const liveServer = require('live-server');
+const FiveServer = require('five-server').default;
 const httpsConfiguration = require('./Utils/DevServerHttpsConfiguration.js');
 const { getAvailablePort } = require('./Utils/AvailablePortFinder');
 
-/** @type {import("live-server").LiveServerParams} */
+/** @type {import("five-server").default} */
+let serverInstance = null;
+/** @type {import("five-server").LiveServerParams} */
 let currentServerParams = null;
 
 module.exports = {
@@ -15,7 +17,13 @@ module.exports = {
       return;
     }
 
-    liveServer.shutdown();
+    // Shutdown existing server if any
+    if (serverInstance) {
+      serverInstance.shutdown().catch(() => {
+        // Ignore shutdown errors
+      });
+    }
+
     getAvailablePort(2929, 4000).then(
       port => {
         currentServerParams = {
@@ -44,8 +52,16 @@ module.exports = {
             },
           ],
         };
-        liveServer.start(currentServerParams);
-        onDone(null, currentServerParams);
+
+        serverInstance = new FiveServer();
+        serverInstance
+          .start(currentServerParams)
+          .then(() => {
+            onDone(null, currentServerParams);
+          })
+          .catch(err => {
+            onDone(err);
+          });
       },
       err => onDone(err)
     );
@@ -55,9 +71,22 @@ module.exports = {
    * Stop any running server
    */
   stopServer: onDone => {
-    liveServer.shutdown();
-    currentServerParams = null;
-
-    onDone();
+    if (serverInstance) {
+      serverInstance
+        .shutdown()
+        .then(() => {
+          serverInstance = null;
+          currentServerParams = null;
+          onDone();
+        })
+        .catch(err => {
+          serverInstance = null;
+          currentServerParams = null;
+          onDone(err);
+        });
+    } else {
+      currentServerParams = null;
+      onDone();
+    }
   },
 };

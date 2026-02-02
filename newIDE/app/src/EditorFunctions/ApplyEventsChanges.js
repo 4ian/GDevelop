@@ -54,7 +54,7 @@ const parseEventPath = (pathString: string): Array<number> => {
     const partsNoPrefix = pathString.split('.');
     if (
       partsNoPrefix.length > 0 &&
-      partsNoPrefix.every(s => s !== '' && !isNaN(parseInt(s, 10)))
+      partsNoPrefix.every(s => s !== '' && Number.isInteger(Number(s)))
     ) {
       console.warn(
         `Event path string "${originalPathString}" does not start with "event-". Parsed as direct indices.`
@@ -71,14 +71,14 @@ const parseEventPath = (pathString: string): Array<number> => {
   const parts = pathString.split('.');
   if (
     parts.length === 0 ||
-    parts.some(s => s === '' || isNaN(parseInt(s, 10)))
+    parts.some(s => s === '' || !Number.isInteger(Number(s)))
   ) {
     throw new Error(
       `Invalid event path string content: "${originalPathString}". Ensure numbers are separated by dots.`
     );
   }
   return parts.map(s => {
-    const num = parseInt(s, 10);
+    const num = Number(s);
     if (num < 0) {
       throw new Error(
         `Event path indices must be positive in string "${originalPathString}", but found ${num}.`
@@ -272,16 +272,17 @@ export const applyEventsChanges = (
 
     try {
       if (operationTargetEvent) {
-        // First, try to parse as a path string (e.g., "event-0.1.2" or "0.1.2")
-        try {
-          parsedPath = parseEventPath(operationTargetEvent);
-        } catch (pathParseError) {
-          // If parsing as path fails, treat it as an aiGeneratedEventId
-          parsedPath = findEventPathByAiGeneratedEventId(
-            sceneEvents,
-            operationTargetEvent
-          );
-          if (!parsedPath) {
+        // First search for an event with the exact aiGeneratedEventId.
+        parsedPath = findEventPathByAiGeneratedEventId(
+          sceneEvents,
+          operationTargetEvent
+        );
+
+        if (!parsedPath) {
+          // Then try to parse as a path string (e.g., "event-0.1.2" or "0.1.2")
+          try {
+            parsedPath = parseEventPath(operationTargetEvent);
+          } catch (pathParseError) {
             console.warn(
               `Could not find event with aiGeneratedEventId "${operationTargetEvent}" and could not parse as path. Skipping operation "${operationName}".`
             );

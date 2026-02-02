@@ -56,15 +56,45 @@ bool Model3DObjectConfiguration::UpdateProperty(const gd::String &propertyName,
     return true;
   }
   if (propertyName == "materialType") {
-    materialType = newValue;
+    auto normalizedValue = newValue.LowerCase();
+    if (normalizedValue == "basic")
+      materialType = "Basic";
+    else if (normalizedValue == "standardwithoutmetalness")
+      materialType = "StandardWithoutMetalness";
+    else if (normalizedValue == "keeporiginal")
+      materialType = "KeepOriginal";
+    else
+      return false;
     return true;
   }
   if (propertyName == "originLocation") {
-    originLocation = newValue;
+    auto normalizedValue = newValue.LowerCase();
+    if (normalizedValue == "modelorigin")
+      originLocation = "ModelOrigin";
+    else if (normalizedValue == "topleft")
+      originLocation = "TopLeft";
+    else if (normalizedValue == "objectcenter")
+      originLocation = "ObjectCenter";
+    else if (normalizedValue == "bottomcenterz")
+      originLocation = "BottomCenterZ";
+    else if (normalizedValue == "bottomcentery")
+      originLocation = "BottomCenterY";
+    else
+      return false;
     return true;
   }
   if (propertyName == "centerLocation") {
-    centerLocation = newValue;
+    auto normalizedValue = newValue.LowerCase();
+    if (normalizedValue == "modelorigin")
+      centerLocation = "ModelOrigin";
+    else if (normalizedValue == "objectcenter")
+      centerLocation = "ObjectCenter";
+    else if (normalizedValue == "bottomcenterz")
+      centerLocation = "BottomCenterZ";
+    else if (normalizedValue == "bottomcentery")
+      centerLocation = "BottomCenterY";
+    else
+      return false;
     return true;
   }
   if (propertyName == "keepAspectRatio") {

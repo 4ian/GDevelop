@@ -23,14 +23,14 @@
     "@electron/notarize": "^2.1.0",
     "adm-zip": "^0.5.10",
     "dotenv": "^8.2.0",
-    "electron": "18.2.2",
-    "electron-builder": "^24.9.1",
+    "electron": "32.3.3",
+    "electron-builder": "26.4.0",
     "minimist": "^1.2.3",
     "prettier": "1.15.3",
     "shelljs": "0.8.4"
   },
   "dependencies": {
-    "@electron/remote": "^2.0.8",
+    "@electron/remote": "2.1.2",
     "electron-is": "^2.4.0"
   }
 }

@@ -275,7 +275,9 @@ namespace gdjs {
               );
           }
 
+          this._transformationIsUpToDate = false;
           this.updateTransformation();
+          this.invalidateHitboxes();
         }
       );
     }

@@ -163,10 +163,8 @@ function createNewWindow(windowArgs = args) {
     // Create a unique partition for this window so it has independent auth state
     // Each partition gets its own storage (IndexedDB, localStorage, cookies, etc.)
     options.webPreferences.partition = `persist:gdevelop-window-${windowCounter}`;
-    // Force separate renderer process to prevent shared module state (e.g., LocalPreviewDebuggerServer)
-    options.webPreferences.affinity = `gdevelop-window-${windowCounter}`;
     log.info(
-      `Creating window #${windowCounter} with partition: persist:gdevelop-window-${windowCounter}, affinity: gdevelop-window-${windowCounter}`
+      `Creating window #${windowCounter} with partition: persist:gdevelop-window-${windowCounter}`
     );
   } else {
     log.info(

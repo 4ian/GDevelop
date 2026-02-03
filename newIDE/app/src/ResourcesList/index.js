@@ -103,6 +103,18 @@ const ResourcesList = React.memo<Props, ResourcesListInterface>(
       const sortableListRef = React.useRef(null);
       const listContainerRef = React.useRef(null);
 
+      const resourcesManager = project.getResourcesManager();
+      const filteredList = React.useMemo(
+        () => {
+          const allResourcesList = resourcesManager
+            .getAllResourceNames()
+            .toJSArray()
+            .map(resourceName => resourcesManager.getResource(resourceName));
+          return filterResourcesList(allResourcesList, searchText);
+        },
+        [resourcesManager, searchText]
+      );
+
       const deleteResource = React.useCallback(
         (resource: gdResource) => {
           onDeleteResource(resource);
@@ -169,39 +181,41 @@ const ResourcesList = React.memo<Props, ResourcesListInterface>(
       );
 
       const moveSelection = React.useCallback(
-        (delta: number) => {
-          const resourcesManager = project.getResourcesManager();
-          const resourceCount = resourcesManager.count();
+        (delta: number, filteredList: Array<gdResource>) => {
+          const resourceCount = filteredList.length;
 
           if (resourceCount === 0) return;
 
           let nextIndex = 0;
           if (selectedResource) {
-            const currentIndex = resourcesManager.getResourcePosition(
-              selectedResource.getName()
-            );
-            nextIndex = Math.max(
-              0,
-              Math.min(resourceCount - 1, currentIndex + delta)
-            );
+            const currentIndex = filteredList.indexOf(selectedResource);
+            if (currentIndex === -1) {
+              // Selected resource is not in filtered list, select the first one.
+              nextIndex = 0;
+            } else {
+              nextIndex = Math.max(
+                0,
+                Math.min(resourceCount - 1, currentIndex + delta)
+              );
+            }
           }
 
-          const nextResource = resourcesManager.getResourceAt(nextIndex);
+          const nextResource = filteredList[nextIndex];
           onSelectResource(nextResource);
         },
-        [project, selectedResource, onSelectResource]
+        [selectedResource, onSelectResource]
       );
 
       const handleKeyDown = React.useCallback(
         (event: KeyboardEvent) => {
           if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-            moveSelection(event.key === 'ArrowDown' ? 1 : -1);
+            moveSelection(event.key === 'ArrowDown' ? 1 : -1, filteredList);
             event.preventDefault();
           } else {
             keyboardShortcutsRef.current.onKeyDown(event);
           }
         },
-        [moveSelection]
+        [moveSelection, filteredList]
       );
 
       const moveSelectionTo = React.useCallback(
@@ -341,13 +355,6 @@ const ResourcesList = React.memo<Props, ResourcesListInterface>(
         },
         [checkMissingPaths]
       );
-
-      const resourcesManager = project.getResourcesManager();
-      const allResourcesList = resourcesManager
-        .getAllResourceNames()
-        .toJSArray()
-        .map(resourceName => resourcesManager.getResource(resourceName));
-      const filteredList = filterResourcesList(allResourcesList, searchText);
 
       // Force List component to be mounted again if project
       // has been changed. Avoid accessing to invalid objects that could

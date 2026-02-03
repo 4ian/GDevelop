@@ -2387,22 +2387,35 @@ namespace gdjs {
               );
 
               // When Alt is pressed, snap rotation to 45-degree increments
+              // Only snap the axis that is actually being rotated
               if (
                 this._transformControlsMode === 'rotate' &&
-                isAltPressed(inputManager)
+                isAltPressed(inputManager) &&
+                threeTransformControls.axis
               ) {
                 const snapAngle = (angle: number) =>
                   Math.round(angle / 45) * 45;
 
-                // Snap each axis rotation to 45-degree increment based on final angle
-                rotationX =
-                  snapAngle(initialObjectRotationX + rotationX) -
-                  initialObjectRotationX;
-                rotationY =
-                  snapAngle(initialObjectRotationY + rotationY) -
-                  initialObjectRotationY;
-                rotationZ =
-                  snapAngle(initialObjectAngle + rotationZ) - initialObjectAngle;
+                const isRotatingOnX = threeTransformControls.axis.includes('X');
+                const isRotatingOnY = threeTransformControls.axis.includes('Y');
+                const isRotatingOnZ = threeTransformControls.axis.includes('Z');
+
+                // Snap only the axis being rotated to 45-degree increment based on final angle
+                if (isRotatingOnX) {
+                  rotationX =
+                    snapAngle(initialObjectRotationX + rotationX) -
+                    initialObjectRotationX;
+                }
+                if (isRotatingOnY) {
+                  rotationY =
+                    snapAngle(initialObjectRotationY + rotationY) -
+                    initialObjectRotationY;
+                }
+                if (isRotatingOnZ) {
+                  rotationZ =
+                    snapAngle(initialObjectAngle + rotationZ) -
+                    initialObjectAngle;
+                }
               }
 
               this._selectionControlsMovementTotalDelta = {

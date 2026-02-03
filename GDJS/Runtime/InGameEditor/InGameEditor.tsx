@@ -314,6 +314,7 @@ namespace gdjs {
   const KEY_DIGIT_1 = 49;
   const KEY_DIGIT_2 = 50;
   const KEY_DIGIT_3 = 51;
+  const ROTATION_SNAP_DEGREES = 45;
 
   const exceptionallyGetKeyCodeFromLocationAwareKeyCode = (
     locationAwareKeyCode: number
@@ -2414,6 +2415,16 @@ namespace gdjs {
         !this._draggedSelectedObject
       ) {
         const { threeTransformControls } = this._selectionControls;
+
+        // Update the rotation snap.
+        const inputManager = this._runtimeGame.getInputManager();
+        const shouldSnap =
+          this._transformControlsMode === 'rotate' && isAltPressed(inputManager);
+        const rotationSnap = shouldSnap ? gdjs.toRad(ROTATION_SNAP_DEGREES) : null;
+
+        threeTransformControls.setRotationSnap(rotationSnap);
+
+        // Update the grid.
         const axis = threeTransformControls.axis;
         if (axis) {
           const isMovingOnX = axis ? axis.includes('X') : false;

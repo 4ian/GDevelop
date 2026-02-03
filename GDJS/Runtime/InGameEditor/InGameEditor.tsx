@@ -2266,6 +2266,9 @@ namespace gdjs {
             let initialObjectX = 0;
             let initialObjectY = 0;
             let initialObjectZ = 0;
+            let initialObjectAngle = 0;
+            let initialObjectRotationX = 0;
+            let initialObjectRotationY = 0;
             const initialDummyPosition = new THREE.Vector3();
             const initialDummyRotation = new THREE.Euler();
             const initialDummyScale = new THREE.Vector3();
@@ -2284,6 +2287,13 @@ namespace gdjs {
                 initialObjectY = lastEditableSelectedObject.getY();
                 initialObjectZ = is3D(lastEditableSelectedObject)
                   ? lastEditableSelectedObject.getZ()
+                  : 0;
+                initialObjectAngle = lastEditableSelectedObject.getAngle();
+                initialObjectRotationX = is3D(lastEditableSelectedObject)
+                  ? lastEditableSelectedObject.getRotationX()
+                  : 0;
+                initialObjectRotationY = is3D(lastEditableSelectedObject)
+                  ? lastEditableSelectedObject.getRotationY()
                   : 0;
                 initialDummyPosition.copy(dummyThreeObject.position);
                 initialDummyRotation.copy(dummyThreeObject.rotation);
@@ -2364,19 +2374,44 @@ namespace gdjs {
                 threeTransformControls.axis.length === 1
                   ? 1
                   : 0.2;
+
+              // Calculate rotation deltas
+              let rotationX = gdjs.toDegrees(
+                dummyThreeObject.rotation.x - initialDummyRotation.x
+              );
+              let rotationY = -gdjs.toDegrees(
+                dummyThreeObject.rotation.y - initialDummyRotation.y
+              );
+              let rotationZ = -gdjs.toDegrees(
+                dummyThreeObject.rotation.z - initialDummyRotation.z
+              );
+
+              // When Alt is pressed, snap rotation to 45-degree increments
+              if (
+                this._transformControlsMode === 'rotate' &&
+                isAltPressed(inputManager)
+              ) {
+                const snapAngle = (angle: number) =>
+                  Math.round(angle / 45) * 45;
+
+                // Snap each axis rotation to 45-degree increment based on final angle
+                rotationX =
+                  snapAngle(initialObjectRotationX + rotationX) -
+                  initialObjectRotationX;
+                rotationY =
+                  snapAngle(initialObjectRotationY + rotationY) -
+                  initialObjectRotationY;
+                rotationZ =
+                  snapAngle(initialObjectAngle + rotationZ) - initialObjectAngle;
+              }
+
               this._selectionControlsMovementTotalDelta = {
                 translationX,
                 translationY,
                 translationZ,
-                rotationX: gdjs.toDegrees(
-                  dummyThreeObject.rotation.x - initialDummyRotation.x
-                ),
-                rotationY: -gdjs.toDegrees(
-                  dummyThreeObject.rotation.y - initialDummyRotation.y
-                ),
-                rotationZ: -gdjs.toDegrees(
-                  dummyThreeObject.rotation.z - initialDummyRotation.z
-                ),
+                rotationX,
+                rotationY,
+                rotationZ,
                 scaleX:
                   1 +
                   (dummyThreeObject.scale.x / initialDummyScale.x - 1) *

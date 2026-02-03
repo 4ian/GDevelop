@@ -2266,9 +2266,6 @@ namespace gdjs {
             let initialObjectX = 0;
             let initialObjectY = 0;
             let initialObjectZ = 0;
-            let initialObjectAngle = 0;
-            let initialObjectRotationX = 0;
-            let initialObjectRotationY = 0;
             const initialDummyPosition = new THREE.Vector3();
             const initialDummyRotation = new THREE.Euler();
             const initialDummyScale = new THREE.Vector3();
@@ -2287,13 +2284,6 @@ namespace gdjs {
                 initialObjectY = lastEditableSelectedObject.getY();
                 initialObjectZ = is3D(lastEditableSelectedObject)
                   ? lastEditableSelectedObject.getZ()
-                  : 0;
-                initialObjectAngle = lastEditableSelectedObject.getAngle();
-                initialObjectRotationX = is3D(lastEditableSelectedObject)
-                  ? lastEditableSelectedObject.getRotationX()
-                  : 0;
-                initialObjectRotationY = is3D(lastEditableSelectedObject)
-                  ? lastEditableSelectedObject.getRotationY()
                   : 0;
                 initialDummyPosition.copy(dummyThreeObject.position);
                 initialDummyRotation.copy(dummyThreeObject.rotation);
@@ -2386,40 +2376,86 @@ namespace gdjs {
                 dummyThreeObject.rotation.z - initialDummyRotation.z
               );
 
-              // When Alt is pressed, snap rotation to 45-degree increments
-              // Only snap the axis that is actually being rotated, and zero out others
-              // to prevent floating-point drift on unrelated axes
+              // When Alt is pressed, snap rotation to 45-degree increments using quaternions
+              // to properly handle the rotation regardless of existing object rotation
               if (
                 this._transformControlsMode === 'rotate' &&
                 isAltPressed(inputManager) &&
                 threeTransformControls.axis
               ) {
-                const snapAngle = (angle: number) =>
+                const snapAngleDeg = (angle: number) =>
                   Math.round(angle / 45) * 45;
 
+                // Determine which axis is being rotated
                 const isRotatingOnX = threeTransformControls.axis.includes('X');
                 const isRotatingOnY = threeTransformControls.axis.includes('Y');
                 const isRotatingOnZ = threeTransformControls.axis.includes('Z');
 
-                // Snap the axis being rotated, zero out others to prevent drift
-                if (isRotatingOnX) {
-                  rotationX =
-                    snapAngle(initialObjectRotationX + rotationX) -
-                    initialObjectRotationX;
-                  rotationY = 0;
-                  rotationZ = 0;
-                } else if (isRotatingOnY) {
-                  rotationY =
-                    snapAngle(initialObjectRotationY + rotationY) -
-                    initialObjectRotationY;
-                  rotationX = 0;
-                  rotationZ = 0;
-                } else if (isRotatingOnZ) {
-                  rotationZ =
-                    snapAngle(initialObjectAngle + rotationZ) -
-                    initialObjectAngle;
-                  rotationX = 0;
-                  rotationY = 0;
+                // Get the rotation axis vector (in world space, Y is flipped in GDevelop)
+                let axisVector: THREE.Vector3 | null = null;
+                if (isRotatingOnX && !isRotatingOnY && !isRotatingOnZ) {
+                  axisVector = new THREE.Vector3(1, 0, 0);
+                } else if (isRotatingOnY && !isRotatingOnX && !isRotatingOnZ) {
+                  axisVector = new THREE.Vector3(0, -1, 0);
+                } else if (isRotatingOnZ && !isRotatingOnX && !isRotatingOnY) {
+                  axisVector = new THREE.Vector3(0, 0, -1);
+                }
+
+                if (axisVector) {
+                  // Convert Euler rotations to quaternions
+                  const initialQuat = new THREE.Quaternion().setFromEuler(
+                    initialDummyRotation
+                  );
+                  const currentQuat = new THREE.Quaternion().setFromEuler(
+                    dummyThreeObject.rotation
+                  );
+
+                  // Compute the delta rotation: deltaQuat = currentQuat * inverse(initialQuat)
+                  const deltaQuat = currentQuat
+                    .clone()
+                    .multiply(initialQuat.clone().invert());
+
+                  // Extract the rotation angle around the selected axis
+                  // Project the quaternion rotation onto the axis
+                  const axisComponent = new THREE.Vector3(
+                    deltaQuat.x,
+                    deltaQuat.y,
+                    deltaQuat.z
+                  );
+                  const dotProduct = axisComponent.dot(axisVector);
+                  const rotationAngleRad =
+                    2 * Math.atan2(dotProduct, deltaQuat.w);
+                  const rotationAngleDeg = gdjs.toDegrees(rotationAngleRad);
+
+                  // Snap the rotation angle to 45-degree increments
+                  const snappedAngleDeg = snapAngleDeg(rotationAngleDeg);
+                  const snappedAngleRad = gdjs.toRad(snappedAngleDeg);
+
+                  // Create a new quaternion for the snapped rotation around the axis
+                  const snappedQuat = new THREE.Quaternion().setFromAxisAngle(
+                    axisVector,
+                    snappedAngleRad
+                  );
+
+                  // Apply snapped rotation to initial rotation: finalQuat = snappedQuat * initialQuat
+                  const finalQuat = snappedQuat.multiply(initialQuat);
+
+                  // Convert back to Euler angles
+                  const finalEuler = new THREE.Euler().setFromQuaternion(
+                    finalQuat,
+                    dummyThreeObject.rotation.order
+                  );
+
+                  // Compute the new deltas
+                  rotationX = gdjs.toDegrees(
+                    finalEuler.x - initialDummyRotation.x
+                  );
+                  rotationY = -gdjs.toDegrees(
+                    finalEuler.y - initialDummyRotation.y
+                  );
+                  rotationZ = -gdjs.toDegrees(
+                    finalEuler.z - initialDummyRotation.z
+                  );
                 }
               }
 

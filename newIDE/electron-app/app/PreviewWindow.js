@@ -9,6 +9,7 @@ const { load } = require('./Utils/UrlLoader');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
+// Map of preview windows with their parent window ID: { previewWindow, parentWindowId }
 let previewWindows = [];
 
 let openDevToolsByDefault = false;
@@ -71,28 +72,54 @@ const openPreviewWindow = ({
 
     previewWindow.loadURL(previewGameIndexHtmlPath);
 
-    previewWindows.push(previewWindow);
+    // Track this preview window with its parent
+    previewWindows.push({
+      previewWindow: previewWindow,
+      parentWindowId: parentWindow ? parentWindow.id : null,
+    });
 
     previewWindow.on('closed', closeEvent => {
       previewWindows = previewWindows.filter(
-        otherPreviewBrowserWindow => otherPreviewBrowserWindow !== previewWindow
+        entry => entry.previewWindow !== previewWindow
       );
-      openEvent.sender.send('preview-window-closed');
+      // Only send message if the parent window still exists
+      if (openEvent.sender && !openEvent.sender.isDestroyed()) {
+        openEvent.sender.send('preview-window-closed');
+      }
       previewWindow = null;
     });
   }
 };
 
 const closePreviewWindow = windowId => {
-  const previewWindow = previewWindows.find(window => window.id === windowId);
-  if (previewWindow) previewWindow.close();
+  const entry = previewWindows.find(
+    entry => entry.previewWindow.id === windowId
+  );
+  if (entry && entry.previewWindow) {
+    entry.previewWindow.close();
+  }
+};
+
+const closePreviewWindowsForParent = parentWindowId => {
+  const entriesToClose = previewWindows.filter(
+    entry => entry.parentWindowId === parentWindowId
+  );
+  entriesToClose.forEach(entry => {
+    try {
+      if (entry.previewWindow && !entry.previewWindow.isDestroyed()) {
+        entry.previewWindow.close();
+      }
+    } catch (error) {
+      console.warn('Ignoring exception when closing preview window:', error);
+    }
+  });
 };
 
 const closeAllPreviewWindows = () => {
-  previewWindows.forEach(previewWindow => {
+  previewWindows.forEach(entry => {
     try {
-      if (previewWindow && !previewWindow.isDestroyed()) {
-        previewWindow.close();
+      if (entry.previewWindow && !entry.previewWindow.isDestroyed()) {
+        entry.previewWindow.close();
       }
     } catch (error) {
       console.warn('Ignoring exception when closing preview window:', error);
@@ -103,5 +130,6 @@ const closeAllPreviewWindows = () => {
 module.exports = {
   openPreviewWindow,
   closePreviewWindow,
+  closePreviewWindowsForParent,
   closeAllPreviewWindows,
 };

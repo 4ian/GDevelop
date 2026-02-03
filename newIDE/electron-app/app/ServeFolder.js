@@ -2,31 +2,32 @@ const FiveServer = require('five-server').default;
 const httpsConfiguration = require('./Utils/DevServerHttpsConfiguration.js');
 const { getAvailablePort } = require('./Utils/AvailablePortFinder');
 
-/** @type {import("five-server").default} */
-let serverInstance = null;
-/** @type {import("five-server").LiveServerParams} */
-let currentServerParams = null;
+// Track servers per window ID
+// Map<windowId, { serverParams, serverInstance }>
+const serversByWindow = new Map();
 
 module.exports = {
   /**
-   * Start a server to serve a folder
+   * Start a server to serve a folder for a specific window
    */
-  serveFolder: ({ root, useHttps }, onDone) => {
-    if (currentServerParams && currentServerParams.root === root) {
-      onDone(null, currentServerParams);
+  serveFolder: ({ root, useHttps, windowId }, onDone) => {
+    // Check if this window already has a server for the same root
+    const existingServer = serversByWindow.get(windowId);
+    if (existingServer && existingServer.serverParams.root === root) {
+      onDone(null, existingServer.serverParams);
       return;
     }
 
-    // Shutdown existing server if any
-    if (serverInstance) {
-      serverInstance.shutdown().catch(() => {
+    // Stop any existing server for this window
+    if (existingServer && existingServer.serverInstance) {
+      existingServer.serverInstance.shutdown().catch(() => {
         // Ignore shutdown errors
       });
     }
 
     getAvailablePort(2929, 4000).then(
       port => {
-        currentServerParams = {
+        const serverParams = {
           port,
           root,
           open: false,
@@ -53,11 +54,12 @@ module.exports = {
           ],
         };
 
-        serverInstance = new FiveServer();
+        const serverInstance = new FiveServer();
         serverInstance
-          .start(currentServerParams)
+          .start(serverParams)
           .then(() => {
-            onDone(null, currentServerParams);
+            serversByWindow.set(windowId, { serverParams, serverInstance });
+            onDone(null, serverParams);
           })
           .catch(err => {
             onDone(err);
@@ -68,25 +70,38 @@ module.exports = {
   },
 
   /**
-   * Stop any running server
+   * Stop the server for a specific window
    */
-  stopServer: onDone => {
-    if (serverInstance) {
-      serverInstance
+  stopServer: (windowId, onDone) => {
+    const server = serversByWindow.get(windowId);
+    if (server && server.serverInstance) {
+      server.serverInstance
         .shutdown()
         .then(() => {
-          serverInstance = null;
-          currentServerParams = null;
+          serversByWindow.delete(windowId);
           onDone();
         })
         .catch(err => {
-          serverInstance = null;
-          currentServerParams = null;
+          serversByWindow.delete(windowId);
           onDone(err);
         });
     } else {
-      currentServerParams = null;
+      serversByWindow.delete(windowId);
       onDone();
     }
+  },
+
+  /**
+   * Stop all servers (for cleanup on app quit)
+   */
+  stopAllServers: () => {
+    serversByWindow.forEach((server, windowId) => {
+      if (server && server.serverInstance) {
+        server.serverInstance.shutdown().catch(() => {
+          // Silently ignore errors during shutdown
+        });
+      }
+    });
+    serversByWindow.clear();
   },
 };

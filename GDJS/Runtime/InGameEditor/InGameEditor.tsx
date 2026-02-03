@@ -2387,7 +2387,8 @@ namespace gdjs {
               );
 
               // When Alt is pressed, snap rotation to 45-degree increments
-              // Only snap the axis that is actually being rotated
+              // Only snap the axis that is actually being rotated, and zero out others
+              // to prevent floating-point drift on unrelated axes
               if (
                 this._transformControlsMode === 'rotate' &&
                 isAltPressed(inputManager) &&
@@ -2400,21 +2401,25 @@ namespace gdjs {
                 const isRotatingOnY = threeTransformControls.axis.includes('Y');
                 const isRotatingOnZ = threeTransformControls.axis.includes('Z');
 
-                // Snap only the axis being rotated to 45-degree increment based on final angle
+                // Snap the axis being rotated, zero out others to prevent drift
                 if (isRotatingOnX) {
                   rotationX =
                     snapAngle(initialObjectRotationX + rotationX) -
                     initialObjectRotationX;
-                }
-                if (isRotatingOnY) {
+                  rotationY = 0;
+                  rotationZ = 0;
+                } else if (isRotatingOnY) {
                   rotationY =
                     snapAngle(initialObjectRotationY + rotationY) -
                     initialObjectRotationY;
-                }
-                if (isRotatingOnZ) {
+                  rotationX = 0;
+                  rotationZ = 0;
+                } else if (isRotatingOnZ) {
                   rotationZ =
                     snapAngle(initialObjectAngle + rotationZ) -
                     initialObjectAngle;
+                  rotationX = 0;
+                  rotationY = 0;
                 }
               }
 

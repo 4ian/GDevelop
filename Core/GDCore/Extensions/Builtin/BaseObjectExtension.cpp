@@ -472,7 +472,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .UseStandardOperatorParameters("number",
                                      ParameterOptions::MakeNewOptions());
 
-  // Compatibility with GD <= 5.6.251
+  // Compatibility with GD <= 5.6.254
   obj.AddDuplicatedAction("ChangePlan", "SetZOrder").SetHidden();
   // End of compatibility code
 

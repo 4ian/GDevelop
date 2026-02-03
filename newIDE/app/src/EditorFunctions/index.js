@@ -790,6 +790,14 @@ const createOrReplaceObject: EditorFunction = {
             `Unable to search and install object (${message}).`
           );
         } else if (status === 'asset-installed') {
+          // Update behaviors shared data for the scene where the object was created.
+          // Assets from the store can come with behaviors that have shared data.
+          if (target_object_scope === 'global') {
+            gd.WholeProjectRefactorer.updateBehaviorsSharedData(project);
+          } else {
+            layout.updateBehaviorsSharedData(project);
+          }
+
           // /!\ Tell the editor that some objects have potentially been modified (and even removed).
           // This will force the objects panel to refresh.
           onObjectsModifiedOutsideEditor({
@@ -1012,6 +1020,13 @@ const createOrReplaceObject: EditorFunction = {
         project
       );
       newObject.setName(targetObjectName); // Unserialization has overwritten the name.
+
+      // Update behaviors shared data for the scene where the object was duplicated.
+      if (target_object_scope === 'global') {
+        gd.WholeProjectRefactorer.updateBehaviorsSharedData(project);
+      } else {
+        layout.updateBehaviorsSharedData(project);
+      }
 
       // /!\ Tell the editor that some objects have potentially been modified (and even removed).
       // This will force the objects panel to refresh.

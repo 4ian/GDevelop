@@ -52,15 +52,23 @@ const createField = (
   };
   const propertyDescription = property.getDescription();
   const getDescription = () => propertyDescription;
+
   const measurementUnit = property.getMeasurementUnit();
+  // TODO Pass this object in the schema instead of building an UI element here.
+  const enumeratedMeasurementUnit = {
+    shortLabel: getMeasurementUnitShortLabel(measurementUnit),
+    label: measurementUnit.getLabel(),
+    description: measurementUnit.getDescription(),
+    elementsWithWords: measurementUnit.getElementsWithWords(),
+  };
   const getEndAdornment = (instance: Instance) => {
     return {
-      label: getMeasurementUnitShortLabel(measurementUnit),
+      label: enumeratedMeasurementUnit.shortLabel,
       tooltipContent: (
         <MeasurementUnitDocumentation
-          label={measurementUnit.getLabel()}
-          description={measurementUnit.getDescription()}
-          elementsWithWords={measurementUnit.getElementsWithWords()}
+          label={enumeratedMeasurementUnit.label}
+          description={enumeratedMeasurementUnit.description}
+          elementsWithWords={enumeratedMeasurementUnit.elementsWithWords}
         />
       ),
     };

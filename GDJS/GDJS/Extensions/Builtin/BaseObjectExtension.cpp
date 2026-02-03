@@ -64,10 +64,12 @@ BaseObjectExtension::BaseObjectExtension() {
       .SetFunctionName("setZOrder")
       .SetGetter("getZOrder");
   objectConditions["ZOrder"].SetFunctionName("getZOrder");
-  // Compatibility with GD <= 5.6.251
+  // Compatibility with GD <= 5.6.254
   objectActions["ChangePlan"]
       .SetFunctionName("setZOrder")
       .SetGetter("getZOrder");
+  // End of compatibility code
+  // Compatibility with GD <= 5.6.251
   objectConditions["Plan"].SetFunctionName("getZOrder");
   // End of compatibility code
   objectActions["Hide"].SetFunctionName("hide").SetIncludeFile(

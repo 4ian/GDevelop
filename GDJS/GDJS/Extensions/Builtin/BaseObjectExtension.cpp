@@ -60,11 +60,14 @@ BaseObjectExtension::BaseObjectExtension() {
   objectActions["RotateTowardObject"].SetFunctionName("rotateTowardObject");
   objectActions["ChangeLayer"].SetFunctionName("setLayer");
   objectConditions["Layer"].SetFunctionName("isOnLayer");
-  objectActions["ChangePlan"]
+  objectActions["SetZOrder"]
       .SetFunctionName("setZOrder")
       .SetGetter("getZOrder");
   objectConditions["ZOrder"].SetFunctionName("getZOrder");
   // Compatibility with GD <= 5.6.251
+  objectActions["ChangePlan"]
+      .SetFunctionName("setZOrder")
+      .SetGetter("getZOrder");
   objectConditions["Plan"].SetFunctionName("getZOrder");
   // End of compatibility code
   objectActions["Hide"].SetFunctionName("hide").SetIncludeFile(

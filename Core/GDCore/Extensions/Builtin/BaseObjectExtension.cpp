@@ -460,7 +460,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .MarkAsSimple();
 
-  obj.AddAction("ChangePlan",
+  obj.AddAction("SetZOrder",
                 _("Z order"),
                 _("Modify the Z-order of an object"),
                 _("the z-order"),
@@ -471,6 +471,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .UseStandardOperatorParameters("number",
                                      ParameterOptions::MakeNewOptions());
+
+  // Compatibility with GD <= 5.6.254
+  obj.AddDuplicatedAction("ChangePlan", "SetZOrder").SetHidden();
+  // End of compatibility code
 
   obj.AddAction("ChangeLayer",
                 _("Layer"),

@@ -1032,6 +1032,8 @@ void WholeProjectRefactorer::RenameEventsBasedBehaviorProperty(
       behaviorType, oldPropertyName, newPropertyName);
   projectBrowser.ExposeObjects(project, behaviorPropertyRenamer);
 
+  // TODO Rename the property in behavior overridings of InitialInstances.
+
   if (properties.Get(oldPropertyName).GetType() == "Behavior") {
     // This is a property representing another behavior that must exist on the
     // object.

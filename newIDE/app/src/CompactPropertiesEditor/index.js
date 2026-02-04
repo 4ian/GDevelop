@@ -146,7 +146,7 @@ const getFieldEndAdornmentIcon = ({
   return null;
 };
 
-const isFieldShowcased = ({
+const isFieldHighlighted = ({
   instances,
   field,
 }: {|
@@ -155,12 +155,12 @@ const isFieldShowcased = ({
 |}): any => {
   if (!instances[0]) {
     console.warn(
-      'isFieldShowcased was called with an empty list of instances (or containing undefined). This is a bug that should be fixed.'
+      'isFieldHighlighted was called with an empty list of instances (or containing undefined). This is a bug that should be fixed.'
     );
     return false;
   }
 
-  return field.isShowcased ? field.isShowcased(instances[0]) : false;
+  return field.isHighlighted ? field.isHighlighted(instances[0]) : false;
 };
 
 const getFieldLabel = ({
@@ -265,7 +265,7 @@ const CompactPropertiesEditor = ({
             disabled={getDisabled({ instances, field })}
             fullWidth
             labelColor={
-              isFieldShowcased({ instances, field }) ? 'primary' : 'secondary'
+              isFieldHighlighted({ instances, field }) ? 'primary' : 'secondary'
             }
           />
         );
@@ -327,7 +327,9 @@ const CompactPropertiesEditor = ({
                 />
               }
               labelColor={
-                isFieldShowcased({ instances, field }) ? 'primary' : 'secondary'
+                isFieldHighlighted({ instances, field })
+                  ? 'primary'
+                  : 'secondary'
               }
             />
           );
@@ -356,7 +358,7 @@ const CompactPropertiesEditor = ({
               />
             }
             labelColor={
-              isFieldShowcased({ instances, field }) ? 'primary' : 'secondary'
+              isFieldHighlighted({ instances, field }) ? 'primary' : 'secondary'
             }
           />
         );
@@ -399,7 +401,7 @@ const CompactPropertiesEditor = ({
             label={getFieldLabel({ instances, field })}
             markdownDescription={getFieldDescription(field)}
             labelColor={
-              isFieldShowcased({ instances, field }) ? 'primary' : 'secondary'
+              isFieldHighlighted({ instances, field }) ? 'primary' : 'secondary'
             }
           />
         );
@@ -456,7 +458,9 @@ const CompactPropertiesEditor = ({
               markdownDescription={getFieldDescription(field)}
               field={<CompactSemiControlledTextField {...otherCommonProps} />}
               labelColor={
-                isFieldShowcased({ instances, field }) ? 'primary' : 'secondary'
+                isFieldHighlighted({ instances, field })
+                  ? 'primary'
+                  : 'secondary'
               }
             />
           );
@@ -540,7 +544,7 @@ const CompactPropertiesEditor = ({
           markdownDescription={getFieldDescription(field)}
           field={compactSelectField}
           labelColor={
-            isFieldShowcased({ instances, field }) ? 'primary' : 'secondary'
+            isFieldHighlighted({ instances, field }) ? 'primary' : 'secondary'
           }
         />
       );
@@ -655,7 +659,7 @@ const CompactPropertiesEditor = ({
           />
         }
         labelColor={
-          isFieldShowcased({ instances, field }) ? 'primary' : 'secondary'
+          isFieldHighlighted({ instances, field }) ? 'primary' : 'secondary'
         }
       />
     );
@@ -691,7 +695,7 @@ const CompactPropertiesEditor = ({
           />
         }
         labelColor={
-          isFieldShowcased({ instances, field }) ? 'primary' : 'secondary'
+          isFieldHighlighted({ instances, field }) ? 'primary' : 'secondary'
         }
       />
     );

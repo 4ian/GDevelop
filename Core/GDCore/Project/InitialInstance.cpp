@@ -171,7 +171,6 @@ void InitialInstance::SerializeTo(SerializerElement& element) const {
 
   GetVariables().SerializeTo(element.AddChild("initialVariables"));
 
-  // TODO Don't serialize empty overridings
   if (!behaviorOverridings.GetAllBehaviorContents().empty()) {
     behaviorOverridings.SerializeTo(element.AddChild("behaviorOverridings"));
   }

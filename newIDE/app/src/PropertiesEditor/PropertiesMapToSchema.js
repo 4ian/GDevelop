@@ -85,13 +85,13 @@ const createField = (
     getNumberValue(instance, name);
   const defaultValueNumber =
     defaultValue !== null ? parseFloat(defaultValue) || 0 : null;
-  const isShowcasedForNumber = (instance: gdInitialInstance) => {
+  const isHighlightedForNumber = (instance: gdInitialInstance) => {
     return (
       showcaseNonDefaultValues &&
       getValueForNumber(instance) !== defaultValueNumber
     );
   };
-  const isShowcasedForString = (instance: gdInitialInstance) => {
+  const isHighlightedForString = (instance: gdInitialInstance) => {
     return (
       showcaseNonDefaultValues && getValueForString(instance) !== defaultValue
     );
@@ -133,7 +133,7 @@ const createField = (
       getEndAdornmentIcon,
       onClickEndAdornment,
       visibility,
-      isShowcased: isShowcasedForNumber,
+      isHighlighted: isHighlightedForNumber,
     };
   } else if (valueType === 'string' || valueType === '') {
     return {
@@ -148,7 +148,7 @@ const createField = (
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
-      isShowcased: isShowcasedForString,
+      isHighlighted: isHighlightedForString,
     };
   } else if (valueType === 'boolean') {
     const defaultValueBoolean = defaultValue ? defaultValue === 'true' : null;
@@ -166,7 +166,7 @@ const createField = (
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
-      isShowcased: isShowcasedForString,
+      isHighlighted: isHighlightedForString,
     };
   } else if (valueType === 'choice' || valueType === 'numberwithchoices') {
     // Choice is a "string" (with a selector for the user in the UI)
@@ -197,7 +197,7 @@ const createField = (
           getDescription,
           hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
           visibility,
-          isShowcased: isShowcasedForNumber,
+          isHighlighted: isHighlightedForNumber,
         }
       : {
           name,
@@ -211,7 +211,7 @@ const createField = (
           getDescription,
           hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
           visibility,
-          isShowcased: isShowcasedForString,
+          isHighlighted: isHighlightedForString,
         };
   } else if (valueType === 'behavior') {
     const behaviorType =
@@ -242,7 +242,7 @@ const createField = (
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
-      isShowcased: isShowcasedForString,
+      isHighlighted: isHighlightedForString,
     };
   } else if (valueType === 'leaderboardid') {
     // LeaderboardId is a "string" (with a selector in the UI)
@@ -257,7 +257,7 @@ const createField = (
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
-      isShowcased: isShowcasedForString,
+      isHighlighted: isHighlightedForString,
     };
   } else if (valueType === 'resource') {
     // Resource is a "string" (with a selector in the UI)
@@ -276,7 +276,7 @@ const createField = (
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
-      isShowcased: isShowcasedForString,
+      isHighlighted: isHighlightedForString,
     };
   } else if (valueType === 'color') {
     return {
@@ -290,7 +290,7 @@ const createField = (
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
-      isShowcased: isShowcasedForString,
+      isHighlighted: isHighlightedForString,
     };
   } else if (valueType === 'multilinestring') {
     return {
@@ -304,7 +304,7 @@ const createField = (
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
-      isShowcased: isShowcasedForString,
+      isHighlighted: isHighlightedForString,
     };
   } else if (valueType === 'objectanimationname') {
     return {
@@ -337,7 +337,7 @@ const createField = (
       getLabel,
       getDescription,
       visibility,
-      isShowcased: isShowcasedForString,
+      isHighlighted: isHighlightedForString,
     };
   } else if (valueType === 'keyboardkey') {
     return {
@@ -358,7 +358,7 @@ const createField = (
       getLabel,
       getDescription,
       visibility,
-      isShowcased: isShowcasedForString,
+      isHighlighted: isHighlightedForString,
     };
   } else {
     console.error(

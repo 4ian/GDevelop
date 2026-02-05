@@ -131,6 +131,20 @@ bool CustomObjectConfiguration::UpdateProperty(const gd::String& propertyName,
         newValue);
 }
 
+bool CustomObjectConfiguration::RenameProperty(const gd::String& oldName, const gd::String& newName) {
+    if (!project->HasEventsBasedObject(GetType())) {
+      return false;
+    }
+    const auto &eventsBasedObject = project->GetEventsBasedObject(GetType());
+    const auto &properties = eventsBasedObject.GetPropertyDescriptors();
+
+    return gd::CustomConfigurationHelper::RenameProperty(
+        properties,
+        objectContent,
+        oldName,
+        newName);
+};
+
 std::map<gd::String, gd::PropertyDescriptor>
 CustomObjectConfiguration::GetInitialInstanceProperties(
     const gd::InitialInstance &initialInstance) {

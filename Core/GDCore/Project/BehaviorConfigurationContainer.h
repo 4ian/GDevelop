@@ -88,6 +88,17 @@ class GD_CORE_API BehaviorConfigurationContainer {
   };
 
   /**
+   * \brief Called when the IDE wants to rename a custom property of the object
+   * configuration.
+   *
+   * \return false if properties can't be renamed
+   */
+  virtual bool RenameProperty(const gd::String &oldName,
+                              const gd::String &newName) {
+    return RenameProperty(content, oldName, newName);
+  };
+
+  /**
    * \brief Called to initialize the content with the default properties
    * for the behavior.
    */
@@ -196,6 +207,18 @@ class GD_CORE_API BehaviorConfigurationContainer {
   virtual bool UpdateProperty(gd::SerializerElement& behaviorContent,
                               const gd::String& name,
                               const gd::String& value) {
+    return false;
+  };
+
+  /**
+   * \brief Called when the IDE wants to rename a custom property of the object
+   * configuration.
+   *
+   * \return false if properties can't be renamed
+   */
+  virtual bool RenameProperty(gd::SerializerElement &behaviorContent,
+                              const gd::String &oldName,
+                              const gd::String &newName) {
     return false;
   };
 

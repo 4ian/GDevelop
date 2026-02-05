@@ -3,8 +3,7 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_CUSTOMCONFIGURATIONHELPER_H
-#define GDCORE_CUSTOMCONFIGURATIONHELPER_H
+#pragma once
 
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
@@ -38,7 +37,10 @@ public:
       gd::SerializerElement &behaviorContent,
       const gd::String &name,
       const gd::String &value);
+
+  static bool RenameProperty(const gd::PropertiesContainer &properties,
+                             gd::SerializerElement &behaviorContent,
+                             const gd::String &oldName,
+                             const gd::String &newName);
 };
 }  // namespace gd
-
-#endif  // GDCORE_CUSTOMCONFIGURATIONHELPER_H

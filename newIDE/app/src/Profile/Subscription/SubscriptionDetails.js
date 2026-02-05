@@ -199,7 +199,7 @@ const SubscriptionDetails = ({
                     } else {
                       showAlert({
                         title: t`Subscription outside the app store`,
-                        message: t`The subscription of this account comes from outside the app store. Connect with your account on gdevelop.io from your web-browser to manage it.`,
+                        message: t`The subscription of this account comes from outside the app store. Connect with your account on editor.gdevelop.io from your web-browser to manage it.`,
                       });
                     }
                   }}

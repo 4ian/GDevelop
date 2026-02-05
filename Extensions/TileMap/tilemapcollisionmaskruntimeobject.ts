@@ -368,6 +368,10 @@ namespace gdjs {
       );
     }
 
+    override isSpatiallyIndexed(): boolean {
+      return true;
+    }
+
     /**
      * insideObject usually use the AABB of the object.
      * But, in case of a tile map, it makes more sense to look each tile individually.

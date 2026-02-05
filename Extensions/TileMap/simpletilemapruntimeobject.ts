@@ -500,8 +500,10 @@ namespace gdjs {
     // This implementation doesn't use updateHitBoxes.
     // It's important for good performances.
     override getAABB(): AABB {
+      // It's fine to compute it every time because tile maps are rarely rotated.
+      // It avoids calling updateHitBoxes to rely on hitBoxesDirty to know when
+      // to update.
       this.updateAABB();
-      this.hitBoxesDirty = false;
       return this.aabb;
     }
 
@@ -595,6 +597,10 @@ namespace gdjs {
         right,
         bottom
       );
+    }
+
+    override isSpatiallyIndexed(): boolean {
+      return true;
     }
 
     updateTransformation() {

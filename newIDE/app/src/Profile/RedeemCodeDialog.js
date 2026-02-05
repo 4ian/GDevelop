@@ -4,7 +4,7 @@ import { t, Trans } from '@lingui/macro';
 import React from 'react';
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
-import { type AuthenticatedUser } from './AuthenticatedUserContext';
+import AuthenticatedUserContext from './AuthenticatedUserContext';
 import { ColumnStackLayout } from '../UI/Layout';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import LeftLoader from '../UI/LeftLoader';
@@ -16,7 +16,7 @@ import { SubscriptionContext } from './Subscription/SubscriptionContext';
 
 type Props = {|
   onClose: (hasJustRedeemedCode: boolean) => Promise<void>,
-  authenticatedUser: AuthenticatedUser,
+  codeToAutoSubmit?: string,
 |};
 
 export const getRedeemCodeErrorText = (error: ?Error) => {
@@ -67,57 +67,77 @@ export const getRedeemCodeErrorText = (error: ?Error) => {
   );
 };
 
-export default function RedeemCodeDialog({
-  onClose,
-  authenticatedUser,
-}: Props) {
-  const [redemptionCode, setRedemptionCode] = React.useState('');
+export default function RedeemCodeDialog({ onClose, codeToAutoSubmit }: Props) {
+  const [redemptionCode, setRedemptionCode] = React.useState(
+    codeToAutoSubmit || ''
+  );
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<?Error>(null);
   const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const hasAutoSubmitted = React.useRef(false);
 
-  const onRedeemCode = async () => {
-    setIsLoading(true);
-    const { getAuthorizationHeader, profile } = authenticatedUser;
+  const onRedeemCode = React.useCallback(
+    async () => {
+      setIsLoading(true);
+      const { getAuthorizationHeader, profile } = authenticatedUser;
 
-    try {
-      if (!profile) throw new Error('User should be logged in');
+      try {
+        if (!profile) throw new Error('User should be logged in');
 
-      await redeemCode(
-        getAuthorizationHeader,
-        profile.id,
-        redemptionCode.trim().toLowerCase()
-      );
+        await redeemCode(
+          getAuthorizationHeader,
+          profile.id,
+          redemptionCode.trim().toLowerCase()
+        );
 
-      // Redemption was successful, we close the dialog and let the parent know
-      // that a redemption happened - so some update should be fetched.
-      onClose(/*hasJustRedeemedCode=*/ true);
-    } catch (error) {
-      const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
-        error
-      );
-      if (
-        extractedStatusAndCode &&
-        extractedStatusAndCode.code === 'redemption-code/code-is-a-coupon'
-      ) {
-        // This is a coupon code, not a redemption code.
-        // Open the subscription dialog with this coupon code.
-        openSubscriptionDialog({
-          analyticsMetadata: {
-            reason: 'Coupon code entered',
-            placementId: 'redeem-code',
-          },
-          couponCode: redemptionCode.trim().toLowerCase(),
-        });
-        // Close this dialog
-        onClose(/*hasJustRedeemedCode=*/ false);
-      } else {
-        setError(error);
+        // Redemption was successful, we close the dialog and let the parent know
+        // that a redemption happened - so some update should be fetched.
+        onClose(/*hasJustRedeemedCode=*/ true);
+      } catch (error) {
+        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+          error
+        );
+        if (
+          extractedStatusAndCode &&
+          extractedStatusAndCode.code === 'redemption-code/code-is-a-coupon'
+        ) {
+          // This is a coupon code, not a redemption code.
+          // Open the subscription dialog with this coupon code.
+          openSubscriptionDialog({
+            analyticsMetadata: {
+              reason: 'Coupon code entered',
+              placementId: 'redeem-code',
+            },
+            couponCode: redemptionCode.trim().toLowerCase(),
+          });
+          // Close this dialog
+          onClose(/*hasJustRedeemedCode=*/ false);
+        } else {
+          setError(error);
+        }
+      } finally {
+        setIsLoading(false);
       }
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+    [authenticatedUser, redemptionCode, onClose, openSubscriptionDialog]
+  );
+
+  // Auto-submit if codeToAutoSubmit is provided
+  React.useEffect(
+    () => {
+      if (
+        codeToAutoSubmit &&
+        redemptionCode &&
+        !hasAutoSubmitted.current &&
+        !isLoading
+      ) {
+        hasAutoSubmitted.current = true;
+        onRedeemCode();
+      }
+    },
+    [codeToAutoSubmit, redemptionCode, isLoading, onRedeemCode]
+  );
 
   const canRedeem = !!redemptionCode && !isLoading;
   const { subscription } = authenticatedUser;
@@ -143,6 +163,16 @@ export default function RedeemCodeDialog({
                 onClick={onRedeemCode}
               />
             </LeftLoader>,
+          ]}
+          secondaryActions={[
+            <FlatButton
+              label={<Trans>See my codes</Trans>}
+              key="see-codes"
+              disabled={isLoading}
+              onClick={() => {
+                authenticatedUser.onOpenRedemptionCodesDialog();
+              }}
+            />,
           ]}
           cannotBeDismissed={isLoading}
           onRequestClose={() => onClose(false)}

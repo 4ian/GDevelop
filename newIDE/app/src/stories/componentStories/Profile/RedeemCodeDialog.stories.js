@@ -6,6 +6,7 @@ import { fakeSilverAuthenticatedUser } from '../../../fixtures/GDevelopServicesT
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 import { GDevelopUsageApi } from '../../../Utils/GDevelopServices/ApiConfigs';
+import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 
 export default {
   title: 'Profile/RedeemCodeDialog',
@@ -24,10 +25,9 @@ export const WorkingCode = () => {
     });
 
   return (
-    <RedeemCodeDialog
-      authenticatedUser={fakeSilverAuthenticatedUser}
-      onClose={action('onClose')}
-    />
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <RedeemCodeDialog onClose={action('onClose')} />
+    </AuthenticatedUserContext.Provider>
   );
 };
 
@@ -43,10 +43,9 @@ export const CodeDoesNotExist = () => {
     });
 
   return (
-    <RedeemCodeDialog
-      authenticatedUser={fakeSilverAuthenticatedUser}
-      onClose={action('onClose')}
-    />
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <RedeemCodeDialog onClose={action('onClose')} />
+    </AuthenticatedUserContext.Provider>
   );
 };
 
@@ -62,10 +61,9 @@ export const UnknownError = () => {
     });
 
   return (
-    <RedeemCodeDialog
-      authenticatedUser={fakeSilverAuthenticatedUser}
-      onClose={action('onClose')}
-    />
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <RedeemCodeDialog onClose={action('onClose')} />
+    </AuthenticatedUserContext.Provider>
   );
 };
 
@@ -83,10 +81,9 @@ export const CannotBeRedeemedAnymoreError = () => {
     });
 
   return (
-    <RedeemCodeDialog
-      authenticatedUser={fakeSilverAuthenticatedUser}
-      onClose={action('onClose')}
-    />
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <RedeemCodeDialog onClose={action('onClose')} />
+    </AuthenticatedUserContext.Provider>
   );
 };
 
@@ -104,9 +101,8 @@ export const AlreadyRedeemedByUser = () => {
     });
 
   return (
-    <RedeemCodeDialog
-      authenticatedUser={fakeSilverAuthenticatedUser}
-      onClose={action('onClose')}
-    />
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <RedeemCodeDialog onClose={action('onClose')} />
+    </AuthenticatedUserContext.Provider>
   );
 };

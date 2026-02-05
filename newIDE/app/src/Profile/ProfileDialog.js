@@ -23,7 +23,6 @@ import ErrorBoundary from '../UI/ErrorBoundary';
 import Text from '../UI/Text';
 import Link from '../UI/Link';
 import CreditsStatusBanner from '../Credits/CreditsStatusBanner';
-import RedeemCodeDialog from './RedeemCodeDialog';
 import { SubscriptionContext } from './Subscription/SubscriptionContext';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 
@@ -39,7 +38,6 @@ const ProfileDialog = ({ onClose }: Props) => {
     SubscriptionContext
   );
   const { isMobile } = useResponsiveWindowSize();
-  const [redeemCodeDialogOpen, setRedeemCodeDialogOpen] = React.useState(false);
 
   const isUserLoading = authenticatedUser.loginState !== 'done';
   const userAchievementsContainerRef = React.useRef<?HTMLDivElement>(null);
@@ -173,8 +171,12 @@ const ProfileDialog = ({ onClose }: Props) => {
           disabled={isUserLoading}
           primary={false}
           onClick={() => {
-            if (authenticatedUser.authenticated) setRedeemCodeDialogOpen(true);
-            else authenticatedUser.onOpenCreateAccountDialog();
+            if (authenticatedUser.authenticated) {
+              authenticatedUser.onOpenRedeemCodeDialog();
+              openSubscriptionPendingDialog();
+            } else {
+              authenticatedUser.onOpenCreateAccountDialog();
+            }
           }}
         />,
       ]}
@@ -261,19 +263,6 @@ const ProfileDialog = ({ onClose }: Props) => {
             }
           />
         </Column>
-      )}
-      {redeemCodeDialogOpen && (
-        <RedeemCodeDialog
-          authenticatedUser={authenticatedUser}
-          onClose={async hasJustRedeemedCode => {
-            setRedeemCodeDialogOpen(false);
-
-            if (hasJustRedeemedCode) {
-              openSubscriptionPendingDialog();
-              await authenticatedUser.onRefreshSubscription();
-            }
-          }}
-        />
       )}
     </Dialog>
   );

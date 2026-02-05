@@ -15,6 +15,7 @@ import {
   ensureObjectHasProperty,
   ensureIsObjectWithPropertyOfType,
 } from '../DataValidator';
+import { type BundleListingData } from './Shop';
 
 export type Usage = {
   id: string,
@@ -679,20 +680,12 @@ export type CouponValidationApiResponse = {
 };
 
 export const validateCoupon = async (
-  getAuthorizationHeader: () => Promise<string>,
   couponCode: string
 ): Promise<CouponValidationApiResponse> => {
-  const authorizationHeader = await getAuthorizationHeader();
-
   const response = await apiClient.post(
     '/subscription-v2/action/validate-coupon',
     {
       couponCode,
-    },
-    {
-      headers: {
-        Authorization: authorizationHeader,
-      },
     }
   );
 
@@ -806,4 +799,37 @@ export const getRedemptionCodes = async (
     data: response.data,
     endpointName: '/redemption-code of Usage API',
   });
+};
+
+export const getNewestRedemptionCodeForBundle = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  bundleListingData: BundleListingData
+): Promise<?string> => {
+  if (
+    !bundleListingData.includedRedemptionCodes ||
+    bundleListingData.includedRedemptionCodes.length === 0
+  ) {
+    return null;
+  }
+
+  const expectedPlanId =
+    bundleListingData.includedRedemptionCodes[0].givenSubscriptionPlanId;
+
+  try {
+    const allCodes = await getRedemptionCodes(getAuthorizationHeader, userId);
+    const matchingCodes = allCodes.filter(
+      code => code.givenSubscriptionPlanId === expectedPlanId
+    );
+
+    if (matchingCodes.length === 0) {
+      return null;
+    }
+
+    matchingCodes.sort((a, b) => b.createdAt - a.createdAt);
+    return matchingCodes[0].code;
+  } catch (error) {
+    console.error('Error fetching redemption codes:', error);
+    return null;
+  }
 };

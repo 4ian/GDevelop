@@ -25,7 +25,6 @@ import {
 import Window from '../../../Utils/Window';
 import Text from '../../../UI/Text';
 import { ColumnStackLayout, LineStackLayout } from '../../../UI/Layout';
-import RedeemCodeDialog from '../../RedeemCodeDialog';
 import PlaceholderLoader from '../../../UI/PlaceholderLoader';
 import { Column, Line, Spacer } from '../../../UI/Grid';
 import { SubscriptionContext } from '../SubscriptionContext';
@@ -120,12 +119,10 @@ export default function SubscriptionDialog({
   const [isChangingSubscription, setIsChangingSubscription] = React.useState(
     false
   );
-  const [isRefreshing, setIsRefreshing] = React.useState(false);
   const [
     educationPlanSeatsCount,
     setEducationPlanSeatsCount,
   ] = React.useState<number>(20);
-  const [redeemCodeDialogOpen, setRedeemCodeDialogOpen] = React.useState(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
     getAuthorizationHeader,
@@ -283,9 +280,7 @@ export default function SubscriptionDialog({
   };
 
   const isLoading =
-    authenticatedUser.loginState === 'loggingIn' ||
-    isChangingSubscription ||
-    isRefreshing;
+    authenticatedUser.loginState === 'loggingIn' || isChangingSubscription;
 
   const isPlanValid = hasValidSubscriptionPlan(authenticatedUser.subscription);
 
@@ -362,7 +357,7 @@ export default function SubscriptionDialog({
   // Validate coupon when coupon code is provided
   React.useEffect(
     () => {
-      if (!couponCode || !getAuthorizationHeader) {
+      if (!couponCode) {
         // Clear local state when coupon is removed
         setPricingSystemDiscounts({});
         setCouponErrorMessage(null);
@@ -375,10 +370,7 @@ export default function SubscriptionDialog({
         setCouponErrorMessage(null);
 
         try {
-          const result = await validateCoupon(
-            getAuthorizationHeader,
-            couponCode
-          );
+          const result = await validateCoupon(couponCode);
 
           if (result.isValid) {
             // Convert array to map for easier lookup by pricingSystemId
@@ -404,7 +396,7 @@ export default function SubscriptionDialog({
 
       validateCouponCode();
     },
-    [couponCode, getAuthorizationHeader]
+    [couponCode]
   );
 
   return (
@@ -556,7 +548,7 @@ export default function SubscriptionDialog({
                     onClickRedeemCode={
                       !authenticatedUser.authenticated
                         ? authenticatedUser.onOpenCreateAccountDialog
-                        : () => setRedeemCodeDialogOpen(true)
+                        : () => authenticatedUser.onOpenRedeemCodeDialog()
                     }
                     subscriptionPlanWithPricingSystems={displayedPlan}
                     disabled={isLoading}
@@ -663,24 +655,6 @@ export default function SubscriptionDialog({
               onCloseAfterSuccess={() => {
                 setCancelReasonDialogOpen(false);
                 onClose();
-              }}
-            />
-          )}
-          {redeemCodeDialogOpen && (
-            <RedeemCodeDialog
-              authenticatedUser={authenticatedUser}
-              onClose={async hasJustRedeemedCode => {
-                setRedeemCodeDialogOpen(false);
-
-                if (hasJustRedeemedCode) {
-                  try {
-                    onOpenPendingDialog(true);
-                    setIsRefreshing(true);
-                    await authenticatedUser.onRefreshSubscription();
-                  } finally {
-                    setIsRefreshing(false);
-                  }
-                }
               }}
             />
           )}

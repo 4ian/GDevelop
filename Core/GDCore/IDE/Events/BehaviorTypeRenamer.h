@@ -4,8 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 
-#ifndef GDCORE_BEHAVIORTYPERENAMER_H
-#define GDCORE_BEHAVIORTYPERENAMER_H
+#pragma once
 #include <set>
 
 #include "GDCore/IDE/Project/ArbitraryObjectsWorker.h"
@@ -34,5 +33,3 @@ class GD_CORE_API BehaviorTypeRenamer : public ArbitraryObjectsWorker {
 };
 
 };  // namespace gd
-
-#endif // GDCORE_BEHAVIORTYPERENAMER_H

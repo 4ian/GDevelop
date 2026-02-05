@@ -16,6 +16,7 @@
 #include "GDCore/IDE/EventBasedObjectBrowser.h"
 #include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
 #include "GDCore/IDE/Events/BehaviorParametersFiller.h"
+#include "GDCore/IDE/Events/BehaviorPropertyRenamer.h"
 #include "GDCore/IDE/Events/BehaviorTypeRenamer.h"
 #include "GDCore/IDE/Events/CustomObjectTypeRenamer.h"
 #include "GDCore/IDE/Events/EventsBehaviorRenamer.h"
@@ -30,6 +31,7 @@
 #include "GDCore/IDE/Events/InstructionsTypeRenamer.h"
 #include "GDCore/IDE/Events/LinkEventTargetRenamer.h"
 #include "GDCore/IDE/Events/LeaderboardIdRenamer.h"
+#include "GDCore/IDE/Events/ObjectPropertyRenamer.h"
 #include "GDCore/IDE/Events/ProjectElementRenamer.h"
 #include "GDCore/IDE/Project/BehaviorObjectTypeRenamer.h"
 #include "GDCore/IDE/Project/BehaviorsSharedDataBehaviorTypeRenamer.h"
@@ -1021,6 +1023,14 @@ void WholeProjectRefactorer::RenameEventsBasedBehaviorProperty(
   auto &properties = eventsBasedBehavior.GetPropertyDescriptors();
   if (!properties.Has(oldPropertyName))
     return;
+  const auto &behaviorType = gd::PlatformExtension::GetBehaviorFullType(
+      eventsFunctionsExtension.GetName(), eventsBasedBehavior.GetName());
+
+  // Rename the property in behaviors of all objects.
+  const WholeProjectBrowser projectBrowser;
+  auto behaviorPropertyRenamer = gd::BehaviorPropertyRenamer(
+      behaviorType, oldPropertyName, newPropertyName);
+  projectBrowser.ExposeObjects(project, behaviorPropertyRenamer);
 
   if (properties.Get(oldPropertyName).GetType() == "Behavior") {
     // This is a property representing another behavior that must exist on the
@@ -1049,8 +1059,7 @@ void WholeProjectRefactorer::RenameEventsBasedBehaviorProperty(
     gd::ExpressionsRenamer expressionRenamer =
         gd::ExpressionsRenamer(project.GetCurrentPlatform());
     expressionRenamer.SetReplacedBehaviorExpression(
-        gd::PlatformExtension::GetBehaviorFullType(
-            eventsFunctionsExtension.GetName(), eventsBasedBehavior.GetName()),
+        behaviorType,
         EventsBasedBehavior::GetPropertyExpressionName(oldPropertyName),
         EventsBasedBehavior::GetPropertyExpressionName(newPropertyName));
     gd::ProjectBrowserHelper::ExposeProjectEvents(project, expressionRenamer);
@@ -1173,6 +1182,14 @@ void WholeProjectRefactorer::RenameEventsBasedObjectProperty(
   auto &properties = eventsBasedObject.GetPropertyDescriptors();
   if (!properties.Has(oldPropertyName))
     return;
+  const auto &objectType = gd::PlatformExtension::GetObjectFullType(
+      eventsFunctionsExtension.GetName(), eventsBasedObject.GetName());
+
+  // Rename the property in all custom objects of this type.
+  const WholeProjectBrowser projectBrowser;
+  auto objectPropertyRenamer =
+      gd::ObjectPropertyRenamer(objectType, oldPropertyName, newPropertyName);
+  projectBrowser.ExposeObjects(project, objectPropertyRenamer);
 
   // Properties that represent primitive values will be used through
   // their related actions/conditions/expressions. Rename these.
@@ -1185,8 +1202,7 @@ void WholeProjectRefactorer::RenameEventsBasedObjectProperty(
   gd::ExpressionsRenamer expressionRenamer =
       gd::ExpressionsRenamer(project.GetCurrentPlatform());
   expressionRenamer.SetReplacedObjectExpression(
-      gd::PlatformExtension::GetObjectFullType(
-          eventsFunctionsExtension.GetName(), eventsBasedObject.GetName()),
+      objectType,
       EventsBasedObject::GetPropertyExpressionName(oldPropertyName),
       EventsBasedObject::GetPropertyExpressionName(newPropertyName));
   gd::ProjectBrowserHelper::ExposeProjectEvents(project, expressionRenamer);

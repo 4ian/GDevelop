@@ -29,7 +29,6 @@ public:
 
 private:
   void DoVisitObject(gd::Object &object) override;
-  void DoVisitBehavior(gd::Behavior &behavior) override;
 
   gd::String objectType;
   gd::String oldName;

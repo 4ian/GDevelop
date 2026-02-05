@@ -29,7 +29,6 @@ public:
   virtual ~BehaviorPropertyRenamer();
 
 private:
-  void DoVisitObject(gd::Object &object) override;
   void DoVisitBehavior(gd::Behavior &behavior) override;
 
   gd::String behaviorType;

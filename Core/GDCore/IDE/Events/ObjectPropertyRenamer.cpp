@@ -16,8 +16,6 @@ void ObjectPropertyRenamer::DoVisitObject(gd::Object &object) {
   }
 };
 
-void ObjectPropertyRenamer::DoVisitBehavior(gd::Behavior &behavior) {};
-
 ObjectPropertyRenamer::~ObjectPropertyRenamer() {}
 
 } // namespace gd

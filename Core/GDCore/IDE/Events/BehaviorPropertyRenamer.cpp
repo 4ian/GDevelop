@@ -10,8 +10,6 @@
 
 namespace gd {
 
-void BehaviorPropertyRenamer::DoVisitObject(gd::Object &object) {};
-
 void BehaviorPropertyRenamer::DoVisitBehavior(gd::Behavior &behavior) {
   if (behavior.GetTypeName() == behaviorType) {
     behavior.RenameProperty(oldName, newName);

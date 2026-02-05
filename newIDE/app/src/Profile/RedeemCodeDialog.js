@@ -12,6 +12,7 @@ import { redeemCode } from '../Utils/GDevelopServices/Usage';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import AlertMessage from '../UI/AlertMessage';
 import Form from '../UI/Form';
+import { SubscriptionContext } from './Subscription/SubscriptionContext';
 
 type Props = {|
   onClose: (hasJustRedeemedCode: boolean) => Promise<void>,
@@ -73,6 +74,7 @@ export default function RedeemCodeDialog({
   const [redemptionCode, setRedemptionCode] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<?Error>(null);
+  const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
 
   const onRedeemCode = async () => {
     setIsLoading(true);
@@ -91,7 +93,27 @@ export default function RedeemCodeDialog({
       // that a redemption happened - so some update should be fetched.
       onClose(/*hasJustRedeemedCode=*/ true);
     } catch (error) {
-      setError(error);
+      const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+        error
+      );
+      if (
+        extractedStatusAndCode &&
+        extractedStatusAndCode.code === 'redemption-code/code-is-a-coupon'
+      ) {
+        // This is a coupon code, not a redemption code.
+        // Open the subscription dialog with this coupon code.
+        openSubscriptionDialog({
+          analyticsMetadata: {
+            reason: 'Coupon code entered',
+            placementId: 'redeem-code',
+          },
+          couponCode: redemptionCode.trim().toLowerCase(),
+        });
+        // Close this dialog
+        onClose(/*hasJustRedeemedCode=*/ false);
+      } else {
+        setError(error);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -136,7 +158,7 @@ export default function RedeemCodeDialog({
                 value={redemptionCode}
                 onChange={setRedemptionCode}
                 translatableHintText={t`Enter your code here`}
-                floatingLabelText={<Trans>Redemption code</Trans>}
+                floatingLabelText={<Trans>Redemption or coupon code</Trans>}
                 floatingLabelFixed
                 errorText={getRedeemCodeErrorText(error)}
                 autoFocus="desktop"

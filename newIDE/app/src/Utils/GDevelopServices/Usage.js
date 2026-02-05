@@ -620,11 +620,13 @@ export const getRedirectToCheckoutUrl = ({
   userId,
   userEmail,
   quantity,
+  couponCode,
 }: {|
   pricingSystemId: string,
   userId: string,
   userEmail: string,
   quantity?: number,
+  couponCode?: string,
 |}): string => {
   const url = new URL(
     `${GDevelopUsageApi.baseUrl}/subscription-v2/action/redirect-to-checkout-v2`
@@ -634,6 +636,7 @@ export const getRedirectToCheckoutUrl = ({
   url.searchParams.set('customerEmail', userEmail);
   if (quantity !== undefined && quantity > 1)
     url.searchParams.set('quantity', quantity.toString());
+  if (couponCode) url.searchParams.set('couponCode', couponCode);
   return url.toString();
 };
 
@@ -658,6 +661,42 @@ export const redeemCode = async (
       },
     }
   );
+};
+
+export interface PricingSystemDiscount {
+  pricingSystemId: string;
+  discountMessage: string;
+  originalAmountInCents: number;
+  discountedAmountInCents: number;
+  currency: string;
+  discountedPaypalPlanId: string | null;
+}
+
+export type CouponValidationApiResponse = {
+  isValid: boolean,
+  pricingSystemDiscounts: PricingSystemDiscount[],
+  errorMessage?: string,
+};
+
+export const validateCoupon = async (
+  getAuthorizationHeader: () => Promise<string>,
+  couponCode: string
+): Promise<CouponValidationApiResponse> => {
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await apiClient.post(
+    '/subscription-v2/action/validate-coupon',
+    {
+      couponCode,
+    },
+    {
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+
+  return response.data;
 };
 
 export const canBenefitFromDiscordRole = (subscription: ?Subscription) => {

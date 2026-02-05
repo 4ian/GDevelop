@@ -6,6 +6,7 @@ import { Column, Line, Spacer } from '../../../UI/Grid';
 import {
   type SubscriptionPlanWithPricingSystems,
   type SubscriptionPlanPricingSystem,
+  type PricingSystemDiscount,
   EDUCATION_PLAN_MAX_SEATS,
   EDUCATION_PLAN_MIN_SEATS,
   hasValidSubscriptionPlan,
@@ -75,6 +76,69 @@ const getYearlyDiscountDisplayText = (
   );
 };
 
+const formatPriceWithDiscount = (
+  pricingSystem: SubscriptionPlanPricingSystem,
+  discount: ?PricingSystemDiscount,
+  periodLabel: 'Yearly' | 'Monthly',
+  validColor: string
+) => {
+  if (discount) {
+    return !pricingSystem.isPerUser ? (
+      <Trans>
+        {periodLabel},{' '}
+        <span style={{ textDecoration: 'line-through' }}>
+          {formatPriceWithCurrency(
+            pricingSystem.amountInCents,
+            pricingSystem.currency
+          )}
+        </span>{' '}
+        <span style={{ color: validColor }}>
+          {formatPriceWithCurrency(
+            discount.discountedAmountInCents,
+            discount.currency
+          )}
+        </span>
+      </Trans>
+    ) : (
+      <Trans>
+        {periodLabel},{' '}
+        <span style={{ textDecoration: 'line-through' }}>
+          {formatPriceWithCurrency(
+            pricingSystem.amountInCents,
+            pricingSystem.currency
+          )}
+        </span>{' '}
+        <span style={{ color: validColor }}>
+          {formatPriceWithCurrency(
+            discount.discountedAmountInCents,
+            discount.currency
+          )}
+        </span>{' '}
+        per seat
+      </Trans>
+    );
+  }
+
+  return !pricingSystem.isPerUser ? (
+    <Trans>
+      {periodLabel},
+      {formatPriceWithCurrency(
+        pricingSystem.amountInCents,
+        pricingSystem.currency
+      )}
+    </Trans>
+  ) : (
+    <Trans>
+      {periodLabel},
+      {formatPriceWithCurrency(
+        pricingSystem.amountInCents,
+        pricingSystem.currency
+      )}{' '}
+      per seat
+    </Trans>
+  );
+};
+
 const SubscriptionPlanPricingSummary = ({
   subscriptionPlanWithPricingSystems,
   disabled,
@@ -84,6 +148,7 @@ const SubscriptionPlanPricingSummary = ({
   period,
   setPeriod,
   onlyShowDiscountedPrice,
+  pricingSystemDiscounts,
 }: {|
   subscriptionPlanWithPricingSystems: SubscriptionPlanWithPricingSystems,
   disabled?: boolean,
@@ -95,6 +160,7 @@ const SubscriptionPlanPricingSummary = ({
   period: 'year' | 'month',
   setPeriod: ('year' | 'month') => void,
   onlyShowDiscountedPrice?: boolean,
+  pricingSystemDiscounts?: { [pricingSystemId: string]: PricingSystemDiscount },
 |}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const selectedPricingSystem = subscriptionPlanWithPricingSystems.pricingSystems.find(
@@ -147,6 +213,12 @@ const SubscriptionPlanPricingSummary = ({
     monthlyPlanPrice,
     yearlyPlanPrice
   );
+
+  // Get coupon discounts for yearly and monthly pricing systems
+  const yearlyDiscount =
+    pricingSystemDiscounts && pricingSystemDiscounts[yearlyPlanPrice.id];
+  const monthlyDiscount =
+    pricingSystemDiscounts && pricingSystemDiscounts[monthlyPlanPrice.id];
 
   return (
     <I18n>
@@ -243,23 +315,11 @@ const SubscriptionPlanPricingSummary = ({
                           <Line>
                             <Column>
                               <Text noMargin color="inherit" size="sub-title">
-                                {!yearlyPlanPrice.isPerUser ? (
-                                  <Trans>
-                                    Yearly,
-                                    {formatPriceWithCurrency(
-                                      yearlyPlanPrice.amountInCents,
-                                      yearlyPlanPrice.currency
-                                    )}
-                                  </Trans>
-                                ) : (
-                                  <Trans>
-                                    Yearly,
-                                    {formatPriceWithCurrency(
-                                      yearlyPlanPrice.amountInCents,
-                                      yearlyPlanPrice.currency
-                                    )}{' '}
-                                    per seat
-                                  </Trans>
+                                {formatPriceWithDiscount(
+                                  yearlyPlanPrice,
+                                  yearlyDiscount,
+                                  'Yearly',
+                                  gdevelopTheme.message.valid
                                 )}
                               </Text>
                               <Text color="secondary" noMargin>
@@ -328,23 +388,11 @@ const SubscriptionPlanPricingSummary = ({
                           <Line>
                             <Column>
                               <Text noMargin size="sub-title" color="inherit">
-                                {!monthlyPlanPrice.isPerUser ? (
-                                  <Trans>
-                                    Monthly,
-                                    {formatPriceWithCurrency(
-                                      monthlyPlanPrice.amountInCents,
-                                      monthlyPlanPrice.currency
-                                    )}
-                                  </Trans>
-                                ) : (
-                                  <Trans>
-                                    Monthly,
-                                    {formatPriceWithCurrency(
-                                      monthlyPlanPrice.amountInCents,
-                                      monthlyPlanPrice.currency
-                                    )}{' '}
-                                    per seat
-                                  </Trans>
+                                {formatPriceWithDiscount(
+                                  monthlyPlanPrice,
+                                  monthlyDiscount,
+                                  'Monthly',
+                                  gdevelopTheme.message.valid
                                 )}
                               </Text>
                             </Column>

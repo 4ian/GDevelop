@@ -31,7 +31,7 @@ import {
   proMonthlyPricingSystem,
   fakeGoldWithPurchaselyAuthenticatedUser,
 } from '../../../../fixtures/GDevelopServicesTestData';
-import PromotionSubscriptionDialog from '../../../../Profile/Subscription/PromotionSubscriptionDialog';
+import SubscriptionDialog from '../../../../Profile/Subscription/SubscriptionDialog';
 import AlertProvider from '../../../../UI/Alert/AlertProvider';
 import {
   SubscriptionContext,
@@ -40,8 +40,8 @@ import {
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 
 export default {
-  title: 'Subscription/PromotionSubscriptionDialog',
-  component: PromotionSubscriptionDialog,
+  title: 'Subscription/SubscriptionDialog',
+  component: SubscriptionDialog,
   decorators: [paperDecorator],
   argTypes: {
     userState: {
@@ -162,7 +162,7 @@ export const Default = ({
       recommendedPlanId === 'None' ? null : recommendedPlanId;
 
     return (
-      <PromotionSubscriptionDialog
+      <SubscriptionDialog
         availableSubscriptionPlansWithPrices={filteredPlans}
         userSubscriptionPlanEvenIfLegacy={userSubscriptionPlanEvenIfLegacy}
         onClose={() => action('on close')()}

@@ -15,6 +15,8 @@ import {
   isSubscriptionComingFromTeam,
   hasMobileAppStoreSubscriptionPlan,
   canUpgradeSubscription,
+  validateCoupon,
+  type PricingSystemDiscount,
 } from '../../../Utils/GDevelopServices/Usage';
 import {
   sendCancelSubscriptionToChange,
@@ -26,8 +28,9 @@ import { ColumnStackLayout, LineStackLayout } from '../../../UI/Layout';
 import RedeemCodeDialog from '../../RedeemCodeDialog';
 import PlaceholderLoader from '../../../UI/PlaceholderLoader';
 import { Column, Line, Spacer } from '../../../UI/Grid';
+import { SubscriptionContext } from '../SubscriptionContext';
 import SubscriptionOptions from './SubscriptionOptions';
-import PromotionSubscriptionPlan from './PromotionSubscriptionPlan';
+import SubscriptionPlan from './SubscriptionPlan';
 import AlertMessage from '../../../UI/AlertMessage';
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 import Paper from '../../../UI/Paper';
@@ -103,14 +106,16 @@ type Props = {|
   userSubscriptionPlanEvenIfLegacy: ?SubscriptionPlanWithPricingSystems,
   recommendedPlanId: ?string,
   onOpenPendingDialog: (open: boolean) => void,
+  couponCode?: ?string,
 |};
 
-export default function PromotionSubscriptionDialog({
+export default function SubscriptionDialog({
   onClose,
   availableSubscriptionPlansWithPrices,
   userSubscriptionPlanEvenIfLegacy,
   recommendedPlanId,
   onOpenPendingDialog,
+  couponCode,
 }: Props) {
   const [isChangingSubscription, setIsChangingSubscription] = React.useState(
     false
@@ -129,6 +134,8 @@ export default function PromotionSubscriptionDialog({
     subscriptionPricingSystem,
   } = authenticatedUser;
 
+  const { clearCouponCode } = React.useContext(SubscriptionContext);
+
   const [
     availableRecommendedPlanId,
     setAvailableRecommendedPlanId,
@@ -142,6 +149,22 @@ export default function PromotionSubscriptionDialog({
   } = useAlertDialog();
   const [cancelReasonDialogOpen, setCancelReasonDialogOpen] = React.useState(
     false
+  );
+  const [pricingSystemDiscounts, setPricingSystemDiscounts] = React.useState<{
+    [pricingSystemId: string]: PricingSystemDiscount,
+  }>({});
+  const [isValidatingCoupon, setIsValidatingCoupon] = React.useState(false);
+  const [couponErrorMessage, setCouponErrorMessage] = React.useState<?string>(
+    null
+  );
+
+  const onClearCoupon = React.useCallback(
+    () => {
+      clearCouponCode();
+      setPricingSystemDiscounts({});
+      setCouponErrorMessage(null);
+    },
+    [clearCouponCode]
   );
 
   const buyUpdateOrCancelPlan = async (
@@ -169,6 +192,7 @@ export default function PromotionSubscriptionDialog({
           userId: profile.id,
           userEmail: profile.email,
           quantity,
+          couponCode: couponCode || undefined,
         })
       );
       return;
@@ -253,6 +277,7 @@ export default function PromotionSubscriptionDialog({
         pricingSystemId: subscriptionPlanPricingSystem.id,
         userId: profile.id,
         userEmail: profile.email,
+        couponCode: couponCode || undefined,
       })
     );
   };
@@ -288,7 +313,8 @@ export default function PromotionSubscriptionDialog({
 
   React.useEffect(
     () => {
-      if (purchasablePlansWithPricingSystems) {
+      // Only set the selected plan on initial load, not when subscription updates
+      if (purchasablePlansWithPricingSystems && selectedPlanId === null) {
         // We recommend a planId only if the user doesn't have a plan yet,
         // or has a plan that can be upgraded.
         let planIdToRecommend = null;
@@ -318,6 +344,7 @@ export default function PromotionSubscriptionDialog({
       recommendedPlanId,
       userPlanId,
       authenticatedUser.subscription,
+      selectedPlanId,
     ]
   );
 
@@ -330,6 +357,54 @@ export default function PromotionSubscriptionDialog({
           )
         : null,
     [purchasablePlansWithPricingSystems, selectedPlanId]
+  );
+
+  // Validate coupon when coupon code is provided
+  React.useEffect(
+    () => {
+      if (!couponCode || !getAuthorizationHeader) {
+        // Clear local state when coupon is removed
+        setPricingSystemDiscounts({});
+        setCouponErrorMessage(null);
+        setIsValidatingCoupon(false);
+        return;
+      }
+
+      const validateCouponCode = async () => {
+        setIsValidatingCoupon(true);
+        setCouponErrorMessage(null);
+
+        try {
+          const result = await validateCoupon(
+            getAuthorizationHeader,
+            couponCode
+          );
+
+          if (result.isValid) {
+            // Convert array to map for easier lookup by pricingSystemId
+            const discountsMap: {
+              [pricingSystemId: string]: PricingSystemDiscount,
+            } = {};
+            result.pricingSystemDiscounts.forEach(discount => {
+              discountsMap[discount.pricingSystemId] = discount;
+            });
+            setPricingSystemDiscounts(discountsMap);
+          } else {
+            setCouponErrorMessage(result.errorMessage || null);
+            setPricingSystemDiscounts({});
+          }
+        } catch (error) {
+          console.error('Error validating coupon:', error);
+          setCouponErrorMessage('Error validating coupon');
+          setPricingSystemDiscounts({});
+        } finally {
+          setIsValidatingCoupon(false);
+        }
+      };
+
+      validateCouponCode();
+    },
+    [couponCode, getAuthorizationHeader]
   );
 
   return (
@@ -477,7 +552,7 @@ export default function PromotionSubscriptionDialog({
             ) : (
               <ColumnStackLayout noMargin justifyContent="space-between" expand>
                 <ColumnStackLayout expand noMargin>
-                  <PromotionSubscriptionPlan
+                  <SubscriptionPlan
                     onClickRedeemCode={
                       !authenticatedUser.authenticated
                         ? authenticatedUser.onOpenCreateAccountDialog
@@ -494,6 +569,11 @@ export default function PromotionSubscriptionDialog({
                     }}
                     seatsCount={educationPlanSeatsCount}
                     setSeatsCount={setEducationPlanSeatsCount}
+                    couponCode={couponCode}
+                    pricingSystemDiscounts={pricingSystemDiscounts}
+                    couponErrorMessage={couponErrorMessage}
+                    isValidatingCoupon={isValidatingCoupon}
+                    onClearCoupon={onClearCoupon}
                   />
                   <SubscriptionOptions
                     subscriptionPlansWithPricingSystems={

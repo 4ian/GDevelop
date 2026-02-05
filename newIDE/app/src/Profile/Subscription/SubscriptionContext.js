@@ -18,7 +18,7 @@ import {
 } from '../../Utils/GDevelopServices/Usage';
 import AuthenticatedUserContext from '../AuthenticatedUserContext';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
-import PromotionSubscriptionDialog from './PromotionSubscriptionDialog';
+import SubscriptionDialog from './SubscriptionDialog';
 import SubscriptionPendingDialog from './SubscriptionPendingDialog';
 import LoaderModal from '../../UI/LoaderModal';
 import { useAsyncLazyMemo } from '../../Utils/UseLazyMemo';
@@ -91,8 +91,17 @@ type SubscriptionState = {|
    */
   openSubscriptionDialog: ({|
     analyticsMetadata: SubscriptionAnalyticsMetadata,
+    couponCode?: string,
   |}) => void,
   openSubscriptionPendingDialog: () => void,
+  /**
+   * Returns the current coupon code being used, or null.
+   */
+  getCouponCode: () => ?string,
+  /**
+   * Clears the current coupon code.
+   */
+  clearCouponCode: () => void,
 |};
 
 export const SubscriptionContext = React.createContext<SubscriptionState>({
@@ -100,6 +109,8 @@ export const SubscriptionContext = React.createContext<SubscriptionState>({
   getUserSubscriptionPlanEvenIfLegacy: () => null,
   openSubscriptionDialog: () => {},
   openSubscriptionPendingDialog: () => {},
+  getCouponCode: () => null,
+  clearCouponCode: () => {},
 });
 
 type SubscriptionProviderProps = {|
@@ -115,6 +126,7 @@ export const SubscriptionProvider = ({
     analyticsMetadata,
     setAnalyticsMetadata,
   ] = React.useState<?SubscriptionAnalyticsMetadata>(null);
+  const [couponCode, setCouponCode] = React.useState<?string>(null);
   const recommendedPlanId = analyticsMetadata
     ? analyticsMetadata.recommendedPlanId
     : null;
@@ -201,10 +213,13 @@ export const SubscriptionProvider = ({
     []
   );
 
-  const closeSubscriptionDialog = () => setAnalyticsMetadata(null);
+  const closeSubscriptionDialog = () => {
+    setAnalyticsMetadata(null);
+    setCouponCode(null);
+  };
 
   const openSubscriptionDialog = React.useCallback(
-    ({ analyticsMetadata: metadata }) => {
+    ({ analyticsMetadata: metadata, couponCode: coupon }) => {
       if (isNativeMobileApp() || simulateMobileApp) {
         if (hasValidSubscriptionPlan(authenticatedUser.subscription)) {
           if (
@@ -221,6 +236,7 @@ export const SubscriptionProvider = ({
         // Would present App Store screen.
       } else {
         setAnalyticsMetadata(metadata);
+        setCouponCode(coupon || null);
       }
     },
     [authenticatedUser.subscription, showAlert, simulateMobileApp]
@@ -247,18 +263,26 @@ export const SubscriptionProvider = ({
     ]
   );
 
+  const getCouponCode = React.useCallback(() => couponCode, [couponCode]);
+
+  const clearCouponCode = React.useCallback(() => setCouponCode(null), []);
+
   const value = React.useMemo(
     () => ({
       getSubscriptionPlansWithPricingSystems,
       getUserSubscriptionPlanEvenIfLegacy,
       openSubscriptionDialog,
       openSubscriptionPendingDialog,
+      getCouponCode,
+      clearCouponCode,
     }),
     [
       getSubscriptionPlansWithPricingSystems,
       getUserSubscriptionPlanEvenIfLegacy,
       openSubscriptionDialog,
       openSubscriptionPendingDialog,
+      getCouponCode,
+      clearCouponCode,
     ]
   );
 
@@ -289,7 +313,7 @@ export const SubscriptionProvider = ({
         authenticatedUser.loginState === 'loggingIn' ? (
           <LoaderModal showImmediately />
         ) : (
-          <PromotionSubscriptionDialog
+          <SubscriptionDialog
             availableSubscriptionPlansWithPrices={getSubscriptionPlansWithPricingSystems()}
             userSubscriptionPlanEvenIfLegacy={getUserSubscriptionPlanEvenIfLegacy()}
             onClose={closeSubscriptionDialog}
@@ -297,6 +321,7 @@ export const SubscriptionProvider = ({
             onOpenPendingDialog={(open: boolean) =>
               setSubscriptionPendingDialogOpen(open)
             }
+            couponCode={couponCode}
           />
         )
       ) : null}

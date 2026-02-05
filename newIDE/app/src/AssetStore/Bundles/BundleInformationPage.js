@@ -36,9 +36,9 @@ import Text from '../../UI/Text';
 import CourseStoreContext from '../../Course/CourseStoreContext';
 import { planIdSortingFunction } from '../../Profile/Subscription/PlanSmallCard';
 import { SubscriptionContext } from '../../Profile/Subscription/SubscriptionContext';
-import SubscriptionPlanPricingSummary from '../../Profile/Subscription/PromotionSubscriptionDialog/SubscriptionPlanPricingSummary';
+import SubscriptionPlanPricingSummary from '../../Profile/Subscription/SubscriptionDialog/SubscriptionPlanPricingSummary';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
-import SubscriptionPlanTableSummary from '../../Profile/Subscription/PromotionSubscriptionDialog/SubscriptionPlanTableSummary';
+import SubscriptionPlanTableSummary from '../../Profile/Subscription/SubscriptionDialog/SubscriptionPlanTableSummary';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { LARGE_WIDGET_SIZE } from '../../MainFrame/EditorContainers/HomePage/CardWidget';
 import SectionContainer, {

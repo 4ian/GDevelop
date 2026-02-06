@@ -689,7 +689,8 @@ namespace gdjs {
               ) {
                 const polygon = new gdjs.Polygon();
                 this.hitBoxes[polygonIndex] = polygon;
-                polygon.vertices.length = definitionHitboxes[polygonIndex].length;
+                polygon.vertices.length =
+                  definitionHitboxes[polygonIndex].length;
                 for (
                   let vertexIndex = 0;
                   vertexIndex < polygon.vertices.length;

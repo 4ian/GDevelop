@@ -11,7 +11,6 @@ const path = optionalRequire('path');
 export type ParsedProjectSettings = {
   preferences?: { [string]: boolean | string | number },
   toolbarButtons?: Array<ToolbarButtonConfig>,
-  projectPath: string,
 };
 
 const SETTINGS_FILE_NAME = 'gdevelop-settings.yaml';
@@ -19,7 +18,7 @@ const SETTINGS_FILE_NAME = 'gdevelop-settings.yaml';
 // Only allow safe characters in npm script names to prevent command injection
 const SAFE_SCRIPT_NAME_PATTERN = /^[a-zA-Z0-9_:-]+$/;
 
-const getProjectDirectory = (projectFilePath: string): string | null => {
+export const getProjectDirectory = (projectFilePath: string): string | null => {
   if (!path) return null;
   return path.dirname(projectFilePath);
 };
@@ -133,7 +132,7 @@ export const readProjectSettings = async (
       } preferences, ${toolbarButtons.length} buttons`
     );
 
-    const result: ParsedProjectSettings = { projectPath: projectDirectory };
+    const result: ParsedProjectSettings = {};
     if (Object.keys(preferences).length > 0) {
       result.preferences = preferences;
     }

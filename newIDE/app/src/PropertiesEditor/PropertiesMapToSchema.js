@@ -55,6 +55,8 @@ const createField = (
 
   const measurementUnit = property.getMeasurementUnit();
   // TODO Pass this object in the schema instead of building an UI element here.
+  // It will allow to use these data to make a different component for the
+  // compact and regular UI.
   const enumeratedMeasurementUnit = {
     shortLabel: getMeasurementUnitShortLabel(measurementUnit),
     label: measurementUnit.getLabel(),

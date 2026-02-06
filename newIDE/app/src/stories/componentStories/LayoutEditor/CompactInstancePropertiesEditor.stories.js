@@ -43,7 +43,7 @@ export const InstanceSprite2d = () => (
             tileMapTileSelection={null}
             onSelectTileMapTile={() => {}}
             isVariableListLocked={false}
-            canOverrideBehaviors={true}
+            canOverrideBehaviorProperties={true}
             resourceManagementProps={fakeResourceManagementProps}
           />
         </SerializedObjectDisplay>
@@ -76,7 +76,7 @@ export const InstanceCube3d = () => (
             tileMapTileSelection={null}
             onSelectTileMapTile={() => {}}
             isVariableListLocked={false}
-            canOverrideBehaviors={true}
+            canOverrideBehaviorProperties={true}
             resourceManagementProps={fakeResourceManagementProps}
           />
         </SerializedObjectDisplay>
@@ -109,7 +109,7 @@ export const InstanceTextInput = () => (
             tileMapTileSelection={null}
             onSelectTileMapTile={() => {}}
             isVariableListLocked={false}
-            canOverrideBehaviors={true}
+            canOverrideBehaviorProperties={true}
             resourceManagementProps={fakeResourceManagementProps}
           />
         </SerializedObjectDisplay>

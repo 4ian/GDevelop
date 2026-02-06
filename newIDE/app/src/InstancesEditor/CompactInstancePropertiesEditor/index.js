@@ -126,7 +126,7 @@ type Props = {|
   tileMapTileSelection: ?TileMapTileSelection,
   onSelectTileMapTile: (?TileMapTileSelection) => void,
   isVariableListLocked: boolean,
-  canOverrideBehaviors: boolean,
+  canOverrideBehaviorProperties: boolean,
 |};
 
 export const CompactInstancePropertiesEditor = ({
@@ -148,7 +148,7 @@ export const CompactInstancePropertiesEditor = ({
   tileMapTileSelection,
   onSelectTileMapTile,
   isVariableListLocked,
-  canOverrideBehaviors,
+  canOverrideBehaviorProperties,
 }: Props) => {
   const forceUpdate = useForceUpdate();
   const instance = instances[0];
@@ -355,7 +355,7 @@ export const CompactInstancePropertiesEditor = ({
               </Column>
             </>
           )}
-          {object && canOverrideBehaviors ? (
+          {object && canOverrideBehaviorProperties ? (
             <TopLevelCollapsibleSection
               title={<Trans>Behaviors</Trans>}
               isFolded={isBehaviorsFolded}

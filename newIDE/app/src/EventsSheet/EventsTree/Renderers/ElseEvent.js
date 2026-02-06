@@ -26,8 +26,7 @@ const styles = {
 export default class ElseEvent extends React.Component<EventRendererProps, *> {
   render() {
     const elseEvent = gd.asElseEvent(this.props.event);
-    const isElseInvalid = !this.props.isPreviousEventStandardOrElse;
-    console.log('isElseInvalid', isElseInvalid);
+    const { isValidElseEvent } = this.props;
 
     return (
       <div
@@ -38,10 +37,10 @@ export default class ElseEvent extends React.Component<EventRendererProps, *> {
       >
         <div
           className={classNames({
-            [invalidElse]: isElseInvalid,
+            [invalidElse]: !isValidElseEvent,
           })}
         >
-          {!isElseInvalid && (
+          {isValidElseEvent && (
             <span
               className={classNames({
                 [elseLine]: true,
@@ -50,10 +49,11 @@ export default class ElseEvent extends React.Component<EventRendererProps, *> {
           )}
           <Tooltip
             title={
-              isElseInvalid ? (
+              !isValidElseEvent ? (
                 <Trans>
                   This Else event is not preceded by a standard event (or
-                  another Else), so it will run normally.
+                  another Else), so it will run normally, like an event without
+                  an Else.
                 </Trans>
               ) : (
                 <Trans>

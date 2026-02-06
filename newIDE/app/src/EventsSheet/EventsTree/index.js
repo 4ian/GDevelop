@@ -136,7 +136,7 @@ type EventsContainerProps = {|
 
   idPrefix: string,
   highlightedAiGeneratedEventIds: Set<string>,
-  isPreviousEventStandardOrElse: boolean,
+  isValidElseEvent: boolean,
 |};
 
 /**
@@ -255,7 +255,9 @@ const EventContainer = (props: EventsContainerProps) => {
               eventsSheetHeight={props.eventsSheetHeight}
               windowSize={props.windowSize}
               idPrefix={props.idPrefix}
-              isPreviousEventStandardOrElse={props.isPreviousEventStandardOrElse}
+              isValidElseEvent={
+                props.isValidElseEvent
+              }
             />
           </div>
         </div>
@@ -676,7 +678,7 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
                 node.projectScopedContainersAccessor,
             };
 
-            let isPreviousEventStandardOrElse = false;
+            let isValidElseEvent = false;
             if (event.getType() === 'BuiltinCommonInstructions::Else') {
               for (let i = node.indexInList - 1; i >= 0; i--) {
                 const previousEvent = node.eventsList.getEventAt(i);
@@ -685,7 +687,7 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
                   previousEvent.isExecutable()
                 ) {
                   const previousEventType = previousEvent.getType();
-                  isPreviousEventStandardOrElse =
+                  isValidElseEvent =
                     previousEventType ===
                       'BuiltinCommonInstructions::Standard' ||
                     previousEventType === 'BuiltinCommonInstructions::Else';
@@ -803,7 +805,7 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
                   connectDragSource={connectDragSource}
                   windowSize={props.windowSize}
                   idPrefix={`event-${node.relativeNodePath.join('-')}`}
-                  isPreviousEventStandardOrElse={isPreviousEventStandardOrElse}
+                  isValidElseEvent={isValidElseEvent}
                   highlightedAiGeneratedEventIds={
                     props.highlightedAiGeneratedEventIds
                   }

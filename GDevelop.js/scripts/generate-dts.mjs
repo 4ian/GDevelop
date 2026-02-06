@@ -12,6 +12,7 @@ const bindingsFile = readFileSync(
 /** @type {Record<string, {returnType: string, inputType?: string}>} */
 const castFunctions = {
   StandardEvent: { inputType: 'Event', returnType: 'StandardEvent' },
+  ElseEvent: { inputType: 'Event', returnType: 'ElseEvent' },
   RepeatEvent: { inputType: 'Event', returnType: 'RepeatEvent' },
   WhileEvent: { inputType: 'Event', returnType: 'WhileEvent' },
   ForEachEvent: { inputType: 'Event', returnType: 'ForEachEvent' },

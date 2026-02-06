@@ -1090,6 +1090,7 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
 gd::String EventsCodeGenerator::GenerateEventsListCode(
     gd::EventsList& events, EventsCodeGenerationContext& parentContext) {
   gd::String output;
+  bool elseChainCanContinue = false;
   for (std::size_t eId = 0; eId < events.size(); ++eId) {
     auto& event = events[eId];
     if (event.HasVariables()) {
@@ -1117,7 +1118,38 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(
 
     auto& context = reuseParentContext ? reusedContext : newContext;
 
+    const bool isStandardEvent =
+        event.GetType() == "BuiltinCommonInstructions::Standard";
+    const bool isElseEvent =
+        event.GetType() == "BuiltinCommonInstructions::Else";
+
     gd::String eventCoreCode = event.GenerateEventCode(*this, context);
+
+    const bool hasFollowingElseEvent =
+        eId + 1 < events.size() &&
+        events[eId + 1].GetType() == "BuiltinCommonInstructions::Else";
+
+    if (isStandardEvent) {
+      if (hasFollowingElseEvent) {
+        eventCoreCode =
+            GenerateBooleanInitializationToFalse("elseEventsChainSatisfied",
+                                                 context) +
+            eventCoreCode;
+      }
+      elseChainCanContinue = hasFollowingElseEvent;
+    } else if (isElseEvent) {
+      if (!elseChainCanContinue) {
+        // If an Else event is not preceded by a Standard/Else chain,
+        // make it act like a Standard event.
+        eventCoreCode =
+            GenerateBooleanInitializationToFalse("elseEventsChainSatisfied",
+                                                 context) +
+            eventCoreCode;
+      }
+      elseChainCanContinue = hasFollowingElseEvent;
+    } else {
+      elseChainCanContinue = false;
+    }
     gd::String scopeBegin = GenerateScopeBegin(context);
     gd::String scopeEnd = GenerateScopeEnd(context);
     gd::String declarationsCode = GenerateObjectsDeclarationCode(context);

@@ -116,6 +116,7 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
   commonInstructionsExtension->SetExtensionInformation(
       "BuiltinCommonInstructions", "instruction extension", "", "", "");
   commonInstructionsExtension->AddEvent("Standard", "Standard event", "", "", "", std::make_shared<gd::StandardEvent>());
+  commonInstructionsExtension->AddEvent("Else", "Else event", "", "", "", std::make_shared<gd::ElseEvent>());
   commonInstructionsExtension->AddEvent("ForEachChildVariable", "For each child variable event", "", "", "", std::make_shared<gd::ForEachChildVariableEvent>());
   commonInstructionsExtension->AddEvent("Repeat", "Repeat event", "", "", "", std::make_shared<gd::RepeatEvent>());
 

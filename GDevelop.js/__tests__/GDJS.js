@@ -243,6 +243,56 @@ describe('libGD.js - GDJS related tests', function () {
       // Trigger once is used in a condition
       expect(code).toMatch('runtimeScene.getOnceTriggers().triggerOnce');
     });
+
+    it('can generate code for else events', function () {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const layout = project.insertNewLayout('Scene', 0);
+
+      const standardEvent = layout
+        .getEvents()
+        .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+      const elseEvent = layout
+        .getEvents()
+        .insertNewEvent(project, 'BuiltinCommonInstructions::Else', 1);
+
+      const standardCondition = new gd.Instruction();
+      standardCondition.setType('BuiltinCommonInstructions::Always');
+      gd.asStandardEvent(standardEvent).getConditions().insert(standardCondition, 0);
+      standardCondition.delete();
+
+      const standardAction = new gd.Instruction();
+      standardAction.setType('BuiltinCommonInstructions::SetNumberVariable');
+      standardAction.setParametersCount(3);
+      standardAction.setParameter(0, 'MyVariable');
+      standardAction.setParameter(1, '=');
+      standardAction.setParameter(2, '1');
+      gd.asStandardEvent(standardEvent).getActions().insert(standardAction, 0);
+      standardAction.delete();
+
+      const elseAction = new gd.Instruction();
+      elseAction.setType('BuiltinCommonInstructions::SetNumberVariable');
+      elseAction.setParametersCount(3);
+      elseAction.setParameter(0, 'MyVariable');
+      elseAction.setParameter(1, '=');
+      elseAction.setParameter(2, '2');
+      gd.asElseEvent(elseEvent).getActions().insert(elseAction, 0);
+      elseAction.delete();
+
+      const layoutCodeGenerator = new gd.LayoutCodeGenerator(project);
+      const diagnosticReport = new gd.DiagnosticReport();
+      const code = layoutCodeGenerator.generateLayoutCompleteCode(
+        layout,
+        new gd.SetString(),
+        diagnosticReport,
+        true
+      );
+      diagnosticReport.delete();
+      layoutCodeGenerator.delete();
+      project.delete();
+
+      expect(code).toMatch('elseEventsChainSatisfied');
+      expect(code).toMatch('&&');
+    });
     it('does not generate code for improperly set up actions/conditions', function () {
       const project = gd.ProjectHelper.createNewGDJSProject();
       const layout = project.insertNewLayout('Scene', 0);

@@ -1,4 +1,5 @@
 #include <GDCore/Events/Builtin/CommentEvent.h>
+#include <GDCore/Events/Builtin/ElseEvent.h>
 #include <GDCore/Events/Builtin/ForEachChildVariableEvent.h>
 #include <GDCore/Events/Builtin/ForEachEvent.h>
 #include <GDCore/Events/Builtin/GroupEvent.h>

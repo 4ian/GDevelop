@@ -783,6 +783,22 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
                   connectDragSource={connectDragSource}
                   windowSize={props.windowSize}
                   idPrefix={`event-${node.relativeNodePath.join('-')}`}
+                  isPreviousEventStandardOrElse={
+                    node.indexInList > 0 &&
+                    (() => {
+                      const previousEvent = node.eventsList.getEventAt(
+                        node.indexInList - 1
+                      );
+                      const previousEventType = previousEvent.getType();
+                      return (
+                        !previousEvent.isDisabled() &&
+                        (previousEventType ===
+                          "BuiltinCommonInstructions::Standard" ||
+                          previousEventType ===
+                            "BuiltinCommonInstructions::Else")
+                      );
+                    })()
+                  }
                   highlightedAiGeneratedEventIds={
                     props.highlightedAiGeneratedEventIds
                   }

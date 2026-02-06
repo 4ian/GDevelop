@@ -20,6 +20,7 @@ declare class libGDevelop {
   swapInVectorParameterMetadata(gdVectorParameterMetadata, oldIndex: number, newIndex: number): void;
 
   asStandardEvent(gdBaseEvent): gdStandardEvent;
+  asElseEvent(gdBaseEvent): gdElseEvent;
   asRepeatEvent(gdBaseEvent): gdRepeatEvent;
   asWhileEvent(gdBaseEvent): gdWhileEvent;
   asForEachEvent(gdBaseEvent): gdForEachEvent;
@@ -180,6 +181,7 @@ declare class libGDevelop {
   EventsList: Class<gdEventsList>;
   BaseEvent: Class<gdBaseEvent>;
   StandardEvent: Class<gdStandardEvent>;
+  ElseEvent: Class<gdElseEvent>;
   RepeatEvent: Class<gdRepeatEvent>;
   WhileEvent: Class<gdWhileEvent>;
   ForEachEvent: Class<gdForEachEvent>;

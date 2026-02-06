@@ -677,23 +677,26 @@ namespace gdjs {
         this.hitBoxes = [];
         if (definition) {
           const tag = this.layer.tileMap.tag;
-          const definitionHitboxes = definition.getHitBoxes(tag);
-          if (definitionHitboxes) {
-            this.hitBoxes.length = definitionHitboxes.length;
-            for (
-              let polygonIndex = 0;
-              polygonIndex < this.hitBoxes.length;
-              polygonIndex++
-            ) {
-              const polygon = new gdjs.Polygon();
-              this.hitBoxes[polygonIndex] = polygon;
-              polygon.vertices.length = definitionHitboxes[polygonIndex].length;
+          // Full hit boxes are built on demand.
+          if (!definition.hasFullHitBox(tag)) {
+            const definitionHitboxes = definition.getHitBoxes(tag);
+            if (definitionHitboxes && definitionHitboxes.length) {
+              this.hitBoxes.length = definitionHitboxes.length;
               for (
-                let vertexIndex = 0;
-                vertexIndex < polygon.vertices.length;
-                vertexIndex++
+                let polygonIndex = 0;
+                polygonIndex < this.hitBoxes.length;
+                polygonIndex++
               ) {
-                polygon.vertices[vertexIndex] = [0, 0];
+                const polygon = new gdjs.Polygon();
+                this.hitBoxes[polygonIndex] = polygon;
+                polygon.vertices.length = definitionHitboxes[polygonIndex].length;
+                for (
+                  let vertexIndex = 0;
+                  vertexIndex < polygon.vertices.length;
+                  vertexIndex++
+                ) {
+                  polygon.vertices[vertexIndex] = [0, 0];
+                }
               }
             }
           }

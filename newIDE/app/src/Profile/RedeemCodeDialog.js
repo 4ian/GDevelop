@@ -133,12 +133,28 @@ export default function RedeemCodeDialog({
     [authenticatedUser, redemptionCode, onClose, openSubscriptionDialog]
   );
 
-  // Auto-submit if autoSubmit and codeToPrefill are provided
+  const canRedeem = !!redemptionCode && !isLoading;
+  const { subscription } = authenticatedUser;
+
+  const hasAValidSubscriptionFromRedemptionCode =
+    !!subscription &&
+    subscription.planId &&
+    !!subscription.redemptionCodeValidUntil &&
+    subscription.redemptionCodeValidUntil > Date.now();
+  const hasAValidSubscriptionNotFromRedemptionCode =
+    !!subscription &&
+    subscription.planId &&
+    !subscription.redemptionCodeValidUntil;
+
+  // Auto-submit if autoSubmit and codeToPrefill are provided,
+  // and if there isn't an existing subscription as it would replace it.
   React.useEffect(
     () => {
       if (
         autoSubmit &&
         codeToPrefill &&
+        !hasAValidSubscriptionFromRedemptionCode &&
+        !hasAValidSubscriptionNotFromRedemptionCode &&
         redemptionCode &&
         !hasAutoSubmitted.current &&
         !isLoading
@@ -147,11 +163,16 @@ export default function RedeemCodeDialog({
         onRedeemCode();
       }
     },
-    [autoSubmit, codeToPrefill, redemptionCode, isLoading, onRedeemCode]
+    [
+      autoSubmit,
+      codeToPrefill,
+      redemptionCode,
+      isLoading,
+      onRedeemCode,
+      hasAValidSubscriptionFromRedemptionCode,
+      hasAValidSubscriptionNotFromRedemptionCode,
+    ]
   );
-
-  const canRedeem = !!redemptionCode && !isLoading;
-  const { subscription } = authenticatedUser;
 
   return (
     <>
@@ -206,29 +227,27 @@ export default function RedeemCodeDialog({
                   autoFocus="desktop"
                   disabled={isLoading}
                 />
-                {!subscription ||
-                !subscription.planId ? null : !!subscription.redemptionCodeValidUntil ? ( // No subscription, do not show a warning.
-                  subscription.redemptionCodeValidUntil > Date.now() ? ( // Has valid subscription.
-                    <AlertMessage kind="warning">
-                      <Trans>
-                        You currently have a subscription, applied thanks to a
-                        redemption code, valid until{' '}
-                        {i18n.date(subscription.redemptionCodeValidUntil)}. If
-                        you redeem another code, your existing subscription will
-                        be canceled and not redeemable anymore!
-                      </Trans>
-                    </AlertMessage>
-                  ) : null // Has expired subscription, do not show a warning.
-                ) : (
+                {hasAValidSubscriptionFromRedemptionCode ? (
+                  <AlertMessage kind="warning">
+                    <Trans>
+                      You currently have a subscription, applied thanks to a
+                      redemption code, valid until{' '}
+                      {!!subscription &&
+                        i18n.date(subscription.redemptionCodeValidUntil)}
+                      . If you redeem another code, your existing subscription
+                      will be canceled and not redeemable anymore!
+                    </Trans>
+                  </AlertMessage>
+                ) : hasAValidSubscriptionNotFromRedemptionCode ? (
                   // Has a subscription, but not applied thanks to a redemption code.
-                  <AlertMessage kind="info">
+                  <AlertMessage kind="warning">
                     <Trans>
                       You currently have a subscription. If you redeem a code,
                       the existing subscription will be cancelled and replaced
                       by the one given by the code.
                     </Trans>
                   </AlertMessage>
-                )}
+                ) : null}
               </ColumnStackLayout>
             </Form>
           </Dialog>

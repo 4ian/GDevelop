@@ -188,15 +188,12 @@ const BundlePurchaseDialog = ({
 
   const onCloseDialog = React.useCallback(
     () => {
-      // Don't close if we're showing the activation prompt
-      if (showActivatePrompt) return;
-
       if (onCloseAfterPurchaseDone && purchaseSuccessful) {
         onCloseAfterPurchaseDone();
       }
       onClose();
     },
-    [onCloseAfterPurchaseDone, purchaseSuccessful, onClose, showActivatePrompt]
+    [onCloseAfterPurchaseDone, purchaseSuccessful, onClose]
   );
 
   // This effect will be triggered when the bundle purchases change,
@@ -492,11 +489,9 @@ const BundlePurchaseDialog = ({
               codeToPrefill: redemptionCodeToActivate,
               autoSubmit: true,
             });
-            onCloseDialog();
           }}
           onClose={() => {
             setShowActivatePrompt(false);
-            onCloseDialog();
           }}
         />
       )}

@@ -118,6 +118,10 @@ export default class KeyboardShortcuts {
     return this._altPressed;
   }
 
+  shouldCenteredResize() {
+    return this._altPressed;
+  }
+
   shouldMoveView() {
     return this._spacePressed || this._mouseMidButtonPressed;
   }

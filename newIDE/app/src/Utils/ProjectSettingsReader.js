@@ -104,7 +104,10 @@ export const readProjectSettings = async (
         for (const rawButton of rawToolbarButtons) {
           const name = SafeExtractor.extractStringProperty(rawButton, 'name');
           const icon = SafeExtractor.extractStringProperty(rawButton, 'icon');
-          const npmScript = SafeExtractor.extractStringProperty(rawButton, 'npmScript');
+          const npmScript = SafeExtractor.extractStringProperty(
+            rawButton,
+            'npmScript'
+          );
           if (name && icon && npmScript) {
             if (!SAFE_SCRIPT_NAME_PATTERN.test(npmScript)) {
               console.warn(
@@ -125,7 +128,9 @@ export const readProjectSettings = async (
     }
 
     console.info(
-      `[ProjectSettingsReader] Loaded: ${Object.keys(preferences).length} preferences, ${toolbarButtons.length} buttons`
+      `[ProjectSettingsReader] Loaded: ${
+        Object.keys(preferences).length
+      } preferences, ${toolbarButtons.length} buttons`
     );
 
     const result: ParsedProjectSettings = { projectPath: projectDirectory };

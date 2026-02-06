@@ -64,7 +64,9 @@ const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
     } = React.useContext(PreferencesContext);
 
     const [confirmDialogOpen, setConfirmDialogOpen] = React.useState(false);
-    const [pendingNpmScript, setPendingNpmScript] = React.useState<?string>(null);
+    const [pendingNpmScript, setPendingNpmScript] = React.useState<?string>(
+      null
+    );
 
     const handleCustomButtonClick = React.useCallback(
       (npmScript: string) => {
@@ -105,52 +107,52 @@ const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
 
     return (
       <>
-      <NpmScriptConfirmDialog
-        open={confirmDialogOpen}
-        scriptNames={scriptNames}
-        onConfirm={handleConfirm}
-        onDismiss={handleDismiss}
-      />
-      <ToolbarGroup firstChild>
-        <IconButton
-          size="small"
-          id="toolbar-history-button"
-          onClick={props.onOpenVersionHistory}
-          tooltip={t`Open version history`}
-          color="default"
-        >
-          <HistoryIcon />
-        </IconButton>
-        <SaveProjectIcon
-          id="toolbar-save-button"
-          onSave={props.onSave}
-          canSave={props.canSave}
+        <NpmScriptConfirmDialog
+          open={confirmDialogOpen}
+          scriptNames={scriptNames}
+          onConfirm={handleConfirm}
+          onDismiss={handleDismiss}
         />
-        {props.toolbarButtons.map((button, index) => (
-          <CustomToolbarButton
-            key={index}
-            name={button.name}
-            icon={button.icon}
-            onClick={() => handleCustomButtonClick(button.npmScript)}
-          />
-        ))}
-        {props.checkedOutVersionStatus && (
-          <div
-            style={{
-              // Leave margin between the chip that has a Cross icon to click and the
-              // Play icon to preview the project. It's to avoid a mis-click that would
-              // quit the version history instead of previewing the game.
-              marginRight: 20,
-            }}
+        <ToolbarGroup firstChild>
+          <IconButton
+            size="small"
+            id="toolbar-history-button"
+            onClick={props.onOpenVersionHistory}
+            tooltip={t`Open version history`}
+            color="default"
           >
-            <OpenedVersionStatusChip
-              onQuit={props.onQuitVersionHistory}
-              disableQuitting={!props.canQuitVersionHistory}
-              openedVersionStatus={props.checkedOutVersionStatus}
+            <HistoryIcon />
+          </IconButton>
+          <SaveProjectIcon
+            id="toolbar-save-button"
+            onSave={props.onSave}
+            canSave={props.canSave}
+          />
+          {props.toolbarButtons.map((button, index) => (
+            <CustomToolbarButton
+              key={index}
+              name={button.name}
+              icon={button.icon}
+              onClick={() => handleCustomButtonClick(button.npmScript)}
             />
-          </div>
-        )}
-      </ToolbarGroup>
+          ))}
+          {props.checkedOutVersionStatus && (
+            <div
+              style={{
+                // Leave margin between the chip that has a Cross icon to click and the
+                // Play icon to preview the project. It's to avoid a mis-click that would
+                // quit the version history instead of previewing the game.
+                marginRight: 20,
+              }}
+            >
+              <OpenedVersionStatusChip
+                onQuit={props.onQuitVersionHistory}
+                disableQuitting={!props.canQuitVersionHistory}
+                openedVersionStatus={props.checkedOutVersionStatus}
+              />
+            </div>
+          )}
+        </ToolbarGroup>
       </>
     );
   }

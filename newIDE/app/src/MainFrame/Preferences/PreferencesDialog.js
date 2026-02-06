@@ -595,11 +595,7 @@ const PreferencesDialog = ({
               {!!electron && values.disableNpmScriptConfirmation && (
                 <Line noMargin>
                   <FlatButton
-                    label={
-                      <Trans>
-                        Re-enable npm script security warning
-                      </Trans>
-                    }
+                    label={<Trans>Re-enable npm script security warning</Trans>}
                     onClick={() => setDisableNpmScriptConfirmation(false)}
                   />
                 </Line>

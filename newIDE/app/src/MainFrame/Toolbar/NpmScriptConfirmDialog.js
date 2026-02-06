@@ -14,19 +14,30 @@ type Props = {|
   onDismiss: () => void,
 |};
 
-function NpmScriptConfirmDialog({ open, scriptNames, onConfirm, onDismiss }: Props) {
+function NpmScriptConfirmDialog({
+  open,
+  scriptNames,
+  onConfirm,
+  onDismiss,
+}: Props) {
   const [dontShowAgain, setDontShowAgain] = React.useState(false);
 
-  const handleConfirm = React.useCallback(() => {
-    onConfirm(dontShowAgain);
-  }, [onConfirm, dontShowAgain]);
+  const handleConfirm = React.useCallback(
+    () => {
+      onConfirm(dontShowAgain);
+    },
+    [onConfirm, dontShowAgain]
+  );
 
   // Reset checkbox when dialog reopens
-  React.useEffect(() => {
-    if (open) {
-      setDontShowAgain(false);
-    }
-  }, [open]);
+  React.useEffect(
+    () => {
+      if (open) {
+        setDontShowAgain(false);
+      }
+    },
+    [open]
+  );
 
   return (
     <Dialog

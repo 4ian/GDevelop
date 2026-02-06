@@ -136,6 +136,7 @@ type EventsContainerProps = {|
 
   idPrefix: string,
   highlightedAiGeneratedEventIds: Set<string>,
+  isPreviousEventStandardOrElse: boolean,
 |};
 
 /**
@@ -254,6 +255,7 @@ const EventContainer = (props: EventsContainerProps) => {
               eventsSheetHeight={props.eventsSheetHeight}
               windowSize={props.windowSize}
               idPrefix={props.idPrefix}
+              isPreviousEventStandardOrElse={props.isPreviousEventStandardOrElse}
             />
           </div>
         </div>
@@ -674,6 +676,24 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
                 node.projectScopedContainersAccessor,
             };
 
+            let isPreviousEventStandardOrElse = false;
+            if (event.getType() === 'BuiltinCommonInstructions::Else') {
+              for (let i = node.indexInList - 1; i >= 0; i--) {
+                const previousEvent = node.eventsList.getEventAt(i);
+                if (
+                  !previousEvent.isDisabled() &&
+                  previousEvent.isExecutable()
+                ) {
+                  const previousEventType = previousEvent.getType();
+                  isPreviousEventStandardOrElse =
+                    previousEventType ===
+                      'BuiltinCommonInstructions::Standard' ||
+                    previousEventType === 'BuiltinCommonInstructions::Else';
+                  break;
+                }
+              }
+            }
+
             const dropTarget = (
               <div
                 style={{
@@ -783,6 +803,7 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
                   connectDragSource={connectDragSource}
                   windowSize={props.windowSize}
                   idPrefix={`event-${node.relativeNodePath.join('-')}`}
+                  isPreviousEventStandardOrElse={isPreviousEventStandardOrElse}
                   highlightedAiGeneratedEventIds={
                     props.highlightedAiGeneratedEventIds
                   }

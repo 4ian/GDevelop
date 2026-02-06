@@ -306,6 +306,7 @@ type CustomObjectConfiguration_EdgeAnchor = 0 | 1 | 2 | 3 | 4`
         '  swapInVectorParameterMetadata(gdVectorParameterMetadata, oldIndex: number, newIndex: number): void;',
         '',
         `  asStandardEvent(gdBaseEvent): gdStandardEvent;`,
+        `  asElseEvent(gdBaseEvent): gdStandardEvent;`,
         `  asRepeatEvent(gdBaseEvent): gdRepeatEvent;`,
         `  asWhileEvent(gdBaseEvent): gdWhileEvent;`,
         `  asForEachEvent(gdBaseEvent): gdForEachEvent;`,

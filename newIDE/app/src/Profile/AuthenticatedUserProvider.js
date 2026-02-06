@@ -69,9 +69,6 @@ import CreateAccountWithPurchaseClaimDialog from './CreateAccountWithPurchaseCla
 import PurchaseClaimDialog, {
   type ClaimedProductOptions,
 } from './PurchaseClaimDialog';
-import RedeemCodeDialog from './RedeemCodeDialog';
-import RedemptionCodesDialog from '../RedemptionCode/RedemptionCodesDialog';
-
 type Props = {|
   authentication: Authentication,
   preferencesValues: PreferencesValues,
@@ -101,9 +98,6 @@ type State = {|
   changeEmailInProgress: boolean,
   userSnackbarMessage: ?React.Node,
   claimedProductOptions: ?ClaimedProductOptions,
-  redeemCodeDialogOpen: boolean,
-  codeToAutoSubmit: ?string,
-  redemptionCodesDialogOpen: boolean,
 |};
 
 const cleanUserTracesOnDevice = async () => {
@@ -143,9 +137,6 @@ export default class AuthenticatedUserProvider extends React.Component<
     changeEmailInProgress: false,
     userSnackbarMessage: null,
     claimedProductOptions: null,
-    redeemCodeDialogOpen: false,
-    codeToAutoSubmit: null,
-    redemptionCodesDialogOpen: false,
   };
   _automaticallyUpdateUserProfile = true;
   _hasNotifiedUserAboutEmailVerification = false;
@@ -252,9 +243,6 @@ export default class AuthenticatedUserProvider extends React.Component<
         onOpenPurchaseClaimDialog: (
           claimedProductOptions: ClaimedProductOptions
         ) => this.openPurchaseClaimDialog(claimedProductOptions),
-        onOpenRedeemCodeDialog: codeToAutoSubmit =>
-          this.openRedeemCodeDialog(codeToAutoSubmit),
-        onOpenRedemptionCodesDialog: () => this.openRedemptionCodesDialog(),
         onRefreshUserProfile: this._fetchUserProfile,
         onRefreshFirebaseProfile: async () => {
           await this._reloadFirebaseProfile();
@@ -1602,19 +1590,6 @@ export default class AuthenticatedUserProvider extends React.Component<
     });
   };
 
-  openRedeemCodeDialog = (codeToAutoSubmit?: string) => {
-    this.setState({
-      redeemCodeDialogOpen: true,
-      codeToAutoSubmit: codeToAutoSubmit || null,
-    });
-  };
-
-  openRedemptionCodesDialog = () => {
-    this.setState({
-      redemptionCodesDialogOpen: true,
-    });
-  };
-
   openChangeEmailDialog = (open: boolean = true) => {
     this.setState({
       changeEmailDialogOpen: open,
@@ -1897,29 +1872,6 @@ export default class AuthenticatedUserProvider extends React.Component<
           <PurchaseClaimDialog
             claimedProductOptions={this.state.claimedProductOptions}
             onClose={() => this.openPurchaseClaimDialog(null)}
-          />
-        )}
-        {this.state.redeemCodeDialogOpen && (
-          <RedeemCodeDialog
-            codeToAutoSubmit={this.state.codeToAutoSubmit || undefined}
-            onClose={async hasJustRedeemedCode => {
-              this.setState({
-                redeemCodeDialogOpen: false,
-                codeToAutoSubmit: null,
-              });
-              if (hasJustRedeemedCode) {
-                await this._fetchUserSubscriptionLimitsAndUsages();
-              }
-            }}
-          />
-        )}
-        {this.state.redemptionCodesDialogOpen && (
-          <RedemptionCodesDialog
-            onClose={() =>
-              this.setState({
-                redemptionCodesDialogOpen: false,
-              })
-            }
           />
         )}
         <Snackbar

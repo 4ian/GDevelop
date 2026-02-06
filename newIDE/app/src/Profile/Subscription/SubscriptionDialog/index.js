@@ -131,7 +131,9 @@ export default function SubscriptionDialog({
     subscriptionPricingSystem,
   } = authenticatedUser;
 
-  const { clearCouponCode } = React.useContext(SubscriptionContext);
+  const { clearCouponCode, openRedeemCodeDialog } = React.useContext(
+    SubscriptionContext
+  );
 
   const [
     availableRecommendedPlanId,
@@ -548,7 +550,7 @@ export default function SubscriptionDialog({
                     onClickRedeemCode={
                       !authenticatedUser.authenticated
                         ? authenticatedUser.onOpenCreateAccountDialog
-                        : () => authenticatedUser.onOpenRedeemCodeDialog()
+                        : () => openRedeemCodeDialog()
                     }
                     subscriptionPlanWithPricingSystems={displayedPlan}
                     disabled={isLoading}

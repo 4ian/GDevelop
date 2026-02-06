@@ -13,10 +13,12 @@ import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/
 import AlertMessage from '../UI/AlertMessage';
 import Form from '../UI/Form';
 import { SubscriptionContext } from './Subscription/SubscriptionContext';
+import RedemptionCodesDialog from '../RedemptionCode/RedemptionCodesDialog';
 
 type Props = {|
   onClose: (hasJustRedeemedCode: boolean) => Promise<void>,
-  codeToAutoSubmit?: string,
+  codeToPrefill?: string,
+  autoSubmit?: boolean,
 |};
 
 export const getRedeemCodeErrorText = (error: ?Error) => {
@@ -67,15 +69,23 @@ export const getRedeemCodeErrorText = (error: ?Error) => {
   );
 };
 
-export default function RedeemCodeDialog({ onClose, codeToAutoSubmit }: Props) {
+export default function RedeemCodeDialog({
+  onClose,
+  codeToPrefill,
+  autoSubmit,
+}: Props) {
   const [redemptionCode, setRedemptionCode] = React.useState(
-    codeToAutoSubmit || ''
+    codeToPrefill || ''
   );
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<?Error>(null);
   const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const hasAutoSubmitted = React.useRef(false);
+  const [
+    redemptionCodesDialogOpen,
+    setRedemptionCodesDialogOpen,
+  ] = React.useState(false);
 
   const onRedeemCode = React.useCallback(
     async () => {
@@ -109,7 +119,7 @@ export default function RedeemCodeDialog({ onClose, codeToAutoSubmit }: Props) {
               reason: 'Coupon code entered',
               placementId: 'redeem-code',
             },
-            couponCode: redemptionCode.trim().toLowerCase(),
+            couponCode: redemptionCode.trim().toUpperCase(),
           });
           // Close this dialog
           onClose(/*hasJustRedeemedCode=*/ false);
@@ -123,11 +133,12 @@ export default function RedeemCodeDialog({ onClose, codeToAutoSubmit }: Props) {
     [authenticatedUser, redemptionCode, onClose, openSubscriptionDialog]
   );
 
-  // Auto-submit if codeToAutoSubmit is provided
+  // Auto-submit if autoSubmit and codeToPrefill are provided
   React.useEffect(
     () => {
       if (
-        codeToAutoSubmit &&
+        autoSubmit &&
+        codeToPrefill &&
         redemptionCode &&
         !hasAutoSubmitted.current &&
         !isLoading
@@ -136,91 +147,102 @@ export default function RedeemCodeDialog({ onClose, codeToAutoSubmit }: Props) {
         onRedeemCode();
       }
     },
-    [codeToAutoSubmit, redemptionCode, isLoading, onRedeemCode]
+    [autoSubmit, codeToPrefill, redemptionCode, isLoading, onRedeemCode]
   );
 
   const canRedeem = !!redemptionCode && !isLoading;
   const { subscription } = authenticatedUser;
 
   return (
-    <I18n>
-      {({ i18n }) => (
-        <Dialog
-          title={<Trans>Redeem a code</Trans>}
-          actions={[
-            <FlatButton
-              label={<Trans>Close</Trans>}
-              key="close"
-              primary={false}
-              disabled={isLoading}
-              onClick={() => onClose(false)}
-            />,
-            <LeftLoader isLoading={isLoading} key="redeem">
-              <DialogPrimaryButton
-                label={<Trans>Redeem</Trans>}
-                disabled={!canRedeem}
-                primary
-                onClick={onRedeemCode}
-              />
-            </LeftLoader>,
-          ]}
-          secondaryActions={[
-            <FlatButton
-              label={<Trans>See my codes</Trans>}
-              key="see-codes"
-              disabled={isLoading}
-              onClick={() => {
-                authenticatedUser.onOpenRedemptionCodesDialog();
-              }}
-            />,
-          ]}
-          cannotBeDismissed={isLoading}
-          onRequestClose={() => onClose(false)}
-          onApply={() => {
-            if (canRedeem) onRedeemCode();
-          }}
-          maxWidth="sm"
-          open
-        >
-          <Form onSubmit={onRedeemCode} name="redeemSubscriptionCoupon">
-            <ColumnStackLayout noMargin>
-              <SemiControlledTextField
-                value={redemptionCode}
-                onChange={setRedemptionCode}
-                translatableHintText={t`Enter your code here`}
-                floatingLabelText={<Trans>Redemption or coupon code</Trans>}
-                floatingLabelFixed
-                errorText={getRedeemCodeErrorText(error)}
-                autoFocus="desktop"
+    <>
+      <I18n>
+        {({ i18n }) => (
+          <Dialog
+            title={<Trans>Redeem a code</Trans>}
+            actions={[
+              <FlatButton
+                label={<Trans>Close</Trans>}
+                key="close"
+                primary={false}
                 disabled={isLoading}
-              />
-              {!subscription ||
-              !subscription.planId ? null : !!subscription.redemptionCodeValidUntil ? ( // No subscription, do not show a warning.
-                subscription.redemptionCodeValidUntil > Date.now() ? ( // Has valid subscription.
-                  <AlertMessage kind="warning">
+                onClick={() => onClose(false)}
+              />,
+              <LeftLoader isLoading={isLoading} key="redeem">
+                <DialogPrimaryButton
+                  label={<Trans>Redeem</Trans>}
+                  disabled={!canRedeem}
+                  primary
+                  onClick={onRedeemCode}
+                />
+              </LeftLoader>,
+            ]}
+            secondaryActions={[
+              <FlatButton
+                label={<Trans>See my codes</Trans>}
+                key="see-codes"
+                disabled={isLoading}
+                onClick={() => {
+                  setRedemptionCodesDialogOpen(true);
+                }}
+              />,
+            ]}
+            cannotBeDismissed={isLoading}
+            onRequestClose={() => onClose(false)}
+            onApply={() => {
+              if (canRedeem) onRedeemCode();
+            }}
+            maxWidth="sm"
+            open
+          >
+            <Form onSubmit={onRedeemCode} name="redeemSubscriptionCoupon">
+              <ColumnStackLayout noMargin>
+                <SemiControlledTextField
+                  value={redemptionCode}
+                  onChange={setRedemptionCode}
+                  translatableHintText={t`Enter your code here`}
+                  floatingLabelText={<Trans>Redemption or coupon code</Trans>}
+                  floatingLabelFixed
+                  errorText={getRedeemCodeErrorText(error)}
+                  autoFocus="desktop"
+                  disabled={isLoading}
+                />
+                {!subscription ||
+                !subscription.planId ? null : !!subscription.redemptionCodeValidUntil ? ( // No subscription, do not show a warning.
+                  subscription.redemptionCodeValidUntil > Date.now() ? ( // Has valid subscription.
+                    <AlertMessage kind="warning">
+                      <Trans>
+                        You currently have a subscription, applied thanks to a
+                        redemption code, valid until{' '}
+                        {i18n.date(subscription.redemptionCodeValidUntil)}. If
+                        you redeem another code, your existing subscription will
+                        be canceled and not redeemable anymore!
+                      </Trans>
+                    </AlertMessage>
+                  ) : null // Has expired subscription, do not show a warning.
+                ) : (
+                  // Has a subscription, but not applied thanks to a redemption code.
+                  <AlertMessage kind="info">
                     <Trans>
-                      You currently have a subscription, applied thanks to a
-                      redemption code, valid until{' '}
-                      {i18n.date(subscription.redemptionCodeValidUntil)}. If you
-                      redeem another code, your existing subscription will be
-                      canceled and not redeemable anymore!
+                      You currently have a subscription. If you redeem a code,
+                      the existing subscription will be cancelled and replaced
+                      by the one given by the code.
                     </Trans>
                   </AlertMessage>
-                ) : null // Has expired subscription, do not show a warning.
-              ) : (
-                // Has a subscription, but not applied thanks to a redemption code.
-                <AlertMessage kind="info">
-                  <Trans>
-                    You currently have a subscription. If you redeem a code, the
-                    existing subscription will be cancelled and replaced by the
-                    one given by the code.
-                  </Trans>
-                </AlertMessage>
-              )}
-            </ColumnStackLayout>
-          </Form>
-        </Dialog>
+                )}
+              </ColumnStackLayout>
+            </Form>
+          </Dialog>
+        )}
+      </I18n>
+      {redemptionCodesDialogOpen && (
+        <RedemptionCodesDialog
+          onClose={() => setRedemptionCodesDialogOpen(false)}
+          onSelectCode={code => {
+            setRedemptionCode(code);
+            setRedemptionCodesDialogOpen(false);
+          }}
+        />
       )}
-    </I18n>
+    </>
   );
 }

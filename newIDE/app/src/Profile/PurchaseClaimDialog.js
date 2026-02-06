@@ -7,6 +7,7 @@ import {
 } from '../Utils/GDevelopServices/Shop';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import AuthenticatedUserContext from './AuthenticatedUserContext';
+import { SubscriptionContext } from './Subscription/SubscriptionContext';
 import Text from '../UI/Text';
 import { Column, Line } from '../UI/Grid';
 import Mark from '../UI/CustomSvgIcons/Mark';
@@ -57,8 +58,8 @@ const PurchaseClaimDialog = ({
     profile,
     onPurchaseSuccessful,
     onRefreshBundlePurchases,
-    onOpenRedeemCodeDialog,
   } = React.useContext(AuthenticatedUserContext);
+  const { openRedeemCodeDialog } = React.useContext(SubscriptionContext);
   const [isActivating, setIsActivating] = React.useState(false);
   const [isPurchaseActivated, setIsPurchaseActivated] = React.useState(false);
   const { showAlert } = useAlertDialog();
@@ -295,7 +296,10 @@ const PurchaseClaimDialog = ({
           bundleListingData={productListingData}
           onActivateNow={() => {
             setShowActivatePrompt(false);
-            onOpenRedeemCodeDialog(redemptionCodeToActivate);
+            openRedeemCodeDialog({
+              codeToPrefill: redemptionCodeToActivate,
+              autoSubmit: true,
+            });
             onClose();
           }}
           onClose={() => {

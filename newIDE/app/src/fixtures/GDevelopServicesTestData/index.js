@@ -1172,12 +1172,6 @@ export const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
   achievements: fakeAchievements,
-  onOpenRedeemCodeDialog: () => {
-    console.info('This should open the redeem code dialog');
-  },
-  onOpenRedemptionCodesDialog: () => {
-    console.info('This should open the redemption codes dialog');
-  },
 };
 
 export const fakeSilverAuthenticatedUser: AuthenticatedUser = {

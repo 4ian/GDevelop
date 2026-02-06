@@ -7,6 +7,7 @@ import RedemptionCodeIcon from '../UI/CustomSvgIcons/RedemptionCode';
 import Text from '../UI/Text';
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
+import RaisedButton from '../UI/RaisedButton';
 import {
   getRedemptionCodes,
   type RedemptionCode,
@@ -24,14 +25,14 @@ import {
   getPlanIcon,
   getPlanInferredNameFromId,
 } from '../Profile/Subscription/PlanSmallCard';
-import AlertMessage from '../UI/AlertMessage';
 import { formatDurationOfRedemptionCode } from './Utils';
 
 type Props = {|
   onClose: () => void,
+  onSelectCode?: (code: string) => void,
 |};
 
-const RedemptionCodesDialog = ({ onClose }: Props) => {
+const RedemptionCodesDialog = ({ onClose, onSelectCode }: Props) => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );
@@ -80,9 +81,6 @@ const RedemptionCodesDialog = ({ onClose }: Props) => {
       ]}
       flexColumnBody
     >
-      <AlertMessage kind="info">
-        <Trans>To use a code, go to your profile!</Trans>
-      </AlertMessage>
       <LineStackLayout>
         {<RedemptionCodeIcon />}
         <Text size="sub-title">
@@ -107,6 +105,7 @@ const RedemptionCodesDialog = ({ onClose }: Props) => {
               <TableHeaderColumn>
                 <Trans>Remaining usage</Trans>
               </TableHeaderColumn>
+              {onSelectCode && <TableHeaderColumn />}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -148,6 +147,17 @@ const RedemptionCodesDialog = ({ onClose }: Props) => {
                       )}
                     </Text>
                   </TableRowColumn>
+                  {onSelectCode && (
+                    <TableRowColumn>
+                      {code.remainingUsageCount > 0 && (
+                        <RaisedButton
+                          label={<Trans>Use</Trans>}
+                          primary
+                          onClick={() => onSelectCode(code.code)}
+                        />
+                      )}
+                    </TableRowColumn>
+                  )}
                 </TableRow>
               );
             })}

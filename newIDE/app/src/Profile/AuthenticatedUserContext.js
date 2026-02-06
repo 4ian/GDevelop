@@ -105,8 +105,6 @@ export type AuthenticatedUser = {|
   onAcceptGameStatsEmail: (value: boolean) => Promise<void>,
   getAuthorizationHeader: () => Promise<string>,
   achievements: ?Array<Achievement>,
-  onOpenRedeemCodeDialog: (codeToAutoSubmit?: string) => void,
-  onOpenRedemptionCodesDialog: () => void,
 |};
 
 export const authenticatedUserPropertiesLoadingState = {
@@ -170,8 +168,6 @@ export const initialAuthenticatedUser = {
   onAcceptGameStatsEmail: async () => {},
   getAuthorizationHeader: () => Promise.reject(new Error('Unimplemented')),
   achievements: null,
-  onOpenRedeemCodeDialog: () => {},
-  onOpenRedemptionCodesDialog: () => {},
 };
 
 export const authenticatedUserLoggedOutAttributes = {

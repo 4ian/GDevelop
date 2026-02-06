@@ -7,6 +7,7 @@ import {
 } from '../../Utils/GDevelopServices/Shop';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
+import { SubscriptionContext } from '../../Profile/Subscription/SubscriptionContext';
 import CreateProfile from '../../Profile/CreateProfile';
 import Text from '../../UI/Text';
 import { useInterval } from '../../Utils/UseInterval';
@@ -54,8 +55,8 @@ const BundlePurchaseDialog = ({
     onPurchaseSuccessful,
     onRefreshBundlePurchases,
     bundlePurchases,
-    onOpenRedeemCodeDialog,
   } = React.useContext(AuthenticatedUserContext);
+  const { openRedeemCodeDialog } = React.useContext(SubscriptionContext);
   const [isPurchasing, setIsPurchasing] = React.useState(false);
   const [
     isCheckingPurchasesAfterLogin,
@@ -487,7 +488,10 @@ const BundlePurchaseDialog = ({
           bundleListingData={bundleListingData}
           onActivateNow={() => {
             setShowActivatePrompt(false);
-            onOpenRedeemCodeDialog(redemptionCodeToActivate);
+            openRedeemCodeDialog({
+              codeToPrefill: redemptionCodeToActivate,
+              autoSubmit: true,
+            });
             onCloseDialog();
           }}
           onClose={() => {

@@ -24,6 +24,7 @@ import {
 } from '../../AssetStore/ProductPageHelper';
 import { shouldUseAppStoreProduct } from '../../Utils/AppStorePurchases';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
+import { SubscriptionContext } from '../../Profile/Subscription/SubscriptionContext';
 import { BundleStoreContext } from '../../AssetStore/Bundles/BundleStoreContext';
 import { sendBundleBuyClicked } from '../../Utils/Analytics/EventSender';
 import BundlePurchaseDialog from '../../AssetStore/Bundles/BundlePurchaseDialog';
@@ -89,6 +90,7 @@ const BundlePageHeader = ({
   const { privateAssetPackListingDatas } = React.useContext(AssetStoreContext);
   const { listedCourses } = React.useContext(CourseStoreContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const { openRedeemCodeDialog } = React.useContext(SubscriptionContext);
   const { receivedBundles, bundlePurchases } = authenticatedUser;
   const [
     purchasingBundleListingData,
@@ -182,7 +184,7 @@ const BundlePageHeader = ({
             <FlatButton
               primary
               label={<Trans>Activate my subscription</Trans>}
-              onClick={() => authenticatedUser.onOpenRedeemCodeDialog()}
+              onClick={() => openRedeemCodeDialog()}
             />
           </Line>
         );
@@ -205,7 +207,7 @@ const BundlePageHeader = ({
       bundleListingData,
       productListingDatasIncludedInBundle,
       isMobile,
-      authenticatedUser,
+      openRedeemCodeDialog,
     ]
   );
 

@@ -11,7 +11,7 @@ import { FlippingHelper } from "./GID";
  * A tile map model.
  *
  * Tile map files are parsed into this model by {@link TiledTileMapLoader} or {@link LDtkTileMapLoader}.
- * This model is used for rending ({@link TileMapRuntimeObjectPixiRenderer})
+ * This model is used for rendering ({@link TileMapRuntimeObjectPixiRenderer})
  * and hitboxes handling ({@link TransformedCollisionTileMap}).
  * This allows to support new file format with only a new parser.
  */

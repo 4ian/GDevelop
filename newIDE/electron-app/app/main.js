@@ -1,5 +1,6 @@
 const electron = require('electron');
 const path = require('path');
+const child_process = require('child_process');
 const app = electron.app; // Module to control application life.
 const BrowserWindow = electron.BrowserWindow; // Module to create native browser window.
 const Menu = electron.Menu;
@@ -652,4 +653,56 @@ app.on('ready', function() {
   });
 
   setUpDiscordRichPresence(ipcMain);
+
+  // npm script execution in external terminal (cross-platform)
+  ipcMain.on('run-npm-script', (event, { projectPath, npmScript }) => {
+    log.info(`Running npm script "${npmScript}" in ${projectPath}`);
+
+    const platform = process.platform;
+    const npmCommand = `npm run ${npmScript}`;
+
+    try {
+      if (platform === 'win32') {
+        // Windows: open cmd window that stays open after npm command
+        child_process.spawn('cmd.exe', ['/c', 'start', 'cmd.exe', '/k', `cd ${projectPath} && ${npmCommand}`], {
+          detached: true,
+          stdio: 'ignore',
+        }).unref();
+      } else if (platform === 'darwin') {
+        const escapedPath = projectPath.replace(/'/g, "'\\''");
+        const script = `tell application "Terminal" to do script "cd '${escapedPath}' && ${npmCommand}"`;
+        child_process.spawn('osascript', ['-e', script], {
+          detached: true,
+          stdio: 'ignore',
+        });
+      } else {
+        // Linux: try common terminal emulators
+        const bashCommand = `cd "${projectPath}" && ${npmCommand}; exec bash`;
+        const terminals = [
+          { cmd: 'x-terminal-emulator', args: ['-e', 'bash', '-c', bashCommand] },
+          { cmd: 'gnome-terminal', args: ['--', 'bash', '-c', bashCommand] },
+          { cmd: 'konsole', args: ['-e', 'bash', '-c', bashCommand] },
+          { cmd: 'xterm', args: ['-e', 'bash', '-c', bashCommand] },
+        ];
+
+        const tryTerminal = (index) => {
+          if (index >= terminals.length) {
+            log.error('No terminal emulator found');
+            return;
+          }
+          const terminal = terminals[index];
+          const proc = child_process.spawn(terminal.cmd, terminal.args, {
+            detached: true,
+            stdio: 'ignore',
+          });
+          proc.on('error', () => tryTerminal(index + 1));
+          proc.unref();
+        };
+
+        tryTerminal(0);
+      }
+    } catch (err) {
+      log.error('Failed to run npm script:', err);
+    }
+  });
 });

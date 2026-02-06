@@ -86,6 +86,7 @@ const PreferencesDialog = ({
     setShowAiAskButtonInTitleBar,
     setAutomaticallyUseCreditsForAiRequests,
     setShowCreateSectionByDefault,
+    setDisableNpmScriptConfirmation,
   } = React.useContext(PreferencesContext);
 
   const initialUse3DEditor = React.useRef<boolean>(values.use3DEditor);
@@ -590,6 +591,14 @@ const PreferencesDialog = ({
                     t`Watch the project folder for file changes in order to refresh the resources used in the editor (images, 3D models, fonts, etc.)`
                   )}
                 />
+              )}
+              {!!electron && values.disableNpmScriptConfirmation && (
+                <Line noMargin>
+                  <FlatButton
+                    label={<Trans>Re-enable npm script security warning</Trans>}
+                    onClick={() => setDisableNpmScriptConfirmation(false)}
+                  />
+                </Line>
               )}
             </ColumnStackLayout>
           </Column>

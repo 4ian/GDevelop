@@ -200,7 +200,8 @@ import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
 import { readProjectSettings } from '../Utils/ProjectSettingsReader';
-import { applyProjectSettings } from '../Utils/ApplyProjectSettings';
+import { type ToolbarButtonConfig } from './CustomToolbarButton';
+import { applyProjectPreferences } from '../Utils/ApplyProjectPreferences';
 import {
   EmbeddedGameFrame,
   setEditorHotReloadNeeded,
@@ -312,6 +313,8 @@ export type State = {|
   openFromStorageProviderDialogOpen: boolean,
   saveToStorageProviderDialogOpen: boolean,
   gdjsDevelopmentWatcherEnabled: boolean,
+  toolbarButtons: Array<ToolbarButtonConfig>,
+  projectPath: ?string,
 |};
 
 const initialPreviewState: PreviewState = {
@@ -389,6 +392,8 @@ const MainFrame = (props: Props) => {
       openFromStorageProviderDialogOpen: false,
       saveToStorageProviderDialogOpen: false,
       gdjsDevelopmentWatcherEnabled: false,
+      toolbarButtons: [],
+      projectPath: null,
     }: State)
   );
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
@@ -996,6 +1001,8 @@ const MainFrame = (props: Props) => {
         currentProject: null,
         currentFileMetadata: null,
         editorTabs: closeProjectTabs(state.editorTabs, currentProject),
+        toolbarButtons: [],
+        projectPath: null,
       }));
 
       // Delete the project from memory. All references to it have been dropped previously
@@ -1104,7 +1111,12 @@ const MainFrame = (props: Props) => {
             updatedFileMetadata.fileIdentifier
           );
           if (rawSettings) {
-            applyProjectSettings(rawSettings, preferences);
+            applyProjectPreferences(rawSettings.preferences, preferences);
+            setState(currentState => ({
+              ...currentState,
+              toolbarButtons: rawSettings.toolbarButtons || [],
+              projectPath: rawSettings.projectPath,
+            }));
           }
         } catch (error) {
           console.warn(
@@ -4859,6 +4871,8 @@ const MainFrame = (props: Props) => {
     triggerHotReloadInGameEditorIfNeeded,
     onRestartInGameEditor,
     showRestartInGameEditorAfterErrorButton,
+    toolbarButtons: state.toolbarButtons,
+    projectPath: state.projectPath,
   };
 
   const hasEditorsInLeftPane = hasEditorsInPane(state.editorTabs, 'left');

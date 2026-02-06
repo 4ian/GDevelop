@@ -69,6 +69,8 @@ const defaultProps: MainFrameToolbarProps = {
     overridenPreviewLayoutName: null,
     overridenPreviewExternalLayoutName: null,
   },
+  toolbarButtons: [],
+  projectPath: '',
 };
 
 export const NoProjectOpen = () => (

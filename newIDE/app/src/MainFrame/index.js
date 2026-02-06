@@ -18,6 +18,7 @@ import ProjectManager from '../ProjectManager';
 import LoaderModal from '../UI/LoaderModal';
 import CloseConfirmDialog from '../UI/CloseConfirmDialog';
 import ProfileDialog from '../Profile/ProfileDialog';
+import PurchaseClaimDialog from '../Profile/PurchaseClaimDialog';
 import Window from '../Utils/Window';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import EditorTabsPane, {
@@ -5053,6 +5054,15 @@ const MainFrame = (props: Props) => {
           onClose={() => {
             openProfileDialog(false);
           }}
+        />
+      )}
+      {authenticatedUser.claimedProductOptions && (
+        // PurchaseClaimDialog is dependent on SubscriptionContext,
+        // which is defined after the AuthenticatedUserProvider in Providers.js.
+        // So it cannot be rendered inside the AuthenticatedUserProvider.
+        <PurchaseClaimDialog
+          claimedProductOptions={authenticatedUser.claimedProductOptions}
+          onClose={authenticatedUser.onClosePurchaseClaimDialog}
         />
       )}
       {renderNewProjectDialog()}

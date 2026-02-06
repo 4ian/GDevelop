@@ -155,7 +155,6 @@ const PurchaseClaimDialog = ({
                 setIsActivating(false);
                 setIsPurchaseActivated(true);
                 onPurchaseSuccessful();
-                return;
               }
             } catch (error) {
               console.error('Error fetching redemption code:', error);
@@ -163,7 +162,7 @@ const PurchaseClaimDialog = ({
             }
           }
 
-          // Original navigation logic if no codes or error
+          // Navigate to the bundle page.
           navigateToRoute('learn', {
             bundle: updatedPurchase.productId,
           });
@@ -300,17 +299,9 @@ const PurchaseClaimDialog = ({
               codeToPrefill: redemptionCodeToActivate,
               autoSubmit: true,
             });
-            onClose();
           }}
           onClose={() => {
             setShowActivatePrompt(false);
-            if (isPurchaseActivated) {
-              // If the purchase is activated but the user doesn't want to activate the code right now, we can navigate them to the bundle page so they can activate it later if they want.
-              navigateToRoute('learn', {
-                bundle: productListingData.id,
-              });
-            }
-            onClose();
           }}
         />
       )}

@@ -751,7 +751,6 @@ namespace gdjs {
         }
       }
       this._isTileMapDirty = true;
-      this.invalidateHitboxes();
     }
 
     flipTileOnYAtPosition(x: float, y: float, flip: boolean) {
@@ -830,14 +829,20 @@ namespace gdjs {
       }
       layer.removeTile(columnIndex, rowIndex);
       if (this._collisionTileMap) {
-        this._collisionTileMap.invalidateTile(
-          this._layerIndex,
-          columnIndex,
-          rowIndex
-        );
+        const oldTileDefinition =
+          oldTileId !== undefined && this._tileMap.getTileDefinition(oldTileId);
+        const hadFullHitBox =
+          !!oldTileDefinition &&
+          oldTileDefinition.hasFullHitBox(this._hitBoxTag);
+        if (hadFullHitBox) {
+          this._collisionTileMap.invalidateTile(
+            this._layerIndex,
+            columnIndex,
+            rowIndex
+          );
+        }
       }
       this._isTileMapDirty = true;
-      this.invalidateHitboxes();
     }
 
     setGridRowCount(targetRowCount: integer) {

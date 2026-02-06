@@ -84,6 +84,8 @@ export type AuthenticatedUser = {|
   onOpenPurchaseClaimDialog: (
     claimedProductOptions: ClaimedProductOptions
   ) => void,
+  claimedProductOptions: ?ClaimedProductOptions,
+  onClosePurchaseClaimDialog: () => void,
   onBadgesChanged: () => Promise<void>,
   onCloudProjectsChanged: () => Promise<void>,
   onRefreshUserProfile: () => Promise<void>,
@@ -150,6 +152,8 @@ export const initialAuthenticatedUser = {
   onOpenCreateAccountDialog: () => {},
   onOpenCreateAccountWithPurchaseClaimDialog: () => {},
   onOpenPurchaseClaimDialog: () => {},
+  claimedProductOptions: null,
+  onClosePurchaseClaimDialog: () => {},
   onBadgesChanged: async () => {},
   onCloudProjectsChanged: async () => {},
   onRefreshUserProfile: async () => {},

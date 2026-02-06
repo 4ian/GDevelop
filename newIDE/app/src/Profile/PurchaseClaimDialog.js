@@ -7,6 +7,7 @@ import {
 } from '../Utils/GDevelopServices/Shop';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import AuthenticatedUserContext from './AuthenticatedUserContext';
+import { SubscriptionContext } from './Subscription/SubscriptionContext';
 import Text from '../UI/Text';
 import { Column, Line } from '../UI/Grid';
 import Mark from '../UI/CustomSvgIcons/Mark';
@@ -17,6 +18,8 @@ import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import RouterContext from '../MainFrame/RouterContext';
+import { getNewestRedemptionCodeForBundle } from '../Utils/GDevelopServices/Usage';
+import ActivateSubscriptionPromptDialog from './ActivateSubscriptionPromptDialog';
 
 export type ClaimedProductOptions = {|
   productListingData: BundleListingData, // Add more product types in the future.
@@ -56,12 +59,18 @@ const PurchaseClaimDialog = ({
     onPurchaseSuccessful,
     onRefreshBundlePurchases,
   } = React.useContext(AuthenticatedUserContext);
+  const { openRedeemCodeDialog } = React.useContext(SubscriptionContext);
   const [isActivating, setIsActivating] = React.useState(false);
   const [isPurchaseActivated, setIsPurchaseActivated] = React.useState(false);
   const { showAlert } = useAlertDialog();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { navigateToRoute } = React.useContext(RouterContext);
   const shouldClaimOnOpen = React.useRef(!profile);
+  const [showActivatePrompt, setShowActivatePrompt] = React.useState(false);
+  const [
+    redemptionCodeToActivate,
+    setRedemptionCodeToActivate,
+  ] = React.useState<?string>(null);
 
   const activatePurchase = React.useCallback(
     async () => {
@@ -126,6 +135,34 @@ const PurchaseClaimDialog = ({
       try {
         if (updatedPurchase.productType === 'BUNDLE') {
           await onRefreshBundlePurchases();
+
+          // Check if bundle has redemption codes and prompt for activation
+          if (
+            productListingData.includedRedemptionCodes &&
+            productListingData.includedRedemptionCodes.length > 0
+          ) {
+            try {
+              const code = await getNewestRedemptionCodeForBundle(
+                getAuthorizationHeader,
+                profile.id,
+                productListingData
+              );
+
+              if (code) {
+                setRedemptionCodeToActivate(code);
+                setShowActivatePrompt(true);
+                // Don't navigate yet - wait for user decision
+                setIsActivating(false);
+                setIsPurchaseActivated(true);
+                onPurchaseSuccessful();
+              }
+            } catch (error) {
+              console.error('Error fetching redemption code:', error);
+              // Continue with normal flow if code fetching fails
+            }
+          }
+
+          // Navigate to the bundle page.
           navigateToRoute('learn', {
             bundle: updatedPurchase.productId,
           });
@@ -148,6 +185,7 @@ const PurchaseClaimDialog = ({
       onClose,
       isPurchaseActivated,
       navigateToRoute,
+      productListingData,
     ]
   );
 
@@ -217,40 +255,57 @@ const PurchaseClaimDialog = ({
   ];
 
   return (
-    <Dialog
-      title={<Trans>Activate {productName}</Trans>}
-      maxWidth="md"
-      open
-      onRequestClose={onClose}
-      actions={dialogActions}
-      onApply={isPurchaseActivated ? onClose : activatePurchase}
-      cannotBeDismissed // Prevent the user from continuing by clicking outside.
-      flexColumnBody
-    >
-      <ResponsiveLineStackLayout noMargin alignItems="center">
-        {productListingData && (
-          <CorsAwareImage
-            style={{
-              ...styles.previewImage,
-              background: gdevelopTheme.paper.backgroundColor.light,
-            }}
-            src={productListingData.thumbnailUrls[0]}
-            alt={`Preview image of product ${productListingData.name}`}
-          />
-        )}
-        <Column>
-          <LineStackLayout
-            justifyContent="flex-start"
-            alignItems="center"
-            noMargin
-          >
-            {isPurchaseActivated && <Mark />}
-            <Text size="sub-title">{dialogContents.subtitle}</Text>
-          </LineStackLayout>
-          {dialogContents.content}
-        </Column>
-      </ResponsiveLineStackLayout>
-    </Dialog>
+    <>
+      <Dialog
+        title={<Trans>Activate {productName}</Trans>}
+        maxWidth="md"
+        open
+        onRequestClose={onClose}
+        actions={dialogActions}
+        onApply={isPurchaseActivated ? onClose : activatePurchase}
+        cannotBeDismissed={isActivating || showActivatePrompt} // Prevent the user from continuing by clicking outside.
+        flexColumnBody
+      >
+        <ResponsiveLineStackLayout noMargin alignItems="center">
+          {productListingData && (
+            <CorsAwareImage
+              style={{
+                ...styles.previewImage,
+                background: gdevelopTheme.paper.backgroundColor.light,
+              }}
+              src={productListingData.thumbnailUrls[0]}
+              alt={`Preview image of product ${productListingData.name}`}
+            />
+          )}
+          <Column>
+            <LineStackLayout
+              justifyContent="flex-start"
+              alignItems="center"
+              noMargin
+            >
+              {isPurchaseActivated && <Mark />}
+              <Text size="sub-title">{dialogContents.subtitle}</Text>
+            </LineStackLayout>
+            {dialogContents.content}
+          </Column>
+        </ResponsiveLineStackLayout>
+      </Dialog>
+      {showActivatePrompt && redemptionCodeToActivate && productListingData && (
+        <ActivateSubscriptionPromptDialog
+          bundleListingData={productListingData}
+          onActivateNow={() => {
+            setShowActivatePrompt(false);
+            openRedeemCodeDialog({
+              codeToPrefill: redemptionCodeToActivate,
+              autoSubmit: true,
+            });
+          }}
+          onClose={() => {
+            setShowActivatePrompt(false);
+          }}
+        />
+      )}
+    </>
   );
 };
 

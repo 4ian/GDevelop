@@ -1128,6 +1128,8 @@ export const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   onOpenCreateAccountDialog: () => {},
   onOpenCreateAccountWithPurchaseClaimDialog: () => {},
   onOpenPurchaseClaimDialog: () => {},
+  claimedProductOptions: null,
+  onClosePurchaseClaimDialog: () => {},
   onOpenEmailVerificationDialog: () => {},
   onBadgesChanged: async () => {},
   onCloudProjectsChanged: async () => {},

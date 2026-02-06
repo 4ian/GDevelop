@@ -537,7 +537,8 @@ export type SubscriptionDialogDisplayReason =
   | 'Account get premium'
   | 'AI requests (subscribe)'
   | 'AI requests (upgrade)'
-  | 'AI requests history';
+  | 'AI requests history'
+  | 'Coupon code entered';
 
 export type SubscriptionPlacementId =
   | 'builds'
@@ -557,7 +558,8 @@ export type SubscriptionPlacementId =
   | 'unlock-course-chapter'
   | 'account-get-premium'
   | 'education'
-  | 'ai-requests';
+  | 'ai-requests'
+  | 'redeem-code';
 
 export const sendSubscriptionDialogShown = (
   metadata: SubscriptionAnalyticsMetadata

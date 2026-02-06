@@ -18,10 +18,11 @@ import {
 } from '../../Utils/GDevelopServices/Usage';
 import AuthenticatedUserContext from '../AuthenticatedUserContext';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
-import PromotionSubscriptionDialog from './PromotionSubscriptionDialog';
+import SubscriptionDialog from './SubscriptionDialog';
 import SubscriptionPendingDialog from './SubscriptionPendingDialog';
 import LoaderModal from '../../UI/LoaderModal';
 import { useAsyncLazyMemo } from '../../Utils/UseLazyMemo';
+import RedeemCodeDialog from '../RedeemCodeDialog';
 
 export type SubscriptionType = 'individual' | 'team' | 'education';
 
@@ -91,15 +92,29 @@ type SubscriptionState = {|
    */
   openSubscriptionDialog: ({|
     analyticsMetadata: SubscriptionAnalyticsMetadata,
+    couponCode?: string,
   |}) => void,
-  openSubscriptionPendingDialog: () => void,
+  /**
+   * Returns the current coupon code being used, or null.
+   */
+  getCouponCode: () => ?string,
+  /**
+   * Clears the current coupon code.
+   */
+  clearCouponCode: () => void,
+  openRedeemCodeDialog: (options?: {|
+    codeToPrefill?: string,
+    autoSubmit?: boolean,
+  |}) => void,
 |};
 
 export const SubscriptionContext = React.createContext<SubscriptionState>({
   getSubscriptionPlansWithPricingSystems: () => null,
   getUserSubscriptionPlanEvenIfLegacy: () => null,
   openSubscriptionDialog: () => {},
-  openSubscriptionPendingDialog: () => {},
+  getCouponCode: () => null,
+  clearCouponCode: () => {},
+  openRedeemCodeDialog: () => {},
 });
 
 type SubscriptionProviderProps = {|
@@ -115,6 +130,7 @@ export const SubscriptionProvider = ({
     analyticsMetadata,
     setAnalyticsMetadata,
   ] = React.useState<?SubscriptionAnalyticsMetadata>(null);
+  const [couponCode, setCouponCode] = React.useState<?string>(null);
   const recommendedPlanId = analyticsMetadata
     ? analyticsMetadata.recommendedPlanId
     : null;
@@ -124,6 +140,13 @@ export const SubscriptionProvider = ({
     subscriptionPendingDialogOpen,
     setSubscriptionPendingDialogOpen,
   ] = React.useState(false);
+  const [
+    subscriptionPendingDialogImmediateSuccess,
+    setSubscriptionPendingDialogImmediateSuccess,
+  ] = React.useState(false);
+  const [redeemCodeDialogOpen, setRedeemCodeDialogOpen] = React.useState(false);
+  const [codeToPrefill, setCodeToPrefill] = React.useState<?string>(null);
+  const [autoSubmit, setAutoSubmit] = React.useState(false);
   const userId =
     authenticatedUser && authenticatedUser.profile
       ? authenticatedUser.profile.id
@@ -197,14 +220,17 @@ export const SubscriptionProvider = ({
   );
 
   const openSubscriptionPendingDialog = React.useCallback(
-    () => setSubscriptionPendingDialogOpen(true),
+    (open: boolean) => setSubscriptionPendingDialogOpen(open),
     []
   );
 
-  const closeSubscriptionDialog = () => setAnalyticsMetadata(null);
+  const closeSubscriptionDialog = () => {
+    setAnalyticsMetadata(null);
+    setCouponCode(null);
+  };
 
   const openSubscriptionDialog = React.useCallback(
-    ({ analyticsMetadata: metadata }) => {
+    ({ analyticsMetadata: metadata, couponCode: coupon }) => {
       if (isNativeMobileApp() || simulateMobileApp) {
         if (hasValidSubscriptionPlan(authenticatedUser.subscription)) {
           if (
@@ -221,6 +247,7 @@ export const SubscriptionProvider = ({
         // Would present App Store screen.
       } else {
         setAnalyticsMetadata(metadata);
+        setCouponCode(coupon || null);
       }
     },
     [authenticatedUser.subscription, showAlert, simulateMobileApp]
@@ -247,18 +274,50 @@ export const SubscriptionProvider = ({
     ]
   );
 
+  const getCouponCode = React.useCallback(() => couponCode, [couponCode]);
+
+  const clearCouponCode = React.useCallback(() => setCouponCode(null), []);
+
+  const openRedeemCodeDialog = React.useCallback(
+    (options?: {| codeToPrefill?: string, autoSubmit?: boolean |}) => {
+      setRedeemCodeDialogOpen(true);
+      setCodeToPrefill((options && options.codeToPrefill) || null);
+      setAutoSubmit((options && options.autoSubmit) || false);
+    },
+    []
+  );
+
+  const closeRedeemCodeDialog = React.useCallback(
+    async (hasJustRedeemedCode: boolean) => {
+      setRedeemCodeDialogOpen(false);
+      setCodeToPrefill(null);
+      setAutoSubmit(false);
+      if (hasJustRedeemedCode) {
+        await authenticatedUser.onRefreshSubscription();
+        // Show the success message after the subscription has been refreshed.
+        setSubscriptionPendingDialogImmediateSuccess(true);
+        setSubscriptionPendingDialogOpen(true);
+      }
+    },
+    [authenticatedUser]
+  );
+
   const value = React.useMemo(
     () => ({
       getSubscriptionPlansWithPricingSystems,
       getUserSubscriptionPlanEvenIfLegacy,
       openSubscriptionDialog,
-      openSubscriptionPendingDialog,
+      getCouponCode,
+      clearCouponCode,
+      openRedeemCodeDialog,
     }),
     [
       getSubscriptionPlansWithPricingSystems,
       getUserSubscriptionPlanEvenIfLegacy,
       openSubscriptionDialog,
-      openSubscriptionPendingDialog,
+      getCouponCode,
+      clearCouponCode,
+      openRedeemCodeDialog,
     ]
   );
 
@@ -278,8 +337,12 @@ export const SubscriptionProvider = ({
       {subscriptionPendingDialogOpen && (
         <SubscriptionPendingDialog
           authenticatedUser={authenticatedUser}
+          immediatelyShowSuccessMessage={
+            subscriptionPendingDialogImmediateSuccess
+          }
           onClose={() => {
             setSubscriptionPendingDialogOpen(false);
+            setSubscriptionPendingDialogImmediateSuccess(false);
             authenticatedUser.onRefreshSubscription();
           }}
           onSuccess={closeSubscriptionDialog}
@@ -289,17 +352,23 @@ export const SubscriptionProvider = ({
         authenticatedUser.loginState === 'loggingIn' ? (
           <LoaderModal showImmediately />
         ) : (
-          <PromotionSubscriptionDialog
+          <SubscriptionDialog
             availableSubscriptionPlansWithPrices={getSubscriptionPlansWithPricingSystems()}
             userSubscriptionPlanEvenIfLegacy={getUserSubscriptionPlanEvenIfLegacy()}
             onClose={closeSubscriptionDialog}
             recommendedPlanId={recommendedPlanId}
-            onOpenPendingDialog={(open: boolean) =>
-              setSubscriptionPendingDialogOpen(open)
-            }
+            onOpenPendingDialog={openSubscriptionPendingDialog}
+            couponCode={couponCode}
           />
         )
       ) : null}
+      {redeemCodeDialogOpen && (
+        <RedeemCodeDialog
+          codeToPrefill={codeToPrefill || undefined}
+          autoSubmit={autoSubmit}
+          onClose={closeRedeemCodeDialog}
+        />
+      )}
     </SubscriptionContext.Provider>
   );
 };

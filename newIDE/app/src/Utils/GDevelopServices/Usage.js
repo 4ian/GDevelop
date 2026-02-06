@@ -15,6 +15,7 @@ import {
   ensureObjectHasProperty,
   ensureIsObjectWithPropertyOfType,
 } from '../DataValidator';
+import { type BundleListingData } from './Shop';
 
 export type Usage = {
   id: string,
@@ -620,11 +621,13 @@ export const getRedirectToCheckoutUrl = ({
   userId,
   userEmail,
   quantity,
+  couponCode,
 }: {|
   pricingSystemId: string,
   userId: string,
   userEmail: string,
   quantity?: number,
+  couponCode?: string,
 |}): string => {
   const url = new URL(
     `${GDevelopUsageApi.baseUrl}/subscription-v2/action/redirect-to-checkout-v2`
@@ -634,6 +637,7 @@ export const getRedirectToCheckoutUrl = ({
   url.searchParams.set('customerEmail', userEmail);
   if (quantity !== undefined && quantity > 1)
     url.searchParams.set('quantity', quantity.toString());
+  if (couponCode) url.searchParams.set('couponCode', couponCode);
   return url.toString();
 };
 
@@ -658,6 +662,34 @@ export const redeemCode = async (
       },
     }
   );
+};
+
+export interface PricingSystemDiscount {
+  pricingSystemId: string;
+  discountMessage: string;
+  originalAmountInCents: number;
+  discountedAmountInCents: number;
+  currency: string;
+  discountedPaypalPlanId: string | null;
+}
+
+export type CouponValidationApiResponse = {
+  isValid: boolean,
+  pricingSystemDiscounts: PricingSystemDiscount[],
+  errorMessage?: string,
+};
+
+export const validateCoupon = async (
+  couponCode: string
+): Promise<CouponValidationApiResponse> => {
+  const response = await apiClient.post(
+    '/subscription-v2/action/validate-coupon',
+    {
+      couponCode,
+    }
+  );
+
+  return response.data;
 };
 
 export const canBenefitFromDiscordRole = (subscription: ?Subscription) => {
@@ -767,4 +799,37 @@ export const getRedemptionCodes = async (
     data: response.data,
     endpointName: '/redemption-code of Usage API',
   });
+};
+
+export const getNewestRedemptionCodeForBundle = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  bundleListingData: BundleListingData
+): Promise<?string> => {
+  if (
+    !bundleListingData.includedRedemptionCodes ||
+    bundleListingData.includedRedemptionCodes.length === 0
+  ) {
+    return null;
+  }
+
+  const expectedPlanId =
+    bundleListingData.includedRedemptionCodes[0].givenSubscriptionPlanId;
+
+  try {
+    const allCodes = await getRedemptionCodes(getAuthorizationHeader, userId);
+    const matchingCodes = allCodes.filter(
+      code => code.givenSubscriptionPlanId === expectedPlanId
+    );
+
+    if (matchingCodes.length === 0) {
+      return null;
+    }
+
+    matchingCodes.sort((a, b) => b.createdAt - a.createdAt);
+    return matchingCodes[0].code;
+  } catch (error) {
+    console.error('Error fetching redemption codes:', error);
+    return null;
+  }
 };

@@ -37,7 +37,7 @@ import Pause from '../../UI/CustomSvgIcons/Pause';
 import Paper, { getBackgroundColor } from '../../UI/Paper';
 import Play from '../../UI/CustomSvgIcons/Play';
 import Floppy from '../../UI/CustomSvgIcons/Floppy';
-import SubscriptionPlanTableSummary from '../../Profile/Subscription/PromotionSubscriptionDialog/SubscriptionPlanTableSummary';
+import SubscriptionPlanTableSummary from '../../Profile/Subscription/SubscriptionDialog/SubscriptionPlanTableSummary';
 import { SubscriptionContext } from '../../Profile/Subscription/SubscriptionContext';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { canUpgradeSubscription } from '../../Utils/GDevelopServices/Usage';

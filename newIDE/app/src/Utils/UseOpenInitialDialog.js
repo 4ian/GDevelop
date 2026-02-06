@@ -53,6 +53,7 @@ const useOpenInitialDialog = ({
           case 'subscription':
             const recommendedPlanId =
               routeArguments['recommended-plan-id'] || 'gdevelop_silver';
+            const couponCode = routeArguments['coupon-code'];
 
             openSubscriptionDialog({
               analyticsMetadata: {
@@ -60,8 +61,13 @@ const useOpenInitialDialog = ({
                 recommendedPlanId,
                 placementId: 'opening-from-link',
               },
+              couponCode: couponCode || undefined,
             });
-            removeRouteArguments(['initial-dialog', 'recommended-plan-id']);
+            removeRouteArguments([
+              'initial-dialog',
+              'recommended-plan-id',
+              'coupon-code',
+            ]);
             break;
           case 'profile':
             if (loginState !== 'done') {

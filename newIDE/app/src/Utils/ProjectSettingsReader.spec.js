@@ -1,9 +1,10 @@
 // @flow
 import {
   filterAllowedPreferences,
-  applyProjectSettings,
-} from './ApplyProjectSettings';
+  applyProjectPreferences,
+} from './ApplyProjectPreferences';
 import YAML from 'yaml';
+import { type Preferences } from '../MainFrame/Preferences/PreferencesContext';
 
 describe('ProjectSettingsReader', () => {
   describe('end-to-end: YAML content applied to preferences', () => {
@@ -74,13 +75,14 @@ preferences:
 
       // Step 4: Apply to preferences via setMultipleValues
       const mockSetMultipleValues = jest.fn();
-      const mockPreferences = {
+      // $FlowFixMe - partial mock
+      const mockPreferences: Preferences = {
+        // $FlowFixMe - partial mock
         values: {},
         setMultipleValues: mockSetMultipleValues,
       };
 
-      // $FlowFixMe - partial mock
-      applyProjectSettings({ preferences: rawPreferences }, mockPreferences);
+      applyProjectPreferences(rawPreferences, mockPreferences);
 
       expect(mockSetMultipleValues).toHaveBeenCalledWith({
         autosaveOnPreview: true,

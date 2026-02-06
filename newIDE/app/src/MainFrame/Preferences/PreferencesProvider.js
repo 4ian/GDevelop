@@ -176,6 +176,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setShowBasicProfilingCounters: this._setShowBasicProfilingCounters.bind(
       this
     ),
+    setDisableNpmScriptConfirmation: this._setDisableNpmScriptConfirmation.bind(
+      this
+    ),
     saveTutorialProgress: this._saveTutorialProgress.bind(this),
     getTutorialProgress: this._getTutorialProgress.bind(this),
     setNewProjectsDefaultFolder: this._setNewProjectsDefaultFolder.bind(this),
@@ -546,6 +549,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           showBasicProfilingCounters,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setDisableNpmScriptConfirmation(disableNpmScriptConfirmation: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          disableNpmScriptConfirmation,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

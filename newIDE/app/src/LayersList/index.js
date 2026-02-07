@@ -339,7 +339,6 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
         // Don't allow renaming base layer (empty name)
         if (!layerName) return;
 
-        // Find the layer ID from the layer name
         if (!layersContainer.hasLayerNamed(layerName)) return;
         const layer = layersContainer.getLayer(layerName);
 

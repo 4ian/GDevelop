@@ -148,7 +148,7 @@ export class LayerTreeViewItemContent implements TreeViewItemContent {
     return [
       {
         label: i18n._(t`Rename`),
-        click: () => this.props.editName(this.getId()),
+        click: () => this.props.editName(this.layer.getName()),
         accelerator: 'F2',
         enabled: !this._isBaseLayer(),
       },

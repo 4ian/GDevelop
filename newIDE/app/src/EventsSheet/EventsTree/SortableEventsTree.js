@@ -18,6 +18,19 @@ type FlatDataEntry = {
   treeIndex: number,
 };
 
+type RowItemData = {
+  flatData: Array<FlatDataEntry>,
+  matchIndexSet: Set<number>,
+  matchIndexes: Array<number>,
+  onVisibilityToggle: ({
+    node: SortableTreeNode,
+    path: Array<number | string>,
+    treeIndex: number,
+  }) => void,
+  scaffoldBlockPxWidth: number,
+  searchFocusOffset: ?number,
+};
+
 type SortableEventsTreeProps = {|
   treeData: Array<SortableTreeNode>,
   scaffoldBlockPxWidth: number,
@@ -252,6 +265,121 @@ const getSearchMatches = ({
   return { matchIndexes, matchIndexSet: new Set(matchIndexes) };
 };
 
+/**
+ * Stable row component for react-window. Defined outside of SortableEventsTree
+ * so that its reference never changes, preventing react-window from
+ * unmounting/remounting all visible rows on every render. Changing data is
+ * received via the `data` prop (react-window's itemData pattern).
+ */
+const TreeRow = ({
+  index,
+  style,
+  data,
+}: {
+  index: number,
+  style: any,
+  data: RowItemData,
+}) => {
+  const {
+    flatData,
+    matchIndexSet,
+    matchIndexes,
+    onVisibilityToggle,
+    scaffoldBlockPxWidth,
+    searchFocusOffset,
+  } = data;
+
+  const entry = flatData[index];
+  if (!entry) return null;
+
+  const { node, path, lowerSiblingCounts, treeIndex } = entry;
+  const scaffoldBlockCount = lowerSiblingCounts.length;
+  const isSearchMatch = matchIndexSet.has(index);
+  const isSearchFocus =
+    searchFocusOffset != null && matchIndexes[searchFocusOffset] === index;
+
+  const scaffold = lowerSiblingCounts.map((lowerSiblingCount, i) => {
+    let lineClass = '';
+    if (lowerSiblingCount > 0) {
+      if (index === 0) {
+        lineClass = 'rst__lineHalfHorizontalRight rst__lineHalfVerticalBottom';
+      } else if (i === scaffoldBlockCount - 1) {
+        lineClass = 'rst__lineHalfHorizontalRight rst__lineFullVertical';
+      } else {
+        lineClass = 'rst__lineFullVertical';
+      }
+    } else if (index === 0) {
+      lineClass = 'rst__lineHalfHorizontalRight';
+    } else if (i === scaffoldBlockCount - 1) {
+      lineClass = 'rst__lineHalfVerticalTop rst__lineHalfHorizontalRight';
+    }
+
+    return (
+      <div
+        key={`scaffold-${i}`}
+        style={{ width: scaffoldBlockPxWidth }}
+        className={classNames('rst__lineBlock', lineClass)}
+      />
+    );
+  });
+
+  const nodeContentStyle = {
+    left: scaffoldBlockPxWidth * scaffoldBlockCount,
+  };
+  const hasChildren =
+    node.children && typeof node.children !== 'function'
+      ? node.children.length > 0
+      : !!node.children;
+
+  return (
+    <div style={style} className="rst__node">
+      {scaffold}
+      <div className="rst__nodeContent" style={nodeContentStyle}>
+        {hasChildren && (
+          <div>
+            <button
+              type="button"
+              aria-label={node.expanded ? 'Collapse' : 'Expand'}
+              className={classNames(
+                node.expanded ? 'rst__collapseButton' : 'rst__expandButton'
+              )}
+              style={{ left: -0.5 * scaffoldBlockPxWidth }}
+              onClick={() => {
+                onVisibilityToggle({ node, path, treeIndex });
+              }}
+            />
+            {node.expanded && (
+              <div
+                style={{ width: scaffoldBlockPxWidth }}
+                className="rst__lineChildren"
+              />
+            )}
+          </div>
+        )}
+        <div className="rst__rowWrapper">
+          <div
+            className={classNames(
+              'rst__row',
+              isSearchMatch && 'rst__rowSearchMatch',
+              isSearchFocus && 'rst__rowSearchFocus'
+            )}
+          >
+            <div className="rst__rowContents">
+              <div className="rst__rowLabel">
+                <span className="rst__rowTitle">
+                  {typeof node.title === 'function'
+                    ? node.title({ node, path, treeIndex })
+                    : node.title}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const SortableEventsTree = ({
   treeData,
   scaffoldBlockPxWidth,
@@ -322,98 +450,15 @@ const SortableEventsTree = ({
     [reactVirtualizedListProps]
   );
 
-  const renderRow = React.useCallback(
-    ({ index, style }: { index: number, style: any }) => {
-      const entry = flatData[index];
-      if (!entry) return null;
-
-      const { node, path, lowerSiblingCounts, treeIndex } = entry;
-      const scaffoldBlockCount = lowerSiblingCounts.length;
-      const isSearchMatch = matchIndexSet.has(index);
-      const isSearchFocus =
-        searchFocusOffset != null && matchIndexes[searchFocusOffset] === index;
-
-      const scaffold = lowerSiblingCounts.map((lowerSiblingCount, i) => {
-        let lineClass = '';
-        if (lowerSiblingCount > 0) {
-          if (index === 0) {
-            lineClass = 'rst__lineHalfHorizontalRight rst__lineHalfVerticalBottom';
-          } else if (i === scaffoldBlockCount - 1) {
-            lineClass = 'rst__lineHalfHorizontalRight rst__lineFullVertical';
-          } else {
-            lineClass = 'rst__lineFullVertical';
-          }
-        } else if (index === 0) {
-          lineClass = 'rst__lineHalfHorizontalRight';
-        } else if (i === scaffoldBlockCount - 1) {
-          lineClass = 'rst__lineHalfVerticalTop rst__lineHalfHorizontalRight';
-        }
-
-        return (
-          <div
-            key={`scaffold-${i}`}
-            style={{ width: scaffoldBlockPxWidth }}
-            className={classNames('rst__lineBlock', lineClass)}
-          />
-        );
-      });
-
-      const nodeContentStyle = {
-        left: scaffoldBlockPxWidth * scaffoldBlockCount,
-      };
-      const hasChildren =
-        node.children && typeof node.children !== 'function'
-          ? node.children.length > 0
-          : !!node.children;
-
-      return (
-        <div style={style} className="rst__node">
-          {scaffold}
-          <div className="rst__nodeContent" style={nodeContentStyle}>
-            {hasChildren && (
-              <div>
-                <button
-                  type="button"
-                  aria-label={node.expanded ? 'Collapse' : 'Expand'}
-                  className={classNames(
-                    node.expanded ? 'rst__collapseButton' : 'rst__expandButton'
-                  )}
-                  style={{ left: -0.5 * scaffoldBlockPxWidth }}
-                  onClick={() => {
-                    onVisibilityToggle({ node, path, treeIndex });
-                  }}
-                />
-                {node.expanded && (
-                  <div
-                    style={{ width: scaffoldBlockPxWidth }}
-                    className="rst__lineChildren"
-                  />
-                )}
-              </div>
-            )}
-            <div className="rst__rowWrapper">
-              <div
-                className={classNames(
-                  'rst__row',
-                  isSearchMatch && 'rst__rowSearchMatch',
-                  isSearchFocus && 'rst__rowSearchFocus'
-                )}
-              >
-                <div className="rst__rowContents">
-                  <div className="rst__rowLabel">
-                    <span className="rst__rowTitle">
-                      {typeof node.title === 'function'
-                        ? node.title({ node, path, treeIndex })
-                        : node.title}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    },
+  const itemData: RowItemData = React.useMemo(
+    () => ({
+      flatData,
+      matchIndexSet,
+      matchIndexes,
+      onVisibilityToggle,
+      scaffoldBlockPxWidth,
+      searchFocusOffset,
+    }),
     [
       flatData,
       matchIndexSet,
@@ -422,6 +467,14 @@ const SortableEventsTree = ({
       scaffoldBlockPxWidth,
       searchFocusOffset,
     ]
+  );
+
+  const itemKey = React.useCallback(
+    (index: number, data: RowItemData) => {
+      const entry = data.flatData[index];
+      return entry ? String(entry.node.key) : String(index);
+    },
+    []
   );
 
   return (
@@ -436,9 +489,11 @@ const SortableEventsTree = ({
             width={width}
             itemCount={flatData.length}
             itemSize={itemSize}
+            itemData={itemData}
+            itemKey={itemKey}
             onScroll={handleScroll}
           >
-            {renderRow}
+            {TreeRow}
           </VariableSizeList>
         )}
       </AutoSizer>

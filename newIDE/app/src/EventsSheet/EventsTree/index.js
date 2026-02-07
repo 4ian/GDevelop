@@ -1,11 +1,10 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import {
-  SortableTreeWithoutDndContext,
+import SortableEventsTree, {
   getFlatDataFromTree,
   getNodeAtPath,
-} from 'react-sortable-tree';
+} from './SortableEventsTree';
 import { type ConnectDragSource } from 'react-dnd';
 import { mapFor } from '../../Utils/MapFor';
 import { isEventSelected } from '../SelectionHandler';
@@ -34,8 +33,8 @@ import { type ScreenType } from '../../UI/Responsive/ScreenTypeMeasurer';
 import { type WindowSizeType } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 
 // Import default style of react-sortable-tree and the override made for EventsSheet.
-import 'react-sortable-tree/style.css';
 import './style.css';
+import './SortableEventsTree.css';
 import BottomButtons from './BottomButtons';
 import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
@@ -267,7 +266,7 @@ const EventContainer = (props: EventsContainerProps) => {
 const SortableTree = ({ className, ...otherProps }) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
-    <SortableTreeWithoutDndContext
+    <SortableEventsTree
       className={`${eventsTree} ${
         gdevelopTheme.palette.type === 'light' ? 'light-theme' : 'dark-theme'
       } ${className}`}
@@ -449,8 +448,8 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
      */
     const onHeightsChanged = React.useCallback(
       (cb: ?() => void) => {
-        if (_list.current && _list.current.wrappedInstance.current) {
-          _list.current.wrappedInstance.current.recomputeRowHeights();
+        if (_list.current) {
+          _list.current.recomputeRowHeights();
         }
         forceUpdate();
 
@@ -472,8 +471,7 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
     const scrollToRow = React.useCallback((row: number) => {
       if (row === -1) return;
       if (!_list.current) return;
-      if (!_list.current.wrappedInstance.current) return;
-      _list.current.wrappedInstance.current.scrollToRow(row);
+      _list.current.scrollToRow(row);
     }, []);
 
     /**
@@ -1089,8 +1087,8 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
     React.useLayoutEffect(() => {
       // Recompute the row heights of the tree at each render, because there
       // is no guarantee that events heights have not changed (resizing, change in event...).
-      if (_list.current && _list.current.wrappedInstance.current) {
-        _list.current.wrappedInstance.current.recomputeRowHeights();
+      if (_list.current) {
+        _list.current.recomputeRowHeights();
       }
     });
 

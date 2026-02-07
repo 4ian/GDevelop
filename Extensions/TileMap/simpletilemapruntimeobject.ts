@@ -120,8 +120,7 @@ namespace gdjs {
       return this._renderer.getRendererObject();
     }
 
-    updateTileMap(): void {
-      let shouldContinue = true;
+    updateTileMap(forceUpdate: boolean): void {
       this._tileMapManager.getOrLoadSimpleTileMapTextureCache(
         (textureName) => {
           return this.getInstanceContainer()
@@ -140,26 +139,20 @@ namespace gdjs {
             // getOrLoadTextureCache already log warns and errors.
             return;
           }
-          this._renderer.refreshPixiTileMap(textureCache);
+          this._renderer.refreshPixiTileMap(textureCache, forceUpdate);
         },
         (error) => {
-          shouldContinue = false;
           console.error(
             `Could not load texture cache for atlas ${this._atlasImage} during prerender. The tilemap might be badly configured or an issues happened with the loaded atlas image:`,
             error
           );
         }
       );
-      if (!shouldContinue) return;
-      if (this._collisionTileMap) {
-        if (this._tileMap)
-          this._collisionTileMap.updateFromTileMap(this._tileMap);
-      }
     }
 
     updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer): void {
-      if (this._isTileMapDirty) {
-        this.updateTileMap();
+      if (!this.isHidden()) {
+        this.updateTileMap(this._isTileMapDirty);
         this._isTileMapDirty = false;
       }
     }
@@ -339,7 +332,7 @@ namespace gdjs {
                 return;
               }
               this._tileMap = tileMap;
-              this._renderer.refreshPixiTileMap(textureCache);
+              this._renderer.refreshPixiTileMap(textureCache, true);
               tileMapLoadingCallback(tileMap);
             },
             (error) => {
@@ -490,16 +483,11 @@ namespace gdjs {
      * This method is expensive and should not be called.
      * Prefer using {@link getHitBoxesAround} rather than getHitBoxes.
      */
-    getHitBoxes(): gdjs.Polygon[] {
-      if (this.hitBoxesDirty) {
-        this.updateHitBoxes();
-        this.updateAABB();
-        this.hitBoxesDirty = false;
-      }
-      return this.hitBoxes;
+    override getHitBoxes(): gdjs.Polygon[] {
+      return super.getHitBoxes();
     }
 
-    updateHitBoxes(): void {
+    override updateHitBoxes(): void {
       this.updateTransformation();
       if (!this._collisionTileMap) return;
       this.hitBoxes = Array.from(
@@ -511,7 +499,17 @@ namespace gdjs {
 
     // This implementation doesn't use updateHitBoxes.
     // It's important for good performances.
-    updateAABB(): void {
+    override getAABB(): AABB {
+      // It's fine to compute it every time because tile maps are rarely rotated.
+      // It avoids calling updateHitBoxes to rely on hitBoxesDirty to know when
+      // to update.
+      this.updateAABB();
+      return this.aabb;
+    }
+
+    // This implementation doesn't use updateHitBoxes.
+    // It's important for good performances.
+    override updateAABB(): void {
       if (this.getAngle() === 0) {
         // Fast computation of AABB for non rotated object
         this.aabb.min[0] = this.x;
@@ -599,6 +597,10 @@ namespace gdjs {
         right,
         bottom
       );
+    }
+
+    override isSpatiallyIndexed(): boolean {
+      return true;
     }
 
     updateTransformation() {
@@ -749,7 +751,6 @@ namespace gdjs {
         }
       }
       this._isTileMapDirty = true;
-      this.invalidateHitboxes();
     }
 
     flipTileOnYAtPosition(x: float, y: float, flip: boolean) {
@@ -828,14 +829,20 @@ namespace gdjs {
       }
       layer.removeTile(columnIndex, rowIndex);
       if (this._collisionTileMap) {
-        this._collisionTileMap.invalidateTile(
-          this._layerIndex,
-          columnIndex,
-          rowIndex
-        );
+        const oldTileDefinition =
+          oldTileId !== undefined && this._tileMap.getTileDefinition(oldTileId);
+        const hadFullHitBox =
+          !!oldTileDefinition &&
+          oldTileDefinition.hasFullHitBox(this._hitBoxTag);
+        if (hadFullHitBox) {
+          this._collisionTileMap.invalidateTile(
+            this._layerIndex,
+            columnIndex,
+            rowIndex
+          );
+        }
       }
       this._isTileMapDirty = true;
-      this.invalidateHitboxes();
     }
 
     setGridRowCount(targetRowCount: integer) {

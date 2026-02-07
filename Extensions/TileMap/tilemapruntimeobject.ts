@@ -250,7 +250,7 @@ namespace gdjs {
                 return;
               }
               this._tileMap = tileMap;
-              this._renderer.refreshPixiTileMap(textureCache);
+              this._renderer.refreshPixiTileMap(textureCache, true);
               this.invalidateHitboxes();
             }
           );

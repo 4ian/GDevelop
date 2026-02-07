@@ -45,13 +45,21 @@ export declare namespace PixiTileMapHelper {
    * - everything (`all`).
    * @param layerIndex If `displayMode` is set to `index`, the layer index to be
    * displayed.
+   * @param leftBound Left bound position in tiles
+   * @param rightBound Right bound position in tiles
+   * @param topBound Top bound position in tiles
+   * @param bottomBound Button bound position in tiles
    */
   function updatePixiTileMap(
     untypedPixiTileMap: any,
     tileMap: EditableTileMap,
     textureCache: TileTextureCache,
     displayMode: 'index' | 'visible' | 'all',
-    layerIndex: number
+    layerIndex: number,
+    leftBound: number,
+    rightBound: number,
+    topBound: number,
+    bottomBound: number
   ): void;
   /**
    * Re-renders the collision mask

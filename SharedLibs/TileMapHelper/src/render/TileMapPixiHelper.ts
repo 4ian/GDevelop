@@ -99,13 +99,21 @@ export namespace PixiTileMapHelper {
    * - everything (`all`).
    * @param layerIndex If `displayMode` is set to `index`, the layer index to be
    * displayed.
+   * @param leftBound Left bound position in tiles
+   * @param rightBound Right bound position in tiles
+   * @param topBound Top bound position in tiles
+   * @param bottomBound Button bound position in tiles
    */
   export function updatePixiTileMap(
     untypedPixiTileMap: any,
     tileMap: EditableTileMap,
     textureCache: TileTextureCache,
     displayMode: "index" | "visible" | "all",
-    layerIndex: number
+    layerIndex: number,
+    leftBound: number,
+    rightBound: number,
+    topBound: number,
+    bottomBound: number,
   ): void {
     // The extension doesn't handle the Pixi sub-namespace very well.
     const pixiTileMap = untypedPixiTileMap as PIXI.tilemap.CompositeTilemap;
@@ -153,8 +161,12 @@ export namespace PixiTileMapHelper {
         const dimensionY = tileLayer.tileMap.getDimensionY();
         const alpha = tileLayer.getAlpha();
 
-        for (let y = 0; y < dimensionY; y++) {
-          for (let x = 0; x < dimensionX; x++) {
+        const minY = Math.max(0, Math.floor(topBound));
+        const maxY = Math.min(dimensionY, Math.ceil(bottomBound));
+        const minX = Math.max(0, Math.floor(leftBound));
+        const maxX = Math.min(dimensionX, Math.ceil(rightBound));
+        for (let y = minY; y < maxY; y++) {
+          for (let x = minX; x < maxX; x++) {
             const xPos = tileWidth * x;
             const yPos = tileHeight * y;
 

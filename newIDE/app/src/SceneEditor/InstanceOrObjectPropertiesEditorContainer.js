@@ -175,8 +175,10 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
           layersContainer={layersContainer}
           project={project}
           projectScopedContainersAccessor={projectScopedContainersAccessor}
+          resourceManagementProps={resourceManagementProps}
           unsavedChanges={unsavedChanges}
           i18n={i18n}
+          canOverrideBehaviorProperties={!!eventsFunctionsExtension}
         />
       ) : !!objects.length && lastSelectionType === 'object' ? (
         <CompactObjectPropertiesEditor

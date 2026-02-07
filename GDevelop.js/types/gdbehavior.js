@@ -6,7 +6,9 @@ declare class gdBehavior {
   getTypeName(): string;
   getProperties(): gdMapStringPropertyDescriptor;
   updateProperty(name: string, value: string): boolean;
+  removeProperty(name: string): void;
   initializeContent(): void;
+  hasPropertyValue(name: string): boolean;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;
   isFolded(): boolean;

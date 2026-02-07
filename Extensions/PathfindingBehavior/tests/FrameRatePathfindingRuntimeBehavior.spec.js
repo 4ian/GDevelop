@@ -62,29 +62,33 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
     };
 
     const addPlayer = (runtimeScene, allowDiagonals) => {
-      const player = new gdjs.RuntimeObject(runtimeScene, {
-        name: 'player',
-        type: '',
-        behaviors: [
-          {
-            type: 'PathfindingBehavior::PathfindingBehavior',
-            name: 'auto1',
-            // @ts-ignore - properties are not typed
-            allowDiagonals: allowDiagonals,
-            acceleration: 400,
-            maxSpeed: 200,
-            angularMaxSpeed: 180,
-            rotateObject: false,
-            angleOffset: 0,
-            cellWidth: 20,
-            cellHeight: 20,
-            extraBorder: 0,
-            collisionMethod: true,
-          },
-        ],
-        effects: [],
-        variables: [],
-      });
+      const player = new gdjs.RuntimeObject(
+        runtimeScene,
+        {
+          name: 'player',
+          type: '',
+          behaviors: [
+            {
+              type: 'PathfindingBehavior::PathfindingBehavior',
+              name: 'auto1',
+              // @ts-ignore - properties are not typed
+              allowDiagonals: allowDiagonals,
+              acceleration: 400,
+              maxSpeed: 200,
+              angularMaxSpeed: 180,
+              rotateObject: false,
+              angleOffset: 0,
+              cellWidth: 20,
+              cellHeight: 20,
+              extraBorder: 0,
+              collisionMethod: true,
+            },
+          ],
+          effects: [],
+          variables: [],
+        },
+        undefined
+      );
       player.getWidth = function () {
         return 90;
       };
@@ -96,20 +100,24 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
     };
 
     const addObstacle = (runtimeScene) => {
-      const obstacle = new gdjs.RuntimeObject(runtimeScene, {
-        name: 'obstacle',
-        type: '',
-        behaviors: [
-          {
-            type: 'PathfindingBehavior::PathfindingObstacleBehavior',
-            // @ts-ignore - properties are not typed
-            impassable: true,
-            cost: 2,
-          },
-        ],
-        effects: [],
-        variables: [],
-      });
+      const obstacle = new gdjs.RuntimeObject(
+        runtimeScene,
+        {
+          name: 'obstacle',
+          type: '',
+          behaviors: [
+            {
+              type: 'PathfindingBehavior::PathfindingObstacleBehavior',
+              // @ts-ignore - properties are not typed
+              impassable: true,
+              cost: 2,
+            },
+          ],
+          effects: [],
+          variables: [],
+        },
+        undefined
+      );
       obstacle.getWidth = function () {
         return 100;
       };

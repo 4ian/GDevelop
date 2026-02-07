@@ -103,9 +103,10 @@ namespace gdjs {
      */
     constructor(
       parent: gdjs.RuntimeInstanceContainer,
-      objectData: ObjectData & CustomObjectConfiguration
+      objectData: ObjectData & CustomObjectConfiguration,
+      instanceData: InstanceData | undefined
     ) {
-      super(parent, objectData);
+      super(parent, objectData, instanceData);
       this._type = objectData.type;
       this._instanceContainer = new gdjs.CustomRuntimeObjectInstanceContainer(
         parent,

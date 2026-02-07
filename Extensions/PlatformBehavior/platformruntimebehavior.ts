@@ -146,15 +146,15 @@ namespace gdjs {
       this._manager = PlatformObjectsManager.getManager(instanceContainer);
     }
 
-    updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
-      if (oldBehaviorData.platformType !== newBehaviorData.platformType) {
-        this.changePlatformType(newBehaviorData.platformType);
+    override applyBehaviorOverriding(behaviorData): boolean {
+      if (behaviorData.platformType !== undefined) {
+        this.changePlatformType(behaviorData.platformType);
       }
-      if (oldBehaviorData.canBeGrabbed !== newBehaviorData.canBeGrabbed) {
-        this._canBeGrabbed = newBehaviorData.canBeGrabbed;
+      if (behaviorData.canBeGrabbed !== undefined) {
+        this._canBeGrabbed = behaviorData.canBeGrabbed;
       }
-      if (oldBehaviorData.yGrabOffset !== newBehaviorData.yGrabOffset) {
-        this._yGrabOffset = newBehaviorData.yGrabOffset;
+      if (behaviorData.yGrabOffset !== undefined) {
+        this._yGrabOffset = behaviorData.yGrabOffset;
       }
       return true;
     }

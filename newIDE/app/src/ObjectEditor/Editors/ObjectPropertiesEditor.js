@@ -42,7 +42,11 @@ const ObjectPropertiesEditor = (props: Props) => {
   const propertiesSchema = propertiesMapToSchema({
     properties,
     defaultValueProperties: null,
-    getProperties: object => object.getProperties(),
+    getPropertyValue: (object, name) =>
+      object
+        .getProperties()
+        .get(name)
+        .getValue(),
     onUpdateProperty: (object, name, value) =>
       object.updateProperty(name, value),
   });

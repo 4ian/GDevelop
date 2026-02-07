@@ -93,45 +93,42 @@ namespace gdjs {
       );
     }
 
-    updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
-      if (oldBehaviorData.allowDiagonals !== newBehaviorData.allowDiagonals) {
-        this.allowDiagonals(newBehaviorData.allowDiagonals);
+    override applyBehaviorOverriding(behaviorData): boolean {
+      if (behaviorData.allowDiagonals !== undefined) {
+        this.allowDiagonals(behaviorData.allowDiagonals);
       }
-      if (oldBehaviorData.acceleration !== newBehaviorData.acceleration) {
-        this.setAcceleration(newBehaviorData.acceleration);
+      if (behaviorData.acceleration !== undefined) {
+        this.setAcceleration(behaviorData.acceleration);
       }
-      if (oldBehaviorData.maxSpeed !== newBehaviorData.maxSpeed) {
-        this.setMaxSpeed(newBehaviorData.maxSpeed);
+      if (behaviorData.maxSpeed !== undefined) {
+        this.setMaxSpeed(behaviorData.maxSpeed);
       }
-      if (oldBehaviorData.angularMaxSpeed !== newBehaviorData.angularMaxSpeed) {
-        this.setAngularMaxSpeed(newBehaviorData.angularMaxSpeed);
+      if (behaviorData.angularMaxSpeed !== undefined) {
+        this.setAngularMaxSpeed(behaviorData.angularMaxSpeed);
       }
-      if (oldBehaviorData.rotateObject !== newBehaviorData.rotateObject) {
-        this.setRotateObject(newBehaviorData.rotateObject);
+      if (behaviorData.rotateObject !== undefined) {
+        this.setRotateObject(behaviorData.rotateObject);
       }
-      if (oldBehaviorData.angleOffset !== newBehaviorData.angleOffset) {
-        this.setAngleOffset(newBehaviorData.angleOffset);
+      if (behaviorData.angleOffset !== undefined) {
+        this.setAngleOffset(behaviorData.angleOffset);
       }
-      if (oldBehaviorData.cellWidth !== newBehaviorData.cellWidth) {
-        this.setCellWidth(newBehaviorData.cellWidth);
+      if (behaviorData.cellWidth !== undefined) {
+        this.setCellWidth(behaviorData.cellWidth);
       }
-      if (oldBehaviorData.cellHeight !== newBehaviorData.cellHeight) {
-        this.setCellHeight(newBehaviorData.cellHeight);
+      if (behaviorData.cellHeight !== undefined) {
+        this.setCellHeight(behaviorData.cellHeight);
       }
-      if (oldBehaviorData.gridOffsetX !== newBehaviorData.gridOffsetX) {
-        this._gridOffsetX = newBehaviorData.gridOffsetX;
+      if (behaviorData.gridOffsetX !== undefined) {
+        this._gridOffsetX = behaviorData.gridOffsetX;
       }
-      if (oldBehaviorData.gridOffsetY !== newBehaviorData.gridOffsetY) {
-        this._gridOffsetY = newBehaviorData.gridOffsetY;
+      if (behaviorData.gridOffsetY !== undefined) {
+        this._gridOffsetY = behaviorData.gridOffsetY;
       }
-      if (oldBehaviorData.extraBorder !== newBehaviorData.extraBorder) {
-        this.setExtraBorder(newBehaviorData.extraBorder);
+      if (behaviorData.extraBorder !== undefined) {
+        this.setExtraBorder(behaviorData.extraBorder);
       }
-      if (
-        oldBehaviorData.smoothingMaxCellGap !==
-        newBehaviorData.smoothingMaxCellGap
-      ) {
-        this._smoothingMaxCellGap = newBehaviorData.smoothingMaxCellGap;
+      if (behaviorData.smoothingMaxCellGap !== undefined) {
+        this._smoothingMaxCellGap = behaviorData.smoothingMaxCellGap;
       }
       return true;
     }

@@ -63,9 +63,10 @@ namespace gdjs {
      */
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      tiledSpriteObjectData: TiledSpriteObjectData
+      tiledSpriteObjectData: TiledSpriteObjectData,
+      instanceData?: InstanceData
     ) {
-      super(instanceContainer, tiledSpriteObjectData);
+      super(instanceContainer, tiledSpriteObjectData, instanceData);
       this._objectData = tiledSpriteObjectData;
       this._renderer = new gdjs.TiledSpriteRuntimeObjectRenderer(
         this,

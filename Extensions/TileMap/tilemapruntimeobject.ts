@@ -65,9 +65,10 @@ namespace gdjs {
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      objectData: TilemapObjectData
+      objectData: TilemapObjectData,
+      instanceData?: InstanceData
     ) {
-      super(instanceContainer, objectData);
+      super(instanceContainer, objectData, instanceData);
       this._tilemapJsonFile = objectData.content.tilemapJsonFile;
       this._tilesetJsonFile = objectData.content.tilesetJsonFile;
       this._tilemapAtlasImage = objectData.content.tilemapAtlasImage;

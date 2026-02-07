@@ -134,9 +134,10 @@ namespace gdjs {
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      objectData: TextInputObjectData
+      objectData: TextInputObjectData,
+      instanceData?: InstanceData
     ) {
-      super(instanceContainer, objectData);
+      super(instanceContainer, objectData, instanceData);
 
       this._string = objectData.content.initialValue;
       this._placeholder = objectData.content.placeholder;

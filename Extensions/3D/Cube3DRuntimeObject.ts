@@ -84,9 +84,10 @@ namespace gdjs {
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      objectData: Cube3DObjectData
+      objectData: Cube3DObjectData,
+      instanceData?: InstanceData
     ) {
-      super(instanceContainer, objectData);
+      super(instanceContainer, objectData, instanceData);
       this._shouldUseTransparentTexture =
         objectData.content.enableTextureTransparency || false;
       this._facesOrientation = objectData.content.facesOrientation || 'Y';

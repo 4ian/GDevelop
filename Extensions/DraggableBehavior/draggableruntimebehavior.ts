@@ -27,7 +27,7 @@ namespace gdjs {
       this._checkCollisionMask = behaviorData.checkCollisionMask ? true : false;
     }
 
-    updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
+    override applyBehaviorOverriding(behaviorData): boolean {
       // Nothing to update.
       return true;
     }

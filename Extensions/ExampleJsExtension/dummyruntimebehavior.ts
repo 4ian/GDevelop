@@ -26,9 +26,9 @@ namespace gdjs {
       logger.log('DummyRuntimeBehavior was created for object:', owner);
     }
 
-    updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
-      if (oldBehaviorData.property1 !== newBehaviorData.property1) {
-        this._textToSet = newBehaviorData.property1;
+    override applyBehaviorOverriding(behaviorData): boolean {
+      if (behaviorData.property1 !== undefined) {
+        this._textToSet = behaviorData.property1;
       }
 
       // Return true to specify that the new behavior data have been applied

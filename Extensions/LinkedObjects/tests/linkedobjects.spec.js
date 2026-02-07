@@ -54,76 +54,112 @@ describe('gdjs.LinksManager', function () {
 
     const manager = gdjs.LinksManager.getManager(runtimeScene);
 
-    const object1A = new gdjs.RuntimeObject(runtimeScene, {
-      name: object1Names[0],
-      type: '',
-      behaviors: [],
-      variables: [],
-      effects: [],
-    });
-    const object1B = new gdjs.RuntimeObject(runtimeScene, {
-      name: object1Names[1],
-      type: '',
-      behaviors: [],
-      variables: [],
-      effects: [],
-    });
+    const object1A = new gdjs.RuntimeObject(
+      runtimeScene,
+      {
+        name: object1Names[0],
+        type: '',
+        behaviors: [],
+        variables: [],
+        effects: [],
+      },
+      undefined
+    );
+    const object1B = new gdjs.RuntimeObject(
+      runtimeScene,
+      {
+        name: object1Names[1],
+        type: '',
+        behaviors: [],
+        variables: [],
+        effects: [],
+      },
+      undefined
+    );
 
-    const object1C = new gdjs.RuntimeObject(runtimeScene, {
-      name: object1Names[2],
-      type: '',
-      behaviors: [],
-      variables: [],
-      effects: [],
-    });
+    const object1C = new gdjs.RuntimeObject(
+      runtimeScene,
+      {
+        name: object1Names[2],
+        type: '',
+        behaviors: [],
+        variables: [],
+        effects: [],
+      },
+      undefined
+    );
 
-    const object2A = new gdjs.RuntimeObject(runtimeScene, {
-      name: object2Names[0],
-      type: '',
-      behaviors: [],
-      variables: [],
-      effects: [],
-    });
+    const object2A = new gdjs.RuntimeObject(
+      runtimeScene,
+      {
+        name: object2Names[0],
+        type: '',
+        behaviors: [],
+        variables: [],
+        effects: [],
+      },
+      undefined
+    );
 
-    const object2B = new gdjs.RuntimeObject(runtimeScene, {
-      name: object2Names[1],
-      type: '',
-      behaviors: [],
-      variables: [],
-      effects: [],
-    });
+    const object2B = new gdjs.RuntimeObject(
+      runtimeScene,
+      {
+        name: object2Names[1],
+        type: '',
+        behaviors: [],
+        variables: [],
+        effects: [],
+      },
+      undefined
+    );
 
-    const object2C = new gdjs.RuntimeObject(runtimeScene, {
-      name: object2Names[2],
-      type: '',
-      behaviors: [],
-      variables: [],
-      effects: [],
-    });
+    const object2C = new gdjs.RuntimeObject(
+      runtimeScene,
+      {
+        name: object2Names[2],
+        type: '',
+        behaviors: [],
+        variables: [],
+        effects: [],
+      },
+      undefined
+    );
 
-    const object3A = new gdjs.RuntimeObject(runtimeScene, {
-      name: object3Names[0],
-      type: '',
-      behaviors: [],
-      variables: [],
-      effects: [],
-    });
+    const object3A = new gdjs.RuntimeObject(
+      runtimeScene,
+      {
+        name: object3Names[0],
+        type: '',
+        behaviors: [],
+        variables: [],
+        effects: [],
+      },
+      undefined
+    );
 
-    const object3B = new gdjs.RuntimeObject(runtimeScene, {
-      name: object3Names[1],
-      type: '',
-      behaviors: [],
-      variables: [],
-      effects: [],
-    });
+    const object3B = new gdjs.RuntimeObject(
+      runtimeScene,
+      {
+        name: object3Names[1],
+        type: '',
+        behaviors: [],
+        variables: [],
+        effects: [],
+      },
+      undefined
+    );
 
-    const object3C = new gdjs.RuntimeObject(runtimeScene, {
-      name: object3Names[2],
-      type: '',
-      behaviors: [],
-      variables: [],
-      effects: [],
-    });
+    const object3C = new gdjs.RuntimeObject(
+      runtimeScene,
+      {
+        name: object3Names[2],
+        type: '',
+        behaviors: [],
+        variables: [],
+        effects: [],
+      },
+      undefined
+    );
 
     runtimeScene.addObject(object1A);
     runtimeScene.addObject(object1B);

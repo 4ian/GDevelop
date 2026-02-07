@@ -88,8 +88,12 @@ namespace gdjs {
      */
     private _transformationIsUpToDate: boolean = false;
 
-    constructor(instanceContainer: gdjs.RuntimeInstanceContainer, objectData) {
-      super(instanceContainer, objectData);
+    constructor(
+      instanceContainer: gdjs.RuntimeInstanceContainer,
+      objectData,
+      instanceData?: InstanceData
+    ) {
+      super(instanceContainer, objectData, instanceData);
       this._tilemapJsonFile = objectData.content.tilemapJsonFile;
       this._tilesetJsonFile = objectData.content.tilesetJsonFile;
       this._collisionMaskTag = objectData.content.collisionMaskTag;

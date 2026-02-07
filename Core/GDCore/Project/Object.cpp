@@ -51,7 +51,7 @@ void Object::CopyWithoutConfiguration(const gd::Object& object) {
   assetStoreId = object.assetStoreId;
   objectVariables = object.objectVariables;
   effectsContainer = object.effectsContainer;
-  behaviors = gd::Clone(object.behaviors);
+  behaviors = object.behaviors;
 }
 
 gd::ObjectConfiguration& Object::GetConfiguration() { return *configuration; }
@@ -61,69 +61,31 @@ const gd::ObjectConfiguration& Object::GetConfiguration() const {
 }
 
 std::vector<gd::String> Object::GetAllBehaviorNames() const {
-  std::vector<gd::String> allNameIdentifiers;
-
-  for (auto& it : behaviors) allNameIdentifiers.push_back(it.first);
-
-  return allNameIdentifiers;
+  return behaviors.GetAllBehaviorNames();
 }
 
-void Object::RemoveBehavior(const gd::String& name) { behaviors.erase(name); }
+void Object::RemoveBehavior(const gd::String& name) { behaviors.RemoveBehavior(name); }
 
 bool Object::RenameBehavior(const gd::String& name, const gd::String& newName) {
-  if (behaviors.find(name) == behaviors.end() ||
-      behaviors.find(newName) != behaviors.end())
-    return false;
-
-  std::unique_ptr<Behavior> aut = std::move(behaviors.find(name)->second);
-  behaviors.erase(name);
-  behaviors[newName] = std::move(aut);
-  behaviors[newName]->SetName(newName);
-
-  return true;
+  return behaviors.RenameBehavior(name, newName);
 }
 
 gd::Behavior& Object::GetBehavior(const gd::String& name) {
-  return *behaviors.find(name)->second;
+  return behaviors.GetBehavior(name);
 }
 
 const gd::Behavior& Object::GetBehavior(const gd::String& name) const {
-  return *behaviors.find(name)->second;
+  return behaviors.GetBehavior(name);
 }
 
 bool Object::HasBehaviorNamed(const gd::String& name) const {
-  return behaviors.find(name) != behaviors.end();
+  return behaviors.HasBehaviorNamed(name);
 }
 
 gd::Behavior* Object::AddNewBehavior(const gd::Project& project,
                                      const gd::String& type,
                                      const gd::String& name) {
-  auto initializeAndAdd = [this,
-                           &name](std::unique_ptr<gd::Behavior> behavior) {
-    behavior->InitializeContent();
-    this->behaviors[name] = std::move(behavior);
-    return this->behaviors[name].get();
-  };
-
-  if (project.HasEventsBasedBehavior(type)) {
-    return initializeAndAdd(
-        gd::make_unique<CustomBehavior>(name, project, type));
-  } else {
-    const gd::BehaviorMetadata& behaviorMetadata =
-        gd::MetadataProvider::GetBehaviorMetadata(project.GetCurrentPlatform(),
-                                                  type);
-    if (gd::MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
-      gd::LogWarning("Tried to create a behavior with an unknown type: " +
-                     type + " on object " + GetName() + "!");
-      // It's probably an events-based behavior that was removed.
-      // Create a custom behavior to preserve the properties values.
-      return initializeAndAdd(
-          gd::make_unique<CustomBehavior>(name, project, type));
-    }
-    std::unique_ptr<gd::Behavior> behavior(behaviorMetadata.Get().Clone());
-    behavior->SetName(name);
-    return initializeAndAdd(std::move(behavior));
-  }
+  return behaviors.AddNewBehavior(project, type, name);
 }
 
 void Object::UnserializeFrom(gd::Project& project,
@@ -145,7 +107,7 @@ void Object::UnserializeFrom(gd::Project& project,
   // Compatibility with GD <= 3.3
   if (element.HasChild("Automatism")) {
     for (std::size_t i = 0; i < element.GetChildrenCount("Automatism"); ++i) {
-      SerializerElement& behaviorElement = element.GetChild("Automatism", i);
+      SerializerElement &behaviorElement = element.GetChild("Automatism", i);
 
       gd::String type = behaviorElement.GetStringAttribute("type", "", "Type")
                             .FindAndReplace("Automatism", "Behavior");
@@ -157,59 +119,9 @@ void Object::UnserializeFrom(gd::Project& project,
   }
   // End of compatibility code
   else {
-    SerializerElement& behaviorsElement =
+    SerializerElement &behaviorsElement =
         element.GetChild("behaviors", 0, "automatisms");
-    behaviorsElement.ConsiderAsArrayOf("behavior", "automatism");
-    for (std::size_t i = 0; i < behaviorsElement.GetChildrenCount(); ++i) {
-      SerializerElement& behaviorElement = behaviorsElement.GetChild(i);
-
-      gd::String type =
-          behaviorElement.GetStringAttribute("type").FindAndReplace(
-              "Automatism", "Behavior");  // Compatibility with GD <= 4
-      gd::String name = behaviorElement.GetStringAttribute("name");
-
-      auto behavior = gd::Object::AddNewBehavior(project, type, name);
-      // Compatibility with GD <= 4.0.98
-      // If there is only one child called "content" (in addition to "type" and
-      // "name"), it's the content of a JavaScript behavior. Move the content
-      // out of the "content" object (to put it directly at the root of the
-      // behavior element).
-      if (behaviorElement.HasChild("content") &&
-          behaviorElement.GetAllChildren().size() == 3) {
-        SerializerElement& contentElement = behaviorElement.GetChild("content");
-
-        // Physics2 Behavior was using "type" for the type of the body. The name
-        // conflicts with the behavior "type". Rename it.
-        if (contentElement.HasChild("type")) {
-          contentElement.AddChild("bodyType")
-              .SetValue(contentElement.GetChild("type").GetStringValue());
-          contentElement.RemoveChild("type");
-        }
-
-        behavior->UnserializeFrom(contentElement);
-      }
-      // end of compatibility code
-      else {
-        behavior->UnserializeFrom(behaviorElement);
-      }
-
-      bool isFolded = behaviorElement.GetBoolAttribute("isFolded", false);
-      behavior->SetFolded(isFolded);
-
-      // Handle Quick Customization info.
-      if (behaviorElement.HasChild(
-              "propertiesQuickCustomizationVisibilities")) {
-        behavior->GetPropertiesQuickCustomizationVisibilities().UnserializeFrom(
-            behaviorElement.GetChild(
-                "propertiesQuickCustomizationVisibilities"));
-      }
-      if (behaviorElement.HasChild("quickCustomizationVisibility")) {
-        behavior->SetQuickCustomizationVisibility(
-            QuickCustomization::StringAsVisibility(
-                behaviorElement.GetStringAttribute(
-                    "quickCustomizationVisibility")));
-      }
-    }
+    behaviors.UnserializeFrom(project, behaviorsElement);
   }
 
   configuration->UnserializeFrom(project, element);
@@ -224,48 +136,7 @@ void Object::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("type", GetType());
   objectVariables.SerializeTo(element.AddChild("variables"));
   effectsContainer.SerializeTo(element.AddChild("effects"));
-
-  SerializerElement& behaviorsElement = element.AddChild("behaviors");
-  behaviorsElement.ConsiderAsArrayOf("behavior");
-  std::vector<gd::String> allBehaviors = GetAllBehaviorNames();
-  for (std::size_t i = 0; i < allBehaviors.size(); ++i) {
-    const gd::Behavior& behavior = GetBehavior(allBehaviors[i]);
-    // Default behaviors are added at the object creation according to
-    // metadata. They don't need to be serialized.
-    // During the export, all behaviors are set as not default by
-    // `BehaviorDefaultFlagClearer` because the Runtime needs all the behaviors.
-    if (behavior.IsDefaultBehavior()) {
-      continue;
-    }
-    SerializerElement& behaviorElement = behaviorsElement.AddChild("behavior");
-
-    behavior.SerializeTo(behaviorElement);
-    behaviorElement.RemoveChild("type");  // The content can contain type or
-                                          // name properties, remove them.
-    behaviorElement.RemoveChild("name");
-    behaviorElement.RemoveChild("isFolded");
-    behaviorElement.SetAttribute("type", behavior.GetTypeName());
-    behaviorElement.SetAttribute("name", behavior.GetName());
-    if (behavior.IsFolded()) behaviorElement.SetAttribute("isFolded", true);
-
-    // Handle Quick Customization info.
-    behaviorElement.RemoveChild("propertiesQuickCustomizationVisibilities");
-    const QuickCustomizationVisibilitiesContainer&
-        propertiesQuickCustomizationVisibilities =
-            behavior.GetPropertiesQuickCustomizationVisibilities();
-    if (!propertiesQuickCustomizationVisibilities.IsEmpty()) {
-      propertiesQuickCustomizationVisibilities.SerializeTo(
-          behaviorElement.AddChild("propertiesQuickCustomizationVisibilities"));
-    }
-    const QuickCustomization::Visibility visibility =
-        behavior.GetQuickCustomizationVisibility();
-    if (visibility != QuickCustomization::Visibility::Default) {
-      behaviorElement.SetAttribute(
-          "quickCustomizationVisibility",
-          QuickCustomization::VisibilityAsString(visibility));
-    }
-  }
-
+  behaviors.SerializeTo(element.AddChild("behaviors"));
   configuration->SerializeTo(element);
 }
 

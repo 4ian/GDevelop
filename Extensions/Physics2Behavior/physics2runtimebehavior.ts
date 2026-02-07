@@ -443,69 +443,69 @@ namespace gdjs {
       return tempb2Vec2Sec;
     }
 
-    updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
-      if (oldBehaviorData.bullet !== newBehaviorData.bullet) {
-        this.setBullet(newBehaviorData.bullet);
+    override applyBehaviorOverriding(behaviorData): boolean {
+      if (behaviorData.bullet !== undefined) {
+        this.setBullet(behaviorData.bullet);
       }
-      if (oldBehaviorData.fixedRotation !== newBehaviorData.fixedRotation) {
-        this.setFixedRotation(newBehaviorData.fixedRotation);
+      if (behaviorData.fixedRotation !== undefined) {
+        this.setFixedRotation(behaviorData.fixedRotation);
       }
-      if (oldBehaviorData.canSleep !== newBehaviorData.canSleep) {
-        this.setSleepingAllowed(newBehaviorData.canSleep);
+      if (behaviorData.canSleep !== undefined) {
+        this.setSleepingAllowed(behaviorData.canSleep);
       }
-      if (oldBehaviorData.shapeDimensionA !== newBehaviorData.shapeDimensionA) {
-        this.shapeDimensionA = newBehaviorData.shapeDimensionA;
+      if (behaviorData.shapeDimensionA !== undefined) {
+        this.shapeDimensionA = behaviorData.shapeDimensionA;
         this.recreateShape();
       }
-      if (oldBehaviorData.shapeDimensionB !== newBehaviorData.shapeDimensionB) {
-        this.shapeDimensionB = newBehaviorData.shapeDimensionB;
+      if (behaviorData.shapeDimensionB !== undefined) {
+        this.shapeDimensionB = behaviorData.shapeDimensionB;
         this.recreateShape();
       }
-      if (oldBehaviorData.shapeOffsetX !== newBehaviorData.shapeOffsetX) {
-        this.shapeOffsetX = newBehaviorData.shapeOffsetX;
+      if (behaviorData.shapeOffsetX !== undefined) {
+        this.shapeOffsetX = behaviorData.shapeOffsetX;
         this.recreateShape();
       }
-      if (oldBehaviorData.shapeOffsetY !== newBehaviorData.shapeOffsetY) {
-        this.shapeOffsetY = newBehaviorData.shapeOffsetY;
+      if (behaviorData.shapeOffsetY !== undefined) {
+        this.shapeOffsetY = behaviorData.shapeOffsetY;
         this.recreateShape();
       }
-      if (oldBehaviorData.polygonOrigin !== newBehaviorData.polygonOrigin) {
-        this.polygonOrigin = newBehaviorData.polygonOrigin;
+      if (behaviorData.polygonOrigin !== undefined) {
+        this.polygonOrigin = behaviorData.polygonOrigin;
         this.recreateShape();
       }
-      if (oldBehaviorData.density !== newBehaviorData.density) {
-        this.setDensity(newBehaviorData.density);
+      if (behaviorData.density !== undefined) {
+        this.setDensity(behaviorData.density);
       }
-      if (oldBehaviorData.friction !== newBehaviorData.friction) {
-        this.setFriction(newBehaviorData.friction);
+      if (behaviorData.friction !== undefined) {
+        this.setFriction(behaviorData.friction);
       }
-      if (oldBehaviorData.restitution !== newBehaviorData.restitution) {
-        this.setRestitution(newBehaviorData.restitution);
+      if (behaviorData.restitution !== undefined) {
+        this.setRestitution(behaviorData.restitution);
       }
-      if (oldBehaviorData.linearDamping !== newBehaviorData.linearDamping) {
-        this.setLinearDamping(newBehaviorData.linearDamping);
+      if (behaviorData.linearDamping !== undefined) {
+        this.setLinearDamping(behaviorData.linearDamping);
       }
-      if (oldBehaviorData.angularDamping !== newBehaviorData.angularDamping) {
-        this.setAngularDamping(newBehaviorData.angularDamping);
+      if (behaviorData.angularDamping !== undefined) {
+        this.setAngularDamping(behaviorData.angularDamping);
       }
-      if (oldBehaviorData.gravityScale !== newBehaviorData.gravityScale) {
-        this.setGravityScale(newBehaviorData.gravityScale);
+      if (behaviorData.gravityScale !== undefined) {
+        this.setGravityScale(behaviorData.gravityScale);
       }
 
       // TODO: make these properties updatable.
-      if (oldBehaviorData.layers !== newBehaviorData.layers) {
+      if (behaviorData.layers !== undefined) {
         return false;
       }
-      if (oldBehaviorData.masks !== newBehaviorData.masks) {
+      if (behaviorData.masks !== undefined) {
         return false;
       }
-      if (oldBehaviorData.vertices !== newBehaviorData.vertices) {
+      if (behaviorData.vertices !== undefined) {
         return false;
       }
-      if (oldBehaviorData.bodyType !== newBehaviorData.bodyType) {
+      if (behaviorData.bodyType !== undefined) {
         return false;
       }
-      if (oldBehaviorData.shape !== newBehaviorData.shape) {
+      if (behaviorData.shape !== undefined) {
         return false;
       }
       return true;

@@ -4,14 +4,18 @@
  * Create and return a game with a few assets loaded, to be used in tests
  * needing real images.
  * @internal
+ * @param props {?{customObjectInstances?: Array<InstanceData>}}
  * @returns {Promise<gdjs.RuntimeGame>} A promise resolving with the game with loaded assets.
  */
-gdjs.getPixiRuntimeGameWithAssets = () => {
-  if (gdjs.getPixiRuntimeGameWithAssets._pixiRuntimeGameWithAssetsPromise) {
+gdjs.getPixiRuntimeGameWithAssets = (props = null) => {
+  if (
+    gdjs.getPixiRuntimeGameWithAssets._pixiRuntimeGameWithAssetsPromise &&
+    !props
+  ) {
     return gdjs.getPixiRuntimeGameWithAssets._pixiRuntimeGameWithAssetsPromise;
   }
 
-  var runtimeGame = new gdjs.RuntimeGame({
+  const runtimeGame = new gdjs.RuntimeGame({
     variables: [],
     properties: {
       adaptGameResolutionAtRuntime: true,
@@ -77,19 +81,19 @@ gdjs.getPixiRuntimeGameWithAssets = () => {
         title: '',
         variables: [],
         usedResources: [],
-      uiSettings: {
-        grid: false,
-        gridType: 'rectangular',
-        gridWidth: 10,
-        gridHeight: 10,
-        gridDepth: 10,
-        gridOffsetX: 0,
-        gridOffsetY: 0,
-        gridOffsetZ: 0,
-        gridColor: 0,
-        gridAlpha: 1,
-        snap: false,
-      }
+        uiSettings: {
+          grid: false,
+          gridType: 'rectangular',
+          gridWidth: 10,
+          gridHeight: 10,
+          gridDepth: 10,
+          gridOffsetX: 0,
+          gridOffsetY: 0,
+          gridOffsetZ: 0,
+          gridColor: 0,
+          gridAlpha: 1,
+          snap: false,
+        },
       },
     ],
     externalLayouts: [],
@@ -207,7 +211,7 @@ gdjs.getPixiRuntimeGameWithAssets = () => {
                 ],
               },
             ],
-            instances: [
+            instances: (props && props.customObjectInstances) || [
               {
                 angle: 0,
                 customSize: true,
@@ -242,20 +246,23 @@ gdjs.getPixiRuntimeGameWithAssets = () => {
     ],
   });
 
-  gdjs.getPixiRuntimeGameWithAssets._pixiRuntimeGameWithAssetsPromise =
-    new Promise((resolve) => {
-      runtimeGame.loadAllAssets(
-        () => {
-          console.info('Done loading assets for test game');
+  const pixiRuntimeGameWithAssetsPromise = new Promise((resolve) => {
+    runtimeGame.loadAllAssets(
+      () => {
+        console.info('Done loading assets for test game');
 
-          resolve(runtimeGame);
-        },
-        () => {
-          /* Ignore progress */
-        }
-      );
-    });
-  return gdjs.getPixiRuntimeGameWithAssets._pixiRuntimeGameWithAssetsPromise;
+        resolve(runtimeGame);
+      },
+      () => {
+        /* Ignore progress */
+      }
+    );
+  });
+  if (!props) {
+    gdjs.getPixiRuntimeGameWithAssets._pixiRuntimeGameWithAssetsPromise =
+      pixiRuntimeGameWithAssetsPromise;
+  }
+  return pixiRuntimeGameWithAssetsPromise;
 };
 
 /**

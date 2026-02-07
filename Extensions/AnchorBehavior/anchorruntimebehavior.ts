@@ -68,32 +68,24 @@ namespace gdjs {
           : behaviorData.useLegacyBottomAndRightAnchors;
     }
 
-    override updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
-      if (oldBehaviorData.leftEdgeAnchor !== newBehaviorData.leftEdgeAnchor) {
-        this._leftEdgeAnchor = newBehaviorData.leftEdgeAnchor;
+    override applyBehaviorOverriding(behaviorData): boolean {
+      if (behaviorData.leftEdgeAnchor !== undefined) {
+        this._leftEdgeAnchor = behaviorData.leftEdgeAnchor;
       }
-      if (oldBehaviorData.rightEdgeAnchor !== newBehaviorData.rightEdgeAnchor) {
-        this._rightEdgeAnchor = newBehaviorData.rightEdgeAnchor;
+      if (behaviorData.rightEdgeAnchor !== undefined) {
+        this._rightEdgeAnchor = behaviorData.rightEdgeAnchor;
       }
-      if (oldBehaviorData.topEdgeAnchor !== newBehaviorData.topEdgeAnchor) {
-        this._topEdgeAnchor = newBehaviorData.topEdgeAnchor;
+      if (behaviorData.topEdgeAnchor !== undefined) {
+        this._topEdgeAnchor = behaviorData.topEdgeAnchor;
       }
-      if (
-        oldBehaviorData.bottomEdgeAnchor !== newBehaviorData.bottomEdgeAnchor
-      ) {
-        this._bottomEdgeAnchor = newBehaviorData.bottomEdgeAnchor;
+      if (behaviorData.bottomEdgeAnchor !== undefined) {
+        this._bottomEdgeAnchor = behaviorData.bottomEdgeAnchor;
       }
-      if (
-        oldBehaviorData.useLegacyTrajectory !==
-        newBehaviorData.useLegacyTrajectory
-      ) {
+      if (behaviorData.useLegacyTrajectory !== undefined) {
         this._useLegacyBottomAndRightAnchors =
-          newBehaviorData.useLegacyBottomAndRightAnchors;
+          behaviorData.useLegacyBottomAndRightAnchors;
       }
-      if (
-        oldBehaviorData.relativeToOriginalWindowSize !==
-        newBehaviorData.relativeToOriginalWindowSize
-      ) {
+      if (behaviorData.relativeToOriginalWindowSize !== undefined) {
         return false;
       }
       return true;

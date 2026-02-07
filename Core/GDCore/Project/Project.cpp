@@ -915,7 +915,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
 
     gd::ExternalLayout& newExternalLayout =
         InsertNewExternalLayout("", GetExternalLayoutsCount());
-    newExternalLayout.UnserializeFrom(externalLayoutElement);
+    newExternalLayout.UnserializeFrom(*this, externalLayoutElement);
   }
 }
 

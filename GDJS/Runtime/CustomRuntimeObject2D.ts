@@ -6,9 +6,10 @@ namespace gdjs {
   export class CustomRuntimeObject2D extends gdjs.CustomRuntimeObject {
     constructor(
       parent: gdjs.RuntimeInstanceContainer,
-      objectData: ObjectData & CustomObjectConfiguration
+      objectData: ObjectData & CustomObjectConfiguration,
+      instanceData?: InstanceData
     ) {
-      super(parent, objectData);
+      super(parent, objectData, instanceData);
     }
 
     protected override _createRender(): gdjs.CustomRuntimeObject2DRenderer {

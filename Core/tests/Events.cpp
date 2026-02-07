@@ -8,6 +8,7 @@
  */
 #include <memory>
 #include "GDCore/CommonTools.h"
+#include "GDCore/Events/Builtin/ElseEvent.h"
 #include "GDCore/Events/Builtin/ForEachEvent.h"
 #include "GDCore/Events/Builtin/GroupEvent.h"
 #include "GDCore/Events/Builtin/StandardEvent.h"
@@ -51,6 +52,21 @@ TEST_CASE("Events", "[common][events]") {
 
     // Ensuring cloning is working
     std::shared_ptr<gd::StandardEvent> cloned(event.Clone());
+    REQUIRE(cloned->GetActions().size() == 1);
+    REQUIRE(cloned->GetActions()[0].GetType() == "InstructionType");
+
+    cloned->GetActions()[0].SetType("ChangedInstructionType");
+    REQUIRE(cloned->GetActions()[0].GetType() == "ChangedInstructionType");
+    REQUIRE(event.GetActions()[0].GetType() == "InstructionType");
+  }
+
+
+  SECTION("ElseEvent") {
+    gd::Instruction instr("InstructionType");
+    gd::ElseEvent event;
+    event.GetActions().Insert(instr);
+
+    std::shared_ptr<gd::ElseEvent> cloned(event.Clone());
     REQUIRE(cloned->GetActions().size() == 1);
     REQUIRE(cloned->GetActions()[0].GetType() == "InstructionType");
 

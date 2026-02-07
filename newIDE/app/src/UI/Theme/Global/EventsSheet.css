@@ -225,6 +225,13 @@
   min-height: var(--instruction-missing-parameter-min-height);
 }
 
+.gd-events-sheet .invalid-else {
+  padding-left: 1px;
+  color: var(--event-sheet-instruction-parameter-warning-color);
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
 /**
  * Search results highlight
  */

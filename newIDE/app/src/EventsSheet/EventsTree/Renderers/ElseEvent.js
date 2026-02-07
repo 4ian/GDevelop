@@ -8,7 +8,6 @@ import {
   largeSelectableArea,
   executableEventContainer,
   invalidElse,
-  elseLine,
 } from '../ClassNames';
 import { type EventRendererProps } from './EventRenderer';
 import ConditionsActionsColumns from '../ConditionsActionsColumns';
@@ -40,13 +39,6 @@ export default class ElseEvent extends React.Component<EventRendererProps, *> {
             [invalidElse]: !isValidElseEvent,
           })}
         >
-          {isValidElseEvent && (
-            <span
-              className={classNames({
-                [elseLine]: true,
-              })}
-            />
-          )}
           <Tooltip
             title={
               !isValidElseEvent ? (

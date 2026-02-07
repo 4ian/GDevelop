@@ -20,7 +20,7 @@ GDevelop relies on some dependencies that can have special requirements.
 
 ## Drag'n'drop handling
 
-**`react-dnd`** is used by `react-mosaic-component` and `react-sortable-tree` (but not `react-sortable-hoc`). Both must be using **the same versions** of `react-dnd` and `react-dnd-html5-backend`. Otherwise, you get blanks/not rendered components.
+**`react-dnd`** is used by `react-mosaic-component` and the EventsSheet drag'n'drop (but not `react-sortable-hoc`). Both must be using **the same versions** of `react-dnd` and `react-dnd-html5-backend`. Otherwise, you get blanks/not rendered components.
 
 > You can check if there is only one version of a package by doing `npm ls` or `yarn why`:
 >

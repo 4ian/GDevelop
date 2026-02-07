@@ -255,9 +255,7 @@ const EventContainer = (props: EventsContainerProps) => {
               eventsSheetHeight={props.eventsSheetHeight}
               windowSize={props.windowSize}
               idPrefix={props.idPrefix}
-              isValidElseEvent={
-                props.isValidElseEvent
-              }
+              isValidElseEvent={props.isValidElseEvent}
             />
           </div>
         </div>

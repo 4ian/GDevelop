@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import SoundPlayer, { type SoundPlayerInterface } from '../../UI/SoundPlayer';
-import Paper from '../../UI/Paper';
 import GenericIconPreview from './GenericIconPreview';
 import Music from '../../UI/CustomSvgIcons/Music';
 

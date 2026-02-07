@@ -7,6 +7,7 @@ import * as React from 'react';
 import { AutoSizer } from 'react-virtualized';
 import Background from '../UI/Background';
 import SearchBar from '../UI/SearchBar';
+import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { filterResourcesList } from './EnumerateResources';
 import { getResourceFilePathStatus } from './ResourceUtils';
@@ -26,6 +27,7 @@ import SortableVirtualizedItemList from '../UI/SortableVirtualizedItemList';
 const styles = {
   listContainer: {
     flex: 1,
+    outline: 'none',
   },
 };
 
@@ -57,6 +59,7 @@ export const getDefaultResourceThumbnail = (resource: gdResource) => {
 export type ResourcesListInterface = {|
   forceUpdateList: () => void,
   checkMissingPaths: () => void,
+  focus: () => void,
 |};
 
 type Props = {|
@@ -69,6 +72,7 @@ type Props = {|
     newName: string,
     cb: (boolean) => void
   ) => void,
+  onResourceRenamed?: () => void,
   fileMetadata: ?FileMetadata,
   onRemoveUnusedResources: ResourceKind => void,
   onRemoveAllResourcesWithInvalidPath: () => void,
@@ -84,6 +88,7 @@ const ResourcesList = React.memo<Props, ResourcesListInterface>(
         onSelectResource,
         onDeleteResource,
         onRenameResource,
+        onResourceRenamed,
         fileMetadata,
         onRemoveUnusedResources,
         getResourceActionsSpecificToStorageProvider,
@@ -96,6 +101,19 @@ const ResourcesList = React.memo<Props, ResourcesListInterface>(
       const [resourcesWithErrors, setResourcesWithErrors] = React.useState({});
       const [infoBarContent, setInfoBarContent] = React.useState(null);
       const sortableListRef = React.useRef(null);
+      const listContainerRef = React.useRef(null);
+
+      const resourcesManager = project.getResourcesManager();
+      const filteredList = React.useMemo(
+        () => {
+          const allResourcesList = resourcesManager
+            .getAllResourceNames()
+            .toJSArray()
+            .map(resourceName => resourcesManager.getResource(resourceName));
+          return filterResourcesList(allResourcesList, searchText);
+        },
+        [resourcesManager, searchText]
+      );
 
       const deleteResource = React.useCallback(
         (resource: gdResource) => {
@@ -153,9 +171,51 @@ const ResourcesList = React.memo<Props, ResourcesListInterface>(
             resource.setName(newName);
             // Force re-render
             forceUpdateList();
+            if (onResourceRenamed) onResourceRenamed();
           });
+
+          // Refocus the list container to allow keyboard shortcuts
+          if (listContainerRef.current) listContainerRef.current.focus();
         },
-        [project, onRenameResource, forceUpdateList]
+        [project, onRenameResource, forceUpdateList, onResourceRenamed]
+      );
+
+      const moveSelection = React.useCallback(
+        (delta: number, filteredList: Array<gdResource>) => {
+          const resourceCount = filteredList.length;
+
+          if (resourceCount === 0) return;
+
+          let nextIndex = 0;
+          if (selectedResource) {
+            const currentIndex = filteredList.indexOf(selectedResource);
+            if (currentIndex === -1) {
+              // Selected resource is not in filtered list, select the first one.
+              nextIndex = 0;
+            } else {
+              nextIndex = Math.max(
+                0,
+                Math.min(resourceCount - 1, currentIndex + delta)
+              );
+            }
+          }
+
+          const nextResource = filteredList[nextIndex];
+          onSelectResource(nextResource);
+        },
+        [selectedResource, onSelectResource]
+      );
+
+      const handleKeyDown = React.useCallback(
+        (event: KeyboardEvent) => {
+          if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+            moveSelection(event.key === 'ArrowDown' ? 1 : -1, filteredList);
+            event.preventDefault();
+          } else {
+            keyboardShortcutsRef.current.onKeyDown(event);
+          }
+        },
+        [moveSelection, filteredList]
       );
 
       const moveSelectionTo = React.useCallback(
@@ -257,9 +317,35 @@ const ResourcesList = React.memo<Props, ResourcesListInterface>(
         [project, forceUpdateList]
       );
 
+      // KeyboardShortcuts callbacks are set dynamically in useEffect below
+      // instead of here, because they depend on selectedResource which can change.
+      // This ensures the callbacks always use the current selectedResource.
+      const keyboardShortcutsRef = React.useRef<KeyboardShortcuts>(
+        new KeyboardShortcuts({
+          shortcutCallbacks: {},
+        })
+      );
+
+      React.useEffect(
+        () => {
+          if (!keyboardShortcutsRef.current) return;
+          if (!selectedResource) return;
+          keyboardShortcutsRef.current.setShortcutCallback('onDelete', () => {
+            deleteResource(selectedResource);
+          });
+          keyboardShortcutsRef.current.setShortcutCallback('onRename', () => {
+            editName(selectedResource);
+          });
+        },
+        [selectedResource, deleteResource, editName]
+      );
+
       React.useImperativeHandle(ref, () => ({
         forceUpdateList,
         checkMissingPaths,
+        focus: () => {
+          if (listContainerRef.current) listContainerRef.current.focus();
+        },
       }));
 
       // Check missing paths on mount and when project changes.
@@ -269,13 +355,6 @@ const ResourcesList = React.memo<Props, ResourcesListInterface>(
         },
         [checkMissingPaths]
       );
-
-      const resourcesManager = project.getResourcesManager();
-      const allResourcesList = resourcesManager
-        .getAllResourceNames()
-        .toJSArray()
-        .map(resourceName => resourcesManager.getResource(resourceName));
-      const filteredList = filterResourcesList(allResourcesList, searchText);
 
       // Force List component to be mounted again if project
       // has been changed. Avoid accessing to invalid objects that could
@@ -294,7 +373,12 @@ const ResourcesList = React.memo<Props, ResourcesListInterface>(
               />
             </Column>
           </Line>
-          <div style={styles.listContainer}>
+          <div
+            ref={listContainerRef}
+            style={styles.listContainer}
+            tabIndex={0}
+            onKeyDown={handleKeyDown}
+          >
             <AutoSizer>
               {({ height, width }) => (
                 <I18n>

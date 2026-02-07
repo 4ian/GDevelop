@@ -1105,12 +1105,14 @@ export class ResourcesContainer extends EmscriptenObject {
   findFilesNotInResources(filesToCheck: VectorString): VectorString;
   hasResource(name: string): boolean;
   getResource(name: string): Resource;
+  getResourceAt(index: number): Resource;
   getResourceNameWithOrigin(originName: string, originIdentifier: string): string;
   getResourceNameWithFile(file: string): string;
   addResource(res: Resource): boolean;
   removeResource(name: string): void;
   renameResource(oldName: string, name: string): void;
   getResourcePosition(name: string): number;
+  count(): number;
   moveResourceUpInList(oldName: string): boolean;
   moveResourceDownInList(oldName: string): boolean;
   moveResource(oldIndex: number, newIndex: number): void;

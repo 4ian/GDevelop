@@ -84,6 +84,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
       this.onResourceExternallyChanged.bind(this)
     );
   }
+
   componentWillUnmount() {
     unregisterOnResourceExternallyChangedCallback(
       this.resourceExternallyChangedCallbackId
@@ -126,18 +127,40 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     );
     if (!answer) return;
 
+    const resourcesManager = project.getResourcesManager();
+    const allNames = resourcesManager.getAllResourceNames().toJSArray();
+    const currentIndex = allNames.indexOf(resource.getName());
+
+    let nextResourceName = null;
+    if (allNames.length > 1) {
+      const nextIndex =
+        currentIndex < allNames.length - 1
+          ? currentIndex + 1
+          : currentIndex - 1;
+      nextResourceName = allNames[nextIndex];
+    }
+
     onDeleteResource(resource, doRemove => {
       if (!doRemove || !resource) return;
 
-      project.getResourcesManager().removeResource(resource.getName());
+      resourcesManager.removeResource(resource.getName());
+
+      const nextResourceToSelect = nextResourceName
+        ? resourcesManager.getResource(nextResourceName)
+        : null;
+
       this.setState(
         {
-          selectedResource: null,
+          selectedResource: nextResourceToSelect,
         },
         () => {
-          // Force update of the resources list as otherwise it could render
-          // resource that was just deleted.
-          if (this._resourcesList) this._resourcesList.forceUpdateList();
+          const resourcesList = this._resourcesList;
+          if (resourcesList) {
+            resourcesList.forceUpdateList();
+            if (resourcesList.focus) resourcesList.focus();
+          }
+          const propertiesEditor = this._propertiesEditor;
+          if (propertiesEditor) propertiesEditor.forceUpdate();
           this.updateToolbar();
         }
       );
@@ -288,6 +311,11 @@ export default class ResourcesEditor extends React.Component<Props, State> {
             getResourceActionsSpecificToStorageProvider={
               resourcesActionsMenuBuilder
             }
+            onResourceRenamed={() => {
+              if (this._propertiesEditor) {
+                this._propertiesEditor.forceUpdate();
+              }
+            }}
           />
         ),
       },

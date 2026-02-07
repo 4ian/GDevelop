@@ -2458,6 +2458,14 @@ interface StandardEvent {
 };
 StandardEvent implements BaseEvent;
 
+interface ElseEvent {
+    void ElseEvent();
+
+    [Ref] InstructionsList GetConditions();
+    [Ref] InstructionsList GetActions();
+};
+ElseEvent implements BaseEvent;
+
 interface RepeatEvent {
     void RepeatEvent();
 

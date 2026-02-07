@@ -15,6 +15,7 @@ export const warningInstruction = 'warning-instruction';
 export const smallWidthContainer = 'small-width-container';
 export const instructionParameter = 'instruction-parameter';
 export const instructionInvalidParameter = 'instruction-invalid-parameter';
+export const invalidElse = 'invalid-else';
 export const instructionMissingParameter = 'instruction-missing-parameter';
 export const instructionWarningParameter = 'instruction-warning-parameter';
 export const disabledText = 'disabled-text';

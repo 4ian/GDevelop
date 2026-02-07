@@ -5,6 +5,7 @@
  */
 #include "AllBuiltinExtensions.h"
 #include "GDCore/Events/Builtin/CommentEvent.h"
+#include "GDCore/Events/Builtin/ElseEvent.h"
 #include "GDCore/Events/Builtin/ForEachChildVariableEvent.h"
 #include "GDCore/Events/Builtin/ForEachEvent.h"
 #include "GDCore/Events/Builtin/GroupEvent.h"
@@ -168,6 +169,13 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
       "",
       "res/eventaddicon.png",
       std::make_shared<gd::StandardEvent>());
+
+  extension.AddEvent("Else",
+                     _("Else"),
+                     _("Else event: Actions are run if previous events in the chain were not fulfilled."),
+                     "",
+                     "res/eventaddicon.png",
+                     std::make_shared<gd::ElseEvent>());
 
   extension.AddEvent("Link",
                      _("Link external events"),

@@ -89,6 +89,9 @@ var adaptNamingConventions = function (gd) {
   gd.asStandardEvent = function (evt) {
     return gd.castObject(evt, gd.StandardEvent);
   };
+  gd.asElseEvent = function (evt) {
+    return gd.castObject(evt, gd.ElseEvent);
+  };
   gd.asRepeatEvent = function (evt) {
     return gd.castObject(evt, gd.RepeatEvent);
   };

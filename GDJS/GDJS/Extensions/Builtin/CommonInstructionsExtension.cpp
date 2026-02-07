@@ -10,6 +10,7 @@
 
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/Builtin/CommentEvent.h"
+#include "GDCore/Events/Builtin/ElseEvent.h"
 #include "GDCore/Events/Builtin/ForEachChildVariableEvent.h"
 #include "GDCore/Events/Builtin/ForEachEvent.h"
 #include "GDCore/Events/Builtin/GroupEvent.h"
@@ -129,6 +130,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
          gd::EventsCodeGenerationContext &context) {
         gd::StandardEvent &event = dynamic_cast<gd::StandardEvent &>(event_);
 
+        const gd::String chainSatisfiedVariable = "elseEventsChainSatisfied";
+
         gd::String localVariablesInitializationCode = "";
         if (event_.HasVariables()) {
           GenerateLocalVariablesInitializationCode(
@@ -165,12 +168,69 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         outputCode += "{\n";
         outputCode += actionsDeclarationsCode;
         outputCode += actionsCode;
+        outputCode += chainSatisfiedVariable + " = true;\n";
         outputCode += "}\n";
 
         if (event_.HasVariables()) {
           outputCode += codeGenerator.GenerateLocalVariablesStackAccessor() +
                         ".pop();\n";
         }
+
+        return outputCode;
+      });
+
+  GetAllEvents()["BuiltinCommonInstructions::Else"].SetCodeGenerator(
+      [](gd::BaseEvent &event_, gd::EventsCodeGenerator &codeGenerator,
+         gd::EventsCodeGenerationContext &context) {
+        gd::ElseEvent &event = dynamic_cast<gd::ElseEvent &>(event_);
+
+        const gd::String chainSatisfiedVariable = "elseEventsChainSatisfied";
+
+        gd::String localVariablesInitializationCode = "";
+        if (event_.HasVariables()) {
+          GenerateLocalVariablesInitializationCode(
+              event_.GetVariables(), codeGenerator,
+              localVariablesInitializationCode);
+        }
+
+        gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(
+            event.GetConditions(), context);
+        gd::String ifPredicate =
+            event.GetConditions().empty()
+                ? "!" + chainSatisfiedVariable
+                : "!" + chainSatisfiedVariable + " && " +
+                      codeGenerator.GenerateBooleanFullName("isConditionTrue",
+                                                            context);
+
+        gd::EventsCodeGenerationContext actionsContext;
+        actionsContext.Reuse(context);
+        gd::String actionsCode = codeGenerator.GenerateActionsListCode(
+            event.GetActions(), actionsContext);
+        if (event.HasSubEvents()) {
+          actionsCode += "\n{ //Subevents\n";
+          actionsCode += codeGenerator.GenerateEventsListCode(
+              event.GetSubEvents(), actionsContext);
+          actionsCode += "} //End of subevents\n";
+        }
+        gd::String actionsDeclarationsCode =
+            codeGenerator.GenerateObjectsDeclarationCode(actionsContext);
+
+        gd::String outputCode;
+        outputCode += "if (!" + chainSatisfiedVariable + ") {\n";
+        outputCode += localVariablesInitializationCode;
+        outputCode += conditionsCode;
+        outputCode += "if (" + ifPredicate + ") {\n";
+        outputCode += actionsDeclarationsCode;
+        outputCode += actionsCode;
+        outputCode += chainSatisfiedVariable + " = true;\n";
+        outputCode += "}\n";
+
+        if (event_.HasVariables()) {
+          outputCode += codeGenerator.GenerateLocalVariablesStackAccessor() +
+                        ".pop();\n";
+        }
+
+        outputCode += "}\n";
 
         return outputCode;
       });

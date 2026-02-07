@@ -1871,6 +1871,12 @@ export class StandardEvent extends BaseEvent {
   getActions(): InstructionsList;
 }
 
+export class ElseEvent extends BaseEvent {
+  constructor();
+  getConditions(): InstructionsList;
+  getActions(): InstructionsList;
+}
+
 export class RepeatEvent extends BaseEvent {
   constructor();
   getConditions(): InstructionsList;
@@ -3162,6 +3168,8 @@ export function removeFromVectorVector2f(index: number): void;
 export function moveVector2fInVector(oldIndex: number, newIndex: number): void;
 
 export function asStandardEvent(object: Event): StandardEvent;
+
+export function asElseEvent(object: Event): ElseEvent;
 
 export function asRepeatEvent(object: Event): RepeatEvent;
 

@@ -200,7 +200,10 @@ import { QuickCustomizationDialog } from '../QuickCustomization/QuickCustomizati
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
-import { readProjectSettings } from '../Utils/ProjectSettingsReader';
+import {
+  readProjectSettings,
+  getProjectDirectory,
+} from '../Utils/ProjectSettingsReader';
 import { type ToolbarButtonConfig } from './CustomToolbarButton';
 import { applyProjectPreferences } from '../Utils/ApplyProjectPreferences';
 import {
@@ -315,7 +318,6 @@ export type State = {|
   saveToStorageProviderDialogOpen: boolean,
   gdjsDevelopmentWatcherEnabled: boolean,
   toolbarButtons: Array<ToolbarButtonConfig>,
-  projectPath: ?string,
 |};
 
 const initialPreviewState: PreviewState = {
@@ -394,7 +396,6 @@ const MainFrame = (props: Props) => {
       saveToStorageProviderDialogOpen: false,
       gdjsDevelopmentWatcherEnabled: false,
       toolbarButtons: [],
-      projectPath: null,
     }: State)
   );
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
@@ -1003,7 +1004,6 @@ const MainFrame = (props: Props) => {
         currentFileMetadata: null,
         editorTabs: closeProjectTabs(state.editorTabs, currentProject),
         toolbarButtons: [],
-        projectPath: null,
       }));
 
       // Delete the project from memory. All references to it have been dropped previously
@@ -1116,7 +1116,6 @@ const MainFrame = (props: Props) => {
             setState(currentState => ({
               ...currentState,
               toolbarButtons: rawSettings.toolbarButtons || [],
-              projectPath: rawSettings.projectPath,
             }));
           }
         } catch (error) {
@@ -4873,7 +4872,9 @@ const MainFrame = (props: Props) => {
     onRestartInGameEditor,
     showRestartInGameEditorAfterErrorButton,
     toolbarButtons: state.toolbarButtons,
-    projectPath: state.projectPath,
+    projectPath: currentFileMetadata
+      ? getProjectDirectory(currentFileMetadata.fileIdentifier)
+      : null,
   };
 
   const hasEditorsInLeftPane = hasEditorsInPane(state.editorTabs, 'left');

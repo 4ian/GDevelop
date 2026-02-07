@@ -1,4 +1,81 @@
-/* This overwrite the default react-sortable-tree css to display events list */
+/**
+ * Base styles for the events tree scaffolding and node layout.
+ * These replace the styles previously imported from react-sortable-tree/style.css.
+ */
+
+/**
+ * Scaffolding line blocks - positioned relative so pseudo-elements can be placed.
+ */
+.gd-events-sheet .rst__lineBlock {
+    position: relative;
+    flex-shrink: 0;
+    flex-grow: 0;
+}
+
+/**
+ * Full vertical line through the entire block height (ancestor has more siblings below).
+ */
+.gd-events-sheet .rst__lineFullVertical::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    border-left: 1px solid;
+}
+
+/**
+ * Half vertical line from top to middle (for the last sibling at a depth, connecting to parent).
+ */
+.gd-events-sheet .rst__lineHalfVerticalTop::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 50%;
+    left: 50%;
+    width: 0;
+    border-left: 1px solid;
+}
+
+/**
+ * Half vertical line from middle to bottom (unused in current events tree,
+ * but kept for completeness and compatibility).
+ */
+.gd-events-sheet .rst__lineHalfVerticalBottom::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    border-left: 1px solid;
+}
+
+/**
+ * Horizontal line from center to right (connects scaffold to node content).
+ */
+.gd-events-sheet .rst__lineHalfHorizontalRight::before {
+    content: '';
+    position: absolute;
+    height: 0;
+    right: 0;
+    top: 50%;
+    left: 50%;
+    border-top: 1px solid;
+}
+
+/**
+ * Prevent the virtual scroll container from showing horizontal scrollbar.
+ */
+.gd-events-sheet .rst__virtualScrollOverride {
+    overflow-x: hidden !important;
+}
+
+/* ====================================================================
+ * Below are the EventsSheet-specific overrides (previously overriding
+ * react-sortable-tree defaults, now providing the sole styling).
+ * ==================================================================== */
 
 /**
  * Remove the outline visible on the events sheet (contrary to most
@@ -36,6 +113,8 @@
  */
 .gd-events-sheet .rst__node {
     display: flex;
+    min-width: 100%;
+    position: relative;
 }
 
 .gd-events-sheet .rst__nodeContent {
@@ -119,6 +198,10 @@
  */
 .gd-events-sheet .rst__collapseButton,
 .gd-events-sheet .rst__expandButton {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    padding: 0;
     border-radius: 0;
     border: none;
     box-shadow: none;
@@ -128,6 +211,7 @@
     width: 16px; /*Leave space for the line to be visible between the button and the handle*/
     background-color: var(--event-sheet-event-tree-background-color);
     border-radius: 4px;
+    cursor: pointer;
 }
 
 .gd-events-sheet .rst__collapseButton:hover:not(:active), .rst__expandButton:hover:not(:active) {

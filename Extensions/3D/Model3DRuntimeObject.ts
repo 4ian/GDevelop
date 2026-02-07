@@ -75,6 +75,7 @@ namespace gdjs {
     implements gdjs.Animatable
   {
     _renderer: gdjs.Model3DRuntimeObjectRenderer;
+    _meshParts: gdjs.Model3DRuntimeObjectMeshParts;
 
     _modelResourceName: string;
     _materialType: gdjs.Model3DRuntimeObject.MaterialType =
@@ -130,6 +131,7 @@ namespace gdjs {
         this,
         instanceContainer
       );
+      this._meshParts = new gdjs.Model3DRuntimeObjectMeshParts();
       this._materialType = this._convertMaterialType(
         objectData.content.materialType
       );
@@ -500,6 +502,192 @@ namespace gdjs {
     getDrawableZ(): float {
       const originPoint = this._renderer.getOriginPoint();
       return this.getZ() - this.getDepth() * originPoint[2];
+    }
+
+    // Mesh Parts Management
+
+    /**
+     * Get the mesh parts manager for this object.
+     * @returns The mesh parts manager
+     */
+    getMeshParts(): gdjs.Model3DRuntimeObjectMeshParts {
+      return this._meshParts;
+    }
+
+    /**
+     * Get the number of meshes in the model.
+     * @returns Number of meshes
+     */
+    getMeshesCount(): number {
+      return this._meshParts.getMeshesCount();
+    }
+
+    /**
+     * Get mesh name at a specific index.
+     * @param index The index
+     * @returns The mesh name
+     */
+    getMeshNameAt(index: number): string {
+      return this._meshParts.getMeshNameAt(index);
+    }
+
+    /**
+     * Check if a mesh exists.
+     * @param name The mesh name
+     * @returns True if the mesh exists
+     */
+    hasMesh(name: string): boolean {
+      return this._meshParts.hasMesh(name);
+    }
+
+    /**
+     * Set mesh visibility.
+     * @param name The mesh name
+     * @param visible Whether the mesh should be visible
+     */
+    setMeshVisible(name: string, visible: boolean): void {
+      this._meshParts.setMeshVisible(name, visible);
+    }
+
+    /**
+     * Check if a mesh is visible.
+     * @param name The mesh name
+     * @returns True if visible
+     */
+    isMeshVisible(name: string): boolean {
+      return this._meshParts.isMeshVisible(name);
+    }
+
+    /**
+     * Set mesh position.
+     * @param name The mesh name
+     * @param x X position
+     * @param y Y position
+     * @param z Z position
+     */
+    setMeshPosition(name: string, x: number, y: number, z: number): void {
+      this._meshParts.setMeshPosition(name, x, y, z);
+    }
+
+    /**
+     * Get mesh X position.
+     * @param name The mesh name
+     * @returns X position
+     */
+    getMeshPositionX(name: string): number {
+      return this._meshParts.getMeshPositionX(name);
+    }
+
+    /**
+     * Get mesh Y position.
+     * @param name The mesh name
+     * @returns Y position
+     */
+    getMeshPositionY(name: string): number {
+      return this._meshParts.getMeshPositionY(name);
+    }
+
+    /**
+     * Get mesh Z position.
+     * @param name The mesh name
+     * @returns Z position
+     */
+    getMeshPositionZ(name: string): number {
+      return this._meshParts.getMeshPositionZ(name);
+    }
+
+    /**
+     * Set mesh rotation.
+     * @param name The mesh name
+     * @param rotationX Rotation around X axis in degrees
+     * @param rotationY Rotation around Y axis in degrees
+     * @param rotationZ Rotation around Z axis in degrees
+     */
+    setMeshRotation(
+      name: string,
+      rotationX: number,
+      rotationY: number,
+      rotationZ: number
+    ): void {
+      this._meshParts.setMeshRotation(name, rotationX, rotationY, rotationZ);
+    }
+
+    /**
+     * Get mesh X rotation.
+     * @param name The mesh name
+     * @returns X rotation in degrees
+     */
+    getMeshRotationX(name: string): number {
+      return this._meshParts.getMeshRotationX(name);
+    }
+
+    /**
+     * Get mesh Y rotation.
+     * @param name The mesh name
+     * @returns Y rotation in degrees
+     */
+    getMeshRotationY(name: string): number {
+      return this._meshParts.getMeshRotationY(name);
+    }
+
+    /**
+     * Get mesh Z rotation.
+     * @param name The mesh name
+     * @returns Z rotation in degrees
+     */
+    getMeshRotationZ(name: string): number {
+      return this._meshParts.getMeshRotationZ(name);
+    }
+
+    /**
+     * Set mesh scale.
+     * @param name The mesh name
+     * @param scaleX Scale on X axis
+     * @param scaleY Scale on Y axis
+     * @param scaleZ Scale on Z axis
+     */
+    setMeshScale(
+      name: string,
+      scaleX: number,
+      scaleY: number,
+      scaleZ: number
+    ): void {
+      this._meshParts.setMeshScale(name, scaleX, scaleY, scaleZ);
+    }
+
+    /**
+     * Get mesh X scale.
+     * @param name The mesh name
+     * @returns X scale
+     */
+    getMeshScaleX(name: string): number {
+      return this._meshParts.getMeshScaleX(name);
+    }
+
+    /**
+     * Get mesh Y scale.
+     * @param name The mesh name
+     * @returns Y scale
+     */
+    getMeshScaleY(name: string): number {
+      return this._meshParts.getMeshScaleY(name);
+    }
+
+    /**
+     * Get mesh Z scale.
+     * @param name The mesh name
+     * @returns Z scale
+     */
+    getMeshScaleZ(name: string): number {
+      return this._meshParts.getMeshScaleZ(name);
+    }
+
+    /**
+     * Remove a mesh from the model.
+     * @param name The mesh name
+     */
+    removeMesh(name: string): void {
+      this._meshParts.removeMesh(name);
     }
   }
 

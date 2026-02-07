@@ -154,11 +154,13 @@ export default class ResourcesEditor extends React.Component<Props, State> {
           selectedResource: nextResourceToSelect,
         },
         () => {
-          if (this._resourcesList) {
-            this._resourcesList.forceUpdateList();
-            if (this._resourcesList.focus) this._resourcesList.focus();
+          const resourcesList = this._resourcesList;
+          if (resourcesList) {
+            resourcesList.forceUpdateList();
+            if (resourcesList.focus) resourcesList.focus();
           }
-          if (this._propertiesEditor) this._propertiesEditor.forceUpdate();
+          const propertiesEditor = this._propertiesEditor;
+          if (propertiesEditor) propertiesEditor.forceUpdate();
           this.updateToolbar();
         }
       );

@@ -1,0 +1,550 @@
+/* Base styles from react-sortable-tree (inlined). */
+.rst__tree {
+  /* Dimensions */
+  --rst-row-height: 62px;
+  --rst-block-width: 44px;
+  --rst-handle-width: 44px;
+
+  /* Colors */
+  --rst-line-color: #000;
+  --rst-line-highlight: #36c2f6;
+  --rst-line-highlight-arrow: white;
+
+  --rst-primary-color: #36c2f6;
+  --rst-focus-color: #fc6421;
+  --rst-match-color: #0080ff;
+
+  --rst-bg-landing: lightblue;
+  --rst-bg-cancel: #e6a8ad;
+  --rst-border-cancel: #e6a8ad;
+
+  --rst-text-color: #333;
+
+  --rst-icon-color: #6db3f2;
+
+  --rst-button-bg: #fff;
+  --rst-button-border: #989898;
+
+  /* Layout */
+  display: block;
+  height: 100%;
+}
+
+.rst__node {
+  min-width: 100%;
+  white-space: nowrap;
+  position: relative;
+  text-align: start;
+  height: var(--rst-row-height);
+  box-sizing: border-box;
+  display: flex;
+  align-items: stretch;
+}
+
+.rst__nodeContent {
+  position: absolute;
+  inset-block: 0;
+}
+
+/* ==========================================================================
+   Scaffold Lines
+   ========================================================================== */
+.rst__lineBlock,
+.rst__absoluteLineBlock {
+  height: 100%;
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.rst__absoluteLineBlock {
+  position: absolute;
+  top: 0;
+}
+
+.rst__lineHalfHorizontalRight::before,
+.rst__lineFullVertical::after,
+.rst__lineHalfVerticalTop::after,
+.rst__lineHalfVerticalBottom::after {
+  position: absolute;
+  content: '';
+  background-color: var(--rst-line-color);
+}
+
+/**
+ * +-----+
+ * |     |
+ * |  +--+
+ * |     |
+ * +-----+
+ */
+.rst__lineHalfHorizontalRight::before {
+  height: 1px;
+  top: 50%;
+  inset-inline-end: 0;
+  width: 50%;
+}
+
+/**
+ * +--+--+
+ * |  |  |
+ * |  |  |
+ * |  |  |
+ * +--+--+
+ */
+.rst__lineFullVertical::after,
+.rst__lineHalfVerticalTop::after,
+.rst__lineHalfVerticalBottom::after {
+  width: 1px;
+  inset-inline-start: 50%;
+  height: 100%;
+}
+
+/**
+ * +-----+
+ * |  |  |
+ * |  +  |
+ * |     |
+ * +-----+
+ */
+.rst__lineHalfVerticalTop::after {
+  height: 50%;
+}
+
+/**
+ * +-----+
+ * |     |
+ * |  +  |
+ * |  |  |
+ * +-----+
+ */
+.rst__lineHalfVerticalBottom::after {
+  top: auto;
+  bottom: 0;
+  height: 50%;
+}
+
+/* Highlight line for pointing to dragged row destination
+   ========================================================================== */
+/**
+ * +--+--+
+ * |  |  |
+ * |  |  |
+ * |  |  |
+ * +--+--+
+ */
+.rst__highlightLineVertical {
+  z-index: 3;
+}
+
+.rst__highlightLineVertical::before {
+  position: absolute;
+  content: '';
+  background-color: var(--rst-line-highlight);
+  width: 8px;
+  inset-inline-start: 50%;
+  translate: -50% 0;
+  top: 0;
+  height: 100%;
+}
+
+@keyframes arrow-pulse {
+  0% {
+    translate: -50% 0;
+    opacity: 0;
+  }
+
+  30% {
+    translate: -50% 300%;
+    opacity: 1;
+  }
+
+  70% {
+    translate: -50% 700%;
+    opacity: 1;
+  }
+
+  100% {
+    translate: -50% 1000%;
+    opacity: 0;
+  }
+}
+
+.rst__highlightLineVertical::after {
+  content: '';
+  position: absolute;
+  height: 0;
+  inset-inline-start: 50%;
+  top: 0;
+  border-inline: 4px solid transparent;
+  border-top: 4px solid var(--rst-line-highlight-arrow);
+  animation: arrow-pulse 1s infinite linear both;
+}
+
+/**
+ * +-----+
+ * |     |
+ * |  +--+
+ * |  |  |
+ * +--+--+
+ */
+.rst__highlightTopLeftCorner::before {
+  z-index: 3;
+  content: '';
+  position: absolute;
+  border-top: solid 8px var(--rst-line-highlight);
+  border-inline-start: solid 8px var(--rst-line-highlight);
+  box-sizing: border-box;
+  height: calc(50% + 4px);
+  top: 50%;
+  margin-top: -4px;
+  inset-inline-end: 0;
+  width: calc(50% + 4px);
+}
+
+/**
+ * +--+--+
+ * |  |  |
+ * |  |  |
+ * |  +->|
+ * +-----+
+ */
+.rst__highlightBottomLeftCorner {
+  z-index: 3;
+}
+
+.rst__highlightBottomLeftCorner::before {
+  content: '';
+  position: absolute;
+  border-bottom: solid 8px var(--rst-line-highlight);
+  border-inline-start: solid 8px var(--rst-line-highlight);
+  box-sizing: border-box;
+  height: calc(100% + 4px);
+  top: 0;
+  inset-inline-end: 12px;
+  width: calc(50% - 8px);
+}
+
+.rst__highlightBottomLeftCorner::after {
+  content: '';
+  position: absolute;
+  height: 0;
+  inset-inline-end: 0;
+  top: 100%;
+  margin-top: -12px;
+  border-top: 12px solid transparent;
+  border-bottom: 12px solid transparent;
+  border-inline-start: 12px solid var(--rst-line-highlight);
+}
+
+.rst__rowWrapper {
+  padding-block: 10px;
+  padding-inline-end: 10px;
+  padding-inline-start: 0;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+}
+
+.rst__rtl.rst__rowWrapper {
+  padding-inline-start: 10px;
+  padding-inline-end: 0;
+}
+
+.rst__row {
+  height: 100%;
+  white-space: nowrap;
+  display: flex;
+  position: relative;
+}
+
+.rst__row > * {
+  box-sizing: border-box;
+}
+
+/**
+ * The outline of where the element will go if dropped, displayed while dragging
+ */
+.rst__rowLandingPad::before,
+.rst__rowCancelPad::before {
+  background-color: var(--rst-bg-landing);
+  border: 3px dashed white;
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+/**
+ * Alternate appearance of the landing pad when the dragged location is invalid
+ */
+.rst__rowCancelPad::before {
+  background-color: var(--rst-bg-cancel);
+}
+
+/**
+ * Nodes matching the search conditions are highlighted
+ */
+.rst__rowSearchMatch {
+  outline: solid 3px var(--rst-match-color);
+}
+
+/**
+ * The node that matches the search conditions and is currently focused
+ */
+.rst__rowSearchFocus {
+  outline: solid 3px var(--rst-focus-color);
+}
+
+.rst__rowContents {
+  position: relative;
+  height: 100%;
+  border: solid #bbb 1px;
+  border-inline-start: none;
+  box-shadow: 0 2px 2px -2px rgba(0, 0, 0, 0.2);
+  padding-inline: 10px 5px;
+  border-radius: 2px;
+  min-width: 230px;
+  flex: 1 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.rst__rowContentsDragDisabled {
+  border-left: solid #bbb 1px;
+}
+
+.rst__rowLabel {
+  flex: 0 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.rst__rowToolbar {
+  flex: 0 1 auto;
+  display: flex;
+  gap: 5px;
+}
+
+.rst__moveHandle,
+.rst__loadingHandle {
+  height: 100%;
+  width: var(--rst-handle-width);
+  background-color: var(--rst-icon-color);
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MiIgaGVpZ2h0PSI0MiI+PGcgc3Ryb2tlPSIjRkZGIiBzdHJva2Utd2lkdGg9IjIuOSIgPjxwYXRoIGQ9Ik0xNCAxNS43aDE0LjQiLz48cGF0aCBkPSJNMTQgMjEuNGgxNC40Ii8+PHBhdGggZD0iTTE0IDI3LjFoMTQuNCIvPjwvZz4KPC9zdmc+');
+  background-repeat: no-repeat;
+  background-position: center;
+  border: solid #aaa 1px;
+  box-shadow: 0 2px 2px -2px;
+  cursor: move;
+  border-radius: 1px;
+  z-index: 1;
+}
+
+.rst__loadingHandle {
+  cursor: default;
+  background-color: #d9d9d9;
+  background-image: none;
+}
+
+.rst__loadingCircle {
+  width: 80%;
+  height: 80%;
+  margin: 10%;
+  position: relative;
+}
+
+.rst__loadingCirclePoint {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0;
+}
+
+@keyframes pointFade {
+  0%,
+  19.999%,
+  100% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+}
+
+.rst__loadingCirclePoint::before {
+  content: '';
+  display: block;
+  margin: 0 auto;
+  width: 11%;
+  height: 30%;
+  background-color: #fff;
+  border-radius: 30%;
+  animation: pointFade 800ms infinite ease-in-out both;
+}
+
+.rst__loadingCirclePoint:nth-of-type(1) {
+  transform: rotate(0deg);
+}
+
+.rst__loadingCirclePoint:nth-of-type(7) {
+  transform: rotate(180deg);
+}
+
+.rst__loadingCirclePoint:nth-of-type(1)::before,
+.rst__loadingCirclePoint:nth-of-type(7)::before {
+  animation-delay: -800ms;
+}
+
+.rst__loadingCirclePoint:nth-of-type(2) {
+  transform: rotate(30deg);
+}
+
+.rst__loadingCirclePoint:nth-of-type(8) {
+  transform: rotate(210deg);
+}
+
+.rst__loadingCirclePoint:nth-of-type(2)::before,
+.rst__loadingCirclePoint:nth-of-type(8)::before {
+  animation-delay: -666ms;
+}
+
+.rst__loadingCirclePoint:nth-of-type(3) {
+  transform: rotate(60deg);
+}
+
+.rst__loadingCirclePoint:nth-of-type(9) {
+  transform: rotate(240deg);
+}
+
+.rst__loadingCirclePoint:nth-of-type(3)::before,
+.rst__loadingCirclePoint:nth-of-type(9)::before {
+  animation-delay: -533ms;
+}
+
+.rst__loadingCirclePoint:nth-of-type(4) {
+  transform: rotate(90deg);
+}
+
+.rst__loadingCirclePoint:nth-of-type(10) {
+  transform: rotate(270deg);
+}
+
+.rst__loadingCirclePoint:nth-of-type(4)::before,
+.rst__loadingCirclePoint:nth-of-type(10)::before {
+  animation-delay: -400ms;
+}
+
+.rst__loadingCirclePoint:nth-of-type(5) {
+  transform: rotate(120deg);
+}
+
+.rst__loadingCirclePoint:nth-of-type(11) {
+  transform: rotate(300deg);
+}
+
+.rst__loadingCirclePoint:nth-of-type(5)::before,
+.rst__loadingCirclePoint:nth-of-type(11)::before {
+  animation-delay: -266ms;
+}
+
+.rst__loadingCirclePoint:nth-of-type(6) {
+  transform: rotate(150deg);
+}
+
+.rst__loadingCirclePoint:nth-of-type(12) {
+  transform: rotate(330deg);
+}
+
+.rst__loadingCirclePoint:nth-of-type(6)::before,
+.rst__loadingCirclePoint:nth-of-type(12)::before {
+  animation-delay: -133ms;
+}
+
+.rst__loadingCirclePoint:nth-of-type(7) {
+  transform: rotate(180deg);
+}
+
+.rst__loadingCirclePoint:nth-of-type(13) {
+  transform: rotate(360deg);
+}
+
+.rst__loadingCirclePoint:nth-of-type(7)::before,
+.rst__loadingCirclePoint:nth-of-type(13)::before {
+  animation-delay: 0ms;
+}
+
+.rst__rowTitle {
+  font-weight: bold;
+}
+
+.rst__rowTitleWithSubtitle {
+  font-size: 0.85em;
+  display: block;
+}
+
+.rst__rowSubtitle {
+  font-size: 0.7em;
+  opacity: 0.8;
+}
+
+.rst__collapseButton,
+.rst__expandButton {
+  appearance: none;
+  border: none;
+  position: absolute;
+  border-radius: 100%;
+  box-shadow: 0 0 0 1px #000;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  top: 50%;
+  translate: -50% -50%;
+  cursor: pointer;
+  background-color: var(--rst-button-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--rst-button-bg);
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.rst__collapseButton {
+  /* SVG for Minus */
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCI+PGNpcmNsZSBjeD0iOSIgY3k9IjkiIHI9IjgiIGZpbGw9IiNGRkYiLz48ZyBzdHJva2U9IiM5ODk4OTgiIHN0cm9rZS13aWR0aD0iMS45IiA+PHBhdGggZD0iTTQuNSA5aDkiLz48L2c+Cjwvc3ZnPg==');
+}
+
+.rst__expandButton {
+  /* SVG for Plus */
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCI+PGNpcmNsZSBjeD0iOSIgY3k9IjkiIHI9IjgiIGZpbGw9IiNGRkYiLz48ZyBzdHJva2U9IiM5ODk4OTgiIHN0cm9rZS13aWR0aD0iMS45IiA+PHBhdGggZD0iTTQuNSA5aDkiLz48cGF0aCBkPSJNOSA0LjV2OSIvPjwvZz4KPC9zdmc+');
+}
+
+.rst__collapseButton:focus,
+.rst__expandButton:focus {
+  outline: none;
+  box-shadow: 0 0 0 1px #000, 0 0 1px 3px var(--rst-primary-color);
+}
+
+/**
+ * Line for under a node with children
+ */
+.rst__lineChildren {
+  height: 100%;
+  display: inline-block;
+  position: absolute;
+}
+
+.rst__lineChildren::after {
+  content: '';
+  position: absolute;
+  background-color: var(--rst-line-color);
+  width: 1px;
+  inset-inline-start: 50%;
+  bottom: 0;
+  height: 10px;
+}

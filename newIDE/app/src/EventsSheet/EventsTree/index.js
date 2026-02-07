@@ -1,11 +1,11 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import {
-  SortableTreeWithoutDndContext,
+import SortableEventsTree, {
   getFlatDataFromTree,
   getNodeAtPath,
-} from 'react-sortable-tree';
+} from './SortableEventsTree';
+import type { SortableEventsTreeHandle } from './SortableEventsTree';
 import { type ConnectDragSource } from 'react-dnd';
 import { mapFor } from '../../Utils/MapFor';
 import { isEventSelected } from '../SelectionHandler';
@@ -33,8 +33,8 @@ import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingServ
 import { type ScreenType } from '../../UI/Responsive/ScreenTypeMeasurer';
 import { type WindowSizeType } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 
-// Import default style of react-sortable-tree and the override made for EventsSheet.
-import 'react-sortable-tree/style.css';
+// Import base tree styles and the override made for EventsSheet.
+import './react-sortable-tree.css';
 import './style.css';
 import BottomButtons from './BottomButtons';
 import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
@@ -262,19 +262,21 @@ const EventContainer = (props: EventsContainerProps) => {
   );
 };
 
-const SortableTree = ({ className, ...otherProps }) => {
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  return (
-    <SortableTreeWithoutDndContext
-      className={`${eventsTree} ${
-        gdevelopTheme.palette.type === 'light' ? 'light-theme' : 'dark-theme'
-      } ${className}`}
-      {...otherProps}
-    />
-  );
-};
+const SortableTree = React.forwardRef(
+  ({ className, ...otherProps }, ref) => {
+    const gdevelopTheme = React.useContext(GDevelopThemeContext);
+    return (
+      <SortableEventsTree
+        ref={ref}
+        className={`${eventsTree} ${
+          gdevelopTheme.palette.type === 'light' ? 'light-theme' : 'dark-theme'
+        } ${className}`}
+        {...otherProps}
+      />
+    );
+  }
+);
 
-const noop = () => {};
 
 type EventsTreeProps = {|
   events: gdEventsList,
@@ -379,7 +381,7 @@ export type EventsTreeInterface = {|
 // A node displayed by the SortableTree. Almost always represents an
 // event, except for the buttons at the bottom of the sheet and the tutorial.
 export type SortableTreeNode = {|
-  // Necessary attributes for react-sortable-tree.
+  // Necessary attributes for the tree renderer.
   title: (node: {| node: SortableTreeNode |}) => React.Node,
   children: Array<any>,
   expanded: boolean,
@@ -401,17 +403,15 @@ export type SortableTreeNode = {|
   fixedHeight?: ?number,
 |};
 
-const getNodeKey = ({ treeIndex }) => treeIndex;
-
 /**
- * Display a tree of event. Builtin on react-sortable-tree so that event
- * can be drag'n'dropped and events rows are virtualized.
+ * Display a tree of event. Builtin on a custom tree using react-window
+ * so that event can be drag'n'dropped and events rows are virtualized.
  */
 const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
   (props, ref) => {
     const forceUpdate = useForceUpdate();
 
-    const _list = React.useRef<?any>(null);
+    const listRef = React.useRef<?SortableEventsTreeHandle>(null);
     const eventsHeightsCache = React.useMemo(() => new EventHeightsCache(), []);
 
     const DragSourceAndDropTarget = React.useMemo(
@@ -435,6 +435,7 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
     // any reference to them).
     // Array is created now, so can be referenced by callbacks, and filled later.
     const treeDataRoot = React.useRef<Array<SortableTreeNode>>([]);
+    const flatDataTreeRef = React.useRef<Array<any>>([]);
 
     React.useEffect(() => {
       return () => {
@@ -447,8 +448,8 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
      */
     const onHeightsChanged = React.useCallback(
       (cb: ?() => void) => {
-        if (_list.current && _list.current.wrappedInstance.current) {
-          _list.current.wrappedInstance.current.recomputeRowHeights();
+        if (listRef.current) {
+          listRef.current.recomputeRowHeights();
         }
         forceUpdate();
 
@@ -469,9 +470,8 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
 
     const scrollToRow = React.useCallback((row: number) => {
       if (row === -1) return;
-      if (!_list.current) return;
-      if (!_list.current.wrappedInstance.current) return;
-      _list.current.wrappedInstance.current.scrollToRow(row);
+      if (!listRef.current) return;
+      listRef.current.scrollToRow(row);
     }, []);
 
     /**
@@ -802,8 +802,7 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
                     getNodeAtPath={path =>
                       getNodeAtPath({
                         path,
-                        treeData: treeDataRoot.current,
-                        getNodeKey,
+                        flatData: flatDataTreeRef.current,
                       }).node
                     }
                   />
@@ -974,14 +973,7 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
     const getEventContextAtRowIndexes = (
       rowIndexes: Array<number>
     ): Array<EventContext> => {
-      // We use flatDataTree instead of treeDataRoot because we need the events contexts too.
-      const flatDataTree: Array<{
-        node: SortableTreeNode,
-      }> = getFlatDataFromTree({
-        treeData: treeDataRoot.current,
-        getNodeKey,
-        ignoreCollapsed: true,
-      });
+      const flatDataTree = flatDataTreeRef.current;
       return rowIndexes
         .map(rowIndex => {
           if (!flatDataTree[rowIndex]) return null;
@@ -1047,11 +1039,17 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
     );
 
     const _scrollUp = React.useCallback(() => {
-      _list.current && _list.current.container.scrollBy({ top: -5 });
+      const scrollElement = listRef.current
+        ? listRef.current.getScrollElement()
+        : null;
+      scrollElement && scrollElement.scrollBy({ top: -5 });
     }, []);
 
     const _scrollDown = React.useCallback(() => {
-      _list.current && _list.current.container.scrollBy({ top: 5 });
+      const scrollElement = listRef.current
+        ? listRef.current.getScrollElement()
+        : null;
+      scrollElement && scrollElement.scrollBy({ top: 5 });
     }, []);
 
     const zoomLevel = props.fontSize || 14;
@@ -1064,12 +1062,16 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
       props.projectScopedContainersAccessor,
       props.events
     );
+    flatDataTreeRef.current = getFlatDataFromTree({
+      treeData: treeDataRoot.current,
+      ignoreCollapsed: true,
+    });
 
     React.useLayoutEffect(() => {
       // Recompute the row heights of the tree at each render, because there
       // is no guarantee that events heights have not changed (resizing, change in event...).
-      if (_list.current && _list.current.wrappedInstance.current) {
-        _list.current.wrappedInstance.current.recomputeRowHeights();
+      if (listRef.current) {
+        listRef.current.recomputeRowHeights();
       }
     });
 
@@ -1106,6 +1108,7 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
           </>
         )}
         <SortableTree
+          ref={listRef}
           treeData={
             // Pass a new array each time, otherwise the tree will not re-render.
             [...treeDataRoot.current]
@@ -1113,7 +1116,6 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
           scaffoldBlockPxWidth={
             getIndentWidth(props.windowSize) * props.indentScale
           }
-          onChange={noop}
           onVisibilityToggle={_onVisibilityToggle}
           canDrag={false}
           rowHeight={_getRowHeight}
@@ -1121,23 +1123,16 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
           searchQuery={props.searchResults}
           searchFocusOffset={props.searchFocusOffset}
           className={props.searchResults ? eventsTreeWithSearchResults : ''}
-          reactVirtualizedListProps={{
-            ref: list => {
-              _list.current = list;
-            },
-            onScroll: event => {
-              props.onScroll && props.onScroll();
-              setIsScrolledTop(event.scrollTop === 0);
-              setIsScrolledBottom(
-                event.clientHeight + event.scrollTop >= event.scrollHeight
-              );
-            },
-            scrollToAlignment: 'center',
+          height={props.eventsSheetHeight}
+          width={props.eventsSheetWidth}
+          onScroll={event => {
+            props.onScroll && props.onScroll();
+            setIsScrolledTop(event.scrollTop === 0);
+            setIsScrolledBottom(
+              event.clientHeight + event.scrollTop >= event.scrollHeight
+            );
           }}
-          // Disable slideRegionSize on touchscreen because of a bug that makes scrolling
-          // uncontrollable on touchscreens. Ternary operator does not update slideRegionSize
-          // well.
-          slideRegionSize={-10}
+          scrollToAlignment="center"
         />
       </div>
     );

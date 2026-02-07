@@ -63,7 +63,15 @@ export type SoundPlayerInterface = {|
 
 const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
   (
-    { soundSrc, onSoundLoaded, onSoundError, onSkipBack, onSkipForward, title, subtitle },
+    {
+      soundSrc,
+      onSoundLoaded,
+      onSoundError,
+      onSkipBack,
+      onSkipForward,
+      title,
+      subtitle,
+    },
     ref
   ) => {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -120,9 +128,12 @@ const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
       setIsPlaying(false);
     }, []);
 
-    const onError = React.useCallback(() => {
-      if (onSoundError) onSoundError();
-    }, [onSoundError]);
+    const onError = React.useCallback(
+      () => {
+        if (onSoundError) onSoundError();
+      },
+      [onSoundError]
+    );
 
     React.useEffect(
       () => {
@@ -189,7 +200,15 @@ const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
         }
         onLoad();
       },
-      [isMobile, soundSrc, onTimeupdate, onFinishPlaying, onLoad, onAudioReady, onError]
+      [
+        isMobile,
+        soundSrc,
+        onTimeupdate,
+        onFinishPlaying,
+        onLoad,
+        onAudioReady,
+        onError,
+      ]
     );
 
     return (

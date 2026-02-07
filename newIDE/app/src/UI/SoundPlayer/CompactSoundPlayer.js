@@ -16,10 +16,7 @@ export type CompactSoundPlayerInterface = {|
 |};
 
 const CompactSoundPlayer = React.forwardRef<Props, CompactSoundPlayerInterface>(
-  (
-    { soundSrc, onSoundLoaded, onSoundError },
-    ref
-  ) => {
+  ({ soundSrc, onSoundLoaded, onSoundError }, ref) => {
     const mobileAudioRef = React.useRef<?Audio>(null);
     const [isPlaying, setIsPlaying] = React.useState(false);
 

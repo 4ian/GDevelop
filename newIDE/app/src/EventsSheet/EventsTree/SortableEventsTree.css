@@ -1,0 +1,180 @@
+/* Base styles from react-sortable-tree (trimmed for EventsTree usage) */
+
+.rst__rowWrapper {
+  padding: 10px 10px 10px 0;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.rst__row {
+  height: 100%;
+  white-space: nowrap;
+  display: flex;
+}
+
+.rst__row > * {
+  box-sizing: border-box;
+}
+
+.rst__rowSearchMatch {
+  outline: solid 3px #0080ff;
+}
+
+.rst__rowSearchFocus {
+  outline: solid 3px #fc6421;
+}
+
+.rst__rowContents,
+.rst__rowLabel {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.rst__rowContents {
+  position: relative;
+  height: 100%;
+  border: solid #bbb 1px;
+  border-left: none;
+  box-shadow: 0 2px 2px -2px;
+  padding: 0 5px 0 10px;
+  border-radius: 2px;
+  min-width: 230px;
+  flex: 1 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: white;
+}
+
+.rst__rowLabel {
+  flex: 0 1 auto;
+  padding-right: 20px;
+}
+
+.rst__rowTitle {
+  font-weight: bold;
+}
+
+.rst__collapseButton,
+.rst__expandButton {
+  appearance: none;
+  border: none;
+  position: absolute;
+  border-radius: 100%;
+  box-shadow: 0 0 0 1px #000;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+}
+
+.rst__collapseButton:focus,
+.rst__expandButton:focus {
+  outline: none;
+  box-shadow: 0 0 0 1px #000, 0 0 1px 3px #83bef9;
+}
+
+.rst__collapseButton:hover:not(:active),
+.rst__expandButton:hover:not(:active) {
+  background-size: 24px;
+  height: 20px;
+  width: 20px;
+}
+
+.rst__collapseButton {
+  background: #fff
+    url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCI+PGNpcmNsZSBjeD0iOSIgY3k9IjkiIHI9IjgiIGZpbGw9IiNGRkYiLz48ZyBzdHJva2U9IiM5ODk4OTgiIHN0cm9rZS13aWR0aD0iMS45IiA+PHBhdGggZD0iTTQuNSA5aDkiLz48L2c+Cjwvc3ZnPg==')
+    no-repeat center;
+}
+
+.rst__expandButton {
+  background: #fff
+    url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCI+PGNpcmNsZSBjeD0iOSIgY3k9IjkiIHI9IjgiIGZpbGw9IiNGRkYiLz48ZyBzdHJva2U9IiM5ODk4OTgiIHN0cm9rZS13aWR0aD0iMS45IiA+PHBhdGggZD0iTTQuNSA5aDkiLz48cGF0aCBkPSJNOSA0LjV2OSIvPjwvZz4KPC9zdmc+')
+    no-repeat center;
+}
+
+.rst__lineChildren {
+  height: 100%;
+  display: inline-block;
+  position: absolute;
+}
+
+.rst__lineChildren::after {
+  content: '';
+  position: absolute;
+  background-color: black;
+  width: 1px;
+  left: 50%;
+  bottom: 0;
+  height: 10px;
+}
+
+.rst__virtualScrollOverride {
+  overflow: auto !important;
+}
+
+.rst__virtualScrollOverride * {
+  box-sizing: border-box;
+}
+
+.rst__node {
+  min-width: 100%;
+  white-space: nowrap;
+  position: relative;
+  text-align: left;
+}
+
+.rst__nodeContent {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+
+.rst__lineBlock,
+.rst__absoluteLineBlock {
+  height: 100%;
+  position: relative;
+  display: inline-block;
+}
+
+.rst__absoluteLineBlock {
+  position: absolute;
+  top: 0;
+}
+
+.rst__lineHalfHorizontalRight::before,
+.rst__lineFullVertical::after,
+.rst__lineHalfVerticalTop::after,
+.rst__lineHalfVerticalBottom::after {
+  position: absolute;
+  content: '';
+  background-color: black;
+}
+
+.rst__lineHalfHorizontalRight::before {
+  height: 1px;
+  top: 50%;
+  right: 0;
+  width: 50%;
+}
+
+.rst__lineFullVertical::after,
+.rst__lineHalfVerticalTop::after,
+.rst__lineHalfVerticalBottom::after {
+  width: 1px;
+  left: 50%;
+  top: 0;
+  height: 100%;
+}
+
+.rst__lineHalfVerticalTop::after {
+  height: 50%;
+}
+
+.rst__lineHalfVerticalBottom::after {
+  top: auto;
+  bottom: 0;
+  height: 50%;
+}

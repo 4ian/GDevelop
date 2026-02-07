@@ -397,6 +397,9 @@ export type SortableTreeNode = {|
   // Key is event pointer or an identification string.
   key: number | string,
 
+  // True if this event is an Else event.
+  isElseEvent: boolean,
+
   // In case of nodes without event (buttons at the bottom of the sheet),
   // use a fixed height.
   fixedHeight?: ?number,
@@ -889,6 +892,8 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
           disabled,
           depth,
           key: event.ptr, //TODO: useless?
+          isElseEvent:
+            event.getType() === 'BuiltinCommonInstructions::Else',
           children: childrenTreeData,
           nodePath: currentAbsolutePath,
           relativeNodePath: currentRelativePath,
@@ -920,6 +925,7 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
               rowIndex: flattenedList.length,
               projectScopedContainersAccessor: parentProjectScopedContainersAccessor,
               key: 'bottom-buttons',
+              isElseEvent: false,
               // Unused, but still provided to make typing happy:
               expanded: false,
               nodePath: [flattenedList.length + 0],
@@ -943,6 +949,7 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
               rowIndex: flattenedList.length + 1,
               projectScopedContainersAccessor: parentProjectScopedContainersAccessor,
               key: 'eventstree-tutorial-node',
+              isElseEvent: false,
               // Unused, but still provided to make typing happy:
               expanded: false,
               nodePath: [flattenedList.length + 1],
@@ -979,6 +986,7 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
               rowIndex: flattenedList.length + 2,
               projectScopedContainersAccessor: parentProjectScopedContainersAccessor,
               key: 'empty-state',
+              isElseEvent: false,
               // Unused, but still provided to make typing happy:
               expanded: false,
               nodePath: [flattenedList.length + 2],

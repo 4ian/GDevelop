@@ -297,21 +297,32 @@ const TreeRow = ({
   const isSearchMatch = matchIndexSet.has(index);
   const isSearchFocus =
     searchFocusOffset != null && matchIndexes[searchFocusOffset] === index;
+  const isElseEvent = !!node.isElseEvent;
 
   const scaffold = lowerSiblingCounts.map((lowerSiblingCount, i) => {
+    const isLastBlock = i === scaffoldBlockCount - 1;
+    // For else events, don't draw horizontal connector at their depth level.
+    const drawHorizontal = !(isElseEvent && isLastBlock);
+
     let lineClass = '';
     if (lowerSiblingCount > 0) {
       if (index === 0) {
-        lineClass = 'rst__lineHalfHorizontalRight rst__lineHalfVerticalBottom';
-      } else if (i === scaffoldBlockCount - 1) {
-        lineClass = 'rst__lineHalfHorizontalRight rst__lineFullVertical';
+        lineClass = drawHorizontal
+          ? 'rst__lineHalfHorizontalRight rst__lineHalfVerticalBottom'
+          : 'rst__lineHalfVerticalBottom';
+      } else if (isLastBlock) {
+        lineClass = drawHorizontal
+          ? 'rst__lineHalfHorizontalRight rst__lineFullVertical'
+          : 'rst__lineFullVertical';
       } else {
         lineClass = 'rst__lineFullVertical';
       }
     } else if (index === 0) {
-      lineClass = 'rst__lineHalfHorizontalRight';
-    } else if (i === scaffoldBlockCount - 1) {
-      lineClass = 'rst__lineHalfVerticalTop rst__lineHalfHorizontalRight';
+      lineClass = drawHorizontal ? 'rst__lineHalfHorizontalRight' : '';
+    } else if (isLastBlock) {
+      lineClass = drawHorizontal
+        ? 'rst__lineHalfVerticalTop rst__lineHalfHorizontalRight'
+        : 'rst__lineHalfVerticalTop';
     }
 
     return (

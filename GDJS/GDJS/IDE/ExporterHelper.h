@@ -555,7 +555,8 @@ class ExporterHelper {
                       bool includeCaptureManager,
                       bool includeInAppTutorialMessage,
                       gd::String gdevelopLogoStyle,
-                      std::vector<gd::String> &includesFiles);
+                      std::vector<gd::String> &includesFiles,
+                      std::vector<gd::String> &requiredFiles);
 
   /**
    * \brief Remove include files that are Pixi renderers.
@@ -606,7 +607,8 @@ class ExporterHelper {
    * The includes files must be relative to the export directory.
    *
    * \param project The project with layouts to be exported.
-   * \param source The file to be used as a template for the final file.
+   * \param sourceDir The directory containing the files to be used as a
+   * template for the final file.
    * \param exportDir The directory where the preview must be created.
    * \param includesFiles The JS files to be included in the HTML file. Order is
    * important.
@@ -617,34 +619,13 @@ class ExporterHelper {
    * gdjs.RuntimeGame object.
    */
   bool ExportIndexFile(const gd::Project &project,
-                       gd::String source,
+                       gd::String sourceDir,
                        gd::String exportDir,
                        const std::vector<gd::String> &includesFiles,
                        const std::vector<gd::SourceFileMetadata> &sourceFiles,
                        unsigned int nonRuntimeScriptsCacheBurst,
+                       bool has3DObjects,
                        gd::String additionalSpec = "");
-
-  /**
-   * \brief Replace the annotations in a index.html file by the specified
-   * content.
-   *
-   * \param indexFileContent The source of the index.html file.
-   * \param exportDir The directory where the project must be generated.
-   * \param includesFiles "<!--GDJS_CODE_FILES -->" will be
-   * replaced by HTML tags to include the filenames
-   * contained inside the vector.
-   * \param nonRuntimeScriptsCacheBurst If non zero, add an additional cache
-   * bursting parameter to scripts, that are not part of the runtime/extensions,
-   * to force the browser to reload them.
-   * \param additionalSpec The string "GDJS_ADDITIONAL_SPEC"
-   * surrounded by comments marks will be replaced by the
-   * content of this string.
-   */
-  bool CompleteIndexFile(gd::String &indexFileContent,
-                         gd::String exportDir,
-                         const std::vector<gd::String> &includesFiles,
-                         unsigned int nonRuntimeScriptsCacheBurst,
-                         gd::String additionalSpec);
 
   /**
    * \brief Generates a WebManifest, a metadata file that allow to make the
@@ -751,6 +732,28 @@ class ExporterHelper {
                              ///< be then copied to the final output directory.
 
  private:
+  /**
+   * \brief Replace the annotations in a index.html file by the specified
+   * content.
+   *
+   * \param indexFileContent The source of the index.html file.
+   * \param exportDir The directory where the project must be generated.
+   * \param includesFiles "<!--GDJS_CODE_FILES -->" will be
+   * replaced by HTML tags to include the filenames
+   * contained inside the vector.
+   * \param nonRuntimeScriptsCacheBurst If non zero, add an additional cache
+   * bursting parameter to scripts, that are not part of the runtime/extensions,
+   * to force the browser to reload them.
+   * \param additionalSpec The string "GDJS_ADDITIONAL_SPEC"
+   * surrounded by comments marks will be replaced by the
+   * content of this string.
+   */
+  bool CompleteIndexFile(gd::String &indexFileContent,
+                         gd::String exportDir,
+                         const std::vector<gd::String> &includesFiles,
+                         unsigned int nonRuntimeScriptsCacheBurst,
+                         bool has3DObjects);
+
    static void
    SerializeUsedResources(gd::SerializerElement &rootElement,
                           std::set<gd::String> &projectUsedResources,

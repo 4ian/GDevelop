@@ -109,7 +109,8 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
         /*includeCaptureManager*/ false,
         /*includeInAppTutorialMessage*/ false,
         exportedProject.GetLoadingScreen().GetGDevelopLogoStyle(),
-        includesFiles);
+        includesFiles,
+        resourcesFiles);
 
     // Export files for free function, object and behaviors
     for (const auto &includeFile : usedExtensionsResult.GetUsedIncludeFiles()) {
@@ -145,14 +146,14 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
     helper.ExportIncludesAndLibs(includesFiles, exportDir, false);
     helper.ExportIncludesAndLibs(resourcesFiles, exportDir, false);
 
-    gd::String source = gdjsRoot + "/Runtime/index.html";
+    gd::String sourceDir = gdjsRoot + "/Runtime";
     if (options.target == "cordova")
-      source = gdjsRoot + "/Runtime/Cordova/www/index.html";
+      sourceDir = gdjsRoot + "/Runtime/Cordova/www";
     else if (options.target == "facebookInstantGames")
-      source = gdjsRoot + "/Runtime/FacebookInstantGames/index.html";
+      sourceDir = gdjsRoot + "/Runtime/FacebookInstantGames";
 
     if (!helper.ExportIndexFile(exportedProject,
-                                    source,
+                                    sourceDir,
                                     exportDir,
                                     includesFiles,
                                     usedExtensionsResult.GetUsedSourceFiles(),

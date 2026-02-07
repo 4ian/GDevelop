@@ -340,10 +340,10 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
         if (!layerName) return;
 
         // Find the layer ID from the layer name
+        if (!layersContainer.hasLayerNamed(layerName)) return;
         const layer = layersContainer.getLayer(layerName);
-        if (!layer) return;
 
-        const itemId = `layer-${layer.ptr}`;
+        const itemId = getLayerTreeViewItemId(layer);
         const treeView = treeViewRef.current;
         if (treeView) {
           if (isMobile) {

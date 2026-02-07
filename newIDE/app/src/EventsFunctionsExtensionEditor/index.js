@@ -54,7 +54,8 @@ const gd: libGDevelop = global.gd;
 export type ExtensionItemConfigurationAttribute =
   | 'type'
   | 'isPrivate'
-  | 'isAsync';
+  | 'isAsync'
+  | 'isDeprecated';
 
 type Props = {|
   project: gdProject,

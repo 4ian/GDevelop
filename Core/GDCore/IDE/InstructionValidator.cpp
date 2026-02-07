@@ -5,6 +5,7 @@
  */
 #include "InstructionValidator.h"
 
+#include "GDCore/Events/Parsers/ExpressionParser2Node.h"
 #include "GDCore/Extensions/Metadata/AbstractFunctionMetadata.h"
 #include "GDCore/Extensions/Metadata/BehaviorMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
@@ -24,25 +25,31 @@
 
 namespace gd {
 
-bool InstructionValidator::IsParameterValid(
+ParameterValidationResult InstructionValidator::ValidateParameter(
     const gd::Platform &platform,
     const gd::ProjectScopedContainers projectScopedContainers,
     const gd::Instruction &instruction, const InstructionMetadata &metadata,
     std::size_t parameterIndex, const gd::String &value) {
+  ParameterValidationResult result;
+
   if (parameterIndex >= instruction.GetParametersCount() ||
       parameterIndex >= metadata.GetParametersCount()) {
-    return false;
+    result.isValid = false;
+    return result;
   }
+
   const auto &parameterMetadata = metadata.GetParameter(parameterIndex);
   // TODO Remove the ternary when all parameter declarations use
   // "number" instead of "expression".
   const auto &parameterType = parameterMetadata.GetType() == "expression"
                                   ? "number"
                                   : parameterMetadata.GetType();
+
   bool shouldNotBeValidated = parameterType == "layer" && value.empty();
   if (shouldNotBeValidated) {
-    return true;
+    return result;  // Valid by default, no deprecation warning
   }
+
   if (gd::ParameterMetadata::IsExpression("number", parameterType) ||
       gd::ParameterMetadata::IsExpression("string", parameterType) ||
       gd::ParameterMetadata::IsExpression("variable", parameterType)) {
@@ -52,13 +59,26 @@ bool InstructionValidator::IsParameterValid(
                                             parameterType,
                                             parameterMetadata.GetExtraInfo());
     expressionNode.Visit(expressionValidator);
-    if (!expressionValidator.GetAllErrors().empty()) {
-      return false;
+
+    // Check for fatal errors (validation)
+    if (!expressionValidator.GetFatalErrors().empty()) {
+      result.isValid = false;
     }
+
+    // Check for deprecation warnings in the same pass
+    const auto &allErrors = expressionValidator.GetAllErrors();
+    for (const auto *error : allErrors) {
+      if (error->GetType() ==
+          gd::ExpressionParserError::ErrorType::DeprecatedExpression) {
+        result.hasDeprecationWarning = true;
+        break;
+      }
+    }
+
     // New object variable instructions require the variable to be
     // declared while legacy ones don't.
     // This is why it's done here instead of in the parser directly.
-    if (parameterType == "objectvar" &&
+    if (result.isValid && parameterType == "objectvar" &&
         gd::VariableInstructionSwitcher::IsSwitchableVariableInstruction(
             instruction.GetType())) {
       // Check at least the name of the root variable, it's the best we can
@@ -72,7 +92,7 @@ bool InstructionValidator::IsParameterValid(
               objectName,
               gd::InstructionValidator::GetRootVariableName(variableName)) ==
           gd::ObjectsContainersList::DoesNotExist) {
-        return false;
+        result.isValid = false;
       }
     }
   } else if (gd::ParameterMetadata::IsObject(parameterType)) {
@@ -80,19 +100,31 @@ bool InstructionValidator::IsParameterValid(
         instruction.GetParameter(parameterIndex).GetPlainString();
     const auto &objectsContainersList =
         projectScopedContainers.GetObjectsContainersList();
-    return objectsContainersList.HasObjectOrGroupNamed(objectOrGroupName) &&
-           (parameterMetadata.GetExtraInfo().empty() ||
-            objectsContainersList.GetTypeOfObject(objectOrGroupName) ==
-                parameterMetadata.GetExtraInfo()) &&
-           InstructionValidator::HasRequiredBehaviors(
-               instruction, metadata, parameterIndex, objectsContainersList);
+    result.isValid =
+        objectsContainersList.HasObjectOrGroupNamed(objectOrGroupName) &&
+        (parameterMetadata.GetExtraInfo().empty() ||
+         objectsContainersList.GetTypeOfObject(objectOrGroupName) ==
+             parameterMetadata.GetExtraInfo()) &&
+        InstructionValidator::HasRequiredBehaviors(
+            instruction, metadata, parameterIndex, objectsContainersList);
   } else if (gd::ParameterMetadata::IsExpression("resource", parameterType)) {
     const auto &resourceName =
         instruction.GetParameter(parameterIndex).GetPlainString();
-    return projectScopedContainers.GetResourcesContainersList()
-        .HasResourceNamed(resourceName);
+    result.isValid = projectScopedContainers.GetResourcesContainersList()
+                         .HasResourceNamed(resourceName);
   }
-  return true;
+
+  return result;
+}
+
+bool InstructionValidator::IsParameterValid(
+    const gd::Platform &platform,
+    const gd::ProjectScopedContainers projectScopedContainers,
+    const gd::Instruction &instruction, const InstructionMetadata &metadata,
+    std::size_t parameterIndex, const gd::String &value) {
+  return ValidateParameter(platform, projectScopedContainers, instruction,
+                           metadata, parameterIndex, value)
+      .isValid;
 }
 
 gd::String InstructionValidator::GetRootVariableName(const gd::String &name) {
@@ -106,6 +138,16 @@ gd::String InstructionValidator::GetRootVariableName(const gd::String &name) {
                             ? dotPosition
                             : squareBracketPosition);
 };
+
+bool InstructionValidator::HasDeprecationWarnings(
+    const gd::Platform &platform,
+    const gd::ProjectScopedContainers projectScopedContainers,
+    const gd::Instruction &instruction, const InstructionMetadata &metadata,
+    std::size_t parameterIndex, const gd::String &value) {
+  return ValidateParameter(platform, projectScopedContainers, instruction,
+                           metadata, parameterIndex, value)
+      .hasDeprecationWarning;
+}
 
 bool InstructionValidator::HasRequiredBehaviors(
     const gd::Instruction &instruction,

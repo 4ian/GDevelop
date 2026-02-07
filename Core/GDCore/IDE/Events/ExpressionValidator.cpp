@@ -295,6 +295,16 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(
     return returnType;
   }
 
+  // Check if the expression is deprecated
+  if (metadata.IsDeprecated()) {
+    gd::String deprecationMessage = metadata.GetDeprecationMessage();
+    RaiseError(gd::ExpressionParserError::ErrorType::DeprecatedExpression,
+               _("This expression is deprecated.") +
+                   (deprecationMessage.empty() ? "" : " " + deprecationMessage),
+               function.location,
+               /*isFatal=*/false);
+  }
+
   // Validate the type of the function
   if (returnType == Type::Number) {
     if (parentType == Type::String) {

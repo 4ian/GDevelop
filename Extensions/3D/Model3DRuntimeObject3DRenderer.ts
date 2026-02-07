@@ -320,6 +320,9 @@ namespace gdjs {
       this.updatePosition();
       this._updateShadow();
 
+      // Build mesh parts map after the model is loaded
+      this._model3DRuntimeObject._meshParts.buildMeshesMap(root, this._model3DRuntimeObject);
+
       // Start the current animation on the new 3D object.
       this._animationMixer = new THREE.AnimationMixer(root);
       const isAnimationPaused = this._model3DRuntimeObject.isAnimationPaused();
@@ -465,6 +468,14 @@ namespace gdjs {
         animationName
       );
       return clip ? clip.duration : 0;
+    }
+
+    /**
+     * Get the THREE.Object3D for direct access to meshes.
+     * @returns The THREE.Object3D
+     */
+    getThreeObject(): THREE.Object3D {
+      return this._threeObject;
     }
   }
 

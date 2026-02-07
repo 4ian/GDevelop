@@ -267,7 +267,8 @@ module.exports = {
         .setIncludeFile('Extensions/3D/A_RuntimeObject3D.js')
         .addIncludeFile('Extensions/3D/A_RuntimeObject3DRenderer.js')
         .addIncludeFile('Extensions/3D/Model3DRuntimeObject.js')
-        .addIncludeFile('Extensions/3D/Model3DRuntimeObject3DRenderer.js');
+        .addIncludeFile('Extensions/3D/Model3DRuntimeObject3DRenderer.js')
+        .addIncludeFile('Extensions/3D/Model3DRuntimeObjectMeshParts.js');
 
       // Properties expressions/conditions/actions:
 
@@ -838,6 +839,254 @@ module.exports = {
         .addParameter('object', _('3D model'), 'Model3DObject', false)
         .addParameter('number', _('Crossfade duration (in seconds)'), '', false)
         .setFunctionName('setCrossfadeDuration');
+
+      // Mesh Parts Actions and Conditions
+
+      object
+        .addScopedAction(
+          'SetMeshVisible',
+          _('Show/hide a mesh part'),
+          _('Show or hide a specific mesh part of the 3D model.'),
+          _('Set mesh _PARAM1_ visibility of _PARAM0_ to _PARAM2_'),
+          _('Mesh parts'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .addParameter('string', _('Mesh name'), '', false)
+        .addParameter('yesorno', _('Visible'), '', false)
+        .markAsAdvanced()
+        .setFunctionName('setMeshVisible');
+
+      object
+        .addScopedCondition(
+          'IsMeshVisible',
+          _('Mesh part is visible'),
+          _('Check if a mesh part is visible.'),
+          _('Mesh _PARAM1_ of _PARAM0_ is visible'),
+          _('Mesh parts'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .addParameter('string', _('Mesh name'), '', false)
+        .markAsAdvanced()
+        .setFunctionName('isMeshVisible');
+
+      object
+        .addScopedCondition(
+          'HasMesh',
+          _('Has mesh part'),
+          _('Check if the model has a mesh part with the given name.'),
+          _('_PARAM0_ has mesh _PARAM1_'),
+          _('Mesh parts'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .addParameter('string', _('Mesh name'), '', false)
+        .markAsAdvanced()
+        .setFunctionName('hasMesh');
+
+      object
+        .addScopedAction(
+          'SetMeshPosition',
+          _('Change mesh part position'),
+          _('Change the position of a mesh part (relative to the model).'),
+          _('Set mesh _PARAM1_ position of _PARAM0_ to X: _PARAM2_, Y: _PARAM3_, Z: _PARAM4_'),
+          _('Mesh parts'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .addParameter('string', _('Mesh name'), '', false)
+        .addParameter('number', _('X position'), '', false)
+        .addParameter('number', _('Y position'), '', false)
+        .addParameter('number', _('Z position'), '', false)
+        .markAsAdvanced()
+        .setFunctionName('setMeshPosition');
+
+      object
+        .addExpression(
+          'MeshPositionX',
+          _('Mesh part X position'),
+          _('Return the X position of a mesh part.'),
+          _('Mesh parts'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .addParameter('string', _('Mesh name'), '', false)
+        .setFunctionName('getMeshPositionX');
+
+      object
+        .addExpression(
+          'MeshPositionY',
+          _('Mesh part Y position'),
+          _('Return the Y position of a mesh part.'),
+          _('Mesh parts'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .addParameter('string', _('Mesh name'), '', false)
+        .setFunctionName('getMeshPositionY');
+
+      object
+        .addExpression(
+          'MeshPositionZ',
+          _('Mesh part Z position'),
+          _('Return the Z position of a mesh part.'),
+          _('Mesh parts'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .addParameter('string', _('Mesh name'), '', false)
+        .setFunctionName('getMeshPositionZ');
+
+      object
+        .addScopedAction(
+          'SetMeshRotation',
+          _('Change mesh part rotation'),
+          _('Change the rotation of a mesh part (relative to the model).'),
+          _('Set mesh _PARAM1_ rotation of _PARAM0_ to X: _PARAM2_°, Y: _PARAM3_°, Z: _PARAM4_°'),
+          _('Mesh parts'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .addParameter('string', _('Mesh name'), '', false)
+        .addParameter('number', _('Rotation X (degrees)'), '', false)
+        .addParameter('number', _('Rotation Y (degrees)'), '', false)
+        .addParameter('number', _('Rotation Z (degrees)'), '', false)
+        .markAsAdvanced()
+        .setFunctionName('setMeshRotation');
+
+      object
+        .addExpression(
+          'MeshRotationX',
+          _('Mesh part X rotation'),
+          _('Return the X rotation of a mesh part (in degrees).'),
+          _('Mesh parts'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .addParameter('string', _('Mesh name'), '', false)
+        .setFunctionName('getMeshRotationX');
+
+      object
+        .addExpression(
+          'MeshRotationY',
+          _('Mesh part Y rotation'),
+          _('Return the Y rotation of a mesh part (in degrees).'),
+          _('Mesh parts'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .addParameter('string', _('Mesh name'), '', false)
+        .setFunctionName('getMeshRotationY');
+
+      object
+        .addExpression(
+          'MeshRotationZ',
+          _('Mesh part Z rotation'),
+          _('Return the Z rotation of a mesh part (in degrees).'),
+          _('Mesh parts'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .addParameter('string', _('Mesh name'), '', false)
+        .setFunctionName('getMeshRotationZ');
+
+      object
+        .addScopedAction(
+          'SetMeshScale',
+          _('Change mesh part scale'),
+          _('Change the scale of a mesh part.'),
+          _('Set mesh _PARAM1_ scale of _PARAM0_ to X: _PARAM2_, Y: _PARAM3_, Z: _PARAM4_'),
+          _('Mesh parts'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .addParameter('string', _('Mesh name'), '', false)
+        .addParameter('number', _('Scale X'), '', false)
+        .addParameter('number', _('Scale Y'), '', false)
+        .addParameter('number', _('Scale Z'), '', false)
+        .markAsAdvanced()
+        .setFunctionName('setMeshScale');
+
+      object
+        .addExpression(
+          'MeshScaleX',
+          _('Mesh part X scale'),
+          _('Return the X scale of a mesh part.'),
+          _('Mesh parts'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .addParameter('string', _('Mesh name'), '', false)
+        .setFunctionName('getMeshScaleX');
+
+      object
+        .addExpression(
+          'MeshScaleY',
+          _('Mesh part Y scale'),
+          _('Return the Y scale of a mesh part.'),
+          _('Mesh parts'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .addParameter('string', _('Mesh name'), '', false)
+        .setFunctionName('getMeshScaleY');
+
+      object
+        .addExpression(
+          'MeshScaleZ',
+          _('Mesh part Z scale'),
+          _('Return the Z scale of a mesh part.'),
+          _('Mesh parts'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .addParameter('string', _('Mesh name'), '', false)
+        .setFunctionName('getMeshScaleZ');
+
+      object
+        .addScopedAction(
+          'RemoveMesh',
+          _('Remove mesh part'),
+          _('Remove a mesh part from the 3D model.'),
+          _('Remove mesh _PARAM1_ from _PARAM0_'),
+          _('Mesh parts'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .addParameter('string', _('Mesh name'), '', false)
+        .markAsAdvanced()
+        .setFunctionName('removeMesh');
+
+      object
+        .addExpression(
+          'MeshesCount',
+          _('Mesh parts count'),
+          _('Return the number of mesh parts in the model.'),
+          _('Mesh parts'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .setFunctionName('getMeshesCount');
+
+      object
+        .addStrExpression(
+          'MeshNameAt',
+          _('Mesh part name at index'),
+          _('Return the name of the mesh part at the given index.'),
+          _('Mesh parts'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .addParameter('number', _('Index'), '', false)
+        .setFunctionName('getMeshNameAt');
     }
 
     const Cube3DObject = new gd.ObjectJsImplementation();

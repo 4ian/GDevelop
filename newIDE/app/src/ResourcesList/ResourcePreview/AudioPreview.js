@@ -10,11 +10,9 @@ type Props = {|
 |};
 
 const AudioPreview = ({ resourceName, audioResourceSource }: Props) => {
-  const soundPlayerRef = React.useRef<?SoundPlayerInterface>(null);
   const [hasError, setHasError] = React.useState(false);
 
   const onSoundLoaded = React.useCallback(() => {
-    // Sound loaded callback
     setHasError(false);
   }, []);
 
@@ -28,7 +26,6 @@ const AudioPreview = ({ resourceName, audioResourceSource }: Props) => {
 
   return (
     <SoundPlayer
-      ref={soundPlayerRef}
       soundSrc={audioResourceSource || null}
       onSoundLoaded={onSoundLoaded}
       onSoundError={onSoundError}

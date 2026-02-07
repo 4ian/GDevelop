@@ -11,13 +11,9 @@ type Props = {|
   onSoundError?: () => void,
 |};
 
-export type CompactSoundPlayerInterface = {|
-  playPause: (forcePlay: boolean) => void,
-|};
-
-const CompactSoundPlayer = React.forwardRef<Props, CompactSoundPlayerInterface>(
+const CompactSoundPlayer = React.forwardRef<Props>(
   ({ soundSrc, onSoundLoaded, onSoundError }, ref) => {
-    const mobileAudioRef = React.useRef<?Audio>(null);
+    const audioRef = React.useRef<?Audio>(null);
     const [isPlaying, setIsPlaying] = React.useState(false);
 
     const onPlayPause = React.useCallback(
@@ -34,23 +30,18 @@ const CompactSoundPlayer = React.forwardRef<Props, CompactSoundPlayerInterface>(
 
     const onAudioReady = React.useCallback(
       () => {
-        if (!mobileAudioRef.current) return;
         if (onSoundLoaded) onSoundLoaded();
       },
       [onSoundLoaded]
     );
 
-    React.useImperativeHandle(ref, () => ({
-      playPause: onPlayPause,
-    }));
-
     React.useEffect(
       () => {
-        if (!mobileAudioRef.current) return;
+        if (!audioRef.current) return;
         if (isPlaying) {
-          mobileAudioRef.current.play();
+          audioRef.current.play();
         } else {
-          mobileAudioRef.current.pause();
+          audioRef.current.pause();
         }
       },
       [isPlaying]
@@ -59,8 +50,8 @@ const CompactSoundPlayer = React.forwardRef<Props, CompactSoundPlayerInterface>(
     React.useEffect(
       () => {
         if (soundSrc) {
-          if (mobileAudioRef.current) {
-            mobileAudioRef.current.pause();
+          if (audioRef.current) {
+            audioRef.current.pause();
           }
           const audio = new Audio(soundSrc);
           audio.loop = true;
@@ -69,7 +60,7 @@ const CompactSoundPlayer = React.forwardRef<Props, CompactSoundPlayerInterface>(
           audio.addEventListener('error', () => {
             if (onSoundError) onSoundError();
           });
-          mobileAudioRef.current = audio;
+          audioRef.current = audio;
         }
         onLoad();
       },

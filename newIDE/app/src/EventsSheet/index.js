@@ -17,7 +17,10 @@ import { getShortcutDisplayName, useShortcutMap } from '../KeyboardShortcuts';
 import { type ShortcutMap } from '../KeyboardShortcuts/DefaultShortcuts';
 import InlineParameterEditor from './InlineParameterEditor';
 import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
-import { serializeToJSObject } from '../Utils/Serializer';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
 import {
   type HistoryState,
   type RevertableActionType,
@@ -959,6 +962,27 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           label: i18n._(t`Analyze Objects Used in this Event`),
           click: this._openEventsContextAnalyzer,
         },
+        { type: 'separator' },
+        {
+          label: i18n._(t`Make it an Else for the previous event`),
+          click: () =>
+            this._replaceEventByType('BuiltinCommonInstructions::Else'),
+          enabled:
+            getSelectedEvents(this.state.selection).length === 1 &&
+            getSelectedEvents(this.state.selection)[0].getType() ===
+              'BuiltinCommonInstructions::Standard',
+        },
+        {
+          label: i18n._(t`Remove the Else`),
+          click: () =>
+            this._replaceEventByType(
+              'BuiltinCommonInstructions::Standard'
+            ),
+          visible:
+            getSelectedEvents(this.state.selection).length === 1 &&
+            getSelectedEvents(this.state.selection)[0].getType() ===
+              'BuiltinCommonInstructions::Else',
+        },
       ],
     },
     { type: 'separator' },
@@ -1686,6 +1710,36 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     groupEvent
       .getSubEvents()
       .insertEvents(eventsList, 0, eventsList.getEventsCount(), 0);
+
+    this.deleteSelection({ deleteInstructions: false });
+  };
+
+  _replaceEventByType = (targetType: string) => {
+    const eventContext = getLastSelectedTopMostOnlyEventContext(
+      this.state.selection
+    );
+    if (!eventContext) return;
+
+    const { project } = this.props;
+
+    // Serialize the current event data (conditions, actions, sub-events, variables).
+    const serializedEvent = serializeToJSObject(eventContext.event);
+
+    // Insert a new event of the target type at the same position.
+    const newEvent = eventContext.eventsList.insertNewEvent(
+      project,
+      targetType,
+      eventContext.indexInList
+    );
+
+    // Unserialize the data into the new event. Both StandardEvent and ElseEvent
+    // share the same serialization format so this preserves everything.
+    unserializeFromJSObject(
+      newEvent,
+      serializedEvent,
+      'unserializeFrom',
+      project
+    );
 
     this.deleteSelection({ deleteInstructions: false });
   };

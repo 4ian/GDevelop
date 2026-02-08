@@ -26,6 +26,7 @@ export type SortableTreeNode = {|
   key: number | string,
   isValidElseEvent: boolean,
   fixedHeight?: ?number,
+  heightCacheKey?: ?string,
 |};
 
 type FlatDataEntry = {
@@ -378,7 +379,7 @@ const SortableEventsTree = ({
     [flatData, searchMethod, searchQuery]
   );
 
-  React.useEffect(
+  React.useLayoutEffect(
     () => {
       if (!reactVirtualizedListProps || !reactVirtualizedListProps.ref) return;
       reactVirtualizedListProps.ref({

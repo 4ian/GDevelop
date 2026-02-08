@@ -92,6 +92,8 @@ const getEventContainerStyle = (windowSize: WindowSizeType) =>
 
 type EventsContainerProps = {|
   eventsHeightsCache: EventHeightsCache,
+  eventHeightKey: string,
+  onHeightChange: () => void,
   event: gdBaseEvent,
   onUpdate: () => void,
   leftIndentWidth: number,
@@ -151,6 +153,8 @@ const EventContainer = (props: EventsContainerProps) => {
     scope,
     disabled,
     eventsHeightsCache,
+    eventHeightKey,
+    onHeightChange,
     onEventContextMenu,
     projectScopedContainersAccessor,
     onUpdate,
@@ -160,16 +164,42 @@ const EventContainer = (props: EventsContainerProps) => {
   const containerRef = React.useRef<?HTMLDivElement>(null);
 
   // At EACH rendering, update the cache with the current height of the event.
+  const updateHeight = React.useCallback(
+    () => {
+      const container = containerRef.current;
+      const height = container ? container.offsetHeight : 0;
+      if (height === 0) {
+        // An empty height means that the event is hidden, when navigating outside of the events sheet tab for example.
+        // Don't store the height in this case.
+        return;
+      }
+      const didChange = eventsHeightsCache.setEventHeight(
+        event,
+        height,
+        eventHeightKey
+      );
+      if (didChange) onHeightChange();
+    },
+    [event, eventHeightKey, eventsHeightsCache, onHeightChange]
+  );
+
+  React.useLayoutEffect(() => {
+    updateHeight();
+  });
+
   React.useLayoutEffect(() => {
     const container = containerRef.current;
-    const height = container ? container.offsetHeight : 0;
-    if (height === 0) {
-      // An empty height means that the event is hidden, when navigating outside of the events sheet tab for example.
-      // Don't store the height in this case.
-      return;
-    }
-    eventsHeightsCache.setEventHeight(event, height);
-  });
+    if (!container) return;
+    const ResizeObserverClass =
+      typeof window !== 'undefined' ? (window: any).ResizeObserver : null;
+    if (!ResizeObserverClass) return;
+
+    const observer = new ResizeObserverClass(() => {
+      updateHeight();
+    });
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [updateHeight]);
 
   const _onUpdate = React.useCallback(
     () => {
@@ -560,7 +590,10 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
         return node.fixedHeight || 0;
       }
 
-      const height = eventsHeightsCache.getEventHeight(node.event);
+      const height = eventsHeightsCache.getEventHeight(
+        node.event,
+        node.heightCacheKey
+      );
       return height;
     };
 
@@ -669,6 +702,8 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
                   event={event}
                   key={event.ptr}
                   eventsHeightsCache={eventsHeightsCache}
+                  eventHeightKey={node.heightCacheKey || ''}
+                  onHeightChange={onHeightsChanged}
                   selection={props.selection}
                   leftIndentWidth={
                     depth *
@@ -820,6 +855,9 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
           flattenedList.length - 1
         );
         const currentRelativePath = [...(parentRelativePath || []), i];
+        const heightCacheKey = `${event.getType()}|${currentRelativePath.join(
+          '.'
+        )}`;
         const projectScopedContainersAccessor = event.canHaveVariables()
           ? parentProjectScopedContainersAccessor.makeNewProjectScopedContainersWithLocalVariables(
               event
@@ -867,6 +905,7 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
           depth,
           key: event.ptr,
           isValidElseEvent,
+          heightCacheKey,
           children: childrenTreeData,
           nodePath: currentAbsolutePath,
           relativeNodePath: currentRelativePath,

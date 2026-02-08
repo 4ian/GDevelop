@@ -1478,14 +1478,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           if (row !== undefined) {
             // Whether it is an ADD, EDIT or DELETE, scroll to the place where it was done.
             eventsTree.scrollToRow(row);
-            // Hack: because of the virtualization and the undo/redo, we lose the heights of events
-            // (at least some, because they are different objects in memory).
-            // While they are recomputed when rendered, scroll again to be sure we don't end
-            // up at the very beginning (if everything was recomputed from 0) or at
-            // an offset too large.
+            // After undo/redo, events are new objects in memory with different ptrs,
+            // so their heights are initially estimated. The estimated heights are close
+            // to actual heights (thanks to DEFAULT_ESTIMATED_EVENT_HEIGHT), so scroll
+            // position is approximately correct. We scroll again after a short delay
+            // to account for the measurement pass correcting any height differences.
             setTimeout(() => {
               eventsTree.scrollToRow(row);
-            }, 70);
+            }, 50);
           }
           this.updateToolbar();
         }
@@ -1537,14 +1537,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           if (row !== undefined) {
             // Whether it was an ADD, EDIT or DELETE, scroll to the place where it will happen.
             eventsTree.scrollToRow(row);
-            // Hack: because of the virtualization and the undo/redo, we lose the heights of events
-            // (at least some, because they are different objects in memory).
-            // While they are recomputed when rendered, scroll again to be sure we don't end
-            // up at the very beginning (if everything was recomputed from 0) or at
-            // an offset too large.
+            // After undo/redo, events are new objects in memory with different ptrs,
+            // so their heights are initially estimated. The estimated heights are close
+            // to actual heights (thanks to DEFAULT_ESTIMATED_EVENT_HEIGHT), so scroll
+            // position is approximately correct. We scroll again after a short delay
+            // to account for the measurement pass correcting any height differences.
             setTimeout(() => {
               eventsTree.scrollToRow(row);
-            }, 70);
+            }, 50);
           }
           this.updateToolbar();
         }

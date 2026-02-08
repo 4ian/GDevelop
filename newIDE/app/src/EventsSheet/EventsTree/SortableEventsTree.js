@@ -3,6 +3,7 @@ import * as React from 'react';
 import { VariableSizeList } from 'react-window';
 import classNames from 'classnames';
 import { AutoSizer } from 'react-virtualized';
+import { DEFAULT_ESTIMATED_EVENT_HEIGHT } from './EventHeightsCache';
 import type { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 
 // -- Types --
@@ -378,7 +379,11 @@ const SortableEventsTree = ({
     [flatData, searchMethod, searchQuery]
   );
 
-  React.useEffect(
+  // Use useLayoutEffect so that the ref is available before paint.
+  // This allows EventsTree's useLayoutEffect to call recomputeRowHeights()
+  // synchronously before the browser paints, preventing the user from ever
+  // seeing events rendered at estimated (instead of measured) heights.
+  React.useLayoutEffect(
     () => {
       if (!reactVirtualizedListProps || !reactVirtualizedListProps.ref) return;
       reactVirtualizedListProps.ref({
@@ -458,6 +463,7 @@ const SortableEventsTree = ({
             height={height}
             width={width}
             itemCount={flatData.length}
+            estimatedItemSize={DEFAULT_ESTIMATED_EVENT_HEIGHT}
             itemSize={itemSize}
             itemData={itemData}
             itemKey={itemKey}

@@ -1054,6 +1054,10 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
 
     const zoomLevel = props.fontSize || 14;
 
+    // Invalidate cached event heights when the container width changes,
+    // because text wrapping may cause different event heights at different widths.
+    eventsHeightsCache.setContainerWidth(props.eventsSheetWidth);
+
     // Update treeDataRoot with the events tree. Done at each render as events
     // could change at any time, so we can't keep stale data
     // (we would risk pointing to deleted events in memory).

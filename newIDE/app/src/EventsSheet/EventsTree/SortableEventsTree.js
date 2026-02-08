@@ -61,7 +61,7 @@ type Props = {|
   reactVirtualizedListProps?: {
     ref?: (list: {
       scrollToRow: (row: number) => void,
-      recomputeRowHeights: () => void,
+      recomputeRowHeights: (startIndex?: number) => void,
       container: ?HTMLDivElement,
     }) => void,
     onScroll?: (event: {
@@ -378,7 +378,7 @@ const SortableEventsTree = ({
     [flatData, searchMethod, searchQuery]
   );
 
-  React.useEffect(
+  React.useLayoutEffect(
     () => {
       if (!reactVirtualizedListProps || !reactVirtualizedListProps.ref) return;
       reactVirtualizedListProps.ref({
@@ -387,9 +387,11 @@ const SortableEventsTree = ({
             listRef.current.scrollToItem(row, alignment);
           }
         },
-        recomputeRowHeights: () => {
+        recomputeRowHeights: (startIndex?: number) => {
+          const safeStartIndex =
+            startIndex != null ? Math.max(0, startIndex) : 0;
           if (listRef.current) {
-            listRef.current.resetAfterIndex(0, true);
+            listRef.current.resetAfterIndex(safeStartIndex, true);
           }
         },
         container: outerRef.current,

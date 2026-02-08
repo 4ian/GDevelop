@@ -91,8 +91,13 @@ const getEventContainerStyle = (windowSize: WindowSizeType) =>
     : styles.defaultEventContainer;
 
 type EventsContainerProps = {|
-  eventsHeightsCache: EventHeightsCache,
   event: gdBaseEvent,
+  rowIndex: number,
+  onHeightChanged: (
+    event: gdBaseEvent,
+    height: number,
+    rowIndex: number
+  ) => void,
   onUpdate: () => void,
   leftIndentWidth: number,
   disabled: boolean,
@@ -150,17 +155,18 @@ const EventContainer = (props: EventsContainerProps) => {
     project,
     scope,
     disabled,
-    eventsHeightsCache,
     onEventContextMenu,
     projectScopedContainersAccessor,
     onUpdate,
+    onHeightChanged,
+    rowIndex,
     highlightedAiGeneratedEventIds,
   } = props;
   const forceUpdate = useForceUpdate();
   const containerRef = React.useRef<?HTMLDivElement>(null);
+  const lastMeasuredHeightRef = React.useRef<?number>(null);
 
-  // At EACH rendering, update the cache with the current height of the event.
-  React.useLayoutEffect(() => {
+  const reportHeight = React.useCallback(() => {
     const container = containerRef.current;
     const height = container ? container.offsetHeight : 0;
     if (height === 0) {
@@ -168,8 +174,40 @@ const EventContainer = (props: EventsContainerProps) => {
       // Don't store the height in this case.
       return;
     }
-    eventsHeightsCache.setEventHeight(event, height);
+    if (lastMeasuredHeightRef.current === height) return;
+    lastMeasuredHeightRef.current = height;
+    onHeightChanged(event, height, rowIndex);
+  }, [event, onHeightChanged, rowIndex]);
+
+  // At EACH rendering, update the cache with the current height of the event.
+  React.useLayoutEffect(() => {
+    reportHeight();
   });
+
+  // Track size changes that don't trigger React renders (resize, layout changes).
+  React.useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const ResizeObserverConstructor = (window: any).ResizeObserver;
+    if (!ResizeObserverConstructor) return;
+
+    let animationFrameId: ?number = null;
+    const observer = new ResizeObserverConstructor(() => {
+      if (animationFrameId != null)
+        window.cancelAnimationFrame(animationFrameId);
+      animationFrameId = window.requestAnimationFrame(() => {
+        animationFrameId = null;
+        reportHeight();
+      });
+    });
+
+    observer.observe(container);
+    return () => {
+      if (animationFrameId != null)
+        window.cancelAnimationFrame(animationFrameId);
+      observer.disconnect();
+    };
+  }, [reportHeight]);
 
   const _onUpdate = React.useCallback(
     () => {
@@ -564,6 +602,17 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
       return height;
     };
 
+    const onEventHeightChanged = React.useCallback(
+      (event: gdBaseEvent, height: number, rowIndex: number) => {
+        const didChange = eventsHeightsCache.setEventHeight(event, height);
+        if (!didChange) return;
+        if (_list.current) {
+          _list.current.recomputeRowHeights(rowIndex);
+        }
+      },
+      [eventsHeightsCache]
+    );
+
     const {
       project,
       globalObjectsContainer,
@@ -668,7 +717,8 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
                   }
                   event={event}
                   key={event.ptr}
-                  eventsHeightsCache={eventsHeightsCache}
+                  rowIndex={node.rowIndex}
+                  onHeightChanged={onEventHeightChanged}
                   selection={props.selection}
                   leftIndentWidth={
                     depth *
@@ -1053,6 +1103,13 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
     }, []);
 
     const zoomLevel = props.fontSize || 14;
+
+    React.useLayoutEffect(
+      () => {
+        eventsHeightsCache.setDefaultHeight(Math.round(zoomLevel * 3));
+      },
+      [eventsHeightsCache, zoomLevel]
+    );
 
     // Update treeDataRoot with the events tree. Done at each render as events
     // could change at any time, so we can't keep stale data

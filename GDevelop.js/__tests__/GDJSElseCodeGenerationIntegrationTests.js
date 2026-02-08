@@ -627,6 +627,92 @@ describe('libGD.js - GDJS "Else" Code Generation integration tests', function ()
     expect(runtimeScene.getVariables().get('AfterL3').getAsNumber()).toBe(1);
   });
 
+  it('can generate an Else event with local variables', function () {
+    // Standard event with local variable LocalInIf=5.
+    // Condition checks LocalInIf == 999, which fails (5 != 999).
+    // Else-if has local variable LocalInElse=42.
+    // Condition checks LocalInElse == 42, which passes.
+    // Sub-event of the else-if also accesses LocalInElse from parent scope.
+    // Final else does not run since the else-if matched.
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        variables: [{ name: 'LocalInIf', type: 'number', value: 5 }],
+        conditions: [
+          {
+            type: { value: 'NumberVariable' },
+            parameters: ['LocalInIf', '=', '999'],
+          },
+        ],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['Result', '=', '1'],
+          },
+        ],
+        events: [],
+      },
+      {
+        type: 'BuiltinCommonInstructions::Else',
+        variables: [{ name: 'LocalInElse', type: 'number', value: 42 }],
+        conditions: [
+          {
+            type: { value: 'NumberVariable' },
+            parameters: ['LocalInElse', '=', '42'],
+          },
+        ],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['Result', '=', '2'],
+          },
+        ],
+        events: [
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [
+              {
+                type: { value: 'NumberVariable' },
+                parameters: ['LocalInElse', '=', '42'],
+              },
+            ],
+            actions: [
+              {
+                type: { value: 'ModVarScene' },
+                parameters: ['SubResult', '=', '10'],
+              },
+            ],
+            events: [],
+          },
+        ],
+      },
+      {
+        type: 'BuiltinCommonInstructions::Else',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['Result', '=', '3'],
+          },
+        ],
+        events: [],
+      },
+    ]);
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement
+    );
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    runCompiledEvents(gdjs, runtimeScene, []);
+    // Standard condition failed (LocalInIf=5, not 999).
+    // Else-if condition passed (LocalInElse=42).
+    expect(runtimeScene.getVariables().get('Result').getAsNumber()).toBe(2);
+    // Sub-event of else-if also ran (LocalInElse=42 from parent scope).
+    expect(runtimeScene.getVariables().get('SubResult').getAsNumber()).toBe(
+      10
+    );
+  });
+
   it('stress test: combinations of standard, disabled, else, and repeat events', function () {
     // Helpers to build events concisely.
     // All conditions compare scene variable "X" which is never modified

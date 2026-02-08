@@ -1,4 +1,4 @@
-import { type SortableTreeNode } from '.';
+import { type SortableTreeNode } from './SortableEventsTree';
 
 export type MoveFunctionArguments = {
   targetNode: SortableTreeNode,

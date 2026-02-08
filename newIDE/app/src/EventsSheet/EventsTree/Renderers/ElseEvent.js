@@ -8,6 +8,7 @@ import {
   largeSelectableArea,
   executableEventContainer,
   invalidElse,
+  elseTextContainer,
 } from '../ClassNames';
 import { type EventRendererProps } from './EventRenderer';
 import ConditionsActionsColumns from '../ConditionsActionsColumns';
@@ -36,6 +37,7 @@ export default class ElseEvent extends React.Component<EventRendererProps, *> {
       >
         <div
           className={classNames({
+            [elseTextContainer]: true,
             [invalidElse]: !isValidElseEvent,
           })}
         >

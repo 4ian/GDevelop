@@ -155,7 +155,7 @@
 
 .rst__lineHalfHorizontalRight::before {
   height: 1px;
-  top: 50%;
+  top: 12px;
   right: 0;
   width: 50%;
 }
@@ -170,11 +170,11 @@
 }
 
 .rst__lineHalfVerticalTop::after {
-  height: 50%;
+  height: 12px;
 }
 
 .rst__lineHalfVerticalBottom::after {
   top: auto;
   bottom: 0;
-  height: 50%;
+  height: calc(100% - 12px);
 }

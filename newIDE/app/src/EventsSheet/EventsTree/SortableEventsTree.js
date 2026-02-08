@@ -3,13 +3,30 @@ import * as React from 'react';
 import { VariableSizeList } from 'react-window';
 import classNames from 'classnames';
 import { AutoSizer } from 'react-virtualized';
+import type { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 
-type SortableTreeNode = {
+// -- Types --
+
+// A node displayed by the SortableTree. Almost always represents an
+// event, except for the buttons at the bottom of the sheet and the tutorial.
+export type SortableTreeNode = {|
   title: (node: {| node: SortableTreeNode |}) => React.Node,
   children: Array<any>,
   expanded: boolean,
-  [string]: any,
-};
+
+  eventsList: gdEventsList,
+  event: ?gdBaseEvent,
+  depth: number,
+  disabled: boolean,
+  indexInList: number,
+  rowIndex: number,
+  nodePath: Array<number>,
+  relativeNodePath: Array<number>,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
+  key: number | string,
+  isValidElseEvent: boolean,
+  fixedHeight?: ?number,
+|};
 
 type FlatDataEntry = {
   node: SortableTreeNode,
@@ -22,24 +39,15 @@ type RowItemData = {
   flatData: Array<FlatDataEntry>,
   matchIndexSet: Set<number>,
   matchIndexes: Array<number>,
-  onVisibilityToggle: ({
-    node: SortableTreeNode,
-    path: Array<number | string>,
-    treeIndex: number,
-  }) => void,
+  onVisibilityToggle: ({| node: SortableTreeNode |}) => void,
   scaffoldBlockPxWidth: number,
   searchFocusOffset: ?number,
 };
 
-type SortableEventsTreeProps = {|
+type Props = {|
   treeData: Array<SortableTreeNode>,
   scaffoldBlockPxWidth: number,
-  onChange: () => void,
-  onVisibilityToggle: ({
-    node: SortableTreeNode,
-    path: Array<number | string>,
-    treeIndex: number,
-  }) => void,
+  onVisibilityToggle: ({| node: SortableTreeNode |}) => void,
   rowHeight: ({ node: ?SortableTreeNode }) => number,
   searchMethod?: ({
     node: SortableTreeNode,
@@ -63,116 +71,58 @@ type SortableEventsTreeProps = {|
     }) => void,
     scrollToAlignment?: string,
   },
-  slideRegionSize?: number,
 |};
+
+// -- Tree walk utilities --
 
 const defaultGetNodeKey = ({ treeIndex }: { treeIndex: number }) => treeIndex;
 
-const walkDescendants = ({
-  callback,
-  getNodeKey,
-  ignoreCollapsed,
-  isPseudoRoot = false,
-  node,
-  parentNode = null,
-  currentIndex,
-  path = [],
-  lowerSiblingCounts = [],
-}: {
-  callback: ({
-    node: SortableTreeNode,
-    parentNode: ?SortableTreeNode,
-    path: Array<number | string>,
-    lowerSiblingCounts: Array<number>,
-    treeIndex: number,
-  }) => void | false,
-  getNodeKey: ({ node: SortableTreeNode, treeIndex: number }) => number | string,
+/**
+ * Recursively walk visible tree nodes in display order, calling `callback`
+ * for each. Returns the last treeIndex visited, or `false` if the callback
+ * signalled early exit.
+ */
+const walkNodes = (
+  nodes: Array<SortableTreeNode>,
+  callback: (entry: FlatDataEntry) => void | false,
+  getNodeKey: ({ treeIndex: number }) => number | string,
   ignoreCollapsed: boolean,
-  isPseudoRoot?: boolean,
-  node: SortableTreeNode,
-  parentNode?: ?SortableTreeNode,
-  currentIndex: number,
-  path?: Array<number | string>,
-  lowerSiblingCounts?: Array<number>,
-}): number | false => {
-  const selfPath = isPseudoRoot
-    ? []
-    : [...path, getNodeKey({ node, treeIndex: currentIndex })];
-  const selfInfo = isPseudoRoot
-    ? null
-    : {
-        node,
-        parentNode,
-        path: selfPath,
-        lowerSiblingCounts,
-        treeIndex: currentIndex,
-      };
+  startIndex: number,
+  parentPath: Array<number | string>,
+  parentLowerSiblingCounts: Array<number>
+): number | false => {
+  let currentIndex = startIndex;
+  const count = nodes.length;
 
-  if (!isPseudoRoot && selfInfo) {
-    const callbackResult = callback(selfInfo);
-    if (callbackResult === false) return false;
-  }
+  for (let i = 0; i < count; i++) {
+    currentIndex++;
+    const node = nodes[i];
+    const path = [...parentPath, getNodeKey({ treeIndex: currentIndex })];
+    const lowerSiblingCounts = [...parentLowerSiblingCounts, count - i - 1];
 
-  if (
-    !node.children ||
-    (node.expanded !== true && ignoreCollapsed && !isPseudoRoot)
-  ) {
-    return currentIndex;
-  }
+    const result = callback({
+      node,
+      path,
+      lowerSiblingCounts,
+      treeIndex: currentIndex,
+    });
+    if (result === false) return false;
 
-  let childIndex = currentIndex;
-  const childCount = node.children.length;
-
-  if (typeof node.children !== 'function') {
-    for (let i = 0; i < childCount; i += 1) {
-      childIndex = walkDescendants({
+    if (node.children.length > 0 && (!ignoreCollapsed || node.expanded)) {
+      currentIndex = walkNodes(
+        node.children,
         callback,
         getNodeKey,
         ignoreCollapsed,
-        node: node.children[i],
-        parentNode: isPseudoRoot ? null : node,
-        currentIndex: childIndex + 1,
-        lowerSiblingCounts: [...lowerSiblingCounts, childCount - i - 1],
-        path: selfPath,
-      });
-      if (childIndex === false) {
-        return false;
-      }
+        currentIndex,
+        path,
+        lowerSiblingCounts
+      );
+      if (currentIndex === false) return false;
     }
   }
 
-  return childIndex;
-};
-
-const walk = ({
-  treeData,
-  getNodeKey,
-  callback,
-  ignoreCollapsed = true,
-}: {
-  treeData: Array<SortableTreeNode>,
-  getNodeKey: ({ node: SortableTreeNode, treeIndex: number }) => number | string,
-  callback: ({
-    node: SortableTreeNode,
-    parentNode: ?SortableTreeNode,
-    path: Array<number | string>,
-    lowerSiblingCounts: Array<number>,
-    treeIndex: number,
-  }) => void | false,
-  ignoreCollapsed?: boolean,
-}) => {
-  if (!treeData || treeData.length < 1) return;
-
-  walkDescendants({
-    callback,
-    getNodeKey,
-    ignoreCollapsed,
-    isPseudoRoot: true,
-    node: { children: treeData, expanded: true },
-    currentIndex: -1,
-    path: [],
-    lowerSiblingCounts: [],
-  });
+  return currentIndex;
 };
 
 export const getFlatDataFromTree = ({
@@ -181,20 +131,23 @@ export const getFlatDataFromTree = ({
   ignoreCollapsed = true,
 }: {
   treeData: Array<SortableTreeNode>,
-  getNodeKey: ({ node: SortableTreeNode, treeIndex: number }) => number | string,
+  getNodeKey: ({ treeIndex: number }) => number | string,
   ignoreCollapsed?: boolean,
 }): Array<FlatDataEntry> => {
   if (!treeData || treeData.length < 1) return [];
 
   const flattened: Array<FlatDataEntry> = [];
-  walk({
+  walkNodes(
     treeData,
+    entry => {
+      flattened.push(entry);
+    },
     getNodeKey,
     ignoreCollapsed,
-    callback: nodeInfo => {
-      flattened.push(nodeInfo);
-    },
-  });
+    -1,
+    [],
+    []
+  );
   return flattened;
 };
 
@@ -205,30 +158,32 @@ export const getNodeAtPath = ({
   ignoreCollapsed = true,
 }: {
   treeData: Array<SortableTreeNode>,
-  path: Array<number | string>,
-  getNodeKey: ({ node: SortableTreeNode, treeIndex: number }) => number | string,
+  path: $ReadOnlyArray<number | string>,
+  getNodeKey: ({ treeIndex: number }) => number | string,
   ignoreCollapsed?: boolean,
 }): ?{ node: SortableTreeNode, treeIndex: number } => {
   let foundNodeInfo = null;
-  walk({
+  walkNodes(
     treeData,
-    getNodeKey,
-    ignoreCollapsed,
-    callback: nodeInfo => {
+    entry => {
       if (
-        nodeInfo.path.length === path.length &&
-        nodeInfo.path.every((value, index) => value === path[index])
+        entry.path.length === path.length &&
+        entry.path.every((value, idx) => value === path[idx])
       ) {
-        foundNodeInfo = {
-          node: nodeInfo.node,
-          treeIndex: nodeInfo.treeIndex,
-        };
+        foundNodeInfo = { node: entry.node, treeIndex: entry.treeIndex };
         return false;
       }
     },
-  });
+    getNodeKey,
+    ignoreCollapsed,
+    -1,
+    [],
+    []
+  );
   return foundNodeInfo;
 };
+
+// -- Search --
 
 const getSearchMatches = ({
   flatData,
@@ -265,11 +220,13 @@ const getSearchMatches = ({
   return { matchIndexes, matchIndexSet: new Set(matchIndexes) };
 };
 
+// -- Row component --
+
 /**
- * Stable row component for react-window. Defined outside of SortableEventsTree
- * so that its reference never changes, preventing react-window from
- * unmounting/remounting all visible rows on every render. Changing data is
- * received via the `data` prop (react-window's itemData pattern).
+ * Stable row component for react-window. Defined outside SortableEventsTree
+ * so its reference never changes, preventing react-window from
+ * unmounting/remounting all visible rows on every render.
+ * Changing data is received via `data` (react-window's itemData pattern).
  */
 const TreeRow = ({
   index,
@@ -292,17 +249,21 @@ const TreeRow = ({
   const entry = flatData[index];
   if (!entry) return null;
 
-  const { node, path, lowerSiblingCounts, treeIndex } = entry;
-  const scaffoldBlockCount = lowerSiblingCounts.length;
+  const { node, lowerSiblingCounts } = entry;
+  const depth = lowerSiblingCounts.length;
   const isSearchMatch = matchIndexSet.has(index);
   const isSearchFocus =
     searchFocusOffset != null && matchIndexes[searchFocusOffset] === index;
-  const isElseEvent = !!node.isElseEvent;
 
   const scaffold = lowerSiblingCounts.map((lowerSiblingCount, i) => {
-    const isLastBlock = i === scaffoldBlockCount - 1;
-    // For else events, don't draw horizontal connector at their depth level.
-    const drawHorizontal = !(isElseEvent && isLastBlock);
+    const isNodeDepth = i === depth - 1;
+
+    // Some nodes are not linked to the "parent" node by a horizontal branch connector.
+    const drawHorizontal =
+      !(node.isValidElseEvent && isNodeDepth) &&
+      !(
+        node.key === 'bottom-buttons' || node.key === 'eventstree-tutorial-node'
+      );
 
     let lineClass = '';
     if (lowerSiblingCount > 0) {
@@ -310,7 +271,7 @@ const TreeRow = ({
         lineClass = drawHorizontal
           ? 'rst__lineHalfHorizontalRight rst__lineHalfVerticalBottom'
           : 'rst__lineHalfVerticalBottom';
-      } else if (isLastBlock) {
+      } else if (isNodeDepth) {
         lineClass = drawHorizontal
           ? 'rst__lineHalfHorizontalRight rst__lineFullVertical'
           : 'rst__lineFullVertical';
@@ -319,7 +280,7 @@ const TreeRow = ({
       }
     } else if (index === 0) {
       lineClass = drawHorizontal ? 'rst__lineHalfHorizontalRight' : '';
-    } else if (isLastBlock) {
+    } else if (isNodeDepth) {
       lineClass = drawHorizontal
         ? 'rst__lineHalfVerticalTop rst__lineHalfHorizontalRight'
         : 'rst__lineHalfVerticalTop';
@@ -334,30 +295,25 @@ const TreeRow = ({
     );
   });
 
-  const nodeContentStyle = {
-    left: scaffoldBlockPxWidth * scaffoldBlockCount,
-  };
-  const hasChildren =
-    node.children && typeof node.children !== 'function'
-      ? node.children.length > 0
-      : !!node.children;
+  const hasChildren = node.children.length > 0;
 
   return (
     <div style={style} className="rst__node">
       {scaffold}
-      <div className="rst__nodeContent" style={nodeContentStyle}>
+      <div
+        className="rst__nodeContent"
+        style={{ left: scaffoldBlockPxWidth * depth }}
+      >
         {hasChildren && (
           <div>
             <button
               type="button"
               aria-label={node.expanded ? 'Collapse' : 'Expand'}
-              className={classNames(
+              className={
                 node.expanded ? 'rst__collapseButton' : 'rst__expandButton'
-              )}
+              }
               style={{ left: -0.5 * scaffoldBlockPxWidth }}
-              onClick={() => {
-                onVisibilityToggle({ node, path, treeIndex });
-              }}
+              onClick={() => onVisibilityToggle({ node })}
             />
             {node.expanded && (
               <div
@@ -377,11 +333,7 @@ const TreeRow = ({
           >
             <div className="rst__rowContents">
               <div className="rst__rowLabel">
-                <span className="rst__rowTitle">
-                  {typeof node.title === 'function'
-                    ? node.title({ node, path, treeIndex })
-                    : node.title}
-                </span>
+                <span className="rst__rowTitle">{node.title({ node })}</span>
               </div>
             </div>
           </div>
@@ -391,10 +343,11 @@ const TreeRow = ({
   );
 };
 
+// -- Main component --
+
 const SortableEventsTree = ({
   treeData,
   scaffoldBlockPxWidth,
-  onChange,
   onVisibilityToggle,
   rowHeight,
   searchMethod,
@@ -402,11 +355,13 @@ const SortableEventsTree = ({
   searchFocusOffset,
   className,
   reactVirtualizedListProps,
-}: SortableEventsTreeProps) => {
-  void onChange;
+}: Props) => {
   const listRef = React.useRef<?VariableSizeList>(null);
   const outerRef = React.useRef<?HTMLDivElement>(null);
-  const alignment = reactVirtualizedListProps?.scrollToAlignment || 'auto';
+  const alignment =
+    (reactVirtualizedListProps &&
+      reactVirtualizedListProps.scrollToAlignment) ||
+    'auto';
 
   const flatData = React.useMemo(
     () =>
@@ -423,34 +378,41 @@ const SortableEventsTree = ({
     [flatData, searchMethod, searchQuery]
   );
 
-  React.useEffect(() => {
-    if (!reactVirtualizedListProps?.ref) return;
-    reactVirtualizedListProps.ref({
-      scrollToRow: (row: number) => {
-        if (listRef.current) {
-          listRef.current.scrollToItem(row, alignment);
-        }
-      },
-      recomputeRowHeights: () => {
-        if (listRef.current) {
-          listRef.current.resetAfterIndex(0, true);
-        }
-      },
-      container: outerRef.current,
-    });
-  }, [alignment, reactVirtualizedListProps, flatData.length]);
+  React.useEffect(
+    () => {
+      if (!reactVirtualizedListProps || !reactVirtualizedListProps.ref) return;
+      reactVirtualizedListProps.ref({
+        scrollToRow: (row: number) => {
+          if (listRef.current) {
+            listRef.current.scrollToItem(row, alignment);
+          }
+        },
+        recomputeRowHeights: () => {
+          if (listRef.current) {
+            listRef.current.resetAfterIndex(0, true);
+          }
+        },
+        container: outerRef.current,
+      });
+    },
+    [alignment, reactVirtualizedListProps, flatData.length]
+  );
 
   const itemSize = React.useCallback(
     (index: number) => {
-      const node = flatData[index] ? flatData[index].node : null;
-      return Math.max(1, rowHeight({ node }));
+      const entry = flatData[index];
+      return Math.max(1, rowHeight({ node: entry ? entry.node : null }));
     },
     [flatData, rowHeight]
   );
 
   const handleScroll = React.useCallback(
     ({ scrollOffset }: { scrollOffset: number }) => {
-      if (reactVirtualizedListProps?.onScroll && outerRef.current) {
+      if (
+        reactVirtualizedListProps &&
+        reactVirtualizedListProps.onScroll &&
+        outerRef.current
+      ) {
         reactVirtualizedListProps.onScroll({
           scrollTop: scrollOffset,
           clientHeight: outerRef.current.clientHeight,
@@ -480,13 +442,10 @@ const SortableEventsTree = ({
     ]
   );
 
-  const itemKey = React.useCallback(
-    (index: number, data: RowItemData) => {
-      const entry = data.flatData[index];
-      return entry ? String(entry.node.key) : String(index);
-    },
-    []
-  );
+  const itemKey = React.useCallback((index: number, data: RowItemData) => {
+    const entry = data.flatData[index];
+    return entry ? String(entry.node.key) : String(index);
+  }, []);
 
   return (
     <div className={className}>

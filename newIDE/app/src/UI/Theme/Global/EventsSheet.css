@@ -225,6 +225,10 @@
   min-height: var(--instruction-missing-parameter-min-height);
 }
 
+.gd-events-sheet .else-text-container {
+  padding-left: 1px;
+}
+
 .gd-events-sheet .invalid-else {
   padding-left: 1px;
   color: var(--event-sheet-instruction-parameter-warning-color);

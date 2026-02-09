@@ -25,6 +25,8 @@ declare class gdEventsFunction {
   isPrivate(): boolean;
   setAsync(isAsync: boolean): gdEventsFunction;
   isAsync(): boolean;
+  setHelpUrl(helpUrl: string): gdEventsFunction;
+  getHelpUrl(): string;
   isAction(): boolean;
   isExpression(): boolean;
   isCondition(): boolean;

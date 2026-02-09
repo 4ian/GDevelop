@@ -59,10 +59,13 @@ const SearchPanel = (
     onGoToNextSearchResult,
     searchFocusOffset,
   }: Props,
+  // $FlowFixMe[missing-local-annot]
   ref
 ) => {
   const { isMobile } = useResponsiveWindowSize();
+  // $FlowFixMe[value-as-type]
   const searchTextField = React.useRef<?TextFieldInterface>(null);
+  // $FlowFixMe[value-as-type]
   const replaceTextField = React.useRef<?TextFieldInterface>(null);
 
   const [searchText, setSearchText] = React.useState<string>('');
@@ -396,6 +399,4 @@ const SearchPanel = (
   );
 };
 
-export default React.forwardRef<Props, SearchPanelInterface>(SearchPanel) as component(
-  ...{ ...Props, +ref?: React.RefSetter<SearchPanelInterface> }
-) React.Node;
+export default React.forwardRef<Props, SearchPanelInterface>(SearchPanel) as React.ComponentType<any>;

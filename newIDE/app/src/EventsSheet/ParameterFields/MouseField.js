@@ -13,6 +13,7 @@ import SelectOption from '../../UI/SelectOption';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function MouseField(props: ParameterFieldProps, ref) {
+    // $FlowFixMe[value-as-type]
     const field = React.useRef<?SelectFieldInterface>(null);
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
@@ -58,9 +59,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       </SelectField>
     );
   },
-) as component(
-  ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
-) React.Node;
+) as React.ComponentType<any>;
 
 export const renderInlineMouse = ({value, InvalidParameterValue}: ParameterInlineRendererProps): string | React.MixedElement => {
   return value ? (

@@ -32,7 +32,7 @@ export const renderInstructionOrExpressionListItem = (
       const matchesForGivenField = matches.filter(match => match.key === field);
       if (!!matchesForGivenField.length) {
         text = (
-          {/* $FlowFixMe[incompatible-type] */}
+          // $FlowFixMe[incompatible-type] 
           <HighlightedText
             text={text}
             matchesCoordinates={matchesForGivenField[0].indices}

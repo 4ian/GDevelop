@@ -280,7 +280,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
         type: 'primary',
         noTitleBar: true,
         renderEditor: () => (
-          {/* $FlowFixMe[incompatible-type] */}
+          // $FlowFixMe[incompatible-type] 
           <ResourcesList
             project={project}
             fileMetadata={fileMetadata}

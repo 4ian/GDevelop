@@ -3,7 +3,7 @@ import { mapFor, mapVector } from '../../../Utils/MapFor';
 
 const gd: libGDevelop = global.gd;
 
-// $FlowFixMe[recursive-definition]
+// $FlowFixMe[definition-cycle][recursive-definition]
 const renderInstructionsAsText = ({
   instructionsList,
   padding,

@@ -105,12 +105,16 @@ const MosaicEditorsDisplay: React.ComponentType<any> = React.forwardRef<
   const instanceOrObjectPropertiesEditorRef = React.useRef<?InstanceOrObjectPropertiesEditorInterface>(
     null
   );
+  // $FlowFixMe[value-as-type]
   const layersListRef = React.useRef<?LayersListInterface>(null);
   const instancesListRef = React.useRef<?InstancesListInterface>(null);
   const editorRef = React.useRef<?InstancesEditor>(null);
+  // $FlowFixMe[value-as-type]
   const objectsListRef = React.useRef<?ObjectsListInterface>(null);
   const editorMosaicRef = React.useRef<?EditorMosaicInterface>(null);
+  // $FlowFixMe[value-as-type]
   const objectGroupsListRef = React.useRef<?ObjectGroupsListInterface>(null);
+  // $FlowFixMe[value-as-type]
   const objectsListDoNowOrAfterRender = useDoNowOrAfterRender<?ObjectsListInterface>(
     objectsListRef
   );
@@ -189,6 +193,7 @@ const MosaicEditorsDisplay: React.ComponentType<any> = React.forwardRef<
       }
 
       // Open the new object dialog when the objects list is opened.
+      // $FlowFixMe[value-as-type]
       objectsListDoNowOrAfterRender((objectsList: ?ObjectsListInterface) => {
         if (objectsList) objectsList.openNewObjectDialog();
       });

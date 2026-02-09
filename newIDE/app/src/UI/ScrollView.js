@@ -28,6 +28,7 @@ export type ScrollBehaviorOptions = {|
 export type ScrollViewInterface = {|
   getScrollPosition: () => number,
   scrollTo: (
+    // $FlowFixMe[cannot-resolve-name]
     target: ?React$Component<any, any> | ?React.ElementRef<any>
   ) => void,
   scrollToPosition: (number: number) => void,
@@ -37,6 +38,7 @@ export type ScrollViewInterface = {|
 
 export default React.forwardRef<Props, ScrollViewInterface>(
   ({id, data, children, autoHideScrollbar, style, onScroll}: Props, ref) => {
+    // $FlowFixMe[cannot-resolve-name]
     const scrollView = React.useRef((null: ?HTMLDivElement));
     React.useImperativeHandle(
       ref,
@@ -54,11 +56,13 @@ export default React.forwardRef<Props, ScrollViewInterface>(
         /**
        * Scroll the view to the target component.
        */
+        // $FlowFixMe[cannot-resolve-name]
         scrollTo: (target: ?React$Component<any, any>) => {
           const scrollViewElement = scrollView.current;
           if (!scrollViewElement) return;
           
           const targetElement = ReactDOM.findDOMNode(target);
+          // $FlowFixMe[cannot-resolve-name]
           if (targetElement instanceof HTMLElement) {
             const yPosition = targetElement.getBoundingClientRect().top;
             
@@ -135,6 +139,4 @@ export default React.forwardRef<Props, ScrollViewInterface>(
       </div>
     );
   },
-) as component(
-  ...{ ...Props, +ref?: React.RefSetter<ScrollViewInterface> }
-) React.Node;
+) as React.ComponentType<any>;

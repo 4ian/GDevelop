@@ -162,6 +162,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     
     const onComputeAllVariableNames = React.useCallback(
       () => {
+        // $FlowFixMe[missing-empty-array-annot]
         if (!project || !layout || !objectName) return [];
         
         return EventsRootVariablesFinder.findAllObjectVariables(
@@ -241,9 +242,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       </React.Fragment>
     );
   },
-) as component(
-  ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
-) React.Node;
+) as React.ComponentType<any>;
 
 const getVariableSourceFromIdentifier = (
   identifier: string,

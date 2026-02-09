@@ -14,7 +14,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
     },
   },
   headers: [
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'reviewed',
       authorIds: ['this-is-a-fake-id', 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2'],
@@ -59,7 +59,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'reviewed',
       authorIds: ['this-is-a-fake-id', 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2'],
@@ -103,7 +103,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'experimental',
       authorIds: ['ZgrsWuRTAkXgeuPV9bo0zuEcA2w1'],
@@ -138,7 +138,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'experimental',
       authorIds: ['I0kdjvsICFML0APq45CZjZ6PyEQ2'],
@@ -172,7 +172,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'experimental',
       authorIds: ['wWP8BSlAW0UP4NeaHa2LcmmDzmH2'],
@@ -207,7 +207,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'reviewed',
       authorIds: ['ZgrsWuRTAkXgeuPV9bo0zuEcA2w1'],
@@ -242,7 +242,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'reviewed',
       authorIds: ['2OwwM8ToR9dx9RJ2sAKTcrLmCB92'],
@@ -276,7 +276,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'reviewed',
       authorIds: ['ZgrsWuRTAkXgeuPV9bo0zuEcA2w1'],
@@ -309,7 +309,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'reviewed',
       authorIds: ['onPsboRtDkUHNOsx7OPr8R8G1oj2'],
@@ -343,7 +343,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'experimental',
       authorIds: ['AlZ3D1xkH0QDao7T37VZZUeYNpn1'],
@@ -377,7 +377,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'experimental',
       authorIds: [
@@ -423,7 +423,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'experimental',
       authorIds: ['this-is-a-fake-id', 'gqDaZjCfevOOxBYkK6zlhtZnXCg1'],
@@ -467,7 +467,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'reviewed',
       authorIds: ['wWP8BSlAW0UP4NeaHa2LcmmDzmH2'],
@@ -501,7 +501,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'reviewed',
       authorIds: [
@@ -548,7 +548,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'experimental',
       authorIds: [
@@ -595,7 +595,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'reviewed',
       authorIds: ['IWykYNRvhCZBN3vEgKEbBPOR3Oc2'],
@@ -630,7 +630,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'reviewed',
       authorIds: ['gqDaZjCfevOOxBYkK6zlhtZnXCg1'],
@@ -664,7 +664,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'reviewed',
       authorIds: [
@@ -710,7 +710,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'experimental',
       authorIds: ['ZShmW1xkW7WWl9AkB78VITJMiTw1'],
@@ -744,7 +744,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'reviewed',
       authorIds: [
@@ -790,7 +790,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'reviewed',
       authorIds: [
@@ -848,7 +848,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'reviewed',
       authorIds: ['ZgrsWuRTAkXgeuPV9bo0zuEcA2w1'],
@@ -881,7 +881,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'reviewed',
       authorIds: ['gqDaZjCfevOOxBYkK6zlhtZnXCg1'],
@@ -916,7 +916,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'reviewed',
       authorIds: ['gqDaZjCfevOOxBYkK6zlhtZnXCg1'],
@@ -951,7 +951,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'reviewed',
       authorIds: ['ZShmW1xkW7WWl9AkB78VITJMiTw1'],
@@ -986,7 +986,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'experimental',
       authorIds: ['IWykYNRvhCZBN3vEgKEbBPOR3Oc2'],
@@ -1020,7 +1020,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'experimental',
       authorIds: [
@@ -1067,7 +1067,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'reviewed',
       authorIds: ['gqDaZjCfevOOxBYkK6zlhtZnXCg1'],
@@ -1101,7 +1101,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'experimental',
       authorIds: ['ZgrsWuRTAkXgeuPV9bo0zuEcA2w1'],
@@ -1135,7 +1135,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'reviewed',
       authorIds: ['8Ih1aa8f5gWUp4UB2BdhQ2iXWxJ3'],
@@ -1169,7 +1169,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'reviewed',
       authorIds: [
@@ -1216,7 +1216,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'reviewed',
       authorIds: ['gqDaZjCfevOOxBYkK6zlhtZnXCg1'],
@@ -1250,7 +1250,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'reviewed',
       authorIds: [
@@ -1298,7 +1298,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     {
       tier: 'reviewed',
       authorIds: ['this-is-a-fake-id'],

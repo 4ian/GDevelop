@@ -128,7 +128,7 @@ const SemiControlledTextField: React.ComponentType<any> = React.forwardRef<
   } = props;
 
   return (
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     <TextField
       {...otherProps}
       type={type || 'text'}

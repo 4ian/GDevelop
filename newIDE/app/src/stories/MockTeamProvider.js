@@ -51,7 +51,7 @@ const initialTeam: Team = {
 
 const initialAdmins: Array<User> = [
   // $FlowIgnore - the whole user object is not needed for this component
-  {/* $FlowFixMe[incompatible-type] */}
+  // $FlowFixMe[incompatible-type] 
   {
     id: fakeAuthenticatedUserWithEducationPlan.profile
       ? fakeAuthenticatedUserWithEducationPlan.profile.id
@@ -63,7 +63,7 @@ const initialAdmins: Array<User> = [
 
 const initialMembers: Array<User> = [
   // $FlowIgnore - the whole user object is not needed for this component
-  {/* $FlowFixMe[incompatible-type] */}
+  // $FlowFixMe[incompatible-type] 
   {
     id: 'user1',
     email: 'user1@hotmail.com',
@@ -72,21 +72,21 @@ const initialMembers: Array<User> = [
     fullName: 'John Doe',
   },
   // $FlowIgnore - the whole user object is not needed for this component
-  {/* $FlowFixMe[incompatible-type] */}
+  // $FlowFixMe[incompatible-type] 
   {
     id: 'user2',
     email: 'user2@naver.com',
     username: 'DrCortex',
   },
   // $FlowIgnore - the whole user object is not needed for this component
-  {/* $FlowFixMe[incompatible-type] */}
+  // $FlowFixMe[incompatible-type] 
   {
     id: 'user3',
     email: 'user3@gmail.com',
     username: 'Sonic',
   },
   // $FlowIgnore - the whole user object is not needed for this component
-  {/* $FlowFixMe[incompatible-type] */}
+  // $FlowFixMe[incompatible-type] 
   {
     id: 'user4',
     email: 'user4@live.com',
@@ -94,21 +94,21 @@ const initialMembers: Array<User> = [
     password: 'mario-help',
   },
   // $FlowIgnore - the whole user object is not needed for this component
-  {/* $FlowFixMe[incompatible-type] */}
+  // $FlowFixMe[incompatible-type] 
   {
     id: 'user5',
     email: 'user5@live.fr',
     username: null,
   },
   // $FlowIgnore - the whole user object is not needed for this component
-  {/* $FlowFixMe[incompatible-type] */}
+  // $FlowFixMe[incompatible-type] 
   {
     id: 'user6',
     email: 'user6@live.it',
     username: 'Mario',
   },
   // $FlowIgnore - the whole user object is not needed for this component
-  {/* $FlowFixMe[incompatible-type] */}
+  // $FlowFixMe[incompatible-type] 
   {
     id: 'user7',
     email: 'user7@mail.ru',
@@ -116,7 +116,7 @@ const initialMembers: Array<User> = [
     fullName: 'Jane Smith',
   },
   // $FlowIgnore - the whole user object is not needed for this component
-  {/* $FlowFixMe[incompatible-type] */}
+  // $FlowFixMe[incompatible-type] 
   {
     id: 'user8',
     email: 'user8@mail.com',

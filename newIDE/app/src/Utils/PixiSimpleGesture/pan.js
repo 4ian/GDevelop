@@ -48,7 +48,7 @@ export default function panable(
     move(e, touch);
   }
 
-  // $FlowFixMe[value-as-type]
+  // $FlowFixMe[cannot-resolve-name][value-as-type]
   function move(e: PIXI.FederatedPointerEvent, t: Touch) {
     let now = new Date();
     let interval = now - sprite._pan.p.date;
@@ -92,7 +92,7 @@ export default function panable(
     end(e, e.data.originalEvent.nativeEvent);
   }
 
-  // $FlowFixMe[value-as-type]
+  // $FlowFixMe[cannot-resolve-name][value-as-type]
   function end(e: PIXI.FederatedPointerEvent, t: Touch) {
     sprite.removeEventListener('globalpointermove', pointerMove);
     if (!sprite._pan || !sprite._pan.pp) {

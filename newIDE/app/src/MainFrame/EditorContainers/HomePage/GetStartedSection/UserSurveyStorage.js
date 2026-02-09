@@ -25,6 +25,7 @@ export const getRecentPersistedState = (): any | null => {
 };
 
 export const persistState = (state: {|
+  // $FlowFixMe[value-as-type]
   userAnswers: UserAnswers,
   questionId: string,
 |}) => {

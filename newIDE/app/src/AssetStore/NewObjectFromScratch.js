@@ -114,6 +114,7 @@ const TitleListItem = ({ value, onHeightComputed }: TitleListItemProps) => {
 };
 
 const getObjectType = (
+  // $FlowFixMe[value-as-type]
   objectShortHeader: ObjectShortHeader | ObjectCategory
   // $FlowFixMe[incompatible-type]
 ): string => objectShortHeader.type || objectShortHeader.categoryId;

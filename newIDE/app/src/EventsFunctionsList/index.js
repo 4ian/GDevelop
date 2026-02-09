@@ -1374,7 +1374,7 @@ const EventsFunctionsList = React.forwardRef<
               <div style={styles.autoSizerContainer}>
                 <AutoSizer style={styles.autoSizer} disableWidth>
                   {({ height }) => (
-                    {/* $FlowFixMe[incompatible-type] */}
+                    // $FlowFixMe[incompatible-type] 
                     <TreeView
                       key={listKey}
                       ref={treeViewRef}

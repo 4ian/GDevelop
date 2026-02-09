@@ -23,4 +23,4 @@ export default React.memo<Props>(
       strokeLinejoin="round"
     />
   </SvgIcon>,
-) as component(...Props) React.Node;
+) as React.ComponentType<Props>;

@@ -2915,7 +2915,7 @@ const MainFrame = (props: Props): React.MixedElement => {
               initiallyFocusedObjectName: eventsBasedObject.getName(),
             },
           }),
-          {/* $FlowFixMe[incompatible-type] */}
+          // $FlowFixMe[incompatible-type] 
           {
             ...getEditorOpeningOptions({
               kind: 'custom object',

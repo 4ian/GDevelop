@@ -35,6 +35,7 @@ export default React.forwardRef<Props, LeaderboardIdPropertyFieldInterface>(
     const leaderboards = useFetchLeaderboards();
     const [isAdminOpen, setIsAdminOpen] = React.useState(false);
     const field = React.useRef<
+      // $FlowFixMe[value-as-type]
       ?(SemiControlledTextFieldInterface | SelectFieldInterface),
     >(null);
     const focus: FieldFocusFunction = options => {
@@ -54,6 +55,7 @@ export default React.forwardRef<Props, LeaderboardIdPropertyFieldInterface>(
       !leaderboards || !!props.value && !isCurrentValueInLeaderboardList,
     );
     
+    // $FlowFixMe[missing-local-annot]
     const onChangeSelectValue = (event, value) => {
       props.onChange(event.target.value);
     };
@@ -151,6 +153,4 @@ export default React.forwardRef<Props, LeaderboardIdPropertyFieldInterface>(
       </I18n>
     );
   },
-) as component(
-  ...{ ...Props, +ref?: React.RefSetter<LeaderboardIdPropertyFieldInterface> }
-) React.Node;
+) as React.ComponentType<any>;

@@ -115,6 +115,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       () => {
         const functionMetadata = instructionMetadata || expressionMetadata;
         if (!project || !functionMetadata || parameterIndex === undefined) {
+          // $FlowFixMe[missing-empty-array-annot]
           return [];
         }
         return getRequiredCapabilitiesBehaviorTypes(
@@ -130,6 +131,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       () => {
         const functionMetadata = instructionMetadata || expressionMetadata;
         if (!project || !functionMetadata || parameterIndex === undefined) {
+          // $FlowFixMe[missing-empty-array-annot]
           return [];
         }
         return getRequiredVisibleBehaviorTypes(
@@ -191,9 +193,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       />
     );
   },
-) as component(
-  ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
-) React.Node;
+) as React.ComponentType<any>;
 
 export const renderInlineObjectWithThumbnail = (
   {

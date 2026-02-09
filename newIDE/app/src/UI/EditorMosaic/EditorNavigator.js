@@ -119,6 +119,4 @@ export default React.forwardRef<Props, EditorNavigatorInterface>(
       </Column>
     );
   },
-) as component(
-  ...{ ...Props, +ref?: React.RefSetter<EditorNavigatorInterface> }
-) React.Node;
+) as React.ComponentType<any>;

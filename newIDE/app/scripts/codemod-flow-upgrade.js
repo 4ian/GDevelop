@@ -234,24 +234,45 @@ function applyFlowSuppressions(errors) {
   return updatedFiles;
 }
 
-function convertJsxFlowFixMe(filePath) {
+function normalizeFlowFixMeComments(filePath) {
   if (!fs.existsSync(filePath)) return false;
   const lines = fs.readFileSync(filePath, 'utf8').split('\n');
   let changed = false;
 
   for (let i = 0; i < lines.length - 1; i += 1) {
     const line = lines[i];
-    const match = line.match(/^(\s*)\/\/\s*\$FlowFixMe(\[[^\]]+\])*(.*)$/);
-    if (!match) continue;
-    const nextLine = lines[i + 1];
-    const trimmedNext = nextLine.trimStart();
-    if (!trimmedNext.startsWith('{') && !trimmedNext.startsWith('<')) continue;
+    const lineCommentMatch = line.match(/^(\s*)\/\/\s*\$FlowFixMe(\[[^\]]+\])*(.*)$/);
+    const jsxCommentMatch = line.match(/^(\s*)\{\s*\/\*\s*\$FlowFixMe(\[[^\]]+\])*(.*?)\*\/\s*\}\s*$/);
 
-    const indent = match[1];
-    const codes = match[2] || '';
-    const suffix = match[3] || '';
-    lines[i] = `${indent}{/* $FlowFixMe${codes}${suffix} */}`;
-    changed = true;
+    let prevNonEmptyIndex = i - 1;
+    while (prevNonEmptyIndex >= 0 && lines[prevNonEmptyIndex].trim() === '') {
+      prevNonEmptyIndex -= 1;
+    }
+    const prevLine = prevNonEmptyIndex >= 0 ? lines[prevNonEmptyIndex].trim() : '';
+    const prevEndsWithTag = prevLine.endsWith('>') || prevLine.endsWith('/>');
+
+    if (lineCommentMatch) {
+      const nextLine = lines[i + 1];
+      const trimmedNext = nextLine.trimStart();
+      if (!prevEndsWithTag) continue;
+      if (!trimmedNext.startsWith('{') && !trimmedNext.startsWith('<')) continue;
+
+      const indent = lineCommentMatch[1];
+      const codes = lineCommentMatch[2] || '';
+      const suffix = lineCommentMatch[3] || '';
+      lines[i] = `${indent}{/* $FlowFixMe${codes}${suffix} */}`;
+      changed = true;
+      continue;
+    }
+
+    if (jsxCommentMatch) {
+      if (prevEndsWithTag) continue;
+      const indent = jsxCommentMatch[1];
+      const codes = jsxCommentMatch[2] || '';
+      const suffix = jsxCommentMatch[3] || '';
+      lines[i] = `${indent}// $FlowFixMe${codes}${suffix}`;
+      changed = true;
+    }
   }
 
   if (!changed) return false;
@@ -453,6 +474,18 @@ function run() {
       searchValue: /:\s*component\([\s\S]*?\)\s*React\.Node/g,
       replaceValue: ': React.ComponentType<any>',
     },
+    {
+      searchValue: /\sas component\(\.\.\.\{[\s\S]*?\.\.\.([A-Za-z0-9_$]+)[\s\S]*?\}\)\s*React\.Node/g,
+      replaceValue: ' as React.ComponentType<$1>',
+    },
+    {
+      searchValue: /\sas component\(\.\.\.([A-Za-z0-9_$]+)\)\s*React\.Node/g,
+      replaceValue: ' as React.ComponentType<$1>',
+    },
+    {
+      searchValue: /\sas component\([\s\S]*?\)\s*React\.Node/g,
+      replaceValue: ' as React.ComponentType<any>',
+    },
     { searchValue: /renders\*/g, replaceValue: 'React.Node' },
     { searchValue: /renders React\.Node\b/g, replaceValue: 'React.Node' },
     { searchValue: /renders React\$Node\b/g, replaceValue: 'React.Node' },
@@ -640,7 +673,7 @@ function run() {
   if (suppressedFiles) updatedFiles += suppressedFiles;
 
   for (const filePath of srcFiles) {
-    if (convertJsxFlowFixMe(filePath)) updatedFiles += 1;
+    if (normalizeFlowFixMeComments(filePath)) updatedFiles += 1;
   }
 
   console.log(`Flow upgrade codemod complete. Updated ${updatedFiles} file(s).`);

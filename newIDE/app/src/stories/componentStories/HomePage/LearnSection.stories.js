@@ -240,7 +240,7 @@ export const EducationTeacher = (): React.Node => (
 );
 
 export const LoadingTutorials = (): React.Node => (
-  {/* $FlowFixMe[incompatible-type] */}
+  // $FlowFixMe[incompatible-type] 
   <PreferencesContext.Provider value={initialPreferences}>
     <TutorialContext.Provider
       value={{
@@ -285,7 +285,7 @@ export const LoadingTutorials = (): React.Node => (
 );
 
 export const LoadingCourses = (): React.Node => (
-  {/* $FlowFixMe[incompatible-type] */}
+  // $FlowFixMe[incompatible-type] 
   <PreferencesContext.Provider value={initialPreferences}>
     <TutorialContext.Provider
       value={{

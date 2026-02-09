@@ -22,7 +22,7 @@ type VariablesContainer = {|
   _variables: { items: { [string]: Variable } },
 |};
 
-// $FlowFixMe[recursive-definition]
+// $FlowFixMe[definition-cycle][recursive-definition]
 const transformVariable = (variable: Variable) => {
   if (!variable) return null;
 

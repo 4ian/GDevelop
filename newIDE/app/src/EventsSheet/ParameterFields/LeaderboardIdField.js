@@ -64,6 +64,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const leaderboards = useFetchLeaderboards();
     const [isAdminOpen, setIsAdminOpen] = React.useState(false);
     const field = React.useRef<
+      // $FlowFixMe[value-as-type]
       ?(GenericExpressionField | SelectFieldInterface),
     >(null);
     const focus: FieldFocusFunction = options => {
@@ -83,6 +84,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       !leaderboards || !!props.value && !isCurrentValueInLeaderboardList,
     );
     
+    // $FlowFixMe[missing-local-annot]
     const onChangeSelectValue = (event, value) => {
       props.onChange(event.target.value);
     };
@@ -192,9 +194,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       </I18n>
     );
   },
-) as component(
-  ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
-) React.Node;
+) as React.ComponentType<any>;
 
 const InlineLeaderboardIdField = ({
   value,

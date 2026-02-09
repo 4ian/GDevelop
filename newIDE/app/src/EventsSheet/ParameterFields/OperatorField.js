@@ -23,6 +23,7 @@ const operatorLabels = {
 };
 
 const mapTypeToOperators: { [string]: Array<string> } = {
+  // $FlowFixMe[incompatible-type]
   unknown: Object.keys(operatorLabels),
   number: ['=', '+', '-', '*', '/'],
   string: ['=', '+'],
@@ -32,6 +33,7 @@ const mapTypeToOperators: { [string]: Array<string> } = {
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function OperatorField(props: ParameterFieldProps, ref) {
+    // $FlowFixMe[value-as-type]
     const field = React.useRef<?SelectFieldInterface>(null);
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
@@ -82,15 +84,14 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           operator => <SelectOption
             key={operator}
             value={operator}
+            // $FlowFixMe[invalid-computed-prop]
             label={operatorLabels[operator]}
           />,
         )}
       </SelectField>
     );
   },
-) as component(
-  ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
-) React.Node;
+) as React.ComponentType<any>;
 
 export const renderInlineOperator = (
   {

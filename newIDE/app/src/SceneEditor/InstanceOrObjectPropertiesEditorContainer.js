@@ -34,6 +34,7 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
   i18n: I18nType,
   lastSelectionType: 'instance' | 'object' | 'layer',
+  // $FlowFixMe[value-as-type]
   historyHandler?: HistoryHandler,
   isVariableListLocked: boolean,
   layout?: ?gdLayout,

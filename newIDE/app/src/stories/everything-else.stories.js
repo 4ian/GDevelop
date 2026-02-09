@@ -2287,7 +2287,7 @@ storiesOf('BrowserPreviewErrorDialog', module)
   .add('networking error', () => (
     <BrowserPreviewErrorDialog
       error={
-        {/* $FlowFixMe[incompatible-type] - mocking an Error with "code field" */}
+        // $FlowFixMe[incompatible-type] - mocking an Error with "code field" 
         {
           code: 'NetworkingError',
           message: "Oops, you're offline",

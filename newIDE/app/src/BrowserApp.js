@@ -82,10 +82,10 @@ export const create = (authentication: Authentication): React.Node => {
               i18n={i18n}
               renderPreviewLauncher={(props, ref) =>
                 canUseBrowserSW ? (
-                  {/* $FlowFixMe[incompatible-type] */}
+                  // $FlowFixMe[incompatible-type] 
                   <BrowserSWPreviewLauncher {...props} ref={ref} />
                 ) : (
-                  {/* $FlowFixMe[incompatible-type] */}
+                  // $FlowFixMe[incompatible-type] 
                   <BrowserS3PreviewLauncher {...props} ref={ref} />
                 )
               }

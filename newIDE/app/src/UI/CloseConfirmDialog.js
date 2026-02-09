@@ -35,6 +35,7 @@ export default React.memo<Props>(
         );
         
         if (electron) {
+          // $FlowFixMe[cannot-resolve-name]
           window.onbeforeunload = e => {
             if (delayElectronClose.current && shouldPrompt) {
               // Use setTimeout to avoiding blocking the thread with the "confirm" dialog,
@@ -59,10 +60,13 @@ export default React.memo<Props>(
             } else {// Returning undefined will let the window close
             }
           };
+        // $FlowFixMe[cannot-resolve-name]
         } else if (window && !isNativeMobileApp()) {
           if (shouldPrompt) {
+            // $FlowFixMe[cannot-resolve-name]
             window.onbeforeunload = () => message;
           } else {
+            // $FlowFixMe[cannot-resolve-name]
             window.onbeforeunload = null;
           }
         }
@@ -72,4 +76,4 @@ export default React.memo<Props>(
     
     return null;
   },
-) as component(...Props) React.Node;
+) as React.ComponentType<Props>;

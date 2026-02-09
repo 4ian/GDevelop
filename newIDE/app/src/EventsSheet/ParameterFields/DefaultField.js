@@ -12,6 +12,7 @@ import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flo
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function DefaultField(props: ParameterFieldProps, ref) {
+    // $FlowFixMe[value-as-type]
     const field = React.useRef<?SemiControlledTextFieldInterface>(null);
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
@@ -43,9 +44,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       />
     );
   },
-) as component(
-  ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
-) React.Node;
+) as React.ComponentType<any>;
 
 export const renderInlineDefaultField = (
   {

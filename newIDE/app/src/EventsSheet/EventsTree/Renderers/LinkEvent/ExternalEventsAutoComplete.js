@@ -39,6 +39,7 @@ const getList = (
     })),
   ];
 
+  // $FlowFixMe[incompatible-type]
   return externalEvents;
 };
 

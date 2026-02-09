@@ -389,7 +389,7 @@ export const BehaviorStoreStateProvider = ({children, i18n, defaultSearchText}: 
   );
 
   return (
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     <BehaviorStoreContext.Provider value={behaviorStoreState}>
       {children}
     </BehaviorStoreContext.Provider>

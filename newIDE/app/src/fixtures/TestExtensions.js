@@ -303,7 +303,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       return false;
     };
     // $FlowFixMe[incompatible-type]
-    // $FlowFixMe[missing-this-annot]
+    // $FlowFixMe[cannot-write][missing-this-annot]
     fakeObject.getProperties = function() {
       const objectProperties = new gd.MapStringPropertyDescriptor();
       const objectContent = this.content;

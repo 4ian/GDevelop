@@ -47,7 +47,7 @@ const TwoStatesButton: React.ComponentType<any> = React.forwardRef<Props, TwoSta
       <ButtonGroup size="small" disableElevation disabled={disabled}>
         <Button
           id={leftButton.id}
-          {/* $FlowFixMe[incompatible-type] */}
+          // $FlowFixMe[incompatible-type] 
           {...dataObjectToProps(leftButtonDataset)}
           variant={isLeft ? 'contained' : 'outlined'}
           color={isLeft ? 'secondary' : 'default'}
@@ -60,7 +60,7 @@ const TwoStatesButton: React.ComponentType<any> = React.forwardRef<Props, TwoSta
         </Button>
         <Button
           id={rightButton.id}
-          {/* $FlowFixMe[incompatible-type] */}
+          // $FlowFixMe[incompatible-type] 
           {...dataObjectToProps(rightButtonDataset)}
           variant={!isLeft ? 'contained' : 'outlined'}
           color={!isLeft ? 'secondary' : 'default'}

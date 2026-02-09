@@ -109,6 +109,7 @@ export const quicklyAnalyzeVariableName = (
   projectScopedContainersAccessor?: ProjectScopedContainersAccessor,
   isObjectVariable: boolean = false
 ): VariableNameQuickAnalyzeResult => {
+  // $FlowFixMe[incompatible-type]
   if (!name) return VariableNameQuickAnalyzeResults.OK;
 
   for (let i = 0; i < name.length; ++i) {
@@ -118,8 +119,10 @@ export const quicklyAnalyzeVariableName = (
       // This probably starts an expression, so stop the analysis.
       break;
     } else if (character === ' ') {
+      // $FlowFixMe[incompatible-type]
       return VariableNameQuickAnalyzeResults.WRONG_SPACE;
     } else if (character === '"') {
+      // $FlowFixMe[incompatible-type]
       return VariableNameQuickAnalyzeResults.WRONG_QUOTE;
     } else if (
       character === '(' ||
@@ -128,6 +131,7 @@ export const quicklyAnalyzeVariableName = (
       character === '/' ||
       character === '*'
     ) {
+      // $FlowFixMe[incompatible-type]
       return VariableNameQuickAnalyzeResults.WRONG_EXPRESSION;
     }
   }
@@ -140,10 +144,12 @@ export const quicklyAnalyzeVariableName = (
       variablesContainer.has(rootVariableName)
     )
   ) {
+    // $FlowFixMe[incompatible-type]
     return VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE;
   }
 
   if (!projectScopedContainersAccessor) {
+    // $FlowFixMe[incompatible-type]
     return VariableNameQuickAnalyzeResults.OK;
   }
   const projectScopedContainers = projectScopedContainersAccessor.get();
@@ -154,6 +160,7 @@ export const quicklyAnalyzeVariableName = (
       .getObjectsContainersList()
       .hasObjectOrGroupNamed(rootVariableName)
   ) {
+    // $FlowFixMe[incompatible-type]
     return VariableNameQuickAnalyzeResults.NAME_COLLISION_WITH_OBJECT;
   }
 
@@ -167,13 +174,16 @@ export const quicklyAnalyzeVariableName = (
     );
 
     if (variableSource === gd.VariablesContainer.Parameters) {
+      // $FlowFixMe[incompatible-type]
       return VariableNameQuickAnalyzeResults.PARAMETER_WITH_CHILD;
     }
     if (variableSource === gd.VariablesContainer.Properties) {
+      // $FlowFixMe[incompatible-type]
       return VariableNameQuickAnalyzeResults.PROPERTY_WITH_CHILD;
     }
   }
 
+  // $FlowFixMe[incompatible-type]
   return VariableNameQuickAnalyzeResults.OK;
 };
 
@@ -469,9 +479,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
       </I18n>
     );
   },
-) as component(
-  ...{ ...Props, +ref?: React.RefSetter<VariableFieldInterface> }
-) React.Node;
+) as React.ComponentType<any>;
 
 export const renderVariableWithIcon = (
   {

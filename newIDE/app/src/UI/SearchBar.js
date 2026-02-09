@@ -105,6 +105,7 @@ const SearchBar: React.ComponentType<any> = React.forwardRef<Props, SearchBarInt
       parentValue
     );
 
+    // $FlowFixMe[value-as-type]
     const textField = React.useRef<?TextFieldInterface>(null);
 
     const nonEmpty = !!value && value.length > 0;

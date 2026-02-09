@@ -536,7 +536,7 @@ const makeShortTextForNamedProperty = (
   const choices =
     type.toLowerCase() === 'choice'
       ? [
-          // $FlowFixMe[incompatible-use]
+          // $FlowFixMe[incompatible-exact][incompatible-use]
           ...mapVector(property.getChoices(), choice => choice.getValue()),
           // TODO Remove this once we made sure no built-in extension still use `addExtraInfo` instead of `addChoice`.
           ...property.getExtraInfo().toJSArray(),

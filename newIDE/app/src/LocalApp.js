@@ -79,7 +79,7 @@ export const create = (authentication: Authentication): React.Node => {
                 />
               )}
               renderPreviewLauncher={(props, ref) => (
-                {/* $FlowFixMe[incompatible-type] */}
+                // $FlowFixMe[incompatible-type] 
                 <LocalPreviewLauncher {...props} ref={ref} />
               )}
               renderShareDialog={props => (

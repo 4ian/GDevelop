@@ -26,7 +26,9 @@ type EditorRef =
   | ExternalLayoutEditorContainer
   | ResourcesEditorContainer
   | SceneEditorContainer
+  // $FlowFixMe[value-as-type]
   | HomePageEditorInterface
+  // $FlowFixMe[value-as-type]
   | AskAiEditorInterface;
 
 type TabOptions = {| data?: HTMLDataset |};
@@ -643,6 +645,7 @@ const hasEditorTabOpenedWithKey = (
 export const getOpenedAskAiEditor = (
   state: EditorTabsState
 ): null | {|
+  // $FlowFixMe[value-as-type]
   askAiEditor: ?AskAiEditorInterface,
   editorTab: EditorTab,
   paneIdentifier: string,

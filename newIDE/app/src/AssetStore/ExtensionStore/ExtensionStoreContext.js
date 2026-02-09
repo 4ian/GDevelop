@@ -266,7 +266,7 @@ export const ExtensionStoreStateProvider = ({children, i18n, defaultSearchText}:
   );
 
   return (
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     <ExtensionStoreContext.Provider value={extensionStoreState}>
       {children}
     </ExtensionStoreContext.Provider>

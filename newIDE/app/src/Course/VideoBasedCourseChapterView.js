@@ -70,7 +70,7 @@ type Props = {|
 // $FlowFixMe[cannot-resolve-name]
 const VideoBasedCourseChapterView: React.ComponentType<Props> = React.forwardRef<Props, HTMLDivElement>(
   (
-    {/* $FlowFixMe[missing-local-annot] */}
+    // $FlowFixMe[missing-local-annot] 
     {
       chapterIndex,
       course,

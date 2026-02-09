@@ -177,6 +177,7 @@ const styles = {
 };
 
 type PageBreakNavigationProps = {|
+  // $FlowFixMe[value-as-type]
   currentPage: AssetStorePageState,
   pageBreakIndex: number,
   setPageBreakIndex: number => void,
@@ -259,6 +260,7 @@ type Props = {|
   // then currentPage is the current page of the navigator.
   // Or it can display arbitrary content, like the list of assets in a pack, or similar assets,
   // then currentPage is null.
+  // $FlowFixMe[value-as-type]
   currentPage?: AssetStorePageState,
   onlyShowAssets?: boolean,
   hideDetails?: boolean,

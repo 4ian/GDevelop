@@ -23,6 +23,7 @@ import { type DraggedItem } from '../DragAndDrop/DragSourceAndDropTarget';
 import classNames from 'classnames';
 import { TreeViewRightPrimaryButton } from './TreeViewRightPrimaryButton';
 
+// $FlowFixMe[missing-local-annot]
 const stopPropagation = e => e.stopPropagation();
 
 const DELAY_BEFORE_OPENING_FOLDER_ON_DRAG_HOVER = 800;
@@ -30,6 +31,7 @@ const DELAY_BEFORE_OPENING_CONTEXT_MENU_ON_MOBILE = 1000;
 export const TREE_VIEW_ROW_HEIGHT = 32;
 const COLLAPSABLE_LINE_SIDE_DROP_ZONE_HEIGHT = 6;
 
+// $FlowFixMe[cannot-resolve-name]
 const onInputKeyDown = (event: KeyboardEvent) => {
   if (navigationKeys.includes(event.key)) {
     // Prevent navigating in the tree view when renaming an item.
@@ -50,6 +52,7 @@ const SemiControlledRowInput = ({
   onBlur: () => void,
 }) => {
   const [value, setValue] = React.useState<string>(initialValue);
+  // $FlowFixMe[cannot-resolve-name]
   const inputRef = React.useRef<?HTMLInputElement>(null);
 
   /**
@@ -107,6 +110,7 @@ const SemiControlledRowInput = ({
   );
 };
 
+// $FlowFixMe[missing-local-annot]
 const memoized = memoizeOne((initialValue, callback) => callback());
 
 type Props<Item> = {|
@@ -117,6 +121,7 @@ type Props<Item> = {|
   isScrolling?: boolean,
 |};
 
+// $FlowFixMe[missing-local-annot]
 const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   const { data, index, style } = props;
   const {
@@ -145,8 +150,10 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   const [whereToDrop, setWhereToDrop] = React.useState<
     'before' | 'after' | 'inside'
   >('before');
+  // $FlowFixMe[cannot-resolve-name]
   const containerRef = React.useRef<?HTMLDivElement>(null);
   const openContextMenu = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     ({ clientX, clientY }) => {
       onContextMenu({
         index: index,
@@ -163,6 +170,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   });
 
   const onClickItem = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     event => {
       if (!node || node.item.isPlaceholder) return;
       if (node.item.isRoot) {
@@ -176,6 +184,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   );
 
   const onDoubleClickItem = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     e => {
       if (!node || !node.hasChildren || node.disableCollapse) return;
       onOpen(node);
@@ -184,6 +193,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   );
 
   const selectAndOpenContextMenu = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     (event: MouseEvent) => {
       if (!node.item.isRoot) onClickItem(event);
       openContextMenu(event);
@@ -247,6 +257,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   const displayAsFolder = node.canHaveChildren;
 
   // Create an empty pixel image once to override the default drag preview of all items.
+  // $FlowFixMe[cannot-resolve-name]
   const emptyImage = new Image();
   emptyImage.src = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 
@@ -268,7 +279,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
               name: node.name,
               thumbnail: node.thumbnailSrc || undefined,
               is3D:
-                // $FlowFixMe[incompatible-type]
+                // $FlowFixMe[incompatible-type][prop-missing]
                 !!node.item.content &&
                 !!node.item.content.is3D &&
                 // $FlowFixMe[incompatible-type]
@@ -577,5 +588,5 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   );
 };
 
-// $FlowFixMe[incompatible-type] - memo does not support having a generic in the props.
-export default React.memo<Props>(TreeViewRow, areEqual) as component(...any) React.Node;
+// $FlowFixMe[incompatible-type][missing-type-arg] - memo does not support having a generic in the props.
+export default React.memo<Props>(TreeViewRow, areEqual) as React.ComponentType<any>;

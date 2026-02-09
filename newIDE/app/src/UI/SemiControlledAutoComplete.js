@@ -39,6 +39,7 @@ export type AutoCompleteOption =
       value: string, // The value to show on screen and to be selected
       translatableValue?: MessageDescriptor,
       onClick?: () => void | Promise<void>, // If defined, will be called when the item is clicked. onChange/onChoose won't be called.
+      // $FlowFixMe[prop-missing]
       renderIcon?: ?() => React.Element<typeof ListIcon | typeof SvgIcon>,
       disabled?: boolean, // If true, the item is disabled and cannot be selected.
     |};
@@ -53,8 +54,11 @@ type Props = {|
   dataSource: DataSource,
 
   id?: ?string,
+  // $FlowFixMe[cannot-resolve-name]
   onBlur?: (event: SyntheticFocusEvent<HTMLInputElement>) => void,
+  // $FlowFixMe[cannot-resolve-name]
   onClick?: (event: SyntheticPointerEvent<HTMLInputElement>) => void,
+  // $FlowFixMe[cannot-resolve-name]
   onFocus?: (event: SyntheticFocusEvent<HTMLInputElement>) => void,
   commitOnInputChange?: boolean,
   onRequestClose?: () => void,
@@ -185,6 +189,7 @@ const filterFunction = (
 };
 
 const handleChange = (
+  // $FlowFixMe[cannot-resolve-name]
   input: HTMLInputElement,
   option: AutoCompleteOption,
   props: Props
@@ -227,6 +232,7 @@ const getDefaultStylingProps = (params: Object, props: Props): Object => {
       ...inputProps,
       className: null,
       disabled: props.disabled,
+      // $FlowFixMe[cannot-resolve-name]
       onKeyDown: (event: SyntheticKeyboardEvent<HTMLInputElement>): void => {
         if (shouldCloseOrCancel(event)) {
           if (props.onRequestClose) props.onRequestClose();
@@ -254,6 +260,7 @@ const getOptionLabel = (option: AutoCompleteOption, value: string): string =>
 
 export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
   function SemiControlledAutoComplete(props, ref) {
+    // $FlowFixMe[cannot-resolve-name]
     const input = React.useRef((null: ?HTMLInputElement));
     const [inputValue, setInputValue] = useState((null: string | null));
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -290,6 +297,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
       : null;
     
     const handleInputChange = (
+      // $FlowFixMe[cannot-resolve-name]
       event: SyntheticKeyboardEvent<HTMLInputElement>,
       value: string,
       reason: string,
@@ -308,6 +316,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
           freeSolo
           classes={classes}
           onChange={(
+            // $FlowFixMe[cannot-resolve-name]
             event: SyntheticKeyboardEvent<HTMLInputElement>,
             option: AutoCompleteOption | null,
           ) => {
@@ -359,6 +368,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
                   ...inputProps,
                   onClick: props.onClick,
                   onFocus: (
+                    // $FlowFixMe[cannot-resolve-name]
                     event: SyntheticFocusEvent<HTMLInputElement>,
                   ): void => {
                     setIsMenuOpen(true);
@@ -369,6 +379,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
                   // We do this because the default behavior of the Autocomplete is not
                   // to call onChange when blurred (though it should according to the docs?).
                   onBlur: (
+                    // $FlowFixMe[cannot-resolve-name]
                     event: SyntheticFocusEvent<HTMLInputElement>,
                   ): void => {
                     setInputValue(null);
@@ -382,6 +393,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
                     if (props.onBlur) props.onBlur(event);
                   },
                   onMouseDown: (
+                    // $FlowFixMe[cannot-resolve-name]
                     event: SyntheticMouseEvent<HTMLInputElement>,
                   ): void => {
                     // Toggle the menu when clicked and empty
@@ -405,6 +417,4 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
       </I18n>
     );
   },
-) as component(
-  ...{ ...Props, +ref?: React.RefSetter<SemiControlledAutoCompleteInterface> }
-) React.Node;
+) as React.ComponentType<any>;

@@ -23,6 +23,7 @@ import { TextFieldWithButtonLayout } from '../../UI/Layout';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectEffectNameField(props: ParameterFieldProps, ref) {
+    // $FlowFixMe[value-as-type]
     const field = React.useRef<?GenericExpressionField | SelectFieldInterface>(
       null,
     );
@@ -79,11 +80,13 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       );
       if (group) {
         const effectsNamesByObject: Array<Array<string>> = mapVector(
+          // $FlowFixMe[incompatible-exact]
           group.getAllObjectsNames(),
           objectName => {
             const object = getObjectByName(
               globalObjectsContainer,
               objectsContainer,
+              // $FlowFixMe[incompatible-type]
               objectName,
             );
             if (!object) {
@@ -115,6 +118,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       setIsExpressionField(!isExpressionField);
     };
     
+    // $FlowFixMe[missing-local-annot]
     const onChangeSelectValue = (event, value) => {
       props.onChange(event.target.value);
     };
@@ -190,6 +194,4 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       />
     );
   },
-) as component(
-  ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
-) React.Node;
+) as React.ComponentType<any>;

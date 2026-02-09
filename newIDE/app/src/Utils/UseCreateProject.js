@@ -63,7 +63,9 @@ type Props = {|
   loadFromProject: (
     project: gdProject,
     fileMetadata: ?FileMetadata
+  // $FlowFixMe[value-as-type]
   ) => Promise<State>,
+  // $FlowFixMe[value-as-type]
   openFromFileMetadata: (fileMetadata: FileMetadata) => Promise<?State>,
   onProjectSaved: (fileMetadata: ?FileMetadata) => void,
   ensureResourcesAreMoved: (
@@ -160,6 +162,7 @@ const useCreateProject = (
       try {
         if (!newProjectSource) return { createdProject: null }; // New project creation aborted.
 
+        // $FlowFixMe[value-as-type]
         let state: ?State;
         const sourceStorageProvider = newProjectSource.storageProvider;
         const sourceStorageProviderOperations = sourceStorageProvider

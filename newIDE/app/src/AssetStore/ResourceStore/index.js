@@ -387,6 +387,7 @@ const SvgResourceListAndFilters = ({
 type Props = {
   selectedResourceIndex?: ?number,
   onSelectResource: (?number) => void,
+  // $FlowFixMe[value-as-type]
   resourceKind: ResourceKindSupportedByResourceStore,
 };
 

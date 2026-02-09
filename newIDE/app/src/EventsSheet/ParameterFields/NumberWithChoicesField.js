@@ -22,6 +22,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const {value, onChange, parameterIndex, parameterMetadata, isInline} = props;
     
     const field = React.useRef<
+      // $FlowFixMe[value-as-type]
       ?(GenericExpressionField | SelectFieldInterface),
     >(null);
     
@@ -59,6 +60,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       setIsExpressionField(!isExpressionField);
     };
     
+    // $FlowFixMe[missing-local-annot]
     const onChangeSelectValue = (event, value) => {
       onChange(event.target.value);
     };
@@ -128,6 +130,4 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       />
     );
   },
-) as component(
-  ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
-) React.Node;
+) as React.ComponentType<any>;

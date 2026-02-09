@@ -338,7 +338,7 @@ export const ResourceStoreStateProvider = ({children}: ResourceStoreStateProvide
   );
 
   return (
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     <ResourceStoreContext.Provider value={resourceStoreState}>
       {children}
     </ResourceStoreContext.Provider>

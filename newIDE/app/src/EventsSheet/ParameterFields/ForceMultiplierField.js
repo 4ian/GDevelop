@@ -85,9 +85,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       </Column>
     );
   },
-) as component(
-  ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
-) React.Node;
+) as React.ComponentType<any>;
 
 export const renderInlineForceMultiplier = ({value}: ParameterInlineRendererProps): string | React.Node => {
   if (value === '1') return <Trans>{`a permanent`}</Trans>;

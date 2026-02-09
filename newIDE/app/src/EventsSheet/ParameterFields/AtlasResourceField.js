@@ -50,6 +50,4 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       />
     );
   },
-) as component(
-  ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
-) React.Node;
+) as React.ComponentType<any>;

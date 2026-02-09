@@ -16,6 +16,7 @@ import {
 } from '../../EmbeddedGame/EmbeddedGameFrame';
 
 export class ResourcesEditorContainer extends React.Component<RenderEditorContainerProps> {
+  // $FlowFixMe[value-as-type]
   editor: ?ResourcesEditor;
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {

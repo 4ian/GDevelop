@@ -25,7 +25,7 @@ const fakeLeaderboard: Leaderboard = {
 };
 
 export const Default = (): React.Node => (
-  {/* $FlowFixMe[incompatible-type] */}
+  // $FlowFixMe[incompatible-type] 
   <LeaderboardOptionsDialog
     open
     onClose={() => action('onClose')()}

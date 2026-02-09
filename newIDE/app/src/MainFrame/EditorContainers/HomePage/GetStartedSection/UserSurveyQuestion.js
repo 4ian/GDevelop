@@ -360,7 +360,7 @@ type Props = {|
 // $FlowFixMe[cannot-resolve-name]
 const UserSurveyQuestion: React.ComponentType<Props> = React.forwardRef<Props, HTMLDivElement>(
   (
-    {/* $FlowFixMe[missing-local-annot] */}
+    // $FlowFixMe[missing-local-annot] 
     {
       questionData,
       onSelectAnswer,

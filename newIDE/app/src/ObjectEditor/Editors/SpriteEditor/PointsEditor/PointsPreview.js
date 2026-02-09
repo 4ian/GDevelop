@@ -300,7 +300,7 @@ const PointsPreview = (props: Props): React.MixedElement => {
 
   const nonDefaultPoints = pointsContainer.getAllNonDefaultPoints();
   const backgroundPointNames = [
-    // $FlowFixMe[incompatible-use]
+    // $FlowFixMe[incompatible-exact][incompatible-use]
     ...mapVector(nonDefaultPoints, (point, i) => point.getName()),
     'Origin',
     'Center',

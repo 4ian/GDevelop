@@ -51,7 +51,7 @@ export const SimpleTextField: component(...SimpleTextFieldProps) renders SimpleT
   // $FlowFixMe[incompatible-type]
   SimpleTextFieldInterface
 >(
-  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[incompatible-exact][incompatible-type]
   React.forwardRef<SimpleTextFieldProps, SimpleTextFieldInterface>(
     (props, ref) => {
       // $FlowFixMe[cannot-resolve-name]

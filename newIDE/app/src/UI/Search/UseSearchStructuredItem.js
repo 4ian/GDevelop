@@ -17,6 +17,7 @@ type SearchableItem =
   | ExampleShortHeader
   | BehaviorShortHeader
   | ObjectShortHeader
+  // $FlowFixMe[value-as-type]
   | ObjectCategory
   | PrivateGameTemplateListingData;
 
@@ -389,7 +390,7 @@ export const filterSearchResults = <SearchItem: SearchableItem>(
       return passTier && passChosenFilters;
     })
     .filter(({ item }) => {
-      // $FlowFixMe[incompatible-type] Only categories are excluded.
+      // $FlowFixMe[incompatible-type][value-as-type] Only categories are excluded.
       const category: ObjectCategory = item;
       return (isSearchTextEmpty && !chosenItemCategory) || !category.categoryId;
     });

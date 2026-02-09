@@ -246,6 +246,7 @@ export const AssetStore: React.ComponentType<any> = React.forwardRef<Props, Asse
       openedAssetShortHeader != null
     );
     const setScrollUpdateIsNeeded = React.useCallback(
+      // $FlowFixMe[value-as-type]
       (page: AssetStorePageState) => {
         hasAppliedSavedScrollPosition.current = false;
         isAssetDetailLoading.current = page.openedAssetShortHeader !== null;
@@ -274,6 +275,7 @@ export const AssetStore: React.ComponentType<any> = React.forwardRef<Props, Asse
       assetStoreError || privateGameTemplateStoreError || bundleStoreError;
 
     const reApplySearchTextIfNeeded = React.useCallback(
+      // $FlowFixMe[value-as-type]
       (page: AssetStorePageState): boolean => {
         const previousSearchText = page.searchText || '';
         if (searchText !== previousSearchText) {
@@ -314,6 +316,7 @@ export const AssetStore: React.ComponentType<any> = React.forwardRef<Props, Asse
     );
     // This is also called when the asset detail page has loaded.
     const applyBackScrollPosition = React.useCallback(
+      // $FlowFixMe[value-as-type]
       (page: AssetStorePageState) => {
         if (hasAppliedSavedScrollPosition.current) {
           return;

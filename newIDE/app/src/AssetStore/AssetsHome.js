@@ -240,7 +240,7 @@ export const AssetsHome: React.ComponentType<any> = React.forwardRef<Props, Asse
     const categoryTiles = React.useMemo(
       () =>
         Object.entries(shopCategories).map(
-          // $FlowFixMe[incompatible-type][incompatible-use] - Object.entries does not infer well the type of the value.
+          // $FlowFixMe[incompatible-use] - Object.entries does not infer well the type of the value.
           ([id, { title, imageSource, imageAlt }]) =>
             onlyShowAssets && id === 'game-template' ? null : (
               <CategoryTile

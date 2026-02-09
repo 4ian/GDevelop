@@ -661,7 +661,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
                 <div style={{ flex: 1 }}>
                   <AutoSizer style={{ width: '100%' }} disableWidth>
                     {({ height }) => (
-                      {/* $FlowFixMe[incompatible-type] */}
+                      // $FlowFixMe[incompatible-type] 
                       <TreeView
                         key={listKey}
                         ref={treeViewRef}

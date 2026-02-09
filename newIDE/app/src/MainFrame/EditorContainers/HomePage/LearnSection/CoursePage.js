@@ -356,7 +356,7 @@ const CoursePage = (
                     key={chapter.id}
                   >
                     {chapter.videoUrl ? (
-                      {/* $FlowFixMe[incompatible-type] */}
+                      // $FlowFixMe[incompatible-type] 
                       <VideoBasedCourseChapterView
                         chapterIndex={index}
                         course={course}
@@ -380,7 +380,7 @@ const CoursePage = (
                         }}
                       />
                     ) : (
-                      {/* $FlowFixMe[incompatible-type] */}
+                      // $FlowFixMe[incompatible-type] 
                       <TextBasedCourseChapterView
                         chapterIndex={index}
                         course={course}

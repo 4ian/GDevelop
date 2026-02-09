@@ -327,7 +327,7 @@ const TextField: React.ComponentType<any> = React.forwardRef<Props, TextFieldInt
           rows={props.rows}
           rowsMax={props.rowsMax}
           // Styling:
-          {/* $FlowFixMe[incompatible-type] */}
+          // $FlowFixMe[incompatible-type] 
           {...computeTextFieldStyleProps(props)}
           fullWidth={props.fullWidth}
           InputProps={{

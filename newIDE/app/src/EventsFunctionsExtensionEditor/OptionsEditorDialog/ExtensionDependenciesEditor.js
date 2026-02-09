@@ -107,7 +107,7 @@ export const ExtensionDependenciesEditor = ({eventsFunctionsExtension, project, 
               // $FlowFixMe[incompatible-exact]
               eventsFunctionsExtension.getAllDependencies(),
               (dependency, index) => (
-                {/* $FlowFixMe[incompatible-type] - unsure why Flow complains about TableRow. */}
+                // $FlowFixMe[incompatible-type] - unsure why Flow complains about TableRow. 
                 <TableRow key={dependency.getName()}>
                   <TableRowColumn>
                     <CompactSemiControlledTextField
@@ -235,7 +235,7 @@ export const ExtensionDependenciesEditor = ({eventsFunctionsExtension, project, 
               // $FlowFixMe[incompatible-exact]
               eventsFunctionsExtension.getAllSourceFiles(),
               (sourceFile, index) => (
-                {/* $FlowFixMe[incompatible-type] - unsure why Flow complains about TableRow. */}
+                // $FlowFixMe[incompatible-type] - unsure why Flow complains about TableRow. 
                 <TableRow key={sourceFile.getResourceName()}>
                   <TableRowColumn>
                     <CompactResourceSelectorWithThumbnail

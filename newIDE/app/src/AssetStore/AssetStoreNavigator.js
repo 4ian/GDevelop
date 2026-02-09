@@ -605,7 +605,7 @@ export const AssetStoreNavigatorStateProvider = (props: AssetStoreNavigatorState
   );
 
   return (
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     <AssetStoreNavigatorContext.Provider value={state}>
       {props.children}
     </AssetStoreNavigatorContext.Provider>

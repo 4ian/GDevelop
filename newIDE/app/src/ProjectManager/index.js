@@ -1378,7 +1378,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     >
                       <AutoSizer style={styles.autoSizer} disableWidth>
                         {({ height }) => (
-                          {/* $FlowFixMe[incompatible-type] */}
+                          // $FlowFixMe[incompatible-type] 
                           <TreeView
                             key={listKey}
                             ref={treeViewRef}
@@ -1464,7 +1464,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                       isListLocked={false}
                     />
                   )}
-                  {/* $FlowFixMe[constant-condition] */}
+                  // $FlowFixMe[constant-condition] 
                   {!!editedPropertiesLayout &&
                     project &&
                     projectScopedContainersAccessor && (

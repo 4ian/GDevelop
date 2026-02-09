@@ -120,7 +120,7 @@ const SelectField: React.ComponentType<any> = React.forwardRef<Props, SelectFiel
             id={props.id}
             select
             color="secondary"
-            {/* $FlowFixMe[incompatible-type] */}
+            // $FlowFixMe[incompatible-type] 
             {...computeTextFieldStyleProps(props)}
             disabled={props.disabled}
             fullWidth={props.fullWidth}

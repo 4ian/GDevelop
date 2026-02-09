@@ -622,7 +622,7 @@ export const AssetStoreStateProvider = ({children}: AssetStoreStateProviderProps
   );
 
   return (
-    {/* $FlowFixMe[incompatible-type] */}
+    // $FlowFixMe[incompatible-type] 
     <AssetStoreContext.Provider value={assetStoreState}>
       {children}
     </AssetStoreContext.Provider>

@@ -24,6 +24,7 @@ const styles = {
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function TrueFalseField(props: ParameterFieldProps, ref) {
+    // $FlowFixMe[value-as-type]
     const button = React.useRef<?TwoStatesButtonInterface>(null);
     const focus: FieldFocusFunction = options => {
       if (button.current) button.current.focusLeftButton();
@@ -66,9 +67,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       </Column>
     );
   },
-) as component(
-  ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
-) React.Node;
+) as React.ComponentType<any>;
 
 export const renderInlineTrueFalse = ({value, parameterMetadata}: ParameterInlineRendererProps): React.Node => {
   if (getParameterValueOrDefault(value, parameterMetadata) === 'True') {

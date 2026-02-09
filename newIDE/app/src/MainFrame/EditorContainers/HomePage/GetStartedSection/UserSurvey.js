@@ -193,7 +193,7 @@ const DesktopDisplay = ({
     <SectionContainer flexBody>
       <ColumnStackLayout noMargin>
         {questionsPropsToRender.map((props, index) => (
-          {/* $FlowFixMe[incompatible-type] */}
+          // $FlowFixMe[incompatible-type] 
           <UserSurveyQuestion
             {...props}
             ref={

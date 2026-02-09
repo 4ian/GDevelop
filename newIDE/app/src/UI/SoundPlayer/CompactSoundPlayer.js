@@ -61,6 +61,8 @@ const CompactSoundPlayer = ({
       const handleError = () => {
         if (!isMountedRef.current) return;
         setIsLoading(false);
+        setIsPlaying(false);
+        setIsAudioLoaded(false);
         if (onSoundError) onSoundError();
       };
 
